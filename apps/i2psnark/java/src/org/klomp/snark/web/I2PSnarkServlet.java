@@ -461,7 +461,7 @@ public class I2PSnarkServlet extends BasicServlet {
      */
     private boolean writeTorrents(PrintWriter out, HttpServletRequest req, boolean canWrite) throws IOException {
         /** dl, ul, down rate, up rate, peers, size */
-        final long stats[] = {0,0,0,0,0,0};
+        final long stats[] = new long[6];
         String peerParam = req.getParameter("p");
         String stParam = req.getParameter("st");
 
@@ -2479,8 +2479,8 @@ public class I2PSnarkServlet extends BasicServlet {
         if (!_context.isRouterContext()) {
             try {
                 // class only in standalone builds
-                Class helper = Class.forName("org.klomp.snark.standalone.ConfigUIHelper");
-                Method getLangSettings = helper.getMethod("getLangSettings", new Class[] {I2PAppContext.class});
+                Class<?> helper = Class.forName("org.klomp.snark.standalone.ConfigUIHelper");
+                Method getLangSettings = helper.getMethod("getLangSettings", I2PAppContext.class);
                 String langSettings = (String) getLangSettings.invoke(null, _context);
                 // If we get to here, we have the language settings
                 out.write("<tr><td>");
