@@ -864,7 +864,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                     if (ts.getAcked())
                         buf.append(" acked");
                     buf.append(" created:</b> ").append(DataHelper.formatTime(ts.getCreated()))
-                       .append(" <b>last use:</b> ").append(DataHelper.formatTime(ts.getDate()));
+                       .append(" <b>last used:</b> ").append(DataHelper.formatTime(ts.getDate()));
                     buf.append(" <b>expires in:</b> ").append(DataHelper.formatDuration2(expires)).append(" with ");
                     buf.append(size).append(" tags remaining");
                     if (ts.getNextKey() != null)
@@ -1178,8 +1178,11 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                                                          _context.clock().now(), newtsID, _myOBKeyID);
                     _tagSet = ts;
                     _currentOBTagSetID = newtsID;
-                    if (_log.shouldDebug())
-                        _log.debug("Got nextkey " + key + "\nratchet to new OB ES TS:\n" + ts);
+                    if (_log.shouldWarn())
+                        _log.warn("Got nextkey " + key +
+                                  "from " + (_destination != null ? _destination.toBase32() : "???") +
+                                  "\nold OB TS:\n" + oldts +
+                                  "\nratchet to new OB ES TS:\n" + ts);
                 } else {
                     // this is about my inbound tag set
                     if (key.equals(_hisOBKey)) {
@@ -1273,8 +1276,11 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                                                          _context.clock().now(), newtsID, _myIBKeyID,
                                                          MAX_RCV_WINDOW_ES, MAX_RCV_WINDOW_ES);
                     _nextIBRootKey = ts.getNextRootKey();
-                    if (_log.shouldDebug())
-                        _log.debug("Got nextkey " + key + "\nratchet to new IB ES TS:\n" + ts);
+                    if (_log.shouldWarn())
+                        _log.warn("Got nextkey " + key +
+                                  "from " + (_destination != null ? _destination.toBase32() : "???") +
+                                  "\nold IB TS ID #" + oldtsID +
+                                  "\nratchet to new IB ES TS:\n" + ts);
                 }
             }
         }

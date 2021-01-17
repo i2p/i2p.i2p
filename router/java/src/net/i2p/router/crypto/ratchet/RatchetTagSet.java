@@ -81,6 +81,7 @@ class RatchetTagSet implements TagSetHandle {
     private static final byte[] ZEROLEN = new byte[0];
     private static final int TAGLEN = RatchetSessionTag.LENGTH;
     private static final int MAX = 65535;
+    private static final boolean DEBUG = false;
     private static final boolean TEST_RATCHET = false;
     // 4 * max streaming window
     private static final int LOW = TEST_RATCHET ? (MAX - 512) : (MAX - 4096);
@@ -572,10 +573,16 @@ class RatchetTagSet implements TagSetHandle {
                 buf.append("\n  ").append(n).append('\t').append(tag.toBase64());
                 if (_sessionKeys != null) {
                     byte[] key = _sessionKeys.get(n);
-                    if (key != null)
+                    if (key != null) {
                         buf.append('\t').append(Base64.encode(key));
-                    else
+                    } else {
                         buf.append("\tTBD");
+                        // set DEBUG if you want to see them all
+                        if (!DEBUG) {
+                            buf.append(" (" + (sz - (i +1)) + " more)");
+                            break;
+                        }
+                    }
                 }
             }
         }
