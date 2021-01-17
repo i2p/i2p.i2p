@@ -95,7 +95,7 @@ public class ClientAppConfig {
     /** @since 0.7.12 */
     public final String uninstallargs;
     /** @since 0.9.42 */
-    private File configFile;
+    File configFile;
 
     public ClientAppConfig(String cl, String client, String a, long d, boolean dis) {
         this(cl, client, a, d, dis, null, null, null);

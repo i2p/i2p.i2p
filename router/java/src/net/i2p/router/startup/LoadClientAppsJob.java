@@ -36,7 +36,8 @@ public class LoadClientAppsJob extends JobImpl {
             if (_loaded) return;
             _loaded = true;
         }
-        List<ClientAppConfig> apps = ClientAppConfig.getClientApps(getContext());
+        RouterContext ctx = getContext();
+        List<ClientAppConfig> apps = ClientAppConfig.getClientApps(ctx);
         if (apps.isEmpty()) {
             _log.logAlways(Log.WARN, "Warning - No client apps or router console configured - we are just a router");
             System.err.println("Warning - No client apps or router console configured - we are just a router");
@@ -47,7 +48,7 @@ public class LoadClientAppsJob extends JobImpl {
             if (app.disabled) {
                 if ("net.i2p.router.web.RouterConsoleRunner".equals(app.className)) {
                     String s = "Warning - Router console is disabled. To enable,\n edit the file " +
-                               ClientAppConfig.configFile(getContext()) +
+                               (ClientAppConfig.isSplitConfig(ctx) ? app.configFile : ClientAppConfig.configFile(ctx)) +
                                ",\n change the line \"clientApp." + i + ".startOnLoad=false\"" +
                                " to \"clientApp." + i + ".startOnLoad=true\",\n and restart.";
                     _log.logAlways(Log.WARN, s);
@@ -58,14 +59,14 @@ public class LoadClientAppsJob extends JobImpl {
             String argVal[] = parseArgs(app.args);
             if (app.delay == 0) {
                 // run this guy now
-                runClient(app.className, app.clientName, argVal, getContext(), _log);
+                runClient(app.className, app.clientName, argVal, ctx, _log);
             } else if (app.delay > 0) {
                 // wait before firing it up
-                DelayedRunClient drc = new DelayedRunClient(getContext().simpleTimer2(), getContext(), app.className,
+                DelayedRunClient drc = new DelayedRunClient(ctx.simpleTimer2(), ctx, app.className,
                                                             app.clientName, argVal);
                 drc.schedule(app.delay);
             } else {
-                WaitForRunningClient wfrc = new WaitForRunningClient(getContext().simpleTimer2(), getContext(),
+                WaitForRunningClient wfrc = new WaitForRunningClient(ctx.simpleTimer2(), ctx,
                                                                 app.className, app.clientName, argVal);
                 wfrc.schedule(1000);
             }
