@@ -55,7 +55,7 @@ import java.util.StringTokenizer;
  * This handles the starting and stopping of Jetty
  * from a single static class so it can be called via clients.config.
  *
- * This makes installation of a new eepsite a turnkey operation.
+ * This makes installation of a new I2P Site a turnkey operation.
  *
  * Usage: I2PControlController -d $PLUGIN [start|stop]
  *

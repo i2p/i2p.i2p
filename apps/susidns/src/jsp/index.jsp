@@ -78,7 +78,7 @@
 <p>
 <%=intl._t("The addressbook application regularly polls your subscriptions and merges their content into your \"router\" address book.")%>
 <%=intl._t("Then it merges your \"local\" address book into the router address book as well.")%>
-<%=intl._t("If configured, the router address book is now written to the \"published\" address book, which will be publicly available if you are running an eepsite.")%>
+<%=intl._t("If configured, the router address book is now written to the \"published\" address book, which will be publicly available if you are running an I2P Site.")%>
 </p><p>
 <%=intl._t("The router also uses a private address book, which is not merged or published.")%>
 <%=intl._t("Hosts in the private address book can be accessed by you but their addresses are never distributed to others.")%>

@@ -134,7 +134,7 @@
                     <%=intl._t("Try this if none of the tunnel types below fit your requirements, or you don't know what type of tunnel you need.")%>
                 </td></tr>
                 <tr><td>HTTP/HTTPS</td><td>
-                    <%=intl._t("Tunnel that acts as an HTTP proxy for reaching eepsites inside I2P.")%>
+                    <%=intl._t("Tunnel that acts as an HTTP proxy for reaching I2P Sites inside I2P.")%>
                     <%=intl._t("Set your browser to use this tunnel as an http proxy, or set your \"http_proxy\" environment variable for command-line applications in GNU/Linux.")%>
                     <%=intl._t("Websites outside I2P can also be reached if an HTTP proxy within I2P is known.")%>
                 </td></tr>
@@ -161,7 +161,7 @@
                 </td></tr>
                 <tr><td>HTTP</td><td>
                     <%=intl._t("A server tunnel that is customised for HTTP connections.")%>
-                    <%=intl._t("Use this tunnel type if you want to host an eepsite.")%>
+                    <%=intl._t("Use this tunnel type if you want to host an I2P Site.")%>
                 </td></tr>
                 <tr><td>IRC</td><td>
                     <%=intl._t("A customised server tunnel for hosting IRC networks inside I2P.")%>

@@ -73,6 +73,14 @@ img {
      border: none;
 }
 
+img:not(img[src$="i2plogo.png"]){     
+     image-rendering: -moz-crisp-edges;
+     image-rendering: -o-crisp-edges;
+     image-rendering: -webkit-optimize-contrast;
+     image-rendering: crisp-edges;
+     -ms-interpolation-mode: nearest-neighbor;
+}
+
 a:hover img {
      filter: drop-shadow(0 0 1px #f60);
 }
@@ -105,14 +113,11 @@ pre {
      padding: 8px;
      margin-bottom: 2px;
      text-align: center !important;
-     border: 1px solid #dee2e6;
      color: #33333f;
      font-size: 8pt;
      clear: left;/* fixes a bug in Opera */
      border-radius: 2px;
      background: #fafaff;
-     box-shadow: inset 0 0 0 1px #dee2e6;
-     filter: drop-shadow(0 0 1px #999daf);
 }
 
 .routersummary div[style="height: 36px;"] {

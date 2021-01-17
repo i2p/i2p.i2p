@@ -83,7 +83,7 @@ public class HomeHelper extends HelperBase {
         //_x("Key Server") + S + _x("OpenPGP Keyserver") + S + "http://keys.i2p/" + S + I + "education.png" + S +
         //"killyourtv.i2p" + S + _x("Debian and Tahoe-LAFS repositories") + S + "http://killyourtv.i2p/" + S + I + "television_delete.png" + S +
         _x("MuWire") + S + _x("Easy anonymous file sharing") + S + "http://muwire.i2p/" + S + I + "muwire.png" + S +
-        //_x("Open4You") + S + _x("Free eepsite hosting with PHP and MySQL") + S + "http://open4you.i2p/" + S + I + "open4you-logo.png" + S +
+        //_x("Open4You") + S + _x("Free I2P Site hosting with PHP and MySQL") + S + "http://open4you.i2p/" + S + I + "open4you-logo.png" + S +
         //_x("Pastebin") + S + _x("Encrypted I2P Pastebin") + S + "http://zerobin.i2p/" + S + I + "paste_plain.png" + S +
         _x("Planet I2P") + S + _x("I2P News") + S + "http://planet.i2p/" + S + I + "world.png" + S +
         //_x("I2P Plugins") + S + _x("Add-on directory") + S + "http://i2pwiki.i2p/index.php?title=Plugins" + S + I + "info/plugin_link.png" + S +
@@ -307,7 +307,7 @@ public class HomeHelper extends HelperBase {
         for (App app : apps) {
             String url;
             if (app.name.equals(website) && app.url.equals("http://127.0.0.1:7658/")) {
-                // fixup eepsite link
+                // fixup I2P Site link
                 url = SummaryBarRenderer.getEepsiteURL(pm);
                 if (url == null)
                     continue;

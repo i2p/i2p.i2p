@@ -22,8 +22,8 @@ class Dummy {
         _t("Web console");
         _t("SAM application bridge");
         _t("Application tunnels");
-        _t("My eepsite web server");
-        _t("I2P webserver (eepsite)");        
+        _t("My I2P Site web server");
+        _t("I2P webserver (I2P Site)");        
         _t("Browser launch at startup");
         _t("BOB application bridge");
         _t("I2P Router Console");
@@ -35,7 +35,7 @@ class Dummy {
         // keep the old string here as well for existing installs
         _t("shared clients");
         _t("IRC proxy");
-        _t("eepsite");
+        _t("I2P Site");
         _t("I2P webserver");
         _t("HTTP Proxy");        
         // hardcoded in i2psnark

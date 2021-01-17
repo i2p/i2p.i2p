@@ -77,7 +77,7 @@ class Daemon {
      *            client applications.
      * @param published
      *            The published AddressBook. This address book is published on
-     *            the user's eepsite so that others may subscribe to it.
+     *            the user's I2P Site so that others may subscribe to it.
      *            May be null.
      *            If non-null, overwrite with the new addressbook.
      * @param subscriptions
@@ -111,7 +111,7 @@ class Daemon {
      *            The NamingService to update, generally the root NamingService from the context.
      * @param published
      *            The published AddressBook. This address book is published on
-     *            the user's eepsite so that others may subscribe to it.
+     *            the user's I2P Site so that others may subscribe to it.
      *            May be null.
      *            If non-null, overwrite with the new addressbook.
      * @param subscriptions

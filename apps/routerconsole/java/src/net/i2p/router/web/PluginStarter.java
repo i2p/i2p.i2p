@@ -1009,7 +1009,7 @@ public class PluginStarter implements Runnable {
             return false;
         boolean rv = group.activeCount() > 0;
         
-        // Plugins start before the eepsite, and will create the static Timer thread
+        // Plugins start before the I2P Site, and will create the static Timer thread
         // in RolloverFileOutputStream, which never stops. Don't count it.
         // Ditto HSQLDB Timer (jwebcache)
         if (rv) {

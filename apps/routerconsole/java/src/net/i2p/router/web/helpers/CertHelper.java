@@ -65,7 +65,7 @@ public class CertHelper extends HelperBase {
             if (!hasTunnels)
                 output(_t("SAM"), null);
 
-            // Eepsite
+            // I2P Site
             tunnelDir = new File(dir, EEPSITE_DIR);
             hasTunnels = false;
             tunnels = tunnelDir.listFiles(new FileSuffixFilter(".crt"));

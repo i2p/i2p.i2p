@@ -68,7 +68,7 @@ import net.i2p.util.PortMapper;
  * Rewrite as http://i2p/$b64key/...
  *
  * If the $site resolves with the I2P naming service, then it is directed towards
- * that eepsite, otherwise it is directed towards this client's outproxy (typically
+ * that I2P Site, otherwise it is directed towards this client's outproxy (typically
  * "squid.i2p").  Only HTTP and HTTPS are supported (no ftp, mailto, etc).  Both GET
  * and POST have been tested, though other $methods should work.
  *
@@ -678,7 +678,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                         // allow i2paddresshelper=<b32>.b32.i2p syntax.
                                         /*
                                         also i2paddresshelper=name.i2p for aliases
-                                        i.e. on your eepsite put
+                                        i.e. on your I2P Site put
                                         <a href="?i2paddresshelper=name.i2p">This is the name I want to be called.</a>
                                          */
                                         Destination _dest = _context.namingService().lookup(ahelperKey);
@@ -1351,7 +1351,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             }
 
             // Redirect to non-addresshelper URL to not clog the browser address bar
-            // and not pass the parameter to the eepsite.
+            // and not pass the parameter to the I2P Site.
             // This also prevents the not-found error page from looking bad
             // Syndie can't handle a redirect of a POST
             if (ahelperPresent && !"POST".equals(method) && !"PUT".equals(method)) {
