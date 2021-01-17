@@ -19,6 +19,8 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientApp;
+import net.i2p.app.ClientAppManager;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -179,7 +181,18 @@ public class PersistSybil {
      *  @since 0.9.41
      */
     public synchronized void removeOld() {
-        long age = _context.getProperty(Analysis.PROP_REMOVETIME, Analysis.DEFAULT_REMOVE_TIME);
+        // if we don't have a console, don't keep too many
+        long removeTime = Analysis.SHORT_REMOVE_TIME;
+        ClientAppManager cmgr = _context.clientAppManager();
+        if (cmgr != null) {
+            ClientApp console = cmgr.getRegisteredApp("console");
+            if (console != null)
+                removeTime = Analysis.DEFAULT_REMOVE_TIME;
+        }
+        long age = _context.getProperty(Analysis.PROP_REMOVETIME, removeTime);
+        long freq2 = 2 * _context.getProperty(Analysis.PROP_FREQUENCY, Analysis.DEFAULT_FREQUENCY);
+        if (age < freq2)
+            age = freq2;
         if (age < 60*1000)
             return;
         long cutoff = _context.clock().now() - age;

@@ -96,7 +96,8 @@ public class Analysis extends JobImpl implements RouterApp {
     public static final boolean DEFAULT_BLOCK = true;
     public static final double DEFAULT_BLOCK_THRESHOLD = 50.0;
     public static final long DEFAULT_BLOCK_TIME = 7*24*60*60*1000L;
-    public static final long DEFAULT_REMOVE_TIME = 30*24*60*60*1000L;
+    public static final long DEFAULT_REMOVE_TIME = 10*24*60*60*1000L;
+    public static final long SHORT_REMOVE_TIME = 2*24*60*60*1000L;
     public static final long DEFAULT_FREQUENCY = 24*60*60*1000L;
     public static final float MIN_BLOCK_POINTS = 12.01f;
 
