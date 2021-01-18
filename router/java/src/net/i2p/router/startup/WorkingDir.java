@@ -81,22 +81,33 @@ public class WorkingDir {
             String home = System.getProperty("user.home");
             if (isWindows) {
                 String appdata = System.getenv("LOCALAPPDATA");
-                if (appdata != null)
+                if (appdata != null) {
                     home = appdata;
+                }
                 // Don't mess with existing Roaming Application Data installs,
                 // in case somebody is using roaming appdata for a reason
                 // already. In new installs, use local appdata by default. -idk
                 appdata = System.getenv("APPDATA");
                 if (appdata != null) {
                     File checkOld = new File(appdata, WORKING_DIR_DEFAULT_WINDOWS);
-                    if (checkOld.exists() && checkOld.isDirectory())
-                        home = appdata;
+                    if (checkOld.exists() && checkOld.isDirectory()){
+                        File routerConfig = new File(checkOld.getAbsolutePath(), "router.config");
+                        // The Firefox profile installer was mistakenly using the Roaming application data
+                        // which is synced between devices on some Windows machines using MS cloud services,
+                        // instead of the local application data which is used by default.
+                        // It would create the router.config file in an empty directory, which the router would
+                        // then attempt to use, resulting in a router with no client applications. Checking
+                        // for clients.config.d determines if the directory is "Real" or not.
+                        File clientAppsConfig = new File(checkOld.getAbsolutePath(), "clients.config.d");
+                        if (routerConfig.exists() && clientAppsConfig.exists() && clientAppsConfig.isDirectory())
+                            home = appdata;
+                    }
                 }
                 dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT_WINDOWS);
             } else if (SystemVersion.isMac()) {
                 String appdata = "/Library/Application Support/";
-		File old = new File(home,WORKING_DIR_DEFAULT);
-		if (old.exists() && old.isDirectory())
+                File old = new File(home,WORKING_DIR_DEFAULT);
+                if (old.exists() && old.isDirectory())
                     dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT);
                 else {
                     home = home+appdata;
