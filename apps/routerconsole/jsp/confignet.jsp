@@ -46,7 +46,7 @@
   </td>
  </tr>
  <tr>
-  <th id="upnpconfig"><%=intl._t("UPnP Configuration")%>&nbsp;<a href="peers#upnp">[<%=intl._t("UPnP Status")%>]</a></th>
+  <th id="upnpconfig"><%=intl._t("UPnP Configuration")%>&nbsp;<a href="peers?tx=upnp">[<%=intl._t("UPnP Status")%>]</a></th>
  </tr>
  <tr>
   <td>
