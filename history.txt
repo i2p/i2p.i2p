@@ -1,3 +1,22 @@
+2021-01-20 zzz
+ * Console: Fix link to UPnP status
+ * SSU: Fix deadlock with router restart
+
+2021-01-14 zzz
+ * Router:
+   - Change default encryption type to ECIES-X25519 (proposal 156)
+   - Move Sybil subsystem from console to router
+   - Limit max addresses in RI
+
+2021-01-13 zzz
+ * Jetty: Fix URI in request logs
+
+2021-01-12 zzz
+ * i2psnark: Don't decrement downloaded counter after receiving bad piece
+
+2021-01-11 zzz
+ * Console: Delete rrd files for no-longer-configured stats at startup
+
 2021-01-08 zzz
  * i2ptunnel: Disable shared clients (DSA) (part 2)
  * SSU: Fix bandwidth estimator deadlock (ticket #2798)

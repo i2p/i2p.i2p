@@ -2455,7 +2455,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // warning, this calls back into us with allowRebuildRouterInfo = false,
                 // via CSFI.createAddresses->TM.getAddresses()->updateAddress()->REA
                 if (allowRebuildRouterInfo)
-                    _context.router().rebuildRouterInfo();
+                    rebuildRouterInfo();
             } else {
                 addr = null;
             }
@@ -2510,10 +2510,34 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // warning, this calls back into us with allowRebuildRouterInfo = false,
                 // via CSFI.createAddresses->TM.getAddresses()->updateAddress()->REA
                 if (allowRebuildRouterInfo)
-                    _context.router().rebuildRouterInfo();
+                    rebuildRouterInfo();
             }
         }
     }
+
+    /**
+     *  Avoid deadlocks part 999
+     *  @since 0.9.49
+     */
+    private void rebuildRouterInfo() {
+        (new RebuildEvent()).schedule(0);
+    }
+
+    /**
+     *  @since 0.9.49
+     */
+    private class RebuildEvent extends SimpleTimer2.TimedEvent {
+        /**
+         *  Caller must schedule
+         */
+        public RebuildEvent() {
+            super(_context.simpleTimer2());
+        }
+        public void timeReached() {
+            _context.router().rebuildRouterInfo(true);
+        }
+    }
+
 
     /**
      *  Simple fetch of stored IP and port, since
