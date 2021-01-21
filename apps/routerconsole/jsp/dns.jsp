@@ -41,7 +41,7 @@
 </script>
 </head><body>
 <%@include file="summary.jsi" %>
-<h1><%=intl._t("I2P Addressbook")%> <span class="newtab"><a href="/susidns/index" target="_blank" title="<%=intl._t("Open in new tab")%>"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/newtab.png" /></a></span></h1>
+<h1><%=intl._t("I2P Address Book")%> <span class="newtab"><a href="/susidns/index" target="_blank" title="<%=intl._t("Open in new tab")%>"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/newtab.png" /></a></span></h1>
 <div class="main" id="dns">
 <iframe src="/susidns/index" width="100%" height="100%" frameborder="0" border="0" name="susidnsframe" id="susidnsframe" allowtransparency="true">
 <%=intl._t("Your browser does not support iFrames.")%>

@@ -520,7 +520,7 @@ textarea {
      font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      font-size: 9pt;
      width: 100%;
-     border-radius: 2px;
+     border-radius: 6px;
      border: 1px solid #999daf;
      padding: 1px 3px;
      color: #33333f;
@@ -542,7 +542,7 @@ textarea {
 }
 
 textarea[name="config"], textarea[name="content"] {
-     border-radius: 0;
+     border-radius: 6;
      box-shadow: none;
      border: 1px solid #dee2e6;
      background: #fafaff;
@@ -1050,7 +1050,7 @@ input[type="submit"], input[type="reset"], .fakebutton {
      font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif;
      padding: 4px 3px;
      text-decoration: none;
-     border-radius: 2px;
+     border-radius: 12px;
      border: 1px solid #999daf;
      box-shadow: inset 0 0 0 1px #fff;
      background: #eee;
