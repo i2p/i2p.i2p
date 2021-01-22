@@ -1270,7 +1270,7 @@ p:empty + .sb_notice {
      box-shadow: inset 0 0 0 1px #dee2e6;
 }
 
-.news, .main#news, .main#proof, .main#oldconsole, #warning2 {
+.news, .main#news, .main#oldconsole, #warning2 {
      background: #f6f6fa;
      background-size: 100% 100%, auto 160px, 100% 100% !important;
 }
@@ -1292,7 +1292,7 @@ p:empty + .sb_notice {
      min-width: 546px;
 }
 
-.main#proof, .main#oldconsole {
+.main#oldconsole {
      background-size: 100% 100%, auto 70%, 100% 100% !important;
 }
 
@@ -6423,7 +6423,7 @@ h3#ntcpcon, h3#udpcon {
      margin-bottom: 1px;
 }
 
-#oldconsole p, #proof p {
+#oldconsole p {
      margin: 20px 5px 10px;
      padding: 10px 0;
      line-height: 180%;
@@ -6439,39 +6439,6 @@ h3#ntcpcon, h3#udpcon {
      display: inline-block;
      min-width: 160px;
      text-align: right;
-}
-
-#proof textarea, #proof textarea:focus, #proof p {
-     margin: 0 !important;
-     padding: 0 !important;
-}
-
-#proof p {
-     margin: 15px 0 5px !important;
-     padding: 15px 0 0 20px !important;
-     width: calc(100% - 22px);
-}
-
-#proof p::before {
-     content: "";
-     display: inline-block;
-     background: url(/themes/console/images/info/rosette.png) right 5px top no-repeat !important;
-     background-size: 24px 24px;
-     height: 32px;
-     width: 100%;
-     margin: -8px 0 -10px;
-     opacity: 0.7;
-}
-
-#proof textarea, #proof textarea:focus {
-     background: none;
-     border: none;
-     box-shadow: none;
-     color: #33333f !important;
-     filter: none;
-     outline: none;
-     line-height: 160%;
-     height: 200px;
 }
 
 .homelinkedit th:first-child, #sidebarconf th:first-child, #consolepass th:first-child {
@@ -7429,17 +7396,6 @@ input[name="pluginURL"] {
      padding-left: 8px;
 }
 
-.main#proof {
-     padding: 0;
-     min-width: 576px;
-}
-
-.main#proof textarea {
-     margin: -5px 10px !important;
-     word-break: break-all;
-     white-space: pre-wrap;
-}
-
 .cells {
      padding: 3px 2px !important;
 }
@@ -7501,20 +7457,6 @@ input[name="pluginURL"] {
      display: inline-block;
      width: 100px;
      overflow: auto;
-}
-
-#proof p {
-     border: none;
-     box-shadow: none;
-     background: none;
-}
-
-#proof p::before {
-     display: inline;
-}
-
-#proof textarea {
-     padding-right: 15px !important;
 }
 }
 

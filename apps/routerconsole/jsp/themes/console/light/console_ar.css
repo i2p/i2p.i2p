@@ -10,7 +10,7 @@ pre {
      text-align: right;
 }
 
-#help pre, #logs li, #proof textarea {
+#help pre, #logs li {
      text-align: left;
      direction: ltr;
 }

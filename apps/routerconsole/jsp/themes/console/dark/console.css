@@ -4994,30 +4994,6 @@ ul#banlist + hr {
      margin-right: 5px;
 }
 
-#proof p {
-     margin: 15px;
-     padding: 30px 5px 0;
-     border: 1px solid #000;
-     border-radius: 2px;
-     box-shadow: inset 0 0 0 1px #020, 0 0 1px #000;
-     background: url(/themes/console/images/info/rosette.png) right 8px top 8px no-repeat #001900;
-     background: url(/themes/console/images/info/rosette.png) right 8px top 8px no-repeat rgba(0,32,0,0.4);
-     background-blend-mode: color-burn;
-}
-
-#proof textarea {
-     line-height: 160%;
-     font-size: 9pt;
-     overflow: hidden;
-     word-break: break-all;
-     white-space: pre-wrap;
-     height: 200px;
-}
-
-#proof textarea:focus {
-     outline: none;
-}
-
 #oldconsole p {
      margin: 15px 0 10px;
      padding: 10px 20px;
@@ -5443,21 +5419,6 @@ table#leasesetdebug th a:hover, table#leasesetsummary th a:hover {
 .main#certs textarea {
      margin: -1px 0 11px 0;
      width: 100%;
-}
-
-.main#proof {
-     padding: 0;
-}
-
-.main#proof textarea, .main#proof textarea:focus {
-     padding: 5px 20px;
-     margin: 0;
-     width: 100%;
-     border: none;
-     background: none !important;
-     box-shadow: none;
-     color: #e6e6e7 !important;
-     filter: none;
 }
 
 #leasesetdebug, #leasesetsummary {

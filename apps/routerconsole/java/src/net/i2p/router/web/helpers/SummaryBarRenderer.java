@@ -531,15 +531,6 @@ class SummaryBarRenderer {
            .append("</a>\n");
         svcs.put(tx, rbuf.toString());
 
-        tx = _t("Proof");
-        rbuf.setLength(0);
-        rbuf.append("<a title=\"")
-           .append(_t("Signed proof of ownership of this router"))
-           .append("\" href=\"/proof\" target=\"_top\">")
-           .append(nbsp(tx))
-           .append("</a>\n");
-        svcs.put(tx, rbuf.toString());
-
         tx = _t("Stats");
         rbuf.setLength(0);
         rbuf.append("<a href=\"/stats\" target=\"_top\" title=\"")
