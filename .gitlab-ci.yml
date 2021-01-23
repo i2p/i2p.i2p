@@ -59,4 +59,8 @@ build_docker:
         key: "$CI_COMMIT_REF_SLUG"
         paths:
             - ci-exports/*.tar
+    only:
+        - master
+        - merge_requests
+        - tags
 
