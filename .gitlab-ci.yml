@@ -2,6 +2,7 @@ image: openjdk:8-alpine
 
 stages:
     - test
+    - build
 
 cache:
     key: ${CI_COMMIT_REF_SLUG}
@@ -26,7 +27,7 @@ test:
 # Make sure we can build a docker image
 # It's cached for later jobs
 build_docker:
-    stage: test
+    stage: build
     image: docker:19.03.12
     services:
         - docker:19.03.12-dind
