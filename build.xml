@@ -1509,7 +1509,7 @@
 
     <target name="copyflags-unlesspkg" unless="${with-famfamfam-flag-png}" >
         <copy todir="pkg-temp/eepsite/docroot/help/lib/" >
-            <fileset dir="installer/resources/icons/flags/" includes="az.png cn.png de.png es.png fr.png hu.png id.png ir.png it.png jp.png nl.png pl.png pt.png ro.png ru.png se.png tr.png us.png" />
+            <fileset dir="installer/resources/icons/flags/" includes="az.png cn.png de.png es.png fr.png gr.png hu.png id.png ir.png it.png jp.png nl.png pl.png pt.png ro.png ru.png se.png tr.png ua.png us.png" />
         </copy>
         <copy todir="pkg-temp/docs/icons/flags" >
           <!-- base flags/ dir only. flags16x11/ dir now in the war -->

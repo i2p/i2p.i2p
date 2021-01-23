@@ -1,113 +1,183 @@
 <!DOCTYPE html>
-<html lang="zh">
- <head>
-  <title>I2P匿名网页服务器|欢迎来到您的eepsite</title>
-  <link rel="shortcut icon" href="favicon.ico" />
-  <link rel="stylesheet" type="text/css" href="lib/eepsite.css" />
-  <link rel="stylesheet" type="text/css" href="lib/eepsite_zh.css" />
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
- </head>
- <body>
-<div class="main">
-<div class="langbar">
-<!-- Some of these languages listed here are yet to be translated -->
+<html lang="zh_CN">
+<head>
+<title>I2P 匿名网页服务器</title>
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="stylesheet" type="text/css" href="lib/eepsite.css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+
+   <div class="main">
+
+   <div class="langbar">
 <a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
-<a href="index_zh.html"><img src="lib/cn.png" title="中文" alt="中文"></a>
-<a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a>
-<a href="index_es.html"><img src="lib/es.png" title="Español" alt="Español"></a>
-<a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
-<a href="index_na.html"><img src="lib/ir.png" title="فارسی" alt="فارسی"></a>
-<a href="index_na.html"><img src="lib/jp.png" title="日本語" alt="日本語"></a>
-<a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a>
-<a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a>
-<a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
+      <a href="index_zh.html"><img src="lib/cn.png" title="中文" alt="中文"></a>
+      <a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a>
+      <a href="index_es.html"><img src="lib/es.png" title="Español" alt="Español"></a>
+      <a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
+      <a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a>
+      <a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a>
+      <a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
 </div>
- <h1>I2P匿名网页服务器</h1>
-<h2>I2P匿名网页服务快速指南</h2>
 
- <p>这是您的eepsite，您自己的匿名I2P网络服务器 - 只要编辑 <code>~/.i2p/eepsite/docroot/</code> (Linux),
- <code>%LOCALAPPDATA%\I2P\eepsite\docroot\</code> (Windows),
- 或 <code>/Users/(user)/Library/Application Support/i2p</code> (Mac),  下的文件,并且按照以下说明操作后,别人就可以访问了.
- 在I2P,eepsites是用一个很长的Base64字串"密钥"来寻址访问的.
- (这"密钥"有点类似于IP地址,且会显示在eepsite的I2PTunnel上
- <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">配置页</a>).
- 以下说明详细解释了如何为您的密钥分配像"mysite.i2p"的名称并启动您的 eepsite</p>
- <p>您可以通过 
- <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>在本地访问您的eepsite.
-</p>
+    <h1>I2P 匿名网页服务器</h1>
 
- <h2>如何设置和宣告您的eepsite</h2>
-  <p>默认情况下,您的eepsite是停止运行的.
-  您启动它后，它将很难被其他人找到，因为它没有名称，其他人也没有您的很长的Base64密钥.
-  您可以告诉别人那真的很长的密钥，但值得庆幸的是,I2P有一个地址簿和几个简单的方法来告诉其他人您eepsite.这是详细说明.</p>
- <ul>
- <li>为您的eepsite选个名称(<i>something</i>.i2p).全部用小写字母.
-     您可能要先在<a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router&amp;filter=none">这里</a>检查自己路由器的地址簿,
-     或检查文件<code>i2p/hosts.txt</code>里,看看是否您的名称已经被占用.
-     在eepsite i2ptunnel <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">配置页</a>的“网站名称”部分输入您eepsite的新名称。这将替换缺省的"mysite.i2p".
-     同时，选中“自动启动”框。现在每次启动您的路由器时,您的eepsite也将启动.
-     请点击“保存”.</li>
- <li>在
-     <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">主i2ptunnel配置页</a>,点击您的eepsite启动按钮.
-     在
-     <a href="http://127.0.0.1:7657/index.jsp">I2P路由器控制台</a>的左侧,您应该可以看到"eepsite"列在"本地目标"下面.
-     您的 eepsite 现在正在运行了.</li>
- <li>在
-     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel 配置页</a>,突出显示全部的"本地目的地"的密钥.
-     并将它复制以备以后粘贴. 确保您复制到了完整的密钥 - 它有超过 500 个字符.</li>
- <li>在您的
-     <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">主地址簿</a>内,输入名称并粘贴目标密钥.
-     单击"添加"，将目标添加到您的址簿内。</li>
- <li>在您的浏览器内，输入您的 eepsite名称 (<i>something</i>.i2p)您应该会立刻返回这里. 希望它能生效.</li>
- <li>在您向全世界宣告您的新eepsite前，您应该增加一些内容.
-到<code>~/.i2p/eepsite/docroot/</code> (Linux),
- <code>%LOCALAPPDATA%\I2P\eepsite\docroot\</code> (Windows),
- 或 <code>/Users/(user)/Library/Application Support/i2p</code> (Mac),  并用自己的内容替换掉index.html重定向页面.虚拟文件夹会起作用，这样您就可以从一个子目录中提供文件服务而不用明确需要提供链接到文件的一个页面.如果您需要一个基本的网站模板, 请自由借来并适用 <a href="pagetemplate.html">本页</a> 和 <a href="lib/">内容</a> !</li>
-</ul>
-<h2>注册自己的.I2P域名</h2>
- <p>现在,是时候把您的eepsite加入到其它网站的I2P地址簿了
-     比如<a href="http://stats.i2p/">stats.i2p</a> 或<a href="http://no.i2p/">no.i2p</a>.
-     就是,您必须在一个或多个这样网站的网页界面输入您eepsite的名称和密钥.
-     这是在stats.i2p的<a href="http://stats.i2p/i2p/addkey.html">密钥输入表格</a>.
-     再说一次, 您的密钥是在
-     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel 配置页面</a>上的整个"本地目标"密钥.
-     确保您复制到了以"AAAA" or "A=="为结束的符完整的密钥.
-     不要忘记点击“添加一个密钥”.
-     检查看看是否报告密钥有添加.
-     由于许多路由器周期性地从这些网站获取更新地址簿,在几个小时内其他人就能够通过在他们的浏览器里简单的输入 <i>something</i>.i2p 来找到您的网站.
-</p><h2>添加地址簿订阅</h2>
- <p>说到地址簿更新,这会是个很好的时机来添加些更多的地址簿到您自己的<a href="http://127.0.0.1:7657/susidns/subscriptions.jsp">订阅列表</a>. 到您的订阅配置页面,并添加以下内容以自动更新新主机列表:</p><ul>
-     <li><a href="http://tino.i2p/hosts.txt">http://tino.i2p/hosts.txt</a></li>
-     <li><a href="http://stats.i2p/cgi-bin/newhosts.txt">http://stats.i2p/cgi-bin/newhosts.txt</a></li>
-     <li><a href="http://i2host.i2p/cgi-bin/i2hostetag">http://i2host.i2p/cgi-bin/i2hostetag</a></li>
-     <li><a href="http://no.i2p/export/alive-hosts.txt">http://no.i2p/export/alive-hosts.txt</a></li></ul>
- <ul><li>若您很匆忙不能等待几个小时，您可以告诉别人用“跳转”地址助手重定向服务.
-     这将会在您输入密钥到同一个网站上的地址簿内的几分钟内起作用.
-     自己先测试一下,在您的浏览器里输入<code>
-     http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code>
-     或 <code>http://i2host.i2p/cgi-bin/i2hostjump?<i>something</i>.i2p</code>
-     一旦开始工作，那么您就可以告诉别人来使用它.</li>
- <li>有些人会检查eepsite列表,如
- <a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p/status.php</a>或<a href="http://perv.i2p">perv.i2p</a> 以获取新eepsites,所以开始您可能会有几个访客. 但也有很多其他的方式来告诉人们.这里有一些点子:
-     <ul>
-     <li>在<a href="http://forum.i2p/viewforum.php?f=16">Eepsite宣告论坛</a>上发布一条消息
-         在<a href="http://forum.i2p/">forum.i2p</a>上.</li>
-     <li>在IRC的#i2p 或 #i2p-chat频道告诉人们您的eepsite站点</li>
-     <li>在<a href="http://syndie.i2p2.de/">新Syndie</a>上发一个新贴告诉人们您的eepsite站点.</li>
-     <li>把它放入<a href="http://ugha.i2p/EepsiteIndex">Ugha的 Eepsite 索引 Wiki</a></li>
-     </ul></ul>
-     <p>请注意，有些网站推荐贴那很长的目标密钥. 若您愿意您可以-但是,如果您已成功在添加密钥服务里发布您的密钥,使用跳转服务测试过了,并等待了24个小时以便地址簿更新传播给他人,这应该不是很必要.</p>
-<h2>更进一步的援助</h2>
-	<p>如果您有任何问题，以下地方可提供支持:</p>
-<ul>
-<li>我们的 IRC 支持频道: <ul><li><a href="irc://irc.freenode.net/i2p">在Freenode上的 #i2p </a></li>
-<li>匿名的,通过您常驻的 <a href="irc://127.0.0.1:6668/i2p-help">I2P IRC隧道</a>.</li></ul>
-	<li><a href="http://forum.i2p/viewforum.php?f=10">技术问题部分</a> 在
-     <a href="http://forum.i2p/">forum.i2p</a>.</li></ul>
-<div class="notify">
-<b>注:</b> 本页, 网站和控制台都需要翻译成您的语言，如果不是已经完成或在进展中,请考虑<a href="http://www.i2p2.i2p/getinvolved.html">奉献您的时间</a>来翻译 以帮助项目的成长. 请通过上面列出的IRC频道联系项目组. 先谢谢了!</div>
-<hr><div class="footnote">	
-文件最后编辑：2014.06</div>
+    <h2>在I2P上匿名部署网页的指导</h2>
+
+    <p>这是你自己的匿名I2P网页服务器（经常被称为一个<i>匿名网站</i>）。
+       如果要提供你自己的内容，简单地编辑在网页服务器根目录下的文件。如果你按照下面的说明操作，这个站点将会被发布。</p>
+
+    <p id="dir">网页服务器的根目录文件夹可以在如下几个位置找到，这要看你的操作系统：</p>
+
+    <ul>
+<li>
+<b>Linux</b><br>
+标准 安装:<code>~/.i2p/匿名网站/docroot/</code><br>
+包安装,作为一个运行服务,<code>/var/lib/i2p/i2p-配置/匿名网站/docroot/</code>
+</li>
+      <li>
+<b>Windows</b><br><code>%APPDATA%\I2P\eepsite\docroot\</code>
+</li>        
+      <li>
+<b>Mac</b><br><code>/Users/(user)/Library/Application Support/i2p</code>
+</li>
+    </ul>
+<p>在I2P中，隐藏服务使用以“ .b32.i2p”结尾的Base32地址或以长Base64字符串表示的Destination来寻址。
+在您按照以下说明分配寄存器名称之前，可以将Base32地址用作主机名。
+目标在某种程度上类似于IP地址，并显示在
+<a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">隐藏服务配置页面上</a></p>
+
+    <p>教程：如何为你的网站配置类似 "mysite.i2p" 的域名并允许他人访问。
+       你可以在本机访问<a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>进入你的网站。</p>
+
+    <h2>如何设置并发布你的隐藏服务</h2>
+
+     <p>网页服务默认开启，但在你开启隐藏服务隧道前他人不能访问。
+      尽管你开启了 I2P 网页服务器隧道，但他人很难访问你的网站。
+      这是因为匿名网站只能由一段很长的网址或原始网址的 Base32 编码(下称“编码网址”)（.b32.i2p）访问。
+      为了让他人访问，你可以直接告知他人你的匿名网站的原始网址或编码网址，但把网址加入 I2P 的地址簿会比较方便。
+      以下是详细说明。</p>
+
+    <ul>
+<li>Pick a name for your website (<i>something</i>.i2p), using lower-case.
+        You may wish to check first in your own router's <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">address book</a> to see if your name is already taken.
+        Enter the new name for your website on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a> where it says "Website name".
+        This will replace the default "mysite.i2p".
+        Also, if you would like your I2P Webserver tunnel to be automatically started when you start I2P, check the "Auto Start" box.
+        Your website will now start every time you start your router.
+        Be sure to click "Save".</li>
+      <li>Click the start button for your webserver tunnel on the <a href="http://127.0.0.1:7657/i2ptunnel/">main Hidden Service Manager page</a>.
+         You should now see it listed under "Local Tunnels" on the left side of the <a href="http://127.0.0.1:7657/">I2P Router Console</a>.
+         Your website is now running.</li>
+      <li>Highlight and copy the entire Local destination on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.
+         Make sure you copy the whole thing, it is over 500 characters.</li>
+      <li>Enter the name and paste the destination into your <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">address book</a>.
+         Click "Add" to save the new entry.</li>
+      <li>In your browser, enter in your website name (<i>something</i>.i2p) and you should be right back here. 
+          Hopefully it worked!</li>
+      <li>Before you tell the world about your new website, you should add some content.
+          Go to the server's root directory <a href="#dir">listed above</a> and replace the index.html redirect page with your own content.</li>
+    </ul>
+<p>Directory listings are enabled, so you may host files from a subdirectory without providing a page with links to the files. 
+      You may change the appearance of the directory by supplying an edited <a href="lib/jetty-dir.css">jetty-dir.css</a> file for each directory.
+      The <a href="lib/">lib subdirectory</a> demonstrates a custom style.
+      The <a href="lib/resources">resources subdirectory</a> demonstrates the default style.
+      If you need a template for a basic site, feel free to adapt <a href="pagetemplate.html">this page</a> and <a href="lib/">associated content</a>.</p>
+
+    <p>如果您在编辑内容后返回此页面，尝试清楚您的浏览器缓存：</p>
+
+    <ul>
+<li>
+<b>Firefox:</b> Preferences ➜ Advanced ➜ Network ➜ Cached Web Content ➜ Clear Now</li>
+      <li>
+<b>Chrome/Chromium:</b> Settings ➜ Advanced Settings ➜ Privacy ➜ Clear browsing data</li>
+      <li>
+<b>Opera:</b> Settings ➜ Privacy ➜ Clear browsing data</li>
+    </ul>
+<h2>注册您自己的I2P域名</h2>
+
+    <p>Now it is time to add your website to an I2P address book hosted by a site such as <a href="http://stats.i2p/%20" target="_blank">stats.i2p</a> or <a href="http://no.i2p/" target="_blank">no.i2p</a>. 
+      You must enter your website name and Destination (or Registration Authentication string) on one or more of these sites.</p>
+<p>Some registration sites require the Destination.
+      If so, highlight and copy the entire Local destination on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.
+      Make sure you copy the whole thing, it is over 500 characters.</p>
+<p>Some registration sites, including <a href="http://stats.i2p/i2p/addkey.html" target="_blank">stats.i2p</a>, require the Registration Authentication string.
+      It is found on the <a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">Registration Authentication page</a> linked from the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service configuration page</a>.
+      Copy the entire authentication string and paste it on the registration page. 
+      Make sure you copy the whole thing, it is over 500 characters.
+      Describe your site briefly if the site requests this information.
+      If your site is a HTTP service, leave the checkbox selected; if not, unselect it.</p>
+<p>对于所有注册站点，请仔细阅读服务条款。
+点击“提交”按钮。
+验证提交是否成功。
+由于许多路由器会定期从这些站点获取地址簿更新，因此在几个小时之内，其他路由器只需在其浏览器中输入您的主机名就能找到您的网站。</p>
+
+    <h2>添加地址簿订阅</h2>
+
+    <p>说到地址簿更新，这是将更多地址簿添加到您自己的订阅列表中的好时机。
+  转到<a href="http://127.0.0.1:7657/susidns/subscriptions">订阅配置页面</a>并添加一个或多个自动更新的新主机列表：</p>
+
+    <ul>
+<li>
+<code>http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
+      <li>
+<code>http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
+    </ul>
+<p>如果您赶时间并且不能等几个小时，可以告诉人们使用“跳转”地址帮助程序重定向服务。
+   将会在您同一站点上注册主机名后的几分钟内生效。
+  首先，通过在浏览器中输入<code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>某</i>.i2p</code>进入您的浏览器。
+  一旦运行，您就可以告诉其他人使用它。</p>
+
+    <p>Some people check website lists such as <a href="http://identiguy.i2p/" target="_blank">Identiguy's eepsite status list</a> or <a href="http://no.i2p/browse/" target="_blank">no.i2p's active host list</a> for new eepsites, so your site may start getting some traffic. 
+      There are plenty of other ways to tell people. Here are a few ideas:</p>
+
+    <ul>
+<li>在<a href="http://i2pforum.i2p/" target="_blank">I2P 论坛</a>发布消息给所有人介绍你的新I2P网站！</li>
+      <li>在IRC #i2p 或者 #i2p-chat 频道告诉人们.</li>
+      <li>Put it on the <a href="http://i2pwiki.i2p/index.php?title=Eepsite/Services" target="_blank">I2PWiki Eepsite Index</a>
+</li>
+    </ul>
+<p>Note that some sites recommend pasting in that really long destination.
+      You can if you want, but if you have successfully registered your hostname on a registration service, tested it using a jump service, and waited 24 hours for the address book update to propagate to others, that shouldn't be necessary.</p>
+
+    <h2>使用备用网络服务器托管你的网站</h2>
+
+    <p>该网站（和I2P路由控制台）正在运行<a href="https://en.wikipedia.org/wiki/Jetty_(web_server)" target="_blank">Jetty网络服务器</a>，但您可能希望使用其他网络服务器来托管您的主机内容。
+为了保持匿名，请确保将您的网络服务器配置为仅允许来自本地主机（127.0.0.1）的连接，并检查文档以确保您的网络服务器没有发布可能危害您匿名性的详细信息。</p>
+
+     <p>To configure your webserver for use on I2P, you may either use the existing webserver tunnel and <a href="http://127.0.0.1:7657/configclients">disable the default webserver</a> from running, or create a new HTTP Server tunnel in the <a href="http://127.0.0.1:7657/i2ptunnelmgr">Hidden Services Manager</a>.
+       Ensure that the listening port configured for the webserver (7658 by default) is also configured in the Hidden Services settings.
+       For example, if your webserver is listening by default on address 127.0.0.1 port 80, you'd need to also ensure that the Target port in the Hidden Service Manager settings page for the service is also configured to port 80.</p> 
+
+        <p>请注意，配置不当的Web服务器或Web应用程序可能会泄漏可能危害信息的信息，例如
+您的真实IP地址或服务器详细信息，可能会减少您的匿名性或帮助黑客。
+我们建议您使用默认服务器，除非您愿意进行服务器管理。
+在将其联机之前，请确保您的Web服务器是安全的。
+在线上有很多指南，例如，如果您搜索“ nginx安全强化指南”，则会发现许多具有良好建议的指南。</p> 
+
+        <p>There is one important issue with the Apache web server.
+          The <code>mod_status</code> and <code>mod_info</code> Apache modules are enabled by default on some operating systems.
+          These modules expose internal data which can lead to serious compromise of anonymity when used on an anonymous network.
+          Removing the lines in the configuration file where these modules are loaded is the easiest way to prevent these issues.</p>
+
+    <h2>更多帮助</h2>
+
+        <p>如你有任何问题，可在如下地方寻求帮助：</p>
+
+        <ul>
+<li>我们的IRC支持频道：<ul>
+<li><a href="irc://irc.freenode.net/i2p">#i2p on Freenode</a></li>
+                <li>匿名使用你的本地<a href="irc://127.0.0.1:6668/i2p">I2P IRC 隧道</a>。</li>
+             </ul>
+</li>
+<li>项目论坛<a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>。</li>
+            <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">I2PWiki匿名网站托管指南</a></li>
+        </ul>
+<hr>
+<div class="notify">This page, the project website and the router console need translations!
+          Please help the project grow by <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank"> getting involved</a> or <a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators" target="_blank">translating</a>.</div>
+        <hr>
 </div>
- </body>
+</body>
 </html>

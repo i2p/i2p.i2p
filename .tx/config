@@ -595,8 +595,10 @@ source_lang = en
 ;;trans.ar = installer/resources/eepsite/docroot/help/index_ar.html
 trans.az = installer/resources/eepsite/docroot/help/index_az.html
 trans.de = installer/resources/eepsite/docroot/help/index_de.html
+trans.el = installer/resources/eepsite/docroot/help/index_el.html
 ;; not yet translated on TX, use old page
 ;;trans.es = installer/resources/eepsite/docroot/help/index_es.html
+trans.fa = installer/resources/eepsite/docroot/help/index_fa.html
 trans.fr = installer/resources/eepsite/docroot/help/index_fr.html
 trans.hu = installer/resources/eepsite/docroot/help/index_hu.html
 ;; Java converts id to in
@@ -608,11 +610,10 @@ trans.pl = installer/resources/eepsite/docroot/help/index_pl.html
 trans.pt = installer/resources/eepsite/docroot/help/index_pt.html
 trans.ro = installer/resources/eepsite/docroot/help/index_ro.html
 trans.ru_RU = installer/resources/eepsite/docroot/help/index_ru.html
-;; not yet translated on TX, use old page
-;;trans.sv_SE = installer/resources/eepsite/docroot/help/index_sv.html
+trans.sv_SE = installer/resources/eepsite/docroot/help/index_sv.html
 trans.tr_TR = installer/resources/eepsite/docroot/help/index_tr.html
-;; not yet translated on TX, use old page
-;;trans.zh_CN = installer/resources/eepsite/docroot/help/index_zh.html
+trans.uk_UA = installer/resources/eepsite/docroot/help/index_uk.html
+trans.zh_CN = installer/resources/eepsite/docroot/help/index_zh.html
 
 [I2P.readme]
 ;;
@@ -633,6 +634,7 @@ trans.pt = apps/routerconsole/resources/docs/readme_pt.html
 trans.ro = apps/routerconsole/resources/docs/readme_ro.html
 trans.ru_RU = apps/routerconsole/resources/docs/readme_ru.html
 trans.tr_TR = apps/routerconsole/resources/docs/readme_tr.html
+trans.uk_UA = apps/routerconsole/resources/docs/readme_uk.html
 trans.zh_CN = apps/routerconsole/resources/docs/readme_zh.html
 
 [main]

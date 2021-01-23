@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="sv_SE">
+<html lang="uk_UA">
 <head>
-<title>I2P anonym webbserver</title>
+<title>Анонімний Веб-Сервер I2P</title>
 <link rel="shortcut icon" href="favicon.ico">
 <link rel="stylesheet" type="text/css" href="lib/eepsite.css">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -21,20 +21,20 @@
       <a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
 </div>
 
-    <h1>I2P anonym webbserver</h1>
+    <h1>Анонімний Веб-Сервер I2P</h1>
 
-    <h2>Guide till anonyma webbserver på I2P</h2>
+    <h2>Керівництво для Анонімної Web Сервіровки на I2P</h2>
 
-    <p>Detta är din egen anonyma I2P-webbserver (traditionellt kallad en <i>eepsida</i>).
-      För att betjäna ditt eget innehåll, redigerar du bara filerna i webbserverens rotkatalog så kommer webbplatsen att vara offentlig när du följer instruktionerna nedan.</p>
+    <p>This is your own anonymous I2P webserver (traditionally referred to as an <i>eepsite</i>).
+      To serve your own content, simply edit the files in the webserver's root directory and the site will be public once you follow the instructions below.</p>
 
-    <p id="dir">Webbserverns rotkatalog finns på en av följande platser, beroende på ditt operativsystem:</p>
+    <p id="dir">The webserver's root directory can be found in one of the following locations, depending on your operating system:</p>
 
     <ul>
 <li>
 <b>Linux</b><br>
-        Standardinstallation: <code>~/.i2p/eepsite/docroot/</code><br>
-        Paketinstallation, körs som en tjänst: <code>/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+        Standard install: <code>~/.i2p/eepsite/docroot/</code><br>
+        Package install, running as a service: <code>/var/lib/i2p/i2p-config/eepsite/docroot/</code>
 </li>
       <li>
 <b>Windows</b><br><code>%APPDATA%\I2P\eepsite\docroot\</code>
@@ -47,10 +47,10 @@
       The Base32 address may be used as a hostname, until you assign a register a name following the instructions below.
       The Destination is somewhat like an IP address, and is shown on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.</p>
 
-    <p>Instruktionerna nedan beskriver hur du tilldelar ett namn som "minsida.i2p" till din webbplats och möjliggör åtkomst för andra.
-       Du kan nå din webbplats lokalt via <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.</p>
+    <p>The instructions below detail how to assign a name like "mysite.i2p" to your website and enable access by others.
+       You may reach your site locally via <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.</p>
 
-    <h2>Så här ställer du in och annonserar din dolda tjänst</h2>
+    <h2>How to set up and announce your hidden service</h2>
 
      <p>Your webserver is running by default, but is not accessible by others until you start the hidden service tunnel.
       After you start your I2P Webserver tunnel, it will be difficult for other people to find
@@ -84,7 +84,7 @@
       The <a href="lib/resources">resources subdirectory</a> demonstrates the default style.
       If you need a template for a basic site, feel free to adapt <a href="pagetemplate.html">this page</a> and <a href="lib/">associated content</a>.</p>
 
-    <p>Om du kommer tillbaka till den här sidan efter att du har redigerat innehållet kan du försöka rensa webbläsarens webbcache:</p>
+    <p>If you're returned to this page after editing the content, try clearing your browser's web cache:</p>
 
     <ul>
 <li>
@@ -94,7 +94,7 @@
       <li>
 <b>Opera:</b> Settings ➜ Privacy ➜ Clear browsing data</li>
     </ul>
-<h2>Registrera din egen I2P-domän</h2>
+<h2>Register your own I2P Domain</h2>
 
     <p>Now it is time to add your website to an I2P address book hosted by a site such as <a href="http://stats.i2p/%20" target="_blank">stats.i2p</a> or <a href="http://no.i2p/" target="_blank">no.i2p</a>. 
       You must enter your website name and Destination (or Registration Authentication string) on one or more of these sites.</p>
@@ -112,7 +112,7 @@
       Verify the submission was successful.
       Since many routers periodically get address book updates from these sites, within several hours others will be able to find your website by simply entering your hostname in their browser.</p>
 
-    <h2>Lägga till prenumerationsadressbok</h2>
+    <h2>Adding Addressbook Subscriptions</h2>
 
     <p>Speaking of address book updates, this would be a good time to add some more addressbooks to your own subscription list.
        Go to your <a href="http://127.0.0.1:7657/susidns/subscriptions">Subscriptions Configuration page</a> and add one or more for an automatically updated list of new hosts:</p>
@@ -132,15 +132,15 @@
       There are plenty of other ways to tell people. Here are a few ideas:</p>
 
     <ul>
-<li>Posta ett meddelande på <a href="http://i2pforum.i2p/" target="_blank">I2P-forum</a> för att berätta för alla om din nya I2PS-webbplats!</li>
-      <li>Berätta för folk om det på kanalerna #i2p- eller #i2p-chat på IRC.</li>
-      <li>Sätt det på <a href="http://i2pwiki.i2p/index.php?title=Eepsite/Services" target="_blank">I2PWiki eepsidsindexet</a>
+<li>Post a message on the <a href="http://i2pforum.i2p/" target="_blank">I2P forum</a> telling everyone about your new I2P website!</li>
+      <li>Розкажіть людям про це на каналах # i2p або # i2p-chat на IRC.</li>
+      <li>Put it on the <a href="http://i2pwiki.i2p/index.php?title=Eepsite/Services" target="_blank">I2PWiki Eepsite Index</a>
 </li>
     </ul>
-<p>Observera att vissa sidor rekommenderar att du klistrar in den riktigt långa destinationen.
-      Du kan om du vill, men om du framgångsrikt har registrerat ditt värdnamn på en registreringstjänst, testat det med hjälp av en hopptjänst och väntat 24 timmar på att adressboksuppdateringen ska spridas till andra, borde det inte vara nödvändigt.</p>
+<p>Note that some sites recommend pasting in that really long destination.
+      You can if you want, but if you have successfully registered your hostname on a registration service, tested it using a jump service, and waited 24 hours for the address book update to propagate to others, that shouldn't be necessary.</p>
 
-    <h2>Använda en alternativ webbserver för att vara värd för din webbplats</h2>
+    <h2>Using an alternative webserver to host your site</h2>
 
     <p>This site (and the I2P router console) is running on the <a href="https://en.wikipedia.org/wiki/Jetty_(web_server)" target="_blank">Jetty webserver</a>, but you may wish to use a different webserver to host your content. 
       To maintain anonymity, be sure that your webserver is configured to only allow connections from localhost (127.0.0.1), and check the documentation to ensure your webserver isn't advertising details that may compromise your anonymity.</p>
@@ -160,22 +160,23 @@
           These modules expose internal data which can lead to serious compromise of anonymity when used on an anonymous network.
           Removing the lines in the configuration file where these modules are loaded is the easiest way to prevent these issues.</p>
 
-    <h2>Ytterligare hjälp</h2>
+    <h2>Додаткова Допомога</h2>
 
-        <p>Om du har några frågor finns följande platser tillgängliga för support:</p>
+        <p>Якщо ви маєте питання, тут можна дістати підтримку:</p>
 
         <ul>
-<li>Vår IRC-supportkanal:<ul>
-<li><a href="irc://irc.freenode.net/i2p">#i2p på Freenode</a></li>
-                <li>Anonymt med din lokala <a href="irc://127.0.0.1:6668/i2p">I2P IRC-tunnel</a>.</li>
+<li>Наш канал підтримки IRC:<ul>
+<li><a href="irc://irc.freenode.net/i2p"> #i2p на Freenode</a></li>
+                <li>Anonymously using your local <a href="irc://127.0.0.1:6668/i2p">I2P IRC tunnel</a>.</li>
              </ul>
 </li>
-<li>Projektforumet <a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>.</li>
-            <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">I2P-värdguide för eepsidor</a></li>
+<li>Форум проекту<a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>
+</li>
+            <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">I2PWiki Eepsite Hosting guide</a></li>
         </ul>
 <hr>
-<div class="notify">Denna sida, projektwebbplatsen och routerkonsolen behöver översättningar!
-          Hjälp projektet att växa med <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank"> att bli involverad</a> eller <a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators" target="_blank">översätta</a>.</div>
+<div class="notify">This page, the project website and the router console need translations!
+          Please help the project grow by <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank"> getting involved</a> or <a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators" target="_blank">translating</a>.</div>
         <hr>
 </div>
 </body>
