@@ -286,6 +286,7 @@
             </classpath>
         </scalac>
     </target>
+
     <target name="junit.compileTest" depends="compile">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
@@ -293,10 +294,13 @@
         <echo message="[DEBUG] ant home is ${ant.home}" />
         <echo message="[DEBUG] junit home before override is ${junit.home}" />
         <echo message="[DEBUG] hamcrest home before override is ${hamcrest.home}" />
+        <echo message="[DEBUG] mockito home before override is ${mockito.home}" />
         <property name="hamcrest.home" value="${ant.home}/lib/" />
         <property name="junit.home" value="${ant.home}/lib/" />
+        <property name="mockito.home" value="${ant.home}/lib" />
         <echo message="[DEBUG] junit home after override is ${junit.home}" />
         <echo message="[DEBUG] hamcrest home after override is ${hamcrest.home}" />
+        <echo message="[DEBUG] mockito home after override is ${mockito.home}" />
         <javac srcdir="./test/junit" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
                release="${javac.release}"
                debuglevel="lines,vars,source"
@@ -310,11 +314,15 @@
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-all.jar" />
+                <pathelement location="${mockito.home}/byte-buddy.jar" />
+                <pathelement location="${mockito.home}/objenesis.jar" />
+                <pathelement location="${mockito.home}/mockito-core.jar" />
                 <pathelement location="${junit.home}/junit4.jar" />
             </classpath>
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
+
     <!-- jars with tests -->
     <target name="jarScalaTest" depends="scalatest.compileTest">
         <mkdir dir="./build/obj_scala_jar" />
@@ -443,6 +451,7 @@
             <fileset dir="../../reports/core/scalatest/" />
         </replaceregexp>
     </target>
+
     <target name="junit.test" depends="clean, junit.compileTest, prepareTest">
         <property name="hamcrest.home" value="${ant.home}/lib/" />
         <property name="junit.home" value="${ant.home}/lib/" />
@@ -461,6 +470,9 @@
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-all.jar" />
+                <pathelement location="${mockito.home}/byte-buddy.jar" />
+                <pathelement location="${mockito.home}/objenesis.jar" />
+                <pathelement location="${mockito.home}/mockito-core.jar" />
                 <pathelement location="${junit.home}/junit4.jar" />
                 <pathelement location="./build/obj_cobertura" />
                 <pathelement location="./build/obj" />
@@ -492,6 +504,7 @@
             <fileset dir="../../reports/core/junit/" />
         </replaceregexp>
     </target>
+
     <target name="test" depends="junit.test, scalatest.test"/>
     <!-- test reports -->
     <target name="scalatest.report">

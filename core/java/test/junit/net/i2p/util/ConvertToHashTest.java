@@ -5,6 +5,9 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+/**
+ * @since 0.9.49
+ */
 public class ConvertToHashTest {
     private static final String zzzDotI2pBase32Hash = "lhbd7ojcaiofbfku7ixh47qj537g572zmhdc4oilvugzxdpdghua";
     private static final String zzzDotI2pBase64Hash = "WcI~uSICHFCVVPoufn4J7v5u~1lhxi45C60Nm43jMeg=";

@@ -1,5 +1,8 @@
 package net.i2p;
 
+/**
+ * @since 0.9.49
+ */
 public class TestContext extends I2PAppContext {
 
     public TestContext() {
@@ -7,7 +10,7 @@ public class TestContext extends I2PAppContext {
     }
 
     /**
-     * Allows overriding the existing I2PAppContext with a test context who's fields we may mock as we like
+     * Allows overriding the existing I2PAppContext with a test context whose fields we may mock as we like
      *
      * @param ctx Our test context to replace the global context with
      */

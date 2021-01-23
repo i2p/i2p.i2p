@@ -15,7 +15,10 @@ import org.mockito.MockitoAnnotations;
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
-public class ConvertToHashMockTest{
+/**
+ * @since 0.9.49
+ */
+public class ConvertToHashMockTest {
 
     @Mock private NamingService namingService;
     @Mock private Destination destination;
@@ -34,7 +37,7 @@ public class ConvertToHashMockTest{
      * We would otherwise pollute the other tests that depend on I2PAppContext
      */
     @AfterClass
-    public static void afterClass(){
+    public static void afterClass() {
         TestContext.setGlobalContext(null);
     }
 
