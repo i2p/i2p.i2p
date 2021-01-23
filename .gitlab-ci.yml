@@ -32,7 +32,7 @@ build_docker:
         - docker:19.03.12-dind
     script:
         # Try to load latest branch image from local tar or from registry
-        - docker load ci-exports/$CI_COMMIT_REF_SLUG.tar || docker pull $CI_REGISTRY_IMAGE:latest || true
+        - docker load -i ci-exports/$CI_COMMIT_REF_SLUG.tar || docker pull $CI_REGISTRY_IMAGE:latest || true
         - docker build --cache-from $CI_REGISTRY_IMAGE:latest --tag $CI_REGISTRY_IMAGE:latest .
         - mkdir -p ci-exports/
         - docker save $CI_REGISTRY_IMAGE:latest > ci-exports/$CI_COMMIT_REF_SLUG.tar
