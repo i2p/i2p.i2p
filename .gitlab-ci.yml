@@ -20,5 +20,6 @@ test:
         # The actual output that will be parsed by the code coverage
         - grep -oP "Total.*?%" build/reports/jacoco/html/index.html
     only:
+        - master
         - merge_requests
         - tags
