@@ -246,7 +246,7 @@ public class ConfigClientsHelper extends HelperBase {
                 else if (app.equals("imagegen"))
                     desc = _t("Identification Image Generator");
                 else if (app.equals("susidns"))
-                    desc = _t("Addressbook");
+                    desc = _t("Address Book");
                 else if (app.equals("susimail"))
                     desc = _t("Email");
                 else

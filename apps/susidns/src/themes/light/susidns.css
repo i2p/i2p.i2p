@@ -589,7 +589,7 @@ textarea[name="config"]:focus, textarea[name="content"]:focus {
      margin: 2px 1px;
      padding: 4px 8px;
      border: 1px solid #dee2e6;
-     border-radius: 2px;
+     border-radius: 6px;
      color: #3b6bbf;
      text-align: center;
      

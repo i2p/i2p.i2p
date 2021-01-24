@@ -540,9 +540,9 @@ class NetDbRenderer {
                     String b32 = key.toBase32();
                     buf.append("<a href=\"http://").append(b32).append("\">").append(b32).append("</a></td>");
                     if (linkSusi && !unpublished && host == null) {
-                        buf.append("<td class=\"addtobook\" colspan=\"2\">").append("<a title=\"").append(_t("Add to addressbook"))
+                        buf.append("<td class=\"addtobook\" colspan=\"2\">").append("<a title=\"").append(_t("Add to address book"))
                            .append("\" href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
-                           .append(dest.toBase64()).append("#add\">").append(_t("Add to local addressbook")).append("</a></td>");
+                           .append(dest.toBase64()).append("#add\">").append(_t("Add to local address book")).append("</a></td>");
                     } // else probably a client
                 }
             } else {
@@ -563,9 +563,9 @@ class NetDbRenderer {
                         buf.append(" colspan=\"2\"");
                     buf.append("><a href=\"http://").append(b32).append("\">").append(b32).append("</a></td>\n");
                     if (linkSusi && dest != null) {
-                       buf.append("<td class=\"addtobook\"><a title=\"").append(_t("Add to addressbook"))
+                       buf.append("<td class=\"addtobook\"><a title=\"").append(_t("Add to address book"))
                        .append("\" href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
-                       .append(dest.toBase64()).append("#add\">").append(_t("Add to local addressbook")).append("</a></td>");
+                       .append(dest.toBase64()).append("#add\">").append(_t("Add to local address book")).append("</a></td>");
                     }
                 }
             }

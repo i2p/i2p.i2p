@@ -45,7 +45,7 @@ public class HomeHelper extends HelperBase {
         _x("Hidden Services Manager") + S + _x("Control your client and server tunnels") + S + "/i2ptunnelmgr" + S + I + "server_32x32.png" + S +
         _x("Torrents") + S + _x("Built-in anonymous BitTorrent Client") + S + "/torrents" + S + I + "i2psnark.png" + S +
         _x("Web Server") + S + _x("Local web server for hosting your own content on I2P") + S + "http://127.0.0.1:7658/" + S + I + "server_32x32.png" + S +
-        _x("Addressbook") + S + _x("Manage your I2P hosts file here (I2P domain name resolution)") + S + "/dns" + S + I + "book_addresses.png" + S +
+        _x("Address Book") + S + _x("Manage your I2P hosts file here (I2P domain name resolution)") + S + "/dns" + S + I + "book_addresses.png" + S +
         "";
 
     /** @since 0.9.44 */

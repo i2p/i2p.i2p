@@ -298,7 +298,7 @@ public abstract class LocalHTTPServer {
                                .append(conURL).append("help.jsp\">").append(_t("Help")).append("</a>");
                             if (pm.isRegistered(PortMapper.SVC_SUSIDNS)) {
                                 buf.append(" <a href=\"").append(conURL).append("susidns/index\">")
-                                   .append(_t("Addressbook")).append("</a>\n");
+                                   .append(_t("Address book")).append("</a>\n");
                             }
                             buf.append("</div>" +
                                        "<div class=warning id=warning>\n" +
@@ -368,13 +368,13 @@ public abstract class LocalHTTPServer {
                   "<a href=\"" + conURL + "\" title=\"" + _t("Router Console") + "\"><img src=\"http://proxy.i2p/themes/console/images/i2plogo.png\" alt=\"I2P Router Console\" border=\"0\"></a><hr>\n" +
                   "<a href=\"" + conURL + "config\">" + _t("Configuration") + "</a> <a href=\"" + conURL + "help.jsp\">" + _t("Help") + "</a>").getBytes("UTF-8"));
         if (pm.isRegistered(PortMapper.SVC_SUSIDNS))
-            out.write((" <a href=\"" + conURL + "susidns/index\">" + _t("Addressbook") + "</a>\n").getBytes("UTF-8"));
+            out.write((" <a href=\"" + conURL + "susidns/index\">" + _t("Address Book") + "</a>\n").getBytes("UTF-8"));
         out.write(("</div>" +
                   "<div class=warning id=warning>\n" +
                   "<h3>" +
                   (success ?
-                           _t("Saved {0} to the {1} addressbook, redirecting now.", host, tbook) :
-                           _t("Failed to save {0} to the {1} addressbook, redirecting now.", host, tbook)) +
+                           _t("Saved {0} to the {1} address book, redirecting now.", host, tbook) :
+                           _t("Failed to save {0} to the {1} address book, redirecting now.", host, tbook)) +
                   "</h3>\n<p><a href=\"" + url + "\">" +
                   _t("Click here if you are not redirected automatically.") +
                   "</a></p></div>").getBytes("UTF-8"));
@@ -402,7 +402,7 @@ public abstract class LocalHTTPServer {
                   "<a href=\"" + conURL + "\" title=\"" + _t("Router Console") + "\"><img src=\"http://proxy.i2p/themes/console/images/i2plogo.png\" alt=\"I2P Router Console\" border=\"0\"></a><hr>\n" +
                   "<a href=\"" + conURL + "config\">" + _t("Configuration") + "</a> <a href=\"" + conURL + "help.jsp\">" + _t("Help") + "</a>").getBytes("UTF-8"));
         if (pm.isRegistered(PortMapper.SVC_SUSIDNS))
-            out.write((" <a href=\"" + conURL + "susidns/index\">" + _t("Addressbook") + "</a>\n").getBytes("UTF-8"));
+            out.write((" <a href=\"" + conURL + "susidns/index\">" + _t("Address Book") + "</a>\n").getBytes("UTF-8"));
         out.write(("</div>" +
                   "<div class=warning id=warning>\n" +
                   "<h3>" +

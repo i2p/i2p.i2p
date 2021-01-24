@@ -69,7 +69,7 @@
 <div class="help" id="helpsubs">
 <p class="help">
 <%=intl._t("The subscription file contains a list of i2p URLs.")%>
-<%=intl._t("The addressbook application regularly checks this list for new I2P Sites.")%>
+<%=intl._t("The address book application regularly checks this list for new I2P Sites.")%>
 <%=intl._t("Those URLs refer to published hosts.txt files.")%>
 <%=intl._t("The default subscription is the hosts.txt from {0}, which is updated infrequently.", "i2p-projekt.i2p")%>
 <%=intl._t("So it is a good idea to add additional subscriptions to sites that have the latest addresses.")%>

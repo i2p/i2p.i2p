@@ -145,7 +145,7 @@ public class SubscriptionsBean extends BaseBean
 				*******/
 					if (content != null && content.length() > 2 &&
 					    _context.portMapper().isRegistered(PortMapper.SVC_HTTP_PROXY)) {
-						message = _t("Subscriptions saved, updating addressbook from subscription sources now.");
+						message = _t("Subscriptions saved, updating address book from subscription sources now.");
 						          // + "<img height=\"1\" width=\"1\" alt=\"\" " +
 						          // "src=\"/addressbook/?wakeup=1&nonce=" + nonce + "\">";
 						_context.namingService().requestUpdate(null);

@@ -62,9 +62,9 @@
 </div>
 <hr>
 <div id="content">
-<h3><%=intl._t("What is the addressbook?")%></h3>
+<h3><%=intl._t("What is the address book?")%></h3>
 <p>
-<%=intl._t("The addressbook application is part of your I2P installation.")%>
+<%=intl._t("The address book application is part of your I2P installation.")%>
 <%=intl._t("It regularly updates your hosts.txt file from distributed sources or \"subscriptions\".")%>
 </p>
 <p>
@@ -74,9 +74,9 @@
 <p>
 <%=intl._t("For more information on naming in I2P, see <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">the overview</a>.")%>
 </p>
-<h3><%=intl._t("How does the addressbook application work?")%></h3>
+<h3><%=intl._t("How does the address book application work?")%></h3>
 <p>
-<%=intl._t("The addressbook application regularly polls your subscriptions and merges their content into your \"router\" address book.")%>
+<%=intl._t("The address book application regularly polls your subscriptions and merges their content into your \"router\" address book.")%>
 <%=intl._t("Then it merges your \"local\" address book into the router address book as well.")%>
 <%=intl._t("If configured, the router address book is now written to the \"published\" address book, which will be publicly available if you are running an I2P Site.")%>
 </p><p>

@@ -2597,6 +2597,7 @@ input[type="submit"] {
      font-size: 12pt !important;
      padding: 4px 1px 3px !important;
      min-width: 300px;
+     border-radius: 0px 0px 6px 6px;
 }
 
 .snarkTorrentStatus b {
@@ -2633,6 +2634,7 @@ input[type="submit"] {
 .snarkConfigTitle a {
      font-size: 12.5pt !important;
      margin-top: 0 !important;
+     border-radius: 0px 0px 6px 6px;
 }
 }
 

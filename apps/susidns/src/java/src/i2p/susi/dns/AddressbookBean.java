@@ -207,7 +207,7 @@ public class AddressbookBean extends BaseBean
 		} else {
 			if (resultCount <= 0)
 				// covered in jsp
-				//message = _t("This addressbook is empty.");
+				//message = _t("This address book is empty.");
 				message = "";
 			else
 				message = ngettext("Address book contains 1 entry.",
@@ -366,7 +366,7 @@ public class AddressbookBean extends BaseBean
 						message += "<br>" + _t("Address book saved.");
 					} catch (IOException e) {
 						warn(e);
-						message += "<br>" + _t("ERROR: Could not write addressbook file.");
+						message += "<br>" + _t("ERROR: Could not write address book file.");
 					}
 				}
 			}			

@@ -71,15 +71,15 @@
 <h3><%=intl._t("Hints")%></h3>
 <ol>
 <li>
-<%=intl._t("File and directory paths here are relative to the addressbook's working directory, which is normally ~/.i2p/addressbook/ (Linux) or %LOCALAPPDATA%\\I2P\\addressbook\\ (Windows).")%>
+<%=intl._t("File and directory paths here are relative to the address book's working directory, which is normally ~/.i2p/addressbook/ (Linux) or %LOCALAPPDATA%\\I2P\\addressbook\\ (Windows).")%>
 </li>
 <li>
-<%=intl._t("If you want to manually add lines to an addressbook, add them to the private or local addressbooks.")%>
-<%=intl._t("The router addressbook and the published addressbook are updated by the addressbook application.")%>
+<%=intl._t("If you want to manually add lines to an address book, add them to the private or local address books.")%>
+<%=intl._t("The router address book and the published address book are updated by the address book application.")%>
 </li>
 <li>
-<%=intl._t("When you publish your addressbook, ALL destinations from the local and router addressbooks appear there.")%>
-<%=intl._t("Use the private addressbook for private destinations, these are not published.")%>
+<%=intl._t("When you publish your address book, ALL destinations from the local and router address books appear there.")%>
+<%=intl._t("Use the private address book for private destinations, these are not published.")%>
 </li>
 </ol>
 <h3><%=intl._t("Options")%></h3>
@@ -97,10 +97,10 @@
 <%=intl._t("Your hosts.txt (don't change)")%>
 </li>
 <li><b>local_addressbook</b> -
-<%=intl._t("Your personal addressbook, these hosts will be published")%>
+<%=intl._t("Your personal address book, these hosts will be published")%>
 </li>
 <li><b>private_addressbook</b> -
-<%=intl._t("Your private addressbook, it is never published")%>
+<%=intl._t("Your private address book, it is never published")%>
 </li>
 <li><b>proxy_port</b> -
 <%=intl._t("Port for your eepProxy (no need to change)")%>
@@ -109,7 +109,7 @@
 <%=intl._t("Hostname for your eepProxy (no need to change)")%>
 </li>
 <li><b>should_publish</b> -
-<%=intl._t("Whether to update the published addressbook")%>
+<%=intl._t("Whether to update the published address book")%>
 </li>
 <li><b>etags</b> -
 <%=intl._t("File containing the etags header from the fetched subscription URLs (no need to change)")%>
