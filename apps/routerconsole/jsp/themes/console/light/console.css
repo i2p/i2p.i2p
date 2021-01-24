@@ -1328,6 +1328,7 @@ p:empty + .sb_notice {
 .main#tunnelmgr {
      padding: 0 10px;
      min-width: 556px;
+     height: 150%;
 }
 
 #i2ptunnelframe {
