@@ -9,8 +9,6 @@ body {
      font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
      color: #33333f;
      font-size: 9pt;
-     background: linear-gradient(135deg, #9dabd5 0%,#265ea7 53%,#222187 76%,#323638 100%);
-     background: -webkit-linear-gradient(-45deg, #9dabd5 0%,#265ea7 53%,#222187 76%,#323638 100%);
 }
 
 body.iframed {
@@ -248,7 +246,6 @@ a.control {
 
 .panel {
      width: calc(100% - 14px);
-     max-width: 1400px;
      margin: 8px auto;
      min-width: 580px;
      overflow: hidden;
@@ -258,7 +255,6 @@ a.control {
      box-shadow: inset 0 0 1px #999;
      background: #fff;
      background: linear-gradient(to right, #fff 0%, rgba(247, 248, 255, 0.5), #fff), linear-gradient(to bottom, #efefff, #fff, #efefff);
-     border: 1px solid #447;
      filter: drop-shadow(0 0 1px #777);
 }
 
