@@ -117,8 +117,9 @@ class FragmentHandler {
      * sending the resulting I2NPMessages where necessary.  The received 
      * fragments are all verified.
      *
+     * @return ok (false if corrupt)
      */
-    public void receiveTunnelMessage(byte preprocessed[], int offset, int length) {
+    public boolean receiveTunnelMessage(byte preprocessed[], int offset, int length) {
         boolean ok = verifyPreprocessed(preprocessed, offset, length);
         if (!ok) {
             if (_log.shouldLog(Log.WARN))
@@ -126,7 +127,7 @@ class FragmentHandler {
                           + preprocessed.length + " off=" +offset + " len=" + length);
             _cache.release(new ByteArray(preprocessed));
             _context.statManager().addRateData("tunnel.corruptMessage", 1);
-            return;
+            return false;
         }
         offset += HopProcessor.IV_LENGTH; // skip the IV
         offset += 4; // skip the hash segment
@@ -139,7 +140,7 @@ class FragmentHandler {
                 _context.statManager().addRateData("tunnel.corruptMessage", 1);
                 if (_log.shouldWarn())
                     _log.warn("Corrupt fragment received: off = " + offset);
-                return;
+                return false;
             }
             padding++;
         }
@@ -155,7 +156,7 @@ class FragmentHandler {
                     _context.statManager().addRateData("tunnel.corruptMessage", 1);
                     if (_log.shouldWarn())
                         _log.warn("Corrupt fragment received: off = " + off);
-                    return;
+                    return false;
                 }
                 offset = off;
             }
@@ -163,10 +164,12 @@ class FragmentHandler {
             _context.statManager().addRateData("tunnel.corruptMessage", 1);
             if (_log.shouldWarn())
                 _log.warn("Corrupt fragment received: offset = " + offset, aioobe);
+            return false;
         } catch (NullPointerException npe) {
             if (_log.shouldWarn())
                 _log.warn("Corrupt fragment received: offset = " + offset, npe);
             _context.statManager().addRateData("tunnel.corruptMessage", 1);
+            return false;
         } catch (RuntimeException e) {
             if (_log.shouldWarn())
                 _log.warn("Corrupt fragment received: offset = " + offset, e);
@@ -183,6 +186,7 @@ class FragmentHandler {
             // let's limit the damage here and skip the:
             // .transport.udp.MessageReceiver: b0rked receiving a message.. wazza huzza hmm?
             //throw e;
+            return false;
         } finally {
             // each of the FragmentedMessages populated make a copy out of the
             // payload, which they release separately, so we can release 
@@ -192,6 +196,7 @@ class FragmentHandler {
             // in order to put it in the pool, but it shouldn't cause any harm.
             _cache.release(new ByteArray(preprocessed));
         }
+        return true;
     }
     
     public int getCompleteCount() { return _completed.get(); }

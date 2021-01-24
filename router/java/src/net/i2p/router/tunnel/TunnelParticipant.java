@@ -122,10 +122,26 @@ class TunnelParticipant {
                                                   new TimeoutJob(_context, msg), MAX_LOOKUP_TIME);
             }
         } else {
-            _inboundEndpointProcessor.getConfig().incrementProcessedMessages();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Receive fragment: on " + _config + ": " + msg);
-            _handler.receiveTunnelMessage(data, 0, data.length);
+            // IBEP
+            TunnelCreatorConfig cfg = _inboundEndpointProcessor.getConfig();
+            cfg.incrementProcessedMessages();
+            ok = _handler.receiveTunnelMessage(data, 0, data.length);
+            if (ok) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Receive fragment: on " + _config + ": " + msg);
+            } else {
+                // blame everybody equally
+                int lenm1 = cfg.getLength() - 1;
+                if (lenm1 > 0) {
+                    int pct = 100 / (lenm1);
+                    for (int i = 0; i < lenm1; i++) {
+                        Hash h = cfg.getPeer(i);
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn(toString() + ": Blaming " + h + ' ' + pct + '%');
+                        _context.profileManager().tunnelFailed(h, pct);
+                    }
+                }
+            }
         }
     }
     
