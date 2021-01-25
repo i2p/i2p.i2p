@@ -31,6 +31,7 @@ ENV PATH=${I2P_PREFIX}/bin:$PATH
 
 # "install" i2p by copying over installed files
 COPY --from=builder /opt/i2p ${I2P_PREFIX}
+COPY docker/* /opt/i2p/
 
 # Setup user and fix permissions in
 RUN adduser --system --uid ${I2P_UID} --home /user ${I2P_USER} \
