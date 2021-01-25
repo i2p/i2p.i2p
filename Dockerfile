@@ -38,7 +38,7 @@ RUN adduser --system --uid ${I2P_UID} --home /user ${I2P_USER} \
     && chown -R ${I2P_USER} ${I2P_PREFIX} \
     && chmod -R u+rwx ${I2P_PREFIX}
 
-EXPOSE 7654 7656 7657 7658 4444 6668 8998 7659 7660 4445 15000-20000
+EXPOSE 7654 7656 7657 7658 4444 6668 8998 7659 7660 4445
 
 USER i2p
 ENTRYPOINT [ "/opt/i2p/i2psvc" ]
