@@ -3,14 +3,7 @@ image: openjdk:8-alpine
 stages:
     - test
 
-cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-        - $HOME/.gradle/caches/
-        - $HOME/.gradle/wrapper/
-        - .gradle
-
-test:
+test:gradle:
     stage: test
     coverage: '/Total.*?([0-9]{1,3})%/'
     before_script:
@@ -19,6 +12,47 @@ test:
         - ./gradlew codeCoverageReport
         # The actual output that will be parsed by the code coverage
         - grep -oP "Total.*?%" build/reports/jacoco/html/index.html
+    cache:
+        key: ${CI_COMMIT_REF_SLUG}
+        paths:
+            - $HOME/.gradle/caches/
+            - $HOME/.gradle/wrapper/
+            - .gradle
+    only:
+        - master
+        - merge_requests
+        - tags
+
+test:ant:
+    stage: test
+    image: debian:buster-slim
+    variables:
+        SCALA: https://downloads.lightbend.com/scala/2.12.13/scala-2.12.13.deb
+        LIB_SCALATEST: https://repo1.maven.org/maven2/org/scalatest/scalatest_2.12/3.0.4/scalatest_2.12-3.0.4.jar
+        LIB_SCALACTIC: https://repo1.maven.org/maven2/org/scalactic/scalactic_2.12/3.0.4/scalactic_2.12-3.0.4.jar
+    before_script:
+        # Fix bug installing openjdk-11-jdk-headless's manuals
+        - mkdir -p /usr/share/man/man1/
+        - apt-get update -q
+        - apt-get install -y wget ant libmockito-java libhamcrest-java default-jdk-headless
+        # Install specific version of scala
+        - wget -O scala.deb "${SCALA}"
+        - dpkg -i scala.deb
+        # link to the scala libs with the name `ant test` expects
+        - cd /usr/share/scala/lib/
+        - ln -s scala-xml_2.12-1.0.6.jar scala-xml.jar
+        # Download required scala libs
+        - wget -O scalactic.jar "${LIB_SCALACTIC}"
+        - wget -O scalatest.jar "${LIB_SCALATEST}"
+        # Point ant to the right directories
+        - echo "
+          scalatest.libs=/usr/share/scala/lib
+          junit.home=/usr/share/java
+          hamcrest.home=/usr/share/java
+          mockito.home=/usr/share/java
+          " > override.properties
+    script:
+        - ant test
     only:
         - master
         - merge_requests
