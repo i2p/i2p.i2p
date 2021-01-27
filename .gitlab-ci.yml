@@ -28,6 +28,7 @@ test:ant:
     image: debian:buster-slim
     variables:
         SCALA: https://downloads.lightbend.com/scala/2.12.13/scala-2.12.13.deb
+        LIBPREFIX: /usr/share/scala/lib
         LIB_SCALATEST: https://repo1.maven.org/maven2/org/scalatest/scalatest_2.12/3.0.4/scalatest_2.12-3.0.4.jar
         LIB_SCALACTIC: https://repo1.maven.org/maven2/org/scalactic/scalactic_2.12/3.0.4/scalactic_2.12-3.0.4.jar
     before_script:
@@ -39,18 +40,16 @@ test:ant:
         - wget -qO scala.deb "${SCALA}"
         - dpkg -i scala.deb
         # link to the scala libs with the name `ant test` expects
-        - cd /usr/share/scala/lib/
-        - ln -s scala-xml_2.12-1.0.6.jar scala-xml.jar
+        - ln -s "${LIBPREFIX}/scala-xml_2.12-1.0.6.jar" "${LIBPREFIX}/scala-xml.jar"
         # Download required scala libs
-        - wget -qO scalactic.jar "${LIB_SCALACTIC}"
-        - wget -qO scalatest.jar "${LIB_SCALATEST}"
+        - wget -qO "${LIBPREFIX}/scalactic.jar" "${LIB_SCALACTIC}"
+        - wget -qO "${LIBPREFIX}/scalatest.jar" "${LIB_SCALATEST}"
         # Point ant to the right directories
         - echo scalatest.libs=/usr/share/scala/lib > override.properties
         - echo junit.home=/usr/share/java >> override.properties
         - echo hamcrest.home=/usr/share/java >> override.properties
         - echo mockito.home=/usr/share/java >> override.properties
     script:
-        - ls -l
         - ant test
     only:
         - master
