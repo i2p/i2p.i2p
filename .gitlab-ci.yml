@@ -50,6 +50,7 @@ test:ant:
         - echo hamcrest.home=/usr/share/java >> override.properties
         - echo mockito.home=/usr/share/java >> override.properties
     script:
+        - ls -l
         - ant test
     only:
         - master
