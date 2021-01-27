@@ -45,12 +45,10 @@ test:ant:
         - wget -qO scalactic.jar "${LIB_SCALACTIC}"
         - wget -qO scalatest.jar "${LIB_SCALATEST}"
         # Point ant to the right directories
-        - echo "
-          scalatest.libs=/usr/share/scala/lib
-          junit.home=/usr/share/java
-          hamcrest.home=/usr/share/java
-          mockito.home=/usr/share/java
-          " > override.properties
+        - echo scalatest.libs=/usr/share/scala/lib > override.properties
+        - echo junit.home=/usr/share/java >> override.properties
+        - echo hamcrest.home=/usr/share/java >> override.properties
+        - echo mockito.home=/usr/share/java >> override.properties
     script:
         - ant test
     only:
