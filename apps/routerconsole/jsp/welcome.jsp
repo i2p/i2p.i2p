@@ -365,7 +365,7 @@
 <%=intl._t("There is a quick guide, news about the latest release, an FAQ, and troubleshooting guide available on the {0}console{1} page.", "<a href=\"/console\" target=\"_blank\">", "</a>")%>
 </p><p>
 <%=intl._t("You may notice a message in the sidebar that I2P is rejecting tunnels.")%>
-<%=intl._t("This is normal behavior as part of the start-up process, to make sure that your router is ready to help others with participating traffic.")%>
+<%=intl._t("This is normal behavior as part of the startup process, to make sure that your router is ready to help others with participating traffic.")%>
 <%=intl._t("When the connection indicators in the sidebar turn green, you are ready to explore the Invisible Internet.")%>
 </p>
 </div>

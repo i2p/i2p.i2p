@@ -258,8 +258,8 @@ public class PeerHelper extends HelperBase {
            .append("<tr><td><b id=\"def.up\">").append(_t("Up")).append("</b></td><td>").append(_t("How long ago this connection was established")).append("</td></tr>\n")
            .append("<tr><td><b id=\"def.skew\">").append(_t("Skew")).append("</b></td><td>").append(_t("The difference between the peer's clock and your own")).append("</td></tr>\n");
         if (isAdvanced()) {
-           buf.append("<tr><td><b id=\"def.cwnd\">CWND</b></td><td>").append(_t("The congestion window, which is how many bytes can be sent without an acknowledgement")).append(" /<br>\n")
-           .append(_t("The number of sent messages awaiting acknowledgement")).append(" /<br>\n")
+           buf.append("<tr><td><b id=\"def.cwnd\">CWND</b></td><td>").append(_t("The congestion window, which is how many bytes can be sent without an acknowledgment")).append(" /<br>\n")
+           .append(_t("The number of sent messages awaiting acknowledgment")).append(" /<br>\n")
            .append(_t("The maximum number of concurrent messages to send")).append(" /<br>\n")
            .append(_t("The number of pending sends which exceed congestion window")).append("</td></tr>\n")
            .append("<tr><td><b id=\"def.ssthresh\">SST</b></td><td>").append(_t("The slow start threshold")).append("</td></tr>\n")

@@ -172,7 +172,7 @@ public class ErrorServlet extends HttpServlet {
      */
     protected void outputMessage(PrintWriter out, int errorCode, String errorMsg, String errorURI, Throwable errorCause) {
         if (errorCode == 404) {
-            out.println(_t("Sorry! You appear to be requesting a non-existent Router Console page or resource."));
+            out.println(_t("Sorry! You appear to be requesting a nonexistent Router Console page or resource."));
             out.println("<hr>");
             out.println(_t("Error {0}", 404) + ": " + errorURI + "&nbsp;" + _t("not found"));
         } else if (errorCode == 403 || errorCode >= 500 || errorCause != null) {

@@ -160,7 +160,7 @@ public class ConfigKeyringHandler extends FormHandler {
                         _context.netDb().setBlindData(bdout);
                         addFormNotice(_t("Key for {0} added to keyring", bdout.toBase32()));
                         if (_mode == 6 || _mode == 7) {
-                            addFormNotice(_t("Send key to server opererator.") + ' ' + pk.toPublic().toBase64());
+                            addFormNotice(_t("Send key to server operator.") + ' ' + pk.toPublic().toBase64());
                         }
                     } catch (IllegalArgumentException iae) {
                         addFormError(_t("Invalid destination") + ": " + iae.getLocalizedMessage());

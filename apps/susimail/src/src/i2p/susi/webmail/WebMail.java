@@ -1805,7 +1805,7 @@ public class WebMail extends HttpServlet
 				} else if (!newHost.equals(oldHost) && !newHost.equals("localhost")) {
 					props.setProperty(CONFIG_HOST, oldHost);
 					File cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), "susimail.config");
-					sessionObject.error += _t("Host unchanged. Edit configation file {0} to change host.", cfg.getAbsolutePath()) + '\n';
+					sessionObject.error += _t("Host unchanged. Edit configuration file {0} to change host.", cfg.getAbsolutePath()) + '\n';
 				}
 				String ps = props.getProperty(Folder.PAGESIZE);
 				Folder<String> folder = getCurrentFolder(sessionObject, request);

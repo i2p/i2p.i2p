@@ -139,7 +139,7 @@
                     <%=intl._t("Websites outside I2P can also be reached if an HTTP proxy within I2P is known.")%>
                 </td></tr>
                 <tr><td>IRC</td><td>
-                    <%=intl._t("Customised client tunnel specific for IRC connections.")%>
+                    <%=intl._t("Customized client tunnel specific for IRC connections.")%>
                     <%=intl._t("With this tunnel type, your IRC client will be able to connect to an IRC network inside I2P.")%>
                     <%=intl._t("Each IRC network in I2P that you wish to connect to will require its own tunnel. (See Also, SOCKS IRC)")%>
                 </td></tr>
@@ -148,7 +148,7 @@
                     <%=intl._t("This enables both TCP and UDP connections to be made through a SOCKS outproxy within I2P.")%>
                 </td></tr>
                 <tr><td>SOCKS IRC</td><td>
-                    <%=intl._t("A client tunnel implementing the SOCKS protocol, which is customised for connecting to IRC networks.")%>
+                    <%=intl._t("A client tunnel implementing the SOCKS protocol, which is customized for connecting to IRC networks.")%>
                     <%=intl._t("With this tunnel type, IRC networks in I2P can be reached by typing the I2P address into your IRC client, and configuring the IRC client to use this SOCKS tunnel.")%>
                     <%=intl._t("This means that only one I2P tunnel is required rather than a separate tunnel per IRC network.")%>
                     <%=intl._t("IRC networks outside I2P can also be reached if a SOCKS outproxy within I2P is known, though it depends on whether or not the outproxy has been blocked by the IRC network.")%>
@@ -160,11 +160,11 @@
                     <%=intl._t("Try this if none of the tunnel types below fit your requirements, or you don't know what type of tunnel you need.")%>
                 </td></tr>
                 <tr><td>HTTP</td><td>
-                    <%=intl._t("A server tunnel that is customised for HTTP connections.")%>
+                    <%=intl._t("A server tunnel that is customized for HTTP connections.")%>
                     <%=intl._t("Use this tunnel type if you want to host an I2P Site.")%>
                 </td></tr>
                 <tr><td>IRC</td><td>
-                    <%=intl._t("A customised server tunnel for hosting IRC networks inside I2P.")%>
+                    <%=intl._t("A customized server tunnel for hosting IRC networks inside I2P.")%>
                     <%=intl._t("Usually, a separate tunnel needs to be created for each IRC server that is to be accessible inside I2P.")%>
                 </td></tr><%
                 }
@@ -408,7 +408,7 @@
         <td>
             <p>
                 <%=intl._t("The I2P router can automatically start this tunnel for you when the router is started.")%>
-                <%=intl._t("This can be useful for frequently-used tunnels (especially server tunnels), but for tunnels that are only used occassionally it would mean that the I2P router is creating and maintaining unnecessary tunnels.")%>
+                <%=intl._t("This can be useful for frequently-used tunnels (especially server tunnels), but for tunnels that are only used occasionally it would mean that the I2P router is creating and maintaining unnecessary tunnels.")%>
             </p>
         </td>
     </tr>

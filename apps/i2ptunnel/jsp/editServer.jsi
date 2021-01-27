@@ -962,7 +962,7 @@
                 <b><%=intl._t("Per Client")%>
                 </b>
             </td><td>
-                <input type="text" name="postMax" title="<%=intl._t("Maximum number of post requests permitted for a unique client for the configured timespan")%>" value="<%=editBean.getPostMax(curTunnel)%>" class="freetext quantity"/>
+                <input type="text" name="postMax" title="<%=intl._t("Maximum number of post requests permitted for a unique client for the configured time span")%>" value="<%=editBean.getPostMax(curTunnel)%>" class="freetext quantity"/>
             </td><td colspan="2">
                 <input type="text" name="postBanTime" title="<%=intl._t("If a client exceeds the maximum number of post requests per allocated period, enforce a ban for this number of minutes")%>" value="<%=editBean.getPostBanTime(curTunnel)%>" class="freetext period"/>
                 <%=intl._t("minutes")%>
@@ -972,7 +972,7 @@
                 <b><%=intl._t("Total")%>
                 </b>
             </td><td>
-                <input type="text" name="postTotalMax" title="<%=intl._t("Total number of post requests permitted for the configured timespan")%>" value="<%=editBean.getPostTotalMax(curTunnel)%>" class="freetext quantity"/>
+                <input type="text" name="postTotalMax" title="<%=intl._t("Total number of post requests permitted for the configured time span")%>" value="<%=editBean.getPostTotalMax(curTunnel)%>" class="freetext quantity"/>
             </td><td colspan="2">
                 <input type="text" name="postTotalBanTime" title="<%=intl._t("If the maximum number of post requests per allocated period is exceeded, enforce a global access ban for this number of minutes")%>" value="<%=editBean.getPostTotalBanTime(curTunnel)%>" class="freetext period"/>
                 <%=intl._t("minutes")%>
@@ -982,7 +982,7 @@
                 <b><%=intl._t("POST limit period")%>
                 </b>
             </td><td colspan="2">
-                <input type="text" name="postCheckTime" title="<%=intl._t("Timespan for the maximum number of post requests to be reached before a ban is triggered")%>" value="<%=editBean.getPostCheckTime(curTunnel)%>" class="freetext period"/>
+                <input type="text" name="postCheckTime" title="<%=intl._t("Time span for the maximum number of post requests to be reached before a ban is triggered")%>" value="<%=editBean.getPostCheckTime(curTunnel)%>" class="freetext period"/>
                 <%=intl._t("minutes")%>
             </td><td></td><td class="blankColumn"></td>
         </tr>
