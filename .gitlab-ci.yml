@@ -35,7 +35,7 @@ test:ant:
         # Fix bug installing openjdk-11-jdk-headless's manuals
         - mkdir -p /usr/share/man/man1/
         - apt-get update -q
-        - apt-get install -y wget ant libmockito-java libhamcrest-java default-jdk-headless
+        - apt-get install -y wget ant libmockito-java libhamcrest-java junit4 default-jdk-headless
         # Install specific version of scala
         - wget -qO scala.deb "${SCALA}"
         - dpkg -i scala.deb
