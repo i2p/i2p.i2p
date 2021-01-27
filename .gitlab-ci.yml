@@ -59,7 +59,7 @@ build_docker:
         # The same key should be used across branches
         key: "$CI_COMMIT_REF_SLUG"
         paths:
-            - ci-exports/*.tar
+            - ci-exports/
     only:
         - master
         - merge_requests
