@@ -1,8 +1,8 @@
 body {
     margin: 25px 10%;
     text-align: justify;
-    color: #ffffe0;
-    background: #210800 url(pagebg.png);
+    color: #2E2E2E;
+    background: #DFDFDF;
     background-size: 120px 120px;
 }
 
@@ -16,12 +16,11 @@ h1 {
     padding: 20px 0 5px 48px;
     white-space: nowrap;
     letter-spacing: .05em;
-    border-bottom: 1px solid #5f3423;
-    background-image: url(itoopie.png);
+
+
     background-repeat: no-repeat;
     background-position: left 5px bottom 5px;
-    text-shadow: 0 0 24px rgba(255, 96, 48, .9);
-    text-shadow: 2px 2px 1px #110500 !important;
+
 }
 
 h2 {
@@ -30,15 +29,17 @@ h2 {
     margin-bottom: 10px;
     padding: 5px 10px;
     letter-spacing: .09em;
-    text-transform: capitalize;
-    border: 1px solid #5f3423;
-    border-radius: 2px;
-    background: #110500 url(h2bg.png) right center no-repeat;
-    background: url(h2bg.png) right 1px center no-repeat, linear-gradient(to bottom, #2f160c 50%, #110500 50%);
-    box-shadow: inset 0 0 0 1px #000;
+    text-transform: uppercase;
+    color: #2E2E2E;
+    border: 2px solid #363A68;
+    border-radius: 5px;
+
+
+
+
+
     background-size: auto 112%, 100% 100%;
-    filter: drop-shadow(0 0 1px #000);
-    -webkit-filter: drop-shadow(0 0 1px #000);
+
 }
 
 h3 {
@@ -52,12 +53,10 @@ h4 {
     text-transform: capitalize;
     border: 1px solid #5f3423;
     border-radius: 2px;
-    background: #110500 url(h2bg.png) right center no-repeat;
-    background: url(h2bg.png) right 1px center no-repeat, linear-gradient(to bottom, #2f160c 50%, #110500 50%);
-    box-shadow: inset 0 0 0 1px #000;
+    background: ##F2F2F2;
+
     background-size: auto 112%, 100% 100%;
-    filter: drop-shadow(0 0 1px #000);
-    -webkit-filter: drop-shadow(0 0 1px #000);
+
     vertical-align: middle;
 }
 
@@ -76,12 +75,12 @@ a.footref {
 a:link {
     text-decoration: none;
     outline: none;
-    color: #ffc266;
+    color: #ED8936;
 }
 
 a:visited {
     text-decoration: none;
-    color: #ffd699;
+    color: #ED8936;
 }
 
 a:active {
@@ -91,7 +90,7 @@ a:active {
 
 a:hover, a:focus {
     text-decoration: none;
-    color: #fb0;
+    color: #FBD38D;
 }
 
 a:focus {
@@ -172,9 +171,7 @@ ul {
 hr {
     height: 1px;
     margin: 5px 0;
-    color: #5f3423;
-    border: 0 solid #5f3423;
-    background: #5f3423;
+
 }
 
 div.langbar {
@@ -185,11 +182,7 @@ div.langbar {
     padding: 5px 10px 5px 5px;
     float: right;
     margin: -6px -26px 0 0;
-    border: 1px solid #fb7;
-    border: 1px solid #7f462f;
-    background: #310;
-    border-radius: 0 2px 0 0;
-    box-shadow: inset 0 0 0 3px #000;
+
 }
 
 div.langbar a {
@@ -199,7 +192,7 @@ div.langbar a {
 
 div.langbar img {
     padding: 3px 5px 0;
-    opacity: .7;
+
     border: 0;
 }
 
@@ -214,24 +207,16 @@ div.langbar img:last-child {
 div.sidenav {
     float: right;
     width: 200px;
-    border: 1px solid #7f462f;
+    border: 1px solid #F2F2F2;
 }
 
 div.main {
     font-size: 10pt;
     min-width: 570px;
     padding: 5px 25px 10px 25px;
-    border: 2px solid #220800;
-    border: 1px solid #fb7;
-    border: 1px solid #7f462f;
-    border-radius: 2px;
-    background: #220800 url(brown.png);
-    background: linear-gradient(to bottom, rgba(47, 18, 6, 0.3), rgba(47, 18, 6, 0.5)), url(brown.png);
-    background-size: 100% 100%, 120px 120px;
-    box-shadow: inset 0 0 1px 0 #220800;
-    box-shadow: inset 0 0 0 3px #000;
-    filter: drop-shadow(0 0 5px #000);
-    -webkit-filter: drop-shadow(0 0 5px #000);
+
+    background: #F2F2F2;
+
 }
 
 div.footnote {
@@ -243,31 +228,28 @@ div.footnote {
 div.notify {
     margin: 15px 0 15px 0;
     padding: 10px;
-    border: 1px solid #940;
-    border-radius: 2px;
-    background: #440a00;
-    box-shadow: inset 0 0 0 1px #000;
-    filter: drop-shadow(0 0 1px #000);
-    -webkit-filter: drop-shadow(0 0 1px #000);
+
+    background: #F2F2F2;
+
 }
 
 code {
     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
     font-weight: bold;
-    color: #dd5;
+    color: #38ADC2;
 }
 
 #navbar {
      border: 1px solid #7f462f;
      border-left: none;
-     border-right: none; 
+     border-right: none;
      margin: -6px -22px 0;
      border-radius: 2px 2px 0 0;
      text-align: center;
 }
 
 #navbar a {
-     border: 1px solid #7f462f;
+     border: 1px solid #38ADC2;
      display: inline-block;
      padding: 8px 10px;
      margin: -1px;
