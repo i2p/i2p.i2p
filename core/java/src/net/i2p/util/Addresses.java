@@ -394,7 +394,13 @@ public abstract class Addresses {
      *  Unlike InetAddress.getByName(), we do NOT allow numeric IPs
      *  of the form d.d.d, d.d, or d, as these are almost certainly mistakes.
      *
-     *  @param host DNS or IPv4 or IPv6 host name; if null returns null
+     *  InetAddress.getByName() is documented to return 127.0.0.1 for a null host;
+     *  here we return null.
+     *
+     *  InetAddress.getByName() also returns 127.0.0.1 for a host "",
+     *  but this is undocumented; as of 0.9.49, here we return null.
+     *
+     *  @param host DNS or IPv4 or IPv6 host name; if null or empty returns null
      *  @return IP or null
      *  @since 0.9.3
      */
