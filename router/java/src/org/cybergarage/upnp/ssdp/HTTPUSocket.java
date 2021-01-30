@@ -203,9 +203,10 @@ public class HTTPUSocket
 		}
 		catch (Exception e) {
 			// I2P prevent NPE android gitlab #1
-			if (ssdpUniSock != null) {
-				Debug.warning("addr = " +ssdpUniSock.getLocalAddress().getHostName());
-				Debug.warning("port = " + ssdpUniSock.getLocalPort());
+			DatagramSocket sock = ssdpUniSock;
+			if (sock != null) {
+				Debug.warning("addr = " + sock.getLocalAddress().getHostName());
+				Debug.warning("port = " + sock.getLocalPort());
 			}
 			Debug.warning(e);
 			return false;
