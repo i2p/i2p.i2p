@@ -77,9 +77,9 @@ public class StatisticsManager {
         stats.setProperty(RouterInfo.PROP_CAPABILITIES, _context.router().getCapabilities());
 
         if (_context.getBooleanPropertyDefaultTrue(PROP_PUBLISH_RANKINGS) &&
-            _context.random().nextInt(RANDOM_INCLUDE_STATS) == 0) {
-            //long publishedUptime = _context.router().getUptime();
-            // Don't publish these for first hour
+            _context.random().nextInt(RANDOM_INCLUDE_STATS) == 0 &&
+            _context.router().getUptime() > 62*60*1000) {
+
             // Disabled in 0.9
             //if (publishedUptime > 62*60*1000)
             //    includeAverageThroughput(stats);

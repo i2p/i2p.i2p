@@ -14,9 +14,11 @@ public abstract class StrictCountries {
 
     private static final Set<String> _countries;
 
-    // List updated using the Freedom in the World Index 2019
-    // https://freedomhouse.org/report/countries-world-freedom-2019
-    // General guidance: Include countries with a Civil Liberties (CL) score of 6 or 7.
+    // List updated using the Freedom in the World Index 2020
+    // https://freedomhouse.org/
+    // General guidance: Include countries with a Civil Liberties (CL) score of 16 or less
+    // (equivalent to a CL rating of 6 or 7 in their raw data)
+    // or a Internet Freedom score of 39 or less (not free)
 
     static {
         String[] c = {
@@ -37,12 +39,14 @@ public abstract class StrictCountries {
             /* Eritrea */ "ER",
             /* Ethiopia */ "ET",
             /* Iran */ "IR",
+            /* Iraq */ "IQ",
             /* Kazakhstan */ "KZ",
             /* Laos */ "LA",
             /* Libya */ "LY",
             /* Myanmar */ "MM",
             /* North Korea */ "KP",
             /* Palestinian Territories */ "PS",
+            /* Pakistan */ "PK",
             /* Rwanda */ "RW",
             /* Saudi Arabia */ "SA",
             /* Somalia */ "SO",
@@ -57,6 +61,7 @@ public abstract class StrictCountries {
             /* Venezuela */ "VE",
             /* United Arab Emirates */ "AE",
             /* Uzbekistan */ "UZ",
+            /* Vietnam */ "VN",
             /* Western Sahara */ "EH",
             /* Yemen */ "YE"
         };

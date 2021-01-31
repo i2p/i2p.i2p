@@ -241,6 +241,8 @@ public abstract class TransportUtil {
         return port >= 1024 &&
                port <= 65535 &&
                port != 1900 &&  // UPnP SSDP
+               port != 1719 &&  // H.323
+               port != 1720 &&  // H.323
                port != 2049 &&  // NFS
                port != 2827 &&  // BOB
                port != 3659 &&  // Apple-sasl
@@ -270,7 +272,7 @@ public abstract class TransportUtil {
      */
     public static void logInvalidPort(Log log, String transportStyle, int port) {
         log.error("Specified " + transportStyle + " port " + port + " is not valid, selecting a new port");
-        log.error("Invalid ports are: 0-1023, 1900, 2049, 2827, 3659, 4045, 4444, 4445, 5060, 5061, 6000, 6665-6669, 6697, 7650-7668, 8998, 9001, 9030, 9050, 9100, 9150, 31000, 32000, 65536+");
+        log.error("Invalid ports are: 0-1023, 1719, 1720, 1900, 2049, 2827, 3659, 4045, 4444, 4445, 5060, 5061, 6000, 6665-6669, 6697, 7650-7668, 8998, 9001, 9030, 9050, 9100, 9150, 31000, 32000, 65536+");
     }
 
     /**

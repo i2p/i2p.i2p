@@ -1159,7 +1159,8 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     public String getCapabilities() {
         StringBuilder rv = new StringBuilder(4);
-        char bw = getBandwidthClass();
+        boolean hidden = isHidden();
+        char bw = hidden ? CAPABILITY_BW32 : getBandwidthClass();
         rv.append(bw);
         // 512 and unlimited supported as of 0.9.18;
         // Add 256 as well for compatibility
@@ -1174,7 +1175,7 @@ public class Router implements RouterClock.ClockShiftListener {
         if(_context.getBooleanProperty(PROP_HIDDEN))
             rv.append(RouterInfo.CAPABILITY_HIDDEN);
         
-        if (_context.getBooleanProperty(PROP_FORCE_UNREACHABLE)) {
+        if (hidden || _context.getBooleanProperty(PROP_FORCE_UNREACHABLE)) {
             rv.append(CAPABILITY_UNREACHABLE);
             return rv.toString();
         }
@@ -1935,9 +1936,10 @@ public class Router implements RouterClock.ClockShiftListener {
             }
             if (downtime > LIVELINESS_DELAY) {
                 System.err.println("WARN: Old router was not shut down gracefully, deleting " + f);
-                if (lastWritten > 0)
-                    _eventLog.addEvent(EventLog.CRASHED, (downtime / 60000) + " minutes ago");
                 f.delete();
+                if (lastWritten > 0)
+                    _eventLog.addEvent(EventLog.CRASHED,
+                                       Translate.getString("{0} ago", DataHelper.formatDuration2(downtime), _context, "net.i2p.router.web.messages"));
             } else {
                 return false;
             }
