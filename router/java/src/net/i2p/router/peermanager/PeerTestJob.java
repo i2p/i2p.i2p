@@ -192,10 +192,11 @@ class PeerTestJob extends JobImpl {
      *
      */
     private class ReplySelector implements MessageSelector {
-        private long _expiration;
-        private long _nonce;
-        private Hash _peer;
+        private final long _expiration;
+        private final long _nonce;
+        private final Hash _peer;
         private boolean _matchFound;
+
         public ReplySelector(Hash peer, long nonce, long expiration) {
             _nonce = nonce;
             _expiration = expiration;
@@ -237,10 +238,11 @@ class PeerTestJob extends JobImpl {
      * Called when the peer's response is found
      */
     private class PeerReplyFoundJob extends JobImpl implements ReplyJob {
-        private RouterInfo _peer;
-        private long _testBegin;
-        private TunnelInfo _replyTunnel;
-        private TunnelInfo _sendTunnel;
+        private final RouterInfo _peer;
+        private final long _testBegin;
+        private final TunnelInfo _replyTunnel;
+        private final TunnelInfo _sendTunnel;
+
         public PeerReplyFoundJob(RouterContext context, RouterInfo peer, TunnelInfo replyTunnel, TunnelInfo sendTunnel) {
             super(context);
             _peer = peer;
@@ -272,10 +274,11 @@ class PeerTestJob extends JobImpl {
      * Called when the peer's response times out
      */
     private class PeerReplyTimeoutJob extends JobImpl {
-        private RouterInfo _peer;
-        private TunnelInfo _replyTunnel;
-        private TunnelInfo _sendTunnel;
-        private ReplySelector _selector;
+        private final RouterInfo _peer;
+        private final TunnelInfo _replyTunnel;
+        private final TunnelInfo _sendTunnel;
+        private final ReplySelector _selector;
+
         public PeerReplyTimeoutJob(RouterContext context, RouterInfo peer, TunnelInfo replyTunnel, TunnelInfo sendTunnel, ReplySelector sel) {
             super(context);
             _peer = peer;
