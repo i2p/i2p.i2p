@@ -273,8 +273,8 @@ public abstract class Addresses {
 
     private static boolean shouldInclude(InetAddress ia, boolean includeSiteLocal,
                                          boolean includeLoopbackAndWildcard, boolean includeIPv6) {
+        byte[] ip = ia.getAddress();
         if (TEST_IPV6_ONLY) {
-            byte[] ip = ia.getAddress();
             if (ip.length == 4) {
                 int i = ip[0] & 0xff;
                 if (i != 127 &&
@@ -294,8 +294,10 @@ public abstract class Addresses {
             (includeSiteLocal ||
              ((!ia.isSiteLocalAddress()) &&
               // disallow fc00::/8 and fd00::/8 (Unique local addresses RFC 4193)
+              // and yggdrasil
               // not recognized as local by InetAddress
-              (ia.getAddress().length != 16 || (ia.getAddress()[0] & 0xfe) != 0xfc))) &&
+              (ip.length != 16 ||
+               ((ip[0] & 0xff) >= 0x20 && (ip[0] & 0xff) <= 0x3f)))) &&
             // Hamachi 5/8 allocated to RIPE (30 November 2010)
             // Removed from TransportImpl.isPubliclyRoutable()
             // Check moved to here, for now, but will eventually need to
@@ -303,7 +305,7 @@ public abstract class Addresses {
             //(includeLocal ||
             //(!ia.getHostAddress().startsWith("5."))) &&
             (includeIPv6 ||
-             (ia instanceof Inet4Address));
+             ip.length == 4);
     }
 
     /**
