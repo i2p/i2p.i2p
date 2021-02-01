@@ -84,7 +84,7 @@ public class ConfigKeyringHandler extends FormHandler {
                         spk = bdin.getUnblindedPubKey();
                     }
                     if (spk == null) {
-                        addFormError(_t("Requires hostname, destination, or blinded Base32"));
+                        addFormError(_t("Requires host name, destination, or blinded Base32"));
                         return;
                     }
                     // from BlindCache

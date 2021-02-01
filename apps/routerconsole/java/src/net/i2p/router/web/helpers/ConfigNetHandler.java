@@ -466,7 +466,7 @@ public class ConfigNetHandler extends FormHandler {
         // TODO set IPv6 arg based on configuration?
         boolean rv = TransportUtil.isPubliclyRoutable(iab, true);
         if (!rv)
-            addFormError(_t("The hostname or IP {0} is not publicly routable", addr));
+            addFormError(_t("The address {0} is not publicly routable", addr));
         return rv;
     }
 

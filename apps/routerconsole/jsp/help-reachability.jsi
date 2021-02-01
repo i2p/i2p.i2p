@@ -61,7 +61,7 @@
      <%=intl._t("However, a restart is always required after this error.")%>
   </li>
   <li><b><%=intl._t("ERR - UDP Disabled and Inbound TCP host/port not set")%>:</b>
-     <%=intl._t("You have not configured inbound TCP with a hostname and port on the Network Configuration page, however you have disabled UDP.")%>&nbsp;
+     <%=intl._t("You have not configured inbound TCP with an address and port on the Network Configuration page, however you have disabled UDP.")%>&nbsp;
      <%=intl._t("Therefore your router cannot accept inbound connections.")%>&nbsp;
      <%=intl._t("Please configure a TCP host and port on the Network Configuration page or enable UDP.")%>
   </li>

@@ -26,7 +26,7 @@
 <ul><li>
 <%=intl._t("The proxy may be a remote public proxy, or may be running on your computer (localhost).")%>
 </li><li>
-<%=intl._t("To use a proxy, configure the type, hostname, and port below.")%>
+<%=intl._t("To use a proxy, configure the type, host, and port below.")%>
 </li><li>
 <%=intl._t("If you are running Tor Browser, reseed through it by configuring SOCKS 5, localhost, port 9150.")%>
 </li><li>
