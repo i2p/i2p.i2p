@@ -89,22 +89,22 @@ public abstract class NamingService {
     public String reverseLookup(Hash h) { return null; }
 
     /**
-     * If the hostname is a valid Base64 encoded destination, return the
+     * If the address is a valid Base64 encoded destination, return the
      * decoded Destination. Useful as a "fallback" in custom naming
      * implementations.
      * This is misnamed as it isn't a "lookup" at all, but
      * a simple conversion from a Base64 string to a Destination.
      *
-     * @param hostname 516+ character Base 64
+     * @param address 516+ character Base 64
      * @return Destination or null on error
      */
-    protected Destination lookupBase64(String hostname) {
+    protected Destination lookupBase64(String address) {
         try {
             Destination result = new Destination();
-            result.fromBase64(hostname);
+            result.fromBase64(address);
             return result;
         } catch (DataFormatException dfe) {
-            if (_log.shouldLog(Log.WARN)) _log.warn("Bad B64 dest [" + hostname + "]", dfe);
+            if (_log.shouldLog(Log.WARN)) _log.warn("Bad B64 dest [" + address + "]", dfe);
             return null;
         }
     }
@@ -534,12 +534,12 @@ public abstract class NamingService {
      *  This implementation returns null.
      *  See also lookup(Hash, int).
      *
-     *  @param hostname must be {52 chars}.b32.i2p
+     *  @param address must be {52 chars}.b32.i2p
      *  @param timeout in seconds; &lt;= 0 means use router default
      *  @return dest or null
      *  @since 0.8.7
      */
-    public Destination lookupBase32(String hostname, int timeout) {
+    public Destination lookupBase32(String address, int timeout) {
         return null;
     }
 

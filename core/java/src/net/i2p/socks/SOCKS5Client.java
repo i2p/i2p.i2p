@@ -34,7 +34,7 @@ public class SOCKS5Client {
      *  Caller must close sock on success.
      *
      *  @param sock socket to the proxy
-     *  @param connHostName hostname for the proxy to connect to
+     *  @param connHostName hostname or IP for the proxy to connect to
      *  @param connPort port for the proxy to connect to
      */
     public static void connect(Socket sock, String connHostName, int connPort) throws IOException {
@@ -48,7 +48,7 @@ public class SOCKS5Client {
      *  Caller must close sock on success.
      *
      *  @param sock socket to the proxy
-     *  @param connHostName hostname for the proxy to connect to
+     *  @param connHostName hostname or IP for the proxy to connect to
      *  @param connPort port for the proxy to connect to
      *  @param configUser username for proxy authentication or null
      *  @param configPW password for proxy authentication or null
@@ -76,7 +76,7 @@ public class SOCKS5Client {
      *
      *  @param pin input stream from the proxy
      *  @param pout output stream to the proxy
-     *  @param connHostName hostname for the proxy to connect to
+     *  @param connHostName hostname or IP for the proxy to connect to
      *  @param connPort port for the proxy to connect to
      */
     public static void connect(InputStream pin, OutputStream pout, String connHostName, int connPort) throws IOException {
@@ -91,7 +91,7 @@ public class SOCKS5Client {
      *
      *  @param pin input stream from the proxy
      *  @param pout output stream to the proxy
-     *  @param connHostName hostname for the proxy to connect to
+     *  @param connHostName hostname or IP for the proxy to connect to
      *  @param connPort port for the proxy to connect to
      *  @param configUser username for proxy authentication or null
      *  @param configPW password for proxy authentication or null

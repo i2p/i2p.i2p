@@ -390,8 +390,8 @@ public abstract class Addresses {
 
     /**
      *  Caching version of InetAddress.getByName(host).getAddress(), which is slow.
-     *  Caches numeric hostnames only.
-     *  Will resolve but not cache DNS hostnames.
+     *  Caches numeric addresses only.
+     *  Will resolve but not cache DNS addresses.
      *
      *  Unlike InetAddress.getByName(), we do NOT allow numeric IPs
      *  of the form d.d.d, d.d, or d, as these are almost certainly mistakes.
@@ -402,7 +402,7 @@ public abstract class Addresses {
      *  InetAddress.getByName() also returns 127.0.0.1 for a host "",
      *  but this is undocumented; as of 0.9.49, here we return null.
      *
-     *  @param host DNS or IPv4 or IPv6 hostname; if null or empty returns null
+     *  @param host DNS or IPv4 or IPv6 address; if null or empty returns null
      *  @return IP or null
      *  @since 0.9.3
      */
@@ -480,7 +480,7 @@ public abstract class Addresses {
      *  else the other type if available.
      *  Will resolve but not cache DNS hostnames.
      *
-     *  @param host DNS or IPv4 or IPv6 hostname; if null returns null
+     *  @param host DNS or IPv4 or IPv6 address; if null returns null
      *  @return IP or null
      *  @since 0.9.28
      */
@@ -533,7 +533,7 @@ public abstract class Addresses {
      *  Number of results may also change based on caching at various layers,
      *  even if the ultimate name server results did not change.
      *
-     *  @param host DNS or IPv4 or IPv6 hostname; if null returns null
+     *  @param host DNS or IPv4 or IPv6 address; if null returns null
      *  @return non-empty list IPs, or null if none
      *  @since 0.9.28
      */

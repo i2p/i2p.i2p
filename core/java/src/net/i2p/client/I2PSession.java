@@ -352,7 +352,7 @@ public interface I2PSession {
      *  Ask the router to lookup a Destination by hostname.
      *  Blocking. Waits a max of 10 seconds by default.
      *
-     *  This only makes sense for a b32 hostname, OR outside router context.
+     *  This only makes sense for a b32 address, OR outside router context.
      *  Inside router context, just query the naming service.
      *  Outside router context, this does NOT query the context naming service.
      *  Do that first if you expect a local addressbook.
