@@ -509,7 +509,7 @@ public class SingleFileNamingService extends NamingService {
 
     /**
      *  @param options ignored
-     *  @return all known host names, unsorted
+     *  @return all known hostnames, unsorted
      */
     public Set<String> getNames(Properties options) {
         if (!_file.exists())

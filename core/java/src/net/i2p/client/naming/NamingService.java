@@ -55,8 +55,8 @@ public abstract class NamingService {
     }
     
     /**
-     * Look up a host name.
-     * @return the Destination for this host name, or
+     * Look up a hostname.
+     * @return the Destination for this hostname, or
      * <code>null</code> if name is unknown.
      */
     public Destination lookup(String hostname) {
@@ -68,7 +68,7 @@ public abstract class NamingService {
      * This implementation returns reverseLookup(dest, null).
      *
      * @param dest non-null
-     * @return a host name for this Destination, or <code>null</code>
+     * @return a hostname for this Destination, or <code>null</code>
      * if none is known. It is safe for subclasses to always return
      * <code>null</code> if no reverse lookup is possible.
      */
@@ -82,14 +82,14 @@ public abstract class NamingService {
      * Subclasses implementing reverse lookups should override.
      *
      * @param h non-null
-     * @return a host name for this hash, or <code>null</code>
+     * @return a hostname for this hash, or <code>null</code>
      * if none is known. It is safe for subclasses to always return
      * <code>null</code> if no reverse lookup is possible.
      */
     public String reverseLookup(Hash h) { return null; }
 
     /**
-     * If the host name is a valid Base64 encoded destination, return the
+     * If the hostname is a valid Base64 encoded destination, return the
      * decoded Destination. Useful as a "fallback" in custom naming
      * implementations.
      * This is misnamed as it isn't a "lookup" at all, but
@@ -342,7 +342,7 @@ public abstract class NamingService {
     }
 
     /**
-     *  @return all known host names
+     *  @return all known hostnames
      *          or empty Set if none;
      *          Returned Set is not necessarily sorted, implementation dependent
      *  @since 0.8.7
@@ -353,7 +353,7 @@ public abstract class NamingService {
 
     /**
      *  @param options NamingService-specific, can be null
-     *  @return all known host names (matching the options if non-null)
+     *  @return all known hostnames (matching the options if non-null)
      *          or empty Set if none;
      *          Returned Set is not necessarily sorted, implementation dependent
      *  @since 0.8.7
@@ -521,7 +521,7 @@ public abstract class NamingService {
      *
      *  @param d non-null
      *  @param options NamingService-specific, can be null
-     *  @return host name or null
+     *  @return hostname or null
      *  @since 0.8.7
      */
     public String reverseLookup(Destination d, Properties options) {
@@ -576,7 +576,7 @@ public abstract class NamingService {
     //// Begin new API for multiple Destinations
 
     /**
-     *  For NamingServices that support multiple Destinations for a single host name,
+     *  For NamingServices that support multiple Destinations for a single hostname,
      *  return all of them.
      *
      *  It is recommended that the returned list is in order of priority, highest-first,
@@ -594,7 +594,7 @@ public abstract class NamingService {
     }
 
     /**
-     *  For NamingServices that support multiple Destinations and Properties for a single host name,
+     *  For NamingServices that support multiple Destinations and Properties for a single hostname,
      *  return all of them.
      *
      *  It is recommended that the returned list is in order of priority, highest-first,
@@ -698,7 +698,7 @@ public abstract class NamingService {
      * Subclasses implementing reverse lookups should override.
      *
      * @param h non-null
-     * @return a non-empty list of host names for this hash, or <code>null</code>
+     * @return a non-empty list of hostnames for this hash, or <code>null</code>
      * if none is known. It is safe for subclasses to always return
      * <code>null</code> if no reverse lookup is possible.
      * @since 0.9.26
@@ -713,7 +713,7 @@ public abstract class NamingService {
      * This implementation returns reverseLookupAll(dest, null).
      *
      * @param dest non-null
-     * @return a non-empty list of host names for this Destination, or <code>null</code>
+     * @return a non-empty list of hostnames for this Destination, or <code>null</code>
      * if none is known. It is safe for subclasses to always return
      * <code>null</code> if no reverse lookup is possible.
      * @since 0.9.26
@@ -729,7 +729,7 @@ public abstract class NamingService {
      *
      *  @param d non-null
      *  @param options NamingService-specific, can be null
-     *  @return a non-empty list of host names for this Destination, or <code>null</code>
+     *  @return a non-empty list of hostnames for this Destination, or <code>null</code>
      *  @since 0.9.26
      */
     public List<String> reverseLookupAll(Destination d, Properties options) {

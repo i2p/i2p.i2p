@@ -349,7 +349,7 @@ public interface I2PSession {
     public Destination lookupDest(Hash h, long maxWait) throws I2PSessionException;
 
     /**
-     *  Ask the router to lookup a Destination by host name.
+     *  Ask the router to lookup a Destination by hostname.
      *  Blocking. Waits a max of 10 seconds by default.
      *
      *  This only makes sense for a b32 hostname, OR outside router context.
@@ -402,7 +402,7 @@ public interface I2PSession {
     public Destination lookupDest(String name) throws I2PSessionException;
 
     /**
-     *  Ask the router to lookup a Destination by host name.
+     *  Ask the router to lookup a Destination by hostname.
      *  Blocking. See above for details.
      *  @param maxWait ms
      *  @since 0.9.11
@@ -411,7 +411,7 @@ public interface I2PSession {
     public Destination lookupDest(String name, long maxWait) throws I2PSessionException;
 
     /**
-     *  Ask the router to lookup a Destination by host name.
+     *  Ask the router to lookup a Destination by hostname.
      *  Blocking. See above for details.
      *  Same as lookupDest() but with a failure code in the return value
      *

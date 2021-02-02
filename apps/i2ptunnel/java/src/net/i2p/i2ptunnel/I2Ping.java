@@ -269,7 +269,7 @@ public class I2Ping extends I2PTunnelClientBase {
         /**
          *  As of 0.9.11, does NOT start itself.
          *  Caller must call start()
-         *  @param dest b64 or b32 or host name
+         *  @param dest b64 or b32 or hostname
          */
         public PingHandler(String dest, int count, int fromPort, int toPort,
                            long timeout, boolean countPings, boolean report) {
@@ -335,7 +335,7 @@ public class I2Ping extends I2PTunnelClientBase {
         }
 
         /**
-         *  @param name b64 or b32 or host name
+         *  @param name b64 or b32 or hostname
          *  @since 0.9.11
          */
         private Destination lookup(String name) {

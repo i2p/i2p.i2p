@@ -390,8 +390,8 @@ public abstract class Addresses {
 
     /**
      *  Caching version of InetAddress.getByName(host).getAddress(), which is slow.
-     *  Caches numeric host names only.
-     *  Will resolve but not cache DNS host names.
+     *  Caches numeric hostnames only.
+     *  Will resolve but not cache DNS hostnames.
      *
      *  Unlike InetAddress.getByName(), we do NOT allow numeric IPs
      *  of the form d.d.d, d.d, or d, as these are almost certainly mistakes.
@@ -402,7 +402,7 @@ public abstract class Addresses {
      *  InetAddress.getByName() also returns 127.0.0.1 for a host "",
      *  but this is undocumented; as of 0.9.49, here we return null.
      *
-     *  @param host DNS or IPv4 or IPv6 host name; if null or empty returns null
+     *  @param host DNS or IPv4 or IPv6 hostname; if null or empty returns null
      *  @return IP or null
      *  @since 0.9.3
      */
@@ -443,7 +443,7 @@ public abstract class Addresses {
     /**
      *  Caching version of InetAddress.getByName(host).getAddress(), which is slow.
      *  Resolves literal IP addresses only, will not cause a DNS lookup.
-     *  Will return null for host names.
+     *  Will return null for hostnames.
      *
      *  Unlike InetAddress.getByName(), we do NOT allow numeric IPs
      *  of the form d.d.d, d.d, or d, as these are almost certainly mistakes.
@@ -476,11 +476,11 @@ public abstract class Addresses {
 
     /**
      *  For literal IP addresses, this is the same as getIP(String).
-     *  For host names, will return the preferred type (IPv4/v6) if available,
+     *  For hostnames, will return the preferred type (IPv4/v6) if available,
      *  else the other type if available.
-     *  Will resolve but not cache DNS host names.
+     *  Will resolve but not cache DNS hostnames.
      *
-     *  @param host DNS or IPv4 or IPv6 host name; if null returns null
+     *  @param host DNS or IPv4 or IPv6 hostname; if null returns null
      *  @return IP or null
      *  @since 0.9.28
      */
@@ -522,9 +522,9 @@ public abstract class Addresses {
 
     /**
      *  For literal IP addresses, this is the same as getIP(String).
-     *  For host names, may return multiple addresses, both IPv4 and IPv6,
+     *  For hostnames, may return multiple addresses, both IPv4 and IPv6,
      *  even if those addresses are not reachable due to configuration or available interfaces.
-     *  Will resolve but not cache DNS host names.
+     *  Will resolve but not cache DNS hostnames.
      *
      *  Note that order of returned results, and whether
      *  multiple results for either IPv4 or IPv6 or both are actually
@@ -533,7 +533,7 @@ public abstract class Addresses {
      *  Number of results may also change based on caching at various layers,
      *  even if the ultimate name server results did not change.
      *
-     *  @param host DNS or IPv4 or IPv6 host name; if null returns null
+     *  @param host DNS or IPv4 or IPv6 hostname; if null returns null
      *  @return non-empty list IPs, or null if none
      *  @since 0.9.28
      */

@@ -119,7 +119,7 @@ public class AddressBean
 
 		boolean needsIDN = false;
 		// Here we do easy checks and throw translated exceptions.
-		// We do checks on the whole host name, not on each "label", so
+		// We do checks on the whole hostname, not on each "label", so
 		// we allow '.', and some untranslated errors will be thrown by IDN.toASCII()
 		for (int i = 0; i < host.length(); i++) {
 			char c = host.charAt(i);

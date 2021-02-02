@@ -500,9 +500,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
            %><tr><td class="infohelp"><%=intl._t("Local destination is not available. Start the tunnel.")%></td></tr><%
        } else if (name == null || name.equals("") || name.contains(" ") || !name.endsWith(".i2p")) {
            if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
-               %><tr><td class="infohelp"><%=intl._t("To enable registration verification, edit tunnel and set name (or website name) to a valid host name ending in '.i2p'")%></td></tr><%
+               %><tr><td class="infohelp"><%=intl._t("To enable registration verification, edit tunnel and set name (or website name) to a valid hostname ending in '.i2p'")%></td></tr><%
            } else {
-               %><tr><td class="infohelp"><%=intl._t("To enable registration verification, edit tunnel and set name to a valid host name ending in '.i2p'")%></td></tr><%
+               %><tr><td class="infohelp"><%=intl._t("To enable registration verification, edit tunnel and set name to a valid hostname ending in '.i2p'")%></td></tr><%
            }
        } else {
            valid = true;

@@ -17,7 +17,7 @@
 *		- Fixed isRootDevice() to check the ST header.
 *	11/19/04
 *		- Theo Beisch <theo.beisch@gmx.de>
-*		- Changed getRemoteAddress() to return the adresss instead of the host name.
+*		- Changed getRemoteAddress() to return the adresss instead of the hostname.
 *
 ******************************************************************/
 

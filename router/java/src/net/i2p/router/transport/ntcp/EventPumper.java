@@ -865,7 +865,7 @@ class EventPumper implements Runnable {
                 con.setKey(key);
                 RouterAddress naddr = con.getRemoteAddress();
                 try {
-                    // no DNS lookups, do not use host names
+                    // no DNS lookups, do not use hostnames
                     int port = naddr.getPort();
                     byte[] ip = naddr.getIP();
                     if (port <= 0 || ip == null)

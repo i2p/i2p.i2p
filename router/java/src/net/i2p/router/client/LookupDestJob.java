@@ -26,7 +26,7 @@ import net.i2p.util.Log;
 
 /**
  * Look up the lease of a hash, to convert it to a Destination for the client.
- * Or, since 0.9.11, lookup a host name in the naming service.
+ * Or, since 0.9.11, lookup a hostname in the naming service.
  */
 class LookupDestJob extends JobImpl {
     private final Log _log;

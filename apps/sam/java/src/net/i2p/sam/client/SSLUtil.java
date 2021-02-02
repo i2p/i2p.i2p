@@ -103,7 +103,7 @@ class SSLUtil {
         if (success) {
             logAlways("Created self-signed certificate for " + cname + " in keystore: " + ks.getAbsolutePath() + "\n" +
                            "The certificate was generated randomly, and is not associated with your " +
-                           "IP address, host name, router identity, or destination keys.");
+                           "IP address, hostname, router identity, or destination keys.");
         } else {
             error("Failed to create SAM SSL keystore.\n" +
                        "If you create the keystore manually, you must add " + PROP_KEYSTORE_PASSWORD + " and " + PROP_KEY_PASSWORD +

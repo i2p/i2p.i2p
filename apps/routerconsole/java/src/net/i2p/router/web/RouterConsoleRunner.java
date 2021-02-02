@@ -953,7 +953,7 @@ public class RouterConsoleRunner implements RouterApp {
             System.err.println("Created self-signed certificate for " + cname + " in keystore: " + ks.getAbsolutePath() + "\n" +
                                "The certificate was generated randomly.\n" +
                                "Unless you have changed the default settings, the certificate is not associated with your " +
-                               "IP address, host name, router identity, or destination keys.");
+                               "IP address, hostname, router identity, or destination keys.");
         } else {
             System.err.println("Failed to create console SSL keystore.\n" +
                                "This is for the Sun/Oracle keytool, others may be incompatible.\n" +

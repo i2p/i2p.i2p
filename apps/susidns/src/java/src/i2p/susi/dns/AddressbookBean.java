@@ -310,14 +310,14 @@ public class AddressbookBean extends BaseBean
 									else
 										message = _t("Destination changed for {0}.", displayHost);
 									if (!host.endsWith(".i2p"))
-										message += "<br>" + _t("Warning - host name does not end with \".i2p\"");
+										message += "<br>" + _t("Warning - hostname does not end with \".i2p\"");
 									// clear form
 									hostname = null;
 									destination = null;
 								} else {
 									if (message.length() <= 0) {
 										if (wasB32)
-											message = _t("Invalid Base 32 host name.");
+											message = _t("Invalid Base 32 hostname.");
 										else
 											message = _t("Invalid Base 64 destination.");
 									}
@@ -326,10 +326,10 @@ public class AddressbookBean extends BaseBean
 						} catch (IllegalArgumentException iae) {
 							message = iae.getMessage();
 							if (message == null)
-								message = _t("Invalid host name \"{0}\".", hostname);
+								message = _t("Invalid hostname \"{0}\".", hostname);
 						}
 					} else {
-						message = _t("Please enter a host name and destination");
+						message = _t("Please enter a hostname and destination");
 					}
 					// clear search when adding
 					search = null;

@@ -1220,7 +1220,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				if ((sName = getParameter(NDTConstants.TARGET1)) == null) {
 					throw new IllegalArgumentException("U parameter Required:");
 				}
-				// host name
+				// hostname
 				if ((sHost = getParameter(NDTConstants.TARGET2)) == null) {
 					throw new IllegalArgumentException("H parameter Required:");
 				}

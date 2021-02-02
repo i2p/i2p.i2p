@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
  * This class is immutable.
  *
  * <ul>
- *     <li>The client's host name.
+ *     <li>The client's hostname.
  *     <li>The client's IP address.
  *     <li>Whether the request / notification was transmitted securely (e.g. 
  *         via HTTPS).
@@ -122,7 +122,7 @@ public class MessageContext {
 	/**
 	 * Creates a new JSON-RPC 2.0 request / notification context.
 	 *
-	 * @param clientHostName    The client host name, {@code null} if 
+	 * @param clientHostName    The client hostname, {@code null} if 
 	 *                          unknown.
 	 * @param clientInetAddress The client IP address, {@code null} if 
 	 *                          unknown.
@@ -150,7 +150,7 @@ public class MessageContext {
 	/**
 	 * Creates a new JSON-RPC 2.0 request / notification context.
 	 *
-	 * @param clientHostName    The client host name, {@code null} if 
+	 * @param clientHostName    The client hostname, {@code null} if 
 	 *                          unknown.
 	 * @param clientInetAddress The client IP address, {@code null} if 
 	 *                          unknown.
@@ -181,7 +181,7 @@ public class MessageContext {
 	 * Creates a new JSON-RPC 2.0 request / notification context. No 
 	 * authenticated client principal is specified.
 	 *
-	 * @param clientHostName    The client host name, {@code null} if 
+	 * @param clientHostName    The client hostname, {@code null} if 
 	 *                          unknown.
 	 * @param clientInetAddress The client IP address, {@code null} if 
 	 *                          unknown.
@@ -202,7 +202,7 @@ public class MessageContext {
 	 * an insecure transport (plain HTTP) and no authenticated client 
 	 * principal.
 	 *
-	 * @param clientHostName    The client host name, {@code null} if 
+	 * @param clientHostName    The client hostname, {@code null} if 
 	 *                          unknown.
 	 * @param clientInetAddress The client IP address, {@code null} if 
 	 *                          unknown.
@@ -219,7 +219,7 @@ public class MessageContext {
 	/**
 	 * Creates a new JSON-RPC 2.0 request / notification context. Indicates 
 	 * an insecure transport (plain HTTP) and no authenticated client 
-	 * principal. Not client host name / IP is specified.
+	 * principal. Not client hostname / IP is specified.
 	 */
 	public MessageContext() {
 	
@@ -315,10 +315,10 @@ public class MessageContext {
 	
 	
 	/**
-	 * Gets the host name of the client that sent the request / 
+	 * Gets the hostname of the client that sent the request / 
 	 * notification.
 	 *
-	 * @return The client host name, {@code null} if unknown.
+	 * @return The client hostname, {@code null} if unknown.
 	 */
 	public String getClientHostName() {
 	

@@ -2229,7 +2229,7 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     /**
-     *  Full anchor to home page or details page with shortened host name as anchor text
+     *  Full anchor to home page or details page with shortened hostname as anchor text
      *  @return string, non-null
      *  @since 0.9.5
      */

@@ -205,7 +205,7 @@ class UDPAddress {
     public String getHost() { return _host; }
 
     /**
-     *  As of 0.9.32, will NOT resolve host names.
+     *  As of 0.9.32, will NOT resolve hostnames.
      *
      *  @return InetAddress or null
      */
@@ -228,7 +228,7 @@ class UDPAddress {
     int getIntroducerCount() { return (_introAddresses == null ? 0 : _introAddresses.length); }
 
     /**
-     *  As of 0.9.32, will NOT resolve host names.
+     *  As of 0.9.32, will NOT resolve hostnames.
      *
      *  @throws NullPointerException if getIntroducerCount() == 0
      *  @throws ArrayIndexOutOfBoundsException if i &lt; 0 or i &gt;= getIntroducerCount()
@@ -321,7 +321,7 @@ class UDPAddress {
     /**
      *  Caching version of InetAddress.getByName(host), which is slow.
      *  Caches numeric IPs only.
-     *  As of 0.9.32, will NOT resolve host names.
+     *  As of 0.9.32, will NOT resolve hostnames.
      *
      *  Unlike InetAddress.getByName(), we do NOT allow numeric IPs
      *  of the form d.d.d, d.d, or d, as these are almost certainly mistakes.

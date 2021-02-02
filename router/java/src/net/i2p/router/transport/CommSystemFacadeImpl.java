@@ -405,7 +405,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      * Collect the IPs for all routers in the DB, and queue them for lookup,
      * then fire off the periodic lookup task for the first time.
      *
-     *  As of 0.9.32, works only for literal IPs, ignores host names.
+     *  As of 0.9.32, works only for literal IPs, ignores hostnames.
      */
     private class QueueAll implements SimpleTimer.TimedEvent {
         public void timeReached() {
@@ -508,7 +508,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      *  Not recommended for our local router hash, as we may not be either in the cache or netdb,
      *  or may not be publishing an IP.
      *
-     *  As of 0.9.32, works only for literal IPs, returns null for host names.
+     *  As of 0.9.32, works only for literal IPs, returns null for hostnames.
      *
      *  @param peer not ourselves - use getOurCountry() for that
      *  @return two-letter lower-case country code or null
@@ -532,7 +532,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      *  Return first IP (v4 or v6) we find, any transport.
      *  Not validated, may be local, etc.
      *
-     *  As of 0.9.32, works only for literal IPs, returns null for host names.
+     *  As of 0.9.32, works only for literal IPs, returns null for hostnames.
      *
      *  @return IP or null
      */
@@ -549,7 +549,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      *  Return first valid IP (v4 or v6) we find, any transport.
      *  Local and other invalid IPs will not be returned.
      *
-     *  As of 0.9.32, works only for literal IPs, returns null for host names.
+     *  As of 0.9.32, works only for literal IPs, returns null for hostnames.
      *
      *  @return IP or null
      *  @since 0.9.18

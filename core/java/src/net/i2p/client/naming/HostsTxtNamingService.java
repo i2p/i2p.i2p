@@ -22,7 +22,7 @@ import net.i2p.data.Destination;
  * A naming service based on multiple "hosts.txt" files.
  * Supports .b32.i2p and {b64} lookups.
  * Supports caching.
- * All host names are converted to lower case.
+ * All hostnames are converted to lower case.
  */
 public class HostsTxtNamingService extends MetaNamingService {
 

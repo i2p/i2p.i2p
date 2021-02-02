@@ -1765,7 +1765,7 @@ class PeerCoordinator implements PeerListener
 
   /**
    *  Ban a web peer for this torrent, for while or permanently.
-   *  @param host the host name
+   *  @param host the hostname
    *  @since 0.9.49
    */
   public synchronized void banWebPeer(String host, boolean isPermanent) {
@@ -1785,7 +1785,7 @@ class PeerCoordinator implements PeerListener
 
   /**
    *  Is a web peer banned?
-   *  @param host the host name
+   *  @param host the hostname
    *  @since 0.9.49
    */
   public synchronized boolean isWebPeerBanned(String host) {

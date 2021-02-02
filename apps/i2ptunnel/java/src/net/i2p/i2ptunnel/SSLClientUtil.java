@@ -137,7 +137,7 @@ public class SSLClientUtil {
             logAlways("Created self-signed certificate for " + cname + " in keystore: " + ks.getAbsolutePath() + "\n" +
                       "The certificate was generated randomly.\n" +
                       "Unless you have changed the default settings, the certificate is not associated with your " +
-                           "IP address, host name, router identity, or destination keys.");
+                           "IP address, hostname, router identity, or destination keys.");
         } else {
             error("Failed to create I2PTunnel SSL keystore.\n" +
                        "If you create the keystore manually, you must add " + optPfx + PROP_KEYSTORE_PASSWORD + " and " + optPfx + PROP_KEY_PASSWORD +

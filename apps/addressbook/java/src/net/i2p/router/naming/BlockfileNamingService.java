@@ -98,7 +98,7 @@ import net.metanotion.util.skiplist.SkipList;
  *
  * </pre>
  *
- * All host names are converted to lower case.
+ * All hostnames are converted to lower case.
  *
  * @since 0.8.7, moved from core to addressbook in 0.9.31
  */

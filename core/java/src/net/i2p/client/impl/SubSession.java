@@ -300,7 +300,7 @@ class SubSession extends I2PSessionMuxedImpl {
     }
 
     /**
-     *  Ask the router to lookup a Destination by host name.
+     *  Ask the router to lookup a Destination by hostname.
      *  Blocking. Waits a max of 10 seconds by default.
      *
      *  This only makes sense for a b32 hostname, OR outside router context.
@@ -321,7 +321,7 @@ class SubSession extends I2PSessionMuxedImpl {
     }
 
     /**
-     *  Ask the router to lookup a Destination by host name.
+     *  Ask the router to lookup a Destination by hostname.
      *  Blocking. See above for details.
      *  @param maxWait ms
      *  @return null on failure

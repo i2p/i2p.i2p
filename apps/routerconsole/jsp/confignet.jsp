@@ -71,7 +71,7 @@
     <label><input type="radio" class="optbox" name="udpAutoIP" value="hidden" <%=nethelper.getUdpAutoIPChecked(2) %> >
     <%=intl._t("Hidden mode - do not publish IP")%> <i><%=intl._t("(prevents participating traffic)")%></i></label><br>
     <label><input type="radio" class="optbox" name="udpAutoIP" value="fixed" <%=nethelper.getUdpAutoIPChecked(1) %> >
-    <%=intl._t("Specify host name or IP")%>:</label>
+    <%=intl._t("Specify hostname or IP")%>:</label>
     <%=nethelper.getAddressSelector() %>
   </td>
  </tr>
@@ -149,7 +149,7 @@
     <label><input type="radio" class="optbox" name="ntcpAutoIP" value="disabled" <%=nethelper.getTcpAutoIPChecked(4) %> >
     <%=intl._t("Completely disable")%> <i><%=intl._t("(select only if behind a firewall that throttles or blocks outbound TCP)")%></i></label><br>
     <label><input type="radio" class="optbox" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(1) %> >
-    <%=intl._t("Specify host name or IP")%>:</label>
+    <%=intl._t("Specify hostname or IP")%>:</label>
     <input name ="ntcphost" type="text" size="16" value="<jsp:getProperty name="nethelper" property="ntcphostname" />" >
   </td>
  </tr>

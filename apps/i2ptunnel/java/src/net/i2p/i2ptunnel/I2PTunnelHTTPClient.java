@@ -64,7 +64,7 @@ import net.i2p.util.PortMapper;
  * resolve correctly, cookies won't work, etc.
  *
  * Note that http://$b64key/... and http://$b64key.i2p/... are NOT supported, as
- * a b64 key may contain '=' and '~', both of which are illegal host name characters.
+ * a b64 key may contain '=' and '~', both of which are illegal hostname characters.
  * Rewrite as http://i2p/$b64key/...
  *
  * If the $site resolves with the I2P naming service, then it is directed towards
@@ -76,7 +76,7 @@ import net.i2p.util.PortMapper;
 public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runnable {
 
     /**
-     *  Map of host name to base64 destination for destinations collected
+     *  Map of hostname to base64 destination for destinations collected
      *  via address helper links
      */
     private final ConcurrentHashMap<String, String> addressHelpers = new ConcurrentHashMap<String, String>(8);
@@ -172,8 +172,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "Proxy-Connection: close\r\n"+
             "\r\n" +
             "<html><body><H1>New Host Name with Address Helper</H1>" +
-            "The address helper link you followed is for a new host name that is not in your address book. " +
-            "You may either save the destination for this host name to your address book, or remember it only until your router restarts. " +
+            "The address helper link you followed is for a new hostname that is not in your address book. " +
+            "You may either save the destination for this hostname to your address book, or remember it only until your router restarts. " +
             "If you save it to your address book, you will not see this message again. " +
             "If you do not wish to visit this host, click the \"back\" button on your browser.";
 
@@ -573,7 +573,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
 
                     int port = requestURI.getPort();
 
-                    // Go through the various types of host names, set
+                    // Go through the various types of hostnames, set
                     // the host and destination variables accordingly,
                     // and transform the first line.
                     // For all i2p network hosts, ensure that the host is a
@@ -622,7 +622,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             break;
                         }
                     } else if(hostLowerCase.endsWith(".i2p")) {
-                        // Destination gets the host name
+                        // Destination gets the hostname
                         destination = host;
                         // Host becomes the destination's "{b32}.b32.i2p" string, or "i2p" on lookup failure
                         host = getHostName(destination);
@@ -911,7 +911,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             // ignore
                         }
                         return;
-                    }   // end host name processing
+                    }   // end hostname processing
 
                     boolean isValid = usingInternalOutproxy || usingWWWProxy ||
                                       usingInternalServer || isSupportedAddress(host, protocol);
@@ -1006,7 +1006,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                         line = null;
                                         continue; // completely strip the line if everything doesn't match
                                     }
-                                    // Strip to a relative URI, to hide the original host name
+                                    // Strip to a relative URI, to hide the original hostname
                                     StringBuilder buf = new StringBuilder();
                                     buf.append("Referer: ");
                                     String refererPath = refererURI.getRawPath();

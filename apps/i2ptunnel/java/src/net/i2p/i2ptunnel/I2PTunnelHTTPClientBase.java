@@ -762,7 +762,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         private final boolean _isSSL;
 
         /**
-         *  @param target the URI for an HTTP request, or the host name for CONNECT
+         *  @param target the URI for an HTTP request, or the hostname for CONNECT
          */
         public OnTimeout(Socket s, OutputStream out, String target, boolean usingProxy, String wwwProxy, long id) {
             _socket = s;
@@ -776,7 +776,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         }
 
         /**
-         *  @param target the URI for an HTTP request, or the host name for CONNECT
+         *  @param target the URI for an HTTP request, or the hostname for CONNECT
          *  @param targetHost if non-null, call noteProxyResult() with this as host
          *  @param isSSL to pass to noteProxyResult(). FALSE for ConnectClient.
          *  @since 0.9.39
@@ -981,7 +981,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                     out.write(jurl);
                     out.write(uri);
                     out.write("\">");
-                    // Translators: parameter is a host name
+                    // Translators: parameter is a hostname
                     out.write(_t("{0} jump service", jumphost));
                     out.write("</a>\n");
                 }

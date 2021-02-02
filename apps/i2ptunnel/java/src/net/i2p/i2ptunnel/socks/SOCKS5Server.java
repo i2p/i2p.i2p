@@ -348,7 +348,7 @@ class SOCKS5Server extends SOCKSServer {
         setupServer();
 
         if (connHostName == null) {
-            _log.error("BUG: destination host name has not been initialized!");
+            _log.error("BUG: destination hostname has not been initialized!");
             throw new SOCKSException("BUG! See the logs!");
         }
         if (connPort == 0) {

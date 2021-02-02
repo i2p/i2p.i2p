@@ -97,7 +97,7 @@ class SSLClientListenerRunner extends ClientListenerRunner {
         if (success) {
             _log.logAlways(Log.INFO, "Created self-signed certificate for " + cname + " in keystore: " + ks.getAbsolutePath() + "\n" +
                            "The certificate was generated randomly, and is not associated with your " +
-                           "IP address, host name, router identity, or destination keys.");
+                           "IP address, hostname, router identity, or destination keys.");
         } else {
             _log.error("Failed to create I2CP SSL keystore.\n" +
                        "This is for the Sun/Oracle keytool, others may be incompatible.\n" +

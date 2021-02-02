@@ -249,7 +249,7 @@ public class I2PSSLSocketFactory {
     /**
      * Returns a socket to the host.
      *
-     * A host argument that's an IP address (instead of a host name)
+     * A host argument that's an IP address (instead of a hostname)
      * is not recommended, as this will probably fail
      * SSL certificate validation.
      *
@@ -267,9 +267,9 @@ public class I2PSSLSocketFactory {
     /**
      * Returns a socket to the host.
      *
-     * An InetAddress argument created with an IP address (instead of a host name)
+     * An InetAddress argument created with an IP address (instead of a hostname)
      * is not recommended, as this will perform a reverse DNS lookup to
-     * get the host name for certificate validation, which will probably then fail.
+     * get the hostname for certificate validation, which will probably then fail.
      *
      * Hostname validation is skipped for localhost addresses, but you still
      * must trust the certificate.

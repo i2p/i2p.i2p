@@ -247,7 +247,7 @@ public class ConfigNetHelper extends HelperBase {
         }
         if (!addrs.isEmpty()) {
             buf.append("\n<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-               .append(_t("Add host name or IP"))
+               .append(_t("Add hostname or IP"))
                .append(": ");
         }
         buf.append("<input name=\"udpHost1\" type=\"text\" size=\"16\" >");

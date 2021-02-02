@@ -215,11 +215,11 @@ public class RouterAddress extends DataStructureImpl {
     
     /**
      *  Caching version of InetAddress.getByName(getOption("host")).getAddress(), which is slow.
-     *  Caches numeric host names, and negative caches also.
+     *  Caches numeric hostnames, and negative caches also.
      *
-     *  As of 0.9.32, this works for literal IP addresses only, and does NOT resolve host names.
-     *  If a host name is specified in the options, this will return null.
-     *  Use getHost() if you need the host name.
+     *  As of 0.9.32, this works for literal IP addresses only, and does NOT resolve hostnames.
+     *  If a hostname is specified in the options, this will return null.
+     *  Use getHost() if you need the hostname.
      *
      *  @return IP or null
      *  @since 0.9.3
@@ -228,7 +228,7 @@ public class RouterAddress extends DataStructureImpl {
         if (_ip == NOT_LOOKED_UP) {
             // Only look up once, even if it fails, so we don't generate excessive DNS lookups.
             // The lifetime of a RouterAddress object is a few hours at most,
-            // it will get republished or expired, so it's OK even for host names.
+            // it will get republished or expired, so it's OK even for hostnames.
             String host = getHost();
             if (host != null)
                 _ip = Addresses.getIPOnly(host);

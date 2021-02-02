@@ -205,7 +205,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
 
                     String hostLowerCase = host.toLowerCase(Locale.US);
                     if (hostLowerCase.endsWith(".i2p")) {
-                        // Destination gets the host name
+                        // Destination gets the hostname
                         destination = host;
                     } else if (host.contains(".") || host.startsWith("[")) {
                         if (Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_USE_OUTPROXY_PLUGIN, "true"))) {
