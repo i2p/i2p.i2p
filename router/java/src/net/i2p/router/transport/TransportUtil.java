@@ -13,6 +13,7 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.router.RouterAddress;
@@ -38,6 +39,8 @@ public abstract class TransportUtil {
      */
     private static final int MIN_RANDOM_PORT = 9151;
     private static final int MAX_RANDOM_PORT = 30777;
+
+    private static final Pattern YGGDRASIL_PATTERN = Pattern.compile("^[2-3][0-9a-fA-F]{2}:[0-9a-fA-F:]*");
 
     public enum IPv6Config {
         /** IPv6 disabled */
@@ -126,6 +129,15 @@ public abstract class TransportUtil {
         // do this the fast way, without calling getIP() to parse the host string
         String host = addr.getHost();
         return host != null && host.contains(":");
+    }
+
+    /**
+     *  @since 0.9.49
+     */
+    public static boolean isYggdrasil(RouterAddress addr) {
+        // do this the fast way, without calling getIP() to parse the host string
+        String host = addr.getHost();
+        return host != null && YGGDRASIL_PATTERN.matcher(host).matches();
     }
 
     /**
@@ -290,4 +302,16 @@ public abstract class TransportUtil {
         int maxPort = Math.min(65535, Math.max(minPort, ctx.getProperty(maxprop, MAX_RANDOM_PORT)));
         return minPort + ctx.random().nextInt(1 + maxPort - minPort);
     }
+
+/*
+    public static void main(String[] args) {
+        java.util.Set<String> addrs = net.i2p.util.Addresses.getAddresses(true, true, true, true);
+        net.i2p.util.OrderedProperties props = new net.i2p.util.OrderedProperties();
+        RouterAddress ra = new RouterAddress("foo", props, 10);
+        for (String a : addrs) {
+            props.setProperty("host", a);
+            System.out.println(a + " - " + isYggdrasil(ra));
+        }
+    }
+*/
 }

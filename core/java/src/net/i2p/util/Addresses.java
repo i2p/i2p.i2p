@@ -261,6 +261,36 @@ public abstract class Addresses {
     }
 
     /**
+     *  Warning, very slow on Windows. Caller should cache.
+     *
+     *  @return the IPv6 address with prefix 02xx: or 03xx:
+     *  @since 0.9.49
+     */
+    public static byte[] getYggdrasilAddress() {
+        if (SystemVersion.isAndroid())
+            return null;
+        try {
+            Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
+            if (ifcs != null) {
+                while (ifcs.hasMoreElements()) {
+                    NetworkInterface ifc = ifcs.nextElement();
+                    if (!ifc.isUp())
+                        continue;
+                    for(Enumeration<InetAddress> addrs =  ifc.getInetAddresses(); addrs.hasMoreElements();) {
+                        InetAddress addr = addrs.nextElement();
+                        byte[] ip = addr.getAddress();
+                        if (ip.length == 16 && (ip[0] & 0xfe) == 0x02)
+                            return ip;
+                    }
+                }
+            }
+        } catch (SocketException e) {
+        } catch (java.lang.Error e) {
+        }
+        return null;
+    }
+
+    /**
      *  Strip the trailing "%nn" from Inet6Address.getHostAddress()
      *  @since IPv6
      */
@@ -789,6 +819,11 @@ public abstract class Addresses {
         System.out.println("\nAll External Addresses:");
         a = getAddresses(false, false, true);
         print(a);
+        byte[] ygg = getYggdrasilAddress();
+        if (ygg != null) {
+            System.out.println("\nYggdrasil Address:");
+            System.out.println(toString(ygg));
+        }
         System.out.println("\nAll External and Local Addresses:");
         a = getAddresses(true, false, true);
         print(a);
