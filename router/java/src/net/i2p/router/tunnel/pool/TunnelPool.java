@@ -735,8 +735,8 @@ public class TunnelPool {
 
         int wanted = Math.min(_settings.getQuantity(), LeaseSet.MAX_LEASES);
         if (_tunnels.size() < wanted) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn(toString() + ": Not enough tunnels (" + _tunnels.size() + ", wanted " + wanted + ")");
+            if (_log.shouldInfo())
+                _log.info(toString() + ": Not enough tunnels (" + _tunnels.size() + ", wanted " + wanted + ")");
             // see comment below
             if (_tunnels.isEmpty())
                 return null;
@@ -797,8 +797,8 @@ public class TunnelPool {
         // So we will generate a succession of leases at startup. That's OK.
         // Do we want a config option for this, or are there times when we shouldn't do this?
         if (leases.size() < wanted) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn(toString() + ": Not enough leases (" + leases.size() + ", wanted " + wanted + ")");
+            if (_log.shouldInfo())
+                _log.info(toString() + ": Not enough leases (" + leases.size() + ", wanted " + wanted + ")");
             if (leases.isEmpty())
                 return null;
         }
