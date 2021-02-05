@@ -283,7 +283,7 @@
                 <pathelement location="../../../build/i2p.jar" />
             </classpath>
             <arg value="tag" />
-            <arg value="../../../installer/resources/initialNews/initialNews.xml" />
+            <arg value="../resources-news/docs/initialNews/initialNews.xml" />
             <arg value="build/News.java" />
         </java>
     </target>
