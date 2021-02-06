@@ -41,6 +41,7 @@ class BlindCache {
     private final ConcurrentHashMap<SigningPublicKey, BlindData> _reverseCache;
     // dest hash
     private final ConcurrentHashMap<Hash, BlindData> _hashCache;
+    private boolean _changed;
 
     private static final String PERSIST_FILE = "router.blindcache.dat";
 
@@ -58,7 +59,8 @@ class BlindCache {
      *  May be restarted by calling startup() again.
      */
     public synchronized void shutdown() {
-        store();
+        if (_changed)
+            store();
         _cache.clear();
         _reverseCache.clear();
         _hashCache.clear();
@@ -173,8 +175,11 @@ class BlindCache {
      */
     public void addToCache(BlindData bd) {
         storeInCache(bd);
-        if (bd.getSecret() != null || bd.getAuthPrivKey() != null)
+        if (bd.getSecret() != null || bd.getAuthPrivKey() != null) {
             store();
+        } else {
+            synchronized(this) { _changed = true; }
+        }
     }
 
     /**
@@ -313,6 +318,7 @@ class BlindCache {
                         log.warn("Error reading cache entry: " + line, dfe);
                 }
             }
+            _changed = false;
         } catch (IOException ioe) {
             if (log.shouldLog(Log.WARN) && file.exists())
                 log.warn("Error reading the blinding cache file", ioe);
@@ -339,6 +345,7 @@ class BlindCache {
             }
             if (out.checkError())
                 throw new IOException("Failed write to " + file);
+            _changed = false;
         } catch (IOException ioe) {
             if (log.shouldLog(Log.WARN))
                 log.warn("Error writing the blinding cache File", ioe);
