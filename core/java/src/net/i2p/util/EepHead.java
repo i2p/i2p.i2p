@@ -163,7 +163,9 @@ public class EepHead extends EepGet {
                            "        (use -c or -p :0 for no proxy)");
     }
     
-    /** return true if the URL was completely retrieved */
+    /**
+     *  @param timeout may be null as of 0.9.49
+     */
     @Override
     protected void doFetch(SocketTimeout timeout) throws IOException {
         _aborted = false;
@@ -171,11 +173,13 @@ public class EepHead extends EepGet {
         if (_aborted)
             throw new IOException("Timed out reading the HTTP headers");
         
-        timeout.resetTimer();
-        if (_fetchInactivityTimeout > 0)
-            timeout.setInactivityTimeout(_fetchInactivityTimeout);
-        else
-            timeout.setInactivityTimeout(60*1000);
+        if (timeout != null) {
+            timeout.resetTimer();
+            if (_fetchInactivityTimeout > 0)
+                timeout.setInactivityTimeout(_fetchInactivityTimeout);
+            else
+                timeout.setInactivityTimeout(60*1000);
+        }
         
         // Should we even follow redirects for HEAD?
         if (_redirectLocation != null) {

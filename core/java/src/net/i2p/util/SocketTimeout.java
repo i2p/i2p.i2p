@@ -5,11 +5,19 @@ import java.net.Socket;
 import java.util.Date;
 
 /**
- *  This should be deprecated.
- *  It is only used by EepGet and Syndie.
+ *  Implements one or two timers; one for inactivity, that is reset by resetTimer(),
+ *  and optionally, a total time since instantiation, that is configured by setTotalTimeoutPeriod().
+ *
+ *  On timer expiration, this will close a provided socket, and/or run a configured job.
+ *
+ *  Deprecated for external use.
+ *  It is only used by EepGet, its subclasses, and Syndie.
+ *  Take care not to break Syndie.
  *  The only advantage seems to be a total timeout period, which is the second
  *  argument to EepGet.fetch(headerTimeout, totalTimeout, inactivityTimeout),
  *  which is most likely always set to -1.
+ *
+ *  Not for use by plugins or external applications, subject to change.
  *
  *  Use socket.setsotimeout instead?
  */
@@ -22,23 +30,31 @@ public class SocketTimeout extends SimpleTimer2.TimedEvent {
     private volatile boolean _cancelled;
     private volatile Runnable _command;
 
+    /**
+     *  @param delay greater than zero
+     */
     public SocketTimeout(long delay) { this(null, delay); }
 
+    /**
+     *  If socket is non-null, or is set later by setSocket(),
+     *  it will be closed when the timer expires.
+     *
+     *  @param socket may be null
+     *  @param delay greater than zero
+     */
     public SocketTimeout(Socket socket, long delay) {
         super(SimpleTimer2.getInstance());
         _inactivityDelay = delay;
         _targetSocket = socket;
-        _cancelled = false;
         _lastActivity = _startTime = System.currentTimeMillis();
-        _totalTimeoutTime = -1;
         schedule(delay);
     }
 
     public void timeReached() {
         if (_cancelled) return;
-        
-        if ( ( (_totalTimeoutTime > 0) && (_totalTimeoutTime <= System.currentTimeMillis()) ) ||
-             (_inactivityDelay + _lastActivity <= System.currentTimeMillis()) ) {
+        long now = System.currentTimeMillis();
+        if ((_totalTimeoutTime > 0 && _totalTimeoutTime <= now) ||
+            (_inactivityDelay + _lastActivity <= now)) {
             if (_targetSocket != null) {
                 try {
                     if (!_targetSocket.isClosed())
@@ -46,8 +62,12 @@ public class SocketTimeout extends SimpleTimer2.TimedEvent {
                 } catch (IOException ioe) {}
             }
             if (_command != null) _command.run();
-        }  else {
-            schedule(_inactivityDelay);
+        } else {
+            if (_totalTimeoutTime > 0) {
+                schedule(Math.min(_inactivityDelay, _totalTimeoutTime - now));
+            } else {
+                schedule(_inactivityDelay);
+            }
         }
     }
     
@@ -61,17 +81,38 @@ public class SocketTimeout extends SimpleTimer2.TimedEvent {
         return super.cancel();
     }
 
+    /**
+     *  If non-null, will be closed when the timer expires.
+     */
     public void setSocket(Socket s) { _targetSocket = s; }
-    public void resetTimer() { _lastActivity = System.currentTimeMillis();  }
-    public void setInactivityTimeout(long timeout) { _inactivityDelay = timeout; }
 
+    /**
+     *  Call when there is activity
+     */
+    public void resetTimer() { _lastActivity = System.currentTimeMillis();  }
+
+    /**
+     *  Changes the delay provided in the constructor
+     *
+     *  @param delay greater than zero
+     */
+    public void setInactivityTimeout(long delay) { _inactivityDelay = delay; }
+
+    /**
+     *  If greater than zero, must be greater than the inactivity timeout.
+     *
+     *  @param timeoutPeriod Time since constructed, or less than or equal to zero to disable
+     */
     public void setTotalTimeoutPeriod(long timeoutPeriod) { 
         if (timeoutPeriod > 0)
             _totalTimeoutTime = _startTime + timeoutPeriod;
         else
-            _totalTimeoutTime = -1;
+            _totalTimeoutTime = 0;
     }
 
+    /**
+     *  If non-null, will be run when the timer expires.
+     */
     public void setTimeoutCommand(Runnable job) { _command = job; }
     
     @Override
