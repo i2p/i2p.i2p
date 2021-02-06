@@ -864,7 +864,7 @@ public class NTCPTransport extends TransportImpl {
         } else if (port > 0 && !isFixedOrForceFirewalled) {
             // all detected interfaces
             Collection<InetAddress> addrs = getSavedLocalAddresses();
-            if (!addrs.isEmpty()) {
+            if (!addrs.isEmpty() && !_context.router().isHidden()) {
                 for (InetAddress ia : addrs) {
                     OrderedProperties props = new OrderedProperties();
                     props.setProperty(RouterAddress.PROP_HOST, ia.getHostAddress());
