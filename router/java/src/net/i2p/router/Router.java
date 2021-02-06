@@ -916,11 +916,11 @@ public class Router implements RouterClock.ClockShiftListener {
             } else if (_state == State.EXPL_TUNNELS_READY) {
                 changeState(State.RUNNING);
                 changed = true;
-            } else {
-                _log.warn("Invalid state " + _state + " for setNetDbReady()");
             }
         }
-        if (changed) {
+        if (_context.netDb().isInitialized()) {
+            if (_log.shouldWarn())
+                _log.warn("NetDB ready, publishing RI");
             // any previous calls to netdb().publish() did not
             // actually publish, because netdb init was not complete
             Republish r = new Republish(_context);
@@ -928,6 +928,8 @@ public class Router implements RouterClock.ClockShiftListener {
             // so we probably don't need to throw it to the timer queue,
             // but just to be safe
             _context.simpleTimer2().addEvent(r, 0);
+        }
+        if (changed) {
             _context.commSystem().initGeoIP();
 
             if (!SystemVersion.isSlow() &&

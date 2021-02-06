@@ -11,6 +11,7 @@ package net.i2p.router.networkdb.kademlia;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
@@ -337,8 +338,8 @@ abstract class StoreJob extends JobImpl {
             return;
         }
 
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": Send store timeout is " + responseTime);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug(getJobId() + ": Send store timeout is " + responseTime);
 
         sendStore(msg, router, now + responseTime);
     }
@@ -349,19 +350,22 @@ abstract class StoreJob extends JobImpl {
      *
      */
     private void sendStore(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
+        RouterContext ctx = getContext();
         if (msg.getEntry().isLeaseSet()) {
-            getContext().statManager().addRateData("netDb.storeLeaseSetSent", 1);
+            ctx.statManager().addRateData("netDb.storeLeaseSetSent", 1);
             // if it is an encrypted leaseset...
-            if (getContext().keyRing().get(msg.getKey()) != null)
+            if (ctx.keyRing().get(msg.getKey()) != null)
                 sendStoreThroughExploratory(msg, peer, expiration);
             else if (msg.getEntry().getType() == DatabaseEntry.KEY_TYPE_META_LS2)
                 sendWrappedStoreThroughExploratory(msg, peer, expiration);
             else
                 sendStoreThroughClient(msg, peer, expiration);
         } else {
-            getContext().statManager().addRateData("netDb.storeRouterInfoSent", 1);
+            ctx.statManager().addRateData("netDb.storeRouterInfoSent", 1);
             // if we can't connect to peer directly, just send it out an exploratory tunnel
-            if (_connectChecker.canConnect(_connectMask, peer))
+            Hash h = peer.getIdentity().getHash();
+            if (ctx.commSystem().isEstablished(h) ||
+                (!ctx.commSystem().wasUnreachable(h) && _connectChecker.canConnect(_connectMask, peer)))
                 sendDirect(msg, peer, expiration);
             else
                 sendStoreThroughExploratory(msg, peer, expiration);
@@ -756,6 +760,7 @@ abstract class StoreJob extends JobImpl {
     private class FailedJob extends JobImpl {
         private final RouterInfo _peer;
         private final long _sendOn;
+        private final AtomicBoolean _wasRun = new AtomicBoolean();
 
         public FailedJob(RouterContext enclosingContext, RouterInfo peer, long sendOn) {
             super(enclosingContext);
@@ -763,6 +768,8 @@ abstract class StoreJob extends JobImpl {
             _sendOn = sendOn;
         }
         public void runJob() {
+            if (!_wasRun.compareAndSet(false, true))
+                return;
             Hash hash = _peer.getIdentity().getHash();
             if (_log.shouldLog(Log.INFO))
                 _log.info(StoreJob.this.getJobId() + ": Peer " + hash.toBase64() 
