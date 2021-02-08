@@ -1618,7 +1618,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             //"http://no.i2p/jump/," +
             "http://i2pjump.i2p/jump/," +
             //"http://i2jump.i2p/";
-            "http://notbob.i2p/cgi-bin/defcon.cgi?jump=";
+            "http://notbob.i2p/cgi-bin/jump.cgi?q=";
 
     /** @param host ignored */
     private static boolean isSupportedAddress(String host, String protocol) {
