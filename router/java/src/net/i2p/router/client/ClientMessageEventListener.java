@@ -886,6 +886,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 long nexp = bd.getExpiration();
                 if (nexp > oexp) {
                     obd.setExpiration(nexp);
+                    // to force save at shutdown
+                    _context.netDb().setBlindData(obd);
                     if (_log.shouldWarn())
                         _log.warn("Updated expiration: " + obd);
                 } else {

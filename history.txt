@@ -1,3 +1,16 @@
+2021-02-06 zzz
+ * Proxy: Update default jump servers
+ * NetDB:
+   - Ensure RI is published after netdb is initialized
+   - Only rewrite blind cache at shutdown if changed
+ * NTCP: Don't publish saved local address when hidden
+
+2021-02-05 zzz
+ * GeoIP update
+
+2021-02-03 zzz
+ * Tunnels: Peer selection changes
+
 2021-01-31 zzz
  * Router:
    - Update list of hidden mode countries
