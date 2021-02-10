@@ -1272,41 +1272,51 @@ public final class KeyStoreUtil {
     }
 
     /**
-     *   Usage: KeyStoreUtil (loads from system keystore)
+     *   Usage: KeyStoreUtil system (loads from system keystore)
      *          KeyStoreUtil foo.ks (loads from system keystore, and from foo.ks keystore if exists, else creates empty)
-     *          KeyStoreUtil certDir (loads from system keystore and all certs in certDir if exists)
      *          KeyStoreUtil import file.ks file.key alias keypw (imports private key from file to keystore)
      *          KeyStoreUtil export file.ks alias keypw (exports private key from keystore)
      *          KeyStoreUtil keygen file.ks alias keypw (create keypair in keystore)
      *          KeyStoreUtil keygen2 file.ks alias keypw (create keypair using I2PProvider)
      */
     public static void main(String[] args) {
+        if (args.length <= 0) {
+            usage();
+            return;
+        }
         try {
-            if (args.length > 0 && "import".equals(args[0])) {
+            if ("import".equals(args[0])) {
                 testImport(args);
                 return;
             }
-            if (args.length > 0 && "export".equals(args[0])) {
+            if ("export".equals(args[0])) {
                 testExport(args);
                 return;
             }
-            if (args.length > 0 && "keygen".equals(args[0])) {
+            if ("keygen".equals(args[0])) {
                 testKeygen(args);
                 return;
             }
-            if (args.length > 0 && "keygen2".equals(args[0])) {
+            if ("keygen2".equals(args[0])) {
                 testKeygen2(args);
                 return;
             }
-            if (args.length > 0 && "list".equals(args[0])) {
+            if ("list".equals(args[0])) {
                 listKeys(args);
                 return;
             }
-            File ksf = (args.length > 0) ? new File(args[0]) : null;
-            if (ksf != null && !ksf.exists()) {
-                createKeyStore(ksf, DEFAULT_KEYSTORE_PASSWORD);
-                System.out.println("Created empty keystore " + ksf);
-            } else {
+            if ("create".equals(args[0])) {
+                File ksf = (args.length == 2) ? new File(args[1]) : null;
+                if (ksf != null && !ksf.exists()) {
+                    createKeyStore(ksf, DEFAULT_KEYSTORE_PASSWORD);
+                    System.out.println("Created empty keystore " + ksf);
+                } else {
+                    usage();
+                }
+                return;
+            }
+            File ksf = new File(args[0]);
+            if ("system".equals(args[0]) || ksf.isFile()) {
                 KeyStore ks = loadSystemKeyStore();
                 if (ks != null) {
                     System.out.println("Loaded system keystore");
@@ -1326,10 +1336,25 @@ public final class KeyStoreUtil {
                 } else {
                     System.out.println("FAIL");
                 }
+                return;
             }
+            usage();
         } catch (Exception e) {
             e.printStackTrace();
+            usage();
         }
+    }
+
+    private static void usage() {
+         System.err.println(
+                            "Usage: KeyStoreUtil create keystore.ks (create empty keystore)\n" +
+                            "       KeyStoreUtil export keystore.ks alias keypw (exports private key from keystore)\n" +
+                            "       KeyStoreUtil import keystore.ks file.key alias keypw (imports private key from file to keystore)\n" +
+                            "       KeyStoreUtil keygen keystore.ks alias keypw (create keypair in keystore)\n" +
+                            "       KeyStoreUtil keygen2 keystore.ks alias keypw (create keypair using I2PProvider)\n" +
+                            "       KeyStoreUtil list keystore.ks (list contents)\n" +
+                            "       KeyStoreUtil system (loads from system keystore)\n" +
+                            "       KeyStoreUtil keystore.ks (loads from system keystore and from keystore.ks)");
     }
 
     private static void testImport(String[] args) throws Exception {
@@ -1343,7 +1368,7 @@ public final class KeyStoreUtil {
 
     private static void testExport(String[] args) throws Exception {
         if (args.length != 4) {
-            System.err.println("Usage: KeyStoreUtil export keystore.ks keyalias keypassword");
+            usage();
             System.exit(1);
         }
         File ksf = new File(args[1]);
@@ -1396,7 +1421,7 @@ public final class KeyStoreUtil {
 
     private static void listKeys(String[] args) {
         if (args.length != 2) {
-            System.err.println("Usage: KeyStoreUtil list keystore.ks");
+            usage();
             System.exit(1);
         }
         File ksf = new File(args[1]);
