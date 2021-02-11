@@ -1116,6 +1116,7 @@ _:-ms-lang(x), .snarkTorrentOdd, .SnarkTorrentEven {
 }
 }
 
+
 .snarkConfigTitle {
      margin-bottom: -2px !important;
 }
@@ -1259,6 +1260,10 @@ a:active {
      color: #f90 !important;
 }
 
+.reload {
+     padding-left: 8px !important;
+}
+
 input {
      text-align: left;
      padding: 3px 4px !important;
@@ -1306,7 +1311,7 @@ input[type=submit], input[type=submit]:visited, input.disabled:hover {
      color: #e6e6e7;
      background: #000;
      border: 1px outset #191;
-     padding: 5px 10px !important;
+     padding: 5px 10px 5px 22px !important;
      font-size: 8pt;
      font-weight: bold;
      min-width: 95px;
@@ -2247,6 +2252,29 @@ hr.debug:last-child {
 
 .prioritySkip {
      background: url(/i2psnark/.resources/icons/solid/cancel.png) left 22px center no-repeat;
+}
+
+.delete {
+     background: url(images/delete.png) left 6px center no-repeat !important;
+}
+
+.add {
+     background: url(images/add.png) left 6px center no-repeat !important;
+     background-size: 12px 12px !important;
+}
+
+.accept {
+     background: url(/i2psnark/.resources/icons/solid/yes.png) left 6px center no-repeat !important;
+     background-size: 12px 12px !important;
+}
+
+input.reload {
+     padding: 5px 10px 5px 10px !important;
+}
+
+input.starttorrent {
+     background: url(images/start.png) left 10px center no-repeat !important;
+     background-size: 12px 10px !important;
 }
 
 /* configs */

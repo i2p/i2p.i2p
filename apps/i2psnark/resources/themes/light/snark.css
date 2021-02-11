@@ -1140,7 +1140,8 @@ input.r {
 
 input[type=submit], a.control, input.disabled {
      margin: 6px 3px 6px 6px !important;
-     padding: 5px 8px !important;
+     padding-left: 22px;
+     padding: 5px 8px 5px 22px !important;
      min-width: 90px;
      text-align: center;
      font: bold 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
@@ -1955,6 +1956,29 @@ hr.debug:last-child {
 
 .prioritySkip {
      background: url(/i2psnark/.resources/icons/solid/cancel.png) left 22px center no-repeat;
+}
+
+.delete {
+     background: url(images/delete.png) left 6px center no-repeat;
+}
+
+.add {
+     background: url(images/add.png) left 6px center no-repeat;
+     background-size: 12px 12px;
+}
+
+.accept {
+     background: url(/i2psnark/.resources/icons/solid/yes.png) left 6px center no-repeat;
+     background-size: 12px 12px;
+}
+
+input.starttorrent {
+    background: url(images/start.png) left 14px center no-repeat !important;
+    background-size: 12px 12px !important;
+}
+
+input.reload {
+     padding: 5px 8px 5px 8px !important;
 }
 
 /* end priorities */
