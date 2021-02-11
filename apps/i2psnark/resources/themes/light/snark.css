@@ -891,8 +891,6 @@ tr:hover .percentBarText {
 
 .snarkDirInfo .percentBarText, .snarkDirInfo .percentBarOuter, .peerinfo .percentBarText, .peerinfo .percentBarOuter {
      width: 80px !important;
-     margin-left: 30%;
-     margin-top: 5%;
 }
 
 /* end download bars */
@@ -1948,15 +1946,15 @@ hr.debug:last-child {
 }
 
 .priorityHigh {
-     background: url(images/icons/clock_red.png) left 24px center no-repeat;
+     background: url(/i2psnark/.resources/icons/solid/clock_red.png) left 24px center no-repeat;
 }
 
 .priorityNormal {
-     background: url(images/icons/clock.png) left 24px center no-repeat;
+     background: url(/i2psnark/.resources/icons/solid/clock.png) left 24px center no-repeat;
 }
 
 .prioritySkip {
-     background: url(images/icons/cancel.png) left 22px center no-repeat;
+     background: url(/i2psnark/.resources/icons/solid/cancel.png) left 22px center no-repeat;
 }
 
 /* end priorities */
