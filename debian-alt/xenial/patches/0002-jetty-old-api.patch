@@ -1,16 +1,3 @@
-Index: b/apps/jetty/java/src/net/i2p/jetty/I2PRequestLog.java
-============================================================
---- a/apps/jetty/java/src/net/i2p/jetty/I2PRequestLog.java
-+++ b/apps/jetty/java/src/net/i2p/jetty/I2PRequestLog.java
-@@ -317,7 +317,7 @@ public class I2PRequestLog extends Abstr
-                 buf.append(request.getMethod());
-                 buf.append(' ');
-                 
--                u8buf.append(request.getHttpURI().toString());
-+                request.getUri().writeTo(u8buf);
-                 
-                 buf.append(' ');
-                 buf.append(request.getProtocol());
 Index: b/apps/routerconsole/java/src/net/i2p/router/web/HostCheckHandler.java
 ===================================================================
 --- a/apps/routerconsole/java/src/net/i2p/router/web/HostCheckHandler.java
@@ -50,7 +37,7 @@ Index: b/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.java
 ============================================================
 --- a/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.java
 +++ b/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.java
-@@ -1102,8 +1102,8 @@ public class RouterConsoleRunner impleme
+@@ -1093,8 +1093,8 @@ public class RouterConsoleRunner impleme
          }
  
          @Override

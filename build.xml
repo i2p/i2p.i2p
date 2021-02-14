@@ -2405,8 +2405,7 @@
         <echo message="Don't forget to sign i2pinstall_${release.number}_windows.exe on Windows and then:" />
         <echo message="    ${gpg} -u ${release.gpg.keyid} -b i2pinstall_${release.number}_windows.exe" />
         <echo message="    sha256sum i2pinstall_${release.number}_windows.exe" />
-        <echo message="Don't forget to mtn tag w: i2p-${release.number}" />
-        <echo message="... and mtn cert t:i2p-${release.number} branch i2p.i2p.release" />
+        <echo message="Don't forget to git tag -s i2p-${release.number}" />
     </target>
 
     <target name="forceJava7">

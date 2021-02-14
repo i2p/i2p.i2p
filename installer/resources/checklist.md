@@ -17,7 +17,7 @@
 
 - GeoIP: db-ip.com update is usually first of the month, time accordingly
 - installer/resources/makegeoip.sh
-- mtn ci installer/resources/GeoLite2-Country.mmdb.gz
+- git commit installer/resources/GeoLite2-Country.mmdb.gz
 
 - BuildTime: Don't have to do this every release, but update the
   EARLIEST and EARLIEST_LONG values in core/java/src/net/i2p/time/BuildTime.java
@@ -28,8 +28,8 @@
 
 - Initial review: Review the complete diff from the last release, fix any issues
 
-- Trial Debian build: Build and test a preliminary Debian build
-  with 'ant debian' and fix any issues
+- Trial Debian build: Run 'ant debcheckpatch' and fix any issues.
+  Build and test a preliminary Debian build with 'ant debian' and fix any issues
 
 - Javadoc test: 'ant javadoc' and 'ant mavenCentral.deps'
   with a recent Oracle JDK (12+), and fix any issues.
@@ -45,7 +45,7 @@
   - `./create_new_entry.sh`
     - Entry href should be the in-net link to the release blog post
   - `tx push -s`
-  - `mtn ci`
+  - `git commit`
 
 2. Write the draft blog post and push to Transifex:
 
@@ -53,7 +53,7 @@
   - Write draft release announcement - see i2p2www/blog/README for instructions
     - Top content should be the same as the news entry
   - `tx push -s -r I2P.website_blog`
-  - `mtn ci`
+  - `git commit`
 
 3. Make announcement on Transifex asking for news translation
 
@@ -78,15 +78,15 @@
     See instructions in .tx/config for fixing up getopt properties files.
   - `installer/resources/poupdate-man.sh` to generate new man page translations
     (requires po4a package)
-  - `mtn add` for any new po files
-  - `mtn ci` all changed po files, and .tx/config if changed
+  - `git add` for any new po files
+  - `git commit` all changed po files, and .tx/config if changed
 
-2. Sync with mtn.i2p2.i2p
+2. Sync with git.idk.i2p
 
 3. Start with a clean checkout:
 
     ```
-    mtn -d i2p.mtn co --branch=i2p.i2p /path/to/releasedir
+    git clone -l . /path/to/releasedir
     ```
 
   - You must build with Java 8 or higher.
@@ -103,7 +103,7 @@
 
 5. Copy latest trust list _MTN/monotonerc from website or some other workspace
 
-6. Verify that no untrusted revisions were inadvertently blessed by a trusted party:
+6. Verify that no untrusted revisions were included:
 
     ```
     ant revisions
@@ -112,7 +112,7 @@
 7. Review the complete diff from the last release:
 
     ```
-    mtn diff -r t:i2p-0.9.(xx-1) > out.diff
+    git diff i2p-0.9.(xx-1)..HEAD > out.diff
     vi out.diff
     ```
 
@@ -124,7 +124,7 @@
   - `router/java/src/net/i2p/router/RouterVersion.java`
     - (change to BUILD = 0 and EXTRA = "")
 
-9. `mtn ci`
+9. `git commit`
 
 
 ### Build and test
@@ -179,9 +179,8 @@
 3. If all goes well, tag and push the release:
 
     ```
-    mtn tag h: i2p-0.x.xx
-    mtn cert t:i2p-0.x.xx branch i2p.i2p.release
-    mtn push
+    git tag -s i2p-0.x.xx
+    git push
     ```
 
 ### Distribute updates
@@ -239,14 +238,14 @@
    Verify at http://download.i2p2.no/releases/
 
 3. Website files to change:
-  - Sync with mtn.i2p-projekt.i2p
-  - `i2p2www/static/hosts.txt` if it changed (copy from i2p.i2p mtn branch)
+  - Sync with git.idk.i2p
+  - `i2p2www/static/hosts.txt` if it changed (copy from i2p.i2p git branch)
   - `i2p2www/__init__.py` (release number)
   - `i2p2www/pages/downloads/list.html` (release signer, if changed)
   - `i2p2www/pages/downloads/macros` (checksums)
   - `i2p2www/pages/site/get-involved/roadmap.html` (release date, actual release contents)
   - `i2p2www/static/news/news.xml` (no longer necessary)
-  - Sync with mtn.i2p-projekt.i2p
+  - Sync with git.idk.i2p
 
 4. Announce on:
   - #i2p, #i2p-dev (also on Freenode side)
@@ -268,4 +267,4 @@
   - `tx pull -r I2P.website_blog`
   Do NOT forget this step!
   - `./update-existing-po.sh`
-  - `mtn ci i2p2www/translations/ -m "Updated translations"`
+  - `git commit i2p2www/translations/ -m "Updated translations"`
