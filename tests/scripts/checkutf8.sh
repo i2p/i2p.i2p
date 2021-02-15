@@ -27,7 +27,7 @@ DIRS="\
   apps/desktopgui/locale \
   debian/po \
   installer/resources/eepsite/docroot/help \
-  installer/resources/initialNews \
+  apps/routerconsole/resources-news/docs/initialNews \
   apps/routerconsole/jsp \
   apps/i2ptunnel/jsp \
   apps/susidns/src/jsp"

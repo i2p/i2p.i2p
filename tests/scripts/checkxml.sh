@@ -59,7 +59,7 @@ XMLFILES="\
 ./Slackware/i2p/build.xml"
 
 HTMLFILES="\
-./installer/resources/initialNews/*.xml \
+./apps/routerconsole/resources-news/docs/initialNews/*.xml \
 ./apps/BOB/src/net/i2p/BOB/package.html \
 ./apps/desktopgui/src/net/i2p/desktopgui/package.html \
 ./apps/ministreaming/java/src/net/i2p/client/streaming/package.html \
