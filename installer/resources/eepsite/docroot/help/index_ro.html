@@ -12,13 +12,25 @@
 
    <div class="langbar">
 <a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
+      <a href="index_ar.html"><img src="lib/lang_ar.png" title="عربية" alt="عربية"></a>
+      <a href="index_az.html"><img src="lib/az.png" title="Azerbaijani" alt="Azerbaijani"></a>
       <a href="index_zh.html"><img src="lib/cn.png" title="中文" alt="中文"></a>
       <a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a>
+      <a href="index_el.html"><img src="lib/gr.png" title="Ελληνικά" alt="Ελληνικά"></a>
       <a href="index_es.html"><img src="lib/es.png" title="Español" alt="Español"></a>
+      <a href="index_fa.html"><img src="lib/ir.png" title="فارسی" alt="فارسی"></a>
       <a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
+      <a href="index_hu.html"><img src="lib/hu.png" title="Magyar" alt="Magyar"></a>
+      <a href="index_in.html"><img src="lib/id.png" title="bahasa Indonesia" alt="bahasa Indonesia"></a>
+      <a href="index_it.html"><img src="lib/it.png" title="Italian" alt="Italian"></a>
       <a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a>
+      <a href="index_pl.html"><img src="lib/pl.png" title="Polish" alt="Polish"></a>
+      <a href="index_pt.html"><img src="lib/pt.png" title="Português" alt="Português"></a>
+      <a href="index_ro.html"><img src="lib/ro.png" title="Română" alt="Română"></a>
       <a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a>
       <a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
+      <a href="index_pl.html"><img src="lib/tr.png" title="Turkish" alt="Turkish"></a>
+      <a href="index_uk.html"><img src="lib/ua.png" title="Українська" alt="Українська"></a>
 </div>
 
     <h1>I2P Webserver anonim</h1>
@@ -33,30 +45,30 @@ Pentru a vă servi propriul conținut, pur și simplu editați fișierele din di
     <ul>
 <li>
 <b>Linux</b><br>
-        Instalare standard: <code>~/.i2p/eepsite/docroot/</code><br>
-        Instalarea pachetului, care rulează ca serviciu: <code>/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+        Standard install: <code dir="ltr">~/.i2p/eepsite/docroot/</code><br>
+        Package install, running as a service: <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/</code>
 </li>
       <li>
-<b>Windows</b><br><code>%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
+<b>Windows</b><br><code dir="ltr">%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
 </li>        
       <li>
-<b>Mac</b><br><code>/Users/(user)/Library/Application Support/i2p</code>
+<b>Mac</b><br><code dir="ltr">/Users/(user)/Library/Application Support/i2p</code>
 </li>
     </ul>
-<p>În I2P, serviciile ascunse sunt adresate folosind o adresă Base32 care se termină în „.b32.i2p”, sau o destinație reprezentată ca un șir lung Base64.
-Adresa Base32 poate fi utilizată ca nume de gazdă, până când atribuiți unui registru un nume urmând instrucțiunile de mai jos.
-Destinația este oarecum ca o adresă IP și este afișată în <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">pagina Configurare a serviciilor ascunse</a>.</p>
+<p>In I2P, hidden services are addressed using a Base32 address ending in ".b32.i2p", or a Destination represented as a long Base64 string.
+      The Base32 address may be used as a hostname, until you register a name following the instructions below.
+      The Destination is somewhat like an IP address, and is shown on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.</p>
 
     <p>Instrucțiunile de mai jos detaliază cum să atribuiți un nume de genul "mysite.i2p" site-ului dvs. web și să permiteți accesul altora.
 Puteți accesa site-ul dvs. local prin <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.</p>
 
     <h2>Cum să configurați și să anunțați serviciul ascuns</h2>
 
-     <p>Site-ul dvs. Web rulează în mod implicit, dar nu este accesibil de către alții până nu porniți tunelul de servicii ascuns.
-După ce porniți tunelul dvs. I2P Webserver, va fi dificil să găsească alte persoane
-Poate fi accesat numai cu destinația lungă sau cu adresa Base32 mai scurtă (.b32.i2p), care este un haș al Destinației.
-Ați putea spune oamenilor destinația sau adresa Base32, dar, din fericire, I2P are o carte de adrese și mai multe modalități ușoare de a spune oamenilor despre site-ul dvs. web.
-Iată instrucțiuni detaliate.</p>
+     <p>Your webserver is running by default, but is not accessible by others until you start the hidden service tunnel.
+      After you start your I2P Webserver tunnel, it will be difficult for other people to find.
+      It can only be accessed with the long Destination or with the shorter Base32 address (.b32.i2p), which is a hash of the Destination.
+      You could just tell people the Destnation or the Base32 address, but thankfully I2P has an address book and several easy ways to tell people about your website.
+      Here are detailed instructions.</p>
 
     <ul>
 <li>Alegeți un nume pentru site-ul dvs. web (<i>ceva</i>.i2p), cu minuscule.
@@ -119,14 +131,14 @@ Accesați <a href="http://127.0.0.1:7657/susidns/subscriptions">pagina dvs. Conf
 
     <ul>
 <li>
-<code>http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
+<code dir="ltr">http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
       <li>
-<code>http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
+<code dir="ltr">http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
     </ul>
-<p>Dacă vă grăbiți și nu puteți aștepta câteva ore, puteți spune oamenilor să utilizeze un serviciu de redirecționare a adresei de asistență.
-Acest lucru va funcționa în câteva minute de la înregistrarea numelui dvs. de gazdă pe același site.
-Încercați-l mai întâi introducând <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>ceva</i>.i2p</code> în browser.
-Odată ce funcționează, puteți spune altora să îl folosească.</p>
+<p>If you are in a hurry and can't wait a few hours, you can tell people to use a "jump" address helper redirection service. 
+      This will work within a few minutes of your registering your hostname on the same site.
+      Test it yourself first by entering <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code> into your browser. 
+      Once it is working, you can tell others to use it.</p>
 
     <p>Unii verifică listele de site-uri, cum ar fi <a href="http://identiguy.i2p/" target="_blank">lista de stări a eepsitului Identiguy</a> sau <a href="http://no.i2p/browse/" target="_blank">lista gazdă activă a no.i2p</a> pentru eepsite noi, astfel încât site-ul dvs. poate începe să obțină trafic.
 Există o mulțime de alte modalități de a spune oamenilor. Iată câteva idei:</p>
@@ -155,10 +167,10 @@ Vă recomandăm să utilizați serverul implicit, cu excepția cazului în care 
 Vă rugăm să vă asigurați că serverul dvs. web este sigur înainte de a-l plasa online.
 Există o mulțime de ghiduri online, de exemplu, dacă căutați „nginx security hardening guide”, veți găsi o serie de ghiduri care au recomandări bune.</p> 
 
-        <p>Există o problemă importantă cu serverul web Apache.
-Modulele <code>mod_status</code> și <code>mod_info</code> Apache sunt activate în mod implicit pe unele sisteme de operare.
-Aceste module expun date interne care pot duce la compromisuri grave ale anonimatului atunci când sunt utilizate într-o rețea anonimă.
-Eliminarea liniilor din fișierul de configurare în care sunt încărcate aceste module este cea mai simplă modalitate de a preveni aceste probleme.</p>
+        <p>There is one important issue with the Apache web server.
+          The <code dir="ltr">mod_status</code> and <code dir="ltr">mod_info</code> Apache modules are enabled by default on some operating systems.
+          These modules expose internal data which can lead to serious compromise of anonymity when used on an anonymous network.
+          Removing the lines in the configuration file where these modules are loaded is the easiest way to prevent these issues.</p>
 
     <h2>Asistență suplimentară</h2>
 

@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-12 13:39+0000\n"
-"PO-Revision-Date: 2020-08-12 18:50+0000\n"
-"Last-Translator: zzzi2p\n"
+"POT-Creation-Date: 2021-02-05 14:31+0000\n"
+"PO-Revision-Date: 2021-02-05 15:27+0000\n"
+"Last-Translator: Waseihou Watashi <waseihou@gmail.com>\n"
 "Language-Team: Czech (http://www.transifex.com/otf/I2P/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -37,9 +37,9 @@ msgstr ""
 #: ../java/build/Proxy.java:151 ../java/build/Proxy.java:161
 #: ../java/build/Proxy.java:173 ../java/build/Proxy.java:186
 #: ../java/build/Proxy.java:198 ../java/build/Proxy.java:208
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:295
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:369
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:403
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:294
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:368
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:402
 msgid "Router Console"
 msgstr "Konzole routeru"
 
@@ -66,9 +66,9 @@ msgstr "I2P konzole routeru"
 #: ../java/build/Proxy.java:153 ../java/build/Proxy.java:163
 #: ../java/build/Proxy.java:175 ../java/build/Proxy.java:188
 #: ../java/build/Proxy.java:200 ../java/build/Proxy.java:210
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:298
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:370
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:404
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:297
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:369
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:403
 msgid "Configuration"
 msgstr "Konfigurace"
 
@@ -82,9 +82,9 @@ msgstr "Konfigurace"
 #: ../java/build/Proxy.java:154 ../java/build/Proxy.java:164
 #: ../java/build/Proxy.java:176 ../java/build/Proxy.java:189
 #: ../java/build/Proxy.java:201 ../java/build/Proxy.java:211
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:299
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:370
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:404
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:298
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:369
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:403
 msgid "Help"
 msgstr "Pomoc"
 
@@ -98,9 +98,6 @@ msgstr "Pomoc"
 #: ../java/build/Proxy.java:155 ../java/build/Proxy.java:165
 #: ../java/build/Proxy.java:177 ../java/build/Proxy.java:190
 #: ../java/build/Proxy.java:202 ../java/build/Proxy.java:212
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:302
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:372
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:406
 msgid "Addressbook"
 msgstr "Adresář"
 
@@ -619,78 +616,87 @@ msgstr ""
 msgid "You must enter the password provided by the server operator."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:197
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:196
 #, java-format
 msgid "Added via address helper from {0}"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:199
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:198
 msgid "Added via address helper"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:236
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:235
 msgid "Missing lookup password"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:250
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:249
 msgid "Missing private key"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:255
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:254
 msgid "Invalid private key"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:288
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:307
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:287
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:306
 msgid "Your new encryption key"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:312
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:301
+msgid "Address book"
+msgstr ""
+
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:311
 msgid "Copy the key and send it to the server operator."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:314
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:313
 msgid "After you are granted permission, you may proceed to the website."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:335
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:334
 msgid "Go back and fix the error"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:346
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:345
 msgid "router"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:348
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:347
 msgid "local"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:350
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:349
 msgid "private"
 msgstr "soukromé"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:363
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:397
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:362
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:396
 #, java-format
 msgid "Redirecting to {0}"
 msgstr ""
 
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:371
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:405
+msgid "Address Book"
+msgstr "Adresář"
+
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:376
+#, java-format
+msgid "Saved {0} to the {1} address book, redirecting now."
+msgstr ""
+
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:377
 #, java-format
-msgid "Saved {0} to the {1} addressbook, redirecting now."
+msgid "Failed to save {0} to the {1} address book, redirecting now."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:378
-#, java-format
-msgid "Failed to save {0} to the {1} addressbook, redirecting now."
-msgstr ""
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:380
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:412
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:379
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:411
 msgid "Click here if you are not redirected automatically."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:410
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:409
 #, java-format
 msgid "Saved the authentication for {0}, redirecting now."
 msgstr ""

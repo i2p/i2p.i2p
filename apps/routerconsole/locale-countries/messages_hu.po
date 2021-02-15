@@ -4,7 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Gergő Doma <domag02@gmail.com>, 2019
+# Gergő Doma <domag02@gmail.com>, 2019-2020
 # Hunor Paksy <heds@cock.li>, 2018
 # omgitsadalek <mihalymokus76@gmail.com>, 2013
 # benewfy <benewfy@gmail.com>, 2015
@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:33+0000\n"
-"PO-Revision-Date: 2019-03-17 20:14+0000\n"
+"POT-Creation-Date: 2020-08-12 13:39+0000\n"
+"PO-Revision-Date: 2020-12-27 02:26+0000\n"
 "Last-Translator: Gergő Doma <domag02@gmail.com>\n"
 "Language-Team: Hungarian (http://www.transifex.com/otf/I2P/language/hu/)\n"
 "MIME-Version: 1.0\n"
@@ -762,6 +762,9 @@ msgstr "Wallis és Futuna"
 
 msgid "Samoa"
 msgstr "Szamoa"
+
+msgid "Kosovo"
+msgstr "Koszovó"
 
 msgid "Yemen"
 msgstr "Jemen"

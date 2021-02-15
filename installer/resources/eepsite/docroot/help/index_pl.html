@@ -11,14 +11,26 @@
    <div class="main">
 
    <div class="langbar">
-<a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
+<a href="index_pl.html"><img src="lib/pl.png" title="Polski" alt="Polski"></a>
+      <a href="index_ar.html"><img src="lib/lang_ar.png" title="عربية" alt="عربية"></a>
+      <a href="index_az.html"><img src="lib/az.png" title="Azərbaycan" alt="Azərbaycan"></a>
       <a href="index_zh.html"><img src="lib/cn.png" title="中文" alt="中文"></a>
       <a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a>
+      <a href="index_el.html"><img src="lib/gr.png" title="Ελληνικά" alt="Ελληνικά"></a>
+      <a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
       <a href="index_es.html"><img src="lib/es.png" title="Español" alt="Español"></a>
+      <a href="index_fa.html"><img src="lib/ir.png" title="فارسی" alt="فارسی"></a>
       <a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
+      <a href="index_hu.html"><img src="lib/hu.png" title="Magyar" alt="Magyar"></a>
+      <a href="index_in.html"><img src="lib/id.png" title="bahasa Indonesia" alt="bahasa Indonesia"></a>
+      <a href="index_it.html"><img src="lib/it.png" title="Italiano" alt="Italiano"></a>
       <a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a>
+      <a href="index_pt.html"><img src="lib/pt.png" title="Português" alt="Português"></a>
+      <a href="index_ro.html"><img src="lib/ro.png" title="Română" alt="Română"></a>
       <a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a>
       <a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
+      <a href="index_pl.html"><img src="lib/tr.png" title="Türkçe" alt="Türkçe"></a>
+      <a href="index_uk.html"><img src="lib/ua.png" title="Українська" alt="Українська"></a>
 </div>
 
     <h1>Anonimowy serwer hostingowy I2P</h1>
@@ -32,30 +44,26 @@
     <ul>
 <li>
 <b>Linuks</b><br>
-        Normalna instalacja: <code>~/.i2p/eepsite/docroot/</code><br>
-        Instalacja z paczek, działa jako usługa: <code>/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+        Zwykła instalacja: <code dir="ltr">~/.i2p/eepsite/docroot/</code><br>
+        Instalacja z paczek, bądź jako usługa: <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/</code>
 </li>
       <li>
-<b>Windows</b><br><code>%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
+<b>Windows</b><br><code dir="ltr">%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
 </li>        
       <li>
-<b>Mac</b><br><code>/Users/(użytkownik)/Library/Application Support/i2p</code>
+<b>Mac</b><br><code dir="ltr">/Users/(użytkownik)/Library/Application Support/i2p</code>
 </li>
     </ul>
-<p>W I2P ukryte usługi otrzymują adres Base32 kończący się „.b32.i2p” lub „adres przeznaczenia” reprezentowany jako długi ciąg Base64.
-Adres Base32 można użyć jako nazwy hosta do czasu zarejestrowania własnej nazwy, co jest opisane poniżej.
-Adres przeznaczenia jest jak adres IP, i jest on wyświetlany na <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">stronie konfiguracji ukrytych usług</a>.</p>
+<p>W I2P ukryte usługi otrzymują adres Base32 kończący się „.b32.i2p” lub adres docelowy reprezentowany jako długi ciąg Base64.
+Adresu Base32 można użyć jako nazwy hosta do czasu zarejestrowania własnej nazwy, co jest opisane poniżej.
+Adres docelowy jest jak adres IP, i jest on wyświetlany na <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">stronie konfiguracji ukrytych usług</a>.</p>
 
     <p>Następująca instrukcja opisuje w jako sposób przypisać adres „mojadres.i2p” do swojej strony i go rozpropagować.
 Możesz dostać się do swojej strony lokalnie na <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.</p>
 
     <h2>Jak skonfigurować i rozpropagować swoją ukrytą usługę</h2>
 
-     <p>Serwer stron jest domyślnie włączony, ale nie jest dostępny dla ludzi z zewnątrz przed uruchomieniem tunelu ukrytej usługi.
-Po uruchomieniu tunelu serwera stron I2P będzie trudno innym osobom go znaleźć.
-Można się do strony dostać tylko poprzez długi adres przeznaczenia lub krótszy Base32 (.b32.i2p), który jest sumą kontrolną adresu przeznaczenia.
-Możesz po prostu przekazać innym ten adres, ale na szczęście I2P posiada książkę adresową i inne sposoby na rozpropagowanie swojej strony.
-Poniżej dokładna instrukcja.</p>
+     <p>Serwer stron jest domyślnie włączony, ale nie jest dostępny dla ludzi z zewnątrz przed uruchomieniem tunelu ukrytej usługi. Po uruchomieniu tunelu serwera stron I2P będzie trudno innym osobom go znaleźć. Można się do strony dostać tylko poprzez długi adres docelowy lub krótszy Base32 (.b32.i2p), który jest sumą kontrolną adresu docelowego. Możesz po prostu przekazać innym ten adres, ale na szczęście I2P posiada książkę adresową i inne sposoby na rozpropagowanie swojej strony. Poniżej dokładna instrukcja.</p>
 
     <ul>
 <li>Wybierz nazwę dla swojej strony (<i>cośtam</i>.i2p), małymi literami, bez polskich znaków. Najpierw sprawdź w <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">książce adresowej</a> swojego węzła, czy wybrana nazwa nie została już zarezerwowana. Wpisz nową nazwę dla swojej strony na <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">stronie konfiguracji ukrytej usługi</a> w polu „nazwa strony”. To zastąpi domyślną nazwę „mojastrona.i2p”. Jeżeli chcesz, aby tunel serwera strony internetowej automatycznie uruchamiał się podczas startu I2P, zaznacz pole „automatyczne uruchamianie”. Twoja strona uruchomi się przy każdym uruchomieniu węzła. Kliknij „zapisz”.</li>
@@ -90,11 +98,11 @@ Poniżej dokładna instrukcja.</p>
 
     <ul>
 <li>
-<code>http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
+<code dir="ltr">http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
       <li>
-<code>http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
+<code dir="ltr">http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
     </ul>
-<p>Jeżeli Ci się spieszy i nie możesz poczekać kilku godzin, poproś ludzi o skorzystanie z „usługi skoków” (jump service). To zadziała po kilku minutach od rejestracji strony na tej samej stronie. Wypróbuj ją wpisując w przeglądarkę <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>cośtam</i>.i2p</code>. Kiedy to zadziała, powiadom o tym innych użytkowników.</p>
+<p>Jeżeli Ci się spieszy i nie możesz poczekać kilku godzin, poproś ludzi o skorzystanie z „usługi skoków” (jump service). To zadziała po kilku minutach od rejestracji strony na tej samej stronie. Wypróbuj ją wpisując w przeglądarkę <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i>cośtam</i>.i2p</code>. Kiedy to zadziała, powiadom o tym innych użytkowników.</p>
 
     <p>Niektórzy sprawdzają listy stron takie jak <a href="http://identiguy.i2p/" target="_blank">identiguy.i2p</a> lub <a href="http://no.i2p/browse/" target="_blank">no.i2p</a> w poszukiwaniu nowych stron I2P, więc Twoja strona powinna uzyskać kilku gości. Istnieją inne sposoby na rozpropagowanie swojej strony:</p>
 
@@ -113,7 +121,7 @@ Poniżej dokładna instrukcja.</p>
 
         <p>Miej świadomość, że nieprawidłowo skonfigurowany serwer lub aplikacja webowa może potencjalnie wyjawić informacje takie jak adres IP lub detale serwera, co może zmniejszyć Twoją anonimowość lub narazić stronę na atak hakera. Zaleca się użycie domyślnego serwera, chyba że czujesz się ekspertem od administrowania serwerami. Upewnij się, że serwer www jest zabezpieczony przed podłączeniem go do sieci. Jest mnóstwo poradników online, wpisz w wyszukiwarkę „nginx security hardening guide” i przestudiuj wszelkie zalecenia.</p> 
 
-        <p>Jest pewien problem z serwerem Apache. Moduły Apache <code>mod_status</code> i <code>mod_info</code> są domyślnie włączone na niektórych systemach. Te moduły wyjawiają wewnętrzne dane, które mogą poważnie naruszyć Twoją anonimowość podczas użytku w anonimowej sieci. Usunięcie z pliku konfiguracyjnego linii odpowiedzialnych za ładowanie tych modułów jest najłatwiejszym sposobem, aby temu zapobiec.</p>
+        <p>Jest pewien problem z serwerem Apache. Moduły Apache <code dir="ltr">mod_status</code> i <code dir="ltr">mod_info</code> są domyślnie włączone na niektórych systemach. Te moduły ujawniają wewnętrzne dane, które mogą poważnie naruszyć Twoją anonimowość podczas użytku w anonimowej sieci. Usunięcie z pliku konfiguracyjnego linii odpowiedzialnych za ładowanie tych modułów jest najłatwiejszym sposobem, aby temu zapobiec.</p>
 
     <h2>Dalsze wsparcie</h2>
 

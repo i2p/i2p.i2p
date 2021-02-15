@@ -24,20 +24,18 @@ I2Pが「トンネルを拒否している」ような表示をするかもし�
 
 <ul class="links">
 <li>
-<b>秘匿サービスと公開Web閲覧</b><br>
-I2Pでは秘匿サービスWebサイト（「I2Pサイト」）や他サービスにアクセスでき、また自分のサービスを提供することができます。
-また通常のWebにもI2P組み込みのWebプロキシ（アウトプロキシ）経由で匿名でアクセスできます。
-HTTPプロキシを<code>127.0.0.1 ポート4444</code>を使うよう<a href="https://geti2p.net/en/about/browser-config" target="_blank">ブラウザを設定</a>し、それからI2Pサイトや<code>http://</code>アドレスのWebサイトを閲覧してください。
-アウトプロキシアクセスを非匿名インターネットに無効化または変更したい場合は、
-<a href="/i2ptunnel/edit?tunnel=0" target="_blank">I2P HTTP プロキシトンネルエディタ</a> の <i>アウトプロキシ</i>オプション下の
-<code>false.i2p</code>用のアウトプロキシエントリを削除または編集してください。
-<a href="#eepsites">下記</a>「興味深いI2Pの秘匿サービス」の章で、I2Pで提供されているサイトをいくつかまとめています。<br>
-また、半公式または非公式的にたくさんのI2P閲覧ツール作成が試みられています。
-例えば、<a href="https://geti2p.net/en/download/firefox">設定済みFirefoxブラウザプロファイル</a>、
-<a href="http://idk.i2p/I2P-in-Private-Browsing-Mode-Firefox">簡単にインストールできるブラウザ拡張機能</a>、
-<a href="https://www.whonix.org/wiki/I2P">Whonixのようなプライバシー重視のLinuxディストリビューションでの自動ランチャー</a>など。
-これらはどれも興味深いプロジェクトですが、
-あなた個人の脅威モデルに合うかどうかを評価してから万全の信頼をするようにしてください。</li>
+<b>Hidden Services and Public Web Browsing</b><br>
+On I2P you can access hidden service websites ("I2P sites") and other services, and you can host your own services.
+You can also access the normal web anonymously via I2P's built-in web proxy (outproxy).
+<a href="https://geti2p.net/en/about/browser-config" target="_blank">Configure your browser</a> to use the HTTP proxy at <code>127.0.0.1 port 4444</code>, then browse to an I2P Site or website at an <code>http://</code> or <code>https://</code> address.
+If you wish to disable or change outproxy access to the non-anonymous internet, remove or modify the outproxy entry for <code>false.i2p</code> under the <i>Outproxies</i> option in the <a href="/i2ptunnel/edit?tunnel=0" target="_blank">I2P HTTP Proxy Tunnel Editor</a>.
+In the "Sites of Interest" section <a href="#eepsites">below</a>, we list a few of the sites hosted on I2P.<br>
+There are also a number of semi-official and unofficial efforts to build browsing tools for I2P,
+including a <a href="https://geti2p.net/en/download/firefox">preconfigured Firefox Browser profile</a>,
+<a href="http://idk.i2p/I2P-in-Private-Browsing-Mode-Firefox">an easy-to-install WebExtension</a>,
+or via <a href="https://www.whonix.org/wiki/I2P">automatic launchers in privacy-focused Linux distributions like Whonix</a>.
+While these are all interesting projects, please evaluate them to see if they fit within your personal threat
+model before trusting them with your well-being.</li>
 
 <li>
 <b>匿名メール</b><br>
@@ -166,13 +164,9 @@ Webサイトが全く（<a href="http://i2p-projekt.i2p/" target="_blank">i2p-pr
 Java が最新であることを確かめてください。
 <a href="/logs">ログページ</a>先頭のJavaバージョンを確認してください。</li>
 <li>
-<b>古いハードウェアでの動作問題</b><br>
-[Linux/BSD] <code>i2p/i2prouter start</code> でルータが始動できない場合、
-同ディレクトリの <code>runplain.sh</code> スクリプトを試してください。
-I2P動作にルート権限は不要です。
-<a href="http://i2p-projekt.i2p/jbigi.html" target="_blank">jBigiライブラリ</a>のコンパイルが必要な場合（ごく稀に必要です）、
-適切なドキュメントの確認、フォーラムや<a href="irc://127.0.0.1:6668/i2p-dev">IRC開発者チャンネル</a>への訪問をしてください。</li>
-
+<b>Problems running on Legacy Hardware</b><br>
+[Linux/BSD] If you can't start the router with <code>i2p/i2prouter start</code> try the <code>runplain.sh</code> script in the same directory.
+Root privileges are never required to run I2P.</li>
 <li>
 <b>Universal Plug and Play（UPnP）の有効化</b><br>
 あなたのモデムまたはルータはおそらく自動ポートフォワーディングのためのUPnPをサポートしています。
@@ -194,13 +188,10 @@ I2P内部のIRCネットワーク - Irc2P 上の<a href="irc://127.0.0.1:6668/i2
 これらのチャンネルはI2Pの暗号化・匿名ネットワークの外側でも <a href="irc://irc.freenode.net/i2p">Freenode IRC</a>経由で利用可能です。</li>
 
 <li>
-<b>バグ報告</b><br>
-バグ報告は、<a href="http://trac.i2p2.i2p/" target="_blank">trac.i2p2.i2p</a> あるいは クリアネットの <a href="https://trac.i2p2.de/" target="_blank">https://trac.i2p2.de/</a> でチケットを発行してください。
-開発者関連の議論は、<a href="http://zzz.i2p/" target="_blank">zzzの開発者フォーラム</a>かI2PのIRCネットワーク上の<a href="irc://127.0.0.1:6668/i2p-dev">開発者チャンネル</a>を訪問してください。
-開発者は <a href="https://github.com/i2p/i2p.i2p" target="_blank">Github</a> でソースを閲覧できます。
-我々はソースコード管理に <a href="http://i2p-projekt.i2p/monotone.html" target="_blank">monotone</a> を使用しています -
-匿名でソースコードをクローンできますが、コミットは開発者契約を結んだ後のみ許可されます。</li>
-
+<b>Reporting Bugs</b><br>
+To report a bug, please file a ticket on <a href="http://trac.i2p2.i2p/" target="_blank">trac.i2p2.i2p</a> or, over clearnet, <a href="https://trac.i2p2.de/" target="_blank">https://trac.i2p2.de/</a>.
+For developer-related discussions, please visit <a href="http://zzz.i2p/" target="_blank">zzz's developer forums</a> or come and visit the <a href="irc://127.0.0.1:6668/i2p-dev">developer channel</a> on I2P's IRC network.
+Developers can browse source at <a href="http://git.idk.i2p/i2p-hackers/i2p.i2p" target="_blank">git.idk.i2p</a>.</li>
 <li>
 <b>参加しよう！</b><br>
 I2Pは主にコミュニティメンバーの無償で自発的な参加によって開発され維持されています。

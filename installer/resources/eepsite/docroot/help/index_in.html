@@ -11,14 +11,26 @@
    <div class="main">
 
    <div class="langbar">
-<a href="index.html%20"><img src="lib/us.png%20" title="English " alt="English "></a>
-      <a href="index_zh.html%20"><img src="lib/cn.png%20" title="中文 " alt="中文 "></a>
-      <a href="index_de.html%20"><img src="lib/de.png%20" title="Deutsch " alt="Deutsch "></a>
-      <a href="index_es.html%20"><img src="lib/es.png%20" title="Español " alt="Español "></a>
-      <a href="index_fr.html%20"><img src="lib/fr.png%20" title="Français " alt="Français "></a>
-      <a href="index_nl.html%20"><img src="lib/nl.png%20" title="Nederlands " alt="Nederlands "></a>
-      <a href="index_ru.html%20"><img src="lib/ru.png%20" title="Русский " alt="Русский "></a>
-      <a href="index_sv.html%20"><img src="lib/se.png%20" title="Svenska " alt="Svenska "></a>
+<a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
+      <a href="index_ar.html"><img src="lib/lang_ar.png" title="عربية" alt="عربية"></a>
+      <a href="index_az.html"><img src="lib/az.png" title="Azerbaijani" alt="Azerbaijani"></a>
+      <a href="index_zh.html"><img src="lib/cn.png" title="中文" alt="中文"></a>
+      <a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a>
+      <a href="index_el.html"><img src="lib/gr.png" title="Ελληνικά" alt="Ελληνικά"></a>
+      <a href="index_es.html"><img src="lib/es.png" title="Español" alt="Español"></a>
+      <a href="index_fa.html"><img src="lib/ir.png" title="فارسی" alt="فارسی"></a>
+      <a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
+      <a href="index_hu.html"><img src="lib/hu.png" title="Magyar" alt="Magyar"></a>
+      <a href="index_in.html"><img src="lib/id.png" title="bahasa Indonesia" alt="bahasa Indonesia"></a>
+      <a href="index_it.html"><img src="lib/it.png" title="Italian" alt="Italian"></a>
+      <a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a>
+      <a href="index_pl.html"><img src="lib/pl.png" title="Polish" alt="Polish"></a>
+      <a href="index_pt.html"><img src="lib/pt.png" title="Português" alt="Português"></a>
+      <a href="index_ro.html"><img src="lib/ro.png" title="Română" alt="Română"></a>
+      <a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a>
+      <a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
+      <a href="index_pl.html"><img src="lib/tr.png" title="Turkish" alt="Turkish"></a>
+      <a href="index_uk.html"><img src="lib/ua.png" title="Українська" alt="Українська"></a>
 </div>
 
     <h1>Server Web Anonim i2p</h1>
@@ -31,22 +43,30 @@
 
     <ul>
 <li>
-<b>Linux</b><br>  Standard install: <code>~/.i2p/eepsite/docroot/</code><br>  Package install, dijalankan sebagai service: <code>/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+<b>Linux</b><br>
+        Standard install: <code dir="ltr">~/.i2p/eepsite/docroot/</code><br>
+        Package install, running as a service: <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/</code>
 </li>
       <li>
-<b>Windows</b><br><code>%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
+<b>Windows</b><br><code dir="ltr">%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
 </li>        
       <li>
-<b>Mac</b><br><code>/Users/(user)/Library/Application Support/i2p</code>
+<b>Mac</b><br><code dir="ltr">/Users/(user)/Library/Application Support/i2p</code>
 </li>
     </ul>
-<p>Di I2P, hidden services menggunakan alamat Base32 yang berakhir dengan ".b32.i2p", atau sebuah Destination menggunakan string Base64. Alamat Base32 dapat digunakan sebagai hostname, sampai anda mendaftarkan nama situs dengan cara di bawah ini. Destination seperti alamat IP, dan ditampilkan di <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3%20">Hidden Service Configuration page</a>.</p>
+<p>In I2P, hidden services are addressed using a Base32 address ending in ".b32.i2p", or a Destination represented as a long Base64 string.
+      The Base32 address may be used as a hostname, until you register a name following the instructions below.
+      The Destination is somewhat like an IP address, and is shown on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.</p>
 
     <p>Instruksi di bawah ini menjelaskan cara memberikan nama seperti "mysite.i2p" ke situs web Anda dan memberikan akses kepada orang lain. Anda dapat membuka situs Anda secara lokal dengan alamat <a href="http://127.0.0.1:7658/%20">http://127.0.0.1:7658/</a>.</p>
 
     <h2>Cara mengatur dan mengumumkan hidden service Anda</h2>
 
-     <p>Situs web Anda sudah berjalan secara default, tapi tidak dapat diakses oleh orang lain sampai Anda mengaktifkan hidden service tunnel. Sampai Anda memulai I2P Webserver tunnel, orang lain akan sulit membukanya. Lalu, ini dapat dicapai dengan long Destination atau atau alamat Base32 yang lebih pendek (.b32.i2p), yang ini adalah berupa hash dari Destination. Anda dapat mengumumkan Destination-nya atau alamat Base32, tapi syukurnya I2P punya address book dan beberapa cara mudah untuk mengumumkan situs web Anda. Ini Instruksi Terperincinya.</p>
+     <p>Your webserver is running by default, but is not accessible by others until you start the hidden service tunnel.
+      After you start your I2P Webserver tunnel, it will be difficult for other people to find.
+      It can only be accessed with the long Destination or with the shorter Base32 address (.b32.i2p), which is a hash of the Destination.
+      You could just tell people the Destnation or the Base32 address, but thankfully I2P has an address book and several easy ways to tell people about your website.
+      Here are detailed instructions.</p>
 
     <ul>
 <li>Pilih nama situs web Anda(<i>namasitusanda</i>.i2p), menggunakan huruf kecil. Mungkin Anda sebaiknya memeriksai <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none%20">address book</a> di router Anda untuk melihat apakah namanya sudah digunakan situs lain. Masukkan nama baru situs Anda di <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3%20">Hidden Service Configuration page</a> di bagian "Website name". Ini akan menggantikan "mysite.i2p". Lalu, jika Anda ingin I2P Webserver tunnel dimulai otomatis ketika I2P dimulai, centang kotak "Auto Start". Situs Anda akan berjalan setiap kali Anda menjalankan situs Anda. Pastikan klik "Simpan"</li>
@@ -81,11 +101,14 @@
 
     <ul>
 <li>
-<code>http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt%20" target="_blank">stats.i2p</a>)</li>
+<code dir="ltr">http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
       <li>
-<code>http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt%20" target="_blank">no.i2p</a>)</li>
+<code dir="ltr">http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
     </ul>
-<p>Jika Anda terburu-buru dan tidak bisa mengunggu beberapa jam, Anda dapat bilang ke orang lain untuk menggunakan jasa "jump" address helper redirection service. Ini akan berfungsi dalam beberapa menit setelah pendaftaran di situs registrasinya. Uji sendiri terlebih dahulu dengan memasukkan <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>namasitusanda</i>.i2p</code> ke browser Anda. Jika Anda dapat membukanya, orang juga dapat membukanya.</p>
+<p>If you are in a hurry and can't wait a few hours, you can tell people to use a "jump" address helper redirection service. 
+      This will work within a few minutes of your registering your hostname on the same site.
+      Test it yourself first by entering <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code> into your browser. 
+      Once it is working, you can tell others to use it.</p>
 
     <p>Beberapa orang memeriksa daftar situs web seperti<a href="http://identiguy.i2p/%20" target="_blank">Identiguy's eepsite status list</a> atau <a href="http://no.i2p/browse/%20" target="_blank">no.i2p's active host list</a> untuk eepsites baru, jadi situs Anda mungkin akan mulai mendapat pengunjung. Ada banyak cara lain untuk mengumumkan situs Anda. Ini cara-caranya:</p>
 
@@ -105,7 +128,10 @@
 
         <p>Ketahui bahwa webserver atau web appplication yang salah konfigurasi akan membocorkan informasi vital seperto alamat IP asli atau server details yang mengurangi anonimitas atau membantu hacker. Kami menyarankan menggunakan server default kecuali Anda merasa lebih nyaman melakukan sendiri administrasi server Anda. Mohon pastikan webserver Anda sudah aman sebelum membuatnya online. Ada banyak panduan di Internet untuk hal ini, misalnya jika Anda mencari "nginx security hardening guide" Anda akan menemukan banyak panduang yang berisi banyak rekomendasi bagus.</p> 
 
-        <p>Ada satu hal penting di Apache web server. Apache modules <code>mod_status</code> dan <code>mod_info</code> diaktifkan secara default di beberapa sistem operasi. Modul-modul ini menyebarkan data internal yang sangat menurunkan anonimitas jika digunakan di jaringan anonim. Hapus baris-baris ini di file konfigurasi di mana module-modul ini dimuat adalah cara termudah untuk mencegah masalah ini.</p>
+        <p>There is one important issue with the Apache web server.
+          The <code dir="ltr">mod_status</code> and <code dir="ltr">mod_info</code> Apache modules are enabled by default on some operating systems.
+          These modules expose internal data which can lead to serious compromise of anonymity when used on an anonymous network.
+          Removing the lines in the configuration file where these modules are loaded is the easiest way to prevent these issues.</p>
 
     <h2>Bantuan Lebih Lanjut</h2>
 

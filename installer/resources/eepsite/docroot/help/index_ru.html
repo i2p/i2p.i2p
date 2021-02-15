@@ -12,13 +12,25 @@
 
    <div class="langbar">
 <a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
+      <a href="index_ar.html"><img src="lib/lang_ar.png" title="عربية" alt="عربية"></a>
+      <a href="index_az.html"><img src="lib/az.png" title="Azerbaijani" alt="Azerbaijani"></a>
       <a href="index_zh.html"><img src="lib/cn.png" title="中文" alt="中文"></a>
       <a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a>
+      <a href="index_el.html"><img src="lib/gr.png" title="Ελληνικά" alt="Ελληνικά"></a>
       <a href="index_es.html"><img src="lib/es.png" title="Español" alt="Español"></a>
+      <a href="index_fa.html"><img src="lib/ir.png" title="فارسی" alt="فارسی"></a>
       <a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
+      <a href="index_hu.html"><img src="lib/hu.png" title="Magyar" alt="Magyar"></a>
+      <a href="index_in.html"><img src="lib/id.png" title="bahasa Indonesia" alt="bahasa Indonesia"></a>
+      <a href="index_it.html"><img src="lib/it.png" title="Italian" alt="Italian"></a>
       <a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a>
+      <a href="index_pl.html"><img src="lib/pl.png" title="Polish" alt="Polish"></a>
+      <a href="index_pt.html"><img src="lib/pt.png" title="Português" alt="Português"></a>
+      <a href="index_ro.html"><img src="lib/ro.png" title="Română" alt="Română"></a>
       <a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a>
       <a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
+      <a href="index_pl.html"><img src="lib/tr.png" title="Turkish" alt="Turkish"></a>
+      <a href="index_uk.html"><img src="lib/ua.png" title="Українська" alt="Українська"></a>
 </div>
 
     <h1>Анонимный веб-сервер I2P</h1>
@@ -33,19 +45,19 @@
     <ul>
 <li>
 <b>Linux</b><br>
-        Для стандартной установки: <code>~/.i2p/eepsite/docroot/</code><br>
-        Для установленного пакета, запущенного в виде сервиса: <code>/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+        Для стандартной установки: <code dir="ltr">~/.i2p/eepsite/docroot/</code><br>
+        Для установленного пакета, запущенного в виде сервиса: <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/</code>
 </li>
       <li>
-<b>Windows</b><br><code>%APPDATA%\I2P\eepsite\docroot\</code>
+<b>Windows</b><br><code dir="ltr">%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
 </li>        
       <li>
-<b>Mac</b><br><code>/Users/(user)/Library/Application Support/i2p</code>
+<b>Mac</b><br><code dir="ltr">/Users/(user)/Library/Application Support/i2p</code>
 </li>
     </ul>
-<p>В I2P доступ к скрытым сервисам осуществляется по Base32-адресу, оканчивающимся на ".b32.i2p", или адресу назначения — строке, закодированной в Base64.
-Base32-адрес можно использовать в качестве имени хоста до тех пор, пока вы не зададите доменное имя, следуя инструкции ниже.
-Адрес назначения — аналог IP-адреса в I2P, он отображается на странице <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">настройки скрытого сервиса</a>.</p>
+<p>В I2P доступ к скрытым сервисам осуществляется по Base32-адресу, оканчивающимся на ".b32.i2p", или адресу назначения — длинной строке, закодированной в Base64.
+    Base32-адрес можно использовать в качестве имени хоста до тех пор, пока вы не зададите доменное имя, следуя инструкции ниже.
+    Адрес назначения — аналог IP-адреса в I2P, он отображается на странице <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">настройки скрытого сервиса</a>.</p>
 
     <p>Ниже описано, как назначить вашему сайту имя, например, "mysite.i2p" и разрешить к нему доступ. 
        Вы можете зайти на сайт локально по адресу <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.</p>
@@ -53,9 +65,9 @@ Base32-адрес можно использовать в качестве име
     <h2>Как настроить и анонсировать ваш скрытый сервис</h2>
 
      <p>Ваш веб-сервер запускается по умолчанию, но не будет доступен для других пользователей, пока вы не запустите туннель скрытого сервиса.
-Сразу после запуска туннеля пользователям будет непросто найти ваш сайт.
-На сайт можно зайти, используя длинный адрес назначения или более короткий Base32-адрес, который представляет собой хеш адреса назначения.
-Можно просто сообщить людям адрес назначения или Base32-адрес, но, к счастью, в I2P есть адресная книга и несколько простых способов рассказать людям о своем сайте.
+    Сразу после запуска туннеля пользователям будет непросто найти ваш сайт.
+    На сайт можно зайти, используя длинный адрес назначения или более короткий Base32-адрес (.b32.i2p), который представляет собой хеш адреса назначения.
+    Можно просто сообщить людям адрес назначения или Base32-адрес, но, к счастью, в I2P есть адресная книга и несколько простых способов рассказать людям о своем сайте.
 Вот подробная инструкция.</p>
 
     <ul>
@@ -119,13 +131,13 @@ Base32-адрес можно использовать в качестве име
 
     <ul>
 <li>
-<code>http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
+<code dir="ltr">http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
       <li>
-<code>http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
+<code dir="ltr">http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
     </ul>
-<p>Если вы спешите и не можете ждать несколько часов, вы можете попросить людей воспользоваться "jump" сервисом.
+<p>Если вы спешите и не можете ждать несколько часов, вы можете попросить людей воспользоваться "jump"-сервисом, который перенаправит запрос.
       Это будет будет работать уже через несколько минут после регистрации вашего имени хоста на том же сайте.
-       Сначала проверьте самостоятельно, перейдя на <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code> в вашем браузере.
+       Сначала проверьте самостоятельно, перейдя на <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i>адрес</i>.i2p</code> в вашем браузере.
       Как только он заработает, вы можете попросить остальных воспользоваться им.</p>
 
     <p>Некоторые люди проверяют списки сайтов, такие как <a href="http://identiguy.i2p/" target="_blank">список eepsite статусов Identiguy</a> или <a href="http://no.i2p/browse/" target="_blank"> список активных хостов no.i2p</a> для поиска новых eepsites, так что ваш сайт может начать получать некоторый трафик. 
@@ -156,7 +168,7 @@ Base32-адрес можно использовать в качестве име
           В сети существует множество руководств, например, если вы ищете «Руководство по усилению безопасности nginx», вы найдете несколько руководств, в которых есть хорошие рекомендации.</p> 
 
         <p>Есть одна важная проблема с веб-сервером Apache.
-          Модули Apache <code>mod_status</code> и <code>mod_info</code> включены по умолчанию в некоторых операционных системах.
+          Модули Apache <code dir="ltr">mod_status</code> и <code dir="ltr">mod_info</code> включены по умолчанию в некоторых операционных системах.
           Эти модули предоставляют внутренние данные, которые могут привести к серьезному нарушению анонимности при использовании в анонимной сети.
           Удаление строк в файле конфигурации, где загружаются эти модули, является самым простым способом предотвращения этих проблем.</p>
 

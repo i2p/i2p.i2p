@@ -4,15 +4,16 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# タカハシ <indexial@outlook.jp>, 2013-2014
+# タカハシ, 2013-2014
 # Masayuki Hatta <mhatta@mhatta.org>, 2018
+# riopfga caetocla, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:33+0000\n"
-"PO-Revision-Date: 2018-08-17 22:07+0000\n"
-"Last-Translator: Masayuki Hatta <mhatta@mhatta.org>\n"
+"POT-Creation-Date: 2020-08-12 13:39+0000\n"
+"PO-Revision-Date: 2020-12-21 05:50+0000\n"
+"Last-Translator: riopfga caetocla\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -760,6 +761,9 @@ msgstr "ウォリス・フトゥーナ"
 
 msgid "Samoa"
 msgstr "サモア"
+
+msgid "Kosovo"
+msgstr "コソボ"
 
 msgid "Yemen"
 msgstr "イエメン"

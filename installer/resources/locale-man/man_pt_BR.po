@@ -7,13 +7,14 @@
 # Translators:
 # blueboy, 2017
 # Eduardo Addad de Oliveira <eduardoaddad@hotmail.com>, 2019
+# Eduardo Rodrigues, 2020
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2017-01-26 15:24+0000\n"
 "PO-Revision-Date: 2017-01-26 15:31+0000\n"
-"Last-Translator: Eduardo Addad de Oliveira <eduardoaddad@hotmail.com>, 2019\n"
+"Last-Translator: Eduardo Rodrigues, 2020\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/otf/teams/12694/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -199,13 +200,13 @@ msgstr ""
 #, no-wrap
 msgid "Sets the inactivity timeout. The default is 60 seconds."
 msgstr ""
-"Especifique o intervalo de inatividade. O valor padrão, por omissão, é de 60"
-" segundos."
+"Especifique o intervalo de tempo de espera. O valor padrão, por omissão, é "
+"de 60 segundos."
 
 #. type: Plain text
 #: man/eepget.1:79
 msgid "B<-u> username"
-msgstr ""
+msgstr "B<-u> nome de usuário"
 
 #. type: TP
 #: man/eepget.1:79
@@ -216,7 +217,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:85
 msgid "B<-x> password"
-msgstr ""
+msgstr "B<-x> senha"
 
 #. type: TP
 #: man/eepget.1:85

@@ -22,18 +22,18 @@
 
 <ul class="links">
 <li>
-<b>隐藏服务和公开网络浏览</b><br>
-在 I2P 上您可以访问隐藏服务网站（“匿名网站”）及其他服务，并且您可以托管您自己的服务。
-您也可以通过 I2P 的内置网络代理（出口代理）匿名访问普通网络。
-<a href="https://geti2p.net/en/about/browser-config" target="_blank">配置您的浏览器</a>使用在 <code>127.0.0.1 4444 端口</code>的 HTTP 代理，然后浏览隐藏服务网站或普通的未加密 <code>http://</code> 地址。
-如果您希望禁用或更改访问普通网络的出口代理，移除或修改 <a href="/i2ptunnel/edit?tunnel=0" target="_blank">I2P HTTP 代理隧道编辑器</a>中的<i>出口代理</i>选项下的出口代理项 <code>false.i2p</code>。
-在<a href="#eepsites">下方</a>“感兴趣的网站”部分，我们列出了一些托管在 I2P 上的网站。<br>
-此外还有为构建I2P浏览工具进行了许多半官方和非官方的工作，
-包括一个<a href="https://geti2p.net/en/download/firefox">预设置的Firefox 浏览器配置文件</a>，
-<a href="http://idk.i2p/I2P-in-Private-Browsing-Mode-Firefox">一个易于安装的网页扩展</a>，
-或通过<a href="https://www.whonix.org/wiki/I2P">像Whonix这样专注于隐私的Linux发行版中的自动启动器</a>。
-尽管这些都是有趣的项目，但在信任它们前，请评估它们是否符合您的个人威胁
-模型。</li>
+<b>Hidden Services and Public Web Browsing</b><br>
+On I2P you can access hidden service websites ("I2P sites") and other services, and you can host your own services.
+You can also access the normal web anonymously via I2P's built-in web proxy (outproxy).
+<a href="https://geti2p.net/en/about/browser-config" target="_blank">Configure your browser</a> to use the HTTP proxy at <code>127.0.0.1 port 4444</code>, then browse to an I2P Site or website at an <code>http://</code> or <code>https://</code> address.
+If you wish to disable or change outproxy access to the non-anonymous internet, remove or modify the outproxy entry for <code>false.i2p</code> under the <i>Outproxies</i> option in the <a href="/i2ptunnel/edit?tunnel=0" target="_blank">I2P HTTP Proxy Tunnel Editor</a>.
+In the "Sites of Interest" section <a href="#eepsites">below</a>, we list a few of the sites hosted on I2P.<br>
+There are also a number of semi-official and unofficial efforts to build browsing tools for I2P,
+including a <a href="https://geti2p.net/en/download/firefox">preconfigured Firefox Browser profile</a>,
+<a href="http://idk.i2p/I2P-in-Private-Browsing-Mode-Firefox">an easy-to-install WebExtension</a>,
+or via <a href="https://www.whonix.org/wiki/I2P">automatic launchers in privacy-focused Linux distributions like Whonix</a>.
+While these are all interesting projects, please evaluate them to see if they fit within your personal threat
+model before trusting them with your well-being.</li>
 
 <li>
 <b>匿名电子邮件</b><br>
@@ -143,11 +143,9 @@ I2P 默认配置为一些相当保守的数值，并不适合许多用例，所�
 <li>
 <b>验证 Java 是最新版</b><br>确保您的 Java 是最新版。在<a href="/logs">日志页面</a>顶部检查您的 Java 版本。</li>
 <li>
-<b>在旧式硬件上运行的问题</b><br>
-[Linux/BSD] 如果您无法通过 <code>i2p/i2prouter start</code> 启动路由，尝试同一文件夹下的 <code>runplain.sh</code> 脚本。
-绝对不需要使用 root 权限运行 I2P。
-如果您需要编译 <a href="http://i2p-projekt.i2p/jbigi.html" target="_blank">jBigi 库</a>（极少数情况下需要），请参与合适的文档，访问论坛，或访问我们的 <a href="irc://127.0.0.1:6668/i2p-dev">IRC 开发者频道</a>。</li>
-
+<b>Problems running on Legacy Hardware</b><br>
+[Linux/BSD] If you can't start the router with <code>i2p/i2prouter start</code> try the <code>runplain.sh</code> script in the same directory.
+Root privileges are never required to run I2P.</li>
 <li>
 <b>启用通用即插即用 (UPnP)</b><br>
 您的调制解调器或路由器可能支持 UPnP 自动端口转发。 
@@ -166,12 +164,10 @@ I2P 默认配置为一些相当保守的数值，并不适合许多用例，所�
 <b>获取在线支持</b><br>您可能也想要在 <a href="http://i2p-projekt.i2p/" target="_blank">I2P 网站</a>上获取信息，在 <a href="http://i2pforum.i2p/" target="_blank">I2P 讨论论坛</a>上发布消息或在  I2P 的内部 IRC 网络 - Irc2P 上的 <a href="irc://127.0.0.1:6668/i2p">#i2p</a> 或 <a href="irc://127.0.0.1:6668/i2p-chat">#i2p-chat</a> 上摇摆。这些频道也可以通过 <a href="irc://irc.freenode.net/i2p">Freenode IRC</a> 在 I2P 的加密匿名网络之外访问。</li>
 
 <li>
-<b>报告错误</b><br>
-请在 <a href="http://trac.i2p2.i2p/" target="_blank">trac.i2p2.i2p</a>，或通过明网， <a href="https://trac.i2p2.de/" target="_blank">https://trac.i2p2.de/</a> 上提交 ticket 以报告错误。
-对于开发者相关的讨论，请访问 <a href="http://zzz.i2p/" target="_blank">zzz 的开发者论坛</a> 或 I2P 的 IRC 网络上的<a href="irc://127.0.0.1:6668/i2p-dev">开发者频道</a>。
-开发者可在 <a href="https://github.com/i2p/i2p.i2p" target="_blank">Github</a> 上浏览源代码。
-我们使用 <a href="http://i2p-projekt.i2p/monotone.html" target="_blank">monotone</a> 管理源代码 - 尽管您可以匿名 clone 源代码，仅在接受开发者协议后提交才会被接受。</li>
-
+<b>Reporting Bugs</b><br>
+To report a bug, please file a ticket on <a href="http://trac.i2p2.i2p/" target="_blank">trac.i2p2.i2p</a> or, over clearnet, <a href="https://trac.i2p2.de/" target="_blank">https://trac.i2p2.de/</a>.
+For developer-related discussions, please visit <a href="http://zzz.i2p/" target="_blank">zzz's developer forums</a> or come and visit the <a href="irc://127.0.0.1:6668/i2p-dev">developer channel</a> on I2P's IRC network.
+Developers can browse source at <a href="http://git.idk.i2p/i2p-hackers/i2p.i2p" target="_blank">git.idk.i2p</a>.</li>
 <li>
 <b>参与进来！</b><br>
 I2P 通常由社区成员无经费志愿参与进行开发和维护。我们乐于接受<a href="http://i2p-projekt.i2p/donate.html" target="_blank">捐赠</a>，它们将用于基础托管和管理费用。我们对寻找参与激励的 I2P 方面的开发者有<a href="http://i2p-projekt.i2p/bounties.html" target="_blank">现金奖励</a>，我们也一直在寻找更多 <a href="http://i2p-projekt.i2p/newdevelopers.html" target="_blank">Java 程序员</a>，<a href="http://i2p-projekt.i2p/newtranslators.html" target="_blank">翻译者</a>，宣传者和用户以帮助 I2P 成长。I2P 网络越大，每个人获益越多，所以简单地告诉您的朋友们 I2P,（并在需要的时候帮助安装和设置）很有帮助。关于您如何参与的更多信息，访问网站上的<a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank">志愿者页面</a>。</li>

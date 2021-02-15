@@ -2,39 +2,23 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# foo <foo@bar>, 2009.
+# 
 # Translators:
-# alamir <christianm@libero.it>, 2014
-# Bad Cluster <badcluster@i2pmail.org>, 2012
-# Bad Cluster <badcluster@i2pmail.org>, 2012
-# Leelium <bovas85@gmail.com>, 2012
-# alamir <christianm@libero.it>, 2014
-# ColomboI2P <inactive+ColomboI2P@transifex.com>, 2012
-# ColomboI2P <inactive+ColomboI2P@transifex.com>, 2012
-# coso <coso@i2pmail.org>, 2013
-# danimoth <kronat@tiscali.it>, 2011
-# ironbishop <ironbishop@fsfe.org>, 2011
-# ironbishop <ironbishop@fsfe.org>, 2011
-# mkkid <jokjok@hotmail.it>, 2011
-# danimoth <kronat@tiscali.it>, 2011
-# Leelium <bovas85@gmail.com>, 2012
-# mkkid <jokjok@hotmail.it>, 2011
-# OlatusRooc <sebastiano.pistore.info@aol.com>, 2016
-# SebastianoPistore <SebastianoPistore.info@protonmail.ch>, 2016-2017
-# spawned76 <fswitch20@hotmail.com>, 2012
-# spawned76 <fswitch20@hotmail.com>, 2012
+# zzzi2p, 2019
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P\n"
+"Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-18 13:32+0000\n"
-"PO-Revision-Date: 2019-11-24 13:40+0000\n"
-"Last-Translator: Dominik Schürmann <dominik@schuermann.eu>\n"
-"Language-Team: Italian (http://www.transifex.com/otf/I2P/language/it/)\n"
-"Language: it\n"
+"PO-Revision-Date: 2019-12-19 14:09+0000\n"
+"Last-Translator: zzzi2p, 2019\n"
+"Language-Team: Italian (https://www.transifex.com/otf/teams/12694/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: it\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. * IPv4 OK, IPv6 OK or disabled or no address
@@ -110,7 +94,8 @@ msgstr "Verifica in corso"
 
 #. NPE, too early
 #. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
-#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too low");
+#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too
+#. low");
 #. else
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:84
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:142
@@ -131,7 +116,8 @@ msgid "Rejecting most tunnels: High number of requests"
 msgstr "Rifiutando la maggior parte dei tunnel: Alto numero di richieste"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of tunnels");
+#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of
+#. tunnels");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:243
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:424
 msgid "Accepting most tunnels"
@@ -151,7 +137,8 @@ msgid "Rejecting tunnels: Bandwidth limit"
 msgstr "Rifiutando i tunnel: Limite di banda raggiunto"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels: Bandwidth limit");
+#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels:
+#. Bandwidth limit");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:420
 msgid "Rejecting most tunnels: Bandwidth limit"
 msgstr "Rifiutando la maggior parte dei tunnel: Limite di banda raggiunto"
@@ -169,9 +156,8 @@ msgid "Dropping tunnel requests: Too slow"
 msgstr "Abbandono delle richieste tunnel: Troppo lento"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:270
-#, fuzzy
 msgid "Dropping tunnel requests: High job lag"
-msgstr "Abbandono delle richieste tunnel: Carico elevato"
+msgstr ""
 
 #. don't even bother, since we are so overloaded locally
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:464
@@ -179,9 +165,8 @@ msgid "Dropping tunnel requests: Overloaded"
 msgstr "Abbandono delle richieste tunnel: Carico troppo elevato"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:747
-#, fuzzy
 msgid "Rejecting tunnels: Hidden mode"
-msgstr "Rifiutando i tunnel: Alto ritardo nei messaggi"
+msgstr ""
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:775
 msgid "Rejecting tunnels: Request overload"

@@ -9,7 +9,7 @@
 # ducki2p <ducki2p@gmail.com>, 2011
 # K <daleks@foxmail.com>, 2017
 # nobody <oiiu19@yahoo.com>, 2013-2014
-# Scott Rhodes <starring169@gmail.com>, 2020
+# Scott Rhodes <starring169@gmail.com>, 2020-2021
 # walking <walking@i2pmail.org>, 2011
 # walking <waling@mail.i2p>, 2013
 # walking <walking@i2pmail.org>, 2011
@@ -19,8 +19,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-12 13:39+0000\n"
-"PO-Revision-Date: 2020-09-23 00:28+0000\n"
+"POT-Creation-Date: 2021-02-05 14:31+0000\n"
+"PO-Revision-Date: 2021-02-05 16:52+0000\n"
 "Last-Translator: Scott Rhodes <starring169@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/otf/I2P/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -46,9 +46,9 @@ msgstr "网站不可达"
 #: ../java/build/Proxy.java:151 ../java/build/Proxy.java:161
 #: ../java/build/Proxy.java:173 ../java/build/Proxy.java:186
 #: ../java/build/Proxy.java:198 ../java/build/Proxy.java:208
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:295
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:369
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:403
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:294
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:368
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:402
 msgid "Router Console"
 msgstr "路由控制台"
 
@@ -75,9 +75,9 @@ msgstr "I2P 路由控制台"
 #: ../java/build/Proxy.java:153 ../java/build/Proxy.java:163
 #: ../java/build/Proxy.java:175 ../java/build/Proxy.java:188
 #: ../java/build/Proxy.java:200 ../java/build/Proxy.java:210
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:298
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:370
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:404
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:297
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:369
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:403
 msgid "Configuration"
 msgstr "配置"
 
@@ -91,9 +91,9 @@ msgstr "配置"
 #: ../java/build/Proxy.java:154 ../java/build/Proxy.java:164
 #: ../java/build/Proxy.java:176 ../java/build/Proxy.java:189
 #: ../java/build/Proxy.java:201 ../java/build/Proxy.java:211
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:299
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:370
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:404
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:298
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:369
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:403
 msgid "Help"
 msgstr "帮助"
 
@@ -107,9 +107,6 @@ msgstr "帮助"
 #: ../java/build/Proxy.java:155 ../java/build/Proxy.java:165
 #: ../java/build/Proxy.java:177 ../java/build/Proxy.java:190
 #: ../java/build/Proxy.java:202 ../java/build/Proxy.java:212
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:302
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:372
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:406
 msgid "Addressbook"
 msgstr "地址簿"
 
@@ -546,7 +543,7 @@ msgstr "本地址会被存储在您的路由器地址簿，您基于订阅的地
 msgid ""
 "If you want to keep track of sites you have added manually, add to your "
 "Local or Private address book instead."
-msgstr ""
+msgstr "如果您希望追踪您手动添加的站点，请将其添加到本地或私有地址簿。"
 
 #. FIXME wasn't escaped
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1466
@@ -565,7 +562,7 @@ msgid ""
 "This address will be saved to your Local address book. Select this option "
 "for addresses you wish to keep separate from the main router address book, "
 "but don't mind publishing."
-msgstr ""
+msgstr "该地址会被保存到你的本地地址簿。如果您希望与主路由器地址簿分开存储，但不介意发布的话，请选择此选项。"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1478
 #, java-format
@@ -628,78 +625,87 @@ msgstr "查找密码"
 msgid "You must enter the password provided by the server operator."
 msgstr "您需要输入服务器操作者提供的密码。"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:197
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:196
 #, java-format
 msgid "Added via address helper from {0}"
 msgstr "已通过地址助手 {0} 添加"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:199
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:198
 msgid "Added via address helper"
 msgstr "已通过地址助手添加"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:236
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:235
 msgid "Missing lookup password"
 msgstr "查找密码不存在"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:250
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:249
 msgid "Missing private key"
 msgstr "私有密钥不存在"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:255
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:254
 msgid "Invalid private key"
 msgstr "私有密钥无效"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:288
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:307
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:287
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:306
 msgid "Your new encryption key"
 msgstr "您的新加密密钥"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:312
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:301
+msgid "Address book"
+msgstr "通讯录"
+
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:311
 msgid "Copy the key and send it to the server operator."
 msgstr "复制密钥，并发送给服务器操作者"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:314
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:313
 msgid "After you are granted permission, you may proceed to the website."
 msgstr "被授予权限后，您才可以访问这个网站"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:335
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:334
 msgid "Go back and fix the error"
 msgstr "返回并修复错误"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:346
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:345
 msgid "router"
 msgstr "路由器"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:348
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:347
 msgid "local"
 msgstr "本地"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:350
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:349
 msgid "private"
 msgstr "私有"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:363
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:397
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:362
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:396
 #, java-format
 msgid "Redirecting to {0}"
 msgstr "正在重定向至 {0}"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:377
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:371
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:405
+msgid "Address Book"
+msgstr "地址簿"
+
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:376
 #, java-format
-msgid "Saved {0} to the {1} addressbook, redirecting now."
+msgid "Saved {0} to the {1} address book, redirecting now."
 msgstr "目标{0}已保存至{1}地址簿中，正在重定向至此目标。"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:378
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:377
 #, java-format
-msgid "Failed to save {0} to the {1} addressbook, redirecting now."
+msgid "Failed to save {0} to the {1} address book, redirecting now."
 msgstr "目标{0}在{1}地址簿中保存失败，正在重定向至此目标。"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:380
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:412
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:379
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:411
 msgid "Click here if you are not redirected automatically."
 msgstr "如果未能自动转到，请点击这里。"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:410
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:409
 #, java-format
 msgid "Saved the authentication for {0}, redirecting now."
 msgstr "已保存 {0} 的凭据，正在重定向。"

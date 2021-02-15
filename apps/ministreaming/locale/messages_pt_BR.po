@@ -4,15 +4,16 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Gabriel Moura <gabriel.all@yandex.com>, 2017
+# Eduardo Rodrigues, 2021
+# Gabriel Rodrigues de Moura <gabriel.all@yandex.com>, 2017
 # blueboy, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-29 14:30+0000\n"
-"PO-Revision-Date: 2017-11-03 13:02+0000\n"
-"Last-Translator: Gabriel Moura <gabriel.all@yandex.com>\n"
+"PO-Revision-Date: 2021-02-09 18:18+0000\n"
+"Last-Translator: Eduardo Rodrigues\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/otf/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -59,7 +60,7 @@ msgstr "Mensagem expirada"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:96
 msgid "Local lease set invalid"
-msgstr ""
+msgstr "Conjunto de locação local inválido"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:99
 msgid "No local tunnels"
@@ -67,7 +68,7 @@ msgstr "Nenhum túnel local"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:102
 msgid "Unsupported encryption options"
-msgstr ""
+msgstr "Opções de criptografia não suportadas"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:105
 msgid "Invalid destination"
@@ -75,15 +76,15 @@ msgstr "Destino inválido"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:111
 msgid "Destination lease set expired"
-msgstr ""
+msgstr "A locação de destino expirou"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:114
 msgid "Destination lease set not found"
-msgstr ""
+msgstr "Conjunto de locação de destino não encontrado"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:117
 msgid "Local destination shutdown"
-msgstr ""
+msgstr "Encerrar destino local"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:120
 msgid "Connection was reset"

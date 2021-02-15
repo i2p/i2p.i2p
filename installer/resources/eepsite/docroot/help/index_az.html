@@ -12,13 +12,25 @@
 
    <div class="langbar">
 <a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
-<a href="index_zh.html"><img src="lib/cn.png" title="中文" alt="中文"></a>
-<a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a>
-<a href="index_es.html"><img src="lib/es.png" title="Español" alt="Español"></a>
-<a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
-<a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a>
-<a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a>
-<a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
+      <a href="index_ar.html"><img src="lib/lang_ar.png" title="عربية" alt="عربية"></a>
+      <a href="index_az.html"><img src="lib/az.png" title="Azerbaijani" alt="Azerbaijani"></a>
+      <a href="index_zh.html"><img src="lib/cn.png" title="中文" alt="中文"></a>
+      <a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a>
+      <a href="index_el.html"><img src="lib/gr.png" title="Ελληνικά" alt="Ελληνικά"></a>
+      <a href="index_es.html"><img src="lib/es.png" title="Español" alt="Español"></a>
+      <a href="index_fa.html"><img src="lib/ir.png" title="فارسی" alt="فارسی"></a>
+      <a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
+      <a href="index_hu.html"><img src="lib/hu.png" title="Magyar" alt="Magyar"></a>
+      <a href="index_in.html"><img src="lib/id.png" title="bahasa Indonesia" alt="bahasa Indonesia"></a>
+      <a href="index_it.html"><img src="lib/it.png" title="Italian" alt="Italian"></a>
+      <a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a>
+      <a href="index_pl.html"><img src="lib/pl.png" title="Polish" alt="Polish"></a>
+      <a href="index_pt.html"><img src="lib/pt.png" title="Português" alt="Português"></a>
+      <a href="index_ro.html"><img src="lib/ro.png" title="Română" alt="Română"></a>
+      <a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a>
+      <a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
+      <a href="index_pl.html"><img src="lib/tr.png" title="Turkish" alt="Turkish"></a>
+      <a href="index_uk.html"><img src="lib/ua.png" title="Українська" alt="Українська"></a>
 </div>
 
     <h1>I2P Anonim vebserver</h1>
@@ -31,30 +43,32 @@
     <p id="dir">Əməliyyat sisteminizdən asılı olaraq, Vebserver-in əsas qovluğunu aşağıdakı yerlərdən birində tapa bilərsiniz:</p>
 
     <ul>
-<li><code><b>Linux</b><br>
- Standart quraşdırma:<code>~/.i2p/eepsite/docroot/</code><br>
- Xidmət kimi çalışan Paket quraşdırma: /var/lib/i2p/i2p-config/eepsite/docroot/</code></li>
+<li>
+<b>Linux</b><br>
+        Standard install: <code dir="ltr">~/.i2p/eepsite/docroot/</code><br>
+        Package install, running as a service: <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+</li>
       <li>
-<b>Windows</b><br><code>%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
+<b>Windows</b><br><code dir="ltr">%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
 </li>        
       <li>
-<b>Mac</b><br><code>/Users/(user)/Library/Application Support/i2p</code>
+<b>Mac</b><br><code dir="ltr">/Users/(user)/Library/Application Support/i2p</code>
 </li>
     </ul>
-<p>I2P-də gizli xidmətlər ".b32.i2p" ilə bitən Base32 ünvanı və ya uzun Base64 sətri olaraq göstərilən təyinat yeri vasitəsilə nəzərdən keçirilir. 
-       Aşağıdakı təlimatları izləyib, qeydiyyatdan keçənə qədər Base32-dən hostun adı kimi istifadə etmək olar.
-       Təyinat yeri bir qədər IP ünvanına bənzəyir və <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Gizli Xidmət Quraşdırması səhifəsində</a> göstərilir.</p>
+<p>In I2P, hidden services are addressed using a Base32 address ending in ".b32.i2p", or a Destination represented as a long Base64 string.
+      The Base32 address may be used as a hostname, until you register a name following the instructions below.
+      The Destination is somewhat like an IP address, and is shown on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.</p>
 
     <p>Aşağıdakı təlimatlarda saytınıza "mysite.i2p" kimi adın təyin edilməsi və başqalarının istifadəsinin təmin edilməsi barədə ətraflı məlumat verilir. 
          Saytınıza yerli olaraq <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a> ünvanından gələ bilərsiniz.</p>
 
     <h2>Gizli xidmətinizi necə qurmaq və elan etmək olar</h2>
 
-     <p>Vebserveriniz standart olaraq işləyir, lakin gizli xidmət tunelinə başlayana kimi başqaları tərəfindən girilə bilməz. 
-     I2P Vebserver tunelinizə başladıqdan sonra digər insanların tapması çətin olacaq
-     Giriş yalnız uzun Təyinat yeri və ya Təyinat yerinin hash-i olan qısa Base32 ünvanı (.b32.i2p) vasitəsilə mümkündür.
-     Siz insanlara sadəcə Təyinat yeri və ya Base32 ünvanını deyə bilərdiniz, lakin xoşbəxtlikdən I2P-nin ünvan kitabı və insanlara sayt haqqında məlumat verən bir neçə asan yolu var.
-     Burada ətraflı təlimat verilib.</p>
+     <p>Your webserver is running by default, but is not accessible by others until you start the hidden service tunnel.
+      After you start your I2P Webserver tunnel, it will be difficult for other people to find.
+      It can only be accessed with the long Destination or with the shorter Base32 address (.b32.i2p), which is a hash of the Destination.
+      You could just tell people the Destnation or the Base32 address, but thankfully I2P has an address book and several easy ways to tell people about your website.
+      Here are detailed instructions.</p>
 
     <ul>
 <li>Aşağı registrdən istifadə edərək saytınıza ad (<i>something</i>.i2p) seçin.
@@ -119,14 +133,14 @@ Qeydiyyatı Təsdiqləmə sətrini kopyalayıb, qeydiyyat səhifəsinə yapışd
 
     <ul>
 <li>
-<code>http://stats.i2p/cgi-bin/newhosts.txt</code>(<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
+<code dir="ltr">http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
       <li>
-<code>http://no.i2p/export/alive-hosts.txt</code>(<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
+<code dir="ltr">http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
     </ul>
-<p>Tələsirsinizsə və bir neçə saat gözləyə bilmirsinizsə, adamlara "keçid" ünvanı dəyişmə xidmətindən istifadə etmələrini söyləyin.  
- Bu,  hostname-in eyni saytda qeydiyyatından bir neçə dəqiqə sonra işləyəcək.
- Brauzerinizə <code>http: //stats.i2p/cgi-bin/jump.cgi? A = <i>something</i>.i2p</code> daxil edərək, özünüzü sınayın.
- Çalışdıqdan sonra başqalarına da istifadə edə biləcəklərini söyləyə bilərsiniz.</p>
+<p>If you are in a hurry and can't wait a few hours, you can tell people to use a "jump" address helper redirection service. 
+      This will work within a few minutes of your registering your hostname on the same site.
+      Test it yourself first by entering <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code> into your browser. 
+      Once it is working, you can tell others to use it.</p>
 
     <p>Bəzi adamlar yeni eepsites-lar üçün <a href="http://identiguy.i2p/" target="_blank">Identiguy-ın eepsite statusu siyahısı</a> və ya <a href="http://no.i2p/browse/" target="_blank">no.i2p-nin aktiv host siyahısı</a> kimi saytların siyahısını yoxlayır, beləcə saytınız trafik yığa bilər.
 İnsanlara izah etməyin fərqli yolları var. Məsələn:</p>
@@ -155,10 +169,10 @@ Məsələn, vebserveriniz 127.0.0.1 port 80-də standart olaraq dinlənirsə, xi
 Vebserverinizin internetə yerləşdirilməsindən əvvəl təhlükəsiz olmasını təmin edin.
  Çoxlu online təlimatlar var, məsələn, "nginx təhlükəsizliyi sərtləşdirmə təlimatı" nı axtarırsınızsa,  yaxşı tövsiyələr verən bir sıra təlimatlar tapa bilərsiniz.</p> 
 
-        <p>Apache vebserveri ilə əlaqədar əhəmiyyətli məsələ var.
-<code>Mod_status</code> və <code>mod_info</code> Apache modulları bəzi əməliyyat sistemlərində standart olaraq aktiv edilir.
- Bu modullar anonim şəbəkədə istifadə edildikdə anonimliyi ciddi təhlükə altına qoyacaq daxili məlumatları ifşa edə bilər.
-Bu modulların yükləndiyi quraşdırma faylında xətlərin təmizlənməsi bu məsələlərin qarşısını almağın ən asan yoludur.</p>
+        <p>There is one important issue with the Apache web server.
+          The <code dir="ltr">mod_status</code> and <code dir="ltr">mod_info</code> Apache modules are enabled by default on some operating systems.
+          These modules expose internal data which can lead to serious compromise of anonymity when used on an anonymous network.
+          Removing the lines in the configuration file where these modules are loaded is the easiest way to prevent these issues.</p>
 
     <h2>Əlavə Yardım</h2>
 

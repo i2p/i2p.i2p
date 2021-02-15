@@ -4,13 +4,14 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Gergő Doma <domag02@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-12 13:39+0000\n"
-"PO-Revision-Date: 2020-08-12 18:50+0000\n"
-"Last-Translator: zzzi2p\n"
+"POT-Creation-Date: 2021-02-05 14:31+0000\n"
+"PO-Revision-Date: 2021-02-05 15:27+0000\n"
+"Last-Translator: vargaviktor <viktor.varga@gmail.com>\n"
 "Language-Team: Hungarian (http://www.transifex.com/otf/I2P/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,7 +24,7 @@ msgstr ""
 #: ../java/build/Proxy.java:55 ../java/build/Proxy.java:91
 #: ../java/build/Proxy.java:97 ../java/build/Proxy.java:111
 msgid "Website Unreachable"
-msgstr ""
+msgstr "Weboldal nem érhető el"
 
 #: ../java/build/Proxy.java:6 ../java/build/Proxy.java:17
 #: ../java/build/Proxy.java:29 ../java/build/Proxy.java:41
@@ -35,9 +36,9 @@ msgstr ""
 #: ../java/build/Proxy.java:151 ../java/build/Proxy.java:161
 #: ../java/build/Proxy.java:173 ../java/build/Proxy.java:186
 #: ../java/build/Proxy.java:198 ../java/build/Proxy.java:208
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:295
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:369
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:403
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:294
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:368
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:402
 msgid "Router Console"
 msgstr "Router Konzol"
 
@@ -52,7 +53,7 @@ msgstr "Router Konzol"
 #: ../java/build/Proxy.java:174 ../java/build/Proxy.java:187
 #: ../java/build/Proxy.java:199 ../java/build/Proxy.java:209
 msgid "I2P Router Console"
-msgstr "Router Konzol"
+msgstr "I2P Router Konzol"
 
 #: ../java/build/Proxy.java:8 ../java/build/Proxy.java:19
 #: ../java/build/Proxy.java:31 ../java/build/Proxy.java:43
@@ -64,9 +65,9 @@ msgstr "Router Konzol"
 #: ../java/build/Proxy.java:153 ../java/build/Proxy.java:163
 #: ../java/build/Proxy.java:175 ../java/build/Proxy.java:188
 #: ../java/build/Proxy.java:200 ../java/build/Proxy.java:210
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:298
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:370
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:404
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:297
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:369
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:403
 msgid "Configuration"
 msgstr "Beállítások"
 
@@ -80,9 +81,9 @@ msgstr "Beállítások"
 #: ../java/build/Proxy.java:154 ../java/build/Proxy.java:164
 #: ../java/build/Proxy.java:176 ../java/build/Proxy.java:189
 #: ../java/build/Proxy.java:201 ../java/build/Proxy.java:211
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:299
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:370
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:404
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:298
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:369
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:403
 msgid "Help"
 msgstr "Segítség"
 
@@ -96,27 +97,24 @@ msgstr "Segítség"
 #: ../java/build/Proxy.java:155 ../java/build/Proxy.java:165
 #: ../java/build/Proxy.java:177 ../java/build/Proxy.java:190
 #: ../java/build/Proxy.java:202 ../java/build/Proxy.java:212
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:302
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:372
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:406
 msgid "Addressbook"
 msgstr "Címjegyzék"
 
 #: ../java/build/Proxy.java:12
 msgid "The website was not reachable."
-msgstr ""
+msgstr "A weboldalt nem lehetett elérni."
 
 #: ../java/build/Proxy.java:13
 msgid ""
 "The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr ""
+msgstr "Lehet hogy a webhely jelenleg nem üzemel, vagy a hálózat túlzsúfolt, esetleg a routered még nincs jól integrálva az ügyfelekkel."
 
 #: ../java/build/Proxy.java:14 ../java/build/Proxy.java:58
 #: ../java/build/Proxy.java:109 ../java/build/Proxy.java:129
 #, java-format
 msgid "You may want to {0}retry{1}."
-msgstr ""
+msgstr "Érdemes lehet {0}újra{1} megpróbálni."
 
 #: ../java/build/Proxy.java:15 ../java/build/Proxy.java:27
 #: ../java/build/Proxy.java:48 ../java/build/Proxy.java:59
@@ -124,22 +122,22 @@ msgstr ""
 #: ../java/build/Proxy.java:118 ../java/build/Proxy.java:130
 #: ../java/build/Proxy.java:171 ../java/build/Proxy.java:196
 msgid "Could not find the following destination:"
-msgstr "Alagút célállomása"
+msgstr "A következő célállomás nem található:"
 
 #: ../java/build/Proxy.java:16 ../java/build/Proxy.java:22
 #: ../java/build/Proxy.java:160 ../java/build/Proxy.java:166
 msgid "Outproxy Not Found"
-msgstr ""
+msgstr "Kimenő proxy nem található"
 
 #: ../java/build/Proxy.java:23
 msgid ""
 "The HTTP outproxy was not reachable, because its lease set was not found."
-msgstr ""
+msgstr "A HTTP kimenő proxyt nem lehetett elérni, mivel annak bérleti készlete nem található."
 
 #: ../java/build/Proxy.java:24
 msgid ""
 "The outproxy is probably down, but there could also be network congestion."
-msgstr ""
+msgstr "A kimenő proxy valószínűleg leállt, de túlzsúfolt hálózat is lehet az oka."
 
 #: ../java/build/Proxy.java:25 ../java/build/Proxy.java:169
 #: ../java/build/Proxy.java:194 ../java/build/Proxy.java:215
@@ -147,7 +145,7 @@ msgstr ""
 msgid ""
 "You may want to {0}retry{1} as this will randomly reselect an outproxy from "
 "the pool you have defined {2}here{3} (if you have more than one configured)."
-msgstr ""
+msgstr "Érdemes lehet {0}újrapróbálni{1}, mivel ez véletlenszerűen újraválaszt egy kimenő proxit abból a készletből amit {2}itt{3} meghatározhattál (feltéve hogy egynél többet állítottál be)."
 
 #: ../java/build/Proxy.java:26 ../java/build/Proxy.java:170
 #: ../java/build/Proxy.java:195 ../java/build/Proxy.java:216
@@ -155,181 +153,181 @@ msgstr ""
 msgid ""
 "If you continue to have trouble you may want to edit your outproxy list "
 "{0}here{1}."
-msgstr ""
+msgstr "Ha továbbra is problémák adódnak, akkor {0}itt{1} szerkesztheted a kimenő proxyk listáját."
 
 #: ../java/build/Proxy.java:28
 msgid "Information: New Host Name"
-msgstr ""
+msgstr "Információ: Új hosztnév"
 
 #: ../java/build/Proxy.java:34
 msgid "Information: New Host Name with Address Helper"
-msgstr ""
+msgstr "Információ: Új hosztnév címsegéddel"
 
 #: ../java/build/Proxy.java:35
 msgid ""
 "The address helper link you followed is for a new host name that is not in "
 "your address book."
-msgstr ""
+msgstr "A címsegéd hivatkozás amit követtél egy új hosztnévhez tartozik ami nincs benne a címjegyzékedben."
 
 #: ../java/build/Proxy.java:36
 msgid "You may save this host name to your local address book."
-msgstr ""
+msgstr "Ezt a hosztnevet elmentheted a helyi címjegyzékedbe."
 
 #: ../java/build/Proxy.java:37
 msgid ""
 "If you save it to your address book, you will not see this message again."
-msgstr ""
+msgstr "Ha elmented a címjegyzékedbe, akkor nem fogod ezt az üzenetet újból megkapni."
 
 #: ../java/build/Proxy.java:38
 msgid ""
 "If you do not save it, the host name will be forgotten after the next router"
 " restart."
-msgstr ""
+msgstr "Ha nem mented el, a hosztnév el lesz felejtve a router következő újraindításakor."
 
 #: ../java/build/Proxy.java:39
 msgid ""
 "If you do not wish to visit this host, click the \"back\" button on your "
 "browser."
-msgstr ""
+msgstr "Ha nem kívánod meglátogatni ezt az állomást, akkor kattints a ‟Vissza„ gombra a böngésződben."
 
 #: ../java/build/Proxy.java:46 ../java/build/Proxy.java:119
 #: ../java/build/Proxy.java:125
 msgid "Warning: Invalid Destination"
-msgstr "Helyi célállomást"
+msgstr "Figyelmeztetés: Érvénytelen célállomás"
 
 #: ../java/build/Proxy.java:47
 msgid "The Base32 address is invalid."
-msgstr ""
+msgstr "A Base32 cím érvénytelen."
 
 #: ../java/build/Proxy.java:56
 msgid "The website was not reachable, because its lease set was not found."
-msgstr ""
+msgstr "A weboldalt nem lehetett elérni, mivel annak bérleti készlete nem található."
 
 #: ../java/build/Proxy.java:57
 msgid ""
 "The website is probably down, but there could also be network congestion."
-msgstr ""
+msgstr "A weboldal valószínűleg leállt, de túlzsúfolt hálózat is lehet az oka."
 
 #: ../java/build/Proxy.java:60 ../java/build/Proxy.java:66
 msgid "Warning: Invalid Request URI"
-msgstr ""
+msgstr "Figyelmeztetés: Érvénytelen kérési URI"
 
 #: ../java/build/Proxy.java:67
 msgid "The request URI is invalid, and probably contains illegal characters."
-msgstr ""
+msgstr "A kérési URI érvénytelen és valószínűleg nem engedélyezett karaktereket tartalmaz."
 
 #: ../java/build/Proxy.java:68
 msgid ""
 "If you clicked a link, check the end of the URI for any characters the "
 "browser has mistakenly added on."
-msgstr ""
+msgstr "Ha rákattintottál egy hivatkozásra, akkor ellenőrizd hogy az URI végén nincs-e olyan karakter amit a böngésző tévesen hozzáadhatott."
 
 #: ../java/build/Proxy.java:69
 msgid "Error: Request Denied"
-msgstr ""
+msgstr "Hiba: Kérés elutasítva"
 
 #: ../java/build/Proxy.java:75
 msgid "Error: Local Access"
-msgstr ""
+msgstr "Hiba: Helyi cím"
 
 #: ../java/build/Proxy.java:76
 msgid "Your browser is misconfigured."
-msgstr ""
+msgstr "A böngésződ nincs megfelelően beállítva."
 
 #: ../java/build/Proxy.java:77
 msgid ""
 "Do not use the proxy to access the router console, localhost, or local LAN "
 "destinations."
-msgstr ""
+msgstr "Ne használd a proxyt a router konzol, a sajátgép (localhost) vagy a helyi hálózaton lévő célállomások eléréséhez."
 
 #: ../java/build/Proxy.java:78
 msgid "Website Unknown"
-msgstr ""
+msgstr "Ismeretlen weboldal"
 
 #: ../java/build/Proxy.java:84
 msgid "Website Not Found in Addressbook"
-msgstr ""
+msgstr "A weboldal nem található meg a címjegyzékben"
 
 #: ../java/build/Proxy.java:85
 msgid "The website was not found in your router's addressbook."
-msgstr ""
+msgstr "A weboldalt nem lehetett megtalálni a routered címjegyzékében."
 
 #: ../java/build/Proxy.java:86
 msgid "Check the link or find a Base 32 or Base 64 address."
-msgstr ""
+msgstr "Ellenőrizd a hivatkozást vagy keress egy Base 32 vagy Base 64 formátumú címet."
 
 #: ../java/build/Proxy.java:87
 #, java-format
 msgid "If you have the Base 64 address, {0}add it to your addressbook{1}."
-msgstr ""
+msgstr "Ha Base 64 formátumú címed van, {0}add hozzá a címjegyzékedhez{1}."
 
 #: ../java/build/Proxy.java:88
 msgid ""
 "Otherwise, find a Base 32 or address helper link, or use a jump service link"
 " below."
-msgstr ""
+msgstr "Ellenkező esetben keress egy Base 32 vagy címsegéd hivatkozást, vagy használd az alábbi ugrószolgáltatás hivatkozást."
 
 #: ../java/build/Proxy.java:89
 #, java-format
 msgid ""
 "Seeing this page often? See {0}the FAQ{1} for help in {2}adding some "
 "subscriptions{3} to your addressbook."
-msgstr ""
+msgstr "Túl gyakran látod ezt az oldalt? Tekintsd meg a {0}GYIK-et{1} ahhoz, hogy megtudd {2}hogyan adhatsz hozzá néhány feliratkozást{3} a címjegyzékedhez."
 
 #: ../java/build/Proxy.java:98
 msgid ""
 "The website was not reachable, because it uses encryption options that are "
 "not supported by your I2P or Java version."
-msgstr ""
+msgstr "A weboldalt nem lehetett elérni, mivel olyan titkosítási opciókat használ amelyek nem támogatottak a Te I2P vagy Java verziód által."
 
 #: ../java/build/Proxy.java:99 ../java/build/Proxy.java:217
 msgid "Could not connect to the following destination:"
-msgstr ""
+msgstr "Sikertelen a csatlakozás a következő célállomáshoz:"
 
 #: ../java/build/Proxy.java:100 ../java/build/Proxy.java:106
 #: ../java/build/Proxy.java:185 ../java/build/Proxy.java:191
 msgid "Connection Reset"
-msgstr ""
+msgstr "A kapcsolat alaphelyzetbe állt"
 
 #: ../java/build/Proxy.java:107
 msgid "The connection to the website was reset while the page was loading."
-msgstr ""
+msgstr "A kapcsolat a weboldalhoz alaphelyzetbe állt az oldal betöltése közben."
 
 #: ../java/build/Proxy.java:108
 msgid ""
 "The website could be temporarily unavailable, too busy, or it has blocked "
 "your access."
-msgstr ""
+msgstr "Előfordulhat, hogy a weboldal ideiglenesen nem érhető el, túl elfoglalt, vagy blokkolta a hozzáférésed."
 
 #: ../java/build/Proxy.java:117
 msgid "Warning: Authorization Required"
-msgstr ""
+msgstr "Figyelmeztetés: Hitelesítés szükséges"
 
 #: ../java/build/Proxy.java:126
 msgid ""
 "The website destination specified was not valid, or was otherwise "
 "unreachable."
-msgstr ""
+msgstr "A weboldal célcíme nem volt érvényes, vagy más okból elérhetetlen volt."
 
 #: ../java/build/Proxy.java:127
 msgid ""
 "Perhaps you pasted in the wrong Base 64 string or the link you are following"
 " is bad."
-msgstr ""
+msgstr "Lehet, hogy rossz Base 64 szöveget illesztettél be, vagy a követett hivatkozás hibás."
 
 #: ../java/build/Proxy.java:128
 msgid "The I2P host could also be offline."
-msgstr ""
+msgstr "Az is lehet, hogy az I2P állomás nem üzemel."
 
 #: ../java/build/Proxy.java:131 ../java/build/Proxy.java:137
 msgid "Warning: No Outproxy Configured"
-msgstr ""
+msgstr "Figyelmeztetés: Nincs kimenő proxy beállítva"
 
 #: ../java/build/Proxy.java:138
 msgid ""
 "Your request was for a site outside of I2P, but you have no HTTP outproxy "
 "configured."
-msgstr ""
+msgstr "A kérésed az I2P-n kívüli helyre mutatott, de ahhoz nincs beállítva HTTP kimenő proxy."
 
 #: ../java/build/Proxy.java:139
 msgid "Please configure an outproxy in I2PTunnel."
@@ -397,11 +395,11 @@ msgstr ""
 
 #: ../java/build/Proxy.java:180
 msgid "Proxy Authorization Required"
-msgstr "Kimenő proxy Hitelesítés"
+msgstr "Proxy hitelesítés szükséges"
 
 #: ../java/build/Proxy.java:181
 msgid "I2P HTTP Proxy Authorization Required"
-msgstr "Kimenő proxy Hitelesítés"
+msgstr "I2P HTTP Proxy hitelesítés szükséges"
 
 #: ../java/build/Proxy.java:182
 msgid ""
@@ -617,78 +615,87 @@ msgstr ""
 msgid "You must enter the password provided by the server operator."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:197
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:196
 #, java-format
 msgid "Added via address helper from {0}"
 msgstr "Címsegítőn keresztül hozzáadva {0}"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:199
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:198
 msgid "Added via address helper"
 msgstr "Címsegítőn keresztül hozzáadva"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:236
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:235
 msgid "Missing lookup password"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:250
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:249
 msgid "Missing private key"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:255
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:254
 msgid "Invalid private key"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:288
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:307
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:287
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:306
 msgid "Your new encryption key"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:312
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:301
+msgid "Address book"
+msgstr "Címjegyzék"
+
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:311
 msgid "Copy the key and send it to the server operator."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:314
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:313
 msgid "After you are granted permission, you may proceed to the website."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:335
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:334
 msgid "Go back and fix the error"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:346
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:345
 msgid "router"
 msgstr "router"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:348
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:347
 msgid "local"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:350
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:349
 msgid "private"
 msgstr "privát"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:363
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:397
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:362
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:396
 #, java-format
 msgid "Redirecting to {0}"
 msgstr "Átirányítás ide: {0}"
 
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:371
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:405
+msgid "Address Book"
+msgstr "Címjegyzék"
+
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:376
+#, java-format
+msgid "Saved {0} to the {1} address book, redirecting now."
+msgstr ""
+
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:377
 #, java-format
-msgid "Saved {0} to the {1} addressbook, redirecting now."
-msgstr "{0} mentése {1} címjegyzékbe, átirányítás alatt."
+msgid "Failed to save {0} to the {1} address book, redirecting now."
+msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:378
-#, java-format
-msgid "Failed to save {0} to the {1} addressbook, redirecting now."
-msgstr "{0} mentése {1} címjegyzékbe sikertelen, átirányítás alatt."
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:380
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:412
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:379
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:411
 msgid "Click here if you are not redirected automatically."
 msgstr "Kattints ide, amennyiben nem történt meg az automatikus átirányítás."
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:410
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:409
 #, java-format
 msgid "Saved the authentication for {0}, redirecting now."
 msgstr ""

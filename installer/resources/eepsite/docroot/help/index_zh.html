@@ -12,13 +12,25 @@
 
    <div class="langbar">
 <a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
+      <a href="index_ar.html"><img src="lib/lang_ar.png" title="عربية" alt="عربية"></a>
+      <a href="index_az.html"><img src="lib/az.png" title="Azerbaijani" alt="Azerbaijani"></a>
       <a href="index_zh.html"><img src="lib/cn.png" title="中文" alt="中文"></a>
       <a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a>
+      <a href="index_el.html"><img src="lib/gr.png" title="Ελληνικά" alt="Ελληνικά"></a>
       <a href="index_es.html"><img src="lib/es.png" title="Español" alt="Español"></a>
+      <a href="index_fa.html"><img src="lib/ir.png" title="فارسی" alt="فارسی"></a>
       <a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
+      <a href="index_hu.html"><img src="lib/hu.png" title="Magyar" alt="Magyar"></a>
+      <a href="index_in.html"><img src="lib/id.png" title="bahasa Indonesia" alt="bahasa Indonesia"></a>
+      <a href="index_it.html"><img src="lib/it.png" title="Italian" alt="Italian"></a>
       <a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a>
+      <a href="index_pl.html"><img src="lib/pl.png" title="Polish" alt="Polish"></a>
+      <a href="index_pt.html"><img src="lib/pt.png" title="Português" alt="Português"></a>
+      <a href="index_ro.html"><img src="lib/ro.png" title="Română" alt="Română"></a>
       <a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a>
       <a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
+      <a href="index_pl.html"><img src="lib/tr.png" title="Turkish" alt="Turkish"></a>
+      <a href="index_uk.html"><img src="lib/ua.png" title="Українська" alt="Українська"></a>
 </div>
 
     <h1>I2P 匿名网页服务器</h1>
@@ -33,31 +45,30 @@
     <ul>
 <li>
 <b>Linux</b><br>
-标准 安装:<code>~/.i2p/匿名网站/docroot/</code><br>
-包安装,作为一个运行服务,<code>/var/lib/i2p/i2p-配置/匿名网站/docroot/</code>
+        Standard install: <code dir="ltr">~/.i2p/eepsite/docroot/</code><br>
+        Package install, running as a service: <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/</code>
 </li>
       <li>
-<b>Windows</b><br><code>%APPDATA%\I2P\eepsite\docroot\</code>
+<b>Windows</b><br><code dir="ltr">%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
 </li>        
       <li>
-<b>Mac</b><br><code>/Users/(user)/Library/Application Support/i2p</code>
+<b>Mac</b><br><code dir="ltr">/Users/(user)/Library/Application Support/i2p</code>
 </li>
     </ul>
-<p>在I2P中，隐藏服务使用以“ .b32.i2p”结尾的Base32地址或以长Base64字符串表示的Destination来寻址。
-在您按照以下说明分配寄存器名称之前，可以将Base32地址用作主机名。
-目标在某种程度上类似于IP地址，并显示在
-<a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">隐藏服务配置页面上</a></p>
+<p>In I2P, hidden services are addressed using a Base32 address ending in ".b32.i2p", or a Destination represented as a long Base64 string.
+      The Base32 address may be used as a hostname, until you register a name following the instructions below.
+      The Destination is somewhat like an IP address, and is shown on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.</p>
 
     <p>教程：如何为你的网站配置类似 "mysite.i2p" 的域名并允许他人访问。
        你可以在本机访问<a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>进入你的网站。</p>
 
     <h2>如何设置并发布你的隐藏服务</h2>
 
-     <p>网页服务默认开启，但在你开启隐藏服务隧道前他人不能访问。
-      尽管你开启了 I2P 网页服务器隧道，但他人很难访问你的网站。
-      这是因为匿名网站只能由一段很长的网址或原始网址的 Base32 编码(下称“编码网址”)（.b32.i2p）访问。
-      为了让他人访问，你可以直接告知他人你的匿名网站的原始网址或编码网址，但把网址加入 I2P 的地址簿会比较方便。
-      以下是详细说明。</p>
+     <p>Your webserver is running by default, but is not accessible by others until you start the hidden service tunnel.
+      After you start your I2P Webserver tunnel, it will be difficult for other people to find.
+      It can only be accessed with the long Destination or with the shorter Base32 address (.b32.i2p), which is a hash of the Destination.
+      You could just tell people the Destnation or the Base32 address, but thankfully I2P has an address book and several easy ways to tell people about your website.
+      Here are detailed instructions.</p>
 
     <ul>
 <li>Pick a name for your website (<i>something</i>.i2p), using lower-case.
@@ -120,14 +131,14 @@
 
     <ul>
 <li>
-<code>http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
+<code dir="ltr">http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
       <li>
-<code>http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
+<code dir="ltr">http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
     </ul>
-<p>如果您赶时间并且不能等几个小时，可以告诉人们使用“跳转”地址帮助程序重定向服务。
-   将会在您同一站点上注册主机名后的几分钟内生效。
-  首先，通过在浏览器中输入<code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>某</i>.i2p</code>进入您的浏览器。
-  一旦运行，您就可以告诉其他人使用它。</p>
+<p>If you are in a hurry and can't wait a few hours, you can tell people to use a "jump" address helper redirection service. 
+      This will work within a few minutes of your registering your hostname on the same site.
+      Test it yourself first by entering <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code> into your browser. 
+      Once it is working, you can tell others to use it.</p>
 
     <p>Some people check website lists such as <a href="http://identiguy.i2p/" target="_blank">Identiguy's eepsite status list</a> or <a href="http://no.i2p/browse/" target="_blank">no.i2p's active host list</a> for new eepsites, so your site may start getting some traffic. 
       There are plenty of other ways to tell people. Here are a few ideas:</p>
@@ -157,7 +168,7 @@
 在线上有很多指南，例如，如果您搜索“ nginx安全强化指南”，则会发现许多具有良好建议的指南。</p> 
 
         <p>There is one important issue with the Apache web server.
-          The <code>mod_status</code> and <code>mod_info</code> Apache modules are enabled by default on some operating systems.
+          The <code dir="ltr">mod_status</code> and <code dir="ltr">mod_info</code> Apache modules are enabled by default on some operating systems.
           These modules expose internal data which can lead to serious compromise of anonymity when used on an anonymous network.
           Removing the lines in the configuration file where these modules are loaded is the easiest way to prevent these issues.</p>
 

@@ -12,13 +12,25 @@
 
    <div class="langbar">
 <a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
+      <a href="index_ar.html"><img src="lib/lang_ar.png" title="عربية" alt="عربية"></a>
+      <a href="index_az.html"><img src="lib/az.png" title="Azerbaijani" alt="Azerbaijani"></a>
       <a href="index_zh.html"><img src="lib/cn.png" title="中文" alt="中文"></a>
       <a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a>
+      <a href="index_el.html"><img src="lib/gr.png" title="Ελληνικά" alt="Ελληνικά"></a>
       <a href="index_es.html"><img src="lib/es.png" title="Español" alt="Español"></a>
+      <a href="index_fa.html"><img src="lib/ir.png" title="فارسی" alt="فارسی"></a>
       <a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
+      <a href="index_hu.html"><img src="lib/hu.png" title="Magyar" alt="Magyar"></a>
+      <a href="index_in.html"><img src="lib/id.png" title="bahasa Indonesia" alt="bahasa Indonesia"></a>
+      <a href="index_it.html"><img src="lib/it.png" title="Italian" alt="Italian"></a>
       <a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a>
+      <a href="index_pl.html"><img src="lib/pl.png" title="Polish" alt="Polish"></a>
+      <a href="index_pt.html"><img src="lib/pt.png" title="Português" alt="Português"></a>
+      <a href="index_ro.html"><img src="lib/ro.png" title="Română" alt="Română"></a>
       <a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a>
       <a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
+      <a href="index_pl.html"><img src="lib/tr.png" title="Turkish" alt="Turkish"></a>
+      <a href="index_uk.html"><img src="lib/ua.png" title="Українська" alt="Українська"></a>
 </div>
 
     <h1>Serveur Web anonyme I2P</h1>
@@ -33,19 +45,19 @@ Pour servir votre propre contenu, modifiez simplement les fichiers situés dans 
     <ul>
 <li>
 <b>Linux</b><br>
-        Installation normale : <code>~/.i2p/eepsite/docroot/</code><br>
-        Installation par un paquet, exécuté comme service : <code>/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+        Installation normale : <code dir="ltr">~/.i2p/eepsite/docroot/</code><br>
+        Installation par un paquet, exécuté comme service : <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/</code>
 </li>
       <li>
-<b>Windows</b><br><code>%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
+<b>Windows</b><br><code dir="ltr">%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
 </li>        
       <li>
-<b>macOS</b><br><code>/Users/(user)/Library/Application Support/i2p</code>
+<b>Mac</b><br><code dir="ltr">/Users/(user)/Library/Application Support/i2p</code>
 </li>
     </ul>
 <p>Dans I2P, l’on communique avec les services cachés en utilisant une adresse Base32 qui se termine par « .b32.i2p » ou par une destination représentée par une longue chaîne Base64.
-L’adresse Base32 peut être utilisée comme nom d’hôte, jusqu’à ce que vous lui attribuiez un nom en suivant les instructions ci-dessous.
-La destination est d’une certaine façon semblable à une adresse IP et elle apparaît sur la <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">page Configuration des services cachés</a>.</p>
+      L’adresse Base32 peut être utilisée comme nom d’hôte, jusqu’à ce que vous lui attribuiez un nom en suivant les instructions ci-dessous.
+      La destination est d’une certaine façon semblable à une adresse IP et elle apparaît sur la <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">page Configuration des services cachés</a>.</p>
 
     <p>Les instructions ci-dessous expliquent en détail comment attribuer un nom comme « monsite.i2p » à votre site Web et permettre aux autres d’y accéder.
 Vous pouvez accéder à votre site localement à l’adresse <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658</a>.</p>
@@ -53,9 +65,10 @@ Vous pouvez accéder à votre site localement à l’adresse <a href="http://12
     <h2>Mettre en place et annoncer votre service caché</h2>
 
      <p>Votre serveur Web est exécuté par défaut, mais les autres ne pourront pas y accéder tant que vous n’aurez pas démarré le tunnel de service caché.
-Une fois que vous aurez démarré le tunnel de votre serveur Web I2P, les autres auront du mal à le trouver.
-On ne peut y accéder que par la longue destination ou par  l’adresse Base32 plus courte (.b32.i2p), qui est à condensat de la destination.
-Vous pourriez juste communiquer la destination ou l’adresse Base32, mais heureusement I2P offre un carnet d’adresses et plusieurs moyens faciles d’informer les autres au sujet de votre site Web.</p>
+      Une fois que vous aurez démarré le tunnel de votre serveur Web I2P, les autres auront du mal à le trouver.
+      On ne peut y accéder que par la longue destination ou par  l’adresse Base32 plus courte (.b32.i2p), qui est à condensat de la destination.
+      Vous pourriez juste communiquer la destination ou l’adresse Base32, mais heureusement I2P offre un carnet d’adresses et plusieurs moyens faciles d’informer les autres au sujet de votre site Web.
+      Voici des instructions détaillées.</p>
 
     <ul>
 <li>Choisissez un nom pour votre site Web (<i>quelque chose</i>.i2p) en utilisant des minuscules.
@@ -118,13 +131,13 @@ Rendez-vous sur votre <a href="http://127.0.0.1:7657/susidns/subscriptions">page
 
     <ul>
 <li>
-<code>http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
+<code dir="ltr">http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
       <li>
-<code>http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
+<code dir="ltr">http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
     </ul>
 <p>Si vous êtes pressé et ne pouvez pas attendre quelques heures, vous pouvez demander aux autres d’utiliser un service de redirection de d’aide d’adresse de « saut ».
-Testez-le d’abord vous-même en saisissant <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>quelquechose</i>.i2p</code> dans votre navigateur.
-Une fois que cela fonctionnera, vous pourrez demander aux autres de l’utiliser.</p>
+      Essayez-le d’abord vous-même en saisissant <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i> quelquechose </i>.i2p</code> dans votre navigateur.
+       Une fois que cela fonctionnera, vous pourrez dire aux autres de l’utiliser.</p>
 
     <p>Certains utilisateurs vérifient la présence de nouveaux sites eep sur des listes de sites Web telles que la <a href="http://identiguy.i2p/" target="_blank">liste d’état de sites eep d’Identiguy</a> ou la <a href="http://no.i2p/browse/" target="_blank">liste d’hôtes actifs de no.i2p</a>, et votre site pourrait ainsi commencer à recevoir du trafic.
 Les façons d’informer les autres utilisateurs sont nombreuses. Voici quelques idées :</p>
@@ -153,9 +166,9 @@ Veuillez vous assurer de la sécurité de votre serveur Web avant de le mettre e
 Il existe une myriade de guides en ligne, par exemple, si vous cherchez « nginx guide renforcement sécurité » ou « nginx security hardening guide », vous trouverez nombre de guides avec de bonnes recommandations.</p> 
 
         <p>Il existe un problème important avec le serveur Web Apache.
-Les modules Apache <code>mod_status</code> et <code>mod_info</code> sont activés par défaut sur certains systèmes d’exploitation.
-Ces modules exposent des données internes qui pourraient sérieusement compromettre votre anonymat s’ils sont utilisés sur un réseau anonyme.
-La façon la plus simple de prévenir ces problèmes est de supprimer les lignes qui appellent ces modules dans le fichier de configuration.</p>
+          Les modules Apache <code dir="ltr">mod_status</code> et <code dir="ltr">mod_info</code> sont activés par défaut sur certains systèmes d’exploitation.
+          Ces modules exposent des données internes qui pourraient sérieusement compromettre votre anonymat s’ils sont utilisés sur un réseau anonyme.
+          La façon la plus simple de prévenir ces problèmes est de supprimer les lignes qui appellent ces modules dans le fichier de configuration.</p>
 
     <h2>Assistance supplémentaire</h2>
 
