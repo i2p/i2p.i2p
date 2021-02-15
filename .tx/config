@@ -50,6 +50,7 @@ trans.hu = apps/i2ptunnel/locale-proxy/messages_hu.po
 ;; Java converts id to in
 trans.id = apps/i2ptunnel/locale-proxy/messages_in.po
 trans.it = apps/i2ptunnel/locale-proxy/messages_it.po
+trans.ja = apps/i2ptunnel/locale-proxy/messages_ja.po
 trans.ko = apps/i2ptunnel/locale-proxy/messages_ko.po
 trans.nb = apps/i2ptunnel/locale-proxy/messages_nb.po
 trans.nl = apps/i2ptunnel/locale-proxy/messages_nl.po
@@ -189,6 +190,7 @@ trans.fr = apps/routerconsole/locale-news/messages_fr.po
 trans.gl = apps/routerconsole/locale-news/messages_gl.po
 ;; Java converts he to iw
 trans.he = apps/routerconsole/locale-news/messages_iw.po
+trans.hu = apps/routerconsole/locale-news/messages_hu.po
 ;; Java converts id to in
 trans.id = apps/routerconsole/locale-news/messages_in.po
 trans.it = apps/routerconsole/locale-news/messages_it.po
@@ -362,9 +364,9 @@ trans.sk = apps/desktopgui/locale/messages_sk.po
 trans.sr = apps/desktopgui/locale/messages_sr.po
 trans.sv_SE = apps/desktopgui/locale/messages_sv.po
 trans.sq = apps/desktopgui/locale/messages_sq.po
-trans.uk_UA = apps/desktopgui/locale/messages_uk.po
 trans.tk = apps/desktopgui/locale/messages_tk.po
 trans.tr_TR = apps/desktopgui/locale/messages_tr.po
+trans.uk_UA = apps/desktopgui/locale/messages_uk.po
 trans.vi = apps/desktopgui/locale/messages_vi.po
 trans.zh_CN = apps/desktopgui/locale/messages_zh.po
 trans.zh_TW = apps/desktopgui/locale/messages_zh_TW.po
