@@ -1,3 +1,5 @@
+* 2021-02-17 0.9.49 released
+
 2021-02-15 zzz
  * Build: Test script fixes
  * Pull translations from Transifex
