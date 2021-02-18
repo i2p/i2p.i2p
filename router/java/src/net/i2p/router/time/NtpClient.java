@@ -60,7 +60,7 @@ import net.i2p.util.Log;
  *
  * Public only for main(), not a public API, not for external use.
  *
- * TODO NOT 2036-compliant, see RFC 4330
+ * 2036-compliant as of 0.9.50, see NtpMessage.
  *
  * @author Adam Buckley
  * (minor refactoring by jrandom)

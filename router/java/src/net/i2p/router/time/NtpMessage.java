@@ -72,12 +72,36 @@ import net.i2p.util.RandomSource;
  * inspired by http://www.pps.jussieu.fr/~jch/enseignement/reseaux/
  * NTPMessage.java which is copyright (c) 2003 by Juliusz Chroboczek
  *
- * TODO NOT 2036-compliant, see RFC 4330
+ * <h2>2036-compliance informaction</h2>
+ *
+ * Prior to 0.9.50, this supported years 1900-2035.
+ * As of 0.9.50, this supports years 1968-2104 and is year-2036 compliant.
+ * All double timestamps are the actual seconds since 1900.
+ * We use a "pivot" of January 1968.
+ * NTP-format dates before 1968 are coverted to 2036+.
+ * So this code handles the last half of era 0 and the first half of era 1,
+ * i.e. 1968-2104.
+ * All math and comparisons on timestamps must be on the double values,
+ * never on the raw NTP-format byte arrays.
+ *
+ * refs:
+ * https://docs.ntpsec.org/latest/rollover.html
+ * https://www.eecis.udel.edu/~mills/y2k.html
+ * https://www.eecis.udel.edu/~mills/time.html
+ * https://tools.ietf.org/html/rfc4330 sec. 3
  *
  * @author Adam Buckley
  * @since 0.9.1 moved from net.i2p.time
  */
 class NtpMessage {
+
+    // Jan. 19, 1968, halfway through era 0, the earliest date we can handle
+    private static final double SECONDS_PIVOT = 1L << 31;
+    // Feb. 8, 2036, the start of era 1
+    private static final double SECONDS_ERA = 1L << 32;
+    // Feb. 26, 2104, halfway through era 1, the latest date we can handle
+    private static final double SECONDS_END = 3L << 31;
+
     /**
      * This is a two-bit code warning of an impending leap second to be
      * inserted/deleted in the last minute of the current day.  Its values
@@ -376,6 +400,8 @@ class NtpMessage {
      * and return it as a double, according to the NTP 64-bit timestamp
      * format.
      *
+     * 2036-compliant as of 0.9.50
+     *
      * @param array 8 bytes starting at pointer
      * @param pointer the offset
      * @return the time since 1900 (NOT Java time)
@@ -386,14 +412,20 @@ class NtpMessage {
         for(int i=0; i<8; i++) {
             r += unsignedByteToShort(array[pointer+i]) * Math.pow(2, (3-i)*8);
         }
-        
+        // 2036-compliance
+        if (r < SECONDS_PIVOT && r > 0d)
+            r += SECONDS_ERA;
         return r;
     }
     
     
     
     /**
-     * Encodes a timestamp in the specified position in the message
+     * Encodes a timestamp in the specified position in the message.
+     *
+     * 2036-compliant as of 0.9.50.
+     * Timestamps before 1968 will be encoded as Jan. 1968.
+     * Timestamps after Feb. 2104 will be encoded as Feb. 2104.
      *
      * @param array output 8 bytes starting at pointer
      * @param pointer the offset
@@ -404,6 +436,19 @@ class NtpMessage {
             // don't put in random data
             Arrays.fill(array, pointer, pointer + 8, (byte) 0);
             return;
+        }
+        // 2036-compliance
+        if (timestamp < SECONDS_PIVOT) {
+            // very borked
+            timestamp = SECONDS_PIVOT;
+        } else if (timestamp >= SECONDS_END) {
+            // very borked
+            timestamp = SECONDS_END - 1;
+        } else if (timestamp >= SECONDS_ERA) {
+            timestamp -= SECONDS_ERA;
+            // 0 is special, don't send 0
+            if (timestamp == 0d)
+                timestamp = .001d;
         }
 
         // Converts a double into a 64-bit fixed point
@@ -505,4 +550,42 @@ class NtpMessage {
         
         return "";
     }
+
+/*
+    // Test 2036 rollover
+    public static void main(String[] args) {
+        byte[] x = new byte[8];
+        byte[] y = new byte[8];
+        test(x, y);
+        x[0] = (byte) 0x80;
+        test(x, y);
+        x[0] = (byte) 0x81;
+        test(x, y);
+        x[0] = (byte) 0xff;
+        test(x, y);
+        Arrays.fill(x, 1, 6, (byte) 0xff);
+        test(x, y);
+        x[0] = 0x40;
+        Arrays.fill(x, 1, 6, (byte) 0);
+        test(x, y);
+        x[0] = 0x7f;
+        test(x, y);
+        Arrays.fill(x, 1, 6, (byte) 0xff);
+        test(x, y);
+    }
+
+    private static void test(byte[] x, byte[] y) {
+        double d = decodeTimestamp(x, 0);
+        encodeTimestamp(y, 0, d);
+        System.out.println(net.i2p.util.HexDump.dump(x));
+        System.out.println(net.i2p.util.HexDump.dump(y));
+        System.out.println("Date: " + timestampToString(d));
+        // skip 2 random bytes at end
+        if (net.i2p.data.DataHelper.eq(x, 0, y, 0, 6))
+            System.out.println("PASS\n");
+        else
+            System.out.println("FAIL\n");
+
+    }
+*/
 }

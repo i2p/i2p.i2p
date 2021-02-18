@@ -1,3 +1,7 @@
+2021-02-18 zzz
+ * Build: Remove empty jars and wars from installers
+ * NTP: Year 2036 fixes (gitlab ticket #12)
+
 * 2021-02-17 0.9.49 released
 
 2021-02-15 zzz
