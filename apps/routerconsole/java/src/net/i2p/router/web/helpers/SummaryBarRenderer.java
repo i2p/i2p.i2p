@@ -169,7 +169,7 @@ class SummaryBarRenderer {
            .append("</a>\n");
         svcs.put(tx, rbuf.toString());
 
-        tx = _t("Legal");
+        tx = _t("Licenses");
         rbuf.setLength(0);
         rbuf.append("<a href=\"/viewlicense\" target=\"_top\" title=\"")
            .append(_t("Information regarding software and licenses used by I2P"))
