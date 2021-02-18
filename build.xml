@@ -1192,9 +1192,6 @@
                     <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
             </exec>
             <echo message="Everything is checked in, right? Let's be sure:" />
-            <exec executable="mtn" failonerror="false" >
-                    <arg value="st" />
-            </exec>
             <exec executable="git" failonerror="false" >
                     <arg value="status" />
             </exec>
@@ -1453,8 +1450,11 @@
     <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepCertificates, prepRouterInfos, copyjetty, copytomcat-unlesspkg, copyjstl-unlesspkg, copystandard-unlesspkg, copyflags, truncatehistory">
         <!-- if updater200 was run previously, it left *.pack files in pkg-temp -->
         <!-- Also remove deletelist.txt used for updater only -->
+        <!-- And empty jars and wars used only in the updater -->
         <delete>
             <fileset dir="pkg-temp" includes="**/*.jar.pack **/*.war.pack deletelist.txt" />
+            <fileset dir="pkg-temp/lib" includes="commons-logging.jar jasper-compiler.jar jetty-java5-threadpool.jar jetty-sslengine.jar" />
+            <fileset dir="pkg-temp" includes="webapps/addressbook.war" />
         </delete>
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
@@ -2310,8 +2310,17 @@
          since preppkg puts too much stuff in pkg-temp -->
 
     <!-- Release targets - pick one: with Jbigi, GeoIP, or neither; pack200, repack, or not -->
+    <target name="release" >
+        <echo message="Pick a target:" />
+        <echo />
+        <echo message="Pack200 |  no jbigi/geoip    with jbigi              with geoip" />
+        <echo message="---------  --------------    ----------------        ----------------" />
+        <echo message="none    |  releaseit         releaseWithJbigi        releaseWithGeoIP" />
+        <echo message="repack  |  releaseRepack     releaseWithJbigiRepack  releaseWithGeoIPRepack" />
+        <echo message="full    |  release200        releaseWithJbigi200     releaseWithGeoIP200" />
+    </target>
 
-    <target name="release"          depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJetty, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
+    <target name="releaseit"        depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJetty, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
     <target name="releaseWithJbigi" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndJbigi, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
     <target name="releaseWithGeoIP" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndGeoIP, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
 
@@ -2406,6 +2415,7 @@
         <echo message="    ${gpg} -u ${release.gpg.keyid} -b i2pinstall_${release.number}_windows.exe" />
         <echo message="    sha256sum i2pinstall_${release.number}_windows.exe" />
         <echo message="Don't forget to git tag -s i2p-${release.number}" />
+        <echo message="         ...and git push origin i2p-${release.number}" />
     </target>
 
     <target name="forceJava7">
