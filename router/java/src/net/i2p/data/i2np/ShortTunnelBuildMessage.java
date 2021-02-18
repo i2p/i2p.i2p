@@ -22,7 +22,7 @@ public class ShortTunnelBuildMessage extends TunnelBuildMessage {
     }
 
     @Override
-    protected int calculateWrittenLength() { return 1 + super.calculateWrittenLength(); }
+    protected int calculateWrittenLength() { return 1 + (RECORD_COUNT * SHORT_RECORD_SIZE); }
 
     @Override
     public int getType() { return MESSAGE_TYPE; }
