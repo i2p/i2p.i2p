@@ -72,7 +72,7 @@ import net.i2p.util.RandomSource;
  * inspired by http://www.pps.jussieu.fr/~jch/enseignement/reseaux/
  * NTPMessage.java which is copyright (c) 2003 by Juliusz Chroboczek
  *
- * <h2>2036-compliance informaction</h2>
+ * <h2>Year 2036 compliance</h2>
  *
  * Prior to 0.9.50, this supported years 1900-2035.
  * As of 0.9.50, this supports years 1968-2104 and is year-2036 compliant.
