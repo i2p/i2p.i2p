@@ -228,7 +228,8 @@ public class Reseeder {
             _checker.setStatus(
                 _t("Reseeding: got router info from file ({0} successful, {1} errors).", fetched, errors));
             System.err.println("Reseed got " + fetched + " router infos from file with " + errors + " errors");
-            _context.router().eventLog().addEvent(EventLog.RESEED, fetched + " from file");
+            if (fetched > 0)
+                _context.router().eventLog().addEvent(EventLog.RESEED, fetched + " from file");
             return fetched;
         } finally {
             try { in.close(); } catch (IOException ioe) {}
@@ -392,7 +393,8 @@ public class Reseeder {
             _isRunning = false;
             // ReseedChecker will set timer to clean up
             //_checker.setStatus("");
-            _context.router().eventLog().addEvent(EventLog.RESEED, Integer.toString(total));
+            if (total > 0)
+                _context.router().eventLog().addEvent(EventLog.RESEED, Integer.toString(total));
         }
 
         /**
