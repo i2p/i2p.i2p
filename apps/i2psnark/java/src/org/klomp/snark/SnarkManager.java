@@ -140,6 +140,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
     public static final String RC_PROP_UNIVERSAL_THEMING = "routerconsole.universal.theme";
     public static final String PROP_THEME = "i2psnark.theme";
     public static final String DEFAULT_THEME = "ubergine";
+    private static final String[] THEMES = new String[] { "dark", "light", "ubergine", "vanilla" };
     /** From CSSHelper */
     private static final String PROP_DISABLE_OLD = "routerconsole.disableOldThemes";
     private static final boolean DEFAULT_DISABLE_OLD = true;
@@ -913,29 +914,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
      * Get all themes
      * @return String[] -- Array of all the themes found, non-null, unsorted
      */
-    public String[] getThemes() {
-         String[] themes;
-         if (_context.isRouterContext()) {
-            File dir = new File(_context.getBaseDir(), "docs/themes/snark");
-            FileFilter fileFilter = new FileFilter() { public boolean accept(File file) { return file.isDirectory(); } };
-            File[] dirnames = dir.listFiles(fileFilter);
-            if (dirnames != null) {
-                List<String> th = new ArrayList<String>(dirnames.length);
-                boolean skipOld = _context.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD);
-                for (int i = 0; i < dirnames.length; i++) {
-                    String name = dirnames[i].getName();
-                    if (skipOld && (name.equals("midnight") || name.equals("classic")))
-                        continue;
-                    th.add(name);
-                }
-                themes = th.toArray(new String[th.size()]);
-            } else {
-                themes = new String[0];
-            }
-        } else {
-            themes = new String[] { "dark", "light", "ubergine", "vanilla" };
-        }
-        return themes;
+    public static String[] getThemes() {
+        return THEMES;
     }
 
 
