@@ -1807,8 +1807,8 @@ h3#passwordheading {
 
 .mlabtable {
     width: 30%;
+    top: 150px;
     position: absolute;
-    top: 17%;
     font-size: 10pt !important;
 }
 
@@ -2197,8 +2197,7 @@ td.optionsave {
 
 .wizardnotice {
      position: absolute;
-     top: 75%;
-     left: 5%;
+     left: 75%;
      width: 22%;
 }
 
@@ -2498,27 +2497,27 @@ td {
 
 #wizardheading {
     border: none;
-    width: 100%;
     padding: 2%;
     margin: auto;
-    top: 1%;
+    margin-left: 40%;
+    margin-top: -1%;
     font-size: xx-large;
     letter-spacing: 0.08em;
     word-spacing: 0.1em;
     color: #41465f;
-    position: absolute;
     background: none !important;
     box-shadow: none !important;
 }
 
 .clickableProgression {
-	color: #327bbf;
+    color: #327bbf;
+    margin-left: 47%;
 }
 
 #infodiv {
-    position: absolute;
-    left: 32%;
-    width: 35%;
+    position: relative;
+    left: 31%;
+    width: 31%;
     top: 50%;
     box-shadow: inset 0 0 0 1px #fff;
     background: rgba(255,255,255,0.7);
@@ -2530,10 +2529,9 @@ td {
 }
 
 #bandwidthconfig.configtable.wizardtable {
-    width: 35%;
-    top: 17%;
-    left: 32%;
-    position: absolute;
+    width: 31%;
+    margin-top: -23%;
+    margin-left: 32%;
     background: none;
     font-size: 10pt !important;
 }
@@ -2542,7 +2540,6 @@ td {
     bottom: 10%;
     right: 10%;
     width: max-content;
-    position: absolute;
     box-shadow: none !important;
     white-space: normal;
     background: none;
@@ -2572,7 +2569,7 @@ td {
 
 #xhr.notification {
     width: 30%;
-    position: absolute;
+    position: relative;
     left: 30%;
     top: 38%;
     font-size: larger;
@@ -2582,7 +2579,7 @@ td {
 
 #xhr2.notification {
 	width: 20%;
-	position: absolute;
+	position: relative;
 	left: 70%;
 	top: 30%;
     font-size: larger;
@@ -3768,7 +3765,7 @@ button:active, input[type="submit"]:active, input[type="reset"]:active {
      transition: ease box-shadow 0.05s;
 }
 
-input.wizardbutton, button.wizardbutton {
+input.wizardbuttons, button.wizardbuttons {
     font-size: large;
 }
 
@@ -4799,9 +4796,7 @@ div#langsettings {
 }
 
 div#wizlangsettings.wizard {
-     position: absolute;
-     left: 15%;
-     top: 50%;
+    margin-left: 30%;
 }
 
 #themesettings hr, #langsettings hr {
@@ -4809,12 +4804,11 @@ div#wizlangsettings.wizard {
 }
 
 img.wizard.progress {
-    position: absolute;
-    top: 6%;
-    left: 1%;
-    max-height: 10%;
-    max-width: 30%;
     mix-blend-mode: multiply;
+    position: absolute;
+    top: 1%;
+    left: 1%;
+    max-width: 40%;
 }
 
 .overlay {
@@ -4834,20 +4828,23 @@ img.wizard.progress {
 
 .wizardtext {
     width: 25%;
-    position: absolute;
-    top: 17%;
-    left: 5%;
     font-size: larger;
+    margin-top: -20%;
+    margin-left: 10%;
+}
+
+.wizardbuttons {
+  margin-left: 10%;
 }
 
 #wizard {
     z-index: 0;
-    position: absolute;
     left: 0px;
     top: 0px;
     height: 100%;
     width: 100%;
     background-color: #f8f9fa;
+    text-align: start;
 }
 
 .langselect { /* containing box for lang selection */
@@ -4862,16 +4859,17 @@ img.wizard.progress {
      float: left;
      margin-left: 15%;
      transition: transform 0.3s ease 0s;
+     
 }
 
 .wizardimg {
-    max-width: 75%;
+    max-width: 50%;
     max-height: 100%;
     margin: auto;
     mix-blend-mode: multiply;
-    position: absolute;
-    z-index: 0;
-    right: 0%;
+    margin-left: 40%;
+    margin-top: -10%;
+    position: relative;
 }
 
 .langselect:hover {

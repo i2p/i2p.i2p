@@ -111,9 +111,6 @@
 <jsp:setProperty name="uihelper" property="contextId" value="<%=i2pcontextId%>" />
 <%-- needed for CSS: --%><div id="config_ui">
 <%-- needed for lang setting in css.jsi: --%><input type="hidden" name="consoleNonce" value="<%=net.i2p.router.web.CSSHelper.getNonce()%>" >
-<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
-<h3 id="wizardheading" class="wizard"><%=uihelper._t("Select Language")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/step-0.png">
 <div class="clickableProgression">
 <span class="currentProgression">&#x2B24;</span>
 <span class="unvisitedProgression">&#x25EF;</span>
@@ -122,6 +119,9 @@
 <span class="unvisitedProgression">&#x25EF;</span>
 <span class="unvisitedProgression">&#x25EF;</span>
 </div>
+<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
+<h3 id="wizardheading" class="wizard"><%=uihelper._t("Select Language")%></h3>
+<img class="wizardimg" src="/themes/console/images/wizard/step-0.png">
 <div id="wizlangsettings" class="wizard">
 <jsp:getProperty name="uihelper" property="langSettings" />
 </div>
@@ -143,9 +143,6 @@
     } else if (ipg == 2) {
         // Overview of bandwidth test
 %>
-<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
-<h3 id="wizardheading" class="wizard"><%=intl._t("Bandwidth Test")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/step-2.png">
 <div class="clickableProgression">
 <span class="visitedProgression">&#x25EF;</span>
 <span class="currentProgression">&#x2B24;</span>
@@ -154,6 +151,9 @@
 <span class="unvisitedProgression">&#x25EF;</span>
 <span class="unvisitedProgression">&#x25EF;</span>
 </div>
+<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
+<h3 id="wizardheading" class="wizard"><%=intl._t("Bandwidth Test")%></h3>
+<img class="wizardimg" src="/themes/console/images/wizard/step-2.png">
 <div class="wizardtext">
 <p>
 <%=intl._t("Let's check your internet connection!")%>
@@ -179,9 +179,6 @@
     } else if (ipg == 3) {
         // Bandwidth test in progress (w/ AJAX)
 %>
-<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
-<h3 id="wizardheading" class="wizard"><%=intl._t("Bandwidth Test in Progress")%></h3>
-<img class="wizardimg" src="themes/console/images/wizard/step-3.png">
 <div class="clickableProgression">
 <span class="visitedProgression">&#x25EF;</span>
 <span class="visitedProgression">&#x25EF;</span>
@@ -190,6 +187,9 @@
 <span class="unvisitedProgression">&#x25EF;</span>
 <span class="unvisitedProgression">&#x25EF;</span>
 </div>
+<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
+<h3 id="wizardheading" class="wizard"><%=intl._t("Bandwidth Test in Progress")%></h3>
+<img class="wizardimg" src="themes/console/images/wizard/step-3.png">
 <div id="xhr" class="notifcation">
 <!-- for non-script -->
 <%=intl._t("Javascript is disabled - wait 60 seconds for the bandwidth test to complete and then click Next")%>
@@ -219,8 +219,6 @@
         if (request.getParameter("skipbw") == null) {
             // don't display this if we skipped the test
 %>
-<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
-<h3 id="wizardheading" class="wizard bwtest"><%=intl._t("Bandwidth Test Results")%></h3>
 <div class="clickableProgression">
 <span class="visitedProgression">&#x25EF;</span>
 <span class="visitedProgression">&#x25EF;</span>
@@ -229,6 +227,8 @@
 <span class="unvisitedProgression">&#x25EF;</span>
 <span class="unvisitedProgression">&#x25EF;</span>
 </div>
+<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
+<h3 id="wizardheading" class="wizard bwtest"><%=intl._t("Bandwidth Test Results")%></h3>
 <table class="mlabtable">
 <tr><td><%=intl._t("Test server location")%></td><td colspan="3"><%=wizhelper.getServerLocation()%></td></tr>
 <tr><td><%=intl._t("Completion status")%></td><td colspan="3"><%=wizhelper.getCompletionStatus()%></td></tr>
@@ -302,9 +302,6 @@
     } else if (ipg == 5) {
         // Browser setup
 %>
-<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
-<h3 id="wizardheading" class="wizard"><%=intl._t("Browser and Application Setup")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/step-5.png">
 <div class="clickableProgression">
 <span class="visitedProgression">&#x25EF;</span>
 <span class="visitedProgression">&#x25EF;</span>
@@ -313,6 +310,9 @@
 <span class="currentProgression">&#x2B24;</span>
 <span class="unvisitedProgression">&#x25EF;</span>
 </div>
+<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
+<h3 id="wizardheading" class="wizard"><%=intl._t("Browser and Application Setup")%></h3>
+<img class="wizardimg" src="/themes/console/images/wizard/step-5.png">
 <div class="wizardtext"><p>
 <%=intl._t("Your browser needs to be configured to work with I2P.")%>
 <%=intl._t("We have instructions for configuring both Firefox and Chromium based browsers with I2P.")%>
@@ -348,9 +348,6 @@
     } else if (ipg == LAST_PAGE) {
         // Done
 %>
-<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
-<h3 id="wizardheading" class="wizard"><%=intl._t("Welcome to the Invisible Internet!")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/step-6.png">
 <div class="clickableProgression">
 <span class="visitedProgression">&#x25EF;</span>
 <span class="visitedProgression">&#x25EF;</span>
@@ -359,6 +356,9 @@
 <span class="visitedProgression">&#x25EF;</span>
 <span class="currentProgression">&#x2B24;</span>
 </div>
+<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
+<h3 id="wizardheading" class="wizard"><%=intl._t("Welcome to the Invisible Internet!")%></h3>
+<img class="wizardimg" src="/themes/console/images/wizard/step-6.png">
 <div class="wizardtext">
 <p>
 <%=intl._t("It will take some time for your peers to integrate your router into the network, but while that is happening you can still explore I2P applications and get to know your way around the router console.")%>
