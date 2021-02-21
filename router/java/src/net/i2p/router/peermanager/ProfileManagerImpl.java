@@ -114,11 +114,14 @@ public class ProfileManagerImpl implements ProfileManager {
      *
      * Non-blocking. Will not update the profile if we can't get the lock.
      */
+    @SuppressWarnings("deprecation")
     public void tunnelTestSucceeded(Hash peer, long responseTimeMs) {
-        PeerProfile data = getProfileNonblocking(peer);
-        if (data == null) return;
-        data.updateTunnelTestTimeAverage(responseTimeMs);
-        data.getTunnelTestResponseTime().addData(responseTimeMs, responseTimeMs);
+        if (PeerProfile.ENABLE_TUNNEL_TEST_RESPONSE_TIME) {
+            PeerProfile data = getProfileNonblocking(peer);
+            if (data == null) return;
+            data.updateTunnelTestTimeAverage(responseTimeMs);
+            data.getTunnelTestResponseTime().addData(responseTimeMs, responseTimeMs);
+        }
     }
     
     /**

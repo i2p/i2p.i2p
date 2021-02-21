@@ -111,6 +111,7 @@ class ProfilePersistenceHelper {
      * @param addComments add comment lines to the output
      * @since 0.9.41
      */
+    @SuppressWarnings("deprecation")
     public void writeProfile(PeerProfile profile, OutputStream out, boolean addComments) throws IOException {
         String groups = null;
         if (_context.profileOrganizer().isFailing(profile.getPeer())) {
@@ -150,7 +151,8 @@ class ProfilePersistenceHelper {
         addDate(buf, addComments, "lastHeardFrom", profile.getLastHeardFrom(), "When did we last get a message from the peer?");
         addDate(buf, addComments, "lastSentToSuccessfully", profile.getLastSendSuccessful(), "When did we last send the peer a message successfully?");
         addDate(buf, addComments, "lastFailedSend", profile.getLastSendFailed(), "When did we last fail to send a message to the peer?");
-        add(buf, addComments, "tunnelTestTimeAverage", profile.getTunnelTestTimeAverage(), "Moving average as to how fast the peer replies");
+        if (PeerProfile.ENABLE_TUNNEL_TEST_RESPONSE_TIME)
+            add(buf, addComments, "tunnelTestTimeAverage", profile.getTunnelTestTimeAverage(), "Moving average as to how fast the peer replies");
         add(buf, addComments, "tunnelPeakThroughput", profile.getPeakThroughputKBps(), "KBytes/sec");
         add(buf, addComments, "tunnelPeakTunnelThroughput", profile.getPeakTunnelThroughputKBps(), "KBytes/sec");
         add(buf, addComments, "tunnelPeakTunnel1mThroughput", profile.getPeakTunnel1mThroughputKBps(), "KBytes/sec");
@@ -165,7 +167,8 @@ class ProfilePersistenceHelper {
             //profile.getReceiveSize().store(out, "receiveSize");
             //profile.getSendSuccessSize().store(out, "sendSuccessSize");
             profile.getTunnelCreateResponseTime().store(out, "tunnelCreateResponseTime", addComments);
-            profile.getTunnelTestResponseTime().store(out, "tunnelTestResponseTime", addComments);
+            if (PeerProfile.ENABLE_TUNNEL_TEST_RESPONSE_TIME)
+                profile.getTunnelTestResponseTime().store(out, "tunnelTestResponseTime", addComments);
         }
 
         if (profile.getIsExpandedDB()) {
@@ -283,6 +286,7 @@ class ProfilePersistenceHelper {
         return (timeSince > EXPIRE_AGE);
     }
     
+    @SuppressWarnings("deprecation")
     public PeerProfile readProfile(File file) {
         Hash peer = getHash(file.getName());
         try {
@@ -321,7 +325,10 @@ class ProfilePersistenceHelper {
             profile.setLastSendSuccessful(getLong(props, "lastSentToSuccessfully"));
             profile.setLastSendFailed(getLong(props, "lastFailedSend"));
             profile.setLastHeardFrom(getLong(props, "lastHeardFrom"));
-            profile.setTunnelTestTimeAverage(getFloat(props, "tunnelTestTimeAverage"));
+
+            if (PeerProfile.ENABLE_TUNNEL_TEST_RESPONSE_TIME)
+                profile.setTunnelTestTimeAverage(getFloat(props, "tunnelTestTimeAverage"));
+
             profile.setPeakThroughputKBps(getFloat(props, "tunnelPeakThroughput"));
             profile.setPeakTunnelThroughputKBps(getFloat(props, "tunnelPeakTunnelThroughput"));
             profile.setPeakTunnel1mThroughputKBps(getFloat(props, "tunnelPeakTunnel1mThroughput"));
@@ -344,7 +351,9 @@ class ProfilePersistenceHelper {
             //profile.getReceiveSize().load(props, "receiveSize", true);
             //profile.getSendSuccessSize().load(props, "sendSuccessSize", true);
             profile.getTunnelCreateResponseTime().load(props, "tunnelCreateResponseTime", true);
-            profile.getTunnelTestResponseTime().load(props, "tunnelTestResponseTime", true);
+
+            if (PeerProfile.ENABLE_TUNNEL_TEST_RESPONSE_TIME)
+                profile.getTunnelTestResponseTime().load(props, "tunnelTestResponseTime", true);
             
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Loaded the profile for " + peer.toBase64() + " from " + file.getName());

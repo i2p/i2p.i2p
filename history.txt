@@ -1,3 +1,13 @@
+2021-02-21 zzz
+ * Console: List all Jetty servers in sidebar
+ * Profiles: Disable peer test (ticket #2456) and tunnel test response time stat
+
+2021-02-20 zzz
+ * Router: Don't rekey previous ECIES every restart on ARM
+
+2021-02-19 zzz
+ * i2psnark: Fix theme selection
+
 2021-02-18 zzz
  * Build: Remove empty jars and wars from installers
  * NTP: Year 2036 fixes (gitlab ticket #12)

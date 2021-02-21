@@ -41,12 +41,14 @@ public class PeerProfile {
     private long _lastSentToSuccessfully;
     private long _lastFailedSend;
     private long _lastHeardFrom;
+    // unused
     private float _tunnelTestResponseTimeAvg;
     // periodic rates
     //private RateStat _sendSuccessSize = null;
     //private RateStat _receiveSize = null;
     private RateStat _dbResponseTime;
     private RateStat _tunnelCreateResponseTime;
+    // unused
     private RateStat _tunnelTestResponseTime;
     private RateStat _dbIntroduction;
     // calculation bonuses
@@ -95,6 +97,7 @@ public class PeerProfile {
     // x**4 = .5; x = 4th root of .5,  x = .5**(1/4), x ~= 0.84
     private static final float DEGRADE_FACTOR = (float) Math.pow(TOTAL_DEGRADE_PER_DAY, 1.0d / DEGRADES_PER_DAY);
     //static { System.out.println("Degrade factor is " + DEGRADE_FACTOR); }
+    static final boolean ENABLE_TUNNEL_TEST_RESPONSE_TIME = false;
 
     private long _lastCoalesceDate = System.currentTimeMillis();
     
@@ -301,9 +304,18 @@ public class PeerProfile {
     /** how long it takes to get a tunnel create response from the peer (in milliseconds), calculated over a 1 minute, 1 hour, and 1 day period
         Warning - may return null if !getIsExpanded() */
     public RateStat getTunnelCreateResponseTime() { return _tunnelCreateResponseTime; }
-    /** how long it takes to successfully test a tunnel this peer participates in (in milliseconds), calculated over a 10 minute, 1 hour, and 1 day period
-        Warning - may return null if !getIsExpanded() */
+
+    /**
+     *  How long it takes to successfully test a tunnel this peer participates in (in milliseconds),
+     *  calculated over a 10 minute, 1 hour, and 1 day period
+     *  Warning - may return null if !getIsExpanded()
+     *
+     *  @deprecated unused
+     *  @return null always
+     */
+    @Deprecated
     public RateStat getTunnelTestResponseTime() { return _tunnelTestResponseTime; }
+
     /** how many new peers we get from dbSearchReplyMessages or dbStore messages, calculated over a 1 hour, 1 day, and 1 week period
         Warning - may return null if !getIsExpandedDB() */
     public RateStat getDbIntroduction() { return _dbIntroduction; }
@@ -356,10 +368,25 @@ public class PeerProfile {
      */
     public boolean getIsFailing() { return false; }
 
+    /**
+     *  @deprecated unused
+     *  @return 0 always
+     */
+    @Deprecated
     public float getTunnelTestTimeAverage() { return _tunnelTestResponseTimeAvg; }
-    void setTunnelTestTimeAverage(float avg) { _tunnelTestResponseTimeAvg = avg; }
+
+    /**
+     *  @deprecated unused
+     */
+    @Deprecated
+    void setTunnelTestTimeAverage(float avg) { /* _tunnelTestResponseTimeAvg = avg; */ }
     
+    /**
+     *  @deprecated unused
+     */
+    @Deprecated
     void updateTunnelTestTimeAverage(long ms) {
+/*
         if (_tunnelTestResponseTimeAvg <= 0) 
             _tunnelTestResponseTimeAvg = 30*1000; // should we instead start at $ms?
         
@@ -372,6 +399,7 @@ public class PeerProfile {
         if (_log.shouldLog(Log.INFO))
             _log.info("Updating tunnel test time for " + _peer.toBase64().substring(0,6) 
                       + " to " + _tunnelTestResponseTimeAvg + " via " + ms);
+*/
     }
 
     public float getPeakThroughputKBps() { 
@@ -520,7 +548,8 @@ public class PeerProfile {
         //    _receiveSize = new RateStat("receiveSize", "How large received messages are", group, new long[] { 5*60*1000l, 60*60*1000l } );
         if (_tunnelCreateResponseTime == null)
             _tunnelCreateResponseTime = new RateStat("tunnelCreateResponseTime", "how long it takes to get a tunnel create response from the peer (in milliseconds)", group, new long[] { 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000 } );
-        if (_tunnelTestResponseTime == null)
+
+        if (ENABLE_TUNNEL_TEST_RESPONSE_TIME && _tunnelTestResponseTime == null)
             _tunnelTestResponseTime = new RateStat("tunnelTestResponseTime", "how long it takes to successfully test a tunnel this peer participates in (in milliseconds)", group, new long[] { 10*60*1000l, 30*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000 } );
 
         if (_tunnelHistory == null)
@@ -605,7 +634,8 @@ public class PeerProfile {
     	//_receiveSize.coalesceStats();
     	//_sendSuccessSize.coalesceStats();
     	_tunnelCreateResponseTime.coalesceStats();
-    	_tunnelTestResponseTime.coalesceStats();
+        if (_tunnelTestResponseTime != null)
+            _tunnelTestResponseTime.coalesceStats();
     	_tunnelHistory.coalesceStats();
     	if (_expandedDB) {
     		_dbIntroduction.coalesceStats();
