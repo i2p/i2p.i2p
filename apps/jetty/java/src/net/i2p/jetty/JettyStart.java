@@ -206,8 +206,7 @@ public class JettyStart implements ClientApp {
                                                 _port = port;
                                                 svc = PortMapper.SVC_EEPSITE;
                                             }
-                                            if (pm.getPort(svc) <= 0)
-                                                pm.register(svc, host, port);
+                                            pm.register(svc, host, port);
                                         }
                                     }
                                 }
@@ -253,13 +252,13 @@ public class JettyStart implements ClientApp {
             }
             if (_context != null) {
                 PortMapper pm = _context.portMapper();
-                if (_port > 0 && pm.getPort(PortMapper.SVC_EEPSITE) == _port) {
+                if (_port > 0) {
+                    pm.unregister(PortMapper.SVC_EEPSITE, _port);
                     _port = 0;
-                    pm.unregister(PortMapper.SVC_EEPSITE);
                 }
-                if (_sslPort > 0 && pm.getPort(PortMapper.SVC_HTTPS_EEPSITE) == _sslPort) {
+                if (_sslPort > 0) {
+                    pm.unregister(PortMapper.SVC_HTTPS_EEPSITE, _sslPort);
                     _sslPort = 0;
-                    pm.unregister(PortMapper.SVC_HTTPS_EEPSITE);
                 }
             }
             changeState(STOPPED);
