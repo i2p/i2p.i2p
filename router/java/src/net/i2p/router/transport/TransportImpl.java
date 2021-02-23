@@ -70,6 +70,17 @@ public abstract class TransportImpl implements Transport {
     private static final long UNREACHABLE_PERIOD = 5*60*1000;
     private static final long WAS_UNREACHABLE_PERIOD = 30*60*1000;
 
+    /** @since 0.9.50 */
+    protected static final String PROP_TRANSPORT_CAPS = "i2np.transportCaps";
+    /** @since 0.9.50 */
+    protected static final boolean ENABLE_TRANSPORT_CAPS = false;
+    /** @since 0.9.50 */
+    public static final String CAP_IPV4 = "4";
+    /** @since 0.9.50 */
+    public static final String CAP_IPV6 = "6";
+    /** @since 0.9.50 */
+    public static final String CAP_IPV4_IPV6 = CAP_IPV4 + CAP_IPV6;
+
     /** @since 0.9.44 */
     protected static final String PROP_IPV6_FIREWALLED = "i2np.lastIPv6Firewalled";
 

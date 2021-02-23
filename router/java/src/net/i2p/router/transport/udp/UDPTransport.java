@@ -187,6 +187,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
     private static final String CAP_TESTING = Character.toString(UDPAddress.CAPACITY_TESTING);
     private static final String CAP_TESTING_INTRO = CAP_TESTING + UDPAddress.CAPACITY_INTRODUCER;
+    private static final String CAP_TESTING_4 = CAP_TESTING + CAP_IPV4;
 
     /** how many relays offered to us will we use at a time? */
     public static final int PUBLIC_RELAY_COUNT = 3;
@@ -204,6 +205,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int MAX_CONSECUTIVE_FAILED = 5;
     
     public static final int DEFAULT_COST = 5;
+    private static final int SSU_OUTBOUND_COST = 14;
     static final long[] RATES = { 10*60*1000 };
     /** minimum active peers to maintain IP detection, etc. */
     private static final int MIN_PEERS = 5;
@@ -610,12 +612,21 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         // REA param is false;
         // TransportManager.startListening() calls router.rebuildRouterInfo()
         if (newPort > 0 && bindToAddrs.isEmpty()) {
+            // Update some config variables and event logs,
+            // because changeAddress() below won't do that for hidden mode
+            // because rebuildExternalAddress() always returns null.
+            boolean save = _context.router().isHidden();
+            Map<String, String> changes = save ? new HashMap<String, String>(4) : null;
             boolean hasv6 = false;
             for (InetAddress ia : getSavedLocalAddresses()) {
                 // Discovered or configured addresses are presumed good at the start.
                 // when externalAddressReceived() was called with SOURCE_INTERFACE,
                 // isAlive() was false, so setReachabilityStatus() was not called
-                if (ia.getAddress().length == 16) {
+                byte[] addr = ia.getAddress();
+                String prop = addr.length == 4 ? PROP_IP : PROP_IPV6;
+                String oldIP = save ? _context.getProperty(prop) : null;
+                String newIP = Addresses.toString(addr);
+                if (addr.length == 16) {
                     // only call REA for one v6 address
                     if (hasv6)
                         continue;
@@ -625,14 +636,23 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     } else {
                         _lastInboundIPv6 = _context.clock().now();
                         setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK, true);
-                        rebuildExternalAddress(ia.getHostAddress(), newPort, false);
+                        rebuildExternalAddress(newIP, newPort, false);
                     }
                 } else {
                     if (!isIPv4Firewalled())
                         setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
-                    rebuildExternalAddress(ia.getHostAddress(), newPort, false);
+                    rebuildExternalAddress(newIP, newPort, false);
+                }
+                if (save && !newIP.equals(oldIP)) {
+                    changes.put(prop, newIP);
+                    if (addr.length == 4)
+                        changes.put(PROP_IP_CHANGE, Long.toString(_context.clock().now()));
+                    if (oldIP != null)
+                        _context.router().eventLog().addEvent(EventLog.CHANGE_IP, newIP);
                 }
             }
+            if (save && !changes.isEmpty())
+                _context.router().saveConfig(changes, null);
         } else if (newPort > 0 && !bindToAddrs.isEmpty()) {
             for (InetAddress ia : bindToAddrs) {
                 if (ia.getAddress().length == 16) {
@@ -725,6 +745,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     SessionKey getIntroKey() { return _introKey; }
 
+    /**
+     *  Published or requested port
+     */
     int getExternalPort(boolean ipv6) {
         RouterAddress addr = getCurrentAddress(ipv6);
         if (addr != null) {
@@ -736,7 +759,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     /**
-     *  IPv4 only
+     *  Published IP, IPv4 only
      *  @return IP or null
      *  @since 0.9.2
      */
@@ -940,6 +963,24 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     return;
                 else
                     gotIPv6Addr = true;
+            }
+        }
+        if ((source == SOURCE_INTERFACE || source == SOURCE_UPNP) &&
+            _context.router().isHidden()) {
+            // Update some config variables and event logs,
+            // because changeAddress() below won't do that for hidden mode
+            // because rebuildExternalAddress() always returns null.
+            String prop = ip.length == 4 ? PROP_IP : PROP_IPV6;
+            String oldIP = _context.getProperty(prop);
+            String newIP = Addresses.toString(ip);
+            if (!newIP.equals(oldIP)) {
+                Map<String, String> changes = new HashMap<String, String>(2);
+                changes.put(prop, newIP);
+                if (ip.length == 4)
+                    changes.put(PROP_IP_CHANGE, Long.toString(_context.clock().now()));
+                _context.router().saveConfig(changes, null);
+                if (oldIP != null)
+                    _context.router().eventLog().addEvent(EventLog.CHANGE_IP, newIP);
             }
         }
         boolean changed = changeAddress(ip, port);
@@ -2351,13 +2392,49 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private RouterAddress locked_rebuildExternalAddress(String host, int port, boolean allowRebuildRouterInfo) {
         if (_log.shouldDebug())
             _log.debug("REA4 " + host + ' ' + port, new Exception());
-        if (_context.router().isHidden())
-            return null;
-        
+        boolean isIPv6 = host != null && host.contains(":");
         OrderedProperties options = new OrderedProperties(); 
+        if (_context.router().isHidden()) {
+            // save the external address, since we didn't publish it
+            if (port > 0 && host != null) {
+                RouterAddress old = getCurrentExternalAddress(isIPv6);
+                if (old == null || !host.equals(old.getHost()) || port != old.getPort()) {
+                    options.setProperty(UDPAddress.PROP_PORT, String.valueOf(port));
+                    options.setProperty(UDPAddress.PROP_HOST, host);
+                    RouterAddress local = new RouterAddress(STYLE, options, SSU_OUTBOUND_COST);
+                    replaceCurrentExternalAddress(local, isIPv6);
+                    options = new OrderedProperties(); 
+                }
+            }
+            if (!_context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS))
+                return null;
+            // As of 0.9.50, make an address with only 4/6 caps
+            String caps;
+            TransportUtil.IPv6Config config = getIPv6Config();
+            if (config == IPV6_ONLY)
+                caps = CAP_IPV6;
+            else if (config != IPV6_DISABLED && hasIPv6Address())
+                caps = CAP_IPV4_IPV6;
+            else
+                caps = CAP_IPV4;
+            options.setProperty(UDPAddress.PROP_CAPACITY, caps);
+            RouterAddress current = getCurrentAddress(false);
+            RouterAddress addr = new RouterAddress(STYLE, options, SSU_OUTBOUND_COST);
+            if (!addr.deepEquals(current)) {
+                if (_log.shouldInfo())
+                    _log.info("Address rebuilt: " + addr, new Exception());
+                replaceAddress(addr);
+                if (allowRebuildRouterInfo)
+                    rebuildRouterInfo();
+            } else {
+                addr = null;
+            }
+            _needsRebuild = false;
+            return addr;
+        }
+
         boolean directIncluded;
         // DNS name assumed IPv4
-        boolean isIPv6 = host != null && host.contains(":");
         boolean introducersRequired = (!isIPv6) && introducersRequired();
         if (!introducersRequired && allowDirectUDP() && port > 0 && host != null) {
             options.setProperty(UDPAddress.PROP_PORT, String.valueOf(port));
@@ -2388,10 +2465,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
         
         // if we have explicit external addresses, they had better be reachable
-        if (introducersRequired)
-            options.setProperty(UDPAddress.PROP_CAPACITY, CAP_TESTING);
-        else
-            options.setProperty(UDPAddress.PROP_CAPACITY, CAP_TESTING_INTRO);
+        String caps;
+        if (introducersRequired) {
+            if (_context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS))
+                caps = CAP_TESTING_4;
+            else
+                caps = CAP_TESTING;
+        } else {
+            caps = CAP_TESTING_INTRO;
+        }
+        options.setProperty(UDPAddress.PROP_CAPACITY, caps);
 
         // MTU since 0.9.2
         int mtu;
