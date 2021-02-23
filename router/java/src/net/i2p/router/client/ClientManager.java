@@ -835,7 +835,7 @@ class ClientManager {
                 try {
                     // only send version if the client can handle it (0.8.7 or greater)
                     runner.doSend(new SetDateMessage(runner.getClientVersion() != null ?
-                                                     CoreVersion.VERSION : null));
+                                                     CoreVersion.PUBLISHED_VERSION : null));
                 } catch (I2CPMessageException ime) {}
             }
             if (_isStarted)

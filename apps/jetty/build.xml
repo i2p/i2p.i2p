@@ -545,7 +545,7 @@
         <jar destfile="./build/servlet-i2p-${release.number}.jar" basedir="./build/obj" includes="net/i2p/servlet/filters/*.class" >
             <manifest>
                 <attribute name="Specification-Title" value="I2P Servlet classes" />
-                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Version" value="${api.version}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
                 <attribute name="Implementation-Title" value="I2P Java Servlet classes" />
                 <attribute name="Implementation-Version" value="${full.version}" />
@@ -609,7 +609,7 @@
             <fileset dir="./build/servlet-i2p-javadoc" />
             <manifest>
                 <attribute name="Specification-Title" value="I2P Servlet classes" />
-                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Version" value="${api.version}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
                 <attribute name="Implementation-Title" value="I2P Java Servlet classes" />
                 <attribute name="Implementation-Version" value="${full.version}" />
@@ -626,7 +626,7 @@
             <fileset dir="./java/src" includes="net/i2p/servlet/filters/**" />
             <manifest>
                 <attribute name="Specification-Title" value="I2P Servlet classes" />
-                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Version" value="${api.version}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
                 <attribute name="Implementation-Title" value="I2P Java Servlet classes" />
                 <attribute name="Implementation-Version" value="${full.version}" />

@@ -210,7 +210,7 @@
         <jar destfile="./build/streaming.jar" basedir="./build/obj" includes="**/*.class" >
             <manifest>
                 <attribute name="Specification-Title" value="I2P Streaming Implementation" />
-                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Version" value="${api.version}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
                 <attribute name="Implementation-Title" value="I2P Java Streaming Implementation" />
                 <attribute name="Implementation-Version" value="${full.version}" />
@@ -282,7 +282,7 @@
             <fileset dir="./build/javadoc" />
             <manifest>
                 <attribute name="Specification-Title" value="I2P Streaming Implementation" />
-                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Version" value="${api.version}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
                 <attribute name="Implementation-Title" value="I2P Java Streaming Implementation" />
                 <attribute name="Implementation-Version" value="${full.version}" />
@@ -299,7 +299,7 @@
             <fileset dir="./src" />
             <manifest>
                 <attribute name="Specification-Title" value="I2P Streaming Implementation" />
-                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Version" value="${api.version}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
                 <attribute name="Implementation-Title" value="I2P Java Streaming Implementation" />
                 <attribute name="Implementation-Version" value="${full.version}" />

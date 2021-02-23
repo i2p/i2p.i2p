@@ -89,10 +89,12 @@ public class Analysis extends JobImpl implements RouterApp {
     private static final double PAIR_DISTANCE_FACTOR = 2.0;
     private static final double OUR_KEY_FACTOR = 4.0;
     private static final double VERSION_FACTOR = 1.0;
-    private static final double POINTS_BAD_VERSION = 50.0;
+    private static final double POINTS_BAD_VERSION = 20.0;
     private static final double POINTS_UNREACHABLE = 4.0;
     private static final double POINTS_NEW = 4.0;
-    private static final double POINTS_BANLIST = 25.0;
+    // since we're blocking by default now, don't make this too high,
+    // so we don't always turn a temporary block into a permanent one.
+    private static final double POINTS_BANLIST = 10.0;
     public static final boolean DEFAULT_BLOCK = true;
     public static final double DEFAULT_BLOCK_THRESHOLD = 50.0;
     public static final long DEFAULT_BLOCK_TIME = 7*24*60*60*1000L;
@@ -775,6 +777,7 @@ public class Analysis extends JobImpl implements RouterApp {
         RouterInfo us = _context.router().getRouterInfo();
         if (us == null) return;
         String ourVer = us.getVersion();
+        // TODO do the math once we hit version 1.0.0
         if (!ourVer.startsWith("0.9.")) return;
         ourVer = ourVer.substring(4);
         int dot = ourVer.indexOf('.');
@@ -793,7 +796,9 @@ public class Analysis extends JobImpl implements RouterApp {
                 addPoints(points, h, POINTS_NONFF, "Non-floodfill");
             String hisFullVer = info.getVersion();
             if (!hisFullVer.startsWith("0.9.")) {
-                addPoints(points, h, POINTS_BAD_VERSION, "Strange version " + DataHelper.escapeHTML(hisFullVer));
+                if (!hisFullVer.startsWith("1."))
+                    addPoints(points, h, POINTS_BAD_VERSION, "Strange version " + DataHelper.escapeHTML(hisFullVer));
+                // TODO do the math once we hit version 1.0.0
                 continue;
             }
             String hisVer = hisFullVer.substring(4);

@@ -1085,6 +1085,7 @@
         <echo message="Warning, javadoc embeds timestamps in the output, run with 'TZ=UTC ant javadoc' if you plan to distribute" />
     </target>
 
+    <!-- sets release.number and api.version -->
     <target name="getReleaseNumber">
         <loadfile srcfile="core/java/src/net/i2p/CoreVersion.java" property="release.number">
             <filterchain>
@@ -1098,8 +1099,41 @@
                 <trim/>
             </filterchain>
         </loadfile>
+        <loadfile srcfile="core/java/src/net/i2p/CoreVersion.java" property="api.version">
+            <filterchain>
+                <linecontains>
+                    <contains value="public final static String PUBLISHED_VERSION"/>
+                </linecontains>
+                <tokenfilter>
+                    <replaceregex pattern='.*"([^"]+)";' replace="\1" flags="gi" />
+                </tokenfilter>
+                <striplinebreaks/>
+                <trim/>
+            </filterchain>
+        </loadfile>
         <property name="release.number" value="unknown" />
-        <echo message="Release number is ${release.number}" />
+        <property name="api.version" value="unknown" />
+        <echo message="Release number: ${release.number}" />
+        <echo message="API version:    ${api.version}" />
+        <fail message="Bad API version, must start with 0.9." >
+            <condition>
+                <not>
+                    <matches pattern="^0\.9\." string="${api.version}" />
+                </not>
+            </condition>
+        </fail>
+        <fail message="Release number / API version mismatch" >
+            <condition>
+                <and>
+                    <not>
+                        <equals arg1="${release.number}" arg2="${api.version}"/>
+                    </not>
+                    <not>
+                        <matches pattern="^1\." string="${release.number}" />
+                    </not>
+                </and>
+            </condition>
+        </fail>
     </target>
 
     <target name="getBuildNumber">

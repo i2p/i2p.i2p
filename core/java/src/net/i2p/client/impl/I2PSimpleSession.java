@@ -123,11 +123,11 @@ public class I2PSimpleSession extends I2PSessionImpl2 {
                     Properties auth = new OrderedProperties();
                     auth.setProperty(I2PClient.PROP_USER, opts.getProperty(I2PClient.PROP_USER));
                     auth.setProperty(I2PClient.PROP_PW, opts.getProperty(I2PClient.PROP_PW));
-                    sendMessage_unchecked(new GetDateMessage(CoreVersion.VERSION, auth));
+                    sendMessage_unchecked(new GetDateMessage(CoreVersion.PUBLISHED_VERSION, auth));
                 } else {
                     // we must now send a GetDate even in SimpleSession, or we won't know
                     // what version we are talking with and cannot use HostLookup
-                    sendMessage_unchecked(new GetDateMessage(CoreVersion.VERSION));
+                    sendMessage_unchecked(new GetDateMessage(CoreVersion.PUBLISHED_VERSION));
                 }
                 waitForDate();
             }

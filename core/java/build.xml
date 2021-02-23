@@ -120,7 +120,7 @@
             <manifest>
                 <attribute name="${manifest.classpath.name}" value="${gettext.jar} ${getopt.jar} ${httpclient.jar}" />
                 <attribute name="Specification-Title" value="I2P Core API" />
-                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Version" value="${api.version}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
                 <attribute name="Implementation-Title" value="I2P Java Core API" />
                 <attribute name="Implementation-Version" value="${full.version}" />
@@ -228,7 +228,7 @@
             <fileset dir="./build/javadoc" />
             <manifest>
                 <attribute name="Specification-Title" value="I2P Core API" />
-                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Version" value="${api.version}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
                 <attribute name="Implementation-Title" value="I2P Java Core API" />
                 <attribute name="Implementation-Version" value="${full.version}" />
@@ -245,7 +245,7 @@
             <fileset dir="./src" />
             <manifest>
                 <attribute name="Specification-Title" value="I2P Core API" />
-                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Version" value="${api.version}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
                 <attribute name="Implementation-Title" value="I2P Java Core API" />
                 <attribute name="Implementation-Version" value="${full.version}" />
@@ -342,7 +342,7 @@
             <manifest>
                 <attribute name="${manifest.classpath.name}" value="${gettext.jar} ${getopt.jar} ${httpclient.jar}" />
                 <attribute name="Specification-Title" value="I2P Core API" />
-                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Version" value="${api.version}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
                 <attribute name="Implementation-Title" value="I2P Java Core API" />
                 <attribute name="Implementation-Version" value="${full.version}" />
@@ -368,7 +368,7 @@
             <manifest>
                 <attribute name="${manifest.classpath.name}" value="${gettext.jar} ${getopt.jar} ${httpclient.jar}" />
                 <attribute name="Specification-Title" value="I2P Core API" />
-                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Version" value="${api.version}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
                 <attribute name="Implementation-Title" value="I2P Java Core API" />
                 <attribute name="Implementation-Version" value="${full.version}" />

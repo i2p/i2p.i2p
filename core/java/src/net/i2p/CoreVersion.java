@@ -18,11 +18,13 @@ package net.i2p;
 public class CoreVersion {
 
     /** deprecated */
-    public final static String ID = "Monotone";
+    public final static String ID = "Git";
 
     /**
      *  The version used when checking for router updates,
      *  and exchanged between router and client over I2CP.
+     *  This is the marketing and user-visible version.
+     *
      *  If we ever need a point release for a specific
      *  architecture only, append ".1" to VERSION
      *  and leave PUBLISHED_VERSION unchanged.
@@ -33,6 +35,11 @@ public class CoreVersion {
 
     /**
      *  The version published in the netdb via StatisticsManager.
+     *  This is the API version.
+     *  It must not go to 1.x for several years, because through
+     *  0.9.49, the Sybil analyzer blocked releases that didn't
+     *  start with "0.9."
+     *
      *  If we ever need a point release for a specific
      *  architecture only, append ".1" to VERSION
      *  and leave PUBLISHED_VERSION unchanged.
@@ -41,7 +48,7 @@ public class CoreVersion {
      *
      *  @since 0.9.46
      */
-    public final static String PUBLISHED_VERSION = VERSION;
+    public final static String PUBLISHED_VERSION = "0.9.49";
 
     /**
      *  For Vuze.
@@ -54,6 +61,7 @@ public class CoreVersion {
 
     public static void main(String args[]) {
         System.out.println("I2P Core version: " + VERSION);
+        System.out.println("I2P API version:  " + PUBLISHED_VERSION);
         System.out.println("ID: " + ID);
     }
 }

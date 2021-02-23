@@ -769,7 +769,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 auth.setProperty(I2PClient.PROP_USER, _options.getProperty(I2PClient.PROP_USER));
                 auth.setProperty(I2PClient.PROP_PW, _options.getProperty(I2PClient.PROP_PW));
             }
-            sendMessage_unchecked(new GetDateMessage(CoreVersion.VERSION, auth));
+            sendMessage_unchecked(new GetDateMessage(CoreVersion.PUBLISHED_VERSION, auth));
             waitForDate();
 
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Before producer.connect()");
@@ -1880,7 +1880,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      */
     public String getRouterVersion() {
         if (_context.isRouterContext())
-            return CoreVersion.VERSION;
+            return CoreVersion.PUBLISHED_VERSION;
         return _routerVersion;
     }
 
