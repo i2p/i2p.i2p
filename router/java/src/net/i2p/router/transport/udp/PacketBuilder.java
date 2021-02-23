@@ -411,8 +411,7 @@ class PacketBuilder {
         if (explicitToSend > 0) {
             if (msg != null)
                 msg.append(explicitToSend).append(" full acks included:");
-            DataHelper.toLong(data, off, 1, explicitToSend);
-            off++;
+            data[off++] = (byte) explicitToSend;
             Iterator<Long> iter = ackIdsRemaining.iterator();
             for (int i = 0; i < explicitToSend && iter.hasNext(); i++) {
                 Long ackId = iter.next();
@@ -471,8 +470,7 @@ class PacketBuilder {
         //if ( (msg != null) && (acksIncluded) )
         //  _log.debug(msg.toString());
         
-        DataHelper.toLong(data, off, 1, numFragments);
-        off++;
+        data[off++] = (byte) numFragments;
         
         // now write each fragment
         int sizeWritten = 0;
@@ -625,8 +623,7 @@ class PacketBuilder {
         off++;
         
         if (fullACKCount > 0) {
-            DataHelper.toLong(data, off, 1, fullACKCount);
-            off++;
+            data[off++] = (byte) fullACKCount;
             for (int i = 0; i < ackBitfields.size(); i++) {
                 ACKBitfield bf = ackBitfields.get(i);
                 if (bf.receivedComplete()) {
@@ -639,8 +636,7 @@ class PacketBuilder {
         }
         
         if (partialACKCount > 0) {
-            DataHelper.toLong(data, off, 1, partialACKCount);
-            off++;
+            data[off++] = (byte) partialACKCount;
             for (int i = 0; i < ackBitfields.size(); i++) {
                 ACKBitfield bitfield = ackBitfields.get(i);
                 if (bitfield.receivedComplete()) continue;
@@ -670,8 +666,7 @@ class PacketBuilder {
             }
         }
         
-        DataHelper.toLong(data, off, 1, 0); // no fragments in this message
-        off++;
+        data[off++] = 0; // no fragments in this message
         
         if (msg != null)
             _log.debug(msg.toString());
@@ -720,8 +715,7 @@ class PacketBuilder {
         // now for the body
         System.arraycopy(state.getSentY(), 0, data, off, state.getSentY().length);
         off += state.getSentY().length;
-        DataHelper.toLong(data, off, 1, sentIP.length);
-        off += 1;
+        data[off++] = (byte) sentIP.length;
         System.arraycopy(sentIP, 0, data, off, sentIP.length);
         off += sentIP.length;
         DataHelper.toLong(data, off, 2, state.getSentPort());
@@ -826,8 +820,7 @@ class PacketBuilder {
         byte[] x = state.getSentX();
         System.arraycopy(x, 0, data, off, x.length);
         off += x.length;
-        DataHelper.toLong(data, off, 1, toIP.length);
-        off += 1;
+        data[off++] = (byte) toIP.length;
         System.arraycopy(toIP, 0, data, off, toIP.length);
         off += toIP.length;
         int port = state.getSentPort();
@@ -1074,8 +1067,7 @@ class PacketBuilder {
         // now for the body
         DataHelper.toLong(data, off, 4, nonce);
         off += 4;
-        DataHelper.toLong(data, off, 1, 0); // neither Bob nor Charlie need Alice's IP from her
-        off++;
+        data[off++] = 0; // neither Bob nor Charlie need Alice's IP from her
         DataHelper.toLong(data, off, 2, 0); // neither Bob nor Charlie need Alice's port from her
         off += 2;
         System.arraycopy(aliceIntroKey.getData(), 0, data, off, SessionKey.KEYSIZE_BYTES);
@@ -1109,8 +1101,7 @@ class PacketBuilder {
         DataHelper.toLong(data, off, 4, nonce);
         off += 4;
         byte ip[] = aliceIP.getAddress();
-        DataHelper.toLong(data, off, 1, ip.length);
-        off++;
+        data[off++] = (byte) ip.length;
         System.arraycopy(ip, 0, data, off, ip.length);
         off += ip.length;
         DataHelper.toLong(data, off, 2, alicePort);
@@ -1147,8 +1138,7 @@ class PacketBuilder {
         DataHelper.toLong(data, off, 4, nonce);
         off += 4;
         byte ip[] = aliceIP.getAddress();
-        DataHelper.toLong(data, off, 1, ip.length);
-        off++;
+        data[off++] = (byte) ip.length;
         System.arraycopy(ip, 0, data, off, ip.length);
         off += ip.length;
         DataHelper.toLong(data, off, 2, alicePort);
@@ -1185,8 +1175,7 @@ class PacketBuilder {
         DataHelper.toLong(data, off, 4, nonce);
         off += 4;
         byte ip[] = aliceIP.getAddress();
-        DataHelper.toLong(data, off, 1, ip.length);
-        off++;
+        data[off++] = (byte) ip.length;
         System.arraycopy(ip, 0, data, off, ip.length);
         off += ip.length;
         DataHelper.toLong(data, off, 2, alicePort);
@@ -1299,22 +1288,18 @@ class PacketBuilder {
         DataHelper.toLong(data, off, 4, introTag);
         off += 4;
         if (ourIP != null) {
-            DataHelper.toLong(data, off, 1, ourIP.length);
-            off++;
+            data[off++] = (byte) ourIP.length;
             System.arraycopy(ourIP, 0, data, off, ourIP.length);
             off += ourIP.length;
         } else {
-            DataHelper.toLong(data, off, 1, 0);
-            off++;
+            data[off++] = 0;
         }
         
         DataHelper.toLong(data, off, 2, ourPort);
         off += 2;
         
         // challenge...
-        DataHelper.toLong(data, off, 1, 0);
-        off++;
-        //off += 0; // *cough*
+        data[off++] = 0;
         
         System.arraycopy(ourIntroKey.getData(), 0, data, off, SessionKey.KEYSIZE_BYTES);
         off += SessionKey.KEYSIZE_BYTES;
@@ -1347,16 +1332,14 @@ class PacketBuilder {
         
         // now for the body
         byte ip[] = alice.getIP();
-        DataHelper.toLong(data, off, 1, ip.length);
-        off++;
+        data[off++] = (byte) ip.length;
         System.arraycopy(ip, 0, data, off, ip.length);
         off += ip.length;
         DataHelper.toLong(data, off, 2, alice.getPort());
         off += 2;
         
         int sz = request.readChallengeSize();
-        DataHelper.toLong(data, off, 1, sz);
-        off++;
+        data[off++] = (byte) sz;
         if (sz > 0) {
             request.readChallengeSize(data, off);
             off += sz;
@@ -1391,8 +1374,7 @@ class PacketBuilder {
 
         // now for the body
         byte charlieIP[] = charlie.getRemoteIP();
-        DataHelper.toLong(data, off, 1, charlieIP.length);
-        off++;
+        data[off++] = (byte) charlieIP.length;
         System.arraycopy(charlieIP, 0, data, off, charlieIP.length);
         off += charlieIP.length;
         DataHelper.toLong(data, off, 2, charlie.getRemotePort());
@@ -1400,8 +1382,7 @@ class PacketBuilder {
         
         // Alice IP/Port currently ignored on receive - see UDPPacketReader
         byte aliceIP[] = alice.getIP();
-        DataHelper.toLong(data, off, 1, aliceIP.length);
-        off++;
+        data[off++] = (byte) aliceIP.length;
         System.arraycopy(aliceIP, 0, data, off, aliceIP.length);
         off += aliceIP.length;
         DataHelper.toLong(data, off, 2, alice.getPort());
