@@ -1341,7 +1341,7 @@ class PacketBuilder {
         int sz = request.readChallengeSize();
         data[off++] = (byte) sz;
         if (sz > 0) {
-            request.readChallengeSize(data, off);
+            request.readChallengeData(data, off);
             off += sz;
         }
         

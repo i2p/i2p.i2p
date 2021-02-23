@@ -748,7 +748,7 @@ class UDPPacketReader {
         }
 
         /** unused */
-        public void readChallengeSize(byte target[], int targetOffset) {
+        public void readChallengeData(byte target[], int targetOffset) {
             int offset = readBodyOffset() + 4;
             offset += _message[offset] & 0xff;
             offset += 1 + 2;
@@ -815,7 +815,7 @@ class UDPPacketReader {
         }
 
         /** unused */
-        public void readChallengeSize(byte target[], int targetOffset) {
+        public void readChallengeData(byte target[], int targetOffset) {
             int offset = readBodyOffset();
             offset += _message[offset] & 0xff;
             offset += 1 + 2;
