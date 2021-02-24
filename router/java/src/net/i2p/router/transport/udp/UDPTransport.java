@@ -1965,6 +1965,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return null;
             }
 
+            // c++ bug thru 2.36.0/0.9.49, will disconnect inbound session after 5 seconds
+            if (addr.getCost() == 10) {
+                if (VersionComparator.comp(toAddress.getVersion(), "0.9.49") <= 0) {
+                    //if (_log.shouldDebug())
+                    //    _log.debug("Not bidding to: " + toAddress);
+                    markUnreachable(to);
+                    return null;
+                }
+            }
+
             // Check for supported sig type
             SigType type = toAddress.getIdentity().getSigType();
             if (type == null || !type.isAvailable()) {
