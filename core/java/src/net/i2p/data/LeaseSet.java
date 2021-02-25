@@ -118,6 +118,11 @@ public class LeaseSet extends DatabaseEntry {
         return KEY_TYPE_LEASESET;
     }
 
+    /**
+     *  Warning - will be null for LS2 EncryptedLeaseSets if not decrypted
+     *
+     *  @return Destination or null
+     */
     public Destination getDestination() {
         return _destination;
     }

@@ -913,13 +913,15 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             // lookupLeaseSetLocally()
             latest <= now - Router.CLOCK_FUDGE_FACTOR) {
             long age = now - earliest;
+            Destination dest = leaseSet.getDestination();
+            String id = dest != null ? dest.toBase32() : leaseSet.getHash().toBase32();
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Old leaseSet!  not storing it: " 
-                          + leaseSet.getDestination().toBase32()
+                          + id
                           + " first exp. " + new Date(earliest)
                           + " last exp. " + new Date(latest),
                           new Exception("Rejecting store"));
-            return "Expired leaseSet for " + leaseSet.getDestination().toBase32()
+            return "Expired leaseSet for " + id
                    + " expired " + DataHelper.formatDuration(age) + " ago";
         }
         if (latest > now + (Router.CLOCK_FUDGE_FACTOR + MAX_LEASE_FUTURE) &&
@@ -927,11 +929,13 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
              latest > now + (Router.CLOCK_FUDGE_FACTOR + MAX_META_LEASE_FUTURE))) {
             long age = latest - now;
             // let's not make this an error, it happens when peers have bad clocks
+            Destination dest = leaseSet.getDestination();
+            String id = dest != null ? dest.toBase32() : leaseSet.getHash().toBase32();
             if (_log.shouldLog(Log.WARN))
                 _log.warn("LeaseSet expires too far in the future: " 
-                          + leaseSet.getDestination().toBase32()
+                          + id
                           + " expires " + DataHelper.formatDuration(age) + " from now");
-            return "Future expiring leaseSet for " + leaseSet.getDestination().toBase32()
+            return "Future expiring leaseSet for " + id
                    + " expiring in " + DataHelper.formatDuration(age);
         }
         return null;
