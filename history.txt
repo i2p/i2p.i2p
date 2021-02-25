@@ -1,3 +1,15 @@
+2021-02-25 zzz
+ * SSU: Enable RelayRequest over IPv6
+ * Transports: Adjust conn limits for some platforms
+
+2021-02-24 zzz
+ * Jetty: Fix detection of SSL connector
+ * SSU: Avoid outbound connections to buggy routers
+
+2021-02-23 zzz
+ * Build: Prep for different release and API versions
+ * Transports: Add 4/6 transport caps
+
 2021-02-21 zzz
  * Console: List all Jetty servers in sidebar
  * Profiles: Disable peer test (ticket #2456) and tunnel test response time stat
