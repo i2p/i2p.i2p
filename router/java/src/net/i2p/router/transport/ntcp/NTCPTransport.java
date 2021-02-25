@@ -865,18 +865,23 @@ public class NTCPTransport extends TransportImpl {
             // all detected interfaces
             Collection<InetAddress> addrs = getSavedLocalAddresses();
             if (!addrs.isEmpty() && !_context.router().isHidden()) {
+                int count = 0;
                 for (InetAddress ia : addrs) {
+                    boolean ipv6 = ia instanceof Inet6Address;
+                    if ((ipv6 && (isIPv6Firewalled() || _context.getBooleanProperty(PROP_IPV6_FIREWALLED))) ||
+                        (!ipv6 && isIPv4Firewalled()))
+                        continue;
                     OrderedProperties props = new OrderedProperties();
                     props.setProperty(RouterAddress.PROP_HOST, ia.getHostAddress());
                     props.setProperty(RouterAddress.PROP_PORT, Integer.toString(port));
                     addNTCP2Options(props);
-                    boolean ipv6 = ia instanceof Inet6Address;
-                    if (!ipv6 || !_context.getBooleanProperty(PROP_IPV6_FIREWALLED)) {
-                        int cost = getDefaultCost(ipv6);
-                        myAddress = new RouterAddress(getPublishStyle(), props, cost);
-                        replaceAddress(myAddress);
-                    }
+                    int cost = getDefaultCost(ipv6);
+                    myAddress = new RouterAddress(getPublishStyle(), props, cost);
+                    replaceAddress(myAddress);
+                    count++;
                 }
+                if (count <= 0)
+                    setOutboundNTCP2Address();
             } else if (_enableNTCP2) {
                 setOutboundNTCP2Address();
             }
