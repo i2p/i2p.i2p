@@ -690,9 +690,9 @@ public abstract class TransportImpl implements Transport {
      *  shuffled and then sorted by cost/preference.
      *  Lowest cost (most preferred) first.
      *  @return non-null, possibly empty
-     *  @since IPv6
+     *  @since IPv6, public since 0.9.50, was protected
      */
-    protected List<RouterAddress> getTargetAddresses(RouterInfo target) {
+    public List<RouterAddress> getTargetAddresses(RouterInfo target) {
         List<RouterAddress> rv;
         String alt = getAltStyle();
         if (alt != null)

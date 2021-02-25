@@ -13,14 +13,15 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Base64;
+import net.i2p.data.SessionKey;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
-import net.i2p.data.SessionKey;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.TransportUtil;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
-import net.i2p.router.transport.TransportUtil;
+import net.i2p.util.VersionComparator;
 
 /**
  *  Keep track of inbound and outbound introductions.
@@ -100,6 +101,7 @@ class IntroductionManager {
     /** Max for all targets per PUNCH_CLEAN_TIME */
     private static final int MAX_PUNCHES = 8;
     private static final long INTRODUCER_EXPIRATION = 80*60*1000L;
+    private static final String MIN_IPV6_INTRODUCER_VERSION = "0.9.50";
 
     public IntroductionManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
@@ -125,30 +127,32 @@ class IntroductionManager {
         // let's not use an introducer on a privileged port, sounds like trouble
         if (!TransportUtil.isValidPort(peer.getRemotePort()))
             return;
-        // Only allow relay as Bob or Charlie if the Bob-Charlie session is IPv4
-        if (peer.getRemoteIP().length != 4)
-            return;
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Adding peer " + peer.getRemoteHostId() + ", weRelayToThemAs " 
-                       + peer.getWeRelayToThemAs() + ", theyRelayToUsAs " + peer.getTheyRelayToUsAs());
-        if (peer.getWeRelayToThemAs() > 0) 
-            _outbound.put(Long.valueOf(peer.getWeRelayToThemAs()), peer);
-        if (peer.getTheyRelayToUsAs() > 0 && _inbound.size() < MAX_INBOUND) {
+        long id = peer.getWeRelayToThemAs();
+        boolean added = id > 0;
+        if (added)
+            _outbound.put(Long.valueOf(id), peer);
+        long id2 = peer.getTheyRelayToUsAs();
+        if (id2 > 0 && _inbound.size() < MAX_INBOUND) {
+            added = true;
             _inbound.add(peer);
         }
+        if (added &&_log.shouldLog(Log.DEBUG))
+            _log.debug("adding peer " + peer.getRemoteHostId() + ", weRelayToThemAs "
+                       + id + ", theyRelayToUsAs " + id2);
     }
     
     public void remove(PeerState peer) {
         if (peer == null) return;
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("removing peer " + peer.getRemoteHostId() + ", weRelayToThemAs " 
-                       + peer.getWeRelayToThemAs() + ", theyRelayToUsAs " + peer.getTheyRelayToUsAs());
         long id = peer.getWeRelayToThemAs(); 
         if (id > 0) 
             _outbound.remove(Long.valueOf(id));
-        if (peer.getTheyRelayToUsAs() > 0) {
+        long id2 = peer.getTheyRelayToUsAs();
+        if (id2 > 0) {
             _inbound.remove(peer);
         }
+        if ((id > 0 || id2 > 0) &&_log.shouldLog(Log.DEBUG))
+            _log.debug("removing peer " + peer.getRemoteHostId() + ", weRelayToThemAs "
+                       + id + ", theyRelayToUsAs " + id2);
     }
     
     private PeerState get(long id) {
@@ -196,8 +200,8 @@ class IntroductionManager {
             }
             // FIXME we can include all his addresses including IPv6 even if we don't support IPv6 (isValid() is false)
             // but requires RelayRequest support, see below
-            RouterAddress ra = _transport.getTargetAddress(ri);
-            if (ra == null) {
+            List<RouterAddress> ras = _transport.getTargetAddresses(ri);
+            if (ras.isEmpty()) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Picked peer has no SSU address: " + ri);
                 continue;
@@ -219,21 +223,31 @@ class IntroductionManager {
                     _log.info("Peer is idle too long: " + cur);
                 continue;
             }
-            // FIXME we can include all his addresses including IPv6 even if we don't support IPv6 (isValid() is false)
-            // but requires RelayRequest support, see below
-            byte[] ip = cur.getRemoteIP();
-            int port = cur.getRemotePort();
-            if (!isValid(ip, port))
-                continue;
-            if (_log.shouldLog(Log.INFO))
+            int oldFound = found;
+            for (RouterAddress ra : ras) {
+                // IPv6 allowed as of 0.9.50
+                byte[] ip = ra.getIP();
+                if (ip.length == 16 && VersionComparator.comp(ri.getVersion(), MIN_IPV6_INTRODUCER_VERSION) < 0) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Would have picked IPv6 introducer but he doesn't support it: " + cur);
+                    continue;
+                }
+                int port = ra.getPort();
+                if (!isValid(ip, port, true))
+                    continue;
+                cur.setIntroducerTime();
+                UDPAddress ura = new UDPAddress(ra);
+                byte[] ikey = ura.getIntroKey();
+                if (ikey == null)
+                    continue;
+                introducers.add(new Introducer(ip, port, ikey, cur.getTheyRelayToUsAs()));
+                found++;
+                // two per router max
+                if (found - oldFound >= 2)
+                    break;
+            }
+            if (oldFound != found && _log.shouldLog(Log.INFO))
                 _log.info("Picking introducer: " + cur);
-            cur.setIntroducerTime();
-            UDPAddress ura = new UDPAddress(ra);
-            byte[] ikey = ura.getIntroKey();
-            if (ikey == null)
-                continue;
-            introducers.add(new Introducer(ip, port, ikey, cur.getTheyRelayToUsAs()));
-            found++;
         }
 
         // we sort them so a change in order only won't happen, and won't cause a republish
@@ -468,40 +482,57 @@ class IntroductionManager {
         int ipSize = rrReader.readIPSize();
         int port = rrReader.readPort();
 
-        // ip/port inside message should be 0:0, as it's unimplemented on send -
-        // see PacketBuilder.buildRelayRequest()
-        // and we don't read it here.
-        // FIXME implement for getting Alice's IPv4 in RelayRequest sent over IPv6?
-        // or is that just too easy to spoof?
         byte[] aliceIP = alice.getIP();
         int alicePort = alice.getPort();
-        if (!isValid(alice.getIP(), alice.getPort())) {
+        boolean ipIncluded = ipSize != 0;
+        // here we allow IPv6, but only if there's an IP included
+        if (!isValid(aliceIP, alicePort, ipIncluded)) {
+            // not necessarily invalid ip/port, could be blocklisted
             if (_log.shouldWarn())
-                _log.warn("Bad relay req from " + alice + " for " + Addresses.toString(aliceIP, alicePort));
+                _log.warn("Rejecting relay req from " + alice + " for " + Addresses.toString(aliceIP, alicePort));
             _context.statManager().addRateData("udp.relayBadIP", 1);
             return;
         }
         // prior to 0.9.24 we rejected any non-zero-length ip
-        // here we reject anything different
-        // TODO relay request over IPv6
-        if (ipSize != 0) {
+        // here we reject anything different if it's the same size
+        // As of 0.9.50 we allow relay request over IPv6
+        if (ipIncluded) {
             byte ip[] = new byte[ipSize];
             rrReader.readIP(ip, 0);
-            if (!Arrays.equals(aliceIP, ip)) {
+            if (ipSize == aliceIP.length && !Arrays.equals(aliceIP, ip)) {
                 if (_log.shouldWarn())
                     _log.warn("Bad relay req from " + alice + " for " + Addresses.toString(ip, port));
                 _context.statManager().addRateData("udp.relayBadIP", 1);
                 return;
             }
+            aliceIP = ip;
         }
         // prior to 0.9.24 we rejected any nonzero port
         // here we reject anything different
-        // TODO relay request over IPv6
-        if (port != 0 && port != alicePort) {
-            if (_log.shouldWarn())
-                _log.warn("Bad relay req from " + alice + " for " + Addresses.toString(aliceIP, port));
-            _context.statManager().addRateData("udp.relayBadIP", 1);
+        // As of 0.9.50 we allow it if the IP was included
+        if (port != 0) {
+            if (ipIncluded) {
+                alicePort = port;
+            } else if (port != alicePort) {
+                if (_log.shouldWarn())
+                    _log.warn("Bad relay req from " + alice + " for " + Addresses.toString(aliceIP, port));
+                _context.statManager().addRateData("udp.relayBadIP", 1);
+            }
             return;
+        }
+        // check again if IP was provided
+        // here we do not allow IPv6
+        RemoteHostId aliceRelayID;
+        if (ipIncluded) {
+            if (!isValid(aliceIP, alicePort)) {
+                if (_log.shouldWarn())
+                    _log.warn("Bad relay req from " + alice + " for " + Addresses.toString(aliceIP, alicePort));
+                _context.statManager().addRateData("udp.relayBadIP", 1);
+                return;
+            }
+            aliceRelayID = new RemoteHostId(aliceIP, alicePort);
+        } else {
+            aliceRelayID = alice;
         }
 
         PeerState charlie = get(tag);
@@ -522,7 +553,7 @@ class IntroductionManager {
         _context.statManager().addRateData("udp.receiveRelayRequest", 1);
 
         // send that peer an introduction for alice
-        _transport.send(_builder.buildRelayIntro(alice, charlie, reader.getRelayRequestReader()));
+        _transport.send(_builder.buildRelayIntro(aliceRelayID, charlie, rrReader));
 
         // send alice back charlie's info
         // lookup session so we can use session key if available
@@ -546,7 +577,7 @@ class IntroductionManager {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Sending relay response (in-session) to " + alice);
         }
-        _transport.send(_builder.buildRelayResponse(alice, charlie, reader.getRelayRequestReader().readNonce(),
+        _transport.send(_builder.buildRelayResponse(alice, charlie, rrReader.readNonce(),
                                                     cipherKey, macKey));
     }
 
@@ -557,8 +588,17 @@ class IntroductionManager {
      *  @since 0.9.3
      */
     private boolean isValid(byte[] ip, int port) {
+        return isValid(ip, port, false);
+    }
+
+    /**
+     *  Are IP and port valid?
+     *  @since 0.9.50
+     */
+    private boolean isValid(byte[] ip, int port, boolean allowIPv6) {
         return TransportUtil.isValidPort(port) &&
-               ip != null && ip.length == 4 &&
+               ip != null &&
+               (ip.length == 4 || (allowIPv6 && ip.length == 16)) &&
                _transport.isValid(ip) &&
                (!_transport.isTooClose(ip)) &&
                (!_context.blocklist().isBlocklisted(ip));

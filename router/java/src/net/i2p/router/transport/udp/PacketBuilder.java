@@ -2,6 +2,7 @@ package net.i2p.router.transport.udp;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.Inet6Address;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +17,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
+import net.i2p.data.router.RouterAddress;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.TransportUtil;
 import net.i2p.util.Addresses;
@@ -1193,12 +1195,6 @@ class PacketBuilder {
         return packet;
     }
 
-    // specify these if we know what our external receive ip/port is and if its different
-    // from what bob is going to think
-    // FIXME IPv4 addr must be specified when sent over IPv6
-    private byte[] getOurExplicitIP() { return null; }
-    private int getOurExplicitPort() { return 0; }
-    
     /**
      *  build intro packets for each of the published introducers
      *
@@ -1228,7 +1224,7 @@ class PacketBuilder {
                 (Arrays.equals(iaddr.getAddress(), _transport.getExternalIP()) && !_transport.allowLocal())) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Cannot build a relay request for " + state.getRemoteIdentity().calculateHash()
-                               + ", as the introducer address is invalid: " + iaddr + ':' + iport);
+                               + ", as the introducer address is invalid: " + Addresses.toString(iaddr.getAddress(), iport));
                 // TODO implement some sort of introducer banlist
                 continue;
             }
@@ -1255,22 +1251,24 @@ class PacketBuilder {
                 cipherKey = new SessionKey(ikey);
                 macKey = cipherKey;
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Sending relay request (w/ intro key) to " + iaddr + ":" + iport);
+                    _log.info("Sending relay request (w/ intro key) to " + Addresses.toString(iaddr.getAddress(), iport));
             } else {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Sending relay request (in-session) to " + iaddr + ":" + iport);
+                    _log.info("Sending relay request (in-session) to " + Addresses.toString(iaddr.getAddress(), iport));
             }
 
-            rv.add(buildRelayRequest(iaddr, iport, cipherKey, macKey, tag,
-                                     ourIntroKey, state.getIntroNonce()));
+            UDPPacket pkt = buildRelayRequest(iaddr, iport, cipherKey, macKey, tag, ourIntroKey, state.getIntroNonce());
+            if (pkt != null)
+                rv.add(pkt);
+            else if (_log.shouldWarn())
+                _log.warn("Cannot build a relay request for " + state.getRemoteIdentity().calculateHash()
+                          + ", as we don't have an IPv4 address to send to: " + Addresses.toString(iaddr.getAddress(), iport));
         }
         return rv;
     }
     
     /**
-     *  TODO Alice IP/port in packet will always be null/0, must be fixed to
-     *  send a RelayRequest over IPv6
-     *
+     *  @return null on failure
      */
     private UDPPacket buildRelayRequest(InetAddress introHost, int introPort,
                                         SessionKey cipherKey, SessionKey macKey,
@@ -1280,9 +1278,21 @@ class PacketBuilder {
         byte data[] = pkt.getData();
         int off = HEADER_SIZE;
         
-        // FIXME must specify these if request is going over IPv6
-        byte ourIP[] = getOurExplicitIP();
-        int ourPort = getOurExplicitPort();
+        // Must specify these if request is going over IPv6
+        byte ourIP[];
+        int ourPort;
+        if (introHost instanceof Inet6Address) {
+            RouterAddress ra = _transport.getCurrentExternalAddress(false);
+            if (ra == null)
+                return null;
+            ourIP = ra.getIP();
+            if (ourIP == null)
+                return null;
+            ourPort = _transport.getRequestedPort();
+        } else {
+            ourIP = null;
+            ourPort = 0;
+        }
         
         // now for the body
         DataHelper.toLong(data, off, 4, introTag);

@@ -2637,9 +2637,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  we don't put them in the real, published RouterAddress anymore
      *  if we are firewalled.
      *
-     *  @since 0.9.18
+     *  @since 0.9.18, pkg private for PacketBuilder since 0.9.50
      */
-    private RouterAddress getCurrentExternalAddress(boolean isIPv6) {
+    RouterAddress getCurrentExternalAddress(boolean isIPv6) {
         // deadlock thru here ticket #1699
         synchronized (_rebuildLock) {
             return isIPv6 ? _currentOurV6Address : _currentOurV4Address;
@@ -2717,6 +2717,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     /**
      *  Do we require introducers?
+     *  Currently for IPv4 only.
      */
     public boolean introducersRequired() {
         /******************
@@ -2755,6 +2756,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  MIGHT we require introducers?
      *  This is like introducersRequired, but if we aren't sure, this returns true.
      *  Used only by EstablishmentManager.
+     *  Currently for IPv4 only.
      *
      *  @since 0.9.24
      */
@@ -2776,7 +2778,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     /**
-     *  For EstablishmentManager
+     *  For EstablishmentManager.
+     *  Currently for IPv4 only.
      *  @since 0.9.3
      */
     boolean canIntroduce() {
@@ -2789,6 +2792,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             (!introducersRequired()) &&
             haveCapacity() &&
             (!_context.netDb().floodfillEnabled()) &&
+            getIPv6Config() != IPV6_ONLY &&
             _introManager.introducedCount() < IntroductionManager.MAX_OUTBOUND &&
             _introManager.introducedCount() < getMaxConnections() / 4;
     }
