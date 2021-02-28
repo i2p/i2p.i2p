@@ -1364,8 +1364,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			return false;
 		}
 		String ip = fp.getIP();
-		add.setArgumentValue("RemoteHost", ip);
-		add.setArgumentValue("RemotePort", port);
+		add.setArgumentValue("RemoteHost", "");
+		add.setArgumentValue("RemotePort", 0);
 		add.setArgumentValue("InternalClient", ip);
 		add.setArgumentValue("InternalPort", port);
 		add.setArgumentValue("Protocol", fp.protocol);
