@@ -1384,6 +1384,20 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			rv = add.postControlAction();
 		}
 		if (rv) {
+			// In cases where the RemoteHost, RemotePort, InternalPort, InternalClient and Protocol are the same than
+			// an existing pinhole, but LeaseTime is different, the device MUST extend the existing pinhole's lease time
+			// and return the UniqueID of the existing pinhole.
+			Argument a = add.getOutputArgumentList().getArgument("UniqueID");
+			if (a != null) {
+				try {
+					int newuid = Integer.parseInt(a.getValue());
+					if (newuid != uid) {
+						if (_log.shouldWarn())
+							_log.warn("Updated UID from " + uid + " to " + newuid);
+						fp.setUID(newuid);
+					}
+				} catch (NumberFormatException nfe) {}
+			}
 			synchronized(lock) {
 				portsForwarded.add(fp);
 			}
