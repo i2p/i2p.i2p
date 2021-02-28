@@ -14,14 +14,6 @@ cd `dirname $0`/../..
 XMLFILES="\
 ./apps/addressbook/build.xml \
 ./apps/BOB/build.xml \
-./apps/BOB/Demos/echo/echoclient/build.xml \
-./apps/BOB/Demos/echo/echoclient/nbproject/build-impl.xml \
-./apps/BOB/Demos/echo/echoclient/nbproject/private/private.xml \
-./apps/BOB/Demos/echo/echoclient/nbproject/project.xml \
-./apps/BOB/Demos/echo/echoserver/build.xml \
-./apps/BOB/Demos/echo/echoserver/nbproject/build-impl.xml \
-./apps/BOB/Demos/echo/echoserver/nbproject/private/private.xml \
-./apps/BOB/Demos/echo/echoserver/nbproject/project.xml \
 ./apps/BOB/nbproject/build-impl.xml \
 ./apps/BOB/nbproject/project.xml \
 ./apps/desktopgui/build.xml \
