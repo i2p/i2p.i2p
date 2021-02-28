@@ -74,7 +74,7 @@ public class QueryRequest extends ControlRequest
 	{
 		Service service = stateVar.getService();		
 		
-		String ctrlURL = service.getControlURL();
+		//String ctrlURL = service.getControlURL();
 
 		setRequestHost(service);
 

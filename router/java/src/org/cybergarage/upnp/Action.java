@@ -52,7 +52,7 @@ public class Action
 	////////////////////////////////////////////////
 
 	private Node serviceNode;
-	private Node actionNode;
+	private final Node actionNode;
 
 	private Node getServiceNode()
 	{
@@ -370,11 +370,24 @@ public class Action
 
 	public boolean postControlAction()
 	{
+		return postControlAction(null);
+	}
+
+	/**
+	 *  I2P - bind HTTP socket to specified local host address
+	 *
+	 *  @param fromHost null to not bind to a particlar local address
+	 *  @since 0.9.50
+	 */
+	public boolean postControlAction(String fromHost)
+	{
 		// Thanks for Giordano Sassaroli <sassarol@cefriel.it> (08/30/03)
 		ArgumentList actionArgList = getArgumentList();
 		ArgumentList actionInputArgList = getInputArgumentList();		
 		ActionRequest ctrlReq = new ActionRequest();
 		ctrlReq.setRequest(this, actionInputArgList);
+		if (fromHost != null)
+			ctrlReq.setBindHost(fromHost);
 		if (Debug.isOn() == true)
 			ctrlReq.print();
 		ActionResponse ctrlRes = ctrlReq.post();

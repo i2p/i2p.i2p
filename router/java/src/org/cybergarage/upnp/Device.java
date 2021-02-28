@@ -731,9 +731,18 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 	}
 
 	public SSDPPacket getSSDPPacket() {
+		return getSSDPPacket(false);
+	}
+
+	/**
+	 *  I2P for multiple location support
+	 *
+	 *  @since 0.9.50
+	 */
+	public SSDPPacket getSSDPPacket(boolean preferIPv6) {
 		if (isRootDevice() == false)
 			return null;
-		return getDeviceData().getSSDPPacket();
+		return getDeviceData().getSSDPPacket(preferIPv6);
 	}
 
 	// //////////////////////////////////////////////
@@ -745,10 +754,19 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 	}
 
 	public String getLocation() {
-		SSDPPacket packet = getSSDPPacket();
+		return getLocation(false);
+	}
+
+	/**
+	 *  I2P for multiple location support
+	 *
+	 *  @since 0.9.50
+	 */
+	public String getLocation(boolean preferIPv6) {
+		SSDPPacket packet = getSSDPPacket(preferIPv6);
 		if (packet != null)
 			return packet.getLocation();
-		return getDeviceData().getLocation();
+		return getDeviceData().getLocation(preferIPv6);
 	}
 
 	// //////////////////////////////////////////////

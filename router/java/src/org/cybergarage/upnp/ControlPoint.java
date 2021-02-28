@@ -108,6 +108,9 @@ public class ControlPoint implements HTTPRequestListener
 	
 	private final static String DEFAULT_EVENTSUB_URI = "/evetSub";
 	
+	// I2P
+	private static final boolean ALLOW_IPV6_LOCATION = true;
+
 	////////////////////////////////////////////////
 	//	Member
 	////////////////////////////////////////////////
@@ -277,15 +280,20 @@ public class ControlPoint implements HTTPRequestListener
 				Debug.warning("Ignoring localhost device at " + location);
 				return;
 			}
-			if (host.startsWith("[")) {
-				Debug.warning("Ignoring IPv6 device at " + location);
-				return;
+			if (host.startsWith("[") && host.endsWith("]")) {
+				if (!ALLOW_IPV6_LOCATION) {
+					Debug.warning("Ignoring IPv6 device at " + location);
+					return;
+				}
+				// fixup for valid checks below
+				host = host.substring(1, host.length() - 1);
 			}
 			if (!"http".equals(locationUrl.getProtocol())) {
 				Debug.warning("Ignoring non-http device at " + location);
 				return;
 			}
-			if (!Addresses.isIPv4Address(host)) {
+			if (!Addresses.isIPv4Address(host) &&
+			    (!ALLOW_IPV6_LOCATION || !Addresses.isIPv6Address(host))) {
 				Debug.warning("Ignoring non-IPv4 address at " + location);
 				return;
 			}
@@ -294,7 +302,7 @@ public class ControlPoint implements HTTPRequestListener
 				Debug.warning("Ignoring bad IP at " + location);
 				return;
 			}
-			if (TransportUtil.isPubliclyRoutable(ip, false)) {
+			if (TransportUtil.isPubliclyRoutable(ip, ALLOW_IPV6_LOCATION)) {
 				Debug.warning("Ignoring public address at " + location);
 				return;
 			}

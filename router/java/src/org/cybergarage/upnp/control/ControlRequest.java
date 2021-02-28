@@ -50,6 +50,9 @@ import org.cybergarage.upnp.*;
 
 public class ControlRequest extends SOAPRequest
 {
+	// I2P see setRequestHost();
+	private static final String WAN_IPV6_CONNECTION = "urn:schemas-upnp-org:service:WANIPv6FirewallControl:1";
+
 	////////////////////////////////////////////////
 	//	Constructor
 	////////////////////////////////////////////////
@@ -114,8 +117,13 @@ public class ControlRequest extends SOAPRequest
 
 		// Thanks for Rob van den Boomen <rob.van.den.boomen@philips.com> (02/17/04)
 		// BUGFIX, set urlbase from location string if not set in description.xml
-		if (postURL == null || postURL.length() <= 0)
-			postURL = service.getRootDevice().getLocation();
+		if (postURL == null || postURL.length() <= 0) {
+			// I2P
+			// if service is ipv6 service...
+			String type = service.getServiceType();
+			boolean preferIPv6 = WAN_IPV6_CONNECTION.equals(type);
+			postURL = service.getRootDevice().getLocation(preferIPv6);
+		}
 		
 		String reqHost = HTTP.getHost(postURL);
 		int reqPort = HTTP.getPort(postURL);

@@ -71,12 +71,13 @@ public abstract class Parser
 			throw new ParserException("Not HTTP");
 		String host = locationURL.getHost();
 		if (host == null ||
-		    !Addresses.isIPv4Address(host) ||
 		    host.startsWith("127."))
 			throw new ParserException("Bad host " + host);
+		if (host.startsWith("[") && host.endsWith("]"))
+			host = host.substring(1, host.length() - 1);
 		byte[] ip = Addresses.getIP(host);
 		if (ip == null ||
-		    TransportUtil.isPubliclyRoutable(ip, false))
+		    TransportUtil.isPubliclyRoutable(ip, true))
 			throw new ParserException("Bad host " + host);
 
 		int port = locationURL.getPort();

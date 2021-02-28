@@ -19,6 +19,8 @@ package org.cybergarage.upnp.xml;
 
 import java.io.*;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.cybergarage.util.*;
 import org.cybergarage.http.*;
@@ -27,6 +29,11 @@ import org.cybergarage.upnp.*;
 import org.cybergarage.upnp.ssdp.*;
 import org.cybergarage.upnp.device.*;
 
+/**
+ *
+ *  I2P added multiple location support
+ *
+ */
 public class DeviceData extends NodeData
 {
 	public DeviceData() 
@@ -61,12 +68,43 @@ public class DeviceData extends NodeData
 	////////////////////////////////////////////////
 
 	private String location = "";
+	private String location_ipv6 = "";
 	
 	public String getLocation() {
-		return location;
+		return getLocation(false);
+	}
+
+	/**
+	 *  I2P for multiple location support
+	 *
+	 *  @since 0.9.50
+	 */
+	public String getLocation(boolean preferIPv6) {
+		if (preferIPv6) {
+			if (location_ipv6 != null && !location_ipv6.isEmpty())
+				return location_ipv6;
+			return location;
+		} else {
+			if (location != null && !location.isEmpty())
+				return location;
+			return location_ipv6;
+		}
 	}
 
 	public void setLocation(String location) {
+		if (location != null) {
+			try {	
+				URL url = new URL(location);
+				String host = url.getHost();
+				if (host != null && host.startsWith("[")) {
+					location_ipv6 = location;
+					return;
+				}
+			} catch (MalformedURLException me) {
+				Debug.warning("Bad location: " + location, me);
+				return;
+			}
+		}
 		this.location = location;
 	}
 
@@ -241,12 +279,44 @@ public class DeviceData extends NodeData
 	////////////////////////////////////////////////
 	
 	private SSDPPacket ssdpPacket = null;
+	private SSDPPacket ssdpPacket_ipv6 = null;
 	
 	public SSDPPacket getSSDPPacket() {
-		return ssdpPacket;
+		return getSSDPPacket(false);
+	}
+	
+	/**
+	 *  I2P for multiple location support
+	 *
+	 *  @since 0.9.50
+	 */
+	public SSDPPacket getSSDPPacket(boolean preferIPv6) {
+		if (preferIPv6) {
+			if (ssdpPacket_ipv6 != null)
+				return ssdpPacket_ipv6;
+			return ssdpPacket;
+		} else {
+			if (ssdpPacket != null)
+				return ssdpPacket;
+			return ssdpPacket_ipv6;
+		}
 	}
 
 	public void setSSDPPacket(SSDPPacket packet) {
+		String location = packet.getLocation();
+		if (location != null) {
+			try {	
+				URL url = new URL(location);
+				String host = url.getHost();
+				if (host != null && host.startsWith("[")) {
+					ssdpPacket_ipv6 = packet;
+					return;
+				}
+			} catch (MalformedURLException me) {
+				Debug.warning("Bad location: " + location, me);
+				return;
+			}
+		}
 		ssdpPacket = packet;
 	}
 
