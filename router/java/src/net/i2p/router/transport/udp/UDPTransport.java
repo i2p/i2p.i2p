@@ -633,6 +633,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     hasv6 = true;
                     if (isIPv6Firewalled() || _context.getBooleanProperty(PROP_IPV6_FIREWALLED)) {
                         setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_FIREWALLED, true);
+                        // save the external address but don't publish it
+                        // save it where UPnP can get it and try to forward it
+                        OrderedProperties localOpts = new OrderedProperties(); 
+                        localOpts.setProperty(UDPAddress.PROP_PORT, String.valueOf(newPort));
+                        localOpts.setProperty(UDPAddress.PROP_HOST, newIP);
+                        RouterAddress local = new RouterAddress(STYLE, localOpts, DEFAULT_COST);
+                        replaceCurrentExternalAddress(local, true);
                     } else {
                         _lastInboundIPv6 = _context.clock().now();
                         setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK, true);
@@ -1013,9 +1020,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             else
                 _log.warn("UPnP has failed to open the SSU port: " + port + " reason: " + reason);
         }
-        if (success && ip != null && getExternalIP() != null) {
-            if (!isIPv4Firewalled())
-                setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
+        if (success && ip != null) {
+            if (ip.length == 4) {
+                if (getExternalIP() != null && !isIPv4Firewalled())
+                    setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
+            } else if (ip.length == 16) {
+                if (!isIPv6Firewalled())
+                    setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK, true);
+            }
         }
     }
 
@@ -2637,9 +2649,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  we don't put them in the real, published RouterAddress anymore
      *  if we are firewalled.
      *
-     *  @since 0.9.18, pkg private for PacketBuilder since 0.9.50
+     *  @since 0.9.18, public for PacketBuilder and TransportManager since 0.9.50
      */
-    RouterAddress getCurrentExternalAddress(boolean isIPv6) {
+    public RouterAddress getCurrentExternalAddress(boolean isIPv6) {
         // deadlock thru here ticket #1699
         synchronized (_rebuildLock) {
             return isIPv6 ? _currentOurV6Address : _currentOurV4Address;

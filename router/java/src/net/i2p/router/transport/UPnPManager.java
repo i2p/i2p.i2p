@@ -287,7 +287,11 @@ class UPnPManager {
             }
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Adding: " + style + " " + port);
-            ForwardPort fp = new ForwardPort(name, false, protocol, port);
+            ForwardPort fp;
+            if (entry.isIPv6)
+                fp = new UPnP.IPv6ForwardPort(name, protocol, port, entry.ip);
+            else
+                fp = new ForwardPort(name, false, protocol, port);
             forwards.add(fp);
         }
         // non-blocking
@@ -352,6 +356,7 @@ class UPnPManager {
                 ForwardPortStatus fps = entry.getValue();
                 if (_log.shouldDebug())
                     _log.debug("FPS: " + fp.name + ' ' + fp.protocol + ' ' + fp.portNumber +
+                               (fp.isIP6 ? " IPv6" : " IPv4") +
                                " status: " + fps.status + " reason: " + fps.reasonString + " ext port: " + fps.externalPort);
                 String style;
                 if (fp.protocol == ForwardPort.PROTOCOL_UDP_IPV4) {
@@ -364,8 +369,18 @@ class UPnPManager {
                     continue;
                 }
                 boolean success = fps.status >= ForwardPortStatus.MAYBE_SUCCESS;
+                byte[] fwdip;
+                if (fp.isIP6) {
+                    UPnP.IPv6ForwardPort v6fp = (UPnP.IPv6ForwardPort) fp;
+                    String sip = v6fp.getIP();
+                    fwdip = Addresses.getIP(sip);
+                    if (fwdip == null)
+                        continue;
+                } else {
+                    fwdip = ipaddr;
+                }
                 // deadlock path 2
-                _manager.forwardPortStatus(style, ipaddr, fp.portNumber, fps.externalPort, success, fps.reasonString);
+                _manager.forwardPortStatus(style, fwdip, fp.portNumber, fps.externalPort, success, fps.reasonString);
             }
         }
     }

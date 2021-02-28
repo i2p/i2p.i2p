@@ -267,7 +267,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 				}
 			}
 		}
-		Set<String> myAddresses = Addresses.getAddresses(true, false);  // yes local, no IPv6
+		Set<String> myAddresses = Addresses.getAddresses(true, true);  // yes local, yes IPv6
 		if (!ignore && !ALLOW_SAME_HOST && ip != null && myAddresses.contains(ip)) {
 			ignore = true;
 			if (_log.shouldWarn())
@@ -282,7 +282,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 				if (!stringEquals(ip, pktIP)) {
 					ignore = true;
 					if (_log.shouldWarn())
-						_log.warn("Ignoring UPnP with IP mismatch: " + name + " UDN: " + udn);
+						_log.warn("Ignoring UPnP with IP mismatch: " + name + " UDN: " + udn +
+						          " dev IP " + ip + " pkt IP: " + pktIP);
 				}
 			}
 		}
@@ -1452,6 +1453,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 				} catch (URISyntaxException use) {}
 			}
 		}
+		if (rv != null && rv.startsWith("[") && rv.endsWith("]"))
+			rv = rv.substring(1, rv.length() - 1);
 		return rv;
 	}
 
@@ -1556,11 +1559,12 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			portsForwarded.remove(fp);
 		}
 		
-		if (!noLog && _log.shouldWarn()) {
+		int level = retval ? Log.INFO : Log.WARN;
+		if (!noLog && _log.shouldLog(level)) {
 			if (retval)
-				_log.warn("UPnP: Removed IPv4 mapping for "+fp.name+" "+port+" / "+protocol);
+				_log.log(level, "UPnP: Removed IPv4 mapping for "+fp.name+" "+port+" / "+protocol);
 			else
-				_log.warn("UPnP: Failed to remove IPv4 mapping for "+fp.name+" "+port+" / "+protocol);
+				_log.log(level, "UPnP: Failed to remove IPv4 mapping for "+fp.name+" "+port+" / "+protocol);
 		}
 		return retval;
 	}
@@ -1593,12 +1597,23 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		synchronized(lock) {
 			portsForwarded.remove(fp);
 		}
-		if (!noLog && _log.shouldWarn()) {
+
+		int level = retval ? Log.INFO : Log.WARN;
+		if (!noLog && _log.shouldLog(level)) {
 			String ip = fp.getIP();
-			if (retval)
-				_log.warn("UPnP: Removed IPv6 mapping for " + fp.name + ' ' + ip + ' ' + port + " / " + protocol);
-			else
-				_log.warn("UPnP: Failed to remove IPv6 mapping for " + fp.name + ' ' + ip + ' ' + port + " / " + protocol);
+			if (retval) {
+				_log.log(level, "UPnP: Removed IPv6 mapping for " + fp.name + ' ' + ip + ' ' + port + " / " + protocol);
+			} else {
+				StringBuilder buf = new StringBuilder();
+				buf.append("UPnP: Failed to remove IPv6 mapping for ").append(fp.getIP()).append(" port ").append(fp.portNumber).append(" / ").append(protocol);
+				UPnPStatus status = remove.getStatus();
+				if (status != null)
+				    buf.append(" Status: ").append(status.getCode()).append(' ').append(status.getDescription());
+				status = remove.getControlStatus();
+				if (status != null)
+				    buf.append(" ControlStatus: ").append(status.getCode()).append(' ').append(status.getDescription());
+				_log.log(level, buf.toString());
+			}
 		}
 		return retval;
 	}

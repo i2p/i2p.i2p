@@ -59,6 +59,18 @@ public interface Transport {
     public List<RouterAddress> getCurrentAddresses();
 
     /**
+     *  What address are we currently listening to?
+     *  Replaces getCurrentAddress()
+     *
+     *  Note: An address without a host is considered IPv4.
+     *
+     *  @param ipv6 true for IPv6 only; false for IPv4 only
+     *  @return first matching address or null
+     *  @since 0.9.50 lifted from TransportImpl
+     */
+    public RouterAddress getCurrentAddress(boolean ipv6);
+
+    /**
      *  Do we have any current address?
      *  @since IPv6
      */

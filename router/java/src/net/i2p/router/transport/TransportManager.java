@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.crypto.SigType;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterIdentity;
@@ -85,6 +86,8 @@ public class TransportManager implements TransportEventListener {
     public final static String PROP_ENABLE_NTCP = "i2np.ntcp.enable";
     /** default true */
     public final static String PROP_ENABLE_UPNP = "i2np.upnp.enable";
+    /** default false for now */
+    public final static String PROP_ENABLE_UPNP_IPV6 = "i2np.upnp.ipv6.enable";
     private static final String PROP_JAVA_PROXY1 = "socksProxyHost";
     private static final String PROP_JAVA_PROXY2 = "java.net.useSystemProxies";
     private static final String PROP_JAVA_PROXY3 = "http.proxyHost";
@@ -743,25 +746,43 @@ public class TransportManager implements TransportEventListener {
     static class Port {
         public final String style;
         public final int port;
+        public final boolean isIPv6;
+        public final String ip;
 
+        /**
+         *  IPv4 only
+         */
         public Port(String style, int port) {
             this.style = style;
             this.port = port;
+            isIPv6 = false;
+            ip = null;
+        }
+
+        /**
+         *  IPv6 only
+         *  @since 0.9.50
+         */
+        public Port(String style, String host, int port) {
+            this.style = style;
+            this.port = port;
+            isIPv6 = true;
+            ip = host;
         }
 
         @Override
         public int hashCode() {
-            return style.hashCode() ^ port;
+            return style.hashCode() ^ port ^ DataHelper.hashCode(ip);
         }
 
         @Override
         public boolean equals(Object o) {
-            if (o == null)
-                return false;
+            if (o == this)
+                return true;
             if (! (o instanceof Port))
                 return false;
             Port p = (Port) o;
-            return port == p.port && style.equals(p.style);
+            return port == p.port && style.equals(p.style) && DataHelper.eq(ip, p.ip);
         }
     }
 
@@ -780,8 +801,24 @@ public class TransportManager implements TransportEventListener {
                 if (udp != null)
                     port = udp.getRequestedPort();
             }
-            if (port > 0)
+            if (port > 0) {
+                // ipv4
                 rv.add(new Port(t.getStyle(), port));
+                // ipv6
+                if (_context.getBooleanProperty(PROP_ENABLE_UPNP_IPV6)) {
+                    RouterAddress ra = t.getCurrentAddress(true);
+                    if (ra == null) {
+                        if (t.getStyle().equals(UDPTransport.STYLE)) {
+                            UDPTransport udp = (UDPTransport) t;
+                            ra = udp.getCurrentExternalAddress(true);
+                        }
+                    }
+                    if (ra != null) {
+                        String host = ra.getHost();
+                        rv.add(new Port(t.getStyle(), host, port));
+                    }
+                }
+            }
         }
         return rv;
     }
