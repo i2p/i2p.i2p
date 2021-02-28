@@ -248,7 +248,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                                                                     Status.REJECT_UNSOLICITED,
                                                                     Status.IPV4_FIREWALLED_IPV6_OK,
                                                                     Status.IPV4_SNAT_IPV6_OK,
-                                                                    Status.IPV4_OK_IPV6_FIREWALLED);
+                                                                    Status.IPV4_FIREWALLED_IPV6_UNKNOWN);
 
     private static final Set<Status> STATUS_IPV6_FW =    EnumSet.of(Status.IPV4_OK_IPV6_FIREWALLED,
                                                                     Status.IPV4_UNKNOWN_IPV6_FIREWALLED,

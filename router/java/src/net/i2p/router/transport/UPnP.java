@@ -280,10 +280,15 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			if (pkt != null) {
 				String pktIP = pkt.getRemoteAddress();
 				if (!stringEquals(ip, pktIP)) {
-					ignore = true;
-					if (_log.shouldWarn())
-						_log.warn("Ignoring UPnP with IP mismatch: " + name + " UDN: " + udn +
-						          " dev IP " + ip + " pkt IP: " + pktIP);
+					// IPv6 location received over IPv4 is ok, or vice versa
+					boolean v61 = ip.contains(":");
+					boolean v62 = pktIP.contains(":");
+					if (v61 == v62) {
+						ignore = true;
+						if (_log.shouldWarn())
+							_log.warn("Ignoring UPnP with IP mismatch: " + name + " UDN: " + udn +
+							          " dev IP " + ip + " pkt IP: " + pktIP);
+					}
 				}
 			}
 		}
