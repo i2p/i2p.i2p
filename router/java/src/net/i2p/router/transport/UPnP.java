@@ -169,6 +169,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 				Thread.sleep(100);
 			} catch (InterruptedException ie) {}
 		}
+		// stop() does unsubscribe()
 		super.stop();
 		synchronized(lock) {
 			_router = null;
@@ -312,7 +313,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 				if (extIP == null) {
 					// this would meet all our qualifications if connected.
 					// subscribe to it, in case it becomes connected.
-					boolean ok = subscribe(service);
+					boolean ok = subscribe(service, LEASE_TIME_SECONDS);
 					if (ok) {
 						// we can't trust that events will work even if the subscription succeeded.
 						//ignore = true;
@@ -418,12 +419,14 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			_log.warn("UP&P IGD found : " + name + " UDN: " + udn + " lease time: " + dev.getLeaseTime());
 		
 		if (!subscriptionFailed) {
-			boolean ok = subscribe(service);
-			if (_log.shouldInfo()) {
-				if (ok)
-					_log.info("Subscribed to our device " + name + " UDN: " + udn);
-				else
-					_log.info("Failed subscription to our device " + name + " UDN: " + udn);
+			for (Service svc : services) {
+				boolean ok = subscribe(svc);
+				if (_log.shouldInfo()) {
+					if (ok)
+						_log.info("Subscribed to " + svc.getServiceType() + " on device " + name);
+					else
+						_log.info("Failed subscription to " + svc.getServiceType() + " on device " + name);
+				}
 			}
 		}
 
@@ -1748,8 +1751,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		}
 		if(portsToDumpNow != null && !portsToDumpNow.isEmpty())
 			unregisterPorts(portsToDumpNow);
-		if(portsToForwardNow != null && !portsToForwardNow.isEmpty())
-			registerPorts(portsToForwardNow);
+		// call all the time, as it renews subsriptions also.
+		registerPorts(portsToForwardNow);
 	}
 
         private static String protoToString(int p) {
@@ -1766,9 +1769,11 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	 *  postControlAction() can take many seconds, especially if it's failing,
          *  and onChangePublicPorts() may be called from threads we don't want to slow down,
          *  so throw this in a thread.
+	 *
+	 *  @param portsToForwardNow if null, renew subscriptions only, then exit.
          */
 	private void registerPorts(Set<ForwardPort> portsToForwardNow) {
-		if (_serviceLacksAPM) {
+		if (_serviceLacksAPM && portsToForwardNow != null) {
                     if (_log.shouldLog(Log.WARN))
 			_log.warn("UPnP device does not support port forwarding");
 		    Map<ForwardPort, ForwardPortStatus> map =
@@ -1782,22 +1787,36 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		    forwardCallback.portForwardStatus(map);
 		    return;
 		}
-		if (_log.shouldLog(Log.INFO))
-			_log.info("Starting thread to forward " + portsToForwardNow.size() + " ports");
-	        Thread t = new I2PThread(new RegisterPortsThread(portsToForwardNow));
+		if (_log.shouldInfo()) {
+			if (portsToForwardNow != null)
+				_log.info("Starting thread to forward " + portsToForwardNow.size() + " ports");
+			else
+				_log.info("Starting thread to renew subscriptions");
+		}
+		Thread t = new I2PThread(new RegisterPortsThread(portsToForwardNow));
 		t.setName("UPnP Port Opener " + __id.incrementAndGet());
 		t.setDaemon(true);
 		t.start();
 	}
 
+	/**
+	 *  This also renews all subscriptions.
+	 */
 	private class RegisterPortsThread implements Runnable {
 		private Set<ForwardPort> portsToForwardNow;
 
+		/**
+		 *  @param ports if null, renew subscriptions only, then exit.
+		 */
 		public RegisterPortsThread(Set<ForwardPort> ports) {
 			portsToForwardNow = ports;
 		}
 
 		public void run() {
+			// This renews the subscriptions for all services on all devices
+			renewSubscriberService(LEASE_TIME_SECONDS);
+			if (portsToForwardNow == null)
+				return;
 			Map<ForwardPort, ForwardPortStatus> map =
 				new HashMap<ForwardPort, ForwardPortStatus>(portsToForwardNow.size());
 			for(ForwardPort port : portsToForwardNow) {
