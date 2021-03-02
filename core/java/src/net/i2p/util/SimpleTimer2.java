@@ -397,10 +397,12 @@ public class SimpleTimer2 {
                 // The result (if rescheduled) is a dup on the queue, see tickets 1694, 1705
                 // Mitigated by close-to-execution check in reschedule()
                 boolean cancelled = _future.cancel(true);
-                if (cancelled)
+                if (cancelled) {
                     _state = TimedEventState.CANCELLED;
-                else
-                    _log.error("could not cancel " + this + " to run in " + (_nextRun - System.currentTimeMillis()), new Exception());
+                } else {
+                    if (_log.shouldWarn())
+                        _log.warn("could not cancel " + this + " to run in " + (_nextRun - System.currentTimeMillis()), new Exception());
+                }
                 return cancelled;
             }
             return false;
