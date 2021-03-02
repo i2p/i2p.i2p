@@ -71,9 +71,10 @@ class UPnPManager {
         _context = context;
         _manager = manager;
         _log = _context.logManager().getLog(UPnPManager.class);
-        // UPnP wants to bind to IPv6 link local interfaces by default, but what UPnP router
-        // is going to want to talk IPv6 anyway? Just make it easy and force IPv4 only
-        org.cybergarage.upnp.UPnP.setEnable(org.cybergarage.upnp.UPnP.USE_ONLY_IPV4_ADDR);
+        // this controls what sockets UPnP listens on
+        // not clear it makes any practical difference though
+        if (!context.getProperty(TransportManager.PROP_ENABLE_UPNP_IPV6, TransportManager.DEFAULT_ENABLE_UPNP_IPV6))
+            org.cybergarage.upnp.UPnP.setEnable(org.cybergarage.upnp.UPnP.USE_ONLY_IPV4_ADDR);
         // set up logging in the UPnP package
         Debug.initialize(context);
         int ssdpPort = _context.getProperty(PROP_SSDP_PORT, DEFAULT_SSDP_PORT);
@@ -189,7 +190,7 @@ class UPnPManager {
             if (_scannerCallback != null)
                 _scannerCallback.beforeScan();
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("UPnP Rescan");
+                _log.debug("UPnP Rescan", new Exception());
             // TODO default search MX (jitter) is 3 seconds... reduce?
             // See also:
             // Adaptive Jitter Control for UPnP M-Search

@@ -1,4 +1,26 @@
+2021-03-02 zzz
+ * UPnP:
+   - Limit event subscription time
+   - Subscribe to IPv6 service also
+
+2021-03-01 zzz
+ * UPnP:
+   - Fix mappings not being renewed before expiration
+   - IPv6 port forwarding fixes
+   - Continue to forward deprecated addresses for a while
+
+2021-02-28 zzz
+ * SSU: Fix set of states requiring address confirmation
+ * UPnP:
+   - Add support for IPv6 firewall addresses
+   - Add support for forwarding IPv6 addresses
+
+2021-02-27 zzz
+ * UPnP: Move IPv6 checks from Parser to ControlPoint
+
 2021-02-25 zzz
+ * NetDB: Fix NPE validating expired blinded LS2
+ * NTCP: Don't publish IP at startup when configured as firewalled
  * SSU: Enable RelayRequest over IPv6
  * Transports: Adjust conn limits for some platforms
 

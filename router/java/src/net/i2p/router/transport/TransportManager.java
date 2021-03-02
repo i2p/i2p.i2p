@@ -87,8 +87,8 @@ public class TransportManager implements TransportEventListener {
     public final static String PROP_ENABLE_NTCP = "i2np.ntcp.enable";
     /** default true */
     public final static String PROP_ENABLE_UPNP = "i2np.upnp.enable";
-    /** default false for now */
     public final static String PROP_ENABLE_UPNP_IPV6 = "i2np.upnp.ipv6.enable";
+    public static final boolean DEFAULT_ENABLE_UPNP_IPV6 = true;
     private static final String PROP_JAVA_PROXY1 = "socksProxyHost";
     private static final String PROP_JAVA_PROXY2 = "java.net.useSystemProxies";
     private static final String PROP_JAVA_PROXY3 = "http.proxyHost";
@@ -813,7 +813,7 @@ public class TransportManager implements TransportEventListener {
                 // ipv4
                 rv.add(new Port(t.getStyle(), port));
                 // ipv6
-                if (_context.getBooleanProperty(PROP_ENABLE_UPNP_IPV6)) {
+                if (_context.getProperty(PROP_ENABLE_UPNP_IPV6, DEFAULT_ENABLE_UPNP_IPV6)) {
                     RouterAddress ra = t.getCurrentAddress(true);
                     if (ra == null) {
                         if (t.getStyle().equals(UDPTransport.STYLE)) {
