@@ -1534,9 +1534,10 @@ public class NTCPTransport extends TransportImpl {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Old status: " + old + " New status: " + status +
                           " from: ", new Exception("traceback"));
-            if (old != Status.UNKNOWN)
+            if (old != Status.UNKNOWN && _context.router().getUptime() > 5*60*1000L) {
                 _context.router().eventLog().addEvent(EventLog.REACHABILITY,
                    "from " + _t(old.toStatusString()) + " to " +  _t(status.toStatusString()));
+            }
         }
         _context.router().rebuildRouterInfo();
     }
