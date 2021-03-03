@@ -1795,16 +1795,19 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long now = _context.clock().now();
             int valid = 0;
             for (int i = 0; i < ua.getIntroducerCount(); i++) {
-                // warning: this is only valid as long as we use the ident hash as their key.
-                byte[] key = ua.getIntroducerKey(i);
-                if (key.length != Hash.HASH_LENGTH)
-                    continue;
                 long exp = ua.getIntroducerExpiration(i);
-                if (exp > 0 && exp < now + INTRODUCER_EXPIRATION_MARGIN)
+                if (exp > 0 && exp < now + INTRODUCER_EXPIRATION_MARGIN) {
+                    if (_log.shouldWarn())
+                        _log.warn("Introducer " + i + " is expiring soon, need to replace");
                     continue;
-                PeerState peer = getPeerState(new Hash(key));
-                if (peer != null)
+                }
+                long tag = ua.getIntroducerTag(i);
+                if (_introManager.isInboundTagValid(tag)) {
                     valid++;
+                } else {
+                    if (_log.shouldWarn())
+                        _log.warn("Introducer " + i + " is no longer connected, need to replace");
+                }
             }
             long sinceSelected = now - _introducersSelectedOn;
             if (valid >= PUBLIC_RELAY_COUNT) {
@@ -2785,7 +2788,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             case IPV4_UNKNOWN_IPV6_OK:
             case IPV4_UNKNOWN_IPV6_FIREWALLED:
             case UNKNOWN:
-                return _introManager.introducerCount() < 2 * MIN_INTRODUCER_POOL;
+                return _introManager.introducerCount() < 3 * MIN_INTRODUCER_POOL;
 
             default:
                 return !allowDirectUDP();

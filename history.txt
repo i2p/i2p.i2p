@@ -1,3 +1,10 @@
+2021-03-03 zzz
+ * SSU:
+   - Only advertise 'C' cap if we can really introduce
+   - Only ask for relay tag if we don't have enough
+   - Fix transition out of IPv4 firewalled after UPnP success
+   - Fix validation of current introducers
+
 2021-03-02 zzz
  * UPnP:
    - Limit event subscription time

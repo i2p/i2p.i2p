@@ -19,7 +19,6 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.TransportUtil;
 import net.i2p.util.Addresses;
-import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
 
@@ -79,8 +78,8 @@ class IntroductionManager {
     private final PacketBuilder _builder;
     /** map of relay tag to PeerState that should receive the introduction */
     private final Map<Long, PeerState> _outbound;
-    /** list of peers (PeerState) who have given us introduction tags */
-    private final Set<PeerState> _inbound;
+    /** map of relay tag to PeerState who have given us introduction tags */
+    private final Map<Long, PeerState> _inbound;
     private final Set<InetAddress> _recentHolePunches;
     private long _lastHolePunchClean;
 
@@ -109,7 +108,7 @@ class IntroductionManager {
         _transport = transport;
         _builder = new PacketBuilder(ctx, transport);
         _outbound = new ConcurrentHashMap<Long, PeerState>(MAX_OUTBOUND);
-        _inbound = new ConcurrentHashSet<PeerState>(MAX_INBOUND);
+        _inbound = new ConcurrentHashMap<Long, PeerState>(MAX_INBOUND);
         _recentHolePunches = new HashSet<InetAddress>(16);
         ctx.statManager().createRateStat("udp.receiveRelayIntro", "How often we get a relayed request for us to talk to someone?", "udp", UDPTransport.RATES);
         ctx.statManager().createRateStat("udp.receiveRelayRequest", "How often we receive a good request to relay to someone else?", "udp", UDPTransport.RATES);
@@ -134,7 +133,7 @@ class IntroductionManager {
         long id2 = peer.getTheyRelayToUsAs();
         if (id2 > 0 && _inbound.size() < MAX_INBOUND) {
             added = true;
-            _inbound.add(peer);
+            _inbound.put(Long.valueOf(id2), peer);
         }
         if (added &&_log.shouldLog(Log.DEBUG))
             _log.debug("adding peer " + peer.getRemoteHostId() + ", weRelayToThemAs "
@@ -148,13 +147,23 @@ class IntroductionManager {
             _outbound.remove(Long.valueOf(id));
         long id2 = peer.getTheyRelayToUsAs();
         if (id2 > 0) {
-            _inbound.remove(peer);
+            _inbound.remove(Long.valueOf(id2));
         }
         if ((id > 0 || id2 > 0) &&_log.shouldLog(Log.DEBUG))
             _log.debug("removing peer " + peer.getRemoteHostId() + ", weRelayToThemAs "
                        + id + ", theyRelayToUsAs " + id2);
     }
     
+    /**
+     *  Is this inbound tag currently valid,
+     *  i.e. is the peer still connected?
+     *
+     *  @since 0.9.50
+     */
+    public boolean isInboundTagValid(long tag) {
+        return _inbound.containsKey(Long.valueOf(tag));
+    }
+
     private PeerState get(long id) {
         return _outbound.get(Long.valueOf(id));
     }
@@ -180,7 +189,7 @@ class IntroductionManager {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Picking inbound out of " + _inbound.size());
         if (_inbound.isEmpty()) return 0;
-        List<PeerState> peers = new ArrayList<PeerState>(_inbound);
+        List<PeerState> peers = new ArrayList<PeerState>(_inbound.values());
         int sz = peers.size();
         start = start % sz;
         int found = 0;
@@ -339,7 +348,7 @@ class IntroductionManager {
         long now = _context.clock().now();
         long pingCutoff = now - (105 * 60 * 1000);
         long inactivityCutoff = now - UDPTransport.MIN_EXPIRE_TIMEOUT;
-        for (PeerState cur : _inbound) {
+        for (PeerState cur : _inbound.values()) {
             if (cur.getIntroducerTime() > pingCutoff &&
                 cur.getLastSendTime() < inactivityCutoff) {
                 if (_log.shouldLog(Log.INFO))
