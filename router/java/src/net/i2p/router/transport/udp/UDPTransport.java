@@ -2491,7 +2491,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         // if we have explicit external addresses, they had better be reachable
         String caps;
-        if (introducersRequired) {
+        if (introducersRequired || !canIntroduce()) {
             if (_context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS))
                 caps = CAP_TESTING_4;
             else
@@ -2785,7 +2785,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             case IPV4_UNKNOWN_IPV6_OK:
             case IPV4_UNKNOWN_IPV6_FIREWALLED:
             case UNKNOWN:
-                return true;
+                return _introManager.introducerCount() < 2 * MIN_INTRODUCER_POOL;
 
             default:
                 return !allowDirectUDP();

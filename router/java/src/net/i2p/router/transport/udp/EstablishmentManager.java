@@ -500,8 +500,9 @@ class EstablishmentManager {
             // TODO if already we have their RI, only offer if they need it (no 'C' cap)
             // if extended options, only if they asked for it
             if (state.isIntroductionRequested() &&
-                _transport.canIntroduce() && state.getSentPort() >= 1024 &&
-                state.getSentIP().length == 4) {
+                state.getSentIP().length == 4 &&
+                state.getSentPort() >= 1024 &&
+                _transport.canIntroduce()) {
                 // ensure > 0
                 long tag = 1 + _context.random().nextLong(MAX_TAG_VALUE);
                 state.setSentRelayTag(tag);
