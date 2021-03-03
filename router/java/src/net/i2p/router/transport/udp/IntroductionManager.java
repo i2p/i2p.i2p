@@ -225,16 +225,16 @@ class IntroductionManager {
             }
             int oldFound = found;
             for (RouterAddress ra : ras) {
-                // IPv6 allowed as of 0.9.50
                 byte[] ip = ra.getIP();
+                int port = ra.getPort();
+                if (!isValid(ip, port, true))
+                    continue;
+                // IPv6 allowed as of 0.9.50
                 if (ip.length == 16 && VersionComparator.comp(ri.getVersion(), MIN_IPV6_INTRODUCER_VERSION) < 0) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Would have picked IPv6 introducer but he doesn't support it: " + cur);
                     continue;
                 }
-                int port = ra.getPort();
-                if (!isValid(ip, port, true))
-                    continue;
                 cur.setIntroducerTime();
                 UDPAddress ura = new UDPAddress(ra);
                 byte[] ikey = ura.getIntroKey();
