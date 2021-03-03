@@ -1,4 +1,4 @@
-<h2><%=intl._t("Reachability Help")%></h2>
+<h2><%=intl._t("Network Help")%></h2>
 <p>
   <%=intl._t("While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port is forwarded for both UDP and TCP.")%>&nbsp;
   <%=intl._t("If you think you have opened up your firewall and I2P still thinks you are firewalled, remember that you may have multiple firewalls, for example both software packages and external hardware routers.")%>&nbsp;

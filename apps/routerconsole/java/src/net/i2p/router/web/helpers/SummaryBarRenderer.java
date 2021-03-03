@@ -178,10 +178,10 @@ class SummaryBarRenderer {
            .append("</a>\n");
         svcs.put(tx, rbuf.toString());
 
-        tx = _t("Reachability");
+        tx = _t("Network");
         rbuf.setLength(0);
-        rbuf.append("<a href=\"/help#reachability\" target=\"_top\" title=\"")
-           .append(_t("A short guide to the sidebar's network reachability notification"))
+        rbuf.append("<a href=\"/help#reachabilityhelp\" target=\"_top\" title=\"")
+           .append(_t("Information about the network status"))
            .append("\">")
            .append(nbsp(tx))
            .append("</a>\n");
@@ -714,8 +714,8 @@ class SummaryBarRenderer {
             default:
                 buf.append("testing");
         }
-        buf.append("\"><a href=\"/help#confignet\" target=\"_top\" title=\"")
-           .append(_t("Help with configuring your firewall and router for optimal I2P performance"))
+        buf.append("\"><a href=\"/help#reachabilityhelp\" target=\"_top\" title=\"")
+           .append(_t("Information about the network status"))
            .append("\">")
            .append(_t("Network"))
            .append(": ")

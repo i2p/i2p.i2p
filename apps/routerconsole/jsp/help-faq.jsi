@@ -23,8 +23,7 @@
 <%=intl._t("You may wish to add one or two to your <a href=\"/susidns/subscriptions\">subscription list</a>.")%> 
 <ul>
 <li><code>http://stats.i2p/cgi-bin/newhosts.txt</code></li>
-<li><code>http://no.i2p/export/alive-hosts.txt</code></li>
-<li><code>http://identiguy.i2p/hosts.txt</code></li>
+<li><code>http://notbob.i2p/hosts.txt</code></li>
 </ul>
 
 <p><%=intl._t("Note that subscribing to a hosts.txt service is an act of trust, as a malicious subscription could give you incorrect addresses, so be careful subscribing to lists from unknown sources.")%>
