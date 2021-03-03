@@ -123,12 +123,15 @@ public abstract class TransportUtil {
 
     /**
      *  Addresses without a host (i.e. w/introducers)
-     *  are assumed to be IPv4
+     *  are assumed to be IPv4 unless a '6' cap is present
      */
     public static boolean isIPv6(RouterAddress addr) {
         // do this the fast way, without calling getIP() to parse the host string
         String host = addr.getHost();
-        return host != null && host.contains(":");
+        if (host != null)
+            return host.contains(":");
+        String caps = addr.getOption("caps");
+        return caps != null && caps.contains("6");
     }
 
     /**

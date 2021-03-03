@@ -646,9 +646,19 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                         rebuildExternalAddress(newIP, newPort, false);
                     }
                 } else {
-                    if (!isIPv4Firewalled())
+                    if (isIPv4Firewalled()) {
+                        setReachabilityStatus(Status.IPV4_FIREWALLED_IPV6_UNKNOWN);
+                        // save the external address but don't publish it
+                        // save it where UPnP can get it and try to forward it
+                        OrderedProperties localOpts = new OrderedProperties(); 
+                        localOpts.setProperty(UDPAddress.PROP_PORT, String.valueOf(newPort));
+                        localOpts.setProperty(UDPAddress.PROP_HOST, newIP);
+                        RouterAddress local = new RouterAddress(STYLE, localOpts, DEFAULT_COST);
+                        replaceCurrentExternalAddress(local, false);
+                    } else {
                         setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
-                    rebuildExternalAddress(newIP, newPort, false);
+                        rebuildExternalAddress(newIP, newPort, false);
+                    }
                 }
                 if (save && !newIP.equals(oldIP)) {
                     changes.put(prop, newIP);
@@ -2495,7 +2505,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         // if we have explicit external addresses, they had better be reachable
         String caps;
         if (introducersRequired || !canIntroduce()) {
-            if (_context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS))
+            if (!directIncluded && !isIPv6 &&
+                _context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS))
                 caps = CAP_TESTING_4;
             else
                 caps = CAP_TESTING;
@@ -2563,6 +2574,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Address rebuilt: " + addr, new Exception());
                 replaceAddress(addr);
+                if (!isIPv6 &&
+                    _context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS) &&
+                    getCurrentAddress(true) == null &&
+                    getIPv6Config() != IPV6_DISABLED &&
+                    hasIPv6Address()) {
+                    // Also make an empty "6" address
+                    OrderedProperties opts = new OrderedProperties(); 
+                    opts.setProperty(UDPAddress.PROP_CAPACITY, CAP_IPV6);
+                    RouterAddress addr6 = new RouterAddress(STYLE, opts, SSU_OUTBOUND_COST);
+                    replaceAddress(addr6);
+                }
                 // warning, this calls back into us with allowRebuildRouterInfo = false,
                 // via CSFI.createAddresses->TM.getAddresses()->updateAddress()->REA
                 if (allowRebuildRouterInfo)
@@ -2586,6 +2608,21 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 localOpts.setProperty(UDPAddress.PROP_HOST, host);
                 RouterAddress local = new RouterAddress(STYLE, localOpts, DEFAULT_COST);
                 replaceCurrentExternalAddress(local, isIPv6);
+            }
+            if (!isIPv6 &&
+                _context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS)) {
+                // Make an empty "4" address
+                OrderedProperties opts = new OrderedProperties(); 
+                opts.setProperty(UDPAddress.PROP_CAPACITY, CAP_IPV4);
+                RouterAddress addr4 = new RouterAddress(STYLE, opts, SSU_OUTBOUND_COST);
+                RouterAddress current = getCurrentAddress(false);
+                boolean wantsRebuild = !addr4.deepEquals(current);
+                if (!wantsRebuild)
+                    return null;
+                replaceAddress(addr4);
+                if (allowRebuildRouterInfo)
+                    rebuildRouterInfo();
+                return addr4;
             }
             removeExternalAddress(isIPv6, allowRebuildRouterInfo);
             return null;
