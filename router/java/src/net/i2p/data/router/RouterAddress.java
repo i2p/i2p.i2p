@@ -315,12 +315,16 @@ public class RouterAddress extends DataStructureImpl {
         if (object == this) return true;
         if ((object == null) || !(object instanceof RouterAddress)) return false;
         RouterAddress addr = (RouterAddress) object;
-        return
+        boolean rv =
                getPort() == addr.getPort() &&
                DataHelper.eq(getHost(), addr.getHost()) &&
                DataHelper.eq(_transportStyle, addr._transportStyle);
                //DataHelper.eq(_options, addr._options) &&
                //DataHelper.eq(_expiration, addr._expiration);
+        if (!rv || !_transportStyle.equals("SSU"))
+               return rv;
+        // SSU 4/6 caps
+        return DataHelper.eq(_options.getProperty("caps"), addr._options.getProperty("caps"));
     }
     
     /**
