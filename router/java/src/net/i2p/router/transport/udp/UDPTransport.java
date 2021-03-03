@@ -1022,7 +1022,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
         if (success && ip != null) {
             if (ip.length == 4) {
-                if (getExternalIP() != null && !isIPv4Firewalled())
+                if (getCurrentExternalAddress(false) != null && !isIPv4Firewalled())
                     setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
             } else if (ip.length == 16) {
                 boolean fwOld = _context.getBooleanProperty(PROP_IPV6_FIREWALLED);
