@@ -98,7 +98,7 @@ class IntroductionManager {
     /** Max one per target in this time */
     private static final long PUNCH_CLEAN_TIME = 5*1000;
     /** Max for all targets per PUNCH_CLEAN_TIME */
-    private static final int MAX_PUNCHES = 8;
+    private static final int MAX_PUNCHES = 20;
     private static final long INTRODUCER_EXPIRATION = 80*60*1000L;
     private static final String MIN_IPV6_INTRODUCER_VERSION = "0.9.50";
 
