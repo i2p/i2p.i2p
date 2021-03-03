@@ -1782,6 +1782,10 @@ public class NTCPTransport extends TransportImpl {
      * Previously returned short, now enum as of 0.9.20
      */
     public Status getReachabilityStatus() { 
+        boolean fwV4 = isIPv4Firewalled();
+        boolean fwV6 = isIPv6Firewalled();
+        if (fwV4 && fwV6)
+            return Status.REJECT_UNSOLICITED;
         if (!isAlive())
             return Status.UNKNOWN;
         TransportUtil.IPv6Config config = getIPv6Config();
@@ -1796,8 +1800,8 @@ public class NTCPTransport extends TransportImpl {
             v4Disabled = false;
             v6Disabled = false;
         }
-        boolean hasV4 = getCurrentAddress(false) != null;
-        boolean hasV6 = getCurrentAddress(true) != null;
+        boolean hasV4 = !fwV4 && getCurrentAddress(false) != null;
+        boolean hasV6 = !fwV6 && getCurrentAddress(true) != null;
         boolean showFirewalled = !_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP) &&
                                  _context.router().getUptime() > 10*60*1000;
         if (!hasV4 && !hasV6) {
@@ -1813,12 +1817,16 @@ public class NTCPTransport extends TransportImpl {
                 return Status.OK;
             if (!_haveIPv6Address)
                 return Status.OK;
+            if (fwV6)
+                return Status.IPV4_OK_IPV6_FIREWALLED;
             if (!hasV6)
                 return Status.IPV4_OK_IPV6_UNKNOWN;
         }
         if (v6OK) {
             if (v4Disabled)
                 return Status.IPV4_DISABLED_IPV6_OK;
+            if (fwV4)
+                return Status.IPV4_FIREWALLED_IPV6_OK;
             if (!hasV4)
                 return showFirewalled ? Status.IPV4_FIREWALLED_IPV6_OK : Status.IPV4_UNKNOWN_IPV6_OK;
         }
