@@ -1712,7 +1712,13 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 							long now = _context.clock().now();
 							long exp = v6port.getExpiration();
 							if (exp > 0) {
-								keep = exp < now;
+								keep = exp > now;
+								if (_log.shouldWarn()) {
+									if (keep)
+									       _log.warn("Deprecated address not expired, continue forwarding: " + v6port);
+									else
+									       _log.warn("Deprecated address expired, stop forwarding: " + v6port);
+								}
 							} else {
 								try {
 									Inet6Address v6addr = (Inet6Address) InetAddress.getByName(v6port.getIP());
@@ -1803,7 +1809,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	 *  This also renews all subscriptions.
 	 */
 	private class RegisterPortsThread implements Runnable {
-		private Set<ForwardPort> portsToForwardNow;
+		private final Set<ForwardPort> portsToForwardNow;
 
 		/**
 		 *  @param ports if null, renew subscriptions only, then exit.
@@ -1859,7 +1865,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	}
 
 	private class UnregisterPortsThread implements Runnable {
-		private Set<ForwardPort> portsToForwardNow;
+		private final Set<ForwardPort> portsToForwardNow;
 
 		public UnregisterPortsThread(Set<ForwardPort> ports) {
 			portsToForwardNow = ports;
