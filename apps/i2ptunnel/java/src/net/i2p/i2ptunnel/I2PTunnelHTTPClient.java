@@ -1528,7 +1528,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                       "</p>\n" +
 
                       "<p><b>PSK:</b> " + _t("Enter PSK encryption key") +
-                      ": ]</p>\n" +
+                      ":</p>\n" +
                       "<input type=\"text\" size=\"55\" name=\"privkey\" value=\"\">\n" +
                       "<p><b>DH:</b> " + _t("Generate new DH encryption key") +
                       ": <div class=\"formaction_xx\">" +
