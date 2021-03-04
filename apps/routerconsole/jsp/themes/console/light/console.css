@@ -4143,6 +4143,7 @@ button.download.control:hover, button.download.control:focus {
 
 .routersummary .cancel {
      margin-top: 10px;
+     padding: 5px 7px 1px 24px !important;
 }
 
 /* Show text on context specific buttons (eg deferred shutdown) */
@@ -4153,13 +4154,17 @@ button.download.control:hover, button.download.control:focus {
      text-indent: 0;
      text-align: left;
      min-width: 0 !important;
-     padding: 5px 7px 1px 22px !important;
      text-transform: capitalize;
 }
 
-.routersummary .cancel {
-     text-transform: capitalize;
-     padding: 5px 7px 1px 22px !important;
+.routersummary .cancel[value="cancelShutdown"] {
+     background: url(/themes/console/images/buttons/no.png) center left 6px no-repeat, linear-gradient(to bottom, #fff, #efefff) !important;
+     background-size: 14px 14px, 100% 100% !important;
+}
+
+.routersummary .cancel[value="cancelShutdown"]:hover, .routersummary .cancel[value="cancelShutdown"]:focus, .routersummary .cancel[value="cancelShutdown"]:active {
+     background: url(/themes/console/images/buttons/no.png) center left 6px no-repeat, linear-gradient(to bottom, #eee, #fff) !important;
+     background-size: 14px 14px, 100% 100% !important;
 }
 
 .routersummary .reload[value="restartImmediate"] {
