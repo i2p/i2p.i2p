@@ -326,10 +326,10 @@ public class TransportManager implements TransportEventListener {
         Set<String> ipset = Addresses.getAddresses(_context.getBooleanProperty("i2np.allowLocal"), false, true);
         String lastv4 = _context.getProperty(UDPTransport.PROP_IP);
         String lastv6 = _context.getProperty(UDPTransport.PROP_IPV6);
-        boolean preferTemp = _context.getBooleanProperty(UDPTransport.PROP_LAPTOP_MODE);
+        boolean preferTemp = Boolean.valueOf(Addresses.useIPv6TempAddresses());
         //
         // Avoid IPv6 temporary addresses if we have a non-temporary one,
-        // unless laptop mode
+        // unless the kernel prefers them
         //
         boolean hasPreferredV6Address = false;
         List<InetAddress> addresses = new ArrayList<InetAddress>(4);

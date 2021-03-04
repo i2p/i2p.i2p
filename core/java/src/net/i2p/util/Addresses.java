@@ -898,17 +898,15 @@ public abstract class Addresses {
     }
 
     /**
-     * RFC 4941
-     * @since 0.9.34
+     * @return "true", "false", or "unknown"
+     * @since 0.9.50
      */
-    private static String getPrivacyStatus() {
+    public static String useIPv6TempAddresses() {
         // Windows: netsh interface ipv6 show privacy
         // Mac: sysctl net.inet6.ip6.use_tempaddr (1 is enabled)
         if (SystemVersion.isMac() || SystemVersion.isWindows())
             return "unknown";
         long t = getLong("/proc/sys/net/ipv6/conf/all/use_tempaddr");
-        if (t < 0)
-            return "unknown";
         String rv;
         if (t == 0)
             rv = "false";
@@ -916,7 +914,16 @@ public abstract class Addresses {
             rv = "true";
         else
             rv = "unknown";
-        if (t == 2) {
+        return rv;
+    }
+
+    /**
+     * RFC 4941
+     * @since 0.9.34
+     */
+    private static String getPrivacyStatus() {
+        String rv = useIPv6TempAddresses();
+        if (Boolean.valueOf(rv)) {
             long pref = getLong("/proc/sys/net/ipv6/conf/all/temp_prefered_lft");
             if (pref > 0)
                 rv += ", preferred lifetime " + DataHelper.formatDuration(pref * 1000);
