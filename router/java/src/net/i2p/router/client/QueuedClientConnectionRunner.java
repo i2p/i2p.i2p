@@ -78,11 +78,11 @@ class QueuedClientConnectionRunner extends ClientConnectionRunner {
 
     /**
      *  The client version.
-     *  @return CoreVersion.VERSION
+     *  @return CoreVersion.PUBLISHED_VERSION
      *  @since 0.9.7
      */
     @Override
     public String getClientVersion() {
-        return CoreVersion.VERSION;
+        return CoreVersion.PUBLISHED_VERSION;
     }
 }

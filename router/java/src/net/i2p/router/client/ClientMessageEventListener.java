@@ -199,7 +199,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             return;
         try {
             // only send version if the client can handle it (0.8.7 or greater)
-            _runner.doSend(new SetDateMessage(clientVersion != null ? CoreVersion.VERSION : null));
+            _runner.doSend(new SetDateMessage(clientVersion != null ? CoreVersion.PUBLISHED_VERSION : null));
         } catch (I2CPMessageException ime) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error writing out the setDate message", ime);
