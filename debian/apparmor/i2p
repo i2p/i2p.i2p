@@ -50,6 +50,8 @@
   /usr/share/i2p/**                                       r,
 
   # Used by some plugins
+  /usr/share/java/ecj.jar                                 r,
+  /usr/share/java/eclipse-ecj.jar                         r,
   /usr/share/java/eclipse-ecj-*.jar                       r,
 
   # Tanuki java wrapper
@@ -81,6 +83,9 @@
   # Other /proc
   @{PROC}/cpuinfo                                         r,
   @{PROC}/net/if_inet6                                    r,
+  @{PROC}/sys/net/ipv6/conf/all/temp_prefered_lft         r,
+  @{PROC}/sys/net/ipv6/conf/all/temp_valid_lft            r,
+  @{PROC}/sys/net/ipv6/conf/all/use_tempaddr              r,
 
   # 'm' is needed by the I2P-Bote plugin
   /{,lib/live/mount/overlay/}tmp/                         rwm,
