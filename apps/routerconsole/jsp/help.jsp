@@ -11,7 +11,7 @@
 <div class="main" id="help">
 <div class="confignav">
 <span class="tab"><a href="#sidebarhelp"><%=intl._t("Sidebar")%></a></span>
-<span class="tab"><a href="#reachabilityhelp"><%=intl._t("Reachability")%></a></span>
+<span class="tab"><a href="#reachabilityhelp"><%=intl._t("Network")%></a></span>
 <span class="tab"><a href="#faq"><%=intl._t("FAQ")%></a></span>
 <span class="tab"><a href="/viewlicense"><%=intl._t("Licenses")%></a></span>
 <span class="tab"><a href="/viewhistory"><%=intl._t("Change Log")%></a></span>
