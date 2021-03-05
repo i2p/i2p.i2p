@@ -17,15 +17,16 @@
 <%@include file="formhandler.jsi" %>
 
 <p class="infohelp"><%=intl._t("Routers in the same family share a family key.")%>
-<%=intl._t("To join an existing family, import the private key you exported from a router in the family.")%>
-<%=intl._t("To start a new family, enter a family name.")%>
-</p>
 
 <%
    String family = familyHelper.getFamily();
    if (family.length() <= 0) {
        // no family yet
 %>
+<%=intl._t("To join an existing family, import the private key you exported from a router in the family.")%>
+<%=intl._t("To start a new family, enter a family name.")%>
+</p>
+
 <form action="" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
 <table class="configtable" id="joinfamily">
@@ -57,10 +58,13 @@
 <%
    } else {
        // family is configured
+       family = net.i2p.data.DataHelper.escapeHTML(family);
        String keypw = familyHelper.getKeyPW();
        if (keypw.length() > 0) {
            // family is active
 %>
+<%=intl._t("The current router family is {0}.", '"' + family + '"')%></p>
+
 <form action="/exportfamily" method="GET">
 <table class="configtable" id="exportfamily">
  <tr><th><%=intl._t("Export Family Key")%></th></tr>
