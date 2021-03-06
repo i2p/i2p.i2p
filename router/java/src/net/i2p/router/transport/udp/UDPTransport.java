@@ -254,6 +254,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                                                                     Status.IPV4_UNKNOWN_IPV6_FIREWALLED,
                                                                     Status.IPV4_DISABLED_IPV6_FIREWALLED);
 
+    private static final Set<Status> STATUS_FW =         EnumSet.of(Status.DIFFERENT,
+                                                                    Status.REJECT_UNSOLICITED,
+                                                                    Status.IPV4_FIREWALLED_IPV6_OK,
+                                                                    Status.IPV4_SNAT_IPV6_OK,
+                                                                    Status.IPV4_FIREWALLED_IPV6_UNKNOWN,
+                                                                    Status.IPV4_OK_IPV6_FIREWALLED,
+                                                                    Status.IPV4_UNKNOWN_IPV6_FIREWALLED,
+                                                                    Status.IPV4_DISABLED_IPV6_FIREWALLED);
+
     private static final Set<Status> STATUS_IPV6_FW_2 =  EnumSet.of(Status.IPV4_OK_IPV6_FIREWALLED,
                                                                     Status.IPV4_UNKNOWN_IPV6_FIREWALLED,
                                                                     Status.IPV4_DISABLED_IPV6_FIREWALLED,
@@ -3303,8 +3312,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (status != old) {
                 // for the following transitions ONLY, require two in a row
                 // to prevent thrashing
-                if ((old == Status.OK && STATUS_IPV4_FW.contains(status)) ||
-                    (status == Status.OK && STATUS_IPV4_FW.contains(old))) {
+                if ((old == Status.OK && STATUS_FW.contains(status)) ||
+                    (status == Status.OK && STATUS_FW.contains(old))) {
                     if (status != _reachabilityStatusPending) {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Old status: " + old + " status pending confirmation: " + status +
