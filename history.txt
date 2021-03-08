@@ -1,9 +1,28 @@
+2021-03-08 zzz
+ * SSU: Increase CoDel drop threshold at UDPSender queue
+
+2021-03-06 zzz
+ * SSU: Require confirmation for IPv6 firewalled state transitions
+
+2021-03-04 zzz
+ * I2CP: More prep for different release and API versions
+ * i2ptunnel: Add missing button icons for proxy forms
+ * Router: Increase rekey probability
+ * Transports: Prefer IPv6 temporary addresses if the kernel does
+
 2021-03-03 zzz
+ * NTCP: Fix reachability status when force-firewalled
  * SSU:
    - Only advertise 'C' cap if we can really introduce
    - Only ask for relay tag if we don't have enough
    - Fix transition out of IPv4 firewalled after UPnP success
    - Fix validation of current introducers
+   - Don't publish IPv4 address at startup when force-firewalled
+   - Publish empty '4' address if firewalled and no introducers
+   - Publish empty '6' address if firewalled
+   - 4/6 caps fixes
+   - Increase hole punch rate limit
+ * UPnP: Fix retention of deprecated addresses
 
 2021-03-02 zzz
  * UPnP:
