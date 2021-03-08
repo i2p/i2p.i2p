@@ -94,12 +94,6 @@ public class TransportManager implements TransportEventListener {
     private static final String PROP_JAVA_PROXY3 = "http.proxyHost";
     private static final String PROP_JAVA_PROXY4 = "https.proxyHost";
 
-    /** default true */
-    private static final String PROP_NTCP1_ENABLE = "i2np.ntcp1.enable";
-    private static final boolean DEFAULT_NTCP1_ENABLE = false;
-    private static final String PROP_NTCP2_ENABLE = "i2np.ntcp2.enable";
-    private static final boolean DEFAULT_NTCP2_ENABLE = true;
-
     private static final String PROP_ADVANCED = "routerconsole.advanced";
     
     /** not forever, since they may update */
@@ -125,10 +119,8 @@ public class TransportManager implements TransportEventListener {
         _upnpManager = enableUPnP ? new UPnPManager(context, this) : null;
         _upnpRefresher = enableUPnP ? new UPnPRefresher() : null;
         _enableUDP = _context.getBooleanPropertyDefaultTrue(PROP_ENABLE_UDP);
-        _enableNTCP1 = isNTCPEnabled(context) &&
-                       context.getProperty(PROP_NTCP1_ENABLE, DEFAULT_NTCP1_ENABLE);
-        boolean enableNTCP2 = isNTCPEnabled(context) &&
-                              context.getProperty(PROP_NTCP2_ENABLE, DEFAULT_NTCP2_ENABLE);
+        _enableNTCP1 = false;
+        boolean enableNTCP2 = isNTCPEnabled(context);
         _dhThread = (_enableUDP || enableNTCP2) ? new DHSessionKeyBuilder.PrecalcRunner(context) : null;
         // always created, even if NTCP2 is not enabled, because ratchet needs it
         _xdhThread = new X25519KeyFactory(context);
@@ -268,10 +260,7 @@ public class TransportManager implements TransportEventListener {
             initializeAddress(udp);
         }
         if (isNTCPEnabled(_context)) {
-            DHSessionKeyBuilder.PrecalcRunner dh = _enableNTCP1 ? _dhThread : null;
-            boolean enableNTCP2 = _context.getProperty(PROP_NTCP2_ENABLE, DEFAULT_NTCP2_ENABLE);
-            X25519KeyFactory xdh = enableNTCP2 ? _xdhThread : null;
-            Transport ntcp = new NTCPTransport(_context, dh, xdh);
+            Transport ntcp = new NTCPTransport(_context, null, _xdhThread);
             addTransport(ntcp);
             initializeAddress(ntcp);
             if (udp != null) {
@@ -292,9 +281,7 @@ public class TransportManager implements TransportEventListener {
     }
     
     public static boolean isNTCPEnabled(RouterContext ctx) {
-        return ctx.getBooleanPropertyDefaultTrue(PROP_ENABLE_NTCP) &&
-               (ctx.getProperty(PROP_NTCP1_ENABLE, DEFAULT_NTCP1_ENABLE) ||
-                ctx.getProperty(PROP_NTCP2_ENABLE, DEFAULT_NTCP2_ENABLE));
+        return ctx.getBooleanPropertyDefaultTrue(PROP_ENABLE_NTCP);
     }
     
     /**
