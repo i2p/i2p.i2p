@@ -309,7 +309,7 @@ public class ControlPoint implements HTTPRequestListener
 			String udn = USN.getUDN(usn);
 			Device dev = getDevice(udn);
 			if (dev != null) {
-				Debug.warning("Additional SSDP for " + udn + " at " + location);
+				Debug.message("Additional SSDP for " + udn + " at " + location);
 				dev.setSSDPPacket(ssdpPacket);
 				return;
 			}

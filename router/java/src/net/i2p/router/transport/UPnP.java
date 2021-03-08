@@ -1409,8 +1409,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 				try {
 					int newuid = Integer.parseInt(a.getValue());
 					if (newuid != uid) {
-						if (_log.shouldWarn())
-							_log.warn("Updating UID from " + uid + " to " + newuid + " for " + fp);
+						if (_log.shouldDebug())
+							_log.debug("Updating UID from " + uid + " to " + newuid + " for " + fp);
 						fp.setUID(newuid);
 					}
 				} catch (NumberFormatException nfe) {}
@@ -1558,8 +1558,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			service = fp.isIP6 ? _service6 : _service;
 		}
 		if (service == null) {
-			if (_log.shouldWarn())
-				_log.warn("No service for IPv" + (fp.isIP6 ? '6' : '4'));
+			if (_log.shouldInfo())
+				_log.info("No service for IPv" + (fp.isIP6 ? '6' : '4'));
 			return false;
 		}
 		if (fp.isIP6)
@@ -1713,11 +1713,11 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 							long exp = v6port.getExpiration();
 							if (exp > 0) {
 								keep = exp > now;
-								if (_log.shouldWarn()) {
+								if (_log.shouldDebug()) {
 									if (keep)
-									       _log.warn("Deprecated address not expired, continue forwarding: " + v6port);
+									       _log.debug("Deprecated address not expired, continue forwarding: " + v6port);
 									else
-									       _log.warn("Deprecated address expired, stop forwarding: " + v6port);
+									       _log.debug("Deprecated address expired, stop forwarding: " + v6port);
 								}
 							} else {
 								try {
@@ -1839,8 +1839,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 					// Don't report result if deprecated
 					IPv6ForwardPort v6port = (IPv6ForwardPort) port;
 					if (v6port.getExpiration() > 0) {
-						if (_log.shouldWarn())
-							_log.warn("Not reporting result for deprecated " + v6port + " - " + fps.reasonString);
+						if (_log.shouldDebug())
+							_log.debug("Not reporting result for deprecated " + v6port + " - " + fps.reasonString);
 						continue;
 					}
 				}
