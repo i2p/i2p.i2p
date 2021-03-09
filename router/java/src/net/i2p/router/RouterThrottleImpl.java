@@ -363,8 +363,6 @@ public class RouterThrottleImpl implements RouterThrottle {
         int usedIn = Math.min(_context.router().get1sRateIn(), _context.router().get15sRateIn());
         int usedOut = Math.min(_context.router().get1sRate(true), _context.router().get15sRate(true));
         int used = Math.max(usedIn, usedOut);
-        int used1mIn = _context.router().get1mRateIn();
-        int used1mOut = _context.router().get1mRate(true);
 
         // Check the inbound and outbound total bw available (separately)
         // We block all tunnels when share bw is over (max * 0.9) - 4KB
@@ -391,6 +389,8 @@ public class RouterThrottleImpl implements RouterThrottle {
         _context.statManager().addRateData("router.throttleTunnelBytesAllowed", availBps, (long)bytesAllocated);
 
         // Now see if 1m rates are too high
+        int used1mIn = _context.router().get1mRateIn();
+        int used1mOut = _context.router().get1mRate(true);
         long overage = Math.max(used1mIn - (maxKBpsIn*1024), used1mOut - (maxKBpsOut*1024));
         if ( (overage > 0) && 
              ((overage/(maxKBps*1024f)) > _context.random().nextFloat()) ) {
@@ -399,20 +399,42 @@ public class RouterThrottleImpl implements RouterThrottle {
             return false;
         }
 
+        double probReject;
+        boolean reject;
+        if (availBps <= 0) {
+            probReject = 1;
+            reject = true;
+            if (_log.shouldWarn())
+                _log.warn("Reject avail/maxK/used " + availBps + "/" + maxKBps + "/" 
+                          + used + " pReject = 1 numTunnels = " + numTunnels 
+                          + " est = " + bytesAllocated);
+        } else {
             // limit at 90% - 4KBps (see above)
             float maxBps = (maxKBps * 1024f * 0.9f) - MIN_AVAILABLE_BPS;
             float pctFull = (maxBps - availBps) / (maxBps);
-            double probReject = Math.pow(pctFull, 16); // steep curve 
-            double rand = _context.random().nextFloat();
-            boolean reject = rand <= probReject;
-            if (reject && _log.shouldLog(Log.WARN))
-                _log.warn("Reject avail/maxK/used " + availBps + "/" + maxKBps + "/" 
+            if (pctFull < 0.83f) {
+                // probReject < ~5%
+                probReject = 0;
+                reject = false;
+                if (_log.shouldDebug())
+                    _log.debug("Accept avail/maxK/used " + availBps + "/" + maxKBps + "/" 
+                               + used + " pReject = 0 numTunnels = " + numTunnels 
+                               + " est = " + bytesAllocated);
+            } else {
+                probReject = Math.pow(pctFull, 16); // steep curve 
+                double rand = _context.random().nextFloat();
+                reject = rand <= probReject;
+                if (reject && _log.shouldWarn())
+                    _log.warn("Reject avail/maxK/used " + availBps + "/" + maxKBps + "/" 
                           + used + " pReject = " + probReject + " pFull = " + pctFull + " numTunnels = " + numTunnels 
                           + " rand = " + rand + " est = " + bytesAllocated);
-            else if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Accept avail/maxK/used " + availBps + "/" + maxKBps + "/" 
+                else if (_log.shouldDebug())
+                    _log.debug("Accept avail/maxK/used " + availBps + "/" + maxKBps + "/" 
                            + used + " pReject = " + probReject + " pFull = " + pctFull + " numTunnels = " + numTunnels 
                            + " rand = " + rand + " est = " + bytesAllocated);
+            }
+        }
+
             if (probReject >= 0.9)
                 setTunnelStatus(LIMIT_STR);
             else if (probReject >= 0.5)
