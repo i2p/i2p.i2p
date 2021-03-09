@@ -2,6 +2,7 @@ package net.i2p.router.transport.udp;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.util.BandwidthEstimator;
 import net.i2p.util.Log;
 
 /**

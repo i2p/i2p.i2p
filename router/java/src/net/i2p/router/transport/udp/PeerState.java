@@ -24,6 +24,7 @@ import net.i2p.router.transport.udp.InboundMessageFragments.ModifiableLong;
 import net.i2p.router.util.CachedIteratorCollection;
 import net.i2p.router.util.CoDelPriorityBlockingQueue;
 import net.i2p.router.util.PriBlockingQueue;
+import net.i2p.util.BandwidthEstimator;
 import net.i2p.util.Log;
 import net.i2p.util.ConcurrentHashSet;
 
