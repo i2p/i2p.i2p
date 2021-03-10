@@ -136,8 +136,8 @@ class TransientDataStore implements DataStore {
                         _log.info("Almost clobbered an old router! " + key + ": [old published on " + new Date(ori.getPublished()) +
                                   " new on " + new Date(ri.getPublished()) + ']');
                 } else if (ri.getPublished() == ori.getPublished()) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Duplicate " + key);
+                    if (_log.shouldDebug())
+                        _log.debug("Duplicate " + key);
                 } else {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Updated the old router for " + key + ": [old published on " + new Date(ori.getPublished()) +
