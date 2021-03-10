@@ -416,7 +416,8 @@ public class NTCPTransport extends TransportImpl {
                     // Queue the message, and our RI
                     // doesn't do anything yet, just enqueues it
                     con.send(msg);
-                    con.enqueueInfoMessage();
+                    // does nothing for outbound NTCP2
+                    //con.enqueueInfoMessage();
                 } else if (shouldFlood || newVersion == 1) {
                     // Queue the message, which is a DSM of our RI
                     con.send(msg);
@@ -501,9 +502,8 @@ public class NTCPTransport extends TransportImpl {
             return null;
         // passed in dataSize assumes 16 byte header, if NTCP2 then
         // we have a 9-byte header so there's 7 to spare
-        if (dataSize > NTCPConnection.NTCP2_MAX_MSG_SIZE + 7 ||
-            (!_enableNTCP2 && dataSize > NTCPConnection.NTCP1_MAX_MSG_SIZE)) {
-            // Too big for NTCP2, or NTCP2 disabled and too big for NTCP1
+        if (dataSize > NTCPConnection.NTCP2_MAX_MSG_SIZE + 7) {
+            // Too big for NTCP2
             // Let SSU deal with it
             _context.statManager().addRateData("ntcp.noBidTooLargeI2NP", dataSize);
             return null;
@@ -521,14 +521,6 @@ public class NTCPTransport extends TransportImpl {
 
         boolean established = isEstablished(peer);
         if (established) { // should we check the queue size?  nah, if its valid, use it
-            if (dataSize > NTCPConnection.NTCP1_MAX_MSG_SIZE) {
-                // Must be version 2 to send a big message
-                NTCPConnection con = _conByIdent.get(peer);
-                if (con == null || con.getVersion() < NTCP2_INT_VERSION) {
-                    _context.statManager().addRateData("ntcp.noBidTooLargeI2NP", dataSize);
-                    return null;
-                }
-            }
             return _fastBid;
         }
         if (toAddress.getNetworkId() != _networkID) {
@@ -537,12 +529,6 @@ public class NTCPTransport extends TransportImpl {
                 _log.warn("Not in our network: " + toAddress, new Exception());
             markUnreachable(peer);
             return null;    
-        }
-        if (dataSize > NTCPConnection.NTCP1_MAX_MSG_SIZE) {
-            // Not established, too big for NTCP 1, let SSU deal with it
-            // TODO look at his addresses to see if NTCP2 supported?
-            _context.statManager().addRateData("ntcp.noBidTooLargeI2NP", dataSize);
-            return null;
         }
 
         RouterAddress addr = getTargetAddress(toAddress);

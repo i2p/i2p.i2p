@@ -40,7 +40,7 @@ import net.i2p.util.SimpleByteCache;
 
 /**
  *
- *  NTCP 1 or 2. We are Bob.
+ *  NTCP 2. We are Bob.
  *
  *  @since 0.9.35 pulled out of EstablishState
  */
@@ -74,7 +74,6 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
     private static final int MAX_DATA_READ_BUFS = 32;
     private static final ByteCache _dataReadBufs = ByteCache.getInstance(MAX_DATA_READ_BUFS, BUFFER_SIZE);
 
-    private static final int NTCP1_MSG1_SIZE = XY_SIZE + HXY_SIZE;
     // 287 - 64 = 223
     private static final int PADDING1_MAX = TOTAL1_MAX - MSG1_SIZE;
     private static final int PADDING1_FAIL_MAX = 128;
@@ -89,7 +88,6 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
     private static final Set<State> STATES_NTCP2 =
         EnumSet.of(State.IB_NTCP2_INIT, State.IB_NTCP2_GOT_X, State.IB_NTCP2_GOT_PADDING,
                    State.IB_NTCP2_SENT_Y, State.IB_NTCP2_GOT_RI, State.IB_NTCP2_READ_RANDOM);
-    private static final Set<State> STATES_MSG3 = EnumSet.of(State.IB_SENT_Y, State.IB_GOT_RI_SIZE, State.IB_GOT_RI);
 
     
     public InboundEstablishState(RouterContext ctx, NTCPTransport transport, NTCPConnection con) {
@@ -123,17 +121,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
      *  @since 0.9.35
      */
     public int getVersion() {
-        if (!_transport.isNTCP2Enabled())
-            return 1;
-        if (!_transport.isNTCP1Enabled())
             return 2;
-        synchronized (_stateLock) {
-            if (_state == State.IB_INIT)
-                return 0;
-            if (STATES_NTCP2.contains(_state))
-                return 2;
-            return 1;
-        } 
     } 
 
     /**
@@ -389,11 +377,6 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                 // This isn't very likely, outbound will do it first
                 // See verifyInbound() above.
                 fail("Clock Skew: " + _peerSkew, null, true);
-                return;
-            }
-            // If NTCP1 disabled, we allow longer padding
-            if (_padlen1 > PADDING1_MAX && _transport.isNTCP1Enabled()) {
-                fail("bad msg 1 padlen: " + _padlen1);
                 return;
             }
             if (_msg3p2len < MSG3P2_MIN || _msg3p2len > MSG3P2_MAX) {

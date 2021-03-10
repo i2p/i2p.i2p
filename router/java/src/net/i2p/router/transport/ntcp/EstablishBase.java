@@ -7,53 +7,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
-import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleByteCache;
 
 /**
- * Inbound NTCP 1 or 2. Outbound NTCP 1 only.
+ * Inbound NTCP 2 only.
  * OutboundNTCP2State does not extend this.
- *
- * NTCP 1 establishement overview:
- *
- * Handle the 4-phase establishment, which is as follows:
- *
- * <pre>
- *
- * Alice                   contacts                      Bob
- * =========================================================
- *
- * Message 1 (Session Request):
- *  X+(H(X) xor Bob.identHash)-----------------------------&gt;
- *
- * Message 2 (Session Created):
- *  &lt;----------------------------------------Y+E(H(X+Y)+tsB, sk, Y[239:255])
- *
- * Message 3 (Session Confirm A):
- *  E(sz+Alice.identity+tsA+padding+S(X+Y+Bob.identHash+tsA+tsB), sk, hX_xor_Bob.identHash[16:31])---&gt;
- *
- * Message 4 (Session Confirm B):
- *  &lt;----------------------E(S(X+Y+Alice.identHash+tsA+tsB)+padding, sk, prev)
- *
- *  Key:
- *
- *    X, Y: 256 byte DH keys
- *    H(): 32 byte SHA256 Hash
- *    E(data, session key, IV): AES256 Encrypt
- *    S(): 40 byte DSA Signature, or length as implied by sig type
- *    tsA, tsB: timestamps (4 bytes, seconds since epoch)
- *    sk: 32 byte Session key
- *    sz: 2 byte size of Alice identity to follow
- *
- * </pre>
- *
- *
- * Alternately, when Bob receives a connection, it could be a
- * check connection (perhaps prompted by Bob asking for someone
- * to verify his listener).  check connections are formatted per
- * isCheckInfo()
- * NOTE: Check info is unused.
  *
  * @since 0.9.35 pulled out of EstablishState
  */
@@ -94,8 +53,6 @@ abstract class EstablishBase implements EstablishState {
     /** bytes received so far */
     protected int _received;
 
-    protected final DHSessionKeyBuilder _dh;
-
     protected final NTCPTransport _transport;
     protected final NTCPConnection _con;
     
@@ -114,28 +71,7 @@ abstract class EstablishBase implements EstablishState {
 
     protected enum State {
         OB_INIT,
-        /** sent 1 */
-        OB_SENT_X,
-        /** sent 1, got 2 partial */
-        OB_GOT_Y,
-        /** sent 1, got 2 */
-        OB_GOT_HXY,
-        /** sent 1, got 2, sent 3 */
-        OB_SENT_RI,
-        /** sent 1, got 2, sent 3, got 4 */
-        OB_GOT_SIG,
-
         IB_INIT,
-        /** got 1 partial */
-        IB_GOT_X,
-        /** got 1 */
-        IB_GOT_HX,
-        /** got 1, sent 2 */
-        IB_SENT_Y,
-        /** got 1, sent 2, got partial 3 */
-        IB_GOT_RI_SIZE,
-        /** got 1, sent 2, got 3 */
-        IB_GOT_RI,
 
         /**
          * Next state IB_NTCP2_GOT_X
@@ -187,7 +123,6 @@ abstract class EstablishBase implements EstablishState {
         _Y = null;
         _hX_xor_bobIdentHash = null;
         _curDecrypted = null;
-        _dh = null;
         _transport = null;
         _con = null;
         _e_hXY_tsB = null;
@@ -198,19 +133,13 @@ abstract class EstablishBase implements EstablishState {
         _log = ctx.logManager().getLog(getClass());
         _transport = transport;
         _con = con;
-        // null if NTCP1 disabled
-        _dh = _transport.getDHBuilder();
         _hX_xor_bobIdentHash = SimpleByteCache.acquire(HXY_SIZE);
         if (_con.isInbound()) {
             _X = SimpleByteCache.acquire(XY_SIZE);
-            _Y = (_dh != null) ?_dh.getMyPublicValueBytes() : null;
+            _Y = null;
         } else {
             // OutboundNTCP2State does not extend this,
-            // can't get here with NTCP1 disabled
-            if (_dh == null)
                 throw new IllegalStateException();
-            _X = _dh.getMyPublicValueBytes();
-            _Y = SimpleByteCache.acquire(XY_SIZE);
         }
 
         _e_hXY_tsB = new byte[HXY_TSB_PAD_SIZE];
@@ -314,8 +243,6 @@ abstract class EstablishBase implements EstablishState {
             SimpleByteCache.release(_prevEncrypted);
         SimpleByteCache.release(_curDecrypted);
         SimpleByteCache.release(_hX_xor_bobIdentHash);
-        if (_dh != null && _dh.getPeerPublicValue() == null)
-            _transport.returnUnused(_dh);
     }
 
     /**

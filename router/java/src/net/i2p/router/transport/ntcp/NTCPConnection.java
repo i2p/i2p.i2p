@@ -18,7 +18,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.zip.Adler32;
 
 import com.southernstorm.noise.protocol.CipherState;
 
@@ -144,8 +143,6 @@ public class NTCPConnection implements Closeable {
     static final int BUFFER_SIZE = 16*1024;
     private static final int MAX_DATA_READ_BUFS = 16;
     private static final ByteCache _dataReadBufs = ByteCache.getInstance(MAX_DATA_READ_BUFS, BUFFER_SIZE);
-    /** 2 bytes for length and 4 for CRC */
-    static final int NTCP1_MAX_MSG_SIZE = BUFFER_SIZE - (2 + 4);
 
     private static final int INFO_PRIORITY = OutNetMessage.PRIORITY_MY_NETDB_STORE_LOW;
     private static final String FIXED_RI_VERSION = "0.9.12";
@@ -620,18 +617,15 @@ public class NTCPConnection implements Closeable {
     static class PrepBuffer {
         final byte unencrypted[];
         int unencryptedLength;
-        final Adler32 crc;
         byte encrypted[];
         
         public PrepBuffer() {
             unencrypted = new byte[BUFFER_SIZE];
-            crc = new Adler32();
         }
 
         public void init() {
             unencryptedLength = 0;
             encrypted = null;
-            crc.reset();
         }
     }
 
