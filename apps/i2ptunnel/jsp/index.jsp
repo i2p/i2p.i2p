@@ -14,6 +14,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
     <link href="<%=indexBean.getTheme()%>i2ptunnel.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css" /> 
+    <script src="js/copy.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 </head><body id="tunnelListPage">
 <div class="panel" id="overview"><h2><%=intl._t("Hidden Services Manager")%></h2><p>
 <%=intl._t("These are the local services provided by your router.")%>
@@ -194,8 +195,7 @@
 	<td class="tunnelPreview" colspan="1">
 <%
             if (("httpserver".equals(indexBean.getInternalType(curServer)) || ("httpbidirserver".equals(indexBean.getInternalType(curServer)))) && indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
-                //String name = indexBean.getSpoofedHost(curServer);
-                if (name != null || !name.equals("")) {
+                if (name != null && !name.equals("") && name.endsWith(".i2p") ) {
 %>
                     <a class="control tunnelPreviewHostname" title="<%=intl._t("Share your site using the hostname")%>" href="http://<%=indexBean.getSpoofedHost(curServer)%>/?i2paddresshelper=<%=indexBean.getDestHashBase32(curServer)%>" target="_top"><%=intl._t("Share Hostname")%></a>
 <%
