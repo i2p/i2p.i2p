@@ -587,6 +587,11 @@ html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbod
      text-align: center;
 }
 
+.control.tunnelPreviewHostname {
+    margin-bottom: 1em !important;
+    margin-top: -1em !important;
+}
+
 .tunnelLocation, .tunnelInterface {
      width: 20%;
 }

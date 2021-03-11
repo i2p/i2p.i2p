@@ -177,7 +177,7 @@
             } // encName
 %>
     <tr>
-        <td class="tunnelDescription" colspan="6">
+        <td class="tunnelDescription" colspan="3">
 <%
             String descr = indexBean.getTunnelDescription(curServer);
             if (descr != null && descr.length() > 0) {
@@ -190,6 +190,24 @@
                 %>&nbsp;<%
             } // descr
 %>
+        </td>
+	<td class="tunnelPreview" colspan="1">
+<%
+            if (("httpserver".equals(indexBean.getInternalType(curServer)) || ("httpbidirserver".equals(indexBean.getInternalType(curServer)))) && indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
+                //String name = indexBean.getSpoofedHost(curServer);
+                if (name != null || !name.equals("")) {
+%>
+                    <a class="control tunnelPreviewHostname" title="<%=intl._t("Share your site using the hostname")%>" href="http://<%=indexBean.getSpoofedHost(curServer)%>/?i2paddresshelper=<%=indexBean.getDestHashBase32(curServer)%>" target="_top"><%=intl._t("Share Hostname")%></a>
+<%
+                }
+            } else {
+                // needed to make the spacing look right
+                %>&nbsp;
+<%
+            }
+%>
+        </td>
+        <td colspan="2">
         </td>
     </tr>
 <%
