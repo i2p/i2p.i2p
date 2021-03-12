@@ -15,6 +15,7 @@
     <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
     <link href="<%=indexBean.getTheme()%>i2ptunnel.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css" /> 
     <script src="js/copy.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
+    <noscript><style> .jsonly { display: none } </style></noscript>
 </head><body id="tunnelListPage">
 <div class="panel" id="overview"><h2><%=intl._t("Hidden Services Manager")%></h2><p>
 <%=intl._t("These are the local services provided by your router.")%>
@@ -178,7 +179,7 @@
             } // encName
 %>
     <tr>
-        <td class="tunnelDescription" colspan="3">
+        <td class="tunnelDescription" colspan="2">
 <%
             String descr = indexBean.getTunnelDescription(curServer);
             if (descr != null && descr.length() > 0) {
@@ -197,7 +198,22 @@
             if (("httpserver".equals(indexBean.getInternalType(curServer)) || ("httpbidirserver".equals(indexBean.getInternalType(curServer)))) && indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
                 if (name != null && !name.equals("") && name.endsWith(".i2p") ) {
 %>
-                    <a class="control tunnelPreviewHostname" title="<%=intl._t("Share your site using the hostname")%>" href="http://<%=indexBean.getSpoofedHost(curServer)%>/?i2paddresshelper=<%=indexBean.getDestHashBase32(curServer)%>" target="_top"><%=intl._t("Share Hostname")%></a>
+                    <textarea  wrap="off" class="tunnelPreviewHostname" title="<%=intl._t("Share your site using the hostname")%>">http://<%=indexBean.getSpoofedHost(curServer)%>/?i2paddresshelper=<%=indexBean.getDestHashBase32(curServer)%></textarea>
+<%
+                }
+            } else {
+                // needed to make the spacing look right
+                %>&nbsp;
+<%
+            }
+%>
+        </td>
+        <td class="tunnelPreview" colspan="1">
+<%
+            if (("httpserver".equals(indexBean.getInternalType(curServer)) || ("httpbidirserver".equals(indexBean.getInternalType(curServer)))) && indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
+                if (name != null && !name.equals("") && name.endsWith(".i2p") ) {
+%>
+                   <button class="jsonly control tunnelHostnameCopy tunnelPreview" title="<%=intl._t("Copy the hostname to the clipboard")%>"><%=intl._t("Copy Hostname")%></button>
 <%
                 }
             } else {
