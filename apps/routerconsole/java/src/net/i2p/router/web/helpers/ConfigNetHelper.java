@@ -349,7 +349,7 @@ public class ConfigNetHelper extends HelperBase {
         StringBuilder buf = new StringBuilder(256);
         buf.append("<select style=\"text-align: right !important;\" name=\"sharePercentage\">\n");
         boolean found = false;
-        for (int i = 100; i >= -5; i -= 5) {
+        for (int i = 90; i >= -5; i -= 5) {
             int val = i;
             if (i == -5) {
                 if (found)
