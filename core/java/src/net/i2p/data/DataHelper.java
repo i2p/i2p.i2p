@@ -2101,7 +2101,7 @@ public class DataHelper {
         Pattern p = patterns.get(regex);
         if (p == null) {
             // catches easy mistake, and also swapping the args by mistake
-            if (regex.length() > 1 && !regex.startsWith("[") && !regex.equals("\r\n")) {
+            if (regex.length() > 1 && !regex.startsWith("[") && !regex.equals("\r\n") && !regex.startsWith("\\")) {
                 //(new Exception("Warning: Split on regex: \"" + regex + "\" should probably be enclosed with []")).printStackTrace();
                 System.out.println("Warning: Split on regex: \"" + regex + "\" should probably be enclosed with []");
             }
