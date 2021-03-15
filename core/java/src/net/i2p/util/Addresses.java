@@ -499,6 +499,10 @@ public abstract class Addresses {
                         rv = getIPv4(host);
                         if (rv == null)
                             return null;
+                    } else if (host.contains(":") && !host.contains("::")) {
+                        rv = getIPv6(host);
+                        if (rv == null)
+                            return null;
                     } else {
                         rv = InetAddress.getByName(host).getAddress();
                     }
@@ -656,6 +660,33 @@ public abstract class Addresses {
                 if (b < 0 || b > 255)
                     return null;
                 rv[i] = (byte) b;
+            }
+        } catch (NumberFormatException nfe) {
+            return null;
+        }
+        return rv;
+    }
+
+    /**
+     *  Because InetAddress.getByName() is slow, esp. on Windows
+     *
+     *  @param host full 0:1:2:3:4:5:6:7 only, no ::
+     *  @return 16 bytes or null
+     *  @since 0.9.50
+     */
+    private static byte[] getIPv6(String host) {
+        String[] s = DataHelper.split(host, ":", 8);
+        if (s.length != 8)
+            return null;
+        byte[] rv = new byte[16];
+        try {
+            int j = 0;
+            for (int i = 0; i < 8; i++) {
+                int b = Integer.parseInt(s[i], 16);
+                if (b < 0 || b > 65535)
+                    return null;
+                rv[j++] = (byte) (b >> 8);
+                rv[j++] = (byte) b;
             }
         } catch (NumberFormatException nfe) {
             return null;
