@@ -478,12 +478,15 @@ public abstract class Addresses {
      *  Unlike InetAddress.getByName(), we do NOT allow numeric IPs
      *  of the form d.d.d, d.d, or d, as these are almost certainly mistakes.
      *
+     *  InetAddress.getByName() also returns 127.0.0.1 for a host "",
+     *  but this is undocumented; as of 0.9.50, here we return null.
+     *
      *  @param host literal IPv4 or IPv6 address; if null returns null
      *  @return IP or null
      *  @since 0.9.32
      */
     public static byte[] getIPOnly(String host) {
-        if (host == null)
+        if (host == null || host.isEmpty())
             return null;
         byte[] rv;
         synchronized (_IPAddress) {
@@ -492,7 +495,13 @@ public abstract class Addresses {
         if (rv == null) {
             if (isIPAddress(host)) {
                 try {
-                    rv = InetAddress.getByName(host).getAddress();
+                    if (host.contains(".")) {
+                        rv = getIPv4(host);
+                        if (rv == null)
+                            return null;
+                    } else {
+                        rv = InetAddress.getByName(host).getAddress();
+                    }
                     synchronized (_IPAddress) {
                         _IPAddress.put(host, rv);
                     }
@@ -510,12 +519,15 @@ public abstract class Addresses {
      *  else the other type if available.
      *  Will resolve but not cache DNS hostnames.
      *
+     *  InetAddress.getByName() also returns 127.0.0.1 for a host "",
+     *  but this is undocumented; as of 0.9.50, here we return null.
+     *
      *  @param host DNS or IPv4 or IPv6 address; if null returns null
      *  @return IP or null
      *  @since 0.9.28
      */
     public static byte[] getIP(String host, boolean preferIPv6) {
-        if (host == null)
+        if (host == null || host.isEmpty())
             return null;
         if (isIPAddress(host))
             return getIP(host);
@@ -563,12 +575,15 @@ public abstract class Addresses {
      *  Number of results may also change based on caching at various layers,
      *  even if the ultimate name server results did not change.
      *
+     *  InetAddress.getByName() also returns 127.0.0.1 for a host "",
+     *  but this is undocumented; as of 0.9.50, here we return null.
+     *
      *  @param host DNS or IPv4 or IPv6 address; if null returns null
      *  @return non-empty list IPs, or null if none
      *  @since 0.9.28
      */
     public static List<byte[]> getIPs(String host) {
-        if (host == null)
+        if (host == null || host.isEmpty())
             return null;
         if (isIPAddress(host)) {
             byte[] brv = getIP(host);
@@ -623,8 +638,30 @@ public abstract class Addresses {
         return InetAddressUtils.isIPv4Address(host) || InetAddressUtils.isIPv6Address(host);
     }
 
-
-
+    /**
+     *  Because InetAddress.getByName() is slow, esp. on Windows
+     *
+     *  @param host w.x.y.z only
+     *  @return 4 bytes or null
+     *  @since 0.9.50
+     */
+    private static byte[] getIPv4(String host) {
+        String[] s = DataHelper.split(host, "\\.", 4);
+        if (s.length != 4)
+            return null;
+        byte[] rv = new byte[4];
+        try {
+            for (int i = 0; i < 4; i++) {
+                int b = Integer.parseInt(s[i]);
+                if (b < 0 || b > 255)
+                    return null;
+                rv[i] = (byte) b;
+            }
+        } catch (NumberFormatException nfe) {
+            return null;
+        }
+        return rv;
+    }
 
     //////// IPv6 Cache Utils ///////
 
