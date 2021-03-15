@@ -3353,9 +3353,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // as rebuildExternalAddress() calls replaceAddress() which calls CSFI.notifyReplaceAddress()
             // which will start up NTCP inbound when we transition to OK.
             if (isIPv6) {
-                if (STATUS_IPV6_FW.contains(status)) {
+                if (STATUS_IPV6_FW_2.contains(status)) {
                     removeExternalAddress(true, true);
-                } else if (STATUS_IPV6_FW.contains(old) &&
+                } else if (STATUS_IPV6_FW_2.contains(old) &&
                            STATUS_IPV6_OK.contains(status) &&
                            _lastOurIPv6 != null &&
                            !explicitAddressSpecified()){
@@ -3367,6 +3367,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 rebuildExternalAddress();
             }
         } else {
+            if (newStatus == Status.UNKNOWN && status != _reachabilityStatusPending) {
+                // still have something pending, try again
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Old status: " + status + " status pending confirmation: " + _reachabilityStatusPending +
+                              " Caused by update: " + newStatus);
+                _testEvent.forceRunSoon(isIPv6);
+            }
             if (_log.shouldLog(Log.INFO))
                 _log.info("Status unchanged: " + _reachabilityStatus +
                           " after update: " + newStatus +

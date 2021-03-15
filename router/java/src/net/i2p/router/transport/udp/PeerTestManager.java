@@ -195,7 +195,6 @@ class PeerTestManager {
         test.setBobPort(bobPort);
         test.setBobCipherKey(bobCipherKey);
         test.setBobMACKey(bobMACKey);
-        test.setLastSendTime(test.getBeginTime());
         _currentTest = test;
         _currentTestComplete = false;
         
@@ -268,6 +267,7 @@ class PeerTestManager {
         if (!expired()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Sending test to Bob: " + test);
+            test.setLastSendTime(_context.clock().now());
             _transport.send(_packetBuilder.buildPeerTestFromAlice(test.getBobIP(), test.getBobPort(),
                                                                   test.getBobCipherKey(), test.getBobMACKey(), //_bobIntroKey, 
                                                                   test.getNonce(), _transport.getIntroKey()));
@@ -282,6 +282,7 @@ class PeerTestManager {
         if (!expired()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Sending test to Charlie: " + test);
+            test.setLastSendTime(_context.clock().now());
             _transport.send(_packetBuilder.buildPeerTestFromAlice(test.getCharlieIP(), test.getCharliePort(),
                                                                   test.getCharlieIntroKey(), 
                                                                   test.getNonce(), _transport.getIntroKey()));
@@ -688,7 +689,6 @@ class PeerTestManager {
             state.setAliceIntroKey(aliceIntroKey);
             state.setBobIP(bobIP);
             state.setBobPort(from.getPort());
-            state.setLastSendTime(now);
             state.setReceiveBobTime(now);
             
             PeerState bob = _transport.getPeerState(from);
@@ -716,6 +716,7 @@ class PeerTestManager {
                 _context.simpleTimer2().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
             }
 
+            state.setLastSendTime(now);
             UDPPacket packet = _packetBuilder.buildPeerTestToBob(bobIP, from.getPort(), aliceIP, alicePort,
                                                                  aliceIntroKey, nonce,
                                                                  state.getBobCipherKey(), state.getBobMACKey());
@@ -810,7 +811,6 @@ class PeerTestManager {
             state.setCharlieIP(charlie.getRemoteIPAddress());
             state.setCharliePort(charlie.getRemotePort());
             state.setCharlieIntroKey(charlieIntroKey);
-            state.setLastSendTime(now);
             state.setReceiveAliceTime(now);
             
             if (state.incrementPacketsRelayed() > MAX_RELAYED_PER_TEST_BOB) {
@@ -824,6 +824,7 @@ class PeerTestManager {
                 _context.simpleTimer2().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
             }
             
+            state.setLastSendTime(now);
             UDPPacket packet = _packetBuilder.buildPeerTestToCharlie(aliceIP, from.getPort(), aliceIntroKey, nonce, 
                                                                      charlie.getRemoteIPAddress(), 
                                                                      charlie.getRemotePort(), 
@@ -862,6 +863,7 @@ class PeerTestManager {
             return;
         }
         state.setReceiveCharlieTime(now);
+        state.setLastSendTime(now);
         
         UDPPacket packet = _packetBuilder.buildPeerTestToAlice(state.getAliceIP(), state.getAlicePort(),
                                                                state.getAliceIntroKey(), state.getCharlieIntroKey(), 
@@ -894,6 +896,7 @@ class PeerTestManager {
             return;
         }
         state.setReceiveAliceTime(now);
+        state.setLastSendTime(now);
 
         try {
             InetAddress aliceIP = InetAddress.getByAddress(from.getIP());
