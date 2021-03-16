@@ -332,7 +332,10 @@ class NetDbRenderer {
                     for (RouterAddress ra : ri.getAddresses()) {
                         if (!"SSU".equals(ra.getTransportStyle()))
                             continue;
-                        if (ssucaps.equals(ra.getOption("caps"))) {
+                        String racaps = ra.getOption("caps");
+                        if (racaps == null)
+                            continue;
+                        if (racaps.contains(ssucaps)) {
                             if (skipped < toSkip) {
                                 skipped++;
                                 break;
