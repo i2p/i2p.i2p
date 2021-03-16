@@ -1,4 +1,24 @@
+2021-03-16 zzz
+ * Console: Fix netdb SSU caps search
+ * Transports: Enable 4/6 caps
+
+2021-03-15 zzz
+ * SSU: Fix IPv6 addresses not being removed on some state transitions
+ * Util: Don't call out to InetAddress for IP parsing
+
+2021-03-13 zzz
+ * Console: Limit share to 90% max
+
+2021-03-11 zzz
+ * NetDB: Queue RI file deletion and delete in a single thread
+ * SSU: Limit port changes
+
+2021-03-09 zzz
+ * Throttle: Don't do exponential calculation unless necessary
+ * Util: Consolidate dup BandwidthEstimator interfaces
+
 2021-03-08 zzz
+ * NTCP: Remove NTCP 1 suppport
  * SSU: Increase CoDel drop threshold at UDPSender queue
 
 2021-03-06 zzz

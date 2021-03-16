@@ -1240,6 +1240,7 @@ public class NTCPTransport extends TransportImpl {
         // only set i if we are not firewalled
         if (props.containsKey("host")) {
             props.setProperty("i", _b64Ntcp2StaticIV);
+            props.remove("caps");
         } else if (_context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS)) {
             String caps;
             TransportUtil.IPv6Config config = getIPv6Config();
