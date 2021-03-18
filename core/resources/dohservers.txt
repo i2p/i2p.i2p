@@ -26,8 +26,7 @@ https://dns.aa.net.uk/dns-query
 #
 https://dnses.alekberg.net/dns-query
 #
-# 400
-#https://dnsnl.alekberg.net/dns-query
+https://dnsnl.alekberg.net/dns-query
 # 400
 #https://dnsse.alekberg.net/dns-query
 # down, see https://www.armadillodns.net/ for status
@@ -52,8 +51,7 @@ https://dns.digitale-gesellschaft.ch/dns-query
 #
 https://dnsforge.de/dns-query
 #
-# not found
-#https://doh.dnslify.com/dns-query
+https://doh.dnslify.com/dns-query
 #
 https://doh.li/dns-query
 #
@@ -72,12 +70,12 @@ https://dns.hostux.net/dns-query
 https://jp.tiar.app/dns-query
 https://jp.tiarap.org/dns-query
 #
-# timeout
-#https://resolver-eu.lelux.fi/dns-query
+https://resolver-eu.lelux.fi/dns-query
 #
 https://doh.libredns.gr/dns-query
 #
-https://fi.doh.dns.snopyta.org/dns-query
+# timeout, no results
+#https://fi.doh.dns.snopyta.org/dns-query
 #
 https://dns.twnic.tw/dns-query
 #
@@ -85,14 +83,15 @@ https://dns.twnic.tw/dns-query
 #https://dns.wugui.zone/dns-query
 #https://dns-asia.wugui.zone/dns-query
 #
-https://dns.dnsoverhttps.net/dns-query
+# cert expired
+#https://dns.dnsoverhttps.net/dns-query
 #
-https://ibksturm.synology.me/dns-query
+# host not found
+#https://ibksturm.synology.me/dns-query
 #
 https://ibuki.cgnat.net/dns-query
 #
-# timeout
-#https://doh-2.seby.io/dns-query
+https://doh-2.seby.io/dns-query
 https://doh.seby.io:8443/dns-query
 #
 #
