@@ -249,11 +249,12 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
      */
     private String query(String host, Type type, String url) {
         List<String> toQuery;
-        if (url != null)
+        if (url != null) {
             toQuery = Collections.singletonList(url);
-        else
+        } else {
             toQuery = new ArrayList<String>((type == Type.V6_ONLY) ? v6urls : v4urls);
-        Collections.shuffle(toQuery);
+            Collections.shuffle(toQuery);
+        }
         final long timeout = System.currentTimeMillis() + OVERALL_TIMEOUT;
         if (type == Type.V4_ONLY || type == Type.V4_PREFERRED) {
             // v4 query
@@ -444,7 +445,7 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
         // We do this more than once, because
         // the first SSL handshake may take a while, and it may take the server
         // a while to render the index page.
-        if (gotDate < MAX_DATE_SETS && "Date".equals(key)) {
+        if (gotDate < MAX_DATE_SETS && "date".equals(key.toLowerCase(Locale.US))) {
             long timeRcvd = System.currentTimeMillis();
             long serverTime = RFC822Date.parse822Date(val);
             if (serverTime > 0) {
