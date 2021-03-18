@@ -64,6 +64,8 @@ https://doh.ffmuc.net/dns-query
 #
 https://dns.hostux.net/dns-query
 #
+https://ordns.he.net/dns-query
+#
 # not found
 #https://jcdns.fun/dns-query
 #
@@ -73,6 +75,10 @@ https://jp.tiarap.org/dns-query
 https://resolver-eu.lelux.fi/dns-query
 #
 https://doh.libredns.gr/dns-query
+#
+https://dns.moulticast.net/dns-query
+#
+https://doh.post-factum.tk/dns-query
 #
 # timeout, no results
 #https://fi.doh.dns.snopyta.org/dns-query
