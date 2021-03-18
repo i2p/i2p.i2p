@@ -766,19 +766,26 @@ public class SSLEepGet extends EepGet {
 
                 String originalHost = host;
                 boolean useDNSOverHTTPS;
-                if (_forceDoH == 2)
-                    useDNSOverHTTPS = true;
-                else if (_forceDoH == 1)
+                if (_forceDoH == 1 || _shouldProxy)
                     useDNSOverHTTPS = false;
+                else if (_forceDoH == 2)
+                    useDNSOverHTTPS = true;
                 else
                     useDNSOverHTTPS = _context.getProperty(PROP_USE_DNS_OVER_HTTPS, DEFAULT_USE_DNS_OVER_HTTPS);
                 // This duplicates checks in DNSOverHTTPS.lookup() but do it here too so
                 // we don't even construct it if we don't need it
+                String ip = null;
                 if (useDNSOverHTTPS && !host.equals("dns.google") && !Addresses.isIPAddress(host)) {
                     DNSOverHTTPS doh = new DNSOverHTTPS(_context, getSSLState());
-                    String ip = doh.lookup(host);
-                    if (ip != null)
-                        host = ip;
+                    ip = doh.lookup(host);
+                    if (ip != null) {
+                        // will be used below
+                        if (_log.shouldDebug())
+                            _log.debug("DoH success: " + host + ' ' + ip);
+                    } else {
+                        if (_log.shouldWarn())
+                            _log.debug("DoH fail: " + host);
+                    }
                 }
 
                 if (_shouldProxy) {
@@ -814,6 +821,20 @@ public class SSLEepGet extends EepGet {
                         _proxy = ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(_proxy, host, port, true);
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug(_proxyType + " proxy headers read completely");
+                } else if (ip != null) {
+                    // DoH, create the socket with the IP, then create the SSL socket with the host
+                    // So that SNI and cert validation works
+                    if (_fetchHeaderTimeout > 0) {
+                        _proxy = new Socket();
+                        _proxy.setSoTimeout(_fetchHeaderTimeout);
+                        _proxy.connect(new InetSocketAddress(ip, port), _fetchHeaderTimeout);
+                     } else {
+                        _proxy = new Socket(ip, port);
+                     }
+                    if (_sslContext != null)
+                        _proxy = _sslContext.getSocketFactory().createSocket(_proxy, host, port, true);
+                    else
+                        _proxy = ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(_proxy, host, port, true);
                 } else {
                     // Warning, createSocket() followed by connect(InetSocketAddress)
                     // disables SNI, at least on Java 7.
