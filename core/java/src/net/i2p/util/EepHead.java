@@ -263,6 +263,14 @@ public class EepHead extends EepGet {
         }
     }
 
+    /**
+     *  Should we read the body of the response?
+     *  @return false always
+     *  @since 0.9.50
+     */
+    @Override
+    protected boolean shouldReadBody() { return false; }
+
     @Override
     protected String getRequest() throws IOException {
         StringBuilder buf = new StringBuilder(512);
