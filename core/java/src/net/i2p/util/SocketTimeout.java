@@ -31,7 +31,7 @@ public class SocketTimeout extends SimpleTimer2.TimedEvent {
     private volatile Runnable _command;
 
     /**
-     *  @param delay greater than zero
+     *  @param delay The inactivity delay, greater than zero
      */
     public SocketTimeout(long delay) { this(null, delay); }
 
@@ -40,7 +40,7 @@ public class SocketTimeout extends SimpleTimer2.TimedEvent {
      *  it will be closed when the timer expires.
      *
      *  @param socket may be null
-     *  @param delay greater than zero
+     *  @param delay The inactivity delay, greater than zero
      */
     public SocketTimeout(Socket socket, long delay) {
         super(SimpleTimer2.getInstance());

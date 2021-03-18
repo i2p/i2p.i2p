@@ -586,12 +586,16 @@ public class SSLEepGet extends EepGet {
         if (_aborted)
             throw new IOException("Timed out reading the HTTP headers");
         
+        // _proxy is the socket, even if not proxied.
+        // We never use the timeout inactivity timer; only socket SoTimeout.
         if (timeout != null) {
-            timeout.resetTimer();
-            if (_fetchInactivityTimeout > 0)
-                timeout.setInactivityTimeout(_fetchInactivityTimeout);
-            else
-                timeout.setInactivityTimeout(60*1000);
+            if (_fetchTotalTimeout > 0) {
+                timeout.resetTimer();
+            } else {
+                // we don't need the timeout any more, we'll use soTimeout
+                timeout.cancel();
+                timeout = null;
+            }
         }        
         if (_fetchInactivityTimeout > 0)
             _proxy.setSoTimeout(_fetchInactivityTimeout);
@@ -823,6 +827,8 @@ public class SSLEepGet extends EepGet {
                         _proxy.setSoTimeout(_fetchHeaderTimeout);
                     }
                 }
+                if (timeout != null)
+                    timeout.setSocket(_proxy);
 
                 SSLSocket socket = (SSLSocket) _proxy;
                 I2PSSLSocketFactory.setProtocolsAndCiphers(socket);

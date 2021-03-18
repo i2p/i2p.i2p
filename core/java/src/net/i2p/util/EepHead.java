@@ -37,7 +37,7 @@ import net.i2p.I2PAppContext;
  */
 public class EepHead extends EepGet {
     /** EepGet needs either a non-null file or a stream... shouldn't actually be written to... */
-    static final OutputStream _dummyStream = new ByteArrayOutputStream(0);
+    private static final OutputStream _dummyStream = new ByteArrayOutputStream(0);
 
     public EepHead(I2PAppContext ctx, String proxyHost, int proxyPort, int numRetries, String url) {
         // we're using this constructor:
@@ -178,7 +178,7 @@ public class EepHead extends EepGet {
             if (_fetchInactivityTimeout > 0)
                 timeout.setInactivityTimeout(_fetchInactivityTimeout);
             else
-                timeout.setInactivityTimeout(60*1000);
+                timeout.setInactivityTimeout(INACTIVITY_TIMEOUT);
         }
         
         // Should we even follow redirects for HEAD?
@@ -239,6 +239,8 @@ public class EepHead extends EepGet {
             doFetch(timeout);
             return;
         }
+        if (timeout != null)
+            timeout.cancel();
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Headers read completely");
@@ -249,8 +251,6 @@ public class EepHead extends EepGet {
         
         if (_aborted)
             throw new IOException("Timed out reading the HTTP data");
-        
-        timeout.cancel();
         
         if (_transferFailed) {
             // 404, etc - transferFailed is called after all attempts fail, by fetch() above
