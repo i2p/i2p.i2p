@@ -2108,6 +2108,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // introducers
                 if (getIPv6Config() == IPV6_ONLY)
                     continue;
+                // TODO support IPv6 introductions
+                String caps = addr.getOption(UDPAddress.PROP_CAPACITY);
+                if (caps != null && caps.contains(CAP_IPV6)   /* && !_haveIPv6Address */  )
+                    continue;
             }
             return addr;
         }
