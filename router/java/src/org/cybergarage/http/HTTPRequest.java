@@ -393,7 +393,7 @@ public class HTTPRequest extends HTTPPacket
 	/**
 	 *  I2P - bind HTTP socket to specified local host address
 	 *
-	 *  @param fromHost null to not bind to a particlar local address
+	 *  @param host null to not bind to a particlar local address
 	 *  @since 0.9.50
 	 */
 	public void setBindHost(String host) { bindTo = host; }
