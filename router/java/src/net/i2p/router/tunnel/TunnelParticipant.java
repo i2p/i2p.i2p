@@ -203,7 +203,6 @@ class TunnelParticipant {
                                                                        TunnelDataMessage.MESSAGE_TYPE, 1024))
             return;
         //_config.incrementSentMessages();
-        _context.bandwidthLimiter().sentParticipatingMessage(1024);
         long oldId = msg.getUniqueId();
         long newId = _context.random().nextLong(I2NPMessage.MAX_ID_VALUE);
         _context.messageHistory().wrap("TunnelDataMessage", oldId, "TunnelDataMessage", newId);

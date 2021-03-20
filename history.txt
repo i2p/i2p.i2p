@@ -1,3 +1,14 @@
+2021-03-20 zzz
+ * Tunnels: Fix RED dropping for part. tunnels (Gitlab MR #24)
+
+2021-03-18 zzz
+ * Util:
+   - DoH: Update server list
+   - EepGet timeout fixes
+   - EepHead: Fix failure if headers specify chunked
+   - SSLEepGet: Specify hostname for SSL socket when using DoH
+   - SSLEepGet: Use DoH by default (reseeding) (ticket #2201)
+
 2021-03-16 zzz
  * Console: Fix netdb SSU caps search
  * Transports: Enable 4/6 caps

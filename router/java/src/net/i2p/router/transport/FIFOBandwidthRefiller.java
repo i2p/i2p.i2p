@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter.Request;
 import net.i2p.util.Log;
 
@@ -22,8 +22,11 @@ import net.i2p.util.Log;
  */
 public class FIFOBandwidthRefiller implements Runnable {
     private final Log _log;
-    private final I2PAppContext _context;
+    private final RouterContext _context;
     private final FIFOBandwidthLimiter _limiter;
+    // This is only changed if the config changes
+    private volatile SyntheticREDQueue _partBWE;
+
     /** how many KBps do we want to allow? */
     private int _inboundKBytesPerSecond;
     /** how many KBps do we want to allow? */
@@ -76,6 +79,9 @@ public class FIFOBandwidthRefiller implements Runnable {
      *  See util/DecayingBloomFilter and tunnel/BloomFilterIVValidator.
      */
     public static final int MAX_OUTBOUND_BANDWIDTH = 16384;
+
+    private static final float MAX_SHARE_PERCENTAGE = 0.90f;
+    private static final float SHARE_LIMIT_FACTOR = 0.95f;
     
     /** 
      * how often we replenish the queues.  
@@ -83,10 +89,11 @@ public class FIFOBandwidthRefiller implements Runnable {
      */
     private static final long REPLENISH_FREQUENCY = 40;
     
-    FIFOBandwidthRefiller(I2PAppContext context, FIFOBandwidthLimiter limiter) {
+    FIFOBandwidthRefiller(RouterContext context, FIFOBandwidthLimiter limiter) {
         _limiter = limiter;
         _context = context;
         _log = context.logManager().getLog(FIFOBandwidthRefiller.class);
+        _context.statManager().createRateStat("bwLimiter.participatingBandwidthQueue", "size in bytes", "BandwidthLimiter", new long[] { 5*60*1000l, 60*60*1000l });
         reinitialize();
         _isRunning = true;
     }
@@ -100,6 +107,7 @@ public class FIFOBandwidthRefiller implements Runnable {
         // bootstrap 'em with nothing
         _lastRefillTime = _limiter.now();
         List<FIFOBandwidthLimiter.Request> buffer = new ArrayList<Request>(2);
+        byte i = 0;
         while (_isRunning) {
             long now = _limiter.now();
             if (now >= _lastCheckConfigTime + _configCheckPeriodMs) {
@@ -107,8 +115,10 @@ public class FIFOBandwidthRefiller implements Runnable {
                 now = _limiter.now();
                 _lastCheckConfigTime = now;
             }
+            // just for the stats
+            if ((++i) == 0)
+                updateParticipating(now);
             
-            updateParticipating(now);
             boolean updated = updateQueues(buffer, now);
             if (updated) {
                 _lastRefillTime = now;
@@ -171,6 +181,16 @@ public class FIFOBandwidthRefiller implements Runnable {
             return false;
         }
     }
+
+    /**
+     *  In Bytes per second
+     */
+    private int getShareBandwidth() {
+        int maxKBps = Math.min(_inboundKBytesPerSecond, _outboundKBytesPerSecond);
+        // limit to 90% so it doesn't clog up at the transport bandwidth limiter
+        float share = Math.min((float) _context.router().getSharePercentage(), MAX_SHARE_PERCENTAGE);
+        return (int) (maxKBps * share * 1024f * SHARE_LIMIT_FACTOR);
+    }
     
     private void checkConfig() {
         updateInboundRate();
@@ -179,7 +199,13 @@ public class FIFOBandwidthRefiller implements Runnable {
         updateOutboundBurstRate();
         updateInboundPeak();
         updateOutboundPeak();
-        
+
+        // if share bandwidth config changed, throw out the SyntheticREDQueue and make a new one
+        int maxBps = getShareBandwidth();
+        if (_partBWE == null || maxBps != _partBWE.getMaxBandwidth()) {
+            _partBWE = new SyntheticREDQueue(_context, maxBps);
+        }
+
         // We are always limited for now
         //_limiter.setInboundUnlimited(_inboundKBytesPerSecond <= 0);
         //_limiter.setOutboundUnlimited(_outboundKBytesPerSecond <= 0);
@@ -300,33 +326,18 @@ public class FIFOBandwidthRefiller implements Runnable {
     int getInboundBurstKBytesPerSecond() { return _inboundBurstKBytesPerSecond; } 
 
     /**
-     *  Participating counter stuff below here
-     *  TOTAL_TIME needs to be high enough to get a burst without dropping
-     *  @since 0.8.12
-     */
-    private static final int TOTAL_TIME = 4000;
-    private static final int PERIODS = TOTAL_TIME / (int) REPLENISH_FREQUENCY;
-    /** count in current replenish period */
-    private final AtomicInteger _currentParticipating = new AtomicInteger();
-    private long _lastPartUpdateTime;
-    private int _lastTotal;
-    /** the actual length of last total period as coalesced (nominally TOTAL_TIME) */
-    private long _lastTotalTime;
-    private int _lastIndex;
-    /** buffer of count per replenish period, last is at _lastIndex, older at higher indexes (wraps) */
-    private final int[] _counts = new int[PERIODS];
-    /** the actual length of the period (nominally REPLENISH_FREQUENCY) */
-    private final long[] _times = new long[PERIODS];
-    private final ReentrantReadWriteLock _updateLock = new ReentrantReadWriteLock(false);
-
-    /**
-     *  We sent a message.
+     *  We intend to send traffic for a participating tunnel
+     *  with the given size and adjustment factor.
+     *  Returns true if the message can be sent within the current
+     *  share bandwidth limits, or false if it should be dropped.
      *
      *  @param size bytes
+     *  @param factor multiplier of size for the drop calculation, 1 for no adjustment
+     *  @return true for accepted, false for drop
      *  @since 0.8.12
      */
-    void incrementParticipatingMessageBytes(int size) {
-        _currentParticipating.addAndGet(size);
+    boolean incrementParticipatingMessageBytes(int size, float factor) {
+        return _partBWE.offer(size, factor);
     }
 
     /**
@@ -336,24 +347,7 @@ public class FIFOBandwidthRefiller implements Runnable {
      *  @since 0.8.12
      */
     int getCurrentParticipatingBandwidth() {
-        _updateLock.readLock().lock();
-        try {
-            return locked_getCurrentParticipatingBandwidth();
-        } finally {
-            _updateLock.readLock().unlock();
-        }
-    }
-
-    private int locked_getCurrentParticipatingBandwidth() {
-        int current = _currentParticipating.get();
-        long totalTime = (_limiter.now() - _lastPartUpdateTime) + _lastTotalTime;
-        if (totalTime <= 0)
-            return 0;
-        // 1000 for ms->seconds in denominator
-        long bw = 1000l * (current + _lastTotal) / totalTime;
-        if (bw > Integer.MAX_VALUE)
-            return 0;
-        return (int) bw;
+        return (int) (_partBWE.getBandwidthEstimate() * 1000f);
     }
 
     /**
@@ -362,42 +356,7 @@ public class FIFOBandwidthRefiller implements Runnable {
      *  @since 0.8.12
      */
     private void updateParticipating(long now) {
-        _updateLock.writeLock().lock();
-        try {
-            locked_updateParticipating(now);
-        } finally {
-            _updateLock.writeLock().unlock();
-        }
-    }
-
-    private void locked_updateParticipating(long now) {
-        long elapsed = now - _lastPartUpdateTime;
-        if (elapsed <= 0) {
-            // glitch in the matrix
-            _lastPartUpdateTime = now;
-            return;
-        }
-        _lastPartUpdateTime = now;
-        if (--_lastIndex < 0)
-            _lastIndex = PERIODS - 1;
-        _counts[_lastIndex] = _currentParticipating.getAndSet(0);
-        _times[_lastIndex] = elapsed;
-        _lastTotal = 0;
-        _lastTotalTime = 0;
-        // add up total counts and times
-        for (int i = 0; i < PERIODS; i++) {
-            int idx = (_lastIndex + i) % PERIODS;
-             _lastTotal += _counts[idx];
-             _lastTotalTime += _times[idx];
-             if (_lastTotalTime >= TOTAL_TIME)
-                 break;
-        }
-        if (_lastIndex == 0 && _lastTotalTime > 0) {
-            long bw = 1000l * _lastTotal / _lastTotalTime;
-            _context.statManager().addRateData("tunnel.participatingBandwidthOut", bw);
-            if (_lastTotal > 0 && _log.shouldLog(Log.INFO))
-                _log.info(DataHelper.formatSize(_lastTotal) + " bytes out part. tunnels in last " + _lastTotalTime + " ms: " +
-                          DataHelper.formatSize(bw) + " Bps");
-        }
+            _context.statManager().addRateData("tunnel.participatingBandwidthOut", getCurrentParticipatingBandwidth());
+            _context.statManager().addRateData("bwLimiter.participatingBandwidthQueue", (long) _partBWE.getQueueSizeEstimate());
     }
 }

@@ -767,84 +767,30 @@ public class TunnelDispatcher implements Service {
     public boolean shouldDropParticipatingMessage(Location loc, int type, int length) {
         if (length <= 0)
             return false;
-     /****
-        Don't use the tunnel.participatingBandwidth stat any more. It could be up to 3 minutes old.
-        Also, it counts inbound bandwidth, i.e. before dropping, which resulted in too many drops
-        during a burst.
-        We now use the bandwidth limiter to track outbound participating bandwidth
-        over the last few seconds.
-     ****/
 
-     /****
-        RateStat rs = _context.statManager().getRate("tunnel.participatingBandwidth");
-        if (rs == null)
-            return false;
-        Rate r = rs.getRate(60*1000);
-        if (r == null)
-            return false;
-        // weight current period higher
-        long count = r.getLastEventCount() + (3 * r.getCurrentEventCount());
-        int bw = 0;
-        if (count > 0)
-            bw = (int) ((r.getLastTotalValue() + (3 * r.getCurrentTotalValue())) / count);
-        else
-            bw = (int) r.getLifetimeAverageValue();
-
-        int usedIn = Math.min(_context.router().get1sRateIn(), _context.router().get15sRateIn());
-        if (bw < usedIn)
-            usedIn = bw;
-        if (usedIn <= 0)
-            return false;
-        int usedOut = Math.min(_context.router().get1sRate(true), _context.router().get15sRate(true));
-        if (bw < usedOut)
-            usedOut = bw;
-        if (usedOut <= 0)
-            return false;
-        int used = Math.min(usedIn, usedOut);
-     ****/
-        int used = _context.bandwidthLimiter().getCurrentParticipatingBandwidth();
-        if (used <= 0)
-            return false;
-
-        int maxKBps = Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
-                               _context.bandwidthLimiter().getOutboundKBytesPerSecond());
-        float share = (float) _context.router().getSharePercentage();
-
-        // start dropping at 120% of the limit,
-        // as we rely on Throttle for long-term bandwidth control by rejecting tunnels
-        float maxBps = maxKBps * share * (1024f * 1.20f);
-        float pctDrop = (used - maxBps) / used;
-        if (pctDrop <= 0)
-            return false;
         // increase the drop probability for OBEP,
         // (except lower it for tunnel build messages type 21/22/23/24),
         // and lower it for IBGW, for network efficiency
-        double len = length;
+        float factor;
         if (loc == Location.OBEP) {
             // we don't need to check for VTBRM/TBRM as that happens at tunnel creation
             if (type == VariableTunnelBuildMessage.MESSAGE_TYPE || type == TunnelBuildMessage.MESSAGE_TYPE)
-                len /= 1.5;
+                factor = 1 / 1.5f;
             else
-                len *= 1.5;
+                factor = 1.5f;
         } else if (loc == Location.IBGW) {
             // we don't need to check for VTBM/TBM as that happens at tunnel creation
             if (type == VariableTunnelBuildReplyMessage.MESSAGE_TYPE || type == TunnelBuildReplyMessage.MESSAGE_TYPE)
-                len /= 1.5 * 1.5 * 1.5;
+                factor = 1 / (1.5f * 1.5f * 1.5f);
             else
-                len /= 1.5;
+                factor = 1 / 1.5f;
+        } else {
+            factor = 1.0f;
         }
-        // drop in proportion to size w.r.t. a standard 1024-byte message
-        // this is a little expensive but we want to adjust the curve between 0 and 1
-        // Most messages are 1024, only at the OBEP do we see other sizes
-        if ((int)len != 1024)
-            pctDrop = (float) Math.pow(pctDrop, 1024d / len);
-        float rand = _context.random().nextFloat();
-        boolean reject = rand <= pctDrop;
+        boolean reject = ! _context.bandwidthLimiter().sentParticipatingMessage(length, factor);
         if (reject) {
             if (_log.shouldLog(Log.WARN)) {
-                int availBps = (int) (((maxKBps*1024)*share) - used);
-                _log.warn("Drop part. msg. avail/max/used " + availBps + "/" + (int) maxBps + "/" 
-                          + used + " %Drop = " + pctDrop
+                _log.warn("Drop part. msg. factor=" + factor
                           + ' ' + loc + ' ' + type + ' ' + length);
             }
             _context.statManager().addRateData("tunnel.participatingMessageDropped", 1);

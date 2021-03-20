@@ -79,8 +79,6 @@ class OutboundTunnelEndpoint {
             //int kb = (size + 1023) / 1024;
             //for (int i = 0; i < kb; i++)
             //    _config.incrementSentMessages();
-            if (!toUs)
-                _context.bandwidthLimiter().sentParticipatingMessage(size);
             _outDistributor.distribute(msg, toRouter, toTunnel);
         }
     }

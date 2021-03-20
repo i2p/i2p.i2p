@@ -52,7 +52,6 @@ class InboundGatewayReceiver implements TunnelGateway.Receiver {
         //if (_context.tunnelDispatcher().shouldDropParticipatingMessage("IBGW", encrypted.length))
         //    return -1;
         //_config.incrementSentMessages();
-        _context.bandwidthLimiter().sentParticipatingMessage(1024);
         TunnelDataMessage msg = new TunnelDataMessage(_context);
         msg.setData(encrypted);
         msg.setTunnelId(_config.getSendTunnel());

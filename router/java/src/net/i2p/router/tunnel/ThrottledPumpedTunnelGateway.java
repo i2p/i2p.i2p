@@ -34,7 +34,15 @@ class ThrottledPumpedTunnelGateway extends PumpedTunnelGateway {
         // Hard to do this exactly, but we'll assume 2:1 batching
         // for the purpose of estimating outgoing size.
         // We assume that it's the outbound bandwidth that is the issue...
-        int size = Math.max(msg.getMessageSize(), 1024/2);
+        // first frag. overhead
+        int size = msg.getMessageSize() + 60;
+        if (size > 1024) {
+            // additional frag. overhead
+            size += 28 * (size / 1024);
+        } else if (size < 512) {
+            // 2:1 batching of small messages
+            size = 512;
+        }
         if (_context.tunnelDispatcher().shouldDropParticipatingMessage(TunnelDispatcher.Location.IBGW, msg.getType(), size)) {
             // this overstates the stat somewhat, but ok for now
             int kb = (size + 1023) / 1024;

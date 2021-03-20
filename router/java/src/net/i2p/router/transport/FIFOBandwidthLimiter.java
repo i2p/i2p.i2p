@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import net.i2p.I2PAppContext;
+import net.i2p.router.RouterContext;
 import net.i2p.router.util.PQEntry;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -33,7 +33,7 @@ import net.i2p.util.Log;
  */
 public class FIFOBandwidthLimiter {
     private final Log _log;
-    private final I2PAppContext _context;
+    private final RouterContext _context;
     private final List<SimpleRequest> _pendingInboundRequests;
     private final List<SimpleRequest> _pendingOutboundRequests;
     /** how many bytes we can consume for inbound transmission immediately */
@@ -84,7 +84,7 @@ public class FIFOBandwidthLimiter {
         return System.currentTimeMillis(); 
     }
     
-    public FIFOBandwidthLimiter(I2PAppContext context) {
+    public FIFOBandwidthLimiter(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(FIFOBandwidthLimiter.class);
         _context.statManager().createRateStat("bwLimiter.pendingOutboundRequests", "How many outbound requests are ahead of the current one (ignoring ones with 0)?", "BandwidthLimiter", new long[] { 5*60*1000l, 60*60*1000l });
@@ -187,13 +187,18 @@ public class FIFOBandwidthLimiter {
     }
     
     /**
-     *  We sent a message.
+     *  We intend to send traffic for a participating tunnel
+     *  with the given size and adjustment factor.
+     *  Returns true if the message can be sent within the current
+     *  share bandwidth limits, or false if it should be dropped.
      *
      *  @param size bytes
+     *  @param factor multiplier of size for the drop calculation, 1 for no adjustment
+     *  @return true for accepted, false for drop
      *  @since 0.8.12
      */
-    public void sentParticipatingMessage(int size) {
-        _refiller.incrementParticipatingMessageBytes(size);
+    public boolean sentParticipatingMessage(int size, float factor) {
+        return _refiller.incrementParticipatingMessageBytes(size, factor);
     }
 
     /**
