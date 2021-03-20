@@ -328,6 +328,15 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             // force type 3
             props.setProperty("i2cp.leaseSetType", "3");
         }
+        // Ensure we have the nickname properties set
+        String name = props.getProperty("inbound.nickname");
+        if (name == null || name.trim().isEmpty()) {
+            name = dest.toBase32();
+            props.setProperty("inbound.nickname", name);
+        }
+        String name2 = props.getProperty("outbound.nickname");
+        if (name2 == null || name2.trim().isEmpty())
+            props.setProperty("outbound.nickname", name);
         cfg.setOptions(props);
         // this sets the session id
         int status = _runner.sessionEstablished(cfg);
