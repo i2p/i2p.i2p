@@ -205,7 +205,7 @@ public class AddressBean
 
 	/** @since 0.9.26 */
 	public boolean isValidated() {
-		return Boolean.valueOf(getProp("v"));
+		return Boolean.parseBoolean(getProp("v"));
 	}
 
 	/** @since 0.8.7 */

@@ -441,7 +441,7 @@ class PluginUpdateRunner extends UpdateRunner {
             boolean wasRunning = false;
             File destDir = new SecureDirectory(appDir, appName);
             if (destDir.exists()) {
-                if (Boolean.valueOf(props.getProperty("install-only")).booleanValue()) {
+                if (Boolean.parseBoolean(props.getProperty("install-only"))) {
                     to.delete();
                     statusDone("<b>" + _t("Downloaded plugin is for new installs only, but the plugin is already installed", url) + "</b>");
                     return;
@@ -517,7 +517,7 @@ class PluginUpdateRunner extends UpdateRunner {
                     return;
                 }
                 // do we defer extraction and installation?
-                if (Boolean.valueOf(props.getProperty("router-restart-required")).booleanValue()) {
+                if (Boolean.parseBoolean(props.getProperty("router-restart-required"))) {
                     // Yup!
                     try {
                         if(!FileUtil.copy(to, (new SecureFile( new SecureFile(appDir.getCanonicalPath() +"/" + appName +"/"+ ZIP).getCanonicalPath())) , true, true)) {
@@ -548,7 +548,7 @@ class PluginUpdateRunner extends UpdateRunner {
                 }
                 update = true;
             } else {
-                if (Boolean.valueOf(props.getProperty("update-only")).booleanValue()) {
+                if (Boolean.parseBoolean(props.getProperty("update-only"))) {
                     to.delete();
                     statusDone("<b>" + _t("Plugin is for upgrades only, but the plugin is not installed") + ". " + appName + ' ' + version + "</b>");
                     return;
@@ -569,7 +569,7 @@ class PluginUpdateRunner extends UpdateRunner {
             _updated = true;
             to.delete();
             // install != update. Changing the user's settings like this is probabbly a bad idea.
-            if (Boolean.valueOf( props.getProperty("dont-start-at-install")).booleanValue()) {
+            if (Boolean.parseBoolean( props.getProperty("dont-start-at-install"))) {
                 statusDone("<b>" + _t("Plugin {0} installed", appName + ' ' + version) + "</b>");
                 if(!update) {
                     Properties pluginProps = PluginStarter.pluginProperties();

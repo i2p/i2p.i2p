@@ -106,7 +106,7 @@ public class HostCheckHandler extends GzipHandler
             int httpsPort = _portMapper.getPort(PortMapper.SVC_HTTPS_CONSOLE);
             if (httpsPort > 0 && httpRequest.getLocalPort() != httpsPort) {
                 String redir = _context.getProperty(PROP_REDIRECT);
-                if (Boolean.valueOf(redir) ||
+                if (Boolean.parseBoolean(redir) ||
                     (redir == null && "1".equals(httpRequest.getHeader("Upgrade-Insecure-Requests")))) {
                     sendRedirect(httpsPort, httpRequest, httpResponse);
                     baseRequest.setHandled(true);

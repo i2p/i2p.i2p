@@ -991,7 +991,7 @@ public abstract class Addresses {
      */
     private static String getPrivacyStatus() {
         String rv = useIPv6TempAddresses();
-        if (Boolean.valueOf(rv)) {
+        if (Boolean.parseBoolean(rv)) {
             long pref = getLong("/proc/sys/net/ipv6/conf/all/temp_prefered_lft");
             if (pref > 0)
                 rv += ", preferred lifetime " + DataHelper.formatDuration(pref * 1000);

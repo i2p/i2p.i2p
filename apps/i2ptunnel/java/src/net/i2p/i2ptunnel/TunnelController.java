@@ -868,7 +868,7 @@ public class TunnelController implements Logging {
             }
             if (type.equals(TYPE_HTTP_SERVER) || type.equals(TYPE_STREAMR_SERVER)) {
                 String tgzip = _config.getProperty(PROP_TUN_GZIP);
-                if (tgzip == null || Boolean.valueOf(tgzip)) {
+                if (tgzip == null || Boolean.parseBoolean(tgzip)) {
                     // Web server will gzip
                     // If web server doesn't gzip, I2PTunnelHTTPServer will.
                     // Streaming will force gzip on first packet for header compression,
@@ -933,7 +933,7 @@ public class TunnelController implements Logging {
                 }
             }
             if (isClient(type) &&
-                (type.equals(TYPE_HTTP_CLIENT) || Boolean.valueOf(_config.getProperty(PROP_SHARED, "false")))) {
+                (type.equals(TYPE_HTTP_CLIENT) || Boolean.parseBoolean(_config.getProperty(PROP_SHARED)))) {
                 // migration: HTTP proxy and shared clients default to both
                 if (!_config.containsKey(OPT_ENCTYPE))
                     _config.setProperty(OPT_ENCTYPE, "4,0");

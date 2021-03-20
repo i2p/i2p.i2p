@@ -389,7 +389,7 @@ public class ConfigServiceHandler extends FormHandler {
                     }
                 } else if (enable) {
                     // already set to true, GraphicsEnvironment initialized, can't change it now
-                    if (Boolean.valueOf(System.getProperty("java.awt.headless"))) {
+                    if (Boolean.parseBoolean(System.getProperty("java.awt.headless"))) {
                         addFormError(_t("Restart required to take effect"));
                     } else {
                         dtg = new net.i2p.desktopgui.Main(_context, mgr, null);    

@@ -42,10 +42,10 @@ public class JspC {
     private static final String THREADS_VERSION_8 = "8.5.33";
     private static final String THREADS_VERSION_9 = "9.0.11";
     // if true, try to make web.xml reproducible
-    private static final boolean REPRODUCIBLE = Boolean.valueOf(System.getProperty("build.reproducible"));
+    private static final boolean REPRODUCIBLE = Boolean.parseBoolean(System.getProperty("build.reproducible"));
     // if true, we must get the Tomcat version out of the jasper jar's manifest
-    private static final boolean SYSTEM_TOMCAT = Boolean.valueOf(System.getProperty("with-libtomcat8-java")) ||
-                                                 Boolean.valueOf(System.getProperty("with-libtomcat9-java"));
+    private static final boolean SYSTEM_TOMCAT = Boolean.parseBoolean(System.getProperty("with-libtomcat8-java")) ||
+                                                 Boolean.parseBoolean(System.getProperty("with-libtomcat9-java"));
     // path to the jasper jar
     private static final String JASPER_JAR = System.getProperty("jasper.jar");
 

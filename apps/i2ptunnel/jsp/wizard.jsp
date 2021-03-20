@@ -29,7 +29,7 @@
      curPage = 1;
    }
    /* Fetch and format a couple of regularly-used values */
-   boolean tunnelIsClient = Boolean.valueOf(request.getParameter("isClient"));
+   boolean tunnelIsClient = Boolean.parseBoolean(request.getParameter("isClient"));
    String tunnelType = request.getParameter("type");
    tunnelType = net.i2p.data.DataHelper.stripHTML(tunnelType);
    /* Special case - don't display page 4 for server tunnels */

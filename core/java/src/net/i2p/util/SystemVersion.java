@@ -44,7 +44,7 @@ public abstract class SystemVersion {
     private static final boolean _hasWrapper = System.getProperty("wrapper.version") != null;
     private static final boolean _isLinuxService;
     // found in Tanuki WrapperManager source so we don't need the WrapperManager class here
-    private static final boolean _isWindowsService = _isWin && _hasWrapper && Boolean.valueOf(System.getProperty("wrapper.service"));
+    private static final boolean _isWindowsService = _isWin && _hasWrapper && Boolean.parseBoolean(System.getProperty("wrapper.service"));
     private static final boolean _isService;
     private static final boolean _isSlow;
 

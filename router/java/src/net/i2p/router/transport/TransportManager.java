@@ -143,7 +143,7 @@ public class TransportManager implements TransportEventListener {
             System.out.println(msg);
             _log.logAlways(Log.WARN, msg);
             rv = true;
-        } else if (!SystemVersion.isMac() && Boolean.valueOf(System.getProperty(PROP_JAVA_PROXY2))) {
+        } else if (!SystemVersion.isMac() && Boolean.parseBoolean(System.getProperty(PROP_JAVA_PROXY2))) {
             try {
                 // Use ProxySelector to see if we would be proxied
                 // using a dummy address.
@@ -313,7 +313,7 @@ public class TransportManager implements TransportEventListener {
         Set<String> ipset = Addresses.getAddresses(_context.getBooleanProperty("i2np.allowLocal"), false, true);
         String lastv4 = _context.getProperty(UDPTransport.PROP_IP);
         String lastv6 = _context.getProperty(UDPTransport.PROP_IPV6);
-        boolean preferTemp = Boolean.valueOf(Addresses.useIPv6TempAddresses());
+        boolean preferTemp = Boolean.parseBoolean(Addresses.useIPv6TempAddresses());
         //
         // Avoid IPv6 temporary addresses if we have a non-temporary one,
         // unless the kernel prefers them
