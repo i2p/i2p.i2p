@@ -261,10 +261,14 @@ abstract class SAMMessageSession implements SAMMessageSess {
                 _log.debug("Instantiating new SAM message-based session handler");
 
             I2PClient client = I2PClientFactory.createClient();
-            if (!props.containsKey("inbound.nickname") && !props.containsKey("outbound.nickname")) {
-                props.setProperty("inbound.nickname", "SAM UDP Client");
-                props.setProperty("outbound.nickname", "SAM UDP Client");
+            String name = props.getProperty("inbound.nickname");
+            if (name == null || name.trim().isEmpty()) {
+                name = "SAM UDP Client";
+                props.setProperty("inbound.nickname", name);
             }
+            String name2 = props.getProperty("outbound.nickname");
+            if (name2 == null || name2.trim().isEmpty())
+                props.setProperty("outbound.nickname", name);
             _session = client.createSession(destStream, props);
 
             if (_log.shouldLog(Log.DEBUG))
