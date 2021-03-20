@@ -25,6 +25,7 @@
 <table id="enviro"><tbody>
 <tr><td><!-- fix for first row not being selected --></td></tr>
 <tr><td><b>I2P version:</b></td><td><%=net.i2p.router.RouterVersion.FULL_VERSION%></td></tr>
+<tr><td><b>API version:</b></td><td><%=net.i2p.CoreVersion.PUBLISHED_VERSION%></td></tr>
 <tr><td><b>Java version:</b></td><td><%=System.getProperty("java.vendor")%> <%=System.getProperty("java.version")%> (<%=System.getProperty("java.runtime.name")%> <%=System.getProperty("java.runtime.version")%>)</td></tr>
  <jsp:useBean class="net.i2p.router.web.helpers.LogsHelper" id="logsHelper" scope="request" />
  <jsp:setProperty name="logsHelper" property="contextId" value="<%=i2pcontextId%>" />
