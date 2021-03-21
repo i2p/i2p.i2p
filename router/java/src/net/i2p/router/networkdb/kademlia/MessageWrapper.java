@@ -132,9 +132,9 @@ public class MessageWrapper {
      *
      *  @param to must be ELGAMAL_2048 or ECIES_X25519 EncType
      *  @return null on encrypt failure
-     *  @since 0.9.5
+     *  @since 0.9.5, public since 0.9.50 for BuildRequestor
      */
-    static GarlicMessage wrap(RouterContext ctx, I2NPMessage m, RouterInfo to) {
+    public static GarlicMessage wrap(RouterContext ctx, I2NPMessage m, RouterInfo to) {
 
         PayloadGarlicConfig payload = new PayloadGarlicConfig(Certificate.NULL_CERT,
                                                               ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE),
