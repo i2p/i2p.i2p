@@ -83,21 +83,19 @@ class OutboundMessageDistributor {
         if (_toRouters == null)
             return false;
         synchronized(this) {
-            if (_toRouters.contains(target))
+            if (!_toRouters.add(target) || _context.commSystem().isEstablished(target) || ++_newRouterCount <= MAX_ROUTERS_PER_PERIOD)
                 return false;
-            // haven't sent to this router before
             long now = _context.clock().now();
             if (_newRouterTime < now - NEW_ROUTER_PERIOD) {
-                _newRouterCount = 0;
+                // latest guy is outside previous period
+                _newRouterCount = 1;
                 _newRouterTime = now;
-            } else if (_newRouterCount >= MAX_ROUTERS_PER_PERIOD) {
-                if (!_context.commSystem().isEstablished(target))
-                    return true;  //drop
+                return false;
             }
-            _newRouterCount++;
-            _toRouters.add(target);
+            // rarely get here at current limits
+            _toRouters.remove(target);
         }
-        return false;
+        return true;
     }
 
     private void distribute(I2NPMessage msg, RouterInfo target, TunnelId tunnel) {
