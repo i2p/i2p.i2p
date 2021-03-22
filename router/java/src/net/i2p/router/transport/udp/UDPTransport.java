@@ -710,7 +710,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public synchronized void shutdown() {
         if (_haveIPv6Address) {
             boolean fwOld = _context.getBooleanProperty(PROP_IPV6_FIREWALLED);
-            boolean fwNew = STATUS_IPV6_FW.contains(_reachabilityStatus);
+            boolean fwNew = STATUS_IPV6_FW_2.contains(_reachabilityStatus);
             if (fwOld != fwNew)
                 _context.router().saveConfig(PROP_IPV6_FIREWALLED, Boolean.toString(fwNew));
         }
