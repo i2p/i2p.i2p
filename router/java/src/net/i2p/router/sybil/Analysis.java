@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -16,6 +17,7 @@ import java.util.Set;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.ClientAppState;
 import static net.i2p.app.ClientAppState.*;
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -24,6 +26,7 @@ import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.router.RouterKeyGenerator;
 import net.i2p.router.Banlist;
+import net.i2p.router.Blocklist;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
@@ -129,6 +132,38 @@ public class Analysis extends JobImpl implements RouterApp {
 
     public PersistSybil getPersister() { return _persister; }
 
+    /**
+     *  Load the persisted blocklist and tell the router
+     *
+     *  @since 0.9.50
+     */
+    private class InitJob extends JobImpl {
+        public InitJob() { super(_context); }
+
+        public String getName() { return "Load Sybil Blocklist"; }
+
+        public void runJob() {
+            Map<String, Long> map = _persister.readBlocklist();
+            if (map == null || map.isEmpty())
+                return;
+            Blocklist bl = _context.blocklist();
+            Banlist ban = _context.banlist();
+            for (Map.Entry<String, Long> e : map.entrySet()) {
+                String s = e.getKey();
+                if (s.contains(".") || s.contains(":")) {
+                    bl.add(s);
+                } else {
+                    byte[] b = Base64.decode(s);
+                    if (b != null && b.length == Hash.HASH_LENGTH) {
+                        Hash h = Hash.create(b);
+                        long until = e.getValue().longValue();
+                        ban.banlistRouter(h, "Sybil analysis", null, null, until);
+                    }
+                }
+            }
+        }
+    }
+
     /////// begin Job methods
 
     public void runJob() {
@@ -159,6 +194,10 @@ public class Analysis extends JobImpl implements RouterApp {
         changeState(RUNNING);
         _cmgr.register(this);
         _persister.removeOld();
+        InitJob init = new InitJob();
+        long start = _context.clock().now() + 5*1000;
+        init.getTiming().setStartAfter(start);
+        _context.jobQueue().addJob(init);
         schedule();
     }
 
@@ -395,16 +434,21 @@ public class Analysis extends JobImpl implements RouterApp {
                 threshold = MIN_BLOCK_POINTS;
         } catch (NumberFormatException nfe) {}
         String day = DataHelper.formatTime(now);
+        Set<String> blocks = new HashSet<String>();
         for (Map.Entry<Hash, Points> e : points.entrySet()) {
             double p = e.getValue().getPoints();
             if (p >= threshold) {
                 Hash h = e.getKey();
+                blocks.add(h.toBase64());
                 RouterInfo ri = _context.netDb().lookupRouterInfoLocally(h);
                 if (ri != null) {
                     for (RouterAddress ra : ri.getAddresses()) {
                         byte[] ip = ra.getIP();
                         if (ip != null)
-                             _context.blocklist().add(ip);
+                            _context.blocklist().add(ip);
+                        String host = ra.getHost();
+                        if (host != null)
+                            blocks.add(host);
                     }
                 }
                 String reason = "Sybil analysis " + day + " with " + fmt.format(p) + " threat points";
@@ -417,6 +461,8 @@ public class Analysis extends JobImpl implements RouterApp {
                 _context.banlist().banlistRouter(h, reason, null, null, blockUntil);
             }
         }
+        if (!blocks.isEmpty())
+            _persister.storeBlocklist(blocks, blockUntil);
     }
 
     /**

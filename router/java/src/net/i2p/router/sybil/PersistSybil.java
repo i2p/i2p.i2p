@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -41,9 +42,11 @@ public class PersistSybil {
     private final I2PAppContext _context;
     private final Log _log;
 
-    private static final String DIR = "sybil-analysis/results";
+    private static final String SDIR = "sybil-analysis";
+    private static final String DIR = SDIR + "/results";
     private static final String PFX = "sybil-";
     private static final String SFX = ".txt.gz";
+    private static final String BLOCKLIST_SYBIL_FILE = "blocklist-sybil.txt";
 
     /** access via Analysis.getPersister() */
     PersistSybil(I2PAppContext ctx) {
@@ -227,6 +230,101 @@ public class PersistSybil {
         File dir = new File(_context.getConfigDir(), DIR);
         File file = new File(dir, PFX + date + SFX);
         return file.delete();
+    }
+
+    /**
+     *  Read the blocklist
+     *
+     *  @return map of ip or hash to expiration (ms), or null on failure
+     *  @since 0.9.50
+     */
+    Map<String, Long> readBlocklist() {
+        File f = new File(_context.getConfigDir(), SDIR);
+        f = new File(f, BLOCKLIST_SYBIL_FILE);
+        return readBlocklist(f);
+    }
+
+    /**
+     *  Read the blocklist
+     *
+     *  @return map of ip or hash to expiration (ms), or null on failure
+     *  @since 0.9.50
+     */
+    private synchronized Map<String, Long> readBlocklist(File blFile) {
+        Map<String, Long> rv = null;
+        if (blFile.exists()) {
+            BufferedReader br = null;
+            try {
+                br = new BufferedReader(new InputStreamReader(
+                        new FileInputStream(blFile), "UTF-8"));
+                rv = new HashMap<String, Long>();
+                String buf = null;
+                long now = _context.clock().now() + 5*60*1000L;
+                while ((buf = br.readLine()) != null) {
+                    int index = buf.indexOf('#');
+                    if (index == 0)
+                        continue;
+                    String[] ss = DataHelper.split(buf, ",", 2);
+                    if (ss.length != 2)
+                        continue;
+                    try {
+                        long exp = Long.parseLong(ss[1]);
+                        if (exp < now)
+                            continue;
+                        rv.put(ss[0], Long.valueOf(exp));
+                    } catch (NumberFormatException nfe) {}
+                }
+            } catch (IOException ioe) {
+                if (_log.shouldWarn())
+                    _log.warn("Error reading the blocklist file", ioe);
+            } finally {
+                if (br != null) try { br.close(); } catch (IOException ioe) {}
+            }
+        }
+        return rv;
+    }
+
+    /**
+     *  Write the blocklist.
+     *  The format is different than other blocklists because we include an expiration.
+     *  Format: One per line: ip or hash,expiration time (ms)
+     *
+     *  @param blocks non-empty, will be merged with existing entries
+     *  @since 0.9.50
+     */
+    synchronized void storeBlocklist(Set<String> blocks, long blockUntil) {
+        File dir = new SecureDirectory(_context.getConfigDir(), SDIR);
+        if (!dir.exists())
+            dir.mkdirs();
+        File blFile = new File(dir, BLOCKLIST_SYBIL_FILE);
+        Map<String, Long> map = readBlocklist(blFile);
+        if (map == null)
+            map = new HashMap<String, Long>();
+        Long until = Long.valueOf(blockUntil);
+        for (String s : blocks) {
+            Long old = map.put(s, until);
+            if (old != null && old.longValue() > blockUntil) {
+                // unlikely
+                map.put(s, old);
+            }
+        }
+        Writer out = null;
+        try {
+            out = new OutputStreamWriter(new SecureFileOutputStream(blFile));
+            out.write("# Format (one per line)\n");
+            out.write("# IP or Base64 router hash,expiration (ms)\n");
+            for (Map.Entry<String, Long> e : map.entrySet()) {
+                out.write(e.getKey());
+                out.write(',');
+                out.write(e.getValue().toString());
+                out.write('\n');
+            }
+        } catch (IOException ioe) {
+            if (_log.shouldWarn())
+                _log.warn("Error writing the blocklist file", ioe);
+        } finally {
+            if (out != null) try { out.close(); } catch (IOException ioe) {}
+        }
     }
 
 /****
