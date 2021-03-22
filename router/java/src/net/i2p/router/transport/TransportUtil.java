@@ -131,7 +131,7 @@ public abstract class TransportUtil {
         if (host != null)
             return host.contains(":");
         String caps = addr.getOption("caps");
-        return caps != null && caps.contains("6");
+        return caps != null && caps.contains(TransportImpl.CAP_IPV6) && !caps.contains(TransportImpl.CAP_IPV4);
     }
 
     /**
