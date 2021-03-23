@@ -9,9 +9,11 @@ package net.i2p.router.transport;
  */
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -268,9 +270,31 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         //if (_context.router().isHidden())
         //    return Collections.EMPTY_SET;
         List<RouterAddress> addresses = new ArrayList<RouterAddress>(_manager.getAddresses());
+        if (addresses.size() > 1)
+            Collections.sort(addresses, new AddrComparator());
         if (_log.shouldLog(Log.INFO))
             _log.info("Creating addresses: " + addresses, new Exception("creator"));
         return addresses;
+    }
+
+    /**
+     *  Arbitrary sort for consistency.
+     *  Note that the console UI has its own sorter.
+     *  @since 0.9.50
+     */
+    private static class AddrComparator implements Comparator<RouterAddress>, Serializable {
+        public int compare(RouterAddress l, RouterAddress r) {
+            int rv = l.getCost() - r.getCost();
+            if (rv != 0)
+                return rv;
+            int lh = l.hashCode();
+            int rh = l.hashCode();
+            if (lh > rh)
+                return 1;
+            if (lh < rh)
+                return -1;
+            return 0;
+        }
     }
     
     /**
