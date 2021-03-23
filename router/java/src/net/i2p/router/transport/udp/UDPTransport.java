@@ -3361,11 +3361,19 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     removeExternalAddress(true, true);
                 } else if (STATUS_IPV6_FW_2.contains(old) &&
                            STATUS_IPV6_OK.contains(status) &&
-                           _lastOurIPv6 != null &&
                            !explicitAddressSpecified()){
-                     String addr = Addresses.toString(_lastOurIPv6);
-                     int port = _context.getProperty(PROP_EXTERNAL_PORT, -1);
-                     rebuildExternalAddress(addr, port, true);
+                    RouterAddress ra = _currentOurV6Address;
+                    if (ra != null) {
+                        String addr = ra.getHost();
+                        if (addr != null) {
+                            int port = _context.getProperty(PROP_EXTERNAL_PORT, -1);
+                            rebuildExternalAddress(addr, port, true);
+                        } else if (_log.shouldWarn()) {
+                            _log.warn("Not IPv6 firewalled but no address?");
+                        }
+                    } else if (_log.shouldWarn()) {
+                        _log.warn("Not IPv6 firewalled but no address?");
+                    }
                 }
             } else {
                 rebuildExternalAddress();
