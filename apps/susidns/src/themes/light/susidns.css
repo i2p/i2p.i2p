@@ -12,7 +12,7 @@ body {
 body.iframed {
      background: transparent !important;
      margin: 0;
-     overflow: hidden;
+     /*overflow: hidden;*/
 }
 
 ::selection {
@@ -293,7 +293,6 @@ div.help {
 div.help h3, #add h3, #import h3 {
      border: 1px solid #dee2e6;
      padding: 5px 32px;
-     margin: -1px -16px 0;
      background: url(/themes/console/light/images/dropdown.png) #f8f8ff;
      background-repeat: no-repeat !important;
      background-position: .5%, 15% !important;
@@ -301,7 +300,6 @@ div.help h3, #add h3, #import h3 {
 
 #howitworks {
      padding: 5px 32px;
-     margin: -1px -16px 0;
      background: url(/themes/console/light/images/dropdown.png) #f8f8ff;
      background-repeat: no-repeat !important;
      background-position: .5%, 15% !important;
@@ -309,7 +307,6 @@ div.help h3, #add h3, #import h3 {
 
 #whatitis {
      padding: 5px 32px;
-     margin: -1px -16px 0;
      background: url(/themes/console/light/images/dropdown.png) #f8f8ff;
      background-repeat: no-repeat !important;
      background-position: .5%, 15% !important;

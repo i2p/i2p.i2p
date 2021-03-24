@@ -1320,7 +1320,7 @@ p:empty + .sb_notice {
 
 #susidnsframe {
      margin: 0 0 -2px;
-     height: 100%;
+     height: 100vh !important;
      width: 100%;
      overflow: hidden;
 }
@@ -1333,6 +1333,7 @@ p:empty + .sb_notice {
 
 #i2ptunnelframe {
      margin: -4px 0 -1px;
+     height: 100vh !important;
      overflow: hidden;
 }
 
