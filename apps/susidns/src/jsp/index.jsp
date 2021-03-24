@@ -62,29 +62,29 @@
 </div>
 <hr>
 <div id="content">
-<h3><%=intl._t("What is the address book?")%></h3>
-<p>
+<h3 id="whatitis"><%=intl._t("What is the address book?")%></h3>
+<p class="whatitis">
 <%=intl._t("The address book application is part of your I2P installation.")%>
+<%=intl._t("You can use it to connect human-readable names, like i2p-projekt.i2p, to I2P Destinations.")%>
+</p><p class="whatitis">
 <%=intl._t("It regularly updates your hosts.txt file from distributed sources or \"subscriptions\".")%>
-</p>
-<p>
 <%=intl._t("In the default configuration, the address book is only subscribed to {0}.", "i2p-projekt.i2p")%>
 <%=intl._t("Subscribing to additional sites is easy, just add them to your <a href=\"subscriptions\">subscriptions</a> file.")%>
 </p>
-<p>
+<p class="whatitis">
 <%=intl._t("For more information on naming in I2P, see <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">the overview</a>.")%>
 </p>
-<h3><%=intl._t("How does the address book application work?")%></h3>
-<p>
+<h3 id="howitworks"><%=intl._t("How does the address book application work?")%></h3>
+<p class="howitworks">
 <%=intl._t("The address book application regularly polls your subscriptions and merges their content into your \"router\" address book.")%>
 <%=intl._t("Then it merges your \"local\" address book into the router address book as well.")%>
 <%=intl._t("If configured, the router address book is now written to the \"published\" address book, which will be publicly available if you are running an I2P Site.")%>
-</p><p>
+</p><p class="howitworks">
 <%=intl._t("The router also uses a private address book, which is not merged or published.")%>
 <%=intl._t("Hosts in the private address book can be accessed by you but their addresses are never distributed to others.")%>
 <%=intl._t("The private address book can also be used for aliases of hosts in your other address books.")%>
 </p>
-<div class="illustrate">
+<div class="illustrate howitworks">
 <object type="image/svg+xml" data="images/how.svg?<%=net.i2p.CoreVersion.VERSION%>">
 <img src="themes/images/how.png" border="0" alt="address book working scheme" title="How the address book works" class="illustrate" />
 </object>

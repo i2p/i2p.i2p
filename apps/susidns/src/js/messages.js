@@ -58,6 +58,30 @@ function ToggleImportFormTableView() {
   }
 }
 
+function ToggleHowView(){
+  var pHow = document.getElementsByClassName("howitworks");
+  var i;
+  for (i = 0; i < pHow.length; i++) {
+    pHow[i].classList.toggle("invisible");
+  }
+  var idHow = document.getElementById("howitworks");
+  if (idHow != null) {
+    idHow.classList.toggle("expanded");
+  }
+}
+
+function ToggleWhatView(){
+  var pWhat = document.getElementsByClassName("whatitis");
+  var i;
+  for (i = 0; i < pWhat.length; i++) {
+    pWhat[i].classList.toggle("invisible");
+  }
+  var idWhat = document.getElementById("whatitis");
+  if (idWhat != null) {
+    idWhat.classList.toggle("expanded");
+  }
+}
+
 function initClickables() {
 
   /*Hide the storage path by default, show it if someone clicks on the header*/
@@ -112,6 +136,24 @@ function initClickables() {
   if (clickableForm2 != null) {
     clickableForm2.addEventListener('click', ToggleImportFormTableView, true);
   }
+
+  var pHow = document.getElementsByClassName("howitworks");
+  i = 0;
+  for (i = 0; i < pHow.length; i++) {
+    pHow[i].classList.add("invisible");
+  }
+  var idHow = document.getElementById("howitworks");
+  if (idHow != null) {
+    idHow.addEventListener('click', ToggleHowView, true);
+  }
+
+  var pWhat = document.getElementsByClassName("whatitis");
+  var idWhat = document.getElementById("whatitis");
+  if (idWhat != null) {
+    idWhat.classList.add("expanded");
+    idWhat.addEventListener('click', ToggleWhatView, true);
+  }
+
 }
 
 document.addEventListener("DOMContentLoaded", function() {

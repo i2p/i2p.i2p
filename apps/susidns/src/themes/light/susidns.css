@@ -299,6 +299,22 @@ div.help h3, #add h3, #import h3 {
      background-position: .5%, 15% !important;
 }
 
+#howitworks {
+     padding: 5px 32px;
+     margin: -1px -16px 0;
+     background: url(/themes/console/light/images/dropdown.png) #f8f8ff;
+     background-repeat: no-repeat !important;
+     background-position: .5%, 15% !important;
+}
+
+#whatitis {
+     padding: 5px 32px;
+     margin: -1px -16px 0;
+     background: url(/themes/console/light/images/dropdown.png) #f8f8ff;
+     background-repeat: no-repeat !important;
+     background-position: .5%, 15% !important;
+}
+
 .expanded {
      background: url(/themes/console/light/images/dropdown_active.png) #f8f8ff !important;
      background-repeat: no-repeat !important;
