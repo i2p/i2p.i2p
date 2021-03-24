@@ -57,7 +57,10 @@ class FloodfillMonitorJob extends JobImpl {
         _facade.setFloodfillEnabledFromMonitor(ff);
         if (ff != wasFF) {
             if (ff) {
-                getContext().router().eventLog().addEvent(EventLog.BECAME_FLOODFILL);
+                if (!(getContext().getBooleanProperty(PROP_FLOODFILL_PARTICIPANT) &&
+                      getContext().router().getUptime() < 3*60*1000)) {
+                    getContext().router().eventLog().addEvent(EventLog.BECAME_FLOODFILL);
+                }
             } else {
                 getContext().router().eventLog().addEvent(EventLog.NOT_FLOODFILL);
             }
