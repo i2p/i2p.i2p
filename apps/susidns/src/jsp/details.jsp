@@ -49,9 +49,9 @@
 <a id="config" href="config"><%=intl._t("Configuration")%></a>
 </div>
 <hr>
-<div class="headline">
+<div class="headline" id="addressbook">
 <h3><%=intl._t("Address book")%>: <%=intl._t(book.getBook())%></h3>
-<h4><%=intl._t("Storage")%>: ${book.displayName}</h4>
+<h4 id="storagepath"><%=intl._t("Storage")%>: ${book.displayName}</h4>
 </div>
 <div id="book">
 <%

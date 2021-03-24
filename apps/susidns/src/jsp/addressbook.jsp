@@ -74,15 +74,8 @@
 </div>
 <hr>
 <div class="headline" id="addressbook">
-<h3><%=intl._t("Address book")%>: <%=intl._t(book.getBook())%></h3>
-<h4><%=intl._t("Storage")%>: ${book.displayName}</h4>
-</div>
-
-<div id="messages">${book.messages}<%
-   if (importMessages != null) {
-       %><%=importMessages%><%
-   }
-%></div>
+<h3 id="addrtitle"><%=intl._t("Address book")%>: <%=intl._t(book.getBook())%></h3>
+<h4 id="storagepath"><%=intl._t("Storage")%>: ${book.displayName}</h4>
 
 ${book.loadBookMessages}
 
@@ -101,6 +94,14 @@ ${book.loadBookMessages}
 </div>
 </form>
 <% } /* book.getEntries().length() > 0 */ %>
+
+</div>
+
+<div id="messages">${book.messages}<%
+   if (importMessages != null) {
+       %><%=importMessages%><%
+   }
+%></div>
 
 <div id="filter">
 <c:if test="${book.hasFilter}">
@@ -239,8 +240,8 @@ ${book.loadBookMessages}
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="49">
 <div id="add">
-<h3><%=intl._t("Add new destination")%></h3>
-<table>
+<h3 id="addnewaddr" ><%=intl._t("Add new destination")%></h3>
+<table id="addnewaddrtable">
 <tr>
 <td><b><%=intl._t("Hostname")%></b></td>
 <td><input type="text" name="hostname" value="${book.hostname}" size="54"></td>
@@ -250,7 +251,7 @@ ${book.loadBookMessages}
 <td><input type="text" name="destination" value="${book.destination}" size="70"></td>
 </tr>
 </table>
-<p class="buttons">
+<p class="buttons" id="addnewaddrbutton">
 <input class="cancel" type="reset" value="<%=intl._t("Cancel")%>" >
 <input class="accept" type="submit" name="action" value="<%=intl._t("Replace")%>" >
 <% if (!book.getBook().equals("published")) { %>
@@ -268,14 +269,14 @@ ${book.loadBookMessages}
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="49">
 <div id="import">
-<h3><%=intl._t("Import from hosts.txt file")%></h3>
-<table>
+<h3 id="importhosts"><%=intl._t("Import from hosts.txt file")%></h3>
+<table id="importhostsform">
 <tr>
 <td><b><%=intl._t("File")%></b></td>
 <td><input name="file" type="file" accept=".txt" value="" /></td>
 </tr>
 </table>
-<p class="buttons">
+<p class="buttons" id="importhostsbuttons">
 <input class="cancel" type="reset" value="<%=intl._t("Cancel")%>" >
 <input class="download" type="submit" name="action" value="<%=intl._t("Import")%>" >
 </p>

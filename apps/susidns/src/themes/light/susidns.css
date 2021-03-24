@@ -119,6 +119,12 @@ object {
      border: 1px solid #dee2e6;
      transition: ease border 0.7s
 }
+
+.invisible {
+     visibility: hidden;
+     display: none;
+}
+
 .headline {
      border: 1px solid #dee2e6;
      margin: -1px 0 -2px;
@@ -144,13 +150,13 @@ h3 {
 .headline h3 {
      font-size: 11.5pt !important;
      background: url(../images/addressbook.png) 6px center no-repeat #fcfcff;
-     background: url(../images/addressbook.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
+     /*background: url(../images/addressbook.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);*/
      background-size: 22px 22px, 100% 100%, 100% 100%;
 }
 
 .headline#subscriptions h3 {
      background: url(../images/subs_24.png) 6px center no-repeat #fcfcff;
-     background: url(../images/subs_24.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
+     /*background: url(../images/subs_24.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);*/
      background-size: 22px 22px, 100% 100%, 100% 100%;
 }
 
@@ -161,7 +167,7 @@ h3 {
 }
 
 .headline#subscriptions h3, .headline#configure h3, .headline#addressbook h3, .headline h3 {
-     margin: -8px -5px -5px;
+     /*margin: -8px -5px -5px;*/
      padding: 9px 5px 8px 32px;
      text-transform: capitalize;
 }
@@ -286,10 +292,21 @@ div.help {
 
 div.help h3, #add h3, #import h3 {
      border: 1px solid #dee2e6;
-     padding: 5px 10px;
+     padding: 5px 32px;
      margin: -1px -16px 0;
-     background: #fcfcff;
-     background: linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
+     background: url(/themes/console/light/images/dropdown.png) #f8f8ff;
+     background-repeat: no-repeat !important;
+     background-position: .5%, 15% !important;
+}
+
+.expanded {
+     background: url(/themes/console/light/images/dropdown_active.png) #f8f8ff !important;
+     background-repeat: no-repeat !important;
+     background-position: .5%, 15% !important;
+}
+
+#addrtitle.expanded {
+     background: url(../images/addressbook.png) 6px center no-repeat #fcfcff !important;
 }
 
 p#help {
@@ -623,7 +640,6 @@ textarea[name="config"]:focus, textarea[name="content"]:focus {
      min-width: 300px;
      margin: -1px 10%;
      box-shadow: inset 0 0 0 1px #fff;
-     background: linear-gradient(to bottom, #fcfcff 50%, #eef 50%);
 }
 
 #filter span a {
@@ -663,7 +679,6 @@ form {
 }
 
 th {
-     background: linear-gradient(to bottom, #fcfcff 50%, #eef 50%);
      font-size: 9pt;
 }
 
@@ -1391,7 +1406,7 @@ td.destinations textarea {
 }
 
 input.export {
-     margin-top: 8px;
+     margin-top: -6px;
 }
 
 #host_list th:nth-child(2), #host_list td:nth-child(2),
