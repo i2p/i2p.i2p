@@ -30,6 +30,7 @@ public class BaseBean
     private static final String PROP_THEME_NAME = "theme";
     private static final String DEFAULT_THEME = "light";
     private static final String BASE_THEME_PATH = "themes/";
+    private static final String[] THEMES = new String[] { "dark", "light"};
     /** From CSSHelper */
     private static final String PROP_DISABLE_OLD = "routerconsole.disableOldThemes";
     private static final boolean DEFAULT_DISABLE_OLD = true;
@@ -103,8 +104,10 @@ public class BaseBean
         // Fetch routerconsole theme (or use our default if it doesn't exist)
         String theme = _context.getProperty(RC_PROP_THEME_NAME, DEFAULT_THEME);
         // Apply any override
+        debug("Theme test 1: " + theme);
         theme = properties.getProperty(PROP_THEME_NAME, theme);
         // remap deprecated themes
+        debug("Theme test 2: " + theme);
         if (theme.equals("midnight")) {
             if (_context.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD))
                 theme = "dark";
@@ -112,6 +115,7 @@ public class BaseBean
             if (_context.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD))
                 theme = "light";
         }
+        debug("Theme test 3: " + theme);
         // Ensure that theme exists
         String[] themes = getThemes();
         boolean themeExists = false;
@@ -121,8 +125,10 @@ public class BaseBean
                 break;
             }
         }
-        if (!themeExists)
+        if (!themeExists) {
+            debug("Theme did not exist:" + theme);
             theme = DEFAULT_THEME;
+        }
         url += theme + "/";
         return url;
     }
@@ -133,24 +139,7 @@ public class BaseBean
      * @since 0.9.2
      */
     public String[] getThemes() {
-            String[] themes;
-            File dir = new File(_context.getBaseDir(), "docs/themes/susidns");
-            FileFilter fileFilter = new FileFilter() { public boolean accept(File file) { return file.isDirectory(); } };
-            File[] dirnames = dir.listFiles(fileFilter);
-            if (dirnames != null) {
-                List<String> th = new ArrayList<String>(dirnames.length);
-                boolean skipOld = _context.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD);
-                for (int i = 0; i < dirnames.length; i++) {
-                    String name = dirnames[i].getName();
-                    if (skipOld && (name.equals("midnight") || name.equals("classic")))
-                        continue;
-                    th.add(name);
-                }
-                themes = th.toArray(new String[th.size()]);
-            } else {
-                themes = new String[0];
-            }
-            return themes;
+        return THEMES;
     }
 
     /**

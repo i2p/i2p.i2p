@@ -100,6 +100,8 @@ body.iframed {
      position: relative;
      text-shadow: 0 1px 1px #000;
      border-radius: 12px;
+     background-color: #2c4e8f;
+     color: #7b7;
 }
 
 #navi a:hover, #navi a:focus  {

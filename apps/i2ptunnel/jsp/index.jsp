@@ -193,7 +193,7 @@
             } // descr
 %>
         </td>
-	<td class="tunnelPreview" colspan="1">
+	<td class="tunnelPreview tunnelPreviewHostname" colspan="1">
 <%
             if (("httpserver".equals(indexBean.getInternalType(curServer)) || ("httpbidirserver".equals(indexBean.getInternalType(curServer)))) && indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
                 if (name != null && !name.equals("") && name.endsWith(".i2p") ) {
@@ -208,7 +208,7 @@
             }
 %>
         </td>
-        <td class="tunnelPreview" colspan="1">
+        <td class="tunnelPreview tunnelPreviewHostname" colspan="1">
 <%
             if (("httpserver".equals(indexBean.getInternalType(curServer)) || ("httpbidirserver".equals(indexBean.getInternalType(curServer)))) && indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
                 if (name != null && !name.equals("") && name.endsWith(".i2p") ) {
@@ -223,7 +223,7 @@
             }
 %>
         </td>
-        <td colspan="2">
+        <td colspan="2" class="tunnelPreviewHostname">
         </td>
     </tr>
 <%

@@ -430,8 +430,17 @@ html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbod
 }
 
 .tunnelPreview, .tunnelPort {
-     width: 15%;
+     /*width: 15%;*/
      text-align: center;
+}
+
+.tunnelPreviewHostname {
+    /*margin-bottom: 1em !important;
+    margin-top: -1em !important;*/
+    width: 100%;
+    height: 1.5em;
+    overflow: hidden;
+    background: #332940;
 }
 
 .tunnelLocation, .tunnelInterface {
