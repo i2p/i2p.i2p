@@ -253,6 +253,7 @@ public class WebMail extends HttpServlet
 	private static final String RC_PROP_FORCE_MOBILE_CONSOLE = "routerconsole.forceMobileConsole";
 	private static final String CONFIG_THEME = "theme";
 	private static final String DEFAULT_THEME = "light";
+	private static final String[] THEMES = new String[] { "dark", "light"};
 	/** From CSSHelper */
 	private static final String PROP_DISABLE_OLD = "routerconsole.disableOldThemes";
 	private static final boolean DEFAULT_DISABLE_OLD = true;
@@ -3580,23 +3581,6 @@ public class WebMail extends HttpServlet
      * @return String[] -- Array of all the themes found.
      */
     private static String[] getThemes(I2PAppContext ctx) {
-            String[] themes;
-            File dir = new File(ctx.getBaseDir(), "docs/themes/susimail");
-            FileFilter fileFilter = new FileFilter() { public boolean accept(File file) { return file.isDirectory(); } };
-            File[] dirnames = dir.listFiles(fileFilter);
-            if (dirnames != null) {
-		List<String> th = new ArrayList<String>(dirnames.length);
-		boolean skipOld = ctx.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD);
-		for (int i = 0; i < dirnames.length; i++) {
-			String name = dirnames[i].getName();
-			if (skipOld && (name.equals("midnight") || name.equals("classic")))
-				continue;
-			th.add(name);
-		}
-		themes = th.toArray(new String[th.size()]);
-            } else {
-                themes = new String[0];
-            }
-            return themes;
+        return THEMES;
     }
 }
