@@ -1,3 +1,14 @@
+2021-03-25 zzz
+ * SSU: Implement IPv6 introductions (proposal 158)
+
+2021-03-23 zzz
+ * NetDB: Sort published addresses for consistency
+ * SSU: Fix IPv6 transition from firewalled to non-firewalled
+
+2021-03-22 zzz
+ * Sybil: Persist blocklist
+ * Tunnels: Don't count established routers as new in OBEP throttle (ticket #2245)
+
 2021-03-20 zzz
  * Tunnels: Fix RED dropping for part. tunnels (Gitlab MR #24)
 

@@ -375,7 +375,7 @@ class EstablishmentManager {
                     // w/o ext options, it's always 'requested', no need to set
                     // don't ask if they are indirect
                     boolean requestIntroduction = allowExtendedOptions && !isIndirect &&
-                                                  _transport.introducersMaybeRequired();
+                                                  _transport.introducersMaybeRequired(TransportUtil.isIPv6(ra));
                     state = new OutboundEstablishState(_context, maybeTo, to,
                                                        toIdentity, allowExtendedOptions,
                                                        requestIntroduction,
@@ -500,9 +500,8 @@ class EstablishmentManager {
             // TODO if already we have their RI, only offer if they need it (no 'C' cap)
             // if extended options, only if they asked for it
             if (state.isIntroductionRequested() &&
-                state.getSentIP().length == 4 &&
                 state.getSentPort() >= 1024 &&
-                _transport.canIntroduce()) {
+                _transport.canIntroduce(state.getSentIP().length == 16)) {
                 // ensure > 0
                 long tag = 1 + _context.random().nextLong(MAX_TAG_VALUE);
                 state.setSentRelayTag(tag);
@@ -626,8 +625,8 @@ class EstablishmentManager {
         //if (admitted > 0)
         //    _log.log(Log.CRIT, "Admitted " + admitted + " with " + remaining + " remaining queued and " + active + " active");
         
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Outbound established completely!  yay: " + state);
+        if (_log.shouldDebug())
+            _log.debug("Outbound established: " + state);
         PeerState peer = handleCompletelyEstablished(state);
         notifyActivity();
         return peer;
@@ -761,8 +760,8 @@ class EstablishmentManager {
      */
     private void sendInboundComplete(PeerState peer) {
         // SimpleTimer.getInstance().addEvent(new PublishToNewInbound(peer), 10*1000);
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Completing to the peer after IB confirm: " + peer);
+        if (_log.shouldDebug())
+            _log.debug("IB confirm: " + peer);
         DeliveryStatusMessage dsm = new DeliveryStatusMessage(_context);
         dsm.setArrival(_networkID); // overloaded, sure, but future versions can check this
                                            // This causes huge values in the inNetPool.droppedDeliveryStatusDelay stat

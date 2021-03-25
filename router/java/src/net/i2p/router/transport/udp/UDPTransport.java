@@ -87,7 +87,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     // only for logging, to be removed
     private long _reachabilityStatusLastUpdated;
     private int _reachabilityStatusUnchanged;
-    private long _introducersSelectedOn;
+    private long _v4IntroducersSelectedOn;
+    private long _v6IntroducersSelectedOn;
     private long _lastInboundReceivedOn;
     private final DHSessionKeyBuilder.Factory _dhFactory;
     private final SSUHMACGenerator _hmac;
@@ -189,6 +190,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final String CAP_TESTING = Character.toString(UDPAddress.CAPACITY_TESTING);
     private static final String CAP_TESTING_INTRO = CAP_TESTING + UDPAddress.CAPACITY_INTRODUCER;
     private static final String CAP_TESTING_4 = CAP_TESTING + CAP_IPV4;
+    private static final String CAP_TESTING_6 = CAP_TESTING + CAP_IPV6;
 
     /** how many relays offered to us will we use at a time? */
     public static final int PUBLIC_RELAY_COUNT = 3;
@@ -327,7 +329,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _reachabilityStatus = Status.UNKNOWN;
         _reachabilityStatusPending = Status.OK;
         _introManager = new IntroductionManager(_context, this);
-        _introducersSelectedOn = -1;
+        _v4IntroducersSelectedOn = -1;
+        _v6IntroducersSelectedOn = -1;
         _lastInboundReceivedOn = -1;
         _hmac = new SSUHMACGenerator();
         _mtu = PeerState.LARGE_MTU;
@@ -1815,9 +1818,36 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private boolean locked_needsRebuild() {
         if (_needsRebuild) return true; // simple enough
         if (_context.router().isHidden()) return false;
-        boolean v6Only = getIPv6Config() == IPV6_ONLY;
-        RouterAddress addr = getCurrentAddress(v6Only);
-        if (!v6Only && introducersRequired()) {
+        TransportUtil.IPv6Config config = getIPv6Config();
+        // IPv4
+        boolean v6Only = config == IPV6_ONLY;
+        if (!v6Only) {
+            RouterAddress addr = getCurrentAddress(false);
+            if (locked_needsRebuild(addr, false))
+                return true;
+        }
+        // IPv6
+        // Disable for now until we have introducers working
+        // because it loops too quickly
+     /*
+        boolean v4Only = config == IPV6_DISABLED;
+        if (!v4Only && _hasIPv6Address) {
+            RouterAddress addr = getCurrentAddress(true);
+            if (locked_needsRebuild(addr, true))
+                return true;
+        }
+      */
+        return false;
+    }
+
+    /**
+     *  Does this address need rebuilding?
+     *
+     *  @param addr may be null
+     *  @since 0.9.50 split out from above
+     */
+    private boolean locked_needsRebuild(RouterAddress addr, boolean ipv6) {
+        if (introducersRequired(ipv6)) {
             UDPAddress ua = new UDPAddress(addr);
             long now = _context.clock().now();
             int valid = 0;
@@ -1825,7 +1855,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 long exp = ua.getIntroducerExpiration(i);
                 if (exp > 0 && exp < now + INTRODUCER_EXPIRATION_MARGIN) {
                     if (_log.shouldWarn())
-                        _log.warn("Introducer " + i + " is expiring soon, need to replace");
+                        _log.warn((ipv6 ? "IPv6" : "IPv4") + " Introducer " + i + " expiring soon, need to replace");
                     continue;
                 }
                 long tag = ua.getIntroducerTag(i);
@@ -1833,29 +1863,29 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     valid++;
                 } else {
                     if (_log.shouldWarn())
-                        _log.warn("Introducer " + i + " is no longer connected, need to replace");
+                        _log.warn((ipv6 ? "IPv6" : "IPv4") + " Introducer " + i + " no longer connected, need to replace");
                 }
             }
-            long sinceSelected = now - _introducersSelectedOn;
+            long sinceSelected = now - (ipv6 ? _v6IntroducersSelectedOn : _v4IntroducersSelectedOn);
             if (valid >= PUBLIC_RELAY_COUNT) {
                 // try to shift 'em around every 10 minutes or so
-                if (sinceSelected > 17*60*1000) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Our introducers are valid, but haven't changed in " + DataHelper.formatDuration(sinceSelected) + ", so lets rechoose");
-                    return true;
-                } else {
+                //if (sinceSelected > 17*60*1000) {
+                //    if (_log.shouldLog(Log.WARN))
+                //        _log.warn((ipv6 ? "IPv6" : "IPv4") + " introducers valid, haven't changed in " + DataHelper.formatDuration(sinceSelected) + ", reselecting");
+                //    return true;
+                //} else {
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Our introducers are valid and were selected " + DataHelper.formatDuration(sinceSelected) + " ago");
+                        _log.info((ipv6 ? "IPv6" : "IPv4") + " introducers valid, selected " + DataHelper.formatDuration(sinceSelected) + " ago");
                     return false;
-                }
+                //}
             } else if (sinceSelected > 2*60*1000) {
                 // Rate limit to prevent rapid churn after transition to firewalled or at startup
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Need more introducers (have " +valid + " need " + PUBLIC_RELAY_COUNT + ')');
+                    _log.info((ipv6 ? "IPv6" : "IPv4") + " Need more introducers (have " + valid + " need " + PUBLIC_RELAY_COUNT + ')');
                 return true;
             } else {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Need more introducers (have " +valid + " need " + PUBLIC_RELAY_COUNT + ')' +
+                    _log.info((ipv6 ? "IPv6" : "IPv4") + " Need more introducers (have " + valid + " need " + PUBLIC_RELAY_COUNT + ')' +
                               " but we just chose them " + DataHelper.formatDuration(sinceSelected) + " ago so wait");
                 // TODO also check to see if we actually have more available
                 return false;
@@ -1871,10 +1901,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
             if (rv) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Need to initialize our direct SSU info (" + Addresses.toString(externalListenHost, externalListenPort) + ')');
+                    _log.info((ipv6 ? "IPv6" : "IPv4") + " Need to initialize our direct SSU info (" + Addresses.toString(externalListenHost, externalListenPort) + ')');
             } else if (addr.getPort() <= 0 || addr.getHost() == null) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Our direct SSU info is initialized, but not used in our address yet");
+                    _log.info((ipv6 ? "IPv6" : "IPv4") + " Our direct SSU info is initialized, but not used in our address yet");
                 rv = true;
             } else {
                 //_log.info("Our direct SSU info is initialized");
@@ -2053,11 +2083,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // (Otherwise we only talk UDP to those that are firewalled, and we will
             // never get any introducers)
             int count = _peersByIdent.size();
+            boolean ipv6 = TransportUtil.isIPv6(addr);
             if (alwaysPreferUDP()) {
                 return _cachedBid[SLOW_PREFERRED_BID];
-            } else if (count < _min_peers ||
-                       (_haveIPv6Address && count < _min_v6_peers) ||
-                       (introducersRequired() && _introManager.introducerCount() < MIN_INTRODUCER_POOL)) {
+            } else if ((!ipv6 && count < _min_peers) ||
+                       (ipv6 && _haveIPv6Address && count < _min_v6_peers) ||
+                       (introducersRequired(ipv6) &&
+                        addr.getOption(UDPAddress.PROP_CAPACITY) != null &&
+                        addr.getOption(UDPAddress.PROP_CAPACITY).indexOf(UDPAddress.CAPACITY_INTRODUCER) >= 0 &&
+                        _introManager.introducerCount(ipv6) < MIN_INTRODUCER_POOL)) {
                  // Even if we haven't hit our minimums, give NTCP a chance some of the time.
                  // This may make things work a little faster at startup
                  // (especially when we have an IPv6 address and the increased minimums),
@@ -2403,8 +2437,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return rv;
             }
         } else {
-            if (!introducersRequired()) {
-                boolean v6Only = getIPv6Config() == IPV6_ONLY;
+            boolean v6Only = getIPv6Config() == IPV6_ONLY;
+            if (!introducersRequired(v6Only)) {
                 RouterAddress cur = getCurrentExternalAddress(v6Only);
                 if (cur != null)
                     host = cur.getHost();
@@ -2494,7 +2528,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         boolean directIncluded;
         // DNS name assumed IPv4
-        boolean introducersRequired = (!isIPv6) && introducersRequired();
+        boolean introducersRequired = introducersRequired(isIPv6);
         if (!introducersRequired && allowDirectUDP() && port > 0 && host != null) {
             options.setProperty(UDPAddress.PROP_PORT, String.valueOf(port));
             options.setProperty(UDPAddress.PROP_HOST, host);
@@ -2509,28 +2543,34 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // deepEquals() below will not fail even with same introducers.
             // Was only a problem when we had very very few peers to pick from.
             RouterAddress current = getCurrentAddress(isIPv6);
-            int found = _introManager.pickInbound(current, options, PUBLIC_RELAY_COUNT);
+            int found = _introManager.pickInbound(current, isIPv6, options, PUBLIC_RELAY_COUNT);
             if (found > 0) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Direct? " + directIncluded + " reqd? " + introducersRequired +
-                              " picked introducers: " + found);
-                _introducersSelectedOn = _context.clock().now();
+                    _log.info("ipv6? " + isIPv6 + " picked introducers: " + found);
+                long now = _context.clock().now();
+                if (isIPv6)
+                    _v6IntroducersSelectedOn = now;
+                else
+                    _v4IntroducersSelectedOn = now;
                 introducersIncluded = true;
             } else {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Direct? " + directIncluded + " reqd? " + introducersRequired +
-                              " no introducers");
+                    _log.warn("ipv6? " + isIPv6 + " no introducers");
             }
         }
         
         // if we have explicit external addresses, they had better be reachable
         String caps;
-        if (introducersRequired || !canIntroduce()) {
-            if (!directIncluded && !isIPv6 &&
-                _context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS))
-                caps = CAP_TESTING_4;
-            else
+        if (introducersRequired || !canIntroduce(isIPv6)) {
+            if (!directIncluded &&
+                _context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS)) {
+                if (isIPv6)
+                    caps = CAP_TESTING_6;
+                else
+                    caps = CAP_TESTING_4;
+            } else {
                 caps = CAP_TESTING;
+            }
         } else {
             caps = CAP_TESTING_INTRO;
         }
@@ -2620,7 +2660,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Wanted to rebuild my SSU address, but couldn't specify either the direct or indirect info (needs introducers? " 
-                           + introducersRequired + ")", new Exception("source"));
+                           + introducersRequired +
+                           " ipv6? " + isIPv6 +
+                           ')', new Exception());
             _needsRebuild = true;
             // save the external address, even if we didn't publish it
             if (port > 0 && host != null) {
@@ -2793,9 +2835,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     /**
      *  Do we require introducers?
-     *  Currently for IPv4 only.
      */
-    public boolean introducersRequired() {
+    public boolean introducersRequired(boolean ipv6) {
+        //if (ipv6) return false;
         /******************
          *  Don't do this anymore, as we are removing the checkbox from the UI,
          *  and we rarely if ever see the problem of false negatives for firewall detection -
@@ -2809,66 +2851,110 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
         *******************/
         Status status = getReachabilityStatus();
-        switch (status) {
-            case REJECT_UNSOLICITED:
-            case DIFFERENT:
-            case IPV4_FIREWALLED_IPV6_OK:
-            case IPV4_FIREWALLED_IPV6_UNKNOWN:
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Require introducers, because our status is " + status);
-                return true;
-
-            default:
-                if (!allowDirectUDP()) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Require introducers, because we do not allow direct UDP connections");
-                    return true;
-                }
+        TransportUtil.IPv6Config config = getIPv6Config();
+        if (ipv6) {
+            if (!_haveIPv6Address)
                 return false;
+            if (config == IPV6_DISABLED)
+                return false;
+            // must be published with '6' cap
+            if (!_context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS))
+                return false;
+            switch (status) {
+                case REJECT_UNSOLICITED:
+                case DIFFERENT:
+                case IPV4_OK_IPV6_FIREWALLED:
+                case IPV4_UNKNOWN_IPV6_FIREWALLED:
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Require IPv6 introducers, status is " + status);
+                    return true;
+            }
+        } else {
+            if (config == IPV6_ONLY)
+                return false;
+            switch (status) {
+                case REJECT_UNSOLICITED:
+                case DIFFERENT:
+                case IPV4_FIREWALLED_IPV6_OK:
+                case IPV4_FIREWALLED_IPV6_UNKNOWN:
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Require IPv4 introducers, status is " + status);
+                    return true;
+            }
         }
+        if (!allowDirectUDP()) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Require introducers, because we do not allow direct UDP connections");
+            return true;
+        }
+        return false;
     }
     
     /**
      *  MIGHT we require introducers?
      *  This is like introducersRequired, but if we aren't sure, this returns true.
      *  Used only by EstablishmentManager.
-     *  Currently for IPv4 only.
      *
      *  @since 0.9.24
      */
-    boolean introducersMaybeRequired() {
+    boolean introducersMaybeRequired(boolean ipv6) {
+        //if (ipv6) return false;
         Status status = getReachabilityStatus();
-        switch (status) {
-            case REJECT_UNSOLICITED:
-            case DIFFERENT:
-            case IPV4_FIREWALLED_IPV6_OK:
-            case IPV4_FIREWALLED_IPV6_UNKNOWN:
-            case IPV4_UNKNOWN_IPV6_OK:
-            case IPV4_UNKNOWN_IPV6_FIREWALLED:
-            case UNKNOWN:
-                return _introManager.introducerCount() < 3 * MIN_INTRODUCER_POOL;
+        TransportUtil.IPv6Config config = getIPv6Config();
+        if (ipv6) {
+            if (!_haveIPv6Address)
+                return false;
+            if (config == IPV6_DISABLED)
+                return false;
+            // must be published with '6' cap
+            if (!_context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS))
+                return false;
+            switch (status) {
+                case REJECT_UNSOLICITED:
+                case DIFFERENT:
+                case IPV4_OK_IPV6_FIREWALLED:
+                case IPV4_UNKNOWN_IPV6_FIREWALLED:
+                case IPV4_OK_IPV6_UNKNOWN:
+                case IPV4_FIREWALLED_IPV6_UNKNOWN:
+                case UNKNOWN:
+                    return _introManager.introducerCount(true) < 3 * MIN_INTRODUCER_POOL;
+            }
+        } else {
+            if (config == IPV6_ONLY)
+                return false;
+            switch (status) {
+                case REJECT_UNSOLICITED:
+                case DIFFERENT:
+                case IPV4_FIREWALLED_IPV6_OK:
+                case IPV4_FIREWALLED_IPV6_UNKNOWN:
+                case IPV4_UNKNOWN_IPV6_OK:
+                case IPV4_UNKNOWN_IPV6_FIREWALLED:
+                case UNKNOWN:
+                    return _introManager.introducerCount(false) < 3 * MIN_INTRODUCER_POOL;
 
-            default:
-                return !allowDirectUDP();
+            }
         }
+        return !allowDirectUDP();
     }
     
     /**
      *  For EstablishmentManager.
-     *  Currently for IPv4 only.
+     *
      *  @since 0.9.3
      */
-    boolean canIntroduce() {
+    boolean canIntroduce(boolean ipv6) {
         // we don't expect inbound connections when hidden, but it could happen
         // Don't offer if we are approaching max connections. While Relay Intros do not
         // count as connections, we have to keep the connection to this peer up longer if
         // we are offering introductions.
         return
             (!_context.router().isHidden()) &&
-            (!introducersRequired()) &&
+            (!introducersRequired(ipv6)) &&
             haveCapacity() &&
             (!_context.netDb().floodfillEnabled()) &&
-            getIPv6Config() != IPV6_ONLY &&
+            (!ipv6 || _haveIPv6Address) &&
+            ((!ipv6 && getIPv6Config() != IPV6_ONLY) ||
+             (ipv6 && getIPv6Config() != IPV6_DISABLED)) &&
             _introManager.introducedCount() < IntroductionManager.MAX_OUTBOUND &&
             _introManager.introducedCount() < getMaxConnections() / 4;
     }
@@ -3503,7 +3589,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     private class PingIntroducers implements SimpleTimer.TimedEvent {
         public void timeReached() {
-            if (introducersRequired())
+            if (introducersRequired(false) || introducersRequired(true))
                 _introManager.pingIntroducers();
         }
     }

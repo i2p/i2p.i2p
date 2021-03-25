@@ -181,10 +181,11 @@ class IntroductionManager {
      * and we want to keep our introducers valid.
      *
      * @param current current router address, may be null
+     * @param ipv6 what type is the current address we need introducers for?
      * @param ssuOptions out parameter, options are added
      * @return number of introducers added
      */
-    public int pickInbound(RouterAddress current, Properties ssuOptions, int howMany) {
+    public int pickInbound(RouterAddress current, boolean ipv6, Properties ssuOptions, int howMany) {
         int start = _context.random().nextInt();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Picking inbound out of " + _inbound.size());
@@ -199,8 +200,33 @@ class IntroductionManager {
         if (sz <= howMany + 2)
             inactivityCutoff -= UDPTransport.EXPIRE_TIMEOUT / 4;
         List<Introducer> introducers = new ArrayList<Introducer>(howMany);
+        String exp = Long.toString((now + INTRODUCER_EXPIRATION) / 1000);
+
+        // reuse old ones if ok
+        if (current != null) {
+            UDPAddress ua = new UDPAddress(current);
+            for (int i = 0; i < ua.getIntroducerCount(); i++) {
+                long lexp = ua.getIntroducerExpiration(i);
+                if (lexp > 0 && lexp < now + UDPTransport.INTRODUCER_EXPIRATION_MARGIN)
+                    continue;
+                long tag = ua.getIntroducerTag(i);
+                if (!isInboundTagValid(tag))
+                    continue;
+                introducers.add(new Introducer(ua.getIntroducerHost(i).getAddress(),
+                                               ua.getIntroducerPort(i),
+                                               ua.getIntroducerKey(i),
+                                               tag,
+                                               Long.toString(ua.getIntroducerExpiration(i) / 1000)));
+                if (_log.shouldInfo())
+                    _log.info("Reusing introducer: " + ua.getIntroducerHost(i));
+                found++;
+            }
+        }
+
         for (int i = 0; i < sz && found < howMany; i++) {
             PeerState cur = peers.get((start + i) % sz);
+            if (cur.isIPv6() != ipv6)
+                continue;
             RouterInfo ri = _context.netDb().lookupRouterInfoLocally(cur.getRemotePeer());
             if (ri == null) {
                 if (_log.shouldLog(Log.INFO))
@@ -233,7 +259,16 @@ class IntroductionManager {
                 continue;
             }
             int oldFound = found;
+            loop:
             for (RouterAddress ra : ras) {
+                String host = ra.getHost();
+                if (host == null)
+                    continue;
+                // dup check of reused introducers
+                for (Introducer intro : introducers) {
+                    if (host.equals(intro.sip))
+                        continue loop;
+                }
                 byte[] ip = ra.getIP();
                 int port = ra.getPort();
                 if (!isValid(ip, port, true))
@@ -249,7 +284,7 @@ class IntroductionManager {
                 byte[] ikey = ura.getIntroKey();
                 if (ikey == null)
                     continue;
-                introducers.add(new Introducer(ip, port, ikey, cur.getTheyRelayToUsAs()));
+                introducers.add(new Introducer(ip, port, ikey, cur.getTheyRelayToUsAs(), exp));
                 found++;
                 // two per router max
                 if (found - oldFound >= 2)
@@ -261,14 +296,13 @@ class IntroductionManager {
 
         // we sort them so a change in order only won't happen, and won't cause a republish
         Collections.sort(introducers);
-        String exp = Long.toString((now + INTRODUCER_EXPIRATION) / 1000);
         for (int i = 0; i < found; i++) {
             Introducer in = introducers.get(i);
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_HOST_PREFIX + i, in.sip);
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_PORT_PREFIX + i, in.sport);
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_KEY_PREFIX + i, in.skey);
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_TAG_PREFIX + i, in.stag);
-            String sexp = exp;
+            String sexp = in.sexp;
             // look for existing expiration in current published
             // and reuse if still recent enough, so deepEquals() won't fail in UDPT.rEA
             if (current != null) {
@@ -306,13 +340,14 @@ class IntroductionManager {
      *  @since 0.9.18
      */
     private static class Introducer implements Comparable<Introducer> {
-        public final String sip, sport, skey, stag;
+        public final String sip, sport, skey, stag, sexp;
 
-        public Introducer(byte[] ip, int port, byte[] key, long tag) {
+        public Introducer(byte[] ip, int port, byte[] key, long tag, String exp) {
             sip = Addresses.toString(ip);
             sport = String.valueOf(port);
             skey = Base64.encode(key);
             stag = String.valueOf(tag);
+            sexp = exp;
         }
 
         @Override
@@ -363,13 +398,22 @@ class IntroductionManager {
      * Not as elaborate as pickInbound() above.
      * Just a quick check to see how many volunteers we know,
      * which the Transport uses to see if we need more.
+     *
+     * @param ipv6 what type of address are they introducing us for
      * @return number of peers that have volunteered to introduce us
      */
-    int introducerCount() {
-            return _inbound.size();
+    int introducerCount(boolean ipv6) {
+        int rv = 0;
+        for (PeerState ps : _inbound.values()) {
+            if (ps.isIPv6() == ipv6)
+                rv++;
+        }
+        return rv;
     }
     
     /**
+     *  Combined IPv4 and IPv6
+     *
      *  @return number of peers we have volunteered to introduce
      *  @since 0.9.3
      */
@@ -403,7 +447,8 @@ class IntroductionManager {
         reader.getRelayIntroReader().readIP(ip, 0);
         int port = reader.getRelayIntroReader().readPort();
 
-        if ((!isValid(ip, port)) || (!isValid(bob.getIP(), bob.getPort()))) {
+        // allow IPv6 as of 0.9.50
+        if ((!isValid(ip, port, true)) || (!isValid(bob.getIP(), bob.getPort(), true))) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Bad relay intro from " + bob + " for " + Addresses.toString(ip, port));
             _context.statManager().addRateData("udp.relayBadIP", 1);
@@ -530,10 +575,10 @@ class IntroductionManager {
             return;
         }
         // check again if IP was provided
-        // here we do not allow IPv6
+        // allow IPv6 as of 0.9.50
         RemoteHostId aliceRelayID;
         if (ipIncluded) {
-            if (!isValid(aliceIP, alicePort)) {
+            if (!isValid(aliceIP, alicePort, true)) {
                 if (_log.shouldWarn())
                     _log.warn("Bad relay req from " + alice + " for " + Addresses.toString(aliceIP, alicePort));
                 _context.statManager().addRateData("udp.relayBadIP", 1);
