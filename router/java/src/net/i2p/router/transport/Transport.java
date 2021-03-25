@@ -196,6 +196,11 @@ public interface Transport {
     @Deprecated
     public void recheckReachability();
 
+    /**
+     *  @since 0.9.50 added to interface
+     */
+    public TransportUtil.IPv6Config getIPv6Config();
+
     public boolean isBacklogged(Hash peer);
 
     /**
