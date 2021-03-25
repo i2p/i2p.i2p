@@ -41,9 +41,18 @@ public class ConfigNetHelper extends HelperBase {
     
     /** @return host or "unknown" */
     public String getUdpIP() {
-        String rv = _context.getProperty(UDPTransport.PROP_IP);
-        if (rv != null)
-            return rv;
+        String s = _context.getProperty(TransportUtil.SSU_IPV6_CONFIG);
+        String rv;
+        if (!"only".equals(s)) {
+            rv = _context.getProperty(UDPTransport.PROP_IP);
+            if (rv != null)
+                return rv;
+        }
+        if (!"false".equals(s)) {
+            rv = _context.getProperty(UDPTransport.PROP_IPV6);
+            if (rv != null)
+                return rv;
+        }
         RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
         if (addr != null) {
             rv = addr.getHost();
