@@ -822,7 +822,9 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 port = isa.getPort();
             }
         }
-        return getSocket(from, host, port);
+        // don't do SSL-over-SSL
+        boolean force = incomingPort == 443 || incomingPort == 22;
+        return getSocket(from, host, port, force);
     }
 
     /**
@@ -833,8 +835,19 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
      *  @since 0.9.9
      */
     protected Socket getSocket(Hash from, InetAddress remoteHost, int remotePort) throws IOException {
+        return getSocket(from, remoteHost, remotePort, false);
+    }
+
+    /**
+     *  Get a regular or SSL socket depending on config.
+     *  The SSL config applies to all hosts/ports, unless forced off.
+     *
+     *  @param forceNonSSL override config
+     *  @since 0.9.50
+     */
+    private Socket getSocket(Hash from, InetAddress remoteHost, int remotePort, boolean forceNonSSL) throws IOException {
         String opt = getTunnel().getClientOptions().getProperty(PROP_USE_SSL);
-        if (Boolean.parseBoolean(opt)) {
+        if (!forceNonSSL && Boolean.parseBoolean(opt)) {
             synchronized(sslLock) {
                 if (_sslFactory == null) {
                     try {
