@@ -589,12 +589,12 @@ html body#tunnelEditPage form div.panel table#serverTunnelEdit.tunnelConfig tbod
 
 .tunnelHostnameCopy {
     margin-bottom: 1em !important;
-    margin-top: -1em !important;
+    /*margin-top: -1em !important;*/
 }
 
 .tunnelPreviewHostname {
     margin-bottom: 1em !important;
-    margin-top: -1em !important;
+    /*margin-top: -1em !important;*/
     width: 100%;
     height: 1.5em;
     overflow: hidden;

@@ -130,8 +130,6 @@ object {
      margin: -1px 0 -2px;
      padding: 8px 5px;
      background: #f6f6fa;
-     background: #f6f6fa;
-     background: #f6f6fa;
 }
 
 .iframed .headline {
@@ -352,6 +350,11 @@ p, #helpconfig {
      break-inside: avoid;
      page-break-inside: avoid;
      -webkit-break-inside: avoid;
+}
+
+#helpconfig h3 {
+    background-image: none;
+    padding: 6px 16px;
 }
 
 span.addrhlpr {

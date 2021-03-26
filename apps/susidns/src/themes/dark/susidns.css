@@ -111,6 +111,11 @@ body.iframed {
     z-index: 10;
 }
 
+.invisible {
+     visibility: hidden;
+     display: none;
+}
+
 #navi a:active {
     border: 1px solid #da736b;
     box-shadow: inset 3px 3px 3px #000;
@@ -566,6 +571,16 @@ tr.list0 {
      margin: 10px -31px;
 }
 
+.expanded {
+     background: url(/themes/console/light/images/dropdown_active.png) #f8f8ff !important;
+     background-repeat: no-repeat !important;
+     background-position: .5%, 15% !important;
+}
+
+#addrtitle.expanded {
+     background: url(../images/addressbook.png) 6px center no-repeat #fcfcff !important;
+}
+
 .help h3:first-child {
      margin-top: -21px;
 }
@@ -607,6 +622,11 @@ tr.list0 {
 #helpconfig li b {
      font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", monospace;
      color: #990;
+}
+
+#helpconfig h3 {
+    background-image: none;
+    padding: 6px 16px;
 }
 
 div#content p {
