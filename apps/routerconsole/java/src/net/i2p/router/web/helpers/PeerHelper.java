@@ -300,7 +300,7 @@ public class PeerHelper extends HelperBase {
             }
         }
 
-        StringBuilder buf = new StringBuilder(512);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append("<h3 id=\"ntcpcon\">").append(_t("NTCP connections")).append(": ").append(peers.size());
         buf.append(". ").append(_t("Limit")).append(": ").append(nt.getMaxConnections());
         //buf.append(". ").append(_t("Timeout")).append(": ").append(DataHelper.formatDuration2(_pumper.getIdleTimeout()));
@@ -463,7 +463,7 @@ public class PeerHelper extends HelperBase {
         int numPeers = 0;
         int numRTTPeers = 0;
 
-        StringBuilder buf = new StringBuilder(512);
+        StringBuilder buf = new StringBuilder(4096);
         buf.append("<h3 id=\"udpcon\">").append(_t("UDP connections")).append(": ").append(peers.size());
         buf.append(". ").append(_t("Limit")).append(": ").append(ut.getMaxConnections());
         //buf.append(". ").append(_t("Timeout")).append(": ").append(DataHelper.formatDuration2(_expireTimeout));
@@ -675,16 +675,14 @@ public class PeerHelper extends HelperBase {
             long dupRecv = peer.getPacketsReceivedDuplicate();
 
             buf.append("<td class=\"cells\" align=\"right\">");
-            //buf.append(formatPct(sendLostPct));
-            buf.append(resent); // + "/" + peer.getPacketsPeriodRetransmitted() + "/" + sent);
-            //buf.append(peer.getPacketRetransmissionRate());
-            buf.append("</td>");
+            buf.append(dupRecv);
+            buf.append("</td>" +
 
-            buf.append("<td class=\"cells\" align=\"right\">");
-            buf.append(dupRecv); //formatPct(recvDupPct));
-            buf.append("</td>");
+                       "<td class=\"cells\" align=\"right\">");
+            buf.append(resent);
+            buf.append("</td>" +
 
-            buf.append("</tr>\n");
+                       "</tr>\n");
             out.write(buf.toString());
             buf.setLength(0);
 
