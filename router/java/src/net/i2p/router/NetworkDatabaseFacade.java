@@ -207,4 +207,11 @@ public abstract class NetworkDatabaseFacade implements Service {
     public boolean removeBlindData(SigningPublicKey spk) {
         return false;
     }
+
+    /**
+     *  Notify the netDB that the routing key changed at midnight UTC
+     *
+     *  @since 0.9.50
+     */
+    public void routingKeyChanged() {}
 }

@@ -1,5 +1,10 @@
+2021-03-27 zzz
+ * Router: Fix decryption of blinded leasesets
+
 2021-03-25 zzz
+ * i2ptunnel: Force non-SSL socket to local target for SSL ports
  * SSU: Implement IPv6 introductions (proposal 158)
+ * Transports: Don't open UPnP ports for disabled IPv4/v6
 
 2021-03-23 zzz
  * NetDB: Sort published addresses for consistency
