@@ -787,6 +787,8 @@ public class TransportManager implements TransportEventListener {
      */
     private Set<Port> getPorts() {
         Set<Port> rv = new HashSet<Port>(4);
+        if (_context.router().isHidden())
+            return rv;
         for (Transport t : _transports.values()) {
             int port = t.getRequestedPort();
             // Use UDP port for NTCP too - see comment in NTCPTransport.getRequestedPort() for why this is here
