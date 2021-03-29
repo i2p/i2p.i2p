@@ -2836,7 +2836,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /**
      *  Do we require introducers?
      */
-    public boolean introducersRequired(boolean ipv6) {
+    private boolean introducersRequired(boolean ipv6) {
+        if (_context.router().isHidden())
+            return false;
         //if (ipv6) return false;
         /******************
          *  Don't do this anymore, as we are removing the checkbox from the UI,
@@ -2898,6 +2900,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  @since 0.9.24
      */
     boolean introducersMaybeRequired(boolean ipv6) {
+        if (_context.router().isHidden())
+            return false;
         //if (ipv6) return false;
         Status status = getReachabilityStatus();
         TransportUtil.IPv6Config config = getIPv6Config();
