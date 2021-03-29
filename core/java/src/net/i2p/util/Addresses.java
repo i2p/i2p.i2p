@@ -122,7 +122,8 @@ public abstract class Addresses {
      *
      *  Warning, very slow on Windows, appx. 200ms + 50ms/interface
      *
-     *  @param includeLocal whether to include local
+     *  @param includeLocal whether to include local addresses
+     *                      and deprecated IPv6 addresses
      *  @param includeIPv6 whether to include IPV6
      *  @return a sorted set of all addresses including wildcard
      *  @since 0.8.3
@@ -141,6 +142,7 @@ public abstract class Addresses {
      *  Warning, very slow on Windows, appx. 200ms + 50ms/interface
      *
      *  @param includeSiteLocal whether to include private like 192.168.x.x
+     *                          and deprecated IPv6 addresses
      *  @param includeLoopbackAndWildcard whether to include 127.x.x.x and 0.0.0.0
      *  @param includeIPv6 whether to include IPV6
      *  @return a sorted set of all addresses
@@ -162,6 +164,7 @@ public abstract class Addresses {
      *  Warning, very slow on Windows, appx. 200ms + 50ms/interface
      *
      *  @param includeSiteLocal whether to include private like 192.168.x.x
+     *                          and deprecated IPv6 addresses
      *  @param includeLoopbackAndWildcard whether to include 127.x.x.x and 0.0.0.0
      *  @param includeIPv6 whether to include IPV6
      *  @param includeIPv6Temporary whether to include IPV6 temporary addresses
@@ -884,7 +887,7 @@ public abstract class Addresses {
         System.out.println("\nExternal and Local IPv4 Addresses:");
         a = getAddresses(true, false, false);
         print(a);
-        System.out.println("\nAll External Addresses:");
+        System.out.println("\nAll External Addresses (except deprecated IPv6):");
         a = getAddresses(false, false, true);
         print(a);
         byte[] ygg = getYggdrasilAddress();
@@ -892,7 +895,7 @@ public abstract class Addresses {
             System.out.println("\nYggdrasil Address:");
             System.out.println(toString(ygg));
         }
-        System.out.println("\nAll External and Local Addresses:");
+        System.out.println("\nAll External and Local Addresses (may include deprecated IPv6):");
         a = getAddresses(true, false, true);
         print(a);
         System.out.println("\nAll addresses:");
@@ -946,8 +949,8 @@ public abstract class Addresses {
             macs.add(buf.toString());
         }
         print(macs);
-        System.out.println("\nIs connected? " + isConnected() +
-                           "\nIs conn IPv6? " + isConnectedIPv6());
+        System.out.println("\nHas IPv4?     " + isConnected() +
+                           "\nHas IPv6?     " + isConnectedIPv6());
         System.out.println("Has v6 flags? " + INET6_CACHE_ENABLED);
         System.out.println("Uses v6 temp? " + getPrivacyStatus());
         // Windows 8.1 Java 1.8.0_66 netbook appx. 200ms + 50ms/interface
