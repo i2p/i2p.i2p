@@ -801,11 +801,14 @@ public class TransportManager implements TransportEventListener {
             if (port > 0) {
                 TransportUtil.IPv6Config config = t.getIPv6Config();
                 // ipv4
-                if (config != TransportUtil.IPv6Config.IPV6_ONLY)
+                if (config != TransportUtil.IPv6Config.IPV6_ONLY &&
+                    !t.isIPv4Firewalled()) {
                     rv.add(new Port(t.getStyle(), port));
+                }
                 // ipv6
                 if (_context.getProperty(PROP_ENABLE_UPNP_IPV6, DEFAULT_ENABLE_UPNP_IPV6) &&
-                    config != TransportUtil.IPv6Config.IPV6_DISABLED) {
+                    config != TransportUtil.IPv6Config.IPV6_DISABLED &&
+                    !t.isIPv6Firewalled()) {
                     RouterAddress ra = t.getCurrentAddress(true);
                     if (ra == null) {
                         if (t.getStyle().equals(UDPTransport.STYLE)) {

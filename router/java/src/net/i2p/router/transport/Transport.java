@@ -201,6 +201,20 @@ public interface Transport {
      */
     public TransportUtil.IPv6Config getIPv6Config();
 
+    /**
+     *  This returns true if the force-firewalled setting is configured, false otherwise.
+     *
+     *  @since 0.9.50 added to interface
+     */
+    public boolean isIPv4Firewalled();
+
+    /**
+     *  This returns true if the force-firewalled setting is configured, false otherwise.
+     *
+     *  @since 0.9.50 added to interface
+     */
+    public boolean isIPv6Firewalled();
+
     public boolean isBacklogged(Hash peer);
 
     /**
