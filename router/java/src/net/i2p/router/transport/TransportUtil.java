@@ -124,6 +124,8 @@ public abstract class TransportUtil {
     /**
      *  Addresses without a host (i.e. w/introducers)
      *  are assumed to be IPv4 unless a '6' cap is present
+     *
+     *  @param addr non-null
      */
     public static boolean isIPv6(RouterAddress addr) {
         // do this the fast way, without calling getIP() to parse the host string
