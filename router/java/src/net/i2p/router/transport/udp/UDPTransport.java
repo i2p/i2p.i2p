@@ -707,7 +707,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             else
                 setReachabilityStatus(Status.REJECT_UNSOLICITED);
         }
-        rebuildExternalAddress(false);
+        rebuildExternalAddress(false, false);
     }
     
     public synchronized void shutdown() {
@@ -760,7 +760,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 setReachabilityStatus(Status.HOSED);
                 // TODO restart?
             }
-            rebuildExternalAddress();
+            rebuildExternalAddress(endpoint.isIPv6());
         }
     }
 
@@ -1756,7 +1756,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         synchronized(_addDropLock) {
             locked_dropPeer(peer, shouldBanlist, why);
         }
-        rebuildIfNecessary();
+        // the only possible reason to rebuild is if they were an introducer for us
+        if (peer.getTheyRelayToUsAs() > 0)
+            rebuildIfNecessary();
     }
 
     /**
@@ -1810,34 +1812,34 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     private void rebuildIfNecessary() {
         synchronized (_rebuildLock) {
-            if (locked_needsRebuild())
-                rebuildExternalAddress();
+            int code = locked_needsRebuild();
+            if (code != 0)
+                rebuildExternalAddress(code == 2);
         }
     }
 
-    private boolean locked_needsRebuild() {
-        if (_needsRebuild) return true; // simple enough
-        if (_context.router().isHidden()) return false;
+    /**
+     *  @return 1 for ipv4, 2 for ipv6, 0 for neither
+     */
+    private int locked_needsRebuild() {
+        if (_needsRebuild) return 1; // assume ipv4
+        if (_context.router().isHidden()) return 0;
         TransportUtil.IPv6Config config = getIPv6Config();
         // IPv4
         boolean v6Only = config == IPV6_ONLY;
         if (!v6Only) {
             RouterAddress addr = getCurrentAddress(false);
             if (locked_needsRebuild(addr, false))
-                return true;
+                return 1;
         }
         // IPv6
-        // Disable for now until we have introducers working
-        // because it loops too quickly
-     /*
         boolean v4Only = config == IPV6_DISABLED;
-        if (!v4Only && _hasIPv6Address) {
+        if (!v4Only && _haveIPv6Address) {
             RouterAddress addr = getCurrentAddress(true);
             if (locked_needsRebuild(addr, true))
-                return true;
+                return 2;
         }
-      */
-        return false;
+        return 0;
     }
 
     /**
@@ -1851,7 +1853,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             UDPAddress ua = new UDPAddress(addr);
             long now = _context.clock().now();
             int valid = 0;
-            for (int i = 0; i < ua.getIntroducerCount(); i++) {
+            int count = ua.getIntroducerCount();
+            for (int i = 0; i < count; i++) {
                 long exp = ua.getIntroducerExpiration(i);
                 if (exp > 0 && exp < now + INTRODUCER_EXPIRATION_MARGIN) {
                     if (_log.shouldWarn())
@@ -1880,9 +1883,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 //}
             } else if (sinceSelected > 2*60*1000) {
                 // Rate limit to prevent rapid churn after transition to firewalled or at startup
-                if (_log.shouldLog(Log.INFO))
-                    _log.info((ipv6 ? "IPv6" : "IPv4") + " Need more introducers (have " + valid + " need " + PUBLIC_RELAY_COUNT + ')');
-                return true;
+                int avail = _introManager.introducerCount(ipv6);
+                boolean rv = valid < count || valid < avail;
+                if (rv) {
+                    if (_log.shouldWarn())
+                        _log.warn((ipv6 ? "IPv6" : "IPv4") + " Need more introducers (have " + count + " valid " + valid + " need " + PUBLIC_RELAY_COUNT + " avail " + avail + ')');
+                } else {
+                    if (_log.shouldInfo())
+                        _log.info((ipv6 ? "IPv6" : "IPv4") + " Need more introducers, no more avail. (have " + valid + " need " + PUBLIC_RELAY_COUNT + " avail " + avail + ')');
+                }
+                return rv;
             } else {
                 if (_log.shouldLog(Log.INFO))
                     _log.info((ipv6 ? "IPv6" : "IPv4") + " Need more introducers (have " + valid + " need " + PUBLIC_RELAY_COUNT + ')' +
@@ -2330,25 +2340,25 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     /**
-     * Rebuild to get updated cost and introducers.
+     * Rebuild to get updated cost and introducers. IPv4 only.
      * Do not tell the router (he is the one calling this)
      * @since 0.7.12
      */
     @Override
     public List<RouterAddress> updateAddress() {
-        rebuildExternalAddress(false);
+        rebuildExternalAddress(false, false);
         return getCurrentAddresses();
     }
 
     /**
-     *  Update our IPv4 addresses AND tell the router to rebuild and republish the router info.
+     *  Update our IPv4 or IPv6 address AND tell the router to rebuild and republish the router info.
      *
      *  @return the new address if changed, else null
      */
-    private RouterAddress rebuildExternalAddress() {
+    private RouterAddress rebuildExternalAddress(boolean ipv6) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("REA1");
-        return rebuildExternalAddress(true);
+        return rebuildExternalAddress(true, ipv6);
     }
 
     /**
@@ -2365,7 +2375,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  @param allowRebuildRouterInfo whether to tell the router
      *  @return the new address if changed, else null
      */
-    private RouterAddress rebuildExternalAddress(boolean allowRebuildRouterInfo) {
+    private RouterAddress rebuildExternalAddress(boolean allowRebuildRouterInfo, boolean ipv6) {
         if (_log.shouldDebug())
             _log.debug("REA2 " + allowRebuildRouterInfo);
         // if the external port is specified, we want to use that to bind to even
@@ -2437,12 +2447,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return rv;
             }
         } else {
-            boolean v6Only = getIPv6Config() == IPV6_ONLY;
-            if (!introducersRequired(v6Only)) {
-                RouterAddress cur = getCurrentExternalAddress(v6Only);
+            if (!introducersRequired(ipv6)) {
+                RouterAddress cur = getCurrentExternalAddress(ipv6);
                 if (cur != null)
                     host = cur.getHost();
             }
+            if (ipv6 && host == null)
+                host = ":";  // special flag, see REA4
         }
         return rebuildExternalAddress(host, port, allowRebuildRouterInfo);
     }
@@ -2471,6 +2482,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  FIXME no way to remove an IPv6 address
      *
      *  @param host new validated IPv4 or IPv6 or DNS hostname or null
+     *              or ":" to force IPv6 introducer rebuild
      *  @param port new validated port or 0/-1
      *  @param allowRebuildRouterInfo whether to tell the router
      *  @return the new address if changed, else null
@@ -2482,10 +2494,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
 
+    /**
+     *  @param host new validated IPv4 or IPv6 or DNS hostname or null
+     *              or ":" to force IPv6 introducer rebuild
+     */
     private RouterAddress locked_rebuildExternalAddress(String host, int port, boolean allowRebuildRouterInfo) {
         if (_log.shouldDebug())
             _log.debug("REA4 " + host + ' ' + port, new Exception());
         boolean isIPv6 = host != null && host.contains(":");
+        if (isIPv6 && host.equals(":"))
+            host = null;
         OrderedProperties options = new OrderedProperties(); 
         if (_context.router().isHidden()) {
             // save the external address, since we didn't publish it
@@ -3466,7 +3484,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     }
                 }
             } else {
-                rebuildExternalAddress();
+                rebuildExternalAddress(false);
             }
         } else {
             if (newStatus == Status.UNKNOWN && status != _reachabilityStatusPending) {
