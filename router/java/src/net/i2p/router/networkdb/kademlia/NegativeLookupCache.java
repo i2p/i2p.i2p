@@ -20,7 +20,7 @@ class NegativeLookupCache {
     private final Map<Hash, Destination> badDests;
     private final int _maxFails;
     
-    private static final int MAX_FAILS = 3;
+    static final int MAX_FAILS = 3;
     private static final int MAX_BAD_DESTS = 128;
     private static final long CLEAN_TIME = 2*60*1000;
 

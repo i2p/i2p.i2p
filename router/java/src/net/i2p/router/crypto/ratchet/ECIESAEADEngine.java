@@ -1479,6 +1479,9 @@ public final class ECIESAEADEngine {
             if (entry.getType() != DatabaseEntry.KEY_TYPE_LS2)
                 continue;
             LeaseSet2 ls2 = (LeaseSet2) entry;
+            // i2pd bug?
+            if (ls2.getLeaseCount() == 0)
+                return;
             if (!ls2.isCurrent(Router.CLOCK_FUDGE_FACTOR))
                 continue;
             PublicKey pk = ls2.getEncryptionKey(LeaseSetKeys.SET_EC);
