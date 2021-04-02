@@ -261,7 +261,11 @@ class IntroductionManager {
             int oldFound = found;
             loop:
             for (RouterAddress ra : ras) {
-                String host = ra.getHost();
+                byte[] ip = ra.getIP();
+                if (ip == null)
+                    continue;
+                // we must canonicalize IPv6 addresses
+                String host = ip.length == 4 ? ra.getHost() : Addresses.toString(ip);
                 if (host == null)
                     continue;
                 // dup check of reused introducers
@@ -269,7 +273,6 @@ class IntroductionManager {
                     if (host.equals(intro.sip))
                         continue loop;
                 }
-                byte[] ip = ra.getIP();
                 int port = ra.getPort();
                 if (!isValid(ip, port, true))
                     continue;
