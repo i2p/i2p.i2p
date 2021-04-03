@@ -1224,7 +1224,7 @@ class PacketBuilder {
                 (Arrays.equals(iaddr.getAddress(), _transport.getExternalIP()) && !_transport.allowLocal())) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Cannot build a relay request for " + state.getRemoteIdentity().calculateHash()
-                               + ", as the introducer address is invalid: " + Addresses.toString(iaddr.getAddress(), iport));
+                               + ", introducer address is invalid or blocklisted: " + Addresses.toString(iaddr.getAddress(), iport));
                 // TODO implement some sort of introducer banlist
                 continue;
             }
@@ -1262,7 +1262,7 @@ class PacketBuilder {
                 rv.add(pkt);
             else if (_log.shouldWarn())
                 _log.warn("Cannot build a relay request for " + state.getRemoteIdentity().calculateHash()
-                          + ", as we don't have an IPv4 address to send to: " + Addresses.toString(iaddr.getAddress(), iport));
+                          + ", as we don't have an address to send to: " + Addresses.toString(iaddr.getAddress(), iport));
         }
         return rv;
     }
@@ -1278,18 +1278,28 @@ class PacketBuilder {
         byte data[] = pkt.getData();
         int off = HEADER_SIZE;
         
-        // Must specify these if request is going over IPv6
+        // Must specify these if request is going over IPv6 for v4 or vice versa
         byte ourIP[];
         int ourPort;
         if (introHost instanceof Inet6Address) {
-            RouterAddress ra = _transport.getCurrentExternalAddress(false);
-            if (ra == null)
+            RouterAddress ra = _transport.getCurrentExternalAddress(true);
+            if (ra == null) {
+                ra = _transport.getCurrentExternalAddress(false);
+                if (ra == null)
+                    return null;
+            }
+            byte[] ip = ra.getIP();
+            if (ip == null)
                 return null;
-            ourIP = ra.getIP();
-            if (ourIP == null)
-                return null;
-            ourPort = _transport.getRequestedPort();
+            if (ip.length != 16) {
+                ourIP = ip;
+                ourPort = _transport.getRequestedPort();
+            } else {
+                ourIP = null;
+                ourPort = 0;
+            }
         } else {
+            // TODO IPv4 introducer, IPv6 introduction
             ourIP = null;
             ourPort = 0;
         }

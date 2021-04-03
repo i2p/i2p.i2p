@@ -943,16 +943,16 @@ class EstablishmentManager {
         _context.statManager().addRateData("udp.sendIntroRelayRequest", 1);
         List<UDPPacket> requests = _builder.buildRelayRequest(_transport, this, state, _transport.getIntroKey());
         if (requests.isEmpty()) {
-            // FIXME need a failed OB state
             if (_log.shouldLog(Log.WARN))
                 _log.warn("No valid introducers! " + state);
-            // set failed state, remove nonce, and return
+            processExpired(state);
+            return;
         }
         for (UDPPacket req : requests) {
             _transport.send(req);
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Send intro for " + state + " with our intro key as " + _transport.getIntroKey());
+            _log.debug("Send relay request for " + state + " with our intro key as " + _transport.getIntroKey());
         state.introSent();
     }
 
@@ -1043,13 +1043,13 @@ class EstablishmentManager {
 
     /**
      *  Are IP and port valid? This is only for checking the relay response.
-     *  Reject all IPv6, for now, even if we are configured for it.
+     *  Allow IPv6 as of 0.9.50.
      *  Refuse anybody in the same /16
      *  @since 0.9.3, pkg private since 0.9.45 for PacketBuider
      */
     boolean isValid(byte[] ip, int port) {
         return TransportUtil.isValidPort(port) &&
-               ip != null && ip.length == 4 &&
+               ip != null &&
                _transport.isValid(ip) &&
                (!_transport.isTooClose(ip)) &&
                (!_context.blocklist().isBlocklisted(ip));
@@ -1377,7 +1377,7 @@ class EstablishmentManager {
             boolean removed = _liveIntroductions.remove(Long.valueOf(nonce), outboundState);
             if (removed) {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Send intro for " + outboundState + " timed out");
+                    _log.debug("Relay request for " + outboundState + " timed out");
                 _context.statManager().addRateData("udp.sendIntroRelayTimeout", 1);
             }
         }

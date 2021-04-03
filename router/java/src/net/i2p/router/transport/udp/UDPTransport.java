@@ -825,7 +825,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 if (DataHelper.eq(ip, 0, myip, 0, 2))
                     return true;
             } else if (ip.length == 16) {
-                if (DataHelper.eq(ip, 0, myip, 0, 8))
+                if (DataHelper.eq(ip, 0, myip, 0, 4))
                     return true;
             }
         }
@@ -1822,7 +1822,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  @return 1 for ipv4, 2 for ipv6, 0 for neither
      */
     private int locked_needsRebuild() {
-        if (_needsRebuild) return 1; // assume ipv4
         if (_context.router().isHidden()) return 0;
         TransportUtil.IPv6Config config = getIPv6Config();
         // IPv4
@@ -1849,6 +1848,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  @since 0.9.50 split out from above
      */
     private boolean locked_needsRebuild(RouterAddress addr, boolean ipv6) {
+        if (_needsRebuild)
+            return true;
         if (introducersRequired(ipv6)) {
             UDPAddress ua = new UDPAddress(addr);
             long now = _context.clock().now();
@@ -2043,6 +2044,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return null;
             }
 
+            if (isUnreachable(to))
+                return null;
+
             // Validate his SSU address
             RouterAddress addr = getTargetAddress(toAddress);
             if (addr == null) {
@@ -2150,11 +2154,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 }
             } else {
                 // introducers
-                if (getIPv6Config() == IPV6_ONLY)
-                    continue;
-                // TODO support IPv6 introductions
                 String caps = addr.getOption(UDPAddress.PROP_CAPACITY);
-                if (caps != null && caps.contains(CAP_IPV6)   /* && !_haveIPv6Address */  )
+                if (caps != null && caps.contains(CAP_IPV6) && !_haveIPv6Address)
                     continue;
             }
             return addr;
@@ -2340,13 +2341,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     /**
-     * Rebuild to get updated cost and introducers. IPv4 only.
+     * Rebuild to get updated cost and introducers. IPv4 only, unless configured as IPv6 only.
      * Do not tell the router (he is the one calling this)
      * @since 0.7.12
      */
     @Override
     public List<RouterAddress> updateAddress() {
-        rebuildExternalAddress(false, false);
+        boolean ipv6 = getIPv6Config() == IPV6_ONLY;
+        rebuildExternalAddress(false, ipv6);
         return getCurrentAddresses();
     }
 
@@ -2672,8 +2674,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 addr = null;
             }
         
-            if (!isIPv6)
-                _needsRebuild = false;
+            _needsRebuild = false;
             return addr;
         } else {
             if (_log.shouldLog(Log.WARN))
@@ -3311,8 +3312,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     } else if ((!haveCap || !peer.isInbound()) &&
                                peer.getMayDisconnect() &&
                                peer.getMessagesReceived() <= 2 && peer.getMessagesSent() <= 2) {
-                        if (_log.shouldInfo())
-                            _log.info("Possible early disconnect for: " + peer);
+                        //if (_log.shouldInfo())
+                        //    _log.info("Possible early disconnect for: " + peer);
                         inactivityCutoff = mayDisconCutoff;
                     } else {
                         inactivityCutoff = shortInactivityCutoff;
