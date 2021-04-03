@@ -1214,15 +1214,31 @@ class PacketBuilder {
             long tag = addr.getIntroducerTag(i);
             long exp = addr.getIntroducerExpiration(i);
             // let's not use an introducer on a privileged port, sounds like trouble
-            if (ikey == null ||
-                iaddr == null || tag <= 0 ||
-                // we must use the same isValid() as EstablishmentManager.receiveRelayResponse().
-                // If an introducer isn't valid, we shouldn't send to it
-                !emgr.isValid(iaddr.getAddress(), iport) ||
-                (exp > 0 && exp < cutoff) ||
+            if (iaddr == null) {
+                if (_log.shouldWarn())
+                    _log.warn("Cannot build a relay request for " + state.getRemoteIdentity().calculateHash()
+                               + " slot " + i + " no address");
+                continue;
+            }
+            if (ikey == null || tag <= 0) {
+                if (_log.shouldWarn())
+                    _log.warn("Cannot build a relay request for " + state.getRemoteIdentity().calculateHash()
+                               + " slot " + i + " no key/tag");
+                continue;
+            }
+            if  (exp > 0 && exp < cutoff) {
+                if (_log.shouldWarn())
+                    _log.warn("Cannot build a relay request for " + state.getRemoteIdentity().calculateHash()
+                               + ", expired " + DataHelper.formatTime(exp)
+                               + " : " + Addresses.toString(iaddr.getAddress(), iport));
+                continue;
+            }
+            // we must use the same isValid() as EstablishmentManager.receiveRelayResponse().
+            // If an introducer isn't valid, we shouldn't send to it
+            if (!emgr.isValid(iaddr.getAddress(), iport) ||
                 // FIXME this will have already failed in isValid() above, right?
                 (Arrays.equals(iaddr.getAddress(), _transport.getExternalIP()) && !_transport.allowLocal())) {
-                if (_log.shouldLog(Log.WARN))
+                if (_log.shouldWarn())
                     _log.warn("Cannot build a relay request for " + state.getRemoteIdentity().calculateHash()
                                + ", introducer address is invalid or blocklisted: " + Addresses.toString(iaddr.getAddress(), iport));
                 // TODO implement some sort of introducer banlist
