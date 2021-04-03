@@ -183,6 +183,7 @@ class PrimarySession extends SAMv3StreamSession implements SAMDatagramReceiver, 
 
 	/**
 	 *  Remove a session
+	 *  @param props ignored, may be null
 	 *  @return null for success, or error message
 	 */
 	public synchronized String remove(String nick, Properties props) {
@@ -268,13 +269,17 @@ class PrimarySession extends SAMv3StreamSession implements SAMDatagramReceiver, 
 	}
 
 	/**
-	 * Close the primary session
-	 * Overridden to stop the acceptor.
+	 * Close the primary session and all subsessions.
+	 * Overridden to stop the acceptor and the subsessions.
 	 */
 	@Override
-	public void close() {
-		// close sessions?
+	public synchronized void close() {
 		streamAcceptor.stopRunning();
+		for (Map.Entry<String, SAMMessageSess> e : sessions.entrySet()) {
+			SAMv3Handler.sSessionsHash.del(e.getKey());
+			e.getValue().close();
+		}
+		sessions.clear();
 		super.close();
 	}
         

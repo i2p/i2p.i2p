@@ -1,3 +1,23 @@
+2021-04-03 zzz
+ * SAM: Remove subsessions when primary session closes
+ * SSU: Remove restrictions on IPv6 introducers (prop. 158)
+
+2021-04-02 zzz
+ * SSU: Fix dup IPv6 introducers
+
+2021-04-01 zzz
+ * NetDB: Negative cache LS received with zero leases
+
+2021-03-31 zzz
+ * SSU: Update address when IPv6 introducers change (prop. 158)
+
+2021-03-30 zzz
+ * Transport: Fix NTCP removing IPv4 address when SSU removes IPv6 address
+
+2021-03-29 zzz
+ * SSU: Don't request introducers when hidden
+ * Transport: Don't open UPnP ports when hidden or force-firewalled
+
 2021-03-27 zzz
  * Router: Fix decryption of blinded leasesets
 
