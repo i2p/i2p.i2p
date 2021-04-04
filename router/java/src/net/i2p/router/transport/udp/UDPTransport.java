@@ -1671,13 +1671,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 }
             }
         } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Received another message: " + inMsg.getClass().getName());
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Received another message: " + inMsg.getClass().getName());
         }
-        PeerState peer = getPeerState(remoteIdentHash);
+        //PeerState peer = getPeerState(remoteIdentHash);
         super.messageReceived(inMsg, remoteIdent, remoteIdentHash, msToReceive, bytesReceived);
-        if (peer != null)
-            peer.expireInboundMessages();
+        // Called in IMF, not needed here too
+        //if (peer != null)
+        //    peer.expireInboundMessages();
     }
 
     private class RemoveDropList implements SimpleTimer.TimedEvent {
