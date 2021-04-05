@@ -31,8 +31,6 @@
         <echo message="  installer-windows: build the GUI installer (Windows only)" />
         <echo message="  installer-nowindows: build the GUI installer (all but Windows)" />
         <echo message="  installer5, installer5-linux, installer5-nowindows, installer5-windows: use IzPack 5" />
-        <echo message="  osxLauncher: build the Mac OS X router/GUI launcher (OSX only)" />
-        <echo message="  bbLauncher: build the Browser Bundle router launcher" />
         <echo message="  bundle:    (GIT ONLY!) generate a git bundle and a corresponding torrent." />
         <echo message="  tarball:   tar the full install into i2p.tar.bz2 (extracts to build a new clean install)" />
         <echo message="  git-bundle:    (GIT ONLY!) generate a git bundle and a corresponding torrent." />
@@ -311,28 +309,6 @@
             <arg value="+%s" />
         </exec>
         <echo message="Epoch is: ${epoch}" />
-    </target>
-
-    <target name="bbLauncher" depends="build">
-        <sequential>
-            <exec executable="./sbt" dir="launchers" failonerror="true">
-                <arg value="browserbundle:clean" />
-            </exec>
-            <exec executable="./sbt" dir="launchers" failonerror="true">
-                <arg value="browserbundle:assembly" />
-            </exec>
-        </sequential>
-    </target>
-
-    <target name="osxLauncher" depends="build,preppkg-osx">
-        <sequential>
-            <exec executable="./sbt" dir="launchers" failonerror="true">
-                <arg value="macosx:cleanAllTask" />
-            </exec>
-            <exec executable="./sbt" dir="launchers" failonerror="true">
-                <arg value="macosx:buildAppBundleTask" />
-            </exec>
-        </sequential>
     </target>
 
     <target name="buildBOB" depends="buildMinistreaming" >
@@ -2804,7 +2780,6 @@
             <fileset dir="../i2p-${Extended.Version}/" includes="Docker*" />
             <file name="../i2p-${Extended.Version}/Makefile.gcj" />
             <fileset dir="../i2p-${Extended.Version}/docs" />
-            <fileset dir="../i2p-${Extended.Version}/launchers" />
             <file name="../i2p-${Extended.Version}/.travis.yml" />
             <file name="../i2p-${Extended.Version}/.gitignore" />
             <!-- gradle files -->
@@ -2881,7 +2856,6 @@
             <fileset dir="../i2p-${Extended.Version}/" includes="Docker*" />
             <file name="../i2p-${Extended.Version}/Makefile.gcj" />
             <fileset dir="../i2p-${Extended.Version}/docs" />
-            <fileset dir="../i2p-${Extended.Version}/launchers" />
             <file name="../i2p-${Extended.Version}/.travis.yml" />
             <file name="../i2p-${Extended.Version}/.gitignore" />
             <!-- gradle files -->
@@ -2961,7 +2935,6 @@
             <fileset dir="../i2p-${Extended.Version}/" includes="Docker*" />
             <file name="../i2p-${Extended.Version}/Makefile.gcj" />
             <fileset dir="../i2p-${Extended.Version}/docs" />
-            <fileset dir="../i2p-${Extended.Version}/launchers" />
             <file name="../i2p-${Extended.Version}/.travis.yml" />
             <file name="../i2p-${Extended.Version}/.gitignore" />
             <!-- gradle files -->
@@ -3028,7 +3001,6 @@
             <fileset dir="../i2p-${Extended.Version}/" includes="Docker*" />
             <file name="../i2p-${Extended.Version}/Makefile.gcj" />
             <fileset dir="../i2p-${Extended.Version}/docs" />
-            <fileset dir="../i2p-${Extended.Version}/launchers" />
             <file name="../i2p-${Extended.Version}/.travis.yml" />
             <file name="../i2p-${Extended.Version}/.gitignore" />
             <!-- gradle files -->
