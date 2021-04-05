@@ -59,7 +59,8 @@ public class VariableTunnelBuildMessage extends TunnelBuildMessage {
     public String toString() {
         StringBuilder buf = new StringBuilder(64);
         buf.append("[VariableTunnelBuildMessage: " +
-                   "\n\tRecords: ").append(getRecordCount())
+                   "\n\tID: ").append(getUniqueId())
+           .append("\n\tRecords: ").append(getRecordCount())
            .append(']');
         return buf.toString();
     }
