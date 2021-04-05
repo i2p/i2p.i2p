@@ -499,6 +499,7 @@ public class Analysis extends JobImpl implements RouterApp {
         }
 
         double avg = total / (sz * sz / 2d);
+        String other = _context.getBooleanProperty(PROP_NONFF) ? "router" : "floodfill";
         for (Pair p : pairs) {
             double distance = biLog2(p.dist);
             double point = MIN_CLOSE - distance;
@@ -507,10 +508,10 @@ public class Analysis extends JobImpl implements RouterApp {
             point *= PAIR_DISTANCE_FACTOR;
             String b2 = p.r2.getHash().toBase64();
             addPoints(points, p.r1.getHash(), point, "Very close (" + fmt.format(distance) +
-                          ") to other floodfill <a href=\"netdb?r=" + b2 + "\">" + b2 + "</a>");
+                          ") to other " + other + " <a href=\"netdb?r=" + b2 + "\">" + b2 + "</a>");
             String b1 = p.r1.getHash().toBase64();
             addPoints(points, p.r2.getHash(), point, "Very close (" + fmt.format(distance) +
-                          ") to other floodfill <a href=\"netdb?r=" + b1 + "\">" + b1 + "</a>");
+                          ") to other " + other + " <a href=\"netdb?r=" + b1 + "\">" + b1 + "</a>");
         }
         return avg;
     }

@@ -26,6 +26,9 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.router.Blocklist;
+import net.i2p.update.UpdateManager;
+import net.i2p.update.UpdateType;
 import net.i2p.util.Log;
 import net.i2p.util.FileSuffixFilter;
 import net.i2p.util.SecureDirectory;
@@ -241,7 +244,10 @@ public class PersistSybil {
     Map<String, Long> readBlocklist() {
         File f = new File(_context.getConfigDir(), SDIR);
         f = new File(f, BLOCKLIST_SYBIL_FILE);
-        return readBlocklist(f);
+        Map<String, Long> rv = readBlocklist(f);
+        if (rv != null)
+            notifyVersion(f.lastModified());
+        return rv;
     }
 
     /**
@@ -319,11 +325,24 @@ public class PersistSybil {
                 out.write(e.getValue().toString());
                 out.write('\n');
             }
+            notifyVersion(_context.clock().now());
         } catch (IOException ioe) {
             if (_log.shouldWarn())
                 _log.warn("Error writing the blocklist file", ioe);
         } finally {
             if (out != null) try { out.close(); } catch (IOException ioe) {}
+        }
+    }
+
+    /**
+     *  @since 0.9.50
+     */
+    private void notifyVersion(long v) {
+        ClientAppManager cmgr = _context.clientAppManager();
+        if (cmgr != null) {
+            UpdateManager umgr = (UpdateManager) cmgr.getRegisteredApp(UpdateManager.APP_NAME);
+            if (umgr != null)
+                umgr.notifyInstalled(UpdateType.BLOCKLIST, Blocklist.ID_SYBIL, Long.toString(v));
         }
     }
 
