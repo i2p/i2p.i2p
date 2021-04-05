@@ -34,7 +34,6 @@ SCRIPTFILES="\
 	./installer/resources/locale/bundle-messages.sh \
 	./installer/resources/uninstall_i2p_service_osx.command
 	./installer/resources/uninstall_i2p_service_unix \
-	./launchers/macosx/check_latest_java.sh \
 	./Slackware/i2p/i2p.SlackBuild \
 	./Slackware/i2p/doinst.sh \
 	./Slackware/i2p/rc.i2p \
