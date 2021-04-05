@@ -1678,6 +1678,11 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
 
         @Override
         public String toString() {
+            if (version.length() == 13) {
+                try {
+                    return "Version " + version + " (" + DataHelper.formatTime(Long.parseLong(version)) + ')';
+                } catch (NumberFormatException nfe) {}
+            }
             return "Version " + version;
         }
     }
