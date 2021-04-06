@@ -52,7 +52,8 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlocking
      *
      *  Maybe need to make configurable per-instance.
      */
-    private static final long TARGET = 15;
+    private static final int TARGET = 15;
+    private final long _target;
 
     /**
      *  Quote:
@@ -62,7 +63,8 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlocking
      *
      *  Maybe need to make configurable per-instance.
      */
-    private static final long INTERVAL = 300;
+    private static final int INTERVAL = 300;
+    private final long _interval;
     //private static final int MAXPACKET = 512;
 
     private final String STAT_DROP;
@@ -77,7 +79,16 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlocking
      *  @param name for stats
      */
     public CoDelPriorityBlockingQueue(I2PAppContext ctx, String name, int initialCapacity) {
+        this(ctx, name, initialCapacity, TARGET, INTERVAL);
+    }
+
+    /**
+     *  @param name for stats
+     */
+    public CoDelPriorityBlockingQueue(I2PAppContext ctx, String name, int initialCapacity, int target, int interval) {
         super(ctx, name, initialCapacity);
+        _target = target;
+        _interval = interval;
         STAT_DROP = ("codel." + name + ".drop.").intern();
         STAT_DELAY = ("codel." + name + ".delay").intern();
         for (int i = 0; i < PRIORITIES.length; i++) {
@@ -190,13 +201,13 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlocking
         long sojurn = _now - entry.getEnqueueTime();
         _context.statManager().addRateData(STAT_DELAY, sojurn);
         // I2P use isEmpty instead of size() < MAXPACKET
-        if (sojurn < TARGET || isEmpty()) {
+        if (sojurn < _target || isEmpty()) {
             _first_above_time = 0;
         } else {
             if (_first_above_time == 0) {
                 // just went above from below. if we stay above
-                // for at least INTERVAL we'll say it's ok to drop
-                _first_above_time = _now + INTERVAL;
+                // for at least _interval we'll say it's ok to drop
+                _first_above_time = _now + _interval;
             } else if (_now >= _first_above_time) {
                 ok_to_drop = true;
             }
@@ -253,7 +264,7 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlocking
                 }
             } else if (ok_to_drop &&
                        rv.getPriority() < DONT_DROP_PRIORITY &&
-                       (_now - _drop_next < INTERVAL || _now - _first_above_time >= INTERVAL)) {
+                       (_now - _drop_next < _interval || _now - _first_above_time >= _interval)) {
                 // If we get here, then we're not in dropping state. If the sojourn time has been above
                 // target for interval, then we decide whether it's time to enter dropping state.
                 // We do so if we've been either in dropping state recently or above target for a relatively
@@ -271,7 +282,7 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlocking
                 _dropping = true;
                 // If we're in a drop cycle, the drop rate that controlled the queue
                 // on the last cycle is a good starting point to control it now.
-                if (_now - _drop_next < INTERVAL)
+                if (_now - _drop_next < _interval)
                     _count = _count > 2 ? _count - 2 : 1;
                 else
                     _count = 1;
@@ -301,6 +312,6 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlocking
      *  Caller must synch on this
      */
     private void control_law(long t) {
-        _drop_next = t + (long) (INTERVAL / Math.sqrt(_count));
+        _drop_next = t + (long) (_interval / Math.sqrt(_count));
     }
 }
