@@ -543,8 +543,8 @@ class IntroductionManager {
         byte[] aliceIP = alice.getIP();
         int alicePort = alice.getPort();
         boolean ipIncluded = ipSize != 0;
-        // here we allow IPv6, but only if there's an IP included
-        if (!isValid(aliceIP, alicePort, ipIncluded)) {
+        // here we allow IPv6
+        if (!isValid(aliceIP, alicePort, true)) {
             // not necessarily invalid ip/port, could be blocklisted
             if (_log.shouldWarn())
                 _log.warn("Rejecting relay req from " + alice + " for " + Addresses.toString(aliceIP, alicePort));
@@ -597,7 +597,7 @@ class IntroductionManager {
         if (charlie == null) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Receive relay request from " + alice 
-                      + " with unknown tag");
+                      + " with unknown tag " + tag);
             _context.statManager().addRateData("udp.receiveRelayRequestBadTag", 1);
             return;
         }

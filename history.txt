@@ -1,3 +1,14 @@
+2021-04-08 zzz
+ * Debian: Fix link to compiler jar (Debian ticket #986474)
+
+2021-04-05 zzz
+ * Build: Remove launcher code
+ * Console: Convert update versions to times for debug page
+ * Sybil: Register blocklist version with update manager
+
+2021-04-04 zzz
+ * Tunnels: Fix timestamp checking for ECIES records
+
 2021-04-03 zzz
  * SAM: Remove subsessions when primary session closes
  * SSU: Remove restrictions on IPv6 introducers (prop. 158)
