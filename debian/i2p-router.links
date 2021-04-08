@@ -52,8 +52,8 @@ usr/share/java/tomcat9-util-scan.jar usr/share/i2p/lib/tomcat-util-scan.jar
 usr/share/java/tomcat9-jasper-el.jar usr/share/i2p/lib/jasper-el.jar
 # legacy name in lib/
 usr/share/java/tomcat9-el-api.jar usr/share/i2p/lib/commons-el.jar
-# tomcat pulls in ecj, link to it for eepsite webapps needing a compiler
-usr/share/java/ecj.jar usr/share/i2p/lib/ecj.jar
+# tomcat9 pulls in libeclipse-jdk-core-java, link to it for eepsite webapps needing a compiler
+usr/share/java/eclipse-jdt-core.jar usr/share/i2p/lib/ecj.jar
 
 
 # comment out if not building with libtaglibs-standard
