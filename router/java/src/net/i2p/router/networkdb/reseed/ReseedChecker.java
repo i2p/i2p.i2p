@@ -75,8 +75,10 @@ public class ReseedChecker {
                 s = "Only " + x + " peers remaining but reseed disabled by configuration";
             else
                 s = "No peers remaining but reseed disabled by configuration";
-            _lastError = s;
-            _log.logAlways(Log.WARN, s);
+            if (!s.equals(_lastError)) {
+                _lastError = s;
+                _log.logAlways(Log.WARN, s);
+            }
             return false;
         }
 
@@ -88,8 +90,10 @@ public class ReseedChecker {
                 s = "Only " + x + " peers remaining but reseed disabled by shutdown in progress";
             else
                 s = "No peers remaining but reseed disabled by shutdown in progress";
-            _lastError = s;
-            _log.logAlways(Log.WARN, s);
+            if (!s.equals(_lastError)) {
+                _lastError = s;
+                _log.logAlways(Log.WARN, s);
+            }
             return false;
         }
 
@@ -122,8 +126,10 @@ public class ReseedChecker {
                 s = "Only " + x + " peers remaining but reseed disabled by config file";
             else
                 s = "No peers remaining but reseed disabled by config file";
-            _lastError = s;
-            _log.logAlways(Log.WARN, s);
+            if (!s.equals(_lastError)) {
+                _lastError = s;
+                _log.logAlways(Log.WARN, s);
+            }
             return false;
         }
     }
