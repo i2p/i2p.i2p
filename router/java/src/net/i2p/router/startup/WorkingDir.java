@@ -361,6 +361,8 @@ public class WorkingDir {
      */
     private static boolean migrateClientsConfig(File olddir, File todir) {
         File oldFile = new File(olddir, "clients.config");
+        if (!oldFile.exists())
+            return true;
         File newFile = new File(todir, "clients.config");
         FileInputStream in = null;
         PrintWriter out = null;
@@ -389,9 +391,7 @@ public class WorkingDir {
                 throw new IOException("Failed write to " + newFile);
             return true;
         } catch (IOException ioe) {
-            if (in != null) {
-                System.err.println("FAILED copy " + oldFile + ": " + ioe);
-            }
+            System.err.println("FAILED copy " + oldFile + ": " + ioe);
             return false;
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
@@ -406,6 +406,8 @@ public class WorkingDir {
      */
     static boolean migrateJettyXml(File olddir, File todir, String filename, String oldString, String newString) {
         File oldFile = new File(olddir, filename);
+        if (!oldFile.exists())
+            return true;
         File newFile = new File(todir, filename);
         FileInputStream in = null;
         PrintWriter out = null;
@@ -426,9 +428,7 @@ public class WorkingDir {
             System.err.println("Copied " + oldFile + " with modifications");
             return true;
         } catch (IOException ioe) {
-            if (in != null) {
-                System.err.println("FAILED copy " + oldFile + ": " + ioe);
-            }
+            System.err.println("FAILED copy " + oldFile + ": " + ioe);
             return false;
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
