@@ -33,7 +33,7 @@ import net.i2p.util.SystemVersion;
 class SummaryBarRenderer {
 
     static final String ALL_SECTIONS[] =
-        {"HelpAndFAQ", "I2PServices", "I2PInternals", "RouterInfo", "ShortRouterInfo", "AdvancedRouterInfo", "MemoryBar", "NetworkReachability",
+        {"HelpAndFAQ", "I2PServices", "I2PInternals", "I2PDiagnostics", "RouterInfo", "ShortRouterInfo", "AdvancedRouterInfo", "MemoryBar", "NetworkReachability",
         "UpdateStatus", "RestartStatus", "Peers", "PeersAdvanced", "FirewallAndReseedStatus", "Bandwidth", "BandwidthGraph", "Tunnels",
         "Congestion", "TunnelStatus", "Destinations", "NewsHeadings", "Advanced" };
     static final Map<String, String> SECTION_NAMES;
@@ -42,7 +42,8 @@ class SummaryBarRenderer {
         Map<String, String> aMap = new HashMap<String, String>();
         aMap.put("HelpAndFAQ", _x("Help &amp; FAQ"));
         aMap.put("I2PServices", _x("I2P Services"));
-        aMap.put("I2PInternals", _x("I2P Internals"));
+        aMap.put("I2PInternals", _x("I2P Configuration"));
+        aMap.put("I2PDiagnostics", _x("I2P Diagnostics"));
         aMap.put("RouterInfo", _x("Router Information"));
         aMap.put("ShortRouterInfo", _x("Router Information (brief)"));
         aMap.put("AdvancedRouterInfo", _x("Router Information (advanced)"));
@@ -96,6 +97,8 @@ class SummaryBarRenderer {
                 buf.append(renderI2PServicesHTML());
             else if ("I2PInternals".equals(section))
                 buf.append(renderI2PInternalsHTML());
+            else if ("I2PDiagnostics".equals(section))
+                buf.append(renderI2PDiagnosticsHTML());
             else if ("Advanced".equals(section))
                 buf.append(renderAdvancedHTML());
             else if ("RouterInfo".equals(section) || "General".equals(section)) // Backwards-compatibility
@@ -182,15 +185,6 @@ class SummaryBarRenderer {
         rbuf.setLength(0);
         rbuf.append("<a href=\"/help#reachabilityhelp\" target=\"_top\" title=\"")
            .append(_t("Information about the network status"))
-           .append("\">")
-           .append(nbsp(tx))
-           .append("</a>\n");
-        svcs.put(tx, rbuf.toString());
-
-        tx = _t("Setup");
-        rbuf.setLength(0);
-        rbuf.append("<a href=\"/welcome\" target=\"_top\" title=\"")
-           .append(_t("New Install Wizard"))
            .append("\">")
            .append(nbsp(tx))
            .append("</a>\n");
@@ -341,7 +335,7 @@ class SummaryBarRenderer {
         buf.append("<h3><a href=\"/config\" target=\"_top\" title=\"")
            .append(_t("Configure I2P Router"))
            .append("\">")
-           .append(_t("I2P Internals"))
+           .append(_t("I2P Configuration"))
            .append("</a></h3><hr class=\"b\">\n" +
 
                    "<table id=\"sb_internals\"><tr><td>\n");
@@ -360,11 +354,11 @@ class SummaryBarRenderer {
             svcs.put(tx, rbuf.toString());
         }
 
-        if (!StatSummarizer.isDisabled(_context)) {
-            String tx = _t("Graphs");
+        if (pm.isRegistered(PortMapper.SVC_I2PTUNNEL)) {
+            String tx = _t("Hidden Services Manager");
             rbuf.setLength(0);
-            rbuf.append("<a href=\"/graphs\" target=\"_top\" title=\"")
-                .append(_t("Graph router performance"))
+            rbuf.append("<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
+                .append(_t("Local Tunnels"))
                 .append("\">")
                 .append(nbsp(tx))
                 .append("</a>\n");
@@ -380,18 +374,62 @@ class SummaryBarRenderer {
            .append("</a>\n");
         svcs.put(tx, rbuf.toString());
 
-        if (pm.isRegistered(PortMapper.SVC_I2PTUNNEL)) {
-            tx = _t("Hidden Services Manager");
+        tx = _t("Settings");
+        rbuf.setLength(0);
+        rbuf.append("<a href=\"/config\" target=\"_top\" title=\"")
+           .append(_t("New Install Wizard"))
+           .append("\">")
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
+
+        tx = _t("Setup");
+        rbuf.setLength(0);
+        rbuf.append("<a href=\"/welcome\" target=\"_top\" title=\"")
+           .append(_t("New Install Wizard"))
+           .append("\">")
+           .append(nbsp(tx))
+           .append("</a>\n");
+        svcs.put(tx, rbuf.toString());
+
+        for (String row : svcs.values()) {
+             buf.append(row);
+        }
+        buf.append("</td></tr></table>\n");
+        return buf.toString();
+    }
+
+
+    /**
+     *  Renders html for section containing logging, peer information, non-configuration "Admin" elements.
+     *  @since 0.9.50 separates config from non config elements in "I2P Internals"
+     */
+    public String renderI2PDiagnosticsHTML() {
+        StringBuilder buf = new StringBuilder(512);
+        buf.append("<h3><a href=\"/config\" target=\"_top\" title=\"")
+           .append(_t("Configure I2P Router"))
+           .append("\">")
+           .append(_t("Diagnostics"))
+           .append("</a></h3><hr class=\"b\">\n" +
+
+                   "<table id=\"sb_internals\"><tr><td>\n");
+
+        // Store all items in map so they are sorted by translated name, then output
+        Map<String, String> svcs = new TreeMap<String, String>(Collator.getInstance());
+        StringBuilder rbuf = new StringBuilder(128);
+
+        if (!StatSummarizer.isDisabled(_context)) {
+            String tx = _t("Graphs");
             rbuf.setLength(0);
-            rbuf.append("<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
-                .append(_t("Local Tunnels"))
+            rbuf.append("<a href=\"/graphs\" target=\"_top\" title=\"")
+                .append(_t("Graph router performance"))
                 .append("\">")
                 .append(nbsp(tx))
                 .append("</a>\n");
             svcs.put(tx, rbuf.toString());
         }
 
-        tx = _t("Logs");
+        String tx = _t("Logs");
         rbuf.setLength(0);
         rbuf.append("<a href=\"/logs\" target=\"_top\" title=\"")
             .append(_t("Health Report"))

@@ -172,7 +172,7 @@ public class HomeHelper extends HelperBase {
             return "";
         }
         StringBuilder buf = new StringBuilder(1380);
-        buf.append(topWrap(_t("Network Information and Developer Information")));
+        buf.append(topWrap(_t("Network and Developer Information")));
         buf.append(table);
         buf.append(bottomWrap);
         return buf.toString();
