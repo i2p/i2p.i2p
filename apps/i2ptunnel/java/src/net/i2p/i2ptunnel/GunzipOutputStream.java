@@ -17,9 +17,9 @@ import net.i2p.data.DataHelper;
  * so we don't have a Reusable version of this.
  *
  * Modified from net.i2p.util.ResettableGZIPInputStream to use Java 6 InflaterOutputstream
- * @since 0.9.21
+ * @since 0.9.21, public since 0.9.50 for LocalHTTPServer
  */
-class GunzipOutputStream extends InflaterOutputStream {
+public class GunzipOutputStream extends InflaterOutputStream {
     private static final int FOOTER_SIZE = 8; // CRC32 + ISIZE
     private final CRC32 _crc32;
     private final byte _buf1[] = new byte[1];

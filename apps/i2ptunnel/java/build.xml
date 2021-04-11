@@ -88,9 +88,17 @@
         <property name="workspace.changes.j.tr" value="" />
         <mkdir dir="./build/obj/net/i2p/i2ptunnel/resources"/>
         <copy todir="./build/obj/net/i2p/i2ptunnel/resources">
-            <fileset dir="../../routerconsole/jsp/" includes="themes/console/*/*.css themes/console/images/i2plogo.png themes/console/images/favicon.ico themes/console/images/itoopie_sm.png themes/console/images/buttons/go.png themes/console/images/buttons/yes.png" />
+            <fileset dir="../../routerconsole/jsp/" includes="themes/console/images/i2plogo.png themes/console/images/favicon.ico themes/console/images/itoopie_sm.png themes/console/images/buttons/go.png themes/console/images/buttons/yes.png" />
             <fileset dir="../resources" includes="**/*.ht" />
         </copy>
+        <mkdir dir="./build/obj/net/i2p/i2ptunnel/resources/themes/console/light"/>
+        <mkdir dir="./build/obj/net/i2p/i2ptunnel/resources/themes/console/dark"/>
+        <!--
+          - Pre-gzip the css files.
+          - LocalHTTPServer will convert the filenames, and gunzip if necessary.
+         -->
+        <gzip src="../../routerconsole/jsp/themes/console/light/console.css" destfile="./build/obj/net/i2p/i2ptunnel/resources/themes/console/light/console.css.gz" />
+        <gzip src="../../routerconsole/jsp/themes/console/dark/console.css" destfile="./build/obj/net/i2p/i2ptunnel/resources/themes/console/dark/console.css.gz" />
         <jar destfile="./build/i2ptunnel.jar" basedir="./build/obj" excludes="**/ui/*.class **/web/*.class" >
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.i2ptunnel.I2PTunnel" />

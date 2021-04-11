@@ -28,6 +28,7 @@ import net.i2p.data.Destination;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SigningPublicKey;
+import net.i2p.i2ptunnel.GunzipOutputStream;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.util.FileUtil;
 import net.i2p.util.PortMapper;
@@ -111,10 +112,11 @@ public abstract class LocalHTTPServer {
      *  @param sockMgr only for /b32, otherwise ignored
      *  @param targetRequest decoded path only, non-null
      *  @param query raw (encoded), may be null
+     *  @param allowGzip may we send a gzipped response?
      */
     public static void serveLocalFile(I2PAppContext context, I2PSocketManager sockMgr,
                                       OutputStream out, String method, String targetRequest,
-                                      String query, String proxyNonce) throws IOException {
+                                      String query, String proxyNonce, boolean allowGzip) throws IOException {
         //System.err.println("targetRequest: \"" + targetRequest + "\"");
         // a home page message for the curious...
         if (targetRequest.equals("/")) {
@@ -129,23 +131,34 @@ public abstract class LocalHTTPServer {
             // theme hack
             if (filename.startsWith("themes/console/default/"))
                 filename = filename.replaceFirst("default", context.getProperty("routerconsole.theme", "light"));
+            if (filename.endsWith(".css"))
+                filename = filename + ".gz";
             InputStream in = getResource(filename);
             if (in != null) {
                 try {
                     String type;
-                    if (filename.endsWith(".css"))
-                        type = "text/css";
+                    if (filename.endsWith(".css.gz"))
+                        type = "text/css; charset=UTF-8";
                     else if (filename.endsWith(".ico"))
                         type = "image/x-icon";
                     else if (filename.endsWith(".png"))
                         type = "image/png";
                     else if (filename.endsWith(".jpg"))
                         type = "image/jpeg";
-                    else type = "text/html";
+                    else type = "text/html; charset=UTF-8";
                     out.write("HTTP/1.1 200 OK\r\nContent-Type: ".getBytes("UTF-8"));
                     out.write(type.getBytes("UTF-8"));
+                    if (allowGzip && filename.endsWith(".gz"))
+                        out.write("\r\nContent-Encoding: gzip".getBytes("UTF-8"));
                     out.write("\r\nCache-Control: max-age=86400\r\nConnection: close\r\nProxy-Connection: close\r\n\r\n".getBytes("UTF-8"));
-                    DataHelper.copy(in, out);
+                    if (!allowGzip && filename.endsWith(".gz")) {
+                        // gunzip on the fly. should be very rare, all browsers should support gzip
+                        OutputStream out2 = new GunzipOutputStream(out);
+                        DataHelper.copy(in, out2);
+                        out2.flush();
+                    } else {
+                        DataHelper.copy(in, out);
+                    }
                 } finally {
                     try { in.close(); } catch (IOException ioe) {}
                 }
