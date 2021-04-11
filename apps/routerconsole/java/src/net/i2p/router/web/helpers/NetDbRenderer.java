@@ -1062,10 +1062,21 @@ class NetDbRenderer {
                     rv |= SSU;
             }
             String host = addr.getHost();
-            if (host != null && host.contains(":"))
+            if (host != null && host.contains(":")) {
                 rv |= IPV6;
-
+            } else {
+                String caps = addr.getOption("caps");
+                if (caps != null && caps.contains("6"))
+                    rv |= IPV6;
+            }
         }
+        // map invalid values with "" in TNAMES
+        if (rv == 3)
+            rv = 2;
+        else if (rv == 7)
+            rv = 6;
+        else if (rv == 8)
+            rv = 0;
         return rv;
     }
 
