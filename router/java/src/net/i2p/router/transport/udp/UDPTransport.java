@@ -290,6 +290,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                                                                     Status.IPV4_FIREWALLED_IPV6_OK,
                                                                     Status.IPV4_FIREWALLED_IPV6_UNKNOWN);
 
+    private static final Set<Status> STATUS_OK =         EnumSet.of(Status.OK,
+                                                                    Status.IPV4_DISABLED_IPV6_OK);
+
 
     public UDPTransport(RouterContext ctx, DHSessionKeyBuilder.Factory dh) {
         super(ctx);
@@ -3304,7 +3307,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             final long mayDisconCutoff = now - MAY_DISCON_TIMEOUT;
             long pingCutoff = now - (2 * 60*60*1000);
             long pingFirewallCutoff = now - PING_FIREWALL_CUTOFF;
-            boolean shouldPingFirewall = _reachabilityStatus != Status.OK;
+            boolean shouldPingFirewall = !STATUS_OK.contains(_reachabilityStatus);
             int currentListenPort = getListenPort(false);
             boolean pingOneOnly = shouldPingFirewall && getExternalPort(false) == currentListenPort;
             boolean shortLoop = shouldPingFirewall || !haveCap || _context.netDb().floodfillEnabled();
@@ -3442,8 +3445,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (status != old) {
                 // for the following transitions ONLY, require two in a row
                 // to prevent thrashing
-                if ((old == Status.OK && STATUS_FW.contains(status)) ||
-                    (status == Status.OK && STATUS_FW.contains(old))) {
+                if ((STATUS_OK.contains(old) && STATUS_FW.contains(status)) ||
+                    (STATUS_OK.contains(status) && STATUS_FW.contains(old))) {
                     if (status != _reachabilityStatusPending) {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Old status: " + old + " status pending confirmation: " + status +
