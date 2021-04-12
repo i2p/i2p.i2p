@@ -224,13 +224,18 @@ class PeerTestManager {
                     // already completed, possibly on to the next test
                     return;
                 } else if (expired()) {
-                    testComplete(true);
-                } else if (_context.clock().now() - state.getLastSendTime() >= RESEND_TIMEOUT) {
+                    if (!_currentTestComplete)
+                        testComplete();
+                    return;
+                }
+                long timeSinceSend = _context.clock().now() - state.getLastSendTime();
+                if (timeSinceSend >= RESEND_TIMEOUT) {
                     int sent = state.incrementPacketsRelayed();
                     if (sent > MAX_RELAYED_PER_TEST_ALICE) {
-                        testComplete(false);
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Sent too many packets: " + state);
+                        if (!_currentTestComplete)
+                            testComplete();
                         return;
                     }
                     if (state.getReceiveBobTime() <= 0) {
@@ -247,6 +252,8 @@ class PeerTestManager {
                     }
                     // retx at 4, 10, 17, 25 elapsed time
                     _context.simpleTimer2().addEvent(ContinueTest.this, RESEND_TIMEOUT + (sent*1000));
+                } else {
+                    _context.simpleTimer2().addEvent(ContinueTest.this, RESEND_TIMEOUT - timeSinceSend);
                 }
             }
         }
@@ -347,7 +354,7 @@ class PeerTestManager {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Receive test reply from Bob: " + test);
                 if (test.getAlicePortFromCharlie() > 0)
-                    testComplete(true);
+                    testComplete();
             } catch (UnknownHostException uhe) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unable to get our IP (length " + ipSize +
@@ -392,7 +399,7 @@ class PeerTestManager {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Receive test reply from Charlie: " + test);
                     if (test.getReceiveBobTime() > 0)
-                        testComplete(true);
+                        testComplete();
                 } catch (UnknownHostException uhe) {
                     if (_log.shouldWarn())
                         _log.warn("Charlie @ " + from + " said we were an invalid IP address: " + uhe.getMessage(), uhe);
@@ -400,9 +407,10 @@ class PeerTestManager {
                 }
             } else {
                 if (test.incrementPacketsRelayed() > MAX_RELAYED_PER_TEST_ALICE) {
-                    testComplete(false);
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Sent too many packets on the test: " + test);
+                    if (!_currentTestComplete)
+                        testComplete();
                     return;
                 }
                 
@@ -434,11 +442,9 @@ class PeerTestManager {
      * Evaluate the info we have and act accordingly, since the test has either timed out or
      * we have successfully received the second PeerTest from a Charlie.
      *
-     * @param forgetTest must be true to clear out this test and allow another
-     *
      * call from a synchronized method
      */
-    private void testComplete(boolean forgetTest) {
+    private void testComplete() {
         _currentTestComplete = true;
         PeerTestState test = _currentTest;
 
@@ -477,8 +483,7 @@ class PeerTestManager {
             _log.info("Test complete: " + test);
         
         honorStatus(status, isIPv6);
-        if (forgetTest)
-            _currentTest = null;
+        _currentTest = null;
     }
     
     /**

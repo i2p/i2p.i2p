@@ -3,6 +3,7 @@ package net.i2p.router.transport.udp;
 import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
 
 /**
@@ -119,6 +120,8 @@ class PeerTestState {
     public String toString() {
         StringBuilder buf = new StringBuilder(256);
         buf.append("PeerTest ").append(_testNonce)
+           .append(_isIPv6 ? " IPv6" : " IPv4")
+           .append(" started ").append(DataHelper.formatTime(_beginTime))
            .append(" as ").append(_ourRole.toString());
         if (_aliceIP != null)
             buf.append("; Alice: ").append(_aliceIP).append(':').append(_alicePort);
