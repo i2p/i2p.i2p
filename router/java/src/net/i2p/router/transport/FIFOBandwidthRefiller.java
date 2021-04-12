@@ -351,12 +351,14 @@ public class FIFOBandwidthRefiller implements Runnable {
     }
 
     /**
-     *  Run once every replenish period
+     *  Call a few times a minute to update the stats
      *
      *  @since 0.8.12
      */
     private void updateParticipating(long now) {
             _context.statManager().addRateData("tunnel.participatingBandwidthOut", getCurrentParticipatingBandwidth());
-            _context.statManager().addRateData("bwLimiter.participatingBandwidthQueue", (long) _partBWE.getQueueSizeEstimate());
+            // this one is not a required stat
+            if (_context.getBooleanProperty("stat.full"))
+                _context.statManager().addRateData("bwLimiter.participatingBandwidthQueue", (long) _partBWE.getQueueSizeEstimate());
     }
 }
