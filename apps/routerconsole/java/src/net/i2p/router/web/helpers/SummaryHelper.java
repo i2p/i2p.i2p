@@ -57,6 +57,7 @@ public class SummaryHelper extends HelperBase {
         "FirewallAndReseedStatus" + S +
         "I2PServices" + S +
         "I2PInternals" + S +
+        "I2PDiagnostics" + S +
         "HelpAndFAQ" + S +
         "Peers" + S +
         "RestartStatus" + S +
@@ -74,6 +75,7 @@ public class SummaryHelper extends HelperBase {
         "FirewallAndReseedStatus" + S +
         "I2PServices" + S +
         "I2PInternals" + S +
+        "I2PDiagnostics" + S +
         "Advanced" + S +
         "Peers" + S +
         "RestartStatus" + S +

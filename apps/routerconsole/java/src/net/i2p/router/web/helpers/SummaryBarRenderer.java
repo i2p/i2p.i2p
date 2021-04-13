@@ -42,8 +42,8 @@ class SummaryBarRenderer {
         Map<String, String> aMap = new HashMap<String, String>();
         aMap.put("HelpAndFAQ", _x("Help &amp; FAQ"));
         aMap.put("I2PServices", _x("I2P Services"));
-        aMap.put("I2PInternals", _x("I2P Configuration"));
-        aMap.put("I2PDiagnostics", _x("I2P Diagnostics"));
+        aMap.put("I2PInternals", _x("Configuration"));
+        aMap.put("I2PDiagnostics", _x("Diagnostics"));
         aMap.put("RouterInfo", _x("Router Information"));
         aMap.put("ShortRouterInfo", _x("Router Information (brief)"));
         aMap.put("AdvancedRouterInfo", _x("Router Information (advanced)"));
