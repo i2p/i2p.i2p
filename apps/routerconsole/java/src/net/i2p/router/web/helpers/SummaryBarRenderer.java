@@ -335,7 +335,7 @@ class SummaryBarRenderer {
         buf.append("<h3><a href=\"/config\" target=\"_top\" title=\"")
            .append(_t("Configure I2P Router"))
            .append("\">")
-           .append(_t("I2P Configuration"))
+           .append(_t("Configuration"))
            .append("</a></h3><hr class=\"b\">\n" +
 
                    "<table id=\"sb_internals\"><tr><td>\n");
