@@ -539,14 +539,13 @@ public abstract class CommSystemFacade implements Service {
 
                         case REJECT_UNSOLICITED:
                         case IPV4_FIREWALLED_IPV6_OK:
-                        case IPV4_DISABLED_IPV6_FIREWALLED:
                             return REJECT_UNSOLICITED;
 
                         case IPV4_DISABLED_IPV6_OK:
                             return IPV4_DISABLED_IPV6_FIREWALLED;
 
                         case DIFFERENT:
-                        case IPV4_SNAT_IPV6_OK:
+                        case IPV4_DISABLED_IPV6_FIREWALLED:
                             return oldStatus;
 
                         // cases where we already knew the IPv6 state only
@@ -565,6 +564,7 @@ public abstract class CommSystemFacade implements Service {
                             return IPV4_DISABLED_IPV6_FIREWALLED;
 
                         case IPV4_SNAT_IPV6_UNKNOWN:
+                        case IPV4_SNAT_IPV6_OK:
                             return DIFFERENT;
 
                         default:
