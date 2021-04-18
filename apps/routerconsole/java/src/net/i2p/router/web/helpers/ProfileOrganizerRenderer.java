@@ -303,10 +303,12 @@ class ProfileOrganizerRenderer {
            .append("Caps").append(":</b></td><td>").append(_t("capabilities in the netDb, not used to determine profiles"))
            .append("</td></tr>");
         buf.append("<tr id=\"capabilities_key\"><td colspan=\"2\"><table><tbody>");
+/*
         buf.append("<tr><td>&nbsp;</td>")
            .append("<td><b>B</b></td><td>").append(_t("SSU Testing")).append("</td>")
            .append("<td><b>C</b></td><td>").append(_t("SSU Introducer")).append("</td>")
            .append("<td>&nbsp;</td></tr>");
+*/
         buf.append("<tr><td>&nbsp;</td>")
            .append("<td><b>f</b></td><td>").append(_t("Floodfill")).append("</td>")
            .append("<td><b>H</b></td><td>").append(_t("Hidden")).append("</td>")
