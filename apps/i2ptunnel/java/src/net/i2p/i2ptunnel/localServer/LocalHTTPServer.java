@@ -365,6 +365,7 @@ public abstract class LocalHTTPServer {
 
         PortMapper pm = I2PAppContext.getGlobalContext().portMapper();
         String conURL = pm.getConsoleURL();
+        String idn = I2PTunnelHTTPClientBase.decodeIDNHost(host);
         out.write(("HTTP/1.1 200 OK\r\n"+
                   "Content-Type: text/html; charset=UTF-8\r\n"+
                   "Referrer-Policy: no-referrer\r\n"+
@@ -372,7 +373,7 @@ public abstract class LocalHTTPServer {
                   "Proxy-Connection: close\r\n"+
                   "\r\n"+
                   "<html><head>"+
-                  "<title>" + _t("Redirecting to {0}", host) + "</title>\n" +
+                  "<title>" + _t("Redirecting to {0}", idn) + "</title>\n" +
                   "<link rel=\"shortcut icon\" href=\"http://proxy.i2p/themes/console/images/favicon.ico\" >\n" +
                   "<link href=\"http://proxy.i2p/themes/console/default/console.css\" rel=\"stylesheet\" type=\"text/css\" >\n" +
                   "<meta http-equiv=\"Refresh\" content=\"1; url=" + url + "\">\n" +
@@ -386,8 +387,8 @@ public abstract class LocalHTTPServer {
                   "<div class=warning id=warning>\n" +
                   "<h3>" +
                   (success ?
-                           _t("Saved {0} to the {1} address book, redirecting now.", host, tbook) :
-                           _t("Failed to save {0} to the {1} address book, redirecting now.", host, tbook)) +
+                           _t("Saved {0} to the {1} address book, redirecting now.", idn, tbook) :
+                           _t("Failed to save {0} to the {1} address book, redirecting now.", idn, tbook)) +
                   "</h3>\n<p><a href=\"" + url + "\">" +
                   _t("Click here if you are not redirected automatically.") +
                   "</a></p></div>").getBytes("UTF-8"));
@@ -399,6 +400,7 @@ public abstract class LocalHTTPServer {
     private static void writeB32RedirectPage(OutputStream out, String host, String url) throws IOException {
         PortMapper pm = I2PAppContext.getGlobalContext().portMapper();
         String conURL = pm.getConsoleURL();
+        String idn = I2PTunnelHTTPClientBase.decodeIDNHost(host);
         out.write(("HTTP/1.1 200 OK\r\n"+
                   "Content-Type: text/html; charset=UTF-8\r\n"+
                   "Referrer-Policy: no-referrer\r\n"+
@@ -406,7 +408,7 @@ public abstract class LocalHTTPServer {
                   "Proxy-Connection: close\r\n"+
                   "\r\n"+
                   "<html><head>"+
-                  "<title>" + _t("Redirecting to {0}", host) + "</title>\n" +
+                  "<title>" + _t("Redirecting to {0}", idn) + "</title>\n" +
                   "<link rel=\"shortcut icon\" href=\"http://proxy.i2p/themes/console/images/favicon.ico\" >\n" +
                   "<link href=\"http://proxy.i2p/themes/console/default/console.css\" rel=\"stylesheet\" type=\"text/css\" >\n" +
                   "<meta http-equiv=\"Refresh\" content=\"1; url=" + url + "\">\n" +
@@ -419,7 +421,7 @@ public abstract class LocalHTTPServer {
         out.write(("</div>" +
                   "<div class=warning id=warning>\n" +
                   "<h3>" +
-                  _t("Saved the authentication for {0}, redirecting now.", host) +
+                  _t("Saved the authentication for {0}, redirecting now.", idn) +
                   "</h3>\n<p><a href=\"" + url + "\">" +
                   _t("Click here if you are not redirected automatically.") +
                   "</a></p></div>").getBytes("UTF-8"));
