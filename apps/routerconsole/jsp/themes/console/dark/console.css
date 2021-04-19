@@ -263,6 +263,24 @@ div.warning {
      padding: 0;
 }
 
+.hostaddform {
+     display: inline-table;
+     width: 48%;
+}
+
+.hostadd {
+     height: 130px;
+     width: 100%;
+}
+
+.hostaddaction {
+     background: transparent !important;
+     border: none !important;
+     padding-bottom: 15px !important;
+     padding-top: 0px !important;
+}
+
+
 /* end proxy errors */
 
 /* sidebar */
