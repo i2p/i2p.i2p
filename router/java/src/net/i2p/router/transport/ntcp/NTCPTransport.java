@@ -852,11 +852,18 @@ public class NTCPTransport extends TransportImpl {
             Collection<InetAddress> addrs = getSavedLocalAddresses();
             if (!addrs.isEmpty() && !_context.router().isHidden()) {
                 int count = 0;
+                boolean skipv4 = false;
+                boolean skipv6 = false;
                 for (InetAddress ia : addrs) {
                     boolean ipv6 = ia instanceof Inet6Address;
                     if ((ipv6 && (isIPv6Firewalled() || _context.getBooleanProperty(PROP_IPV6_FIREWALLED))) ||
-                        (!ipv6 && isIPv4Firewalled()))
+                        (!ipv6 && isIPv4Firewalled())) {
+                        if (ipv6)
+                            skipv6 = true;
+                        else
+                            skipv4 = true;
                         continue;
+                    }
                     OrderedProperties props = new OrderedProperties();
                     props.setProperty(RouterAddress.PROP_HOST, ia.getHostAddress());
                     props.setProperty(RouterAddress.PROP_PORT, Integer.toString(port));
@@ -866,8 +873,13 @@ public class NTCPTransport extends TransportImpl {
                     replaceAddress(myAddress);
                     count++;
                 }
-                if (count <= 0)
+                if (count <= 0) {
                     setOutboundNTCP2Address();
+                } else if (skipv6) {
+                    setOutboundNTCP2Address(true);
+                } else if (skipv4) {
+                    setOutboundNTCP2Address(false);
+                }
             } else if (_enableNTCP2) {
                 setOutboundNTCP2Address();
             }
@@ -878,12 +890,40 @@ public class NTCPTransport extends TransportImpl {
     }
 
     /**
-     *  Outbound only, NTCP2 with "s" and "v" only
+     *  Outbound only, both IPv4 and IPv6, NTCP2 with "s" and "v" only
      *  @since 0.9.36
      */
     private void setOutboundNTCP2Address() {
         OrderedProperties props = new OrderedProperties();
         addNTCP2Options(props);
+        RouterAddress myAddress = new RouterAddress(STYLE2, props, NTCP2_OUTBOUND_COST);
+        replaceAddress(myAddress);
+    }
+
+    /**
+     *  Outbound only, either IPv4 or IPv6, NTCP2 with "s" and "v" only.
+     *  @since 0.9.50
+     */
+    private void setOutboundNTCP2Address(boolean ipv6) {
+        if (!_context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS))
+            return;
+        // following is like addNTCP2Options() but adds 4 or 6 only,
+        // and returns if not appropriately configured
+        String caps;
+        TransportUtil.IPv6Config config = getIPv6Config();
+        if (ipv6) {
+            if (config == IPV6_DISABLED)
+                return;
+            caps = CAP_IPV6;
+        } else {
+            if (config == IPV6_ONLY)
+                return;
+            caps = CAP_IPV4;
+        }
+        OrderedProperties props = new OrderedProperties();
+        props.setProperty("caps", caps);
+        props.setProperty("s", _b64Ntcp2StaticPubkey);
+        props.setProperty("v", NTCP2_VERSION);
         RouterAddress myAddress = new RouterAddress(STYLE2, props, NTCP2_OUTBOUND_COST);
         replaceAddress(myAddress);
     }
@@ -1640,6 +1680,8 @@ public class NTCPTransport extends TransportImpl {
                 newAddr.setCost(DEFAULT_COST);
             changed = true;
         } else if (ohost == null || ohost.length() <= 0) {
+            if (_log.shouldInfo())
+                _log.info("No old host, no new host, no change to NTCP Address");
             return false;
         } else if (Boolean.parseBoolean(enabled) && !ssuOK) {
             // UDP transitioned to not-OK, turn off NTCP address
@@ -1686,6 +1728,9 @@ public class NTCPTransport extends TransportImpl {
             // IPv6
             // We have an IPv4 address, IPv6 transitioned to firewalled,
             // so just remove the v6 address
+            // TODO '6' address
+            if (_log.shouldInfo())
+                _log.info("IPv6 now firewalled");
             newAddr = null;
         }
 
