@@ -647,30 +647,30 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     if (hasv6)
                         continue;
                     hasv6 = true;
+                    // save the external address but don't publish it
+                    // save it where UPnP can get it and try to forward it
+                    OrderedProperties localOpts = new OrderedProperties(); 
+                    localOpts.setProperty(UDPAddress.PROP_PORT, String.valueOf(newPort));
+                    localOpts.setProperty(UDPAddress.PROP_HOST, newIP);
+                    RouterAddress local = new RouterAddress(STYLE, localOpts, DEFAULT_COST);
+                    replaceCurrentExternalAddress(local, true);
                     if (isIPv6Firewalled() || _context.getBooleanProperty(PROP_IPV6_FIREWALLED)) {
                         setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_FIREWALLED, true);
-                        // save the external address but don't publish it
-                        // save it where UPnP can get it and try to forward it
-                        OrderedProperties localOpts = new OrderedProperties(); 
-                        localOpts.setProperty(UDPAddress.PROP_PORT, String.valueOf(newPort));
-                        localOpts.setProperty(UDPAddress.PROP_HOST, newIP);
-                        RouterAddress local = new RouterAddress(STYLE, localOpts, DEFAULT_COST);
-                        replaceCurrentExternalAddress(local, true);
                     } else {
                         _lastInboundIPv6 = _context.clock().now();
                         setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK, true);
                         rebuildExternalAddress(newIP, newPort, false);
                     }
                 } else {
+                    // save the external address but don't publish it
+                    // save it where UPnP can get it and try to forward it
+                    OrderedProperties localOpts = new OrderedProperties(); 
+                    localOpts.setProperty(UDPAddress.PROP_PORT, String.valueOf(newPort));
+                    localOpts.setProperty(UDPAddress.PROP_HOST, newIP);
+                    RouterAddress local = new RouterAddress(STYLE, localOpts, DEFAULT_COST);
+                    replaceCurrentExternalAddress(local, false);
                     if (isIPv4Firewalled()) {
                         setReachabilityStatus(Status.IPV4_FIREWALLED_IPV6_UNKNOWN);
-                        // save the external address but don't publish it
-                        // save it where UPnP can get it and try to forward it
-                        OrderedProperties localOpts = new OrderedProperties(); 
-                        localOpts.setProperty(UDPAddress.PROP_PORT, String.valueOf(newPort));
-                        localOpts.setProperty(UDPAddress.PROP_HOST, newIP);
-                        RouterAddress local = new RouterAddress(STYLE, localOpts, DEFAULT_COST);
-                        replaceCurrentExternalAddress(local, false);
                     } else {
                         setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
                         rebuildExternalAddress(newIP, newPort, false);

@@ -1,5 +1,25 @@
+2021-04-20 zzz
+ * SSU: Fix setting addresses from interfaces at startup
+
+2021-04-18 zzz
+ * Proxy: Decode IDN hostnames in error pages
+
+2021-04-17 zzz
+ * Transport: IPv6 state transition fixes
+
+2021-04-12 zzz
+ * SSU: Fix peer test getting stuck
+
+2021-04-11 zzz
+ * Proxy: Precompress error page CSS
+ * SSU: IPv6-only fixes
+
+2021-04-09 zzz
+ * Router: Fixes for setting up config dir in embedded applications
+
 2021-04-08 zzz
  * Debian: Fix link to compiler jar (Debian ticket #986474)
+ * SSU: IPv6 introducer fixes
 
 2021-04-05 zzz
  * Build: Remove launcher code
