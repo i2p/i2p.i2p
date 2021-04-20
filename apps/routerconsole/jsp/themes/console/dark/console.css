@@ -264,13 +264,26 @@ div.warning {
 }
 
 .hostaddform {
-     display: inline-table;
-     width: 48%;
+     display: inline-block;
+     width: 45%;
+     vertical-align: top;
 }
 
 .hostadd {
-     height: 130px;
+     height: 25%;
      width: 100%;
+}
+
+@media screen and (max-width: 1080px) {
+.hostadd {
+     height: 35%;
+}
+}
+
+@media screen and (max-width: 540px) {
+.hostadd {
+     height: 45%;
+}
 }
 
 .hostaddaction {
