@@ -1455,7 +1455,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 // FIXME if there is a query remaining it is lost
                 "<form method=\"GET\" action=\"" + targetRequest + "\" class=\"hostaddform\">\n" +
                 "<div class=\"formaction hostaddaction\"><button type=\"submit\" class=\"go hostadd\">" +
-                "<h4>" + _t("Continue to {0} without saving", destination) + "</h4>\n<p>" +
+                "<h4>" + _t("Continue to {0} without saving", idn) + "</h4>\n<p>" +
                 _t("You can browse to the site without saving it to the address book. The address will be remembered until you restart your I2P router.") +
                 "</p>\n</button></div>" + "\n</form>\n" +
 
