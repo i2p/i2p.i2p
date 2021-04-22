@@ -1455,7 +1455,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 // FIXME if there is a query remaining it is lost
                 "<form method=\"GET\" action=\"" + targetRequest + "\" class=\"hostaddform\">\n" +
                 "<div class=\"formaction hostaddaction\"><button type=\"submit\" class=\"go hostadd\">" +
-                "<h4>" + _t("Continue to {0} without saving", idn) + "</h4>\n<p>" +
+                "<span class=\"unicodeicon\">&#10143;</span><h4>" + _t("Continue to {0} without saving", idn) + "</h4>\n<p>" +
                 _t("You can browse to the site without saving it to the address book. The address will be remembered until you restart your I2P router.") +
                 "</p>\n</button></div>" + "\n</form>\n" +
 
@@ -1467,7 +1467,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         // FIXME wasn't escaped
         String label = _t("Save & continue").replace("&", "&amp;");
         out.write("<div class=\"formaction hostaddaction\"><button type=\"submit\" class=\"accept hostadd\" name=\"router\" value=\"router\">" +
-                "<h4>" + _t("Save {0} to router address book and continue to website", idn) + "</h4>\n<p>" +
+                "<span class=\"unicodeicon\">&#10143;</span><h4>" + _t("Save {0} to router address book and continue to website", idn) + "</h4>\n<p>" +
                 _t("This address will be saved to your Router address book where your subscription-based addresses are stored."));
                 if(_context.namingService().getName().equals("BlockfileNamingService")) {
                     out.write(" " + _t("If you want to keep track of sites you have added manually, add to your Local or Private address book instead."));
@@ -1478,12 +1478,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             // only blockfile supports multiple books
 
             out.write("<div class=\"formaction hostaddaction\"><button type=\"submit\" class=\"accept hostadd\" name=\"local\" value=\"local\">" +
-            "<h4>" + _t("Save {0} to local address book and continue to website", idn) + "</h4>\n<p>" +
+            "<span class=\"unicodeicon\">&#10143;</span><h4>" + _t("Save {0} to local address book and continue to website", idn) + "</h4>\n<p>" +
             _t("This address will be saved to your Local address book. Select this option for addresses you wish to keep separate from the main router address book, but don't mind publishing.") +
             "</p>\n</button></div>\n");
 
             out.write("<div class=\"formaction hostaddaction\"><button type=\"submit\" class=\"accept hostadd\" name=\"private\" value=\"private\">" +
-            "<h4>" + _t("Save {0} to private address book and continue to website", idn) + "</h4>\n<p>" +
+            "<span class=\"unicodeicon\">&#10143;</span><h4>" + _t("Save {0} to private address book and continue to website", idn) + "</h4>\n<p>" +
             _t("This address will be saved to your Private address book, ensuring it is never published.") +
              "</p>\n</button></div>\n");
 

@@ -1183,21 +1183,14 @@ p:empty + .sb_notice {
 }
 
 .hostadd {
-     height: 25%;
+     min-height: 20%;
      width: 100%;
      background: #fafaff !important;
 }
 
-@media screen and (max-width: 1080px) {
-.hostadd {
-     height: 35%;
-}
-}
-
-@media screen and (max-width: 540px) {
-.hostadd {
-     height: 45%;
-}
+.unicodeicon {
+     font-size: 2rem;
+     vertical-align: middle;
 }
 
 .hostaddaction {
