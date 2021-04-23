@@ -101,6 +101,9 @@ public class WorkingDir {
                         File clientAppsConfig = new File(checkOld.getAbsolutePath(), "clients.config.d");
                         if (routerConfig.exists() && clientAppsConfig.exists() && clientAppsConfig.isDirectory())
                             home = appdata;
+                        clientAppsConfig = new File(checkOld.getAbsolutePath(), "clients.config");
+                        if (routerConfig.exists() && clientAppsConfig.exists())
+                            home = appdata;
                     }
                 }
                 dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT_WINDOWS);
