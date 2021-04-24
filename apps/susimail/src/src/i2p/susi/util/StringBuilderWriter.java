@@ -47,7 +47,7 @@ public class StringBuilderWriter extends Writer {
 
     @Override
     public void write(int c) {
-        buf.append(c);
+        buf.append((char) c);
     }
 
     @Override

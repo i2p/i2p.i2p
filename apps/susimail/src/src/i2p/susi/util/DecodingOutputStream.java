@@ -85,10 +85,17 @@ public class DecodingOutputStream extends OutputStream {
         // So just check if we got a character back in the buffer.
         if (result == null || (result.isError() && !_cb.hasRemaining())) {
             _out.write(REPLACEMENT);
+            // need to do this or we will infinite loop
+            ((Buffer)_bb).clear();
         } else {
             ((Buffer)_cb).flip();
             _out.append(_cb);
             ((Buffer)_cb).clear();
+            if (result.isError()) {
+                _out.write(REPLACEMENT);
+                // need to do this or we will infinite loop
+                ((Buffer)_bb).clear();
+            }
         }
     }
 
@@ -107,7 +114,7 @@ public class DecodingOutputStream extends OutputStream {
     public static void main(String[] args) {
         try {
             String s = "Consider the encoding of the Euro sign, €." +
-                       " The Unicode code point for \"€\" is U+20AC.";
+                       " The Unicode code point for \"€\" is U+20AC.\n";
             StringBuilder buf = new StringBuilder();
             for (int i = 0; i < 100; i++) {
                 buf.append(s);
@@ -118,10 +125,13 @@ public class DecodingOutputStream extends OutputStream {
             Writer w = new StringBuilderWriter();
             DecodingOutputStream r = new DecodingOutputStream(w, "UTF-8");
             int b;
-            while ((b = bais.read()) >= 0) {
-                r.write(b);
+            byte[] bf = new byte[256];
+            int rand = 1 + net.i2p.I2PAppContext.getGlobalContext().random().nextInt(256);
+            while ((b = bais.read(bf, 0, rand)) >= 0) {
+                r.write(bf, 0, b);
+                rand = 1 + net.i2p.I2PAppContext.getGlobalContext().random().nextInt(256);
             }
-            r.flush();
+            r.close();
             System.out.println("Received: \"" + w.toString() + '"');
             System.out.println("Test passed? " + w.toString().equals(s));
             bais = new java.io.ByteArrayInputStream(new byte[] { 'x', (byte) 0xcc, 'x' } );
@@ -130,7 +140,7 @@ public class DecodingOutputStream extends OutputStream {
             while ((b = bais.read()) >= 0) {
                 r.write(b);
             }
-            r.flush();
+            r.close();
             System.out.println("Received: \"" + w.toString() + '"');
         } catch (IOException ioe) {
             ioe.printStackTrace();

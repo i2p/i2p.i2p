@@ -1,10 +1,13 @@
 2021-04-24 zzz
  * Jetty: Patch for CVE-2021-28165 Jetty #6072 -
    Jetty server high CPU when client send data length > 17408
+ * SusiMail: Fix infinite loop in decoder on malformed input
 
 2021-04-24 zlatinb
- * SusiMail: Fix stream closed exception reading new mail
-   (trac ticket #2202, gitlab ticket #17)
+ * SusiMail:
+   - Fix stream closed exception reading new mail
+     (trac ticket #2202, gitlab ticket #17)
+   - Fix corruption of large messages (ticket #2765)
 
 2021-04-23 idk
  * Router: Fix update on Windows from very old versions (gitlab ticket #16)
