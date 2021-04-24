@@ -107,23 +107,30 @@ public class DecodingOutputStream extends OutputStream {
         try {
             String s = "Consider the encoding of the Euro sign, €." +
                        " The Unicode code point for \"€\" is U+20AC.";
+            StringBuilder buf = new StringBuilder();
+            for (int i = 0; i < 100; i++) {
+                buf.append(s);
+            }
+            s = buf.toString();
             byte[] test = s.getBytes("UTF-8");
-            InputStream bais = new java.io.ByteArrayInputStream(test);
-            DecodingOutputStream r = new DecodingOutputStream(bais);
+            java.io.InputStream bais = new java.io.ByteArrayInputStream(test);
+            Writer w = new StringBuilderWriter();
+            DecodingOutputStream r = new DecodingOutputStream(w, "UTF-8");
             int b;
-            StringBuilder buf = new StringBuilder(128);
-            while ((b = r.write()) >= 0) {
-                buf.append((char) b);
+            while ((b = bais.read()) >= 0) {
+                r.write(b);
             }
-            System.out.println("Received: " + buf);
-            System.out.println("Test passed? " + buf.toString().equals(s));
-            buf.setLength(0);
+            r.flush();
+            System.out.println("Received: \"" + w.toString() + '"');
+            System.out.println("Test passed? " + w.toString().equals(s));
             bais = new java.io.ByteArrayInputStream(new byte[] { 'x', (byte) 0xcc, 'x' } );
-            r = new DecodingOutputStream(bais);
-            while ((b = r.write()) >= 0) {
-                buf.append((char) b);
+            w = new StringBuilderWriter();
+            r = new DecodingOutputStream(w, "UTF-8");
+            while ((b = bais.read()) >= 0) {
+                r.write(b);
             }
-            System.out.println("Received: " + buf);
+            r.flush();
+            System.out.println("Received: \"" + w.toString() + '"');
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
