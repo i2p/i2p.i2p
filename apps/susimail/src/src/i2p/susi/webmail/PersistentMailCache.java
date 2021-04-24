@@ -356,10 +356,11 @@ class PersistentMailCache {
 			GzipFileBuffer gb = new GzipFileBuffer(f);
 			out = gb.getOutputStream();
 			DataHelper.copy(in, out);
-            rb.readComplete(true);
+			rb.readComplete(true);
 			return true;
 		} catch (IOException ioe) {
 			_log.error("Error writing: " + f + ": " + ioe);
+			rb.readComplete(false);
 			return false;
 		} finally {
 			if (in != null) 
