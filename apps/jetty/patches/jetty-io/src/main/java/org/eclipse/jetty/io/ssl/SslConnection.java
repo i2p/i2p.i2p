@@ -358,7 +358,17 @@ public class SslConnection extends AbstractConnection
 
     protected SSLEngineResult unwrap(SSLEngine sslEngine, ByteBuffer input, ByteBuffer output) throws SSLException
     {
-        return sslEngine.unwrap(input, output);
+        // CVE-2021-28165 - Jetty #6072
+        // https://github.com/eclipse/jetty.project/security/advisories/GHSA-26vr-8j45-3r4w
+        SSLEngineResult results = sslEngine.unwrap(input, output);
+        if ((results.getStatus() == SSLEngineResult.Status.BUFFER_UNDERFLOW ||
+            results.getStatus() == SSLEngineResult.Status.OK && results.bytesConsumed() == 0 && results.bytesProduced() == 0) &&
+            BufferUtil.space(input) == 0)
+        {
+            BufferUtil.clear(input);
+            throw new SSLHandshakeException("Encrypted buffer max length exceeded");
+        }
+        return results;
     }
 
     @Override

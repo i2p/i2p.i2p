@@ -1,5 +1,21 @@
+2021-04-24 zzz
+ * Jetty: Patch for CVE-2021-28165 Jetty #6072 -
+   Jetty server high CPU when client send data length > 17408
+
+2021-04-24 zlatinb
+ * SusiMail: Fix stream closed exception reading new mail
+   (trac ticket #2202, gitlab ticket #17)
+
+2021-04-23 idk
+ * Router: Fix update on Windows from very old versions (gitlab ticket #16)
+
 2021-04-20 zzz
- * SSU: Fix setting addresses from interfaces at startup
+ * NTCP:
+   - Set outbound addresses at startup when force-firewalled
+   - More NTCP1 removal cleanup
+ * SSU:
+   - Fix setting addresses from interfaces at startup
+   - Don't start peer test when shutting down
 
 2021-04-18 zzz
  * Proxy: Decode IDN hostnames in error pages
