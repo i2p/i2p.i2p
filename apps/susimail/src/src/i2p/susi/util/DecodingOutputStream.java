@@ -60,6 +60,7 @@ public class DecodingOutputStream extends OutputStream {
 	        int toWrite = Math.min(len, _bb.remaining());
     	        _bb.put(buf, off, toWrite);
                 len -= toWrite;
+                off += toWrite;
             }
             flush();
         }
