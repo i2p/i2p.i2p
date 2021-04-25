@@ -3446,7 +3446,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // for the following transitions ONLY, require two in a row
                 // to prevent thrashing
                 if ((STATUS_OK.contains(old) && STATUS_FW.contains(status)) ||
-                    (STATUS_OK.contains(status) && STATUS_FW.contains(old))) {
+                    (STATUS_OK.contains(status) && STATUS_FW.contains(old)) ||
+                    (STATUS_FW.contains(status) && STATUS_FW.contains(old))) {
                     if (status != _reachabilityStatusPending) {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Old status: " + old + " status pending confirmation: " + status +
