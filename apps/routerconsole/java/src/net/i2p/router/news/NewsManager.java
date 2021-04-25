@@ -20,6 +20,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
+import net.i2p.util.Translate;
 import net.i2p.util.TranslateReader;
 
 import org.cybergarage.xml.Node;
@@ -209,6 +210,8 @@ public class NewsManager implements ClientApp {
             if (!rv.isEmpty()) {
                 //rv.get(0).updated = RFC3339Date.parse3339Date("2015-01-01");
                 rv.get(0).updated = _context.clock().now();
+                // Tagged in initialNews.xml inside a comment
+                rv.get(0).authorName = Translate.getString("I2P Development Team", _context, BUNDLE_NAME);
             } else {
                 if (_log.shouldWarn())
                     _log.warn("failed to load initial news");

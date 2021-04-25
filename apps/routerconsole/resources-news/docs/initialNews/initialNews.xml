@@ -19,4 +19,5 @@ _("Once you have a \"shared clients\" destination listed on the left, please {0}
 <p>
 _("Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p{3}.", "<b>", "</b>", "<a href=\"irc://127.0.0.1:6668/i2p\">", "</a>")
 </p>
+<!-- tagged for NewsManager _("I2P Development Team") -->
 </div>
