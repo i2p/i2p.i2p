@@ -65,6 +65,7 @@
         <jar destfile="susimail.jar"
              basedir="src/WEB-INF/classes">
             <manifest>
+                <attribute name="Class-Path" value="i2p.jar" />
                 <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
