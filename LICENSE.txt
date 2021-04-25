@@ -339,7 +339,7 @@ Applications:
    Systray (systray.jar):
    Public domain.
 
-   Tomcat 9.0.40 (jasper-runtime.jar):
+   Tomcat 9.0.45 (jasper-runtime.jar):
    (not included in most distribution packages)
    Copyright 1999-2020 The Apache Software Foundation
    See licenses/LICENSE-Apache2.0.txt
