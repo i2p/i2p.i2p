@@ -20,9 +20,11 @@
         </depend>
     </target>
 
+    <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.8" />
     <property name="javac.release" value="8" />
+    <property name="manifest.classpath.name" value="Class-Path" />
 
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
@@ -62,7 +64,7 @@
         <property name="workspace.changes.tr" value="" />
         <jar destfile="./build/systray.jar" basedir="./build/obj" includes="**/*.class">
             <manifest>
-                <attribute name="Main-Class" value="net.i2p.apps.systray.SysTray" />
+                <attribute name="${manifest.classpath.name}" value="i2p.jar" />
                 <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
