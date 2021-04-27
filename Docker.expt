@@ -1,7 +1,0 @@
-#!/usr/bin/expect
-set timeout 15;
-spawn java -jar /tmp/i2pinstall.jar -console
-expect {
- -re ".*press 1 to continue, 2 to quit, 3 to redisplay" {send "1\r"; exp_continue;}
- -re "Select target path *" {send "/opt/i2p\r"; exp_continue;}
-}
