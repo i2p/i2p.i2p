@@ -64,6 +64,8 @@ your `~/.gradle/gradle.properties`:
     systemProp.socksProxyHost=localhost
     systemProp.socksProxyPort=9150
 
+### Docker
+For more information how to run I2P in Docker, see [Docker.md](Docker.md)
 ## Contact info
 
 Need help? See the IRC channel #i2p on irc.freenode.net

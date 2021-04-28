@@ -7,6 +7,7 @@ COPY . .
 
 RUN add-pkg --virtual build-base gettext tar bzip2 apache-ant openjdk8 \
     && ant preppkg-linux-only \
+    && rm -rf pkg-temp/osid pkg-temp/lib/wrapper pkg-temp/lib/wrapper.* \
     && del-pkg build-base gettext tar bzip2 apache-ant openjdk8
 
 FROM jlesage/baseimage:alpine-3.10-glibc
@@ -23,7 +24,7 @@ COPY docker/rootfs/ /
 VOLUME ["${APP_HOME}/.i2p"]
 VOLUME ["/i2psnark"]
 
-EXPOSE 7654 7656 7657 7658 4444 6668 8998 7659 7660 4445 12345
+EXPOSE 7654 7656 7657 7658 4444 6668 7659 7660 4445 12345
 
 # Metadata.
 LABEL \
