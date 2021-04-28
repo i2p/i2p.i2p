@@ -190,7 +190,7 @@
 <img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <h3 id="wizardheading" class="wizard"><%=intl._t("Bandwidth Test in Progress")%></h3>
 <img class="wizardimg" src="themes/console/images/wizard/step-3.png">
-<div id="xhr" class="notifcation">
+<div id="xhr" class="notification">
 <!-- for non-script -->
 <%=intl._t("Javascript is disabled - wait 60 seconds for the bandwidth test to complete and then click Next")%>
 </div>

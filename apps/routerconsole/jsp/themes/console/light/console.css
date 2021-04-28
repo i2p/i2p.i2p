@@ -2591,23 +2591,20 @@ td {
 }
 
 #xhr.notification {
-    width: 30%;
+    width: 20%;
     position: relative;
-    left: 30%;
-    top: 38%;
+    left: 70%;
+    top: 30%;
     font-size: larger;
-    background: #eef;
-    box-shadow: inset 0 0 0 1px #fff;
+    background-size: auto;
 }
 
 #xhr2.notification {
-	width: 20%;
-	position: relative;
-	left: 70%;
-	top: 30%;
+    width: 20%;
+    position: relative;
+    left: 70%;
+    top: 30%;
     font-size: larger;
-    background: #eef;
-    background: linear-gradient(to right, #fafaff, #eef);
     background-size: auto 100%, 100% 100%;
     box-shadow: inset 0 0 0 1px #fff;
 }
