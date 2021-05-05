@@ -49,6 +49,7 @@ public class NewsManager implements ClientApp {
 
     public static final String APP_NAME = "news";
     private static final String BUNDLE_NAME = "net.i2p.router.news.messages";
+    private static final String WELCOME_AUTHOR = "I2P Development Team";
 
     /**
      *  @param args ignored
@@ -211,7 +212,7 @@ public class NewsManager implements ClientApp {
                 //rv.get(0).updated = RFC3339Date.parse3339Date("2015-01-01");
                 rv.get(0).updated = _context.clock().now();
                 // Tagged in initialNews.xml inside a comment
-                rv.get(0).authorName = Translate.getString("I2P Development Team", _context, BUNDLE_NAME);
+                rv.get(0).authorName = Translate.getString(WELCOME_AUTHOR, _context, BUNDLE_NAME);
             } else {
                 if (_log.shouldWarn())
                     _log.warn("failed to load initial news");
