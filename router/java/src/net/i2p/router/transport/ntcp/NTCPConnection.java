@@ -616,16 +616,16 @@ public class NTCPConnection implements Closeable {
 
     static class PrepBuffer {
         final byte unencrypted[];
-        int unencryptedLength;
-        byte encrypted[];
+        //int unencryptedLength;
+        //byte encrypted[];
         
         public PrepBuffer() {
             unencrypted = new byte[BUFFER_SIZE];
         }
 
         public void init() {
-            unencryptedLength = 0;
-            encrypted = null;
+            //unencryptedLength = 0;
+            //encrypted = null;
         }
     }
 

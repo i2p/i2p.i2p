@@ -914,10 +914,12 @@ public class Blocklist {
         return match(ip, blocklist[cur]);
     }
 
+/*
     // Is the IP included in the entry _blocklist[cur] ?
     private boolean match(int ip, int cur) {
         return match(ip, _blocklist[cur]);
     }
+*/
 
     // Is the IP included in the compressed entry?
     private static boolean match(int ip, long entry) {

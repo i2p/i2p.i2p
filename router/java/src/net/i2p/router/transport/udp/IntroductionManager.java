@@ -645,9 +645,11 @@ class IntroductionManager {
      *  Refuse anybody in the same /16
      *  @since 0.9.3
      */
+/*
     private boolean isValid(byte[] ip, int port) {
         return isValid(ip, port, false);
     }
+*/
 
     /**
      *  Are IP and port valid?
