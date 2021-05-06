@@ -431,7 +431,7 @@
         <copy file="apps/jrobin/java/build/jrobin.jar" todir="build/" />
     </target>
 
-    <target name="buildProperties" depends="getMtnRev, getGitRev, getReleaseNumber, getBuildNumber, setBuildTimestamp, disableManifestClasspath" >
+    <target name="buildProperties" depends="getGitRev, getReleaseNumber, getBuildNumber, setBuildTimestamp, disableManifestClasspath" >
         <antversion property="antversion"/>
         <fail message="FATAL: Minimum Ant version is ${ant.minimumVersion} - your Ant version is ${antversion}">
             <condition>
@@ -472,86 +472,6 @@
     </target>
 
     <!-- end of sub-build.xml targets -->
-
-    <!-- monotone targets -->
-
-    <target name="checkForMtn" >
-        <available property="mtn.available" file="_MTN" type="dir" />
-    </target>
-
-    <target name="failIfNoMtn" depends="checkForMtn">
-        <fail message="This target cannot be used without Monotone!">
-            <condition>
-                <not>
-                    <isset property="mtn.available" />
-                </not>
-            </condition>
-        </fail>
-    </target>
-
-    <target name="getMtnRev" depends="checkForMtn" if="mtn.available" >
-        <exec executable="mtn" outputproperty="workspace.version" errorproperty="mtn.error1" failifexecutionfails="false" >
-            <arg value="automate" />
-            <arg value="get_base_revision_id" />
-        </exec>
-    </target>
-
-    <target name="checkIfBumpedMtn" depends="checkForMtn" if="mtn.available" >
-        <exec executable="mtn" outputproperty="bumped" errorproperty="mtn.error2" failifexecutionfails="false" >
-            <arg value="ls" />
-            <arg value="ch" />
-            <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
-        </exec>
-        <condition property="bumped.already">
-            <not>
-                <equals arg1="${bumped}" arg2=""/>
-            </not>
-        </condition>
-    </target>
-
-    <!-- if both present, only mtn will run -->
-    <target name="checkoutFromMtn" depends="checkForMtn" if="mtn.available" >
-        <echo message="Checking out fresh copy into ${checkoutDir}" />
-        <delete dir="${checkoutDir}" />
-        <exec executable="mtn" failonerror="true">
-            <arg value="co" />
-            <!-- w: is the revision of the current workspace -->
-            <arg value="-r" />
-            <arg value="w:" />
-            <arg value="-b" />
-            <arg value="i2p.i2p" />
-            <arg value="${checkoutDir}" />
-        </exec>
-    </target>
-
-    <target name="revisionsMtn" depends="checkForMtn, getReleaseNumber, getBuildNumber" if="mtn.available">
-        <!-- mtn log __brief __no-graph __to t:i2p-0.9.xx | cut -d ' ' -f 2 | sort | uniq -c | sort -rn -->
-        <exec executable="mtn" outputproperty="getrevisions1" errorproperty="reverror1" failifexecutionfails="true" >
-            <arg value="log" />
-            <arg value="--brief" />
-            <arg value="--no-graph" />
-            <arg value="--to" />
-            <arg value="t:i2p-${release.number}" />
-        </exec>
-        <exec executable="cut" inputstring="${getrevisions1}" outputproperty="getrevisions2" failifexecutionfails="true" >
-            <arg value="-d" />
-            <arg value=" " />
-            <arg value="-f" />
-            <arg value="2" />
-        </exec>
-        <exec executable="sort" inputstring="${getrevisions2}" outputproperty="getrevisions3" failifexecutionfails="true" >
-        </exec>
-        <exec executable="uniq" inputstring="${getrevisions3}" outputproperty="getrevisions4" failifexecutionfails="true" >
-            <arg value="-c" />
-        </exec>
-        <exec executable="sort" inputstring="${getrevisions4}" outputproperty="getrevisions5" failifexecutionfails="true" >
-            <arg value="-rn" />
-        </exec>
-        <echo message="Revisions since ${release.number}:" />
-        <echo message="${getrevisions5}" />
-    </target>
-
-    <!-- end monotone targets -->
 
     <!-- git targets -->
 
@@ -625,14 +545,13 @@
 
     <!-- combined mtn/git targets -->
 
-    <target name="checkForVCS" depends="checkForMtn, checkForGit" />
+    <target name="checkForVCS" depends="checkForGit" />
 
     <target name="failIfNoVCS" depends="checkForVCS">
         <fail message="This target cannot be used without Monotone or Git!">
             <condition>
                 <not>
                     <or>
-                        <isset property="mtn.available" />
                         <isset property="git.available" />
                     </or>
                 </not>
@@ -640,7 +559,7 @@
         </fail>
     </target>
 
-    <target name="trimRev" depends="getMtnRev, getGitRev">
+    <target name="trimRev" depends="getGitRev">
         <exec executable="cut" inputstring="${workspace.version}" outputproperty="shortHash" errorproperty="cut.error1" failifexecutionfails="true" >
             <arg value="-c" />
             <arg value="1-8" />
@@ -648,7 +567,7 @@
         <echo message="Short version is: ${shortHash}" />
     </target>
 
-    <target name="checkIfBumped" depends="failIfNoVCS, checkIfBumpedMtn, checkIfBumpedGit" />
+    <target name="checkIfBumped" depends="failIfNoVCS, checkIfBumpedGit" />
 
     <target name="bump" depends="bumpBuild" />
 
@@ -663,10 +582,10 @@
     </target>
 
     <!-- if both present, only mtn will run -->
-    <target name="checkoutFromVCS" depends="failIfNoVCS, checkoutFromMtn, checkoutFromGit" />
+    <target name="checkoutFromVCS" depends="failIfNoVCS, checkoutFromGit" />
 
     <!-- if both present, only mtn will run -->
-    <target name="revisions" depends="failIfNoVCS, revisionsMtn, revisionsGit" />
+    <target name="revisions" depends="failIfNoVCS, revisionsGit" />
 
     <!-- end combined mtn/git targets -->
 
@@ -732,14 +651,14 @@
 
     <!-- jbigi targets -->
 
-    <target name="jbigi-list-changes" depends="checkForMtn" if="mtn.available">
+    <target name="jbigi-list-changes" depends="checkForGit" if="git.available">
         <exec executable="mtn" outputproperty="workspace.changes.jbigi" errorproperty="mtn.error.jbigi" failifexecutionfails="false" >
             <arg value="list" />
             <arg value="changed" />
             <arg value="installer/lib/jbigi" />
         </exec>
         <!-- \n in an attribute value generates an invalid manifest -->
-        <exec executable="tr" inputstring="${workspace.changes.jbigi}" outputproperty="workspace.changes.jbigi.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+        <exec executable="tr" inputstring="${workspace.changes.jbigi}" outputproperty="workspace.changes.jbigi.tr" errorproperty="git.error2" failifexecutionfails="false" >
             <arg value="-s" />
             <arg value="&quot;[:space:]&quot;" />
             <arg value="," />
@@ -1903,14 +1822,14 @@
         <copy file="build/jetty-i2p.jar" todir="pkg-temp/lib/" />
     </target>
 
-    <target name="util-list-changes" depends="checkForMtn" if="mtn.available" >
-        <exec executable="mtn" outputproperty="workspace.changes.util" errorproperty="mtn.error.util" failifexecutionfails="false" >
+    <target name="util-list-changes" depends="checkForGit" if="git.available" >
+        <exec executable="git" outputproperty="workspace.changes.util" errorproperty="git.error.util" failifexecutionfails="false" >
             <arg value="list" />
             <arg value="changed" />
             <arg value="core/java/src/net/i2p/util" />
         </exec>
         <!-- \n in an attribute value generates an invalid manifest -->
-        <exec executable="tr" inputstring="${workspace.changes.util}" outputproperty="workspace.changes.util.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+        <exec executable="tr" inputstring="${workspace.changes.util}" outputproperty="workspace.changes.util.tr" errorproperty="git.error2" failifexecutionfails="false" >
             <arg value="-s" />
             <arg value="[:space:]" />
             <arg value="," />
