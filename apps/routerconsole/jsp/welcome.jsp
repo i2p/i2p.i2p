@@ -249,7 +249,6 @@
 %>
 <img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <h3 id="wizardheading" class="wizard"><%=intl._t("Bandwidth Configuration")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/step-4.png">
 <style>
 .bwtest {
     display: none;
