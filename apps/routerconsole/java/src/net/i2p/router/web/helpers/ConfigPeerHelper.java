@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 
+import net.i2p.data.Hash;
 import net.i2p.router.Blocklist;
 import net.i2p.router.web.HelperBase;
 import net.i2p.util.Addresses;
@@ -130,6 +131,13 @@ public class ConfigPeerHelper extends HelperBase {
         out.write("</table>" +
                   "</td></tr></table>");
         return out.toString();
+    }
+
+    /**
+     *  @since 0.9.50
+     */
+    public boolean isBanned(Hash h) {
+        return _context.banlist().isBanlisted(h);
     }
 
     /**

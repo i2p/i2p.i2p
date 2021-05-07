@@ -15,8 +15,23 @@
  <jsp:useBean class="net.i2p.router.web.helpers.ConfigPeerHelper" id="peerhelper" scope="request" />
  <jsp:setProperty name="peerhelper" property="contextId" value="<%=i2pcontextId%>" />
  <% String peer = "";
-    if (request.getParameter("peer") != null)
-        peer = net.i2p.data.DataHelper.stripHTML(request.getParameter("peer"));  // XSS
+    net.i2p.data.Hash peerHash = null;
+    boolean isBanned = false;
+    if (request.getParameter("peer") != null) {
+        // don't redisplay after POST, we don't do P-R-G
+        if (!"POST".equals(request.getMethod())) {
+            peer = net.i2p.data.DataHelper.stripHTML(request.getParameter("peer"));  // XSS
+            if (peer.length() == 44) {
+                byte[] h = net.i2p.data.Base64.decode(peer);
+                if (h != null) {
+                    try {
+                        peerHash = net.i2p.data.Hash.create(h);
+                        isBanned = peerhelper.isBanned(peerHash);
+                    } catch (Exception e) {}
+                }
+            }
+        }
+    }
  %>
  <form action="configpeer" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
@@ -25,16 +40,23 @@
  <a name="bonus"> </a>
  <h3 class="tabletitle"><%=intl._t("Manual Peer Controls")%></h3>
  <table class="configtable">
-   <tr><td colspan="2"><b><%=intl._t("Router Hash")%>:</b> <input type="text" size="55" name="peer" value="<%=peer%>" /></td></tr>
+   <tr><td colspan="2"><b><%=intl._t("Router Hash")%>:</b> <input type="text" size="44" name="peer" value="<%=peer%>" /></td></tr>
    <tr><th colspan="2"><%=intl._t("Manually Ban / Unban a Peer")%></th></tr>
    <tr><td class="infohelp" colspan="2"><%=intl._t("Banning will prevent the participation of this peer in tunnels you create.")%></td></tr>
    <tr>
      <td class="optionsave" colspan="2">
+<%
+    if (peerHash == null || !isBanned) {
+ %>
         <input type="submit" name="action" class="delete" value="<%=intl._t("Ban peer until restart")%>" />
+<%
+    }
+    if (peerHash == null || isBanned) {
+ %>
         <input type="submit" name="action" class="accept" value="<%=intl._t("Unban peer")%>" />
-        <% if (! "".equals(peer)) { %>
-        <!-- <font color="blue">&lt;---- click to verify action</font> -->
-        <% } %>
+<%
+    }
+ %>
      </td>
    </tr>
    <tr><th colspan="2"><%=intl._t("Adjust Profile Bonuses")%></th></tr>
