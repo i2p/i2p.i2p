@@ -2538,10 +2538,10 @@ td {
 }
 
 #infodiv {
-    position: relative;
+    position: absolute;
     left: 31%;
     width: 31%;
-    top: 50%;
+    top: 25%;
     box-shadow: inset 0 0 0 1px #fff;
     background: rgba(255,255,255,0.7);
     font-size: larger;
@@ -2553,8 +2553,7 @@ td {
 
 #bandwidthconfig.configtable.wizardtable {
     width: 31%;
-    margin-top: -23%;
-    margin-left: 50%;
+    margin-left: 65%;
     background: none;
     font-size: 10pt !important;
 }
