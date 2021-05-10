@@ -196,6 +196,9 @@ public class PersistSybil {
                 removeTime = Analysis.DEFAULT_REMOVE_TIME;
         }
         long age = _context.getProperty(Analysis.PROP_REMOVETIME, removeTime);
+        // 0 means never delete
+        if (age <= 0)
+            return;
         long freq2 = 2 * _context.getProperty(Analysis.PROP_FREQUENCY, Analysis.DEFAULT_FREQUENCY);
         if (age < freq2)
             age = freq2;
