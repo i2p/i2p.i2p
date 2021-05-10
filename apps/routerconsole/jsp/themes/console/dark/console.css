@@ -3155,6 +3155,7 @@ td#themeselect {
     position: absolute;
     background: none !important;
     box-shadow: none !important;
+    line-height: normal;
     z-index: 999;
 }
 

@@ -2222,6 +2222,7 @@ td.optionsave {
      position: absolute;
      left: 75%;
      width: 22%;
+     top: 75%;
 }
 
 #bandwidthconfig .configtable tr:last-child td {
@@ -2528,6 +2529,7 @@ td {
     letter-spacing: 0.08em;
     word-spacing: 0.1em;
     color: #41465f;
+    line-height: normal;
     background: none !important;
     box-shadow: none !important;
 }
