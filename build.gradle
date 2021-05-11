@@ -53,6 +53,7 @@ String getWorkspaceVersion() {
     "git" // TODO: extract revision
 }
 
+
 def releaseVersion = getReleaseVersion()
 def buildVersion = getBuildVersion()
 def buildExtra = getBuildExtra()
@@ -74,6 +75,8 @@ subprojects {
         testCompile 'org.hamcrest:hamcrest-library:1.3'
         testCompile 'org.mockito:mockito-core:2.5.0'
     }
+
+
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -100,6 +103,9 @@ subprojects {
     tasks.withType(AbstractArchiveTask) {
         preserveFileTimestamps = false
         reproducibleFileOrder = true
+        doLast {
+            stripJar(it.archivePath)
+        }
     }
 }
 
@@ -125,3 +131,23 @@ task codeCoverageReport(type: JacocoReport) {
 }
 
 apply from: file('gradle/update.gradle')
+
+import java.util.jar.*
+void stripJar(File file) {
+    if (file.getName().endsWith('.tar'))
+        return
+    println "stripping $file"
+    File newFile = new File(file.parent, 'tmp-' + file.name)
+    newFile.withOutputStream { fout ->
+        JarOutputStream out = new JarOutputStream(fout)
+        JarFile jf = new JarFile(file)
+        jf.entries().unique {it.name}.sort {it.name}.each {
+            def copy = new JarEntry(it.name)
+            copy.time = 1001
+            out.putNextEntry(copy)
+            out << jf.getInputStream(it)
+        }
+        out.finish()
+    }
+    newFile.renameTo file
+}

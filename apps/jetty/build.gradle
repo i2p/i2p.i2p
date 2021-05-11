@@ -10,7 +10,7 @@ sourceSets {
 
 dependencies {
     ext.jettyVersion = '9.3.29.v20201019'
-    ext.tomcatVersion = '9.0.40'
+    ext.tomcatVersion = "${tomcatVersion}"
     compile project(':core')
     compile 'org.eclipse.jetty:jetty-http:' + ext.jettyVersion
     compile 'org.eclipse.jetty:jetty-io:' + ext.jettyVersion

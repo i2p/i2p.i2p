@@ -32,7 +32,7 @@ task i2psnarkJar(type: Jar) {
 // TODO: standalone jar.  This is rather involved!
 
 artifacts {
-    archives i2psnarkJar
+    archives i2psnarkJar,war
 }
 
 // Create the java files from the po files. The jar task will compile them.
