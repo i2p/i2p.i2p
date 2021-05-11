@@ -1,0 +1,93 @@
+apply plugin: 'application'
+
+application {
+    mainClassName='net.i2p.router.RouterLaunch'
+    applicationName='i2p'
+}
+
+dependencies {
+    implementation project(':router')
+    implementation project(':apps:ministreaming')
+    implementation project(':apps:streaming')
+    implementation project(':apps:i2ptunnel')
+    implementation project(':apps:jetty')
+    implementation project(':apps:i2psnark')
+    implementation project(':apps:systray')
+    implementation project(':apps:BOB')
+    implementation project(':apps:sam')
+    implementation project(':apps:routerconsole')
+    implementation project(':apps:desktopgui')
+    implementation project(':apps:jrobin')
+    implementation project(':apps:addressbook')
+    implementation project(':apps:susidns')
+    implementation project(':apps:susimail')
+    implementation project(':apps:i2pcontrol')
+    implementation project(':apps:imagegen')
+    implementation project(':core')
+    implementation project(':router')
+    implementation project(path : ':installer', configuration: 'jbigi')
+    implementation fileTree("../apps/susidns/src/lib")
+}
+
+import java.nio.file.*
+import java.util.zip.*
+
+def projects = [':apps:routerconsole',
+                ':apps:addressbook',
+                ':apps:i2psnark',
+                ':apps:imagegen',
+                ':apps:i2pcontrol',
+                ':apps:susidns',
+                ':apps:susimail',
+                ':apps:i2ptunnel'].collect {project(it)}
+
+def rootDir = project.getRootProject().getRootDir()
+def buildDir = new File("$buildDir")
+def webappDir = new File(buildDir, 'webapps')
+def geoipDir = new File(buildDir, "geoip")
+
+task copyWars {
+    doLast {
+        webappDir.mkdirs()
+        projects.each { p ->
+            p.configurations.archives.getArtifacts().getFiles().
+                filter({it.getName().endsWith('war')}).each { file ->
+                println "copying war $file exists ${file.exists()}"
+                File target = new File(webappDir, file.getName())
+                Files.copy(file.toPath(), target.toPath())
+            }
+        } 
+    }
+}
+
+projects.each { p ->
+    copyWars.dependsOn p.tasks['assemble']    
+}
+
+task copyGeoip() {
+    doLast {
+        geoipDir.mkdirs()
+        File target = new File(geoipDir, "GeoLite2-Country.mmdb")
+        File source = new File("$rootDir/installer/resources/GeoLite2-Country.mmdb.gz")
+        InputStream is = new GZIPInputStream(new FileInputStream(source))
+        java.nio.file.Files.copy(is, target.toPath())
+    }
+}
+
+jar.dependsOn copyWars,copyGeoip
+
+distributions {
+    main {
+        contents {
+            from('../installer/resources/') {
+                exclude '*.gz*'
+            }
+            from(webappDir.getAbsolutePath()) {
+                into 'webapps'
+            }
+            from(geoipDir.getAbsolutePath()) {
+                into 'geoip'
+            }
+        }
+    }
+}

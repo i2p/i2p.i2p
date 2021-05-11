@@ -14,7 +14,7 @@ sourceSets {
 }
 
 dependencies {
-    compile project(':core')
+    providedCompile project(':core')
     providedCompile project(':apps:jetty')
 }
 
@@ -22,4 +22,8 @@ war {
     from 'imagegen/webapp/src/main/webapp/imagegen.css'
     from 'imagegen/webapp/src/main/webapp/index.html'
     webXml = file('imagegen/webapp/src/main/webapp/WEB-INF/web.xml')
+}
+
+artifacts {
+    archives war
 }

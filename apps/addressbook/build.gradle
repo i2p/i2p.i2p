@@ -1,3 +1,5 @@
+apply plugin:'war'
+
 sourceSets {
     main {
         java {
@@ -7,6 +9,14 @@ sourceSets {
 }
 
 dependencies {
-    compile project(':core')
-    compile project(':apps:jetty')
+    providedCompile project(':core')
+    providedCompile project(':apps:jetty')
+}
+
+war {
+    rootSpec.exclude('**/*.class')
+}
+
+artifacts {
+    archives war
 }

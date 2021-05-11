@@ -22,6 +22,9 @@ dependencies {
     providedCompile project(':apps:ministreaming')
     compile 'gnu.getopt:java-getopt:1.0.13'
     providedCompile project(':apps:jetty')
+
+    implementation 'org.apache.ant:ant:1.10.10'
+    implementation fileTree("../jetty/apache-tomacat-${tomcatVersion}")
 }
 
 // Create the java files from the po files. The jar task will compile them.
@@ -62,8 +65,73 @@ task i2ptunnelJar(type: Jar) {
         into "net/i2p/i2ptunnel/resources"
     })
 }
+
+task helpersJar(type: Jar) {
+    from sourceSets.main.output
+    include '**/EditBean.class'
+    include '**/IndexBean.class'
+    include 'net/i2p/i2ptunnel/ui/**'
+    include 'net/i2p/i2ptunnel/web/SSLHelper.class'
+    archiveBaseName='i2pTunnelHelpers'
+}
+
+task precompileJsp(type : JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'net.i2p.servlet.util.JspC'
+
+    jvmArgs "-Dtomcat.util.scan.StandardJarScanFilter.jarsToSkip=commons-collections.jar,junit.jar,junit4.jar"
+    jvmArgs "-Dbuild.reproducible=true"
+
+    args "-d"
+    args "jsp/WEB-INF/classes"
+    args "-v"
+    args "-p"
+    args "net.i2p.i2ptunnel.jsp"
+    args "-webinc"
+    args "$buildDir/web-fragment.xml"
+    args "-webapp"
+    args "jsp"
+    doLast {
+        def output = new File("$buildDir/compiledJsps")
+        output.mkdirs()
+        ant.javac(srcDir: "jsp/WEB-INF/classes",
+                    classpath: sourceSets.main.runtimeClasspath.asPath,
+                    debug : true,
+                    includeAntRuntime : false,
+                    deprecation : "on",
+                    source: project.sourceCompatibility,
+                    target: project.targetCompatibility,
+                    destDir:file("$buildDir/compiledJsps"))
+
+        def fragment = file("$buildDir/web-fragment.xml").text
+        def templateXML = file("jsp/web.xml").text
+        def webXML = templateXML.replace("<!-- precompiled servlets -->", fragment)
+
+        def multipart = "<multipart-config>" +
+                        "<max-file-size>134217728</max-file-size>" +
+                        "<max-request-size>134217728</max-request-size>" +
+                        "<file-size-threshold>262144</file-size-threshold>" +
+                        "</multipart-config>"
+
+        def multipartServlets = ["register"]
+                                
+
+        multipartServlets = multipartServlets.collect {
+            "<servlet-class>net.i2p.i2ptunnel.jsp.${it}_jsp</servlet-class>"
+        }
+
+        multipartServlets.each {
+            webXML = webXML.replace(it, it + multipart)
+        }
+
+        file("$buildDir/web.xml").text = webXML
+    }
+
+
+}
+
 i2ptunnelJar.dependsOn bundleProxy
-war.dependsOn bundle
+war.dependsOn bundle,precompileJsp
 
 // not needed unless we're building for both android and regular
 task tempBeansJar(type: Jar) {
@@ -85,7 +153,7 @@ task uiJar(type: Jar) {
 }
 
 artifacts {
-    archives i2ptunnelJar   //, tempBeansJar, uiJar
+    archives i2ptunnelJar,war   //, tempBeansJar, uiJar
 }
 
 war {
@@ -93,6 +161,11 @@ war {
     include '**/ui/*.class'
     include '**/IndexBean.class'
     from 'jsp'
+    from ("$buildDir/compiledJsps") {
+        include '**/*.class'
+        into "WEB-INF/classes"
+    }
+    rootSpec.exclude('**/*.jar')
     rootSpec.exclude('/net/i2p/i2ptunnel/*.class')
     rootSpec.exclude('/net/i2p/i2ptunnel/access')
     rootSpec.exclude('/net/i2p/i2ptunnel/irc')
@@ -102,9 +175,11 @@ war {
     rootSpec.exclude('/net/i2p/i2ptunnel/streamr')
     rootSpec.exclude('/net/i2p/i2ptunnel/udp')
     rootSpec.exclude('/net/i2p/i2ptunnel/udpTunnel')
-    exclude 'jsp/web.xml'
-    exclude '*.jsi'
-    exclude '*.jsp'
-    webXml = file('jsp/web.xml')
+    from("jsp") {
+        exclude 'web.xml'
+        exclude '*.jsi'
+        exclude '*.jsp'
+    }
+    webXml = file("$buildDir/web.xml")
 }
 

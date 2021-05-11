@@ -8,5 +8,4 @@ sourceSets {
 
 dependencies {
     compile project(':core')
-    compile files('java/lib/systray4j.jar')
 }

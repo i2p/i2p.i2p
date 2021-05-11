@@ -20,3 +20,7 @@ war {
     archiveName 'jsonrpc.war'
     webXml = file('web.xml')
 }
+
+artifacts {
+    archives war
+}

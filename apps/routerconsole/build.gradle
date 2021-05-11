@@ -18,11 +18,15 @@ dependencies {
     compile project(':core')
     compile project(':router')
     compile project(':installer')
+
+    // below were providedCompile
     providedCompile project(':apps:desktopgui')
     providedCompile project(':apps:systray')
     providedCompile project(':apps:jetty')
     providedCompile project(':apps:jrobin')
 
+    implementation 'org.apache.ant:ant:1.10.10'
+    implementation fileTree("../jetty/apache-tomacat-${tomcatVersion}")
     testCompile "org.scala-lang:scala-library:2.12.4"
     testCompile 'org.scalatest:scalatest_2.12:3.0.4'
 }
@@ -77,26 +81,96 @@ task consoleJar(type: Jar) {
         into "net/i2p/router/news/resources"
     })
 }
-consoleJar.dependsOn bundleJar
-war.dependsOn bundle
 
-artifacts {
-    archives consoleJar
+task helpersJar(type: Jar) {
+    from sourceSets.main.output
+    include 'net/i2p/router/web/helpers/**'
+    archiveBaseName = 'consoleHelpers'
 }
 
+
+task precompileJsp(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'net.i2p.servlet.util.JspC'
+
+    jvmArgs "-Dtomcat.util.scan.StandardJarScanFilter.jarsToSkip=commons-collections.jar,junit.jar,junit4.jar"
+    jvmArgs "-Dbuild.reproducible=true"
+    
+    args "-d"
+    args "jsp/WEB-INF/classes"
+    args "-v"
+    args "-p"
+    args "net.i2p.router.web.jsp"
+    args "-webinc"
+    args "$buildDir/web-fragment.xml"
+    args "-webapp"
+    args "jsp"
+    doLast {
+        def output = new File("$buildDir/compiledJsps")
+        output.mkdirs()
+        ant.javac(srcDir: "jsp/WEB-INF/classes",
+                    classpath: sourceSets.main.runtimeClasspath.asPath,
+                    debug : true,
+                    includeAntRuntime : false,
+                    deprecation : "on",
+                    source: project.sourceCompatibility,
+                    target: project.targetCompatibility,
+                    destDir:file("$buildDir/compiledJsps"))
+        
+        def fragment = file("$buildDir/web-fragment.xml").text
+        def templateXML = file("jsp/web.xml").text
+        def webXML = templateXML.replace("<!-- precompiled servlets -->", fragment)
+
+        def multipart = "<multipart-config>" +
+                        "<max-file-size>134217728</max-file-size>" +
+                        "<max-request-size>134217728</max-request-size>" +
+                        "<file-size-threshold>262144</file-size-threshold>" +
+                        "</multipart-config>"
+
+        def multipartServlets = ["configplugins",
+                                "configfamily",
+                                "configreseed"]
+
+        multipartServlets = multipartServlets.collect {
+            "<servlet-class>net.i2p.router.web.jsp.${it}_jsp</servlet-class>"
+        }
+
+        multipartServlets.each {
+            webXML = webXML.replace(it, it + multipart)
+        }
+
+        file("$buildDir/web.xml").text = webXML
+    }
+        
+}
+
+consoleJar.dependsOn bundleJar
+war.dependsOn(bundle,precompileJsp)
+
+
 war {
+    rootSpec.exclude('**/*.jar')
     rootSpec.exclude('/com/vuze/**/*')
     rootSpec.exclude('/edu/internet2/**/*')
     rootSpec.exclude('/net/i2p/router/news/*')
     rootSpec.exclude('/net/i2p/router/sybil/*')
     rootSpec.exclude('/net/i2p/router/update/*')
     rootSpec.exclude('/net/i2p/router/web/*.class')
-    from 'jsp'
-    exclude 'jsp/web.xml'
-    exclude '*.jsi'
-    exclude '*.jsp'
-    webXml = file('jsp/web.xml')
+    from ("$buildDir/compiledJsps") {
+        into "WEB-INF/classes"
+    }
+    from ('jsp') {
+        exclude 'web.xml'
+        exclude '*.jsi'
+        exclude '*.jsp'
+    }
+    webXml = file("$buildDir/web.xml")
     from ('resources', {
         into "WEB-INF/classes/net/i2p/router/web/resources"
     })
 }
+
+artifacts {
+    archives war,consoleJar
+}
+

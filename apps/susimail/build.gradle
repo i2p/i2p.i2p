@@ -39,3 +39,7 @@ war {
     }
     webXml = file('src/WEB-INF/web.xml')
 }
+
+artifacts {
+    archives war
+}
