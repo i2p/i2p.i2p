@@ -29,10 +29,31 @@ task bundle {
     }
 }
 
+task copyJsps(type: Copy) {
+    doFirst {
+        def f = file("$buildDir/jsp_copy")
+        f.mkdirs()
+    }
+    from("src/jsp")
+    include("**/*.jsp")
+    include("**/*.jsi")
+    into("$buildDir/jsp_copy")
+
+    doLast {
+        fileTree("$buildDir/jsp_copy").getFiles().each {
+            if (it.getName().endsWith("jsi"))
+                it.setLastModified(0)
+        }
+    }
+}
+
+
 task precompileJsp(type: JavaExec) {
     doFirst {
         file("$buildDir/tmp_jsp").mkdirs()
     }
+
+    dependsOn copyJsps
 
     classpath = sourceSets.main.runtimeClasspath + fileTree("src/lib")
     main = 'net.i2p.servlet.util.JspC'
@@ -48,7 +69,7 @@ task precompileJsp(type: JavaExec) {
     args "-webinc"
     args "$buildDir/web-fragment.xml"
     args "-webapp"
-    args "src/jsp"
+    args "$buildDir/jsp_copy"
     doLast {
         // normalize the order of the _jspx_dependents
         ant.replaceregexp(file : "$buildDir/tmp_jsp/i2p/susi/dns/jsp/addressbook_jsp.java",

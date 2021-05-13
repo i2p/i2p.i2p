@@ -89,7 +89,26 @@ task helpersJar(type: Jar) {
 }
 
 
+task copyJsps(type: Copy) {
+    doFirst {
+        def f = file("$buildDir/jsp_copy")
+        f.mkdirs()
+    }
+    from("jsp") 
+    include("**/*.jsp")
+    include("**/*.jsi")
+    into("$buildDir/jsp_copy")
+    
+    doLast {
+        fileTree("$buildDir/jsp_copy").getFiles().each {
+            if (it.getName().endsWith("jsi"))
+                it.setLastModified(0)
+        }
+    }
+}
+
 task precompileJsp(type: JavaExec) {
+    dependsOn copyJsps
     classpath = sourceSets.main.runtimeClasspath
     main = 'net.i2p.servlet.util.JspC'
 
@@ -104,7 +123,7 @@ task precompileJsp(type: JavaExec) {
     args "-webinc"
     args "$buildDir/web-fragment.xml"
     args "-webapp"
-    args "jsp"
+    args "$buildDir/jsp_copy"
     doLast {
         def output = new File("$buildDir/compiledJsps")
         output.mkdirs()
