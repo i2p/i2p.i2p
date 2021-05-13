@@ -26,7 +26,8 @@ dependencies {
     implementation project(':core')
     implementation project(':router')
     implementation project(path : ':installer', configuration: 'jbigi')
-    implementation fileTree("../apps/susidns/src/lib")
+    implementation files("../apps/susidns/src/lib/standard.jar")
+    implementation files("../apps/susidns/src/lib/jstl.jar")
 }
 
 import java.nio.file.*
