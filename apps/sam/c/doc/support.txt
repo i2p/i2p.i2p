@@ -1,3 +1,0 @@
-The author is Matthew P. Cashdollar, who can be reached via email at
-mpc@innographx.com.  The official LibSAM distribution site is at
-http://www.cashdollar.org/libsam

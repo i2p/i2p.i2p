@@ -1,7 +1,0 @@
-Title: SAM proxy
-
-A '''SAM proxy''' is run by the I2P router.  The proxy allows streams, datagrams, and raw packets to be sent through the I2P network.  A client application uses a telnet-like session to communicate with the proxy.  In this way, the core features of the I2P library can be used by any language.
-
-The protocol used for SAM is described in [http://dev.i2p.net/pipermail/i2p/2004-July/000353.html SAM 1.0].
-
-In practice, a ''SAM library'' is usually written, so that client applications do not need to use the low-level SAM commands.

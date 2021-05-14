@@ -355,24 +355,7 @@ distributions. See the source package for the additional license information.
    Admin Manager:
    Public domain
 
-   BOB Demos:
-   Copyright (C) sponge
-   DWTFYWTPL
-
-   Gradle wrapper:
+   Gradle wrapper 5.2.1:
+   (not included in most distribution packages)
    Copyright (c) 2017 the original author or authors.
    See licenses/LICENSE-Apache2.0.txt
-
-   SAM C Library:
-   Copyright (c) 2004, Matthew P. Cashdollar <mpc@innographx.com>
-   See apps/sam/c/doc/license.txt
-
-   SAM C# Library:
-   Public domain.
-   See apps/sam/csharp/README
-
-   SAM Perl Library:
-   See licenses/LICENSE-GPLv2.txt
-
-   SAM Python Library:
-   Public domain.

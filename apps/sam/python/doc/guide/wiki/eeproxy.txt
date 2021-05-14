@@ -1,5 +1,0 @@
-Title: Eeproxy
-
-The '''Eeproxy''' is run by the I2P router.  The proxy is normally used for web browsers, as a means of accessing eepsites.
-
-The eeproxy is usually available at http://127.0.0.1:4444/.
