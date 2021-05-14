@@ -6,15 +6,16 @@
 # Translators:
 # タカハシ, 2014
 # rafe <rafe.kun@gmail.com>, 2015
-# riopfga caetocla, 2021
+# XMPPはいいぞ, 2021
 # 432cfded806ff6b7fe5774185a19126f_b5bc177, 2013
+# XMPPはいいぞ, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
-"PO-Revision-Date: 2021-02-05 15:27+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2021-04-09 08:17+0000\n"
+"Last-Translator: XMPPはいいぞ\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -58,7 +59,7 @@ msgstr "ごみ箱"
 #. MailDir-like
 #: src/src/i2p/susi/webmail/WebMail.java:217
 msgid "Bulk Mail"
-msgstr ""
+msgstr "迷惑メール"
 
 #. untranslated, translate on use
 #: src/src/i2p/susi/webmail/WebMail.java:221
@@ -229,7 +230,7 @@ msgstr "削除にマークされているメッセージなし。"
 #: src/src/i2p/susi/webmail/WebMail.java:1808
 #, java-format
 msgid "Host unchanged. Edit configuration file {0} to change host."
-msgstr ""
+msgstr "ホストは変更されていません。ホストを変更するために、設定ファイル {0} を編集してください。"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1828
 msgid "Configuration saved"
@@ -556,7 +557,7 @@ msgstr "削除"
 #. can't move from drafts
 #: src/src/i2p/susi/webmail/WebMail.java:3425
 msgid "Move to Folder"
-msgstr ""
+msgstr "フォルダーへ移動"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3445
 msgid "Back to Folder"

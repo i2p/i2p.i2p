@@ -10,7 +10,7 @@
 # Gutem <gutemhc@gmail.com>, 2019
 # C. E., 2019
 # zzzi2p, 2019
-# Eduardo Rodrigues, 2020
+# Eduardo Rodrigues, 2021
 # 
 msgid ""
 msgstr ""
@@ -18,7 +18,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-18 13:32+0000\n"
 "PO-Revision-Date: 2019-12-19 14:09+0000\n"
-"Last-Translator: Eduardo Rodrigues, 2020\n"
+"Last-Translator: Eduardo Rodrigues, 2021\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/otf/teams/12694/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -158,20 +158,20 @@ msgstr "Rejeitando túneis"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:260
 msgid "Dropping tunnel requests: Too slow"
-msgstr ""
+msgstr "Cessando solicitações de túnel: Demasiado lento"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:270
 msgid "Dropping tunnel requests: High job lag"
-msgstr ""
+msgstr "Cessando solicitações de túnel: Alto acúmulo de trabalho"
 
 #. don't even bother, since we are so overloaded locally
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:464
 msgid "Dropping tunnel requests: Overloaded"
-msgstr ""
+msgstr "Cessando solicitações de túnel: Sobrecarregado"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:747
 msgid "Rejecting tunnels: Hidden mode"
-msgstr ""
+msgstr "Rejeitando túneis: Modo oculto"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:775
 msgid "Rejecting tunnels: Request overload"
@@ -184,8 +184,8 @@ msgstr "Rejeitando túneis: limitado pela conexão"
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1024
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1057
 msgid "Dropping tunnel requests: High load"
-msgstr ""
+msgstr "Cessando solicitações de túnel: Carga alta"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1140
 msgid "Dropping tunnel requests: Queue time"
-msgstr ""
+msgstr "Cessando solicitações de túnel: Tempo de espera"

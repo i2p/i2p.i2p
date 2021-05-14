@@ -9,16 +9,17 @@
 # polacco <polacco@i2pmail.org>, 2014
 # polacco <polacco@i2pmail.org>, 2012
 # PolishAnon <b790979@klzlk.com>, 2011
+# Przemyslaw Ka. <przemyslaw.karpeta@gmail.com>, 2021
 # Taporpo Ne <taporpone@gmail.com>, 2015
-# Verdulo :-), 2016-2017
+# ☆Verdulo, 2016-2017
 # Tracerneo <ziolkoneo@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:33+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
-"Last-Translator: Verdulo :-)\n"
+"POT-Creation-Date: 2020-08-12 13:39+0000\n"
+"PO-Revision-Date: 2021-03-12 13:18+0000\n"
+"Last-Translator: Przemyslaw Ka. <przemyslaw.karpeta@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/otf/I2P/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -766,6 +767,9 @@ msgstr "Wallis i Futuna"
 
 msgid "Samoa"
 msgstr "Samoa"
+
+msgid "Kosovo"
+msgstr "Kosowo"
 
 msgid "Yemen"
 msgstr "Jemen"

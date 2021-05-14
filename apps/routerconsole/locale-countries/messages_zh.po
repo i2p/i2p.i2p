@@ -5,7 +5,7 @@
 # 
 # Translators:
 # ducki2p <ducki2p@gmail.com>, 2011
-# Scott Rhodes <starring169@gmail.com>, 2020
+# Scott Rhodes <starring169@gmail.com>, 2020-2021
 # walking <waling@mail.i2p>, 2013
 # walking <walking@i2pmail.org>, 2011
 # xtoaster <zhazhenzhong@gmail.com>, 2012
@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-08-12 13:39+0000\n"
-"PO-Revision-Date: 2020-11-19 00:53+0000\n"
+"PO-Revision-Date: 2021-04-16 01:51+0000\n"
 "Last-Translator: Scott Rhodes <starring169@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/otf/I2P/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -157,7 +157,7 @@ msgid "Congo"
 msgstr "刚果"
 
 msgid "Central African Republic"
-msgstr "中非"
+msgstr "中非共和国"
 
 msgid "Switzerland"
 msgstr "瑞士"
@@ -214,7 +214,7 @@ msgid "Denmark"
 msgstr "丹麦"
 
 msgid "Dominica"
-msgstr "多米尼"
+msgstr "多米尼克"
 
 msgid "Dominican Republic"
 msgstr "多米尼加共和国"
@@ -277,7 +277,7 @@ msgid "Georgia"
 msgstr "格鲁吉亚"
 
 msgid "French Guiana"
-msgstr "圭亚那"
+msgstr "法属圭亚那"
 
 msgid "Guernsey"
 msgstr "根西岛"
@@ -466,7 +466,7 @@ msgid "Marshall Islands"
 msgstr "马绍尔群岛"
 
 msgid "Macedonia"
-msgstr "马其顿"
+msgstr "北马其顿"
 
 msgid "Mali"
 msgstr "马里"
@@ -559,7 +559,7 @@ msgid "Peru"
 msgstr "秘鲁"
 
 msgid "French Polynesia"
-msgstr "玻利尼西亚"
+msgstr "法属玻利尼西亚"
 
 msgid "Papua New Guinea"
 msgstr "巴布亚新几内亚"
@@ -607,7 +607,7 @@ msgid "Serbia"
 msgstr "塞尔维亚"
 
 msgid "Russian Federation"
-msgstr "俄联邦"
+msgstr "俄罗斯联邦"
 
 msgid "Rwanda"
 msgstr "卢旺达"

@@ -7,14 +7,14 @@
 # Translators:
 # blueboy, 2017
 # Eduardo Addad de Oliveira <eduardoaddad@hotmail.com>, 2019
-# Eduardo Rodrigues, 2020
+# Eduardo Rodrigues, 2021
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2017-01-26 15:24+0000\n"
 "PO-Revision-Date: 2017-01-26 15:31+0000\n"
-"Last-Translator: Eduardo Rodrigues, 2020\n"
+"Last-Translator: Eduardo Rodrigues, 2021\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/otf/teams/12694/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -116,7 +116,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:37
 msgid "B<-h> name=value"
-msgstr ""
+msgstr "B<-h> nome=valor"
 
 #. type: TP
 #: man/eepget.1:37
@@ -166,7 +166,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:61
 msgid "B<-o> file"
-msgstr ""
+msgstr "B<-o> arquivo"
 
 #. type: TP
 #: man/eepget.1:61
@@ -193,7 +193,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:73
 msgid "B<-t> seconds"
-msgstr ""
+msgstr "B<-t> segundos"
 
 #. type: TP
 #: man/eepget.1:73
@@ -212,7 +212,7 @@ msgstr "B<-u> nome de usuário"
 #: man/eepget.1:79
 #, no-wrap
 msgid "Sets the username for proxy authorization, if required."
-msgstr ""
+msgstr "Defina o nome de usuário para a autorização do proxy, se necessário."
 
 #. type: Plain text
 #: man/eepget.1:85
@@ -353,7 +353,7 @@ msgstr "B<graceful>"
 #. type: Plain text
 #: man/i2prouter.1:37
 msgid "Stop I2P gracefully (may take up to 11 minutes)"
-msgstr ""
+msgstr "Parar a I2P graciosamente (pode demorar até 11 minutos)"
 
 #. type: IP
 #: man/i2prouter.1:39

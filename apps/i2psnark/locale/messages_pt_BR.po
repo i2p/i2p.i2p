@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:30+0000\n"
-"PO-Revision-Date: 2021-02-09 18:23+0000\n"
+"PO-Revision-Date: 2021-05-08 02:17+0000\n"
 "Last-Translator: Eduardo Rodrigues\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/otf/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -1438,11 +1438,11 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2677
 msgid "I2CP host"
-msgstr ""
+msgstr "Host do I2CP"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2682
 msgid "I2CP port"
-msgstr ""
+msgstr "Porta do I2CP"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2697
 msgid "I2CP options"

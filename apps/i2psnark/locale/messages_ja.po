@@ -5,14 +5,15 @@
 # 
 # Translators:
 # kami <b52c55627324b29125cbcfb101258463_228943>, 2014-2015
-# riopfga caetocla, 2020-2021
+# XMPPはいいぞ, 2020-2021
+# XMPPはいいぞ, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:30+0000\n"
-"PO-Revision-Date: 2021-02-05 15:27+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2021-05-14 01:18+0000\n"
+"Last-Translator: XMPPはいいぞ\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,13 +23,13 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/IdleChecker.java:76
 msgid "No more torrents running."
-msgstr "これ以上のtorrentを稼働しないでください。"
+msgstr "これ以上のトレントを稼働しないでください。"
 
 #: ../java/src/org/klomp/snark/IdleChecker.java:77
 #: ../java/src/org/klomp/snark/SnarkManager.java:3060
 #: ../java/src/org/klomp/snark/SnarkManager.java:3071
 msgid "I2P tunnel closed."
-msgstr "I2Pトンネルは閉じています。"
+msgstr "I2Pトンネルは閉じました。"
 
 #: ../java/src/org/klomp/snark/MagnetURI.java:50
 #: ../java/src/org/klomp/snark/MagnetURI.java:60
@@ -135,7 +136,7 @@ msgstr "I2CP設定は {0} に変更されました"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1241
 msgid "Disconnecting old I2CP destination"
-msgstr "古いI2CP送信先を切断しています"
+msgstr "古いI2CP宛先を切断しています"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1243
 #, java-format
@@ -194,7 +195,7 @@ msgstr "DHTを無効にしました。"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1305
 msgid "DHT change requires tunnel shutdown and reopen"
-msgstr "DHTの変更には、トンネルのシャットダウンと再オープンが必要です"
+msgstr "DHTの変更には、トンネルのシャットダウンと再開放が必要です"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1312
 msgid "Enabled Ratings."
@@ -324,7 +325,7 @@ msgid ""
 "Warning - No I2P trackers in \"{0}\", and DHT and open trackers are "
 "disabled, you should enable open trackers or DHT before starting the "
 "torrent."
-msgstr "警告 - I2Pトラッカーは\"{0}\"になく、I2PオープントラッカーとDHTは無効なので、Torrentを開始する前にオープントラッカーまたはDHTを有効にする必要があります。"
+msgstr "警告 - I2Pトラッカーは\"{0}\"になく、I2PオープントラッカーとDHTは無効なので、トレントを開始する前にオープントラッカーまたはDHTを有効にする必要があります。"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1683
 #, java-format
@@ -386,7 +387,7 @@ msgstr "ダウンロードは既に稼働しています: {0}"
 #: ../java/src/org/klomp/snark/SnarkManager.java:2636
 #, java-format
 msgid "Failed to copy torrent file to {0}"
-msgstr "{0} へのtorrentファイルのコピーに失敗しました。"
+msgstr "{0} へのトレントファイルのコピーに失敗しました。"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:2412
 #, java-format
@@ -401,17 +402,17 @@ msgstr "トレントファイル\"{0}\"は\".torrent\"で終われません！"
 #: ../java/src/org/klomp/snark/SnarkManager.java:2416
 #, java-format
 msgid "No pieces in \"{0}\"!"
-msgstr "\"{0}\"にピースがありません！"
+msgstr "\"{0}\"に断片がありません！"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:2418
 #, java-format
 msgid "Too many pieces in \"{0}\", limit is {1}!"
-msgstr "\"{0}\"にピースが多すぎます、上限は {1} です！"
+msgstr "\"{0}\"に断片が多すぎます、上限は {1} です！"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:2420
 #, java-format
 msgid "Pieces are too large in \"{0}\" ({1}B)!"
-msgstr "\"{0}\"ではピースが大きすぎます（{1}B）！"
+msgstr "\"{0}\"では断片が大きすぎます（{1}B）！"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:2421
 #, java-format
@@ -431,7 +432,7 @@ msgstr "トレント\"{0}\"にはデータがありません"
 #: ../java/src/org/klomp/snark/SnarkManager.java:2432
 #, java-format
 msgid "Torrents larger than {0}B are not supported yet \"{1}\"!"
-msgstr ""
+msgstr "{0}Bより大きいトレントは、まだサポートされていません \"{1}\" ！"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:2449
 #, java-format
@@ -487,7 +488,7 @@ msgstr "I2Pトンネルを開放し、全てのトレントを開始しました
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:3018
 msgid "Stopping all torrents and closing the I2P tunnel."
-msgstr "全てのトレントを停止し、I2Pトンネルを閉じました。"
+msgstr "全てのトレントを停止し、I2Pトンネルを閉じます。"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:3045
 msgid "Closing I2P tunnel after notifying trackers."
@@ -575,7 +576,7 @@ msgstr "I2PSnarkは停止しました"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:321
 msgid "Router is down"
-msgstr "ルーターは落ちています"
+msgstr "ルータは落ちています"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:332
 #, java-format
@@ -605,7 +606,7 @@ msgstr "トレントを取得するために、\"トレントを追加\"ボタ�
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:443
 msgid "clear messages"
-msgstr "メッセージ消去"
+msgstr "通知消去"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:500
 msgid "Status"
@@ -686,7 +687,7 @@ msgstr "アップロード率"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:629
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:630
 msgid "Uploaded"
-msgstr ""
+msgstr "アップロードした量"
 
 #. Translators: Please keep short or translate as " "
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:642
@@ -710,7 +711,7 @@ msgstr "アップ率"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:676
 msgid "Stop all torrents and the I2P tunnel"
-msgstr "全てのtorrentとI2Pトンネルを停止"
+msgstr "全てのトレントとI2Pトンネルを停止"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:678
 msgid "Stop All"
@@ -761,7 +762,7 @@ msgstr "Dest"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:770
 msgid "Our destination (identity) for this session"
-msgstr "このセッションの destination （同一性）"
+msgstr "このセッション用の宛先（同一性）"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:795
 msgid "Dht Debug"
@@ -954,7 +955,7 @@ msgstr "確認中"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1684
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3392
 msgid "Allocating"
-msgstr ""
+msgstr "割当中"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1699
 msgid "Tracker Error"
@@ -986,7 +987,7 @@ msgstr "シード中"
 #, java-format
 msgid "Seeding to {0} peer"
 msgid_plural "Seeding to {0} peers"
-msgstr[0] "{0}個のピアへシード中"
+msgstr[0] "{0}個のピアがシード中"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1726
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1742
@@ -1025,7 +1026,7 @@ msgstr[0] "{0}個のピアへ接続しました"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1764
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1765
 msgid "Stalled"
-msgstr "停滞された"
+msgstr "停滞"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1764
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1769
@@ -1043,7 +1044,7 @@ msgstr "ピアなし"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1776
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1777
 msgid "Stopped"
-msgstr "停止しました"
+msgstr "停止"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1807
 msgid "Torrent details"
@@ -1064,7 +1065,7 @@ msgstr "ファイルを開く"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1878
 msgid "complete"
-msgstr "完了"
+msgstr "完成"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1878
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3656
@@ -1074,7 +1075,7 @@ msgstr "残り"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1886
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3260
 msgid "Completed"
-msgstr "完了しました"
+msgstr "完結"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1924
 msgid "Stop the torrent"
@@ -1120,7 +1121,7 @@ msgstr "不明"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2025
 msgid "Destination (identity) of peer"
-msgstr "ピアの destination（同一性）"
+msgstr "ピアの宛先（同一性）"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2041
 msgid "Seed"
@@ -1128,19 +1129,19 @@ msgstr "シード"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2067
 msgid "Uninteresting (The peer has no pieces we need)"
-msgstr "Uninteresting（そのピアは私たちが必要なピースを持ちません）"
+msgstr "無関心中（そのピアは私たちが必要な断片を持ちません）"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2069
 msgid "Choked (The peer is not allowing us to request pieces)"
-msgstr "被チョーク（そのピアは、私たちがピースを要求することを許可していません）"
+msgstr "被抑制（そのピアは、私たちが断片を要求することを許可していません）"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2089
 msgid "Uninterested (We have no pieces the peer needs)"
-msgstr "Uninterested（私たちはそのピアが必要なピースを持ちません）"
+msgstr "被無関心（私たちはそのピアが必要な断片を持ちません）"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2091
 msgid "Choking (We are not allowing the peer to request pieces)"
-msgstr "チョーク中（私たちは、そのピアがピースを要求することを許可していません）"
+msgstr "抑制中（私たちは、そのピアが断片を要求することを許可していません）"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2207
 #, java-format
@@ -1252,7 +1253,7 @@ msgstr "トレント及び ダウンロードされた/共有された ファイ
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2443
 msgid "Files readable by all"
-msgstr "ファイルは全てに読み取り可能です"
+msgstr "ファイルが全てに読み取り可能"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2447
 msgid ""
@@ -1268,7 +1269,7 @@ msgstr "トレントを自動開始"
 msgid ""
 "Automatically start torrents when added and restart torrents when I2PSnark "
 "starts"
-msgstr "I2PSnarkが起動するとトレントの追加と再開をし、自動的にトレントを開始します"
+msgstr "I2PSnarkが起動すると、トレントの追加と再開をし、自動的にトレントを開始します"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2459
 msgid "Smart torrent sorting"
@@ -1328,7 +1329,7 @@ msgstr "二度としない"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2548
 msgid "Startup delay"
-msgstr "稼働開始を遅らせる"
+msgstr "起動を遅らせる"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2551
 msgid "How long before auto-started torrents are loaded when I2PSnark starts"
@@ -1352,7 +1353,7 @@ msgstr "トレント"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2587
 msgid "Total uploader limit"
-msgstr "合計アップローダー制限"
+msgstr "合計アップローダーの上限"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2591
 msgid "Maximum number of peers for uploading"
@@ -1364,7 +1365,7 @@ msgstr "ピア"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2597
 msgid "Up bandwidth limit"
-msgstr "上り帯域幅の制限"
+msgstr "上り帯域幅の上限"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2601
 msgid "Maximum bandwidth allocated for uploading"
@@ -1376,7 +1377,7 @@ msgstr "半分の帯域幅を利用可能にすることを推奨します。"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2606
 msgid "View or change router bandwidth"
-msgstr "ルーターの帯域幅を閲覧または変更"
+msgstr "ルータの帯域幅を閲覧または変更"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2612
 msgid "Use open trackers also"
@@ -1386,7 +1387,7 @@ msgstr "オープントラッカーも使う"
 msgid ""
 "Announce torrents to open trackers as well as trackers listed in the torrent"
 " file"
-msgstr "オープントラッカーだけでなく、トレントファイルに記載されているトラッカーにトレントをアナウンスします。"
+msgstr "トレントファイルに記載されているトラッカーだけでなく、オープントラッカーにトレントをアナウンスします。"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2620
 msgid "Enable DHT"
@@ -1479,13 +1480,13 @@ msgstr "マグネットURL {0} は無効です"
 #, java-format
 msgid "1 hop"
 msgid_plural "{0} hops"
-msgstr[0] ""
+msgstr[0] "{0}ホップ"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2833
 #, java-format
 msgid "1 tunnel"
 msgid_plural "{0} tunnels"
-msgstr[0] ""
+msgstr[0] "{0}トンネル"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3116
 msgid "Torrent file"
@@ -1509,7 +1510,7 @@ msgstr "トラッカー一覧"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3198
 msgid "Web Seeds"
-msgstr ""
+msgstr "ウェブシード"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3220
 msgid "Comment"
@@ -1525,7 +1526,7 @@ msgstr "作成者"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3251
 msgid "Added"
-msgstr "追加されました"
+msgstr "追加"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3271
 msgid "Last activity"
@@ -1558,11 +1559,11 @@ msgstr "ファイル個数"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3371
 msgid "Pieces"
-msgstr "ピース個数"
+msgstr "断片個数"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3376
 msgid "Piece size"
-msgstr "ピースの大きさ"
+msgstr "断片の大きさ"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3388
 msgid "Refresh page for results"
@@ -1586,7 +1587,7 @@ msgstr "ファイルを順にダウンロード"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3417
 msgid "Download pieces in order"
-msgstr "ピースを順にダウンロード"
+msgstr "断片を順にダウンロード"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3424
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4012
@@ -1605,7 +1606,7 @@ msgstr "リソース"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3436
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3447
 msgid "Base"
-msgstr ""
+msgstr "Base"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3445
 msgid "Resource Does Not Exist"

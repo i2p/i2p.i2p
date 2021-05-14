@@ -5,7 +5,7 @@
 # 
 # Translators:
 # bassmax, 2014
-# AO <ao@localizationlab.org>, 2019
+# AO <ao@localizationlab.org>, 2019,2021
 # Boxoa590, 2013
 # foo <foo@bar>, 2009
 # AO <ao@localizationlab.org>, 2017-2018
@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2019-12-03 16:10+0000\n"
+"POT-Creation-Date: 2021-05-05 15:14+0000\n"
+"PO-Revision-Date: 2021-05-05 16:43+0000\n"
 "Last-Translator: AO <ao@localizationlab.org>\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -70,3 +70,6 @@ msgid ""
 "Point your IRC client to {0}localhost:6668{1} and say hi to us on "
 "{2}#i2p{3}."
 msgstr "Dirigez votre client IRC vers {0}localhost:6668{1} et dites-nous bonjour sur {2}#i2p{3}."
+
+msgid "I2P Development Team"
+msgstr "L’équipe de développement d’I2P"

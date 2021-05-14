@@ -45,8 +45,8 @@ Um Ihre eigenen Daten anzubieten, ändern Sie einfach die Dateien im Wurzelverze
     <ul>
 <li>
 <b>Linux</b><br>
-        Standard install: <code dir="ltr">~/.i2p/eepsite/docroot/</code><br>
-        Package install, running as a service: <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+        Standard Installation: <code dir="ltr">~/.i2p/eepsite/docroot/</code><br>
+        Paketinstallation, gestartet als Service: <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/</code>
 </li>
       <li>
 <b>Windows</b><br><code dir="ltr">%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
@@ -55,20 +55,20 @@ Um Ihre eigenen Daten anzubieten, ändern Sie einfach die Dateien im Wurzelverze
 <b>Mac</b><br><code dir="ltr">/Users/(user)/Library/Application Support/i2p</code>
 </li>
     </ul>
-<p>In I2P, hidden services are addressed using a Base32 address ending in ".b32.i2p", or a Destination represented as a long Base64 string.
-      The Base32 address may be used as a hostname, until you register a name following the instructions below.
-      The Destination is somewhat like an IP address, and is shown on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.</p>
+<p>Basis32 AdresseIn I2P werden die Versteckte Services mit einem Basis2 String mit der Endung ".b32.i2p" oder als Destination mit einem langen Basis64 String addressiert.
+Die Basis32 Adresse kann auch als Hostname genutzt werden bis Sie einen Namen wie unten beschrieben registriert haben.
+Die Destination ist etwa so etwas wie eine IP Adresse und wird auf der <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Konfigurationsseite Versteckte Services</a> angezeigt.</p>
 
     <p>Die unteren Anleitungen erklären im Detail, wie sie eine Adresse wie "mysite.i2p" zu Ihrer Webseite registrieren und diese für andere erreichbar schalten.
 Sie erreichen Ihre Webseite lokal unter <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.</p>
 
     <h2>Wie Sie einen versteckten Service einrichten und veröffentlichen</h2>
 
-     <p>Your webserver is running by default, but is not accessible by others until you start the hidden service tunnel.
-      After you start your I2P Webserver tunnel, it will be difficult for other people to find.
-      It can only be accessed with the long Destination or with the shorter Base32 address (.b32.i2p), which is a hash of the Destination.
-      You could just tell people the Destnation or the Base32 address, but thankfully I2P has an address book and several easy ways to tell people about your website.
-      Here are detailed instructions.</p>
+     <p>Ihr Webserver wird automatisch gestartet,  ist aber nicht erreichbar bevor Sie nicht den Versteckte Services Tunnel starten.
+Nach dem Start des I2P Webserver Tunnels wird es für andere Personen schwer diesen zu finden.
+Dieser kann nur mit der langen Destination oder mit der kurzen Basis32 Adresse (.b32.i2p), welche ein Hashwert der Destination ist, erreicht werden.
+Sie können den Personen einfach die Destination oder die Basis32 Adresse mitteilen, aber dankenswerterweise hat I2P ein Adressbuch und mehrere Wege um den Personen von Ihrer Webseite zu erzählen.
+Hier sind detaillierte Informationen.</p>
 
     <ul>
 <li>Wählen Sie einen Namen für Ihre Webseite (<i>einname</i>.i2p) ohne Großbuchstaben.
@@ -138,10 +138,10 @@ Gehen Sie zu Ihrer <a href="http://127.0.0.1:7657/susidns/subscriptions">Abo Kon
       <li>
 <code dir="ltr">http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
     </ul>
-<p>If you are in a hurry and can't wait a few hours, you can tell people to use a "jump" address helper redirection service. 
-      This will work within a few minutes of your registering your hostname on the same site.
-      Test it yourself first by entering <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code> into your browser. 
-      Once it is working, you can tell others to use it.</p>
+<p>Falls Sie in EIle sind und nicht ein paar Stunden warten können, teilen Sie den Personen mit, bitte den "Jump" Adress-Helfer Redirektions Service zu nutzen.
+Dieses wird innerhalb weniger Minuten nach der Registration Ihres Hostnamens auf der Selben Seite funktionieren.
+Bitte testen Sie es zuerst unter <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i>irgendwas</i>.i2p</code> selber in Ihrem Webbrowser. 
+Sobald dieses funktioniert, können Sie dieses anderen mitteilen.</p>
 
     <p>Einige Leute beobachten Webseitenlisten wie z.B. <a href="http://identiguy.i2p/" target="_blank">Identiguy's Eepsite Status Liste</a> oder <a href="http://no.i2p/browse/" target="_blank">no.i2p's Active Services Listet</a> um neue Webseiten zu finden, somit kann Ihre Webseite so mehr Besucher bekommen.
 Es gibt mehrere Methoden, anderen von Ihrer Webseite mitzuteilen. Hier sind ein paar Ideen:</p>
@@ -168,10 +168,10 @@ Wir empfehlen Ihnen die Nutzung des Standard Webservers, bis Sie sich wohl fühl
 Stellen Sie sicher, das Ihr Webserver gesichert ist, bevor Sie ihn online bringen.
 Es gibt viele Anleitungen im Internet, z.B. können Sie nach "nginx sicherheit abhärten" suchen und eine Liste von Anleitungen mit guten Hinweisen finden.</p> 
 
-        <p>There is one important issue with the Apache web server.
-          The <code dir="ltr">mod_status</code> and <code dir="ltr">mod_info</code> Apache modules are enabled by default on some operating systems.
-          These modules expose internal data which can lead to serious compromise of anonymity when used on an anonymous network.
-          Removing the lines in the configuration file where these modules are loaded is the easiest way to prevent these issues.</p>
+        <p>Es gibt ein wichtiges Problem mit dem Apache Webserver
+Die <code dir="ltr">mod_status</code> und <code dir="ltr">mod_info</code> Apache Module sind auf einigen Betriebssystemen standardmässig aktiviert
+Diese Module geben interne Daten preis, welches zu einer schwerwiegenden Kompromisierung Ihrere Anonnymität im anonymen Netzwerk führen kann.
+Das Entfernen der entsprechenden Zeilen in der Konfigurationsdatei zum Laden dieser Module ist der einfachste Weg um dieses Problem zu vermeiden.</p>
 
     <h2>Weitergehende Assistenz</h2>
 

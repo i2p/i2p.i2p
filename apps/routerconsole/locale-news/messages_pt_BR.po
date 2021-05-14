@@ -5,17 +5,18 @@
 # 
 # Translators:
 # blueboy, 2013
+# Eduardo Rodrigues, 2021
 # blueboy, 2013
 # blueboy, 2014-2015
 # blueboy, 2013-2014
-# thefabio <thefabioluiz@bol.com.br>, 2014
+# f416a30e99ae734114a8028a3e82bfb2_83c2a0b <7028a0713e9bd987da2fe8a98a8e0384_155275>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
-"Last-Translator: blueboy\n"
+"POT-Creation-Date: 2021-05-05 15:14+0000\n"
+"PO-Revision-Date: 2021-05-08 04:32+0000\n"
+"Last-Translator: Eduardo Rodrigues\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/otf/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,10 +25,10 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "Congratulations on getting I2P installed!"
-msgstr "Parabéns! A I2P foi instalada!"
+msgstr "Parabéns! I2P foi instalado!"
 
 msgid "Welcome to I2P!"
-msgstr "Seja bem-vindo à I2P!"
+msgstr "Boas-Vindas ao I2P!"
 
 #, java-format
 msgid "Please {0}have patience{1} as I2P boots up and finds peers."
@@ -67,3 +68,6 @@ msgid ""
 "Point your IRC client to {0}localhost:6668{1} and say hi to us on "
 "{2}#i2p{3}."
 msgstr "Aponte seu cliente IRC para {0}localhost:6668{1} e dê um oi para nós em {2}#i2p{3}."
+
+msgid "I2P Development Team"
+msgstr "Equipe de Desenvolvimento I2P"
