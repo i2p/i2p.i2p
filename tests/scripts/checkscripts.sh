@@ -16,7 +16,6 @@ SCRIPTFILES="\
 	./apps/i2ptunnel/java/bundle-messages*.sh \
 	./apps/ministreaming/java/bundle-messages.sh \
 	./apps/routerconsole/java/bundle-messages*.sh \
-	./apps/sam/c/examples/i2p-ping/pinger.sh \
 	./apps/susidns/src/bundle-messages.sh \
 	./apps/susimail/bundle-messages.sh \
 	./core/c/*.sh \
