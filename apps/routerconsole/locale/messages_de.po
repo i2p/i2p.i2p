@@ -7896,7 +7896,7 @@ msgstr "Die Zahl der teilnehmenden Tunnel, die für andere geroutet werden, gete
 msgid ""
 "A number greater than 1.00 means you are contributing more tunnels to the "
 "network than you are using."
-msgstr "Eine Zahl größer als 1.00 bedeutet, daß man mehr Tunnel zum Netzwerk beiträgt als man nutzt."
+msgstr "Eine Zahl größer als 1.00 bedeutet, dass man mehr Tunnel zum Netzwerk beiträgt als man nutzt."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/viewprofile_jsp.java:238
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/viewprofile_jsp.java:409
