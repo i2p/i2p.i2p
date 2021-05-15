@@ -1,3 +1,23 @@
+2021-05-14 zzz
+ * SAM: Remove ancient client demo code
+ * Update Translations
+
+2021-05-10 zzz
+ * Sybil: Fix retention of analysis files when configured
+   to never delete
+
+2021-05-07 zzz
+ * Console: /configpeer improvements
+
+2021-05-04 zzz
+ * GeoIP 2021-05
+
+2021-05-02 zzz
+ * Console: Update bug report URLs
+
+2021-04-25 zzz
+ * Console: Add author for initial news
+
 2021-04-24 zzz
  * Jetty: Patch for CVE-2021-28165 Jetty #6072 -
    Jetty server high CPU when client send data length > 17408
