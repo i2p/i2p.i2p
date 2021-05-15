@@ -136,24 +136,6 @@ function initClickables() {
   if (clickableForm2 != null) {
     clickableForm2.addEventListener('click', ToggleImportFormTableView, true);
   }
-
-  var pHow = document.getElementsByClassName("howitworks");
-  i = 0;
-  for (i = 0; i < pHow.length; i++) {
-    pHow[i].classList.add("invisible");
-  }
-  var idHow = document.getElementById("howitworks");
-  if (idHow != null) {
-    idHow.addEventListener('click', ToggleHowView, true);
-  }
-
-  var pWhat = document.getElementsByClassName("whatitis");
-  var idWhat = document.getElementById("whatitis");
-  if (idWhat != null) {
-    idWhat.classList.add("expanded");
-    idWhat.addEventListener('click', ToggleWhatView, true);
-  }
-
 }
 
 document.addEventListener("DOMContentLoaded", function() {

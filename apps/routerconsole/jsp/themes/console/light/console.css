@@ -1344,7 +1344,7 @@ p:empty + .sb_notice {
 
 #susidnsframe {
      margin: 0 0 -2px;
-     height: 100vh !important;
+     min-height: 100vh !important;
      width: 100%;
      overflow: hidden;
 }
