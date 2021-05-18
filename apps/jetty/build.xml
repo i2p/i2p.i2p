@@ -174,7 +174,7 @@
 -->
       <!-- comment out above line and uncomment below and the patches section further down if we need patches -->
         <jar destfile="jettylib/jetty-io.jar"  manifest="${jetty.base}/lib/jetty-io-${jetty.ver}.jar" filesetmanifest="mergewithoutmain" >
-            <zipfileset excludes="**/SslConnection.class" src="${jetty.base}/lib/jetty-io-${jetty.ver}.jar" />
+            <zipfileset excludes="**/SslConnection*.class" src="${jetty.base}/lib/jetty-io-${jetty.ver}.jar" />
             <zipfileset src="build/jetty-io-patch.jar" />
         </jar>
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-jmx-${jetty.ver}.jar" tofile="jettylib/org.mortbay.jmx.jar" />
