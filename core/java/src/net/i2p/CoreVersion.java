@@ -31,7 +31,7 @@ public class CoreVersion {
      *  Otherwise, the same as PUBLISHED_VERSION.
      *  RouterVersion.FULL_VERSION is suggested for display to the user.
      */
-    public final static String VERSION = "0.9.49";
+    public final static String VERSION = "0.9.50";
 
     /**
      *  The version published in the netdb via StatisticsManager.
@@ -48,7 +48,7 @@ public class CoreVersion {
      *
      *  @since 0.9.46
      */
-    public final static String PUBLISHED_VERSION = "0.9.49";
+    public final static String PUBLISHED_VERSION = "0.9.50";
 
     /**
      *  For Vuze.

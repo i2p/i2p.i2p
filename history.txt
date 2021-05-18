@@ -1,3 +1,5 @@
+* 2021-05-18 0.9.50 released
+
 2021-05-14 zzz
  * SAM: Remove ancient client demo code
  * Update Translations
