@@ -377,7 +377,7 @@ class SummaryBarRenderer {
         tx = _t("Settings");
         rbuf.setLength(0);
         rbuf.append("<a href=\"/config\" target=\"_top\" title=\"")
-           .append(_t("New Install Wizard"))
+           .append(_t("Configure I2P Router"))
            .append("\">")
            .append(nbsp(tx))
            .append("</a>\n");
