@@ -1,3 +1,9 @@
+i2p (0.9.50-1~bionic+1) bionic; urgency=medium
+
+  * New upstream version 0.9.50
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 19 May 2021 12:12:12 +0000
+
 i2p (0.9.49-1~bionic+1) bionic; urgency=medium
 
   * New upstream version 0.9.49

@@ -101,30 +101,29 @@
     javac.compilerargs=-bootclasspath /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/jce.jar
     ```
 
-5. Copy latest trust list _MTN/monotonerc from website or some other workspace
-
-6. Verify that no untrusted revisions were included:
+5. Verify that no untrusted revisions were included:
 
     ```
     ant revisions
     ```
 
-7. Review the complete diff from the last release:
+6. Review the complete diff from the last release:
 
     ```
     git diff i2p-0.9.(xx-1)..HEAD > out.diff
     vi out.diff
     ```
 
-8. Change revision in:
+7. Change revision in:
   - `history.txt`
   - `installer/install.xml`
   - `installer/install5.xml`
   - `core/java/src/net/i2p/CoreVersion.java`
+    - (both VERSION and PUBLISHED_VERSION)
   - `router/java/src/net/i2p/router/RouterVersion.java`
     - (change to BUILD = 0 and EXTRA = "")
 
-9. `git commit`
+8. `git commit`
 
 
 ### Build and test

@@ -15,7 +15,7 @@ Versions are as follows:
 Min version	Max version	Uses src pkg	Copied to Debian
 -----------	-----------	------------	----------------
 bionic		cosmic		bionic		--
-focal		hirsute		bionic		buster, sid
+focal		impish		bionic		buster, bullseye, sid
 
 Unsupported (Java 7):
 precise		saucy   	precise		wheezy
@@ -39,16 +39,7 @@ Prep (first time only)
 - Make a PPA, lets call it 'test'
 - OPTIONAL: Go to i2p.packages PPA and copy over existing I2P to your PPA:
   (select "copy existing binaries")
-    trusty, xenial, bionic
-    not precise (only if building for precise which you probably aren't)
-    not utopic (obsolete, disabled by launchpad)
-- Go to i2p.packages PPA and copy over service-wrapper-java to your PPA.
-  This is required for the build.
-  (select "copy existing binaries")
-    trusty
-    not precise (only if building for precise which you probably aren't)
-    not xenial, bionic (more recent versions 3.5.25-2 or 3.5.26-3 are in official launchpad)
-    not utopic (obsolete, disabled by launchpad)
+    bionic and higher
 
 - you need the following packages
   sudo apt-get install devscripts dput dh_systemd bash-completion
@@ -75,7 +66,6 @@ Generate files to upload
     run gpg -K to list your private keys
 - Remove patch files in debian/patches that are not listed in debian/patches/series
 - ant debian-release-tarball (this is currently for bionic and higher)
-  (ant xenial-release-tarball for xenial)
   this will make a directory ../i2p-0.9.XX-0-xxxxxxxx/
   and a tarball ../i2p_0.9.XX.orig.tar.bz2
 - cp debian/changelog ../i2p-0.9.XX-0-xxxxxxxx/debian/
