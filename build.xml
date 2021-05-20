@@ -12,7 +12,7 @@
     <property file="build.properties"/>
     <!--  When changing, also change javadoc URL in build.properties,
           and checksum in apps/jetty/build.xml
-          and versions in apps/jetty/build.gradle
+          and versions in gradle.properties and apps/jetty/build.gradle
      -->
     <property name="jetty.ver" value="9.3.29.v20201019" />
     <property name="tomcat.ver" value="9.0.45" />
@@ -651,21 +651,7 @@
 
     <!-- jbigi targets -->
 
-    <target name="jbigi-list-changes" depends="checkForGit" if="git.available">
-        <exec executable="mtn" outputproperty="workspace.changes.jbigi" errorproperty="mtn.error.jbigi" failifexecutionfails="false" >
-            <arg value="list" />
-            <arg value="changed" />
-            <arg value="installer/lib/jbigi" />
-        </exec>
-        <!-- \n in an attribute value generates an invalid manifest -->
-        <exec executable="tr" inputstring="${workspace.changes.jbigi}" outputproperty="workspace.changes.jbigi.tr" errorproperty="git.error2" failifexecutionfails="false" >
-            <arg value="-s" />
-            <arg value="&quot;[:space:]&quot;" />
-            <arg value="," />
-        </exec>
-    </target>
-
-    <target name="jbigi" depends="buildProperties, jbigi-list-changes">
+    <target name="jbigi" depends="buildProperties">
         <!-- set if unset -->
         <property name="workspace.changes.jbigi.tr" value="" />
         <mkdir dir="./build" />
@@ -681,7 +667,7 @@
         </jar>
     </target>
 
-    <target name="jbigi-nowindows" depends="buildProperties, jbigi-list-changes">
+    <target name="jbigi-nowindows" depends="buildProperties">
         <!-- set if unset -->
         <property name="workspace.changes.jbigi.tr" value="" />
         <delete file="build/jbigi.jar" failonerror="false" quiet="true" />
@@ -698,7 +684,7 @@
     </target>
 
     <!-- Now system-specific jbigis in alphabetical order -->
-    <target name="jbigi-freebsd-only"  depends="buildProperties, jbigi-list-changes">
+    <target name="jbigi-freebsd-only"  depends="buildProperties">
         <!-- set if unset -->
         <property name="workspace.changes.jbigi.tr" value="" />
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
@@ -713,7 +699,7 @@
         </jar>
     </target>
 
-    <target name="jbigi-linux-only"  depends="buildProperties, jbigi-list-changes">
+    <target name="jbigi-linux-only"  depends="buildProperties">
         <!-- set if unset -->
         <property name="workspace.changes.jbigi.tr" value="" />
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
@@ -728,7 +714,7 @@
         </jar>
     </target>
 
-    <target name="jbigi-linux-x86-only"  depends="buildProperties, jbigi-list-changes">
+    <target name="jbigi-linux-x86-only"  depends="buildProperties">
         <!-- set if unset -->
         <property name="workspace.changes.jbigi.tr" value="" />
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
@@ -743,7 +729,7 @@
         </jar>
     </target>
 
-    <target name="jbigi-linux-x86-64-only"  depends="buildProperties, jbigi-list-changes">
+    <target name="jbigi-linux-x86-64-only"  depends="buildProperties">
         <!-- set if unset -->
         <property name="workspace.changes.jbigi.tr" value="" />
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
@@ -758,7 +744,7 @@
         </jar>
     </target>
 
-    <target name="jbigi-linux-nonx86-only"  depends="buildProperties, jbigi-list-changes">
+    <target name="jbigi-linux-nonx86-only"  depends="buildProperties">
         <!-- set if unset -->
         <property name="workspace.changes.jbigi.tr" value="" />
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
@@ -773,7 +759,7 @@
         </jar>
     </target>
 
-    <target name="jbigi-osx-only"  depends="buildProperties, jbigi-list-changes" >
+    <target name="jbigi-osx-only"  depends="buildProperties" >
         <!-- set if unset -->
         <property name="workspace.changes.jbigi.tr" value="" />
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
@@ -788,7 +774,7 @@
         </jar>
     </target>
 
-    <target name="jbigi-windows-only" depends="buildProperties, jbigi-list-changes" >
+    <target name="jbigi-windows-only" depends="buildProperties" >
         <!-- set if unset -->
         <property name="workspace.changes.jbigi.tr" value="" />
         <delete file="build/jbigi.jar" failonerror="false" quiet="true" />
@@ -1822,20 +1808,6 @@
         <copy file="build/jetty-i2p.jar" todir="pkg-temp/lib/" />
     </target>
 
-    <target name="util-list-changes" depends="checkForGit" if="git.available" >
-        <exec executable="git" outputproperty="workspace.changes.util" errorproperty="git.error.util" failifexecutionfails="false" >
-            <arg value="list" />
-            <arg value="changed" />
-            <arg value="core/java/src/net/i2p/util" />
-        </exec>
-        <!-- \n in an attribute value generates an invalid manifest -->
-        <exec executable="tr" inputstring="${workspace.changes.util}" outputproperty="workspace.changes.util.tr" errorproperty="git.error2" failifexecutionfails="false" >
-            <arg value="-s" />
-            <arg value="[:space:]" />
-            <arg value="," />
-        </exec>
-    </target>
-
     <target name="izpack-patches" >
             <taskdef name="izpack"
                      classpath="${basedir}/installer/lib/izpack/patches.jar:${basedir}/installer/lib/izpack/standalone-compiler.jar"
@@ -1849,7 +1821,7 @@
     </target>
 
     <!-- IzPack 4 -->
-    <target name="installer" depends="preppkg, buildProperties, util-list-changes, izpack-patches, buildUtilityJar" >
+    <target name="installer" depends="preppkg, buildProperties, izpack-patches, buildUtilityJar" >
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
         <ant target="installerexe" />
     </target>
@@ -1880,7 +1852,7 @@
         <ant dir="installer/lib/izpack5/patches/java/" target="jar" />
     </target>
 
-    <target name="installer5" depends="izpack5-patches, preppkg, buildProperties, util-list-changes, buildUtilityJar" >
+    <target name="installer5" depends="izpack5-patches, preppkg, buildProperties, buildUtilityJar" >
         <izpack5 input="${basedir}/installer/install5.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
         <ant target="installer5exe" />
     </target>
@@ -2004,7 +1976,7 @@
     </target>
 
     <!-- IzPack 4 -->
-    <target name="installer-windows" depends="clean, preppkg-windows-only, util-list-changes, izpack-patches, buildUtilityJar" >
+    <target name="installer-windows" depends="clean, preppkg-windows-only, izpack-patches, buildUtilityJar" >
         <fixcrlf srcdir="pkg-temp" includes="*.config *.bat *.cmd **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="crlf"/>
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
         <ant target="installerexe" />
@@ -2013,7 +1985,7 @@
     </target>
 
     <!-- IzPack 5 -->
-    <target name="installer5-windows" depends="clean, izpack5-patches, preppkg-windows-only, util-list-changes, buildUtilityJar" >
+    <target name="installer5-windows" depends="clean, izpack5-patches, preppkg-windows-only, buildUtilityJar" >
         <fixcrlf srcdir="pkg-temp" includes="*.config *.bat *.cmd **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="crlf"/>
         <izpack5 input="${basedir}/installer/install5.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
         <ant target="installer5exe" />
