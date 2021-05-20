@@ -74,7 +74,7 @@ input.default {
  </div>
 </form>
 
-<h3 class="tabletitle"><%=intl._t("Websites Inside I2P")%></h3>
+<h3 class="tabletitle"><%=intl._t("I2P Community Sites")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="1">
@@ -88,7 +88,7 @@ input.default {
  </div>
 </form>
 
-<h3 class="tabletitle"><%=intl._t("Configuration")%></h3>
+<h3 class="tabletitle"><%=intl._t("Configuration and Help")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="4">
@@ -102,7 +102,7 @@ input.default {
  </div>
 </form>
 
-<h3 class="tabletitle"><%=intl._t("Developer Information")%></h3>
+<h3 class="tabletitle"><%=intl._t("Network and Developer Information")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="5">

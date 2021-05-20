@@ -4250,7 +4250,6 @@ input[type="text"]:focus, input[type="password"]:focus {
 
 input[type="file"] {
      border: none;
-     padding: 0;
      background: none;
      box-shadow: none;
      cursor: pointer;
