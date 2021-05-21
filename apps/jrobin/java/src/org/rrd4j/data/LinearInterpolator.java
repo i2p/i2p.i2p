@@ -15,6 +15,7 @@ import java.util.Date;
  * Interpolation method handles NaN datasource
  * values gracefully.</p>
  */
+@SuppressWarnings("deprecation")
 public class LinearInterpolator extends Plottable {
 
     /**

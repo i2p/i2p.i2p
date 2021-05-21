@@ -1,7 +1,5 @@
 package org.rrd4j.core.timespec;
 
-import org.rrd4j.core.Util;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -33,7 +31,7 @@ public class TimeSpec {
     void localtime(long timestamp) {
         GregorianCalendar date = new GregorianCalendar();
         date.setTime(new Date(timestamp * 1000L));
-        year = date.get(Calendar.YEAR) - 1900;
+        year = date.get(Calendar.YEAR);
         month = date.get(Calendar.MONTH);
         day = date.get(Calendar.DAY_OF_MONTH);
         hour = date.get(Calendar.HOUR_OF_DAY);
@@ -46,7 +44,7 @@ public class TimeSpec {
         GregorianCalendar gc;
         // absolute time, this is easy
         if (type == TYPE_ABSOLUTE) {
-            gc = new GregorianCalendar(year + 1900, month, day, hour, min, sec);
+            gc = new GregorianCalendar(year, month, day, hour, min, sec);
         }
         // relative time, we need a context to evaluate it
         else if (context != null && context.type == TYPE_ABSOLUTE) {
@@ -77,7 +75,7 @@ public class TimeSpec {
      * @return Timestamp (in seconds, no milliseconds)
      */
     public long getTimestamp() {
-        return Util.getTimestamp(getTime());
+        return getTime().toInstant().getEpochSecond();
     }
 
     String dump() {
@@ -133,7 +131,7 @@ public class TimeSpec {
     public static long[] getTimestamps(TimeSpec spec1, TimeSpec spec2) {
         Calendar[] gcs = getTimes(spec1, spec2);
         return new long[] {
-                Util.getTimestamp(gcs[0]), Util.getTimestamp(gcs[1])
+                gcs[0].toInstant().getEpochSecond(), gcs[1].toInstant().getEpochSecond()
         };
     }
 }

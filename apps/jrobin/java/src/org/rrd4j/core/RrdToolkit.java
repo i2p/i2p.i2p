@@ -31,7 +31,6 @@ import org.rrd4j.ConsolFun;
  * (files which are currently in use).
  *
  */
-@SuppressWarnings("deprecation")
 public class RrdToolkit {
 
     private static final String SOURCE_AND_DESTINATION_PATHS_ARE_THE_SAME = "Source and destination paths are the same";
@@ -472,11 +471,8 @@ public class RrdToolkit {
             if (arcDef.getRows() != newRows) {
                 arcDef.setRows(newRows);
                 rrdDef.setPath(destPath);
-                RrdDb rrdDest = new RrdDb(rrdDef);
-                try {
+                try (RrdDb rrdDest = RrdDb.of(rrdDef)){
                     rrdSource.copyStateTo(rrdDest);
-                } finally {
-                    rrdDest.close();
                 }
             }
         }
@@ -571,4 +567,3 @@ public class RrdToolkit {
     }
 
 }
-

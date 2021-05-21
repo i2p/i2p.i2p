@@ -14,7 +14,7 @@ class VDef extends Source {
     }
 
     void requestData(DataProcessor dproc) {
-        dproc.addDatasource(name, defName, var);
+        dproc.datasource(name, defName, var);
     }
 
 }

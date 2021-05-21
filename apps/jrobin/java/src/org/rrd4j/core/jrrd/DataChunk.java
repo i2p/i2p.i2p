@@ -2,8 +2,8 @@ package org.rrd4j.core.jrrd;
 
 import java.util.Map;
 
-import org.rrd4j.data.LinearInterpolator;
 import org.rrd4j.data.Plottable;
+import org.rrd4j.data.LinearInterpolator;
 
 /**
  * Models a chunk of result data from an RRDatabase.
@@ -11,6 +11,7 @@ import org.rrd4j.data.Plottable;
  * @author <a href="mailto:ciaran@codeloop.com">Ciaran Treanor</a>
  * @version $Revision: 1.1 $
  */
+@SuppressWarnings("deprecation")
 public class DataChunk {
 
     private static final String NEWLINE = System.getProperty("line.separator");

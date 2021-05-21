@@ -1,11 +1,13 @@
 package org.rrd4j.core.timespec;
 
-import org.rrd4j.core.Util;
+import java.time.Instant;
 
 /**
  * Class which parses at-style time specification (described in detail on the rrdfetch man page),
  * used in all RRDTool commands. This code is in most parts just a java port of Tobi's parsetime.c
  * code.
+ * 
+ * For years written with two digits, any year before 38 will be post 2000.
  *
  */
 public class TimeParser {
@@ -102,7 +104,8 @@ public class TimeParser {
      * the scanner state to what it was at entry, and returns without setting anything.
      */
     private void timeOfDay() {
-        int hour, minute = 0;
+        int hour = 0;
+        int minute = 0;
         /* save token status in case we must abort */
         scanner.saveState();
         /* first pick out the time of day - we assume a HH (COLON|DOT) MM time */
@@ -165,20 +168,13 @@ public class TimeParser {
     }
 
     private void assignDate(long mday, long mon, long year) {
-        if (year > 138) {
-            if (year > 1970) {
-                year -= 1900;
-            }
-            else {
-                throw new IllegalArgumentException("Invalid year " + year + " (should be either 00-99 or >1900)");
-            }
+        if (year >= 0 && year < 38) {
+            // 00-37  means post 2000
+            year += 2000;
         }
-        else if (year >= 0 && year < 38) {
-            year += 100;         /* Allow year 2000-2037 to be specified as   */
-        }                         /* 00-37 until the problem of 2038 year will */
-        /* arise for unices with 32-bit time_t     */
-        if (year < 70) {
-            throw new IllegalArgumentException("Won't handle dates before epoch (01/01/1970), sorry");
+        else if (year >= 38 && year <= 99) {
+            // 38-99  means 1938-1999
+            year += 1900;
         }
         spec.year = (int) year;
         spec.month = (int) mon;
@@ -186,7 +182,10 @@ public class TimeParser {
     }
 
     private void day() {
-        long mday = 0, wday, mon, year = spec.year;
+        long mday = 0;
+        long wday = 0;
+        long mon = 0;
+        long year = spec.year;
         switch (token.token_id) {
         case TimeToken.YESTERDAY:
             spec.day--;
@@ -244,7 +243,7 @@ public class TimeParser {
                 token = scanner.nextToken();
                 break;
             }
-            if (mon > 19700101 && mon < 24000101) { /*works between 1900 and 2400 */
+            if (mon > 19000101 && mon < 24000101) { /*works between 1900 and 2400 */
                 year = mon / 10000;
                 mday = mon % 100;
                 mon = (mon / 100) % 100;
@@ -292,7 +291,7 @@ public class TimeParser {
      * @return Object representing parsed date/time.
      */
     public TimeSpec parse() {
-        long now = Util.getTime();
+        long now = Instant.now().getEpochSecond();
         int hr = 0;
         /* this MUST be initialized to zero for midnight/noon/teatime */
         /* establish the default time reference */

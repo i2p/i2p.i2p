@@ -26,6 +26,10 @@ public abstract class Variable {
             this.value = value;
             this.timestamp = timestamp;
         }
+        @Override
+        public String toString() {
+            return "Value [value=" + value + ", timestamp=" + timestamp + "]";
+        }
     };
 
     public static final Value INVALIDVALUE = new Value(0, Double.NaN);
@@ -33,7 +37,7 @@ public abstract class Variable {
     private Value val = null;
 
     /**
-     * Used to calculate the needed value from a source, this method call fill.
+     * Used to calculate the needed value from a source, this method call the abstract method {@link #fill(long[], double[], long, long)}.
      * @param s
      * @param start
      * @param end
@@ -44,8 +48,8 @@ public abstract class Variable {
         int last = -1;
         // Iterate over array, stop then end cursor reach start or when both start and end has been found
         // It also stop if cursor cross other side boundary
-        for(int i = 0, j = s.timestamps.length - 1 ; ( last == -1 && j > first ) || ( first == -1 && ( last == -1 || i < last )  ) ; i++, j--) {
-            if(first == -1) {
+        for (int i = 0, j = s.timestamps.length - 1 ; i < s.timestamps.length && j >= 0 ; i++, j--) {
+            if (first == -1) {
                 long leftdown = Math.max(s.timestamps[i] - step, start);
                 long rightdown = Math.min(s.timestamps[i], end);
                 if(rightdown > leftdown) {
@@ -53,34 +57,35 @@ public abstract class Variable {
                 }
             }
 
-            if(last == -1) {
+            if (last == -1) {
                 long leftup = Math.max(s.timestamps[j] - step, start);
                 long rightup = Math.min(s.timestamps[j], end);
-                if(rightup > leftup ) {
+                if (rightup > leftup ) {
                     last = j;
                 }
             }
+            if ((( last != -1 || j <= first ) && ( first != -1 || ( last != -1 && i >= last )))) {
+                break;
+            }
         }
-        if( first == -1 || last == -1) {
-            throw new RuntimeException("Invalid range");
-        }
-        if(s instanceof VDef) {
+        if (first == -1 || last == -1) {
+            val = INVALIDVALUE;
+        } else if (s instanceof VDef) {
             // Already a variable, just check if it fits
             Value v = ((VDef) s).getValue();
             // No time stamp, or not time stamped value, keep it
-            if(v.timestamp == 0) {
+            if (v.timestamp == 0) {
                 val = v;
             }
             else {
-                if(v.timestamp < end && v.timestamp > start) {
+                if (v.timestamp < end && v.timestamp > start) {
                     val = v;
                 }
                 else {
                     val = new Value(0, Double.NaN);
                 }
             }
-        }
-        else {
+        } else {
             long[] timestamps = new long[ last - first + 1];
             System.arraycopy(s.timestamps, first, timestamps, 0, timestamps.length);
             double[] values = new double[ last - first + 1];
@@ -115,8 +120,8 @@ public abstract class Variable {
     public static class FIRST extends Variable {
         @Override
         protected Value fill(long[] timestamps, double[] values, long start, long end) {
-            for(int i = 0; i < values.length; i++) {
-                if( timestamps[i] > start && timestamps[i] < end && ! Double.isNaN(values[i])) {
+            for (int i = 0; i < values.length; i++) {
+                if (timestamps[i] > start && timestamps[i] < end && ! Double.isNaN(values[i])) {
                     return new Value(timestamps[i], values[i]);
                 }
             }
@@ -131,8 +136,8 @@ public abstract class Variable {
     public static class LAST extends Variable {
         @Override
         protected Value fill(long[] timestamps, double[] values, long start, long end) {
-            for(int i = values.length - 1 ; i >=0 ; i--) {
-                if( ! Double.isNaN(values[i]) ) {
+            for (int i = values.length - 1 ; i >=0 ; i--) {
+                if (! Double.isNaN(values[i]) ) {
                     return new Value(timestamps[i], values[i]);
                 }
             }
@@ -149,11 +154,11 @@ public abstract class Variable {
         protected Value fill(long[] timestamps, double[] values, long start, long end) {
             long timestamp = 0;
             double value = Double.NaN;
-            for(int i = values.length -1 ; i >=0 ; i--) {
-                if(! Double.isNaN(values[i]) && Double.isNaN(value)) {
+            for (int i = values.length -1 ; i >=0 ; i--) {
+                if (! Double.isNaN(values[i]) && Double.isNaN(value)) {
                     timestamp = timestamps[i];
                     value = values[i];
-                } else if( ! Double.isNaN(values[i]) && value > values[i]) {
+                } else if ( ! Double.isNaN(values[i]) && value > values[i]) {
                     timestamp = timestamps[i];
                     value = values[i];
                 }
@@ -171,11 +176,11 @@ public abstract class Variable {
         protected Value fill(long[] timestamps, double[] values, long start, long end) {
             long timestamp = 0;
             double value = Double.NaN;
-            for(int i = values.length -1 ; i >=0 ; i--) {
-                if(! Double.isNaN(values[i]) && Double.isNaN(value)) {
+            for (int i = values.length -1 ; i >=0 ; i--) {
+                if (! Double.isNaN(values[i]) && Double.isNaN(value)) {
                     timestamp = timestamps[i];
                     value = values[i];
-                } else if(!Double.isNaN(values[i]) && value < values[i]) {
+                } else if (!Double.isNaN(values[i]) && value < values[i]) {
                     timestamp = timestamps[i];
                     value = values[i];
                 }
@@ -193,7 +198,7 @@ public abstract class Variable {
         protected Value fill(long[] timestamps, double[] values, long start, long end) {
             double value = Double.NaN;
 
-            for(double tempVal: values) {
+            for (double tempVal: values) {
                 value = Util.sum(value, tempVal);
             }
             return new Value(0, value * (timestamps[1] - timestamps[0]) );
@@ -217,8 +222,7 @@ public abstract class Variable {
             }
             if (! Double.isNaN(value) && count > 0) {
                 value = value / count;
-            }
-            else {
+            } else {
                 value = Double.NaN;
             }
             return new Value(0, value);
@@ -237,21 +241,20 @@ public abstract class Variable {
             double M = 0.0;
             double S = 0.0;
             // See Knuth TAOCP vol 2, 3rd edition, page 232 and http://www.johndcook.com/standard_deviation.html
-            for(double cursVal: values) {
-                if(Double.isNaN(cursVal))
+            for (double cursVal: values) {
+                if (Double.isNaN(cursVal))
                     continue;
                 count++;
-                if(count == 1) {
+                if (count == 1) {
                     M = cursVal;
                     S = 0;
-                }
-                else {
+                } else {
                     double dM = cursVal - M;
                     M += dM/count;
                     S += dM * (cursVal - M);
                 }
             }
-            if(count > 1) {
+            if (count > 1) {
                 value = Math.sqrt( S/(count - 1) );
             }
             return new Value(0, value);
@@ -303,9 +306,9 @@ public abstract class Variable {
     static final class ComparPercentElemen implements Comparator<PercentElem>, Serializable {
         @Override
         public final int compare(PercentElem arg0, PercentElem arg1) {
-            if(Double.isNaN(arg0.value) && Double.isNaN(arg1.value))
+            if (Double.isNaN(arg0.value) && Double.isNaN(arg1.value))
                 return Long.signum(arg0.timestamp - arg1.timestamp);
-            else if(Double.isNaN(arg0.value))
+            else if (Double.isNaN(arg0.value))
                 return -1;
             else if (Double.isNaN(arg1.value))
                 return +1;
@@ -344,12 +347,12 @@ public abstract class Variable {
         protected Value fill(long[] timestamps, double[] values, long start, long end) {
             // valuesSet will be a set with NaN packet at the start
             SortedSet<PercentElem> valuesSet = new TreeSet<PercentElem>(new ComparPercentElemen());
-            for(int i = 0 ; i < values.length ; i++) {
+            for (int i = 0 ; i < values.length ; i++) {
                 valuesSet.add(new PercentElem(i, timestamps[i], values[i]));
             }
 
             //If not with nan, just drop all nan (inferior to min value)
-            if( ! withNaN) {
+            if (! withNaN) {
                 valuesSet = valuesSet.tailSet(new PercentElem(0, 0, Double.NEGATIVE_INFINITY ));
             }
 
@@ -435,7 +438,7 @@ public abstract class Variable {
             double lslslope;
             double lslint;
 
-            for(int i = 0; i < values.length; i++) {
+            for (int i = 0; i < values.length; i++) {
                 double value = values[i];
 
                 if (!Double.isNaN(value)) {
@@ -449,7 +452,7 @@ public abstract class Variable {
                 lslstep++;
             }
             double divisor = (SUMx * SUMx - cnt * SUMxx);
-            if(cnt > 0 && divisor != 0) {
+            if (cnt > 0 && divisor != 0) {
                 /* Bestfit line by linear least squares method */
                 lslslope = (SUMx * SUMy - cnt * SUMxy) / divisor;
                 lslint = (SUMy - lslslope * SUMx) / cnt;
@@ -478,7 +481,7 @@ public abstract class Variable {
             double SUMyy = 0.0;
             double lslcorrel;
 
-            for(int i = 0; i < values.length; i++) {
+            for (int i = 0; i < values.length; i++) {
                 double value = values[i];
 
                 if (!Double.isNaN(value)) {
@@ -492,7 +495,7 @@ public abstract class Variable {
                 }
                 lslstep++;
             }
-            if(cnt > 0) {
+            if (cnt > 0) {
                 /* Bestfit line by linear least squares method */
                 lslcorrel =
                         (SUMxy - (SUMx * SUMy) / cnt) /

@@ -1,14 +1,15 @@
 package org.rrd4j.data;
 
+import java.io.IOException;
+import java.net.URI;
+
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.FetchData;
 import org.rrd4j.core.RrdBackendFactory;
-import org.rrd4j.core.Util;
-
-import java.io.IOException;
+import org.rrd4j.core.RrdDb;
 
 class Def extends Source {
-    private final String path;
+    private final URI rrdUri;
     private final String dsName;
     private final RrdBackendFactory backend;
     private final ConsolFun consolFun;
@@ -20,34 +21,26 @@ class Def extends Source {
 
     Def(String name, String dsName, FetchData fetchData) {
         this(name,
-                fetchData.getRequest().getParentDb().getPath(),
+                fetchData.getRequest().getParentDb().getCanonicalUri(),
                 dsName, fetchData.getRequest().getConsolFun(),
                 fetchData.getRequest().getParentDb().getRrdBackend().getFactory()
                 );
         this.fetchData = fetchData;
     }
 
-    Def(String name, String path, String dsName, ConsolFun consolFunc) {
-        this(name, path, dsName, consolFunc, null);
-    }
-
-    Def(String name, String path, String dsName, ConsolFun consolFunc, RrdBackendFactory backend) {
+    Def(String name, URI rrdUri, String dsName, ConsolFun consolFunc, RrdBackendFactory backend) {
         super(name);
-        this.path = path;
+        this.rrdUri = backend.getCanonicalUri(rrdUri);
         this.dsName = dsName;
         this.consolFun = consolFunc;
         this.backend = backend;
     }
 
-    String getPath() {
-        return path;
+    URI getCanonicalUri() throws IOException {
+       return rrdUri;
     }
 
-    String getCanonicalPath() throws IOException {
-        return Util.getCanonicalPath(path);
-    }
-
-    String getDsName() {
+     String getDsName() {
         return dsName;
     }
 
@@ -60,10 +53,14 @@ class Def extends Source {
     }
 
     boolean isCompatibleWith(Def def) throws IOException {
-        return getCanonicalPath().equals(def.getCanonicalPath()) &&
+        return getCanonicalUri().equals(def.getCanonicalUri()) &&
                 getConsolFun() == def.consolFun &&
                 ((backend == null && def.backend == null) ||
                         (backend != null && def.backend != null && backend.equals(def.backend)));
+    }
+
+    RrdDb getRrdDb() {
+        return fetchData.getRequest().getParentDb();
     }
 
     void setFetchData(FetchData fetchData) {

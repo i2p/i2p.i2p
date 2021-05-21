@@ -1,13 +1,39 @@
 package org.rrd4j.graph;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.Stroke;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.function.Function;
 
 /**
  * Class to represent various constants used for graphing. No methods are specified.
+ * <p>
+ * The fonts settings can be changed use some on the following properties, sorted by increased priority.
+ * <ol>
+ * <li><code>org.rrd4j.fonts.properties</code></li>
+ * <li><code>org.rrd4j.fonts.properties.url</code></li>
+ * <li><code>org.rrd4j.font.plain</code></li>
+ * <li><code>org.rrd4j.font.bold</code></li>
+ * <li><code>org.rrd4j.font.plain.url</code></li>
+ * <li><code>org.rrd4j.font.bold.url</code></li>
+ * </ol>
+ * 
+ * If either <code>org.rrd4j.fonts.properties</code> or <code>org.rrd4j.fonts.properties.url</code> is used, the file provided contains any other property of lower priority .
+ * The last four properties defines directly the plain or bold font. All properties URL related (<code>org.rrd4j.fonts.url</code>, <code>org.rrd4j.font.plain.url</code> and
+ * <code>org.rrd4j.font.bold.url</code>) download data from an URL. They are useful when those data are provided by the file system, defined by the OS. 
+ * The others search for the data in the classpath. So it's easy to provided font-pack as a jar that's put before RRD44J's jar.
+ * <p>
+ * The default settings uses <code>org.rrd4j.fonts.properties</code> looking for the file <code>/rrd4jfonts.properties</code> in the classpath.
  */
 public interface RrdGraphConstants {
     /**
@@ -265,10 +291,70 @@ public interface RrdGraphConstants {
     double DEFAULT_BASE = 1000;
 
     /**
-     * Font constructor, to use embedded fonts
+     * The file that contains font configuration searched in the class path. The default value is <code>/rrd4jfonts.properties</code>
+     */
+    public static final String PROPERTYFONTSPROPERTIES = "org.rrd4j.fonts.properties";
+    /**
+     * A possible URL to a configuration file.
+     */
+    public static final String PROPERTYFONTSURL = "org.rrd4j.fonts.properties.url";
+    /**
+     * The name of the plain font, used to define the {@link #DEFAULT_SMALL_FONT} and the {@link GATOR_FONT}. To be found in the classpath.
+     */
+    public static final String PROPERTYFONTPLAIN = "org.rrd4j.font.plain";
+    /**
+     * The name of the bold font, used to define the {@link #DEFAULT_LARGE_FONT}. To be found in the classpath.
+     */
+    public static final String PROPERTYFONTBOLD = "org.rrd4j.font.bold";
+    /**
+     * An URL to the plain font, used to define the {@link #DEFAULT_SMALL_FONT} and the {@link GATOR_FONT}.
+     */
+    public static final String PROPERTYFONTPLAINURL = "org.rrd4j.font.plain.url";
+    /**
+     * An URL to the bold font, used to define the {@link #DEFAULT_LARGE_FONT}.
+     */
+    public static final String PROPERTYFONTBOLDURL = "org.rrd4j.font.bold.url";
+
+    /**
+     * Font constructor, to use embedded fonts. Not really useful outside internal use for RRD4J.
      */
     static class FontConstructor {
+        private static final Properties fileProps = new Properties();
+        static {
+            refreshConf();
+        }
         private FontConstructor() {}
+        
+        /**
+         * Used for tests
+         */
+        static void refreshConf() {
+            fileProps.clear();
+            Optional.ofNullable(System.getProperty(PROPERTYFONTSPROPERTIES, "/rrd4jfonts.properties"))
+                    .filter(s -> ! s.isEmpty())
+                    .map(RrdGraphConstants.class::getResourceAsStream)
+                    .ifPresent(t -> {
+                        try {
+                            fileProps.load(t);
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+            Optional.ofNullable(System.getProperty(PROPERTYFONTSURL))
+                    .filter(s -> ! s.isEmpty())
+                    .ifPresent(t -> {
+                        try {
+                            fileProps.load(new URL(t).openStream());
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+            for (String prop: new String[] {PROPERTYFONTPLAIN, PROPERTYFONTBOLD, PROPERTYFONTPLAINURL, PROPERTYFONTBOLDURL}) {
+                Optional.ofNullable(System.getProperty(prop))
+                        .filter(s -> ! s.isEmpty())
+                        .ifPresent(s -> fileProps.put(prop, s));
+            }
+        }
 
         /**
          * Return the default RRD4J's default font for the given strength
@@ -278,14 +364,22 @@ public interface RrdGraphConstants {
          */
         public static Font getFont(int type, int size) {
 /*
-            String fontPath;
-            if (type == Font.BOLD)
-                fontPath = "/DejaVuSansMono-Bold.ttf";
-            else
-                fontPath = "/DejaVuSansMono.ttf";
-
-            try (InputStream fontstream = RrdGraphConstants.class.getResourceAsStream(fontPath)) {
-                return Font.createFont(Font.TRUETYPE_FONT, fontstream).deriveFont(type == Font.BOLD ? Font.BOLD : Font.PLAIN, size);
+            Function<String, InputStream> fontStream = null;
+            String fontPath = fileProps.getProperty(type == Font.BOLD ? PROPERTYFONTBOLDURL : PROPERTYFONTPLAINURL);
+            if (fontPath!= null) {
+                fontStream = s -> {
+                    try {
+                        return new URL(s).openStream();
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                };
+            } else {
+                fontPath = fileProps.getProperty(type == Font.BOLD ? PROPERTYFONTBOLD : PROPERTYFONTPLAIN);
+                fontStream = RrdGraphConstants.class::getResourceAsStream;
+            }
+            try (InputStream fontstream = fontStream.apply(fontPath)) {
+                return Font.createFont(Font.TRUETYPE_FONT, fontstream).deriveFont((float)size);
             } catch (FontFormatException | IOException e) {
                 throw new RuntimeException(e);
             }

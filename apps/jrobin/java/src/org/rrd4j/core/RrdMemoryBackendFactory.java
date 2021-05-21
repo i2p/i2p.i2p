@@ -2,8 +2,10 @@ package org.rrd4j.core;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Factory class which creates actual {@link org.rrd4j.core.RrdMemoryBackend} objects. Rrd4j's support
@@ -19,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @RrdBackendAnnotation(name="MEMORY", shouldValidateHeader=false)
 public class RrdMemoryBackendFactory extends RrdBackendFactory {
 
-    protected final Map<String, RrdMemoryBackend> backends = new ConcurrentHashMap<>();
+    protected final Map<String, AtomicReference<ByteBuffer>> backends = new ConcurrentHashMap<>();
 
     /**
      * {@inheritDoc}
@@ -27,15 +29,8 @@ public class RrdMemoryBackendFactory extends RrdBackendFactory {
      * Creates RrdMemoryBackend object.
      */
     protected RrdBackend open(String id, boolean readOnly) throws IOException {
-        RrdMemoryBackend backend;
-        if (backends.containsKey(id)) {
-            backend = backends.get(id);
-        }
-        else {
-            backend = new RrdMemoryBackend(id);
-            backends.put(id, backend);
-        }
-        return backend;
+        AtomicReference<ByteBuffer> refbb = backends.computeIfAbsent(id, i -> new AtomicReference<ByteBuffer>());
+        return new RrdMemoryBackend(id, refbb);
     }
 
     @Override
@@ -47,6 +42,7 @@ public class RrdMemoryBackendFactory extends RrdBackendFactory {
      * {@inheritDoc}
      *
      * Method to determine if a memory storage with the given ID already exists.
+     * 
      */
     protected boolean exists(String id) {
         return backends.containsKey(id);

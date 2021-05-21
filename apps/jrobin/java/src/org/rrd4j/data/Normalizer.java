@@ -64,4 +64,3 @@ class Normalizer {
         return values;
     }
 }
-

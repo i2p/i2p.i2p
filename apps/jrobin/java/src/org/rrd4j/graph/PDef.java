@@ -1,17 +1,17 @@
 package org.rrd4j.graph;
 
 import org.rrd4j.data.DataProcessor;
-import org.rrd4j.data.Plottable;
+import org.rrd4j.data.IPlottable;
 
 class PDef extends Source {
-    private Plottable plottable;
+    private IPlottable plottable;
 
-    PDef(String name, Plottable plottable) {
+    PDef(String name, IPlottable plottable) {
         super(name);
         this.plottable = plottable;
     }
 
     void requestData(DataProcessor dproc) {
-        dproc.addDatasource(name, plottable);
+        dproc.datasource(name, plottable);
     }
 }

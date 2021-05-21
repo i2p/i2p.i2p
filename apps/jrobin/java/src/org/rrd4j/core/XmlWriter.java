@@ -202,7 +202,7 @@ public class XmlWriter implements AutoCloseable {
     }
 
     private static String escape(String s) {
-        return s.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+        return s.replace("<", "&lt;").replace(">", "&gt;");
     }
 
     @Override

@@ -17,6 +17,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * Base (abstract) backend factory class which holds references to all concrete
@@ -209,6 +210,15 @@ public abstract class RrdBackendFactory implements Closeable {
     public static synchronized void setActiveFactories(RrdBackendFactory... newFactories) {
         activeFactories.clear();
         activeFactories.addAll(Arrays.asList(newFactories));
+    }
+    
+    /**
+     * Return the current active factories as a stream.
+     * @return
+     * @since 3.7
+     */
+    public static synchronized Stream<RrdBackendFactory> getActiveFactories() {
+        return activeFactories.stream();
     }
 
     /**

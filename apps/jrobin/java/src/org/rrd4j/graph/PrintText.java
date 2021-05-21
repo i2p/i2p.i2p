@@ -45,7 +45,7 @@ class PrintText extends CommentText {
                     resolvedText = String.format(l, resolvedText, c);
                 } catch (Exception e) {
                     throw new RuntimeException("can't format '" + resolvedText + "'", e);
-                }                
+                }
             }
             else {
                 resolvedText = "-";

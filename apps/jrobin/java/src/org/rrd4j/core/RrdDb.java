@@ -70,6 +70,7 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
          * @return a new build RrdDb
          * @throws IOException              in case of I/O error.
          * @throws IllegalArgumentException if the builder settings were incomplete
+         * @throws java.lang.IllegalStateException if the thread was interrupted in pool usage
          */
         public RrdDb build() throws IOException {
             if (rrdDef != null) {
@@ -113,6 +114,7 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
          *
          * @throws IOException              in case of I/O error.
          * @throws IllegalArgumentException if the builder settings were incomplete
+         * @throws java.lang.IllegalStateException if the thread was interrupted in pool usage
          */
         public void doimport() throws IOException {
             if (rrdDef != null || (importer == null && externalPath == null)) {
@@ -185,7 +187,8 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
         }
 
         /**
-         * Activate the pool usage
+         * Activate the pool usage. If the pool is not declared using
+         * {@link #setPool(RrdDbPool)}, the singleton instance will be used.
          *
          * @return the same builder.
          */
@@ -195,18 +198,29 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
         }
 
         /**
-         * Set the pool that will be used if {@link #usePool} is true. If not defined,
-         * the singleton instance will be used.
+         * Set the pool that will be used and set usePool to true.
          *
          * @param pool true if a pool is going to be used
          * @return the same builder.
          */
         public Builder setPool(RrdDbPool pool) {
             this.pool = pool;
+            this.usePool = pool != null;
             return this;
         }
 
         /**
+         * Internal method used to memorized the pool, without generating a loop
+         * @param pool
+         * @return
+         */
+        Builder setPoolInternal(RrdDbPool pool) {
+            this.pool = pool;
+            this.usePool = false;
+            return this;
+        }
+
+       /**
          * Set when the builder will be used to import external data with a predefined source: XML or RRDTool.
          * @param externalPath an URI-like indication of RRD data to import
          * @return the same builder.
@@ -396,6 +410,7 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
      * </pre>
      *
      * @param rrdDef Object describing the structure of the new RRD file.
+     * @return a new Rrdb created from the definition.
      * @throws java.io.IOException Thrown in case of I/O error.
      */
     public static RrdDb of(RrdDef rrdDef) throws IOException {
@@ -807,6 +822,7 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
      * Closes RRD. No further operations are allowed on this RrdDb object.
      *
      * @throws java.io.IOException Thrown in case of I/O related error.
+     * @throws java.lang.IllegalStateException if the thread was interrupted in pool usage.
      */
     @SuppressWarnings("deprecation")
     public synchronized void close() throws IOException {
@@ -1379,6 +1395,10 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
      */
     public URI getUri() {
         return backend.getUri();
+    }
+
+    public URI getCanonicalUri() {
+        return backend.getFactory().getCanonicalUri(getUri());
     }
 
     /**

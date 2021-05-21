@@ -11,6 +11,6 @@ class CDef extends Source {
     }
 
     void requestData(DataProcessor dproc) {
-        dproc.addDatasource(name, rpnExpression);
+        dproc.datasource(name, rpnExpression);
     }
 }

@@ -86,7 +86,7 @@ public class RrdNioBackendFactory extends RrdFileBackendFactory {
      * Creates a new RrdNioBackendFactory with default settings.
      */
     public RrdNioBackendFactory() {
-        this(RrdNioBackendFactory.defaultSyncPeriod, DefaultSyncThreadPool.INSTANCE);
+        this(RrdNioBackendFactory.defaultSyncPeriod, RrdNioBackendFactory.defaultSyncPeriod > 0 ? DefaultSyncThreadPool.INSTANCE : null);
     }
 
     /**

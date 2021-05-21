@@ -16,7 +16,7 @@ class TDef extends Source {
 
     @Override
     void requestData(DataProcessor dproc) {
-        dproc.addDatasource(name, dsName, fetchData);
+        dproc.datasource(name, dsName, fetchData);
     }
 
 }

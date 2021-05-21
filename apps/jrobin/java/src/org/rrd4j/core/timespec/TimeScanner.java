@@ -7,11 +7,11 @@ class TimeScanner {
     private TimeToken token, token_save;
 
     static final TimeToken[] WORDS = {
-            new TimeToken("midnight", TimeToken.MIDNIGHT),    /* 00:00:00 of today or tomorrow */
-            new TimeToken("noon", TimeToken.NOON),        /* 12:00:00 of today or tomorrow */
-            new TimeToken("teatime", TimeToken.TEATIME),    /* 16:00:00 of today or tomorrow */
-            new TimeToken("am", TimeToken.AM),        /* morning times for 0-12 clock */
-            new TimeToken("pm", TimeToken.PM),        /* evening times for 0-12 clock */
+            new TimeToken("midnight", TimeToken.MIDNIGHT), /* 00:00:00 of today or tomorrow */
+            new TimeToken("noon", TimeToken.NOON),         /* 12:00:00 of today or tomorrow */
+            new TimeToken("teatime", TimeToken.TEATIME),   /* 16:00:00 of today or tomorrow */
+            new TimeToken("am", TimeToken.AM),             /* morning times for 0-12 clock */
+            new TimeToken("pm", TimeToken.PM),             /* evening times for 0-12 clock */
             new TimeToken("tomorrow", TimeToken.TOMORROW),
             new TimeToken("yesterday", TimeToken.YESTERDAY),
             new TimeToken("today", TimeToken.TODAY),
@@ -62,33 +62,33 @@ class TimeScanner {
             new TimeToken(null, 0)            /*** SENTINEL ***/
     };
 
-    static TimeToken[] MULTIPLIERS = {
-            new TimeToken("second", TimeToken.SECONDS),    /* seconds multiplier */
-            new TimeToken("seconds", TimeToken.SECONDS),    /* (pluralized) */
-            new TimeToken("sec", TimeToken.SECONDS),        /* (generic) */
+    static final TimeToken[] MULTIPLIERS = {
+            new TimeToken("second", TimeToken.SECONDS),   /* seconds multiplier */
+            new TimeToken("seconds", TimeToken.SECONDS),  /* (pluralized) */
+            new TimeToken("sec", TimeToken.SECONDS),      /* (generic) */
             new TimeToken("s", TimeToken.SECONDS),        /* (short generic) */
-            new TimeToken("minute", TimeToken.MINUTES),    /* minutes multiplier */
-            new TimeToken("minutes", TimeToken.MINUTES),    /* (pluralized) */
-            new TimeToken("min", TimeToken.MINUTES),        /* (generic) */
-            new TimeToken("m", TimeToken.MONTHS_MINUTES),    /* (short generic) */
-            new TimeToken("hour", TimeToken.HOURS),        /* hours ... */
-            new TimeToken("hours", TimeToken.HOURS),        /* (pluralized) */
-            new TimeToken("hr", TimeToken.HOURS),        /* (generic) */
-            new TimeToken("h", TimeToken.HOURS),        /* (short generic) */
-            new TimeToken("day", TimeToken.DAYS),        /* days ... */
+            new TimeToken("minute", TimeToken.MINUTES),   /* minutes multiplier */
+            new TimeToken("minutes", TimeToken.MINUTES),  /* (pluralized) */
+            new TimeToken("min", TimeToken.MINUTES),      /* (generic) */
+            new TimeToken("m", TimeToken.MONTHS_MINUTES), /* (short generic) */
+            new TimeToken("hour", TimeToken.HOURS),       /* hours ... */
+            new TimeToken("hours", TimeToken.HOURS),      /* (pluralized) */
+            new TimeToken("hr", TimeToken.HOURS),         /* (generic) */
+            new TimeToken("h", TimeToken.HOURS),          /* (short generic) */
+            new TimeToken("day", TimeToken.DAYS),         /* days ... */
             new TimeToken("days", TimeToken.DAYS),        /* (pluralized) */
-            new TimeToken("d", TimeToken.DAYS),        /* (short generic) */
-            new TimeToken("week", TimeToken.WEEKS),        /* week ... */
-            new TimeToken("weeks", TimeToken.WEEKS),        /* (pluralized) */
-            new TimeToken("wk", TimeToken.WEEKS),        /* (generic) */
-            new TimeToken("w", TimeToken.WEEKS),        /* (short generic) */
-            new TimeToken("month", TimeToken.MONTHS),    /* week ... */
+            new TimeToken("d", TimeToken.DAYS),           /* (short generic) */
+            new TimeToken("week", TimeToken.WEEKS),       /* week ... */
+            new TimeToken("weeks", TimeToken.WEEKS),      /* (pluralized) */
+            new TimeToken("wk", TimeToken.WEEKS),         /* (generic) */
+            new TimeToken("w", TimeToken.WEEKS),          /* (short generic) */
+            new TimeToken("month", TimeToken.MONTHS),     /* week ... */
             new TimeToken("months", TimeToken.MONTHS),    /* (pluralized) */
-            new TimeToken("mon", TimeToken.MONTHS),        /* (generic) */
-            new TimeToken("year", TimeToken.YEARS),        /* year ... */
-            new TimeToken("years", TimeToken.YEARS),        /* (pluralized) */
-            new TimeToken("yr", TimeToken.YEARS),        /* (generic) */
-            new TimeToken("y", TimeToken.YEARS),        /* (short generic) */
+            new TimeToken("mon", TimeToken.MONTHS),       /* (generic) */
+            new TimeToken("year", TimeToken.YEARS),       /* year ... */
+            new TimeToken("years", TimeToken.YEARS),      /* (pluralized) */
+            new TimeToken("yr", TimeToken.YEARS),         /* (generic) */
+            new TimeToken("y", TimeToken.YEARS),          /* (short generic) */
             new TimeToken(null, 0)            /*** SENTINEL ***/
     };
 

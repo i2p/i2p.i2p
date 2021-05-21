@@ -2,6 +2,8 @@ package org.rrd4j.core;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Backend to be used to store all RRD bytes in memory.
@@ -9,14 +11,17 @@ import java.nio.ByteBuffer;
  */
 public class RrdMemoryBackend extends ByteBufferBackend {
 
-    private ByteBuffer dbb = null;
+    private final AtomicReference<ByteBuffer> refbb;
     /**
      * <p>Constructor for RrdMemoryBackend.</p>
      *
      * @param path a {@link java.lang.String} object.
+     * @param refbb 
      */
-    protected RrdMemoryBackend(String path) {
+    protected RrdMemoryBackend(String path, AtomicReference<ByteBuffer> refbb) {
         super(path);
+        this.refbb = refbb;
+        Optional.ofNullable(refbb).map(r -> r.get()).ifPresent(this::setByteBuffer);
     }
 
     @Override
@@ -24,13 +29,13 @@ public class RrdMemoryBackend extends ByteBufferBackend {
         if (length < 0 || length > Integer.MAX_VALUE) {
             throw new IllegalArgumentException("Illegal length: " + length);
         }
-        dbb = ByteBuffer.allocate((int) length);
-        setByteBuffer(dbb);
+        refbb.set(ByteBuffer.allocate((int) length));
+        setByteBuffer(refbb.get());
     }
 
     @Override
     public long getLength() throws IOException {
-        return dbb.capacity();
+        return Optional.ofNullable(refbb.get()).map(ByteBuffer::capacity).orElse(0);
     }
 
     /**

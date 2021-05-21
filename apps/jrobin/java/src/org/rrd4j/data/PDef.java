@@ -1,11 +1,11 @@
 package org.rrd4j.data;
 
 class PDef extends Source implements NonRrdSource  {
-    private final Plottable plottable;
+    private final IPlottable plottable;
 
-    PDef(String name, Plottable plottable) {
+    PDef(String name, IPlottable plottable2) {
         super(name);
-        this.plottable = plottable;
+        this.plottable = plottable2;
     }
 
     /** {@inheritDoc} */

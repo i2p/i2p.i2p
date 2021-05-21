@@ -4,6 +4,9 @@ import java.io.IOException;
 
 /**
  * Factory class which creates actual {@link org.rrd4j.core.RrdSafeFileBackend} objects.
+ * <p>
+ * Because of locking, each RrdDb can be open only once even from within the JVM. So usage
+ * of the {@link org.rrd4j.core.RrdDbPool} is mandatory with this backend.
  *
  */
 @RrdBackendAnnotation(name="SAFE", shouldValidateHeader=true, cachingAllowed=false)
