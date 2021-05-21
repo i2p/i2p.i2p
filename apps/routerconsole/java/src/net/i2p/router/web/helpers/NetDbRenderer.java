@@ -1012,7 +1012,7 @@ class NetDbRenderer {
                 buf.append("<br><b class=\"netdb_transport\">").append(DataHelper.stripHTML(style)).append(":</b>");
                 if (debug) {
                     int cost = addr.getCost();
-                    if (!((style.equals("SSU") && cost == 5) || (style.equals("NTCP") && cost == 10)))
+                    if (!((style.equals("SSU") && cost == 5) || (style.startsWith("NTCP") && cost == 10)))
                         buf.append("&nbsp;<span class=\"netdb_name\">").append(_t("cost")).append("</span>: <span class=\"netdb_info\">").append("" + cost).append("</span>&nbsp;");
                 }
                 Map<Object, Object> p = addr.getOptionsMap();
