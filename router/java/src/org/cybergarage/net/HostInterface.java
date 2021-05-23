@@ -158,7 +158,7 @@ public class HostInterface
 				
 				if (((ipfilter & IPV4_BITMASK)!=0) && addr instanceof Inet4Address ) {						
 					addresses.add(addr);
-				}else if (((ipfilter & IPV6_BITMASK)!=0)&& addr instanceof InetAddress) {
+				}else if (((ipfilter & IPV6_BITMASK)!=0) && addr instanceof Inet6Address) {
 					addresses.add(addr);
 				}
 			}
