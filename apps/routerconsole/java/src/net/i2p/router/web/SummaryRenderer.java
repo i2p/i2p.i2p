@@ -125,7 +125,7 @@ class SummaryRenderer {
         long start = end - (period * periodCount);
         ImageOutputStream ios = null;
         try {
-            RrdGraphDef def = new RrdGraphDef();
+            RrdGraphDef def = new RrdGraphDef(start/1000, end/1000);
 
             // Override defaults
             def.setColor(ElementsNames.back,   BACK_COLOR);
@@ -165,7 +165,6 @@ class SummaryRenderer {
             boolean localTime = !_context.getBooleanProperty(GraphConstants.PROP_UTC);
             if (localTime)
                 def.setTimeZone(SystemVersion.getSystemTimeZone(_context));
-            def.setTimeSpan(start/1000, end/1000);
             def.setMinValue(0d);
             String name = _listener.getRate().getRateStat().getName();
             // heuristic to set K=1024
