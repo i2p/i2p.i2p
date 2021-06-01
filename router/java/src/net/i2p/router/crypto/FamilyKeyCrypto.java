@@ -28,7 +28,6 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.RouterContext;
-import net.i2p.router.StatisticsManager;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
