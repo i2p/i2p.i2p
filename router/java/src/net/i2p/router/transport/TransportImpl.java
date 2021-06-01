@@ -335,6 +335,7 @@ public abstract class TransportImpl implements Transport {
                           + " to " + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) + "\n" + msg.toString());
         }
 
+        long now = _context.clock().now();
         if (sendSuccessful) {
             if (debug)
                 _log.debug(getStyle() + " Sent " + msg.getMessageType() + " successfully to "
@@ -349,11 +350,11 @@ public abstract class TransportImpl implements Transport {
                 _log.debug(getStyle() + " Failed to send " + msg.getMessageType()
                           + " to " + msg.getTarget().getIdentity().getHash().toBase64()
                           + " (details: " + msg + ')');
-            if (msg.getExpiration() < _context.clock().now())
+            if (msg.getExpiration() < now)
                 _context.statManager().addRateData("transport.expiredOnQueueLifetime", lifetime);
 
             if (allowRequeue) {
-                if ( ( (msg.getExpiration() <= 0) || (msg.getExpiration() > _context.clock().now()) )
+                if ( ( (msg.getExpiration() <= 0) || (msg.getExpiration() > now) )
                      && (msg.getMessage() != null) ) {
                     // this may not be the last transport available - keep going
                     _context.outNetMessagePool().add(msg);
@@ -400,7 +401,6 @@ public abstract class TransportImpl implements Transport {
         }
 ****/
 
-        long now = _context.clock().now();
         long sendTime = now - msg.getSendBegin();
         long allTime = now - msg.getCreated();
         if (allTime > 5*1000) {
