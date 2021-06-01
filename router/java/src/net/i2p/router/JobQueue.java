@@ -426,25 +426,29 @@ public class JobQueue {
     
     /**
      * When did the most recently begin job start?
+     *
+     * @since Broken before 0.9.51, always returned -1
      */
     public long getLastJobBegin() { 
         long when = -1;
         for (JobQueueRunner runner : _queueRunners.values()) {
             long cur = runner.getLastBegin();
             if (cur > when)
-                cur = when;
+                when = cur;
         }
         return when; 
     }
     /**
      * When did the most recently begin job start?
+     *
+     * @since Broken before 0.9.51, always returned -1
      */
     public long getLastJobEnd() { 
         long when = -1;
         for (JobQueueRunner runner : _queueRunners.values()) {
             long cur = runner.getLastEnd();
             if (cur > when)
-                cur = when;
+                when = cur;
         }
         return when; 
     }
