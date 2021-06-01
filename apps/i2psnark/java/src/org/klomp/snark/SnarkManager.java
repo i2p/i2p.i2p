@@ -2363,6 +2363,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
         String now = Long.toString(System.currentTimeMillis());
         config.setProperty(PROP_META_ADDED, now);
         config.setProperty(PROP_META_STAMP, now);
+        config.setProperty(PROP_META_RUNNING, "true");
         // save
         synchronized (_configLock) {
             saveConfig();
@@ -2495,7 +2496,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
         public void run() {
             // don't bother delaying if auto start is false
             long delay = (60L * 1000) * getStartupDelayMinutes();
-            if (delay > 0 && shouldAutoStart()) {
+            boolean autostart = shouldAutoStart();
+            if (delay > 0 && autostart) {
                 int id = _messages.addMessageNoEscape(_t("Adding torrents in {0}", DataHelper.formatDuration2(delay)));
                 try { Thread.sleep(delay); } catch (InterruptedException ie) {}
                 // Remove that first message
@@ -2523,7 +2525,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
                 if (doMagnets) {
                     // first run only
                     try {
-                        addMagnets();
+                        addMagnets(autostart);
                         doMagnets = false;
                     } catch (RuntimeException e) {
                         _log.error("Error in the DirectoryMonitor", e);
@@ -2671,7 +2673,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
      *
      * @since 0.8.4
      */
-    private void addMagnets() {
+    private void addMagnets(boolean autostart) {
         boolean changed = false;
         for (Iterator<?> iter = _config.keySet().iterator(); iter.hasNext(); ) {
             String k = (String) iter.next();
@@ -2688,7 +2690,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
                     String tracker = config.getProperty(PROP_META_MAGNET_TR);
                     String dir = config.getProperty(PROP_META_MAGNET_DIR);
                     File dirf = (dir != null) ? (new File(dir)) : null;
-                    addMagnet(name, ih, tracker, false, dirf);
+                    addMagnet(name, ih, tracker, false, autostart, dirf, this);
                 } else {
                     iter.remove();
                     changed = true;
