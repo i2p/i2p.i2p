@@ -997,8 +997,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *
      *  Warning - risk of deadlock - do not call while holding locks
      *
-     * @param blockingRebuild If true, netdb publish will happen in-line.
-     *                        This may take a long time.
+     * @param blockingRebuild ignored, always nonblocking
      */
     public void rebuildRouterInfo(boolean blockingRebuild) {
         if (_log.shouldLog(Log.INFO))
@@ -1015,6 +1014,8 @@ public class Router implements RouterClock.ClockShiftListener {
     /**
      * Rebuild and republish our routerInfo since something significant 
      * has changed.
+     *
+     * @param blockingRebuild ignored, always nonblocking
      */
     private void locked_rebuildRouterInfo(boolean blockingRebuild) {
         RouterInfo ri;
@@ -1041,9 +1042,10 @@ public class Router implements RouterClock.ClockShiftListener {
             if (!ri.isValid())
                 throw new DataFormatException("Our RouterInfo has a bad signature");
             Republish r = new Republish(_context);
-            if (blockingRebuild)
-                r.timeReached();
-            else
+            // Avoid deadlocks part 1000
+            //if (blockingRebuild)
+            //    r.timeReached();
+            //else
                 _context.simpleTimer2().addEvent(r, 0);
         } catch (DataFormatException dfe) {
             _log.log(Log.CRIT, "Internal error - unable to sign our own address?!", dfe);
