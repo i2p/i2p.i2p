@@ -1,7 +1,6 @@
 package net.i2p.router.tunnel.pool;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,6 +14,7 @@ import java.util.StringTokenizer;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SigType;
+import net.i2p.crypto.SipHashInline;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -26,7 +26,6 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.transport.TransportUtil;
-import net.i2p.router.util.HashDistance;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
@@ -653,34 +652,40 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
      *  to maximize his chances of those two routers being at opposite
      *  ends of a tunnel.
      *
-     *  Previous:
+     *  Previous Previous:
      *     d(l, h) - d(r, h)
      *
-     *  Now:
+     *  Previous:
      *     d((H(l+h), h) - d(H(r+h), h)
+     *
+     *  Now:
+     *     SipHash using h to generate the SipHash keys
+     *     then siphash(l) - siphash(r)
      */
     private static class HashComparator implements Comparator<Hash>, Serializable {
-        private final Hash _hash, tmp;
-        private final byte[] data;
+        private final long k0, k1;
 
-        /** not thread safe */
+        /**
+         * not thread safe
+         *
+         * @param h container for sort keys, not used as a Hash
+         */
         private HashComparator(Hash h) {
-            _hash = h;
-            tmp = new Hash(new byte[Hash.HASH_LENGTH]);
-            data = new byte[2*Hash.HASH_LENGTH];
-            System.arraycopy(_hash.getData(), 0, data, Hash.HASH_LENGTH, Hash.HASH_LENGTH);
+            byte[] b = h.getData();
+            // we use the first half of the random key in ProfileOrganizer.getSubTier(),
+            // so use the last half here
+            k0 = DataHelper.fromLong8(b, 16);
+            k1 = DataHelper.fromLong8(b, 24);
         }
 
         public int compare(Hash l, Hash r) {
-            System.arraycopy(l.getData(), 0, data, 0, Hash.HASH_LENGTH);
-            byte[] tb = tmp.getData();
-            // don't use caching version of calculateHash()
-            SHA256Generator.getInstance().calculateHash(data, 0, 2*Hash.HASH_LENGTH, tb, 0);
-            BigInteger ll = HashDistance.getDistance(_hash, tmp);
-            System.arraycopy(r.getData(), 0, data, 0, Hash.HASH_LENGTH);
-            SHA256Generator.getInstance().calculateHash(data, 0, 2*Hash.HASH_LENGTH, tb, 0);
-            BigInteger rr = HashDistance.getDistance(_hash, tmp);
-            return ll.compareTo(rr);
+            long lh = SipHashInline.hash24(k0, k1, l.getData());
+            long rh = SipHashInline.hash24(k0, k1, r.getData());
+            if (lh > rh)
+                return 1;
+            if (lh < rh)
+                return -1;
+            return 0;
         }
     }
 

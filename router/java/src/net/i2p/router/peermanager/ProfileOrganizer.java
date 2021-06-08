@@ -17,6 +17,7 @@ import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import net.i2p.crypto.SipHashInline;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
@@ -1352,6 +1353,12 @@ public class ProfileOrganizer {
     private void locked_selectPeers(Map<Hash, PeerProfile> peers, int howMany, Set<Hash> toExclude,
                                     Set<Hash> matches, Hash randomKey, Slice subTierMode) {
         List<Hash> all = new ArrayList<Hash>(peers.keySet());
+        byte[] rk = randomKey.getData();
+        // we use the first half of the random key here,
+        // the second half is used in TunnelPeerSelector.
+        long k0 = DataHelper.fromLong8(rk, 0);
+        long k1 = DataHelper.fromLong8(rk, 8);
+
         // use RandomIterator to avoid shuffling the whole thing
         for (Iterator<Hash> iter = new RandomIterator<Hash>(all); (matches.size() < howMany) && iter.hasNext(); ) {
             Hash peer = iter.next();
@@ -1361,7 +1368,7 @@ public class ProfileOrganizer {
                 continue;
             if (_us.equals(peer))
                 continue;
-            int subTier = getSubTier(peer, randomKey);
+            int subTier = getSubTier(peer, k0, k1);
             if ((subTier & subTierMode.mask) != subTierMode.val)
                 continue;
             boolean ok = isSelectable(peer);
@@ -1375,15 +1382,13 @@ public class ProfileOrganizer {
     /**
      *  Implement a random, deterministic split into 4 groups that cannot be predicted by
      *  others.
+     *
+     *  @param k0 random key part 1
+     *  @param k1 random key part 2
      *  @return 0-3
      */
-    private int getSubTier(Hash peer, Hash randomKey) {
-        // input is first 64 bytes; output is last 32 bytes
-        byte[] data = new byte[96];
-        System.arraycopy(peer.getData(), 0, data, 0, 32);
-        System.arraycopy(randomKey.getData(), 0, data, 32, 32);
-        _context.sha().calculateHash(data, 0, 64, data, 64);
-        return data[64] & 0x03;
+    private int getSubTier(Hash peer, long k0, long k1) {
+        return ((int) SipHashInline.hash24(k0, k1, peer.getData())) & 0x03;
     }
 
     public boolean isSelectable(Hash peer) {
