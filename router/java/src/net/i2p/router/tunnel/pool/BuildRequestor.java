@@ -22,7 +22,6 @@ import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.kademlia.MessageWrapper;
-import net.i2p.router.tunnel.BuildMessageGenerator;
 import net.i2p.router.tunnel.HopConfig;
 import net.i2p.router.tunnel.TunnelCreatorConfig;
 import net.i2p.util.Log;

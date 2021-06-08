@@ -1,4 +1,4 @@
-package net.i2p.router.tunnel;
+package net.i2p.router.tunnel.pool;
 
 import java.util.List;
 
@@ -11,6 +11,7 @@ import net.i2p.data.i2np.BuildResponseRecord;
 import net.i2p.data.i2np.EncryptedBuildRecord;
 import net.i2p.data.i2np.OutboundTunnelBuildReplyMessage;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
+import net.i2p.router.tunnel.TunnelCreatorConfig;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleByteCache;
 
@@ -18,8 +19,9 @@ import net.i2p.util.SimpleByteCache;
  * Decrypt the layers of a tunnel build reply message, determining whether the individual 
  * hops agreed to participate in the tunnel, or if not, why not.
  *
+ * @since 0.9.51 moved to tunnel.pool package
  */
-public class BuildReplyHandler {
+class BuildReplyHandler {
 
     private final I2PAppContext ctx;
     private final Log log;

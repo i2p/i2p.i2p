@@ -1,4 +1,4 @@
-package net.i2p.router.tunnel;
+package net.i2p.router.tunnel.pool;
 
 import java.util.List;
 
@@ -17,11 +17,15 @@ import net.i2p.data.i2np.ShortEncryptedBuildRecord;
 import net.i2p.data.i2np.ShortTunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.tunnel.HopConfig;
+import net.i2p.router.tunnel.TunnelCreatorConfig;
 
 /**
  *  Fill in the encrypted BuildRequestRecords in a TunnelBuildMessage
+ *
+ *  @since 0.9.51 moved to tunnel.pool package
  */
-public abstract class BuildMessageGenerator {
+abstract class BuildMessageGenerator {
     
     /**
      * Place the asymmetrically encrypted record in the specified record slot, 

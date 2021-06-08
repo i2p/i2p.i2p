@@ -1,4 +1,4 @@
-package net.i2p.router.tunnel;
+package net.i2p.router.tunnel.pool;
 
 import net.i2p.crypto.EncType;
 import net.i2p.data.Base64;
@@ -26,8 +26,9 @@ import net.i2p.util.SystemVersion;
  * There is only one of these.
  * Instantiated by BuildHandler.
  *
+ * @since 0.9.51 moved to tunnel.pool package
  */
-public class BuildMessageProcessor {
+class BuildMessageProcessor {
     private final RouterContext ctx;
     private final Log log;
     private final DecayingBloomFilter _filter;
