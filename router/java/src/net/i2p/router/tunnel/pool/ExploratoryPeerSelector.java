@@ -256,7 +256,11 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
             return false;
 
         // no need to explore too wildly at first (if we have enough connected peers)
-        if (ctx.router().getUptime() <= (SystemVersion.isAndroid() ? 15*60*1000 : 5*60*1000))
+        long uptime = ctx.router().getUptime();
+        if (uptime <= (SystemVersion.isAndroid() ? 15*60*1000 : 5*60*1000))
+            return true;
+        // wait for first expiration of old RIs, if we had a long downtime
+        if (uptime <= 61*60*1000 && ctx.router().getEstimatedDowntime() > 3*24*60*60*1000L)
             return true;
         // or at the end
         if (ctx.router().gracefulShutdownInProgress())
