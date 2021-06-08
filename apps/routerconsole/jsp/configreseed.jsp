@@ -9,7 +9,7 @@
 <%@include file="summary.jsi" %>
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigReseedHelper" id="reseedHelper" scope="request" />
 <jsp:setProperty name="reseedHelper" property="contextId" value="<%=i2pcontextId%>" />
-<h1><%=intl._t("I2P Reseeding Configuration")%></h1>
+<h1><%=intl._t("Configuration")%></h1>
 <div class="main" id="config_reseed">
 <%@include file="confignav.jsi" %>
 

@@ -9,7 +9,7 @@
 <%@include file="summary.jsi" %>
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigNetHelper" id="nethelper" scope="request" />
 <jsp:setProperty name="nethelper" property="contextId" value="<%=i2pcontextId%>" />
-<h1><%=intl._t("I2P Network Configuration")%></h1>
+<h1><%=intl._t("Configuration")%></h1>
 <div class="main" id="config_network">
  <%@include file="confignav.jsi" %>
 

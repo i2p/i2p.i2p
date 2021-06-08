@@ -9,7 +9,7 @@
 <%@include file="summary.jsi" %>
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigTunnelsHelper" id="tunnelshelper" scope="request" />
 <jsp:setProperty name="tunnelshelper" property="contextId" value="<%=i2pcontextId%>" />
-<h1><%=intl._t("I2P Tunnel Configuration")%></h1>
+<h1><%=intl._t("Configuration")%></h1>
 <div class="main" id="config_tunnels">
  <%@include file="confignav.jsi" %>
  <jsp:useBean class="net.i2p.router.web.helpers.ConfigTunnelsHandler" id="formhandler" scope="request" />

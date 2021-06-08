@@ -7,7 +7,7 @@
 <%@include file="summaryajax.jsi" %>
 </head><body>
 <%@include file="summary.jsi" %>
-<h1><%=intl._t("I2P Peer Configuration")%></h1>
+<h1><%=intl._t("Configuration")%></h1>
 <div class="main" id="config_peers">
  <%@include file="confignav.jsi" %>
  <jsp:useBean class="net.i2p.router.web.helpers.ConfigPeerHandler" id="formhandler" scope="request" />

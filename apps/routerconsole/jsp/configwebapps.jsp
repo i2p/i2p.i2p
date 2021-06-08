@@ -16,7 +16,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigClientsHelper" id="clientshelper" scope="request" />
 <jsp:setProperty name="clientshelper" property="contextId" value="<%=i2pcontextId%>" />
 <jsp:setProperty name="clientshelper" property="edit" value="<%=request.getParameter(\"edit\")%>" />
-<h1><%=intl._t("WebApp Configuration")%></h1>
+<h1><%=intl._t("Configuration")%></h1>
 <div class="main" id="config_webapps">
  <%@include file="confignav.jsi" %>
 

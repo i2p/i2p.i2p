@@ -7,7 +7,7 @@
 <%@include file="summaryajax.jsi" %>
 </head><body>
 <%@include file="summary.jsi" %>
-<h1><%=intl._t("I2P Keyring Configuration")%></h1>
+<h1><%=intl._t("Configuration")%></h1>
 <div class="main" id="config_keyring">
  <%@include file="confignav.jsi" %>
 

@@ -8,7 +8,7 @@
 <%@include file="summaryajax.jsi" %>
 </head><body>
 <%@include file="summary.jsi" %>
-<h1><%=intl._t("I2P Update Configuration")%></h1>
+<h1><%=intl._t("Configuration")%></h1>
 <div class="main" id="config_update">
  <%@include file="confignav.jsi" %>
 

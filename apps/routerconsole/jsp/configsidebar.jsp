@@ -14,7 +14,7 @@ input.default {
 <%@include file="summaryajax.jsi" %>
 </head><body>
 <%@include file="summary.jsi" %>
-<h1><%=intl._t("I2P Sidebar Configuration")%></h1>
+<h1><%=intl._t("Configuration")%></h1>
 <div class="main" id="config_summarybar">
 <%@include file="confignav.jsi" %>
 

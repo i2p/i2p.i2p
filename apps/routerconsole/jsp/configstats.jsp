@@ -10,7 +10,7 @@
 <script src="/js/configstats.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 </head><body>
 <%@include file="summary.jsi" %>
-<h1><%=intl._t("I2P Stats Configuration")%></h1>
+<h1><%=intl._t("Configuration")%></h1>
 <div class="main" id="config_stats">
  <%@include file="confignav.jsi" %>
 
