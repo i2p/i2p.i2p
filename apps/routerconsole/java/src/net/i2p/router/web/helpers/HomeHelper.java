@@ -50,7 +50,7 @@ public class HomeHelper extends HelperBase {
 
     /** @since 0.9.44 */
     static final String DEFAULT_CONFIG =
-        _x("Configure Homepage") + S + _x("Configure the contents of this page") + S + "/confighome" + S + I + "info/home.png" + S +
+        //_x("Configure Homepage") + S + _x("Configure the contents of this page") + S + "/confighome" + S + I + "info/home.png" + S +
         _x("Configure Bandwidth") + S + _x("I2P Bandwidth Configuration") + S + "/config" + S + I + "info/bandwidth.png" + S +
         // FIXME wasn't escaped
         //_x("Configure UI") + S + _x("Select console theme & language & set optional console password").replace("&", "&amp;") + S + "/configui" + S + I + "info/ui.png" + S +
