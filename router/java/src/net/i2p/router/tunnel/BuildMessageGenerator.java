@@ -3,6 +3,7 @@ package net.i2p.router.tunnel;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.ChaCha20;
 import net.i2p.crypto.EncType;
 import net.i2p.data.EmptyProperties;
 import net.i2p.data.Hash;
@@ -11,6 +12,9 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.BuildRequestRecord;
 import net.i2p.data.i2np.EncryptedBuildRecord;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.InboundTunnelBuildMessage;
+import net.i2p.data.i2np.ShortEncryptedBuildRecord;
+import net.i2p.data.i2np.ShortTunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.router.RouterContext;
 
@@ -32,14 +36,17 @@ public abstract class BuildMessageGenerator {
     public static void createRecord(int recordNum, int hop, TunnelBuildMessage msg,
                                     TunnelCreatorConfig cfg, Hash replyRouter,
                                     long replyTunnel, RouterContext ctx, PublicKey peerKey) {
+        int mtype = msg.getType();
+        boolean isShort = mtype == InboundTunnelBuildMessage.MESSAGE_TYPE || mtype == ShortTunnelBuildMessage.MESSAGE_TYPE;
         EncryptedBuildRecord erec;
         if (peerKey != null) {
             boolean isEC = peerKey.getType() == EncType.ECIES_X25519;
             BuildRequestRecord req;
             if ( (!cfg.isInbound()) && (hop + 1 == cfg.getLength()) ) //outbound endpoint
-                req = createUnencryptedRecord(ctx, cfg, hop, replyRouter, replyTunnel, isEC);
+                /// TODO if isEC && isShort
+                req = createUnencryptedRecord(ctx, cfg, hop, replyRouter, replyTunnel, isEC, isShort);
             else
-                req = createUnencryptedRecord(ctx, cfg, hop, null, -1, isEC);
+                req = createUnencryptedRecord(ctx, cfg, hop, null, -1, isEC, isShort);
             if (req == null)
                 throw new IllegalArgumentException("hop bigger than config");
             Hash peer = cfg.getPeer(hop);
@@ -50,26 +57,33 @@ public abstract class BuildMessageGenerator {
                 erec = req.encryptRecord(ctx, peerKey, peer);
             }
         } else {
-            byte encrypted[] = new byte[TunnelBuildMessage.RECORD_SIZE];
+            int len = isShort ? ShortTunnelBuildMessage.SHORT_RECORD_SIZE : TunnelBuildMessage.RECORD_SIZE;
+            byte encrypted[] = new byte[len];
             if (cfg.isInbound() && hop + 1 == cfg.getLength()) { // IBEP
                 System.arraycopy(cfg.getPeer(hop).getData(), 0, encrypted, 0, BuildRequestRecord.PEER_SIZE);
-                ctx.random().nextBytes(encrypted, BuildRequestRecord.PEER_SIZE, TunnelBuildMessage.RECORD_SIZE - BuildRequestRecord.PEER_SIZE);
+                ctx.random().nextBytes(encrypted, BuildRequestRecord.PEER_SIZE, len - BuildRequestRecord.PEER_SIZE);
                 byte[] h = new byte[Hash.HASH_LENGTH];
-                ctx.sha().calculateHash(encrypted, 0, TunnelBuildMessage.RECORD_SIZE, h, 0);
+                ctx.sha().calculateHash(encrypted, 0, len, h, 0);
                 cfg.setBlankHash(new Hash(h));
             } else {
                 ctx.random().nextBytes(encrypted);
             }
-            erec = new EncryptedBuildRecord(encrypted);
+            erec = isShort ? new ShortEncryptedBuildRecord(encrypted) : new EncryptedBuildRecord(encrypted);
         }
         msg.setRecord(recordNum, erec);
     }
     
     /**
      *  Returns null if hop >= cfg.length
+     *
+     *  @param replyRouter null unless we are the OBEP
+     *  @param replyTunnel -1 unless we are the OBEP
+     *  @param isEC must be true if isShort is true
+     *  @param isShort short EC record
      */
     private static BuildRequestRecord createUnencryptedRecord(I2PAppContext ctx, TunnelCreatorConfig cfg, int hop,
-                                                              Hash replyRouter, long replyTunnel, boolean isEC) {
+                                                              Hash replyRouter, long replyTunnel, boolean isEC,
+                                                              boolean isShort) {
         if (hop < cfg.getLength()) {
             // ok, now lets fill in some data
             HopConfig hopConfig = cfg.getConfig(hop);
@@ -114,9 +128,15 @@ public abstract class BuildMessageGenerator {
             BuildRequestRecord rec;
             if (isEC) {
                 // TODO pass properties from cfg
-                rec = new BuildRequestRecord(ctx, recvTunnelId, nextTunnelId, nextPeer,
-                                             nextMsgId, layerKey, ivKey, replyKey, 
-                                             iv, isInGW, isOutEnd, EmptyProperties.INSTANCE);
+                if (isShort) {
+                    rec = new BuildRequestRecord(ctx, recvTunnelId, nextTunnelId, nextPeer,
+                                                 nextMsgId,
+                                                 isInGW, isOutEnd, EmptyProperties.INSTANCE);
+                } else {
+                    rec = new BuildRequestRecord(ctx, recvTunnelId, nextTunnelId, nextPeer,
+                                                 nextMsgId, layerKey, ivKey, replyKey, 
+                                                 iv, isInGW, isOutEnd, EmptyProperties.INSTANCE);
+                }
             } else {
                 rec = new BuildRequestRecord(ctx, recvTunnelId, peer, nextTunnelId, nextPeer,
                                              nextMsgId, layerKey, ivKey, replyKey, 
@@ -138,6 +158,10 @@ public abstract class BuildMessageGenerator {
      */
     public static void layeredEncrypt(I2PAppContext ctx, TunnelBuildMessage msg,
                                       TunnelCreatorConfig cfg, List<Integer> order) {
+        int mtype = msg.getType();
+        boolean isShort = mtype == InboundTunnelBuildMessage.MESSAGE_TYPE || mtype == ShortTunnelBuildMessage.MESSAGE_TYPE;
+        int size = isShort ? ShortTunnelBuildMessage.SHORT_RECORD_SIZE : TunnelBuildMessage.RECORD_SIZE;
+        byte[] chachaIV = isShort ? new byte[12] : null;
         // encrypt the records so that the right elements will be visible at the right time
         for (int i = 0; i < msg.getRecordCount(); i++) {
             EncryptedBuildRecord rec = msg.getRecord(i);
@@ -150,10 +174,22 @@ public abstract class BuildMessageGenerator {
             // ok, now decrypt the record with all of the reply keys from cfg.getConfig(0) through hop-1
             int stop = (cfg.isInbound() ? 0 : 1);
             for (int j = hop-1; j >= stop; j--) {
-                SessionKey key = cfg.getAESReplyKey(j);
-                byte iv[] = cfg.getAESReplyIV(j);
+                SessionKey key;
+                byte iv[];
                 // corrupts the SDS
-                ctx.aes().decrypt(rec.getData(), 0, rec.getData(), 0, key, iv, TunnelBuildMessage.RECORD_SIZE);
+                byte[] data = rec.getData();
+                if (isShort) {
+                    // ChaCha for short (STBM or ITBM)
+                    key = cfg.getChaChaReplyKey(j);
+                    iv = chachaIV;
+                    // slot number, little endian
+                    iv[0] = (byte) i;
+                    ChaCha20.encrypt(key.getData(), iv, data, 0, data, 0, size);
+                } else {
+                    key = cfg.getAESReplyKey(j);
+                    iv = cfg.getAESReplyIV(j);
+                    ctx.aes().decrypt(data, 0, data, 0, key, iv, size);
+                }
             }
         }
     }

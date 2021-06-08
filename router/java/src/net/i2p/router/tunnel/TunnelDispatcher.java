@@ -11,6 +11,9 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.InboundTunnelBuildMessage;
+import net.i2p.data.i2np.OutboundTunnelBuildReplyMessage;
+import net.i2p.data.i2np.ShortTunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
 import net.i2p.data.i2np.TunnelDataMessage;
@@ -774,13 +777,15 @@ public class TunnelDispatcher implements Service {
         float factor;
         if (loc == Location.OBEP) {
             // we don't need to check for VTBRM/TBRM as that happens at tunnel creation
-            if (type == VariableTunnelBuildMessage.MESSAGE_TYPE || type == TunnelBuildMessage.MESSAGE_TYPE)
+            if (type == VariableTunnelBuildMessage.MESSAGE_TYPE || type == TunnelBuildMessage.MESSAGE_TYPE ||
+                type == ShortTunnelBuildMessage.MESSAGE_TYPE)
                 factor = 1 / 1.5f;
             else
                 factor = 1.5f;
         } else if (loc == Location.IBGW) {
             // we don't need to check for VTBM/TBM as that happens at tunnel creation
-            if (type == VariableTunnelBuildReplyMessage.MESSAGE_TYPE || type == TunnelBuildReplyMessage.MESSAGE_TYPE)
+            if (type == VariableTunnelBuildReplyMessage.MESSAGE_TYPE || type == TunnelBuildReplyMessage.MESSAGE_TYPE ||
+                type == OutboundTunnelBuildReplyMessage.MESSAGE_TYPE || type == InboundTunnelBuildMessage.MESSAGE_TYPE)
                 factor = 1 / (1.5f * 1.5f * 1.5f);
             else
                 factor = 1 / 1.5f;

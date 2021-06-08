@@ -9,6 +9,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.BuildResponseRecord;
 import net.i2p.data.i2np.EncryptedBuildRecord;
+import net.i2p.data.i2np.OutboundTunnelBuildReplyMessage;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleByteCache;
@@ -137,7 +138,8 @@ public class BuildReplyHandler {
                 return -1;
             }
             // reply properties TODO
-            rv = data[TunnelBuildReplyMessage.RECORD_SIZE - 17] & 0xff;
+            // this handles both standard records in a build reply message and short records in a OTBRM
+            rv = data[rec.length() - 17] & 0xff;
         } else {
             // don't cache the result
             //Hash h = ctx.sha().calculateHash(data, off + Hash.HASH_LENGTH, TunnelBuildReplyMessage.RECORD_SIZE-Hash.HASH_LENGTH);

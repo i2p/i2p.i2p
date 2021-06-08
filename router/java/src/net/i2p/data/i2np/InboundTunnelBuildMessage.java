@@ -31,6 +31,16 @@ public class InboundTunnelBuildMessage extends TunnelBuildMessage {
     }
 
     /**
+     *  @param record must be ShortEncryptedBuildRecord or null
+     */
+    @Override
+    public void setRecord(int index, EncryptedBuildRecord record) {
+        if (record != null && record.length() != SHORT_RECORD_SIZE)
+            throw new IllegalArgumentException();
+        super.setRecord(index, record);
+    }
+
+    /**
      *  Set the slot and data for the plaintext record.
      *  @throws IllegalArgumentException on bad slot or data length.
      */
@@ -66,12 +76,12 @@ public class InboundTunnelBuildMessage extends TunnelBuildMessage {
     public void readMessage(byte[] data, int offset, int dataSize, int type) throws I2NPMessageException {
         if (type != MESSAGE_TYPE) 
             throw new I2NPMessageException("Message type is incorrect for this message");
-        int r = data[offset++] & 0xff;
+        int r = data[offset++];
         if (r <= 0 || r > MAX_RECORD_COUNT)
             throw new I2NPMessageException("Bad record count " + r);
         RECORD_COUNT = r;
         int _plaintextSlot = data[offset++] & 0xff;
-        if (_plaintextSlot < 0 || _plaintextSlot >= r)
+        if (_plaintextSlot >= r)
             throw new I2NPMessageException("Bad slot " + _plaintextSlot);
         int size = (int) DataHelper.fromLong(data, offset, 2);
         if (size <= 0 || size > MAX_PLAINTEXT_RECORD_SIZE)

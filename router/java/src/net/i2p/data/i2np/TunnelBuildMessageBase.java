@@ -35,8 +35,14 @@ public abstract class TunnelBuildMessageBase extends I2NPMessageImpl {
         // else will be initialized by readMessage()
     }
 
+    /**
+     *  @param record may be null
+     */
     public void setRecord(int index, EncryptedBuildRecord record) { _records[index] = record; }
 
+    /**
+     *  @return may be null
+     */
     public EncryptedBuildRecord getRecord(int index) { return _records[index]; }
 
     /** @since 0.7.12 */

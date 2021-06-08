@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.i2p.crypto.EncType;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.PublicKey;
@@ -11,6 +12,7 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.InboundTunnelBuildMessage;
+import net.i2p.data.i2np.ShortTunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.data.i2np.VariableTunnelBuildMessage;
 import net.i2p.router.JobImpl;
@@ -31,8 +33,10 @@ import net.i2p.util.VersionComparator;
  */
 abstract class BuildRequestor {
     private static final List<Integer> ORDER = new ArrayList<Integer>(TunnelBuildMessage.MAX_RECORD_COUNT);
-    //private static final String MIN_VARIABLE_VERSION = "0.7.12";
+    private static final String MIN_NEWTBM_VERSION = "0.9.51";
     private static final boolean SEND_VARIABLE = true;
+    // TODO remove when finished
+    private static final boolean SEND_SHORT = false;
     private static final int SHORT_RECORDS = 4;
     private static final List<Integer> SHORT_ORDER = new ArrayList<Integer>(SHORT_RECORDS);
     /** 5 (~2600 bytes) fits nicely in 3 tunnel messages */
@@ -268,18 +272,18 @@ abstract class BuildRequestor {
         return true;
     }
 
-    /** @since 0.7.12 */
-/****
-we can assume everybody supports variable now...
-keep this here for the next time we change the build protocol
-    private static boolean supportsVariable(RouterContext ctx, Hash h) {
+    /**
+     * @since 0.9.51
+     */
+    private static boolean supportsShortTBM(RouterContext ctx, Hash h) {
         RouterInfo ri = ctx.netDb().lookupRouterInfoLocally(h);
         if (ri == null)
             return false;
+        if (ri.getIdentity().getPublicKey().getType() != EncType.ECIES_X25519)
+            return false;
         String v = ri.getVersion();
-        return VersionComparator.comp(v, MIN_VARIABLE_VERSION) >= 0;
+        return VersionComparator.comp(v, MIN_NEWTBM_VERSION) >= 0;
     }
-****/
 
     /**
      *  If the tunnel is short enough, and everybody in the tunnel, and the
@@ -294,53 +298,54 @@ keep this here for the next time we change the build protocol
         long replyTunnel = 0;
         Hash replyRouter;
         boolean useVariable = SEND_VARIABLE && cfg.getLength() <= MEDIUM_RECORDS;
+        boolean useShortTBM = SEND_SHORT && ctx.keyManager().getPublicKey().getType() == EncType.ECIES_X25519;
 
         if (cfg.isInbound()) {
             //replyTunnel = 0; // as above
             replyRouter = ctx.routerHash();
-/****
-we can assume everybody supports variable now...
-keep this here for the next time we change the build protocol
-            if (useVariable) {
-                // check the reply OBEP and all the tunnel peers except ourselves
-                if (!supportsVariable(ctx, pairedTunnel.getPeer(pairedTunnel.getLength() - 1))) {
-                    useVariable = false;
-                } else {
-                    for (int i = 0; i < cfg.getLength() - 1; i++) {
-                        if (!supportsVariable(ctx, cfg.getPeer(i))) {
-                            useVariable = false;
-                            break;
-                        }
+            if (useShortTBM) {
+                // check all the tunnel peers except ourselves
+                for (int i = 0; i < cfg.getLength() - 1; i++) {
+                    if (!supportsShortTBM(ctx, cfg.getPeer(i))) {
+                        useShortTBM = false;
+                        break;
                     }
                 }
             }
-****/
         } else {
             replyTunnel = pairedTunnel.getReceiveTunnelId(0).getTunnelId();
             replyRouter = pairedTunnel.getPeer(0);
-/****
-we can assume everybody supports variable now
-keep this here for the next time we change the build protocol
-            if (useVariable) {
-                // check the reply IBGW and all the tunnel peers except ourselves
-                if (!supportsVariable(ctx, replyRouter)) {
-                    useVariable = false;
-                } else {
-                    for (int i = 1; i < cfg.getLength() - 1; i++) {
-                        if (!supportsVariable(ctx, cfg.getPeer(i))) {
-                            useVariable = false;
-                            break;
-                        }
+            if (useShortTBM) {
+                // check all the tunnel peers except ourselves
+                for (int i = 1; i < cfg.getLength() - 1; i++) {
+                    if (!supportsShortTBM(ctx, cfg.getPeer(i))) {
+                        useShortTBM = false;
+                        break;
                     }
                 }
             }
-****/
         }
 
         // populate and encrypt the message
         TunnelBuildMessage msg;
         List<Integer> order;
-        if (useVariable) {
+        if (useShortTBM) {
+            int len;
+            if (cfg.getLength() <= SHORT_RECORDS) {
+                len = SHORT_RECORDS;
+                order = new ArrayList<Integer>(SHORT_ORDER);
+            } else if (cfg.getLength() <= MEDIUM_RECORDS) {
+                len = MEDIUM_RECORDS;
+                order = new ArrayList<Integer>(MEDIUM_ORDER);
+            } else {
+                len = TunnelBuildMessage.MAX_RECORD_COUNT;
+                order = new ArrayList<Integer>(ORDER);
+            }
+            if (cfg.isInbound())
+                msg = new InboundTunnelBuildMessage(ctx, len);
+            else
+                msg = new ShortTunnelBuildMessage(ctx, len);
+        } else if (useVariable) {
             if (cfg.getLength() <= SHORT_RECORDS) {
                 msg = new VariableTunnelBuildMessage(ctx, SHORT_RECORDS);
                 order = new ArrayList<Integer>(SHORT_ORDER);
@@ -381,8 +386,12 @@ keep this here for the next time we change the build protocol
                     key = peerInfo.getIdentity().getPublicKey();
                 }
             }
-            if (log.shouldLog(Log.DEBUG))
-                log.debug(cfg.getReplyMessageId() + ": record " + i + "/" + hop + " has key " + key);
+            if (log.shouldLog(Log.DEBUG)) {
+                if (key != null)
+                    log.debug(cfg.getReplyMessageId() + ": record " + i + "/" + hop + " has key " + key);
+                else
+                    log.debug(cfg.getReplyMessageId() + ": record " + i + "/" + hop + " empty");
+            }
             BuildMessageGenerator.createRecord(i, hop, msg, cfg, replyRouter, replyTunnel, ctx, key);
         }
         BuildMessageGenerator.layeredEncrypt(ctx, msg, cfg, order);

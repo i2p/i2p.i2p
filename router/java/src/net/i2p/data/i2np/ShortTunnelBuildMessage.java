@@ -21,6 +21,16 @@ public class ShortTunnelBuildMessage extends TunnelBuildMessage {
         super(context, records);
     }
 
+    /**
+     *  @param record must be ShortEncryptedBuildRecord or null
+     */
+    @Override
+    public void setRecord(int index, EncryptedBuildRecord record) {
+        if (record != null && record.length() != SHORT_RECORD_SIZE)
+            throw new IllegalArgumentException();
+        super.setRecord(index, record);
+    }
+
     @Override
     protected int calculateWrittenLength() { return 1 + (RECORD_COUNT * SHORT_RECORD_SIZE); }
 

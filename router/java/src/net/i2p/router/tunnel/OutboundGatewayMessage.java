@@ -59,6 +59,7 @@ class OutboundGatewayMessage extends PendingGatewayMessage implements CDPQEntry 
                 return 1000;
 
             // building new IB tunnel
+            case ShortTunnelBuildMessage.MESSAGE_TYPE:
             case TunnelBuildMessage.MESSAGE_TYPE:
             case VariableTunnelBuildMessage.MESSAGE_TYPE:
                 return 500;
@@ -78,6 +79,8 @@ class OutboundGatewayMessage extends PendingGatewayMessage implements CDPQEntry 
             // these shouldn't go into a OBGW
             case DatabaseSearchReplyMessage.MESSAGE_TYPE:
             case DataMessage.MESSAGE_TYPE:
+            case InboundTunnelBuildMessage.MESSAGE_TYPE:
+            case OutboundTunnelBuildReplyMessage.MESSAGE_TYPE:
             case TunnelBuildReplyMessage.MESSAGE_TYPE:
             case TunnelDataMessage.MESSAGE_TYPE:
             case TunnelGatewayMessage.MESSAGE_TYPE:

@@ -31,6 +31,16 @@ public class OutboundTunnelBuildReplyMessage extends TunnelBuildReplyMessage {
     }
 
     /**
+     *  @param record must be ShortEncryptedBuildRecord or null
+     */
+    @Override
+    public void setRecord(int index, EncryptedBuildRecord record) {
+        if (record != null && record.length() != SHORT_RECORD_SIZE)
+            throw new IllegalArgumentException();
+        super.setRecord(index, record);
+    }
+
+    /**
      *  Set the slot and data for the plaintext record.
      *  @throws IllegalArgumentException on bad slot or data length.
      */

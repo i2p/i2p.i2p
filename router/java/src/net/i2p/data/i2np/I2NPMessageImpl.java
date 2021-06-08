@@ -438,6 +438,15 @@ public abstract class I2NPMessageImpl implements I2NPMessage {
             // since 0.7.10
             case VariableTunnelBuildReplyMessage.MESSAGE_TYPE:
                 return new VariableTunnelBuildReplyMessage(context);
+            // since 0.9.51
+            case InboundTunnelBuildMessage.MESSAGE_TYPE:
+                return new InboundTunnelBuildMessage(context);
+            // since 0.9.51
+            case OutboundTunnelBuildReplyMessage.MESSAGE_TYPE:
+                return new OutboundTunnelBuildReplyMessage(context);
+            // since 0.9.51
+            case ShortTunnelBuildMessage.MESSAGE_TYPE:
+                return new ShortTunnelBuildMessage(context);
             default:
                 // unused
                 Builder builder = _builders.get(Integer.valueOf(type));
