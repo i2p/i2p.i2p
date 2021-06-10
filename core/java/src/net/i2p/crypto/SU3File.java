@@ -81,6 +81,10 @@ public class SU3File {
     public static final int TYPE_XML_GZ = 3;
     /** @since 0.9.28 */
     public static final int TYPE_TXT_GZ = 4;
+    /** @since 0.9.51 */
+    public static final int TYPE_DMG = 5;
+    /** @since 0.9.51 */
+    public static final int TYPE_EXE = 6;
 
     public static final int CONTENT_UNKNOWN = 0;
     public static final int CONTENT_ROUTER = 1;
@@ -703,7 +707,9 @@ public class SU3File {
                    "      HTML\t(code: 2)\n" +
                    "      XML_GZ\t(code: 3)\n" +
                    "      TXT_GZ\t(code: 4)\n" +
-                   "      (user defined)\t(code: 5-255)\n");
+                   "      DMG\t(code: 5)\n" +
+                   "      EXE\t(code: 6)\n" +
+                   "      (user defined)\t(code: 7-255)\n");
         return buf.toString();
     }
 
@@ -761,6 +767,10 @@ public class SU3File {
                 ftype = "HTML";
             else if (file._fileType == TYPE_XML_GZ)
                 ftype = "XML_GZ";
+            else if (file._fileType == TYPE_DMG)
+                ftype = "DMG";
+            else if (file._fileType == TYPE_EXE)
+                ftype = "EXE";
             else
                 ftype = Integer.toString(file._fileType);
                 System.out.println("FileType: " + ftype);
@@ -861,6 +871,10 @@ public class SU3File {
                 ft = TYPE_HTML;
             } else if (ftype.equalsIgnoreCase("XML_GZ")) {
                 ft = TYPE_XML_GZ;
+            } else if (ftype.equalsIgnoreCase("DMG")) {
+                ft = TYPE_DMG;
+            } else if (ftype.equalsIgnoreCase("EXE")) {
+                ft = TYPE_EXE;
             } else {
                 try {
                     ft = Integer.parseInt(ftype);
@@ -974,6 +988,12 @@ public class SU3File {
                     break;
                   case TYPE_TXT_GZ:
                     sfx = ".txt.gz";
+                    break;
+                  case TYPE_DMG:
+                    sfx = ".dmg";
+                    break;
+                  case TYPE_EXE:
+                    sfx = ".exe";
                     break;
                   default:
                     sfx = ".extracted";
