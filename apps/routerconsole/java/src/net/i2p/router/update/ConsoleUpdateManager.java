@@ -62,6 +62,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
     private final Log _log;
     private final Collection<RegisteredUpdater> _registeredUpdaters;
     private final Collection<RegisteredChecker> _registeredCheckers;
+    private final Map<Integer, UpdatePostProcessor> _registeredPostProcessors;
     /** active checking tasks */
     private final Collection<UpdateTask> _activeCheckers;
     /** active updating tasks, pointing to the next ones to try */
@@ -95,6 +96,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         _log = ctx.logManager().getLog(ConsoleUpdateManager.class);
         _registeredUpdaters = new ConcurrentHashSet<RegisteredUpdater>();
         _registeredCheckers = new ConcurrentHashSet<RegisteredChecker>();
+        _registeredPostProcessors = new ConcurrentHashMap<Integer, UpdatePostProcessor>(2);
         _activeCheckers = new ConcurrentHashSet<UpdateTask>();
         _downloaders = new ConcurrentHashMap<UpdateTask, List<RegisteredUpdater>>();
         _available = new ConcurrentHashMap<UpdateItem, VersionAvailable>();
@@ -756,6 +758,20 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
             _log.info("Unregistering " + rc);
         _registeredCheckers.remove(rc);
     }
+
+    /**
+     *  Register a post-processor for this UpdateType and SU3File file type.
+     *
+     *  @param type only ROUTER_SIGNED_SU3 and ROUTER_DEV_SU3 are currently supported
+     *  @param fileType a SU3File TYPE_xxx constant, 1-255, TYPE_ZIP not supported.
+     *  @since 0.9.51
+     */
+    public void register(UpdatePostProcessor upp, UpdateType type, int fileType) {
+        Integer key = Integer.valueOf(type.toString().hashCode() ^ fileType);
+        UpdatePostProcessor old = _registeredPostProcessors.put(key, upp);
+        if (old != null && _log.shouldLog(Log.WARN))
+            _log.warn("Duplicate registration " + upp);
+    }
     
     /**
      *  Called by the Updater, either after check() was called, or it found out on its own.
@@ -1102,7 +1118,8 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         if (_log.shouldLog(Log.INFO))
             _log.info("Updater " + task + " for " + task.getType() + " complete");
         boolean rv = false;
-        switch (task.getType()) {
+        UpdateType utype = task.getType();
+        switch (utype) {
             case TYPE_DUMMY:
             case NEWS:
             case NEWS_SU3:
@@ -1110,13 +1127,13 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                 break;
 
             case ROUTER_SIGNED:
-                rv = handleSudFile(task.getURI(), actualVersion, file);
+                rv = handleRouterFile(task.getURI(), actualVersion, file, utype);
                 if (rv)
                     notifyDownloaded(task.getType(), task.getID(), actualVersion);
                 break;
 
             case ROUTER_SIGNED_SU3:
-                rv = handleSu3File(task.getURI(), actualVersion, file);
+                rv = handleRouterFile(task.getURI(), actualVersion, file, utype);
                 if (rv)
                     notifyDownloaded(task.getType(), task.getID(), actualVersion);
                 break;
@@ -1130,7 +1147,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                 break;
 
             case ROUTER_DEV_SU3:
-                rv = handleSu3File(task.getURI(), actualVersion, file);
+                rv = handleRouterFile(task.getURI(), actualVersion, file, utype);
                 if (rv) {
                     _context.router().saveConfig(PROP_DEV_SU3_AVAILABLE, null);
                     notifyDownloaded(task.getType(), task.getID(), actualVersion);
@@ -1325,47 +1342,48 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
     }
 
     /**
+     *  Process sud, su2, or su3.
+     *  Only for router updates.
      *
      *  @return success
-     */
-    private boolean handleSudFile(URI uri, String actualVersion, File f) {
-        return handleRouterFile(uri, actualVersion, f, false);
-    }
-
-    /**
-     *  @return success
      *  @since 0.9.9
      */
-    private boolean handleSu3File(URI uri, String actualVersion, File f) {
-        return handleRouterFile(uri, actualVersion, f, true);
-    }
-
-    /**
-     *  Process sud, su2, or su3
-     *  @return success
-     *  @since 0.9.9
-     */
-    private boolean handleRouterFile(URI uri, String actualVersion, File f, boolean isSU3) {
+    private boolean handleRouterFile(URI uri, String actualVersion, File f, UpdateType updateType) {
+        boolean isSU3 = updateType == ROUTER_SIGNED_SU3 || updateType == ROUTER_DEV_SU3;
         String url = uri.toString();
         updateStatus("<b>" + _t("Update downloaded") + "</b>");
         File to = new File(_context.getRouterDir(), Router.UPDATE_FILE);
-        String err;
+        String err = null;
         // Process the file
         if (isSU3) {
             SU3File up = new SU3File(_context, f);
-            File temp = new File(_context.getTempDir(), "su3out-" + _context.random().nextLong() + ".zip");
+            File temp = new File(_context.getTempDir(), "su3out-" + _context.random().nextLong());
             try {
                 if (up.verifyAndMigrate(temp)) {
                     String ver = up.getVersionString();
                     int type = up.getContentType();
-                    if (ver == null || VersionComparator.comp(RouterVersion.VERSION, ver) >= 0)
+                    if (ver == null || VersionComparator.comp(RouterVersion.VERSION, ver) >= 0) {
                         err = "Old version " + ver;
-                    else if (type != SU3File.CONTENT_ROUTER)
+                    } else if (type != SU3File.CONTENT_ROUTER) {
                         err = "Bad su3 content type " + type;
-                    else if (!FileUtil.copy(temp, to, true, false))
-                        err = "Failed copy to " + to;
-                    else
-                        err = null;   // success
+                    } else {
+                        int ftype = up.getFileType();
+                        if (ftype == SU3File.TYPE_ZIP) {
+                            // standard update, copy to i2pupdate.zip in config dir
+                            if (!FileUtil.copy(temp, to, true, false))
+                                err = "Failed copy to " + to;
+                        } else if ((ftype == SU3File.TYPE_DMG && SystemVersion.isMac()) ||
+                                   (ftype == SU3File.TYPE_EXE && SystemVersion.isWindows())) {
+                            Integer key = Integer.valueOf(updateType.toString().hashCode() ^ ftype);
+                            UpdatePostProcessor upp = _registeredPostProcessors.get(key);
+                            if (upp != null)
+                                upp.updateDownloadedandVerified(updateType, ftype, actualVersion, temp);
+                            else
+                                err = "Unsupported su3 file type " + ftype;
+                        } else {
+                            err = "Unsupported su3 file type " + ftype;
+                        }
+                    }
                 } else {
                     err = "Signature failed, signer " + DataHelper.stripHTML(up.getSignerString()) +
                           ' ' + up.getSigType();
@@ -1406,6 +1424,8 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
     }
 
     /**
+     *  Only for router updates
+     *
      *  @param Long.toString(timestamp)
      *  @return success
      */
@@ -1754,6 +1774,10 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         buf.append("<h3>Registered Updaters</h3>");
         buf.append("<div class=\"debug_container\">");
         toString(buf, _registeredUpdaters);
+        buf.append("</div>");
+        buf.append("<h3>Registered PostProcessors</h3>");
+        buf.append("<div class=\"debug_container\">");
+        toString(buf, _registeredPostProcessors.values());
         buf.append("</div>");
         buf.append("<h3>Active Checkers</h3>");
         buf.append("<div class=\"debug_container\">");
