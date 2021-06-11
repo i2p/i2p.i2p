@@ -681,13 +681,18 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	 * @since 0.9.46
 	 */
 	static Set<String> getLocalAddresses() {
-		Set<String> addrs = Addresses.getAddresses(true, false, false);
+		// older miniupnpd will send ipv6 ssdp search response to ipv4 address,
+		// but newer ones won't. So we need to bind to an ipv6 address
+		// to get his ipv6 address so we can bind to OUR ipv6 address
+		// for a port forward when miniupnpd is configured for "secure".
+		// local, no loopback, ipv6, no temp. ipv6
+		Set<String> addrs = Addresses.getAddresses(true, false, true, false);
 		// remove public addresses
 		// see TransportManager.startListening()
 		for (Iterator<String> iter = addrs.iterator(); iter.hasNext(); ) {
 			String addr = iter.next();
 			byte[] ip = Addresses.getIP(addr);
-			if (ip == null || TransportUtil.isPubliclyRoutable(ip, false))
+			if (ip == null || TransportUtil.isPubliclyRoutable(ip, true))
 				iter.remove();
 		}
 		return addrs;

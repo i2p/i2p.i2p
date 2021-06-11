@@ -423,8 +423,16 @@ public class HTTPRequest extends HTTPPacket
 				// And set the soTimeout to 2 second (for reads).
 				//postSocket = new Socket(host, port);
 				postSocket = new Socket();
-				if (bindTo != null)
-					postSocket.bind(new InetSocketAddress(bindTo, 0));
+				if (bindTo != null) {
+					boolean fromv6 = bindTo.contains(":");
+					boolean tov6 = host.contains(":");
+					if (fromv6 == tov6) {
+						//Debug.warning("POST bindTo " + bindTo + " connect to " + host);
+						postSocket.bind(new InetSocketAddress(bindTo, 0));
+					} else {
+						Debug.warning("POST mismatch, NOT binding to " + bindTo + " connect to " + host);
+					}
+				}
 				postSocket.setSoTimeout(2000);
 				SocketAddress sa = new InetSocketAddress(host, port);
 				postSocket.connect(sa, 3000);

@@ -1,7 +1,18 @@
-2021-06-07 zzz
- Tunnels:
- - More work on short tunnel build messages (proposal 157)
- - Fix compare logic in ITBM parser (ticket #2814)
+2021-06-11 zzz
+ * UPnP: Bind to IPv6 addresses for search responses
+
+2021-06-10 zzz
+ * Updates:
+   - Add preliminary support for dmg/exe updates
+   - Make backup news URL configurable (see gitlab MR !33)
+
+2021-06-08 zzz
+ * NetDB: Prevent rare deadlock in rebuildRouterInfo()
+ * Tunnels:
+   - More work on short tunnel build messages (proposal 157)
+   - Fix compare logic in ITBM parser (ticket #2814)
+   - Extend use of high cap peers in expl. tunnels at startup, after extended downtime
+   - Switch from SHA256 to SipHash for peer ordering
 
 2021-06-01 zzz
  * i2psnark: Fix autostart for magnets
