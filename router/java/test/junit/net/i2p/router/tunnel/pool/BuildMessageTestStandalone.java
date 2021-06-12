@@ -7,8 +7,11 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.EncType;
+import net.i2p.crypto.KeyPair;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
+import net.i2p.data.EmptyProperties;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
@@ -45,23 +48,26 @@ public class BuildMessageTestStandalone extends TestCase {
     
     public void testBuildMessage() {
         RouterContext ctx = new RouterContext(null);
-        x_testBuildMessage(ctx);
+        x_testBuildMessage(ctx, 1);
+        x_testBuildMessage(ctx, 2);
     }
 
-    private void x_testBuildMessage(RouterContext ctx) {
+    /**
+     *  @param testType 1=ElG; 2=ECIES; 3=ECIES short
+     */
+    private void x_testBuildMessage(RouterContext ctx, int testType) {
         Log log = ctx.logManager().getLog(getClass());
         // set our keys to avoid NPE
-        Object[] kp = ctx.keyGenerator().generatePKIKeypair();
-        PublicKey k1 = (PublicKey) kp[0];
-        PrivateKey k2 = (PrivateKey) kp[1];
-        kp = ctx.keyGenerator().generateSigningKeypair();
+        KeyPair kpr = ctx.keyGenerator().generatePKIKeys(testType == 1 ? EncType.ELGAMAL_2048 : EncType.ECIES_X25519);
+        PublicKey k1 = kpr.getPublic();
+        PrivateKey k2 = kpr.getPrivate();
+        Object[] kp = ctx.keyGenerator().generateSigningKeypair();
         SigningPublicKey k3 = (SigningPublicKey) kp[0];
         SigningPrivateKey k4 = (SigningPrivateKey) kp[1];
         ctx.keyManager().setKeys(k1, k2, k3, k4);
         
         List<Integer> order = pickOrder();
-        
-        TunnelCreatorConfig cfg = createConfig(ctx);
+        TunnelCreatorConfig cfg = createConfig(ctx, testType);
         _replyRouter = new Hash();
         byte h[] = new byte[Hash.HASH_LENGTH];
         Arrays.fill(h, (byte)0xFF);
@@ -105,7 +111,11 @@ public class BuildMessageTestStandalone extends TestCase {
             long now = (ctx.clock().now() / (60l*60l*1000l)) * (60*60*1000);
             int ourSlot = -1;
 
-            EncryptedBuildRecord reply = BuildResponseRecord.create(ctx, 0, req.readReplyKey(), replyIV, i);
+            EncryptedBuildRecord reply;
+            if (testType == 1)
+                reply = BuildResponseRecord.create(ctx, 0, req.readReplyKey(), replyIV, i);
+            else
+                reply = BuildResponseRecord.create(ctx, 0, req.getChaChaReplyKey(), req.getChaChaReplyAD(), EmptyProperties.INSTANCE);
             for (int j = 0; j < TunnelBuildMessage.MAX_RECORD_COUNT; j++) {
                 if (msg.getRecord(j) == null) {
                     ourSlot = j;
@@ -162,8 +172,8 @@ public class BuildMessageTestStandalone extends TestCase {
         return rv;
     }
 
-    private TunnelCreatorConfig createConfig(I2PAppContext ctx) {
-        return configOutbound(ctx);
+    private TunnelCreatorConfig createConfig(I2PAppContext ctx, int testType) {
+        return configOutbound(ctx, testType);
     }
 
     /**
@@ -171,7 +181,7 @@ public class BuildMessageTestStandalone extends TestCase {
      *  The first entry in the config is the gateway (us),
      *  and is mostly ignored.
      */
-    private TunnelCreatorConfig configOutbound(I2PAppContext ctx) {
+    private TunnelCreatorConfig configOutbound(I2PAppContext ctx, int testType) {
         _peers = new Hash[4];
         _pubKeys = new PublicKey[_peers.length];
         _privKeys = new PrivateKey[_peers.length];
@@ -180,9 +190,9 @@ public class BuildMessageTestStandalone extends TestCase {
             Arrays.fill(buf, (byte)i); // consistent for repeatability
             Hash h = new Hash(buf);
             _peers[i] = h;
-            Object kp[] = ctx.keyGenerator().generatePKIKeypair();
-            _pubKeys[i] = (PublicKey)kp[0];
-            _privKeys[i] = (PrivateKey)kp[1];
+            KeyPair kp = ctx.keyGenerator().generatePKIKeys(testType == 1 ? EncType.ELGAMAL_2048 : EncType.ECIES_X25519);
+            _pubKeys[i] = kp.getPublic();
+            _privKeys[i] = kp.getPrivate();
         }
         
         TunnelCreatorConfig cfg = new TCConfig(null, _peers.length, false);
@@ -212,7 +222,8 @@ public class BuildMessageTestStandalone extends TestCase {
         RouterContext ctx = r.getContext();
         ctx.initAll();
         try {
-            test.x_testBuildMessage(ctx);
+            test.x_testBuildMessage(ctx, 1);
+            test.x_testBuildMessage(ctx, 2);
         } finally {
             ctx.logManager().flush();
         }
