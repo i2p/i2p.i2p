@@ -12,12 +12,15 @@ import net.i2p.data.ByteArray;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
+import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPublicKey;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.BuildRequestRecord;
 import net.i2p.data.i2np.BuildResponseRecord;
 import net.i2p.data.i2np.EncryptedBuildRecord;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.tunnel.HopConfig;
 import net.i2p.router.tunnel.TCConfig;
@@ -32,10 +35,6 @@ import net.i2p.util.Log;
  * ===
  * Update 1/5/2013 :
  * This test is renamed so it does not match the JUnit wildcard.
- * There is something wrong with the decryption check; it doesn't look like the test takes
- * into consideration the re-encryption of the records in the TunnelBuildMessage.
- * Most probably the test will have to be re-written from scratch.
- * --zab
  */
 public class BuildMessageTestStandalone extends TestCase {
     private Hash _peers[];
@@ -46,7 +45,19 @@ public class BuildMessageTestStandalone extends TestCase {
     
     public void testBuildMessage() {
         RouterContext ctx = new RouterContext(null);
+        x_testBuildMessage(ctx);
+    }
+
+    private void x_testBuildMessage(RouterContext ctx) {
         Log log = ctx.logManager().getLog(getClass());
+        // set our keys to avoid NPE
+        Object[] kp = ctx.keyGenerator().generatePKIKeypair();
+        PublicKey k1 = (PublicKey) kp[0];
+        PrivateKey k2 = (PrivateKey) kp[1];
+        kp = ctx.keyGenerator().generateSigningKeypair();
+        SigningPublicKey k3 = (SigningPublicKey) kp[0];
+        SigningPrivateKey k4 = (SigningPrivateKey) kp[1];
+        ctx.keyManager().setKeys(k1, k2, k3, k4);
         
         List<Integer> order = pickOrder();
         
@@ -70,13 +81,15 @@ public class BuildMessageTestStandalone extends TestCase {
         
         log.debug("\n================================================================" +
                   "\nMessage fully encrypted" + 
+                  "\n" + cfg +
                   "\n================================================================");
         
         // now msg is fully encrypted, so lets go through the hops, decrypting and replying
         // as necessary
         
         BuildMessageProcessor proc = new BuildMessageProcessor(ctx);
-        for (int i = 0; i < cfg.getLength(); i++) {
+        // skip cfg(0) which is the gateway (us)
+        for (int i = 1; i < cfg.getLength(); i++) {
             // this not only decrypts the current hop's record, but encrypts the other records
             // with the reply key
             BuildRequestRecord req = proc.decrypt(msg, _peers[i], _privKeys[i]);
@@ -92,7 +105,7 @@ public class BuildMessageTestStandalone extends TestCase {
             long now = (ctx.clock().now() / (60l*60l*1000l)) * (60*60*1000);
             int ourSlot = -1;
 
-            EncryptedBuildRecord reply = BuildResponseRecord.create(ctx, 0, req.readReplyKey(), req.readReplyIV(), -1);
+            EncryptedBuildRecord reply = BuildResponseRecord.create(ctx, 0, req.readReplyKey(), replyIV, i);
             for (int j = 0; j < TunnelBuildMessage.MAX_RECORD_COUNT; j++) {
                 if (msg.getRecord(j) == null) {
                     ourSlot = j;
@@ -121,13 +134,11 @@ public class BuildMessageTestStandalone extends TestCase {
         int statuses[] = (new BuildReplyHandler(ctx)).decrypt(reply, cfg, order);
         if (statuses == null) throw new RuntimeException("bar");
         boolean allAgree = true;
-        for (int i = 0; i < cfg.getLength(); i++) {
+        for (int i = 1; i < cfg.getLength(); i++) {
             Hash peer = cfg.getPeer(i);
             int record = order.get(i).intValue();
             if (statuses[record] != 0)
                 allAgree = false;
-            //else
-            //    penalize peer according to the rejection cause    
         }
         
         log.debug("\n================================================================" +
@@ -137,6 +148,8 @@ public class BuildMessageTestStandalone extends TestCase {
     
     private static final List<Integer> pickOrder() {
         // pseudorandom, yet consistent (so we can be repeatable)
+        // slot -> hop
+        // build slots for hops 1-3 are 4,0,5
         List<Integer> rv = new ArrayList<Integer>(8);
         rv.add(new Integer(2));
         rv.add(new Integer(4));
@@ -148,10 +161,16 @@ public class BuildMessageTestStandalone extends TestCase {
         rv.add(new Integer(7));
         return rv;
     }
-    
+
     private TunnelCreatorConfig createConfig(I2PAppContext ctx) {
         return configOutbound(ctx);
     }
+
+    /**
+     *  This creates a 3-hop (4 entries in the config) outbound tunnel.
+     *  The first entry in the config is the gateway (us),
+     *  and is mostly ignored.
+     */
     private TunnelCreatorConfig configOutbound(I2PAppContext ctx) {
         _peers = new Hash[4];
         _pubKeys = new PublicKey[_peers.length];
@@ -168,10 +187,11 @@ public class BuildMessageTestStandalone extends TestCase {
         
         TunnelCreatorConfig cfg = new TCConfig(null, _peers.length, false);
         long now = ctx.clock().now();
-        // peers[] is ordered endpoint first, but cfg.getPeer() is ordered gateway first
+        // peers[] is ordered gateway first (unlike in production code)
         for (int i = 0; i < _peers.length; i++) {
             cfg.setPeer(i, _peers[i]);
             HopConfig hop = cfg.getConfig(i);
+            hop.setCreation(now);
             hop.setExpiration(now+10*60*1000);
             hop.setIVKey(ctx.keyGenerator().generateSessionKey());
             hop.setLayerKey(ctx.keyGenerator().generateSessionKey());
@@ -181,5 +201,20 @@ public class BuildMessageTestStandalone extends TestCase {
             hop.setReceiveTunnelId(new TunnelId(i+1));
         }
         return cfg;
+    }
+
+    /**
+     *  @since 0.9.51
+     */
+    public static void main(String[] args) {
+        BuildMessageTestStandalone test = new BuildMessageTestStandalone();
+        Router r = new Router();
+        RouterContext ctx = r.getContext();
+        ctx.initAll();
+        try {
+            test.x_testBuildMessage(ctx);
+        } finally {
+            ctx.logManager().flush();
+        }
     }
 }
