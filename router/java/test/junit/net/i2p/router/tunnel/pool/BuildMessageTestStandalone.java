@@ -1,4 +1,4 @@
-package net.i2p.router.tunnel;
+package net.i2p.router.tunnel.pool;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +19,9 @@ import net.i2p.data.i2np.EncryptedBuildRecord;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.tunnel.HopConfig;
+import net.i2p.router.tunnel.TCConfig;
+import net.i2p.router.tunnel.TunnelCreatorConfig;
 import net.i2p.util.Log;
 
 /**
