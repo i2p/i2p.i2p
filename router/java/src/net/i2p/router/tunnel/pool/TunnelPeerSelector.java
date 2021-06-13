@@ -18,6 +18,7 @@ import net.i2p.crypto.SipHashInline;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.SessionKey;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.LeaseSetKeys;
@@ -640,9 +641,9 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
 ****/
 
     /** see HashComparator */
-    protected void orderPeers(List<Hash> rv, Hash hash) {
+    protected void orderPeers(List<Hash> rv, SessionKey key) {
         if (rv.size() > 1)
-            Collections.sort(rv, new HashComparator(hash));
+            Collections.sort(rv, new HashComparator(key));
     }
 
     /**
@@ -670,8 +671,8 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
          *
          * @param h container for sort keys, not used as a Hash
          */
-        private HashComparator(Hash h) {
-            byte[] b = h.getData();
+        private HashComparator(SessionKey k) {
+            byte[] b = k.getData();
             // we use the first half of the random key in ProfileOrganizer.getSubTier(),
             // so use the last half here
             k0 = DataHelper.fromLong8(b, 16);

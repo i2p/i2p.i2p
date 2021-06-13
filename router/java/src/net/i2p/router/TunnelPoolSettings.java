@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import net.i2p.data.Base64;
 import net.i2p.data.Hash;
+import net.i2p.data.SessionKey;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.RandomSource;
@@ -31,7 +32,7 @@ public class TunnelPoolSettings {
     private boolean _allowZeroHop;
     private int _IPRestriction;
     private final Properties _unknownOptions;
-    private Hash _randomKey;
+    private SessionKey _randomKey;
     private int _priority;
     private final Set<Hash> _aliases;
     private Hash _aliasOf;
@@ -255,7 +256,7 @@ public class TunnelPoolSettings {
      *
      *  @return non-null
      */
-    public Hash getRandomKey() { return _randomKey; }
+    public SessionKey getRandomKey() { return _randomKey; }
 
     /** what user supplied name was given to the client connected (can be null) */
     public String getDestinationNickname() { return _destinationNickname; }
@@ -324,8 +325,8 @@ public class TunnelPoolSettings {
                     _priority = Math.min(max, Math.max(MIN_PRIORITY, getInt(value, def)));
                 } else if (name.equalsIgnoreCase(prefix + PROP_RANDOM_KEY)) {
                     byte[] rk = Base64.decode(value);
-                    if (rk != null && rk.length == Hash.HASH_LENGTH)
-                        _randomKey = new Hash(rk);
+                    if (rk != null && rk.length == SessionKey.KEYSIZE_BYTES)
+                        _randomKey = new SessionKey(rk);
                 } else
                     _unknownOptions.setProperty(name.substring(prefix.length()), value);
             }
@@ -375,10 +376,10 @@ public class TunnelPoolSettings {
     }
     
     // used for strict peer ordering
-    private static Hash generateRandomKey() {
-        byte hash[] = new byte[Hash.HASH_LENGTH];
-        RandomSource.getInstance().nextBytes(hash);
-        return new Hash(hash);
+    private static SessionKey generateRandomKey() {
+        byte data[] = new byte[SessionKey.KEYSIZE_BYTES];
+        RandomSource.getInstance().nextBytes(data);
+        return new SessionKey(data);
     }
     
     private static final boolean getBoolean(String str, boolean defaultValue) { 

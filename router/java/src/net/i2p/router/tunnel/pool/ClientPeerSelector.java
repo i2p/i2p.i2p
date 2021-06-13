@@ -7,6 +7,7 @@ import java.util.Set;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.SessionKey;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
@@ -84,7 +85,7 @@ class ClientPeerSelector extends TunnelPeerSelector {
                 // For a 2-hop tunnel, the first hop comes from subtiers 0-1 and the last from subtiers 2-3.
                 // For a longer tunnels, the first hop comes from subtier 0, the middle from subtiers 2-3, and the last from subtier 1.
                 rv = new ArrayList<Hash>(length + 1);
-                Hash randomKey = settings.getRandomKey();
+                SessionKey randomKey = settings.getRandomKey();
                 // OBEP or IB last hop
                 // group 0 or 1 if two hops, otherwise group 0
                 Set<Hash> lastHopExclude;

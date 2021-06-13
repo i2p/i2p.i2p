@@ -20,6 +20,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import net.i2p.crypto.SipHashInline;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.SessionKey;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.ClientManagerFacade;
@@ -482,7 +483,7 @@ public class ProfileOrganizer {
      *    7: return only from group 3
      *</pre>
      */
-    public void selectFastPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, Hash randomKey, Slice subTierMode) {
+    public void selectFastPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, SessionKey randomKey, Slice subTierMode) {
         getReadLock();
         try {
             if (subTierMode != Slice.SLICE_ALL) {
@@ -1351,7 +1352,7 @@ public class ProfileOrganizer {
      *</pre>
      */
     private void locked_selectPeers(Map<Hash, PeerProfile> peers, int howMany, Set<Hash> toExclude,
-                                    Set<Hash> matches, Hash randomKey, Slice subTierMode) {
+                                    Set<Hash> matches, SessionKey randomKey, Slice subTierMode) {
         List<Hash> all = new ArrayList<Hash>(peers.keySet());
         byte[] rk = randomKey.getData();
         // we use the first half of the random key here,
