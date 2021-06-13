@@ -22,6 +22,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.InboundTunnelBuildMessage;
 import net.i2p.data.i2np.OutboundTunnelBuildReplyMessage;
 import net.i2p.data.i2np.ShortTunnelBuildMessage;
+import net.i2p.data.i2np.ShortTunnelBuildReplyMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
@@ -566,12 +567,15 @@ class BuildHandler implements Runnable {
     private void handleRequestAsInboundEndpoint(BuildEndMessageState state) {
         int records = state.msg.getRecordCount();
         TunnelBuildReplyMessage msg;
-        if (records == TunnelBuildMessage.MAX_RECORD_COUNT)
+        if (state.msg.getType() == ShortTunnelBuildMessage.MESSAGE_TYPE)
+            msg = new ShortTunnelBuildReplyMessage(_context, records);
+        else if (records == TunnelBuildMessage.MAX_RECORD_COUNT)
             msg = new TunnelBuildReplyMessage(_context);
         else
             msg = new VariableTunnelBuildReplyMessage(_context, records);
-        for (int i = 0; i < records; i++)
+        for (int i = 0; i < records; i++) {
             msg.setRecord(i, state.msg.getRecord(i));
+        }
         msg.setUniqueId(state.msg.getUniqueId());
         handleReply(msg, state.cfg, System.currentTimeMillis() - state.recvTime);
     }

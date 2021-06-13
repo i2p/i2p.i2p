@@ -12,6 +12,7 @@ import net.i2p.data.i2np.BuildResponseRecord;
 import net.i2p.data.i2np.EncryptedBuildRecord;
 import net.i2p.data.i2np.OutboundTunnelBuildReplyMessage;
 import net.i2p.data.i2np.ShortEncryptedBuildRecord;
+import net.i2p.data.i2np.ShortTunnelBuildReplyMessage;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
 import net.i2p.router.tunnel.TunnelCreatorConfig;
 import net.i2p.util.Log;
@@ -52,7 +53,6 @@ class BuildReplyHandler {
             log.error("Corrupted build reply, expected " + recordOrder.size() + " records, got " + reply.getRecordCount());
             return null;
         }
-        boolean isShort = reply.getType() == OutboundTunnelBuildReplyMessage.MESSAGE_TYPE;
         int rv[] = new int[reply.getRecordCount()];
         for (int i = 0; i < rv.length; i++) {
             int hop = recordOrder.get(i).intValue();
@@ -89,7 +89,7 @@ class BuildReplyHandler {
                 rv[i] = ok;
             }
         }
-        if (isShort) {
+        if (reply.getType() == OutboundTunnelBuildReplyMessage.MESSAGE_TYPE) {
             OutboundTunnelBuildReplyMessage otbrm = (OutboundTunnelBuildReplyMessage) reply;
             rv[otbrm.getPlaintextSlot()] = otbrm.getPlaintextReply();
         }
@@ -107,9 +107,10 @@ class BuildReplyHandler {
      */
     private int decryptRecord(TunnelBuildReplyMessage reply, TunnelCreatorConfig cfg, int recordNum, int hop) {
         EncryptedBuildRecord rec = reply.getRecord(recordNum);
-        boolean isShort = reply.getType() == OutboundTunnelBuildReplyMessage.MESSAGE_TYPE;
+        int type = reply.getType();
+        boolean isOTBRM = type == OutboundTunnelBuildReplyMessage.MESSAGE_TYPE;
         if (rec == null) {
-            if (!isShort) {
+            if (!isOTBRM) {
                 if (log.shouldWarn())
                     log.warn("Missing record " + recordNum);
                 return -1;
@@ -135,6 +136,7 @@ class BuildReplyHandler {
         if (isEC)
             end++;
         // do we need to adjust this for the endpoint?
+        boolean isShort = isOTBRM || type == ShortTunnelBuildReplyMessage.MESSAGE_TYPE;
         if (isShort) {
             byte iv[] = new byte[12];
             for (int j = start; j >= end; j--) {

@@ -24,8 +24,10 @@ import net.i2p.data.i2np.EncryptedBuildRecord;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.I2NPMessageHandler;
+import net.i2p.data.i2np.InboundTunnelBuildMessage;
 import net.i2p.data.i2np.OutboundTunnelBuildReplyMessage;
 import net.i2p.data.i2np.ShortTunnelBuildMessage;
+import net.i2p.data.i2np.ShortTunnelBuildReplyMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
 import net.i2p.router.Router;
@@ -53,18 +55,18 @@ public class BuildMessageTestStandalone extends TestCase {
     
     public void testBuildMessage() {
         RouterContext ctx = new RouterContext(null);
-        x_testBuildMessage(ctx, 1);
-        x_testBuildMessage(ctx, 2);
-        x_testBuildMessage(ctx, 3);
+        for (int i = 1; i <= 6; i++) {
+            x_testBuildMessage(ctx, i);
+        }
     }
 
     /**
-     *  @param testType 1=ElG; 2=ECIES; 3=ECIES short outbound; 4=ECIES short inbound
+     *  @param testType outbound: 1=ElG; 2=ECIES; 3=ECIES short; inbound: 4-6
      */
     private void x_testBuildMessage(RouterContext ctx, int testType) {
         Log log = ctx.logManager().getLog(getClass());
         // set our keys to avoid NPE
-        KeyPair kpr = ctx.keyGenerator().generatePKIKeys(testType == 1 ? EncType.ELGAMAL_2048 : EncType.ECIES_X25519);
+        KeyPair kpr = ctx.keyGenerator().generatePKIKeys((testType == 1 || testType == 4) ? EncType.ELGAMAL_2048 : EncType.ECIES_X25519);
         PublicKey k1 = kpr.getPublic();
         PrivateKey k2 = kpr.getPrivate();
         Object[] kp = ctx.keyGenerator().generateSigningKeypair();
@@ -82,16 +84,34 @@ public class BuildMessageTestStandalone extends TestCase {
         
         // populate and encrypt the message
         TunnelBuildMessage msg;
-        if (testType == 3)
+        if (testType == 3) {
             msg = new ShortTunnelBuildMessage(ctx, TunnelBuildMessage.MAX_RECORD_COUNT);
-        else
+        } else if (testType == 6) {
+            InboundTunnelBuildMessage itbm = new InboundTunnelBuildMessage(ctx, TunnelBuildMessage.MAX_RECORD_COUNT);
+            // set plaintext record for ibgw
+            for (int i = 0; i < order.size(); i++) {
+                int hop = order.get(i).intValue();
+                if (hop == 0) {
+                    // TODO
+                    itbm.setPlaintextRecord(i, new byte[100]);
+                    break;
+                }
+            }
+            msg = itbm;
+        } else {
             msg = new TunnelBuildMessage(ctx);
+        }
+        int end = cfg.getLength();
+        if (testType > 3)
+            end--;
         for (int i = 0; i < order.size(); i++) {
             int hop = order.get(i).intValue();
             PublicKey key = null;
-            if (hop < _pubKeys.length)
+            if (hop < end)
                 key = _pubKeys[hop];
-            BuildMessageGenerator.createRecord(i, hop, msg, cfg, _replyRouter, _replyTunnel, ctx, key);
+            // don't do this for ibgw in itbm
+            if (testType != 6 || hop != 0)
+                BuildMessageGenerator.createRecord(i, hop, msg, cfg, _replyRouter, _replyTunnel, ctx, key);
         }
         BuildMessageGenerator.layeredEncrypt(ctx, msg, cfg, order);
         
@@ -100,14 +120,14 @@ public class BuildMessageTestStandalone extends TestCase {
                   "\n" + cfg +
                   "\n================================================================");
         
-        if (testType == 3) {
-            // test read/write
+        if (testType == 3 || testType == 6) {
+            // test read/write for new messages
             byte[] data = msg.toByteArray();
             try {
                 I2NPMessage msg2 = (new I2NPMessageHandler(ctx)).readMessage(data);
-                msg = (ShortTunnelBuildMessage) msg2;
+                msg = (TunnelBuildMessage) msg2;
             } catch (Exception e) {
-                log.error("STBM out/in fail", e);
+                log.error("TBM out/in fail", e);
                 assertTrue(e.toString(), false);
             }
         }
@@ -115,8 +135,10 @@ public class BuildMessageTestStandalone extends TestCase {
         // as necessary
         
         BuildMessageProcessor proc = new BuildMessageProcessor(ctx);
-        // skip cfg(0) which is the gateway (us)
-        for (int i = 1; i < cfg.getLength(); i++) {
+        // skip cfg(0) which is the gateway (us) for outbound
+        // skip cfg(end) which is the endpoint (us) for inbound
+        int start = testType > 3 ? 0 : 1;
+        for (int i =  start; i < end; i++) {
             // this not only decrypts the current hop's record, but encrypts the other records
             // with the reply key
             BuildRequestRecord req = proc.decrypt(msg, _peers[i], _privKeys[i]);
@@ -132,9 +154,9 @@ public class BuildMessageTestStandalone extends TestCase {
             int ourSlot = -1;
 
             EncryptedBuildRecord reply;
-            if (testType == 1) {
+            if (testType == 1 || testType == 4) {
                 reply = BuildResponseRecord.create(ctx, 0, req.readReplyKey(), req.readReplyIV(), i);
-            } else if (testType == 2) {
+            } else if (testType == 2 || testType == 5) {
                 reply = BuildResponseRecord.create(ctx, 0, req.getChaChaReplyKey(), req.getChaChaReplyAD(), EmptyProperties.INSTANCE);
             } else {
                 reply = BuildResponseRecord.createShort(ctx, 0, req.getChaChaReplyKey(), req.getChaChaReplyAD(), EmptyProperties.INSTANCE);
@@ -156,14 +178,14 @@ public class BuildMessageTestStandalone extends TestCase {
                 }
             }
 
-            if (testType == 1) {
+            if (testType == 1 || testType == 4) {
                 log.debug("Read slot " + ourSlot + " containing hop " + i + " @ " + _peers[i].toBase64() 
                           + " receives on " + ourId + " sending to " + nextId
                           + " replyKey " + Base64.encode(req.readReplyKey().getData())
                           + " replyIV " + Base64.encode(req.readReplyIV())
                           + " on " + nextPeer.toBase64()
                           + " inGW? " + isInGW + " outEnd? " + isOutEnd + " time difference " + (now-time));
-            } else if (testType == 2) {
+            } else if (testType == 2 || testType == 5) {
                 log.debug("Read slot " + ourSlot + " containing hop " + i + " @ " + _peers[i].toBase64() 
                           + " receives on " + ourId + " sending to " + nextId
                           + " replyKey " + Base64.encode(req.readReplyKey().getData())
@@ -218,7 +240,10 @@ public class BuildMessageTestStandalone extends TestCase {
                 assertTrue(e.toString(), false);
             }
         } else {
-            reply = new TunnelBuildReplyMessage(ctx);
+            if (testType == 6)
+                reply = new ShortTunnelBuildReplyMessage(ctx, TunnelBuildMessage.MAX_RECORD_COUNT);
+            else
+                reply = new TunnelBuildReplyMessage(ctx);
             for (int i = 0; i < TunnelBuildMessage.MAX_RECORD_COUNT; i++) {
                 reply.setRecord(i, msg.getRecord(i));
             }
@@ -257,15 +282,19 @@ public class BuildMessageTestStandalone extends TestCase {
     }
 
     private TunnelCreatorConfig createConfig(I2PAppContext ctx, int testType) {
-        return configOutbound(ctx, testType);
+        boolean isInbound = testType > 3;
+        if (isInbound)
+            testType -= 3;
+        return createConfig(ctx, testType, isInbound);
     }
 
     /**
-     *  This creates a 3-hop (4 entries in the config) outbound tunnel.
-     *  The first entry in the config is the gateway (us),
+     *  This creates a 3-hop (4 entries in the config) tunnel.
+     *  The first entry in the outbound config is the gateway (us),
      *  and is mostly ignored.
+     *  Ditto last entry in inbound config.
      */
-    private TunnelCreatorConfig configOutbound(I2PAppContext ctx, int testType) {
+    private TunnelCreatorConfig createConfig(I2PAppContext ctx, int testType, boolean isInbound) {
         _peers = new Hash[4];
         _pubKeys = new PublicKey[_peers.length];
         _privKeys = new PrivateKey[_peers.length];
@@ -279,7 +308,7 @@ public class BuildMessageTestStandalone extends TestCase {
             _privKeys[i] = kp.getPrivate();
         }
         
-        TunnelCreatorConfig cfg = new TCConfig(null, _peers.length, false);
+        TunnelCreatorConfig cfg = new TCConfig(null, _peers.length, isInbound);
         long now = ctx.clock().now();
         // peers[] is ordered gateway first (unlike in production code)
         for (int i = 0; i < _peers.length; i++) {
@@ -306,9 +335,9 @@ public class BuildMessageTestStandalone extends TestCase {
         RouterContext ctx = r.getContext();
         ctx.initAll();
         try {
-            test.x_testBuildMessage(ctx, 1);
-            test.x_testBuildMessage(ctx, 2);
-            test.x_testBuildMessage(ctx, 3);
+            for (int i = 1; i <= 6; i++) {
+                test.x_testBuildMessage(ctx, i);
+            }
         } finally {
             ctx.logManager().flush();
         }

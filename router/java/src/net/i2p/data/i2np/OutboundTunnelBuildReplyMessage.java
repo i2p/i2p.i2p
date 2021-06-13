@@ -128,7 +128,11 @@ public class OutboundTunnelBuildReplyMessage extends TunnelBuildReplyMessage {
     }
 
     @Override
-    protected int calculateWrittenLength() { return 4 + _plaintextRecord.length + ((RECORD_COUNT - 1) * SHORT_RECORD_SIZE); }
+    protected int calculateWrittenLength() {
+        if (_plaintextRecord == null)
+            throw new IllegalStateException("Plaintext record not set");
+        return 4 + _plaintextRecord.length + ((RECORD_COUNT - 1) * SHORT_RECORD_SIZE);
+    }
 
     @Override
     public int getType() { return MESSAGE_TYPE; }
@@ -167,6 +171,8 @@ public class OutboundTunnelBuildReplyMessage extends TunnelBuildReplyMessage {
     
     @Override
     protected int writeMessageBody(byte[] out, int curIndex) throws I2NPMessageException {
+        if (_plaintextRecord == null)
+            throw new I2NPMessageException("Plaintext record not set");
         int remaining = out.length - (curIndex + calculateWrittenLength());
         if (remaining < 0)
             throw new I2NPMessageException("Not large enough (too short by " + remaining + ")");
