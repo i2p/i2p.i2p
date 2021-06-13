@@ -21,6 +21,9 @@ import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.BuildRequestRecord;
 import net.i2p.data.i2np.BuildResponseRecord;
 import net.i2p.data.i2np.EncryptedBuildRecord;
+import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.I2NPMessageException;
+import net.i2p.data.i2np.I2NPMessageHandler;
 import net.i2p.data.i2np.OutboundTunnelBuildReplyMessage;
 import net.i2p.data.i2np.ShortTunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
@@ -97,6 +100,17 @@ public class BuildMessageTestStandalone extends TestCase {
                   "\n" + cfg +
                   "\n================================================================");
         
+        if (testType == 3) {
+            // test read/write
+            byte[] data = msg.toByteArray();
+            try {
+                I2NPMessage msg2 = (new I2NPMessageHandler(ctx)).readMessage(data);
+                msg = (ShortTunnelBuildMessage) msg2;
+            } catch (Exception e) {
+                log.error("STBM out/in fail", e);
+                assertTrue(e.toString(), false);
+            }
+        }
         // now msg is fully encrypted, so lets go through the hops, decrypting and replying
         // as necessary
         
@@ -193,7 +207,16 @@ public class BuildMessageTestStandalone extends TestCase {
                 else
                     otbrm.setRecord(i, msg.getRecord(i));
             }
-            reply = otbrm;
+            // test read/write
+            byte[] data = otbrm.toByteArray();
+            try {
+                I2NPMessage msg2 = (new I2NPMessageHandler(ctx)).readMessage(data);
+                reply = (OutboundTunnelBuildReplyMessage) msg2;
+            } catch (Exception e) {
+                reply = null;
+                log.error("OTBRM out/in fail", e);
+                assertTrue(e.toString(), false);
+            }
         } else {
             reply = new TunnelBuildReplyMessage(ctx);
             for (int i = 0; i < TunnelBuildMessage.MAX_RECORD_COUNT; i++) {
