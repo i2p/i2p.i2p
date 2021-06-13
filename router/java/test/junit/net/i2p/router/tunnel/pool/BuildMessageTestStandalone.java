@@ -21,6 +21,8 @@ import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.BuildRequestRecord;
 import net.i2p.data.i2np.BuildResponseRecord;
 import net.i2p.data.i2np.EncryptedBuildRecord;
+import net.i2p.data.i2np.OutboundTunnelBuildReplyMessage;
+import net.i2p.data.i2np.ShortTunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
 import net.i2p.router.Router;
@@ -50,10 +52,11 @@ public class BuildMessageTestStandalone extends TestCase {
         RouterContext ctx = new RouterContext(null);
         x_testBuildMessage(ctx, 1);
         x_testBuildMessage(ctx, 2);
+        x_testBuildMessage(ctx, 3);
     }
 
     /**
-     *  @param testType 1=ElG; 2=ECIES; 3=ECIES short
+     *  @param testType 1=ElG; 2=ECIES; 3=ECIES short outbound; 4=ECIES short inbound
      */
     private void x_testBuildMessage(RouterContext ctx, int testType) {
         Log log = ctx.logManager().getLog(getClass());
@@ -75,7 +78,11 @@ public class BuildMessageTestStandalone extends TestCase {
         _replyTunnel = 42;
         
         // populate and encrypt the message
-        TunnelBuildMessage msg = new TunnelBuildMessage(ctx);
+        TunnelBuildMessage msg;
+        if (testType == 3)
+            msg = new ShortTunnelBuildMessage(ctx, TunnelBuildMessage.MAX_RECORD_COUNT);
+        else
+            msg = new TunnelBuildMessage(ctx);
         for (int i = 0; i < order.size(); i++) {
             int hop = order.get(i).intValue();
             PublicKey key = null;
@@ -102,7 +109,6 @@ public class BuildMessageTestStandalone extends TestCase {
             // If false, no records matched the _peers[i], or the decryption failed
             assertTrue("foo @ " + i, req != null);
             long ourId = req.readReceiveTunnelId();
-            byte replyIV[] = req.readReplyIV();
             long nextId = req.readNextTunnelId();
             Hash nextPeer = req.readNextIdentity();
             boolean isInGW = req.readIsInboundGateway();
@@ -112,23 +118,54 @@ public class BuildMessageTestStandalone extends TestCase {
             int ourSlot = -1;
 
             EncryptedBuildRecord reply;
-            if (testType == 1)
-                reply = BuildResponseRecord.create(ctx, 0, req.readReplyKey(), replyIV, i);
-            else
+            if (testType == 1) {
+                reply = BuildResponseRecord.create(ctx, 0, req.readReplyKey(), req.readReplyIV(), i);
+            } else if (testType == 2) {
                 reply = BuildResponseRecord.create(ctx, 0, req.getChaChaReplyKey(), req.getChaChaReplyAD(), EmptyProperties.INSTANCE);
-            for (int j = 0; j < TunnelBuildMessage.MAX_RECORD_COUNT; j++) {
-                if (msg.getRecord(j) == null) {
-                    ourSlot = j;
-                    msg.setRecord(j, reply);
-                    break;
+            } else {
+                reply = BuildResponseRecord.createShort(ctx, 0, req.getChaChaReplyKey(), req.getChaChaReplyAD(), EmptyProperties.INSTANCE);
+            }
+            if (testType != 3 || i != cfg.getLength() - 1) {
+                for (int j = 0; j < TunnelBuildMessage.MAX_RECORD_COUNT; j++) {
+                    if (msg.getRecord(j) == null) {
+                        ourSlot = j;
+                        msg.setRecord(j, reply);
+                        break;
+                    }
+                }
+            } else {
+                for (int j = 0; j < TunnelBuildMessage.MAX_RECORD_COUNT; j++) {
+                    if (msg.getRecord(j) == null) {
+                        ourSlot = j;
+                        break;
+                    }
                 }
             }
-            
-            log.debug("Read slot " + ourSlot + " containing hop " + i + " @ " + _peers[i].toBase64() 
-                      + " receives on " + ourId 
-                      + " w/ replyIV " + Base64.encode(replyIV) + " sending to " + nextId
-                      + " on " + nextPeer.toBase64()
-                      + " inGW? " + isInGW + " outEnd? " + isOutEnd + " time difference " + (now-time));
+
+            if (testType == 1) {
+                log.debug("Read slot " + ourSlot + " containing hop " + i + " @ " + _peers[i].toBase64() 
+                          + " receives on " + ourId + " sending to " + nextId
+                          + " replyKey " + Base64.encode(req.readReplyKey().getData())
+                          + " replyIV " + Base64.encode(req.readReplyIV())
+                          + " on " + nextPeer.toBase64()
+                          + " inGW? " + isInGW + " outEnd? " + isOutEnd + " time difference " + (now-time));
+            } else if (testType == 2) {
+                log.debug("Read slot " + ourSlot + " containing hop " + i + " @ " + _peers[i].toBase64() 
+                          + " receives on " + ourId + " sending to " + nextId
+                          + " replyKey " + Base64.encode(req.readReplyKey().getData())
+                          + " replyIV " + Base64.encode(req.readReplyIV())
+                          + " chachaKey " + Base64.encode(req.getChaChaReplyKey().getData())
+                          + " chachaAD " + Base64.encode(req.getChaChaReplyAD())
+                          + " on " + nextPeer.toBase64()
+                          + " inGW? " + isInGW + " outEnd? " + isOutEnd + " time difference " + (now-time));
+            } else {
+                log.debug("Read slot " + ourSlot + " containing hop " + i + " @ " + _peers[i].toBase64() 
+                          + " receives on " + ourId + " sending to " + nextId
+                          + " chachaKey " + Base64.encode(req.getChaChaReplyKey().getData())
+                          + " chachaAD " + Base64.encode(req.getChaChaReplyAD())
+                          + " on " + nextPeer.toBase64()
+                          + " inGW? " + isInGW + " outEnd? " + isOutEnd + " time difference " + (now-time));
+            }
         }
         
         
@@ -137,9 +174,32 @@ public class BuildMessageTestStandalone extends TestCase {
                   "\n================================================================");
         
         // now all of the replies are populated, toss 'em into a reply message and handle it
-        TunnelBuildReplyMessage reply = new TunnelBuildReplyMessage(ctx);
-        for (int i = 0; i < TunnelBuildMessage.MAX_RECORD_COUNT; i++)
-            reply.setRecord(i, msg.getRecord(i));
+        TunnelBuildReplyMessage reply;
+        if (testType == 3) {
+            OutboundTunnelBuildReplyMessage otbrm = new OutboundTunnelBuildReplyMessage(ctx, TunnelBuildMessage.MAX_RECORD_COUNT);
+            int ibep = _peers.length - 1;
+            int ibepSlot = -1;
+            for (int i = 0; i < order.size(); i++) {
+                int slot = order.get(i).intValue();
+                if (slot == ibep) {
+                    ibepSlot = i;
+                    break;
+                }
+            }
+            log.debug("OTBRM plaintext slot is " + ibepSlot);
+            for (int i = 0; i < TunnelBuildMessage.MAX_RECORD_COUNT; i++) {
+                if (i == ibepSlot)
+                    otbrm.setPlaintextRecord(i, 0);
+                else
+                    otbrm.setRecord(i, msg.getRecord(i));
+            }
+            reply = otbrm;
+        } else {
+            reply = new TunnelBuildReplyMessage(ctx);
+            for (int i = 0; i < TunnelBuildMessage.MAX_RECORD_COUNT; i++) {
+                reply.setRecord(i, msg.getRecord(i));
+            }
+        }
 
         int statuses[] = (new BuildReplyHandler(ctx)).decrypt(reply, cfg, order);
         if (statuses == null) throw new RuntimeException("bar");
@@ -154,6 +214,7 @@ public class BuildMessageTestStandalone extends TestCase {
         log.debug("\n================================================================" +
                   "\nAll peers agree? " + allAgree + 
                   "\n================================================================");
+        assertTrue("All peers agree", allAgree);
     }
     
     private static final List<Integer> pickOrder() {
@@ -224,6 +285,7 @@ public class BuildMessageTestStandalone extends TestCase {
         try {
             test.x_testBuildMessage(ctx, 1);
             test.x_testBuildMessage(ctx, 2);
+            test.x_testBuildMessage(ctx, 3);
         } finally {
             ctx.logManager().flush();
         }

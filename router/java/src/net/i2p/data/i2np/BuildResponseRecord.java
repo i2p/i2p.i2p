@@ -86,7 +86,7 @@ public class BuildResponseRecord {
      * @param options 116 bytes max when serialized
      * @return a 236-byte response record
      * @throws IllegalArgumentException if options too big or on encryption failure
-     * @since 0.9.451
+     * @since 0.9.51
      */
     public static ShortEncryptedBuildRecord createShort(I2PAppContext ctx, int status, SessionKey replyKey,
                                                         byte replyAD[], Properties options) {

@@ -1,6 +1,11 @@
 package net.i2p.data.i2np;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 
 /**
@@ -18,7 +23,7 @@ public class OutboundTunnelBuildReplyMessage extends TunnelBuildReplyMessage {
     public static final int SHORT_RECORD_SIZE = ShortTunnelBuildMessage.SHORT_RECORD_SIZE;
     public static final int MAX_PLAINTEXT_RECORD_SIZE = 172;
 
-    private int _plaintextSlot;
+    private int _plaintextSlot = -1;
     private byte[] _plaintextRecord;
 
     /** zero record count, will be set with readMessage() */
@@ -32,12 +37,49 @@ public class OutboundTunnelBuildReplyMessage extends TunnelBuildReplyMessage {
 
     /**
      *  @param record must be ShortEncryptedBuildRecord or null
+     *  @throws IllegalArgumentException on bad slot or record length.
      */
     @Override
     public void setRecord(int index, EncryptedBuildRecord record) {
-        if (record != null && record.length() != SHORT_RECORD_SIZE)
+        if (record != null && (record.length() != SHORT_RECORD_SIZE || index == _plaintextSlot))
             throw new IllegalArgumentException();
         super.setRecord(index, record);
+    }
+
+    /**
+     *  Set the slot and data for the plaintext record.
+     *  Empty properties will be used.
+     *
+     *  @param reply 0-255
+     *  @throws IllegalArgumentException on bad slot or data length.
+     *  @since 0.9.51
+     */
+    public void setPlaintextRecord(int slot, int reply) {
+        // 00 00 reply
+        byte[] data = new byte[3];
+        data[2] = (byte) reply;
+        setPlaintextRecord(slot, data);
+    }
+
+    /**
+     *  Set the slot and data for the plaintext record.
+     *
+     *  @param reply 0-255
+     *  @param props may be null
+     *  @throws IllegalArgumentException on bad slot or data length.
+     *  @since 0.9.51
+     */
+    public void setPlaintextRecord(int slot, int reply, Properties props) throws DataFormatException {
+        if (props == null || props.isEmpty()) {
+            setPlaintextRecord(slot, reply);
+            return;
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            DataHelper.writeProperties(baos, props);
+        } catch (IOException ioe) {}
+        baos.write((byte) reply);
+        setPlaintextRecord(slot, baos.toByteArray());
     }
 
     /**
@@ -45,7 +87,8 @@ public class OutboundTunnelBuildReplyMessage extends TunnelBuildReplyMessage {
      *  @throws IllegalArgumentException on bad slot or data length.
      */
     public void setPlaintextRecord(int slot, byte[] data) {
-        if (slot < 0 || slot >= RECORD_COUNT || data.length == 0 || data.length > MAX_PLAINTEXT_RECORD_SIZE)
+        if (slot < 0 || slot >= RECORD_COUNT || data.length == 0 || data.length > MAX_PLAINTEXT_RECORD_SIZE ||
+            (_records != null && _records[slot] != null))
             throw new IllegalArgumentException();
         _plaintextSlot = slot;
         _plaintextRecord = data;
@@ -64,6 +107,24 @@ public class OutboundTunnelBuildReplyMessage extends TunnelBuildReplyMessage {
      */
     public byte[] getPlaintextRecord() {
         return _plaintextRecord;
+    }
+
+    /**
+     *  Get the data for the plaintext record.
+     *  @since 0.9.51
+     */
+    public int getPlaintextReply() {
+        return _plaintextRecord[_plaintextRecord.length - 1] & 0xff;
+    }
+
+    /**
+     *  Get the data for the plaintext record.
+     *  @since 0.9.51
+     */
+    public Properties getPlaintextOptions() throws DataFormatException {
+        Properties props = new Properties();
+        DataHelper.fromProperties(_plaintextRecord, 0, props);
+        return props;
     }
 
     @Override

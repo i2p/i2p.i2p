@@ -18,7 +18,7 @@ public class InboundTunnelBuildMessage extends TunnelBuildMessage {
     public static final int SHORT_RECORD_SIZE = ShortTunnelBuildMessage.SHORT_RECORD_SIZE;
     public static final int MAX_PLAINTEXT_RECORD_SIZE = OutboundTunnelBuildReplyMessage.MAX_PLAINTEXT_RECORD_SIZE;
 
-    private int _plaintextSlot;
+    private int _plaintextSlot = -1;
     private byte[] _plaintextRecord;
 
     /** zero record count, will be set with readMessage() */
@@ -32,10 +32,11 @@ public class InboundTunnelBuildMessage extends TunnelBuildMessage {
 
     /**
      *  @param record must be ShortEncryptedBuildRecord or null
+     *  @throws IllegalArgumentException on bad slot or record length.
      */
     @Override
     public void setRecord(int index, EncryptedBuildRecord record) {
-        if (record != null && record.length() != SHORT_RECORD_SIZE)
+        if (record != null && (record.length() != SHORT_RECORD_SIZE || index == _plaintextSlot))
             throw new IllegalArgumentException();
         super.setRecord(index, record);
     }
@@ -45,7 +46,8 @@ public class InboundTunnelBuildMessage extends TunnelBuildMessage {
      *  @throws IllegalArgumentException on bad slot or data length.
      */
     public void setPlaintextRecord(int slot, byte[] data) {
-        if (slot < 0 || slot >= RECORD_COUNT || data.length == 0 || data.length > MAX_PLAINTEXT_RECORD_SIZE)
+        if (slot < 0 || slot >= RECORD_COUNT || data.length == 0 || data.length > MAX_PLAINTEXT_RECORD_SIZE ||
+            (_records != null && _records[slot] != null))
             throw new IllegalArgumentException();
         _plaintextSlot = slot;
         _plaintextRecord = data;

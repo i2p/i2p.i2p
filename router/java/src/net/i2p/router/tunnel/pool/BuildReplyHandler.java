@@ -3,6 +3,7 @@ package net.i2p.router.tunnel.pool;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.ChaCha20;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -10,6 +11,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.BuildResponseRecord;
 import net.i2p.data.i2np.EncryptedBuildRecord;
 import net.i2p.data.i2np.OutboundTunnelBuildReplyMessage;
+import net.i2p.data.i2np.ShortEncryptedBuildRecord;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
 import net.i2p.router.tunnel.TunnelCreatorConfig;
 import net.i2p.util.Log;
@@ -50,6 +52,7 @@ class BuildReplyHandler {
             log.error("Corrupted build reply, expected " + recordOrder.size() + " records, got " + reply.getRecordCount());
             return null;
         }
+        boolean isShort = reply.getType() == OutboundTunnelBuildReplyMessage.MESSAGE_TYPE;
         int rv[] = new int[reply.getRecordCount()];
         for (int i = 0; i < rv.length; i++) {
             int hop = recordOrder.get(i).intValue();
@@ -86,6 +89,10 @@ class BuildReplyHandler {
                 rv[i] = ok;
             }
         }
+        if (isShort) {
+            OutboundTunnelBuildReplyMessage otbrm = (OutboundTunnelBuildReplyMessage) reply;
+            rv[otbrm.getPlaintextSlot()] = otbrm.getPlaintextReply();
+        }
         return rv;
     }
 
@@ -100,6 +107,24 @@ class BuildReplyHandler {
      */
     private int decryptRecord(TunnelBuildReplyMessage reply, TunnelCreatorConfig cfg, int recordNum, int hop) {
         EncryptedBuildRecord rec = reply.getRecord(recordNum);
+        boolean isShort = reply.getType() == OutboundTunnelBuildReplyMessage.MESSAGE_TYPE;
+        if (rec == null) {
+            if (!isShort) {
+                if (log.shouldWarn())
+                    log.warn("Missing record " + recordNum);
+                return -1;
+            }
+            OutboundTunnelBuildReplyMessage otbrm = (OutboundTunnelBuildReplyMessage) reply;
+            if (otbrm.getPlaintextSlot() != recordNum) {
+                if (log.shouldWarn())
+                    log.warn("Plaintext slot mismatch expected " + recordNum + " got " + otbrm.getPlaintextSlot());
+                return -1;
+            }
+            int rv = otbrm.getPlaintextReply();
+            if (log.shouldLog(Log.DEBUG))
+                log.debug(reply.getUniqueId() + ": Received: " + rv + " for plaintext record " + recordNum + "/" + hop);
+            return rv;
+        }
         byte[] data = rec.getData();
         int start = cfg.getLength() - 1;
         if (cfg.isInbound())
@@ -110,18 +135,32 @@ class BuildReplyHandler {
         if (isEC)
             end++;
         // do we need to adjust this for the endpoint?
-        for (int j = start; j >= end; j--) {
-            SessionKey replyKey = cfg.getAESReplyKey(j);
-            byte replyIV[] = cfg.getAESReplyIV(j);
-            if (log.shouldLog(Log.DEBUG)) {
-                log.debug(reply.getUniqueId() + ": Decrypting record " + recordNum + "/" + hop + "/" + j + " with replyKey " 
-                          + replyKey.toBase64() + "/" + Base64.encode(replyIV) + ": " + cfg);
-                log.debug(reply.getUniqueId() + ": before decrypt: " + Base64.encode(data));
-                log.debug(reply.getUniqueId() + ": Full reply rec: sz=" + data.length + " data=" + Base64.encode(data, 0, TunnelBuildReplyMessage.RECORD_SIZE));
+        if (isShort) {
+            byte iv[] = new byte[12];
+            for (int j = start; j >= end; j--) {
+                byte[] replyKey = cfg.getChaChaReplyKey(j).getData();
+                if (log.shouldDebug()) {
+                    log.debug(reply.getUniqueId() + ": Decrypting ChaCha record " + recordNum + "/" + hop + "/" + j + " with replyKey " 
+                              + Base64.encode(replyKey) + " : " + cfg);
+                }
+                // slot number, little endian
+                iv[0] = (byte) recordNum;
+                ChaCha20.encrypt(replyKey, iv, data, 0, data, 0, ShortEncryptedBuildRecord.LENGTH);
             }
-            ctx.aes().decrypt(data, 0, data, 0, replyKey, replyIV, 0, TunnelBuildReplyMessage.RECORD_SIZE);
-            if (log.shouldLog(Log.DEBUG))
-                log.debug(reply.getUniqueId() + ": after decrypt: " + Base64.encode(data));
+        } else {
+            for (int j = start; j >= end; j--) {
+                SessionKey replyKey = cfg.getAESReplyKey(j);
+                byte replyIV[] = cfg.getAESReplyIV(j);
+                if (log.shouldDebug()) {
+                    log.debug(reply.getUniqueId() + ": Decrypting AES record " + recordNum + "/" + hop + "/" + j + " with replyKey " 
+                              + replyKey.toBase64() + "/" + Base64.encode(replyIV) + ": " + cfg);
+                    //log.debug(reply.getUniqueId() + ": before decrypt: " + Base64.encode(data));
+                    //log.debug(reply.getUniqueId() + ": Full reply rec: sz=" + data.length + " data=" + Base64.encode(data));
+                }
+                ctx.aes().decrypt(data, 0, data, 0, replyKey, replyIV, 0, data.length);
+                //if (log.shouldLog(Log.DEBUG))
+                //    log.debug(reply.getUniqueId() + ": after decrypt: " + Base64.encode(data));
+            }
         }
         // ok, all of the layered encryption is stripped, so lets verify it 
         // (formatted per BuildResponseRecord.create)

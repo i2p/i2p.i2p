@@ -1,5 +1,6 @@
 package net.i2p.router.tunnel.pool;
 
+import net.i2p.crypto.ChaCha20;
 import net.i2p.crypto.EncType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
@@ -9,6 +10,8 @@ import net.i2p.data.PrivateKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.BuildRequestRecord;
 import net.i2p.data.i2np.EncryptedBuildRecord;
+import net.i2p.data.i2np.ShortEncryptedBuildRecord;
+import net.i2p.data.i2np.ShortTunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterThrottleImpl;
@@ -92,39 +95,39 @@ class BuildMessageProcessor {
     public BuildRequestRecord decrypt(TunnelBuildMessage msg, Hash ourHash, PrivateKey privKey) {
         BuildRequestRecord rv = null;
         int ourHop = -1;
-        long beforeActualDecrypt = 0;
-        long afterActualDecrypt = 0;
         byte[] ourHashData = ourHash.getData();
-        long beforeLoop = System.currentTimeMillis();
+        boolean isShort = msg.getType() == ShortTunnelBuildMessage.MESSAGE_TYPE;
         for (int i = 0; i < msg.getRecordCount(); i++) {
             EncryptedBuildRecord rec = msg.getRecord(i);
             boolean eq = DataHelper.eq(ourHashData, 0, rec.getData(), 0, BuildRequestRecord.PEER_SIZE);
             if (eq) {
-                beforeActualDecrypt = System.currentTimeMillis();
                 try {
                     rv = new BuildRequestRecord(ctx, privKey, rec);
-                    afterActualDecrypt = System.currentTimeMillis();
 
-                    // i2pd bug
-                    boolean isBad = SessionKey.INVALID_KEY.equals(rv.readReplyKey());
-                    if (isBad) {
-                        if (log.shouldLog(Log.WARN))
-                            log.warn(msg.getUniqueId() + ": Bad reply key: " + rv);
-                        ctx.statManager().addRateData("tunnel.buildRequestBadReplyKey", 1);
-                        return null;
-                    }
+                    if (isShort) {
+                        // Bloom filter TBD
+                    } else {
+                        // i2pd bug
+                        boolean isBad = SessionKey.INVALID_KEY.equals(rv.readReplyKey());
+                        if (isBad) {
+                            if (log.shouldLog(Log.WARN))
+                                log.warn(msg.getUniqueId() + ": Bad reply key: " + rv);
+                            ctx.statManager().addRateData("tunnel.buildRequestBadReplyKey", 1);
+                            return null;
+                        }
 
-                    // The spec says to feed the 32-byte AES-256 reply key into the Bloom filter.
-                    // But we were using the first 32 bytes of the encrypted reply.
-                    // Fixed in 0.9.24
-                    boolean isEC = ctx.keyManager().getPrivateKey().getType() == EncType.ECIES_X25519;
-                    int off = isEC ? BuildRequestRecord.OFF_REPLY_KEY_EC : BuildRequestRecord.OFF_REPLY_KEY;
-                    boolean isDup = _filter.add(rv.getData(), off, 32);
-                    if (isDup) {
-                        if (log.shouldLog(Log.WARN))
-                            log.warn(msg.getUniqueId() + ": Dup record: " + rv);
-                        ctx.statManager().addRateData("tunnel.buildRequestDup", 1);
-                        return null;
+                        // The spec says to feed the 32-byte AES-256 reply key into the Bloom filter.
+                        // But we were using the first 32 bytes of the encrypted reply.
+                        // Fixed in 0.9.24
+                        boolean isEC = ctx.keyManager().getPrivateKey().getType() == EncType.ECIES_X25519;
+                        int off = isEC ? BuildRequestRecord.OFF_REPLY_KEY_EC : BuildRequestRecord.OFF_REPLY_KEY;
+                        boolean isDup = _filter.add(rv.getData(), off, 32);
+                        if (isDup) {
+                            if (log.shouldLog(Log.WARN))
+                                log.warn(msg.getUniqueId() + ": Dup record: " + rv);
+                            ctx.statManager().addRateData("tunnel.buildRequestDup", 1);
+                            return null;
+                        }
                     }
 
                     if (log.shouldLog(Log.DEBUG))
@@ -150,28 +153,36 @@ class BuildMessageProcessor {
             return null;
         }
         
-        long beforeEncrypt = System.currentTimeMillis();
-        SessionKey replyKey = rv.readReplyKey();
-        byte iv[] = rv.readReplyIV();
-        for (int i = 0; i < msg.getRecordCount(); i++) {
-            if (i != ourHop) {
-                EncryptedBuildRecord data = msg.getRecord(i);
-                //if (log.shouldLog(Log.DEBUG))
-                //    log.debug("Encrypting record " + i + "/? with replyKey " + replyKey.toBase64() + "/" + Base64.encode(iv));
-                // encrypt in-place, corrupts SDS
-                byte[] bytes = data.getData();
-                ctx.aes().encrypt(bytes, 0, bytes, 0, replyKey, iv, 0, EncryptedBuildRecord.LENGTH);
+        if (isShort) {
+            byte[] replyKey = rv.getChaChaReplyKey().getData();
+            byte iv[] = new byte[12];
+            for (int i = 0; i < msg.getRecordCount(); i++) {
+                if (i != ourHop) {
+                    EncryptedBuildRecord data = msg.getRecord(i);
+                    //if (log.shouldLog(Log.DEBUG))
+                    //    log.debug("Encrypting record " + i + "/? with replyKey " + replyKey.toBase64() + "/" + Base64.encode(iv));
+                    // encrypt in-place, corrupts SDS
+                    byte[] bytes = data.getData();
+                    // slot number, little endian
+                    iv[0] = (byte) i;
+                    ChaCha20.encrypt(replyKey, iv, bytes, 0, bytes, 0, ShortEncryptedBuildRecord.LENGTH);
+                }
+            }
+        } else {
+            SessionKey replyKey = rv.readReplyKey();
+            byte iv[] = rv.readReplyIV();
+            for (int i = 0; i < msg.getRecordCount(); i++) {
+                if (i != ourHop) {
+                    EncryptedBuildRecord data = msg.getRecord(i);
+                    //if (log.shouldLog(Log.DEBUG))
+                    //    log.debug("Encrypting record " + i + "/? with replyKey " + replyKey.toBase64() + "/" + Base64.encode(iv));
+                    // encrypt in-place, corrupts SDS
+                    byte[] bytes = data.getData();
+                    ctx.aes().encrypt(bytes, 0, bytes, 0, replyKey, iv, 0, EncryptedBuildRecord.LENGTH);
+                }
             }
         }
-        long afterEncrypt = System.currentTimeMillis();
         msg.setRecord(ourHop, null);
-        if (afterEncrypt-beforeLoop > 1000) {
-            if (log.shouldLog(Log.WARN))
-                log.warn("Slow decryption, total=" + (afterEncrypt-beforeLoop) 
-                         + " looping=" + (beforeEncrypt-beforeLoop)
-                         + " decrypt=" + (afterActualDecrypt-beforeActualDecrypt)
-                         + " encrypt=" + (afterEncrypt-beforeEncrypt));
-        }
         return rv;
     }
 }

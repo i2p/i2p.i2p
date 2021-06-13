@@ -246,6 +246,8 @@ public class BuildRequestRecord {
      * Not to be used for short ECIES records; use the ChaChaReplyKey instead.
      */
     public SessionKey readReplyKey() {
+        if (_isEC && _data.length == LENGTH_EC_SHORT)
+            throw new IllegalStateException();
         byte key[] = new byte[SessionKey.KEYSIZE_BYTES];
         int off = _isEC ? OFF_REPLY_KEY_EC : OFF_REPLY_KEY;
         System.arraycopy(_data, off, key, 0, SessionKey.KEYSIZE_BYTES);
@@ -258,6 +260,8 @@ public class BuildRequestRecord {
      * @return 16 bytes
      */
     public byte[] readReplyIV() {
+        if (_isEC && _data.length == LENGTH_EC_SHORT)
+            throw new IllegalStateException();
         byte iv[] = new byte[IV_SIZE];
         int off = _isEC ? OFF_REPLY_IV_EC : OFF_REPLY_IV;
         System.arraycopy(_data, off, iv, 0, IV_SIZE);
