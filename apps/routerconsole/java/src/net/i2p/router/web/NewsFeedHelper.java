@@ -1,8 +1,6 @@
 package net.i2p.router.web;
 
-import java.text.DateFormat;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
@@ -65,9 +63,6 @@ public class NewsFeedHelper extends HelperBase {
             }
         }
         if (!entries.isEmpty()) {
-            DateFormat fmt = DateFormat.getDateInstance(DateFormat.MEDIUM);
-            // the router sets the JVM time zone to UTC but saves the original here so we can get it
-            fmt.setTimeZone(SystemVersion.getSystemTimeZone(ctx));
             int i = 0;
             for (NewsEntry entry : entries) {
                 if (i < start)
@@ -77,9 +72,8 @@ public class NewsFeedHelper extends HelperBase {
                     break;
                 buf.append("<div class=\"newsentry\"><h3>");
                 if (entry.updated > 0) {
-                    Date date = new Date(entry.updated);
                     buf.append("<span class=\"newsDate\">")
-                       .append(fmt.format(date))
+                       .append(DataHelper.formatDate(entry.updated))
                        .append("</span> ");
                 }
                 if (entry.link != null)
