@@ -3291,7 +3291,6 @@ ul.statlist {
      margin-top: 4px;
      margin-bottom: 2px;
      display: inline-block;
-     vertical-align: middle;
 }
 
 .statlist li.statsName::before {
