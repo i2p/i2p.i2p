@@ -460,6 +460,8 @@ public class DHSessionKeyBuilder {
             // add to the defaults for every 128MB of RAM, up to 512MB
             long maxMemory = SystemVersion.getMaxMemory();
             int factor = (int) Math.max(1l, Math.min(4l, 1 + (maxMemory / (128*1024*1024l))));
+            if (SystemVersion.isSlow())
+                factor *= 2;
             int defaultMin = DEFAULT_DH_PRECALC_MIN * factor;
             int defaultMax = DEFAULT_DH_PRECALC_MAX * factor;
             _minSize = ctx.getProperty(PROP_DH_PRECALC_MIN, defaultMin);
@@ -587,8 +589,8 @@ public class DHSessionKeyBuilder {
                 _log.error("builder returned used", new Exception());
                 return;
             }
-            _context.statManager().addRateData("crypto.DHReused", 1);
-            _builders.offer(builder);
+            if (_builders.offer(builder))
+                _context.statManager().addRateData("crypto.DHReused", 1);
 */
         }
 

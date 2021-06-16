@@ -371,8 +371,8 @@ class OutboundEstablishState {
         _receivedIV = null;
         _receivedSignature = null;
         if (_keyBuilder != null) {
-            if (_keyBuilder.getPeerPublicValue() == null)
-                _keyFactory.returnUnused(_keyBuilder);
+            //if (_keyBuilder.getPeerPublicValue() == null)
+            //    _keyFactory.returnUnused(_keyBuilder);
             _keyBuilder = null;
         }
         // sure, there's a chance the packet was corrupted, but in practice

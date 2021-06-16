@@ -2,12 +2,12 @@ package net.i2p.router.crypto.ratchet;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-import net.i2p.I2PAppContext;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.KeyFactory;
 import net.i2p.crypto.KeyPair;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
+import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
@@ -24,7 +24,7 @@ import net.i2p.util.SystemVersion;
  */
 public class Elg2KeyFactory extends I2PThread implements KeyFactory {
 
-    private final I2PAppContext _context;
+    private final RouterContext _context;
     private final Log _log;
     private final int _minSize;
     private final int _maxSize;
@@ -36,11 +36,12 @@ public class Elg2KeyFactory extends I2PThread implements KeyFactory {
     private final static String PROP_DH_PRECALC_MIN = "crypto.edh.precalc.min";
     private final static String PROP_DH_PRECALC_MAX = "crypto.edh.precalc.max";
     private final static String PROP_DH_PRECALC_DELAY = "crypto.edh.precalc.delay";
-    private final static int DEFAULT_DH_PRECALC_MIN = 10;
-    private final static int DEFAULT_DH_PRECALC_MAX = 30;
+    private final static int DEFAULT_DH_PRECALC_MIN = 20;
+    private final static int DEFAULT_DH_PRECALC_MAX = 60;
     private final static int DEFAULT_DH_PRECALC_DELAY = 25;
+    private final boolean RETURN_UNUSED_TO_XDH;
 
-    public Elg2KeyFactory(I2PAppContext ctx) {
+    public Elg2KeyFactory(RouterContext ctx) {
         super("EDH Precalc");
         _context = ctx;
         _log = ctx.logManager().getLog(Elg2KeyFactory.class);
@@ -52,6 +53,10 @@ public class Elg2KeyFactory extends I2PThread implements KeyFactory {
         // add to the defaults for every 128MB of RAM, up to 512MB
         long maxMemory = SystemVersion.getMaxMemory();
         int factor = (int) Math.max(1l, Math.min(4l, 1 + (maxMemory / (128*1024*1024l))));
+        boolean slow = SystemVersion.isSlow();
+        RETURN_UNUSED_TO_XDH = slow;
+        if (slow)
+            factor *= 2;
         int defaultMin = DEFAULT_DH_PRECALC_MIN * factor;
         int defaultMax = DEFAULT_DH_PRECALC_MAX * factor;
         _minSize = ctx.getProperty(PROP_DH_PRECALC_MIN, defaultMin);
@@ -147,6 +152,8 @@ public class Elg2KeyFactory extends I2PThread implements KeyFactory {
             rv = _context.keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
             enc = Elligator2.encode(rv.getPublic(), _context.random().nextBoolean());
             i++;
+            if (enc == null && RETURN_UNUSED_TO_XDH)
+                _context.commSystem().getXDHFactory().returnUnused(rv);
         } while (enc == null);
         long diff = System.currentTimeMillis() - start;
         _context.statManager().addRateData("crypto.EDHGenerateTime", diff);
@@ -161,8 +168,8 @@ public class Elg2KeyFactory extends I2PThread implements KeyFactory {
      */
     public void returnUnused(Elg2KeyPair kp) {
 /*
-        _context.statManager().addRateData("crypto.EDHReused", 1);
-        _keys.offer(kp);
+        if (_keys.offer(kp))
+            _context.statManager().addRateData("crypto.EDHReused", 1);
 */
     }
 
