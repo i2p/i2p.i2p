@@ -40,7 +40,6 @@ import net.i2p.util.SystemVersion;
 public final class CryptixAESEngine extends AESEngine {
     private final LinkedBlockingQueue<Cipher> _ciphers;
 
-    private final static CryptixRijndael_Algorithm _algo = new CryptixRijndael_Algorithm();
     // keys are now cached in the SessionKey objects
     //private CryptixAESKeyCache _cache;
     
