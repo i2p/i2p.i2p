@@ -110,9 +110,8 @@ abstract class BuildRequestor {
             
             if (i > 0)
                 cfg.getConfig(i-1).setSendTunnelId(hop.getReceiveTunnelId());
-            byte iv[] = new byte[TunnelCreatorConfig.REPLY_IV_LENGTH];
-            ctx.random().nextBytes(iv);
-            cfg.setAESReplyKeys(i, ctx.keyGenerator().generateSessionKey(), iv);
+            // AES reply keys now set in createTunnelBuildMessage(),
+            // as we don't need them for short TBM
         }
         // This is in BuildExecutor.buildTunnel() now
         // And it was overwritten by the one in createTunnelBuildMessage() anyway!
@@ -356,6 +355,20 @@ abstract class BuildRequestor {
             msg = new TunnelBuildMessage(ctx);
             order = new ArrayList<Integer>(ORDER);
         }
+
+        if (!useShortTBM) {
+            int len = cfg.getLength();
+            for (int i = 0; i < len; i++) {
+                HopConfig hop = cfg.getConfig(i);
+                // set IV/Layer keys (formerly in TunnelPool.configureNewTunnel())
+                hop.setIVKey(ctx.keyGenerator().generateSessionKey());
+                hop.setLayerKey(ctx.keyGenerator().generateSessionKey());
+                // set the AES reply keys (formerly in prepare())
+                byte iv[] = new byte[TunnelCreatorConfig.REPLY_IV_LENGTH];
+                ctx.random().nextBytes(iv);
+                cfg.setAESReplyKeys(i, ctx.keyGenerator().generateSessionKey(), iv);
+            }
+        }  // else keys are derived
 
         // This is in BuildExecutor.buildTunnel() now
         //long replyMessageId = ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE);

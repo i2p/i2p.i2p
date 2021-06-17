@@ -1110,6 +1110,9 @@ public class TunnelPool {
     }
     
     /**
+     *  This only sets the peers and creation/expiration times in the configuration.
+     *  For the crypto, see BuildRequestor and BuildMessageGenerator.
+     *
      *  @return null on failure
      */
     PooledTunnelCreatorConfig configureNewTunnel() { return configureNewTunnel(false); }
@@ -1178,8 +1181,7 @@ public class TunnelPool {
             HopConfig hop = cfg.getConfig(j);
             hop.setCreation(now);
             hop.setExpiration(expiration);
-            hop.setIVKey(_context.keyGenerator().generateSessionKey());
-            hop.setLayerKey(_context.keyGenerator().generateSessionKey());
+            // IV and Layer key now set in BuildRequestor.createTunnelBuildMessage()
             // tunnelIds will be updated during building, and as the creator, we
             // don't need to worry about prev/next hop
         }
