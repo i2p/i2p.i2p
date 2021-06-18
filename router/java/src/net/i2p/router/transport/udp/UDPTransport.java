@@ -1048,7 +1048,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (success)
                 _log.warn("UPnP has opened the SSU port: " + port + " via " + Addresses.toString(ip, externalPort));
             else
-                _log.warn("UPnP has failed to open the SSU port: " + port + " reason: " + reason);
+                _log.warn("UPnP has failed to open the SSU port: " + Addresses.toString(ip, externalPort) + " reason: " + reason);
         }
         if (success && ip != null) {
             if (ip.length == 4) {
@@ -1812,7 +1812,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     /**
-     *  Rebuild the IPv4 external address if required
+     *  Rebuild the IPv4 or IPv6 external address if required
      */
     private void rebuildIfNecessary() {
         synchronized (_rebuildLock) {
@@ -2363,7 +2363,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     private RouterAddress rebuildExternalAddress(boolean ipv6) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("REA1");
+            _log.debug("REA1 ipv6? " + ipv6);
         return rebuildExternalAddress(true, ipv6);
     }
 
@@ -2383,7 +2383,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     private RouterAddress rebuildExternalAddress(boolean allowRebuildRouterInfo, boolean ipv6) {
         if (_log.shouldDebug())
-            _log.debug("REA2 " + allowRebuildRouterInfo);
+            _log.debug("REA2 " + allowRebuildRouterInfo + " ipv6? " + ipv6);
         // if the external port is specified, we want to use that to bind to even
         // if we don't know the external host.
         int port = _context.getProperty(PROP_EXTERNAL_PORT, -1);
@@ -2523,8 +2523,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     options = new OrderedProperties(); 
                 }
             }
-            if (!_context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS))
-                return null;
             // As of 0.9.50, make an address with only 4/6 caps
             String caps;
             TransportUtil.IPv6Config config = getIPv6Config();
@@ -2586,8 +2584,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         // if we have explicit external addresses, they had better be reachable
         String caps;
         if (introducersRequired || !canIntroduce(isIPv6)) {
-            if (!directIncluded &&
-                _context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS)) {
+            if (!directIncluded) {
                 if (isIPv6)
                     caps = CAP_TESTING_6;
                 else
@@ -2660,7 +2657,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     _log.info("Address rebuilt: " + addr, new Exception());
                 replaceAddress(addr);
                 if (!isIPv6 &&
-                    _context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS) &&
                     getCurrentAddress(true) == null &&
                     getIPv6Config() != IPV6_DISABLED &&
                     hasIPv6Address()) {
@@ -2695,8 +2691,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 RouterAddress local = new RouterAddress(STYLE, localOpts, DEFAULT_COST);
                 replaceCurrentExternalAddress(local, isIPv6);
             }
-            if (!isIPv6 &&
-                _context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS)) {
+            if (!isIPv6) {
                 // Make an empty "4" address
                 OrderedProperties opts = new OrderedProperties(); 
                 opts.setProperty(UDPAddress.PROP_CAPACITY, CAP_IPV4);
@@ -2882,9 +2877,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return false;
             if (config == IPV6_DISABLED)
                 return false;
-            // must be published with '6' cap
-            if (!_context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS))
-                return false;
             if (isIPv6Firewalled())
                 return true;
             switch (status) {
@@ -2936,9 +2928,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (!_haveIPv6Address)
                 return false;
             if (config == IPV6_DISABLED)
-                return false;
-            // must be published with '6' cap
-            if (!_context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS))
                 return false;
             if (isIPv6Firewalled())
                 return true;

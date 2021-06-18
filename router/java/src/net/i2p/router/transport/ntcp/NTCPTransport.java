@@ -893,8 +893,6 @@ public class NTCPTransport extends TransportImpl {
      *  @since 0.9.50
      */
     private void setOutboundNTCP2Address(boolean ipv6) {
-        if (!_context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS))
-            return;
         // following is like addNTCP2Options() but adds 4 or 6 only,
         // and returns if not appropriately configured
         String caps;
@@ -1247,7 +1245,7 @@ public class NTCPTransport extends TransportImpl {
         if (props.containsKey("host")) {
             props.setProperty("i", _b64Ntcp2StaticIV);
             props.remove("caps");
-        } else if (_context.getProperty(PROP_TRANSPORT_CAPS, ENABLE_TRANSPORT_CAPS)) {
+        } else {
             String caps;
             TransportUtil.IPv6Config config = getIPv6Config();
             if (config == IPV6_ONLY)
@@ -1714,7 +1712,7 @@ public class NTCPTransport extends TransportImpl {
             if (success)
                 _log.warn("UPnP has opened the NTCP port: " + port + " via " + Addresses.toString(ip, externalPort));
             else
-                _log.warn("UPnP has failed to open the NTCP port: " + port + " reason: " + reason);
+                _log.warn("UPnP has failed to open the NTCP port: " + Addresses.toString(ip, externalPort) + " reason: " + reason);
         }
         // if SSU is disabled, externalAddressReceived() will update our address and call rebuildRouterInfo().
         // getReachabilityStatus() should report correctly after address is updated.
