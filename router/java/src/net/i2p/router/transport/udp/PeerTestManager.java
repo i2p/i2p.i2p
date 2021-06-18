@@ -327,29 +327,35 @@ class PeerTestManager {
             boolean expectV6 = test.isIPv6();
             if ((!expectV6 && ipSize != 4) ||
                 (expectV6 && ipSize != 16)) {
-                // There appears to be a bug where Bob is sending us a zero-length IP.
+                // There appears to be an i2pd bug where Bob is sending us a zero-length IP.
                 // We could proceed without setting the IP, but then when Charlie
                 // sends us his message, we will think we are behind a symmetric NAT
                 // because the Bob and Charlie IPs won't match.
-                // So for now we just return and pretend we didn't hear from Bob at all.
-                // Which is essentially what catching the uhe below did,
-                // but without the error message to the log.
-                // To do: fix the bug.
+                // Stop the test.
+                // Sometimes, the first response has an IP but a later one does not,
+                // check every time.
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Bad IP length " + ipSize +
-                               " from bob's reply: " + from + ", " + testInfo);
+                    _log.warn("Bad IP length " + ipSize + " from bob's reply: " + from);
+                // reset all state
+                // so testComplete() will return UNKNOWN
+                test.setAlicePortFromCharlie(0);
+                test.setReceiveCharlieTime(0);
+                test.setReceiveBobTime(0);
+                testComplete();
                 return;
             }
             byte ip[] = new byte[ipSize];
             testInfo.readIP(ip, 0);
             try {
-                InetAddress addr = InetAddress.getByAddress(ip);
-                test.setAliceIP(addr);
+                if (test.getReceiveBobTime() <= 0) {
+                    InetAddress addr = InetAddress.getByAddress(ip);
+                    test.setAliceIP(addr);
+                    int testPort = testInfo.readPort();
+                    if (testPort == 0)
+                        throw new UnknownHostException("port 0");
+                    test.setAlicePort(testPort);
+                } // else ignore IP/port
                 test.setReceiveBobTime(_context.clock().now());
-                int testPort = testInfo.readPort();
-                if (testPort == 0)
-                    throw new UnknownHostException("port 0");
-                test.setAlicePort(testPort);
 
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Receive test reply from Bob: " + test);
@@ -358,7 +364,7 @@ class PeerTestManager {
             } catch (UnknownHostException uhe) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unable to get our IP (length " + ipSize +
-                               ") from bob's reply: " + from + ", " + testInfo, uhe);
+                               ") from bob's reply: " + from, uhe);
                 _context.statManager().addRateData("udp.testBadIP", 1);
             }
         } else {
@@ -431,7 +437,7 @@ class PeerTestManager {
                     sendTestToCharlie();
                 } catch (UnknownHostException uhe) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Charlie's IP is b0rked: " + from + ": " + testInfo);
+                        _log.warn("Charlie's IP is b0rked: " + from);
                     _context.statManager().addRateData("udp.testBadIP", 1);
                 }
             }

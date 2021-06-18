@@ -131,7 +131,8 @@ class PeerTestState {
             buf.append("; Bob: ").append(_bobIP).append(':').append(_bobPort);
         if (_charlieIP != null)
             buf.append(" Charlie: ").append(_charlieIP).append(':').append(_charliePort);
-        buf.append("; last send after ").append(_lastSendTime - _beginTime);
+        if (_lastSendTime > 0)
+            buf.append("; last send after ").append(_lastSendTime - _beginTime);
         if (_receiveAliceTime > 0)
             buf.append("; rcvd from Alice after ").append(_receiveAliceTime - _beginTime);
         if (_receiveBobTime > 0)
