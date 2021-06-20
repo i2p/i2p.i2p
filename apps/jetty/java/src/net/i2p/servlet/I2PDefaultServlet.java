@@ -21,9 +21,11 @@
 package net.i2p.servlet;
 
 import java.io.IOException;
+import java.text.Collator;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -40,6 +42,7 @@ import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.resource.ResourceCollection;
 
+import net.i2p.data.DataHelper;
 
 
 /**
@@ -192,7 +195,7 @@ public class I2PDefaultServlet extends DefaultServlet
         String[] ls = res.list();
         if (ls==null)
             return null;
-        Arrays.sort(ls);
+        DataHelper.sort(ls, new FileComparator(res));
         
         String decodedBase = URIUtil.decodePath(base);
         String title = "Directory: "+deTag(decodedBase);
@@ -270,6 +273,37 @@ public class I2PDefaultServlet extends DefaultServlet
         return buf.toString();
     }
     
+    /**
+     *  I2P
+     *
+     *  @since 0.9.51
+     */
+    private static class FileComparator implements Comparator<String> {
+        private final Comparator<Object> _coll;
+        private final Resource _base;
+
+        public FileComparator(Resource base) {
+            _base = base;
+            _coll = Collator.getInstance(Locale.US);
+        }
+
+        public int compare(String a, String b) {
+            Resource ra, rb;
+            try {
+                ra = _base.addPath(a);
+                rb = _base.addPath(b);
+            } catch (Exception e) { 
+                // see above
+                return 0;
+            }
+            boolean da = ra.isDirectory();
+            boolean db = rb.isDirectory();
+            if (da && !db) return -1;
+            if (!da && db) return 1;
+            return _coll.compare(a, b);
+        }
+    }
+
     /**
      * Copied unchanged from Resource.java
      *
