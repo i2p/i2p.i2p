@@ -288,18 +288,16 @@ public class I2PDefaultServlet extends DefaultServlet
         }
 
         public int compare(String a, String b) {
-            Resource ra, rb;
             try {
-                ra = _base.addPath(a);
-                rb = _base.addPath(b);
-            } catch (Exception e) { 
+                Resource ra = _base.addPath(a);
+                Resource rb = _base.addPath(b);
+                boolean da = ra.isDirectory();
+                boolean db = rb.isDirectory();
+                if (da && !db) return -1;
+                if (!da && db) return 1;
+            } catch (Exception e) {
                 // see above
-                return 0;
             }
-            boolean da = ra.isDirectory();
-            boolean db = rb.isDirectory();
-            if (da && !db) return -1;
-            if (!da && db) return 1;
             return _coll.compare(a, b);
         }
     }
