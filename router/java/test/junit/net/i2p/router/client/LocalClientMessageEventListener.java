@@ -8,7 +8,6 @@ package net.i2p.router.client;
  *
  */
 
-import java.util.Date;
 import java.util.Locale;
 
 import net.i2p.data.Base32;
@@ -51,8 +50,7 @@ class LocalClientMessageEventListener extends ClientMessageEventListener {
         lease.setGateway(Hash.FAKE_HASH);
         TunnelId id = new TunnelId(1);
         lease.setTunnelId(id);
-        Date date = new Date(exp);
-        lease.setEndDate(date);
+        lease.setEndDate(exp);
         ls.addLease(lease);
         _runner.requestLeaseSet(config.getDestination().calculateHash(), ls, exp, null, null);
     }
