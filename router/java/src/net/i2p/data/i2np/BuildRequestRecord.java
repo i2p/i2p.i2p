@@ -94,7 +94,7 @@ import net.i2p.router.RouterContext;
  *
  * ECIES short record format, ref: proposal 157:
  *
- * Holds the unencrypted 172-byte tunnel request record,
+ * Holds the unencrypted 154-byte tunnel request record,
  * with a constructor for ECIES decryption and a method for ECIES encryption.
  * Iterative AES encryption/decryption is done elsewhere.
  *
@@ -111,15 +111,15 @@ import net.i2p.router.RouterContext;
  *   bytes   52-55: next message ID
  *   bytes    56-x: tunnel build options (Mapping)
  *   bytes     x-x: other data as implied by flags or options
- *   bytes   x-171: random padding
+ *   bytes   x-153: random padding
  * </pre>
  *
  * Encrypted:
  * <pre>
  *   bytes    0-15: Hop's truncated identity hash
  *   bytes   16-47: Sender's ephemeral X25519 public key
- *   bytes  48-219: ChaCha20 encrypted BuildRequestRecord
- *   bytes 220-235: Poly1305 MAC
+ *   bytes  48-201: ChaCha20 encrypted BuildRequestRecord
+ *   bytes 202-217: Poly1305 MAC
  * </pre>
  *
  */
@@ -189,10 +189,11 @@ public class BuildRequestRecord {
     private static final int OFF_FLAG_EC_SHORT = OFF_SEND_IDENT_EC + Hash.HASH_LENGTH;
     private static final int OFF_LAYER_ENC_TYPE = OFF_FLAG_EC_SHORT + 3;
     private static final int OFF_REQ_TIME_EC_SHORT = OFF_LAYER_ENC_TYPE + 1;
-    private static final int OFF_EXPIRATION_SHORT = OFF_REQ_TIME_EC + 4;
-    private static final int OFF_SEND_MSG_ID_EC_SHORT = OFF_EXPIRATION + 4;
+    private static final int OFF_EXPIRATION_SHORT = OFF_REQ_TIME_EC_SHORT + 4;
+    private static final int OFF_SEND_MSG_ID_EC_SHORT = OFF_EXPIRATION_SHORT + 4;
     private static final int OFF_OPTIONS_SHORT = OFF_SEND_MSG_ID_EC_SHORT + 4;
-    private static final int LENGTH_EC_SHORT = 172;
+    // 16 byte trunc. hash, 32 byte eph. key, 16 byte MAC
+    private static final int LENGTH_EC_SHORT = ShortTunnelBuildMessage.SHORT_RECORD_SIZE - (16 + 32 + 16);
     private static final int MAX_OPTIONS_LENGTH_SHORT = LENGTH_EC_SHORT - OFF_OPTIONS_SHORT; // includes options length
     
     private static final boolean TEST = false;
@@ -644,7 +645,7 @@ public class BuildRequestRecord {
      * @param nextMsgId message ID to use when sending on to the next hop (or for the reply)
      * @param isInGateway are we the gateway of an inbound tunnel?
      * @param isOutEndpoint are we the endpoint of an outbound tunnel?
-     * @param options 116 bytes max when serialized
+     * @param options 98 bytes max when serialized
      * @since 0.9.51
      * @throws IllegalArgumentException if options too long
      */

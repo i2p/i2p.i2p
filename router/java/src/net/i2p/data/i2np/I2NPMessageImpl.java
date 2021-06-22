@@ -439,9 +439,6 @@ public abstract class I2NPMessageImpl implements I2NPMessage {
             case VariableTunnelBuildReplyMessage.MESSAGE_TYPE:
                 return new VariableTunnelBuildReplyMessage(context);
             // since 0.9.51
-            case InboundTunnelBuildMessage.MESSAGE_TYPE:
-                return new InboundTunnelBuildMessage(context);
-            // since 0.9.51
             case OutboundTunnelBuildReplyMessage.MESSAGE_TYPE:
                 return new OutboundTunnelBuildReplyMessage(context);
             // since 0.9.51

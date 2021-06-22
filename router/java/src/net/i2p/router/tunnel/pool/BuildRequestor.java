@@ -11,7 +11,6 @@ import net.i2p.data.PublicKey;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.InboundTunnelBuildMessage;
 import net.i2p.data.i2np.ShortTunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.data.i2np.VariableTunnelBuildMessage;
@@ -211,8 +210,8 @@ abstract class BuildRequestor {
         //long beforeDispatch = System.currentTimeMillis();
         if (cfg.isInbound()) {
             Hash ibgw = cfg.getPeer(0);
-            if (msg.getType() == InboundTunnelBuildMessage.MESSAGE_TYPE) {
-                // ITBM is garlic encrypted to the IBGW, to hide it from the OBEP
+            if (msg.getType() == ShortTunnelBuildMessage.MESSAGE_TYPE) {
+                // STBM is garlic encrypted to the IBGW, to hide it from the OBEP
                 RouterInfo peer = ctx.netDb().lookupRouterInfoLocally(ibgw);
                 if (peer != null) {
                     I2NPMessage enc = MessageWrapper.wrap(ctx, msg, peer);
@@ -339,10 +338,7 @@ abstract class BuildRequestor {
                 len = TunnelBuildMessage.MAX_RECORD_COUNT;
                 order = new ArrayList<Integer>(ORDER);
             }
-            if (cfg.isInbound())
-                msg = new InboundTunnelBuildMessage(ctx, len);
-            else
-                msg = new ShortTunnelBuildMessage(ctx, len);
+            msg = new ShortTunnelBuildMessage(ctx, len);
         } else if (useVariable) {
             if (cfg.getLength() <= SHORT_RECORDS) {
                 msg = new VariableTunnelBuildMessage(ctx, SHORT_RECORDS);

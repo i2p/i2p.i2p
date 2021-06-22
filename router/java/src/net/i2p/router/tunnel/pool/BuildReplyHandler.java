@@ -62,7 +62,8 @@ class BuildReplyHandler {
                     log.debug(reply.getUniqueId() + ": skipping record " + i + "/" + hop + " for: " + cfg);
                 if (cfg.isInbound() && hop + 1 == cfg.getLength()) { // IBEP
                     byte[] h1 = new byte[Hash.HASH_LENGTH];
-                    ctx.sha().calculateHash(reply.getRecord(i).getData(), 0, TunnelBuildReplyMessage.RECORD_SIZE, h1, 0);
+                    byte[] data = reply.getRecord(i).getData();
+                    ctx.sha().calculateHash(data, 0, data.length, h1, 0);
                     // get stored hash put here by BuildMessageGenerator
                     Hash h2 = cfg.getBlankHash();
                     if (h2 != null && DataHelper.eq(h1, h2.getData())) {

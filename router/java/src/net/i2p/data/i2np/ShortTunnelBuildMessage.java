@@ -10,7 +10,7 @@ import net.i2p.I2PAppContext;
  */
 public class ShortTunnelBuildMessage extends TunnelBuildMessage {
     public static final int MESSAGE_TYPE = 25;
-    public static final int SHORT_RECORD_SIZE = 236;
+    public static final int SHORT_RECORD_SIZE = 218;
 
     /** zero record count, will be set with readMessage() */
     public ShortTunnelBuildMessage(I2PAppContext context) {

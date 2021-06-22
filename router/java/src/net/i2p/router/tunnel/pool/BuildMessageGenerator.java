@@ -12,7 +12,6 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.BuildRequestRecord;
 import net.i2p.data.i2np.EncryptedBuildRecord;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.InboundTunnelBuildMessage;
 import net.i2p.data.i2np.ShortEncryptedBuildRecord;
 import net.i2p.data.i2np.ShortTunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
@@ -41,7 +40,7 @@ abstract class BuildMessageGenerator {
                                     TunnelCreatorConfig cfg, Hash replyRouter,
                                     long replyTunnel, RouterContext ctx, PublicKey peerKey) {
         int mtype = msg.getType();
-        boolean isShort = mtype == InboundTunnelBuildMessage.MESSAGE_TYPE || mtype == ShortTunnelBuildMessage.MESSAGE_TYPE;
+        boolean isShort = mtype == ShortTunnelBuildMessage.MESSAGE_TYPE;
         EncryptedBuildRecord erec;
         if (peerKey != null) {
             boolean isEC = peerKey.getType() == EncType.ECIES_X25519;
@@ -56,6 +55,7 @@ abstract class BuildMessageGenerator {
             Hash peer = cfg.getPeer(hop);
             if (isEC) {
                 erec = req.encryptECIESRecord(ctx, peerKey, peer);
+                // TODO if isShort, set derived keys in coonfig
                 cfg.setChaChaReplyKeys(hop, req.getChaChaReplyKey(), req.getChaChaReplyAD());
             } else {
                 erec = req.encryptRecord(ctx, peerKey, peer);
@@ -163,7 +163,7 @@ abstract class BuildMessageGenerator {
     public static void layeredEncrypt(I2PAppContext ctx, TunnelBuildMessage msg,
                                       TunnelCreatorConfig cfg, List<Integer> order) {
         int mtype = msg.getType();
-        boolean isShort = mtype == InboundTunnelBuildMessage.MESSAGE_TYPE || mtype == ShortTunnelBuildMessage.MESSAGE_TYPE;
+        boolean isShort = mtype == ShortTunnelBuildMessage.MESSAGE_TYPE;
         int size = isShort ? ShortTunnelBuildMessage.SHORT_RECORD_SIZE : TunnelBuildMessage.RECORD_SIZE;
         byte[] chachaIV = isShort ? new byte[12] : null;
         // encrypt the records so that the right elements will be visible at the right time

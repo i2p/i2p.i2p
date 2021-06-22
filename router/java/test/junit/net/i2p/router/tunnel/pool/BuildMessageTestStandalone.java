@@ -24,7 +24,6 @@ import net.i2p.data.i2np.EncryptedBuildRecord;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.I2NPMessageHandler;
-import net.i2p.data.i2np.InboundTunnelBuildMessage;
 import net.i2p.data.i2np.OutboundTunnelBuildReplyMessage;
 import net.i2p.data.i2np.ShortTunnelBuildMessage;
 import net.i2p.data.i2np.ShortTunnelBuildReplyMessage;
@@ -84,20 +83,8 @@ public class BuildMessageTestStandalone extends TestCase {
         
         // populate and encrypt the message
         TunnelBuildMessage msg;
-        if (testType == 3) {
+        if (testType == 3 || testType == 6) {
             msg = new ShortTunnelBuildMessage(ctx, TunnelBuildMessage.MAX_RECORD_COUNT);
-        } else if (testType == 6) {
-            InboundTunnelBuildMessage itbm = new InboundTunnelBuildMessage(ctx, TunnelBuildMessage.MAX_RECORD_COUNT);
-            // set plaintext record for ibgw
-            for (int i = 0; i < order.size(); i++) {
-                int hop = order.get(i).intValue();
-                if (hop == 0) {
-                    // TODO
-                    itbm.setPlaintextRecord(i, new byte[100]);
-                    break;
-                }
-            }
-            msg = itbm;
         } else {
             msg = new TunnelBuildMessage(ctx);
         }
@@ -109,9 +96,7 @@ public class BuildMessageTestStandalone extends TestCase {
             PublicKey key = null;
             if (hop < end)
                 key = _pubKeys[hop];
-            // don't do this for ibgw in itbm
-            if (testType != 6 || hop != 0)
-                BuildMessageGenerator.createRecord(i, hop, msg, cfg, _replyRouter, _replyTunnel, ctx, key);
+            BuildMessageGenerator.createRecord(i, hop, msg, cfg, _replyRouter, _replyTunnel, ctx, key);
         }
         BuildMessageGenerator.layeredEncrypt(ctx, msg, cfg, order);
         
