@@ -316,9 +316,13 @@
     </target>
 
     <target name="jarTest" depends="junit.compileTest">
-        <jar destfile="./build/routertest.jar" basedir="./build/obj" includes="**/*.class">
+        <mkdir dir="build/obj/net/i2p/router/util/resources" />
+        <copy todir="build/obj/net/i2p/router/util/resources" >
+            <fileset dir="../resources" />
+        </copy>
+        <jar destfile="./build/routertest.jar" basedir="./build/obj">
             <manifest>
-                <attribute name="${manifest.classpath.name}" value="i2p.jar" />
+                <attribute name="${manifest.classpath.name}" value="i2ptest.jar" />
                 <attribute name="Specification-Title" value="I2P Router" />
                 <attribute name="Specification-Version" value="${api.version}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />

@@ -1,3 +1,22 @@
+2021-06-22 zzz
+ * Tests: Fix duplicate classes in i2ptest.jar
+ * Tunnels: Changes for new build messages (Prop. 157)
+
+2021-06-20 zzz
+ * Jetty: Case-insensitive sort on directory listing, put directories first
+
+2021-06-18 zzz
+ * Console: Add Permissions-Policy header
+ * SSU: Fix handling of bad peer test responses
+ * Transport: Remove 4/6 caps config
+
+2021-06-16 zzz
+ * Router: Increase key pool sizes for slow machines
+
+2021-06-13 zzz
+ * Tests: Fix and expand BuildMessageTestStandalone
+ * Tunnels: Continue work on new build messages (proposal 157)
+
 2021-06-11 zzz
  * UPnP: Bind to IPv6 addresses for search responses
 

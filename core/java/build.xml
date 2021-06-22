@@ -361,8 +361,12 @@
         <!-- warning - The junit.test target below doesn't actually include i2ptest.jar in the classpath,
              only the build/obj directory.
           -->
+        <mkdir dir="build/obj/net/i2p/util/resources" />
+        <copy todir="build/obj/net/i2p/util/resources" >
+            <fileset dir="../resources" />
+        </copy>
         <jar destfile="./build/i2ptest.jar" basedir="./build/obj" >
-            <fileset dir="./build/obj" includes="**/*.class **/test.data **/baseDblPrecmp **/basePrecmp" />
+            <fileset dir="test/resources" includes="**/test.data **/baseDblPrecmp **/basePrecmp" />
             <!-- the getopt translation files -->
             <fileset dir="src" includes="${translation.includes}" />
             <manifest>
