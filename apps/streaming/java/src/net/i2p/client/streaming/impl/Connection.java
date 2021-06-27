@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -59,7 +58,7 @@ class Connection {
     private final boolean _isInbound;
     private boolean _updatedShareOpts;
     /** Packet ID (Long) to PacketLocal for sent but unacked packets */
-    private final SortedMap<Long, PacketLocal> _outboundPackets;
+    private final TreeMap<Long, PacketLocal> _outboundPackets;
     private final PacketQueue _outboundQueue;
     private final ConnectionPacketHandler _handler;
     private ConnectionOptions _options;
@@ -1481,19 +1480,19 @@ class Connection {
             congestionOccurred();
 
             // 1. Double RTO and backoff (RFC 6298 section 5.5 & 5.6)
-            final long now = _context.clock().now();
             pushBackRTO(_options.doubleRTO());
 
             // 2. cut ssthresh to bandwidth estimate, window to 1
             List<PacketLocal> toResend = null;
             synchronized(_outboundPackets) {
-                if (_outboundPackets.isEmpty()) {
+                Map.Entry<Long, PacketLocal> e = _outboundPackets.firstEntry();
+                if (e == null) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn(Connection.this + " Retransmission timer hit but nothing transmitted??");
                     return;
                 }
 
-                PacketLocal oldest = _outboundPackets.get(_outboundPackets.firstKey());
+                PacketLocal oldest = e.getValue();
                 if (oldest.getNumSends() == 1) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug(Connection.this + " cutting ssthresh and window");
@@ -1574,7 +1573,7 @@ class Connection {
             }
 
             if (sentAny) {
-                _lastSendTime = now;
+                _lastSendTime = _context.clock().now();
                 resetActivityTimer();
                 windowAdjusted();
             }

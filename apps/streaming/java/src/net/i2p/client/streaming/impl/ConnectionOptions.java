@@ -135,7 +135,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final String PROP_TAG_THRESHOLD = "crypto.lowTagThreshold";
     
     
-    private static final int TREND_COUNT = 3;
+    //private static final int TREND_COUNT = 3;
     /** RFC 5681 sec. 3.1 */
     static final int INITIAL_WINDOW_SIZE = 3;
     static final int DEFAULT_MAX_SENDS = 8;
@@ -166,7 +166,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     private static final boolean DEFAULT_ENFORCE_PROTO = true;
 
-    private final int _trend[] = new int[TREND_COUNT];
+    //private final int _trend[] = new int[TREND_COUNT];
 
     /**
      *  OK, here is the calculation on the message size to fit in a single
@@ -632,6 +632,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      *  not public, use updateRTT()
      */
     private void setRTT(int ms) { 
+/*
         synchronized (_trend) {
             _trend[0] = _trend[1];
             _trend[1] = _trend[2];
@@ -642,6 +643,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             else
                 _trend[2] = 0;
         }
+*/
         
         synchronized(this) {
             _rtt = ms; 
@@ -711,9 +713,12 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * If we have 3 consecutive rtt increases, we are trending upwards (1), or if we have
      * 3 consecutive rtt decreases, we are trending downwards (-1), else we're stable.
      *
+     * @deprecated unused as of 0.9.51
      * @return positive/flat/negative trend in round trip time
      */
+    @Deprecated
     public int getRTTTrend() {
+/*
         synchronized (_trend) {
             for (int i = 0; i < TREND_COUNT - 1; i++) {
                 if (_trend[i] != _trend[i+1])
@@ -721,6 +726,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             }
             return _trend[0];
         }
+*/
+        return 0;
     }
     
     /**
