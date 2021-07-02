@@ -288,10 +288,15 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 					boolean v61 = ip.contains(":");
 					boolean v62 = pktIP.contains(":");
 					if (v61 == v62) {
-						ignore = true;
-						if (_log.shouldWarn())
-							_log.warn("Ignoring UPnP with IP mismatch: " + name + " UDN: " + udn +
-							          " dev IP " + ip + " pkt IP: " + pktIP);
+						// canonicalize
+						byte[] b1 = Addresses.getIP(ip);
+						byte[] b2 = Addresses.getIP(pktIP);
+						if (!DataHelper.eq(b1, b2)) {
+							ignore = true;
+							if (_log.shouldWarn())
+								_log.warn("Ignoring UPnP with IP mismatch: " + name + " UDN: " + udn +
+								          " dev IP " + ip + " pkt IP: " + pktIP);
+						}
 					}
 				}
 			}
