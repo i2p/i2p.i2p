@@ -31,7 +31,7 @@ class ConnectionPacketHandler {
     public static final int MAX_SLOW_START_WINDOW = 64;
     
     // see tickets 1939 and 2584
-    private static final int IMMEDIATE_ACK_DELAY = 150;
+    private static final int IMMEDIATE_ACK_DELAY = 120;
 
     public ConnectionPacketHandler(I2PAppContext context) {
         _context = context;
@@ -128,7 +128,8 @@ class ConnectionPacketHandler {
         con.packetReceived();
         
         boolean choke = false;
-        if (packet.isFlagSet(Packet.FLAG_DELAY_REQUESTED)) {
+        boolean delayReq = packet.isFlagSet(Packet.FLAG_DELAY_REQUESTED);
+        if (delayReq) {
             if (packet.getOptionalDelay() >= Packet.MIN_DELAY_CHOKE) {
                 // requested choke 
                 choke = true;
@@ -217,19 +218,19 @@ class ConnectionPacketHandler {
             con.incrementUnackedPacketsReceived();
             con.incrementBytesReceived(packet.getPayloadSize());
             
-            if (packet.isFlagSet(Packet.FLAG_DELAY_REQUESTED) && (packet.getOptionalDelay() <= 0) ) {
+            if (delayReq && packet.getOptionalDelay() <= 0) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Scheduling immediate ack for " + packet);
                 //con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
                 // honor request "almost" immediately
-                // TODO the 250 below _may_ be a big limiter in how fast local "loopback" connections
+                // Note: the delay below _may_ be a big limiter in how fast local "loopback" connections
                 // can go, however if it goes too fast then we start choking which causes
                 // frequent stalls anyway.
                 // see tickets 1939 and 2584
-                con.setNextSendTime(_context.clock().now() + IMMEDIATE_ACK_DELAY);
+                con.setNextSendTime(_context.clock().now() + Math.min(IMMEDIATE_ACK_DELAY, con.getOptions().getRTT() / 8));
             } else {
                 int delay;
-                if (packet.isFlagSet(Packet.FLAG_DELAY_REQUESTED)) // delayed ACK requested
+                if (delayReq) // delayed ACK requested
                     delay = packet.getOptionalDelay();
                 else
                     delay = con.getOptions().getSendAckDelay();
