@@ -65,7 +65,6 @@ public class JettyStart implements ClientApp {
     private static final String GZIP_DIR = "eepsite-jetty9.3";
     private static final String GZIP_CONFIG = "jetty-gzip.xml";
     private static final String MIN_GZIP_HANDLER_VER = "9.3";
-
     /**
      *  All args must be XML file names.
      *  Does not support any of the other argument types from org.mortbay.start.Main.
@@ -179,6 +178,10 @@ public class JettyStart implements ClientApp {
         public void run() {
             for (LifeCycle lc : _jettys) {
                 if (!lc.isRunning()) {
+                    if (lc instanceof Server) {
+                        Server server = (Server) lc;
+                        server.insertHandler(new XI2PLocationFilter());
+                    }
                     try {
                         lc.start();
                         if (_context != null) {
