@@ -158,6 +158,7 @@ public class BuildMessageTestStandalone extends TestCase {
                 for (int j = 0; j < TunnelBuildMessage.MAX_RECORD_COUNT; j++) {
                     if (msg.getRecord(j) == null) {
                         ourSlot = j;
+                        msg.setRecord(j, reply);
                         break;
                     }
                 }
@@ -198,21 +199,8 @@ public class BuildMessageTestStandalone extends TestCase {
         TunnelBuildReplyMessage reply;
         if (testType == 3) {
             OutboundTunnelBuildReplyMessage otbrm = new OutboundTunnelBuildReplyMessage(ctx, TunnelBuildMessage.MAX_RECORD_COUNT);
-            int ibep = _peers.length - 1;
-            int ibepSlot = -1;
-            for (int i = 0; i < order.size(); i++) {
-                int slot = order.get(i).intValue();
-                if (slot == ibep) {
-                    ibepSlot = i;
-                    break;
-                }
-            }
-            log.debug("OTBRM plaintext slot is " + ibepSlot);
             for (int i = 0; i < TunnelBuildMessage.MAX_RECORD_COUNT; i++) {
-                if (i == ibepSlot)
-                    otbrm.setPlaintextRecord(i, 0);
-                else
-                    otbrm.setRecord(i, msg.getRecord(i));
+                otbrm.setRecord(i, msg.getRecord(i));
             }
             // test read/write
             byte[] data = otbrm.toByteArray();
