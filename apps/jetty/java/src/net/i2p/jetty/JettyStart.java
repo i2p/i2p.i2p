@@ -31,6 +31,7 @@ import java.util.Properties;
 import net.i2p.I2PAppContext;
 import net.i2p.app.*;
 import static net.i2p.app.ClientAppState.*;
+import net.i2p.servlet.filters.XI2PLocationFilter;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.PortMapper;
