@@ -84,7 +84,7 @@ public class BuildResponseRecord {
      * @param status the response 0-255
      * @param replyAD 32 bytes
      * @param options 116 bytes max when serialized
-     * @return a 236-byte response record
+     * @return a 218-byte response record
      * @throws IllegalArgumentException if options too big or on encryption failure
      * @since 0.9.51
      */
@@ -111,10 +111,10 @@ public class BuildResponseRecord {
 
     /**
      * Encrypts in place.
-     * Handles both standard (528) and short (236) byte records as of 0.9.51.
+     * Handles both standard (528) and short (218) byte records as of 0.9.51.
      *
      * @param ad non-null
-     * @param data 528 or 236 bytes, data will be encrypted in place.
+     * @param data 528 or 218 bytes, data will be encrypted in place.
      * @return success
      * @since 0.9.48
      */
@@ -131,12 +131,12 @@ public class BuildResponseRecord {
 
     /*
      * ChaCha/Poly only for ECIES routers.
-     * Handles both standard (528) and short (236) byte records as of 0.9.51.
+     * Handles both standard (528) and short (218) byte records as of 0.9.51.
      * Decrypts in place.
      * Status will be rec.getData()[511 or 219].
      * Properties will be at rec.getData()[0].
      *
-     * @param rec 528 or 236 bytes, data will be decrypted in place.
+     * @param rec 528 or 218 bytes, data will be decrypted in place.
      * @param ad non-null
      * @return success
      * @since 0.9.48

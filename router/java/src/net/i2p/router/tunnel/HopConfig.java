@@ -1,7 +1,5 @@
 package net.i2p.router.tunnel;
 
-import java.util.Date;
-
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
@@ -21,8 +19,6 @@ public class HopConfig {
     private Hash _sendTo;
     private SessionKey _layerKey;
     private SessionKey _ivKey;
-    private SessionKey _replyKey;
-    private byte[] _replyIV;
     private long _creation;
     private long _expiration;
     //private Map _options;
@@ -179,20 +175,19 @@ public class HopConfig {
     /** */
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder(64);
+        StringBuilder buf = new StringBuilder(256);
         if (_receiveTunnel != null) {
             buf.append("recv on ");
             buf.append(_receiveTunnel.getTunnelId());
-            buf.append(' ');
         }
-        
         if (_sendTo != null) {
-            buf.append("send to ").append(_sendTo.toBase64().substring(0,4)).append(":");
+            buf.append(" send to ").append(_sendTo.toBase64().substring(0,4)).append(":");
             if (_sendTunnel != null)
                 buf.append(_sendTunnel.getTunnelId());
         }
-        
-        buf.append(" exp. ").append(new Date(_expiration));
+        buf.append(" layer key: ").append(_layerKey);
+        buf.append(" IV key: ").append(_ivKey);
+        buf.append(" exp. ").append(DataHelper.formatTime(_expiration));
         int messagesProcessed = getProcessedMessagesCount();
         if (messagesProcessed > 0)
             buf.append(" used ").append(messagesProcessed).append("KB");

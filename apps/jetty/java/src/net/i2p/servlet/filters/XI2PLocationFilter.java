@@ -1,4 +1,4 @@
-package net.i2p.jetty;
+package net.i2p.servlet.filters;
 
 import java.io.IOException;
 import java.io.File;

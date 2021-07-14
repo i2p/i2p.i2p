@@ -1012,7 +1012,6 @@ class BuildHandler implements Runnable {
             TunnelBuildReplyMessage replyMsg;
             if (state.msg.getType() == ShortTunnelBuildMessage.MESSAGE_TYPE) {
                 OutboundTunnelBuildReplyMessage otbrm  = new OutboundTunnelBuildReplyMessage(_context, records);
-                otbrm.setPlaintextRecord(ourSlot, response);
                 replyMsg = otbrm;
             } else if (records == TunnelBuildMessage.MAX_RECORD_COUNT) {
                 replyMsg = new TunnelBuildReplyMessage(_context);

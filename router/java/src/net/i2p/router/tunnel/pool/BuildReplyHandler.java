@@ -90,10 +90,6 @@ class BuildReplyHandler {
                 rv[i] = ok;
             }
         }
-        if (reply.getType() == OutboundTunnelBuildReplyMessage.MESSAGE_TYPE) {
-            OutboundTunnelBuildReplyMessage otbrm = (OutboundTunnelBuildReplyMessage) reply;
-            rv[otbrm.getPlaintextSlot()] = otbrm.getPlaintextReply();
-        }
         return rv;
     }
 
@@ -109,23 +105,10 @@ class BuildReplyHandler {
     private int decryptRecord(TunnelBuildReplyMessage reply, TunnelCreatorConfig cfg, int recordNum, int hop) {
         EncryptedBuildRecord rec = reply.getRecord(recordNum);
         int type = reply.getType();
-        boolean isOTBRM = type == OutboundTunnelBuildReplyMessage.MESSAGE_TYPE;
         if (rec == null) {
-            if (!isOTBRM) {
-                if (log.shouldWarn())
-                    log.warn("Missing record " + recordNum);
-                return -1;
-            }
-            OutboundTunnelBuildReplyMessage otbrm = (OutboundTunnelBuildReplyMessage) reply;
-            if (otbrm.getPlaintextSlot() != recordNum) {
-                if (log.shouldWarn())
-                    log.warn("Plaintext slot mismatch expected " + recordNum + " got " + otbrm.getPlaintextSlot());
-                return -1;
-            }
-            int rv = otbrm.getPlaintextReply();
-            if (log.shouldLog(Log.DEBUG))
-                log.debug(reply.getUniqueId() + ": Received: " + rv + " for plaintext record " + recordNum + "/" + hop);
-            return rv;
+            if (log.shouldWarn())
+                log.warn("Missing record " + recordNum);
+            return -1;
         }
         byte[] data = rec.getData();
         int start = cfg.getLength() - 1;
@@ -137,6 +120,7 @@ class BuildReplyHandler {
         if (isEC)
             end++;
         // do we need to adjust this for the endpoint?
+        boolean isOTBRM = type == OutboundTunnelBuildReplyMessage.MESSAGE_TYPE;
         boolean isShort = isOTBRM || type == ShortTunnelBuildReplyMessage.MESSAGE_TYPE;
         if (isShort) {
             byte iv[] = new byte[12];
