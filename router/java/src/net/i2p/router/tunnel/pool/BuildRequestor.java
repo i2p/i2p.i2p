@@ -5,22 +5,27 @@ import java.util.Collections;
 import java.util.List;
 
 import net.i2p.crypto.EncType;
+import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.PublicKey;
-import net.i2p.data.router.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.ShortTunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.data.i2np.VariableTunnelBuildMessage;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.JobImpl;
+import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelPoolSettings;
+import net.i2p.router.crypto.ratchet.RatchetSKM;
+import net.i2p.router.crypto.ratchet.MuxedSKM;
 import net.i2p.router.networkdb.kademlia.MessageWrapper;
+import net.i2p.router.networkdb.kademlia.MessageWrapper.OneTimeSession;
 import net.i2p.router.tunnel.HopConfig;
 import net.i2p.router.tunnel.TunnelCreatorConfig;
 import net.i2p.util.Log;
@@ -142,16 +147,51 @@ abstract class BuildRequestor {
         TunnelManagerFacade mgr = ctx.tunnelManager();
         boolean isInbound = settings.isInbound();
         if (settings.isExploratory() || !usePairedTunnels(ctx)) {
-            if (isInbound)
+            if (isInbound) {
                 pairedTunnel = mgr.selectOutboundExploratoryTunnel(farEnd);
-            else
+            } else {
                 pairedTunnel = mgr.selectInboundExploratoryTunnel(farEnd);
+                if (pairedTunnel != null) {
+                    OneTimeSession ots = cfg.getGarlicReplyKeys();
+                    if (ots != null) {
+                        SessionKeyManager skm = ctx.sessionKeyManager();
+                        RatchetSKM rskm = (RatchetSKM) skm;
+                        rskm.tagsReceived(ots.key, ots.rtag, 2 * BUILD_MSG_TIMEOUT);
+                        cfg.setGarlicReplyKeys(null);
+                    }
+                }
+            }
         } else {
             // building a client tunnel
-            if (isInbound)
-                pairedTunnel = mgr.selectOutboundTunnel(settings.getDestination(), farEnd);
-            else
-                pairedTunnel = mgr.selectInboundTunnel(settings.getDestination(), farEnd);
+            Hash from = settings.getDestination();
+            if (isInbound) {
+                pairedTunnel = mgr.selectOutboundTunnel(from, farEnd);
+            } else {
+                pairedTunnel = mgr.selectInboundTunnel(from, farEnd);
+                if (pairedTunnel != null) {
+                    OneTimeSession ots = cfg.getGarlicReplyKeys();
+                    if (ots != null) {
+                        SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(from);
+                        if (skm != null) {
+                            if (skm instanceof RatchetSKM) {
+                                RatchetSKM rskm = (RatchetSKM) skm;
+                                rskm.tagsReceived(ots.key, ots.rtag, 2 * BUILD_MSG_TIMEOUT);
+                                cfg.setGarlicReplyKeys(null);
+                            } else if (skm instanceof MuxedSKM) {
+                                MuxedSKM mskm = (MuxedSKM) skm;
+                                mskm.tagsReceived(ots.key, ots.rtag, 2 * BUILD_MSG_TIMEOUT);
+                                cfg.setGarlicReplyKeys(null);
+                            } else {
+                                // ElG-only won't work, fall back to expl.
+                                pairedTunnel = null;
+                            }
+                        } else {
+                            // no client SKM, fall back to expl.
+                            pairedTunnel = null;
+                        }
+                    }
+                }
+            }
             if (pairedTunnel == null) {   
                 if (isInbound) {
                     // random more reliable than closest ??
@@ -176,6 +216,15 @@ abstract class BuildRequestor {
                         mgr.getInboundSettings().getLength() + mgr.getInboundSettings().getLengthVariance() > 0) {
                         // ditto
                         pairedTunnel = null;
+                    }
+                    if (pairedTunnel != null) {
+                        OneTimeSession ots = cfg.getGarlicReplyKeys();
+                        if (ots != null) {
+                            SessionKeyManager skm = ctx.sessionKeyManager();
+                            RatchetSKM rskm = (RatchetSKM) skm;
+                            rskm.tagsReceived(ots.key, ots.rtag, 2 * BUILD_MSG_TIMEOUT);
+                            cfg.setGarlicReplyKeys(null);
+                        }
                     }
                 }
                 if (pairedTunnel != null && log.shouldLog(Log.INFO))
@@ -296,6 +345,16 @@ abstract class BuildRequestor {
         Hash replyRouter;
         boolean useVariable = SEND_VARIABLE && cfg.getLength() <= MEDIUM_RECORDS;
         boolean useShortTBM = SEND_SHORT && ctx.keyManager().getPublicKey().getType() == EncType.ECIES_X25519;
+        if (useShortTBM && !pool.getSettings().isExploratory()) {
+            // pool must be EC also
+            LeaseSetKeys lsk = ctx.keyManager().getKeys(pool.getSettings().getDestination());
+            if (lsk != null) {
+                if (!lsk.isSupported(EncType.ECIES_X25519))
+                    useShortTBM = false;
+            } else {
+                useShortTBM = false;
+            }
+        }
 
         if (cfg.isInbound()) {
             //replyTunnel = 0; // as above

@@ -9,6 +9,7 @@ import com.southernstorm.noise.protocol.HandshakeState;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.EncType;
+import net.i2p.crypto.HKDF;
 import net.i2p.crypto.KeyFactory;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
@@ -20,12 +21,14 @@ import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.router.crypto.ratchet.RatchetSessionTag;
+import net.i2p.router.networkdb.kademlia.MessageWrapper.OneTimeSession;
 
 /**
  * As of 0.9.48, supports two formats.
  * As of 0.9.51, supports three formats.
  * The original 222-byte ElGamal format, the new 464-byte ECIES format,
- * and the newest 172-byte ECIES format.
+ * and the newest 154-byte ECIES format.
  * See proposal 152 and 157 for details on the new formats.
  *
  * None of the readXXX() calls are cached. For efficiency,
@@ -128,6 +131,10 @@ public class BuildRequestRecord {
     private final boolean _isEC;
     private SessionKey _chachaReplyKey;
     private byte[] _chachaReplyAD;
+    // derived keys for short records
+    private SessionKey _derivedLayerKey;
+    private SessionKey _derivedIVKey;
+    private OneTimeSession _derivedGarlicKeys;
     
     /** 
      * If set in the flag byte, any peer may send a message into this tunnel, but if
@@ -195,6 +202,12 @@ public class BuildRequestRecord {
     // 16 byte trunc. hash, 32 byte eph. key, 16 byte MAC
     private static final int LENGTH_EC_SHORT = ShortTunnelBuildMessage.SHORT_RECORD_SIZE - (16 + 32 + 16);
     private static final int MAX_OPTIONS_LENGTH_SHORT = LENGTH_EC_SHORT - OFF_OPTIONS_SHORT; // includes options length
+    // short record HKDF
+    private static final byte[] ZEROLEN = new byte[0];
+    private static final String INFO_1 = "SMTunnelReplyKey";
+    private static final String INFO_2 = "SMTunnelLayerKey";
+    private static final String INFO_3 = "TunnelLayerIVKey";
+    private static final String INFO_4 = "RGarlicKeyAndTag";
     
     private static final boolean TEST = false;
     private static KeyFactory TESTKF;
@@ -226,6 +239,8 @@ public class BuildRequestRecord {
      * Tunnel layer encryption key that the current hop should use
      */
     public SessionKey readLayerKey() {
+        if (_data.length == LENGTH_EC_SHORT)
+            return _derivedLayerKey;
         byte key[] = new byte[SessionKey.KEYSIZE_BYTES];
         int off = _isEC ? OFF_LAYER_KEY_EC : OFF_LAYER_KEY;
         System.arraycopy(_data, off, key, 0, SessionKey.KEYSIZE_BYTES);
@@ -236,6 +251,8 @@ public class BuildRequestRecord {
      * Tunnel IV encryption key that the current hop should use
      */
     public SessionKey readIVKey() {
+        if (_data.length == LENGTH_EC_SHORT)
+            return _derivedIVKey;
         byte key[] = new byte[SessionKey.KEYSIZE_BYTES];
         int off = _isEC ? OFF_IV_KEY_EC : OFF_IV_KEY;
         System.arraycopy(_data, off, key, 0, SessionKey.KEYSIZE_BYTES);
@@ -345,7 +362,7 @@ public class BuildRequestRecord {
             return null;
         }
     }
-    
+
     /**
      * ECIES short record only.
      * @return 0 for ElGamal or ECIES long record
@@ -355,6 +372,15 @@ public class BuildRequestRecord {
         if (_data.length == LENGTH_EC_SHORT)
             return _data[OFF_LAYER_ENC_TYPE] & 0xff;
         return 0;
+    }
+
+    /**
+     * ECIES short OBEP record only.
+     * @return null for ElGamal or ECIES long record or non-OBEP
+     * @since 0.9.51
+     */
+    public OneTimeSession readGarlicKeys() {
+        return _derivedGarlicKeys;
     }
 
     /**
@@ -385,8 +411,10 @@ public class BuildRequestRecord {
      * Encrypt the record to the specified peer. ECIES only.
      * The ChaCha reply key and IV will be available via the getters
      * after this call.
+     * For short records, derived keys will be available via
+     * readLayerKey(), readIVKey(), and readGarlicKeys() after this call.
      * See class javadocs for format.
-     * See proposal 152.
+     * See proposals 152 and 157.
      *
      * @return non-null
      * @since 0.9.48
@@ -406,9 +434,37 @@ public class BuildRequestRecord {
             state.start();
             state.writeMessage(out, PEER_SIZE, _data, 0, _data.length);
             EncryptedBuildRecord rv = isShort ? new ShortEncryptedBuildRecord(out) : new EncryptedBuildRecord(out);
-            _chachaReplyKey = new SessionKey(state.getChainingKey());
             _chachaReplyAD = new byte[32];
             System.arraycopy(state.getHandshakeHash(), 0, _chachaReplyAD, 0, 32);
+            byte[] ck = state.getChainingKey();
+            if (isShort) {
+                byte[] crk = new byte[32];
+                byte[] newck = new byte[32];
+                HKDF hkdf = new HKDF(ctx);
+                hkdf.calculate(ck, ZEROLEN, INFO_1, newck, crk, 0);
+                _chachaReplyKey = new SessionKey(crk);
+                System.arraycopy(newck, 0, ck, 0, 32);
+                byte[] dlk = new byte[32];
+                hkdf.calculate(ck, ZEROLEN, INFO_2, newck, dlk, 0);
+                _derivedLayerKey = new SessionKey(dlk);
+                boolean isOBEP = readIsOutboundEndpoint();
+                if (isOBEP) {
+                    System.arraycopy(newck, 0, ck, 0, 32);
+                    byte[] divk = new byte[32];
+                    hkdf.calculate(ck, ZEROLEN, INFO_3, newck, divk, 0);
+                    _derivedIVKey = new SessionKey(divk);
+                    System.arraycopy(newck, 0, ck, 0, 32);
+                    byte[] dgk = new byte[32];
+                    hkdf.calculate(ck, ZEROLEN, INFO_4, newck, dgk, 0);
+                    SessionKey sdgk = new SessionKey(dgk);
+                    RatchetSessionTag rst = new RatchetSessionTag(newck);
+                    _derivedGarlicKeys = new OneTimeSession(sdgk, rst);
+                } else {
+                    _derivedIVKey = new SessionKey(newck);
+                }
+            } else {
+                _chachaReplyKey = new SessionKey(ck);
+            }
             return rv;
         } catch (GeneralSecurityException gse) {
             throw new IllegalStateException("failed", gse);
@@ -491,9 +547,37 @@ public class BuildRequestRecord {
                 decrypted = new byte[isShort ? LENGTH_EC_SHORT : LENGTH_EC];
                 state.readMessage(encrypted, PEER_SIZE, len - PEER_SIZE,
                                   decrypted, 0);
-                _chachaReplyKey = new SessionKey(state.getChainingKey());
                 _chachaReplyAD = new byte[32];
                 System.arraycopy(state.getHandshakeHash(), 0, _chachaReplyAD, 0, 32);
+                byte[] ck = state.getChainingKey();
+                if (isShort) {
+                    byte[] crk = new byte[32];
+                    byte[] newck = new byte[32];
+                    HKDF hkdf = new HKDF(ctx);
+                    hkdf.calculate(ck, ZEROLEN, INFO_1, newck, crk, 0);
+                    _chachaReplyKey = new SessionKey(crk);
+                    System.arraycopy(newck, 0, ck, 0, 32);
+                    byte[] dlk = new byte[32];
+                    hkdf.calculate(ck, ZEROLEN, INFO_2, newck, dlk, 0);
+                    _derivedLayerKey = new SessionKey(dlk);
+                    boolean isOBEP = (decrypted[OFF_FLAG_EC_SHORT] & FLAG_OUTBOUND_ENDPOINT) != 0;
+                    if (isOBEP) {
+                        System.arraycopy(newck, 0, ck, 0, 32);
+                        byte[] divk = new byte[32];
+                        hkdf.calculate(ck, ZEROLEN, INFO_3, newck, divk, 0);
+                        _derivedIVKey = new SessionKey(divk);
+                        System.arraycopy(newck, 0, ck, 0, 32);
+                        byte[] dgk = new byte[32];
+                        hkdf.calculate(ck, ZEROLEN, INFO_4, newck, dgk, 0);
+                        SessionKey sdgk = new SessionKey(dgk);
+                        RatchetSessionTag rst = new RatchetSessionTag(newck);
+                        _derivedGarlicKeys = new OneTimeSession(sdgk, rst);
+                    } else {
+                        _derivedIVKey = new SessionKey(newck);
+                    }
+                } else {
+                    _chachaReplyKey = new SessionKey(ck);
+                }
             } catch (GeneralSecurityException gse) {
                 if (state != null) {
                     Log log = ctx.logManager().getLog(BuildRequestRecord.class);
@@ -690,7 +774,7 @@ public class BuildRequestRecord {
         StringBuilder buf = new StringBuilder(256);
         buf.append(_isEC ? "ECIES" : "ElGamal");
         if (_data.length == LENGTH_EC_SHORT)
-            buf.append(" short ");
+            buf.append(" short");
         buf.append(" BRR ");
         boolean isIBGW = readIsInboundGateway();
         boolean isOBEP = readIsOutboundEndpoint();
@@ -704,10 +788,10 @@ public class BuildRequestRecord {
                .append(" out: ").append(readNextTunnelId());
         }
         buf.append(" to: ").append(readNextIdentity());
+        buf.append(" layer key: ").append(readLayerKey())
+           .append(" IV key: ").append(readIVKey());
         if (_data.length != LENGTH_EC_SHORT) {
-            buf.append(" layer key: ").append(readLayerKey())
-               .append(" IV key: ").append(readIVKey())
-               .append(" reply key: ").append(readReplyKey())
+            buf.append(" reply key: ").append(readReplyKey())
                .append(" reply IV: ").append(Base64.encode(readReplyIV()));
         }
         buf.append(" time: ").append(DataHelper.formatTime(readRequestTime()))
@@ -718,6 +802,10 @@ public class BuildRequestRecord {
             if (_chachaReplyKey != null) {
                 buf.append(" chacha reply key: ").append(_chachaReplyKey)
                    .append(" chacha reply IV: ").append(Base64.encode(_chachaReplyAD));
+            }
+            if (_derivedGarlicKeys != null) {
+                buf.append(" garlic reply key: ").append(_derivedGarlicKeys.key)
+                   .append(" garlic reply tag: ").append(_derivedGarlicKeys.rtag);
             }
         }
         // to chase i2pd bug

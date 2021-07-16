@@ -215,6 +215,16 @@ public class MuxedSKM extends SessionKeyManager {
         _elg.tagsReceived(key, sessionTags, expire);
     }
 
+    /**
+     * EC only
+     * One time session
+     * @param expire time from now
+     * @since 0.9.51
+     */
+    public void tagsReceived(SessionKey key, RatchetSessionTag tag, long expire) {
+        _ec.tagsReceived(key, tag, expire);
+    }
+
     @Override
     public SessionKey consumeTag(SessionTag tag) {
         SessionKey rv = _elg.consumeTag(tag);

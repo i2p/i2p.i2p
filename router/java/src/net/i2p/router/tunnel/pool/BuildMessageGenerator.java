@@ -46,7 +46,6 @@ abstract class BuildMessageGenerator {
             boolean isEC = peerKey.getType() == EncType.ECIES_X25519;
             BuildRequestRecord req;
             if ( (!cfg.isInbound()) && (hop + 1 == cfg.getLength()) ) //outbound endpoint
-                /// TODO if isEC && isShort
                 req = createUnencryptedRecord(ctx, cfg, hop, replyRouter, replyTunnel, isEC, isShort);
             else
                 req = createUnencryptedRecord(ctx, cfg, hop, null, -1, isEC, isShort);
@@ -55,8 +54,15 @@ abstract class BuildMessageGenerator {
             Hash peer = cfg.getPeer(hop);
             if (isEC) {
                 erec = req.encryptECIESRecord(ctx, peerKey, peer);
-                // TODO if isShort, set derived keys in coonfig
                 cfg.setChaChaReplyKeys(hop, req.getChaChaReplyKey(), req.getChaChaReplyAD());
+                if (isShort) {
+                    // save derived keys
+                    HopConfig hopConfig = cfg.getConfig(hop);
+                    hopConfig.setLayerKey(req.readLayerKey());
+                    hopConfig.setIVKey(req.readIVKey());
+                    if (!cfg.isInbound() && hop + 1 == cfg.getLength()) //outbound endpoint
+                        cfg.setGarlicReplyKeys(req.readGarlicKeys());
+                }
             } else {
                 erec = req.encryptRecord(ctx, peerKey, peer);
             }
@@ -114,11 +120,6 @@ abstract class BuildMessageGenerator {
             }
             SessionKey layerKey = hopConfig.getLayerKey();
             SessionKey ivKey = hopConfig.getIVKey();
-            SessionKey replyKey = cfg.getAESReplyKey(hop);
-            byte iv[] = cfg.getAESReplyIV(hop);
-            if (iv == null) {
-                throw new IllegalStateException();
-            }
             boolean isInGW = (cfg.isInbound() && (hop == 0));
             boolean isOutEnd = (!cfg.isInbound() && (hop + 1 >= cfg.getLength()));
             
@@ -137,11 +138,19 @@ abstract class BuildMessageGenerator {
                                                  nextMsgId,
                                                  isInGW, isOutEnd, EmptyProperties.INSTANCE);
                 } else {
+                    SessionKey replyKey = cfg.getAESReplyKey(hop);
+                    byte iv[] = cfg.getAESReplyIV(hop);
+                    if (iv == null)
+                        throw new IllegalStateException();
                     rec = new BuildRequestRecord(ctx, recvTunnelId, nextTunnelId, nextPeer,
                                                  nextMsgId, layerKey, ivKey, replyKey, 
                                                  iv, isInGW, isOutEnd, EmptyProperties.INSTANCE);
                 }
             } else {
+                SessionKey replyKey = cfg.getAESReplyKey(hop);
+                byte iv[] = cfg.getAESReplyIV(hop);
+                if (iv == null)
+                    throw new IllegalStateException();
                 rec = new BuildRequestRecord(ctx, recvTunnelId, peer, nextTunnelId, nextPeer,
                                              nextMsgId, layerKey, ivKey, replyKey, 
                                              iv, isInGW, isOutEnd);

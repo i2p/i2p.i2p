@@ -64,6 +64,9 @@ public class BuildMessageTestStandalone extends TestCase {
      */
     private void x_testBuildMessage(RouterContext ctx, int testType) {
         Log log = ctx.logManager().getLog(getClass());
+        log.debug("\n================================================================" +
+                  "\nTest " + testType +
+                  "\n================================================================");
         // set our keys to avoid NPE
         KeyPair kpr = ctx.keyGenerator().generatePKIKeys((testType == 1 || testType == 4) ? EncType.ELGAMAL_2048 : EncType.ECIES_X25519);
         PublicKey k1 = kpr.getPublic();
@@ -102,7 +105,7 @@ public class BuildMessageTestStandalone extends TestCase {
         
         log.debug("\n================================================================" +
                   "\nMessage fully encrypted" + 
-                  "\n" + cfg +
+                  "\n" + cfg.toStringFull() +
                   "\n================================================================");
         
         if (testType == 3 || testType == 6) {
@@ -137,6 +140,12 @@ public class BuildMessageTestStandalone extends TestCase {
             long time = req.readRequestTime();
             long now = (ctx.clock().now() / (60l*60l*1000l)) * (60*60*1000);
             int ourSlot = -1;
+            for (int j = 0; j < TunnelBuildMessage.MAX_RECORD_COUNT; j++) {
+                if (msg.getRecord(j) == null) {
+                    ourSlot = j;
+                    break;
+                }
+            }
 
             EncryptedBuildRecord reply;
             if (testType == 1 || testType == 4) {
@@ -144,25 +153,9 @@ public class BuildMessageTestStandalone extends TestCase {
             } else if (testType == 2 || testType == 5) {
                 reply = BuildResponseRecord.create(ctx, 0, req.getChaChaReplyKey(), req.getChaChaReplyAD(), EmptyProperties.INSTANCE);
             } else {
-                reply = BuildResponseRecord.createShort(ctx, 0, req.getChaChaReplyKey(), req.getChaChaReplyAD(), EmptyProperties.INSTANCE);
+                reply = BuildResponseRecord.createShort(ctx, 0, req.getChaChaReplyKey(), req.getChaChaReplyAD(), EmptyProperties.INSTANCE, ourSlot);
             }
-            if (testType != 3 || i != cfg.getLength() - 1) {
-                for (int j = 0; j < TunnelBuildMessage.MAX_RECORD_COUNT; j++) {
-                    if (msg.getRecord(j) == null) {
-                        ourSlot = j;
-                        msg.setRecord(j, reply);
-                        break;
-                    }
-                }
-            } else {
-                for (int j = 0; j < TunnelBuildMessage.MAX_RECORD_COUNT; j++) {
-                    if (msg.getRecord(j) == null) {
-                        ourSlot = j;
-                        msg.setRecord(j, reply);
-                        break;
-                    }
-                }
-            }
+            msg.setRecord(ourSlot, reply);
 
             if (testType == 1 || testType == 4) {
                 log.debug("Read slot " + ourSlot + " containing hop " + i + " @ " + _peers[i].toBase64() 
@@ -233,7 +226,7 @@ public class BuildMessageTestStandalone extends TestCase {
         }
         
         log.debug("\n================================================================" +
-                  "\nAll peers agree? " + allAgree + 
+                  "\nTest " + testType + " complete, all peers agree? " + allAgree + 
                   "\n================================================================");
         assertTrue("All peers agree", allAgree);
     }
@@ -289,12 +282,18 @@ public class BuildMessageTestStandalone extends TestCase {
             HopConfig hop = cfg.getConfig(i);
             hop.setCreation(now);
             hop.setExpiration(now+10*60*1000);
-            hop.setIVKey(ctx.keyGenerator().generateSessionKey());
-            hop.setLayerKey(ctx.keyGenerator().generateSessionKey());
-            byte iv[] = new byte[BuildRequestRecord.IV_SIZE];
-            Arrays.fill(iv, (byte)i); // consistent for repeatability
-            cfg.setAESReplyKeys(i, ctx.keyGenerator().generateSessionKey(), iv);
+            if (testType != 3 && testType != 6) {
+                hop.setIVKey(ctx.keyGenerator().generateSessionKey());
+                hop.setLayerKey(ctx.keyGenerator().generateSessionKey());
+                byte iv[] = new byte[BuildRequestRecord.IV_SIZE];
+                Arrays.fill(iv, (byte)i); // consistent for repeatability
+                cfg.setAESReplyKeys(i, ctx.keyGenerator().generateSessionKey(), iv);
+            }
             hop.setReceiveTunnelId(new TunnelId(i+1));
+            if (i != _peers.length - 1) {
+                hop.setSendTo(_peers[i + 1]);
+                hop.setSendTunnelId(new TunnelId(i+2));
+            }
         }
         return cfg;
     }

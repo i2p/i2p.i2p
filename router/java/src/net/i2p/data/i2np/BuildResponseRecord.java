@@ -84,12 +84,13 @@ public class BuildResponseRecord {
      * @param status the response 0-255
      * @param replyAD 32 bytes
      * @param options 116 bytes max when serialized
+     * @param slot the slot number, 0-7
      * @return a 218-byte response record
      * @throws IllegalArgumentException if options too big or on encryption failure
      * @since 0.9.51
      */
     public static ShortEncryptedBuildRecord createShort(I2PAppContext ctx, int status, SessionKey replyKey,
-                                                        byte replyAD[], Properties options) {
+                                                        byte replyAD[], Properties options, int slot) {
         byte rv[] = new byte[ShortTunnelBuildMessage.SHORT_RECORD_SIZE];
         int off;
         try {
@@ -103,7 +104,7 @@ public class BuildResponseRecord {
         else if (sz < 0)
             throw new IllegalArgumentException("options");
         rv[ShortTunnelBuildMessage.SHORT_RECORD_SIZE - 17] = (byte) status;
-        boolean ok = encryptAEADBlock(replyAD, rv, replyKey);
+        boolean ok = encryptAEADBlock(replyAD, rv, replyKey, slot);
         if (!ok)
             throw new IllegalArgumentException("encrypt fail");
         return new ShortEncryptedBuildRecord(rv);
@@ -111,14 +112,16 @@ public class BuildResponseRecord {
 
     /**
      * Encrypts in place.
-     * Handles both standard (528) and short (218) byte records as of 0.9.51.
+     * Handles standard (528) byte records only.
      *
      * @param ad non-null
-     * @param data 528 or 218 bytes, data will be encrypted in place.
+     * @param data 528 bytes, data will be encrypted in place.
      * @return success
      * @since 0.9.48
      */
     private static final boolean encryptAEADBlock(byte[] ad, byte data[], SessionKey key) {
+        if (data.length != EncryptedBuildRecord.LENGTH)
+            throw new IllegalArgumentException();
         ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
         chacha.initializeKey(key.getData(), 0);
         try {
@@ -131,19 +134,74 @@ public class BuildResponseRecord {
 
     /*
      * ChaCha/Poly only for ECIES routers.
-     * Handles both standard (528) and short (218) byte records as of 0.9.51.
+     * Handles standard (528) byte records only.
      * Decrypts in place.
-     * Status will be rec.getData()[511 or 219].
+     * Status will be rec.getData()[511].
      * Properties will be at rec.getData()[0].
      *
-     * @param rec 528 or 218 bytes, data will be decrypted in place.
+     * @param rec 528 bytes, data will be decrypted in place.
      * @param ad non-null
      * @return success
      * @since 0.9.48
      */
     public static boolean decrypt(EncryptedBuildRecord rec, SessionKey key, byte[] ad) {
+        if (rec.length() != EncryptedBuildRecord.LENGTH)
+            throw new IllegalArgumentException();
         ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
         chacha.initializeKey(key.getData(), 0);
+        try {
+            // this is safe to do in-place, it checks the mac before starting decryption
+            byte[] data = rec.getData();
+            chacha.decryptWithAd(ad, data, 0, data, 0, rec.length());
+        } catch (GeneralSecurityException e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Encrypts in place.
+     * Handles short (218) byte records only.
+     *
+     * @param ad non-null
+     * @param data 218 bytes, data will be encrypted in place.
+     * @param nonce the slot number, 0-7
+     * @return success
+     * @since 0.9.51
+     */
+    private static final boolean encryptAEADBlock(byte[] ad, byte data[], SessionKey key, int nonce) {
+        if (data.length != ShortEncryptedBuildRecord.LENGTH || nonce < 0 || nonce > 7)
+            throw new IllegalArgumentException();
+        ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
+        chacha.initializeKey(key.getData(), 0);
+        chacha.setNonce(nonce);
+        try {
+            chacha.encryptWithAd(ad, data, 0, data, 0, data.length - 16);
+        } catch (GeneralSecurityException e) {
+            return false;
+        }
+        return true;
+    }
+
+    /*
+     * ChaCha/Poly only for ECIES routers.
+     * Handles short (218) byte records only.
+     * Decrypts in place.
+     * Status will be rec.getData()[201].
+     * Properties will be at rec.getData()[0].
+     *
+     * @param rec 218 bytes, data will be decrypted in place.
+     * @param ad non-null
+     * @param nonce the slot number, 0-7
+     * @return success
+     * @since 0.9.51
+     */
+    public static boolean decrypt(EncryptedBuildRecord rec, SessionKey key, byte[] ad, int nonce) {
+        if (rec.length() != ShortEncryptedBuildRecord.LENGTH || nonce < 0 || nonce > 7)
+            throw new IllegalArgumentException();
+        ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
+        chacha.initializeKey(key.getData(), 0);
+        chacha.setNonce(nonce);
         try {
             // this is safe to do in-place, it checks the mac before starting decryption
             byte[] data = rec.getData();

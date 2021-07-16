@@ -159,7 +159,11 @@ class BuildReplyHandler {
             if (log.shouldDebug())
                 log.debug(reply.getUniqueId() + ": Decrypting chacha/poly record " + recordNum + "/" + hop + " with replyKey " 
                           + replyKey.toBase64() + "/" + Base64.encode(replyIV) + ": " + cfg);
-            boolean ok = BuildResponseRecord.decrypt(rec, replyKey, replyIV);
+            boolean ok;
+            if (isShort)
+                ok = BuildResponseRecord.decrypt(rec, replyKey, replyIV, recordNum);
+            else
+                ok = BuildResponseRecord.decrypt(rec, replyKey, replyIV);
             if (!ok) {
                 if (log.shouldWarn())
                     log.debug(reply.getUniqueId() + ": chacha reply decrypt fail on " + recordNum + "/" + hop);

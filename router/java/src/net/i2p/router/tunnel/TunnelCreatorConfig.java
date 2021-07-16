@@ -10,6 +10,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.TunnelId;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
+import net.i2p.router.networkdb.kademlia.MessageWrapper.OneTimeSession;
 
 /**
  * Coordinate the info that the tunnel creator keeps track of, including what 
@@ -45,6 +46,8 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
     private byte[][] _ChaReplyADs;
     private final SessionKey[] _AESReplyKeys;
     private final byte[][] _AESReplyIVs;
+    // short record OBEP only
+    private OneTimeSession _garlicReplyKeys;
     
     /**
      *  IV length for {@link #getAESReplyIV}
@@ -270,6 +273,7 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
     
     /**
      *  Key to encrypt the reply sent for the tunnel creation crypto.
+     *  Null for short build record.
      *
      *  @return key or null
      *  @throws IllegalArgumentException if iv not 16 bytes
@@ -279,6 +283,7 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
 
     /**
      *  IV used to encrypt the reply sent for the tunnel creation crypto.
+     *  Null for short build record.
      *
      *  @return 16 bytes or null
      *  @since 0.9.48 moved from HopConfig
@@ -340,6 +345,24 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
         return _ChaReplyADs[hop];
     }
 
+    /**
+     * ECIES short OBEP record only.
+     * @return null for ElGamal or ECIES long record or non-OBEP
+     * @since 0.9.51
+     */
+    public void setGarlicReplyKeys(OneTimeSession keys) {
+        _garlicReplyKeys = keys;
+    }
+
+    /**
+     * ECIES short OBEP record only.
+     * @return null for ElGamal or ECIES long record or non-OBEP
+     * @since 0.9.51
+     */
+    public OneTimeSession getGarlicReplyKeys() {
+        return _garlicReplyKeys;
+    }
+
     @Override
     public String toString() {
         // H0:1235-->H1:2345-->H2:2345
@@ -380,6 +403,24 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
     
         if (_failures > 0)
             buf.append(" with ").append(_failures).append(" failures");
+        return buf.toString();
+    }
+
+    /**
+     * @since 0.9.51
+     */
+    public String toStringFull() {
+        StringBuilder buf = new StringBuilder(1024);
+        buf.append(toString());
+        for (int i = 0; i < _peers.length; i++) {
+             if (i == 0)
+                 buf.append("\nGW   ");
+             else if (i == _peers.length - 1)
+                 buf.append("\nEP   ");
+             else
+                 buf.append("\nHop ").append(i);
+             buf.append(": ").append(_config[i]);
+        }
         return buf.toString();
     }
 }
