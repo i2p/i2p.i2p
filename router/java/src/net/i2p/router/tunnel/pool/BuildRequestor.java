@@ -146,19 +146,15 @@ abstract class BuildRequestor {
         Hash farEnd = cfg.getFarEnd();
         TunnelManagerFacade mgr = ctx.tunnelManager();
         boolean isInbound = settings.isInbound();
+        // OB only, short record only
+        SessionKeyManager replySKM = null;
         if (settings.isExploratory() || !usePairedTunnels(ctx)) {
             if (isInbound) {
                 pairedTunnel = mgr.selectOutboundExploratoryTunnel(farEnd);
             } else {
                 pairedTunnel = mgr.selectInboundExploratoryTunnel(farEnd);
                 if (pairedTunnel != null) {
-                    OneTimeSession ots = cfg.getGarlicReplyKeys();
-                    if (ots != null) {
-                        SessionKeyManager skm = ctx.sessionKeyManager();
-                        RatchetSKM rskm = (RatchetSKM) skm;
-                        rskm.tagsReceived(ots.key, ots.rtag, 2 * BUILD_MSG_TIMEOUT);
-                        cfg.setGarlicReplyKeys(null);
-                    }
+                    replySKM = ctx.sessionKeyManager();
                 }
             }
         } else {
@@ -169,26 +165,10 @@ abstract class BuildRequestor {
             } else {
                 pairedTunnel = mgr.selectInboundTunnel(from, farEnd);
                 if (pairedTunnel != null) {
-                    OneTimeSession ots = cfg.getGarlicReplyKeys();
-                    if (ots != null) {
-                        SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(from);
-                        if (skm != null) {
-                            if (skm instanceof RatchetSKM) {
-                                RatchetSKM rskm = (RatchetSKM) skm;
-                                rskm.tagsReceived(ots.key, ots.rtag, 2 * BUILD_MSG_TIMEOUT);
-                                cfg.setGarlicReplyKeys(null);
-                            } else if (skm instanceof MuxedSKM) {
-                                MuxedSKM mskm = (MuxedSKM) skm;
-                                mskm.tagsReceived(ots.key, ots.rtag, 2 * BUILD_MSG_TIMEOUT);
-                                cfg.setGarlicReplyKeys(null);
-                            } else {
-                                // ElG-only won't work, fall back to expl.
-                                pairedTunnel = null;
-                            }
-                        } else {
-                            // no client SKM, fall back to expl.
-                            pairedTunnel = null;
-                        }
+                    replySKM = ctx.clientManager().getClientSessionKeyManager(from);
+                    if (replySKM == null && cfg.getGarlicReplyKeys() != null) {
+                        // no client SKM, fall back to expl.
+                        pairedTunnel = null;
                     }
                 }
             }
@@ -218,13 +198,7 @@ abstract class BuildRequestor {
                         pairedTunnel = null;
                     }
                     if (pairedTunnel != null) {
-                        OneTimeSession ots = cfg.getGarlicReplyKeys();
-                        if (ots != null) {
-                            SessionKeyManager skm = ctx.sessionKeyManager();
-                            RatchetSKM rskm = (RatchetSKM) skm;
-                            rskm.tagsReceived(ots.key, ots.rtag, 2 * BUILD_MSG_TIMEOUT);
-                            cfg.setGarlicReplyKeys(null);
-                        }
+                        replySKM = ctx.sessionKeyManager();
                     }
                 }
                 if (pairedTunnel != null && log.shouldLog(Log.INFO))
@@ -305,6 +279,21 @@ abstract class BuildRequestor {
             }
             OutNetMessage outMsg = new OutNetMessage(ctx, msg, ctx.clock().now() + FIRST_HOP_TIMEOUT, PRIORITY, peer);
             outMsg.setOnFailedSendJob(new TunnelBuildFirstHopFailJob(ctx, cfg, exec));
+            OneTimeSession ots = cfg.getGarlicReplyKeys();
+            if (ots != null && replySKM != null) {
+                if (replySKM instanceof RatchetSKM) {
+                    RatchetSKM rskm = (RatchetSKM) replySKM;
+                    rskm.tagsReceived(ots.key, ots.rtag, 2 * BUILD_MSG_TIMEOUT);
+                } else if (replySKM instanceof MuxedSKM) {
+                    MuxedSKM mskm = (MuxedSKM) replySKM;
+                    mskm.tagsReceived(ots.key, ots.rtag, 2 * BUILD_MSG_TIMEOUT);
+                } else {
+                    // non-EC client, shouldn't happen, checked at top of createTunnelBuildMessage() below
+                    if (log.shouldWarn())
+                        log.warn("Unsupported SKM for garlic reply to: " + cfg);
+                }
+                cfg.setGarlicReplyKeys(null);
+            }
             try {
                 ctx.outNetMessagePool().add(outMsg);
             } catch (RuntimeException re) {
@@ -345,8 +334,8 @@ abstract class BuildRequestor {
         Hash replyRouter;
         boolean useVariable = SEND_VARIABLE && cfg.getLength() <= MEDIUM_RECORDS;
         boolean useShortTBM = SEND_SHORT && ctx.keyManager().getPublicKey().getType() == EncType.ECIES_X25519;
-        if (useShortTBM && !pool.getSettings().isExploratory()) {
-            // pool must be EC also
+        if (useShortTBM && !cfg.isInbound() && !pool.getSettings().isExploratory()) {
+            // client must be EC also to get garlic OTBRM reply
             LeaseSetKeys lsk = ctx.keyManager().getKeys(pool.getSettings().getDestination());
             if (lsk != null) {
                 if (!lsk.isSupported(EncType.ECIES_X25519))

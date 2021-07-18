@@ -318,7 +318,8 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                         _context.statManager().addRateData("tunnel.handleLoadClove", 1);
                         data = null;
                         //_context.inNetMessagePool().add(data, null, null);
-                } else if (_client != null && type != DeliveryStatusMessage.MESSAGE_TYPE) {
+                } else if (_client != null && type != DeliveryStatusMessage.MESSAGE_TYPE &&
+                           type != OutboundTunnelBuildReplyMessage.MESSAGE_TYPE) {
                             // drop it, since the data we receive shouldn't include other stuff, 
                             // as that might open an attack vector
                             _context.statManager().addRateData("tunnel.dropDangerousClientTunnelMessage", 1, 

@@ -421,6 +421,9 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
                  buf.append("\nHop ").append(i);
              buf.append(": ").append(_config[i]);
         }
+        if (_garlicReplyKeys != null) {
+            buf.append("\nGarlic reply key: ").append(_garlicReplyKeys.key).append(" tag: ").append(_garlicReplyKeys.rtag);
+        }
         return buf.toString();
     }
 }

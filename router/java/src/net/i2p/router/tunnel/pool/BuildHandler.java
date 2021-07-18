@@ -13,7 +13,6 @@ import net.i2p.data.EmptyProperties;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
-import net.i2p.data.SessionKey;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.BuildRequestRecord;
 import net.i2p.data.i2np.BuildResponseRecord;
@@ -32,9 +31,7 @@ import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
-import net.i2p.router.crypto.ratchet.RatchetSessionTag;
 import net.i2p.router.networkdb.kademlia.MessageWrapper;
-import net.i2p.router.networkdb.kademlia.MessageWrapper.OneTimeSession;
 import net.i2p.router.peermanager.TunnelHistory;
 import net.i2p.router.tunnel.HopConfig;
 import net.i2p.router.tunnel.TunnelDispatcher;
@@ -161,9 +158,10 @@ class BuildHandler implements Runnable {
         
         _processor = new BuildMessageProcessor(ctx);
         // used for previous hop, for all requests
-        _requestThrottler = new RequestThrottler(ctx);
+        boolean testMode = ctx.getBooleanProperty("i2np.allowLocal");
+        _requestThrottler = testMode ? null : new RequestThrottler(ctx);
         // used for previous and next hops, for successful builds only
-        _throttler = new ParticipatingThrottler(ctx);
+        _throttler = testMode ? null : new ParticipatingThrottler(ctx);
         _buildReplyHandler = new BuildReplyHandler(ctx);
         _buildMessageHandlerJob = new TunnelBuildMessageHandlerJob(ctx);
         _buildReplyMessageHandlerJob = new TunnelBuildReplyMessageHandlerJob(ctx);
@@ -854,7 +852,7 @@ class BuildHandler implements Runnable {
         // Check participating throttle counters for previous and next hops
         // This is at the end as it compares to a percentage of created tunnels.
         // We may need another counter above for requests.
-        if (response == 0 && !isInGW) {
+        if (response == 0 && !isInGW && _throttler != null) {
             if (from != null && _throttler.shouldThrottle(from)) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Rejecting tunnel (hop throttle), previous hop: " + from + ": " + req);
@@ -864,7 +862,7 @@ class BuildHandler implements Runnable {
             }
         }
         if (response == 0 && (!isOutEnd) &&
-            _throttler.shouldThrottle(nextPeer)) {
+            _throttler != null && _throttler.shouldThrottle(nextPeer)) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Rejecting tunnel (hop throttle), next hop: " + req);
             _context.statManager().addRateData("tunnel.rejectHopThrottle", 1);
@@ -1020,10 +1018,7 @@ class BuildHandler implements Runnable {
             I2NPMessage outMessage;
             if (state.msg.getType() == ShortTunnelBuildMessage.MESSAGE_TYPE) {
                 // garlic encrypt
-                OneTimeSession ots = req.readGarlicKeys();
-                SessionKey sk = ots.key;
-                RatchetSessionTag st = ots.rtag;
-                outMessage = MessageWrapper.wrap(_context, replyMsg, sk, st);
+                outMessage = MessageWrapper.wrap(_context, replyMsg, req.readGarlicKeys());
                 if (outMessage == null) {
                     if (_log.shouldWarn())
                         _log.warn("OTBRM encrypt fail");
@@ -1102,7 +1097,7 @@ class BuildHandler implements Runnable {
                             accept = false;
                         }
                     }
-                    if (accept) {
+                    if (accept && _requestThrottler != null) {
                         // early request throttle check, before queueing and decryption
                         Hash fh = fromHash;
                         if (fh == null && from != null)
