@@ -14,7 +14,7 @@ Content-Security-Policy: default-src 'none'; style-src 'self' 'unsafe-inline' ht
 <head>
 <title>_("Website Unknown")</title>
 <link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
-<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css">
+<link href="http://proxy.i2p/themes/console/default/proxy.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 <div class="logo">
@@ -34,6 +34,5 @@ _("Otherwise, find a Base 32 or address helper link, or use a jump service link 
 _("Seeing this page often? See {0}the FAQ{1} for help in {2}adding some subscriptions{3} to your addressbook.", "<a href=\"http://127.0.0.1:7657/help#addressbooksubs\">", "</a>", "<a href=\"http://127.0.0.1:7657/susidns/config\">", "</a>")
 </p>
 <hr>
-<p>
-<b>_("Could not find the following destination:")</b>
-</p>
+<span><b>_("Could not find the following destination:")</b>
+</span>

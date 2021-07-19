@@ -1,0 +1,291 @@
+
+body {
+    margin: 5px 0px 0px;
+    padding: 0px;
+    text-align: center;
+    background-color: rgb(31, 26, 36);
+    color: rgb(230, 230, 231);
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+    font-size: 8.5pt;
+    line-height: 130%;
+    font-family: 'Droid Sans', 'Noto Sans', Ubuntu, 'Segoe UI', 'Bitstream Vera Sans', 'DejaVu Sans', Verdana, 'Lucida Grande', Helvetica, sans-serif;
+    background-position: initial initial;
+    background-repeat: initial initial;
+}
+
+img {
+    border: none;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    border: 1px groove rgb(82, 75, 94);
+    padding: 1px;
+    font-size: 9pt;
+    margin: 1px 0px;
+}
+
+tr {
+    vertical-align: middle;
+}
+
+tr:nth-child(odd) {
+    vertical-align: middle;
+}
+
+td {
+    padding: 4px 6px;
+    color: rgb(230, 230, 231);
+    vertical-align: middle;
+    border-top-width: 1px;
+    border-top-style: inset;
+    border-top-color: rgb(41, 41, 41);
+}
+
+td img {
+    padding: 0px 1px 0px 2px;
+}
+
+a:link {
+    color: rgb(119, 120, 191);
+    text-decoration: none;
+    font-weight: bold;
+    word-wrap: break-word;
+}
+
+a:visited {
+    color: rgb(119, 120, 191);
+    text-decoration: none;
+    font-weight: bold;
+    word-wrap: break-word;
+}
+
+p {
+    text-align: justify;
+    line-height: 160%;
+}
+
+p img:first-child {
+    display: none !important;
+}
+
+h1 {
+    text-align: left;
+    color: rgb(230, 230, 231);
+    padding: 13px 15px;
+    font-size: 17pt;
+    font-weight: bold;
+    font-style: normal;
+    letter-spacing: 0.15em;
+    text-shadow: rgb(0, 17, 0) 0px 0px 2px;
+    white-space: normal;
+    background-image: url(images/header.png);
+    background-color: rgb(0, 0, 0);
+    border: 1px solid rgb(41, 41, 41);
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+    line-height: 120%;
+    min-width: 620px;
+    box-shadow: rgb(0, 0, 0) 0px 1px 5px;
+    margin: 0px 5px 0px 216px !important;
+    background-position: 50% 50%;
+    background-repeat: initial initial;
+}
+
+h2 {
+    font-size: 12pt;
+    color: rgb(230, 230, 231);
+    text-shadow: rgb(0, 17, 0) 0px 0px 2px;
+    letter-spacing: 0.08em;
+    word-spacing: 0.1em;
+    padding: 10px;
+    border: 1px solid rgb(41, 41, 41);
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    border-bottom-left-radius: 2px;
+    vertical-align: middle;
+    word-wrap: break-word;
+    margin: 15px 0px 12px !important;
+}
+
+h2 {
+    box-shadow: rgb(0, 0, 0) 0px 0px 0px 1px inset;
+}
+
+h1 {
+    background-color: rgb(31, 26, 36);
+    box-shadow: rgb(0, 0, 0) 0px 0px 0px 1px inset;
+    text-shadow: rgb(0, 0, 0) 0px 1px 1px;
+    border: 1px groove rgb(82, 75, 94);
+    background-position: initial initial;
+    background-repeat: initial initial;
+}
+
+hr {
+    background-color: rgb(225, 219, 233);
+    height: 1px;
+    border: 0px solid rgb(82, 75, 94);
+    margin: 20px 0px 10px;
+    background-position: initial initial;
+    background-repeat: initial initial;
+}
+
+hr:last-child {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.right {
+    text-align: right;
+    margin: 0px 1px;
+    display: inline-block;
+    width: 40%;
+}
+
+.hostadd {
+    height: 10rem;
+    width: 100%;
+}
+
+.hostaddform {
+    width: 48%;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.logo {
+    float: left;
+    padding: 10px;
+    text-align: center;
+    color: rgb(34, 34, 34);
+    margin: 0px 85px;
+    border: 1px solid rgb(68, 68, 119);
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    border-bottom-left-radius: 2px;
+    background-position: initial initial;
+    background-repeat: initial initial;
+}
+
+.logo hr {
+    margin: 8px -10px;
+    height: 1px;
+    background-position: initial initial;
+    background-repeat: initial initial;
+}
+
+.warning hr {
+    background-image: linear-gradient(to right, rgb(119, 120, 191), rgb(194, 196, 239));
+    background-position: initial initial;
+    background-repeat: initial initial;
+}
+
+.logo a {
+    width: 100%;
+    display: inline-block !important;
+}
+
+.logo hr~a {
+    margin: 3px 2px;
+}
+
+.warning {
+    padding: 10px 25px 20px 75px;
+    text-align: start;
+    margin: 0px 10px;
+}
+
+.warning:not(old) {
+    background-attachment: scroll, initial;
+    background-origin: initial, initial;
+    background-clip: initial, initial;
+    background-size: 54px, 100%;
+    background-position: 10px calc(50% + 32px);
+    background-repeat: no-repeat;
+}
+
+.warning h3 {
+    text-align: left;
+    padding: 10px 10px 8px;
+    font-size: 1.1rem;
+}
+
+#jumplinks {
+    text-align: start;
+}
+
+#jumplinks > a {
+    border: black;
+        border-top-style: none;
+        border-top-width: medium;
+        border-right-style: none;
+        border-right-width: medium;
+        border-bottom-style: none;
+        border-bottom-width: medium;
+        border-left-style: none;
+        border-left-width: medium;
+    border-style: outset;
+    margin: 2px;
+    float: none;
+    display: inline-block;
+    width: 80%;
+    border-width: 1px;
+    border-radius: 12px;
+    vertical-align: middle;
+    font-size: 1.1rem;
+    text-align: start;
+    padding-top: 1.5%;
+    padding-bottom: 1.5%;
+    padding-left: 1%;
+}
+
+#jumplinks > a:hover {
+    text-decoration: none;
+    color: #da736b !important;
+    border: 1px solid #da736b !important;
+    box-shadow: inset 0 1px 1px 0 #eff;
+}
+
+#jumplinks > h4 {
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+#warning > a {
+    font-size: 1.1rem;
+}
+
+span b {
+    font-size: 1.1rem;
+}
+
+element {
+    height: 6em;
+    min-width: 0;
+    min-height: 0;
+    width: 96%;
+}
+
+table,
+tr,
+td {
+    font-family: 'Droid Sans', 'Noto Sans', Ubuntu, 'Segoe UI', 'Lucida Grande', Verdana, Helvetica, sans-serif;
+    font-size: 10pt;
+}
+
+@media screen and (min-width: 1500px) {
+    body {
+        font-size: 10pt !important;
+    }
+    h1 {
+        margin-left: 242px !important;
+    }
+}
+
