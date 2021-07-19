@@ -300,7 +300,7 @@ public abstract class LocalHTTPServer {
                                .append(_t("Your new encryption key"))
                                .append("</title>\n" +
                                        "<link rel=\"shortcut icon\" href=\"http://proxy.i2p/themes/console/images/favicon.ico\" >\n" +
-                                       "<link href=\"http://proxy.i2p/themes/console/default/console.css\" rel=\"stylesheet\" type=\"text/css\" >\n" +
+                                       "<link href=\"http://proxy.i2p/themes/console/default/proxy.css\" rel=\"stylesheet\" type=\"text/css\" >\n" +
                                        "</head><body>\n" +
                                        "<div class=logo>\n" +
                                        "<a href=\"")
@@ -375,7 +375,7 @@ public abstract class LocalHTTPServer {
                   "<html><head>"+
                   "<title>" + _t("Redirecting to {0}", idn) + "</title>\n" +
                   "<link rel=\"shortcut icon\" href=\"http://proxy.i2p/themes/console/images/favicon.ico\" >\n" +
-                  "<link href=\"http://proxy.i2p/themes/console/default/console.css\" rel=\"stylesheet\" type=\"text/css\" >\n" +
+                  "<link href=\"http://proxy.i2p/themes/console/default/proxy.css\" rel=\"stylesheet\" type=\"text/css\" >\n" +
                   "<meta http-equiv=\"Refresh\" content=\"1; url=" + url + "\">\n" +
                   "</head><body>\n" +
                   "<div class=logo>\n" +
@@ -410,7 +410,7 @@ public abstract class LocalHTTPServer {
                   "<html><head>"+
                   "<title>" + _t("Redirecting to {0}", idn) + "</title>\n" +
                   "<link rel=\"shortcut icon\" href=\"http://proxy.i2p/themes/console/images/favicon.ico\" >\n" +
-                  "<link href=\"http://proxy.i2p/themes/console/default/console.css\" rel=\"stylesheet\" type=\"text/css\" >\n" +
+                  "<link href=\"http://proxy.i2p/themes/console/default/proxy.css\" rel=\"stylesheet\" type=\"text/css\" >\n" +
                   "<meta http-equiv=\"Refresh\" content=\"1; url=" + url + "\">\n" +
                   "</head><body>\n" +
                   "<div class=logo>\n" +

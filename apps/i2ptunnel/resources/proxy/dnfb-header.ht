@@ -12,7 +12,7 @@ Content-Security-Policy: default-src 'none'; style-src 'self' 'unsafe-inline' ht
 <html><head>
 <title>_("Warning: Invalid Destination")</title>
 <link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
-<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css">
+<link href="http://proxy.i2p/themes/console/default/proxy.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 <div class="logo">
@@ -28,5 +28,5 @@ _("The I2P host could also be offline.")
 <span>_("You may want to {0}retry{1}.", "<a href=\"\">", "</a>")</span>
 </p>
 <hr>
-<p><b>_("Could not find the following destination:")</b>
-</p>
+<span><b>_("Could not find the following destination:")</b>
+</span>

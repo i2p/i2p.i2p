@@ -1,0 +1,311 @@
+
+
+html {
+    margin: 0px !important;
+}
+
+body {
+    margin: 6px;
+    text-align: center;
+    color: rgb(51, 51, 63);
+    font-size: 9pt;
+    line-height: 130%;
+    background-color: rgb(246, 246, 250);
+    background-position: initial initial;
+    background-repeat: initial initial;
+}
+
+b {
+    color: rgb(65, 70, 95);
+}
+
+body {
+    font-family: 'Droid Sans', 'Noto Sans', Ubuntu, 'Segoe UI', 'Lucida Grande', Verdana, Helvetica, sans-serif;
+}
+
+* {
+    outline: none;
+}
+
+img {
+    border: none;
+}
+
+.logo {
+    float: left;
+    padding: 10px;
+    text-align: center;
+    color: rgb(34, 34, 34);
+    margin: 0px 10px;
+    border: 1px solid rgb(68, 68, 119);
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    border-bottom-left-radius: 2px;
+    background-color: rgb(248, 248, 255);
+    box-shadow: rgb(187, 187, 255) 0px 0px 0px 1px inset;
+    background-position: initial initial;
+    background-repeat: initial initial;
+}
+
+.logo hr {
+    margin: 8px -10px;
+    background-color: rgb(119, 120, 191);
+    height: 1px;
+    background-position: initial initial;
+    background-repeat: initial initial;
+}
+
+.warning hr {
+    background-image: linear-gradient(to right, rgb(119, 120, 191), rgb(194, 196, 239));
+    background-position: initial initial;
+    background-repeat: initial initial;
+}
+
+.logo a {
+    width: 100%;
+    display: inline-block !important;
+}
+
+.logo hr~a {
+    margin: 3px 2px;
+}
+
+.warning {
+    padding: 10px 25px 20px 75px;
+    text-align: start;
+    color: rgb(34, 34, 34);
+    margin: 0px 10px;
+    border: 1px solid rgb(68, 68, 119);
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    border-bottom-left-radius: 2px;
+    background-color: rgb(248, 248, 255);
+    box-shadow: rgb(187, 187, 255) 0px 0px 0px 1px inset;
+}
+
+.warning:not(old) {
+    background-image: url(/themes/console/images/itoopie_sm.png), linear-gradient(rgba(248, 248, 255, 0.8), rgba(240, 240, 255, 0.8));
+    background-attachment: scroll, initial;
+    background-origin: initial, initial;
+    background-clip: initial, initial;
+    background-size: 54px, 100%;
+    background-position: 10px calc(50% + 32px);
+    background-repeat: no-repeat;
+}
+
+.warning h3 {
+    text-align: left;
+    border-style: none none solid;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(68, 68, 119);
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+    padding: 10px 10px 8px;
+    font-size: 1.1rem;
+}
+
+@media screen and (max-width: 800px) {
+    .warning {
+        margin: 114px 5px 0px !important;
+        background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.298039)) !important;
+        background-color: rgb(248, 248, 255) !important;
+        padding-left: 25px !important;
+        background-position: initial initial !important;
+        background-repeat: initial initial !important;
+    }
+    .warning h3 {
+        font-size: 10pt !important;
+    }
+    .logo {
+        position: absolute;
+        top: 0px;
+        min-width: 430px;
+        width: calc(100% - 40px) !important;
+        margin: 10px 5px 0px !important;
+    }
+    .logo a:link:not(img) {
+        display: inline-block;
+        width: auto;
+        margin: 0px 5px;
+    }
+}
+
+.logo hr {
+    visibility: hidden;
+}
+
+@media screen and (min-height: 700px) {
+    .warning {
+        margin-bottom: 30px;
+    }
+}
+
+.logo {
+    background-color: rgb(246, 246, 250) !important;
+    background-position: initial initial !important;
+    background-repeat: initial initial !important;
+}
+
+hr {
+    color: rgb(17, 17, 51);
+    background-color: rgb(17, 17, 51);
+    height: 1px;
+    border: 0px solid rgb(17, 17, 51);
+    margin: 10px 0px;
+    background-position: initial initial;
+    background-repeat: initial initial;
+}
+
+a,
+h3 {
+    text-shadow: rgb(255, 255, 255) 0px 1px 1px;
+}
+
+a:link {
+    color: rgb(59, 107, 191);
+    text-decoration: none;
+    font-weight: bold;
+    word-wrap: break-word;
+    outline: none;
+    padding-top: 4px;
+}
+
+a:hover {
+    color: rgb(59, 107, 191);
+    text-decoration: none;
+    font-weight: bold;
+    word-wrap: break-word;
+    outline: none;
+    padding-top: 4px;
+}
+
+p {
+    text-align: justify;
+    line-height: 130%;
+}
+
+h3 {
+    padding: 7px 5px 6px 7px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    border-bottom-left-radius: 0px;
+    font-size: 11pt;
+    letter-spacing: 0.08em;
+    word-spacing: 0.1em;
+    color: rgb(65, 70, 95);
+    border: 1px solid rgb(222, 226, 230);
+}
+
+h3 {
+    background-color: rgb(245, 245, 245) !important;
+    background-position: initial initial !important;
+    background-repeat: initial initial !important;
+}
+
+.right {
+    text-align: right;
+    margin: 0px 1px;
+    display: inline-block;
+    width: 40%;
+}
+
+.hostadd {
+    height: 10rem;
+    width: 100%;
+    border-radius: 12px;
+    background: #eef;
+}
+
+.hostaddform {
+    width: 48%;
+    display: inline-block;
+    vertical-align: top;
+}
+
+#jumplinks {
+    text-align: start;
+}
+
+#jumplinks > a {
+    border: black;
+        border-top-style: none;
+        border-top-width: medium;
+        border-right-style: none;
+        border-right-width: medium;
+        border-bottom-style: none;
+        border-bottom-width: medium;
+        border-left-style: none;
+        border-left-width: medium;
+    border-style: outset;
+    margin: 2px;
+    float: none;
+    display: inline-block;
+    width: 80%;
+    border-width: 1px;
+    border-radius: 12px;
+    vertical-align: middle;
+    font-size: 1.1rem;
+    text-align: start;
+    padding-top: 1.5%;
+    padding-bottom: 1.5%;
+    padding-left: 1%;
+    background: #ddd;
+    background: linear-gradient(to bottom, #eee, #fff);
+}
+
+#jumplinks > a:hover {
+    text-decoration: none;
+    color: #19191f;
+    border: 1px solid #f60 !important;
+    background: #ddd;
+    background: linear-gradient(to bottom, #eee, #fff);
+    box-shadow: inset 0 0 0 1px #fff !important;
+    filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.8));
+    transition: ease border 0.7s;
+}
+
+
+#jumplinks > h4 {
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+#warning > a {
+    font-size: 1.1rem;
+}
+
+span b {
+    font-size: 1.1rem;
+}
+
+element {
+    height: 6em;
+    min-width: 0;
+    min-height: 0;
+    width: 96%;
+}
+
+table,
+tr,
+td {
+    font-family: 'Droid Sans', 'Noto Sans', Ubuntu, 'Segoe UI', 'Lucida Grande', Verdana, Helvetica, sans-serif;
+    font-size: 10pt;
+}
+
+@media screen and (max-width: 1500px) {
+    body {
+        margin: 4px;
+    }
+}
+
+@media screen and (min-width: 1500px) {
+    body {
+        font-size: 10pt !important;
+    }
+}
+

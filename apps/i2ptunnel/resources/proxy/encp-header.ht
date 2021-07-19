@@ -12,7 +12,7 @@ Content-Security-Policy: default-src 'none'; style-src 'self' 'unsafe-inline' ht
 <html><head>
 <title>_("Outproxy Unreachable")</title>
 <link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
-<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css">
+<link href="http://proxy.i2p/themes/console/default/proxy.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 <div class="logo">
@@ -26,4 +26,5 @@ _("The HTTP outproxy was not reachable, because it uses encryption options that 
 <span>_("You may want to {0}retry{1} as this will randomly reselect an outproxy from the pool you have defined {2}here{3} (if you have more than one configured).", "<a href=\"\">", "</a>", "<a href=\"http://127.0.0.1:7657/i2ptunnelmgr\">", "</a>")</span>
 _("If you continue to have trouble you may want to edit your outproxy list {0}here{1}.", "<a href=\"http://127.0.0.1:7657/i2ptunnelmgr/edit?tunnel=0\">", "</a>")
 </p>
-<hr><p><b>_("Could not connect to the following destination:")</b></p>
+<hr><span><b>_("Could not find the following destination:")</b>
+</span>
