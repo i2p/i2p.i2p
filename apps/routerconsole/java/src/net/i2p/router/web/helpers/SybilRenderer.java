@@ -68,7 +68,7 @@ public class SybilRenderer {
     private static final int PAIRMAX = Analysis.PAIRMAX;
     private static final int MAX = Analysis.MAX;
     private static final double MIN_CLOSE = Analysis.MIN_CLOSE;
-    private static final double MIN_DISPLAY_POINTS = 12.01;
+    private static final double MIN_DISPLAY_POINTS = 20.0;
     private static final int[] HOURS = { 1, 6, 24, 7*24, 30*24, 0 };
     private static final int[] DAYS = { 2, 7, 30, 90, 365, 0 };
 
@@ -502,6 +502,13 @@ public class SybilRenderer {
      *  @since 0.9.38 split out from renderRouterInfoHTML()
      */
     private void renderThreatsHTML(Writer out, StringBuilder buf, long date, Map<Hash, Points> points) throws IOException {
+        double threshold = Analysis.DEFAULT_BLOCK_THRESHOLD;
+        try {
+            threshold = Double.parseDouble(_context.getProperty(Analysis.PROP_THRESHOLD, Double.toString(threshold)));
+            if (threshold < Analysis.MIN_BLOCK_POINTS)
+                threshold = Analysis.MIN_BLOCK_POINTS;
+        } catch (NumberFormatException nfe) {}
+        final double minDisplay = Math.min(threshold, MIN_DISPLAY_POINTS);
         if (!points.isEmpty()) {
             List<Hash> warns = new ArrayList<Hash>(points.keySet());
             Collections.sort(warns, new PointsComparator(points));
@@ -510,7 +517,7 @@ public class SybilRenderer {
             for (Hash h : warns) {
                 Points pp = points.get(h);
                 double p = pp.getPoints();
-                if (p < MIN_DISPLAY_POINTS)
+                if (p < minDisplay)
                     break;  // sorted
                 buf.append("<p class=\"threatpoints\"><b>Threat Points: " + fmt.format(p) + "</b></p><ul>");
                 List<String> reasons = pp.getReasons();
