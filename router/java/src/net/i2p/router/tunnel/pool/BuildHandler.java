@@ -803,6 +803,16 @@ class BuildHandler implements Runnable {
         //if ( (response == 0) && (_context.random().nextInt(50) <= 1) )
         //    response = TunnelHistory.TUNNEL_REJECT_PROBABALISTIC_REJECT;
         
+        if (response == 0) {
+            // only in short build request, otherwise 0
+            int type = req.readLayerEncryptionType();
+            if (type != 0) {
+                if (_log.shouldWarn())
+                    _log.warn("Unsupported layer enc. type: " + type);
+                response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
+            }
+        }
+
         long recvDelay = now - state.recvTime;
 
         if (response == 0) {
