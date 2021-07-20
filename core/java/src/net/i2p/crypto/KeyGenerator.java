@@ -142,8 +142,11 @@ public final class KeyGenerator {
                PUBKEY_EXPONENT_SIZE_SHORT;
     }
 
-    /** Generate a pair of keys, where index 0 is a PublicKey, and
+    /**
+     * ElGamal only.
+     * Generate a pair of keys, where index 0 is a PublicKey, and
      * index 1 is a PrivateKey
+     *
      * @return pair of keys
      */
     public Object[] generatePKIKeypair() {
@@ -151,7 +154,9 @@ public final class KeyGenerator {
     }
 
     /**
-     *  Same as above but different return type
+     *  ElGamal only.
+     *  Same as generatePKIKeypair() but different return type.
+     *
      *  @since 0.8.7
      */
     public SimpleDataStructure[] generatePKIKeys() {
