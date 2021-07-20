@@ -1,3 +1,15 @@
+2021-07-20 zzz
+ * NetDB: Increase min ff version to 0.9.38
+
+2021-07-18 zzz
+ * Tunnels: Updates for proposal 157
+
+2021-07-07 zzz
+ * Streaming: Reduce immediate ack delay
+
+2021-07-02 zzz
+ * UPnP: IPv6 address validation fix
+
 2021-06-22 zzz
  * Tests: Fix duplicate classes in i2ptest.jar
  * Tunnels: Changes for new build messages (Prop. 157)
