@@ -97,8 +97,6 @@
           - Pre-gzip the css files.
           - LocalHTTPServer will convert the filenames, and gunzip if necessary.
          -->
-        <gzip src="../../routerconsole/jsp/themes/console/light/console.css" destfile="./build/obj/net/i2p/i2ptunnel/resources/themes/console/light/console.css.gz" />
-        <gzip src="../../routerconsole/jsp/themes/console/dark/console.css" destfile="./build/obj/net/i2p/i2ptunnel/resources/themes/console/dark/console.css.gz" />
         <gzip src="../../i2ptunnel/resources/proxy/css/light/proxy.css" destfile="./build/obj/net/i2p/i2ptunnel/resources/themes/console/light/proxy.css.gz" />
         <gzip src="../../i2ptunnel/resources/proxy/css/dark/proxy.css" destfile="./build/obj/net/i2p/i2ptunnel/resources/themes/console/dark/proxy.css.gz" />
         <jar destfile="./build/i2ptunnel.jar" basedir="./build/obj" excludes="**/ui/*.class **/web/*.class" >
