@@ -59,8 +59,8 @@ public class MessageOutputStreamTest extends TestCase {
     }
 
     private static class DummyWriteStatus implements MessageOutputStream.WriteStatus {        
-        public void waitForAccept(int maxWaitMs) { return; }
-        public void waitForCompletion(int maxWaitMs) { return; }
+        public void waitForAccept(int maxWaitMs) {}
+        public void waitForCompletion(int maxWaitMs) {}
         public boolean writeAccepted() { return true; }
         public boolean writeFailed() { return false; }
         public boolean writeSuccessful() { return true; }
