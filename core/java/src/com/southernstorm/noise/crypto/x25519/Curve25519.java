@@ -288,7 +288,7 @@ public final class Curve25519 {
 	 * @param x The first number to subtract.
 	 * @param y The second number to subtract.
 	 */
-	private void sub(int[] result, int[] x, int[] y)
+	private static void sub(int[] result, int[] x, int[] y)
 	{
 		int index, borrow;
 		
