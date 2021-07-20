@@ -107,6 +107,7 @@ reprepro -v copysrc stretch trusty i2p
 # To copy focal to sid and buster:
 # Note that syntax is reprepro copysrc TO FROM package!
 reprepro -v copysrc sid focal i2p
+reprepro -v copysrc bullseye focal i2p
 reprepro -v copysrc buster focal i2p
 
 # check status
