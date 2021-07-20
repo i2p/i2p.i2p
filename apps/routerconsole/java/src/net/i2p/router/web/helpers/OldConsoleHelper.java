@@ -1,8 +1,7 @@
 package net.i2p.router.web.helpers;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Date;
 
@@ -28,9 +27,9 @@ public class OldConsoleHelper extends HelperBase {
                 renderStatusHTML(_out);
                 return "";
             } else {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream(2*1024);
-                renderStatusHTML(new OutputStreamWriter(baos));
-                return baos.toString();
+                StringWriter sw = new StringWriter(2*1024);
+                renderStatusHTML(sw);
+                return sw.toString();
             }
         } catch (IOException ioe) {
             return "<b>Error displaying the console.</b>";
@@ -44,9 +43,9 @@ public class OldConsoleHelper extends HelperBase {
                 gen.generateStatsPage(_out, _full);
                 return "";
             } else {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream(32*1024);
-                gen.generateStatsPage(new OutputStreamWriter(baos), _full);
-                return baos.toString();
+                StringWriter sw = new StringWriter(32*1024);
+                gen.generateStatsPage(sw, _full);
+                return sw.toString();
             }
         } catch (IOException ioe) {
             return "<b>Error displaying the console.</b>";

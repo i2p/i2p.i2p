@@ -2828,7 +2828,7 @@ public class WebMail extends HttpServlet
 			try {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
 				draft.getPart().outputRaw(baos);
-				body.append(new String(baos.toByteArray(), "ISO-8859-1"));
+				body.append(baos.toString("ISO-8859-1"));
 			} catch (IOException ioe) {
 				ok = false;
 				sessionObject.error += ioe.getMessage() + '\n';
