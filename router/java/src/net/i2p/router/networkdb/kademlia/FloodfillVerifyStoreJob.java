@@ -268,8 +268,8 @@ class FloodfillVerifyStoreJob extends JobImpl {
                 RouterInfo ri = _facade.lookupRouterInfoLocally(peer);
                 //if (ri != null && StoreJob.supportsCert(ri, keyCert)) {
                 if (ri != null && StoreJob.shouldStoreTo(ri) &&
-                    (!_isLS2 || (StoreJob.shouldStoreLS2To(ri) &&
-                                 (_type != DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 || StoreJob.shouldStoreEncLS2To(ri))))) {
+                    //(!_isLS2 || (StoreJob.shouldStoreLS2To(ri) &&
+                                 (_type != DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 || StoreJob.shouldStoreEncLS2To(ri))) {
                     Set<String> peerIPs = new MaskedIPSet(getContext(), ri, IP_CLOSE_BYTES);
                     if (!_ipSet.containsAny(peerIPs)) {
                         _ipSet.addAll(peerIPs);

@@ -304,9 +304,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
        if (peer.equals(_context.routerHash()))
            return false;
        // min version checks
+/*
        if (type != DatabaseEntry.KEY_TYPE_ROUTERINFO && type != DatabaseEntry.KEY_TYPE_LEASESET &&
            !StoreJob.shouldStoreLS2To(target))
            return false;
+*/
        if ((type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 ||
             lsSigType == SigType.RedDSA_SHA512_Ed25519) &&
            !StoreJob.shouldStoreEncLS2To(target))
