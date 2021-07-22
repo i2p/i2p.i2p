@@ -196,7 +196,7 @@ abstract class BuildMessageGenerator {
                     key = cfg.getChaChaReplyKey(j);
                     iv = chachaIV;
                     // slot number, little endian
-                    iv[0] = (byte) i;
+                    iv[4] = (byte) i;
                     ChaCha20.encrypt(key.getData(), iv, data, 0, data, 0, size);
                 } else {
                     key = cfg.getAESReplyKey(j);

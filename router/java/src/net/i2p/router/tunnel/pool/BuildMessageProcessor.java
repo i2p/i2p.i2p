@@ -164,7 +164,7 @@ class BuildMessageProcessor {
                     // encrypt in-place, corrupts SDS
                     byte[] bytes = data.getData();
                     // slot number, little endian
-                    iv[0] = (byte) i;
+                    iv[4] = (byte) i;
                     ChaCha20.encrypt(replyKey, iv, bytes, 0, bytes, 0, ShortEncryptedBuildRecord.LENGTH);
                 }
             }
