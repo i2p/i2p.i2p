@@ -1,3 +1,9 @@
+2021-07-23 zzz
+ * Transport: Fix UPnP IPv6 NPE
+
+2021-07-22 zzz
+ * Tunnels: Fixes for proposal 157
+
 2021-07-20 zzz
  * NetDB: Increase min ff version to 0.9.38
 

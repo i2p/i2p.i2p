@@ -818,7 +818,8 @@ public class TransportManager implements TransportEventListener {
                     }
                     if (ra != null) {
                         String host = ra.getHost();
-                        rv.add(new Port(t.getStyle(), host, port));
+                        if (host != null)
+                            rv.add(new Port(t.getStyle(), host, port));
                     }
                 }
             }

@@ -1902,10 +1902,12 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		private long _expires;
 
 		/**
-		 *  @param ip the IPv6 address being forwarded
+		 *  @param ip the IPv6 address being forwarded, non-null
 		 */
 		public IPv6ForwardPort(String name, int protocol, int port, String ip) {
 			super(name, true, protocol, port);
+			if (ip == null)
+				throw new IllegalArgumentException();
 			_ip = ip;
 		}
 
