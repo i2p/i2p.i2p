@@ -172,6 +172,7 @@ hr:last-child {
     border-bottom-left-radius: 2px;
     background-position: initial initial;
     background-repeat: initial initial;
+    min-height: 165px;
 }
 
 .logo hr {
@@ -200,6 +201,7 @@ hr:last-child {
     padding: 10px 25px 20px 75px;
     text-align: start;
     margin: 0px 10px;
+    min-height: 165px;
 }
 
 .warning:not(old) {
@@ -209,6 +211,7 @@ hr:last-child {
     background-size: 54px, 100%;
     background-position: 10px calc(50% + 32px);
     background-repeat: no-repeat;
+    background-image: url(/themes/console/images/itoopie_sm.png);
 }
 
 .warning h3 {
@@ -235,7 +238,7 @@ hr:last-child {
     margin: 2px;
     float: none;
     display: inline-block;
-    width: 80%;
+    width: 96%;
     border-width: 1px;
     border-radius: 12px;
     vertical-align: middle;
@@ -254,15 +257,7 @@ hr:last-child {
 }
 
 #jumplinks > h4 {
-    text-align: center;
-    font-size: 1.1rem;
-}
-
-#warning > a {
-    font-size: 1.1rem;
-}
-
-span b {
+    text-align: left;
     font-size: 1.1rem;
 }
 

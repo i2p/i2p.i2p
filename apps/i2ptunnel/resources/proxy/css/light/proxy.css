@@ -46,6 +46,7 @@ img {
     box-shadow: rgb(187, 187, 255) 0px 0px 0px 1px inset;
     background-position: initial initial;
     background-repeat: initial initial;
+    min-height: 175px;
 }
 
 .logo hr {
@@ -83,6 +84,7 @@ img {
     border-bottom-left-radius: 2px;
     background-color: rgb(248, 248, 255);
     box-shadow: rgb(187, 187, 255) 0px 0px 0px 1px inset;
+    min-height: 165px;
 }
 
 .warning:not(old) {
@@ -245,7 +247,7 @@ h3 {
     margin: 2px;
     float: none;
     display: inline-block;
-    width: 80%;
+    width: 96%;
     border-width: 1px;
     border-radius: 12px;
     vertical-align: middle;
@@ -271,15 +273,7 @@ h3 {
 
 
 #jumplinks > h4 {
-    text-align: center;
-    font-size: 1.1rem;
-}
-
-#warning > a {
-    font-size: 1.1rem;
-}
-
-span b {
+    text-align: left;
     font-size: 1.1rem;
 }
 
