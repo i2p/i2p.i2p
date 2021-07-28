@@ -3,9 +3,11 @@ package net.i2p.router.tunnel.pool;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SessionKeyManager;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.PublicKey;
@@ -233,7 +235,9 @@ abstract class BuildRequestor {
         //long beforeDispatch = System.currentTimeMillis();
         if (cfg.isInbound()) {
             Hash ibgw = cfg.getPeer(0);
-            if (msg.getType() == ShortTunnelBuildMessage.MESSAGE_TYPE) {
+            // don't wrap if IBGW == OBEP
+            if (msg.getType() == ShortTunnelBuildMessage.MESSAGE_TYPE &&
+                !ibgw.equals(pairedTunnel.getEndpoint())) {
                 // STBM is garlic encrypted to the IBGW, to hide it from the OBEP
                 RouterInfo peer = ctx.netDb().lookupRouterInfoLocally(ibgw);
                 if (peer != null) {
@@ -263,6 +267,7 @@ abstract class BuildRequestor {
             if (log.shouldLog(Log.INFO))
                 log.info("Sending the tunnel build request directly to " + cfg.getPeer(1)
                           + " for " + cfg + " waiting for the reply of " + cfg.getReplyMessageId() 
+                          + " via IB tunnel " + pairedTunnel
                           + " with msgId=" + msg.getUniqueId());
             // send it directly to the first hop
             // Add some fuzz to the TBM expiration to make it harder to guess how many hops
@@ -345,13 +350,36 @@ abstract class BuildRequestor {
             }
         }
 
+        // Testing, send to explicitPeers only
+        List<Hash> explicitPeers = null;
+        if (useShortTBM) {
+            String peers = ctx.getProperty("explicitPeers");
+            if (peers != null && !peers.isEmpty()) {
+                explicitPeers = new ArrayList<Hash>(4);
+                StringTokenizer tok = new StringTokenizer(peers, ",");
+                while (tok.hasMoreTokens()) {
+                    String peerStr = tok.nextToken();
+                    Hash peer = new Hash();
+                    try {
+                        peer.fromBase64(peerStr);
+                        explicitPeers.add(peer);
+                    } catch (DataFormatException dfe) {}
+                }
+                if (explicitPeers.isEmpty())
+                    useShortTBM = false;
+            } else {
+                useShortTBM = false;
+            }
+        }
+
         if (cfg.isInbound()) {
             //replyTunnel = 0; // as above
             replyRouter = ctx.routerHash();
             if (useShortTBM) {
                 // check all the tunnel peers except ourselves
                 for (int i = 0; i < cfg.getLength() - 1; i++) {
-                    if (!supportsShortTBM(ctx, cfg.getPeer(i))) {
+                    // TODO remove explicit check
+                    if (!explicitPeers.contains(cfg.getPeer(i)) || !supportsShortTBM(ctx, cfg.getPeer(i))) {
                         useShortTBM = false;
                         break;
                     }
@@ -362,8 +390,9 @@ abstract class BuildRequestor {
             replyRouter = pairedTunnel.getPeer(0);
             if (useShortTBM) {
                 // check all the tunnel peers except ourselves
-                for (int i = 1; i < cfg.getLength() - 1; i++) {
-                    if (!supportsShortTBM(ctx, cfg.getPeer(i))) {
+                for (int i = 1; i < cfg.getLength(); i++) {
+                    // TODO remove explicit check
+                    if (!explicitPeers.contains(cfg.getPeer(i)) || !supportsShortTBM(ctx, cfg.getPeer(i))) {
                         useShortTBM = false;
                         break;
                     }
@@ -451,6 +480,8 @@ abstract class BuildRequestor {
             BuildMessageGenerator.createRecord(i, hop, msg, cfg, replyRouter, replyTunnel, ctx, key);
         }
         BuildMessageGenerator.layeredEncrypt(ctx, msg, cfg, order);
+        //if (useShortTBM && log.shouldWarn())
+        //    log.warn("Sending STBM: " + cfg.toStringFull());
         
         return msg;
     }

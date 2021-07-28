@@ -106,6 +106,9 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
      */
     protected boolean shouldSelectExplicit(TunnelPoolSettings settings) {
         if (settings.isExploratory()) return false;
+        // To test IB or OB only
+        //if (settings.isInbound()) return false;
+        //if (!settings.isInbound()) return false;
         Properties opts = settings.getUnknownOptions();
         String peers = opts.getProperty("explicitPeers");
         if (peers == null)
@@ -216,7 +219,8 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
 
         Set<Hash> peers = new HashSet<Hash>(8);
         peers.addAll(ctx.profileOrganizer().selectPeersRecentlyRejecting());
-        peers.addAll(ctx.tunnelManager().selectPeersInTooManyTunnels());
+        if (!ctx.getBooleanProperty("i2np.allowLocal"))
+            peers.addAll(ctx.tunnelManager().selectPeersInTooManyTunnels());
         if (filterUnreachable(isInbound, isExploratory)) {
             // This is the only use for getPeersByCapability? And the whole set of datastructures in PeerManager?
             Collection<Hash> caps = ctx.peerManager().getPeersByCapability(Router.CAPABILITY_UNREACHABLE);

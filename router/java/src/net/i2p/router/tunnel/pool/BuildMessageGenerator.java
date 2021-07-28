@@ -94,6 +94,8 @@ abstract class BuildMessageGenerator {
     private static BuildRequestRecord createUnencryptedRecord(I2PAppContext ctx, TunnelCreatorConfig cfg, int hop,
                                                               Hash replyRouter, long replyTunnel, boolean isEC,
                                                               boolean isShort) {
+        if (isShort && !isEC)
+            throw new IllegalArgumentException();
         if (hop < cfg.getLength()) {
             // ok, now lets fill in some data
             HopConfig hopConfig = cfg.getConfig(hop);
@@ -118,8 +120,6 @@ abstract class BuildMessageGenerator {
                     nextPeer = peer; // self
                 }
             }
-            SessionKey layerKey = hopConfig.getLayerKey();
-            SessionKey ivKey = hopConfig.getIVKey();
             boolean isInGW = (cfg.isInbound() && (hop == 0));
             boolean isOutEnd = (!cfg.isInbound() && (hop + 1 >= cfg.getLength()));
             
@@ -138,6 +138,8 @@ abstract class BuildMessageGenerator {
                                                  nextMsgId,
                                                  isInGW, isOutEnd, EmptyProperties.INSTANCE);
                 } else {
+                    SessionKey layerKey = hopConfig.getLayerKey();
+                    SessionKey ivKey = hopConfig.getIVKey();
                     SessionKey replyKey = cfg.getAESReplyKey(hop);
                     byte iv[] = cfg.getAESReplyIV(hop);
                     if (iv == null)
@@ -147,6 +149,8 @@ abstract class BuildMessageGenerator {
                                                  iv, isInGW, isOutEnd, EmptyProperties.INSTANCE);
                 }
             } else {
+                SessionKey layerKey = hopConfig.getLayerKey();
+                SessionKey ivKey = hopConfig.getIVKey();
                 SessionKey replyKey = cfg.getAESReplyKey(hop);
                 byte iv[] = cfg.getAESReplyIV(hop);
                 if (iv == null)
