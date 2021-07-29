@@ -338,7 +338,8 @@ abstract class BuildRequestor {
         long replyTunnel = 0;
         Hash replyRouter;
         boolean useVariable = SEND_VARIABLE && cfg.getLength() <= MEDIUM_RECORDS;
-        boolean useShortTBM = SEND_SHORT && ctx.keyManager().getPublicKey().getType() == EncType.ECIES_X25519;
+        boolean useShortTBM = (SEND_SHORT || ctx.getBooleanProperty("router.useShortTBM")) &&
+                              ctx.keyManager().getPublicKey().getType() == EncType.ECIES_X25519;
         if (useShortTBM && !cfg.isInbound() && !pool.getSettings().isExploratory()) {
             // client must be EC also to get garlic OTBRM reply
             LeaseSetKeys lsk = ctx.keyManager().getKeys(pool.getSettings().getDestination());
@@ -350,6 +351,7 @@ abstract class BuildRequestor {
             }
         }
 
+/*
         // Testing, send to explicitPeers only
         List<Hash> explicitPeers = null;
         if (useShortTBM) {
@@ -371,6 +373,7 @@ abstract class BuildRequestor {
                 useShortTBM = false;
             }
         }
+*/
 
         if (cfg.isInbound()) {
             //replyTunnel = 0; // as above
@@ -379,7 +382,7 @@ abstract class BuildRequestor {
                 // check all the tunnel peers except ourselves
                 for (int i = 0; i < cfg.getLength() - 1; i++) {
                     // TODO remove explicit check
-                    if (!explicitPeers.contains(cfg.getPeer(i)) || !supportsShortTBM(ctx, cfg.getPeer(i))) {
+                    if (/* !explicitPeers.contains(cfg.getPeer(i)) || */ !supportsShortTBM(ctx, cfg.getPeer(i))) {
                         useShortTBM = false;
                         break;
                     }
@@ -392,7 +395,7 @@ abstract class BuildRequestor {
                 // check all the tunnel peers except ourselves
                 for (int i = 1; i < cfg.getLength(); i++) {
                     // TODO remove explicit check
-                    if (!explicitPeers.contains(cfg.getPeer(i)) || !supportsShortTBM(ctx, cfg.getPeer(i))) {
+                    if (/* !explicitPeers.contains(cfg.getPeer(i)) || */ !supportsShortTBM(ctx, cfg.getPeer(i))) {
                         useShortTBM = false;
                         break;
                     }

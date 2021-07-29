@@ -106,7 +106,7 @@ class BuildHandler implements Runnable {
     private static final long JOB_LAG_LIMIT_TUNNEL = 350;
 
     // TODO remove when finished
-    private static final boolean HANDLE_SHORT = false;
+    private static final boolean HANDLE_SHORT = true;
 
     public BuildHandler(RouterContext ctx, TunnelPoolManager manager, BuildExecutor exec) {
         _context = ctx;
@@ -1026,7 +1026,7 @@ class BuildHandler implements Runnable {
             replyMsg.setMessageExpiration(expires);
             boolean replyGwIsUs = _context.routerHash().equals(nextPeer);
             I2NPMessage outMessage;
-            if (!replyGwIsUs && state.msg.getType() == ShortTunnelBuildMessage.MESSAGE_TYPE && !_context.getBooleanProperty("router.disableEncryptOTBRM")) {
+            if (!replyGwIsUs && state.msg.getType() == ShortTunnelBuildMessage.MESSAGE_TYPE) {
                 // garlic encrypt
                 outMessage = MessageWrapper.wrap(_context, replyMsg, req.readGarlicKeys());
                 if (outMessage == null) {
