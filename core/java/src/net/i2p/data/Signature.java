@@ -31,13 +31,6 @@ public class Signature extends SimpleDataStructure {
     /** 40 */
     public final static int SIGNATURE_BYTES = DEF_TYPE.getSigLen();
 
-    /**
-     * all zeros
-     * @deprecated to be removed
-     */
-    @Deprecated
-    public final static byte[] FAKE_SIGNATURE = new byte[SIGNATURE_BYTES];
-
     private final SigType _type;
 
     public Signature() {
