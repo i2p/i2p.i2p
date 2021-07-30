@@ -139,6 +139,7 @@
     <target name="jarUpToDate" >
         <uptodate property="jar.uptodate" targetfile="build/i2p.jar" >
             <srcfiles dir= "build/obj" includes="**/*.class" />
+            <srcfiles dir= "../resources" />
         </uptodate>
     </target>
 

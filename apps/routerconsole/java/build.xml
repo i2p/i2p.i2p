@@ -371,6 +371,7 @@
         <uptodate property="war.uptodate" targetfile="build/routerconsole.war" >
             <srcfiles dir= "../jsp" excludes="web.xml, web-fragment.xml, *.css, **/*.java, *.jsp, *.jsi" />
             <srcfiles dir= "build/obj" includes="net/i2p/router/web/helpers/*.class net/i2p/router/web/servlets/*.class" />
+            <srcfiles dir= "../resources" />
         </uptodate>
         <condition property="shouldListChanges" >
             <and>

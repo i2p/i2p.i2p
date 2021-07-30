@@ -122,6 +122,7 @@
     <target name="jarUpToDate">
         <uptodate property="jar.uptodate" targetfile="build/i2ptunnel.jar" >
             <srcfiles dir= "build/obj" includes="**/*.class" />
+            <srcfiles dir= "../resources" />
         </uptodate>
         <condition property="shouldListChanges" >
             <and>
