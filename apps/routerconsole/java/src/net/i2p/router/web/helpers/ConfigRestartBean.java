@@ -6,6 +6,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.web.ConfigServiceHandler;
 import net.i2p.router.web.ContextHelper;
 import net.i2p.router.web.Messages;
+import net.i2p.router.web.NewsHelper;
 import net.i2p.util.RandomSource;
 
 /**
@@ -92,7 +93,7 @@ public class ConfigRestartBean {
             buf.append("</h4><hr>");
             buttons(ctx, buf, urlBase, systemNonce, SET2);
         } else {
-            if (ctx.hasWrapper())
+            if (ctx.hasWrapper() || NewsHelper.isExternalRestartPending())
                 buttons(ctx, buf, urlBase, systemNonce, SET3);
             else
                 buttons(ctx, buf, urlBase, systemNonce, SET4);

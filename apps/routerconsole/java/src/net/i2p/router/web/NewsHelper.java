@@ -70,6 +70,18 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
+     *  A router update had been downloaded and handled by an UpdatePostProcessor.
+     *  It will provide wrapper-like function to install the update and restart after shutdown.
+     *
+     *  @since 0.9.51
+     */
+    public static boolean isExternalRestartPending() {
+        ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
+        if (mgr == null) return false;
+        return mgr.isExternalRestartPending();
+    }
+
+    /**
      *  Release update only.
      *  Available version, will be null if already downloaded.
      *  @return null if none

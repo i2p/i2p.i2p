@@ -79,6 +79,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
     private volatile ClientAppState _state = UNINITIALIZED;
 
     private volatile String _status;
+    private volatile boolean _externalRestartPending;
 
     private static final long DEFAULT_MAX_TIME = 3*60*60*1000L;
     private static final long DEFAULT_CHECK_TIME = 60*1000;
@@ -563,6 +564,16 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                 t.shutdown();
             }
         }
+    }
+
+    /**
+     *  A router update had been downloaded and handled by an UpdatePostProcessor.
+     *  It will provide wrapper-like function to install the update and restart after shutdown.
+     *
+     *  @since 0.9.51
+     */
+    public boolean isExternalRestartPending() {
+        return _externalRestartPending;
     }
 
     /**
@@ -1376,10 +1387,12 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                                    (ftype == SU3File.TYPE_EXE && SystemVersion.isWindows())) {
                             Integer key = Integer.valueOf(updateType.toString().hashCode() ^ ftype);
                             UpdatePostProcessor upp = _registeredPostProcessors.get(key);
-                            if (upp != null)
+                            if (upp != null) {
                                 upp.updateDownloadedandVerified(updateType, ftype, actualVersion, temp);
-                            else
+                                _externalRestartPending = true;
+                            } else {
                                 err = "Unsupported su3 file type " + ftype;
+                            }
                         } else {
                             err = "Unsupported su3 file type " + ftype;
                         }
