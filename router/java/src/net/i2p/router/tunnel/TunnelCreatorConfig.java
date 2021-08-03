@@ -347,7 +347,6 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
 
     /**
      * ECIES short OBEP record only.
-     * @return null for ElGamal or ECIES long record or non-OBEP
      * @since 0.9.51
      */
     public void setGarlicReplyKeys(OneTimeSession keys) {
