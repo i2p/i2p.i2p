@@ -268,30 +268,17 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 
 		if ((baseURLStr == null) || (baseURLStr.length() <= 0)) {
 			if ((locationURLStr != null) && (0 < locationURLStr.length())) {
-				if (!locationURLStr.endsWith("/") || !urlString.startsWith("/")) {
+				if (!urlString.startsWith("/")) {
 					String absUrl;
-					// I2P - getAbsoluteURL("/WANIPCn.xml", "", "http://192.168.1.1:5555/rootDesc.xml")
-					// returns here as  "http://192.168.1.1:5555/rootDesc.xml/WANIPCn.xml" which is horribly wrong
-					// So back up to last slash
+					// Relative to location, so back up to last slash
 					if (!locationURLStr.endsWith("/")) {
-						if (urlString.startsWith("/"))
-						      absUrl = locationURLStr.substring(0, locationURLStr.lastIndexOf('/')) + urlString;
-						else
-						      absUrl = locationURLStr.substring(0, locationURLStr.lastIndexOf('/') + 1) + urlString;
+						absUrl = locationURLStr.substring(0, locationURLStr.lastIndexOf('/') + 1) + urlString;
 					} else {
 						absUrl = locationURLStr + urlString;
 					}
 					try {
 						URL url = new URL(absUrl);
 						//Debug.warning("Return 1: " + url);
-						return url.toString();
-					} catch (Exception e) {
-					}
-				} else {
-					String absUrl = locationURLStr + urlString.substring(1);
-					try {
-						URL url = new URL(absUrl);
-						//Debug.warning("Return 2: " + url);
 						return url.toString();
 					} catch (Exception e) {
 					}
@@ -318,19 +305,17 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 		}
 
 		if ((baseURLStr != null) && (0 < baseURLStr.length())) {
-			if (!baseURLStr.endsWith("/") || !urlString.startsWith("/")) {
-				String absUrl = baseURLStr + urlString;
+			if (!urlString.startsWith("/")) {
+				String absUrl;
+				// Relative to base, so back up to last slash
+				if (!baseURLStr.endsWith("/")) {
+					absUrl = baseURLStr.substring(0, baseURLStr.lastIndexOf('/') + 1) + urlString;
+				} else {
+					absUrl = baseURLStr + urlString;
+				}
 				try {
 					URL url = new URL(absUrl);
 					//Debug.warning("Return 4: " + url);
-					return url.toString();
-				} catch (Exception e) {
-				}
-			} else {
-				String absUrl = baseURLStr + urlString.substring(1);
-				try {
-					URL url = new URL(absUrl);
-					//Debug.warning("Return 5: " + url);
 					return url.toString();
 				} catch (Exception e) {
 				}
@@ -2326,4 +2311,22 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 	 * output(pr); pr.flush(); }
 	 */
 
+/*
+	public static void main(String[] args) {
+		test("/foo/x", "http://aa:123/");
+		test("/foo/x", "http://aa:123/bar/");
+		test("/foo/x", "http://aa:123/bar/baz");
+		test("foo/x", "http://aa:123/");
+		test("foo/x", "http://aa:123/bar/");
+		test("foo/x", "http://aa:123/bar/baz");
+	}
+
+	private static void test(String a, String b) {
+		Device d = new Device();
+		String c = d.getAbsoluteURL(a, "", b);
+		System.out.println(b + ' ' + a + ' ' + c);
+		c = d.getAbsoluteURL(a, b, "");
+		System.out.println(b + ' ' + a + ' ' + c);
+	}
+*/
 }

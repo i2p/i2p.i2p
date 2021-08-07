@@ -1,3 +1,13 @@
+2021-08-07 zzz
+ * UPnP: Fix URL handling
+
+2021-08-02 zzz
+ * Console: Show restart button if there's an update
+   to be handled by a post-processor
+
+2021-07-30 zzz
+ * Util: Update DoH server list
+
 2021-07-28 zzz
  * Tunnels: Fixes for proposal 157
 
