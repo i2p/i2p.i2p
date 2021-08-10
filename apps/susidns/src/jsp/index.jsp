@@ -69,11 +69,21 @@
 </p><p class="whatitis">
 <%=intl._t("It regularly updates your hosts.txt file from distributed sources or \"subscriptions\".")%>
 <%=intl._t("In the default configuration, the address book is only subscribed to {0}.", "i2p-projekt.i2p")%>
-<%=intl._t("Subscribing to additional sites is easy, just add them to your <a href=\"subscriptions\">subscriptions</a> file.")%>
+<%=intl._t("Subscribing to additional sites is easy, just add them to your <a href=\"subscriptions\">subscriptions</a>.")%>
 </p>
 <p class="whatitis">
 <%=intl._t("For more information on naming in I2P, see <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">the overview</a>.")%>
 </p>
+<h3 id="howtouse"><%=intl._t("How to use the Address Book?")%></h3>
+<p class="howtouse">
+<%=intl._t("The I2P Address Book allows you to manage addresses by sorting them into categories.")%>
+<%=intl._t("You may use these categories according to how you intend to use the address.")%>
+</p>
+<ul class="howtouse">
+<li><%=intl._t("Router: These addresses are added automatically, by your subscriptions. If you publish an address book, the router address book will be shared with other I2P users.")%></li>
+<li><%=intl._t("Local: This is your personal addresbook, for hosts which you publish and share with others.")%></li>
+<li><%=intl._t("Private: This address book if used for addresses which you do not want to share with other I2P users.")%></li>
+</ul>
 <h3 id="howitworks"><%=intl._t("How does the address book application work?")%></h3>
 <p class="howitworks">
 <%=intl._t("The address book application regularly polls your subscriptions and merges their content into your \"router\" address book.")%>

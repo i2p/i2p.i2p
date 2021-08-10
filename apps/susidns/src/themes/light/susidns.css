@@ -310,6 +310,17 @@ div.help h3, #add h3, #import h3 {
      background-position: .5%, 15% !important;
 }
 
+#howtouse {
+     padding: 5px 32px;
+     background: url(/themes/console/light/images/dropdown.png) #f8f8ff;
+     background-repeat: no-repeat !important;
+     background-position: .5%, 15% !important;
+}
+
+ul.howtouse {
+     margin-left: 32px;
+}
+
 .expanded {
      background: url(/themes/console/light/images/dropdown_active.png) #f8f8ff !important;
      background-repeat: no-repeat !important;

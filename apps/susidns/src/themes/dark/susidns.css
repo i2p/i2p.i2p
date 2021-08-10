@@ -323,6 +323,10 @@ h3 {
      box-shadow: inset 0 0 0 1px #000;
 }
 
+ul.howtouse {
+     margin-left: 32px;
+}
+
 .headline h3 {
      margin-top: -10px;
 }
