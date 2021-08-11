@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P desktopgui\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-25 12:29+0000\n"
+"POT-Creation-Date: 2021-08-11 15:33+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -33,57 +33,57 @@ msgstr ""
 msgid "Starting"
 msgstr ""
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:55
-#: src/net/i2p/desktopgui/InternalTrayManager.java:207
+#: src/net/i2p/desktopgui/InternalTrayManager.java:54
+#: src/net/i2p/desktopgui/InternalTrayManager.java:206
 msgid "Launch I2P Browser"
+msgstr ""
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:75
+#: src/net/i2p/desktopgui/InternalTrayManager.java:227
+msgid "Configure I2P System Tray"
 msgstr ""
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:76
 #: src/net/i2p/desktopgui/InternalTrayManager.java:228
-msgid "Configure I2P System Tray"
-msgstr ""
-
-#: src/net/i2p/desktopgui/InternalTrayManager.java:77
-#: src/net/i2p/desktopgui/InternalTrayManager.java:229
 msgid "Disable"
 msgstr ""
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:93
-#: src/net/i2p/desktopgui/InternalTrayManager.java:245
+#: src/net/i2p/desktopgui/InternalTrayManager.java:92
+#: src/net/i2p/desktopgui/InternalTrayManager.java:244
 msgid "Restart I2P"
 msgstr ""
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:110
-#: src/net/i2p/desktopgui/InternalTrayManager.java:262
+#: src/net/i2p/desktopgui/InternalTrayManager.java:109
+#: src/net/i2p/desktopgui/InternalTrayManager.java:261
 msgid "Stop I2P"
 msgstr ""
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:126
-#: src/net/i2p/desktopgui/InternalTrayManager.java:278
+#: src/net/i2p/desktopgui/InternalTrayManager.java:125
+#: src/net/i2p/desktopgui/InternalTrayManager.java:277
 msgid "Restart I2P Immediately"
 msgstr ""
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:143
-#: src/net/i2p/desktopgui/InternalTrayManager.java:295
+#: src/net/i2p/desktopgui/InternalTrayManager.java:142
+#: src/net/i2p/desktopgui/InternalTrayManager.java:294
 msgid "Stop I2P Immediately"
 msgstr ""
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:157
-#: src/net/i2p/desktopgui/InternalTrayManager.java:309
+#: src/net/i2p/desktopgui/InternalTrayManager.java:156
+#: src/net/i2p/desktopgui/InternalTrayManager.java:308
 msgid "Cancel I2P Shutdown"
 msgstr ""
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:363
+#: src/net/i2p/desktopgui/InternalTrayManager.java:362
 #, java-format
 msgid "Shutdown in {0}"
 msgstr ""
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:365
+#: src/net/i2p/desktopgui/InternalTrayManager.java:364
 msgid "Shutdown imminent"
 msgstr ""
 
 #. status translations are in the console bundle
-#: src/net/i2p/desktopgui/InternalTrayManager.java:370
+#: src/net/i2p/desktopgui/InternalTrayManager.java:369
 msgid "Network"
 msgstr ""
 
