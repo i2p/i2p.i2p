@@ -3,7 +3,6 @@
 <p><%=intl._t("Further assistance is available here:")%></p>
 <ul class="links">
 <li><a href="http://i2p-projekt.i2p/en/faq" target="_blank"><%=intl._t("FAQ on i2p-projekt.i2p")%></a></li>
-<li><a href="http://i2pwiki.i2p/" target="_blank"><%=intl._t("I2P Wiki")%></a></li>
 </ul>
 <p><%=intl._t("You may also try {0} or {1}.",
 "<a href=\"http://i2pforum.i2p/\" target=\"_blank\">" + intl._t("I2P Forum") + "</a>",
