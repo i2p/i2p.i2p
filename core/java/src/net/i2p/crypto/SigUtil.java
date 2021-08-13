@@ -289,7 +289,11 @@ public final class SigUtil {
                               throws GeneralSecurityException {
         SigType type = pk.getType();
         byte[] b = pk.getData();
-        BigInteger s = new NativeBigInteger(1, b);
+        // Java 17 is zeroing out the byte array somewhere.
+        // So we can't use NBI which caches the byte array returned in toByteArray(),
+        // or it trashes our private key
+        //BigInteger s = new NativeBigInteger(1, b);
+        BigInteger s = new BigInteger(1, b);
         // see ECConstants re: casting
         ECPrivateKeySpec ks = new ECPrivateKeySpec(s, (ECParameterSpec) type.getParams());
         KeyFactory kf = KeyFactory.getInstance("EC");
@@ -426,7 +430,9 @@ public final class SigUtil {
                               throws GeneralSecurityException {
         KeyFactory kf = KeyFactory.getInstance("DSA");
         // x p q g
-        KeySpec ks = new DSAPrivateKeySpec(new NativeBigInteger(1, pk.getData()),
+        KeySpec ks = new DSAPrivateKeySpec(new BigInteger(1, pk.getData()),
+        // see cvtToJavaECKey
+        //KeySpec ks = new DSAPrivateKeySpec(new NativeBigInteger(1, pk.getData()),
                                             CryptoConstants.dsap,
                                             CryptoConstants.dsaq,
                                             CryptoConstants.dsag);

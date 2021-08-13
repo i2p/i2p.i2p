@@ -1,3 +1,6 @@
+2021-08-13 zzz
+ * Crypto: Fix corruption of EC and DSA private keys on Java 17
+
 2021-08-07 zzz
  * UPnP: Fix URL handling
 

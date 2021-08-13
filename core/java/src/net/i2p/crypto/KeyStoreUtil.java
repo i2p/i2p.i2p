@@ -1381,10 +1381,21 @@ public final class KeyStoreUtil {
         File ksf = new File(args[1]);
         String alias = args[2];
         String pw = args[3];
-        boolean ok = createKeys(ksf, DEFAULT_KEYSTORE_PASSWORD, alias, "test cname", "test ou",
+        boolean ok = createKeys(ksf, DEFAULT_KEYSTORE_PASSWORD, alias + "-EC", "test cname", "test ou",
+                                DEFAULT_KEY_VALID_DAYS, "EC", 256, pw);
+        System.out.println("EC genkey ok? " + ok);
+        ok = createKeys(ksf, DEFAULT_KEYSTORE_PASSWORD, alias + "-DSA", "test cname", "test ou",
+                                DEFAULT_KEY_VALID_DAYS, "DSA", 1024, pw);
+        System.out.println("DSA genkey ok? " + ok);
+        ok = createKeys(ksf, DEFAULT_KEYSTORE_PASSWORD, alias + "-RSA", "test cname", "test ou",
+                                DEFAULT_KEY_VALID_DAYS, "RSA", 4096, pw);
+        System.out.println("RSA genkey ok? " + ok);
+        ok = createKeys(ksf, DEFAULT_KEYSTORE_PASSWORD, alias + "-EdDSA", "test cname", "test ou",
                                 DEFAULT_KEY_VALID_DAYS, "EdDSA", 256, pw);
-                                //DEFAULT_KEY_VALID_DAYS, "ElGamal", 2048, pw);
-        System.out.println("genkey ok? " + ok);
+        System.out.println("EdDSA genkey ok? " + ok);
+        //ok = createKeys(ksf, DEFAULT_KEYSTORE_PASSWORD, alias + "-ElG", "test cname", "test ou",
+        //                        DEFAULT_KEY_VALID_DAYS, "ElGamal", 2048, pw);
+        //System.out.println("ElG genkey ok? " + ok);
     }
 
     private static void testKeygen2(String[] args) throws Exception {
