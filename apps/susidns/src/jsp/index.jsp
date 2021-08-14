@@ -81,7 +81,7 @@
 </p>
 <ul class="howtouse">
 <li><%=intl._t("Router: These addresses are added automatically, by your subscriptions. If you publish an address book, the router address book will be shared with other I2P users.")%></li>
-<li><%=intl._t("Local: This is your personal addresbook, for hosts which you publish and share with others.")%></li>
+<li><%=intl._t("Local: This is your personal address book, for hosts which you publish and share with others.")%></li>
 <li><%=intl._t("Private: This address book if used for addresses which you do not want to share with other I2P users.")%></li>
 </ul>
 <h3 id="howitworks"><%=intl._t("How does the address book application work?")%></h3>

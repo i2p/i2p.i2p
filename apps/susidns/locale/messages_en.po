@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P susidns\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-11 15:33+0000\n"
+"POT-Creation-Date: 2021-08-14 13:36+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -811,7 +811,7 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:226
 msgid ""
-"Local: This is your personal addresbook, for hosts which you publish and "
+"Local: This is your personal address book, for hosts which you publish and "
 "share with others."
 msgstr ""
 
