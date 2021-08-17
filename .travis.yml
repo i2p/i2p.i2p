@@ -28,7 +28,7 @@ env:
   - SONAR_SCANNER_OPTS="-Xmx2048m" 
 
 script:
-  - travis_wait 45 ./tests/scripts/travis.sh
+  - ./tests/scripts/travis.sh
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
