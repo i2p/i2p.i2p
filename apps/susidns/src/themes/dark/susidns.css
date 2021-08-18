@@ -552,7 +552,7 @@ ol, ul {
 
 li {
      color: #e6e6e7;
-     margin: 0;
+     margin: 0 20px 0 20px;
      font-size: 9pt;
      list-style: square;
      line-height: 150%;
