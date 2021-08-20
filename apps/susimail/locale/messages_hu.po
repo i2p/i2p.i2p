@@ -4,13 +4,15 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# AdminLMH <lehetmashogy@i2pmail.org>, 2021
+# Nyul Csoki <csokinyul@i2pmail.org>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
-"PO-Revision-Date: 2021-02-05 15:27+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2021-06-20 09:47+0000\n"
+"Last-Translator: AdminLMH <lehetmashogy@i2pmail.org>\n"
 "Language-Team: Hungarian (http://www.transifex.com/otf/I2P/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,7 +36,7 @@ msgstr "Re:"
 #: src/src/i2p/susi/webmail/WebMail.java:1257
 #: src/src/i2p/susi/webmail/WebMail.java:1258
 msgid "Fwd:"
-msgstr ""
+msgstr "Fwd:"
 
 #. MailDir-like
 #: src/src/i2p/susi/webmail/WebMail.java:214
@@ -54,7 +56,7 @@ msgstr "Törölt Elemek"
 #. MailDir-like
 #: src/src/i2p/susi/webmail/WebMail.java:217
 msgid "Bulk Mail"
-msgstr ""
+msgstr "Ömlesztett Levél"
 
 #. untranslated, translate on use
 #: src/src/i2p/susi/webmail/WebMail.java:221
@@ -79,7 +81,7 @@ msgstr "Nincs mutatva ({0}) rész, mert {1}"
 #: src/src/i2p/susi/webmail/WebMail.java:648
 #, java-format
 msgid "Download attachment {0}"
-msgstr ""
+msgstr "Melléklet letöltése: {0}"
 
 #: src/src/i2p/susi/webmail/WebMail.java:649
 msgid "File is packed into a zipfile for security reasons."
@@ -137,12 +139,12 @@ msgstr "Érvénytelen SMTP port szám."
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:243
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:258
 msgid "Cannot connect"
-msgstr ""
+msgstr "Nem lehet kapcsolódni"
 
 #: src/src/i2p/susi/webmail/WebMail.java:932
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:744
 msgid "Error connecting to server"
-msgstr ""
+msgstr "Hiba a szerverhez való kapcsolódáskor."
 
 #. _t("Internal error, lost connection.") + '\n' +
 #: src/src/i2p/susi/webmail/WebMail.java:976
@@ -152,14 +154,14 @@ msgstr "Felhasználó kijelentkezett."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1041
 msgid "Draft saved."
-msgstr ""
+msgstr "Piszkozat mentve."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1051
 #: src/src/i2p/susi/webmail/WebMail.java:1292
 #: src/src/i2p/susi/webmail/WebMail.java:2728
 #: src/src/i2p/susi/webmail/WebMail.java:2909
 msgid "Unable to save mail."
-msgstr ""
+msgstr "Nem sikerült elmenteni a levelet."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1181
 #, java-format
@@ -201,7 +203,7 @@ msgstr "Nem található kódoló a következőhöz: {0}"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1598
 msgid "Attachment not found."
-msgstr ""
+msgstr "Melléklet nem található."
 
 #. error if we get here
 #: src/src/i2p/susi/webmail/WebMail.java:1627
@@ -209,7 +211,7 @@ msgstr ""
 #: src/src/i2p/susi/webmail/WebMail.java:2320
 #: src/src/i2p/susi/webmail/WebMail.java:3495
 msgid "Message not found."
-msgstr ""
+msgstr "Üzenet nem található."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1732
 #, java-format
@@ -226,11 +228,11 @@ msgstr "Nincs kijelölve üzenet törlésre."
 #: src/src/i2p/susi/webmail/WebMail.java:1808
 #, java-format
 msgid "Host unchanged. Edit configuration file {0} to change host."
-msgstr ""
+msgstr "Kiszolgáló nem változtott. Szerkeszd a következő beállítófájlt: {0}, hogy megváltoztasd a kiszolgálót."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1828
 msgid "Configuration saved"
-msgstr ""
+msgstr "Beállítás elmentve."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1850
 msgid "Invalid pagesize number, resetting to default value."
@@ -245,7 +247,7 @@ msgstr "Bejelentkezés"
 #: src/src/i2p/susi/webmail/WebMail.java:2427
 #: src/src/i2p/susi/webmail/WebMail.java:3124
 msgid "Loading emails, please wait..."
-msgstr ""
+msgstr "Levelek betöltése, kérlek várj..."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2308
 #, java-format
@@ -265,7 +267,7 @@ msgstr "Üzenet Megjelenítése"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2323
 msgid "New Message"
-msgstr ""
+msgstr "Új Üzenet"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2325
 msgid "Configuration"
@@ -279,21 +281,21 @@ msgstr "Email"
 #, java-format
 msgid "{0} new message"
 msgid_plural "{0} new messages"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{0} új üzenet"
+msgstr[1] "{0} új üzenet"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2416
 msgid "No new messages"
-msgstr ""
+msgstr "Nincs új üzenet"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2429
 msgid "Checking for new emails on server"
-msgstr ""
+msgstr "Új levelek keresése a kiszolgálón"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2431
 #: src/src/i2p/susi/webmail/WebMail.java:3126
 msgid "Refresh the page for updates"
-msgstr ""
+msgstr "Töltsd újra az oldalt a frissítéshez"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2636
 #: src/src/i2p/susi/webmail/WebMail.java:3226
@@ -318,19 +320,19 @@ msgstr "Címzett nem található."
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:302
 #, java-format
 msgid "Email is too large, max is {0}"
-msgstr ""
+msgstr "Levél túl nagy, a maximum: {0}"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2841
 #: src/src/i2p/susi/webmail/WebMail.java:2922
 msgid "Sending mail."
-msgstr ""
+msgstr "Levél küldése."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2846
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:254
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:346
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:351
 msgid "Error sending mail"
-msgstr ""
+msgstr "Levél küldése sikertelen"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2880
 msgid "Mail sent."
@@ -342,7 +344,7 @@ msgstr "Küldés"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2973
 msgid "Save as Draft"
-msgstr ""
+msgstr "Mentés piszkozatként"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2974
 #: src/src/i2p/susi/webmail/WebMail.java:3282
@@ -366,11 +368,11 @@ msgstr "Ide"
 #: src/src/i2p/susi/webmail/WebMail.java:3063
 #: src/src/i2p/susi/webmail/WebMail.java:3479
 msgid "Cc"
-msgstr ""
+msgstr "Cc"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3064
 msgid "Bcc"
-msgstr ""
+msgstr "Bcc"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3065
 #: src/src/i2p/susi/webmail/WebMail.java:3180
@@ -380,7 +382,7 @@ msgstr "Tárgy"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3068
 msgid "Add Attachment"
-msgstr ""
+msgstr "Melléklet Hozzáadása"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3074
 msgid "Attachments"
@@ -388,7 +390,7 @@ msgstr "Csatolmányok"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3083
 msgid "Delete selected attachments"
-msgstr ""
+msgstr "Kiválasztott melléklet(ek) törlése"
 
 #. boolean fixed = Boolean.parseBoolean(Config.getProperty(
 #. CONFIG_PORTS_FIXED, "true" ));
@@ -399,7 +401,7 @@ msgstr ""
 #. Integer.toString(DEFAULT_SMTPPORT));
 #: src/src/i2p/susi/webmail/WebMail.java:3100
 msgid "Email Login"
-msgstr ""
+msgstr "Email Bejelelntkezés"
 
 #. current postman hq length limits 16/12, new postman version 32/32
 #: src/src/i2p/susi/webmail/WebMail.java:3102
@@ -412,7 +414,7 @@ msgstr "Jelszó"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3108
 msgid "Read Mail Offline"
-msgstr ""
+msgstr "Levélolvasás Kapcsolat Nélkül Módban"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3112
 #: src/src/i2p/susi/webmail/WebMail.java:3301
@@ -459,15 +461,15 @@ msgstr "Méret"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3230
 msgid "Message is new"
-msgstr ""
+msgstr "Üzenet új"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3257
 msgid "Message has an attachment"
-msgstr ""
+msgstr "Üzenet rendelkezik melléklettel"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3259
 msgid "Message is spam"
-msgstr ""
+msgstr "Üzenet levélszemét"
 
 #. TODO ngettext
 #: src/src/i2p/susi/webmail/WebMail.java:3280
@@ -488,7 +490,7 @@ msgstr "Mindet Kijelöli"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3288
 msgid "Clear All"
-msgstr ""
+msgstr "Mind Törlése"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3313
 msgid "Folder"
@@ -497,7 +499,7 @@ msgstr "Mappa"
 #. TODO css to center it
 #: src/src/i2p/susi/webmail/WebMail.java:3314
 msgid "Change to Folder"
-msgstr ""
+msgstr "Váltás Mappára"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3320
 msgid "First"
@@ -555,7 +557,7 @@ msgstr "Törlés"
 #. can't move from drafts
 #: src/src/i2p/susi/webmail/WebMail.java:3425
 msgid "Move to Folder"
-msgstr ""
+msgstr "Átmozgatás Mappába"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3445
 msgid "Back to Folder"
@@ -563,7 +565,7 @@ msgstr "Visszatérés Mappához"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3530
 msgid "Folder Page Size"
-msgstr ""
+msgstr "Mappa Oldal Méret"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3533
 msgid "Set"
@@ -571,11 +573,11 @@ msgstr "Beállít"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3536
 msgid "Advanced Configuration"
-msgstr ""
+msgstr "Haladó Beállítások"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3546
 msgid "Save Configuration"
-msgstr ""
+msgstr "Beállítások Mentése"
 
 #. this appears in the UI so translate
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:108
@@ -585,28 +587,28 @@ msgstr ""
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:978
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1199
 msgid "No response from server"
-msgstr ""
+msgstr "Nem érkezett válasz a kiszolgálótól"
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:747
 msgid "Mail server login failed, wrong username or password."
-msgstr ""
+msgstr "Email kiszolgáló bejelentkezés meghiúsult, rossz felhasználónév vagy jelszó."
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:749
 msgid "Logout and then login again with the correct username and password."
-msgstr ""
+msgstr "Jelentkezz ki és aztán jelentkezz be újra a helyes felhasználónévvel és jelszóval."
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1238
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1240
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:314
 msgid "Login failed"
-msgstr ""
+msgstr "Bejelentkezés sikertelen"
 
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:256
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:285
 msgid "Server refused connection"
-msgstr ""
+msgstr "Kiszolgáló visszautasította a kapcsolódást"
 
 #. TODO which recipient?
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:327
 msgid "Mail rejected"
-msgstr ""
+msgstr "Levél elutasítva"

@@ -1,16 +1,18 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the i2p package.
 # 
 # Translators:
+# Hunor Paksy <heds@cock.li>, 2018
+# AdminLMH <lehetmashogy@i2pmail.org>, 2021
 # benewfy <benewfy@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2015-02-18 22:14+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: benewfy <benewfy@gmail.com>\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2017-11-12 14:01+0000\n"
+"PO-Revision-Date: 2021-06-20 09:43+0000\n"
+"Last-Translator: AdminLMH <lehetmashogy@i2pmail.org>\n"
 "Language-Team: Hungarian (http://www.transifex.com/otf/I2P/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -74,13 +76,13 @@ msgstr "Alapeseten az I2P számára csak maximum 128MB memória engedélyezett."
 msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
-msgstr "Lehetséges, hogy nagy szávszélességű routerek, úgyis mint sok aktív torrenttel vagy kiegészítővel rendelkező routerek számára ezt az értéket növelni szükséges."
+msgstr "Lehetséges, hogy nagy szávszélességű routerek, és a sok aktív torrenttel vagy kiegészítővel rendelkező routerek számára ezt az értéket növelni szükséges."
 
 #. Type: boolean
 #. Description
 #: ../i2p.templates:5001
-msgid "Run I2P daemon confined with AppArmor"
-msgstr "I2P kiszolgáló futtatása korlátozva az AppArmor-ral"
+msgid "Should the I2P daemon be confined with AppArmor?"
+msgstr "I2P kiszolgáló futtatása korlátozva legyen az AppArmor-ral?"
 
 #. Type: boolean
 #. Description

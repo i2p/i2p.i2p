@@ -20,9 +20,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-05 15:14+0000\n"
-"PO-Revision-Date: 2021-05-05 16:40+0000\n"
-"Last-Translator: Scott Rhodes <starring169@gmail.com>\n"
+"POT-Creation-Date: 2021-08-14 13:36+0000\n"
+"PO-Revision-Date: 2021-08-14 13:39+0000\n"
+"Last-Translator: zzzi2p\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/otf/I2P/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -784,8 +784,8 @@ msgstr "在默认配置中，地址簿只订阅 {0}。"
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:214
 msgid ""
 "Subscribing to additional sites is easy, just add them to your <a "
-"href=\"subscriptions\">subscriptions</a> file."
-msgstr "要订阅其他站点很容易，只需将它们加入您的<a href=\"subscriptions\">订阅</a>文件。"
+"href=\"subscriptions\">subscriptions</a>."
+msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:216
 msgid ""
@@ -794,41 +794,75 @@ msgid ""
 msgstr "更多关于 I2P 中命名的信息，请参见<a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">概述</a>。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:218
+msgid "How to use the Address Book?"
+msgstr ""
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:220
+msgid ""
+"The I2P Address Book allows you to manage addresses by sorting them into "
+"categories."
+msgstr ""
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:222
+msgid ""
+"You may use these categories according to how you intend to use the address."
+msgstr ""
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:224
+msgid ""
+"Router: These addresses are added automatically, by your subscriptions. If "
+"you publish an address book, the router address book will be shared with "
+"other I2P users."
+msgstr ""
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:226
+msgid ""
+"Local: This is your personal address book, for hosts which you publish and "
+"share with others."
+msgstr ""
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:228
+msgid ""
+"Private: This address book if used for addresses which you do not want to "
+"share with other I2P users."
+msgstr ""
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:230
 msgid "How does the address book application work?"
 msgstr "地址簿应用如何工作？"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:220
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:232
 msgid ""
 "The address book application regularly polls your subscriptions and merges "
 "their content into your \"router\" address book."
 msgstr ""
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:222
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:234
 msgid ""
 "Then it merges your \"local\" address book into the router address book as "
 "well."
 msgstr "接着它也会把你的“本地”地址簿合并到路由地址簿"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:224
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:236
 msgid ""
 "If configured, the router address book is now written to the \"published\" "
 "address book, which will be publicly available if you are running an I2P "
 "Site."
 msgstr ""
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:226
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:238
 msgid ""
 "The router also uses a private address book, which is not merged or "
 "published."
 msgstr "路由也使用私有地址簿，既不合并也不发布。"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:228
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:240
 msgid ""
 "Hosts in the private address book can be accessed by you but their addresses"
 " are never distributed to others."
 msgstr "您可以访问“私有”地址簿中的主机名，但它们的实际地址不会发布给其他人。"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:230
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:242
 msgid ""
 "The private address book can also be used for aliases of hosts in your other"
 " address books."

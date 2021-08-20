@@ -1,21 +1,22 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the i2p package.
 # 
 # Translators:
+# slrslr, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2015-02-18 22:14+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2017-11-12 14:01+0000\n"
+"PO-Revision-Date: 2021-07-08 09:46+0000\n"
+"Last-Translator: slrslr\n"
 "Language-Team: Czech (http://www.transifex.com/otf/I2P/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: cs\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
 #. Type: boolean
 #. Description
@@ -78,8 +79,8 @@ msgstr "Pokud máte velmi rychlé připojení, používáte hodně pluginů a ne
 #. Type: boolean
 #. Description
 #: ../i2p.templates:5001
-msgid "Run I2P daemon confined with AppArmor"
-msgstr ""
+msgid "Should the I2P daemon be confined with AppArmor?"
+msgstr "Měl by být I2P daemon omezen pomocí AppArmor?"
 
 #. Type: boolean
 #. Description
@@ -87,4 +88,4 @@ msgstr ""
 msgid ""
 "With this option enabled I2P will be sandboxed with AppArmor, restricting "
 "which files and directories may be accessed by I2P."
-msgstr ""
+msgstr "S touto možností zapnutou bude I2P omezen pomocí sandboxu AppArmor a nebude moci přistupovat k některým souborům a adresářům."

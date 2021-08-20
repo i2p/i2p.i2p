@@ -5,19 +5,20 @@
 # 
 # Translators:
 # A5h8d0wf0x <littleslyfoxie28@gmail.com>, 2014
+# slrslr, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
-"Last-Translator: A5h8d0wf0x <littleslyfoxie28@gmail.com>\n"
+"POT-Creation-Date: 2021-05-05 15:14+0000\n"
+"PO-Revision-Date: 2021-07-08 14:30+0000\n"
+"Last-Translator: slrslr\n"
 "Language-Team: Czech (http://www.transifex.com/otf/I2P/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: cs\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
 msgid "Congratulations on getting I2P installed!"
 msgstr "Gratulujeme k nainstalování I2P!"
@@ -27,13 +28,13 @@ msgstr "Vítejte v I2P!"
 
 #, java-format
 msgid "Please {0}have patience{1} as I2P boots up and finds peers."
-msgstr ""
+msgstr "Prosím {0}buďte trpěliví{1}, I2P startuje a hledá peery."
 
 #, java-format
 msgid ""
 "While you are waiting, please {0}adjust your bandwidth settings{1} on the "
 "{2}configuration page{3}."
-msgstr ""
+msgstr "Prosím {0}upravte nastavení datového přenosu{1} na stránce {2}nastavení{3}."
 
 msgid ""
 "Also you can setup your browser to use the I2P proxy to reach eepsites."
@@ -42,24 +43,27 @@ msgstr "Také můžete nastavit váš prohlížeč aby používal I2P proxy k do
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
 "browser settings."
-msgstr ""
+msgstr "Vložte HTTP proxy 127.0.0.1 (nebo localhost) a port 4444 do nastavení internetového prohlížeče."
 
 msgid "Do not use SOCKS for this."
-msgstr ""
+msgstr "Nepoužívejte SOCKS v tomto případě."
 
 #, java-format
 msgid ""
 "More information can be found on the {0}I2P browser proxy setup page{1}."
-msgstr ""
+msgstr "Více informací můžete najít na {0}stránce I2P nastavení proxy prohlížeče{1}."
 
 #, java-format
 msgid ""
 "Once you have a \"shared clients\" destination listed on the left, please "
 "{0}check out{1} our {2}FAQ{3}."
-msgstr ""
+msgstr "Jakmile bude v seznamu \"sdílení klienti\" nalevo cíl, prosím {0}zkontrolujte{1} FAQ {2}často kladené dotazy{3}."
 
 #, java-format
 msgid ""
 "Point your IRC client to {0}localhost:6668{1} and say hi to us on "
 "{2}#i2p{3}."
-msgstr ""
+msgstr "Nastavte svého IRC klienta na {0}localhost:6668{1} a pozdravte nás na {2}#i2p{3}."
+
+msgid "I2P Development Team"
+msgstr "Tým vývoje I2P"

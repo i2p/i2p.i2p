@@ -42,15 +42,14 @@ Pour obtenir un compte, rendez-vous sur <a href="http://hq.postman.i2p/" target=
 <b>Transfert anonyme de fichiers</b><br>
 Intégré à I2P, <a href="/torrents">I2PSnark</a> offre des transferts BitTorrent anonymes et chiffrés.</li>
 <li>
-<b>Dialogue en ligne anonyme</b><br>
-Lancez votre client IRC (p. ex. HexChat) et connectez-vous au <a href="irc://127.0.0.1:6668/i2p">server</a> sur <code>127.0.0.1 port 6668</code>.
-Vous n’avez pas besoin de configurer un mandataire dans votre client IRC ; I2P fournit un tunnel IRC local (configuré dans votre client IRC comme serveur IRC ou hôte distant).
-Votre tunnel I2P IRC local sur <code>localhost:6668</code> vous acheminera vers l’un des trois serveurs IRC hébergés sur I2P par Postman, echelon et zl0, mais ni eux ni vous ne sauront où l’autre se trouve et vos communications seront chiffrées en transit par I2P pour prévenir les interceptions.
-Une fois que vous y serez, <code>#i2p-chat</code> et <code>#i2p-dev</code> ne sont que quelques-uns des canaux proposés auxquels vous pourriez vous joindre.
-I2P est aussi adéquat pour des dialogues en ligne anonymes qui ne peuvent être ni surveillés ni censurés, et il y a aussi d’autres serveurs IRC, des serveurs Jabber, un dialogue en ligne Web, et plus encore.
-Vous pouvez faire tourner vos propres serveurs sur I2P, quel qu’en soit le type, ou si vous êtes un développeur écrire vos propres <a href="http://i2p-projekt.i2p/applications.html" target="_blank">applications I2P</a>.
-Les protocoles UDP et TCP sont tous deux <a href="http://i2p-projekt.i2p/techintro.html#op.transport" target="_blank">pris en charge</a>. 
-Nous offrons aussi l’accès complet à l’<a href="http://echelon.i2p/javadoc/" target="_blank">API Java</a>.</li>
+<b>Anonymous Chat</b><br>
+Start your IRC client (e.g. HexChat) and connect to the <a href="irc://127.0.0.1:6668/i2p">server</a> at <code>127.0.0.1 port 6668</code>.
+You do not need to configure a proxy in your IRC client; I2P provides you with a local IRC tunnel (configured in your IRC client as an IRC server or remote host).
+Your local I2P IRC tunnel on <code>localhost:6668</code> will direct you to one of three IRC servers hosted on I2P by Postman, echelon and zl0, but neither you nor they know where the other is, and your communcations are encrypted in transit by I2P to prevent interception.
+Once you're there, <code>#i2p-chat</code> and <code>#i2p-dev</code> are just a few of the available channels you may wish to join.
+I2P is also suitable for unmonitorable and uncensorable anonymous chat, as well as alternative IRC servers, Jabber servers, website-based chat, and more.
+You may run your own servers over I2P in whatever flavor you choose, or if you're a developer write your own <a href="http://i2p-projekt.i2p/applications.html" target="_blank">I2P applications</a>.
+Both UDP and TCP protocols are <a href="http://i2p-projekt.i2p/techintro.html#op.transport" target="_blank">supported</a>.</li>
 
 <li>
 <b>Forum et blogage</b><br>
@@ -92,16 +91,13 @@ Vous pourrez accéder par votre propre serveur Web I2P sur <a href="http://127.
 <a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a> : un forum où l’on discute des problèmes et idées relatives à I2P et des sujets connexes.</li>
 
 <li>
-<b>Ressources I2P d’echelon</b><br><a href="http://echelon.i2p/" target="_blank">echelon.i2p</a> : archive de logiciels d’I2P avec le code source, des renseignements sur I2P, un <a href="http://echelon.i2p/I2Pguide/index.html" target="_blank">guide pour débutants</a> et des préversions d’I2P pour les développeurs.</li>
-
-<li>
 <b>Planète I2P</b><br><a href="http://planet.i2p/" target="_blank">planet.i2p</a> : un site agrégateur RSS qui prend des nouvelles et des événements partout dans I2P et les publie au même endroit. Un bon site à visiter pour voir la communauté en action.</li>
 
 <li>
 <b>Santé du réseau I2P</b><br><a href="http://stats.i2p/cgi-bin/dashboard.cgi" target="_blank">stats.i2p</a> : vérifiez les divers aspects des performances du réseau grâce à ce site de surveillance du réseau géré par zzz.</li>
 
 <li>
-<b>Système de suivi des bogues d’I2P — GitLab</b><br><a href="http://git.idk.i2p/" target="_blank">git.idk.i2p</a> : le système de signalement et de suivi des bogues d’I2P. Veuillez vous y rendre si vous avez un problème à signaler. Il se trouve aussi sur <a href="https://i2pgit.org/" target="_blank">https://i2pgit.org/</a>
+<b>I2P Bug Tracker - GitLab</b><br><a href="http://git.idk.i2p/" target="_blank">git.idk.i2p</a>: I2P's issue reporting and bug-tracking system. Please visit if you have an issue to report, also available at <a href="https://i2pgit.org/" target="_blank">https://i2pgit.org/</a>
 </li>
 
 <li>
@@ -168,10 +164,10 @@ Vous pourriez aussi consulter les renseignements sur le <a href="http://i2p-proj
 Ces canaux sont aussi accessibles par <a href="irc://irc.freenode.net/i2p">Freenode IRC</a> en dehors du réseau chiffré anonyme d’I2P.</li>
 
 <li>
-<b>Signaler des bogues</b><br>
-Pour signaler un bogue, veuillez remplir un ticket sur <a href="http://git.idk.i2p/" target="_blank">git.idk.i2p</a> ou sur le réseau visible <a href="https://i2pgit.org/" target="_blank">https://i2pgit.org/</a>.
-Pour les discussions des développeurs, veuillez visiter les <a href="http://zzz.i2p/" target="_blank">forums pour développeurs de zzz</a> ou rendez-vous sur le <a href="irc://127.0.0.1:6668/i2p-dev">canal des développeurs</a> sur le réseau IRC d’I2P.
-Les développeurs peuvent parcourir la source sur <a href="http://git.idk.i2p/i2p-hackers/i2p.i2p" target="_blank">git.idk.i2p</a>.</li>
+<b>Reporting Bugs</b><br>
+To report a bug, please file a ticket on <a href="http://git.idk.i2p/" target="_blank">git.idk.i2p</a> or, over clearnet, <a href="https://i2pgit.org/" target="_blank">https://i2pgit.org/</a>.
+For developer-related discussions, please visit <a href="http://zzz.i2p/" target="_blank">zzz's developer forums</a> or come and visit the <a href="irc://127.0.0.1:6668/i2p-dev">developer channel</a> on I2P's IRC network.
+Developers can browse source at <a href="http://git.idk.i2p/i2p-hackers/i2p.i2p" target="_blank">git.idk.i2p</a>.</li>
 <li>
 <b>Impliquez-vous !</b><br>
 I2P est développé et maintenu principalement par une participation bénévole, sans financement, des membres de la communauté.

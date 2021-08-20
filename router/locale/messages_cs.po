@@ -2,25 +2,25 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# foo <foo@bar>, 2009.
+# 
 # Translators:
-# A5h8d0wf0x <littleslyfoxie28@gmail.com>, 2014
-# Pavel Pavel <tmp478523792@gmail.com>, 2016
-# Waseihou Watashi <waseihou@gmail.com>, 2012
+# zzzi2p, 2019
+# slrslr, 2021
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P\n"
+"Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-18 13:32+0000\n"
-"PO-Revision-Date: 2019-11-28 13:22+0000\n"
-"Last-Translator: Ondrej Führer <transifex@fuhrer.cz>\n"
-"Language-Team: Czech (http://www.transifex.com/otf/I2P/language/cs/)\n"
-"Language: cs\n"
+"PO-Revision-Date: 2019-12-19 14:09+0000\n"
+"Last-Translator: slrslr, 2021\n"
+"Language-Team: Czech (https://www.transifex.com/otf/teams/12694/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
-"<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"Language: cs\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
 #. * IPv4 OK, IPv6 OK or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:370
@@ -33,7 +33,7 @@ msgstr "IPv4: OK, IPv6: Testování"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:372
 msgid "IPv4: OK; IPv6: Firewalled"
-msgstr ""
+msgstr "IPv4: OK; IPv6: Firewalled"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:373
 msgid "IPv4: Testing; IPv6: OK"
@@ -41,7 +41,7 @@ msgstr "IPv4: Testování, IPv6: OK"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:374
 msgid "IPv4: Firewalled; IPv6: OK"
-msgstr ""
+msgstr "IPv4: Firewalled; IPv6: OK"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:375
 msgid "IPv4: Disabled; IPv6: OK"
@@ -49,37 +49,37 @@ msgstr "IPv4: Zakázáno, IPv6: OK"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:376
 msgid "IPv4: Symmetric NAT; IPv6: OK"
-msgstr ""
+msgstr "IPv4: Symetrický NAT; IPv6: OK"
 
 #. * IPv4 symmetric NAT, IPv6 firewalled or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:378
 msgid "Symmetric NAT"
-msgstr ""
+msgstr "Symetrický NAT"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:379
 msgid "IPv4: Symmetric NAT; IPv6: Testing"
-msgstr ""
+msgstr "IPv4: Symetrický NAT; IPv6: Testování"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:380
 msgid "IPv4: Firewalled; IPv6: Testing"
-msgstr ""
+msgstr "IPv4: Firewalled; IPv6: Testování"
 
 #. * IPv4 firewalled, IPv6 firewalled or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:382
 msgid "Firewalled"
-msgstr ""
+msgstr "Firewalled"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:383
 msgid "IPv4: Testing; IPv6: Firewalled"
-msgstr ""
+msgstr "IPv4: Testování; IPv6: Firewalled"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:384
 msgid "IPv4: Disabled; IPv6: Testing"
-msgstr ""
+msgstr "IPv4: Vypnuto; IPv6: Testování"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:385
 msgid "IPv4: Disabled; IPv6: Firewalled"
-msgstr ""
+msgstr "IPv4: Vypnuto; IPv6: Firewalled"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:386
 msgid "Disconnected"
@@ -87,15 +87,16 @@ msgstr "Odpojeno"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:387
 msgid "Port Conflict"
-msgstr ""
+msgstr "Konflikt Portu"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:388
 msgid "Testing"
-msgstr ""
+msgstr "Testování"
 
 #. NPE, too early
 #. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
-#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too low");
+#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too
+#. low");
 #. else
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:84
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:142
@@ -116,7 +117,8 @@ msgid "Rejecting most tunnels: High number of requests"
 msgstr "Odmítám tunely: velké množství požadavků"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of tunnels");
+#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of
+#. tunnels");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:243
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:424
 msgid "Accepting most tunnels"
@@ -136,7 +138,8 @@ msgid "Rejecting tunnels: Bandwidth limit"
 msgstr "Odmítnutí tunelů: limit rychlosti"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels: Bandwidth limit");
+#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels:
+#. Bandwidth limit");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:420
 msgid "Rejecting most tunnels: Bandwidth limit"
 msgstr "Odmítnutí většiny tunelů: limit rychlost"
@@ -151,37 +154,34 @@ msgstr "Odmítnutí tunelů"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:260
 msgid "Dropping tunnel requests: Too slow"
-msgstr ""
+msgstr "Zahazování požadavků tunelu: Příliš pomalé"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:270
 msgid "Dropping tunnel requests: High job lag"
-msgstr ""
+msgstr "Zahazování požadavků tunelu: Vysoké zpoždění úlohy"
 
 #. don't even bother, since we are so overloaded locally
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:464
 msgid "Dropping tunnel requests: Overloaded"
-msgstr ""
+msgstr "Zahazování požadavků tunelu: Přetíženo"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:747
-#, fuzzy
 msgid "Rejecting tunnels: Hidden mode"
-msgstr "Odmítám tunely: velké spoždění zprávy"
+msgstr "Odmítnutí tunelů: Skrytý režim"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:775
-#, fuzzy
 msgid "Rejecting tunnels: Request overload"
-msgstr "Odmítám tunely: limit dosažen"
+msgstr "Odmítnutí tunelů: Přetížení mnoha požadavky"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:806
-#, fuzzy
 msgid "Rejecting tunnels: Connection limit"
-msgstr "Odmítnutí tunelů: limit rychlosti"
+msgstr "Odmítnutí tunelů: Limit počtu spojení"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1024
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1057
 msgid "Dropping tunnel requests: High load"
-msgstr ""
+msgstr "Zahazování požadavků tunelu: Vysoká zátěž"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1140
 msgid "Dropping tunnel requests: Queue time"
-msgstr ""
+msgstr "Zahazování požadavků tunelu: Čas fronty"

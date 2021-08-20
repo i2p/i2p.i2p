@@ -18,7 +18,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-05 15:14+0000\n"
-"PO-Revision-Date: 2021-05-13 23:06+0000\n"
+"PO-Revision-Date: 2021-08-20 15:51+0000\n"
 "Last-Translator: ☆Verdulo\n"
 "Language-Team: Polish (http://www.transifex.com/otf/I2P/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -1518,7 +1518,7 @@ msgstr "To są lokalne usługi dostarczane przez Twój węzeł."
 msgid ""
 "By default, most of your client services (email, HTTP proxy, IRC) will share"
 " the same set of tunnels and be listed as \"Shared Clients\"."
-msgstr "Domyślnie większość usług klienckich (el‑poczta, proxy HTTP, IRC) dzieli wspólny zestaw tuneli wyświetlany jako „współdzielone klienty”."
+msgstr "Domyślnie większość usług klienckich (e‑poczta, proxy HTTP, IRC) dzieli wspólny zestaw tuneli wyświetlany jako „współdzielone klienty”."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:177
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:638

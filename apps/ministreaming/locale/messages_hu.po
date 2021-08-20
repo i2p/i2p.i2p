@@ -5,13 +5,14 @@
 # 
 # Translators:
 # Hunor Paksy <heds@cock.li>, 2018
+# Nyul Csoki <csokinyul@i2pmail.org>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-29 14:30+0000\n"
-"PO-Revision-Date: 2018-12-15 20:02+0000\n"
-"Last-Translator: Hunor Paksy <heds@cock.li>\n"
+"PO-Revision-Date: 2021-06-20 09:47+0000\n"
+"Last-Translator: AdminLMH <lehetmashogy@i2pmail.org>\n"
 "Language-Team: Hungarian (http://www.transifex.com/otf/I2P/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -38,7 +39,7 @@ msgstr "Helyi hálózati hiba"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:81
 msgid "Session closed"
-msgstr ""
+msgstr "Munkafázis lezárva"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:84
 msgid "Invalid message"
@@ -58,7 +59,7 @@ msgstr "Üzenet lejárt"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:96
 msgid "Local lease set invalid"
-msgstr ""
+msgstr "Helyi cél névbejegyzés információ érvénytelen"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:99
 msgid "No local tunnels"
@@ -74,11 +75,11 @@ msgstr "Érvénytelen célállomás"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:111
 msgid "Destination lease set expired"
-msgstr ""
+msgstr "Távoli cél névbejegyzés információ lejárt"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:114
 msgid "Destination lease set not found"
-msgstr ""
+msgstr "Úticél kihasználási engedély nem található"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:117
 msgid "Local destination shutdown"

@@ -5,19 +5,20 @@
 # 
 # Translators:
 # A5h8d0wf0x <littleslyfoxie28@gmail.com>, 2014
+# slrslr, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-29 14:30+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"PO-Revision-Date: 2021-07-08 12:50+0000\n"
+"Last-Translator: slrslr\n"
 "Language-Team: Czech (http://www.transifex.com/otf/I2P/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: cs\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:69
 msgid "Message timeout"
@@ -42,53 +43,53 @@ msgstr "Schůze uzavřena"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:84
 msgid "Invalid message"
-msgstr ""
+msgstr "Neplatná zpráva"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:87
 msgid "Invalid message options"
-msgstr ""
+msgstr "Neplatné vlastnosti zprávy"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:90
 msgid "Buffer overflow"
-msgstr ""
+msgstr "Přetečení vyrovnávací paměti"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:93
 msgid "Message expired"
-msgstr ""
+msgstr "Zpráva vypršela"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:96
 msgid "Local lease set invalid"
-msgstr ""
+msgstr "Nastavení místního pronájmu je neplatné"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:99
 msgid "No local tunnels"
-msgstr ""
+msgstr "Žádné místní tunely"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:102
 msgid "Unsupported encryption options"
-msgstr ""
+msgstr "Nepodporované vlastnosti šifrování"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:105
 msgid "Invalid destination"
-msgstr ""
+msgstr "Neplatný cíl"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:111
 msgid "Destination lease set expired"
-msgstr ""
+msgstr "Vypršela platnost sady cílového pronájmu"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:114
 msgid "Destination lease set not found"
-msgstr ""
+msgstr "Cílová sada pronájmu nebyla nalezena"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:117
 msgid "Local destination shutdown"
-msgstr ""
+msgstr "Vypnutí místního cíle"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:120
 msgid "Connection was reset"
-msgstr ""
+msgstr "Spojení bylo resetováno"
 
 #. Translate this one here, can't do it later
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:127
 msgid "Failure code"
-msgstr ""
+msgstr "Kód selhání"

@@ -5,13 +5,15 @@
 # 
 # Translators:
 # Gergő Doma <domag02@gmail.com>, 2019
+# AdminLMH <lehetmashogy@i2pmail.org>, 2021
+# Nyul Csoki <csokinyul@i2pmail.org>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2019-12-15 19:30+0000\n"
-"Last-Translator: Gergő Doma <domag02@gmail.com>\n"
+"POT-Creation-Date: 2021-05-05 15:14+0000\n"
+"PO-Revision-Date: 2021-06-20 09:47+0000\n"
+"Last-Translator: AdminLMH <lehetmashogy@i2pmail.org>\n"
 "Language-Team: Hungarian (http://www.transifex.com/otf/I2P/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,39 +29,42 @@ msgstr "Üdvözöl az I2P!"
 
 #, java-format
 msgid "Please {0}have patience{1} as I2P boots up and finds peers."
-msgstr "Kérem {0}legyen türelemmel{1} amíg az I2P elindul és társakat talál."
+msgstr "Kérlek {0}légy türelemmel{1} amíg az I2P elindul és társakat talál."
 
 #, java-format
 msgid ""
 "While you are waiting, please {0}adjust your bandwidth settings{1} on the "
 "{2}configuration page{3}."
-msgstr "Amíg várakozik, kérem {0}hangolja be a sávszélesség beállításokat{1} a {2}beállítások oldalon{3}."
+msgstr "Amíg várakozol, kérlek {0}hangold be a sávszélesség beállításokat{1} a {2}beállítások oldalon{3}."
 
 msgid ""
 "Also you can setup your browser to use the I2P proxy to reach eepsites."
-msgstr "Továbbá beállíthatja a böngészőjét az I2P proxy használatára az eepsite-ok eléréséhez."
+msgstr "Továbbá beállíthatod a böngésződet az I2P proxy használatára az eepsite-ok eléréséhez."
 
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
 "browser settings."
-msgstr "Csak adja meg a 127.0.0.1 címet (vagy localhost), 4444-es porton mint http proxy a böngésző beállításaiban."
+msgstr "Csak add meg a 127.0.0.1 címet (vagy localhost), 4444-es porton mint http proxy a böngésző beállításaiban."
 
 msgid "Do not use SOCKS for this."
-msgstr "Ne használjon SOCKS-ot ehhez."
+msgstr "Ne használj SOCKS-ot ehhez."
 
 #, java-format
 msgid ""
 "More information can be found on the {0}I2P browser proxy setup page{1}."
-msgstr "További információt találhat az {0}I2P böngésző proxy beállítása lapon{1}."
+msgstr "További információt találhatsz az {0}I2P böngésző proxy beállítása lapon{1}."
 
 #, java-format
 msgid ""
 "Once you have a \"shared clients\" destination listed on the left, please "
 "{0}check out{1} our {2}FAQ{3}."
-msgstr "Kérjük, hogy miután már szerepelnek \"megosztott kliens\" célok a bal oldalon, {0}tekintse meg{1} a {2}GYIK-et{3} is."
+msgstr "Kérünk, hogy miután már szerepelnek \"megosztott kliens\" célok a bal oldalon, {0}tekintsd meg{1} a {2}GYIK-et{3}."
 
 #, java-format
 msgid ""
 "Point your IRC client to {0}localhost:6668{1} and say hi to us on "
 "{2}#i2p{3}."
-msgstr "Irányítsa az IRC kliensét a {0}localhost:6668{1} címre és üdvözöljön minket az {2}#i2p{3} csatornán."
+msgstr "Irányítsd az IRC kliensedet a {0}localhost:6668{1} címre és üdvözölj minket az {2}#i2p{3} csatornán."
+
+msgid "I2P Development Team"
+msgstr "I2P Fejlesztői Csapata"

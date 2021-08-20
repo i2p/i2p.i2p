@@ -8,13 +8,14 @@
 # Irina Fedulova <istartlin@gmail.com>, 2020
 # 82f4f02557fd4886d250a2aa0aecb530_0f90749 <0cd40767d55b0248271195f29db18a8d_208365>, 2014
 # tengo <akin@rbcmail.ru>, 2013
+# ValdikSS <iam@valdikss.org.ru>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2020-07-24 15:16+0000\n"
-"Last-Translator: Irina Fedulova <istartlin@gmail.com>\n"
+"POT-Creation-Date: 2021-05-05 15:14+0000\n"
+"PO-Revision-Date: 2021-06-09 17:25+0000\n"
+"Last-Translator: ValdikSS <iam@valdikss.org.ru>\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -66,3 +67,6 @@ msgid ""
 "Point your IRC client to {0}localhost:6668{1} and say hi to us on "
 "{2}#i2p{3}."
 msgstr "Подключите IRC-клиент к {0}localhost:6668{1} и поприветствуйте нас на {2}#i2p{3}."
+
+msgid "I2P Development Team"
+msgstr "Команда разработчиков I2P"

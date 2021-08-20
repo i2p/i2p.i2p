@@ -45,8 +45,8 @@
     <ul>
 <li>
 <b>Linux</b><br>
-        Standard install: <code dir="ltr">~/.i2p/eepsite/docroot/</code><br>
-        Package install, running as a service: <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+       Normál telepítés: <code dir="ltr">~/.i2p/eepsite/docroot/</code><br>
+        Csomag telepítés, szolgáltatásként fut: <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/</code>
 </li>
       <li>
 <b>Windows</b><br><code dir="ltr">%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
@@ -55,20 +55,20 @@
 <b>Mac</b><br><code dir="ltr">/Users/(user)/Library/Application Support/i2p</code>
 </li>
     </ul>
-<p>In I2P, hidden services are addressed using a Base32 address ending in ".b32.i2p", or a Destination represented as a long Base64 string.
-      The Base32 address may be used as a hostname, until you register a name following the instructions below.
-      The Destination is somewhat like an IP address, and is shown on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.</p>
+<p>Az I2P-ben a rejtett szolgáltatások megjelölésére egy Base32 címmel történik, aminek a vége ".b32.i2p", vagy egy Úticél, ami egy hosszú Base64 karaktersorozat.
+      A Base32 cím használható, mint gépnév, névbejegyzés előtt. A névbejegyzés az alábbi útmutató alapján történik.
+      Az Úticél hasonló az IP címhez, megtalálható a <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Rejtett Szolgáltatások Beállításai oldalon</a>.</p>
 
     <p>Az alábbi utasítások részletezik, miként lehet egy "enoldalam.i2p"-hez hasonló nevet társítani a weboldaladhoz, hogy mások is hozzáférjenek.
       Az oldal helyileg elérhető a <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a> címen.</p>
 
     <h2>Hogyan állítsd be és hirdesd a rejtett szolgáltatásod</h2>
 
-     <p>Your webserver is running by default, but is not accessible by others until you start the hidden service tunnel.
-      After you start your I2P Webserver tunnel, it will be difficult for other people to find.
-      It can only be accessed with the long Destination or with the shorter Base32 address (.b32.i2p), which is a hash of the Destination.
-      You could just tell people the Destnation or the Base32 address, but thankfully I2P has an address book and several easy ways to tell people about your website.
-      Here are detailed instructions.</p>
+     <p>A saját webszervered fut alapértelmezésben, de nem érhető el mások által, amíg el nem indítod a rejtett szolgáltatás alagutat.
+      Miután elindítottad az I2P Webszerver alagutadat, másoknak nehéz lesz megtalálniuk.
+      Csak a hosszú Úticéllal vagy a rövidebb Base32 címmel (.b32.i2p) lesz elérhető, ami az Úticél hash-e.
+      Elmondhatod másoknak az Úticélt vagy a Base32 címet, de szerencsére az I2P-nek van címlistája és néhány egyszerű módszere, hogy értesíts másokat a weboldaladról
+      A részletes útmutató következik.</p>
 
     <ul>
 <li>Válassz egy nevet a weboldaladnak (<i>valami</i>.i2p), kizárólag kis betűkkel.
@@ -102,92 +102,90 @@
 <li>
 <b>Firefox:</b> Preferenciák ➜ Haladó ➜ Hálózat ➜ Gyorsítótárazott Web Tartalom ➜ Ürítés most</li>
       <li>
-<b>Chrome/Chromium:</b> Settings ➜ Advanced Settings ➜ Privacy ➜ Clear browsing data</li>
+<b>Chrome/Chromium:</b> Beállítások ➜ Speciális ➜ Böngészési adatok törlése ➜ Böngészési adatok törlése</li>
       <li>
-<b>Opera:</b> Settings ➜ Privacy ➜ Clear browsing data</li>
+<b>Opera:</b> Beállítások ➜ Adatvédelem és biztonság ➜ Böngészési adatok törlése</li>
     </ul>
 <h2>Regisztráld a saját I2P domain-ed</h2>
 
-    <p>Now it is time to add your website to an I2P address book hosted by a site such as <a href="http://stats.i2p/%20" target="_blank">stats.i2p</a> or <a href="http://no.i2p/" target="_blank">no.i2p</a>. 
+    <p>Now it is time to add your website to an I2P address book hosted by a site such as <a href="http://stats.i2p/" target="_blank">stats.i2p</a>. 
       You must enter your website name and Destination (or Registration Authentication string) on one or more of these sites.</p>
-<p>Some registration sites require the Destination.
-      If so, highlight and copy the entire Local destination on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.
-      Make sure you copy the whole thing, it is over 500 characters.</p>
-<p>Some registration sites, including <a href="http://stats.i2p/i2p/addkey.html" target="_blank">stats.i2p</a>, require the Registration Authentication string.
-      It is found on the <a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">Registration Authentication page</a> linked from the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service configuration page</a>.
-      Copy the entire authentication string and paste it on the registration page. 
-      Make sure you copy the whole thing, it is over 500 characters.
-      Describe your site briefly if the site requests this information.
-      If your site is a HTTP service, leave the checkbox selected; if not, unselect it.</p>
-<p>For all registration sites, read through the Terms of Service carefully.
-      Click the "Submit" button.
-      Verify the submission was successful.
-      Since many routers periodically get address book updates from these sites, within several hours others will be able to find your website by simply entering your hostname in their browser.</p>
+<p>Néhány regisztrációs oldalon szükséges megadni az Úticélt.
+      Ha ez a helyzet, jelöld ki és másold be a teljes Helyi Úticélt a <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Rejtett Szolgáltatások Beállításai</a> oldalról.
+      Győződj meg róla, hogy átmásoltad az egészet, több, mint 500 karakterből áll.</p>
+<p>Néhány regisztrációs oldalon, többek között <a href="http://stats.i2p/i2p/addkey.html" target="_blank">stats.i2p</a>, szükség van a Regisztárciós Hitelesítés karaktersorozatra.
+      Ez a <a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">Regisztrációs Hitelesítés oldalon</a> található, hivatkozás a  <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Rejtett Szolgáltatások Beállításai</a> oldalról.
+      Másold ki a teljes hitelesítési karaktersorozatot és illeszd be a regisztrációs oldalon. 
+      Győződj meg arról, hogy az egészet átmásolod, több, mint 500 karakterből áll.
+      Adj rövid leírást az oldaladról, ha az oldal kéri ezt az információt.
+      Ha az oldalad HTTP szolgáltatás, hagyd a pipát bejelölve; ha nem, vedd ki a pipát.</p>
+<p>Minden regisztrációs oldalon figyelmesen olvasd el a Szolgáltatás Feltételeit.
+      Kattints a "Elküld" gombra.
+      Bizonyosodj meg, hogy sikeresen el lett küldve.
+      Mivel sok router kap időszakos címlista frissítéseket ezektől az oldalaktól, néhány órán belül elérhető lesz a weboldalad mások számára, ha egyszerűen begépelik az oldalad címét a böngészőbe.</p>
 
-    <h2>Adding Addressbook Subscriptions</h2>
+    <h2>Címjegyzék Bejegyzések Hozzáadása</h2>
 
-    <p>Speaking of address book updates, this would be a good time to add some more addressbooks to your own subscription list.
-       Go to your <a href="http://127.0.0.1:7657/susidns/subscriptions">Subscriptions Configuration page</a> and add one or more for an automatically updated list of new hosts:</p>
+    <p>A címjegyzék frissítésekről szólva, ez jó idő arra, hogy még több címjegyzéket adj hozzá saját bejegyzési listádhoz.
+       Menj a <a href="http://127.0.0.1:7657/susidns/subscriptions">Bejegyzések Beállításai oldalra</a> és adj hozzá egyet vagy többet, új kiszolgálók automatikusan frissített listájáért:</p>
 
     <ul>
 <li>
 <code dir="ltr">http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
-      <li>
-<code dir="ltr">http://no.i2p/export/alive-hosts.txt</code> (<a href="http://no.i2p/export/alive-hosts.txt" target="_blank">no.i2p</a>)</li>
     </ul>
-<p>If you are in a hurry and can't wait a few hours, you can tell people to use a "jump" address helper redirection service. 
-      This will work within a few minutes of your registering your hostname on the same site.
-      Test it yourself first by entering <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code> into your browser. 
-      Once it is working, you can tell others to use it.</p>
+<p>Ha sietsz és nem tudsz órákat várni, megkérhetsz másokat, hogy használják az "ugrás" cím átirányító segédszolgáltatást.
+Ez néhány perccel azután működésbe lép, hogy regisztráltad az oldalnevedet ugyanazon az oldalon.
+      Magad is kipróbálhatod, ha megadod a <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i>valami</i>.i2p</code> címet a böngésződben. 
+     Amint működésbe lép, elmondhatod másoknak, hogy használják.</p>
 
-    <p>Some people check website lists such as <a href="http://identiguy.i2p/" target="_blank">Identiguy's eepsite status list</a> or <a href="http://no.i2p/browse/" target="_blank">no.i2p's active host list</a> for new eepsites, so your site may start getting some traffic. 
-      There are plenty of other ways to tell people. Here are a few ideas:</p>
+    <p>Vannak, akik weboldal listákat néznek, mint pl.  <a href="http://identiguy.i2p/" target="_blank">Identiguy eepoldal állapot listája</a> vagy <a href="http://no.i2p/browse/" target="_blank">no.i2p aktív kiszolgáló listája</a> új   eepoldalakért, így lehet, hogy a weboldaladnak némi forgalma lesz.
+      Sok más mód van arra, hogy elmondd másoknak. Íme néhány ötlet:</p>
 
     <ul>
-<li>Post a message on the <a href="http://i2pforum.i2p/" target="_blank">I2P forum</a> telling everyone about your new I2P website!</li>
-      <li>Tell people about it on the #i2p or #i2p-chat channels on IRC.</li>
-      <li>Put it on the <a href="http://i2pwiki.i2p/index.php?title=Eepsite/Services" target="_blank">I2PWiki Eepsite Index</a>
+<li>Küldj üzenetet az  <a href="http://i2pforum.i2p/" target="_blank">I2P fórumon</a>, mesélj mindenkinek az új I2P weboldaladról!</li>
+      <li>Mondd el az #i2p vagy #i2p-chat IRC csatornán.</li>
+      <li>Tedd fel ide:  <a href="http://i2pwiki.i2p/index.php?title=Eepsite/Services" target="_blank">I2PWiki Eepoldal Tartalomjegyzék</a>
 </li>
     </ul>
-<p>Note that some sites recommend pasting in that really long destination.
-      You can if you want, but if you have successfully registered your hostname on a registration service, tested it using a jump service, and waited 24 hours for the address book update to propagate to others, that shouldn't be necessary.</p>
+<p>Jó tudni, hogy néhány oldal annak az igazán hosszú úticél beillesztését javasolja.
+      Megteheted, ha akarod, de ha sikeresen regisztráltad az oldalad címét egy regisztrációs szolgáltatón, leellenőrizted az ugrás szolgáltatással és vártál 24 órát címjegyzék frissítésére, hogy eljusson másokhoz, erre nem kéne, hogy szükséges legyen.</p>
 
-    <h2>Using an alternative webserver to host your site</h2>
+    <h2>Alternatív webkiszolgáló használata, hogy tárolja az oldaladat</h2>
 
-    <p>This site (and the I2P router console) is running on the <a href="https://en.wikipedia.org/wiki/Jetty_(web_server)" target="_blank">Jetty webserver</a>, but you may wish to use a different webserver to host your content. 
-      To maintain anonymity, be sure that your webserver is configured to only allow connections from localhost (127.0.0.1), and check the documentation to ensure your webserver isn't advertising details that may compromise your anonymity.</p>
+    <p>Ez az oldal (és az I2P router parancsértelmező) a <a href="https://en.wikipedia.org/wiki/Jetty_(web_server)" target="_blank">Jetty webszerveren</a> fut, de lehet, hogy másik webkiszolgálót szeretnél használni tartalom tárolására.
+      A névtelenség megőrzése érdekében győződj meg arról, hogy a webszerver úgy van beállítva, hogy csak localhost-ról (127.0.0.1) engedélyezzen csatlakozást, és nézd át a dokumentációt, hogy megbizonyosodj arról, hogy a webszerver nem küld olyan adatokat, melyek a névtelenségedet veszélyeztethetik.</p>
 
-     <p>To configure your webserver for use on I2P, you may either use the existing webserver tunnel and <a href="http://127.0.0.1:7657/configclients">disable the default webserver</a> from running, or create a new HTTP Server tunnel in the <a href="http://127.0.0.1:7657/i2ptunnelmgr">Hidden Services Manager</a>.
-       Ensure that the listening port configured for the webserver (7658 by default) is also configured in the Hidden Services settings.
-       For example, if your webserver is listening by default on address 127.0.0.1 port 80, you'd need to also ensure that the Target port in the Hidden Service Manager settings page for the service is also configured to port 80.</p> 
+     <p>Hogy beállítsd a webkiszolgálódat az I2P-hez, használhatod vagy a meglévő webszerver alagutat és <a href="http://127.0.0.1:7657/configclients">alapértelmezett webszerver letiltása</a>, hogy ne fusson, vagy létrehozhatsz egy új HTTP Szerver alagutat a <a href="http://127.0.0.1:7657/i2ptunnelmgr">Rejtett Szolgáltatások Kezelőjében</a>.
+       Bizonyosodj meg arról, hogy webszerverhez beállított figyelő port (7658 alapértelmezésben) a Rejtett Szolgáltatások beállításaiban is megadásra került.
+       Például, ha a webszervered az alapértelmezésben a 127.0.0.1 címen a 80-as porton figyel, szükséged lesz arra is, hogy a szolgáltatáshoz tartozó cél port a Rejtett Szolgáltatások Kezelő beállítások oldalon ugyancsak a 80-as porthoz legyen beállítva.</p> 
 
-        <p>Beware that a poorly configured webserver or web appplication can leak potentially compromising information such as 
-          your real IP address or server details that may reduce your anonymity or assist a hacker.
-          We recommend using the default server unless you feel comfortable doing server administration.
-          Please ensure your web server is secure prior to placing it online.
-          There are plenty of guides online, for example if you search for "nginx security hardening guide" you will find a number of guides that have good recommendations.</p> 
+        <p>Vigyázz, hogy a rosszul beállított webszerver vagy webalkalmazás kiszivárogtathat olyan valószínűleg veszélyes információkat, mint
+          az igazi IP cím vagy szerveradatok, melyek csökkenthetik az anonimitásod vagy hacker-ek segítségére lehetnek.
+          Javasoljuk az alapértelmezett szerver használatát, ha nem vagy biztos szerverek kezelésében.
+          Kérünk győződj meg arról, hogy a webszervered biztonságos, mielőtt csatlakoztatnád.
+          Sok Internetes útmutató létezik, például ha rákeresel a "nginx biztonsági edzési hogy"-ra, találsz majd néhány útmutatót, melyek jó tanácsokkal szolgálnak.</p> 
 
-        <p>There is one important issue with the Apache web server.
-          The <code dir="ltr">mod_status</code> and <code dir="ltr">mod_info</code> Apache modules are enabled by default on some operating systems.
-          These modules expose internal data which can lead to serious compromise of anonymity when used on an anonymous network.
-          Removing the lines in the configuration file where these modules are loaded is the easiest way to prevent these issues.</p>
+        <p>Egy jelentős probléma van az Apache webszerverrel.
+          A <code dir="ltr">mod_status</code> és <code dir="ltr">mod_info</code> Apache modulok alapértelmezésben engedélyezettek néhány operációs rendszeren.
+          Ezek a modulok belső adatokat tesznek közzé, melyek a névtelenség komoly veszélyeztetéséhez vezethetnek, amikor névtelenségi hálózatra kerülnek.
+          A legegyszerűbb módja, hogy  ezt a problémát elkerüljük, azon sorok eltávolítása a beállító fájlból, melyek ezeket a modulokat betöltik.</p>
 
-    <h2>Further Assistance</h2>
+    <h2>További Segítség</h2>
 
-        <p>If you have any questions, the following places are available for support:</p>
+        <p>Ha kérdésed van, a következő helyeken fodulhatsz segítségért:</p>
 
         <ul>
-<li>Our IRC support channel:<ul>
-<li><a href="irc://irc.freenode.net/i2p">#i2p on Freenode</a></li>
-                <li>Anonymously using your local <a href="irc://127.0.0.1:6668/i2p">I2P IRC tunnel</a>.</li>
+<li>Az IRC támogató csatornánk:<ul>
+<li><a href="irc://irc.freenode.net/i2p">#i2p a Freenode-n</a></li>
+                <li>Névtelenül használd a helyi <a href="irc://127.0.0.1:6668/i2p">I2P IRC alagutat</a>.</li>
              </ul>
 </li>
-<li>The project forum <a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>.</li>
-            <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">I2PWiki Eepsite Hosting guide</a></li>
+<li>A projekt fórumot  <a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>.</li>
+            <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">I2PWiki Eepoldal Szolgáltató útmutató</a></li>
         </ul>
 <hr>
-<div class="notify">This page, the project website and the router console need translations!
-          Please help the project grow by <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank"> getting involved</a> or <a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators" target="_blank">translating</a>.</div>
+<div class="notify">Ennek az oldalnak, a projekt weboldalának és a router parancsértelmezőjének mind szüksége van fordítókra!
+          Kérünk, hogy segítsd a projekt növekedését azzal, hogy <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank"> részt veszel</a> vagy <a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators" target="_blank">fordítasz</a>.</div>
         <hr>
 </div>
 </body>

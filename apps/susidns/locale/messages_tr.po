@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-05 15:14+0000\n"
-"PO-Revision-Date: 2021-05-05 17:43+0000\n"
+"POT-Creation-Date: 2021-08-14 13:36+0000\n"
+"PO-Revision-Date: 2021-08-15 18:43+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -583,7 +583,7 @@ msgid ""
 "File and directory paths here are relative to the address book's working "
 "directory, which is normally ~/.i2p/addressbook/ (Linux) or "
 "%LOCALAPPDATA%\\I2P\\addressbook\\ (Windows)."
-msgstr "Buradaki dosya ve klasör yolları, normal durumda ~i2p/addressbook/ (Linux) ya da %LOCALAPPDATA%\\I2P\\addressbook\\ (Windows) şeklinde olan adres defteri klasörüne göre yazılmıştır."
+msgstr "Buradaki dosya ve klasör yolları, normal durumda ~/.i2p/addressbook/ (Linux) ya da %LOCALAPPDATA%\\I2P\\addressbook\\ (Windows) şeklinde olan adres defteri klasörüne göre yazılmıştır."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:243
 msgid ""
@@ -780,8 +780,8 @@ msgstr "Varsayılan yapılandırmada, adres defteri yalnız {0} üzerine abonedi
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:214
 msgid ""
 "Subscribing to additional sites is easy, just add them to your <a "
-"href=\"subscriptions\">subscriptions</a> file."
-msgstr "Ek sitelere kolayca abone olabilirsiniz. Yalnızca siteleri <a href=\"subscriptions\">subscriptions</a> dosyasına ekleyin."
+"href=\"subscriptions\">subscriptions</a>."
+msgstr "Ek sitelere kolayca abone olabilirsiniz. Siteleri <a href=\"subscriptions\">aboneliklerinize</a> eklemeniz yeterli."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:216
 msgid ""
@@ -790,41 +790,75 @@ msgid ""
 msgstr "I2P adlandırmaları hakkında ayrıntılı bilgi almak için <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">özet bölümüne</a> bakabilirsiniz."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:218
+msgid "How to use the Address Book?"
+msgstr "Adres defteri nasıl kullanılır?"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:220
+msgid ""
+"The I2P Address Book allows you to manage addresses by sorting them into "
+"categories."
+msgstr "I2P adres defteri ile adresleri sıralayıp kategorilere ayırabilirsiniz."
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:222
+msgid ""
+"You may use these categories according to how you intend to use the address."
+msgstr "Kategorileri adresleri kullanma şeklinize göre kullanabilirsiniz."
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:224
+msgid ""
+"Router: These addresses are added automatically, by your subscriptions. If "
+"you publish an address book, the router address book will be shared with "
+"other I2P users."
+msgstr "Yöneltici: Bu adresler otomatik olarak abonelikleriniz tarafından eklenir. Bir adres defterini yayınlarsanız, yöneltici adres defteri diğer I2P kullanıcıları ile paylaşılır."
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:226
+msgid ""
+"Local: This is your personal address book, for hosts which you publish and "
+"share with others."
+msgstr "Yerel: Kişisel adres defteriniz. Diğer kişiler ile paylaşmak istediğiniz siteler için."
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:228
+msgid ""
+"Private: This address book if used for addresses which you do not want to "
+"share with other I2P users."
+msgstr "Özel: Diğer I2P kullanıcıları ile paylaşmak istemediğiniz siteler için."
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:230
 msgid "How does the address book application work?"
 msgstr "Adres defteri uygulaması nasıl çalışır?"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:220
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:232
 msgid ""
 "The address book application regularly polls your subscriptions and merges "
 "their content into your \"router\" address book."
 msgstr "Adres defteri uygulaması düzenli olarak aboneliklerinizi denetleyerek içeriklerini \"yöneltici\" adres defterinize aktarır."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:222
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:234
 msgid ""
 "Then it merges your \"local\" address book into the router address book as "
 "well."
 msgstr "Ardından \"yerel\" adres defteriniz yönelticinin adres defterine aktarılır."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:224
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:236
 msgid ""
 "If configured, the router address book is now written to the \"published\" "
 "address book, which will be publicly available if you are running an I2P "
 "Site."
 msgstr "Bir I2P sitesi işletiyorsanız ve uygun seçeneği etkinleştirdiyseniz, yöneltici adres defteri herkes tarafından görülebilecek \"yayınlanmış\" adres defterine yazılır."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:226
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:238
 msgid ""
 "The router also uses a private address book, which is not merged or "
 "published."
 msgstr "Yöneltici ayrıca aktarılmayan ya da yayınlanmayan bir kişisel adres defteri kullanır."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:228
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:240
 msgid ""
 "Hosts in the private address book can be accessed by you but their addresses"
 " are never distributed to others."
 msgstr "Kişisel adres defterindeki sunuculara yalnız siz erişebilirsiniz. Bu adresler asla diğer kişiler ile paylaşılmaz."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:230
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:242
 msgid ""
 "The private address book can also be used for aliases of hosts in your other"
 " address books."
@@ -964,7 +998,7 @@ msgid ""
 "If you configure SusiDNS to publish your Router address book, it will export"
 " a hosts.txt file containing all the hosts (by default to the root of your "
 "eepsite)."
-msgstr "Yönelticinizin adres defterini yayınlamak için SusiDNS kullanıyorsanız, tüm sunucu kayıtlarının bulunduğu bir hosts.txt dosyası dışa aktarılır (varsayılan olarak eepsitenizin kök klasörüne)."
+msgstr "Yönelticinizin adres defterini yayınlamak için SusiDNS kullanıyorsanız, tüm sunucu kayıtlarının bulunduğu bir hosts.txt dosyası dışa aktarılır (varsayılan olarak eepsitenizin kök klasörüne)."
 
 #: build/HowSVG.java:26
 msgid ""

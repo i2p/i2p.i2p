@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-05 15:14+0000\n"
-"PO-Revision-Date: 2021-05-05 17:35+0000\n"
+"PO-Revision-Date: 2021-08-01 12:26+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -1363,7 +1363,7 @@ msgstr "Hizmet sürekliliğini sağlamak için açık tutulacak tünel sayısı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2296
 msgid "Period of inactivity before tunnel number is reduced"
-msgstr "Etkinlik olmadığında tünel sayısının azaltılması için beklenecek zaman aralığı"
+msgstr "İşlem yapılmadığında tünel sayısının azaltılması için beklenecek zaman aralığı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2300
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2366

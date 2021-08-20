@@ -5,13 +5,15 @@
 # 
 # Translators:
 # Gergő Doma <domag02@gmail.com>, 2020
+# AdminLMH <lehetmashogy@i2pmail.org>, 2021
+# Nyul Csoki <csokinyul@i2pmail.org>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
-"PO-Revision-Date: 2021-02-05 15:27+0000\n"
-"Last-Translator: vargaviktor <viktor.varga@gmail.com>\n"
+"PO-Revision-Date: 2021-06-20 09:44+0000\n"
+"Last-Translator: AdminLMH <lehetmashogy@i2pmail.org>\n"
 "Language-Team: Hungarian (http://www.transifex.com/otf/I2P/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -108,7 +110,7 @@ msgstr "A weboldalt nem lehetett elérni."
 msgid ""
 "The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr "Lehet hogy a webhely jelenleg nem üzemel, vagy a hálózat túlzsúfolt, esetleg a routered még nincs jól integrálva az ügyfelekkel."
+msgstr "Lehet hogy a webhely jelenleg nem üzemel, vagy a hálózat túlzsúfolt, esetleg a routered még nem jól integrált társakkal."
 
 #: ../java/build/Proxy.java:14 ../java/build/Proxy.java:58
 #: ../java/build/Proxy.java:109 ../java/build/Proxy.java:129
@@ -331,49 +333,49 @@ msgstr "A kérésed az I2P-n kívüli helyre mutatott, de ahhoz nincs beállítv
 
 #: ../java/build/Proxy.java:139
 msgid "Please configure an outproxy in I2PTunnel."
-msgstr ""
+msgstr "Kérlek állíts be egy kimenő proxyt az I2PAlagútban."
 
 #: ../java/build/Proxy.java:140 ../java/build/Proxy.java:146
 msgid "Warning: Destination Key Conflict"
-msgstr ""
+msgstr "Figyelmeztetés: Úticél Kulcs Konfliktus"
 
 #: ../java/build/Proxy.java:147
 msgid ""
 "The address helper link you followed specifies a different destination key "
 "than the entry in your address book."
-msgstr ""
+msgstr "A cím segédhivatkozás, amit követtél más úticél kulcsot ad, mint a bejegyzés a címjegyzékedben."
 
 #: ../java/build/Proxy.java:148
 msgid ""
 "Someone could be trying to impersonate another website, or people have given"
 " two websites identical names."
-msgstr ""
+msgstr "Lehet, hogy valaki utánozni próbál egy másik weboldalt, vagy két ember két különböző oldalnak ugyanazt a nevet adta."
 
 #: ../java/build/Proxy.java:149
 msgid ""
 "Resolve the conflict by deciding which key you trust, and then either ignore"
 " the address helper link, or delete the host entry from your address book "
 "and click the address helper link again."
-msgstr ""
+msgstr "Oldd meg a konfliktust azáltal, hogy eldöntöd, hogy melyik kulcsban bízol meg, és aztán vagy hagyad figyelmen kívül a cím segédhivatkozást, vagy töröld ki a gép bejegyzését a címjegyzékedből és kattints a cím segédhivatkozásra újra."
 
 #: ../java/build/Proxy.java:150 ../java/build/Proxy.java:156
 msgid "Warning: Bad Address Helper"
-msgstr ""
+msgstr "Figyelmeztetés: Rossz Cím Segéd"
 
 #: ../java/build/Proxy.java:157
 #, java-format
 msgid "The helper key in the URL ({0}i2paddresshelper={1}) is not resolvable."
-msgstr ""
+msgstr "A segédlukcs a következő URL-ben: ({0}i2paddresshelper={1}) nem feloldható."
 
 #: ../java/build/Proxy.java:158
 msgid "It seems to be garbage data, or a mistyped Base 32 address."
-msgstr ""
+msgstr "Úgy tűnik, hogy hulladék adat, vagy félregépelt Base 32 cím."
 
 #: ../java/build/Proxy.java:159
 msgid ""
 "Check your URL to try and fix the helper key to be a valid Base 32 hostname "
 "or Base 64 key."
-msgstr ""
+msgstr "Ellenőrizd az URL-t, hogy kipróbáld és kijavítsd a segédkulcsot, hogy érvényes Base 32 gépnév vagy Base 64 kulcs legyen."
 
 #: ../java/build/Proxy.java:167
 msgid "The HTTP Outproxy was not found."
@@ -383,15 +385,15 @@ msgstr "A HTTP proxy nincs bekapcsolva"
 msgid ""
 "It is offline, there is network congestion, or your router is not yet well-"
 "integrated with peers."
-msgstr ""
+msgstr "Nem elérhető, hálózati torlódás van, vagy a routered még nem jól integrált társakkal."
 
 #: ../java/build/Proxy.java:172 ../java/build/Proxy.java:178
 msgid "Warning: Request Denied"
-msgstr ""
+msgstr "Figyelmeztetés: Kérés Elutasítva"
 
 #: ../java/build/Proxy.java:179
 msgid "You attempted to connect to a non-I2P website or location."
-msgstr ""
+msgstr "Megpróbáltál egy nem I2P weboldalhoz vagy helyhez kapcsolódni."
 
 #: ../java/build/Proxy.java:180
 msgid "Proxy Authorization Required"
@@ -404,14 +406,14 @@ msgstr "I2P HTTP Proxy hitelesítés szükséges"
 #: ../java/build/Proxy.java:182
 msgid ""
 "This proxy is configured to require a username and password for access."
-msgstr ""
+msgstr "Ez a proxy úgy van beállítva, hogy az eléréshez felhasználónvet és jelszót kérjen."
 
 #: ../java/build/Proxy.java:183
 #, java-format
 msgid ""
 "Please enter your username and password, or check your {0}router "
 "configuration{1} or {2}I2PTunnel configuration{3}."
-msgstr ""
+msgstr "Kérlek, add meg a felhasználónevedet és jelszavadat, ellenőrizd a {0}router beállításaidat{1} vagy {2}I2PAlagút beállításokat{3}."
 
 #: ../java/build/Proxy.java:184
 #, java-format
@@ -419,43 +421,43 @@ msgid ""
 "To disable authorization, remove the configuration "
 "{0}i2ptunnel.proxy.auth=basic{1}, then stop and restart the HTTP Proxy "
 "tunnel."
-msgstr ""
+msgstr "A hitelesítés kikapcsolásához távolítsd el a beállítást {0}i2ptunnel.proxy.auth=basic{1}, azután állítsd le és indítsd újra a HTTPS Proxy alagutat."
 
 #: ../java/build/Proxy.java:192
 msgid "The connection to the proxy was reset."
-msgstr ""
+msgstr "A proxyhoz csatlakozás alaphelyzetbe került."
 
 #: ../java/build/Proxy.java:193
 msgid ""
 "The proxy could be temporarily unavailable, too busy, or it has blocked your"
 " access."
-msgstr ""
+msgstr "Lehet, hogy a proxy átmenetileg nem elérhető, túlterhelt vagy letiltotta a hozzáférésedet."
 
 #: ../java/build/Proxy.java:197 ../java/build/Proxy.java:203
 msgid "Warning: Non-HTTP Protocol"
-msgstr ""
+msgstr "Figyelmeztetés: Nem HTTP Protokol"
 
 #: ../java/build/Proxy.java:204
 msgid "The request uses a bad protocol."
-msgstr ""
+msgstr "A kérés rossz protokolt használ."
 
 #: ../java/build/Proxy.java:205
 msgid "The I2P HTTP Proxy supports HTTP and HTTPS requests only."
-msgstr ""
+msgstr "Az I2P HTTP Proxy csak HTTP és HTTPS kéréseket támogat."
 
 #: ../java/build/Proxy.java:206
 msgid "Other protocols such as FTP are not allowed."
-msgstr ""
+msgstr "Más protokolok, pl. FTP, nincsenek engedélyezve."
 
 #: ../java/build/Proxy.java:207 ../java/build/Proxy.java:213
 msgid "Outproxy Unreachable"
-msgstr ""
+msgstr "Kimenő proxy nem elérhető."
 
 #: ../java/build/Proxy.java:214
 msgid ""
 "The HTTP outproxy was not reachable, because it uses encryption options that"
 " are not supported by your I2P or Java version."
-msgstr ""
+msgstr "A HTTP kimenő proxy nem volt elérhető, mert olyan titkosítási beállításokat használ, melyeket a te I2P vagy Java verziód nem támogat."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:692
 msgid "This seems to be a bad destination:"
@@ -471,24 +473,24 @@ msgid ""
 "To visit the destination in your address book, click <a "
 "href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, "
 "click <a href=\"{1}\">here</a>."
-msgstr ""
+msgstr "A címjegyzékedben való úticél eléréséhez kattints <a href=\"{0}\">ide</a>. Hogy ellátogass a konfliktusban lévő címsegéd úticélhoz, kattints <a href=\"{1}\">ide</a>."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:774
 #, java-format
 msgid "Destination for {0} in address book"
-msgstr ""
+msgstr "Úticél ide: {0} a címjegyzékben"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:777
 msgid "Conflicting address helper destination"
-msgstr ""
+msgstr "Konfliktusban lévő cím segéd úticél"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1224
 msgid "Corrupt Base32 address"
-msgstr ""
+msgstr "Korrupt Base32 cím"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1304
 msgid "Destination lease set not found"
-msgstr ""
+msgstr "Úticél kihasználási engedély nem található"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1437
 msgid "Host"
@@ -497,7 +499,7 @@ msgstr "Hoszt"
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1441
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1502
 msgid "Base32"
-msgstr ""
+msgstr "Base32"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1445
 msgid "Destination"
@@ -512,74 +514,74 @@ msgstr "Mentés nélkül tovább ide: {0}"
 msgid ""
 "You can browse to the site without saving it to the address book. The "
 "address will be remembered until you restart your I2P router."
-msgstr ""
+msgstr "Böngészheted az oldalt a címjegyzékbe való mentés nélkül. A cím megjegyzésre kerül, amíg az I2P routered újra nem lesz indítva."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1453
 msgid "Continue without saving"
-msgstr ""
+msgstr "Folytatás mentés nélkül"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1460
 #, java-format
 msgid "Save {0} to router address book and continue to website"
-msgstr ""
+msgstr "{0} mentése a router címjegyzékébe és tovább a weboldalra"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1461
 msgid ""
 "This address will be saved to your Router address book where your "
 "subscription-based addresses are stored."
-msgstr ""
+msgstr "Ez a cím el lesz mentve a Routered címjegyzékébe, ahol az előjegyzés-alapú címek vannak tárolva."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1463
 msgid ""
 "If you want to keep track of sites you have added manually, add to your "
 "Local or Private address book instead."
-msgstr ""
+msgstr "Ha nyomon szeretnéd követni azokat a kézzel hozzáadott oldalakat, inkább add hozzá a Helyi vagy Magán címjegyzékedhez."
 
 #. FIXME wasn't escaped
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1466
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1548
 msgid "Save & continue"
-msgstr ""
+msgstr "Mentés és folytatás"
 
 #. only blockfile supports multiple books
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1473
 #, java-format
 msgid "Save {0} to local address book and continue to website"
-msgstr ""
+msgstr "{0} mentése a helyi címjegyzékbe és tovább a weboldalra"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1474
 msgid ""
 "This address will be saved to your Local address book. Select this option "
 "for addresses you wish to keep separate from the main router address book, "
 "but don't mind publishing."
-msgstr ""
+msgstr "Ez a cím el lesz mentve a a Helyi címjegyzékedbe. Válaszd ezt a lehetőséget azokhoz a címekhez, melyeket külön szeretnél tartani a fő router címjegyzéktől, de nem bánod, ha közzé vannak téve."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1478
 #, java-format
 msgid "Save {0} to private address book and continue to website"
-msgstr ""
+msgstr "{0} mentése a magán címjegyzékbe és tovább a weboldalra"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1479
 msgid ""
 "This address will be saved to your Private address book, ensuring it is "
 "never published."
-msgstr ""
+msgstr "Ez a cím el lesz mentve a Magán címjegyzékedbe, biztosítva azt, hogy soha nem lesz közzétéve."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1507
 msgid "Base32 address requires lookup password"
-msgstr ""
+msgstr "Base32 cím kereső jelszót kér"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1509
 msgid "Base32 address requires encryption key"
-msgstr ""
+msgstr "Base32 cím titkosítási kulcsot kér"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1511
 msgid "Base32 address requires encryption key and lookup password"
-msgstr ""
+msgstr "Base32 cím titkosítási kulcsot és kereső jelszót kér"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1513
 msgid "Base32 address decryption failure, check encryption key"
-msgstr ""
+msgstr "Base32 cím titkosítás feloldása meghiúsult, ellenőrizd a titkosítási kulcsot"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1524
 msgid "Generate"
@@ -587,33 +589,33 @@ msgstr "Generálás"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1525
 msgid "Encryption key"
-msgstr ""
+msgstr "Titkosítási kulcs"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1526
 msgid ""
 "You must either enter a PSK encryption key provided by the server operator, "
 "or generate a DH encryption key and send that to the server operator."
-msgstr ""
+msgstr "Kötelező megadnod vagy egy PSK titkosítási kulcsot, melyet a szerverüzemeltetője bocsátott rendelkezésedre, vagy létre kell hoznod egy DH titkosítási kulcsot és elküldened a szerver üzemeltetőjének."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1527
 msgid "Ask the server operator for help."
-msgstr ""
+msgstr "Kérj segítséget a szerver üzemeltetőjétől."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1530
 msgid "Enter PSK encryption key"
-msgstr ""
+msgstr "Add meg a PSK titkosítási kulcsot"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1533
 msgid "Generate new DH encryption key"
-msgstr ""
+msgstr "Új DH titkosítási kulcs létrehozása"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1541
 msgid "Lookup password"
-msgstr ""
+msgstr "Kereső jelszó"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1542
 msgid "You must enter the password provided by the server operator."
-msgstr ""
+msgstr "Meg kell adnod a jelszót, melyet a szerver üzemeltetője bocsátott a rendelkezésedre"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:196
 #, java-format
@@ -626,20 +628,20 @@ msgstr "Címsegítőn keresztül hozzáadva"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:235
 msgid "Missing lookup password"
-msgstr ""
+msgstr "Hiányzó kereső jelszó"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:249
 msgid "Missing private key"
-msgstr ""
+msgstr "Hiányzó magánkulcs"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:254
 msgid "Invalid private key"
-msgstr ""
+msgstr "Érvénytelen magánkulcs"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:287
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:306
 msgid "Your new encryption key"
-msgstr ""
+msgstr "Az új titkosítási kulcsod"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:301
 msgid "Address book"
@@ -647,15 +649,15 @@ msgstr "Címjegyzék"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:311
 msgid "Copy the key and send it to the server operator."
-msgstr ""
+msgstr "Másold ki a kulcsot és küldd el a szerver üzemeltetőjének."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:313
 msgid "After you are granted permission, you may proceed to the website."
-msgstr ""
+msgstr "Miután megkaptad az engedélyt, beléphetsz a weboldalra."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:334
 msgid "Go back and fix the error"
-msgstr ""
+msgstr "Menj vissza és javítsd ki a hibát"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:345
 msgid "router"
@@ -663,7 +665,7 @@ msgstr "router"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:347
 msgid "local"
-msgstr ""
+msgstr "helyi"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:349
 msgid "private"
@@ -683,12 +685,12 @@ msgstr "Címjegyzék"
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:376
 #, java-format
 msgid "Saved {0} to the {1} address book, redirecting now."
-msgstr ""
+msgstr "{0} mentve a {1} címjegyzékbe, átirányítás most."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:377
 #, java-format
 msgid "Failed to save {0} to the {1} address book, redirecting now."
-msgstr ""
+msgstr "{0} mentése a {1} címjegyzékbe nem sikerült, redirecting now."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:379
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:411
@@ -698,4 +700,4 @@ msgstr "Kattints ide, amennyiben nem történt meg az automatikus átirányítá
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:409
 #, java-format
 msgid "Saved the authentication for {0}, redirecting now."
-msgstr ""
+msgstr "Hitelesítés mentve ehhez: {0}, átirányítás most."

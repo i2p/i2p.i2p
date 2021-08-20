@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-05 15:14+0000\n"
-"PO-Revision-Date: 2021-05-14 01:18+0000\n"
+"POT-Creation-Date: 2021-08-14 13:36+0000\n"
+"PO-Revision-Date: 2021-08-19 02:21+0000\n"
 "Last-Translator: XMPPはいいぞ\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
@@ -439,7 +439,7 @@ msgstr "ストレージ"
 msgid ""
 "Addresses in the Private Address Book are not shared with anyone else unless"
 " you copy them by hand."
-msgstr "プライベートアドレス帳のアドレスは、あなたが手でコピーしない限り、他の人と共有されることはありません。"
+msgstr "プライベートアドレス帳のアドレスは、あなたが手動でコピーしない限り、他の人と共有されることはありません。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:263
 msgid ""
@@ -616,7 +616,7 @@ msgstr "購読 URL の一覧を含むファイル (変更の必要なし)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:255
 msgid "Update interval in hours"
-msgstr "アップデートの更新間隔"
+msgstr "時間で更新間隔"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:257
 msgid ""
@@ -777,8 +777,8 @@ msgstr "初期設定では、アドレス帳は{0}に設定されています。
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:214
 msgid ""
 "Subscribing to additional sites is easy, just add them to your <a "
-"href=\"subscriptions\">subscriptions</a> file."
-msgstr "追加サイトへの購読は簡単です、<a href=\"subscriptions\">購読</a>ファイルに追加するだけです。"
+"href=\"subscriptions\">subscriptions</a>."
+msgstr "追加のサイトを購読するのは簡単で、あなたの<a href=\"subscriptions\">購読</a>に追加するだけです。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:216
 msgid ""
@@ -787,41 +787,75 @@ msgid ""
 msgstr "I2P における名付けに関する詳細については、<a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_top\">概観</a>をご覧ください。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:218
+msgid "How to use the Address Book?"
+msgstr "アドレス帳を使うには？"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:220
+msgid ""
+"The I2P Address Book allows you to manage addresses by sorting them into "
+"categories."
+msgstr "I2Pのアドレス帳は、アドレスをカテゴリーごとに分類して管理することができます。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:222
+msgid ""
+"You may use these categories according to how you intend to use the address."
+msgstr "これらのカテゴリーは、アドレスの使用目的に応じて使い分けることができます。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:224
+msgid ""
+"Router: These addresses are added automatically, by your subscriptions. If "
+"you publish an address book, the router address book will be shared with "
+"other I2P users."
+msgstr "ルータ: これらのアドレスは、あなたの購読によって、自動的に追加されます。あなたがアドレス帳を公開した場合、ルータのアドレス帳は他のI2Pユーザーと共有されます。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:226
+msgid ""
+"Local: This is your personal address book, for hosts which you publish and "
+"share with others."
+msgstr "ローカル: これはあなたの個人的なアドレス帳で、あなたが公開し、他の人と共有するホストのためのものです。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:228
+msgid ""
+"Private: This address book if used for addresses which you do not want to "
+"share with other I2P users."
+msgstr "プライベート: このアドレス帳は、他のI2Pユーザーと共有したくないアドレスに使用します。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:230
 msgid "How does the address book application work?"
 msgstr "アドレス帳アプリケーションはどのように動作するのか？"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:220
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:232
 msgid ""
 "The address book application regularly polls your subscriptions and merges "
 "their content into your \"router\" address book."
 msgstr "アドレス帳アプリケーションは定期的に購読を調査し、「ルータ」アドレス帳内に内容を統合します。"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:222
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:234
 msgid ""
 "Then it merges your \"local\" address book into the router address book as "
 "well."
 msgstr "その後、あなたの「マスター」アドレス帳も同様に、ルータアドレス帳に統合します。"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:224
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:236
 msgid ""
 "If configured, the router address book is now written to the \"published\" "
 "address book, which will be publicly available if you are running an I2P "
 "Site."
 msgstr "設定している場合、ルータアドレス帳は、 I2P サイトを運用している場合、一般に公表される「公開」アドレス帳に書き込まれています。"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:226
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:238
 msgid ""
 "The router also uses a private address book, which is not merged or "
 "published."
 msgstr "ルータは、統合または公開されないプライベートアドレス帳も使います。"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:228
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:240
 msgid ""
 "Hosts in the private address book can be accessed by you but their addresses"
 " are never distributed to others."
 msgstr "プライベートアドレス帳のホストは、あなたがアクセスすることはできますが、アドレスが他者に配布されることはありません。"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:230
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:242
 msgid ""
 "The private address book can also be used for aliases of hosts in your other"
 " address books."
@@ -900,7 +934,7 @@ msgstr "プライベートのアドレス帳"
 
 #: build/HowSVG.java:12
 msgid "Local Records"
-msgstr ""
+msgstr "ローカルのレコード"
 
 #: build/HowSVG.java:13
 msgid ""
@@ -936,7 +970,7 @@ msgstr "ローカルのアドレス帳"
 
 #: build/HowSVG.java:20
 msgid "Searchable by"
-msgstr ""
+msgstr "これを検索可能なのは"
 
 #: build/HowSVG.java:21
 msgid "I2P applications"
@@ -946,11 +980,11 @@ msgstr "I2P アプリケーション"
 msgid ""
 "The Local, Router and Private address books collectively serve as the DNS "
 "authority for I2P applications."
-msgstr "ローカル、ルータ、及びプライベートのアドレス帳は、I2PアプリケーションのDNS権威としてまとめて機能します。"
+msgstr "ローカル、ルータ、及びプライベートのアドレス帳は、I2Pアプリケーションの権威DNSとしてまとめて機能します。"
 
 #: build/HowSVG.java:23
 msgid "Optional,"
-msgstr ""
+msgstr "任意、"
 
 #: build/HowSVG.java:24
 msgid "for websites"

@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:30+0000\n"
-"PO-Revision-Date: 2021-05-14 01:18+0000\n"
+"PO-Revision-Date: 2021-06-07 03:18+0000\n"
 "Last-Translator: XMPPはいいぞ\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
@@ -57,7 +57,7 @@ msgstr "データディレクトリを作成できません"
 #: ../java/src/org/klomp/snark/SnarkManager.java:1057
 #, java-format
 msgid "Total uploaders limit changed to {0}"
-msgstr "合計アップローダー数の上限を{0}に変更しました"
+msgstr "合計アップローダー数の上限は{0}に変更されました"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1059
 #, java-format
@@ -345,7 +345,7 @@ msgstr "I2Pに接続しています"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1719
 msgid "Error connecting to I2P - check your I2CP settings!"
-msgstr "I2Pへの接続にエラー - I2CP設定を確認して下さい！"
+msgstr "I2Pへの接続中にエラー - I2CP設定を確認して下さい！"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1725
 #, java-format
@@ -837,7 +837,7 @@ msgstr "ダウンロードを削除しました: {0}"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1249
 #, java-format
 msgid "Data file deleted: {0}"
-msgstr "データファイル削除を削除しました: {0}"
+msgstr "データファイルを削除しました: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1251
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1261
@@ -912,7 +912,7 @@ msgstr "トレント作成エラー - ファイルまたはディレクトリを
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1486
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2787
 msgid "Delete selected"
-msgstr "選択されたものを削除"
+msgstr "選択したものを削除"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1486
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2789
@@ -1019,7 +1019,7 @@ msgstr[0] "{0}個のピアからダウンロード中"
 #, java-format
 msgid "Connected to {0} peer"
 msgid_plural "Connected to {0} peers"
-msgstr[0] "{0}個のピアへ接続しました"
+msgstr[0] "{0}個のピアに接続しました"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1758
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1759
@@ -1032,7 +1032,7 @@ msgstr "停滞"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1769
 #, java-format
 msgid "Connected to {0} of {1} peers in swarm"
-msgstr "スウォームにある{1}個中{0}個のピアへ接続しました"
+msgstr "スウォームにある{1}個中{0}個のピアに接続しました"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1769
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1770
@@ -1057,7 +1057,7 @@ msgstr "コメント"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1858
 msgid "View files"
-msgstr "ファイルを見る"
+msgstr "ファイルを表示"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1860
 msgid "Open file"
@@ -1377,7 +1377,7 @@ msgstr "半分の帯域幅を利用可能にすることを推奨します。"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2606
 msgid "View or change router bandwidth"
-msgstr "ルータの帯域幅を閲覧または変更"
+msgstr "ルータの帯域幅を表示または変更"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2612
 msgid "Use open trackers also"
@@ -1698,7 +1698,7 @@ msgstr "公開されるコメントと評価のための、あなたの作成者
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4008
 msgid "Enable viewing and posting comments for this torrent"
-msgstr "このトレントでコメントの閲覧と投稿を有効にする"
+msgstr "このトレントでコメントの表示と投稿を有効にする"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4031
 #, java-format
@@ -1741,4 +1741,4 @@ msgstr "削除にマーク"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4143
 msgid "Delete Selected"
-msgstr "マークされたメッセージを削除しました"
+msgstr "選択したものを削除"
