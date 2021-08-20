@@ -8000,7 +8000,6 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:591
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:598
-#, java-printf-format
 msgid ""
 "We recommend sharing 75% or more for I2P, but you can adjust based on your "
 "needs."

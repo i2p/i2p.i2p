@@ -8002,7 +8002,6 @@ msgstr "通过贡献带宽作为参与流量，您不仅可以帮助他人，还
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:591
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:598
-#, java-printf-format
 msgid ""
 "We recommend sharing 75% or more for I2P, but you can adjust based on your "
 "needs."

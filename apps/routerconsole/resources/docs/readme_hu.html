@@ -1,0 +1,183 @@
+<div lang="hu">
+
+<ul class="links">
+<li>
+<b>Elindulás</b><br>
+Ha épp csak most indítottad el az I2P-t, a bal oldali panel <i>Aktív társak</i> részén megjelenített <i>Társak</i> száma el kell hogy kezdjen növekedni az elkövetkező néhány percben. 
+Amikor a router-ed kész, látni fogod továbbá a <i>Helyi Alagút</i> nevű <i>Megosztott Klienseket</i>, és esetleg további klienseket és kiszolgálókat.
+Ha nem, tekintsd meg a hibaelhárítási részt <a href="#trouble">lentebb</a>. 
+Ezek a <i>Helyi Alagutak</i> biztosítják a kapcsolatot az I2P hálózatához, lehetővé téve a  bittorrent, email, web proxy és egyéb szolgáltatásokat. 
+A <a href="/netdb">Hálózati Adatbázis</a> mutatja az összes ismert társat a hálózaton. 
+Továbbá megfigyelheted a meglévő <a href="/peers">Társ Kapcsolatokat</a>, és megnézheted a kiépített <a href="/tunnels">Alagutakat</a> és azok állapotát. 
+További információ elérhető a <a href="/help">segítség oldalon</a>.</li>
+
+<li>
+<b>Beilleszkedés a hálózatba</b><br>
+Amikor elindítod az I2P-t, néhány percig is eltarthat mire a router-e elindul (beilleszkedik) a hálózatba és további társakat talál, ezért kérünk, legyél türelemmel. 
+Az I2P elindulása és normál működése közben, az I2P alagút felépültségének indikátora az oldalsó panelen azt mutathatja hogy az I2P "Elutasítja az Alagutakat"; ez normális viselkedés.
+Miután zöld csillagok jelennek meg a <i>Helyi Alagutak</i> mellett, sokféle dolgot megtehetsz az I2P-vel, az alábbiakban bemutatunk néhányat ezek közül.</li>
+
+</ul>
+<h3>Szolgáltatások az I2P-n</h3>
+
+<ul class="links">
+<li>
+<b>Rejtett Szolgáltatások és Publikus Webböngészés</b><br>
+Az I2P-n hozzáférhetsz rejtett szolgáltatás weboldalakhoz ("I2P oldalak") és más szolgáltatásokhoz és saját szolgáltatásokat is elérhetővé tehetsz.
+Névtelenül hozzáférhetsz a normál Internethez is az I2P beépített webproxyján keresztül (kimenő porxy).
+<a href="https://geti2p.net/en/about/browser-config" target="_blank">Állítsd be a böngésződet</a>, hogy HTTP proxyt használjon a <code>127.0.0.1 4444-es porton</code>, azután böngészhetsz I2P Oldalakat vagy <code>http://</code> és <code>https://</code> kezdetű címeken weboldalakat.
+Ha ki szeretnéd kapcsolni a kimenő proxyt vagy a nem névtelen Internetre törénő kimenő proxy elérést megváltoztatni, távolítsd el vagy módosítsd a kimenő proxy bejegyzést erre: <code>false.i2p</code> itt: <i>Kimenő proxyk</i> opciónál, a <a href="/i2ptunnel/edit?tunnel=0" target="_blank">I2P HTTP Proxy Alagút Szerkesztőben</a>.
+Az "Érdekesebb Oldalak" részben, <a href="#eepsites">lentebb</a>, felsorolunk néhány, az I2P-n közztett oldalt.<br>
+Létezik számos részint hivatalos és nem hivatalos erőfeszítés is arra, hogy böngészést segítő eszközöket építsen az I2P számára,
+többek között <a href="https://geti2p.net/en/download/firefox">előre beállított Firefox Böngésző profil</a>,
+<a href="http://idk.i2p/I2P-in-Private-Browsing-Mode-Firefox">könnyen telepíthető WebBővítmény</a>,
+vagy <a href="https://www.whonix.org/wiki/I2P">automatikus indítók titoktartást szem előtt tartó Linux disztribúciókon keresztül, mint pl. Whonix</a>.
+Noha ezek mind érdekes projektek, kérünk, hogy vedd fontolóra  beilleszkedésüket a saját személyes fenyegettségi
+modelledbe, mielőtt jólétedet rájuk bíznád.</li>
+
+<li>
+<b>Névtelen Email</b><br>
+Postman I2P alapú levelőzrendszere elérhető vagy a <a href="/webmail">I2P beépített levelező kliensén keresztül</a> vagy bármilyen külső levelezőklienssel.
+A fiókok képesek a normál Internetre levelet küldeni és onnan levelet fogadni.
+Levélfiókért látogass el ide: <a href="http://hq.postman.i2p/" target="_blank">hq.postman.i2p</a>.</li>
+
+<li>
+<b>Névtelenus Fájlátvitel</b><br><a href="/torrents">I2PSnark</a> be van ágyazva az I2P-be, névtelen titkosított BitTorrent fájlátvitelt biztosít.</li>
+<li>
+<b>Anonymous Chat</b><br>
+Start your IRC client (e.g. HexChat) and connect to the <a href="irc://127.0.0.1:6668/i2p">server</a> at <code>127.0.0.1 port 6668</code>.
+You do not need to configure a proxy in your IRC client; I2P provides you with a local IRC tunnel (configured in your IRC client as an IRC server or remote host).
+Your local I2P IRC tunnel on <code>localhost:6668</code> will direct you to one of three IRC servers hosted on I2P by Postman, echelon and zl0, but neither you nor they know where the other is, and your communcations are encrypted in transit by I2P to prevent interception.
+Once you're there, <code>#i2p-chat</code> and <code>#i2p-dev</code> are just a few of the available channels you may wish to join.
+I2P is also suitable for unmonitorable and uncensorable anonymous chat, as well as alternative IRC servers, Jabber servers, website-based chat, and more.
+You may run your own servers over I2P in whatever flavor you choose, or if you're a developer write your own <a href="http://i2p-projekt.i2p/applications.html" target="_blank">I2P applications</a>.
+Both UDP and TCP protocols are <a href="http://i2p-projekt.i2p/techintro.html#op.transport" target="_blank">supported</a>.</li>
+
+<li>
+<b>Fórumok és Blogok</b><br>
+Minden általános blog, fórum, és CMS szoftver elfut az I2P-n keresztül, ámbár a biztonság szemszögéből külön elővigyázatosságot javaslunk telepítéskor, valamint az összes ide tartozó szoftver (pl. Php, MySql, Python, Apache) naprakészen tartását és lezárását!
+Továbbá létezik számos, a közösség által üzemeltetett különböző nyelvű fórum az I2P-n; lásd <a href="#eepsites">lentebb</a> javaslatokért.</li>
+
+<li>
+<a name="plugins"></a><b>Bővítmények az I2P-hez</b><br>
+Tovább növelheted az I2P hasznosságát bővítmények telepítésével: blog, chat, fájlmegosztó és egyéb bővítmények már meg lettek írva vagy adoptálva lettek erre a platformra és csak arra várnak, hogy <a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target="_blank">telepítsd</a> őket!
+Böngészheted a bővítményeket és hozzájuk tartozó infót itt: <a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target="_blank">wiki.i2p-projekt.i2p</a>.
+Ha <a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target="_blank">programfejlesztő</a> vagy, teljes framework-öt biztosítunk, hogy megírhasd a saját bővítményeidet, itt:  <a href="http://i2p-projekt.i2p/plugins.html" target="_blank">dokumentáció</a>.</li>
+
+</ul>
+<h3>Névtelen Titkosított Webtárhely Biztosítása az I2P-n</h3>
+
+<ul class="links">
+<li>
+<b>Beépített Webszerver</b><br>
+Az I2P beépített webszervert tartalmaz, hogy a saját rejtett szolgáltatás weboldaladat ("eepoldal") közzétedd az I2P hálózatán: egy <a href="https://www.eclipse.org/jetty/" target="_blank">Jetty</a> példány fut itt: <a href="http://127.0.0.1:7658/" target="_blank">http://127.0.0.1:7658/</a>.
+Hogy a saját tartalmadat közzétedd, egyszerűen másolj fájlokat a <code>eepsite/docroot/</code> könyvtárba (vagy másolj bármilyen normál JSP/Servlet .war fájlokat ide: <code>eepsite/webapps</code>, vagy normál CGI szkripteket ide: <code>eepsite/cgi-bin</code>) és megjelennek.
+Futtathatsz bármilyen másik webszerver platformot is az I2P-n keresztül, vagy leváltva ezzel a beépített szervert, vagy egy másik alagúton keresztül.</li>
+
+<li>
+<b>Alagutad Indítása</b><br>
+Indítás után az előre beállított <a href="/i2ptunnel/" target="_blank">I2P Webszerver Alagutad</a>, weboldalad mások által látható (de nem megtalálható) lesz.
+Részletes útmutató a weboldalad elindítására, .i2p domain regisztrálására és weboldalad másoknak való hirdetésére elérhető a saját I2P webszervereden keresztül itt: <a href="http://127.0.0.1:7658/help/" target="_blank">http://127.0.0.1:7658/help/</a>.</li>
+
+</ul>
+<a name="eepsites"></a>
+<h3>I2P-Érdekesebb Rejtett Szolgáltatások</h3>
+
+<ul class="links twocol">
+<li>
+<b>Láthatatlan Internet Projekt (I2P) Hivatalos Weboldal</b><br><a href="http://i2p-projekt.i2p" target="_blank">i2p-projekt.i2p</a>, ami biztonságos és névtelen csatlakozás ehhez az oldalhoz: <a href="https://geti2p.net/en/" target="_blank">geti2p.net</a>. Ha többet szeretnél megtudni arról, hogyan működik az I2P vagy arról, hogyan vehetsz részt benne, látogass el ide először!</li>
+
+<li>
+<b>I2P Közösségi Fórumok</b><br><a href="http://zzz.i2p/" target="_blank">zzz's fejlesztői fórumai</a> az I2P fejlesztésével kapcsolatos beszélgetéseknek ad teret.
+
+<a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>: Fórum, ahol I2P-re vonatkozó és az ahhoz tartozó témákkal kapcsolatos problémák és ötletek kerülnek megvitatásra.</li>
+
+<li>
+<b>I2P Bolygó</b><br><a href="http://planet.i2p/" target="_blank">planet.i2p</a>: RSS oldal, amely I2P-vel kapcsolatos híreket és eseményeket gyűjt és egy helyen közzéteszi. Ez egy jó oldal ahhoz, hogy lásd a közösséget munka közben!</li>
+
+<li>
+<b>Az I2P Hálózat Egészségi Állapota</b><br><a href="http://stats.i2p/cgi-bin/dashboard.cgi" target="_blank">stats.i2p</a>: Tekintsd meg a hálózat teljesítményének számos vetületét ezen az I2P hálózati figyelő oldalán, zzz által üzemeltetve.</li>
+
+<li>
+<b>I2P Bug Tracker - GitLab</b><br><a href="http://git.idk.i2p/" target="_blank">git.idk.i2p</a>: I2P's issue reporting and bug-tracking system. Please visit if you have an issue to report, also available at <a href="https://i2pgit.org/" target="_blank">https://i2pgit.org/</a>
+</li>
+
+<li>
+<b>Fedezd Fel Az I2P-t</b><br>
+Sok más rejtett szolgáltatás van még - kövesd a látható hivatkozásokat, mentsd el kedvenceidet könyvjelzőként és látogass el hozzájuk gyakran!<br>
+</li>
+
+</ul>
+<h2 id="trouble">Hibaelhárítás és További Segítség</h2>
+
+<ul class="links">
+<li>
+<b>Legyél Türelemmel!</b><br>
+Az I2P lehet, hogy lassan integrálódik a hálózatba, amikor először indítod el, mert a kezdeti lépésit teszi a hálózatban és társakat keres. Minél tovább fut az I2P router-ed, annál jobban teljesít majd, tehát próbáld a router-t bekapcsolva hagyni amilyen hosszan csak tudod, a nap 24 órájában, ha lehetséges!
+Ha 30 perc után a <i>Aktív: [csatlakozva/legutóbbi]</i> számláló még mindig 10-nél kevesebb társat mutat, vagy ha az <i>Integrálódott</i> társak száma összesen kevesebb, mint 5, íme néhány dolog, amit problémák vizsgálatának érdekében tehetsz:</li>
+
+<li>
+<b>Ellenőrizd A Beállításaidat és Sávszélességed Kiosztását</b><br>
+Az I2P akkor működik legjobban, ha pontosan viszontlátod a hálózati kapcsolatod sebességét a <a href="/config">sávszélesség beállításai részben</a>.
+Alapértelmezésben az I2P meglehetősen visszafogott értékekre van beállítva, mely sok esetben nem fog megfelelni, ezért kérünk, hogy szánj időt arra, hogy ezeket a beállításokat átnézed és kijavítod, ha szükséges.
+Minél több sávszélességet osztasz ki, <i>különösen</i> feltöltési sávszélességet, annál több hasznot húzol a hálózatból.</li>
+
+<li>
+<b>Tűzfalak, Modemek és Router-ek</b><br>
+Ahol lehetséges, kérünk, hogy biztosítsd az I2P/Java tűzfal nélküli elérését az Internetől, az erre vonatkozó beállításokat végezd el a modemeden/router-en/számítógépeden.
+Ha tiltó tűzfal mögött vagy de korlátlan kimenő eléréssel rendelkezel, az I2P  így is működik; kikapcsolhatod a bejövő elérést és támaszkodhatsz <a href="http://i2p-projekt.i2p/udp.html" target="_blank">SSU IP Cím Észlelésre</a> (<a href="https://en.wikipedia.org/wiki/Hole_punching_(networking)" target="_blank">lyuk ütése tűzfalon</a>), hogy a hálózathoz csatlakozz, ezt mutatni fogja az oldalsó panelen a hálózati állapot: "Hálózat: Tűzfalazva".
+Legjobb teljesítményért kérünk, győződj meg arról, hogy az I2P <a href="/confignet">külső portja</a> látható az Internetről
+További információért lásd lentebb.</li>
+
+<li>
+<b>Proxy Beállítások Ellenőrzése</b><br>
+Ha egyátalán nem férsz hozzá weboldalakhoz (még az <a href="http://i2p-projekt.i2p/" target="_blank">i2p-projekt.i2p</a>-hez sem), bizonyosodj meg arról, hogy a böngésződ proxyja arra van beállítva, hogy http forgalom (<i>nem</i> https, <i>nem</i> socks), ezen keresztül: <code>127.0.0.1 4444-es port</code>.
+Ha segítségre van szükséged, létezik <a href="https://geti2p.net/en/about/browser-config" target="_blank">útmutató</a> a böngésződ beállítására az I2P-vel való használathoz.</li>
+
+<li>
+<b>Napló Ellenőrzése</b><br><a href="/logs">Napló</a> segíthet a problémamegoldásban.
+Lehetséges, hogy kivonatokat szeretnél beilleszteni a <a href="http://i2pforum.i2p/" target="_blank">fórumunkon</a>, hogy segítséget kapj, vagy talán ehelyett <a href="http://paste.idk.i2p/" target="_blank">beillesztenéd</a> és hivatkoznál a link-re az IRC-n, hogy segítséget kapj.</li>
+
+<li>
+<b>Ellenőrizd, hogy a Java naprakész</b><br>
+Bizonyosodj meg arról, hogy a Java-d naprakész.
+A Java verziódat leellenőrizheted a <a href="/logs">napló oldal</a> tetején.</li>
+<li>
+<b>Problémák Régi Hardvern való futtatáskor</b><br>
+[Linux/BSD] Ha nem tudod elindítani a router-t a <code>i2p/i2prouter start</code> paranccsal, próbáld a <code>runplain.sh</code> szkriptet, ugyanabban a könytárban.
+Root jogosultság soha nem szükséges az I2P futtatásához.</li>
+<li>
+<b>Universal Plug and Play (UPnP) Engedélyezése</b><br>
+A modemed vagy router-ed valószínűleg támogatja az UPnP-t automatikus port továbbításhoz.
+Győződj meg róla, hogy az UPnP támogatás engedélyezve van a modemeden vagy router-eden.
+Most próbáld újraindítani az <a href="/">I2P router-t</a>.
+Ha sikeres, az I2P-nek "Hálózat: Rendben"-t kellene jeleznie az oldalsó panelen, amint az I2P router végez az indításnál szokásos csatlkaozási tesztekkel.</li>
+
+<li>
+<b>Port Továbbítás</b><br>
+Nyisd meg az <a href="/confignet">I2P portját</a> a modemeden, router-eden és/vagy tűzfal(ak)on a jobb csatlakozás érdekében (ideális esetben mind UDP-t, mind TCP-t).
+További információ arról, hogyan kell portot továbbítani, könnyen található webes keresés által.
+Ha nehézségeid támadnak, kérhetsz segítséget az alábbiakban felsorolt fórumainkon és IRC csatornáinkon.
+Jó tudnod, hogy az I2P nem támogatja a csatlakozást http vagy socks proxyn keresztül [a küldött programokat szívesen vesszük!], de csatlakozhatsz proxykhoz magán az I2P-n keresztünk, amint csatlakozik a hálózathoz.</li>
+
+<li>
+<b>Online Támogatás Kérése</b><br>
+Lehet, hogy át akarod nézni az <a href="http://i2p-projekt.i2p/" target="_blank">I2P weboldalt</a> is, küldj üzenetet az <a href="http://i2pforum.i2p/" target="_blank">I2P vitafórumra</a>, vagy nézz be a <a href="irc://127.0.0.1:6668/i2p">#i2p</a>-re vagy a <a href="irc://127.0.0.1:6668/i2p-chat">#i2p-chat</a>-re az I2P belső IRC hálózatás - Irc2P.
+Ezek a csatornák elérhetők az I2P titkosított névtelen hálózatán kívülről is, a  <a href="irc://irc.freenode.net/i2p">Freenode IRC-n</a> keresztül.</li>
+
+<li>
+<b>Reporting Bugs</b><br>
+To report a bug, please file a ticket on <a href="http://git.idk.i2p/" target="_blank">git.idk.i2p</a> or, over clearnet, <a href="https://i2pgit.org/" target="_blank">https://i2pgit.org/</a>.
+For developer-related discussions, please visit <a href="http://zzz.i2p/" target="_blank">zzz's developer forums</a> or come and visit the <a href="irc://127.0.0.1:6668/i2p-dev">developer channel</a> on I2P's IRC network.
+Developers can browse source at <a href="http://git.idk.i2p/i2p-hackers/i2p.i2p" target="_blank">git.idk.i2p</a>.</li>
+<li>
+<b>Vegyél részt benne!</b><br>
+Az I2P fejlesztése és karbantartása többnyire a közösség tagjainak költségvetés nélküli, önkéntes közreműködéssel történik.
+Boldogan elfogadunk <a href="http://i2p-projekt.i2p/donate.html" target="_blank">adományokat</a>, melyeket nélkülözhetetlen tárhely biztosítására és adminisztratív kiadásokra fordítunk.
+Vannak az I2P-vel kapcsolatos <a href="http://i2p-projekt.i2p/bounties.html" target="_blank">pénzjutalmaink</a>, azon programozók számára, akik a részvételhez ösztönzést keresnek, és mindig keresünk <a href="http://i2p-projekt.i2p/newdevelopers.html" target="_blank">Java programozókat</a>, <a href="http://i2p-projekt.i2p/newtranslators.html" target="_blank">fordítókat</a>, hirdetőket és felhasználókat, hogy segítsenek az I2P növekedésében.
+Minél nagyobb az I2P hálózat, annál több haszonnal jár mindenkinek, tehát ha egyszerűen csak beszélsz minden barátodnak az I2P-ről (és segítesz a telepítésben és beállításban, ha kell), az is nagy segítség.
+További infóért, hogyan működhetsz közre, látogass el az <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank">önkéntesek oldalát</a> a weboldalon.</li>
+
+</ul>
+<div class="topness"><a href="#top">[Vissza a Tetjére]</a></div>
+</div>

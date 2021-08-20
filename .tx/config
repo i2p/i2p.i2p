@@ -627,6 +627,7 @@ source_lang = en
 trans.ar = apps/routerconsole/resources/docs/readme_ar.html
 trans.de = apps/routerconsole/resources/docs/readme_de.html
 trans.fr = apps/routerconsole/resources/docs/readme_fr.html
+trans.hu = apps/routerconsole/resources/docs/readme_hu.html
 ;; Java converts id to in
 trans.id = apps/routerconsole/resources/docs/readme_in.html
 trans.it = apps/routerconsole/resources/docs/readme_it.html
