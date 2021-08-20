@@ -15,7 +15,7 @@
          parser.redirectEntity("configure_1_1.dtd",config60);
 --- a/apps/jetty/java/src/net/i2p/servlet/I2PDefaultServlet.java
 +++ b/apps/jetty/java/src/net/i2p/servlet/I2PDefaultServlet.java
-@@ -132,7 +132,6 @@
+@@ -135,7 +135,6 @@
       *
       * Get the resource list as a HTML directory listing.
       */

@@ -382,16 +382,16 @@ Index: b/installer/resources/locale/po/messages_en.po
 @@ -185,7 +185,7 @@ msgid "Request a Java thread dump if run
  msgstr ""
  
- #: ../i2prouter:1874
+ #: ../i2prouter:1884
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
  msgstr ""
  
- #: ../i2prouter:1879
+ #: ../i2prouter:1889
 @@ -193,5 +193,5 @@ msgid "Running I2P as the root user is *
  msgstr ""
  
- #: ../i2prouter:1882
+ #: ../i2prouter:1892
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
  msgstr ""
