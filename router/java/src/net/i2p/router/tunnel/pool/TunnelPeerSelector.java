@@ -673,7 +673,7 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
         /**
          * not thread safe
          *
-         * @param h container for sort keys, not used as a Hash
+         * @param k container for sort keys, not used as a Hash
          */
         private HashComparator(SessionKey k) {
             byte[] b = k.getData();
