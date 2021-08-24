@@ -110,7 +110,7 @@
 6. Review the complete diff from the last release:
 
     ```
-    git diff i2p-0.9.(xx-1)..HEAD > out.diff
+    git diff i2p-1.(xx-1).0..HEAD > out.diff
     vi out.diff
     ```
 
@@ -190,7 +190,7 @@
   - In the i2p.newsxml branch, edit magnet links, release dates and release
     number in data/releases.json, check in and push
 
-2. Add i2pupdate-0.9.xx.su3 torrent to tracker2.postman.i2p and start seeding
+2. Add i2pupdate-1.xx.0.su3 torrent to tracker2.postman.i2p and start seeding
 
 3. Notify the following people:
   - All in-network update hosts

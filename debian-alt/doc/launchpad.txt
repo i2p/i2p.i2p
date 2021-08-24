@@ -49,14 +49,14 @@ Generate files to upload
 ------------------------
 
 - check out clean copy of release:
-  mtn co -d i2p.mtn -b i2p.i2p i2p.i2p.foobar -r t:i2p-0.9.xx
+  mtn co -d i2p.mtn -b i2p.i2p i2p.i2p.foobar -r t:i2p-1.xx.0
 
 - export TZ=UTC
 - cd i2p.i2p.foobar
 - copy debian-alt/(series)/* to debian/
 - edit debian/changelog to add the release at the top
-  * version MUST be 0.9.XX-1ubuntu1
-    next version for fixes would be 0.9.XX-2ubunutu1
+  * version MUST be 1.xx.0-1ubuntu1
+    next version for fixes would be 1.xx.0-2ubunutu1
   * series MUST be xenial or bionic or focal
   * name and email MUST EXACTLY match what's in your GPG keyring
     or the signing will fail.
@@ -66,11 +66,11 @@ Generate files to upload
     run gpg -K to list your private keys
 - Remove patch files in debian/patches that are not listed in debian/patches/series
 - ant debian-release-tarball (this is currently for bionic and higher)
-  this will make a directory ../i2p-0.9.XX-0-xxxxxxxx/
-  and a tarball ../i2p_0.9.XX.orig.tar.bz2
-- cp debian/changelog ../i2p-0.9.XX-0-xxxxxxxx/debian/
-- cp debian-alt/(series)/(other files besides changelog) to ../i2p-0.9.XX-0-xxxxxxxx/debian/
-- cd ../i2p-0.9.XX-0-xxxxxxxx/
+  this will make a directory ../i2p-1.xx.0-0-xxxxxxxx/
+  and a tarball ../i2p_1.xx.0.orig.tar.bz2
+- cp debian/changelog ../i2p-1.xx.0-0-xxxxxxxx/debian/
+- cp debian-alt/(series)/(other files besides changelog) to ../i2p-1.xx.0-0-xxxxxxxx/debian/
+- cd ../i2p-1.xx.0-0-xxxxxxxx/
 - Build the *1ubuntu1* files:
   If you have NOT done a successful dput for this release yet:
     debuild -S -sa -kkeyid
@@ -83,25 +83,25 @@ Generate files to upload
   (quilt instructions go here)
 
 - You will now have the following files in ..:
-  i2p_0.9.XX-1ubuntu1.debian.tar.xz
-  i2p_0.9.XX-1ubuntu1.dsc
-  i2p_0.9.XX-1ubuntu1_source.changes
-  i2p_0.9.XX-1ubuntu1_source.build
+  i2p_1.xx.0-1ubuntu1.debian.tar.xz
+  i2p_1.xx.0-1ubuntu1.dsc
+  i2p_1.xx.0-1ubuntu1_source.changes
+  i2p_1.xx.0-1ubuntu1_source.build
 - And from the copy above:
-  i2p_0.9.XX.orig.tar.bz2
+  i2p_1.xx.0.orig.tar.bz2
 
 Upload to launchpad
 -------------------
 
 - cd ..
 - Upload to launchpad:
-  dput ppa:your-lp-id/your-ppa-name i2p_0.9.XX-1ubuntu1_source.changes
+  dput ppa:your-lp-id/your-ppa-name i2p_1.xx.0-1ubuntu1_source.changes
 
 This will upload the following files:
-  i2p_0.9.XX-1ubuntu1.dsc            (the GPG signature)
-  i2p_0.9.XX-1ubuntu1.debian.tar.xz  (basically the debian/ directory tarball)
-  i2p_0.9.XX-1ubuntu1_source.changes (the changelog text file)
-  i2p_0.9.XX.orig.tar.bz2            (the source tarball)
+  i2p_1.xx.0-1ubuntu1.dsc            (the GPG signature)
+  i2p_1.xx.0-1ubuntu1.debian.tar.xz  (basically the debian/ directory tarball)
+  i2p_1.xx.0-1ubuntu1_source.changes (the changelog text file)
+  i2p_1.xx.0.orig.tar.bz2            (the source tarball)
 
 Note: If you didn't add your GPG fingerprint to your launchpad account
 way up there above in step 2 or so, the upload will work,
@@ -162,7 +162,7 @@ and attach it to the milestone.
 
 Go to https://launchpad.net/i2p/trunk
 Down at bottom, click 'create milestone'
-    Name: 0.9.xx (NOT i2p 0.9.xx)
+    Name: 1.xx.0 (NOT i2p 1.xx.0)
     Code name: empty
     Date targeted: Actual release date
     Tags: empty
@@ -177,19 +177,19 @@ Click 'create release'
 Now you are on the page for that milestone
 Click 'add download file'
 For each of the four files
-    i2psource_0.9.xx.tar.bz2
-      Description: I2P 0.9.xx Source Code
-      Sig: i2psource_0.9.xx.tar.bz2.sig
+    i2psource_1.xx.0.tar.bz2
+      Description: I2P 1.xx.0 Source Code
+      Sig: i2psource_1.xx.0.tar.bz2.sig
       File Content Type: Code Release Tarball
-    i2pinstall_0.9.xx_windows.exe
-      Description: I2P 0.9.xx Installer for Windows
-      Sig: i2pinstall_0.9.xx_windows.exe.sig
+    i2pinstall_1.xx.0_windows.exe
+      Description: I2P 1.xx.0 Installer for Windows
+      Sig: i2pinstall_1.xx.0_windows.exe.sig
       File Content Type: Installer File
-    i2pinstall_0.9.xx.jar
-      Description: I2P 0.9.xx Installer (Linux / OSX / FreeBSD / Solaris)
-      Sig: i2pinstall_0.9.xx.jar.sig
+    i2pinstall_1.xx.0.jar
+      Description: I2P 1.xx.0 Installer (Linux / OSX / FreeBSD / Solaris)
+      Sig: i2pinstall_1.xx.0.jar.sig
       File Content Type: Installer File
-    i2pupdate_0.9.xx.zip
-      Description: I2P 0.9.xx Update
-      Sig: i2pupdate_0.9.xx.zip.sig
+    i2pupdate_1.xx.0.zip
+      Description: I2P 1.xx.0 Update
+      Sig: i2pupdate_1.xx.0.zip.sig
       File Content Type: Installer File

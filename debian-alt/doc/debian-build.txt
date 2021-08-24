@@ -4,7 +4,7 @@ Make sure workspace revision matches what you want to release.
 
 # Make the source tarball
 # only if you didn't already do it for launchpad!
-# Otherwise make sure the i2p-0.9.xx.orig.tar.bz2 file is
+# Otherwise make sure the i2p-1.xx.0.orig.tar.bz2 file is
 # in the dir above the source directory, and skip to next step
 ant debian-release-tarball
 
@@ -13,12 +13,12 @@ ant debian-release-tarball
 
 # Go to the source directory created by ant debian-release-tarball
 # Fix up the changelog
-cd i2p_0.9.xx-x-xxxxxxxx/
+cd i2p_1.xx.0-x-xxxxxxxx/
 ant debchange
 vi debian/changelog
-   change i2p_0.9.xx-x-xxxxxxxx-1 to i2p_0.9.xx-1
+   change i2p_1.xx.0-x-xxxxxxxx-1 to i2p_1.xx.0-1
    change UNRELEASED to stable
-   change comment to "New upstream version 0.9.xx"
+   change comment to "New upstream version 1.xx.0"
    fix your name and email
 # fix up the control and rules files as necessary
 # fix up the patches/ files as necessary
@@ -26,11 +26,11 @@ vi debian/changelog
 # build the binary packages:
 ant debian-binary
 This will make the following files in .:
-  i2p-doc_0.9.xx-1_all.deb
-  i2p-router_0.9.xx-1_all.deb
-  i2p_0.9.xx-1_all.deb
-  libjbigi-jni_0.9.xx-1_amd64.deb
-Note that you won't have a libjbigi-jni_0.9.xx-1_i386.deb file,
+  i2p-doc_1.xx.0-1_all.deb
+  i2p-router_1.xx.0-1_all.deb
+  i2p_1.xx.0-1_all.deb
+  libjbigi-jni_1.xx.0-1_amd64.deb
+Note that you won't have a libjbigi-jni_1.xx.0-1_i386.deb file,
 or one for any other architecture. Oh well.
 
 # copy up so they don't get deleted
@@ -43,32 +43,32 @@ rm apps/susidns/src/lib/standard.jar
 debuild -S -sa -kYOURSUBKEYID
   (note: no space allowed in -kkeyid)
 This will make the following files in ..:
-  i2p_0.9.XX-1.dsc            (the GPG signature)
-  i2p_0.9.XX-1.debian.tar.xz  (basically the debian/ directory tarball)
-  i2p_0.9.XX-1_source.changes (the changelog text file)
+  i2p_1.xx.0-1.dsc            (the GPG signature)
+  i2p_1.xx.0-1.debian.tar.xz  (basically the debian/ directory tarball)
+  i2p_1.xx.0-1_source.changes (the changelog text file)
 # now do the same for jessie and wheezy and precise (NO, don't, we will copy below)
 
 # scp the following files to the reprepro server:
-  i2p_0.9.XX-1.dsc            (the GPG signature)
-  i2p_0.9.XX-1.tar.xz  (basically the debian/ directory tarball)
-  i2p_0.9.XX-1_source.changes (the changelog text file)
-  i2p_0.9.XX.orig.tar.bz2            (the source tarball)
-  i2p-doc_0.9.xx-1_all.deb           (docs)
-  i2p-router_0.9.xx-1_all.deb        (binary)
-  i2p_0.9.xx-1_all.deb               (top-level package)
-  libjbigi-jni_0.9.xx-1_amd64.deb    (binary)
+  i2p_1.xx.0-1.dsc            (the GPG signature)
+  i2p_1.xx.0-1.tar.xz  (basically the debian/ directory tarball)
+  i2p_1.xx.0-1_source.changes (the changelog text file)
+  i2p_1.xx.0.orig.tar.bz2            (the source tarball)
+  i2p-doc_1.xx.0-1_all.deb           (docs)
+  i2p-router_1.xx.0-1_all.deb        (binary)
+  i2p_1.xx.0-1_all.deb               (top-level package)
+  libjbigi-jni_1.xx.0-1_amd64.deb    (binary)
 
 
 ssh to reprepro server
 sudo su kytv (he owns the reprepro directories)
 
-reprepro includedeb stable i2p-doc_0.9.xx-1_all.deb
-reprepro includedeb stable i2p-router_0.9.xx-1_all.deb
-reprepro includedeb stable libjbigi-jni_0.9.xx-1_amd64.deb
-reprepro includedeb stable i2p_0.9.xx-1_all.deb
+reprepro includedeb stable i2p-doc_1.xx.0-1_all.deb
+reprepro includedeb stable i2p-router_1.xx.0-1_all.deb
+reprepro includedeb stable libjbigi-jni_1.xx.0-1_amd64.deb
+reprepro includedeb stable i2p_1.xx.0-1_all.deb
 # if you already got the source from launchpad
 # with reprepro update, skip this.
-reprepro includedsc stable i2p_0.9.XX-1.dsc
+reprepro includedsc stable i2p_1.xx.0-1.dsc
 
 # copy built packages from launchpad
 for i in precise trusty xenial bionic disco eoan focal
