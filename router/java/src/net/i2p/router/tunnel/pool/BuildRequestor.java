@@ -40,8 +40,6 @@ abstract class BuildRequestor {
     private static final List<Integer> ORDER = new ArrayList<Integer>(TunnelBuildMessage.MAX_RECORD_COUNT);
     private static final String MIN_NEWTBM_VERSION = "0.9.51";
     private static final boolean SEND_VARIABLE = true;
-    // TODO remove when finished
-    private static final boolean SEND_SHORT = false;
     private static final int SHORT_RECORDS = 4;
     private static final List<Integer> SHORT_ORDER = new ArrayList<Integer>(SHORT_RECORDS);
     /** 5 (~2600 bytes) fits nicely in 3 tunnel messages */
@@ -338,8 +336,7 @@ abstract class BuildRequestor {
         long replyTunnel = 0;
         Hash replyRouter;
         boolean useVariable = SEND_VARIABLE && cfg.getLength() <= MEDIUM_RECORDS;
-        boolean useShortTBM = (SEND_SHORT || ctx.getBooleanProperty("router.useShortTBM")) &&
-                              ctx.keyManager().getPublicKey().getType() == EncType.ECIES_X25519;
+        boolean useShortTBM = ctx.keyManager().getPublicKey().getType() == EncType.ECIES_X25519;
         if (useShortTBM && !cfg.isInbound() && !pool.getSettings().isExploratory()) {
             // client must be EC also to get garlic OTBRM reply
             LeaseSetKeys lsk = ctx.keyManager().getKeys(pool.getSettings().getDestination());
