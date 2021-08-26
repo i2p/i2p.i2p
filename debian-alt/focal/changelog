@@ -1,3 +1,9 @@
+i2p (1.5.0-2ubuntu1) focal; urgency=medium
+
+  * New upstream version 1.5.0
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 25 Aug 2021 12:12:12 +0000
+
 i2p (0.9.50-1ubuntu1) focal; urgency=medium
 
   * New upstream version 0.9.50
