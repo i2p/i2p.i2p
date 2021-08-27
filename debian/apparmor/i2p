@@ -80,6 +80,9 @@
   # GeoIP data
   /usr/share/GeoIP/*                                      r,
 
+  # License link in console via viewlicense.jsp
+  /usr/share/doc/i2p-router/copyright                     r,
+
   # Other /proc
   @{PROC}/cpuinfo                                         r,
   @{PROC}/net/if_inet6                                    r,
