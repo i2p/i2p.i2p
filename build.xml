@@ -447,6 +447,7 @@
         <!-- default if not set by disableManifestClasspath -->
         <property name="manifest.classpath.name" value="Class-Path" />
         <property name="full.version" value="${release.number}-${i2p.build.number}${build.extra}" />
+        <echo message="JDK: ${java.vendor} ${java.version} (${java.runtime.name} ${java.runtime.version})" />
         <echo message="Building version ${full.version} (revision ${workspace.version})" />
     </target>
 
@@ -1048,7 +1049,6 @@
     </target>
 
     <target name="verifyReleaseBuildNumbers" depends="getReleaseNumber, getBuildNumber" >
-        <echo message="SDK: ${java.vendor} ${java.version} (${java.runtime.name} ${java.runtime.version})" />
         <fail message="Bad release number: ${release.number}" >
             <condition>
                 <or>
