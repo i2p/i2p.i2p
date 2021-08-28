@@ -203,8 +203,14 @@ public class ConfigServiceHandler extends FormHandler {
      *  @since 0.9.26
      */
     public boolean shouldShowSystray() {
-        return SystemTray.isSupported() &&
-               !SystemVersion.isService() &&
+        try {
+            if (!SystemTray.isSupported())
+                return false;
+        } catch (Throwable t) {
+            // java.lang.NoClassDefFoundError: Could not initialize class java.awt.Toolkit
+            return false;
+        }
+        return !SystemVersion.isService() &&
                !(SystemVersion.isWindows() && _context.hasWrapper() && WrapperManager.isLaunchedAsService());
     }
 
