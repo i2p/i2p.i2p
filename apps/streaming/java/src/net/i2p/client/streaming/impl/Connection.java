@@ -233,7 +233,7 @@ class Connection {
                 int wsz = _options.getWindowSize();
                 if (_isChoked || unacked >= wsz ||
                     _activeResends.get() >= (wsz + 1) / 2 ||
-                    _lastSendId.get() - _highestAckedThrough >= Math.max(MAX_WINDOW_SIZE, 2 * wsz)) {
+                    _lastSendId.get() - _highestAckedThrough >= Math.min(MAX_WINDOW_SIZE, 2 * wsz)) {
                     if (timeoutMs > 0) {
                         if (timeLeft <= 0) {
                             if (_log.shouldLog(Log.INFO))
