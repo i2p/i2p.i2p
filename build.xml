@@ -80,11 +80,12 @@
             <echo message="In addition to those packages, be sure to install &quot;fakeroot&quot;,"/>
             <echo message="&quot;quilt&quot; and &quot;build-essential&quot;!" />
             <echo message="" />
+            <echo message="This is recent for Debian Bullseye" />
             <echo message="The following command will install the build dependencies for you:" />
             <echo message=" " />
             <echo message="sudo apt-get install debhelper ant debconf default-jdk gettext libgmp-dev po-debconf fakeroot \" />
-            <echo message="  build-essential quilt dh-apparmor dh-systemd libservice-wrapper-java libjson-simple-java \"  />
-            <echo message="  devscripts libjetty9-java libtomcat8-java libtaglibs-standard-jstlel-java libgetopt-java"  />
+            <echo message="  build-essential quilt dh-apparmor libservice-wrapper-java libjson-simple-java \"  />
+            <echo message="  devscripts libjetty9-java libtomcat9-java libtaglibs-standard-jstlel-java libgetopt-java"  />
             <echo message=" " />
             <echo message="The following command will install the additional runtime dependencies:" />
             <echo message="sudo apt-get install geoip-database famfamfam-flag-png" />
