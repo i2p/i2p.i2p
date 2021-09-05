@@ -258,7 +258,37 @@ public class NewsXMLParser {
                     String href = t.getAttributeValue("href");
                     if (href.length() > 0) {
                         update.torrent = href.trim();
-                        totalSources += 1;
+                        totalSources++;
+                    }
+                }
+                List<Node> urlNodes = getNodes(u, "i2p:clearnet");
+                for (Node n1 : urlNodes) {
+                    String href = n1.getAttributeValue("href");
+                    if (href.length() > 0) {
+                        if (update.clearnet == null)
+                            update.clearnet = new ArrayList<String>(4);
+                        update.clearnet.add(href.trim());
+                        totalSources++;
+                    }
+                }
+                urlNodes = getNodes(u, "i2p:clearnetssl");
+                for (Node n2 : urlNodes) {
+                    String href = n2.getAttributeValue("href");
+                    if (href.length() > 0) {
+                        if (update.ssl == null)
+                            update.ssl = new ArrayList<String>(4);
+                        update.ssl.add(href.trim());
+                        totalSources++;
+                    }
+                }
+                urlNodes = getNodes(u, "i2p:url");
+                for (Node n3 : urlNodes) {
+                    String href = n3.getAttributeValue("href");
+                    if (href.length() > 0) {
+                        if (update.i2pnet == null)
+                            update.i2pnet = new ArrayList<String>(4);
+                        update.i2pnet.add(href.trim());
+                        totalSources++;
                     }
                 }
 

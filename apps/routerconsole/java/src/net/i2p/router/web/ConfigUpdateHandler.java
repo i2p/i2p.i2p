@@ -132,24 +132,6 @@ public class ConfigUpdateHandler extends FormHandler {
         USE_SU3_UPDATE = files != null && files.length > 0;
     }
 
-    private static final String DEFAULT_SU3_UPDATE_URLS =
-    "http://echelon.i2p/i2p/i2pupdate.su3\r\n" +
-    //"http://inr.i2p/i2p/i2pupdate.su3\r\n" +
-    //"http://meeh.i2p/i2pupdate/i2pupdate.su3\r\n" +
-    "http://stats.i2p/i2p/i2pupdate.su3\r\n" +
-    // "http://www.i2p2.i2p/_static/i2pupdate.su3\r\n" +
-    //"http://update.dg.i2p/files/i2pupdate.su3";
-    //"http://update.killyourtv.i2p/i2pupdate.su3\r\n" ;
-    // "http://update.postman.i2p/i2pupdate.su3" ;
-    // project download server
-    "http://whnxvjwjhzsske5yevyokhskllvtisv5ueokw6yvh6t7zqrpra2q.b32.i2p/current/i2pupdate.su3";
-
-    /**
-     *  Empty string if disabled. Cannot be overridden by config.
-     *  @since 0.9.9
-     */
-    public static final String SU3_UPDATE_URLS = USE_SU3_UPDATE ? DEFAULT_SU3_UPDATE_URLS : "";
-
     public static final String PROP_TRUSTED_KEYS = "router.trustedUpdateKeys";
     
     /**

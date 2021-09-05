@@ -14,7 +14,6 @@ import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -205,8 +204,13 @@ class NewsFetcher extends UpdateRunner {
     private static final String CLEARNET_SU2_KEY = "su2clearnet";
     private static final String CLEARNET_HTTP_SU3_KEY = "su3clearnet";
     private static final String CLEARNET_HTTPS_SU3_KEY = "su3ssl";
-    private static final String I2P_SUD_KEY = "sudi2p";
-    private static final String I2P_SU2_KEY = "su2i2p";
+    // unused
+    //private static final String I2P_SUD_KEY = "sudi2p";
+    //private static final String I2P_SU2_KEY = "su2i2p";
+    /**
+     *  @since 0.9.52
+     */
+    private static final String I2P_SU3_KEY = "su3i2p";
 
     /**
      *  Parse the installed (not the temp) news file for the latest version.
@@ -281,14 +285,14 @@ class NewsFetcher extends UpdateRunner {
                             Map<UpdateMethod, List<URI>> sourceMap = new HashMap<UpdateMethod, List<URI>>(4);
                             // Must do su3 first
                             //if (ConfigUpdateHandler.USE_SU3_UPDATE) {
-                                sourceMap.put(HTTP, _mgr.getUpdateURLs(ROUTER_SIGNED_SU3, "", HTTP));
+                                addMethod(HTTP, args.get(I2P_SU3_KEY), sourceMap);
                                 addMethod(TORRENT, args.get(SU3_KEY), sourceMap);
                                 addMethod(HTTP_CLEARNET, args.get(CLEARNET_HTTP_SU3_KEY), sourceMap);
                                 addMethod(HTTPS_CLEARNET, args.get(CLEARNET_HTTPS_SU3_KEY), sourceMap);
                                 // notify about all sources at once
                                 _mgr.notifyVersionAvailable(this, _currentURI, ROUTER_SIGNED_SU3,
                                                             "", sourceMap, ver, "");
-                                sourceMap.clear();
+                            //  sourceMap.clear();
                             //}
                             // now do sud/su2 - DISABLED
                             //sourceMap.put(HTTP, _mgr.getUpdateURLs(ROUTER_SIGNED, "", HTTP));
@@ -630,13 +634,13 @@ class NewsFetcher extends UpdateRunner {
         long oldTime = _context.getProperty(PROP_BLOCKLIST_TIME, 0L);
         if (ble.updated <= oldTime) {
             if (_log.shouldWarn())
-                _log.warn("Not processing blocklist " + new Date(ble.updated) +
-                          ", already have " + new Date(oldTime));
+                _log.warn("Not processing blocklist " + DataHelper.formatDate(ble.updated) +
+                          ", already have " + DataHelper.formatDate(oldTime));
             return;
         }
         Blocklist bl = _context.blocklist();
         Banlist ban = _context.banlist();
-        String reason = "Blocklist feed " + new Date(ble.updated);
+        String reason = "Blocklist feed " + DataHelper.formatDate(ble.updated);
         int banned = 0;
         for (Iterator<String> iter = ble.entries.iterator(); iter.hasNext(); ) {
             String s = iter.next();
@@ -732,7 +736,7 @@ class NewsFetcher extends UpdateRunner {
             out = new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(to), "UTF-8"));
             out.write("<!--\n");
             // update metadata in old format
-            out.write("<i2p.release ");
+            out.write(VERSION_PREFIX);
             if (latestRelease.i2pVersion != null)
                 out.write(" version=\"" + latestRelease.i2pVersion + '"');
             if (latestRelease.minVersion != null)
@@ -741,25 +745,35 @@ class NewsFetcher extends UpdateRunner {
                 out.write(" minJavaVersion=\"" + latestRelease.minJavaVersion + '"');
             String su3Torrent = "";
             String su2Torrent = "";
+            List<String> i2pnet = null;
+            List<String> clearnet = null;
+            List<String> clearnetssl = null;
             for (NewsMetadata.Update update : latestRelease.updates) {
                 if (update.torrent != null) {
-                    if ("su3".equals(update.type))
+                    if ("su3".equals(update.type)) {
                         su3Torrent = update.torrent;
-                    else if ("su2".equals(update.type))
+                        i2pnet = update.i2pnet;
+                        clearnet = update.clearnet;
+                        clearnetssl = update.ssl;
+                    } else if ("su2".equals(update.type)) {
                         su2Torrent = update.torrent;
+                    }
                 }
             }
             if (!su2Torrent.isEmpty())
                 out.write(" su2Torrent=\"" + su2Torrent + '"');
             if (!su3Torrent.isEmpty())
                 out.write(" su3Torrent=\"" + su3Torrent + '"');
+            writeList(out, I2P_SU3_KEY, i2pnet);
+            writeList(out, CLEARNET_HTTPS_SU3_KEY, clearnetssl);
+            writeList(out, CLEARNET_HTTP_SU3_KEY, clearnet);
             out.write("/>\n");
             // su3 and feed metadata for debugging
             out.write("** News version:\t" + DataHelper.stripHTML(sudVersion) + '\n');
             out.write("** Signed by:\t" + signingKeyName + '\n');
             out.write("** Feed:\t" + DataHelper.stripHTML(data.feedTitle) + '\n');
             out.write("** Feed ID:\t" + DataHelper.stripHTML(data.feedID) + '\n');
-            out.write("** Feed Date:\t" + (new Date(data.feedUpdated)) + '\n');
+            out.write("** Feed Date:\t" + DataHelper.formatDate(data.feedUpdated) + '\n');
             out.write("-->\n");
             if (entries == null)
                 return;
@@ -781,5 +795,27 @@ class NewsFetcher extends UpdateRunner {
                 out.close(); 
             } catch (IOException ioe) {}
         }
+    }
+
+    /**
+     *  Write out key="foo,bar,baz".
+     *  Values cannot contain ','
+     *
+     *  @param values if null or empty, does nothing
+     *  @since 0.9.52
+     */
+    private static void writeList(Writer out, String key, List<String> values) throws IOException {
+        if (values == null || values.isEmpty())
+            return;
+        out.write(' ');
+        out.write(key);
+        out.write("=\"");
+        int sz = values.size();
+        for (int i = 0; i < sz; i++) {
+            out.write(values.get(i));
+            if (i != sz - 1)
+                out.write(',');
+        }
+        out.write('"');
     }
 }

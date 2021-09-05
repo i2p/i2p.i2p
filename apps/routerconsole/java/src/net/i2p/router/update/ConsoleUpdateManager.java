@@ -1293,18 +1293,8 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
               }
 
             case ROUTER_SIGNED_SU3:
-              {
-                String URLs = ConfigUpdateHandler.SU3_UPDATE_URLS;
-                StringTokenizer tok = new StringTokenizer(URLs, " ,\r\n");
-                List<URI> rv = new ArrayList<URI>();
-                while (tok.hasMoreTokens()) {
-                    try {
-                        rv.add(new URI(tok.nextToken().trim()));
-                    } catch (URISyntaxException use) {}
-                }
-                Collections.shuffle(rv, _context.random());
-                return rv;
-              }
+                // handled in NewsFetcher
+                break;
 
             case ROUTER_UNSIGNED:
                 String url = _context.getProperty(ConfigUpdateHandler.PROP_ZIP_URL);

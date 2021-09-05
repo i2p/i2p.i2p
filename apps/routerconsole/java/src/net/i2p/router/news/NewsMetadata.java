@@ -63,8 +63,19 @@ public class NewsMetadata {
     public static class Update implements Comparable<Update> {
         public String type;
         public String torrent;
+        /**
+         *  Stored as of 0.9.52, but there is no registered handler
+         */
         public List<String> clearnet;
+        /**
+         *  Stored as of 0.9.52, but there is no registered handler
+         */
         public List<String> ssl;
+        /**
+         *  In-net URLs
+         *  @since 0.9.52
+         */
+        public List<String> i2pnet;
 
         @Override
         public int compareTo(Update other) {
