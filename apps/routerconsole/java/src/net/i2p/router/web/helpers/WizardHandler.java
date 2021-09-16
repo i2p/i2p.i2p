@@ -41,13 +41,19 @@ public class WizardHandler extends FormHandler {
             // note that the page is the page we are on now,
             // which is the page after the one the settings were on.
             String page = getJettyString("page");
+            int ipage = 1;
+            if (page != null) {
+                try {
+                    ipage = Integer.parseInt(page);
+                } catch (NumberFormatException nfe) {}
+            }
             if (getJettyString("lang") != null) {
                 // Saved in CSSHelper, assume success
                 addFormNoticeNoEscape(_t("Console language saved."));
             }
-            if ("3".equals(page)) {
+            if (ipage == WizardHelper.PAGE_TEST) {
                 startNDT();
-            } else if ("4".equals(page)) {
+            } else if (ipage == WizardHelper.PAGE_RESULTS) {
                 synchronized (_helper) {
                     if (_helper.isNDTSuccessful()) {
                         addFormNotice(_t("Bandwidth test completed successfully"));
@@ -60,7 +66,7 @@ public class WizardHandler extends FormHandler {
                         addFormError(_t("Bandwidth test did not complete"));
                     }
                 }
-            } else if ("5".equals(page)) {
+            } else if (ipage == WizardHelper.PAGE_BROWSER) {
                 Map<String, String> changes = new HashMap<String, String>();
                 boolean updated = updateRates(changes);
                 if (updated) {

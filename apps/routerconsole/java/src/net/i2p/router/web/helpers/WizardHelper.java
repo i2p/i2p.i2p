@@ -21,6 +21,14 @@ public class WizardHelper extends HelperBase {
     public static final String PROP_COMPLETE = "routerconsole.welcomeWizardComplete";
     // scale bw test results by this for limiter settings
     public static final float BW_SCALE = 0.75f;
+    // pages
+    public static final int PAGE_LANG = 1;
+    public static final int PAGE_CHECK = 2;
+    public static final int PAGE_TEST = 3;
+    public static final int PAGE_RESULTS = 4;
+    public static final int PAGE_BROWSER = 5;
+    public static final int PAGE_DONE = 6;
+
     // KBps
     private static final float MIN_DOWN_BW = 32.0f;
     private static final float MIN_UP_BW = 12.0f;

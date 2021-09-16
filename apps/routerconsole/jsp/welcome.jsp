@@ -4,7 +4,21 @@
     // The MLabHelper singleton will prevent multiple simultaneous tests, even across sessions.
 
     // page ID
-    final int LAST_PAGE = 6;
+    // 1: Select language
+    // 2: Check internet connection
+    // 3: Bandwidth test in progress
+    // 4: Bandwidth test results
+    // 5: Browser setup
+    // 6: Done
+    final int PAGE_LANG = net.i2p.router.web.helpers.WizardHelper.PAGE_LANG;
+    final int PAGE_CHECK = net.i2p.router.web.helpers.WizardHelper.PAGE_CHECK;
+    final int PAGE_TEST = net.i2p.router.web.helpers.WizardHelper.PAGE_TEST;
+    final int PAGE_RESULTS = net.i2p.router.web.helpers.WizardHelper.PAGE_RESULTS;
+    final int PAGE_BROWSER = net.i2p.router.web.helpers.WizardHelper.PAGE_BROWSER;
+    final int PAGE_DONE = net.i2p.router.web.helpers.WizardHelper.PAGE_DONE;
+
+    final int FIRST_PAGE = PAGE_LANG;
+    final int LAST_PAGE = PAGE_DONE;
     String pg = request.getParameter("page");
     int ipg;
     if (pg == null) {
@@ -14,18 +28,18 @@
             ipg = Integer.parseInt(pg);
             if (request.getParameter("prev") != null) {
                 // previous button handling
-                if (ipg == 5)
-                    ipg = 2;
+                if (ipg == PAGE_BROWSER)
+                    ipg = PAGE_CHECK;
                 else
                     ipg -= 2;
             }
-            if (ipg <= 0 || ipg > LAST_PAGE) {
-                ipg = 1;
-            } else if (ipg == 3 && request.getParameter("skipbw") != null) {
+            if (ipg < FIRST_PAGE || ipg > LAST_PAGE) {
+                ipg = FIRST_PAGE;
+            } else if (ipg == PAGE_TEST && request.getParameter("skipbw") != null) {
                 ipg++;  // skip bw test
             }
         } catch (NumberFormatException nfe) {
-            ipg = 1;
+            ipg = FIRST_PAGE;
         }
     }
 
@@ -64,7 +78,7 @@
 <%=intl.title("New Install Wizard")%>
 <%
     wizhelper.setContextId(i2pcontextId);
-    if (ipg == 3) {
+    if (ipg == PAGE_TEST) {
 %>
 <script src="/js/welcomeajax.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 <script nonce="<%=cspNonce%>" type="text/javascript">
@@ -85,7 +99,7 @@
 /* @license-end */
 </script>
 <%
-    }  // ipg == 3
+    }  // ipg == PAGE_TEST
 %>
 </head><body>
 <div id="wizard" class="overlay">
@@ -104,7 +118,7 @@
 <input type="hidden" name="action" value="blah" >
 <input type="hidden" name="page" value="<%=(ipg + 1)%>" >
 <%
-    if (ipg == 1) {
+    if (ipg == PAGE_LANG) {
         // language selection
 %>
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigUIHelper" id="uihelper" scope="request" />
@@ -140,7 +154,7 @@
 </div>
 <%
 
-    } else if (ipg == 2) {
+    } else if (ipg == PAGE_CHECK) {
         // Overview of bandwidth test
 %>
 <div class="clickableProgression">
@@ -176,7 +190,7 @@
 </div>
 <%
 
-    } else if (ipg == 3) {
+    } else if (ipg == PAGE_TEST) {
         // Bandwidth test in progress (w/ AJAX)
 %>
 <div class="clickableProgression">
@@ -209,7 +223,7 @@
 </div>
 <%
 
-    } else if (ipg == 4) {
+    } else if (ipg == PAGE_RESULTS) {
         // Bandwidth test results
         // and/or manual bw entry?
 %>
@@ -298,7 +312,7 @@
 </div>
 <%
 
-    } else if (ipg == 5) {
+    } else if (ipg == PAGE_BROWSER) {
         // Browser setup
 %>
 <div class="clickableProgression">
@@ -379,7 +393,7 @@
 <div class="wizardbuttons wizard">
 <table class="configtable wizard"><tr class="wizard"><td class="optionsave wizard">
 <%
-    if (ipg != 1) {
+    if (ipg != FIRST_PAGE) {
 %>
 <input type="submit" class="back wizardbutton" name="prev" value="<%=intl._t("Previous")%>" >
 <%
@@ -388,11 +402,11 @@
 %>
 <input type="submit" class="cancel wizardbutton" name="skip" value="<%=intl._t("Skip Setup")%>" >
 <%
-        if (ipg == 2) {
+        if (ipg == PAGE_CHECK) {
 %>
 <input type="submit" class="cancel wizardbutton" name="skipbw" value="<%=intl._t("Skip Bandwidth Test")%>" >
 <%
-        } else if (ipg == 3) {
+        } else if (ipg == PAGE_TEST) {
 %>
 <input type="submit" class="cancel wizardbutton" name="cancelbw" value="<%=intl._t("Cancel Bandwidth Test")%>" >
 <%
