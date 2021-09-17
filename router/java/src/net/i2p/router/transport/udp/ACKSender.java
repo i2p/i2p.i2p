@@ -78,7 +78,7 @@ class ACKSender implements Runnable {
         // the unsentACKThreshold to figure out when to send an ACK instead of
         // using the timer, so we can set the timeout/frequency higher
         if (timeSinceACK < 2*1000)
-            return Math.max(rtt/2, ACK_FREQUENCY);
+            return Math.min(rtt/2, ACK_FREQUENCY);
         else
             return ACK_FREQUENCY;
     }
