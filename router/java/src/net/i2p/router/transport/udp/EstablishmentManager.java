@@ -143,7 +143,7 @@ class EstablishmentManager {
         _log = ctx.logManager().getLog(EstablishmentManager.class);
         _networkID = ctx.router().getNetworkID();
         _transport = transport;
-        _builder = new PacketBuilder(ctx, transport);
+        _builder = transport.getBuilder();
         _inboundStates = new ConcurrentHashMap<RemoteHostId, InboundEstablishState>();
         _outboundStates = new ConcurrentHashMap<RemoteHostId, OutboundEstablishState>();
         _queuedOutbound = new ConcurrentHashMap<RemoteHostId, List<OutNetMessage>>();

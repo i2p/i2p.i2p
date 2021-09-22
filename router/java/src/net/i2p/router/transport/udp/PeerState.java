@@ -2124,8 +2124,7 @@ public class PeerState {
                 List<ACKBitfield> ackBitfields = retrieveACKBitfields(false);
 
                 if (!ackBitfields.isEmpty()) {
-                    PacketBuilder builder = new PacketBuilder(_context, _transport);
-                    UDPPacket ack = builder.buildACK(PeerState.this, ackBitfields);
+                    UDPPacket ack = _transport.getBuilder().buildACK(PeerState.this, ackBitfields);
                     ack.markType(1);
                     ack.setFragmentCount(-1);
                     ack.setMessageType(PacketBuilder.TYPE_ACK);

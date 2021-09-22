@@ -184,6 +184,8 @@ class PacketBuilder {
     private static final byte SESSION_DESTROY_FLAG_BYTE = (byte) (UDPPacket.PAYLOAD_TYPE_SESSION_DESTROY << 4);
     
     /**
+     *  No state, all methods are thread-safe.
+     *
      *  @param transport may be null for unit testing only
      */
     public PacketBuilder(RouterContext ctx, UDPTransport transport) {

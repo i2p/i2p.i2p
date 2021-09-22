@@ -106,7 +106,7 @@ class IntroductionManager {
         _context = ctx;
         _log = ctx.logManager().getLog(IntroductionManager.class);
         _transport = transport;
-        _builder = new PacketBuilder(ctx, transport);
+        _builder = transport.getBuilder();
         _outbound = new ConcurrentHashMap<Long, PeerState>(MAX_OUTBOUND);
         _inbound = new ConcurrentHashMap<Long, PeerState>(MAX_INBOUND);
         _recentHolePunches = new HashSet<InetAddress>(16);

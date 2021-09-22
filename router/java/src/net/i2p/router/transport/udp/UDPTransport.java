@@ -81,7 +81,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private final IntroductionManager _introManager;
     private final ExpirePeerEvent _expireEvent;
     private final PeerTestEvent _testEvent;
-    private final PacketBuilder _destroyBuilder;
+    private final PacketBuilder _packetBuilder;
     private Status _reachabilityStatus;
     private Status _reachabilityStatusPending;
     // only for logging, to be removed
@@ -320,7 +320,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _cachedBid[i] = new SharedBid(BID_VALUES[i]);
         }
 
-        _destroyBuilder = new PacketBuilder(_context, this);
+        _packetBuilder = new PacketBuilder(_context, this);
         _fragments = new OutboundMessageFragments(_context, this, _activeThrottle);
         _inboundFragments = new InboundMessageFragments(_context, _fragments, this);
         //if (SHOULD_FLOOD_PEERS)
@@ -1978,7 +1978,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         // peer must be fully established
         if (peer.getCurrentCipherKey() == null)
             return;
-        UDPPacket pkt = _destroyBuilder.buildSessionDestroyPacket(peer);
+        UDPPacket pkt = _packetBuilder.buildSessionDestroyPacket(peer);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending destroy to : " + peer);
         send(pkt);
@@ -3228,6 +3228,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     /**
+     *  @return the PacketBuilder
+     *  @since 0.9.52
+     */
+    PacketBuilder getBuilder() {
+        return _packetBuilder;
+    }
+
+    /**
      * Does nothing
      * @deprecated as of 0.9.31
      */
@@ -3334,7 +3342,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                         // TODO if both sides are firewalled should only one ping
                         // or else session will stay open forever?
                         //peer.setLastSendTime(now);
-                        send(_destroyBuilder.buildPing(peer));
+                        send(_packetBuilder.buildPing(peer));
                         peer.setLastPingTime(now);
                         // If external port is different, it may be changing the port for every
                         // session, so ping all of them. Otherwise only one.
