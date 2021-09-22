@@ -25,7 +25,6 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
     private DecayingBloomFilter _recentlyCompletedMessages;
     private final OutboundMessageFragments _outbound;
     private final UDPTransport _transport;
-    private final ACKSender _ackSender;
     private final MessageReceiver _messageReceiver;
     private volatile boolean _alive;
     
@@ -38,7 +37,6 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
         //_inboundMessages = new HashMap(64);
         _outbound = outbound;
         _transport = transport;
-        _ackSender = new ACKSender(_context, _transport);
         _messageReceiver = new MessageReceiver(_context, _transport);
         _context.statManager().createRateStat("udp.receivedCompleteTime", "How long it takes to receive a full message", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.receivedCompleteFragments", "How many fragments go in a fully received message", "udp", UDPTransport.RATES);
@@ -55,7 +53,6 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
         // array size (currently its tuned for 10 minute rates for the 
         // messageValidator)
         _recentlyCompletedMessages = new DecayingHashSet(_context, DECAY_PERIOD, 4, "UDPIMF");
-        _ackSender.startup();
         _messageReceiver.startup();
     }
 
@@ -64,7 +61,6 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
         if (_recentlyCompletedMessages != null)
             _recentlyCompletedMessages.stopDecaying();
         _recentlyCompletedMessages = null;
-        _ackSender.shutdown();
         _messageReceiver.shutdown();
     }
 
@@ -127,7 +123,6 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
                 if (data.readMessageFragmentNum(i) == 0) {
                     _context.statManager().addRateData("udp.ignoreRecentDuplicate", 1);
                     from.messageFullyReceived(messageId, -1);
-                    _ackSender.ackPeer(from);
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Message received is a dup: " + mid + " dups: " 
                                   + _recentlyCompletedMessages.getCurrentDuplicateCount() + " out of " 
@@ -174,7 +169,6 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
             if (messageComplete) {
                 _recentlyCompletedMessages.add(mid);
                 from.messageFullyReceived(messageId, state.getCompleteSize());
-                _ackSender.ackPeer(from);
 
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Message received completely!  " + state);
@@ -196,7 +190,6 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Queueing up a partial ACK for peer: " + from + " for " + state);
                 from.messagePartiallyReceived();
-                _ackSender.ackPeer(from);
             }
 
             // TODO: Why give up on other fragments if one is bad?

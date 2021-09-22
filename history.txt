@@ -1,3 +1,15 @@
+2021-09-22 zzz
+ * UDP: Replace ACKSender thread with per-PeerState ack timers
+
+2021-09-10 zzz
+ * I2CP: Don't call listener.readError() after external client disconnect
+
+2021-09-05 zzz
+ * Update: Get backup URLs from news feed
+
+2021-08-28 zzz
+ * Console: Catch error checking systray availability (gitlab issue #331)
+
 2021-08-26 zzz
  * Debian: Fix dh_installdocs build error
  * Router: Increase rekey probability

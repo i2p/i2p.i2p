@@ -25,8 +25,9 @@ import net.i2p.router.util.CachedIteratorCollection;
 import net.i2p.router.util.CoDelPriorityBlockingQueue;
 import net.i2p.router.util.PriBlockingQueue;
 import net.i2p.util.BandwidthEstimator;
-import net.i2p.util.Log;
 import net.i2p.util.ConcurrentHashSet;
+import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * Contain all of the state about a UDP connection to a peer.
@@ -301,7 +302,9 @@ public class PeerState {
     private static final int INIT_RTO = 1000;
     private static final int INIT_RTT = 0;
     private static final int MAX_RTO = 60*1000;
-    private static final int CLOCK_SKEW_FUDGE = (ACKSender.ACK_FREQUENCY * 2) / 3;
+    /** how frequently do we want to send ACKs to a peer? */
+    private static final int ACK_FREQUENCY = 150;
+    private static final int CLOCK_SKEW_FUDGE = (ACK_FREQUENCY * 2) / 3;
 
     /**
      *  The max number of acks we save to send as duplicates
@@ -712,15 +715,26 @@ public class PeerState {
             _receiveBytes = 0;
             _receivePeriodBegin = now;
         }
-
-        if (_wantACKSendSince <= 0)
-            _wantACKSendSince = now;
         _currentACKs.add(messageId);
+        messagePartiallyReceived(now);
     }
 
+    /**
+     *  We received a partial message, or we want to send some acks.
+     */
     void messagePartiallyReceived() {
-        if (_wantACKSendSince <= 0)
-            _wantACKSendSince = _context.clock().now();
+        messagePartiallyReceived(_context.clock().now());
+    }
+
+    /**
+     *  We received a partial message, or we want to send some acks.
+     *  @since 0.9.52
+     */
+    private synchronized void messagePartiallyReceived(long now) {
+        if (_wantACKSendSince <= 0) {
+            _wantACKSendSince = now;
+            new ACKTimer();
+        }
     }
 
     /**
@@ -874,28 +888,18 @@ public class PeerState {
     }
 
     /**
-     * grab a list of ACKBitfield instances, some of which may fully
-     * ACK a message while others may only partially ACK a message.
-     * the values returned are limited in size so that they will fit within
-     * the peer's current MTU as an ACK - as such, not all messages may be
-     * ACKed with this call.  Be sure to check getWantedACKSendSince() which
-     * will be unchanged if there are ACKs remaining.
-     *
-     * @return non-null, possibly empty
-     * @deprecated unused
-     */
-    @Deprecated
-    List<ACKBitfield> retrieveACKBitfields() { return retrieveACKBitfields(true); }
-
-    /**
-     * See above. Only called by ACKSender with alwaysIncludeRetransmissions = false.
+     * Only called by ACKTimer with alwaysIncludeRetransmissions = false.
      * So this is only for ACK-only packets, so all the size limiting is useless.
      * FIXME.
-     * Side effect - sets _lastACKSend if rv is non-empty
+     *
+     * Caller should sync on this.
+     *
+     * Side effect - sets _lastACKSend to now if rv is non-empty.
+     * Side effect - sets _wantACKSendSince to 0 if _currentACKs is now empty.
      *
      * @return non-null, possibly empty
      */
-    List<ACKBitfield> retrieveACKBitfields(boolean alwaysIncludeRetransmissions) {
+    private List<ACKBitfield> retrieveACKBitfields(boolean alwaysIncludeRetransmissions) {
         int bytesRemaining = countMaxACKData();
 
             // Limit the overhead of all the resent acks when using small MTU
@@ -924,7 +928,7 @@ public class PeerState {
                 bytesRemaining -= 4;
             }
             if (_currentACKs.isEmpty())
-                _wantACKSendSince = -1;
+                _wantACKSendSince = 0;
             if (alwaysIncludeRetransmissions || !rv.isEmpty()) {
                 List<Long> randomResends = getCurrentResendACKs();
                 // now repeat by putting in some old ACKs
@@ -1278,11 +1282,15 @@ public class PeerState {
     /** when did we last send an ACK to the peer? */
     public long getLastACKSend() { return _lastACKSend; }
 
-    /** @deprecated unused */
-    @Deprecated
-    public void setLastACKSend(long when) { _lastACKSend = when; }
-
-    public long getWantedACKSendSince() { return _wantACKSendSince; }
+    /**
+     *  All acks have been sent.
+     *  @since 0.9.52
+     */
+    synchronized void clearWantedACKSendSince() {
+        // race prevention
+        if (_currentACKs.isEmpty())
+            _wantACKSendSince = 0;
+    }
 
     /**
      *  Are we out of room to send all the current unsent acks in a single packet?
@@ -1372,7 +1380,7 @@ public class PeerState {
             }
 
         // so the ACKSender will drop this peer from its queue
-        _wantACKSendSince = -1;
+        _wantACKSendSince = 0;
     }
 
     /**
@@ -2084,6 +2092,67 @@ public class PeerState {
         @Override
         protected boolean removeEldestEntry(Map.Entry<Integer, Long> eldest) {
             return size() > MAX_SEND_MSGS_PENDING;
+        }
+    }
+
+    /**
+     *  A timer to send an ack-only packet.
+     *  @since 0.9.52
+     */
+    private class ACKTimer extends SimpleTimer2.TimedEvent {
+        public ACKTimer() {
+            super(_context.simpleTimer2());
+            long delta = Math.min(_rtt/2, ACK_FREQUENCY);
+            if (_log.shouldDebug())
+                _log.debug("Sending delayed ack in " + delta + ": " + PeerState.this);
+            schedule(delta);
+        }
+
+        /**
+         *  Send an ack-only packet, unless acks were already sent
+         *  as indicated by _wantACKSendSince == 0.
+         *  Will not requeue unless the acks don't all fit (unlikely).
+         */
+        public void timeReached() {
+            synchronized(PeerState.this) {
+                long wanted = _wantACKSendSince;
+                if (wanted <= 0) {
+                    if (_log.shouldDebug())
+                        _log.debug("Already acked:" + PeerState.this);
+                    return;
+                }
+                List<ACKBitfield> ackBitfields = retrieveACKBitfields(false);
+
+                if (!ackBitfields.isEmpty()) {
+                    PacketBuilder builder = new PacketBuilder(_context, _transport);
+                    UDPPacket ack = builder.buildACK(PeerState.this, ackBitfields);
+                    ack.markType(1);
+                    ack.setFragmentCount(-1);
+                    ack.setMessageType(PacketBuilder.TYPE_ACK);
+
+                    if (_log.shouldDebug()) {
+                        //_log.debug("Sending " + ackBitfields + " to " + PeerState.this);
+                        _log.debug("Sending " + ackBitfields.size() + " acks to " + PeerState.this);
+                    }
+                    // locking issues, we ignore the result, and acks are small,
+                    // so don't even bother allocating
+                    //peer.allocateSendingBytes(ack.getPacket().getLength(), true);
+                    // ignore whether its ok or not, its a bloody ack.  this should be fixed, probably.
+                    _transport.send(ack);
+
+                    if (_wantACKSendSince > 0) {
+                        // still full packets left to be ACKed, since wanted time
+                        // is reset by retrieveACKBitfields when all of the IDs are
+                        // removed
+                        if (_log.shouldInfo())
+                            _log.info("Requeueing more ACKs for " + PeerState.this);
+                        reschedule(25);
+                    }
+                } else {
+                    if (_log.shouldDebug())
+                        _log.debug("No more acks:" + PeerState.this);
+                }
+           }
         }
     }
 

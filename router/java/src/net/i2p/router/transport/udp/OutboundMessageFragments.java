@@ -502,6 +502,8 @@ class OutboundMessageFragments {
 
         int sent = rv.size();
         peer.packetsTransmitted(sent);
+        if (newFullAckCount <= 0)
+            peer.clearWantedACKSendSince();
         if (_log.shouldDebug())
             _log.debug("Sent " + fragmentsToSend + " fragments of " + states.size() +
                       " messages in " + sent + " packets to " + peer);
