@@ -1,3 +1,8 @@
+2021-09-25 zzz
+ * Tunnels:
+   - Implement Bloom filter for short TBM
+   - Reduce TBM Bloom filter size and interval for EC routers
+
 2021-09-22 zzz
  * UDP: Replace ACKSender thread with per-PeerState ack timers
 

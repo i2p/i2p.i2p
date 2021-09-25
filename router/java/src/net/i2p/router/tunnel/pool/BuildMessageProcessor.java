@@ -1,5 +1,7 @@
 package net.i2p.router.tunnel.pool;
 
+import java.io.File;
+
 import net.i2p.crypto.ChaCha20;
 import net.i2p.crypto.EncType;
 import net.i2p.data.Base64;
@@ -76,9 +78,27 @@ class BuildMessageProcessor {
             // appx 2K part. tunnels or 24K req/hr
             m = 19;
         }
+        // Too early, keys not registered with key manager yet
+        //boolean isEC = ctx.keyManager().getPrivateKey().getType() == EncType.ECIES_X25519;
+        // ... rather than duplicating all the logic in LoadRouterInfoJob,
+        // just look for a short router.keys.dat file.
+        // If it doesn't exist, it will be created later as EC.
+        // If we're rekeing to EC, it's ok to have a longer duration this time.
+        File f = new File(ctx.getConfigDir(), "router.keys.dat");
+        boolean isEC = f.length() < 663;
+        int duration;
+        if (isEC) {
+            // EC build records have a minute timestamp, so the Bloom filter can turn over faster
+            duration = 8*60*1000;
+            // shorter duration filter does not need to be as big
+            m = Math.max(m - 3, 17);
+        } else {
+            // ElG build records have an hour timestamp
+            duration = 60*60*1000;
+        }
         if (log.shouldInfo())
             log.info("Selected Bloom filter m = " + m);
-        return new DecayingBloomFilter(ctx, 60*60*1000, 32, "TunnelBMP", m);
+        return new DecayingBloomFilter(ctx, duration, 32, "TunnelBMP", m);
     }
 
     /**
@@ -105,7 +125,14 @@ class BuildMessageProcessor {
                     rv = new BuildRequestRecord(ctx, privKey, rec);
 
                     if (isShort) {
-                        // Bloom filter TBD
+                        SessionKey sk = rv.getChaChaReplyKey();
+                        boolean isDup = _filter.add(sk.getData(), 0, 32);
+                        if (isDup) {
+                            if (log.shouldWarn())
+                                log.warn(msg.getUniqueId() + ": Dup record: " + rv);
+                            ctx.statManager().addRateData("tunnel.buildRequestDup", 1);
+                            return null;
+                        }
                     } else {
                         // i2pd bug
                         boolean isBad = SessionKey.INVALID_KEY.equals(rv.readReplyKey());
