@@ -3471,7 +3471,7 @@ img.wizard.progress {
     left: 1%;
     max-height: 10%;
     max-width: 30%;
-    mix-blend-mode: multiply;
+    mix-blend-mode: exclusion;
 }
 
 .wizard {
