@@ -35,6 +35,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.crypto.FamilyKeyCrypto;
 import net.i2p.router.networkdb.kademlia.PersistentDataStore;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  *  Run once or twice at startup by StartupJob,
@@ -129,7 +130,7 @@ class LoadRouterInfoJob extends JobImpl {
                     (encTypeChanged && getContext().getProperty(CreateRouterInfoJob.PROP_ROUTER_ENCTYPE) == null)) {
                     // Not explicitly configured, and default has changed
                     // Give a chance of rekeying for each restart
-                    if (getContext().random().nextInt(REKEY_PROBABILITY) > 0) {
+                    if (!SystemVersion.isSlow() && getContext().random().nextInt(REKEY_PROBABILITY) > 0) {
                         sigTypeChanged = false;
                         encTypeChanged = false;
                         if (_log.shouldWarn())
