@@ -113,6 +113,19 @@
 <div class="wizardnotice">
 <%@include file="formhandler.jsi" %>
 </div>
+<div class="clickableProgression">
+<%
+    for (int i = FIRST_PAGE; i <= LAST_PAGE; i++) {
+        if (i < ipg) {
+            %><span class="visitedProgression">&#x2B24;</span><%
+        } else if (i == ipg) {
+            %><span class="currentProgression">&#x2B24;</span><%
+        } else {
+            %><span class="unvisitedProgression">&#x25EF;</span><%
+        }
+    }
+%>
+</div><img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <form action="" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>">
 <input type="hidden" name="action" value="blah" >
@@ -125,15 +138,6 @@
 <jsp:setProperty name="uihelper" property="contextId" value="<%=i2pcontextId%>" />
 <%-- needed for CSS: --%><div id="config_ui">
 <%-- needed for lang setting in css.jsi: --%><input type="hidden" name="consoleNonce" value="<%=net.i2p.router.web.CSSHelper.getNonce()%>" >
-<div class="clickableProgression">
-<span class="currentProgression">&#x2B24;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-</div>
-<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <h3 id="wizardheading" class="wizard"><%=uihelper._t("Select Language")%></h3>
 <img class="wizardimg" src="/themes/console/images/wizard/step-0.png">
 <div id="wizlangsettings" class="wizard">
@@ -157,15 +161,6 @@
     } else if (ipg == PAGE_CHECK) {
         // Overview of bandwidth test
 %>
-<div class="clickableProgression">
-<span class="visitedProgression">&#x25EF;</span>
-<span class="currentProgression">&#x2B24;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-</div>
-<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <h3 id="wizardheading" class="wizard"><%=intl._t("Bandwidth Test")%></h3>
 <img class="wizardimg" src="/themes/console/images/wizard/step-2.png">
 <div class="wizardtext">
@@ -193,15 +188,6 @@
     } else if (ipg == PAGE_TEST) {
         // Bandwidth test in progress (w/ AJAX)
 %>
-<div class="clickableProgression">
-<span class="visitedProgression">&#x25EF;</span>
-<span class="visitedProgression">&#x25EF;</span>
-<span class="currentProgression">&#x2B24;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-</div>
-<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <h3 id="wizardheading" class="wizard"><%=intl._t("Bandwidth Test in Progress")%></h3>
 <img class="wizardimg" src="themes/console/images/wizard/step-3.png">
 <div id="xhr" class="notification">
@@ -233,15 +219,6 @@
         if (request.getParameter("skipbw") == null) {
             // don't display this if we skipped the test
 %>
-<div class="clickableProgression">
-<span class="visitedProgression">&#x25EF;</span>
-<span class="visitedProgression">&#x25EF;</span>
-<span class="visitedProgression">&#x25EF;</span>
-<span class="currentProgression">&#x2B24;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-</div>
-<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <h3 id="wizardheading" class="wizard bwtest"><%=intl._t("Bandwidth Test Results")%></h3>
 <table class="mlabtable">
 <tr><td><%=intl._t("Test server location")%></td><td colspan="3"><%=wizhelper.getServerLocation()%></td></tr>
@@ -261,7 +238,6 @@
 <%
         } // skipbw
 %>
-<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <h3 id="wizardheading" class="wizard"><%=intl._t("Bandwidth Configuration")%></h3>
 <style>
 .bwtest {
@@ -315,15 +291,6 @@
     } else if (ipg == PAGE_BROWSER) {
         // Browser setup
 %>
-<div class="clickableProgression">
-<span class="visitedProgression">&#x25EF;</span>
-<span class="visitedProgression">&#x25EF;</span>
-<span class="visitedProgression">&#x25EF;</span>
-<span class="visitedProgression">&#x25EF;</span>
-<span class="currentProgression">&#x2B24;</span>
-<span class="unvisitedProgression">&#x25EF;</span>
-</div>
-<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <h3 id="wizardheading" class="wizard"><%=intl._t("Browser and Application Setup")%></h3>
 <img class="wizardimg" src="/themes/console/images/wizard/step-5.png">
 <div class="wizardtext"><p>
@@ -361,15 +328,6 @@
     } else if (ipg == LAST_PAGE) {
         // Done
 %>
-<div class="clickableProgression">
-<span class="visitedProgression">&#x25EF;</span>
-<span class="visitedProgression">&#x25EF;</span>
-<span class="visitedProgression">&#x25EF;</span>
-<span class="visitedProgression">&#x25EF;</span>
-<span class="visitedProgression">&#x25EF;</span>
-<span class="currentProgression">&#x2B24;</span>
-</div>
-<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <h3 id="wizardheading" class="wizard"><%=intl._t("Welcome to the Invisible Internet!")%></h3>
 <img class="wizardimg" src="/themes/console/images/wizard/step-6.png">
 <div class="wizardtext">
