@@ -270,18 +270,18 @@
         out.print(intl._t("NOTE"));
         out.print("</b>: ");
         out.print(intl._t("You have configured I2P to share only {0} KBps.", share));
-        out.print("</br>");
+        out.print("<br>");
 
         out.print(intl._t("I2P requires at least 12KBps to enable sharing. "));
         out.print(intl._t("By donating your bandwidth to participating traffic, you not only help others, you improve your own anonymity and performance."));
-        out.print("</br>");
+        out.print("<br>");
         out.print(intl._t("We recommend sharing 75% or more for I2P, but you can adjust based on your needs."));
     } else {
         out.print(intl._t("You have configured I2P to share {0} KBps.", share));
-        out.print("</br>");
+        out.print("<br>");
 
         out.print(intl._t("By donating your bandwidth to participating traffic, you not only help others, you improve your own anonymity and performance."));
-        out.print("</br>");
+        out.print("<br>");
         out.print(intl._t("We recommend sharing 75% or more for I2P, but you can adjust based on your needs."));
     }
 %>
