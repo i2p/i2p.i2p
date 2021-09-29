@@ -1193,7 +1193,7 @@ div.messages {
 /*     margin: 10px 0 15px 0;*/
      border: 1px solid #292929;
      background: #1F1A24;
-     background: url(images/confirmed.png) no-repeat 12px center, right bottom no-repeat #1F1A24;
+     background: url(images/infohelp.png) no-repeat 12px center, right bottom no-repeat #1F1A24;
      background-size: 28px 28px, auto 90%;
      font-weight: bold;
      font-size: 9.5pt;
@@ -1224,8 +1224,8 @@ div.messages li {
 
 .wizardnotice {
      position: absolute;
-     bottom: 5%;
-     left: 5%;
+     top: 5%;
+     right: 5%;
      width: 22%;
 }
 
@@ -3151,7 +3151,7 @@ td#themeselect {
     font-size: xx-large !important;
     letter-spacing: 0.08em;
     word-spacing: 0.1em;
-    color: #41465f;
+    color: #7778bf;
     position: absolute;
     background: none !important;
     box-shadow: none !important;
@@ -3234,8 +3234,8 @@ div#langsettings {
 div#wizlangsettings.wizard {
      border: none;
      position: absolute;
-     left: 15%;
-     top: 50%;
+     left: 20%;
+     top: 53%;
 }
 
 #langsettings hr {
@@ -3500,6 +3500,7 @@ img.wizard.progress {
     top: 17%;
     left: 5%;
     font-size: larger;
+	color: #e6e6e7;
 }
 
 #wizard {
@@ -3554,22 +3555,41 @@ table#bandwidthconfig td:first-child {
 }
 
 #xhr.notification {
-    width: 30%;
+    width: 22%;
     position: absolute;
-    left: 30%;
-    top: 38%;
+    right: 5%;
+    top: 50%;
     font-size: larger;
     background: #000;
     box-shadow: inset 0 0 0 1px #fff;
-    filter: drop-shadow(0 0 1px #ccf);
+	border: 1px solid #292929;
+	background: #1F1A24;
+	background: url(images/confirmed.png) no-repeat 12px center, right bottom no-repeat #1F1A24;
+	font-weight: bold;
+	font-size: 9.5pt;
+	color: #e6e6e7 !important;
+	box-shadow: inset 0 0 1px 0 #990 !important;
+	padding-top: 20px;
+	padding-bottom: 20px;
 }
 
 #xhr2.notification {
-	width: 20%;
-	position: absolute;
-	left: 70%;
-	top: 30%;
+    width: 22%;
+    position: absolute;
+    right: 5%;
+    top: 30%;
     font-size: larger;
+    background: #000;
+    box-shadow: inset 0 0 0 1px #fff;
+	border: 1px solid #292929;
+	background: #1F1A24;
+	background: url(images/infohelp.png) no-repeat 12px center, right bottom no-repeat #1F1A24;
+	font-weight: bold;
+	font-size: 9.5pt;
+	color: #e6e6e7 !important;
+	box-shadow: inset 0 0 1px 0 #990 !important;
+	padding-top: 20px;
+	padding-bottom: 20px;
 }
 
 table#bandwidthconfig {
