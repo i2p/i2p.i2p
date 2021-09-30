@@ -13,6 +13,7 @@ input.default {
 }
 </style>
 <%@include file="summaryajax.jsi" %>
+<script src="/js/configui.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 </head><body>
 <%@include file="summary.jsi" %>
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigUIHelper" id="uihelper" scope="request" />
@@ -26,7 +27,7 @@ input.default {
  <jsp:useBean class="net.i2p.router.web.helpers.ConfigUIHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
 <h3 id="themeheading"><%=uihelper._t("Router Console Theme")%></h3>
- <form action="" method="POST">
+ <form id="themeForm" action="" method="POST">
  <input type="hidden" name="consoleNonce" value="<%=net.i2p.router.web.CSSHelper.getNonce()%>" >
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="action" value="blah" >
@@ -43,8 +44,8 @@ input.default {
 <% } %>
  <jsp:getProperty name="uihelper" property="forceMobileConsole" />
 <hr><div class="formaction" id="themeui">
-<input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
-<input type="submit" name="shouldsave" class="accept" value="<%=intl._t("Apply")%>" >
+<input id="themeCancel" type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
+<input id="themeApply" type="submit" name="shouldsave" class="accept" value="<%=intl._t("Apply")%>" >
 </div></div></form>
 <h3 id="langheading"><%=uihelper._t("Router Console Language")%></h3>
  <form action="" method="POST">
@@ -56,7 +57,7 @@ input.default {
 <p id="helptranslate"><%=uihelper._t("Please contribute to the router console translation project! Contact the developers in #i2p-dev on IRC to help.")%>
 </p><hr><div class="formaction" id="langui">
 <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
-<input type="submit" name="shouldsave" class="accept" value="<%=intl._t("Apply")%>" >
+<input type="submit" name="foo" class="accept" value="<%=intl._t("Apply")%>" >
 </div></div></form>
 
 <h3 id="passwordheading"><%=uihelper._t("Router Console Password")%></h3>

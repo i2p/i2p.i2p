@@ -70,6 +70,16 @@ public class CSSHelper extends HelperBase {
     }
 
     /**
+     * So we don't have to refresh after saving. Called from css.jsi.
+     * @since 0.9.52
+     */
+    public void setTheme(String theme) {
+        if (theme != null && theme.length() > 0 &&
+            theme.replaceAll("[a-zA-Z0-9_-]", "").length() == 0)
+            _context.router().saveConfig(PROP_THEME_NAME, theme);
+    }
+
+    /**
      * Returns whether app embedding is enabled or disabled
      * @since 0.9.32
      */

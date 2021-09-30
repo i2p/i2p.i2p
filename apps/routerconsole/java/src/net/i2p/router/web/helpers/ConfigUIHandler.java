@@ -28,7 +28,7 @@ public class ConfigUIHandler extends FormHandler {
             delUser();
         } else if (_action.equals(_t("Add user"))) {
             addUser();
-        }
+        } // else lang change, handled in CSSHelper
     }
 
     public void setShouldsave(String moo) { _shouldSave = true; }
@@ -43,22 +43,23 @@ public class ConfigUIHandler extends FormHandler {
         _config = val;
     }
 
-    /** note - lang change is handled in CSSHelper but we still need to save it here */
+    /**
+     *  This is for the theme options only.
+     *  Lang change is handled in CSSHelper.
+     */
     private void saveChanges() {
-        if (_config == null || _config.length() <= 0)
-            return;
-        if (_config.replaceAll("[a-zA-Z0-9_-]", "").length() != 0) {
-            addFormError("Bad theme name");
-            return;
-        }
         Map<String, String> changes = new HashMap<String, String>();
         List<String> removes = new ArrayList<String>();
         String oldTheme = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
         boolean oldForceMobileConsole = _context.getBooleanProperty(CSSHelper.PROP_FORCE_MOBILE_CONSOLE);
-        if (_config.equals("default")) // obsolete
-            removes.add(CSSHelper.PROP_THEME_NAME);
-        else
-            changes.put(CSSHelper.PROP_THEME_NAME, _config);
+        boolean validTheme = _config != null && _config.length() > 0 &&
+                             _config.replaceAll("[a-zA-Z0-9_-]", "").length() == 0;
+        if (validTheme) {
+            if (_config.equals("default")) // obsolete
+                removes.add(CSSHelper.PROP_THEME_NAME);
+            else
+                changes.put(CSSHelper.PROP_THEME_NAME, _config);
+        }
         if (_universalTheming)
             changes.put(CSSHelper.PROP_UNIVERSAL_THEMING, "true");
         else
@@ -73,11 +74,11 @@ public class ConfigUIHandler extends FormHandler {
             removes.add(CSSHelper.PROP_EMBED_APPS);
         boolean ok = _context.router().saveConfig(changes, removes);
         if (ok) {
-            if (!oldTheme.equals(_config))
-                addFormNoticeNoEscape(_t("Theme change saved.") +
-                              " <a href=\"configui\">" +
-                              _t("Refresh the page to view.") +
-                              "</a>");
+            // Theme saving happens in CSSHelper
+            // so output this even if it didn't change
+            //if (!oldTheme.equals(_config))
+            if (validTheme)
+                addFormNotice(_t("Theme change saved."));
             if (oldForceMobileConsole != _forceMobileConsole)
                 addFormNoticeNoEscape(_t("Mobile console option saved.") +
                               " <a href=\"configui\">" +

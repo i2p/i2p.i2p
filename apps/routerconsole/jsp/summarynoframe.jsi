@@ -8,7 +8,7 @@
 %>
   <div>
    <a href="/" target="_top">
-    <img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/i2plogo.png" alt="<%=intl._t("I2P Router Console")%>" title="<%=intl._t("I2P Router Console")%>">
+    <img id="i2plogo" src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/i2plogo.png" alt="<%=intl._t("I2P Router Console")%>" title="<%=intl._t("I2P Router Console")%>">
    </a>
   </div>
   <div id="xhr">

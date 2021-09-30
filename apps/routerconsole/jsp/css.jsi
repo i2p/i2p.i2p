@@ -33,11 +33,6 @@
 <jsp:useBean class="net.i2p.router.web.CSSHelper" id="intl" scope="request" />
 <jsp:setProperty name="intl" property="contextId" value="<%=i2pcontextId%>" /><%
 
-   // used several times below
-   String theUserAgent = request.getHeader("User-Agent");
-   String theThemePath = intl.getTheme(theUserAgent);
-
-%><link rel="icon" href="<%=theThemePath%>images/favicon.ico"><%
    response.setHeader("Accept-Ranges", "none");
 
    String cspNonce = Integer.toHexString(net.i2p.util.RandomSource.getInstance().nextInt());
@@ -61,8 +56,13 @@
    if (net.i2p.router.web.CSSHelper.getNonce().equals(conNonceParam)) {
        intl.setLang(request.getParameter("lang"));
        intl.setNews(request.getParameter("news"));
+       intl.setTheme(request.getParameter("theme"));
    }
-%><link href="<%=theThemePath%>console.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
+   // used several times below
+   String theUserAgent = request.getHeader("User-Agent");
+   String theThemePath = intl.getTheme(theUserAgent);
+%><link rel="icon" href="<%=theThemePath%>images/favicon.ico">
+<link id="pagestyle" href="<%=theThemePath%>console.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
 <%
    if (intl.getLang().equals("zh")) {
        // make the fonts bigger for chinese
