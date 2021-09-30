@@ -1820,7 +1820,7 @@ h1 {
 .mlabtable {
     width: 30%;
     position: absolute;
-    top: 17%;
+    top: 20%;
     z-index: 499;
 }
 
@@ -2829,7 +2829,6 @@ tr#addnew, tr#addnew:hover {
      overflow: hidden;
      text-overflow: ellipsis;
      white-space: nowrap;
-     /*! border: 1px solid #292929; */
      float: left;
      text-align: center;
      padding: 0 4px;
@@ -2856,14 +2855,13 @@ tr#addnew, tr#addnew:hover {
      transition: ease transform 0.05s;
 }
 
-.themechoice:hover .themelabel {
+.themechoice:hover {
      background: #7789bf;
 }
 
 .themechoice:active .themelabel {
      background: #449944 !important;
      color: #e6e6e7 !important;
-     box-shadow: inset 0 0 0 1px #000 !important;
 }
 
 .themechoice .optbox:checked + img, .themechoice .optbox:checked + img {
@@ -2875,7 +2873,6 @@ tr#addnew, tr#addnew:hover {
 }
 
 .themechoice .optbox:checked + img ~ .themelabel {
-     background: #7789bf !important;
      color: #e6e6e7;
      font-weight: bold;
      box-shadow: none !important
@@ -2883,12 +2880,10 @@ tr#addnew, tr#addnew:hover {
 
 .themechoice .optbox:focus + img ~ .themelabel {
      color: #449944 !important;
-     box-shadow: inset 0 0 10px 3px #000 !important;
 }
 
 .themechoice .optbox:active + img ~ .themelabel {
      color: #e6e6e7 !important;
-     box-shadow: inset 0 0 0 1px #000 !important;
 }
 
 .themechoice .optbox {
@@ -3060,7 +3055,6 @@ td#themeselect {
 
 .langselect input:focus + img + div.ui_lang {
      color: #449944 !important;
-     box-shadow: inset 0 0 10px 3px #000 !important;
 }
 
 .langselect input:active + img + div.ui_lang {
@@ -3161,11 +3155,11 @@ td#themeselect {
 
 #infodiv {
     position: absolute;
-    left: 32%;
-    width: 34%;
-    top: 50%;
+    right: 5%;
+    width: 20%;
+    top: 15%;
     box-shadow: inset 0 0 0 1px #fff;
-    filter: drop-shadow(0 0 1px #ccf);
+     color: #e6e6e7;
     background: rgba(0,0,0,0.7);
     padding: .5%;
     text-align: justify;
@@ -3488,7 +3482,7 @@ img.wizard.progress {
 
 #bandwidthconfig.configtable.wizardtable {
     width: 35%;
-    top: 17%;
+    top: 20%;
     left: 32%;
     position: absolute;
     background: none;
