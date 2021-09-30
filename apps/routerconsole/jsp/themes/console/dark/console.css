@@ -1193,7 +1193,7 @@ div.messages {
 /*     margin: 10px 0 15px 0;*/
      border: 1px solid #292929;
      background: #1F1A24;
-     background: url(images/infohelp.png) no-repeat 12px center, right bottom no-repeat #1F1A24;
+     background: url(images/confirmed.png) no-repeat 12px center, right bottom no-repeat #1F1A24;
      background-size: 28px 28px, auto 90%;
      font-weight: bold;
      font-size: 9.5pt;
@@ -3590,6 +3590,10 @@ table#bandwidthconfig td:first-child {
 	box-shadow: inset 0 0 1px 0 #990 !important;
 	padding-top: 20px;
 	padding-bottom: 20px;
+}
+
+#xhr2.notification:empty {
+    display: none;
 }
 
 table#bandwidthconfig {
