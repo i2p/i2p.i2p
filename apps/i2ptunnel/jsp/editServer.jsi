@@ -701,11 +701,11 @@
         </tr><tr>
             <td colspan="2">
                 <span class="multiOption" <%=ehdisabled%>>
-                    <label><input value="0" type="radio" id="startOnLoad" name="encType" <%=(has0 ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
+                    <label><input value="0" type="radio" id="startOnLoad" name="encType" <%=((has0 && !has4) ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
                     ElGamal-2048</label>
                 </span>
                 <span class="multiOption" <%=ehdisabled%>>
-                    <label><input value="4" type="radio" id="startOnLoad" name="encType" <%=(has4 ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
+                    <label><input value="4" type="radio" id="startOnLoad" name="encType" <%=((has4 && !has0) ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
                     ECIES-X25519</label>
                 </span>
                 <span class="multiOption" <%=ehdisabled%>>
