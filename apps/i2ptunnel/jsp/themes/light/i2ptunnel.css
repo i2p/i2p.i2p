@@ -216,7 +216,7 @@ hr {
      box-sizing: border-box;
      margin: 2px 4px !important;
      min-width: 70px !important;
-     padding: 7px 8px 3px;
+     padding: 5px 8px 5px;
 }
 
 .control:hover, .control:focus {
