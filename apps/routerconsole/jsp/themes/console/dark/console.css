@@ -1905,6 +1905,10 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      border: none;
 }
 
+button:disabled, input:disabled {
+	color: #778b;
+}
+
 button, button:visited {
      font: bold 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      border: 1px outset #191;
