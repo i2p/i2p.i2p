@@ -16,6 +16,9 @@ import net.i2p.router.web.RouterConsoleRunner;
  */
 public class ConfigUIHelper extends HelperBase {
 
+    /**
+     *  Theme picker
+     */
     public String getSettings() {
         StringBuilder buf = new StringBuilder(512);
         buf.append("<div id=\"availablethemes\">");
@@ -39,19 +42,23 @@ public class ConfigUIHelper extends HelperBase {
                        "<div class=\"themelabel\">").append(_t(theme)).append("</div>" +
                        "</div></label>\n");
         }
+        buf.append("</div>");
+        return buf.toString();
+    }
+
+    /**
+     *  Three theme checkboxes
+     */
+    public String getForceMobileConsole() {
+        StringBuilder buf = new StringBuilder(256);
         boolean universalTheming = _context.getBooleanProperty(CSSHelper.PROP_UNIVERSAL_THEMING);
-        buf.append("</div><div id=\"themeoptions\">" +
+        buf.append("<div id=\"themeoptions\">" +
                    "<label><input id=\"themebox1\" type=\"checkbox\" name=\"universalTheming\" ");
         if (universalTheming)
             buf.append(CHECKED);
         buf.append("value=\"1\">")
            .append(_t("Set theme universally across all apps"))
            .append("</label><br>\n");
-        return buf.toString();
-    }
-
-    public String getForceMobileConsole() {
-        StringBuilder buf = new StringBuilder(256);
         boolean forceMobileConsole = _context.getBooleanProperty(CSSHelper.PROP_FORCE_MOBILE_CONSOLE);
         buf.append("<label><input id=\"themebox2\" type=\"checkbox\" name=\"forceMobileConsole\" ");
         if (forceMobileConsole)
