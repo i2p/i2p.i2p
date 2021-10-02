@@ -39,6 +39,8 @@ public class WizardHelper extends HelperBase {
     // session scope
     private TestListener _listener;
     private MLabRunner.ToolRun _runner;
+    private String _lastTestStatus;
+    private int _lastTestCount;
 
     /**
      * Overriden to only do this once.
@@ -74,8 +76,22 @@ public class WizardHelper extends HelperBase {
         String rv = "";
         if (_runner != null) {
             String s = _runner.getStatus();
-            if (s != null)
+            if (s != null) {
                 rv = DataHelper.escapeHTML(s);
+                if (rv.equals(_lastTestStatus)) {
+                    _lastTestCount++;
+                    int mod = _lastTestCount & 0x03;
+                    if (mod == 1)
+                        rv += ".";
+                    else if (mod == 2)
+                        rv += "..";
+                    else if (mod == 3)
+                        rv += "...";
+                } else {
+                    _lastTestCount = 0;
+                    _lastTestStatus = rv;
+                }
+            }
         }
         return rv;
     }
