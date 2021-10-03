@@ -267,7 +267,7 @@ class ProfileOrganizerRenderer {
                 buf.append("<td align=\"right\">").append(davg(dbh, 24*60*60*1000l, ra)).append("</td>");
             } else {
                 for (int i = 0; i < 6; i++)
-                    buf.append("<td align=\"right\">").append(_t(NA));
+                    buf.append("<td align=\"right\">").append(NA);
             }
             buf.append("</tr>\n");
         }
@@ -415,18 +415,18 @@ class ProfileOrganizerRenderer {
 
     private final static DecimalFormat _fmt = new DecimalFormat("###,##0.00");
     private final static String num(double num) { synchronized (_fmt) { return _fmt.format(num); } }
-    private final static String NA = HelperBase._x("n/a");
+    private final static String NA = "--";
 
     private String avg (PeerProfile prof, long rate, RateAverages ra) {
             RateStat rs = prof.getDbResponseTime();
             if (rs == null)
-                return _t(NA);
+                return NA;
             Rate r = rs.getRate(rate);
             if (r == null)
-                return _t(NA);
+                return NA;
             r.computeAverages(ra, false);
             if (ra.getTotalEventCount() == 0)
-                return _t(NA);
+                return NA;
             return DataHelper.formatDuration2(Math.round(ra.getAverage()));
     }
 
@@ -447,7 +447,7 @@ class ProfileOrganizerRenderer {
     /** @since 0.9.21 */
     private String formatInterval(long now, long then) {
         if (then <= 0)
-            return _t(NA);
+            return NA;
         // avoid 0 or negative
         if (now <= then)
             return DataHelper.formatDuration2(1);
