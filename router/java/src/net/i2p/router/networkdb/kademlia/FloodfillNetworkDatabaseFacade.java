@@ -570,8 +570,9 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         // drop the peer in these cases
         // yikes don't do this - stack overflow //  getFloodfillPeers().size() == 0 ||
         // yikes2 don't do this either - deadlock! // getKnownRouters() < MIN_REMAINING_ROUTERS ||
+        int knownRouters = getKBucketSetSize();
         if (info.getNetworkId() == _networkID &&
-            (getKBucketSetSize() < MIN_REMAINING_ROUTERS ||
+            (knownRouters < MIN_REMAINING_ROUTERS ||
              _context.router().getUptime() < DONT_FAIL_PERIOD ||
              _context.commSystem().countActivePeers() <= MIN_ACTIVE_PEERS)) {
             if (_log.shouldInfo())
@@ -583,7 +584,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         if (_floodfillEnabled ||
             _context.jobQueue().getMaxLag() > 500 ||
             _context.banlist().isBanlistedForever(peer) ||
-            getKBucketSetSize() > MAX_DB_BEFORE_SKIPPING_SEARCH) {
+            knownRouters > MAX_DB_BEFORE_SKIPPING_SEARCH) {
             // don't try to overload ourselves (e.g. failing 3000 router refs at
             // once, and then firing off 3000 netDb lookup tasks)
             // Also don't queue a search if we have plenty of routerinfos

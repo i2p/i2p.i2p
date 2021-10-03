@@ -463,10 +463,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     }
 
     /**
-     *  This is fast and doesn't use synchronization,
-     *  but it includes both routerinfos and leasesets.
-     *  Use it to avoid deadlocks.
-     *  No - not true - the KBS contains RIs only.
+     *  The KBucketSet contains RIs only.
      */
     protected int getKBucketSetSize() {  
         if (_kb == null) return 0;
@@ -1154,7 +1151,6 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (floodfillEnabled())
             adjustedExpiration = ROUTER_INFO_EXPIRATION_FLOODFILL;
         else
-            // _kb.size() includes leasesets but that's ok
             adjustedExpiration = Math.min(ROUTER_INFO_EXPIRATION,
                                           ROUTER_INFO_EXPIRATION_MIN +
                                           ((ROUTER_INFO_EXPIRATION - ROUTER_INFO_EXPIRATION_MIN) * MIN_ROUTERS / (_kb.size() + 1)));
