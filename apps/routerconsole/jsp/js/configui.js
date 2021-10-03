@@ -4,16 +4,7 @@
 // as a formal dedication to the public domain and in circumstances where
 // a public domain is not usable.
 
-var prefersDarkTheme = false;
 var oldTheme = "light";
-
-function detectDark() {
-    // https://stackoverflow.com/questions/56393880/how-do-i-detect-dark-mode-using-javascript
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        // dark mode
-        prefersDarkTheme = true;
-    }
-}
 
 function swapStyleSheet(theme) {
     // https://stackoverflow.com/questions/14292997/changing-style-sheet-javascript
@@ -34,6 +25,9 @@ function resetStyleSheet() {
 
 function initThemeSwitcher() {
     var dark = document.getElementById("dark");
+    if (dark == null) {
+        return;
+    }
     dark.onclick = function() {
         swapStyleSheet("dark");
         disableButtons(false);
@@ -56,8 +50,6 @@ function initThemeSwitcher() {
     document.getElementById("themebox1").onclick = function() { disableButtons(false); }
     document.getElementById("themebox2").onclick = function() { disableButtons(false); }
     document.getElementById("themebox3").onclick = function() { disableButtons(false); }
-    // unused for now
-    detectDark();
 }
 
 document.addEventListener("DOMContentLoaded", function() {

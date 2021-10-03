@@ -23,11 +23,12 @@ public class WizardHelper extends HelperBase {
     public static final float BW_SCALE = 0.75f;
     // pages
     public static final int PAGE_LANG = 1;
-    public static final int PAGE_CHECK = 2;
-    public static final int PAGE_TEST = 3;
-    public static final int PAGE_RESULTS = 4;
-    public static final int PAGE_BROWSER = 5;
-    public static final int PAGE_DONE = 6;
+    public static final int PAGE_THEME = 2;
+    public static final int PAGE_CHECK = 3;
+    public static final int PAGE_TEST = 4;
+    public static final int PAGE_RESULTS = 5;
+    public static final int PAGE_BROWSER = 6;
+    public static final int PAGE_DONE = 7;
 
     // KBps
     private static final float MIN_DOWN_BW = 32.0f;

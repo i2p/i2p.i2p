@@ -11,6 +11,7 @@
     // 5: Browser setup
     // 6: Done
     final int PAGE_LANG = net.i2p.router.web.helpers.WizardHelper.PAGE_LANG;
+    final int PAGE_THEME = net.i2p.router.web.helpers.WizardHelper.PAGE_THEME;
     final int PAGE_CHECK = net.i2p.router.web.helpers.WizardHelper.PAGE_CHECK;
     final int PAGE_TEST = net.i2p.router.web.helpers.WizardHelper.PAGE_TEST;
     final int PAGE_RESULTS = net.i2p.router.web.helpers.WizardHelper.PAGE_RESULTS;
@@ -99,6 +100,10 @@
 /* @license-end */
 </script>
 <%
+    } else if (ipg == PAGE_THEME) {
+%>
+<script src="/js/welcomeui.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
+<%
     }  // ipg == PAGE_TEST
 %>
 </head><body>
@@ -131,13 +136,17 @@
 <input type="hidden" name="action" value="blah" >
 <input type="hidden" name="page" value="<%=(ipg + 1)%>" >
 <%
+    if (ipg == PAGE_LANG || ipg == PAGE_THEME) {
+%>
+<%-- needed for CSS: --%><div id="config_ui">
+<%-- needed for lang setting in css.jsi: --%><input type="hidden" name="consoleNonce" value="<%=net.i2p.router.web.CSSHelper.getNonce()%>" >
+<%
+    }
     if (ipg == PAGE_LANG) {
         // language selection
 %>
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigUIHelper" id="uihelper" scope="request" />
 <jsp:setProperty name="uihelper" property="contextId" value="<%=i2pcontextId%>" />
-<%-- needed for CSS: --%><div id="config_ui">
-<%-- needed for lang setting in css.jsi: --%><input type="hidden" name="consoleNonce" value="<%=net.i2p.router.web.CSSHelper.getNonce()%>" >
 <h3 id="wizardheading" class="wizard"><%=uihelper._t("Select Language")%></h3>
 <img class="wizardimg" src="/themes/console/images/wizard/step-0.png">
 <div id="wizlangsettings" class="wizard">
@@ -153,6 +162,24 @@
 </p>
 <p>
 <%=intl._t("Please select your preferred language:")%>
+</p>
+</div>
+</div>
+<%
+
+    } else if (ipg == PAGE_THEME) {
+        // Theme picker
+%>
+<jsp:useBean class="net.i2p.router.web.helpers.ConfigUIHelper" id="uihelper2" scope="request" />
+<jsp:setProperty name="uihelper2" property="contextId" value="<%=i2pcontextId%>" />
+<h3 id="wizardheading" class="wizard"><%=uihelper2._t("Select Theme")%></h3>
+<img class="wizardimg" src="/themes/console/images/wizard/step-1.png">
+<div id="wizlangsettings" class="wizard">
+<jsp:getProperty name="uihelper2" property="settings" />
+</div>
+<div class="wizardtext">
+<p>
+<%=intl._t("Please select your preferred theme:")%>
 </p>
 </div>
 </div>
