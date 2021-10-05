@@ -911,7 +911,7 @@
             </th>
         </tr><tr>
             <th colspan="5">
-                <%=intl._t("Inbound connection limits (0=unlimited)")%>
+                <%=intl._t("Inbound connection limits")%>
             </th>
         </tr><tr>
             <td></td>
@@ -921,27 +921,30 @@
             <td class="blankColumn"></td>
         </tr><tr>
             <td><b><%=intl._t("Per Client")%></b></td>
+<%
+   String unlimited = " (0 = " + intl._t("unlimited") + ')';
+%>
             <td>
-                <input type="text" name="limitMinute" title="<%=intl._t("Maximum number of web page requests per minute for a unique client before access to the server is blocked")%>" value="<%=editBean.getLimitMinute(curTunnel)%>" class="freetext" />
+                <input type="text" name="limitMinute" title="<%=intl._t("Maximum number of web page requests per minute for a unique client before access to the server is blocked") + unlimited %>" value="<%=editBean.getLimitMinute(curTunnel)%>" class="freetext" />
             </td><td>
-                <input type="text" name="limitHour" title="<%=intl._t("Maximum number of web page requests per hour for a unique client before access to the server is blocked")%>" value="<%=editBean.getLimitHour(curTunnel)%>" class="freetext" />
+                <input type="text" name="limitHour" title="<%=intl._t("Maximum number of web page requests per hour for a unique client before access to the server is blocked") + unlimited %>" value="<%=editBean.getLimitHour(curTunnel)%>" class="freetext" />
             </td><td>
-                <input type="text" name="limitDay" title="<%=intl._t("Maximum number of web page requests per day for a unique client before access to the server is blocked")%>" value="<%=editBean.getLimitDay(curTunnel)%>" class="freetext" />
+                <input type="text" name="limitDay" title="<%=intl._t("Maximum number of web page requests per day for a unique client before access to the server is blocked") + unlimited %>" value="<%=editBean.getLimitDay(curTunnel)%>" class="freetext" />
             </td><td class="blankColumn"></td>
         </tr><tr>
             <td><b><%=intl._t("Total")%></b></td>
             <td>
-                <input type="text" name="totalMinute" title="<%=intl._t("Total number of web page requests per minute before access to the server is blocked")%>" value="<%=editBean.getTotalMinute(curTunnel)%>" class="freetext" />
+                <input type="text" name="totalMinute" title="<%=intl._t("Total number of web page requests per minute before access to the server is blocked") + unlimited %>" value="<%=editBean.getTotalMinute(curTunnel)%>" class="freetext" />
             </td><td>
-                <input type="text" name="totalHour" title="<%=intl._t("Total number of web page requests per hour before access to the server is blocked")%>" value="<%=editBean.getTotalHour(curTunnel)%>" class="freetext" />
+                <input type="text" name="totalHour" title="<%=intl._t("Total number of web page requests per hour before access to the server is blocked") + unlimited %>" value="<%=editBean.getTotalHour(curTunnel)%>" class="freetext" />
             </td><td>
-                <input type="text" name="totalDay" title="<%=intl._t("Total number of web page requests per day before access to the server is blocked")%>" value="<%=editBean.getTotalDay(curTunnel)%>" class="freetext" />
+                <input type="text" name="totalDay" title="<%=intl._t("Total number of web page requests per day before access to the server is blocked") + unlimited %>" value="<%=editBean.getTotalDay(curTunnel)%>" class="freetext" />
             </td><td class="blankColumn"></td>
         </tr><tr>
-            <th colspan="5"><%=intl._t("Max concurrent connections (0=unlimited)")%></th>
+            <th colspan="5"><%=intl._t("Max concurrent connections")%></th>
         </tr><tr>
             <td></td><td>
-                <input type="text" name="maxStreams" title="<%=intl._t("Maximum number of simultaneous client connections")%>" value="<%=editBean.getMaxStreams(curTunnel)%>" class="freetext" />
+                <input type="text" name="maxStreams" title="<%=intl._t("Maximum number of simultaneous client connections") + unlimited %>" value="<%=editBean.getMaxStreams(curTunnel)%>" class="freetext" />
             </td><td></td><td></td><td class="blankColumn"></td>
         </tr>
 <%
@@ -949,7 +952,7 @@
 %>
         <tr>
             <th colspan="5">
-                <%=intl._t("POST limits (0=unlimited)")%>
+                <%=intl._t("POST limits")%>
             </th>
         </tr><tr>
             <td></td><td>
@@ -962,7 +965,7 @@
                 <b><%=intl._t("Per Client")%>
                 </b>
             </td><td>
-                <input type="text" name="postMax" title="<%=intl._t("Maximum number of post requests permitted for a unique client for the configured time span")%>" value="<%=editBean.getPostMax(curTunnel)%>" class="freetext quantity"/>
+                <input type="text" name="postMax" title="<%=intl._t("Maximum number of post requests permitted for a unique client for the configured time span") + unlimited %>" value="<%=editBean.getPostMax(curTunnel)%>" class="freetext quantity"/>
             </td><td colspan="2">
                 <input type="text" name="postBanTime" title="<%=intl._t("If a client exceeds the maximum number of post requests per allocated period, enforce a ban for this number of minutes")%>" value="<%=editBean.getPostBanTime(curTunnel)%>" class="freetext period"/>
                 <%=intl._t("minutes")%>
@@ -972,7 +975,7 @@
                 <b><%=intl._t("Total")%>
                 </b>
             </td><td>
-                <input type="text" name="postTotalMax" title="<%=intl._t("Total number of post requests permitted for the configured time span")%>" value="<%=editBean.getPostTotalMax(curTunnel)%>" class="freetext quantity"/>
+                <input type="text" name="postTotalMax" title="<%=intl._t("Total number of post requests permitted for the configured time span") + unlimited %>" value="<%=editBean.getPostTotalMax(curTunnel)%>" class="freetext quantity"/>
             </td><td colspan="2">
                 <input type="text" name="postTotalBanTime" title="<%=intl._t("If the maximum number of post requests per allocated period is exceeded, enforce a global access ban for this number of minutes")%>" value="<%=editBean.getPostTotalBanTime(curTunnel)%>" class="freetext period"/>
                 <%=intl._t("minutes")%>
