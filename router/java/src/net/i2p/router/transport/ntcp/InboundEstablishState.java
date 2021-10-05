@@ -230,11 +230,9 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
 
     /**
      *  Validate network ID, NTCP 2 only.
-     *  Call after receiving Alice's RouterInfo,
-     *  but before storing it in the netdb.
+     *  Call if storing in netdb fails.
      *
-     *  Side effects: When returning false, sets _msg3p2FailReason,
-     *  banlists permanently and blocklists
+     *  Side effects: When returning false, sets _msg3p2FailReason
      *
      *  @return success
      *  @since 0.9.38
@@ -253,7 +251,6 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                 byte[] ip = addr.getAddress();
                 _context.blocklist().add(ip);
             }
-            _context.banlist().banlistRouterForever(aliceHash, "Not in our network: " + aliceID);
             _transport.markUnreachable(aliceHash);
             _msg3p2FailReason = NTCPConnection.REASON_BANNED;
         }
@@ -652,9 +649,6 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         boolean ok = verifyInbound(h);
         if (!ok)
             throw new DataFormatException("NTCP2 verifyInbound() fail");
-        ok = verifyInboundNetworkID(ri);
-        if (!ok)
-            throw new DataFormatException("NTCP2 network ID mismatch");
         try {
             RouterInfo old = _context.netDb().store(h, ri);
             if (flood && !ri.equals(old)) {
@@ -668,6 +662,10 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                 }
             }
         } catch (IllegalArgumentException iae) {
+            // sets _msg3p2FailReason
+            ok = verifyInboundNetworkID(ri);
+            if (!ok)
+                throw new DataFormatException("NTCP2 network ID mismatch");
             // hash collision?
             // expired RI?
             _msg3p2FailReason = NTCPConnection.REASON_MSG3;

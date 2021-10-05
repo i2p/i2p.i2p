@@ -39,6 +39,7 @@ import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.router.Banlist;
 import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
@@ -511,8 +512,12 @@ public class NTCPTransport extends TransportImpl {
         if (established) { // should we check the queue size?  nah, if its valid, use it
             return _fastBid;
         }
-        if (toAddress.getNetworkId() != _networkID) {
-            _context.banlist().banlistRouterForever(peer, "Not in our network: " + toAddress.getNetworkId());
+        int nid = toAddress.getNetworkId();
+        if (nid != _networkID) {
+            if (nid == -1)
+                _context.banlist().banlistRouter(peer, "No network specified", null, null, _context.clock().now() + Banlist.BANLIST_DURATION_NO_NETWORK);
+            else
+                _context.banlist().banlistRouterForever(peer, "Not in our network: " + nid);
             if (_log.shouldWarn())
                 _log.warn("Not in our network: " + toAddress, new Exception());
             markUnreachable(peer);

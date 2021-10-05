@@ -33,6 +33,7 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.router.Banlist;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.OutNetMessage;
@@ -1628,60 +1629,35 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             DatabaseEntry entry = dsm.getEntry();
             if (entry == null)
                 return;
-            if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO &&
-                ((RouterInfo) entry).getNetworkId() != _networkID) {
-                // this is pre-0.6.1.10, so it isn't going to happen any more
-
-                /*
-                if (remoteIdentHash != null) {
-                    _context.banlist().banlistRouter(remoteIdentHash, "Sent us a peer from the wrong network");
-                    dropPeer(remoteIdentHash);
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("Dropping the peer " + remoteIdentHash
-                                   + " because they are in the wrong net");
-                } else if (remoteIdent != null) {
-                    _context.banlist().banlistRouter(remoteIdent.calculateHash(), "Sent us a peer from the wrong network");
-                    dropPeer(remoteIdent.calculateHash());
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("Dropping the peer " + remoteIdent.calculateHash()
-                                   + " because they are in the wrong net");
-                }
-                 */
-                Hash peerHash = entry.getHash();
-                PeerState peer = getPeerState(peerHash);
-                if (peer != null) {
-                    RemoteHostId remote = peer.getRemoteHostId();
-                    _dropList.add(remote);
-                    _context.statManager().addRateData("udp.dropPeerDroplist", 1);
-                    _context.simpleTimer2().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
-                }
-                markUnreachable(peerHash);
-                _context.banlist().banlistRouterForever(peerHash, "Not in our network: " + ((RouterInfo) entry).getNetworkId());
-                //_context.banlist().banlistRouter(peerHash, "Part of the wrong network", STYLE);
-                if (peer != null)
-                    sendDestroy(peer);
-                dropPeer(peerHash, false, "Not in our network");
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Not in our network: " + entry, new Exception());
-                return;
-            } else {
-                if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Received an RI from the same net");
-                } else {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Received a leaseSet: " + dsm);
+            if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+                RouterInfo ri = (RouterInfo) entry;
+                int id = ri.getNetworkId();
+                if (id != _networkID) {
+                    Hash peerHash = entry.getHash();
+                    if (peerHash.equals(remoteIdentHash)) {
+                        PeerState peer = getPeerState(peerHash);
+                        if (peer != null) {
+                            RemoteHostId remote = peer.getRemoteHostId();
+                            _dropList.add(remote);
+                            _context.statManager().addRateData("udp.dropPeerDroplist", 1);
+                            _context.simpleTimer2().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
+                        }
+                        markUnreachable(peerHash);
+                        if (id == -1)
+                            _context.banlist().banlistRouter(peerHash, "No network specified", null, null, _context.clock().now() + Banlist.BANLIST_DURATION_NO_NETWORK);
+                        else
+                            _context.banlist().banlistRouterForever(peerHash, "Not in our network: " + id);
+                        if (peer != null)
+                            sendDestroy(peer);
+                        dropPeer(peerHash, false, "Not in our network");
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Not in our network: " + entry, new Exception());
+                        return;
+                    } // else will be invalidated and handled by netdb
                 }
             }
-        } else {
-            //if (_log.shouldLog(Log.DEBUG))
-            //    _log.debug("Received another message: " + inMsg.getClass().getName());
         }
-        //PeerState peer = getPeerState(remoteIdentHash);
         super.messageReceived(inMsg, remoteIdent, remoteIdentHash, msToReceive, bytesReceived);
-        // Called in IMF, not needed here too
-        //if (peer != null)
-        //    peer.expireInboundMessages();
     }
 
     private class RemoveDropList implements SimpleTimer.TimedEvent {
@@ -2036,8 +2012,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             else
                 return _cachedBid[FAST_BID];
         } else {
-            if (toAddress.getNetworkId() != _networkID) {
-                _context.banlist().banlistRouterForever(to, "Not in our network: " + toAddress.getNetworkId());
+            int nid = toAddress.getNetworkId();
+            if (nid != _networkID) {
+                if (nid == -1)
+                    _context.banlist().banlistRouter(to, "No network specified", null, null, _context.clock().now() + Banlist.BANLIST_DURATION_NO_NETWORK);
+                else
+                    _context.banlist().banlistRouterForever(to, "Not in our network: " + nid);
                 markUnreachable(to);
                 return null;    
             }
