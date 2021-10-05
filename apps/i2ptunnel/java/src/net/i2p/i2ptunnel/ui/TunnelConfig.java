@@ -19,6 +19,7 @@ import net.i2p.crypto.EncType;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.KeyPair;
 import net.i2p.crypto.SigType;
+import net.i2p.data.Base32;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -466,8 +467,27 @@ public class TunnelConfig {
     }
 
     public void setAccessList(String val) {
-        if (val != null)
-            _otherOptions.put("i2cp.accessList", val.trim().replace("\r\n", ",").replace("\n", ",").replace(" ", ","));
+        if (val != null) {
+            val = val.trim().replace("\r\n", ",").replace("\n", ",").replace(" ", ",");
+            // Convert to B64 to save space
+            String[] vals = DataHelper.split(val, ",");
+            StringBuilder buf = new StringBuilder(val.length());
+            for (int i = 0; i < vals.length; i++) {
+                String v = vals[i];
+                int len = v.length();
+                if (len == 0)
+                    continue;
+                if (len == 60 && v.endsWith(".b32.i2p")) {
+                    byte[] b = Base32.decode(v.substring(0, 52));
+                    if (b != null)
+                        v = Base64.encode(b);
+                }
+                buf.append(v);
+                if (i != vals.length - 1)
+                    buf.append(',');
+            }
+            _otherOptions.put("i2cp.accessList", buf.toString());
+        }
     }
 
     public void setJumpList(String val) {

@@ -2,7 +2,9 @@ package net.i2p.i2ptunnel.ui;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +16,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.crypto.SigType;
+import net.i2p.data.Base32;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -855,8 +858,35 @@ public class GeneralHelper {
         return 0;
     }
 
+    /**
+     *  @return entries sorted, converted to b32, separated by newlines, or ""
+     */
     public String getAccessList(int tunnel) {
-        return getProperty(tunnel, "i2cp.accessList", "").replace(",", "\n");
+        String val = getProperty(tunnel, "i2cp.accessList", "");
+        if (val.length() > 0) {
+            // Convert B64 to B32 for display
+            String[] vals = DataHelper.split(val, ",");
+            for (int i = 0; i < vals.length; i++) {
+                String v = vals[i];
+                if (v.length() == 44) {
+                    byte[] b = Base64.decode(v);
+                    if (b != null)
+                        vals[i] = Base32.encode(b) + ".b32.i2p";
+                }
+            }
+            Arrays.sort(vals, Collator.getInstance());
+            StringBuilder buf = new StringBuilder(val.length() * 3 / 2);
+            for (int i = 0; i < vals.length; i++) {
+                String v = vals[i];
+                if (v.length() == 0)
+                    continue;
+                buf.append(vals[i]);
+                if (i != vals.length - 1)
+                    buf.append('\n');
+            }
+            val = buf.toString();
+        }
+        return val;
     }
 
     /**
