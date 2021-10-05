@@ -43,15 +43,15 @@
           <td><jsp:getProperty name="updatehelper" property="updatePolicySelectBox" /></td></tr>
     <% }   // if canInstall %>
     <% if (updatehelper.isAdvanced()) { %>
-        <tr><td align="right"><label for="newsThroughProxy"><b><%=intl._t("Fetch news through the eepProxy?")%></b></label></td>
+        <tr><td align="right"><label for="newsThroughProxy"><b><%=intl._t("Fetch news through the proxy?")%></b></label></td>
           <td><jsp:getProperty name="updatehelper" property="newsThroughProxy" /></td></tr>
       <% if (updatehelper.canInstall()) { %>
-        <tr><td align="right"><b><label for="updateThroughProxy"><%=intl._t("Update through the eepProxy?")%></b></label></td>
+        <tr><td align="right"><b><label for="updateThroughProxy"><%=intl._t("Update through the proxy?")%></b></label></td>
           <td><jsp:getProperty name="updatehelper" property="updateThroughProxy" /></td></tr>
       <% }   // if canInstall %>
-        <tr><td align="right"><b><%=intl._t("eepProxy host")%>:</b></td>
+        <tr><td align="right"><b><%=intl._t("Proxy host")%>:</b></td>
           <td><input type="text" size="10" name="proxyHost" value="<jsp:getProperty name="updatehelper" property="proxyHost" />" /></td>
-        </tr><tr><td align="right"><b><%=intl._t("eepProxy port")%>:</b></td>
+        </tr><tr><td align="right"><b><%=intl._t("Proxy port")%>:</b></td>
           <td><input type="text" size="10" name="proxyPort" value="<jsp:getProperty name="updatehelper" property="proxyPort" />" /></td></tr>
     <% }   // if isAdvanced %>
     <% if (updatehelper.canInstall()) { %>
