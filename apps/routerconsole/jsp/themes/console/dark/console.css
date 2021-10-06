@@ -3231,9 +3231,6 @@ div#langsettings {
 
 div#wizlangsettings.wizard {
      border: none;
-     position: absolute;
-     left: 20%;
-     top: 53%;
 }
 
 #langsettings hr {

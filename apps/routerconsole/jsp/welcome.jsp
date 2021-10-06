@@ -149,9 +149,6 @@
 <jsp:setProperty name="uihelper" property="contextId" value="<%=i2pcontextId%>" />
 <h3 id="wizardheading" class="wizard"><%=uihelper._t("Select Language")%></h3>
 <img class="wizardimg" src="/themes/console/images/wizard/step-0.png">
-<div id="wizlangsettings" class="wizard">
-<jsp:getProperty name="uihelper" property="langSettings" />
-</div>
 <div class="wizardtext">
 <p>
 
@@ -163,6 +160,9 @@
 <p>
 <%=intl._t("Please select your preferred language:")%>
 </p>
+<div id="wizlangsettings" class="wizard">
+<jsp:getProperty name="uihelper" property="langSettings" />
+</div>
 </div>
 </div>
 <%
@@ -174,12 +174,12 @@
 <jsp:setProperty name="uihelper2" property="contextId" value="<%=i2pcontextId%>" />
 <h3 id="wizardheading" class="wizard"><%=uihelper2._t("Select Theme")%></h3>
 <img class="wizardimg" src="/themes/console/images/wizard/step-1.png">
-<div id="wizlangsettings" class="wizard">
-<jsp:getProperty name="uihelper2" property="settings" />
-</div>
 <div class="wizardtext">
 <p>
 <%=intl._t("Please select your preferred theme:")%>
+<div id="wizlangsettings" class="wizard">
+<jsp:getProperty name="uihelper2" property="settings" />
+</div>
 </p>
 </div>
 </div>

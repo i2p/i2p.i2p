@@ -4818,8 +4818,8 @@ div#langsettings {
     border: 1px solid #dee2e6;
 }
 
-div#wizlangsettings.wizard {
-    margin-left: 40%;
+#wizlangsettings{
+    height: 100px;
 }
 
 #themesettings hr, #langsettings hr {
