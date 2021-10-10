@@ -264,7 +264,7 @@ Applications:
      Zxing 3.4.1:
        See licenses/LICENSE-Apache2.0.txt
 
-   Jetty 9.3.29.v20201019 (jetty-*.jar, org.mortbay.*.jar):
+   Jetty 9.3.30.v20211001 (jetty-*.jar, org.mortbay.*.jar):
    (not included in most distribution packages, except for jetty-i2p.jar)
    See licenses/ABOUT-Jetty.html
    See licenses/NOTICE-Jetty.html

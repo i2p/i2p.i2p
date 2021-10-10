@@ -1,3 +1,21 @@
+2021-10-10 zzz
+ * Jetty 9.3.30.v20211001
+
+2021-10-05 zzz
+ * NetDB: Reduce ban time for routers without netId
+
+2021-10-03 zzz
+ * Console: Add theme selection to wizard
+
+2021-10-01 zzz
+ * i2ptunnel: Fix enc type configuration logic
+
+2021-09-30 zzz
+ * Console: Add js to /configui to preview themes
+
+2021-09-27 zzz
+ * Router: Rekey all Android/ARM routers
+
 2021-09-25 zzz
  * Tunnels:
    - Implement Bloom filter for short TBM

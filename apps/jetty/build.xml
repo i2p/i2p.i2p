@@ -17,7 +17,7 @@
 
     <property name="jetty.branch" value="stable-9" />
     <property name="jetty.base" value="jetty-distribution-${jetty.ver}" />
-    <property name="jetty.sha1" value="acf3118a5cbfb3a6dfe218d3f20ecff09974d921" />
+    <property name="jetty.sha1" value="e9f176730aea36a69c24eeba77dd0880a30492dc" />
     <property name="jetty.filename" value="${jetty.base}.zip" />
     <property name="jetty.url" value="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/${jetty.ver}/${jetty.filename}" />
     <property name="verified.filename" value="verified.txt" />
@@ -169,14 +169,14 @@
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-continuation-${jetty.ver}.jar" tofile="jettylib/jetty-continuation.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-deploy-${jetty.ver}.jar" tofile="jettylib/jetty-deploy.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-http-${jetty.ver}.jar" tofile="jettylib/jetty-http.jar" />
-<!--
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-io-${jetty.ver}.jar" tofile="jettylib/jetty-io.jar" />
--->
       <!-- comment out above line and uncomment below and the patches section further down if we need patches -->
+<!--
         <jar destfile="jettylib/jetty-io.jar"  manifest="${jetty.base}/lib/jetty-io-${jetty.ver}.jar" filesetmanifest="mergewithoutmain" >
             <zipfileset excludes="**/SslConnection*.class" src="${jetty.base}/lib/jetty-io-${jetty.ver}.jar" />
             <zipfileset src="build/jetty-io-patch.jar" />
         </jar>
+-->
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-jmx-${jetty.ver}.jar" tofile="jettylib/org.mortbay.jmx.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-rewrite-${jetty.ver}.jar" tofile="jettylib/jetty-rewrite-handler.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-security-${jetty.ver}.jar" tofile="jettylib/jetty-security.jar" />
@@ -494,6 +494,7 @@
             classpath="" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
+<!--
         <mkdir dir="./build/objPatches2" />
         <javac 
             srcdir="./patches/jetty-io/src/main/java" 
@@ -508,11 +509,14 @@
                 <pathelement location="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" />
             </classpath>
         </javac>
+-->
     </target>
 
     <target name="jarPatches" depends="compilePatches, jarPatchesUpToDate" unless="jarPatches.uptodate" >
         <jar destfile="./build/jetty-util-patch.jar" basedir="./build/objPatches" includes="**/*.class" />
+<!--
         <jar destfile="./build/jetty-io-patch.jar" basedir="./build/objPatches2" includes="**/*.class" />
+-->
     </target>    
 
     <target name="jarPatchesUpToDate" >
@@ -521,7 +525,9 @@
                 <equals arg1="${with-libjetty9-java}" arg2="true" />
                 <uptodate property="jarPatches.uptodate" targetfile="jettylib/jetty-i2p.jar" >
                     <srcfiles dir= "build/objPatches" includes="**/*.class" />
+<!--
                     <srcfiles dir= "build/objPatches2" includes="**/*.class" />
+-->
                 </uptodate>
             </or>
         </condition>
