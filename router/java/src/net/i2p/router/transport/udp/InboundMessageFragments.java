@@ -11,8 +11,8 @@ import net.i2p.util.Log;
 
 /**
  * Organize the received data message fragments, feeding completed messages
- * to the {@link MessageReceiver} and telling the {@link ACKSender} of new
- * peers to ACK.  In addition, it drops failed fragments and keeps a
+ * to the {@link MessageReceiver} and telling the {@link PeerState}
+ * to ACK.  In addition, it drops failed fragments and keeps a
  * minimal list of the most recently completed messages (even though higher
  * up in the router we have full blown replay detection, its nice to have a
  * basic line of defense here).
