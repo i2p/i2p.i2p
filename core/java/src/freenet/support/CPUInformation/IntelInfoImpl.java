@@ -483,12 +483,25 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     }
 
 
-                // TODO case 0x5f: // Goldmont / Atom
-                // TODO case 0x7a: // Gemini Lake
-                // TODO case 0x7e: // Ice Lake
+                    case 0x5f: // Goldmont / Atom
+                    case 0x7a: // Gemini Lake (Goldmont Plus)
+                    case 0x9c: // Jasper Lake (Tremont)
+                               {
+                        // This processor is "corei" compatible, as we define it,
+                        // i.e. SSE4.2 but not necessarily AVX.
+                        CPUIDCPUInfo c = new CPUIDCPUInfo();
+                        if (c.hasAVX()) {
+                            isSandyCompatible = true;
+                            isIvyCompatible = true;
+                            modelString = "Goldmont w/ AVX";
+                        } else {
+                            modelString = "Goldmont";
+                        }
+                        break;
+                    }
 
 
-                // following are for extended model == 8 or 9
+                // following are for extended model == 8 or higher
                 // most flags are set above
                 // isCoreiCompatible = true is the default
 
@@ -496,11 +509,18 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     // ref: https://github.com/InstLatx64/InstLatx64/commit/9d2ea1a9eb727868dc514900da9e2f175710f9bf
                     // ref: https://github.com/InstLatx64/InstLatx64/blob/master/ChangeLog.htm
                     // ref: https://github.com/coreboot/coreboot/blob/master/src/soc/intel/common/block/include/intelblocks/mp_init.h
+                    // ref: https://github.com/intel/thermal_daemon/blob/master/src/thd_engine.cpp
                     // See Haswell notes above
                     case 0x8e: // also Whiskey Lake, Coffee Lake
                     case 0x9e: // also Whiskey Lake, Coffee Lake
                     case 0xa5: // Comet Lake
                     case 0xa6: // Comet Lake
+                    case 0x7e: // Ice Lake
+                    case 0x8c: // Tiger Lake
+                    case 0x8d: // Tiger Lake
+                    case 0xa7: // Rocket Lake
+                    case 0x97: // Alder Lake
+                    case 0x9a: // Alder Lake
                                {
                         CPUIDCPUInfo c = new CPUIDCPUInfo();
                         if (c.hasAVX2() && c.hasBMI1()  && c.hasBMI2() &&
