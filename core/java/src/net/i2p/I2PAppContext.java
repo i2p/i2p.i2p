@@ -1019,7 +1019,7 @@ public class I2PAppContext {
      *  Once called, the result is cached.
      *
      *  @return 0 always in app context
-     *  @since 0.0.47
+     *  @since 0.9.47
      */
     public long getEstimatedDowntime() {
         return 0L;

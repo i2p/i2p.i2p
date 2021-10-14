@@ -732,7 +732,7 @@ public class RouterContext extends I2PAppContext {
      *  Once called, the result is cached.
      *
      *  @return downtime in ms or 0 if unknown
-     *  @since 0.0.47
+     *  @since 0.9.47
      */
     public long getEstimatedDowntime() {
         if (_router == null)
