@@ -23,6 +23,8 @@ class PeerTestState {
     private InetAddress _aliceIPFromCharlie;
     private int _alicePortFromCharlie;
     private SessionKey _aliceIntroKey;
+    private SessionKey _aliceCipherKey;
+    private SessionKey _aliceMACKey;
     private SessionKey _charlieIntroKey;
     private SessionKey _bobCipherKey;
     private SessionKey _bobMACKey;
@@ -85,12 +87,42 @@ class PeerTestState {
     
     public SessionKey getAliceIntroKey() { return _aliceIntroKey; }
     public void setAliceIntroKey(SessionKey key) { _aliceIntroKey = key; }
+
+    /**
+     *  @since 0.9.52
+     */
+    public SessionKey getAliceCipherKey() { return _aliceCipherKey; }
+
+    /**
+     *  @since 0.9.52
+     */
+    public SessionKey getAliceMACKey() { return _aliceMACKey; }
+
+    /**
+     *  @param ck cipher key
+     *  @param mk MAC key
+     *  @since 0.9.52
+     */
+    public void setAliceKeys(SessionKey ck, SessionKey mk) {
+        _aliceCipherKey = ck;
+        _aliceMACKey = mk;
+    }
+
     public SessionKey getCharlieIntroKey() { return _charlieIntroKey; }
     public void setCharlieIntroKey(SessionKey key) { _charlieIntroKey = key; }
+
     public SessionKey getBobCipherKey() { return _bobCipherKey; }
-    public void setBobCipherKey(SessionKey key) { _bobCipherKey = key; }
     public SessionKey getBobMACKey() { return _bobMACKey; }
-    public void setBobMACKey(SessionKey key) { _bobMACKey = key; }
+
+    /**
+     *  @param ck cipher key
+     *  @param mk MAC key
+     *  @since 0.9.52
+     */
+    public void setBobKeys(SessionKey ck, SessionKey mk) {
+        _bobCipherKey = ck;
+        _bobMACKey = mk;
+    }
     
     /** when did this test begin? */
     public long getBeginTime() { return _beginTime; }

@@ -193,8 +193,7 @@ class PeerTestManager {
                                                _context.clock().now());
         test.setBobIP(bobIP);
         test.setBobPort(bobPort);
-        test.setBobCipherKey(bobCipherKey);
-        test.setBobMACKey(bobMACKey);
+        test.setBobKeys(bobCipherKey, bobMACKey);
         _currentTest = test;
         _currentTestComplete = false;
         
@@ -276,7 +275,7 @@ class PeerTestManager {
                 _log.debug("Sending test to Bob: " + test);
             test.setLastSendTime(_context.clock().now());
             _transport.send(_packetBuilder.buildPeerTestFromAlice(test.getBobIP(), test.getBobPort(),
-                                                                  test.getBobCipherKey(), test.getBobMACKey(), //_bobIntroKey, 
+                                                                  test.getBobCipherKey(), test.getBobMACKey(),
                                                                   test.getNonce(), _transport.getIntroKey()));
         } else {
             _currentTest = null;
@@ -312,8 +311,12 @@ class PeerTestManager {
     /**
      * Receive a PeerTest message which contains the correct nonce for our current 
      * test. We are Alice.
+     *
+     * @param fromPeer non-null if an associated session was found, otherwise null
+     * @param inSession true if authenticated in-session
      */
-    private synchronized void receiveTestReply(RemoteHostId from, UDPPacketReader.PeerTestReader testInfo) {
+    private synchronized void receiveTestReply(RemoteHostId from, PeerState fromPeer, boolean inSession,
+                                               UDPPacketReader.PeerTestReader testInfo) {
         _context.statManager().addRateData("udp.receiveTestReply", 1);
         PeerTestState test = _currentTest;
         if (expired())
@@ -322,6 +325,17 @@ class PeerTestManager {
             return;
         if ( (DataHelper.eq(from.getIP(), test.getBobIP().getAddress())) && (from.getPort() == test.getBobPort()) ) {
             // The reply is from Bob
+
+            if (inSession) {
+                // i2pd has sent the Bob->Alice message in-session for a long time
+                // Java I2P switched to in-session in 0.9.52
+                //if (_log.shouldDebug())
+                //    _log.debug("Bob replied to us (Alice) in-session " + fromPeer);
+            } else {
+                // TODO check Bob version, drop if >= 0.9.52
+                if (_log.shouldDebug())
+                    _log.debug("Bob replied to us (Alice) with intro key " + from + ' ' + fromPeer);
+            }
 
             int ipSize = testInfo.readIPSize();
             boolean expectV6 = test.isIPv6();
@@ -512,8 +526,11 @@ class PeerTestManager {
      * adjusting our test state.
      *
      * We could be Alice, Bob, or Charlie.
+     *
+     * @param fromPeer non-null if an associated session was found, otherwise null
+     * @param inSession true if authenticated in-session
      */
-    public void receiveTest(RemoteHostId from, UDPPacketReader reader) {
+    public void receiveTest(RemoteHostId from, PeerState fromPeer, boolean inSession, UDPPacketReader reader) {
         _context.statManager().addRateData("udp.receiveTest", 1);
         byte[] fromIP = from.getIP();
         int fromPort = from.getPort();
@@ -557,7 +574,7 @@ class PeerTestManager {
         PeerTestState test = _currentTest;
         if ( (test != null) && (test.getNonce() == nonce) ) {
             // we are Alice, we initiated the test
-            receiveTestReply(from, testInfo);
+            receiveTestReply(from, fromPeer, inSession, testInfo);
             return;
         }
 
@@ -606,7 +623,7 @@ class PeerTestManager {
                         _log.warn("Too many active tests, droppping from Alice " + Addresses.toString(fromIP, fromPort));
                     return;
                 }
-                if (_transport.getPeerState(from) == null) {
+                if (!inSession || fromPeer == null) {
                     // Require an existing session to start a test,
                     // as a way of preventing trouble
                     if (_log.shouldLog(Log.WARN))
@@ -615,7 +632,7 @@ class PeerTestManager {
                 }
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("test IP/port are blank coming from " + from + ", assuming we are Bob and they are alice");
-                receiveFromAliceAsBob(from, testInfo, nonce, null);
+                receiveFromAliceAsBob(from, fromPeer, testInfo, nonce, null);
             } else {
                 if (_recentTests.contains(lNonce)) {
                     // ignore the packet, as its a holdover from a recently completed locally
@@ -630,7 +647,7 @@ class PeerTestManager {
                         _log.debug("We are charlie, as the testIP/port is " + Addresses.toString(testIP, testPort) + " and the state is unknown for " + nonce);
                     // we are charlie, since alice never sends us her IP and port, only bob does (and,
                     // erm, we're not alice, since it isn't our nonce)
-                    receiveFromBobAsCharlie(from, testInfo, nonce, null);
+                    receiveFromBobAsCharlie(from, fromPeer, inSession, testInfo, nonce, null);
                 }
             }
         } else {
@@ -638,10 +655,16 @@ class PeerTestManager {
             if (state.getOurRole() == BOB) {
                 if (DataHelper.eq(fromIP, state.getAliceIP().getAddress()) && 
                     (fromPort == state.getAlicePort()) ) {
-                    receiveFromAliceAsBob(from, testInfo, nonce, state);
+                    if (!inSession || fromPeer == null) {
+                        // Still should be in-session
+                        if (_log.shouldWarn())
+                            _log.warn("No session, dropping test from Alice " + Addresses.toString(fromIP, fromPort));
+                        return;
+                    }
+                    receiveFromAliceAsBob(from, fromPeer, testInfo, nonce, state);
                 } else if (DataHelper.eq(fromIP, state.getCharlieIP().getAddress()) && 
                            (fromPort == state.getCharliePort()) ) {
-                    receiveFromCharlieAsBob(from, state);
+                    receiveFromCharlieAsBob(from, fromPeer, inSession, state);
                 } else {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Received from a fourth party as bob!  alice: " + state.getAliceIP() + ", charlie: " + state.getCharlieIP() + ", dave: " + from);
@@ -650,7 +673,7 @@ class PeerTestManager {
                 if ( (testIP == null) || (testPort <= 0) ) {
                     receiveFromAliceAsCharlie(from, testInfo, nonce, state);
                 } else {
-                    receiveFromBobAsCharlie(from, testInfo, nonce, state);
+                    receiveFromBobAsCharlie(from, fromPeer, inSession, testInfo, nonce, state);
                 }
             }
         }
@@ -662,9 +685,18 @@ class PeerTestManager {
      * The packet's IP/port does not match the IP/port included in the message, 
      * so we must be Charlie receiving a PeerTest from Bob.
      *  
+     * @param bob non-null if received in-session, otherwise null
+     * @param inSession true if authenticated in-session
      * @param state null if new
      */
-    private void receiveFromBobAsCharlie(RemoteHostId from, UDPPacketReader.PeerTestReader testInfo, long nonce, PeerTestState state) {
+    private void receiveFromBobAsCharlie(RemoteHostId from, PeerState bob, boolean inSession,
+                                         UDPPacketReader.PeerTestReader testInfo, long nonce, PeerTestState state) {
+        if (!inSession || bob == null) {
+            if (_log.shouldWarn())
+                _log.warn("Received from bob (" + from + ") as charlie w/o session");
+            return;
+        }
+
         long now = _context.clock().now();
         int sz = testInfo.readIPSize();
         boolean isNew = false;
@@ -701,17 +733,8 @@ class PeerTestManager {
             state.setBobIP(bobIP);
             state.setBobPort(from.getPort());
             state.setReceiveBobTime(now);
+            state.setBobKeys(bob.getCurrentCipherKey(), bob.getCurrentMACKey());
             
-            PeerState bob = _transport.getPeerState(from);
-            if (bob == null) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Received from bob (" + from + ") who hasn't established a session with us, refusing to help him test " + aliceIP +":" + alicePort);
-                return;
-            } else {
-                state.setBobCipherKey(bob.getCurrentCipherKey());
-                state.setBobMACKey(bob.getCurrentMACKey());
-            }
-
             // we send two packets below, but increment just once
             if (state.incrementPacketsRelayed() > MAX_RELAYED_PER_TEST_CHARLIE) {
                 if (_log.shouldLog(Log.WARN))
@@ -748,9 +771,12 @@ class PeerTestManager {
      * any info in the message), plus we are not acting as Charlie (so we've got to be Bob).
      *
      * testInfo IP/port ignored
+     *
+     * @param alice non-null
      * @param state null if new
      */
-    private void receiveFromAliceAsBob(RemoteHostId from, UDPPacketReader.PeerTestReader testInfo, long nonce, PeerTestState state) {
+    private void receiveFromAliceAsBob(RemoteHostId from, PeerState alice, UDPPacketReader.PeerTestReader testInfo,
+                                       long nonce, PeerTestState state) {
         // we are Bob, so pick a (potentially) Charlie and send Charlie Alice's info
         PeerState charlie;
         RouterInfo charlieInfo = null;
@@ -819,6 +845,7 @@ class PeerTestManager {
             state.setAliceIP(aliceIP);
             state.setAlicePort(from.getPort());
             state.setAliceIntroKey(aliceIntroKey);
+            state.setAliceKeys(alice.getCurrentCipherKey(), alice.getCurrentMACKey());
             state.setCharlieIP(charlie.getRemoteIPAddress());
             state.setCharliePort(charlie.getRemotePort());
             state.setCharlieIntroKey(charlieIntroKey);
@@ -858,9 +885,18 @@ class PeerTestManager {
      * packet verifying participation.
      *
      * testInfo IP/port ignored
+     *
+     * @param fromPeer non-null if an associated session was found, otherwise null
+     * @param inSession true if authenticated in-session
      * @param state non-null
      */
-    private void receiveFromCharlieAsBob(RemoteHostId from, PeerTestState state) {
+    private void receiveFromCharlieAsBob(RemoteHostId from, PeerState charlie, boolean inSession, PeerTestState state) {
+        if (!inSession || charlie == null) {
+            if (_log.shouldWarn())
+                _log.warn("Received from charlie (" + from + ") as bob w/o session");
+            return;
+        }
+
         long now = _context.clock().now();
         if (state.getReceiveCharlieTime() > now - (RESEND_TIMEOUT / 2)) {
             if (_log.shouldLog(Log.WARN))
@@ -876,9 +912,10 @@ class PeerTestManager {
         state.setReceiveCharlieTime(now);
         state.setLastSendTime(now);
         
+        // In-session as of 0.9.52
         UDPPacket packet = _packetBuilder.buildPeerTestToAlice(state.getAliceIP(), state.getAlicePort(),
-                                                               state.getAliceIntroKey(), state.getCharlieIntroKey(), 
-                                                               state.getNonce());
+                                                               state.getAliceCipherKey(), state.getAliceMACKey(),
+                                                               state.getCharlieIntroKey(), state.getNonce());
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Receive from Charlie, sending Alice back the OK: " + state);

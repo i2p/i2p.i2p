@@ -792,7 +792,7 @@ class PacketHandler {
                     }
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Received test packet: " + reader + " from " + from);
-                    _testManager.receiveTest(from, reader);
+                    _testManager.receiveTest(from, state, auth == AuthType.SESSION, reader);
                     //_context.statManager().addRateData("udp.receivePacketSize.test", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_RELAY_REQUEST:

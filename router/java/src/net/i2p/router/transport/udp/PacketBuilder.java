@@ -1089,11 +1089,26 @@ class PacketBuilder {
 
     /**
      * Build a packet as if we are either Bob or Charlie and we are helping test Alice.
-     * 
+     * Not for use as Bob, as of 0.9.52; use in-session cipher/mac keys instead.
+     *
      * @return ready to send packet, or null if there was a problem
      */
     public UDPPacket buildPeerTestToAlice(InetAddress aliceIP, int alicePort,
                                           SessionKey aliceIntroKey, SessionKey charlieIntroKey, long nonce) {
+        return buildPeerTestToAlice(aliceIP, alicePort, aliceIntroKey, aliceIntroKey, charlieIntroKey, nonce);
+    }
+
+    /**
+     * Build a packet as if we are either Bob or Charlie and we are helping test Alice.
+     * 
+     * @param aliceCipherKey the intro key if we are Charlie
+     * @param aliceMACKey the intro key if we are Charlie
+     * @return ready to send packet, or null if there was a problem
+     * @since 0.9.52
+     */
+    public UDPPacket buildPeerTestToAlice(InetAddress aliceIP, int alicePort,
+                                          SessionKey aliceCipherKey, SessionKey aliceMACKey,
+                                          SessionKey charlieIntroKey, long nonce) {
         UDPPacket packet = buildPacketHeader(PEER_TEST_FLAG_BYTE);
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
@@ -1117,7 +1132,7 @@ class PacketBuilder {
         off = pad1(data, off);
         off = pad2(data, off);
         pkt.setLength(off);
-        authenticate(packet, aliceIntroKey, aliceIntroKey);
+        authenticate(packet, aliceCipherKey, aliceMACKey);
         setTo(packet, aliceIP, alicePort);
         packet.setMessageType(TYPE_TTA);
         return packet;
