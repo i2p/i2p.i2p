@@ -4887,13 +4887,14 @@ img.wizard.progress {
 }
 
 .wizardimg {
-    max-width: 50%;
+    max-width: 75%;
     max-height: 100%;
     margin: auto;
+    top: 0;
+    z-index: 0;
+    position: absolute;
+    right: 0%;
     mix-blend-mode: multiply;
-    margin-left: 40%;
-    margin-top: -10%;
-    position: relative;
 }
 
 .langselect:hover {
