@@ -2222,7 +2222,6 @@ td.optionsave {
      position: absolute;
      left: 75%;
      width: 22%;
-     top: 75%;
 }
 
 #bandwidthconfig .configtable tr:last-child td {
@@ -2561,9 +2560,10 @@ td {
 }
 
 .configtable.wizard {
-    bottom: 10%;
+    width: 20%;
+    bottom: 5%;
     right: 10%;
-    width: max-content;
+    position: absolute;
     box-shadow: none !important;
     white-space: normal;
     background: none;
@@ -4827,11 +4827,11 @@ div#langsettings {
 }
 
 img.wizard.progress {
-    mix-blend-mode: multiply;
-    position: absolute;
-    top: 1%;
-    left: 1%;
-    max-width: 40%;
+	position: absolute;
+	top: 6%;
+	left: 1%;
+	max-height: 10%;
+	max-width: 30%;
 }
 
 .overlay {
@@ -4851,9 +4851,10 @@ img.wizard.progress {
 
 .wizardtext {
     width: 25%;
+    position: absolute;
+    top: 37%;
+    left: 5%;
     font-size: larger;
-    margin-top: -20%;
-    margin-left: 10%;
 }
 
 .wizardbuttons {
