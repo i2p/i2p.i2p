@@ -1,3 +1,6 @@
+2021-10-21 idk
+ * Improve consistency between light and dark theme on Bandwidth Config Wizard
+
 2021-10-10 zzz
  * Jetty 9.3.30.v20211001
 
