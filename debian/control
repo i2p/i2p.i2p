@@ -78,7 +78,7 @@ Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- openjdk-16-jre-headless | openjdk-15-jre-headless | openjdk-14-jre-headless | openjdk-13-jre-headless | openjdk-12-jre-headless | openjdk-11-jre-headless | default-jre-headless | java16-runtime-headless | java15-runtime-headless | java14-runtime-headless | java13-runtime-headless | java12-runtime-headless | java11-runtime-headless,
+ openjdk-17-jre-headless | openjdk-16-jre-headless | openjdk-15-jre-headless | openjdk-11-jre-headless | default-jre-headless | java17-runtime-headless | java16-runtime-headless | java15-runtime-headless | java11-runtime-headless,
  geoip-database,
  gettext-base,
  libgetopt-java,
