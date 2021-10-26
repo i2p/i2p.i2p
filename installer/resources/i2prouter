@@ -135,7 +135,7 @@ OPEN_FILES_ULIMIT=2048
 # you may comment out this block and set them yourself here.
 
 if [ ! -n $LANG ]; then
-        for ENV_FILE in /etc/environment /etc/default/locale; do
+        for ENV_FILE in /etc/environment /etc/default/locale /etc/locale.conf; do
                 [ -r "$ENV_FILE" ] || continue
                 [ -s "$ENV_FILE" ] || continue
 
