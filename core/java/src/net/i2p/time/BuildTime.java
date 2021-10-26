@@ -116,7 +116,7 @@ public class BuildTime {
     private static long getBuildTime(SimpleDateFormat fmt, String jar) {
         if (SystemVersion.isAndroid())
             return 0;
-        File f = new File(I2PAppContext.getGlobalContext().getBaseDir(), "lib");
+        File f = I2PAppContext.getGlobalContext().getLibDir();
         f = new File(f, jar);
         Attributes atts = attributes(f);
         if (atts == null)

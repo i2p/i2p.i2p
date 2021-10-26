@@ -211,8 +211,8 @@ public class LogsHelper extends HelperBase {
      * @since 0.9.35
      */
     public String getBuiltBy() {
-        File baseDir = _context.getBaseDir();
-        File f = new File(new File(baseDir, "lib"), "i2p.jar");
+        File libDir = _context.getLibDir();
+        File f = new File(libDir, "i2p.jar");
         Attributes att = FileDumpHelper.attributes(f);
         if (att != null) {
             String s = FileDumpHelper.getAtt(att, "Built-By");

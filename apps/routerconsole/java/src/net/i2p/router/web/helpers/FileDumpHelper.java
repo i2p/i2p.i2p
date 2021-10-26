@@ -63,7 +63,7 @@ public class FileDumpHelper extends HelperBase {
         }
 
         // our jars
-        File dir = new File(_context.getBaseDir(), "lib");
+        File dir = _context.getLibDir();
         buf.append("<tr><th class=\"subheading routerfiles\" colspan=\"9\"><b>Router Jar Files:</b> <code>");
         buf.append(dir.getAbsolutePath());
         buf.append("</code></th></tr>\n");

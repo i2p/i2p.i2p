@@ -135,7 +135,7 @@ public class InstallUpdate {
         boolean goodOS = isWin || isMac ||
                          osName.contains("linux") || osName.contains("freebsd");
 
-        File jbigiJar = new File(context.getBaseDir(), "lib/jbigi.jar");
+        File jbigiJar = new File(context.getLibDir(), "jbigi.jar");
         if (goodOS && jbigiJar.exists()) {
             String libPrefix = (isWin ? "" : "lib");
             String libSuffix = (isWin ? ".dll" : isMac ? ".jnilib" : ".so");

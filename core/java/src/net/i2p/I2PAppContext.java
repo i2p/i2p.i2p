@@ -111,6 +111,7 @@ public class I2PAppContext {
     private final File _logDir;
     private final File _appDir;
     private volatile File _tmpDir;
+    private final File _libDir;
     private final Random _tmpDirRand = new Random();
     private final ClientAppManager _appManager;
     // split up big lock on this to avoid deadlocks
@@ -317,6 +318,13 @@ public class I2PAppContext {
         } else {
             _appDir = _routerDir;
         }
+
+        s = getProperty("i2p.dir.lib");
+        if (s != null) {
+            _libDir = new File(s);
+        } else {
+            _libDir = new File(_baseDir, "lib");
+        }
         String isPortableStr = System.getProperty("i2p.dir.portableMode");
         boolean isPortable = Boolean.parseBoolean(isPortableStr);
         if (isPortable) {
@@ -437,6 +445,13 @@ public class I2PAppContext {
             return _tmpDir;
         }
     }
+
+    /**
+     *  This is the library dir, which is usually $I2P/lib.
+     *  @return dir constant for the life of the context
+     *  @since 0.9.52
+     */
+    public File getLibDir() { return _libDir; }
 
     /** don't rely on deleteOnExit() */
     public void deleteTempDir() {

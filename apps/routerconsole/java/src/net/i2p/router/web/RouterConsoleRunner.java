@@ -455,7 +455,7 @@ public class RouterConsoleRunner implements RouterApp {
             System.err.println("ERROR: Unable to create Jetty temporary work directory");
 
         // so Jetty can find WebAppConfiguration
-        System.setProperty("jetty.class.path", _context.getBaseDir() + "/lib/routerconsole.jar");
+        System.setProperty("jetty.class.path", (new File(_context.getLibDir(), "routerconsole.jar")).getPath());
         // FIXME
         // http://dev.eclipse.org/mhonarc/lists/jetty-users/msg03487.html
         //_server.setGracefulShutdown(1000);
