@@ -1349,7 +1349,7 @@ public class Router implements RouterClock.ClockShiftListener {
                     // only do this on these OSes
                     boolean goodOS = isWin || isMac ||
                                      osName.contains("linux") || osName.contains("freebsd");
-                    File jbigiJar = new File(_context.getBaseDir(), "lib/jbigi.jar");
+                    File jbigiJar = new File(_context.getLibDir(), "jbigi.jar");
                     if (goodOS && jbigiJar.exists() && _context.getBaseDir().canWrite()) {
                         String libPrefix = isWin ? "" : "lib";
                         String libSuffix = isWin ? ".dll" : isMac ? ".jnilib" : ".so";

@@ -935,8 +935,7 @@ public final class KeyStoreUtil {
         a.add("-keysize");   a.add(Integer.toString(keySize));
         a.add("-keypass");   a.add(keyPW);
         if (keyAlg.equals("Ed") || keyAlg.equals("EdDSA") || keyAlg.equals("ElGamal")) {
-            File f = I2PAppContext.getGlobalContext().getBaseDir();
-            f = new File(f, "lib");
+            File f = I2PAppContext.getGlobalContext().getLibDir();
             f = new File(f, "i2p.jar");
             // providerpath is not in the man page; see keytool -genkey -help
             a.add("-providerpath");  a.add(f.getAbsolutePath());

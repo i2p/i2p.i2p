@@ -87,7 +87,7 @@ public class WebAppConfiguration implements Configuration {
 ****/
 
         I2PAppContext i2pContext = I2PAppContext.getGlobalContext();
-        File libDir = new File(i2pContext.getBaseDir(), "lib");
+        File libDir = i2pContext.getLibDir();
         // FIXME this only works if war is the same name as the plugin
         File pluginDir = new File(i2pContext.getConfigDir(),
                                         PluginStarter.PLUGIN_DIR + ctxPath);
@@ -180,7 +180,7 @@ public class WebAppConfiguration implements Configuration {
         } else {
             // Java 9 - assume everything in lib/ is in the classpath
             // except addressbook.jar
-            File libDir = new File(ctx.getBaseDir(), "lib");
+            File libDir = ctx.getLibDir();
             File[] files = libDir.listFiles(new FileSuffixFilter(".jar"));
             if (files != null) {
                 for (int i = 0; i < files.length; i++) {
