@@ -54,7 +54,7 @@ import net.i2p.util.SecureFileOutputStream;
  *     - Cert. type (1 byte)
  *     - Cert. length (2 bytes)
  *     - Certificate if length != 0
- *  - Private key (256 bytes)
+ *  - Private key (256 bytes for ElGamal, or length specified by key certificate)
  *  - Signing Private key (20 bytes, or length specified by key certificate)
  *  - As of 0.9.38, if the Signing Private Key is all zeros,
  *    the offline signature section (see proposal 123):
@@ -64,7 +64,7 @@ import net.i2p.util.SecureFileOutputStream;
  *     - Signature of Signed Public key by offline key (length as specified by destination sig type)
  *     - Transient Signing Private key (length as specified by transient sig type)
  *
- * Total: 663 or more bytes
+ * Total: 663 or more bytes for ElGamal, may be smaller for other enc. types
  *</pre>
  *
  * @author welterde, zzz
