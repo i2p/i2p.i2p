@@ -18,8 +18,8 @@ import net.i2p.util.Log;
  *
  */
 class UDPPacketReader {
-    private final I2PAppContext _context;
-    private final Log _log;
+    //private final I2PAppContext _context;
+    //private final Log _log;
     private byte _message[];
     private int _payloadBeginOffset;
     private int _payloadLength;
@@ -34,9 +34,12 @@ class UDPPacketReader {
     
     private static final int KEYING_MATERIAL_LENGTH = 64;
     
+    /**
+     *  @param ctx unused
+     */
     public UDPPacketReader(I2PAppContext ctx) {
-        _context = ctx;
-        _log = ctx.logManager().getLog(UDPPacketReader.class);
+        //_context = ctx;
+        //_log = ctx.logManager().getLog(UDPPacketReader.class);
         _sessionRequestReader = new SessionRequestReader();
         _sessionCreatedReader = new SessionCreatedReader();
         _sessionConfirmedReader = new SessionConfirmedReader();
@@ -254,9 +257,9 @@ class UDPPacketReader {
         public long readSignedOnTime() {
             int offset = readBodyOffset() + Y_LENGTH + 1 + readIPSize() + 2 + 4;
             long rv = DataHelper.fromLong(_message, offset, 4);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Signed on time offset: " + offset + " val: " + rv
-                           + "\nRawCreated: " + Base64.encode(_message, _payloadBeginOffset, _payloadLength));
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Signed on time offset: " + offset + " val: " + rv
+            //               + "\nRawCreated: " + Base64.encode(_message, _payloadBeginOffset, _payloadLength));
             return rv;
         }
         
@@ -489,7 +492,7 @@ class UDPPacketReader {
         @Override
         public String toString() {
             StringBuilder buf = new StringBuilder(512);
-            long msAgo = _context.clock().now() - readTimestamp()*1000;
+            long msAgo = System.currentTimeMillis() - readTimestamp()*1000;
             buf.append("Data packet sent ").append(msAgo).append("ms ago ");
             buf.append("IV ");
             buf.append(Base64.encode(_message, _payloadBeginOffset-UDPPacket.IV_SIZE, UDPPacket.IV_SIZE));
@@ -705,15 +708,15 @@ class UDPPacketReader {
     public class RelayRequestReader extends Reader {
         public long readTag() { 
             long rv = DataHelper.fromLong(_message, readBodyOffset(), 4); 
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("read alice tag: " + rv);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("read alice tag: " + rv);
             return rv;
         }
         public int readIPSize() {
             int offset = readBodyOffset() + 4;
             int rv = _message[offset] & 0xff;
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("read alice ip size: " + rv);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("read alice ip size: " + rv);
             return rv;
         }
         
@@ -723,16 +726,16 @@ class UDPPacketReader {
             int size = _message[offset] & 0xff;
             offset++;
             System.arraycopy(_message, offset, target, targetOffset, size);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("read alice ip: " + Base64.encode(target, targetOffset, size));
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("read alice ip: " + Base64.encode(target, targetOffset, size));
         }
         public int readPort() {
             int offset = readBodyOffset() + 4;
             offset += _message[offset] & 0xff;
             offset++;
             int rv = (int)DataHelper.fromLong(_message, offset, 2);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("read alice port: " + rv);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("read alice port: " + rv);
             return rv;
         }
 
@@ -742,8 +745,8 @@ class UDPPacketReader {
             offset += _message[offset] & 0xff;
             offset += 1 + 2;
             int rv = _message[offset] & 0xff;
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("read challenge size: " + rv);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("read challenge size: " + rv);
             return rv;
         }
 
@@ -755,8 +758,8 @@ class UDPPacketReader {
             int sz = _message[offset] & 0xff;
             offset++;
             System.arraycopy(_message, offset, target, targetOffset, sz);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("read challenge data: " + Base64.encode(target));
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("read challenge data: " + Base64.encode(target));
         }
         public void readAliceIntroKey(byte target[], int targetOffset) {
             int offset = readBodyOffset() + 4;
@@ -766,9 +769,9 @@ class UDPPacketReader {
             offset++;
             offset += sz;
             System.arraycopy(_message, offset, target, targetOffset, SessionKey.KEYSIZE_BYTES);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("read alice intro key: " + Base64.encode(target, targetOffset, SessionKey.KEYSIZE_BYTES)
-                          + " packet size: " + _payloadLength + " off: " + offset + " data: " + Base64.encode(_message));
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("read alice intro key: " + Base64.encode(target, targetOffset, SessionKey.KEYSIZE_BYTES)
+            //              + " packet size: " + _payloadLength + " off: " + offset + " data: " + Base64.encode(_message));
         }
         public long readNonce() {
             int offset = readBodyOffset() + 4;
@@ -779,8 +782,8 @@ class UDPPacketReader {
             offset += sz;
             offset += SessionKey.KEYSIZE_BYTES;
             long rv = DataHelper.fromLong(_message, offset, 4);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("read request nonce: " + rv);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("read request nonce: " + rv);
             return rv;
         }
     }
