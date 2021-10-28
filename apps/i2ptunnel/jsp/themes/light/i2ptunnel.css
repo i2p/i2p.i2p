@@ -47,7 +47,7 @@ form {
 }
 
 input[type="checkbox"], input[type="radio"] {
-     margin: 5px 3px 5px 5px;
+     margin: 4px 5px 6px;
      background: none;
      vertical-align: sub;
      min-width: 16px;

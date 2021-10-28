@@ -3722,7 +3722,7 @@ input[type="submit"], input[type="reset"], button, .optbox, select {
 
 button.search {
      background: url(/themes/console/images/buttons/search.png) no-repeat 9px center, linear-gradient(to bottom, #fff, #efefff);
-     padding: 5px 7px 5px 24px;
+     padding: 5px 7px 5px 26px;
 }
 
 button.search:hover, button.search:focus, button.search:active {
@@ -4256,7 +4256,7 @@ input[type="file"] {
 
 .optbox, input[type="checkbox"], input[type="radio"] {
      background: none;
-     margin: 5px;
+     margin: 4px 5px 7px;
      padding: 2px;
      min-height: 16px;
      height: 16px;
@@ -5177,7 +5177,7 @@ img + tt {
      padding-right: 5px;
 }
 
-#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10) {
+#ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10) {
      text-align: right !important;
 }
 
