@@ -885,7 +885,7 @@ public class SU3File {
                     System.out.println("File type " + ftype + " is not supported");
                     return false;
                 }
-                if (ft  > TYPE_XML_GZ)
+                if (ft  > TYPE_EXE)
                     System.out.println("Warning: File type " + ftype + " is undefined");
             }
         }
