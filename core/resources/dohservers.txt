@@ -12,6 +12,8 @@
 #
 # Exclude big companies without any privacy policy:
 # - Alibaba
+# - AT&T
+# - Charter
 # - OpenDNS (Cisco)
 # - Xfinity (Comcast)
 #
@@ -24,7 +26,8 @@
 #
 https://dns.aa.net.uk/dns-query
 #
-https://dnses.alekberg.net/dns-query
+# SSL issues
+#https://dnses.alekberg.net/dns-query
 #
 # SSL cert issues
 #https://dnsnl.alekberg.net/dns-query
@@ -35,6 +38,8 @@ https://dnses.alekberg.net/dns-query
 #
 https://doh.42l.fr/dns-query
 #
+https://doh-ch.blahdns.com/dns-query
+https://doh-sg.blahdns.com/dns-query
 https://doh-fi.blahdns.com/dns-query
 https://doh-jp.blahdns.com/dns-query
 https://doh-de.blahdns.com/dns-query
@@ -51,20 +56,25 @@ https://doh.opendns.com/dns-query
 # not found
 #https://dns.containerpi.com/dns-query
 #
-https://dns.digitale-gesellschaft.ch/dns-query
+https://freedns.controld.com/p0
 #
-https://dnsforge.de/dns-query
+# SSL issues
+#https://dns.digitale-gesellschaft.ch/dns-query
+#
+# SSL issues
+#https://dnsforge.de/dns-query
 #
 # not found
 #https://doh.dnslify.com/dns-query
 #
 https://doh.li/dns-query
 #
-https://rdns.faelix.net/
+# SSL issues
+#https://rdns.faelix.net/
 #
 https://doh.ffmuc.net/dns-query
 #
-# not found
+# SSL issues
 #https://doh.applied-privacy.net/query
 #
 https://dns.hostux.net/dns-query
@@ -74,10 +84,12 @@ https://ordns.he.net/dns-query
 # not found
 #https://jcdns.fun/dns-query
 #
-https://jp.tiar.app/dns-query
+# SSL issues
+#https://jp.tiar.app/dns-query
 https://jp.tiarap.org/dns-query
 #
-https://us1.dns.lavate.ch/dns-query
+# down
+#https://us1.dns.lavate.ch/dns-query
 https://eu1.dns.lavate.ch/dns-query
 #
 https://resolver-eu.lelux.fi/dns-query
@@ -91,8 +103,7 @@ https://doh.post-factum.tk/dns-query
 #
 https://basic.rethinkdns.com/dns-query
 #
-# timeout, no results
-#https://fi.doh.dns.snopyta.org/dns-query
+https://fi.doh.dns.snopyta.org/dns-query
 #
 https://dns.twnic.tw/dns-query
 #
@@ -105,8 +116,7 @@ https://dns.wevpn.com/dns-query
 # cert expired
 #https://dns.dnsoverhttps.net/dns-query
 #
-# host not found
-#https://ibksturm.synology.me/dns-query
+https://ibksturm.synology.me/dns-query
 #
 https://ibuki.cgnat.net/dns-query
 #
@@ -146,8 +156,13 @@ https://dns1.ryan-palmer.com/dns-query
 https://dns.dnshome.de/dns-query
 # doh-crypto-sx
 https://doh.crypto.sx/dns-query
+#
+https://doh.dns.sb/dns-query
+https://doh.sb/dns-query
+#
 # id-gmail-doh
-https://doh.tiar.app/dns-query
+# SSL issues
+#https://doh.tiar.app/dns-query
 #
 # meganerd-doh
 # 404
@@ -155,11 +170,15 @@ https://doh.tiar.app/dns-query
 # nextdns
 https://dns.nextdns.io/dns-query
 # powerdns
-https://doh.powerdns.org/dns-query
+# down
+#https://doh.powerdns.org/dns-query
 #
 # rumpelsepp.org
 # 404
 #https://rumpelsepp.org/dns-query
+#
+https://anycast.uncensoreddns.org/dns-query
+https://unicast.uncensoreddns.org/dns-query
 #
 #
 #############################################
