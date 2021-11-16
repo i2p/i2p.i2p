@@ -111,6 +111,7 @@ public class Reseeder {
         //
         // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
         // ----------------------------------           ------------------------     -------------------------     ---------------
+        "https://banana.incognet.io/"         + ',' +   // rambler_at_mail.i2p.crt   // CA
         "https://reseed.diva.exchange/"       + ',' +   // reseed_at_diva.exchange.crt       // CA
         "https://reseed.i2pgit.org/"          + ',' +   // hankhill19580_at_gmail.com.crt    // CA
         "https://i2p.novg.net/"               + ',' +   // igor_at_novg.net.crt      // CA                         // Java 8+ only
