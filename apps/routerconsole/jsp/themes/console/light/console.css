@@ -73,7 +73,7 @@ img {
      border: none;
 }
 
-img:not(img[src$="i2plogo.png"]){     
+img:not(img[src$="i2plogo.png"]){
      image-rendering: -moz-crisp-edges;
      image-rendering: -o-crisp-edges;
      image-rendering: -webkit-optimize-contrast;
@@ -2220,8 +2220,9 @@ td.optionsave {
 
 .wizardnotice {
      position: absolute;
-     left: 75%;
+     right: 5%;
      width: 22%;
+     bottom: 20%;
 }
 
 #bandwidthconfig .configtable tr:last-child td {
@@ -4883,7 +4884,7 @@ img.wizard.progress {
      float: left;
      margin-left: 15%;
      transition: transform 0.3s ease 0s;
-     
+
 }
 
 .wizardimg {

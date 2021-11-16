@@ -1224,7 +1224,7 @@ div.messages li {
 
 .wizardnotice {
      position: absolute;
-     top: 5%;
+     bottom: 20%;
      right: 5%;
      width: 22%;
 }
