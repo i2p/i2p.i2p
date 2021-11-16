@@ -254,7 +254,7 @@ class OutboundNTCP2State implements EstablishState {
 
         changeState(State.OB_SENT_X);
         // send it all at once
-        _transport.getPumper().wantsWrite(_con, _tmp, 0, MSG1_SIZE + padlen1);
+        _con.wantsWrite(_tmp, 0, MSG1_SIZE + padlen1);
     }
 
     /**
@@ -392,7 +392,7 @@ class OutboundNTCP2State implements EstablishState {
         // send it all at once
         if (_log.shouldDebug())
             _log.debug("Sending msg3, part 1 is:\n" + net.i2p.util.HexDump.dump(tmp, 0, MSG3P1_SIZE));
-        _transport.getPumper().wantsWrite(_con, tmp);
+        _con.wantsWrite(tmp);
         if (_log.shouldDebug())
             _log.debug("After msg 3: " + _handshakeState.toString());
         setDataPhase();

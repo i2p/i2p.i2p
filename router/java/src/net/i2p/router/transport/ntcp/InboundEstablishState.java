@@ -537,7 +537,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
 
         changeState(State.IB_NTCP2_SENT_Y);
         // send it all at once
-        _transport.getPumper().wantsWrite(_con, tmp);
+        _con.wantsWrite(tmp);
     }
 
     /**

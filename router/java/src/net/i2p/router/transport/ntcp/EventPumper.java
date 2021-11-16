@@ -427,35 +427,6 @@ class EventPumper implements Runnable {
     }
 
     /**
-     *  Called by the connection when it has data ready to write.
-     *  If we have bandwidth, calls con.Write() which calls wantsWrite(con).
-     *  If no bandwidth, calls con.queuedWrite().
-     */
-    public void wantsWrite(NTCPConnection con, byte data[]) {
-        wantsWrite(con, data, 0, data.length);
-    }
-
-    /**
-     *  Called by the connection when it has data ready to write.
-     *  If we have bandwidth, calls con.Write() which calls wantsWrite(con).
-     *  If no bandwidth, calls con.queuedWrite().
-     *
-     *  @since 0.9.35 off/len version
-     */
-    public void wantsWrite(NTCPConnection con, byte data[], int off, int len) {
-        ByteBuffer buf = ByteBuffer.wrap(data, off, len);
-        FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestOutbound(len, 0, "NTCP write");//con, buf);
-        if (req.getPendingRequested() > 0) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("queued write on " + con + " for " + len);
-            _context.statManager().addRateData("ntcp.wantsQueuedWrite", 1);
-            con.queuedWrite(buf, req);
-        } else {
-            con.write(buf);
-        }
-    }
-
-    /**
      *  Called by the connection when it has data ready to write (after bw allocation).
      *  Only wakeup if new.
      */
