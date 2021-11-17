@@ -1,0 +1,186 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# foo <foo@bar>, 2009.
+# 
+# Translators:
+# Žan Šadl-Ferš, 2021
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P routerconsole\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-12-18 13:32+0000\n"
+"PO-Revision-Date: 2019-12-19 14:09+0000\n"
+"Last-Translator: Žan Šadl-Ferš, 2021\n"
+"Language-Team: Slovenian (https://www.transifex.com/otf/teams/12694/sl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sl\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
+
+#. * IPv4 OK, IPv6 OK or disabled or no address
+#: ../java/src/net/i2p/router/CommSystemFacade.java:370
+msgid "OK"
+msgstr "V redu"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:371
+msgid "IPv4: OK; IPv6: Testing"
+msgstr "IPv4: V redu; IPv6: Preizkušanje"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:372
+msgid "IPv4: OK; IPv6: Firewalled"
+msgstr "IPv4: V redu; IPv6: Pod požarnim zidom"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:373
+msgid "IPv4: Testing; IPv6: OK"
+msgstr "IPv4: Preizkušanje; IPv6: V redu"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:374
+msgid "IPv4: Firewalled; IPv6: OK"
+msgstr "IPv4: Pod požarnim zidom; IPv6: V redu"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:375
+msgid "IPv4: Disabled; IPv6: OK"
+msgstr "IPv4: Onemogočeno; IPv6: V redu"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:376
+msgid "IPv4: Symmetric NAT; IPv6: OK"
+msgstr "IPv4: Simetrični NAT; IPv6: V redu"
+
+#. * IPv4 symmetric NAT, IPv6 firewalled or disabled or no address
+#: ../java/src/net/i2p/router/CommSystemFacade.java:378
+msgid "Symmetric NAT"
+msgstr "Simetrični NAT"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:379
+msgid "IPv4: Symmetric NAT; IPv6: Testing"
+msgstr "IPv4: Simetrični NAT; IPv6: Preizkušanje"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:380
+msgid "IPv4: Firewalled; IPv6: Testing"
+msgstr "IPv4: Pod požarnim zidom; IPv6: Preizkušanje"
+
+#. * IPv4 firewalled, IPv6 firewalled or disabled or no address
+#: ../java/src/net/i2p/router/CommSystemFacade.java:382
+msgid "Firewalled"
+msgstr "Pod požarnim zidom"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:383
+msgid "IPv4: Testing; IPv6: Firewalled"
+msgstr "IPv4: Preizkušanje; IPv6: Pod požarnim zidom"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:384
+msgid "IPv4: Disabled; IPv6: Testing"
+msgstr "IPv4: Onemogočeno; IPv6: Preizkušanje"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:385
+msgid "IPv4: Disabled; IPv6: Firewalled"
+msgstr "IPv4: Onemogočeno; IPv6: Pod požarnim zidom"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:386
+msgid "Disconnected"
+msgstr "Ni povezave"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:387
+msgid "Port Conflict"
+msgstr "Konflikt omrežnih vrat"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:388
+msgid "Testing"
+msgstr "Preizkušanje"
+
+#. NPE, too early
+#. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
+#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too
+#. low");
+#. else
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:84
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:142
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:545
+msgid "Rejecting tunnels: Starting up"
+msgstr "Zavrnitev predorov: Zagon"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:189
+msgid "Rejecting tunnels: High message delay"
+msgstr "Zavrnitev predorov: Visoka zamuda sporočil"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:202
+msgid "Rejecting tunnels: Limit reached"
+msgstr "Zavrnitev predorov: Omejitev dosežena"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:241
+msgid "Rejecting most tunnels: High number of requests"
+msgstr "Zavrnitev večine predorov: Visoko število prošenj"
+
+#. hard to do {0} from here
+#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of
+#. tunnels");
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:243
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:424
+msgid "Accepting most tunnels"
+msgstr "Sprejemanje večine predorov"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:245
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:426
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:561
+msgid "Accepting tunnels"
+msgstr "Sprejemanje predorov"
+
+#. .067KBps
+#. * also limited to 90% - see below
+#. always leave at least 4KBps free when allowing
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:350
+msgid "Rejecting tunnels: Bandwidth limit"
+msgstr "Zavrnitev predorov: Omejitev pretočnosti"
+
+#. hard to do {0} from here
+#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels:
+#. Bandwidth limit");
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:420
+msgid "Rejecting most tunnels: Bandwidth limit"
+msgstr "Zavrnitev večine predorov: Omejitev pretočnosti"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:550
+msgid "Rejecting tunnels: Shutting down"
+msgstr "Zavrnitev predorov: Zaustavitev"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:563
+msgid "Rejecting tunnels"
+msgstr "Zavrnitev predorov"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:260
+msgid "Dropping tunnel requests: Too slow"
+msgstr "Spuščanje prošenj predorov: Preveč počasno"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:270
+msgid "Dropping tunnel requests: High job lag"
+msgstr "Spuščanje prošenj predorov: Visoki odzivni čas dela"
+
+#. don't even bother, since we are so overloaded locally
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:464
+msgid "Dropping tunnel requests: Overloaded"
+msgstr "Spuščanje prošenj predorov: Preobremenjeno"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:747
+msgid "Rejecting tunnels: Hidden mode"
+msgstr "Zavrnitev predorov: Skriti način"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:775
+msgid "Rejecting tunnels: Request overload"
+msgstr "Zavrnitev predorov: Preobremenitev prošenj"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:806
+msgid "Rejecting tunnels: Connection limit"
+msgstr "Zavrnitev predorov: Omejitev povezave"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1024
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1057
+msgid "Dropping tunnel requests: High load"
+msgstr "Spuščanje prošenj predorov: Visoko breme"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1140
+msgid "Dropping tunnel requests: Queue time"
+msgstr "Spuščanje prošenj predorov: Čas čakalnega reda"
