@@ -562,13 +562,23 @@ public class PluginStarter implements Runnable {
         if (log.shouldLog(Log.WARN))
             log.warn("Stopping plugin: " + appName);
 
-        // stop things in clients.config
-        File clientConfig = new File(pluginDir, "clients.config");
-        if (clientConfig.exists()) {
-            Properties props = new Properties();
-            DataHelper.loadProps(props, clientConfig);
-            List<ClientAppConfig> clients = ClientAppConfig.getClientApps(clientConfig);
-            runClientApps(ctx, pluginDir, clients, "stop");
+        ClientApp client = ctx.clientAppManager().getRegisteredApp(appName);
+        if (client != null) {
+            try{
+                client.shutdown(null);
+            }catch(Throwable t){
+                if (log.shouldLog(Log.ERROR))
+                    log.error("Error stopping client app: " + appName, t);
+            }
+        } else {
+            // stop things in clients.config
+            File clientConfig = new File(pluginDir, "clients.config");
+            if (clientConfig.exists()) {
+                Properties props = new Properties();
+                DataHelper.loadProps(props, clientConfig);
+                List<ClientAppConfig> clients = ClientAppConfig.getClientApps(clientConfig);
+                runClientApps(ctx, pluginDir, clients, "stop");
+            }
         }
 
         // stop console webapps in console/webapps
@@ -681,7 +691,7 @@ public class PluginStarter implements Runnable {
         File dir = I2PAppContext.getGlobalContext().getConfigDir();
         Properties rv = new Properties();
         File cfgFile = new File(dir, CONFIG_FILE);
-        
+
         try {
             DataHelper.loadProps(rv, cfgFile);
         } catch (IOException ioe) {}
@@ -792,7 +802,7 @@ public class PluginStarter implements Runnable {
      */
     private static void runClientApps(RouterContext ctx, File pluginDir, List<ClientAppConfig> apps, String action) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
-        
+
         // initialize pluginThreadGroup and _pendingPluginClients
         String pluginName = pluginDir.getName();
         if (!pluginThreadGroups.containsKey(pluginName))
@@ -800,7 +810,7 @@ public class PluginStarter implements Runnable {
         ThreadGroup pluginThreadGroup = pluginThreadGroups.get(pluginName);
         if (action.equals("start"))
             _pendingPluginClients.put(pluginName, new ConcurrentHashSet<SimpleTimer2.TimedEvent>());
-        
+
         for(ClientAppConfig app : apps) {
             // If the client is a running ClientApp that we want to stop,
             // bypass all the logic below.
@@ -903,7 +913,7 @@ public class PluginStarter implements Runnable {
                     // quick check
                     LoadClientAppsJob.testClient(app.className, cl);
                 } catch (ClassNotFoundException ex) {
-                    // Try again 1 or 2 seconds later. 
+                    // Try again 1 or 2 seconds later.
                     // This should be enough time. Although it is a lousy hack
                     // it should work for most cases.
                     // Perhaps it may be even better to delay a percentage
@@ -966,7 +976,7 @@ public class PluginStarter implements Runnable {
      */
     protected static boolean isPluginRunning(String pluginName, RouterContext ctx, Server s) {
         Log log = ctx.logManager().getLog(PluginStarter.class);
-        
+
         boolean isJobRunning = false;
         Collection<SimpleTimer2.TimedEvent> pending = _pendingPluginClients.get(pluginName);
         if (pending != null && !pending.isEmpty()) {
@@ -987,17 +997,35 @@ public class PluginStarter implements Runnable {
             }
         }
 
+        // load and check for ShellServices.
+        boolean isProcessRunning = false;
+        ClientApp client = ctx.clientAppManager().getRegisteredApp(pluginName);
+        if (client != null) {
+            if (log.shouldLog(Log.DEBUG))
+                log.debug("Checking state of client " + pluginName + client.getState());
+            if (client.getState() == ClientAppState.RUNNING) {
+                isProcessRunning = true;
+            }
+        } else {
+            if (log.shouldLog(Log.DEBUG))
+                log.debug("No client found for plugin " + pluginName);
+        }
+
         boolean isClientThreadRunning = isClientThreadRunning(pluginName, ctx);
         if (log.shouldLog(Log.DEBUG))
-            log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning + "; webapp running? " + isWarRunning + "; jobs running? " + isJobRunning);
-        return isClientThreadRunning || isWarRunning || isJobRunning;
+            log.debug("plugin name = <" + pluginName +
+            ">; threads running? " + isClientThreadRunning +
+            "; webapp running? " + isWarRunning +
+            "; jobs running? " + isJobRunning +
+            "; process running? " + isProcessRunning);
+        return isClientThreadRunning || isWarRunning || isJobRunning || isProcessRunning;
         //
         //if (log.shouldLog(Log.DEBUG))
         //    log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning(pluginName) + "; webapp running? " + WebAppStarter.isWebAppRunning(pluginName) + "; jobs running? " + isJobRunning);
         //return isClientThreadRunning(pluginName) || WebAppStarter.isWebAppRunning(pluginName) || isJobRunning;
         //
     }
-    
+
     /**
      * Returns <code>true</code> if one or more client threads are running in a given plugin.
      * @param pluginName
@@ -1008,7 +1036,7 @@ public class PluginStarter implements Runnable {
         if (group == null)
             return false;
         boolean rv = group.activeCount() > 0;
-        
+
         // Plugins start before the I2P Site, and will create the static Timer thread
         // in RolloverFileOutputStream, which never stops. Don't count it.
         // Ditto HSQLDB Timer (jwebcache)
@@ -1032,7 +1060,7 @@ public class PluginStarter implements Runnable {
 
         return rv;
     }
-    
+
     /**
      *  Perhaps there's an easy way to use Thread.setContextClassLoader()
      *  but I don't see how to make it magically get used for everything.
