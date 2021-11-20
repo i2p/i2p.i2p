@@ -39,6 +39,7 @@ User=i2psvc
 PermissionsStartOnly=true
 AppArmorProfile=system_i2p
 ExecStartPre=/bin/mkdir -p /tmp/i2p-daemon
+ExecStartPre=/bin/mkdir -p /var/log/i2p
 ExecStartPre=/bin/chown -R ${I2PUSER}:${I2PUSER} /var/log/i2p /run/i2p /tmp/i2p-daemon
 ExecStartPre=/bin/chmod 750 /var/log/i2p
 ExecStart=/usr/sbin/wrapper "$I2P_ARGS"

@@ -96,6 +96,7 @@ do_start()
         || return 1
     [ -d $RUN ] || mkdir $RUN > /dev/null 2>&1
     [ -d $I2PTEMP ] || mkdir $I2PTEMP > /dev/null 2>&1
+    [ -d "/var/log/$NAME" ] || mkdir "/var/log/$NAME" > /dev/null 2>&1
     if [ -r $PIDFILE ]; then
         PID="$(cat ${PIDFILE})"
         if ! kill -0 $PID > /dev/null 2>&1; then
