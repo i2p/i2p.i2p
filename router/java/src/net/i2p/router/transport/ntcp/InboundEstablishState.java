@@ -33,6 +33,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import static net.i2p.router.transport.ntcp.OutboundNTCP2State.*;
+import net.i2p.util.Addresses;
 import net.i2p.util.ByteArrayStream;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
@@ -181,8 +182,8 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         InetAddress addr = this._con.getChannel().socket().getInetAddress();
         byte[] ip = (addr == null) ? null : addr.getAddress();
         if (_context.banlist().isBanlistedForever(aliceHash)) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Dropping inbound connection from permanently banlisted peer: " + aliceHash);
+            if (_log.shouldWarn())
+                _log.warn("Dropping inbound connection from permanently banlisted peer at " + Addresses.toString(ip) + " : " + aliceHash);
             // So next time we will not accept the con from this IP,
             // rather than doing the whole handshake
             if(ip != null)

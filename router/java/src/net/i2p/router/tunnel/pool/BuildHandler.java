@@ -467,6 +467,13 @@ class BuildHandler implements Runnable {
         Hash from = state.fromHash;
         if (from == null && state.from != null)
             from = state.from.calculateHash();
+        if (from != null && _context.banlist().isBanlisted(from)) {
+            // Usually won't have connected, but may have been banlisted after connect
+            if (_log.shouldWarn())
+                _log.warn("Drop request, previous peer is banned: " + from);
+            _context.commSystem().mayDisconnect(from);
+            return -1;
+        }
 
         if (timeSinceReceived > (BuildRequestor.REQUEST_TIMEOUT*3)) {
             // don't even bother, since we are so overloaded locally
@@ -499,13 +506,15 @@ class BuildHandler implements Runnable {
             return -1;
         }
 
-        long beforeLookup = System.currentTimeMillis();
         Hash nextPeer = req.readNextIdentity();
-        long readPeerTime = System.currentTimeMillis()-beforeLookup;
+        if (_context.banlist().isBanlisted(nextPeer)) {
+            if (_log.shouldWarn())
+                _log.warn("Drop request, next peer is banned: " + nextPeer);
+            if (from != null)
+                _context.commSystem().mayDisconnect(from);
+            return -1;
+        }
         RouterInfo nextPeerInfo = _context.netDb().lookupRouterInfoLocally(nextPeer);
-        long lookupTime = System.currentTimeMillis()-beforeLookup;
-        if (lookupTime > 500 && _log.shouldLog(Log.WARN))
-            _log.warn("Took too long to lookup the request: " + lookupTime + "/" + readPeerTime + " for " + req);
         if (nextPeerInfo == null) {
             // limit concurrent next-hop lookups to prevent job queue overload attacks
             int numTunnels = _context.tunnelManager().getParticipatingCount();
@@ -549,7 +558,7 @@ class BuildHandler implements Runnable {
                            + " ID: " + state.msg.getUniqueId()
                            + " handled and we know the next peer " 
                            + nextPeer + " after " + handleTime
-                           + "/" + decryptTime + "/" + lookupTime + "/" + timeSinceReceived);
+                           + "/" + decryptTime + "/" + timeSinceReceived);
             return handleTime;
         }
     }

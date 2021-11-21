@@ -2,6 +2,7 @@ package net.i2p.router.tunnel.pool;
 
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 import net.i2p.util.ObjectCounter;
 import net.i2p.util.SimpleTimer;
 
@@ -15,6 +16,7 @@ import net.i2p.util.SimpleTimer;
 class RequestThrottler {
     private final RouterContext context;
     private final ObjectCounter<Hash> counter;
+    private final Log _log;
 
     /** portion of the tunnel lifetime */
     private static final int LIFETIME_PORTION = 6;
@@ -26,6 +28,7 @@ class RequestThrottler {
     RequestThrottler(RouterContext ctx) {
         this.context = ctx;
         this.counter = new ObjectCounter<Hash>();
+        _log = ctx.logManager().getLog(RequestThrottler.class);
         ctx.simpleTimer2().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
     }
 
@@ -33,12 +36,32 @@ class RequestThrottler {
     boolean shouldThrottle(Hash h) {
         int numTunnels = this.context.tunnelManager().getParticipatingCount();
         int limit = Math.max(MIN_LIMIT, Math.min(MAX_LIMIT, numTunnels * PERCENT_LIMIT / 100));
-        return this.counter.increment(h) > limit;
+        int count = counter.increment(h);
+        boolean rv = count > limit;
+        if (rv && count == 2 * limit) {
+            context.banlist().banlistRouter(h, "Excess tunnel requests", null, null, context.clock().now() + 30*60*1000);
+            // drop after any accepted tunnels have expired
+            context.simpleTimer2().addEvent(new Disconnector(h), 11*60*1000);
+            if (_log.shouldWarn())
+                _log.warn("Banning router for excess tunnel requests, limit: " + limit + " count: " + count + ' ' + h.toBase64());
+        }
+        return rv;
     }
 
     private class Cleaner implements SimpleTimer.TimedEvent {
         public void timeReached() {
             RequestThrottler.this.counter.clear();
+        }
+    }
+
+    /**
+     *  @since 0.9.52
+     */
+    private class Disconnector implements SimpleTimer.TimedEvent {
+        private final Hash h;
+        public Disconnector(Hash h) { this.h = h; }
+        public void timeReached() {
+            context.commSystem().forceDisconnect(h);
         }
     }
 }

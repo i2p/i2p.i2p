@@ -1,3 +1,10 @@
+2021-11-21 zzz
+ * Console: Drop peer when manually banned
+ * Tunnels:
+   - Ban peer on excessive build requests
+   - Drop requests if previous or next peer is banned
+ * Update: Drop peer when banlisted
+
 2021-11-12 zzz
  * Tunnels: Improve build success when at conn limits
 

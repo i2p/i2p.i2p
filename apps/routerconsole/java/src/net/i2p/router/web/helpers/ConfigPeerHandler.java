@@ -22,6 +22,7 @@ public class ConfigPeerHandler extends FormHandler {
             Hash h = getHash();
             if (h != null) {
                 _context.banlist().banlistRouterForever(h, _t("Manually banned via {0}"), "<a href=\"configpeer\">configpeer</a>");
+                _context.commSystem().forceDisconnect(h);
                 addFormNotice(_t("Peer") + " " + _peer + " " + _t("banned until restart") );
                 return;
             }
