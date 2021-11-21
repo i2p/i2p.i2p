@@ -379,7 +379,11 @@ class PluginUpdateRunner extends UpdateRunner {
                 f.delete();
                 to.delete();
                 FileUtil.rmdir(tempDir, false);
-                statusDone("<b>" + _t("Plugin from {0} is corrupt", url) + "</b>");
+                String msg = _t("Plugin from {0} is corrupt", url);
+                // too hard to figure out if it actually contains pack200 files, so just add a hint...
+                if (!FileUtil.isPack200Supported())
+                    msg += " (or requires Pack200 which is unsupported in this JVM)";
+                statusDone("<b>" + msg + "</b>");
                 return null;
             }
             File installProps = new File(tempDir, "plugin.config");
