@@ -1232,7 +1232,6 @@ div.messages li {
 div.widepanel h3 {
      text-align: left !important;
      padding: 8px 10px;
-
      font-size: 10.5pt;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
@@ -3550,13 +3549,13 @@ table#bandwidthconfig td:first-child {
 }
 
 #xhr.notification {
-    width: 22%;
-    position: absolute;
-    right: 5%;
-    top: 50%;
-    font-size: larger;
-    background: #000;
-    box-shadow: inset 0 0 0 1px #fff;
+     width: 20%;
+     position: absolute;
+     left: 40%;
+     top: 40%;
+     font-size: larger;
+     background: #000;
+     box-shadow: inset 0 0 0 1px #fff;
 	border: 1px solid #292929;
 	background: #1F1A24;
 	background: url(images/confirmed.png) no-repeat 12px center, right bottom no-repeat #1F1A24;
@@ -3566,17 +3565,18 @@ table#bandwidthconfig td:first-child {
 	box-shadow: inset 0 0 1px 0 #990 !important;
 	padding-top: 20px;
 	padding-bottom: 20px;
+     padding-left: 45px;
 }
 
 #xhr2.notification {
-    width: 22%;
-    position: absolute;
-    right: 5%;
-    top: 30%;
-    font-size: larger;
-    background: #000;
-    box-shadow: inset 0 0 0 1px #fff;
-	border: 1px solid #292929;
+     width: 20%;
+     position: absolute;
+     left: 40%;
+     top: 40%;
+     font-size: larger;
+     background: #000;
+     box-shadow: inset 0 0 0 1px #fff;
+     border: 1px solid #292929;
 	background: #1F1A24;
 	background: url(images/infohelp.png) no-repeat 12px center, right bottom no-repeat #1F1A24;
 	font-weight: bold;
@@ -3585,6 +3585,7 @@ table#bandwidthconfig td:first-child {
 	box-shadow: inset 0 0 1px 0 #990 !important;
 	padding-top: 20px;
 	padding-bottom: 20px;
+     padding-left: 45px;
 }
 
 #xhr2.notification:empty {
