@@ -867,22 +867,37 @@ class BuildHandler implements Runnable {
         // Check participating throttle counters for previous and next hops
         // This is at the end as it compares to a percentage of created tunnels.
         // We may need another counter above for requests.
-        if (response == 0 && !isInGW && _throttler != null) {
-            if (from != null && _throttler.shouldThrottle(from)) {
-                if (_log.shouldLog(Log.WARN))
+        if (response == 0 && !isInGW && _throttler != null && from != null) {
+            ParticipatingThrottler.Result result = _throttler.shouldThrottle(from);
+            if (result == ParticipatingThrottler.Result.DROP) {
+                if (_log.shouldWarn())
+                    _log.warn("Dropping request (hop throttle), previous hop: " + from + ": " + req);
+                _context.statManager().addRateData("tunnel.rejectHopThrottle", 1);
+                _context.commSystem().mayDisconnect(from);
+                 return;
+            }
+            if (result == ParticipatingThrottler.Result.REJECT) {
+                if (_log.shouldWarn())
                     _log.warn("Rejecting tunnel (hop throttle), previous hop: " + from + ": " + req);
-                // no setTunnelStatus() indication
                 _context.statManager().addRateData("tunnel.rejectHopThrottle", 1);
                 response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
             }
         }
-        if (response == 0 && (!isOutEnd) &&
-            _throttler != null && _throttler.shouldThrottle(nextPeer)) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Rejecting tunnel (hop throttle), next hop: " + req);
-            _context.statManager().addRateData("tunnel.rejectHopThrottle", 1);
-            // no setTunnelStatus() indication
-            response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
+        if (response == 0 && (!isOutEnd) && _throttler != null) {
+            ParticipatingThrottler.Result result = _throttler.shouldThrottle(nextPeer);
+            if (result == ParticipatingThrottler.Result.DROP) {
+                if (_log.shouldWarn())
+                    _log.warn("Dropping request (hop throttle), next hop: " + nextPeer + ": " + req);
+                _context.statManager().addRateData("tunnel.rejectHopThrottle", 1);
+                _context.commSystem().mayDisconnect(from);
+                 return;
+            }
+            if (result == ParticipatingThrottler.Result.REJECT) {
+                if (_log.shouldWarn())
+                    _log.warn("Rejecting tunnel (hop throttle), next hop: " + nextPeer + ": " + req);
+                _context.statManager().addRateData("tunnel.rejectHopThrottle", 1);
+                response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
+            }
         }
 
         HopConfig cfg = null;

@@ -1,0 +1,95 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH EEPGET 1 "January 26, 2017" "" I2P
+
+.SH NÉV
+Eepget \- I2P letöltő
+
+.SH ÖSSZEGZÉS
+\fBeepget\fP [\fIoptions\fP]\fIURL\fP
+.br
+
+.SH LEÍRÁS
+.P
+Beavatkozás nélkül HTTP\-n keresztül tölt le fájlokat. Mind I2P\-n keresztüli,
+mint normál Interneten keresztüli átvitel támogatott.
+.P
+Az Eepget meg tud birkózni lassú vagy instabil hálózati kapcsolatokkal; ha
+hálózati probléma miatt sikertelen a letöltés, addig fogja újrapróbálni,
+amíg leszed az egész fájlt (ha a \-n opció be van állítva). Ha a távoli
+szerver támogatja, eepget utasítani fogja a szervert, hogy folytassa a
+letöltést attól a ponttól, ahol megszakadt.
+
+.SH OPCIÓK
+\fB\-c\fP
+.TP 
+Tiszta hálózat. Ne használd proxyként. Ugyanaz, mint \fB\-p\fP :0 .
+.TP 
+
+\fB\-e\fP etag
+.TP 
+Beállítja az ecímke értéket a kérési fejlécekben.
+.TP 
+
+\fB\-h\fP name=value
+.TP 
+Tetszőleges kérési fejlécet ad hozzá a megadott névvel és értékkel.
+.TP 
+
+\fB\-l\fP lineLen
+.TP 
+A folyamatkijelzőt irányítja. \fB\ lineLen \fP egy folyamatsor hossza, karakterekben megadva. Alapértelmezésben 40.
+.TP 
+
+\fB\-m\fP markSize
+.TP 
+A folyamatkijelzőt irányítja. \fB\ markSize \fP a bájtok száma, melyet egy '#' karakter jelez. Alapértelmezésben 1024.
+.TP 
+
+\fB\-n\fP retries
+.TP 
+Megadja, hogy hányszor próbálja újra a letöltést, ha sikertelen. Ha nincs ez az opció megadva, eepget nem fogja újrapróbálni.
+.TP 
+
+\fB\-o\fP file
+.TP 
+Beállítja a kimeneti fájlt, mely írásra kerül. Ha nincs ez az opció megadva, a kimeneti fájlnevet az URL határozza meg.
+.TP 
+
+\fB\-p\fP proxy_host[:port]
+.TP 
+Megadja a használandó I2P proxy szervert. Ha nincs port megadva, eepget a 4444\-es portot fogja használni. Ha nincs ez az opció megadva, eepget a 127.0.0.1:444\-et fogja használni. Add meg ezt: \fB\-c\fP vagy ezt: \fB\-p\fP :0 az eeproxy kikapcsolásához.
+.TP 
+
+\fB\-t\fP seconds
+.TP 
+Beállítja a tétlenségi időkorlátot. Alapértelmezésben 60 másodperc.
+.TP 
+
+\fB\-u\fP username
+.TP 
+Beállítja az felhasználónevet proxy azonosításhoz, ha szükséges.
+.TP 
+
+\fB\-x\fP password
+.TP 
+Beállítja a jelszót a proxy azonosításhoz, ha szükséges. Ha felhasználónév meg van adva, de a jelszó nincs, EepGet kérni fogja a jelszót
+
+.SH "KILÉPÉSI ÁLLAPOT"
+
+\fBeepget\fP kilép 0 állapottal sikeres átvitel esetén és nem 0 állapottal, ha
+probléma volt a letöltéssel.
+
+.SH HIBAJELENTÉS
+Kérünk, adj le jelentést itt:
+.UR https://trac.i2p2.de/
+az I2P trac
+oldalon
+.UE .
+
+.SH "LÁSD MÉG"
+\fBi2prouter\fP(1)  \fBcurl\fP(1)  \fBwget\fP(1)
+

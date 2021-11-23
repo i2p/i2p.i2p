@@ -1,3 +1,8 @@
+2021-11-23 zzz
+ * Tunnels:
+   - Drop request if hop throttle exceeded by 50%
+   - Revert banning peer in throttles
+
 2021-11-21 zzz
  * Console: Drop peer when manually banned
  * Tunnels:
