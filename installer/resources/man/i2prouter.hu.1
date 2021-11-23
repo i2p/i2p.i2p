@@ -1,0 +1,58 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH I2PROUTER 1 "January 26, 2017" "" I2P
+
+.SH NÉV
+i2prouter \- az I2P router indítása és leállítása
+
+.SH ÖSSZEGZÉS
+\fBi2prouter\fP
+{\fIconsole\fP|\fIstart\fP|\fIstop\fP|\fIgraceful\fP|\fIrestart\fP|\fIcondrestart\fP|\fIstatus\fP|\fIdump\fP|\fIinstall\fP|\fIremove\fP}
+.br
+
+.SH LEÍRÁS
+Az I2P szolgáltatás irányítása.
+
+.IP \fBconsole\fP
+Parancssori alkalmazásként futtatja az I2P\-t a jelenlegi felhasználóként.
+
+.IP \fBstart\fP
+Elindítja az I2P szolgáltatást.
+
+.IP \fBstop\fP
+Leállítja az I2P szolgáltatást.
+
+.IP \fBrestart\fP
+Leállítja, azután elindítja az I2P szolgáltatást.
+
+.IP \fBcondrestart\fP
+Újraindítja az I2P szolgáltatást, de csak akkor, ha az már fut.
+
+.IP \fBgraceful\fP
+Óvatosan álltja le az I2P\-t (eltarthat akár 11 perig is)
+
+.IP \fBinstall\fP
+Initscript\-et telepít, ami automatikusan elindítja az I2P\-t
+rendszerindításkor.
+
+.IP \fBremove\fP
+Eltávolítja az initscript\-et, ami telepítésre került ezzel: \fBinstall\fP
+
+.IP \fBstatus\fP
+Kiadja, hogy az I2P szolgáltatás fut vagy sem.
+
+.IP \fBdump\fP
+Lerakja a jelenlegi szálakat ide: \fBwrapper.log\fP.
+
+.SH HIBAJELENTÉS
+Kérünk, adj le jelentést itt:
+.UR https://trac.i2p2.de/
+az I2P trac
+oldalon
+.UE .
+
+.SH "LÁSD MÉG"
+\fBi2prouter\-nowrapper\fP(1)

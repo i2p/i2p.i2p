@@ -575,6 +575,7 @@ trans.de = installer/resources/locale-man/man_de.po
 trans.es = installer/resources/locale-man/man_es.po
 trans.fi = installer/resources/locale-man/man_fi.po
 trans.fr = installer/resources/locale-man/man_fr.po
+trans.hu = installer/resources/locale-man/man_hu.po
 trans.id = installer/resources/locale-man/man_id.po
 trans.it = installer/resources/locale-man/man_it.po
 trans.ko = installer/resources/locale-man/man_ko.po
