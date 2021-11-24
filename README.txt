@@ -47,7 +47,8 @@ Need help?
 	IRC irc.freenode.net #i2p
 
 Bug reports:
-	https://trac.i2p2.de/report/1
+	https://i2pgit.org/i2p-hackers/i2p.i2p/-/issues
+	http://git.idk.i2p/i2p-hackers/i2p.i2p/-/issues
 
 Contact information, security issues, press inquiries:
 	https://geti2p.net/en/contact
