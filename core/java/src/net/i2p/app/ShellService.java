@@ -20,11 +20,6 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import java.lang.IllegalArgumentException;
-import java.lang.NullPointerException;
-import java.lang.IndexOutOfBoundsException;
-import java.lang.SecurityException;
-import java.lang.ProcessBuilder;
 import java.lang.reflect.Field;
 
 import java.nio.file.Files;
@@ -36,9 +31,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.i2p.I2PAppContext;
-import net.i2p.app.ClientApp;
-import net.i2p.app.ClientAppManager;
-import net.i2p.app.ClientAppState;
 import net.i2p.util.Log;
 import net.i2p.util.ShellCommand;
 import net.i2p.util.SystemVersion;
@@ -114,18 +106,19 @@ public class ShellService implements ClientApp {
     private String scriptArgs(String[] procArgs) {
         StringBuilder tidiedArgs = new StringBuilder();
         for (int i = 0; i < procArgs.length; i++) {
-            tidiedArgs.append(" \""+procArgs[i]+"\" ");
+            tidiedArgs.append(" \"").append(procArgs[i]).append("\" ");
         }
         return tidiedArgs.toString();
     }
 
     private String batchScript(String[] procArgs) {
-        String cmd = procArgs[0];
-        if(_log.shouldLog(Log.DEBUG))
+        if (_log.shouldLog(Log.DEBUG)) {
+            String cmd = procArgs[0];
             _log.debug("cmd: " + cmd);
-        String Script = "start \""+getName()+"\" "+scriptArgs(procArgs)+System.lineSeparator();
-        Script += "tasklist /V /FI \"WindowTitle eq "+getName()+"*\""+System.lineSeparator();
-        return Script;
+        }
+        String script = "start \""+getName()+"\" "+scriptArgs(procArgs)+System.lineSeparator() +
+                        "tasklist /V /FI \"WindowTitle eq "+getName()+"*\""+System.lineSeparator();
+        return script;
     }
 
     private String shellScript(String[] procArgs) {
@@ -162,9 +155,9 @@ public class ShellService implements ClientApp {
         try {
             script.createNewFile();
             scriptWriter = new FileWriter(script);
-            if (extension == ".bat" || extension == "")
+            if (extension.equals(".bat") || extension.equals(""))
                 scriptWriter.write(batchScript(procArgs));
-            if (extension == ".sh")
+            else if (extension.equals(".sh"))
                 scriptWriter.write(shellScript(procArgs));
             changeState(ClientAppState.INITIALIZED, "ShellService: "+getName()+" initialized");
         } catch (IOException ioe) {
@@ -249,8 +242,8 @@ public class ShellService implements ClientApp {
             _log.debug("Finding the PID of: " + getName());
         if (isProcessIdRunning(getPID())) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Read PID in from " + getPID().toString());
-            return Long.valueOf(getPID());
+                _log.debug("Read PID in from " + getPID());
+            return _pid;
         }
         BufferedInputStream bis = null;
         ByteArrayOutputStream buf = null;
@@ -260,19 +253,19 @@ public class ShellService implements ClientApp {
             if (_p == null) {
                 if (_log.shouldLog(Log.WARN)) {
                     _log.warn("Process is null, something is wrong");
-                    changeState(ClientAppState.CRASHED, "ShellService: "+getName()+" should be runnning but the process is null.");
-                    return -1;
                 }
+                changeState(ClientAppState.CRASHED, "ShellService: "+getName()+" should be runnning but the process is null.");
+                return -1;
             }
             bis = new BufferedInputStream(_p.getInputStream());
             buf = new ByteArrayOutputStream();
             for (int result = bis.read(); result != -1; result = bis.read()) {
-                buf.write((byte) result);
-                if (result == 10)
+                if (result == '\n')
                     break;
+                buf.write((byte) result);
             }
             String pidString = buf.toString("UTF-8").replaceAll("[\\r\\n\\t ]", "");
-            long pid = Long.valueOf(pidString);
+            long pid = _pid;
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Found " + getName() + "process with PID: " + pid);
             return pid;
@@ -324,7 +317,7 @@ public class ShellService implements ClientApp {
             }
         }
         if (getName() == null)
-            throw new IllegalArgumentException("ShellService: ShellService passed with args="+args+" must have a name");
+            throw new IllegalArgumentException("ShellService: ShellService passed with args=" + Arrays.toString(args) + " must have a name");
         if (getDisplayName() == null)
             displayName = name;
         String arr[] = new String[newargs.size()];
