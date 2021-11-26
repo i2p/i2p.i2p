@@ -18,8 +18,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-08-14 13:36+0000\n"
-"PO-Revision-Date: 2021-08-14 13:39+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2021-10-02 16:55+0000\n"
+"Last-Translator: Jonatan Nyberg <jonatan@autistici.org>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -172,12 +172,12 @@ msgstr "Mål ändrat för {0}."
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:313
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:322
 msgid "Warning - hostname does not end with \".i2p\""
-msgstr ""
+msgstr "Varning - värdnamnet slutar inte med \".i2p\""
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:320
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:334
 msgid "Invalid Base 32 hostname."
-msgstr ""
+msgstr "Ogiltigt Base 32-värdnamn."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:322
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:336
@@ -188,12 +188,12 @@ msgstr "Ogiltigt Base64 mål."
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:342
 #, java-format
 msgid "Invalid hostname \"{0}\"."
-msgstr ""
+msgstr "Ogiltigt värdnamn \"{0}\"."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:332
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:345
 msgid "Please enter a hostname and destination"
-msgstr ""
+msgstr "Ange ett värdnamn och en destination"
 
 #. clear search when deleting
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:336
@@ -249,7 +249,7 @@ msgstr "Adressbok sparad."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:369
 msgid "ERROR: Could not write address book file."
-msgstr ""
+msgstr "FEL: Det gick inte att skriva adressbokfilen."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:374
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:108
@@ -341,8 +341,8 @@ msgstr "Importerad från fil"
 #, java-format
 msgid "Loaded {0} entry from file"
 msgid_plural "Loaded {0} entries from file"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Läste in {0} post från filen"
+msgstr[1] "Läste in {0} poster från filen"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:599
 #, java-format
@@ -358,7 +358,7 @@ msgstr "Importen från filen misslyckades"
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:148
 msgid ""
 "Subscriptions saved, updating address book from subscription sources now."
-msgstr ""
+msgstr "Prenumerationer sparade, adressbok uppdateras från prenumerationskällor nu."
 
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:153
 msgid "Subscriptions saved."
@@ -464,7 +464,7 @@ msgstr "Webbplatser i den privata adressboken publiceras inte här."
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:272
 msgid "This is the Local Address Book."
-msgstr "Detta är den lokala adressboken."
+msgstr "Det här är den lokala adressboken."
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:275
 msgid "Use it for sites that you host on this computer."
@@ -521,7 +521,7 @@ msgstr "Mål"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:453
 msgid "Select hosts for deletion from address book"
-msgstr ""
+msgstr "Välj värdar för borttagning från adressboken"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:501
 msgid "View larger version of identicon for this hostname"
@@ -533,7 +533,7 @@ msgstr "Base32 adress"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:521
 msgid "Helper link to share host address with option to add to address book"
-msgstr ""
+msgstr "Hjälplänk för att dela värdadress med möjlighet att lägga till i adressbok"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:527
 msgid "More information on this entry"
@@ -555,7 +555,7 @@ msgstr "Avbryt"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:651
 msgid "This address book is empty."
-msgstr "Denna adressboken är tom."
+msgstr "Den här adressboken är tom."
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:671
 msgid "Add new destination"
@@ -645,7 +645,7 @@ msgstr "Din personliga adressbok, dessa värdar kommer att publiceras"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:263
 msgid "Your private address book, it is never published"
-msgstr ""
+msgstr "Din privata adressbok, den publiceras aldrig"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:265
 msgid "Port for your eepProxy (no need to change)"
@@ -771,7 +771,7 @@ msgstr "Adressboksapplikationen är en del av din I2P-installation."
 msgid ""
 "You can use it to connect human-readable names, like i2p-projekt.i2p, to I2P"
 " Destinations."
-msgstr ""
+msgstr "Du kan använda den för att ansluta läsbara namn för människor, som i2p-projekt.i2p, till I2P-destinationer."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:210
 msgid ""
@@ -789,7 +789,7 @@ msgstr "I den förvalda konfigurationen, är adressboken endast abonnerad till {
 msgid ""
 "Subscribing to additional sites is easy, just add them to your <a "
 "href=\"subscriptions\">subscriptions</a>."
-msgstr ""
+msgstr "Det är enkelt att prenumerera på ytterligare webbplatser, lägg bara till dem i dina <a href=\"subscriptions\">prenumerationer</a>."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:216
 msgid ""
@@ -799,37 +799,37 @@ msgstr "Mer information om namngivning i I2P finns i <a href=\"http://i2p-projek
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:218
 msgid "How to use the Address Book?"
-msgstr ""
+msgstr "Hur använder man adressboken?"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:220
 msgid ""
 "The I2P Address Book allows you to manage addresses by sorting them into "
 "categories."
-msgstr ""
+msgstr "I2P-adressboken låter dig hantera adresser genom att sortera dem i kategorier."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:222
 msgid ""
 "You may use these categories according to how you intend to use the address."
-msgstr ""
+msgstr "Du kan använda dessa kategorier enligt hur du tänker använda adressen."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:224
 msgid ""
 "Router: These addresses are added automatically, by your subscriptions. If "
 "you publish an address book, the router address book will be shared with "
 "other I2P users."
-msgstr ""
+msgstr "Router: Dessa adresser läggs till automatiskt av dina prenumerationer. Om du publicerar en adressbok delas routerns adressbok med andra I2P-användare."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:226
 msgid ""
 "Local: This is your personal address book, for hosts which you publish and "
 "share with others."
-msgstr ""
+msgstr "Lokal: Detta är din personliga adressbok för värdar som du publicerar och delar med andra."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:228
 msgid ""
 "Private: This address book if used for addresses which you do not want to "
 "share with other I2P users."
-msgstr ""
+msgstr "Privat: Den här adressboken används för adresser som du inte vill dela med andra I2P-användare."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:230
 msgid "How does the address book application work?"
@@ -883,7 +883,7 @@ msgstr "Prenumerationsfilen innehåller en lista över i2p-webbadresser."
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:232
 msgid ""
 "The address book application regularly checks this list for new I2P Sites."
-msgstr ""
+msgstr "Adressboksapplikationen kontrollerar regelbundet denna lista efter nya I2P-webbplatser."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:234
 msgid "Those URLs refer to published hosts.txt files."
@@ -911,7 +911,7 @@ msgid ""
 "If SusiDNS is configured to publish your Router address book, the entries "
 "will appear in your Published address book and saved to a hosts.txt file for"
 " sharing."
-msgstr ""
+msgstr "Om SusiDNS är konfigurerat för att publicera din adressbok i routern kommer posterna att visas i din publicerade adressbok och sparas i en hosts.txt-fil för delning."
 
 #: build/HowSVG.java:6
 msgid "Published Addressbook"
@@ -921,13 +921,13 @@ msgstr "Publicerad adressbok"
 msgid ""
 "To configure SusiDNS to push your Router address book to your Published "
 "address book, set 'should_publish=true' on the configuration page."
-msgstr ""
+msgstr "För att konfigurera SusiDNS för att överföra din adressbok till din publicerade adressbok ställer du in 'should_publish=true' på konfigurationssidan."
 
 #: build/HowSVG.java:8
 msgid ""
 "All hosts derived from subscriptions will appear in this address book, in "
 "addition to any you manually add here or to your Local address book."
-msgstr ""
+msgstr "Alla värdar som härrör från prenumerationer kommer att visas i den här adressboken, förutom alla du manuellt lägger till här eller i din lokala adressbok."
 
 #: build/HowSVG.java:9
 msgid "Router Addressbook"
@@ -937,7 +937,7 @@ msgstr "Routeradressbok"
 msgid ""
 "Hosts you manually add here will never be published. You can also add "
 "aliases to hosts in other address books here."
-msgstr ""
+msgstr "Värdar du lägger till manuellt här kommer aldrig att publiceras. Du kan också lägga till alias till värdar i andra adressböcker här."
 
 #: build/HowSVG.java:11
 msgid "Private Addressbook"
@@ -951,19 +951,19 @@ msgstr "Lokala poster"
 msgid ""
 "I2P applications (including the HTTP proxy) use the hosts in your local "
 "address books to resolve .i2p hostnames."
-msgstr ""
+msgstr "I2P-applikationer (inklusive HTTP-proxyn) använder värdarna i dina lokala adressböcker för att lösa .i2p-värdnamn."
 
 #: build/HowSVG.java:14
 msgid ""
 "Additional subscriptions can be found in the FAQ section of the Router help "
 "page."
-msgstr ""
+msgstr "Ytterligare prenumerationer kan hittas i avsnittet Vanliga frågor på routerns hjälpsida."
 
 #: build/HowSVG.java:16
 msgid ""
 "Hosts sourced from your subscriptions are added to your Router address book,"
 " and are automatically synced (by default every 12 hours)."
-msgstr ""
+msgstr "Värdar från dina prenumerationer läggs till i routerns adressbok och synkroniseras automatiskt (som standard var 12:e timme)."
 
 #: build/HowSVG.java:17
 msgid "Configure Subscriptions"
@@ -973,7 +973,7 @@ msgstr "Konfigurera prenumerationer"
 msgid ""
 "If you manually add hosts here, they will be included your Published address"
 " book (if configured)."
-msgstr ""
+msgstr "Om du manuellt lägger till värdar här kommer de att inkluderas i din publicerade adressbok (om den är konfigurerad)."
 
 #: build/HowSVG.java:19
 msgid "Local Addressbook"
@@ -991,11 +991,11 @@ msgstr "I2P-applikationer"
 msgid ""
 "The Local, Router and Private address books collectively serve as the DNS "
 "authority for I2P applications."
-msgstr ""
+msgstr "De lokala, router- och privata adressböckerna fungerar tillsammans som DNS-auktoritet för I2P-applikationer."
 
 #: build/HowSVG.java:23
 msgid "Optional,"
-msgstr ""
+msgstr "Frivillig,"
 
 #: build/HowSVG.java:24
 msgid "for websites"
@@ -1006,16 +1006,16 @@ msgid ""
 "If you configure SusiDNS to publish your Router address book, it will export"
 " a hosts.txt file containing all the hosts (by default to the root of your "
 "eepsite)."
-msgstr ""
+msgstr "Om du konfigurerar SusiDNS för att publicera din adressbok i routern exporterar den en hosts.txt-fil som innehåller alla värdar (som standard till roten på din eepsite)."
 
 #: build/HowSVG.java:26
 msgid ""
 "Addresses manually added to your Local address book will merge with your "
 "Router address book."
-msgstr ""
+msgstr "Adresser som läggs till manuellt i din lokala adressbok slås samman med routerns adressbok."
 
 #: build/HowSVG.java:27
 msgid ""
 "Hosts you receive from your subscriptions will merge with your Router "
 "address book."
-msgstr ""
+msgstr "Värdar du får från dina prenumerationer kommer att slås samman med din adressbok i routern."

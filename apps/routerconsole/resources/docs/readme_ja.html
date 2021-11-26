@@ -24,18 +24,20 @@ I2Pが「トンネルを拒否している」ような表示をするかもし�
 
 <ul class="links">
 <li>
-<b>Hidden Services and Public Web Browsing</b><br>
-On I2P you can access hidden service websites ("I2P sites") and other services, and you can host your own services.
-You can also access the normal web anonymously via I2P's built-in web proxy (outproxy).
-<a href="https://geti2p.net/en/about/browser-config" target="_blank">Configure your browser</a> to use the HTTP proxy at <code>127.0.0.1 port 4444</code>, then browse to an I2P Site or website at an <code>http://</code> or <code>https://</code> address.
-If you wish to disable or change outproxy access to the non-anonymous internet, remove or modify the outproxy entry for <code>false.i2p</code> under the <i>Outproxies</i> option in the <a href="/i2ptunnel/edit?tunnel=0" target="_blank">I2P HTTP Proxy Tunnel Editor</a>.
-In the "Sites of Interest" section <a href="#eepsites">below</a>, we list a few of the sites hosted on I2P.<br>
-There are also a number of semi-official and unofficial efforts to build browsing tools for I2P,
-including a <a href="https://geti2p.net/en/download/firefox">preconfigured Firefox Browser profile</a>,
-<a href="http://idk.i2p/I2P-in-Private-Browsing-Mode-Firefox">an easy-to-install WebExtension</a>,
-or via <a href="https://www.whonix.org/wiki/I2P">automatic launchers in privacy-focused Linux distributions like Whonix</a>.
-While these are all interesting projects, please evaluate them to see if they fit within your personal threat
-model before trusting them with your well-being.</li>
+<b>秘匿サービスと公開Web閲覧</b><br>
+I2Pでは秘匿サービスWebサイト（「I2Pサイト」）や他サービスにアクセスでき、また自分のサービスを提供することができます。
+また通常のWebにもI2P組み込みのWebプロキシ（アウトプロキシ）経由で匿名でアクセスできます。
+HTTPプロキシを<code>127.0.0.1 ポート4444</code>を使うよう<a href="https://geti2p.net/en/about/browser-config" target="_blank">ブラウザを設定</a>し、それからI2Pサイトや<code>http://</code>または<code>https://</code>アドレスのWebサイトを閲覧してください。
+アウトプロキシアクセスを非匿名インターネットに無効化または変更したい場合は、
+<a href="/i2ptunnel/edit?tunnel=0" target="_blank">I2P HTTP プロキシトンネルエディタ</a> の <i>アウトプロキシ</i>オプション下の
+<code>false.i2p</code>用のアウトプロキシ項目を削除または編集してください。
+<a href="#eepsites">下記</a>「興味深いI2Pの秘匿サービス」の章で、I2Pで提供されているサイトをいくつかまとめています。<br>
+また、半公式または非公式的にたくさんのI2P閲覧ツール作成が試みられています。
+例えば、<a href="https://geti2p.net/en/download/firefox">設定済みFirefoxブラウザプロファイル</a>、
+<a href="http://idk.i2p/I2P-in-Private-Browsing-Mode-Firefox">簡単にインストールできるブラウザ拡張機能</a>、
+<a href="https://www.whonix.org/wiki/I2P">Whonixのようなプライバシー重視のLinuxディストリビューションでの自動ランチャー</a>など。
+これらはどれも興味深いプロジェクトですが、
+あなた個人の脅威モデルに合うかどうかを評価してから万全の信頼をするようにしてください。</li>
 
 <li>
 <b>匿名メール</b><br>
@@ -45,14 +47,16 @@ PostmanによるI2P用メールシステムが、<a href="/webmail">I2P組み込
 <li>
 <b>匿名ファイル送信</b><br><a href="/torrents">I2PSnark</a> はI2Pに統合されており、匿名の暗号化されたBitTorrent送信を提供します。</li>
 <li>
-<b>Anonymous Chat</b><br>
-Start your IRC client (e.g. HexChat) and connect to the <a href="irc://127.0.0.1:6668/i2p">server</a> at <code>127.0.0.1 port 6668</code>.
-You do not need to configure a proxy in your IRC client; I2P provides you with a local IRC tunnel (configured in your IRC client as an IRC server or remote host).
-Your local I2P IRC tunnel on <code>localhost:6668</code> will direct you to one of three IRC servers hosted on I2P by Postman, echelon and zl0, but neither you nor they know where the other is, and your communcations are encrypted in transit by I2P to prevent interception.
-Once you're there, <code>#i2p-chat</code> and <code>#i2p-dev</code> are just a few of the available channels you may wish to join.
-I2P is also suitable for unmonitorable and uncensorable anonymous chat, as well as alternative IRC servers, Jabber servers, website-based chat, and more.
-You may run your own servers over I2P in whatever flavor you choose, or if you're a developer write your own <a href="http://i2p-projekt.i2p/applications.html" target="_blank">I2P applications</a>.
-Both UDP and TCP protocols are <a href="http://i2p-projekt.i2p/techintro.html#op.transport" target="_blank">supported</a>.</li>
+<b>匿名チャット</b><br>
+IRCクライアント（例えば HexChat）を起動して<code> 127.0.0.1 ポート6668</code> の<a href="irc://127.0.0.1:6668/i2p">サーバ</a>に接続してください。
+IRCクライアントにプロキシを設定する必要はありません； I2PがローカルIRCトンネルを提供します（IRCクライアントでIRCサーバまたはリモートホストとして設定される）。
+<code>localhost:6668</code> のローカルI2P IRCトンネルは、Postman・Echlon・zl0がI2P上で提供する3つのIRCサーバのうち1つへ案内します。
+しかしあなたと彼らはどちらも誰がどこにいるのか知りませんし、
+やり取りは傍受防止のためI2Pによる輸送の中で暗号化されます。
+ここまでくれば、<code>#i2p-chat</code> と <code>#i2p-dev</code> はあなたが参加したいと思うような利用可能チャンネルのほんの一部にすぎません。
+またI2Pは監視不能・検閲不能な匿名チャットに向いています。代替IRCサーバ、Jabberサーバ、Webサイトベースのチャットなどにもいいでしょう。
+I2P上にあなたの好きなタイプの自サーバを立てたり、開発者であれば自分の<a href="http://i2p-projekt.i2p/applications.html" target="_blank">I2Pアプリ</a>を作るのもよいでしょう。
+UDPとTCPプロトコルの両方が<a href="http://i2p-projekt.i2p/techintro.html#op.transport" target="_blank">サポート</a>されています。</li>
 
 <li>
 <b>フォーラムとブログ</b><br>
@@ -66,7 +70,7 @@ Both UDP and TCP protocols are <a href="http://i2p-projekt.i2p/techintro.html#op
 プラグインをインストールしてI2Pの有用性を拡張してください：
 ブログ、チャット、ファイル共有などのプラグインが既に作成・移植され、あなたの<a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target="_blank">インストール</a>を待ち構えています！
 プラグインや関連情報を <a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target="_blank">wiki.i2p-projekt.i2p</a> で閲覧してください。
-<a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target="_blank">開発者</a>であれば、オリジナルのプラグインを書くための完結したフレームワークが<a href="http://i2p-projekt.i2p/plugins.html" target="_blank">ドキュメント</a>と共に提供されています。</li>
+<a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target="_blank">開発者</a>であれば、オリジナルのプラグインを書くための完結したフレームワークが<a href="http://i2p-projekt.i2p/plugins.html" target="_blank">文書</a>と共に提供されています。</li>
 
 </ul>
 <h3>I2Pにおける匿名の暗号化されたウェブホスティング</h3>
@@ -108,8 +112,7 @@ Webサイトの開始、.i2pドメインの登録、サイトの宣伝につい�
 <b>I2P ネットワークの状態</b><br><a href="http://stats.i2p/cgi-bin/dashboard.cgi" target="_blank">stats.i2p</a>: zzzが運営する、I2Pネットワークの監視サイトです。ネットワークパフォーマンスの様々な側面をチェックできます。</li>
 
 <li>
-<b>I2P Bug Tracker - GitLab</b><br><a href="http://git.idk.i2p/" target="_blank">git.idk.i2p</a>: I2P's issue reporting and bug-tracking system. Please visit if you have an issue to report, also available at <a href="https://i2pgit.org/" target="_blank">https://i2pgit.org/</a>
-</li>
+<b>I2P バグトラッカ - GitLab</b><br><a href="http://git.idk.i2p/" target="_blank">git.idk.i2p</a>: I2Pの問題報告およびバグトラッキングシステムです。もし報告したい問題があれば訪ねてください。また、 <a href="https://i2pgit.org/" target="_blank">https://i2pgit.org/</a>でもアクセス可能です。</li>
 
 <li>
 <b>ディスカバー I2P</b><br>
@@ -160,9 +163,9 @@ Webサイトが全く（<a href="http://i2p-projekt.i2p/" target="_blank">i2p-pr
 Java が最新であることを確かめてください。
 <a href="/logs">ログページ</a>先頭のJavaバージョンを確認してください。</li>
 <li>
-<b>Problems running on Legacy Hardware</b><br>
-[Linux/BSD] If you can't start the router with <code>i2p/i2prouter start</code> try the <code>runplain.sh</code> script in the same directory.
-Root privileges are never required to run I2P.</li>
+<b>古いハードウェア上で起動時に問題</b><br>
+[Linux/BSD] <code>i2p/i2prouter start</code>でルータが起動できない場合、同じディレクトリ内の<code>runplain.sh</code>スクリプトをお試しください。
+I2Pを起動するのにroot権限は必要ありません。</li>
 <li>
 <b>Universal Plug and Play（UPnP）の有効化</b><br>
 あなたのモデムまたはルータはおそらく自動ポートフォワーディングのためのUPnPをサポートしています。
@@ -184,10 +187,10 @@ I2P内部のIRCネットワーク - Irc2P 上の<a href="irc://127.0.0.1:6668/i2
 これらのチャンネルはI2Pの暗号化・匿名ネットワークの外側でも <a href="irc://irc.freenode.net/i2p">Freenode IRC</a>経由で利用可能です。</li>
 
 <li>
-<b>Reporting Bugs</b><br>
-To report a bug, please file a ticket on <a href="http://git.idk.i2p/" target="_blank">git.idk.i2p</a> or, over clearnet, <a href="https://i2pgit.org/" target="_blank">https://i2pgit.org/</a>.
-For developer-related discussions, please visit <a href="http://zzz.i2p/" target="_blank">zzz's developer forums</a> or come and visit the <a href="irc://127.0.0.1:6668/i2p-dev">developer channel</a> on I2P's IRC network.
-Developers can browse source at <a href="http://git.idk.i2p/i2p-hackers/i2p.i2p" target="_blank">git.idk.i2p</a>.</li>
+<b>バグ報告</b><br>
+バグを報告するには、 <a href="http://git.idk.i2p/" target="_blank">git.idk.i2p</a> または、クリアネットから <a href="https://i2pgit.org/" target="_blank">https://i2pgit.org/</a> で、チケットを提出してください。
+開発者関連の議論のために、<a href="http://zzz.i2p/" target="_blank">zzzの開発者フォーラム</a>を訪れてください。もしくは、I2PのIRCネットワーク上の<a href="irc://127.0.0.1:6668/i2p-dev">開発者チャンネル</a>に遊びに来てください。
+開発者は<a href="http://git.idk.i2p/i2p-hackers/i2p.i2p" target="_blank">git.idk.i2p</a>でソースを閲覧できます。</li>
 <li>
 <b>参加しよう！</b><br>
 I2Pは主にコミュニティメンバーの無償で自発的な参加によって開発され維持されています。

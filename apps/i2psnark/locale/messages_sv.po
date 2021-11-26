@@ -13,7 +13,7 @@
 # hottuna <i2p@robertfoss.se>, 2011
 # hottuna <i2p@robertfoss.se>, 2013
 # hottuna <i2p@robertfoss.se>, 2011-2012
-# efef6ec5b435a041fce803c7f8af77d2_2341d43, 2017
+# Jonatan Nyberg <jonatan@autistici.org>, 2017,2021
 # Jonatan Nyberg <jonatan@autistici.org>, 2018-2021
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2017-2018
 # Martin Svensson <digitalmannen@gmail.com>, 2011-2012
@@ -24,7 +24,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:30+0000\n"
-"PO-Revision-Date: 2021-04-27 19:05+0000\n"
+"PO-Revision-Date: 2021-10-15 08:07+0000\n"
 "Last-Translator: Jonatan Nyberg <jonatan@autistici.org>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
@@ -492,7 +492,7 @@ msgstr "Fel på torrent {0}"
 #: ../java/src/org/klomp/snark/SnarkManager.java:2933
 #: ../java/src/org/klomp/snark/web/FetchAndAdd.java:130
 msgid "Opening the I2P tunnel"
-msgstr "Öppnar I2P tunneln"
+msgstr "Öppnar I2P-tunneln"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:2953
 msgid "Opening the I2P tunnel and starting all torrents."
@@ -504,7 +504,7 @@ msgstr "Stoppar alla torrenter och stänger I2P-tunneln."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:3045
 msgid "Closing I2P tunnel after notifying trackers."
-msgstr "Stänger I2P tunnel efter att ha meddelat bevakare."
+msgstr "Stänger I2P-tunnel efter att ha meddelat bevakare."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:3115
 #, java-format
@@ -602,7 +602,7 @@ msgstr "Är du säker på att du vill radera filen  \\''{0}\\' (hämtade data ko
 msgid ""
 "Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded "
 "data?"
-msgstr "Är du säker på att du vill ta bort torrenten \"{0}\" och all hämtad data?"
+msgstr "Är du säker på att du vill ta bort torrenten \"{0}\" och alla hämtade data?"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:349
 msgid "Torrents"
@@ -610,7 +610,7 @@ msgstr "Torrenter"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:358
 msgid "Refresh page"
-msgstr "Läs om sida"
+msgstr "Uppdatera sidan"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:379
 msgid "Click \"Add torrent\" button to fetch torrent"
@@ -618,7 +618,7 @@ msgstr "Klicka på \"Lägg till torrent\" för att hämta en torrent"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:443
 msgid "clear messages"
-msgstr "rensa meddelandena"
+msgstr "rensa meddelanden"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:500
 msgid "Status"
@@ -678,7 +678,7 @@ msgstr "RX"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:598
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:599
 msgid "Downloaded"
-msgstr "Hämtade"
+msgstr "Hämtat"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:598
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3321
@@ -744,7 +744,7 @@ msgstr "Starta alla torrenter och I2P-tunneln"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:738
 msgid "No torrents loaded."
-msgstr "Inga torrenter lästes in."
+msgstr "Inga torrenter inlästa."
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:746
 msgid "Totals"
@@ -863,12 +863,12 @@ msgstr "Datafil kunde inte tas bort: {0}"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1278
 #, java-format
 msgid "Directory could not be deleted: {0}"
-msgstr "Katalogen kunde inta tas bort: {0}"
+msgstr "Mappen kunde inta tas bort: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1286
 #, java-format
 msgid "Directory deleted: {0}"
-msgstr "Katalogen bort tagen: {0}"
+msgstr "Mappen bort tagen: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1350
 #, java-format
@@ -932,7 +932,7 @@ msgstr "Ta bort valda"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1486
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2789
 msgid "Save tracker configuration"
-msgstr "Spara bevakare konfiguration"
+msgstr "Spara bevakarkonfiguration"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1503
 msgid "Removed"
@@ -1124,7 +1124,7 @@ msgstr "Ta bort"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1973
 msgid "Delete the .torrent file and the associated data files"
-msgstr ""
+msgstr "Ta bort .torrent-filen och tillhörande datafiler"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1977
 msgid "Delete"
@@ -1165,7 +1165,7 @@ msgstr "Stryper (vi låter inte nod be om delar)"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2207
 #, java-format
 msgid "Details at {0} tracker"
-msgstr "Detaljer för {0} bevakare"
+msgstr "Detaljer för {0}-bevakare"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2224
 msgid "Info"
@@ -1182,7 +1182,7 @@ msgstr "Adress"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2310
 msgid ""
 "Enter the torrent file download URL (I2P only), magnet link, or info hash"
-msgstr ""
+msgstr "Ange webbadress för hämtning av torrentfiler (endast I2P), magnetlänk eller infohash"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2315
 msgid "Add torrent"
@@ -1190,7 +1190,7 @@ msgstr "Lägg till torrent"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2319
 msgid "Data dir"
-msgstr "Datakatalog"
+msgstr "Datamapp"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2322
 #, java-format
@@ -1219,7 +1219,7 @@ msgstr "Data att ladda upp"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2348
 #, java-format
 msgid "File or directory to seed (full path or within the directory {0} )"
-msgstr "Fil eller katalog att seeda (fullständig sökväg eller inom katalog {0})"
+msgstr "Fil eller mapp att distribuera (fullständig sökväg eller inom mapp {0})"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2351
 msgid "Create torrent"
@@ -1268,11 +1268,11 @@ msgstr "Datamapp"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2438
 msgid "Directory where torrents and downloaded/shared files are stored"
-msgstr "Katalog var torrenter och hämtade/delade filer lagras"
+msgstr "Mapp var torrenter och hämtade/delade filer lagras"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2443
 msgid "Files readable by all"
-msgstr "Filer läsbara för alla"
+msgstr "Filer läsbara av alla"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2447
 msgid ""
@@ -1492,7 +1492,7 @@ msgstr "Lägg till"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2824
 #, java-format
 msgid "Invalid magnet URL {0}"
-msgstr "Ogiltig magnet-adress {0}"
+msgstr "Ogiltig magnetwebbadress {0}"
 
 #. * dummies for translation
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2832
@@ -1555,7 +1555,7 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3284
 msgid "Magnet link"
-msgstr "Magnet länk"
+msgstr "Magnetlänk"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3299
 msgid "Private torrent"
@@ -1588,7 +1588,7 @@ msgstr "Delstorlek"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3388
 msgid "Refresh page for results"
-msgstr "Ladda om sidan för resultat"
+msgstr "Uppdatera sidan för resultat"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3400
 msgid "Force Recheck"

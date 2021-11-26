@@ -18,7 +18,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
-"PO-Revision-Date: 2021-06-23 09:38+0000\n"
+"PO-Revision-Date: 2021-10-02 15:40+0000\n"
 "Last-Translator: Jonatan Nyberg <jonatan@autistici.org>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
@@ -116,7 +116,7 @@ msgstr "Webbplatsen var inte nåbar."
 msgid ""
 "The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr "Webbplatsen är frånkopplad, nätverket är under stor belastning eller så är din router inte välintegrerad med noder."
+msgstr "Webbplatsen är frånkopplad, nätverket är under stor belastning, eller din router är ännu inte välintegrerad med noder."
 
 #: ../java/build/Proxy.java:14 ../java/build/Proxy.java:58
 #: ../java/build/Proxy.java:109 ../java/build/Proxy.java:129
@@ -130,7 +130,7 @@ msgstr "Du kanske vill {0}försöka igen{1}."
 #: ../java/build/Proxy.java:118 ../java/build/Proxy.java:130
 #: ../java/build/Proxy.java:171 ../java/build/Proxy.java:196
 msgid "Could not find the following destination:"
-msgstr "Kunde inte hitta följande mål:"
+msgstr "Det gick inte att hitta följande destination:"
 
 #: ../java/build/Proxy.java:16 ../java/build/Proxy.java:22
 #: ../java/build/Proxy.java:160 ../java/build/Proxy.java:166

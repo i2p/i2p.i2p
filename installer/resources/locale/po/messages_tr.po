@@ -4,13 +4,13 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2013,2018-2020
+# Kaya Zeren <kayazeren@gmail.com>, 2013,2018-2021
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-10-06 13:42+0000\n"
-"PO-Revision-Date: 2020-11-19 00:42+0000\n"
+"PO-Revision-Date: 2021-08-22 08:21+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -191,7 +191,7 @@ msgstr "i2prouter dosyasını düzenleyin ve RUN_AS_USER değişkenini ayarlayı
 
 #: ../i2prouter:1879
 msgid "Running I2P as the root user is *not* recommended."
-msgstr "I2P yazılımının root olarak çalıştırmanız *önerilmez*."
+msgstr "I2P uygulamasını root olarak çalıştırmanız *önerilmez*."
 
 #: ../i2prouter:1882
 msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."

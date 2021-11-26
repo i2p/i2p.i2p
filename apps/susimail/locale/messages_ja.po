@@ -14,7 +14,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
-"PO-Revision-Date: 2021-04-09 08:17+0000\n"
+"PO-Revision-Date: 2021-10-14 06:00+0000\n"
 "Last-Translator: XMPPはいいぞ\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
@@ -390,7 +390,7 @@ msgstr "添付ファイル"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3083
 msgid "Delete selected attachments"
-msgstr "指定された添付ファイルを削除する"
+msgstr "選択した添付ファイルを削除する"
 
 #. boolean fixed = Boolean.parseBoolean(Config.getProperty(
 #. CONFIG_PORTS_FIXED, "true" ));
@@ -432,7 +432,7 @@ msgstr "I2P メールについて知る"
 #: src/src/i2p/susi/webmail/WebMail.java:3139
 #: src/src/i2p/susi/webmail/WebMail.java:3409
 msgid "New"
-msgstr "新着"
+msgstr "新規"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3149
 msgid "Check Mail"
@@ -482,7 +482,7 @@ msgstr "はい、本当に削除します！"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3284
 msgid "Delete Selected"
-msgstr "マークされたメッセージを削除しました"
+msgstr "選択したものを削除"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3286
 msgid "Mark All"
@@ -499,7 +499,7 @@ msgstr "フォルダー"
 #. TODO css to center it
 #: src/src/i2p/susi/webmail/WebMail.java:3314
 msgid "Change to Folder"
-msgstr ""
+msgstr "フォルダーへ変更"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3320
 msgid "First"

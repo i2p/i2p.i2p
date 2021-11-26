@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-05 15:14+0000\n"
-"PO-Revision-Date: 2021-11-10 12:27+0000\n"
+"PO-Revision-Date: 2021-11-17 23:12+0000\n"
 "Last-Translator: Žan Šadl-Ferš\n"
 "Language-Team: Slovenian (http://www.transifex.com/otf/I2P/language/sl/)\n"
 "MIME-Version: 1.0\n"
@@ -27,13 +27,13 @@ msgstr "Dobrodošli v I2P-ju!"
 
 #, java-format
 msgid "Please {0}have patience{1} as I2P boots up and finds peers."
-msgstr ""
+msgstr "Prosim {0}imejte potrpljenje{1} medtem, ko se I2P zaganja in išče druge uporabnike."
 
 #, java-format
 msgid ""
 "While you are waiting, please {0}adjust your bandwidth settings{1} on the "
 "{2}configuration page{3}."
-msgstr ""
+msgstr "Medtem ko čakate, prosim {0}prilagodite si svoje nastavitve pretočnosti{1} na {2}konfiguracijski strani{3}."
 
 msgid ""
 "Also you can setup your browser to use the I2P proxy to reach eepsites."
@@ -42,21 +42,21 @@ msgstr "Vi si lahko tudi nastavite vaš brskalnik, da uporablja I2P namestnika z
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
 "browser settings."
-msgstr ""
+msgstr "Samo vnestite 127.0.0.1 (ali localhost) z omrežnimi vrati 4444 kot HTTP posrednika v nastavitve vašega brskalnika."
 
 msgid "Do not use SOCKS for this."
-msgstr "Za to ne uporabljajte SOCKS."
+msgstr "Za to ne uporabite SOCKS."
 
 #, java-format
 msgid ""
 "More information can be found on the {0}I2P browser proxy setup page{1}."
-msgstr ""
+msgstr "Več podatkov lahko najdete na {0}I2P strani za nastavitev posrednika brskalniku{1}."
 
 #, java-format
 msgid ""
 "Once you have a \"shared clients\" destination listed on the left, please "
 "{0}check out{1} our {2}FAQ{3}."
-msgstr ""
+msgstr "Ko imate clij \"deljenega odjemalca\" prikazan na levi, prosim {0}poglejte si{1} naša {2}pogostokrat vprašana vprašanja{3}."
 
 #, java-format
 msgid ""
