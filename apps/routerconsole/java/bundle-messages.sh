@@ -115,9 +115,11 @@ do
 			RC=1
 			break
 		fi
-		rm -f ${i}t
-		# so we don't do this again
-		touch $i
+		# the string with '75%' causes it to add a java-printf-format directive,
+		# and then the testscript fails if the translated
+		# string doesn't have a '%' in it; strip out the directive
+		grep -v java-printf-format $i > ${i}t
+		mv ${i}t ${i}
 	fi
 
     if [ "$LG" != "en" ]
