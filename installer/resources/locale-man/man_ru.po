@@ -18,14 +18,14 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
-"POT-Creation-Date: 2017-01-26 15:24+0000\n"
-"PO-Revision-Date: 2017-01-26 15:31+0000\n"
+"POT-Creation-Date: 2021-11-27 13:31-0000\n"
 "Last-Translator: Irina Fedulova <istartlin@gmail.com>, 2020\n"
 "Language-Team: Russian (Russia) (https://www.transifex.com/otf/teams/12694/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru_RU\n"
+"POT-Revision-Date: 2021-11-27 13:31-0000\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #. type: TH
@@ -255,13 +255,13 @@ msgstr ""
 "пользователя задано, а пароль - нет, EepGet будет запрашивать пароль."
 
 #. type: SH
-#: man/eepget.1:89
+#: man/eepget.1:88
 #, no-wrap
 msgid "EXIT STATUS"
 msgstr "СТАТУС ВЫХОДА"
 
 #. type: Plain text
-#: man/eepget.1:93
+#: man/eepget.1:92
 msgid ""
 "B<eepget> exits with status zero upon successful transfer and non-zero if "
 "there were problems with the download."
@@ -270,28 +270,26 @@ msgstr ""
 "если были проблемы с загрузкой."
 
 #. type: SH
-#: man/eepget.1:94 man/i2prouter.1:54 man/i2prouter-nowrapper.1:24
+#: man/eepget.1:93 man/i2prouter.1:54 man/i2prouter-nowrapper.1:24
 #, no-wrap
 msgid "REPORTING BUGS"
 msgstr "СООБЩИТЬ ОБ ОШИБКАХ"
 
 #. type: Plain text
-#: man/eepget.1:99 man/i2prouter.1:59 man/i2prouter-nowrapper.1:29
+#: man/eepget.1:98 man/i2prouter.1:59 man/i2prouter-nowrapper.1:29
 msgid ""
-"Please enter a ticket on E<.UR https://trac.i2p2.de/> the I2P trac page "
-"E<.UE .>"
+"Please enter an issue on E<.UR https://i2pgit.org/i2p-"
+"hackers/i2p.i2p/-/issues> the I2P GitLab server E<.UE .>"
 msgstr ""
-"Пожалуйста, заведите тикет на E<.UR https://trac.i2p2.de/> странице трекера "
-"I2P E<.UE .>."
 
 #. type: SH
-#: man/eepget.1:100 man/i2prouter.1:60 man/i2prouter-nowrapper.1:30
+#: man/eepget.1:99 man/i2prouter.1:60 man/i2prouter-nowrapper.1:30
 #, no-wrap
 msgid "SEE ALSO"
 msgstr "СМ. ТАКЖЕ"
 
 #. type: Plain text
-#: man/eepget.1:104
+#: man/eepget.1:103
 msgid "B<i2prouter>(1)  B<curl>(1)  B<wget>(1)"
 msgstr "B<i2prouter>(1)  B<curl>(1)  B<wget>(1)"
 

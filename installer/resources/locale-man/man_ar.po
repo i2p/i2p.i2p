@@ -8,17 +8,18 @@
 # Mohammed ALDOUB <voulnet@gmail.com>, 2017
 # Tashigi OP, 2018
 # zzzi2p, 2018
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
-"POT-Creation-Date: 2017-01-26 15:24+0000\n"
-"PO-Revision-Date: 2017-01-26 15:24+0000\n"
+"POT-Creation-Date: 2021-11-27 13:31-0000\n"
 "Last-Translator: zzzi2p, 2018\n"
 "Language-Team: Arabic (https://www.transifex.com/otf/teams/12694/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ar\n"
+"POT-Revision-Date: 2021-11-27 13:31-0000\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #. type: TH
@@ -245,13 +246,13 @@ msgstr ""
 "وليس كلمة السّرّ، فسيقوم EepGet فوريًا بطلب كلمة السّرّ."
 
 #. type: SH
-#: man/eepget.1:89
+#: man/eepget.1:88
 #, no-wrap
 msgid "EXIT STATUS"
 msgstr "الخروج من الحالة"
 
 #. type: Plain text
-#: man/eepget.1:93
+#: man/eepget.1:92
 msgid ""
 "B<eepget> exits with status zero upon successful transfer and non-zero if "
 "there were problems with the download."
@@ -260,28 +261,26 @@ msgstr ""
 "مشاكل في التّنزيل."
 
 #. type: SH
-#: man/eepget.1:94 man/i2prouter.1:54 man/i2prouter-nowrapper.1:24
+#: man/eepget.1:93 man/i2prouter.1:54 man/i2prouter-nowrapper.1:24
 #, no-wrap
 msgid "REPORTING BUGS"
 msgstr "اﻹبلاغ عن اﻷخطاء"
 
 #. type: Plain text
-#: man/eepget.1:99 man/i2prouter.1:59 man/i2prouter-nowrapper.1:29
+#: man/eepget.1:98 man/i2prouter.1:59 man/i2prouter-nowrapper.1:29
 msgid ""
-"Please enter a ticket on E<.UR https://trac.i2p2.de/> the I2P trac page "
-"E<.UE .>"
+"Please enter an issue on E<.UR https://i2pgit.org/i2p-"
+"hackers/i2p.i2p/-/issues> the I2P GitLab server E<.UE .>"
 msgstr ""
-"الرجاء إدخال تذكرة على E<.UR https://trac.i2p2.de/> صفحة I2P لمتابعة المشاكل"
-" E<.UE .>"
 
 #. type: SH
-#: man/eepget.1:100 man/i2prouter.1:60 man/i2prouter-nowrapper.1:30
+#: man/eepget.1:99 man/i2prouter.1:60 man/i2prouter-nowrapper.1:30
 #, no-wrap
 msgid "SEE ALSO"
 msgstr "انظر أيضًا إلى"
 
 #. type: Plain text
-#: man/eepget.1:104
+#: man/eepget.1:103
 msgid "B<i2prouter>(1)  B<curl>(1)  B<wget>(1)"
 msgstr "B<i2prouter>(1) B<curl>(1) B<wget>(1)"
 
