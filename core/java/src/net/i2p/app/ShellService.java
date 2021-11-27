@@ -10,25 +10,13 @@
 package net.i2p.app;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
-import java.lang.reflect.Field;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import java.util.Arrays;
 import java.util.ArrayList;
-
-import java.util.HashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
