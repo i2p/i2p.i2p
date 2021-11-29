@@ -1,3 +1,5 @@
+2021-11-29 1.6.0 released
+
 2021-11-23 zzz
  * Tunnels:
    - Drop request if hop throttle exceeded by 50%
