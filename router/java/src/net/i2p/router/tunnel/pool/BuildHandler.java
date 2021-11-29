@@ -889,7 +889,8 @@ class BuildHandler implements Runnable {
                 if (_log.shouldWarn())
                     _log.warn("Dropping request (hop throttle), next hop: " + nextPeer + ": " + req);
                 _context.statManager().addRateData("tunnel.rejectHopThrottle", 1);
-                _context.commSystem().mayDisconnect(from);
+                if (from != null)
+                    _context.commSystem().mayDisconnect(from);
                  return;
             }
             if (result == ParticipatingThrottler.Result.REJECT) {
