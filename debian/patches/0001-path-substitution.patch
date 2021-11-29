@@ -454,7 +454,7 @@ Index: b/installer/resources/locale/po/messages_tr.po
  
  #: ../i2prouter:1879
  msgid "Running I2P as the root user is *not* recommended."
- msgstr "I2P yazılımının root olarak çalıştırmanız *önerilmez*."
+ msgstr "I2P uygulamasını root olarak çalıştırmanız *önerilmez*."
  
  #: ../i2prouter:1882
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
