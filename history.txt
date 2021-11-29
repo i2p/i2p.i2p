@@ -1,4 +1,9 @@
-2021-11-29 1.6.0 released
+2021-11-29 1.6.1 released
+
+2021-11-29 zzz
+ * Tunnels: Fix NPE in BuildHandler
+
+2021-11-29 1.6.0 (not released)
 
 2021-11-23 zzz
  * Tunnels:
