@@ -207,8 +207,8 @@ public class BlocklistEntries {
             if (br != null) try { br.close(); } catch (IOException ioe) {}
         }
         if (elist.isEmpty() && rlist.isEmpty()) {
-            System.err.println("nothing to sign");
-            System.exit(1);
+            System.err.println("Signing empty blocklist");
+            //System.exit(1);
         }
         if (elist.size() > MAX_ENTRIES) {
             System.err.println("too many blocks, max is " + MAX_ENTRIES);
