@@ -296,7 +296,7 @@
     <target name="buildSmall" depends="builddepSmall, jarSmall, buildWEB" />
     <target name="buildclean" depends="distclean, build" />
 
-    <target name="builddep" depends="builddepSmall, buildBOB, buildSAM, buildSusiMail, buildSusiDNS, buildI2PSnark, buildI2PControl" />
+    <target name="builddep" depends="builddepSmall, buildSAM, buildSusiMail, buildSusiDNS, buildI2PSnark, buildI2PControl" />
 
     <target name="builddepSmall" depends="buildrouter, buildSystray, buildDesktopGui, buildRouterConsole, buildStreaming, buildI2PTunnel, buildAddressbook" />
 
@@ -619,7 +619,7 @@
         <jar destfile="./build/launchi2p.jar">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.router.RouterLaunch" />
-                <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/BOB.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-runtime.jar lib/commons-el.jar lib/wrapper.jar lib/systray.jar lib/desktopgui.jar lib/i2psnark.jar lib/jrobin.jar lib/jstl.jar lib/standard.jar lib/jetty-continuation.jar lib/jetty-deploy.jar lib/jetty-http.jar lib/jetty-i2p.jar lib/jetty-io.jar lib/jetty-rewrite-handler.jar lib/jetty-security.jar lib/jetty-servlet.jar lib/jetty-servlets.jar lib/jetty-start.jar lib/jetty-util.jar lib/jetty-webapp.jar lib/jetty-xml.jar" />
+                <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-runtime.jar lib/commons-el.jar lib/wrapper.jar lib/systray.jar lib/desktopgui.jar lib/i2psnark.jar lib/jrobin.jar lib/jstl.jar lib/standard.jar lib/jetty-continuation.jar lib/jetty-deploy.jar lib/jetty-http.jar lib/jetty-i2p.jar lib/jetty-io.jar lib/jetty-rewrite-handler.jar lib/jetty-security.jar lib/jetty-servlet.jar lib/jetty-servlets.jar lib/jetty-start.jar lib/jetty-util.jar lib/jetty-webapp.jar lib/jetty-xml.jar" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
@@ -859,7 +859,6 @@
             <group title="Router Console" packages="net.i2p.router.web:net.i2p.router.web.*:net.i2p.router.update:edu.internet2.ndt:net.i2p.router.news:com.vuze.*" />
             <!-- apps and bridges starting here, alphabetical please -->
             <group title="Addressbook Application" packages="net.i2p.addressbook:net.i2p.router.naming:net.metanotion:net.metanotion.*" />
-            <group title="BOB Bridge" packages="net.i2p.BOB" />
             <group title="Desktopgui Application" packages="net.i2p.desktopgui:net.i2p.desktopgui.*" />
             <group title="I2PControl Application" packages="net.i2p.i2pcontrol:net.i2p.i2pcontrol.*:org.mindrot.jbcrypt:com.thetransactioncompany.jsonrpc2:com.thetransactioncompany.jsonrpc2.*" />
             <group title="I2PSnark Application" packages="org.klomp.snark:org.klomp.snark.*" />
@@ -885,7 +884,6 @@
                 <pathelement location="apps/addressbook/java/src" />
                 <pathelement location="apps/i2psnark/java/src" />
                 <pathelement location="apps/sam/java/src" />
-                <pathelement location="apps/BOB/src" />
                 <pathelement location="apps/susidns/src/java/src" />
                 <pathelement location="apps/susimail/src/src" />
                 <pathelement location="apps/jetty/java/src" />
@@ -1379,7 +1377,6 @@
         <!-- Updated in 0.9.28; name without version so we can overwrite if we upgrade  -->
         <copy file="build/jrobin.jar" tofile="pkg-temp/lib/jrobin.jar" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
-        <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/systray.jar" todir="pkg-temp/lib" />
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
@@ -1487,7 +1484,7 @@
     <target name="preplicenses" depends="preplicenses-unlesspkg" >
         <copy file="LICENSE.txt" todir="pkg-temp/" />
         <copy todir="pkg-temp/licenses/" >
-          <fileset dir="licenses/" />
+          <fileset dir="licenses/" excludes="COPYING-BOB.txt" />
         </copy>
         <copy file="apps/imagegen/identicon/README.md" tofile="pkg-temp/licenses/LICENSE-Identicon.txt" />
         <copy file="apps/desktopgui/LICENSE" tofile="pkg-temp/licenses/LICENSE-DesktopGUI.txt" />
@@ -1701,7 +1698,6 @@
     </target>
 
     <target name="prepupdate" depends="build2, prepupdateSmall, prepCertificates, prep-script-translation, truncatehistory">
-        <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib" />
         <!-- include systray changes in 0.7.5 -->
@@ -2176,9 +2172,8 @@
             <arg value="-auxclasspath"/>
             <arg value="build/commons-el.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:build/jrobin.jar:installer/lib/wrapper/all/wrapper.jar:apps/susidns/src/lib/standard.jar:apps/susidns/src/lib/jstl.jar"/>
             <arg value="-sourcepath"/>
-            <arg value="apps/BOB/src/:apps/addressbook/java/src/:apps/desktopgui/src:apps/i2pcontrol/java:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/imagegen/identicon/core/src/main/java:apps/imagegen/imagegen/webapp/src/main/java:apps/imagegen/zxing/core/src/main/java:apps/jetty/java/src:apps/jrobin/java/src:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/:installer/java/src"/>
+            <arg value="apps/addressbook/java/src/:apps/desktopgui/src:apps/i2pcontrol/java:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/imagegen/identicon/core/src/main/java:apps/imagegen/imagegen/webapp/src/main/java:apps/imagegen/zxing/core/src/main/java:apps/jetty/java/src:apps/jrobin/java/src:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/:installer/java/src"/>
             <!-- start of the files to be analyzed -->
-            <arg value="build/BOB.jar"/>
             <arg value="build/addressbook.jar"/>
             <arg value="build/i2p.jar"/>
             <arg value="build/i2psnark.jar"/>

@@ -18,7 +18,6 @@ pkg-temp/webapps usr/share/i2p
 
 
 pkg-temp/lib/addressbook.jar usr/share/i2p/lib
-pkg-temp/lib/BOB.jar usr/share/i2p/lib
 pkg-temp/lib/desktopgui.jar usr/share/i2p/lib
 pkg-temp/lib/i2p.jar usr/share/i2p/lib
 pkg-temp/lib/i2psnark.jar usr/share/i2p/lib
