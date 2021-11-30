@@ -5,6 +5,7 @@ package net.i2p.desktopgui;
  */
 
 import java.awt.Image;
+import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.io.File;
 import java.lang.reflect.Method;
@@ -95,6 +96,11 @@ public class Main implements RouterApp {
     }
     
     public static void main(String[] args) {
+        // early check so we can bail out when started via CLI
+        if (!SystemTray.isSupported()) {
+            System.err.println("SystemTray not supported");
+            return;
+        }
         Main main = new Main();
         main.beginStartup(args);
     }
