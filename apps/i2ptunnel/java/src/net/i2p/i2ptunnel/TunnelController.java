@@ -148,6 +148,9 @@ public class TunnelController implements Logging {
 
     private static final String OPT_ENCTYPE = PFX_OPTION + "i2cp.leaseSetEncType";
 
+    /** @since 0.9.53 */
+    private static final String OPT_PRIORITY = PFX_OPTION + "outbound.priority";
+
     /** all of these @since 0.9.14 */
     public static final String TYPE_CONNECT = "connectclient";
     public static final String TYPE_HTTP_BIDIR_SERVER = "httpbidirserver";
@@ -901,6 +904,12 @@ public class TunnelController implements Logging {
                 type.equals(TYPE_HTTP_CLIENT)) {
                 if (!_config.containsKey(OPT_SIG_TYPE))
                     _config.setProperty(OPT_SIG_TYPE, PREFERRED_SIGTYPE.name());
+            }
+            if (type.equals(TYPE_IRC_CLIENT) || type.equals(TYPE_STD_CLIENT) ||
+                type.equals(TYPE_IRC_SERVER) || type.equals(TYPE_STD_SERVER) ||
+                type.equals(TYPE_SOCKS_IRC)) {
+                if (!_config.containsKey(OPT_PRIORITY))
+                    _config.setProperty(OPT_PRIORITY, "10");
             }
             if (!isClient(type)) {
                 _tunnel.filterDefinition = _config.getProperty(PROP_FILTER);
