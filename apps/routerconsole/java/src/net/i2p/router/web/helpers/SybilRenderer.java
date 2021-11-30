@@ -825,7 +825,7 @@ public class SybilRenderer {
             buf.append("<th colspan=\"2\"><a name=\"our-info\" ></a><b>" + _t("Our info") + ":</b> <code>").append(hash)
                .append("</code></th></tr>\n<tr><td class=\"sybilinfo_params\" colspan=\"2\"><div class=\"sybilinfo_container\">");
         } else {
-            buf.append("<th><b>" + _t("Router") + ":</b> <code>").append(hash).append("</code>\n");
+            buf.append("<th><b>" + _t("Router") + ":</b> <a href=\"netdb?r=").append(hash, 0, 6).append("\"><code>").append(hash).append("</code></a>\n");
 
             String country = _context.commSystem().getCountry(info.getIdentity().getHash());
             buf.append("</th><th>");
