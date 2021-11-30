@@ -1,3 +1,8 @@
+2021-11-30 zzz
+ * Build: Remove BOB from installer, updater, and clients.config
+ * Console: NetDB search form improvements
+ * i2ptunnel: Increase priority for IRC and standard tunnels
+
 2021-11-29 1.6.1 released
 
 2021-11-29 zzz
