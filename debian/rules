@@ -40,7 +40,7 @@ export BITS := $(shell dpkg-architecture -qDEB_HOST_ARCH_BITS)
 
 # debian: bullseye - transitioning
 JSON_SIMPLE_VERSION = $(shell dpkg -l libjson-simple-java | grep '^ii' | awk '{print $$3}')
-JSON_SIMPLE_3 = $(shell dpkg --compare-versions '$(JSON_SIMPLE_VERSION)' '>' '3.1.1-1~' && echo yes || echo no)
+JSON_SIMPLE_3 = $(shell dpkg --compare-versions '$(JSON_SIMPLE_VERSION)' 'gt' '3.1.1-1~' && echo yes || echo no)
 ifeq (yes,$(JSON_SIMPLE_3))
 JSON_SIMPLE_PACKAGE = com.github.cliftonlabs.json_simple
 JSON_EXCEPTION = JsonException

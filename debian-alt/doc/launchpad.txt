@@ -49,7 +49,7 @@ Generate files to upload
 ------------------------
 
 - check out clean copy of release:
-  mtn co -d i2p.mtn -b i2p.i2p i2p.i2p.foobar -r t:i2p-1.xx.0
+  git clone -l . /path/to/releasedir
 
 - export TZ=UTC
 - cd i2p.i2p.foobar
