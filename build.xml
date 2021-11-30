@@ -583,6 +583,24 @@
             match='(^\s+public\s+final\s+static\s+long\s+BUILD\s+=\s+)[0-9]+;' replace='\1${new.i2p.build.number};'/>
     </target>
 
+    <target name="bumpBuildTime">
+        <exec executable="date" outputproperty="new.today" errorproperty="bt.error" failifexecutionfails="true" >
+            <arg value="-u" />
+            <arg value="+%Y-%m-%d" />
+        </exec>
+        <exec executable="date" outputproperty="new.today.secs" errorproperty="bt.error2" failifexecutionfails="true" >
+            <arg value="-u" />
+            <arg value="-d" />
+            <arg value="${new.today}" />
+            <arg value="+%s" />
+        </exec>
+        <echo message="Today is: ${new.today} ${new.today.secs}" />
+        <replaceregexp byline="true" file="core/java/src/net/i2p/time/BuildTime.java"
+            match='(^\s+private\s+static\s+final\s+String\s+EARLIEST\s+=\s+)"[0-9A-Z: -]+";' replace='\1"${new.today} 12:00:00 UTC";'/>
+        <replaceregexp byline="true" file="core/java/src/net/i2p/time/BuildTime.java"
+            match='(^\s+private\s+static\s+final\s+long\s+EARLIEST_LONG\s+=\s+)[0-9]+ \* 1000L;' replace='\1${new.today.secs} * 1000L;'/>
+    </target>
+
     <!-- if both present, only mtn will run -->
     <target name="checkoutFromVCS" depends="failIfNoVCS, checkoutFromGit" />
 
