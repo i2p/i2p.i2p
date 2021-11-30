@@ -375,14 +375,34 @@ class NetDbRenderer {
                 buf.append("<div class=\"netdbnotfound\">");
                 buf.append(_t("Router")).append(' ');
                 if (routerPrefix != null)
-                    buf.append(routerPrefix);
-                else if (version != null)
-                    buf.append(version);
-                else if (country != null)
-                    buf.append(country);
-                else if (family != null)
-                    buf.append(_t("Family")).append(' ').append(family);
-                buf.append(' ').append(_t("not found in network database"));
+                    buf.append(routerPrefix).append(' ');
+                if (version != null)
+                    buf.append(_t("Version")).append(' ').append(version).append(' ');
+                if (country != null)
+                    buf.append(_t("Country")).append(' ').append(country).append(' ');
+                if (family != null)
+                    buf.append(_t("Family")).append(' ').append(family).append(' ');
+                if (ip != null)
+                    buf.append("IP ").append(ip).append(' ');
+                if (ipv6 != null)
+                    buf.append("IP ").append(ipv6).append(' ');
+                if (port != 0)
+                    buf.append(_t("Port")).append(' ').append(port).append(' ');
+                if (mtu != null)
+                    buf.append(_t("MTU")).append(' ').append(mtu).append(' ');
+                if (cost != 0)
+                    buf.append("Cost ").append(cost).append(' ');
+                if (type != null)
+                    buf.append("Type ").append(type).append(' ');
+                if (etype != null)
+                    buf.append("Type ").append(etype).append(' ');
+                if (caps != null)
+                    buf.append("Caps ").append(caps).append(' ');
+                if (ssucaps != null)
+                    buf.append("Caps ").append(ssucaps).append(' ');
+                if (tr != null)
+                    buf.append("Transport ").append(tr).append(' ');
+                buf.append(_t("not found in network database"));
                 buf.append("</div>");
             } else if (page > 0 || morePages) {
                 buf.append("<div class=\"netdbnotfound\">");

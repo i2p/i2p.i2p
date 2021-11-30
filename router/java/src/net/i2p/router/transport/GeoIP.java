@@ -877,6 +877,16 @@ public class GeoIP {
         return _codeToName.get(code);
     }
 
+    /**
+     * Get the country code map
+     *
+     * @return Map of two-letter lower case code to untranslated country name, unmodifiable
+     * @since 0.9.53
+     */
+    public Map<String, String> getCountries() {
+        return Collections.unmodifiableMap(_codeToName);
+    }
+
     public static void main(String args[]) {
         if (args.length <= 0) {
             System.out.println("Usage: GeoIP ip...");

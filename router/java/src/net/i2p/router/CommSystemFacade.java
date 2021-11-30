@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -139,6 +140,17 @@ public abstract class CommSystemFacade implements Service {
 
     public String getCountry(Hash peer) { return null; }
     public String getCountryName(String code) { return code; }
+
+    /**
+     * Get the country code map
+     *
+     * @return Map of two-letter lower case code to untranslated country name, unmodifiable
+     * @since 0.9.53
+     */
+    public Map<String, String> getCountries() {
+        return Collections.emptyMap();
+    }
+
     public String renderPeerHTML(Hash peer) {
         return peer.toBase64().substring(0, 4);
     }
