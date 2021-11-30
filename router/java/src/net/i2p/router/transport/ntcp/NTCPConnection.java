@@ -288,6 +288,19 @@ public class NTCPConnection implements Closeable {
     }
 
     /**
+     *  @return null if unknown
+     *  @since 0.9.53
+     */
+    public byte[] getRemoteIP() {
+        if (_chan == null)
+            return null;
+        InetAddress addr = _chan.socket().getInetAddress();
+        if (addr == null)
+            return null;
+        return addr.getAddress();
+    }
+
+    /**
      *  Only valid during establishment;
      *  replaced with EstablishState.VERIFIED or FAILED afterward
      */

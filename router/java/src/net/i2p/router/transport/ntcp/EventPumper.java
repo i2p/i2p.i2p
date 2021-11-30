@@ -666,10 +666,9 @@ class EventPumper implements Runnable {
             if (buf != null)
                 releaseBuf(buf);
             if (con.isInbound() && con.getMessagesReceived() <= 0) {
-                InetAddress addr = chan.socket().getInetAddress();
+                byte[] ip = con.getRemoteIP();
                 int count;
-                if (addr != null) {
-                    byte[] ip = addr.getAddress();
+                if (ip != null) {
                     ByteArray ba = new ByteArray(ip);
                     count = _blockedIPs.increment(ba);
                     if (_log.shouldLog(Log.WARN))

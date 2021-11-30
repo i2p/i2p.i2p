@@ -179,8 +179,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
      */
     private boolean verifyInbound(Hash aliceHash) {
         // get inet-addr
-        InetAddress addr = this._con.getChannel().socket().getInetAddress();
-        byte[] ip = (addr == null) ? null : addr.getAddress();
+        byte[] ip = _con.getRemoteIP();
         if (_context.banlist().isBanlistedForever(aliceHash)) {
             if (_log.shouldWarn())
                 _log.warn("Dropping inbound connection from permanently banlisted peer at " + Addresses.toString(ip) + " : " + aliceHash);
@@ -247,9 +246,8 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                 _log.warn("Not in our network: " + alice, new Exception());
             // So next time we will not accept the con from this IP,
             // rather than doing the whole handshake
-            InetAddress addr = _con.getChannel().socket().getInetAddress();
-            if (addr != null) {
-                byte[] ip = addr.getAddress();
+            byte[] ip = _con.getRemoteIP();
+            if (ip != null) {
                 _context.blocklist().add(ip);
             }
             _transport.markUnreachable(aliceHash);
@@ -349,11 +347,10 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             // network ID cross-check, proposal 147, as of 0.9.42
             v = options[0] & 0xff;
             if (v != 0 && v != _context.router().getNetworkID()) {
-                InetAddress addr = _con.getChannel().socket().getInetAddress();
-                if (addr != null) {
+                byte[] ip = _con.getRemoteIP();
+                if (ip != null) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Dropping inbound connection from wrong network: " + addr);
-                    byte[] ip = addr.getAddress();
+                        _log.warn("Dropping inbound connection from wrong network: " + Addresses.toString(ip));
                     // So next time we will not accept the con from this IP
                     _context.blocklist().add(ip);
                 }
