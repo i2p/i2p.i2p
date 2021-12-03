@@ -87,4 +87,11 @@ public interface TunnelInfo {
      *  @since 0.8.11
      */
     public void setReused();
+
+    /**
+     * Has the tunnel failed completely?
+     *
+     * @since 0.9.53 copied from TunnelCreatorConfig
+     */
+    public boolean getTunnelFailed();
 }
