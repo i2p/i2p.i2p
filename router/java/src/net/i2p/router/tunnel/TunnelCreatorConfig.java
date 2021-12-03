@@ -3,6 +3,7 @@ package net.i2p.router.tunnel;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.data.Base64;
 import net.i2p.data.Hash;
@@ -32,8 +33,7 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
     private final boolean _isInbound;
     private int _messagesProcessed;
     private long _verifiedBytesTransferred;
-    private boolean _failed;
-    private int _failures;
+    private final AtomicInteger _failures = new AtomicInteger();
     private boolean _reused;
     private int _priority;
     //private static final int THROUGHPUT_COUNT = 3;
@@ -213,23 +213,18 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
     
     /**
      * The tunnel failed a test, so (maybe) stop using it
+     *
+     * @return false if we stopped using it, true if still ok
      */
     public boolean tunnelFailed() {
-        _failures++;
-        if (_failures > MAX_CONSECUTIVE_TEST_FAILURES) {
-            _failed = true;
-            return false;
-        } else {
-            return true;
-        }
+        return _failures.incrementAndGet() <= MAX_CONSECUTIVE_TEST_FAILURES;
     }
 
-    public boolean getTunnelFailed() { return _failed; }
-    public int getTunnelFailures() { return _failures; }
+    public boolean getTunnelFailed() { return _failures.get() > MAX_CONSECUTIVE_TEST_FAILURES; }
+    public int getTunnelFailures() { return _failures.get(); }
     
     public void testSuccessful(int ms) {
-        if (!_failed)
-            _failures = 0;
+        _failures.set(0);
     }
     
     /**
@@ -400,8 +395,9 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
         if (_messagesProcessed > 0)
             buf.append(" with ").append(_messagesProcessed).append("/").append(_verifiedBytesTransferred).append(" msgs/bytes");
     
-        if (_failures > 0)
-            buf.append(" with ").append(_failures).append(" failures");
+        int fails = _failures.get();
+        if (fails > 0)
+            buf.append(" with ").append(fails).append(" consec. failures");
         return buf.toString();
     }
 
