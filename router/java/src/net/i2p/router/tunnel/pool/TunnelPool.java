@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -47,6 +48,7 @@ public class TunnelPool {
     private long _lastLifetimeProcessed;
     private final String _rateName;
     private final long _firstInstalled;
+    private final AtomicInteger _consecutiveBuildTimeouts = new AtomicInteger();
 
     private static final int TUNNEL_LIFETIME = 10*60*1000;
     /** if less than one success in this many, reduce quantity (exploratory only) */
@@ -127,6 +129,7 @@ public class TunnelPool {
         synchronized (_inProgress) {
             _inProgress.clear();
         }
+        _consecutiveBuildTimeouts.set(0);
     }
 
     /** 
@@ -1200,6 +1203,7 @@ public class TunnelPool {
 
     /**
      *  Remove from the _inprogress list and call addTunnel() if result is SUCCESS.
+     *  Updates consecutive build timeout count.
      *
      *  @since 0.9.53 added result parameter
      */
@@ -1213,21 +1217,31 @@ public class TunnelPool {
 
         switch (result) {
             case SUCCESS:
+                _consecutiveBuildTimeouts.set(0);
                 addTunnel(cfg);
                 break;
 
             case REJECT:
             case BAD_RESPONSE:
             case DUP_ID:
+                _consecutiveBuildTimeouts.set(0);
                 break;
 
             case TIMEOUT:
+                _consecutiveBuildTimeouts.incrementAndGet();
                 break;
 
             case OTHER_FAILURE:
             default:
                 break;
         }
+    }
+
+    /**
+     *  @since 0.9.53
+     */
+    int getConsecutiveBuildTimeouts() {
+        return _consecutiveBuildTimeouts.get();
     }
 
     @Override

@@ -77,6 +77,8 @@ abstract class BuildRequestor {
     /** some randomization is added on to this */
     private static final int BUILD_MSG_TIMEOUT = 60*1000;
 
+    private static final int MAX_CONSECUTIVE_CLIENT_BUILD_FAILS = 6;
+
     /**
      *  "paired tunnels" means using a client's own inbound tunnel to receive the
      *  reply for an outbound build request, and using a client's own outbound tunnel
@@ -160,18 +162,27 @@ abstract class BuildRequestor {
             }
         } else {
             // building a client tunnel
-            Hash from = settings.getDestination();
-            if (isInbound) {
-                pairedTunnel = mgr.selectOutboundTunnel(from, farEnd);
-            } else {
-                pairedTunnel = mgr.selectInboundTunnel(from, farEnd);
-                if (pairedTunnel != null) {
-                    replySKM = ctx.clientManager().getClientSessionKeyManager(from);
-                    if (replySKM == null && cfg.getGarlicReplyKeys() != null) {
-                        // no client SKM, fall back to expl.
-                        pairedTunnel = null;
+            int fails = pool.getConsecutiveBuildTimeouts();
+            if (fails < MAX_CONSECUTIVE_CLIENT_BUILD_FAILS) {
+                Hash from = settings.getDestination();
+                if (isInbound) {
+                    pairedTunnel = mgr.selectOutboundTunnel(from, farEnd);
+                } else {
+                    pairedTunnel = mgr.selectInboundTunnel(from, farEnd);
+                    if (pairedTunnel != null) {
+                        replySKM = ctx.clientManager().getClientSessionKeyManager(from);
+                        if (replySKM == null && cfg.getGarlicReplyKeys() != null) {
+                            // no client SKM, fall back to expl.
+                            pairedTunnel = null;
+                        }
                     }
                 }
+            } else {
+                // Force using an expl. tunnel as the paired tunnel
+                // This prevents us from being stuck for 10 minutes if the client pool
+                // has exactly one tunnel in the other direction and it's bad
+                if (log.shouldWarn())
+                    log.warn(fails + " consecutive build timeouts for " + cfg + ", using exploratory tunnel");
             }
             if (pairedTunnel == null) {   
                 if (isInbound) {
