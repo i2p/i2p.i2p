@@ -536,8 +536,6 @@ public class TunnelPool {
      *  Remove the tunnel.
      */
     private void fail(TunnelInfo cfg) {
-        if (_log.shouldLog(Log.WARN))
-            _log.warn(toString() + ": Tunnel failed: " + cfg);
         LeaseSet ls = null;
         synchronized (_tunnels) {
             boolean removed = _tunnels.remove(cfg);
@@ -546,7 +544,9 @@ public class TunnelPool {
             if (_settings.isInbound() && !_settings.isExploratory())
                 ls = locked_buildNewLeaseSet();
         }
-        
+
+        if (_log.shouldLog(Log.WARN))
+            _log.warn(toString() + ": Tunnel failed: " + cfg);
         _manager.tunnelFailed();
         
         _lifetimeProcessed += cfg.getProcessedMessagesCount();

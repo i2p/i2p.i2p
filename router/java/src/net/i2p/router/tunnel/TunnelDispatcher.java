@@ -24,6 +24,7 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.Service;
 import net.i2p.router.peermanager.PeerProfile;
+import net.i2p.router.tunnel.pool.PooledTunnelCreatorConfig;
 import net.i2p.util.Log;
 
 /**
@@ -247,7 +248,7 @@ public class TunnelDispatcher implements Service {
      *
      *  @return success; false if Tunnel ID is a duplicate
      */
-    public boolean joinOutbound(TunnelCreatorConfig cfg) {
+    public boolean joinOutbound(PooledTunnelCreatorConfig cfg) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Outbound built successfully: " + cfg);
         TunnelGateway gw;

@@ -9,7 +9,7 @@ import net.i2p.router.tunnel.TunnelCreatorConfig;
 /**
  *  Data about a tunnel we created
  */
-class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
+public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     private final TunnelPool _pool;
 
     /**
@@ -45,6 +45,20 @@ class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
             _pool.tunnelFailed(this);
         }
         return rv;
+    }
+    
+    /**
+     * We failed to contact the first hop for an outbound tunnel,
+     * so immediately stop using it.
+     * For outbound non-zero-hop tunnels only.
+     *
+     * @since 0.9.53
+     */
+    public void tunnelFailedFirstHop() {
+        if (isInbound() || getLength() <= 1)
+            return;
+        tunnelFailedCompletely();
+        _pool.tunnelFailed(this, getPeer(1));
     }
     
     /**
