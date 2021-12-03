@@ -49,6 +49,11 @@ class BuildExecutor implements Runnable {
     /** accept replies up to a minute after we gave up on them */
     private static final long GRACE_PERIOD = 60*1000;
 
+    /**
+     *  @since 0.9.53
+     */
+    enum Result { SUCCESS, REJECT, TIMEOUT, BAD_RESPONSE, DUP_ID, OTHER_FAILURE }
+
     public BuildExecutor(RouterContext ctx, TunnelPoolManager mgr) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
@@ -145,7 +150,8 @@ class BuildExecutor implements Runnable {
         allowed = _context.getProperty("router.tunnelConcurrentBuilds", allowed);
 
         // expire any REALLY old requests
-        long expireBefore = _context.clock().now() + 10*60*1000 - BuildRequestor.REQUEST_TIMEOUT - GRACE_PERIOD;
+        long now = _context.clock().now();
+        long expireBefore = now + 10*60*1000 - BuildRequestor.REQUEST_TIMEOUT - GRACE_PERIOD;
         for (Iterator<PooledTunnelCreatorConfig> iter = _recentlyBuildingMap.values().iterator(); iter.hasNext(); ) {
             PooledTunnelCreatorConfig cfg = iter.next();
             if (cfg.getExpiration() <= expireBefore) {
@@ -157,7 +163,7 @@ class BuildExecutor implements Runnable {
         List<PooledTunnelCreatorConfig> expired = null;
         int concurrent = 0;
         // Todo: Make expiration variable
-        expireBefore = _context.clock().now() + 10*60*1000 - BuildRequestor.REQUEST_TIMEOUT;
+        expireBefore = now + 10*60*1000 - BuildRequestor.REQUEST_TIMEOUT;
         for (Iterator<PooledTunnelCreatorConfig> iter = _currentlyBuildingMap.values().iterator(); iter.hasNext(); ) {
             PooledTunnelCreatorConfig cfg = iter.next();
             if (cfg.getExpiration() <= expireBefore) {
@@ -202,7 +208,7 @@ class BuildExecutor implements Runnable {
 
                 TunnelPool pool = cfg.getTunnelPool();
                 if (pool != null)
-                    pool.buildComplete(cfg);
+                    pool.buildComplete(cfg, Result.TIMEOUT);
                 if (cfg.getDestination() == null) {
                     _context.statManager().addRateData("tunnel.buildExploratoryExpire", 1);
                     //if (cfg.isInbound())
@@ -409,7 +415,7 @@ class BuildExecutor implements Runnable {
                                     if (_log.shouldLog(Log.DEBUG))
                                         _log.debug("We don't need more fallbacks for " + pool);
                                     i--; //0hop, we can keep going, as there's no worry about throttling
-                                    pool.buildComplete(cfg);
+                                    pool.buildComplete(cfg, Result.OTHER_FAILURE);
                                     continue;
                                 }
                                 long pTime = System.currentTimeMillis() - bef;
@@ -553,19 +559,25 @@ class BuildExecutor implements Runnable {
     }
     
     /**
-     *  This wakes up the executor, so call this after TunnelPool.addTunnel()
-     *  so we don't build too many.
+     *  This calls TunnelPool.buildComplete which calls TunnelPool.addTunnel()
+     *  on success, and then we wake up the executor.
+     *
+     *  On success, this also calls TunnelPoolManager to optionally start a test job,
+     *  and queues an ExpireJob.
+     *
+     *  @since 0.9.53 added result parameter
      */
-    public void buildComplete(PooledTunnelCreatorConfig cfg) {
+    public void buildComplete(PooledTunnelCreatorConfig cfg, Result result) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Build complete for " + cfg, new Exception());
-        cfg.getTunnelPool().buildComplete(cfg);
+            _log.debug("Build complete (" + result + ") for " + cfg);
+        cfg.getTunnelPool().buildComplete(cfg, result);
         if (cfg.getLength() > 1)
             removeFromBuilding(cfg.getReplyMessageId());
         // Only wake up the build thread if it took a reasonable amount of time -
         // this prevents high CPU usage when there is no network connection
         // (via BuildRequestor.TunnelBuildFirstHopFailJob)
-        long buildTime = _context.clock().now() + 10*60*1000- cfg.getExpiration();
+        long now = _context.clock().now();
+        long buildTime = now + 10*60*1000 - cfg.getExpiration();
         if (buildTime > 250) {
             synchronized (_currentlyBuilding) { 
                 _currentlyBuilding.notifyAll();
@@ -575,10 +587,15 @@ class BuildExecutor implements Runnable {
                 _log.info("Build complete really fast (" + buildTime + " ms) for tunnel: " + cfg);
         }
         
-        long expireBefore = _context.clock().now() + 10*60*1000 - BuildRequestor.REQUEST_TIMEOUT;
+        long expireBefore = now + 10*60*1000 - BuildRequestor.REQUEST_TIMEOUT;
         if (cfg.getExpiration() <= expireBefore) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Build complete for expired tunnel: " + cfg);
+        }
+        if (result == Result.SUCCESS) {
+            _manager.buildComplete(cfg);
+            ExpireJob expireJob = new ExpireJob(_context, cfg);
+            _context.jobQueue().addJob(expireJob);
         }
     }
     
@@ -586,10 +603,6 @@ class BuildExecutor implements Runnable {
         synchronized (_recentBuildIds) {
             return _recentBuildIds.contains(Long.valueOf(replyId));
         }
-    }
-    
-    public void buildSuccessful(PooledTunnelCreatorConfig cfg) {
-        _manager.buildComplete(cfg);
     }
     
     public void repoll() { 

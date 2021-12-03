@@ -86,7 +86,7 @@ public class AliasedTunnelPool extends TunnelPool {
     }
     
     @Override
-    void addTunnel(TunnelInfo info) {
+    protected void addTunnel(TunnelInfo info) {
         _aliasOf.addTunnel(info);
     }
     
@@ -147,7 +147,7 @@ public class AliasedTunnelPool extends TunnelPool {
     }
 
     @Override
-    void buildComplete(PooledTunnelCreatorConfig cfg) {}
+    void buildComplete(PooledTunnelCreatorConfig cfg, BuildExecutor.Result result) {}
     
     @Override
     public String toString() {

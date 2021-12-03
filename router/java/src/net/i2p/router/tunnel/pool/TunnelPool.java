@@ -449,7 +449,7 @@ public class TunnelPool {
     /**
      *  Add to the pool.
      */
-    void addTunnel(TunnelInfo info) {
+    protected void addTunnel(TunnelInfo info) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(toString() + ": Adding tunnel " + info /* , new Exception("Creator") */ );
         LeaseSet ls = null;
@@ -1197,15 +1197,39 @@ public class TunnelPool {
         }
         return cfg;
     }
-    
+
     /**
-     *  Remove from the _inprogress list
+     *  Remove from the _inprogress list and call addTunnel() if result is SUCCESS.
+     *
+     *  @since 0.9.53 added result parameter
      */
-    void buildComplete(PooledTunnelCreatorConfig cfg) {
+    void buildComplete(PooledTunnelCreatorConfig cfg, BuildExecutor.Result result) {
+        if (cfg.getTunnelPool() != this) {
+            _log.error("Wrong pool " + cfg + " for " + this, new Exception());
+            return;
+        }
+
         synchronized (_inProgress) { _inProgress.remove(cfg); }
-        //_manager.buildComplete(cfg);
+
+        switch (result) {
+            case SUCCESS:
+                addTunnel(cfg);
+                break;
+
+            case REJECT:
+            case BAD_RESPONSE:
+            case DUP_ID:
+                break;
+
+            case TIMEOUT:
+                break;
+
+            case OTHER_FAILURE:
+            default:
+                break;
+        }
     }
-    
+
     @Override
     public String toString() {
         if (_settings.isExploratory()) {
