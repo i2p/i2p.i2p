@@ -1321,6 +1321,15 @@ public class Snark
       }
   }
 
+  /**
+   * Call after editing torrent.
+   * Caller must ensure infohash, files, etc. did not change.
+   *
+   * @since 0.9.53
+   */
+  public void replaceMetaInfo(MetaInfo metainfo) {
+      meta = metainfo;
+  }
 
   ///////////// Begin StorageListener methods
 
