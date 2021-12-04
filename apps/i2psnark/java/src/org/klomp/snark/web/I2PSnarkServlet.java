@@ -3227,7 +3227,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     toThemeImg(buf, "details");
                     buf.append("</td><td><b>")
                        .append(_t("Comment")).append("</b></td><td>")
-                       .append(DataHelper.escapeHTML(com))
+                       .append(DataHelper.escapeHTML(com).replace("\r\n", "<br>").replace("\n", "<br>"))
                        .append("</td></tr>\n");
                 }
                 long dat = meta.getCreationDate();
