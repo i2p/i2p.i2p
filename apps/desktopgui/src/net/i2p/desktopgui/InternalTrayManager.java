@@ -1,5 +1,6 @@
 package net.i2p.desktopgui;
 
+import java.awt.AWTException;
 import java.awt.Desktop;
 import java.awt.Desktop.Action;
 import java.awt.MenuItem;
@@ -42,6 +43,14 @@ class InternalTrayManager extends TrayManager {
         super(ctx, main, useSwing);
         _context = ctx;
         log = ctx.logManager().getLog(InternalTrayManager.class);
+    }
+
+    /**
+     *  @since 0.9.53
+     */
+    public void startManager() throws AWTException {
+        super.startManager();
+        displayMessage(Log.INFO, _t("Starting"), _t("I2P is starting!"), null);
     }
 
     public synchronized PopupMenu getMainMenu() {

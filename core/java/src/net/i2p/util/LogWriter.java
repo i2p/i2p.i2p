@@ -11,6 +11,9 @@ package net.i2p.util;
 
 import java.util.Queue;
 
+import net.i2p.app.ClientAppManager;
+import net.i2p.app.NotificationService;
+
 /**
  * Log writer thread that pulls log records from the LogManager and writes them to
  * the log.  This also periodically instructs the LogManager to reread its config
@@ -186,15 +189,43 @@ abstract class LogWriter implements Runnable {
 
         // we always add to the console buffer, but only sometimes write to stdout
         _manager.getBuffer().add(val);
-        if (rec.getPriority() >= Log.CRIT)
+        int priority = rec.getPriority();
+        if (priority >= Log.CRIT)
             _manager.getBuffer().addCritical(val);
-        if (_manager.getDisplayOnScreenLevel() <= rec.getPriority()) {
+        // Default is CRIT
+        if (_manager.getDisplayOnScreenLevel() <= priority) {
             if (_manager.displayOnScreen()) {
                 // wrapper and android logs already do time stamps, so reformat without the date
                 if (_manager.getContext().hasWrapper() || SystemVersion.isAndroid())
                     System.out.print(LogRecordFormatter.formatRecord(_manager, rec, false));
                 else
                     System.out.print(val);
+
+                //
+                //  Display a popup on DTG
+                //  Experimental, may disable or add a separate config after testing
+                //  These also aren't translated.
+                //  May be appropriate for advanced users only.
+                //
+                String msg = rec.getMessage();
+                if (priority >= Log.ERROR && msg != null && !SystemVersion.isAndroid()) {
+                    ClientAppManager cmgr = _manager.getContext().clientAppManager();
+                    if (cmgr != null) {
+                        NotificationService ns = (NotificationService) cmgr.getRegisteredApp("desktopgui");
+                        if (ns != null) {
+                            String name;
+                            Class cls = rec.getSource();
+                            if (cls != null) {
+                                name = cls.getSimpleName();
+                            } else {
+                                name = rec.getSourceName();
+                                if (name == null)
+                                    name = "I2P";
+                            }
+                            ns.notify(name, null, priority, name, msg, null);
+                        }
+                    }
+                }
             }
         }
     }
