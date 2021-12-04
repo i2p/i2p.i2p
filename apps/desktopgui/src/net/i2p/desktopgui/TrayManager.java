@@ -46,7 +46,8 @@ abstract class TrayManager {
 
     private static final String PNG_DIR = "/desktopgui/resources/images/";
     private static final String MAC_ICON = "itoopie_black_24.png";
-    private static final String WIN_ICON = "itoopie_white_24.png";
+    private static final String WIN_ICON_LIGHT = "itoopie_white_24.png";
+    private static final String WIN_ICON_DARK  = "itoopie_black_24.png";
     private static final String LIN_ICON = "logo.png";
 
     /**
@@ -197,12 +198,20 @@ abstract class TrayManager {
      */
     private Image getTrayImage() throws AWTException {
         String img;
-        if (SystemVersion.isWindows())
-            img = WIN_ICON;
-        else if (SystemVersion.isMac())
+        if (SystemVersion.isWindows()) {
+            // too hard to get the theme out of the registry,
+            // use our console theme as a best guess
+            // so we have a contrasting icon
+            String theme = _appContext.getProperty("routerconsole.theme", "light");
+            if (theme.equals("dark"))
+                img = WIN_ICON_LIGHT;
+            else
+                img = WIN_ICON_DARK;
+        } else if (SystemVersion.isMac()) {
             img = MAC_ICON;
-        else
+        } else {
             img = LIN_ICON;
+        }
         URL url = getClass().getResource(PNG_DIR + img);
         if (url == null)
             throw new AWTException("cannot load tray image " + img);
