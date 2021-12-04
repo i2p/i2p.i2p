@@ -253,7 +253,7 @@ public class ShellService implements ClientApp {
                 buf.write((byte) result);
             }
             String pidString = buf.toString("UTF-8").replaceAll("[\\r\\n\\t ]", "");
-            long pid = _pid;
+            long pid = Long.parseLong(pidString);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Found " + getName() + "process with PID: " + pid);
             return pid;
