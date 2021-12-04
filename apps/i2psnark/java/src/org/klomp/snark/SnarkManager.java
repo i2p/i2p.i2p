@@ -29,6 +29,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.app.ClientApp;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.ClientAppState;
+import net.i2p.app.NotificationService;
 import net.i2p.client.I2PClient;
 import net.i2p.crypto.SHA1Hash;
 import net.i2p.crypto.SigType;
@@ -2555,8 +2556,18 @@ public class SnarkManager implements CompleteListener, ClientApp {
         Storage storage = snark.getStorage();
         if (meta == null || storage == null)
             return;
-        if (snark.getDownloaded() > 0)
+        if (snark.getDownloaded() > 0) {
             addMessageNoEscape(_t("Download finished: {0}", linkify(snark)));
+            ClientAppManager cmgr = _context.clientAppManager();
+            if (cmgr != null) {
+                NotificationService ns = (NotificationService) cmgr.getRegisteredApp("desktopgui");
+                if (ns != null) {
+                    ns.notify("I2PSnark", null, Log.INFO, _t("I2PSnark"), 
+                              _t("Download finished: {0}", snark.getName()),
+                              "/i2psnark/" + linkify(snark));
+                }
+            }
+        }
         updateStatus(snark);
     }
     
