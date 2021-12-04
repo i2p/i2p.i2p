@@ -3112,7 +3112,7 @@ public class I2PSnarkServlet extends BasicServlet {
             // first table - torrent info
             buf.append("<table class=\"snarkTorrentInfo\">\n" +
                        "<tr><th></th><th><b>")
-               .append(_t("Torrent"))
+               .append(showEdit ? _t("Edit Torrent") : _t("Torrent"))
                .append("</b></th><th>")
                .append(DataHelper.escapeHTML(snark.getBaseName()))
                .append("</th></tr>\n");
@@ -3126,7 +3126,7 @@ public class I2PSnarkServlet extends BasicServlet {
                .append("</b></td><td><a href=\"").append(_contextPath).append('/').append(baseName).append("\">")
                .append(DataHelper.escapeHTML(fullPath))
                .append("</a></td></tr>\n");
-            if (storage != null) {
+            if (storage != null && !showEdit) {
                 buf.append("<tr><td>");
                 toThemeImg(buf, "file");
                 buf.append("</td><td><b>")
@@ -3136,13 +3136,15 @@ public class I2PSnarkServlet extends BasicServlet {
                    .append("</td></tr>\n");
             }
             String hex = I2PSnarkUtil.toHex(snark.getInfoHash());
-            buf.append("<tr><td>");
-            toThemeImg(buf, "details");
-            buf.append("</td><td><b>")
-               .append(_t("Info hash"))
-               .append("</b></td><td><span id=\"infohash\">")
-               .append(hex.toUpperCase(Locale.US))
-               .append("</span></td></tr>\n");
+            if (!showEdit) {
+                buf.append("<tr><td>");
+                toThemeImg(buf, "details");
+                buf.append("</td><td><b>")
+                   .append(_t("Info hash"))
+                   .append("</b></td><td><span id=\"infohash\">")
+                   .append(hex.toUpperCase(Locale.US))
+                   .append("</span></td></tr>\n");
+            }
 
             String announce = null;
             MetaInfo meta = snark.getMetaInfo();
@@ -3284,6 +3286,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 }
             }
 
+          if (!showEdit) {  // don't bother to reindent
             if (meta == null || !meta.isPrivate()) {
                 buf.append("<tr><td><a href=\"")
                    .append(MagnetURI.MAGNET_FULL).append(hex);
@@ -3386,6 +3389,7 @@ public class I2PSnarkServlet extends BasicServlet {
                .append(":</b> ")
                .append(formatSize(snark.getPieceLength(0)))
                .append("</span></td></tr>\n");
+          } // !showEdit
 
             // buttons
             if (showStopStart) {
@@ -4183,9 +4187,11 @@ public class I2PSnarkServlet extends BasicServlet {
         MetaInfo meta = snark.getMetaInfo();
         if (meta == null)
             return;
-        buf.append("<div id=\"snarkCommentSection\"><table class=\"snarkTorrentInfo\">\n<tr><th colspan=\"5\">")
-           .append(_t("Edit Torrent"))
-           .append("</th></tr>");
+        buf.append("<div id=\"snarkCommentSection\"><table class=\"snarkTorrentInfo\">\n")
+           //.append("<tr><th colspan=\"5\">")
+           //.append(_t("Edit Torrent"))
+           //.append("</th>")
+           .append("</tr>");
         boolean isRunning = !snark.isStopped();
         if (isRunning) {
             // shouldn't happen
