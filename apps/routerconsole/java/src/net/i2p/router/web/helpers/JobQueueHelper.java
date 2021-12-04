@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Serializable;
 import java.io.Writer;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -222,14 +223,17 @@ public class JobQueueHelper extends HelperBase {
 
     /** @since 0.8.9 */
     private static class JobStatsComparator implements Comparator<JobStats>, Serializable {
+         private final Collator coll = Collator.getInstance();
+
          public int compare(JobStats l, JobStats r) {
-             return l.getName().compareTo(r.getName());
+             return coll.compare(l.getName(), r.getName());
         }
     }
 
     /** @since 0.9.5 */
     private static class JobCountComparator implements Comparator<String>, Serializable {
          private final ObjectCounter<String> _counter;
+         private final Collator coll = Collator.getInstance();
 
          public JobCountComparator(ObjectCounter<String> counter) {
              _counter = counter;
@@ -243,7 +247,7 @@ public class JobQueueHelper extends HelperBase {
                  return -1;
              if (lc < rc)
                  return 1;
-             return l.compareTo(r);
+             return coll.compare(l, r);
         }
     }
 }
