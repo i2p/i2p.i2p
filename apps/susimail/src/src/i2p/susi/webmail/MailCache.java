@@ -46,6 +46,8 @@ import java.util.Map;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientAppManager;
+import net.i2p.app.NotificationService;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
@@ -492,20 +494,42 @@ class MailCache {
 			List<FetchRequest> bar = foo;
 			mailbox.getBodies(bar);
 			//  Process results
+			int newMail = 0;
+			String additionalMsg = null;  // info on first new message
 			for (POP3Request pr : fetches) {
 				if (pr.getSuccess()) {
+					boolean setAdditional = false;
 					Mail mail = pr.mail;
-					if (!mail.hasHeader())
+					if (!mail.hasHeader()) {
 						mail.setNew(true);
+						if (newMail == 0)
+							setAdditional = true;
+						newMail++;
+					}
 					if (pr.getHeaderOnly()) {
 						mail.setHeader(pr.getBuffer());
 					} else {
 						mail.setBody(pr.getBuffer());
 					}
+					if (setAdditional)
+						additionalMsg = "\n\n" + mail.sender + '\n' + mail.subject;
 					rv = true;
 					if (disk.saveMail(mail) && mail.hasBody() &&
 					    !Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
 						mailbox.queueForDeletion(mail.uidl);
+					}
+				}
+			}
+			if (newMail > 0) {
+				// DTG popup
+				ClientAppManager cmgr = _context.clientAppManager();
+				if (cmgr != null) {
+					NotificationService ns = (NotificationService) cmgr.getRegisteredApp("desktopgui");
+					if (ns != null) {
+						String msg = ngettext("{0} new message", "{0} new messages", newMail);
+						if (newMail == 1 && additionalMsg != null)
+							msg += additionalMsg;
+						ns.notify("SusiMail", null, Log.INFO, _t("Email"), msg, "/susimail/");
 					}
 				}
 			}
@@ -596,5 +620,15 @@ class MailCache {
 		public synchronized boolean getSuccess() {
 			return success;
 		}
+	}
+
+	/** translate */
+	private static String _t(String s) {
+		return Messages.getString(s);
+	}
+
+	/** translate */
+	private static String ngettext(String s, String p, int n) {
+		return Messages.getString(n, s, p);
 	}
 }
