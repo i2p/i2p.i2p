@@ -78,7 +78,7 @@
      }
    }
 %>
- <h3 class="ptitle" id="servicedebug"><%=intl._t("Debugging")%>&nbsp;<a href="/jobs">[<%=intl._t("View the job queue")%>]</a></h3>
+ <h3 class="ptitle" id="servicedebug"><%=intl._t("Debugging")%></h3>
  <p class="infohelp">
 <% if (net.i2p.util.SystemVersion.hasWrapper()) { %>
     <%=intl._t("At times, it may be helpful to debug I2P by getting a thread dump. To do so, please select the following option and review the thread dumped to <a href=\"logs.jsp#servicelogs\">wrapper.log</a>.")%>
