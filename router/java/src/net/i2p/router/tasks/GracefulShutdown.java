@@ -26,12 +26,14 @@ public class GracefulShutdown implements Runnable {
                 int gracefulExitCode = _context.router().scheduledGracefulExitCode();
                 if (gracefulExitCode == Router.EXIT_HARD || gracefulExitCode == Router.EXIT_HARD_RESTART ||
                     _context.tunnelManager().getParticipatingCount() <= 0) {
-                    if (gracefulExitCode == Router.EXIT_HARD)
-                        log.log(Log.CRIT, "Shutting down after a brief delay");
-                    else if (gracefulExitCode == Router.EXIT_HARD_RESTART)
-                        log.log(Log.CRIT, "Restarting after a brief delay");
-                    else
-                        log.log(Log.CRIT, "Graceful shutdown progress: No more tunnels, starting final shutdown");
+                    if (log.shouldWarn()) {
+                        if (gracefulExitCode == Router.EXIT_HARD)
+                            log.warn("Shutting down after a brief delay");
+                        else if (gracefulExitCode == Router.EXIT_HARD_RESTART)
+                            log.warn("Restarting after a brief delay");
+                        else
+                            log.warn("Graceful shutdown progress: No more tunnels, starting final shutdown");
+                    }
                     // Allow time for a UI reponse
                     try {
                         synchronized (Thread.currentThread()) {

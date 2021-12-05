@@ -39,6 +39,7 @@ fi
 # router/ now has its own bundle for some files
 ROUTERFILES="\
    ../../../router/java/src/net/i2p/router/Blocklist.java \
+   ../../../router/java/src/net/i2p/router/Router.java \
    ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java \
    ../../../router/java/src/net/i2p/router/sybil/Analysis.java \
    ../../../router/java/src/net/i2p/router/tasks/CoalesceStatsEvent.java \

@@ -108,6 +108,7 @@ public class Router implements RouterClock.ClockShiftListener {
     private UPnPScannerCallback _upnpScannerCallback;
     private long _downtime = -1;
     
+    private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
     /** let clocks be off by 1 minute */
@@ -1443,7 +1444,10 @@ public class Router implements RouterClock.ClockShiftListener {
         // help us shut down esp. after OOM
         int priority = (exitCode == EXIT_OOM) ? Thread.MAX_PRIORITY - 1 : Thread.NORM_PRIORITY + 2;
         Thread.currentThread().setPriority(priority);
-        _log.log(Log.CRIT, "Starting final shutdown(" + exitCode + ')');
+        if (exitCode == EXIT_HARD_RESTART || exitCode == EXIT_GRACEFUL_RESTART)
+            _log.log(Log.CRIT, _t("Restart imminent"));
+        else
+            _log.log(Log.CRIT, _t("Shutdown imminent"));
         // So we can get all the way to the end
         // No, you can't do Thread.currentThread.setDaemon(false)
         if (_killVMOnEnd) {
@@ -1943,7 +1947,7 @@ public class Router implements RouterClock.ClockShiftListener {
                 f.delete();
                 if (lastWritten > 0)
                     _eventLog.addEvent(EventLog.CRASHED,
-                                       Translate.getString("{0} ago", DataHelper.formatDuration2(downtime), _context, "net.i2p.router.web.messages"));
+                                       Translate.getString("{0} ago", DataHelper.formatDuration2(downtime), _context, BUNDLE_NAME));
             } else {
                 return false;
             }
@@ -2136,5 +2140,13 @@ public class Router implements RouterClock.ClockShiftListener {
         if (rs != null)
             recv = (int)rs.getRate(5*60*1000).getAverageValue();
         return Math.max(send, recv);
+    }
+
+    /**
+     *  Translate with console bundle
+     *  @since 0.9.53
+     */
+    private final String _t(String s) {
+        return Translate.getString(s, _context, BUNDLE_NAME);
     }
 }

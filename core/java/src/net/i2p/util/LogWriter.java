@@ -166,6 +166,7 @@ abstract class LogWriter implements Runnable {
     }
     
     private static final String BUNDLE_NAME = "net.i2p.util.messages";
+    private static final String ROUTER_BUNDLE_NAME = "net.i2p.router.web.messages";
 
     /**
      *  gettext
@@ -222,7 +223,10 @@ abstract class LogWriter implements Runnable {
                                 if (name == null)
                                     name = "I2P";
                             }
-                            ns.notify(name, null, priority, name, msg, null);
+                            // the class name usually won't be translated,
+                            // but it will be for "Router"
+                            String tname = Translate.getString(name, _manager.getContext(), ROUTER_BUNDLE_NAME);
+                            ns.notify(name, null, priority, tname, msg, null);
                         }
                     }
                 }
