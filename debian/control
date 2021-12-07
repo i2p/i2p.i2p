@@ -12,6 +12,7 @@ Build-Depends: debhelper (>= 9.20160709)
  ,debconf
  ,default-jdk
  ,libjetty9-java (>= 9.4)
+ ,libservlet3.1-java
  ,libtaglibs-standard-jstlel-java
  ,libtomcat9-java
  ,dh-apparmor
@@ -84,6 +85,7 @@ Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  libgetopt-java,
  libjson-simple-java (>= 2),libjson-simple-java (<< 3),
  libjetty9-java (>= 9.4),
+ libservlet3.1-java,
  libtaglibs-standard-jstlel-java,
  libtomcat9-java,
  famfamfam-flag-png,
