@@ -460,6 +460,7 @@ public final class SigUtil {
     /**
      *  @deprecated unused
      */
+    @Deprecated
     public static RSAPublicKey toJavaRSAKey(SigningPublicKey pk)
                               throws GeneralSecurityException {
         SigType type = pk.getType();

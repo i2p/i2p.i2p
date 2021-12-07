@@ -478,6 +478,7 @@ public final class DSAEngine {
      *  @return hash SHA-1 hash, NOT a SHA-256 hash
      *  @deprecated unused
      */
+    @Deprecated
     public SHA1Hash calculateHash(InputStream in) {
         MessageDigest digest = SHA1.getInstance();
         byte buf[] = new byte[64];

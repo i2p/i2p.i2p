@@ -69,6 +69,7 @@ public class Lease extends DataStructureImpl {
     /**
      * @deprecated use setEndDate(long)
      */
+    @Deprecated
     public void setEndDate(Date date) {
         _end = date.getTime();
     }

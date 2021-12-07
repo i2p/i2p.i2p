@@ -232,7 +232,6 @@ public class DeliveryInstructions extends DataStructureImpl {
     
     /**
      * For cloves only (not tunnels), default false, unused
-     * @deprecated unused
      */
 /****
     private static boolean flagEncrypted(long flags) {

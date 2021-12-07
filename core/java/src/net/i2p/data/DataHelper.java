@@ -629,6 +629,7 @@ public class DataHelper {
      *  @return (new BigInteger(1, buf)).toString()
      *  @deprecated unused
      */
+    @Deprecated
     public static String toDecimalString(byte buf[], int len) {
         if (buf == null)
             return "0";
@@ -652,6 +653,7 @@ public class DataHelper {
      *  @return minimum-length representation (with possible leading 0 byte)
      *  @deprecated unused
      */
+    @Deprecated
     public final static byte[] fromHexString(String val) {
         BigInteger bv = new BigInteger(val, 16);
         return bv.toByteArray();
@@ -2011,6 +2013,7 @@ public class DataHelper {
      *  @throws RuntimeException
      *  @deprecated unused
      */
+    @Deprecated
     public static byte[] getUTF8(StringBuffer orig) {
         if (orig == null) return null;
         return getUTF8(orig.toString());

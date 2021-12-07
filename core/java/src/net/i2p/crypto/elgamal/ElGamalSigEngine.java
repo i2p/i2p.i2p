@@ -150,6 +150,7 @@ public final class ElGamalSigEngine extends Signature {
      * @deprecated replaced with <a href="#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">this</a>
      */
     @Override
+    @Deprecated
     protected void engineSetParameter(String param, Object value) {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
@@ -158,6 +159,7 @@ public final class ElGamalSigEngine extends Signature {
      * @deprecated
      */
     @Override
+    @Deprecated
     protected Object engineGetParameter(String param) {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }

@@ -73,6 +73,7 @@ public final class ElGamalAESEngine {
      *
      * @deprecated specify the key manager!
      */
+    @Deprecated
     public byte[] decrypt(byte data[], PrivateKey targetPrivateKey) throws DataFormatException {
         return decrypt(data, targetPrivateKey, _context.sessionKeyManager());
     }
@@ -567,6 +568,7 @@ public final class ElGamalAESEngine {
      * @throws IllegalArgumentException on bad target EncType
      * @deprecated unused
      */
+    @Deprecated
     public byte[] encrypt(byte data[], PublicKey target, SessionKey key, Set<SessionTag> tagsForDelivery, long paddedSize) {
         return encrypt(data, target, key, tagsForDelivery, null, null, paddedSize);
     }
@@ -579,6 +581,7 @@ public final class ElGamalAESEngine {
      * @throws IllegalArgumentException on bad target EncType
      * @deprecated unused
      */
+    @Deprecated
     public byte[] encrypt(byte data[], PublicKey target, SessionKey key, long paddedSize) {
         return encrypt(data, target, key, null, null, null, paddedSize);
     }

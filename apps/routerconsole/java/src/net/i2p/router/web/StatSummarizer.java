@@ -342,6 +342,7 @@ public class StatSummarizer implements Runnable, ClientApp {
     }
 
     /** @deprecated unused */
+    @Deprecated
     public boolean renderPng(OutputStream out, String templateFilename) throws IOException {
         SummaryRenderer.render(_context, out, templateFilename);
         return true;
