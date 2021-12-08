@@ -24,11 +24,13 @@ public class StreamrConsumer extends I2PTunnelUDPClientBase {
         super(destination, l, notifyThis, tunnel);
 
         // create udp-destination
-        this.sink = new UDPSink(host, port);
+        UDPSink udps = new UDPSink(host, port);
+        int localPort = udps.getPort();
+        this.sink = udps;
         setSink(this.sink);
         
         // create pinger
-        this.pinger = new Pinger();
+        this.pinger = new Pinger(_context, localPort);
         this.pinger.setSink(this);
     }
     

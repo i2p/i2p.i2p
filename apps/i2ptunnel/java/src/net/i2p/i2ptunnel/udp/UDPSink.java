@@ -13,7 +13,13 @@ import net.i2p.data.Destination;
  */
 public class UDPSink implements Sink {
 
+    protected final DatagramSocket sock;
+    protected final InetAddress remoteHost;
+    protected final int remotePort;
+
     /**
+     *  @param host where to send
+     *  @param port where to send
      *  @throws IllegalArgumentException on DatagramSocket IOException
      */
     public UDPSink(InetAddress host, int port) {
@@ -23,18 +29,31 @@ public class UDPSink implements Sink {
         } catch (IOException e) {
             throw new IllegalArgumentException("failed to open udp-socket", e);
         }
-        
         this.remoteHost = host;
+        this.remotePort = port;
+    }
         
-        // remote port
+
+    /**
+     *  @param socket existing socket
+     *  @param host where to send
+     *  @param port where to send
+     *  @since 0.9.53
+     */
+    public UDPSink(DatagramSocket socket, InetAddress host, int port) {
+        sock = socket;
+        this.remoteHost = host;
         this.remotePort = port;
     }
     
     /**
      *  @param src ignored
+     *  @param fromPort ignored
+     *  @param toPort ignored
+     *  @since 0.9.53 added fromPort and toPort parameters, breaking change, sorry
      *  @throws RuntimeException on DatagramSocket IOException
      */
-    public void send(Destination src, byte[] data) {
+    public void send(Destination src, int fromPort, int toPort, byte[] data) {
         // if data.length > this.sock.getSendBufferSize() ...
 
         // create packet
@@ -48,6 +67,9 @@ public class UDPSink implements Sink {
         }
     }
     
+    /**
+     *  @return the local port of the DatagramSocket we are sending from
+     */
     public int getPort() {    
         return this.sock.getLocalPort();    
     }    
@@ -60,9 +82,4 @@ public class UDPSink implements Sink {
     public void stop() {    
         this.sock.close();    
     }    
-    
-    protected final DatagramSocket sock;
-    protected final InetAddress remoteHost;
-    protected final int remotePort;
-
 }

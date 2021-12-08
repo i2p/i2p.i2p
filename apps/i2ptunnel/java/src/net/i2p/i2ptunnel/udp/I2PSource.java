@@ -1,94 +1,105 @@
 package net.i2p.i2ptunnel.udp;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
-import net.i2p.client.I2PSessionListener;
+import net.i2p.client.I2PSessionMuxedListener;
 import net.i2p.client.datagram.I2PDatagramDissector;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
+ * Refactored in 0.9.53 to support I2CP protocols and ports
  *
  * @author welterde
  */
-public class I2PSource implements Source, Runnable {
+public class I2PSource implements Source {
 
+    protected final I2PSession sess;
+    protected Sink sink;
+    private final Protocol protocol;
+    private final int port;
+    private final I2PDatagramDissector diss;
+    private final Log log;
+
+    /**
+     *  @since 0.9.53
+     */
+    public enum Protocol { REPLIABLE, RAW, BOTH }
+
+    /**
+     *  Handles both REPLIABLE and RAW on any port
+     */
     public I2PSource(I2PSession sess) {
-        this(sess, true, false);
+        this(sess, Protocol.BOTH);
     }
 
-    public I2PSource(I2PSession sess, boolean verify) {
-        this(sess, verify, false);
+    /**
+     *  Listen on all I2CP ports.
+     *  No support for arbitrary protocol numbers.
+     *
+     *  @param protocol REPLIABLE, RAW, or BOTH
+     *  @since 0.9.53
+     */
+    public I2PSource(I2PSession sess, Protocol protocol) {
+        this(sess, protocol, I2PSession.PORT_ANY);
     }
 
-    public I2PSource(I2PSession sess, boolean verify, boolean raw) {
+    /**
+     *  @param port I2CP port or I2PSession.PORT_ANY
+     *  @param portocol REPLIABLE, RAW, or BOTH
+     *  @since 0.9.53
+     */
+    public I2PSource(I2PSession sess, Protocol protocol, int port) {
         this.sess = sess;
-        this.verify = verify;
-        this.raw = raw;
-        
-        // create queue
-        this.queue = new ArrayBlockingQueue<Integer>(256);
-        
-        // create listener
-        this.sess.setSessionListener(new Listener());
-        
-        // create thread
-        this.thread = new I2PAppThread(this);
+        this.protocol = protocol;
+        this.port = port;
+        diss = (protocol != Protocol.RAW) ? new I2PDatagramDissector() : null;
+        log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
     }
     
     public void setSink(Sink sink) {
         this.sink = sink;
     }
-    
+
     public void start() {
-        this.thread.start();
+        // create listener
+        Listener l = new Listener();
+        if (protocol != Protocol.RAW)
+            sess.addMuxedSessionListener(l, I2PSession.PROTO_DATAGRAM, port);
+        if (protocol != Protocol.REPLIABLE)
+            sess.addMuxedSessionListener(l, I2PSession.PROTO_DATAGRAM_RAW, port);
     }
     
-    public void run() {
-        // create dissector
-        I2PDatagramDissector diss = new I2PDatagramDissector();
-        _running = true;
-        while (_running) {
+    protected class Listener implements I2PSessionMuxedListener {
+
+        public void messageAvailable(I2PSession sess, int id, long size) {
+            throw new IllegalStateException("muxed");
+        }
+
+        /**
+         *  @since 0.9.53
+         */
+        public void messageAvailable(I2PSession session, int id, long size, int proto, int fromPort, int toPort) {
+            if (log.shouldDebug())
+                log.debug("Got " + size + " bytes, proto: " + proto + " from port: " + fromPort + " to port: " + toPort);
             try {
-                // get id
-                int id = this.queue.take();
-                
                 // receive message
-                byte[] msg = this.sess.receiveMessage(id);
-                
-                if(!this.raw) {
+                byte[] msg = session.receiveMessage(id);
+                if (proto == I2PSession.PROTO_DATAGRAM) {
                     // load datagram into it
                     diss.loadI2PDatagram(msg);
-                    
                     // now call sink
-                    if(this.verify)
-                        this.sink.send(diss.getSender(), diss.getPayload());
-                    else
-                        this.sink.send(diss.extractSender(), diss.extractPayload());
+                    sink.send(diss.getSender(), fromPort, toPort, diss.getPayload());
+                } else if (proto == I2PSession.PROTO_DATAGRAM_RAW) {
+                    sink.send(null, fromPort, toPort, msg);
                 } else {
-                    // verify is ignored
-                    this.sink.send(null, msg);
+                    if (log.shouldWarn())
+                        log.warn("dropping message with unknown protocol " + proto);
                 }
                 //System.out.print("r");
             } catch(Exception e) {
-                Log log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
                 if (log.shouldWarn())
-                    log.warn("error sending", e);
-                break;
-            }
-        }
-    }
-    
-    protected class Listener implements I2PSessionListener {
-
-        public void messageAvailable(I2PSession sess, int id, long size) {
-            try {
-                queue.put(id);
-            } catch(Exception e) {
-                // ignore
+                    log.warn("error receiving datagram", e);
             }
         }
 
@@ -97,24 +108,11 @@ public class I2PSource implements Source, Runnable {
         }
 
         public void disconnected(I2PSession arg0) {
-            _running = false;
-            thread.interrupt();
         }
 
         public void errorOccurred(I2PSession arg0, String arg1, Throwable arg2) {
-            Log log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
             log.error(arg1, arg2);
-            _running = false;
-            thread.interrupt();
         }
         
     }
-    
-    protected final I2PSession sess;
-    protected final BlockingQueue<Integer> queue;
-    protected Sink sink;
-    protected final Thread thread;
-    protected final boolean verify;
-    protected final boolean raw;
-    private volatile boolean _running;
 }

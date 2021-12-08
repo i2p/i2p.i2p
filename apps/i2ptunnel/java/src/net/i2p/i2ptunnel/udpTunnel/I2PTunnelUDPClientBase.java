@@ -12,6 +12,7 @@ import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
+import net.i2p.client.streaming.I2PSocketAddress;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnel;
@@ -57,7 +58,6 @@ import net.i2p.util.EventDispatcher;
     private final I2PSession _session;
     private final Source _i2pSource;
     private final Sink _i2pSink;
-    private final Destination _otherDest;
 
     /**
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
@@ -103,19 +103,19 @@ import net.i2p.util.EventDispatcher;
             throw new RuntimeException("failed to create session", exc);
         }
 
-        // Setup the source. Always expect raw unverified datagrams.
-        _i2pSource = new I2PSource(_session, false, true);
+        // Setup the source. Handle both repliable and raw datagrams, on all ports.
+        _i2pSource = new I2PSource(_session, I2PSource.Protocol.BOTH);
 
         // Setup the sink. Always send repliable datagrams.
         if (destination != null && destination.length() > 0) {
-            _otherDest = _context.namingService().lookup(destination);
-            if (_otherDest == null) {
+            I2PSocketAddress addr = new I2PSocketAddress(destination);
+            if (addr.isUnresolved()) {
+                // unlike in I2PTunnelClient, we don't defer and retry resolution later
                 l.log("Could not resolve " + destination);
                 throw new RuntimeException("failed to create session - could not resolve " + destination);
-             }
-            _i2pSink = new I2PSink(_session, _otherDest, false);
+            }
+            _i2pSink = new I2PSink(_session, addr.getAddress(), false, addr.getPort());
         } else {
-            _otherDest = null;
             _i2pSink = new I2PSinkAnywhere(_session, false);
         }   
     }
@@ -178,10 +178,11 @@ import net.i2p.util.EventDispatcher;
      *  Sink Methods
      *
      * @param to - ignored if configured for a single destination
-     * (we use the dest specified in the constructor)
+     *             (we use the dest specified in the constructor)
+     * @since 0.9.53 added fromPort and toPort parameters
      * @throws RuntimeException if session is closed
      */
-    public void send(Destination to, byte[] data) {
-        _i2pSink.send(to, data);
+    public void send(Destination to, int fromPort, int toPort, byte[] data) {
+        _i2pSink.send(to, fromPort, toPort, data);
     }
 }

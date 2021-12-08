@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.i2ptunnel.udpTunnel.I2PTunnelUDPClientBase;
@@ -12,18 +13,24 @@ import net.i2p.i2ptunnel.udpTunnel.I2PTunnelUDPClientBase;
  * A Datagram Tunnel that can have multiple bidirectional ports on the UDP side.
  *
  * TX:
- *   (ReplyTracker in multiple SOCKSUDPPorts -&gt; ) I2PSink
+ *   (multiple SOCKSUDPPorts -&gt; ) I2PSink
  *
  * RX:
  *   (SOCKSUDPWrapper in multiple SOCKSUDPPorts &lt;- ) MultiSink &lt;- I2PSource
  *
- * The reply from a dest goes to the last SOCKSUDPPort that sent to that dest.
- * If multiple ports are talking to a dest at the same time, this isn't
- * going to work very well.
+ * The replies must be to the same I2CP toPort as the outbound fromPort.
+ * If the server does not honor that, the replies will be dropped.
+ *
+ * The replies must be repliable. Raw datagrams are not supported, and would
+ * require a unique source port for each target.
+ *
+ * Preliminary, untested, possibly incomplete.
  *
  * @author zzz modded from streamr/StreamrConsumer
  */
 public class SOCKSUDPTunnel extends I2PTunnelUDPClientBase {
+    private final Map<Integer, SOCKSUDPPort> ports;
+    private final MultiSink<SOCKSUDPPort> demuxer;
 
     /**
      *  Set up a tunnel with no UDP side yet.
@@ -33,15 +40,14 @@ public class SOCKSUDPTunnel extends I2PTunnelUDPClientBase {
         super(null, tunnel, tunnel, tunnel);
 
         this.ports = new ConcurrentHashMap<Integer, SOCKSUDPPort>(1);
-        this.cache = new ConcurrentHashMap<Destination, SOCKSUDPPort>(1);
-        this.demuxer = new MultiSink<SOCKSUDPPort>(this.cache);
+        this.demuxer = new MultiSink<SOCKSUDPPort>(ports);
         setSink(this.demuxer);
     }
 
 
     /** @return the UDP port number */
     public int add(InetAddress host, int port) {
-        SOCKSUDPPort sup = new SOCKSUDPPort(host, port, this.cache);
+        SOCKSUDPPort sup = new SOCKSUDPPort(host, port, ports);
         this.ports.put(Integer.valueOf(sup.getPort()), sup);
         sup.setSink(this);
         sup.start();
@@ -52,11 +58,6 @@ public class SOCKSUDPTunnel extends I2PTunnelUDPClientBase {
         SOCKSUDPPort sup = this.ports.remove(port);
         if (sup != null)
             sup.stop();
-        for (Iterator<Map.Entry<Destination, SOCKSUDPPort>> iter = cache.entrySet().iterator(); iter.hasNext();) {
-            Map.Entry<Destination, SOCKSUDPPort> e = iter.next();
-            if (e.getValue() == sup)
-                iter.remove();
-        }
     }
     
     @Override
@@ -81,12 +82,5 @@ public class SOCKSUDPTunnel extends I2PTunnelUDPClientBase {
               sup.stop();
          }
          this.ports.clear();
-         this.cache.clear();
     }
-
-
-
-    private Map<Integer, SOCKSUDPPort> ports;
-    private Map<Destination, SOCKSUDPPort> cache;
-    private MultiSink<SOCKSUDPPort> demuxer;
 }

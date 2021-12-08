@@ -21,8 +21,7 @@ public class StreamrProducer extends I2PTunnelUDPServerBase {
     public StreamrProducer(int port,
                            File privkey, String privkeyname, Logging l,
                            EventDispatcher notifyThis, I2PTunnel tunnel) {
-        // verify subscription requests
-        super(true, privkey, privkeyname, l, notifyThis, tunnel);
+        super(privkey, privkeyname, l, notifyThis, tunnel);
         
         // The broadcaster
         this.multi = new MultiSource();

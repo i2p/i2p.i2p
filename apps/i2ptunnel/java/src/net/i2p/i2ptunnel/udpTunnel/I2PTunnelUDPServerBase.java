@@ -67,15 +67,14 @@ public class I2PTunnelUDPServerBase extends I2PTunnelTask implements Source, Sin
      *                                  badly that we cant create a socketManager
      *
      */
-
-    public I2PTunnelUDPServerBase(boolean verify, File privkey, String privkeyname, Logging l,
+    public I2PTunnelUDPServerBase(File privkey, String privkeyname, Logging l,
                            EventDispatcher notifyThis, I2PTunnel tunnel) {
         super("UDPServer <- " + privkeyname, notifyThis, tunnel);
         _log = tunnel.getContext().logManager().getLog(I2PTunnelUDPServerBase.class);
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(privkey);
-            init(verify, fis, privkeyname, l);
+            init(fis, privkeyname, l);
         } catch (IOException ioe) {
             _log.error("Error starting server", ioe);
             notifyEvent("openServerResult", "error");
@@ -85,7 +84,7 @@ public class I2PTunnelUDPServerBase extends I2PTunnelTask implements Source, Sin
         }
     }
 
-    private void init(boolean verify, InputStream privData, String privkeyname, Logging l) {
+    private void init(InputStream privData, String privkeyname, Logging l) {
         this.l = l;
 
         // create i2pclient
@@ -99,8 +98,8 @@ public class I2PTunnelUDPServerBase extends I2PTunnelTask implements Source, Sin
             throw new RuntimeException("failed to create session", exc);
         }
 
-        // Setup the source. Always expect repliable datagrams, optionally verify
-        _i2pSource = new I2PSource(_session, verify, false);
+        // Setup the source. Always expect repliable datagrams, listen on all ports.
+        _i2pSource = new I2PSource(_session, I2PSource.Protocol.REPLIABLE);
 
         // Setup the sink. Always send raw datagrams.
         _i2pSink = new I2PSinkAnywhere(_session, true);
@@ -188,11 +187,12 @@ public class I2PTunnelUDPServerBase extends I2PTunnelTask implements Source, Sin
      *  Sink Methods
      *
      * @param to
+     * @since 0.9.53 added fromPort and toPort parameters
      * @throws RuntimeException if session is closed
      *
      */
-    public void send(Destination to, byte[] data) {
-        _i2pSink.send(to, data);
+    public void send(Destination to, int fromPort, int toPort, byte[] data) {
+        _i2pSink.send(to, fromPort, toPort, data);
     }
 }
 

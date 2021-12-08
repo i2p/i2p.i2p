@@ -13,6 +13,10 @@ import net.i2p.util.Log;
  * @author welterde
  */
 public class UDPSource implements Source, Runnable {
+    protected final DatagramSocket sock;
+    protected Sink sink;
+    protected final Thread thread;
+    private final int port;
     public static final int MAX_SIZE = 15360;
 
     /**
@@ -25,7 +29,7 @@ public class UDPSource implements Source, Runnable {
         } catch (IOException e) {
             throw new RuntimeException("failed to listen...", e);
         }
-        
+        this.port = port;
         // create thread
         this.thread = new I2PAppThread(this);
     }
@@ -33,6 +37,7 @@ public class UDPSource implements Source, Runnable {
     /** use socket from UDPSink */
     public UDPSource(DatagramSocket sock) {
         this.sock = sock;
+        port = sock.getLocalPort();    
         this.thread = new I2PAppThread(this);
     }
     
@@ -60,7 +65,7 @@ public class UDPSource implements Source, Runnable {
                 System.arraycopy(pack.getData(), 0, nbuf, 0, nbuf.length);
                 
                 // transfer to sink
-                this.sink.send(null, nbuf);
+                this.sink.send(null, port, 0, nbuf);
                 //System.out.print("i");
             } catch(Exception e) {
                 Log log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
@@ -71,11 +76,15 @@ public class UDPSource implements Source, Runnable {
         }
     }
     
+    /**
+     *  @return the local port of the DatagramSocket we are receiving on
+     *  @since 0.9.53
+     */
+    public int getPort() {    
+        return port;    
+    }    
+
     public void stop() {    
         this.sock.close();    
     }    
-    
-    protected final DatagramSocket sock;
-    protected Sink sink;
-    protected final Thread thread;
 }

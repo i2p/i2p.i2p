@@ -14,10 +14,12 @@ import net.i2p.util.Log;
  * @author zzz modded for I2PTunnel
  */
 public class MultiSource implements Source, Sink {
+    private Sink sink;
+    private final List<MSink> sinks;
     private final Log log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
 
     public MultiSource() {
-        this.sinks = new CopyOnWriteArrayList<Destination>();
+        this.sinks = new CopyOnWriteArrayList<MSink>();
     }
     
     public void setSink(Sink sink) {
@@ -32,9 +34,10 @@ public class MultiSource implements Source, Sink {
 
     /**
      *  May throw RuntimeException from underlying sinks
+     *  @since 0.9.53 added fromPort and toPort parameters
      *  @throws RuntimeException
      */
-    public void send(Destination ignored_from, byte[] data) {
+    public void send(Destination ignored_from, int ignored_fromPort, int ignored_toPort, byte[] data) {
         if (sinks.isEmpty()) {
             if (log.shouldDebug())
                 log.debug("No subscribers to send " + data.length + " bytes to");
@@ -43,19 +46,53 @@ public class MultiSource implements Source, Sink {
         if (log.shouldDebug())
             log.debug("Sending " + data.length + " bytes to " + sinks.size() + " subscribers");
 
-        for(Destination dest : this.sinks) {
-            this.sink.send(dest, data);
+        for(MSink ms : this.sinks) {
+            this.sink.send(ms.dest, ms.fromPort, ms.toPort, data);
         }
     }
     
-    public void add(Destination sink) {
-        this.sinks.add(sink);
+    /**
+     *  @since 0.9.53 changed to MSink parameter
+     */
+    public void add(MSink ms) {
+        sinks.add(ms);
     }
     
-    public void remove(Destination sink) {
-        this.sinks.remove(sink);
+    /**
+     *  @since 0.9.53 changed to MSink parameter
+     */
+    public void remove(MSink ms) {
+        sinks.remove(ms);
     }
-    
-    private Sink sink;
-    private final List<Destination> sinks;
+
+    /**
+     *  @since 0.9.53
+     */
+    static class MSink {
+        public final Destination dest;
+        public final int fromPort, toPort;
+
+        public MSink(Destination dest, int fromPort, int toPort) {
+            this.dest = dest; this.fromPort = fromPort; this.toPort = toPort;
+        }
+
+        @Override
+        public int hashCode() {
+            return dest.hashCode() | fromPort | (toPort << 16);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof MSink))
+                return false;
+            MSink s = (MSink) o;
+            return dest.equals(s.dest) && fromPort == s.fromPort && toPort == s.toPort;
+        }
+
+        @Override
+        public String toString() {
+            return "from port " + fromPort + " to " + dest.toBase32() + ':' + toPort;
+
+        }
+    }
 }

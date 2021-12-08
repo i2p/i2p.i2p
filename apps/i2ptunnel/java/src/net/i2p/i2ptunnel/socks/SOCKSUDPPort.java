@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
+import net.i2p.client.streaming.I2PSocketAddress;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.udp.*;
 
@@ -14,22 +15,26 @@ import net.i2p.i2ptunnel.udp.*;
  * ports, it happens outside of here.
  *
  * TX:
- *   UDPSource -&gt; SOCKSUDPUnwrapper -&gt; ReplyTracker ( -&gt; I2PSink in SOCKSUDPTunnel)
+ *   UDPSource -&gt; SOCKSUDPUnwrapper -&gt; (I2PSink in SOCKSUDPTunnel)
  *
  * RX:
  *   UDPSink &lt;- SOCKSUDPWrapper ( &lt;- MultiSink &lt;- I2PSource in SOCKSUDPTunnel)
  *
  * The Unwrapper passes headers to the Wrapper through a cache.
- * The ReplyTracker passes sinks to MultiSink through a cache.
+ * MultiSink routes packets based on toPort.
  *
  * @author zzz
  */
 public class SOCKSUDPPort implements Source, Sink {
+    private final UDPSink udpsink;
+    private final UDPSource udpsource;
+    private final SOCKSUDPWrapper wrapper;
+    private final SOCKSUDPUnwrapper unwrapper;
 
-    public SOCKSUDPPort(InetAddress host, int port, Map<Destination, SOCKSUDPPort> replyMap) {
+    public SOCKSUDPPort(InetAddress host, int port, Map<Integer, SOCKSUDPPort> replyMap) {
 
         // this passes the host and port from UDPUnwrapper to UDPWrapper
-        Map<Destination, SOCKSHeader> cache = new ConcurrentHashMap<Destination, SOCKSHeader>(4);
+        Map<I2PSocketAddress, SOCKSHeader> cache = new ConcurrentHashMap<I2PSocketAddress, SOCKSHeader>(4);
 
         // rcv from I2P and send to a port
         this.wrapper = new SOCKSUDPWrapper(cache);
@@ -41,8 +46,6 @@ public class SOCKSUDPPort implements Source, Sink {
         this.udpsource = new UDPSource(sock);
         this.unwrapper = new SOCKSUDPUnwrapper(cache);
         this.udpsource.setSink(this.unwrapper);
-        this.udptracker = new ReplyTracker<SOCKSUDPPort>(this, replyMap);
-        this.unwrapper.setSink(this.udptracker);
     }
 
     /** Socks passes this back to the client on the TCP connection */
@@ -51,7 +54,7 @@ public class SOCKSUDPPort implements Source, Sink {
     }
 
     public void setSink(Sink sink) {
-        this.udptracker.setSink(sink);
+        this.unwrapper.setSink(sink);
     }
 
     public void start() {
@@ -66,16 +69,14 @@ public class SOCKSUDPPort implements Source, Sink {
 
     /**
      *  May throw RuntimeException from underlying sink
+
+     *  @param from will be passed along
+     *  @param fromPort will be passed along
+     *  @param toPort will be passed along
+     *  @since 0.9.53 added fromPort and toPort parameters
      *  @throws RuntimeException
      */
-    public void send(Destination from, byte[] data) {
-        this.wrapper.send(from, data);
+    public void send(Destination from, int fromPort, int toPort, byte[] data) {
+        this.wrapper.send(from, fromPort, toPort, data);
     }
-    
-
-    private UDPSink udpsink;
-    private UDPSource udpsource;
-    private SOCKSUDPWrapper wrapper;
-    private SOCKSUDPUnwrapper unwrapper;
-    private ReplyTracker<SOCKSUDPPort> udptracker;
 }
