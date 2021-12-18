@@ -267,9 +267,12 @@ public class TunnelPoolSettings {
      *  to be in the same tunnel
      *  (1-4, 0 to disable)
      *
+     *  Support removed in the ClientPeerSelector in 0.8.6; restored in 0.9.53
+     *
+     *  @return 0-4 Number of bytes to match to determine if peers in the same IP range should
+     *          not be in the same tunnel. 0 = disable check; 1 = /8; 2 = /16; 3 = /24; 4 = exact IP match
      */
-    public int getIPRestriction() { int r = _IPRestriction; if (r>4) r=4; else if (r<0) r=0; return r;}
-    public void setIPRestriction(int b) { _IPRestriction = b; }
+    public int getIPRestriction() { return _IPRestriction; }
     
     /**
      *  Outbound message priority - for outbound tunnels only
@@ -317,9 +320,14 @@ public class TunnelPoolSettings {
                 //     _rebuildPeriod = getInt(value, DEFAULT_REBUILD_PERIOD);
                 else if (name.equalsIgnoreCase(prefix + PROP_NICKNAME))
                     _destinationNickname = value;
-                else if (name.equalsIgnoreCase(prefix + PROP_IP_RESTRICTION))
-                    _IPRestriction = getInt(value, DEFAULT_IP_RESTRICTION);
-                else if ((!_isInbound) && name.equalsIgnoreCase(prefix + PROP_PRIORITY)) {
+                else if (name.equalsIgnoreCase(prefix + PROP_IP_RESTRICTION)) {
+                    int r = getInt(value, DEFAULT_IP_RESTRICTION);
+                    if (r > 4)
+                        r = 4;
+                    else if (r < 0)
+                        r = 0;
+                    _IPRestriction = r;
+                } else if ((!_isInbound) && name.equalsIgnoreCase(prefix + PROP_PRIORITY)) {
                      int def = _isExploratory ? EXPLORATORY_PRIORITY : 0;
                      int max = _isExploratory ? EXPLORATORY_PRIORITY : MAX_PRIORITY;
                     _priority = Math.min(max, Math.max(MIN_PRIORITY, getInt(value, def)));
