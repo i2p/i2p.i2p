@@ -585,7 +585,7 @@ a:active #sb_bandwidthgraph {
      background: #ccf;
      background: linear-gradient(to right, #ddf, #efefff 30%, #efefff 60%, #ddf);
      box-shadow: inset 0 0 0 1px #fff;
-     margin: -7px 2px 5px !important;
+     margin: -3px 2px 5px !important;
      padding: 4px 0 3px;
 }
 
