@@ -217,7 +217,11 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
      * @return false if we stopped using it, true if still ok
      */
     public boolean tunnelFailed() {
-        return _failures.incrementAndGet() <= MAX_CONSECUTIVE_TEST_FAILURES;
+        boolean rv = _failures.incrementAndGet() <= MAX_CONSECUTIVE_TEST_FAILURES;
+        // don't allow it to be rebuilt
+        if (!rv)
+            _reused = true;
+        return rv;
     }
 
     /**
@@ -227,6 +231,8 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
      */
     public void tunnelFailedCompletely() {
         _failures.addAndGet(MAX_CONSECUTIVE_TEST_FAILURES + 1);
+        // don't allow it to be rebuilt
+        _reused = true;
     }
 
     /**
