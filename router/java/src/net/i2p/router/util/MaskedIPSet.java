@@ -98,8 +98,6 @@ public class MaskedIPSet extends HashSet<String> {
             int port = pa.getPort();
             if (port > 0)
                 add("p" + port);
-            if (pa.getCost() == 2 && "NTCP".equals(pa.getTransportStyle()))
-                add("=cost2");
         }
         String family = pinfo.getOption("family");
         if (family != null) {
