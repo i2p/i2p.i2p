@@ -5,6 +5,7 @@ import java.util.Arrays;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.socks.SOCKS5Constants.AddressType;
 import net.i2p.util.Addresses;
 
 /**
@@ -30,11 +31,11 @@ public class SOCKSHeader {
             throw new IllegalArgumentException("We can't handle fragments!");
         int headerlen = 0;
         int addressType = data[3];
-        if (addressType == 1) {
+        if (addressType == AddressType.IPV4) {
             headerlen = 6 + 4;
-        } else if (addressType == 3) {
+        } else if (addressType == AddressType.DOMAINNAME) {
             headerlen = 6 + 1 + (data[4] & 0xff);
-        } else if (addressType == 4) {
+        } else if (addressType == AddressType.IPV6) {
             // future garlicat partial hash lookup possible?
             headerlen = 6 + 16;
         } else {
@@ -70,13 +71,13 @@ public class SOCKSHeader {
      */
     public String getHost() {
         int addressType = this.header[3];
-        if (addressType == 3) {
+        if (addressType == AddressType.DOMAINNAME) {
             int namelen = (this.header[4] & 0xff);
             return DataHelper.getUTF8(header, 5, namelen);
         }
-        if (addressType == 1)
+        if (addressType == AddressType.IPV4)
             return Addresses.toString(Arrays.copyOfRange(header, 4, 4));
-        if (addressType == 4)
+        if (addressType == AddressType.IPV6)
             return Addresses.toString(Arrays.copyOfRange(header, 4, 16));
         return null;
     }
