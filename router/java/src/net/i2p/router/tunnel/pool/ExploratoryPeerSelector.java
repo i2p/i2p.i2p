@@ -11,6 +11,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelPoolSettings;
+import net.i2p.router.util.MaskedIPSet;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
@@ -31,7 +32,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
      * Returns ENDPOINT FIRST, GATEWAY LAST!!!!
      * In: us .. closest .. middle .. IBGW
      * Out: OBGW .. middle .. closest .. us
-     * 
+     *
      * @return ordered list of Hash objects (one per peer) specifying what order
      *         they should appear in a tunnel (ENDPOINT FIRST).  This includes
      *         the local router in the list.  If there are no tunnels or peers
@@ -40,19 +41,19 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
      */
     public List<Hash> selectPeers(TunnelPoolSettings settings) {
         int length = getLength(settings);
-        if (length < 0) { 
+        if (length < 0) {
             if (log.shouldLog(Log.DEBUG))
                 log.debug("Length requested is zero: " + settings);
             return null;
         }
-        
+
         //if (false && shouldSelectExplicit(settings)) {
         //    List<Hash> rv = selectExplicit(settings, length);
         //    if (l.shouldLog(Log.DEBUG))
         //        l.debug("Explicit peers selected: " + rv);
         //    return rv;
         //}
-        
+
         boolean isInbound = settings.isInbound();
         Set<Hash> exclude = getExclude(isInbound, true);
         exclude.add(ctx.routerHash());
@@ -70,6 +71,8 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         boolean hiddenInbound = hidden && isInbound;
         boolean hiddenOutbound = hidden && !isInbound;
         boolean lowOutbound = nonzero && !isInbound && !ctx.commSystem().haveHighOutboundCapacity();
+        int ipRestriction =  (ctx.getBooleanProperty("i2np.allowLocal") || length <= 1) ? 0 : settings.getIPRestriction();
+        MaskedIPSet ipSet = ipRestriction > 0 ? new MaskedIPSet(16) : null;
 
 
         // closest-hop restrictions
@@ -99,21 +102,21 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
                     log.info("EPS SANFP closest " + (isInbound ? "IB" : "OB") + " exclude " + closestExclude.size());
                 // SANFP adds all not-connected to exclude, so make a copy
                 Set<Hash> SANFPExclude = new HashSet<Hash>(closestExclude);
-                ctx.profileOrganizer().selectActiveNotFailingPeers(1, SANFPExclude, closest);
+                ctx.profileOrganizer().selectActiveNotFailingPeers(1, SANFPExclude, closest, ipRestriction, ipSet);
                 if (closest.isEmpty()) {
                     // ANFP does not fall back to non-connected
                     if (log.shouldLog(Log.INFO))
                         log.info("EPS SFP closest " + (isInbound ? "IB" : "OB") + " exclude " + closestExclude.size());
-                    ctx.profileOrganizer().selectFastPeers(1, closestExclude, closest);
+                    ctx.profileOrganizer().selectFastPeers(1, closestExclude, closest, ipRestriction, ipSet);
                 }
             } else if (exploreHighCap) {
                 if (log.shouldLog(Log.INFO))
                     log.info("EPS SHCP closest " + (isInbound ? "IB" : "OB") + " exclude " + closestExclude.size());
-                ctx.profileOrganizer().selectHighCapacityPeers(1, closestExclude, closest);
+                ctx.profileOrganizer().selectHighCapacityPeers(1, closestExclude, closest, ipRestriction, ipSet);
             } else {
                 if (log.shouldLog(Log.INFO))
                     log.info("EPS SNFP closest " + (isInbound ? "IB" : "OB") + " exclude " + closestExclude.size());
-                ctx.profileOrganizer().selectNotFailingPeers(1, closestExclude, closest, false);
+                ctx.profileOrganizer().selectNotFailingPeers(1, closestExclude, closest, false, ipRestriction, ipSet);
             }
             if (!closest.isEmpty()) {
                 closestHop = closest.iterator().next();
@@ -155,12 +158,12 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
                     log.info("EPS SANFP furthest OB exclude " + exclude.size());
                 // ANFP adds all not-connected to exclude, so make a copy
                 Set<Hash> SANFPExclude = new HashSet<Hash>(exclude);
-                ctx.profileOrganizer().selectActiveNotFailingPeers(1, SANFPExclude, furthest);
+                ctx.profileOrganizer().selectActiveNotFailingPeers(1, SANFPExclude, furthest, ipRestriction, ipSet);
                 if (furthest.isEmpty()) {
                     // ANFP does not fall back to non-connected
                     if (log.shouldLog(Log.INFO))
                         log.info("EPS SFP furthest OB exclude " + exclude.size());
-                    ctx.profileOrganizer().selectFastPeers(1, exclude, furthest);
+                    ctx.profileOrganizer().selectFastPeers(1, exclude, furthest, ipRestriction, ipSet);
                 }
                 if (!furthest.isEmpty()) {
                     furthestHop = furthest.iterator().next();
@@ -179,13 +182,10 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         HashSet<Hash> matches = new HashSet<Hash>(length);
 
         if (length > 0) {
-            //
-            // We don't honor IP Restriction here, to be fixed
-            //
             if (exploreHighCap) {
                 if (log.shouldLog(Log.INFO))
                     log.info("EPS SHCP " + length + (isInbound ? " IB" : " OB") + " exclude " + exclude.size());
-                ctx.profileOrganizer().selectHighCapacityPeers(length, exclude, matches);
+                ctx.profileOrganizer().selectHighCapacityPeers(length, exclude, matches, ipRestriction, ipSet);
             } else {
                 // As of 0.9.23, we include a max of 2 not failing peers,
                 // to improve build success on 3-hop tunnels.
@@ -194,7 +194,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
                     ctx.profileOrganizer().selectHighCapacityPeers(length - 2, exclude, matches);
                 if (log.shouldLog(Log.INFO))
                     log.info("EPS SNFP " + length + (isInbound ? " IB" : " OB") + " exclude " + exclude.size());
-                ctx.profileOrganizer().selectNotFailingPeers(length, exclude, matches, false);
+                ctx.profileOrganizer().selectNotFailingPeers(length, exclude, matches, false, ipRestriction, ipSet);
             }
             matches.remove(ctx.routerHash());
         }
@@ -231,7 +231,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         }
         return rv;
     }
-    
+
     private static final int MIN_NONFAILING_PCT = 15;
     private static final int MIN_ACTIVE_PEERS_STARTUP = 6;
     private static final int MIN_ACTIVE_PEERS = 12;
@@ -290,7 +290,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         }
         return (failPct >= ctx.random().nextInt(100));
     }
-    
+
     /**
      * We should really use the difference between the exploratory fail rate
      * and the high capacity fail rate - but we don't have a stat for high cap,
@@ -326,11 +326,11 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         double pct = (double)(reject + timeout) / (accept + reject + timeout);
         return (int)(100 * pct);
     }
-    
+
     /** Use current + last to get more recent and smoother data */
     private int getEvents(String stat, long period) {
         RateStat rs = ctx.statManager().getRate(stat);
-        if (rs == null) 
+        if (rs == null)
             return 0;
         Rate r = rs.getRate(period);
         if (r == null)

@@ -32,7 +32,7 @@ import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
 
 /**
- * Coordinate the selection of peers to go into a tunnel for one particular 
+ * Coordinate the selection of peers to go into a tunnel for one particular
  * pool.
  *
  */
@@ -45,8 +45,8 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
     }
 
     /**
-     * Which peers should go into the next tunnel for the given settings?  
-     * 
+     * Which peers should go into the next tunnel for the given settings?
+     *
      * @return ordered list of Hash objects (one per peer) specifying what order
      *         they should appear in a tunnel (ENDPOINT FIRST).  This includes
      *         the local router in the list.  If there are no tunnels or peers
@@ -54,7 +54,7 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
      *         return null.
      */
     public abstract List<Hash> selectPeers(TunnelPoolSettings settings);
-    
+
     /**
      *  @return randomized number of hops 0-7, not including ourselves
      */
@@ -81,7 +81,7 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
         else if (length > 7) // as documented in tunnel.html
             length = 7;
         /*
-        if ( (ctx.tunnelManager().getOutboundTunnelCount() <= 0) || 
+        if ( (ctx.tunnelManager().getOutboundTunnelCount() <= 0) ||
              (ctx.tunnelManager().getFreeTunnelCount() <= 0) ) {
             Log log = ctx.logManager().getLog(TunnelPeerSelector.class);
             // no tunnels to build tunnels with
@@ -98,7 +98,7 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
         */
         return length;
     }
-    
+
     /**
      *  For debugging, also possibly for restricted routes?
      *  Needs analysis and testing
@@ -118,7 +118,7 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
             return true;
         return false;
     }
-    
+
     /**
      *  For debugging, also possibly for restricted routes?
      *  Needs analysis and testing
@@ -128,10 +128,10 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
         String peers = null;
         Properties opts = settings.getUnknownOptions();
         peers = opts.getProperty("explicitPeers");
-        
+
         if (peers == null)
             peers = ctx.getProperty("explicitPeers");
-        
+
         List<Hash> rv = new ArrayList<Hash>();
         StringTokenizer tok = new StringTokenizer(peers, ",");
         while (tok.hasMoreTokens()) {
@@ -139,7 +139,7 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
             Hash peer = new Hash();
             try {
                 peer.fromBase64(peerStr);
-                
+
                 if (ctx.profileOrganizer().isSelectable(peer)) {
                     rv.add(peer);
                 } else {
@@ -150,14 +150,14 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
                     log.error("Explicit peer is improperly formatted (" + peerStr + ")", dfe);
             }
         }
-        
+
         int sz = rv.size();
         if (sz == 0) {
             log.logAlways(Log.WARN, "No valid explicit peers found, building zero hop");
         } else if (sz > 1) {
             Collections.shuffle(rv, ctx.random());
         }
-        
+
         while (rv.size() > length) {
             rv.remove(0);
         }
@@ -166,11 +166,12 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
             Set<Hash> exclude = getExclude(settings.isInbound(), settings.isExploratory());
             exclude.addAll(rv);
             Set<Hash> matches = new HashSet<Hash>(more);
-            ctx.profileOrganizer().selectFastPeers(more, exclude, matches, 0);
+            // don't bother with IP restrictions here
+            ctx.profileOrganizer().selectFastPeers(more, exclude, matches);
             rv.addAll(matches);
             Collections.shuffle(rv, ctx.random());
         }
-        
+
         if (log.shouldLog(Log.INFO)) {
             StringBuilder buf = new StringBuilder();
             if (settings.getDestinationNickname() != null)
@@ -187,16 +188,16 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
             buf.append(", out of ").append(sz).append(" (not including self)");
             log.info(buf.toString());
         }
-        
+
         if (settings.isInbound())
             rv.add(0, ctx.routerHash());
         else
             rv.add(ctx.routerHash());
-        
+
         return rv;
     }
-    
-    /** 
+
+    /**
      * Pick peers that we want to avoid
      */
     public Set<Hash> getExclude(boolean isInbound, boolean isExploratory) {
@@ -267,7 +268,7 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
                             peers.add(peer.getIdentity().calculateHash());
                         // otherwise, it contains flags we aren't trying to focus on,
                         // so don't exclude it based on published capacity
-                        
+
                         if (filterUptime(ctx, isInbound, isExploratory)) {
                             Properties opts = peer.getOptions();
                             if (opts != null) {
@@ -298,7 +299,7 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
                                     peers.add(peer.getIdentity().calculateHash());
                                     continue;
                                 }
-                                
+
                                 long infoAge = ctx.clock().now() - peer.getPublished();
                                 if (infoAge < 0) {
                                     infoAge = 0;
@@ -387,8 +388,8 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
             return false;
         return canConnect(ANY_V4, ri);
     }
-    
-    /** 
+
+    /**
      *  Pick peers that we want to avoid for the first OB hop or last IB hop.
      *  There's several cases of importance:
      *  <ol><li>Inbound and we are hidden -
@@ -452,19 +453,19 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
         }
         return rv;
     }
-    
+
     /** warning, this is also called by ProfileOrganizer.isSelectable() */
     public static boolean shouldExclude(RouterContext ctx, RouterInfo peer) {
         return shouldExclude(peer, getExcludeCaps(ctx));
     }
-    
+
     /**
      *  @return non-null, possibly empty
      */
     private static String getExcludeCaps(RouterContext ctx) {
         return ctx.getProperty("router.excludePeerCaps", DEFAULT_EXCLUDE_CAPS);
     }
-    
+
     /** NTCP2 */
     private static final String MIN_VERSION = "0.9.36";
 
@@ -555,18 +556,18 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
       ******/
         return false;
     }
-    
+
     private static final String PROP_OUTBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = "router.outboundExploratoryExcludeUnreachable";
     private static final String PROP_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE = "router.outboundClientExcludeUnreachable";
     private static final String PROP_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = "router.inboundExploratoryExcludeUnreachable";
     private static final String PROP_INBOUND_CLIENT_EXCLUDE_UNREACHABLE = "router.inboundClientExcludeUnreachable";
-    
+
     private static final boolean DEFAULT_OUTBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = false;
     private static final boolean DEFAULT_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE = false;
     // see comments at getExclude() above
     private static final boolean DEFAULT_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = false;
     private static final boolean DEFAULT_INBOUND_CLIENT_EXCLUDE_UNREACHABLE = false;
-    
+
     /**
      * do we want to skip unreachable peers?
      * @return true if yes
@@ -587,18 +588,18 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
                 if (ctx.router().isHidden())
                     return true;
                 return ctx.getProperty(PROP_INBOUND_CLIENT_EXCLUDE_UNREACHABLE, DEFAULT_INBOUND_CLIENT_EXCLUDE_UNREACHABLE);
-            } else { 
+            } else {
                 return ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE, DEFAULT_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE);
             }
         }
     }
 
-    
+
     private static final String PROP_OUTBOUND_EXPLORATORY_EXCLUDE_SLOW = "router.outboundExploratoryExcludeSlow";
     private static final String PROP_OUTBOUND_CLIENT_EXCLUDE_SLOW = "router.outboundClientExcludeSlow";
     private static final String PROP_INBOUND_EXPLORATORY_EXCLUDE_SLOW = "router.inboundExploratoryExcludeSlow";
     private static final String PROP_INBOUND_CLIENT_EXCLUDE_SLOW = "router.inboundClientExcludeSlow";
-    
+
     /**
      * do we want to skip peers that are slow?
      * @return true unless configured otherwise
@@ -612,18 +613,18 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
         } else {
             if (isInbound)
                 return ctx.getProperty(PROP_INBOUND_CLIENT_EXCLUDE_SLOW, true);
-            else 
+            else
                 return ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_SLOW, true);
-        }        
+        }
     }
-    
+
 /****
     private static final String PROP_OUTBOUND_EXPLORATORY_EXCLUDE_UPTIME = "router.outboundExploratoryExcludeUptime";
     private static final String PROP_OUTBOUND_CLIENT_EXCLUDE_UPTIME = "router.outboundClientExcludeUptime";
     private static final String PROP_INBOUND_EXPLORATORY_EXCLUDE_UPTIME = "router.inboundExploratoryExcludeUptime";
     private static final String PROP_INBOUND_CLIENT_EXCLUDE_UPTIME = "router.inboundClientExcludeUptime";
 ****/
-    
+
     /**
      * do we want to skip peers who haven't been up for long?
      * @return true unless configured otherwise
@@ -638,7 +639,7 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
         } else {
             if (isInbound)
                 return ctx.getProperty(PROP_INBOUND_CLIENT_EXCLUDE_UPTIME, true);
-            else 
+            else
                 return ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_UPTIME, true);
         }
     }
