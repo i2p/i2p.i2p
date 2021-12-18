@@ -1,3 +1,30 @@
+2021-12-18 zzz
+ * Tunnels:
+   - Restore support for IP restriction in client tunnels (MR !45)
+   - Add support for IP restriction in exploratory tunnels
+   - Do not allow failed tunnels to be rebuilt
+
+2021-12-08 zzz
+ * i2ptunnel: Refactor UDPTunnel, Streamr, and SOCKS UDP for I2CP ports
+
+2021-12-07 zzz
+ * Debian: Add explicit dependency on libservlet3.1-java (Debian #997213)
+
+2021-12-05 zzz
+ * DTG: Add notification enable/disable to menu
+ * Router: Tweak shutdown messages
+
+2021-12-04 zzz
+ * Build: Fix minimum Java version in installer config
+ * DTG:
+   - Show I2P starting message
+   - Show all CRIT log messages
+   - Change to dark icon on Windows
+ * i2psnark:
+   - Format multiple lines in torrent comment
+   - Notify completed downloads on DTG
+ * SusiMail: Notify new messages on DTG
+
 2021-12-03 zzz
  * i2psnark: Add torrent edit page
  * Tunnels:
