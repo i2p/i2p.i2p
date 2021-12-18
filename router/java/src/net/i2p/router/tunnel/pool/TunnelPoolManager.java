@@ -119,7 +119,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
 
     /**
      * Pick a random inbound tunnel from the given destination's pool.
-     * Warning - selectOutboundTunnel(Hash, Hash) is preferred.
+     * Warning - selectInboundTunnel(Hash, Hash) is preferred.
      *
      * @param destination if null, returns inbound exploratory tunnel
      * @return null if none
