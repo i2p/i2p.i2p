@@ -103,7 +103,7 @@ public class MaskedIPSet extends HashSet<String> {
         if (family != null) {
             // TODO should KNDF put a family-verified indicator in the RI,
             // after checking the sig, or does it matter?
-            // What's the threat here of not avoid ding a router
+            // What's the threat here of not avoiding a router
             // falsely claiming to be in the family?
             // Prefix with something so an IP can't be spoofed
             add('x' + family);
@@ -112,14 +112,14 @@ public class MaskedIPSet extends HashSet<String> {
 
     /**
      * generate an arbitrary unique value for this ip/mask (mask = 1-4)
-     * If IPv6, force mask = 6.
+     * If IPv6, double the mask value
      * @param mask is 1-4 (number of bytes to match)
      */
     private static String maskedIP(byte[] ip, int mask) {
         final StringBuilder buf = new StringBuilder(1 + (mask*2));
         final char delim;
         if (ip.length == 16) {
-            mask = 6;
+            mask *= 2;
             delim = ':';
         } else {
             delim = '.';
