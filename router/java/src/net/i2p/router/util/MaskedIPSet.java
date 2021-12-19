@@ -116,7 +116,6 @@ public class MaskedIPSet extends HashSet<String> {
      * @param mask is 1-4 (number of bytes to match)
      */
     private static String maskedIP(byte[] ip, int mask) {
-        final StringBuilder buf = new StringBuilder(1 + (mask*2));
         final char delim;
         if (ip.length == 16) {
             mask *= 2;
@@ -124,8 +123,14 @@ public class MaskedIPSet extends HashSet<String> {
         } else {
             delim = '.';
         }
+        final StringBuilder buf = new StringBuilder(1 + (mask*2));
         buf.append(delim);
-        buf.append(Long.toHexString(DataHelper.fromLong(ip, 0, mask)));
+        for (int i = 0; i < mask; i++) {
+            // fake hex "0123456789:;<=>?"
+            byte b = ip[i];
+            buf.append('0' + (char) ((b >> 4) & 0x0f));
+            buf.append('0' + (char) (b & 0x0f));
+        }
         return buf.toString();
     }
 
