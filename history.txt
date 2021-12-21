@@ -1,3 +1,6 @@
+2021-12-21 zzz
+ * Transport: Async NTCP writes (MR !43)
+
 2021-12-18 zzz
  * Tunnels:
    - Restore support for IP restriction in client tunnels (MR !45)
