@@ -228,6 +228,7 @@
         <zipfileset src="../../ministreaming/java/build/mstreaming.jar" />
         <zipfileset src="../../streaming/java/build/streaming.jar" />
         <zipfileset src="../../systray/java/build/systray.jar" />
+        <zipfileset src="../../../build/jbigi.jar" />
         <!-- Countries translations. The i2psnark translations are in the war but it's easier to put these here -->
         <!-- 300KB just to translate "Brazil", but why not... -->
       <!--
