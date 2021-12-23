@@ -10,6 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.Collator;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2516,12 +2517,18 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("<select name='theme'>");
             String theme = _manager.getTheme();
             String[] themes = _manager.getThemes();
-            Arrays.sort(themes);
+            // translated sort
+            Map<String, String> tmap = new TreeMap<String, String>(Collator.getInstance());
             for (int i = 0; i < themes.length; i++) {
-                if(themes[i].equals(theme))
-                    out.write("\n<OPTION value=\"" + themes[i] + "\" SELECTED>" + themes[i]);
+                 tmap.put(_t(themes[i]), themes[i]);
+            }
+            for (Map.Entry<String, String> e : tmap.entrySet()) {
+                String tr = e.getKey();
+                String opt = e.getValue();
+                if(opt.equals(theme))
+                    out.write("\n<option value=\"" + opt + "\" SELECTED>" + tr + "</option>");
                 else
-                    out.write("\n<OPTION value=\"" + themes[i] + "\">" + themes[i]);
+                    out.write("\n<option value=\"" + opt + "\">" +  tr + "</option>");
             }
             out.write("</select>\n");
         }

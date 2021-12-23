@@ -141,7 +141,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
     public static final String RC_PROP_UNIVERSAL_THEMING = "routerconsole.universal.theme";
     public static final String PROP_THEME = "i2psnark.theme";
     public static final String DEFAULT_THEME = "ubergine";
-    private static final String[] THEMES = new String[] { "dark", "light", "ubergine", "vanilla" };
+    private static final String[] THEMES = new String[] { _x("dark"), _x("light"), _x("ubergine"), _x("vanilla") };
     /** From CSSHelper */
     private static final String PROP_DISABLE_OLD = "routerconsole.disableOldThemes";
     private static final boolean DEFAULT_DISABLE_OLD = true;
@@ -848,7 +848,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
 
     /**
      * Get current theme.
-     * @return String -- the current theme
+     * @return String -- the current theme, untranslated
      */
     public String getTheme() {
         String theme;
@@ -913,7 +913,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
 
     /**
      * Get all themes
-     * @return String[] -- Array of all the themes found, non-null, unsorted
+     * @return Array of all the themes found, non-null, unsorted, untranslated. Not a copy, do not modify.
      */
     public static String[] getThemes() {
         return THEMES;
@@ -2800,6 +2800,14 @@ public class SnarkManager implements CompleteListener, ClientApp {
     /** translate */
     private String _t(String s, Object o, Object o2) {
         return _util.getString(s, o, o2);
+    }
+
+    /**
+     * mark for translation, does not translate
+     * @since 0.9.53
+     */
+    private static String _x(String s) {
+        return s;
     }
 
     /**
