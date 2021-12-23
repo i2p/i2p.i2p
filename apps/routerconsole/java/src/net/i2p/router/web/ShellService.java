@@ -7,7 +7,7 @@
  * This code is public domain.
  */
 
-package net.i2p.app;
+package net.i2p.router.web;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -19,6 +19,9 @@ import java.util.Arrays;
 import java.util.ArrayList;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientApp;
+import net.i2p.app.ClientAppManager;
+import net.i2p.app.ClientAppState;
 import net.i2p.util.Log;
 import net.i2p.util.ShellCommand;
 import net.i2p.util.SystemVersion;
