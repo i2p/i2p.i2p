@@ -23,7 +23,7 @@ To add RPC support:
     to the webapps/ directory in your standalone install.
 
 2b) If you do not have the i2psnark-rpc plugin installed, get the i2p.plugins.i2psnark-rpc
-    branch out of monotone, build with 'ant war', and copy the file src/build/transmission.war.jar
+    branch out of git, build with 'ant war', and copy the file src/build/transmission.war.jar
     to the file webapps/transmission.war in your standalone install.
 
 3) Start i2psnark standalone as usual. The transmission web interface will be at
