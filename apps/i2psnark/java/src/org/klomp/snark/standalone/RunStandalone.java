@@ -35,7 +35,7 @@ public class RunStandalone {
         // Do this after we have a context
         // To take effect, must be set before any Jetty classes are loaded
         try {
-            Log.setLog(new I2PLogger());
+            Log.setLog(new I2PLogger(_context));
         } catch (Throwable t) {
             System.err.println("INFO: I2P Jetty logging class not found, logging to stdout");
         }
