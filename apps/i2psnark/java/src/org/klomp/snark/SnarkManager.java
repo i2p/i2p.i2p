@@ -1698,7 +1698,10 @@ public class SnarkManager implements CompleteListener, ClientApp {
                 addMessage(_t("Connecting to I2P"));
                 boolean ok = _util.connect();
                 if (!ok) {
-                    addMessage(_t("Error connecting to I2P - check your I2CP settings!"));
+                    if (_context.isRouterContext())
+                        addMessage(_t("Unable to connect to I2P"));
+                    else
+                        addMessage(_t("Error connecting to I2P - check your I2CP settings!") + ' ' + _util.getI2CPHost() + ':' + _util.getI2CPPort());
                     // this would rename the torrent to .BAD
                     //return false;
                 }
