@@ -141,7 +141,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
     public static final String RC_PROP_UNIVERSAL_THEMING = "routerconsole.universal.theme";
     public static final String PROP_THEME = "i2psnark.theme";
     public static final String DEFAULT_THEME = "ubergine";
-    private static final String[] THEMES = new String[] { _x("dark"), _x("light"), _x("ubergine"), _x("vanilla") };
+    // Translators: Translate "ubergine" as "aubergine" or "eggplant" or "purple"
+    private static final String[] THEMES = new String[] { _x("ubergine"), _x("dark"), _x("light"), _x("vanilla") };
     /** From CSSHelper */
     private static final String PROP_DISABLE_OLD = "routerconsole.disableOldThemes";
     private static final boolean DEFAULT_DISABLE_OLD = true;
