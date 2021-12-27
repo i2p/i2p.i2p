@@ -55,6 +55,7 @@ import net.i2p.data.SigningPublicKey;
 import net.i2p.data.i2cp.BlindingInfoMessage;
 import net.i2p.data.i2cp.DestLookupMessage;
 import net.i2p.data.i2cp.DestReplyMessage;
+import net.i2p.data.i2cp.DestroySessionMessage;
 import net.i2p.data.i2cp.GetBandwidthLimitsMessage;
 import net.i2p.data.i2cp.GetDateMessage;
 import net.i2p.data.i2cp.HostLookupMessage;
@@ -1306,13 +1307,24 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         }
         
         if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "Destroy the session", new Exception("DestroySession()"));
-        if (sendDisconnect && _producer != null) {    // only null if overridden by I2PSimpleSession
-            try {
-                _producer.disconnect(this);
-            } catch (I2PSessionException ipe) {
-                //propogateError("Error destroying the session", ipe);
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Error destroying the session", ipe);
+        if (sendDisconnect) {
+            if (_producer != null) {    // only null if overridden by I2PSimpleSession
+                try {
+                    _producer.disconnect(this);
+                } catch (I2PSessionException ipe) {
+                    //propogateError("Error destroying the session", ipe);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Error destroying the session", ipe);
+                }
+            } else if (!_context.isRouterContext()) {
+                // Simple session, prevent error on router side in I2CP reader
+                DestroySessionMessage dmsg = new DestroySessionMessage();
+                dmsg.setSessionId(DUMMY_SESSION);
+                try {
+                    sendMessage_unchecked(dmsg);
+                    // give it a chance to get there
+                    try { Thread.sleep(20); } catch (InterruptedException ie) {}
+                } catch (I2PSessionException ise) {}
             }
         }
         // SimpleSession does not initialize
