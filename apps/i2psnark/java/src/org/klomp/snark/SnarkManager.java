@@ -31,6 +31,7 @@ import net.i2p.app.ClientAppManager;
 import net.i2p.app.ClientAppState;
 import net.i2p.app.NotificationService;
 import net.i2p.client.I2PClient;
+import net.i2p.client.streaming.I2PSocketManager.DisconnectListener;
 import net.i2p.crypto.SHA1Hash;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
@@ -58,7 +59,7 @@ import org.klomp.snark.dht.KRPC;
 /**
  * Manage multiple snarks
  */
-public class SnarkManager implements CompleteListener, ClientApp {
+public class SnarkManager implements CompleteListener, ClientApp, DisconnectListener {
     
     /**
      *  Map of (canonical) filename of the .torrent file to Snark instance.
@@ -131,7 +132,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
     public static final String PROP_FILES_PUBLIC = "i2psnark.filesPublic";
     public static final String PROP_OLD_AUTO_START = "i2snark.autoStart";   // oops
     public static final String PROP_AUTO_START = "i2psnark.autoStart";      // convert in migration to new config file
-    public static final String DEFAULT_AUTO_START = "false";
+    private final boolean DEFAULT_AUTO_START;
     //public static final String PROP_LINK_PREFIX = "i2psnark.linkPrefix";
     //public static final String DEFAULT_LINK_PREFIX = "file:///";
     public static final String PROP_STARTUP_DELAY = "i2psnark.startupDelay";
@@ -269,7 +270,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
         _contextName = ctxName;
         _log = _context.logManager().getLog(SnarkManager.class);
         _messages = new UIMessages(MAX_MESSAGES);
-        _util = new I2PSnarkUtil(_context, ctxName);
+        _util = new I2PSnarkUtil(_context, ctxName, this);
+        DEFAULT_AUTO_START = !ctx.isRouterContext();
         String cfile = ctxName + CONFIG_FILE_SUFFIX;
         File configFile = new File(cfile);
         if (!configFile.isAbsolute())
@@ -341,6 +343,18 @@ public class SnarkManager implements CompleteListener, ClientApp {
             } else {
                 _log.warn("No update manager to register with");
             }
+        }
+    }
+    
+    /**
+     * DisconnectListener interface
+     * @since 0.9.53
+     */
+    public void sessionDisconnected() {
+        if (!_context.isRouterContext()) {
+            addMessage(_t("Unable to connect to I2P"));
+            stopAllTorrents(true);
+            _stopping = false;
         }
     }
     
@@ -465,7 +479,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
     }
 
     public boolean shouldAutoStart() {
-        return Boolean.parseBoolean(_config.getProperty(PROP_AUTO_START, DEFAULT_AUTO_START));
+        return Boolean.parseBoolean(_config.getProperty(PROP_AUTO_START, Boolean.toString(DEFAULT_AUTO_START)));
     }
     
     /**
@@ -816,7 +830,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
         if (!_config.containsKey(PROP_DIR))
             _config.setProperty(PROP_DIR, _contextName);
         if (!_config.containsKey(PROP_AUTO_START))
-            _config.setProperty(PROP_AUTO_START, DEFAULT_AUTO_START);
+            _config.setProperty(PROP_AUTO_START, Boolean.toString(DEFAULT_AUTO_START));
         if (!_config.containsKey(PROP_REFRESH_DELAY))
             _config.setProperty(PROP_REFRESH_DELAY, Integer.toString(DEFAULT_REFRESH_DELAY_SECS));
         if (!_config.containsKey(PROP_STARTUP_DELAY))
@@ -921,13 +935,22 @@ public class SnarkManager implements CompleteListener, ClientApp {
     }
 
 
-    /** call from DirMonitor since loadConfig() is called before router I2CP is up */
-    private void getBWLimit() {
-        if (!_config.containsKey(PROP_UPBW_MAX)) {
+    /**
+     * Call from DirMonitor since loadConfig() is called before router I2CP is up.
+     * We also use this as a test that the router is there for standalone.
+     *
+     * @return true if we got a response from the router
+     */
+    private boolean getBWLimit() {
+        boolean shouldSet = !_config.containsKey(PROP_UPBW_MAX);
+        if (shouldSet || !_context.isRouterContext()) {
             int[] limits = BWLimits.getBWLimits(_util.getI2CPHost(), _util.getI2CPPort());
-            if (limits != null && limits[1] > 0)
+            if (limits == null)
+                return false;
+            if (shouldSet && limits[1] > 0)
                 _util.setMaxUpBW(limits[1]);
         }
+        return true;
     }
 
     private void updateConfig() {
@@ -1578,7 +1601,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
         }
         if (dataDir == null)
             dataDir = getDataDir();
-        Snark torrent = null;
+        Snark torrent;
         synchronized (_snarks) {
             torrent = _snarks.get(filename);
         }
@@ -2497,6 +2520,13 @@ public class SnarkManager implements CompleteListener, ClientApp {
         addMessage(_t("Torrent removed: \"{0}\"", torrent.getBaseName()));
     }
     
+    /**
+     *  This calls monitorTorrents() once a minute.
+     *  It also gets the bandwidth limits and loads magnets on first run.
+     *  For standalone, it also handles checking that the external router is there,
+     *  and restarting torrents once the router appears.
+     *
+     */
     private class DirMonitor implements Runnable {
         public void run() {
             // don't bother delaying if auto start is false
@@ -2511,17 +2541,65 @@ public class SnarkManager implements CompleteListener, ClientApp {
 
             // here because we need to delay until I2CP is up
             // although the user will see the default until then
-            getBWLimit();
+            boolean routerOK = false;
             boolean doMagnets = true;
             while (_running) {
                 File dir = getDataDir();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Directory Monitor loop over " + dir.getAbsolutePath());
+                if (routerOK &&
+                    (_context.isRouterContext() || _util.connected() || _util.isConnecting())) {
+                    autostart = shouldAutoStart();
+                } else {
+                    // Test if the router is there
+                    // For standalone, this will probe the router every 60 seconds if not connected
+                    boolean oldOK = routerOK;
+                    routerOK = getBWLimit();
+                    if (routerOK) {
+                        autostart = shouldAutoStart();
+                        if (autostart && !oldOK && !doMagnets && !_snarks.isEmpty()) {
+                            // Start previously added torrents
+                            for (Snark snark : _snarks.values()) {
+                                Properties config = getConfig(snark);
+                                String prop = config.getProperty(PROP_META_RUNNING);
+                                if (prop == null || Boolean.parseBoolean(prop)) {
+                                    if (!_util.connected()) {
+                                        addMessage(_t("Connecting to I2P"));
+                                        // getBWLimit() was successful so this should work
+                                        boolean ok = _util.connect();
+                                        if (!ok) {
+                                            if (_context.isRouterContext())
+                                                addMessage(_t("Unable to connect to I2P"));
+                                            else
+                                                addMessage(_t("Error connecting to I2P - check your I2CP settings!") + ' ' + _util.getI2CPHost() + ':' + _util.getI2CPPort());
+                                            routerOK = false;
+                                            autostart = false;
+                                            break;
+                                        }
+                                    }
+                                    addMessageNoEscape(_t("Starting up torrent {0}", linkify(snark)));
+                                    try {
+                                        snark.startTorrent();
+                                    } catch (Snark.RouterException re) {
+                                        // Snark.fatal() will log and call fatal() here for user message before throwing
+                                        break;
+                                    } catch (RuntimeException re) {
+                                        // Snark.fatal() will log and call fatal() here for user message before throwing
+                                    }
+                                }
+                            }
+                            if (routerOK)
+                                addMessage(_t("Up bandwidth limit is {0} KBps", _util.getMaxUpBW()));
+                        }
+                    } else {
+                        autostart = false;
+                    }
+                }
                 boolean ok;
                 try {
                     // Don't let this interfere with .torrent files being added or deleted
                     synchronized (_snarks) {
-                        ok = monitorTorrents(dir);
+                        ok = monitorTorrents(dir, autostart);
                     }
                 } catch (RuntimeException e) {
                     _log.error("Error in the DirectoryMonitor", e);
@@ -2535,7 +2613,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
                     } catch (RuntimeException e) {
                         _log.error("Error in the DirectoryMonitor", e);
                     }
-                    if (!_snarks.isEmpty())
+                    if (routerOK && !_snarks.isEmpty())
                         addMessage(_t("Up bandwidth limit is {0} KBps", _util.getMaxUpBW()));
                     // To fix bug where files were left behind,
                     // but also good for when user removes snarks when i2p is not running
@@ -2544,6 +2622,12 @@ public class SnarkManager implements CompleteListener, ClientApp {
                     // time i2psnark starts. See ticket #1658.
                     if (ok)
                         cleanupTorrentStatus();
+                    if (!routerOK) {
+                        if (_context.isRouterContext())
+                            addMessage(_t("Unable to connect to I2P"));
+                        else
+                            addMessage(_t("Error connecting to I2P - check your I2CP settings!") + ' ' + _util.getI2CPHost() + ':' + _util.getI2CPPort());
+                    }
                 }
                 try { Thread.sleep(60*1000); } catch (InterruptedException ie) {}
             }
@@ -2719,9 +2803,10 @@ public class SnarkManager implements CompleteListener, ClientApp {
     /**
      *  caller must synchronize on _snarks
      *
+     *  @param shouldStart should we autostart the torrents
      *  @return success, false if an error adding any torrent.
      */
-    private boolean monitorTorrents(File dir) {
+    private boolean monitorTorrents(File dir, boolean shouldStart) {
         boolean rv = true;
         File files[] = dir.listFiles(new FileSuffixFilter(".torrent"));
         List<String> foundNames = new ArrayList<String>(0);
@@ -2741,7 +2826,6 @@ public class SnarkManager implements CompleteListener, ClientApp {
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("DirMon found: " + DataHelper.toString(foundNames) + " existing: " + DataHelper.toString(existingNames));
         // lets find new ones first...
-        boolean shouldStart = shouldAutoStart();
         for (String name : foundNames) {
             if (existingNames.contains(name)) {
                 // already known.  noop

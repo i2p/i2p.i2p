@@ -23,6 +23,7 @@ import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketEepGet;
 import net.i2p.client.streaming.I2PSocketManager;
+import net.i2p.client.streaming.I2PSocketManager.DisconnectListener;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.Base32;
@@ -47,7 +48,7 @@ import org.klomp.snark.dht.KRPC;
  * so we can run multiple instances of single Snarks
  * (but not multiple SnarkManagers, it is still static)
  */
-public class I2PSnarkUtil {
+public class I2PSnarkUtil implements DisconnectListener {
     private final I2PAppContext _context;
     private final Log _log;
     private final String _baseName;
@@ -75,6 +76,7 @@ public class I2PSnarkUtil {
     private List<String> _openTrackers;
     private DHT _dht;
     private long _startedTime;
+    private final DisconnectListener _discon;
 
     private static final int EEPGET_CONNECT_TIMEOUT = 45*1000;
     private static final int EEPGET_CONNECT_TIMEOUT_SHORT = 5*1000;
@@ -91,17 +93,18 @@ public class I2PSnarkUtil {
 
 
     public I2PSnarkUtil(I2PAppContext ctx) {
-        this(ctx, "i2psnark");
+        this(ctx, "i2psnark", null);
     }
 
     /**
      *  @param baseName generally "i2psnark"
      *  @since Jetty 7
      */
-    public I2PSnarkUtil(I2PAppContext ctx, String baseName) {
+    public I2PSnarkUtil(I2PAppContext ctx, String baseName, DisconnectListener discon) {
         _context = ctx;
         _log = _context.logManager().getLog(Snark.class);
         _baseName = baseName;
+        _discon = discon;
         _opts = new HashMap<String, String>();
         //setProxy("127.0.0.1", 4444);
         setI2CPConfig("127.0.0.1", I2PClient.DEFAULT_LISTEN_PORT, null);
@@ -324,8 +327,11 @@ public class I2PSnarkUtil {
             if (opts.getProperty(I2PClient.PROP_GZIP) == null)
                 opts.setProperty(I2PClient.PROP_GZIP, "false");
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
-            if (_manager != null)
+            if (_manager != null) {
                 _startedTime = _context.clock().now();
+                if (_discon != null)
+                    _manager.addDisconnectListener(this);
+            }
             _connecting = false;
         }
         if (_shouldUseDHT && _manager != null && _dht == null)
@@ -333,6 +339,19 @@ public class I2PSnarkUtil {
         return (_manager != null);
     }
     
+    /**
+     * DisconnectListener interface
+     * @since 0.9.53
+     */
+    public void sessionDisconnected() {
+        synchronized(this) {
+            _manager = null;
+            _connecting = false;
+        }
+        if (_discon != null)
+            _discon.sessionDisconnected();
+    }
+
     /**
      * @return null if disabled or not started
      * @since 0.8.4
