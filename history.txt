@@ -1,3 +1,12 @@
+2021-12-27 zzz
+ * Banlist: Increase ban time again for routers without netID
+ * I2CP: Send DestroySession message when destroying session
+         in client-side AppContext SimpleSession
+ * i2psnark: Standalone fixes for router startup/shutdown
+
+2021-12-23 zzz
+ * i2psnark: Various standalone fixes
+
 2021-12-21 zzz
  * Transport: Async NTCP writes (MR !43)
 
