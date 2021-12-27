@@ -349,25 +349,24 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("</head>\n" +
                   "<body>" +
                   "<center>");
-        List<Tracker> sortedTrackers = null;
         if (isConfigure) {
             out.write("<div class=\"snarknavbar\"><a href=\"" + _contextPath + "/\" title=\"");
             out.write(_t("Torrents"));
-            out.write("\" class=\"snarkNav nav_main\">");
-            if (_contextName.equals(DEFAULT_NAME))
-                out.write(_t("I2PSnark"));
-            else
-                out.write(_contextName);
-            out.write("</a>");
         } else {
             out.write("<div class=\"snarknavbar\"><a href=\"" + _contextPath + '/' + peerString + "\" title=\"");
             out.write(_t("Refresh page"));
-            out.write("\" class=\"snarkNav nav_main\">");
-            if (_contextName.equals(DEFAULT_NAME))
-                out.write(_t("I2PSnark"));
-            else
-                out.write(_contextName);
-            out.write("</a>\n");
+        }
+        out.write("\" class=\"snarkNav nav_main\">");
+        if (_contextName.equals(DEFAULT_NAME))
+            out.write(_t("I2PSnark"));
+        else
+            out.write(_contextName);
+        if (!_context.isRouterContext()) {
+            out.write(' ' + CoreVersion.VERSION);
+        }
+        out.write("</a>");
+        List<Tracker> sortedTrackers = null;
+        if (!isConfigure) {
             sortedTrackers = _manager.getSortedTrackers();
             if (_context.isRouterContext() && _manager.hasModifiedTrackers()) {
                 for (Tracker t : sortedTrackers) {
