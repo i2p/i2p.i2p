@@ -190,6 +190,7 @@ class NetDbRenderer {
             boolean notFound = true;
             Set<RouterInfo> routers = _context.netDb().getRouters();
             int ipMode = 0;
+            String ipArg = ip;  // save for error message
             if (ip != null) {
                 if (ip.endsWith("/24")) {
                     ipMode = 1;
@@ -382,8 +383,8 @@ class NetDbRenderer {
                     buf.append(_t("Country")).append(' ').append(country).append(' ');
                 if (family != null)
                     buf.append(_t("Family")).append(' ').append(family).append(' ');
-                if (ip != null)
-                    buf.append("IP ").append(ip).append(' ');
+                if (ipArg != null)
+                    buf.append("IP ").append(ipArg).append(' ');
                 if (ipv6 != null)
                     buf.append("IP ").append(ipv6).append(' ');
                 if (port != 0)
