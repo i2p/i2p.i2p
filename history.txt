@@ -1,5 +1,6 @@
 2021-12-28 zzz
  * Console: Partial string case-insensitive match for netdb family search
+ * i2ptunnel: Add IRC filter support for IRCv3 message tags
  * NetDB:
    - StoreJob reliability improvements
    - Ensure tunnel diversity in lookup retries
