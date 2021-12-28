@@ -1,3 +1,12 @@
+2021-12-28 zzz
+ * Console: Partial string case-insensitive match for netdb family search
+ * NetDB:
+   - StoreJob reliability improvements
+   - Ensure tunnel diversity in lookup retries
+   - Fix usage of dbResponseTime stat
+   - Increase lookup throttle time
+   - Don't requeue LS republish on failure if there is a newer LS
+
 2021-12-27 zzz
  * Banlist: Increase ban time again for routers without netID
  * I2CP: Send DestroySession message when destroying session
