@@ -305,14 +305,18 @@ public class IterativeSearchJob extends FloodSearchJob {
                 }
                 _unheardFrom.add(peer);
             }
-            sendQuery(peer);
+            sendQuery(peer, done + pend);
         }
     }
 
     /**
      *  Send a DLM to the peer
+     *
+     *  @param peer who to send to
+     *  @param previouslyTried how many did we send to before this one?
+     *  @since 0.9.53 added previouslyTried param
      */
-    private void sendQuery(Hash peer) {
+    private void sendQuery(Hash peer, int previouslyTried) {
             final RouterContext ctx = getContext();
             TunnelManagerFacade tm = ctx.tunnelManager();
             RouterInfo ri = ctx.netDb().lookupRouterInfoLocally(peer);
@@ -335,9 +339,19 @@ public class IterativeSearchJob extends FloodSearchJob {
             boolean supportsRatchet = false;
             boolean supportsElGamal = true;
             if (_fromLocalDest != null) {
-                outTunnel = tm.selectOutboundTunnel(_fromLocalDest, peer);
-                if (outTunnel == null)
-                    outTunnel = tm.selectOutboundExploratoryTunnel(peer);
+                // For all tunnel selections, the first time we pick the tunnel with the far-end closest
+                // to the target. After that we pick a random tunnel, or else we'd pick the
+                // same tunnels every time.
+                if (previouslyTried <= 0)
+                    outTunnel = tm.selectOutboundTunnel(_fromLocalDest, peer);
+                else
+                    outTunnel = tm.selectOutboundTunnel(_fromLocalDest);
+                if (outTunnel == null) {
+                    if (previouslyTried <= 0)
+                        outTunnel = tm.selectOutboundExploratoryTunnel(peer);
+                    else
+                        outTunnel = tm.selectOutboundTunnel();
+                }
                 LeaseSetKeys lsk = ctx.keyManager().getKeys(_fromLocalDest);
                 supportsRatchet = lsk != null &&
                                   lsk.isSupported(EncType.ECIES_X25519) &&
@@ -347,15 +361,25 @@ public class IterativeSearchJob extends FloodSearchJob {
                                   lsk.isSupported(EncType.ELGAMAL_2048);
                 if (supportsElGamal || supportsRatchet) {
                     // garlic encrypt to dest SKM
-                    replyTunnel = tm.selectInboundTunnel(_fromLocalDest, peer);
+                    if (previouslyTried <= 0)
+                        replyTunnel = tm.selectInboundTunnel(_fromLocalDest, peer);
+                    else
+                        replyTunnel = tm.selectInboundTunnel(_fromLocalDest);
                     isClientReplyTunnel = replyTunnel != null;
-                    if (!isClientReplyTunnel)
-                        replyTunnel = tm.selectInboundExploratoryTunnel(peer);
+                    if (!isClientReplyTunnel) {
+                        if (previouslyTried <= 0)
+                            replyTunnel = tm.selectInboundExploratoryTunnel(peer);
+                        else
+                            replyTunnel = tm.selectInboundTunnel();
+                    }
                 } else {
                     // We don't have a way to request/get a ECIES-tagged reply,
                     // so send it to the router SKM
                     isClientReplyTunnel = false;
-                    replyTunnel = tm.selectInboundExploratoryTunnel(peer);
+                    if (previouslyTried <= 0)
+                        replyTunnel = tm.selectInboundExploratoryTunnel(peer);
+                    else
+                        replyTunnel = tm.selectInboundTunnel();
                 }
                 isDirect = false;
             } else if ((!_isLease) && ri != null && ctx.commSystem().isEstablished(peer)) {
@@ -370,8 +394,13 @@ public class IterativeSearchJob extends FloodSearchJob {
                 isDirect = true;
                 ctx.statManager().addRateData("netDb.RILookupDirect", 1);
             } else {
-                outTunnel = tm.selectOutboundExploratoryTunnel(peer);
-                replyTunnel = tm.selectInboundExploratoryTunnel(peer);
+                if (previouslyTried <= 0) {
+                    outTunnel = tm.selectOutboundExploratoryTunnel(peer);
+                    replyTunnel = tm.selectInboundExploratoryTunnel(peer);
+                } else {
+                    outTunnel = tm.selectOutboundTunnel();
+                    replyTunnel = tm.selectInboundTunnel();
+                }
                 isClientReplyTunnel = false;
                 isDirect = false;
                 ctx.statManager().addRateData("netDb.RILookupDirect", 0);
