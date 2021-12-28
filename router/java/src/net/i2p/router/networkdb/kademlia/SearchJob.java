@@ -479,12 +479,13 @@ class SearchJob extends JobImpl {
     
     /** we're searching for a router, so we can just send direct */
     protected void sendRouterSearch(RouterInfo router) {
-        int timeout = _facade.getPeerTimeout(router.getIdentity().getHash());
+        Hash to = router.getIdentity().getHash();
+        int timeout = _facade.getPeerTimeout(to);
         long expiration = getContext().clock().now() + timeout;
 
         // use the 4-arg one so we pick up the override in ExploreJob
         //I2NPMessage msg = buildMessage(expiration);
-        I2NPMessage msg = buildMessage(null, router.getIdentity().getHash(), expiration, router);	
+        I2NPMessage msg = buildMessage(null, to, expiration, router);	
         if (msg == null) {
             if (_log.shouldWarn())
                 _log.warn("Failed to create DLM to : " + router);
@@ -493,11 +494,11 @@ class SearchJob extends JobImpl {
         }
 
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": Sending router search directly to " + router.getIdentity().getHash()
+            _log.debug(getJobId() + ": Sending router search directly to " + to
                       + " for " + _state.getTarget());
         SearchMessageSelector sel = new SearchMessageSelector(getContext(), router, _expiration, _state);
         SearchUpdateReplyFoundJob reply = new SearchUpdateReplyFoundJob(getContext(), router, _state, _facade, this);
-        SendMessageDirectJob j = new SendMessageDirectJob(getContext(), msg, router.getIdentity().getHash(), 
+        SendMessageDirectJob j = new SendMessageDirectJob(getContext(), msg, to,
                                                           reply, new FailedJob(getContext(), router), sel, timeout,
                                                           OutNetMessage.PRIORITY_EXPLORATORY);
         if (FloodfillNetworkDatabaseFacade.isFloodfill(router))
