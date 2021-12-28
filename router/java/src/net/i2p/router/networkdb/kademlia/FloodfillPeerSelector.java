@@ -178,7 +178,7 @@ class FloodfillPeerSelector extends PeerSelector {
     /** this must be longer than the max streaming timeout (60s) */
     private static final int NO_FAIL_LOOKUP_OK = 75*1000;
     private static final int NO_FAIL_LOOKUP_GOOD = NO_FAIL_LOOKUP_OK * 3;
-    private static final int MAX_GOOD_RESP_TIME = 5*1000;
+    private static final int MAX_GOOD_RESP_TIME = 3500;
     // TODO we need better tracking of floodfill first-heard-about times
     // before we can do this. Old profiles get deleted.
     //private static final long HEARD_AGE = 48*60*60*1000L;
@@ -286,7 +286,7 @@ class FloodfillPeerSelector extends PeerSelector {
                             _log.debug("Bad (new): " + entry);
                         badff.add(entry);
                     } else if (prof.getDBHistory() != null) {
-                        if (prof.getDbResponseTime().getRate(10*60*1000).getAverageValue() < maxGoodRespTime
+                        if (prof.getDbResponseTime().getRate(60*60*1000L).getAvgOrLifetimeAvg() < maxGoodRespTime
                             && prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_GOOD
                             && prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_GOOD
                             && prof.getDBHistory().getFailedLookupRate().getRate(60*60*1000).getAverageValue() < maxFailRate) {
