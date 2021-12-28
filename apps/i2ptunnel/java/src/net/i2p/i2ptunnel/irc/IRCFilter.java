@@ -59,13 +59,17 @@ abstract class IRCFilter {
      */
     public static String inboundFilter(String s, StringBuffer expectedPong, DCCHelper helper) {
         
-        String field[] = DataHelper.split(s, " ", 4);
+        String field[] = DataHelper.split(s, " ", 5);
         String command;
         int idx=0;
         
 
         try {
-            if (field[0].charAt(0) == ':')
+            // https://www.unrealircd.org/docs/Message_tags
+            // https://ircv3.net/specs/extensions/message-tags.html
+            if (field[0].charAt(0) == '@')
+                idx++;
+            if (field[idx].charAt(0) == ':')
                 idx++;
             command = field[idx++].toUpperCase(Locale.US);
         } catch (IndexOutOfBoundsException ioobe) {
@@ -279,7 +283,7 @@ abstract class IRCFilter {
      */
     public static String outboundFilter(String s, StringBuffer expectedPong, DCCHelper helper) {
 
-        String field[] = DataHelper.split(s, " ",3);
+        String field[] = DataHelper.split(s, " ", 4);
 
         if(field[0].length()==0)
             return null; // W T F?
@@ -288,7 +292,12 @@ abstract class IRCFilter {
         if(field[0].charAt(0)==':')
             return null; // ???
         
-        String command = field[0].toUpperCase(Locale.US);
+        int idx = 0;
+        // https://www.unrealircd.org/docs/Message_tags
+        // https://ircv3.net/specs/extensions/message-tags.html
+        if (field[0].charAt(0) == '@')
+            idx++;
+        String command = field[idx++].toUpperCase(Locale.US);
 
         if ("PING".equals(command)) {
             // Most clients just send a PING and are happy with any old PONG.  Others,
@@ -304,17 +313,17 @@ abstract class IRCFilter {
 
             String rv = null;
             expectedPong.setLength(0);
-            if (field.length == 1) { // PING
+            if (field.length == idx) { // PING
                 rv = "PING";
                 // If we aren't rewriting the PING don't rewrite the PONG
                 // expectedPong.append("PONG 127.0.0.1");
-            } else if (field.length == 2) { // PING nonce
-                rv = "PING " + field[1];
+            } else if (field.length == idx + 1) { // PING nonce
+                rv = "PING " + field[idx];
                 // If we aren't rewriting the PING don't rewrite the PONG
                 // expectedPong.append("PONG ").append(field[1]);
-            } else if (field.length == 3) { // PING nonce serverLocation
-                rv = "PING " + field[1];
-                expectedPong.append("PONG ").append(field[2]).append(" :").append(field[1]); // PONG serverLocation nonce
+            } else if (field.length == idx + 2) { // PING nonce serverLocation
+                rv = "PING " + field[idx];
+                expectedPong.append("PONG ").append(field[idx + 1]).append(" :").append(field[idx]); // PONG serverLocation nonce
             } else {
                 //if (_log.shouldLog(Log.ERROR))
                 //    _log.error("IRC client sent a PING we don't understand, filtering it (\"" + s + "\")");
@@ -335,20 +344,20 @@ abstract class IRCFilter {
         // in addition to the CTCP version
         if("NOTICE".equals(command))
         {
-            if (field.length < 3)
+            if (field.length < idx + 2)
                 return s;  // invalid, allow server response
-            String msg = field[2];
+            String msg = field[idx + 1];
             if(msg.startsWith(":DCC "))
-                return filterDCCOut(field[0] + ' ' + field[1] + " :DCC ", msg.substring(5), helper);
+                return filterDCCOut(field[idx - 1] + ' ' + field[idx] + " :DCC ", msg.substring(5), helper);
             // fall through
         }
         
         // Allow PRIVMSG, but block CTCP (except ACTION).
         if("PRIVMSG".equals(command) || "NOTICE".equals(command))
         {
-            if (field.length < 3)
+            if (field.length < idx + 2)
                 return s;  // invalid, allow server response
-            String msg = field[2];
+            String msg = field[idx + 1];
         
             if(msg.indexOf(0x01) >= 0) // CTCP marker ^A can be anywhere, not just immediately after the ':'
             {
@@ -369,7 +378,7 @@ abstract class IRCFilter {
                     return s;
                 }
                 if (msg.startsWith("DCC "))
-                    return filterDCCOut(field[0] + ' ' + field[1] + " :\001DCC ", msg.substring(4), helper);
+                    return filterDCCOut(field[idx - 1] + ' ' + field[idx] + " :\001DCC ", msg.substring(4), helper);
                 // XDCC looks safe, ip/port happens over regular DCC
                 // http://en.wikipedia.org/wiki/XDCC
                 if (msg.toUpperCase(Locale.US).startsWith("XDCC ") && helper != null && helper.isEnabled())
@@ -382,19 +391,19 @@ abstract class IRCFilter {
         }
         
         if("USER".equals(command)) {
-            if (field.length < 3)
+            if (field.length < idx + 2)
                 return s;  // invalid, allow server response
-            int idx = field[2].lastIndexOf(':');
-            if(idx<0)
+            int cidx = field[idx + 1].lastIndexOf(':');
+            if (cidx < 0)
                 return "USER user hostname localhost :realname";
-            String realname = field[2].substring(idx+1);
-            String ret = "USER "+field[1]+" hostname localhost :"+realname;
+            String realname = field[idx + 1].substring(cidx + 1);
+            String ret = "USER " + field[idx] + " hostname localhost :" + realname;
             return ret;
         }
 
         if ("PART".equals(command)) {
             // hide client message
-            return "PART " + field[1] + " :leaving";
+            return "PART " + field[idx] + " :leaving";
         }
         
         if ("QUIT".equals(command)) {
