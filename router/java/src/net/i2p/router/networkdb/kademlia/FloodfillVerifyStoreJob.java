@@ -40,6 +40,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
     private final FloodfillNetworkDatabaseFacade _facade;
     private long _expiration;
     private long _sendTime;
+    private int _attempted;
     private final long _published;
     private final int _type;
     private final boolean _isRouterInfo;
@@ -59,9 +60,11 @@ class FloodfillVerifyStoreJob extends JobImpl {
      *  @param client generally the same as key, unless encrypted LS2; non-null
      *  @param published getDate() for RI or LS1, getPublished() for LS2
      *  @param sentTo who to give the credit or blame to, can be null
+     *  @param toSkip don't query any of these peers, may be null
+     *  @since 0.9.53 added toSkip param
      */
     public FloodfillVerifyStoreJob(RouterContext ctx, Hash key, Hash client, long published, int type,
-                                   Hash sentTo, FloodfillNetworkDatabaseFacade facade) {
+                                   Hash sentTo, Set<Hash> toSkip, FloodfillNetworkDatabaseFacade facade) {
         super(ctx);
         facade.verifyStarted(key);
         _key = key;
@@ -73,7 +76,12 @@ class FloodfillVerifyStoreJob extends JobImpl {
         _log = ctx.logManager().getLog(getClass());
         _sentTo = sentTo;
         _facade = facade;
-        _ignore = new HashSet<Hash>(MAX_PEERS_TO_TRY);
+        _ignore = new HashSet<Hash>(8);
+        if (toSkip != null) {
+            synchronized(toSkip) {
+                _ignore.addAll(toSkip);
+            }
+        }
         if (sentTo != null) {
             _ipSet = new MaskedIPSet(ctx, sentTo, IP_CLOSE_BYTES);
             _ignore.add(_sentTo);
@@ -192,7 +200,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
                     // We don't have a compatible way to get a reply,
                     // skip it for now.
                      if (_log.shouldWarn())
-                         _log.warn("Skipping store verify for ECIES client " + _client.toBase32());
+                         _log.warn("Skipping store verify to " + _target + " for ECIES- or ElG-only client " + _client.toBase32());
                     _facade.verifyFinished(_key);
                     return;
                 }
@@ -242,6 +250,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
                                                        new VerifyReplyJob(getContext()),
                                                        new VerifyTimeoutJob(getContext()));
         ctx.tunnelDispatcher().dispatchOutbound(sent, outTunnel.getSendTunnelId(0), _target);
+        _attempted++;
     }
     
     /**
@@ -442,10 +451,14 @@ class FloodfillVerifyStoreJob extends JobImpl {
                     _log.info(getJobId() + ": Verify failed, but new store already happened for: " + _key);
                 return;
             }
-            Set<Hash> toSkip = new HashSet<Hash>(2);
+            Set<Hash> toSkip = new HashSet<Hash>(8);
             if (_sentTo != null)
                 toSkip.add(_sentTo);
             toSkip.add(_target);
+            // pass over all the ignores for the next attempt
+            // unless we've had a crazy number of attempts, then start over
+            if (_ignore.size() < 20)
+                toSkip.addAll(_ignore);
             if (_log.shouldWarn())
                 _log.warn(getJobId() + ": Verify failed, starting new store for: " + _key);
             _facade.sendStore(_key, ds, null, null, FloodfillNetworkDatabaseFacade.PUBLISH_TIMEOUT, toSkip);
@@ -467,7 +480,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
             getContext().statManager().addRateData("netDb.floodfillVerifyTimeout", getContext().clock().now() - _sendTime);
             if (_log.shouldLog(Log.WARN))
                 _log.warn(getJobId() + ": Verify timed out for: " + _key);
-            if (_ignore.size() < MAX_PEERS_TO_TRY) {
+            if (_attempted < MAX_PEERS_TO_TRY) {
                 // Don't resend, simply rerun FVSJ.this inline and
                 // chose somebody besides _target for verification
                 _ignore.add(_target);

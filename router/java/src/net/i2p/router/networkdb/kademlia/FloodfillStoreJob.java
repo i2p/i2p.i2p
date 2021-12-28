@@ -8,7 +8,6 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import net.i2p.data.DatabaseEntry;
@@ -98,10 +97,7 @@ class FloodfillStoreJob extends StoreJob {
                 published = data.getDate();
             }
             // we should always have exactly one successful entry
-            Hash sentTo = null;
-            try {
-                sentTo = _state.getSuccessful().iterator().next();
-            } catch (NoSuchElementException nsee) {}
+            Hash sentTo = _state.getSuccessful();
             Hash client;
             if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
                 // get the real client hash
@@ -111,7 +107,7 @@ class FloodfillStoreJob extends StoreJob {
             }
             Job fvsj = new FloodfillVerifyStoreJob(ctx, key, client,
                                                    published, type,
-                                                   sentTo, _facade);
+                                                   sentTo, _state.getAttempted(), _facade);
             if (shouldLog)
                 _log.info(getJobId() + ": Succeeded sending key " + key +
                           ", queueing verify job " + fvsj.getJobId());
