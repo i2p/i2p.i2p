@@ -790,7 +790,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                 return;
         }
         
-        RepublishLeaseSetJob j = null;
+        RepublishLeaseSetJob j;
         synchronized (_publishingLeaseSets) {
             j = _publishingLeaseSets.get(h);
             if (j == null) {
@@ -1467,7 +1467,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      *  to be greater than MAX_PER_PEER_TIMEOUT * TIMEOUT_MULTIPLIER by a factor of at least
      *  3 or 4, to allow at least that many peers to be attempted for a store.
      */
-    private static final int MAX_PER_PEER_TIMEOUT = 7*1000;
+    private static final int MAX_PER_PEER_TIMEOUT = 5100;
     private static final int TIMEOUT_MULTIPLIER = 3;
 
     /** todo: does this need more tuning? */
@@ -1475,7 +1475,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         PeerProfile prof = _context.profileOrganizer().getProfile(peer);
         double responseTime = MAX_PER_PEER_TIMEOUT;
         if (prof != null && prof.getIsExpandedDB()) {
-            responseTime = prof.getDbResponseTime().getRate(24*60*60*1000l).getAverageValue();
+            responseTime = prof.getDbResponseTime().getRate(60*60*1000L).getAvgOrLifetimeAvg();
             // if 0 then there is no data, set to max.
             if (responseTime <= 0 || responseTime > MAX_PER_PEER_TIMEOUT)
                 responseTime = MAX_PER_PEER_TIMEOUT;
@@ -1485,8 +1485,17 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         return TIMEOUT_MULTIPLIER * (int)responseTime;  // give it up to 3x the average response time
     }
 
-    /** unused (overridden in FNDF) */
-    public abstract void sendStore(Hash key, DatabaseEntry ds, Job onSuccess, Job onFailure, long sendTimeout, Set<Hash> toIgnore);
+    /**
+     * See implementation in FNDF
+     *
+     * @param key the DatabaseEntry hash
+     * @param onSuccess may be null, always called if we are ff and ds is an RI
+     * @param onFailure may be null, ignored if we are ff and ds is an RI
+     * @param sendTimeout ignored if we are ff and ds is an RI
+     * @param toIgnore may be null, if non-null, all attempted and skipped targets will be added as of 0.9.53,
+     *                 unused if we are ff and ds is an RI
+     */
+    abstract void sendStore(Hash key, DatabaseEntry ds, Job onSuccess, Job onFailure, long sendTimeout, Set<Hash> toIgnore);
 
     /**
      *  Increment in the negative lookup cache

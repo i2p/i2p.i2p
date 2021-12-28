@@ -155,8 +155,18 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             sendStore(localRouterInfo.getIdentity().calculateHash(), localRouterInfo, null, null, PUBLISH_TIMEOUT, null);
     }
     
+    /**
+     * Send out a store.
+     *
+     * @param key the DatabaseEntry hash
+     * @param onSuccess may be null, always called if we are ff and ds is an RI
+     * @param onFailure may be null, ignored if we are ff and ds is an RI
+     * @param sendTimeout ignored if we are ff and ds is an RI
+     * @param toIgnore may be null, if non-null, all attempted and skipped targets will be added as of 0.9.53,
+     *                 unused if we are ff and ds is an RI
+     */
     @Override
-    public void sendStore(Hash key, DatabaseEntry ds, Job onSuccess, Job onFailure, long sendTimeout, Set<Hash> toIgnore) {
+    void sendStore(Hash key, DatabaseEntry ds, Job onSuccess, Job onFailure, long sendTimeout, Set<Hash> toIgnore) {
         // if we are a part of the floodfill netDb, don't send out our own leaseSets as part 
         // of the flooding - instead, send them to a random floodfill peer so *they* can flood 'em out.
         // perhaps statistically adjust this so we are the source every 1/N times... or something.

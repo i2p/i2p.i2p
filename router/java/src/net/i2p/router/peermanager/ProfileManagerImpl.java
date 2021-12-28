@@ -113,7 +113,10 @@ public class ProfileManagerImpl implements ProfileManager {
      * was successfully tested with the given round trip latency
      *
      * Non-blocking. Will not update the profile if we can't get the lock.
+     *
+     * @deprecated disabled
      */
+    @Deprecated
     @SuppressWarnings("deprecation")
     public void tunnelTestSucceeded(Hash peer, long responseTimeMs) {
         if (PeerProfile.ENABLE_TUNNEL_TEST_RESPONSE_TIME) {
@@ -260,10 +263,11 @@ public class ProfileManagerImpl implements ProfileManager {
      * Note that we've confirmed a successful send of db data to the peer (though we haven't
      * necessarily requested it again from them, so they /might/ be lying)
      *
-     * This is not really interesting, since they could be lying, so we do not
-     * increment any DB stats at all. On verify, call dbStoreSuccessful().
+     * As of 0.9.53 we update the DbResponseTime.
      *
-     * @param responseTimeMs ignored
+     * This will force creation of DB stats
+     *
+     * @param responseTimeMs duration
      */
     public void dbStoreSent(Hash peer, long responseTimeMs) {
         PeerProfile data = getProfile(peer);
@@ -271,10 +275,9 @@ public class ProfileManagerImpl implements ProfileManager {
         long now = _context.clock().now();
         data.setLastHeardFrom(now);
         data.setLastSendSuccessful(now);
-        //if (!data.getIsExpandedDB())
-        //    data.expandDBProfile();
-        //DBHistory hist = data.getDBHistory();
-        //hist.storeSuccessful();
+        if (!data.getIsExpandedDB())
+            data.expandDBProfile();
+        data.getDbResponseTime().addData(responseTimeMs, responseTimeMs);
     }
     
     /**
