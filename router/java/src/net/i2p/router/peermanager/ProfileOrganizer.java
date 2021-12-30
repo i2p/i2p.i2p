@@ -660,7 +660,6 @@ public class ProfileOrganizer {
      * @param exclude non-null, WARNING - side effect, all not-connected peers are added
      * @param mask 0-4 Number of bytes to match to determine if peers in the same IP range should
      *             not be in the same tunnel. 0 = disable check; 1 = /8; 2 = /16; 3 = /24; 4 = exact IP match
-     * @param ipSet ignored, should call locked_selectPeers, to be fixed
      * @param ipSet may be null only if mask is 0
      * @since 0.9.53
      */

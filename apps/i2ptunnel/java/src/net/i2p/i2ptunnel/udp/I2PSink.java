@@ -39,7 +39,6 @@ public class I2PSink implements Sink {
 
     /**
      *  @param raw false for repliable
-     *  @param fromPort I2CP source port, 0-65535
      *  @param toPort I2CP destination port, 0-65535
      *  @since 0.9.53
      */

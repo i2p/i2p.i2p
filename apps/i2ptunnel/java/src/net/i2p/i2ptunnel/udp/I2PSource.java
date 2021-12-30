@@ -46,7 +46,7 @@ public class I2PSource implements Source {
 
     /**
      *  @param port I2CP port or I2PSession.PORT_ANY
-     *  @param portocol REPLIABLE, RAW, or BOTH
+     *  @param protocol REPLIABLE, RAW, or BOTH
      *  @since 0.9.53
      */
     public I2PSource(I2PSession sess, Protocol protocol, int port) {
