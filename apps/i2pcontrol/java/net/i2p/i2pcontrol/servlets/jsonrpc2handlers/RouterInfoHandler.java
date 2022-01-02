@@ -179,25 +179,44 @@ public class RouterInfoHandler implements RequestHandler {
 
         int status = _context.commSystem().getStatus().getCode();
         switch (status) {
-        case CommSystemFacade.STATUS_OK:
-            RouterAddress ra = _context.router().getRouterInfo().getTargetAddress("NTCP");
+
+          case CommSystemFacade.STATUS_OK:
+          case CommSystemFacade.STATUS_IPV4_OK_IPV6_UNKNOWN:
+          case CommSystemFacade.STATUS_IPV4_OK_IPV6_FIREWALLED:
+          case CommSystemFacade.STATUS_IPV4_FIREWALLED_IPV6_OK:
+          case CommSystemFacade.STATUS_IPV4_DISABLED_IPV6_OK:
+            RouterAddress ra = _context.router().getRouterInfo().getTargetAddress("NTCP2");
             if (ra == null || TransportUtil.isPubliclyRoutable(ra.getIP(), true))
                 return NETWORK_STATUS.OK;
             return NETWORK_STATUS.ERROR_PRIVATE_TCP_ADDRESS;
-        case CommSystemFacade.STATUS_DIFFERENT:
+
+          case CommSystemFacade.STATUS_DIFFERENT:
+          case CommSystemFacade.STATUS_IPV4_SNAT_IPV6_OK:
+          case CommSystemFacade.STATUS_IPV4_SNAT_IPV6_UNKNOWN:
             return NETWORK_STATUS.ERROR_SYMMETRIC_NAT;
-        case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
-            if (_context.router().getRouterInfo().getTargetAddress("NTCP") != null)
+
+          case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
+          case CommSystemFacade.STATUS_IPV4_FIREWALLED_IPV6_UNKNOWN:
+          case CommSystemFacade.STATUS_IPV4_DISABLED_IPV6_FIREWALLED:
+            if (_context.router().getRouterInfo().getTargetAddress("NTCP2") != null)
                 return NETWORK_STATUS.WARN_FIREWALLED_WITH_INBOUND_TCP;
             if (((FloodfillNetworkDatabaseFacade) _context.netDb()).floodfillEnabled())
                 return NETWORK_STATUS.WARN_FIREWALLED_AND_FLOODFILL;
             if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)
                 return NETWORK_STATUS.WARN_FIREWALLED_AND_FAST;
             return NETWORK_STATUS.FIREWALLED;
-        case CommSystemFacade.STATUS_HOSED:
+
+          case CommSystemFacade.STATUS_HOSED:
             return NETWORK_STATUS.ERROR_UDP_PORT_IN_USE;
-        case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
-        default:
+
+          case CommSystemFacade.STATUS_DISCONNECTED:
+            return NETWORK_STATUS.ERROR_NO_ACTIVE_PEERS_CHECK_CONNECTION_AND_FIREWALL;
+
+          case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
+          case CommSystemFacade.STATUS_IPV4_UNKNOWN_IPV6_OK:
+          case CommSystemFacade.STATUS_IPV4_UNKNOWN_IPV6_FIREWALLED:
+          case CommSystemFacade.STATUS_IPV4_DISABLED_IPV6_UNKNOWN:
+          default:
             ra = _context.router().getRouterInfo().getTargetAddress("SSU");
             if (ra == null && _context.router().getUptime() > 5 * 60 * 1000) {
                 if (_context.commSystem().countActivePeers() <= 0)
