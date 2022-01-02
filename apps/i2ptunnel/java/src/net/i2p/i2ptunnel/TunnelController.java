@@ -235,6 +235,15 @@ public class TunnelController implements Logging {
     }
 
     /**
+     *  The I2PTunnel
+     *
+     *  @since 0.9.53 for advanced plugin usage
+     */
+    public I2PTunnel getTunnel() {
+        return _tunnel;
+    }
+
+    /**
      * @return success
      */
     private boolean createPrivateKey() {
