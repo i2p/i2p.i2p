@@ -59,6 +59,8 @@ public class ShellService implements ClientApp {
     private final ProcessBuilder _pb;
     private final I2PAppContext _context;
     private final ClientAppManager _cmgr;
+    private final File _errorLog;
+    private final File _outputLog;
 
     private ClientAppState _state = ClientAppState.UNINITIALIZED;
 
@@ -84,6 +86,10 @@ public class ShellService implements ClientApp {
         _pb = new ProcessBuilder(process);
 
         File pluginDir = new File(_context.getConfigDir(), PLUGIN_DIR + '/' + this.getName());
+        _errorLog = new File(pluginDir, "error.log");
+        _outputLog = new File(pluginDir, "output.log");
+        _pb.redirectOutput(_outputLog);
+        _pb.redirectError(_errorLog);
         _pb.directory(pluginDir);
         changeState(ClientAppState.INITIALIZED, "ShellService: " + getName() + " set up and initialized");
     }
