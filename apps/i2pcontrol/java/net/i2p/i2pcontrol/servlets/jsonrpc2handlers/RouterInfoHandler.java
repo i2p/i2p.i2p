@@ -96,7 +96,7 @@ public class RouterInfoHandler implements RequestHandler {
         }
 
         if (inParams.containsKey("i2p.router.status")) {
-            outParams.put("i2p.router.status", _context.throttle().getTunnelStatus());
+            outParams.put("i2p.router.status", _context.throttle().getLocalizedTunnelStatus());
         }
 
         if (inParams.containsKey("i2p.router.net.status")) {
