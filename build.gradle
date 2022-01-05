@@ -151,3 +151,10 @@ void stripJar(File file) {
     }
     newFile.renameTo file
 }
+
+allprojects {
+    tasks.withType(JavaCompile).configureEach {
+        options.fork = true
+    }
+
+}
