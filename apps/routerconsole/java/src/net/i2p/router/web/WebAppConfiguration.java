@@ -88,9 +88,12 @@ public class WebAppConfiguration implements Configuration {
 
         I2PAppContext i2pContext = I2PAppContext.getGlobalContext();
         File libDir = i2pContext.getLibDir();
-        // FIXME this only works if war is the same name as the plugin
-        File pluginDir = new File(i2pContext.getConfigDir(),
-                                        PluginStarter.PLUGIN_DIR + ctxPath);
+        // Get the plugin name that WebAppStarter stuck in here for us
+        String pluginName = wac.getInitParameter(WebAppStarter.PARAM_PLUGIN_NAME);
+        if (pluginName == null)
+            pluginName = ctxPath;
+        File pluginDir = new File(i2pContext.getConfigDir(), PluginStarter.PLUGIN_DIR);
+        pluginDir = new File(pluginDir, pluginName);
 
         File dir = libDir;
         String cp;

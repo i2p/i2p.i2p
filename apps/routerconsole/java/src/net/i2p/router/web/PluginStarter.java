@@ -475,7 +475,7 @@ public class PluginStarter implements Runnable {
                             if (log.shouldLog(Log.INFO))
                                 log.info("Starting webapp: " + warName);
                             String path = files[i].getCanonicalPath();
-                            WebAppStarter.startWebApp(ctx, server, warName, path);
+                            WebAppStarter.startWebApp(ctx, server, warName, path, appName);
                             pluginWars.get(appName).add(warName);
                         }
                     } catch (IOException ioe) {

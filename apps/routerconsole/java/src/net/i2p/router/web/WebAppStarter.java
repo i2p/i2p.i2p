@@ -43,6 +43,7 @@ public class WebAppStarter {
 
     private static final Map<String, Long> warModTimes = new ConcurrentHashMap<String, Long>();
     static final Map<String, String> INIT_PARAMS = new HashMap<String, String>(4);
+    static final String PARAM_PLUGIN_NAME = "net.i2p.router.web.WebAppStarter.PLUGIN_NAME";
 
     // There are 4 additional jars that are required to do the Servlet 3.0 annotation scanning.
     // The following 4 classes were the first to get thrown as not found, for each jar.
@@ -88,6 +89,7 @@ public class WebAppStarter {
      *  Adds and starts.
      *  Prior to 0.9.28, was not guaranteed to throw on failure.
      *  Not for routerconsole.war, it's started in RouterConsoleRunner.
+     *  Not for plugins, use 5-arg method.
      *
      *  As of 0.9.34, the appName will be registered with the PortMapper.
      *
@@ -96,10 +98,28 @@ public class WebAppStarter {
      */
     public static void startWebApp(RouterContext ctx, ContextHandlerCollection server,
                             String appName, String warPath) throws Exception {
+        startWebApp(ctx, server, appName, warPath, null);
+    }
+
+    /**
+     *  Adds and starts.
+     *  Not for routerconsole.war, it's started in RouterConsoleRunner.
+     *
+     *  The appName will be registered with the PortMapper.
+     *
+     *  @param pluginName may be null, will look for console/webapps.config in that plugin
+     *  @throws Exception just about anything, caller would be wise to catch Throwable
+     *  @since 0.9.53 added pluginName param
+     */
+    public static void startWebApp(RouterContext ctx, ContextHandlerCollection server,
+                                   String appName, String warPath, String pluginName) throws Exception {
          File tmpdir = new SecureDirectory(ctx.getTempDir(), "jetty-work-" + appName + ctx.random().nextInt());
          WebAppContext wac = addWebApp(ctx, server, appName, warPath, tmpdir);      
          //_log.debug("Loading war from: " + warPath);
          LocaleWebAppHandler.setInitParams(wac, INIT_PARAMS);
+         // save plugin name so WebAppConfiguration can find it
+         if (pluginName != null)
+             wac.setInitParameter(PARAM_PLUGIN_NAME, pluginName);
          // default false, set to true so we get good logging,
          // and the caller will know it failed
          wac.setThrowUnavailableOnStartupException(true);
