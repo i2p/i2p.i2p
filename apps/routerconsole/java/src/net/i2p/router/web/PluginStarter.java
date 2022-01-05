@@ -486,9 +486,23 @@ public class PluginStarter implements Runnable {
                 String icfile = stripHTML(props, "console-icon");
                 if (icfile != null && !icfile.contains("..")) {
                     StringBuilder buf = new StringBuilder(32);
-                    buf.append('/').append(appName);
-                    if (!icfile.startsWith("/"))
+                    String url = stripHTML(props, "consoleLinkURL");
+                    if (url != null) {
+                        if (url.endsWith(".html") || url.endsWith(".htm") || url.endsWith(".jsp") || url.endsWith("/home")) {
+                            int slash = url.lastIndexOf('/');
+                            if (slash > 0)
+                                url = url.substring(0, slash);
+                        }
+                    } else {
+                        url = appName;
+                    }
+                    if (!url.startsWith("/"))
                         buf.append('/');
+                    buf.append(url);
+                    if (!url.endsWith("/") && !icfile.startsWith("/"))
+                        buf.append('/');
+                    else if (url.endsWith("/") && icfile.startsWith("/"))
+                        icfile = icfile.substring(1);
                     buf.append(icfile);
                     iconfile = buf.toString();
                 }
