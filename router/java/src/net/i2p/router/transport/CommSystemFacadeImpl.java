@@ -86,6 +86,12 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         else
             _manager.restart();
     }
+
+    /**
+     * @since 0.9.53
+     */
+    @Override
+    public synchronized boolean isRunning() { return _wasStarted; }
     
     /**
      *  How many peers are we currently connected to, that we have

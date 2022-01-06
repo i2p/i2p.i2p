@@ -69,6 +69,13 @@ public class PublishLocalRouterInfoJob extends JobImpl {
     public String getName() { return "Publish Local Router Info"; }
 
     public void runJob() {
+        if (!getContext().commSystem().isRunning()) {
+            // Avoid deadlock in the transports through here via FNDF.publish() at startup
+            if (_log.shouldWarn())
+                _log.warn("PLRIJ before comm system started");
+            requeue(100);
+            return;
+        }
         long last = getContext().netDb().getLastRouterInfoPublishTime();
         long now = getContext().clock().now();
         if (last + MIN_PUBLISH_DELAY > now) {

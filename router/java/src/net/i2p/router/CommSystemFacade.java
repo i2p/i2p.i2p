@@ -176,6 +176,9 @@ public abstract class CommSystemFacade implements Service {
     /** @since 0.8.13 */
     public boolean isDummy() { return true; }
 
+    /** @since 0.9.53 */
+    public boolean isRunning() { return true; }
+
     /** 
      * Tell other transports our address changed
      */

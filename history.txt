@@ -1,3 +1,20 @@
+2022-01-06 zzz
+ * Router: Prevent deadlock at startup
+
+2022-01-05 zzz
+ * Plugins:
+   - Fix console icon when consoleLinkURL is specified
+     and different from the plugin name
+   - Fix webapp classpath setting when the webapp name
+     is different from the plugin name
+
+2022-01-04 zzz
+ * i2pcontrol: Send translated tunnel status string
+
+2022-01-02 zzz
+ * i2pcontrol: Handle more router states mapping to i2pcontrol states
+ * i2ptunnel: Add hooks to get the session from the contoller
+
 2021-12-28 zzz
  * Console: Partial string case-insensitive match for netdb family search
  * i2ptunnel: Add IRC filter support for IRCv3 message tags
