@@ -48,7 +48,7 @@ import net.i2p.util.Log;
  * Works on Windows, OSX, and Linux.
  *
  * @author eyedeekay
- * @since 1.6.0/0.9.52
+ * @since 1.6.0/0.9.52, moved from net.i2p.app in 0.9.53
  */
 public class ShellService implements ClientApp {
     private static final String NAME_OPTION = "-shellservice.name";
