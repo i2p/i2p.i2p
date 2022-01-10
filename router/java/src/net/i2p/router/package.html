@@ -14,5 +14,42 @@ Subject to change. Not necessarily maintained as a stable API.
 For applications bundling the I2P router, instantiate Router and call runRouter(), or use Router.main() or RouterLaunch.
 Most public methods in Router are maintained as a stable I2P for those bundling the router.
 </p>
+<p>
+Message flow:
+<pre>
+
+
+                                                                                                                              NTCP2
+                                                                                                                              Per-Conn
+
+                                                                                                                                /--- Pri Queue )
+NTCP2                                                                                                                          /        .      )                                                                      NTCP2
+                                                                                                                              /         .      )
+kernel -&gt; NIO -&gt; Reader -------------------------\                                                                           /          .      ) ---------------------------------------                       -- Writer -&gt; NIO -&gt; Kernel
+                                                  \                                 Tunnels                                 /           .      )                                        \                     /
+                                                   \                                                                       /            .      )                                         \                   /
+                                                    \                      /-- RED - Codel/Pri - Frag - \                 /             .      )                                          \                 /
+                                                     \              IBGW  /          Queue               \               /                                                                 \               /
+                                                      \                  /                                \             /                                                                   \             /
+                                                       \                /                                  \           /                                                                     \           /
+                                                        \              /  Middle hop                        \         /                                                                        Bandwidth
+                                                         -&gt; In Net --------------------- RED ------------------Out Net                                                                         Limiter
+                                                        /   Msg Pool   \                                   /   Msg Pool                                                                      /           \
+                                                       /                \                                 /            \                                                                    /             \
+                                                      /                  \                               /              \                                                                  /               \
+SSU                                                  /              OBEP  \                             /                \                                                                /                 \
+                                                    /                      \                           /                  \                                                              /                   \
+kernel -&gt; Reader -&gt; Codel -----------------&gt; Codel -                        --------------------- RED -                    \                                                            /                     \
+                    Queue \              /   Queue                            \              /                              \       SSU                                                /                       \
+                           \            /                                      \            /                                \      Per-Conn                                          /                         \
+                             Reasssembly                                         Reasssembly                                  \                                                      /                           \
+                                                                                                                               \--&gt; Pri Queue -&gt; Frag -&gt; Window/ )                  /                             \
+                                                                                                                                                         ReTX    )                 /                               \     SSU
+                                                                                                                                               .                 )                /                                 \
+                                                                                                                                               .                 ) - OMF - Codel -                                   - Writer -&gt; Kernel
+                                                                                                                                               .                 )         Queue
+                                                                                                                                               .                 )
+                                                                                                                                               .                 )
+</pre>
     </body>
 </html>

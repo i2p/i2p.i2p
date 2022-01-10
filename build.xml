@@ -869,8 +869,8 @@
             splitindex="true"
             failonerror="true"
             additionalparam="-notimestamp"
-            doctitle="I2P Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra}"
-            windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
+            doctitle="I2P Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra} (API ${api.version})"
+            windowtitle="I2P Anonymous Network - Java Documentation - API Version ${api.version}">
             <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:org.apache.http.conn.ssl:org.apache.http.conn.util:org.apache.http.util:org.json.simple:com.southernstorm.noise.crypto.x25519:com.southernstorm.noise.crypto.chacha20:org.minidns:org.minidns.*" />
             <group title="Streaming Library" packages="net.i2p.client.streaming:net.i2p.client.streaming.impl" />
             <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:net.i2p.data.router:org.cybergarage:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters:com.maxmind.*:com.southernstorm.noise.*" />
@@ -958,8 +958,8 @@
             packagenames="*"
             use="true"
             splitindex="true"
-            doctitle="I2P Unit Test Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra}"
-            windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
+            doctitle="I2P Unit Test Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra} (API ${api.version})"
+            windowtitle="I2P Anonymous Network - Java Documentation - API Version ${api.version}">
             <group title="Core SDK" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:gnu.crypto.*:gnu.gettext:org:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
             <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters" />
             <sourcepath>
