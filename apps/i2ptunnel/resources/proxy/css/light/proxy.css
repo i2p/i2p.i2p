@@ -1,5 +1,3 @@
-
-
 html {
     margin: 0px !important;
 }
@@ -13,6 +11,38 @@ body {
     background-color: rgb(246, 246, 250);
     background-position: initial initial;
     background-repeat: initial initial;
+}
+
+#jumplinks h3 {
+    margin: 0 0 10px;
+}
+
+#jumplinks a {
+    display: block;
+    padding: 2px 0;
+    line-height: 16px;
+}
+
+#jumplinks a::before {
+    content: "\279F\00A0";
+    font-size: 16pt;
+    display: inline-block;
+    padding: 3px 0;
+    vertical-align: sub;
+    line-height: 16px;
+}
+
+@media screen and (min-width: 1400px) {
+    #jumplinks h4 {
+        font-size: 10.5pt;
+    }
+}
+
+#jumplinks h4 {
+    margin-bottom: 10px;
+    border-color: #7778bf !important;
+    color: #41465f;
+    padding-bottom: 10px;
 }
 
 b {
@@ -229,12 +259,12 @@ h3 {
     vertical-align: top;
 }
 
-#jumplinks {
-    text-align: start;
-}
-
-#jumplinks > a {
-    border: black;
+@media only screen and (max-width: 600px) {
+    #jumplinks {
+        text-align: start;
+    }
+    #jumplinks>a {
+        border: black;
         border-top-style: none;
         border-top-width: medium;
         border-right-style: none;
@@ -243,38 +273,36 @@ h3 {
         border-bottom-width: medium;
         border-left-style: none;
         border-left-width: medium;
-    border-style: outset;
-    margin: 2px;
-    float: none;
-    display: inline-block;
-    width: 96%;
-    border-width: 1px;
-    border-radius: 12px;
-    vertical-align: middle;
-    font-size: 1.1rem;
-    text-align: start;
-    padding-top: 1.5%;
-    padding-bottom: 1.5%;
-    padding-left: 1%;
-    background: #ddd;
-    background: linear-gradient(to bottom, #eee, #fff);
-}
-
-#jumplinks > a:hover {
-    text-decoration: none;
-    color: #19191f;
-    border: 1px solid #f60 !important;
-    background: #ddd;
-    background: linear-gradient(to bottom, #eee, #fff);
-    box-shadow: inset 0 0 0 1px #fff !important;
-    filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.8));
-    transition: ease border 0.7s;
-}
-
-
-#jumplinks > h4 {
-    text-align: left;
-    font-size: 1.1rem;
+        border-style: outset;
+        margin: 2px;
+        float: none;
+        display: inline-block;
+        width: 96%;
+        border-width: 1px;
+        border-radius: 12px;
+        vertical-align: middle;
+        font-size: 1.1rem;
+        text-align: start;
+        padding-top: 1.5%;
+        padding-bottom: 1.5%;
+        padding-left: 1%;
+        background: #ddd;
+        background: linear-gradient(to bottom, #eee, #fff);
+    }
+    #jumplinks>a:hover {
+        text-decoration: none;
+        color: #19191f;
+        border: 1px solid #f60 !important;
+        background: #ddd;
+        background: linear-gradient(to bottom, #eee, #fff);
+        box-shadow: inset 0 0 0 1px #fff !important;
+        filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.8));
+        transition: ease border 0.7s;
+    }
+    #jumplinks>h4 {
+        text-align: left;
+        font-size: 1.1rem;
+    }
 }
 
 element {
@@ -302,4 +330,3 @@ td {
         font-size: 10pt !important;
     }
 }
-

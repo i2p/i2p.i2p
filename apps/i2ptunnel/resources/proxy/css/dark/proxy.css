@@ -1,4 +1,3 @@
-
 body {
     margin: 5px 0px 0px;
     padding: 0px;
@@ -13,6 +12,26 @@ body {
     font-family: 'Droid Sans', 'Noto Sans', Ubuntu, 'Segoe UI', 'Bitstream Vera Sans', 'DejaVu Sans', Verdana, 'Lucida Grande', Helvetica, sans-serif;
     background-position: initial initial;
     background-repeat: initial initial;
+}
+
+#jumplinks h4 {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+#jumplinks a {
+    display: inline-block;
+    padding: 2px 0;
+    line-height: 16px;
+}
+
+#jumplinks a::before {
+    content: "\279F\00A0";
+    font-size: 16pt;
+    display: inline-block;
+    padding: 3px 0;
+    vertical-align: sub;
+    line-height: 16px;
 }
 
 img {
@@ -220,12 +239,15 @@ hr:last-child {
     font-size: 1.1rem;
 }
 
-#jumplinks {
-    text-align: start;
-}
+@media only screen and (max-width: 600px) {
+    /*body {
 
-#jumplinks > a {
-    border: black;
+     }*/
+    #jumplinks {
+        text-align: start;
+    }
+    #jumplinks>a {
+        border: black;
         border-top-style: none;
         border-top-width: medium;
         border-right-style: none;
@@ -234,31 +256,30 @@ hr:last-child {
         border-bottom-width: medium;
         border-left-style: none;
         border-left-width: medium;
-    border-style: outset;
-    margin: 2px;
-    float: none;
-    display: inline-block;
-    width: 96%;
-    border-width: 1px;
-    border-radius: 12px;
-    vertical-align: middle;
-    font-size: 1.1rem;
-    text-align: start;
-    padding-top: 1.5%;
-    padding-bottom: 1.5%;
-    padding-left: 1%;
-}
-
-#jumplinks > a:hover {
-    text-decoration: none;
-    color: #da736b !important;
-    border: 1px solid #da736b !important;
-    box-shadow: inset 0 1px 1px 0 #eff;
-}
-
-#jumplinks > h4 {
-    text-align: left;
-    font-size: 1.1rem;
+        border-style: outset;
+        margin: 2px;
+        float: none;
+        display: inline-block;
+        width: 96%;
+        border-width: 1px;
+        border-radius: 12px;
+        vertical-align: middle;
+        font-size: 1.1rem;
+        text-align: start;
+        padding-top: 1.5%;
+        padding-bottom: 1.5%;
+        padding-left: 1%;
+    }
+    #jumplinks>a:hover {
+        text-decoration: none;
+        color: #da736b !important;
+        border: 1px solid #da736b !important;
+        box-shadow: inset 0 1px 1px 0 #eff;
+    }
+    #jumplinks>h4 {
+        text-align: left;
+        font-size: 1.1rem;
+    }
 }
 
 element {
@@ -283,4 +304,3 @@ td {
         margin-left: 242px !important;
     }
 }
-
