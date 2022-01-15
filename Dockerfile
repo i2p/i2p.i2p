@@ -1,4 +1,4 @@
-FROM jlesage/baseimage:alpine-3.10-glibc as builder
+FROM jlesage/baseimage:alpine-3.15-glibc as builder
 
 ENV APP_HOME="/i2p"
 
@@ -10,7 +10,7 @@ RUN add-pkg --virtual build-base gettext tar bzip2 apache-ant openjdk8 \
     && rm -rf pkg-temp/osid pkg-temp/lib/wrapper pkg-temp/lib/wrapper.* \
     && del-pkg build-base gettext tar bzip2 apache-ant openjdk8
 
-FROM jlesage/baseimage:alpine-3.10-glibc
+FROM jlesage/baseimage:alpine-3.15-glibc
 ENV APP_HOME="/i2p"
 
 RUN add-pkg openjdk8-jre
