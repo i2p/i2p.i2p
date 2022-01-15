@@ -4193,11 +4193,11 @@ public class I2PSnarkServlet extends BasicServlet {
         MetaInfo meta = snark.getMetaInfo();
         if (meta == null)
             return;
-        buf.append("<div id=\"snarkCommentSection\"><table class=\"snarkTorrentInfo\">\n")
+        buf.append("<div id=\"snarkCommentSection\"><table class=\"snarkTorrentInfo\">\n");
            //.append("<tr><th colspan=\"5\">")
            //.append(_t("Edit Torrent"))
            //.append("</th>")
-           .append("</tr>");
+           //.append("</tr>");
         boolean isRunning = !snark.isStopped();
         if (isRunning) {
             // shouldn't happen
