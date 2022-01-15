@@ -43,15 +43,16 @@ class BanlistRenderer {
 
     public void renderStatusHTML(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(1024);
-        // move to the jsp
-        //buf.append("<h2>Banned Peers</h2>");
         Map<Hash, Banlist.Entry> entries = new TreeMap<Hash, Banlist.Entry>(new HashComparator());
         
         entries.putAll(_context.banlist().getEntries());
+        buf.append("<h3 id=\"bannedpeers\">").append(_t("Banned Peers"));
         if (entries.isEmpty()) {
-            buf.append("<i>").append(_t("none")).append("</i>");
+            buf.append("</h3><i>").append(_t("none")).append("</i>");
             out.write(buf.toString());
             return;
+        } else {
+            buf.append(" (").append(entries.size()).append(")</h3>");
         }
 
         buf.append("<ul id=\"banlist\">");

@@ -21,9 +21,12 @@ public class ConfigPeerHelper extends HelperBase {
         out.write("<table id=\"bannedips\"><tr><td>" +
                   "<table id=\"banneduntilrestart\"><tr><th align=\"center\"><b>");
         out.write(_t("IPs Banned Until Restart"));
-        out.write("</b></th></tr>");
         List<Integer> singles = bl.getTransientIPv4Blocks();
         List<BigInteger> s6 = bl.getTransientIPv6Blocks();
+        int sz = singles.size() + s6.size();
+        if (sz > 0)
+            out.write(" (" + sz + ')');
+        out.write("</b></th></tr>");
         if (!(singles.isEmpty() && s6.isEmpty())) {
             if (!singles.isEmpty()) {
                 Collections.sort(singles);

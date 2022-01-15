@@ -82,7 +82,7 @@
    </tr>
  </table>
  </form>
- <a name="banlist"> </a><h3 id="bannedpeers"><%=intl._t("Banned Peers")%></h3>
+<%-- h3 in BanlistRenderer --%>
  <jsp:useBean class="net.i2p.router.web.helpers.ProfilesHelper" id="profilesHelper" scope="request" />
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=i2pcontextId%>" />
  <% profilesHelper.storeWriter(out); %>
