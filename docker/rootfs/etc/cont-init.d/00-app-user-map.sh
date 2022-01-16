@@ -19,8 +19,8 @@ echo "$APP_USER:x:$GROUP_ID:" >> /etc/group
 
 # Make sure APP_HOME is editable by the user
 if [[ -n "$APP_HOME" ]] ; then
-    chown -R "$APP_USER" "$APP_HOME"
-    chmod -R u+rw "$APP_HOME"
+    chown -R "$APP_USER" "$APP_HOME" || true
+    chmod -R u+rw "$APP_HOME" || true
 fi
 
 # vim:ft=sh:ts=4:sw=4:et:sts=4
