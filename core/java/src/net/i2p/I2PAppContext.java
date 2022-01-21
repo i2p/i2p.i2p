@@ -906,6 +906,13 @@ public class I2PAppContext {
     public void addShutdownTask(Runnable task) {
         _shutdownTasks.add(task);
     }
+
+    /**
+     *  @since 0.9.53
+     */
+    public void removeShutdownTask(Runnable task) {
+        _shutdownTasks.remove(task);
+    }
     
     /**
      *  @return an unmodifiable Set
