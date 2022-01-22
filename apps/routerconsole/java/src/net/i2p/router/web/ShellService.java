@@ -76,7 +76,7 @@ public class ShellService implements ClientApp {
 
         String[] procArgs = trimArgs(args);
 
-        String process = procArgs.toString();
+        String process = Arrays.toString(procArgs);
 
         if (_log.shouldLog(Log.DEBUG)) {
             _log.debug("Process: " + process);
@@ -112,6 +112,8 @@ public class ShellService implements ClientApp {
                     i++;
                 }
             } else {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Adding arg: " + args[i]);
                 newargs.add(args[i]);
             }
         }
