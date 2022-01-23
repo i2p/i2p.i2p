@@ -59,6 +59,7 @@ public class ShellService implements ClientApp {
     private final ProcessBuilder _pb;
     private final I2PAppContext _context;
     private final ClientAppManager _cmgr;
+    private final String _commandPath;
     private final File _errorLog;
     private final File _outputLog;
 
@@ -74,16 +75,27 @@ public class ShellService implements ClientApp {
         _cmgr = listener;
         _log = context.logManager().getLog(ShellService.class);
 
-        String[] procArgs = trimArgs(args);
-
-        String process = Arrays.toString(procArgs);
+        ArrayList<String> procArgs = trimArgs(args);
 
         if (_log.shouldLog(Log.DEBUG)) {
-            _log.debug("Process: " + process);
+            _log.debug("Process: " + procArgs.toString());
             _log.debug("Name: " + this.getName() + ", DisplayName: " + this.getDisplayName());
         }
 
-        _pb = new ProcessBuilder(process);
+        _commandPath = procArgs.get(0);
+
+        File exe = new File(_commandPath);
+        if (!exe.exists()) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Command does not exist: " + _commandPath);
+        }
+        if (!exe.canExecute()) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Command is not executable: " + _commandPath + " marking it executable");
+            exe.setExecutable(true);
+        }
+
+        _pb = new ProcessBuilder(procArgs);
 
         File pluginDir = new File(_context.getConfigDir(), PLUGIN_DIR + '/' + this.getName());
         _errorLog = new File(pluginDir, "error.log");
@@ -94,7 +106,8 @@ public class ShellService implements ClientApp {
         changeState(ClientAppState.INITIALIZED, "ShellService: " + getName() + " setup and initialized");
     }
 
-    private String[] trimArgs(String[] args) {
+    // private String[] trimArgs(String[] args) {
+    private ArrayList<String> trimArgs(String[] args) {
         ArrayList<String> newargs = new ArrayList<String>();
         for (int i = 0; i < args.length; i++) {
             if (args[i].startsWith(NAME_OPTION)) {
@@ -122,8 +135,7 @@ public class ShellService implements ClientApp {
                     "ShellService: ShellService passed with args=" + Arrays.toString(args) + " must have a name");
         if (getDisplayName() == null)
             displayName = name;
-        String arr[] = new String[newargs.size()];
-        return newargs.toArray(arr);
+        return newargs;
     }
 
     private synchronized void changeState(ClientAppState newState, String message, Exception ex) {
@@ -157,7 +169,7 @@ public class ShellService implements ClientApp {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Started " + getName() + "process");
         }
-        if (!_p.isAlive())
+        if (_p.isAlive())
             changeState(ClientAppState.RUNNING, "ShellService: " + getName() + " started");
         Boolean reg = _cmgr.register(this);
         if (reg) {
@@ -228,6 +240,8 @@ public class ShellService implements ClientApp {
      */
     public ClientAppState getState() {
         if (!isProcessRunning()) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Process is not running " + getName());
             changeState(ClientAppState.STOPPED, "ShellService: " + getName() + " stopped");
             _cmgr.unregister(this);
         }
