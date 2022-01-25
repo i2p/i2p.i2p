@@ -2146,7 +2146,6 @@ h3#graphdisplay {
 }
 
 .messages li, .messages li:first-child, .error li:first-child, .error li {
-     text-align: justify !important;
      font-weight: bold;
      list-style: none;
      background: url(images/warning.png) left center no-repeat;
