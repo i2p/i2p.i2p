@@ -281,10 +281,34 @@ public class FIFOBandwidthLimiter {
     
     StringBuilder getStatus() {
         StringBuilder rv = new StringBuilder(128);
-        rv.append("Available: ").append(_availableInbound).append('/').append(_availableOutbound).append(' ');
-        rv.append("Max: ").append(_maxInbound).append('/').append(_maxOutbound).append(' ');
-        rv.append("Burst: ").append(_unavailableInboundBurst).append('/').append(_unavailableOutboundBurst).append(' ');
-        rv.append("Burst max: ").append(_maxInboundBurst).append('/').append(_maxOutboundBurst).append(' ');
+        rv.append("Available: ").append(_availableInbound).append('/').append(_availableOutbound);
+        rv.append(" Max: ").append(_maxInbound).append('/').append(_maxOutbound);
+        rv.append(" Burst: ").append(_unavailableInboundBurst).append('/').append(_unavailableOutboundBurst);
+        rv.append(" Burst max: ").append(_maxInboundBurst).append('/').append(_maxOutboundBurst);
+        return rv;
+    }
+    
+    /**
+     *  @since 0.9.53
+     */
+    private StringBuilder getInboundStatus() {
+        StringBuilder rv = new StringBuilder(128);
+        rv.append("Available: ").append(_availableInbound);
+        rv.append(" Max: ").append(_maxInbound);
+        rv.append(" Burst: ").append(_unavailableInboundBurst);
+        rv.append(" Burst max: ").append(_maxInboundBurst);
+        return rv;
+    }
+    
+    /**
+     *  @since 0.9.53
+     */
+    private StringBuilder getOutboundStatus() {
+        StringBuilder rv = new StringBuilder(128);
+        rv.append("Available: ").append(_availableOutbound);
+        rv.append(" Max: ").append(_maxOutbound);
+        rv.append(" Burst: ").append(_unavailableOutboundBurst);
+        rv.append(" Burst max: ").append(_maxOutboundBurst);
         return rv;
     }
     
@@ -450,8 +474,8 @@ public class FIFOBandwidthLimiter {
                 } else {
                     // no bandwidth available
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Still denying the " + _pendingInboundRequests.size() 
-                                  + " pending inbound requests (status: " + getStatus().toString()
+                        _log.debug("Denying " + _pendingInboundRequests.size() 
+                                  + " pending inbound requests (status: " + getInboundStatus()
                                   + ", longest waited " + locked_getLongestInboundWait() + ')');
                 }
             }
@@ -497,6 +521,7 @@ public class FIFOBandwidthLimiter {
     /**
      * There are no limits, so just give every inbound request whatever they want
      *
+     * @param satisfied out param, list of requests that were completely satisfied
      */
     private final void locked_satisfyInboundUnlimited(List<Request> satisfied) {
         while (!_pendingInboundRequests.isEmpty()) {
@@ -520,7 +545,7 @@ public class FIFOBandwidthLimiter {
      * bandwidth as we can to those who have used what we have given them and are waiting
      * for more (giving priority to the first ones who requested it)
      * 
-     * @return list of requests that were completely satisfied
+     * @param satisfied out param, list of requests that were completely satisfied
      */
     private final void locked_satisfyInboundAvailable(List<Request> satisfied) {
         for (int i = 0; i < _pendingInboundRequests.size(); i++) {
@@ -600,8 +625,8 @@ public class FIFOBandwidthLimiter {
                 } else {
                     // no bandwidth available
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Still denying the " + _pendingOutboundRequests.size() 
-                                  + " pending outbound requests (status: " + getStatus().toString()
+                        _log.info("Denying " + _pendingOutboundRequests.size() 
+                                  + " pending outbound requests (status: " + getOutboundStatus()
                                   + ", longest waited " + locked_getLongestOutboundWait() + ')');
                 }
             }
@@ -618,6 +643,7 @@ public class FIFOBandwidthLimiter {
     /**
      * There are no limits, so just give every outbound request whatever they want
      *
+     * @param satisfied out param, list of requests that were completely satisfied
      */
     private final void locked_satisfyOutboundUnlimited(List<Request> satisfied) {
         while (!_pendingOutboundRequests.isEmpty()) {
@@ -642,7 +668,7 @@ public class FIFOBandwidthLimiter {
      * bandwidth as we can to those who have used what we have given them and are waiting
      * for more (giving priority to the first ones who requested it)
      * 
-     * @return list of requests that were completely satisfied
+     * @param satisfied out param, list of requests that were completely satisfied
      */
     private final void locked_satisfyOutboundAvailable(List<Request> satisfied) {
         for (int i = 0; i < _pendingOutboundRequests.size(); i++) {
