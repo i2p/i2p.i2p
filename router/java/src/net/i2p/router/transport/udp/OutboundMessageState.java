@@ -500,7 +500,7 @@ class OutboundMessageState implements CDPQEntry {
      *  @since 0.9.3
      */
     public int getPriority() {
-        return _message != null ? _message.getPriority() : 1000;
+        return _message != null ? _message.getPriority() : PacketBuilder.PRIORITY_HIGH;
     }
 
     @Override

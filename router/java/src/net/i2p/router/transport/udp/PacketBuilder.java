@@ -18,6 +18,7 @@ import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
 import net.i2p.data.router.RouterAddress;
+import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.TransportUtil;
 import net.i2p.util.Addresses;
@@ -182,6 +183,12 @@ class PacketBuilder {
     private static final byte DATA_FLAG_BYTE = UDPPacket.PAYLOAD_TYPE_DATA << 4;
     private static final byte PEER_TEST_FLAG_BYTE = UDPPacket.PAYLOAD_TYPE_TEST << 4;
     private static final byte SESSION_DESTROY_FLAG_BYTE = (byte) (UDPPacket.PAYLOAD_TYPE_SESSION_DESTROY << 4);
+
+    /* Higher than all other OutNetMessage priorities, but still droppable,
+     * and will be shown in the codel.UDP-Sender.drop.500 stat.
+     */
+    static final int PRIORITY_HIGH = 550;
+    private static final int PRIORITY_LOW = OutNetMessage.PRIORITY_LOWEST;
     
     /**
      *  No state, all methods are thread-safe.
@@ -318,9 +325,13 @@ class PacketBuilder {
         // calculate data size
         int numFragments = fragments.size();
         int dataSize = 0;
+        int priority = 0;
         for (int i = 0; i < numFragments; i++) {
             Fragment frag = fragments.get(i);
             OutboundMessageState state = frag.state;
+            int pri = state.getPriority();
+            if (pri > priority)
+                priority = pri;
             int fragment = frag.num;
             int sz = state.fragmentSize(fragment);
             dataSize += sz;
@@ -569,6 +580,7 @@ class PacketBuilder {
             }
         }
         
+        packet.setPriority(priority);
         return packet;
     }
     
@@ -681,6 +693,7 @@ class PacketBuilder {
         pkt.setLength(off);
         authenticate(packet, peer.getCurrentCipherKey(), peer.getCurrentMACKey());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
+        packet.setPriority((fullACKCount > 0 || partialACKCount > 0) ? PRIORITY_HIGH : PRIORITY_LOW);
         return packet;
     }
     
@@ -775,6 +788,7 @@ class PacketBuilder {
         setTo(packet, to, state.getSentPort());
         SimpleByteCache.release(iv);
         packet.setMessageType(TYPE_CREAT);
+        packet.setPriority(PRIORITY_HIGH);
         return packet;
     }
     
@@ -840,6 +854,7 @@ class PacketBuilder {
         authenticate(packet, state.getIntroKey(), state.getIntroKey());
         setTo(packet, to, port);
         packet.setMessageType(TYPE_SREQ);
+        packet.setPriority(PRIORITY_HIGH);
         return packet;
     }
 
@@ -944,6 +959,7 @@ class PacketBuilder {
         authenticate(packet, state.getCipherKey(), state.getMACKey());
         setTo(packet, to, state.getSentPort());
         packet.setMessageType(TYPE_CONF);
+        packet.setPriority(PRIORITY_HIGH);
         return packet;
     }
 
@@ -1040,6 +1056,7 @@ class PacketBuilder {
         pkt.setLength(off);
         authenticate(packet, cipherKey, macKey);
         setTo(packet, addr, port);
+        packet.setPriority(PRIORITY_LOW);
         return packet;
     }
     
@@ -1084,6 +1101,7 @@ class PacketBuilder {
         authenticate(packet, toCipherKey, toMACKey);
         setTo(packet, toIP, toPort);
         packet.setMessageType(TYPE_TFA);
+        packet.setPriority(PRIORITY_LOW);
         return packet;
     }
 
@@ -1135,6 +1153,7 @@ class PacketBuilder {
         authenticate(packet, aliceCipherKey, aliceMACKey);
         setTo(packet, aliceIP, alicePort);
         packet.setMessageType(TYPE_TTA);
+        packet.setPriority(PRIORITY_LOW);
         return packet;
     }
 
@@ -1172,6 +1191,7 @@ class PacketBuilder {
         authenticate(packet, charlieCipherKey, charlieMACKey);
         setTo(packet, charlieIP, charliePort);
         packet.setMessageType(TYPE_TBC);
+        packet.setPriority(PRIORITY_LOW);
         return packet;
     }
     
@@ -1209,6 +1229,7 @@ class PacketBuilder {
         authenticate(packet, bobCipherKey, bobMACKey);
         setTo(packet, bobIP, bobPort);
         packet.setMessageType(TYPE_TCB);
+        packet.setPriority(PRIORITY_LOW);
         return packet;
     }
 
@@ -1372,6 +1393,7 @@ class PacketBuilder {
         authenticate(packet, cipherKey, macKey);
         setTo(packet, introHost, introPort);
         packet.setMessageType(TYPE_RREQ);
+        packet.setPriority(PRIORITY_HIGH);
         return packet;
     }
 
@@ -1405,6 +1427,7 @@ class PacketBuilder {
         authenticate(packet, charlie.getCurrentCipherKey(), charlie.getCurrentMACKey());
         setTo(packet, charlie.getRemoteIPAddress(), charlie.getRemotePort());
         packet.setMessageType(TYPE_INTRO);
+        packet.setPriority(PRIORITY_LOW);
         return packet;
     }
     
@@ -1451,6 +1474,7 @@ class PacketBuilder {
         authenticate(packet, cipherKey, macKey);
         setTo(packet, aliceAddr, alice.getPort());
         packet.setMessageType(TYPE_RESP);
+        packet.setPriority(PRIORITY_LOW);
         return packet;
     }
     
@@ -1469,6 +1493,7 @@ class PacketBuilder {
         setTo(packet, to, port);
         
         packet.setMessageType(TYPE_PUNCH);
+        packet.setPriority(PRIORITY_HIGH);
         return packet;
     }
     

@@ -7,7 +7,8 @@ import java.util.concurrent.BlockingQueue;
 
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
-import net.i2p.router.util.CoDelBlockingQueue;
+//import net.i2p.router.util.CoDelBlockingQueue;
+import net.i2p.router.util.CoDelPriorityBlockingQueue;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
@@ -46,7 +47,8 @@ class UDPSender {
         _log = ctx.logManager().getLog(UDPSender.class);
         long maxMemory = SystemVersion.getMaxMemory();
         int qsize = (int) Math.max(MIN_QUEUE_SIZE, Math.min(MAX_QUEUE_SIZE, maxMemory / (1024*1024)));
-        _outboundQueue = new CoDelBlockingQueue<UDPPacket>(ctx, "UDP-Sender", qsize, CODEL_TARGET, CODEL_INTERVAL);
+        //_outboundQueue = new CoDelBlockingQueue<UDPPacket>(ctx, "UDP-Sender", qsize, CODEL_TARGET, CODEL_INTERVAL);
+        _outboundQueue = new CoDelPriorityBlockingQueue<UDPPacket>(ctx, "UDP-Sender", qsize, CODEL_TARGET, CODEL_INTERVAL);
         _socket = socket;
         _runner = new Runner();
         _name = name;
