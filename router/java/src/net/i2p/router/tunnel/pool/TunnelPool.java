@@ -264,6 +264,9 @@ public class TunnelPool {
         return rv;
     }
     
+    /**
+     *  @param gatewayId for inbound, the GW rcv tunnel ID; for outbound, the GW send tunnel ID.
+     */
     public TunnelInfo getTunnel(TunnelId gatewayId) {
         synchronized (_tunnels) {
             for (int i = 0; i < _tunnels.size(); i++) {
@@ -1219,16 +1222,19 @@ public class TunnelPool {
             case SUCCESS:
                 _consecutiveBuildTimeouts.set(0);
                 addTunnel(cfg);
+                updatePairedProfile(cfg, true);
                 break;
 
             case REJECT:
             case BAD_RESPONSE:
             case DUP_ID:
                 _consecutiveBuildTimeouts.set(0);
+                updatePairedProfile(cfg, true);
                 break;
 
             case TIMEOUT:
                 _consecutiveBuildTimeouts.incrementAndGet();
+                updatePairedProfile(cfg, false);
                 break;
 
             case OTHER_FAILURE:
@@ -1242,6 +1248,56 @@ public class TunnelPool {
      */
     int getConsecutiveBuildTimeouts() {
         return _consecutiveBuildTimeouts.get();
+    }
+
+    /**
+     *  Update the paired tunnel profiles by treating the build as a tunnel test
+     *
+     *  @param cfg the build for this tunnel, to lookup the paired tunnel
+     *  @param success did the paired tunnel pass the message through
+     *  @since 0.9.53
+     */
+    private void updatePairedProfile(PooledTunnelCreatorConfig cfg, boolean success) {
+       // will be null if paired tunnel is 0-hop
+       TunnelId pairedGW = cfg.getPairedGW();
+       if (pairedGW == null)
+           return;
+       if (!success) {
+           // don't blame the paired tunnel for exploratory build failures
+           if (_settings.isExploratory())
+               return;
+           // don't blame the paired tunnel if there might be some other problem
+           if (getConsecutiveBuildTimeouts() > 3)
+               return;
+       }
+       TunnelPool pool;
+       PooledTunnelCreatorConfig paired = null;
+       if (!_settings.isExploratory()) {
+           Hash dest = _settings.getDestination();
+           if (_settings.isInbound())
+               pool = _manager.getOutboundPool(dest);
+           else
+               pool = _manager.getInboundPool(dest);
+           if (pool != null)
+               paired = (PooledTunnelCreatorConfig) pool.getTunnel(pairedGW);
+       }
+       if (paired == null) { // not found or exploratory
+           if (_settings.isInbound())
+               pool = _manager.getOutboundExploratoryPool();
+           else
+               pool = _manager.getInboundExploratoryPool();
+           paired = (PooledTunnelCreatorConfig) pool.getTunnel(pairedGW);
+       }
+       if (paired != null && paired.getLength() > 1) {
+           //_log.info("Updating paired cfg, success? " + success + ' ' + paired);
+           if (success) {
+               long requestedOn = cfg.getExpiration() - 10*60*1000;
+               int rtt = (int) (_context.clock().now() - requestedOn);
+               paired.testSuccessful(rtt);
+           } else {
+               paired.tunnelFailed();
+           }
+       }
     }
 
     @Override

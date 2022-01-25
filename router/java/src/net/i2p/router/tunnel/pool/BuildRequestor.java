@@ -240,7 +240,14 @@ abstract class BuildRequestor {
             return false;
         }
         
-        //cfg.setPairedTunnel(pairedTunnel);
+        // store the ID of the paired GW so we can credit/blame the paired tunnel,
+        // see TunnelPool.updatePairedProfile()
+        if (pairedTunnel.getLength() > 1) {
+            TunnelId gw = pairedTunnel.isInbound() ?
+                          pairedTunnel.getReceiveTunnelId(0) :
+                          pairedTunnel.getSendTunnelId(0);
+            cfg.setPairedGW(gw);
+        }
         
         //long beforeDispatch = System.currentTimeMillis();
         if (cfg.isInbound()) {
