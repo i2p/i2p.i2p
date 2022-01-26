@@ -199,6 +199,10 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(prefix() + "verification successful for " + _con);
 
+        // Adjust skew calculation now that we know RTT
+        // rtt from receiving #1 to receiving #3
+        long rtt = _context.clock().now() - _con.getCreated();
+        _peerSkew -= ((rtt / 2) + 500) / 1000;
         long diff = 1000*Math.abs(_peerSkew);
         if (!_context.clock().getUpdatedSuccessfully()) {
             // Adjust the clock one time in desperation
@@ -209,16 +213,12 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             if (diff != 0)
                 _log.logAlways(Log.WARN, "NTP failure, NTCP adjusting clock by " + DataHelper.formatDuration(diff));
         } else if (diff >= Router.CLOCK_FUDGE_FACTOR) {
-            _context.statManager().addRateData("ntcp.invalidInboundSkew", diff);
-            _transport.markReachable(aliceHash, true);
             // Only banlist if we know what time it is
             _context.banlist().banlistRouter(DataHelper.formatDuration(diff),
                                              aliceHash,
                                                _x("Excessive clock skew: {0}"));
             _transport.setLastBadSkew(_peerSkew);
-            if (getVersion() < 2)
-                fail("Clocks too skewed (" + diff + " ms)", null, true);
-            else if (_log.shouldWarn())
+            if (_log.shouldWarn())
                 _log.warn("Clocks too skewed (" + diff + " ms)");
             _msg3p2FailReason = NTCPConnection.REASON_SKEW;
             return false;
@@ -361,18 +361,21 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             _msg3p2len = (int) DataHelper.fromLong(options, 4, 2);
             long tsA = DataHelper.fromLong(options, 8, 4);
             long now = _context.clock().now();
-            // In NTCP1, timestamp comes in msg 3 so we know the RTT.
-            // In NTCP2, it comes in msg 1, so just guess.
-            // We could defer this to msg 3 to calculate the RTT?
-            long rtt = 250;
-            _peerSkew = (now - (tsA * 1000) - (rtt / 2) + 500) / 1000; 
-            if ((_peerSkew > MAX_SKEW || _peerSkew < 0 - MAX_SKEW) &&
-                !_context.clock().getUpdatedSuccessfully()) {
-                // If not updated successfully, allow it.
-                // This isn't very likely, outbound will do it first
-                // See verifyInbound() above.
-                fail("Clock Skew: " + _peerSkew, null, true);
-                return;
+            // Will be adjusted for RTT in verifyInbound()
+            _peerSkew = (now - (tsA * 1000) + 500) / 1000; 
+            if (_peerSkew > MAX_SKEW || _peerSkew < 0 - MAX_SKEW) {
+                long diff = 1000*Math.abs(_peerSkew);
+                _context.statManager().addRateData("ntcp.invalidInboundSkew", diff);
+                _transport.setLastBadSkew(_peerSkew);
+                if (_log.shouldWarn())
+                    _log.warn("Clock Skew: " + _peerSkew + " on " + this);
+                // Do them a favor, keep going with msg 2 so they get our timestamp.
+                // They should disconnect after that.
+                // If they do send a msg 3, verifyInbound() will catch it and
+                // will send a destroy with code 7 and
+                // ban the peer for a while.
+                //fail("Clock Skew: " + _peerSkew, null, true);
+                //return;
             }
             if (_msg3p2len < MSG3P2_MIN || _msg3p2len > MSG3P2_MAX) {
                 fail("bad msg3p2 len: " + _msg3p2len);
@@ -671,9 +674,10 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             ok = verifyInboundNetworkID(ri);
             if (!ok)
                 throw new DataFormatException("NTCP2 network ID mismatch");
-            // hash collision?
-            // expired RI?
-            _msg3p2FailReason = NTCPConnection.REASON_MSG3;
+            // generally expired/future RI
+            // don't change reason if already set as clock skew
+            if (_msg3p2FailReason <= 0)
+                _msg3p2FailReason = NTCPConnection.REASON_MSG3;
             throw new DataFormatException("RI store fail: " + ri, iae);
         }
         _con.setRemotePeer(_aliceIdent);

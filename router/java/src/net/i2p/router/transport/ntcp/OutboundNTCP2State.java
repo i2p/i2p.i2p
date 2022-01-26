@@ -300,8 +300,23 @@ class OutboundNTCP2State implements EstablishState {
             long rtt = now - _con.getCreated();
             _peerSkew = (now - (tsB * 1000) - (rtt / 2) + 500) / 1000; 
             if (_peerSkew > MAX_SKEW || _peerSkew < 0 - MAX_SKEW) {
-                fail("Clock Skew: " + _peerSkew, null, true);
-                return;
+                long diff = 1000 * Math.abs(_peerSkew);
+                if (_context.clock().getUpdatedSuccessfully()) {
+                    // usual case
+                    _context.statManager().addRateData("ntcp.invalidOutboundSkew", diff);
+                    fail("Clock Skew: " + _peerSkew, null, true);
+                    // Only banlist if we know what time it is
+                    _context.banlist().banlistRouter(DataHelper.formatDuration(diff),
+                                                     _con.getRemotePeer().calculateHash(),
+                                                     "Excessive clock skew: {0}");  // _x in IES
+                    _transport.setLastBadSkew(_peerSkew);
+                    return;
+                }
+                // Adjust the clock one time in desperation
+                // We are Alice, he is Bob, adjust to match Bob
+                _context.clock().setOffset(1000 * (0 - _peerSkew), true);
+                _peerSkew = 0;
+                _log.logAlways(Log.WARN, "NTP failure, NTCP adjusting clock by " + DataHelper.formatDuration(diff));
             }
             changeState(State.OB_GOT_HXY);
             _received = 0;
