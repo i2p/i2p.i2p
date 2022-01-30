@@ -29,6 +29,7 @@ import org.minidns.record.Record.TYPE;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.util.Addresses;
 
 /**
  *  Simple implemetation of DNS over HTTPS.
@@ -157,11 +158,12 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
     }
 
     /**
-     *  V4_ONLY
+     *  V4_ONLY unless we have only IPv6 address, then V6_ONLY
      *  @return null if not found
      */
     public String lookup(String host) {
-        return lookup(host, Type.V4_ONLY);
+        Type type = (Addresses.isConnected() || !Addresses.isConnectedIPv6()) ? Type.V4_ONLY : Type.V6_ONLY;
+        return lookup(host, type);
     }
 
     /**

@@ -1,7 +1,14 @@
+2022-01-30 zzz
+ * Reseed, DoH: Fixes for IPv6-only
+
+2022-01-26 zzz
+ * NTCP: Clock skew handling improvements
+
 2022-01-25 zzz
  * Tunnels:
    - Enable tunnel testing by default
    - Use tunnel builds as a tunnel test
+ * NTCP: Ban IP if RI signature fails
  * UDP: Pass priority through the packet builder,
    add priority to UDP-Sender queue
 
