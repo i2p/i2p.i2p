@@ -16,6 +16,7 @@ import net.i2p.crypto.eddsa.math.ed25519.*;
 import net.i2p.crypto.eddsa.spec.*;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -451,8 +452,8 @@ public class MathUtils {
             final GroupElement h2 = addGroupElements(neutral, g);
 
             // Assert:
-            Assert.assertThat(g, IsEqual.equalTo(h1));
-            Assert.assertThat(g, IsEqual.equalTo(h2));
+            assertThat(g, IsEqual.equalTo(h1));
+            assertThat(g, IsEqual.equalTo(h2));
         }
 
         for (int i=0; i<1000; i++) {
@@ -460,24 +461,24 @@ public class MathUtils {
 
             // P3 -> P2.
             GroupElement h = toRepresentation(g, GroupElement.Representation.P2);
-            Assert.assertThat(h, IsEqual.equalTo(g));
+            assertThat(h, IsEqual.equalTo(g));
             // P3 -> P1P1.
             h = toRepresentation(g, GroupElement.Representation.P1P1);
-            Assert.assertThat(g, IsEqual.equalTo(h));
+            assertThat(g, IsEqual.equalTo(h));
 
             // P3 -> CACHED.
             h = toRepresentation(g, GroupElement.Representation.CACHED);
-            Assert.assertThat(h, IsEqual.equalTo(g));
+            assertThat(h, IsEqual.equalTo(g));
 
             // P3 -> P2 -> P3.
             g = toRepresentation(g, GroupElement.Representation.P2);
             h = toRepresentation(g, GroupElement.Representation.P3);
-            Assert.assertThat(g, IsEqual.equalTo(h));
+            assertThat(g, IsEqual.equalTo(h));
 
             // P3 -> P2 -> P1P1.
             g = toRepresentation(g, GroupElement.Representation.P2);
             h = toRepresentation(g, GroupElement.Representation.P1P1);
-            Assert.assertThat(g, IsEqual.equalTo(h));
+            assertThat(g, IsEqual.equalTo(h));
         }
 
         for (int i=0; i<10; i++) {
@@ -488,7 +489,7 @@ public class MathUtils {
             final GroupElement h = MathUtils.scalarMultiplyGroupElement(g, curve.getField().ZERO);
 
             // Assert:
-            Assert.assertThat(curve.getZero(GroupElement.Representation.P3), IsEqual.equalTo(h));
+            assertThat(curve.getZero(GroupElement.Representation.P3), IsEqual.equalTo(h));
         }
     }
     // End TODO BR: Remove when finished!

@@ -13,7 +13,9 @@ package net.i2p.crypto.eddsa;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
@@ -27,9 +29,7 @@ import net.i2p.crypto.eddsa.spec.EdDSAParameterSpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author str4d
@@ -40,9 +40,6 @@ public class EdDSAEngineTest {
     static final byte[] TEST_PK = Utils.hexToBytes("3b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29");
     static final byte[] TEST_MSG = "This is a secret message".getBytes(Charset.forName("UTF-8"));
     static final byte[] TEST_MSG_SIG = Utils.hexToBytes("94825896c7075c31bcb81f06dba2bdcd9dcf16e79288d4b9f87c248215c8468d475f429f3de3b4a2cf67fe17077ae19686020364d6d4fa7a0174bab4a123ba0f");
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testSign() throws Exception {
@@ -93,9 +90,11 @@ public class EdDSAEngineTest {
 
         sgr.update(TEST_MSG);
 
-        exception.expect(SignatureException.class);
-        exception.expectMessage("signature length is wrong");
-        sgr.verify(new byte[] {0});
+        try {
+            sgr.verify(new byte[]{0});
+        } catch (SignatureException expected) {
+            assertEquals("signature length is wrong", expected.getMessage());
+        }
     }
 
     @Test
@@ -171,9 +170,12 @@ public class EdDSAEngineTest {
 
         sgr.update(TEST_MSG);
 
-        exception.expect(SignatureException.class);
-        exception.expectMessage("update() already called");
-        sgr.update(TEST_MSG);
+        try {
+            sgr.update(TEST_MSG);
+            fail("exception not thrown");
+        }  catch (SignatureException expected) {
+            assertEquals("update() already called", expected.getMessage());
+        }
     }
 
     @Test
@@ -187,9 +189,12 @@ public class EdDSAEngineTest {
 
         sgr.update(TEST_MSG);
 
-        exception.expect(SignatureException.class);
-        exception.expectMessage("update() already called");
-        sgr.update(TEST_MSG);
+        try {
+            sgr.update(TEST_MSG);
+            fail("exception not thrown");
+        } catch (SignatureException expected) {
+            assertEquals("update() already called", expected.getMessage());
+        }
     }
 
     @Test

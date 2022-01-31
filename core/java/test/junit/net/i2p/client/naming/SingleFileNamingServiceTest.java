@@ -1,8 +1,8 @@
 package net.i2p.client.naming;
 
 import junit.framework.TestCase;
-import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.File;
 import java.util.Collections;

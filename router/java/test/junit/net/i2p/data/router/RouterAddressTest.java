@@ -1,21 +1,19 @@
 package net.i2p.data.router;
 /*
  * free (adj.): unencumbered; not under the control of others
- * Written by jrandom in 2003 and released into the public domain 
- * with no warranty of any kind, either expressed or implied.  
- * It probably won't make your computer catch on fire, or eat 
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
  * your children, but it might.  Use at your own risk.
  *
  */
- 
+
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Properties;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
@@ -29,16 +27,13 @@ import net.i2p.util.OrderedProperties;
  */
 public class RouterAddressTest extends StructureTest {
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     public DataStructure createDataStructure() throws DataFormatException {
         //addr.setExpiration(new Date(1000*60*60*24)); // jan 2 1970
         OrderedProperties options = new OrderedProperties();
         options.setProperty("hostname", "localhost");
         options.setProperty("portnum", "1234");
         RouterAddress addr = new RouterAddress("Blah", options, 42);
-        return addr; 
+        return addr;
     }
     public DataStructure createStructureToRead() { return new RouterAddress(); }
 
@@ -47,8 +42,10 @@ public class RouterAddressTest extends StructureTest {
     public void testSetNullOptions(){
         RouterAddress addr = new RouterAddress();
 
-        exception.expect(NullPointerException.class);
-        addr.setOptions(null);
+        try {
+            addr.setOptions(null);
+            fail("no exception thrown");
+        } catch (NullPointerException expected) {}
     }
 
     @SuppressWarnings("deprecation")
@@ -60,17 +57,22 @@ public class RouterAddressTest extends StructureTest {
         RouterAddress addr = new RouterAddress("Blah", options, 42);
         options.setProperty("portnum", "2345");
 
-        exception.expect(IllegalStateException.class);
-        addr.setOptions(options);
+        try {
+            addr.setOptions(options);
+            fail("no exception thrown");
+        } catch (IllegalStateException expected) {}
     }
 
     @Test
     public void testBadWrite() throws Exception{
         RouterAddress addr = new RouterAddress();
 
-        exception.expect(DataFormatException.class);
-        exception.expectMessage("uninitialized");
-        addr.writeBytes(new ByteArrayOutputStream());
+        try {
+            addr.writeBytes(new ByteArrayOutputStream());
+            fail("no exception thrown");
+        } catch (DataFormatException expected) {
+            assertEquals("uninitialized", expected.getMessage());
+        }
     }
 
     @Test

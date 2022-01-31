@@ -1,18 +1,16 @@
 package net.i2p.data;
 /*
  * free (adj.): unencumbered; not under the control of others
- * Written by jrandom in 2003 and released into the public domain 
- * with no warranty of any kind, either expressed or implied.  
- * It probably won't make your computer catch on fire, or eat 
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
  * your children, but it might.  Use at your own risk.
  *
  */
 
 import static org.junit.Assert.*;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * Test harness for loading / storing Lease objects
@@ -21,9 +19,6 @@ import org.junit.rules.ExpectedException;
  */
 public class LeaseSetTest extends StructureTest {
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     public DataStructure createDataStructure() throws DataFormatException {
         LeaseSet leaseSet = new LeaseSet();
         leaseSet.setDestination((Destination)(new DestinationTest()).createDataStructure());
@@ -31,7 +26,7 @@ public class LeaseSetTest extends StructureTest {
 	leaseSet.setSignature((Signature)(new SignatureTest()).createDataStructure());
 	leaseSet.setSigningKey((SigningPublicKey)(new SigningPublicKeyTest()).createDataStructure());
 	//leaseSet.setVersion(42l);
-        return leaseSet; 
+        return leaseSet;
     }
     public DataStructure createStructureToRead() { return new LeaseSet(); }
 
@@ -41,8 +36,10 @@ public class LeaseSetTest extends StructureTest {
         LeaseSet subj = new LeaseSet();
 
         // should contain no leases now.
-        exception.expect(IndexOutOfBoundsException.class);
-        subj.getLease(0);
+        try {
+            subj.getLease(0);
+            fail("exception not thrown");
+        } catch (IndexOutOfBoundsException expected) {}
     }
 
     @Test
@@ -51,8 +48,10 @@ public class LeaseSetTest extends StructureTest {
         LeaseSet subj = new LeaseSet();
 
         // this shouldn't work either
-        exception.expect(IndexOutOfBoundsException.class);
-        subj.getLease(-1);
+        try {
+            subj.getLease(-1);
+            fail("exception not thrown");
+        } catch (IndexOutOfBoundsException expected) {}
     }
 
     @Test
@@ -61,9 +60,12 @@ public class LeaseSetTest extends StructureTest {
         LeaseSet subj = new LeaseSet();
 
         // now add an null lease
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("erm, null lease");
-        subj.addLease(null);
+        try {
+            subj.addLease(null);
+            fail("exception not thrown");
+        } catch (IllegalArgumentException expected) {
+            assertEquals("erm, null lease", expected.getMessage());
+        }
     }
 
     @Test
@@ -72,8 +74,11 @@ public class LeaseSetTest extends StructureTest {
         LeaseSet subj = new LeaseSet();
 
         // try to add completely invalid lease(ie. no data)
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("erm, lease has no gateway");
-        subj.addLease(new Lease());
+        try {
+            subj.addLease(new Lease());
+            fail("exception not thrown");
+        } catch (IllegalArgumentException expected) {
+            assertEquals("erm, lease has no gateway", expected.getMessage());
+        }
     }
 }
