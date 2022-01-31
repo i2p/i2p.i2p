@@ -37,10 +37,10 @@ class FileFilterDefinitionElement extends FilterDefinitionElement {
             return;
         if (file.lastModified() <= lastLoading) {
             synchronized (lastLoaded) {
-                lastLoaded.forEach((hash,tracker) -> {
-                    if (!map.containsKey(hash))
-                        map.put(hash, tracker);
-                });
+                for (Map.Entry<Hash, DestTracker> entry : lastLoaded.entrySet()) {
+                    if (!map.containsKey(entry.getKey()))
+                        map.put(entry.getKey(),entry.getValue());
+                }
             }
             return;
         }
