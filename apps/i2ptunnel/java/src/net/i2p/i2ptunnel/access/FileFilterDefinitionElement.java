@@ -1,5 +1,6 @@
 package net.i2p.i2ptunnel.access;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import java.io.File;
@@ -18,6 +19,7 @@ import net.i2p.data.Hash;
 class FileFilterDefinitionElement extends FilterDefinitionElement {
 
     private final File file;
+    private final Map<Hash, DestTracker> lastLoaded = new HashMap<>();
     private volatile long lastLoading;
 
     /**
@@ -31,18 +33,36 @@ class FileFilterDefinitionElement extends FilterDefinitionElement {
 
     @Override
     public void update(Map<Hash, DestTracker> map) throws IOException {
-        if (!(file.exists() && file.isFile() && file.lastModified() > lastLoading))
+        if (!(file.exists() && file.isFile()))
             return;
+        if (file.lastModified() <= lastLoading) {
+            synchronized (lastLoaded) {
+                lastLoaded.forEach((hash,tracker) -> {
+                    if (!map.containsKey(hash))
+                        map.put(hash, tracker);
+                });
+            }
+            return;
+        }
+
         lastLoading = System.currentTimeMillis();
-        BufferedReader reader = null; 
+        synchronized (lastLoaded) {
+            lastLoaded.clear();
+        }
+
+        BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new FileReader(file)); 
+            reader = new BufferedReader(new FileReader(file));
             String b32;
             while((b32 = reader.readLine()) != null) {
                 Hash hash = fromBase32(b32);
                 if (map.containsKey(hash))
                     continue;
-                map.put(hash, new DestTracker(hash, threshold));
+                DestTracker newTracker = new DestTracker(hash, threshold);
+                map.put(hash, newTracker);
+                synchronized (lastLoaded) {
+                    lastLoaded.put(hash, newTracker);
+                }
             }
         } catch (InvalidDefinitionException bad32) {
             throw new IOException("invalid access list entry", bad32);
