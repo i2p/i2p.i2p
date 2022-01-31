@@ -1,9 +1,9 @@
 package net.i2p.data;
 /*
  * free (adj.): unencumbered; not under the control of others
- * Written by jrandom in 2003 and released into the public domain 
- * with no warranty of any kind, either expressed or implied.  
- * It probably won't make your computer catch on fire, or eat 
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
  * your children, but it might.  Use at your own risk.
  *
  */
@@ -15,18 +15,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Comwiz
  */
 public class DataStructureImplTest {
     DataStructure _struct;
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Before
     public void setUp(){
@@ -45,38 +40,47 @@ public class DataStructureImplTest {
     }
 
     @Test
-    public void toBase64ReturnsNull() throws Exception{
+    public void toBase64ReturnsNull() {
         assertNull(_struct.toBase64());
     }
 
     @Test
-    public void fromBase64ThrowsOnNull() throws Exception{
-        exception.expect(DataFormatException.class);
-        exception.expectMessage("Null data passed in");
-        _struct.fromBase64(null);
+    public void fromBase64ThrowsOnNull() {
+        try {
+            _struct.fromBase64(null);
+            fail("exception not thrown");
+        } catch (DataFormatException expected) {
+            assertEquals("Null data passed in", expected.getMessage());
+        }
     }
 
     @Test
-    public void calculateHashReturnsNull() throws Exception{
+    public void calculateHashReturnsNull() {
         assertNull(_struct.calculateHash());
     }
 
     @Test
-    public void fromByteArrayThrowsOnNull() throws Exception{
-        exception.expect(DataFormatException.class);
-        exception.expectMessage("Null data passed in");
-        _struct.fromByteArray(null);
+    public void fromByteArrayThrowsOnNull() {
+        try {
+            _struct.fromByteArray(null);
+            fail("exception not thrown");
+        } catch (DataFormatException expected) {
+            assertEquals("Null data passed in", expected.getMessage());
+        }
     }
 
     @Test
-    public void fromByteArrayThrowsOnError() throws Exception{
-        exception.expect(DataFormatException.class);
-        exception.expectMessage("Error reading the byte array");
-        _struct.fromByteArray(DataHelper.getASCII("water is poison"));
+    public void fromByteArrayThrowsOnError() {
+        try {
+            _struct.fromByteArray(DataHelper.getASCII("water is poison"));
+            fail("exception not thrown");
+        } catch (DataFormatException expected) {
+            assertEquals("Error reading the byte array", expected.getMessage());
+        }
     }
 
     @Test
-    public void toByteArrayReturnsNullOnError() throws Exception{
+    public void toByteArrayReturnsNullOnError() {
         assertNull(_struct.toByteArray());
     }
 }

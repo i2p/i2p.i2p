@@ -1,18 +1,16 @@
 package net.i2p.data;
 /*
  * free (adj.): unencumbered; not under the control of others
- * Written by jrandom in 2003 and released into the public domain 
- * with no warranty of any kind, either expressed or implied.  
- * It probably won't make your computer catch on fire, or eat 
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
  * your children, but it might.  Use at your own risk.
  *
  */
 
 import static org.junit.Assert.*;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * Test harness for the simple data structure
@@ -20,9 +18,6 @@ import org.junit.rules.ExpectedException;
  * @author welterde
  */
 public class SimpleDataStructureTest {
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void setDataThrowsOnNullAfterDataSet() throws Exception {
@@ -36,9 +31,12 @@ public class SimpleDataStructureTest {
         struct.setData(new byte[3]);
 
         // now setting it to null should fail
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Data already set");
-        struct.setData(null);
+        try {
+            struct.setData(null);
+            fail("exception not thrown");
+        } catch (RuntimeException expected) {
+            assertEquals("Data already set", expected.getMessage());
+        }
     }
 
     @Test
@@ -53,9 +51,12 @@ public class SimpleDataStructureTest {
         struct.setData(new byte[3]);
 
         // setting it to something non-null should fail.
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Data already set");
-        struct.setData(new byte[3]);
+        try {
+            struct.setData(new byte[3]);
+            fail("exception not thrown");
+        } catch (RuntimeException expected) {
+            assertEquals("Data already set", expected.getMessage());
+        }
     }
 
     @Test

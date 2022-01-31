@@ -21,7 +21,8 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 
 /**
  * @author str4d
@@ -49,9 +50,6 @@ public class GroupElementTest {
         curve.getField().fromByteArray(Utils.hexToBytes("3b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29"))
         };
     static final byte[] BYTES_PKR = Utils.hexToBytes("3b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29");
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     /**
      * Test method for {@link GroupElement#p2(Curve, FieldElement, FieldElement, FieldElement)}.
@@ -201,7 +199,7 @@ public class GroupElementTest {
             final GroupElement h2 = MathUtils.toGroupElement(bytes);
 
             // Assert:
-            Assert.assertThat(h1, IsEqual.equalTo(h2));
+            assertThat(h1, IsEqual.equalTo(h2));
         }
     }
 
@@ -247,7 +245,7 @@ public class GroupElementTest {
              }
 
              // Assert:
-             Assert.assertThat(Arrays.equals(gBytes, bytes), IsEqual.equalTo(true));
+             assertThat(Arrays.equals(gBytes, bytes), IsEqual.equalTo(true));
          }
      }
 
@@ -303,12 +301,12 @@ public class GroupElementTest {
             final GroupElement h = g.toP2();
 
             // Assert:
-            Assert.assertThat(h, IsEqual.equalTo(g));
-            Assert.assertThat(h.getRepresentation(), IsEqual.equalTo(GroupElement.Representation.P2));
-            Assert.assertThat(h.getX(), IsEqual.equalTo(g.getX()));
-            Assert.assertThat(h.getY(), IsEqual.equalTo(g.getY()));
-            Assert.assertThat(h.getZ(), IsEqual.equalTo(g.getZ()));
-            Assert.assertThat(h.getT(), IsEqual.equalTo(null));
+            assertThat(h, IsEqual.equalTo(g));
+            assertThat(h.getRepresentation(), IsEqual.equalTo(GroupElement.Representation.P2));
+            assertThat(h.getX(), IsEqual.equalTo(g.getX()));
+            assertThat(h.getY(), IsEqual.equalTo(g.getY()));
+            assertThat(h.getZ(), IsEqual.equalTo(g.getZ()));
+            assertThat(h.getT(), IsEqual.equalTo(null));
         }
     }
 
@@ -323,12 +321,12 @@ public class GroupElementTest {
             final GroupElement h2 = MathUtils.toRepresentation(g, GroupElement.Representation.P2);
 
             // Assert:
-            Assert.assertThat(h1, IsEqual.equalTo(h2));
-            Assert.assertThat(h1.getRepresentation(), IsEqual.equalTo(GroupElement.Representation.P2));
-            Assert.assertThat(h1.getX(), IsEqual.equalTo(g.getX()));
-            Assert.assertThat(h1.getY(), IsEqual.equalTo(g.getY()));
-            Assert.assertThat(h1.getZ(), IsEqual.equalTo(g.getZ()));
-            Assert.assertThat(h1.getT(), IsEqual.equalTo(null));
+            assertThat(h1, IsEqual.equalTo(h2));
+            assertThat(h1.getRepresentation(), IsEqual.equalTo(GroupElement.Representation.P2));
+            assertThat(h1.getX(), IsEqual.equalTo(g.getX()));
+            assertThat(h1.getY(), IsEqual.equalTo(g.getY()));
+            assertThat(h1.getZ(), IsEqual.equalTo(g.getZ()));
+            assertThat(h1.getT(), IsEqual.equalTo(null));
         }
     }
 
@@ -343,12 +341,12 @@ public class GroupElementTest {
             final GroupElement h2 = MathUtils.toRepresentation(g, GroupElement.Representation.P2);
 
             // Assert:
-            Assert.assertThat(h1, IsEqual.equalTo(h2));
-            Assert.assertThat(h1.getRepresentation(), IsEqual.equalTo(GroupElement.Representation.P2));
-            Assert.assertThat(h1.getX(), IsEqual.equalTo(g.getX().multiply(g.getT())));
-            Assert.assertThat(h1.getY(), IsEqual.equalTo(g.getY().multiply(g.getZ())));
-            Assert.assertThat(h1.getZ(), IsEqual.equalTo(g.getZ().multiply(g.getT())));
-            Assert.assertThat(h1.getT(), IsEqual.equalTo(null));
+            assertThat(h1, IsEqual.equalTo(h2));
+            assertThat(h1.getRepresentation(), IsEqual.equalTo(GroupElement.Representation.P2));
+            assertThat(h1.getX(), IsEqual.equalTo(g.getX().multiply(g.getT())));
+            assertThat(h1.getY(), IsEqual.equalTo(g.getY().multiply(g.getZ())));
+            assertThat(h1.getZ(), IsEqual.equalTo(g.getZ().multiply(g.getT())));
+            assertThat(h1.getT(), IsEqual.equalTo(null));
         }
     }
 
@@ -390,12 +388,12 @@ public class GroupElementTest {
             final GroupElement h2 = MathUtils.toRepresentation(g, GroupElement.Representation.P3);
 
             // Assert:
-            Assert.assertThat(h1, IsEqual.equalTo(h2));
-            Assert.assertThat(h1.getRepresentation(), IsEqual.equalTo(GroupElement.Representation.P3));
-            Assert.assertThat(h1.getX(), IsEqual.equalTo(g.getX().multiply(g.getT())));
-            Assert.assertThat(h1.getY(), IsEqual.equalTo(g.getY().multiply(g.getZ())));
-            Assert.assertThat(h1.getZ(), IsEqual.equalTo(g.getZ().multiply(g.getT())));
-            Assert.assertThat(h1.getT(), IsEqual.equalTo(g.getX().multiply(g.getY())));
+            assertThat(h1, IsEqual.equalTo(h2));
+            assertThat(h1.getRepresentation(), IsEqual.equalTo(GroupElement.Representation.P3));
+            assertThat(h1.getX(), IsEqual.equalTo(g.getX().multiply(g.getT())));
+            assertThat(h1.getY(), IsEqual.equalTo(g.getY().multiply(g.getZ())));
+            assertThat(h1.getZ(), IsEqual.equalTo(g.getZ().multiply(g.getT())));
+            assertThat(h1.getT(), IsEqual.equalTo(g.getX().multiply(g.getY())));
         }
     }
 
@@ -409,13 +407,13 @@ public class GroupElementTest {
             final GroupElement h = g.toP3();
 
             // Assert:
-            Assert.assertThat(h, IsEqual.equalTo(g));
-            Assert.assertThat(h.getRepresentation(), IsEqual.equalTo(GroupElement.Representation.P3));
-            Assert.assertThat(h, IsEqual.equalTo(g));
-            Assert.assertThat(h.getX(), IsEqual.equalTo(g.getX()));
-            Assert.assertThat(h.getY(), IsEqual.equalTo(g.getY()));
-            Assert.assertThat(h.getZ(), IsEqual.equalTo(g.getZ()));
-            Assert.assertThat(h.getT(), IsEqual.equalTo(g.getT()));
+            assertThat(h, IsEqual.equalTo(g));
+            assertThat(h.getRepresentation(), IsEqual.equalTo(GroupElement.Representation.P3));
+            assertThat(h, IsEqual.equalTo(g));
+            assertThat(h.getX(), IsEqual.equalTo(g.getX()));
+            assertThat(h.getY(), IsEqual.equalTo(g.getY()));
+            assertThat(h.getZ(), IsEqual.equalTo(g.getZ()));
+            assertThat(h.getT(), IsEqual.equalTo(g.getT()));
         }
     }
 
@@ -430,15 +428,15 @@ public class GroupElementTest {
             final GroupElement h2 = MathUtils.toRepresentation(g, GroupElement.Representation.P3PrecomputedDouble);
 
             // Assert:
-            Assert.assertThat(h1, IsEqual.equalTo(h2));
-            Assert.assertThat(h1.getRepresentation(), IsEqual.equalTo(GroupElement.Representation.P3));
-            Assert.assertThat(h1.getX(), IsEqual.equalTo(g.getX().multiply(g.getT())));
-            Assert.assertThat(h1.getY(), IsEqual.equalTo(g.getY().multiply(g.getZ())));
-            Assert.assertThat(h1.getZ(), IsEqual.equalTo(g.getZ().multiply(g.getT())));
-            Assert.assertThat(h1.getT(), IsEqual.equalTo(g.getX().multiply(g.getY())));
-            Assert.assertThat(h1.precmp, IsNull.nullValue());
-            Assert.assertThat(h1.dblPrecmp, IsNull.notNullValue());
-            Assert.assertThat(h1.dblPrecmp, IsEqual.equalTo(h2.dblPrecmp));
+            assertThat(h1, IsEqual.equalTo(h2));
+            assertThat(h1.getRepresentation(), IsEqual.equalTo(GroupElement.Representation.P3));
+            assertThat(h1.getX(), IsEqual.equalTo(g.getX().multiply(g.getT())));
+            assertThat(h1.getY(), IsEqual.equalTo(g.getY().multiply(g.getZ())));
+            assertThat(h1.getZ(), IsEqual.equalTo(g.getZ().multiply(g.getT())));
+            assertThat(h1.getT(), IsEqual.equalTo(g.getX().multiply(g.getY())));
+            assertThat(h1.precmp, IsNull.nullValue());
+            assertThat(h1.dblPrecmp, IsNull.notNullValue());
+            assertThat(h1.dblPrecmp, IsEqual.equalTo(h2.dblPrecmp));
         }
     }
 
@@ -479,13 +477,13 @@ public class GroupElementTest {
             final GroupElement h = g.toCached();
 
             // Assert:
-            Assert.assertThat(h, IsEqual.equalTo(g));
-            Assert.assertThat(h.getRepresentation(), IsEqual.equalTo(GroupElement.Representation.CACHED));
-            Assert.assertThat(h, IsEqual.equalTo(g));
-            Assert.assertThat(h.getX(), IsEqual.equalTo(g.getX()));
-            Assert.assertThat(h.getY(), IsEqual.equalTo(g.getY()));
-            Assert.assertThat(h.getZ(), IsEqual.equalTo(g.getZ()));
-            Assert.assertThat(h.getT(), IsEqual.equalTo(g.getT()));
+            assertThat(h, IsEqual.equalTo(g));
+            assertThat(h.getRepresentation(), IsEqual.equalTo(GroupElement.Representation.CACHED));
+            assertThat(h, IsEqual.equalTo(g));
+            assertThat(h.getX(), IsEqual.equalTo(g.getX()));
+            assertThat(h.getY(), IsEqual.equalTo(g.getY()));
+            assertThat(h.getZ(), IsEqual.equalTo(g.getZ()));
+            assertThat(h.getT(), IsEqual.equalTo(g.getT()));
         }
     }
 
@@ -500,13 +498,13 @@ public class GroupElementTest {
             final GroupElement h2 = MathUtils.toRepresentation(g, GroupElement.Representation.CACHED);
 
             // Assert:
-            Assert.assertThat(h1, IsEqual.equalTo(h2));
-            Assert.assertThat(h1.getRepresentation(), IsEqual.equalTo(GroupElement.Representation.CACHED));
-            Assert.assertThat(h1, IsEqual.equalTo(g));
-            Assert.assertThat(h1.getX(), IsEqual.equalTo(g.getY().add(g.getX())));
-            Assert.assertThat(h1.getY(), IsEqual.equalTo(g.getY().subtract(g.getX())));
-            Assert.assertThat(h1.getZ(), IsEqual.equalTo(g.getZ()));
-            Assert.assertThat(h1.getT(), IsEqual.equalTo(g.getT().multiply(curve.get2D())));
+            assertThat(h1, IsEqual.equalTo(h2));
+            assertThat(h1.getRepresentation(), IsEqual.equalTo(GroupElement.Representation.CACHED));
+            assertThat(h1, IsEqual.equalTo(g));
+            assertThat(h1.getX(), IsEqual.equalTo(g.getY().add(g.getX())));
+            assertThat(h1.getY(), IsEqual.equalTo(g.getY().subtract(g.getX())));
+            assertThat(h1.getZ(), IsEqual.equalTo(g.getZ()));
+            assertThat(h1.getT(), IsEqual.equalTo(g.getT().multiply(curve.get2D())));
         }
     }
 
@@ -531,7 +529,7 @@ public class GroupElementTest {
         for (int i = 0; i < 32; i++) {
             GroupElement h = g;
             for (int j = 0; j < 8; j++) {
-                Assert.assertThat(MathUtils.toRepresentation(h, GroupElement.Representation.PRECOMP), IsEqual.equalTo(ed25519.getB().precmp[i][j]));
+                assertThat(MathUtils.toRepresentation(h, GroupElement.Representation.PRECOMP), IsEqual.equalTo(ed25519.getB().precmp[i][j]));
                 h = MathUtils.addGroupElements(h, g);
             }
             for (int k = 0; k < 8; k++) {
@@ -548,7 +546,7 @@ public class GroupElementTest {
 
         // Act + Assert:
         for (int i=0; i<8; i++) {
-            Assert.assertThat(MathUtils.toRepresentation(g, GroupElement.Representation.PRECOMP), IsEqual.equalTo(ed25519.getB().dblPrecmp[i]));
+            assertThat(MathUtils.toRepresentation(g, GroupElement.Representation.PRECOMP), IsEqual.equalTo(ed25519.getB().dblPrecmp[i]));
             g = MathUtils.addGroupElements(g, h);
         }
     }
@@ -574,7 +572,7 @@ public class GroupElementTest {
             final GroupElement h2 = MathUtils.doubleGroupElement(g);
 
             // Assert:
-            Assert.assertThat(h2, IsEqual.equalTo(h1));
+            assertThat(h2, IsEqual.equalTo(h1));
         }
     }
 
@@ -590,8 +588,8 @@ public class GroupElementTest {
             final GroupElement h2 = neutral.add(g.toCached());
 
             // Assert:
-            Assert.assertThat(g, IsEqual.equalTo(h1));
-            Assert.assertThat(g, IsEqual.equalTo(h2));
+            assertThat(g, IsEqual.equalTo(h1));
+            assertThat(g, IsEqual.equalTo(h2));
         }
     }
 
@@ -607,7 +605,7 @@ public class GroupElementTest {
             final GroupElement h2 = MathUtils.addGroupElements(g1, g2);
 
             // Assert:
-            Assert.assertThat(h2, IsEqual.equalTo(h1));
+            assertThat(h2, IsEqual.equalTo(h1));
         }
     }
 
@@ -623,7 +621,7 @@ public class GroupElementTest {
             final GroupElement h2 = MathUtils.addGroupElements(g1, MathUtils.negateGroupElement(g2));
 
             // Assert:
-            Assert.assertThat(h2, IsEqual.equalTo(h1));
+            assertThat(h2, IsEqual.equalTo(h1));
         }
     }
 
@@ -647,13 +645,13 @@ public class GroupElementTest {
         final GroupElement g5 = MathUtils.getRandomGroupElement();
 
         // Assert
-        Assert.assertThat(g2, IsEqual.equalTo(g1));
-        Assert.assertThat(g3, IsEqual.equalTo(g1));
-        Assert.assertThat(g1, IsEqual.equalTo(g4));
-        Assert.assertThat(g1, IsNot.not(IsEqual.equalTo(g5)));
-        Assert.assertThat(g2, IsNot.not(IsEqual.equalTo(g5)));
-        Assert.assertThat(g3, IsNot.not(IsEqual.equalTo(g5)));
-        Assert.assertThat(g5, IsNot.not(IsEqual.equalTo(g4)));
+        assertThat(g2, IsEqual.equalTo(g1));
+        assertThat(g3, IsEqual.equalTo(g1));
+        assertThat(g1, IsEqual.equalTo(g4));
+        assertThat(g1, IsNot.not(IsEqual.equalTo(g5)));
+        assertThat(g2, IsNot.not(IsEqual.equalTo(g5)));
+        assertThat(g3, IsNot.not(IsEqual.equalTo(g5)));
+        assertThat(g5, IsNot.not(IsEqual.equalTo(g4)));
     }
 
     @Test
@@ -665,11 +663,11 @@ public class GroupElementTest {
         final GroupElement g4 = MathUtils.getRandomGroupElement();
 
         // Assert
-        Assert.assertThat(g2.hashCode(), IsEqual.equalTo(g1.hashCode()));
-        Assert.assertThat(g3.hashCode(), IsEqual.equalTo(g1.hashCode()));
-        Assert.assertThat(g1.hashCode(), IsNot.not(IsEqual.equalTo(g4.hashCode())));
-        Assert.assertThat(g2.hashCode(), IsNot.not(IsEqual.equalTo(g4.hashCode())));
-        Assert.assertThat(g3.hashCode(), IsNot.not(IsEqual.equalTo(g4.hashCode())));
+        assertThat(g2.hashCode(), IsEqual.equalTo(g1.hashCode()));
+        assertThat(g3.hashCode(), IsEqual.equalTo(g1.hashCode()));
+        assertThat(g1.hashCode(), IsNot.not(IsEqual.equalTo(g4.hashCode())));
+        assertThat(g2.hashCode(), IsNot.not(IsEqual.equalTo(g4.hashCode())));
+        assertThat(g3.hashCode(), IsNot.not(IsEqual.equalTo(g4.hashCode())));
     }
 
     // endregion
@@ -780,7 +778,7 @@ public class GroupElementTest {
         final GroupElement g = basePoint.scalarMultiply(curve.getField().ZERO.toByteArray());
 
         // Assert:
-        Assert.assertThat(curve.getZero(GroupElement.Representation.P3), IsEqual.equalTo(g));
+        assertThat(curve.getZero(GroupElement.Representation.P3), IsEqual.equalTo(g));
     }
 
     @Test
@@ -792,7 +790,7 @@ public class GroupElementTest {
         final GroupElement g = basePoint.scalarMultiply(curve.getField().ONE.toByteArray());
 
         // Assert:
-        Assert.assertThat(basePoint, IsEqual.equalTo(g));
+        assertThat(basePoint, IsEqual.equalTo(g));
     }
 
     // This test is slow (~6s) due to math utils using an inferior algorithm to calculate the result.
@@ -808,7 +806,7 @@ public class GroupElementTest {
             final GroupElement h = MathUtils.scalarMultiplyGroupElement(basePoint, f);
 
             // Assert:
-            Assert.assertThat(g, IsEqual.equalTo(h));
+            assertThat(g, IsEqual.equalTo(h));
         }
     }
 
@@ -871,7 +869,7 @@ public class GroupElementTest {
             final GroupElement h2 = MathUtils.doubleScalarMultiplyGroupElements(basePoint, f1, g, f2);
 
             // Assert:
-            Assert.assertThat(h1, IsEqual.equalTo(h2));
+            assertThat(h1, IsEqual.equalTo(h2));
         }
     }
 
@@ -903,7 +901,7 @@ public class GroupElementTest {
             final GroupElement g = MathUtils.getRandomGroupElement();
 
             // Assert:
-            Assert.assertThat(g.isOnCurve(), IsEqual.equalTo(true));
+            assertThat(g.isOnCurve(), IsEqual.equalTo(true));
         }
     }
 
@@ -915,7 +913,7 @@ public class GroupElementTest {
             final GroupElement h = GroupElement.p2(curve, g.getX(), g.getY(), g.getZ().multiply(curve.getField().TWO));
 
             // Assert (can only fail for 5*Z^2=1):
-            Assert.assertThat(h.isOnCurve(), IsEqual.equalTo(false));
+            assertThat(h.isOnCurve(), IsEqual.equalTo(false));
         }
     }
 }

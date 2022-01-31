@@ -12,7 +12,8 @@
 package net.i2p.crypto.eddsa.math.bigint;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 
 import java.math.BigInteger;
 

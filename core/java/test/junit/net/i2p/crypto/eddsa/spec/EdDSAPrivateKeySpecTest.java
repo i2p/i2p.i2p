@@ -12,13 +12,14 @@
 package net.i2p.crypto.eddsa.spec;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
 import net.i2p.crypto.eddsa.Utils;
-import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.Rule;
+import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author str4d
@@ -30,9 +31,6 @@ public class EdDSAPrivateKeySpecTest {
     static final byte[] ZERO_PK = Utils.hexToBytes("3b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29");
 
     static final EdDSANamedCurveSpec ed25519 = EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.ED_25519);
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     /**
      * Test method for {@link net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec#EdDSAPrivateKeySpec(byte[], net.i2p.crypto.eddsa.spec.EdDSAParameterSpec)}.
@@ -47,9 +45,12 @@ public class EdDSAPrivateKeySpecTest {
 
     @Test
     public void incorrectSeedLengthThrows() {
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("seed length is wrong");
-        new EdDSAPrivateKeySpec(new byte[2], ed25519);
+        try {
+            new EdDSAPrivateKeySpec(new byte[2], ed25519);
+            Assert.fail("exception not thrown");
+        } catch (IllegalArgumentException expected) {
+            assertEquals("seed length is wrong", expected.getMessage());
+        }
     }
 
     /**
@@ -65,8 +66,11 @@ public class EdDSAPrivateKeySpecTest {
 
     @Test
     public void incorrectHashLengthThrows() {
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("hash length is wrong");
-        new EdDSAPrivateKeySpec(ed25519, new byte[2]);
+        try {
+            new EdDSAPrivateKeySpec(ed25519, new byte[2]);
+            fail("exception not thrown");
+        } catch (IllegalArgumentException expected) {
+            assertEquals("hash length is wrong", expected.getMessage());
+        }
     }
 }

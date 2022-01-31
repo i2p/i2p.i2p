@@ -1,9 +1,9 @@
 package net.i2p.data;
 /*
  * free (adj.): unencumbered; not under the control of others
- * Written by jrandom in 2003 and released into the public domain 
- * with no warranty of any kind, either expressed or implied.  
- * It probably won't make your computer catch on fire, or eat 
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
  * your children, but it might.  Use at your own risk.
  *
  */
@@ -13,9 +13,7 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * Test harness for loading / storing Lease objects
@@ -23,9 +21,6 @@ import org.junit.rules.ExpectedException;
  * @author jrandom
  */
 public class LeaseTest extends StructureTest {
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     public DataStructure createDataStructure() throws DataFormatException {
         Lease lease = new Lease();
@@ -35,7 +30,7 @@ public class LeaseTest extends StructureTest {
         StructureTest tst = new TunnelIdTest();
         lease.setTunnelId((TunnelId)tst.createDataStructure());
 
-        return lease; 
+        return lease;
     }
     public DataStructure createStructureToRead() { return new Lease(); }
 
@@ -75,9 +70,12 @@ public class LeaseTest extends StructureTest {
         lease.setGateway(new Hash(h));
         lease.setTunnelId(null);
 
-        exception.expect(DataFormatException.class);
-        exception.expectMessage("Not enough data to write out a Lease");
-        lease.writeBytes(new ByteArrayOutputStream());
+        try {
+            lease.writeBytes(new ByteArrayOutputStream());
+            fail("exception not thrown");
+        } catch (DataFormatException expected) {
+            assertEquals("Not enough data to write out a Lease", expected.getMessage());
+        }
     }
 
     @Test
@@ -89,9 +87,12 @@ public class LeaseTest extends StructureTest {
         StructureTest tst = new TunnelIdTest();
         lease.setTunnelId((TunnelId)tst.createDataStructure());
 
-        exception.expect(DataFormatException.class);
-        exception.expectMessage("Not enough data to write out a Lease");
-        lease.writeBytes(new ByteArrayOutputStream());
+        try {
+            lease.writeBytes(new ByteArrayOutputStream());
+            fail("exception not thrown");
+        } catch (DataFormatException expected) {
+            assertEquals("Not enough data to write out a Lease", expected.getMessage());
+        }
     }
 
     @Test

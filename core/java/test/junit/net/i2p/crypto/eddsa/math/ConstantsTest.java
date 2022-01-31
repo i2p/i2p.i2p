@@ -14,8 +14,9 @@ package net.i2p.crypto.eddsa.math;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

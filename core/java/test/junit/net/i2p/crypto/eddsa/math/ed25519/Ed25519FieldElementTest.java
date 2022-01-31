@@ -14,6 +14,8 @@ package net.i2p.crypto.eddsa.math.ed25519;
 import net.i2p.crypto.eddsa.math.*;
 import org.hamcrest.core.*;
 import org.junit.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 
 import java.math.BigInteger;
 
@@ -95,7 +97,7 @@ public class Ed25519FieldElementTest extends AbstractFieldElementTest {
         builder.append("]");
 
         // Assert:
-        Assert.assertThat(fAsString, IsEqual.equalTo(builder.toString()));
+        assertThat(fAsString, IsEqual.equalTo(builder.toString()));
     }
 
     // endregion

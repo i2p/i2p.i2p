@@ -14,6 +14,8 @@ package net.i2p.crypto.eddsa.math;
 import org.hamcrest.core.*;
 import org.junit.*;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.math.BigInteger;
 
 /**
@@ -37,7 +39,7 @@ public abstract class AbstractFieldElementTest {
         final FieldElement f = getZeroFieldElement();
 
         // Assert:
-        Assert.assertThat(f.isNonZero(), IsEqual.equalTo(false));
+        assertThat(f.isNonZero(), IsEqual.equalTo(false));
     }
 
     @Test
@@ -46,7 +48,7 @@ public abstract class AbstractFieldElementTest {
         final FieldElement f = getNonZeroFieldElement();
 
         // Assert:
-        Assert.assertThat(f.isNonZero(), IsEqual.equalTo(true));
+        assertThat(f.isNonZero(), IsEqual.equalTo(true));
     }
 
     // endregion
@@ -67,7 +69,7 @@ public abstract class AbstractFieldElementTest {
             final BigInteger b3 = toBigInteger(f3).mod(getQ());
 
             // Assert:
-            Assert.assertThat(b3, IsEqual.equalTo(b1.add(b2).mod(getQ())));
+            assertThat(b3, IsEqual.equalTo(b1.add(b2).mod(getQ())));
         }
     }
 
@@ -85,7 +87,7 @@ public abstract class AbstractFieldElementTest {
             final BigInteger b3 = toBigInteger(f3).mod(getQ());
 
             // Assert:
-            Assert.assertThat(b3, IsEqual.equalTo(b1.subtract(b2).mod(getQ())));
+            assertThat(b3, IsEqual.equalTo(b1.subtract(b2).mod(getQ())));
         }
     }
 
@@ -101,7 +103,7 @@ public abstract class AbstractFieldElementTest {
             final BigInteger b2 = toBigInteger(f2).mod(getQ());
 
             // Assert:
-            Assert.assertThat(b2, IsEqual.equalTo(b1.negate().mod(getQ())));
+            assertThat(b2, IsEqual.equalTo(b1.negate().mod(getQ())));
         }
     }
 
@@ -119,7 +121,7 @@ public abstract class AbstractFieldElementTest {
             final BigInteger b3 = toBigInteger(f3).mod(getQ());
 
             // Assert:
-            Assert.assertThat(b3, IsEqual.equalTo(b1.multiply(b2).mod(getQ())));
+            assertThat(b3, IsEqual.equalTo(b1.multiply(b2).mod(getQ())));
         }
     }
 
@@ -135,7 +137,7 @@ public abstract class AbstractFieldElementTest {
             final BigInteger b2 = toBigInteger(f2).mod(getQ());
 
             // Assert:
-            Assert.assertThat(b2, IsEqual.equalTo(b1.multiply(b1).mod(getQ())));
+            assertThat(b2, IsEqual.equalTo(b1.multiply(b1).mod(getQ())));
         }
     }
 
@@ -151,7 +153,7 @@ public abstract class AbstractFieldElementTest {
             final BigInteger b2 = toBigInteger(f2).mod(getQ());
 
             // Assert:
-            Assert.assertThat(b2, IsEqual.equalTo(b1.multiply(b1).multiply(new BigInteger("2")).mod(getQ())));
+            assertThat(b2, IsEqual.equalTo(b1.multiply(b1).multiply(new BigInteger("2")).mod(getQ())));
         }
     }
 
@@ -167,7 +169,7 @@ public abstract class AbstractFieldElementTest {
             final BigInteger b2 = toBigInteger(f2).mod(getQ());
 
             // Assert:
-            Assert.assertThat(b2, IsEqual.equalTo(b1.modInverse(getQ())));
+            assertThat(b2, IsEqual.equalTo(b1.modInverse(getQ())));
         }
     }
 
@@ -183,7 +185,7 @@ public abstract class AbstractFieldElementTest {
             final BigInteger b2 = toBigInteger(f2).mod(getQ());
 
             // Assert:
-            Assert.assertThat(b2, IsEqual.equalTo(b1.modPow(BigInteger.ONE.shiftLeft(252).subtract(new BigInteger("3")), getQ())));
+            assertThat(b2, IsEqual.equalTo(b1.modPow(BigInteger.ONE.shiftLeft(252).subtract(new BigInteger("3")), getQ())));
         }
     }
 
@@ -197,11 +199,11 @@ public abstract class AbstractFieldElementTest {
         final FieldElement nz = getNonZeroFieldElement();
         final FieldElement f = getRandomFieldElement();
 
-        Assert.assertThat(zero.cmov(nz, 0), IsEqual.equalTo(zero));
-        Assert.assertThat(zero.cmov(nz, 1), IsEqual.equalTo(nz));
+        assertThat(zero.cmov(nz, 0), IsEqual.equalTo(zero));
+        assertThat(zero.cmov(nz, 1), IsEqual.equalTo(nz));
 
-        Assert.assertThat(f.cmov(nz, 0), IsEqual.equalTo(f));
-        Assert.assertThat(f.cmov(nz, 1), IsEqual.equalTo(nz));
+        assertThat(f.cmov(nz, 0), IsEqual.equalTo(f));
+        assertThat(f.cmov(nz, 1), IsEqual.equalTo(nz));
     }
 
     // endregion
@@ -217,10 +219,10 @@ public abstract class AbstractFieldElementTest {
         final FieldElement f4 = getRandomFieldElement();
 
         // Assert:
-        Assert.assertThat(f1, IsEqual.equalTo(f2));
-        Assert.assertThat(f1, IsNot.not(IsEqual.equalTo(f3)));
-        Assert.assertThat(f1, IsNot.not(IsEqual.equalTo(f4)));
-        Assert.assertThat(f3, IsNot.not(IsEqual.equalTo(f4)));
+        assertThat(f1, IsEqual.equalTo(f2));
+        assertThat(f1, IsNot.not(IsEqual.equalTo(f3)));
+        assertThat(f1, IsNot.not(IsEqual.equalTo(f4)));
+        assertThat(f3, IsNot.not(IsEqual.equalTo(f4)));
     }
 
     @Test
@@ -232,10 +234,10 @@ public abstract class AbstractFieldElementTest {
         final FieldElement f4 = getRandomFieldElement();
 
         // Assert:
-        Assert.assertThat(f1.hashCode(), IsEqual.equalTo(f2.hashCode()));
-        Assert.assertThat(f1.hashCode(), IsNot.not(IsEqual.equalTo(f3.hashCode())));
-        Assert.assertThat(f1.hashCode(), IsNot.not(IsEqual.equalTo(f4.hashCode())));
-        Assert.assertThat(f3.hashCode(), IsNot.not(IsEqual.equalTo(f4.hashCode())));
+        assertThat(f1.hashCode(), IsEqual.equalTo(f2.hashCode()));
+        assertThat(f1.hashCode(), IsNot.not(IsEqual.equalTo(f3.hashCode())));
+        assertThat(f1.hashCode(), IsNot.not(IsEqual.equalTo(f4.hashCode())));
+        assertThat(f3.hashCode(), IsNot.not(IsEqual.equalTo(f4.hashCode())));
     }
 
     // endregion

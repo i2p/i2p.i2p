@@ -10,9 +10,7 @@ package net.i2p.data.i2np;
 
 import static org.junit.Assert.*;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
@@ -30,9 +28,6 @@ import net.i2p.util.Clock;
  */
 public class DatabaseStoreMessageTest extends StructureTest {
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     public DataStructure createDataStructure() throws DataFormatException {
         DSMStructure msg = new DSMStructure(I2PAppContext.getGlobalContext());
         RouterInfo info = (RouterInfo)new RouterInfoTest().createDataStructure();
@@ -41,16 +36,18 @@ public class DatabaseStoreMessageTest extends StructureTest {
         msg.setEntry(info);
         return msg;
     }
-    
-    public DataStructure createStructureToRead() { 
-    	return new DSMStructure(I2PAppContext.getGlobalContext()); 
+
+    public DataStructure createStructureToRead() {
+    	return new DSMStructure(I2PAppContext.getGlobalContext());
     }
-    
+
     @Override
     @Test
     public void testStructure() throws Exception {
-        exception.expect(UnsupportedOperationException.class);
-        super.testStructure();
+        try {
+            super.testStructure();
+            fail("no exception thrown");
+        } catch (UnsupportedOperationException expected) {}
     }
 
     private static class DSMStructure extends DatabaseStoreMessage implements DataStructure {
