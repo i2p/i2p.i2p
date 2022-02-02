@@ -19,6 +19,7 @@ import net.i2p.app.ClientApp;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.ClientAppState;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Alternative to ShellCommand for plugins based on ProcessBuilder, which
@@ -88,6 +89,7 @@ public class ShellService implements ClientApp {
         if (!exe.exists()) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Command does not exist: " + _commandPath);
+            throw new RuntimeException("Command does not exist: " + _commandPath);
         }
         if (!exe.canExecute()) {
             if (_log.shouldLog(Log.WARN))
@@ -97,12 +99,27 @@ public class ShellService implements ClientApp {
 
         _pb = new ProcessBuilder(procArgs);
 
+        if (_log.shouldDebug())
+            _log.debug("ProcessBuilder: " + _pb.command().toString() + " is built");
+
         File pluginDir = new File(_context.getConfigDir(), PLUGIN_DIR + '/' + this.getName());
+        if (!pluginDir.exists())
+            pluginDir = new File(_context.getConfigDir(), PLUGIN_DIR + '/' + this.getName()+"-"+SystemVersion.getOS()+"-"+SystemVersion.getArch());
+        if (!pluginDir.exists())
+            pluginDir = new File(_context.getConfigDir(), PLUGIN_DIR + '/' + this.getName()+"-"+SystemVersion.getOS());
+        if (!pluginDir.exists())
+            throw new RuntimeException("Plugin directory does not exist: " + pluginDir.getAbsolutePath());
         _errorLog = new File(pluginDir, "error.log");
         _outputLog = new File(pluginDir, "output.log");
         _pb.redirectOutput(_outputLog);
         _pb.redirectError(_errorLog);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Logs: " + _errorLog.getAbsolutePath() + ", " + _outputLog.getAbsolutePath());
+
+
         _pb.directory(pluginDir);
+        if (_log.shouldDebug())
+            _log.debug("ProcessBuilder: " + _pb.directory() + " is set");
         changeState(ClientAppState.INITIALIZED, "ShellService: " + getName() + " setup and initialized");
     }
 
@@ -155,6 +172,17 @@ public class ShellService implements ClientApp {
      * notify the router that it has been started.
      */
     public synchronized void startup() throws Throwable {
+        File exe = new File(_commandPath);
+        if (!exe.exists()) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Command does not exist: " + _commandPath);
+            throw new RuntimeException("Command does not exist: " + _commandPath);
+        }
+        if (!exe.canExecute()) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Command is not executable: " + _commandPath + " marking it executable");
+            exe.setExecutable(true);
+        }
         if (getName().equals("unnamedClient")) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("ShellService has no name, not starting");
@@ -165,7 +193,7 @@ public class ShellService implements ClientApp {
         if (start) {
             _p = _pb.start();
             if (!_p.isAlive() && _log.shouldLog(Log.ERROR))
-                _log.error("Error getting Process of application from recently instantiated shellservice" + getName());
+                _log.error("Error getting Process of application from recently instantiated shellservice " + _pb.command()+" "+_p.exitValue());
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Started " + getName() + "process");
         }
