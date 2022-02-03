@@ -104,23 +104,24 @@ public class ShellService implements ClientApp {
 
         String tmp_name = this.getName();
         File pluginDir = new File(_context.getConfigDir(), PLUGIN_DIR + '/' + tmp_name);
-        if (!pluginDir.exists())
+        if (!pluginDir.exists()){
             pluginDir = new File(_context.getConfigDir(), PLUGIN_DIR + '/' + tmp_name+"-"+SystemVersion.getOS()+"-"+SystemVersion.getArch());
-
-        if (!pluginDir.exists()) {
-            pluginDir = new File(_context.getConfigDir(), PLUGIN_DIR + '/' + tmp_name+"-"+SystemVersion.getOS());
-            if (!pluginDir.exists())
-                throw new RuntimeException("Plugin directory does not exist: " + pluginDir.getAbsolutePath());
-            else{
-                this.name = tmp_name+"-"+SystemVersion.getOS();
+            if (!pluginDir.exists()) {
+                pluginDir = new File(_context.getConfigDir(), PLUGIN_DIR + '/' + tmp_name+"-"+SystemVersion.getOS());
+                if (!pluginDir.exists()) {
+                    throw new RuntimeException("Plugin directory does not exist: " + pluginDir.getAbsolutePath());
+                } else {
+                    this.name = tmp_name+"-"+SystemVersion.getOS();
+                    if (_log.shouldDebug())
+                        _log.debug("ShellService: Plugin name revised to match directory: " + this.getName());
+                }
+            } else {
+                this.name = tmp_name+"-"+SystemVersion.getOS()+"-"+SystemVersion.getArch();
                 if (_log.shouldDebug())
                     _log.debug("ShellService: Plugin name revised to match directory: " + this.getName());
             }
-        } else {
-            this.name = tmp_name+"-"+SystemVersion.getOS()+"-"+SystemVersion.getArch();
-            if (_log.shouldDebug())
-                _log.debug("ShellService: Plugin name revised to match directory: " + this.getName());
         }
+
 
         _errorLog = new File(pluginDir, "error.log");
         _outputLog = new File(pluginDir, "output.log");
