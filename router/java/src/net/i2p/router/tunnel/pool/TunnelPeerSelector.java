@@ -11,6 +11,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import net.i2p.CoreVersion;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SigType;
@@ -19,6 +20,7 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
+import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.LeaseSetKeys;
@@ -498,6 +500,17 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
 
         // minimum version check
         String v = peer.getVersion();
+        if (v.equals("0.9.52")) {
+            // c++ bug in 2.40.0/0.9.52, drops SSU messages
+            for (RouterAddress addr : peer.getAddresses()) {
+                if (addr.getCost() == 9 && addr.getTransportStyle().equals("SSU"))
+                    return true;
+            }
+            return false;
+        }
+        // quick check to skip the comparator
+        if (v.equals(CoreVersion.PUBLISHED_VERSION))
+            return false;
         if (VersionComparator.comp(v, MIN_VERSION) < 0)
             return true;
 

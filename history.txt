@@ -1,3 +1,7 @@
+2022-02-03 zzz
+ * SSU: Don't bid on connection to buggy routers
+ * Tunnels: Avoid buggy routers
+
 2022-01-30 zzz
  * Reseed, DoH: Fixes for IPv6-only
 

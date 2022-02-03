@@ -2039,10 +2039,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
 
             // c++ bug thru 2.36.0/0.9.49, will disconnect inbound session after 5 seconds
-            if (addr.getCost() == 10) {
+            int cost = addr.getCost();
+            if (cost == 10) {
                 if (VersionComparator.comp(toAddress.getVersion(), "0.9.49") <= 0) {
                     //if (_log.shouldDebug())
                     //    _log.debug("Not bidding to: " + toAddress);
+                    markUnreachable(to);
+                    return null;
+                }
+            } else if (cost == 9) {
+                // c++ bug in 2.40.0/0.9.52, drops SSU messages
+                if (toAddress.getVersion().equals("0.9.52")) {
                     markUnreachable(to);
                     return null;
                 }
@@ -2106,12 +2113,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             } else if (preferUDP()) {
                 return _cachedBid[SLOW_BID];
             } else if (haveCapacity()) {
-                if (addr.getCost() > DEFAULT_COST)
+                if (cost > DEFAULT_COST)
                     return _cachedBid[SLOWEST_COST_BID];
                 else
                     return _cachedBid[SLOWEST_BID];
             } else {
-                if (addr.getCost() > DEFAULT_COST)
+                if (cost > DEFAULT_COST)
                     return _cachedBid[NEAR_CAPACITY_COST_BID];
                 else
                     return _cachedBid[NEAR_CAPACITY_BID];
