@@ -79,7 +79,7 @@ td:nth-child(1) {
 }
 
 .formaction button p {
-    display: inline-block;
+    display: block;
     color: rgb(34, 34, 34);
 }
 
@@ -163,6 +163,10 @@ td:nth-child(1) {
 }
 
 @media screen and (max-width: 800px) {
+    .formaction button p {
+        display: inline-block;
+        color: rgb(34, 34, 34);
+    }
     .warning {
         margin: 114px 5px 0px !important;
         background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.298039)) !important;
