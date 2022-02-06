@@ -363,8 +363,9 @@ class InboundMessageState implements CDQEntry {
         } else {
             for (int i = 0; i <= _lastFragment; i++) {
                 buf.append(" fragment ").append(i);
-                if (_fragments[i] != null)
-                    buf.append(": known at size ").append(_fragments[i].getValid());
+                ByteArray ba = _fragments[i];
+                if (ba != null)
+                    buf.append(": known at size ").append(ba.getValid());
                 else
                     buf.append(": unknown");
             }
