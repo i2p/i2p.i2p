@@ -22,6 +22,16 @@ button {
     display: inline;
 }
 
+.unicodeicon {
+    font-size: 16pt;
+    display: inline-block;
+    padding: 3px 0;
+    vertical-align: sub;
+    line-height: 16px;
+    font-weight: bold;
+    text-shadow: rgb(255, 255, 255) 0px 1px 1px;
+}
+
 #jumplinks h3 {
     margin: 0 0 10px;
 }
