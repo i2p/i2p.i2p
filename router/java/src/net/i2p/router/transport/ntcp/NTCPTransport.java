@@ -329,10 +329,28 @@ public class NTCPTransport extends TransportImpl {
             old = _conByIdent.put(peer, con);
         }
         if (con.isIPv6()) {
+            long last = _lastInboundIPv6;
+            Status oldStatus;
+            if (last <= 0)
+                oldStatus = getReachabilityStatus();
+            else
+                oldStatus = null;
             _lastInboundIPv6 = con.getCreated();
+            // Get that "R" cap in the netdb ASAP, esp. when SSU disabled
+            if (last <= 0)
+                addressChanged(oldStatus);
             _context.statManager().addRateData("ntcp.inboundIPv6Conn", 1);
         } else {
+            long last = _lastInboundIPv4;
+            Status oldStatus;
+            if (last <= 0)
+                oldStatus = getReachabilityStatus();
+            else
+                oldStatus = null;
             _lastInboundIPv4 = con.getCreated();
+            // Get that "R" cap in the netdb ASAP, esp. when SSU disabled
+            if (last <= 0)
+                addressChanged(oldStatus);
             _context.statManager().addRateData("ntcp.inboundIPv4Conn", 1);
         }
         return old;
@@ -1440,7 +1458,7 @@ public class NTCPTransport extends TransportImpl {
             // must be set before isValid() call
             _haveIPv6Address = true;
         }
-        if (ip != null && !isValid(ip)) {
+        if (ip != null && !isValid(ip) && !allowLocal()) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Invalid address: " + Addresses.toString(ip, port) + " from: " + source);
             return;

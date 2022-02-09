@@ -1,3 +1,6 @@
+2022-02-09 zzz
+ * NTCP: Fixes for SSU disabled
+
 2022-02-03 zzz
  * SSU: Don't bid on connection to buggy routers
  * Tunnels: Avoid buggy routers
