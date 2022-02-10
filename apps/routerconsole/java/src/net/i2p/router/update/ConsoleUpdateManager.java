@@ -1381,7 +1381,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                                 upp.updateDownloadedandVerified(updateType, ftype, actualVersion, temp);
                                 _externalRestartPending = true;
                             } else {
-                                err = "Unsupported su3 file type " + ftype;
+                                err = "Unsupported su3 file type " + ftype + " " + key;
                             }
                         } else {
                             err = "Unsupported su3 file type " + ftype;
