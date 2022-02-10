@@ -35,8 +35,8 @@ import net.i2p.util.SimpleTimer2;
  *<pre>
  *  client		tracker		type
  *  ------		-------		----
- *   announce  -->			repliable
- *            	<-- 	ann resp	raw
+ *   announce  --&gt;			repliable
+ *            	&lt;-- 	ann resp	raw
  *</pre>
  *
  *  @since 0.9.53, enabled in 0.9.54

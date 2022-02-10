@@ -14,7 +14,7 @@ package net.i2p.app;
  *         if (ns != null)
  *             ns.notify("foo", null, Log.INFO, _t("foo"), _t("message"), "/foo/bar");
  *     }
- * <pre>
+ * </pre>
  *
  *  @since 0.9.53
  */
