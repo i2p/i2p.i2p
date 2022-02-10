@@ -16,6 +16,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.CoreVersion;
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.ClientAppState;
@@ -146,6 +147,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         notifyInstalled(ROUTER_SIGNED, "", RouterVersion.VERSION);
         notifyInstalled(ROUTER_SIGNED_SU3, "", RouterVersion.VERSION);
         notifyInstalled(ROUTER_DEV_SU3, "", RouterVersion.FULL_VERSION);
+        notifyInstalled(API, "", CoreVersion.PUBLISHED_VERSION);
         String blist = _context.getProperty(NewsFetcher.PROP_BLOCKLIST_TIME);
         if (blist != null)
             notifyInstalled(BLOCKLIST, Blocklist.ID_FEED, blist);
