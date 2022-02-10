@@ -58,7 +58,7 @@ import net.i2p.util.VersionComparator;
  *  @since 0.9.4
  */
 public class ConsoleUpdateManager implements UpdateManager, RouterApp {
-    
+
     private final RouterContext _context;
     private final Log _log;
     private final Collection<RegisteredUpdater> _registeredUpdaters;
@@ -754,7 +754,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
             _log.info("Unregistering " + ru);
         _registeredUpdaters.remove(ru);
     }
-    
+
     public void register(Checker updater, UpdateType type, UpdateMethod method, int priority) {
         RegisteredChecker rc = new RegisteredChecker(updater, type, method, priority);
         if (_log.shouldLog(Log.INFO))
@@ -785,7 +785,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         if (old != null && _log.shouldLog(Log.WARN))
             _log.warn("Duplicate registration " + upp);
     }
-    
+
     /**
      *  Called by the Updater, either after check() was called, or it found out on its own.
      *  Use this if there is only one UpdateMethod; otherwise use the Map method below.
@@ -1251,7 +1251,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         if (old != null && old.compareTo(ver) <= 0)
             _available.remove(ui);
     }
-    
+
     /** from NewsFetcher */
     boolean shouldInstall() {
         String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
@@ -1261,7 +1261,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         File zip = new File(_context.getRouterDir(), Router.UPDATE_FILE);
         return !zip.exists();
     }
-    
+
     /**
      *  Where to find various resources
      *  @return non-null may be empty
@@ -1383,7 +1383,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                                 upp.updateDownloadedandVerified(updateType, ftype, actualVersion, temp);
                                 _externalRestartPending = true;
                             } else {
-                                err = "Unsupported su3 file type " + ftype + " " + key;
+                                err = "Unsupported su3 file type " + ftype + " " + updateType;
                             }
                         } else {
                             err = "Unsupported su3 file type " + ftype;
