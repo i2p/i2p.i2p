@@ -28,7 +28,7 @@ jobs:
       - name: Upload installer.jar
         uses: actions/upload-artifact@v2
         with:
-          name: I2P-installer.jar-${{ github.sha }}
-          path: installer.jar
+          name: I2P-install.jar-${{ github.sha }}
+          path: install.jar
         
 
