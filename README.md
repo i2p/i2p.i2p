@@ -64,6 +64,9 @@ your `~/.gradle/gradle.properties`:
     systemProp.socksProxyHost=localhost
     systemProp.socksProxyPort=9150
 
+### Development builds
+Automatic CI builds are available at the [continuous integration](https://github.com/i2p/i2p.i2p/actions/workflows/ant.yml) page.
+
 ### Docker
 For more information how to run I2P in Docker, see [Docker.md](Docker.md)
 ## Contact info
