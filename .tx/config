@@ -581,6 +581,7 @@ trans.fr = installer/resources/locale-man/man_fr.po
 trans.hu = installer/resources/locale-man/man_hu.po
 trans.id = installer/resources/locale-man/man_id.po
 trans.it = installer/resources/locale-man/man_it.po
+trans.ja = installer/resources/locale-man/man_ja.po
 trans.ko = installer/resources/locale-man/man_ko.po
 trans.nl = installer/resources/locale-man/man_nl.po
 trans.pl = installer/resources/locale-man/man_pl.po

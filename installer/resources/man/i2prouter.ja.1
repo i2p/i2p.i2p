@@ -1,0 +1,56 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH I2PROUTER 1 "November 27, 2021" "" I2P
+
+.SH 名前
+i2prouter \- I2Pルータの起動と停止
+
+.SH SYNOPSIS
+\fBi2prouter\fP
+{\fIconsole\fP|\fIstart\fP|\fIstop\fP|\fIgraceful\fP|\fIrestart\fP|\fIcondrestart\fP|\fIstatus\fP|\fIdump\fP|\fIinstall\fP|\fIremove\fP}
+.br
+
+.SH 説明
+I2Pサービスを制御する。
+
+.IP \fBconsole\fP
+現在のユーザーの下で、コンソールアプリケーションとしてI2Pを起動する。
+
+.IP \fBstart\fP
+I2Pサービスを起動する。
+
+.IP \fBstop\fP
+I2Pサービスを停止する。
+
+.IP \fBrestart\fP
+I2Pサービスを停止し、そして起動する。
+
+.IP \fBcondrestart\fP
+既にI2Pサービスが実行中のときのみ、それを再起動します。
+
+.IP \fBgraceful\fP
+I2P を正常に停止する（最大11分かかります）
+
+.IP \fBinstall\fP
+システムがブートするときI2Pを自動的に起動する、initscriptをインストールする。
+
+.IP \fBremove\fP
+ \fBinstall\fP でインストールされた initscript をアンインストール
+
+.IP \fBstatus\fP
+I2P サービスが動作しているかどうか出力する
+
+.IP \fBdump\fP
+\fBwrapper.log\fP に現在のスレッドをダンプ
+
+.SH バグを報告
+.UR https://i2pgit.org/i2p\-hackers/i2p.i2p/\-/issues
+I2P GitLab server
+.UE .
+上で問題を入力してください。
+
+.SH 参照
+\fBi2prouter\-nowrapper\fP(1)
