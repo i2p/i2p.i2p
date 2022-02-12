@@ -170,7 +170,8 @@ div.warning {
 
 .warning p,
 .warning a {
-    font-size: 10pt line-height: 130%;
+    font-size: 10pt;
+    line-height: 130%;
 }
 
 .warning p {
@@ -544,6 +545,8 @@ div.warning {
 #sb_help td {
     /* color ellipsis */
     color: #595 !important;
+    border-collapse: collapse;
+    table-layout: fixed;
 }
 
 #sb_services,
