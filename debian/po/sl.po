@@ -1,0 +1,91 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the i2p package.
+# 
+# Translators:
+# Žan Šadl-Ferš, 2021-2022
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2017-11-12 14:01+0000\n"
+"PO-Revision-Date: 2022-02-11 16:53+0000\n"
+"Last-Translator: Žan Šadl-Ferš\n"
+"Language-Team: Slovenian (http://www.transifex.com/otf/I2P/language/sl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sl\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:2001
+msgid "Should the I2P router be started at boot?"
+msgstr "Ali je treba I2P ruter zagnati ob zagonu?"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:2001
+msgid ""
+"The I2P router can be run as a daemon that starts automatically when your "
+"computer boots up. This is the recommended configuration."
+msgstr "I2P ruter je mogoče zagnati kot daemon, kateri se zažene samodejno ob zagonu računalnika. To je priporočena konfiguracija."
+
+#. Type: string
+#. Description
+#: ../i2p.templates:3001
+msgid "I2P daemon user:"
+msgstr "I2P daemon uporabnik:"
+
+#. Type: string
+#. Description
+#: ../i2p.templates:3001
+msgid ""
+"By default I2P is configured to run under the account i2psvc when running as"
+" a daemon. To use an **existing** I2P profile you may enter a different "
+"account name here. For example, if your previous I2P installation is at "
+"/home/user/i2p, you may enter 'user' here."
+msgstr "I2P je privzeto konfiguriran, da se zažene pod računom i2psvc, ko teče kot daemon. Za uporabo **obstoječega** I2P profila lahko vi vnesete drugačno ime računa tukaj. Na primer, če je vaša prejšna I2P namestitev je pri /home/user/i2p, lahko vnesete 'user' tu."
+
+#. Type: string
+#. Description
+#: ../i2p.templates:3001
+msgid ""
+"Very important: If a user other than the default of 'i2psvc' is entered "
+"here, the chosen username *MUST* already exist."
+msgstr "Zelo pomembno: Če je uporabnik razen privzetega 'i2psvc' vnesen tu, *MORA* izbrano uporabniško ime že obstajati."
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid "Memory that can be allocated to I2P:"
+msgstr "Pomnilnik, ki ga je mogoče dodeliti I2P:"
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
+msgstr "I2P bo privzeto lahko uporabljal le do 128 MB RAM-a."
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid ""
+"High bandwidth routers, as well as routers with a lot of active torrents / "
+"plugins, may need to have this value increased."
+msgstr "Ruterji z visoko podatkovno pretočnostjo, in tudi tistim z veliko aktivnimi torrenti /  vtičniki se mora ta vrednost zvišati."
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid "Should the I2P daemon be confined with AppArmor?"
+msgstr "Mora I2P daemon biti omejen z AppArmor?"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid ""
+"With this option enabled I2P will be sandboxed with AppArmor, restricting "
+"which files and directories may be accessed by I2P."
+msgstr "Če je ta možnost omogočena, bo I2P sandbox-an v AppArmor, kar omejuje, do katerih datotek in map lahko dostopa I2P."

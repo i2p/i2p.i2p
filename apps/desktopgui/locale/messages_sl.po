@@ -1,0 +1,106 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the desktopgui package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# Žan Šadl-Ferš, 2021
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-02-09 19:13+0000\n"
+"PO-Revision-Date: 2022-02-09 19:23+0000\n"
+"Last-Translator: zzzi2p\n"
+"Language-Team: Slovenian (http://www.transifex.com/otf/I2P/language/sl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sl\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:31
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:59
+msgid "Start I2P"
+msgstr "Zaženi I2P"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:44
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:72
+#: src/net/i2p/desktopgui/InternalTrayManager.java:55
+msgid "I2P is starting!"
+msgstr "I2P se zaganja!"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:44
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:72
+#: src/net/i2p/desktopgui/InternalTrayManager.java:55
+msgid "Starting"
+msgstr "Zaganja"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:65
+#: src/net/i2p/desktopgui/InternalTrayManager.java:249
+msgid "Launch I2P Browser"
+msgstr "Zaženi I2P brskalnik"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:86
+#: src/net/i2p/desktopgui/InternalTrayManager.java:270
+msgid "Configure I2P System Tray"
+msgstr "Konfiguriraj I2P opravilno vrstico"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:87
+#: src/net/i2p/desktopgui/InternalTrayManager.java:271
+msgid "Enable notifications"
+msgstr ""
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:101
+#: src/net/i2p/desktopgui/InternalTrayManager.java:285
+msgid "Disable notifications"
+msgstr ""
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:115
+#: src/net/i2p/desktopgui/InternalTrayManager.java:299
+msgid "Disable system tray"
+msgstr ""
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:131
+#: src/net/i2p/desktopgui/InternalTrayManager.java:315
+msgid "Restart I2P"
+msgstr "Ponovno zaženi I2P"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:148
+#: src/net/i2p/desktopgui/InternalTrayManager.java:332
+msgid "Stop I2P"
+msgstr "Ustavi I2P"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:164
+#: src/net/i2p/desktopgui/InternalTrayManager.java:348
+msgid "Restart I2P Immediately"
+msgstr "Nemudoma ponovno zaženi I2P"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:181
+#: src/net/i2p/desktopgui/InternalTrayManager.java:365
+msgid "Stop I2P Immediately"
+msgstr "Nemudoma ustavi I2P"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:195
+#: src/net/i2p/desktopgui/InternalTrayManager.java:379
+msgid "Cancel I2P Shutdown"
+msgstr "Prekliči zaustavitev od I2P"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:437
+#, java-format
+msgid "Shutdown in {0}"
+msgstr "Zaustavi v {0}"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:439
+msgid "Shutdown imminent"
+msgstr "Zaustavitev je neizbežna"
+
+#. status translations are in the console bundle
+#: src/net/i2p/desktopgui/InternalTrayManager.java:444
+msgid "Network"
+msgstr "Omrežje"
+
+#. Windows typically has tooltips; Linux (at least Ubuntu) doesn't
+#: src/net/i2p/desktopgui/TrayManager.java:73
+msgid "I2P: Right-click for menu"
+msgstr "I2P: Pritisnite na desno tipko miške za meni"
