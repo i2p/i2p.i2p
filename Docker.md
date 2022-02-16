@@ -1,5 +1,25 @@
 # I2P in Docker
 
+### Very quick start
+If you just want to give I2P a quick try or are using it on a home network, follow these steps:
+
+1. Create two directories `i2pconfig` and `i2ptorrents`
+2. Copy the following text and save it in a file `docker-compose.yml`
+```
+version: "3.5"
+services:
+    i2p:
+        image: geti2p/i2p
+        network_mode: host
+        volumes:
+            - ./i2pconfig:/i2p/.i2p
+            - ./i2ptorrents:/i2psnark
+```
+3. Execute `docker-compose up`
+4. Start a browser and go to `http://127.0.0.1:7657` to complete the setup wizard.
+
+Note that this quick-start approach is not recommended for production deployments on remote servers.  Please read the rest of this document for more information.
+
 ### Building an image
 There is an i2P image available over at [DockerHub](https://hub.docker.com).  If you do not want to use that one, you can build one yourself:
 ```
@@ -17,20 +37,25 @@ By the default the image limits the memory available to the Java heap to 512MB. 
 #### Ports
 There are several ports which are exposed by the image.  You can choose which ones to publish depending on your specific needs.
 
-|Port|Description|TCP/UDP|
-|---|---|---|
-|4444|HTTP Proxy|TCP|
-|4445|HTTPS Proxy|TCP|
-|6668|IRC Proxy|TCP|
-|7654|I2CP Protocol|TCP|
-|7656|SAM Bridge TCP|TCP|
-|7657|Router console|TCP|
-|7658|I2P Site|TCP|
-|7659|SMTP Proxy|TCP|
-|7660|POP Proxy|TCP|
-|12345|I2NP Protocol|TCP and UDP|
+|Port|Interface|Description|TCP/UDP|
+|---|---|---|---|
+|4444|127.0.0.1|HTTP Proxy|TCP|
+|4445|127.0.0.1|HTTPS Proxy|TCP|
+|6668|127.0.0.1|IRC Proxy|TCP|
+|7654|127.0.0.1|I2CP Protocol|TCP|
+|7656|127.0.0.1|SAM Bridge TCP|TCP|
+|7657|127.0.0.1|Router console|TCP|
+|7658|127.0.0.1|I2P Site|TCP|
+|7659|127.0.0.1|SMTP Proxy|TCP|
+|7660|127.0.0.1|POP Proxy|TCP|
+|7652|LAN interface|UPnP|TCP|
+|7653|LAN interface|UPnP|UDP|
+|12345|0.0.0.0|I2NP Protocol|TCP and UDP|
 
 You probably want at least the Router Console (7657)  and the HTTP Proxy (4444).  If you want I2P to be able to receive incoming connections from the internet, and hence not think it's firewalled, publish the I2NP Protocol port (12345) - but make sure you publish to a different random port, otherwise others may be able to guess you're running I2P in a Docker image.
+
+#### Networking
+The `network_mode=host` used in the quick-start example is not recommended for cloud deployments.  The [macvlan](https://docs.docker.com/network/macvlan) driver is preferred.  See this [blog post](https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/) for some tips on using macvlan.
 
 #### Example
 Here is an example container that mounts `i2phome` as home directory, `i2ptorrents` for torrents, and opens HTTP Proxy, IRC, Router Console and I2NP Protocols.  It also limits the memory available to the JVM to 256MB.
