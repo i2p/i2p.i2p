@@ -55,7 +55,7 @@ There are several ports which are exposed by the image.  You can choose which on
 You probably want at least the Router Console (7657)  and the HTTP Proxy (4444).  If you want I2P to be able to receive incoming connections from the internet, and hence not think it's firewalled, publish the I2NP Protocol port (12345) - but make sure you publish to a different random port, otherwise others may be able to guess you're running I2P in a Docker image.
 
 #### Networking
-The `network_mode=host` used in the quick-start example is not recommended for cloud deployments.  The [macvlan](https://docs.docker.com/network/macvlan) driver is preferred.  See this [blog post](https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/) for some tips on using macvlan.
+A best-practices guide for cloud deployments is beyond the scope of this document, but in general you should try to minimize the number of published ports, while exposing only the `I2NP` ports to the internet.  That means that the services in the list above which are bound to `127.0.0.1` (which include the router console) will need to be accessed via other methods like ssh tunneling or be manually configured to bind to a different interface.
 
 #### Example
 Here is an example container that mounts `i2phome` as home directory, `i2ptorrents` for torrents, and opens HTTP Proxy, IRC, Router Console and I2NP Protocols.  It also limits the memory available to the JVM to 256MB.
