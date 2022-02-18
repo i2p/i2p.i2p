@@ -4,7 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2016-2021
+# Kaya Zeren <kayazeren@gmail.com>, 2016-2022
 # Mustafa Berk Çörtoğlu <mbcortoglu@gmail.com>, 2017
 # Ozancan Karataş <ozancankaratas96@outlook.com>, 2015
 msgid ""
@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-17 13:12+0000\n"
-"PO-Revision-Date: 2021-11-20 07:52+0000\n"
+"PO-Revision-Date: 2022-02-03 06:28+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -696,7 +696,7 @@ msgstr "Gerekene kadar tünel açılması geciktirilsin"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:720
 msgid "Conserve resources by only creating tunnels when required"
-msgstr "Bu seçenek etkinleştirildiğinde, tüneller yalnız gerektiğinde açılarak kaynaklar korunur"
+msgstr "Bu seçenek etkinleştirildiğinde, tüneller yalnızca gerektiğinde açılarak kaynaklar korunur"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:724
 msgid ""
@@ -1267,7 +1267,7 @@ msgstr "Reddedilenler Listesi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2188
 msgid "Only allow listed clients to connect to this service"
-msgstr "Yalnız listedeki istemciler bu hizmete bağlanabilsin"
+msgstr "Yalnızca listedeki istemciler bu hizmete bağlanabilsin"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2192
 msgid "Allow List"
@@ -1333,7 +1333,7 @@ msgstr "virgül ile ayırarak yazın. Örnek: Mozilla,Opera (büyük küçük ha
 msgid ""
 "Use unique IP addresses for each connecting client (local non-SSL servers "
 "only)"
-msgstr "Bağlanan her istemci için benzersiz IP adresi kullanılsın (yalnız yerel ve SSL olmayan sunucular)"
+msgstr "Bağlanan her istemci için benzersiz IP adresi kullanılsın (yalnızca yerel ve SSL olmayan sunucular)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2245
 msgid "Unique Local Address per Client"
@@ -1341,7 +1341,7 @@ msgstr "Her İstemci için Benzersiz Yerel Adres"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2247
 msgid "Only enable if you are hosting this service on multiple routers"
-msgstr "Bu seçeneği yalnız bu hizmeti birden çok yöneltici üzerinden sunuyorsanız etkinleştirin"
+msgstr "Bu seçeneği yalnızca bu hizmeti birden çok yöneltici üzerinden sunuyorsanız etkinleştirin"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2251
 msgid "Optimize for Multihoming"
@@ -1865,7 +1865,7 @@ msgstr "Eski adı ve hedefi belirtin"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:584
 msgid "This is only required for advanced authentication."
-msgstr "Bu seçenek yalnız gelişmiş kimlik doğrulama için gereklidir."
+msgstr "Bu seçenek yalnızca gelişmiş kimlik doğrulaması için gereklidir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:586
 msgid "See above for required items."
@@ -1893,7 +1893,7 @@ msgstr "SSL Yardımcısı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:653
 msgid "Experts only!"
-msgstr "Yalnız deneyimli kullanıcılar!"
+msgstr "Yalnızca deneyimli kullanıcılar!"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:689
 msgid "Base32"
@@ -2211,11 +2211,11 @@ msgstr "İstemci tüneline yerel olarak erişilebilecek kapı numarası."
 msgid ""
 "How do you want this tunnel to be accessed? By just this machine, your "
 "entire subnet, or external internet?"
-msgstr "Bu tünele nasıl erişilmesini istiyorsunuz? Yalnız bu bilgisayar üzerinden, tüm alt ağınızdan ya da dış İnternet üzerinden?"
+msgstr "Bu tünele nasıl erişilmesini istiyorsunuz? Yalnızca bu bilgisayar üzerinden, tüm alt ağınızdan ya da dış İnternet üzerinden?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:533
 msgid "You will most likely want to just allow 127.0.0.1"
-msgstr "Büyük olasılıkla yalnız 127.0.0.1 adresine izin vermek isteyeceksiniz."
+msgstr "Büyük olasılıkla yalnızca 127.0.0.1 adresine izin vermek isteyeceksiniz."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:576
 msgid ""
