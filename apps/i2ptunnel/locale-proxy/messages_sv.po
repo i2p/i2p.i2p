@@ -9,7 +9,7 @@
 # cacapo <handelsehorisont@gmail.com>, 2015-2016
 # hottuna <i2p@robertfoss.se>, 2013
 # hottuna <i2p@robertfoss.se>, 2012
-# Jonatan Nyberg <jonatan@autistici.org>, 2016-2017,2021
+# Jonatan Nyberg <jonatan@autistici.org>, 2016-2017,2021-2022
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2019-2020
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2017
 # WinterFairy <winterfairy@riseup.net>, 2014
@@ -18,7 +18,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
-"PO-Revision-Date: 2021-10-02 15:40+0000\n"
+"PO-Revision-Date: 2022-01-14 17:57+0000\n"
 "Last-Translator: Jonatan Nyberg <jonatan@autistici.org>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
@@ -116,7 +116,7 @@ msgstr "Webbplatsen var inte nåbar."
 msgid ""
 "The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr "Webbplatsen är frånkopplad, nätverket är under stor belastning, eller din router är ännu inte välintegrerad med noder."
+msgstr "Webbplatsen är frånkopplad, nätverket är under stor belastning, eller din router är ännu inte välintegrerad med jämlikar."
 
 #: ../java/build/Proxy.java:14 ../java/build/Proxy.java:58
 #: ../java/build/Proxy.java:109 ../java/build/Proxy.java:129
@@ -205,7 +205,7 @@ msgstr "Varning: Ogiltigt Mål"
 
 #: ../java/build/Proxy.java:47
 msgid "The Base32 address is invalid."
-msgstr ""
+msgstr "Base32-adressen är ogiltig."
 
 #: ../java/build/Proxy.java:56
 msgid "The website was not reachable, because its lease set was not found."
@@ -315,7 +315,7 @@ msgstr ""
 msgid ""
 "The website destination specified was not valid, or was otherwise "
 "unreachable."
-msgstr "Webbplatsens angivna destination var inte giltig, eller på annat sätt onåbar. "
+msgstr "Den angivna webbplatsdestinationen var inte giltig eller på annat sätt onåbar."
 
 #: ../java/build/Proxy.java:127
 msgid ""
@@ -335,7 +335,7 @@ msgstr "Varning: Ingen utproxy inställd"
 msgid ""
 "Your request was for a site outside of I2P, but you have no HTTP outproxy "
 "configured."
-msgstr "Din förfrågan var för en sida utanför I2P, men du har ingen HTTP utproxy inställd."
+msgstr "Din förfrågan gällde en webbplats utanför I2P, men du har ingen HTTP-utproxy konfigurerad."
 
 #: ../java/build/Proxy.java:139
 msgid "Please configure an outproxy in I2PTunnel."
@@ -362,7 +362,7 @@ msgid ""
 "Resolve the conflict by deciding which key you trust, and then either ignore"
 " the address helper link, or delete the host entry from your address book "
 "and click the address helper link again."
-msgstr "Lös konflikten genom att välja vilken nyckel du litar på. Sedan kan du antingen ignorera adressens hjälplänk eller radera posten från din adressbok och klicka på adressens hjälplänk igen. "
+msgstr "Lös konflikten genom att bestämma vilken nyckel du litar på och ignorera sedan länken för adresshjälp eller ta bort värdposten från din adressbok och klicka på länken för adresshjälp igen."
 
 #: ../java/build/Proxy.java:150 ../java/build/Proxy.java:156
 msgid "Warning: Bad Address Helper"
@@ -391,7 +391,7 @@ msgstr "HTTP-utproxyn hittades inte."
 msgid ""
 "It is offline, there is network congestion, or your router is not yet well-"
 "integrated with peers."
-msgstr "Den är antingen frånkopplad, nätverket är under stor belastning eller så är din router ännu inte väl integrerad med noder."
+msgstr "Den är antingen frånkopplad, nätverket är under stor belastning eller så är din router ännu inte väl integrerad med jämlikar."
 
 #: ../java/build/Proxy.java:172 ../java/build/Proxy.java:178
 msgid "Warning: Request Denied"
@@ -399,7 +399,7 @@ msgstr "Varning: Förfrågan Nekad"
 
 #: ../java/build/Proxy.java:179
 msgid "You attempted to connect to a non-I2P website or location."
-msgstr "Du försökte ansluta till en icke-I2P webbplats eller plats."
+msgstr "Du försökte ansluta till en icke-I2P-webbplats eller plats."
 
 #: ../java/build/Proxy.java:180
 msgid "Proxy Authorization Required"
@@ -467,7 +467,7 @@ msgstr "HTTP-proxyn kunde inte nås eftersom den använder krypteringsinställni
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:692
 msgid "This seems to be a bad destination:"
-msgstr "Detta verkar vara ett felaktigt mål"
+msgstr "Det här verkar vara en dåligt destination:"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:693
 msgid "i2paddresshelper cannot help you with a destination like that!"
@@ -529,7 +529,7 @@ msgstr "Fortsätt utan att spara"
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1460
 #, java-format
 msgid "Save {0} to router address book and continue to website"
-msgstr "Spara {0} till routerns adressbok och fortsätt till webbplatsen."
+msgstr "Spara {0} i routerns adressbok och fortsätt till webbplatsen"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1461
 msgid ""
@@ -565,7 +565,7 @@ msgstr ""
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1478
 #, java-format
 msgid "Save {0} to private address book and continue to website"
-msgstr "Spara {0} till privata adressboken och fortsätt till webbplatsen."
+msgstr "Spara {0} i den privata adressboken och fortsätt till webbplatsen"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1479
 msgid ""
@@ -626,7 +626,7 @@ msgstr ""
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:196
 #, java-format
 msgid "Added via address helper from {0}"
-msgstr "Tillagd via adresshjälpare från {0}"
+msgstr "Tillagd via adresshjälp från {0}"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:198
 msgid "Added via address helper"
@@ -701,7 +701,7 @@ msgstr ""
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:379
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:411
 msgid "Click here if you are not redirected automatically."
-msgstr "Klicka här om du inte omdirigeras automatiskt "
+msgstr "Klicka här om du inte omdirigeras automatiskt."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:409
 #, java-format

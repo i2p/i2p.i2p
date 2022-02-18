@@ -5,13 +5,14 @@
 # 
 # Translators:
 # A5h8d0wf0x <littleslyfoxie28@gmail.com>, 2014
+# Marketa Chalupnikova, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:33+0000\n"
-"PO-Revision-Date: 2018-10-04 00:40+0000\n"
-"Last-Translator: erinm\n"
+"POT-Creation-Date: 2020-08-12 13:39+0000\n"
+"PO-Revision-Date: 2022-02-07 09:19+0000\n"
+"Last-Translator: Marketa Chalupnikova\n"
 "Language-Team: Czech (http://www.transifex.com/otf/I2P/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,7 +24,7 @@ msgid "Anonymous Proxy"
 msgstr "Anonymní proxy"
 
 msgid "Satellite Provider"
-msgstr "Poskytovatel satelutního vysílání"
+msgstr "Poskytovatel satelitního vysílání"
 
 msgid "Andorra"
 msgstr "Andorra"
@@ -158,7 +159,7 @@ msgid "Switzerland"
 msgstr "Switzerland"
 
 msgid "Cote D'Ivoire"
-msgstr ""
+msgstr "Pobřeží slonoviny"
 
 msgid "Cook Islands"
 msgstr ""
@@ -179,7 +180,7 @@ msgid "Costa Rica"
 msgstr "Kosta Rika"
 
 msgid "Serbia and Montenegro"
-msgstr ""
+msgstr "Srbsko a Černá Hora"
 
 msgid "Cuba"
 msgstr "Kuba"
@@ -239,7 +240,7 @@ msgid "Ethiopia"
 msgstr "Ethiopia"
 
 msgid "European Union"
-msgstr ""
+msgstr "Evropská unie"
 
 msgid "Finland"
 msgstr "Finland"
@@ -254,7 +255,7 @@ msgid "Micronesia"
 msgstr "Micronesia"
 
 msgid "Faroe Islands"
-msgstr ""
+msgstr "Faerské ostrovy"
 
 msgid "France"
 msgstr "Francie"
@@ -272,19 +273,19 @@ msgid "Georgia"
 msgstr "Georgia"
 
 msgid "French Guiana"
-msgstr ""
+msgstr "Francouzská Guyana"
 
 msgid "Guernsey"
-msgstr ""
+msgstr "Guernsey"
 
 msgid "Ghana"
 msgstr "Ghana"
 
 msgid "Gibraltar"
-msgstr ""
+msgstr "Gibraltar"
 
 msgid "Greenland"
-msgstr ""
+msgstr "Grónsko"
 
 msgid "Gambia"
 msgstr "Gambia"
@@ -293,7 +294,7 @@ msgid "Guinea"
 msgstr "Guinea"
 
 msgid "Guadeloupe"
-msgstr ""
+msgstr "Guadeloupe"
 
 msgid "Equatorial Guinea"
 msgstr "Equatorial Guinea"
@@ -341,7 +342,7 @@ msgid "Israel"
 msgstr "Israel"
 
 msgid "Isle of Man"
-msgstr ""
+msgstr "Ostrov Man"
 
 msgid "India"
 msgstr "India"
@@ -362,7 +363,7 @@ msgid "Italy"
 msgstr "Italy"
 
 msgid "Jersey"
-msgstr ""
+msgstr "Jersey"
 
 msgid "Jamaica"
 msgstr "Jamaica"
@@ -392,7 +393,7 @@ msgid "Saint Kitts and Nevis"
 msgstr ""
 
 msgid "North Korea"
-msgstr ""
+msgstr "Severní Korea"
 
 msgid "Republic of Korea"
 msgstr ""
@@ -401,7 +402,7 @@ msgid "Kuwait"
 msgstr "Kuwait"
 
 msgid "Cayman Islands"
-msgstr ""
+msgstr "Kajmanské ostrovy"
 
 msgid "Kazakhstan"
 msgstr "Kazakhstan"
@@ -479,7 +480,7 @@ msgid "Northern Mariana Islands"
 msgstr ""
 
 msgid "Martinique"
-msgstr ""
+msgstr "Martinik"
 
 msgid "Mauritania"
 msgstr "Mauritania"
@@ -512,7 +513,7 @@ msgid "Namibia"
 msgstr "Namibia"
 
 msgid "New Caledonia"
-msgstr ""
+msgstr "Nová Kaledonie"
 
 msgid "Niger"
 msgstr "Niger"
@@ -554,7 +555,7 @@ msgid "Peru"
 msgstr "Peru"
 
 msgid "French Polynesia"
-msgstr ""
+msgstr "Francouzská Polynésie"
 
 msgid "Papua New Guinea"
 msgstr "Papua New Guinea"
@@ -593,7 +594,7 @@ msgid "Qatar"
 msgstr "Qatar"
 
 msgid "Réunion"
-msgstr ""
+msgstr "Réunion"
 
 msgid "Romania"
 msgstr "Romania"
@@ -626,7 +627,7 @@ msgid "Singapore"
 msgstr "Singapore"
 
 msgid "Saint Helena"
-msgstr ""
+msgstr "Svatá Helena"
 
 msgid "Slovenia"
 msgstr "Slovenia"
@@ -755,16 +756,19 @@ msgid "Vanuatu"
 msgstr "Vanuatu"
 
 msgid "Wallis and Futuna"
-msgstr ""
+msgstr "Wallis a Futuna"
 
 msgid "Samoa"
 msgstr "Samoa"
+
+msgid "Kosovo"
+msgstr "Kosovo"
 
 msgid "Yemen"
 msgstr "Yemen"
 
 msgid "Mayotte"
-msgstr ""
+msgstr "Mayotte"
 
 msgid "South Africa"
 msgstr "South Africa"

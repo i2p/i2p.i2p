@@ -4,14 +4,15 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# タカハシ <indexial@outlook.jp>, 2014
+# タカハシ, 2014
+# daingewuvzeevisiddfddd, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-10-06 13:42+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
-"Last-Translator: タカハシ <indexial@outlook.jp>\n"
+"PO-Revision-Date: 2022-01-25 01:07+0000\n"
+"Last-Translator: daingewuvzeevisiddfddd\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -159,11 +160,11 @@ msgstr "デーモンとして、あるいは他のコンソールで起動中の
 
 #: ../i2prouter:1855
 msgid "Stop gracefully, may take up to 11 minutes."
-msgstr "適切に停、最大11分掛かる恐れがあります。"
+msgstr "適切に停止、最大11分掛かる恐れがあります。"
 
 #: ../i2prouter:1856
 msgid "Stop if running and then start."
-msgstr "起動中の場合、停止してから起動"
+msgstr "起動中の場合、停止してから起動。"
 
 #: ../i2prouter:1857
 msgid "Restart only if already running."

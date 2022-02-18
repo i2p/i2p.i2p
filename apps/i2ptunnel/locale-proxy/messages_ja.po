@@ -4,16 +4,17 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# タカハシ, 2022
 # Masayuki Hatta <mhatta@mhatta.org>, 2018
-# XMPPはいいぞ, 2021
-# XMPPはいいぞ, 2021
+# daingewuvzeevisiddfddd, 2021
+# daingewuvzeevisiddfddd, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
-"PO-Revision-Date: 2021-05-14 01:18+0000\n"
-"Last-Translator: XMPPはいいぞ\n"
+"PO-Revision-Date: 2022-02-14 11:11+0000\n"
+"Last-Translator: タカハシ\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -554,7 +555,7 @@ msgid ""
 "This address will be saved to your Local address book. Select this option "
 "for addresses you wish to keep separate from the main router address book, "
 "but don't mind publishing."
-msgstr ""
+msgstr "このアドレスはローカルのアドレス帳に保存されます。メインのルーターアドレス帳とは別に保管したいが、公開しても構わないアドレスに対してこのオプションを選択してください。"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1478
 #, java-format
@@ -569,7 +570,7 @@ msgstr "このアドレスはプライベートなアドレス帳へ保存され
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1507
 msgid "Base32 address requires lookup password"
-msgstr ""
+msgstr "Base32のアドレスにはルックアップパスワードが必要です"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1509
 msgid "Base32 address requires encryption key"
@@ -577,7 +578,7 @@ msgstr "Base32 アドレスは暗号化鍵を要求します"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1511
 msgid "Base32 address requires encryption key and lookup password"
-msgstr ""
+msgstr "Base32のアドレスには暗号化キーとルックアップパスワードが必要です"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1513
 msgid "Base32 address decryption failure, check encryption key"
@@ -611,7 +612,7 @@ msgstr "新しいDH暗号化鍵を生成"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1541
 msgid "Lookup password"
-msgstr ""
+msgstr "ルックアップパスワード"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1542
 msgid "You must enter the password provided by the server operator."
@@ -628,7 +629,7 @@ msgstr "アドレスヘルパー経由で追加"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:235
 msgid "Missing lookup password"
-msgstr ""
+msgstr "ルックアップパスワードがありません"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:249
 msgid "Missing private key"

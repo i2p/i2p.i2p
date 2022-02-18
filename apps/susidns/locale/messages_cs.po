@@ -5,14 +5,15 @@
 # 
 # Translators:
 # A5h8d0wf0x <littleslyfoxie28@gmail.com>, 2014
+# Marketa Chalupnikova, 2022
 # Waseihou Watashi <waseihou@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-08-14 13:36+0000\n"
-"PO-Revision-Date: 2021-08-27 07:16+0000\n"
-"Last-Translator: Pavel Borecki <pavel.borecki@gmail.com>\n"
+"PO-Revision-Date: 2022-01-25 06:11+0000\n"
+"Last-Translator: Marketa Chalupnikova\n"
 "Language-Team: Czech (http://www.transifex.com/otf/I2P/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -325,7 +326,7 @@ msgstr ""
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:555
 msgid "You must enter a file"
-msgstr ""
+msgstr "Vložte soubor"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:571
 msgid "No entries found in file"
@@ -334,11 +335,11 @@ msgstr ""
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:581
 #, java-format
 msgid "Imported from file {0}"
-msgstr ""
+msgstr "Importováno ze souboru {0}"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:583
 msgid "Imported from file"
-msgstr ""
+msgstr "Importováno ze souboru"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:595
 #, java-format
@@ -493,7 +494,7 @@ msgstr "Současný filtr"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:340
 msgid "clear filter"
-msgstr ""
+msgstr "smazat filtr"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:368
 msgid "Filter"
@@ -501,7 +502,7 @@ msgstr "Filtr"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:385
 msgid "other"
-msgstr ""
+msgstr "jiné"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:387
 msgid "all"
@@ -704,7 +705,7 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:316
 msgid "link"
-msgstr ""
+msgstr "odkaz"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:320
 msgid "Public Key"
@@ -728,11 +729,11 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:340
 msgid "no"
-msgstr ""
+msgstr "ne"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:340
 msgid "yes"
-msgstr ""
+msgstr "ano"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:346
 msgid "Source"
@@ -744,7 +745,7 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:363
 msgid "Last Modified"
-msgstr ""
+msgstr "Naposledny upraveno"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:382
 msgid "Notes"
@@ -760,11 +761,11 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:423
 msgid "Launch Image Generator"
-msgstr ""
+msgstr "Spustit generátor obrázků"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:182
 msgid "Introduction"
-msgstr ""
+msgstr "Úvod"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:204
 msgid "What is the address book?"
@@ -800,8 +801,9 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:216
 msgid ""
-"For more information on naming in I2P, see <a href=\"http://i2p-"
-"projekt.i2p/naming.html\" target=\"_blank\">the overview</a>."
+"For more information on naming in I2P, see <a "
+"href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">the "
+"overview</a>."
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:218
@@ -992,7 +994,7 @@ msgstr ""
 
 #: build/HowSVG.java:21
 msgid "I2P applications"
-msgstr ""
+msgstr "I2P aplikace"
 
 #: build/HowSVG.java:22
 msgid ""
@@ -1002,11 +1004,11 @@ msgstr ""
 
 #: build/HowSVG.java:23
 msgid "Optional,"
-msgstr ""
+msgstr "Volitelné"
 
 #: build/HowSVG.java:24
 msgid "for websites"
-msgstr ""
+msgstr "pro webové stránky"
 
 #: build/HowSVG.java:25
 msgid ""

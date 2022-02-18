@@ -4,7 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2016-2021
+# Kaya Zeren <kayazeren@gmail.com>, 2016-2022
 # Ozancan Karataş <ozancankaratas96@outlook.com>, 2015
 # zzzi2p, 2018
 msgid ""
@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
-"PO-Revision-Date: 2021-02-15 04:27+0000\n"
+"PO-Revision-Date: 2022-02-03 06:12+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -443,7 +443,7 @@ msgstr "İstek kötü bir iletişim kuralı kullanıyor."
 
 #: ../java/build/Proxy.java:205
 msgid "The I2P HTTP Proxy supports HTTP and HTTPS requests only."
-msgstr "I2P HTTP Vekil Sunucusu yalnız HTTP ve HTTPS isteklerini destekler."
+msgstr "I2P HTTP Vekil Sunucusu yalnızca HTTP ve HTTPS isteklerini destekler."
 
 #: ../java/build/Proxy.java:206
 msgid "Other protocols such as FTP are not allowed."

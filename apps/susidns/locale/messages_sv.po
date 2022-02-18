@@ -9,7 +9,7 @@
 # cacapo <handelsehorisont@gmail.com>, 2015
 # hottuna <i2p@robertfoss.se>, 2013
 # hottuna <i2p@robertfoss.se>, 2012
-# Jonatan Nyberg <jonatan@autistici.org>, 2017,2021
+# Jonatan Nyberg <jonatan@autistici.org>, 2017,2021-2022
 # Jonatan Nyberg <jonatan@autistici.org>, 2019-2021
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2017
 # Martin Svensson <digitalmannen@gmail.com>, 2011, 2012
@@ -18,7 +18,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-08-14 13:36+0000\n"
-"PO-Revision-Date: 2021-10-02 16:55+0000\n"
+"PO-Revision-Date: 2022-01-14 12:28+0000\n"
 "Last-Translator: Jonatan Nyberg <jonatan@autistici.org>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
@@ -37,18 +37,18 @@ msgstr " Värdnamn \"{0}\" innehåller ogiltiga tecken {1}"
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:154
 #, java-format
 msgid "Host name cannot start with \"{0}\""
-msgstr " Värdnamn kan inte börja med \"{0}\""
+msgstr "Värdnamn kan inte börja med \"{0}\""
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:149
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:151
 #, java-format
 msgid "Host name cannot end with \"{0}\""
-msgstr " Värdnamn kan inte sluta med \"{0}\""
+msgstr "Värdnamn kan inte sluta med \"{0}\""
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:156
 #, java-format
 msgid "Host name cannot contain \"{0}\""
-msgstr " Värdnamn kan inte innehålla \"{0}\""
+msgstr "Värdnamn kan inte innehålla \"{0}\""
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:159
 #, java-format
@@ -134,7 +134,7 @@ msgstr "Lägg till"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:245
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:683
 msgid "Replace"
-msgstr "Ersätt "
+msgstr "Ersätt"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:261
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:256
@@ -209,14 +209,14 @@ msgstr "Ta bort post"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:349
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:605
 msgid "Delete Selected"
-msgstr "Radera Valda"
+msgstr "Ta bort valda"
 
 #. parameter is a hostname
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:350
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:379
 #, java-format
 msgid "Destination {0} deleted."
-msgstr "Mål {0} raderat."
+msgstr "Mål {0} borttaget."
 
 #. parameter will always be >= 2
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:353
@@ -224,8 +224,8 @@ msgstr "Mål {0} raderat."
 #, java-format
 msgid "1 destination deleted."
 msgid_plural "{0} destinations deleted."
-msgstr[0] "1 mål raderat."
-msgstr[1] "{0} mål raderade."
+msgstr[0] "1 mål borttaget."
+msgstr[1] "{0} mål borttagna."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:355
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:384
@@ -793,8 +793,9 @@ msgstr "Det är enkelt att prenumerera på ytterligare webbplatser, lägg bara t
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:216
 msgid ""
-"For more information on naming in I2P, see <a href=\"http://i2p-"
-"projekt.i2p/naming.html\" target=\"_blank\">the overview</a>."
+"For more information on naming in I2P, see <a "
+"href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">the "
+"overview</a>."
 msgstr "Mer information om namngivning i I2P finns i <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">översikten</a>."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:218
@@ -904,7 +905,7 @@ msgstr "Så det är bra idé att lägga till ytterligare prenumerationer till we
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:240
 msgid "See the FAQ for a list of subscription URLs."
-msgstr "Se Vanliga frågor för en lista över prenumerationswebbadresser"
+msgstr "Se Vanliga frågor för en lista över prenumerationswebbadresser."
 
 #: build/HowSVG.java:5
 msgid ""

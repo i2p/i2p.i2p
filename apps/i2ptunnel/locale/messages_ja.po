@@ -4,17 +4,19 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# daingewuvzeevisiddfddd, 2022
 # タカハシ, 2013-2014
+# タカハシ, 2022
 # heizi <lv.kjsn.29yr@gmail.com>, 2016
-# XMPPはいいぞ, 2020-2021
-# XMPPはいいぞ, 2021
+# daingewuvzeevisiddfddd, 2020-2021
+# daingewuvzeevisiddfddd, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-17 13:12+0000\n"
-"PO-Revision-Date: 2021-11-17 13:34+0000\n"
-"Last-Translator: abbbb bbbb <a1678991@gmail.com>\n"
+"PO-Revision-Date: 2022-02-17 12:18+0000\n"
+"Last-Translator: daingewuvzeevisiddfddd\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,13 +33,13 @@ msgstr "内部"
 #, java-format
 msgid "{0} inbound tunnel"
 msgid_plural "{0} inbound tunnels"
-msgstr[0] ""
+msgstr[0] "{0} 個の着信トンネル"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:547
 #, java-format
 msgid "{0} outbound tunnel"
 msgid_plural "{0} outbound tunnels"
-msgstr[0] ""
+msgstr[0] "{0} 個の送信トンネル"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:549
 #, java-format
@@ -47,15 +49,15 @@ msgstr[0] "{0}個の着信、{0}個の送信トンネル"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:553
 msgid "lower bandwidth and reliability"
-msgstr "低い転送量だが低い信頼性"
+msgstr "帯域幅も信頼性も低め"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:555
 msgid "standard bandwidth and reliability"
-msgstr "標準的な転送量と信頼性"
+msgstr "帯域幅も信頼性も標準的"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:557
 msgid "higher bandwidth and reliability"
-msgstr "高い転送量だが高い信頼性"
+msgstr "帯域幅も信頼性も高め"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:100
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:615
@@ -602,13 +604,13 @@ msgstr "バックアップの回数"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1623
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1673
 msgid "Number of Tunnels in Group"
-msgstr ""
+msgstr "グループ内のトンネルの数"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:641
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1627
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1677
 msgid "Number of Reserve Tunnels"
-msgstr ""
+msgstr "予備トンネルの数"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:649
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:654
@@ -671,12 +673,12 @@ msgstr "接続プロファイル"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:696
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2268
 msgid "interactive connection"
-msgstr ""
+msgstr "双方向接続"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:700
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2272
 msgid "bulk connection (downloads/websites/BT)"
-msgstr ""
+msgstr "バルク接続（ダウンロード/ウェブサイト/BT）"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:702
 msgid "Delay Connection"
@@ -804,11 +806,11 @@ msgstr "ローカルの宛先"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:832
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1279
 msgid "Read Only: Local Destination (if known)"
-msgstr ""
+msgstr "読み込み専用: ローカルの宛先 (知っていれば)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:836
 msgid "Local Base32"
-msgstr ""
+msgstr "ローカルのBase32"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:847
 msgid "Tunnel Filtering Options"
@@ -951,7 +953,7 @@ msgstr "アウトプロキシに必要なパスワードを入力してくださ
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1002
 msgid "Tunnel Address Lookup Options"
-msgstr ""
+msgstr "トンネルアドレスのルックアップオプション"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1004
 msgid "Jump URL List"
@@ -1154,7 +1156,7 @@ msgstr "floodfillによるサーバー発見を防ぐ"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1768
 msgid "Blinded"
-msgstr ""
+msgstr "ブラインド"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1774
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1799
@@ -1164,39 +1166,39 @@ msgstr "全ユーザーへパスワードを送信する"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1778
 msgid "Blinded with lookup password"
-msgstr ""
+msgstr "ルックアップパスワードでブラインド化"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1786
 msgid "Send key and password to all users."
-msgstr ""
+msgstr "全ユーザーへキーとパスワードを送信する"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1790
 msgid "Encrypted with lookup password"
-msgstr ""
+msgstr "ルックアップパスワードで暗号化済"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1792
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1798
 msgid "Send individual key to each user."
-msgstr ""
+msgstr "各ユーザーにここのキーを送る"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1796
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1809
 msgid "Encrypted with per-user key"
-msgstr ""
+msgstr "ユーザーごとのキーで暗号化"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1803
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1816
 msgid "Encrypted with lookup password and per-user key"
-msgstr ""
+msgstr "ルックアップパスワードとユーザーごとのキーで暗号化"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1805
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1811
 msgid "Enter key from each user."
-msgstr ""
+msgstr "各ユーザーからキーを入力"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1829
 msgid "Optional lookup password"
-msgstr ""
+msgstr "任意のルックアップパスワード"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1844
 msgid "Encryption Key"
@@ -1231,7 +1233,7 @@ msgstr "追加"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2055
 msgid "Recommended for blinded and encrypted destinations"
-msgstr ""
+msgstr "ブラインドかつ暗号化された宛先が推奨されます"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2097
 msgid "Alternate private key file"
@@ -1368,7 +1370,7 @@ msgstr "サーバースロットリング"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2300
 msgid "Inbound connection limits"
-msgstr ""
+msgstr "総接続数制限"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2302
 msgid "Per Minute"
@@ -1389,7 +1391,7 @@ msgstr "クライアント毎"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2311
 msgid "unlimited"
-msgstr ""
+msgstr "無制限"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2314
 msgid ""
@@ -1434,7 +1436,7 @@ msgstr "そのサーバーへアクセスが塞がれるまでの、1日毎の�
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2340
 msgid "Max concurrent connections"
-msgstr ""
+msgstr "最大接続数制限"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2342
 msgid "Maximum number of simultaneous client connections"
@@ -1446,11 +1448,11 @@ msgstr "投稿制限"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2352
 msgid "Per Period"
-msgstr ""
+msgstr "一期間あたり"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2354
 msgid "Ban Duration"
-msgstr ""
+msgstr "禁止期間"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2358
 msgid ""
@@ -1496,7 +1498,7 @@ msgstr "これらはルータが提供するローカルサービスです。"
 msgid ""
 "By default, most of your client services (email, HTTP proxy, IRC) will share"
 " the same set of tunnels and be listed as \"Shared Clients\"."
-msgstr "規定では、たいていのあなたのクライアントのサービス（Eメール、HTTPプロキシ、IRC）トンネルのいくつかの組み合わせと共有し、\"共有クライアント\"であると一覧に記載されます。"
+msgstr "規定では、たいていのあなたのクライアントのサービス（Eメール、HTTPプロキシ、IRC）トンネルと同じ組み合わせを共有し、\"共有クライアント\"であると一覧に記載されます。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:177
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:638
@@ -1556,7 +1558,7 @@ msgstr "操作"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:241
 msgid "Edit Server Tunnel Settings for"
-msgstr ""
+msgstr "次のサーバートンネル設定を編集"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:256
 msgid "Test HTTPS server, bypassing I2P"
@@ -1572,7 +1574,7 @@ msgstr "I2P 経由で HTTP サーバーをテスト"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:294
 msgid "No Preview"
-msgstr ""
+msgstr "プレビューなし"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:304
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:307
@@ -1669,12 +1671,12 @@ msgstr "インタフェース"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:479
 msgid "Edit Tunnel Settings for"
-msgstr ""
+msgstr "次のトンネル設定の編集"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:531
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:534
 msgid "Standby"
-msgstr ""
+msgstr "スタンバイ"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:589
 msgid "Outproxy"
@@ -1994,7 +1996,7 @@ msgstr "トンネルの宛先"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:226
 msgid "Binding address and port"
-msgstr ""
+msgstr "バインドするアドレスとポート"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:232
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:711
@@ -2264,11 +2266,11 @@ msgstr "以下は、あなたが選択した選択の概要です:"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:654
 msgid "Tunnel description"
-msgstr ""
+msgstr "トンネル説明"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:680
 msgid "Binding address"
-msgstr ""
+msgstr "バインドするアドレス"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:688
 msgid "Tunnel port"
@@ -2317,7 +2319,7 @@ msgstr "終了"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:779
 msgid "Advance to next page"
-msgstr ""
+msgstr "次のページに進む"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:782
 msgid "Next"

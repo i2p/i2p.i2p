@@ -5,14 +5,14 @@
 # 
 # Translators:
 # Erkin Batu Altunbaş <erkinbatu@gmail.com>, 2013
-# Kaya Zeren <kayazeren@gmail.com>, 2013,2015-2016,2018,2020
+# Kaya Zeren <kayazeren@gmail.com>, 2013,2015-2016,2018,2020-2021
 # Trans Lator <kqzwypgi@sharklasers.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-08-12 13:39+0000\n"
-"PO-Revision-Date: 2020-08-19 04:46+0000\n"
+"PO-Revision-Date: 2021-12-19 07:17+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -22,10 +22,10 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "Anonymous Proxy"
-msgstr "Anonim Vekil Sunucu"
+msgstr "Anonim vekil sunucu"
 
 msgid "Satellite Provider"
-msgstr "Uydu Hizmeti Sağlayıcısı"
+msgstr "Uydu hizmeti sağlayıcısı"
 
 msgid "Andorra"
 msgstr "Andorra"

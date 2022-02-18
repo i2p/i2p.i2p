@@ -6,7 +6,7 @@
 # Translators:
 # Anders Nilsson <anders@devode.se>, 2016
 # cacapo <handelsehorisont@gmail.com>, 2015
-# Jonatan Nyberg <jonatan@autistici.org>, 2017,2021
+# Jonatan Nyberg <jonatan@autistici.org>, 2017,2021-2022
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2019-2020
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2017
 # Martin Svensson <digitalmannen@gmail.com>, 2011
@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
-"PO-Revision-Date: 2021-10-02 16:48+0000\n"
+"PO-Revision-Date: 2022-01-14 12:33+0000\n"
 "Last-Translator: Jonatan Nyberg <jonatan@autistici.org>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
@@ -118,7 +118,7 @@ msgstr "POP3-portnummer är inte inom intervallet 0..65535."
 
 #: src/src/i2p/susi/webmail/WebMail.java:740
 msgid "POP3 port number is invalid."
-msgstr "POP3-portnummer är ogiltigt"
+msgstr "POP3-portnumret är ogiltigt."
 
 #: src/src/i2p/susi/webmail/WebMail.java:746
 msgid "Need port number for smtp connect."
@@ -130,7 +130,7 @@ msgstr "SMTP-portnumret är inte inom intervallet 0..65535."
 
 #: src/src/i2p/susi/webmail/WebMail.java:759
 msgid "SMTP port number is invalid."
-msgstr "SMTP-portnummer ör ogiltigt"
+msgstr "SMTP-portnumret är ogiltigt."
 
 #: src/src/i2p/susi/webmail/WebMail.java:836
 #: src/src/i2p/susi/webmail/WebMail.java:1388
@@ -193,7 +193,7 @@ msgstr "Det gick inte att hämta e-postens brödtext."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1330
 msgid "Message id not valid."
-msgstr "Meddelande-id är inte giltigt"
+msgstr "Meddelande-id är inte giltigt."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1375
 msgid "Internal error, lost connection."
@@ -221,13 +221,13 @@ msgstr "Meddelandet hittades inte."
 #, java-format
 msgid "1 message deleted."
 msgid_plural "{0} messages deleted."
-msgstr[0] "1 meddelande raderart."
-msgstr[1] "{0} meddelanden raderade"
+msgstr[0] "1 meddelande borttaget."
+msgstr[1] "{0} meddelanden borttagna."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1734
 #: src/src/i2p/susi/webmail/WebMail.java:1743
 msgid "No messages marked for deletion."
-msgstr "Inga meddelanden var märkta för radering"
+msgstr "Inga meddelanden markerade för borttagning."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1808
 #, java-format
@@ -394,7 +394,7 @@ msgstr "Bilagor"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3083
 msgid "Delete selected attachments"
-msgstr "Radera valda bilagor"
+msgstr "Ta bort valda bilagor"
 
 #. boolean fixed = Boolean.parseBoolean(Config.getProperty(
 #. CONFIG_PORTS_FIXED, "true" ));
@@ -478,15 +478,15 @@ msgstr "Meddelandet är skräppost"
 #. TODO ngettext
 #: src/src/i2p/susi/webmail/WebMail.java:3280
 msgid "Really delete the marked messages?"
-msgstr "Vill du verkligen radera valda meddelanden?"
+msgstr "Vill du verkligen ta bort valda meddelanden?"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3281
 msgid "Yes, really delete them!"
-msgstr "Ja, radera dem!"
+msgstr "Ja, ta bort dem!"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3284
 msgid "Delete Selected"
-msgstr "Radera valda"
+msgstr "Ta bort valda"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3286
 msgid "Mark All"
@@ -494,7 +494,7 @@ msgstr "Markera alla"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3288
 msgid "Clear All"
-msgstr "Radera alla"
+msgstr "Ta bort alla"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3313
 msgid "Folder"
@@ -530,11 +530,11 @@ msgstr "Sista"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3383
 msgid "Really delete this message?"
-msgstr "Vill du verkligen radera detta meddelande?"
+msgstr "Vill du verkligen ta bort detta meddelande?"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3384
 msgid "Yes, really delete it!"
-msgstr "Ja, radera det!"
+msgstr "Ja, ta bort det!"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3412
 msgid "Reply"
@@ -555,7 +555,7 @@ msgstr "Spara som"
 #: src/src/i2p/susi/webmail/WebMail.java:3417
 #: src/src/i2p/susi/webmail/WebMail.java:3419
 msgid "Delete"
-msgstr "Radera"
+msgstr "Ta bort"
 
 #. can't move unless has body
 #. can't move from drafts

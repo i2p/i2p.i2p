@@ -5,17 +5,17 @@
 # 
 # Translators:
 # タカハシ, 2013-2014
-# タカハシ, 2015
+# タカハシ, 2015,2022
 # rafe <rafe.kun@gmail.com>, 2015
-# XMPPはいいぞ, 2020-2021
-# XMPPはいいぞ, 2021
+# daingewuvzeevisiddfddd, 2020-2021
+# daingewuvzeevisiddfddd, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-08-14 13:36+0000\n"
-"PO-Revision-Date: 2021-09-06 14:30+0000\n"
-"Last-Translator: XMPPはいいぞ\n"
+"PO-Revision-Date: 2022-02-12 08:32+0000\n"
+"Last-Translator: タカハシ\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -734,15 +734,15 @@ msgstr "ノート"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:409
 msgid "Visual Identification for"
-msgstr ""
+msgstr "下記の視覚的識別子"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:421
 msgid "Create your own identification images"
-msgstr ""
+msgstr "自分の識別画像を生成"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:423
 msgid "Launch Image Generator"
-msgstr ""
+msgstr "イメージジェネレーターを起動"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:182
 msgid "Introduction"
@@ -782,8 +782,9 @@ msgstr "追加のサイトを購読するのは簡単で、あなたの<a href=\
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:216
 msgid ""
-"For more information on naming in I2P, see <a href=\"http://i2p-"
-"projekt.i2p/naming.html\" target=\"_blank\">the overview</a>."
+"For more information on naming in I2P, see <a "
+"href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">the "
+"overview</a>."
 msgstr "I2P における名付けに関する詳細については、<a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_top\">概観</a>をご覧ください。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:218

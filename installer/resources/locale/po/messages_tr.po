@@ -4,13 +4,13 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2013,2018-2021
+# Kaya Zeren <kayazeren@gmail.com>, 2013,2018-2022
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-10-06 13:42+0000\n"
-"PO-Revision-Date: 2021-08-22 08:21+0000\n"
+"PO-Revision-Date: 2022-02-03 06:03+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -167,7 +167,7 @@ msgstr "Çalışıyorsa durdurun ve başlatın."
 
 #: ../i2prouter:1857
 msgid "Restart only if already running."
-msgstr "Yalnız zaten çalışıyorsa yeniden başlatın."
+msgstr "Yalnızca zaten çalışıyorsa yeniden başlatın."
 
 #: ../i2prouter:1858
 msgid "Query the current status."

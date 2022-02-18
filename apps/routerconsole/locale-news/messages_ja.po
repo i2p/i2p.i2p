@@ -5,15 +5,16 @@
 # 
 # Translators:
 # タカハシ, 2013-2014
+# タカハシ, 2022
 # Masayuki Hatta <mhatta@mhatta.org>, 2018
-# XMPPはいいぞ, 2021
+# daingewuvzeevisiddfddd, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-05 15:14+0000\n"
-"PO-Revision-Date: 2021-05-09 09:29+0000\n"
-"Last-Translator: XMPPはいいぞ\n"
+"PO-Revision-Date: 2022-02-10 04:35+0000\n"
+"Last-Translator: タカハシ\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -44,7 +45,7 @@ msgstr "また、 eepsite に到達するために I2P プロキシを使用す�
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
 "browser settings."
-msgstr "127.0.0.1 (または localhost) ポート 4444をHTTPプロキシとして、ブラウザ設定に入力してください。"
+msgstr "127.0.0.1 (または localhost) ポート 4444番をHTTPプロキシとして、ブラウザ設定に入力してください。"
 
 msgid "Do not use SOCKS for this."
 msgstr "これには SOCKS を使用しないでください。"
@@ -58,7 +59,7 @@ msgstr "詳細は {0}I2P ブラウザプロキシ設定ページ{1} にありま
 msgid ""
 "Once you have a \"shared clients\" destination listed on the left, please "
 "{0}check out{1} our {2}FAQ{3}."
-msgstr "左にリストされている「共有クライアント」の宛先があれば、{2}FAQ{3}を{0}確認{1}してください。"
+msgstr "左に一覧表示されている「共有クライアント」の宛先があったら、{2}FAQ{3}を{0}確認{1}してください。"
 
 #, java-format
 msgid ""

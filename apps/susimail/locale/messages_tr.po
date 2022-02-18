@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
-"PO-Revision-Date: 2021-02-15 04:25+0000\n"
+"PO-Revision-Date: 2021-12-19 07:23+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -56,16 +56,16 @@ msgstr "Çöp"
 #. MailDir-like
 #: src/src/i2p/susi/webmail/WebMail.java:217
 msgid "Bulk Mail"
-msgstr "Toplu E-posta"
+msgstr "Toplu e-posta"
 
 #. untranslated, translate on use
 #: src/src/i2p/susi/webmail/WebMail.java:221
 msgid "Inbox"
-msgstr "Gelen Kutusu"
+msgstr "Gelen kutusu"
 
 #: src/src/i2p/susi/webmail/WebMail.java:540
 msgid "unknown"
-msgstr "bilinmiyor"
+msgstr "Bilinmiyor"
 
 #: src/src/i2p/susi/webmail/WebMail.java:589
 #, java-format
@@ -81,7 +81,7 @@ msgstr "{1} nedeniyle ({0}) bölümü görüntülenemiyor"
 #: src/src/i2p/susi/webmail/WebMail.java:648
 #, java-format
 msgid "Download attachment {0}"
-msgstr "{0} ekini indir"
+msgstr "{0} ek dosyasını indir"
 
 #: src/src/i2p/susi/webmail/WebMail.java:649
 msgid "File is packed into a zipfile for security reasons."
@@ -90,7 +90,7 @@ msgstr "Dosya güvenlik nedeniyle zip arşivi içine paketlendi."
 #: src/src/i2p/susi/webmail/WebMail.java:654
 #, java-format
 msgid "Attachment ({0})."
-msgstr "Ek ({0})."
+msgstr "Ek dosya ({0})."
 
 #: src/src/i2p/susi/webmail/WebMail.java:714
 msgid "Need username for authentication."
@@ -102,7 +102,7 @@ msgstr "Kimlik doğrulaması için parola gereklidir."
 
 #: src/src/i2p/susi/webmail/WebMail.java:722
 msgid "Need hostname for connect."
-msgstr "Bağlanmak için sunucu adı gereklidir."
+msgstr "Bağlantı kurmak için sunucu adı gereklidir."
 
 #: src/src/i2p/susi/webmail/WebMail.java:727
 msgid "Need port number for pop3 connect."
@@ -144,7 +144,7 @@ msgstr "Bağlantı kurulamadı"
 #: src/src/i2p/susi/webmail/WebMail.java:932
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:744
 msgid "Error connecting to server"
-msgstr "Sunucuya bağlanılırken bir sorun çıktı"
+msgstr "Sunucu ile bağlantı kurulurken bir sorun çıktı"
 
 #. _t("Internal error, lost connection.") + '\n' +
 #: src/src/i2p/susi/webmail/WebMail.java:976
@@ -203,7 +203,7 @@ msgstr "{0} için kodlama bulunamadı"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1598
 msgid "Attachment not found."
-msgstr "Ek bulunamadı."
+msgstr "Ek dosya bulunamadı."
 
 #. error if we get here
 #: src/src/i2p/susi/webmail/WebMail.java:1627
@@ -241,7 +241,7 @@ msgstr "Sayfa boyutu sayısı geçersiz, varsayılan değere sıfırlanıyor."
 #: src/src/i2p/susi/webmail/WebMail.java:2298
 #: src/src/i2p/susi/webmail/WebMail.java:3107
 msgid "Login"
-msgstr "Oturum Aç"
+msgstr "Oturum aç"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2300
 #: src/src/i2p/susi/webmail/WebMail.java:2427
@@ -253,8 +253,8 @@ msgstr "E-postalar yükleniyor, lütfen bekleyin..."
 #, java-format
 msgid "1 Message"
 msgid_plural "{0} Messages"
-msgstr[0] "{0} İleti"
-msgstr[1] "{0} İleti"
+msgstr[0] "{0} ileti"
+msgstr[1] "{0} ileti"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2310
 #: src/src/i2p/susi/webmail/WebMail.java:3267
@@ -263,11 +263,11 @@ msgstr "Herhangi bir ileti yok"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2318
 msgid "Show Message"
-msgstr "İletiyi Görüntüle"
+msgstr "İletiyi görüntüle"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2323
 msgid "New Message"
-msgstr "Yeni İleti"
+msgstr "Yeni ileti"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2325
 msgid "Configuration"
@@ -332,7 +332,7 @@ msgstr "E-posta gönderiliyor."
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:346
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:351
 msgid "Error sending mail"
-msgstr "Posta gönderilirken bir sorun çıktı"
+msgstr "E-posta gönderilirken bir sorun çıktı"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2880
 msgid "Mail sent."
@@ -344,7 +344,7 @@ msgstr "Gönder"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2973
 msgid "Save as Draft"
-msgstr "Taslak Olarak Kaydet"
+msgstr "Taslak olarak kaydet"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2974
 #: src/src/i2p/susi/webmail/WebMail.java:3282
@@ -372,7 +372,7 @@ msgstr "Kopya"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3064
 msgid "Bcc"
-msgstr "Gizli Kopya"
+msgstr "Gizli kopya"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3065
 #: src/src/i2p/susi/webmail/WebMail.java:3180
@@ -382,15 +382,15 @@ msgstr "Konu"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3068
 msgid "Add Attachment"
-msgstr "Ek Ekle"
+msgstr "Dosya ekle"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3074
 msgid "Attachments"
-msgstr "Ekler"
+msgstr "Ek dosyalar"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3083
 msgid "Delete selected attachments"
-msgstr "Seçilmiş ekleri sil"
+msgstr "Seçilmiş ek dosyaları sil"
 
 #. boolean fixed = Boolean.parseBoolean(Config.getProperty(
 #. CONFIG_PORTS_FIXED, "true" ));
@@ -401,7 +401,7 @@ msgstr "Seçilmiş ekleri sil"
 #. Integer.toString(DEFAULT_SMTPPORT));
 #: src/src/i2p/susi/webmail/WebMail.java:3100
 msgid "Email Login"
-msgstr "E-posta Oturumu Aç"
+msgstr "E-posta oturumu aç"
 
 #. current postman hq length limits 16/12, new postman version 32/32
 #: src/src/i2p/susi/webmail/WebMail.java:3102
@@ -414,7 +414,7 @@ msgstr "Parola"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3108
 msgid "Read Mail Offline"
-msgstr "Postayı Çevrimdışı Oku"
+msgstr "E-postayı çevrimdışı oku"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3112
 #: src/src/i2p/susi/webmail/WebMail.java:3301
@@ -423,11 +423,11 @@ msgstr "Ayarlar"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3114
 msgid "Create Account"
-msgstr "Hesap Aç"
+msgstr "Hesap aç"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3114
 msgid "Learn about I2P mail"
-msgstr "I2P Mail Hakkında Bilgiler"
+msgstr "I2P Mail hakkında bilgiler"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3139
 #: src/src/i2p/susi/webmail/WebMail.java:3409
@@ -436,7 +436,7 @@ msgstr "Yeni"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3149
 msgid "Check Mail"
-msgstr "Postaları Denetle"
+msgstr "E-postaları denetle"
 
 #. if (Config.hasConfigFile())
 #. out.println(button( RELOAD, _t("Reload Config") ) + spacer);
@@ -444,11 +444,11 @@ msgstr "Postaları Denetle"
 #: src/src/i2p/susi/webmail/WebMail.java:3421
 #: src/src/i2p/susi/webmail/WebMail.java:3549
 msgid "Logout"
-msgstr "Oturumu Kapat"
+msgstr "Oturumu kapat"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3178
 msgid "Mark for deletion"
-msgstr "Silinmek üzere işaretleyin"
+msgstr "Silinmek üzere işaretle"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3181
 #: src/src/i2p/susi/webmail/WebMail.java:3482
@@ -482,15 +482,15 @@ msgstr "Evet gerçekten silinsin!"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3284
 msgid "Delete Selected"
-msgstr "Seçilmişleri Sil"
+msgstr "Seçilmişleri sil"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3286
 msgid "Mark All"
-msgstr "Tümünü Seç"
+msgstr "Tümünü seç"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3288
 msgid "Clear All"
-msgstr "Tümünü Bırak"
+msgstr "Tümünü bırak"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3313
 msgid "Folder"
@@ -499,7 +499,7 @@ msgstr "Klasör"
 #. TODO css to center it
 #: src/src/i2p/susi/webmail/WebMail.java:3314
 msgid "Change to Folder"
-msgstr "Klasörü Değiştir"
+msgstr "Klasörü değiştir"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3320
 msgid "First"
@@ -538,7 +538,7 @@ msgstr "Yanıtla"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3413
 msgid "Reply All"
-msgstr "Tümüne Yanıtla"
+msgstr "Tümüne yanıtla"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3414
 msgid "Forward"
@@ -546,7 +546,7 @@ msgstr "İlet"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3415
 msgid "Save As"
-msgstr "Farklı Kaydet"
+msgstr "Farklı kaydet"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3417
 #: src/src/i2p/susi/webmail/WebMail.java:3419
@@ -557,15 +557,15 @@ msgstr "Sil"
 #. can't move from drafts
 #: src/src/i2p/susi/webmail/WebMail.java:3425
 msgid "Move to Folder"
-msgstr "Klasöre Taşı"
+msgstr "Klasöre taşı"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3445
 msgid "Back to Folder"
-msgstr "Klasöre Geri Dön"
+msgstr "Klasöre geri dön"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3530
 msgid "Folder Page Size"
-msgstr "Klasör Sayfa Boyutu"
+msgstr "Klasör sayfa boyutu"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3533
 msgid "Set"
@@ -573,11 +573,11 @@ msgstr "Ayarla"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3536
 msgid "Advanced Configuration"
-msgstr "Gelişmiş Yapılandırma"
+msgstr "Gelişmiş yapılandırma"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3546
 msgid "Save Configuration"
-msgstr "Yapılandırmayı Kaydet"
+msgstr "Yapılandırmayı kaydet"
 
 #. this appears in the UI so translate
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:108
@@ -611,4 +611,4 @@ msgstr "Sunucu bağlantıyı reddetti"
 #. TODO which recipient?
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:327
 msgid "Mail rejected"
-msgstr "Posta reddedildi"
+msgstr "E-posta reddedildi"
