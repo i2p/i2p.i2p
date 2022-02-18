@@ -1,3 +1,9 @@
+2022-02-18 zzz
+ * Update translations
+
+2022-02-17 zzz
+ * i2psnark standalone: Increase open files ulimit
+
 2022-02-09 zzz
  * NTCP: Fixes for SSU disabled
 
