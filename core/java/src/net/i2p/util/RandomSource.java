@@ -73,6 +73,16 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
     }
 
     /**
+     *  This code unused, see FortunaRandomSource override
+     *
+     *  @return all possible int values, positive and negative
+     *  @since 0.9.54
+     */
+    public int signedNextInt() {
+        return nextInt();
+    }
+
+    /**
      * Like the modified nextInt, nextLong(n) returns a random number from 0 through n,
      * including 0, excluding n.
      *
@@ -103,33 +113,6 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
         }
     }
 
-    /**
-     * override as synchronized, for those JVMs that don't always pull via
-     * nextBytes (cough ibm)
-
-    @Override
-    public boolean nextBoolean() { return super.nextBoolean(); }
-
-    @Override
-    public void nextBytes(byte buf[]) { super.nextBytes(buf); }
-
-    @Override
-    public double nextDouble() { return super.nextDouble(); }
-
-    @Override
-    public float nextFloat() { return super.nextFloat(); }
-
-    @Override
-    public double nextGaussian() { return super.nextGaussian(); }
-
-    @Override
-    public int nextInt() { return super.nextInt(); }
-
-    @Override
-    public long nextLong() { return super.nextLong(); }
-*****/
-   
-    /** */
     public EntropyHarvester harvester() { return _entropyHarvester; }
  
     public void feedEntropy(String source, long data, int bitoffset, int bits) {

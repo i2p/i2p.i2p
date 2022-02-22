@@ -17,6 +17,7 @@ import java.util.Random;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.EntropyHarvester;
+import net.i2p.data.DataHelper;
 
 /**
  * Wrapper around GNU-Crypto's Fortuna PRNG.  This seeds from /dev/urandom and
@@ -87,9 +88,21 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
         rv %= n;
         return rv;
     }
-    
+
     @Override
-    public int nextInt() { return signedNextInt(Integer.MAX_VALUE); }
+    public int nextInt() {
+        return signedNextInt() & 0x7fffffff;
+    }
+
+    /**
+     *  @return all possible int values, positive and negative
+     *  @since 0.9.54
+     */
+    public int signedNextInt() {
+        byte[] b = new byte[4];
+        nextBytes(b);
+        return (int) DataHelper.fromLong(b, 0, 4);
+    }
 
     /**
      * Implementation from Sun's java.util.Random javadocs
@@ -125,23 +138,21 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
     @Override
     public long nextLong(long n) {
         if (n == 0) return 0;
-        long rv = signedNextLong();
+        long rv = nextLong();
         if (rv < 0) 
             rv = 0 - rv;
         rv %= n;
         return rv;
     }
     
-    @Override
-    public long nextLong() { return signedNextLong(); }
-
     /**
-     * Implementation from Sun's java.util.Random javadocs
+     *  @return all possible long values, positive and negative
      */
-    private long signedNextLong() {
-        synchronized(_fortuna) {
-            return ((long)nextBits(32) << 32) + nextBits(32);
-        }
+    @Override
+    public long nextLong() {
+        byte[] b = new byte[8];
+        nextBytes(b);
+        return DataHelper.fromLong8(b, 0);
     }
 
     @Override
