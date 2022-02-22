@@ -14,7 +14,7 @@ Versions are as follows:
 
 Min version	Max version	Uses src pkg	Copied to Debian
 -----------	-----------	------------	----------------
-bionic		cosmic		bionic		--
+bionic		--		bionic		--
 focal		jammy		bionic		buster, bullseye, bookworm, sid
 
 Unsupported (Java 7):

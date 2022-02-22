@@ -553,7 +553,7 @@ Index: b/installer/resources/locale/po/messages_sv.po
 ===================================================================
 --- a/installer/resources/locale/po/messages_sv.po
 +++ b/installer/resources/locale/po/messages_sv.po
-@@ -189,13 +189,13 @@ msgid "Request a Java thread dump if run
+@@ -190,13 +190,13 @@ msgid "Request a Java thread dump if run
  msgstr "Fråga efter en Java thread dump vid drift."
  
  #: ../i2prouter:1874
@@ -568,9 +568,9 @@ Index: b/installer/resources/locale/po/messages_sv.po
  
  #: ../i2prouter:1882
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
--msgstr "För att köra som root oavsett, ändra i2prouter och sätt ALLOW_ROOT=true"
+-msgstr "För att köra som root ändå, redigera i2prouter och ställ in ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
-+msgstr "För att köra som root oavsett, ändra /etc/default/i2p och sätt ALLOW_ROOT=true"
++msgstr "För att köra som root ändå, redigera i2prouter och ställ in ALLOW_ROOT=true."
 Index: b/installer/resources/locale/po/messages_ro.po
 ===================================================================
 --- a/installer/resources/locale/po/messages_ro.po
@@ -641,7 +641,7 @@ Index: b/installer/resources/locale/po/messages_ja.po
 ===================================================================
 --- a/installer/resources/locale/po/messages_ja.po
 +++ b/installer/resources/locale/po/messages_ja.po
-@@ -186,13 +186,13 @@ msgid "Request a Java thread dump if run
+@@ -187,13 +187,13 @@ msgid "Request a Java thread dump if run
  msgstr "起動中の場合、 Java スレッドダンプを要求"
  
  #: ../i2prouter:1874
