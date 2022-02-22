@@ -13,9 +13,6 @@ cd `dirname $0`/../..
 
 XMLFILES="\
 ./apps/addressbook/build.xml \
-./apps/BOB/build.xml \
-./apps/BOB/nbproject/build-impl.xml \
-./apps/BOB/nbproject/project.xml \
 ./apps/desktopgui/build.xml \
 ./apps/i2psnark/java/build.xml \
 ./apps/i2psnark/jetty-i2psnark.xml \
@@ -52,7 +49,6 @@ XMLFILES="\
 
 HTMLFILES="\
 ./apps/routerconsole/resources-news/docs/initialNews/*.xml \
-./apps/BOB/src/net/i2p/BOB/package.html \
 ./apps/desktopgui/src/net/i2p/desktopgui/package.html \
 ./apps/ministreaming/java/src/net/i2p/client/streaming/package.html \
 ./apps/routerconsole/resources/docs/readme*.html \
