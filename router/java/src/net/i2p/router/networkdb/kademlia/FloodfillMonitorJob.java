@@ -52,6 +52,13 @@ class FloodfillMonitorJob extends JobImpl {
     public String getName() { return "Monitor the floodfill pool"; }
 
     public synchronized void runJob() {
+        if (!getContext().commSystem().isRunning()) {
+            // Avoid deadlock in the transports through here via Router.rebuildRouterInfo() at startup
+            if (_log.shouldWarn())
+                _log.warn("Floodfill Monitor before comm system started");
+            requeue(100);
+            return;
+        }
         boolean wasFF = _facade.floodfillEnabled();
         boolean ff = shouldBeFloodfill();
         _facade.setFloodfillEnabledFromMonitor(ff);
