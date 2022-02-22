@@ -128,16 +128,26 @@ public class HandshakeState implements Destroyable, Cloneable {
 	 */
 	private static final int FALLBACK_POSSIBLE = 0x40;
 
+	/** NTCP2 */
 	public static final String protocolName = "Noise_XKaesobfse+hs2+hs3_25519_ChaChaPoly_SHA256";
+	/** Ratchet */
 	public static final String protocolName2 = "Noise_IKelg2+hs2_25519_ChaChaPoly_SHA256";
+	/** Tunnels */
 	public static final String protocolName3 = "Noise_N_25519_ChaChaPoly_SHA256";
+	/** SSU2 */
+        public static final String protocolName4 = "Noise_XKchaobfse+hs1+hs2+hs3_25519_ChaChaPoly_SHA256";
 	private static final String prefix;
 	private final String patternId;
+	/** NTCP2 */
 	public static final String PATTERN_ID_XK = "XK";
+	/** Ratchet */
 	public static final String PATTERN_ID_IK = "IK";
+	/** Tunnels */
 	public static final String PATTERN_ID_N = "N";
 	/** same as N but no post-mixHash needed */
 	public static final String PATTERN_ID_N_NO_RESPONSE = "N!";
+	/** SSU2 */
+	public static final String PATTERN_ID_XK_SSU2 = "XK-SSU2";
 	private static String dh;
 	private static final String cipher;
 	private static final String hash;
@@ -182,6 +192,11 @@ public class HandshakeState implements Destroyable, Cloneable {
 		PATTERN_N = Pattern.lookup(id);
 		if (PATTERN_N == null)
 			throw new IllegalArgumentException("Handshake pattern is not recognized");
+		// XK-SSU2
+		components = protocolName4.split("_");
+		id = components[1].substring(0, 2);
+		if (!PATTERN_ID_XK.equals(id))
+			throw new IllegalArgumentException();
 	}
 
 	/**
@@ -209,6 +224,8 @@ public class HandshakeState implements Destroyable, Cloneable {
 			pattern = PATTERN_N;
 		else if (patternId.equals(PATTERN_ID_N_NO_RESPONSE))  // same as N but no post-mixHash needed
 			pattern = PATTERN_N;
+		else if (patternId.equals(PATTERN_ID_XK_SSU2))
+			pattern = PATTERN_XK;
 		else
 			throw new IllegalArgumentException("Handshake pattern is not recognized");
 		short flags = pattern[0];
@@ -510,6 +527,18 @@ public class HandshakeState implements Destroyable, Cloneable {
 	/**
 	 * Writes a message payload during the handshake.
 	 * 
+	 * Payload (plaintext) and message (encrypted) may be in the same buffer if the payload
+	 * if offset enough past the message offset to leave room for the
+	 * key(s) and/or MAC. For 32 byte keys and 16 byte MACs,
+	 * if message == payload, payloadOffset must be at least this much
+	 * greater than messageOffset:
+	 *
+	 * XK: Message 1: 32; message 2: 32; message 3: 48
+	 *
+	 * IK: Message 1: 80; message 2: 48
+	 *
+	 * N: Message 1: 32
+	 *
 	 * @param message The buffer that will be populated with the
 	 * handshake packet to be written to the transport.
 	 * @param messageOffset First offset within the message buffer
@@ -679,7 +708,10 @@ public class HandshakeState implements Destroyable, Cloneable {
 
 	/**
 	 * Reads a message payload during the handshake.
-	 * 
+	 *
+	 * Payload (plaintext) and message (encrypted) may be in the same buffer
+	 * and have the same offset.
+	 *
 	 * @param message Buffer containing the incoming handshake
 	 * that was read from the transport.
 	 * @param messageOffset Offset of the first message byte.

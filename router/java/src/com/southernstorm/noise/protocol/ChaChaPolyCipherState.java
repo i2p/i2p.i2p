@@ -114,10 +114,14 @@ public class ChaChaPolyCipherState implements CipherState {
 	
 	/**
 	 * Set up to encrypt or decrypt the next packet.
+	 * I2P add off/len
 	 * 
 	 * @param ad The associated data for the packet.
+	 * @param off offset
+	 * @param len length
+	 * @since 0.9.54 added off/len
 	 */
-	private void setup(byte[] ad)
+	private void setup(byte[] ad, int off, int len)
 	{
 		if (n == -1L)
 			throw new IllegalStateException("Nonce has wrapped around");
@@ -127,7 +131,7 @@ public class ChaChaPolyCipherState implements CipherState {
 		ChaChaCore.xorBlock(polyKey, 0, polyKey, 0, 32, output);
 		poly.reset(polyKey, 0);
 		if (ad != null) {
-			poly.update(ad, 0, ad.length);
+			poly.update(ad, off, len);
 			poly.pad();
 		}
 		if (++(input[12]) == 0)
@@ -155,14 +159,16 @@ public class ChaChaPolyCipherState implements CipherState {
 
 	/**
 	 * Finishes up the authentication tag for a packet.
-	 * 
-	 * @param ad The associated data.
+	 * I2P changed ad to adLength; ad data not used here
+	 *
+	 * @param adLength The length of the associated data, 0 if none.
 	 * @param length The length of the plaintext data.
+	 * @since 0.9.54 changed ad to adLength
 	 */
-	private void finish(byte[] ad, int length)
+	private void finish(int adLength, int length)
 	{
 		poly.pad();
-		putLittleEndian64(polyKey, 0, ad != null ? ad.length : 0);
+		putLittleEndian64(polyKey, 0, adLength);
 		putLittleEndian64(polyKey, 8, length);
 		poly.update(polyKey, 0, 16);
 		poly.finish(polyKey, 0);
@@ -195,7 +201,18 @@ public class ChaChaPolyCipherState implements CipherState {
 
 	@Override
 	public int encryptWithAd(byte[] ad, byte[] plaintext, int plaintextOffset,
-			byte[] ciphertext, int ciphertextOffset, int length) throws ShortBufferException {
+	                         byte[] ciphertext, int ciphertextOffset, int length) throws ShortBufferException {
+		return encryptWithAd(ad, 0, ad != null ? ad.length : 0, plaintext, plaintextOffset,
+		                     ciphertext, ciphertextOffset, length);
+	}
+
+	/**
+	 *  I2P
+	 *  @since 0.9.54
+	 */
+	@Override
+	public int encryptWithAd(byte[] ad, int adOffset, int adLength, byte[] plaintext, int plaintextOffset,
+	                         byte[] ciphertext, int ciphertextOffset, int length) throws ShortBufferException {
 		int space;
 		if (ciphertextOffset > ciphertext.length)
 			space = 0;
@@ -211,18 +228,30 @@ public class ChaChaPolyCipherState implements CipherState {
 		}
 		if (space < 16 || length > (space - 16))
 			throw new ShortBufferException();
-		setup(ad);
+		setup(ad, adOffset, adLength);
 		encrypt(plaintext, plaintextOffset, ciphertext, ciphertextOffset, length);
 		poly.update(ciphertext, ciphertextOffset, length);
-		finish(ad, length);
+		finish(adLength, length);
 		System.arraycopy(polyKey, 0, ciphertext, ciphertextOffset + length, 16);
 		return length + 16;
 	}
 
 	@Override
 	public int decryptWithAd(byte[] ad, byte[] ciphertext,
-			int ciphertextOffset, byte[] plaintext, int plaintextOffset,
-			int length) throws ShortBufferException, BadPaddingException {
+	                         int ciphertextOffset, byte[] plaintext, int plaintextOffset,
+	                         int length) throws ShortBufferException, BadPaddingException {
+		return decryptWithAd(ad, 0, ad != null ? ad.length : 0, ciphertext, ciphertextOffset,
+		                     plaintext, plaintextOffset, length);
+	}
+
+	/**
+	 *  I2P
+	 *  @since 0.9.54
+	 */
+	@Override
+	public int decryptWithAd(byte[] ad, int adOffset, int adLength, byte[] ciphertext,
+	                         int ciphertextOffset, byte[] plaintext, int plaintextOffset,
+	                         int length) throws ShortBufferException, BadPaddingException {
 		int space;
 		if (ciphertextOffset > ciphertext.length)
 			space = 0;
@@ -247,9 +276,9 @@ public class ChaChaPolyCipherState implements CipherState {
 		int dataLen = length - 16;
 		if (dataLen > space)
 			throw new ShortBufferException();
-		setup(ad);
+		setup(ad, adOffset, adLength);
 		poly.update(ciphertext, ciphertextOffset, dataLen);
-		finish(ad, dataLen);
+		finish(adLength, dataLen);
 		int temp = 0;
 		for (int index = 0; index < 16; ++index)
 			temp |= (polyKey[index] ^ ciphertext[ciphertextOffset + dataLen + index]);

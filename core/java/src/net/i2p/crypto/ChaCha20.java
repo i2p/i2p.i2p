@@ -47,6 +47,19 @@ public final class ChaCha20 {
     public static void encrypt(byte[] key, byte[] iv,
                                byte[] plaintext, int plaintextOffset,
                                byte[] ciphertext, int ciphertextOffset, int length) {
+        encrypt(key, iv, 0, ciphertext, ciphertextOffset, plaintext, plaintextOffset, length);
+    }
+
+    /**
+     * Encrypt from plaintext to ciphertext
+     *
+     * @param key first 32 bytes used as the key
+     * @param iv first 12 bytes starting at ivOffset used as the iv
+     * @since 0.9.54
+     */
+    public static void encrypt(byte[] key, byte[] iv, int ivOffset,
+                               byte[] plaintext, int plaintextOffset,
+                               byte[] ciphertext, int ciphertextOffset, int length) {
         int[] input = new int[16];
         int[] output = new int[16];
         ChaChaCore.initKey256(input, key, 0);
@@ -61,9 +74,9 @@ public final class ChaCha20 {
         // bits.
         //ChaChaCore.initIV(input, iv, counter);
         //ChaChaCore.initIV(input, iv[4:11], iv[0:3]);
-        input[13] = (int) DataHelper.fromLongLE(iv, 0, 4);
-        input[14] = (int) DataHelper.fromLongLE(iv, 4, 4);
-        input[15] = (int) DataHelper.fromLongLE(iv, 8, 4);
+        input[13] = (int) DataHelper.fromLongLE(iv, ivOffset, 4);
+        input[14] = (int) DataHelper.fromLongLE(iv, ivOffset + 4, 4);
+        input[15] = (int) DataHelper.fromLongLE(iv, ivOffset + 8, 4);
         //System.out.println("initIV");
         //dumpBlock(input);
         ChaChaCore.hash(output, input);
@@ -96,7 +109,21 @@ public final class ChaCha20 {
                                byte[] ciphertext, int ciphertextOffset,
                                byte[] plaintext, int plaintextOffset, int length) {
         // it's symmetric!
-        encrypt(key, iv, ciphertext, ciphertextOffset, plaintext, plaintextOffset, length);
+        encrypt(key, iv, 0, ciphertext, ciphertextOffset, plaintext, plaintextOffset, length);
+    }
+
+    /**
+     * Encrypt from ciphertext to plaintext
+     *
+     * @param key first 32 bytes used as the key
+     * @param iv first 12 bytes starting at ivOffset used as the iv
+     * @since 0.9.54
+     */
+    public static void decrypt(byte[] key, byte[] iv, int ivOffset,
+                               byte[] ciphertext, int ciphertextOffset,
+                               byte[] plaintext, int plaintextOffset, int length) {
+        // it's symmetric!
+        encrypt(key, iv, ivOffset, ciphertext, ciphertextOffset, plaintext, plaintextOffset, length);
     }
 
 /****

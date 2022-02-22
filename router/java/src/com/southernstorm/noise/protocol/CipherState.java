@@ -110,6 +110,13 @@ public interface CipherState extends Destroyable, Cloneable {
 	int encryptWithAd(byte[] ad, byte[] plaintext, int plaintextOffset, byte[] ciphertext, int ciphertextOffset, int length) throws ShortBufferException;
 
 	/**
+	 *  I2P
+	 *  @since 0.9.54
+	 */
+	public int encryptWithAd(byte[] ad, int adOffset, int adLength, byte[] plaintext, int plaintextOffset,
+	                         byte[] ciphertext, int ciphertextOffset, int length) throws ShortBufferException;
+
+	/**
 	 * Decrypts a ciphertext buffer using the cipher and a block of associated data.
 	 * 
 	 * @param ad The associated data, or null if there is none.
@@ -135,6 +142,14 @@ public interface CipherState extends Destroyable, Cloneable {
 	 * plaintextOffset.
 	 */
 	int decryptWithAd(byte[] ad, byte[] ciphertext, int ciphertextOffset, byte[] plaintext, int plaintextOffset, int length) throws ShortBufferException, BadPaddingException;
+
+	/**
+	 *  I2P
+	 *  @since 0.9.54
+	 */
+	public int decryptWithAd(byte[] ad, int adOffset, int adLength, byte[] ciphertext,
+	                         int ciphertextOffset, byte[] plaintext, int plaintextOffset,
+	                         int length) throws ShortBufferException, BadPaddingException;
 
 	/**
 	 * Creates a new instance of this cipher and initializes it with a key.
