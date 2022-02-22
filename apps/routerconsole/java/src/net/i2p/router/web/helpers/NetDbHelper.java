@@ -410,6 +410,7 @@ public class NetDbHelper extends FormHandler {
                    "<option value=\"NTCP\">NTCP</option>\n" +
                    "<option value=\"NTCP2\">NTCP2</option>\n" +
                    "<option value=\"SSU\">SSU</option>\n" +
+                   "<option value=\"SSU2\">SSU2</option>\n" +
                    "</select></td><td></td></tr>\n" +
                    "<tr><td>Transport Capabilities:</td><td><input type=\"text\" name=\"ssucaps\"></td><td></td></tr>\n" +
                    "<tr><td>Router Version:</td><td><input type=\"text\" name=\"v\"></td><td></td></tr>\n" +
