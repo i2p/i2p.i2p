@@ -59,7 +59,6 @@
         <!-- <echo message="  syndie:    generate a standalone syndie install" /> -->
         <echo message="  desktopgui: generate a standalone desktopgui install" />
         <echo message="  i2psnark:  generate a standalone i2psnark install" />
-        <echo message="  justBOB:  generate a standalone BOB-one.jar" />
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc and ./javadoc.zip" />
         <echo message="  javadoc-test: Javadocs for unit test classes (build/javadoc-test)" />
         <echo message="  slackpkg:  generate Slackware package in ./Slackware/i2p" />
@@ -310,11 +309,6 @@
             <arg value="+%s" />
         </exec>
         <echo message="Epoch is: ${epoch}" />
-    </target>
-
-    <target name="buildBOB" depends="buildMinistreaming" >
-        <ant dir="apps/BOB/" target="jar" />
-        <copy file="apps/BOB/dist/BOB.jar" todir="build/" />
     </target>
 
     <target name="buildSAM" depends="buildMinistreaming" >
@@ -1136,7 +1130,6 @@
         <delete dir="installer/lib/izpack5/patches/java/build" quiet="true" />
         <delete file="syndie-standalone.zip" failonerror="false" quiet="true" />
         <delete file="i2psnark-standalone.zip" failonerror="false" quiet="true" />
-        <delete file="BOB-one.jar" failonerror="false" quiet="true" />
         <delete file="core/java/cobertura.ser"/>
         <delete file="javadoc.zip" />
         <delete file="i2p.fba" />
@@ -1159,7 +1152,6 @@
         <ant dir="apps/streaming/java/" target="distclean" />
         <ant dir="apps/i2ptunnel/java/" target="distclean" />
         <ant dir="apps/sam/java/" target="distclean" />
-        <ant dir="apps/BOB" target="clean" />
         <ant dir="apps/desktopgui" target="clean" />
         <ant dir="apps/routerconsole/java/" target="distclean" />
         <ant dir="apps/addressbook/" target="distclean" />
@@ -1502,7 +1494,7 @@
     <target name="preplicenses" depends="preplicenses-unlesspkg" >
         <copy file="LICENSE.txt" todir="pkg-temp/" />
         <copy todir="pkg-temp/licenses/" >
-          <fileset dir="licenses/" excludes="COPYING-BOB.txt" />
+          <fileset dir="licenses/" />
         </copy>
         <copy file="apps/imagegen/identicon/README.md" tofile="pkg-temp/licenses/LICENSE-Identicon.txt" />
         <copy file="apps/desktopgui/LICENSE" tofile="pkg-temp/licenses/LICENSE-DesktopGUI.txt" />
@@ -2147,10 +2139,6 @@
 
     <target name="slackpkg">
         <ant dir="Slackware/i2p/" target="slackpkg" />
-    </target>
-    <target name="justBOB" depends="builddepSmall, jbigi">
-        <ant dir="apps/BOB/" target="onejar" />
-        <copy file="apps/BOB/dist/BOB-one.jar" todir="." />
     </target>
 
     <target name="sloccount.report">

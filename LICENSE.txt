@@ -212,10 +212,6 @@ Applications:
        Copyright (c) 2006, Matthew Estes
        See licenses/LICENSE-BlockFile.txt
 
-   BOB (BOB.jar):
-   Copyright (C) sponge
-   See licenses/COPYING-BOB.txt
-
    Desktopgui (desktopgui.jar):
    Copyright (c) Mathias De Maré
    See licenses/LICENSE-DesktopGUI.txt
