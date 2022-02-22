@@ -56,16 +56,16 @@ final class SSU2Util {
 
 
     /** 3 byte block header + 9 byte I2NP header = 12 */
-    public static final int FULL_I2NP_HEADER_SIZE = SSU2Payload.BLOCK_HEADER_SIZE + 9;
+ //   public static final int FULL_I2NP_HEADER_SIZE = SSU2Payload.BLOCK_HEADER_SIZE + 9;
 
     /** 3 byte block header + 9 byte I2NP header = 12 */
-    public static final int FIRST_FRAGMENT_HEADER_SIZE = SSU2Payload.BLOCK_HEADER_SIZE + 9;
+ //   public static final int FIRST_FRAGMENT_HEADER_SIZE = SSU2Payload.BLOCK_HEADER_SIZE + 9;
 
     /** 3 byte block header + 4 byte msg ID + 1 byte fragment info = 8 */
-    public static final int FOLLOWON_FRAGMENT_HEADER_SIZE = SSU2Payload.BLOCK_HEADER_SIZE + 5;
+ //   public static final int FOLLOWON_FRAGMENT_HEADER_SIZE = SSU2Payload.BLOCK_HEADER_SIZE + 5;
 
     /** 16 byte block header + 2 + 12 = 30 */
-    public static final int DATA_HEADER_SIZE = SHORT_HEADER_SIZE + 2 + FULL_I2NP_HEADER_SIZE;
+ //   public static final int DATA_HEADER_SIZE = SHORT_HEADER_SIZE + 2 + FULL_I2NP_HEADER_SIZE;
 
     /**
      *  The message types, 0-10, as bytes
