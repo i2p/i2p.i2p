@@ -378,6 +378,11 @@ public class PeerState {
         _remoteHostId = new RemoteHostId(remoteIP, remotePort);
         _bwEstimator = new SimpleBandwidthEstimator(ctx, this);
     }
+    
+    /**
+     * @since 0.9.54
+     */
+    public int getVersion() { return 1; }
 
     /**
      *  Caller should sync; UDPTransport must remove and add to peersByRemoteHost map

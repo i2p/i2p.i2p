@@ -104,6 +104,11 @@ class OutboundMessageState implements CDPQEntry {
         _fragmentAcks = _numFragments < 64 ? mask(_numFragments) - 1L : -1L;
         _fragmentSends = (numFragments > 1) ? new byte[numFragments] : null;
     }
+    
+    /**
+     * @since 0.9.54
+     */
+    public int getVersion() { return _peer.getVersion(); }
 
     /**
      *  @param fragment 0-63

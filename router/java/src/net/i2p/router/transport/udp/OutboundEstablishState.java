@@ -151,6 +151,11 @@ class OutboundEstablishState {
         }
     }
     
+    /**
+     * @since 0.9.54
+     */
+    public int getVersion() { return 1; }
+    
     public synchronized OutboundState getState() { return _currentState; }
 
     /** @return if previously complete */
