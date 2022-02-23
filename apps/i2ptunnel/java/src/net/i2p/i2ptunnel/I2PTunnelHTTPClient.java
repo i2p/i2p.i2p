@@ -38,6 +38,7 @@ import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.i2ptunnel.localServer.LocalHTTPServer;
 import net.i2p.util.ConvertToHash;
+import net.i2p.util.DNSOverHTTPS;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
@@ -92,7 +93,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                          "\r\n";
     // ESR version of Firefox, same as Tor Browser
     private static final String UA_CLEARNET = "User-Agent: " +
-                                              "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0" +
+                                              DNSOverHTTPS.UA_CLEARNET +
                                               "\r\n";
     // overrides
     private static final String PROP_UA_I2P = "httpclient.userAgent.i2p";
