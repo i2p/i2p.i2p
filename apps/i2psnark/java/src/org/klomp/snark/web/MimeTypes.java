@@ -14,12 +14,19 @@
 
 package org.klomp.snark.web;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
+
+import net.i2p.data.DataHelper;
+import net.i2p.util.SystemVersion;
 
 
 /* ------------------------------------------------------------ */
@@ -47,6 +54,8 @@ class MimeTypes
 
     public MimeTypes() {
         _mimeMap = new ConcurrentHashMap<String, String>();
+        if (!(SystemVersion.isWindows() || SystemVersion.isMac() || SystemVersion.getMaxMemory() < 100*1024*1024L))
+            loadSystemMimeTypes();
     }
 
     /* ------------------------------------------------------------ */
@@ -83,6 +92,37 @@ class MimeTypes
             //System.out.println("Loaded " + map.size() + " mime types from " + resourcePath);
         } catch(MissingResourceException e) {
             //System.out.println("No mime types loaded from " + resourcePath);
+        }
+    }
+
+    /**
+     *  Load mime types from /etc/mime.types
+     *  Format: mimetype suffix1 suffix2 ...
+     *
+     *  @since 0.9.54
+     */
+    private void loadSystemMimeTypes() {
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(new InputStreamReader(new FileInputStream("/etc/mime.types"), "ISO-8859-1"));
+            while (true) {
+                String line = in.readLine();
+                if (line == null)
+                    break;
+                if (line.startsWith("#"))
+                    continue;
+                String[] s = DataHelper.split(line, "[ \t]+", 16);
+                if (s.length < 2)
+                    continue;
+                for (int i = 1; i < s.length; i++) {
+                    _mimeMap.put(s[i].toLowerCase(Locale.US), s[0]);
+                    //System.out.println("Mapping: '" + s[i] + "' -> '" + s[0] + "'");
+                }
+            }
+            //System.out.println("Loaded " + _mimeMap.size() + " mime types from /etc/mime.types");
+        } catch (IOException ioe) {
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
         }
     }
 

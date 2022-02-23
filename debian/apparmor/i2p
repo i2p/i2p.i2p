@@ -90,6 +90,9 @@
   @{PROC}/sys/net/ipv6/conf/all/temp_valid_lft            r,
   @{PROC}/sys/net/ipv6/conf/all/use_tempaddr              r,
 
+  # i2psnark
+  /etc/mime.types                                         r,
+
   # 'm' is needed by the I2P-Bote plugin
   /{,lib/live/mount/overlay/}tmp/                         rwm,
   owner /{,lib/live/mount/overlay/}tmp/hsperfdata_*/      rwk,
