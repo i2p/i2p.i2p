@@ -1,6 +1,8 @@
 To run i2psnark's standalone mode make sure you have an i2p router running in the background, then run:
 
-java -jar i2psnark.jar
+launch-i2psnark
+or
+launch-i2psnark.bat (Windows)
 
 I2PSnark web ui will be at http://127.0.0.1:8002/i2psnark/ 
 

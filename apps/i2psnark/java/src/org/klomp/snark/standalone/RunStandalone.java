@@ -66,8 +66,9 @@ public class RunStandalone {
     
     public void start() {
         try {
-            _jettyStart.startup();
             String url = "http://" + _host + ':' + _port + "/i2psnark/";
+            System.out.println("Starting i2psnark at " + url);
+            _jettyStart.startup();
             try {
                Thread.sleep(1000);
             } catch (InterruptedException ie) {}
