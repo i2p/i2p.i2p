@@ -28,8 +28,8 @@ import net.i2p.util.Log;
  * TODO do all these methods need to be synchronized?
  */
 class InboundEstablishState {
-    private final RouterContext _context;
-    private final Log _log;
+    protected final RouterContext _context;
+    protected final Log _log;
     // SessionRequest message
     private byte _receivedX[];
     private byte _bobIP[];
@@ -37,9 +37,9 @@ class InboundEstablishState {
     private final DHSessionKeyBuilder _keyBuilder;
     // SessionCreated message
     private byte _sentY[];
-    private final byte _aliceIP[];
-    private final int _alicePort;
-    private long _sentRelayTag;
+    protected final byte _aliceIP[];
+    protected final int _alicePort;
+    protected long _sentRelayTag;
     private long _sentSignedOnTime;
     private SessionKey _sessionKey;
     private SessionKey _macKey;
@@ -56,17 +56,17 @@ class InboundEstablishState {
     // general status 
     private final long _establishBegin;
     //private long _lastReceive;
-    private long _lastSend;
-    private long _nextSend;
+    protected long _lastSend;
+    protected long _nextSend;
     private final RemoteHostId _remoteHostId;
-    private InboundState _currentState;
+    protected InboundState _currentState;
     private final Queue<OutNetMessage> _queuedMessages;
     // count for backoff
-    private int _createdSentCount;
+    protected int _createdSentCount;
     // default true
-    private boolean _introductionRequested = true;
+    protected boolean _introductionRequested = true;
 
-    private int _rtt;
+    protected int _rtt;
     
     public enum InboundState {
         /** nothin known yet */
@@ -106,10 +106,10 @@ class InboundEstablishState {
      *  Transmissions at 0, 3, 9 sec
      *  Previously: 1500 (0, 1.5, 4.5, 10.5)
      */
-    private static final long RETRANSMIT_DELAY = 3000;
+    protected static final long RETRANSMIT_DELAY = 3000;
 
     /** max delay including backoff */
-    private static final long MAX_DELAY = 15*1000;
+    protected static final long MAX_DELAY = 15*1000;
 
     /**
      *  @param localPort Must be our external port, otherwise the signature of the
@@ -411,7 +411,7 @@ class InboundEstablishState {
      *  Have we fully received the SessionConfirmed messages from Alice?
      *  Caller must synch on this.
      */
-    private boolean confirmedFullyReceived() {
+    protected boolean confirmedFullyReceived() {
         if (_receivedIdentity != null) {
             for (int i = 0; i < _receivedIdentity.length; i++) {
                 if (_receivedIdentity[i] == null)
@@ -535,7 +535,7 @@ class InboundEstablishState {
     /**
      *  Call from synchronized method only
      */
-    private void packetReceived() {
+    protected void packetReceived() {
         _nextSend = _context.clock().now();
     }
     

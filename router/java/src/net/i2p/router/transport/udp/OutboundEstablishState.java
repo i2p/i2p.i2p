@@ -25,12 +25,12 @@ import net.i2p.util.Log;
  *
  */
 class OutboundEstablishState {
-    private final RouterContext _context;
-    private final Log _log;
+    protected final RouterContext _context;
+    protected final Log _log;
     // SessionRequest message
     private byte _sentX[];
-    private byte _bobIP[];
-    private int _bobPort;
+    protected byte _bobIP[];
+    protected int _bobPort;
     private final DHSessionKeyBuilder.Factory _keyFactory;
     private DHSessionKeyBuilder _keyBuilder;
     // SessionCreated message
@@ -53,14 +53,14 @@ class OutboundEstablishState {
     //private long _lastReceive;
     private long _lastSend;
     private long _nextSend;
-    private RemoteHostId _remoteHostId;
+    protected RemoteHostId _remoteHostId;
     private final RemoteHostId _claimedAddress;
     private final RouterIdentity _remotePeer;
     private final boolean _allowExtendedOptions;
     private final boolean _needIntroduction;
     private final SessionKey _introKey;
     private final Queue<OutNetMessage> _queuedMessages;
-    private OutboundState _currentState;
+    protected OutboundState _currentState;
     private long _introductionNonce;
     private boolean _isFirstMessageOurDSM;
     // intro
@@ -68,13 +68,13 @@ class OutboundEstablishState {
     private boolean _complete;
     // counts for backoff
     private int _confirmedSentCount;
-    private int _requestSentCount;
+    protected int _requestSentCount;
     private int _introSentCount;
     // Times for timeout
     private long _confirmedSentTime;
-    private long _requestSentTime;
+    protected long _requestSentTime;
     private long _introSentTime;
-    private int _rtt;
+    protected int _rtt;
     
     public enum OutboundState {
         /** nothin sent yet */
@@ -754,7 +754,7 @@ class OutboundEstablishState {
     /**
      *  Call from synchronized method only
      */
-    private void packetReceived() {
+    protected void packetReceived() {
         _nextSend = _context.clock().now();
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Got a packet, nextSend == now");
