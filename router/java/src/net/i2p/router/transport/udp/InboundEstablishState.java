@@ -1,6 +1,7 @@
 package net.i2p.router.transport.udp;
 
 import java.io.ByteArrayInputStream;
+import java.net.InetSocketAddress;
 import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -82,7 +83,23 @@ class InboundEstablishState {
         /** we are explicitly failing it */
         IB_STATE_FAILED,
         /** Successful completion, PeerState created and added to transport */
-        IB_STATE_COMPLETE
+        IB_STATE_COMPLETE,
+
+        /**
+         * SSU2: We have received a token request
+         * @since 0.9.54
+         */
+        IB_STATE_TOKEN_REQUEST_RECEIVED,
+        /**
+         * SSU2: We have received a request but the token is bad
+         * @since 0.9.54
+         */
+        IB_STATE_REQUEST_BAD_TOKEN_RECEIVED,
+        /**
+         * SSU2: We have sent a retry
+         * @since 0.9.54
+         */
+        IB_STATE_RETRY_SENT,
     }
     
     /** basic delay before backoff
@@ -111,6 +128,24 @@ class InboundEstablishState {
         _keyBuilder = dh;
         _queuedMessages = new LinkedBlockingQueue<OutNetMessage>();
         receiveSessionRequest(req);
+    }
+
+    /**
+     *  For SSU2
+     *
+     *  @since 0.9.54
+     */
+    protected InboundEstablishState(RouterContext ctx, InetSocketAddress addr) {
+        _context = ctx;
+        _log = ctx.logManager().getLog(getClass());
+        _aliceIP = addr.getAddress().getAddress();
+        _alicePort = addr.getPort();
+        _remoteHostId = new RemoteHostId(_aliceIP, _alicePort);
+        _bobPort = 0;
+        _currentState = InboundState.IB_STATE_UNKNOWN;
+        _establishBegin = ctx.clock().now();
+        _keyBuilder = null;
+        _queuedMessages = new LinkedBlockingQueue<OutNetMessage>();
     }
     
     /**

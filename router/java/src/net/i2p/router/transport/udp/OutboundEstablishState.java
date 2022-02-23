@@ -92,7 +92,23 @@ class OutboundEstablishState {
         /** RelayResponse received */
         OB_STATE_INTRODUCED,
         /** SessionConfirmed failed validation */
-        OB_STATE_VALIDATION_FAILED
+        OB_STATE_VALIDATION_FAILED,
+
+        /**
+         * SSU2: We have sent a token request
+         * @since 0.9.54
+         */
+        OB_STATE_TOKEN_REQUEST_SENT,
+        /**
+         * SSU2: We have received a retry
+         * @since 0.9.54
+         */
+        OB_STATE_RETRY_RECEIVED,
+        /**
+         * SSU2: We have sent a second token request with a new token
+         * @since 0.9.54
+         */
+        OB_STATE_REQUEST_SENT_NEW_TOKEN
     }
     
     /** basic delay before backoff
@@ -142,6 +158,45 @@ class OutboundEstablishState {
         _remoteAddress = addr;
         _introductionNonce = -1;
         _keyFactory = dh;
+        if (addr.getIntroducerCount() > 0) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("new outbound establish to " + remotePeer.calculateHash() + ", with address: " + addr);
+            _currentState = OutboundState.OB_STATE_PENDING_INTRO;
+        } else {
+            _currentState = OutboundState.OB_STATE_UNKNOWN;
+        }
+    }
+    
+    /**
+     *  For SSU2
+     *
+     *  @since 0.9.54
+     */
+    public OutboundEstablishState(RouterContext ctx, RemoteHostId claimedAddress,
+                                  RemoteHostId remoteHostId,
+                                  RouterIdentity remotePeer,
+                                  boolean needIntroduction,
+                                  SessionKey introKey, UDPAddress addr) {
+        _context = ctx;
+        _log = ctx.logManager().getLog(getClass());
+        if (claimedAddress != null) {
+            _bobIP = claimedAddress.getIP();
+            _bobPort = claimedAddress.getPort();
+        } else {
+            //_bobIP = null;
+            _bobPort = -1;
+        }
+        _claimedAddress = claimedAddress;
+        _remoteHostId = remoteHostId;
+        _allowExtendedOptions = false;
+        _needIntroduction = needIntroduction;
+        _remotePeer = remotePeer;
+        _introKey = introKey;
+        _queuedMessages = new LinkedBlockingQueue<OutNetMessage>();
+        _establishBegin = ctx.clock().now();
+        _remoteAddress = addr;
+        _introductionNonce = -1;
+        _keyFactory = null;
         if (addr.getIntroducerCount() > 0) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("new outbound establish to " + remotePeer.calculateHash() + ", with address: " + addr);

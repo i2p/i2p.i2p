@@ -1,6 +1,7 @@
 package net.i2p.router.transport.udp;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -376,6 +377,61 @@ public class PeerState {
         _remotePeer = remotePeer;
         _isInbound = isInbound;
         _remoteHostId = new RemoteHostId(remoteIP, remotePort);
+        _bwEstimator = new SimpleBandwidthEstimator(ctx, this);
+    }
+
+    /**
+     *  For SSU2
+     *
+     *  @since 0.9.54
+     */
+    protected PeerState(RouterContext ctx, UDPTransport transport,
+                        InetSocketAddress addr, Hash remotePeer, boolean isInbound, int rtt) {
+        _context = ctx;
+        _log = ctx.logManager().getLog(getClass());
+        _transport = transport;
+        long now = ctx.clock().now();
+        _keyEstablishedTime = now;
+        _lastSendTime = now;
+        _lastReceiveTime = now;
+        _currentACKs = new ConcurrentHashSet<Long>();
+        _currentACKsResend = new LinkedBlockingQueue<ResendACK>();
+        _slowStartThreshold = MAX_SEND_WINDOW_BYTES/2;
+        _receivePeriodBegin = now;
+        _remoteIP = addr.getAddress().getAddress();
+        _remotePort = addr.getPort();
+        if (_remoteIP.length == 4) {
+            _mtu = DEFAULT_MTU;
+            _mtuReceive = DEFAULT_MTU;
+            _largeMTU = transport.getMTU(false);
+        } else {
+            _mtu = MIN_IPV6_MTU;
+            _mtuReceive = MIN_IPV6_MTU;
+            _largeMTU = transport.getMTU(true);
+        }
+        // RFC 5681 sec. 3.1
+        if (_mtu > 1095)
+            _sendWindowBytes = 3 * _mtu;
+        else
+            _sendWindowBytes = 4 * _mtu;
+        _sendWindowBytesRemaining = _sendWindowBytes;
+
+        _lastACKSend = -1;
+
+        _rto = INIT_RTO;
+        _rtt = INIT_RTT;
+        if (rtt > 0)
+            recalculateTimeouts(rtt);
+        else
+            _rttDeviation = _rtt;
+
+        _inboundMessages = new HashMap<Long, InboundMessageState>(8);
+        _outboundMessages = new CachedIteratorCollection<OutboundMessageState>();
+        _outboundQueue = new PriBlockingQueue<OutboundMessageState>(ctx, "UDP-PeerState", 32);
+        _ackedMessages = new AckedMessages();
+        _remotePeer = remotePeer;
+        _isInbound = isInbound;
+        _remoteHostId = new RemoteHostId(_remoteIP, _remotePort);
         _bwEstimator = new SimpleBandwidthEstimator(ctx, this);
     }
     
