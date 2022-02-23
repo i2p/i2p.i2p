@@ -87,11 +87,18 @@ class OutboundMessageState implements CDPQEntry {
         //_expiration = msg.getExpiration();
 
         // now "fragment" it
-        int totalSize = _i2npMessage.getRawMessageSize();
+        int totalSize;
+        if (_peer.getVersion() == 2)
+            totalSize = _i2npMessage.getMessageSize() - 7;  // NTCP2 style, 9 byte header
+        else
+            totalSize = _i2npMessage.getRawMessageSize();
         if (totalSize > MAX_MSG_SIZE)
             throw new IllegalArgumentException("Size too large! " + totalSize);
         _messageBuf = new byte[totalSize];
-        _i2npMessage.toRawByteArray(_messageBuf);
+        if (_peer.getVersion() == 2)
+            _i2npMessage.toRawByteArrayNTCP2(_messageBuf, 0);  // NTCP2 style, 9 byte header
+        else
+            _i2npMessage.toRawByteArray(_messageBuf);
         _fragmentSize = _peer.fragmentSize();
         int numFragments = totalSize / _fragmentSize;
         if (numFragments * _fragmentSize < totalSize)

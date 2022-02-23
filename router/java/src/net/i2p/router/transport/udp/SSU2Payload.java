@@ -393,11 +393,10 @@ class SSU2Payload {
         }
     }
 
-/*
     public static class I2NPBlock extends Block {
-        private final OutboundMessageState2 m;
+        private final OutboundMessageState m;
 
-        public I2NPBlock(OutboundMessageState2 msg) {
+        public I2NPBlock(OutboundMessageState msg) {
             super(BLOCK_I2NP);
             m = msg;
         }
@@ -412,16 +411,14 @@ class SSU2Payload {
             return off + m.writeFragment(tgt, off, 0);
         }
     }
-*/
 
     /**
      *  Same format as I2NPBlock
      */
-/*
     public static class FirstFragBlock extends Block {
-        private final OutboundMessageState2 m;
+        private final OutboundMessageState m;
 
-        public FirstFragBlock(OutboundMessageState2 msg) {
+        public FirstFragBlock(OutboundMessageState msg) {
             super(BLOCK_FIRSTFRAG);
             m = msg;
         }
@@ -436,17 +433,15 @@ class SSU2Payload {
             return off + m.writeFragment(tgt, off, 0);
         }
     }
-*/
 
     /**
      *
      */
-/*
     public static class FollowFragBlock extends Block {
-        private final OutboundMessageState2 m;
+        private final OutboundMessageState m;
         private final int f;
 
-        public FollowFragBlock(OutboundMessageState2 msg, int frag) {
+        public FollowFragBlock(OutboundMessageState msg, int frag) {
             super(BLOCK_FOLLOWONFRAG);
             if (frag <= 0)
                 throw new IllegalArgumentException();
@@ -468,7 +463,6 @@ class SSU2Payload {
             return off + m.writeFragment(tgt, off, 0);
         }
     }
-*/
 
     public static class PaddingBlock extends Block {
         private final int sz;
