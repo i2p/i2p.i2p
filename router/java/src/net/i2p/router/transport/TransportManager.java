@@ -260,7 +260,7 @@ public class TransportManager implements TransportEventListener {
         Transport udp = null;
         if (_enableUDP) {
             X25519KeyFactory xdh = _context.getBooleanProperty(PROP_ENABLE_SSU2) ? _xdhThread : null;
-            udp = new UDPTransport(_context, _dhThread, _xdhThread);
+            udp = new UDPTransport(_context, _dhThread, xdh);
             addTransport(udp);
             initializeAddress(udp);
         }
