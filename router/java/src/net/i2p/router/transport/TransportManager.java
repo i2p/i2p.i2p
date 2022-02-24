@@ -83,6 +83,10 @@ public class TransportManager implements TransportEventListener {
 
     /** default true */
     public final static String PROP_ENABLE_UDP = "i2np.udp.enable";
+    /**
+     * @since 0.9.54
+     */
+    public final static String PROP_ENABLE_SSU2 = "i2np.ssu2.enable";
     /** default true */
     public final static String PROP_ENABLE_NTCP = "i2np.ntcp.enable";
     /** default true */
@@ -255,7 +259,8 @@ public class TransportManager implements TransportEventListener {
     private void configTransports() {
         Transport udp = null;
         if (_enableUDP) {
-            udp = new UDPTransport(_context, _dhThread);
+            X25519KeyFactory xdh = _context.getBooleanProperty(PROP_ENABLE_SSU2) ? _xdhThread : null;
+            udp = new UDPTransport(_context, _dhThread, _xdhThread);
             addTransport(udp);
             initializeAddress(udp);
         }
