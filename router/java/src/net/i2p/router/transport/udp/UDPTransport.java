@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ConcurrentHashMap;
@@ -137,6 +138,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private RouterAddress _currentOurV6Address;
 
     // SSU2
+    public static final String STYLE2 = "SSU2";
+    static final int SSU2_INT_VERSION = 2;
+    /** "2" */
+    static final String SSU2_VERSION = Integer.toString(SSU2_INT_VERSION);
     private final boolean _enableSSU1;
     private final boolean _enableSSU2;
     private final PacketBuilder2 _packetBuilder2;
@@ -890,6 +895,24 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     byte[] getSSU2StaticPrivKey() {
         return _ssu2StaticPrivKey;
+    }
+
+    /**
+     * Add the required options to the properties for a SSU2 address.
+     * Host/port must already be set in props if they are going to be.
+     * Must only be called if SSU2 is enabled.
+     *
+     * @since 0.9.54
+     */
+    private void addSSU2Options(Properties props) {
+        // only set i if we are not firewalled
+        if (props.containsKey("host")) {
+            props.setProperty("i", _ssu2B64StaticIntroKey);
+        } else {
+            props.remove("i");
+        }
+        props.setProperty("s", _ssu2B64StaticPubKey);
+        props.setProperty("v", SSU2_VERSION);
     }
 
     /**
@@ -2633,6 +2656,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             else
                 caps = CAP_IPV4;
             options.setProperty(UDPAddress.PROP_CAPACITY, caps);
+            if (_enableSSU2)
+                addSSU2Options(options);
             RouterAddress current = getCurrentAddress(false);
             RouterAddress addr = new RouterAddress(STYLE, options, SSU_OUTBOUND_COST);
             if (!addr.deepEquals(current)) {
@@ -2733,6 +2758,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 else if (config == IPV6_NOT_PREFERRED)
                     cost++;
             }
+            if (_enableSSU2)
+                addSSU2Options(options);
             RouterAddress addr = new RouterAddress(STYLE, options, cost);
 
             RouterAddress current = getCurrentAddress(isIPv6);
@@ -2763,6 +2790,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     // Also make an empty "6" address
                     OrderedProperties opts = new OrderedProperties(); 
                     opts.setProperty(UDPAddress.PROP_CAPACITY, CAP_IPV6);
+                    if (_enableSSU2)
+                        addSSU2Options(opts);
                     RouterAddress addr6 = new RouterAddress(STYLE, opts, SSU_OUTBOUND_COST);
                     replaceAddress(addr6);
                 }
