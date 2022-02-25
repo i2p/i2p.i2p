@@ -85,6 +85,7 @@ public class Analysis extends JobImpl implements RouterApp {
     private static final double POINTS_US24 = 20.0;
     private static final double POINTS_US16 = 10.0;
     private static final double POINTS_FAMILY = -10.0;
+    private static final double POINTS_FAMILY_VERIFIED = POINTS_FAMILY * 2;
     private static final double POINTS_NONFF = -5.0;
     private static final double POINTS_BAD_OUR_FAMILY = 100.0;
     private static final double POINTS_OUR_FAMILY = -100.0;
@@ -722,43 +723,64 @@ public class Analysis extends JobImpl implements RouterApp {
     }
 
     /**
+     *  @return map of family name to list of routers in that family
      *  @since 0.9.38 split out from renderIPGroupsFamily()
      */
     public Map<String, List<RouterInfo>> calculateIPGroupsFamily(List<RouterInfo> ris, Map<Hash, Points> points) {
-        ObjectCounter<String> oc = new ObjectCounter<String>();
+        Map<String, List<RouterInfo>> rv = new HashMap<String, List<RouterInfo>>();
         for (RouterInfo info : ris) {
             String fam = info.getOption("family");
             if (fam == null)
                 continue;
-            oc.increment(fam);
+            List<RouterInfo> fris = rv.get(fam);
+            if (fris == null) {
+                fris = new ArrayList<RouterInfo>(4);
+                rv.put(fam, fris);
+            }
+            fris.add(info);
         }
-        List<String> foo = new ArrayList<String>(oc.objects());
-        Map<String, List<RouterInfo>> rv = new HashMap<String, List<RouterInfo>>(foo.size());
         FamilyKeyCrypto fkc = _context.router().getFamilyKeyCrypto();
         String ourFamily = fkc != null ? fkc.getOurFamilyName() : null;
-        for (String s : foo) {
-            int count = oc.count(s);
-            List<RouterInfo> list = new ArrayList<RouterInfo>(count);
-            rv.put(s, list);
+        for (Map.Entry<String, List<RouterInfo>> e : rv.entrySet()) {
+            String s = e.getKey();
+            List<RouterInfo> list = e.getValue();
+            int count = list.size();
             String ss = DataHelper.escapeHTML(s);
-            for (RouterInfo info : ris) {
-                String fam = info.getOption("family");
-                if (fam == null)
-                    continue;
-                if (!fam.equals(s))
-                    continue;
-                list.add(info);
-                double point = POINTS_FAMILY;
-                if (fkc != null && s.equals(ourFamily)) {
-                    if (fkc.verifyOurFamily(info))
-                        addPoints(points, info.getHash(), POINTS_OUR_FAMILY, "Our family \"" + ss + "\" with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
-                    else
-                        addPoints(points, info.getHash(), POINTS_BAD_OUR_FAMILY, "Spoofed our family \"" + ss + "\" with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
+            for (RouterInfo info : list) {
+                double point;
+                String reason;
+                if (fkc != null) {
+                    if (s.equals(ourFamily)) {
+                        if (fkc.verifyOurFamily(info)) {
+                            point = POINTS_OUR_FAMILY;
+                            reason = "Our family \"" + ss + "\" with <a href=\"/netdb?fam=" + ss + "&amp;sybil\">" + (count - 1) + " other" + (( count > 2) ? "s" : "") + "</a>";
+                        } else {
+                            point = POINTS_BAD_OUR_FAMILY;
+                            reason = "Spoofed our family \"" + ss + "\" with <a href=\"/netdb?fam=" + ss + "&amp;sybil\">" + (count - 1) + " other" + (( count > 2) ? "s" : "") + "</a>";
+                        }
+                    } else {
+                        if (fkc.verify(info)) {
+                            point = POINTS_FAMILY_VERIFIED;
+                            if (count > 1)
+                                reason = "In verified family \"" + ss + "\" with <a href=\"/netdb?fam=" + ss + "&amp;sybil\">" + (count - 1) + " other" + (( count > 2) ? "s" : "") + "</a>";
+                            else
+                                reason = "In verified family \"" + ss + '"';
+                        } else {
+                            point = POINTS_FAMILY;
+                            if (count > 1)
+                                reason = "In unverified family \"" + ss + "\" with <a href=\"/netdb?fam=" + ss + "&amp;sybil\">" + (count - 1) + " other" + (( count > 2) ? "s" : "") + "</a>";
+                            else
+                                reason = "In unverified family \"" + ss + '"';
+                        }
+                    }
                 } else if (count > 1) {
-                    addPoints(points, info.getHash(), point, "In family \"" + ss + "\" with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
+                    point = POINTS_FAMILY;
+                    reason = "In unverified family \"" + ss + "\" with <a href=\"/netdb?fam=" + ss + "&amp;sybil\">" + (count - 1) + " other" + (( count > 2) ? "s" : "") + "</a>";
                 } else {
-                    addPoints(points, info.getHash(), point, "In family \"" + ss + '"');
+                    point = POINTS_FAMILY;
+                    reason = "In unverified family \"" + ss + '"';
                 }
+                addPoints(points, info.getHash(), point, reason);
             }
         }
         return rv;
