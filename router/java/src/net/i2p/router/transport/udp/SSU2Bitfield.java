@@ -59,9 +59,10 @@ public class SSU2Bitfield {
      * the offset shifts up and the lowest set bits are lost.
      *
      * @throws IndexOutOfBoundsException if bit is smaller then zero
+     *                                   OR if the shift is too big
      * @return previous value, true if previously set or unknown
      */
-    public boolean set(long bit) {
+    public boolean set(long bit) throws IndexOutOfBoundsException {
         if (bit < 0)
             throw new IndexOutOfBoundsException(Long.toString(bit));
         boolean rv;

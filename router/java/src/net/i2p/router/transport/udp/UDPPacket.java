@@ -316,6 +316,9 @@ class UDPPacket implements CDPQEntry {
      * Decrypt this valid packet, overwriting the _data buffer's payload
      * with the decrypted data (leaving the MAC and IV unaltered)
      * 
+     * SSU 1 only.
+     * SSU 2 decryption is in PacketHandler.
+     * 
      */
     public synchronized void decrypt(SessionKey cipherKey) {
         verifyNotReleased(); 

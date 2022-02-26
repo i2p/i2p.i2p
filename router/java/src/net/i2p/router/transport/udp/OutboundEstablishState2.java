@@ -211,6 +211,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     // end payload callbacks
     /////////////////////////////////////////////////////////
     
+    @Override
+    public int getVersion() { return 2; }
     public long getSendConnID() { return _sendConnID; }
     public long getRcvConnID() { return _rcvConnID; }
     public long getToken() { return _token; }

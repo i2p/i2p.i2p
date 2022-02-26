@@ -40,6 +40,7 @@ class PacketHandler {
     private final Map<RemoteHostId, Object> _failCache;
     private final BlockingQueue<UDPPacket> _inboundQueue;
     private static final Object DUMMY = new Object();
+    private final boolean _enableSSU2;
     
     private static final int TYPE_POISON = -99999;
     private static final int MIN_QUEUE_SIZE = 16;
@@ -56,11 +57,12 @@ class PacketHandler {
     
     private enum AuthType { NONE, INTRO, BOBINTRO, SESSION }
 
-    PacketHandler(RouterContext ctx, UDPTransport transport, EstablishmentManager establisher,
+    PacketHandler(RouterContext ctx, UDPTransport transport, boolean enableSSU2, EstablishmentManager establisher,
                   InboundMessageFragments inbound, PeerTestManager testManager, IntroductionManager introManager) {
         _context = ctx;
         _log = ctx.logManager().getLog(PacketHandler.class);
         _transport = transport;
+        _enableSSU2 = enableSSU2;
         _establisher = establisher;
         _inbound = inbound;
         _testManager = testManager;
@@ -222,8 +224,8 @@ class PacketHandler {
          * Classify the packet by source IP/port, into 4 groups:
          *<ol>
          *<li>Established session
-         *<li>Pending inbound establishement
-         *<li>Pending outbound establishement
+         *<li>Pending inbound establishment
+         *<li>Pending outbound establishment
          *<li>No established or pending session found
          *</ol>
          */
@@ -238,7 +240,10 @@ class PacketHandler {
                     // Group 2: Inbound Establishment
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Packet received IS for an inbound establishment");
-                    receivePacket(reader, packet, est);
+                    if (est.getVersion() == 2)
+                        receiveSSU2Packet(packet, (InboundEstablishState2) est);
+                    else
+                        receivePacket(reader, packet, est);
                 } else {
                     //if (_log.shouldLog(Log.DEBUG))
                     //    _log.debug("Packet received is not for an inbound establishment");
@@ -247,7 +252,10 @@ class PacketHandler {
                         // Group 3: Outbound Establishment
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Packet received IS for an outbound establishment");
-                        receivePacket(reader, packet, oest);
+                        if (oest.getVersion() == 2)
+                            receiveSSU2Packet(packet, (OutboundEstablishState2) oest);
+                        else
+                            receivePacket(reader, packet, oest);
                     } else {
                         // Group 4: New conn or needs fallback
                         if (_log.shouldLog(Log.DEBUG))
@@ -259,9 +267,12 @@ class PacketHandler {
                 }
             } else {
                 // Group 1: Established
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Packet received IS for an existing peer");
-                receivePacket(reader, packet, state);
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Packet received IS for an existing peer");
+                if (state.getVersion() == 2)
+                    receiveSSU2Packet(packet, (PeerState2) state);
+                else
+                    receivePacket(reader, packet, state);
             }
         }
 
@@ -520,6 +531,8 @@ class PacketHandler {
          * and send it to one of four places: The EstablishmentManager, IntroductionManager,
          * PeerTestManager, or InboundMessageFragments.
          *
+         * SSU1 only.
+         *
          * @param state non-null if fully established
          * @param outState non-null if outbound establishing in process
          * @param inState unused always null, TODO use for 48-byte destroys during inbound establishment
@@ -742,6 +755,50 @@ class PacketHandler {
             }
         }
     }
+
+    //// Begin SSU2 Handling ////
+
+    /**
+     *  Hand off to the state for processing.
+     *  Packet is decrypted in-place, no fallback
+     *  processing is possible.
+     *
+     *  @param state must be version 2
+     *  @since 0.9.54
+     */
+    private void receiveSSU2Packet(UDPPacket packet, PeerState2 state) {
+        state.receivePacket(packet);
+    }
+
+    /**
+     *  Hand off to the state for processing.
+     *  Packet is decrypted in-place, no fallback
+     *  processing is possible.
+     *
+     *  @param state must be version 2
+     *  @since 0.9.54
+     */
+    private void receiveSSU2Packet(UDPPacket packet, InboundEstablishState2 state) {
+
+
+    }
+
+    /**
+     *  Hand off to the state for processing.
+     *  Packet is decrypted in-place, no fallback
+     *  processing is possible.
+     *
+     *  @param state must be version 2
+     *  @since 0.9.54
+     */
+    private void receiveSSU2Packet(UDPPacket packet, OutboundEstablishState2 state) {
+
+
+    }
+
+
+    //// End SSU2 Handling ////
+
 
     /**
      *  Mark a string for extraction by xgettext and translation.

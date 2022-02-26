@@ -1,14 +1,22 @@
 package net.i2p.router.transport.udp;
 
+import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
+import java.security.GeneralSecurityException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.southernstorm.noise.protocol.CipherState;
+
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SessionKey;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.RouterContext;
+import static net.i2p.router.transport.udp.SSU2Util.*;
+import net.i2p.util.HexDump;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleTimer2;
 
 /**
  * Contain all of the state about a UDP connection to a peer.
@@ -20,17 +28,18 @@ import net.i2p.util.SimpleTimer2;
  *
  * @since 0.9.54
  */
-public class PeerState2 extends PeerState {
+public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback {
     private final long _sendConnID;
     private final long _rcvConnID;
     private final AtomicInteger _packetNumber = new AtomicInteger();
-    private final byte[] _sendEncryptKey;
-    private final byte[] _rcvEncryptKey;
+    private final CipherState _sendCha;
+    private final CipherState _rcvCha;
     private final byte[] _sendHeaderEncryptKey1;
     private final byte[] _rcvHeaderEncryptKey1;
     private final byte[] _sendHeaderEncryptKey2;
     private final byte[] _rcvHeaderEncryptKey2;
     private final SSU2Bitfield _receivedMessages;
+    private final SSU2Bitfield _sentMessages;
 
     public static final int MIN_MTU = 1280;
 
@@ -39,30 +48,146 @@ public class PeerState2 extends PeerState {
      */
     public PeerState2(RouterContext ctx, UDPTransport transport,
                      InetSocketAddress remoteAddress, Hash remotePeer, boolean isInbound, int rtt,
-                     byte[] sendKey, byte[] rcvKey, long sendID, long rcvID,
+                     CipherState sendCha, CipherState rcvCha, long sendID, long rcvID,
                      byte[] sendHdrKey1, byte[] sendHdrKey2, byte[] rcvHdrKey2) {
         super(ctx, transport, remoteAddress, remotePeer, isInbound, rtt);
         _sendConnID = sendID;
         _rcvConnID = rcvID;
-        _sendEncryptKey = sendKey;
-        _rcvEncryptKey = rcvKey;
+        _sendCha = sendCha;
+        _rcvCha = rcvCha;
         _sendHeaderEncryptKey1 = sendHdrKey1;
         _rcvHeaderEncryptKey1 = transport.getSSU2StaticIntroKey();
         _sendHeaderEncryptKey2 = sendHdrKey2;
         _rcvHeaderEncryptKey2 = rcvHdrKey2;
         _receivedMessages = new SSU2Bitfield(256, 0);
+        _sentMessages = new SSU2Bitfield(256, 0);
     }
 
-    // SSU2
+    @Override
+    public int getVersion() { return 2; }
     long getNextPacketNumber() { return _packetNumber.incrementAndGet(); }
-    public long getSendConnID() { return _sendConnID; }
-    public long getRcvConnID() { return _rcvConnID; }
-    public byte[] getSendEncryptKey() { return _sendEncryptKey; }
-    public byte[] getRcvEncryptKey() { return _rcvEncryptKey; }
-    public byte[] getSendHeaderEncryptKey1() { return _sendHeaderEncryptKey1; }
-    public byte[] getRcvHeaderEncryptKey1() { return _rcvHeaderEncryptKey1; }
-    public byte[] getSendHeaderEncryptKey2() { return _sendHeaderEncryptKey2; }
-    public byte[] getRcvHeaderEncryptKey2() { return _rcvHeaderEncryptKey2; }
-    public SSU2Bitfield getReceivedMessages() { return _receivedMessages; }
+    long getSendConnID() { return _sendConnID; }
+    long getRcvConnID() { return _rcvConnID; }
+    /** caller must sync on returned object when encrypting */
+    CipherState getSendCipher() { return _sendCha; }
+    byte[] getSendHeaderEncryptKey1() { return _sendHeaderEncryptKey1; }
+    byte[] getRcvHeaderEncryptKey1() { return _rcvHeaderEncryptKey1; }
+    byte[] getSendHeaderEncryptKey2() { return _sendHeaderEncryptKey2; }
+    byte[] getRcvHeaderEncryptKey2() { return _rcvHeaderEncryptKey2; }
+    SSU2Bitfield getReceivedMessages() { return _receivedMessages; }
+    SSU2Bitfield getSentMessages() { return _sentMessages; }
+
+    void receivePacket(UDPPacket packet) {
+        DatagramPacket dpacket = packet.getPacket();
+        byte[] data = dpacket.getData();
+        int off = dpacket.getOffset();
+        int len = dpacket.getLength();
+        try {
+            if (len < MIN_DATA_LEN) {
+                if (_log.shouldWarn())
+                    _log.warn("Inbound packet too short " + len + " on " + this);
+                return;
+            }
+            SSU2Header.Header header = SSU2Header.trialDecryptShortHeader(packet, _rcvHeaderEncryptKey1, _rcvHeaderEncryptKey2);
+            if (header == null) {
+                if (_log.shouldWarn())
+                    _log.warn("bad data header on " + this);
+                return;
+            }
+            if (header.getDestConnID() != _rcvConnID) {
+                if (_log.shouldWarn())
+                    _log.warn("bad Dest Conn id " + header.getDestConnID() + " on " + this);
+                return;
+            }
+            if (header.getType() != DATA_FLAG_BYTE) {
+                if (_log.shouldWarn())
+                    _log.warn("bad data pkt type " + (header.getType() & 0xff) + " on " + this);
+                return;
+            }
+            long n = header.getPacketNumber();
+            SSU2Header.acceptTrialDecrypt(packet, header);
+            synchronized (_rcvCha) {
+                _rcvCha.setNonce(n);
+                // decrypt in-place
+                _rcvCha.decryptWithAd(header.data, data, off + SHORT_HEADER_SIZE, data, off + SHORT_HEADER_SIZE, len - SHORT_HEADER_SIZE);
+                if (_receivedMessages.set(n)) {
+                    if (_log.shouldWarn())
+                        _log.warn("dup pkt rcvd " + n + " on " + this);
+                    return;
+                }
+            }
+            processPayload(data, off + SHORT_HEADER_SIZE, len - (SHORT_HEADER_SIZE + MAC_LEN));
+        } catch (GeneralSecurityException gse) {
+            if (_log.shouldWarn())
+                _log.warn("Bad encrypted packet:\n" + HexDump.dump(data, off, len), gse);
+        } catch (IndexOutOfBoundsException ioobe) {
+            if (_log.shouldWarn())
+                _log.warn("Bad encrypted packet:\n" + HexDump.dump(data, off, len), ioobe);
+        } finally {
+            packet.release();
+        }
+    }
+
+    private void processPayload(byte[] payload, int offset, int length) throws GeneralSecurityException {
+        try {
+            int blocks = SSU2Payload.processPayload(_context, this, payload, offset, length, false);
+        } catch (Exception e) {
+            throw new GeneralSecurityException("Session Created payload error", e);
+        }
+    }
+
+    /////////////////////////////////////////////////////////
+    // begin payload callbacks
+    /////////////////////////////////////////////////////////
+
+    public void gotDateTime(long time) {
+    }
+
+    public void gotOptions(byte[] options, boolean isHandshake) {
+    }
+
+    public void gotRI(RouterInfo ri, boolean isHandshake, boolean flood) throws DataFormatException {
+    }
+
+    public void gotRIFragment(byte[] data, boolean isHandshake, boolean flood, boolean isGzipped, int frag, int totalFrags) {
+        throw new IllegalStateException("RI fragment in Data phase");
+    }
+
+    public void gotAddress(byte[] ip, int port) {
+    }
+
+    public void gotIntroKey(byte[] key) {
+    }
+
+    public void gotRelayTagRequest() {
+    }
+
+    public void gotRelayTag(long tag) {
+    }
+
+    public void gotToken(long token, long expires) {
+    }
+
+    public void gotI2NP(I2NPMessage msg) {
+    }
+
+    public void gotFragment(byte[] data, long messageID, int type, long expires, int frag, boolean isLast) throws DataFormatException {
+    }
+
+    public void gotACK(long ackThru, int acks, byte[] ranges) {
+    }
+
+    public void gotTermination(int reason, long count) {
+    }
+
+    public void gotUnknown(int type, int len) {
+    }
+
+    public void gotPadding(int paddingLength, int frameLength) {
+    }
+
+    /////////////////////////////////////////////////////////
+    // end payload callbacks
+    /////////////////////////////////////////////////////////
 
 }

@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.southernstorm.noise.protocol.ChaChaPolyCipherState;
+import com.southernstorm.noise.protocol.CipherState;
 import com.southernstorm.noise.protocol.HandshakeState;
 
 import net.i2p.crypto.ChaCha20;
@@ -317,7 +318,7 @@ class PacketBuilder2 {
         SSU2Payload.writePayload(data, SHORT_HEADER_SIZE, blocks);
         pkt.setLength(off);
 
-        encryptDataPacket(packet, peer.getSendEncryptKey(), pktNum, peer.getSendHeaderEncryptKey1(), peer.getSendHeaderEncryptKey2());
+        encryptDataPacket(packet, peer.getSendCipher(), pktNum, peer.getSendHeaderEncryptKey1(), peer.getSendHeaderEncryptKey2());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
         
         // FIXME ticket #2675
@@ -439,7 +440,7 @@ class PacketBuilder2 {
 */
         
         pkt.setLength(off);
-        encryptDataPacket(packet, peer.getSendEncryptKey(), pktNum, peer.getSendHeaderEncryptKey1(), peer.getSendHeaderEncryptKey2());
+        encryptDataPacket(packet, peer.getSendCipher(), pktNum, peer.getSendHeaderEncryptKey1(), peer.getSendHeaderEncryptKey2());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
         packet.setMessageType(TYPE_ACK);
         packet.setPriority((fullACKCount > 0 || partialACKCount > 0) ? PRIORITY_HIGH : PRIORITY_LOW);
@@ -1131,20 +1132,20 @@ class PacketBuilder2 {
      *                length set to the end of the data.
      *                This will extend the length by 16 for the MAC.
      */
-    private void encryptDataPacket(UDPPacket packet, byte[] chachaKey, long n,
+    private void encryptDataPacket(UDPPacket packet, CipherState chacha, long n,
                                     byte[] hdrKey1, byte[] hdrKey2) {
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
         int off = pkt.getOffset();
         int len = pkt.getLength();
-        ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
-        chacha.initializeKey(chachaKey, 0);
-        chacha.setNonce(n);
-        try {
-            chacha.encryptWithAd(data, off, SHORT_HEADER_SIZE,
-                                 data, off + SHORT_HEADER_SIZE, data, off + SHORT_HEADER_SIZE, len - SHORT_HEADER_SIZE);
-        } catch (GeneralSecurityException e) {
-            throw new IllegalArgumentException("Bad data msg", e);
+        synchronized(chacha) {
+            chacha.setNonce(n);
+            try {
+                chacha.encryptWithAd(data, off, SHORT_HEADER_SIZE,
+                                     data, off + SHORT_HEADER_SIZE, data, off + SHORT_HEADER_SIZE, len - SHORT_HEADER_SIZE);
+            } catch (GeneralSecurityException e) {
+                throw new IllegalArgumentException("Bad data msg", e);
+            }
         }
         pkt.setLength(len + MAC_LEN);
         SSU2Header.encryptShortHeader(packet, hdrKey1, hdrKey2);
