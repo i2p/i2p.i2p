@@ -58,14 +58,14 @@ class PacketBuilder2 {
     static final int TYPE_CREAT = 73;
 
     /** IPv4 only */
-    public static final int IP_HEADER_SIZE = 20;
+    public static final int IP_HEADER_SIZE = PacketBuilder.IP_HEADER_SIZE;
     /** Same for IPv4 and IPv6 */
-    public static final int UDP_HEADER_SIZE = 8;
+    public static final int UDP_HEADER_SIZE = PacketBuilder.UDP_HEADER_SIZE;
 
     /** 74 */
     public static final int MIN_DATA_PACKET_OVERHEAD = IP_HEADER_SIZE + UDP_HEADER_SIZE + DATA_HEADER_SIZE + MAC_LEN;
 
-    public static final int IPV6_HEADER_SIZE = 40;
+    public static final int IPV6_HEADER_SIZE = PacketBuilder.IPV6_HEADER_SIZE;
     /** 94 */
     public static final int MIN_IPV6_DATA_PACKET_OVERHEAD = IPV6_HEADER_SIZE + UDP_HEADER_SIZE + DATA_HEADER_SIZE + MAC_LEN;
 
@@ -135,7 +135,7 @@ class PacketBuilder2 {
         // calculate data size
         int numFragments = fragments.size();
         int dataSize = 0;
-        int priority = 0;
+        int priority = PRIORITY_LOW;
         for (int i = 0; i < numFragments; i++) {
             Fragment frag = fragments.get(i);
             OutboundMessageState state = frag.state;
@@ -176,7 +176,7 @@ class PacketBuilder2 {
 
         // add the acks
         if (availableForAcks >= SSU2Payload.BLOCK_HEADER_SIZE + 5) {
-            int maxRanges = (availableForAcks - (SSU2Payload.BLOCK_HEADER_SIZE + 5)) / 2;
+            int maxRanges = Math.min((availableForAcks - (SSU2Payload.BLOCK_HEADER_SIZE + 5)) / 2, ABSOLUTE_MAX_ACK_RANGES);
             Block block = peer.getReceivedMessages().toAckBlock(maxRanges);
             if (block != null) {
                 blocks.add(block);
@@ -255,7 +255,7 @@ class PacketBuilder2 {
         pkt.setLength(off);
         encryptDataPacket(packet, peer.getSendCipher(), pktNum, peer.getSendHeaderEncryptKey1(), peer.getSendHeaderEncryptKey2());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
-        packet.setPriority(0);
+        packet.setPriority(PRIORITY_LOW);
         return packet;
     }
 

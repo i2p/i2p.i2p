@@ -3,6 +3,7 @@ package net.i2p.router.transport.udp;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.security.GeneralSecurityException;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.southernstorm.noise.protocol.CipherState;
@@ -66,8 +67,59 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         _sentMessages = new SSU2Bitfield(256, 0);
     }
 
+    // SSU 1 overrides
+
     @Override
     public int getVersion() { return 2; }
+
+    /**
+     *  how much payload data can we shove in there?
+     *  Does NOT leave any room for acks, we'll fit them in when we can.
+     *  This is 5 bytes too low for first or only fragment.
+     *
+     *  @return MTU - 68 (IPv4), MTU - 88 (IPv6)
+     */
+    @Override
+    int fragmentSize() {
+        // 20 + 8 + 16 + 3 + 5 + 16 = 68 (IPv4)
+        // 40 + 8 + 16 + 3 + 5 + 16 = 88 (IPv6)
+        return _mtu -
+               (_remoteIP.length == 4 ? PacketBuilder2.MIN_DATA_PACKET_OVERHEAD : PacketBuilder2.MIN_IPV6_DATA_PACKET_OVERHEAD) -
+               DATA_FOLLOWON_EXTRA_SIZE; // Followon fragment block overhead (5)
+    }
+
+    /**
+     *  Packet overhead
+     *  Does NOT leave any room for acks, we'll fit them in when we can.
+     *  This is 5 bytes too high for first or only fragment.
+     *
+     *  @return 68 (IPv4), 88 (IPv6)
+     */
+    @Override
+    int fragmentOverhead() {
+        // 20 + 8 + 16 + 3 + 5 + 16 = 68 (IPv4)
+        // 40 + 8 + 16 + 3 + 5 + 16 = 88 (IPv6)
+        return (_remoteIP.length == 4 ? PacketBuilder2.MIN_DATA_PACKET_OVERHEAD : PacketBuilder2.MIN_IPV6_DATA_PACKET_OVERHEAD) +
+               DATA_FOLLOWON_EXTRA_SIZE; // Followon fragment block overhead (5)
+    }
+
+    // SSU 1 unsupported things
+
+    @Override
+    void setCurrentMACKey(SessionKey key) { throw new UnsupportedOperationException(); }
+    @Override
+    void setCurrentCipherKey(SessionKey key) { throw new UnsupportedOperationException(); }
+    @Override
+    List<Long> getCurrentFullACKs() { throw new UnsupportedOperationException(); }
+    @Override
+    List<Long> getCurrentResendACKs() { throw new UnsupportedOperationException(); }
+    @Override
+    void removeACKMessage(Long messageId) { throw new UnsupportedOperationException(); }
+    @Override
+    void fetchPartialACKs(List<ACKBitfield> rv) { throw new UnsupportedOperationException(); }
+
+    // SSU 2 things
+
     long getNextPacketNumber() { return _packetNumber.incrementAndGet(); }
     long getSendConnID() { return _sendConnID; }
     long getRcvConnID() { return _rcvConnID; }

@@ -55,17 +55,22 @@ final class SSU2Util {
     public static final int MIN_HANDSHAKE_DATA_LEN = SESSION_HEADER_SIZE + TOTAL_PROT_SAMPLE_LEN;
 
 
-    /** 3 byte block header + 9 byte I2NP header = 12 */
-    public static final int FULL_I2NP_HEADER_SIZE = SSU2Payload.BLOCK_HEADER_SIZE + 9;
+    /** 3 byte block header */
+    public static final int FULL_I2NP_HEADER_SIZE = SSU2Payload.BLOCK_HEADER_SIZE;
 
-    /** 3 byte block header + 9 byte I2NP header = 12 */
-    public static final int FIRST_FRAGMENT_HEADER_SIZE = SSU2Payload.BLOCK_HEADER_SIZE + 9;
+    /** 3 byte block header */
+    public static final int FIRST_FRAGMENT_HEADER_SIZE = SSU2Payload.BLOCK_HEADER_SIZE;
+
+    /**
+     * 5 for flag and msg number in followon block
+     */
+    public static final int DATA_FOLLOWON_EXTRA_SIZE = 5;
 
     /** 3 byte block header + 4 byte msg ID + 1 byte fragment info = 8 */
-    public static final int FOLLOWON_FRAGMENT_HEADER_SIZE = SSU2Payload.BLOCK_HEADER_SIZE + 5;
+    public static final int FOLLOWON_FRAGMENT_HEADER_SIZE = SSU2Payload.BLOCK_HEADER_SIZE + DATA_FOLLOWON_EXTRA_SIZE;
 
-    /** 16 byte block header + 2 + 12 = 30 */
-    public static final int DATA_HEADER_SIZE = SHORT_HEADER_SIZE + 2 + FULL_I2NP_HEADER_SIZE;
+    /** 16 byte short header + 3 = 19 */
+    public static final int DATA_HEADER_SIZE = SHORT_HEADER_SIZE + FULL_I2NP_HEADER_SIZE;
 
     /**
      *  The message types, 0-10, as bytes
