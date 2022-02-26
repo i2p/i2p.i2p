@@ -187,33 +187,29 @@ class MessageReceiver {
      *  @return null on error
      */
     private I2NPMessage readMessage(ByteArray buf, InboundMessageState state, I2NPMessageHandler handler) {
+        int sz = state.getCompleteSize();
         try {
-            //byte buf[] = new byte[state.getCompleteSize()];
             I2NPMessage m;
             int numFragments = state.getFragmentCount();
             if (numFragments > 1) {
                 ByteArray fragments[] = state.getFragments();
                 int off = 0;
+                byte[] data = buf.getData();
                 for (int i = 0; i < numFragments; i++) {
-                    System.arraycopy(fragments[i].getData(), 0, buf.getData(), off, fragments[i].getValid());
-                    //if (_log.shouldLog(Log.DEBUG))
-                    //    _log.debug("Raw fragment[" + i + "] for " + state.getMessageId() + ": " 
-                    //               + Base64.encode(fragments[i].getData(), 0, fragments[i].getValid())
-                    //               + " (valid: " + fragments[i].getValid() 
-                    //               + " raw: " + Base64.encode(fragments[i].getData()) + ")");
-                    off += fragments[i].getValid();
+                    ByteArray ba = fragments[i];
+                    int len = ba.getValid();
+                    System.arraycopy(ba.getData(), 0, data, off, len);
+                    off += len;
                 }
-                if (off != state.getCompleteSize()) {
+                if (off != sz) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Hmm, offset of the fragments = " + off + " while the state says " + state.getCompleteSize());
+                        _log.warn("Hmm, offset of the fragments = " + off + " while the state says " + sz);
                     return null;
                 }
-                //if (_log.shouldLog(Log.DEBUG))
-                //    _log.debug("Raw byte array for " + state.getMessageId() + ": " + HexDump.dump(buf.getData(), 0, state.getCompleteSize()));
-                m = I2NPMessageImpl.fromRawByteArray(_context, buf.getData(), 0, state.getCompleteSize(), handler);
+                m = I2NPMessageImpl.fromRawByteArray(_context, data, 0, sz, handler);
             } else {
                 // zero copy for single fragment
-                m = I2NPMessageImpl.fromRawByteArray(_context, state.getFragments()[0].getData(), 0, state.getCompleteSize(), handler);
+                m = I2NPMessageImpl.fromRawByteArray(_context, state.getFragments()[0].getData(), 0, sz, handler);
             }
             m.setUniqueId(state.getMessageId());
             return m;
@@ -227,8 +223,8 @@ class MessageReceiver {
                 byte[] data = ba.getData();
                 _log.warn("Message invalid: " + state +
                           " PeerState: " + _transport.getPeerState(state.getFrom()) +
-                          "\nDUMP:\n" + HexDump.dump(data, 0, state.getCompleteSize()) +
-                          "\nRAW:\n" + Base64.encode(data, 0, state.getCompleteSize()),
+                          "\nDUMP:\n" + HexDump.dump(data, 0, sz) +
+                          "\nRAW:\n" + Base64.encode(data, 0, sz),
                           ime);
             }
             if (state.getFragments()[0].getData()[0] == DatabaseStoreMessage.MESSAGE_TYPE) {

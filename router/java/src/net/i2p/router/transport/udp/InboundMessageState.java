@@ -45,6 +45,9 @@ class InboundMessageState implements CDQEntry {
     private static final int MAX_FRAGMENT_SIZE = UDPPacket.MAX_PACKET_SIZE;
     private static final ByteCache _fragmentCache = ByteCache.getInstance(64, MAX_FRAGMENT_SIZE);
     
+    /**
+     * Only for Poison right now.
+     */
     public InboundMessageState(RouterContext ctx, long messageId, Hash from) {
         _context = ctx;
         _log = ctx.logManager().getLog(InboundMessageState.class);
@@ -62,6 +65,9 @@ class InboundMessageState implements CDQEntry {
      * This is more efficient if the fragment is the last (and probably only) fragment.
      * The main savings is not allocating ByteArray[64].
      *
+     * SSU 1 only.
+     *
+     * @param dataFragment the fragment index in the DataReader, NOT the fragment number
      * @throws DataFormatException if the fragment was corrupt
      * @since 0.9.9
      */
@@ -86,11 +92,47 @@ class InboundMessageState implements CDQEntry {
         if (!receiveFragment(data, dataFragment))
             throw new DataFormatException("corrupt");
     }
-    
+
+    /**
+     * Create a new IMS and read in the data from the fragment.
+     * Do NOT call receiveFragment for the same fragment afterwards.
+     * This is more efficient if the fragment is the last (and probably only) fragment.
+     * The main savings is not allocating ByteArray[64].
+     *
+     * SSU 2 only.
+     *
+     * @param fragmentNum the fragment number
+     * @throws DataFormatException if the fragment was corrupt
+     * @since 0.9.54
+     */
+    public InboundMessageState(RouterContext ctx, long messageId, Hash from,
+                               byte[] data, int off, int len, int fragmentNum, boolean isLast)
+                               throws DataFormatException {
+        _context = ctx;
+        _log = ctx.logManager().getLog(InboundMessageState.class);
+        _messageId = messageId;
+        _from = from;
+        if (isLast) {
+            if (fragmentNum > MAX_FRAGMENTS)
+                throw new DataFormatException("corrupt - too many fragments: " + fragmentNum);
+            _fragments = new ByteArray[fragmentNum];
+        } else {
+            _fragments = new ByteArray[MAX_FRAGMENTS];
+        }
+        _lastFragment = -1;
+        _completeSize = -1;
+        _receiveBegin = ctx.clock().now();
+        if (!receiveFragment(data, off, len, fragmentNum, isLast))
+            throw new DataFormatException("corrupt");
+    }
+
     /**
      * Read in the data from the fragment.
      * Caller should synchronize.
      *
+     * SSU 1 only.
+     *
+     * @param dataFragment the fragment index in the DataReader, NOT the fragment number
      * @return true if the data was ok, false if it was corrupt
      */
     public boolean receiveFragment(UDPPacketReader.DataReader data, int dataFragment) throws DataFormatException {
@@ -153,7 +195,58 @@ class InboundMessageState implements CDQEntry {
         }
         return true;
     }
-    
+
+    /**
+     * Read in the data from the fragment.
+     * Caller should synchronize.
+     *
+     * SSU 2 only.
+     *
+     * @param fragmentNum the fragment number
+     * @return true if the data was ok, false if it was corrupt
+     * @since 0.9.54
+     */
+    public boolean receiveFragment(byte[] data, int off, int len, int fragmentNum, boolean isLast) throws DataFormatException {
+        if (fragmentNum >= _fragments.length) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid fragment " + fragmentNum + '/' + _fragments.length);
+            return false;
+        }
+        if (_fragments[fragmentNum] == null) {
+            // new fragment, read it
+            ByteArray message = _fragmentCache.acquire();
+            System.arraycopy(data, off, message.getData(), 0, len);
+            message.setValid(len);
+            _fragments[fragmentNum] = message;
+            if (isLast) {
+                // don't allow _lastFragment to be set twice
+                if (_lastFragment >= 0) {
+                    if (_log.shouldWarn())
+                        _log.warn("Multiple last fragments for message " + _messageId + " from " + _from);
+                    return false;
+                }
+                // TODO - check for non-last fragments after this one?
+                _lastFragment = fragmentNum;
+            } else if (_lastFragment >= 0 && fragmentNum >= _lastFragment) {
+                // don't allow non-last after last
+                if (_log.shouldWarn())
+                    _log.warn("Non-last fragment " + fragmentNum + " when last is " + _lastFragment + " for message " + _messageId + " from " + _from);
+                return false;
+            }
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("New fragment " + fragmentNum + " for message " + _messageId
+                           + ", size=" + len
+                           + ", isLast=" + isLast
+                      /*   + ", data=" + Base64.encode(message.getData(), 0, size)   */  );
+        } else {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Received fragment " + fragmentNum + " for message " + _messageId
+                           + " again, old size=" + _fragments[fragmentNum].getValid()
+                           + " and new size=" + len);
+        }
+        return true;
+    }
+
     /**
      *  May not be valid after released.
      *  Probably doesn't need to be synced by caller, given the order of

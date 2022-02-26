@@ -7,12 +7,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.southernstorm.noise.protocol.CipherState;
 
+import net.i2p.data.ByteArray;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.I2NPMessageException;
+import net.i2p.data.i2np.I2NPMessageImpl;
 import net.i2p.router.RouterContext;
 import static net.i2p.router.transport.udp.SSU2Util.*;
 import net.i2p.util.HexDump;
@@ -116,7 +119,9 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                     return;
                 }
             }
-            processPayload(data, off + SHORT_HEADER_SIZE, len - (SHORT_HEADER_SIZE + MAC_LEN));
+            int payloadLen = len - (SHORT_HEADER_SIZE + MAC_LEN);
+            processPayload(data, off + SHORT_HEADER_SIZE, payloadLen);
+            packetReceived(payloadLen);
         } catch (GeneralSecurityException gse) {
             if (_log.shouldWarn())
                 _log.warn("Bad encrypted packet:\n" + HexDump.dump(data, off, len), gse);
@@ -169,9 +174,50 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotI2NP(I2NPMessage msg) {
+        // 9 byte header
+        int size = msg.getMessageSize() - 7;
+        // complete message, skip IMF and MessageReceiver
+        _transport.messageReceived(msg, null, _remotePeer, 0, size);
     }
 
-    public void gotFragment(byte[] data, long messageID, int type, long expires, int frag, boolean isLast) throws DataFormatException {
+    public void gotFragment(byte[] data, int off, int len, long messageId,int frag, boolean isLast) throws DataFormatException {
+        InboundMessageState state;
+        boolean messageComplete = false;
+        boolean messageExpired = false;
+
+        synchronized (_inboundMessages) {
+            state = _inboundMessages.get(messageId);
+            if (state == null) {
+                state = new InboundMessageState(_context, messageId, _remotePeer, data, off, len, frag, isLast);
+                _inboundMessages.put(messageId, state);
+            } else {
+                boolean fragmentOK = state.receiveFragment(data, off, len, frag, isLast);
+                if (!fragmentOK)
+                    return;
+                if (state.isComplete()) {
+                    messageComplete = true;
+                    _inboundMessages.remove(messageId);
+                } else if (state.isExpired()) {
+                    messageExpired = true;
+                    _inboundMessages.remove(messageId);
+                }
+            }
+        }
+
+        if (messageComplete) {
+            messageFullyReceived(messageId, state.getCompleteSize());
+            if (_log.shouldDebug())
+                _log.debug("Message received completely!  " + state);
+            _context.statManager().addRateData("udp.receivedCompleteTime", state.getLifetime(), state.getLifetime());
+            _context.statManager().addRateData("udp.receivedCompleteFragments", state.getFragmentCount(), state.getLifetime());
+            receiveMessage(state);
+        } else if (messageExpired) {
+            if (_log.shouldWarn())
+                _log.warn("Message expired while only being partially read: " + state);
+            _context.messageHistory().droppedInboundMessage(state.getMessageId(), state.getFrom(), "expired while partially read: " + state.toString());
+            // all state access must be before this
+            state.releaseResources();
+        }
     }
 
     public void gotACK(long ackThru, int acks, byte[] ranges) {
@@ -190,4 +236,40 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     // end payload callbacks
     /////////////////////////////////////////////////////////
 
+    /**
+     *  Do what MessageReceiver does, but inline and for SSU2.
+     *  Will always be more than one fragment.
+     */
+    private void receiveMessage(InboundMessageState state) {
+        int sz = state.getCompleteSize();
+        try {
+            byte buf[] = new byte[sz];
+            I2NPMessage m;
+            int numFragments = state.getFragmentCount();
+            ByteArray fragments[] = state.getFragments();
+            int off = 0;
+            for (int i = 0; i < numFragments; i++) {
+                ByteArray ba = fragments[i];
+                int len = ba.getValid();
+                System.arraycopy(ba.getData(), 0, buf, off, len);
+                off += len;
+             }
+             if (off != sz) {
+                 if (_log.shouldWarn())
+                     _log.warn("Hmm, offset of the fragments = " + off + " while the state says " + sz);
+                 return;
+             }
+             I2NPMessage msg = I2NPMessageImpl.fromRawByteArrayNTCP2(_context, buf, 0, sz, null);
+             _transport.messageReceived(msg, null, _remotePeer, state.getLifetime(), sz);
+        } catch (I2NPMessageException ime) {
+            if (_log.shouldWarn())
+                _log.warn("Message invalid: " + state + " PeerState: " + this, ime);
+        } catch (RuntimeException e) {
+            // e.g. AIOOBE
+            if (_log.shouldWarn())
+                _log.warn("Error handling a message: " + state, e);
+        } finally {
+            state.releaseResources();
+        }
+    }
 }

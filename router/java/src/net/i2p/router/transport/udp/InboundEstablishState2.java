@@ -191,7 +191,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     public void gotAddress(byte[] ip, int port) {
-        System.out.println("Got ADDRESS block: " + Addresses.toString(ip, port));
         throw new IllegalStateException("Address in Handshake");
     }
 
@@ -204,7 +203,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     public void gotRelayTag(long tag) {
-        System.out.println("Got relay tag " + tag);
         throw new IllegalStateException("Relay tag in Handshake");
     }
 
@@ -218,19 +216,17 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             throw new IllegalStateException("I2NP in Sess Req");
     }
 
-    public void gotFragment(byte[] data, long messageID, int type, long expires, int frag, boolean isLast) throws DataFormatException {
+    public void gotFragment(byte[] data, int off, int len, long messageID, int frag, boolean isLast) throws DataFormatException {
         System.out.println("Got FRAGMENT block: " + messageID);
         if (getState() != InboundState.IB_STATE_CREATED_SENT)
             throw new IllegalStateException("I2NP in Sess Req");
     }
 
     public void gotACK(long ackThru, int acks, byte[] ranges) {
-        System.out.println("Got ACK block: " + ackThru);
         throw new IllegalStateException("ACK in Handshake");
     }
 
     public void gotTermination(int reason, long count) {
-        System.out.println("Got TERMINATION block, reason: " + reason + " count: " + count);
         throw new IllegalStateException("Termination in Handshake");
     }
 
@@ -239,7 +235,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     public void gotPadding(int paddingLength, int frameLength) {
-        System.out.println("Got PADDING block, len: " + paddingLength + " in frame len: " + frameLength);
     }
 
     /////////////////////////////////////////////////////////

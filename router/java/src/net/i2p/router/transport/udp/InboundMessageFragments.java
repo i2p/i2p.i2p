@@ -68,6 +68,8 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
 
     /**
      * Pull the fragments and ACKs out of the authenticated data packet
+     *
+     * SSU 1 only.
      */
     public void receiveData(PeerState from, UDPPacketReader.DataReader data) {
         try {

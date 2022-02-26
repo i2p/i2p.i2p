@@ -149,12 +149,10 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     public void gotRI(RouterInfo ri, boolean isHandshake, boolean flood) throws DataFormatException {
-        System.out.println("Got RI block: " + ri);
         throw new DataFormatException("RI in Sess Created");
     }
 
     public void gotRIFragment(byte[] data, boolean isHandshake, boolean flood, boolean isGzipped, int frag, int totalFrags) {
-        System.out.println("Got RI fragment " + frag + " of " + totalFrags);
         throw new IllegalStateException("RI in Sess Created");
     }
 
@@ -167,7 +165,6 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     public void gotRelayTagRequest() {
-        System.out.println("Got relay tag request");
         throw new IllegalStateException("Relay tag req in Sess Created");
     }
 
@@ -180,22 +177,18 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     public void gotI2NP(I2NPMessage msg) {
-        System.out.println("Got I2NP block: " + msg);
         throw new IllegalStateException("I2NP in Sess Created");
     }
 
-    public void gotFragment(byte[] data, long messageID, int type, long expires, int frag, boolean isLast) throws DataFormatException {
-        System.out.println("Got FRAGMENT block: " + messageID);
-        throw new IllegalStateException("I2NP in Sess Created");
+    public void gotFragment(byte[] data, int off, int len, long messageId,int frag, boolean isLast) throws DataFormatException {
+        throw new DataFormatException("I2NP in Sess Created");
     }
 
     public void gotACK(long ackThru, int acks, byte[] ranges) {
-        System.out.println("Got ACK block: " + ackThru);
         throw new IllegalStateException("ACK in Sess Created");
     }
 
     public void gotTermination(int reason, long count) {
-        System.out.println("Got TERMINATION block, reason: " + reason + " count: " + count);
         throw new IllegalStateException("Termination in Sess Created");
     }
 
@@ -204,7 +197,6 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     public void gotPadding(int paddingLength, int frameLength) {
-        System.out.println("Got PADDING block, len: " + paddingLength + " in frame len: " + frameLength);
     }
 
     /////////////////////////////////////////////////////////

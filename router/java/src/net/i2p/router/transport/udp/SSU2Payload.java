@@ -56,10 +56,13 @@ class SSU2Payload {
         public void gotI2NP(I2NPMessage msg) throws I2NPMessageException;
 
         /**
-         *  @param expires 0 for frag greater than 1
-         *  @param type 0 for frag greater than 1
+         *  Data must be copied out in this method.
+         *  Data starts at the 9 byte header for fragment 0.
+         *
+         *  @param off offset in data
+         *  @param len length of data to copy
          */
-        public void gotFragment(byte[] data, long messageID, int type, long expires, int frag, boolean isLast) throws DataFormatException;
+        public void gotFragment(byte[] data, int off, int len, long messageID, int frag, boolean isLast) throws DataFormatException;
 
         /**
          *  @param ranges null if none
@@ -193,28 +196,24 @@ class SSU2Payload {
                 case BLOCK_FIRSTFRAG: {
                     if (isHandshake)
                         throw new IOException("Illegal block in handshake: " + type);
-                    if (len < 9)
+                    if (len <= 9)
                         throw new IOException("Bad length for FIRSTFRAG: " + len);
-                    int mtype = payload[i] & 0xff;
                     long id = DataHelper.fromLong(payload, i + 1, 4);
-                    long exp = DataHelper.fromLong(payload, i + 5, 4) * 1000;
-                    byte[] data = new byte[len - 9];
-                    System.arraycopy(payload, i + 9, data, 0, len - 9);
-                    cb.gotFragment(data, id, mtype, exp, 0, false);
+                    cb.gotFragment(payload, i, len, id, 0, false);
                     break;
                 }
 
                 case BLOCK_FOLLOWONFRAG: {
                     if (isHandshake)
                         throw new IOException("Illegal block in handshake: " + type);
-                    if (len < 5)
+                    if (len <= 5)
                         throw new IOException("Bad length for FOLLOWON: " + len);
                     int frag = (payload[i] & 0xff) >> 1;
+                    if (frag == 0)
+                        throw new IOException("0 frag for FOLLOWON");
                     boolean isLast = (payload[i] & 0x01) != 0;
                     long id = DataHelper.fromLong(payload, i + 1, 4);
-                    byte[] data = new byte[len - 5];
-                    System.arraycopy(payload, i + 5, data, 0, len - 5);
-                    cb.gotFragment(data, id, 0, 0, frag, isLast);
+                    cb.gotFragment(payload, i + 5, len - 5, id, frag, isLast);
                     break;
                 }
 
