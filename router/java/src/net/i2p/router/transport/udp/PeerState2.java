@@ -43,7 +43,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     private final byte[] _sendHeaderEncryptKey2;
     private final byte[] _rcvHeaderEncryptKey2;
     private final SSU2Bitfield _receivedMessages;
-    private final SSU2Bitfield _sentMessages;
+    private final SSU2Bitfield _ackedMessages;
 
     public static final int MIN_MTU = 1280;
 
@@ -64,7 +64,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         _sendHeaderEncryptKey2 = sendHdrKey2;
         _rcvHeaderEncryptKey2 = rcvHdrKey2;
         _receivedMessages = new SSU2Bitfield(256, 0);
-        _sentMessages = new SSU2Bitfield(256, 0);
+        _ackedMessages = new SSU2Bitfield(256, 0);
     }
 
     // SSU 1 overrides
@@ -130,7 +130,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     byte[] getSendHeaderEncryptKey2() { return _sendHeaderEncryptKey2; }
     byte[] getRcvHeaderEncryptKey2() { return _rcvHeaderEncryptKey2; }
     SSU2Bitfield getReceivedMessages() { return _receivedMessages; }
-    SSU2Bitfield getSentMessages() { return _sentMessages; }
+    SSU2Bitfield getAckedMessages() { return _ackedMessages; }
 
     void receivePacket(UDPPacket packet) {
         DatagramPacket dpacket = packet.getPacket();
@@ -323,5 +323,13 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         } finally {
             state.releaseResources();
         }
+    }
+
+    /**
+     *  Record the mapping of packet number to what fragments were in it,
+     *  so we can process acks.
+     */
+    void fragmentsSent(long pktNum, List<PacketBuilder.Fragment> fragments) {
+
     }
 }

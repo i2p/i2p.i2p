@@ -53,6 +53,8 @@ class OutboundMessageFragments {
 
     private volatile boolean _alive;
     private final PacketBuilder _builder;
+    // null if SSU2 not enabled
+    private final PacketBuilder2 _builder2;
 
     /** if we can handle more messages explicitly, set this to true */
     // private boolean _allowExcess; // LINT not used??
@@ -70,6 +72,7 @@ class OutboundMessageFragments {
         // _throttle = throttle;
         _activePeers = new ConcurrentHashSet<PeerState>(256);
         _builder = transport.getBuilder();
+        _builder2 = transport.getBuilder2();
         _alive = true;
         // _allowExcess = false;
         _context.statManager().createRateStat("udp.sendVolleyTime", "Long it takes to send a full volley", "udp", UDPTransport.RATES);
@@ -388,16 +391,33 @@ class OutboundMessageFragments {
         if (states == null || peer == null)
             return null;
 
-        // ok, simplest possible thing is to always tack on the bitfields if
-        List<Long> msgIds = peer.getCurrentFullACKs();
-        int newFullAckCount = msgIds.size();
-        msgIds.addAll(peer.getCurrentResendACKs());
-        List<ACKBitfield> partialACKBitfields = new ArrayList<ACKBitfield>();
-        peer.fetchPartialACKs(partialACKBitfields);
-        int piggybackedPartialACK = partialACKBitfields.size();
-        // getCurrentFullACKs() already makes a copy, do we need to copy again?
-        // YES because buildPacket() now removes them (maybe)
-        Set<Long> remaining = new HashSet<Long>(msgIds);
+        List<Long> msgIds;
+        int newFullAckCount;
+        List<ACKBitfield> partialACKBitfields;
+        int piggybackedPartialACK;
+        Set<Long> remaining;
+        int before;
+        if (peer.getVersion() == 1) {
+            // ok, simplest possible thing is to always tack on the bitfields if
+            msgIds = peer.getCurrentFullACKs();
+            newFullAckCount = msgIds.size();
+            msgIds.addAll(peer.getCurrentResendACKs());
+            partialACKBitfields = new ArrayList<ACKBitfield>();
+            peer.fetchPartialACKs(partialACKBitfields);
+            piggybackedPartialACK = partialACKBitfields.size();
+            // getCurrentFullACKs() already makes a copy, do we need to copy again?
+            // YES because buildPacket() now removes them (maybe)
+            remaining = new HashSet<Long>(msgIds);
+            before = remaining.size();
+        } else {
+            // all unused
+            msgIds = null;
+            newFullAckCount = 0;
+            partialACKBitfields = null;
+            piggybackedPartialACK = 0;
+            remaining = null;
+            before = 0;
+        }
 
         // build the list of fragments to send
         List<Fragment> toSend = new ArrayList<Fragment>(8);
@@ -439,7 +459,11 @@ class OutboundMessageFragments {
             int curTotalDataSize = state.fragmentSize(next.num);
             // now stuff in more fragments if they fit
             if (i +1 < toSend.size()) {
-                int maxAvail = PacketBuilder.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
+                int maxAvail;
+                if (peer.getVersion() == 1)
+                    maxAvail = PacketBuilder.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
+                else
+                    maxAvail = PacketBuilder2.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
                 for (int j = i + 1; j < toSend.size(); j++) {
                     next = toSend.get(j);
                     int nextDataSize = next.state.fragmentSize(next.num);
@@ -451,15 +475,21 @@ class OutboundMessageFragments {
                         j--;
                         sendNext.add(next);
                         curTotalDataSize += nextDataSize;
-                        maxAvail = PacketBuilder.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
+                        if (peer.getVersion() == 1)
+                            maxAvail = PacketBuilder.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
+                        else
+                            maxAvail = PacketBuilder2.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Adding in additional " + next + " to " + peer);
                     }  // else too big
                 }
             }
 
-            int before = remaining.size();
-            UDPPacket pkt = _builder.buildPacket(sendNext, peer, remaining, newFullAckCount, partialACKBitfields);
+            UDPPacket pkt;
+            if (peer.getVersion() == 1)
+                pkt = _builder.buildPacket(sendNext, peer, remaining, newFullAckCount, partialACKBitfields);
+            else
+                pkt = _builder2.buildPacket(sendNext, (PeerState2) peer);
             if (pkt != null) {
                 if (_log.shouldDebug())
                     _log.debug("Built packet with " + sendNext.size() + " fragments totalling " + curTotalDataSize +
@@ -473,24 +503,24 @@ class OutboundMessageFragments {
             }
             rv.add(pkt);
 
-            int after = remaining.size();
-            newFullAckCount = Math.max(0, newFullAckCount - (before - after));
-
-            int piggybackedAck = 0;
-            if (msgIds.size() != remaining.size()) {
-                for (int j = 0; j < msgIds.size(); j++) {
-                    Long id = msgIds.get(j);
-                    if (!remaining.contains(id)) {
-                        peer.removeACKMessage(id);
-                        piggybackedAck++;
+            if (peer.getVersion() == 1) {
+                int after = remaining.size();
+                newFullAckCount = Math.max(0, newFullAckCount - (before - after));
+                int piggybackedAck = 0;
+                if (msgIds.size() != remaining.size()) {
+                    for (int j = 0; j < msgIds.size(); j++) {
+                        Long id = msgIds.get(j);
+                        if (!remaining.contains(id)) {
+                            peer.removeACKMessage(id);
+                            piggybackedAck++;
+                        }
                     }
                 }
+                if (piggybackedAck > 0)
+                    _context.statManager().addRateData("udp.sendPiggyback", piggybackedAck);
+                if (piggybackedPartialACK - partialACKBitfields.size() > 0)
+                    _context.statManager().addRateData("udp.sendPiggybackPartial", piggybackedPartialACK - partialACKBitfields.size(), state.getLifetime());
             }
-
-            if (piggybackedAck > 0)
-                _context.statManager().addRateData("udp.sendPiggyback", piggybackedAck);
-            if (piggybackedPartialACK - partialACKBitfields.size() > 0)
-                _context.statManager().addRateData("udp.sendPiggybackPartial", piggybackedPartialACK - partialACKBitfields.size(), state.getLifetime());
 
             // following for debugging and stats
             pkt.setFragmentCount(sendNext.size());

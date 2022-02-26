@@ -100,7 +100,7 @@ class PacketBuilder2 {
      *
      *  @param numFragments &gt;= 1
      */
-    public static int getMaxAdditionalFragmentSize(PeerState2 peer, int numFragments, int curDataSize) {
+    public static int getMaxAdditionalFragmentSize(PeerState peer, int numFragments, int curDataSize) {
         int available = peer.getMTU() - curDataSize;
         if (peer.isIPv6())
             available -= MIN_IPV6_DATA_PACKET_OVERHEAD;
@@ -235,6 +235,10 @@ class PacketBuilder2 {
         }
         
         packet.setPriority(priority);
+        if (fragments.isEmpty())
+            peer.getAckedMessages().set(pktNum); // not ack-eliciting
+        else
+            peer.fragmentsSent(pktNum, fragments);
         return packet;
     }
     
@@ -256,6 +260,7 @@ class PacketBuilder2 {
         encryptDataPacket(packet, peer.getSendCipher(), pktNum, peer.getSendHeaderEncryptKey1(), peer.getSendHeaderEncryptKey2());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
         packet.setPriority(PRIORITY_LOW);
+        peer.getAckedMessages().set(pktNum); // not ack-eliciting
         return packet;
     }
 
