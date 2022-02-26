@@ -72,8 +72,7 @@ class PacketBuilder2 {
 /// FIXME
     private static final int MAX_IDENTITY_FRAGMENT_SIZE = 1280 - (MIN_DATA_PACKET_OVERHEAD + KEY_LEN + MAC_LEN);
 
-    /** one byte field */
-    public static final int ABSOLUTE_MAX_ACKS = 255;
+    private static final int ABSOLUTE_MAX_ACK_RANGES = 512;
 
     /* Higher than all other OutNetMessage priorities, but still droppable,
      * and will be shown in the codel.UDP-Sender.drop.500 stat.
@@ -120,45 +119,19 @@ class PacketBuilder2 {
      * Note that while the UDP message spec allows for more than one fragment in a message,
      * this method writes exactly one fragment.
      * For no fragments use buildAck().
-     * Multiple fragments in a single packet is not supported.
-     * Rekeying and extended options are not supported.
-     *
-     * So ignoring the ack bitfields, and assuming we have explicit acks,
-     * it's (47 + 4*explict acks + padding) added to the
-     * fragment length.
-     *
-     * @param ackIdsRemaining list of messageIds (Long) that should be acked by this packet.  
-     *                        The list itself is passed by reference, and if a messageId is
-     *                        transmitted it will be removed from the list.
-     *                        Not all message IDs will necessarily be sent, there may not be room.
-     *                        non-null.
-     *
-     * @param newAckCount the number of ackIdsRemaining entries that are new. These must be the first
-     *                    ones in the list
-     *
-     * @param partialACKsRemaining list of messageIds (ACKBitfield) that should be acked by this packet.  
-     *                        The list itself is passed by reference, and if a messageId is
-     *                        included, it should be removed from the list.
-     *                        Full acks in this list are skipped, they are NOT transmitted.
-     *                        non-null.
-     *                        Not all acks will necessarily be sent, there may not be room.
      *
      * @return null on error
      */
-    public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState2 peer,
-                                 Collection<Long> ackIdsRemaining, int newAckCount,
-                                 List<ACKBitfield> partialACKsRemaining) {
+    public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState2 peer) {
         List<Fragment> frags = Collections.singletonList(new Fragment(state, fragment));
-        return buildPacket(frags, peer, ackIdsRemaining, newAckCount, partialACKsRemaining);
+        return buildPacket(frags, peer);
     }
 
     /*
      *  Multiple fragments
      *
      */
-    public UDPPacket buildPacket(List<Fragment> fragments, PeerState2 peer,
-                                 Collection<Long> ackIdsRemaining, int newAckCount,
-                                 List<ACKBitfield> partialACKsRemaining) {
+    public UDPPacket buildPacket(List<Fragment> fragments, PeerState2 peer) {
         // calculate data size
         int numFragments = fragments.size();
         int dataSize = 0;
@@ -172,10 +145,10 @@ class PacketBuilder2 {
             int fragment = frag.num;
             int sz = state.fragmentSize(fragment);
             dataSize += sz;
+            dataSize += SSU2Payload.BLOCK_HEADER_SIZE;
+            if (fragment > 0)
+                dataSize += 5; // frag + msg ID for follow-on blocks
         }
-        
-        if (dataSize < 0)
-            return null;
 
         // calculate size available for acks
         int currentMTU = peer.getMTU();
@@ -188,9 +161,6 @@ class PacketBuilder2 {
             availableForAcks -= MIN_DATA_PACKET_OVERHEAD;
             ipHeaderSize = IP_HEADER_SIZE;
         }
-        if (numFragments > 1)
-            availableForAcks -= (numFragments - 1) * FIRST_FRAGMENT_HEADER_SIZE;
-        int availableForExplicitAcks = availableForAcks;
 
         // make the packet
         long pktNum = peer.getNextPacketNumber();
@@ -202,93 +172,21 @@ class PacketBuilder2 {
         // ok, now for the body...
         // +2 for acks and padding
         List<Block> blocks = new ArrayList<Block>(fragments.size() + 2);
-        
-/*
-        // partial acks have priority but they are after explicit acks in the packet
-        // so we have to compute the space in advance
-        int partialAcksToSend = 0;
-        if (availableForExplicitAcks >= 6 && !partialACKsRemaining.isEmpty()) {
-            for (ACKBitfield bf : partialACKsRemaining) {
-                if (partialAcksToSend >= ABSOLUTE_MAX_ACKS)
-                    break;  // ack count
-                // only send what we have to
-                //int acksz = 4 + (bf.fragmentCount() / 7) + 1;
-                int bits = bf.highestReceived() + 1;
-                if (bits <= 0)
-                    continue;
-                int acksz = bits / 7;
-                if (bits % 7 > 0)
-                    acksz++;
-                acksz += 4;
-                if (partialAcksToSend == 0)
-                    acksz++;  // ack count
-                if (availableForExplicitAcks >= acksz) {
-                    availableForExplicitAcks -= acksz;
-                    partialAcksToSend++;
-                } else {
-                    break;
-                }
+        int sizeWritten = 0;
+
+        // add the acks
+        if (availableForAcks >= SSU2Payload.BLOCK_HEADER_SIZE + 5) {
+            int maxRanges = (availableForAcks - (SSU2Payload.BLOCK_HEADER_SIZE + 5)) / 2;
+            Block block = peer.getReceivedMessages().toAckBlock(maxRanges);
+            if (block != null) {
+                blocks.add(block);
+                int sz = block.getTotalLength();
+                off += sz;
+                sizeWritten += sz;
             }
         }
-
-
-        // always send all the new acks if we have room
-        int explicitToSend = Math.min(ABSOLUTE_MAX_ACKS,
-                                      Math.min(newAckCount + (currentMTU > PeerState.MIN_MTU ? MAX_RESEND_ACKS_LARGE : MAX_RESEND_ACKS_SMALL),
-                                               Math.min((availableForExplicitAcks - 1) / 4, ackIdsRemaining.size())));
-        if (explicitToSend > 0) {
-            data[off++] = (byte) explicitToSend;
-            Iterator<Long> iter = ackIdsRemaining.iterator();
-            for (int i = 0; i < explicitToSend && iter.hasNext(); i++) {
-                Long ackId = iter.next();
-                iter.remove();
-            }
-            //acksIncluded = true;
-        }
-*/
-
-/*
-        if (partialAcksToSend > 0) {
-            if (msg != null)
-                msg.append(partialAcksToSend).append(" partial acks included:");
-            int origNumRemaining = partialACKsRemaining.size();
-            int numPartialOffset = off;
-            // leave it blank for now, since we could skip some
-            off++;
-            Iterator<ACKBitfield> iter = partialACKsRemaining.iterator();
-            for (int i = 0; i < partialAcksToSend && iter.hasNext(); i++) {
-                ACKBitfield bitfield = iter.next();
-                if (bitfield.receivedComplete()) continue;
-                // only send what we have to
-                //int bits = bitfield.fragmentCount();
-                int bits = bitfield.highestReceived() + 1;
-                if (bits <= 0)
-                    continue;
-                int size = bits / 7;
-                if (bits % 7 > 0)
-                    size++;
-                DataHelper.toLong(data, off, 4, bitfield.getMessageId());
-                off += 4;
-                for (int curByte = 0; curByte < size; curByte++) {
-                    if (curByte + 1 < size)
-                        data[off] = (byte)(1 << 7);
-                    else
-                        data[off] = 0;
-                    
-                    for (int curBit = 0; curBit < 7; curBit++) {
-                        if (bitfield.received(curBit + 7*curByte))
-                            data[off] |= (byte)(1 << curBit);
-                    }
-                    off++;
-                }
-                iter.remove();
-            }
-            DataHelper.toLong(data, numPartialOffset, 1, origNumRemaining - partialACKsRemaining.size());
-        }
-*/
         
         // now write each fragment
-        int sizeWritten = 0;
         for (int i = 0; i < numFragments; i++) {
             Fragment frag = fragments.get(i);
             OutboundMessageState state = frag.state;
@@ -332,12 +230,6 @@ class PacketBuilder2 {
                        " data size " + dataSize +
                        " pkt size " + (off + (ipHeaderSize + UDP_HEADER_SIZE)) +
                        " MTU " + currentMTU +
-/*
-                       ' ' + availableForAcks + " for all acks, " +
-                       availableForExplicitAcks + " for full acks, " + 
-                       explicitToSend + " full acks included, " +
-                       partialAcksToSend + " partial acks included, " +
-*/
                        " Fragments: " + DataHelper.toString(fragments), new Exception());
             }
         }
@@ -347,104 +239,35 @@ class PacketBuilder2 {
     }
     
     /**
-     * An ACK packet with no acks.
+     * A DATA packet with padding only.
      * We use this for keepalive purposes.
-     * It doesn't generate a reply, but that's ok.
      */
     public UDPPacket buildPing(PeerState2 peer) {
-        return buildACK(peer, Collections.<ACKBitfield> emptyList());
-    }
-
-    /**
-     *  Build the ack packet. The list need not be sorted into full and partial;
-     *  this method will put all fulls before the partials in the outgoing packet.
-     *  An ack packet is just a data packet with no data.
-     *  See buildPacket() for format.
-     *
-     *  TODO MTU not enforced.
-     *  TODO handle huge number of acks better
-     *
-     * @param ackBitfields list of ACKBitfield instances to either fully or partially ACK
-     */
-    public UDPPacket buildACK(PeerState2 peer, List<ACKBitfield> ackBitfields) {
         long pktNum = peer.getNextPacketNumber();
         UDPPacket packet = buildShortPacketHeader(peer.getSendConnID(), pktNum, DATA_FLAG_BYTE);
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
         int off = SHORT_HEADER_SIZE;
-
-        int fullACKCount = 0;
-        int partialACKCount = 0;
-/*
-        for (int i = 0; i < ackBitfields.size(); i++) {
-            if (ackBitfields.get(i).receivedComplete())
-                fullACKCount++;
-            else
-                partialACKCount++;
-        }
-
-// sort, create ranges
-
-        // FIXME do better than this, we could still exceed MTU
-        if (fullACKCount > ABSOLUTE_MAX_ACKS ||
-            partialACKCount > ABSOLUTE_MAX_ACKS)
-            throw new IllegalArgumentException("Too many acks full/partial " + fullACKCount +
-                                               '/' + partialACKCount);
-
-        // ok, now for the body...
-        if (fullACKCount > 0)
-            data[off] |= UDPPacket.DATA_FLAG_EXPLICIT_ACK;
-        if (partialACKCount > 0)
-            data[off] |= UDPPacket.DATA_FLAG_ACK_BITFIELDS;
-        // add ECN if (peer.getSomethingOrOther())
-        off++;
-        
-        if (fullACKCount > 0) {
-            data[off++] = (byte) fullACKCount;
-            for (int i = 0; i < ackBitfields.size(); i++) {
-                ACKBitfield bf = ackBitfields.get(i);
-                if (bf.receivedComplete()) {
-                    DataHelper.toLong(data, off, 4, bf.getMessageId());
-                    off += 4;
-                }
-            }
-        }
-        
-        if (partialACKCount > 0) {
-            data[off++] = (byte) partialACKCount;
-            for (int i = 0; i < ackBitfields.size(); i++) {
-                ACKBitfield bitfield = ackBitfields.get(i);
-                if (bitfield.receivedComplete()) continue;
-                DataHelper.toLong(data, off, 4, bitfield.getMessageId());
-                off += 4;
-                // only send what we have to
-                //int bits = bitfield.fragmentCount();
-                int bits = bitfield.highestReceived() + 1;
-                int size = bits / 7;
-                if (bits == 0 || bits % 7 > 0)
-                    size++;
-                for (int curByte = 0; curByte < size; curByte++) {
-                    if (curByte + 1 < size)
-                        data[off] = (byte)(1 << 7);
-                    else
-                        data[off] = 0;
-                    
-                    for (int curBit = 0; curBit < 7; curBit++) {
-                        if (bitfield.received(curBit + 7*curByte))
-                            data[off] |= (byte)(1 << curBit);
-                    }
-                    off++;
-                }
-            }
-        }
-*/
-        
+        Block block = getPadding(0, 1280);
+        List<Block> blocks = Collections.singletonList(block);
+        off += block.getTotalLength();
+        SSU2Payload.writePayload(data, SHORT_HEADER_SIZE, blocks);
         pkt.setLength(off);
         encryptDataPacket(packet, peer.getSendCipher(), pktNum, peer.getSendHeaderEncryptKey1(), peer.getSendHeaderEncryptKey2());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
-        packet.setMessageType(TYPE_ACK);
-        packet.setPriority((fullACKCount > 0 || partialACKCount > 0) ? PRIORITY_HIGH : PRIORITY_LOW);
+        packet.setPriority(0);
         return packet;
+    }
+
+    /**
+     *  Build the ack packet.
+     *  An ack packet is just a data packet with no data.
+     *  See buildPacket() for format.
+     *
+     *
+     */
+    public UDPPacket buildACK(PeerState2 peer) {
+        return buildPacket(Collections.emptyList(), peer);
     }
     
     /**
