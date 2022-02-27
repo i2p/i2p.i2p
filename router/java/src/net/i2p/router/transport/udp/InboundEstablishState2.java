@@ -14,11 +14,13 @@ import com.southernstorm.noise.protocol.HandshakeState;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 
@@ -156,6 +158,10 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         if (isHandshake)
             throw new DataFormatException("RI in Sess Req");
         _receivedUnconfirmedIdentity = ri.getIdentity();
+        if (ri.getNetworkId() != _context.router().getNetworkID()) {
+            // TODO ban
+            throw new DataFormatException("SSU2 network ID mismatch");
+        }
         List<RouterAddress> addrs = ri.getTargetAddresses("SSU", "SSU2");
         RouterAddress ra = null;
         for (RouterAddress addr : addrs) {
@@ -186,10 +192,28 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         if (!"2".equals(ra.getOption("v")))
             throw new DataFormatException("bad SSU2 v");
 
+        Hash h = _receivedUnconfirmedIdentity.calculateHash();
+        try {
+            RouterInfo old = _context.netDb().store(h, ri);
+            if (flood && !ri.equals(old)) {
+                FloodfillNetworkDatabaseFacade fndf = (FloodfillNetworkDatabaseFacade) _context.netDb();
+                if (fndf.floodConditional(ri)) {
+                    if (_log.shouldDebug())
+                        _log.debug("Flooded the RI: " + h);
+                } else {
+                    if (_log.shouldInfo())
+                        _log.info("Flood request but we didn't: " + h);
+                }
+            }
+        } catch (IllegalArgumentException iae) {
+            // generally expired/future RI
+            // don't change reason if already set as clock skew
+            throw new DataFormatException("RI store fail: " + ri, iae);
+        }
+
         _receivedConfirmedIdentity = _receivedUnconfirmedIdentity;
         _sendHeaderEncryptKey1 = ik;
         //_sendHeaderEncryptKey2 calculated below
-
     }
 
     public void gotRIFragment(byte[] data, boolean isHandshake, boolean flood, boolean isGzipped, int frag, int totalFrags) {
