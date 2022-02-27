@@ -32,17 +32,21 @@ import net.i2p.util.Log;
  * @since 0.9.54
  */
 class InboundEstablishState2 extends InboundEstablishState implements SSU2Payload.PayloadCallback {
+    private final UDPTransport _transport;
     private final InetSocketAddress _aliceSocketAddress;
     private final long _rcvConnID;
     private final long _sendConnID;
     private final long _token;
-    private final long _nextToken;
     private final HandshakeState _handshakeState;
     private byte[] _sendHeaderEncryptKey1;
     private final byte[] _rcvHeaderEncryptKey1;
     private byte[] _sendHeaderEncryptKey2;
     private byte[] _rcvHeaderEncryptKey2;
     
+    // testing
+    private static final boolean ENFORCE_TOKEN = false;
+
+
     /**
      *  @param localPort Must be our external port, otherwise the signature of the
      *                   SessionCreated message will be bad if the external port != the internal port.
@@ -51,6 +55,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     public InboundEstablishState2(RouterContext ctx, UDPTransport transport,
                                   UDPPacket packet) throws GeneralSecurityException {
         super(ctx, (InetSocketAddress) packet.getPacket().getSocketAddress());
+        _transport = transport;
         DatagramPacket pkt = packet.getPacket();
         _aliceSocketAddress = (InetSocketAddress) pkt.getSocketAddress();
         _handshakeState = new HandshakeState(HandshakeState.PATTERN_ID_XK_SSU2, HandshakeState.RESPONDER, transport.getXDHFactory());
@@ -68,9 +73,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         int off = pkt.getOffset();
         int len = pkt.getLength();
         byte data[] = pkt.getData();
-        // fast MSB check for key < 2^255
-        if ((data[off + 32 + 32 - 1] & 0x80) != 0)
-            throw new GeneralSecurityException("Bad PK msg 1");
         _rcvConnID = DataHelper.fromLong8(data, off);
         _sendConnID = DataHelper.fromLong8(data, off + 16);
         if (_rcvConnID == _sendConnID)
@@ -85,7 +87,9 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                 token = ctx.random().nextLong();
             } while (token == 0);
             _token = token;
-        } else if (type == 0 && token == 0) { // || token not valid
+        } else if (type == 0 &&
+                   (token == 0 ||
+                    (ENFORCE_TOKEN && !_transport.getEstablisher().isInboundTokenValid(_remoteHostId, token)))) {
             _currentState = InboundState.IB_STATE_REQUEST_BAD_TOKEN_RECEIVED;
             _sendHeaderEncryptKey2 = introKey;
             do {
@@ -93,6 +97,9 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             } while (token == 0);
             _token = token;
         } else {
+            // fast MSB check for key < 2^255
+            if ((data[off + 32 + 32 - 1] & 0x80) != 0)
+                throw new GeneralSecurityException("Bad PK msg 1");
             // probably don't need again
             _token = token;
             _handshakeState.start();
@@ -116,7 +123,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             _sendHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessCreateHeader");
             _currentState = InboundState.IB_STATE_REQUEST_RECEIVED;
         }
-        _nextToken = ctx.random().nextLong();
         packetReceived();
     }
 
@@ -149,6 +155,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         System.out.println("Got RI block: " + ri);
         if (isHandshake)
             throw new DataFormatException("RI in Sess Req");
+        _receivedUnconfirmedIdentity = ri.getIdentity();
         List<RouterAddress> addrs = ri.getTargetAddresses("SSU", "SSU2");
         RouterAddress ra = null;
         for (RouterAddress addr : addrs) {
@@ -179,6 +186,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         if (!"2".equals(ra.getOption("v")))
             throw new DataFormatException("bad SSU2 v");
 
+        _receivedConfirmedIdentity = _receivedUnconfirmedIdentity;
         _sendHeaderEncryptKey1 = ik;
         //_sendHeaderEncryptKey2 calculated below
 
@@ -207,19 +215,25 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     public void gotToken(long token, long expires) {
-        System.out.println("Got NEW TOKEN block " + token + " expires " + DataHelper.formatTime(expires));
+        if (_receivedConfirmedIdentity == null)
+            throw new IllegalStateException("RI must be first");
+        _transport.getEstablisher().addOutboundToken(_receivedConfirmedIdentity.calculateHash(), token, expires);
     }
 
     public void gotI2NP(I2NPMessage msg) {
         System.out.println("Got I2NP block: " + msg);
         if (getState() != InboundState.IB_STATE_CREATED_SENT)
             throw new IllegalStateException("I2NP in Sess Req");
+        if (_receivedConfirmedIdentity == null)
+            throw new IllegalStateException("RI must be first");
     }
 
     public void gotFragment(byte[] data, int off, int len, long messageID, int frag, boolean isLast) throws DataFormatException {
         System.out.println("Got FRAGMENT block: " + messageID);
         if (getState() != InboundState.IB_STATE_CREATED_SENT)
             throw new IllegalStateException("I2NP in Sess Req");
+        if (_receivedConfirmedIdentity == null)
+            throw new IllegalStateException("RI must be first");
     }
 
     public void gotACK(long ackThru, int acks, byte[] ranges) {
@@ -244,7 +258,15 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     public long getSendConnID() { return _sendConnID; }
     public long getRcvConnID() { return _rcvConnID; }
     public long getToken() { return _token; }
-    public long getNextToken() { return _nextToken; }
+    public long getNextToken() {
+        // generate on the fly, this will only be called once
+        long token;
+        do {
+            token = _context.random().nextLong();
+        } while (token == 0);
+        _transport.getEstablisher().addInboundToken(_remoteHostId, token);
+        return token;
+    }
     public HandshakeState getHandshakeState() { return _handshakeState; }
     public byte[] getSendHeaderEncryptKey1() { return _sendHeaderEncryptKey1; }
     public byte[] getRcvHeaderEncryptKey1() { return _rcvHeaderEncryptKey1; }

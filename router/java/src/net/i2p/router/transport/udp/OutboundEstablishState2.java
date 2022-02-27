@@ -37,7 +37,6 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     private final long _sendConnID;
     private final long _rcvConnID;
     private long _token;
-    private final long _nextToken;
     private HandshakeState _handshakeState;
     private final byte[] _sendHeaderEncryptKey1;
     private final byte[] _rcvHeaderEncryptKey1;
@@ -96,7 +95,6 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             } while (_token == 0);
         }
         _rcvConnID = rcid;
-        _nextToken = ctx.random().nextLong();
         byte[] ik = introKey.getData();
         _sendHeaderEncryptKey1 = ik;
         _rcvHeaderEncryptKey1 = ik;
@@ -173,7 +171,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     public void gotToken(long token, long expires) {
-        System.out.println("Got NEW TOKEN block " + token + " expires " + DataHelper.formatTime(expires));
+        _transport.getEstablisher().addOutboundToken(_remotePeer.calculateHash(), token, expires);
     }
 
     public void gotI2NP(I2NPMessage msg) {
@@ -208,7 +206,15 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     public long getSendConnID() { return _sendConnID; }
     public long getRcvConnID() { return _rcvConnID; }
     public long getToken() { return _token; }
-    public long getNextToken() { return _nextToken; }
+    public long getNextToken() {
+        // generate on the fly, this will only be called once
+        long token;
+        do {
+            token = _context.random().nextLong();
+        } while (token == 0);
+        _transport.getEstablisher().addInboundToken(_remoteHostId, token);
+        return token;
+    }
     public HandshakeState getHandshakeState() { return _handshakeState; }
     public byte[] getSendHeaderEncryptKey1() { return _sendHeaderEncryptKey1; }
     public byte[] getRcvHeaderEncryptKey1() { return _rcvHeaderEncryptKey1; }

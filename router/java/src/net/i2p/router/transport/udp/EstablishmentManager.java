@@ -29,6 +29,7 @@ import net.i2p.router.util.DecayingHashSet;
 import net.i2p.router.util.DecayingBloomFilter;
 import net.i2p.util.Addresses;
 import net.i2p.util.I2PThread;
+import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
 
@@ -44,6 +45,12 @@ class EstablishmentManager {
     private final UDPTransport _transport;
     private final PacketBuilder _builder;
     private final int _networkID;
+
+    // SSU 2
+    private final PacketBuilder2 _builder2;
+    private final boolean _enableSSU2;
+    private final Map<Hash, Token> _outboundTokens;
+    private final Map<RemoteHostId, Token> _inboundTokens;
 
     /** map of RemoteHostId to InboundEstablishState */
     private final ConcurrentHashMap<RemoteHostId, InboundEstablishState> _inboundStates;
@@ -138,6 +145,10 @@ class EstablishmentManager {
     private static final String VERSION_ALLOW_EXTENDED_OPTIONS = "0.9.24";
     private static final String PROP_DISABLE_EXT_OPTS = "i2np.udp.disableExtendedOptions";
 
+    // SSU 2
+    private static final int MAX_TOKENS = 512;
+    public static final long IB_TOKEN_EXPIRATION = 60*60*1000L;
+
 
     public EstablishmentManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
@@ -145,12 +156,22 @@ class EstablishmentManager {
         _networkID = ctx.router().getNetworkID();
         _transport = transport;
         _builder = transport.getBuilder();
+        _builder2 = transport.getBuilder2();
+        _enableSSU2 = _builder2 != null;
         _inboundStates = new ConcurrentHashMap<RemoteHostId, InboundEstablishState>();
         _outboundStates = new ConcurrentHashMap<RemoteHostId, OutboundEstablishState>();
         _queuedOutbound = new ConcurrentHashMap<RemoteHostId, List<OutNetMessage>>();
         _liveIntroductions = new ConcurrentHashMap<Long, OutboundEstablishState>();
         _outboundByClaimedAddress = new ConcurrentHashMap<RemoteHostId, OutboundEstablishState>();
         _outboundByHash = new ConcurrentHashMap<Hash, OutboundEstablishState>();
+        if (_enableSSU2) {
+            _inboundTokens = new LHMCache<RemoteHostId, Token>(MAX_TOKENS);
+            _outboundTokens = new LHMCache<Hash, Token>(MAX_TOKENS);
+        } else {
+            _inboundTokens = null;
+            _outboundTokens = null;
+        }
+
         _activityLock = new Object();
         _replayFilter = new DecayingHashSet(ctx, 10*60*1000, 8, "SSU-DH-X");
         DEFAULT_MAX_CONCURRENT_ESTABLISH = Math.max(DEFAULT_LOW_MAX_CONCURRENT_ESTABLISH,
@@ -1427,6 +1448,86 @@ class EstablishmentManager {
             _transport.failed(msg, "Expired during failed establish");
         }
     }
+
+    //// SSU 2 ////
+
+    /**
+     *  Remember a token that can be used later to connect to the peer
+     *
+     *  @param token nonzero
+     *  @since 0.9.54
+     */
+    public void addOutboundToken(Hash peer, long token, long expires) {
+        if (expires < _context.clock().now())
+            return;
+        Token tok = new Token(token, expires);
+        synchronized(_outboundTokens) {
+            _outboundTokens.put(peer, tok);
+        }
+    }
+
+    /**
+     *  Get a token to connect to the peer
+     *
+     *  @return 0 if none available
+     *  @since 0.9.54
+     */
+    public long getOutboundToken(Hash peer) {
+        Token tok;
+        synchronized(_outboundTokens) {
+            tok = _outboundTokens.remove(peer);
+        }
+        if (tok == null)
+            return 0;
+        if (tok.expires < _context.clock().now())
+            return 0;
+        return tok.token;
+    }
+
+    /**
+     *  Remember a token that can be used later for the peer to connect to us
+     *
+     *  @param token nonzero
+     *  @since 0.9.54
+     */
+    public void addInboundToken(RemoteHostId peer, long token) {
+        long expires = _context.clock().now() + IB_TOKEN_EXPIRATION;
+        Token tok = new Token(token, expires);
+        synchronized(_inboundTokens) {
+            _inboundTokens.put(peer, tok);
+        }
+    }
+
+    /**
+     *  Is the token from this peer valid?
+     *
+     *  @return valid
+     *  @since 0.9.54
+     */
+    public boolean isInboundTokenValid(RemoteHostId peer, long token) {
+        if (token == 0)
+            return false;
+        Token tok;
+        synchronized(_inboundTokens) {
+            tok = _inboundTokens.get(peer);
+            if (tok == null)
+                return false;
+            if (tok.token != token)
+                return false;
+            _inboundTokens.remove(peer);
+        }
+        return tok.expires >= _context.clock().now();
+    }
+
+    private static class Token {
+        public final long token, expires;
+        public Token(long tok, long exp) {
+            token = tok; expires = exp;
+        }
+    }
+
+    //// End SSU 2 ////
+
 
     /**    
      * Driving thread, processing up to one step for an inbound peer and up to

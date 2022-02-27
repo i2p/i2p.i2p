@@ -50,15 +50,15 @@ class InboundEstablishState {
     private byte _receivedSignature[];
     private boolean _verificationAttempted;
     // sig not verified
-    private RouterIdentity _receivedUnconfirmedIdentity;
+    protected RouterIdentity _receivedUnconfirmedIdentity;
     // identical to uncomfirmed, but sig now verified
-    private RouterIdentity _receivedConfirmedIdentity;
+    protected RouterIdentity _receivedConfirmedIdentity;
     // general status 
     private final long _establishBegin;
     //private long _lastReceive;
     protected long _lastSend;
     protected long _nextSend;
-    private final RemoteHostId _remoteHostId;
+    protected final RemoteHostId _remoteHostId;
     protected InboundState _currentState;
     private final Queue<OutNetMessage> _queuedMessages;
     // count for backoff

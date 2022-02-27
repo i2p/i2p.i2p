@@ -55,7 +55,7 @@ class OutboundEstablishState {
     private long _nextSend;
     protected RemoteHostId _remoteHostId;
     private final RemoteHostId _claimedAddress;
-    private final RouterIdentity _remotePeer;
+    protected final RouterIdentity _remotePeer;
     private final boolean _allowExtendedOptions;
     private final boolean _needIntroduction;
     private final SessionKey _introKey;

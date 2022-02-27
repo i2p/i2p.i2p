@@ -795,7 +795,7 @@ class PacketBuilder2 {
                 blocks.add(block);
             }
             if (token > 0) {
-                block = new SSU2Payload.NewTokenBlock(token, _context.clock().now() + 6*24*60*60*1000L);
+                block = new SSU2Payload.NewTokenBlock(token, _context.clock().now() + EstablishmentManager.IB_TOKEN_EXPIRATION);
                 len += block.getTotalLength();
                 blocks.add(block);
             }
@@ -923,7 +923,7 @@ class PacketBuilder2 {
             blocks.add(riblock);
             if (token > 0) {
                 // TODO only if room
-                Block block = new SSU2Payload.NewTokenBlock(token, _context.clock().now() + 6*24*60*60*1000L);
+                Block block = new SSU2Payload.NewTokenBlock(token, _context.clock().now() + EstablishmentManager.IB_TOKEN_EXPIRATION);
                 len += block.getTotalLength();
                 blocks.add(block);
             }
