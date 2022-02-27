@@ -906,7 +906,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * @return the valid version 1 or 2, or 0 if unusable
      * @since 0.9.54
      */
-    private int getSSUVersion(RouterAddress addr) {
+    int getSSUVersion(RouterAddress addr) {
         int rv;
         String style = addr.getTransportStyle();
         if (style.equals(STYLE)) {

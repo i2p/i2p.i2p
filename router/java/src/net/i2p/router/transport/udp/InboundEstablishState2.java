@@ -2,8 +2,10 @@ package net.i2p.router.transport.udp;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
@@ -44,6 +46,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     private final byte[] _rcvHeaderEncryptKey1;
     private byte[] _sendHeaderEncryptKey2;
     private byte[] _rcvHeaderEncryptKey2;
+    private byte[] _sessCrForReTX;
     
     // testing
     private static final boolean ENFORCE_TOKEN = false;
@@ -52,7 +55,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     /**
      *  @param localPort Must be our external port, otherwise the signature of the
      *                   SessionCreated message will be bad if the external port != the internal port.
-     *  @param packet with all header encryption removed
+     *  @param packet with all header encryption removed,
+     *                either a SessionRequest OR a TokenRequest.
      */
     public InboundEstablishState2(RouterContext ctx, UDPTransport transport,
                                   UDPPacket packet) throws GeneralSecurityException {
@@ -279,6 +283,13 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     // end payload callbacks
     /////////////////////////////////////////////////////////
     
+    // SSU 1 unsupported things
+
+    @Override
+    public void generateSessionKey() { throw new UnsupportedOperationException(); }
+
+    // SSU 2 things
+
     public long getSendConnID() { return _sendConnID; }
     public long getRcvConnID() { return _rcvConnID; }
     public long getToken() { return _token; }
@@ -406,6 +417,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         if (_log.shouldDebug())
             _log.debug("State after sess conf: " + _handshakeState);
         processPayload(payload, payload.length, false);
+        _sessCrForReTX = null;
 
         // TODO split, calculate keys
 
@@ -425,6 +437,58 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         }	
 
         packetReceived();
+    }
+
+    /**
+     * note that we just sent the SessionCreated packet
+     * and save it for retransmission
+     */
+    public synchronized void createdPacketSent(DatagramPacket pkt) {
+        if (_sessCrForReTX == null) {
+            // store pkt for retx
+            byte data[] = pkt.getData();
+            int off = pkt.getOffset();
+            int len = pkt.getLength();
+            _sessCrForReTX = new byte[len];
+            System.arraycopy(data, off, _sessCrForReTX, 0, len);
+        }
+        createdPacketSent();
+    }
+
+    /**
+     * @return null if not sent or already got the session created
+     */
+    public synchronized UDPPacket getRetransmitSessionCreatedPacket() {
+        if (_sessCrForReTX == null)
+            return null;
+        UDPPacket packet = UDPPacket.acquire(_context, false);
+        DatagramPacket pkt = packet.getPacket();
+        byte data[] = pkt.getData();
+        int off = pkt.getOffset();
+        System.arraycopy(_sessCrForReTX, 0, data, off, _sessCrForReTX.length);
+        InetAddress to;
+        try {
+            to = InetAddress.getByAddress(_aliceIP);
+        } catch (UnknownHostException uhe) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("How did we think this was a valid IP?  " + _remoteHostId);
+            packet.release();
+            return null;
+        }
+        pkt.setAddress(to);
+        pkt.setPort(_alicePort);
+        packet.setMessageType(PacketBuilder2.TYPE_CONF);
+        packet.setPriority(PacketBuilder2.PRIORITY_HIGH);
+        createdPacketSent();
+        return packet;
+    }
+
+    /**
+     * @return null we have not received the session confirmed
+     */
+    public synchronized PeerState2 getPeerState() {
+        // TODO
+        return null;
     }
     
     @Override

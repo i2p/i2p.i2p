@@ -292,7 +292,7 @@ class PacketBuilder2 {
             packet.release();
             return null;
         }
-        InetAddress to = null;
+        InetAddress to;
         try {
             to = InetAddress.getByAddress(toIP);
         } catch (UnknownHostException uhe) {
@@ -309,6 +309,7 @@ class PacketBuilder2 {
         setTo(packet, to, state.getSentPort());
         packet.setMessageType(TYPE_SREQ);
         packet.setPriority(PRIORITY_HIGH);
+        state.tokenRequestSent(pkt);
         return packet;
     }
     
@@ -328,7 +329,7 @@ class PacketBuilder2 {
             packet.release();
             return null;
         }
-        InetAddress to = null;
+        InetAddress to;
         try {
             to = InetAddress.getByAddress(toIP);
         } catch (UnknownHostException uhe) {
@@ -345,6 +346,7 @@ class PacketBuilder2 {
         setTo(packet, to, state.getSentPort());
         packet.setMessageType(TYPE_SREQ);
         packet.setPriority(PRIORITY_HIGH);
+        state.requestSent(pkt);
         return packet;
     }
     
@@ -365,10 +367,10 @@ class PacketBuilder2 {
         encryptSessionCreated(packet, state.getHandshakeState(), state.getSendHeaderEncryptKey1(),
                               state.getSendHeaderEncryptKey2(), state.getSentRelayTag(), state.getNextToken(),
                               sentIP, port);
-        state.createdPacketSent();
         pkt.setSocketAddress(state.getSentAddress());
         packet.setMessageType(TYPE_CREAT);
         packet.setPriority(PRIORITY_HIGH);
+        state.createdPacketSent(pkt);
         return packet;
     }
     
@@ -390,10 +392,10 @@ class PacketBuilder2 {
         encryptRetry(packet, state.getSendHeaderEncryptKey1(), n, state.getSendHeaderEncryptKey1(),
                      state.getSendHeaderEncryptKey2(),
                      sentIP, port);
-        state.retryPacketSent();
         pkt.setSocketAddress(state.getSentAddress());
         packet.setMessageType(TYPE_CREAT);
         packet.setPriority(PRIORITY_HIGH);
+        state.retryPacketSent();
         return packet;
     }
     
@@ -460,7 +462,7 @@ class PacketBuilder2 {
             // TODO numFragments > 1 requires shift to data phase
             throw new IllegalArgumentException("TODO");
         }
-        state.confirmedPacketsSent();
+        state.confirmedPacketsSent(packets);
         return packets;
     }
 
@@ -473,7 +475,7 @@ class PacketBuilder2 {
         UDPPacket packet = buildShortPacketHeader(state.getSendConnID(), 1, SESSION_CONFIRMED_FLAG_BYTE);
         DatagramPacket pkt = packet.getPacket();
 
-        InetAddress to = null;
+        InetAddress to;
         try {
             to = InetAddress.getByAddress(state.getSentIP());
         } catch (UnknownHostException uhe) {

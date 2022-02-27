@@ -139,11 +139,11 @@ public class PeerState {
     /** what IP is the peer sending and receiving packets on? */
     protected final byte[] _remoteIP;
     /** cached IP address */
-    private volatile InetAddress _remoteIPAddress;
+    protected volatile InetAddress _remoteIPAddress;
     /** what port is the peer sending and receiving packets on? */
-    private volatile int _remotePort;
+    protected volatile int _remotePort;
     /** cached RemoteHostId, used to find the peerState by remote info */
-    private volatile RemoteHostId _remoteHostId;
+    protected volatile RemoteHostId _remoteHostId;
 
     /** if we need to contact them, do we need to talk to an introducer? */
     //private boolean _remoteRequiresIntroduction;
