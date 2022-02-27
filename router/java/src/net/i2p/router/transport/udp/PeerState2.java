@@ -68,6 +68,9 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         _rcvHeaderEncryptKey2 = rcvHdrKey2;
         _receivedMessages = new SSU2Bitfield(256, 0);
         _ackedMessages = new SSU2Bitfield(256, 0);
+        // For outbound, SessionConfirmed is packet 0
+        if (!isInbound)
+            _packetNumber.set(1);
     }
 
     // SSU 1 overrides

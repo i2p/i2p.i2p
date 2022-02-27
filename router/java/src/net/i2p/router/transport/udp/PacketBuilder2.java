@@ -320,7 +320,8 @@ class PacketBuilder2 {
      * @return ready to send packet, or null if there was a problem
      */
     public UDPPacket buildSessionRequestPacket(OutboundEstablishState2 state) {
-        UDPPacket packet = buildLongPacketHeader(state.getSendConnID(), 0, SESSION_REQUEST_FLAG_BYTE,
+        long n = _context.random().signedNextInt() & 0xFFFFFFFFL;
+        UDPPacket packet = buildLongPacketHeader(state.getSendConnID(), n, SESSION_REQUEST_FLAG_BYTE,
                                                  state.getRcvConnID(), state.getToken());
         DatagramPacket pkt = packet.getPacket();
 
@@ -357,7 +358,8 @@ class PacketBuilder2 {
      * @return ready to send packet, or null if there was a problem
      */
     public UDPPacket buildSessionCreatedPacket(InboundEstablishState2 state) {
-        UDPPacket packet = buildLongPacketHeader(state.getSendConnID(), 0, SESSION_CREATED_FLAG_BYTE,
+        long n = _context.random().signedNextInt() & 0xFFFFFFFFL;
+        UDPPacket packet = buildLongPacketHeader(state.getSendConnID(), n, SESSION_CREATED_FLAG_BYTE,
                                                  state.getRcvConnID(), state.getToken());
         DatagramPacket pkt = packet.getPacket();
         
@@ -472,7 +474,7 @@ class PacketBuilder2 {
      * @return ready to send packet, or null if there was a problem
      */
     private UDPPacket buildSessionConfirmedPacket(OutboundEstablishState2 state, int numFragments, byte ourInfo[], int len, boolean gzip) {
-        UDPPacket packet = buildShortPacketHeader(state.getSendConnID(), 1, SESSION_CONFIRMED_FLAG_BYTE);
+        UDPPacket packet = buildShortPacketHeader(state.getSendConnID(), 0, SESSION_CONFIRMED_FLAG_BYTE);
         DatagramPacket pkt = packet.getPacket();
 
         InetAddress to;
