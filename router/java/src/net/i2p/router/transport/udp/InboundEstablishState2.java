@@ -162,7 +162,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             // TODO ban
             throw new DataFormatException("SSU2 network ID mismatch");
         }
-        List<RouterAddress> addrs = ri.getTargetAddresses("SSU", "SSU2");
+        List<RouterAddress> addrs = _transport.getTargetAddresses(ri);
         RouterAddress ra = null;
         for (RouterAddress addr : addrs) {
             // skip NTCP w/o "s"

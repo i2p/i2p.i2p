@@ -142,6 +142,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     static final int SSU2_INT_VERSION = 2;
     /** "2" */
     static final String SSU2_VERSION = Integer.toString(SSU2_INT_VERSION);
+    /** "2," */
+    static final String SSU2_VERSION_ALT = SSU2_VERSION + ',';
     private final boolean _enableSSU1;
     private final boolean _enableSSU2;
     private final PacketBuilder2 _packetBuilder2;
@@ -895,6 +897,43 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     byte[] getSSU2StaticPrivKey() {
         return _ssu2StaticPrivKey;
+    }
+
+    /**
+     * Get the valid SSU version of Bob's SSU address
+     * for our outbound connections as Alice.
+     *
+     * @return the valid version 1 or 2, or 0 if unusable
+     * @since 0.9.54
+     */
+    private int getSSUVersion(RouterAddress addr) {
+        int rv;
+        String style = addr.getTransportStyle();
+        if (style.equals(STYLE)) {
+            if (!_enableSSU2)
+                return 1;
+            rv = 1;
+        } else if (style.equals(STYLE2)) {
+            if (!_enableSSU2)
+                return 0;
+            rv = SSU2_INT_VERSION;
+        } else {
+            return 0;
+        }
+        // check version == "2" || version starts with "2,"
+        // and static key and intro key
+        String v = addr.getOption("v");
+        if (v == null ||
+            addr.getOption("i") == null ||
+            addr.getOption("s") == null ||
+            (!v.equals(SSU2_VERSION) && !v.startsWith(SSU2_VERSION_ALT))) {
+            // his address is SSU1 or is outbound SSU2 only
+            //return (rv == 1 && _enableSSU1) ? 1 : 0;
+            return (rv == 1) ? 1 : 0;
+        }
+        // his address is SSU2
+        // do not validate the s/i b64, we will just catch it later
+        return SSU2_INT_VERSION;
     }
 
     /**
@@ -2271,6 +2310,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         List<RouterAddress> addrs = getTargetAddresses(target);
         for (int i = 0; i < addrs.size(); i++) {
             RouterAddress addr = addrs.get(i);
+            //if (getSSUVersion(addr) == 0)
+            //    continue;
             if (addr.getOption("ihost0") == null) {
                 byte[] ip = addr.getIP();
                 int port = addr.getPort();
@@ -2311,6 +2352,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public static final int MIN_EXPIRE_TIMEOUT = 165*1000;
     
     public String getStyle() { return STYLE; }
+
+    /**
+     * An alternate supported style, or null.
+     * @since 0.9.54
+     */
+    @Override
+    public String getAltStyle() {
+        return _enableSSU2 ? STYLE2 : null;
+    }
+
 
     @Override
     public void send(OutNetMessage msg) { 
@@ -3709,6 +3760,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         List<PeerState> peers = new ArrayList<PeerState>(_peersByIdent.values());
         for (Iterator<PeerState> iter = new RandomIterator<PeerState>(peers); iter.hasNext(); ) {
             PeerState peer = iter.next();
+            // Skip SSU2 until we have support for peer test
+            if (peer.getVersion() != 1)
+                continue;
             if ( (dontInclude != null) && (dontInclude.equals(peer.getRemoteHostId())) )
                 continue;
             // enforce IPv4/v6 connection if we are ALICE looking for a BOB
