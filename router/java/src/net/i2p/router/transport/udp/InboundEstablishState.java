@@ -54,7 +54,7 @@ class InboundEstablishState {
     // identical to uncomfirmed, but sig now verified
     protected RouterIdentity _receivedConfirmedIdentity;
     // general status 
-    private final long _establishBegin;
+    protected final long _establishBegin;
     //private long _lastReceive;
     protected long _lastSend;
     protected long _nextSend;

@@ -49,7 +49,7 @@ class OutboundEstablishState {
     private long _sentSignedOnTime;
     private Signature _sentSignature;
     // general status 
-    private final long _establishBegin;
+    protected final long _establishBegin;
     //private long _lastReceive;
     private long _lastSend;
     private long _nextSend;

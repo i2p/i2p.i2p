@@ -49,9 +49,11 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     private byte[] _sendHeaderEncryptKey2;
     private byte[] _rcvHeaderEncryptKey2;
     private byte[] _sessCrForReTX;
+    private long _timeReceived;
     
     // testing
     private static final boolean ENFORCE_TOKEN = false;
+    private static final long MAX_SKEW = 2*60*1000L;
 
 
     /**
@@ -139,6 +141,11 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             _sendHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessCreateHeader");
             _currentState = InboundState.IB_STATE_REQUEST_RECEIVED;
         }
+        if (_timeReceived == 0)
+            throw new GeneralSecurityException("No DateTime block in Session/Token Request");
+        long skew = _establishBegin - _timeReceived;
+        if (skew > MAX_SKEW || skew < 0 - MAX_SKEW)
+            throw new GeneralSecurityException("Skew exceeded in Session/Token Request: " + skew);
         packetReceived();
     }
 
@@ -160,7 +167,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     /////////////////////////////////////////////////////////
 
     public void gotDateTime(long time) {
-        System.out.println("Got DATE block: " + DataHelper.formatTime(time));
+        _timeReceived = time;
     }
 
     public void gotOptions(byte[] options, boolean isHandshake) {
@@ -383,7 +390,13 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         }
         if (_log.shouldDebug())
             _log.debug("State after sess req: " + _handshakeState);
+        _timeReceived = 0;
         processPayload(data, off + LONG_HEADER_SIZE, len - (SHORT_HEADER_SIZE + KEY_LEN + MAC_LEN + MAC_LEN), true);
+        if (_timeReceived == 0)
+            throw new GeneralSecurityException("No DateTime block in Session Request");
+        long skew = _establishBegin - _timeReceived;
+        if (skew > MAX_SKEW || skew < 0 - MAX_SKEW)
+            throw new GeneralSecurityException("Skew exceeded in Session Request: " + skew);
         _sendHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessCreateHeader");
         _currentState = InboundState.IB_STATE_REQUEST_RECEIVED;
         

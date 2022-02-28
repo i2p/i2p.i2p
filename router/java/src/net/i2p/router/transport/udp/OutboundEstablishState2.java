@@ -50,7 +50,10 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     private int _mtu;
     private byte[] _sessReqForReTX;
     private byte[] _sessConfForReTX;
+    private long _timeReceived;
+
     private static final boolean SET_TOKEN = false;
+    private static final long MAX_SKEW = 2*60*1000L;
 
     /**
      *  @param claimedAddress an IP/port based RemoteHostId, or null if unknown
@@ -172,7 +175,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     /////////////////////////////////////////////////////////
 
     public void gotDateTime(long time) {
-        System.out.println("Got DATE block: " + DataHelper.formatTime(time));
+        _timeReceived = time;
     }
 
     public void gotOptions(byte[] options, boolean isHandshake) {
@@ -270,6 +273,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         int off = pkt.getOffset();
         int len = pkt.getLength();
         byte data[] = pkt.getData();
+        _timeReceived = 0;
         try {
             // decrypt in-place
             ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
@@ -284,6 +288,11 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                 _log.debug("Retry error", gse);
             throw gse;
         }
+        if (_timeReceived == 0)
+            throw new GeneralSecurityException("No DateTime block in Session/Token Request");
+        long skew = _establishBegin - _timeReceived;
+        if (skew > MAX_SKEW || skew < 0 - MAX_SKEW)
+            throw new GeneralSecurityException("Skew exceeded in Session/Token Request: " + skew);
         createNewState(_routerAddress);
         ////// TODO state change
     }
@@ -317,7 +326,13 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         }
         if (_log.shouldDebug())
             _log.debug("State after sess cr: " + _handshakeState);
+        _timeReceived = 0;
         processPayload(data, off + LONG_HEADER_SIZE, len - (LONG_HEADER_SIZE + KEY_LEN + MAC_LEN), true);
+        if (_timeReceived == 0)
+            throw new GeneralSecurityException("No DateTime block in Session/Token Request");
+        long skew = _establishBegin - _timeReceived;
+        if (skew > MAX_SKEW || skew < 0 - MAX_SKEW)
+            throw new GeneralSecurityException("Skew exceeded in Session/Token Request: " + skew);
         _sessReqForReTX = null;
         _sendHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessionConfirmed");
 
