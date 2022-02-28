@@ -283,7 +283,7 @@ class PacketBuilder2 {
      */
     public UDPPacket buildTokenRequestPacket(OutboundEstablishState2 state) {
         long n = _context.random().signedNextInt() & 0xFFFFFFFFL;
-        UDPPacket packet = buildLongPacketHeader(state.getSendConnID(), n, SESSION_REQUEST_FLAG_BYTE,
+        UDPPacket packet = buildLongPacketHeader(state.getSendConnID(), n, TOKEN_REQUEST_FLAG_BYTE,
                                                  state.getRcvConnID(), 0);
         DatagramPacket pkt = packet.getPacket();
 

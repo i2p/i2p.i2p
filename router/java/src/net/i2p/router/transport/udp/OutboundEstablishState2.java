@@ -124,11 +124,11 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     public synchronized void restart(long token) {
         _token = token;
         HandshakeState old = _handshakeState;
-        byte[] pub = new byte[32];
-        old.getRemotePublicKey().getPublicKey(pub, 0);
-        createNewState(_routerAddress);
-        if (old != null)
+        if (old != null) {
+            // TODO pass the old keys over to createNewState()
             old.destroy();
+        }
+        createNewState(_routerAddress);
         //_rcvHeaderEncryptKey2 will be set after the Session Request message is created
         _rcvHeaderEncryptKey2 = null;
     }
