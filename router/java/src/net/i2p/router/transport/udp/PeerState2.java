@@ -136,7 +136,11 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
 
     // SSU 2 things
 
-    long getNextPacketNumber() { return _packetNumber.incrementAndGet(); }
+    /**
+     * Next outbound packet number,
+     * starts at 1 for Alice (0 is Session Confirmed) and 0 for Bob
+     */
+    long getNextPacketNumber() { return _packetNumber.getAndIncrement(); }
     long getSendConnID() { return _sendConnID; }
     long getRcvConnID() { return _rcvConnID; }
     /** caller must sync on returned object when encrypting */
