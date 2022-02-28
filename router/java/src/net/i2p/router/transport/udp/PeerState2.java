@@ -138,6 +138,9 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     SSU2Bitfield getReceivedMessages() { return _receivedMessages; }
     SSU2Bitfield getAckedMessages() { return _ackedMessages; }
 
+    /**
+     *  @param packet fully encrypted, header and body decryption will be done here
+     */
     void receivePacket(UDPPacket packet) {
         DatagramPacket dpacket = packet.getPacket();
         byte[] data = dpacket.getData();
@@ -163,6 +166,14 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             if (header.getType() != DATA_FLAG_BYTE) {
                 if (_log.shouldWarn())
                     _log.warn("bad data pkt type " + (header.getType() & 0xff) + " on " + this);
+                // TODO if it's early:
+                // If inbound, could be a retransmitted Session Confirmed,
+                // ack it again.
+                // If outbound, and Session Confirmed is not acked yet,
+                // could be a retransmitted Session Created,
+                // retransmit Session Confirmed.
+                // Alternatively, could be a new Session Request or Token Request,
+                // we didn't know the session has disconnected yet.
                 return;
             }
             long n = header.getPacketNumber();

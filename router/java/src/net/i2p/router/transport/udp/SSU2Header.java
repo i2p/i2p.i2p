@@ -25,7 +25,7 @@ final class SSU2Header {
      *  Session Request and Session Created only. 64 bytes.
      *  Packet is unmodified.
      *
-     *  @param packet must be 56 bytes min
+     *  @param packet must be 88 bytes min
      *  @return 64 byte header, null if data too short
      */
     public static Header trialDecryptHandshakeHeader(UDPPacket packet, byte[] key1, byte[] key2) {
@@ -155,6 +155,7 @@ final class SSU2Header {
      */
     public static class Header {
         public final byte[] data;
+
         public Header(int len) { data = new byte[len]; }
 
         /** all headers */

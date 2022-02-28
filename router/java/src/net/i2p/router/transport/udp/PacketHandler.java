@@ -41,6 +41,7 @@ class PacketHandler {
     private final BlockingQueue<UDPPacket> _inboundQueue;
     private static final Object DUMMY = new Object();
     private final boolean _enableSSU2;
+    private final int _networkID;
     
     private static final int TYPE_POISON = -99999;
     private static final int MIN_QUEUE_SIZE = 16;
@@ -68,6 +69,7 @@ class PacketHandler {
         _testManager = testManager;
         _introManager = introManager;
         _failCache = new LHMCache<RemoteHostId, Object>(24);
+        _networkID = ctx.router().getNetworkID();
 
         long maxMemory = SystemVersion.getMaxMemory();
         int qsize = (int) Math.max(MIN_QUEUE_SIZE, Math.min(MAX_QUEUE_SIZE, maxMemory / (2*1024*1024)));
@@ -241,7 +243,7 @@ class PacketHandler {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Packet received IS for an inbound establishment");
                     if (est.getVersion() == 2)
-                        receiveSSU2Packet(packet, (InboundEstablishState2) est);
+                        receiveSSU2Packet(rem, packet, (InboundEstablishState2) est);
                     else
                         receivePacket(reader, packet, est);
                 } else {
@@ -354,6 +356,17 @@ class PacketHandler {
                     alreadyFailed = _failCache.get(remoteHost) != null;
                 }                
                 if (!alreadyFailed) {
+                    // For now, try SSU2 Session/Token Request processing here.
+                    // After we've migrated the majority of the network over to SSU2,
+                    // we can try SSU2 first.
+                    if (_enableSSU2 && peerType == PeerType.NEW_PEER) {
+                        boolean handled = receiveSSU2Packet(remoteHost, packet, (InboundEstablishState2) null);
+                        if (handled)
+                            return;
+                        if (_log.shouldDebug())
+                            _log.debug("Continuing with SSU1 fallback processing, wasn't an SSU2 packet from " + remoteHost);
+                    }
+
                     // this is slow, that's why we cache it above.
                     List<PeerState> peers = _transport.getPeerStatesByIP(remoteHost);
                     if (!peers.isEmpty()) {
@@ -623,9 +636,6 @@ class PacketHandler {
                 return;
             }
 
-            //InetAddress fromHost = packet.getPacket().getAddress();
-            //int fromPort = packet.getPacket().getPort();
-            //RemoteHostId from = new RemoteHostId(fromHost.getAddress(), fromPort);
             RemoteHostId from = packet.getRemoteHost();
             
             switch (type) {
@@ -635,7 +645,7 @@ class PacketHandler {
                             _log.warn("Dropping type " + type + " auth " + auth + ": " + packet);
                         break;
                     }
-                    _establisher.receiveSessionRequest(from, reader);
+                    _establisher.receiveSessionRequest(from, inState, reader);
                     break;
                 case UDPPacket.PAYLOAD_TYPE_SESSION_CONFIRMED:
                     if (auth != AuthType.SESSION) {
@@ -643,7 +653,7 @@ class PacketHandler {
                             _log.warn("Dropping type " + type + " auth " + auth + ": " + packet);
                         break;
                     }
-                    _establisher.receiveSessionConfirmed(from, reader);
+                    _establisher.receiveSessionConfirmed(from, inState, reader);
                     break;
                 case UDPPacket.PAYLOAD_TYPE_SESSION_CREATED:
                     // this is the only type that allows BOBINTRO
@@ -652,7 +662,7 @@ class PacketHandler {
                             _log.warn("Dropping type " + type + " auth " + auth + ": " + packet);
                         break;
                     }
-                    _establisher.receiveSessionCreated(from, reader);
+                    _establisher.receiveSessionCreated(from, outState, reader);
                     break;
                 case UDPPacket.PAYLOAD_TYPE_DATA:
                     if (auth != AuthType.SESSION) {
@@ -763,37 +773,199 @@ class PacketHandler {
      *  Packet is decrypted in-place, no fallback
      *  processing is possible.
      *
-     *  @param state must be version 2
+     *  @param packet any in-session message
+     *  @param state must be version 2, non-null
      *  @since 0.9.54
      */
     private void receiveSSU2Packet(UDPPacket packet, PeerState2 state) {
+        // header and body decryption is done by PeerState2
         state.receivePacket(packet);
     }
 
     /**
-     *  Hand off to the state for processing.
-     *  Packet is decrypted in-place, no fallback
-     *  processing is possible.
+     *  Decrypt the header and hand off to the state for processing.
+     *  Packet is trial-decrypted, so fallback
+     *  processing is possible if this returns false.
      *
-     *  @param state must be version 2
+     *  Possible messages here are Session Request, Token Request, Session Confirmed, or Peer Test.
+     *  Data messages out-of-order from Session Confirmed, or following a
+     *  Session Confirmed that was lost, or in-order but before the Session Confirmed was processed,
+     *  will not be successfully decrypted and will be dropped.
+     *
+     *  @param state must be version 2, but will be null for session request unless retransmitted
+     *  @return true if the header was validated as a SSU2 packet, cannot fallback to SSU 1
      *  @since 0.9.54
      */
-    private void receiveSSU2Packet(UDPPacket packet, InboundEstablishState2 state) {
+    private boolean receiveSSU2Packet(RemoteHostId from, UDPPacket packet, InboundEstablishState2 state) {
+        // decrypt header
+        byte[] k1 = _transport.getSSU2StaticIntroKey();
+        byte[] k2;
+        SSU2Header.Header header;
+        int type;
+        if (state == null) {
+            // Session Request, Token Request, or Peer Test
+            k2 = k1;
+            header = SSU2Header.trialDecryptHandshakeHeader(packet, k1, k2);
+            if (header == null ||
+                header.getType() != SSU2Util.SESSION_REQUEST_FLAG_BYTE ||
+                header.getVersion() != 2 ||
+                header.getNetID() != _networkID) {
+                if (_log.shouldInfo())
+                    _log.info("Does not decrypt as Session Request, attempt to decrypt as Token Request/Peer Test: " + header);
+                // The first 32 bytes were fine, but it corrupted the next 32 bytes
+                // TODO make this more efficient, just take the first 32 bytes
+                header = SSU2Header.trialDecryptLongHeader(packet, k1, k2);
+                if (header == null ||
+                    header.getVersion() != 2 ||
+                    header.getNetID() != _networkID) {
+                    if (_log.shouldWarn())
+                        _log.warn("Does not decrypt as Session Request, Token Request, or Peer Test: " + header);
+                    return false;
+                }
+                type = header.getType();
+            } else {
+                type = SSU2Util.SESSION_REQUEST_FLAG_BYTE;
+            }
+        } else {
+            // Session Request (after Retry) or Session Confirmed
+            // or retransmitted Session Request or Token Rquest
+            k2 = state.getRcvHeaderEncryptKey2();
+            if (state.getState() == InboundEstablishState.InboundState.IB_STATE_RETRY_SENT) {
+                // Session Request
+                header = SSU2Header.trialDecryptHandshakeHeader(packet, k1, k2);
+                if (header == null ||
+                    header.getType() != SSU2Util.SESSION_REQUEST_FLAG_BYTE ||
+                    header.getVersion() != 2 ||
+                    header.getNetID() != _networkID) {
+                    if (_log.shouldWarn())
+                        _log.warn("Failed decrypt Session Request after Retry: " + header);
+                    return false;
+                }
+                type = SSU2Util.SESSION_REQUEST_FLAG_BYTE;
+            } else {
+                // Session Confirmed or retransmitted Session Request or Token Request
+                header = SSU2Header.trialDecryptShortHeader(packet, k1, k2);
+                if (header == null ||
+                    header.getType() != SSU2Util.SESSION_CONFIRMED_FLAG_BYTE) {
+                    if (_log.shouldWarn())
+                        _log.warn("Failed decrypt Session Confirmed: " + header);
+                    // TODO either attempt to decrypt as a retransmitted
+                    // Session Request or Token Request,
+                    // or just tell establisher so it can retransmit Session Created or Retry
+                    // Could also be Data messages after (possibly lost or out-of-order) Session Confirmed
+                    return false;
+                }
+                type = SSU2Util.SESSION_CONFIRMED_FLAG_BYTE;
+            }
+            if (header.getDestConnID() != state.getRcvConnID()) {
+                if (_log.shouldWarn())
+                    _log.warn("Bad Dest Conn id " + header);
+                return false;
+            }
+            if (header.getSrcConnID() != state.getSendConnID()) {
+                if (_log.shouldWarn())
+                    _log.warn("Bad Source Conn id " + header);
+                // TODO could be a retransmitted Session Request,
+                // tell establisher?
+                return false;
+            }
+        }
 
-
+        // all good
+        SSU2Header.acceptTrialDecrypt(packet, header);
+        if (type == SSU2Util.SESSION_REQUEST_FLAG_BYTE) {
+            if (_log.shouldDebug())
+                _log.debug("Got a Session Request on " + state);
+            _establisher.receiveSessionOrTokenRequest(from, state, packet);
+        } else if (type == SSU2Util.TOKEN_REQUEST_FLAG_BYTE) {
+            if (_log.shouldDebug())
+                _log.debug("Got a Token Request on " + state);
+            _establisher.receiveSessionOrTokenRequest(from, state, packet);
+        } else if (type == SSU2Util.SESSION_CONFIRMED_FLAG_BYTE) {
+            if (_log.shouldDebug())
+                _log.debug("Got a Session Confirmed on " + state);
+            _establisher.receiveSessionConfirmed(state, packet);
+        } else if (type == SSU2Util.PEER_TEST_FLAG_BYTE) {
+            if (_log.shouldDebug())
+                _log.debug("Got a Peer Test on " + state);
+            // TODO
+        } else {
+            if (_log.shouldWarn())
+                _log.warn("Got unknown message " + header + " on " + state);
+        }
+        return true;
     }
 
     /**
-     *  Hand off to the state for processing.
-     *  Packet is decrypted in-place, no fallback
-     *  processing is possible.
+     *  Decrypt the header and hand off to the state for processing.
+     *  Packet is trial-decrypted, so fallback
+     *  processing is possible if this returns false.
+     *  But that's probably not necessary.
      *
-     *  @param state must be version 2
+     *  Possible messages here are Session Created or Retry
+     *
+     *  @param state must be version 2, non-null
+     *  @return true if the header was validated as a SSU2 packet, cannot fallback to SSU 1
      *  @since 0.9.54
      */
-    private void receiveSSU2Packet(UDPPacket packet, OutboundEstablishState2 state) {
+    private boolean receiveSSU2Packet(UDPPacket packet, OutboundEstablishState2 state) {
+        // decrypt header
+        byte[] k1 = state.getRcvHeaderEncryptKey1();
+        byte[] k2 = state.getRcvHeaderEncryptKey2();
+        SSU2Header.Header header = SSU2Header.trialDecryptHandshakeHeader(packet, k1, k2);
+        if (header != null) {
+            // dest conn ID decrypts the same for both Session Created
+            // and Retry, so we can bail out now if it doesn't match
+            if (header.getDestConnID() != state.getRcvConnID()) {
+                if (_log.shouldWarn())
+                    _log.warn("Bad Dest Conn id " + header);
+                return false;
+            }
+        }
+        int type;
+        if (header == null ||
+            header.getType() != SSU2Util.SESSION_CREATED_FLAG_BYTE ||
+            header.getVersion() != 2 ||
+            header.getNetID() != _networkID) {
+            if (_log.shouldInfo())
+                _log.info("Does not decrypt as Session Created, attempt to decrypt as Retry: " + header);
+            k2 = state.getRcvRetryHeaderEncryptKey2();
+            header = SSU2Header.trialDecryptLongHeader(packet, k1, k2);
+            if (header == null ||
+                header.getType() != SSU2Util.RETRY_FLAG_BYTE ||
+                header.getVersion() != 2 ||
+                header.getNetID() != _networkID) {
+                if (_log.shouldWarn())
+                    _log.warn("Does not decrypt as Session Created or Retry: " + header);
+                return false;
+            }
+            type = SSU2Util.RETRY_FLAG_BYTE;
+        } else {
+            type = SSU2Util.SESSION_CREATED_FLAG_BYTE;
+        }
+        if (header.getDestConnID() != state.getRcvConnID()) {
+            if (_log.shouldWarn())
+                _log.warn("Bad Dest Conn id " + header);
+            return false;
+        }
+        if (header.getSrcConnID() != state.getSendConnID()) {
+            if (_log.shouldWarn())
+                _log.warn("Bad Source Conn id " + header);
+            return false;
+        }
 
-
+        // all good
+        SSU2Header.acceptTrialDecrypt(packet, header);
+        if (type == SSU2Util.SESSION_CREATED_FLAG_BYTE) {
+            if (_log.shouldDebug())
+                _log.debug("Got a Session Created on " + state);
+            _establisher.receiveSessionCreated(state, packet);
+        } else {
+            if (_log.shouldDebug())
+                _log.debug("Got a Retry on " + state);
+            _establisher.receiveRetry(state, packet);
+        }
+        return true;
     }
 
 

@@ -483,8 +483,10 @@ class EstablishmentManager {
      * Got a SessionRequest (initiates an inbound establishment)
      *
      * SSU 1 only.
+     *
+     * @param state as looked up in PacketHandler, but probably null unless retransmitted
      */
-    void receiveSessionRequest(RemoteHostId from, UDPPacketReader reader) {
+    void receiveSessionRequest(RemoteHostId from, InboundEstablishState state, UDPPacketReader reader) {
         if (!TransportUtil.isValidPort(from.getPort()) || !_transport.isValid(from.getIP())) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Receive session request from invalid: " + from);
@@ -493,7 +495,8 @@ class EstablishmentManager {
         
         boolean isNew = false;
 
-            InboundEstablishState state = _inboundStates.get(from);
+            if (state == null)
+                state = _inboundStates.get(from);
             if (state == null) {
                 // TODO this is insufficient to prevent DoSing, especially if
                 // IP spoofing is used. For further study.
@@ -560,16 +563,17 @@ class EstablishmentManager {
      * Got a SessionRequest OR a TokenRequest (initiates an inbound establishment)
      *
      * SSU 2 only.
+     * @param state as looked up in PacketHandler, but null unless retransmitted or retry sent
+     * @param packet header decrypted only
      * @since 0.9.54
      */
-    void receiveSessionRequest(RemoteHostId from, UDPPacket packet) {
+    void receiveSessionOrTokenRequest(RemoteHostId from, InboundEstablishState2 state, UDPPacket packet) {
         if (!TransportUtil.isValidPort(from.getPort()) || !_transport.isValid(from.getIP())) {
             if (_log.shouldWarn())
                 _log.warn("Receive session request from invalid: " + from);
             return;
         }
         boolean isNew = false;
-        InboundEstablishState state = _inboundStates.get(from);
         if (state == null) {
             // TODO this is insufficient to prevent DoSing, especially if
             // IP spoofing is used. For further study.
@@ -607,9 +611,20 @@ class EstablishmentManager {
 
             InboundEstablishState oldState = _inboundStates.putIfAbsent(from, state);
             isNew = oldState == null;
-            if (!isNew)
+            if (!isNew) {
                 // whoops, somebody beat us to it, throw out the state we just created
-                state = oldState;
+                if (oldState.getVersion() == 2)
+                    state = (InboundEstablishState2) oldState;
+                // else don't cast, this is only for printing below
+            }
+        } else {
+            try {
+                state.receiveSessionRequestAfterRetry(packet);
+            } catch (GeneralSecurityException gse) {
+                if (_log.shouldWarn())
+                    _log.warn("Corrupt Session Request after Retry from: " + state, gse);
+                return;
+            }
         }
 
         if (isNew) {
@@ -629,10 +644,10 @@ class EstablishmentManager {
             }
           ****/
             if (_log.shouldInfo())
-                _log.info("Received NEW session request " + state);
+                _log.info("Received NEW session/token request " + state);
         } else {
             if (_log.shouldDebug())
-                _log.debug("Receive DUP session request from: " + state);
+                _log.debug("Receive DUP session/token request from: " + state);
         }
         notifyActivity();
     }
@@ -642,9 +657,12 @@ class EstablishmentManager {
      * establishment) 
      *
      * SSU 1 only.
+     *
+     * @param state as looked up in PacketHandler, if null is probably retransmitted
      */
-    void receiveSessionConfirmed(RemoteHostId from, UDPPacketReader reader) {
-        InboundEstablishState state = _inboundStates.get(from);
+    void receiveSessionConfirmed(RemoteHostId from, InboundEstablishState state, UDPPacketReader reader) {
+        if (state == null)
+            state = _inboundStates.get(from);
         if (state != null) {
             state.receiveSessionConfirmed(reader.getSessionConfirmedReader());
             notifyActivity();
@@ -661,40 +679,36 @@ class EstablishmentManager {
      * establishment) 
      *
      * SSU 2 only.
+     * @param state non-null
+     * @param packet header decrypted only
      * @since 0.9.54
      */
-    void receiveSessionConfirmed(RemoteHostId from, UDPPacket packet) {
-        InboundEstablishState state = _inboundStates.get(from);
-        if (state != null) {
-            if (state.getVersion() != 2)
-                return;
-            InboundEstablishState2 state2 = (InboundEstablishState2) state;
-            try {
-                state2.receiveSessionConfirmed(packet);
-            } catch (GeneralSecurityException gse) {
-                if (_log.shouldWarn())
-                    _log.warn("Corrupt Session Confirmed from: " + from, gse);
-                state.fail();
-                return;
-            }
-            // we are done, go right to ps2
-            handleCompletelyEstablished(state2);
-            notifyActivity();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Receive session confirmed from: " + state);
-        } else {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Receive (DUP?) session confirmed from: " + from);
+    void receiveSessionConfirmed(InboundEstablishState2 state, UDPPacket packet) {
+        try {
+            state.receiveSessionConfirmed(packet);
+        } catch (GeneralSecurityException gse) {
+            if (_log.shouldWarn())
+                _log.warn("Corrupt Session Confirmed on: " + state, gse);
+            state.fail();
+            return;
         }
+        // we are done, go right to ps2
+        handleCompletelyEstablished(state);
+        notifyActivity();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Receive session confirmed from: " + state);
     }
     
     /**
      * Got a SessionCreated (in response to our outbound SessionRequest)
      *
      * SSU 1 only.
+     *
+     * @param state as looked up in PacketHandler, if null is probably retransmitted
      */
-    void receiveSessionCreated(RemoteHostId from, UDPPacketReader reader) {
-        OutboundEstablishState state = _outboundStates.get(from);
+    void receiveSessionCreated(RemoteHostId from, OutboundEstablishState state, UDPPacketReader reader) {
+        if (state == null)
+            state = _outboundStates.get(from);
         if (state != null) {
             state.receiveSessionCreated(reader.getSessionCreatedReader());
             notifyActivity();
@@ -710,29 +724,23 @@ class EstablishmentManager {
      * Got a SessionCreated (in response to our outbound SessionRequest)
      *
      * SSU 2 only.
+     *
+     * @param state non-null
+     * @param packet header decrypted only
      * @since 0.9.54
      */
-    void receiveSessionCreated(RemoteHostId from, UDPPacket packet) {
-        OutboundEstablishState state = _outboundStates.get(from);
-        if (state != null) {
-            if (state.getVersion() != 2)
-                return;
-            OutboundEstablishState2 state2 = (OutboundEstablishState2) state;
-            try {
-                state2.receiveSessionCreated(packet);
-            } catch (GeneralSecurityException gse) {
-                if (_log.shouldWarn())
-                    _log.warn("Corrupt Session Created from: " + from, gse);
-                state.fail();
-                return;
-            }
-            notifyActivity();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Receive session created from: " + state);
-        } else {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Receive (DUP?) session created from: " + from);
+    void receiveSessionCreated(OutboundEstablishState2 state, UDPPacket packet) {
+        try {
+            state.receiveSessionCreated(packet);
+        } catch (GeneralSecurityException gse) {
+            if (_log.shouldWarn())
+                _log.warn("Corrupt Session Created on: " + state, gse);
+            state.fail();
+            return;
         }
+        notifyActivity();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Receive session created from: " + state);
     }
     
     /**
@@ -741,27 +749,18 @@ class EstablishmentManager {
      * SSU 2 only.
      * @since 0.9.54
      */
-    void receiveRetry(RemoteHostId from, UDPPacket packet) {
-        OutboundEstablishState state = _outboundStates.get(from);
-        if (state != null) {
-            if (state.getVersion() != 2)
-                return;
-            OutboundEstablishState2 state2 = (OutboundEstablishState2) state;
-            try {
-                state2.receiveSessionCreated(packet);
-            } catch (GeneralSecurityException gse) {
-                if (_log.shouldWarn())
-                    _log.warn("Corrupt Retry from: " + from, gse);
-                state.fail();
-                return;
-            }
-            notifyActivity();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Receive retry from: " + state);
-        } else {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Receive (DUP?) retry from: " + from);
+    void receiveRetry(OutboundEstablishState2 state, UDPPacket packet) {
+        try {
+            state.receiveSessionCreated(packet);
+        } catch (GeneralSecurityException gse) {
+            if (_log.shouldWarn())
+                _log.warn("Corrupt Retry from: " + state, gse);
+            state.fail();
+            return;
         }
+        notifyActivity();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Receive retry from: " + state);
     }
 
     /**
