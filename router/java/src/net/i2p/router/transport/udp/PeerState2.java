@@ -48,7 +48,17 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     private final SSU2Bitfield _ackedMessages;
     private byte[] _sessConfForReTX;
 
+    // As SSU
+    public static final int MIN_SSU_IPV4_MTU = 1292;
+    public static final int MAX_SSU_IPV4_MTU = 1484;
+    public static final int DEFAULT_SSU_IPV4_MTU = MAX_SSU_IPV4_MTU;
+    public static final int MIN_SSU_IPV6_MTU = 1280;
+    public static final int MAX_SSU_IPV6_MTU = 1488;
+    public static final int DEFAULT_SSU_IPV6_MTU = MIN_SSU_IPV6_MTU;  // should always be published
+    // As SSU2
     public static final int MIN_MTU = 1280;
+    public static final int MAX_MTU = 1500;
+    public static final int DEFAULT_MTU = MAX_MTU;
 
     /**
      *  @param rtt from the EstablishState, or 0 if not available

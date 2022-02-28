@@ -72,7 +72,30 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                 throw new IllegalArgumentException("bad IP", uhe);
             }
         }
-        _mtu = addr.getMTU();
+        // We need the MTU so the Session Confirmed can fit the RI in
+        int mtu = addr.getMTU();
+        if (mtu == 0) {
+            if (ra.getTransportStyle().equals("SSU2")) {
+                mtu = PeerState2.DEFAULT_MTU;
+            } else {
+                if (_bobIP.length == 16)
+                    mtu = PeerState2.DEFAULT_SSU_IPV6_MTU;
+                else
+                    mtu = PeerState2.DEFAULT_SSU_IPV4_MTU;
+            }
+        } else {
+            // TODO if too small, give up now
+            if (ra.getTransportStyle().equals("SSU2")) {
+                mtu = Math.min(Math.max(mtu, PeerState2.MIN_MTU), PeerState2.MAX_MTU);
+            } else {
+                if (_bobIP.length == 16)
+                    mtu = Math.min(Math.max(mtu, PeerState2.MIN_SSU_IPV6_MTU), PeerState2.MAX_SSU_IPV6_MTU);
+                else
+                    mtu = Math.min(Math.max(mtu, PeerState2.MIN_SSU_IPV4_MTU), PeerState2.MAX_SSU_IPV4_MTU);
+            }
+        }
+        _mtu = mtu;
+        // TODO if RI too big, give up now
         if (addr.getIntroducerCount() > 0) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("new outbound establish to " + remotePeer.calculateHash() + ", with address: " + addr);
@@ -87,13 +110,13 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         do {
             rcid = ctx.random().nextLong();
         } while (_sendConnID == rcid);
+        _rcvConnID = rcid;
 
         _token = _transport.getEstablisher().getOutboundToken(_remotePeer.calculateHash());
         _routerAddress = ra;
         if (_token != 0)
             createNewState(ra);
 
-        _rcvConnID = rcid;
         byte[] ik = introKey.getData();
         _sendHeaderEncryptKey1 = ik;
         _rcvHeaderEncryptKey1 = ik;

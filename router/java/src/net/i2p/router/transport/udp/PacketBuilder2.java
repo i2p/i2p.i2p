@@ -453,7 +453,6 @@ class PacketBuilder2 {
             len = info.length;
         }
 
-
         UDPPacket packets[] = new UDPPacket[numFragments];
         packets[0] = buildSessionConfirmedPacket(state, numFragments, info, len, gzip);
         if (numFragments > 1) {
@@ -909,7 +908,7 @@ class PacketBuilder2 {
                 _log.error("Bad token req msg out", gse);
             throw new RuntimeException("Bad token req msg out", gse);
         }
-        SSU2Header.encryptHandshakeHeader(packet, hdrKey1, hdrKey2);
+        SSU2Header.encryptLongHeader(packet, hdrKey1, hdrKey2);
     }
 
     /**
