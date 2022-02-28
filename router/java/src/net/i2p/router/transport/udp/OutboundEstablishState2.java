@@ -7,6 +7,7 @@ import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 
+import com.southernstorm.noise.protocol.ChaChaPolyCipherState;
 import com.southernstorm.noise.protocol.CipherState;
 import com.southernstorm.noise.protocol.CipherStatePair;
 import com.southernstorm.noise.protocol.HandshakeState;
@@ -20,6 +21,7 @@ import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.RouterContext;
+import static net.i2p.router.transport.udp.SSU2Util.*;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 
@@ -156,9 +158,9 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         _rcvHeaderEncryptKey2 = null;
     }
 
-    private void processPayload(byte[] payload, int length, boolean isHandshake) throws GeneralSecurityException {
+    private void processPayload(byte[] payload, int offset, int length, boolean isHandshake) throws GeneralSecurityException {
         try {
-            int blocks = SSU2Payload.processPayload(_context, this, payload, 0, length, isHandshake);
+            int blocks = SSU2Payload.processPayload(_context, this, payload, offset, length, isHandshake);
             System.out.println("Processed " + blocks + " blocks");
         } catch (Exception e) {
             throw new GeneralSecurityException("Session Created payload error", e);
@@ -264,6 +266,24 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
 
     public synchronized void receiveRetry(UDPPacket packet) throws GeneralSecurityException {
         ////// TODO state check
+        DatagramPacket pkt = packet.getPacket();
+        int off = pkt.getOffset();
+        int len = pkt.getLength();
+        byte data[] = pkt.getData();
+        try {
+            // decrypt in-place
+            ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
+            chacha.initializeKey(_rcvHeaderEncryptKey1, 0);
+            long n = DataHelper.fromLong(data, off + PKT_NUM_OFFSET, 4);
+            chacha.setNonce(n);
+            chacha.decryptWithAd(data, off, LONG_HEADER_SIZE,
+                                 data, off + LONG_HEADER_SIZE, data, off + LONG_HEADER_SIZE, len - LONG_HEADER_SIZE);
+            processPayload(data, off + LONG_HEADER_SIZE, len - (LONG_HEADER_SIZE + MAC_LEN), true);
+        } catch (GeneralSecurityException gse) {
+            if (_log.shouldDebug())
+                _log.debug("Retry error", gse);
+            throw gse;
+        }
         createNewState(_routerAddress);
         ////// TODO state change
     }
@@ -283,13 +303,13 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         int off = pkt.getOffset();
         int len = pkt.getLength();
         byte data[] = pkt.getData();
-        _handshakeState.mixHash(data, off, 32);
+        _handshakeState.mixHash(data, off, LONG_HEADER_SIZE);
         if (_log.shouldDebug())
             _log.debug("State after mixHash 2: " + _handshakeState);
 
-        byte[] payload = new byte[len - 80]; // 32 hdr, 32 eph. key, 16 MAC
+        // decrypt in-place
         try {
-            _handshakeState.readMessage(data, off + 32, len - 32, payload, 0);
+            _handshakeState.readMessage(data, off + LONG_HEADER_SIZE, len - LONG_HEADER_SIZE, data, off + LONG_HEADER_SIZE);
         } catch (GeneralSecurityException gse) {
             if (_log.shouldDebug())
                 _log.debug("Session create error, State at failure: " + _handshakeState + '\n' + net.i2p.util.HexDump.dump(data, off, len), gse);
@@ -297,7 +317,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         }
         if (_log.shouldDebug())
             _log.debug("State after sess cr: " + _handshakeState);
-        processPayload(payload, payload.length, true);
+        processPayload(data, off + LONG_HEADER_SIZE, len - (LONG_HEADER_SIZE + KEY_LEN + MAC_LEN), true);
         _sessReqForReTX = null;
         _sendHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessionConfirmed");
 
