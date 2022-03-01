@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Addresses;
+import net.i2p.util.AddressType;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 
@@ -105,7 +107,8 @@ public class ReseedChecker {
         File noReseedFileAlt2 = new File(_context.getConfigDir(), ".i2pnoreseed");
         File noReseedFileAlt3 = new File(_context.getConfigDir(), "noreseed.i2p");
         if (!noReseedFile.exists() && !noReseedFileAlt1.exists() && !noReseedFileAlt2.exists() && !noReseedFileAlt3.exists()) {
-            if (!Addresses.isConnected() && !Addresses.isConnectedIPv6()) {
+            Set<AddressType> addrs = Addresses.getConnectedAddressTypes();
+            if (!addrs.contains(AddressType.IPV4) && !addrs.contains(AddressType.IPV6)) {
                 if (!_networkLogged) {
                     _log.logAlways(Log.WARN, "Cannot reseed, no network connection");
                     _networkLogged = true;

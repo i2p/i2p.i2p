@@ -31,6 +31,7 @@ import net.i2p.router.transport.crypto.X25519KeyFactory;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.util.EventLog;
 import net.i2p.util.Addresses;
+import net.i2p.util.AddressType;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
@@ -711,7 +712,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         }
 
         public void timeReached() {
-             boolean good = Addresses.isConnected() || Addresses.isConnectedIPv6();
+            Set<AddressType> addrs = Addresses.getConnectedAddressTypes();
+            boolean good = addrs.contains(AddressType.IPV4) || addrs.contains(AddressType.IPV6);
              if (_netMonitorStatus != good) {
                  if (good)
                      _log.logAlways(Log.INFO, "Network reconnected");

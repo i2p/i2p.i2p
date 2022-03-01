@@ -166,7 +166,8 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
      *  @return null if not found
      */
     public String lookup(String host) {
-        Type type = (Addresses.isConnected() || !Addresses.isConnectedIPv6()) ? Type.V4_ONLY : Type.V6_ONLY;
+        Set<AddressType> addrs = Addresses.getConnectedAddressTypes();
+        Type type = (addrs.contains(AddressType.IPV4) || !addrs.contains(AddressType.IPV6)) ? Type.V4_ONLY : Type.V6_ONLY;
         return lookup(host, type);
     }
 

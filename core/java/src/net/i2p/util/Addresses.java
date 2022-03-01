@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -57,6 +58,7 @@ public abstract class Addresses {
     /**
      *  Do we have any address of this type?
      *  Warning, very slow on Windows, appx. 200ms + 50ms/interface
+     *  Use getConnectedAddressTypes() to get all types at once.
      *
      *  @since 0.9.54
      */
@@ -77,6 +79,7 @@ public abstract class Addresses {
     /**
      *  Do we have any non-loop, non-wildcard IPv4 address at all?
      *  Warning, very slow on Windows, appx. 200ms + 50ms/interface
+     *  Use getConnectedAddressTypes() to get all types at once.
      *
      *  @since 0.9.4
      */
@@ -88,6 +91,7 @@ public abstract class Addresses {
     /**
      *  Do we have any non-loop, non-wildcard IPv6 address at all?
      *  Warning, very slow on Windows, appx. 200ms + 50ms/interface
+     *  Use getConnectedAddressTypes() to get all types at once.
      *
      *  @since 0.9.29
      */
@@ -311,6 +315,39 @@ public abstract class Addresses {
         } catch (java.lang.Error e) {
         }
         return null;
+    }
+
+    /**
+     *  Efficiently get all connected address types in one pass.
+     *  Warning, very slow on Windows. Caller should cache.
+     *
+     *  @return the set of connected address types, non-null
+     *  @since 0.9.54
+     */
+    public static Set<AddressType> getConnectedAddressTypes() {
+        Set<AddressType> rv = EnumSet.noneOf(AddressType.class);
+        try {
+            Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
+            if (ifcs != null) {
+                while (ifcs.hasMoreElements()) {
+                    NetworkInterface ifc = ifcs.nextElement();
+                    if (!ifc.isUp())
+                        continue;
+                    for(Enumeration<InetAddress> addrs =  ifc.getInetAddresses(); addrs.hasMoreElements();) {
+                        InetAddress addr = addrs.nextElement();
+                        byte[] ip = addr.getAddress();
+                        if (ip.length == 16 && (ip[0] & 0xfe) == 0x02) {
+                            rv.add(AddressType.YGG);
+                        } else if (shouldInclude(addr, true, false, true)) {
+                            rv.add(ip.length == 16 ? AddressType.IPV6 : AddressType.IPV4);
+                        }
+                    }
+                }
+            }
+        } catch (SocketException e) {
+        } catch (java.lang.Error e) {
+        }
+        return rv;
     }
 
     /**
@@ -901,6 +938,7 @@ public abstract class Addresses {
      *  Print out the local addresses
      */
     public static void main(String[] args) {
+        System.out.println("Connected Address Types: " + getConnectedAddressTypes() + '\n');
         System.out.println("External IPv4 Addresses:");
         Set<String> a = getAddresses(false, false, false);
         print(a);
@@ -970,7 +1008,8 @@ public abstract class Addresses {
         }
         print(macs);
         System.out.println("\nHas IPv4?     " + isConnected() +
-                           "\nHas IPv6?     " + isConnectedIPv6());
+                           "\nHas IPv6?     " + isConnectedIPv6() +
+                           "\nHas Ygg?      " + (ygg != null));
         System.out.println("Has v6 flags? " + INET6_CACHE_ENABLED);
         System.out.println("Uses v6 temp? " + getPrivacyStatus());
         // Windows 8.1 Java 1.8.0_66 netbook appx. 200ms + 50ms/interface
