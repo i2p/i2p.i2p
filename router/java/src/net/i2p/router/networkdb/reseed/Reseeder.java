@@ -111,6 +111,9 @@ public class Reseeder {
         //
         // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
         // ----------------------------------           ------------------------     -------------------------     ---------------
+        "https://reseed-pl.i2pd.xyz/"         + ',' +   // r4sas-reseed_at_mail.i2p.crt // CA
+        "https://reseed-fr.i2pd.xyz/"         + ',' +   // r4sas-reseed_at_mail.i2p.crt // CA
+        "https://www2.mk16.de/"               + ',' +   // i2p-reseed_at_mk16.de.crt // CA
         "https://reseed2.i2p.net/"            + ',' +   // echelon3_at_mail.i2p.crt  // CA
         "https://banana.incognet.io/"         + ',' +   // rambler_at_mail.i2p.crt   // CA
         "https://reseed.diva.exchange/"       + ',' +   // reseed_at_diva.exchange.crt       // CA
