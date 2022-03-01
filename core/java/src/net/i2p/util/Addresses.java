@@ -55,6 +55,26 @@ public abstract class Addresses {
     private static final boolean TEST_IPV6_ONLY = false;
 
     /**
+     *  Do we have any address of this type?
+     *  Warning, very slow on Windows, appx. 200ms + 50ms/interface
+     *
+     *  @since 0.9.54
+     */
+    public static boolean isConnected(AddressType type) {
+        switch(type) {
+            case IPV6:
+                return isConnectedIPv6();
+
+            case YGG:
+                return getYggdrasilAddress() != null;
+
+            case IPV4:
+            default:
+                return isConnected();
+        }
+    }
+
+    /**
      *  Do we have any non-loop, non-wildcard IPv4 address at all?
      *  Warning, very slow on Windows, appx. 200ms + 50ms/interface
      *
@@ -266,7 +286,7 @@ public abstract class Addresses {
     /**
      *  Warning, very slow on Windows. Caller should cache.
      *
-     *  @return the IPv6 address with prefix 02xx: or 03xx:
+     *  @return the IPv6 address with prefix 02xx: or 03xx:, or null
      *  @since 0.9.49
      */
     public static byte[] getYggdrasilAddress() {
