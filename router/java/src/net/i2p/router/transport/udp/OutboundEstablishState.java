@@ -51,7 +51,7 @@ class OutboundEstablishState {
     // general status 
     protected final long _establishBegin;
     //private long _lastReceive;
-    private long _lastSend;
+    protected long _lastSend;
     private long _nextSend;
     protected RemoteHostId _remoteHostId;
     private final RemoteHostId _claimedAddress;

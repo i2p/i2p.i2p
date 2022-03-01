@@ -286,27 +286,11 @@ class PacketBuilder2 {
         UDPPacket packet = buildLongPacketHeader(state.getSendConnID(), n, TOKEN_REQUEST_FLAG_BYTE,
                                                  state.getRcvConnID(), 0);
         DatagramPacket pkt = packet.getPacket();
-
-        byte toIP[] = state.getSentIP();
-        if (!_transport.isValid(toIP)) {
-            packet.release();
-            return null;
-        }
-        InetAddress to;
-        try {
-            to = InetAddress.getByAddress(toIP);
-        } catch (UnknownHostException uhe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("How did we think this was a valid IP?  " + state.getRemoteHostId());
-            packet.release();
-            return null;
-        }
-        
         pkt.setLength(LONG_HEADER_SIZE);
         byte[] introKey = state.getSendHeaderEncryptKey1();
         encryptTokenRequest(packet, introKey, n, introKey, introKey);
         state.requestSent();
-        setTo(packet, to, state.getSentPort());
+        pkt.setSocketAddress(state.getSentAddress());
         packet.setMessageType(TYPE_SREQ);
         packet.setPriority(PRIORITY_HIGH);
         state.tokenRequestSent(pkt);
@@ -324,27 +308,11 @@ class PacketBuilder2 {
         UDPPacket packet = buildLongPacketHeader(state.getSendConnID(), n, SESSION_REQUEST_FLAG_BYTE,
                                                  state.getRcvConnID(), state.getToken());
         DatagramPacket pkt = packet.getPacket();
-
-        byte toIP[] = state.getSentIP();
-        if (!_transport.isValid(toIP)) {
-            packet.release();
-            return null;
-        }
-        InetAddress to;
-        try {
-            to = InetAddress.getByAddress(toIP);
-        } catch (UnknownHostException uhe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("How did we think this was a valid IP?  " + state.getRemoteHostId());
-            packet.release();
-            return null;
-        }
-        
         pkt.setLength(LONG_HEADER_SIZE);
         byte[] introKey = state.getSendHeaderEncryptKey1();
         encryptSessionRequest(packet, state.getHandshakeState(), introKey, introKey, state.needIntroduction());
         state.requestSent();
-        setTo(packet, to, state.getSentPort());
+        pkt.setSocketAddress(state.getSentAddress());
         packet.setMessageType(TYPE_SREQ);
         packet.setPriority(PRIORITY_HIGH);
         state.requestSent(pkt);
@@ -475,23 +443,12 @@ class PacketBuilder2 {
     private UDPPacket buildSessionConfirmedPacket(OutboundEstablishState2 state, int numFragments, byte ourInfo[], int len, boolean gzip) {
         UDPPacket packet = buildShortPacketHeader(state.getSendConnID(), 0, SESSION_CONFIRMED_FLAG_BYTE);
         DatagramPacket pkt = packet.getPacket();
-
-        InetAddress to;
-        try {
-            to = InetAddress.getByAddress(state.getSentIP());
-        } catch (UnknownHostException uhe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("How did we think this was a valid IP?  " + state.getRemoteHostId());
-            packet.release();
-            return null;
-        }
-        
         pkt.setLength(SHORT_HEADER_SIZE);
         SSU2Payload.RIBlock block = new SSU2Payload.RIBlock(ourInfo,  0, len,
                                                             false, gzip, 0, numFragments);
         encryptSessionConfirmed(packet, state.getHandshakeState(), state.getMTU(),
                                 state.getSendHeaderEncryptKey1(), state.getSendHeaderEncryptKey2(), block, state.getNextToken());
-        setTo(packet, to, state.getSentPort());
+        pkt.setSocketAddress(state.getSentAddress());
         packet.setMessageType(TYPE_CONF);
         packet.setPriority(PRIORITY_HIGH);
         return packet;

@@ -14,6 +14,7 @@ import com.southernstorm.noise.protocol.CipherState;
 import com.southernstorm.noise.protocol.CipherStatePair;
 import com.southernstorm.noise.protocol.HandshakeState;
 
+import net.i2p.crypto.HKDF;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -50,6 +51,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     private byte[] _rcvHeaderEncryptKey2;
     private byte[] _sessCrForReTX;
     private long _timeReceived;
+    private PeerState2 _pstate;
     
     // testing
     private static final boolean ENFORCE_TOKEN = false;
@@ -57,8 +59,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
 
 
     /**
-     *  @param localPort Must be our external port, otherwise the signature of the
-     *                   SessionCreated message will be bad if the external port != the internal port.
      *  @param packet with all header encryption removed,
      *                either a SessionRequest OR a TokenRequest.
      */
@@ -351,6 +351,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             _currentState != InboundState.IB_STATE_TOKEN_REQUEST_RECEIVED)
             throw new IllegalStateException("Bad state for Retry Sent: " + _currentState);
         _currentState = InboundState.IB_STATE_RETRY_SENT;
+        _lastSend = _context.clock().now();
     }
 
     /**
@@ -391,7 +392,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         if (_log.shouldDebug())
             _log.debug("State after sess req: " + _handshakeState);
         _timeReceived = 0;
-        processPayload(data, off + LONG_HEADER_SIZE, len - (SHORT_HEADER_SIZE + KEY_LEN + MAC_LEN + MAC_LEN), true);
+        processPayload(data, off + LONG_HEADER_SIZE, len - (LONG_HEADER_SIZE + KEY_LEN + MAC_LEN), true);
         if (_timeReceived == 0)
             throw new GeneralSecurityException("No DateTime block in Session Request");
         long skew = _establishBegin - _timeReceived;
@@ -399,20 +400,17 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             throw new GeneralSecurityException("Skew exceeded in Session Request: " + skew);
         _sendHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessCreateHeader");
         _currentState = InboundState.IB_STATE_REQUEST_RECEIVED;
-        
-        if (_createdSentCount == 1) {
-            _rtt = (int) ( _context.clock().now() - _lastSend );
-        }	
+        _rtt = (int) ( _context.clock().now() - _lastSend );
 
         packetReceived();
     }
 
     /**
+     * Receive the last message in the handshake, and create the PeerState.
      *
-     *
-     *
+     * @return the new PeerState2, may also be retrieved from getPeerState()
      */
-    public synchronized void receiveSessionConfirmed(UDPPacket packet) throws GeneralSecurityException {
+    public synchronized PeerState2 receiveSessionConfirmed(UDPPacket packet) throws GeneralSecurityException {
         if (_currentState != InboundState.IB_STATE_CREATED_SENT)
             throw new GeneralSecurityException("Bad state for Session Confirmed: " + _currentState);
         DatagramPacket pkt = packet.getPacket();
@@ -429,9 +427,9 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         if (_log.shouldDebug())
             _log.debug("State after mixHash 3: " + _handshakeState);
 
-        byte[] payload = new byte[len - 80]; // 16 hdr, 32 static key, 16 MAC, 16 MAC
+        // decrypt in-place
         try {
-            _handshakeState.readMessage(data, off + SHORT_HEADER_SIZE, len - SHORT_HEADER_SIZE, payload, 0);
+            _handshakeState.readMessage(data, off + SHORT_HEADER_SIZE, len - SHORT_HEADER_SIZE, data, off + SHORT_HEADER_SIZE);
         } catch (GeneralSecurityException gse) {
             if (_log.shouldDebug())
                 _log.debug("Session Confirmed error, State at failure: " + _handshakeState + '\n' + net.i2p.util.HexDump.dump(data, off, len), gse);
@@ -439,27 +437,53 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         }
         if (_log.shouldDebug())
             _log.debug("State after sess conf: " + _handshakeState);
-        processPayload(payload, 0, payload.length, false);
+        processPayload(data, off + SHORT_HEADER_SIZE, len - (SHORT_HEADER_SIZE + KEY_LEN + MAC_LEN + MAC_LEN), false);
         _sessCrForReTX = null;
 
-        // TODO split, calculate keys
+        if (_receivedConfirmedIdentity == null)
+            throw new GeneralSecurityException("No RI in Session Confirmed");
 
-        
-        // TODO fix state
-        if ( (_currentState == InboundState.IB_STATE_UNKNOWN) || 
-             (_currentState == InboundState.IB_STATE_REQUEST_RECEIVED) ||
-             (_currentState == InboundState.IB_STATE_CREATED_SENT) ) {
-            if (confirmedFullyReceived())
-                _currentState = InboundState.IB_STATE_CONFIRMED_COMPLETELY;
-            else
-                _currentState = InboundState.IB_STATE_CONFIRMED_PARTIALLY;
-        }
-        
-        if (_createdSentCount == 1) {
+        // split()
+        // The CipherStates are from d_ab/d_ba,
+        // not from k_ab/k_ba, so there's no use for
+        // HandshakeState.split()
+        byte[] ckd = _handshakeState.getChainingKey();
+        byte[] k_ab = new byte[32];
+        byte[] k_ba = new byte[32];
+        HKDF hkdf = new HKDF(_context);
+        hkdf.calculate(ckd, ZEROLEN, k_ab, k_ba, 0);
+        // generate keys
+        byte[] d_ab = new byte[32];
+        byte[] h_ab = new byte[32];
+        byte[] d_ba = new byte[32];
+        byte[] h_ba = new byte[32];
+        hkdf.calculate(k_ab, ZEROLEN, INFO_DATA, d_ab, h_ab, 0);
+        hkdf.calculate(k_ba, ZEROLEN, INFO_DATA, d_ba, h_ba, 0);
+        ChaChaPolyCipherState sender = new ChaChaPolyCipherState();
+        sender.initializeKey(d_ba, 0);
+        ChaChaPolyCipherState rcvr = new ChaChaPolyCipherState();
+        sender.initializeKey(d_ab, 0);
+        if (_log.shouldDebug())
+            _log.debug("Generated Chain key:              " + Base64.encode(ckd) +
+                       "\nGenerated split key for A->B:     " + Base64.encode(k_ab) +
+                       "\nGenerated split key for B->A:     " + Base64.encode(k_ba) +
+                       "\nGenerated encrypt key for A->B:   " + Base64.encode(d_ab) +
+                       "\nGenerated encrypt key for B->A:   " + Base64.encode(d_ba) +
+                       "\nIntro key for Alice:              " + Base64.encode(_sendHeaderEncryptKey1) +
+                       "\nIntro key for Bob:                " + Base64.encode(_rcvHeaderEncryptKey1) +
+                       "\nGenerated header key 2 for A->B:  " + Base64.encode(h_ab) +
+                       "\nGenerated header key 2 for B->A:  " + Base64.encode(h_ba));
+        _handshakeState.destroy();
+        if (_createdSentCount == 1)
             _rtt = (int) ( _context.clock().now() - _lastSend );
-        }	
-
+        _pstate = new PeerState2(_context, _transport, _aliceSocketAddress,
+                                 _receivedConfirmedIdentity.calculateHash(),
+                                 true, _rtt, sender, rcvr,
+                                 _sendConnID, _rcvConnID,
+                                 _sendHeaderEncryptKey1, h_ba, h_ab);
+        _currentState = InboundState.IB_STATE_CONFIRMED_COMPLETELY;
         packetReceived();
+        return _pstate;
     }
 
     /**
@@ -507,11 +531,11 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     /**
-     * @return null we have not received the session confirmed
+     * @return null if we have not received the session confirmed
      */
     public synchronized PeerState2 getPeerState() {
-        // TODO
-        return null;
+        _currentState = InboundState.IB_STATE_COMPLETE;
+        return _pstate;
     }
     
     @Override

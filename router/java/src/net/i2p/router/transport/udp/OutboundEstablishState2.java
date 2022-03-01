@@ -12,6 +12,7 @@ import com.southernstorm.noise.protocol.CipherState;
 import com.southernstorm.noise.protocol.CipherStatePair;
 import com.southernstorm.noise.protocol.HandshakeState;
 
+import net.i2p.crypto.HKDF;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -51,6 +52,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     private byte[] _sessReqForReTX;
     private byte[] _sessConfForReTX;
     private long _timeReceived;
+    private PeerState2 _pstate;
 
     private static final boolean SET_TOKEN = false;
     private static final long MAX_SKEW = 2*60*1000L;
@@ -381,8 +383,10 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     /**
      * note that we just sent the SessionConfirmed packets
      * and save them for retransmission
+     *
+     * @return the new PeerState2, may also be retrieved from getPeerState()
      */
-    public synchronized void confirmedPacketsSent(UDPPacket[] packets) {
+    public synchronized PeerState2 confirmedPacketsSent(UDPPacket[] packets) {
         if (_sessConfForReTX == null) {
             // store pkt for retx
             // only one supported right now
@@ -395,9 +399,49 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             if (_rcvHeaderEncryptKey2 == null)
                 _rcvHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessCreateHeader");
 
-            // TODO split(), create PeerState2
+            // split()
+            // The CipherStates are from d_ab/d_ba,
+            // not from k_ab/k_ba, so there's no use for
+            // HandshakeState.split()
+            byte[] ckd = _handshakeState.getChainingKey();
+            byte[] k_ab = new byte[32];
+            byte[] k_ba = new byte[32];
+            HKDF hkdf = new HKDF(_context);
+            hkdf.calculate(ckd, ZEROLEN, k_ab, k_ba, 0);
+            // generate keys
+            byte[] d_ab = new byte[32];
+            byte[] h_ab = new byte[32];
+            byte[] d_ba = new byte[32];
+            byte[] h_ba = new byte[32];
+            hkdf.calculate(k_ab, ZEROLEN, INFO_DATA, d_ab, h_ab, 0);
+            hkdf.calculate(k_ba, ZEROLEN, INFO_DATA, d_ba, h_ba, 0);
+            ChaChaPolyCipherState sender = new ChaChaPolyCipherState();
+            sender.initializeKey(d_ab, 0);
+            ChaChaPolyCipherState rcvr = new ChaChaPolyCipherState();
+            sender.initializeKey(d_ba, 0);
+            if (_log.shouldDebug())
+                _log.debug("Generated Chain key:              " + Base64.encode(ckd) +
+                           "\nGenerated split key for A->B:     " + Base64.encode(k_ab) +
+                           "\nGenerated split key for B->A:     " + Base64.encode(k_ba) +
+                           "\nGenerated encrypt key for A->B:   " + Base64.encode(d_ab) +
+                           "\nGenerated encrypt key for B->A:   " + Base64.encode(d_ba) +
+                           "\nIntro key for Alice:              " + Base64.encode(_sendHeaderEncryptKey1) +
+                           "\nIntro key for Bob:                " + Base64.encode(_rcvHeaderEncryptKey1) +
+                           "\nGenerated header key 2 for A->B:  " + Base64.encode(h_ab) +
+                           "\nGenerated header key 2 for B->A:  " + Base64.encode(h_ba));
+            _handshakeState.destroy();
+            if (_requestSentCount == 1)
+                _rtt = (int) ( _context.clock().now() - _lastSend );
+            _pstate = new PeerState2(_context, _transport, _bobSocketAddress,
+                                     _remotePeer.calculateHash(),
+                                     false, _rtt, sender, rcvr,
+                                     _sendConnID, _rcvConnID,
+                                     _sendHeaderEncryptKey1, h_ab, h_ba);
+            _currentState = OutboundState.OB_STATE_CONFIRMED_COMPLETELY;
+            _pstate.confirmedPacketsSent(_sessConfForReTX);
         }
         confirmedPacketsSent();
+        return _pstate;
     }
 
     /**
@@ -429,12 +473,11 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     /**
-     * @return null we have not sent the session confirmed
+     * @return null if we have not sent the session confirmed
      */
     public synchronized PeerState2 getPeerState() {
-        // TODO
-        // set confirmed pkt data
-        return null;
+        _currentState = OutboundState.OB_STATE_CONFIRMED_COMPLETELY;
+        return _pstate;
     }
 
     @Override

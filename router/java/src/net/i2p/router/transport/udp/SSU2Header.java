@@ -73,7 +73,7 @@ final class SSU2Header {
      *  Decrypt bytes 0-7 in header.
      *  Packet is unmodified.
      *
-     *  @param packet must be 8 bytes min
+     *  @param pkt must be 8 bytes min
      *  @return the destination connection ID
      *  @throws IndexOutOfBoundsException if too short
      */
