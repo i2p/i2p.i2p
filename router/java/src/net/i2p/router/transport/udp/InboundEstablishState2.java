@@ -155,7 +155,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     private void processPayload(byte[] payload, int offset, int length, boolean isHandshake) throws GeneralSecurityException {
         try {
             int blocks = SSU2Payload.processPayload(_context, this, payload, offset, length, isHandshake);
-            System.out.println("Processed " + blocks + " blocks");
+            if (_log.shouldDebug())
+                _log.debug("Processed " + blocks + " blocks");
         } catch (Exception e) {
             _log.error("IES2 payload error\n" + net.i2p.util.HexDump.dump(payload, 0, length), e);
             throw new GeneralSecurityException("IES2 payload error", e);
@@ -171,11 +172,13 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     public void gotOptions(byte[] options, boolean isHandshake) {
-        System.out.println("Got OPTIONS block");
+        if (_log.shouldDebug())
+            _log.debug("Got OPTIONS block");
     }
 
     public void gotRI(RouterInfo ri, boolean isHandshake, boolean flood) throws DataFormatException {
-        System.out.println("Got RI block: " + ri);
+        if (_log.shouldDebug())
+            _log.debug("Got RI block: " + ri);
         if (isHandshake)
             throw new DataFormatException("RI in Sess Req");
         if (_receivedUnconfirmedIdentity != null)
@@ -241,7 +244,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     public void gotRIFragment(byte[] data, boolean isHandshake, boolean flood, boolean isGzipped, int frag, int totalFrags) {
-            System.out.println("Got RI fragment " + frag + " of " + totalFrags);
+        if (_log.shouldDebug())
+            _log.debug("Got RI fragment " + frag + " of " + totalFrags);
         if (isHandshake)
             throw new IllegalStateException("RI in Sess Req");
     }
@@ -251,11 +255,13 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     public void gotIntroKey(byte[] key) {
-        System.out.println("Got Intro key: " + Base64.encode(key));
+        if (_log.shouldDebug())
+            _log.debug("Got Intro key: " + Base64.encode(key));
     }
 
     public void gotRelayTagRequest() {
-        System.out.println("Got relay tag request");
+        if (_log.shouldDebug())
+            _log.debug("Got relay tag request");
     }
 
     public void gotRelayTag(long tag) {
@@ -269,7 +275,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     public void gotI2NP(I2NPMessage msg) {
-        System.out.println("Got I2NP block: " + msg);
+        if (_log.shouldDebug())
+            _log.debug("Got I2NP block: " + msg);
         if (getState() != InboundState.IB_STATE_CREATED_SENT)
             throw new IllegalStateException("I2NP in Sess Req");
         if (_receivedConfirmedIdentity == null)
@@ -279,7 +286,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     public void gotFragment(byte[] data, int off, int len, long messageID, int frag, boolean isLast) throws DataFormatException {
-        System.out.println("Got FRAGMENT block: " + messageID);
+        if (_log.shouldDebug())
+            _log.debug("Got FRAGMENT block: " + messageID);
         if (getState() != InboundState.IB_STATE_CREATED_SENT)
             throw new IllegalStateException("I2NP in Sess Req");
         if (_receivedConfirmedIdentity == null)
@@ -297,7 +305,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     public void gotUnknown(int type, int len) {
-        System.out.println("Got UNKNOWN block, type: " + type + " len: " + len);
+        if (_log.shouldDebug())
+            _log.debug("Got UNKNOWN block, type: " + type + " len: " + len);
     }
 
     public void gotPadding(int paddingLength, int frameLength) {

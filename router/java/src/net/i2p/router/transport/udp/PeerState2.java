@@ -291,6 +291,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotI2NP(I2NPMessage msg) {
+        if (_log.shouldDebug())
+            _log.debug("Got I2NP block: " + msg);
         // 9 byte header
         int size = msg.getMessageSize() - 7;
         messageFullyReceived(msg.getUniqueId(), size);
@@ -299,6 +301,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotFragment(byte[] data, int off, int len, long messageId, int frag, boolean isLast) throws DataFormatException {
+        if (_log.shouldDebug())
+            _log.debug("Got FRAGMENT block: " + messageId + " fragment " + frag + " isLast? " + isLast);
         InboundMessageState state;
         boolean messageComplete = false;
         boolean messageExpired = false;
@@ -339,12 +343,22 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotACK(long ackThru, int acks, byte[] ranges) {
+        if (_log.shouldDebug()) {
+            if (ranges != null)
+                _log.debug("Got ACK block: " + SSU2Bitfield.toString(ackThru, acks, ranges, ranges.length / 2));
+            else
+                _log.debug("Got ACK block: " + SSU2Bitfield.toString(ackThru, acks, null, 0));
+        }
     }
 
     public void gotTermination(int reason, long count) {
+        if (_log.shouldDebug())
+            _log.debug("Got TERMINATION block, reason: " + reason + " count: " + count);
     }
 
     public void gotUnknown(int type, int len) {
+        if (_log.shouldDebug())
+            _log.debug("Got UNKNOWN block, type: " + type + " len: " + len);
     }
 
     public void gotPadding(int paddingLength, int frameLength) {
