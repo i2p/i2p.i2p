@@ -166,7 +166,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     private void processPayload(byte[] payload, int offset, int length, boolean isHandshake) throws GeneralSecurityException {
         try {
             int blocks = SSU2Payload.processPayload(_context, this, payload, offset, length, isHandshake);
-            System.out.println("Processed " + blocks + " blocks");
+            if (_log.shouldDebug())
+                _log.debug("Processed " + blocks + " blocks");
         } catch (Exception e) {
             throw new GeneralSecurityException("Session Created payload error", e);
         }
@@ -181,7 +182,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     public void gotOptions(byte[] options, boolean isHandshake) {
-        System.out.println("Got OPTIONS block");
+        if (_log.shouldDebug())
+            _log.debug("Got OPTIONS block");
     }
 
     public void gotRI(RouterInfo ri, boolean isHandshake, boolean flood) throws DataFormatException {
@@ -193,11 +195,13 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     public void gotAddress(byte[] ip, int port) {
-        System.out.println("Got ADDRESS block: " + Addresses.toString(ip, port));
+        if (_log.shouldDebug())
+            _log.debug("Got ADDRESS block: " + Addresses.toString(ip, port));
     }
 
     public void gotIntroKey(byte[] key) {
-        System.out.println("Got Intro key: " + Base64.encode(key));
+        if (_log.shouldDebug())
+            _log.debug("Got Intro key: " + Base64.encode(key));
     }
 
     public void gotRelayTagRequest() {
@@ -205,7 +209,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     public void gotRelayTag(long tag) {
-        System.out.println("Got relay tag " + tag);
+        if (_log.shouldDebug())
+            _log.debug("Got relay tag " + tag);
     }
 
     public void gotToken(long token, long expires) {
@@ -229,7 +234,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     public void gotUnknown(int type, int len) {
-        System.out.println("Got UNKNOWN block, type: " + type + " len: " + len);
+        if (_log.shouldDebug())
+            _log.debug("Got UNKNOWN block, type: " + type + " len: " + len);
     }
 
     public void gotPadding(int paddingLength, int frameLength) {
