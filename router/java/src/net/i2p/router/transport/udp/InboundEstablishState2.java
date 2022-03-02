@@ -178,6 +178,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         System.out.println("Got RI block: " + ri);
         if (isHandshake)
             throw new DataFormatException("RI in Sess Req");
+        if (_receivedUnconfirmedIdentity != null)
+            throw new DataFormatException("DUP RI in Sess Conf");
         _receivedUnconfirmedIdentity = ri.getIdentity();
         if (ri.getNetworkId() != _context.router().getNetworkID()) {
             // TODO ban
@@ -234,6 +236,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
 
         _receivedConfirmedIdentity = _receivedUnconfirmedIdentity;
         _sendHeaderEncryptKey1 = ik;
+        createPeerState();
         //_sendHeaderEncryptKey2 calculated below
     }
 
@@ -271,6 +274,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             throw new IllegalStateException("I2NP in Sess Req");
         if (_receivedConfirmedIdentity == null)
             throw new IllegalStateException("RI must be first");
+        // pass to PeerState2
+        _pstate.gotI2NP(msg);
     }
 
     public void gotFragment(byte[] data, int off, int len, long messageID, int frag, boolean isLast) throws DataFormatException {
@@ -279,6 +284,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             throw new IllegalStateException("I2NP in Sess Req");
         if (_receivedConfirmedIdentity == null)
             throw new IllegalStateException("RI must be first");
+        // pass to PeerState2
+        _pstate.gotFragment(data, off, len, messageID, frag, isLast);
     }
 
     public void gotACK(long ackThru, int acks, byte[] ranges) {
@@ -443,6 +450,19 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         if (_receivedConfirmedIdentity == null)
             throw new GeneralSecurityException("No RI in Session Confirmed");
 
+        // createPeerState() called from gotRI()
+
+        _currentState = InboundState.IB_STATE_CONFIRMED_COMPLETELY;
+        packetReceived();
+        return _pstate;
+    }
+
+    /**
+     *  Creates the PeerState and stores in _pstate.
+     *  Called from gotRI() so that we can pass any I2NP messages
+     *  or fragments immediately to the PeerState.
+     */
+    private void createPeerState() {
         // split()
         // The CipherStates are from d_ab/d_ba,
         // not from k_ab/k_ba, so there's no use for
@@ -481,9 +501,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                                  true, _rtt, sender, rcvr,
                                  _sendConnID, _rcvConnID,
                                  _sendHeaderEncryptKey1, h_ba, h_ab);
-        _currentState = InboundState.IB_STATE_CONFIRMED_COMPLETELY;
-        packetReceived();
-        return _pstate;
     }
 
     /**

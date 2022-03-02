@@ -78,9 +78,15 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         _rcvHeaderEncryptKey2 = rcvHdrKey2;
         _receivedMessages = new SSU2Bitfield(256, 0);
         _ackedMessages = new SSU2Bitfield(256, 0);
-        // For outbound, SessionConfirmed is packet 0
-        if (!isInbound)
+        if (isInbound) {
+            // Send immediate ack of Session Confirmed
+            _receivedMessages.set(0);
+            UDPPacket ack = transport.getBuilder2().buildACK(this);
+            transport.send(ack);
+        } else {
+            // For outbound, SessionConfirmed is packet 0
             _packetNumber.set(1);
+        }
     }
 
     // SSU 1 overrides
@@ -292,7 +298,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         _transport.messageReceived(msg, null, _remotePeer, 0, size);
     }
 
-    public void gotFragment(byte[] data, int off, int len, long messageId,int frag, boolean isLast) throws DataFormatException {
+    public void gotFragment(byte[] data, int off, int len, long messageId, int frag, boolean isLast) throws DataFormatException {
         InboundMessageState state;
         boolean messageComplete = false;
         boolean messageExpired = false;
