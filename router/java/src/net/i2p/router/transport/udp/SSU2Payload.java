@@ -459,7 +459,7 @@ class SSU2Payload {
             tgt[off++] = b;
             DataHelper.toLong(tgt, off, 4, m.getMessageId());
             off += 4;
-            return off + m.writeFragment(tgt, off, 0);
+            return off + m.writeFragment(tgt, off, f);
         }
     }
 

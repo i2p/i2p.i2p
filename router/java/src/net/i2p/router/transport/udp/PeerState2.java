@@ -129,6 +129,15 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         //    _wantACKSendSince = 0;
     }
 
+    /**
+     *  We received the message specified completely.
+     *  @param bytes if less than or equal to zero, message is a duplicate.
+     */
+    @Override
+    void messageFullyReceived(Long messageId, int bytes) {
+        // TODO
+    }
+
     // SSU 1 unsupported things
 
     @Override
@@ -278,6 +287,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     public void gotI2NP(I2NPMessage msg) {
         // 9 byte header
         int size = msg.getMessageSize() - 7;
+        messageFullyReceived(msg.getUniqueId(), size);
         // complete message, skip IMF and MessageReceiver
         _transport.messageReceived(msg, null, _remotePeer, 0, size);
     }
