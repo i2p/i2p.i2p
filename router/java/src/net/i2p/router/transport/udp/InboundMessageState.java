@@ -115,7 +115,7 @@ class InboundMessageState implements CDQEntry {
         if (isLast) {
             if (fragmentNum > MAX_FRAGMENTS)
                 throw new DataFormatException("corrupt - too many fragments: " + fragmentNum);
-            _fragments = new ByteArray[fragmentNum];
+            _fragments = new ByteArray[fragmentNum + 1];
         } else {
             _fragments = new ByteArray[MAX_FRAGMENTS];
         }
