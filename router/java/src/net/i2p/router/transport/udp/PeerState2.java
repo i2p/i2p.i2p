@@ -119,6 +119,16 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                DATA_FOLLOWON_EXTRA_SIZE; // Followon fragment block overhead (5)
     }
 
+    /**
+     *  All acks have been sent.
+     */
+    @Override
+    void clearWantedACKSendSince() {
+        // TODO
+        //if (  )
+        //    _wantACKSendSince = 0;
+    }
+
     // SSU 1 unsupported things
 
     @Override
@@ -160,6 +170,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         byte[] data = dpacket.getData();
         int off = dpacket.getOffset();
         int len = dpacket.getLength();
+        if (_log.shouldDebug())
+            _log.debug("Packet before header decryption:\n" + HexDump.dump(data, off, len));
         try {
             if (len < MIN_DATA_LEN) {
                 if (_log.shouldWarn())
@@ -192,10 +204,14 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             }
             long n = header.getPacketNumber();
             SSU2Header.acceptTrialDecrypt(packet, header);
+            if (_log.shouldDebug())
+                _log.debug("Packet " + n + " after header decryption:\n" + HexDump.dump(data, off, len));
             synchronized (_rcvCha) {
                 _rcvCha.setNonce(n);
                 // decrypt in-place
                 _rcvCha.decryptWithAd(header.data, data, off + SHORT_HEADER_SIZE, data, off + SHORT_HEADER_SIZE, len - SHORT_HEADER_SIZE);
+                if (_log.shouldDebug())
+                    _log.debug("Packet " + n + " after full decryption:\n" + HexDump.dump(data, off, len - MAC_LEN));
                 if (_receivedMessages.set(n)) {
                     if (_log.shouldWarn())
                         _log.warn("dup pkt rcvd " + n + " on " + this);
@@ -203,6 +219,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                 }
             }
             int payloadLen = len - (SHORT_HEADER_SIZE + MAC_LEN);
+            if (_log.shouldInfo())
+                _log.info("New pkt rcvd " + n + " on " + this);
             processPayload(data, off + SHORT_HEADER_SIZE, payloadLen);
             packetReceived(payloadLen);
         } catch (GeneralSecurityException gse) {
@@ -220,7 +238,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         try {
             int blocks = SSU2Payload.processPayload(_context, this, payload, offset, length, false);
         } catch (Exception e) {
-            throw new GeneralSecurityException("Session Created payload error", e);
+            throw new GeneralSecurityException("Data payload error", e);
         }
     }
 

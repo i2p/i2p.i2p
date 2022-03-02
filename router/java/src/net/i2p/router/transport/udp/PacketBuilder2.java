@@ -29,6 +29,7 @@ import net.i2p.router.transport.udp.PacketBuilder.Fragment;
 import net.i2p.router.transport.udp.SSU2Payload.Block;
 import static net.i2p.router.transport.udp.SSU2Util.*;
 import net.i2p.util.Addresses;
+import net.i2p.util.HexDump;
 import net.i2p.util.Log;
 
 /**
@@ -215,9 +216,13 @@ class PacketBuilder2 {
         }
         SSU2Payload.writePayload(data, SHORT_HEADER_SIZE, blocks);
         pkt.setLength(off);
+        if (_log.shouldDebug())
+            _log.debug("Packet " + pktNum + " before encryption:\n" + HexDump.dump(data, 0, off));
 
         encryptDataPacket(packet, peer.getSendCipher(), pktNum, peer.getSendHeaderEncryptKey1(), peer.getSendHeaderEncryptKey2());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
+        if (_log.shouldDebug())
+            _log.debug("Packet " + pktNum + " after encryption:\n" + HexDump.dump(data, 0, pkt.getLength()));
         
         // FIXME ticket #2675
         // the packet could have been built before the current mtu got lowered, so

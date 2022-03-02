@@ -462,9 +462,9 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         ChaChaPolyCipherState sender = new ChaChaPolyCipherState();
         sender.initializeKey(d_ba, 0);
         ChaChaPolyCipherState rcvr = new ChaChaPolyCipherState();
-        sender.initializeKey(d_ab, 0);
+        rcvr.initializeKey(d_ab, 0);
         if (_log.shouldDebug())
-            _log.debug("Generated Chain key:              " + Base64.encode(ckd) +
+            _log.debug("split()\nGenerated Chain key:              " + Base64.encode(ckd) +
                        "\nGenerated split key for A->B:     " + Base64.encode(k_ab) +
                        "\nGenerated split key for B->A:     " + Base64.encode(k_ba) +
                        "\nGenerated encrypt key for A->B:   " + Base64.encode(d_ab) +

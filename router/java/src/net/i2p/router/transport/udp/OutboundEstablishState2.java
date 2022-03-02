@@ -418,15 +418,15 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             ChaChaPolyCipherState sender = new ChaChaPolyCipherState();
             sender.initializeKey(d_ab, 0);
             ChaChaPolyCipherState rcvr = new ChaChaPolyCipherState();
-            sender.initializeKey(d_ba, 0);
+            rcvr.initializeKey(d_ba, 0);
             if (_log.shouldDebug())
-                _log.debug("Generated Chain key:              " + Base64.encode(ckd) +
+                _log.debug("split()\nGenerated Chain key:              " + Base64.encode(ckd) +
                            "\nGenerated split key for A->B:     " + Base64.encode(k_ab) +
                            "\nGenerated split key for B->A:     " + Base64.encode(k_ba) +
                            "\nGenerated encrypt key for A->B:   " + Base64.encode(d_ab) +
                            "\nGenerated encrypt key for B->A:   " + Base64.encode(d_ba) +
-                           "\nIntro key for Alice:              " + Base64.encode(_sendHeaderEncryptKey1) +
-                           "\nIntro key for Bob:                " + Base64.encode(_rcvHeaderEncryptKey1) +
+                           "\nIntro key for Alice:              " + Base64.encode(_transport.getSSU2StaticIntroKey()) +
+                           "\nIntro key for Bob:                " + Base64.encode(_sendHeaderEncryptKey1) +
                            "\nGenerated header key 2 for A->B:  " + Base64.encode(h_ab) +
                            "\nGenerated header key 2 for B->A:  " + Base64.encode(h_ba));
             _handshakeState.destroy();
