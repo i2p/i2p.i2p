@@ -408,7 +408,7 @@ public class PersistentDataStore extends TransientDataStore {
                         if (!_context.router().isAlive())
                             break;
                         Hash key = getRouterInfoHash(routerInfoFiles[i].getName());
-                        if ( (key != null) && (!isKnown(key)) ) {
+                        if (key != null) {
                             // Run it inline so we don't clog up the job queue, esp. at startup
                             // Also this allows us to wait until it is really done to call checkReseed() and set _initialized
                             //PersistentDataStore.this._context.jobQueue().addJob(new ReadRouterJob(routerInfoFiles[i], key));
@@ -445,7 +445,7 @@ public class PersistentDataStore extends TransientDataStore {
                 int i = 0;
                 for (File file : toRead) {
                     Hash key = getRouterInfoHash(file.getName());
-                    if (key != null && !isKnown(key)) {
+                    if (key != null) {
                         (new ReadRouterJob(file, key)).runJob();
                         if (i++ == 150 && SystemVersion.isSlow() && !_initialized) {
                             // Can take 2 minutes to load them all on Android,
