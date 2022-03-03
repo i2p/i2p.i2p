@@ -852,6 +852,7 @@ public class NTCPTransport extends TransportImpl {
         boolean isFixedOrForceFirewalled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "true")
                                            .toLowerCase(Locale.US).equals("false");
         RouterAddress myAddress = bindAddress(port);
+        boolean ssuDisabled = !_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP);
         if (myAddress != null) {
             // fixed interface, or bound to the specified host
             replaceAddress(myAddress);
@@ -867,7 +868,7 @@ public class NTCPTransport extends TransportImpl {
                 boolean skipv6 = false;
                 for (InetAddress ia : addrs) {
                     boolean ipv6 = ia instanceof Inet6Address;
-                    if ((ipv6 && (isIPv6Firewalled() || _context.getBooleanProperty(PROP_IPV6_FIREWALLED))) ||
+                    if ((ipv6 && (isIPv6Firewalled() || (_context.getBooleanProperty(PROP_IPV6_FIREWALLED) && !ssuDisabled))) ||
                         (!ipv6 && isIPv4Firewalled())) {
                         if (ipv6)
                             skipv6 = true;
@@ -896,6 +897,13 @@ public class NTCPTransport extends TransportImpl {
             }
         } else {
             setOutboundNTCP2Address();
+        }
+        if (ssuDisabled) {
+            // Since we don't have peer testing, start out reachable,
+            // so peers will attempt to connect to us
+            long now = _context.clock().now();
+            _lastInboundIPv4 = now;
+            _lastInboundIPv6 = now;
         }
         // TransportManager.startListening() calls router.rebuildRouterInfo()
     }
