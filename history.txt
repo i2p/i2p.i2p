@@ -1,3 +1,16 @@
+2022-03-03 zzz
+ * NetDB: Load reseed RI if newer than in-memory
+ * NTCP: Start out reachable if SSU disabled
+
+2022-03-02 zzz
+ * SSU: Finish initial implementation of SSU2
+   Unit tested only, testnet testing to follow
+   Data phase retransmissions unimplemented
+
+2022-03-01 zzz
+ * NetDB: Add new reseeds
+ * Util: More efficient detection of connectivity
+
 2022-02-25 zzz
  * Sybil: Family analysis improvements
 
