@@ -52,6 +52,7 @@ import net.i2p.router.transport.TransportUtil;
 import static net.i2p.router.transport.TransportUtil.IPv6Config.*;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.transport.crypto.X25519KeyFactory;
+import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.util.DecayingHashSet;
 import net.i2p.router.util.DecayingBloomFilter;
 import net.i2p.router.util.EventLog;
@@ -297,22 +298,35 @@ public class NTCPTransport extends TransportImpl {
      *  Pick a port if not previously configured.
      *  Only if UDP is disabled.
      *
+     *  @return the port or -1
      *  @since 0.9.39
      */
-    private void setupPort() {
+    private int setupPort() {
         if (_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP))
-            return;
+            return -1;
         int port = getRequestedPort();
         if (port > 0 && !TransportUtil.isValidPort(port)) {
             TransportUtil.logInvalidPort(_log, STYLE, port);
+            port = -1;
+        }
+        if (port <= 0) {
+            // If we previously had a UDP port, use it
+            port = _context.getProperty(UDPTransport.PROP_INTERNAL_PORT, -1);
+            if (port <= 0)
+                port = _context.getProperty(UDPTransport.PROP_EXTERNAL_PORT, -1);
+            if (port > 0 && !TransportUtil.isValidPort(port)) {
+                TransportUtil.logInvalidPort(_log, STYLE, port);
+                port = -1;
+            }
+            if (port > 0)
+                _context.router().saveConfig(PROP_I2NP_NTCP_PORT, Integer.toString(port));
         }
         if (port <= 0) {
             port = TransportUtil.selectRandomPort(_context, STYLE);
-            Map<String, String> changes = new HashMap<String, String>(2);
-            changes.put(PROP_I2NP_NTCP_PORT, Integer.toString(port));
-            _context.router().saveConfig(changes, null);
+            _context.router().saveConfig(PROP_I2NP_NTCP_PORT, Integer.toString(port));
             _log.logAlways(Log.INFO, "NTCP selected random port " + port);
         }
+        return port;
     }
 
     /**
@@ -842,17 +856,19 @@ public class NTCPTransport extends TransportImpl {
 
         startIt();
         RouterAddress addr = configureLocalAddress();
+        boolean ssuDisabled = !_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP);
         int port;
         if (addr != null)
             // probably not set
             port = addr.getPort();
+        else if (ssuDisabled)
+            port = setupPort();
         else
             // received by externalAddressReceived() from TransportManager
             port = _ssuPort;
         boolean isFixedOrForceFirewalled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "true")
                                            .toLowerCase(Locale.US).equals("false");
         RouterAddress myAddress = bindAddress(port);
-        boolean ssuDisabled = !_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP);
         if (myAddress != null) {
             // fixed interface, or bound to the specified host
             replaceAddress(myAddress);
