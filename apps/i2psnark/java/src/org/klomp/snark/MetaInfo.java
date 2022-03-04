@@ -720,8 +720,9 @@ public class MetaInfo
     if (infoMap != null)
         return Collections.unmodifiableMap(infoMap);
     // we should only get here if serving a magnet on a torrent we created
-    if (_log.shouldLog(Log.WARN))
-        _log.warn("Creating new infomap", new Exception());
+    // or on edit torrent save
+    if (_log.shouldDebug())
+        _log.debug("Creating new infomap", new Exception());
     // otherwise we must create it
     Map<String, BEValue> info = new HashMap<String, BEValue>();
     info.put("name", new BEValue(DataHelper.getUTF8(name)));
