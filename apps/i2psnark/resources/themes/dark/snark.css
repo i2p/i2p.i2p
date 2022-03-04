@@ -2264,7 +2264,7 @@ hr.debug:last-child {
 }
 
 .accept {
-     background: url(/i2psnark/.resources/icons/solid/yes.png) left 6px center no-repeat !important;
+     background: url(/i2psnark/.resources/icons/solid/tick.png) left 6px center no-repeat !important;
      background-size: 12px 12px !important;
 }
 
