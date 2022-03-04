@@ -8,6 +8,9 @@
 # Raise the soft open files soft ulimit to this value, if able
 OPEN_FILES_ULIMIT=2048
 
+# Increase memory to 512 MB
+JAVA_OPTS='-Xmx512m'
+
 raiseopenfilesulimit() {
     OPEN_FILES_SOFT=`ulimit -S -n` 2> /dev/null || return
     if [ "$OPEN_FILES_SOFT" != "unlimited" ]
@@ -33,4 +36,4 @@ raiseopenfilesulimit() {
 raiseopenfilesulimit
 
 I2P="."
-java -jar "$I2P/i2psnark.jar"
+java $JAVA_OPTS -jar "$I2P/i2psnark.jar"

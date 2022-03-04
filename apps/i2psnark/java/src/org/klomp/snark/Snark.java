@@ -1259,6 +1259,8 @@ public class Snark
    */
   private void fatalRouter(String s, Throwable t) throws RouterException {
     _log.error(s, t);
+    if (!_util.getContext().isRouterContext())
+        System.out.println(s);
     stopTorrent(true);
     if (completeListener != null)
         completeListener.fatal(this, s);
