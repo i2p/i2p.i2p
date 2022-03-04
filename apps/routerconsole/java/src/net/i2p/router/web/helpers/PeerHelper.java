@@ -479,6 +479,7 @@ public class PeerHelper extends HelperBase {
         buf.append("</th><th nowrap><a href=\"#def.dir\" title=\"")
            .append(_t("Direction/Introduction")).append("\">").append(_t("Dir"))
            .append("</a></th><th nowrap>").append(_t("IPv6"))
+           .append("</th><th nowrap>").append(_t("Version"))
            .append("</th><th nowrap><a href=\"#def.idle\">").append(_t("Idle")).append("</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, _t("Sort by idle inbound"), FLAG_IDLE_IN);
         buf.append(" / ");
@@ -573,6 +574,10 @@ public class PeerHelper extends HelperBase {
                 buf.append("&#x2713;");
             else
                 buf.append("");
+            buf.append("</td>");
+
+            buf.append("<td class=\"cells peeripv6\" align=\"center\">");
+            buf.append(peer.getVersion());
             buf.append("</td>");
 
             long idleIn = Math.max(now-peer.getLastReceiveTime(), 0);
@@ -706,7 +711,7 @@ public class PeerHelper extends HelperBase {
 
       if (numPeers > 0) {
 //        buf.append("<tr><td colspan=\"16\"><hr></td></tr>\n");
-        buf.append("<tr class=\"tablefooter\"><td colspan=\"4\" align=\"left\"><b>")
+        buf.append("<tr class=\"tablefooter\"><td colspan=\"5\" align=\"left\"><b>")
            .append(ngettext("{0} peer", "{0} peers", peers.size()))
            .append("</b></td>" +
                    "<td align=\"center\" nowrap><span class=\"right\"><b>");

@@ -1605,7 +1605,7 @@ td img {
     padding: 0 1px 0 2px;
 }
 
-#udpconnections td:nth-child(2) img,
+#udpconnections td:nth-child(3) img,
 #ntcpconnections td:nth-child(2) img {
     padding: 0;
 }
@@ -7076,15 +7076,15 @@ img+tt {
 #ntcpconnections td:nth-child(8),
 #ntcpconnections td:nth-child(9),
 #ntcpconnections td:nth-child(10),
-#udpconnections td:nth-child(6),
 #udpconnections td:nth-child(7),
-#udpconnections td:nth-child(9),
+#udpconnections td:nth-child(8),
 #udpconnections td:nth-child(10),
 #udpconnections td:nth-child(11),
-#udpconnections td:nth-child(13),
+#udpconnections td:nth-child(12),
 #udpconnections td:nth-child(14),
 #udpconnections td:nth-child(15),
-#udpconnections td:nth-child(16) {
+#udpconnections td:nth-child(16),
+#udpconnections td:nth-child(17) {
     text-align: right;
     white-space: nowrap;
 }
@@ -7110,10 +7110,10 @@ img+tt {
 
 #ntcpconnections td:nth-child(4),
 #ntcpconnections td:nth-child(5),
-#udpconnections td:nth-child(4),
 #udpconnections td:nth-child(5),
-#udpconnections td:nth-child(8),
-#udpconnections td:nth-child(12) {
+#udpconnections td:nth-child(6),
+#udpconnections td:nth-child(9),
+#udpconnections td:nth-child(13) {
     white-space: nowrap;
 }
 
@@ -7131,13 +7131,13 @@ img+tt {
     text-align: right;
 }
 
-#udpconnections th:nth-child(6),
 #udpconnections th:nth-child(7),
-#udpconnections th:nth-child(n+9) {
+#udpconnections th:nth-child(8),
+#udpconnections th:nth-child(n+10) {
     text-align: right;
 }
 
-#udpconnections th:nth-child(12) {
+#udpconnections th:nth-child(13) {
     text-align: center;
 }
 
@@ -7170,9 +7170,9 @@ img+tt {
     width: auto;
 }
 
-#udpconnections th:nth-child(n+13),
+#udpconnections th:nth-child(n+14),
 #udpconnections .tablefooter th:nth-child(n+10),
-#udpconnections td:nth-child(n+13),
+#udpconnections td:nth-child(n+14),
 #udpconnections .tablefooter td:nth-child(n+10) {
     padding-right: 1% !important;
 }
@@ -7856,7 +7856,7 @@ b.netdb_transport {
 }
 
 @media screen and (max-width: 1220px) {
-    #udpconnections tr:nth-last-child(n+3):hover td:nth-child(n+2) {
+    #udpconnections tr:nth-last-child(n+4):hover td:nth-child(n+3) {
         transform: scale(1.05);
         text-align: center !important;
     }
