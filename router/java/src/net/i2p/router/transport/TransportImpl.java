@@ -68,8 +68,8 @@ public abstract class TransportImpl implements Transport {
     /** global router ident -> IP */
     private static final Map<Hash, byte[]> _IPMap;
 
-    private static final long UNREACHABLE_PERIOD = 5*60*1000;
-    private static final long WAS_UNREACHABLE_PERIOD = 30*60*1000;
+    private final long UNREACHABLE_PERIOD;
+    private final long WAS_UNREACHABLE_PERIOD;
 
     /** @since 0.9.50 */
     public static final String CAP_IPV4 = "4";
@@ -120,6 +120,16 @@ public abstract class TransportImpl implements Transport {
         _unreachableEntries = new ConcurrentHashMap<Hash, Long>(32);
         _wasUnreachableEntries = new ConcurrentHashMap<Hash, Long>(32);
         _localAddresses = new ConcurrentHashSet<InetAddress>(4);
+        if (allowLocal()) {
+            // don't ban for a long time in testnet, or else
+            // everybody is excluded by ProfileOrganizer.selectPeersLocallyUnreachable()
+            // at startup for half an hour
+            UNREACHABLE_PERIOD = 60*1000;
+            WAS_UNREACHABLE_PERIOD = 60*1000;
+        } else {
+            UNREACHABLE_PERIOD = 5*60*1000;
+            WAS_UNREACHABLE_PERIOD = 30*60*1000;
+        }
         _context.simpleTimer2().addPeriodicEvent(new CleanupUnreachable(), 2 * UNREACHABLE_PERIOD, UNREACHABLE_PERIOD / 2);
         // if the router is slow, or we have the i2prouter script on linux that bumps the ulimit,
         // allow more NTCP2 and less SSU. See getMaxConnections() below.
@@ -922,14 +932,16 @@ public abstract class TransportImpl implements Transport {
     private class CleanupUnreachable implements SimpleTimer.TimedEvent {
         public void timeReached() {
             long now = _context.clock().now();
+            long limit = now - UNREACHABLE_PERIOD;
             for (Iterator<Long> iter = _unreachableEntries.values().iterator(); iter.hasNext(); ) {
                 Long when = iter.next();
-                if (when.longValue() + UNREACHABLE_PERIOD < now)
+                if (when.longValue() < limit)
                     iter.remove();
             }
+            limit = now - WAS_UNREACHABLE_PERIOD;
             for (Iterator<Long> iter = _wasUnreachableEntries.values().iterator(); iter.hasNext(); ) {
                 Long when = iter.next();
-                if (when.longValue() + WAS_UNREACHABLE_PERIOD < now)
+                if (when.longValue() < limit)
                     iter.remove();
             }
         }
@@ -953,7 +965,14 @@ public abstract class TransportImpl implements Transport {
         RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
         if (ri == null)
             return false;
-        return null == ri.getTargetAddress(this.getStyle());
+        String alt = getAltStyle();
+        if (alt != null) {
+            List<RouterAddress> addrs = ri.getTargetAddresses(getStyle(), alt);
+            return addrs.isEmpty();
+        } else {
+            RouterAddress addr = ri.getTargetAddress(getStyle());
+            return addr == null;
+        }
     }
 
     /**

@@ -1,3 +1,10 @@
+2022-03-04 zzz
+ * Console: Add SSU version column to /peers
+ * i2psnark: Add js theme preview
+ * i2psnark standalone: Add more CLI messages, increase memory
+ * NTCP: Fix port selection when SSU disabled
+ * Transport: Fix wasUnreachable() for transports with alt style
+
 2022-03-03 zzz
  * NetDB: Load reseed RI if newer than in-memory
  * NTCP: Start out reachable if SSU disabled
