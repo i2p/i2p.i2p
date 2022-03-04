@@ -320,7 +320,9 @@ public class I2PSnarkServlet extends BasicServlet {
 
         // we want it to go to the base URI so we don't refresh with some funky action= value
         int delay = 0;
-        if (!isConfigure) {
+        if (isConfigure) {
+            out.write("<script src=\".resources/js/configui.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
+        } else {
             delay = _manager.getRefreshDelaySeconds();
             if (delay > 0) {
                 String jsPfx = _context.isRouterContext() ? "" : ".resources";
@@ -2503,7 +2505,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(_t("Theme"));
         out.write(":<td colspan=\"2\">");
         if (_manager.getUniversalTheming()) {
-            out.write("<select name='theme' disabled=\"disabled\" title=\"");
+            out.write("<select id=\"theme\" name=\"theme\" disabled=\"disabled\" title=\"");
             out.write(_t("To change themes manually, disable universal theming"));
             out.write("\"><option>");
             out.write(_manager.getTheme());
@@ -2513,7 +2515,7 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write(_t("Configure"));
             out.write("]</a>");
         } else {
-            out.write("<select name='theme'>");
+            out.write("<select id=\"theme\" name=\"theme\">");
             String theme = _manager.getTheme();
             String[] themes = _manager.getThemes();
             // translated sort
@@ -2954,7 +2956,7 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     private static final String DOCTYPE = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n";
-    private static final String HEADER_A = "<link href=\"";
+    private static final String HEADER_A = "<link id=\"pagestyle\" href=\"";
     private static final String HEADER_B = "snark.css?" + CoreVersion.VERSION + "\" rel=\"stylesheet\" type=\"text/css\" >";
     private static final String HEADER_C = "nocollapse.css?" + CoreVersion.VERSION + "\" rel=\"stylesheet\" type=\"text/css\" >";
 
