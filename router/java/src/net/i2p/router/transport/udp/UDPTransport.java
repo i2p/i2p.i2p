@@ -2126,10 +2126,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  @since 0.8.9
      */
     void sendDestroy(PeerState peer) {
-        // peer must be fully established
-        if (peer.getCurrentCipherKey() == null)
-            return;
-        UDPPacket pkt = _packetBuilder.buildSessionDestroyPacket(peer);
+        UDPPacket pkt;
+        if (peer.getVersion() == 1) {
+            // peer must be fully established
+            if (peer.getCurrentCipherKey() == null)
+                return;
+            pkt = _packetBuilder.buildSessionDestroyPacket(peer);
+        } else {
+            // unspecified reason
+            pkt = _packetBuilder2.buildSessionDestroyPacket(0, (PeerState2) peer);
+        }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending destroy to : " + peer);
         send(pkt);

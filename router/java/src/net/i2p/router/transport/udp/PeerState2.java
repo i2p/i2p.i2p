@@ -350,8 +350,9 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotTermination(int reason, long count) {
-        if (_log.shouldDebug())
-            _log.debug("Got TERMINATION block, reason: " + reason + " count: " + count);
+        if (_log.shouldWarn())
+            _log.warn("Got TERMINATION block, reason: " + reason + " count: " + count);
+        _transport.getEstablisher().receiveSessionDestroy(_remoteHostId, this);
     }
 
     public void gotUnknown(int type, int len) {

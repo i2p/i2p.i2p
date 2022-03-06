@@ -144,6 +144,10 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             _sendHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessCreateHeader");
             _currentState = InboundState.IB_STATE_REQUEST_RECEIVED;
         }
+        if (_currentState == InboundState.IB_STATE_FAILED) {
+            // termination block received
+            throw new GeneralSecurityException("Termination block in Session/Token Request");
+        }
         if (_timeReceived == 0)
             throw new GeneralSecurityException("No DateTime block in Session/Token Request");
         long skew = _establishBegin - _timeReceived;
@@ -308,7 +312,11 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     public void gotTermination(int reason, long count) {
-        throw new IllegalStateException("Termination in Handshake");
+        if (_log.shouldWarn())
+            _log.warn("Got TERMINATION block, reason: " + reason + " count: " + count);
+        // this sets the state to FAILED
+        fail();
+        _transport.getEstablisher().receiveSessionDestroy(_remoteHostId);
     }
 
     public void gotUnknown(int type, int len) {
@@ -418,6 +426,11 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             _log.debug("State after sess req: " + _handshakeState);
         _timeReceived = 0;
         processPayload(data, off + LONG_HEADER_SIZE, len - (LONG_HEADER_SIZE + KEY_LEN + MAC_LEN), true);
+        packetReceived();
+        if (_currentState == InboundState.IB_STATE_FAILED) {
+            // termination block received
+            throw new GeneralSecurityException("Termination block in Session Request");
+        }
         if (_timeReceived == 0)
             throw new GeneralSecurityException("No DateTime block in Session Request");
         long skew = _establishBegin - _timeReceived;
@@ -426,8 +439,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         _sendHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessCreateHeader");
         _currentState = InboundState.IB_STATE_REQUEST_RECEIVED;
         _rtt = (int) ( _context.clock().now() - _lastSend );
-
-        packetReceived();
     }
 
     /**
@@ -463,6 +474,11 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         if (_log.shouldDebug())
             _log.debug("State after sess conf: " + _handshakeState);
         processPayload(data, off + SHORT_HEADER_SIZE, len - (SHORT_HEADER_SIZE + KEY_LEN + MAC_LEN + MAC_LEN), false);
+        packetReceived();
+        if (_currentState == InboundState.IB_STATE_FAILED) {
+            // termination block received
+            throw new GeneralSecurityException("Termination block in Session Confirmed");
+        }
         _sessCrForReTX = null;
 
         if (_receivedConfirmedIdentity == null)
@@ -471,7 +487,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         // createPeerState() called from gotRI()
 
         _currentState = InboundState.IB_STATE_CONFIRMED_COMPLETELY;
-        packetReceived();
         return _pstate;
     }
 

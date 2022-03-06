@@ -234,7 +234,11 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     public void gotTermination(int reason, long count) {
-        throw new IllegalStateException("Termination in Sess Created");
+        if (_log.shouldWarn())
+            _log.warn("Got TERMINATION block, reason: " + reason + " count: " + count);
+        // this sets the state to FAILED
+        fail();
+        _transport.getEstablisher().receiveSessionDestroy(_remoteHostId, this);
     }
 
     public void gotUnknown(int type, int len) {
@@ -323,6 +327,11 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                 _log.debug("Retry error", gse);
             throw gse;
         }
+        packetReceived();
+        if (_currentState == OutboundState.OB_STATE_VALIDATION_FAILED) {
+            // termination block received
+            return;
+        }
         if (_timeReceived == 0)
             throw new GeneralSecurityException("No DateTime block in Session/Token Request");
         long skew = _establishBegin - _timeReceived;
@@ -330,7 +339,6 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             throw new GeneralSecurityException("Skew exceeded in Session/Token Request: " + skew);
         createNewState(_routerAddress);
         _currentState = OutboundState.OB_STATE_RETRY_RECEIVED;
-        packetReceived();
     }
 
     public synchronized void receiveSessionCreated(UDPPacket packet) throws GeneralSecurityException {
@@ -371,6 +379,11 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             _log.debug("State after sess cr: " + _handshakeState);
         _timeReceived = 0;
         processPayload(data, off + LONG_HEADER_SIZE, len - (LONG_HEADER_SIZE + KEY_LEN + MAC_LEN), true);
+        packetReceived();
+        if (_currentState == OutboundState.OB_STATE_VALIDATION_FAILED) {
+            // termination block received
+            return;
+        }
         if (_timeReceived == 0)
             throw new GeneralSecurityException("No DateTime block in Session/Token Request");
         long skew = _establishBegin - _timeReceived;
@@ -384,7 +397,6 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         if (_requestSentCount == 1) {
             _rtt = (int) (_context.clock().now() - _requestSentTime);
         }
-        packetReceived();
     }
 
     /**

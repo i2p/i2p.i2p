@@ -133,6 +133,15 @@ class PacketBuilder2 {
      *
      */
     public UDPPacket buildPacket(List<Fragment> fragments, PeerState2 peer) {
+        return buildPacket(fragments, null, peer);
+    }
+
+    /*
+     *  Multiple fragments and optional other blocks.
+     *
+     *  @param otherBlocks may be null or empty
+     */
+    public UDPPacket buildPacket(List<Fragment> fragments, List<Block> otherBlocks, PeerState2 peer) {
         // calculate data size
         int numFragments = fragments.size();
         int dataSize = 0;
@@ -172,7 +181,10 @@ class PacketBuilder2 {
 
         // ok, now for the body...
         // +2 for acks and padding
-        List<Block> blocks = new ArrayList<Block>(fragments.size() + 2);
+        int bcnt = fragments.size() + 2;
+        if (otherBlocks != null)
+            bcnt += otherBlocks.size();
+        List<Block> blocks = new ArrayList<Block>(bcnt);
         int sizeWritten = 0;
 
         // add the acks
@@ -207,6 +219,17 @@ class PacketBuilder2 {
             off += sz;
             sizeWritten += sz;
         }
+
+        // now the other blocks, if any
+        if (otherBlocks != null) {
+            for (Block block : otherBlocks) {
+                blocks.add(block);
+                int sz = block.getTotalLength();
+                off += sz;
+                sizeWritten += sz;
+            }
+        }
+
         // FIXME
         Block block = getPadding(sizeWritten, currentMTU);
         if (block != null) {
@@ -279,6 +302,15 @@ class PacketBuilder2 {
      */
     public UDPPacket buildACK(PeerState2 peer) {
         return buildPacket(Collections.emptyList(), peer);
+    }
+
+    /**
+     *  Build a data packet with a termination block.
+     *  This will also include acks and padding.
+     */
+    public UDPPacket buildSessionDestroyPacket(int reason, PeerState2 peer) {
+        Block block = new SSU2Payload.TerminationBlock(reason, peer.getReceivedMessages().getHighestSet());
+        return buildPacket(Collections.emptyList(), Collections.singletonList(block), peer);
     }
     
     /**
