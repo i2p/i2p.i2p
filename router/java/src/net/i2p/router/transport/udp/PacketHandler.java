@@ -211,7 +211,7 @@ class PacketHandler {
                     handlePacket(_reader, packet);
                 } catch (RuntimeException e) {
                     if (_log.shouldLog(Log.ERROR))
-                        _log.error("Crazy error handling a packet: " + packet, e);
+                        _log.error("Internal error handling " + packet, e);
                 }
                 
                 // back to the cache with thee!
@@ -779,6 +779,8 @@ class PacketHandler {
      */
     private void receiveSSU2Packet(UDPPacket packet, PeerState2 state) {
         // header and body decryption is done by PeerState2
+        // This bypasses InboundMessageStates completely.
+        // All handling of fragments and acks is done in PeerState2.
         state.receivePacket(packet);
     }
 
@@ -830,8 +832,9 @@ class PacketHandler {
             // Session Request (after Retry) or Session Confirmed
             // or retransmitted Session Request or Token Rquest
             k2 = state.getRcvHeaderEncryptKey2();
-            if (state.getState() == InboundEstablishState.InboundState.IB_STATE_RETRY_SENT) {
-                // Session Request
+            if (k2 == null) {
+                // Session Request after Retry
+                k2 = k1;
                 header = SSU2Header.trialDecryptHandshakeHeader(packet, k1, k2);
                 if (header == null ||
                     header.getType() != SSU2Util.SESSION_REQUEST_FLAG_BYTE ||
@@ -839,6 +842,13 @@ class PacketHandler {
                     header.getNetID() != _networkID) {
                     if (_log.shouldWarn())
                         _log.warn("Failed decrypt Session Request after Retry: " + header);
+                    return false;
+                }
+                if (header.getSrcConnID() != state.getSendConnID()) {
+                    if (_log.shouldWarn())
+                        _log.warn("Bad Source Conn id " + header);
+                    // TODO could be a retransmitted Session Request,
+                    // tell establisher?
                     return false;
                 }
                 type = SSU2Util.SESSION_REQUEST_FLAG_BYTE;
@@ -860,13 +870,6 @@ class PacketHandler {
             if (header.getDestConnID() != state.getRcvConnID()) {
                 if (_log.shouldWarn())
                     _log.warn("Bad Dest Conn id " + header);
-                return false;
-            }
-            if (header.getSrcConnID() != state.getSendConnID()) {
-                if (_log.shouldWarn())
-                    _log.warn("Bad Source Conn id " + header);
-                // TODO could be a retransmitted Session Request,
-                // tell establisher?
                 return false;
             }
         }
@@ -912,15 +915,21 @@ class PacketHandler {
         // decrypt header
         byte[] k1 = state.getRcvHeaderEncryptKey1();
         byte[] k2 = state.getRcvHeaderEncryptKey2();
-        SSU2Header.Header header = SSU2Header.trialDecryptHandshakeHeader(packet, k1, k2);
-        if (header != null) {
-            // dest conn ID decrypts the same for both Session Created
-            // and Retry, so we can bail out now if it doesn't match
-            if (header.getDestConnID() != state.getRcvConnID()) {
-                if (_log.shouldWarn())
-                    _log.warn("Bad Dest Conn id " + header);
-                return false;
+        SSU2Header.Header header;
+        if (k2 != null) {
+            header = SSU2Header.trialDecryptHandshakeHeader(packet, k1, k2);
+            if (header != null) {
+                // dest conn ID decrypts the same for both Session Created
+                // and Retry, so we can bail out now if it doesn't match
+                if (header.getDestConnID() != state.getRcvConnID()) {
+                    if (_log.shouldWarn())
+                        _log.warn("Bad Dest Conn id " + header);
+                    return false;
+                }
             }
+        } else {
+            // we have only sent a Token Request
+            header = null;
         }
         int type;
         if (header == null ||

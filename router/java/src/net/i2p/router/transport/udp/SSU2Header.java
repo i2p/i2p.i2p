@@ -190,10 +190,12 @@ final class SSU2Header {
         public String toString() {
             if (data.length >= SESSION_HEADER_SIZE) {
                 return "Handshake header destID " + getDestConnID() + " pkt num " + getPacketNumber() + " type " + getType() +
+                       " version " + getVersion() + " netID " + getNetID() +
                        " srcID " + getSrcConnID() + " token " + getToken() + " key " + Base64.encode(getEphemeralKey());
             }
             if (data.length >= LONG_HEADER_SIZE) {
                 return "Long header destID " + getDestConnID() + " pkt num " + getPacketNumber() + " type " + getType() +
+                       " version " + getVersion() + " netID " + getNetID() +
                        " srcID " + getSrcConnID() + " token " + getToken();
             }
             return "Short header destID " + getDestConnID() + " pkt num " + getPacketNumber() + " type " + getType();

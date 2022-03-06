@@ -32,8 +32,8 @@ class InboundEstablishState {
     protected final Log _log;
     // SessionRequest message
     private byte _receivedX[];
-    private byte _bobIP[];
-    private final int _bobPort;
+    protected byte _bobIP[];
+    protected final int _bobPort;
     private final DHSessionKeyBuilder _keyBuilder;
     // SessionCreated message
     private byte _sentY[];

@@ -35,8 +35,8 @@ class OutboundEstablishState {
     private DHSessionKeyBuilder _keyBuilder;
     // SessionCreated message
     private byte _receivedY[];
-    private byte _aliceIP[];
-    private int _alicePort;
+    protected byte _aliceIP[];
+    protected int _alicePort;
     private long _receivedRelayTag;
     private long _receivedSignedOnTime;
     private SessionKey _sessionKey;
@@ -94,6 +94,11 @@ class OutboundEstablishState {
         /** SessionConfirmed failed validation */
         OB_STATE_VALIDATION_FAILED,
 
+        /**
+         * SSU2: We don't have a token
+         * @since 0.9.54
+         */
+        OB_STATE_NEEDS_TOKEN,
         /**
          * SSU2: We have sent a token request
          * @since 0.9.54

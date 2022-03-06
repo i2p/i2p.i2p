@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.data.Base64;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterIdentity;
@@ -382,7 +383,17 @@ class EstablishmentManager {
                     }
                 } else {
                     // must have a valid session key
-                    byte[] keyBytes = addr.getIntroKey();
+                    byte[] keyBytes;
+                    int version = _transport.getSSUVersion(ra);
+                    if (version == 1) {
+                        keyBytes = addr.getIntroKey();
+                    } else {
+                        String siv = ra.getOption("i");
+                        if (siv != null)
+                            keyBytes = Base64.decode(siv);
+                        else
+                            keyBytes = null;
+                    }
                     if (keyBytes == null) {
                         _transport.markUnreachable(toHash);
                         _transport.failed(msg, "Peer has no key, cannot establish");
@@ -403,7 +414,6 @@ class EstablishmentManager {
                     // don't ask if they are indirect
                     boolean requestIntroduction = allowExtendedOptions && !isIndirect &&
                                                   _transport.introducersMaybeRequired(TransportUtil.isIPv6(ra));
-                    int version = _transport.getSSUVersion(ra);
                     if (version == 1) {
                         state = new OutboundEstablishState(_context, maybeTo, to,
                                                        toIdentity, allowExtendedOptions,
@@ -751,7 +761,7 @@ class EstablishmentManager {
      */
     void receiveRetry(OutboundEstablishState2 state, UDPPacket packet) {
         try {
-            state.receiveSessionCreated(packet);
+            state.receiveRetry(packet);
         } catch (GeneralSecurityException gse) {
             if (_log.shouldWarn())
                 _log.warn("Corrupt Retry from: " + state, gse);
@@ -760,7 +770,7 @@ class EstablishmentManager {
         }
         notifyActivity();
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Receive retry from: " + state);
+            _log.debug("Receive retry with token " + state.getToken() + " from: " + state);
     }
 
     /**
@@ -1108,15 +1118,20 @@ class EstablishmentManager {
     public static final long MAX_TAG_VALUE = 0xFFFFFFFFl;
     
     /**
-     *  This may be called more than once
+     *  This handles both initial send and retransmission of Session Created,
+     *  and, for SSU2, send of Retry.
+     *  Retry is never retransmnitted.
+     *
+     *  This may be called more than once.
+     *
+     *  Caller must synch on state.
      */
     private void sendCreated(InboundEstablishState state) {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Send created to: " + state);
-        
         int version = state.getVersion();
         UDPPacket pkt;
         if (version == 1) {
+            if (_log.shouldDebug())
+                _log.debug("Send created to: " + state);
             try {
                 state.generateSessionKey();
             } catch (DHSessionKeyBuilder.InvalidPublicParameterException ippe) {
@@ -1130,13 +1145,27 @@ class EstablishmentManager {
                                                      _transport.getExternalPort(state.getSentIP().length == 16),
                                                      _transport.getIntroKey());
         } else {
-            // if already sent, get from the state to retx
             InboundEstablishState2 state2 = (InboundEstablishState2) state;
             InboundEstablishState.InboundState istate = state2.getState();
-            if (istate == IB_STATE_CREATED_SENT)
+            if (istate == IB_STATE_CREATED_SENT) {
+                if (_log.shouldDebug())
+                    _log.debug("Send created to: " + state);
+                // if already sent, get from the state to retx
                 pkt = state2.getRetransmitSessionCreatedPacket();
-            else
-                pkt = _builder2.buildSessionCreatedPacket((InboundEstablishState2) state);
+            } else if (istate == IB_STATE_REQUEST_RECEIVED) {
+                if (_log.shouldDebug())
+                    _log.debug("Send created to: " + state);
+                pkt = _builder2.buildSessionCreatedPacket(state2);
+            } else if (istate == IB_STATE_TOKEN_REQUEST_RECEIVED ||
+                       istate == IB_STATE_REQUEST_BAD_TOKEN_RECEIVED) {
+                if (_log.shouldDebug())
+                    _log.debug("Send retry to: " + state);
+                pkt = _builder2.buildRetryPacket(state2);
+            } else {
+                if (_log.shouldWarn())
+                    _log.warn("Unhandled state " + istate + " on " + state);
+                return;
+            }
         }
         if (pkt == null) {
             if (_log.shouldLog(Log.WARN))
@@ -1152,23 +1181,44 @@ class EstablishmentManager {
     }
 
     /**
-     *  Caller should probably synch on outboundState
+     *  This handles both initial send and retransmission of Session Request,
+     *  and, for SSU2, initial send and retransmission of Token Request.
+     *
+     *  This may be called more than once.
+     *
+     *  Caller must synch on state.
      */
     private void sendRequest(OutboundEstablishState state) {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Send SessionRequest to: " + state);
         int version = state.getVersion();
         UDPPacket packet;
         if (version == 1) {
+            if (_log.shouldDebug())
+                _log.debug("Send Session Request to: " + state);
             packet = _builder.buildSessionRequestPacket(state);
         } else {
-            // if already sent, get from the state to retx
             OutboundEstablishState2 state2 = (OutboundEstablishState2) state;
             OutboundEstablishState.OutboundState ostate = state2.getState();
-            if (ostate == OB_STATE_REQUEST_SENT)
+            if (ostate == OB_STATE_REQUEST_SENT ||
+                ostate == OB_STATE_REQUEST_SENT_NEW_TOKEN) {
+                if (_log.shouldDebug())
+                    _log.debug("Send Session Request to: " + state);
+                // if already sent, get from the state to retx
                 packet = state2.getRetransmitSessionRequestPacket();
-            else
+            } else if (ostate == OB_STATE_NEEDS_TOKEN ||
+                       ostate == OB_STATE_TOKEN_REQUEST_SENT) {
+                if (_log.shouldDebug())
+                    _log.debug("Send Token Request to: " + state);
+                packet = _builder2.buildTokenRequestPacket(state2);
+            } else if (ostate == OB_STATE_UNKNOWN ||
+                       ostate == OB_STATE_RETRY_RECEIVED) {
+                if (_log.shouldDebug())
+                    _log.debug("Send Session Request to: " + state);
                 packet = _builder2.buildSessionRequestPacket(state2);
+            } else {
+                if (_log.shouldWarn())
+                    _log.warn("Unhandled state " + ostate + " on " + state);
+                return;
+            }
         }
         if (packet != null) {
             _transport.send(packet);
@@ -1315,7 +1365,8 @@ class EstablishmentManager {
      *  Note that while a SessionConfirmed could in theory be fragmented,
      *  in practice a RouterIdentity is 387 bytes and a single fragment is 512 bytes max,
      *  so it will never be fragmented.
-     *  Caller should probably synch on state.
+     *
+     *  Caller must synch on state.
      */
     private void sendConfirmation(OutboundEstablishState state) {
         boolean valid = state.validateSessionCreated();
@@ -1379,9 +1430,13 @@ class EstablishmentManager {
      *  ack to the SessionConfirmed - otherwise we haven't generated the keys.
      *  Caller should probably synch on state.
      *
+     *  SSU1 only.
+     *
      *  @since 0.9.2
      */
     private void sendDestroy(OutboundEstablishState state) {
+        if (state.getVersion() > 1)
+            return;
         UDPPacket packet = _builder.buildSessionDestroyPacket(state);
         if (packet != null) {
             if (_log.shouldLog(Log.DEBUG))
@@ -1397,9 +1452,13 @@ class EstablishmentManager {
      *  Otherwise we haven't generated the keys.
      *  Caller should probably synch on state.
      *
+     *  SSU1 only.
+     *
      *  @since 0.9.2
      */
     private void sendDestroy(InboundEstablishState state) {
+        if (state.getVersion() > 1)
+            return;
         UDPPacket packet = _builder.buildSessionDestroyPacket(state);
         if (packet != null) {
             if (_log.shouldLog(Log.DEBUG))
@@ -1463,8 +1522,11 @@ class EstablishmentManager {
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Processing for inbound: " + inboundState);
             synchronized (inboundState) {
-                switch (inboundState.getState()) {
+                InboundEstablishState.InboundState istate = inboundState.getState();
+                switch (istate) {
                   case IB_STATE_REQUEST_RECEIVED:
+                  case IB_STATE_TOKEN_REQUEST_RECEIVED:      // SSU2
+                  case IB_STATE_REQUEST_BAD_TOKEN_RECEIVED:  // SSU2
                     if (expired)
                         processExpired(inboundState);
                     else
@@ -1473,11 +1535,18 @@ class EstablishmentManager {
 
                   case IB_STATE_CREATED_SENT: // fallthrough
                   case IB_STATE_CONFIRMED_PARTIALLY:
+                  case IB_STATE_RETRY_SENT:                  // SSU2
                     if (expired) {
                         sendDestroy(inboundState);
                         processExpired(inboundState);
                     } else if (inboundState.getNextSendTime() <= now) {
-                        sendCreated(inboundState);
+                        if (istate == IB_STATE_RETRY_SENT) {
+                            // Retry is never retransmitted
+                            inboundState.fail();
+                            processExpired(inboundState);
+                        } else {
+                            sendCreated(inboundState);
+                        }
                     }
                     break;
 
@@ -1510,6 +1579,12 @@ class EstablishmentManager {
                     // Can't happen, always call receiveSessionRequest() before putting in map
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("hrm, state is unknown for " + inboundState);
+                    break;
+
+                  default:
+                    if (_log.shouldWarn())
+                        _log.warn("Unhandled state on " + inboundState);
+                    break;
                 }
             }
 
@@ -1585,6 +1660,7 @@ class EstablishmentManager {
                 switch (outboundState.getState()) {
                     case OB_STATE_UNKNOWN:  // fall thru
                     case OB_STATE_INTRODUCED:
+                    case OB_STATE_NEEDS_TOKEN:             // SSU2 only
                         if (expired)
                             processExpired(outboundState);
                         else
@@ -1592,6 +1668,9 @@ class EstablishmentManager {
                         break;
 
                     case OB_STATE_REQUEST_SENT:
+                    case OB_STATE_TOKEN_REQUEST_SENT:      // SSU2 only
+                    case OB_STATE_RETRY_RECEIVED:          // SSU2 only
+                    case OB_STATE_REQUEST_SENT_NEW_TOKEN:  // SSU2 only
                         // no response yet (or it was invalid), lets retry
                         long rtime = outboundState.getRequestSentTime();
                         if (expired || (rtime > 0 && rtime + OB_MESSAGE_TIMEOUT <= now))
@@ -1634,6 +1713,11 @@ class EstablishmentManager {
 
                     case OB_STATE_VALIDATION_FAILED:
                         processExpired(outboundState);
+                        break;
+
+                    default:
+                        if (_log.shouldWarn())
+                            _log.warn("Unhandled state on " + outboundState);
                         break;
                 }
             }
@@ -1695,6 +1779,7 @@ class EstablishmentManager {
      *  @since 0.9.2
      */
     private void processExpired(InboundEstablishState inboundState) {
+        _inboundStates.remove(inboundState.getRemoteHostId());
         OutNetMessage msg;
         while ((msg = inboundState.getNextQueuedMessage()) != null) {
             _transport.failed(msg, "Expired during failed establish");
@@ -1794,6 +1879,8 @@ class EstablishmentManager {
                     doPass();
                 } catch (RuntimeException re) {
                     _log.log(Log.CRIT, "Error in the establisher", re);
+                    // don't loop too fast
+                    try { Thread.sleep(1000); } catch (InterruptedException ie) {}
                 }
             }
             _inboundStates.clear();

@@ -185,8 +185,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         byte[] data = dpacket.getData();
         int off = dpacket.getOffset();
         int len = dpacket.getLength();
-        if (_log.shouldDebug())
-            _log.debug("Packet before header decryption:\n" + HexDump.dump(data, off, len));
+        //if (_log.shouldDebug())
+        //    _log.debug("Packet before header decryption:\n" + HexDump.dump(data, off, len));
         try {
             if (len < MIN_DATA_LEN) {
                 if (_log.shouldWarn())
@@ -197,11 +197,6 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             if (header == null) {
                 if (_log.shouldWarn())
                     _log.warn("bad data header on " + this);
-                return;
-            }
-            if (header.getDestConnID() != _rcvConnID) {
-                if (_log.shouldWarn())
-                    _log.warn("bad Dest Conn id " + header.getDestConnID() + " on " + this);
                 return;
             }
             if (header.getType() != DATA_FLAG_BYTE) {
@@ -217,16 +212,21 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                 // we didn't know the session has disconnected yet.
                 return;
             }
+            if (header.getDestConnID() != _rcvConnID) {
+                if (_log.shouldWarn())
+                    _log.warn("bad Dest Conn id " + header.getDestConnID() + " on " + this);
+                return;
+            }
             long n = header.getPacketNumber();
             SSU2Header.acceptTrialDecrypt(packet, header);
-            if (_log.shouldDebug())
-                _log.debug("Packet " + n + " after header decryption:\n" + HexDump.dump(data, off, len));
+            //if (_log.shouldDebug())
+            //    _log.debug("Packet " + n + " after header decryption:\n" + HexDump.dump(data, off, len));
             synchronized (_rcvCha) {
                 _rcvCha.setNonce(n);
                 // decrypt in-place
                 _rcvCha.decryptWithAd(header.data, data, off + SHORT_HEADER_SIZE, data, off + SHORT_HEADER_SIZE, len - SHORT_HEADER_SIZE);
-                if (_log.shouldDebug())
-                    _log.debug("Packet " + n + " after full decryption:\n" + HexDump.dump(data, off, len - MAC_LEN));
+                //if (_log.shouldDebug())
+                //    _log.debug("Packet " + n + " after full decryption:\n" + HexDump.dump(data, off, len - MAC_LEN));
                 if (_receivedMessages.set(n)) {
                     if (_log.shouldWarn())
                         _log.warn("dup pkt rcvd " + n + " on " + this);
@@ -244,8 +244,6 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         } catch (IndexOutOfBoundsException ioobe) {
             if (_log.shouldWarn())
                 _log.warn("Bad encrypted packet:\n" + HexDump.dump(data, off, len), ioobe);
-        } finally {
-            packet.release();
         }
     }
 

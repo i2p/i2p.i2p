@@ -207,7 +207,8 @@ class PacketBuilder2 {
             off += sz;
             sizeWritten += sz;
         }
-        Block block = getPadding(sizeWritten, peer.getMTU());
+        // FIXME
+        Block block = getPadding(sizeWritten, currentMTU);
         if (block != null) {
             blocks.add(block);
             int sz = block.getTotalLength();
@@ -216,13 +217,13 @@ class PacketBuilder2 {
         }
         SSU2Payload.writePayload(data, SHORT_HEADER_SIZE, blocks);
         pkt.setLength(off);
-        if (_log.shouldDebug())
-            _log.debug("Packet " + pktNum + " before encryption:\n" + HexDump.dump(data, 0, off));
+        //if (_log.shouldDebug())
+        //    _log.debug("Packet " + pktNum + " before encryption:\n" + HexDump.dump(data, 0, off));
 
         encryptDataPacket(packet, peer.getSendCipher(), pktNum, peer.getSendHeaderEncryptKey1(), peer.getSendHeaderEncryptKey2());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
-        if (_log.shouldDebug())
-            _log.debug("Packet " + pktNum + " after encryption:\n" + HexDump.dump(data, 0, pkt.getLength()));
+        //if (_log.shouldDebug())
+        //    _log.debug("Packet " + pktNum + " after encryption:\n" + HexDump.dump(data, 0, pkt.getLength()));
         
         // FIXME ticket #2675
         // the packet could have been built before the current mtu got lowered, so
@@ -294,7 +295,6 @@ class PacketBuilder2 {
         pkt.setLength(LONG_HEADER_SIZE);
         byte[] introKey = state.getSendHeaderEncryptKey1();
         encryptTokenRequest(packet, introKey, n, introKey, introKey);
-        state.requestSent();
         pkt.setSocketAddress(state.getSentAddress());
         packet.setMessageType(TYPE_SREQ);
         packet.setPriority(PRIORITY_HIGH);
@@ -316,7 +316,6 @@ class PacketBuilder2 {
         pkt.setLength(LONG_HEADER_SIZE);
         byte[] introKey = state.getSendHeaderEncryptKey1();
         encryptSessionRequest(packet, state.getHandshakeState(), introKey, introKey, state.needIntroduction());
-        state.requestSent();
         pkt.setSocketAddress(state.getSentAddress());
         packet.setMessageType(TYPE_SREQ);
         packet.setPriority(PRIORITY_HIGH);
@@ -451,7 +450,8 @@ class PacketBuilder2 {
         pkt.setLength(SHORT_HEADER_SIZE);
         SSU2Payload.RIBlock block = new SSU2Payload.RIBlock(ourInfo,  0, len,
                                                             false, gzip, 0, numFragments);
-        encryptSessionConfirmed(packet, state.getHandshakeState(), state.getMTU(),
+        boolean isIPv6 = state.getSentIP().length == 16;
+        encryptSessionConfirmed(packet, state.getHandshakeState(), state.getMTU(), isIPv6,
                                 state.getSendHeaderEncryptKey1(), state.getSendHeaderEncryptKey2(), block, state.getNextToken());
         pkt.setSocketAddress(state.getSentAddress());
         packet.setMessageType(TYPE_CONF);
@@ -875,22 +875,24 @@ class PacketBuilder2 {
      *  @param packet containing only 16 byte header
      */
     private void encryptSessionConfirmed(UDPPacket packet, HandshakeState state, int mtu,
-                                         byte[] hdrKey1, byte[] hdrKey2,
+                                         boolean isIPv6, byte[] hdrKey1, byte[] hdrKey2,
                                          SSU2Payload.RIBlock riblock, long token) {
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
         int off = pkt.getOffset();
+        mtu -= UDP_HEADER_SIZE;
+        mtu -= isIPv6 ? IPV6_HEADER_SIZE : IP_HEADER_SIZE;
         try {
             List<Block> blocks = new ArrayList<Block>(3);
             int len = riblock.getTotalLength();
             blocks.add(riblock);
-            if (token > 0) {
-                // TODO only if room
+            // only if room
+            if (token > 0 && mtu - len >= 15) {
                 Block block = new SSU2Payload.NewTokenBlock(token, _context.clock().now() + EstablishmentManager.IB_TOKEN_EXPIRATION);
                 len += block.getTotalLength();
                 blocks.add(block);
             }
-            Block block = getPadding(len, mtu - 80);
+            Block block = getPadding(len, mtu - (SHORT_HEADER_SIZE + KEY_LEN + MAC_LEN + MAC_LEN)); // 80
             if (block != null) {
                 len += block.getTotalLength();
                 blocks.add(block);
@@ -904,6 +906,8 @@ class PacketBuilder2 {
                 _log.debug("State after mixHash 3: " + state);
             state.writeMessage(data, off + SHORT_HEADER_SIZE, data, off + SHORT_HEADER_SIZE + KEY_LEN + MAC_LEN, len);
             pkt.setLength(pkt.getLength() + KEY_LEN + MAC_LEN + len + MAC_LEN);
+            if (_log.shouldDebug())
+                _log.debug("Session confirmed packet length is: " + pkt.getLength());
         } catch (RuntimeException re) {
             if (!_log.shouldWarn())
                 _log.error("Bad msg 3 out", re);

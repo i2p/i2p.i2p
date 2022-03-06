@@ -123,6 +123,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         _routerAddress = ra;
         if (_token != 0)
             createNewState(ra);
+        else
+            _currentState = OutboundState.OB_STATE_NEEDS_TOKEN;
 
         byte[] ik = introKey.getData();
         _sendHeaderEncryptKey1 = ik;
@@ -196,7 +198,9 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
 
     public void gotAddress(byte[] ip, int port) {
         if (_log.shouldDebug())
-            _log.debug("Got ADDRESS block: " + Addresses.toString(ip, port));
+            _log.debug("Got Address: " + Addresses.toString(ip, port));
+        _aliceIP = ip;
+        _alicePort = port;
     }
 
     public void gotIntroKey(byte[] key) {
@@ -245,8 +249,15 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     // end payload callbacks
     /////////////////////////////////////////////////////////
     
-    // SSU 1 unsupported things
+    // SSU 1 overrides
 
+    @Override
+    public synchronized boolean validateSessionCreated() {
+        // All validation is in receiveSessionCreated()
+        boolean rv = _currentState == OutboundState.OB_STATE_CREATED_RECEIVED ||
+                     _currentState == OutboundState.OB_STATE_CONFIRMED_COMPLETELY;
+        return rv;
+    }
 
     // SSU 2 things
 
@@ -268,6 +279,9 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     public byte[] getSendHeaderEncryptKey1() { return _sendHeaderEncryptKey1; }
     public byte[] getRcvHeaderEncryptKey1() { return _rcvHeaderEncryptKey1; }
     public byte[] getSendHeaderEncryptKey2() { return _sendHeaderEncryptKey2; }
+    /**
+     *  @return null before Session Request is sent (i.e. we sent a Token Request first)
+     */
     public byte[] getRcvHeaderEncryptKey2() { return _rcvHeaderEncryptKey2; }
     public byte[] getRcvRetryHeaderEncryptKey2() { return _rcvRetryHeaderEncryptKey2; }
     public InetSocketAddress getSentAddress() { return _bobSocketAddress; }
@@ -278,9 +292,22 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     public synchronized void receiveRetry(UDPPacket packet) throws GeneralSecurityException {
         ////// TODO state check
         DatagramPacket pkt = packet.getPacket();
+        SocketAddress from = pkt.getSocketAddress();
+        if (!from.equals(_bobSocketAddress))
+            throw new GeneralSecurityException("Address mismatch: req: " + _bobSocketAddress + " conf: " + from);
         int off = pkt.getOffset();
         int len = pkt.getLength();
         byte data[] = pkt.getData();
+        long rid = DataHelper.fromLong8(data, off);
+        if (rid != _rcvConnID)
+            throw new GeneralSecurityException("Conn ID mismatch: 1: " + _rcvConnID + " 2: " + rid);
+        long sid = DataHelper.fromLong8(data, off + SRC_CONN_ID_OFFSET);
+        if (sid != _sendConnID)
+            throw new GeneralSecurityException("Conn ID mismatch: 1: " + _sendConnID + " 2: " + sid);
+        long token = DataHelper.fromLong8(data, off + TOKEN_OFFSET);
+        if (token == 0)
+            throw new GeneralSecurityException("Bad token 0 in retry");
+        _token = token;
         _timeReceived = 0;
         try {
             // decrypt in-place
@@ -302,7 +329,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         if (skew > MAX_SKEW || skew < 0 - MAX_SKEW)
             throw new GeneralSecurityException("Skew exceeded in Session/Token Request: " + skew);
         createNewState(_routerAddress);
-        ////// TODO state change
+        _currentState = OutboundState.OB_STATE_RETRY_RECEIVED;
+        packetReceived();
     }
 
     public synchronized void receiveSessionCreated(UDPPacket packet) throws GeneralSecurityException {
@@ -320,6 +348,13 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         int off = pkt.getOffset();
         int len = pkt.getLength();
         byte data[] = pkt.getData();
+        long rid = DataHelper.fromLong8(data, off);
+        if (rid != _rcvConnID)
+            throw new GeneralSecurityException("Conn ID mismatch: 1: " + _rcvConnID + " 2: " + rid);
+        long sid = DataHelper.fromLong8(data, off + SRC_CONN_ID_OFFSET);
+        if (sid != _sendConnID)
+            throw new GeneralSecurityException("Conn ID mismatch: 1: " + _sendConnID + " 2: " + sid);
+
         _handshakeState.mixHash(data, off, LONG_HEADER_SIZE);
         if (_log.shouldDebug())
             _log.debug("State after mixHash 2: " + _handshakeState);
@@ -344,11 +379,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         _sessReqForReTX = null;
         _sendHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessionConfirmed");
 
-        if (_currentState == OutboundState.OB_STATE_UNKNOWN ||
-            _currentState == OutboundState.OB_STATE_REQUEST_SENT ||
-            _currentState == OutboundState.OB_STATE_INTRODUCED ||
-            _currentState == OutboundState.OB_STATE_PENDING_INTRO)
-            _currentState = OutboundState.OB_STATE_CREATED_RECEIVED;
+        _currentState = OutboundState.OB_STATE_CREATED_RECEIVED;
 
         if (_requestSentCount == 1) {
             _rtt = (int) (_context.clock().now() - _requestSentTime);
@@ -361,10 +392,10 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
      * and save them for retransmission
      */
     public synchronized void tokenRequestSent(DatagramPacket packet) {
-        if (_currentState == OutboundState.OB_STATE_UNKNOWN)
+        OutboundState old = _currentState;
+        requestSent();
+        if (old == OutboundState.OB_STATE_NEEDS_TOKEN)
             _currentState = OutboundState.OB_STATE_TOKEN_REQUEST_SENT;
-        else if (_currentState == OutboundState.OB_STATE_RETRY_RECEIVED)
-            _currentState = OutboundState.OB_STATE_REQUEST_SENT_NEW_TOKEN;
         // don't bother saving for retx, just make a new one every time
     }
 
@@ -383,7 +414,10 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         }
         if (_rcvHeaderEncryptKey2 == null)
             _rcvHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessCreateHeader");
+        OutboundState old = _currentState;
         requestSent();
+        if (old == OutboundState.OB_STATE_RETRY_RECEIVED)
+            _currentState = OutboundState.OB_STATE_REQUEST_SENT_NEW_TOKEN;
     }
 
     /**
@@ -461,17 +495,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         byte data[] = pkt.getData();
         int off = pkt.getOffset();
         System.arraycopy(_sessReqForReTX, 0, data, off, _sessReqForReTX.length);
-        InetAddress to;
-        try {
-            to = InetAddress.getByAddress(_bobIP);
-        } catch (UnknownHostException uhe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("How did we think this was a valid IP?  " + _remoteHostId);
-            packet.release();
-            return null;
-        }
-        pkt.setAddress(to);
-        pkt.setPort(_bobPort);
+        pkt.setSocketAddress(_bobSocketAddress);
         packet.setMessageType(PacketBuilder2.TYPE_SREQ);
         packet.setPriority(PacketBuilder2.PRIORITY_HIGH);
         requestSent();
