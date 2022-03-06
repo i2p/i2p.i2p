@@ -114,8 +114,8 @@ public class ConfigLoggingHelper extends HelperBase {
             while ((nextdot = name.indexOf('.', lastdot + 1)) > 0) {
                 if (++dots >= 3) {
                     String subst = name.substring(0, nextdot);
-                    if (!limits.contains(subst))
-                        sortedLogs.add(subst);
+                    // add a package marker, see below
+                    sortedLogs.add(subst + '.');
                 }
                 lastdot = nextdot;
             }
@@ -127,10 +127,28 @@ public class ConfigLoggingHelper extends HelperBase {
            .append(_t("Select a class to add"))
            .append("</option>\n");
 
+        int groups = 0;
         for (String l : sortedLogs) {
+            String d;
+            // replace package marker
+            if (l.endsWith(".")) {
+                if (groups++ > 0)
+                    buf.append("</optgroup>\n");
+                l = l.substring(0, l.length() - 1);
+                buf.append("<optgroup label=\"").append(l).append("\">\n");
+                d = _t("All classes in {0}", l);
+            } else {
+                int last = l.lastIndexOf(".");
+                if (last > 0)
+                    d = l.substring(last + 1);
+                else
+                    d = l;
+            }
             buf.append("<option value=\"").append(l).append("\">")
-               .append(l).append("</option>\n");
+               .append(d).append("</option>\n");
         }        
+        if (groups > 0)
+            buf.append("</optgroup>\n");
         
         buf.append("</select>\n");
         getLogLevelBox(buf, "newloglevel", "WARN", false);
