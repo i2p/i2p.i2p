@@ -307,6 +307,9 @@ class OutboundMessageState implements CDPQEntry {
         return rv;
     }
 
+    /**
+     * @return true if the fragment has not been ACKed
+     */
     public synchronized boolean needsSending(int fragment) {
         return (_fragmentAcks & mask(fragment)) != 0;
     }

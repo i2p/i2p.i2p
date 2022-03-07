@@ -73,6 +73,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     public static final int MAX_MTU = 1500;
     public static final int DEFAULT_MTU = MAX_MTU;
 
+    private static final int BITFIELD_SIZE = 512;
     private static final int MAX_SESS_CONF_RETX = 6;
     private static final int SESS_CONF_RETX_TIME = 1000;
 
@@ -94,8 +95,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         _rcvHeaderEncryptKey1 = transport.getSSU2StaticIntroKey();
         _sendHeaderEncryptKey2 = sendHdrKey2;
         _rcvHeaderEncryptKey2 = rcvHdrKey2;
-        _receivedMessages = new SSU2Bitfield(256, 0);
-        _ackedMessages = new SSU2Bitfield(256, 0);
+        _receivedMessages = new SSU2Bitfield(BITFIELD_SIZE, 0);
+        _ackedMessages = new SSU2Bitfield(BITFIELD_SIZE, 0);
         _sentMessages = new ConcurrentHashMap<Long, List<PacketBuilder.Fragment>>(32);
         if (isInbound) {
             // Send immediate ack of Session Confirmed
@@ -404,12 +405,9 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
 
     public void gotACK(long ackThru, int acks, byte[] ranges) {
         SSU2Bitfield ackbf;
-        if (ranges != null)
-            ackbf = SSU2Bitfield.fromACKBlock(ackThru, acks, ranges, ranges.length / 2);
-        else
-            ackbf = SSU2Bitfield.fromACKBlock(ackThru, acks, null, 0);
+        ackbf = SSU2Bitfield.fromACKBlock(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0));
         if (_log.shouldDebug())
-            _log.debug("Got ACK block: " + ackbf);
+            _log.debug("Got ACK block: " + SSU2Bitfield.toString(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0)));
         // calls bitSet() below
         ackbf.forEachAndNot(_ackedMessages, this);
     }
@@ -517,6 +515,12 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                 continue;
             }
             int num = f.num;
+            if (!state.needsSending(num)) {
+                // will happen with retransmission as a different packet number
+                if (_log.shouldWarn())
+                    _log.warn("New ACK for fragment " + num + " but already acked? " + state);
+                continue;
+            }
             int ackedSize = state.getUnackedSize();
             boolean complete = state.acked(f.num);
             if (complete) {
@@ -596,17 +600,17 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
          */
         public void timeReached() {
             synchronized(PeerState2.this) {
-                long wanted = _wantACKSendSince;
-                if (wanted <= 0) {
+                if (_wantACKSendSince <= 0) {
                     if (_log.shouldDebug())
                         _log.debug("Already acked:" + PeerState2.this);
                     return;
                 }
-                UDPPacket ack = _transport.getBuilder2().buildACK(PeerState2.this);
-                if (_log.shouldDebug())
-                    _log.debug("Sending acks to " + PeerState2.this);
-                _transport.send(ack);
+                _wantACKSendSince = 0;
             }
+            UDPPacket ack = _transport.getBuilder2().buildACK(PeerState2.this);
+            if (_log.shouldDebug())
+                _log.debug("Sending acks to " + PeerState2.this);
+            _transport.send(ack);
         }
     }
 }

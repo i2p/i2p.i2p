@@ -54,7 +54,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     private PeerState2 _pstate;
     
     // testing
-    private static final boolean ENFORCE_TOKEN = false;
+    private static final boolean ENFORCE_TOKEN = true;
     private static final long MAX_SKEW = 2*60*1000L;
 
 
