@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.southernstorm.noise.protocol.CipherState;
 
@@ -20,9 +21,11 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.I2NPMessageImpl;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.udp.InboundMessageFragments.ModifiableLong;
 import static net.i2p.router.transport.udp.SSU2Util.*;
 import net.i2p.util.HexDump;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * Contain all of the state about a UDP connection to a peer.
@@ -34,7 +37,7 @@ import net.i2p.util.Log;
  *
  * @since 0.9.54
  */
-public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback {
+public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback, SSU2Bitfield.Callback {
     private final long _sendConnID;
     private final long _rcvConnID;
     private final AtomicInteger _packetNumber = new AtomicInteger();
@@ -45,8 +48,18 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     private final byte[] _sendHeaderEncryptKey2;
     private final byte[] _rcvHeaderEncryptKey2;
     private final SSU2Bitfield _receivedMessages;
+    /**
+     *  PS1 has _ackedMessages which is a map of message ID to sequence number.
+     *  Here we have the reverse, a bitfield of acked packet (sequence) numbers,
+     *  and map of unacked packet (sequence) numbers to the fragments that packet contained.
+     */
     private final SSU2Bitfield _ackedMessages;
+    private final ConcurrentHashMap<Long, List<PacketBuilder.Fragment>> _sentMessages;
+
+    // Session Confirmed retransmit
     private byte[] _sessConfForReTX;
+    private long _sessConfSentTime;
+    private int _sessConfSentCount;
 
     // As SSU
     public static final int MIN_SSU_IPV4_MTU = 1292;
@@ -59,6 +72,11 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     public static final int MIN_MTU = 1280;
     public static final int MAX_MTU = 1500;
     public static final int DEFAULT_MTU = MAX_MTU;
+
+    private static final int MAX_SESS_CONF_RETX = 6;
+    private static final int SESS_CONF_RETX_TIME = 1000;
+
+
 
     /**
      *  @param rtt from the EstablishState, or 0 if not available
@@ -78,6 +96,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         _rcvHeaderEncryptKey2 = rcvHdrKey2;
         _receivedMessages = new SSU2Bitfield(256, 0);
         _ackedMessages = new SSU2Bitfield(256, 0);
+        _sentMessages = new ConcurrentHashMap<Long, List<PacketBuilder.Fragment>>(32);
         if (isInbound) {
             // Send immediate ack of Session Confirmed
             _receivedMessages.set(0);
@@ -130,18 +149,54 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
      */
     @Override
     void clearWantedACKSendSince() {
-        // TODO
-        //if (  )
-        //    _wantACKSendSince = 0;
+        // race prevention
+        if (_sentMessages.isEmpty())
+            _wantACKSendSince = 0;
     }
 
     /**
-     *  We received the message specified completely.
-     *  @param bytes if less than or equal to zero, message is a duplicate.
+     *  Overridden to use our version of ACKTimer
      */
     @Override
-    void messageFullyReceived(Long messageId, int bytes) {
-        // TODO
+    protected synchronized void messagePartiallyReceived(long now) {
+        if (_wantACKSendSince <= 0) {
+            _wantACKSendSince = now;
+            new ACKTimer();
+        }
+    }
+
+    /**
+     *  Overridden to retransmit SessionConfirmed also
+     */
+    @Override
+    List<OutboundMessageState> allocateSend(long now) {
+        if (!_isInbound && _ackedMessages.getOffset() == 0 && !_ackedMessages.get(0)) {
+            UDPPacket[] packets = null;
+            synchronized(this) {
+                if (_sessConfForReTX != null) {
+                    // retransmit Session Confirmed when it's time
+                    if (_sessConfSentTime + (SESS_CONF_RETX_TIME << (_sessConfSentCount - 1)) < now) {
+                        if (_sessConfSentCount >= MAX_SESS_CONF_RETX) {
+                            if (_log.shouldWarn())
+                                _log.warn("Fail, no Sess Conf ACK rcvd on " + this);
+                            _transport.dropPeer(this, false, "No Sess Conf ACK rcvd");
+                            _sessConfForReTX = null;
+                            return null;
+                        }
+                        _sessConfSentCount++;
+                        packets = getRetransmitSessionConfirmedPackets();
+                    }
+                }
+            }
+            if (packets != null) {
+                if (_log.shouldInfo())
+                    _log.info("ReTX Sess Conf on " + this);
+                for (int i = 0; i < packets.length; i++) {
+                     _transport.send(packets[i]);
+                }
+            }
+        }
+        return super.allocateSend(now);
     }
 
     // SSU 1 unsupported things
@@ -174,7 +229,12 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     byte[] getRcvHeaderEncryptKey1() { return _rcvHeaderEncryptKey1; }
     byte[] getSendHeaderEncryptKey2() { return _sendHeaderEncryptKey2; }
     byte[] getRcvHeaderEncryptKey2() { return _rcvHeaderEncryptKey2; }
-    SSU2Bitfield getReceivedMessages() { return _receivedMessages; }
+
+    SSU2Bitfield getReceivedMessages() {
+        if (_log.shouldDebug())
+            _log.debug("Sending acks " + _receivedMessages + " on " + this);
+        return _receivedMessages;
+    }
     SSU2Bitfield getAckedMessages() { return _ackedMessages; }
 
     /**
@@ -337,16 +397,21 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             _context.messageHistory().droppedInboundMessage(state.getMessageId(), state.getFrom(), "expired while partially read: " + state.toString());
             // all state access must be before this
             state.releaseResources();
+        } else {
+            messagePartiallyReceived();
         }
     }
 
     public void gotACK(long ackThru, int acks, byte[] ranges) {
-        if (_log.shouldDebug()) {
-            if (ranges != null)
-                _log.debug("Got ACK block: " + SSU2Bitfield.toString(ackThru, acks, ranges, ranges.length / 2));
-            else
-                _log.debug("Got ACK block: " + SSU2Bitfield.toString(ackThru, acks, null, 0));
-        }
+        SSU2Bitfield ackbf;
+        if (ranges != null)
+            ackbf = SSU2Bitfield.fromACKBlock(ackThru, acks, ranges, ranges.length / 2);
+        else
+            ackbf = SSU2Bitfield.fromACKBlock(ackThru, acks, null, 0);
+        if (_log.shouldDebug())
+            _log.debug("Got ACK block: " + ackbf);
+        // calls bitSet() below
+        ackbf.forEachAndNot(_ackedMessages, this);
     }
 
     public void gotTermination(int reason, long count) {
@@ -409,7 +474,76 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
      *  so we can process acks.
      */
     void fragmentsSent(long pktNum, List<PacketBuilder.Fragment> fragments) {
+        List<PacketBuilder.Fragment> old = _sentMessages.putIfAbsent(Long.valueOf(pktNum), fragments);
+        if (old != null) {
+            // shouldn't happen
+            if (_log.shouldWarn())
+                _log.warn("Dup send of pkt " + pktNum + " on " + this);
+        } else {
+            if (_log.shouldWarn())
+                _log.warn("New data pkt " + pktNum + " sent with " + fragments.size() + " fragments on " + this);
+        }
+    }
 
+    /**
+     *  Callback from SSU2Bitfield.forEachAndNot().
+     *  A new ack was received.
+     */
+    public void bitSet(long pktNum) {
+        if (pktNum == 0 && !_isInbound) {
+            // we don't need to save the Session Confirmed for retransmission any more
+            synchronized(this) {
+                _sessConfForReTX = null;
+            }
+            if (_log.shouldDebug())
+                _log.debug("New ACK of Session Confirmed on " + this);
+            return;
+        }
+        List<PacketBuilder.Fragment> fragments = _sentMessages.remove(Long.valueOf(pktNum));
+        if (fragments == null) {
+            // shouldn't happen
+            if (_log.shouldWarn())
+                _log.warn("New ACK of pkt " + pktNum + " not found on " + this);
+            return;
+        }
+        if (_log.shouldDebug())
+            _log.debug("New ACK of pkt " + pktNum + " containing " + fragments.size() + " fragments on " + this);
+        ModifiableLong highestSeqNumAcked = new ModifiableLong(-1);
+        for (PacketBuilder.Fragment f : fragments) {
+            OutboundMessageState state = f.state;
+            if (state.isComplete()) {
+                if (_log.shouldWarn())
+                    _log.warn("New ACK but state complete? " + state);
+                continue;
+            }
+            int num = f.num;
+            int ackedSize = state.getUnackedSize();
+            boolean complete = state.acked(f.num);
+            if (complete) {
+                if (_log.shouldDebug())
+                    _log.debug("Received ACK of fragment " + num + " of " + state +
+                               ", now complete");
+                acked(state.getMessageId(), highestSeqNumAcked);
+                if (ackedSize > 0) {
+                    // TODO acked() will have an ackedSize of 0, so do it here also
+                    messageACKed(ackedSize, state.getLifetime(), state.getMaxSends(), false, false);
+                }
+            } else {
+                ackedSize -= state.getUnackedSize();
+                if (_log.shouldDebug())
+                    _log.debug("Received ACK of fragment " + num + " of " + state +
+                               ", still incomplete");
+                if (ackedSize > 0) {
+                    state.clearNACKs();
+                    // this adjusts the rtt/rto/window/etc
+                    // flags TODO
+                    messageACKed(ackedSize, state.getLifetime(), state.getMaxSends(), false, false);
+                }
+            }
+        }
+        long highest = highestSeqNumAcked.value;
+        if (highest >= 0)
+            highestSeqNumAcked(highest);
     }
 
     /**
@@ -419,6 +553,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     public synchronized void confirmedPacketsSent(byte[] data) {
         if (_sessConfForReTX == null)
             _sessConfForReTX = data;
+        _sessConfSentTime = _context.clock().now();
+        _sessConfSentCount++;
     }
 
     /**
@@ -439,5 +575,38 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         packet.setMessageType(PacketBuilder2.TYPE_CONF);
         packet.setPriority(PacketBuilder2.PRIORITY_HIGH);
         return rv;
+    }
+
+    /**
+     *  A timer to send an ack-only packet.
+     */
+    private class ACKTimer extends SimpleTimer2.TimedEvent {
+        public ACKTimer() {
+            super(_context.simpleTimer2());
+            long delta = Math.min(_rtt/2, ACK_FREQUENCY);
+            if (_log.shouldDebug())
+                _log.debug("Sending delayed ack in " + delta + ": " + PeerState2.this);
+            schedule(delta);
+        }
+
+        /**
+         *  Send an ack-only packet, unless acks were already sent
+         *  as indicated by _wantACKSendSince == 0.
+         *  Will not requeue unless the acks don't all fit (unlikely).
+         */
+        public void timeReached() {
+            synchronized(PeerState2.this) {
+                long wanted = _wantACKSendSince;
+                if (wanted <= 0) {
+                    if (_log.shouldDebug())
+                        _log.debug("Already acked:" + PeerState2.this);
+                    return;
+                }
+                UDPPacket ack = _transport.getBuilder2().buildACK(PeerState2.this);
+                if (_log.shouldDebug())
+                    _log.debug("Sending acks to " + PeerState2.this);
+                _transport.send(ack);
+            }
+        }
     }
 }

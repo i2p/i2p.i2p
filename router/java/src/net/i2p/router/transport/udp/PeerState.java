@@ -70,7 +70,7 @@ public class PeerState {
     private SessionKey _nextCipherKey;
 
     /** when were the current cipher and MAC keys established/rekeyed? */
-    private long _keyEstablishedTime;
+    private final long _keyEstablishedTime;
 
     /**
      *  How far off is the remote peer from our clock, in milliseconds?
@@ -111,7 +111,7 @@ public class PeerState {
     /** when did we last send ACKs to the peer? */
     private volatile long _lastACKSend;
     /** when did we decide we need to ACK to this peer? */
-    private volatile long _wantACKSendSince;
+    protected volatile long _wantACKSendSince;
     /** have we received a packet with the ECN bit set in the current second? */
     private boolean _currentSecondECNReceived;
     /**
@@ -169,7 +169,7 @@ public class PeerState {
     private int _mtuIncreases;
     private int _mtuDecreases;
     /** current round trip time estimate */
-    private int _rtt;
+    protected int _rtt;
     /** smoothed mean deviation in the rtt */
     private int _rttDeviation;
     /** current retransmission timeout */
@@ -228,7 +228,7 @@ public class PeerState {
     /** how many concurrency rejections have we had in a row */
     private int _consecutiveRejections;
     /** is it inbound? **/
-    private final boolean _isInbound;
+    protected final boolean _isInbound;
     /** Last time it was made an introducer **/
     private long _lastIntroducerTime;
 
@@ -304,7 +304,7 @@ public class PeerState {
     private static final int INIT_RTT = 0;
     private static final int MAX_RTO = 60*1000;
     /** how frequently do we want to send ACKs to a peer? */
-    private static final int ACK_FREQUENCY = 150;
+    protected static final int ACK_FREQUENCY = 150;
     private static final int CLOCK_SKEW_FUDGE = (ACK_FREQUENCY * 2) / 3;
 
     /**
@@ -777,7 +777,9 @@ public class PeerState {
             _receiveBytes = 0;
             _receivePeriodBegin = now;
         }
-        _currentACKs.add(messageId);
+        // null for PeerState2
+        if (_currentACKs != null)
+            _currentACKs.add(messageId);
         messagePartiallyReceived(now);
     }
 
@@ -792,7 +794,7 @@ public class PeerState {
      *  We received a partial message, or we want to send some acks.
      *  @since 0.9.52
      */
-    private synchronized void messagePartiallyReceived(long now) {
+    protected synchronized void messagePartiallyReceived(long now) {
         if (_wantACKSendSince <= 0) {
             _wantACKSendSince = now;
             new ACKTimer();
@@ -1180,7 +1182,7 @@ public class PeerState {
     /**
      *  We sent a message which was ACKed containing the given # of bytes.
      */
-    private void messageACKed(int bytesACKed, long lifetime, int numSends, boolean anyPending, boolean anyQueued) {
+    protected void messageACKed(int bytesACKed, long lifetime, int numSends, boolean anyPending, boolean anyQueued) {
         synchronized(this) {
             locked_messageACKed(bytesACKed, lifetime, numSends, anyPending, anyQueued);
         }
@@ -1841,12 +1843,15 @@ public class PeerState {
             long sn = state.getSeqNum();
             if (sn > highestSeqNumAcked.value)
                 highestSeqNumAcked.value = sn;
-            synchronized(_ackedMessages) {
-                _ackedMessages.put(Integer.valueOf((int) messageId), Long.valueOf(sn));
+            // null for PS2
+            if (_ackedMessages != null) {
+                synchronized(_ackedMessages) {
+                    _ackedMessages.put(Integer.valueOf((int) messageId), Long.valueOf(sn));
+                }
             }
             // this adjusts the rtt/rto/window/etc
             messageACKed(state.getUnackedSize(), lifetime, numSends, anyPending, anyQueued);
-        } else {
+        } else if (_ackedMessages != null) {  // null for PS2
             // dupack, likely
             Long seq;
             synchronized(_ackedMessages) {

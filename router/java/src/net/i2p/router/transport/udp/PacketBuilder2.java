@@ -264,10 +264,19 @@ class PacketBuilder2 {
         }
         
         packet.setPriority(priority);
-        if (fragments.isEmpty())
+        if (fragments.isEmpty()) {
             peer.getAckedMessages().set(pktNum); // not ack-eliciting
-        else
+            packet.markType(1);
+            packet.setFragmentCount(-1);
+            packet.setMessageType(TYPE_ACK);
+        } else {
+            // OMF reuses/clears the fragments list, so we must copy it
+            if (fragments.size() == 1)
+                fragments = Collections.singletonList(fragments.get(0));
+            else
+                fragments = new ArrayList<Fragment>(fragments);
             peer.fragmentsSent(pktNum, fragments);
+        }
         return packet;
     }
     

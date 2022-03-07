@@ -329,6 +329,18 @@ class OutboundMessageState implements CDPQEntry {
     }
 
     /**
+     * Ack this fragment number.
+     * For SSU 2 only.
+     *
+     * @return true if the message was completely ACKed
+     * @since 0.9.54
+     */
+    public synchronized boolean acked(int fragmentNum) {
+        _fragmentAcks &= ~mask(fragmentNum);
+        return isComplete();
+    }
+
+    /**
      *  The max number of sends for any fragment.
      *  As of 0.9.49, may be less than getPushCount() if we pushed only some fragments
      */

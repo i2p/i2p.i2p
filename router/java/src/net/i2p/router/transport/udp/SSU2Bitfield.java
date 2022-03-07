@@ -14,7 +14,7 @@ import net.i2p.router.transport.udp.SSU2Payload.AckBlock;
  *
  * @since 0.9.54
  */
-public class SSU2Bitfield {
+class SSU2Bitfield {
 
     private final long[] bitfield;
     private final int size;
@@ -38,7 +38,8 @@ public class SSU2Bitfield {
         if (size <= 0 || offset < 0)
             throw new IllegalArgumentException();
         // force mult. of 256
-        this.size = (size + 255) & 0x7FFFFF00;
+        size = (size + 255) & 0x7FFFFF00;
+        this.size = size;
         this.offset = offset;
         max_shift = Math.max(1024, size * 8);
         min_shift = Math.max(8, size / 4);
@@ -194,7 +195,7 @@ public class SSU2Bitfield {
         int t = (int) thru;
         if (ranges == null || rangeCount == 0) {
             // easy case, no ranges
-            SSU2Bitfield rv = new SSU2Bitfield(acnt + 1, t);
+            SSU2Bitfield rv = new SSU2Bitfield(acnt + 1, thru - acnt);
             for (int i = t; i >= t - acnt; i--) {
                 rv.set(i);
             }
@@ -206,7 +207,7 @@ public class SSU2Bitfield {
             min -= ranges[i] & 0xff;
         }
         // fixup if the last ack count was zero
-        // this doesn't handle multple ranges with a zero ack count
+        // this doesn't handle multiple ranges with a zero ack count
         if (ranges[(rangeCount * 2) - 1] == 0)
             min += ranges[(rangeCount * 2) - 2] & 0xff;
 
@@ -226,6 +227,51 @@ public class SSU2Bitfield {
             }
         }
         return rv;
+    }
+
+    public interface Callback {
+        public void bitSet(long bit);
+    }
+
+    /**
+     *  Callback for all bits
+     *  set in this bitfield but not set in bf2.
+     *
+     *  If this offset is greater than bf2's highest bit set,
+     *  i.e. this bitfield is completely newer,
+     *  calls back for all bits in this bitfield.
+     *
+     *  If this highest bit set is less than than bf2's offset,
+     *  i.e. this bitfield is completely older,
+     *  the callback will not be called.
+     *
+     *  Synchs on this and then on bf2.
+     *
+     *  Usage: this is the received acks, bf2 is previously acked,
+     *  callback for each newly acked.
+     *
+     */
+    public synchronized void forEachAndNot(SSU2Bitfield bf2, Callback cb) {
+        synchronized(bf2) {
+            long highest = getHighestSet();
+            if (highest < bf2.offset) {
+                // completely older
+                return;
+            }
+            // We MUST go bottom-up, because bf2 may shift
+            // overlap portion
+            long start = Math.max(offset, bf2.offset);
+            long bf2Highest = bf2.getHighestSet();
+            for (long bit = start; bit < bf2Highest && bit <= highest; bit++) {
+                 if (get(bit) && !bf2.set(bit))
+                    cb.bitSet(bit);
+            }
+            // portion that is strictly newer
+            for (long bit = bf2Highest + 1; bit <= highest; bit++) {
+                bf2.set(bit);
+                cb.bitSet(bit);
+            }
+        }
     }
 
     /**
@@ -291,23 +337,35 @@ public class SSU2Bitfield {
 
 
 /****
+    private static class CallbackImpl implements Callback {
+        public void bitSet(long bit) {
+            System.out.print(" " + bit);
+        }
+    }
+
     public static void main(String[] args) {
+        Callback cbi = new CallbackImpl();
         int off = 100;
         SSU2Bitfield bf = new SSU2Bitfield(256, off);
         System.out.println(bf.toString());
         bf.toAckBlock(20);
+
         bf.set(off);
         System.out.println(bf.toString());
         bf.toAckBlock(20);
+
         bf.set(off + 1);
         System.out.println(bf.toString());
         bf.toAckBlock(20);
+
         bf.set(off + 2);
         System.out.println(bf.toString());
         bf.toAckBlock(20);
+
         bf.set(off + 4);
         System.out.println(bf.toString());
         bf.toAckBlock(20);
+
         bf.set(off + 5);
         System.out.println(bf.toString());
         bf.toAckBlock(20);
@@ -316,17 +374,21 @@ public class SSU2Bitfield {
         System.out.println(bf.toString());
         bf.toAckBlock(20);
 
+
         bf.set(off + 88);
         System.out.println(bf.toString());
         bf.toAckBlock(20);
+
 
         bf.set(off + 254);
         System.out.println(bf.toString());
         bf.toAckBlock(20);
 
+
         bf.set(off + 255);
         System.out.println(bf.toString());
         bf.toAckBlock(20);
+
 
         bf.set(off + 300);
         System.out.println(bf.toString());
