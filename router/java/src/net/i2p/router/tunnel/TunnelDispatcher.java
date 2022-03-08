@@ -574,39 +574,48 @@ public class TunnelDispatcher implements Service {
      */
     public void dispatch(TunnelGatewayMessage msg) {
         long before = _context.clock().now();
-        TunnelGateway gw = _inboundGateways.get(msg.getTunnelId());
+        TunnelId id = msg.getTunnelId();
+        TunnelGateway gw = _inboundGateways.get(id);
+        I2NPMessage submsg = msg.getMessage();
+        // The contained message is nulled out when written
+        if (submsg == null)
+            throw new IllegalArgumentException("TGM message is null");
         if (gw != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("dispatch where we are the inbound gateway: " + gw + ": " + msg);
             long minTime = before - Router.CLOCK_FUDGE_FACTOR;
             long maxTime = before + MAX_FUTURE_EXPIRATION;
-            if ( (msg.getMessageExpiration() < minTime) || (msg.getMessage().getMessageExpiration() < minTime) ||
-                 (msg.getMessageExpiration() > maxTime) || (msg.getMessage().getMessageExpiration() > maxTime) ) {
+            long exp = msg.getMessageExpiration();
+            long subexp = submsg.getMessageExpiration();
+            if (exp < minTime || subexp < minTime ||
+                exp > maxTime || subexp > maxTime) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Not dispatching a gateway message for tunnel " + msg.getTunnelId().getTunnelId()
-                               + " as the wrapper's expiration is in " + DataHelper.formatDuration(msg.getMessageExpiration()-before)
-                               + " and/or the content's expiration is in " + DataHelper.formatDuration(msg.getMessage().getMessageExpiration()-before)
-                               + " with messageId " + msg.getUniqueId() + "/" + msg.getMessage().getUniqueId() + " and message type "
-                               + msg.getMessage().getClass().getSimpleName());
+                    _log.warn("Not dispatching a gateway message for tunnel " + id.getTunnelId()
+                               + " as the wrapper's expiration is in " + DataHelper.formatDuration(exp - before)
+                               + " and/or the content's expiration is in " + DataHelper.formatDuration(subexp - before)
+                               + " with messageId " + id + "/" + submsg.getUniqueId()
+                               + " messageType: " + submsg.getClass().getSimpleName());
                 return;
             }
             //_context.messageHistory().tunnelDispatched("message " + msg.getUniqueId() + "/" + msg.getMessage().getUniqueId() + " on tunnel " 
             //                                               + msg.getTunnelId().getTunnelId() + " as inbound gateway");
-            _context.messageHistory().tunnelDispatched(msg.getUniqueId(), msg.getMessage().getUniqueId(), msg.getTunnelId().getTunnelId(), "inbound gateway");
+            _context.messageHistory().tunnelDispatched(msg.getUniqueId(),
+                                                       submsg.getUniqueId(),
+                                                       id.getTunnelId(), "inbound gateway");
             gw.add(msg);
             _context.statManager().addRateData("tunnel.dispatchInbound", 1);
         } else {
-            _context.messageHistory().droppedTunnelGatewayMessageUnknown(msg.getUniqueId(), msg.getTunnelId().getTunnelId());
+            _context.messageHistory().droppedTunnelGatewayMessageUnknown(msg.getUniqueId(), id.getTunnelId());
             int level = (_context.router().getUptime() > 10*60*1000 ? Log.WARN : Log.INFO);
             if (_log.shouldLog(level))
-                _log.log(level, "no matching tunnel for id=" + msg.getTunnelId().getTunnelId() 
+                _log.log(level, "no matching tunnel for id=" + id.getTunnelId() 
                            + ": gateway message expiring in " 
-                           + DataHelper.formatDuration(msg.getMessageExpiration()-_context.clock().now())
+                           + DataHelper.formatDuration(msg.getMessageExpiration() - before)
                            + "/" 
-                           + DataHelper.formatDuration(msg.getMessage().getMessageExpiration()-_context.clock().now())
-                           + " messageId " + msg.getUniqueId()
+                           + DataHelper.formatDuration(submsg.getMessageExpiration() - before)
+                           + " messageId " + id
                            + "/" + msg.getMessage().getUniqueId()
-                           + " messageType: " + msg.getMessage().getClass().getSimpleName()
+                           + " messageType: " + submsg.getClass().getSimpleName()
                            + " existing = " + _inboundGateways.size());
         }
         

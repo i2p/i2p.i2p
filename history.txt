@@ -1,3 +1,11 @@
+2022-03-08 zzz
+ * I2NP: Fix TunnelGatewayMessage.calculateWrittenLength()
+ * SSU2: Fixes
+
+2022-03-06 zzz
+ * Console: Improve class selection on /configlogging
+ * SSU2: Fixes
+
 2022-03-04 zzz
  * Console: Add SSU version column to /peers
  * i2psnark: Add js theme preview

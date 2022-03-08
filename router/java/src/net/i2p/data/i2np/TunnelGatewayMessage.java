@@ -50,6 +50,8 @@ public class TunnelGatewayMessage extends FastI2NPMessageImpl {
      *  this will be an UnknownI2NPMessage.
      *  If you need a real message class, use UnknownI2NPMessage.convert().
      *
+     *  Warning, will be null after message has been written.
+     *
      *  Note that if you change the expiration on the embedded message it will
      *  mess up the checksum of this message, so don't do that.
      */
@@ -67,13 +69,16 @@ public class TunnelGatewayMessage extends FastI2NPMessageImpl {
     }
     
     protected int calculateWrittenLength() {
+        int rv = 4 + 2;
         synchronized (this) {
-            if (_msgData == null) {
-                _msgData = _msg.toByteArray();
-                _msg = null;
-            }
+            if (_msg != null)
+                rv += _msg.getMessageSize();
+            else if (_msgData != null)
+                rv += _msgData.length;
+            else
+                throw new IllegalStateException();
         }
-        return _msgData.length + 4 + 2;
+        return rv;
     }
     
     /** write the message body to the output array, starting at the given index */
@@ -180,6 +185,7 @@ public class TunnelGatewayMessage extends FastI2NPMessageImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[TunnelGatewayMessage:");
+        buf.append(" MessageId: ").append(getUniqueId());
         buf.append(" Tunnel ID: ").append(getTunnelId());
         buf.append(" Message: ").append(_msg);
         buf.append("]");
