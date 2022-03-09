@@ -51,6 +51,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     private byte[] _rcvHeaderEncryptKey2;
     private byte[] _sessCrForReTX;
     private long _timeReceived;
+    // not adjusted for RTT
+    private long _skew;
     private PeerState2 _pstate;
     
     // testing
@@ -150,9 +152,9 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         }
         if (_timeReceived == 0)
             throw new GeneralSecurityException("No DateTime block in Session/Token Request");
-        long skew = _establishBegin - _timeReceived;
-        if (skew > MAX_SKEW || skew < 0 - MAX_SKEW)
-            throw new GeneralSecurityException("Skew exceeded in Session/Token Request: " + skew);
+        _skew = _establishBegin - _timeReceived;
+        if (_skew > MAX_SKEW || _skew < 0 - MAX_SKEW)
+            throw new GeneralSecurityException("Skew exceeded in Session/Token Request: " + _skew);
         packetReceived();
     }
 
@@ -433,12 +435,13 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         }
         if (_timeReceived == 0)
             throw new GeneralSecurityException("No DateTime block in Session Request");
-        long skew = _establishBegin - _timeReceived;
-        if (skew > MAX_SKEW || skew < 0 - MAX_SKEW)
-            throw new GeneralSecurityException("Skew exceeded in Session Request: " + skew);
+        // _nextSend is now(), from packetReceived()
+        _skew = _nextSend - _timeReceived;
+        if (_skew > MAX_SKEW || _skew < 0 - MAX_SKEW)
+            throw new GeneralSecurityException("Skew exceeded in Session Request: " + _skew);
         _sendHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessCreateHeader");
         _currentState = InboundState.IB_STATE_REQUEST_RECEIVED;
-        _rtt = (int) ( _context.clock().now() - _lastSend );
+        _rtt = (int) (_nextSend - _lastSend);
     }
 
     /**
@@ -534,6 +537,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                                  true, _rtt, sender, rcvr,
                                  _sendConnID, _rcvConnID,
                                  _sendHeaderEncryptKey1, h_ba, h_ab);
+        // PS2.super adds CLOCK_SKEW_FUDGE that doesn't apply here
+        _pstate.adjustClockSkew(_skew - (_rtt / 2) - PeerState.CLOCK_SKEW_FUDGE);
     }
 
     /**

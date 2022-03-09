@@ -505,7 +505,7 @@ class SSU2Payload {
         }
 
         public int writeData(byte[] tgt, int off) {
-            DataHelper.toLong(tgt, off, 4, now / 1000);
+            DataHelper.toLong(tgt, off, 4, (now + 500) / 1000);
             return off + 4;
         }
     }

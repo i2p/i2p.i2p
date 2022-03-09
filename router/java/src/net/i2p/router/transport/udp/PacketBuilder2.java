@@ -81,6 +81,10 @@ class PacketBuilder2 {
     static final int PRIORITY_HIGH = 550;
     private static final int PRIORITY_LOW = OutNetMessage.PRIORITY_LOWEST;
     
+    // every this many packets
+    private static final int DATETIME_SEND_FREQUENCY = 256;
+
+
     /**
      *  No state, all methods are thread-safe.
      *
@@ -230,6 +234,15 @@ class PacketBuilder2 {
                 off += sz;
                 sizeWritten += sz;
             }
+        }
+
+        // DateTime block every so often, if room
+        if ((pktNum & (DATETIME_SEND_FREQUENCY - 1)) == DATETIME_SEND_FREQUENCY - 1 &&
+            sizeWritten + ipHeaderSize + 7 <= currentMTU) {
+            Block block = new SSU2Payload.DateTimeBlock(_context);
+            blocks.add(block);
+            off += 7;
+            sizeWritten += 7;
         }
 
         // FIXME

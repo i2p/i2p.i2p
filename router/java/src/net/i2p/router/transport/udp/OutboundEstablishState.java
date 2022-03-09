@@ -52,7 +52,7 @@ class OutboundEstablishState {
     protected final long _establishBegin;
     //private long _lastReceive;
     protected long _lastSend;
-    private long _nextSend;
+    protected long _nextSend;
     protected RemoteHostId _remoteHostId;
     private final RemoteHostId _claimedAddress;
     protected final RouterIdentity _remotePeer;

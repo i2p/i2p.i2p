@@ -52,6 +52,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     private byte[] _sessReqForReTX;
     private byte[] _sessConfForReTX;
     private long _timeReceived;
+    // not adjusted for RTT
+    private long _skew;
     private PeerState2 _pstate;
 
     private static final boolean SET_TOKEN = false;
@@ -334,9 +336,10 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         }
         if (_timeReceived == 0)
             throw new GeneralSecurityException("No DateTime block in Session/Token Request");
-        long skew = _establishBegin - _timeReceived;
-        if (skew > MAX_SKEW || skew < 0 - MAX_SKEW)
-            throw new GeneralSecurityException("Skew exceeded in Session/Token Request: " + skew);
+        // _nextSend is now(), from packetReceived()
+        _skew = _nextSend - _timeReceived;
+        if (_skew > MAX_SKEW || _skew < 0 - MAX_SKEW)
+            throw new GeneralSecurityException("Skew exceeded in Session/Token Request: " + _skew);
         createNewState(_routerAddress);
         _currentState = OutboundState.OB_STATE_RETRY_RECEIVED;
     }
@@ -386,16 +389,17 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         }
         if (_timeReceived == 0)
             throw new GeneralSecurityException("No DateTime block in Session/Token Request");
-        long skew = _establishBegin - _timeReceived;
-        if (skew > MAX_SKEW || skew < 0 - MAX_SKEW)
-            throw new GeneralSecurityException("Skew exceeded in Session/Token Request: " + skew);
+        // _nextSend is now(), from packetReceived()
+        _skew = _nextSend - _timeReceived;
+        if (_skew > MAX_SKEW || _skew < 0 - MAX_SKEW)
+            throw new GeneralSecurityException("Skew exceeded in Session/Token Request: " + _skew);
         _sessReqForReTX = null;
         _sendHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessionConfirmed");
 
         _currentState = OutboundState.OB_STATE_CREATED_RECEIVED;
 
         if (_requestSentCount == 1) {
-            _rtt = (int) (_context.clock().now() - _requestSentTime);
+            _rtt = (int) (_nextSend - _requestSentTime);
         }
     }
 
@@ -491,6 +495,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                                      _sendHeaderEncryptKey1, h_ab, h_ba);
             _currentState = OutboundState.OB_STATE_CONFIRMED_COMPLETELY;
             _pstate.confirmedPacketsSent(_sessConfForReTX);
+            // PS2.super adds CLOCK_SKEW_FUDGE that doesn't apply here
+            _pstate.adjustClockSkew(_skew - (_rtt / 2) - PeerState.CLOCK_SKEW_FUDGE);
         }
         confirmedPacketsSent();
         return _pstate;

@@ -325,6 +325,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     /////////////////////////////////////////////////////////
 
     public void gotDateTime(long time) {
+        // super adds CLOCK_SKEW_FUDGE that doesn't apply here
+        adjustClockSkew((_context.clock().now() - time) - CLOCK_SKEW_FUDGE);
     }
 
     public void gotOptions(byte[] options, boolean isHandshake) {
