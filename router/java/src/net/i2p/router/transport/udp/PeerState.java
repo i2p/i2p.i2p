@@ -398,20 +398,15 @@ public class PeerState {
         _receivePeriodBegin = now;
         _remoteIP = addr.getAddress().getAddress();
         _remotePort = addr.getPort();
+        _mtu = PeerState2.MIN_MTU;
+        _mtuReceive = PeerState2.MIN_MTU;
         if (_remoteIP.length == 4) {
-            _mtu = DEFAULT_MTU;
-            _mtuReceive = DEFAULT_MTU;
             _largeMTU = transport.getMTU(false);
         } else {
-            _mtu = MIN_IPV6_MTU;
-            _mtuReceive = MIN_IPV6_MTU;
             _largeMTU = transport.getMTU(true);
         }
         // RFC 5681 sec. 3.1
-        if (_mtu > 1095)
-            _sendWindowBytes = 3 * _mtu;
-        else
-            _sendWindowBytes = 4 * _mtu;
+        _sendWindowBytes = 3 * _mtu;
         _sendWindowBytesRemaining = _sendWindowBytes;
 
         _lastACKSend = -1;
@@ -859,7 +854,7 @@ public class PeerState {
             // window and SST set in highestSeqNumAcked()
             bwe = -1;  // for log below
         } else {
-            _sendWindowBytes = isIPv6() ? MAX_IPV6_MTU : LARGE_MTU;
+            _sendWindowBytes = getVersion() == 2 ? PeerState2.MAX_MTU : (isIPv6() ? MAX_IPV6_MTU : LARGE_MTU);
             bwe = _bwEstimator.getBandwidthEstimate();
             _slowStartThreshold = Math.max( (int)(bwe * _rtt), 2 * _mtu);
         }
@@ -1230,12 +1225,12 @@ public class PeerState {
                     _context.statManager().addRateData("udp.mtuIncrease", _mtuIncreases);
 		}
 	    } else if (!wantLarge && _mtu == _largeMTU) {
-                _mtu = _remoteIP.length == 4 ? MIN_MTU : MIN_IPV6_MTU;
+                _mtu = getVersion() == 2 ? PeerState2.MIN_MTU : (_remoteIP.length == 4 ? MIN_MTU : MIN_IPV6_MTU);
                 _mtuDecreases++;
                 _context.statManager().addRateData("udp.mtuDecrease", _mtuDecreases);
 	    }
         } else {
-            _mtu = _remoteIP.length == 4 ? DEFAULT_MTU : MIN_IPV6_MTU;
+            _mtu = getVersion() == 2 ? PeerState2.MIN_MTU : (_remoteIP.length == 4 ? MIN_MTU : MIN_IPV6_MTU);
         }
     }
 
@@ -1244,7 +1239,8 @@ public class PeerState {
      */
     synchronized void setHisMTU(int mtu) {
         if (mtu <= MIN_MTU || mtu >= _largeMTU ||
-            (_remoteIP.length == 16 && mtu <= MIN_IPV6_MTU))
+            (_remoteIP.length == 16 && mtu <= MIN_IPV6_MTU) ||
+            (getVersion() == 2 && mtu <= PeerState2.MIN_MTU))
             return;
         _largeMTU = mtu;
         if (mtu < _mtu)
@@ -1310,10 +1306,10 @@ public class PeerState {
         int minMTU;
         if (_remoteIP.length == 4) {
             size += OVERHEAD_SIZE;
-            minMTU = MIN_MTU;
+            minMTU = getVersion() == 2 ? PeerState2.MIN_MTU : MIN_MTU;
         } else {
             size += IPV6_OVERHEAD_SIZE;
-            minMTU = MIN_IPV6_MTU;
+            minMTU = getVersion() == 2 ? PeerState2.MIN_MTU : MIN_IPV6_MTU;
         }
         if (size <= minMTU) {
             _consecutiveSmall++;

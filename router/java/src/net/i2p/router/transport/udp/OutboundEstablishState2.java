@@ -84,7 +84,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         // We need the MTU so the Session Confirmed can fit the RI in
         int mtu = addr.getMTU();
         if (mtu == 0) {
-            if (ra.getTransportStyle().equals("SSU2")) {
+            if (ra.getTransportStyle().equals(UDPTransport.STYLE2)) {
                 mtu = PeerState2.DEFAULT_MTU;
             } else {
                 if (_bobIP.length == 16)
@@ -94,7 +94,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             }
         } else {
             // TODO if too small, give up now
-            if (ra.getTransportStyle().equals("SSU2")) {
+            if (ra.getTransportStyle().equals(UDPTransport.STYLE2)) {
                 mtu = Math.min(Math.max(mtu, PeerState2.MIN_MTU), PeerState2.MAX_MTU);
             } else {
                 if (_bobIP.length == 16)
@@ -497,6 +497,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             _pstate.confirmedPacketsSent(_sessConfForReTX);
             // PS2.super adds CLOCK_SKEW_FUDGE that doesn't apply here
             _pstate.adjustClockSkew(_skew - (_rtt / 2) - PeerState.CLOCK_SKEW_FUDGE);
+            _pstate.setHisMTU(_mtu);
         }
         confirmedPacketsSent();
         return _pstate;

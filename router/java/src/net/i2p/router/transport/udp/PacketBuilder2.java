@@ -63,11 +63,11 @@ class PacketBuilder2 {
     /** Same for IPv4 and IPv6 */
     public static final int UDP_HEADER_SIZE = PacketBuilder.UDP_HEADER_SIZE;
 
-    /** 74 */
+    /** 60 */
     public static final int MIN_DATA_PACKET_OVERHEAD = IP_HEADER_SIZE + UDP_HEADER_SIZE + DATA_HEADER_SIZE + MAC_LEN;
 
     public static final int IPV6_HEADER_SIZE = PacketBuilder.IPV6_HEADER_SIZE;
-    /** 94 */
+    /** 80 */
     public static final int MIN_IPV6_DATA_PACKET_OVERHEAD = IPV6_HEADER_SIZE + UDP_HEADER_SIZE + DATA_HEADER_SIZE + MAC_LEN;
 
 /// FIXME
@@ -99,11 +99,12 @@ class PacketBuilder2 {
 
     /**
      *  Will a packet to 'peer' that already has 'numFragments' fragments
-     *  totalling 'curDataSize' bytes fit another fragment of size 'newFragSize' ??
+     *  totalling 'curDataSize' bytes fit another fragment?
      *
-     *  This doesn't leave anything for acks.
+     *  This doesn't leave anything for acks or anything else.
      *
      *  @param numFragments &gt;= 1
+     *  @return max additional fragment size
      */
     public static int getMaxAdditionalFragmentSize(PeerState peer, int numFragments, int curDataSize) {
         int available = peer.getMTU() - curDataSize;
@@ -111,7 +112,7 @@ class PacketBuilder2 {
             available -= MIN_IPV6_DATA_PACKET_OVERHEAD;
         else
             available -= MIN_DATA_PACKET_OVERHEAD;
-        // OVERHEAD above includes 1 * FRAGMENT+HEADER_SIZE;
+        // OVERHEAD above includes 1 * FRAGMENT_HEADER_SIZE;
         // this adds for the others, plus the new one.
         available -= numFragments * FIRST_FRAGMENT_HEADER_SIZE;
         return available;
@@ -167,13 +168,19 @@ class PacketBuilder2 {
         // calculate size available for acks
         int currentMTU = peer.getMTU();
         int availableForAcks = currentMTU - dataSize;
+        // includes UDP header
         int ipHeaderSize;
         if (peer.isIPv6()) {
             availableForAcks -= MIN_IPV6_DATA_PACKET_OVERHEAD;
-            ipHeaderSize = IPV6_HEADER_SIZE;
+            ipHeaderSize = IPV6_HEADER_SIZE + UDP_HEADER_SIZE;
         } else {
             availableForAcks -= MIN_DATA_PACKET_OVERHEAD;
-            ipHeaderSize = IP_HEADER_SIZE;
+            ipHeaderSize = IP_HEADER_SIZE + UDP_HEADER_SIZE;
+        }
+        if (otherBlocks != null) {
+            for (Block block : otherBlocks) {
+                availableForAcks -= block.getTotalLength();
+            }
         }
 
         // make the packet
@@ -189,6 +196,7 @@ class PacketBuilder2 {
         if (otherBlocks != null)
             bcnt += otherBlocks.size();
         List<Block> blocks = new ArrayList<Block>(bcnt);
+        // payload only
         int sizeWritten = 0;
 
         // add the acks
@@ -203,6 +211,8 @@ class PacketBuilder2 {
                 if (_log.shouldDebug())
                     _log.debug("Sending acks " + block + " to " + peer);
             }
+        } else if (_log.shouldDebug()) {
+            _log.debug("No room for acks, MTU: " + currentMTU + " data: " + dataSize + " available: " + availableForAcks);
         }
         
         // now write each fragment
@@ -238,15 +248,14 @@ class PacketBuilder2 {
 
         // DateTime block every so often, if room
         if ((pktNum & (DATETIME_SEND_FREQUENCY - 1)) == DATETIME_SEND_FREQUENCY - 1 &&
-            sizeWritten + ipHeaderSize + 7 <= currentMTU) {
+            ipHeaderSize + SHORT_HEADER_SIZE + sizeWritten + 7 + MAC_LEN <= currentMTU) {
             Block block = new SSU2Payload.DateTimeBlock(_context);
             blocks.add(block);
             off += 7;
             sizeWritten += 7;
         }
 
-        // FIXME
-        Block block = getPadding(sizeWritten, currentMTU);
+        Block block = getPadding(ipHeaderSize + SHORT_HEADER_SIZE + sizeWritten + MAC_LEN, currentMTU);
         if (block != null) {
             blocks.add(block);
             int sz = block.getTotalLength();
@@ -268,11 +277,12 @@ class PacketBuilder2 {
         // compare to LARGE_MTU
         // Also happens on switch between IPv4 and IPv6
         if (_log.shouldWarn()) {
-            int maxMTU = peer.isIPv6() ? PeerState.MAX_IPV6_MTU : PeerState.LARGE_MTU;
-            if (off + (ipHeaderSize + UDP_HEADER_SIZE) > maxMTU) {
+            int maxMTU = PeerState2.MAX_MTU;
+            off += MAC_LEN;
+            if (off + ipHeaderSize > maxMTU) {
                 _log.warn("Size is " + off + " for " + packet +
                        " data size " + dataSize +
-                       " pkt size " + (off + (ipHeaderSize + UDP_HEADER_SIZE)) +
+                       " pkt size " + (off + ipHeaderSize) +
                        " MTU " + currentMTU +
                        " Fragments: " + DataHelper.toString(fragments), new Exception());
             }
@@ -1003,7 +1013,7 @@ class PacketBuilder2 {
     }
 
     /**
-     *  @param len current length of the packet
+     *  @param len current length of the packet including IP/UDP header
      *  @param max max length of the packet
      *  @return null if no room
      */

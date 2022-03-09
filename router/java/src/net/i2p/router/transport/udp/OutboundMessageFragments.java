@@ -464,24 +464,30 @@ class OutboundMessageFragments {
                     maxAvail = PacketBuilder.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
                 else
                     maxAvail = PacketBuilder2.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
-                for (int j = i + 1; j < toSend.size(); j++) {
-                    next = toSend.get(j);
-                    int nextDataSize = next.state.fragmentSize(next.num);
-                    //if (PacketBuilder.canFitAnotherFragment(peer, sendNext.size(), curTotalDataSize, nextDataSize)) {
-                    //if (_builder.canFitAnotherFragment(peer, sendNext.size(), curTotalDataSize, nextDataSize)) {
-                    if (nextDataSize <= maxAvail) {
-                        // add it
-                        toSend.remove(j);
-                        j--;
-                        sendNext.add(next);
-                        curTotalDataSize += nextDataSize;
-                        if (peer.getVersion() == 1)
-                            maxAvail = PacketBuilder.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
-                        else
-                            maxAvail = PacketBuilder2.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("Adding in additional " + next + " to " + peer);
-                    }  // else too big
+                // if less than 16, just use it for acks, don't even try to look for a tiny fragment
+                if (maxAvail >= 16) {
+                    for (int j = i + 1; j < toSend.size(); j++) {
+                        next = toSend.get(j);
+                        int nextDataSize = next.state.fragmentSize(next.num);
+                        //if (PacketBuilder.canFitAnotherFragment(peer, sendNext.size(), curTotalDataSize, nextDataSize)) {
+                        //if (_builder.canFitAnotherFragment(peer, sendNext.size(), curTotalDataSize, nextDataSize)) {
+                        if (nextDataSize <= maxAvail) {
+                            // add it
+                            toSend.remove(j);
+                            j--;
+                            sendNext.add(next);
+                            curTotalDataSize += nextDataSize;
+                            if (peer.getVersion() == 1)
+                                maxAvail = PacketBuilder.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
+                            else
+                                maxAvail = PacketBuilder2.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
+                            if (_log.shouldLog(Log.INFO))
+                                _log.info("Adding in additional " + next + " to " + peer);
+                            // if less than 16, just use it for acks, don't even try to look for a tiny fragment
+                            if (maxAvail < 16)
+                                break;
+                        }  // else too big
+                    }
                 }
             }
 

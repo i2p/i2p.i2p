@@ -116,8 +116,9 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
 
     /**
      *  how much payload data can we shove in there?
-     *  Does NOT leave any room for acks, we'll fit them in when we can.
-     *  This is 5 bytes too low for first or only fragment.
+     *  This is 5 bytes too low for first or only fragment,
+     *  because the 9 byte I2NP header is included in that fragment.
+     *  Does NOT leave any room for acks with a full-size fragment.
      *
      *  @return MTU - 68 (IPv4), MTU - 88 (IPv6)
      */
@@ -127,13 +128,14 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         // 40 + 8 + 16 + 3 + 5 + 16 = 88 (IPv6)
         return _mtu -
                (_remoteIP.length == 4 ? PacketBuilder2.MIN_DATA_PACKET_OVERHEAD : PacketBuilder2.MIN_IPV6_DATA_PACKET_OVERHEAD) -
-               DATA_FOLLOWON_EXTRA_SIZE; // Followon fragment block overhead (5)
+               (SSU2Payload.BLOCK_HEADER_SIZE + DATA_FOLLOWON_EXTRA_SIZE);
     }
 
     /**
      *  Packet overhead
-     *  Does NOT leave any room for acks, we'll fit them in when we can.
-     *  This is 5 bytes too high for first or only fragment.
+     *  This is 5 bytes too high for first or only fragment,
+     *  because the 9 byte I2NP header is included in that fragment.
+     *  Does NOT leave any room for acks with a full-size fragment.
      *
      *  @return 68 (IPv4), 88 (IPv6)
      */
@@ -142,7 +144,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         // 20 + 8 + 16 + 3 + 5 + 16 = 68 (IPv4)
         // 40 + 8 + 16 + 3 + 5 + 16 = 88 (IPv6)
         return (_remoteIP.length == 4 ? PacketBuilder2.MIN_DATA_PACKET_OVERHEAD : PacketBuilder2.MIN_IPV6_DATA_PACKET_OVERHEAD) +
-               DATA_FOLLOWON_EXTRA_SIZE; // Followon fragment block overhead (5)
+               SSU2Payload.BLOCK_HEADER_SIZE + DATA_FOLLOWON_EXTRA_SIZE;
     }
 
     /**
@@ -300,7 +302,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             }
             int payloadLen = len - (SHORT_HEADER_SIZE + MAC_LEN);
             if (_log.shouldInfo())
-                _log.info("New pkt rcvd " + n + " on " + this);
+                _log.info("New " + len + " byte pkt " + n + " rcvd on " + this);
             processPayload(data, off + SHORT_HEADER_SIZE, payloadLen);
             packetReceived(payloadLen);
         } catch (GeneralSecurityException gse) {
