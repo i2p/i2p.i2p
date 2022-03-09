@@ -37,7 +37,6 @@ import net.i2p.util.SystemVersion;
 abstract class TrayManager {
 
     protected final I2PAppContext _appContext;
-    protected final Main _main;
     protected final boolean _useSwing;
     ///The tray area, or null if unsupported
     protected SystemTray tray;
@@ -55,9 +54,8 @@ abstract class TrayManager {
     /**
      * Instantiate tray manager.
      */
-    protected TrayManager(I2PAppContext ctx, Main main, boolean useSwing) {
+    protected TrayManager(I2PAppContext ctx, boolean useSwing) {
         _appContext = ctx;
-        _main = main;
         _useSwing = useSwing;
     }
     

@@ -30,6 +30,7 @@ class InternalTrayManager extends TrayManager {
 	
     private final RouterContext _context;
     private final Log log;
+    private final Main _main;
     private MenuItem _statusItem, _browserItem, _configItem, _restartItem, _stopItem,
                      _restartHardItem, _stopHardItem, _cancelItem,
                      _notificationItem1, _notificationItem2;
@@ -42,8 +43,9 @@ class InternalTrayManager extends TrayManager {
     private static final String CONSOLE_BUNDLE_NAME = "net.i2p.router.web.messages";
 
     public InternalTrayManager(RouterContext ctx, Main main, boolean useSwing) {
-        super(ctx, main, useSwing);
+        super(ctx, useSwing);
         _context = ctx;
+        _main = main;
         log = ctx.logManager().getLog(InternalTrayManager.class);
     }
 

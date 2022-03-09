@@ -22,8 +22,8 @@ import net.i2p.desktopgui.router.RouterManager;
  */
 class ExternalTrayManager extends TrayManager {
 	
-    public ExternalTrayManager(I2PAppContext ctx, Main main, boolean useSwing) {
-        super(ctx, main, useSwing);
+    public ExternalTrayManager(I2PAppContext ctx, boolean useSwing) {
+        super(ctx, useSwing);
     }
 
     public PopupMenu getMainMenu() {
