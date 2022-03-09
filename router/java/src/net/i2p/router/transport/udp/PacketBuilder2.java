@@ -196,6 +196,8 @@ class PacketBuilder2 {
                 int sz = block.getTotalLength();
                 off += sz;
                 sizeWritten += sz;
+                if (_log.shouldDebug())
+                    _log.debug("Sending acks " + block + " to " + peer);
             }
         }
         

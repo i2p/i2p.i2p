@@ -248,6 +248,21 @@ class InboundMessageState implements CDQEntry {
     }
 
     /**
+     * Do we have this fragment?
+     *
+     * SSU 2 only.
+     *
+     * @param fragmentNum the fragment number
+     * @return true if we have the fragment
+     * @since 0.9.54
+     */
+    public boolean hasFragment(int fragmentNum) {
+        if (fragmentNum >= _fragments.length)
+            return false;
+        return _fragments[fragmentNum] != null;
+    }
+
+    /**
      *  May not be valid after released.
      *  Probably doesn't need to be synced by caller, given the order of
      *  events in receiveFragment() above, but you might want to anyway

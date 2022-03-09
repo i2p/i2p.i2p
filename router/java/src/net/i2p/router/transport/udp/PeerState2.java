@@ -232,8 +232,9 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     byte[] getRcvHeaderEncryptKey2() { return _rcvHeaderEncryptKey2; }
 
     SSU2Bitfield getReceivedMessages() {
-        if (_log.shouldDebug())
-            _log.debug("Sending acks " + _receivedMessages + " on " + this);
+        // logged in PacketBuilder2
+        //if (_log.shouldDebug())
+        //    _log.debug("Sending acks " + _receivedMessages + " on " + this);
         return _receivedMessages;
     }
     SSU2Bitfield getAckedMessages() { return _ackedMessages; }
@@ -286,13 +287,16 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                 _rcvCha.setNonce(n);
                 // decrypt in-place
                 _rcvCha.decryptWithAd(header.data, data, off + SHORT_HEADER_SIZE, data, off + SHORT_HEADER_SIZE, len - SHORT_HEADER_SIZE);
-                //if (_log.shouldDebug())
-                //    _log.debug("Packet " + n + " after full decryption:\n" + HexDump.dump(data, off, len - MAC_LEN));
-                if (_receivedMessages.set(n)) {
-                    if (_log.shouldWarn())
-                        _log.warn("dup pkt rcvd " + n + " on " + this);
-                    return;
+            }
+            //if (_log.shouldDebug())
+            //    _log.debug("Packet " + n + " after full decryption:\n" + HexDump.dump(data, off, len - MAC_LEN));
+            if (_receivedMessages.set(n)) {
+                synchronized(this) {
+                    _packetsReceivedDuplicate++;
                 }
+                if (_log.shouldWarn())
+                    _log.warn("dup pkt rcvd: " + n + " on " + this);
+                return;
             }
             int payloadLen = len - (SHORT_HEADER_SIZE + MAC_LEN);
             if (_log.shouldInfo())
@@ -365,6 +369,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         InboundMessageState state;
         boolean messageComplete = false;
         boolean messageExpired = false;
+        boolean messageDup = false;
 
         synchronized (_inboundMessages) {
             state = _inboundMessages.get(messageId);
@@ -372,22 +377,34 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                 state = new InboundMessageState(_context, messageId, _remotePeer, data, off, len, frag, isLast);
                 _inboundMessages.put(messageId, state);
             } else {
-                boolean fragmentOK = state.receiveFragment(data, off, len, frag, isLast);
-                if (!fragmentOK)
-                    return;
-                if (state.isComplete()) {
-                    messageComplete = true;
-                    _inboundMessages.remove(messageId);
-                } else if (state.isExpired()) {
-                    messageExpired = true;
-                    _inboundMessages.remove(messageId);
+                messageDup = state.hasFragment(frag);
+                if (!messageDup) {
+                    boolean fragmentOK = state.receiveFragment(data, off, len, frag, isLast);
+                    if (!fragmentOK)
+                        return;
+                    if (state.isComplete()) {
+                        messageComplete = true;
+                        _inboundMessages.remove(messageId);
+                    } else if (state.isExpired()) {
+                        messageExpired = true;
+                        _inboundMessages.remove(messageId);
+                    }
                 }
             }
         }
 
+        if (messageDup) {
+            synchronized(this) {
+                _packetsReceivedDuplicate++;
+            }
+            if (_log.shouldWarn())
+                _log.warn("dup fragment rcvd: " + frag + " for " + state);
+            return;
+        }
+
         if (messageComplete) {
-            messageFullyReceived(messageId, state.getCompleteSize());
-            if (_log.shouldDebug())
+                messageFullyReceived(messageId, state.getCompleteSize());
+                if (_log.shouldDebug())
                 _log.debug("Message received completely!  " + state);
             _context.statManager().addRateData("udp.receivedCompleteTime", state.getLifetime(), state.getLifetime());
             _context.statManager().addRateData("udp.receivedCompleteFragments", state.getFragmentCount(), state.getLifetime());
@@ -609,7 +626,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             }
             UDPPacket ack = _transport.getBuilder2().buildACK(PeerState2.this);
             if (_log.shouldDebug())
-                _log.debug("Sending acks to " + PeerState2.this);
+                _log.debug("ACKTimer sending acks to " + PeerState2.this);
             _transport.send(ack);
         }
     }

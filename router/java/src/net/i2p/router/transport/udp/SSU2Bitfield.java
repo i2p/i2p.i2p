@@ -308,14 +308,15 @@ class SSU2Bitfield {
                 }
             }
         }
-        sb.append("    RAW: ").append(thru).append(" A:").append(acnt);
+        sb.append(" (RAW: ").append(thru).append(" A:").append(acnt);
         if (ranges != null) {
             for (int i = 0; i < rangeCount * 2; i += 2) {
                 sb.append(" N:").append(ranges[i] & 0xff);
                 sb.append(" A:").append(ranges[i + 1] & 0xff);
             }
-         }
-         return sb.toString();
+        }
+        sb.append(')');
+        return sb.toString();
     }
 
     @Override

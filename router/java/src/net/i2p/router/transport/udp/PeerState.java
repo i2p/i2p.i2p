@@ -187,7 +187,7 @@ public class PeerState {
     private final AtomicBoolean _fastRetransmit = new AtomicBoolean();
 
     /** how many dup packets were received within the last RETRANSMISSION_PERIOD_WIDTH packets */
-    private int _packetsReceivedDuplicate;
+    protected int _packetsReceivedDuplicate;
     private int _packetsReceived;
     private boolean _mayDisconnect;
 

@@ -412,7 +412,10 @@ class UDPPacket implements CDPQEntry {
     
     @Override
     public String toString() {
-        verifyNotReleased(); 
+        synchronized(this) {
+            if (_released)
+                return "RELEASED PACKET";
+        }
         StringBuilder buf = new StringBuilder(256);
         buf.append(_packet.getLength());
         buf.append(" byte pkt with ");
