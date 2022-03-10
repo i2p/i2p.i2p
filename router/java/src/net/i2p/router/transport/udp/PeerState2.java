@@ -527,46 +527,21 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         }
         if (_log.shouldDebug())
             _log.debug("New ACK of pkt " + pktNum + " containing " + fragments.size() + " fragments on " + this);
-        ModifiableLong highestSeqNumAcked = new ModifiableLong(-1);
+        long highest = -1;
         for (PacketBuilder.Fragment f : fragments) {
             OutboundMessageState state = f.state;
-            if (state.isComplete()) {
-                if (_log.shouldWarn())
-                    _log.warn("New ACK but state complete? " + state);
-                continue;
-            }
-            int num = f.num;
-            if (!state.needsSending(num)) {
+            if (acked(f)) {
+                if (_log.shouldDebug())
+                    _log.debug("New ACK of fragment " + f.num + " of " + state);
+            } else {
                 // will happen with retransmission as a different packet number
                 if (_log.shouldWarn())
-                    _log.warn("New ACK for fragment " + num + " but already acked? " + state);
-                continue;
+                    _log.warn("Dup ACK of fragment " + f.num + " of " + state);
             }
-            int ackedSize = state.getUnackedSize();
-            boolean complete = state.acked(f.num);
-            if (complete) {
-                if (_log.shouldDebug())
-                    _log.debug("Received ACK of fragment " + num + " of " + state +
-                               ", now complete");
-                acked(state.getMessageId(), highestSeqNumAcked);
-                if (ackedSize > 0) {
-                    // TODO acked() will have an ackedSize of 0, so do it here also
-                    messageACKed(ackedSize, state.getLifetime(), state.getMaxSends(), false, false);
-                }
-            } else {
-                ackedSize -= state.getUnackedSize();
-                if (_log.shouldDebug())
-                    _log.debug("Received ACK of fragment " + num + " of " + state +
-                               ", still incomplete");
-                if (ackedSize > 0) {
-                    state.clearNACKs();
-                    // this adjusts the rtt/rto/window/etc
-                    // flags TODO
-                    messageACKed(ackedSize, state.getLifetime(), state.getMaxSends(), false, false);
-                }
-            }
+            long sn = state.getSeqNum();
+            if (sn > highest)
+                highest = sn;
         }
-        long highest = highestSeqNumAcked.value;
         if (highest >= 0)
             highestSeqNumAcked(highest);
     }
