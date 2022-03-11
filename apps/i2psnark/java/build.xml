@@ -21,6 +21,8 @@
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <!-- jsp-api.jar only present for debian builds -->
                 <pathelement location="../../jetty/jettylib/jsp-api.jar" />
+                <!-- following jars only for standalone builds -->
+                <pathelement location="../../desktopgui/dist/desktopgui.jar" />
             </classpath>
         </depend>
     </target>
@@ -60,6 +62,7 @@
                 <pathelement location="../../systray/java/build/systray.jar" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-util.jar" />
+                <pathelement location="../../desktopgui/dist/desktopgui.jar" />
             </classpath>
         </javac>
     </target>
@@ -236,6 +239,7 @@
         <zipfileset src="../../streaming/java/build/streaming.jar" />
         <zipfileset src="../../systray/java/build/systray.jar" />
         <zipfileset src="../../../build/jbigi.jar" />
+        <zipfileset src="../../desktopgui/dist/desktopgui.jar" />
         <!-- Countries translations. The i2psnark translations are in the war but it's easier to put these here -->
         <!-- 300KB just to translate "Brazil", but why not... -->
       <!--

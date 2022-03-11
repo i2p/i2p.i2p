@@ -342,7 +342,8 @@
         <copy file="apps/i2pcontrol/build/jsonrpc.war" todir="build/" />
     </target>
 
-    <target name="buildI2PSnark" depends="buildMinistreaming, buildJetty, buildSystray" >
+    <!-- DTG only for standalone, but snark compiles standalone classes for non-standalone, to be fixed -->
+    <target name="buildI2PSnark" depends="buildMinistreaming, buildJetty, buildSystray, buildDesktopGui" >
         <ant dir="apps/i2psnark/java/" target="war" />
         <copy file="apps/i2psnark/i2psnark.war" todir="build/" />
         <copy file="apps/i2psnark/java/build/i2psnark.jar" todir="build/" />
@@ -2132,7 +2133,7 @@
     </target> -->
 
     <!-- standalone i2psnark zip -->
-    <target name="i2psnark" depends="buildStreaming, buildJetty, buildSystray, jbigi" >
+    <target name="i2psnark" depends="buildStreaming, buildJetty, buildSystray, jbigi, buildDesktopGui" >
         <ant dir="apps/i2psnark/java" target="standalone" />
         <copy file="apps/i2psnark/java/i2psnark-standalone.zip" todir="." />
     </target>

@@ -1,5 +1,6 @@
 package org.klomp.snark.standalone;
 
+import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
@@ -9,8 +10,10 @@ import org.eclipse.jetty.util.log.Log;
 import net.i2p.I2PAppContext;
 import net.i2p.apps.systray.UrlLauncher;
 import net.i2p.data.DataHelper;
+import net.i2p.desktopgui.ExternalMain;
 import net.i2p.jetty.I2PLogger;
 import net.i2p.jetty.JettyStart;
+import net.i2p.util.SystemVersion;
 
 /**
  *  @since moved from ../web and fixed in 0.9.27
@@ -23,6 +26,7 @@ public class RunStandalone {
     private String _host = "127.0.0.1";
     private static RunStandalone _instance;
     static final File APP_CONFIG_FILE = new File("i2psnark-appctx.config");
+    private static final String PROP_DTG_ENABLED = "desktopgui.enabled";
 
     private RunStandalone(String args[]) throws Exception {
         Properties p = new Properties();
@@ -68,6 +72,7 @@ public class RunStandalone {
         try {
             String url = "http://" + _host + ':' + _port + "/i2psnark/";
             System.out.println("Starting i2psnark at " + url);
+            startTrayApp();
             _jettyStart.startup();
             try {
                Thread.sleep(1000);
@@ -92,5 +97,40 @@ public class RunStandalone {
            Thread.sleep(3000);
         } catch (InterruptedException ie) {}
         System.exit(1);
+    }
+
+    /**
+     *  @since 0.9.54 adapted from RouterConsoleRunner
+     */
+    private static boolean isSystrayEnabled(I2PAppContext context) {
+        if (GraphicsEnvironment.isHeadless())
+            return false;
+        // default false except on OSX and Windows,
+        // and on Linux KDE and LXDE.
+        // Xubuntu XFCE works but doesn't look very good
+        // Ubuntu Unity was far too buggy to enable
+        // Ubuntu GNOME does not work, SystemTray.isSupported() returns false
+        String xdg = System.getenv("XDG_CURRENT_DESKTOP");
+        boolean dflt = SystemVersion.isWindows() ||
+                       SystemVersion.isMac() ||
+                       //"XFCE".equals(xdg) ||
+                       "KDE".equals(xdg) ||
+                       "LXDE".equals(xdg);
+        return context.getProperty(PROP_DTG_ENABLED, dflt);
+    }
+
+    /**
+     *  @since 0.9.54 adapted from RouterConsoleRunner
+     */
+    private void startTrayApp() {
+        try {
+            if (isSystrayEnabled(_context)) {
+                System.setProperty("java.awt.headless", "false");
+                ExternalMain dtg = new ExternalMain(_context, _context.clientAppManager(), null);
+                dtg.startup();
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 }
