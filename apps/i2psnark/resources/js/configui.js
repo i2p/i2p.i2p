@@ -5,6 +5,7 @@
 // a public domain is not usable.
 
 var oldTheme = "ubergine";
+var change = false;
 
 function swapStyleSheet(theme) {
     // https://stackoverflow.com/questions/14292997/changing-style-sheet-javascript
@@ -18,7 +19,12 @@ function initThemeSwitcher() {
     }
     oldtheme = theme.value;
     theme.onclick = function() {
-        swapStyleSheet(theme.value);
+        if (change) {
+            swapStyleSheet(theme.value);
+        } else {
+            // skip the first click to avoid the flash
+            change = true;
+        }
     }
 }
 
