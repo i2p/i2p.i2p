@@ -190,19 +190,22 @@ class OutboundNTCP2State implements EstablishState {
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(this + "send X");
-        byte options[] = new byte[OPTIONS1_SIZE];
+        // write options directly to tmp, offset 32, will encrypt in-place
         // network ID cross-check, proposal 147
-        options[0] = (byte) (_context.router().getNetworkID());
-        options[1] = NTCPTransport.NTCP2_INT_VERSION;
+        _tmp[KEY_SIZE] = (byte) (_context.router().getNetworkID());
+        _tmp[KEY_SIZE + 1] = NTCPTransport.NTCP2_INT_VERSION;
         int padlen1 = _context.random().nextInt(PADDING1_MAX);
-        DataHelper.toLong(options, 2, 2, padlen1);
+        DataHelper.toLong(_tmp, KEY_SIZE + 2, 2, padlen1);
         int msg3p2len = NTCP2Payload.BLOCK_HEADER_SIZE + 1 + _aliceRISize +
                         NTCP2Payload.BLOCK_HEADER_SIZE + OPTIONS3_SIZE +
                         NTCP2Payload.BLOCK_HEADER_SIZE + _padlen3 +
                         MAC_SIZE;
-        DataHelper.toLong(options, 4, 2, msg3p2len);
+        DataHelper.toLong(_tmp, KEY_SIZE + 4, 2, msg3p2len);
+        _tmp[KEY_SIZE + 6] = 0;
+        _tmp[KEY_SIZE + 7] = 0;
         long now = (_context.clock().now() + 500) / 1000;
-        DataHelper.toLong(options, 8, 4, now);
+        DataHelper.toLong(_tmp, KEY_SIZE + 8, 4, now);
+        Arrays.fill(_tmp, KEY_SIZE + 12, KEY_SIZE + 16, (byte) 0);
 
         // set keys
         String s = _con.getRemoteAddress().getOption("s");
@@ -224,7 +227,8 @@ class OutboundNTCP2State implements EstablishState {
             _handshakeState.start();
             if (_log.shouldDebug())
                 _log.debug("After start: " + _handshakeState.toString());
-            _handshakeState.writeMessage(_tmp, 0, options, 0, OPTIONS1_SIZE);
+            // encrypt in-place
+            _handshakeState.writeMessage(_tmp, 0, _tmp, KEY_SIZE, OPTIONS1_SIZE);
         } catch (GeneralSecurityException gse) {
             // buffer length error
             if (!_log.shouldWarn())

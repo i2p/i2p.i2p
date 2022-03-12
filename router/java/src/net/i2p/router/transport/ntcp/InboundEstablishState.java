@@ -511,14 +511,15 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
      */
     private synchronized void prepareOutbound2() {
         // create msg 2 payload
-        byte[] options2 = new byte[OPTIONS2_SIZE];
         int padlen2 = _context.random().nextInt(PADDING2_MAX);
-        DataHelper.toLong(options2, 2, 2, padlen2);
-        long now = _context.clock().now() / 1000;
-        DataHelper.toLong(options2, 8, 4, now);
         byte[] tmp = new byte[MSG2_SIZE + padlen2];
+        // write options directly to tmp with 32 byte offset
+        DataHelper.toLong(tmp, KEY_SIZE + 2, 2, padlen2);
+        long now = (_context.clock().now() + 500) / 1000;
+        DataHelper.toLong(tmp, KEY_SIZE + 8, 4, now);
         try {
-            _handshakeState.writeMessage(tmp, 0, options2, 0, OPTIONS2_SIZE);
+            // encrypt in-place
+            _handshakeState.writeMessage(tmp, 0, tmp, KEY_SIZE, OPTIONS2_SIZE);
         } catch (GeneralSecurityException gse) {
             // buffer length error
             if (!_log.shouldWarn())
