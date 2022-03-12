@@ -32,6 +32,7 @@ import net.i2p.router.tunnel.HopConfig;
 import net.i2p.router.tunnel.TunnelCreatorConfig;
 import static net.i2p.router.tunnel.pool.BuildExecutor.Result.*;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -69,7 +70,7 @@ abstract class BuildRequestor {
      *  so can we use a successfully built tunnel anyway.
      *
      */
-    static final int REQUEST_TIMEOUT = 13*1000;
+    static final int REQUEST_TIMEOUT = SystemVersion.isSlow() ? 10*1000 : 5*1000;
 
     /** make this shorter than REQUEST_TIMEOUT */
     private static final int FIRST_HOP_TIMEOUT = 10*1000;

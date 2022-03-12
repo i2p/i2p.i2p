@@ -1,3 +1,7 @@
+2022-03-12 zzz
+ * SSU2: Fixes
+ * Tunnels: Reduce build reply timeout
+
 2022-03-11 zzz
  * i2psnark standalone: Add DTG
 

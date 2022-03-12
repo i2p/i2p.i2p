@@ -20,6 +20,7 @@ import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.stat.StatManager;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Single threaded controller of the tunnel creation process, spanning all tunnel pools.
@@ -307,7 +308,7 @@ class BuildExecutor implements Runnable {
 */
 
     /** Set 1.5 * LOOP_TIME < BuildRequestor.REQUEST_TIMEOUT/4 - margin */
-    private static final int LOOP_TIME = 1000;
+    private static final int LOOP_TIME = SystemVersion.isSlow() ? 1000 : 800;
 
     public void run() {
         _isRunning = true;
