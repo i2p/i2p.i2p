@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,6 +56,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
      */
     private final SSU2Bitfield _ackedMessages;
     private final ConcurrentHashMap<Long, List<PacketBuilder.Fragment>> _sentMessages;
+    private long _sentMessagesLastExpired;
 
     // Session Confirmed retransmit
     private byte[] _sessConfForReTX;
@@ -76,7 +78,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     private static final int BITFIELD_SIZE = 512;
     private static final int MAX_SESS_CONF_RETX = 6;
     private static final int SESS_CONF_RETX_TIME = 1000;
-
+    private static final long SENT_MESSAGES_CLEAN_TIME = 60*1000;
 
 
     /**
@@ -98,6 +100,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         _receivedMessages = new SSU2Bitfield(BITFIELD_SIZE, 0);
         _ackedMessages = new SSU2Bitfield(BITFIELD_SIZE, 0);
         _sentMessages = new ConcurrentHashMap<Long, List<PacketBuilder.Fragment>>(32);
+        _sentMessagesLastExpired = _keyEstablishedTime;
         if (isInbound) {
             // Send immediate ack of Session Confirmed
             _receivedMessages.set(0);
@@ -166,6 +169,37 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             _wantACKSendSince = now;
             new ACKTimer();
         }
+    }
+
+    /**
+     * Overridden to expire unacked packets in _sentMessages.
+     * These will remain unacked if lost; fragments will be retransmitted
+     * in a new packet.
+     *
+     * @return number of active outbound messages remaining
+     */
+    @Override
+    int finishMessages(long now) {
+        if (now >= _sentMessagesLastExpired + SENT_MESSAGES_CLEAN_TIME) {
+            _sentMessagesLastExpired = now;
+            if (!_sentMessages.isEmpty()) {
+                if (_log.shouldDebug())
+                    _log.debug("finishMessages() over " + _sentMessages.size() + " pending acks");
+                loop:
+                for (Iterator<List<PacketBuilder.Fragment>> iter = _sentMessages.values().iterator(); iter.hasNext(); ) {
+                    List<PacketBuilder.Fragment> frags = iter.next();
+                    for (PacketBuilder.Fragment f : frags) {
+                        OutboundMessageState state = f.state;
+                        if (!state.isComplete() && !state.isExpired(now))
+                            continue loop;
+                    }
+                    iter.remove();
+                    if (_log.shouldWarn())
+                        _log.warn("Cleaned from sentMessages: " + frags);
+                }
+            }
+        }
+        return super.finishMessages(now);
     }
 
     /**
@@ -570,6 +604,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         byte data[] = pkt.getData();
         int off = pkt.getOffset();
         System.arraycopy(_sessConfForReTX, 0, data, off, _sessConfForReTX.length);
+        pkt.setLength(_sessConfForReTX.length);
         pkt.setAddress(_remoteIPAddress);
         pkt.setPort(_remotePort);
         packet.setMessageType(PacketBuilder2.TYPE_CONF);

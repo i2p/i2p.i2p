@@ -70,7 +70,7 @@ public class PeerState {
     private SessionKey _nextCipherKey;
 
     /** when were the current cipher and MAC keys established/rekeyed? */
-    private final long _keyEstablishedTime;
+    protected final long _keyEstablishedTime;
 
     /**
      *  How far off is the remote peer from our clock, in milliseconds?

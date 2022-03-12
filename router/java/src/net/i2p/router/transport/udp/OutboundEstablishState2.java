@@ -514,6 +514,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         byte data[] = pkt.getData();
         int off = pkt.getOffset();
         System.arraycopy(_sessReqForReTX, 0, data, off, _sessReqForReTX.length);
+        pkt.setLength(_sessReqForReTX.length);
         pkt.setSocketAddress(_bobSocketAddress);
         packet.setMessageType(PacketBuilder2.TYPE_SREQ);
         packet.setPriority(PacketBuilder2.PRIORITY_HIGH);

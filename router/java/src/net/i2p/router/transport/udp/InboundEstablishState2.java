@@ -615,6 +615,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         byte data[] = pkt.getData();
         int off = pkt.getOffset();
         System.arraycopy(_sessCrForReTX, 0, data, off, _sessCrForReTX.length);
+        pkt.setLength(_sessCrForReTX.length);
         pkt.setSocketAddress(_aliceSocketAddress);
         packet.setMessageType(PacketBuilder2.TYPE_CONF);
         packet.setPriority(PacketBuilder2.PRIORITY_HIGH);
