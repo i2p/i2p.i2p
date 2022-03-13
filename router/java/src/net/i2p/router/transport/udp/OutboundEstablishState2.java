@@ -16,6 +16,7 @@ import net.i2p.crypto.HKDF;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.router.RouterAddress;
@@ -215,8 +216,27 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     public void gotRelayTag(long tag) {
+        if (!ENABLE_RELAY)
+            return;
         if (_log.shouldDebug())
             _log.debug("Got relay tag " + tag);
+        _receivedRelayTag = tag;
+    }
+
+    public void gotRelayRequest(byte[] data) {
+        // won't be called, SSU2Payload will throw
+    }
+
+    public void gotRelayResponse(int status, byte[] data) {
+        // won't be called, SSU2Payload will throw
+    }
+
+    public void gotRelayIntro(Hash aliceHash, byte[] data) {
+        // won't be called, SSU2Payload will throw
+    }
+
+    public void gotPeerTest(int msg, int status, Hash h, byte[] data) {
+        // won't be called, SSU2Payload will throw
     }
 
     public void gotToken(long token, long expires) {

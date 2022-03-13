@@ -80,7 +80,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         _rcvHeaderEncryptKey1 = introKey;
         //_sendHeaderEncryptKey2 set below
         //_rcvHeaderEncryptKey2 set below
-        _introductionRequested = false; // todo
         int off = pkt.getOffset();
         int len = pkt.getLength();
         byte data[] = pkt.getData();
@@ -321,12 +320,43 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     public void gotRelayTagRequest() {
+        if (!ENABLE_RELAY)
+            return;
         if (_log.shouldDebug())
             _log.debug("Got relay tag request");
+        _introductionRequested = true;
     }
 
     public void gotRelayTag(long tag) {
-        throw new IllegalStateException("Relay tag in Handshake");
+        // shouldn't happen for inbound
+    }
+
+    public void gotRelayRequest(byte[] data) {
+        if (!ENABLE_RELAY)
+            return;
+        if (_receivedConfirmedIdentity == null)
+            throw new IllegalStateException("RI must be first");
+    }
+
+    public void gotRelayResponse(int status, byte[] data) {
+        if (!ENABLE_RELAY)
+            return;
+        if (_receivedConfirmedIdentity == null)
+            throw new IllegalStateException("RI must be first");
+    }
+
+    public void gotRelayIntro(Hash aliceHash, byte[] data) {
+        if (!ENABLE_RELAY)
+            return;
+        if (_receivedConfirmedIdentity == null)
+            throw new IllegalStateException("RI must be first");
+    }
+
+    public void gotPeerTest(int msg, int status, Hash h, byte[] data) {
+        if (!ENABLE_PEER_TEST)
+            return;
+        if (_receivedConfirmedIdentity == null)
+            throw new IllegalStateException("RI must be first");
     }
 
     public void gotToken(long token, long expires) {

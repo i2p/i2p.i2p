@@ -3,6 +3,12 @@ package net.i2p.router.transport.udp;
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.HKDF;
+import net.i2p.crypto.SigType;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
+import net.i2p.data.Signature;
+import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPublicKey;
 
 /**
  *  SSU2 Utils and constants
@@ -11,6 +17,11 @@ import net.i2p.crypto.HKDF;
  */
 final class SSU2Util {
     public static final int PROTOCOL_VERSION = 2;
+
+    // features
+    public static final boolean ENABLE_RELAY = false;
+    public static final boolean ENABLE_PEER_TEST = false;
+    public static final boolean ENABLE_PATH_CHALLENGE = false;
 
     // lengths
     /** 32 */
@@ -87,6 +98,12 @@ final class SSU2Util {
     public static final byte[] ZEROLEN = new byte[0];
     public static final byte[] ZEROKEY = new byte[KEY_LEN];
 
+    // relay and peer test
+    public static final byte[] RELAY_REQUEST_PROLOGUE = DataHelper.getASCII("RelayRequestData");
+    public static final byte[] RELAY_RESPONSE_PROLOGUE = DataHelper.getASCII("RelayAgreementOK");
+    public static final byte[] PEER_TEST_PROLOGUE = DataHelper.getASCII("PeerTestValidate");
+
+
     private SSU2Util() {}
 
     /**
@@ -97,5 +114,38 @@ final class SSU2Util {
         byte[] rv = new byte[32];
         hkdf.calculate(key, ZEROLEN, info, rv);
         return rv;
+    }
+
+    /**
+     *  Sign the relay or peer test data, using
+     *  the prologue and hash as the initial data,
+     *  and then the provided data.
+     *
+     *  @return null on failure
+     */
+    public static Signature sign(I2PAppContext ctx, byte[] prologue, Hash h, byte[] data, SigningPrivateKey spk) {
+        byte[] buf = new byte[prologue.length + Hash.HASH_LENGTH + data.length];
+        System.arraycopy(prologue, 0, buf, 0, prologue.length);
+        System.arraycopy(h.getData(), 0, buf, prologue.length, Hash.HASH_LENGTH);
+        System.arraycopy(data, 0, buf, prologue.length + Hash.HASH_LENGTH, data.length);
+        return ctx.dsa().sign(buf, spk);
+    }
+
+    /**
+     *  Validate the signed relay or peer test data, using
+     *  the prologue and hash as the initial data,
+     *  and then the provided data which ends with a signature of the specified type.
+     */
+    public static boolean validateSig(I2PAppContext ctx, byte[] prologue, Hash h, byte[] data, SigningPublicKey spk) {
+        SigType type = spk.getType();
+        int siglen = type.getSigLen();
+        byte[] buf = new byte[prologue.length + Hash.HASH_LENGTH + data.length - siglen];
+        System.arraycopy(prologue, 0, buf, 0, prologue.length);
+        System.arraycopy(h.getData(), 0, buf, prologue.length, Hash.HASH_LENGTH);
+        System.arraycopy(data, 0, buf, prologue.length + Hash.HASH_LENGTH, data.length - siglen);
+        byte[] bsig = new byte[siglen];
+        System.arraycopy(data, data.length - siglen, bsig, 0, siglen);
+        Signature sig = new Signature(type, bsig);
+        return ctx.dsa().verifySignature(sig, buf, spk);
     }
 }

@@ -63,8 +63,8 @@ class InboundEstablishState {
     private final Queue<OutNetMessage> _queuedMessages;
     // count for backoff
     protected int _createdSentCount;
-    // default true
-    protected boolean _introductionRequested = true;
+    // default true for SSU 1, false for SSU 2
+    protected boolean _introductionRequested;
 
     protected int _rtt;
     
@@ -127,6 +127,7 @@ class InboundEstablishState {
         _establishBegin = ctx.clock().now();
         _keyBuilder = dh;
         _queuedMessages = new LinkedBlockingQueue<OutNetMessage>();
+        _introductionRequested = true;
         receiveSessionRequest(req);
     }
 

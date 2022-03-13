@@ -638,26 +638,20 @@ class EstablishmentManager {
         }
 
         if (isNew) {
-          /**** TODO
-            // Don't offer to relay to privileged ports.
-            // Only offer for an IPv4 session.
-            // TODO if already we have their RI, only offer if they need it (no 'C' cap)
-            // if extended options, only if they asked for it
-            if (state.isIntroductionRequested() &&
-                state.getSentPort() >= 1024 &&
-                _transport.canIntroduce(state.getSentIP().length == 16)) {
-                // ensure > 0
-                long tag = 1 + _context.random().nextLong(MAX_TAG_VALUE);
-                state.setSentRelayTag(tag);
-            } else {
-                // we got an IB even though we were firewalled, hidden, not high cap, etc.
-            }
-          ****/
             if (_log.shouldInfo())
                 _log.info("Received NEW session/token request " + state);
         } else {
             if (_log.shouldDebug())
                 _log.debug("Receive DUP session/token request from: " + state);
+        }
+        // call for both Session and Token request, why not
+        if (SSU2Util.ENABLE_RELAY &&
+            state.isIntroductionRequested() &&
+            state.getSentRelayTag() == 0 &&     // only set once
+            state.getSentPort() >= 1024 &&
+            _transport.canIntroduce(state.getSentIP().length == 16)) {
+            long tag = 1 + _context.random().nextLong(MAX_TAG_VALUE);
+            state.setSentRelayTag(tag);
         }
         notifyActivity();
     }
@@ -1059,7 +1053,6 @@ class EstablishmentManager {
                                  state.getSentIP(), state.getSentPort(), remote.calculateHash(), false, state.getRTT());
             peer.setCurrentCipherKey(state.getCipherKey());
             peer.setCurrentMACKey(state.getMACKey());
-            peer.setTheyRelayToUsAs(state.getReceivedRelayTag());
             int mtu = state.getRemoteAddress().getMTU();
             if (mtu > 0)
                 peer.setHisMTU(mtu);
@@ -1068,6 +1061,7 @@ class EstablishmentManager {
             // OES2 sets PS2 MTU
             peer = state2.getPeerState();
         }
+        peer.setTheyRelayToUsAs(state.getReceivedRelayTag());
         // 0 is the default
         //peer.setWeRelayToThemAs(0);
         

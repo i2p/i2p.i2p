@@ -3434,6 +3434,20 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     /**
+     *  @since 0.9.54
+     */
+    IntroductionManager getIntroManager() {
+        return _introManager;
+    }
+
+    /**
+     *  @since 0.9.54
+     */
+    PeerTestManager getPeerTestManager() {
+        return _testManager;
+    }
+
+    /**
      * Does nothing
      * @deprecated as of 0.9.31
      */

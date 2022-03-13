@@ -126,7 +126,7 @@ class IntroductionManager {
     public void add(PeerState peer) {
         if (peer == null) return;
         // Skip SSU2 until we have support for relay
-        if (peer.getVersion() != 1)
+        if (peer.getVersion() != 1 && !SSU2Util.ENABLE_RELAY)
             return;
         // let's not use an introducer on a privileged port, sounds like trouble
         if (!TransportUtil.isValidPort(peer.getRemotePort()))

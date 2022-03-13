@@ -386,9 +386,41 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotRelayTagRequest() {
+        if (!ENABLE_RELAY)
+            return;
     }
 
     public void gotRelayTag(long tag) {
+        if (!ENABLE_RELAY)
+            return;
+        long old = getTheyRelayToUsAs();
+        if (old != 0) {
+            if (_log.shouldWarn())
+                _log.warn("Got new tag " + tag + " but had previous tag " + old + " on " + this);
+            return;
+        }
+        setTheyRelayToUsAs(tag);
+        _transport.getIntroManager().add(this);
+    }
+
+    public void gotRelayRequest(byte[] data) {
+        if (!ENABLE_RELAY)
+            return;
+    }
+
+    public void gotRelayResponse(int status, byte[] data) {
+        if (!ENABLE_RELAY)
+            return;
+    }
+
+    public void gotRelayIntro(Hash aliceHash, byte[] data) {
+        if (!ENABLE_RELAY)
+            return;
+    }
+
+    public void gotPeerTest(int msg, int status, Hash h, byte[] data) {
+        if (!ENABLE_PEER_TEST)
+            return;
     }
 
     public void gotToken(long token, long expires) {

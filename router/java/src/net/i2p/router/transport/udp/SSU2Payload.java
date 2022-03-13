@@ -8,6 +8,7 @@ import java.util.List;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.I2NPMessageImpl;
@@ -94,6 +95,30 @@ class SSU2Payload {
 
         public void gotRelayTag(long tag);
 
+        /**
+         *  @param data excludes flag, includes signature
+         */
+        public void gotRelayRequest(byte[] data);
+
+        /**
+         *  @param status 0 = accept, 1-255 = reject
+         *  @param data excludes flag, includes signature
+         */
+        public void gotRelayResponse(int status, byte[] data);
+
+        /**
+         *  @param data excludes flag, includes signature
+         */
+        public void gotRelayIntro(Hash aliceHash, byte[] data);
+
+        /**
+         *  @param msg 1-7
+         *  @param status 0 = accept, 1-255 = reject
+         *  @param h Alice or Charlie hash
+         *  @param data excludes flag, includes signature
+         */
+        public void gotPeerTest(int msg, int status, Hash h, byte[] data);
+
         public void gotToken(long token, long expires);
 
         /**
@@ -114,6 +139,7 @@ class SSU2Payload {
     /**
      *  Incoming payload. Calls the callback for each received block.
      *
+     *  @param isHandshake true for Token Req, Retry, Sess Req, Sess Created; false for Sess Confirmed
      *  @return number of blocks processed
      *  @throws IOException on major errors
      *  @throws DataFormatException on parsing of individual blocks
@@ -255,6 +281,55 @@ class SSU2Payload {
                     long tag = DataHelper.fromLong(payload, i, 4);
                     cb.gotRelayTag(tag);
                     break;
+
+                case BLOCK_RELAYREQ: {
+                    if (isHandshake)
+                        throw new IOException("Illegal block in handshake: " + type);
+                    if (len < 61) // 21 byte data w/ IPv4 + 40 byte DSA sig
+                        throw new IOException("Bad length for RELAYREQ: " + len);
+                    byte[] data = new byte[len - 1]; // skip flag
+                    System.arraycopy(payload, i + 1, data, 0, len - 1);
+                    cb.gotRelayRequest(data);
+                    break;
+                }
+
+                case BLOCK_RELAYRESP: {
+                    if (isHandshake)
+                        throw new IOException("Illegal block in handshake: " + type);
+                    if (len < 62) // 22 byte data w/ IPv4 + 40 byte DSA sig
+                        throw new IOException("Bad length for RELAYRESP: " + len);
+                    int resp = payload[i + 1] & 0xff; // skip flag
+                    byte[] data = new byte[len - 2];
+                    System.arraycopy(payload, i + 2, data, 0, len - 2);
+                    cb.gotRelayResponse(resp, data);
+                    break;
+                }
+
+                case BLOCK_RELAYINTRO: {
+                    if (isHandshake)
+                        throw new IOException("Illegal block in handshake: " + type);
+                    if (len < 93) // 32 byte hash + 21 byte data w/ IPv4 + 40 byte DSA sig
+                        throw new IOException("Bad length for RELAYINTRO: " + len);
+                    Hash h = Hash.create(payload, i + 1); // skip flag
+                    byte[] data = new byte[len - (1 + Hash.HASH_LENGTH)]; // skip flag
+                    System.arraycopy(payload, i + 1 + Hash.HASH_LENGTH, data, 0, data.length);
+                    cb.gotRelayIntro(h, data);
+                    break;
+                }
+
+                case BLOCK_PEERTEST: {
+                    if (isHandshake)
+                        throw new IOException("Illegal block in handshake: " + type);
+                    if (len < 92) // 32 byte hash + 20 byte data w/ IPv4 + 40 byte DSA sig
+                        throw new IOException("Bad length for PEERTEST: " + len);
+                    int mnum = payload[i] & 0xff;
+                    int resp = payload[i + 1] & 0xff;
+                    Hash h = Hash.create(payload, i + 3); // skip flag
+                    byte[] data = new byte[len - (3 + Hash.HASH_LENGTH)];
+                    System.arraycopy(payload, i + 3 + Hash.HASH_LENGTH, data, 0, data.length);
+                    cb.gotPeerTest(mnum, resp, h, data);
+                    break;
+                }
 
                 case BLOCK_NEWTOKEN:
                     if (len < 12)
@@ -641,6 +716,78 @@ class SSU2Payload {
         public int writeData(byte[] tgt, int off) {
             DataHelper.toLong(tgt, off, 4, t);
             return off + 4;
+        }
+    }
+
+    public static class RelayRequestBlock extends Block {
+        private final byte[] d;
+
+        public RelayRequestBlock(byte[] data) {
+            super(BLOCK_RELAYREQ);
+            d = data;
+        }
+
+        public int getDataLength() {
+            return d.length;
+        }
+
+        public int writeData(byte[] tgt, int off) {
+            System.arraycopy(d, 0, tgt, off, d.length);
+            return off + d.length;
+        }
+    }
+
+    public static class RelayResponseBlock extends Block {
+        private final byte[] d;
+
+        public RelayResponseBlock(byte[] data) {
+            super(BLOCK_RELAYRESP);
+            d = data;
+        }
+
+        public int getDataLength() {
+            return d.length;
+        }
+
+        public int writeData(byte[] tgt, int off) {
+            System.arraycopy(d, 0, tgt, off, d.length);
+            return off + d.length;
+        }
+    }
+
+    public static class RelayIntroBlock extends Block {
+        private final byte[] d;
+
+        public RelayIntroBlock(byte[] data) {
+            super(BLOCK_RELAYINTRO);
+            d = data;
+        }
+
+        public int getDataLength() {
+            return d.length;
+        }
+
+        public int writeData(byte[] tgt, int off) {
+            System.arraycopy(d, 0, tgt, off, d.length);
+            return off + d.length;
+        }
+    }
+
+    public static class PeerTestBlock extends Block {
+        private final byte[] d;
+
+        public PeerTestBlock(byte[] data) {
+            super(BLOCK_PEERTEST);
+            d = data;
+        }
+
+        public int getDataLength() {
+            return d.length;
+        }
+
+        public int writeData(byte[] tgt, int off) {
+            System.arraycopy(d, 0, tgt, off, d.length);
+            return off + d.length;
         }
     }
 

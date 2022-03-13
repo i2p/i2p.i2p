@@ -37,7 +37,7 @@ class OutboundEstablishState {
     private byte _receivedY[];
     protected byte _aliceIP[];
     protected int _alicePort;
-    private long _receivedRelayTag;
+    protected long _receivedRelayTag;
     private long _receivedSignedOnTime;
     private SessionKey _sessionKey;
     private SessionKey _macKey;
