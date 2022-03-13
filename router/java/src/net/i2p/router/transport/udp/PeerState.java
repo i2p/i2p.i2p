@@ -1722,10 +1722,11 @@ public class PeerState {
                 }
             }
         }
+      /****
         if ( rv == null && _log.shouldLog(Log.DEBUG))
             _log.debug("Nothing to send to " + _remotePeer + ", with " + _outboundMessages.size() +
                        " / " + _outboundQueue.size() + " remaining, rtx timer in " + (_retransmitTimer - now));
-
+       ****/
         return rv;
     }
 

@@ -944,12 +944,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * @since 0.9.54
      */
     private void addSSU2Options(Properties props) {
-        // only set i if we are not firewalled
-        if (props.containsKey("host")) {
-            props.setProperty("i", _ssu2B64StaticIntroKey);
-        } else {
-            props.remove("i");
-        }
+        // Unlike in NTCP2, we need the intro key whether firewalled or not
+        props.setProperty("i", _ssu2B64StaticIntroKey);
         props.setProperty("s", _ssu2B64StaticPubKey);
         props.setProperty("v", SSU2_VERSION);
     }
@@ -3544,7 +3540,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                         // TODO if both sides are firewalled should only one ping
                         // or else session will stay open forever?
                         //peer.setLastSendTime(now);
-                        send(_packetBuilder.buildPing(peer));
+                        UDPPacket ping;
+                        if (peer.getVersion() == 2)
+                            ping = _packetBuilder2.buildPing((PeerState2) peer);
+                        else
+                            ping = _packetBuilder.buildPing(peer);
+                        send(ping);
                         peer.setLastPingTime(now);
                         // If external port is different, it may be changing the port for every
                         // session, so ping all of them. Otherwise only one.

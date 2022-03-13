@@ -953,7 +953,7 @@ class PacketBuilder2 {
             int len = riblock.getTotalLength();
             blocks.add(riblock);
             // only if room
-            if (token > 0 && mtu - len >= 15) {
+            if (token > 0 && mtu - (SHORT_HEADER_SIZE + KEY_LEN + MAC_LEN + len + MAC_LEN) >= 15) {
                 Block block = new SSU2Payload.NewTokenBlock(token, _context.clock().now() + EstablishmentManager.IB_TOKEN_EXPIRATION);
                 len += block.getTotalLength();
                 blocks.add(block);

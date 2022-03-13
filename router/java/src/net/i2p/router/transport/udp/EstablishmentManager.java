@@ -518,8 +518,8 @@ class EstablishmentManager {
                 }
             
                 if (_context.blocklist().isBlocklisted(from.getIP())) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Receive session request from blocklisted IP: " + from);
+                    if (_log.shouldInfo())
+                        _log.info("Receive session request from blocklisted IP: " + from);
                     _context.statManager().addRateData("udp.establishBadIP", 1);
                     return; // drop the packet
                 }
@@ -594,8 +594,8 @@ class EstablishmentManager {
                 return; // drop the packet
             }
             if (_context.blocklist().isBlocklisted(from.getIP())) {
-                if (_log.shouldWarn())
-                    _log.warn("Receive session request from blocklisted IP: " + from);
+                if (_log.shouldInfo())
+                    _log.info("Receive session request from blocklisted IP: " + from);
                 _context.statManager().addRateData("udp.establishBadIP", 1);
                 return; // drop the packet
             }
@@ -679,8 +679,8 @@ class EstablishmentManager {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Receive session confirmed from: " + state);
         } else {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Receive (DUP?) session confirmed from: " + from);
+            if (_log.shouldInfo())
+                _log.info("Receive (DUP?) session confirmed from: " + from);
         }
     }
     
@@ -725,8 +725,8 @@ class EstablishmentManager {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Receive session created from: " + state);
         } else {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Receive (DUP?) session created from: " + from);
+            if (_log.shouldInfo())
+                _log.info("Receive (DUP?) session created from: " + from);
         }
     }
     
@@ -1427,7 +1427,8 @@ class EstablishmentManager {
         } else {
             // save for retx
             OutboundEstablishState2 state2 = (OutboundEstablishState2) state;
-            state2.confirmedPacketsSent(packets);
+            // PacketBuilder2 told the state
+            //state2.confirmedPacketsSent(packets);
             // we are done, go right to ps2
             handleCompletelyEstablished(state2);
         }

@@ -45,7 +45,7 @@ final class SSU2Util {
     public static final int HEADER_PROT_1_OFFSET = DEST_CONN_ID_OFFSET;
     public static final int HEADER_PROT_2_OFFSET = PKT_NUM_OFFSET;
 
-    public static final int PADDING_MAX = 64;
+    public static final int PADDING_MAX = 32;
 
     /** 40 */
     public static final int MIN_DATA_LEN = SHORT_HEADER_SIZE + TOTAL_PROT_SAMPLE_LEN;

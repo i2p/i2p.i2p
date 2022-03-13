@@ -271,6 +271,10 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         // logged in PacketBuilder2
         //if (_log.shouldDebug())
         //    _log.debug("Sending acks " + _receivedMessages + " on " + this);
+        synchronized(this) {
+            // cancel the ack timer
+            _wantACKSendSince = 0;
+        }
         return _receivedMessages;
     }
     SSU2Bitfield getAckedMessages() { return _ackedMessages; }

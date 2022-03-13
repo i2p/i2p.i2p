@@ -308,6 +308,7 @@ class SSU2Bitfield {
                 }
             }
         }
+      /****
         sb.append(" (RAW: ").append(thru).append(" A:").append(acnt);
         if (ranges != null) {
             for (int i = 0; i < rangeCount * 2; i += 2) {
@@ -316,6 +317,7 @@ class SSU2Bitfield {
             }
         }
         sb.append(')');
+      ****/
         return sb.toString();
     }
 
