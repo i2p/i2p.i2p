@@ -469,7 +469,9 @@ class PacketBuilder2 {
         if (numFragments * max != info.length)
             numFragments++;
 
-        if (numFragments > 1) {
+        // try to reduce bandwidth and leave room for other blocks by gzipping
+        // if it is large, even if it would strictly fit
+        if (numFragments > 1 || info.length > 1000) {
             byte[] gzipped = DataHelper.compress(info, 0, info.length, DataHelper.MAX_COMPRESSION);
             if (gzipped.length < info.length) {
                 if (_log.shouldWarn())

@@ -1,5 +1,8 @@
-2022-03-13 zzz
+2022-03-15 zzz
  * SSU2: Fixes
+
+2022-03-13 zzz
+ * SSU2: Fixes, stubs for relay and peer test (phase 2)
 
 2022-03-12 zzz
  * SSU2: Fixes
