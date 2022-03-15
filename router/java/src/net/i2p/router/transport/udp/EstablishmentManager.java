@@ -407,19 +407,21 @@ class EstablishmentManager {
                         _transport.failed(msg, "Peer has bad key, cannot establish");
                         return;
                     }
-                    boolean allowExtendedOptions = VersionComparator.comp(toRouterInfo.getVersion(),
-                                                                          VERSION_ALLOW_EXTENDED_OPTIONS) >= 0
-                                                   && !_context.getBooleanProperty(PROP_DISABLE_EXT_OPTS);
-                    // w/o ext options, it's always 'requested', no need to set
-                    // don't ask if they are indirect
-                    boolean requestIntroduction = allowExtendedOptions && !isIndirect &&
-                                                  _transport.introducersMaybeRequired(TransportUtil.isIPv6(ra));
                     if (version == 1) {
+                        boolean allowExtendedOptions = VersionComparator.comp(toRouterInfo.getVersion(),
+                                                                              VERSION_ALLOW_EXTENDED_OPTIONS) >= 0
+                                                       && !_context.getBooleanProperty(PROP_DISABLE_EXT_OPTS);
+                        // w/o ext options, it's always 'requested', no need to set
+                        // don't ask if they are indirect
+                        boolean requestIntroduction = allowExtendedOptions && !isIndirect &&
+                                                      _transport.introducersMaybeRequired(TransportUtil.isIPv6(ra));
                         state = new OutboundEstablishState(_context, maybeTo, to,
                                                        toIdentity, allowExtendedOptions,
                                                        requestIntroduction,
                                                        sessionKey, addr, _transport.getDHFactory());
                     } else if (version == 2) {
+                        boolean requestIntroduction = SSU2Util.ENABLE_RELAY && !isIndirect &&
+                                                      _transport.introducersMaybeRequired(TransportUtil.isIPv6(ra));
                         state = new OutboundEstablishState2(_context, _transport, maybeTo, to,
                                                             toIdentity, requestIntroduction, sessionKey, ra, addr);
                     } else {
@@ -1152,8 +1154,8 @@ class EstablishmentManager {
             InboundEstablishState2 state2 = (InboundEstablishState2) state;
             InboundEstablishState.InboundState istate = state2.getState();
             if (istate == IB_STATE_CREATED_SENT) {
-                if (_log.shouldDebug())
-                    _log.debug("Send created to: " + state);
+                if (_log.shouldInfo())
+                    _log.info("Retransmit created to: " + state);
                 // if already sent, get from the state to retx
                 pkt = state2.getRetransmitSessionCreatedPacket();
             } else if (istate == IB_STATE_REQUEST_RECEIVED) {
@@ -1204,8 +1206,8 @@ class EstablishmentManager {
             OutboundEstablishState.OutboundState ostate = state2.getState();
             if (ostate == OB_STATE_REQUEST_SENT ||
                 ostate == OB_STATE_REQUEST_SENT_NEW_TOKEN) {
-                if (_log.shouldDebug())
-                    _log.debug("Send Session Request to: " + state);
+                if (_log.shouldInfo())
+                    _log.info("Retransmit Session Request to: " + state);
                 // if already sent, get from the state to retx
                 packet = state2.getRetransmitSessionRequestPacket();
             } else if (ostate == OB_STATE_NEEDS_TOKEN ||

@@ -922,10 +922,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
         // check version == "2" || version starts with "2,"
         // and static key and intro key
+        // and, until we support relay, host and port.
         String v = addr.getOption("v");
         if (v == null ||
             addr.getOption("i") == null ||
             addr.getOption("s") == null ||
+            (!SSU2Util.ENABLE_RELAY && (addr.getHost() == null || addr.getPort() <= 0)) ||
             (!v.equals(SSU2_VERSION) && !v.startsWith(SSU2_VERSION_ALT))) {
             // his address is SSU1 or is outbound SSU2 only
             //return (rv == 1 && _enableSSU1) ? 1 : 0;
@@ -2315,6 +2317,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //if (getSSUVersion(addr) == 0)
             //    continue;
             if (addr.getOption("ihost0") == null) {
+                // No introducers
+                // Skip outbound-only or invalid address/port
                 byte[] ip = addr.getIP();
                 int port = addr.getPort();
                 if (ip == null || !TransportUtil.isValidPort(port) ||
@@ -2326,6 +2330,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // introducers
                 String caps = addr.getOption(UDPAddress.PROP_CAPACITY);
                 if (caps != null && caps.contains(CAP_IPV6) && !_haveIPv6Address)
+                    continue;
+                // Skip SSU2 with introducers until we support relay
+                if (_enableSSU2 && !SSU2Util.ENABLE_RELAY && addr.getTransportStyle().equals(STYLE2))
                     continue;
             }
             return addr;
@@ -3782,7 +3789,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         for (Iterator<PeerState> iter = new RandomIterator<PeerState>(peers); iter.hasNext(); ) {
             PeerState peer = iter.next();
             // Skip SSU2 until we have support for peer test
-            if (peer.getVersion() != 1)
+            if (peer.getVersion() != 1 && !SSU2Util.ENABLE_PEER_TEST)
                 continue;
             if ( (dontInclude != null) && (dontInclude.equals(peer.getRemoteHostId())) )
                 continue;
