@@ -7,6 +7,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.southernstorm.noise.protocol.ChaChaPolyCipherState;
@@ -56,6 +57,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     private long _skew;
     private int _mtu;
     private PeerState2 _pstate;
+    private List<UDPPacket> _queuedDataPackets;
     
     // testing
     private static final boolean ENFORCE_TOKEN = true;
@@ -434,7 +436,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     public byte[] getSendHeaderEncryptKey1() { return _sendHeaderEncryptKey1; }
     public byte[] getRcvHeaderEncryptKey1() { return _rcvHeaderEncryptKey1; }
     public byte[] getSendHeaderEncryptKey2() { return _sendHeaderEncryptKey2; }
-    public byte[] getRcvHeaderEncryptKey2() { return _rcvHeaderEncryptKey2; }
+    public synchronized byte[] getRcvHeaderEncryptKey2() { return _rcvHeaderEncryptKey2; }
     public InetSocketAddress getSentAddress() { return _aliceSocketAddress; }
 
     @Override
@@ -661,8 +663,50 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
      * @return null if we have not received the session confirmed
      */
     public synchronized PeerState2 getPeerState() {
-        _currentState = InboundState.IB_STATE_COMPLETE;
+        if (_pstate != null) {
+            _currentState = InboundState.IB_STATE_COMPLETE;
+            if (_queuedDataPackets != null) {
+                for (UDPPacket packet : _queuedDataPackets) {
+                    if (_log.shouldWarn())
+                        _log.warn("Passing possible data " + packet + " to PeerState2: " + this);
+                    _pstate.receivePacket(packet);
+                    packet.release();
+                }
+                _queuedDataPackets.clear();
+            }
+        }
         return _pstate;
+    }
+
+    /**
+     * @param packet with header still encrypted
+     */
+    public synchronized void queuePossibleDataPacket(UDPPacket packet) {
+        if (_pstate == null) {
+            // case 1, race or out-of-order, queue until we have the peerstate
+            if (_queuedDataPackets == null) {
+                _queuedDataPackets = new ArrayList<UDPPacket>(4);
+            } else if (_queuedDataPackets.size() >= 10) {
+                if (_log.shouldWarn())
+                    _log.warn("Not queueing possible data " + packet + ", too many queued on " + this);
+                return;
+            }
+            if (_log.shouldWarn())
+                _log.warn("Queueing possible data " + packet + " on " + this);
+            // have to copy it because PacketHandler will release
+            DatagramPacket pkt = packet.getPacket();
+            UDPPacket packet2 = UDPPacket.acquire(_context, true);
+            DatagramPacket pkt2 = packet2.getPacket();
+            System.arraycopy(pkt.getData(), pkt.getOffset(), pkt2.getData(), pkt2.getOffset(), pkt.getLength());
+            pkt2.setLength(pkt.getLength());
+            pkt2.setSocketAddress(pkt.getSocketAddress());
+            _queuedDataPackets.add(packet2);
+        } else {
+            // case 2, race, decrypt header and pass over
+            if (_log.shouldWarn())
+                _log.warn("Passing possible data " + packet + " to PeerState2: " + this);
+            _pstate.receivePacket(packet);
+        }
     }
     
     @Override

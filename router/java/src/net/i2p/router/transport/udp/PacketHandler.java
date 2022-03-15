@@ -820,8 +820,10 @@ class PacketHandler {
                 if (header == null ||
                     header.getVersion() != 2 ||
                     header.getNetID() != _networkID) {
-                    if (_log.shouldWarn())
-                        _log.warn("Does not decrypt as Session Request, Token Request, or Peer Test: " + header);
+                    // typical case, SSU 1 that didn't validate, will be logged at WARN level above
+                    // in group 4 receive packet
+                    //if (_log.shouldDebug())
+                    //    _log.debug("Does not decrypt as Session Request, Token Request, or Peer Test: " + header);
                     return false;
                 }
                 type = header.getType();
@@ -851,26 +853,42 @@ class PacketHandler {
                     // tell establisher?
                     return false;
                 }
+                if (header.getDestConnID() != state.getRcvConnID()) {
+                    if (_log.shouldWarn())
+                        _log.warn("Bad Dest Conn id " + header);
+                    return false;
+                }
                 type = SSU2Util.SESSION_REQUEST_FLAG_BYTE;
             } else {
                 // Session Confirmed or retransmitted Session Request or Token Request
                 header = SSU2Header.trialDecryptShortHeader(packet, k1, k2);
-                if (header == null ||
+                if (header == null) {
+                    // too short
+                    if (_log.shouldWarn())
+                        _log.warn("Failed decrypt Session Confirmed");
+                    return false;
+                }
+                if (header.getDestConnID() != state.getRcvConnID()) {
+                    if (_log.shouldWarn())
+                        _log.warn("Bad Dest Conn id " + header);
+                    return false;
+                }
+                if (header.getPacketNumber() != 0 ||
                     header.getType() != SSU2Util.SESSION_CONFIRMED_FLAG_BYTE) {
                     if (_log.shouldWarn())
-                        _log.warn("Failed decrypt Session Confirmed: " + header);
+                        _log.warn("Queue possible data packet on: " + state);
                     // TODO either attempt to decrypt as a retransmitted
                     // Session Request or Token Request,
                     // or just tell establisher so it can retransmit Session Created or Retry
-                    // Could also be Data messages after (possibly lost or out-of-order) Session Confirmed
-                    return false;
+
+                    // Possible ordering issues and races:
+                    // Case 1: Data packets before (possibly lost or out-of-order) Session Confirmed
+                    // Case 2: Data packets after Session Confirmed but it wasn't processed yet
+                    // Queue the packet with the state for processing
+                    state.queuePossibleDataPacket(packet);
+                    return true;
                 }
                 type = SSU2Util.SESSION_CONFIRMED_FLAG_BYTE;
-            }
-            if (header.getDestConnID() != state.getRcvConnID()) {
-                if (_log.shouldWarn())
-                    _log.warn("Bad Dest Conn id " + header);
-                return false;
             }
         }
 
