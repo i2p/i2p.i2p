@@ -782,6 +782,11 @@ public class GeoIP {
      * @param ip IPv4 or IPv6
      */
     public void add(byte ip[]) {
+        // skip he.net tunnel 2001:470:: so we will get correct geoip from IPv4
+        if (ip.length == 16 &&
+            ip[0] == 0x20 && ip[1] == 0x01 &&
+            ip[2] == 0x04 && ip[3] == 0x70)
+            return;
         add(toLong(ip));
     }
 
@@ -815,6 +820,11 @@ public class GeoIP {
      * @return lower-case code, generally two letters, or null.
      */
     String get(byte ip[]) {
+        // skip he.net tunnel 2001:470:: so we will get correct geoip from IPv4
+        if (ip.length == 16 &&
+            ip[0] == 0x20 && ip[1] == 0x01 &&
+            ip[2] == 0x04 && ip[3] == 0x70)
+            return null;
         return get(toLong(ip));
     }
 

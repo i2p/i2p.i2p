@@ -86,6 +86,13 @@ public class MTU {
                                 log.logAlways(Log.WARN, "Unusually low MTU " + mtu + " for interface " + ia +
                                                         ", consider disabling");
                             }
+                            // fix for he.net tunnels with too big MTU
+                            if (isIPv6 && mtu > 1472) {
+                                byte[] ip = addr.getAddress();
+                                if (ip[0] == 0x20 && ip[1] == 0x01 &&
+                                    ip[2] == 0x04 && ip[3] == 0x70)
+                                    return 1472;
+                            }
                             return rectify(isIPv6, mtu);
                         } catch (SocketException se) {
                             // ignore
