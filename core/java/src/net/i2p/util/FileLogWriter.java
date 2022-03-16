@@ -71,7 +71,7 @@ class FileLogWriter extends LogWriter {
                 System.err.println("Error writing log, disk full? " + t);
             //t.printStackTrace();
         }
-        if (_numBytesInCurrentFile >= _manager.getFileSize()) {
+        if (_numBytesInCurrentFile >= _manager.getFileSize() - 1024) {
             rotateFile();
         }
     }
