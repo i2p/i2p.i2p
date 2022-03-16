@@ -1448,17 +1448,9 @@ div.widepanel h3 {
     display: none;
 }
 
-#graphopts+p {
-    display: none;
-}
-
 h3#graphinfo {
     margin-top: 15px;
     border-radius: 0 !important;
-}
-
-.graphspanel p:last-child {
-    display: none;
 }
 
 .formaction#graphing {

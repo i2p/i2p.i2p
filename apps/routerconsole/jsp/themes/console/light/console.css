@@ -2194,11 +2194,6 @@ p#tunnelconfig {
     display: none;
 }
 
-#graphopts+p {
-    text-align: right;
-    display: none;
-}
-
 .formaction#graphing {
     margin: 8px -11px -11px;
 }
