@@ -355,9 +355,7 @@ public class GraphHelper extends FormHandler {
             _out.write(link(_stat, !_showEvents, _periodCount, _end, _width, _height));
             if (!_stat.equals("bw.combined"))
                 _out.write(_showEvents ? _t("Plot averages") : _t("plot events"));
-            _out.write("</a>");
-
-            _out.write("</p><p><i>" + _t("All times are UTC.") + "</i></p>\n");
+            _out.write("</a></p>\n");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
