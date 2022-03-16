@@ -61,6 +61,11 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     private static final long MAX_SKEW = 2*60*1000L;
 
     /**
+     *  Prepare to start a new handshake with the given peer.
+     *
+     *  Caller must then check getState() and build a
+     *  Token Request or Session Request to send to the peer.
+     *
      *  @param claimedAddress an IP/port based RemoteHostId, or null if unknown
      *  @param remoteHostId non-null, == claimedAddress if direct, or a hash-based one if indirect
      *  @param remotePeer must have supported sig type

@@ -359,7 +359,8 @@ class PacketHandler {
                     // For now, try SSU2 Session/Token Request processing here.
                     // After we've migrated the majority of the network over to SSU2,
                     // we can try SSU2 first.
-                    if (_enableSSU2 && peerType == PeerType.NEW_PEER) {
+                    if (_enableSSU2 && peerType == PeerType.NEW_PEER &&
+                        packet.getPacket().getLength() >= SSU2Util.MIN_TOKEN_REQUEST_LEN) {
                         boolean handled = receiveSSU2Packet(remoteHost, packet, (InboundEstablishState2) null);
                         if (handled)
                             return;
@@ -773,6 +774,8 @@ class PacketHandler {
      *  Packet is decrypted in-place, no fallback
      *  processing is possible.
      *
+     *  Min packet data size: 40
+     *
      *  @param packet any in-session message
      *  @param state must be version 2, non-null
      *  @since 0.9.54
@@ -792,7 +795,9 @@ class PacketHandler {
      *  Possible messages here are Session Request, Token Request, Session Confirmed, or Peer Test.
      *  Data messages out-of-order from Session Confirmed, or following a
      *  Session Confirmed that was lost, or in-order but before the Session Confirmed was processed,
-     *  will not be successfully decrypted and will be dropped.
+     *  will handed to the state to be queued for deferred handling.
+     *
+     *  Min packet data size: 56 (token request) if state is null; 40 (data) if state is non-null
      *
      *  @param state must be version 2, but will be null for session request unless retransmitted
      *  @return true if the header was validated as a SSU2 packet, cannot fallback to SSU 1
@@ -924,6 +929,8 @@ class PacketHandler {
      *  But that's probably not necessary.
      *
      *  Possible messages here are Session Created or Retry
+     *
+     *  Min packet data size: 56 (retry)
      *
      *  @param state must be version 2, non-null
      *  @return true if the header was validated as a SSU2 packet, cannot fallback to SSU 1

@@ -630,7 +630,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     /**
      * @return null if not sent or already got the ack
      */
-    public synchronized UDPPacket[] getRetransmitSessionConfirmedPackets() {
+    private synchronized UDPPacket[] getRetransmitSessionConfirmedPackets() {
         if (_sessConfForReTX == null)
             return null;
         UDPPacket packet = UDPPacket.acquire(_context, false);

@@ -65,6 +65,12 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
 
 
     /**
+     *  Start a new handshake with the given incoming packet,
+     *  which must be a Session Request or Token Request.
+     *
+     *  Caller must then check getState() and build a
+     *  Retry or Session Created in response.
+     *
      *  @param packet with all header encryption removed,
      *                either a SessionRequest OR a TokenRequest.
      */
@@ -136,7 +142,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             if (_log.shouldDebug())
                 _log.debug("State after mixHash 1: " + _handshakeState);
 
-            byte[] payload = new byte[len - 80]; // 32 hdr, 32 eph. key, 16 MAC
             // decrypt in-place
             try {
                 _handshakeState.readMessage(data, off + LONG_HEADER_SIZE, len - LONG_HEADER_SIZE, data, off + LONG_HEADER_SIZE);
