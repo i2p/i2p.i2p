@@ -109,7 +109,7 @@ public class PeerState {
     private final Queue<ResendACK> _currentACKsResend;
 
     /** when did we last send ACKs to the peer? */
-    private volatile long _lastACKSend;
+    protected volatile long _lastACKSend;
     /** when did we decide we need to ACK to this peer? */
     protected volatile long _wantACKSendSince;
     /** have we received a packet with the ECN bit set in the current second? */
@@ -358,8 +358,6 @@ public class PeerState {
             _sendWindowBytes = 4 * _mtu;
         _sendWindowBytesRemaining = _sendWindowBytes;
 
-        _lastACKSend = -1;
-
         _rto = INIT_RTO;
         _rtt = INIT_RTT;
         if (rtt > 0)
@@ -408,8 +406,6 @@ public class PeerState {
         // RFC 5681 sec. 3.1
         _sendWindowBytes = 3 * _mtu;
         _sendWindowBytesRemaining = _sendWindowBytes;
-
-        _lastACKSend = -1;
 
         _rto = INIT_RTO;
         _rtt = INIT_RTT;
