@@ -83,7 +83,7 @@ class PeerTestEvent extends SimpleTimer2.TimedEvent {
         if (bob != null) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Running periodic test with bob = " + bob);
-            _testManager.runTest(bob.getRemoteIPAddress(), bob.getRemotePort(), bob.getCurrentCipherKey(), bob.getCurrentMACKey());
+            _testManager.runTest(bob);
             setLastTested(isIPv6);
         } else {
             if (_log.shouldLog(Log.WARN))

@@ -177,23 +177,21 @@ class PeerTestManager {
      *
      *  @param bobIP IPv4 only
      */
-    public synchronized void runTest(InetAddress bobIP, int bobPort, SessionKey bobCipherKey, SessionKey bobMACKey) {
+    public synchronized void runTest(PeerState bob) {
         if (_currentTest != null) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("We are already running a test: " + _currentTest + ", aborting test with bob = " + bobIP);
+                _log.warn("We are already running a test: " + _currentTest + ", aborting test with bob = " + bob);
             return;
         }
+        InetAddress bobIP = bob.getRemoteIPAddress();
         if (_transport.isTooClose(bobIP.getAddress())) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Not running test with Bob too close to us " + bobIP);
             return;
         }
-        PeerTestState test = new PeerTestState(ALICE, bobIP instanceof Inet6Address,
+        PeerTestState test = new PeerTestState(ALICE, bob, bobIP instanceof Inet6Address,
                                                _context.random().nextLong(MAX_NONCE),
                                                _context.clock().now());
-        test.setBobIP(bobIP);
-        test.setBobPort(bobPort);
-        test.setBobKeys(bobCipherKey, bobMACKey);
         _currentTest = test;
         _currentTestComplete = false;
         
@@ -702,7 +700,7 @@ class PeerTestManager {
         boolean isNew = false;
         if (state == null) {
             isNew = true;
-            state = new PeerTestState(CHARLIE, sz == 16, nonce, now);
+            state = new PeerTestState(CHARLIE, bob, sz == 16, nonce, now);
         } else {
             if (state.getReceiveBobTime() > now - (RESEND_TIMEOUT / 2)) {
                 if (_log.shouldLog(Log.WARN))
@@ -730,10 +728,7 @@ class PeerTestManager {
             state.setAliceIP(aliceIP);
             state.setAlicePort(alicePort);
             state.setAliceIntroKey(aliceIntroKey);
-            state.setBobIP(bobIP);
-            state.setBobPort(from.getPort());
             state.setReceiveBobTime(now);
-            state.setBobKeys(bob.getCurrentCipherKey(), bob.getCurrentMACKey());
             
             // we send two packets below, but increment just once
             if (state.incrementPacketsRelayed() > MAX_RELAYED_PER_TEST_CHARLIE) {
@@ -834,7 +829,7 @@ class PeerTestManager {
             boolean isNew = false;
             if (state == null) {
                 isNew = true;
-                state = new PeerTestState(BOB, isIPv6, nonce, now);
+                state = new PeerTestState(BOB, null, isIPv6, nonce, now);
             } else {
                 if (state.getReceiveAliceTime() > now - (RESEND_TIMEOUT / 2)) {
                     if (_log.shouldLog(Log.WARN))

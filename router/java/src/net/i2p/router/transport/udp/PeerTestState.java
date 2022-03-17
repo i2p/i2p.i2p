@@ -16,8 +16,7 @@ class PeerTestState {
     private final boolean _isIPv6;
     private InetAddress _aliceIP;
     private int _alicePort;
-    private InetAddress _bobIP;
-    private int _bobPort;
+    private final PeerState _bob;
     private InetAddress _charlieIP;
     private int _charliePort;
     private InetAddress _aliceIPFromCharlie;
@@ -26,8 +25,6 @@ class PeerTestState {
     private SessionKey _aliceCipherKey;
     private SessionKey _aliceMACKey;
     private SessionKey _charlieIntroKey;
-    private SessionKey _bobCipherKey;
-    private SessionKey _bobMACKey;
     private final long _beginTime;
     private long _lastSendTime;
     private long _receiveAliceTime;
@@ -37,8 +34,12 @@ class PeerTestState {
     
     public enum Role {ALICE, BOB, CHARLIE};
     
-    public PeerTestState(Role role, boolean isIPv6, long nonce, long now) {
+    /**
+     * @param bob null if role is BOB
+     */
+    public PeerTestState(Role role, PeerState bob, boolean isIPv6, long nonce, long now) {
         _ourRole = role;
+        _bob = bob;
         _isIPv6 = isIPv6;
         _testNonce = nonce;
         _beginTime = now;
@@ -63,8 +64,7 @@ class PeerTestState {
      */
     public InetAddress getAliceIP() { return _aliceIP; }
     public void setAliceIP(InetAddress ip) { _aliceIP = ip; }
-    public InetAddress getBobIP() { return _bobIP; }
-    public void setBobIP(InetAddress ip) { _bobIP = ip; }
+    public InetAddress getBobIP() { return _bob.getRemoteIPAddress(); }
     public InetAddress getCharlieIP() { return _charlieIP; }
     public void setCharlieIP(InetAddress ip) { _charlieIP = ip; }
     public InetAddress getAliceIPFromCharlie() { return _aliceIPFromCharlie; }
@@ -77,8 +77,7 @@ class PeerTestState {
      */
     public int getAlicePort() { return _alicePort; }
     public void setAlicePort(int alicePort) { _alicePort = alicePort; }
-    public int getBobPort() { return _bobPort; }
-    public void setBobPort(int bobPort) { _bobPort = bobPort; }
+    public int getBobPort() { return _bob.getRemotePort(); }
     public int getCharliePort() { return _charliePort; }
     public void setCharliePort(int charliePort) { _charliePort = charliePort; }
     
@@ -111,19 +110,9 @@ class PeerTestState {
     public SessionKey getCharlieIntroKey() { return _charlieIntroKey; }
     public void setCharlieIntroKey(SessionKey key) { _charlieIntroKey = key; }
 
-    public SessionKey getBobCipherKey() { return _bobCipherKey; }
-    public SessionKey getBobMACKey() { return _bobMACKey; }
+    public SessionKey getBobCipherKey() { return _bob.getCurrentCipherKey(); }
+    public SessionKey getBobMACKey() { return _bob.getCurrentMACKey(); }
 
-    /**
-     *  @param ck cipher key
-     *  @param mk MAC key
-     *  @since 0.9.52
-     */
-    public void setBobKeys(SessionKey ck, SessionKey mk) {
-        _bobCipherKey = ck;
-        _bobMACKey = mk;
-    }
-    
     /** when did this test begin? */
     public long getBeginTime() { return _beginTime; }
 
@@ -159,8 +148,8 @@ class PeerTestState {
             buf.append("; Alice: ").append(_aliceIP).append(':').append(_alicePort);
         if (_aliceIPFromCharlie != null)
             buf.append(" (fromCharlie ").append(_aliceIPFromCharlie).append(':').append(_alicePortFromCharlie).append(')');
-        if (_bobIP != null)
-            buf.append("; Bob: ").append(_bobIP).append(':').append(_bobPort);
+        if (_bob != null)
+            buf.append("; Bob: ").append(_bob.toString());
         if (_charlieIP != null)
             buf.append(" Charlie: ").append(_charlieIP).append(':').append(_charliePort);
         if (_lastSendTime > 0)
