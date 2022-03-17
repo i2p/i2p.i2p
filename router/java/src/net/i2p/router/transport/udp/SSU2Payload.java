@@ -774,18 +774,37 @@ class SSU2Payload {
     }
 
     public static class PeerTestBlock extends Block {
+        private final int n;
+        private final int c;
+        private final Hash h;
         private final byte[] d;
 
-        public PeerTestBlock(byte[] data) {
+        /**
+         *  @param hash may be null
+         */
+        public PeerTestBlock(int msgNum, int code, Hash hash, byte[] data) {
             super(BLOCK_PEERTEST);
+            n = msgNum;
+            c = code;
+            h = hash;
             d = data;
         }
 
         public int getDataLength() {
-            return d.length;
+            int rv = 3 + d.length;
+            if (h != null)
+                rv += Hash.HASH_LENGTH;
+            return rv;
         }
 
         public int writeData(byte[] tgt, int off) {
+            tgt[off++] = (byte) n;
+            tgt[off++] = (byte) c;
+            tgt[off++] = 0;  // flag
+            if (h != null) {
+                System.arraycopy(h.getData(), 0, tgt, off, Hash.HASH_LENGTH);
+                off += Hash.HASH_LENGTH;
+            }
             System.arraycopy(d, 0, tgt, off, d.length);
             return off + d.length;
         }

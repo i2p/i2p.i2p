@@ -50,6 +50,9 @@ class PacketBuilder2 {
     static final int TYPE_FIRST = 62;
     static final int TYPE_ACK = TYPE_FIRST;
     static final int TYPE_PUNCH = 63;
+    static final int TYPE_RESP = 64;
+    static final int TYPE_INTRO = 65;
+    static final int TYPE_RREQ = 66;
     static final int TYPE_TCB = 67;
     static final int TYPE_TBC = 68;
     static final int TYPE_TTA = 69;
@@ -528,176 +531,151 @@ class PacketBuilder2 {
     }
 
     /**
-     * Build a packet as if we are Alice and we either want Bob to begin a 
-     * peer test or Charlie to finish a peer test.
+     * Build a packet as Alice, to Bob to begin a  peer test.
+     * In-session, message 1.
      * 
      * @return ready to send packet, or null if there was a problem
      */
-/*
-    public UDPPacket buildPeerTestFromAlice(InetAddress toIP, int toPort, SessionKey toIntroKey, long nonce, SessionKey aliceIntroKey) {
-        return buildPeerTestFromAlice(toIP, toPort, toIntroKey, toIntroKey, nonce, aliceIntroKey);
+    public UDPPacket buildPeerTestFromAlice(byte[] signedData, PeerState2 bob) {
+        Block block = new SSU2Payload.PeerTestBlock(1, 0, null, signedData);
+        UDPPacket rv = buildPacket(Collections.emptyList(), Collections.singletonList(block), bob);
+        rv.setMessageType(TYPE_TFA);
+        return rv;
     }
-*/
 
     /**
-     * Build a packet as if we are Alice and we either want Bob to begin a 
-     * peer test or Charlie to finish a peer test.
+     * Build a packet as Alice to Charlie.
+     * Out-of-session, message 6.
      * 
      * @return ready to send packet, or null if there was a problem
      */
-/*
-    public UDPPacket buildPeerTestFromAlice(InetAddress toIP, int toPort, SessionKey toCipherKey, SessionKey toMACKey,
-                                            long nonce, SessionKey aliceIntroKey) {
-        UDPPacket packet = buildShortPacketHeader(PEER_TEST_FLAG_BYTE);
-        DatagramPacket pkt = packet.getPacket();
-        byte data[] = pkt.getData();
-        int off = SHORT_HEADER_SIZE;
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending peer test " + nonce + " to Bob");
-        
-        // now for the body
-        DataHelper.toLong(data, off, 4, nonce);
-        off += 4;
-        data[off++] = 0; // neither Bob nor Charlie need Alice's IP from her
-        DataHelper.toLong(data, off, 2, 0); // neither Bob nor Charlie need Alice's port from her
-        off += 2;
-        System.arraycopy(aliceIntroKey.getData(), 0, data, off, SessionKey.KEYSIZE_BYTES);
-        off += SessionKey.KEYSIZE_BYTES;
-        
-        pkt.setLength(off);
-        authenticate(packet, toCipherKey, toMACKey);
+    public UDPPacket buildPeerTestFromAlice(InetAddress toIP, int toPort, SessionKey introKey,
+                                            long sendID, long rcvID, byte[] signedData) {
+        long n = _context.random().signedNextInt() & 0xFFFFFFFFL;
+        long token = _context.random().nextLong();
+        UDPPacket packet = buildLongPacketHeader(sendID, n, PEER_TEST_FLAG_BYTE, rcvID, token);
+        Block block = new SSU2Payload.PeerTestBlock(6, 0, null, signedData);
+        byte[] ik = introKey.getData();
+        encryptPeerTest(packet, ik, n, ik, ik, toIP.getAddress(), toPort, block);
         setTo(packet, toIP, toPort);
         packet.setMessageType(TYPE_TFA);
         packet.setPriority(PRIORITY_LOW);
         return packet;
     }
-*/
 
     /**
-     * Build a packet as if we are either Bob or Charlie and we are helping test Alice.
-     * Not for use as Bob, as of 0.9.52; use in-session cipher/mac keys instead.
+     * Build a packet as Bob to Alice, with the response from Charlie,
+     * or a rejection by Bob.
+     * In-session, message 4.
      *
+     * @param charlieHash fake hash (all zeros) if rejected by bob
      * @return ready to send packet, or null if there was a problem
      */
-/*
-    public UDPPacket buildPeerTestToAlice(InetAddress aliceIP, int alicePort,
-                                          SessionKey aliceIntroKey, SessionKey charlieIntroKey, long nonce) {
-        return buildPeerTestToAlice(aliceIP, alicePort, aliceIntroKey, aliceIntroKey, charlieIntroKey, nonce);
+    public UDPPacket buildPeerTestToAlice(int code, Hash charlieHash, byte[] signedData, PeerState2 alice) {
+        Block block = new SSU2Payload.PeerTestBlock(4, code, charlieHash, signedData);
+        UDPPacket rv = buildPacket(Collections.emptyList(), Collections.singletonList(block), alice);
+        rv.setMessageType(TYPE_TTA);
+        return rv;
     }
-*/
 
     /**
-     * Build a packet as if we are either Bob or Charlie and we are helping test Alice.
+     * Build a packet as Charlie to Alice.
+     * Out-of-session, messages 5 and 7.
      * 
-     * @param aliceCipherKey the intro key if we are Charlie
-     * @param aliceMACKey the intro key if we are Charlie
      * @return ready to send packet, or null if there was a problem
      */
-/*
-    public UDPPacket buildPeerTestToAlice(InetAddress aliceIP, int alicePort,
-                                          SessionKey aliceCipherKey, SessionKey aliceMACKey,
-                                          SessionKey charlieIntroKey, long nonce) {
-        UDPPacket packet = buildShortPacketHeader(PEER_TEST_FLAG_BYTE);
-        DatagramPacket pkt = packet.getPacket();
-        byte data[] = pkt.getData();
-        int off = SHORT_HEADER_SIZE;
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending peer test " + nonce + " to Alice");
-        
-        // now for the body
-        DataHelper.toLong(data, off, 4, nonce);
-        off += 4;
-        byte ip[] = aliceIP.getAddress();
-        data[off++] = (byte) ip.length;
-        System.arraycopy(ip, 0, data, off, ip.length);
-        off += ip.length;
-        DataHelper.toLong(data, off, 2, alicePort);
-        off += 2;
-        System.arraycopy(charlieIntroKey.getData(), 0, data, off, SessionKey.KEYSIZE_BYTES);
-        off += SessionKey.KEYSIZE_BYTES;
-        
-        pkt.setLength(off);
-        authenticate(packet, aliceCipherKey, aliceMACKey);
+    public UDPPacket buildPeerTestToAlice(InetAddress aliceIP, int alicePort, SessionKey introKey,
+                                          boolean firstSend,
+                                          long sendID, long rcvID, byte[] signedData) {
+        long n = _context.random().signedNextInt() & 0xFFFFFFFFL;
+        long token = _context.random().nextLong();
+        UDPPacket packet = buildLongPacketHeader(sendID, n, PEER_TEST_FLAG_BYTE, rcvID, token);
+        int msgNum = firstSend ? 5 : 7;
+        Block block = new SSU2Payload.PeerTestBlock(msgNum, 0, null, signedData);
+        byte[] ik = introKey.getData();
+        encryptPeerTest(packet, ik, n, ik, ik, aliceIP.getAddress(), alicePort, block);
         setTo(packet, aliceIP, alicePort);
         packet.setMessageType(TYPE_TTA);
         packet.setPriority(PRIORITY_LOW);
         return packet;
     }
-*/
 
     /**
-     * Build a packet as if we are Bob sending Charlie a packet to help test Alice.
+     * Build a packet as Bob to Charlie to help test Alice.
+     * In-session, message 2.
      * 
      * @return ready to send packet, or null if there was a problem
      */
-/*
-    public UDPPacket buildPeerTestToCharlie(InetAddress aliceIP, int alicePort, SessionKey aliceIntroKey, long nonce, 
-                                            InetAddress charlieIP, int charliePort, 
-                                            SessionKey charlieCipherKey, SessionKey charlieMACKey) {
-        UDPPacket packet = buildShortPacketHeader(PEER_TEST_FLAG_BYTE);
-        DatagramPacket pkt = packet.getPacket();
-        byte data[] = pkt.getData();
-        int off = SHORT_HEADER_SIZE;
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending peer test " + nonce + " to Charlie");
-        
-        // now for the body
-        DataHelper.toLong(data, off, 4, nonce);
-        off += 4;
-        byte ip[] = aliceIP.getAddress();
-        data[off++] = (byte) ip.length;
-        System.arraycopy(ip, 0, data, off, ip.length);
-        off += ip.length;
-        DataHelper.toLong(data, off, 2, alicePort);
-        off += 2;
-        System.arraycopy(aliceIntroKey.getData(), 0, data, off, SessionKey.KEYSIZE_BYTES);
-        off += SessionKey.KEYSIZE_BYTES;
-        
-        pkt.setLength(off);
-        authenticate(packet, charlieCipherKey, charlieMACKey);
-        setTo(packet, charlieIP, charliePort);
-        packet.setMessageType(TYPE_TBC);
-        packet.setPriority(PRIORITY_LOW);
-        return packet;
+    public UDPPacket buildPeerTestToCharlie(Hash aliceHash, byte[] signedData, PeerState2 charlie) {
+        Block block = new SSU2Payload.PeerTestBlock(2, 0, aliceHash, signedData);
+        UDPPacket rv = buildPacket(Collections.emptyList(), Collections.singletonList(block), charlie);
+        rv.setMessageType(TYPE_TBC);
+        return rv;
     }
-*/
     
     /**
-     * Build a packet as if we are Charlie sending Bob a packet verifying that we will help test Alice.
+     * Build a packet as Charlie to Bob verifying that we will help test Alice.
+     * In-session, message 3.
      * 
      * @return ready to send packet, or null if there was a problem
      */
-/*
-    public UDPPacket buildPeerTestToBob(InetAddress bobIP, int bobPort, InetAddress aliceIP, int alicePort,
-                                        SessionKey aliceIntroKey, long nonce,
-                                        SessionKey bobCipherKey, SessionKey bobMACKey) {
-        UDPPacket packet = buildShortPacketHeader(PEER_TEST_FLAG_BYTE);
-        DatagramPacket pkt = packet.getPacket();
-        byte data[] = pkt.getData();
-        int off = SHORT_HEADER_SIZE;
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending peer test " + nonce + " to Bob");
-        
-        // now for the body
-        DataHelper.toLong(data, off, 4, nonce);
-        off += 4;
-        byte ip[] = aliceIP.getAddress();
-        data[off++] = (byte) ip.length;
-        System.arraycopy(ip, 0, data, off, ip.length);
-        off += ip.length;
-        DataHelper.toLong(data, off, 2, alicePort);
-        off += 2;
-        System.arraycopy(aliceIntroKey.getData(), 0, data, off, SessionKey.KEYSIZE_BYTES);
-        off += SessionKey.KEYSIZE_BYTES;
-        
-        pkt.setLength(off);
-        authenticate(packet, bobCipherKey, bobMACKey);
-        setTo(packet, bobIP, bobPort);
-        packet.setMessageType(TYPE_TCB);
-        packet.setPriority(PRIORITY_LOW);
-        return packet;
+    public UDPPacket buildPeerTestToBob(int code, byte[] signedData, PeerState2 bob) {
+        Block block = new SSU2Payload.PeerTestBlock(3, code, null, signedData);
+        UDPPacket rv = buildPacket(Collections.emptyList(), Collections.singletonList(block), bob);
+        rv.setMessageType(TYPE_TCB);
+        return rv;
     }
-*/
+
+    /**
+     *  build intro packets for each of the published introducers
+     *
+     *  @param emgr only to call emgr.isValid()
+     *  @return empty list on failure
+     */
+    public List<UDPPacket> buildRelayRequest(EstablishmentManager emgr, OutboundEstablishState2 state) {
+        return null;
+    }
+
+    /**
+     *  From Alice to Bob.
+     *  In-session.
+     *
+     *  @return null on failure
+     */
+    private UDPPacket buildRelayRequest(byte[] signedData, PeerState2 bob) {
+        Block block = new SSU2Payload.RelayRequestBlock(signedData);
+        UDPPacket rv = buildPacket(Collections.emptyList(), Collections.singletonList(block), bob);
+        rv.setMessageType(TYPE_RREQ);
+        rv.setPriority(PRIORITY_HIGH);
+        return rv;
+    }
+
+    /**
+     *  From Bob to Charlie.
+     *  In-session.
+     *
+     *  @return null on failure
+     */
+    UDPPacket buildRelayIntro(byte[] signedData, PeerState2 charlie) {
+        Block block = new SSU2Payload.RelayIntroBlock(signedData);
+        UDPPacket rv = buildPacket(Collections.emptyList(), Collections.singletonList(block), charlie);
+        rv.setMessageType(TYPE_INTRO);
+        return rv;
+    }
+
+    /**
+     *  From Charlie to Bob or Bob to Alice.
+     *  In-session.
+     *
+     *  @param state Alice or Bob
+     *  @return null on failure
+     */
+    UDPPacket buildRelayResponse(byte[] signedData, PeerState2 state) {
+        Block block = new SSU2Payload.RelayResponseBlock(signedData);
+        UDPPacket rv = buildPacket(Collections.emptyList(), Collections.singletonList(block), state);
+        rv.setMessageType(TYPE_RESP);
+        return rv;
+    }
 
     /**
      *  Creates an empty unauthenticated packet for hole punching.
@@ -865,17 +843,33 @@ class PacketBuilder2 {
      */
     private void encryptRetry(UDPPacket packet, byte[] chachaKey, long n,
                               byte[] hdrKey1, byte[] hdrKey2, byte[] ip, int port) {
+        encryptPeerTest(packet, chachaKey, n, hdrKey1, hdrKey2, ip, port, null);
+    }
+
+    /**
+     *  Also used for retry with ptBlock = null
+     *
+     *  @param packet containing only 32 byte header
+     *  @param ptBlock null for retry
+     */
+    private void encryptPeerTest(UDPPacket packet, byte[] chachaKey, long n,
+                                 byte[] hdrKey1, byte[] hdrKey2, byte[] ip, int port,
+                                 Block ptBlock) {
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
         int off = pkt.getOffset();
         try {
-            List<Block> blocks = new ArrayList<Block>(3);
+            List<Block> blocks = new ArrayList<Block>(4);
             Block block = new SSU2Payload.DateTimeBlock(_context);
             int len = block.getTotalLength();
             blocks.add(block);
             block = new SSU2Payload.AddressBlock(ip, port);
             len += block.getTotalLength();
             blocks.add(block);
+            if (ptBlock != null) {
+                len += ptBlock.getTotalLength();
+                blocks.add(ptBlock);
+            }
             // plenty of room
             block = getPadding(len, 1280);
             len += block.getTotalLength();
