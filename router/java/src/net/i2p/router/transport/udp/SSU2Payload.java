@@ -112,9 +112,9 @@ class SSU2Payload {
         public void gotRelayIntro(Hash aliceHash, byte[] data);
 
         /**
-         *  @param msg 1-7
+         *  @param msg 1-4
          *  @param status 0 = accept, 1-255 = reject
-         *  @param h Alice or Charlie hash
+         *  @param h Alice or Charlie hash for msg 2 and 4, null for msg 1 and 3
          *  @param data excludes flag, includes signature
          */
         public void gotPeerTest(int msg, int status, Hash h, byte[] data);
@@ -320,13 +320,25 @@ class SSU2Payload {
                 case BLOCK_PEERTEST: {
                     if (isHandshake)
                         throw new IOException("Illegal block in handshake: " + type);
-                    if (len < 92) // 32 byte hash + 20 byte data w/ IPv4 + 40 byte DSA sig
+                    if (len < 20) // 20 byte data w/ IPv4 (hash and sig optional)
                         throw new IOException("Bad length for PEERTEST: " + len);
                     int mnum = payload[i] & 0xff;
+                    if (mnum == 0 || mnum > 4)
+                        throw new DataFormatException("Bad PEERTEST number: " + mnum);
                     int resp = payload[i + 1] & 0xff;
-                    Hash h = Hash.create(payload, i + 3); // skip flag
-                    byte[] data = new byte[len - (3 + Hash.HASH_LENGTH)];
-                    System.arraycopy(payload, i + 3 + Hash.HASH_LENGTH, data, 0, data.length);
+                    int o = i + 3; // skip flag
+                    int datalen;
+                    Hash h;
+                    if (mnum == 2 || mnum == 4) {
+                        h = Hash.create(payload, o);
+                        datalen = len - (3 + Hash.HASH_LENGTH);
+                        o += Hash.HASH_LENGTH;
+                    } else {
+                        datalen = len - 3;
+                        h = null;
+                    }
+                    byte[] data = new byte[datalen];
+                    System.arraycopy(payload, o, data, 0, datalen);
                     cb.gotPeerTest(mnum, resp, h, data);
                     break;
                 }

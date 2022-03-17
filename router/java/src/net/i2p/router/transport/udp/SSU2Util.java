@@ -133,17 +133,60 @@ final class SSU2Util {
     }
 
     /**
+     *  Make the data for the peer test block
+     *
+     *  @param h to be included in sig, not included in data
+     *  @param h2 may be null, to be included in sig, not included in data
+     *  @return null on failure
+     */
+    public static byte[] createPeerTestData(I2PAppContext ctx, Hash h, Hash h2,
+                                            PeerTestState.Role role, long nonce, byte[] ip, int port,
+                                            SigningPrivateKey spk) {
+        int datalen = 13 + ip.length;
+        byte[] data = new byte[datalen + spk.getType().getSigLen()];
+        if (role == PeerTestState.Role.BOB)
+            throw new IllegalArgumentException();
+        data[0] = (byte) ((role == PeerTestState.Role.ALICE) ? 1 : 3);
+        data[1] = 2;  // version
+        DataHelper.toLong(data, 2, 4, nonce);
+        DataHelper.toLong(data, 6, 4, ctx.clock().now() / 1000);
+        data[10] = (byte) ip.length;
+        System.arraycopy(ip, 0, data, 11, ip.length);
+        DataHelper.toLong(data, 11 + ip.length, 2, port);
+        Signature sig = sign(ctx, PEER_TEST_PROLOGUE, h, h2, data, datalen, spk);
+        if (sig == null)
+            return null;
+        byte[] s = sig.getData();
+        System.arraycopy(s, 0, data, datalen, s.length);
+        return data;
+    }
+
+    /**
      *  Sign the relay or peer test data, using
      *  the prologue and hash as the initial data,
      *  and then the provided data.
      *
+     *  @param data if desired, leave room at end for sig
+     *  @param datalen the length of the data to be signed
+     *  @param h to be included in sig, not included in data
+     *  @param h2 may be null, to be included in sig, not included in data
      *  @return null on failure
      */
-    public static Signature sign(I2PAppContext ctx, byte[] prologue, Hash h, byte[] data, SigningPrivateKey spk) {
-        byte[] buf = new byte[prologue.length + Hash.HASH_LENGTH + data.length];
+    public static Signature sign(I2PAppContext ctx, byte[] prologue, Hash h, Hash h2,
+                                 byte[] data, int datalen, SigningPrivateKey spk) {
+        int len = prologue.length + Hash.HASH_LENGTH + datalen;
+        if (h2 != null)
+            len += Hash.HASH_LENGTH;
+        byte[] buf = new byte[len];
         System.arraycopy(prologue, 0, buf, 0, prologue.length);
         System.arraycopy(h.getData(), 0, buf, prologue.length, Hash.HASH_LENGTH);
-        System.arraycopy(data, 0, buf, prologue.length + Hash.HASH_LENGTH, data.length);
+        System.arraycopy(h.getData(), 0, buf, prologue.length, Hash.HASH_LENGTH);
+        int off = prologue.length + Hash.HASH_LENGTH;
+        if (h2 != null) {
+            System.arraycopy(h2.getData(), 0, buf, off, Hash.HASH_LENGTH);
+            off += Hash.HASH_LENGTH;
+        }
+        System.arraycopy(data, 0, buf, off, datalen);
         return ctx.dsa().sign(buf, spk);
     }
 
@@ -151,14 +194,24 @@ final class SSU2Util {
      *  Validate the signed relay or peer test data, using
      *  the prologue and hash as the initial data,
      *  and then the provided data which ends with a signature of the specified type.
+     *
+     *  @param h2 may be null
      */
-    public static boolean validateSig(I2PAppContext ctx, byte[] prologue, Hash h, byte[] data, SigningPublicKey spk) {
+    public static boolean validateSig(I2PAppContext ctx, byte[] prologue, Hash h, Hash h2, byte[] data, SigningPublicKey spk) {
         SigType type = spk.getType();
         int siglen = type.getSigLen();
-        byte[] buf = new byte[prologue.length + Hash.HASH_LENGTH + data.length - siglen];
+        int len = prologue.length + Hash.HASH_LENGTH + data.length - siglen;
+        if (h2 != null)
+            len += Hash.HASH_LENGTH;
+        byte[] buf = new byte[len];
         System.arraycopy(prologue, 0, buf, 0, prologue.length);
         System.arraycopy(h.getData(), 0, buf, prologue.length, Hash.HASH_LENGTH);
-        System.arraycopy(data, 0, buf, prologue.length + Hash.HASH_LENGTH, data.length - siglen);
+        int off = prologue.length + Hash.HASH_LENGTH;
+        if (h2 != null) {
+            System.arraycopy(h2.getData(), 0, buf, off, Hash.HASH_LENGTH);
+            off += Hash.HASH_LENGTH;
+        }
+        System.arraycopy(data, 0, buf, off, data.length - siglen);
         byte[] bsig = new byte[siglen];
         System.arraycopy(data, data.length - siglen, bsig, 0, siglen);
         Signature sig = new Signature(type, bsig);
