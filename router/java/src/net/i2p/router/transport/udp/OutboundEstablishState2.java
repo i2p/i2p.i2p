@@ -140,6 +140,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         _sendHeaderEncryptKey2 = ik;
         //_rcvHeaderEncryptKey2 will be set after the Session Request message is created
         _rcvRetryHeaderEncryptKey2 = ik;
+        if (_log.shouldDebug())
+            _log.debug("New " + this);
     }
 
     private void createNewState(RouterAddress addr) {
@@ -366,6 +368,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         if (_skew > MAX_SKEW || _skew < 0 - MAX_SKEW)
             throw new GeneralSecurityException("Skew exceeded in Session/Token Request: " + _skew);
         createNewState(_routerAddress);
+        if (_log.shouldDebug())
+            _log.debug("Received a retry on " + this);
         _currentState = OutboundState.OB_STATE_RETRY_RECEIVED;
     }
 

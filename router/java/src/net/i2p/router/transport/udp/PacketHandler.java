@@ -848,7 +848,7 @@ class PacketHandler {
                     header.getVersion() != 2 ||
                     header.getNetID() != _networkID) {
                     if (_log.shouldWarn())
-                        _log.warn("Failed decrypt Session Request after Retry: " + header);
+                        _log.warn("Failed decrypt Session Request after Retry: " + header + " on " + state);
                     return false;
                 }
                 if (header.getSrcConnID() != state.getSendConnID()) {
@@ -970,7 +970,7 @@ class PacketHandler {
                 header.getVersion() != 2 ||
                 header.getNetID() != _networkID) {
                 if (_log.shouldWarn())
-                    _log.warn("Does not decrypt as Session Created or Retry: " + header);
+                    _log.warn("Does not decrypt as Session Created or Retry: " + header + " on " + state);
                 return false;
             }
             type = SSU2Util.RETRY_FLAG_BYTE;
