@@ -323,7 +323,7 @@ class SSU2Payload {
                     if (len < 20) // 20 byte data w/ IPv4 (hash and sig optional)
                         throw new IOException("Bad length for PEERTEST: " + len);
                     int mnum = payload[i] & 0xff;
-                    if (mnum == 0 || mnum > 4)
+                    if (mnum == 0 || mnum > 7)
                         throw new DataFormatException("Bad PEERTEST number: " + mnum);
                     int resp = payload[i + 1] & 0xff;
                     int o = i + 3; // skip flag

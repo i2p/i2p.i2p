@@ -361,11 +361,10 @@ class PeerTestManager {
             try {
                 if (test.getReceiveBobTime() <= 0) {
                     InetAddress addr = InetAddress.getByAddress(ip);
-                    test.setAliceIP(addr);
                     int testPort = testInfo.readPort();
                     if (testPort == 0)
                         throw new UnknownHostException("port 0");
-                    test.setAlicePort(testPort);
+                    test.setAlice(addr, testPort, null);
                 } // else ignore IP/port
                 test.setReceiveBobTime(_context.clock().now());
 
@@ -442,8 +441,7 @@ class PeerTestManager {
                 testInfo.readIntroKey(charlieIntroKey.getData(), 0);
                 test.setCharlieIntroKey(charlieIntroKey);
                 try {
-                    test.setCharlieIP(InetAddress.getByAddress(from.getIP()));
-                    test.setCharliePort(from.getPort());
+                    test.setCharlie(InetAddress.getByAddress(from.getIP()), from.getPort(), null);
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Receive test from Charlie: " + test);
                     sendTestToCharlie();
@@ -519,6 +517,8 @@ class PeerTestManager {
     /**
      * Entry point for all incoming packets. Most of the source and dest validation is here.
      *
+     * SSU 1 only.
+     *
      * Receive a test message of some sort from the given peer, queueing up any packet
      * that should be sent in response, or if its a reply to our own current testing,
      * adjusting our test state.
@@ -532,16 +532,20 @@ class PeerTestManager {
         _context.statManager().addRateData("udp.receiveTest", 1);
         byte[] fromIP = from.getIP();
         int fromPort = from.getPort();
-        if (!TransportUtil.isValidPort(fromPort) ||
-            (!_transport.isValid(fromIP)) ||
-            _transport.isTooClose(fromIP) ||
-            _context.blocklist().isBlocklisted(fromIP)) {
-            // spoof check, and don't respond to privileged ports
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Invalid PeerTest address: " + Addresses.toString(fromIP, fromPort));
-            _context.statManager().addRateData("udp.testBadIP", 1);
-            return;
+        // no need to do these checks if we received it in-session
+        if (!inSession || fromPeer == null) {
+            if (!TransportUtil.isValidPort(fromPort) ||
+                (!_transport.isValid(fromIP)) ||
+                _transport.isTooClose(fromIP) ||
+                _context.blocklist().isBlocklisted(fromIP)) {
+                // spoof check, and don't respond to privileged ports
+                if (_log.shouldWarn())
+                    _log.warn("Invalid PeerTest address: " + Addresses.toString(fromIP, fromPort));
+                _context.statManager().addRateData("udp.testBadIP", 1);
+                return;
+            }
         }
+
         UDPPacketReader.PeerTestReader testInfo = reader.getPeerTestReader();
         byte testIP[] = null;
         int testPort = testInfo.readPort();
@@ -725,8 +729,7 @@ class PeerTestManager {
             SessionKey aliceIntroKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
             testInfo.readIntroKey(aliceIntroKey.getData(), 0);
          
-            state.setAliceIP(aliceIP);
-            state.setAlicePort(alicePort);
+            state.setAlice(aliceIP, alicePort, null);
             state.setAliceIntroKey(aliceIntroKey);
             state.setReceiveBobTime(now);
             
@@ -837,12 +840,10 @@ class PeerTestManager {
                     return;
                 }
             }
-            state.setAliceIP(aliceIP);
-            state.setAlicePort(from.getPort());
+            state.setAlice(aliceIP, from.getPort(), null);
             state.setAliceIntroKey(aliceIntroKey);
             state.setAliceKeys(alice.getCurrentCipherKey(), alice.getCurrentMACKey());
-            state.setCharlieIP(charlie.getRemoteIPAddress());
-            state.setCharliePort(charlie.getRemotePort());
+            state.setCharlie(charlie.getRemoteIPAddress(), charlie.getRemotePort(), null);
             state.setCharlieIntroKey(charlieIntroKey);
             state.setReceiveAliceTime(now);
             

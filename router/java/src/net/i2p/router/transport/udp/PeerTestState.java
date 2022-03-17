@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 
 /**
@@ -25,6 +26,10 @@ class PeerTestState {
     private SessionKey _aliceCipherKey;
     private SessionKey _aliceMACKey;
     private SessionKey _charlieIntroKey;
+    // SSU2 only
+    private Hash _aliceHash;
+    // SSU2 only
+    private Hash _charlieHash;
     private final long _beginTime;
     private long _lastSendTime;
     private long _receiveAliceTime;
@@ -51,6 +56,12 @@ class PeerTestState {
     public Role getOurRole() { return _ourRole; }
 
     /**
+     * @return null if we are bob
+     * @since 0.9.54
+     */
+    public PeerState getBob() { return _bob; }
+
+    /**
      * Is this an IPv6 test?
      * @since 0.9.27
      */
@@ -63,10 +74,26 @@ class PeerTestState {
      *
      */
     public InetAddress getAliceIP() { return _aliceIP; }
-    public void setAliceIP(InetAddress ip) { _aliceIP = ip; }
+    /**
+     * @param hash SSU2 only, null for SSU1
+     * @since 0.9.54
+     */
+    public void setAlice(InetAddress ip, int port, Hash hash) {
+        _aliceIP = ip;
+        _alicePort = port;
+        _aliceHash = hash;
+    }
     public InetAddress getBobIP() { return _bob.getRemoteIPAddress(); }
     public InetAddress getCharlieIP() { return _charlieIP; }
-    public void setCharlieIP(InetAddress ip) { _charlieIP = ip; }
+    /**
+     * @param hash SSU2 only, null for SSU1
+     * @since 0.9.54
+     */
+    public void setCharlie(InetAddress ip, int port, Hash hash) {
+        _charlieIP = ip;
+        _charliePort = port;
+        _charlieHash = hash;
+    }
     public InetAddress getAliceIPFromCharlie() { return _aliceIPFromCharlie; }
     public void setAliceIPFromCharlie(InetAddress ip) { _aliceIPFromCharlie = ip; }
     /**
@@ -76,7 +103,6 @@ class PeerTestState {
      *
      */
     public int getAlicePort() { return _alicePort; }
-    public void setAlicePort(int alicePort) { _alicePort = alicePort; }
     public int getBobPort() { return _bob.getRemotePort(); }
     public int getCharliePort() { return _charliePort; }
     public void setCharliePort(int charliePort) { _charliePort = charliePort; }
