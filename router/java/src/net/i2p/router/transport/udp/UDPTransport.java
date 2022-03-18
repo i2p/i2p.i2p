@@ -3778,19 +3778,28 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  Ditto for v6.
      *
      *  @param peerRole The role of the peer we are looking for, BOB or CHARLIE only (NOT our role)
+     *  @param version 1 or 2 for role CHARLIE; ignored for role BOB
      *  @param isIPv6 true to get a v6-capable peer back
      *  @param dontInclude may be null
-     *  @return IPv4 peer or null
+     *  @return peer or null
      */
-    PeerState pickTestPeer(PeerTestState.Role peerRole, boolean isIPv6, RemoteHostId dontInclude) {
+    PeerState pickTestPeer(PeerTestState.Role peerRole, int version, boolean isIPv6, RemoteHostId dontInclude) {
         if (peerRole == ALICE)
             throw new IllegalArgumentException();
+        if (peerRole == CHARLIE && version != 1 && !SSU2Util.ENABLE_PEER_TEST)
+            return null;
         List<PeerState> peers = new ArrayList<PeerState>(_peersByIdent.values());
         for (Iterator<PeerState> iter = new RandomIterator<PeerState>(peers); iter.hasNext(); ) {
             PeerState peer = iter.next();
-            // Skip SSU2 until we have support for peer test
-            if (peer.getVersion() != 1 && !SSU2Util.ENABLE_PEER_TEST)
-                continue;
+            if (peerRole == BOB) {
+                // Skip SSU2 until we have support for peer test
+                if (peer.getVersion() != 1 && !SSU2Util.ENABLE_PEER_TEST)
+                    continue;
+            } else {
+                // charlie must be same version
+                if (peer.getVersion() != version)
+                    continue;
+            }
             if ( (dontInclude != null) && (dontInclude.equals(peer.getRemoteHostId())) )
                 continue;
             // enforce IPv4/v6 connection if we are ALICE looking for a BOB

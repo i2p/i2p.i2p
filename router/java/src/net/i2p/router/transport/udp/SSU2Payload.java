@@ -112,9 +112,9 @@ class SSU2Payload {
         public void gotRelayIntro(Hash aliceHash, byte[] data);
 
         /**
-         *  @param msg 1-4
+         *  @param msg 1-7
          *  @param status 0 = accept, 1-255 = reject
-         *  @param h Alice or Charlie hash for msg 2 and 4, null for msg 1 and 3
+         *  @param h Alice or Charlie hash for msg 2 and 4, null for msg 1, 3, 5-7
          *  @param data excludes flag, includes signature
          */
         public void gotPeerTest(int msg, int status, Hash h, byte[] data);

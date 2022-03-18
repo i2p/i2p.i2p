@@ -423,6 +423,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     public void gotPeerTest(int msg, int status, Hash h, byte[] data) {
         if (!ENABLE_PEER_TEST)
             return;
+        _transport.getPeerTestManager().receiveTest(_remoteHostId, this, msg, status, h, data);
     }
 
     public void gotToken(long token, long expires) {

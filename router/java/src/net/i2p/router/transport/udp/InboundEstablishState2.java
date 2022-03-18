@@ -364,6 +364,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             return;
         if (_receivedConfirmedIdentity == null)
             throw new IllegalStateException("RI must be first");
+        _transport.getPeerTestManager().receiveTest(_remoteHostId, _pstate, msg, status, h, data);
     }
 
     public void gotToken(long token, long expires) {

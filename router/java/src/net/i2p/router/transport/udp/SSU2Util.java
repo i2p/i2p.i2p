@@ -119,6 +119,18 @@ final class SSU2Util {
     public static final byte[] RELAY_RESPONSE_PROLOGUE = DataHelper.getASCII("RelayAgreementOK");
     public static final byte[] PEER_TEST_PROLOGUE = DataHelper.getASCII("PeerTestValidate");
 
+    public static final int TEST_ACCEPT = 0;
+    public static final int TEST_REJECT_BOB_UNSPEC = 1;
+    public static final int TEST_REJECT_BOB_NO_CHARLIE = 2;
+    public static final int TEST_REJECT_BOB_LIMIT = 3;
+    public static final int TEST_REJECT_BOB_SIGFAIL = 4;
+    public static final int TEST_REJECT_CHARLIE_UNSPEC = 64;
+    public static final int TEST_REJECT_CHARLIE_ADDRESS = 65;
+    public static final int TEST_REJECT_CHARLIE_LIMIT = 66;
+    public static final int TEST_REJECT_CHARLIE_SIGFAIL = 67;
+    public static final int TEST_REJECT_CHARLIE_CONNECTED = 68;
+    public static final int TEST_REJECT_CHARLIE_BANNED = 69;
+    public static final int TEST_REJECT_CHARLIE_UNKNOWN_ALICE = 70;
 
     private SSU2Util() {}
 

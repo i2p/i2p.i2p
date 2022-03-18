@@ -15,6 +15,7 @@ class PeerTestState {
     private final long _testNonce;
     private final Role _ourRole;
     private final boolean _isIPv6;
+    private PeerState2 _alice;
     private InetAddress _aliceIP;
     private int _alicePort;
     private final PeerState _bob;
@@ -74,6 +75,18 @@ class PeerTestState {
      *
      */
     public InetAddress getAliceIP() { return _aliceIP; }
+    /**
+     * SSU2 only
+     * @since 0.9.54
+     */
+    public PeerState2 getAlice() { return _alice; }
+    /**
+     * SSU2 only
+     * @since 0.9.54
+     */
+    public void setAlice(PeerState2 alice) {
+        _alice = alice;
+    }
     /**
      * @param hash SSU2 only, null for SSU1
      * @since 0.9.54
