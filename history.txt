@@ -1,3 +1,17 @@
+2022-03-20 zzz
+ * NetDB:
+   - Refactor family validation
+   - Remove duplicate store in FloodOnlyLookupMatchJob
+   - Don't store an entry which is older
+
+2022-03-18 zzz
+ * Console: Fix rare IAE on destination sort
+ * SSU2: Implement peer test state machine
+
+2022-03-17 zzz
+ * SSU: Peer Test refactor
+ * SSU2: Relay and Peer Test WIP
+
 2022-03-15 zzz
  * SSU2: Fixes
 

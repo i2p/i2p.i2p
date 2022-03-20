@@ -65,7 +65,7 @@ public abstract class DatabaseEntry extends DataStructureImpl {
 
     /**
      * A common interface to the timestamp of the two subclasses.
-     * Identical to getEarliestLeaseData() in LeaseSet,
+     * Identical to getEarliestLeaseDate() in LeaseSet,
      * and getPublished() in RouterInfo.
      * Note that for a LeaseSet this will be in the future,
      * and for a RouterInfo it will be in the past.
