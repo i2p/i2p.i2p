@@ -41,6 +41,7 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
+import net.i2p.router.crypto.FamilyKeyCrypto;
 import net.i2p.router.util.HashDistance;   // debug
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import static net.i2p.router.sybil.Util.biLog2;
@@ -985,7 +986,6 @@ class NetDbRenderer {
      *  Be careful to use stripHTML for any displayed routerInfo data
      *  to prevent vulnerabilities
      */
-
     private void renderRouterInfo(StringBuilder buf, RouterInfo info, boolean isUs, boolean full) {
         String hash = info.getIdentity().getHash().toBase64();
         buf.append("<table class=\"netdbentry\">" +
@@ -1065,7 +1065,7 @@ class NetDbRenderer {
         }
         buf.append("</td></tr>\n");
         if (full) {
-            buf.append("<tr><td><b>" + _t("Stats") + ":</b><td colspan=\"2\"><code>");
+            buf.append("<tr><td><b>").append(_t("Stats")).append(":</b><td colspan=\"2\"><code>");
             Map<Object, Object> p = info.getOptionsMap();
             for (Map.Entry<Object, Object> e : p.entrySet()) {
                 String key = (String) e.getKey();
@@ -1073,6 +1073,17 @@ class NetDbRenderer {
                 buf.append(DataHelper.stripHTML(key)).append(" = ").append(DataHelper.stripHTML(val)).append("<br>\n");
             }
             buf.append("</code></td></tr>\n");
+            String family = info.getOption("family");
+            if (family != null) {
+                FamilyKeyCrypto fkc = _context.router().getFamilyKeyCrypto();
+                if (fkc != null) {
+                    buf.append("<tr><td><b>").append(_t("Family"))
+                       .append(":</b><td colspan=\"2\"><span class=\"netdb_info\">")
+                       .append(fkc.verify(info) == FamilyKeyCrypto.Result.STORED_KEY ? "Verified" : "Unverified")
+                       .append(' ').append(DataHelper.stripHTML(family))
+                       .append("</span></td></tr>\n");
+                }
+            }
         }
         buf.append("</table>\n");
     }

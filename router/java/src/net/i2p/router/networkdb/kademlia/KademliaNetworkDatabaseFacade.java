@@ -1125,12 +1125,17 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         }
         FamilyKeyCrypto fkc = _context.router().getFamilyKeyCrypto();
         if (fkc != null) {
-            boolean validFamily = fkc.verify(routerInfo);
-            if (!validFamily) {
-                if (_log.shouldInfo())
-                    _log.info("Bad family sig: " + routerInfo.getHash());
+            FamilyKeyCrypto.Result r = fkc.verify(routerInfo);
+            switch (r) {
+                case BAD_KEY:
+                case INVALID_SIG:
+                case NO_SIG:
+                    return "Bad family " + r + ' ' + routerInfo.getHash();
+
+                case BAD_SIG:
+                    // To be investigated
+                    break;
             }
-            // todo store in RI
         }
         return validate(routerInfo);
     }
