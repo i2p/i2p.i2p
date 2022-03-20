@@ -152,7 +152,7 @@ abstract class FloodSearchJob extends JobImpl {
      */
     public String getName() { return "NetDb search (phase 1)"; }
     
-    protected Hash getKey() { return _key; }
+    public Hash getKey() { return _key; }
 
     /**
      *  @return number remaining after decrementing
