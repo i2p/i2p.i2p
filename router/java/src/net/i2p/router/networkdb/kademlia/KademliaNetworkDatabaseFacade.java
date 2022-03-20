@@ -973,10 +973,12 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     public LeaseSet store(Hash key, LeaseSet leaseSet) throws IllegalArgumentException {
         if (!_initialized) return null;
         
-        LeaseSet rv = null;
+        LeaseSet rv;
         try {
             rv = (LeaseSet)_ds.get(key);
-            if ( (rv != null) && (rv.equals(leaseSet)) ) {
+            if (rv != null && rv.getEarliestLeaseDate() >= leaseSet.getEarliestLeaseDate()) {
+                if (_log.shouldDebug())
+                    _log.debug("Not storing older " + key);
                 // if it hasn't changed, no need to do anything
                 // except copy over the flags
                 Hash to = leaseSet.getReceivedBy();
@@ -1239,11 +1241,13 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     RouterInfo store(Hash key, RouterInfo routerInfo, boolean persist) throws IllegalArgumentException {
         if (!_initialized) return null;
         
-        RouterInfo rv = null;
+        RouterInfo rv;
         try {
             rv = (RouterInfo)_ds.get(key, persist);
-            if ( (rv != null) && (rv.equals(routerInfo)) ) {
-                // no need to validate
+            if (rv != null && rv.getPublished() >= routerInfo.getPublished()) {
+                if (_log.shouldDebug())
+                    _log.debug("Not storing older " + key);
+                // quick check without calling validate()
                 return rv;
             }
         } catch (ClassCastException cce) {
