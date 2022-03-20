@@ -2386,11 +2386,11 @@ public class PeerState {
         else
             buf.append(_isInbound? " IB " : " OB ");
         long now = _context.clock().now();
-        buf.append(" recvAge: ").append(now-_lastReceiveTime);
-        buf.append(" sendAge: ").append(now-_lastSendFullyTime);
-        buf.append(" sendAttemptAge: ").append(now-_lastSendTime);
-        buf.append(" sendACKAge: ").append(now-_lastACKSend);
-        buf.append(" lifetime: ").append(now-_keyEstablishedTime);
+        buf.append(" recvAge: ").append(DataHelper.formatDuration(now - _lastReceiveTime));
+        buf.append(" sendAge: ").append(DataHelper.formatDuration(now - _lastSendFullyTime));
+        buf.append(" sendAttemptAge: ").append(DataHelper.formatDuration(now - _lastSendTime));
+        buf.append(" sendACKAge: ").append(DataHelper.formatDuration(now - _lastACKSend));
+        buf.append(" lifetime: ").append(DataHelper.formatDuration(now - _keyEstablishedTime));
         buf.append(" RTT: ").append(_rtt);
         buf.append(" RTO: ").append(_rto);
         buf.append(" cwin: ").append(_sendWindowBytes);

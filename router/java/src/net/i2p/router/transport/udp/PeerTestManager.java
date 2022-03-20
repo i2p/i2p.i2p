@@ -274,31 +274,66 @@ class PeerTestManager {
             return true;
     }
     
-    /** call from a synchronized method */
+    /**
+     * SSU 1 or 2. We are Alice.
+     * Call from a synchronized method.
+     */
     private void sendTestToBob() {
         PeerTestState test = _currentTest;
         if (!expired()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Sending test to Bob: " + test);
+            UDPPacket packet;
+            if (test.getBob().getVersion() == 1) {
+                packet = _packetBuilder.buildPeerTestFromAlice(test.getBobIP(), test.getBobPort(),
+                                                               test.getBobCipherKey(), test.getBobMACKey(),
+                                                               test.getNonce(), _transport.getIntroKey());
+            } else {
+                SigningPrivateKey spk = _context.keyManager().getSigningPrivateKey();
+                PeerState2 bob = (PeerState2) test.getBob();
+                // TODO only create this once
+                byte[] data = SSU2Util.createPeerTestData(_context, bob.getRemotePeer(), _context.routerHash(),
+                                                          ALICE, test.getNonce(), null, 0, spk);
+                if (data == null) {
+                    if (_log.shouldWarn())
+                        _log.warn("sig fail");
+                     testComplete();
+                     return;
+                }
+                packet = _packetBuilder2.buildPeerTestFromAlice(data, bob);
+            }
+            _transport.send(packet);
             test.setLastSendTime(_context.clock().now());
-            _transport.send(_packetBuilder.buildPeerTestFromAlice(test.getBobIP(), test.getBobPort(),
-                                                                  test.getBobCipherKey(), test.getBobMACKey(),
-                                                                  test.getNonce(), _transport.getIntroKey()));
         } else {
             _currentTest = null;
         }
     }
 
-    /** call from a synchronized method */
+    /**
+     * SSU 1 or 2. We are Alice.
+     * Call from a synchronized method.
+     */
     private void sendTestToCharlie() {
         PeerTestState test = _currentTest;
         if (!expired()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Sending test to Charlie: " + test);
             test.setLastSendTime(_context.clock().now());
-            _transport.send(_packetBuilder.buildPeerTestFromAlice(test.getCharlieIP(), test.getCharliePort(),
-                                                                  test.getCharlieIntroKey(), 
-                                                                  test.getNonce(), _transport.getIntroKey()));
+            UDPPacket packet;
+            if (test.getBob().getVersion() == 1) {
+                packet = _packetBuilder.buildPeerTestFromAlice(test.getCharlieIP(), test.getCharliePort(),
+                                                               test.getCharlieIntroKey(), 
+                                                               test.getNonce(), _transport.getIntroKey());
+            } else {
+                long nonce = test.getNonce();
+                long sendId = (nonce << 32) | nonce;
+                long rcvId = ~sendId;
+                byte[] data = null; // TODO
+                packet = _packetBuilder2.buildPeerTestFromAlice(test.getCharlieIP(), test.getCharliePort(),
+                                                                test.getCharlieIntroKey(),
+                                                                sendId, rcvId, data);
+            }
+            _transport.send(packet);
         } else {
             _currentTest = null;
         }
@@ -318,6 +353,8 @@ class PeerTestManager {
     /**
      * Receive a PeerTest message which contains the correct nonce for our current 
      * test. We are Alice.
+     *
+     * SSU 1 only.
      *
      * @param fromPeer non-null if an associated session was found, otherwise null
      * @param inSession true if authenticated in-session
@@ -727,14 +764,19 @@ class PeerTestManager {
         long nonce = DataHelper.fromLong(data, 2, 4);
         long time = DataHelper.fromLong(data, 6, 4) * 1000;
         int iplen = data[10] & 0xff;
-        if (iplen != 4 && iplen != 16) {
+        if (iplen != 0 && iplen != 4 && iplen != 16) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Bad IP length " + iplen);
             return;
         }
         boolean isIPv6 = iplen == 16;
-        byte[] testIP = new byte[iplen];
-        System.arraycopy(data, 11, testIP, 0, iplen);
+        byte[] testIP;
+        if (iplen != 0) {
+            testIP = new byte[iplen];
+            System.arraycopy(data, 11, testIP, 0, iplen);
+        } else {
+            testIP = null;
+        }
         int testPort = (int) DataHelper.fromLong(data, 11 + iplen, 2);
         Long lNonce = Long.valueOf(nonce);
         PeerTestState state;
@@ -856,17 +898,14 @@ class PeerTestManager {
                     _transport.send(packet);
                     return;
                 }
-                InetAddress aliceIP;
-                try {
-                    aliceIP = InetAddress.getByAddress(testIP);
-                } catch (UnknownHostException uhe) {
-                    return;
-                }
+                InetAddress aliceIP = fromPeer.getRemoteIPAddress();
+                int alicePort = fromPeer.getRemotePort();
                 state = new PeerTestState(BOB, null, isIPv6, nonce, now);
                 state.setAlice(fromPeer);
-                state.setAlice(aliceIP, testPort, alice);
+                state.setAlice(aliceIP, alicePort, alice);
                 state.setCharlie(charlie.getRemoteIPAddress(), charlie.getRemotePort(), charlie.getRemotePeer());
                 state.setReceiveAliceTime(now);
+                state.setLastSendTime(now);
                 _activeTests.put(lNonce, state);
                 // send alice RI to charlie
                 DatabaseStoreMessage dbsm = new DatabaseStoreMessage(_context);
@@ -874,6 +913,7 @@ class PeerTestManager {
                 dbsm.setMessageExpiration(now + 10*1000);
                 _transport.send(dbsm, charlie);
                 // forward to charlie, don't bother to validate signed data
+                // FIXME this will probably get there before the RI
                 UDPPacket packet = _packetBuilder2.buildPeerTestToCharlie(alice, data, (PeerState2) charlie);
                 _transport.send(packet);
                 break;
@@ -923,17 +963,38 @@ class PeerTestManager {
                     state.setAlice(aliceIP, testPort, h);
                     state.setAliceIntroKey(aliceIntroKey);
                     state.setReceiveBobTime(now);
+                    state.setLastSendTime(now);
                     _activeTests.put(lNonce, state);
                 }
-                // TODO generate our signed data
+                // generate our signed data
+                // we sign it even if rejecting, not required though
+                SigningPrivateKey spk = _context.keyManager().getSigningPrivateKey();
+                data = SSU2Util.createPeerTestData(_context, fromPeer.getRemotePeer(), h,
+                                                   CHARLIE, nonce, testIP, testPort, spk);
+                if (data == null) {
+                    if (_log.shouldWarn())
+                        _log.warn("sig fail");
+                     if (rcode == SSU2Util.TEST_ACCEPT)
+                         _activeTests.remove(lNonce);
+                     return;
+                }
                 UDPPacket packet = _packetBuilder2.buildPeerTestToBob(rcode, data, fromPeer);
                 _transport.send(packet);
-                // delay, then send msg 5
+                // send msg 5
+                long rcvId = (nonce << 32) | nonce;
+                long sendId = ~rcvId;
+                // send the same data we sent to Bob
+                packet = _packetBuilder2.buildPeerTestToAlice(aliceIP, testPort,
+                                                              aliceIntroKey, true,
+                                                              sendId, rcvId, data);
+                _transport.send(packet);
                 break;
             }
 
             // charlie to bob, in-session
             case 3: {
+                state.setReceiveCharlieTime(now);
+                state.setLastSendTime(now);
                 PeerState2 alice = state.getAlice();
                 Hash charlie = fromPeer.getRemotePeer();
                 RouterInfo charlieRI = _context.netDb().lookupRouterInfoLocally(charlie);
@@ -949,6 +1010,7 @@ class PeerTestManager {
                         _log.warn("No charlie RI");
                 }
                 // forward to alice, don't bother to validate signed data
+                // FIXME this will probably get there before the RI
                 UDPPacket packet = _packetBuilder2.buildPeerTestToAlice(status, charlie, data, alice);
                 _transport.send(packet);
                 // we are done
@@ -961,7 +1023,7 @@ class PeerTestManager {
                 PeerTestState test = _currentTest;
                 if (test == null || test.getNonce() != nonce) {
                     if (_log.shouldWarn())
-                        _log.warn("Test nonce mismatch?");
+                        _log.warn("Test nonce mismatch? " + nonce);
                     return;
                 }
                 InetAddress charlieIP;
@@ -970,6 +1032,8 @@ class PeerTestManager {
                 } catch (UnknownHostException uhe) {
                     return;
                 }
+                test.setReceiveBobTime(now);
+                test.setLastSendTime(now);
                 boolean fail = false;
                 RouterInfo charlieRI = null;
                 SessionKey charlieIntroKey = null;
@@ -1003,21 +1067,90 @@ class PeerTestManager {
                     return;
                 }
                 state.setCharlie(charlieIP, testPort, h);
+                state.setCharlieIntroKey(charlieIntroKey);
                 // delay, await msg 5
                 break;
             }
 
             // charlie to alice, out-of-session
-            case 5:
+            case 5: {
+                PeerTestState test = _currentTest;
+                if (test == null || test.getNonce() != nonce) {
+                    if (_log.shouldWarn())
+                        _log.warn("Test nonce mismatch? " + nonce);
+                    return;
+                }
+                test.setReceiveCharlieTime(now);
+                test.setAlicePortFromCharlie(testPort);
+                try {
+                    InetAddress addr = InetAddress.getByAddress(testIP);
+                    test.setAliceIPFromCharlie(addr);
+                    if (test.getReceiveBobTime() > 0)
+                        testComplete();
+                } catch (UnknownHostException uhe) {
+                    if (_log.shouldWarn())
+                        _log.warn("Charlie @ " + from + " said we were an invalid IP address: " + uhe.getMessage(), uhe);
+                    _context.statManager().addRateData("udp.testBadIP", 1);
+                }
+                synchronized(this) {
+                    sendTestToCharlie();
+                }
                 break;
+            }
 
             // alice to charlie, out-of-session
-            case 6:
+            case 6: {
+                state.setReceiveAliceTime(now);
+                state.setLastSendTime(now);
+                long rcvId = (nonce << 32) | nonce;
+                long sendId = ~rcvId;
+                InetAddress addr = state.getAliceIP();
+                int alicePort = state.getAlicePort();
+                byte[] aliceIP = addr.getAddress();
+                iplen = aliceIP.length;
+                data = new byte[13 + iplen];
+                data[0] = 3;  // charlie
+                data[1] = 2;  // version
+                DataHelper.toLong(data, 2, 4, nonce);
+                DataHelper.toLong(data, 6, 4, now / 1000);
+                data[10] = (byte) iplen;
+                System.arraycopy(aliceIP, 0, data, 11, iplen);
+                DataHelper.toLong(data, 11 + iplen, 2, alicePort);
+                UDPPacket packet = _packetBuilder2.buildPeerTestToAlice(addr, alicePort,
+                                                                        state.getAliceIntroKey(), false,
+                                                                        sendId, rcvId, data);
+                _transport.send(packet);
                 break;
+            }
 
             // charlie to alice, out-of-session
-            case 7:
+            case 7: {
+                PeerTestState test = _currentTest;
+                if (test == null || test.getNonce() != nonce) {
+                    if (_log.shouldWarn())
+                        _log.warn("Test nonce mismatch? " + nonce);
+                    return;
+                }
+                if (test.getReceiveCharlieTime() <= 0) {
+                   // ??
+                }
+                // this is our second charlie, yay!
+                test.setReceiveCharlieTime(now);
+                test.setAlicePortFromCharlie(testPort);
+                try {
+                    InetAddress addr = InetAddress.getByAddress(testIP);
+                    test.setAliceIPFromCharlie(addr);
+                    if (test.getReceiveBobTime() > 0)
+                        testComplete();
+                } catch (UnknownHostException uhe) {
+                    if (_log.shouldWarn())
+                        _log.warn("Charlie @ " + from + " said we were an invalid IP address: " + uhe.getMessage(), uhe);
+                    _context.statManager().addRateData("udp.testBadIP", 1);
+                }
+                if (test.getReceiveBobTime() > 0)
+                    testComplete();
                 break;
+            }
 
             default:
                 return;
@@ -1068,6 +1201,8 @@ class PeerTestManager {
     /**
      * The packet's IP/port does not match the IP/port included in the message, 
      * so we must be Charlie receiving a PeerTest from Bob.
+     *
+     * SSU 1 only.
      *  
      * @param bob non-null if received in-session, otherwise null
      * @param inSession true if authenticated in-session
@@ -1149,6 +1284,8 @@ class PeerTestManager {
     /**
      * The PeerTest message came from the peer referenced in the message (or there wasn't
      * any info in the message), plus we are not acting as Charlie (so we've got to be Bob).
+     *
+     * SSU 1 only.
      *
      * testInfo IP/port ignored
      *
@@ -1303,6 +1440,8 @@ class PeerTestManager {
     
     /** 
      * We are charlie, so send Alice her PeerTest message  
+     *
+     * SSU 1 only.
      *
      * testInfo IP/port ignored
      * @param state non-null

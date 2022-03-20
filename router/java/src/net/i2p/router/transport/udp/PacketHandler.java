@@ -817,8 +817,8 @@ class PacketHandler {
                 header.getType() != SSU2Util.SESSION_REQUEST_FLAG_BYTE ||
                 header.getVersion() != 2 ||
                 header.getNetID() != _networkID) {
-                if (_log.shouldInfo())
-                    _log.info("Does not decrypt as Session Request, attempt to decrypt as Token Request/Peer Test: " + header);
+                if (header != null && _log.shouldInfo())
+                    _log.info("Does not decrypt as Session Request, attempt to decrypt as Token Request/Peer Test: " + header + " from " + from);
                 // The first 32 bytes were fine, but it corrupted the next 32 bytes
                 // TODO make this more efficient, just take the first 32 bytes
                 header = SSU2Header.trialDecryptLongHeader(packet, k1, k2);
@@ -853,14 +853,14 @@ class PacketHandler {
                 }
                 if (header.getSrcConnID() != state.getSendConnID()) {
                     if (_log.shouldWarn())
-                        _log.warn("Bad Source Conn id " + header);
+                        _log.warn("Bad Source Conn id " + header + " on " + state);
                     // TODO could be a retransmitted Session Request,
                     // tell establisher?
                     return false;
                 }
                 if (header.getDestConnID() != state.getRcvConnID()) {
                     if (_log.shouldWarn())
-                        _log.warn("Bad Dest Conn id " + header);
+                        _log.warn("Bad Dest Conn id " + header + " on " + state);
                     return false;
                 }
                 type = SSU2Util.SESSION_REQUEST_FLAG_BYTE;
@@ -870,12 +870,12 @@ class PacketHandler {
                 if (header == null) {
                     // too short
                     if (_log.shouldWarn())
-                        _log.warn("Failed decrypt Session Confirmed");
+                        _log.warn("Failed decrypt Session Confirmed on " + state);
                     return false;
                 }
                 if (header.getDestConnID() != state.getRcvConnID()) {
                     if (_log.shouldWarn())
-                        _log.warn("Bad Dest Conn id " + header);
+                        _log.warn("Bad Dest Conn id " + header + " on " + state);
                     return false;
                 }
                 if (header.getPacketNumber() != 0 ||

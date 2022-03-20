@@ -149,6 +149,7 @@ final class SSU2Util {
      *
      *  @param h to be included in sig, not included in data
      *  @param h2 may be null, to be included in sig, not included in data
+     *  @param ip may be null
      *  @return null on failure
      */
     public static byte[] createPeerTestData(I2PAppContext ctx, Hash h, Hash h2,
@@ -162,9 +163,11 @@ final class SSU2Util {
         data[1] = 2;  // version
         DataHelper.toLong(data, 2, 4, nonce);
         DataHelper.toLong(data, 6, 4, ctx.clock().now() / 1000);
-        data[10] = (byte) ip.length;
-        System.arraycopy(ip, 0, data, 11, ip.length);
-        DataHelper.toLong(data, 11 + ip.length, 2, port);
+        int iplen = (ip != null) ? ip.length : 0;
+        data[10] = (byte) iplen;
+        if (ip != null)
+            System.arraycopy(ip, 0, data, 11, iplen);
+        DataHelper.toLong(data, 11 + iplen, 2, port);
         Signature sig = sign(ctx, PEER_TEST_PROLOGUE, h, h2, data, datalen, spk);
         if (sig == null)
             return null;
