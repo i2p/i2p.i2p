@@ -37,11 +37,20 @@ public class ConfigFamilyHandler extends FormHandler {
             } else if (family.length() > 32) {
                 // let's enforce some sanity
                 addFormError("Family too long, 32 chars max: " + family);
-            } else if (_context.router().saveConfig(FamilyKeyCrypto.PROP_FAMILY_NAME, family.trim())) {
-                addFormNotice(_t("Configuration saved successfully."));
-                addFormError(_t("Restart required to take effect"));
             } else {
-                addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs"));
+                family = family.trim();
+                File ks = new SecureDirectory(_context.getConfigDir(), "keystore");
+                ks = new File(ks, FamilyKeyCrypto.KEYSTORE_PREFIX + family + FamilyKeyCrypto.KEYSTORE_SUFFIX);
+                if (ks.exists()) {
+                    addFormError("Keystore for family " + family + " already exists! Delete or rename it first: " + ks);
+                } else {
+                    if (_context.router().saveConfig(FamilyKeyCrypto.PROP_FAMILY_NAME, family.trim())) {
+                        addFormNotice(_t("Configuration saved successfully."));
+                        addFormError(_t("Restart required to take effect"));
+                    } else {
+                        addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs"));
+                    }
+                }
             }
         } else if (_action.equals(_t("Join Family"))) {
             InputStream in = _requestWrapper.getInputStream("file");
@@ -57,6 +66,11 @@ public class ConfigFamilyHandler extends FormHandler {
                 String family = CertUtil.getSubjectValue(certs.get(0), "CN");
                 if (family == null) {
                     addFormError("Bad certificate - No Subject CN");
+                    return;
+                }
+                if (family.contains("/") || family.contains("\\")) {
+                    addFormError("Bad characters in Family: " + family);
+                    return;
                 }
                 if (family.endsWith(FamilyKeyCrypto.CN_SUFFIX) && family.length() > FamilyKeyCrypto.CN_SUFFIX.length())
                     family = family.substring(0, family.length() - FamilyKeyCrypto.CN_SUFFIX.length());
@@ -65,6 +79,10 @@ public class ConfigFamilyHandler extends FormHandler {
                 if (!ks.exists())
                     ks.mkdirs();
                 ks = new File(ks, FamilyKeyCrypto.KEYSTORE_PREFIX + family + FamilyKeyCrypto.KEYSTORE_SUFFIX);
+                if (ks.exists()) {
+                    addFormError("Keystore for family " + family + " already exists! Delete or rename it first: " + ks);
+                    return;
+                }
                 String keypw = KeyStoreUtil.randomString();
                 KeyStoreUtil.storePrivateKey(ks, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD, family, keypw, pk, certs);
                 // store certificate

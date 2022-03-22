@@ -159,7 +159,6 @@ public class StatisticsManager {
 
         String family = _context.getProperty(FamilyKeyCrypto.PROP_FAMILY_NAME);
         if (family != null) {
-            stats.setProperty(FamilyKeyCrypto.OPT_NAME, family);
             String sig = null;
             String key = null;
             RouterInfo oldRI = _context.router().getRouterInfo();
@@ -173,10 +172,12 @@ public class StatisticsManager {
                             // we changed the separator from ';' to ':'
                             key = null;
                         } else {
-                            stats.setProperty(FamilyKeyCrypto.OPT_KEY, key);
                             sig = oldRI.getOption(FamilyKeyCrypto.OPT_SIG);
-                            if (sig != null)
+                            if (sig != null) {
+                                stats.setProperty(FamilyKeyCrypto.OPT_NAME, family);
+                                stats.setProperty(FamilyKeyCrypto.OPT_KEY, key);
                                 stats.setProperty(FamilyKeyCrypto.OPT_SIG, sig);
+                            }
                         }
                     }
                 }
