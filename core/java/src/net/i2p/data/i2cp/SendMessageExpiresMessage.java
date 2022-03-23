@@ -17,6 +17,8 @@ import java.util.Date;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DateAndFlags;
+import net.i2p.data.Destination;
+import net.i2p.data.Payload;
 
 /**
  * Same as SendMessageMessage, but with an expiration to be passed to the router
@@ -30,13 +32,44 @@ public class SendMessageExpiresMessage extends SendMessageMessage {
     public final static int MESSAGE_TYPE = 36;
     private final DateAndFlags _daf;
 
+    /**
+     *  For reading.
+     *  Deprecated for writing, use 4-arg constructor
+     */
     public SendMessageExpiresMessage() {
-        this(new DateAndFlags());
+        super();
+        _daf = new DateAndFlags();
     }
 
-    /** @since 0.9.2 */
+    /**
+     *  For writing
+     *
+     *  @deprecated use 5-arg constructor
+     *  @since 0.9.2
+     */
+    @Deprecated
     public SendMessageExpiresMessage(DateAndFlags options) {
         super();
+        _daf = options;
+    }
+
+    /**
+     *  For writing
+     *
+     *  @since 0.9.54
+     */
+    public SendMessageExpiresMessage(SessionId sessID, Destination dest, Payload payload, long nonce) {
+        super(sessID, dest, payload, nonce);
+        _daf = new DateAndFlags();
+    }
+
+    /**
+     *  For writing
+     *
+     *  @since 0.9.54
+     */
+    public SendMessageExpiresMessage(SessionId sessID, Destination dest, Payload payload, long nonce, DateAndFlags options) {
+        super(sessID, dest, payload, nonce);
         _daf = options;
     }
 
@@ -87,7 +120,7 @@ public class SendMessageExpiresMessage extends SendMessageMessage {
      * @throws IOException 
      */
     @Override
-    public void readMessage(InputStream in, int length, int type) throws I2CPMessageException, IOException {
+    public synchronized void readMessage(InputStream in, int length, int type) throws I2CPMessageException, IOException {
         super.readMessage(in, length, type);
 
         try {
@@ -104,7 +137,7 @@ public class SendMessageExpiresMessage extends SendMessageMessage {
      * @throws IOException 
      */
     @Override
-    public void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
+    public synchronized void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
         if (_sessionId == null)
             throw new I2CPMessageException("No session ID");
         if (_destination == null)

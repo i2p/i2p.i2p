@@ -31,10 +31,28 @@ public class SendMessageMessage extends I2CPMessageImpl {
     protected Payload _payload;
     protected long _nonce;
 
+    /**
+     *  For reading.
+     *  Deprecated for writing, use 4-arg constructor
+     */
     public SendMessageMessage() {
     }
 
-    public SessionId getSessionId() {
+    /**
+     *  For writing
+     *
+     *  @since 0.9.54
+     */
+    public SendMessageMessage(SessionId sessID, Destination dest, Payload payload, long nonce) {
+        synchronized(this) {
+            _sessionId = sessID;
+            _destination = dest;
+            _payload = payload;
+            _nonce = nonce;
+        }
+    }
+
+    public synchronized SessionId getSessionId() {
         return _sessionId;
     }
 
@@ -44,41 +62,55 @@ public class SendMessageMessage extends I2CPMessageImpl {
      * @since 0.9.21
      */
     @Override
-    public SessionId sessionId() {
+    public synchronized SessionId sessionId() {
         return _sessionId;
     }
 
-    public void setSessionId(SessionId id) {
+    /**
+     *  @deprecated use 4-arg constructor
+     */
+    @Deprecated
+    public synchronized void setSessionId(SessionId id) {
         _sessionId = id;
     }
 
-    public Destination getDestination() {
+    public synchronized Destination getDestination() {
         return _destination;
     }
 
-    public void setDestination(Destination destination) {
+    /**
+     *  @deprecated use 4-arg constructor
+     */
+    @Deprecated
+    public synchronized void setDestination(Destination destination) {
         _destination = destination;
     }
 
-    public Payload getPayload() {
+    public synchronized Payload getPayload() {
         return _payload;
     }
 
-    public void setPayload(Payload payload) {
+    /**
+     *  @deprecated use 4-arg constructor
+     */
+    @Deprecated
+    public synchronized void setPayload(Payload payload) {
         _payload = payload;
     }
 
     /**
      * @return 0 to 0xffffffff
      */
-    public long getNonce() {
+    public synchronized long getNonce() {
         return _nonce;
     }
 
     /**
-     * @param nonce 0 to 0xffffffff
+     *  @param nonce 0 to 0xffffffff
+     *  @deprecated use 4-arg constructor
      */
-    public void setNonce(long nonce) {
+    @Deprecated
+    public synchronized void setNonce(long nonce) {
         _nonce = nonce;
     }
 
@@ -93,7 +125,7 @@ public class SendMessageMessage extends I2CPMessageImpl {
      * @throws IOException 
      */
     @Override
-    public void readMessage(InputStream in, int length, int type) throws I2CPMessageException, IOException {
+    public synchronized void readMessage(InputStream in, int length, int type) throws I2CPMessageException, IOException {
         if (type != getType())
             throw new I2CPMessageException("Invalid message type (found: " + type + " supported: " + getType()
                                            + " class: " + getClass().getName() + ")");
@@ -126,7 +158,7 @@ public class SendMessageMessage extends I2CPMessageImpl {
      * @throws IOException 
      */
     @Override
-    public void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
+    public synchronized void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
         if (_sessionId == null)
             throw new I2CPMessageException("No session ID");
         if (_destination == null)

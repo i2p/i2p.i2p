@@ -211,23 +211,20 @@ class I2CPMessageProducer {
             // drop the message... send fail notification?
             return;
         SendMessageMessage msg;
-        if (expires > 0 || flags > 0) {
-            SendMessageExpiresMessage smsg = new SendMessageExpiresMessage();
-            smsg.setExpiration(expires);
-            smsg.setFlags(flags);
-            msg = smsg;
-        } else
-            msg = new SendMessageMessage();
-        msg.setDestination(dest);
         SessionId sid = session.getSessionId();
         if (sid == null) {
             _log.error(session.toString() + " cannot send message, session closed", new Exception());
             return;
         }
-        msg.setSessionId(sid);
-        msg.setNonce(nonce);
         Payload data = createPayload(payload);
-        msg.setPayload(data);
+        if (expires > 0 || flags > 0) {
+            SendMessageExpiresMessage smsg = new SendMessageExpiresMessage(sid, dest, data, nonce);
+            smsg.setExpiration(expires);
+            smsg.setFlags(flags);
+            msg = smsg;
+        } else {
+            msg = new SendMessageMessage(sid, dest, data, nonce);
+        }
         session.sendMessage(msg);
     }
 
@@ -244,17 +241,13 @@ class I2CPMessageProducer {
         if (!updateBps(payload.length, expires))
             // drop the message... send fail notification?
             return;
-        SendMessageMessage msg = new SendMessageExpiresMessage(options);
-        msg.setDestination(dest);
         SessionId sid = session.getSessionId();
         if (sid == null) {
             _log.error(session.toString() + " cannot send message, session closed", new Exception());
             return;
         }
-        msg.setSessionId(sid);
-        msg.setNonce(nonce);
         Payload data = createPayload(payload);
-        msg.setPayload(data);
+        SendMessageMessage msg = new SendMessageExpiresMessage(sid, dest, data, nonce, options);
         session.sendMessage(msg);
     }
 

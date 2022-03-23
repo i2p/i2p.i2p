@@ -28,12 +28,29 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
     private long _messageId;
     private Payload _payload;
 
+    /**
+     *  For reading.
+     *  Deprecated for writing, use 3-arg constructor
+     */
     public MessagePayloadMessage() {
         _sessionId = -1;
         _messageId = -1;
     }
 
-    public long getSessionId() {
+    /**
+     *  For writing
+     *
+     *  @since 0.9.54
+     */
+    public MessagePayloadMessage(long sessID, long msgID, Payload payload) {
+        synchronized(this) {
+            _sessionId = (int) sessID;
+            _messageId = msgID;
+            _payload = payload;
+        }
+    }
+
+    public synchronized long getSessionId() {
         return _sessionId;
     }
 
@@ -43,33 +60,45 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
      * @since 0.9.21
      */
     @Override
-    public SessionId sessionId() {
+    public synchronized SessionId sessionId() {
         return _sessionId >= 0 ? new SessionId(_sessionId) : null;
     }
 
-    /** @param id 0-65535 */
-    public void setSessionId(long id) {
+    /**
+     *  @param id 0-65535
+     *  @deprecated use 3-arg constructor
+     */
+    @Deprecated
+    public synchronized void setSessionId(long id) {
         _sessionId = (int) id;
     }
 
-    public long getMessageId() {
+    public synchronized long getMessageId() {
         return _messageId;
     }
 
-    public void setMessageId(long id) {
+    /**
+     *  @deprecated use 3-arg constructor
+     */
+    @Deprecated
+    public synchronized void setMessageId(long id) {
         _messageId = id;
     }
 
-    public Payload getPayload() {
+    public synchronized Payload getPayload() {
         return _payload;
     }
 
-    public void setPayload(Payload payload) {
+    /**
+     *  @deprecated use 3-arg constructor
+     */
+    @Deprecated
+    public synchronized void setPayload(Payload payload) {
         _payload = payload;
     }
 
     @Override
-    protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
+    protected synchronized void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
             _sessionId = (int) DataHelper.readLong(in, 2);
             _messageId = DataHelper.readLong(in, 4);
@@ -95,7 +124,7 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
      * @throws IOException 
      */
     @Override
-    public void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
+    public synchronized void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
         if (_sessionId <= 0)
             throw new I2CPMessageException("Unable to write out the message, as the session ID has not been defined");
         if (_messageId < 0)

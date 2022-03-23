@@ -512,10 +512,6 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         if (_runner.isDead()) return;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handling receive begin: id = " + message.getMessageId());
-        MessagePayloadMessage msg = new MessagePayloadMessage();
-        msg.setMessageId(message.getMessageId());
-        // TODO validate session id
-        msg.setSessionId(message.getSessionId());
         Payload payload = _runner.getPayload(new MessageId(message.getMessageId()));
         if (payload == null) {
             if (_log.shouldLog(Log.WARN))
@@ -523,7 +519,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                            + "] is null!  Dropped or Unknown message id");
             return;
         }
-        msg.setPayload(payload);
+        // TODO validate session id
+        MessagePayloadMessage msg = new MessagePayloadMessage(message.getSessionId(), message.getMessageId(), payload);
         try {
             _runner.doSend(msg);
         } catch (I2CPMessageException ime) {

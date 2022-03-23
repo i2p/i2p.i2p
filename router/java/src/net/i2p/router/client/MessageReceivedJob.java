@@ -110,16 +110,13 @@ class MessageReceivedJob extends JobImpl {
      *  @since 0.9.4
      */
     private void sendMessage(long id) throws I2CPMessageException {
-        MessagePayloadMessage msg = new MessagePayloadMessage();
-        msg.setMessageId(id);
         SessionId sid = _runner.getSessionId(_toDest.calculateHash());
         if (sid == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("No session for " + _toDest.toBase32());
             return;
         }
-        msg.setSessionId(sid.getSessionId());
-        msg.setPayload(_payload);
+        MessagePayloadMessage msg = new MessagePayloadMessage(sid.getSessionId(), id, _payload);
         _runner.doSend(msg);
     }
 }
