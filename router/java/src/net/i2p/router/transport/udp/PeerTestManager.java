@@ -184,7 +184,7 @@ class PeerTestManager {
     /**
      *  The next few methods are for when we are Alice
      *
-     *  @param bobIP IPv4 only
+     *  @param bob IPv4 only
      */
     public synchronized void runTest(PeerState bob) {
         if (_currentTest != null) {

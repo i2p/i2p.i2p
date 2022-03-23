@@ -427,7 +427,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotToken(long token, long expires) {
-        _transport.getEstablisher().addOutboundToken(_remotePeer, token, expires);
+        _transport.getEstablisher().addOutboundToken(_remoteHostId, token, expires);
     }
 
     public void gotI2NP(I2NPMessage msg) {

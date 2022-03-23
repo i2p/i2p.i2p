@@ -51,7 +51,7 @@ class EstablishmentManager {
     // SSU 2
     private final PacketBuilder2 _builder2;
     private final boolean _enableSSU2;
-    private final Map<Hash, Token> _outboundTokens;
+    private final Map<RemoteHostId, Token> _outboundTokens;
     private final Map<RemoteHostId, Token> _inboundTokens;
 
     /** map of RemoteHostId to InboundEstablishState */
@@ -168,7 +168,7 @@ class EstablishmentManager {
         _outboundByHash = new ConcurrentHashMap<Hash, OutboundEstablishState>();
         if (_enableSSU2) {
             _inboundTokens = new LHMCache<RemoteHostId, Token>(MAX_TOKENS);
-            _outboundTokens = new LHMCache<Hash, Token>(MAX_TOKENS);
+            _outboundTokens = new LHMCache<RemoteHostId, Token>(MAX_TOKENS);
         } else {
             _inboundTokens = null;
             _outboundTokens = null;
@@ -1800,7 +1800,7 @@ class EstablishmentManager {
      *  @param token nonzero
      *  @since 0.9.54
      */
-    public void addOutboundToken(Hash peer, long token, long expires) {
+    public void addOutboundToken(RemoteHostId peer, long token, long expires) {
         if (expires < _context.clock().now())
             return;
         Token tok = new Token(token, expires);
@@ -1815,7 +1815,7 @@ class EstablishmentManager {
      *  @return 0 if none available
      *  @since 0.9.54
      */
-    public long getOutboundToken(Hash peer) {
+    public long getOutboundToken(RemoteHostId peer) {
         Token tok;
         synchronized(_outboundTokens) {
             tok = _outboundTokens.remove(peer);
@@ -1828,17 +1828,54 @@ class EstablishmentManager {
     }
 
     /**
-     *  Remember a token that can be used later for the peer to connect to us
+     *  Remove our outbound tokens for this length
      *
-     *  @param token nonzero
      *  @since 0.9.54
      */
-    public void addInboundToken(RemoteHostId peer, long token) {
+    public void ipChanged(boolean isIPv6) {
+        if (!_enableSSU2)
+            return;
+        int len = isIPv6 ? 16 : 4;
+        // expire while we're at it
+        long now = _context.clock().now();
+        synchronized(_outboundTokens) {
+            for (Iterator<Map.Entry<RemoteHostId, Token>> iter = _outboundTokens.entrySet().iterator(); iter.hasNext(); ) {
+                Map.Entry<RemoteHostId, Token> e = iter.next();
+                if (e.getKey().getIP().length == len || e.getValue().expires < now)
+                    iter.remove();
+            }
+        }
+    }
+
+    /**
+     *  Remove all outbound tokens
+     *
+     *  @since 0.9.54
+     */
+    public void portChanged() {
+        if (!_enableSSU2)
+            return;
+        synchronized(_outboundTokens) {
+            _outboundTokens.clear();
+        }
+    }
+
+    /**
+     *  Get a token that can be used later for the peer to connect to us
+     *
+     *  @since 0.9.54
+     */
+    public Token getInboundToken(RemoteHostId peer) {
+        long token;
+        do {
+            token = _context.random().nextLong();
+        } while (token == 0);
         long expires = _context.clock().now() + IB_TOKEN_EXPIRATION;
         Token tok = new Token(token, expires);
         synchronized(_inboundTokens) {
             _inboundTokens.put(peer, tok);
         }
+        return tok;
     }
 
     /**
@@ -1862,7 +1899,7 @@ class EstablishmentManager {
         return tok.expires >= _context.clock().now();
     }
 
-    private static class Token {
+    public static class Token {
         public final long token, expires;
         public Token(long tok, long exp) {
             token = tok; expires = exp;

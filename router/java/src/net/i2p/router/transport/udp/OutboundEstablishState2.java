@@ -127,7 +127,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         } while (_sendConnID == rcid);
         _rcvConnID = rcid;
 
-        _token = _transport.getEstablisher().getOutboundToken(_remotePeer.calculateHash());
+        _token = _transport.getEstablisher().getOutboundToken(_remoteHostId);
         _routerAddress = ra;
         if (_token != 0)
             createNewState(ra);
@@ -247,7 +247,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     public void gotToken(long token, long expires) {
-        _transport.getEstablisher().addOutboundToken(_remotePeer.calculateHash(), token, expires);
+        _transport.getEstablisher().addOutboundToken(_remoteHostId, token, expires);
     }
 
     public void gotI2NP(I2NPMessage msg) {
@@ -299,14 +299,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     public long getSendConnID() { return _sendConnID; }
     public long getRcvConnID() { return _rcvConnID; }
     public long getToken() { return _token; }
-    public long getNextToken() {
-        // generate on the fly, this will only be called once
-        long token;
-        do {
-            token = _context.random().nextLong();
-        } while (token == 0);
-        _transport.getEstablisher().addInboundToken(_remoteHostId, token);
-        return token;
+    public EstablishmentManager.Token getNextToken() {
+        return _transport.getEstablisher().getInboundToken(_remoteHostId);
     }
     public HandshakeState getHandshakeState() { return _handshakeState; }
     public byte[] getSendHeaderEncryptKey1() { return _sendHeaderEncryptKey1; }
@@ -567,6 +561,9 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
 
     @Override
     public String toString() {
-        return "OES2 " + _remoteHostId + ' ' + _currentState;
+        return "OES2 " + _remoteHostId +
+               " Rcv ID: " + _rcvConnID +
+               " Send ID: " + _sendConnID +
+               ' ' + _currentState;
     }
 }

@@ -73,9 +73,6 @@ class PacketBuilder2 {
     /** 80 */
     public static final int MIN_IPV6_DATA_PACKET_OVERHEAD = IPV6_HEADER_SIZE + UDP_HEADER_SIZE + DATA_HEADER_SIZE + MAC_LEN;
 
-/// FIXME
-    private static final int MAX_IDENTITY_FRAGMENT_SIZE = 1280 - (MIN_DATA_PACKET_OVERHEAD + KEY_LEN + MAC_LEN);
-
     private static final int ABSOLUTE_MAX_ACK_RANGES = 512;
 
     /* Higher than all other OutNetMessage priorities, but still droppable,
@@ -788,7 +785,8 @@ class PacketBuilder2 {
      *  @param packet containing only 32 byte header
      */
     private void encryptSessionCreated(UDPPacket packet, HandshakeState state,
-                                       byte[] hdrKey1, byte[] hdrKey2, long relayTag, long token, byte[] ip, int port) {
+                                       byte[] hdrKey1, byte[] hdrKey2, long relayTag,
+                                       EstablishmentManager.Token token, byte[] ip, int port) {
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
         int off = pkt.getOffset();
@@ -805,8 +803,8 @@ class PacketBuilder2 {
                 len += block.getTotalLength();
                 blocks.add(block);
             }
-            if (token > 0) {
-                block = new SSU2Payload.NewTokenBlock(token, _context.clock().now() + EstablishmentManager.IB_TOKEN_EXPIRATION);
+            if (token != null) {
+                block = new SSU2Payload.NewTokenBlock(token.token, token.expires);
                 len += block.getTotalLength();
                 blocks.add(block);
             }
@@ -938,7 +936,7 @@ class PacketBuilder2 {
      */
     private void encryptSessionConfirmed(UDPPacket packet, HandshakeState state, int mtu,
                                          boolean isIPv6, byte[] hdrKey1, byte[] hdrKey2,
-                                         SSU2Payload.RIBlock riblock, long token) {
+                                         SSU2Payload.RIBlock riblock, EstablishmentManager.Token token) {
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
         int off = pkt.getOffset();
@@ -949,8 +947,8 @@ class PacketBuilder2 {
             int len = riblock.getTotalLength();
             blocks.add(riblock);
             // only if room
-            if (token > 0 && mtu - (SHORT_HEADER_SIZE + KEY_LEN + MAC_LEN + len + MAC_LEN) >= 15) {
-                Block block = new SSU2Payload.NewTokenBlock(token, _context.clock().now() + EstablishmentManager.IB_TOKEN_EXPIRATION);
+            if (token != null && mtu - (SHORT_HEADER_SIZE + KEY_LEN + MAC_LEN + len + MAC_LEN) >= 15) {
+                Block block = new SSU2Payload.NewTokenBlock(token.token, token.expires);
                 len += block.getTotalLength();
                 blocks.add(block);
             }

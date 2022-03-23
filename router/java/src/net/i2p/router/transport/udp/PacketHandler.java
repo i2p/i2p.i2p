@@ -289,8 +289,8 @@ class PacketHandler {
                 if (state.getNextMACKey() != null)
                     isValid = validate(packet, state.getNextMACKey());
                 if (!isValid) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Failed validation with existing con, trying as new con: " + packet);
+                    if (_log.shouldDebug())
+                        _log.debug("Failed validation with existing con, trying as new con: " + packet);
 
                     isValid = validate(packet, _transport.getIntroKey());
                     if (isValid) {
@@ -472,8 +472,8 @@ class PacketHandler {
             if (state.getMACKey() != null) {
                 isValid = validate(packet, state.getMACKey());
                 if (isValid) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Valid introduction packet received for inbound con: " + packet);
+                    if (_log.shouldDebug())
+                        _log.debug("Valid introduction packet received for inbound con: " + packet);
 
                     packet.decrypt(state.getCipherKey());
                     handlePacket(reader, packet, null, null, null, AuthType.SESSION);
@@ -513,8 +513,8 @@ class PacketHandler {
                 isValid = validate(packet, state.getMACKey());
                 if (isValid) {
                     // this should be the Session Confirmed packet
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Valid introduction packet received for outbound established con: " + packet);
+                    if (_log.shouldDebug())
+                        _log.debug("Valid introduction packet received for outbound established con: " + packet);
                     packet.decrypt(state.getCipherKey());
                     handlePacket(reader, packet, null, state, null, AuthType.SESSION);
                     return;
@@ -524,8 +524,8 @@ class PacketHandler {
             // keys not yet exchanged, lets try it with the peer's intro key
             isValid = validate(packet, state.getIntroKey());
             if (isValid) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Valid packet received for " + state + " with Bob's intro key: " + packet);
+                if (_log.shouldDebug())
+                    _log.debug("Valid packet received for " + state + " with Bob's intro key: " + packet);
                 packet.decrypt(state.getIntroKey());
                 // the only packet we should be getting with Bob's intro key is Session Created
                 handlePacket(reader, packet, null, state, null, AuthType.BOBINTRO);
@@ -721,8 +721,8 @@ class PacketHandler {
                             _log.warn("Dropping type " + type + " auth " + auth + ": " + packet);
                         break;
                     }
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Received relay request packet: " + reader + " from " + from);
+                    if (_log.shouldDebug())
+                        _log.debug("Received relay request packet: " + reader + " from " + from);
                     _introManager.receiveRelayRequest(from, reader);
                     break;
                 case UDPPacket.PAYLOAD_TYPE_RELAY_INTRO:
@@ -731,8 +731,8 @@ class PacketHandler {
                             _log.warn("Dropping type " + type + " auth " + auth + ": " + packet);
                         break;
                     }
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Received relay intro packet: " + reader + " from " + from);
+                    if (_log.shouldDebug())
+                        _log.debug("Received relay intro packet: " + reader + " from " + from);
                     _introManager.receiveRelayIntro(from, reader);
                     break;
                 case UDPPacket.PAYLOAD_TYPE_RELAY_RESPONSE:
@@ -741,8 +741,8 @@ class PacketHandler {
                             _log.warn("Dropping type " + type + " auth " + auth + ": " + packet);
                         break;
                     }
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Received relay response packet: " + reader + " from " + from);
+                    if (_log.shouldDebug())
+                        _log.debug("Received relay response packet: " + reader + " from " + from);
                     _establisher.receiveRelayResponse(from, reader);
                     break;
                 case UDPPacket.PAYLOAD_TYPE_SESSION_DESTROY:

@@ -370,7 +370,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     public void gotToken(long token, long expires) {
         if (_receivedConfirmedIdentity == null)
             throw new IllegalStateException("RI must be first");
-        _transport.getEstablisher().addOutboundToken(_receivedConfirmedIdentity.calculateHash(), token, expires);
+        _transport.getEstablisher().addOutboundToken(_remoteHostId, token, expires);
     }
 
     public void gotI2NP(I2NPMessage msg) {
@@ -429,14 +429,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     public long getSendConnID() { return _sendConnID; }
     public long getRcvConnID() { return _rcvConnID; }
     public long getToken() { return _token; }
-    public long getNextToken() {
-        // generate on the fly, this will only be called once
-        long token;
-        do {
-            token = _context.random().nextLong();
-        } while (token == 0);
-        _transport.getEstablisher().addInboundToken(_remoteHostId, token);
-        return token;
+    public EstablishmentManager.Token getNextToken() {
+        return _transport.getEstablisher().getInboundToken(_remoteHostId);
     }
     public HandshakeState getHandshakeState() { return _handshakeState; }
     public byte[] getSendHeaderEncryptKey1() { return _sendHeaderEncryptKey1; }
@@ -720,6 +714,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         StringBuilder buf = new StringBuilder(128);
         buf.append("IES2 ");
         buf.append(Addresses.toString(_aliceIP, _alicePort));
+        buf.append(" Rcv ID: ").append(_rcvConnID);
+        buf.append(" Send ID: ").append(_sendConnID);
         buf.append(" RelayTag: ").append(_sentRelayTag);
         buf.append(' ').append(_currentState);
         return buf.toString();
