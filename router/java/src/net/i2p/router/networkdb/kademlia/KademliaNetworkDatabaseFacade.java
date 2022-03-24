@@ -1206,7 +1206,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             // Just check all the addresses, faster than getting just the SSU ones
             for (RouterAddress ra : routerInfo.getAddresses()) {
                 // Introducers change often, introducee will ping introducer for 2 hours
-                if (ra.getOption("ihost0") != null)
+                if (ra.getOption("itag0") != null)
                     return "Old peer with SSU Introducers";
             }
         }

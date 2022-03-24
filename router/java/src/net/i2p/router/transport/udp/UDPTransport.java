@@ -2069,7 +2069,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             boolean rv = (externalListenHost == null) || (externalListenPort <= 0);
             if (!rv) {
                 // shortcut to determine if introducers are present
-                if (addr.getOption("ihost0") != null)
+                if (addr.getOption("itag0") != null)
                     rv = true;  // status == ok and we don't actually need introducers, so rebuild
             }
             if (rv) {
@@ -2325,7 +2325,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             RouterAddress addr = addrs.get(i);
             //if (getSSUVersion(addr) == 0)
             //    continue;
-            if (addr.getOption("ihost0") == null) {
+            if (addr.getOption("itag0") == null) {
                 // No introducers
                 // Skip outbound-only or invalid address/port
                 byte[] ip = addr.getIP();

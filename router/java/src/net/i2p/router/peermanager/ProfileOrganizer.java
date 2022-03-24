@@ -815,7 +815,7 @@ public class ProfileOrganizer {
                             continue;
                         }
                         // This is the quick way of doing UDPAddress.getIntroducerCount() > 0
-                        if (ra.getOption("ihost0") != null)
+                        if (ra.getOption("itag0") != null)
                             l.add(peer);
                 }
             }
