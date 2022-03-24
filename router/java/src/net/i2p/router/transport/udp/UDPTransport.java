@@ -1424,6 +1424,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     //     (_context.clock().now() - _reachabilityStatusLastUpdated > 2*TEST_FREQUENCY) ) {
                         // they told us something different and our tests are either old or failing
                     if (rebuild) {
+                            if (_enableSSU2) {
+                                // flush SSU2 tokens
+                                if (ourPort != externalListenPort) {
+                                    _establisher.portChanged();
+                                } else if (externalListenHost != null && !Arrays.equals(ourIP, externalListenHost)) {
+                                    _establisher.ipChanged(isIPv6);
+                                }
+                            }
+
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Trying to change our external address to " +
                                           Addresses.toString(ourIP, ourPort));
