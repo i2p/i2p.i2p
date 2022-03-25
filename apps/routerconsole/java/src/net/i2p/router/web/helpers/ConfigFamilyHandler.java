@@ -13,6 +13,7 @@ import java.util.Map;
 
 import net.i2p.crypto.CertUtil;
 import net.i2p.crypto.KeyStoreUtil;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.crypto.FamilyKeyCrypto;
 import net.i2p.router.web.FormHandler;
 import net.i2p.util.SecureDirectory;
@@ -44,6 +45,12 @@ public class ConfigFamilyHandler extends FormHandler {
                 if (ks.exists()) {
                     addFormError("Keystore for family " + family + " already exists! Delete or rename it first: " + ks);
                 } else {
+                    for (RouterInfo ri : _context.netDb().getRouters()) {
+                        if (family.equals(ri.getOption("family"))) {
+                            addFormError("The family name \"" + family + "\" is already in use by another router. Please select a different family name.");
+                            return;
+                        }
+                    }
                     if (_context.router().saveConfig(FamilyKeyCrypto.PROP_FAMILY_NAME, family.trim())) {
                         addFormNotice(_t("Configuration saved successfully."));
                         addFormError(_t("Restart required to take effect"));
