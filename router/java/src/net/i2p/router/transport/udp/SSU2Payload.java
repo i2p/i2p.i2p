@@ -13,6 +13,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.I2NPMessageImpl;
 import net.i2p.data.router.RouterInfo;
+import net.i2p.util.Log;
 
 /**
  *
@@ -125,15 +126,6 @@ class SSU2Payload {
          *  @param lastReceived in theory could wrap around to negative, but very unlikely
          */
         public void gotTermination(int reason, long lastReceived);
-
-        /**
-         *  For stats.
-         *  @param paddingLength the number of padding bytes, not including the 3-byte block header
-         *  @param frameLength the total size of the frame, including all blocks and block headers
-         */
-        public void gotPadding(int paddingLength, int frameLength);
-
-        public void gotUnknown(int type, int len);
     }
 
     /**
@@ -364,13 +356,12 @@ class SSU2Payload {
 
                 case BLOCK_PADDING:
                     gotPadding = true;
-                    cb.gotPadding(len, length);
                     break;
 
                 default:
-                    if (isHandshake)
-                        throw new IOException("Illegal block in handshake: " + type);
-                    cb.gotUnknown(type, len);
+                    Log log = ctx.logManager().getLog(SSU2Payload.class);
+                    if (log.shouldWarn())
+                        log.warn("Got UNKNOWN block, type: " + type + " len: " + len + " on " + cb);
                     break;
 
             }

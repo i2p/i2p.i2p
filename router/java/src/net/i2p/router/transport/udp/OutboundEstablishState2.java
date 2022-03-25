@@ -270,14 +270,6 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         _transport.getEstablisher().receiveSessionDestroy(_remoteHostId, this);
     }
 
-    public void gotUnknown(int type, int len) {
-        if (_log.shouldDebug())
-            _log.debug("Got UNKNOWN block, type: " + type + " len: " + len);
-    }
-
-    public void gotPadding(int paddingLength, int frameLength) {
-    }
-
     /////////////////////////////////////////////////////////
     // end payload callbacks
     /////////////////////////////////////////////////////////

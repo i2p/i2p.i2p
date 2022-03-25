@@ -136,11 +136,11 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             // probably don't need again
             _token = token;
             _handshakeState.start();
-            if (_log.shouldDebug())
-                _log.debug("State after start: " + _handshakeState);
+            //if (_log.shouldDebug())
+            //    _log.debug("State after start: " + _handshakeState);
             _handshakeState.mixHash(data, off, LONG_HEADER_SIZE);
-            if (_log.shouldDebug())
-                _log.debug("State after mixHash 1: " + _handshakeState);
+            //if (_log.shouldDebug())
+            //    _log.debug("State after mixHash 1: " + _handshakeState);
 
             // decrypt in-place
             try {
@@ -150,8 +150,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                     _log.debug("Session request error, State at failure: " + _handshakeState + '\n' + net.i2p.util.HexDump.dump(data, off, len), gse);
                 throw gse;
             }
-            if (_log.shouldDebug())
-                _log.debug("State after sess req: " + _handshakeState);
+            //if (_log.shouldDebug())
+            //    _log.debug("State after sess req: " + _handshakeState);
             processPayload(data, off + LONG_HEADER_SIZE, len - (LONG_HEADER_SIZE + KEY_LEN + MAC_LEN), true);
             _sendHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessCreateHeader");
             _currentState = InboundState.IB_STATE_REQUEST_RECEIVED;
@@ -407,14 +407,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         _transport.getEstablisher().receiveSessionDestroy(_remoteHostId);
     }
 
-    public void gotUnknown(int type, int len) {
-        if (_log.shouldDebug())
-            _log.debug("Got UNKNOWN block, type: " + type + " len: " + len);
-    }
-
-    public void gotPadding(int paddingLength, int frameLength) {
-    }
-
     /////////////////////////////////////////////////////////
     // end payload callbacks
     /////////////////////////////////////////////////////////
@@ -495,8 +487,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             throw new GeneralSecurityException("Token mismatch: 1: " + _token + " 2: " + token);
         _handshakeState.start();
         _handshakeState.mixHash(data, off, 32);
-        if (_log.shouldDebug())
-            _log.debug("State after mixHash 1: " + _handshakeState);
+        //if (_log.shouldDebug())
+        //    _log.debug("State after mixHash 1: " + _handshakeState);
 
         // decrypt in-place
         try {
@@ -506,8 +498,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                 _log.debug("Session Request error, State at failure: " + _handshakeState + '\n' + net.i2p.util.HexDump.dump(data, off, len), gse);
             throw gse;
         }
-        if (_log.shouldDebug())
-            _log.debug("State after sess req: " + _handshakeState);
+        //if (_log.shouldDebug())
+        //    _log.debug("State after sess req: " + _handshakeState);
         _timeReceived = 0;
         processPayload(data, off + LONG_HEADER_SIZE, len - (LONG_HEADER_SIZE + KEY_LEN + MAC_LEN), true);
         packetReceived();
@@ -545,8 +537,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         if (rid != _rcvConnID)
             throw new GeneralSecurityException("Conn ID mismatch: req: " + _rcvConnID + " conf: " + rid);
         _handshakeState.mixHash(data, off, 16);
-        if (_log.shouldDebug())
-            _log.debug("State after mixHash 3: " + _handshakeState);
+        //if (_log.shouldDebug())
+        //    _log.debug("State after mixHash 3: " + _handshakeState);
 
         // decrypt in-place
         try {
@@ -556,8 +548,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                 _log.debug("Session Confirmed error, State at failure: " + _handshakeState + '\n' + net.i2p.util.HexDump.dump(data, off, len), gse);
             throw gse;
         }
-        if (_log.shouldDebug())
-            _log.debug("State after sess conf: " + _handshakeState);
+        //if (_log.shouldDebug())
+        //    _log.debug("State after sess conf: " + _handshakeState);
         processPayload(data, off + SHORT_HEADER_SIZE, len - (SHORT_HEADER_SIZE + KEY_LEN + MAC_LEN + MAC_LEN), false);
         packetReceived();
         if (_currentState == InboundState.IB_STATE_FAILED) {
