@@ -3464,6 +3464,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     /**
+     *  @since 0.9.54
+     */
+    InboundMessageFragments getInboundFragments() {
+        return _inboundFragments;
+    }
+
+    /**
      * Does nothing
      * @deprecated as of 0.9.31
      */
