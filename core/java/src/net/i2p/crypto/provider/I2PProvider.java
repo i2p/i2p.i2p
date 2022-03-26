@@ -72,6 +72,14 @@ public final class I2PProvider extends Provider {
         // but this works fine with programmatic cert generation
         put("Alg.Alias.Signature.1.3.101.101", "SHA512withEdDSA");
         put("Alg.Alias.Signature.OID.1.3.101.101", "SHA512withEdDSA");
+        // The official OID is now 1.3.101.112 for pubkeys, privkeys, and sigs
+        // See RFC 8410 and RFC 8420
+        put("Alg.Alias.KeyFactory.1.3.101.112", "EdDSA");
+        put("Alg.Alias.KeyFactory.OID.1.3.101.112", "EdDSA");
+        put("Alg.Alias.KeyPairGenerator.1.3.101.112", "EdDSA");
+        put("Alg.Alias.KeyPairGenerator.OID.1.3.101.112", "EdDSA");
+        put("Alg.Alias.Signature.1.3.101.112", "SHA512withEdDSA");
+        put("Alg.Alias.Signature.OID.1.3.101.112", "SHA512withEdDSA");
         // TODO Ed25519ph
         // OID: 1.3.101.101
 
