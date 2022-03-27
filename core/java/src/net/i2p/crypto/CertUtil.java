@@ -38,6 +38,7 @@ import java.util.Set;
 import javax.security.auth.x500.X500Principal;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.provider.I2PProvider;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SigningPrivateKey;
@@ -56,6 +57,10 @@ public final class CertUtil {
     private static final String CERT_DIR = "certificates";
     private static final String REVOCATION_DIR = "revocations";
     private static final int LINE_LENGTH = 64;
+
+    static {
+        I2PProvider.addProvider();
+    }
 
     /**
      *  Write a certificate to a file in base64 format.
@@ -284,6 +289,10 @@ public final class CertUtil {
      *  Throws if the certificate is invalid (e.g. expired).
      *
      *  This does NOT check for revocation.
+     *  This verifies the signature, assuming it is self-signed,
+     *  but will not throw an exception,
+     *  will log a warning only, as of 0.9.54.
+     *  We do NOT fetch additional certs or attempt to validate a cert up the chain.
      *
      *  @return non-null, throws on all errors including certificate invalid
      *  @since 0.9.24 adapted from SU3File private method
@@ -295,6 +304,11 @@ public final class CertUtil {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             X509Certificate cert = (X509Certificate)cf.generateCertificate(fis);
             cert.checkValidity();
+            try {
+                cert.verify(cert.getPublicKey());
+            } catch (Exception e) {
+                System.out.println("Warning: Cert is not self-signed or has a bad signature: " + kd + " - " + e);
+            }
             return cert;
         } catch (IllegalArgumentException iae) {
             // java 1.8.0_40-b10, openSUSE
