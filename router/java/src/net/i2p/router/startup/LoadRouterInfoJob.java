@@ -104,11 +104,32 @@ class LoadRouterInfoJob extends JobImpl {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Reading in routerInfo from " + rif.getAbsolutePath() + " and it has " + info.getAddresses().size() + " addresses");
                 // don't reuse if family name changed
-                if (DataHelper.eq(info.getOption(FamilyKeyCrypto.OPT_NAME),
-                                  getContext().getProperty(FamilyKeyCrypto.PROP_FAMILY_NAME))) {
+                String oldFamily = info.getOption(FamilyKeyCrypto.OPT_NAME);
+                if (oldFamily == null) {
                     _us = info;
+                } else if (oldFamily.equals(getContext().getProperty(FamilyKeyCrypto.PROP_FAMILY_NAME))) {
+                    // This keeps the signature the same across restarts,
+                    // which is good because ECDSA creates a different signature each time,
+                    // but in some situations such as leaving and re-joining or recreating a family,
+                    // or copying router.info to a new router,
+                    // could lead to a bad signature being perpetuated forever.
+                    // Here we ignore and delete router.info if the sig is invalid.
+                    FamilyKeyCrypto fkc = getContext().router().getFamilyKeyCrypto();
+                    if (fkc != null && fkc.verifyOurFamily(info)) {
+                        _us = info;
+                    } else {
+                        _log.logAlways(Log.WARN, "NetDb family keys are invalid");
+                        // close and delete so we don't infinite loop
+                        try { fis1.close(); } catch (IOException ioe2) {}
+                        fis1 = null;
+                        rif.delete();
+                    }
                 } else {
                     _log.logAlways(Log.WARN, "NetDb family name changed");
+                    // close and delete so we don't infinite loop
+                    try { fis1.close(); } catch (IOException ioe2) {}
+                    fis1 = null;
+                    rif.delete();
                 }
             }
             
