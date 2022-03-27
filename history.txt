@@ -1,3 +1,24 @@
+2022-03-27 zzz
+ * Crypto: Fix CertUtil loading EdDSA certs, check sigs
+ * Router: Validate family sig at startup
+ * SSU: Increase min pending establish states limit
+ * SSU2: Misc. fixes, prep for fragmented RI
+
+2022-03-26 zzz
+ * Crypto: Add official EdDSA OIDs to provider
+ * SSU: Reduce ack delay to minimize addition to measured RTT
+ * SSU2: Hook in IMF Bloom filter to detect dups
+
+2022-03-25 zzz
+ * Console: Prevent creating a family that another router is using
+
+2022-03-23 zzz
+ * I2CP: Synch fixes
+ * SSU2: Refactor tokens
+
+2022-03-22 zzz
+ * Router family fixes
+
 2022-03-20 zzz
  * NetDB:
    - Refactor family validation
@@ -66,7 +87,7 @@
  * SSU: SSU2 classes and keys (WIP)
 
 2022-02-23 zzz
- * i2psnark: Load sytem mime types if available
+ * i2psnark: Load system mime types if available
  * SSU: More SSU2 prep and support (WIP)
 
 2022-02-22 zzz

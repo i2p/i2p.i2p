@@ -163,8 +163,10 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         if (_timeReceived == 0)
             throw new GeneralSecurityException("No DateTime block in Session/Token Request");
         _skew = _establishBegin - _timeReceived;
-        if (_skew > MAX_SKEW || _skew < 0 - MAX_SKEW)
+        if (_skew > MAX_SKEW || _skew < 0 - MAX_SKEW) {
+            // TODO send retry with termination
             throw new GeneralSecurityException("Skew exceeded in Session/Token Request: " + _skew);
+        }
         packetReceived();
     }
 
@@ -593,6 +595,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         sender.initializeKey(d_ba, 0);
         ChaChaPolyCipherState rcvr = new ChaChaPolyCipherState();
         rcvr.initializeKey(d_ab, 0);
+      /****
         if (_log.shouldDebug())
             _log.debug("split()\nGenerated Chain key:              " + Base64.encode(ckd) +
                        "\nGenerated split key for A->B:     " + Base64.encode(k_ab) +
@@ -603,6 +606,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                        "\nIntro key for Bob:                " + Base64.encode(_rcvHeaderEncryptKey1) +
                        "\nGenerated header key 2 for A->B:  " + Base64.encode(h_ab) +
                        "\nGenerated header key 2 for B->A:  " + Base64.encode(h_ba));
+       ****/
         _handshakeState.destroy();
         if (_createdSentCount == 1)
             _rtt = (int) ( _context.clock().now() - _lastSend );
@@ -706,6 +710,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         StringBuilder buf = new StringBuilder(128);
         buf.append("IES2 ");
         buf.append(Addresses.toString(_aliceIP, _alicePort));
+        buf.append(" lifetime: ").append(DataHelper.formatDuration(getLifetime()));
         buf.append(" Rcv ID: ").append(_rcvConnID);
         buf.append(" Send ID: ").append(_sendConnID);
         buf.append(" RelayTag: ").append(_sentRelayTag);

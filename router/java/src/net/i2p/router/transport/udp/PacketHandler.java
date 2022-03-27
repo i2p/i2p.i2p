@@ -881,7 +881,7 @@ class PacketHandler {
                 if (header.getPacketNumber() != 0 ||
                     header.getType() != SSU2Util.SESSION_CONFIRMED_FLAG_BYTE) {
                     if (_log.shouldWarn())
-                        _log.warn("Queue possible data packet on: " + state);
+                        _log.warn("Queue possible data packet with header " + header + " on: " + state);
                     // TODO either attempt to decrypt as a retransmitted
                     // Session Request or Token Request,
                     // or just tell establisher so it can retransmit Session Created or Retry

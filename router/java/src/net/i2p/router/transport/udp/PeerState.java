@@ -1570,8 +1570,8 @@ public class PeerState {
                 // no need to nudge(), this is called from OMF loop before allocateSend()
             }
             if (rv <= 0) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(_remotePeer + " nothing pending, cancelling timer");
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug(_remotePeer + " nothing pending, cancelling timer");
                 synchronized(this) {
                     _retransmitTimer = 0;
                     exitFastRetransmit();

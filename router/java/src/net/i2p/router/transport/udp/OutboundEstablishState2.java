@@ -6,6 +6,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
+import java.util.List;
 
 import com.southernstorm.noise.protocol.ChaChaPolyCipherState;
 import com.southernstorm.noise.protocol.CipherState;
@@ -461,13 +462,15 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
      * note that we just sent the SessionConfirmed packets
      * and save them for retransmission
      *
+     * @param riFrags if non-null, the RI was fragmented, and these are the
+     *                remaining fragments to be sent in the PeerState.
      * @return the new PeerState2, may also be retrieved from getPeerState()
      */
-    public synchronized PeerState2 confirmedPacketsSent(UDPPacket[] packets) {
+    public synchronized PeerState2 confirmedPacketSent(UDPPacket packet, List<SSU2Payload.RIBlock> riFrags) {
         if (_sessConfForReTX == null) {
             // store pkt for retx
             // only one supported right now
-            DatagramPacket pkt = packets[0].getPacket();
+            DatagramPacket pkt = packet.getPacket();
             byte data[] = pkt.getData();
             int off = pkt.getOffset();
             int len = pkt.getLength();
@@ -515,7 +518,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                                      _sendConnID, _rcvConnID,
                                      _sendHeaderEncryptKey1, h_ab, h_ba);
             _currentState = OutboundState.OB_STATE_CONFIRMED_COMPLETELY;
-            _pstate.confirmedPacketsSent(_sessConfForReTX);
+            _pstate.confirmedPacketSent(_sessConfForReTX, riFrags);
             // PS2.super adds CLOCK_SKEW_FUDGE that doesn't apply here
             _pstate.adjustClockSkew(_skew - (_rtt / 2) - PeerState.CLOCK_SKEW_FUDGE);
             _pstate.setHisMTU(_mtu);
@@ -554,6 +557,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     @Override
     public String toString() {
         return "OES2 " + _remoteHostId +
+               " lifetime: " + DataHelper.formatDuration(getLifetime()) +
                " Rcv ID: " + _rcvConnID +
                " Send ID: " + _sendConnID +
                ' ' + _currentState;

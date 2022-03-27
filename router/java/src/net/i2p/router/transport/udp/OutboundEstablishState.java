@@ -768,6 +768,8 @@ class OutboundEstablishState {
     /** @since 0.8.9 */
     @Override
     public String toString() {
-        return "OES " + _remoteHostId + ' ' + _currentState;
+        return "OES " + _remoteHostId +
+               " lifetime: " + DataHelper.formatDuration(getLifetime()) +
+               ' ' + _currentState;
     }
 }

@@ -443,15 +443,12 @@ class PacketBuilder2 {
      * Build a new series of SessionConfirmed packets for the given peer, 
      * encrypting it as necessary.
      *
-     * Note that while a SessionConfirmed could in theory be fragmented,
-     * in practice a RouterIdentity is 387 bytes and a single fragment is 512 bytes max,
-     * so it will never be fragmented.
+     * If the RI is large enough that it is fragmented, this will still only return
+     * a single Session Confirmed message. The remaining RI blocks will be passed to
+     * the establish state via confirmedPacketsSent(), and the state will
+     * transmit them via the new PeerState2.
      * 
      * @return ready to send packets, or null if there was a problem
-     * 
-     * TODO: doesn't really return null, and caller doesn't handle null return
-     * (null SigningPrivateKey should cause this?)
-     * Should probably return null if buildSessionConfirmedPacket() returns null for any fragment
      */
     public UDPPacket[] buildSessionConfirmedPackets(OutboundEstablishState2 state, RouterInfo ourInfo) {
         boolean gzip = false;
@@ -493,17 +490,24 @@ class PacketBuilder2 {
             len = info.length;
         }
 
-        UDPPacket packets[] = new UDPPacket[numFragments];
+        UDPPacket packets[] = new UDPPacket[1];
         packets[0] = buildSessionConfirmedPacket(state, numFragments, info, len, gzip);
+        List<SSU2Payload.RIBlock> riFrags;
         if (numFragments > 1) {
-            // get PeerState from OES
+            riFrags = new ArrayList<SSU2Payload.RIBlock>(numFragments - 1);
+            int off = len;
             for (int i = 1; i < numFragments; i++) {
-                //packets[i] = buildSessionConfirmedPacket(state, i, numFragments, info, gzip);
+                if (i == numFragments - 1)
+                    len = info.length - off;
+                SSU2Payload.RIBlock block = new SSU2Payload.RIBlock(info,  off, len,
+                                                                    false, gzip, i, numFragments);
+                riFrags.add(block);
+                off += len;
             }
-            // TODO numFragments > 1 requires shift to data phase
-            throw new IllegalArgumentException("TODO");
+        } else {
+            riFrags = null;
         }
-        state.confirmedPacketsSent(packets);
+        state.confirmedPacketSent(packets[0], riFrags);
         return packets;
     }
 

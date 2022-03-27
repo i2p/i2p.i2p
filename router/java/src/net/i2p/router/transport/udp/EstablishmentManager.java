@@ -33,6 +33,7 @@ import net.i2p.util.Addresses;
 import net.i2p.util.I2PThread;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -103,7 +104,7 @@ class EstablishmentManager {
     
     /** max outbound in progress - max inbound is half of this */
     private final int DEFAULT_MAX_CONCURRENT_ESTABLISH;
-    private static final int DEFAULT_LOW_MAX_CONCURRENT_ESTABLISH = 20;
+    private static final int DEFAULT_LOW_MAX_CONCURRENT_ESTABLISH = SystemVersion.isSlow() ? 20 : 40;
     private static final int DEFAULT_HIGH_MAX_CONCURRENT_ESTABLISH = 150;
     private static final String PROP_MAX_CONCURRENT_ESTABLISH = "i2np.udp.maxConcurrentEstablish";
 
@@ -130,7 +131,7 @@ class EstablishmentManager {
      * Kill any inbound that takes more than this
      * One round trip (Created-Confirmed)
      */
-    private static final int MAX_IB_ESTABLISH_TIME = 20*1000;
+    private static final int MAX_IB_ESTABLISH_TIME = 15*1000;
 
     /** max before receiving a response to a single message during outbound establishment */
     public static final int OB_MESSAGE_TIMEOUT = 15*1000;
@@ -513,8 +514,17 @@ class EstablishmentManager {
                 // TODO this is insufficient to prevent DoSing, especially if
                 // IP spoofing is used. For further study.
                 if (!shouldAllowInboundEstablishment()) {
-                    if (_log.shouldLog(Log.WARN))
+                    if (_log.shouldLog(Log.WARN)) {
                         _log.warn("Dropping inbound establish, increase " + PROP_MAX_CONCURRENT_ESTABLISH);
+                        if (_log.shouldDebug()) {
+                            StringBuilder buf = new StringBuilder(4096);
+                            buf.append("Active: ").append(_inboundStates.size()).append('\n');
+                            for (InboundEstablishState ies : _inboundStates.values()) {
+                                 buf.append(ies.toString()).append('\n');
+                            }
+                            _log.debug(buf.toString());
+                        }
+                    }
                     _context.statManager().addRateData("udp.establishDropped", 1);
                     return; // drop the packet
                 }
@@ -697,8 +707,14 @@ class EstablishmentManager {
             state.fail();
             return;
         }
-        // we are done, go right to ps2
-        handleCompletelyEstablished(state);
+        InboundEstablishState.InboundState istate = state.getState();
+        if (istate == IB_STATE_CONFIRMED_COMPLETELY ||
+            istate == IB_STATE_COMPLETE) {
+            // we are done, go right to ps2
+            handleCompletelyEstablished(state);
+        } else {
+            // More RI blocks to come, TODO
+        }
         notifyActivity();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Receive session confirmed from: " + state);
@@ -997,13 +1013,19 @@ class EstablishmentManager {
         // SimpleTimer.getInstance().addEvent(new PublishToNewInbound(peer), 10*1000);
         if (_log.shouldDebug())
             _log.debug("IB confirm: " + peer);
-        DeliveryStatusMessage dsm = new DeliveryStatusMessage(_context);
-        dsm.setArrival(_networkID); // overloaded, sure, but future versions can check this
+        DeliveryStatusMessage dsm;
+        if (peer.getVersion() == 1) {
+            dsm = new DeliveryStatusMessage(_context);
+            dsm.setArrival(_networkID); // overloaded, sure, but future versions can check this
                                            // This causes huge values in the inNetPool.droppedDeliveryStatusDelay stat
                                            // so it needs to be caught in InNetMessagePool.
-        dsm.setMessageExpiration(_context.clock().now() + DATA_MESSAGE_TIMEOUT);
-        dsm.setMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
-        // sent below
+            dsm.setMessageExpiration(_context.clock().now() + DATA_MESSAGE_TIMEOUT);
+            dsm.setMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
+            // sent below
+        } else {
+            // SSU 2 uses an ACK of packet 0
+            dsm = null;
+        }
 
         // just do this inline
         //_context.simpleTimer2().addEvent(new PublishToNewInbound(peer), 0);
@@ -1016,10 +1038,11 @@ class EstablishmentManager {
                 // bundle the two messages together for efficiency
                 DatabaseStoreMessage dbsm = getOurInfo();
                 List<I2NPMessage> msgs = new ArrayList<I2NPMessage>(2);
-                msgs.add(dsm);
+                if (dsm != null)
+                    msgs.add(dsm);
                 msgs.add(dbsm);
                 _transport.send(msgs, peer);
-            } else {
+            } else if (dsm != null) {
                 _transport.send(dsm, peer);
                 // nuh uh.
                 if (_log.shouldLog(Log.WARN))
@@ -1465,6 +1488,7 @@ class EstablishmentManager {
     private void sendDestroy(InboundEstablishState state) {
         if (state.getVersion() > 1)
             return;
+        // TODO ban the IP for a while, like we do in NTCP?
         UDPPacket packet = _builder.buildSessionDestroyPacket(state);
         if (packet != null) {
             if (_log.shouldLog(Log.DEBUG))
@@ -1486,7 +1510,8 @@ class EstablishmentManager {
 
             for (Iterator<InboundEstablishState> iter = _inboundStates.values().iterator(); iter.hasNext(); ) {
                 InboundEstablishState cur = iter.next();
-                if (cur.getState() == IB_STATE_CONFIRMED_COMPLETELY) {
+                InboundEstablishState.InboundState istate = cur.getState();
+                if (istate == IB_STATE_CONFIRMED_COMPLETELY) {
                     // completely received (though the signature may be invalid)
                     iter.remove();
                     inboundState = cur;
@@ -1498,13 +1523,12 @@ class EstablishmentManager {
                     iter.remove();
                     inboundState = cur;
                     //_context.statManager().addRateData("udp.inboundEstablishFailedState", cur.getState(), cur.getLifetime());
-                    //if (_log.shouldLog(Log.DEBUG))
-                    //    _log.debug("Removing expired inbound state");
+                    if (_log.shouldDebug())
+                        _log.debug("Expired: " + cur);
                     expired = true;
                     break;
-                } else if (cur.getState() == IB_STATE_FAILED) {
+                } else if (istate == IB_STATE_FAILED || istate == IB_STATE_COMPLETE) {
                     iter.remove();
-                    //_context.statManager().addRateData("udp.inboundEstablishFailedState", cur.getState(), cur.getLifetime());
                 } else {
                     // this will always be > 0
                     long next = cur.getNextSendTime();
