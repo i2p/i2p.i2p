@@ -103,6 +103,8 @@ public class Certificate extends DataStructureImpl {
             throw new DataFormatException("Not enough bytes for the payload (read: " + read + " length: " + length + ')');
         if (type == CERTIFICATE_TYPE_KEY) {
             if (length == 4) {
+                if (Arrays.equals(payload, KeyCertificate.X25519_Ed25519_PAYLOAD))
+                    return KeyCertificate.X25519_Ed25519_CERT;
                 if (Arrays.equals(payload, KeyCertificate.Ed25519_PAYLOAD))
                     return KeyCertificate.ELG_Ed25519_CERT;
                 if (Arrays.equals(payload, KeyCertificate.ECDSA256_PAYLOAD))

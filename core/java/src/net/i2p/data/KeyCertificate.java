@@ -20,14 +20,31 @@ public class KeyCertificate extends Certificate {
 
     public static final int HEADER_LENGTH = 4;
 
-    /** @since 0.9.22 pkg private for Certificate.create() */
+    /**
+     * ElG + Ed25519
+     *
+     * @since 0.9.22 pkg private for Certificate.create()
+     */
     static final byte[] Ed25519_PAYLOAD = new byte[] {
         0, (byte) (SigType.EdDSA_SHA512_Ed25519.getCode()), 0, 0
     };
 
-    /** @since 0.9.22 pkg private for Certificate.create() */
+    /**
+     * ElG + P256
+     *
+     * @since 0.9.22 pkg private for Certificate.create()
+     */
     static final byte[] ECDSA256_PAYLOAD = new byte[] {
         0, (byte) (SigType.ECDSA_SHA256_P256.getCode()), 0, 0
+    };
+
+    /**
+     * X25519 + Ed25519
+     *
+     * @since 0.9.54
+     */
+    static final byte[] X25519_Ed25519_PAYLOAD = new byte[] {
+        0, (byte) (SigType.EdDSA_SHA512_Ed25519.getCode()), 0, (byte) (EncType.ECIES_X25519.getCode())
     };
 
     /**
@@ -40,6 +57,12 @@ public class KeyCertificate extends Certificate {
      *  @since 0.9.22
      */
     public static final KeyCertificate ELG_Ed25519_CERT;
+
+    /**
+     *  An immutable X25519/Ed25519 certificate.
+     *  @since 0.9.54
+     */
+    public static final KeyCertificate X25519_Ed25519_CERT;
 
     static {
         KeyCertificate kc;
@@ -55,6 +78,12 @@ public class KeyCertificate extends Certificate {
             throw new RuntimeException(dfe);  // won't happen
         }
         ELG_Ed25519_CERT = kc;
+        try {
+            kc = new X25519_Ed25519Cert();
+        } catch (DataFormatException dfe) {
+            throw new RuntimeException(dfe);  // won't happen
+        }
+        X25519_Ed25519_CERT = kc;
     }
 
     /**
@@ -349,6 +378,74 @@ public class KeyCertificate extends Certificate {
 
         public Ed25519Cert() throws DataFormatException {
             super(Ed25519_PAYLOAD);
+            _hashcode = super.hashCode();
+        }
+
+        /** @throws RuntimeException always */
+        @Override
+        public void setCertificateType(int type) {
+            throw new RuntimeException("Data already set");
+        }
+
+        /** @throws RuntimeException always */
+        @Override
+        public void setPayload(byte[] payload) {
+            throw new RuntimeException("Data already set");
+        }
+    
+        /** @throws RuntimeException always */
+        @Override
+        public void readBytes(InputStream in) throws DataFormatException, IOException {
+            throw new RuntimeException("Data already set");
+        }
+    
+        /** Overridden for efficiency */
+        @Override
+        public void writeBytes(OutputStream out) throws IOException {
+            out.write(ED_DATA);
+        }
+    
+        /** Overridden for efficiency */
+        @Override
+        public int writeBytes(byte target[], int offset) {
+            System.arraycopy(ED_DATA, 0, target, offset, ED_LENGTH);
+            return ED_LENGTH;
+        }
+    
+        /** @throws RuntimeException always */
+        @Override
+        public int readBytes(byte source[], int offset) throws DataFormatException {
+            throw new RuntimeException("Data already set");
+        }
+    
+        /** Overridden for efficiency */
+        @Override
+        public int size() {
+            return ED_LENGTH;
+        }
+    
+        /** Overridden for efficiency */
+        @Override
+        public int hashCode() {
+            return _hashcode;
+        }
+    }
+
+    /**
+     *  An immutable X25519/Ed25519 certificate.
+     *  @since 0.9.54
+     */
+    private static final class X25519_Ed25519Cert extends KeyCertificate {
+        private static final byte[] ED_DATA = new byte[] { CERTIFICATE_TYPE_KEY,
+                                                           0, HEADER_LENGTH,
+                                                           0, (byte) SigType.EdDSA_SHA512_Ed25519.getCode(),
+                                                           0, (byte) EncType.ECIES_X25519.getCode()
+        };
+        private static final int ED_LENGTH = ED_DATA.length;
+        private final int _hashcode;
+
+        public X25519_Ed25519Cert() throws DataFormatException {
+            super(X25519_Ed25519_PAYLOAD);
             _hashcode = super.hashCode();
         }
 
