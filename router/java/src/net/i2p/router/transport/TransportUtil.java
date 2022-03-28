@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.router.RouterAddress;
+import net.i2p.util.AddressType;
 import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
 
@@ -143,6 +144,49 @@ public abstract class TransportUtil {
         // do this the fast way, without calling getIP() to parse the host string
         String host = addr.getHost();
         return host != null && YGGDRASIL_PATTERN.matcher(host).matches();
+    }
+
+    /**
+     *  @return null if unknown
+     *  @since 0.9.54
+     */
+    public static AddressType getType(RouterAddress addr) {
+        String host = addr.getHost();
+        return getType(host);
+    }
+
+    /**
+     *  @return null if unknown
+     *  @since 0.9.54
+     */
+    public static AddressType getType(String host) {
+        if (host == null)
+            return null;
+        if (host.indexOf('.') > 0)
+            return AddressType.IPV4;
+        if (host.indexOf(':') >= 0) {
+            if (YGGDRASIL_PATTERN.matcher(host).matches())
+                return AddressType.YGG;
+            return AddressType.IPV6;
+        }
+        return null;
+    }
+
+    /**
+     *  @return null if unknown
+     *  @since 0.9.54
+     */
+    public static AddressType getType(byte[] ip) {
+        if (ip == null)
+            return null;
+        if (ip.length == 4)
+            return AddressType.IPV4;
+        if (ip.length == 16) {
+            if (ip[0] == 2 || ip[0] == 3)
+                return AddressType.YGG;
+            return AddressType.IPV6;
+        }
+        return null;
     }
 
     /**
