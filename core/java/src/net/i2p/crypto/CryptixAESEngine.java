@@ -127,13 +127,12 @@ public final class CryptixAESEngine extends AESEngine {
             }
         }
 
-        int numblock = length / 16;
-        
         DataHelper.xor(iv, ivOffset, payload, payloadIndex, out, outIndex, 16);
         encryptBlock(out, outIndex, sessionKey, out, outIndex);
-        for (int x = 1; x < numblock; x++) {
-            DataHelper.xor(out, outIndex + (x-1) * 16, payload, payloadIndex + x * 16, out, outIndex + x * 16, 16);
-            encryptBlock(out, outIndex + x * 16, sessionKey, out, outIndex + x * 16);
+        for (int x = 16; x < length; x += 16) {
+            int off = outIndex + x;
+            DataHelper.xor(out, off - 16, payload, payloadIndex + x, out, off, 16);
+            encryptBlock(out, off, sessionKey, out, off);
         }
     }
     
