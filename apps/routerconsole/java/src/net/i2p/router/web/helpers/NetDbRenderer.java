@@ -225,9 +225,40 @@ class NetDbRenderer {
                     (country != null && country.equals(_context.commSystem().getCountry(key))) ||
                     // 'O' will catch PO and XO also
                     (caps != null && hasCap(ri, caps)) ||
-                    (tr != null && ri.getTargetAddress(tr) != null) ||
                     (type != null && type == ri.getIdentity().getSigType()) ||
                     (etype != null && etype == ri.getIdentity().getEncType())) {
+                    if (skipped < toSkip) {
+                        skipped++;
+                        continue;
+                    }
+                    if (written++ >= pageSize) {
+                        morePages = true;
+                        break;
+                    }
+                    renderRouterInfo(buf, ri, false, true);
+                    if (sybil != null)
+                        sybils.add(key);
+                    notFound = false;
+                } else if (tr != null) {
+                    boolean found;
+                    if (tr.equals("NTCP_1")) {
+                        RouterAddress ra = ri.getTargetAddress("NTCP");
+                        found = ra != null && ra.getOption("v") == null;
+                    } else if (tr.equals("NTCP_2")) {
+                        RouterAddress ra = ri.getTargetAddress("NTCP");
+                        found = ra != null && ra.getOption("v") != null;
+                    } else if (tr.equals("SSU_1")) {
+                        RouterAddress ra = ri.getTargetAddress("SSU");
+                        found = ra != null && ra.getOption("v") == null;
+                    } else if (tr.equals("SSU_2")) {
+                        RouterAddress ra = ri.getTargetAddress("SSU");
+                        found = ra != null && ra.getOption("v") != null;
+                    } else {
+                        RouterAddress ra = ri.getTargetAddress(tr);
+                        found = ra != null;
+                    }
+                    if (!found)
+                        continue;
                     if (skipped < toSkip) {
                         skipped++;
                         continue;
@@ -421,7 +452,7 @@ class NetDbRenderer {
                 if (ssucaps != null)
                     buf.append("Caps ").append(ssucaps).append(' ');
                 if (tr != null)
-                    buf.append("Transport ").append(tr).append(' ');
+                    buf.append(_t("Transport")).append(' ').append(tr).append(' ');
                 buf.append(_t("not found in network database"));
                 buf.append("</div>");
             } else if (page > 0 || morePages) {
