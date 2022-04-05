@@ -193,7 +193,8 @@ class UDPSender {
     public void add(UDPPacket packet) {
         if (packet == null || !_keepRunning) return;
         int psz = packet.getPacket().getLength();
-        if (psz > PeerState2.MAX_MTU) {
+        // minus IP header and UDP header, assume IPv4, this is just a quick check
+        if (psz > PeerState2.MAX_MTU - 28) {
             _log.error("Dropping large UDP packet " + psz + " bytes: " + packet, new Exception());
             return;
         }
