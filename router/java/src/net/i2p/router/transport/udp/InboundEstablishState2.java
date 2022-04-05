@@ -52,6 +52,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     private byte[] _sendHeaderEncryptKey2;
     private byte[] _rcvHeaderEncryptKey2;
     private byte[] _sessCrForReTX;
+    private byte[][] _sessConfFragments;
     private long _timeReceived;
     // not adjusted for RTT
     private long _skew;
@@ -311,8 +312,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     public void gotRIFragment(byte[] data, boolean isHandshake, boolean flood, boolean isGzipped, int frag, int totalFrags) {
         if (_log.shouldDebug())
             _log.debug("Got RI fragment " + frag + " of " + totalFrags);
-        if (isHandshake)
-            throw new IllegalStateException("RI in Sess Req");
+        // not supported, we fragment the whole message now
+        throw new IllegalStateException("fragmented RI");
     }
 
     public void gotAddress(byte[] ip, int port) {
@@ -521,12 +522,16 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     /**
-     * Receive the last message in the handshake, and create the PeerState.
+     * Receive the last messages in the handshake, and create the PeerState.
+     * If the message is fragmented, store the data for reassembly and return,
+     * unless this was the last one.
      *
-     * @return the new PeerState2, may also be retrieved from getPeerState()
+     * @return the new PeerState2 if are done, may also be retrieved from getPeerState(),
+     *         or null if more fragments to go
      */
     public synchronized PeerState2 receiveSessionConfirmed(UDPPacket packet) throws GeneralSecurityException {
-        if (_currentState != InboundState.IB_STATE_CREATED_SENT)
+        if (_currentState != InboundState.IB_STATE_CREATED_SENT &&
+            _currentState != InboundState.IB_STATE_CONFIRMED_PARTIALLY)
             throw new GeneralSecurityException("Bad state for Session Confirmed: " + _currentState);
         DatagramPacket pkt = packet.getPacket();
         SocketAddress from = pkt.getSocketAddress();
@@ -538,7 +543,74 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         long rid = DataHelper.fromLong8(data, off);
         if (rid != _rcvConnID)
             throw new GeneralSecurityException("Conn ID mismatch: req: " + _rcvConnID + " conf: " + rid);
-        _handshakeState.mixHash(data, off, 16);
+        byte fragbyte = data[off + SHORT_HEADER_FLAGS_OFFSET];
+        int frag = (fragbyte >> 4) & 0x0f;
+        // allow both 0/0 (development) and 0/1 to indicate sole fragment
+        int totalfrag = fragbyte & 0x0f;
+        if (totalfrag > 0 && frag > totalfrag - 1)
+            throw new GeneralSecurityException("Bad sess conf fragment " + frag + " of " + totalfrag);
+        if (totalfrag > 1) {
+            // Fragment processing. Save fragment.
+            // If we have all fragments, reassemble and continue,
+            // else return to await more.
+            if (_sessConfFragments == null) {
+                _sessConfFragments = new byte[totalfrag][];
+                // change state so we will no longer retransmit session created
+                _currentState = InboundState.IB_STATE_CONFIRMED_PARTIALLY;
+                _sessCrForReTX = null;
+                // force past expiration, we don't have anything to send until we have everything
+                _nextSend = _lastSend + 60*1000;
+            } else {
+                if (_sessConfFragments.length != totalfrag) // total frag changed
+                    throw new GeneralSecurityException("Bad sess conf fragment " + frag + " of " + totalfrag);
+                if (_sessConfFragments[frag] != null) {
+                    if (_log.shouldWarn())
+                        _log.warn("Got dup sess conf frag " + frag + " on " + this);
+                    // there is no facility to ack individual fragments
+                    //packetReceived();
+                    return null;
+                }
+            }
+            if (_log.shouldWarn())
+                _log.warn("Got sess conf frag " + frag + " len " + len + " on " + this);
+            byte[] fragdata;
+            if (frag == 0) {
+                // preserve header
+                fragdata = new byte[len];
+                System.arraycopy(data, off, fragdata, 0, len);
+            } else {
+                // discard header
+                len -= SHORT_HEADER_SIZE;
+                fragdata = new byte[len];
+                System.arraycopy(data, off + SHORT_HEADER_SIZE, fragdata, 0, len);
+            }
+            _sessConfFragments[frag] = fragdata;
+            int totalsize = 0;
+            for (int i = 0; i < totalfrag; i++) {
+                if (_sessConfFragments[i] == null) {
+                    if (_log.shouldWarn())
+                        _log.warn("Still missing at least one sess conf frag on " + this);
+                    // there is no facility to ack individual fragments
+                    //packetReceived();
+                    return null;
+                }
+                totalsize += _sessConfFragments[i].length;
+            }
+            // we have all the fragments
+            // make a jumbo packet and process it through noise
+            len = totalsize;
+            off = 0;
+            data = new byte[len];
+            int joff = 0;
+            for (int i = 0; i < totalfrag; i++) {
+                byte[] f = _sessConfFragments[i];
+                System.arraycopy(f, 0, data, joff, f.length);
+                joff += f.length;
+            }
+            if (_log.shouldWarn())
+                _log.warn("Have all " + totalfrag + " sess conf frags, total length " + len + " on " + this);
+        }
+        _handshakeState.mixHash(data, off, SHORT_HEADER_SIZE);
         //if (_log.shouldDebug())
         //    _log.debug("State after mixHash 3: " + _handshakeState);
 
@@ -637,7 +709,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     /**
-     * @return null if not sent or already got the session created
+     * @return null if not sent or already got the session confirmed
      */
     public synchronized UDPPacket getRetransmitSessionCreatedPacket() {
         if (_sessCrForReTX == null)

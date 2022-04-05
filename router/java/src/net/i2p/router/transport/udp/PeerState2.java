@@ -43,6 +43,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     private final long _sendConnID;
     private final long _rcvConnID;
     private final AtomicInteger _packetNumber = new AtomicInteger();
+    private final AtomicInteger _lastAckHashCode = new AtomicInteger(-1);
     private final CipherState _sendCha;
     private final CipherState _rcvCha;
     private final byte[] _sendHeaderEncryptKey1;
@@ -60,8 +61,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     private long _sentMessagesLastExpired;
 
     // Session Confirmed retransmit
-    private byte[] _sessConfForReTX;
-    private List<SSU2Payload.RIBlock> _riFragsForReTX;
+    private byte[][] _sessConfForReTX;
     private long _sessConfSentTime;
     private int _sessConfSentCount;
 
@@ -525,10 +525,16 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotACK(long ackThru, int acks, byte[] ranges) {
+        int hc = ((int) ackThru) ^ (acks << 24) ^ DataHelper.hashCode(ranges);
+        if (_lastAckHashCode.getAndSet(hc) == hc) {
+            if (_log.shouldDebug())
+                _log.debug("Got dup ACK block: " + SSU2Bitfield.toString(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0)));
+            return;
+        }
         SSU2Bitfield ackbf;
         ackbf = SSU2Bitfield.fromACKBlock(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0));
         if (_log.shouldDebug())
-            _log.debug("Got ACK block: " + SSU2Bitfield.toString(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0)));
+            _log.debug("Got new ACK block: " + SSU2Bitfield.toString(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0)));
         // calls bitSet() below
         ackbf.forEachAndNot(_ackedMessages, this);
     }
@@ -639,23 +645,13 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     /**
-     * note that we just sent the SessionConfirmed packet
-     * and save it for retransmission.
+     * Note that we just sent the SessionConfirmed packets
+     * and save them for retransmission.
      *
-     * @param riFrags if non-null, the RI was fragmented, and these are the
-     *                remaining fragments to be sent and saved for retransmission.
      */
-    public synchronized void confirmedPacketSent(byte[] data, List<SSU2Payload.RIBlock> riFrags) {
+    synchronized void confirmedPacketsSent(byte[][] data) {
         if (_sessConfForReTX == null)
             _sessConfForReTX = data;
-        if (riFrags != null) {
-            if (_riFragsForReTX == null)
-                _riFragsForReTX = riFrags;
-            for (SSU2Payload.RIBlock block : riFrags) {
-                UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.emptyList(), Collections.singletonList(block), this);
-                _transport.send(pkt);
-            }
-        }
         _sessConfSentTime = _context.clock().now();
         _sessConfSentCount++;
     }
@@ -666,26 +662,19 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     private synchronized UDPPacket[] getRetransmitSessionConfirmedPackets() {
         if (_sessConfForReTX == null)
             return null;
-        UDPPacket packet = UDPPacket.acquire(_context, false);
-        int count = 1;
-        if (_riFragsForReTX != null)
-            count += _riFragsForReTX.size();
-        UDPPacket[] rv = new UDPPacket[count];
-        rv[0] = packet;
-        DatagramPacket pkt = packet.getPacket();
-        byte data[] = pkt.getData();
-        int off = pkt.getOffset();
-        System.arraycopy(_sessConfForReTX, 0, data, off, _sessConfForReTX.length);
-        pkt.setLength(_sessConfForReTX.length);
-        pkt.setAddress(_remoteIPAddress);
-        pkt.setPort(_remotePort);
-        packet.setMessageType(PacketBuilder2.TYPE_CONF);
-        packet.setPriority(PacketBuilder2.PRIORITY_HIGH);
-        if (_riFragsForReTX != null) {
-            int i = 1;
-            for (SSU2Payload.RIBlock block : _riFragsForReTX) {
-                rv[i++] = _transport.getBuilder2().buildPacket(Collections.emptyList(), Collections.singletonList(block), this);
-            }
+        UDPPacket[] rv = new UDPPacket[_sessConfForReTX.length];
+        for (int i = 0; i < rv.length; i++) {
+            UDPPacket packet = UDPPacket.acquire(_context, false);
+            rv[i] = packet;
+            DatagramPacket pkt = packet.getPacket();
+            byte data[] = pkt.getData();
+            int off = pkt.getOffset();
+            System.arraycopy(_sessConfForReTX[i], 0, data, off, _sessConfForReTX[i].length);
+            pkt.setLength(_sessConfForReTX.length);
+            pkt.setAddress(_remoteIPAddress);
+            pkt.setPort(_remotePort);
+            packet.setMessageType(PacketBuilder2.TYPE_CONF);
+            packet.setPriority(PacketBuilder2.PRIORITY_HIGH);
         }
         return rv;
     }

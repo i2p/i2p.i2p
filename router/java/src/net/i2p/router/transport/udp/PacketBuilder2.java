@@ -490,45 +490,133 @@ class PacketBuilder2 {
             len = info.length;
         }
 
-        UDPPacket packets[] = new UDPPacket[1];
-        packets[0] = buildSessionConfirmedPacket(state, numFragments, info, len, gzip);
-        List<SSU2Payload.RIBlock> riFrags;
+        // one big block
+        SSU2Payload.RIBlock block = new SSU2Payload.RIBlock(info,  0, info.length,
+                                                            false, gzip, 0, 1);
+        UDPPacket packets[];
         if (numFragments > 1) {
-            riFrags = new ArrayList<SSU2Payload.RIBlock>(numFragments - 1);
-            int off = len;
-            for (int i = 1; i < numFragments; i++) {
-                if (i == numFragments - 1)
-                    len = info.length - off;
-                SSU2Payload.RIBlock block = new SSU2Payload.RIBlock(info,  off, len,
-                                                                    false, gzip, i, numFragments);
-                riFrags.add(block);
-                off += len;
-            }
+            packets = buildSessionConfirmedPackets(state, block);
         } else {
-            riFrags = null;
+            packets = new UDPPacket[1];
+            packets[0] = buildSessionConfirmedPacket(state, block);
         }
-        state.confirmedPacketSent(packets[0], riFrags);
+        state.confirmedPacketsSent(packets);
         return packets;
     }
 
     /**
-     * Build a new SessionConfirmed packet for the given peer
+     * Build a single new SessionConfirmed packet for the given peer, unfragmented.
      * 
      * @return ready to send packet, or null if there was a problem
      */
-    private UDPPacket buildSessionConfirmedPacket(OutboundEstablishState2 state, int numFragments, byte ourInfo[], int len, boolean gzip) {
+    private UDPPacket buildSessionConfirmedPacket(OutboundEstablishState2 state, SSU2Payload.RIBlock block) {
         UDPPacket packet = buildShortPacketHeader(state.getSendConnID(), 0, SESSION_CONFIRMED_FLAG_BYTE);
         DatagramPacket pkt = packet.getPacket();
         pkt.setLength(SHORT_HEADER_SIZE);
-        SSU2Payload.RIBlock block = new SSU2Payload.RIBlock(ourInfo,  0, len,
-                                                            false, gzip, 0, numFragments);
         boolean isIPv6 = state.getSentIP().length == 16;
-        encryptSessionConfirmed(packet, state.getHandshakeState(), state.getMTU(), isIPv6,
+        encryptSessionConfirmed(packet, state.getHandshakeState(), state.getMTU(), 1, 0, isIPv6,
                                 state.getSendHeaderEncryptKey1(), state.getSendHeaderEncryptKey2(), block, state.getNextToken());
         pkt.setSocketAddress(state.getSentAddress());
         packet.setMessageType(TYPE_CONF);
         packet.setPriority(PRIORITY_HIGH);
         return packet;
+    }
+
+    /**
+     * Build all the fragmented SessionConfirmed packets
+     * 
+     */
+    private UDPPacket[] buildSessionConfirmedPackets(OutboundEstablishState2 state, SSU2Payload.RIBlock block) {
+        UDPPacket packet0 = buildShortPacketHeader(state.getSendConnID(), 0, SESSION_CONFIRMED_FLAG_BYTE);
+        DatagramPacket pkt = packet0.getPacket();
+        byte[] data0 = pkt.getData();
+        int off = pkt.getOffset();
+        boolean isIPv6 = state.getSentIP().length == 16;
+        // actually IP and UDP overhead
+        int ipOverhead = (isIPv6 ? IPV6_HEADER_SIZE : IP_HEADER_SIZE) + UDP_HEADER_SIZE;
+        // first packet, no new token block or padding
+        int overhead = ipOverhead +
+                       SHORT_HEADER_SIZE + KEY_LEN + MAC_LEN + MAC_LEN;
+        int mtu = state.getMTU();
+        int blockSize = block.getTotalLength();
+        // how much of the ri block we can fit in the first packet
+        int first = mtu - overhead;
+        // how much of the ri block we can fit in additional packets
+        int maxAddl = mtu - (ipOverhead + SHORT_HEADER_SIZE);
+        // how much data fits in a packet
+        int max = mtu - ipOverhead;
+        int remaining = blockSize - first;
+        // ensure last packet isn't too small which would corrupt the header decryption
+        int lastPktSize = remaining % max;
+        int addPadding;
+        if (lastPktSize < 24) {
+            addPadding = 3 + 24 - lastPktSize;
+            remaining += addPadding;
+        } else {
+            addPadding = 0;
+        }
+        int count = 1 + ((remaining + maxAddl - 1) / maxAddl);
+
+        // put jumbo into the first packet, we will put data0 back below
+        // TODO if last packet is less than 8 bytes the header decryption will fail, add padding
+        byte[] jumbo = new byte[overhead + addPadding + block.getTotalLength()];
+        System.arraycopy(data0, off, jumbo, 0, SHORT_HEADER_SIZE);
+        pkt.setData(jumbo);
+        pkt.setLength(SHORT_HEADER_SIZE);
+        byte[] hdrKey1 = state.getSendHeaderEncryptKey1();
+        byte[] hdrKey2 = state.getSendHeaderEncryptKey2();
+        encryptSessionConfirmed(packet0, state.getHandshakeState(), state.getMTU(), count, addPadding, isIPv6,
+                                hdrKey1, hdrKey2, block, state.getNextToken());
+        int total = pkt.getLength();
+        if (_log.shouldWarn())
+            _log.warn("Building " + count + " fragmented session confirmed packets" +
+                      " max data: " + max +
+                      " RI block size: " + blockSize +
+                      " total data size: " + total);
+
+        // fix up packet0 by putting the byte array back
+        // and encrypting the header
+        System.arraycopy(jumbo, 0, data0, off, max);
+        pkt.setData(data0);
+        pkt.setLength(max);
+        pkt.setSocketAddress(state.getSentAddress());
+        SSU2Header.encryptShortHeader(packet0, hdrKey1, hdrKey2);
+        packet0.setMessageType(TYPE_CONF);
+        packet0.setPriority(PRIORITY_HIGH);
+        List<UDPPacket> rv = new ArrayList<UDPPacket>(4);
+        rv.add(packet0);
+
+        // build all the remaining packets
+        // set frag field in header and encrypt headers
+        // these headers are not bound to anything with mixHash(),
+        // but if anything changes the header will not decrypt correctly
+        int pktnum = 0;
+        for (int i = max; i < total; i += max - SHORT_HEADER_SIZE) {
+            // all packets have packet number 0
+            UDPPacket packet = buildShortPacketHeader(state.getSendConnID(), 0, SESSION_CONFIRMED_FLAG_BYTE);
+            pkt = packet.getPacket();
+            byte[] data = pkt.getData();
+            off = pkt.getOffset();
+            int len = Math.min(max - SHORT_HEADER_SIZE, total - i);
+            System.arraycopy(jumbo, i, data, off + SHORT_HEADER_SIZE, len);
+            data[off + SHORT_HEADER_FLAGS_OFFSET] = (byte) (((++pktnum) << 4) | count);  // fragment n of numFragments
+            if (len < 24)
+                _log.error("FIXME " + len);
+            pkt.setLength(len + SHORT_HEADER_SIZE);
+            SSU2Header.encryptShortHeader(packet, hdrKey1, hdrKey2);
+            pkt.setSocketAddress(state.getSentAddress());
+            packet0.setMessageType(TYPE_CONF);
+            packet0.setPriority(PRIORITY_HIGH);
+            rv.add(packet);
+        }
+        if (_log.shouldInfo()) {
+            for (int i = 0; i < rv.size(); i++) {
+                _log.info("pkt " + i + " size " + rv.get(i).getPacket().getLength());
+            }
+        }
+        if (rv.size() != count)
+            throw new IllegalStateException("Count " + count + " != size " + rv.size());
+        return rv.toArray(new UDPPacket[count]);
     }
 
     /**
@@ -936,14 +1024,19 @@ class PacketBuilder2 {
     }
 
     /**
+     *  If numFragments larger than 1, we do NOT encrypt the header here,
+     *  that's caller's responsibility.
+     *
      *  @param packet containing only 16 byte header
+     *  @param addPadding force-add exactly this size a padding block, for jumbo only
      */
-    private void encryptSessionConfirmed(UDPPacket packet, HandshakeState state, int mtu,
+    private void encryptSessionConfirmed(UDPPacket packet, HandshakeState state, int mtu, int numFragments, int addPadding,
                                          boolean isIPv6, byte[] hdrKey1, byte[] hdrKey2,
                                          SSU2Payload.RIBlock riblock, EstablishmentManager.Token token) {
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
         int off = pkt.getOffset();
+        data[off + SHORT_HEADER_FLAGS_OFFSET] = (byte) numFragments;  // fragment 0 of numFragments
         mtu -= UDP_HEADER_SIZE;
         mtu -= isIPv6 ? IPV6_HEADER_SIZE : IP_HEADER_SIZE;
         try {
@@ -956,10 +1049,17 @@ class PacketBuilder2 {
                 len += block.getTotalLength();
                 blocks.add(block);
             }
-            Block block = getPadding(len, mtu - (SHORT_HEADER_SIZE + KEY_LEN + MAC_LEN + MAC_LEN)); // 80
-            if (block != null) {
-                len += block.getTotalLength();
+            if (addPadding > 0) {
+                // forced padding so last packet isn't too small
+                Block block = new SSU2Payload.PaddingBlock(addPadding - 3);
+                len += addPadding;
                 blocks.add(block);
+            } else {
+                Block block = getPadding(len, mtu - (SHORT_HEADER_SIZE + KEY_LEN + MAC_LEN + MAC_LEN)); // 80
+                if (block != null) {
+                    len += block.getTotalLength();
+                    blocks.add(block);
+                }
             }
 
             // If we skip past where the static key and 1st MAC will be, we can
@@ -983,7 +1083,8 @@ class PacketBuilder2 {
         }
         if (_log.shouldDebug())
             _log.debug("After msg 3: " + state);
-        SSU2Header.encryptShortHeader(packet, hdrKey1, hdrKey2);
+        if (numFragments <= 1)
+            SSU2Header.encryptShortHeader(packet, hdrKey1, hdrKey2);
     }
 
     /**

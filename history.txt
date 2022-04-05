@@ -1,3 +1,6 @@
+2022-04-05 zzz
+ * SSU2: Fragmented Session Confirmed
+
 2022-03-27 zzz
  * Crypto: Fix CertUtil loading EdDSA certs, check sigs
  * Router: Validate family sig at startup

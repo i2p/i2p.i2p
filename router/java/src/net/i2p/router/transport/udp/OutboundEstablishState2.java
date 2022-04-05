@@ -52,7 +52,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     private final byte[] _rcvRetryHeaderEncryptKey2;
     private int _mtu;
     private byte[] _sessReqForReTX;
-    private byte[] _sessConfForReTX;
+    private byte[][] _sessConfForReTX;
     private long _timeReceived;
     // not adjusted for RTT
     private long _skew;
@@ -383,8 +383,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             throw new GeneralSecurityException("Conn ID mismatch: 1: " + _sendConnID + " 2: " + sid);
 
         _handshakeState.mixHash(data, off, LONG_HEADER_SIZE);
-        if (_log.shouldDebug())
-            _log.debug("State after mixHash 2: " + _handshakeState);
+        //if (_log.shouldDebug())
+        //    _log.debug("State after mixHash 2: " + _handshakeState);
 
         // decrypt in-place
         try {
@@ -394,8 +394,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                 _log.debug("Session create error, State at failure: " + _handshakeState + '\n' + net.i2p.util.HexDump.dump(data, off, len), gse);
             throw gse;
         }
-        if (_log.shouldDebug())
-            _log.debug("State after sess cr: " + _handshakeState);
+        //if (_log.shouldDebug())
+        //    _log.debug("State after sess cr: " + _handshakeState);
         _timeReceived = 0;
         processPayload(data, off + LONG_HEADER_SIZE, len - (LONG_HEADER_SIZE + KEY_LEN + MAC_LEN), true);
         packetReceived();
@@ -462,20 +462,21 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
      * note that we just sent the SessionConfirmed packets
      * and save them for retransmission
      *
-     * @param riFrags if non-null, the RI was fragmented, and these are the
-     *                remaining fragments to be sent in the PeerState.
      * @return the new PeerState2, may also be retrieved from getPeerState()
      */
-    public synchronized PeerState2 confirmedPacketSent(UDPPacket packet, List<SSU2Payload.RIBlock> riFrags) {
+    public synchronized PeerState2 confirmedPacketsSent(UDPPacket[] packets) {
         if (_sessConfForReTX == null) {
-            // store pkt for retx
-            // only one supported right now
-            DatagramPacket pkt = packet.getPacket();
-            byte data[] = pkt.getData();
-            int off = pkt.getOffset();
-            int len = pkt.getLength();
-            _sessConfForReTX = new byte[len];
-            System.arraycopy(data, off, _sessConfForReTX, 0, len);
+            // store pkts for retx
+            _sessConfForReTX = new byte[packets.length][];
+            for (int i = 0; i < packets.length; i++) {
+                DatagramPacket pkt = packets[i].getPacket();
+                byte data[] = pkt.getData();
+                int off = pkt.getOffset();
+                int len = pkt.getLength();
+                byte[] save = new byte[len];
+                System.arraycopy(data, off, save, 0, len);
+                _sessConfForReTX[i] = save;
+            }
             if (_rcvHeaderEncryptKey2 == null)
                 _rcvHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessCreateHeader");
 
@@ -499,6 +500,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             sender.initializeKey(d_ab, 0);
             ChaChaPolyCipherState rcvr = new ChaChaPolyCipherState();
             rcvr.initializeKey(d_ba, 0);
+          /****
             if (_log.shouldDebug())
                 _log.debug("split()\nGenerated Chain key:              " + Base64.encode(ckd) +
                            "\nGenerated split key for A->B:     " + Base64.encode(k_ab) +
@@ -509,6 +511,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                            "\nIntro key for Bob:                " + Base64.encode(_sendHeaderEncryptKey1) +
                            "\nGenerated header key 2 for A->B:  " + Base64.encode(h_ab) +
                            "\nGenerated header key 2 for B->A:  " + Base64.encode(h_ba));
+            ****/
             _handshakeState.destroy();
             if (_requestSentCount == 1)
                 _rtt = (int) ( _context.clock().now() - _lastSend );
@@ -518,7 +521,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                                      _sendConnID, _rcvConnID,
                                      _sendHeaderEncryptKey1, h_ab, h_ba);
             _currentState = OutboundState.OB_STATE_CONFIRMED_COMPLETELY;
-            _pstate.confirmedPacketSent(_sessConfForReTX, riFrags);
+            _pstate.confirmedPacketsSent(_sessConfForReTX);
             // PS2.super adds CLOCK_SKEW_FUDGE that doesn't apply here
             _pstate.adjustClockSkew(_skew - (_rtt / 2) - PeerState.CLOCK_SKEW_FUDGE);
             _pstate.setHisMTU(_mtu);

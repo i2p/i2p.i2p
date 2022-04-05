@@ -1100,6 +1100,7 @@ class EstablishmentManager {
         _context.statManager().addRateData("udp.outboundEstablishTime", state.getLifetime());
         DatabaseStoreMessage dbsm = null;
         if (version == 1) {
+            // version 2 sends our RI in handshake
             if (!state.isFirstMessageOurDSM()) {
                 dbsm = getOurInfo();
             }
@@ -1563,8 +1564,13 @@ class EstablishmentManager {
                         sendCreated(inboundState);
                     break;
 
-                  case IB_STATE_CREATED_SENT: // fallthrough
+                  // SSU2 only in practice, should only get here if expired
                   case IB_STATE_CONFIRMED_PARTIALLY:
+                    if (expired)
+                        processExpired(inboundState);
+                    break;
+
+                  case IB_STATE_CREATED_SENT: // fallthrough
                   case IB_STATE_RETRY_SENT:                  // SSU2
                     if (expired) {
                         sendDestroy(inboundState);
