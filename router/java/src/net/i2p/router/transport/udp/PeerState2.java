@@ -525,7 +525,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotACK(long ackThru, int acks, byte[] ranges) {
-        int hc = ((int) ackThru) ^ (acks << 24) ^ DataHelper.hashCode(ranges);
+        int hc = (((int) ackThru) << 8) ^ (acks << 24) ^ DataHelper.hashCode(ranges);
         if (_lastAckHashCode.getAndSet(hc) == hc) {
             if (_log.shouldDebug())
                 _log.debug("Got dup ACK block: " + SSU2Bitfield.toString(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0)));
