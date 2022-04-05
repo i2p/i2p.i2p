@@ -132,6 +132,30 @@ final class SSU2Util {
     public static final int TEST_REJECT_CHARLIE_BANNED = 69;
     public static final int TEST_REJECT_CHARLIE_UNKNOWN_ALICE = 70;
 
+    // termination reason codes
+    public static final int REASON_UNSPEC = 0;
+    public static final int REASON_TERMINATION = 1;
+    public static final int REASON_TIMEOUT = 2;
+    public static final int REASON_SHUTDOWN = 3;
+    public static final int REASON_AEAD = 4;
+    public static final int REASON_OPTIONS = 5;
+    public static final int REASON_SIGTYPE = 6;
+    public static final int REASON_SKEW = 7;
+    public static final int REASON_PADDING = 8;
+    public static final int REASON_FRAMING = 9;
+    public static final int REASON_PAYLOAD = 10;
+    public static final int REASON_MSG1 = 11;
+    public static final int REASON_MSG2 = 12;
+    public static final int REASON_MSG3 = 13;
+    public static final int REASON_FRAME_TIMEOUT = 14;
+    public static final int REASON_SIGFAIL = 15;
+    public static final int REASON_S_MISMATCH = 16;
+    public static final int REASON_BANNED = 17;
+    public static final int REASON_TOKEN = 18;
+    public static final int REASON_LIMITS = 19;
+    public static final int REASON_VERSION = 20;
+    public static final int REASON_NETID = 21;
+
     private SSU2Util() {}
 
     /**
