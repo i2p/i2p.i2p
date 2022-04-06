@@ -441,7 +441,7 @@ class SummaryBarRenderer {
         tx = _t("NetDB");
         rbuf.setLength(0);
         rbuf.append("<a href=\"/netdb\" target=\"_top\" title=\"")
-            .append(_t("Show list of all known I2P routers"))
+            .append(_t("Network Database Router Statistics"))
             .append("\">")
             .append(nbsp(tx))
             .append("</a>\n");
