@@ -115,6 +115,7 @@
     // Bind the session-scope Helper to the request-scope Handler
     formhandler.setWizardHelper(wizhelper);
 %>
+<img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
 <div class="wizardnotice">
 <%@include file="formhandler.jsi" %>
 </div>
@@ -130,7 +131,7 @@
         }
     }
 %>
-</div><img class="wizard progress" src="/themes/console/images/wizard/wizardlogo.png">
+</div>
 <form action="" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>">
 <input type="hidden" name="action" value="blah" >
@@ -148,7 +149,6 @@
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigUIHelper" id="uihelper" scope="request" />
 <jsp:setProperty name="uihelper" property="contextId" value="<%=i2pcontextId%>" />
 <h3 id="wizardheading" class="wizard"><%=uihelper._t("Select Language")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/step-0.png">
 <div class="wizardtext">
 <p>
 
@@ -173,7 +173,6 @@
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigUIHelper" id="uihelper2" scope="request" />
 <jsp:setProperty name="uihelper2" property="contextId" value="<%=i2pcontextId%>" />
 <h3 id="wizardheading" class="wizard"><%=uihelper2._t("Select Theme")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/step-1.png">
 <div class="wizardtext">
 <p>
 <%=intl._t("Please select your preferred theme:")%>
@@ -189,7 +188,6 @@
         // Overview of bandwidth test
 %>
 <h3 id="wizardheading" class="wizard"><%=intl._t("Bandwidth Test")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/step-2.png">
 <div class="wizardtext">
 <p>
 <%=intl._t("Let's check your internet connection!")%>
@@ -216,7 +214,6 @@
         // Bandwidth test in progress (w/ AJAX)
 %>
 <h3 id="wizardheading" class="wizard"><%=intl._t("Bandwidth Test in Progress")%></h3>
-<img class="wizardimg" src="themes/console/images/wizard/step-3.png">
 <div id="xhr" class="notification">
 <!-- for non-script -->
 <%=intl._t("Javascript is disabled - wait 60 seconds for the bandwidth test to complete and then click Next")%>
@@ -242,29 +239,6 @@
 %>
 <jsp:useBean class="net.i2p.router.web.helpers.ConfigNetHelper" id="nethelper" scope="request" />
 <jsp:setProperty name="nethelper" property="contextId" value="<%=i2pcontextId%>" />
-<%
-        if (request.getParameter("skipbw") == null) {
-            // don't display this if we skipped the test
-%>
-<h3 id="wizardheading" class="wizard bwtest"><%=intl._t("Bandwidth Test Results")%></h3>
-<table class="mlabtable">
-<tr><td><%=intl._t("Test server location")%></td><td colspan="3"><%=wizhelper.getServerLocation()%></td></tr>
-<tr><td><%=intl._t("Completion status")%></td><td colspan="3"><%=wizhelper.getCompletionStatus()%></td></tr>
-<%
-            if (wizhelper.isNDTSuccessful()) {
-                // don't display this if test failed
-%>
-<tr><td><%=intl._t("Details")%></td><td colspan="3"><%=wizhelper.getDetailStatus()%></td></tr>
-<tr><td><%=intl._t("Downstream Bandwidth")%></td><td><%=net.i2p.data.DataHelper.formatSize2Decimal(wizhelper.getDownBandwidth())%>Bps</td>
-<td><%=intl._t("Upstream Bandwidth")%></td><td><%=net.i2p.data.DataHelper.formatSize2Decimal(wizhelper.getUpBandwidth())%>Bps</td></tr>
-<tr><td><%=intl._t("Share of Bandwidth for I2P")%></td><td><%=Math.round(net.i2p.router.web.helpers.WizardHelper.BW_SCALE * 100)%>%</td></tr>
-<%
-            } // sucessful
-%>
-</table>
-<%
-        } // skipbw
-%>
 <h3 id="wizardheading" class="wizard"><%=intl._t("Bandwidth Configuration")%></h3>
 <style>
 .bwtest {
@@ -319,7 +293,6 @@
         // Browser setup
 %>
 <h3 id="wizardheading" class="wizard"><%=intl._t("Browser and Application Setup")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/step-5.png">
 <div class="wizardtext"><p>
 <%=intl._t("Your browser needs to be configured to work with I2P.")%>
 <%=intl._t("We have instructions for configuring both Firefox and Chromium based browsers with I2P.")%>
@@ -356,7 +329,6 @@
         // Done
 %>
 <h3 id="wizardheading" class="wizard"><%=intl._t("Welcome to the Invisible Internet!")%></h3>
-<img class="wizardimg" src="/themes/console/images/wizard/step-6.png">
 <div class="wizardtext">
 <p>
 <%=intl._t("It will take some time for your peers to integrate your router into the network, but while that is happening you can still explore I2P applications and get to know your way around the router console.")%>

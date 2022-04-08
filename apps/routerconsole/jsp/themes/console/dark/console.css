@@ -1315,9 +1315,8 @@ div.messages li {
 }
 
 .wizardnotice {
-    position: absolute;
-    bottom: 20%;
-    right: 5%;
+    margin-left: 75%;
+    margin-top: -3%;
     width: 22%;
 }
 
@@ -3376,7 +3375,6 @@ td#themeselect {
     letter-spacing: 0.08em;
     word-spacing: 0.1em;
     color: #7778bf;
-    position: absolute;
     background: none !important;
     box-shadow: none !important;
     line-height: normal;
@@ -3384,15 +3382,16 @@ td#themeselect {
 }
 
 #infodiv {
-    position: absolute;
-    right: 5%;
     width: 20%;
-    top: 15%;
-    box-shadow: inset 0 0 0 1px #fff;
     color: #e6e6e7;
-    background: rgba(0, 0, 0, 0.7);
     padding: .5%;
     text-align: justify;
+    margin: auto;
+    margin-top: auto;
+    margin-left: auto;
+    float: right;
+    margin-left: 60%;
+    margin-top: -10%;
 }
 
 #bandwidthconfig {
@@ -3403,16 +3402,13 @@ td#themeselect {
     width: 35%;
     top: 17%;
     left: 31%;
-    position: absolute;
     background: none;
     font-size: larger;
 }
 
 .configtable.wizard {
     width: 20%;
-    bottom: 5%;
-    right: 10%;
-    position: absolute;
+    margin: auto;
     box-shadow: none !important;
     white-space: normal;
     background: none;
@@ -3716,9 +3712,7 @@ p#externaltcp {
 }
 
 img.wizard.progress {
-    position: absolute;
-    top: 6%;
-    left: 1%;
+    margin-left: -75%;
     max-height: 10%;
     max-width: 30%;
     mix-blend-mode: exclusion;
@@ -3732,6 +3726,10 @@ img.wizard.progress {
     background: rgba(0, 0, 0, 0.7);
 }
 
+.wizardbuttons.wizard {
+    padding-top: 5%;
+}
+
 #bwconfigheader {
     background: white;
 }
@@ -3740,22 +3738,18 @@ img.wizard.progress {
     width: 35%;
     top: 20%;
     left: 32%;
-    position: absolute;
     background: none;
 }
 
 .wizardtext {
-    width: 25%;
-    position: absolute;
-    top: 37%;
-    left: 5%;
+    width: 75%;
+    margin: auto;
     font-size: larger;
     color: #e6e6e7;
 }
 
 #wizard {
     z-index: 0;
-    position: absolute;
     left: 0px;
     top: 0px;
     height: 100%;

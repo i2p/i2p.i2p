@@ -2395,10 +2395,10 @@ td.optionsave {
 }
 
 .wizardnotice {
-    position: absolute;
-    right: 5%;
     width: 22%;
-    bottom: 20%;
+    margin: auto;
+    margin-left: 75%;
+    margin-top: -3%;
 }
 
 #bandwidthconfig .configtable tr:last-child td {
@@ -2712,8 +2712,6 @@ td {
     border: none;
     padding: 2%;
     margin: auto;
-    margin-left: 40%;
-    margin-top: -1%;
     font-size: xx-large;
     letter-spacing: 0.08em;
     word-spacing: 0.1em;
@@ -2725,17 +2723,18 @@ td {
 
 .clickableProgression {
     color: #327bbf;
-    margin-left: 47%;
 }
 
 #infodiv {
     position: absolute;
-    left: 33%;
     width: 31%;
-    top: 25%;
-    box-shadow: inset 0 0 0 1px #fff;
-    background: rgba(255, 255, 255, 0.7);
     font-size: larger;
+    margin: auto;
+    margin-top: auto;
+    margin-left: auto;
+    float: right;
+    margin-left: 60%;
+    margin-top: -10%;
 }
 
 #bandwidthconfig {
@@ -2744,16 +2743,13 @@ td {
 
 #bandwidthconfig.configtable.wizardtable {
     width: 31%;
-    margin-left: 65%;
+    /*margin-left: 65%;*/
     background: none;
     font-size: 10pt !important;
 }
 
 .configtable.wizard {
-    width: 20%;
-    bottom: 5%;
-    right: 10%;
-    position: absolute;
+    width: 30%;
     box-shadow: none !important;
     white-space: normal;
     background: none;
@@ -5258,19 +5254,13 @@ div#langsettings {
     border: 1px solid #dee2e6;
 }
 
-#wizlangsettings {
-    height: 100px;
-}
-
 #themesettings hr,
 #langsettings hr {
     display: none;
 }
 
 img.wizard.progress {
-    position: absolute;
-    top: 6%;
-    left: 1%;
+    margin-left: -75%;
     max-height: 10%;
     max-width: 30%;
 }
@@ -5291,25 +5281,24 @@ img.wizard.progress {
 }
 
 .wizardtext {
-    width: 25%;
-    position: absolute;
-    top: 37%;
-    left: 5%;
+    width: 75%;
+    margin: auto;
     font-size: larger;
 }
 
 .wizardbuttons {
-    margin-left: 10%;
+    /*margin-left: 44%;*/
+}
+
+.wizardbuttons.wizard {
+    padding-top: 5%;
 }
 
 #wizard {
     z-index: 0;
-    left: 0px;
-    top: 0px;
     height: 100%;
     width: 100%;
     background-color: #f8f9fa;
-    text-align: start;
 }
 
 .langselect {
@@ -5331,10 +5320,7 @@ img.wizard.progress {
     max-width: 75%;
     max-height: 100%;
     margin: auto;
-    top: 0;
     z-index: 0;
-    position: absolute;
-    right: 0%;
     mix-blend-mode: multiply;
 }
 
