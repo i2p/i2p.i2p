@@ -8484,3 +8484,9 @@ table#externali2cp th {
     letter-spacing: 0 !important;
     word-spacing: 0 !important;
 }
+
+* {
+    forced-color-adjust: none;
+    -ms-high-contrast-adjust: none;
+    high-contrast-adjust: none;
+}

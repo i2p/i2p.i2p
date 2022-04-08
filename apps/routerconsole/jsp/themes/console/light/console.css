@@ -8906,5 +8906,11 @@ th.options {
     }
 }
 
+* {
+    forced-color-adjust: none;
+    -ms-high-contrast-adjust: none;
+    high-contrast-adjust: none;
+}
+
 
 /* end chrome overrides */
