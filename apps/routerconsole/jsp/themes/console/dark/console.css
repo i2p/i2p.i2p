@@ -3793,9 +3793,7 @@ table#bandwidthconfig td:first-child {
 
 #xhr.notification {
     width: 20%;
-    position: absolute;
-    left: 40%;
-    top: 40%;
+    margin: auto;
     font-size: larger;
     background: #000;
     box-shadow: inset 0 0 0 1px #fff;
@@ -3813,9 +3811,7 @@ table#bandwidthconfig td:first-child {
 
 #xhr2.notification {
     width: 20%;
-    position: absolute;
-    left: 40%;
-    top: 40%;
+    margin: auto;
     font-size: larger;
     background: #000;
     box-shadow: inset 0 0 0 1px #fff;
