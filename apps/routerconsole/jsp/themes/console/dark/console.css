@@ -3387,11 +3387,8 @@ td#themeselect {
     padding: .5%;
     text-align: justify;
     margin: auto;
-    margin-top: auto;
-    margin-left: auto;
     float: right;
-    margin-left: 60%;
-    margin-top: -10%;
+    margin-right: 15%;
 }
 
 #bandwidthconfig {
@@ -3736,8 +3733,7 @@ img.wizard.progress {
 
 #bandwidthconfig.configtable.wizardtable {
     width: 35%;
-    top: 20%;
-    left: 32%;
+    margin-left: 15%;
     background: none;
 }
 
