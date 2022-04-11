@@ -2735,6 +2735,7 @@ td {
     float: right;
     margin-left: 60%;
     margin-top: -10%;
+    text-align: start;
 }
 
 #bandwidthconfig {
@@ -2743,7 +2744,7 @@ td {
 
 #bandwidthconfig.configtable.wizardtable {
     width: 31%;
-    /*margin-left: 65%;*/
+    margin-left: 15%;
     background: none;
     font-size: 10pt !important;
 }
@@ -2754,6 +2755,7 @@ td {
     white-space: normal;
     background: none;
     font-size: larger;
+    margin-top: 5%;
 }
 
 #bandwidthconfig td:first-child {
