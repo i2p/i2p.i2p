@@ -125,7 +125,7 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
      */
     @Override
     public synchronized void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
-        if (_sessionId <= 0)
+        if (_sessionId < 0)
             throw new I2CPMessageException("Unable to write out the message, as the session ID has not been defined");
         if (_messageId < 0)
             throw new I2CPMessageException("Unable to write out the message, as the message ID has not been defined");
