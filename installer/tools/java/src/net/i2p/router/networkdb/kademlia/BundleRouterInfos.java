@@ -179,7 +179,7 @@ public class BundleRouterInfos {
                 boolean hasIPv4 = false;
                 boolean dupIP = false;
                 for (RouterAddress addr : addrs) {
-                    if ("SSU".equals(addr.getTransportStyle()) && addr.getOption("ihost0") != null) {
+                    if ("SSU".equals(addr.getTransportStyle()) && addr.getOption("itag0") != null) {
                         hasIntro = true;
                         break;
                     }
