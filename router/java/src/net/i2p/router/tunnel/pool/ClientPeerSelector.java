@@ -233,14 +233,23 @@ class ClientPeerSelector extends TunnelPeerSelector {
                 matches.remove(ctx.routerHash());
                 rv.addAll(matches);
             }
+            if (rv.size() < length) {
+                // not enough peers to build the requested size
+                // client tunnels do not use overrides
+                if (log.shouldWarn())
+                    log.warn("CPS requested " + length + " got " + rv.size());
+                int min = settings.getLength();
+                int skew = settings.getLengthVariance();
+                if (skew < 0)
+                    min += skew;
+                // not enough peers to build the minimum size
+                if (rv.size() < min)
+                    return null;
+            }
         } else {
             rv = new ArrayList<Hash>(1);
         }
 
-        //if (length != rv.size() && log.shouldWarn())
-        //    log.warn("CPS requested " + length + " got " + rv.size() + ": " + DataHelper.toString(rv));
-        //else if (log.shouldDebug())
-        //    log.debug("EPS result: " + DataHelper.toString(rv));
         if (isInbound)
             rv.add(0, ctx.routerHash());
         else
