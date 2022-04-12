@@ -51,7 +51,7 @@ public class InstallUpdate {
                 // carry on
                 return;
             }
-            System.out.println("INFO: Update file exists [" + Router.UPDATE_FILE + "] - installing");
+            System.out.println("INFO: Update file exists [" + updateFile + "] - installing");
             // verify the whole thing first
             // we could remember this fails, and not bother restarting, but who cares...
             boolean ok = FileUtil.verifyZip(updateFile);
