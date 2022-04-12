@@ -977,7 +977,10 @@ public class TransportManager implements TransportEventListener {
                         _upnpUpdateQueued = true;
                         _context.simpleTimer2().addEvent(new UpdatePorts(), 3250);
                     } else {
-                        _upnpManager.update(getPorts());
+                        // throw onto timer to avoid deadlock
+                        //_upnpManager.update(getPorts());
+                        _upnpUpdateQueued = true;
+                        _context.simpleTimer2().addEvent(new UpdatePorts(), 0);
                     }
                 }
             }
@@ -991,9 +994,10 @@ public class TransportManager implements TransportEventListener {
      */
     private class UpdatePorts implements SimpleTimer.TimedEvent {
         public void timeReached() {
+            Set<Port> ports = getPorts();
             synchronized (_upnpManager) {
                 _upnpUpdateQueued = false;
-                _upnpManager.update(getPorts());
+                _upnpManager.update(ports);
             }
         }
     }
