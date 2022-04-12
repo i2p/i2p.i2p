@@ -310,7 +310,7 @@ public abstract class I2NPMessageImpl implements I2NPMessage {
      * Write the message to the buffer, returning the new offset (NOT the length).
      * the data is is not self contained - it does not include the size,
      * unique id, or any checksum, but does include the type and expiration.
-     * Short 9 byte header for NTCP 2.
+     * Short 9 byte header for NTCP2 and SSU2.
      *
      * @param off the offset to start writing at
      * @return the new offset (NOT the length)
@@ -376,7 +376,9 @@ public abstract class I2NPMessageImpl implements I2NPMessage {
     /**
      *  Read the message with a short 9-byte header.
      *  THe header consists of a one-byte type, 4-byte ID, and a 4-byte expiration in seconds only.
-     *  Used by NTCP2 only!
+     *  Used by NTCP2 and SSU2 only!
+     *
+     *  @param handler ignored, may be null
      *  @since 0.9.35
      */
     public static I2NPMessage fromRawByteArrayNTCP2(I2PAppContext ctx, byte buffer[], int offset,
