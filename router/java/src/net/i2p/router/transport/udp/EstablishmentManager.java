@@ -1961,7 +1961,7 @@ class EstablishmentManager {
                 try {
                     doPass();
                 } catch (RuntimeException re) {
-                    _log.log(Log.CRIT, "Error in the establisher", re);
+                    _log.error("Error in the establisher", re);
                     // don't loop too fast
                     try { Thread.sleep(1000); } catch (InterruptedException ie) {}
                 }

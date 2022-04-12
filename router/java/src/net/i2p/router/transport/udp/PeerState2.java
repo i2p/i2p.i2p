@@ -381,9 +381,6 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     public void gotAddress(byte[] ip, int port) {
     }
 
-    public void gotIntroKey(byte[] key) {
-    }
-
     public void gotRelayTagRequest() {
         if (!ENABLE_RELAY)
             return;

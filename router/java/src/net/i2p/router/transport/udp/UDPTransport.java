@@ -2140,8 +2140,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return;
             pkt = _packetBuilder.buildSessionDestroyPacket(peer);
         } else {
-            // unspecified reason
-            pkt = _packetBuilder2.buildSessionDestroyPacket(0, (PeerState2) peer);
+            pkt = _packetBuilder2.buildSessionDestroyPacket(SSU2Util.REASON_TIMEOUT, (PeerState2) peer);
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending destroy to : " + peer);

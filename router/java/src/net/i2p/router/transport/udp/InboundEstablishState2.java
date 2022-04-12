@@ -237,7 +237,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         }
 
         if (ra == null)
-            throw new DataFormatException("no SSU2 addr");
+            throw new DataFormatException("no SSU2 addr, ipv6? " + isIPv6 + ": " + ri);
         String siv = ra.getOption("i");
         if (siv == null)
             throw new DataFormatException("no SSU2 IKey");
@@ -322,11 +322,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         _bobIP = ip;
         // final, see super
         //_bobPort = port;
-    }
-
-    public void gotIntroKey(byte[] key) {
-        if (_log.shouldDebug())
-            _log.debug("Got Intro key: " + Base64.encode(key));
     }
 
     public void gotRelayTagRequest() {
@@ -572,7 +567,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                 }
             }
             if (_log.shouldWarn())
-                _log.warn("Got sess conf frag " + frag + " len " + len + " on " + this);
+                _log.warn("Got sess conf frag " + frag + '/' + totalfrag + " len " + len + " on " + this);
             byte[] fragdata;
             if (frag == 0) {
                 // preserve header

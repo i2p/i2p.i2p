@@ -483,6 +483,8 @@ class PacketBuilder2 {
 
         int len;
         if (numFragments > 1) {
+            if (numFragments > 15)
+                throw new IllegalArgumentException();
             if (_log.shouldWarn())
                 _log.warn("RI size " + info.length + " requires " + numFragments + " packets");
             len = max;

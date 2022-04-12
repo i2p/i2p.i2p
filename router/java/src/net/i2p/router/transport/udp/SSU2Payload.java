@@ -39,12 +39,12 @@ class SSU2Payload {
     private static final int BLOCK_NEXTNONCE = 11;
     private static final int BLOCK_ACK = 12;
     private static final int BLOCK_ADDRESS = 13;
-    private static final int BLOCK_INTROKEY= 14;
     private static final int BLOCK_RELAYTAGREQ = 15;
     private static final int BLOCK_RELAYTAG = 16;
     private static final int BLOCK_NEWTOKEN = 17;
     private static final int BLOCK_PATHCHALLENGE = 18;
     private static final int BLOCK_PATHRESP = 19;
+    private static final int BLOCK_CONGESTION = 21;
     private static final int BLOCK_PADDING = 254;
 
     /**
@@ -89,8 +89,6 @@ class SSU2Payload {
         public void gotRIFragment(byte[] data, boolean isHandshake, boolean flood, boolean isGzipped, int frag, int totalFrags);
 
         public void gotAddress(byte[] ip, int port);
-
-        public void gotIntroKey(byte[] key);
 
         public void gotRelayTagRequest();
 

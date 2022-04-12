@@ -214,11 +214,6 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         _alicePort = port;
     }
 
-    public void gotIntroKey(byte[] key) {
-        if (_log.shouldDebug())
-            _log.debug("Got Intro key: " + Base64.encode(key));
-    }
-
     public void gotRelayTagRequest() {
         throw new IllegalStateException("Relay tag req in Sess Created");
     }
