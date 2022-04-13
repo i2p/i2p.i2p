@@ -82,10 +82,13 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
     
     public synchronized void restart() {
-        if (!_wasStarted)
+        if (!_wasStarted) {
             startup();
-        else
+        } else {
+            _wasStarted = false;
             _manager.restart();
+            _wasStarted = true;
+        }
     }
 
     /**
