@@ -131,6 +131,17 @@ class LoadRouterInfoJob extends JobImpl {
                     fis1 = null;
                     rif.delete();
                 }
+                if (_us != null) {
+                    long now = getContext().clock().now();
+                    long riTime = _us.getPublished();
+                    if (riTime > now || now - riTime > 45*60*1000) {
+                        // prevent netdb store failure and rekey
+                        _us = null;
+                        try { fis1.close(); } catch (IOException ioe2) {}
+                        fis1 = null;
+                        rif.delete();
+                    }
+                }
             }
             
             if (keys2Exist || keysExist) {

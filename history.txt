@@ -1,3 +1,20 @@
+2022-04-14 zzz
+ * Startup: Don't set our RI loaded from disk if too old
+
+2022-04-13 zzz
+ * Router:
+   - Reset uptime on soft restart
+   - Don't rekey after failure to store our RI due to clock skew
+   - Change comm system state during soft restart
+
+2022-04-12 zzz
+ * Console: Fix Sybil closest hash tabs
+ * Transport: Fix UPnP deadlock
+ * Tunnels: Don't build client tunnels less than min length
+
+2022-04-11 zzz
+ * I2CP: Fix external I2CP broken when session ID is 0
+
 2022-04-05 zzz
  * SSU2: Fragmented Session Confirmed
 
