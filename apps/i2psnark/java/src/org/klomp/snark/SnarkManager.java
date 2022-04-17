@@ -85,8 +85,8 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
     private final Log _log;
     private final UIMessages _messages;
     private final I2PSnarkUtil _util;
-    private PeerCoordinatorSet _peerCoordinatorSet;
-    private ConnectionAcceptor _connectionAcceptor;
+    private final PeerCoordinatorSet _peerCoordinatorSet;
+    private final ConnectionAcceptor _connectionAcceptor;
     private Thread _monitor;
     private volatile boolean _running;
     private volatile boolean _stopping;
@@ -271,6 +271,8 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
         _log = _context.logManager().getLog(SnarkManager.class);
         _messages = new UIMessages(MAX_MESSAGES);
         _util = new I2PSnarkUtil(_context, ctxName, this);
+        _peerCoordinatorSet = new PeerCoordinatorSet();
+        _connectionAcceptor = new ConnectionAcceptor(_util, _peerCoordinatorSet);
         DEFAULT_AUTO_START = !ctx.isRouterContext();
         String cfile = ctxName + CONFIG_FILE_SUFFIX;
         File configFile = new File(cfile);
@@ -296,8 +298,6 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
             if (cmgr != null)
                 cmgr.register(this);
         }
-        _peerCoordinatorSet = new PeerCoordinatorSet();
-        _connectionAcceptor = new ConnectionAcceptor(_util, _peerCoordinatorSet);
         _monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor", true);
         _monitor.start();
         // only if default instance
