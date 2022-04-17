@@ -30,6 +30,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.client.streaming.RouterRestartException;
 import net.i2p.data.Hash;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
@@ -131,12 +132,13 @@ class ConnectionAcceptor implements Runnable
   /**
    *  Effectively unused, would only be called if we changed
    *  I2CP host/port, which is hidden in the gui if in router context
-   *  FIXME this only works if already running
    */
   public synchronized void restart() {
       Thread t = thread;
       if (t != null)
           t.interrupt();
+      else
+          startAccepting();
   }
 
   public int getPort()
@@ -201,6 +203,24 @@ class ConnectionAcceptor implements Runnable
                 t.start();
             }
           }
+        catch (RouterRestartException rre) {
+            if (_log.shouldWarn())
+                _log.warn("Waiting for router restart", rre);
+            try {
+                Thread.sleep(2*60*1000);
+            } catch (InterruptedException ie) {}
+            while (true) {
+                if (_util.connected())
+                    break;
+                if (_util.connect())
+                    break;
+                try {
+                    Thread.sleep(60*1000);
+                } catch (InterruptedException ie) { break; }
+            }
+            if (_log.shouldWarn())
+                _log.warn("Router restarted");
+        }
         catch (I2PException ioe)
           {
             int level = stop ? Log.WARN : Log.ERROR;
