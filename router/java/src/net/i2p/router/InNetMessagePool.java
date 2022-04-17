@@ -302,18 +302,18 @@ public class InNetMessagePool implements Service {
         int sz = origMessages.size();
         if (sz <= 0)
             return 0;
-        if (_log.shouldLog(Log.DEBUG)) {
-            _log.debug("Original messages for inbound message: " + sz);
-            if (sz > 1)
-                _log.debug("Orig: " + origMessages + " \nthe above are replies for: " + messageBody);
-        }
+        //if (_log.shouldLog(Log.DEBUG)) {
+        //    _log.debug("Original messages for inbound message: " + sz);
+        //    if (sz > 1)
+        //        _log.debug("Orig: " + origMessages + " \nthe above are replies for: " + messageBody);
+        //}
 
         for (int i = 0; i < sz; i++) {
             OutNetMessage omsg = origMessages.get(i);
             ReplyJob job = omsg.getOnReplyJob();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Original message [" + i + "] " + omsg.getReplySelector() 
-                           + " : " + omsg + ": reply job: " + job);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Original message [" + i + "] " + omsg.getReplySelector() 
+            //               + " : " + omsg + ": reply job: " + job);
 
             if (job != null) {
                 job.setMessage(messageBody);
