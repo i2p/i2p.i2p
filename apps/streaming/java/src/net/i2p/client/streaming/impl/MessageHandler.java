@@ -103,6 +103,9 @@ class MessageHandler implements I2PSessionMuxedListener {
     /**
      * Notify the client that the session has been terminated
      *
+     * As of 0.9.54, this does not clear the listeners, so
+     * they will be notified again after a subsequent connection and disconnection.
+     *
      * @param session that has been terminated
      */
     public void disconnected(I2PSession session) {
@@ -119,7 +122,6 @@ class MessageHandler implements I2PSessionMuxedListener {
         for (I2PSocketManager.DisconnectListener lsnr : _listeners) {
             lsnr.sessionDisconnected();
         }
-        _listeners.clear();
     }
 
     /**
