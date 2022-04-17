@@ -32,23 +32,7 @@ class DisconnectMessageHandler extends HandlerImpl {
         String reason = ((DisconnectMessage)message).getReason();
         session.propogateError(reason, new I2PSessionException("Disconnect Message received: " + reason));
         session.destroySession(false);
-        if (reason.contains("restart")) {
-            Thread t = new I2PAppThread(new Reconnector(session), "Reconnect " + session, true);
-            t.start();
-        }
-    }
-
-    /** @since 0.8.8 */
-    private static class Reconnector implements Runnable {
-        private final I2PSessionImpl _session;
-
-        public Reconnector(I2PSessionImpl session) {
-             _session = session;
-        }
-
-        public void run() {
-            try { Thread.sleep(40*1000); } catch (InterruptedException ie) {}
-            _session.reconnect();
-        }
+        // Higher layers (only) must do the reconnect, to prevent dup destinations
+        //if (reason.contains("restart")) ...
     }
 }
