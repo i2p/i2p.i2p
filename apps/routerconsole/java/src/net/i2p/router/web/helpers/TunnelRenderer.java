@@ -126,6 +126,7 @@ class TunnelRenderer {
             processed = (long)rs.getRate(10*60*1000).getLifetimeTotalValue();
         int inactive = 0;
         int displayed = 0;
+        long now = _context.clock().now();
         for (int i = 0; i < participating.size(); i++) {
             HopConfig cfg = participating.get(i);
             int count = cfg.getProcessedMessagesCount();
@@ -157,13 +158,13 @@ class TunnelRenderer {
                 out.write("<td class=\"cells\" align=\"center\"><span class=\"tunnel_peer\">" + netDbLink(cfg.getSendTo()) +"</span></td>");
             else
                 out.write("<td class=\"cells\">&nbsp;</td>");
-            long timeLeft = cfg.getExpiration()-_context.clock().now();
+            long timeLeft = cfg.getExpiration() - now;
             if (timeLeft > 0)
                 out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatDuration2(timeLeft) + "</td>");
             else
                 out.write("<td class=\"cells\" align=\"center\">(" + _t("grace period") + ")</td>");
-            out.write("<td class=\"cells\" align=\"center\">" + (count * 1024 / 1000) + " KB</td>");
-            int lifetime = (int) ((_context.clock().now() - cfg.getCreation()) / 1000);
+            out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatSize2(count * 1024) + "B</td>");
+            int lifetime = (int) ((now - cfg.getCreation()) / 1000);
             if (lifetime <= 0)
                 lifetime = 1;
             if (lifetime > 10*60)
@@ -186,7 +187,7 @@ class TunnelRenderer {
             out.write("<div class=\"statusnotes\"><b>" + _t("Inactive participating tunnels") + ":&nbsp;&nbsp;" + inactive + "</b></div>\n");
         else if (displayed <= 0)
             out.write("<div class=\"statusnotes\"><b>" + _t("none") + "</b></div>\n");
-        out.write("<div class=\"statusnotes\"><b>" + _t("Lifetime bandwidth usage") + ":&nbsp;&nbsp;" + DataHelper.formatSize2Decimal(processed*1024) + "B</b></div>\n");
+        out.write("<div class=\"statusnotes\"><b>" + _t("Lifetime bandwidth usage") + ":&nbsp;&nbsp;" + DataHelper.formatSize2(processed*1024) + "B</b></div>\n");
         } else {   // bwShare > 12
             out.write("<div class=\"statusnotes noparticipate\"><b>" + _t("Not enough shared bandwidth to build participating tunnels.") +
                       "</b> <a href=\"config\">[" + _t("Configure") + "]</a></div>\n");
@@ -309,9 +310,10 @@ class TunnelRenderer {
         out.write("</tr>\n");
         final String tib = _t("Inbound");
         final String tob = _t("Outbound");
+        long now = _context.clock().now();
         for (int i = 0; i < tunnels.size(); i++) {
             TunnelInfo info = tunnels.get(i);
-            long timeLeft = info.getExpiration()-_context.clock().now();
+            long timeLeft = info.getExpiration() - now;
             if (timeLeft <= 0)
                 continue; // don't display tunnels in their grace period
             live++;
@@ -323,8 +325,8 @@ class TunnelRenderer {
                 out.write("<tr><td class=\"cells\" align=\"center\"><img src=\"/themes/console/images/outbound.png\" alt=\"" + tob + "\" title=\"" +
                           tob + "\"></td>");
             out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatDuration2(timeLeft) + "</td>\n");
-            int count = info.getProcessedMessagesCount() * 1024 / 1000;
-            out.write("<td class=\"cells\" align=\"center\">" + count + " KB</td>\n");
+            int count = info.getProcessedMessagesCount() * 1024;
+            out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatSize2(count) + "B</td>\n");
             int length = info.getLength();
             for (int j = 0; j < length; j++) {
                 Hash peer = info.getPeer(j);
@@ -382,8 +384,8 @@ class TunnelRenderer {
         if (live <= 0)
             out.write("<div class=\"statusnotes\"><center><b>" + _t("none") + "</b></center></div>\n");
         out.write("<div class=\"statusnotes\"><center><b>" + _t("Lifetime bandwidth usage") + ":&nbsp;&nbsp;" +
-                  DataHelper.formatSize2Decimal(processedIn*1024) + "B " + _t("in") + ", " +
-                  DataHelper.formatSize2Decimal(processedOut*1024) + "B " + _t("out") + "</b></center></div>");
+                  DataHelper.formatSize2(processedIn*1024) + "B " + _t("in") + ", " +
+                  DataHelper.formatSize2(processedOut*1024) + "B " + _t("out") + "</b></center></div>");
     }
 
 /****
