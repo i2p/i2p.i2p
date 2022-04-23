@@ -293,7 +293,7 @@ class PeerTestManager {
                 PeerState2 bob = (PeerState2) test.getBob();
                 // TODO only create this once
                 byte[] data = SSU2Util.createPeerTestData(_context, bob.getRemotePeer(), _context.routerHash(),
-                                                          ALICE, test.getNonce(), null, 0, spk);
+                                                          ALICE, test.getNonce(), bob.getOurIP(), bob.getOurPort(), spk);
                 if (data == null) {
                     if (_log.shouldWarn())
                         _log.warn("sig fail");
@@ -786,7 +786,7 @@ class PeerTestManager {
             state = _activeTests.get(lNonce);
 
         if (_log.shouldDebug())
-            _log.debug("Got peer test from " + from + ' ' + fromPeer +
+            _log.debug("Got peer test" +
                        " msg: " + msg +
                        " status: " + status +
                        " hash: " + h +
@@ -794,6 +794,7 @@ class PeerTestManager {
                        " nonce: " + nonce +
                        " time: " + DataHelper.formatTime(time) +
                        " ip/port: " + Addresses.toString(testIP, testPort) +
+                       " from " + fromPeer +
                        " state: " + state);
 
         byte[] fromIP = from.getIP();
@@ -877,6 +878,11 @@ class PeerTestManager {
         switch (msg) {
             // alice to bob, in-session
             case 1: {
+                if (status != 0) {
+                    if (_log.shouldWarn())
+                        _log.warn("Msg 1 status " + status);
+                    return;
+                }
                 PeerState charlie = _transport.pickTestPeer(CHARLIE, fromPeer.getVersion(), isIPv6, from);
                 if (charlie == null) {
                     if (_log.shouldLog(Log.WARN))
@@ -921,6 +927,11 @@ class PeerTestManager {
 
             // bob to charlie, in-session
             case 2: {
+                if (status != 0) {
+                    if (_log.shouldWarn())
+                        _log.warn("Msg 2 status " + status);
+                    return;
+                }
                 InetAddress aliceIP;
                 try {
                     aliceIP = InetAddress.getByAddress(testIP);
@@ -952,9 +963,13 @@ class PeerTestManager {
                             else
                                 rcode = SSU2Util.TEST_REJECT_CHARLIE_ADDRESS;
                         } else {
+                            if (_log.shouldWarn())
+                                _log.warn("Signature failed msg 2\n" + aliceRI);
                             rcode = SSU2Util.TEST_REJECT_CHARLIE_SIGFAIL;
                         }
                     } else {
+                        if (_log.shouldWarn())
+                            _log.warn("Alice RI not found " + h);
                         rcode = SSU2Util.TEST_REJECT_CHARLIE_UNKNOWN_ALICE;
                     }
                 }
@@ -1037,7 +1052,10 @@ class PeerTestManager {
                 boolean fail = false;
                 RouterInfo charlieRI = null;
                 SessionKey charlieIntroKey = null;
-                if (_context.banlist().isBanlisted(h) ||
+                if (status != 0) {
+                    if (_log.shouldWarn())
+                        _log.warn("Msg 4 status " + status);
+                } else if (_context.banlist().isBanlisted(h) ||
                     !TransportUtil.isValidPort(testPort) ||
                     !_transport.isValid(testIP) ||
                     _transport.isTooClose(testIP) ||
@@ -1052,9 +1070,17 @@ class PeerTestManager {
                         // validate signed data
                         SigningPublicKey spk = charlieRI.getIdentity().getSigningPublicKey();
                         if (SSU2Util.validateSig(_context, SSU2Util.PEER_TEST_PROLOGUE,
-                                                 fromPeer.getRemotePeer(), h, data, spk)) {
+                                                 fromPeer.getRemotePeer(), _context.routerHash(), data, spk)) {
                             charlieIntroKey = getIntroKey(charlieRI, isIPv6);
+                            if (charlieIntroKey == null && _log.shouldWarn())
+                                _log.warn("Charlie intro key not found: " + test + '\n' + charlieRI);
+                        } else {
+                            if (_log.shouldWarn())
+                                _log.warn("Signature failed msg 4 " + test + '\n' + charlieRI);
                         }
+                    } else {
+                        if (_log.shouldWarn())
+                            _log.warn("Charlie RI not found" + test + ' ' + h);
                     }
                 }
                 if (charlieIntroKey == null) {

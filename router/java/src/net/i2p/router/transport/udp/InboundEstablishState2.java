@@ -685,6 +685,11 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         // PS2.super adds CLOCK_SKEW_FUDGE that doesn't apply here
         _pstate.adjustClockSkew(_skew - (_rtt / 2) - PeerState.CLOCK_SKEW_FUDGE);
         _pstate.setHisMTU(_mtu);
+        // set our address. _bobIP and _bobPort in super are not set for SSU2
+        boolean isIPv6 = _aliceIP.length == 16;
+        RouterAddress ra = _transport.getCurrentExternalAddress(isIPv6);
+        if (ra != null)
+            _pstate.setOurAddress(ra.getIP(), ra.getPort());
     }
 
     /**

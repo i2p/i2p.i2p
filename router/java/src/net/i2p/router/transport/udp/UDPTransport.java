@@ -3808,8 +3808,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             PeerState peer = iter.next();
             if (peerRole == BOB) {
                 // Skip SSU2 until we have support for peer test
-                if (peer.getVersion() != 1 && !SSU2Util.ENABLE_PEER_TEST)
-                    continue;
+                if (peer.getVersion() != 1) {
+                    if (!SSU2Util.ENABLE_PEER_TEST)
+                        continue;
+                    // we must know our IP/port
+                    PeerState2 bob = (PeerState2) peer;
+                    if (bob.getOurIP() == null || bob.getOurPort() <= 0)
+                        continue;
+                }
             } else {
                 // charlie must be same version
                 if (peer.getVersion() != version)

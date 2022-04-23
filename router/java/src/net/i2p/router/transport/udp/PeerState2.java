@@ -59,6 +59,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     private final SSU2Bitfield _ackedMessages;
     private final ConcurrentHashMap<Long, List<PacketBuilder.Fragment>> _sentMessages;
     private long _sentMessagesLastExpired;
+    private byte[] _ourIP;
+    private int _ourPort;
 
     // Session Confirmed retransmit
     private byte[][] _sessConfForReTX;
@@ -269,6 +271,12 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     byte[] getSendHeaderEncryptKey2() { return _sendHeaderEncryptKey2; }
     byte[] getRcvHeaderEncryptKey2() { return _rcvHeaderEncryptKey2; }
 
+    void setOurAddress(byte[] ip, int port) {
+        _ourIP = ip; _ourPort = port;
+    }
+    byte[] getOurIP() { return _ourIP; }
+    int getOurPort() { return _ourPort; }
+
     SSU2Bitfield getReceivedMessages() {
         // logged in PacketBuilder2
         //if (_log.shouldDebug())
@@ -379,6 +387,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotAddress(byte[] ip, int port) {
+        _ourIP = ip; _ourPort = port;
     }
 
     public void gotRelayTagRequest() {
@@ -594,8 +603,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             if (_log.shouldWarn())
                 _log.warn("Dup send of pkt " + pktNum + " on " + this);
         } else {
-            if (_log.shouldWarn())
-                _log.warn("New data pkt " + pktNum + " sent with " + fragments.size() + " fragments on " + this);
+            if (_log.shouldDebug())
+                _log.debug("New data pkt " + pktNum + " sent with " + fragments.size() + " fragments on " + this);
         }
     }
 

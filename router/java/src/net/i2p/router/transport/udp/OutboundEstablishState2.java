@@ -111,7 +111,6 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             }
         }
         _mtu = mtu;
-        // TODO if RI too big, give up now
         if (addr.getIntroducerCount() > 0) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("new outbound establish to " + remotePeer.calculateHash() + ", with address: " + addr);
@@ -520,6 +519,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             // PS2.super adds CLOCK_SKEW_FUDGE that doesn't apply here
             _pstate.adjustClockSkew(_skew - (_rtt / 2) - PeerState.CLOCK_SKEW_FUDGE);
             _pstate.setHisMTU(_mtu);
+            _pstate.setOurAddress(_aliceIP, _alicePort);
         }
         confirmedPacketsSent();
         return _pstate;
