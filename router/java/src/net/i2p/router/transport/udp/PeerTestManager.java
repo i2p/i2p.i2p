@@ -1,5 +1,6 @@
 package net.i2p.router.transport.udp;
 
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.Inet6Address;
 import java.net.UnknownHostException;
@@ -9,6 +10,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.southernstorm.noise.protocol.ChaChaPolyCipherState;
+
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -16,15 +19,18 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.i2np.DatabaseStoreMessage;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.RouterContext;
 import static net.i2p.router.transport.udp.PeerTestState.Role.*;
+import static net.i2p.router.transport.udp.SSU2Util.*;
 import net.i2p.router.transport.TransportImpl;
 import net.i2p.router.transport.TransportUtil;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
+import net.i2p.util.HexDump;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -310,14 +316,16 @@ class PeerTestManager {
     }
 
     /**
-     * SSU 1 or 2. We are Alice.
+     * Message 6. SSU 1 or 2. We are Alice.
      * Call from a synchronized method.
      */
     private void sendTestToCharlie() {
         PeerTestState test = _currentTest;
+        if (test == null)
+            return;
         if (!expired()) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Sending test to Charlie: " + test);
+                _log.debug("Sending msg 6 to Charlie: " + test);
             test.setLastSendTime(_context.clock().now());
             UDPPacket packet;
             if (test.getBob().getVersion() == 1) {
@@ -328,7 +336,18 @@ class PeerTestManager {
                 long nonce = test.getNonce();
                 long sendId = (nonce << 32) | nonce;
                 long rcvId = ~sendId;
-                byte[] data = null; // TODO
+                InetAddress addr = test.getAliceIP();
+                int alicePort = test.getAlicePort();
+                byte[] aliceIP = addr.getAddress();
+                int iplen = aliceIP.length;
+                byte[] data = new byte[13 + iplen];
+                data[0] = 1;  // alice
+                data[1] = 2;  // version
+                DataHelper.toLong(data, 2, 4, nonce);
+                DataHelper.toLong(data, 6, 4, _context.clock().now() / 1000);
+                data[10] = (byte) iplen;
+                System.arraycopy(aliceIP, 0, data, 11, iplen);
+                DataHelper.toLong(data, 11 + iplen, 2, alicePort);
                 packet = _packetBuilder2.buildPeerTestFromAlice(test.getCharlieIP(), test.getCharliePort(),
                                                                 test.getCharlieIntroKey(),
                                                                 sendId, rcvId, data);
@@ -728,6 +747,49 @@ class PeerTestManager {
     }
 
     /**
+     * Entry point for all out-of-session packets, messages 5-7 only.
+     *
+     * SSU 2 only.
+     *
+     * Receive a test message of some sort from the given peer, queueing up any packet
+     * that should be sent in response, or if its a reply to our own current testing,
+     * adjusting our test state.
+     *
+     * We could be Alice or Charlie.
+     *
+     * @param from non-null
+     * @param packet header already decrypted
+     * @since 0.9.54
+     */
+    public void receiveTest(RemoteHostId from, UDPPacket packet) {
+        DatagramPacket pkt = packet.getPacket();
+        int off = pkt.getOffset();
+        int len = pkt.getLength();
+        byte data[] = pkt.getData();
+        long rcvConnID = DataHelper.fromLong8(data, off);
+        long sendConnID = DataHelper.fromLong8(data, off + SRC_CONN_ID_OFFSET);
+        int type = data[off + TYPE_OFFSET] & 0xff;
+        if (type != PEER_TEST_FLAG_BYTE)
+            return;
+        byte[] introKey = _transport.getSSU2StaticIntroKey();
+        try {
+            // decrypt in-place
+            ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
+            chacha.initializeKey(introKey, 0);
+            long n = DataHelper.fromLong(data, off + PKT_NUM_OFFSET, 4);
+            chacha.setNonce(n);
+            chacha.decryptWithAd(data, off, LONG_HEADER_SIZE,
+                                 data, off + LONG_HEADER_SIZE, data, off + LONG_HEADER_SIZE, len - LONG_HEADER_SIZE);
+            int payloadLen = len - (LONG_HEADER_SIZE + MAC_LEN);
+            SSU2Payload.PayloadCallback cb = new PTCallback(from);
+            SSU2Payload.processPayload(_context, cb, data, off + LONG_HEADER_SIZE, payloadLen, false);
+        } catch (Exception e) {
+            if (_log.shouldWarn())
+                _log.warn("Bad PeerTest packet:\n" + HexDump.dump(data, off, len), e);
+        }
+    }
+
+    /**
      * Entry point for all incoming packets.
      *
      * SSU 2 only.
@@ -744,6 +806,7 @@ class PeerTestManager {
      * @param status 0 = accept, 1-255 = reject
      * @param h Alice or Charlie hash for msg 2 and 4, null for msg 1, 3, 5-7
      * @param data excludes flag, includes signature
+     * @since 0.9.54
      */
     public void receiveTest(RemoteHostId from, PeerState2 fromPeer, int msg, int status, Hash h, byte[] data) {
         PeerTestState.Role role;
@@ -994,15 +1057,21 @@ class PeerTestManager {
                      return;
                 }
                 UDPPacket packet = _packetBuilder2.buildPeerTestToBob(rcode, data, fromPeer);
+                if (_log.shouldDebug())
+                    _log.debug("Send msg 3 response " + rcode + " nonce " + lNonce + " to " + fromPeer);
                 _transport.send(packet);
-                // send msg 5
-                long rcvId = (nonce << 32) | nonce;
-                long sendId = ~rcvId;
-                // send the same data we sent to Bob
-                packet = _packetBuilder2.buildPeerTestToAlice(aliceIP, testPort,
-                                                              aliceIntroKey, true,
-                                                              sendId, rcvId, data);
-                _transport.send(packet);
+                if (rcode == SSU2Util.TEST_ACCEPT) {
+                    // send msg 5
+                    if (_log.shouldDebug())
+                        _log.debug("Send msg 5 to " + Addresses.toString(testIP, testPort));
+                    long rcvId = (nonce << 32) | nonce;
+                    long sendId = ~rcvId;
+                    // send the same data we sent to Bob
+                    packet = _packetBuilder2.buildPeerTestToAlice(aliceIP, testPort,
+                                                                  aliceIntroKey, true,
+                                                                  sendId, rcvId, data);
+                    _transport.send(packet);
+                }
                 break;
             }
 
@@ -1092,9 +1161,20 @@ class PeerTestManager {
                     testComplete();
                     return;
                 }
-                state.setCharlie(charlieIP, testPort, h);
-                state.setCharlieIntroKey(charlieIntroKey);
-                // delay, await msg 5
+                test.setCharlie(charlieIP, testPort, h);
+                test.setCharlieIntroKey(charlieIntroKey);
+                if (test.getReceiveCharlieTime() > 0) {
+                    // send msg 6
+                    if (_log.shouldDebug())
+                        _log.debug("Send msg 6 to charlie on " + test);
+                    synchronized(this) {
+                        sendTestToCharlie();
+                    }
+                } else {
+                    // delay, await msg 5
+                    if (_log.shouldDebug())
+                        _log.debug("Got msg 4 before msg 5 on " + test);
+                }
                 break;
             }
 
@@ -1111,15 +1191,22 @@ class PeerTestManager {
                 try {
                     InetAddress addr = InetAddress.getByAddress(testIP);
                     test.setAliceIPFromCharlie(addr);
-                    if (test.getReceiveBobTime() > 0)
-                        testComplete();
                 } catch (UnknownHostException uhe) {
                     if (_log.shouldWarn())
                         _log.warn("Charlie @ " + from + " said we were an invalid IP address: " + uhe.getMessage(), uhe);
                     _context.statManager().addRateData("udp.testBadIP", 1);
                 }
-                synchronized(this) {
-                    sendTestToCharlie();
+                if (test.getCharlieIntroKey() != null) {
+                    // send msg 6
+                    if (_log.shouldDebug())
+                        _log.debug("Send msg 6 to charlie on " + test);
+                    synchronized(this) {
+                        sendTestToCharlie();
+                    }
+                } else {
+                    // we haven't gotten message 4 yet
+                    if (_log.shouldDebug())
+                        _log.debug("Got msg 5 before msg 4 on " + test);
                 }
                 break;
             }
@@ -1128,6 +1215,7 @@ class PeerTestManager {
             case 6: {
                 state.setReceiveAliceTime(now);
                 state.setLastSendTime(now);
+                // send msg 7
                 long rcvId = (nonce << 32) | nonce;
                 long sendId = ~rcvId;
                 InetAddress addr = state.getAliceIP();
@@ -1142,6 +1230,8 @@ class PeerTestManager {
                 data[10] = (byte) iplen;
                 System.arraycopy(aliceIP, 0, data, 11, iplen);
                 DataHelper.toLong(data, 11 + iplen, 2, alicePort);
+                if (_log.shouldDebug())
+                    _log.debug("Send msg 7 to alice on " + state);
                 UDPPacket packet = _packetBuilder2.buildPeerTestToAlice(addr, alicePort,
                                                                         state.getAliceIntroKey(), false,
                                                                         sendId, rcvId, data);
@@ -1166,8 +1256,6 @@ class PeerTestManager {
                 try {
                     InetAddress addr = InetAddress.getByAddress(testIP);
                     test.setAliceIPFromCharlie(addr);
-                    if (test.getReceiveBobTime() > 0)
-                        testComplete();
                 } catch (UnknownHostException uhe) {
                     if (_log.shouldWarn())
                         _log.warn("Charlie @ " + from + " said we were an invalid IP address: " + uhe.getMessage(), uhe);
@@ -1518,6 +1606,83 @@ class PeerTestManager {
 
         public void timeReached() {
                 _activeTests.remove(Long.valueOf(_nonce));
+        }
+    }
+
+    /**
+     *  @since 0.9.54
+     */
+    private class PTCallback implements SSU2Payload.PayloadCallback {
+        private final RemoteHostId _from;
+        public long _timeReceived;
+        public byte[] _aliceIP;
+        public int _alicePort;
+
+        public PTCallback(RemoteHostId from) {
+            _from = from;
+        }
+
+        public void gotDateTime(long time) {
+            _timeReceived = time;
+        }
+
+        public void gotOptions(byte[] options, boolean isHandshake) {}
+
+        public void gotRI(RouterInfo ri, boolean isHandshake, boolean flood) {
+            throw new IllegalStateException("Bad block in PT");
+        }
+
+        public void gotRIFragment(byte[] data, boolean isHandshake, boolean flood, boolean isGzipped, int frag, int totalFrags) {
+            throw new IllegalStateException("Bad block in PT");
+        }
+
+        public void gotAddress(byte[] ip, int port) {
+            _aliceIP = ip;
+            _alicePort = port;
+        }
+
+        public void gotRelayTagRequest() {
+            throw new IllegalStateException("Bad block in PT");
+        }
+
+        public void gotRelayTag(long tag) {
+            throw new IllegalStateException("Bad block in PT");
+        }
+
+        public void gotRelayRequest(byte[] data) {
+            throw new IllegalStateException("Bad block in PT");
+        }
+
+        public void gotRelayResponse(int status, byte[] data) {
+            throw new IllegalStateException("Bad block in PT");
+        }
+
+        public void gotRelayIntro(Hash aliceHash, byte[] data) {
+            throw new IllegalStateException("Bad block in PT");
+        }
+
+        public void gotPeerTest(int msg, int status, Hash h, byte[] data) {
+            receiveTest(_from, null, msg, status, h, data);
+        }
+
+        public void gotToken(long token, long expires) {
+            throw new IllegalStateException("Bad block in PT");
+        }
+
+        public void gotI2NP(I2NPMessage msg) {
+            throw new IllegalStateException("Bad block in PT");
+        }
+
+        public void gotFragment(byte[] data, int off, int len, long messageId,int frag, boolean isLast) {
+            throw new IllegalStateException("Bad block in PT");
+        }
+
+        public void gotACK(long ackThru, int acks, byte[] ranges) {
+            throw new IllegalStateException("Bad block in PT");
+        }
+
+        public void gotTermination(int reason, long count) {
+            throw new IllegalStateException("Bad block in PT");
         }
     }
 }

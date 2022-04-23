@@ -647,6 +647,7 @@ class PacketBuilder2 {
         UDPPacket packet = buildLongPacketHeader(sendID, n, PEER_TEST_FLAG_BYTE, rcvID, token);
         Block block = new SSU2Payload.PeerTestBlock(6, 0, null, signedData);
         byte[] ik = introKey.getData();
+        packet.getPacket().setLength(LONG_HEADER_SIZE);
         encryptPeerTest(packet, ik, n, ik, ik, toIP.getAddress(), toPort, block);
         setTo(packet, toIP, toPort);
         packet.setMessageType(TYPE_TFA);
@@ -684,6 +685,7 @@ class PacketBuilder2 {
         int msgNum = firstSend ? 5 : 7;
         Block block = new SSU2Payload.PeerTestBlock(msgNum, 0, null, signedData);
         byte[] ik = introKey.getData();
+        packet.getPacket().setLength(LONG_HEADER_SIZE);
         encryptPeerTest(packet, ik, n, ik, ik, aliceIP.getAddress(), alicePort, block);
         setTo(packet, aliceIP, alicePort);
         packet.setMessageType(TYPE_TTA);
@@ -977,12 +979,12 @@ class PacketBuilder2 {
             pkt.setLength(pkt.getLength() + len + MAC_LEN);
         } catch (RuntimeException re) {
             if (!_log.shouldWarn())
-                _log.error("Bad retry msg out", re);
+                _log.error("Bad retry/test msg out", re);
             throw re;
         } catch (GeneralSecurityException gse) {
             if (!_log.shouldWarn())
-                _log.error("Bad retry msg out", gse);
-            throw new RuntimeException("Bad retry msg out", gse);
+                _log.error("Bad retry/test msg out", gse);
+            throw new RuntimeException("Bad retry/test msg out", gse);
         }
         SSU2Header.encryptLongHeader(packet, hdrKey1, hdrKey2);
     }
