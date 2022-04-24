@@ -207,6 +207,17 @@ class PeerTestManager {
         PeerTestState test = new PeerTestState(ALICE, bob, bobIP instanceof Inet6Address,
                                                _context.random().nextLong(MAX_NONCE),
                                                _context.clock().now());
+        if (bob.getVersion() == 2) {
+            PeerState2 b2 = (PeerState2) bob;
+            try {
+                InetAddress addr = InetAddress.getByAddress(b2.getOurIP());
+                test.setAlice(addr, b2.getOurPort(), _context.routerHash());
+            } catch (UnknownHostException uhe) {
+                if (_log.shouldWarn())
+                    _log.warn("Unable to get our IP", uhe);
+                return;
+            }
+        }
         _currentTest = test;
         _currentTestComplete = false;
         
