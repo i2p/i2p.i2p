@@ -2892,6 +2892,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // Make an empty "4" address
                 OrderedProperties opts = new OrderedProperties(); 
                 opts.setProperty(UDPAddress.PROP_CAPACITY, CAP_IPV4);
+                if (_enableSSU2)
+                    addSSU2Options(opts);
                 RouterAddress addr4 = new RouterAddress(STYLE, opts, SSU_OUTBOUND_COST);
                 RouterAddress current = getCurrentAddress(false);
                 boolean wantsRebuild = !addr4.deepEquals(current);
