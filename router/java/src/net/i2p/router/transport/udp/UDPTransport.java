@@ -2888,24 +2888,20 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 RouterAddress local = new RouterAddress(STYLE, localOpts, DEFAULT_COST);
                 replaceCurrentExternalAddress(local, isIPv6);
             }
-            if (!isIPv6) {
-                // Make an empty "4" address
-                OrderedProperties opts = new OrderedProperties(); 
-                opts.setProperty(UDPAddress.PROP_CAPACITY, CAP_IPV4);
-                if (_enableSSU2)
-                    addSSU2Options(opts);
-                RouterAddress addr4 = new RouterAddress(STYLE, opts, SSU_OUTBOUND_COST);
-                RouterAddress current = getCurrentAddress(false);
-                boolean wantsRebuild = !addr4.deepEquals(current);
-                if (!wantsRebuild)
-                    return null;
-                replaceAddress(addr4);
-                if (allowRebuildRouterInfo)
-                    rebuildRouterInfo();
-                return addr4;
-            }
-            removeExternalAddress(isIPv6, allowRebuildRouterInfo);
-            return null;
+            // Make an empty "4" or "6" address
+            OrderedProperties opts = new OrderedProperties(); 
+            opts.setProperty(UDPAddress.PROP_CAPACITY, isIPv6 ? CAP_IPV6 : CAP_IPV4);
+            if (_enableSSU2)
+                addSSU2Options(opts);
+            RouterAddress addr = new RouterAddress(STYLE, opts, SSU_OUTBOUND_COST);
+            RouterAddress current = getCurrentAddress(isIPv6);
+            boolean wantsRebuild = !addr.deepEquals(current);
+            if (!wantsRebuild)
+                return null;
+            replaceAddress(addr);
+            if (allowRebuildRouterInfo)
+                rebuildRouterInfo();
+            return addr;
         }
     }
 
