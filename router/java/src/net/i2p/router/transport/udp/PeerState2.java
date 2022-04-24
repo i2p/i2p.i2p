@@ -669,6 +669,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         if (_sessConfForReTX == null)
             return null;
         UDPPacket[] rv = new UDPPacket[_sessConfForReTX.length];
+        InetAddress addr = getRemoteIPAddress();
         for (int i = 0; i < rv.length; i++) {
             UDPPacket packet = UDPPacket.acquire(_context, false);
             rv[i] = packet;
@@ -677,7 +678,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             int off = pkt.getOffset();
             System.arraycopy(_sessConfForReTX[i], 0, data, off, _sessConfForReTX[i].length);
             pkt.setLength(_sessConfForReTX.length);
-            pkt.setAddress(_remoteIPAddress);
+            pkt.setAddress(addr);
             pkt.setPort(_remotePort);
             packet.setMessageType(PacketBuilder2.TYPE_CONF);
             packet.setPriority(PacketBuilder2.PRIORITY_HIGH);
