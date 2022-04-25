@@ -109,6 +109,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             chacha.setNonce(n);
             chacha.decryptWithAd(data, off, LONG_HEADER_SIZE,
                                  data, off + LONG_HEADER_SIZE, data, off + LONG_HEADER_SIZE, len - LONG_HEADER_SIZE);
+            chacha.destroy();
             processPayload(data, off + LONG_HEADER_SIZE, len - (LONG_HEADER_SIZE + MAC_LEN), true);
             _sendHeaderEncryptKey2 = introKey;
             do {

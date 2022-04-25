@@ -323,12 +323,12 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             throw new GeneralSecurityException("Bad token 0 in retry");
         _token = token;
         _timeReceived = 0;
+        ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
+        chacha.initializeKey(_rcvHeaderEncryptKey1, 0);
+        long n = DataHelper.fromLong(data, off + PKT_NUM_OFFSET, 4);
+        chacha.setNonce(n);
         try {
             // decrypt in-place
-            ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
-            chacha.initializeKey(_rcvHeaderEncryptKey1, 0);
-            long n = DataHelper.fromLong(data, off + PKT_NUM_OFFSET, 4);
-            chacha.setNonce(n);
             chacha.decryptWithAd(data, off, LONG_HEADER_SIZE,
                                  data, off + LONG_HEADER_SIZE, data, off + LONG_HEADER_SIZE, len - LONG_HEADER_SIZE);
             processPayload(data, off + LONG_HEADER_SIZE, len - (LONG_HEADER_SIZE + MAC_LEN), true);
@@ -336,6 +336,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             if (_log.shouldDebug())
                 _log.debug("Retry error", gse);
             throw gse;
+        } finally {
+            chacha.destroy();
         }
         packetReceived();
         if (_currentState == OutboundState.OB_STATE_VALIDATION_FAILED) {

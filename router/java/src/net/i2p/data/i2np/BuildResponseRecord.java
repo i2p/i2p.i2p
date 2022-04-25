@@ -128,6 +128,8 @@ public class BuildResponseRecord {
             chacha.encryptWithAd(ad, data, 0, data, 0, data.length - 16);
         } catch (GeneralSecurityException e) {
             return false;
+        } finally {
+            chacha.destroy();
         }
         return true;
     }
@@ -155,6 +157,8 @@ public class BuildResponseRecord {
             chacha.decryptWithAd(ad, data, 0, data, 0, rec.length());
         } catch (GeneralSecurityException e) {
             return false;
+        } finally {
+            chacha.destroy();
         }
         return true;
     }
@@ -179,6 +183,8 @@ public class BuildResponseRecord {
             chacha.encryptWithAd(ad, data, 0, data, 0, data.length - 16);
         } catch (GeneralSecurityException e) {
             return false;
+        } finally {
+            chacha.destroy();
         }
         return true;
     }
@@ -208,6 +214,8 @@ public class BuildResponseRecord {
             chacha.decryptWithAd(ad, data, 0, data, 0, rec.length());
         } catch (GeneralSecurityException e) {
             return false;
+        } finally {
+            chacha.destroy();
         }
         return true;
     }

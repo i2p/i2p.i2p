@@ -785,12 +785,12 @@ class PeerTestManager {
         if (type != PEER_TEST_FLAG_BYTE)
             return;
         byte[] introKey = _transport.getSSU2StaticIntroKey();
+        ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
+        chacha.initializeKey(introKey, 0);
+        long n = DataHelper.fromLong(data, off + PKT_NUM_OFFSET, 4);
+        chacha.setNonce(n);
         try {
             // decrypt in-place
-            ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
-            chacha.initializeKey(introKey, 0);
-            long n = DataHelper.fromLong(data, off + PKT_NUM_OFFSET, 4);
-            chacha.setNonce(n);
             chacha.decryptWithAd(data, off, LONG_HEADER_SIZE,
                                  data, off + LONG_HEADER_SIZE, data, off + LONG_HEADER_SIZE, len - LONG_HEADER_SIZE);
             int payloadLen = len - (LONG_HEADER_SIZE + MAC_LEN);
@@ -799,6 +799,8 @@ class PeerTestManager {
         } catch (Exception e) {
             if (_log.shouldWarn())
                 _log.warn("Bad PeerTest packet:\n" + HexDump.dump(data, off, len), e);
+        } finally {
+            chacha.destroy();
         }
     }
 
