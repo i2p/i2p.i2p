@@ -1041,7 +1041,7 @@ class PeerTestManager {
                         SigningPublicKey spk = aliceRI.getIdentity().getSigningPublicKey();
                         if (SSU2Util.validateSig(_context, SSU2Util.PEER_TEST_PROLOGUE,
                                                  fromPeer.getRemotePeer(), h, data, spk)) {
-                            aliceIntroKey = getIntroKey(aliceRI, isIPv6);
+                            aliceIntroKey = getIntroKey(getAddress(aliceRI, isIPv6));
                             if (aliceIntroKey != null)
                                 rcode = SSU2Util.TEST_ACCEPT;
                             else
@@ -1135,17 +1135,13 @@ class PeerTestManager {
                         _log.warn("Test nonce mismatch? " + nonce);
                     return;
                 }
-                InetAddress charlieIP;
-                try {
-                    charlieIP = InetAddress.getByAddress(testIP);
-                } catch (UnknownHostException uhe) {
-                    return;
-                }
                 test.setReceiveBobTime(now);
                 test.setLastSendTime(now);
                 boolean fail = false;
                 RouterInfo charlieRI = null;
                 SessionKey charlieIntroKey = null;
+                InetAddress charlieIP = null;
+                int charliePort = 0;
                 PeerState cps = _transport.getPeerState(h);
                 if (status != 0) {
                     if (_log.shouldInfo())
@@ -1157,13 +1153,9 @@ class PeerTestManager {
                            _transport.getEstablisher().getOutboundState(from) != null) {
                     if (_log.shouldInfo())
                         _log.info("Charlie is connecting " + test);
-                } else if (_context.banlist().isBanlisted(h) ||
-                    !TransportUtil.isValidPort(testPort) ||
-                    !_transport.isValid(testIP) ||
-                    _transport.isTooClose(testIP) ||
-                    _context.blocklist().isBlocklisted(testIP)) {
+                } else if (_context.banlist().isBanlisted(h)) {
                     if (_log.shouldInfo())
-                        _log.info("Test fail ban/ip/port " + h + ' ' + Addresses.toString(testIP, testPort));
+                        _log.info("Test fail ban " + h);
                 } else {
                     // bob should have sent it to us. Don't bother to lookup
                     // remotely if he didn't, or it was out-of-order or lost.
@@ -1173,9 +1165,40 @@ class PeerTestManager {
                         SigningPublicKey spk = charlieRI.getIdentity().getSigningPublicKey();
                         if (SSU2Util.validateSig(_context, SSU2Util.PEER_TEST_PROLOGUE,
                                                  fromPeer.getRemotePeer(), _context.routerHash(), data, spk)) {
-                            charlieIntroKey = getIntroKey(charlieRI, isIPv6);
-                            if (charlieIntroKey == null && _log.shouldWarn())
-                                _log.warn("Charlie intro key not found: " + test + '\n' + charlieRI);
+                            RouterAddress ra = getAddress(charlieRI, isIPv6);
+                            if (ra != null) {
+                                charlieIntroKey = getIntroKey(ra);
+                                if (charlieIntroKey == null && _log.shouldWarn())
+                                    _log.warn("Charlie intro key not found: " + test + '\n' + charlieRI);
+                                byte[] ip = ra.getIP();
+                                if (ip != null) {
+                                    if (!_transport.isValid(ip) ||
+                                        _transport.isTooClose(ip) ||
+                                        _context.blocklist().isBlocklisted(ip)) {
+                                        if (_log.shouldInfo())
+                                            _log.info("Test fail ban/ip " + Addresses.toString(ip));
+                                    } else {
+                                        try {
+                                           charlieIP = InetAddress.getByAddress(ip);
+                                        } catch (UnknownHostException uhe) {
+                                           if (_log.shouldWarn())
+                                                _log.warn("Charlie IP not found: " + test + '\n' + ra, uhe);
+                                        }
+                                    }
+                                } else {
+                                    if (_log.shouldWarn())
+                                        _log.warn("Charlie IP not found: " + test + '\n' + ra);
+                                }
+                                charliePort = ra.getPort();
+                                if (!TransportUtil.isValidPort(charliePort)) {
+                                    if (_log.shouldWarn())
+                                        _log.warn("Charlie port bad: " + test + '\n' + ra);
+                                    charliePort = 0;
+                                }
+                            } else {
+                                if (_log.shouldWarn())
+                                    _log.warn("Charlie address not found" + test + '\n' + charlieRI);
+                            }
                         } else {
                             if (_log.shouldWarn())
                                 _log.warn("Signature failed msg 4 " + test + '\n' + charlieRI);
@@ -1185,7 +1208,7 @@ class PeerTestManager {
                             _log.warn("Charlie RI not found" + test + ' ' + h);
                     }
                 }
-                if (charlieIntroKey == null) {
+                if (charlieIntroKey == null || charlieIP == null || charliePort <= 0) {
                     // reset all state
                     // so testComplete() will return UNKNOWN
                     test.setAlicePortFromCharlie(0);
@@ -1194,7 +1217,7 @@ class PeerTestManager {
                     testComplete();
                     return;
                 }
-                test.setCharlie(charlieIP, testPort, h);
+                test.setCharlie(charlieIP, charliePort, h);
                 test.setCharlieIntroKey(charlieIntroKey);
                 if (test.getReceiveCharlieTime() > 0) {
                     // send msg 6
@@ -1305,11 +1328,11 @@ class PeerTestManager {
     }
 
     /**
-     *  Get an intro key out of a RI. SSU2 only.
+     *  Get an address out of a RI. SSU2 only.
      *
      *  @since 0.9.54
      */
-    private SessionKey getIntroKey(RouterInfo ri, boolean isIPv6) {
+    private RouterAddress getAddress(RouterInfo ri, boolean isIPv6) {
         List<RouterAddress> addrs = _transport.getTargetAddresses(ri);
         RouterAddress ra = null;
         for (RouterAddress addr : addrs) {
@@ -1332,6 +1355,15 @@ class PeerTestManager {
             ra = addr;
             break;
         }
+        return ra;
+    }
+
+    /**
+     *  Get an intro key out of an address. SSU2 only.
+     *
+     *  @since 0.9.54
+     */
+    private static SessionKey getIntroKey(RouterAddress ra) {
         if (ra == null)
             return null;
         String siv = ra.getOption("i");
