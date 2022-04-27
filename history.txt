@@ -1,3 +1,13 @@
+2022-04-27 zzz
+ * SSU2: Peer test updates and fixes
+
+2022-04-24 zzz
+ * SSU: Publish empty IPv6 address when missing introducers
+ * SSU2: Finish peer test implementation
+
+2022-04-17 zzz
+ * More soft restart fixes
+
 2022-04-14 zzz
  * Startup: Don't set our RI loaded from disk if too old
 

@@ -179,7 +179,7 @@ final class SSU2Util {
     public static byte[] createPeerTestData(I2PAppContext ctx, Hash h, Hash h2,
                                             PeerTestState.Role role, long nonce, byte[] ip, int port,
                                             SigningPrivateKey spk) {
-        int datalen = 13 + ip.length;
+        int datalen = 13 + (ip != null ? ip.length : 0);
         byte[] data = new byte[datalen + spk.getType().getSigLen()];
         if (role == PeerTestState.Role.BOB)
             throw new IllegalArgumentException();
@@ -188,10 +188,11 @@ final class SSU2Util {
         DataHelper.toLong(data, 2, 4, nonce);
         DataHelper.toLong(data, 6, 4, ctx.clock().now() / 1000);
         int iplen = (ip != null) ? ip.length : 0;
-        data[10] = (byte) iplen;
-        if (ip != null)
-            System.arraycopy(ip, 0, data, 11, iplen);
-        DataHelper.toLong(data, 11 + iplen, 2, port);
+        data[10] = (byte) (ip != null ? iplen + 2 : 0);
+        if (ip != null) {
+            DataHelper.toLong(data, 11, 2, port);
+            System.arraycopy(ip, 0, data, 13, iplen);
+        }
         Signature sig = sign(ctx, PEER_TEST_PROLOGUE, h, h2, data, datalen, spk);
         if (sig == null)
             return null;
