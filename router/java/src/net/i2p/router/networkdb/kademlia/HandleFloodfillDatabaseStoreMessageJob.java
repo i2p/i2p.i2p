@@ -171,16 +171,19 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 wasNew = ((null == prevNetDb) || (prevNetDb.getPublished() < ri.getPublished()));
                 // Check new routerinfo address against blocklist
                 if (wasNew) {
+                    // TODO should we not flood temporarily banned routers either?
+                    boolean forever = getContext().banlist().isBanlistedForever(key);
+                    if (forever)
+                        wasNew = false; // don't flood
                     if (prevNetDb == null) {
-                        if ((!getContext().banlist().isBanlistedForever(key)) &&
+                        if (!forever &&
                             getContext().blocklist().isBlocklisted(ri) &&
                             _log.shouldLog(Log.WARN))
                                 _log.warn("Blocklisting new peer " + key + ' ' + ri);
-                    } else {
+                    } else if (!forever) {
                         Collection<RouterAddress> oldAddr = prevNetDb.getAddresses();
                         Collection<RouterAddress> newAddr = ri.getAddresses();
                         if ((!newAddr.equals(oldAddr)) &&
-                            (!getContext().banlist().isBanlistedForever(key)) &&
                             getContext().blocklist().isBlocklisted(ri) &&
                             _log.shouldLog(Log.WARN))
                                 _log.warn("New address received, Blocklisting old peer " + key + ' ' + ri);
@@ -350,7 +353,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                         }
                     } else {
                         if (_log.shouldWarn())
-                            _log.warn("Reply gw not found in LS with " + count + " leases");
+                            _log.warn("Reply gw " + toPeer + ' ' + replyTunnel + " not found in LS with " + count + " leases: " + ls);
                     }
                 }
             }
