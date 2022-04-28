@@ -23,6 +23,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.I2NPMessageImpl;
 import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.transport.udp.InboundMessageFragments.ModifiableLong;
 import static net.i2p.router.transport.udp.SSU2Util.*;
 import net.i2p.util.HexDump;
@@ -380,6 +381,28 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotRI(RouterInfo ri, boolean isHandshake, boolean flood) throws DataFormatException {
+        if (_log.shouldDebug())
+            _log.debug("Got updated RI");
+        try {
+            Hash h = ri.getHash();
+            if (h.equals(_context.routerHash()))
+                return;
+            RouterInfo old = _context.netDb().store(h, ri);
+            if (flood && !ri.equals(old)) {
+                FloodfillNetworkDatabaseFacade fndf = (FloodfillNetworkDatabaseFacade) _context.netDb();
+                if ((old == null || ri.getPublished() > old.getPublished()) &&
+                    fndf.floodConditional(ri)) {
+                    if (_log.shouldDebug())
+                        _log.debug("Flooded the RI: " + h);
+                } else {
+                    if (_log.shouldInfo())
+                        _log.info("Flood request but we didn't: " + h);
+                }
+            }
+        } catch (IllegalArgumentException iae) {
+            if (_log.shouldWarn())
+                _log.warn("RI store fail: " + ri, iae);
+        }
     }
 
     public void gotRIFragment(byte[] data, boolean isHandshake, boolean flood, boolean isGzipped, int frag, int totalFrags) {

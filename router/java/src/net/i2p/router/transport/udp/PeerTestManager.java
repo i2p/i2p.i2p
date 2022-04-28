@@ -1700,7 +1700,16 @@ class PeerTestManager {
         public void gotOptions(byte[] options, boolean isHandshake) {}
 
         public void gotRI(RouterInfo ri, boolean isHandshake, boolean flood) {
-            throw new IllegalStateException("Bad block in PT");
+            try {
+                Hash h = ri.getHash();
+                if (h.equals(_context.routerHash()))
+                    return;
+                _context.netDb().store(h, ri);
+                // ignore flood request
+            } catch (IllegalArgumentException iae) {
+                if (_log.shouldWarn())
+                    _log.warn("RI store fail: " + ri, iae);
+            }
         }
 
         public void gotRIFragment(byte[] data, boolean isHandshake, boolean flood, boolean isGzipped, int frag, int totalFrags) {

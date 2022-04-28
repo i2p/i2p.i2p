@@ -914,7 +914,8 @@ class PacketHandler {
         } else if (type == SSU2Util.PEER_TEST_FLAG_BYTE) {
             if (_log.shouldDebug())
                 _log.debug("Got a Peer Test");
-             _testManager.receiveTest(from, packet);
+            if (SSU2Util.ENABLE_PEER_TEST)
+                _testManager.receiveTest(from, packet);
         } else {
             if (_log.shouldWarn())
                 _log.warn("Got unknown message " + header + " on " + state);
