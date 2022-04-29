@@ -32,6 +32,7 @@ import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.HexDump;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.VersionComparator;
 
 /**
  *  Entry points are runTest() to start a new test as Alice,
@@ -388,7 +389,7 @@ class PeerTestManager {
      *
      * SSU 1 only.
      *
-     * @param fromPeer non-null if an associated session was found, otherwise null
+     * @param fromPeer non-null if an associated session was found, otherwise may be null
      * @param inSession true if authenticated in-session
      */
     private synchronized void receiveTestReply(RemoteHostId from, PeerState fromPeer, boolean inSession,
@@ -408,9 +409,21 @@ class PeerTestManager {
                 //if (_log.shouldDebug())
                 //    _log.debug("Bob replied to us (Alice) in-session " + fromPeer);
             } else {
-                // TODO check Bob version, drop if >= 0.9.52
-                if (_log.shouldDebug())
-                    _log.debug("Bob replied to us (Alice) with intro key " + from + ' ' + fromPeer);
+                // Check Bob version, drop if >= 0.9.52
+                fromPeer = test.getBob();
+                Hash bob = fromPeer.getRemotePeer();
+                RouterInfo bobRI = _context.netDb().lookupRouterInfoLocally(bob);
+                if (bobRI == null || VersionComparator.comp(bobRI.getVersion(), "0.9.52") >= 0) {
+                    if (_log.shouldInfo())
+                        _log.info("Bob replied to us (Alice) with intro key " + fromPeer);
+                    // reset all state
+                    // so testComplete() will return UNKNOWN
+                    test.setAlicePortFromCharlie(0);
+                    test.setReceiveCharlieTime(0);
+                    test.setReceiveBobTime(0);
+                    testComplete();
+                    return;
+                }
             }
 
             int ipSize = testInfo.readIPSize();
