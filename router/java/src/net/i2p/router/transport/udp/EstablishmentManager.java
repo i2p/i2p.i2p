@@ -315,6 +315,9 @@ class EstablishmentManager {
                       case IB_STATE_CREATED_SENT:
                       case IB_STATE_CONFIRMED_PARTIALLY:
                       case IB_STATE_CONFIRMED_COMPLETELY:
+                      case IB_STATE_TOKEN_REQUEST_RECEIVED:
+                      case IB_STATE_REQUEST_BAD_TOKEN_RECEIVED:
+                      case IB_STATE_RETRY_SENT:
                         // queue it
                         inState.addMessage(msg);
                         if (_log.shouldLog(Log.WARN))

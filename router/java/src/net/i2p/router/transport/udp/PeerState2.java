@@ -434,22 +434,30 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     public void gotRelayRequest(byte[] data) {
         if (!ENABLE_RELAY)
             return;
+        // Relay blocks are ACK-eliciting
+        messagePartiallyReceived();
     }
 
     public void gotRelayResponse(int status, byte[] data) {
         if (!ENABLE_RELAY)
             return;
+        // Relay blocks are ACK-eliciting
+        messagePartiallyReceived();
     }
 
     public void gotRelayIntro(Hash aliceHash, byte[] data) {
         if (!ENABLE_RELAY)
             return;
+        // Relay blocks are ACK-eliciting
+        messagePartiallyReceived();
     }
 
     public void gotPeerTest(int msg, int status, Hash h, byte[] data) {
         if (!ENABLE_PEER_TEST)
             return;
         _transport.getPeerTestManager().receiveTest(_remoteHostId, this, msg, status, h, data);
+        // Peer Test block is ACK-eliciting
+        messagePartiallyReceived();
     }
 
     public void gotToken(long token, long expires) {

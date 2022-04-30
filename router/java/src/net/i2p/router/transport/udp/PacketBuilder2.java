@@ -720,16 +720,6 @@ class PacketBuilder2 {
     }
 
     /**
-     *  build intro packets for each of the published introducers
-     *
-     *  @param emgr only to call emgr.isValid()
-     *  @return empty list on failure
-     */
-    public List<UDPPacket> buildRelayRequest(EstablishmentManager emgr, OutboundEstablishState2 state) {
-        return null;
-    }
-
-    /**
      *  From Alice to Bob.
      *  In-session.
      *
