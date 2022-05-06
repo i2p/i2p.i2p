@@ -24,6 +24,8 @@
 #
 # Grouped as in the link above.
 #
+https://blitz.ahadns.com/
+#
 https://dns.aa.net.uk/dns-query
 #
 # SSL issues
@@ -31,7 +33,7 @@ https://dns.aa.net.uk/dns-query
 #
 # SSL cert issues
 #https://dnsnl.alekberg.net/dns-query
-# 400
+# SSL cert issues
 #https://dnsse.alekberg.net/dns-query
 # down, see https://www.armadillodns.net/ for status
 #https://doh.armadillodns.net/dns-query
@@ -58,19 +60,20 @@ https://doh.opendns.com/dns-query
 #
 https://freedns.controld.com/p0
 #
-# SSL issues
-#https://dns.digitale-gesellschaft.ch/dns-query
+https://dns.digitale-gesellschaft.ch/dns-query
+#
+https://dnsforge.de/dns-query
 #
 # SSL issues
-#https://dnsforge.de/dns-query
-#
-# not found
 #https://doh.dnslify.com/dns-query
 #
 https://doh.li/dns-query
 #
-# SSL issues
-#https://rdns.faelix.net/
+https://doh.asia.dnswarden.com/uncensored
+https://doh.eu.dnswarden.com/uncensored
+https://doh.us.dnswarden.com/uncensored
+#
+https://rdns.faelix.net/
 #
 https://doh.ffmuc.net/dns-query
 #
@@ -84,12 +87,11 @@ https://ordns.he.net/dns-query
 # not found
 #https://jcdns.fun/dns-query
 #
-# SSL issues
-#https://jp.tiar.app/dns-query
-https://jp.tiarap.org/dns-query
+https://doh.tiar.app/dns-query
+https://doh.tiarap.org/dns-query
 #
 # down
-#https://us1.dns.lavate.ch/dns-query
+https://us1.dns.lavate.ch/dns-query
 https://eu1.dns.lavate.ch/dns-query
 #
 https://resolver-eu.lelux.fi/dns-query
@@ -99,7 +101,8 @@ https://doh.libredns.gr/dns-query
 # not found
 #https://dns.moulticast.net/dns-query
 #
-https://doh.post-factum.tk/dns-query
+# not found
+#https://doh.post-factum.tk/dns-query
 #
 https://basic.rethinkdns.com/dns-query
 #
@@ -118,7 +121,8 @@ https://dns.wevpn.com/dns-query
 #
 https://ibksturm.synology.me/dns-query
 #
-https://ibuki.cgnat.net/dns-query
+# not found
+#https://ibuki.cgnat.net/dns-query
 #
 https://doh-2.seby.io/dns-query
 https://doh.seby.io:8443/dns-query
@@ -146,12 +150,15 @@ https://doh.bortzmeyer.fr/
 # fail
 #https://odvr.nic.cz/dns-query
 # dns.ryan-palmer
-https://dns1.ryan-palmer.com/dns-query
+# fail
+#https://dns1.ryan-palmer.com/dns-query
 #
 # dnscrypt.ca-1-doh
-# not found
+# SSL issues
 #https://dns1.dnscrypt.ca/dns-query
 #https://dns2.dnscrypt.ca/dns-query
+https://doh.dnscrypt.uk/dns-query
+https://v.dnscrypt.uk/dns-query
 # dnshome-doh
 https://dns.dnshome.de/dns-query
 # doh-crypto-sx
@@ -187,3 +194,7 @@ https://unicast.uncensoreddns.org/dns-query
 # Others:
 # njalla
 https://dns.njal.la/dns-query
+#
+# R4SAS i2pd
+https://opennic.i2pd.xyz/dns-query
+https://opennic2.i2pd.xyz/dns-query
