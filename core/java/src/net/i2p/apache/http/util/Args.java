@@ -25,7 +25,7 @@
  *
  */
 
-package org.apache.http.util;
+package net.i2p.apache.http.util;
 
 public class Args {
 

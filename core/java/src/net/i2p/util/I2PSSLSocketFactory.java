@@ -85,10 +85,10 @@ import net.i2p.I2PAppContext;
 import net.i2p.crypto.KeyStoreUtil;
 import net.i2p.data.DataHelper;
 
-import org.apache.http.conn.ssl.DefaultHostnameVerifier;
-import org.apache.http.conn.util.PublicSuffixList;
-import org.apache.http.conn.util.PublicSuffixListParser;
-import org.apache.http.conn.util.PublicSuffixMatcher;
+import net.i2p.apache.http.conn.ssl.DefaultHostnameVerifier;
+import net.i2p.apache.http.conn.util.PublicSuffixList;
+import net.i2p.apache.http.conn.util.PublicSuffixListParser;
+import net.i2p.apache.http.conn.util.PublicSuffixMatcher;
 
 /**
  * Loads trusted ASCII certs from ~/.i2p/certificates/ and $I2P/certificates/.

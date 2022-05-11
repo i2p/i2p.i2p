@@ -126,13 +126,6 @@ the binaries or sources.
   We bundle most of the source from https://github.com/rrd4j/rrd4j
   No package or not widely available.
 
-* libhttpclient-java
-  We only use a few classes from this large package.
-  We require 4.4 or higher which is not available in older distributions.
-  This is 2 MB of dependencies, instead we bundle 20 KB of copied source.
-  If we do add this dependency, we use only the code in
-  /usr/share/java/httpclient.jar and /usr/share/java/httpcore.jar.
-
 * UPnP (cybergarage)
   Large subsystem, large number of Java source files, modified with several fixes.
   From https://github.com/cybergarage/cybergarage-upnp

@@ -1,3 +1,6 @@
+2022-05-11 zzz
+ * Util: Rename modified apache classes (Gitlab ticket #353)
+
 2022-05-02 zzz
  * GeoIP 2022-05-01
  * Tomcat 9.0.62

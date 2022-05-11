@@ -116,12 +116,3 @@ usr/share/flags/countries/16x11/se.png usr/share/i2p/eepsite/docroot/help/lib/se
 usr/share/flags/countries/16x11/tr.png usr/share/i2p/eepsite/docroot/help/lib/tr.png
 usr/share/flags/countries/16x11/ua.png usr/share/i2p/eepsite/docroot/help/lib/ua.png
 usr/share/flags/countries/16x11/us.png usr/share/i2p/eepsite/docroot/help/lib/us.png
-
-
-# comment out if not building with libhttpclient-java and libhttpcore-java
-# 2 MB of dependencies vs. 20 KB of copied source
-# Requires 4.4 or higher.
-# Debian: Not in wheezy/jessie
-# Ubuntu: Only in wily and later
-#usr/share/java/httpclient.jar usr/share/i2p/lib/httpclient.jar
-#usr/share/java/httpcore.jar usr/share/i2p/lib/httpcore.jar

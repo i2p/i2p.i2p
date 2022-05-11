@@ -24,12 +24,12 @@
  * <http://www.apache.org/>.
  *
  */
-package org.apache.http.conn.util;
+package net.i2p.apache.http.conn.util;
 
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.http.util.Args;
+import net.i2p.apache.http.util.Args;
 
 /**
  * Public suffix is a set of DNS names or wildcards concatenated with dots. It represents

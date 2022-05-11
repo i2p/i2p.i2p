@@ -25,7 +25,7 @@
  *
  */
 
-package org.apache.http.conn.ssl;
+package net.i2p.apache.http.conn.ssl;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -49,8 +49,8 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 import javax.security.auth.x500.X500Principal;
 
-import org.apache.http.conn.util.InetAddressUtils;
-import org.apache.http.conn.util.PublicSuffixMatcher;
+import net.i2p.apache.http.conn.util.InetAddressUtils;
+import net.i2p.apache.http.conn.util.PublicSuffixMatcher;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;

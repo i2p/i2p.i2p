@@ -24,7 +24,7 @@
  * <http://www.apache.org/>.
  *
  */
-package org.apache.http.conn.util;
+package net.i2p.apache.http.conn.util;
 
 import java.net.IDN;
 import java.util.Collection;
@@ -32,7 +32,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.http.util.Args;
+import net.i2p.apache.http.util.Args;
 
 /**
  * Utility class that can test if DNS names match the content of the Public Suffix List.
@@ -40,7 +40,7 @@ import org.apache.http.util.Args;
  * An up-to-date list of suffixes can be obtained from
  * <a href="http://publicsuffix.org/">publicsuffix.org</a>
  *
- * @see org.apache.http.conn.util.PublicSuffixList
+ * @see net.i2p.apache.http.conn.util.PublicSuffixList
  *
  * @since 4.4
  */

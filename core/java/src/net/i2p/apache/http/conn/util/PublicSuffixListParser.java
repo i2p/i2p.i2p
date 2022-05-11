@@ -24,7 +24,7 @@
  * <http://www.apache.org/>.
  *
  */
-package org.apache.http.conn.util;
+package net.i2p.apache.http.conn.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;

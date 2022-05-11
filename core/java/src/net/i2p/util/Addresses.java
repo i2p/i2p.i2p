@@ -28,7 +28,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.http.conn.util.InetAddressUtils;
+import net.i2p.apache.http.conn.util.InetAddressUtils;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;

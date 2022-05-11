@@ -25,7 +25,7 @@
  *
  */
 
-package org.apache.http.conn.util;
+package net.i2p.apache.http.conn.util;
 
 import java.util.regex.Pattern;
 
