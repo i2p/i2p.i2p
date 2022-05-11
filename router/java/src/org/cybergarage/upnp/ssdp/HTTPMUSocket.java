@@ -55,6 +55,8 @@ public class HTTPMUSocket
 	private InetSocketAddress ssdpMultiGroup = null;
 	private MulticastSocket ssdpMultiSock = null;
 	private NetworkInterface ssdpMultiIf = null;
+	/** I2P */
+	private InetAddress _bindAddress;
 	
 	////////////////////////////////////////////////
 	//	Constructor
@@ -80,6 +82,7 @@ public class HTTPMUSocket
 
 	public String getLocalAddress()
 	{
+	   /**** I2P fix
 		if (ssdpMultiGroup == null || ssdpMultiIf == null)
 			return "";
 		InetAddress mcastAddr = ssdpMultiGroup.getAddress();
@@ -92,6 +95,10 @@ public class HTTPMUSocket
 				return addr.getHostAddress();
 		}
 		return "";
+	    ****/
+		if (_bindAddress == null)
+			return "";
+		return _bindAddress.getHostAddress();
 	}
 
 	/**
@@ -151,6 +158,8 @@ public class HTTPMUSocket
 			ssdpMultiGroup = new InetSocketAddress(InetAddress.getByName(addr), port);
 			ssdpMultiIf = NetworkInterface.getByInetAddress(bindAddr);
 			ssdpMultiSock.joinGroup(ssdpMultiGroup, ssdpMultiIf);
+			// I2P
+			_bindAddress = bindAddr;
 		}
 		catch (Exception e) {
 			Debug.warning(e);
@@ -256,5 +265,10 @@ public class HTTPMUSocket
  		
 		return recvPacket;
 	}
+
+	/** I2P */
+	@Override
+	public String toString() { return getLocalAddress(); }
+
 }
 

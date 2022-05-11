@@ -18,11 +18,13 @@
 
 package org.cybergarage.upnp.ssdp;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Vector;
 
 import org.cybergarage.net.HostInterface;
 import org.cybergarage.upnp.device.SearchListener;
+import org.cybergarage.util.Debug;
 
 public class SSDPSearchSocketList extends Vector<SSDPSearchSocket> 
 {
@@ -101,12 +103,16 @@ public class SSDPSearchSocketList extends Vector<SSDPSearchSocket>
 		
 		for (int i = 0; i < bindAddresses.length; i++) {
 			if(bindAddresses[i]!=null){
-				SSDPSearchSocket ssdpSearchSocket;
-				if(HostInterface.isIPv6Address(bindAddresses[i]))
-					ssdpSearchSocket = new SSDPSearchSocket(bindAddresses[i],port ,multicastIPv6 );
-				else
-					ssdpSearchSocket = new SSDPSearchSocket(bindAddresses[i],port,multicastIPv4 );
-				add(ssdpSearchSocket);
+				try {
+					SSDPSearchSocket ssdpSearchSocket;
+					if(HostInterface.isIPv6Address(bindAddresses[i]))
+						ssdpSearchSocket = new SSDPSearchSocket(bindAddresses[i],port ,multicastIPv6 );
+					else
+						ssdpSearchSocket = new SSDPSearchSocket(bindAddresses[i],port,multicastIPv4 );
+					add(ssdpSearchSocket);
+				} catch (IOException ioe) {
+					Debug.warning("Failed bind to " + bindAddresses[i], ioe);
+				}
 			}
 		}
 		return true;

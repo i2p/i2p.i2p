@@ -54,8 +54,10 @@ public class SSDPSearchSocket extends HTTPMUSocket implements Runnable
 	 * @param multicast The multicast address to use as destination
 	 * @since 1.8
 	 */
-	public SSDPSearchSocket(String bindAddr,int port,String multicast){
-		open(bindAddr,multicast);
+	public SSDPSearchSocket(String bindAddr,int port,String multicast) throws IOException {
+		boolean ok = open(bindAddr,multicast);
+		if (!ok)
+			throw new IOException("Bind to " + bindAddr + " failed");
 	}
 
 	/**
@@ -63,12 +65,15 @@ public class SSDPSearchSocket extends HTTPMUSocket implements Runnable
 	 * @param bindAddr the binding address for sending multicast packet
 	 * @since 1.8
 	 */
-	public SSDPSearchSocket(InetAddress bindAddr){
+	public SSDPSearchSocket(InetAddress bindAddr) throws IOException {
+		boolean ok;
 		if(bindAddr.getAddress().length!=4){
-			this.open((Inet6Address)bindAddr);
+			ok = this.open((Inet6Address)bindAddr);
 		}else{
-			this.open((Inet4Address)bindAddr);
+			ok = this.open((Inet4Address)bindAddr);
 		}
+		if (!ok)
+			throw new IOException("Bind to " + bindAddr + " failed");
 	}
 
 	////////////////////////////////////////////////

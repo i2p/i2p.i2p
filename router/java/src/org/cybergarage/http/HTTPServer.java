@@ -262,4 +262,8 @@ public class HTTPServer implements Runnable
 		httpServerThread = null;
 		return true;
 	}
+
+	/** I2P */
+	@Override
+	public String toString() { return getBindAddress(); }
 }

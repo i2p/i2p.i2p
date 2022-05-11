@@ -1,4 +1,5 @@
 2022-05-11 zzz
+ * Transport: Fix thrashing of UPnP IPv6 listen sockets
  * Util: Rename modified apache classes (Gitlab ticket #353)
 
 2022-05-02 zzz

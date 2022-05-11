@@ -268,5 +268,10 @@ public class HTTPUSocket
 		 return true;
 	 }
 */
+
+	/** I2P */
+	@Override
+	public String toString() { return localAddr; }
+
 }
 

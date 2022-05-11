@@ -98,6 +98,7 @@ package org.cybergarage.upnp;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.Calendar;
@@ -1439,7 +1440,14 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 	public void announce(String bindAddr) {
 		String devLocation = getLocationURL(bindAddr);
 
-		SSDPNotifySocket ssdpSock = new SSDPNotifySocket(bindAddr);
+		SSDPNotifySocket ssdpSock;
+		// I2P
+		try {
+			ssdpSock = new SSDPNotifySocket(bindAddr);
+		} catch (IOException ioe) {
+			Debug.warning("Failed announce from " + bindAddr, ioe);
+			return;
+		}
 
 		SSDPNotifyRequest ssdpReq = new SSDPNotifyRequest();
 		ssdpReq.setServer(UPnP.getServerName());
@@ -1514,7 +1522,14 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 	}
 
 	public void byebye(String bindAddr) {
-		SSDPNotifySocket ssdpSock = new SSDPNotifySocket(bindAddr);
+		SSDPNotifySocket ssdpSock;
+		// I2P
+		try {
+			ssdpSock = new SSDPNotifySocket(bindAddr);
+		} catch (IOException ioe) {
+			Debug.warning("Failed byebye from " + bindAddr, ioe);
+			return;
+		}
 
 		SSDPNotifyRequest ssdpReq = new SSDPNotifyRequest();
 		ssdpReq.setNTS(NTS.BYEBYE);

@@ -73,6 +73,7 @@ package org.cybergarage.upnp;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
 
@@ -662,9 +663,14 @@ public class Service
 		ssdpReq.setNT(serviceNT);
 		ssdpReq.setUSN(serviceUSN);
 
-		SSDPNotifySocket ssdpSock = new SSDPNotifySocket(bindAddr);
-		Device.notifyWait();
-		ssdpSock.post(ssdpReq);
+		// I2P
+		try {
+			SSDPNotifySocket ssdpSock = new SSDPNotifySocket(bindAddr);
+			Device.notifyWait();
+			ssdpSock.post(ssdpReq);
+		} catch (IOException ioe) {
+			Debug.warning("Failed announce from " + bindAddr, ioe);
+		}
 	}
 
 	public void byebye(String bindAddr)
@@ -679,9 +685,14 @@ public class Service
 		ssdpReq.setNT(devNT);
 		ssdpReq.setUSN(devUSN);
 
-		SSDPNotifySocket ssdpSock = new SSDPNotifySocket(bindAddr);
-		Device.notifyWait();
-		ssdpSock.post(ssdpReq);
+		// I2P
+		try {
+			SSDPNotifySocket ssdpSock = new SSDPNotifySocket(bindAddr);
+			Device.notifyWait();
+			ssdpSock.post(ssdpReq);
+		} catch (IOException ioe) {
+			Debug.warning("Failed announce from " + bindAddr, ioe);
+		}
 	}
 
 	public boolean serviceSearchResponse(SSDPPacket ssdpPacket)

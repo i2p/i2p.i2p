@@ -54,7 +54,7 @@ public class SSDPNotifySocket extends HTTPMUSocket implements Runnable
 	//	Constructor
 	////////////////////////////////////////////////
 	
-	public SSDPNotifySocket(String bindAddr)
+	public SSDPNotifySocket(String bindAddr) throws IOException
 	{
 		String addr = SSDP.ADDRESS;
 		useIPv6Address = false;
@@ -62,7 +62,9 @@ public class SSDPNotifySocket extends HTTPMUSocket implements Runnable
 			addr = SSDP.getIPv6Address();
 			useIPv6Address = true;
 		}
-		open(addr, SSDP.PORT, bindAddr);
+		boolean ok = open(addr, SSDP.PORT, bindAddr);
+		if (!ok)
+			throw new IOException("Bind to " + bindAddr + " failed");
 		Debug.message("Opened SSDP notify socket at " + bindAddr + ':' + SSDP.PORT);
 		setControlPoint(null);
 	}
