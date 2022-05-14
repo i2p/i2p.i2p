@@ -137,6 +137,9 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     }
 
     /**
+     *  The local destination for this SKM
+     *
+     *  @return our destination or null for the router SKM
      *  @since 0.9.46
      */
     public Destination getDestination() {
