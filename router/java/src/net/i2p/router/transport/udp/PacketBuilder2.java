@@ -725,7 +725,7 @@ class PacketBuilder2 {
      *
      *  @return null on failure
      */
-    private UDPPacket buildRelayRequest(byte[] signedData, PeerState2 bob) {
+    UDPPacket buildRelayRequest(byte[] signedData, PeerState2 bob) {
         Block block = new SSU2Payload.RelayRequestBlock(signedData);
         UDPPacket rv = buildPacket(Collections.emptyList(), Collections.singletonList(block), bob);
         rv.setMessageType(TYPE_RREQ);
