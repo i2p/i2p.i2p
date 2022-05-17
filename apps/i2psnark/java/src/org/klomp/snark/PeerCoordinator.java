@@ -279,7 +279,6 @@ class PeerCoordinator implements PeerListener
 
   /**
    *  Bytes not yet in storage. Does NOT account for skipped files.
-   *  Not exact (does not adjust for last piece size).
    * Returns how many bytes are still needed to get the complete torrent.
    * @return -1 if in magnet mode
    */
@@ -287,8 +286,13 @@ class PeerCoordinator implements PeerListener
   {
     if (metainfo == null | storage == null)
         return -1;
-    // XXX - Only an approximation.
-    return ((long) storage.needed()) * metainfo.getPieceLength(0);
+    int psz = metainfo.getPieceLength(0);
+    long rv = ((long) storage.needed()) * psz;
+    int last = metainfo.getPieces() - 1;
+    BitField bf = storage.getBitField();
+    if (bf != null && !bf.get(last))
+        rv -= psz - metainfo.getPieceLength(last);
+    return rv;
   }
 
   /**
