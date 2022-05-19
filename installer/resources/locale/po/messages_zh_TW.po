@@ -1,0 +1,197 @@
+# I2P
+# Copyright (C) 2012 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-10-06 13:42+0000\n"
+"PO-Revision-Date: 2012-12-22 15:05+0000\n"
+"Last-Translator: kytv <killyourtv@mail.i2p>\n"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.com/otf/I2P/language/zh_TW/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: ../i2prouter:223
+msgid "Failed to load the wrapper"
+msgstr "封装程序载入失败"
+
+#: ../i2prouter:988 ../i2prouter:1016 ../i2prouter:1090 ../i2prouter:1118
+#: ../i2prouter:1139
+#, sh-format
+msgid "$APP_LONG_NAME is already running."
+msgstr "$APP_LONG_NAME 已运行。"
+
+#: ../i2prouter:999
+#, sh-format
+msgid "Running $APP_LONG_NAME"
+msgstr "正在运行 $APP_LONG_NAME"
+
+#: ../i2prouter:1023
+#, sh-format
+msgid "Waiting for $APP_LONG_NAME"
+msgstr "正在等待 $APP_LONG_NAME"
+
+#: ../i2prouter:1070
+#, sh-format
+msgid "WARNING: $APP_LONG_NAME may have failed to start."
+msgstr "警告：$APP_LONG_NAME 可能启动失败。"
+
+#: ../i2prouter:1084 ../i2prouter:1112 ../i2prouter:1318 ../i2prouter:1607
+msgid "Must be root to perform this action."
+msgstr "root 才能执行此操作。"
+
+#: ../i2prouter:1128
+#, sh-format
+msgid "Starting $APP_LONG_NAME"
+msgstr "正在启动 $APP_LONG_NAME"
+
+#: ../i2prouter:1150
+#, sh-format
+msgid "Stopping $APP_LONG_NAME"
+msgstr "正在停止 $APP_LONG_NAME"
+
+#: ../i2prouter:1154 ../i2prouter:1222 ../i2prouter:1775
+#, sh-format
+msgid "$APP_LONG_NAME was not running."
+msgstr "$APP_LONG_NAME 未运行"
+
+#: ../i2prouter:1167 ../i2prouter:1175 ../i2prouter:1237 ../i2prouter:1245
+#, sh-format
+msgid "Unable to stop $APP_LONG_NAME."
+msgstr "无法停止 $APP_LONG_NAME"
+
+#: ../i2prouter:1193
+#, sh-format
+msgid "Waiting for $APP_LONG_NAME to exit"
+msgstr "正在等待 $APP_LONG_NAME 退出"
+
+#: ../i2prouter:1207
+#, sh-format
+msgid "Failed to stop $APP_LONG_NAME."
+msgstr "无法停止 $APP_LONG_NAME。"
+
+#: ../i2prouter:1210
+#, sh-format
+msgid "Stopped $APP_LONG_NAME."
+msgstr "$APP_LONG_NAME 已停止。"
+
+#: ../i2prouter:1218
+#, sh-format
+msgid "Stopping $APP_LONG_NAME gracefully"
+msgstr "正在等待 $APP_LONG_NAME 自然关闭"
+
+#: ../i2prouter:1264
+#, sh-format
+msgid "$APP_LONG_NAME is not running."
+msgstr "$APP_LONG_NAME 未运行"
+
+#: ../i2prouter:1269
+#, sh-format
+msgid "$APP_LONG_NAME is running: PID:$pid"
+msgstr "$APP_LONG_NAME 已运行：PID:$pid"
+
+#: ../i2prouter:1272
+#, sh-format
+msgid "$APP_LONG_NAME is running: PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
+msgstr "$APP_LONG_NAME 已运行：PID:$pid, 封装:$STATUS, Java:$JAVASTATUS"
+
+#: ../i2prouter:1325 ../i2prouter:1337 ../i2prouter:1356 ../i2prouter:1373
+#: ../i2prouter:1440 ../i2prouter:1460 ../i2prouter:1474 ../i2prouter:1488
+#: ../i2prouter:1516 ../i2prouter:1554 ../i2prouter:1589
+#, sh-format
+msgid "The $APP_LONG_NAME daemon is already installed."
+msgstr "后台服务 $APP_LONG_NAME 已运行。"
+
+#: ../i2prouter:1328 ../i2prouter:1343 ../i2prouter:1445 ../i2prouter:1477
+#: ../i2prouter:1491 ../i2prouter:1505 ../i2prouter:1519 ../i2prouter:1557
+#: ../i2prouter:1592
+#, sh-format
+msgid "Installing the $APP_LONG_NAME daemon"
+msgstr "正在安装后台服务 $APP_LONG_NAME"
+
+#: ../i2prouter:1599
+#, sh-format
+msgid "Install not currently supported for $DIST_OS"
+msgstr "暂不支持 $DIST_OS 平台上的安装"
+
+#: ../i2prouter:1615 ../i2prouter:1628 ../i2prouter:1642 ../i2prouter:1651
+#: ../i2prouter:1661 ../i2prouter:1685 ../i2prouter:1698 ../i2prouter:1710
+#: ../i2prouter:1728 ../i2prouter:1741 ../i2prouter:1755
+#, sh-format
+msgid "Removing $APP_LONG_NAME daemon"
+msgstr "正在删除后台服务 $APP_LONG_NAME"
+
+#: ../i2prouter:1621 ../i2prouter:1636 ../i2prouter:1645 ../i2prouter:1655
+#: ../i2prouter:1666 ../i2prouter:1679 ../i2prouter:1691 ../i2prouter:1704
+#: ../i2prouter:1722 ../i2prouter:1735 ../i2prouter:1749 ../i2prouter:1760
+#, sh-format
+msgid "The $APP_LONG_NAME daemon is not currently installed."
+msgstr "后台服务 $APP_LONG_NAME 未安装。"
+
+#: ../i2prouter:1764
+#, sh-format
+msgid "Remove not currently supported for $DIST_OS"
+msgstr "暂不支持 $DIST_OS 平台上的删除"
+
+#: ../i2prouter:1851
+msgid "Commands:"
+msgstr "指令："
+
+#: ../i2prouter:1852
+msgid "Launch in the current console."
+msgstr "从当前控制台中启动。"
+
+#: ../i2prouter:1853
+msgid "Start in the background as a daemon process."
+msgstr "作为服务进程从后台启动。"
+
+#: ../i2prouter:1854
+msgid "Stop if running as a daemon or in another console."
+msgstr "关闭作为服务进程或从其他控制台启动的I2P。"
+
+#: ../i2prouter:1855
+msgid "Stop gracefully, may take up to 11 minutes."
+msgstr "自然关闭，可以需要最多11分钟。"
+
+#: ../i2prouter:1856
+msgid "Stop if running and then start."
+msgstr "先终止（如果运行）再启动。"
+
+#: ../i2prouter:1857
+msgid "Restart only if already running."
+msgstr "重启(仅在已运行时)。"
+
+#: ../i2prouter:1858
+msgid "Query the current status."
+msgstr "查询当前状态。"
+
+#: ../i2prouter:1859
+msgid "Install to start automatically when system boots."
+msgstr "安装为随系统启动。"
+
+#: ../i2prouter:1860
+msgid "Uninstall."
+msgstr "卸载。"
+
+#: ../i2prouter:1861
+msgid "Request a Java thread dump if running."
+msgstr "请求Java转储(如果在运行)。"
+
+#: ../i2prouter:1874
+msgid "Please edit i2prouter and set the variable RUN_AS_USER"
+msgstr "请编辑 i2prouter 设置 RUN_AS_USER 变量"
+
+#: ../i2prouter:1879
+msgid "Running I2P as the root user is *not* recommended."
+msgstr "推荐 *不要* 以 root 身份运行 I2P 。"
+
+#: ../i2prouter:1882
+msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
+msgstr "要以root运行，请编辑 i2prouter 并设置 ALLOW_ROOT=true。"

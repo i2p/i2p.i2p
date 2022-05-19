@@ -1,0 +1,56 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH I2PROUTER 1 "November 27, 2021" "" I2P
+
+.SH 名称
+i2prouter \- 启动和停止 I2P 路由器
+
+.SH 概要
+\fBi2prouter\fP
+{\fIconsole\fP|\fIstart\fP|\fIstop\fP|\fIgraceful\fP|\fIrestart\fP|\fIcondrestart\fP|\fIstatus\fP|\fIdump\fP|\fIinstall\fP|\fIremove\fP}
+.br
+
+.SH 描述
+控制 I2P 服务。
+
+.IP \fBconsole\fP
+在当前用户以控制台应用运行I2P
+
+.IP \fBstart\fP
+启动 I2P 服务。
+
+.IP \fBstop\fP
+停止 I2P 服务。
+
+.IP \fBrestart\fP
+停止I2P服务，随后重启。
+
+.IP \fBcondrestart\fP
+仅当I2P服务已在运行时重启。
+
+.IP \fBgraceful\fP
+自然关闭I2P（最多可能需要11分钟）
+
+.IP \fBinstall\fP
+Install initscript to start I2P automatically when the system boots.
+
+.IP \fBremove\fP
+Uninstall initscript that was installed with \fBinstall\fP
+
+.IP \fBstatus\fP
+Prints whether the I2P service is running.
+
+.IP \fBdump\fP
+Dumps the current threads into \fBwrapper.log\fP.
+
+.SH 回報錯誤
+Please enter an issue on
+.UR https://i2pgit.org/i2p\-hackers/i2p.i2p/\-/issues
+the I2P GitLab server
+.UE .
+
+.SH 另见
+\fBi2prouter\-nowrapper\fP(1)

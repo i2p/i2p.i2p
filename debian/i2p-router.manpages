@@ -18,6 +18,7 @@ installer/resources/man/eepget.ru.1
 installer/resources/man/eepget.sv.1
 installer/resources/man/eepget.tr.1
 installer/resources/man/eepget.zh.1
+installer/resources/man/eepget.zh_TW.1
 installer/resources/man/i2prouter-nowrapper.1
 installer/resources/man/i2prouter-nowrapper.ar.1
 installer/resources/man/i2prouter-nowrapper.az.1
@@ -38,3 +39,4 @@ installer/resources/man/i2prouter-nowrapper.ru.1
 installer/resources/man/i2prouter-nowrapper.sv.1
 installer/resources/man/i2prouter-nowrapper.tr.1
 installer/resources/man/i2prouter-nowrapper.zh.1
+installer/resources/man/i2prouter-nowrapper.zh_TW.1

@@ -66,6 +66,7 @@ trans.tr_TR = apps/i2ptunnel/locale-proxy/messages_tr.po
 trans.uk_UA = apps/i2ptunnel/locale-proxy/messages_uk.po
 trans.vi = apps/i2ptunnel/locale-proxy/messages_vi.po
 trans.zh_CN = apps/i2ptunnel/locale-proxy/messages_zh.po
+trans.zh_TW = apps/i2ptunnel/locale-proxy/messages_zh_TW.po
 
 [I2P.core]
 type = PO
@@ -479,6 +480,7 @@ trans.sv_SE = installer/resources/locale/po/messages_sv.po
 trans.tr_TR = installer/resources/locale/po/messages_tr.po
 trans.uk_UA = installer/resources/locale/po/messages_uk.po
 trans.zh_CN = installer/resources/locale/po/messages_zh.po
+trans.zh_TW = installer/resources/locale/po/messages_zh_TW.po
 
 [I2P.getopt]
 ;;
@@ -563,6 +565,7 @@ trans.tk = apps/ministreaming/locale/messages_tk.po
 trans.tr_TR = apps/ministreaming/locale/messages_tr.po
 trans.uk_UA = apps/ministreaming/locale/messages_uk.po
 trans.zh_CN = apps/ministreaming/locale/messages_zh.po
+trans.zh_TW = apps/ministreaming/locale/messages_zh_TW.po
 
 [I2P.manpages]
 ;;
@@ -592,6 +595,7 @@ trans.ru_RU = installer/resources/locale-man/man_ru.po
 trans.sv_SE = installer/resources/locale-man/man_sv.po
 trans.tr_TR = installer/resources/locale-man/man_tr.po
 trans.zh_CN = installer/resources/locale-man/man_zh.po
+trans.zh_TW = installer/resources/locale-man/man_zh_TW.po
 
 [I2P.eepsite]
 ;;
@@ -650,6 +654,7 @@ trans.sl = apps/routerconsole/resources/docs/readme_sl.html
 trans.tr_TR = apps/routerconsole/resources/docs/readme_tr.html
 trans.uk_UA = apps/routerconsole/resources/docs/readme_uk.html
 trans.zh_CN = apps/routerconsole/resources/docs/readme_zh.html
+trans.zh_TW = apps/routerconsole/resources/docs/readme_zh_TW.html
 
 [main]
 host = https://www.transifex.com
