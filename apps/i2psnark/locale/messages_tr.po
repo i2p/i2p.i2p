@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-02-09 19:13+0000\n"
-"PO-Revision-Date: 2022-02-10 06:32+0000\n"
-"Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
+"PO-Revision-Date: 2011-02-13 12:00+0000\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2015-2022\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1474,7 +1474,7 @@ msgstr "I2CP sunucusu"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2693
 msgid "I2CP port"
-msgstr "I2CP kapı numarası"
+msgstr "I2CP bağlantı noktası"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2708
 msgid "I2CP options"

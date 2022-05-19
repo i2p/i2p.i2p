@@ -4,18 +4,19 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# daingewuvzeevisiddfddd, 2022
 # タカハシ, 2014
 # rafe <rafe.kun@gmail.com>, 2015
-# XMPPはいいぞ, 2021
+# daingewuvzeevisiddfddd, 2021
 # 432cfded806ff6b7fe5774185a19126f_b5bc177, 2013
-# XMPPはいいぞ, 2021
+# daingewuvzeevisiddfddd, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
-"PO-Revision-Date: 2021-10-14 06:00+0000\n"
-"Last-Translator: XMPPはいいぞ\n"
+"PO-Revision-Date: 2011-03-11 22:21+0000\n"
+"Last-Translator: daingewuvzeevisiddfddd, 2022\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -84,7 +85,7 @@ msgstr "パート ({0}) が表示されませ、 {1} のためです。"
 #: src/src/i2p/susi/webmail/WebMail.java:648
 #, java-format
 msgid "Download attachment {0}"
-msgstr "添付ファイルをダウンロードする{0}"
+msgstr "添付 {0} をダウンロードする"
 
 #: src/src/i2p/susi/webmail/WebMail.java:649
 msgid "File is packed into a zipfile for security reasons."

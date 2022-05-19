@@ -6,6 +6,7 @@
 # Translators:
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
+# Fosworn D4, 2022
 # Scott Rhodes <starring169@gmail.com>, 2020-2022
 # Tommy Lmath <l5h5t7@qq.com>, 2016
 # walking <waling@mail.i2p>, 2013
@@ -16,8 +17,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-02-09 19:13+0000\n"
-"PO-Revision-Date: 2022-02-10 03:00+0000\n"
-"Last-Translator: Scott Rhodes <starring169@gmail.com>\n"
+"PO-Revision-Date: 2011-02-13 12:00+0000\n"
+"Last-Translator: Fosworn D4, 2022\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/otf/I2P/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -81,7 +82,7 @@ msgstr "香草白"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1242
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1350
 msgid "No write permissions for data directory"
-msgstr ""
+msgstr "没有对数据文件夹的写入权限。"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1000
 #: ../java/src/org/klomp/snark/SnarkManager.java:1144
@@ -252,20 +253,20 @@ msgstr "已禁用评论。"
 #: ../java/src/org/klomp/snark/SnarkManager.java:1341
 #, java-format
 msgid "Comments name set to {0}."
-msgstr ""
+msgstr "评论名设置为{0}。"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1348
 #, java-format
 msgid "{0} theme loaded."
-msgstr ""
+msgstr "{0}主题已加载。"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1355
 msgid "Collapsible panels enabled."
-msgstr ""
+msgstr "可折叠面板已启用。"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1357
 msgid "Collapsible panels disabled."
-msgstr ""
+msgstr "可折叠面板已禁用。"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1367
 msgid "Configuration unchanged."
@@ -334,7 +335,7 @@ msgstr "具有相同Hash链接的种子已在下载中:{0}"
 #: ../java/src/org/klomp/snark/SnarkManager.java:1896
 #, java-format
 msgid "Torrent with the same data location is already running: {0}"
-msgstr ""
+msgstr "具有相同数据地址的种子已在下载中:{0}"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1655
 #, java-format
@@ -846,12 +847,12 @@ msgstr "无法添加内含另一个种子的种子 {0}：{1}"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1082
 #, java-format
 msgid "Download from non-I2P location {0} is not supported"
-msgstr ""
+msgstr "不支持从非 I2P 地址{0}下载"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1153
 #, java-format
 msgid "Invalid URL: Must start with \"{0}\" or \"{1}\""
-msgstr ""
+msgstr "无效的 URL：必须以“{0}”或“{1}”开头。"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1195
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1230
@@ -863,7 +864,7 @@ msgstr "Magnet 已删除:{0}"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1243
 #, java-format
 msgid "Torrent file could not be deleted: {0}"
-msgstr ""
+msgstr "无法删除种子文件：{0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1228
 #, java-format
@@ -1024,7 +1025,7 @@ msgstr "正做种"
 #, java-format
 msgid "Seeding to {0} peer"
 msgid_plural "Seeding to {0} peers"
-msgstr[0] ""
+msgstr[0] "正在与用户{0}做种"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1731
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1747
@@ -1050,13 +1051,13 @@ msgstr "正常"
 #, java-format
 msgid "Downloading from {0} peer"
 msgid_plural "Downloading from {0} peers"
-msgstr[0] ""
+msgstr[0] "正在从节点{0}下载"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1763
 #, java-format
 msgid "Connected to {0} peer"
 msgid_plural "Connected to {0} peers"
-msgstr[0] ""
+msgstr[0] "已连接到节点{0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1763
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1764
@@ -1142,7 +1143,7 @@ msgstr "移除"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1978
 msgid "Delete the .torrent file and the associated data files"
-msgstr ""
+msgstr "删除种子及所下载的文件"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1982
 msgid "Delete"
@@ -1150,7 +1151,7 @@ msgstr "删除"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1998
 msgid "Peer attached to swarm"
-msgstr ""
+msgstr "附属于集群的节点"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2028
 msgid "Unknown"
@@ -1200,7 +1201,7 @@ msgstr "从URL"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2315
 msgid ""
 "Enter the torrent file download URL (I2P only), magnet link, or info hash"
-msgstr ""
+msgstr "输入种子文件的下载链接（仅支持 I2P ），magnet 链接，或信息散列值"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2320
 msgid "Add torrent"
@@ -1286,7 +1287,7 @@ msgstr "数据文件夹"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2443
 msgid "Directory where torrents and downloaded/shared files are stored"
-msgstr ""
+msgstr " 种子和下载/分享的文件存储目录"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2448
 msgid "Files readable by all"
@@ -1296,7 +1297,7 @@ msgstr "文件对所有人可读"
 msgid ""
 "Set file permissions to allow other local users to access the downloaded "
 "files"
-msgstr ""
+msgstr "给其他本地用户设置文件权限使其能够访问已下载文件"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2456
 msgid "Auto start torrents"
@@ -1306,7 +1307,7 @@ msgstr "自动开始种子"
 msgid ""
 "Automatically start torrents when added and restart torrents when I2PSnark "
 "starts"
-msgstr ""
+msgstr "当种子被添加时自动启动并且在 I2PSnark 启动时自动重启种子"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2464
 msgid "Smart torrent sorting"
@@ -1314,21 +1315,21 @@ msgstr "智能种子排序"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2468
 msgid "Ignore words such as 'a' and 'the' when sorting"
-msgstr ""
+msgstr "排序时忽略诸如 ‘a’ 和 ‘the’ 的单词"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2472
 msgid "Collapsible panels"
-msgstr ""
+msgstr "可折叠面板"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2477
 msgid "Your browser does not support this feature."
-msgstr ""
+msgstr "您的浏览器不支持这个功能。"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2480
 msgid ""
 "Allow the 'Add Torrent' and 'Create Torrent' panels to be collapsed, and "
 "collapse by default in non-embedded mode"
-msgstr ""
+msgstr "允许‘添加种子’和‘创建种子’面板被折叠，并且在非嵌入模式下默认折叠。"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2492
 msgid "Language"
@@ -1340,11 +1341,11 @@ msgstr "主题"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2507
 msgid "To change themes manually, disable universal theming"
-msgstr ""
+msgstr "要手动更改主题，请禁用通用主题"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2511
 msgid "Universal theming is enabled."
-msgstr ""
+msgstr "通用主题已开启。"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2513
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2619

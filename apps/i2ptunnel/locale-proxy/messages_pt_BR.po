@@ -4,16 +4,16 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# blueboy, 2013
-# blueboy, 2015,2017
-# blueboy, 2013-2014
+# L., 2013
+# L., 2015,2017
+# L., 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
-"PO-Revision-Date: 2021-02-09 18:15+0000\n"
-"Last-Translator: Eduardo Rodrigues\n"
+"PO-Revision-Date: 2013-07-20 14:50+0000\n"
+"Last-Translator: L., 2015,2017\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/otf/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -147,7 +147,7 @@ msgstr "O proxy de saída está provavelmente fora do ar, mas pode ser também c
 msgid ""
 "You may want to {0}retry{1} as this will randomly reselect an outproxy from "
 "the pool you have defined {2}here{3} (if you have more than one configured)."
-msgstr ""
+msgstr "Talvez queiras {0}tentar novamente{1}, o que irá selecionar aleatoriamente um intermediador externo a rede I2P da lista que definiste {2}aqui{3} (Se tens mais de um configurado)."
 
 #: ../java/build/Proxy.java:26 ../java/build/Proxy.java:170
 #: ../java/build/Proxy.java:195 ../java/build/Proxy.java:216
@@ -274,7 +274,7 @@ msgstr "Noutro caso, procure um endereço Base 32 ou um linque de auxiliar de en
 msgid ""
 "Seeing this page often? See {0}the FAQ{1} for help in {2}adding some "
 "subscriptions{3} to your addressbook."
-msgstr ""
+msgstr "Estar a ver esta página frequentemente? Veja as {0}perguntas frequentes{1} para ajuda em {2}incluindo novos registros{3} em teu livro de endereços."
 
 #: ../java/build/Proxy.java:98
 msgid ""
@@ -315,7 +315,7 @@ msgstr "O destino de website especificado não era válido ou era inatingível."
 msgid ""
 "Perhaps you pasted in the wrong Base 64 string or the link you are following"
 " is bad."
-msgstr ""
+msgstr "Talvez colaste uma cadeia de caracteres na base 64 errada ou a ligação que seguiste não serve."
 
 #: ../java/build/Proxy.java:128
 msgid "The I2P host could also be offline."
@@ -365,7 +365,7 @@ msgstr "Aviso: Auxiliar de endereço ruim"
 #: ../java/build/Proxy.java:157
 #, java-format
 msgid "The helper key in the URL ({0}i2paddresshelper={1}) is not resolvable."
-msgstr ""
+msgstr "A palavra ajudante na URL({0}i2paddresshelper={1}) não é traduzível."
 
 #: ../java/build/Proxy.java:158
 msgid "It seems to be garbage data, or a mistyped Base 32 address."
@@ -508,7 +508,7 @@ msgstr "Destino"
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1451
 #, java-format
 msgid "Continue to {0} without saving"
-msgstr ""
+msgstr "Continuar para {0} sem salvar"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1452
 msgid ""

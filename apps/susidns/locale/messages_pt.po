@@ -14,8 +14,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-08-14 13:36+0000\n"
-"PO-Revision-Date: 2021-08-14 13:39+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2011-02-13 12:00+0000\n"
+"Last-Translator: Manuela Silva <mmsrs@sky.com>, 2017\n"
 "Language-Team: Portuguese (http://www.transifex.com/otf/I2P/language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -151,7 +151,7 @@ msgstr "O nome de anfitrião {0} já está no livro de endereços com um destino
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:279
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:286
 msgid "Unable to resolve Base 32 address"
-msgstr ""
+msgstr "Incapaz de decidir endereço de base 32"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:309
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:318
@@ -168,12 +168,12 @@ msgstr "Destino alterado para {0}."
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:313
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:322
 msgid "Warning - hostname does not end with \".i2p\""
-msgstr ""
+msgstr "Aviso - o nome do host não termina com \".i2p\""
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:320
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:334
 msgid "Invalid Base 32 hostname."
-msgstr ""
+msgstr "Nome do host de Base 32 inválido."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:322
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:336
@@ -184,12 +184,12 @@ msgstr "Destino Base 64 inválido."
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:342
 #, java-format
 msgid "Invalid hostname \"{0}\"."
-msgstr ""
+msgstr "Nome do host inválido \"{0}\"."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:332
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:345
 msgid "Please enter a hostname and destination"
-msgstr ""
+msgstr "Por favor, digite um nome do host e destino"
 
 #. clear search when deleting
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:336
@@ -236,7 +236,7 @@ msgstr "Nenhuma entrada marcada para apagar."
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:317
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:687
 msgid "Add Alternate"
-msgstr ""
+msgstr "Adicionar Alternativo"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:366
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:391
@@ -295,7 +295,7 @@ msgstr "{0} livros de endereços no banco de dados {1}"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:258
 #, java-format
 msgid "Host name {0} is not in  the address book."
-msgstr ""
+msgstr "O nome do host {0} não está no catálogo de endereços."
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:301
 msgid "Manually added via SusiDNS"
@@ -314,7 +314,7 @@ msgstr "Falha ao remover o Destino para {0} do serviço de nomes {1}"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:412
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:384
 msgid "Save Notes"
-msgstr ""
+msgstr "Salvar Notas"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:555
 msgid "You must enter a file"
@@ -322,16 +322,16 @@ msgstr "Necessita de seleccionar um ficheiro"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:571
 msgid "No entries found in file"
-msgstr ""
+msgstr "Nenhuma entrada encontrada no arquivo"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:581
 #, java-format
 msgid "Imported from file {0}"
-msgstr ""
+msgstr "Importado do arquivo {0}"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:583
 msgid "Imported from file"
-msgstr ""
+msgstr "Importado de arquivo"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:595
 #, java-format
@@ -349,7 +349,7 @@ msgstr[1] ""
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:605
 msgid "Import from file failed"
-msgstr ""
+msgstr "A importação via arquivo falhou"
 
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:148
 msgid ""
@@ -504,11 +504,11 @@ msgstr "Procurar"
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:673
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:268
 msgid "Hostname"
-msgstr ""
+msgstr "Nome do hospedeiro"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:437
 msgid "Link (b32)"
-msgstr ""
+msgstr "Link(b32)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:439
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:374
@@ -521,7 +521,7 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:501
 msgid "View larger version of identicon for this hostname"
-msgstr ""
+msgstr "Ver versão ampliada do identicon para este nome de host"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:515
 msgid "Base 32 address"
@@ -559,11 +559,11 @@ msgstr "Adicionar destino"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:677
 msgid "Destination or Base 32 Address"
-msgstr ""
+msgstr "Destino ou endereço de base 32"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:699
 msgid "Import from hosts.txt file"
-msgstr ""
+msgstr "Importar do arquivo hosts.txt"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:701
 msgid "File"
@@ -587,7 +587,7 @@ msgid ""
 "File and directory paths here are relative to the address book's working "
 "directory, which is normally ~/.i2p/addressbook/ (Linux) or "
 "%LOCALAPPDATA%\\I2P\\addressbook\\ (Windows)."
-msgstr ""
+msgstr "Os caminhos de arquivo e diretório aqui são relativos ao catálogo de endereços do diretório de trabalho, que normalmente é ~/.i2p/addressbook/ (Linux) or %LOCALAPPDATA%\\I2P\\addressbook\\ (Windows)."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:243
 msgid ""
@@ -713,15 +713,15 @@ msgstr "Certificado"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:338
 msgid "Validated"
-msgstr ""
+msgstr "Validado"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:340
 msgid "no"
-msgstr ""
+msgstr "não"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:340
 msgid "yes"
-msgstr ""
+msgstr "sim"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:346
 msgid "Source"
@@ -741,15 +741,15 @@ msgstr "Notas"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:409
 msgid "Visual Identification for"
-msgstr ""
+msgstr "Identificação Visual para"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:421
 msgid "Create your own identification images"
-msgstr ""
+msgstr "Criar as suas próprias imagens de identificação"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:423
 msgid "Launch Image Generator"
-msgstr ""
+msgstr "Iniciar Gerador de Imagem"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:182
 msgid "Introduction"
@@ -789,9 +789,10 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:216
 msgid ""
-"For more information on naming in I2P, see <a href=\"http://i2p-"
-"projekt.i2p/naming.html\" target=\"_blank\">the overview</a>."
-msgstr ""
+"For more information on naming in I2P, see <a "
+"href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">the "
+"overview</a>."
+msgstr "Para mais informação sobre a resolução de nomes na I2P, ver <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">a visão geral</a>."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:218
 msgid "How to use the Address Book?"
@@ -835,7 +836,7 @@ msgstr ""
 msgid ""
 "The address book application regularly polls your subscriptions and merges "
 "their content into your \"router\" address book."
-msgstr ""
+msgstr "O aplicativo livro de endereços regularmente consulta as inscrições e mescla o conteúdo ao seu livro de endereços do \"roteador\"."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:234
 msgid ""
@@ -854,7 +855,7 @@ msgstr ""
 msgid ""
 "The router also uses a private address book, which is not merged or "
 "published."
-msgstr ""
+msgstr "O roteador também usa um catálogo de endereços privado, que não é mesclado ou publicado."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:240
 msgid ""
@@ -890,7 +891,7 @@ msgstr "Estes URLs referem-se aos ficheiros hosts.txt publicados."
 msgid ""
 "The default subscription is the hosts.txt from {0}, which is updated "
 "infrequently."
-msgstr ""
+msgstr "A inscrição padrão é o hosts.txt de {0}, que é atualizado com pouca frequência."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:238
 msgid ""
@@ -907,17 +908,17 @@ msgid ""
 "If SusiDNS is configured to publish your Router address book, the entries "
 "will appear in your Published address book and saved to a hosts.txt file for"
 " sharing."
-msgstr ""
+msgstr "Se o SusiDNS estiver configurado para publicar o catálogo de endereços do roteador, as entradas aparecerão no catálogo publicado e salvas em um arquivo hosts.txt para compartilhamento."
 
 #: build/HowSVG.java:6
 msgid "Published Addressbook"
-msgstr ""
+msgstr "Catálogo de endereços publicado"
 
 #: build/HowSVG.java:7
 msgid ""
 "To configure SusiDNS to push your Router address book to your Published "
 "address book, set 'should_publish=true' on the configuration page."
-msgstr ""
+msgstr "Para configurar o SusiDNS para enviar seu catálogo de endereços do roteador ao catálogo de endereços publicado, defina 'should_publish = true' na página de configuração."
 
 #: build/HowSVG.java:8
 msgid ""
@@ -927,61 +928,61 @@ msgstr ""
 
 #: build/HowSVG.java:9
 msgid "Router Addressbook"
-msgstr ""
+msgstr "Catálogo de endereços do roteador"
 
 #: build/HowSVG.java:10
 msgid ""
 "Hosts you manually add here will never be published. You can also add "
 "aliases to hosts in other address books here."
-msgstr ""
+msgstr "Os hosts adicionados manualmente aqui nunca serão publicados. Você também pode adicionar apelidos aos hosts em outros catálogos de endereços aqui."
 
 #: build/HowSVG.java:11
 msgid "Private Addressbook"
-msgstr ""
+msgstr "Catálogo de endereços privado"
 
 #: build/HowSVG.java:12
 msgid "Local Records"
-msgstr ""
+msgstr "Registros locais"
 
 #: build/HowSVG.java:13
 msgid ""
 "I2P applications (including the HTTP proxy) use the hosts in your local "
 "address books to resolve .i2p hostnames."
-msgstr ""
+msgstr "Os aplicativos I2P (incluindo o proxy HTTP) usam os hosts nos catálogos de endereços locais para decidir nomes de host .i2p."
 
 #: build/HowSVG.java:14
 msgid ""
 "Additional subscriptions can be found in the FAQ section of the Router help "
 "page."
-msgstr ""
+msgstr "Inscrições adicionais podem ser encontradas na seção FAQ da página de ajuda do roteador"
 
 #: build/HowSVG.java:16
 msgid ""
 "Hosts sourced from your subscriptions are added to your Router address book,"
 " and are automatically synced (by default every 12 hours)."
-msgstr ""
+msgstr "Os hosts originários de suas inscrições são adicionados ao catálogo de endereços do roteador e são sincronizados automaticamente (por padrão a cada 12 horas)."
 
 #: build/HowSVG.java:17
 msgid "Configure Subscriptions"
-msgstr ""
+msgstr "Configurar inscrições"
 
 #: build/HowSVG.java:18
 msgid ""
 "If you manually add hosts here, they will be included your Published address"
 " book (if configured)."
-msgstr ""
+msgstr "Se você adicionar manualmente hosts aqui, eles serão incluídos no catálogo de endereços publicado (se configurado)."
 
 #: build/HowSVG.java:19
 msgid "Local Addressbook"
-msgstr ""
+msgstr "Catálogo de endereços local"
 
 #: build/HowSVG.java:20
 msgid "Searchable by"
-msgstr ""
+msgstr "Pesquisável por"
 
 #: build/HowSVG.java:21
 msgid "I2P applications"
-msgstr ""
+msgstr "Aplicações I2P"
 
 #: build/HowSVG.java:22
 msgid ""
@@ -991,27 +992,27 @@ msgstr ""
 
 #: build/HowSVG.java:23
 msgid "Optional,"
-msgstr ""
+msgstr "Opcional,"
 
 #: build/HowSVG.java:24
 msgid "for websites"
-msgstr ""
+msgstr "para sites web"
 
 #: build/HowSVG.java:25
 msgid ""
 "If you configure SusiDNS to publish your Router address book, it will export"
 " a hosts.txt file containing all the hosts (by default to the root of your "
 "eepsite)."
-msgstr ""
+msgstr "Se você configurar o SusiDNS para publicar seu catálogo de endereços do roteador, ele exportará um arquivo hosts.txt contendo todos os hosts (por padrão, a raiz do seu eepsite)."
 
 #: build/HowSVG.java:26
 msgid ""
 "Addresses manually added to your Local address book will merge with your "
 "Router address book."
-msgstr ""
+msgstr "Endereços adicionados manualmente ao seu catálogo de endereços local se fundirão com seu catálago de endereços do Roteador."
 
 #: build/HowSVG.java:27
 msgid ""
 "Hosts you receive from your subscriptions will merge with your Router "
 "address book."
-msgstr ""
+msgstr "Os hosts que você recebe de suas inscrições serão mesclados ao catálogo de endereços do roteador."

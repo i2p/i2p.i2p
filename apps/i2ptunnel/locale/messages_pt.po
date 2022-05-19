@@ -15,8 +15,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-17 13:12+0000\n"
-"PO-Revision-Date: 2021-11-17 13:34+0000\n"
-"Last-Translator: dllud\n"
+"PO-Revision-Date: 2011-02-13 11:46+0000\n"
+"Last-Translator: Manuela Silva <mmsrs@sky.com>, 2017-2018\n"
 "Language-Team: Portuguese (http://www.transifex.com/otf/I2P/language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -240,7 +240,7 @@ msgstr "Descrição"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:272
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1125
 msgid "Auto Start Tunnel"
-msgstr ""
+msgstr "Iniciar túnel automaticamente"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:274
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1127
@@ -260,7 +260,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1135
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:584
 msgid "Automatically start tunnel when router starts"
-msgstr ""
+msgstr "Iniciar túnel automaticamente quando o roteador iniciar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:286
 msgid ""
@@ -308,7 +308,7 @@ msgstr "obrigatório"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1177
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:512
 msgid "Specify the local port this service should be accessible from"
-msgstr ""
+msgstr "Especificar a porta local a partir da qual esse serviço deve ser acessível"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:330
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1020
@@ -322,7 +322,7 @@ msgstr "Anfitrião"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1163
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:466
 msgid "Hostname or IP address of the target server"
-msgstr ""
+msgstr "Nome do host ou endereço IP do servidor-alvo"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:347
 msgid "Local interface (ip address) the client tunnel will be reachable from"
@@ -371,11 +371,11 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:406
 msgid "SSL Outproxies"
-msgstr ""
+msgstr "Proxies de saída SSL"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:418
 msgid "Use Outproxy Plugin"
-msgstr ""
+msgstr "Usar extensão de proxy de saída"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:420
 msgid ""
@@ -1153,7 +1153,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1784
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:382
 msgid "Encrypted"
-msgstr ""
+msgstr "Encriptado"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1764
 msgid "Prevents server discovery by floodfills"
@@ -1453,7 +1453,7 @@ msgstr "Limite de POSTs"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2352
 msgid "Per Period"
-msgstr ""
+msgstr "Por período"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2354
 msgid "Ban Duration"
@@ -1520,7 +1520,7 @@ msgstr "Apagar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:203
 msgid "Global Tunnel Control"
-msgstr ""
+msgstr "Controle de túnel global"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:205
 msgid "Tunnel Wizard"
@@ -1592,7 +1592,7 @@ msgstr "Iniciando..."
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:328
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:517
 msgid "Stop this Tunnel"
-msgstr ""
+msgstr "Interromper esse túnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:316
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:335
@@ -1619,7 +1619,7 @@ msgstr "Parado"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:347
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:570
 msgid "Start this Tunnel"
-msgstr ""
+msgstr "Iniciar esse túnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:354
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:577
@@ -1633,7 +1633,7 @@ msgstr "Destino"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:371
 msgid "Hostname"
-msgstr ""
+msgstr "Nome do hospedeiro"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:412
 msgid "Share your site using the hostname"
@@ -1676,7 +1676,7 @@ msgstr "Interface"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:479
 msgid "Edit Tunnel Settings for"
-msgstr ""
+msgstr "Editar as configurações de túnel para"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:531
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:534
@@ -2106,7 +2106,7 @@ msgstr "Isto habilita tanto conexões TCP quanto o UDP a serem feitas através d
 msgid ""
 "A client tunnel implementing the SOCKS protocol, which is customized for "
 "connecting to IRC networks."
-msgstr ""
+msgstr "Um túnel de cliente implementando o protocolo SOCKS, e projetado para conectar em redes IRC."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:310
 msgid ""
@@ -2231,7 +2231,7 @@ msgid ""
 "This can be useful for frequently-used tunnels (especially server tunnels), "
 "but for tunnels that are only used occasionally it would mean that the I2P "
 "router is creating and maintaining unnecessary tunnels."
-msgstr ""
+msgstr "Isto pode ser útil em túneis muito utilizados (especialmente os túneis de servidor), mas para os túneis que são utilizado ocasionalmente significa que o I2P vai ficar mantendo túneis desnecessários."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:604
 msgid "The wizard has now collected enough information to create your tunnel."
@@ -2300,7 +2300,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:750
 msgid "Return to previous page"
-msgstr ""
+msgstr "Retornar para a página anterior"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:753
 msgid "Previous"

@@ -25,7 +25,7 @@ I2P başladıktan sonra ve normal çalışırken, yan panodaki I2P tünel oluşt
 <b>Gizli Hizmetler ve Herkese Açık Web Taraması</b><br>
 I2P üzerinden gizli hizmet web sitelerine ("I2P siteleri") ve diğer hizmetlere erişebilir ve kendi hizmetlerinizi sunabilirsiniz. 
 I2P içindeki vekil sunucuyu (çıkış vekil sunucusu) kullanarak normal web sitelerine anonim olarak erişebilirsiniz. 
-<a href="https://geti2p.net/en/about/browser-config" target="_blank">Web tarayıcınızın yapılandırma ayarlarından</a> HTTP vekil sunucusunu <code>127.0.0.1 kapı numarası 4444</code> olarak ayarladıktan sonra, bir I2P sitesine ya da <code>http://</code> ya da <code>https://</code>adresiyle bir web sitesine bakın. 
+<a href="https://geti2p.net/en/about/browser-config" target="_blank">Web tarayıcınızın yapılandırma ayarlarından</a> HTTP vekil sunucusunu <code>127.0.0.1 bağlantı noktası 4444</code> olarak ayarladıktan sonra, bir I2P sitesine ya da <code>http://</code> ya da <code>https://</code>adresiyle bir web sitesine bakın. 
 Normal İnternet bağlantısını kurarken çıkış sunucusu erişimini devre dışı bırakmak isterseniz, <code>false.i2p</code> dosyasında <i>Outproxies</i> bölümü altındaki çıkış sunucusu (outproxy) kaydını <a href="/i2ptunnel/edit?tunnel=0" target="_blank">I2P HTTP Vekil Sunucu Tünel Düzenleyici</a>değiştirin ya da silin. 
 <a href="#eepsites">Aşağıdaki</a> "İlginç Siteler" bölümünde I2P üzerinden sunulan bir kaç örnek site bulabilirsiniz.<br>
 Ayrıca I2P için bazı yarı resmi ya da resmi olmayan tarama araçları geliştirme girişimi var. Bazı örnekler;
@@ -43,10 +43,10 @@ Hesaplar normal İnternet üzerindeki gibi e-posta gönderip alabilir.
 Bir hesap edinmek için <a href="http://hq.postman.i2p/" target="_blank">hq.postman.i2p</a> adresine bakabilirsiniz.</li>
 
 <li>
-<b>Anonim Dosya Aktarımı</b><br><a href="/torrents">I2PSnark</a> I2P ile bütünleşik olarak, anonim ve şifreli BitTorrent aktarımlarının yapılmasını sağlar.</li>
+<b>Anonim Dosya Aktarımı</b><br><a href="/torrents">I2PSnark</a> I2P ile bütünleşik olarak, anonim ve şifrelenmiş BitTorrent aktarımlarının yapılmasını sağlar.</li>
 <li>
 <b>Anonim Sohbet</b><br>
-IRC istemcinizi başlatın (HexChat gibi) ve <a href="irc://127.0.0.1:6668/i2p">sunucuya</a> bağlanmak için <code>127.0.0.1 adresiyle 6668 kapı numarasını</code> kullanın. 
+IRC istemcinizi başlatın (HexChat gibi) ve <a href="irc://127.0.0.1:6668/i2p">sunucuya</a> bağlanmak için <code>127.0.0.1 adresiyle 6668 bağlantı noktasını</code> kullanın. 
 IRC isteciniz için bir vekil sunucu yapılandırmanıza gerek yoktur. I2P size yerel bir IRC tüneli sunar (IRC istemcinizin içinden bir IRC sunucusu ya da uzak sunucu gibi yapılandırabilirsiniz). 
 <code>localhost:6668</code> ile erişebileceğiniz yerel I2P IRC tüneliniz sizi I2P üzerinde Postman, echelon ve zl0 tarafından sunulan üç IRC sunucusundan birine yönlendirir. Ancak siz ya da başkaları bunların nerede olduğunu bilemez. İletişiminiz izlenmeyi engellemek için I2P tarafından şifrelenir. 
 IRC sunucusuna bağlandıktan sonra, pek çok kanal arasından <code>#i2p-chat</code> ve <code>#i2p-dev</code> kanallarına katılmak isteyebilirsiniz. 
@@ -66,7 +66,7 @@ Uygulama eklerine ve ayrıntılı bilgilere ulaşmak için <a href="http://wiki.
 Bir <a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target="_blank">geliştirici</a> iseniz, kendi uygulama eklerinizi yazmak için sunulan geliştirme çatısı ve <a href="http://i2p-projekt.i2p/plugins.html" target="_blank">belgeleri</a> kullanabilirsiniz.</li>
 
 </ul>
-<h3>ISP Üzerinde Anonim ve Şifreli Web Sitesi Barındırma</h3>
+<h3>ISP Üzerinde Anonim ve Şifrelenmiş Web Sitesi Barındırma</h3>
 
 <ul class="links">
 <li>
@@ -121,18 +121,18 @@ I2P yönelticiniz ne kadar uzun süre çalışırsa başarımı o kadar artar. B
 <b>Yapılandırmanızı ve Ayırdığınız Bant Genişliğinizi Denetleyin</b><br>
 I2P uygulamasının iyi çalışması için <a href="/config">bant genişliği yapılandırma bölümünden</a>ağ bağlantınızın hızını doğru olarak belirtin.
 I2P varsayılan olarak her duruma uygun olmayan oldukça kısıtlı ayarlar ile yapılandırılmıştır. Bu nedenle lütfen bu ayarları gözden geçirmek ve gerekiyorsa düzenlemek için zaman ayırın.
-Ne kadar çok bant genişliği ayırırsanız, <i>özellikle</i> giden bant genişliği, ağdan o oranda yararlanırsınız.</li>
+Ne kadar çok bant genişliği ayırırsanız, <i>özellikle</i> gidiş bant genişliği, ağdan o oranda yararlanırsınız.</li>
 
 <li>
 <b>Güvenlik Duvarları, Modemler ve Yönelticiler</b><br>
 Yapabiliyorsanız modeminizi, yönelticinizi, bilgisayarınızdaki güvenlik duvarını uygun şekilde ayarlayarak, I2P/Java bağlantısının herhangi bir güvenlik duvarından geçmeden İnternet üzerine çıktığından emin olun. 
-Engelleme yapan bir güvenlik duvarının arkasında olduğunuz halde kısıtlamasız bir giden bağlantınız varsa, I2P çalışabilir; ağa bağlanmak için gelen erişimi kapatıp <a href="http://i2p-projekt.i2p/udp.html" target="_blank">SSU IP Adresi Algılaması</a> özelliğine güvenebilirsiniz (<a href="https://en.wikipedia.org/wiki/Hole_punching_(networking)" target="_blank">güvenlik duvarını delme</a>), yan panodaki ağ durumunuz "Ağ: Güvenlik Duvarlı" olarak görüntülenir. 
-En iyi başarım için, I2P <a href="/confignet">dış kapı numarasının</a> İnternet üzerinde görülebilir olduğundan emin olun.
+Engelleme yapan bir güvenlik duvarının arkasında olduğunuz halde kısıtlamasız bir gidiş bağlantınız varsa, I2P çalışabilir; ağa bağlanmak için geliş erişimi kapatıp <a href="http://i2p-projekt.i2p/udp.html" target="_blank">SSU IP Adresi Algılaması</a> özelliğine güvenebilirsiniz (<a href="https://en.wikipedia.org/wiki/Hole_punching_(networking)" target="_blank">güvenlik duvarını delme</a>), yan panodaki ağ durumunuz "Ağ: Güvenlik Duvarlı" olarak görüntülenir. 
+En iyi başarım için, I2P <a href="/confignet">dış bağlantı noktasının</a> İnternet üzerinde görülebilir olduğundan emin olun.
 Ayrıntılı bilgi almak için aşağıya bakabilirsiniz.</li>
 
 <li>
 <b>Vekil Sunucu Ayarlarınızı Denetleyin</b><br>
-Herhangi bir web sitesine bağlanamıyorsanız (<a href="http://i2p-projekt.i2p/" target="_blank">i2p-projekt.i2p</a> sitesine bile), web tarayıcınızın vekil sunucu ayarlarının http trafiğini (https <i>değil</i>,  socks <i>değil</i>) <code>127.0.0.1 adresini ve 4444 kapı numarasını</code> kullanacak şekilde ayarlayın. 
+Herhangi bir web sitesine bağlanamıyorsanız (<a href="http://i2p-projekt.i2p/" target="_blank">i2p-projekt.i2p</a> sitesine bile), web tarayıcınızın vekil sunucu ayarlarının http trafiğini (https <i>değil</i>,  socks <i>değil</i>) <code>127.0.0.1 adresini ve 4444 bağlantı noktasını</code> kullanacak şekilde ayarlayın. 
 Yardıma gerek duyarsanız web tarayıcınızı I2P ile kullanma <a href="https://geti2p.net/en/about/browser-config" target="_blank">rehberine</a> bakabilirsiniz.</li>
 
 <li>
@@ -149,21 +149,21 @@ Java sürümünüzü <a href="/logs">günlük sayfasının üzerinde</a> görebi
 I2P çalıştırmak için hiç bir zaman root yetkilerine gerek yoktur.</li>
 <li>
 <b>Evrensel Tak Çalıştır (UPnP) Özelliğini Etkinleştirin</b><br>
-Modem ya da yönelticiniz otomatik kapı numarası yönlendirmesi için büyük olasılıkla UPnP özelliğini destekliyordur.
+Modem ya da yönelticiniz otomatik bağlantı noktası yönlendirmesi için büyük olasılıkla UPnP özelliğini destekliyordur.
 Modeminiz ya da yönelticiniz üzerinde UPnP özelliğinin desteklendiğinden emin olun. 
 Şimdi <a href="/">I2P yönelticiyi</a> yeniden başlatmayı deneyebilirsiniz.
 Başarılı olursa, I2P yönelticisi bağlantı sınamalarını tamamladıktan sonra I2P yan çubuğunda "Ağ: Tamam" iletisi görüntülenir.</li>
 
 <li>
-<b>Kapı Numaralarını Yönlendirin</b><br>
-Daha iyi bir bağlantı için <a href="/confignet">I2Pkapı numaralarını</a> modeminiz, yönelticiniz ya da güvenlik duvarınız üzerinde açın (ideal olarak hem UDP hem TCP).
-Kapı numaralarını yönlendirme hakkında ayrıntılı bilgilere web üzerinde yapacağınız basit bir arama ile erişebilirsiniz.
+<b>Bağlantı Noktası Yönlendirin</b><br>
+Daha iyi bir bağlantı için <a href="/confignet">I2P bağlantı noktalarını</a> modeminiz, yönelticiniz ya da güvenlik duvarınız üzerinde açın (ideal olarak hem UDP hem TCP).
+Bağlantı noktası yönlendirme hakkında ayrıntılı bilgilere web üzerinde yapacağınız basit bir arama ile erişebilirsiniz.
 Sorun yaşamanız durumunda aşağıda listelenen forumlarımıza ve IRC kanallarına bakabilirsiniz.
 I2P İnternet bağlantısının bir http ya da socks vekil sunucusu üzerinden kurulamayacağını unutmayın [yamalarınızı bekliyoruz!]. Ancak bir kez ağ bağlantısı kurulduğunda I2P üzerinden vekil sunuculara bağlanabilirsiniz.</li>
 
 <li>
 <b>Çevrimiçi Destek Alın</b><br><a href="http://i2p-projekt.i2p/" target="_blank">I2P web sitesindeki</a> bilgilere bakabilir, <a href="http://i2pforum.i2p/" target="_blank">I2P tartışma forumuna</a> ileti gönderebilir ya da I2P içindeki  Irc2P IRC ağında <a href="irc://127.0.0.1:6668/i2p">#i2p</a> ve <a href="irc://127.0.0.1:6668/i2p-chat">#i2p-chat</a> kanallarında takılabilirsiniz.
-Bu kanallara anonim ve şifreli I2P ağı dışından <a href="irc://irc.freenode.net/i2p">Freenode IRC</a> ile erişebilirsiniz.</li>
+Bu kanallara anonim ve şifrelenmiş I2P ağı dışından <a href="irc://irc.freenode.net/i2p">Freenode IRC</a> ile erişebilirsiniz.</li>
 
 <li>
 <b>Hataları Bildirin</b><br>

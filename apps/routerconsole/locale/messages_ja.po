@@ -25,9 +25,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-09 19:13+0000\n"
-"PO-Revision-Date: 2022-02-13 03:23+0000\n"
-"Last-Translator: daingewuvzeevisiddfddd\n"
+"POT-Creation-Date: 2022-05-10 16:21+0000\n"
+"PO-Revision-Date: 2011-02-13 12:00+0000\n"
+"Last-Translator: daingewuvzeevisiddfddd, 2022\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -61,65 +61,65 @@ msgstr "即時再起動"
 msgid "Shutdown imminent"
 msgstr "即時シャットダウン"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1950
-#: ../../../router/java/src/net/i2p/router/sybil/Analysis.java:801
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1017
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1022
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:881
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:888
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:895
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:904
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:911
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:918
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:925
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:936
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:938
+#: ../../../router/java/src/net/i2p/router/Router.java:1951
+#: ../../../router/java/src/net/i2p/router/sybil/Analysis.java:854
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1048
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1053
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:882
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:889
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:896
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:905
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:912
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:919
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:926
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:937
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:939
 #, java-format
 msgid "{0} ago"
 msgstr "{0} 前"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:230
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:233
 #, java-format
 msgid "Reseeding: got router info from file ({0} successful, {1} errors)."
 msgstr "再シード中: ファイルからルーター情報を取得 ({0} 成功, {1} 個エラー)。"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:336
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:339
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:34
 msgid "Reseeding"
 msgstr "再シード"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:358
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:361
 #, java-format
 msgid "Reseed successful, fetched {0} router info"
 msgid_plural "Reseed successful, fetched {0} router infos"
 msgstr[0] "再シード成功、{0} 個のルーター情報を取得"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:364
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:367
 #, java-format
 msgid "Reseed fetched only 1 router."
 msgid_plural "Reseed fetched only {0} routers."
 msgstr[0] "再シードでは {0} 個のルーターのみ取得しました。"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:388
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:391
 msgid "Reseed failed."
 msgstr "再シード失敗。"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:389
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:392
 #, java-format
 msgid "See {0} for help."
 msgstr "ヘルプは  {0} をご覧ください。"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:390
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:393
 msgid "reseed configuration page"
 msgstr "再シード設定ページ"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:646
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:780
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:649
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:783
 msgid "Reseeding: fetching seed URL."
 msgstr "再シード中: シード URL を取得中"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:705
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:824
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:708
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:827
 #, java-format
 msgid ""
 "Reseeding: fetching router info from seed URL ({0} successful, {1} errors)."
@@ -157,13 +157,13 @@ msgstr "既知の高速なピア"
 msgid "Size of tunnel acceptor backlog"
 msgstr "トンネル受け入れバックログのサイズ"
 
-#: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:633
+#: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:637
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHelper.java:68
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:150
 msgid "unknown"
 msgstr "不明"
 
-#: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:637
+#: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:641
 msgid "NetDb entry"
 msgstr "NetDb 項目"
 
@@ -173,19 +173,19 @@ msgstr "NetDb 項目"
 msgid "No transports (hidden or starting up?)"
 msgstr "トランスポートなし (隠されているかスタートアップ中？)"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:910
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:915
 msgid "Unsupported signature type"
 msgstr "サポートされていない署名形式です"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:928
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:933
 msgid "No support for our signature type"
 msgstr "署名形式に非対応"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:932
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:937
 msgid "Unreachable on any transport"
 msgstr "すべてのトランスポートに到達不可"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:1033
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:1042
 #: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:395
 msgid "UPnP is not enabled"
 msgstr "UPnP は有効ではありません"
@@ -316,61 +316,87 @@ msgstr "{0} ポート {1,number,#####} は UPnP によって、正常に転送�
 msgid "{0} port {1,number,#####} was not forwarded by UPnP."
 msgstr "{0} ポート {1,number,#####} は UPnP によって転送されませんでした。"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:926
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:900
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:138
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:427
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1028
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:539
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:829
+#: ../java/strings/Strings.java:53
+msgid "Router"
+msgstr "ルーター"
+
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:901
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:860
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:872
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:884
+msgid "Update available"
+msgstr "アップデートが利用できます"
+
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:901
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:844
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:861
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:873
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:885
+#, java-format
+msgid "Version {0}"
+msgstr "バージョン {0} "
+
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:932
 #, java-format
 msgid "New plugin version {0} is available"
 msgstr "新しいプラグインのバージョン {0} が利用できます。"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1006
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1012
 #, java-format
 msgid "Update check failed for plugin {0}"
 msgstr "プラグイン {0} のアップデート確認に失敗"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1010
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1016
 #, java-format
 msgid "No new version is available for plugin {0}"
 msgstr "プラグイン {0} の新しいバージョンはありません。"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1098
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1104
 #, java-format
 msgid "Install failed from {0}"
 msgstr "{0} からのインストールに失敗"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1100
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1106
 #: ../java/src/net/i2p/router/update/UpdateRunner.java:298
 #, java-format
 msgid "Transfer failed from {0}"
 msgstr "{0} からの転送に失敗しました"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1355
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1437
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1461
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1361
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1443
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1467
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:839
 msgid "Update downloaded"
 msgstr "アップデートがダウンロードされました"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1415
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1461
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1421
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1467
 msgid "Restarting"
 msgstr "再起動中"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1415
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1421
 msgid "Update verified"
 msgstr "アップデートが検証されました"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1424
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1430
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:226
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:343
 #, java-format
 msgid "from {0}"
 msgstr "{0} から"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1441
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1447
 #, java-format
 msgid "Unsigned update file from {0} is corrupt"
 msgstr "{0} からの署名されていないアップデートファイルは破損しています"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1470
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1476
 #, java-format
 msgid "Failed copy to {0}"
 msgstr "{0} へのコピーに失敗"
@@ -875,9 +901,9 @@ msgstr "設定は正常に保存されました"
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:254
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:385
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:677
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:44
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:89
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:108
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:58
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:114
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:133
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:418
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:133
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:187
@@ -898,14 +924,14 @@ msgstr "システムトレイを無効にする"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:399
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:675
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:42
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:87
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:106
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:56
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:112
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:131
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:359
 #: ../java/src/net/i2p/router/web/helpers/ConfigStatsHandler.java:125
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:121
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:145
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:512
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:510
 msgid "Restart required to take effect"
 msgstr "再起動するまで有効になりません"
 
@@ -978,7 +1004,7 @@ msgstr "更新頻度を {0} に更新中"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:243
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:126
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:417
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:415
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:317
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:348
 msgid "Never"
@@ -1135,11 +1161,11 @@ msgstr "禁止されたピア"
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:170
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:75
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:131
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1039
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1070
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:159
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:627
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:188
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:383
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:189
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:385
 msgid "none"
 msgstr "なし"
 
@@ -1200,8 +1226,9 @@ msgid "Local Router Family Certificate"
 msgstr "ローカルのルーターファミリー証明書"
 
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:91
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:403
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:872
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:435
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1111
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:873
 msgid "Family"
 msgstr "ファミリー"
 
@@ -1338,7 +1365,7 @@ msgid "No plugin URL specified."
 msgstr "プラグインURLが指定されていません。"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:465
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:51
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:67
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:83
 msgid "You must enter a file"
 msgstr "ファイルを入力する必要があります"
@@ -1468,14 +1495,15 @@ msgid "Plugin"
 msgstr "プラグイン"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:292
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:399
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:851
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:431
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:883
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:316
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:482
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:97
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:620
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:646
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:680
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:855
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:856
 msgid "Version"
 msgstr "バージョン"
 
@@ -1516,33 +1544,33 @@ msgstr "アップデート"
 msgid "Delete"
 msgstr "削除"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:28
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:29
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:576
 msgid "Create Family"
 msgstr "ファミリーを作成"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:32
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:33
 msgid "You must enter a family name"
 msgstr "ファミリーの名前を入力する必要があります"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:41
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:105
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:55
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:130
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:185
 #: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:266
 msgid "Configuration saved successfully."
 msgstr "設定は正常に保存されました。"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:46
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:62
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:568
 msgid "Join Family"
 msgstr "ファミリーに参加"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:92
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:94
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:117
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:119
 msgid "Load from file failed"
 msgstr "ファイルからの読み込みに失敗"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:99
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:124
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:614
 msgid "Leave Family"
 msgstr "ファミリーを離れる"
@@ -1720,8 +1748,8 @@ msgid "Cancel"
 msgstr "キャンセル"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:63
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:561
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:591
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:593
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:623
 msgid "Destination"
 msgstr "宛先"
 
@@ -1732,7 +1760,7 @@ msgid "Name"
 msgstr "名前"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:67
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1032
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1063
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:613
 msgid "Encryption Key"
 msgstr "暗号化キー"
@@ -1752,7 +1780,7 @@ msgstr "期限"
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:97
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:132
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:137
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:554
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:586
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:581
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:593
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:603
@@ -1797,6 +1825,11 @@ msgstr "有効なログレベルは{0}です。"
 #: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:127
 msgid "Select a class to add"
 msgstr "追加するクラスを選択"
+
+#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:139
+#, java-format
+msgid "All classes in {0}"
+msgstr ""
 
 #. stat groups for stats.jsp
 #. See StatsGenerator for groups mapped to a display name
@@ -1902,7 +1935,7 @@ msgid "Peers"
 msgstr "ピア"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:32
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1068
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1099
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:580
 msgid "Stats"
 msgstr "統計"
@@ -2410,15 +2443,15 @@ msgstr "パフォーマンス警告 - 設定に高いトンネルの数量が含
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:108
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:338
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:538
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:310
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:539
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:311
 msgid "Inbound"
 msgstr "着信"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:108
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:340
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:540
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:311
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:541
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:312
 msgid "Outbound"
 msgstr "送信"
 
@@ -2666,7 +2699,6 @@ msgid "Event"
 msgstr "イベント"
 
 #: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:186
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:596
 msgid "Details"
 msgstr "詳細"
 
@@ -2738,91 +2770,87 @@ msgstr "平均を図示"
 msgid "plot events"
 msgstr "イベントを図示"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:360
-msgid "All times are UTC."
-msgstr "時間はすべて UTC です。"
-
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:393
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:253
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:391
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:254
 msgid "Configure Graph Display"
 msgstr "グラフ表示を設定"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:393
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:391
 msgid "Select Stats"
 msgstr "統計を選択"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:398
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:396
 msgid ""
 "Note: Dimensions are for graph only (excludes title, labels and legend)."
 msgstr "注：寸法はグラフのみ（タイトル、ラベル、凡例は含まれません）。"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:399
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:397
 msgid "Graph size"
 msgstr "グラフの大きさ"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:400
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:398
 msgid "pixels wide"
 msgstr "ピクセル幅"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:401
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:399
 msgid "pixels high"
 msgstr "ピクセル高さ"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:403
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:401
 msgid "Display period"
 msgstr "表示期間"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:403
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:401
 msgid "minutes"
 msgstr "分"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:406
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:404
 msgid "Refresh delay"
 msgstr "更新遅延"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:422
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:420
 msgid "Plot type"
 msgstr "描画の種類"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:423
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:421
 msgid "Averages"
 msgstr "平均"
 
 #. 7 days
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:424
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:422
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:525
 msgid "Events"
 msgstr "イベント"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:425
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:423
 msgid "Hide legend"
 msgstr "凡例を隠す"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:430
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:428
 msgid "Do not show legend on graphs"
 msgstr "グラフ上の凡例を表示しない"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:431
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:429
 msgid "UTC"
 msgstr "UTC"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:436
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:434
 msgid "Use UTC time on graphs"
 msgstr "グラフ上でUTC時間を使う"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:437
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:435
 msgid "Persistence"
 msgstr "持続性"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:442
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:440
 msgid "Store graph data on disk"
 msgstr "ディスク上にグラフデータを保存する"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:443
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:441
 msgid "Save settings and redraw graphs"
 msgstr "設定を保存してグラフを再描画する"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:510
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:508
 msgid "Graph settings saved"
 msgstr "グラフ設定が保存されました"
 
@@ -3185,238 +3213,236 @@ msgstr "すべてのルーター（全ステータス）"
 #. 4
 #: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:50
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:562
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:866
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:867
 msgid "LeaseSets"
 msgstr "リースセット"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:114
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:115
 msgid ""
 "Never reveal your router identity to anyone, as it is uniquely linked to "
 "your IP address in the network database."
 msgstr "ルーターアイデンティティを誰にも明かさないでください。ネットワークデータベースのあなたのIPアドレスに一意に紐づいています。"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:137
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:395
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:997
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:539
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:828
-#: ../java/strings/Strings.java:53
-msgid "Router"
-msgstr "ルーター"
-
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:140
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:424
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:141
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:456
 msgid "not found in network database"
 msgstr "ネットワークデータベース内に見つかりませんでした"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:185
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:431
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:764
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:820
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:186
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:463
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:796
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:852
 msgid "Previous Page"
 msgstr "前のページ"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:187
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:434
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:767
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:823
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:188
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:466
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:799
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:855
 msgid "Page"
 msgstr "ページ"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:401
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:897
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:433
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:929
 msgid "Country"
 msgstr "国"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:409
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:441
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:736
 msgid "Port"
 msgstr "ポート"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:411
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:443
 msgid "MTU"
 msgstr "MTU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:438
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:771
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:826
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:455
+#: ../java/strings/Strings.java:55
+msgid "Transport"
+msgstr "トランスポート"
+
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:470
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:803
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:858
 msgid "Next Page"
 msgstr "次のページ"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:514
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:546
 msgid "Manually Configure Floodfill Participation"
 msgstr "Floodfill参加手動設定"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:515
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:547
 msgid "Configure Floodfill Participation"
 msgstr "Floodfill参加設定"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:551
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:583
 msgid "LeaseSet"
 msgstr "リースセット"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:557
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:341
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:589
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:343
 msgid "Local"
 msgstr "ローカル"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:560
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:592
 msgid "Unpublished"
 msgstr "未公開"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:585
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:608
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:617
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:640
 msgid "Add to address book"
 msgstr "アドレス帳へ追加"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:587
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:610
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:619
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:642
 msgid "Add to local address book"
 msgstr "ローカルのアドレス帳へ追加"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:621
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:653
 #, java-format
 msgid "Published {0} ago"
 msgstr "{0} 前に公開"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:627
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:649
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:701
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:659
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:681
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:733
 #, java-format
 msgid "Expires in {0}"
 msgstr "{0} に期限切れ"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:629
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:651
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:703
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:661
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:683
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:735
 #, java-format
 msgid "Expired {0} ago"
 msgstr "{0} 前に期限切れ"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:691
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:723
 msgid "Lease"
 msgstr "リース"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:695
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:727
 msgid "Tunnel"
 msgstr "トンネル"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:741
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:773
 msgid "Not initialized"
 msgstr "未初期化"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:844
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:876
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:444
 msgid "Network Database Router Statistics"
 msgstr "ネットワークデータベースルーター統計"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:851
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:873
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:897
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:883
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:905
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:929
 msgid "Count"
 msgstr "カウント"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:873
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:905
 msgid "Transports"
 msgstr "トランスポート"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:994
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1025
 msgid "Our Router Identity"
 msgstr "ルーターアイデンティティ"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1007
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1038
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:840
 msgid "View extended router info"
 msgstr "拡張されたルーター情報を表示"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1009
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:840
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1040
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:841
 msgid "Full entry"
 msgstr "全項目"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1015
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1046
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:240
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:935
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:936
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:554
 msgid "Hidden"
 msgstr "非表示"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1015
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:935
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1046
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:936
 msgid "Updated"
 msgstr "更新"
 
 #. shouldnt happen
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1020
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1026
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1051
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1057
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1188
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:938
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:939
 msgid "Published"
 msgstr "公開済み"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1030
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:940
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1061
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:941
 msgid "Signing Key"
 msgstr "署名鍵"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1036
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1067
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:37
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:943
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:944
 msgid "Addresses"
 msgstr "アドレス"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1055
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1086
 msgid "cost"
 msgstr "コスト"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1084
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1126
 msgid "Hidden or starting up"
 msgstr "非表示か起動中"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1084
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1126
 msgid "SSU"
 msgstr "SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1084
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1126
 msgid "SSU with introducers"
 msgstr "イントロデューサー付き SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1085
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1127
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:45
 msgid "NTCP"
 msgstr "NTCP"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1085
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1127
 msgid "NTCP and SSU"
 msgstr "NTCP 及び SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1085
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1127
 msgid "NTCP and SSU with introducers"
 msgstr "NTCP 及びイントロデューサー付き SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1086
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1128
 msgid "IPv6 Only SSU, introducers"
 msgstr "IPv6 のみ SSU、イントロデューサー"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1086
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1128
 msgid "IPv6 SSU"
 msgstr "IPv6 SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1086
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1128
 msgid "IPv6 SSU, introducers"
 msgstr "IPv6 SSU、イントロデューサー"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1087
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1129
 msgid "IPv6 NTCP"
 msgstr "IPv6 NTCP"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1087
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1129
 msgid "IPv6 NTCP, SSU"
 msgstr "IPv6 NTCP, SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1087
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1129
 msgid "IPv6 NTCP, SSU, introducers"
 msgstr "IPv6 NTCP, SSU, イントロデューサー"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1087
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1129
 msgid "IPv6 Only NTCP, SSU, introducers"
 msgstr "IPv6 のみ NTCP, SSU, イントロデューサー"
 
@@ -3523,14 +3549,14 @@ msgstr "パケットが受信/送信されてからの経過時間"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:256
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:317
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:482
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:483
 msgid "Idle"
 msgstr "アイドル"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:257
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:318
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:487
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:297
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:488
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:298
 msgid "In/Out"
 msgstr "入出力"
 
@@ -3544,14 +3570,14 @@ msgstr "この接続が確立以後の経過時間"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:258
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:319
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:492
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:493
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1111
 msgid "Up"
 msgstr "アップ"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:259
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:320
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:494
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:495
 msgid "Skew"
 msgstr "スキュー"
 
@@ -3599,7 +3625,7 @@ msgstr "最大 受信/送信 パケットの大きさ（バイト）"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:271
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:321
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:514
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:515
 msgid "RX"
 msgstr "RX"
 
@@ -3609,7 +3635,7 @@ msgstr "ピアから受信したメッセージの合計数"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:272
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:322
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:516
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:517
 msgid "TX"
 msgstr "TX"
 
@@ -3618,7 +3644,7 @@ msgid "The total number of messages sent to the peer"
 msgstr "ピアへ送信したメッセージの合計数"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:273
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:519
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:520
 msgid "Dup RX"
 msgstr "Dup RX"
 
@@ -3627,7 +3653,7 @@ msgid "The total number of duplicate packets received from the peer"
 msgstr "ピアから受信した重複パケットの合計数"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:274
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:521
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:522
 msgid "Dup TX"
 msgstr "Dup TX"
 
@@ -3667,7 +3693,7 @@ msgid "Is peer backlogged?"
 msgstr "ピアはバッグログされていますか？"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:396
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:710
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:715
 #, java-format
 msgid "{0} peer"
 msgid_plural "{0} peers"
@@ -3681,89 +3707,89 @@ msgstr "UDP 接続"
 msgid "Sort by peer hash"
 msgstr "ピアハッシュで並び替え"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:483
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:484
 msgid "Sort by idle inbound"
 msgstr "アイドルの受信で並び替え"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:485
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:486
 msgid "Sort by idle outbound"
 msgstr "アイドルの送信で並び替え"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:488
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:489
 msgid "Sort by inbound rate"
 msgstr "受信速度で並び替え"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:490
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:491
 msgid "Sort by outbound rate"
 msgstr "送信速度で並び替え"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:493
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:494
 msgid "Sort by connection uptime"
 msgstr "接続稼働時間で並び替え"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:495
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:496
 msgid "Sort by clock skew"
 msgstr "クロックスキューで並び替え"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:499
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:500
 msgid "Sort by congestion window"
 msgstr "輻輳ウィンドウで並び替え"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:501
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:502
 msgid "Sort by slow start threshold"
 msgstr "スロースタートしきい値で並び替え"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:504
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:505
 msgid "Sort by round trip time"
 msgstr "往復時間で並び替え"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:508
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:509
 msgid "Sort by retransmission timeout"
 msgstr "再送信タイムアウトで並び替え"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:511
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:512
 msgid "Sort by outbound maximum transmit unit"
 msgstr "送信最大伝送単位で並び替え"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:515
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:516
 msgid "Sort by packets received"
 msgstr "受信パケットで並び替え"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:517
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:518
 msgid "Sort by packets sent"
 msgstr "送信パケットで並び替え"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:520
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:521
 msgid "Sort by packets received more than once"
 msgstr "二度以上受信したパケットで並び替え"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:522
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:523
 msgid "Sort by packets retransmitted"
 msgstr "再送パケットで並び替え"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:543
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:544
 msgid "We offered to introduce them"
 msgstr "We offered to introduce them"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:545
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:546
 msgid "They offered to introduce us"
 msgstr "They offered to introduce us"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:557
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:558
 #, java-format
 msgid "{0} fail"
 msgid_plural "{0} fails"
 msgstr[0] "{0} 回失敗"
 
 #. 1
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:563
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:564
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:178
 #: ../java/src/net/i2p/router/web/helpers/ProfilesHelper.java:15
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:939
 msgid "Banned"
 msgstr "禁止された"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:626
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:631
 msgid "backlogged"
 msgstr "バッグログされました"
 
@@ -3854,12 +3880,12 @@ msgid "Test Fails"
 msgstr "テスト失敗数"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:205
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:842
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:843
 msgid "profile"
 msgstr "プロファイル"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:206
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:843
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:844
 msgid "Configure peer"
 msgstr "ピア構成"
 
@@ -3868,14 +3894,14 @@ msgid "Integ. Value"
 msgstr "整数値"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:226
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:888
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:890
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:889
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:891
 msgid "Last Heard About"
 msgstr "次について最後に耳にした:"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:227
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:895
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:897
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:896
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:898
 msgid "Last Heard From"
 msgstr "次から最後に耳にした:"
 
@@ -3900,22 +3926,22 @@ msgid "1d Resp. Time"
 msgstr "1日応答時間"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:233
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:904
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:905
 msgid "Last Good Lookup"
 msgstr "最終良好検索"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:234
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:911
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:912
 msgid "Last Bad Lookup"
 msgstr "最終不良検索"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:235
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:918
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:919
 msgid "Last Good Store"
 msgstr "最終良好保存"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:236
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:925
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:926
 msgid "Last Bad Store"
 msgstr "最終不良保存"
 
@@ -3974,11 +4000,11 @@ msgstr "{0}未満の共有帯域幅"
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:324
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:325
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:328
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:199
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:200
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:203
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:201
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:204
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:207
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:205
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:208
 #, java-format
 msgid "{0} shared bandwidth"
 msgstr "{0}の共有帯域幅"
@@ -3988,7 +4014,7 @@ msgid "Reachable"
 msgstr "到達可能"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:333
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:208
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:209
 #, java-format
 msgid "Over {0} shared bandwidth"
 msgstr "{0}以上の共有帯域幅"
@@ -4166,7 +4192,7 @@ msgid "Events in peak period"
 msgstr "ピーク期間中のイベント"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:254
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:252
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:253
 msgid "Graph Data"
 msgstr "グラフデータ"
 
@@ -4384,10 +4410,6 @@ msgstr "健全度報告"
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:441
 msgid "NetDB"
 msgstr "NetDB"
-
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:444
-msgid "Show list of all known I2P routers"
-msgstr "既存の全 I2P ルーターの一覧を表示"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:453
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:805
@@ -4800,20 +4822,6 @@ msgstr "インストールするには再起動をクリック"
 msgid "Click Shutdown and restart to install"
 msgstr "インストールするにはシャットダウンをクリックして再起動"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:844
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:861
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:873
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:885
-#, java-format
-msgid "Version {0}"
-msgstr "バージョン {0} "
-
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:860
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:872
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:884
-msgid "Update available"
-msgstr "アップデートが利用できます"
-
 #. Note to translators: parameter is a version, e.g. "0.8.4"
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:908
 #, java-format
@@ -4891,13 +4899,13 @@ msgstr "下部に移動"
 msgid "Select a section to add"
 msgstr "追加するセクションを選択"
 
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:825
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:826
 msgid "Our info"
 msgstr "情報"
 
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:883
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:890
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:897
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:884
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:891
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:898
 msgid "n/a"
 msgstr "n/a"
 
@@ -4935,7 +4943,7 @@ msgid "Receive on"
 msgstr "受信時間: "
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:120
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:298
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:299
 msgid "Expiration"
 msgstr "期限切れ"
 
@@ -4952,98 +4960,98 @@ msgid "Role"
 msgstr "役割"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:121
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:298
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:299
 msgid "Usage"
 msgstr "使用量"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:143
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:153
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:342
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:347
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:144
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:154
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:344
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:349
 msgid "Tunnel identity"
 msgstr "トンネルのアイデンティティ"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:164
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:165
 msgid "grace period"
 msgstr "猶予期間"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:174
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:175
 msgid "Outbound Endpoint"
 msgstr "送信エンドポイント"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:176
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:177
 msgid "Inbound Gateway"
 msgstr "着信ゲートウェイ"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:178
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:304
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:179
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:305
 msgid "Participant"
 msgstr "参加"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:184
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:185
 #, java-format
 msgid "Limited display to the {0} tunnels with the highest usage"
 msgstr "使用度が最高の {0} トンネルに表示を制限"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:186
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:187
 msgid "Inactive participating tunnels"
 msgstr "アクティブでない参加しているトンネル"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:189
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:384
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:190
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:386
 msgid "Lifetime bandwidth usage"
 msgstr "使用期間を通じた帯域幅使用量"
 
 #. bwShare > 12
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:191
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:192
 msgid "Not enough shared bandwidth to build participating tunnels."
 msgstr "参加するトンネルを構築するのに十分な共有帯域幅がありません。"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:192
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:193
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:583
 msgid "Configure"
 msgstr "設定"
 
 #. renderPeers(out);
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:196
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:197
 msgid "Bandwidth Tiers"
 msgstr "帯域幅段階"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:297
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:298
 msgid "Inbound or outbound?"
 msgstr "着信または送信？"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:298
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:299
 msgid "Gateway"
 msgstr "ゲートウェイ"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:301
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:302
 msgid "Participants"
 msgstr "参加"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:307
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:308
 msgid "Endpoint"
 msgstr "エンドポイント"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:341
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:343
 msgid "Locally hosted tunnel"
 msgstr "ローカルにホストされたトンネル"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:343
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:348
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:345
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:350
 msgid "Bandwidth tier"
 msgstr "帯域幅段階"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:370
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:378
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:372
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:380
 msgid "Build in progress"
 msgstr "構築進行中"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:385
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:387
 msgid "in"
 msgstr "着信"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:386
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:388
 msgid "out"
 msgstr "送信"
 
@@ -5175,10 +5183,6 @@ msgstr "暗号化"
 #: ../java/strings/Strings.java:54
 msgid "Stream"
 msgstr "ストリーム"
-
-#: ../java/strings/Strings.java:55
-msgid "Transport"
-msgstr "トランスポート"
 
 #. parameters in transport addresses (netdb.jsp)
 #. may or may not be worth translating
@@ -5353,7 +5357,7 @@ msgid "Advanced Network Configuration"
 msgstr "高度なネットワーク設定"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:525
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:622
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:578
 msgid ""
 "I2P will work best if you configure your rates to match the speed of your "
 "internet connection."
@@ -5388,34 +5392,34 @@ msgid ""
 msgstr "ユーザーの上りの共有量（KBps 送信）によって、ネットワークへの全体的な貢献度が決まります。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:536
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:626
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:582
 msgid "KBps In"
 msgstr "KBps 着信"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:544
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:633
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:589
 msgid "KBps Out"
 msgstr "KBps 送信"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:550
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:639
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:595
 msgid "Share"
 msgstr "共有"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:557
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:582
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:646
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:602
 msgid "NOTE"
 msgstr "注"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:559
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:648
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:604
 #, java-format
 msgid "You have configured I2P to share only {0} KBps."
 msgstr "{0}KBpsのみ共有するようI2Pを設定しています。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:562
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:651
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:607
 msgid "I2P requires at least 12KBps to enable sharing. "
 msgstr "I2Pは共有を有効にするのに、最低12KBpsを要求します。"
 
@@ -5431,7 +5435,7 @@ msgid ""
 msgstr "隠しトラフィックを作成することでユーザーの匿名性を向上させ、ネットワークを支援します。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:566
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:656
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:612
 #, java-format
 msgid "You have configured I2P to share {0} KBps."
 msgstr "{0}KBps共有するようI2Pを設定しています。"
@@ -7956,191 +7960,167 @@ msgid ""
 "Internet in general, you can visit our {0}Project Website{1}."
 msgstr "I2Pプロジェクト自体、あるいは不可視なインターネット全般について詳しく知りたい方は、{0}プロジェクトのウェブサイト{1}をご覧ください。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:581
-msgid "Bandwidth Test Results"
-msgstr "帯域幅テスト結果"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:583
-msgid "Test server location"
-msgstr "テストサーバーの場所"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:587
-msgid "Completion status"
-msgstr "完了状態"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:600
-msgid "Downstream Bandwidth"
-msgstr "ダウンストリーム帯域幅"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:604
-msgid "Upstream Bandwidth"
-msgstr "アップストリーム帯域幅"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:608
-msgid "Share of Bandwidth for I2P"
-msgstr "I2P用帯域幅の共有"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:620
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:576
 msgid "Bandwidth Configuration"
 msgstr "帯域幅設定"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:652
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:659
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:608
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:615
 msgid ""
 "By donating your bandwidth to participating traffic, you not only help "
 "others, you improve your own anonymity and performance."
 msgstr "参加しているトラフィックに自分の帯域幅を提供することで、他の人を助けるだけでなく、自分自身の匿名性とパフォーマンスを向上させることができます。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:654
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:661
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:610
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:617
 msgid ""
 "We recommend sharing 75% or more for I2P, but you can adjust based on your "
 "needs."
 msgstr "I2P用に75%以上共有することを推奨しますが、利用者の必要に応じて調整可能です。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:671
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:627
 msgid "Browser and Application Setup"
 msgstr "ブラウザとアプリケーションの設定"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:673
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:629
 msgid "Your browser needs to be configured to work with I2P."
 msgstr "I2Pを利用するには、ブラウザの設定が必要です。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:675
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:631
 msgid ""
 "We have instructions for configuring both Firefox and Chromium based "
 "browsers with I2P."
 msgstr "FirefoxとChromiumベースのブラウザの両方をI2Pで設定する方法を指南します。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:677
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:633
 #, java-format
 msgid "You can find these instructions on our {0}website{1}."
 msgstr "それらの指南は{0}ウェブサイト{1}で見つけられます。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:683
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:639
 msgid ""
 "Otherwise, the recommended way to browse I2P websites is with a separate "
 "profile in the Firefox browser."
 msgstr "それ以外の場合は、Firefoxブラウザで別のプロファイルを使用してI2Pウェブサイトを閲覧することをお勧めします。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:685
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:641
 #, java-format
 msgid "{0}Install Firefox{1}"
 msgstr "{0}Firefox をインストール{1}"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:687
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:643
 #, java-format
 msgid "{0}Install the I2P Firefox profile{1}"
 msgstr "{0}I2P Firefox用プロファイルをインストール{1}"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:693
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:649
 msgid ""
 "The I2P router also comes with its own versions of common, useful internet "
 "applications."
 msgstr "I2Pルーターにも、便利なインターネットアプリケーションの独自のバージョンが付属しています。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:695
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:651
 #, java-format
 msgid "You can download files with {0}bittorrent{1}."
 msgstr "{0}ビットトレント{1}でファイルをダウンロードできます。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:697
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:653
 #, java-format
 msgid "You can also send and receive {0}email{1}."
 msgstr "{0}Eメール{1}の送受信もできます。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:699
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:655
 #, java-format
 msgid ""
 "Besides that, you can use the built-in {0}web server{1} so you can create, "
 "communicate, and share your content."
 msgstr "それ以外に、内臓の{0}ウェブブラウザ{1}を使用して、コンテンツを作成したり、通信したり、共有したりすることができます。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:701
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:657
 msgid ""
 "These applications work with I2P automatically and require no additional "
 "configuration."
 msgstr "これらのアプリケーションはI2Pとともに自動的に動作し、追加の設定を必要としません。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:703
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:659
 #, java-format
 msgid ""
 "To help make I2P addresses easier to read and remember, the I2P router also "
 "includes its built-in {0}Address Book{1}."
 msgstr "I2Pアドレスを読みやすく、覚えやすくするために、I2Pルーターには{0}アドレス帳{1}が内蔵されています。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:705
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:661
 msgid ""
 "The Address Book is where you keep track of all your I2P \"Contacts\" by "
 "giving them human-readable names."
 msgstr "アドレス帳は、人間にわかりやすい名前を付けてI2Pの「連絡先」をすべて確認できる場です。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:707
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:663
 msgid ""
 "This can be used for the sites you like to visit, messaging contacts, or "
 "potentially any other service on I2P."
 msgstr "これは訪問するサイトやメッセージを送る宛先、あるいは潜在的には他のI2P上のサービスに使用することができます。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:709
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:665
 msgid ""
 "To help you get started, the address book can be used to subscribe to lists "
 "of addresses distributed by other I2P users."
 msgstr "アドレス帳は、他のI2Pユーザーが配布しているアドレスの一覧を購読するために使用することができます。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:717
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:673
 msgid "Welcome to the Invisible Internet!"
 msgstr "不可視なインターネットへようこそ"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:719
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:675
 msgid ""
 "It will take some time for your peers to integrate your router into the "
 "network, but while that is happening you can still explore I2P applications "
 "and get to know your way around the router console."
 msgstr "ピアがルーターをネットワークに統合するには時間がかかりますが、その間もI2Pアプリケーションを探求したり、ルーターのコンソールを使いこなすことができます。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:721
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:677
 #, java-format
 msgid ""
 "There is a quick guide, news about the latest release, an FAQ, and "
 "troubleshooting guide available on the {0}console{1} page."
 msgstr "これらは簡易な手引きであり、最終リリースについての知らせ、よくある質問、及びトラブルシューティングの手引きは、{0}コンソール{1}ページにあります。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:723
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:679
 msgid "You may notice a message in the sidebar that I2P is rejecting tunnels."
 msgstr "サイドバーに、I2Pがトンネルを拒否しているというメッセージが表示されることがあります。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:725
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:681
 msgid ""
 "This is normal behavior as part of the startup process, to make sure that "
 "your router is ready to help others with participating traffic."
 msgstr "これは、起動プロセスの一部としての正常な動作であり、ルーターが他の参加者のトラフィックを支援する準備ができていることを確認します。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:727
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:683
 msgid ""
 "When the connection indicators in the sidebar turn green, you are ready to "
 "explore the Invisible Internet."
 msgstr "サイドバーの接続インジケータが緑色になったら、不可視なインターネットを探索する準備ができたことになります。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:742
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:698
 msgid "Previous"
 msgstr "前へ"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:749
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:705
 msgid "Skip Setup"
 msgstr "セットアップをスキップ"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:755
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:711
 msgid "Skip Bandwidth Test"
 msgstr "帯域幅テストをスキップ"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:761
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:717
 msgid "Cancel Bandwidth Test"
 msgstr "帯域幅テストを取り消す"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:767
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:723
 msgid "Next"
 msgstr "次へ"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:773
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:729
 msgid "Finished"
 msgstr "完了"

@@ -54,9 +54,9 @@ You may run your own servers over I2P in whatever flavor you choose, or if you'r
 Both UDP and TCP protocols are <a href="http://i2p-projekt.i2p/techintro.html#op.transport" target="_blank">supported</a>.</li>
 
 <li>
-<b>Forums and Blogging</b><br>
-All normal blogging, forum and CMS software will run over I2P, though you're advised to take extra precautions with security when setting up and to keep all associated software (e.g. Php, MySql, Python, Apache) up to date and locked-down!
-Also, there are quite a few community run forums on I2P in various languages; see <a href="#eepsites">below</a> for some suggestions.</li>
+<b>Forum dan Blog</b><br>
+Semua blogging, forum, dan CMS software biasa akan berfungsi di I2P, namun Anda disarankan untuk lebih berhati-hati dalam keamanan ketika mengatur dan membuat semua software yang berhubungan (misal: Php, MySql, Python, Apache) tetap up to date dan locked-down!
+Selain itu, ada beberapa forum yang dijalankan komunitas di I2P dalam beberapa bahasa; lihat <a href="#eepsites">di bawah ini</a> untuk beberapa contohnya.</li>
 
 <li>
 <a name="plugins"></a><b>Plugins for I2P</b><br>
@@ -69,15 +69,15 @@ If you're a <a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target=
 
 <ul class="links">
 <li>
-<b>Built-in Web-Server</b><br>
-I2P comes with a built-in web server for hosting your own hidden service website ("eepsite") on the I2P network: a <a href="https://www.eclipse.org/jetty/" target="_blank">Jetty</a> instance listening on <a href="http://127.0.0.1:7658/" target="_blank">http://127.0.0.1:7658/</a>.
-To host your own content, simply place your files in the <code>eepsite/docroot/</code> directory (or place any standard JSP/Servlet .war files under <code>eepsite/webapps</code>, or standard CGI scripts under <code>eepsite/cgi-bin</code>) and they'll show up.
-You can also run any alternative web server platform over I2P and replace the built-in server, or run it on another tunnel.</li>
+<b>Situs Web Built-in</b><br>
+I2P menyediakan built-in web server untuk dihosting di situs web hidden service Anda sendiri ("eepsite") di jaringan I2P: sebuah <a href="https://www.eclipse.org/jetty/" target="_blank">Jetty</a> instance mendengarkan di <a href="http://127.0.0.1:7658/" target="_blank">http://127.0.0.1:7658/</a>. 
+Untuk menghosting konten, hanya masukkan file-file ke dalam folder<code>eepsite/docroot/</code>  (atau masukkan file JSP/Servlet .war standard di <code>eepsite/webapps</code>, atau standard CGI scripts di <code>eepsite/cgi-bin</code>) dan mereka akan muncul di situs web Anda. 
+Anda juga dapat menjalankan platofrm web server alternatif apapun di I2P dan ganti server built-in, atau menjalankannya di tunnel lain.</li>
 
 <li>
-<b>Start Your Tunnel</b><br>
-After starting up, your pre-configured <a href="/i2ptunnel/" target="_blank">I2P Webserver Tunnel</a>, your website will be visible (but not discoverable) to others.
-Detailed instructions for starting your website, registering an .i2p domain and promoting your site to others are accessible via your own I2P webserver on <a href="http://127.0.0.1:7658/help/" target="_blank">http://127.0.0.1:7658/help/</a>.</li>
+<b>Memulai Tunnel Anda</b><br>
+Setelah dimulai, <a href="/i2ptunnel/" target="_blank">I2P Webserver Tunnel</a>yang dikonfigurasikan sebelumnya, situs web Anda akan terlihat (tapi tidak dapat dibuka) oleh pihak lain. 
+Instruksi detail untuk memulai situs web, mendaftarkan .i2p domain dan mempromosikan situs Anda, dapat dilihat di I2P webserver di <a href="http://127.0.0.1:7658/help/" target="_blank">http://127.0.0.1:7658/help/</a>.</li>
 
 </ul>
 <a name="eepsites"></a> 
@@ -112,16 +112,16 @@ Ada lebih banyak lagi hidden services yang tersedia - ikuti saja links yang ters
 
 <ul class="links">
 <li>
-<b>Be Patient!</b><br>
-I2P may be slow to integrate into network the first time you run it as it bootstraps into the network and finds peers.
-The longer your I2P router is running, the better it will perform, so try and keep your router on as long as you can, 24/7 if possible!
-If, after 30 minutes, your <i>Active: [connected/recent]</i> count still has less than 10 peers, or your total number of <i>Integrated</i> peers is less than 5, there are several things you can do to check for problems:</li>
+<b>Mohon Sabar!</b><br>
+I2P mungkin lambat terintegrasi ke jaringan saat pertama kali dijalankan karena sedang menjalankan bootstraps ke dalam jaringan dan mencari peers. 
+Makin lama I2P router aktif, makin baik dia bekerja, jadi usahakan nyalakan router Anda selama mungkin, 24/7 jika mungkin! 
+Jika setelah 30 menit, jumlah <i>Active: [connected/recent]</i> masih kurang dari 10 peers, atau jumlah total <i>Integrated</i> peers kurang dari  5, ada beberapa halyang dapat dilakukan untuk mencari sumber masalah:</li>
 
 <li>
-<b>Check Your Configuration and Bandwidth Allocation</b><br>
-I2P functions best when you can accurately reflect the speed of your network connection in the <a href="/config">bandwidth configuration section</a>.
-By default I2P is configured with some fairly conservative values that will not suit many use cases, so please take time to review these settings and correct where necessary.
-The more bandwidth you allocate, <i>specifically</i> upstream bandwidth, the more you will benefit from the network.</li>
+<b>Periksa Konfigurasi dan Alokasi Bandwidth</b><br>
+I2P berfungsi optimal saat Anda menyamakannya dengan kecepatan koneksi bandwith Internet Anda di <a href="/config">bandwidth configuration section</a>. 
+Secara default, I2P dikonfigurasi dengan nilai-nilai standar yang tidak cocok untuk banyak situasi, jadi mohon sempatkan untuk memeriksa pengaturannya dan koreksi saat dibutuhkan. 
+Makin banyak bandwidth yang dialokasikan, <i>khususnya</i> upstream bandwidth, makin banyak manfaat yang Anda dapat dari jaringan.</li>
 
 <li>
 <b>Firewalls, Modems and Routers</b><br>
@@ -131,9 +131,9 @@ For optimal performance, please ensure I2P's <a href="/confignet">external port<
 See below for more information.</li>
 
 <li>
-<b>Check Your Proxy Settings</b><br>
-If you cannot see any websites at all (not even <a href="http://i2p-projekt.i2p/" target="_blank">i2p-projekt.i2p</a>), make sure your browser's proxy is set to access http traffic (<i>not</i> https, <i>not</i> socks) via <code>127.0.0.1 port 4444</code>.
-If you need some help, there's <a href="https://geti2p.net/en/about/browser-config" target="_blank">a guide</a> to configuring your browser for I2P use.</li>
+<b>Periksa Pengaturan Proxy</b><br>
+Jika Anda sama sekali tidak dapat membuka situs apapun (bahkan <a href="http://i2p-projekt.i2p/" target="_blank">i2p-projekt.i2p</a>), pastikan proxy di peramban Anda diatur untuk lalu-lintas http (<i>bukan</i> https, <i>bukan</i> socks) via <code>127.0.0.1 port 4444</code>. 
+Jika Anda membutuhkan bantuang, ini ada <a href="https://geti2p.net/en/about/browser-config" target="_blank">panduan</a> dalam mengatur peramban Anda untuk menggunakan I2P.</li>
 
 <li>
 <b>Check Your Logs</b><br><a href="/logs">Logs</a> may be helpful to resolve a problem.
@@ -148,23 +148,24 @@ Check your Java version at the top of <a href="/logs">the logs page</a>.</li>
 [Linux/BSD] If you can't start the router with <code>i2p/i2prouter start</code> try the <code>runplain.sh</code> script in the same directory.
 Root privileges are never required to run I2P.</li>
 <li>
-<b>Enable Universal Plug and Play (UPnP)</b><br>
-Your modem or router probably supports UPnP for automatic port forwarding.
-Ensure UPnP support is enabled on your modem or router.
-Now try restarting the <a href="/">I2P router</a>.
-If successful, I2P should report "Network: OK" in the side panel once the I2P router completes initial connectivity tests.</li>
+<b>Mengaktifkan Universal Plug and Play (UPnP)</b><br>
+Modem atau router Anda mungkin mendukung UPnP untuk port forwarding otomatis. 
+Pastikan dukungan UPnP diaktifkan di modem atau router Anda. 
+Lalu restart <a href="/">I2P router</a> Anda. 
+Jika berhasil, I2P seharusnya menunjukkan status "Network: OK" di panel samping ketika I2P router menyelesaikan tes konentivitas awal.</li>
 
 <li>
 <b>Port Forwarding</b><br>
-Open <a href="/confignet">I2P's port</a> on your modem, router and/or firewall(s) for better connectivity (ideally both UDP and TCP).
-More information on how to go about port forwarding can be easily found through a web search.
-Should you have any difficulties, you may request assistance in our forums and IRC channels listed below.
-Note that I2P does not support connecting to the internet via an http or socks proxy [patches welcome!], though you can connect to proxies via I2P itself once connected to the network.</li>
+Buka<a href="/confignet">port I2P pada modem, router dan/atau firewall Anda untuk koneksi yang lebih baik (idealnya baik UDP dan TCP). 
+Informasi lebih lanjut tentang bagaimana cara meneruskan port forwarding dapat dengan mudah ditemukan melalui pencarian web. 
+"Jika Anda mengalami kesulitan, Anda dapat meminta bantuan di forum kami dan saluran IRC yang tercantum di bawah ini.
+Perhatikan bahwa I2P tidak mendukung koneksi ke internet melalui proxy http atau socks [patch diterima!], meskipun Anda dapat terhubung ke proksi melalui I2P sendiri setelah terhubung ke jaringan.</a>
+</li>
 
 <li>
-<b>Getting Support Online</b><br>
-You may also want to review the information on the <a href="http://i2p-projekt.i2p/" target="_blank">I2P website</a>, post messages to the <a href="http://i2pforum.i2p/" target="_blank">I2P discussion forum</a> or swing by <a href="irc://127.0.0.1:6668/i2p">#i2p</a> or <a href="irc://127.0.0.1:6668/i2p-chat">#i2p-chat</a> on I2P's internal IRC network - Irc2P.
-These channels are also available outside of I2P's encrypted, anonymous network via <a href="irc://irc.freenode.net/i2p">Freenode IRC</a>.</li>
+<b>Cara Mendapatkan Bantuang Secara Online</b><br>
+Anda mungkin ingin mendapat informasi dari <a href="http://i2p-projekt.i2p/" target="_blank">I2P website</a>, posting pesan di <a href="http://forums.i2p/" target="_blank">I2P discussion forum</a> atau mengunjungi <a href="irc://127.0.0.1:6668/i2p">#i2p</a> or <a href="irc://127.0.0.1:6668/i2p-chat">#i2p-chat</a> di jaringan IRC internal I2P - Irc2P. 
+Channel tersebut juga tersedia di luar jaringan I2P's yang terenkripsi dan anonim, via <a href="irc://irc.freenode.net/i2p">Freenode IRC</a>.</li>
 
 <li>
 <b>Reporting Bugs</b><br>
@@ -172,12 +173,12 @@ To report a bug, please file a ticket on <a href="http://git.idk.i2p/" target="_
 For developer-related discussions, please visit <a href="http://zzz.i2p/" target="_blank">zzz's developer forums</a> or come and visit the <a href="irc://127.0.0.1:6668/i2p-dev">developer channel</a> on I2P's IRC network.
 Developers can browse source at <a href="http://git.idk.i2p/i2p-hackers/i2p.i2p" target="_blank">git.idk.i2p</a>.</li>
 <li>
-<b>Get Involved!</b><br>
-I2P is developed and maintained mostly through unfunded, voluntary participation by community members.
-We're happy to accept <a href="http://i2p-projekt.i2p/donate.html" target="_blank">donations</a>, which go into essential hosting and administrative costs.
-We have <a href="http://i2p-projekt.i2p/bounties.html" target="_blank">cash bounties</a> for aspects of I2P for developers looking for incentives to participate, and we're always looking for more <a href="http://i2p-projekt.i2p/newdevelopers.html" target="_blank">Java coders</a>, <a href="http://i2p-projekt.i2p/newtranslators.html" target="_blank">translators</a>, promoters and users to help I2P grow.
-The bigger the I2P network, the more everyone benefits, so simply telling all your friends about I2P (and lending a hand with the installation and setup where needed) is helpful.
-For further info on how you can participate, visit the <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank">volunteers page</a> on the website.</li>
+<b>Ikut Terlibat!</b><br>
+I2P dikembangkan dan dipelihara kebanyakan dengan partisipasi yang tidak didanai dan suka rela oleh anggota komunitas. 
+Kami dengan senang menerima <a href="http://i2p-projekt.i2p/donate.html" target="_blank">donasi</a>, yang digunakan untuk hosting dasar dan biaya administrasi. 
+Kami punya <a href="http://i2p-projekt.i2p/bounties.html" target="_blank">sayembara berhadiah uang</a> untuk pengembangan aspek-aspek I2P, untuk developers yang ingin mendapat insentif dalam berpartisipasi, dan kami terus menerima lebih banyak <a href="http://i2p-projekt.i2p/newdevelopers.html" target="_blank">Java coders</a>, <a href="http://i2p-projekt.i2p/newtranslators.html" target="_blank">penerjemah bahasa</a>, promoter, dan pengguna untuk membantu I2P berkembang. 
+Makin besar jaringan I2P, makin banyak manfaat yang dinikmati semua orang. Jadi memberitahu teman tentang I2P (dan membantu instalsi dan pengaturan saat dibutuhkan) akan sengat membantu jaringan. 
+Untuk info lebih banyak tentang cara berpartisipasi, kunjungi <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank">halaman sukarelawan</a> di situs web I2P.</li>
 
 </ul>
 <div class="topness"><a href="#top">[Kembali ke Atas]</a></div>

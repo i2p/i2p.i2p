@@ -7,15 +7,15 @@
 # Translators:
 # h345u37g3 h345u37g3, 2019
 # tama negi, 2020
-# daingewuvzeevisiddfddd, 2022
 # タカハシ, 2022
 # zzzi2p, 2022
+# daingewuvzeevisiddfddd, 2022
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2021-11-27 13:31-0000\n"
-"Last-Translator: zzzi2p, 2022\n"
+"Last-Translator: daingewuvzeevisiddfddd, 2022\n"
 "Language-Team: Japanese (https://www.transifex.com/otf/teams/12694/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -139,7 +139,7 @@ msgstr "B<-l> lineLen"
 msgid ""
 "Controls the progress display. B<\\ lineLen > is the length of one progress "
 "line in characters. The default is 40."
-msgstr "進捗表示を制御。 B<\\ lineLen > は文字列での進捗行の長さです。デフォルトでは 40 です。"
+msgstr "進捗表示を制御。 B<\\ lineLen > は文字列での進捗行の長さ。デフォルトでは 40 。"
 
 #. type: Plain text
 #: man/eepget.1:49
@@ -152,7 +152,7 @@ msgstr "B<-m> markSize"
 msgid ""
 "Controls the progress display. B<\\ markSize > is the number of bytes one "
 "'#' character represents. The default is 1024."
-msgstr "進捗表示を制御。B<\\ markSize > は # 一文字が表すバイト数です。デフォルトでは 1024 です。"
+msgstr "進捗表示を制御。B<\\ markSize > は # 一文字が表すバイト数。デフォルトでは 1024 。"
 
 #. type: Plain text
 #: man/eepget.1:55
@@ -166,7 +166,7 @@ msgid ""
 "Specify the number of times to retry downloading if the download isn't "
 "successful. If this option is not specified, eepget will not retry."
 msgstr ""
-"ダウンロードが成功しなかった場合に、ダウンロードを再試行する回数を指定します。このオプションを指定しない場合、eepgetは再試行を行いません。"
+"ダウンロードが成功しなかった場合に、ダウンロードを再試行する回数を指定する。このオプションを指定しない場合、eepgetは再試行を行わない。"
 
 #. type: Plain text
 #: man/eepget.1:61
@@ -179,7 +179,7 @@ msgstr "B<-o> file"
 msgid ""
 "Sets the output file to write to. If this option is not given, the output "
 "filename will be determined by the URL."
-msgstr "書き込むための出力ファイルを設定します。このオプションが与えられていない場合、出力ファイル名はURLによって決定されます。"
+msgstr "書き込むための出力ファイルを設定する。このオプションが与えられていない場合、出力ファイル名はURLによって決定される。"
 
 #. type: Plain text
 #: man/eepget.1:67
@@ -194,8 +194,8 @@ msgid ""
 "eepget will use 4444. If this option is not specified, eepget will use "
 "127.0.0.1:4444. Specify B<-c> or B<-p> :0 to disable the eeproxy."
 msgstr ""
-"使用するI2Pプロキシサーバ(eeproxy)を明示します。ポートは明示されてないとき、eepgetは4444を使用します。このオプションが明示されてないとき、eepgetは"
-" 127.0.0.1:4444 を使用します。eeproxyを無効化するのに B<-c> または B<-p> :0を明示してください。"
+"使用するI2Pプロキシサーバ(eeproxy)を明示する。ポートは明示されてないとき、eepgetは4444を使用する。このオプションが明示されてないとき、eepgetは"
+" 127.0.0.1:4444 を使用する。eeproxyを無効化するには B<-c> または B<-p> :0を明示する。"
 
 #. type: Plain text
 #: man/eepget.1:73
@@ -206,7 +206,7 @@ msgstr "B<-t> 秒"
 #: man/eepget.1:73
 #, no-wrap
 msgid "Sets the inactivity timeout. The default is 60 seconds."
-msgstr "非アクティブタイムアウトを設定する。初期設定は60秒です。"
+msgstr "非アクティブタイムアウトを設定する。初期設定は60秒。"
 
 #. type: Plain text
 #: man/eepget.1:79
@@ -217,7 +217,7 @@ msgstr "B<-u> ユーザー名"
 #: man/eepget.1:79
 #, no-wrap
 msgid "Sets the username for proxy authorization, if required."
-msgstr "必要な場合、proxy authorization用のユーザー名を設定します。"
+msgstr "必要な場合、proxy authorization用のユーザー名を設定する。"
 
 #. type: Plain text
 #: man/eepget.1:85
@@ -231,7 +231,7 @@ msgid ""
 "Sets the password for proxy authorization, if required. If a username is "
 "specified but not a password, EepGet will prompt for the password."
 msgstr ""
-"必要な場合、プロキシ認証用のパスワードを設定します。ユーザー名は明示されたがパスワードが明示されない場合、EepGetはパスワードのためにプロンプトを表示します。"
+"必要な場合、プロキシ認証用のパスワードを設定する。ユーザー名は明示されたがパスワードが明示されない場合、EepGetはパスワードのためにプロンプトを表示する。"
 
 #. type: SH
 #: man/eepget.1:88
@@ -244,7 +244,7 @@ msgstr "終了ステータス"
 msgid ""
 "B<eepget> exits with status zero upon successful transfer and non-zero if "
 "there were problems with the download."
-msgstr "B<eepget> は正常な転送時ステータスゼロで終了し、ダウンロードに何か問題があれば非ゼロで終了します。 "
+msgstr "B<eepget> は正常な転送時ステータスゼロで終了し、ダウンロードに何か問題があれば非ゼロで終了する。 "
 
 #. type: SH
 #: man/eepget.1:93 man/i2prouter.1:54 man/i2prouter-nowrapper.1:24
@@ -351,7 +351,7 @@ msgstr "B<condrestart>"
 #. type: Plain text
 #: man/i2prouter.1:33
 msgid "Restart the I2P service only if it is already running."
-msgstr "既にI2Pサービスが実行中のときのみ、それを再起動します。"
+msgstr "既にI2Pサービスが実行中のときのみ、それを再起動する。"
 
 #. type: IP
 #: man/i2prouter.1:35
@@ -362,7 +362,7 @@ msgstr "B<graceful>"
 #. type: Plain text
 #: man/i2prouter.1:37
 msgid "Stop I2P gracefully (may take up to 11 minutes)"
-msgstr "I2P を正常に停止する（最大11分かかります）"
+msgstr "I2P を正常に停止する（最大11分かかる）"
 
 #. type: IP
 #: man/i2prouter.1:39
@@ -373,7 +373,7 @@ msgstr "B<install>"
 #. type: Plain text
 #: man/i2prouter.1:41
 msgid "Install initscript to start I2P automatically when the system boots."
-msgstr "システムがブートするときI2Pを自動的に起動する、initscriptをインストールする。"
+msgstr "システムがブートするとき、I2Pを自動的に起動するinitscriptをインストールする。"
 
 #. type: IP
 #: man/i2prouter.1:43
@@ -436,8 +436,8 @@ msgid ""
 "will not restart if it crashes.  Also, it will use the default memory size, "
 "which may not be enough for I2P."
 msgstr ""
-"サービスラッパーなしに、I2P ルーターを起動。つまり、ルーターはクラッシュしたら再起動しません。また、デフォルトのメモリサイズを使用しますが、I2P "
-"の使用に十分な数値出ない場合があります。"
+"サービスラッパーなしに、I2P ルーターを起動する。つまり、ルーターはクラッシュしたら再起動しない。また、デフォルトのメモリサイズを使用するが、I2P "
+"の使用に十分な数値出ない場合がある。"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:23
@@ -446,8 +446,8 @@ msgid ""
 "options.  To stop the router, use your browser to access E<.UR "
 "http://localhost:7657/> the router console E<.UE .>"
 msgstr ""
-"B<i2prouter>(1)  スクリプトを代わりに使用すべきです。他に選択肢はありません。ルーターを停止するには、 E<.UR "
-"http://localhost:7657/> ルーターコンソール E<.UE .> にブラウザを使ってアクセスしてください。"
+"B<i2prouter>(1)  スクリプトを代わりに使用すべき。他に選択肢はない。ルーターを停止するには、 E<.UR "
+"http://localhost:7657/> ルーターコンソール E<.UE .> にブラウザを使ってアクセスする。"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:31

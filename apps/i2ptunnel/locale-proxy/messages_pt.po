@@ -8,7 +8,7 @@
 # kgtm <fabio.h.f.antunes@gmail.com>, 2014
 # hxdcmls, 2013
 # hxdcmls, 2013
-# Manuela Silva <manuelarodsilva@gmail.com>, 2017
+# Manuela Silva <mmsrs@sky.com>, 2017
 # rafaelbf, 2013
 # tuliouel, 2013
 # wicked, 2012
@@ -17,8 +17,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
-"PO-Revision-Date: 2021-02-05 15:27+0000\n"
-"Last-Translator: e8f1a29f7bd45d2490d729ad149fc504_6eadd8e\n"
+"PO-Revision-Date: 2013-07-20 14:50+0000\n"
+"Last-Translator: Manuela Silva <mmsrs@sky.com>, 2017\n"
 "Language-Team: Portuguese (http://www.transifex.com/otf/I2P/language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -144,7 +144,7 @@ msgstr ""
 #: ../java/build/Proxy.java:24
 msgid ""
 "The outproxy is probably down, but there could also be network congestion."
-msgstr ""
+msgstr "O proxy de saída está provavelmente fora do ar, mas pode ser também congestionamento na rede."
 
 #: ../java/build/Proxy.java:25 ../java/build/Proxy.java:169
 #: ../java/build/Proxy.java:194 ../java/build/Proxy.java:215
@@ -213,7 +213,7 @@ msgstr ""
 #: ../java/build/Proxy.java:57
 msgid ""
 "The website is probably down, but there could also be network congestion."
-msgstr ""
+msgstr "O website está provavelmente fora do ar, mas pode ser também congestionamento na rede."
 
 #: ../java/build/Proxy.java:60 ../java/build/Proxy.java:66
 msgid "Warning: Invalid Request URI"
@@ -249,15 +249,15 @@ msgstr "Não utilize o proxy para aceder à consola do roteador, anfitrião loca
 
 #: ../java/build/Proxy.java:78
 msgid "Website Unknown"
-msgstr ""
+msgstr "Site Desconhecido"
 
 #: ../java/build/Proxy.java:84
 msgid "Website Not Found in Addressbook"
-msgstr ""
+msgstr "Website Não Encontrado no Livro de endereços"
 
 #: ../java/build/Proxy.java:85
 msgid "The website was not found in your router's addressbook."
-msgstr ""
+msgstr "O website não foi encontrado no livro de endereços do seu roteador."
 
 #: ../java/build/Proxy.java:86
 msgid "Check the link or find a Base 32 or Base 64 address."
@@ -289,7 +289,7 @@ msgstr ""
 
 #: ../java/build/Proxy.java:99 ../java/build/Proxy.java:217
 msgid "Could not connect to the following destination:"
-msgstr ""
+msgstr "Não foi possível se conectar ao seguinte destino:"
 
 #: ../java/build/Proxy.java:100 ../java/build/Proxy.java:106
 #: ../java/build/Proxy.java:185 ../java/build/Proxy.java:191
@@ -298,13 +298,13 @@ msgstr ""
 
 #: ../java/build/Proxy.java:107
 msgid "The connection to the website was reset while the page was loading."
-msgstr ""
+msgstr "A conexão ao website foi resetada enquanto a página carregava."
 
 #: ../java/build/Proxy.java:108
 msgid ""
 "The website could be temporarily unavailable, too busy, or it has blocked "
 "your access."
-msgstr ""
+msgstr "O site pode estar temporariamente indisponível, sobrecarregado ou bloqueando o seu acesso."
 
 #: ../java/build/Proxy.java:117
 msgid "Warning: Authorization Required"
@@ -314,7 +314,7 @@ msgstr ""
 msgid ""
 "The website destination specified was not valid, or was otherwise "
 "unreachable."
-msgstr ""
+msgstr "O destino de website especificado não era válido ou era inatingível."
 
 #: ../java/build/Proxy.java:127
 msgid ""
@@ -348,7 +348,7 @@ msgstr "Aviso: Conflito entre ligações de ajudante de endereço"
 msgid ""
 "The address helper link you followed specifies a different destination key "
 "than the entry in your address book."
-msgstr ""
+msgstr "O linque do auxiliar de endereço que você seguiu especifica uma chave de destino diferente da que consta na entrada do seu livro de endereços."
 
 #: ../java/build/Proxy.java:148
 msgid ""
@@ -430,13 +430,13 @@ msgstr "Para desabilitar a autorização, remova a configuração {0}i2ptunnel.p
 
 #: ../java/build/Proxy.java:192
 msgid "The connection to the proxy was reset."
-msgstr ""
+msgstr "A conexão com o proxy foi resetada."
 
 #: ../java/build/Proxy.java:193
 msgid ""
 "The proxy could be temporarily unavailable, too busy, or it has blocked your"
 " access."
-msgstr ""
+msgstr "O proxy pode estar temporariamente indisponível, sobrecarregado ou bloqueando o seu acesso."
 
 #: ../java/build/Proxy.java:197 ../java/build/Proxy.java:203
 msgid "Warning: Non-HTTP Protocol"
@@ -448,15 +448,15 @@ msgstr "O pedido usa um protocolo ruim."
 
 #: ../java/build/Proxy.java:205
 msgid "The I2P HTTP Proxy supports HTTP and HTTPS requests only."
-msgstr ""
+msgstr "O proxy HTTP I2P suporta apenas requisições HTTP e HTTPS."
 
 #: ../java/build/Proxy.java:206
 msgid "Other protocols such as FTP are not allowed."
-msgstr ""
+msgstr "Outros protocolos como FTP não são permitidos."
 
 #: ../java/build/Proxy.java:207 ../java/build/Proxy.java:213
 msgid "Outproxy Unreachable"
-msgstr ""
+msgstr "Proxy de saída inalcançável"
 
 #: ../java/build/Proxy.java:214
 msgid ""
@@ -495,7 +495,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1304
 msgid "Destination lease set not found"
-msgstr ""
+msgstr "Conjunto de locação de destino não encontrado"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1437
 msgid "Host"
@@ -528,7 +528,7 @@ msgstr ""
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1460
 #, java-format
 msgid "Save {0} to router address book and continue to website"
-msgstr ""
+msgstr "Salvar {0} no livro de endereços do roteador e continuar no website."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1461
 msgid ""
@@ -594,7 +594,7 @@ msgstr "Gerar"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1525
 msgid "Encryption key"
-msgstr ""
+msgstr "Chave de Criptografia"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1526
 msgid ""

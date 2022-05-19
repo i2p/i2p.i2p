@@ -54,9 +54,9 @@ You may run your own servers over I2P in whatever flavor you choose, or if you'r
 Both UDP and TCP protocols are <a href="http://i2p-projekt.i2p/techintro.html#op.transport" target="_blank">supported</a>.</li>
 
 <li>
-<b>Forums and Blogging</b><br>
-All normal blogging, forum and CMS software will run over I2P, though you're advised to take extra precautions with security when setting up and to keep all associated software (e.g. Php, MySql, Python, Apache) up to date and locked-down!
-Also, there are quite a few community run forums on I2P in various languages; see <a href="#eepsites">below</a> for some suggestions.</li>
+<b>المنتديات والتدوين </b><br>
+ سيتم تشغيل جميع برامج التدوين، والمنتدى وبرامج CMS العادية عبر I2P، على الرغم من ذلك ننصحك باتخاذ الاحتياطات الإضافية مع الأمان عند الإعداد والاحتفاظ بجميع البرامج المرتبطة (مثل Php و MySql و Python و Apache) محدثة ومؤمنة دائمًا.
+أيضا ، هناك عدد غير قليل من المنتديات التي تديرها المجتمعات المحلية على I2P بلغات مختلفة. انظر <a href="#eepsites"> أدناه </a> للحصول على بعض الاقتراحات.</li>
 
 <li>
 <a name="plugins"></a><b>Plugins for I2P</b><br>
@@ -69,15 +69,15 @@ If you're a <a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target=
 
 <ul class="links">
 <li>
-<b>Built-in Web-Server</b><br>
-I2P comes with a built-in web server for hosting your own hidden service website ("eepsite") on the I2P network: a <a href="https://www.eclipse.org/jetty/" target="_blank">Jetty</a> instance listening on <a href="http://127.0.0.1:7658/" target="_blank">http://127.0.0.1:7658/</a>.
-To host your own content, simply place your files in the <code>eepsite/docroot/</code> directory (or place any standard JSP/Servlet .war files under <code>eepsite/webapps</code>, or standard CGI scripts under <code>eepsite/cgi-bin</code>) and they'll show up.
-You can also run any alternative web server platform over I2P and replace the built-in server, or run it on another tunnel.</li>
+<b>خادم الويب المدمج</b><br>
+I2P يأتي مع خادم ويب مدمج ليستضيف موقع الويب الخفيّ الخاص بك ("eepite") على شبكة I2P: <a href="https://www.eclipse.org/jetty/" target="_blank">Jetty</a> على سبيل المثال يستمع على <a href="http://127.0.0.1:7658/" target="_blank">http://127.0.0.1:7658/</a>.
+لاستضافة المحتوى الخاص بك ، قم ببساطة بوضع ملفاتك في المجلد <code> eepsite/docroot/ </code>(أو ضع أي ملفات JPS/Servlet .war موجودة تحت <code> eepsite/webapps </code>، أو البرامج النصية القياسية لـ CGI تحت <code> </code>eepsite/cgi-bin) وسوف تظهر.
+يمكنك أيضًا تشغيل أي نظام بديل لخادم الويب عبر I2P واستبدال الخادم المدمج ، أو تشغيله على نفق آخر.</li>
 
 <li>
-<b>Start Your Tunnel</b><br>
-After starting up, your pre-configured <a href="/i2ptunnel/" target="_blank">I2P Webserver Tunnel</a>, your website will be visible (but not discoverable) to others.
-Detailed instructions for starting your website, registering an .i2p domain and promoting your site to others are accessible via your own I2P webserver on <a href="http://127.0.0.1:7658/help/" target="_blank">http://127.0.0.1:7658/help/</a>.</li>
+<b>ابدأ نفقك</b><br>
+ بعد البدء ، سيكون <a href="/i2ptunnel/" target="_blank"> نفق خادم الويب I2P </a> الذي تم تهيئة مسبقًا ، وموقع الويب الخاص بك مرئيًا (ولكن غير قابل للاكتشاف) من اﻵخرين.
+يمكن الوصول إلى الإرشادات التفصيلية لبدء موقعك الإلكتروني وتسجيل نطاق .i2p والترويج لموقعك للآخرين عبر خادم الويب I2P الخاص بك على <a href="http://127.0.0.1:7658/help/" target="_blank"> http://127.0.0.1:7658/help/</a>.</li>
 
 </ul>
 <a name="eepsites"></a>
@@ -111,16 +111,16 @@ Detailed instructions for starting your website, registering an .i2p domain and 
 
 <ul class="links">
 <li>
-<b>Be Patient!</b><br>
-I2P may be slow to integrate into network the first time you run it as it bootstraps into the network and finds peers.
-The longer your I2P router is running, the better it will perform, so try and keep your router on as long as you can, 24/7 if possible!
-If, after 30 minutes, your <i>Active: [connected/recent]</i> count still has less than 10 peers, or your total number of <i>Integrated</i> peers is less than 5, there are several things you can do to check for problems:</li>
+<b>كن صبوراً!</b><br>
+قد يكون I2P بطيئًا في الاندماج بالشبكة في المرة الأولى التي تقوم فيها بتشغيله أثناء تمهيد دخوله في الشبكة واكتشاف الأقران.
+كلما زاد تشغيل جهاز توجيه I2P ، كان الأداء أفضل ، لذا حاول أن تبقي على جهاز التوجيه لديك طوال الوقت ، إذا كان ذلك ممكنًا ، 24/7 إن أمكن!
+إذا كان عدد الأقران النشطاء [متصلين/حديثًا] بعد 30 دقيقة أقل من 10 أقران، أو كان العدد الأقران المدمج أقل من 5، فهناك عدّة أشياء يمكنك التأكد منها لمعرفة إذ كان هناك أي مشاكل:</li>
 
 <li>
-<b>Check Your Configuration and Bandwidth Allocation</b><br>
-I2P functions best when you can accurately reflect the speed of your network connection in the <a href="/config">bandwidth configuration section</a>.
-By default I2P is configured with some fairly conservative values that will not suit many use cases, so please take time to review these settings and correct where necessary.
-The more bandwidth you allocate, <i>specifically</i> upstream bandwidth, the more you will benefit from the network.</li>
+<b>تحقق من التهيئة الخاصة بك وتخصيص عرض النطاق الترددي</b><br>
+تعمل وظائف I2P بشكل أفضل عندما يمكنك التعبير بدقة عن سرعة اتصال الشبكة الخاصة بك  في <a href="/config"> قسم تهيئة النطاق الترددي</a>.
+بشكل افتراضي ، يتم تهيئة I2P مع بعض القيم المحافظة التي قد لا تتناسب مع العديد من حالات الاستخدام ، لذا يرجى أخذ الوقت لمراجعة هذه الإعدادات وتصحيحها عند الضرورة.
+كلما زاد عرض النطاق الترددي الذي تخصصه ، <i> وتحديدًا </i> نطاق الرفع الترددي  ، كلما استفدت أكثر من الشبكة.</li>
 
 <li>
 <b>Firewalls, Modems and Routers</b><br>
@@ -130,9 +130,9 @@ For optimal performance, please ensure I2P's <a href="/confignet">external port<
 See below for more information.</li>
 
 <li>
-<b>Check Your Proxy Settings</b><br>
-If you cannot see any websites at all (not even <a href="http://i2p-projekt.i2p/" target="_blank">i2p-projekt.i2p</a>), make sure your browser's proxy is set to access http traffic (<i>not</i> https, <i>not</i> socks) via <code>127.0.0.1 port 4444</code>.
-If you need some help, there's <a href="https://geti2p.net/en/about/browser-config" target="_blank">a guide</a> to configuring your browser for I2P use.</li>
+<b>تحقق من إعدادات الوكيل الخاصة بك</b><br>
+إذا لم تتمكن من رؤية أي مواقع ويب على الإطلاق (ولا حتى <a href="http://i2p-projekt.i2p/" target="_blank"> i2p-projekt.i2p </a>) ، فتأكد من تعيين وكيل المتصفح الخاص بك للوصول إلى حركة مرور http ( <i>وليس </i> https ، <i>وليس</i> الجوارب) عبر <code> 127.0.0.1منفذ  4444</code>.
+إذا كنت بحاجة إلى بعض المساعدة ، فهناك <a href="https://geti2p.net/en/about/browser-config" target="_blank">دليل </a> لتهيئة المتصفح الخاص بك لاستخدام I2P.</li>
 
 <li>
 <b>Check Your Logs</b><br><a href="/logs">Logs</a> may be helpful to resolve a problem.
@@ -147,23 +147,23 @@ Check your Java version at the top of <a href="/logs">the logs page</a>.</li>
 [Linux/BSD] If you can't start the router with <code>i2p/i2prouter start</code> try the <code>runplain.sh</code> script in the same directory.
 Root privileges are never required to run I2P.</li>
 <li>
-<b>Enable Universal Plug and Play (UPnP)</b><br>
-Your modem or router probably supports UPnP for automatic port forwarding.
-Ensure UPnP support is enabled on your modem or router.
-Now try restarting the <a href="/">I2P router</a>.
-If successful, I2P should report "Network: OK" in the side panel once the I2P router completes initial connectivity tests.</li>
+<b>تمكين التوصيل والتشغيل العالمي (UPnP)</b><br>
+ربما يدعم المودم أو جهاز التوجيه الخاص بك (UPnP) لإعادة توجيه المنفذ التلقائي.
+تأكد من تمكين دعم UPnP على المودم أو الموجه الخاص بك.
+حاول الآن إعادة تشغيل <a href="/"> جهاز التوجيه I2P </a>.
+إذا نجحت ، يجب على I2P تقديم تقرير عن حالة "الشبكة: OK" في اللوحة الجانبية بمجرد إكمال جهاز التوجيه I2P اختبارات الاتصال الأولية.</li>
 
 <li>
-<b>Port Forwarding</b><br>
-Open <a href="/confignet">I2P's port</a> on your modem, router and/or firewall(s) for better connectivity (ideally both UDP and TCP).
-More information on how to go about port forwarding can be easily found through a web search.
-Should you have any difficulties, you may request assistance in our forums and IRC channels listed below.
-Note that I2P does not support connecting to the internet via an http or socks proxy [patches welcome!], though you can connect to proxies via I2P itself once connected to the network.</li>
+<b>منفذ التقدم</b><br>
+افتح <a href="/confignet">منفذ I2P </a>على المودم أو الموجه و/أو جدار (جدران) الحماية للحصول على اتصال أفضل (من الناحية المثالية UDP و TCP).
+يمكن العثور على المزيد من المعلومات حول كيفية التنقل حول منفذ التقدم بسهولة من خلال بحث الويب.
+إذا واجهتك أي صعوبات ، يمكنك طلب المساعدة في منتدياتنا وقنوات IRC المدرجة أدناه.
+لاحظ أن I2P لا يدعم الاتصال بالإنترنت عبر http أو بوكيل الجوارب [التعديلات مرحب بها!] ، على الرغم من ذلك يمكنك الاتصال بالوكيل عبر I2P نفسه بمجرد توصيله بالشبكة.</li>
 
 <li>
-<b>Getting Support Online</b><br>
-You may also want to review the information on the <a href="http://i2p-projekt.i2p/" target="_blank">I2P website</a>, post messages to the <a href="http://i2pforum.i2p/" target="_blank">I2P discussion forum</a> or swing by <a href="irc://127.0.0.1:6668/i2p">#i2p</a> or <a href="irc://127.0.0.1:6668/i2p-chat">#i2p-chat</a> on I2P's internal IRC network - Irc2P.
-These channels are also available outside of I2P's encrypted, anonymous network via <a href="irc://irc.freenode.net/i2p">Freenode IRC</a>.</li>
+<b>الحصول على الدعم عبر الإنترنت</b><br>
+قد ترغب أيضًا في مراجعة المعلومات على <a href="http://i2p-projekt.i2p/" target="_blank"> موقع I2P </a> ، أو نشر رسائل إلى <a href="http://forums.i2p/" target="_blank"> منتدى I2P للمناقشة  </a> أو السؤال في <a href="irc://127.0.0.1:6668/i2p">#i2p</a> أو <a href="irc://127.0.0.1:6668/i2p-chat">#i2p-chat </a>على شبكة IRC الداخلية I2P - Irc2P.
+تتوفر هذه القنوات أيضًا خارج شبكة I2P المشفرة والمجهولة عبر <a href="irc://irc.freenode.net/i2p"> Freenode IRC</a>.</li>
 
 <li>
 <b>Reporting Bugs</b><br>
@@ -171,12 +171,12 @@ To report a bug, please file a ticket on <a href="http://git.idk.i2p/" target="_
 For developer-related discussions, please visit <a href="http://zzz.i2p/" target="_blank">zzz's developer forums</a> or come and visit the <a href="irc://127.0.0.1:6668/i2p-dev">developer channel</a> on I2P's IRC network.
 Developers can browse source at <a href="http://git.idk.i2p/i2p-hackers/i2p.i2p" target="_blank">git.idk.i2p</a>.</li>
 <li>
-<b>Get Involved!</b><br>
-I2P is developed and maintained mostly through unfunded, voluntary participation by community members.
-We're happy to accept <a href="http://i2p-projekt.i2p/donate.html" target="_blank">donations</a>, which go into essential hosting and administrative costs.
-We have <a href="http://i2p-projekt.i2p/bounties.html" target="_blank">cash bounties</a> for aspects of I2P for developers looking for incentives to participate, and we're always looking for more <a href="http://i2p-projekt.i2p/newdevelopers.html" target="_blank">Java coders</a>, <a href="http://i2p-projekt.i2p/newtranslators.html" target="_blank">translators</a>, promoters and users to help I2P grow.
-The bigger the I2P network, the more everyone benefits, so simply telling all your friends about I2P (and lending a hand with the installation and setup where needed) is helpful.
-For further info on how you can participate, visit the <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank">volunteers page</a> on the website.</li>
+<b>شارك!</b><br>
+تم تطوير I2P والحفاظ عليها في الغالب من خلال المشاركة الطوعية غير الممولة من قبل أفراد المجتمع.
+نحن سعداء بقبول <a href="http://i2p-projekt.i2p/donate.html" target="_blank"> التبرعات</a>، والتي ستذهب في دفع تكاليف الاستضافة اﻷساسية والتكاليف اﻹدارية.
+لدينا مكافآت نقدية لعدة جوانب في I2P للمطورين الذين يبحثون عن حوافز للمشاركة ، ونحن نبحث دائمًا عن المزيد من <a href="http://i2p-projekt.i2p/newdevelopers.html" target="_blank"> مطويرين Java </a>،  <a href="http://i2p-projekt.i2p/newtranslators.html" target="_blank">والمترجمين</a>، والمروجين، والمستخدمين للمساعدة في زيادة نمو I2P.
+كلما كبرت شبكة I2P ، كلما استفاد الجميع من ذلك ، لذلك ببساطة إخبار جميع أصدقائك حول I2P (والمشاركة في المساعدة في التثبيت والإعداد عند الحاجة) أمر مفيد.
+للمزيد من المعلومات حول كيفية المشاركة ، تفضل بزيارة <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank"> صفحة المتطوعين </a> على الموقع.</li>
 
 </ul>
 <div class="topness"><a href="#top">[العودة إلى اﻷعلى]</a></div>

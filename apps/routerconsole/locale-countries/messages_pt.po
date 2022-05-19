@@ -4,10 +4,10 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# alfalb.as, 2015
+# e8f1a29f7bd45d2490d729ad149fc504_6eadd8e, 2015
 # hxdcmls, 2013
 # wtfisthis <low_fps11@yahoo.com>, 2015
-# Manuela Silva <manuela.silva@sky.com>, 2018
+# Manuela Silva <mmsrs@sky.com>, 2018
 # rafaelbf, 2013
 # Ruthein Alex <rutweiller@hotmail.com>, 2012
 # tuliouel, 2013
@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:33+0000\n"
-"PO-Revision-Date: 2018-06-16 16:23+0000\n"
-"Last-Translator: Manuela Silva <manuela.silva@sky.com>\n"
+"POT-Creation-Date: 2020-08-12 13:39+0000\n"
+"PO-Revision-Date: 2013-10-14 15:34+0000\n"
+"Last-Translator: Manuela Silva <mmsrs@sky.com>, 2018\n"
 "Language-Team: Portuguese (http://www.transifex.com/otf/I2P/language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -766,6 +766,9 @@ msgstr "Wallis e Futuna"
 
 msgid "Samoa"
 msgstr "Samoa"
+
+msgid "Kosovo"
+msgstr "Kosovo"
 
 msgid "Yemen"
 msgstr "Yemen"

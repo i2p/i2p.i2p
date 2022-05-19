@@ -4,15 +4,16 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Alperen Yavuz <mingyu@yaani.com>, 2020
+# MinGyu19 <mingyu@yaani.com>, 2020
+# Hellowin, 2022
 # zzzi2p, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2020-10-12 12:47+0000\n"
-"Last-Translator: zzzi2p\n"
+"POT-Creation-Date: 2021-05-05 15:14+0000\n"
+"PO-Revision-Date: 2013-07-20 14:49+0000\n"
+"Last-Translator: Hellowin, 2022\n"
 "Language-Team: Turkmen (http://www.transifex.com/otf/I2P/language/tk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,7 +35,7 @@ msgstr "I2P köpelip, deň-duşlaryny tapýarka {0} sabyr ediň {1}."
 msgid ""
 "While you are waiting, please {0}adjust your bandwidth settings{1} on the "
 "{2}configuration page{3}."
-msgstr "Garaşýan wagtyňyz, {2}konfigurasiýa sahypasynda{3} {0}geçirijilik giňligi sazlamalaryny{1} adjust düzediň."
+msgstr "Garaşýan wagtyňyz, {2}konfigurasiýa sahypasynda{3} {0}geçirijilik giňligi sazlamalaryny{1} düzediň."
 
 msgid ""
 "Also you can setup your browser to use the I2P proxy to reach eepsites."
@@ -64,3 +65,6 @@ msgid ""
 "Point your IRC client to {0}localhost:6668{1} and say hi to us on "
 "{2}#i2p{3}."
 msgstr "IRC müşderiňizi görkeziň  {0}localhost:6668{1} we {2}#i2p{3} on-da bize salam aýdyň."
+
+msgid "I2P Development Team"
+msgstr "I2P işläp düzüş topary"

@@ -54,9 +54,9 @@ You may run your own servers over I2P in whatever flavor you choose, or if you'r
 Both UDP and TCP protocols are <a href="http://i2p-projekt.i2p/techintro.html#op.transport" target="_blank">supported</a>.</li>
 
 <li>
-<b>Forums and Blogging</b><br>
-All normal blogging, forum and CMS software will run over I2P, though you're advised to take extra precautions with security when setting up and to keep all associated software (e.g. Php, MySql, Python, Apache) up to date and locked-down!
-Also, there are quite a few community run forums on I2P in various languages; see <a href="#eepsites">below</a> for some suggestions.</li>
+<b>Forumuri și bloguri</b><br>
+Toate programele de blog, forum și CMS obișnuite vor fi funcționa perfect prin I2P, deși vă recomandăm să luați măsuri de precauție suplimentare atunci când configurați și actualizați toate programele asociate (de ex., Php, MySql, Python, Apache)!
+De asemenea, există câteva forumuri comunitare derulate pe I2P în diferite limbi; vezi <a href="#eepsites">dedesubt</a> pentru câteva sugestii.</li>
 
 <li>
 <a name="plugins"></a><b>Plugins for I2P</b><br>
@@ -69,15 +69,15 @@ If you're a <a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target=
 
 <ul class="links">
 <li>
-<b>Built-in Web-Server</b><br>
-I2P comes with a built-in web server for hosting your own hidden service website ("eepsite") on the I2P network: a <a href="https://www.eclipse.org/jetty/" target="_blank">Jetty</a> instance listening on <a href="http://127.0.0.1:7658/" target="_blank">http://127.0.0.1:7658/</a>.
-To host your own content, simply place your files in the <code>eepsite/docroot/</code> directory (or place any standard JSP/Servlet .war files under <code>eepsite/webapps</code>, or standard CGI scripts under <code>eepsite/cgi-bin</code>) and they'll show up.
-You can also run any alternative web server platform over I2P and replace the built-in server, or run it on another tunnel.</li>
+<b>Web-Server Încorporat </b><br>
+I2P vine cu un server web încorporat pentru găzduirea propriului site web de servicii ascunse ("eepsite") în rețeaua I2P:  instanța <a href="https://www.eclipse.org/jetty/" target="_blank">Jetty</a> ascultă pe <a href="http://127.0.0.1:7658/" target="_blank">http://127.0.0.1:7658/</a>. 
+Pentru a găzdui propriul conținut, pur și simplu plasați fișierele în directorul <code>eepsite/docroot/</code> (sau plasați orice fișiere standard JSP/Servlet .war sub <code>eepsite/webapps</code>, sau scripturi standard CGI sub<code>eepsite/cgi-bin</code>) și ele vor apărea pe eepsite-ul dvs.
+De asemenea, dvs. puteți folosi orice altă platformă de server web alternativă prin I2P și să înlocuiți serverul încorporat în I2P sau să îl folosiți prin alt tunel I2P.</li>
 
 <li>
-<b>Start Your Tunnel</b><br>
-After starting up, your pre-configured <a href="/i2ptunnel/" target="_blank">I2P Webserver Tunnel</a>, your website will be visible (but not discoverable) to others.
-Detailed instructions for starting your website, registering an .i2p domain and promoting your site to others are accessible via your own I2P webserver on <a href="http://127.0.0.1:7658/help/" target="_blank">http://127.0.0.1:7658/help/</a>.</li>
+<b>Porniți tunelul</b><br>
+După pornire, <a href="/i2ptunnel/" target="_blank">Tunelul I2P de Server Web</a> este pre-configurat, iar eepsite-ul dvs. Web va fi vizibil (dar nu poate fi descoperit) altora.
+Instrucțiuni detaliate pentru pornirea eepsite-ului dvs., înregistrarea unui domeniu .i2p și promovarea eepsite-ului dvs. sunt accesibile prin intermediul propriului dvs. server web I2P la adresa <a href="http://127.0.0.1:7658/help/" target="_blank">http://127.0.0.1:7658/help/</a>.</li>
 
 </ul>
 <a name="eepsites"></a>
@@ -112,16 +112,15 @@ Aici există multe servicii ascunse - doar urmăriți linkurile de la cele pe ca
 
 <ul class="links">
 <li>
-<b>Be Patient!</b><br>
-I2P may be slow to integrate into network the first time you run it as it bootstraps into the network and finds peers.
-The longer your I2P router is running, the better it will perform, so try and keep your router on as long as you can, 24/7 if possible!
-If, after 30 minutes, your <i>Active: [connected/recent]</i> count still has less than 10 peers, or your total number of <i>Integrated</i> peers is less than 5, there are several things you can do to check for problems:</li>
+<b>Fii răbdător!</b><br>
+I2P poate fi lent când se integreza în rețea pentru prima oară, în timp ce rulează în rețea I2P găsește parteneri de rețea. Cu cât rulează mai mult routerul dvs. I2P, cu atât va funcționa mai bine, deci încercați să păstrați ruterul pornit cât mai mult timp posibil, 24 de ore pe zi dacă este posibil!
+Dacă, după 30 de minute, routerul dvs <i>Activ: [conectat/recent]</i> numără totuși mai puțin de 10 parteneri de rețea sau numărul total de parteneri de rețea <i>Integrați</i> sunt mai puțin de 5, există mai multe lucruri pe care le puteți face pentru a verifica routerul dvs I2P de probleme:</li>
 
 <li>
-<b>Check Your Configuration and Bandwidth Allocation</b><br>
-I2P functions best when you can accurately reflect the speed of your network connection in the <a href="/config">bandwidth configuration section</a>.
-By default I2P is configured with some fairly conservative values that will not suit many use cases, so please take time to review these settings and correct where necessary.
-The more bandwidth you allocate, <i>specifically</i> upstream bandwidth, the more you will benefit from the network.</li>
+<b>Verificați configurația și alocarea lățimii de bandă</b><br>
+I2P funcționează cel mai bine atunci când puteți stabili cu acuratețe viteza conexiunii dvs. de rețea în <a href="/config">secțiunea de configurare a lățimi de bandă</a>.
+Implicit, I2P este configurat cu câteva valori destul de conservatoare, care nu se potrivesc cu multe dintre cazurile de utilizare a routerului I2P, deci vă rugăm să vă faceți timp pentru a examina aceste setări și pentru a le corecta acolo unde este necesar. 
+Cu cât mai multă lățime de bandă alocați,<i>specific</i> lățime de bandă pentru încarcăre, cu atât veți beneficia mai mult de rețea.</li>
 
 <li>
 <b>Firewalls, Modems and Routers</b><br>
@@ -131,9 +130,9 @@ For optimal performance, please ensure I2P's <a href="/confignet">external port<
 See below for more information.</li>
 
 <li>
-<b>Check Your Proxy Settings</b><br>
-If you cannot see any websites at all (not even <a href="http://i2p-projekt.i2p/" target="_blank">i2p-projekt.i2p</a>), make sure your browser's proxy is set to access http traffic (<i>not</i> https, <i>not</i> socks) via <code>127.0.0.1 port 4444</code>.
-If you need some help, there's <a href="https://geti2p.net/en/about/browser-config" target="_blank">a guide</a> to configuring your browser for I2P use.</li>
+<b>Verificați setările pentru proxy</b><br>
+Dacă nu puteți vedea nici un eepsite (nici măcar <a href="http://i2p-projekt.i2p/" target="_blank">i2p-projekt.i2p</a>), asigurați-vă că proxy-ul browserului dvs. este setat să acceseze traficul http (<i>nu</i> https, <i>nu</i> socks) prin intermediul proxy-ului http <code>127.0.0.1 port 4444</code>. 
+Dacă aveți nevoie de ajutor, aici există<a href="https://geti2p.net/en/about/browser-config" target="_blank">un ghid</a> pentru configurarea corectă a browserului dvs. pentru a putea utiliza I2P fără probleme.</li>
 
 <li>
 <b>Check Your Logs</b><br><a href="/logs">Logs</a> may be helpful to resolve a problem.
@@ -148,23 +147,23 @@ Verificați versiunea Java din partea de sus a <a href="/logs">paginii de jurnal
 [Linux/BSD] If you can't start the router with <code>i2p/i2prouter start</code> try the <code>runplain.sh</code> script in the same directory.
 Root privileges are never required to run I2P.</li>
 <li>
-<b>Enable Universal Plug and Play (UPnP)</b><br>
-Your modem or router probably supports UPnP for automatic port forwarding.
-Ensure UPnP support is enabled on your modem or router.
-Now try restarting the <a href="/">I2P router</a>.
-If successful, I2P should report "Network: OK" in the side panel once the I2P router completes initial connectivity tests.</li>
+<b>Activați Universal Plug and Play (UPnP)</b><br>
+Modemul sau ruterul dvs. suportă probabil UPnP pentru redirecționarea automată a porturilor.
+Asigurați-vă că suportul UPnP este activat pe modem sau pe router.
+Încercați acum să reporniți <a href="/">I2P router</a>. 
+Dacă  modemul sau ruterul dvs. va reuși să se conecteze, I2P ar trebui să raporteze "Rețea: OK" în panoul lateral odată ce routerul dvs. I2P completează testele inițiale de conectivitate.</li>
 
 <li>
 <b>Port Forwarding</b><br>
-Open <a href="/confignet">I2P's port</a> on your modem, router and/or firewall(s) for better connectivity (ideally both UDP and TCP).
-More information on how to go about port forwarding can be easily found through a web search.
-Should you have any difficulties, you may request assistance in our forums and IRC channels listed below.
-Note that I2P does not support connecting to the internet via an http or socks proxy [patches welcome!], though you can connect to proxies via I2P itself once connected to the network.</li>
+Deschide <a href="/confignet">I2P's port</a> pe modemul, router-ul și / sau firewall-ul (firewall-urile) dvs. pentru o conectivitate mai bună (în mod ideal, atât UDP cât și TCP).
+Mai multe informații despre cum să folosiți redirecționarea porturilor pot fi găsite cu ușurință prin intermediul unei căutări pe web.
+În cazul în care aveți dificultăți, puteți solicita asistență în forumurile noastre și în canalele IRC enumerate mai jos.
+Rețineți că I2P nu acceptă conectarea la internet printr-un proxy http sau proxy socks [patch-uri binevenite!], Deși vă puteți conecta la proxy-uri prin intermediul I2P după conectarea la rețea.</li>
 
 <li>
-<b>Getting Support Online</b><br>
-You may also want to review the information on the <a href="http://i2p-projekt.i2p/" target="_blank">I2P website</a>, post messages to the <a href="http://i2pforum.i2p/" target="_blank">I2P discussion forum</a> or swing by <a href="irc://127.0.0.1:6668/i2p">#i2p</a> or <a href="irc://127.0.0.1:6668/i2p-chat">#i2p-chat</a> on I2P's internal IRC network - Irc2P.
-These channels are also available outside of I2P's encrypted, anonymous network via <a href="irc://irc.freenode.net/i2p">Freenode IRC</a>.</li>
+<b>Obținerea de asistență online</b><br>
+De asemenea, poate doriți să revizuiți informațiile de pe <a href="http://i2p-projekt.i2p/" target="_blank">site-ul I2P</a>, să postați mesaje pe <a href="http://i2pforum.i2p/" target="_blank">forumul de discuții I2P</a> sau să faceți legătura cu <a href="irc://127.0.0.1:6668/i2p">#i2p</a> sau <a href="irc://127.0.0.1:6668/i2p-chat">#i2p-chat</a> în rețeaua internă IRC a I2P - Irc2P.
+Aceste canale sunt, de asemenea, disponibile în afara rețelei anonime criptate I2P prin <a href="irc://irc.freenode.net/i2p">Freenode IRC</a>.</li>
 
 <li>
 <b>Reporting Bugs</b><br>
@@ -172,12 +171,13 @@ To report a bug, please file a ticket on <a href="http://git.idk.i2p/" target="_
 For developer-related discussions, please visit <a href="http://zzz.i2p/" target="_blank">zzz's developer forums</a> or come and visit the <a href="irc://127.0.0.1:6668/i2p-dev">developer channel</a> on I2P's IRC network.
 Developers can browse source at <a href="http://git.idk.i2p/i2p-hackers/i2p.i2p" target="_blank">git.idk.i2p</a>.</li>
 <li>
-<b>Get Involved!</b><br>
-I2P is developed and maintained mostly through unfunded, voluntary participation by community members.
-We're happy to accept <a href="http://i2p-projekt.i2p/donate.html" target="_blank">donations</a>, which go into essential hosting and administrative costs.
-We have <a href="http://i2p-projekt.i2p/bounties.html" target="_blank">cash bounties</a> for aspects of I2P for developers looking for incentives to participate, and we're always looking for more <a href="http://i2p-projekt.i2p/newdevelopers.html" target="_blank">Java coders</a>, <a href="http://i2p-projekt.i2p/newtranslators.html" target="_blank">translators</a>, promoters and users to help I2P grow.
-The bigger the I2P network, the more everyone benefits, so simply telling all your friends about I2P (and lending a hand with the installation and setup where needed) is helpful.
-For further info on how you can participate, visit the <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank">volunteers page</a> on the website.</li>
+<b>Implicați-vă!</b><br>
+I2P este dezvoltat și menținut în cea mai mare parte prin participarea nefinanțată, voluntară a membrilor comunității.
+Suntem bucuroși să acceptăm<a href="http://i2p-projekt.i2p/donate.html" target="_blank">donații</a>, care vor fi alocate pentru costurile esențiale administrative  și de găzduire a întregului proiect I2P.
+Noi avem <a href="http://i2p-projekt.i2p/bounties.html" target="_blank">cash bounties</a> pentru aspectele legate de I2P și pentru dezvoltatorii care caută stimulente de participare și căutăm mereu mai multi <a href="http://i2p-projekt.i2p/newdevelopers.html" target="_blank">Java coders</a>, <a href="http://i2p-projekt.i2p/newtranslators.html" target="_blank">traducători</a>, promotori și utilizatori pentru a ajuta I2P să crească.
+Cu cât este mai mare rețeaua I2P, cu cât mai multă lume folosește I2P, cu atât mai mult beneficiază toată lumea, astfel încât să spuneți tuturor prietenilor dvs. despre I2P (și să vă ajutați prietenul/prietena cu instalarea și configurarea acolo unde este necesar) este de ajutor. 
+Pentru mai multe informații despre cum puteți participa, vizitați <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank">pagina voluntarilor</a> pe website.
+</li>
 
 </ul>
 <div class="topness"><a href="#top">[Înapoi la început]</a></div>

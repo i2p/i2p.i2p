@@ -5,15 +5,16 @@
 # zzz <zzz@mail.i2p>, 2017.
 # 
 # Translators:
-# blueboy, 2017
+# L., 2017
 # Eduardo Addad de Oliveira <eduardoaddad@hotmail.com>, 2019
 # Eduardo Rodrigues, 2021
+# Manuela Silva <mmsrs@sky.com>, 2022
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2021-11-27 13:31-0000\n"
-"Last-Translator: Eduardo Rodrigues, 2021\n"
+"Last-Translator: Manuela Silva <mmsrs@sky.com>, 2022\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/otf/teams/12694/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -127,7 +128,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:43
 msgid "B<-l> lineLen"
-msgstr ""
+msgstr "B<-l> lineLen"
 
 #. type: TP
 #: man/eepget.1:43
@@ -140,7 +141,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:49
 msgid "B<-m> markSize"
-msgstr ""
+msgstr "B<-m> markSize"
 
 #. type: TP
 #: man/eepget.1:49
@@ -153,7 +154,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:55
 msgid "B<-n> retries"
-msgstr ""
+msgstr "B<-n> retries"
 
 #. type: TP
 #: man/eepget.1:55
@@ -179,7 +180,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:67
 msgid "B<-p> proxy_host[:port]"
-msgstr ""
+msgstr "B<-p> proxy_host[:port]"
 
 #. type: TP
 #: man/eepget.1:67
@@ -249,8 +250,9 @@ msgstr "RELATANDO ERROS"
 #. type: Plain text
 #: man/eepget.1:98 man/i2prouter.1:59 man/i2prouter-nowrapper.1:29
 msgid ""
-"Please enter an issue on E<.UR https://i2pgit.org/i2p-"
-"hackers/i2p.i2p/-/issues> the I2P GitLab server E<.UE .>"
+"Please enter an issue on E<.UR "
+"https://i2pgit.org/i2p-hackers/i2p.i2p/-/issues> the I2P GitLab server E<.UE"
+" .>"
 msgstr ""
 
 #. type: SH
@@ -268,7 +270,7 @@ msgstr "B<i2prouter>(1)  B<curl>(1)  B<wget>(1)"
 #: man/i2prouter.1:1
 #, no-wrap
 msgid "I2PROUTER"
-msgstr ""
+msgstr "I2PROUTER"
 
 #. type: Plain text
 #: man/i2prouter.1:5

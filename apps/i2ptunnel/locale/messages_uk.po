@@ -16,8 +16,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-17 13:12+0000\n"
-"PO-Revision-Date: 2021-11-17 13:34+0000\n"
-"Last-Translator: Maxym Mykhalchuk\n"
+"PO-Revision-Date: 2011-02-13 11:46+0000\n"
+"Last-Translator: samalero <ivan.barabash96@mail.ru>, 2017\n"
 "Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/otf/I2P/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -203,7 +203,7 @@ msgstr "Редагувати прихований сервіс"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:184
 msgid "Are you sure you want to delete?"
-msgstr ""
+msgstr "Ви справді хочете вилучити?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:208
 msgid "Edit proxy settings"
@@ -1226,7 +1226,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1886
 msgid "Revoke"
-msgstr ""
+msgstr "Відкликати"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1888
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1925
@@ -1751,7 +1751,7 @@ msgstr "Локальна адреса призначення недоступн�
 msgid ""
 "To enable registration verification, edit tunnel and set name (or website "
 "name) to a valid hostname ending in '.i2p'"
-msgstr ""
+msgstr "Для активації реєстраційної перевірки змініть тунель і встановіть назву (чи назву сайту) з правильним суфіксом '.i2p'"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:285
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:681
@@ -2117,7 +2117,7 @@ msgstr "Це дозволяє як TCP, так і UDP з’єднання чер
 msgid ""
 "A client tunnel implementing the SOCKS protocol, which is customized for "
 "connecting to IRC networks."
-msgstr ""
+msgstr "Клієнтський тунель, що реалізує протокол SOCKS, налаштований для з’єднання з мережами IRC."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:310
 msgid ""
@@ -2242,7 +2242,7 @@ msgid ""
 "This can be useful for frequently-used tunnels (especially server tunnels), "
 "but for tunnels that are only used occasionally it would mean that the I2P "
 "router is creating and maintaining unnecessary tunnels."
-msgstr ""
+msgstr "Це може бути корисно для часто використовуваних тунелів (особливо серверних тунелів), але для тунелів які використовуються тільки іноді це означатиме що маршрутизатор I2P створює і підтримує зайві тунелі."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:604
 msgid "The wizard has now collected enough information to create your tunnel."

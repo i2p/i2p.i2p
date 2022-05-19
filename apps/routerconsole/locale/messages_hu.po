@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-17 13:12+0000\n"
-"PO-Revision-Date: 2021-11-17 13:35+0000\n"
-"Last-Translator: Nyul Csoki <csokinyul@i2pmail.org>\n"
+"POT-Creation-Date: 2022-05-10 16:21+0000\n"
+"PO-Revision-Date: 2011-02-13 12:00+0000\n"
+"Last-Translator: AdminLMH <lehetmashogy@i2pmail.org>, 2021\n"
 "Language-Team: Hungarian (http://www.transifex.com/otf/I2P/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,75 +35,86 @@ msgstr "Router hash alapján kitiltva"
 
 #. Temporary reason, until the job finishes
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:1027
-#: ../../../router/java/src/net/i2p/router/Blocklist.java:1113
+#: ../../../router/java/src/net/i2p/router/Blocklist.java:1122
 #, java-format
 msgid "IP banned by blocklist.txt entry {0}"
 msgstr "IP kitiltva a blocklist.txt következő bejegyzése alapján: {0}"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:230
+#: ../../../router/java/src/net/i2p/router/Router.java:1448
+#: ../java/src/net/i2p/router/web/helpers/ConfigRestartBean.java:69
+msgid "Restart imminent"
+msgstr "Újraindítás hamarosan"
+
+#: ../../../router/java/src/net/i2p/router/Router.java:1450
+#: ../java/src/net/i2p/router/web/helpers/ConfigRestartBean.java:71
+msgid "Shutdown imminent"
+msgstr "Kikapcsolás hamarosan"
+
+#: ../../../router/java/src/net/i2p/router/Router.java:1951
+#: ../../../router/java/src/net/i2p/router/sybil/Analysis.java:854
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1048
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1053
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:882
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:889
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:896
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:905
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:912
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:919
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:926
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:937
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:939
+#, java-format
+msgid "{0} ago"
+msgstr "{0} előtt"
+
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:233
 #, java-format
 msgid "Reseeding: got router info from file ({0} successful, {1} errors)."
 msgstr "Újratáplálás: router információt kapott a fájlból ({0} sikeres, {1} hiba)."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:336
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:339
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:34
 msgid "Reseeding"
 msgstr "Újratáplálás (reseed)"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:358
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:361
 #, java-format
 msgid "Reseed successful, fetched {0} router info"
 msgid_plural "Reseed successful, fetched {0} router infos"
 msgstr[0] "Reseed successful, fetched {0} router info"
 msgstr[1] "Újratáplálás sikeres, {0} router infó letöltve"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:364
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:367
 #, java-format
 msgid "Reseed fetched only 1 router."
 msgid_plural "Reseed fetched only {0} routers."
 msgstr[0] "Az újratáplálás csak 1 routert hozott."
 msgstr[1] "Az újratáplálás csak {0} routert hozott."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:388
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:391
 msgid "Reseed failed."
 msgstr "Újratáplálás (reseed) sikertelen."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:389
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:392
 #, java-format
 msgid "See {0} for help."
 msgstr "Segítségért lásd {0}."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:390
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:393
 msgid "reseed configuration page"
 msgstr "újratáplálás (reseed) beállítási oldal"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:646
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:780
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:649
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:783
 msgid "Reseeding: fetching seed URL."
 msgstr "Újratáplálás: táplálási URL kézbesítése."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:705
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:824
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:708
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:827
 #, java-format
 msgid ""
 "Reseeding: fetching router info from seed URL ({0} successful, {1} errors)."
 msgstr "Újratáplálás: router infó kézbesítése a táplálási URL-ről: ({0} sikeres, {1} hibás)."
-
-#: ../../../router/java/src/net/i2p/router/sybil/Analysis.java:801
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:978
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:983
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:881
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:888
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:895
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:904
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:911
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:918
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:925
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:936
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:938
-#, java-format
-msgid "{0} ago"
-msgstr "{0} előtt"
 
 #. NOTE TO TRANSLATORS - each of these phrases is a description for a
 #. statistic
@@ -137,13 +148,13 @@ msgstr "Ismert gyors társak"
 msgid "Size of tunnel acceptor backlog"
 msgstr "Alagút elfogadó hátramaradásának mértéke"
 
-#: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:614
+#: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:637
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHelper.java:68
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:150
 msgid "unknown"
 msgstr "ismeretlen"
 
-#: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:618
+#: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:641
 msgid "NetDb entry"
 msgstr "NetDb bejegyzés"
 
@@ -153,19 +164,19 @@ msgstr "NetDb bejegyzés"
 msgid "No transports (hidden or starting up?)"
 msgstr "Nincs átvitel (rejtett vagy indul)?"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:910
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:915
 msgid "Unsupported signature type"
 msgstr "Nem támogatott aláírástípus"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:928
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:933
 msgid "No support for our signature type"
 msgstr "Nincs támogatás az aláírás típusunkhoz"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:932
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:937
 msgid "Unreachable on any transport"
 msgstr "Egyik átvitelen sem érhető el"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:1033
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:1042
 #: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:395
 msgid "UPnP is not enabled"
 msgstr "UPnP nincs engedélyezve"
@@ -296,61 +307,87 @@ msgstr "UPnP sikeresen átirányította a következőt: {0} port {1,number,#####
 msgid "{0} port {1,number,#####} was not forwarded by UPnP."
 msgstr "Nincs átirányítva az UPnP által a következő: {0} port {1,number,#####}."
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:926
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:900
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:138
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:427
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1028
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:539
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:829
+#: ../java/strings/Strings.java:53
+msgid "Router"
+msgstr "Router"
+
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:901
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:860
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:872
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:884
+msgid "Update available"
+msgstr "Frissítés elérhető"
+
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:901
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:844
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:861
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:873
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:885
+#, java-format
+msgid "Version {0}"
+msgstr "{0} Verzió"
+
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:932
 #, java-format
 msgid "New plugin version {0} is available"
 msgstr "Elérhető új kiegészítő verzió: {0}"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1006
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1012
 #, java-format
 msgid "Update check failed for plugin {0}"
 msgstr "{0} kiegészítő frissítés keresése sikertelen"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1010
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1016
 #, java-format
 msgid "No new version is available for plugin {0}"
 msgstr "Nincs elérhető új verzió a következő kiegészítőhöz: {0}"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1098
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1104
 #, java-format
 msgid "Install failed from {0}"
 msgstr "Sikertelen telepítés innen: {0}"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1100
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1106
 #: ../java/src/net/i2p/router/update/UpdateRunner.java:298
 #, java-format
 msgid "Transfer failed from {0}"
 msgstr "Sikertelen átvitel a következőtől: {0}"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1355
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1437
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1461
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1361
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1443
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1467
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:839
 msgid "Update downloaded"
 msgstr "Frissítés letöltve"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1415
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1461
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1421
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1467
 msgid "Restarting"
 msgstr "Újraindítás"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1415
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1421
 msgid "Update verified"
 msgstr "Frissítés igazolva"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1424
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1430
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:226
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:343
 #, java-format
 msgid "from {0}"
 msgstr "innen {0}"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1441
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1447
 #, java-format
 msgid "Unsigned update file from {0} is corrupt"
 msgstr "Az aláírás nélküli frissítési fájl korrupt a következőtől: {0}"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1470
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1476
 #, java-format
 msgid "Failed copy to {0}"
 msgstr "Sikertelen másolás a következőre: {0}"
@@ -377,7 +414,7 @@ msgstr "{0} Java verzió szükséges, de a telepített Java verzió {1}"
 
 #. set status before thread to ensure UI feedback
 #: ../java/src/net/i2p/router/update/DevSU3UpdateHandler.java:91
-#: ../java/src/net/i2p/router/update/PluginUpdateHandler.java:82
+#: ../java/src/net/i2p/router/update/PluginUpdateHandler.java:90
 #: ../java/src/net/i2p/router/update/UnsignedUpdateHandler.java:91
 msgid "Updating"
 msgstr "Frissítés"
@@ -438,7 +475,7 @@ msgid "Plugin downloaded"
 msgstr "Kiegészítő letöltve"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:181
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:558
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:562
 #, java-format
 msgid "Cannot create plugin directory {0}"
 msgstr "A következő kiegészítő könyvtár létrehozása sikertelen: {0}"
@@ -470,122 +507,122 @@ msgstr "Bővítmény nincs telepítve - az aláíró nem megbízható"
 msgid "Plugin from {0} is corrupt"
 msgstr "A kiegészítő korrupt a következőről: {0}"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:392
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:396
 #, java-format
 msgid "Plugin from {0} does not contain the required configuration file"
 msgstr "A kiegészítő  a következőről: {0} nem tartalmazza a szükséges konfigurációs fájlt"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:414
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:418
 #, java-format
 msgid "Plugin from {0} has invalid name or version"
 msgstr "Kiegészítőnek érvénytelen a neve vagy verziója a következőről: {0}"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:419
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:423
 #, java-format
 msgid "Plugin {0} has mismatched versions"
 msgstr "Egymásnak ellentmondó verziókkal rendelkezik a következő kiegészítő: {0}"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:430
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:434
 #: ../java/src/net/i2p/router/web/PluginStarter.java:358
 #, java-format
 msgid "This plugin requires I2P version {0} or higher"
 msgstr "A kiegészítőhöz az I2P {0} vagy magasabb verziója szükséges"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:437
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:441
 #: ../java/src/net/i2p/router/web/PluginStarter.java:367
 #, java-format
 msgid "This plugin requires Java version {0} or higher"
 msgstr "A kiegészítőhöz az Java {0} vagy magasabb verziója szükséges"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:446
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:450
 msgid ""
 "Downloaded plugin is for new installs only, but the plugin is already "
 "installed"
 msgstr "A letöltött kiegészítő csak az új telepítésekhez való, de a kiegészítő már telepítve van."
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:456
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:460
 msgid "Installed plugin does not contain the required configuration file"
 msgstr "A telepített kiegészítő nem tartalmazza a szükséges konfigurációs fájlt"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:464
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:468
 msgid "Signature of downloaded plugin does not match installed plugin"
 msgstr "A letöltött kiegészítő aláírása nem egyezik a telepített kiegészítővel"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:471
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:475
 #, java-format
 msgid "Downloaded plugin version {0} is not newer than installed plugin"
 msgstr "A letöltött kiegészítő verzió {0} nem újabb, mint a telepített kiegészítő"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:478
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:482
 #, java-format
 msgid "Plugin update requires installed plugin version {0} or higher"
 msgstr "Kiegészítő frissítéshez a telepített kiegészítő következő, vagy annál magasabb verizója szükséges: {0} "
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:485
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:489
 #, java-format
 msgid "Plugin update requires installed plugin version {0} or lower"
 msgstr "Kiegészítő frissítéshez a telepített kiegészítő következő, vagy annál alacsonyabb verizója szükséges: {0} "
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:493
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:497
 #: ../java/src/net/i2p/router/web/PluginStarter.java:378
 #, java-format
 msgid "Plugin requires Jetty version {0} or higher"
 msgstr "A kiegészítőhöz a Jetty {0} vagy magasabb verziója szükséges"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:500
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:516
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:504
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:520
 #: ../java/src/net/i2p/router/web/PluginStarter.java:389
 #: ../java/src/net/i2p/router/web/PluginStarter.java:411
 #, java-format
 msgid "Plugin requires Jetty version {0} or lower"
 msgstr "A kiegészítőhöz a Jetty {0} vagy alacsonyabb verziója szükséges"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:508
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:512
 #: ../java/src/net/i2p/router/web/PluginStarter.java:400
 #, java-format
 msgid "Plugin requires Java version {0} or lower"
 msgstr "A bővítményhez {0} vagy alacsonyabb Java verzió szükséges"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:525
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:529
 #, java-format
 msgid "Cannot copy plugin to directory {0}"
 msgstr "Kiegészítő másolása sikertelen a következő könyvtárba: {0}"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:535
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:539
 msgid "Plugin will be installed on next restart."
 msgstr "A kiegészítő a következő újraindításkor lesz telepítésre."
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:553
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:557
 msgid "Plugin is for upgrades only, but the plugin is not installed"
 msgstr "Ez a kiegészítő kizárólag frissítéshez van, azonban a kiegészítő nincs telepítve"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:566
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:570
 #, java-format
 msgid "Failed to install plugin in {0}"
 msgstr "Kiegészítő telepítése sikertelen a következőben: {0}"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:573
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:601
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:577
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:605
 #, java-format
 msgid "Plugin {0} installed"
 msgstr "{0} kiegészítő telepítve"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:592
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:596
 #, java-format
 msgid "Plugin {0} installed and started"
 msgstr "{0} kiegészítő telepítve és elindítva"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:595
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:599
 #, java-format
 msgid "Plugin {0} installed but failed to start, check logs"
 msgstr "{0} kiegészítő telepítve, de nem sikerült elindítani, ellenőrizd a naplót"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:597
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:601
 #, java-format
 msgid "Plugin {0} installed but failed to start"
 msgstr "{0} kiegészítő telepítve, de nem sikerült elindítani"
 
-#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:609
+#: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:613
 #, java-format
 msgid "Failed to download plugin from {0}"
 msgstr "Kiegészítő letöltése sikertelen a következőről: {0}"
@@ -609,7 +646,7 @@ msgstr "Nincs új verzió a következőn: {0}"
 #: ../java/src/net/i2p/router/web/CSSHelper.java:185
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:241
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:61
-#: ../java/strings/Strings.java:29
+#: ../java/strings/Strings.java:28
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/certs_jsp.java:314
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/certs_jsp.java:316
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:316
@@ -777,7 +814,7 @@ msgid "Don't run I2P on startup"
 msgstr "Ne futtassa az I2P-t indításkor"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:272
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:647
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:645
 msgid "Dump threads"
 msgstr "Szálak lerakása"
 
@@ -787,7 +824,7 @@ msgid "Threads dumped to {0}"
 msgstr "Szálak lerakva ide: {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:280
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:659
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:657
 msgid "View console on startup"
 msgstr "Konzol megjelenítése indításkor"
 
@@ -796,7 +833,7 @@ msgid "Console is to be shown on startup"
 msgstr "Konzol legyen mutatva indításkor"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:283
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:661
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:659
 msgid "Do not view console on startup"
 msgstr "Ne nézzel meg a konzolt indításkor"
 
@@ -805,7 +842,7 @@ msgid "Console is not to be shown on startup"
 msgstr "Indításnál a konzol ne legyen mutatva"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:286
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:643
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:641
 msgid "Force GC"
 msgstr "GC kikényszerítése"
 
@@ -855,9 +892,9 @@ msgstr "Beállítások sikeresen elmentve"
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:254
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:385
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:677
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:44
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:89
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:108
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:58
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:114
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:133
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:418
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:133
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:187
@@ -878,14 +915,14 @@ msgstr "Tálcaikon letilva"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:399
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:675
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:42
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:87
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:106
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:56
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:112
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:131
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:359
 #: ../java/src/net/i2p/router/web/helpers/ConfigStatsHandler.java:125
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:121
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:145
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:512
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:510
 msgid "Restart required to take effect"
 msgstr "Életbelépéséhez újraindítás szükséges"
 
@@ -958,7 +995,7 @@ msgstr "Frissítési gyakoriság frissítése a következőre: {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:243
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:126
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:417
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:415
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:317
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:348
 msgid "Never"
@@ -1057,7 +1094,7 @@ msgstr[1] "{0} bővítmény frissítve"
 msgid "Plugin update check complete"
 msgstr "Kiegészítők frissítéseinek ellenőrzése elkészült"
 
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:434
+#: ../java/src/net/i2p/router/web/StatSummarizer.java:435
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:256
 msgid "Bandwidth usage"
 msgstr "Sávszélesség felhasználás"
@@ -1078,15 +1115,15 @@ msgstr "Események időszakonként"
 
 #: ../java/src/net/i2p/router/web/SummaryRenderer.java:222
 #: ../java/src/net/i2p/router/web/SummaryRenderer.java:241
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:155
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:157
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:156
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:158
 msgid "Avg"
 msgstr "Átlag"
 
 #: ../java/src/net/i2p/router/web/SummaryRenderer.java:225
 #: ../java/src/net/i2p/router/web/SummaryRenderer.java:244
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:156
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:158
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:157
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:159
 msgid "Max"
 msgstr "Max"
 
@@ -1106,34 +1143,38 @@ msgstr "Most"
 msgid "Restart"
 msgstr "Újraindítás"
 
-#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:52
+#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:49
+msgid "Banned Peers"
+msgstr "Kitiltott Társak"
+
+#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:51
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:94
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:124
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:170
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:72
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:128
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1000
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:75
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:131
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1070
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:159
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:627
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:188
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:383
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:189
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:385
 msgid "none"
 msgstr "semmi"
 
-#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:59
+#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:60
 msgid "unban now"
 msgstr "Kitiltás visszavonása most"
 
-#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:70
+#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:71
 msgid "Permanently banned"
 msgstr "Véglegesen kitiltva"
 
-#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:72
+#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:73
 #, java-format
 msgid "Temporary ban expiring in {0}"
 msgstr "Ideiglenes kitiltás lejár a következőn belül: {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:74
+#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:75
 #, java-format
 msgid "Banned until restart or in {0}"
 msgstr "Kitiltva a következő újraindításig vagy következőn belül: {0}"
@@ -1177,8 +1218,9 @@ msgid "Local Router Family Certificate"
 msgstr "Helyi Router Család Tanúsítvány"
 
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:91
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:384
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:872
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:435
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1111
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:873
 msgid "Family"
 msgstr "Család"
 
@@ -1315,7 +1357,7 @@ msgid "No plugin URL specified."
 msgstr "Nincs megadva kiegészítő URL-je."
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:465
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:51
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:67
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:83
 msgid "You must enter a file"
 msgstr "Fájl megadása kötelező"
@@ -1445,13 +1487,15 @@ msgid "Plugin"
 msgstr "Kiegészítő"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:292
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:812
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:431
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:883
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:316
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:482
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:97
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:620
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:646
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:680
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:855
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:856
 msgid "Version"
 msgstr "Verzió"
 
@@ -1492,33 +1536,33 @@ msgstr "Frissítés"
 msgid "Delete"
 msgstr "Törlés"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:28
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:29
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:576
 msgid "Create Family"
 msgstr "Család Létrehozása"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:32
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:33
 msgid "You must enter a family name"
 msgstr "Család név megadása kötelező"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:41
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:105
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:55
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:130
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:185
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:262
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:266
 msgid "Configuration saved successfully."
 msgstr "Beállítások mentése sikeres."
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:46
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:62
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:568
 msgid "Join Family"
 msgstr "Belépés Családba"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:92
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:94
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:117
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:119
 msgid "Load from file failed"
 msgstr "Betöltés fájlból sikertelen"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:99
+#: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:124
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:614
 msgid "Leave Family"
 msgstr "Kilépés Családból"
@@ -1696,8 +1740,8 @@ msgid "Cancel"
 msgstr "Mégse"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:63
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:522
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:552
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:593
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:623
 msgid "Destination"
 msgstr "Célállomás"
 
@@ -1708,7 +1752,7 @@ msgid "Name"
 msgstr "Név"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:67
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:993
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1063
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:613
 msgid "Encryption Key"
 msgstr "Titkosítási Kulcs"
@@ -1728,7 +1772,7 @@ msgstr "Lejár"
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:97
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:132
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:137
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:515
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:586
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:581
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:593
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:603
@@ -1774,11 +1818,16 @@ msgstr "Érvényes napló szintek: {0}."
 msgid "Select a class to add"
 msgstr "Válassz hozzáadandó osztályt"
 
+#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:139
+#, java-format
+msgid "All classes in {0}"
+msgstr ""
+
 #. stat groups for stats.jsp
 #. See StatsGenerator for groups mapped to a display name
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:30
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:57
-#: ../java/strings/Strings.java:51
+#: ../java/strings/Strings.java:50
 msgid "Bandwidth"
 msgstr "Sávszélesség"
 
@@ -1851,7 +1900,7 @@ msgstr "Kezelőfelület"
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:59
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:468
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1032
-#: ../java/strings/Strings.java:57
+#: ../java/strings/Strings.java:56
 msgid "Tunnels"
 msgstr "Alagút"
 
@@ -1872,13 +1921,13 @@ msgstr "Naplózás"
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:450
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:807
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:871
-#: ../java/strings/Strings.java:53
+#: ../java/strings/Strings.java:52
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:476
 msgid "Peers"
 msgstr "Társ"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:32
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1029
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1099
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:580
 msgid "Stats"
 msgstr "Statisztika"
@@ -2067,9 +2116,9 @@ msgstr "Társ kitiltása újraindításig"
 msgid "Manually banned via {0}"
 msgstr "Kézzel kitiltva a következőn keresztül: {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:25
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:34
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:36
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:26
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:35
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:37
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:251
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:312
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:476
@@ -2078,43 +2127,43 @@ msgstr "Kézzel kitiltva a következőn keresztül: {0}"
 msgid "Peer"
 msgstr "Társ"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:25
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:26
 msgid "banned until restart"
 msgstr "újraindításig kitiltva"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:28
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:39
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:60
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:29
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:40
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:61
 msgid "Invalid peer"
 msgstr "Érvénytelen társ"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:29
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:30
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:593
 msgid "Unban peer"
 msgstr "Társ kitiltásának visszavonása"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:34
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:35
 msgid "unbanned"
 msgstr "kitiltás visszavonva"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:36
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:37
 msgid "is not currently banned"
 msgstr "jelenleg nincs kitiltva"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:40
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:41
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:619
 msgid "Adjust peer bonuses"
 msgstr "társ bónusz állítása"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:48
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:49
 msgid "Bad speed value"
 msgstr "Sebesség értéke helytelen"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:53
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:54
 msgid "Bad capacity value"
 msgstr "Helytelen kapacitás érték"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:62
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:63
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:83
 msgid "Unsupported"
 msgstr "Nem támogatott"
@@ -2123,24 +2172,24 @@ msgstr "Nem támogatott"
 msgid "IPs Banned Until Restart"
 msgstr "IP-k Kitiltva Újraindításig"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:31
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:34
 msgid "IPv4 Addresses"
 msgstr "IPv4 címek"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:61
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:64
 msgid "IPv6 Addresses"
 msgstr "IPv6 címek"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:78
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:81
 msgid "IPs Permanently Banned"
 msgstr "Véglegesen kitiltott IP-k"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:83
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:86
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:119
 msgid "From"
 msgstr "Innen"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:85
+#: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:88
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:120
 msgid "To"
 msgstr "Ide"
@@ -2224,14 +2273,6 @@ msgstr "Azonnali Újraindítás"
 #: ../java/src/net/i2p/router/web/helpers/ConfigRestartBean.java:55
 msgid "Shutdown"
 msgstr "Kikapcsolás"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigRestartBean.java:69
-msgid "Restart imminent"
-msgstr "Újraindítás hamarosan"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigRestartBean.java:71
-msgid "Shutdown imminent"
-msgstr "Kikapcsolás hamarosan"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigRestartBean.java:75
 #, java-format
@@ -2398,15 +2439,15 @@ msgstr "TELJESÍTMÉNY FIGYELMEZTETÉS - a beállítások magas alagút mennyis�
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:108
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:338
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:538
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:310
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:539
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:311
 msgid "Inbound"
 msgstr "Bejövő"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:108
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:340
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:540
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:311
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:541
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:312
 msgid "Outbound"
 msgstr "Kimenő"
 
@@ -2645,7 +2686,7 @@ msgid "No \"{0}\" events found in previous {1}"
 msgstr "Nincsenek \"{0}\" események az előző: {1}"
 
 #: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:181
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:155
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:156
 msgid "Time"
 msgstr "Idő"
 
@@ -2654,7 +2695,6 @@ msgid "Event"
 msgstr "Esemény"
 
 #: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:186
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:596
 msgid "Details"
 msgstr "Részletek"
 
@@ -2726,91 +2766,87 @@ msgstr "Ábrázolt átlagok"
 msgid "plot events"
 msgstr "ábrázolt események"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:360
-msgid "All times are UTC."
-msgstr "Minden idő UTC (koordinált világidő)-ben van."
-
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:393
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:253
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:391
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:254
 msgid "Configure Graph Display"
 msgstr "Grafikon Kijelzés Beállítása"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:393
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:391
 msgid "Select Stats"
 msgstr "Statisztika Kiválasztása"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:398
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:396
 msgid ""
 "Note: Dimensions are for graph only (excludes title, labels and legend)."
 msgstr "Jó tudni: A kiterjedés csak a grafikonra vonatkozik (nem a címre, címkékre és jelmagyarázatra)."
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:399
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:397
 msgid "Graph size"
 msgstr "Grafikon mérete"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:400
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:398
 msgid "pixels wide"
 msgstr "pixel széles"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:401
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:399
 msgid "pixels high"
 msgstr "pixel magas"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:403
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:401
 msgid "Display period"
 msgstr "Időtartam megjelenítése"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:403
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:401
 msgid "minutes"
 msgstr "perc"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:406
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:404
 msgid "Refresh delay"
 msgstr "Frissítési késleltetés"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:422
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:420
 msgid "Plot type"
 msgstr "Tartalom típus"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:423
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:421
 msgid "Averages"
 msgstr "Átlagok"
 
 #. 7 days
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:424
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:422
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:525
 msgid "Events"
 msgstr "Események"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:425
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:423
 msgid "Hide legend"
 msgstr "Jelmagyarázat elrejtése"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:430
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:428
 msgid "Do not show legend on graphs"
 msgstr "Ne mutasd a jelmagyarázatot a grafikonon"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:431
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:429
 msgid "UTC"
 msgstr "UTC"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:436
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:434
 msgid "Use UTC time on graphs"
 msgstr "UTC idő használata grafikonokon"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:437
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:435
 msgid "Persistence"
 msgstr "Folytonosság"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:442
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:440
 msgid "Store graph data on disk"
 msgstr "Grafikon adatainak tárolása lemezen"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:443
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:441
 msgid "Save settings and redraw graphs"
 msgstr "Beállítások mentése és ábra újrarajzolása"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:510
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:508
 msgid "Graph settings saved"
 msgstr "Grafikon beállítások elmentve"
 
@@ -2882,8 +2918,8 @@ msgstr "Bővítmények kezelése"
 
 #. "anoncoin.i2p" + S + _x("The Anoncoin project") + S +
 #. "http://anoncoin.i2p/" + S + I + "anoncoin_32.png" + S +
-#. "colombo-bt.i2p" + S + _x("The Italian Bittorrent Resource") + S + "http
-#. ://colombo-bt.i2p/" + S + I + "colomboicon.png" + S +
+#. "colombo-bt.i2p" + S + _x("The Italian Bittorrent Resource") + S +
+#. "http://colombo-bt.i2p/" + S + I + "colomboicon.png" + S +
 #. _x("Dev Builds") + S + _x("Development builds of I2P") + S +
 #. "http://bobthebuilder.i2p/" + S + I + "script_gear.png" + S +
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:69
@@ -2946,8 +2982,8 @@ msgstr "Könnyű névtelen fájlmegosztás"
 #. "http://i2pwiki.i2p/" + S + I + "i2pwiki_logo.png" + S +
 #. "Ident " + _x("Microblog") + S + _x("Your premier microblogging service on
 #. I2P") + S + "http://id3nt.i2p/" + S + I + "ident_icon_blue.png" + S +
-#. _x("Javadocs") + S + _x("Technical documentation") + S + "http://i2p-
-#. javadocs.i2p/" + S + I + "education.png" + S +
+#. _x("Javadocs") + S + _x("Technical documentation") + S +
+#. "http://i2p-javadocs.i2p/" + S + I + "education.png" + S +
 #. "jisko.i2p" + S + _x("Simple and fast microblogging website") + S +
 #. "http://jisko.i2p/" + S + I + "jisko_console_icon.png" + S +
 #. _x("Key Server") + S + _x("OpenPGP Keyserver") + S + "http://keys.i2p/" + S
@@ -2984,18 +3020,6 @@ msgstr "I2P honlap"
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:92
 msgid "Project Website"
 msgstr "Projekt weboldala"
-
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:95
-msgid "Privacy guides and tutorials"
-msgstr "Titoktartási útmutatók és oktatások"
-
-#. _x("lenta news [ru]") + S + _x("Russian News Feed") + S +
-#. "http://lenta.i2p/" + S + I + "lenta_main_logo.png" + S +
-#. "Salt" + S + "salt.i2p" + S + "http://salt.i2p/" + S + I +
-#. "salt_console.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:95
-msgid "The Tin Hat"
-msgstr "Az Alumíniumsapka"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:103
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:432
@@ -3076,74 +3100,74 @@ msgstr "URL"
 msgid "Add"
 msgstr "Hozzáadás"
 
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:53
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:54
 msgid "Job runners"
 msgstr "Feladatok futásai"
 
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:59
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:60
 msgid "Active jobs"
 msgstr "Aktív feladatok"
 
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:63
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:64
 #, java-format
 msgid "started {0} ago"
 msgstr "kezdve ezelőtt: {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:69
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:70
 msgid "Just finished jobs"
 msgstr "Nemrég elkészült feladatok"
 
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:73
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:74
 #, java-format
 msgid "finished {0} ago"
 msgstr "elkészült ezelőtt: {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:79
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:80
 msgid "Ready/waiting jobs"
 msgstr "Készen álló/várakozó feladatok"
 
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:98
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:99
 msgid "Scheduled jobs"
 msgstr "Ütemezett feladatok"
 
 #. translators: {0} is a job name, {1} is a time, e.g. 6 min
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:109
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:110
 #, java-format
 msgid "{0} will start in {1}"
 msgstr "{0} indulni fog {1} múlva"
 
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:124
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:125
 msgid "Total Job Statistics"
 msgstr "Teljes Feladat Statisztika"
 
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:136
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:153
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:137
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:154
 msgid "Job"
 msgstr "Feladat"
 
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:136
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:137
 msgid "Queued"
 msgstr "Sorba állítva"
 
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:153
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:154
 msgid "Runs"
 msgstr "Lefutás"
 
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:154
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:155
 msgid "Dropped"
 msgstr "Elhagyva"
 
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:156
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:158
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:157
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:159
 msgid "Min"
 msgstr "Min"
 
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:157
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:158
 msgid "Pending"
 msgstr "Függő"
 
-#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:209
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:40
+#: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:210
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:44
 msgid "Summary"
 msgstr "Összegzés"
 
@@ -3162,251 +3186,259 @@ msgid "No log messages"
 msgstr "Nincs naplóüzenet"
 
 #. 0
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:41
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:45
 msgid "Local Router"
 msgstr "Helyi router"
 
 #. 1
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:42
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:46
 msgid "Router Lookup"
 msgstr "Router keresése"
 
 #. 2
 #. advanced below here
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:44
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:48
 msgid "All Routers"
 msgstr "Összes router"
 
 #. 3
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:45
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:49
 msgid "All Routers with Full Stats"
 msgstr "Összes router minden adattal"
 
 #. 4
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:46
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:50
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:562
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:866
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:867
 msgid "LeaseSets"
 msgstr "LeaseSet-ek"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:114
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:115
 msgid ""
 "Never reveal your router identity to anyone, as it is uniquely linked to "
 "your IP address in the network database."
 msgstr "Soha ne add ki a router azonosságodat senkinek, mert az egyedülállóan kapcsolódik a te IP címedhez a hálózati adatbázisban."
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:137
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:376
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:958
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:539
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:828
-#: ../java/strings/Strings.java:54
-msgid "Router"
-msgstr "Router"
-
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:140
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:385
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:141
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:456
 msgid "not found in network database"
 msgstr "nem található a hálózati adatbázisban"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:185
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:392
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:725
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:781
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:186
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:463
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:796
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:852
 msgid "Previous Page"
 msgstr "Előző Oldal"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:187
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:395
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:728
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:784
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:188
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:466
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:799
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:855
 msgid "Page"
 msgstr "Oldal"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:399
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:732
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:787
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:433
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:929
+msgid "Country"
+msgstr "Ország"
+
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:441
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:736
+msgid "Port"
+msgstr "Port"
+
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:443
+msgid "MTU"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:455
+#: ../java/strings/Strings.java:55
+msgid "Transport"
+msgstr "Szállítás"
+
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:470
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:803
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:858
 msgid "Next Page"
 msgstr "Következő Oldal"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:475
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:546
 msgid "Manually Configure Floodfill Participation"
 msgstr "Árasztásos-kitöltésben Való Részvétel Kézi Beállítása"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:476
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:547
 msgid "Configure Floodfill Participation"
 msgstr "Árasztásos-kitöltésben Való Részvétel Beállítása"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:512
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:583
 msgid "LeaseSet"
 msgstr "Úticél Kapcsolódási Információ (LeaseSet)"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:518
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:341
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:589
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:343
 msgid "Local"
 msgstr "Helyi"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:521
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:592
 msgid "Unpublished"
 msgstr "Nem közzétett"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:546
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:569
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:617
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:640
 msgid "Add to address book"
 msgstr "Hozzáadás címjegyzékhez"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:548
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:571
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:619
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:642
 msgid "Add to local address book"
 msgstr "Hozzáadás helyi címjegyzékhez"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:582
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:653
 #, java-format
 msgid "Published {0} ago"
 msgstr "Közzétéve ezelőtt: {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:588
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:610
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:662
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:659
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:681
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:733
 #, java-format
 msgid "Expires in {0}"
 msgstr "Lejár {0} belül"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:590
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:612
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:664
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:661
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:683
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:735
 #, java-format
 msgid "Expired {0} ago"
 msgstr "Lejárt {0} ezelőtt"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:652
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:723
 msgid "Lease"
 msgstr "Kiad"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:656
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:727
 msgid "Tunnel"
 msgstr "Alagút"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:702
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:773
 msgid "Not initialized"
 msgstr "Nincs inicializálva"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:805
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:876
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:444
 msgid "Network Database Router Statistics"
 msgstr "Hálózati Adatbázis Router Statisztika"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:812
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:834
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:858
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:883
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:905
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:929
 msgid "Count"
 msgstr "Mennyiség"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:834
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:905
 msgid "Transports"
 msgstr "Átvitel"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:858
-msgid "Country"
-msgstr "Ország"
-
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:955
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1025
 msgid "Our Router Identity"
 msgstr "Saját Router Azonosságunk"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:968
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1038
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:840
 msgid "View extended router info"
 msgstr "Kiterjesztett router infó megtekintése"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:970
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:840
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1040
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:841
 msgid "Full entry"
 msgstr "Teljes bejegyzés"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:976
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1046
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:240
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:935
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:936
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:554
 msgid "Hidden"
 msgstr "Rejtett"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:976
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:935
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1046
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:936
 msgid "Updated"
 msgstr "Frissített"
 
 #. shouldnt happen
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:981
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:987
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1051
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1057
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1188
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:938
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:939
 msgid "Published"
 msgstr "Közzétett"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:991
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:940
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1061
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:941
 msgid "Signing Key"
 msgstr "Aláíró Kulcs"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:997
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1067
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:37
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:943
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:944
 msgid "Addresses"
 msgstr "Címek"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1016
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1086
 msgid "cost"
 msgstr "költség"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1045
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1126
 msgid "Hidden or starting up"
 msgstr "Rejtett vagy indul"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1045
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1126
 msgid "SSU"
 msgstr "SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1045
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1126
 msgid "SSU with introducers"
 msgstr "SSU bemutatókkal"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1046
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1127
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:45
 msgid "NTCP"
 msgstr "NTCP"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1046
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1127
 msgid "NTCP and SSU"
 msgstr "NTCP és SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1046
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1127
 msgid "NTCP and SSU with introducers"
 msgstr "NTCP és SSU bemutatókkal"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1047
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1128
 msgid "IPv6 Only SSU, introducers"
 msgstr "IPv6 Csak SSU, közzétevők"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1047
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1128
 msgid "IPv6 SSU"
 msgstr "IPv6 SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1047
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1128
 msgid "IPv6 SSU, introducers"
 msgstr "IPv6 SSU, közzétevők"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1048
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1129
 msgid "IPv6 NTCP"
 msgstr "IPv6 NTCP"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1048
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1129
 msgid "IPv6 NTCP, SSU"
 msgstr "IPv6 NTCP, SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1048
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1129
 msgid "IPv6 NTCP, SSU, introducers"
 msgstr "IPv6 NTCP, SSU, közzétevők"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1048
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1129
 msgid "IPv6 Only NTCP, SSU, introducers"
 msgstr "IPv6 Csak NTCP, SSU, közzétevők"
 
@@ -3513,14 +3545,14 @@ msgstr "Mennyi idő telt el az utolsó csomag fogadása / küldése óta"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:256
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:317
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:482
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:483
 msgid "Idle"
 msgstr "Üres"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:257
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:318
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:487
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:297
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:488
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:298
 msgid "In/Out"
 msgstr "Be/Ki"
 
@@ -3534,14 +3566,14 @@ msgstr "Mennyi ideje lett a kapcsolat létrehozva"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:258
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:319
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:492
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:493
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1111
 msgid "Up"
 msgstr "Fel"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:259
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:320
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:494
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:495
 msgid "Skew"
 msgstr "Pontatlanság"
 
@@ -3589,7 +3621,7 @@ msgstr "Maximális fogadási / küldési csomagméret (bájt)"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:271
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:321
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:514
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:515
 msgid "RX"
 msgstr "Fogadott"
 
@@ -3599,7 +3631,7 @@ msgstr "A társtól érkezett üzenetek teljes száma"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:272
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:322
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:516
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:517
 msgid "TX"
 msgstr "Küldött"
 
@@ -3608,7 +3640,7 @@ msgid "The total number of messages sent to the peer"
 msgstr "A társnak küldött üzenetek teljes száma"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:273
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:519
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:520
 msgid "Dup RX"
 msgstr "Duplex Fogadott"
 
@@ -3617,7 +3649,7 @@ msgid "The total number of duplicate packets received from the peer"
 msgstr "A társtól érkezett duplikált csomagok teljes száma"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:274
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:521
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:522
 msgid "Dup TX"
 msgstr "Duplex Küldött"
 
@@ -3657,7 +3689,7 @@ msgid "Is peer backlogged?"
 msgstr "Társnak hátramaradása van?"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:396
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:710
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:715
 #, java-format
 msgid "{0} peer"
 msgid_plural "{0} peers"
@@ -3672,75 +3704,75 @@ msgstr "UDP csatlakozások"
 msgid "Sort by peer hash"
 msgstr "Rendezés társ hash szerint"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:483
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:484
 msgid "Sort by idle inbound"
 msgstr "Rendezés üres bejövő szerint"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:485
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:486
 msgid "Sort by idle outbound"
 msgstr "Rendezés üres kimenő szerint"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:488
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:489
 msgid "Sort by inbound rate"
 msgstr "Rendezés bejövő sebesség szerint"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:490
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:491
 msgid "Sort by outbound rate"
 msgstr "Rendezés kimenő sebeeség szerint"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:493
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:494
 msgid "Sort by connection uptime"
 msgstr "Rendezés kapcsolat indítása óta eltelt idő szerint"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:495
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:496
 msgid "Sort by clock skew"
 msgstr "Rendezés óra eltérése szerint"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:499
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:500
 msgid "Sort by congestion window"
 msgstr "Rendezés torlódás ablak szerint"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:501
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:502
 msgid "Sort by slow start threshold"
 msgstr "Rendezés lassú indítás küszöb szerint"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:504
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:505
 msgid "Sort by round trip time"
 msgstr "Rendezés körbejárási idő szerint"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:508
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:509
 msgid "Sort by retransmission timeout"
 msgstr "Rendezés újraátviteli időtúllépés szerint"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:511
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:512
 msgid "Sort by outbound maximum transmit unit"
 msgstr "Rendezés maximális kimenő továbbítási egységenként"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:515
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:516
 msgid "Sort by packets received"
 msgstr "Rendezés fogadott csomagok szerint"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:517
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:518
 msgid "Sort by packets sent"
 msgstr "Rendezés küldött csomagok szerint"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:520
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:521
 msgid "Sort by packets received more than once"
 msgstr "Rendezés több, mint egyszer fogadott csomagok szerint"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:522
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:523
 msgid "Sort by packets retransmitted"
 msgstr "Rendezés újraközvetített csomagok szerint"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:543
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:544
 msgid "We offered to introduce them"
 msgstr "Fejajánlottuk, hogy bemutatjuk őket"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:545
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:546
 msgid "They offered to introduce us"
 msgstr "Felajánlották, hogy bemutatnak minket"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:557
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:558
 #, java-format
 msgid "{0} fail"
 msgid_plural "{0} fails"
@@ -3748,14 +3780,14 @@ msgstr[0] "{0} sikertelen"
 msgstr[1] "{0} sikertelen"
 
 #. 1
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:563
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:564
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:178
 #: ../java/src/net/i2p/router/web/helpers/ProfilesHelper.java:15
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:939
 msgid "Banned"
 msgstr "Kitiltva"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:626
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:631
 msgid "backlogged"
 msgstr "hátramaradás van"
 
@@ -3849,12 +3881,12 @@ msgid "Test Fails"
 msgstr "Teszt sikertelen"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:205
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:842
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:843
 msgid "profile"
 msgstr "profil"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:206
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:843
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:844
 msgid "Configure peer"
 msgstr "Társ beállítása"
 
@@ -3863,14 +3895,14 @@ msgid "Integ. Value"
 msgstr "Változó Értéke"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:226
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:888
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:890
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:889
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:891
 msgid "Last Heard About"
 msgstr "Legutoljára Hallott a Következőről:"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:227
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:895
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:897
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:896
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:898
 msgid "Last Heard From"
 msgstr "Legutoljára Hallott a Következőtől:"
 
@@ -3895,22 +3927,22 @@ msgid "1d Resp. Time"
 msgstr "1nap Válasz Idő"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:233
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:904
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:905
 msgid "Last Good Lookup"
 msgstr "Legutolsó Helyes Kikeresés"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:234
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:911
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:912
 msgid "Last Bad Lookup"
 msgstr "Legutolsó Helytelen Kikeresés"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:235
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:918
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:919
 msgid "Last Good Store"
 msgstr "Legutolsó Helyes Tárolás"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:236
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:925
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:926
 msgid "Last Bad Store"
 msgstr "Legutolsó Helytelen Tárolás"
 
@@ -3972,11 +4004,11 @@ msgstr "{0} megosztott sávszélesség alatt"
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:324
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:325
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:328
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:199
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:200
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:203
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:201
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:204
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:207
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:205
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:208
 #, java-format
 msgid "{0} shared bandwidth"
 msgstr "{0} megosztott sávszélesség"
@@ -3986,7 +4018,7 @@ msgid "Reachable"
 msgstr "Elérhető"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:333
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:208
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:209
 #, java-format
 msgid "Over {0} shared bandwidth"
 msgstr "{0} megosztott sávszélesség felett"
@@ -4166,7 +4198,7 @@ msgid "Events in peak period"
 msgstr "Események csúcsidőben"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:254
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:252
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:253
 msgid "Graph Data"
 msgstr "Grafikon Adatok"
 
@@ -4384,10 +4416,6 @@ msgstr "Egészségi Állapot"
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:441
 msgid "NetDB"
 msgstr "NetDB"
-
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:444
-msgid "Show list of all known I2P routers"
-msgstr "Minden ismert I2P router listájának megjelenítése"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:453
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:805
@@ -4788,7 +4816,7 @@ msgstr "Alagutak építés alatt"
 #. note that if the wording changes in i2ptunnel.config, we have to
 #. keep the old string here as well for existing installs
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:637
-#: ../java/strings/Strings.java:36
+#: ../java/strings/Strings.java:35
 msgid "shared clients"
 msgstr "osztott kliensek"
 
@@ -4799,20 +4827,6 @@ msgstr "Telepítéshez kattints az újraindításra"
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:843
 msgid "Click Shutdown and restart to install"
 msgstr "Telepítéshez kattints a lekapcsolás és újraindítás -ra"
-
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:844
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:861
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:873
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:885
-#, java-format
-msgid "Version {0}"
-msgstr "{0} Verzió"
-
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:860
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:872
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:884
-msgid "Update available"
-msgstr "Frissítés elérhető"
 
 #. Note to translators: parameter is a version, e.g. "0.8.4"
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:908
@@ -4891,13 +4905,13 @@ msgstr "Ugrás az aljára"
 msgid "Select a section to add"
 msgstr "Válassz hozzáadandó részt"
 
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:825
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:826
 msgid "Our info"
 msgstr "Mi infónk"
 
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:883
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:890
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:897
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:884
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:891
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:898
 msgid "n/a"
 msgstr "nem elérhető"
 
@@ -4935,7 +4949,7 @@ msgid "Receive on"
 msgstr "Fogadás a következőn"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:120
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:298
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:299
 msgid "Expiration"
 msgstr "Lejárat"
 
@@ -4952,98 +4966,98 @@ msgid "Role"
 msgstr "Szerep"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:121
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:298
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:299
 msgid "Usage"
 msgstr "Használat"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:143
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:153
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:342
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:347
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:144
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:154
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:344
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:349
 msgid "Tunnel identity"
 msgstr "Alagút azonosító"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:164
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:165
 msgid "grace period"
 msgstr "türelmi idő"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:174
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:175
 msgid "Outbound Endpoint"
 msgstr "Kimenő Végpont"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:176
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:177
 msgid "Inbound Gateway"
 msgstr "Bejövő Átjáró (Gateway)"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:178
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:304
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:179
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:305
 msgid "Participant"
 msgstr "Résztvevő"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:184
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:185
 #, java-format
 msgid "Limited display to the {0} tunnels with the highest usage"
 msgstr "Kijelző limitálva {0} alagútra legtöbb használattal"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:186
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:187
 msgid "Inactive participating tunnels"
 msgstr "Nem aktív résztvevő alagút"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:189
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:384
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:190
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:386
 msgid "Lifetime bandwidth usage"
 msgstr "Élethossz sávszélesség használat"
 
 #. bwShare > 12
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:191
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:192
 msgid "Not enough shared bandwidth to build participating tunnels."
 msgstr "Nincs elég megosztott sávszélesség közreműködő alagutak építéséhez."
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:192
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:193
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:583
 msgid "Configure"
 msgstr "Beállít"
 
 #. renderPeers(out);
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:196
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:197
 msgid "Bandwidth Tiers"
 msgstr "Sávszélességi Szintek"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:297
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:298
 msgid "Inbound or outbound?"
 msgstr "Bejövő vagy kimenő?"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:298
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:299
 msgid "Gateway"
 msgstr "Átjáró (Gateway)"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:301
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:302
 msgid "Participants"
 msgstr "Résztvevők"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:307
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:308
 msgid "Endpoint"
 msgstr "Végpont"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:341
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:343
 msgid "Locally hosted tunnel"
 msgstr "Helyben közzétett alagút"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:343
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:348
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:345
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:350
 msgid "Bandwidth tier"
 msgstr "Sávszélességi szint"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:370
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:378
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:372
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:380
 msgid "Build in progress"
 msgstr "Építés folyamatban"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:385
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:387
 msgid "in"
 msgstr "be"
 
-#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:386
+#: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:388
 msgid "out"
 msgstr "ki"
 
@@ -5134,67 +5148,59 @@ msgstr "I2P webszerver (I2P Oldal)"
 msgid "Browser launch at startup"
 msgstr "Böngésző betöltése indításkor"
 
-#: ../java/strings/Strings.java:28
-msgid "BOB application bridge"
-msgstr "BOB alkalmazás híd"
-
-#: ../java/strings/Strings.java:30
+#: ../java/strings/Strings.java:29
 msgid "Open Router Console in web browser at startup"
 msgstr "Indításkor a Router Konzol megnyitása böngészőben"
 
-#: ../java/strings/Strings.java:37
+#: ../java/strings/Strings.java:36
 msgid "IRC proxy"
 msgstr "IRC proxy"
 
-#: ../java/strings/Strings.java:38
+#: ../java/strings/Strings.java:37
 msgid "I2P Site"
 msgstr "I2P Oldal"
 
-#: ../java/strings/Strings.java:39
+#: ../java/strings/Strings.java:38
 msgid "I2P webserver"
 msgstr "I2P webszerver"
 
-#: ../java/strings/Strings.java:40
+#: ../java/strings/Strings.java:39
 msgid "HTTP Proxy"
 msgstr "HTTP Proxy"
 
 #. hardcoded in i2psnark
-#: ../java/strings/Strings.java:42
+#: ../java/strings/Strings.java:41
 msgid "I2PSnark"
 msgstr "I2PSnark"
 
 #. standard themes for ConfigUIHelper
-#: ../java/strings/Strings.java:46
+#: ../java/strings/Strings.java:45
 msgid "dark"
 msgstr "sötét"
 
-#: ../java/strings/Strings.java:47
+#: ../java/strings/Strings.java:46
 msgid "light"
 msgstr "világos"
 
-#: ../java/strings/Strings.java:52
+#: ../java/strings/Strings.java:51
 msgid "Encryption"
 msgstr "Titkosítás"
 
-#: ../java/strings/Strings.java:55
+#: ../java/strings/Strings.java:54
 msgid "Stream"
 msgstr "Stream"
 
-#: ../java/strings/Strings.java:56
-msgid "Transport"
-msgstr "Szállítás"
-
 #. parameters in transport addresses (netdb.jsp)
 #. may or may not be worth translating
-#: ../java/strings/Strings.java:61
+#: ../java/strings/Strings.java:60
 msgid "host"
 msgstr "hoszt"
 
-#: ../java/strings/Strings.java:62
+#: ../java/strings/Strings.java:61
 msgid "key"
 msgstr "kulcs"
 
-#: ../java/strings/Strings.java:63
+#: ../java/strings/Strings.java:62
 msgid "port"
 msgstr "port"
 
@@ -5357,7 +5363,7 @@ msgid "Advanced Network Configuration"
 msgstr "Haladó Hálózati Beállítások"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:525
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:622
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:578
 msgid ""
 "I2P will work best if you configure your rates to match the speed of your "
 "internet connection."
@@ -5392,34 +5398,34 @@ msgid ""
 msgstr "A kimenő folyam megosztásának mennyisége (KB/mp Ki) fogja meghatározni a teljes hozzájárulásod a hálózathoz."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:536
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:626
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:582
 msgid "KBps In"
 msgstr "KB/mp Be"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:544
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:633
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:589
 msgid "KBps Out"
 msgstr "KB/mp Ki"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:550
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:639
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:595
 msgid "Share"
 msgstr "Megoszt"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:557
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:582
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:646
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:602
 msgid "NOTE"
 msgstr "MEGJEGYZÉS"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:559
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:648
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:604
 #, java-format
 msgid "You have configured I2P to share only {0} KBps."
 msgstr "Az I2P-t úgy állítottad be, hogy csak {0} KB-t osszon meg másodpercenként."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:562
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:651
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:607
 msgid "I2P requires at least 12KBps to enable sharing. "
 msgstr "A megosztás engedélyezéséhez az I2P-nek legalább 12 KB/mp-re van szüksége."
 
@@ -5435,7 +5441,7 @@ msgid ""
 msgstr "Fedőforgalmat generál, ezzel segít anonimitásod növelésében és segíti a hálózatot is."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:566
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:656
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:612
 #, java-format
 msgid "You have configured I2P to share {0} KBps."
 msgstr "Úgy állítottad be az I2P-t, hogy {0} KB/mp-t osszon meg."
@@ -6147,10 +6153,6 @@ msgstr "A bónusz lehet pozitív vagy negatív és hatással van a társ szerepe
 msgid "profiles page"
 msgstr "profilok lap"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:621
-msgid "Banned Peers"
-msgstr "Kitiltott Társak"
-
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:640
 msgid "Banned IPs"
 msgstr "Kitiltott IP-k"
@@ -6538,22 +6540,18 @@ msgstr "Célszerű fontolóra venni a tülermes kikapcsolást, mint fentett, azu
 msgid "Debugging"
 msgstr "Hibaelhárítás"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:633
-msgid "View the job queue"
-msgstr "Feladat sor megtekintése"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:637
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:635
 msgid ""
 "At times, it may be helpful to debug I2P by getting a thread dump. To do so,"
 " please select the following option and review the thread dumped to <a "
 "href=\"logs.jsp#servicelogs\">wrapper.log</a>."
 msgstr "Bizonyos esetekben segíthet az I2P hibajavításában a szál lerakás (thread dump). Ennek eléréséhez kérlek, válaszd ki a következő opciót és nézd át a lerakott szálat a következőn: <a href=\"logs.jsp#servicelogs\">wrapper.log</a>."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:653
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:651
 msgid "Launch browser on router startup?"
 msgstr "Böngésző indítása a router indításakor?"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:657
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:655
 #, java-format
 msgid ""
 "I2P''s main configuration interface is this web console, so for your "
@@ -7595,10 +7593,6 @@ msgid ""
 "accessible from localhost."
 msgstr "Hacsak nincs szükséged eléréshez más gépekről, ezeknek csak localhost-ról kéne, hogy elérhetőek legyenek."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:736
-msgid "Port"
-msgstr "Port"
-
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:738
 msgid "Function"
 msgstr "Funkció"
@@ -7972,191 +7966,167 @@ msgid ""
 "Internet in general, you can visit our {0}Project Website{1}."
 msgstr "Ha többet szeretnél tudni magáról az I2P Projektről vagy a Láthatatlan Internetről általában, ellátogathatsz a {0}Projektünk weboldalára{1}."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:581
-msgid "Bandwidth Test Results"
-msgstr "Sávszélességi Teszt Eredményei"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:583
-msgid "Test server location"
-msgstr "Teszt Szerver Helye"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:587
-msgid "Completion status"
-msgstr "Kész állapot"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:600
-msgid "Downstream Bandwidth"
-msgstr "Letöltési Sávszélesség"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:604
-msgid "Upstream Bandwidth"
-msgstr "Fetöltési Sávszélesség"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:608
-msgid "Share of Bandwidth for I2P"
-msgstr "Sávszélesség rész az I2P számára"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:620
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:576
 msgid "Bandwidth Configuration"
 msgstr "Sávszélesség Beállításai"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:652
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:659
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:608
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:615
 msgid ""
 "By donating your bandwidth to participating traffic, you not only help "
 "others, you improve your own anonymity and performance."
 msgstr "Azzal, hogy sávszélességet adományozol a közreműködő forgalomhoz, nemcsak másokat segítesz, hanem a saját névtelenségedet és a teljesítményt is jobbá teszed."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:654
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:661
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:610
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:617
 msgid ""
 "We recommend sharing 75% or more for I2P, but you can adjust based on your "
 "needs."
 msgstr "Javasoljuk az I2P számára 75% vagy több megosztását, de beállíthatod a saját szükségleteid szerint."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:671
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:627
 msgid "Browser and Application Setup"
 msgstr "Böngésző és Alkalmazás Beállítás"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:673
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:629
 msgid "Your browser needs to be configured to work with I2P."
 msgstr "A böngésződet be kell állítani, hogy az I2P-vel működni tudjon."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:675
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:631
 msgid ""
 "We have instructions for configuring both Firefox and Chromium based "
 "browsers with I2P."
 msgstr "Vannak útmutatóink az I2P-hez való beállításra mind Firefox, mind Chromium alapú böngészőkhöz."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:677
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:633
 #, java-format
 msgid "You can find these instructions on our {0}website{1}."
 msgstr "Ezeket az útmutatókat megtalálhatod a {0}honlapunkon{1}."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:683
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:639
 msgid ""
 "Otherwise, the recommended way to browse I2P websites is with a separate "
 "profile in the Firefox browser."
 msgstr "Máskülönben az I2P weboldalak böngészésének javasolt módja külön profillal a Firefox böngészőben."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:685
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:641
 #, java-format
 msgid "{0}Install Firefox{1}"
 msgstr "{0}Telepítsd a Firefox-ot{1}"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:687
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:643
 #, java-format
 msgid "{0}Install the I2P Firefox profile{1}"
 msgstr "{0}Telepítsd az I2P Firefox profilt{1}"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:693
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:649
 msgid ""
 "The I2P router also comes with its own versions of common, useful internet "
 "applications."
 msgstr "Az I2P router-nek is vannak saját gyakori, hasznos Internet alklamazásai."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:695
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:651
 #, java-format
 msgid "You can download files with {0}bittorrent{1}."
 msgstr "Fájlokat tölthetsz le {0}bittorrent-tel{1}."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:697
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:653
 #, java-format
 msgid "You can also send and receive {0}email{1}."
 msgstr "Küldhetsz és fogadhatsz {0}emailt{1} is."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:699
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:655
 #, java-format
 msgid ""
 "Besides that, you can use the built-in {0}web server{1} so you can create, "
 "communicate, and share your content."
 msgstr "Ezeken kívül használhatod a beépített {0}web szervert{1}, előállíthatod, közzéteheted és megoszthatod az általad készített tartalmat."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:701
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:657
 msgid ""
 "These applications work with I2P automatically and require no additional "
 "configuration."
 msgstr "Ezek az alkalmazások automatikusan működnek az I2P-vel és nem igényelnek további beállítást."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:703
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:659
 #, java-format
 msgid ""
 "To help make I2P addresses easier to read and remember, the I2P router also "
 "includes its built-in {0}Address Book{1}."
 msgstr "Hogy könnyebb legyen az I2P címeket olvasni és emlékezni rájuk, az I2P router ugyancsak tartalmaz beélpített {0}Címjegyzéket{1}."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:705
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:661
 msgid ""
 "The Address Book is where you keep track of all your I2P \"Contacts\" by "
 "giving them human-readable names."
 msgstr "A címjegyzék az, ahol az összes I2P \"Névbejegyzést\" nyomon követed azzal, hogy emberileg olvasható nevet adsz nekik."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:707
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:663
 msgid ""
 "This can be used for the sites you like to visit, messaging contacts, or "
 "potentially any other service on I2P."
 msgstr "Ez használható azokhoz az oldalakhoz, melyeket látogatni szeretsz, üzenetet küldeni másoknak vagy lehetségesen bármelyik másik I2P szolgáltatáshoz."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:709
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:665
 msgid ""
 "To help you get started, the address book can be used to subscribe to lists "
 "of addresses distributed by other I2P users."
 msgstr "Hogy segítsünk az indulásban, a címjegyzék használható a más I2P felhasználók által terjesztett címlistákra való feliratkozáshoz."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:717
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:673
 msgid "Welcome to the Invisible Internet!"
 msgstr "Üdvözlünk a Láthatatlan Interneten!"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:719
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:675
 msgid ""
 "It will take some time for your peers to integrate your router into the "
 "network, but while that is happening you can still explore I2P applications "
 "and get to know your way around the router console."
 msgstr "Beletelik a társaidnak némi időbe, hogy beillesszék a router-ed a hálózatba, amíg ez folyamatban van, felfedezhetsz I2P alkalmazásokat és megismerkedhetsz a router konzollal."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:721
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:677
 #, java-format
 msgid ""
 "There is a quick guide, news about the latest release, an FAQ, and "
 "troubleshooting guide available on the {0}console{1} page."
 msgstr "Létezik gyors útmutató, hírek a legújabb kiadásról, GYIK és hibaelhárító kalauz, rendelkezésre állnak a {0}konzol{1} oldalon."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:723
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:679
 msgid "You may notice a message in the sidebar that I2P is rejecting tunnels."
 msgstr "Lehet, hogy feltűnik az üzenet az oldalsávban, hogy az I2P alagutakat utasít el."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:725
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:681
 msgid ""
 "This is normal behavior as part of the startup process, to make sure that "
 "your router is ready to help others with participating traffic."
 msgstr "Ez a rendes működés és része az indulási folyamatnak, hogy biztos legyen, hogy a router-ed készen van arra, hogy másokat segítsen hozzájáruló forgalommal."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:727
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:683
 msgid ""
 "When the connection indicators in the sidebar turn green, you are ready to "
 "explore the Invisible Internet."
 msgstr "Amikor a kapcsolat kijelzői az oldalsávon zöldre váltanak, készen állsz arra, hogy felfedezd a Láthatatlan Internetet."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:742
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:698
 msgid "Previous"
 msgstr "Előző"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:749
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:705
 msgid "Skip Setup"
 msgstr "Beállítás Kihagyása"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:755
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:711
 msgid "Skip Bandwidth Test"
 msgstr "Sávszélességi Teszt Kihagyása"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:761
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:717
 msgid "Cancel Bandwidth Test"
 msgstr "Sávszélességi Teszt Törlése"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:767
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:723
 msgid "Next"
 msgstr "Következő"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:773
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:729
 msgid "Finished"
 msgstr "Befejeződött"

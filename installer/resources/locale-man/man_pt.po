@@ -6,12 +6,14 @@
 # 
 # Translators:
 # Manuela Silva <mmsrs@sky.com>, 2017
+# Eduardo Rodrigues, 2022
+# L., 2022
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2021-11-27 13:31-0000\n"
-"Last-Translator: Manuela Silva <mmsrs@sky.com>, 2017\n"
+"Last-Translator: L., 2022\n"
 "Language-Team: Portuguese (https://www.transifex.com/otf/teams/12694/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -198,6 +200,8 @@ msgstr "B<-t> segundos"
 #, no-wrap
 msgid "Sets the inactivity timeout. The default is 60 seconds."
 msgstr ""
+"Especifique o intervalo de tempo de espera. O valor padrão, por omissão, é "
+"de 60 segundos."
 
 #. type: Plain text
 #: man/eepget.1:79
@@ -208,7 +212,7 @@ msgstr "B<-u> nome de utilizador"
 #: man/eepget.1:79
 #, no-wrap
 msgid "Sets the username for proxy authorization, if required."
-msgstr ""
+msgstr "Defina o nome de usuário para a autorização do proxy, se necessário."
 
 #. type: Plain text
 #: man/eepget.1:85
@@ -227,7 +231,7 @@ msgstr ""
 #: man/eepget.1:88
 #, no-wrap
 msgid "EXIT STATUS"
-msgstr ""
+msgstr "STATUS DE SAÍDA"
 
 #. type: Plain text
 #: man/eepget.1:92
@@ -245,8 +249,9 @@ msgstr "COMUNICAR ERROS"
 #. type: Plain text
 #: man/eepget.1:98 man/i2prouter.1:59 man/i2prouter-nowrapper.1:29
 msgid ""
-"Please enter an issue on E<.UR https://i2pgit.org/i2p-"
-"hackers/i2p.i2p/-/issues> the I2P GitLab server E<.UE .>"
+"Please enter an issue on E<.UR "
+"https://i2pgit.org/i2p-hackers/i2p.i2p/-/issues> the I2P GitLab server E<.UE"
+" .>"
 msgstr ""
 
 #. type: SH
@@ -258,7 +263,7 @@ msgstr "CONSULTAR TAMBÉM"
 #. type: Plain text
 #: man/eepget.1:103
 msgid "B<i2prouter>(1)  B<curl>(1)  B<wget>(1)"
-msgstr ""
+msgstr "B<i2prouter>(1)  B<curl>(1)  B<wget>(1)"
 
 #. type: TH
 #: man/i2prouter.1:1
@@ -269,7 +274,7 @@ msgstr "I2PROUTER"
 #. type: Plain text
 #: man/i2prouter.1:5
 msgid "i2prouter - start and stop the I2P router"
-msgstr ""
+msgstr "i2prouter - iniciar e interromper o roteador I2P"
 
 #. type: Plain text
 #: man/i2prouter.1:9
@@ -294,7 +299,7 @@ msgstr "B<console>"
 #. type: Plain text
 #: man/i2prouter.1:17
 msgid "Runs I2P as a console application under the current user."
-msgstr ""
+msgstr "Executa a I2P como uma aplicação em modo console sob o usuário atual."
 
 #. type: IP
 #: man/i2prouter.1:19
@@ -327,7 +332,7 @@ msgstr "B<restart>"
 #. type: Plain text
 #: man/i2prouter.1:29
 msgid "Stops the I2P service and then starts it."
-msgstr ""
+msgstr "Interrompe o serviço I2P e, em seguida, o inicia."
 
 #. type: IP
 #: man/i2prouter.1:31
@@ -338,7 +343,7 @@ msgstr "B<condrestart>"
 #. type: Plain text
 #: man/i2prouter.1:33
 msgid "Restart the I2P service only if it is already running."
-msgstr ""
+msgstr "Reiniciar o serviço I2P apenas se estiver em execução."
 
 #. type: IP
 #: man/i2prouter.1:35
@@ -349,7 +354,7 @@ msgstr "B<graceful>"
 #. type: Plain text
 #: man/i2prouter.1:37
 msgid "Stop I2P gracefully (may take up to 11 minutes)"
-msgstr ""
+msgstr "Parar a I2P graciosamente (pode demorar até 11 minutos)"
 
 #. type: IP
 #: man/i2prouter.1:39
@@ -382,7 +387,7 @@ msgstr "B<status>"
 #. type: Plain text
 #: man/i2prouter.1:49
 msgid "Prints whether the I2P service is running."
-msgstr ""
+msgstr "Imprime se o serviço I2P está em execução."
 
 #. type: IP
 #: man/i2prouter.1:51
@@ -409,7 +414,7 @@ msgstr ""
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:5
 msgid "i2prouter-nowrapper - start the I2P router"
-msgstr ""
+msgstr "i2prouter-nowrapper - inicia o roteador I2P"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:8
@@ -423,6 +428,9 @@ msgid ""
 "will not restart if it crashes.  Also, it will use the default memory size, "
 "which may not be enough for I2P."
 msgstr ""
+"Inicia o roteador I2P sem o invólucro do serviço. Isto significa que o "
+"roteador não reinicializará quando travar. Ademais, será usada a quantidade "
+"de memória padrão. que, talvez, não seja suficiente para a I2P."
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:23

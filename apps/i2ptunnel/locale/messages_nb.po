@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-17 13:12+0000\n"
-"PO-Revision-Date: 2021-11-17 13:34+0000\n"
-"Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
+"PO-Revision-Date: 2011-02-13 11:46+0000\n"
+"Last-Translator: Allan Nordhøy <epost@anotheragency.no>, 2016-2017\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/otf/I2P/language/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1631,7 +1631,7 @@ msgstr "Mål"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:371
 msgid "Hostname"
-msgstr ""
+msgstr "Vertsnavn"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:412
 msgid "Share your site using the hostname"
@@ -2104,7 +2104,7 @@ msgstr "Dette gjør at både TCP og UDP-tilkoblinger skal sendes gjennom en SOCK
 msgid ""
 "A client tunnel implementing the SOCKS protocol, which is customized for "
 "connecting to IRC networks."
-msgstr ""
+msgstr "En klient tunnel implementering av SOCKS-protokollen, som er tilpasset for tilkobling til IRC-nettverk."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:310
 msgid ""
@@ -2229,7 +2229,7 @@ msgid ""
 "This can be useful for frequently-used tunnels (especially server tunnels), "
 "but for tunnels that are only used occasionally it would mean that the I2P "
 "router is creating and maintaining unnecessary tunnels."
-msgstr ""
+msgstr "Dette kan være nyttig for ofte brukte tunneler (spesielt tjenertunneler), men for tunneler som bare brukes innimellom vil det bety at I2P-ruteren skaper og opprettholder unødvendige tunneler."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:604
 msgid "The wizard has now collected enough information to create your tunnel."
@@ -2298,7 +2298,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:750
 msgid "Return to previous page"
-msgstr ""
+msgstr "Gå tilbake til forrige side"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:753
 msgid "Previous"

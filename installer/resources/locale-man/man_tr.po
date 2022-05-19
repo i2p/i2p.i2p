@@ -193,7 +193,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:67
 msgid "B<-p> proxy_host[:port]"
-msgstr "B<-p> VekilSunucu[:KapıNumarası]"
+msgstr "B<-p> VekilSunucu[:BağlantıNoktası]"
 
 #. type: TP
 #: man/eepget.1:67
@@ -203,9 +203,9 @@ msgid ""
 "eepget will use 4444. If this option is not specified, eepget will use "
 "127.0.0.1:4444. Specify B<-c> or B<-p> :0 to disable the eeproxy."
 msgstr ""
-"Kullanılacak bir I2P vekil sunucusunu (eeproxy) belirler. Kapı numarası "
-"belirtilmediğinde eepget 4444 numaralı kapıyı kullanır. Bu seçenek "
-"belirtilmediğinde EepGet 127.0.0.1:4444 değerini kullanır. eeproxy "
+"Kullanılacak bir I2P vekil sunucusunu (eeproxy) belirler. Bağlantı noktası "
+"belirtilmediğinde eepget 4444 numaralı bağlantı noktasını kullanır. Bu "
+"seçenek belirtilmediğinde EepGet 127.0.0.1:4444 değerini kullanır. eeproxy "
 "seçeneğini devre dışı bırakmak için B<-c> ya da B<-p>:0 kullanın."
 
 #. type: Plain text

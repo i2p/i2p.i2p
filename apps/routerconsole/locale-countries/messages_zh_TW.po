@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-08-12 13:39+0000\n"
-"PO-Revision-Date: 2022-02-10 17:08+0000\n"
-"Last-Translator: Agustín Wu\n"
+"PO-Revision-Date: 2013-10-14 15:34+0000\n"
+"Last-Translator: Agustín Wu, 2016\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/otf/I2P/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,7 +24,7 @@ msgid "Anonymous Proxy"
 msgstr "匿名代理"
 
 msgid "Satellite Provider"
-msgstr ""
+msgstr "卫星供应商"
 
 msgid "Andorra"
 msgstr "安道爾"
@@ -555,7 +555,7 @@ msgid "Peru"
 msgstr "秘魯"
 
 msgid "French Polynesia"
-msgstr ""
+msgstr "法属玻利尼西亚"
 
 msgid "Papua New Guinea"
 msgstr "巴布亞新吉內雅"
@@ -570,10 +570,10 @@ msgid "Poland"
 msgstr "波蘭"
 
 msgid "Saint Pierre and Miquelon"
-msgstr ""
+msgstr "圣皮埃尔岛和密克隆"
 
 msgid "Pitcairn Islands"
-msgstr ""
+msgstr "皮特凯恩群岛"
 
 msgid "Puerto Rico"
 msgstr "波多黎各"
@@ -594,7 +594,7 @@ msgid "Qatar"
 msgstr "卡達"
 
 msgid "Réunion"
-msgstr ""
+msgstr "留尼汪岛"
 
 msgid "Romania"
 msgstr "羅馬尼亞"
@@ -627,13 +627,13 @@ msgid "Singapore"
 msgstr "新加坡"
 
 msgid "Saint Helena"
-msgstr ""
+msgstr "圣赫勒拿岛"
 
 msgid "Slovenia"
 msgstr "斯洛維尼亞"
 
 msgid "Svalbard and Jan Mayen"
-msgstr ""
+msgstr "斯瓦尔巴群岛和扬马延岛"
 
 msgid "Slovakia"
 msgstr "斯洛伐克"
@@ -657,13 +657,13 @@ msgid "South Sudan"
 msgstr "南蘇丹"
 
 msgid "Sao Tome and Principe"
-msgstr ""
+msgstr "圣多美与普林西比共和国"
 
 msgid "El Salvador"
 msgstr "薩爾瓦多"
 
 msgid "Sint Maarten"
-msgstr ""
+msgstr "圣马丁岛"
 
 msgid "Syria"
 msgstr "敘利亞"
@@ -672,13 +672,13 @@ msgid "Swaziland"
 msgstr "史瓦濟蘭"
 
 msgid "Turks and Caicos Islands"
-msgstr ""
+msgstr "特克斯和凯科斯群岛"
 
 msgid "Chad"
 msgstr "查德"
 
 msgid "French Southern Territories"
-msgstr ""
+msgstr "法属南半球领地"
 
 msgid "Togo"
 msgstr "多哥"
@@ -690,10 +690,10 @@ msgid "Tajikistan"
 msgstr "塔吉克斯坦"
 
 msgid "Tokelau"
-msgstr ""
+msgstr "托克劳群岛"
 
 msgid "Timor-Leste"
-msgstr ""
+msgstr "东帝汶"
 
 msgid "Turkmenistan"
 msgstr "土庫曼斯坦"
@@ -708,7 +708,7 @@ msgid "Turkey"
 msgstr "土耳其"
 
 msgid "Trinidad and Tobago"
-msgstr ""
+msgstr "特立尼达和多巴哥"
 
 msgid "Tuvalu"
 msgstr "吐哇魯"
@@ -726,7 +726,7 @@ msgid "Uganda"
 msgstr "烏干達"
 
 msgid "United States Minor Outlying Islands"
-msgstr ""
+msgstr "美国本土外小岛屿"
 
 msgid "United States"
 msgstr "美國"
@@ -747,7 +747,7 @@ msgid "Venezuela"
 msgstr "委內瑞拉"
 
 msgid "Virgin Islands"
-msgstr ""
+msgstr "维京群岛"
 
 msgid "Vietnam"
 msgstr "越南"
@@ -756,19 +756,19 @@ msgid "Vanuatu"
 msgstr "萬那杜"
 
 msgid "Wallis and Futuna"
-msgstr ""
+msgstr "瓦利斯群岛和富图纳群岛"
 
 msgid "Samoa"
 msgstr "薩摩亞群島"
 
 msgid "Kosovo"
-msgstr ""
+msgstr "科索沃"
 
 msgid "Yemen"
 msgstr "葉門"
 
 msgid "Mayotte"
-msgstr ""
+msgstr "马约特"
 
 msgid "South Africa"
 msgstr "南非"
