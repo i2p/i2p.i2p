@@ -1,3 +1,6 @@
+2022-05-19 zzz
+ * Pull translations from Transifex
+
 2022-05-17 zzz
  * i2psnark: Fix remaining size calculation causing tracker errors
 
