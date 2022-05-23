@@ -558,9 +558,9 @@ Index: b/installer/resources/locale/po/messages_sv.po
  
  #: ../i2prouter:1874
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
--msgstr "Vänligen ändra i2prouter och set variabeln RUN_AS_USER"
+-msgstr "Ändra i2prouter och ställ in variabeln RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
-+msgstr "Vänligen ändra /etc/default/i2p och set variabeln RUN_AS_USER"
++msgstr "Ändra /etc/default/i2p och ställ in variabeln RUN_AS_USER"
  
  #: ../i2prouter:1879
  msgid "Running I2P as the root user is *not* recommended."
