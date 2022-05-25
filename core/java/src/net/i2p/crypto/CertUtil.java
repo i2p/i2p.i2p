@@ -349,9 +349,9 @@ public final class CertUtil {
                 throw new CertificateEncodingException("bad base64 cert");
             PrivateKey rv = null;
             // try all the types
+            KeySpec ks = new PKCS8EncodedKeySpec(data);
             for (SigAlgo algo : EnumSet.allOf(SigAlgo.class)) {
                 try {
-                    KeySpec ks = new PKCS8EncodedKeySpec(data);
                     String alg = algo.getName();
                     KeyFactory kf = KeyFactory.getInstance(alg);
                     rv = kf.generatePrivate(ks);

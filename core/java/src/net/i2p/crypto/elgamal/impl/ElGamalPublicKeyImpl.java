@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
 import javax.crypto.interfaces.DHPublicKey;
@@ -60,9 +61,9 @@ public class ElGamalPublicKeyImpl
     }
     
     public ElGamalPublicKeyImpl(
-        X509EncodedKeySpec spec)
+        X509EncodedKeySpec spec) throws InvalidKeySpecException
     {
-        throw new UnsupportedOperationException("todo");
+        throw new InvalidKeySpecException("todo");
         //this.y = y;
         //this.elSpec = elSpec;
     }

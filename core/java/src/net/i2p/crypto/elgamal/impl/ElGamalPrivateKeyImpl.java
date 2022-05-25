@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 
 import javax.crypto.interfaces.DHPrivateKey;
@@ -65,9 +66,9 @@ public class ElGamalPrivateKeyImpl
     }
 
     public ElGamalPrivateKeyImpl(
-        PKCS8EncodedKeySpec spec)
+        PKCS8EncodedKeySpec spec) throws InvalidKeySpecException
     {
-        throw new UnsupportedOperationException("todo");
+        throw new InvalidKeySpecException("todo");
         //this.x = spec.getX();
         //this.elSpec = new ElGamalParameterSpec(spec.getP(), spec.getG());
     }
