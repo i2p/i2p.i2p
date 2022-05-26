@@ -25,9 +25,9 @@ import net.i2p.util.SystemVersion;
  * Utility class providing methods to parse and write files in a hosts.txt file
  * format, and subscription file format.
  * 
- * @since 0.9.26 modified from ConfigParser
+ * @since 0.9.26 modified from ConfigParser, public since 0.9.55 for CLI
  */
-class HostTxtParser {
+public class HostTxtParser {
 
     private static final boolean isWindows = SystemVersion.isWindows();
 

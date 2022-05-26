@@ -9,6 +9,7 @@
 	<property name="javac.compilerargs" value="" />
 	<property name="javac.version" value="1.8" />
 	<property name="javac.release" value="8" />
+	<property name="manifest.classpath.name" value="Class-Path" />
 
 	<target name="all" depends="jar, emptyWar"/> 
 	
@@ -57,8 +58,14 @@
 		<property name="workspace.changes.tr" value="" />
 		<jar basedir="${build}" destfile="${dist}/${jar}">
 			<manifest>
-				<attribute name="Main-Class" value="net.i2p.addressbook.Daemon"/>
+				<attribute name="${manifest.classpath.name}" value="i2p.jar" />
+				<attribute name="Main-Class" value="net.i2p.addressbook.CommandLine"/>
+				<attribute name="Specification-Title" value="I2P Address Book" />
+				<attribute name="Specification-Version" value="${api.version}" />
+				<attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+				<attribute name="Implementation-Title" value="I2P Java Address Book" />
 				<attribute name="Implementation-Version" value="${full.version}" />
+				<attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
 				<attribute name="Built-By" value="${build.built-by}" />
 		                <attribute name="Build-Date" value="${build.timestamp}" />
 		                <attribute name="Base-Revision" value="${workspace.version}" />
