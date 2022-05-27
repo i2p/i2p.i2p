@@ -635,6 +635,9 @@ trans.zh_CN = installer/resources/eepsite/docroot/help/index_zh.html
 ;;
 ;; Text on /console
 ;;
+;; NOTE: No support for country suffixes right now.
+;; See ResourceHelper.java
+;;
 type = HTML
 source_file = apps/routerconsole/resources/docs/readme.html
 source_lang = en

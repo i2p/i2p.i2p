@@ -48,18 +48,19 @@ public class ResourceHelper extends HelperBase {
         if (lastdot <= 0) {
             page = _page;
         } else {
-            if (_context != null)
-                lang = _context.getProperty(Messages.PROP_LANG);
-            if (lang == null || lang.length() <= 0) {
-                lang = Locale.getDefault().getLanguage();
-                if (lang == null || lang.length() <= 0)
-                    page = _page;
-            }
+            lang = Messages.getLanguage(_context);
         }
         if (page == null) {
             if (lang.equals("en"))
                 page = _page;
             else
+                // TODO no country support or fallback to non-country
+                // right now zh_TW is the only one, and is identical to zh
+                // if (lang.equals("zh")) {
+                //     String country = Messages.getCountry();
+                //     if (country.equals("TW"))
+                //         lang = "zh_TW";
+                // }
                 page = _page.substring(0, lastdot) + '_' + lang + _page.substring(lastdot);
         }
         InputStream is = ResourceHelper.class.getResourceAsStream("/net/i2p/router/web/resources/" + page);
