@@ -328,7 +328,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
                     return rv;
                 if (rv != null)
                     st = rv.toString();
-                _log.logAlways(Log.WARN, "Unsupported sig type " + st +
+                _log.logAlways(Log.WARN, "Tunnel configuration error: Unsupported sig type " + st +
                                          ", reverting to " + I2PClient.DEFAULT_SIGTYPE);
                 // TODO throw instead?
             }
