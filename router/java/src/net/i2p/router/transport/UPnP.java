@@ -684,9 +684,9 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	/**
 	 * Get the addresses we want to bind to
 	 *
-	 * @since 0.9.46
+	 * @since 0.9.46, public since 0.9.55 for HTTPServerList
 	 */
-	static Set<String> getLocalAddresses() {
+	public static Set<String> getLocalAddresses() {
 		// older miniupnpd will send ipv6 ssdp search response to ipv4 address,
 		// but newer ones won't. So we need to bind to an ipv6 address
 		// to get his ipv6 address so we can bind to OUR ipv6 address
@@ -729,9 +729,6 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 				if (pct > 0)
 					addr = addr.substring(0, pct);
 				if (!addrs.contains(addr)) {
-					// the first time through this will close a lot of sockets,
-					// because HTTPServerList binds to every address,
-					// including IPv6 deprecated
 					iter.remove();
 					skt.close();
 					skt.stop();

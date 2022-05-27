@@ -18,10 +18,13 @@
 package org.cybergarage.http;
 
 import java.net.InetAddress;
+import java.util.Set;
 import java.util.Vector;
 
 import org.cybergarage.net.HostInterface;
 import org.cybergarage.upnp.Device;
+
+import net.i2p.router.transport.UPnP;
 
 public class HTTPServerList extends Vector<HTTPServer> 
 {
@@ -80,12 +83,10 @@ public class HTTPServerList extends Vector<HTTPServer>
 				bindAddresses[i] = binds[i].getHostAddress();
 			}
 		}else{
-			int nHostAddrs = HostInterface.getNHostAddresses();
-			bindAddresses = new String[nHostAddrs]; 
-			for (int n=0; n<nHostAddrs; n++) {
-				bindAddresses[n] = HostInterface.getHostAddress(n);
-			}
-		}		
+			// I2P non-public addresses only
+			Set<String> addrs = UPnP.getLocalAddresses();
+			bindAddresses = addrs.toArray(new String[addrs.size()]); 
+		}
 		int j=0;
 		for (int i = 0; i < bindAddresses.length; i++) {
 			HTTPServer httpServer = new HTTPServer();
