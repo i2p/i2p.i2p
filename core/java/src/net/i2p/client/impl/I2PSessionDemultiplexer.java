@@ -1,6 +1,8 @@
 package net.i2p.client.impl;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 
 import net.i2p.I2PAppContext;
@@ -59,13 +61,21 @@ public class I2PSessionDemultiplexer implements I2PSessionMuxedListener {
     }
 
     public void reportAbuse(I2PSession session, int severity) {
-        for (I2PSessionMuxedListener l : _listeners.values()) {
+        Collection<I2PSessionMuxedListener> lsnrs = _listeners.values();
+        // dedup
+        if (lsnrs.size() > 1)
+            lsnrs = new HashSet<I2PSessionMuxedListener>(lsnrs);
+        for (I2PSessionMuxedListener l : lsnrs) {
             l.reportAbuse(session, severity);
         }
     }
 
     public void disconnected(I2PSession session) {
-        for (I2PSessionMuxedListener l : _listeners.values()) {
+        Collection<I2PSessionMuxedListener> lsnrs = _listeners.values();
+        // dedup
+        if (lsnrs.size() > 1)
+            lsnrs = new HashSet<I2PSessionMuxedListener>(lsnrs);
+        for (I2PSessionMuxedListener l : lsnrs) {
             if (_log.shouldInfo())
                 _log.info("Sending disconnected() to " + l);
             l.disconnected(session);
@@ -73,7 +83,11 @@ public class I2PSessionDemultiplexer implements I2PSessionMuxedListener {
     }
 
     public void errorOccurred(I2PSession session, String message, Throwable error) {
-        for (I2PSessionMuxedListener l : _listeners.values()) {
+        Collection<I2PSessionMuxedListener> lsnrs = _listeners.values();
+        // dedup
+        if (lsnrs.size() > 1)
+            lsnrs = new HashSet<I2PSessionMuxedListener>(lsnrs);
+        for (I2PSessionMuxedListener l : lsnrs) {
             if (_log.shouldInfo())
                  _log.info("Sending errorOccurred() \"" + message + "\" to " + l);
             l.errorOccurred(session, message, error);
