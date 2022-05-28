@@ -1069,8 +1069,9 @@ public class Router implements RouterClock.ClockShiftListener {
                 if (!_familyKeyCryptoFail) {
                     try {
                         _familyKeyCrypto = new FamilyKeyCrypto(_context);
-                    } catch (GeneralSecurityException gse) {
-                        _log.error("Failed to initialize family key crypto", gse);
+                    } catch (Exception e) {
+                        // Could be IllegalArgumentException from key problems
+                        _log.error("Failed to initialize family key crypto", e);
                         _familyKeyCryptoFail = true;
                     }
                 }
