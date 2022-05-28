@@ -207,11 +207,12 @@ class FileLogWriter extends LogWriter {
     }
 
     private static final String replace(String pattern, int num) {
-        char c[] = pattern.toCharArray();
-        StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < c.length; i++) {
-            if ( (c[i] != '#') && (c[i] != '@') )
-                buf.append(c[i]);
+        int len = pattern.length();
+        StringBuilder buf = new StringBuilder(len + 1);
+        for (int i = 0; i < len; i++) {
+            char c = pattern.charAt(i);
+            if ( (c != '#') && (c != '@') )
+                buf.append(c);
             else
                 buf.append(num);
         }
