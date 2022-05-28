@@ -77,7 +77,7 @@ public final class SigUtil {
             case RSA:
                 return toJavaRSAKey(pk);
             default:
-                throw new IllegalArgumentException();
+                throw new InvalidKeyException("unsupported key: " + pk);
         }
     }
 
@@ -96,7 +96,7 @@ public final class SigUtil {
             case RSA:
                 return toJavaRSAKey(pk);
             default:
-                throw new IllegalArgumentException();
+                throw new InvalidKeyException("unsupported key: " + pk);
         }
     }
 
@@ -105,7 +105,7 @@ public final class SigUtil {
      *  For efficiency, use fromJavakey(pk, type) if type is known.
      *
      *  @param pk JAVA key!
-     *  @throws IllegalArgumentException on unknown type
+     *  @throws InvalidKeyException on unknown type
      *  @since 0.9.18
      */
     public static SigningPublicKey fromJavaKey(PublicKey pk)
@@ -124,7 +124,7 @@ public final class SigUtil {
             else if (spec.equals(SigType.ECDSA_SHA512_P521.getParams()))
                 type = SigType.ECDSA_SHA512_P521;
             else
-                throw new IllegalArgumentException("Unknown EC type");
+                throw new InvalidKeyException("Unknown EC type");
             return fromJavaKey(k, type);
         }
         if (pk instanceof EdDSAPublicKey) {
@@ -141,10 +141,23 @@ public final class SigUtil {
             else if (sz <= ((RSAKeyGenParameterSpec) SigType.RSA_SHA512_4096.getParams()).getKeysize())
                 type = SigType.RSA_SHA512_4096;
             else
-                throw new IllegalArgumentException("Unknown RSA type");
+                throw new InvalidKeyException("Unknown RSA type");
             return fromJavaKey(k, type);
         }
-        throw new IllegalArgumentException("Unknown type: " + pk.getClass());
+        String algo = pk.getAlgorithm();
+        if ("EdDSA".equals(algo)) {
+            // Java 15+ EdDSA EdECKey class
+            // try to convert to our class
+            byte[] enc = pk.getEncoded();
+            if (enc != null) {
+                X509EncodedKeySpec spec = new X509EncodedKeySpec(enc);
+                try {
+                    EdDSAPublicKey edpk = new EdDSAPublicKey(spec);
+                    return fromJavaKey(edpk, SigType.EdDSA_SHA512_Ed25519);
+                } catch (GeneralSecurityException gse) {}
+            }
+        }
+        throw new InvalidKeyException("Unknown type: " + pk.getClass());
     }
 
     /**
@@ -164,7 +177,7 @@ public final class SigUtil {
             case RSA:
                 return fromJavaKey((RSAPublicKey) pk, type);
             default:
-                throw new IllegalArgumentException("Unknown type: " + type);
+                throw new InvalidKeyException("Unknown type: " + type);
         }
     }
 
@@ -173,7 +186,7 @@ public final class SigUtil {
      *  For efficiency, use fromJavakey(pk, type) if type is known.
      *
      *  @param pk JAVA key!
-     *  @throws IllegalArgumentException on unknown type
+     *  @throws InvalidKeyException on unknown type
      *  @since 0.9.18
      */
     public static SigningPrivateKey fromJavaKey(PrivateKey pk)
@@ -193,7 +206,7 @@ public final class SigUtil {
                 type = SigType.ECDSA_SHA512_P521;
             else {
                 // failing on Android (ticket #2296)
-                throw new IllegalArgumentException("Unknown EC type: " + pk.getClass() + " spec: " + spec.getClass());
+                throw new InvalidKeyException("Unknown EC type: " + pk.getClass() + " spec: " + spec.getClass());
             }
             return fromJavaKey(k, type);
         }
@@ -211,10 +224,23 @@ public final class SigUtil {
             else if (sz <= ((RSAKeyGenParameterSpec) SigType.RSA_SHA512_4096.getParams()).getKeysize())
                 type = SigType.RSA_SHA512_4096;
             else
-                throw new IllegalArgumentException("Unknown RSA type");
+                throw new InvalidKeyException("Unknown RSA type");
             return fromJavaKey(k, type);
         }
-        throw new IllegalArgumentException("Unknown type: " + pk.getClass());
+        String algo = pk.getAlgorithm();
+        if ("EdDSA".equals(algo)) {
+            // Java 15+ EdDSA EdECKey class
+            // try to convert to our class
+            byte[] enc = pk.getEncoded();
+            if (enc != null) {
+                PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(enc);
+                try {
+                    EdDSAPrivateKey edpk = new EdDSAPrivateKey(spec);
+                    return fromJavaKey(edpk, SigType.EdDSA_SHA512_Ed25519);
+                } catch (GeneralSecurityException gse) {}
+            }
+        }
+        throw new InvalidKeyException("Unknown type: " + pk.getClass());
     }
 
     /**
@@ -234,7 +260,7 @@ public final class SigUtil {
             case RSA:
                 return fromJavaKey((RSAPrivateKey) pk, type);
             default:
-                throw new IllegalArgumentException("Unknown type: " + type);
+                throw new InvalidKeyException("Unknown type: " + type);
         }
     }
 
@@ -411,7 +437,7 @@ public final class SigUtil {
         else if (type == SigType.RedDSA_SHA512_Ed25519)
             data = pk.geta();
         else
-            throw new IllegalArgumentException();
+            throw new InvalidKeyException();
         return new SigningPrivateKey(type, data);
     }
 
