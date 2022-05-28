@@ -100,6 +100,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private final ConcurrentHashMap<NID, Token> _incomingTokens;
     /** recently unreachable, with lastSeen() as the added-to-blacklist time  */
     private final Set<NID> _blacklist;
+    private SimpleTimer2.TimedEvent _cleaner, _explorer;
 
     /** hook to inject and receive datagrams */
     private final I2PSession _session;
@@ -623,6 +624,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     public synchronized void start() {
         if (_isRunning)
             return;
+        if (_log.shouldInfo())
+            _log.info("KRPC start", new Exception());
         _session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM_RAW, _rPort);
         _session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM, _qPort);
         _knownNodes.start();
@@ -630,9 +633,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         PersistDHT.loadDHT(this, _dhtFile, _backupDhtFile);
         // start the explore thread
         _isRunning = true;
-        // no need to keep ref, it will eventually stop
-        new Cleaner();
-        new Explorer(5*1000);
+        _cleaner = new Cleaner();
+        _explorer = new Explorer(5*1000);
         _txPkts.set(0);
         _rxPkts.set(0);
         _txBytes.set(0);
@@ -648,7 +650,10 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         if (!_isRunning)
             return;
         _isRunning = false;
-        // FIXME stop the explore thread
+        if (_log.shouldInfo())
+            _log.info("KRPC stop", new Exception());
+        _cleaner.cancel();
+        _explorer.cancel();
         // unregister port listeners
         _session.removeListener(I2PSession.PROTO_DATAGRAM, _qPort);
         _session.removeListener(I2PSession.PROTO_DATAGRAM_RAW, _rPort);
@@ -1640,6 +1645,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     public void disconnected(I2PSession session) {
         if (_log.shouldLog(Log.WARN))
             _log.warn("KRPC disconnected");
+        stop();
     }
 
     public void errorOccurred(I2PSession session, String message, Throwable error) {
@@ -1760,7 +1766,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             }
             if (_log.shouldLog(Log.INFO))
                 _log.info("Explore of " + keys.size() + " buckets done, new size: " + _knownNodes.size());
-            new Explorer(EXPLORE_TIME);
+            _explorer = new Explorer(EXPLORE_TIME);
         }
     }
 }

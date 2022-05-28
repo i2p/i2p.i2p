@@ -1,3 +1,20 @@
+2022-05-28 zzz
+ * Console: Require full restart on transport enable/disable
+ * I2CP: Only send one notification to each session listener
+ * i2psnark: Fix DHT not restarting after router restart
+ * Router: Don't fail to start up on unchecked family key errors
+
+2022-05-27 zzz
+ * Streaming: Improve error message on unsupported sig type
+ * UPnP: Don't bind HTTP listen sockets to all addresses at startup
+
+2022-05-26 zzz
+ * Addressbook: Add CLI handler
+
+2022-05-25 zzz
+ * Crypto: Throw checked exception from ElGamal
+   so console key import reports the correct error
+
 2022-05-23 1.8.0 released
 
 2022-05-19 zzz

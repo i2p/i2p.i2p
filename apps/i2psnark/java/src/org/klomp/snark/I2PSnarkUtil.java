@@ -102,7 +102,7 @@ public class I2PSnarkUtil implements DisconnectListener {
      */
     public I2PSnarkUtil(I2PAppContext ctx, String baseName, DisconnectListener discon) {
         _context = ctx;
-        _log = _context.logManager().getLog(Snark.class);
+        _log = _context.logManager().getLog(I2PSnarkUtil.class);
         _baseName = baseName;
         _discon = discon;
         _opts = new HashMap<String, String>();
@@ -347,6 +347,10 @@ public class I2PSnarkUtil implements DisconnectListener {
         synchronized(this) {
             _manager = null;
             _connecting = false;
+            if (_dht != null) {
+                _dht.stop();
+                _dht = null;
+            }
         }
         if (_discon != null)
             _discon.sessionDisconnected();
@@ -556,6 +560,9 @@ public class I2PSnarkUtil implements DisconnectListener {
             return null;
     }
     
+    /**
+     * Full Base64 of Destination
+     */
     public String getOurIPString() {
         Destination dest = getMyDestination();
         if (dest != null)
