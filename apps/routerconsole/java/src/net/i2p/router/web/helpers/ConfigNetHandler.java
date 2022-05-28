@@ -170,6 +170,7 @@ public class ConfigNetHandler extends FormHandler {
      */
     private void saveChanges() {
         boolean restartRequired = false;
+        boolean fullRestartRequired = false;
         boolean error = false;
         List<String> removes = new ArrayList<String>();
         
@@ -260,6 +261,7 @@ public class ConfigNetHandler extends FormHandler {
             if (_ntcpHostname == null) _ntcpHostname = "";
             if (_ntcpPort == null) _ntcpPort = "";
             if (_ntcpAutoIP == null) _ntcpAutoIP = "true";
+            boolean oldNTCPEnabled = _context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_NTCP);
 
             if ((!oldAutoHost.equals(_ntcpAutoIP)) || ! oldNHost.equalsIgnoreCase(_ntcpHostname)) {
                 boolean valid = true;
@@ -282,8 +284,11 @@ public class ConfigNetHandler extends FormHandler {
                 }
                 if (valid) {
                     changes.put(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP, _ntcpAutoIP);
-                    changes.put(TransportManager.PROP_ENABLE_NTCP, Boolean.toString(!"disabled".equals(_ntcpAutoIP)));
+                    boolean ntcpEnabled = !"disabled".equals(_ntcpAutoIP);
+                    changes.put(TransportManager.PROP_ENABLE_NTCP, Boolean.toString(ntcpEnabled));
                     restartRequired = true;
+                    if (oldNTCPEnabled != ntcpEnabled)
+                        fullRestartRequired = true;
                 }
             }
             if (oldAutoPort != _ntcpAutoPort || ! oldNPort.equals(_ntcpPort)) {
@@ -356,7 +361,7 @@ public class ConfigNetHandler extends FormHandler {
                     addFormNotice(_t("Enabling UPnP"));
                 else
                     addFormNotice(_t("Disabling UPnP"));
-                addFormNotice(_t("Restart required to take effect"));
+                fullRestartRequired = true;
             }
             changes.put(TransportManager.PROP_ENABLE_UPNP, Boolean.toString(_upnp));
 
@@ -396,7 +401,7 @@ public class ConfigNetHandler extends FormHandler {
                     addFormNotice(_t("Disabling UDP"));
                 else
                     addFormNotice(_t("Enabling UDP"));
-                restartRequired = true;
+                fullRestartRequired = true;
             }
             changes.put(TransportManager.PROP_ENABLE_UDP, Boolean.toString(!_udpDisabled));
 
@@ -424,6 +429,8 @@ public class ConfigNetHandler extends FormHandler {
         if (saved && !error) {
             if (switchRequired) {
                 hiddenSwitch();
+            } else if (fullRestartRequired) {
+                addFormNotice(_t("Restart required to take effect"));
             } else if (restartRequired) {
               //if (_context.hasWrapper()) {
                 // Wow this dumps all conns immediately and really isn't nice
