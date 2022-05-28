@@ -299,7 +299,7 @@ button::-moz-focus-inner, input::-moz-focus-inner {
 
 .snarkMessages img {
      float: right;
-     margin: -4px -5px 4px 4px;
+     margin: -4px 8px 4px 4px;
      opacity: 1;
      position: sticky;
      top: -4px;

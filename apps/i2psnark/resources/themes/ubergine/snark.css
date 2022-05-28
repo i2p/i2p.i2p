@@ -308,7 +308,7 @@ _:-ms-lang(x), .snarkNav:last-child[href="/i2psnark/"] {
 
 .snarkMessages img {
      float: right;
-     margin: -3px -5px 4px 4px;
+     margin: -3px 8px 4px 4px;
      opacity: 0.8;
      position: sticky;
      top: -3px;

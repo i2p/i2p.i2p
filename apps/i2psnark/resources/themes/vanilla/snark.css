@@ -343,7 +343,7 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
 
 .snarkMessages img {
      float: right;
-     margin: -1px -3px 4px 4px;
+     margin: -1px 8px 4px 4px;
      opacity: 1 !important;
      position: sticky;
      top: -1px;

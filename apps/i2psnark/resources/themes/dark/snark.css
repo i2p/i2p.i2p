@@ -298,7 +298,7 @@ _:-ms-lang(x), .snarkMessages {
 
 .snarkMessages img {
      float: right;
-     margin: -4px -5px 4px 4px;
+     margin: -4px 8px 4px 4px;
      opacity: 0.7;
      border: 1px solid #433e47;
      border-right: 0 none;
