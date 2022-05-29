@@ -354,14 +354,13 @@ class PeerTestManager {
                 int alicePort = test.getAlicePort();
                 byte[] aliceIP = addr.getAddress();
                 int iplen = aliceIP.length;
-                byte[] data = new byte[13 + iplen];
-                data[0] = 1;  // alice
-                data[1] = 2;  // version
-                DataHelper.toLong(data, 2, 4, nonce);
-                DataHelper.toLong(data, 6, 4, _context.clock().now() / 1000);
-                data[10] = (byte) (iplen + 2);
-                DataHelper.toLong(data, 11, 2, alicePort);
-                System.arraycopy(aliceIP, 0, data, 13, iplen);
+                byte[] data = new byte[12 + iplen];
+                data[0] = 2;  // version
+                DataHelper.toLong(data, 1, 4, nonce);
+                DataHelper.toLong(data, 5, 4, _context.clock().now() / 1000);
+                data[9] = (byte) (iplen + 2);
+                DataHelper.toLong(data, 10, 2, alicePort);
+                System.arraycopy(aliceIP, 0, data, 12, iplen);
                 packet = _packetBuilder2.buildPeerTestFromAlice(test.getCharlieIP(), test.getCharliePort(),
                                                                 test.getCharlieIntroKey(),
                                                                 sendId, rcvId, data);
@@ -837,24 +836,14 @@ class PeerTestManager {
      * @since 0.9.54
      */
     public void receiveTest(RemoteHostId from, PeerState2 fromPeer, int msg, int status, Hash h, byte[] data) {
-        PeerTestState.Role role;
-        if (data[0] == 1) {
-            role = ALICE;
-        } else if (data[0] == 3) {
-            role = CHARLIE;
-        } else {
+        if (data[0] != 2) {
             if (_log.shouldWarn())
-                _log.warn("Bad role " + (data[0] & 0xff) + " from " + from + ' ' + fromPeer);
+                _log.warn("Bad version " + (data[0] & 0xff) + " from " + from + ' ' + fromPeer);
             return;
         }
-        if (data[1] != 2) {
-            if (_log.shouldWarn())
-                _log.warn("Bad version " + (data[1] & 0xff) + " from " + from + ' ' + fromPeer);
-            return;
-        }
-        long nonce = DataHelper.fromLong(data, 2, 4);
-        long time = DataHelper.fromLong(data, 6, 4) * 1000;
-        int iplen = data[10] & 0xff;
+        long nonce = DataHelper.fromLong(data, 1, 4);
+        long time = DataHelper.fromLong(data, 5, 4) * 1000;
+        int iplen = data[9] & 0xff;
         if (iplen != 0 && iplen != 6 && iplen != 18) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Bad IP length " + iplen);
@@ -864,9 +853,9 @@ class PeerTestManager {
         int testPort;
         byte[] testIP;
         if (iplen != 0) {
-            testPort = (int) DataHelper.fromLong(data, 11, 2);
+            testPort = (int) DataHelper.fromLong(data, 10, 2);
             testIP = new byte[iplen - 2];
-            System.arraycopy(data, 13, testIP, 0, iplen - 2);
+            System.arraycopy(data, 12, testIP, 0, iplen - 2);
         } else {
             testPort = 0;
             testIP = null;
@@ -885,7 +874,6 @@ class PeerTestManager {
                        " msg: " + msg +
                        " status: " + status +
                        " hash: " + h +
-                       " role: " + role +
                        " nonce: " + nonce +
                        " time: " + DataHelper.formatTime(time) +
                        " ip/port: " + Addresses.toString(testIP, testPort) +
@@ -1297,14 +1285,13 @@ class PeerTestManager {
                 int alicePort = state.getAlicePort();
                 byte[] aliceIP = addr.getAddress();
                 iplen = aliceIP.length;
-                data = new byte[13 + iplen];
-                data[0] = 3;  // charlie
-                data[1] = 2;  // version
-                DataHelper.toLong(data, 2, 4, nonce);
-                DataHelper.toLong(data, 6, 4, now / 1000);
-                data[10] = (byte) (iplen + 2);
-                DataHelper.toLong(data, 11, 2, alicePort);
-                System.arraycopy(aliceIP, 0, data, 13, iplen);
+                data = new byte[12 + iplen];
+                data[0] = 2;  // version
+                DataHelper.toLong(data, 1, 4, nonce);
+                DataHelper.toLong(data, 5, 4, now / 1000);
+                data[9] = (byte) (iplen + 2);
+                DataHelper.toLong(data, 10, 2, alicePort);
+                System.arraycopy(aliceIP, 0, data, 12, iplen);
                 if (_log.shouldDebug())
                     _log.debug("Send msg 7 to alice on " + state);
                 UDPPacket packet = _packetBuilder2.buildPeerTestToAlice(addr, alicePort,

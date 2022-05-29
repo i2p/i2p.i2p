@@ -310,7 +310,7 @@ class SSU2Payload {
                 case BLOCK_PEERTEST: {
                     if (isHandshake)
                         throw new IOException("Illegal block in handshake: " + type);
-                    if (len < 20) // 20 byte data w/ IPv4 (hash and sig optional)
+                    if (len < 19) // 19 byte data w/ IPv4 (hash and sig optional)
                         throw new IOException("Bad length for PEERTEST: " + len);
                     int mnum = payload[i] & 0xff;
                     if (mnum == 0 || mnum > 7)

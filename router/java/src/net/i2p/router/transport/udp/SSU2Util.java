@@ -173,25 +173,23 @@ final class SSU2Util {
      *
      *  @param h to be included in sig, not included in data
      *  @param h2 may be null, to be included in sig, not included in data
+     *  @param role unused
      *  @param ip may be null
      *  @return null on failure
      */
     public static byte[] createPeerTestData(I2PAppContext ctx, Hash h, Hash h2,
                                             PeerTestState.Role role, long nonce, byte[] ip, int port,
                                             SigningPrivateKey spk) {
-        int datalen = 13 + (ip != null ? ip.length : 0);
+        int datalen = 12 + (ip != null ? ip.length : 0);
         byte[] data = new byte[datalen + spk.getType().getSigLen()];
-        if (role == PeerTestState.Role.BOB)
-            throw new IllegalArgumentException();
-        data[0] = (byte) ((role == PeerTestState.Role.ALICE) ? 1 : 3);
-        data[1] = 2;  // version
-        DataHelper.toLong(data, 2, 4, nonce);
-        DataHelper.toLong(data, 6, 4, ctx.clock().now() / 1000);
+        data[0] = 2;  // version
+        DataHelper.toLong(data, 1, 4, nonce);
+        DataHelper.toLong(data, 5, 4, ctx.clock().now() / 1000);
         int iplen = (ip != null) ? ip.length : 0;
-        data[10] = (byte) (ip != null ? iplen + 2 : 0);
+        data[9] = (byte) (ip != null ? iplen + 2 : 0);
         if (ip != null) {
-            DataHelper.toLong(data, 11, 2, port);
-            System.arraycopy(ip, 0, data, 13, iplen);
+            DataHelper.toLong(data, 10, 2, port);
+            System.arraycopy(ip, 0, data, 12, iplen);
         }
         Signature sig = sign(ctx, PEER_TEST_PROLOGUE, h, h2, data, datalen, spk);
         if (sig == null)
