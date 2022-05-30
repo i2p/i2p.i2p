@@ -957,7 +957,8 @@ public class SSLEepGet extends EepGet {
         _proxyIn = _proxy.getInputStream();
         _proxyOut = _proxy.getOutputStream();
         StringBuilder buf = new StringBuilder(64);
-        buf.append("CONNECT ").append(host).append(':').append(port).append(" HTTP/1.1\r\n");
+        buf.append("CONNECT ").append(host).append(':').append(port).append(" HTTP/1.1\r\n" +
+                   "Host: ").append(host).append(':').append(port).append("\r\n");
         // TODO if we need extra headers to the proxy, add a new method and list.
         // Standard extra headers go the server, not the proxy
         //if (_extraPHeaders != null) {
