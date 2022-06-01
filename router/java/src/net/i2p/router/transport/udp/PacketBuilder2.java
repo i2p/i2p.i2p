@@ -761,19 +761,22 @@ class PacketBuilder2 {
     }
 
     /**
-     *  Creates an empty unauthenticated packet for hole punching.
-     *  Parameters must be validated previously.
+     *  Out-of-session, containing a RelayResponse block.
+     *
      */
-    public UDPPacket buildHolePunch(InetAddress to, int port) {
-        UDPPacket packet = UDPPacket.acquire(_context, false);
+    public UDPPacket buildHolePunch(InetAddress to, int port, SessionKey introKey,
+                                    long sendID, long rcvID, byte[] signedData) {
+        long n = _context.random().signedNextInt() & 0xFFFFFFFFL;
+        long token = _context.random().nextLong();
+        UDPPacket packet = buildLongPacketHeader(sendID, n, HOLE_PUNCH_FLAG_BYTE, rcvID, token);
+        Block block = new SSU2Payload.RelayResponseBlock(signedData);
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending relay hole punch to " + to + ":" + port);
 
-        // the packet is empty and does not need to be authenticated, since
-        // its just for hole punching
-        packet.getPacket().setLength(0);
+        byte[] ik = introKey.getData();
+        packet.getPacket().setLength(LONG_HEADER_SIZE);
+        encryptPeerTest(packet, ik, n, ik, ik, to.getAddress(), port, block);
         setTo(packet, to, port);
-        
         packet.setMessageType(TYPE_PUNCH);
         packet.setPriority(PRIORITY_HIGH);
         return packet;

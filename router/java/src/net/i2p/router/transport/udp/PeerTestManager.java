@@ -1336,10 +1336,21 @@ class PeerTestManager {
     /**
      *  Get an address out of a RI. SSU2 only.
      *
+     *  @return address or null
      *  @since 0.9.54
      */
     private RouterAddress getAddress(RouterInfo ri, boolean isIPv6) {
         List<RouterAddress> addrs = _transport.getTargetAddresses(ri);
+        return getAddress(addrs, isIPv6);
+    }
+
+    /**
+     *  Get an address out of a list of addresses. SSU2 only.
+     *
+     *  @return address or null
+     *  @since 0.9.55
+     */
+    static RouterAddress getAddress(List<RouterAddress> addrs, boolean isIPv6) {
         RouterAddress ra = null;
         for (RouterAddress addr : addrs) {
             // skip SSU 1 address w/o "s"
@@ -1367,9 +1378,9 @@ class PeerTestManager {
     /**
      *  Get an intro key out of an address. SSU2 only.
      *
-     *  @since 0.9.54
+     *  @since 0.9.54, pkg private since 0.9.55 for IntroManager
      */
-    private static SessionKey getIntroKey(RouterAddress ra) {
+    static SessionKey getIntroKey(RouterAddress ra) {
         if (ra == null)
             return null;
         String siv = ra.getOption("i");

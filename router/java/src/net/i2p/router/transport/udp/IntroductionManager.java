@@ -13,7 +13,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
+import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPublicKey;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.RouterContext;
@@ -437,13 +441,15 @@ class IntroductionManager {
 
     /**
      *  We are Charlie and we got this from Bob.
-     *  Send a HolePunch to Alice, who will soon be sending us a RelayRequest.
+     *  Send a HolePunch to Alice, who will soon be sending us a SessionRequest.
      *  We should already have a session with Bob, but probably not with Alice.
      *
      *  If we don't have a session with Bob, we removed the relay tag from
      *  our _outbound table, so this won't work.
      *
      *  We do some throttling here.
+     *
+     *  SSU 1 only.
      */
     void receiveRelayIntro(RemoteHostId bob, UDPPacketReader reader) {
         if (_context.router().isHidden())
@@ -541,6 +547,8 @@ class IntroductionManager {
      *  We are Bob and we got this from Alice.
      *  Send a RelayIntro to Charlie and a RelayResponse to Alice.
      *  We should already have a session with Charlie, but not necessarily with Alice.
+     *
+     *  SSU 1 only.
      */
     void receiveRelayRequest(RemoteHostId alice, UDPPacketReader reader) {
         if (_context.router().isHidden())
@@ -647,6 +655,155 @@ class IntroductionManager {
         }
         _transport.send(_builder.buildRelayResponse(alice, charlie, rrReader.readNonce(),
                                                     cipherKey, macKey));
+    }
+
+    /**
+     *  We are Bob and we got this from Alice.
+     *  Send Alice's RI and a RelayIntro to Charlie, or reject with a RelayResponse to Alice.
+     *  We should already have a session with Charlie and definitely with Alice.
+     *
+     *  SSU 2 only.
+     *
+     *  @since 0.9.55
+     */
+    void receiveRelayRequest(PeerState2 alice, byte[] data) {
+    }
+
+    /**
+     *  We are Charlie and we got this from Bob.
+     *  Send a HolePunch to Alice, who will soon be sending us a SessionRequest.
+     *  And send a RelayResponse to bob.
+     *
+     *  SSU 2 only.
+     *
+     *  @since 0.9.55
+     */
+    void receiveRelayIntro(PeerState2 bob, Hash alice, byte[] data) {
+        long nonce = DataHelper.fromLong(data, 0, 4);
+        long tag = DataHelper.fromLong(data, 4, 4);
+        long time = DataHelper.fromLong(data, 8, 4) * 1000;
+        int ver = data[12] & 0xff;
+        if (ver != 2) {
+            if (_log.shouldWarn())
+                _log.warn("Bad relay intro version " + ver + " from " + bob);
+            return;
+        }
+        int iplen = data[13] & 0xff;
+        if (iplen != 6 && iplen != 18) {
+            if (_log.shouldWarn())
+                _log.warn("Bad IP length " + iplen + " from " + bob);
+            return;
+        }
+        boolean isIPv6 = iplen == 18;
+        int testPort = (int) DataHelper.fromLong(data, 14, 2);
+        byte[] testIP = new byte[iplen - 2];
+        System.arraycopy(data, 16, testIP, 0, iplen - 2);
+        InetAddress aliceIP;
+        try {
+            aliceIP = InetAddress.getByAddress(testIP);
+        } catch (UnknownHostException uhe) {
+            return;
+        }
+
+        RouterInfo aliceRI = null;
+        SessionKey aliceIntroKey = null;
+        int rcode;
+        PeerState aps = _transport.getPeerState(alice);
+        if (aps != null && aps.isIPv6() == isIPv6) {
+            rcode = SSU2Util.RELAY_REJECT_CHARLIE_CONNECTED;
+        } else if (_context.banlist().isBanlisted(alice)) {
+            rcode = SSU2Util.RELAY_REJECT_CHARLIE_BANNED;
+        } else if (!TransportUtil.isValidPort(testPort) ||
+                  !_transport.isValid(testIP) ||
+                 _transport.isTooClose(testIP) ||
+                 _context.blocklist().isBlocklisted(testIP)) {
+            rcode = SSU2Util.RELAY_REJECT_CHARLIE_ADDRESS;
+        } else {
+            // bob should have sent it to us. Don't bother to lookup
+            // remotely if he didn't, or it was out-of-order or lost.
+            aliceRI = _context.netDb().lookupRouterInfoLocally(alice);
+            if (aliceRI != null) {
+                // validate signed data
+                SigningPublicKey spk = aliceRI.getIdentity().getSigningPublicKey();
+                if (SSU2Util.validateSig(_context, SSU2Util.RELAY_REQUEST_PROLOGUE,
+                                         bob.getRemotePeer(), _context.routerHash(), data, spk)) {
+                    aliceIntroKey = PeerTestManager.getIntroKey(getAddress(aliceRI, isIPv6));
+                    if (aliceIntroKey != null)
+                        rcode = SSU2Util.RELAY_ACCEPT;
+                    else
+                        rcode = SSU2Util.RELAY_REJECT_CHARLIE_ADDRESS;
+                } else {
+                    if (_log.shouldWarn())
+                        _log.warn("Signature failed relay intro\n" + aliceRI);
+                    rcode = SSU2Util.RELAY_REJECT_CHARLIE_SIGFAIL;
+                }
+            } else {
+                if (_log.shouldWarn())
+                    _log.warn("Alice RI not found " + alice);
+                rcode = SSU2Util.RELAY_REJECT_CHARLIE_UNKNOWN_ALICE;
+            }
+        }
+
+        // generate our signed data
+        // we sign it even if rejecting, not required though
+        SigningPrivateKey spk = _context.keyManager().getSigningPrivateKey();
+        data = SSU2Util.createRelayResponseData(_context, bob.getRemotePeer(), rcode,
+                                                nonce, testIP, testPort, spk);
+        if (data == null) {
+            if (_log.shouldWarn())
+                _log.warn("sig fail");
+             return;
+        }
+        UDPPacket packet = _builder2.buildRelayResponse(data, bob);
+        if (_log.shouldDebug())
+            _log.debug("Send relay response " + " nonce " + nonce + " to " + bob);
+        _transport.send(packet);
+        if (rcode == SSU2Util.RELAY_ACCEPT) {
+            // send hole punch with the same data we sent to Bob
+            if (_log.shouldDebug())
+                _log.debug("Send hole punch to " + Addresses.toString(testIP, testPort));
+            long rcvId = (nonce << 32) | nonce;
+            long sendId = ~rcvId;
+            packet = _builder2.buildHolePunch(aliceIP, testPort, aliceIntroKey, sendId, rcvId, data);
+            _transport.send(packet);
+        }
+    }
+
+    /**
+     *  We are Bob and we got this from Charlie, OR
+     *  we are Alice and we got this from Bob.
+     *
+     *  If we are Bob, send to Alice.
+     *  If we are Alice, send a SessionRequest to Charlie.
+     *  We should already have a session with Charlie, but not necessarily with Alice.
+     *
+     *  SSU 2 only.
+     *
+     *  @since 0.9.55
+     */
+    void receiveRelayResponse(PeerState2 peer, int status, byte[] data) {
+    }
+
+    /**
+     *  We are Alice and we got this from Charlie.
+     *  Send a SessionRequest to Charlie, whether or not we got the Relay Response already.
+     *
+     *  SSU 2 only, out-of-session.
+     *
+     *  @since 0.9.55
+     */
+    void receiveHolePunch(RemoteHostId charlie, byte[] data) {
+    }
+
+    /**
+     *  Get an address out of a RI. SSU2 only.
+     *
+     *  @return address or null
+     *  @since 0.9.55
+     */
+    private RouterAddress getAddress(RouterInfo ri, boolean isIPv6) {
+        List<RouterAddress> addrs = _transport.getTargetAddresses(ri);
+        return PeerTestManager.getAddress(addrs, isIPv6);
     }
 
     /**

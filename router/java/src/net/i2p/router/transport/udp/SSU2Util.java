@@ -106,6 +106,7 @@ final class SSU2Util {
     public static final byte PEER_TEST_FLAG_BYTE = UDPPacket.PAYLOAD_TYPE_TEST;
     public static final byte RETRY_FLAG_BYTE = 9;
     public static final byte TOKEN_REQUEST_FLAG_BYTE = 10;
+    public static final byte HOLE_PUNCH_FLAG_BYTE = 11;
 
     public static final String INFO_CREATED =   "SessCreateHeader";
     public static final String INFO_CONFIRMED = "SessionConfirmed";
@@ -131,6 +132,20 @@ final class SSU2Util {
     public static final int TEST_REJECT_CHARLIE_CONNECTED = 68;
     public static final int TEST_REJECT_CHARLIE_BANNED = 69;
     public static final int TEST_REJECT_CHARLIE_UNKNOWN_ALICE = 70;
+
+    public static final int RELAY_ACCEPT = 0;
+    public static final int RELAY_REJECT_BOB_UNSPEC = 1;
+    public static final int RELAY_REJECT_BOB_BANNED_CHARLIE = 2;
+    public static final int RELAY_REJECT_BOB_LIMIT = 3;
+    public static final int RELAY_REJECT_BOB_SIGFAIL = 4;
+    public static final int RELAY_REJECT_BOB_NO_TAG = 5;
+    public static final int RELAY_REJECT_CHARLIE_UNSPEC = 64;
+    public static final int RELAY_REJECT_CHARLIE_ADDRESS = 65;
+    public static final int RELAY_REJECT_CHARLIE_LIMIT = 66;
+    public static final int RELAY_REJECT_CHARLIE_SIGFAIL = 67;
+    public static final int RELAY_REJECT_CHARLIE_CONNECTED = 68;
+    public static final int RELAY_REJECT_CHARLIE_BANNED = 69;
+    public static final int RELAY_REJECT_CHARLIE_UNKNOWN_ALICE = 70;
 
     // termination reason codes
     public static final int REASON_UNSPEC = 0;
@@ -192,6 +207,65 @@ final class SSU2Util {
             System.arraycopy(ip, 0, data, 12, iplen);
         }
         Signature sig = sign(ctx, PEER_TEST_PROLOGUE, h, h2, data, datalen, spk);
+        if (sig == null)
+            return null;
+        byte[] s = sig.getData();
+        System.arraycopy(s, 0, data, datalen, s.length);
+        return data;
+    }
+
+    /**
+     *  Make the data for the relay request block
+     *
+     *  @param h Bob hash to be included in sig, not included in data
+     *  @param h2 Charlie hash to be included in sig, not included in data
+     *  @param ip non-null
+     *  @return null on failure
+     *  @since 0.9.55
+     */
+    public static byte[] createRelayRequestData(I2PAppContext ctx, Hash h, Hash h2,
+                                                long nonce, long tag, byte[] ip, int port,
+                                                SigningPrivateKey spk) {
+        int datalen = 17 + ip.length;
+        byte[] data = new byte[datalen + spk.getType().getSigLen()];
+        //data[0] = 0;  // flag
+        DataHelper.toLong(data, 1, 4, nonce);
+        DataHelper.toLong(data, 5, 4, tag);
+        DataHelper.toLong(data, 9, 4, ctx.clock().now() / 1000);
+        data[13] = 2;  // version
+        data[14] = (byte) (ip.length + 2);
+        DataHelper.toLong(data, 15, 2, port);
+        System.arraycopy(ip, 0, data, 17, ip.length);
+        Signature sig = sign(ctx, RELAY_REQUEST_PROLOGUE, h, h2, data, datalen, spk);
+        if (sig == null)
+            return null;
+        byte[] s = sig.getData();
+        System.arraycopy(s, 0, data, datalen, s.length);
+        return data;
+    }
+
+    /**
+     *  Make the data for the relay response block
+     *
+     *  @param h Bob hash to be included in sig, not included in data
+     *  @param ip non-null
+     *  @return null on failure
+     *  @since 0.9.55
+     */
+    public static byte[] createRelayResponseData(I2PAppContext ctx, Hash h, int code,
+                                                 long nonce, byte[] ip, int port,
+                                                 SigningPrivateKey spk) {
+        int datalen = 14 + ip.length;
+        byte[] data = new byte[datalen + spk.getType().getSigLen()];
+        //data[0] = 0;  // flag
+        data[1] = (byte) code;
+        DataHelper.toLong(data, 2, 4, nonce);
+        DataHelper.toLong(data, 6, 4, ctx.clock().now() / 1000);
+        data[10] = 2;  // version
+        data[11] = (byte) (ip.length + 2);
+        DataHelper.toLong(data, 12, 2, port);
+        System.arraycopy(ip, 0, data, 14, ip.length);
+        Signature sig = sign(ctx, RELAY_RESPONSE_PROLOGUE, h, null, data, datalen, spk);
         if (sig == null)
             return null;
         byte[] s = sig.getData();

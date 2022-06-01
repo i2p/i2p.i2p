@@ -434,6 +434,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     public void gotRelayRequest(byte[] data) {
         if (!ENABLE_RELAY)
             return;
+        _transport.getIntroManager().receiveRelayRequest(this, data);
         // Relay blocks are ACK-eliciting
         messagePartiallyReceived();
     }
@@ -441,6 +442,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     public void gotRelayResponse(int status, byte[] data) {
         if (!ENABLE_RELAY)
             return;
+        _transport.getIntroManager().receiveRelayResponse(this, status, data);
         // Relay blocks are ACK-eliciting
         messagePartiallyReceived();
     }
@@ -448,6 +450,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     public void gotRelayIntro(Hash aliceHash, byte[] data) {
         if (!ENABLE_RELAY)
             return;
+        _transport.getIntroManager().receiveRelayIntro(this, aliceHash, data);
         // Relay blocks are ACK-eliciting
         messagePartiallyReceived();
     }
