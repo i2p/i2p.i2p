@@ -1,7 +1,18 @@
+2022-06-01 zzz
+ * SSU2: Enable peer test
+
+2022-05-30 zzz
+ * SSLEepGet: Send Host header to HTTPS proxy
+
+2022-05-29 zzz
+ * SSU2: Remove role field from peer test block
+
 2022-05-28 zzz
  * Console: Require full restart on transport enable/disable
+ * Crypto: Handle conversion from Java JCA 15+ EdEC keys
  * I2CP: Only send one notification to each session listener
  * i2psnark: Fix DHT not restarting after router restart
+ * i2psnark: Fix scrollbar hiding X box on Firefox 100
  * Router: Don't fail to start up on unchecked family key errors
 
 2022-05-27 zzz
