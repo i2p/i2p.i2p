@@ -139,6 +139,7 @@ final class SSU2Util {
     public static final int RELAY_REJECT_BOB_LIMIT = 3;
     public static final int RELAY_REJECT_BOB_SIGFAIL = 4;
     public static final int RELAY_REJECT_BOB_NO_TAG = 5;
+    public static final int RELAY_REJECT_BOB_UNKNOWN_ALICE = 6;
     public static final int RELAY_REJECT_CHARLIE_UNSPEC = 64;
     public static final int RELAY_REJECT_CHARLIE_ADDRESS = 65;
     public static final int RELAY_REJECT_CHARLIE_LIMIT = 66;

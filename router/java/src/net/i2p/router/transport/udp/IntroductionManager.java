@@ -18,6 +18,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
+import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.RouterContext;
@@ -106,6 +107,7 @@ class IntroductionManager {
     private static final int MAX_PUNCHES = 20;
     private static final long INTRODUCER_EXPIRATION = 80*60*1000L;
     private static final String MIN_IPV6_INTRODUCER_VERSION = "0.9.50";
+    private static final long MAX_SKEW = 2*60*1000;
 
     public IntroductionManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
@@ -667,6 +669,79 @@ class IntroductionManager {
      *  @since 0.9.55
      */
     void receiveRelayRequest(PeerState2 alice, byte[] data) {
+        long tag = DataHelper.fromLong(data, 4, 4);
+        long time = DataHelper.fromLong(data, 8, 4) * 1000;
+        long now = _context.clock().now();
+        long skew = time - now;
+        if (skew > MAX_SKEW || skew < 0 - MAX_SKEW) {
+            if (_log.shouldWarn())
+                _log.warn("Too skewed for relay req from " + alice);
+            return;
+        }
+        int ver = data[12] & 0xff;
+        if (ver != 2) {
+            if (_log.shouldWarn())
+                _log.warn("Bad relay req version " + ver + " from " + alice);
+            return;
+        }
+        PeerState charlie = _outbound.get(Long.valueOf(tag));
+        RouterInfo aliceRI = null;
+        int rcode;
+        if (charlie == null) {
+            if (_log.shouldWarn())
+                _log.warn("Relay tag not found " + tag + " from " + alice);
+            rcode = SSU2Util.RELAY_REJECT_BOB_NO_TAG;
+        } else if (charlie.getVersion() != 2) {
+            return;
+        } else {
+            aliceRI = _context.netDb().lookupRouterInfoLocally(alice.getRemotePeer());
+            if (aliceRI != null) {
+                // validate signed data
+                SigningPublicKey spk = aliceRI.getIdentity().getSigningPublicKey();
+                if (SSU2Util.validateSig(_context, SSU2Util.RELAY_REQUEST_PROLOGUE,
+                                         _context.routerHash(), charlie.getRemotePeer(), data, spk)) {
+                    rcode = SSU2Util.RELAY_ACCEPT;
+                } else {
+                    if (_log.shouldWarn())
+                        _log.warn("Signature failed relay intro\n" + aliceRI);
+                    rcode = SSU2Util.RELAY_REJECT_BOB_SIGFAIL;
+                }
+            } else {
+                if (_log.shouldWarn())
+                    _log.warn("Alice RI not found " + alice);
+                rcode = SSU2Util.RELAY_REJECT_BOB_UNKNOWN_ALICE;
+            }
+        }
+        UDPPacket packet;
+        if (rcode == SSU2Util.RELAY_ACCEPT) {
+            // Send Alice RI and forward data in a Relay Intro to Charlie
+            if (_log.shouldDebug())
+                _log.debug("Send alice RI and relay intro to " + charlie);
+            DatabaseStoreMessage dbsm = new DatabaseStoreMessage(_context);
+            dbsm.setEntry(aliceRI);
+            dbsm.setMessageExpiration(now + 10*1000);
+            _transport.send(dbsm, charlie);
+            packet = _builder2.buildRelayIntro(data, (PeerState2) charlie);
+        } else {
+            // send rejection to Alice
+            SigningPrivateKey spk = _context.keyManager().getSigningPrivateKey();
+            long nonce = DataHelper.fromLong(data, 0, 4);
+            int iplen = data[13] & 0xff;
+            int testPort = (int) DataHelper.fromLong(data, 14, 2);
+            byte[] testIP = new byte[iplen - 2];
+            System.arraycopy(data, 16, testIP, 0, iplen - 2);
+            data = SSU2Util.createRelayResponseData(_context, _context.routerHash(), rcode,
+                                                    nonce, testIP, testPort, spk);
+            if (data == null) {
+                if (_log.shouldWarn())
+                    _log.warn("sig fail");
+                 return;
+            }
+            if (_log.shouldDebug())
+                _log.debug("Send relay response rejection " + rcode + " to " + alice);
+            packet = _builder2.buildRelayResponse(data, alice);
+        }
+        _transport.send(packet);
     }
 
     /**
@@ -682,6 +757,13 @@ class IntroductionManager {
         long nonce = DataHelper.fromLong(data, 0, 4);
         long tag = DataHelper.fromLong(data, 4, 4);
         long time = DataHelper.fromLong(data, 8, 4) * 1000;
+        long now = _context.clock().now();
+        long skew = time - now;
+        if (skew > MAX_SKEW || skew < 0 - MAX_SKEW) {
+            if (_log.shouldWarn())
+                _log.warn("Too skewed for relay intro from " + bob);
+            return;
+        }
         int ver = data[12] & 0xff;
         if (ver != 2) {
             if (_log.shouldWarn())
