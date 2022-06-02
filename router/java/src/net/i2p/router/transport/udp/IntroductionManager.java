@@ -86,6 +86,8 @@ class IntroductionManager {
     private final Map<Long, PeerState> _outbound;
     /** map of relay tag to PeerState who have given us introduction tags */
     private final Map<Long, PeerState> _inbound;
+    /** map of relay nonce to alice PeerState who requested it */
+    private final Map<Long, PeerState2> _nonceToAlice;
     private final Set<InetAddress> _recentHolePunches;
     private long _lastHolePunchClean;
 
@@ -117,6 +119,7 @@ class IntroductionManager {
         _builder2 = transport.getBuilder2();
         _outbound = new ConcurrentHashMap<Long, PeerState>(MAX_OUTBOUND);
         _inbound = new ConcurrentHashMap<Long, PeerState>(MAX_INBOUND);
+        _nonceToAlice = (_builder2 != null) ? new ConcurrentHashMap<Long, PeerState2>(MAX_INBOUND) : null;
         _recentHolePunches = new HashSet<InetAddress>(16);
         ctx.statManager().createRateStat("udp.receiveRelayIntro", "How often we get a relayed request for us to talk to someone?", "udp", UDPTransport.RATES);
         ctx.statManager().createRateStat("udp.receiveRelayRequest", "How often we receive a good request to relay to someone else?", "udp", UDPTransport.RATES);
@@ -669,7 +672,6 @@ class IntroductionManager {
      *  @since 0.9.55
      */
     void receiveRelayRequest(PeerState2 alice, byte[] data) {
-        long tag = DataHelper.fromLong(data, 4, 4);
         long time = DataHelper.fromLong(data, 8, 4) * 1000;
         long now = _context.clock().now();
         long skew = time - now;
@@ -684,6 +686,8 @@ class IntroductionManager {
                 _log.warn("Bad relay req version " + ver + " from " + alice);
             return;
         }
+        long nonce = DataHelper.fromLong(data, 0, 4);
+        long tag = DataHelper.fromLong(data, 4, 4);
         PeerState charlie = _outbound.get(Long.valueOf(tag));
         RouterInfo aliceRI = null;
         int rcode;
@@ -700,7 +704,15 @@ class IntroductionManager {
                 SigningPublicKey spk = aliceRI.getIdentity().getSigningPublicKey();
                 if (SSU2Util.validateSig(_context, SSU2Util.RELAY_REQUEST_PROLOGUE,
                                          _context.routerHash(), charlie.getRemotePeer(), data, spk)) {
-                    rcode = SSU2Util.RELAY_ACCEPT;
+                    // save tag-to-alice mapping so we can forward the reply from charlie
+                    PeerState2 old = _nonceToAlice.putIfAbsent(Long.valueOf(nonce), alice);
+                    if (old != null && !old.equals(alice)) {
+                        // dup tag
+                        rcode = SSU2Util.RELAY_REJECT_BOB_UNSPEC;
+                    } else {
+                        rcode = SSU2Util.RELAY_ACCEPT;
+                    }
+                    // TODO add timer to remove from _nonceToAlice
                 } else {
                     if (_log.shouldWarn())
                         _log.warn("Signature failed relay intro\n" + aliceRI);
@@ -721,17 +733,21 @@ class IntroductionManager {
             dbsm.setEntry(aliceRI);
             dbsm.setMessageExpiration(now + 10*1000);
             _transport.send(dbsm, charlie);
-            packet = _builder2.buildRelayIntro(data, (PeerState2) charlie);
+            // put alice hash in intro data
+            byte[] idata = new byte[1 + Hash.HASH_LENGTH + data.length];
+            //idata[0] = 0; // flag
+            System.arraycopy(alice.getRemotePeer().getData(), 0, idata, 1, Hash.HASH_LENGTH);
+            System.arraycopy(data, 0, idata, 1 + Hash.HASH_LENGTH, data.length);
+            packet = _builder2.buildRelayIntro(idata, (PeerState2) charlie);
         } else {
             // send rejection to Alice
             SigningPrivateKey spk = _context.keyManager().getSigningPrivateKey();
-            long nonce = DataHelper.fromLong(data, 0, 4);
             int iplen = data[13] & 0xff;
             int testPort = (int) DataHelper.fromLong(data, 14, 2);
             byte[] testIP = new byte[iplen - 2];
             System.arraycopy(data, 16, testIP, 0, iplen - 2);
             data = SSU2Util.createRelayResponseData(_context, _context.routerHash(), rcode,
-                                                    nonce, testIP, testPort, spk);
+                                                    nonce, testIP, testPort, spk, 0);
             if (data == null) {
                 if (_log.shouldWarn())
                     _log.warn("sig fail");
@@ -828,9 +844,17 @@ class IntroductionManager {
 
         // generate our signed data
         // we sign it even if rejecting, not required though
+        long token;
+        if (rcode == SSU2Util.RELAY_ACCEPT) {
+            RemoteHostId aliceID = new RemoteHostId(testIP, testPort);
+            EstablishmentManager.Token tok = _transport.getEstablisher().getInboundToken(aliceID);
+            token = tok.token;
+        } else {
+            token = 0;
+        }
         SigningPrivateKey spk = _context.keyManager().getSigningPrivateKey();
         data = SSU2Util.createRelayResponseData(_context, bob.getRemotePeer(), rcode,
-                                                nonce, testIP, testPort, spk);
+                                                nonce, testIP, testPort, spk, token);
         if (data == null) {
             if (_log.shouldWarn())
                 _log.warn("sig fail");
@@ -864,6 +888,40 @@ class IntroductionManager {
      *  @since 0.9.55
      */
     void receiveRelayResponse(PeerState2 peer, int status, byte[] data) {
+        long nonce = DataHelper.fromLong(data, 0, 4);
+        long time = DataHelper.fromLong(data, 4, 4) * 1000;
+        long now = _context.clock().now();
+        long skew = time - now;
+        if (skew > MAX_SKEW || skew < 0 - MAX_SKEW) {
+            if (_log.shouldWarn())
+                _log.warn("Too skewed for relay resp from " + peer);
+            return;
+        }
+        int ver = data[8] & 0xff;
+        if (ver != 2) {
+            if (_log.shouldWarn())
+                _log.warn("Bad relay intro version " + ver + " from " + peer);
+            return;
+        }
+        // Look up nonce to determine if we are Alice or Bob
+        PeerState2 alice = _nonceToAlice.remove(Long.valueOf(nonce));
+        if (alice != null) {
+            // We are Bob, send to Alice
+            // We don't check the signature here
+            byte[] idata = new byte[2 + data.length];
+            //idata[0] = 0; // flag
+            idata[1] = (byte) status;
+            System.arraycopy(data, 0, idata, 2, data.length);
+            UDPPacket packet = _builder2.buildRelayResponse(idata, alice);
+            if (_log.shouldDebug())
+                _log.debug("Send relay response " + " nonce " + nonce + " to " + alice);
+            _transport.send(packet);
+        } else {
+            // We are Alice, give to EstablishmentManager to check sig and process
+            if (_log.shouldDebug())
+                _log.debug("Got relay response " + " nonce " + nonce + " from " + peer);
+            _transport.getEstablisher().receiveRelayResponse(peer, nonce, status, data);
+        }
     }
 
     /**

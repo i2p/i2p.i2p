@@ -1296,6 +1296,8 @@ class EstablishmentManager {
 
     /**
      *  We are Alice, we sent a RelayRequest to Bob and got a response back.
+     *
+     *  SSU 1 only.
      */
     void receiveRelayResponse(RemoteHostId bob, UDPPacketReader reader) {
         long nonce = reader.getRelayResponseReader().readNonce();
@@ -1351,6 +1353,18 @@ class EstablishmentManager {
                 _outboundByClaimedAddress.remove(oldId, state);  // only if == state
         }
         notifyActivity();
+    }
+
+    /**
+     *  We are Alice, we sent a RelayRequest to Bob and got a RelayResponse back.
+     *
+     *  SSU 2 only.
+     *
+     *  @param data including token if code == 0
+     *  @since 0.9.55
+     */
+    void receiveRelayResponse(PeerState2 bob, long nonce, int code, byte[] data) {
+        // lookup nonce, determine who signed, validate sig, send SessionRequest if code == 0
     }
 
     /**

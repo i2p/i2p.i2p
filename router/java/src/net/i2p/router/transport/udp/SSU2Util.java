@@ -227,22 +227,25 @@ final class SSU2Util {
     public static byte[] createRelayRequestData(I2PAppContext ctx, Hash h, Hash h2,
                                                 long nonce, long tag, byte[] ip, int port,
                                                 SigningPrivateKey spk) {
-        int datalen = 17 + ip.length;
-        byte[] data = new byte[datalen + spk.getType().getSigLen()];
-        //data[0] = 0;  // flag
-        DataHelper.toLong(data, 1, 4, nonce);
-        DataHelper.toLong(data, 5, 4, tag);
-        DataHelper.toLong(data, 9, 4, ctx.clock().now() / 1000);
-        data[13] = 2;  // version
-        data[14] = (byte) (ip.length + 2);
-        DataHelper.toLong(data, 15, 2, port);
-        System.arraycopy(ip, 0, data, 17, ip.length);
+        int datalen = 16 + ip.length;
+        byte[] data = new byte[datalen];
+        DataHelper.toLong(data, 0, 4, nonce);
+        DataHelper.toLong(data, 4, 4, tag);
+        DataHelper.toLong(data, 8, 4, ctx.clock().now() / 1000);
+        data[12] = 2;  // version
+        data[13] = (byte) (ip.length + 2);
+        DataHelper.toLong(data, 14, 2, port);
+        System.arraycopy(ip, 0, data, 16, ip.length);
         Signature sig = sign(ctx, RELAY_REQUEST_PROLOGUE, h, h2, data, datalen, spk);
         if (sig == null)
             return null;
+        int len = 1 + datalen + spk.getType().getSigLen();
+        byte[] rv = new byte[len];
+        //rv[0] = 0;  // flag
+        System.arraycopy(data, 0, rv, 1, data.length);
         byte[] s = sig.getData();
-        System.arraycopy(s, 0, data, datalen, s.length);
-        return data;
+        System.arraycopy(s, 0, rv, 1 + datalen, s.length);
+        return rv;
     }
 
     /**
@@ -250,28 +253,36 @@ final class SSU2Util {
      *
      *  @param h Bob hash to be included in sig, not included in data
      *  @param ip non-null
+     *  @param token if nonzero, append it
      *  @return null on failure
      *  @since 0.9.55
      */
     public static byte[] createRelayResponseData(I2PAppContext ctx, Hash h, int code,
                                                  long nonce, byte[] ip, int port,
-                                                 SigningPrivateKey spk) {
-        int datalen = 14 + ip.length;
-        byte[] data = new byte[datalen + spk.getType().getSigLen()];
-        //data[0] = 0;  // flag
-        data[1] = (byte) code;
-        DataHelper.toLong(data, 2, 4, nonce);
-        DataHelper.toLong(data, 6, 4, ctx.clock().now() / 1000);
-        data[10] = 2;  // version
-        data[11] = (byte) (ip.length + 2);
-        DataHelper.toLong(data, 12, 2, port);
-        System.arraycopy(ip, 0, data, 14, ip.length);
+                                                 SigningPrivateKey spk, long token) {
+        int datalen = 12 + ip.length;
+        byte[] data = new byte[datalen];
+        DataHelper.toLong(data, 0, 4, nonce);
+        DataHelper.toLong(data, 4, 4, ctx.clock().now() / 1000);
+        data[8] = 2;  // version
+        data[9] = (byte) (ip.length + 2);
+        DataHelper.toLong(data, 10, 2, port);
+        System.arraycopy(ip, 0, data, 12, ip.length);
         Signature sig = sign(ctx, RELAY_RESPONSE_PROLOGUE, h, null, data, datalen, spk);
         if (sig == null)
             return null;
+        int len = 2 + datalen + spk.getType().getSigLen();
+        if (token != 0)
+            len += 8;
+        byte[] rv = new byte[len];
+        //rv[0] = 0;  // flag
+        rv[1] = (byte) code;
+        System.arraycopy(data, 0, rv, 2, data.length);
         byte[] s = sig.getData();
-        System.arraycopy(s, 0, data, datalen, s.length);
-        return data;
+        System.arraycopy(s, 0, rv, 2 + datalen, s.length);
+        if (token != 0)
+            DataHelper.toLong8(rv, 2 + datalen + s.length, token);
+        return rv;
     }
 
     /**

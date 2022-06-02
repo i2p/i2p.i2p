@@ -723,6 +723,7 @@ class PacketBuilder2 {
      *  From Alice to Bob.
      *  In-session.
      *
+     *  @param signedData flag + signed data
      *  @return null on failure
      */
     UDPPacket buildRelayRequest(byte[] signedData, PeerState2 bob) {
@@ -737,6 +738,7 @@ class PacketBuilder2 {
      *  From Bob to Charlie.
      *  In-session.
      *
+     *  @param signedData flag + alice hash + signed data
      *  @return null on failure
      */
     UDPPacket buildRelayIntro(byte[] signedData, PeerState2 charlie) {
@@ -750,6 +752,7 @@ class PacketBuilder2 {
      *  From Charlie to Bob or Bob to Alice.
      *  In-session.
      *
+     *  @param signedData flag + response code + signed data + optional token
      *  @param state Alice or Bob
      *  @return null on failure
      */
