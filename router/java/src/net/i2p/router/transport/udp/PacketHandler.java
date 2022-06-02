@@ -810,7 +810,7 @@ class PacketHandler {
         SSU2Header.Header header;
         int type;
         if (state == null) {
-            // Session Request, Token Request, or Peer Test
+            // Session Request, Token Request, Peer Test 5-7, or Hole Punch
             k2 = k1;
             header = SSU2Header.trialDecryptHandshakeHeader(packet, k1, k2);
             if (header == null ||
@@ -818,7 +818,7 @@ class PacketHandler {
                 header.getVersion() != 2 ||
                 header.getNetID() != _networkID) {
                 if (header != null && _log.shouldInfo())
-                    _log.info("Does not decrypt as Session Request, attempt to decrypt as Token Request/Peer Test: " + header + " from " + from);
+                    _log.info("Does not decrypt as Session Request, attempt to decrypt as TokenRequest/PeerTest/HolePunch: " + header + " from " + from);
                 // The first 32 bytes were fine, but it corrupted the next 32 bytes
                 // TODO make this more efficient, just take the first 32 bytes
                 header = SSU2Header.trialDecryptLongHeader(packet, k1, k2);
@@ -916,6 +916,11 @@ class PacketHandler {
                 _log.debug("Got a Peer Test");
             if (SSU2Util.ENABLE_PEER_TEST)
                 _testManager.receiveTest(from, packet);
+        } else if (type == SSU2Util.HOLE_PUNCH_FLAG_BYTE) {
+            if (_log.shouldDebug())
+                _log.debug("Got a Hole Punch");
+            if (SSU2Util.ENABLE_RELAY)
+                _establisher.receiveHolePunch(from, packet);
         } else {
             if (_log.shouldWarn())
                 _log.warn("Got unknown message " + header + " on " + state);

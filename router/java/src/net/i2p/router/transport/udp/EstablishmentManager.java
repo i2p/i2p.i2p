@@ -1,5 +1,6 @@
 package net.i2p.router.transport.udp;
 
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
@@ -10,7 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.southernstorm.noise.protocol.ChaChaPolyCipherState;
+
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterIdentity;
@@ -27,9 +31,11 @@ import net.i2p.router.transport.TransportUtil;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import static net.i2p.router.transport.udp.InboundEstablishState.InboundState.*;
 import static net.i2p.router.transport.udp.OutboundEstablishState.OutboundState.*;
+import static net.i2p.router.transport.udp.SSU2Util.*;
 import net.i2p.router.util.DecayingHashSet;
 import net.i2p.router.util.DecayingBloomFilter;
 import net.i2p.util.Addresses;
+import net.i2p.util.HexDump;
 import net.i2p.util.I2PThread;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
@@ -1371,6 +1377,8 @@ class EstablishmentManager {
      *  Called from UDPReceiver.
      *  Accelerate response to RelayResponse if we haven't sent it yet.
      *
+     *  SSU 1 only.
+     *
      *  @since 0.9.15
      */
     void receiveHolePunch(InetAddress from, int fromPort) {
@@ -1390,6 +1398,66 @@ class EstablishmentManager {
             // HolePunch received before RelayResponse, and we didn't know the IP/port, or it changed
             if (_log.shouldLog(Log.INFO))
                 _log.info("No state found for hole punch from " + from + " port " + fromPort);
+        }
+    }
+
+    /**
+     *  Called from PacketHandler.
+     *  Accelerate response to RelayResponse if we haven't sent it yet.
+     *
+     *  SSU 2 only.
+     *
+     *  @param id non-null
+     *  @param packet header already decrypted
+     *  @since 0.9.55
+     */
+    void receiveHolePunch(RemoteHostId id, UDPPacket packet) {
+        DatagramPacket pkt = packet.getPacket();
+        int off = pkt.getOffset();
+        int len = pkt.getLength();
+        byte data[] = pkt.getData();
+        long rcvConnID = DataHelper.fromLong8(data, off);
+        long sendConnID = DataHelper.fromLong8(data, off + SRC_CONN_ID_OFFSET);
+        int type = data[off + TYPE_OFFSET] & 0xff;
+        if (type != HOLE_PUNCH_FLAG_BYTE)
+            return;
+        byte[] introKey = _transport.getSSU2StaticIntroKey();
+        ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
+        chacha.initializeKey(introKey, 0);
+        long n = DataHelper.fromLong(data, off + PKT_NUM_OFFSET, 4);
+        chacha.setNonce(n);
+        try {
+            // decrypt in-place
+            chacha.decryptWithAd(data, off, LONG_HEADER_SIZE,
+                                 data, off + LONG_HEADER_SIZE, data, off + LONG_HEADER_SIZE, len - LONG_HEADER_SIZE);
+            int payloadLen = len - (LONG_HEADER_SIZE + MAC_LEN);
+            SSU2Payload.PayloadCallback cb = new HPCallback(id);
+            SSU2Payload.processPayload(_context, cb, data, off + LONG_HEADER_SIZE, payloadLen, false);
+            // TODO process cb fields
+        } catch (Exception e) {
+            if (_log.shouldWarn())
+                _log.warn("Bad HolePunch packet:\n" + HexDump.dump(data, off, len), e);
+            return;
+        } finally {
+            chacha.destroy();
+        }
+
+        // TODO now we can look up by nonce instead if we want
+        OutboundEstablishState state = _outboundStates.get(id);
+        if (state != null) {
+            boolean sendNow = state.receiveHolePunch();
+            if (sendNow) {
+                if (_log.shouldDebug())
+                    _log.debug("Hole punch from " + state + ", sending SessionRequest now");
+                notifyActivity();
+            } else {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Hole punch from " + state + ", already sent SessionRequest");
+            }
+        } else {
+            // HolePunch received before RelayResponse, and we didn't know the IP/port, or it changed
+            if (_log.shouldLog(Log.INFO))
+                _log.info("No state found for hole punch from " + id);
         }
     }
 
@@ -1962,6 +2030,89 @@ class EstablishmentManager {
             token = tok; expires = exp;
         }
     }
+
+    /**
+     *  Process SSU2 hole punch payload
+     *
+     *  @since 0.9.55
+     */
+    private class HPCallback implements SSU2Payload.PayloadCallback {
+        private final RemoteHostId _from;
+        public long _timeReceived;
+        public byte[] _aliceIP;
+        public int _alicePort;
+        public int _respCode;
+        public byte[] _respData;
+
+        public HPCallback(RemoteHostId from) {
+            _from = from;
+        }
+
+        public void gotDateTime(long time) {
+            _timeReceived = time;
+        }
+
+        public void gotOptions(byte[] options, boolean isHandshake) {}
+
+        public void gotRI(RouterInfo ri, boolean isHandshake, boolean flood) {
+            throw new IllegalStateException("Bad block in HP");
+        }
+
+        public void gotRIFragment(byte[] data, boolean isHandshake, boolean flood, boolean isGzipped, int frag, int totalFrags) {
+            throw new IllegalStateException("Bad block in HP");
+        }
+
+        public void gotAddress(byte[] ip, int port) {
+            _aliceIP = ip;
+            _alicePort = port;
+        }
+
+        public void gotRelayTagRequest() {
+            throw new IllegalStateException("Bad block in HP");
+        }
+
+        public void gotRelayTag(long tag) {
+            throw new IllegalStateException("Bad block in HP");
+        }
+
+        public void gotRelayRequest(byte[] data) {
+            throw new IllegalStateException("Bad block in HP");
+        }
+
+        public void gotRelayResponse(int status, byte[] data) {
+            _respCode = status;
+            _respData = data;
+        }
+
+        public void gotRelayIntro(Hash aliceHash, byte[] data) {
+            throw new IllegalStateException("Bad block in HP");
+        }
+
+        public void gotPeerTest(int msg, int status, Hash h, byte[] data) {
+            throw new IllegalStateException("Bad block in HP");
+        }
+
+        public void gotToken(long token, long expires) {
+            throw new IllegalStateException("Bad block in HP");
+        }
+
+        public void gotI2NP(I2NPMessage msg) {
+            throw new IllegalStateException("Bad block in HP");
+        }
+
+        public void gotFragment(byte[] data, int off, int len, long messageId,int frag, boolean isLast) {
+            throw new IllegalStateException("Bad block in HP");
+        }
+
+        public void gotACK(long ackThru, int acks, byte[] ranges) {
+            throw new IllegalStateException("Bad block in HP");
+        }
+
+        public void gotTermination(int reason, long count) {
+            throw new IllegalStateException("Bad block in HP");
+        }
+    }
+
 
     //// End SSU 2 ////
 
