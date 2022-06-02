@@ -298,14 +298,20 @@ class IntroductionManager {
                     continue;
                 }
                 cur.setIntroducerTime();
-                UDPAddress ura = new UDPAddress(ra);
-                byte[] ikey = ura.getIntroKey();
-                if (ikey == null)
-                    continue;
-                introducers.add(new Introducer(ip, port, ikey, cur.getTheyRelayToUsAs(), exp));
+                Introducer intro;
+                if (cur.getVersion() == 1) {
+                    UDPAddress ura = new UDPAddress(ra);
+                    byte[] ikey = ura.getIntroKey();
+                    if (ikey == null)
+                        continue;
+                    intro = new Introducer(ip, port, ikey, cur.getTheyRelayToUsAs(), exp);
+                } else {
+                    intro = new Introducer(cur.getRemotePeer(), cur.getTheyRelayToUsAs(), exp);
+                }
+                introducers.add(intro);
                 found++;
-                // two per router max
-                if (found - oldFound >= 2)
+                // two per router max, one for SSU 2
+                if (found - oldFound >= 2 || cur.getVersion() > 1)
                     break;
             }
             if (oldFound != found && _log.shouldLog(Log.INFO))
@@ -316,32 +322,45 @@ class IntroductionManager {
         Collections.sort(introducers);
         for (int i = 0; i < found; i++) {
             Introducer in = introducers.get(i);
-            ssuOptions.setProperty(UDPAddress.PROP_INTRO_HOST_PREFIX + i, in.sip);
-            ssuOptions.setProperty(UDPAddress.PROP_INTRO_PORT_PREFIX + i, in.sport);
-            ssuOptions.setProperty(UDPAddress.PROP_INTRO_KEY_PREFIX + i, in.skey);
+            if (in.version == 1) {
+                ssuOptions.setProperty(UDPAddress.PROP_INTRO_HOST_PREFIX + i, in.sip);
+                ssuOptions.setProperty(UDPAddress.PROP_INTRO_PORT_PREFIX + i, in.sport);
+                ssuOptions.setProperty(UDPAddress.PROP_INTRO_KEY_PREFIX + i, in.skey);
+            } else {
+                ssuOptions.setProperty(UDPAddress.PROP_INTRO_HASH_PREFIX + i, in.shash);
+            }
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_TAG_PREFIX + i, in.stag);
             String sexp = in.sexp;
             // look for existing expiration in current published
             // and reuse if still recent enough, so deepEquals() won't fail in UDPT.rEA
             if (current != null) {
                 for (int j = 0; j < UDPTransport.PUBLIC_RELAY_COUNT; j++) {
-                    if (in.sip.equals(current.getOption(UDPAddress.PROP_INTRO_HOST_PREFIX + j)) &&
-                        in.sport.equals(current.getOption(UDPAddress.PROP_INTRO_PORT_PREFIX + j)) &&
-                        in.skey.equals(current.getOption(UDPAddress.PROP_INTRO_KEY_PREFIX + j)) &&
-                        in.stag.equals(current.getOption(UDPAddress.PROP_INTRO_TAG_PREFIX + j))) {
-                        // found old one
-                        String oexp = current.getOption(UDPAddress.PROP_INTRO_EXP_PREFIX + j);
-                        if (oexp != null) {
-                            try {
-                                long oex = Long.parseLong(oexp) * 1000;
-                                if (oex > now + UDPTransport.INTRODUCER_EXPIRATION_MARGIN) {
-                                    // still good, use old expiration time
-                                    sexp = oexp;
-                                }
-                            } catch (NumberFormatException nfe) {}
+                    String oexp = null;
+                    if (in.version == 1) {
+                        if (in.sip.equals(current.getOption(UDPAddress.PROP_INTRO_HOST_PREFIX + j)) &&
+                            in.sport.equals(current.getOption(UDPAddress.PROP_INTRO_PORT_PREFIX + j)) &&
+                            in.skey.equals(current.getOption(UDPAddress.PROP_INTRO_KEY_PREFIX + j)) &&
+                            in.stag.equals(current.getOption(UDPAddress.PROP_INTRO_TAG_PREFIX + j))) {
+                            // found old one
+                            oexp = current.getOption(UDPAddress.PROP_INTRO_EXP_PREFIX + j);
                         }
-                        break;
+                    } else {
+                        if (in.shash.equals(current.getOption(UDPAddress.PROP_INTRO_HASH_PREFIX + j)) &&
+                            in.stag.equals(current.getOption(UDPAddress.PROP_INTRO_TAG_PREFIX + j))) {
+                            // found old one
+                            oexp = current.getOption(UDPAddress.PROP_INTRO_EXP_PREFIX + j);
+                        }
                     }
+                    if (oexp != null) {
+                        try {
+                            long oex = Long.parseLong(oexp) * 1000;
+                            if (oex > now + UDPTransport.INTRODUCER_EXPIRATION_MARGIN) {
+                                // still good, use old expiration time
+                                sexp = oexp;
+                            }
+                        } catch (NumberFormatException nfe) {}
+                    }
+                    break;
                 }
             }
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_EXP_PREFIX + i, sexp);
@@ -358,19 +377,43 @@ class IntroductionManager {
      *  @since 0.9.18
      */
     private static class Introducer implements Comparable<Introducer> {
-        public final String sip, sport, skey, stag, sexp;
+        public final String sip, sport, skey, stag, sexp, shash;
+        public final int version;
 
+        /**
+         * SSU 1
+         */
         public Introducer(byte[] ip, int port, byte[] key, long tag, String exp) {
             sip = Addresses.toString(ip);
             sport = String.valueOf(port);
             skey = Base64.encode(key);
             stag = String.valueOf(tag);
             sexp = exp;
+            version = 1;
+            shash = null;
+        }
+
+        /**
+         * SSU 2
+         * @since 0.9.55
+         */
+        public Introducer(Hash h, long tag, String exp) {
+            stag = String.valueOf(tag);
+            sexp = exp;
+            shash = h.toBase64();
+            version = 2;
+            sip = null;
+            sport = null;
+            skey = null;
         }
 
         @Override
         public int compareTo(Introducer i) {
-            return skey.compareTo(i.skey);
+            // put SSU 2 at the end to not confuse SSU 1
+            int diff = version - i.version;
+            if (diff != 0)
+                return diff;
+            return stag.compareTo(i.stag);
         }
         
         @Override
@@ -388,7 +431,7 @@ class IntroductionManager {
         
         @Override
         public int hashCode() {
-        	return skey.hashCode(); 
+            return stag.hashCode();
         }
     }
 

@@ -43,6 +43,9 @@ class UDPAddress {
     public static final String PROP_INTRO_TAG_PREFIX = "itag";
     /** @since 0.9.30 */
     public static final String PROP_INTRO_EXP_PREFIX = "iexp";
+    /** @since 0.9.55 for SSU2 */
+    public static final String PROP_INTRO_HASH_PREFIX = "ih";
+
     static final int MAX_INTRODUCERS = 3;
     private static final String[] PROP_INTRO_HOST;
     private static final String[] PROP_INTRO_PORT;
