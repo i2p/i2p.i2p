@@ -244,10 +244,6 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     // SSU 1 unsupported things
 
     @Override
-    void setCurrentMACKey(SessionKey key) { throw new UnsupportedOperationException(); }
-    @Override
-    void setCurrentCipherKey(SessionKey key) { throw new UnsupportedOperationException(); }
-    @Override
     List<Long> getCurrentFullACKs() { throw new UnsupportedOperationException(); }
     @Override
     List<Long> getCurrentResendACKs() { throw new UnsupportedOperationException(); }
