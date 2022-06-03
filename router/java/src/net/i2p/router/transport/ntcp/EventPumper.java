@@ -93,6 +93,7 @@ class EventPumper implements Runnable {
     private static final long MIN_EXPIRE_IDLE_TIME = 120*1000l;
     private static final long MAX_EXPIRE_IDLE_TIME = 11*60*1000l;
     private static final long MAY_DISCON_TIMEOUT = 10*1000;
+    private static final long RI_STORE_INTERVAL = 29*60*1000;
 
     /**
      *  Do we use direct buffers for reading? Default false.
@@ -312,6 +313,18 @@ class EventPumper implements Runnable {
                                     if (_log.shouldInfo())
                                         _log.info("Failsafe or expire close for " + con);
                                     failsafeCloses++;
+                                } else {
+                                    // periodically send our RI
+                                    long estab = con.getEstablishedOn();
+                                    if (estab > 0) {
+                                        long uptime = now - estab;
+                                        if (uptime >= RI_STORE_INTERVAL) {
+                                            long mod = uptime % RI_STORE_INTERVAL;
+                                            if (mod < FAILSAFE_ITERATION_FREQ) {
+                                                con.sendOurRouterInfo(false);
+                                            }
+                                        }
+                                    }
                                 }
                             } catch (CancelledKeyException cke) {
                                 // cancelled while updating the interest ops.  ah well

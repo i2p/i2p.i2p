@@ -1,3 +1,11 @@
+2022-06-03 zzz
+ * SSU: Possible fix for rare HMAC NPE
+ * Transports: Periodically send RI to connected peers
+   (Gitlab ticket #356)
+
+2022-06-02 zzz
+ * SSU2: Relay partial implementation
+
 2022-06-01 zzz
  * SSU2: Enable peer test
 

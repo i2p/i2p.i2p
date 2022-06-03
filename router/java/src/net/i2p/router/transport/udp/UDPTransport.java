@@ -3504,6 +3504,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         private static final long EXPIRE_INCREMENT = 15*1000;
         private static final long EXPIRE_DECREMENT = 45*1000;
         private static final long MAY_DISCON_TIMEOUT = 10*1000;
+        private static final long RI_STORE_INTERVAL = 29*60*1000;
 
         public ExpirePeerEvent() {
             super(_context.simpleTimer2());
@@ -3540,6 +3541,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             int currentListenPort = getListenPort(false);
             boolean pingOneOnly = shouldPingFirewall && getExternalPort(false) == currentListenPort;
             boolean shortLoop = shouldPingFirewall || !haveCap || _context.netDb().floodfillEnabled();
+            long loopTime = shortLoop ? SHORT_LOOP_TIME : LONG_LOOP_TIME;
             _lastLoopShort = shortLoop;
             _expireBuffer.clear();
             _runCount++;
@@ -3585,7 +3587,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                         // session, so ping all of them. Otherwise only one.
                         if (pingOneOnly)
                             shouldPingFirewall = false;
-		    }
+                    } else {
+                        // periodically send our RI
+                        long uptime = now - peer.getKeyEstablishedTime();
+                        if (uptime >= RI_STORE_INTERVAL) {
+                            long mod = uptime % RI_STORE_INTERVAL;
+                            if (mod < loopTime) {
+                                DatabaseStoreMessage dsm = _establisher.getOurInfo();
+                                send(dsm, peer);
+                            }
+                        }
+                    }
                 }
 
             if (!_expireBuffer.isEmpty()) {
@@ -3603,7 +3615,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
 
             if (_alive)
-                schedule(shortLoop ? SHORT_LOOP_TIME : LONG_LOOP_TIME);
+                schedule(loopTime);
         }
 
         public void add(PeerState peer) {

@@ -1141,9 +1141,9 @@ class EstablishmentManager {
     /**
      *  A database store message with our router info
      *  @return non-null
-     *  @since 0.9.24 split from sendOurInfo()
+     *  @since 0.9.24 split from sendOurInfo(), public since 0.9.55 for UDPTransport
      */
-    private DatabaseStoreMessage getOurInfo() {
+    public DatabaseStoreMessage getOurInfo() {
         DatabaseStoreMessage m = new DatabaseStoreMessage(_context);
         m.setEntry(_context.router().getRouterInfo());
         m.setMessageExpiration(_context.clock().now() + DATA_MESSAGE_TIMEOUT);
