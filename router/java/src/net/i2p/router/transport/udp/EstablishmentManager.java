@@ -949,11 +949,11 @@ class EstablishmentManager {
             peer = new PeerState(_context, _transport,
                                  state.getSentIP(), state.getSentPort(), remote.calculateHash(), true, state.getRTT(),
                                  state.getCipherKey(), state.getMACKey());
-            peer.setWeRelayToThemAs(state.getSentRelayTag());
         } else {
             InboundEstablishState2 state2 = (InboundEstablishState2) state;
             peer = state2.getPeerState();
         }
+        peer.setWeRelayToThemAs(state.getSentRelayTag());
 
         if (version == 1) {
             // Lookup the peer's MTU from the netdb, since it isn't included in the protocol setup (yet)

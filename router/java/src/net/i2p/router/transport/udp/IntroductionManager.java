@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -110,6 +111,9 @@ class IntroductionManager {
     private static final long INTRODUCER_EXPIRATION = 80*60*1000L;
     private static final String MIN_IPV6_INTRODUCER_VERSION = "0.9.50";
     private static final long MAX_SKEW = 2*60*1000;
+    /** testing */
+    private static final String PROP_PREFER_SSU2 = "i2np.ssu2.preferSSU2Introducers";
+    private static final boolean DEFAULT_PREFER_SSU2 = SSU2Util.ENABLE_RELAY && true;
 
     public IntroductionManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
@@ -150,8 +154,7 @@ class IntroductionManager {
             _inbound.put(Long.valueOf(id2), peer);
         }
         if (added &&_log.shouldLog(Log.DEBUG))
-            _log.debug("adding peer " + peer.getRemotePeer() + ' ' + peer.getRemoteHostId() + ", weRelayToThemAs "
-                       + id + ", theyRelayToUsAs " + id2);
+            _log.debug("adding peer " + peer);
     }
     
     public void remove(PeerState peer) {
@@ -164,8 +167,7 @@ class IntroductionManager {
             _inbound.remove(Long.valueOf(id2));
         }
         if ((id > 0 || id2 > 0) &&_log.shouldLog(Log.DEBUG))
-            _log.debug("removing peer " + peer.getRemotePeer() + ' ' + peer.getRemoteHostId() + ", weRelayToThemAs "
-                       + id + ", theyRelayToUsAs " + id2);
+            _log.debug("removing peer " + peer);
     }
     
     /**
@@ -200,13 +202,13 @@ class IntroductionManager {
      * @return number of introducers added
      */
     public int pickInbound(RouterAddress current, boolean ipv6, Properties ssuOptions, int howMany) {
-        int start = _context.random().nextInt();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Picking inbound out of " + _inbound.size());
         if (_inbound.isEmpty()) return 0;
         List<PeerState> peers = new ArrayList<PeerState>(_inbound.values());
         int sz = peers.size();
-        start = start % sz;
+        boolean preferV2 = _context.getProperty(PROP_PREFER_SSU2, DEFAULT_PREFER_SSU2);
+        Collections.sort(peers, new PeerStateComparator(preferV2));
         int found = 0;
         long now = _context.clock().now();
         long inactivityCutoff = now - (UDPTransport.EXPIRE_TIMEOUT / 2);    // 15 min
@@ -238,7 +240,7 @@ class IntroductionManager {
         }
 
         for (int i = 0; i < sz && found < howMany; i++) {
-            PeerState cur = peers.get((start + i) % sz);
+            PeerState cur = peers.get(i);
             if (cur.isIPv6() != ipv6)
                 continue;
             RouterInfo ri = _context.netDb().lookupRouterInfoLocally(cur.getRemotePeer());
@@ -373,6 +375,36 @@ class IntroductionManager {
     }
 
     /**
+     *  For picking introducers.
+     *  Reverse sort, version 2 first, for testing
+     *  Then lowest uptime first, to reduce idle timeout and disconnect,
+     *  and ensure variety.
+     *
+     *  @since 0.9.55
+     */
+    private static class PeerStateComparator implements Comparator<PeerState> {
+        private final boolean _v2;
+
+        public PeerStateComparator(boolean preferV2) {
+            _v2 = preferV2;
+        }
+
+        public int compare(PeerState l, PeerState r) {
+            if (_v2) {
+                int rv = r.getVersion() - l.getVersion();
+                if (rv != 0)
+                    return rv;
+            }
+            long d = r.getKeyEstablishedTime() - l.getKeyEstablishedTime();
+            if (d < 0)
+                return -1;
+            if (d > 0)
+                return 1;
+            return 0;
+        }
+    }
+
+    /**
      *  So we can sort them
      *  @since 0.9.18
      */
@@ -443,13 +475,13 @@ class IntroductionManager {
         // Try to keep the connection up for two hours after we made anybody an introducer
         long now = _context.clock().now();
         long pingCutoff = now - (105 * 60 * 1000);
-        long inactivityCutoff = now - UDPTransport.MIN_EXPIRE_TIMEOUT;
+        long inactivityCutoff = now - (UDPTransport.MIN_EXPIRE_TIMEOUT / 2);
         for (PeerState cur : _inbound.values()) {
             if (cur.getIntroducerTime() > pingCutoff &&
-                cur.getLastSendTime() < inactivityCutoff) {
+                cur.getLastSendOrPingTime() < inactivityCutoff) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Pinging introducer: " + cur);
-                cur.setLastSendTime(now);
+                cur.setLastPingTime(now);
                 UDPPacket ping;
                 if (cur.getVersion() == 2)
                     ping = _builder2.buildPing((PeerState2) cur);
@@ -770,8 +802,11 @@ class IntroductionManager {
         UDPPacket packet;
         if (rcode == SSU2Util.RELAY_ACCEPT) {
             // Send Alice RI and forward data in a Relay Intro to Charlie
-            if (_log.shouldDebug())
-                _log.debug("Send alice RI and relay intro to " + charlie);
+            if (_log.shouldInfo())
+                _log.info("Receive relay request from " + alice 
+                      + " for tag " + tag
+                      + " nonce " + nonce
+                      + " and relaying with " + charlie);
             DatabaseStoreMessage dbsm = new DatabaseStoreMessage(_context);
             dbsm.setEntry(aliceRI);
             dbsm.setMessageExpiration(now + 10*1000);
@@ -796,8 +831,8 @@ class IntroductionManager {
                     _log.warn("sig fail");
                  return;
             }
-            if (_log.shouldDebug())
-                _log.debug("Send relay response rejection " + rcode + " to " + alice);
+            if (_log.shouldInfo())
+                _log.info("Send relay response rejection " + rcode + " to " + alice);
             packet = _builder2.buildRelayResponse(data, alice);
         }
         _transport.send(packet);

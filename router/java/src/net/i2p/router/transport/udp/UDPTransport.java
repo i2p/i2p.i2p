@@ -2040,8 +2040,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 //        _log.warn((ipv6 ? "IPv6" : "IPv4") + " introducers valid, haven't changed in " + DataHelper.formatDuration(sinceSelected) + ", reselecting");
                 //    return true;
                 //} else {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info((ipv6 ? "IPv6" : "IPv4") + " introducers valid, selected " + DataHelper.formatDuration(sinceSelected) + " ago");
+                    if (_log.shouldDebug())
+                        _log.debug((ipv6 ? "IPv6" : "IPv4") + " introducers valid, selected " + DataHelper.formatDuration(sinceSelected) + " ago");
                     return false;
                 //}
             } else if (sinceSelected > 2*60*1000) {
