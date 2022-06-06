@@ -151,7 +151,7 @@ class IntroductionManager {
         long id2 = peer.getTheyRelayToUsAs();
         //if (id2 > 0 && _inbound.size() < MAX_INBOUND) {
         // test
-        if (id2 > 0 && (_inbound.size() < MAX_INBOUND || peer.getVersion() == 2) {
+        if (id2 > 0 && (_inbound.size() < MAX_INBOUND || peer.getVersion() == 2)) {
             added = true;
             _inbound.put(Long.valueOf(id2), peer);
         }
