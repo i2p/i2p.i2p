@@ -82,6 +82,8 @@ public class DataHelper {
             "ihost0", "iport0", "ikey0", "itag0", "iexp0",
             "ihost1", "iport1", "ikey1", "itag1", "iexp1",
             "ihost2", "iport2", "ikey2", "itag2", "iexp2",
+            "ihost3", "iport3", "ikey3", "itag3", "iexp3",
+            "ih0", "ih1", "ih2", "ih3",
             // RouterInfo options
             "caps", "coreVersion", "netId", "router.version",
             "netdb.knownLeaseSets", "netdb.knownRouters",
