@@ -252,7 +252,16 @@ class IntroductionManager {
             PeerState cur = peers.get(i);
             if (cur.isIPv6() != ipv6)
                 continue;
-            RouterInfo ri = _context.netDb().lookupRouterInfoLocally(cur.getRemotePeer());
+            Hash hash = cur.getRemotePeer();
+            // dup check of reused SSU2 introducers
+            if (SSU2Util.ENABLE_RELAY && cur.getVersion() > 1) {
+                String b64 = hash.toBase64();
+                for (Introducer intro : introducers) {
+                    if (b64.equals(intro.shash))
+                        continue;
+                }
+            }
+            RouterInfo ri = _context.netDb().lookupRouterInfoLocally(hash);
             if (ri == null) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Picked peer has no local routerInfo: " + cur);
@@ -267,8 +276,8 @@ class IntroductionManager {
                 continue;
             }
             if ( /* _context.profileOrganizer().isFailing(cur.getRemotePeer()) || */
-                _context.banlist().isBanlisted(cur.getRemotePeer()) ||
-                _transport.wasUnreachable(cur.getRemotePeer())) {
+                _context.banlist().isBanlisted(hash) ||
+                _transport.wasUnreachable(hash)) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Peer is failing, blocklisted or was unreachable: " + cur);
                 continue;
@@ -316,7 +325,7 @@ class IntroductionManager {
                         continue;
                     intro = new Introducer(ip, port, ikey, cur.getTheyRelayToUsAs(), exp);
                 } else {
-                    intro = new Introducer(cur.getRemotePeer(), cur.getTheyRelayToUsAs(), exp);
+                    intro = new Introducer(hash, cur.getTheyRelayToUsAs(), exp);
                 }
                 introducers.add(intro);
                 found++;
