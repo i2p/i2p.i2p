@@ -817,7 +817,7 @@ class PeerTestManager {
     }
 
     /**
-     * Entry point for all incoming packets.
+     * Entry point for all in-session incoming packets.
      *
      * SSU 2 only.
      *
@@ -836,6 +836,32 @@ class PeerTestManager {
      * @since 0.9.54
      */
     public void receiveTest(RemoteHostId from, PeerState2 fromPeer, int msg, int status, Hash h, byte[] data) {
+        receiveTest(from, fromPeer, msg, status, h, data, null, 0);
+    }
+
+    /**
+     * Called from above for in-session 1-4 or the PTCallback via processPayload() for out-of-session 5-7
+     *
+     * SSU 2 only.
+     *
+     * Receive a test message of some sort from the given peer, queueing up any packet
+     * that should be sent in response, or if its a reply to our own current testing,
+     * adjusting our test state.
+     *
+     * We could be Alice, Bob, or Charlie.
+     *
+     * @param from non-null
+     * @param fromPeer non-null if an associated session was found, otherwise null
+     * @param msg 1-7
+     * @param status 0 = accept, 1-255 = reject
+     * @param h Alice or Charlie hash for msg 2 and 4, null for msg 1, 3, 5-7
+     * @param data excludes flag, includes signature
+     * @param addrBlockIP only used for msgs 5-7, otherwise null
+     * @param addrBlockPort only used for msgs 5-7, otherwise 0
+     * @since 0.9.55
+     */
+    private void receiveTest(RemoteHostId from, PeerState2 fromPeer, int msg, int status, Hash h, byte[] data,
+                             byte[] addrBlockIP, int addrBlockPort) {
         if (data[0] != 2) {
             if (_log.shouldWarn())
                 _log.warn("Bad version " + (data[0] & 0xff) + " from " + from + ' ' + fromPeer);
@@ -1292,9 +1318,17 @@ class PeerTestManager {
                 data[9] = (byte) (iplen + 2);
                 DataHelper.toLong(data, 10, 2, alicePort);
                 System.arraycopy(aliceIP, 0, data, 12, iplen);
+                // We send this to the source of msg 6, which may be different than aliceIP/alicePort
+                if (!DataHelper.eq(aliceIP, fromIP)) {
+                    try {
+                        addr = InetAddress.getByAddress(fromIP);
+                    } catch (UnknownHostException uhe) {
+                        return;
+                    }
+                }
                 if (_log.shouldDebug())
-                    _log.debug("Send msg 7 to alice on " + state);
-                UDPPacket packet = _packetBuilder2.buildPeerTestToAlice(addr, alicePort,
+                    _log.debug("Send msg 7 to alice at " + Addresses.toString(fromIP, fromPort) + " on " + state);
+                UDPPacket packet = _packetBuilder2.buildPeerTestToAlice(addr, fromPort,
                                                                         state.getAliceIntroKey(), false,
                                                                         sendId, rcvId, data);
                 _transport.send(packet);
@@ -1314,9 +1348,10 @@ class PeerTestManager {
                 }
                 // this is our second charlie, yay!
                 test.setReceiveCharlieTime(now);
-                test.setAlicePortFromCharlie(testPort);
+                // use the IP/port from the address block
+                test.setAlicePortFromCharlie(addrBlockPort);
                 try {
-                    InetAddress addr = InetAddress.getByAddress(testIP);
+                    InetAddress addr = InetAddress.getByAddress(addrBlockIP);
                     test.setAliceIPFromCharlie(addr);
                 } catch (UnknownHostException uhe) {
                     if (_log.shouldWarn())
@@ -1635,7 +1670,9 @@ class PeerTestManager {
     }
     
     /** 
-     * We are charlie, so send Alice her PeerTest message  
+     * We are Charlie, receiving message 6, so send Alice her PeerTest message 7.
+     * We send it to wherever message 6 came from, which may be different than
+     * where we sent message 5.
      *
      * SSU 1 only.
      *
@@ -1753,7 +1790,7 @@ class PeerTestManager {
         }
 
         public void gotPeerTest(int msg, int status, Hash h, byte[] data) {
-            receiveTest(_from, null, msg, status, h, data);
+            receiveTest(_from, null, msg, status, h, data, _aliceIP, _alicePort);
         }
 
         public void gotToken(long token, long expires) {
