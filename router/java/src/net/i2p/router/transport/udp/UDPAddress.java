@@ -2,9 +2,11 @@ package net.i2p.router.transport.udp;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Map;
 
 import net.i2p.data.Base64;
+import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.SessionKey;
 import net.i2p.router.transport.TransportUtil;
@@ -26,6 +28,7 @@ class UDPAddress {
     private final byte[] _introKeys[];
     private final long _introTags[];
     private final long _introExps[];
+    private final Hash _introHashes[];
     private final int _mtu;
     
     public static final String PROP_PORT = RouterAddress.PROP_PORT;
@@ -45,13 +48,13 @@ class UDPAddress {
     public static final String PROP_INTRO_EXP_PREFIX = "iexp";
     /** @since 0.9.55 for SSU2 */
     public static final String PROP_INTRO_HASH_PREFIX = "ih";
-
     static final int MAX_INTRODUCERS = 3;
     private static final String[] PROP_INTRO_HOST;
     private static final String[] PROP_INTRO_PORT;
     private static final String[] PROP_INTRO_IKEY;
     private static final String[] PROP_INTRO_TAG;
     private static final String[] PROP_INTRO_EXP;
+    private static final String[] PROP_INTRO_HASH;
     static {
         // object churn
         PROP_INTRO_HOST = new String[MAX_INTRODUCERS];
@@ -59,12 +62,14 @@ class UDPAddress {
         PROP_INTRO_IKEY = new String[MAX_INTRODUCERS];
         PROP_INTRO_TAG = new String[MAX_INTRODUCERS];
         PROP_INTRO_EXP = new String[MAX_INTRODUCERS];
+        PROP_INTRO_HASH = new String[MAX_INTRODUCERS];
         for (int i = 0; i < MAX_INTRODUCERS; i++) {
             PROP_INTRO_HOST[i] = PROP_INTRO_HOST_PREFIX + i;
             PROP_INTRO_PORT[i] = PROP_INTRO_PORT_PREFIX + i;
             PROP_INTRO_IKEY[i] = PROP_INTRO_KEY_PREFIX + i;
             PROP_INTRO_TAG[i] = PROP_INTRO_TAG_PREFIX + i;
             PROP_INTRO_EXP[i] = PROP_INTRO_EXP_PREFIX + i;
+            PROP_INTRO_HASH[i] = PROP_INTRO_HASH_PREFIX + i;
         }
     }
 
@@ -79,6 +84,7 @@ class UDPAddress {
             _introKeys = null;
             _introTags = null;
             _introExps = null;
+            _introHashes = null;
             _mtu = 0;
             return;
         }
@@ -112,31 +118,67 @@ class UDPAddress {
         String[] cintroHosts = null;
         InetAddress[] cintroAddresses = null;
         long[] cintroExps = null;
+        Hash[] cintroHashes = null;
+        final boolean ssu2only = addr.getTransportStyle().equals("SSU2");
+        final boolean ssu2enable = SSU2Util.ENABLE_RELAY && (ssu2only || "2".equals(addr.getOption("v")));
         for (int i = MAX_INTRODUCERS - 1; i >= 0; i--) {
-            String host = addr.getOption(PROP_INTRO_HOST[i]);
-            if (host == null) continue;
-            String port = addr.getOption(PROP_INTRO_PORT[i]);
-            if (port == null) continue;
-            String k = addr.getOption(PROP_INTRO_IKEY[i]);
-            if (k == null) continue;
-            byte ikey[] = Base64.decode(k);
-            if ( (ikey == null) || (ikey.length != SessionKey.KEYSIZE_BYTES) )
-                continue;
+            // This is the only one required for SSU 1 and 2
             String t = addr.getOption(PROP_INTRO_TAG[i]);
             if (t == null) continue;
-            int p;
-            try { 
-                p = Integer.parseInt(port); 
-                if (!TransportUtil.isValidPort(p)) continue;
-            } catch (NumberFormatException nfe) {
-                continue;
-            }
             long tag;
             try {
                 tag = Long.parseLong(t);
                 if (tag <= 0) continue;
             } catch (NumberFormatException nfe) {
                 continue;
+            }
+
+            // SSU2 only
+            Hash hash = null;
+            if (ssu2enable) {
+                String shash = addr.getOption(PROP_INTRO_HASH[i]);
+                if (shash != null) {
+                    byte[] bhash = Base64.decode(shash);
+                    if (bhash != null && bhash.length == Hash.HASH_LENGTH) {
+                        hash = Hash.create(bhash);
+                    }
+                }
+            }
+
+            // following 3 for SSU 1 only, won't be present for SSU2 address
+            String host;
+            int p;
+            byte[] ikey;
+            if (ssu2only) {
+                if (hash == null)
+                    continue;
+                host = null;
+                ikey = null;
+                p = 0;
+            } else {
+                if (hash != null) {
+                    // SSU 2
+                    host = null;
+                    ikey = null;
+                    p = 0;
+                } else {
+                    // SSU 1
+                    host = addr.getOption(PROP_INTRO_HOST[i]);
+                    if (host == null) continue;
+                    String port = addr.getOption(PROP_INTRO_PORT[i]);
+                    if (port == null) continue;
+                    String k = addr.getOption(PROP_INTRO_IKEY[i]);
+                    if (k == null) continue;
+                    ikey = Base64.decode(k);
+                    if ( (ikey == null) || (ikey.length != SessionKey.KEYSIZE_BYTES) )
+                        continue;
+                    try {
+                        p = Integer.parseInt(port);
+                        if (!TransportUtil.isValidPort(p)) continue;
+                    } catch (NumberFormatException nfe) {
+                        continue;
+                    }
+                }
             }
             // expiration is optional
             long exp = 0;
@@ -147,54 +189,66 @@ class UDPAddress {
                 } catch (NumberFormatException nfe) {}
             }
 
-            if (cintroHosts == null) {
-                cintroHosts = new String[i+1];
-                cintroPorts = new int[i+1];
-                cintroAddresses = new InetAddress[i+1];
-                cintroKeys = new byte[i+1][];
+            if (cintroTags == null) {
+                if (!ssu2only) {
+                    cintroHosts = new String[i+1];
+                    cintroPorts = new int[i+1];
+                    cintroAddresses = new InetAddress[i+1];
+                    cintroKeys = new byte[i+1][];
+                }
                 cintroTags = new long[i+1];
                 cintroExps = new long[i+1];
+                if (ssu2enable)
+                    cintroHashes = new Hash[i+1];
             }
-            cintroHosts[i] = host;
-            cintroPorts[i] = p;
-            cintroKeys[i] = ikey;
+            if (!ssu2only) {
+                cintroHosts[i] = host;
+                cintroPorts[i] = p;
+                cintroKeys[i] = ikey;
+            }
             cintroTags[i] = tag;
             cintroExps[i] = exp;
+            if (ssu2enable)
+                cintroHashes[i] = hash;
         }
-        
+
         int numOK = 0;
-        if (cintroHosts != null) {
+        if (cintroTags != null) {
             // Validate the intro parameters, and shrink the
-            // introAddresses array if they aren't all valid,
+            // introTags array if they aren't all valid,
             // since we use the length for the valid count.
             // We don't bother shrinking the other arrays,
             // we just remove the invalid entries.
-            for (int i = 0; i < cintroHosts.length; i++) {
-                if ( (cintroKeys[i] != null) && 
-                     (cintroPorts[i] > 0) &&
-                     (cintroTags[i] > 0) &&
-                     (cintroHosts[i] != null) )
+            for (int i = 0; i < cintroTags.length; i++) {
+                if (cintroTags[i] > 0 &&
+                    ((cintroHashes != null && cintroHashes[i] != null) ||
+                     (cintroKeys != null && cintroKeys[i] != null &&
+                      cintroPorts[i] > 0 &&
+                      cintroHosts[i] != null)))
                     numOK++;
             }
-            if (numOK != cintroHosts.length) {
+            if (numOK != cintroTags.length) {
                 int cur = 0;
-                for (int i = 0; i < cintroHosts.length; i++) {
-                    if ( (cintroKeys[i] != null) && 
-                         (cintroPorts[i] > 0) &&
-                         (cintroTags[i] > 0) &&
-                         (cintroHosts[i] != null) ) {
+                for (int i = 0; i < cintroTags.length; i++) {
+                    if (cintroTags[i] > 0 &&
+                        ((cintroHashes != null && cintroHashes[i] != null) ||
+                         (cintroKeys != null && cintroKeys[i] != null &&
+                          cintroPorts[i] > 0 &&
+                          cintroHosts[i] != null))) {
                         if (cur != i) {
                             // just shift these down
-                            cintroHosts[cur] = cintroHosts[i];
-                            cintroPorts[cur] = cintroPorts[i];
+                            if (cintroKeys != null) {
+                                cintroKeys[cur] = cintroKeys[i];
+                                cintroHosts[cur] = cintroHosts[i];
+                                cintroPorts[cur] = cintroPorts[i];
+                            }
                             cintroTags[cur] = cintroTags[i];
-                            cintroKeys[cur] = cintroKeys[i];
                             cintroExps[cur] = cintroExps[i];
                         }
                         cur++;
                     }
                 }
-                cintroAddresses = new InetAddress[numOK];
+                cintroTags = Arrays.copyOfRange(cintroTags, 0, numOK);
             }
         }
         _introKeys = cintroKeys;
@@ -203,6 +257,7 @@ class UDPAddress {
         _introHosts = cintroHosts;
         _introAddresses = cintroAddresses;
         _introExps = cintroExps;
+        _introHashes = cintroHashes;
     }
     
     public String getHost() { return _host; }
@@ -228,34 +283,33 @@ class UDPAddress {
      */
     byte[] getIntroKey() { return _introKey; }
     
-    int getIntroducerCount() { return (_introAddresses == null ? 0 : _introAddresses.length); }
+    int getIntroducerCount() { return (_introTags == null ? 0 : _introTags.length); }
 
     /**
      *  As of 0.9.32, will NOT resolve hostnames.
      *
-     *  @throws NullPointerException if getIntroducerCount() == 0
      *  @throws ArrayIndexOutOfBoundsException if i &lt; 0 or i &gt;= getIntroducerCount()
-     *  @return null if invalid
+     *  @return null if invalid or for SSU2
      */
     InetAddress getIntroducerHost(int i) { 
+        if (_introAddresses == null)
+            return null;
         if (_introAddresses[i] == null)
             _introAddresses[i] = getByName(_introHosts[i]);
         return _introAddresses[i];
     }
 
     /**
-     *  @throws NullPointerException if getIntroducerCount() == 0
      *  @throws ArrayIndexOutOfBoundsException if i &lt; 0 or i &gt;= getIntroducerCount()
-     *  @return greater than zero
+     *  @return greater than zero or zero for SSU2
      */
-    int getIntroducerPort(int i) { return _introPorts[i]; }
+    int getIntroducerPort(int i) { return _introPorts != null ? _introPorts[i] : 0; }
 
     /**
-     *  @throws NullPointerException if getIntroducerCount() == 0
      *  @throws ArrayIndexOutOfBoundsException if i &lt; 0 or i &gt;= getIntroducerCount()
-     *  @return non-null
+     *  @return null if no keys or for SSU2
      */
-    byte[] getIntroducerKey(int i) { return _introKeys[i]; }
+    byte[] getIntroducerKey(int i) { return _introKeys != null ? _introKeys[i] : null; }
 
     /**
      *  @throws NullPointerException if getIntroducerCount() == 0
@@ -271,6 +325,13 @@ class UDPAddress {
      *  @since 0.9.30
      */
     long getIntroducerExpiration(int i) { return _introExps[i]; }
+
+    /**
+     *  @throws ArrayIndexOutOfBoundsException if i &lt; 0 or i &gt;= getIntroducerCount()
+     *  @return null if no keys or for SSU1
+     *  @since 0.9.55
+     */
+    Hash getIntroducerHash(int i) { return _introHashes != null ? _introHashes[i] : null; }
         
     /**
      *  @return 0 if unset or invalid; recitified via MTU.rectify()
@@ -361,4 +422,31 @@ class UDPAddress {
             _inetAddressCache.clear();
         }
     }
+
+/*
+    public static void main(String[] args) {
+        net.i2p.util.OrderedProperties opts = new net.i2p.util.OrderedProperties();
+        opts.setProperty("caps", "B6");
+        opts.setProperty("i", "lkjlierjsdkljglksdjlkgj~jifxg-fFhdp-~HDLJo4=");
+        opts.setProperty("iexp0", "1");
+        opts.setProperty("iexp1", "6");
+        opts.setProperty("iexp2", "5");
+        opts.setProperty("ih2", "kjshfkjshfkjshfkjsdhfkjsdfs6XYi9HbyYO4OllX0=");
+        opts.setProperty("ihost0", "9999:8888:1:6:0:0:0:0");
+        opts.setProperty("ihost1", "1.2.3.4");
+        opts.setProperty("ikey0", "3lksjdflksjflksdjfzLrlABjJf5RcKyG2zSm-qUNqQ=");
+        opts.setProperty("ikey1", "lskjflksjflksdjfQobejJ~Y2QgPNliBhWfDZ3f0icA=");
+        opts.setProperty("iport0", "11114");
+        opts.setProperty("iport1", "11118");
+        opts.setProperty("itag0", "3");
+        opts.setProperty("itag1", "5");
+        opts.setProperty("itag2", "1");
+        opts.setProperty("key", "ioerutoieutoieruotiuertoi8fABtTLXZaSVyE1STk=");
+        opts.setProperty("s", "iouwtoiuwoiutkkjsdlkjfiuwer2Zou3ad60Kgx1cD4=");
+        opts.setProperty("v", "2");
+        RouterAddress ra = new RouterAddress("SSU", opts, 5);
+        UDPAddress ua = new UDPAddress(ra);
+        System.out.println("Introducer count is " + ua.getIntroducerCount());
+    }
+*/
 }

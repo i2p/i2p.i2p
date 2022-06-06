@@ -149,7 +149,9 @@ class IntroductionManager {
         if (added)
             _outbound.put(Long.valueOf(id), peer);
         long id2 = peer.getTheyRelayToUsAs();
-        if (id2 > 0 && _inbound.size() < MAX_INBOUND) {
+        //if (id2 > 0 && _inbound.size() < MAX_INBOUND) {
+        // test
+        if (id2 > 0 && (_inbound.size() < MAX_INBOUND || peer.getVersion() == 2) {
             added = true;
             _inbound.put(Long.valueOf(id2), peer);
         }
@@ -228,13 +230,20 @@ class IntroductionManager {
                 long tag = ua.getIntroducerTag(i);
                 if (!isInboundTagValid(tag))
                     continue;
-                introducers.add(new Introducer(ua.getIntroducerHost(i).getAddress(),
-                                               ua.getIntroducerPort(i),
-                                               ua.getIntroducerKey(i),
-                                               tag,
-                                               Long.toString(ua.getIntroducerExpiration(i) / 1000)));
-                if (_log.shouldInfo())
-                    _log.info("Reusing introducer: " + ua.getIntroducerHost(i));
+                String sexp = Long.toString(ua.getIntroducerExpiration(i) / 1000);
+                Introducer intro;
+                byte[] key = ua.getIntroducerKey(i);
+                if (key != null) {
+                    intro = new Introducer(ua.getIntroducerHost(i).getAddress(),
+                                           ua.getIntroducerPort(i), ua.getIntroducerKey(i), tag, sexp);
+                    if (_log.shouldInfo())
+                        _log.info("Reusing introducer: " + ua.getIntroducerHost(i));
+                } else {
+                    intro = new Introducer(ua.getIntroducerHash(i), tag, sexp);
+                    if (_log.shouldInfo())
+                        _log.info("Reusing introducer: " + ua.getIntroducerHash(i));
+                }
+                introducers.add(intro);
                 found++;
             }
         }
@@ -264,12 +273,11 @@ class IntroductionManager {
                     _log.info("Peer is failing, blocklisted or was unreachable: " + cur);
                 continue;
             }
-            // Try to pick active peers...
-            // FIXME this is really strict and causes us to run out of introducers
-            // We have much less introducers than we used to have because routers don't offer
-            // if they are approaching max connections (see EstablishmentManager)
-            // FIXED, was ||, is this OK now?
-            if (cur.getLastReceiveTime() < inactivityCutoff && cur.getLastSendTime() < inactivityCutoff) {
+            // Try to pick active peers,
+            // but give it min of 20 minutes
+            if (cur.getLastReceiveTime() < inactivityCutoff &&
+                cur.getLastSendTime() < inactivityCutoff &&
+                cur.getIntroducerTime() + (INTRODUCER_EXPIRATION / 4) < now) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Peer is idle too long: " + cur);
                 continue;
