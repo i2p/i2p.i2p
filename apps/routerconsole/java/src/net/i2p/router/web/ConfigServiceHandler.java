@@ -277,6 +277,9 @@ public class ConfigServiceHandler extends FormHandler {
             }
             File wlog = wrapperLogFile(_context);
             addFormNotice(_t("Threads dumped to {0}", wlog.getAbsolutePath()));
+            boolean deadlock = DeadlockDetector.detect(_context);
+            if (deadlock)
+                addFormErrorNoEscape("Deadlock detected!<br><a href=\"/logs\">Please report using the information on the logs page!</a><br>After reporting, please restart your router!");
         } else if (_t("View console on startup").equals(_action)) {
             browseOnStartup(true);
             addFormNotice(_t("Console is to be shown on startup"));

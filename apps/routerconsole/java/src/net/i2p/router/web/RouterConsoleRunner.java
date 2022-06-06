@@ -233,6 +233,7 @@ public class RouterConsoleRunner implements RouterApp {
         checkJavaVersion();
         startTrayApp();
         startConsole();
+        new DeadlockDetector(_context);
     }
 
     /** @since 0.9.4 */
