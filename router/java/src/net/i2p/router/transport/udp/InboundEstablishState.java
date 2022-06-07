@@ -529,7 +529,9 @@ class InboundEstablishState {
                 _receivedConfirmedIdentity = _receivedUnconfirmedIdentity;
             } else {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Signature failed from " + _receivedUnconfirmedIdentity);
+                    _log.warn("Signature failed from " + _receivedUnconfirmedIdentity + "\non: " + this);
+                // we can't ban the hash because it could be spoofed, but we can block the IP
+                _context.blocklist().add(_aliceIP);
             }
     }
     
