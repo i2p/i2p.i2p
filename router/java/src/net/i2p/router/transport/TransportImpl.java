@@ -310,8 +310,13 @@ public abstract class TransportImpl implements Transport {
         else
             msg.timestamp("afterSend(failed)");
 
-        if (!sendSuccessful)
-            msg.transportFailed(getStyle());
+        if (!sendSuccessful) {
+            int prev = msg.transportFailed(getStyle());
+            // This catches the usual case with two enabled transports
+            // GetBidsJob will check against actual transport count
+            if (prev > 0)
+                allowRequeue = false;
+        }
 
         if (msToSend > 1500) {
             if (debug)

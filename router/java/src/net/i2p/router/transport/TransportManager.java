@@ -847,7 +847,7 @@ public class TransportManager implements TransportEventListener {
             throw new IllegalArgumentException("Bids for a message bound to ourselves?");
 
         List<TransportBid> rv = new ArrayList<TransportBid>(_transports.size());
-        Set<String> failedTransports = msg.getFailedTransports();
+        List<String> failedTransports = msg.getFailedTransports();
         for (Transport t : _transports.values()) {
             if (failedTransports.contains(t.getStyle())) {
                 if (_log.shouldLog(Log.DEBUG))
@@ -873,7 +873,7 @@ public class TransportManager implements TransportEventListener {
     TransportBid getNextBid(OutNetMessage msg) {
         int unreachableTransports = 0;
         Hash peer = msg.getTarget().getIdentity().calculateHash();
-        Set<String> failedTransports = msg.getFailedTransports();
+        List<String> failedTransports = msg.getFailedTransports();
         TransportBid rv = null;
         for (Transport t : _transports.values()) {
             if (t.isUnreachable(peer)) {

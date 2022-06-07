@@ -12,10 +12,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
@@ -42,7 +40,7 @@ public class OutNetMessage implements CDPQEntry {
     private ReplyJob _onReply;
     private Job _onFailedReply;
     private MessageSelector _replySelector;
-    private Set<String> _failedTransports;
+    private List<String> _failedTransports;
     private long _sendBegin;
     //private Exception _createdBy;
     private final long _created;
@@ -280,14 +278,33 @@ public class OutNetMessage implements CDPQEntry {
     public MessageSelector getReplySelector() { return _replySelector; }
     public void setReplySelector(MessageSelector selector) { _replySelector = selector; }
     
-    public synchronized void transportFailed(String transportStyle) { 
-        if (_failedTransports == null)
-            _failedTransports = new HashSet<String>(2);
+    /**
+     * As of 0.9.55, returns the previous number of failed transports.
+     */
+    public synchronized int transportFailed(String transportStyle) { 
+        int rv;
+        if (_failedTransports == null) {
+            _failedTransports = new ArrayList<String>(2);
+            rv = 0;
+        } else {
+            rv = _failedTransports.size();
+        }
         _failedTransports.add(transportStyle); 
+        return rv;
     }
 
-    public synchronized Set<String> getFailedTransports() { 
-        return (_failedTransports == null ? Collections.<String> emptySet() : _failedTransports); 
+    /**
+     * @since 0.9.55
+     */
+    public synchronized int getFailedTransportCount() { 
+        return (_failedTransports == null ? 0 : _failedTransports.size()); 
+    }
+
+    /**
+     * As of 0.9.55, changed from a Set to a List
+     */
+    public synchronized List<String> getFailedTransports() { 
+        return (_failedTransports == null ? Collections.<String>emptyList() : _failedTransports); 
     }
     
     /** when did the sending process begin */

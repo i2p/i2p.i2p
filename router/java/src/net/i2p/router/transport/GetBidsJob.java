@@ -43,6 +43,11 @@ class GetBidsJob extends JobImpl {
     }
     
     static void getBids(RouterContext context, TransportManager tmgr, OutNetMessage msg) {
+        if (msg.getFailedTransportCount() > 1) {
+            context.statManager().addRateData("transport.bidFailAllTransports", msg.getLifetime());
+            fail(context, msg);
+            return;
+        }
         Log log = context.logManager().getLog(GetBidsJob.class);
         Hash to = msg.getTarget().getIdentity().getHash();
         msg.timestamp("bid");
@@ -67,15 +72,13 @@ class GetBidsJob extends JobImpl {
         
         TransportBid bid = tmgr.getNextBid(msg);
         if (bid == null) {
-            int failedCount = msg.getFailedTransports().size();
+            int failedCount = msg.getFailedTransportCount();
             if (failedCount == 0) {
                 context.statManager().addRateData("transport.bidFailNoTransports", msg.getLifetime());
                 // This used to be "no common transports" but it is almost always no transports at all
                 context.banlist().banlistRouter(to, _x("No transports (hidden or starting up?)"));
             } else if (failedCount >= tmgr.getTransportCount()) {
                 context.statManager().addRateData("transport.bidFailAllTransports", msg.getLifetime());
-                // fail after all transports were unsuccessful
-                context.netDb().fail(to);
             }
             fail(context, msg);
         } else {
