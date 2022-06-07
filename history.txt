@@ -1,3 +1,12 @@
+2022-06-07 zzz
+ * SSU2: Peer test fixes
+
+2022-06-06 zzz
+ * Console: Add deadlock detector
+ * SSU: Don't allow Android introducers
+ * SSU2: Continue work on relay
+ * SSU2: Peer test fixes
+
 2022-06-03 zzz
  * SSU: Possible fix for rare HMAC NPE
  * Transports: Periodically send RI to connected peers

@@ -992,16 +992,6 @@ class PeerTestManager {
                         _log.warn("Msg 1 status " + status);
                     return;
                 }
-                PeerState charlie = _transport.pickTestPeer(CHARLIE, fromPeer.getVersion(), isIPv6, from);
-                if (charlie == null) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Unable to pick a charlie (no peer), IPv6? " + isIPv6);
-                    // send reject
-                    UDPPacket packet = _packetBuilder2.buildPeerTestToAlice(SSU2Util.TEST_REJECT_BOB_NO_CHARLIE,
-                                                                            Hash.FAKE_HASH, data, fromPeer);
-                    _transport.send(packet);
-                    return;
-                }
                 Hash alice = fromPeer.getRemotePeer();
                 RouterInfo aliceRI = _context.netDb().lookupRouterInfoLocally(alice);
                 if (aliceRI == null) {
@@ -1009,6 +999,29 @@ class PeerTestManager {
                         _log.warn("No alice RI");
                     // send reject
                     UDPPacket packet = _packetBuilder2.buildPeerTestToAlice(SSU2Util.TEST_REJECT_BOB_UNSPEC,
+                                                                            Hash.FAKE_HASH, data, fromPeer);
+                    _transport.send(packet);
+                    return;
+                }
+                // validate signed data
+                // not strictly necessary but needed for debugging
+                SigningPublicKey spk = aliceRI.getIdentity().getSigningPublicKey();
+                if (!SSU2Util.validateSig(_context, SSU2Util.PEER_TEST_PROLOGUE,
+                                          _context.routerHash(), null, data, spk)) {
+                    if (_log.shouldWarn())
+                        _log.warn("Signature failed msg 1\n" + aliceRI);
+                    // send reject
+                    UDPPacket packet = _packetBuilder2.buildPeerTestToAlice(SSU2Util.TEST_REJECT_BOB_SIGFAIL,
+                                                                            Hash.FAKE_HASH, data, fromPeer);
+                    _transport.send(packet);
+                    return;
+                }
+                PeerState charlie = _transport.pickTestPeer(CHARLIE, fromPeer.getVersion(), isIPv6, from);
+                if (charlie == null) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Unable to pick a charlie (no peer), IPv6? " + isIPv6);
+                    // send reject
+                    UDPPacket packet = _packetBuilder2.buildPeerTestToAlice(SSU2Util.TEST_REJECT_BOB_NO_CHARLIE,
                                                                             Hash.FAKE_HASH, data, fromPeer);
                     _transport.send(packet);
                     return;
@@ -1073,7 +1086,7 @@ class PeerTestManager {
                         // validate signed data
                         SigningPublicKey spk = aliceRI.getIdentity().getSigningPublicKey();
                         if (SSU2Util.validateSig(_context, SSU2Util.PEER_TEST_PROLOGUE,
-                                                 fromPeer.getRemotePeer(), h, data, spk)) {
+                                                 fromPeer.getRemotePeer(), null, data, spk)) {
                             aliceIntroKey = getIntroKey(getAddress(aliceRI, isIPv6));
                             if (aliceIntroKey != null)
                                 rcode = SSU2Util.TEST_ACCEPT;
@@ -1144,6 +1157,16 @@ class PeerTestManager {
                     dbsm.setEntry(charlieRI);
                     dbsm.setMessageExpiration(now + 10*1000);
                     _transport.send(dbsm, alice);
+                    if (true) {
+                        // Debug - validate signed data
+                        // we forward it to alice even on failure
+                        SigningPublicKey spk = charlieRI.getIdentity().getSigningPublicKey();
+                        if (!SSU2Util.validateSig(_context, SSU2Util.PEER_TEST_PROLOGUE,
+                                                  _context.routerHash(), alice.getRemotePeer(), data, spk)) {
+                            if (_log.shouldWarn())
+                                _log.warn("Signature failed msg 3\n" + charlieRI);
+                        }
+                    }
                 } else  {
                     // oh well, maybe alice has it
                     if (_log.shouldLog(Log.WARN))

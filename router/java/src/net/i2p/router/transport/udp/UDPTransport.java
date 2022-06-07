@@ -3819,7 +3819,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             PeerState peer = iter.next();
             if (peerRole == BOB) {
                 // Skip SSU2 until we have support for peer test
-                if (peer.getVersion() != 1) {
+                version = peer.getVersion();
+                if (version != 1) {
                     if (!SSU2Util.ENABLE_PEER_TEST)
                         continue;
                     // we must know our IP/port
@@ -3857,6 +3858,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             ip = null;
             List<RouterAddress> addrs = getTargetAddresses(peerInfo);
             for (RouterAddress addr : addrs) {
+                if (_enableSSU2) {
+                    // get the right address
+                    String style = addr.getTransportStyle();
+                    if (version == 1) {
+                        if (style.equals("SSU2"))
+                            continue;
+                    } else {
+                        if (style.equals("SSU") && !"2".equals(addr.getOption("v")))
+                            continue;
+                    }
+                }
                 byte[] rip = addr.getIP();
                 if (rip != null) {
                     if (isIPv6) {
