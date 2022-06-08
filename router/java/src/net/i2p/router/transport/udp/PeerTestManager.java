@@ -153,6 +153,8 @@ class PeerTestManager {
     
     /** longest we will keep track of a Charlie nonce for */
     private static final int MAX_CHARLIE_LIFETIME = 15*1000;
+    /** longest we will keep track of test as Bob to forward response from Charlie */
+    private static final int MAX_BOB_LIFETIME = 10*1000;
 
     /** as Bob/Charlie */
     private static final int MAX_ACTIVE_TESTS = 20;
@@ -1035,6 +1037,7 @@ class PeerTestManager {
                 state.setReceiveAliceTime(now);
                 state.setLastSendTime(now);
                 _activeTests.put(lNonce, state);
+                _context.simpleTimer2().addEvent(new RemoveTest(lNonce), MAX_BOB_LIFETIME);
                 // send alice RI to charlie
                 if (_log.shouldDebug())
                     _log.debug("Send Alice RI and msg 2 to charlie on " + state);
@@ -1110,6 +1113,7 @@ class PeerTestManager {
                     state.setReceiveBobTime(now);
                     state.setLastSendTime(now);
                     _activeTests.put(lNonce, state);
+                    _context.simpleTimer2().addEvent(new RemoveTest(lNonce), MAX_CHARLIE_LIFETIME);
                 }
                 // generate our signed data
                 // we sign it even if rejecting, not required though
@@ -1520,8 +1524,9 @@ class PeerTestManager {
                 _log.debug("Receive from Bob: " + state);
             
             if (isNew) {
-                _activeTests.put(Long.valueOf(nonce), state);
-                _context.simpleTimer2().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
+                Long lnonce = Long.valueOf(nonce);
+                _activeTests.put(lnonce, state);
+                _context.simpleTimer2().addEvent(new RemoveTest(lnonce), MAX_CHARLIE_LIFETIME);
             }
 
             state.setLastSendTime(now);
@@ -1632,8 +1637,9 @@ class PeerTestManager {
             }
             
             if (isNew) {
-                _activeTests.put(Long.valueOf(nonce), state);
-                _context.simpleTimer2().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
+                Long lnonce = Long.valueOf(nonce);
+                _activeTests.put(lnonce, state);
+                _context.simpleTimer2().addEvent(new RemoveTest(lnonce), MAX_BOB_LIFETIME);
             }
             
             state.setLastSendTime(now);
@@ -1745,14 +1751,14 @@ class PeerTestManager {
      * forget about charlie's nonce after a short while.
      */
     private class RemoveTest implements SimpleTimer.TimedEvent {
-        private final long _nonce;
+        private final Long _nonce;
 
-        public RemoveTest(long nonce) {
+        public RemoveTest(Long nonce) {
             _nonce = nonce;
         }
 
         public void timeReached() {
-                _activeTests.remove(Long.valueOf(_nonce));
+                _activeTests.remove(_nonce);
         }
     }
 
