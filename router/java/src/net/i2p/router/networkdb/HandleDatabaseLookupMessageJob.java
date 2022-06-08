@@ -175,7 +175,9 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO &&
                    lookupType != DatabaseLookupMessage.Type.LS) {
             RouterInfo info = (RouterInfo) dbe;
-            if (info.isCurrent(EXPIRE_DELAY)) {
+            if (searchKey.equals(getContext().routerHash())) {
+                sendData(searchKey, info, fromKey, toTunnel);
+            } else if (info.isCurrent(EXPIRE_DELAY)) {
                 if ( (info.isHidden()) || (isUnreachable(info) && !publishUnreachable()) ) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Not answering a query for a netDb peer who isn't reachable");
