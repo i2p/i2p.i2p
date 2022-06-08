@@ -19,6 +19,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
+import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
@@ -265,6 +266,13 @@ class IntroductionManager {
             if (ri == null) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Picked peer has no local routerInfo: " + cur);
+                // ask him for it so we have it for next time
+                DatabaseLookupMessage dlm = new DatabaseLookupMessage(_context);
+                dlm.setSearchKey(hash);
+                dlm.setSearchType(DatabaseLookupMessage.Type.RI);
+                dlm.setMessageExpiration(now + 10*1000);
+                dlm.setFrom(_context.routerHash());
+                _transport.send(dlm, cur);
                 continue;
             }
             // FIXME we can include all his addresses including IPv6 even if we don't support IPv6 (isValid() is false)
