@@ -357,12 +357,15 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     public synchronized void receiveSessionCreated(UDPPacket packet) throws GeneralSecurityException {
-        ////// todo fix state check
-        if (_currentState == OutboundState.OB_STATE_VALIDATION_FAILED) {
+        if (_currentState != OutboundState.OB_STATE_REQUEST_SENT &&
+            _currentState != OutboundState.OB_STATE_REQUEST_SENT_NEW_TOKEN) {
+            // ignore dups
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Session created already failed");
+                _log.warn("Invalid state for session created: " + this);
             return;
         }
+        if (_log.shouldDebug())
+            _log.debug("Received a session created on " + this);
 
         DatagramPacket pkt = packet.getPacket();
         SocketAddress from = pkt.getSocketAddress();
