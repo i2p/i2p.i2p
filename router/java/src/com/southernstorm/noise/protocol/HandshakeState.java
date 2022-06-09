@@ -93,6 +93,9 @@ public class HandshakeState implements Destroyable, Cloneable {
 	 */
 	public static final int COMPLETE = 5;
 	
+	/** I2P for debugging */
+	private static final String STATE_NAMES[] = { "NO_ACTION", "WRITE_MESSAGE", "READ_MESSAGE", "FAILED", "SPLIT", "COMPLETE" };
+
 	/**
 	 * Local static keypair is required for the handshake.
 	 */
@@ -570,7 +573,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 		// Validate the parameters and state.
 		if (action != WRITE_MESSAGE) {
 			throw new IllegalStateException
-				("Handshake state does not allow writing messages");
+				("Handshake state " + STATE_NAMES[action] + " does not allow writing messages");
 		}
 		if (payload == null && (payloadOffset != 0 || payloadLength != 0)) {
 			throw new IllegalArgumentException("Invalid payload argument");
@@ -742,7 +745,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 		// Validate the parameters.
 		if (action != READ_MESSAGE) {
 			throw new IllegalStateException
-				("Handshake state does not allow reading messages");
+				("Handshake state " + STATE_NAMES[action] + " does not allow reading messages");
 		}
 		if (messageOffset > message.length || payloadOffset > payload.length) {
 			throw new ShortBufferException();
@@ -894,7 +897,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 	{
 		if (action != SPLIT) {
 			throw new IllegalStateException
-				("Handshake has not finished");
+				("Handshake has not finished, state: " + STATE_NAMES[action]);
 		}
 		CipherStatePair pair = symmetric.split();
 		if (!isInitiator)
@@ -921,7 +924,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 	{
 		if (action != SPLIT) {
 			throw new IllegalStateException
-				("Handshake has not finished");
+				("Handshake has not finished, state: " + STATE_NAMES[action]);
 		}
 		CipherStatePair pair = symmetric.split(secondaryKey, offset, length);
 		if (!isInitiator) {
@@ -944,7 +947,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 	{
 		if (action != SPLIT && action != COMPLETE) {
 			throw new IllegalStateException
-				("Handshake has not completed");
+				("Handshake has not finished, state: " + STATE_NAMES[action]);
 		}
 		return symmetric.getHandshakeHash();
 	}
@@ -1030,6 +1033,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 	public String toString() {
 		StringBuilder buf = new StringBuilder(256);
 		buf.append(patternId);
+		buf.append(' ').append(STATE_NAMES[action]);
 		buf.append(" Handshake State:\n");
 		buf.append(symmetric.toString());
 
