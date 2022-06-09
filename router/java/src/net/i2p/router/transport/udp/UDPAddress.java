@@ -30,6 +30,8 @@ class UDPAddress {
     private final long _introExps[];
     private final Hash _introHashes[];
     private final int _mtu;
+    // could be both
+    private final boolean _isIPv4, _isIPv6;
     
     public static final String PROP_PORT = RouterAddress.PROP_PORT;
     public static final String PROP_HOST = RouterAddress.PROP_HOST;
@@ -86,10 +88,15 @@ class UDPAddress {
             _introExps = null;
             _introHashes = null;
             _mtu = 0;
+            _isIPv4 = false;
+            _isIPv6 = false;
             return;
         }
         _host = addr.getHost();
         _port = addr.getPort();
+        String caps = addr.getOption(PROP_CAPACITY);
+        _isIPv4 = (_host != null && _host.contains(".")) || (caps != null && caps.contains("4"));
+        _isIPv6 = (_host != null && _host.contains(":")) || (caps != null && caps.contains("6"));
 
         int cmtu = 0;
         try { 
@@ -332,6 +339,16 @@ class UDPAddress {
      *  @since 0.9.55
      */
     Hash getIntroducerHash(int i) { return _introHashes != null ? _introHashes[i] : null; }
+
+    /**
+     *  @since 0.9.55
+     */
+    boolean isIPv4() { return _isIPv4; }
+
+    /**
+     *  @since 0.9.55
+     */
+    boolean isIPv6() { return _isIPv6; }
         
     /**
      *  @return 0 if unset or invalid; recitified via MTU.rectify()

@@ -20,6 +20,7 @@ import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SessionKey;
+import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.I2NPMessage;
@@ -395,6 +396,22 @@ class EstablishmentManager {
                     // must have a valid session key
                     byte[] keyBytes;
                     int version = _transport.getSSUVersion(ra);
+                    if (isIndirect && version == 2 && ra.getTransportStyle().equals("SSU")) {
+                        // revert to v1 if no unexpired v2 introducers are present
+                        boolean v2intros = false;
+                        int count = addr.getIntroducerCount();
+                        long now = _context.clock().now();
+                        for (int i = 0; i < count; i++) {
+                            Hash h = addr.getIntroducerHash(i);
+                            long exp = addr.getIntroducerExpiration(i);
+                            if (h != null && (exp > now || exp == 0)) {
+                                v2intros = true;
+                                break;
+                            }
+                            if (!v2intros)
+                                version = 1;
+                        }
+                    }
                     if (version == 1) {
                         keyBytes = addr.getIntroKey();
                     } else {
@@ -1271,6 +1288,10 @@ class EstablishmentManager {
      *  Send RelayRequests to multiple introducers.
      *  This may be called multiple times, it sets the nonce the first time only
      *  Caller should probably synch on state.
+     *
+     *  SSU 1 or 2
+     *
+     *  @param state charlie
      */
     private void handlePendingIntro(OutboundEstablishState state) {
         long nonce = state.getIntroNonce();
@@ -1282,20 +1303,152 @@ class EstablishmentManager {
             } while (old != null);
             state.setIntroNonce(nonce);
         }
-        _context.statManager().addRateData("udp.sendIntroRelayRequest", 1);
-        List<UDPPacket> requests = _builder.buildRelayRequest(_transport, this, state, _transport.getIntroKey());
-        if (requests.isEmpty()) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("No valid introducers! " + state);
-            processExpired(state);
+        if (state.getVersion() == 1) {
+            List<UDPPacket> requests = _builder.buildRelayRequest(_transport, this, state, _transport.getIntroKey());
+            if (requests.isEmpty()) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("No valid introducers! " + state);
+                processExpired(state);
+                return;
+            }
+            for (UDPPacket req : requests) {
+                _transport.send(req);
+            }
+            _context.statManager().addRateData("udp.sendIntroRelayRequest", 1);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Send relay request for " + state + " with our intro key as " + _transport.getIntroKey());
+            state.introSent();
+        } else {
+            // establish() above ensured there is at least one valid v2 introducer
+            // Look for a connected peer, if found, use the first one only.
+            long now = _context.clock().now();
+            UDPAddress addr = state.getRemoteAddress();
+            int count = addr.getIntroducerCount();
+            for (int i = 0; i < count; i++) {
+                Hash h = addr.getIntroducerHash(i);
+                long exp = addr.getIntroducerExpiration(i);
+                if (h != null && (exp > now || exp == 0)) {
+                    PeerState bob = _transport.getPeerState(h);
+                    if (bob != null && bob.getVersion() == 2) {
+                        if (_log.shouldDebug())
+                            _log.debug("Found connected introducer " + bob + " for " + state);
+                        long tag = addr.getIntroducerTag(i);
+                        sendRelayRequest(tag, (PeerState2) bob, state);
+                        state.introSent();
+                        return;
+                    }
+                }
+            }
+            // Otherwise, look for ones we already have RIs for, attempt to connect to each.
+            boolean sent = false;
+            for (int i = 0; i < count; i++) {
+                Hash h = addr.getIntroducerHash(i);
+                long exp = addr.getIntroducerExpiration(i);
+                if (h != null && (exp > now || exp == 0)) {
+                    if (_context.banlist().isBanlisted(h))
+                        continue;
+                    RouterInfo bob = _context.netDb().lookupRouterInfoLocally(h);
+                    if (bob != null) {
+                        List<RouterAddress> addrs = _transport.getTargetAddresses(bob);
+                        for (RouterAddress ra : addrs) {
+                            byte[] ip = ra.getIP();
+                            int port = ra.getPort();
+                            if (ip == null || port <= 0)
+                                continue;
+                            RemoteHostId rhid = new RemoteHostId(ip, port);
+                            OutboundEstablishState oes = _outboundStates.get(rhid);
+                            if (oes != null) {
+                                if (_log.shouldDebug())
+                                    _log.debug("Awaiting pending connection to introducer " + oes + " for " + state);
+                                break;
+                            }
+                            int version = _transport.getSSUVersion(ra);
+                            if (version == 2) {
+                                if (_log.shouldDebug())
+                                    _log.debug("Connecting to introducer " + bob + " for " + state);
+                                // arbitrary message because we have no way to connect for no reason
+                                DatabaseLookupMessage dlm = new DatabaseLookupMessage(_context);
+                                dlm.setSearchKey(h);
+                                dlm.setSearchType(DatabaseLookupMessage.Type.RI);
+                                dlm.setMessageExpiration(now + 10*1000);
+                                dlm.setFrom(_context.routerHash());
+                                OutNetMessage m = new OutNetMessage(_context, dlm, now + 10*1000, OutNetMessage.PRIORITY_MY_NETDB_LOOKUP, bob);
+                                establish(m);
+                                // for now, just wait until this method is called again,
+                                // hopefully somebody has connected
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            if (sent) {
+                // not really
+                state.introSent();
+                return;
+            }
+            // Otherwise, look up the RIs first.
+            for (int i = 0; i < count; i++) {
+                Hash h = addr.getIntroducerHash(i);
+                long exp = addr.getIntroducerExpiration(i);
+                if (h != null && (exp > now || exp == 0)) {
+                    if (_context.banlist().isBanlisted(h))
+                        continue;
+                    if (_log.shouldDebug())
+                        _log.debug("Looking up introducer " + h + " for " + state);
+                    // TODO on success job
+                    _context.netDb().lookupRouterInfo(h, null, null, 10*1000);
+                    sent = true;
+                }
+            }
+            if (sent) {
+                // not really
+                state.introSent();
+            } else {
+                if (_log.shouldDebug())
+                    _log.debug("No valid introducers for " + state);
+                processExpired(state);
+            }
+        }
+    }
+
+    /**
+     *  We are Alice, we sent a RelayRequest to Bob and got a response back.
+     *
+     *  SSU 2 only.
+     *
+     *  @param charlie must be SSU2
+     *  @since 0.9.55
+     */
+    private void sendRelayRequest(long tag, PeerState2 bob, OutboundEstablishState charlie) {
+        // pick our IP based on what address we're connecting to
+        UDPAddress cra = charlie.getRemoteAddress();
+        RouterAddress ourra;
+        if (cra.isIPv6()) {
+            ourra = _transport.getCurrentExternalAddress(true);
+            if (ourra == null)
+                ourra = _transport.getCurrentExternalAddress(false);
+        } else {
+            ourra = _transport.getCurrentExternalAddress(false);
+        }
+        if (ourra == null)
             return;
+        byte[] ourIP = ourra.getIP();
+        if (ourIP == null)
+            return;
+        int ourPort = _transport.getRequestedPort();
+        byte[] data = SSU2Util.createRelayRequestData(_context, bob.getRemotePeer(), charlie.getRemoteHostId().getPeerHash(),
+                                                      charlie.getIntroNonce(), tag, ourIP, ourPort,
+                                                      _context.keyManager().getSigningPrivateKey());
+        if (data == null) {
+            if (_log.shouldWarn())
+                _log.warn("sig fail");
+             return;
         }
-        for (UDPPacket req : requests) {
-            _transport.send(req);
-        }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Send relay request for " + state + " with our intro key as " + _transport.getIntroKey());
-        state.introSent();
+        UDPPacket packet = _builder2.buildRelayRequest(data, bob);
+        if (_log.shouldDebug())
+            _log.debug("Send relay request to " + bob + " for " + charlie);
+        _transport.send(packet);
     }
 
     /**
