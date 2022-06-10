@@ -574,9 +574,10 @@ class IntroductionManager {
         int port = reader.getRelayIntroReader().readPort();
 
         // allow IPv6 as of 0.9.50
-        if ((!isValid(ip, port, true)) || (!isValid(bob.getIP(), bob.getPort(), true))) {
+        // validate alice IP/port here. We don't need to validate Bob, we have a session with him.
+        if (!isValid(ip, port, true)) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Bad relay intro from " + bob + " for " + Addresses.toString(ip, port));
+                _log.warn("Invalid relay intro for alice " + Addresses.toString(ip, port) + " via bob " + bob);
             _context.statManager().addRateData("udp.relayBadIP", 1);
             return;
         }

@@ -179,7 +179,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         try {
             int blocks = SSU2Payload.processPayload(_context, this, payload, offset, length, isHandshake);
             if (_log.shouldDebug())
-                _log.debug("Processed " + blocks + " blocks");
+                _log.debug("Processed " + blocks + " blocks on " + this);
         } catch (Exception e) {
             throw new GeneralSecurityException("Session Created payload error", e);
         }

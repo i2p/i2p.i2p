@@ -1664,8 +1664,8 @@ class EstablishmentManager {
             }
         } else {
             // HolePunch received before RelayResponse, and we didn't know the IP/port, or it changed
-            if (_log.shouldLog(Log.INFO))
-                _log.info("No state found for hole punch from " + from + " port " + fromPort);
+            if (_log.shouldDebug())
+                _log.debug("No state found for hole punch from " + from + " port " + fromPort);
         }
     }
 
@@ -1725,7 +1725,7 @@ class EstablishmentManager {
         } else {
             // HolePunch received before RelayResponse, and we didn't know the IP/port, or it changed
             if (_log.shouldLog(Log.INFO))
-                _log.info("No state found for hole punch from " + id);
+                _log.info("No state found for SSU2 hole punch from " + id);
         }
     }
 
@@ -1953,6 +1953,7 @@ class EstablishmentManager {
                             handleCompletelyEstablished(inboundState);
                         }
                     } else {
+                        // really shouldn't be this state
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("confirmed with invalid? " + inboundState);
                         inboundState.fail();
