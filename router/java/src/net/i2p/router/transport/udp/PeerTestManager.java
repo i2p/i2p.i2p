@@ -1074,12 +1074,12 @@ class PeerTestManager {
                 } else if (_transport.getEstablisher().getInboundState(from) != null ||
                            _transport.getEstablisher().getOutboundState(from) != null) {
                     rcode = SSU2Util.TEST_REJECT_CHARLIE_CONNECTED;
-                } else if (_context.banlist().isBanlisted(h)) {
+                } else if (_context.banlist().isBanlisted(h) ||
+                           _context.blocklist().isBlocklisted(testIP)) {
                     rcode = SSU2Util.TEST_REJECT_CHARLIE_BANNED;
                 } else if (!TransportUtil.isValidPort(testPort) ||
                           !_transport.isValid(testIP) ||
-                         _transport.isTooClose(testIP) ||
-                         _context.blocklist().isBlocklisted(testIP)) {
+                         _transport.isTooClose(testIP)) {
                     rcode = SSU2Util.TEST_REJECT_CHARLIE_ADDRESS;
                 } else {
                     // bob should have sent it to us. Don't bother to lookup
