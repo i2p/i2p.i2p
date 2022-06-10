@@ -289,14 +289,14 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 if (remaining <= 10*60*1000) {
                     String msg;
                     if (remaining > 0)
-                        msg = "Offline signature for tunnel alternate destination expires " + DataHelper.formatTime(exp);
+                        msg = "Offline signature for tunnel " + name + " alternate destination expires in " + DataHelper.formatTime(exp);
                     else
-                        msg = "Offline signature for tunnel alternate destination expired " + DataHelper.formatTime(exp);
+                        msg = "Offline signature for tunnel " + name + " alternate destination expired " + DataHelper.formatTime(exp);
                     _log.log(Log.CRIT, msg);
                     throw new IllegalArgumentException(msg);
                 }
                 if (remaining < 60*24*60*60*1000L) {
-                    String msg = "Offline signature for tunnel alternate destination expires in " + DataHelper.formatDuration(remaining);
+                    String msg = "Offline signature for tunnel " + name + " alternate destination expires in " + DataHelper.formatDuration(remaining);
                     _log.logAlways(Log.WARN, msg);
                     l.log("WARNING: " + msg);
                 }
@@ -327,18 +327,25 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         if (session.isOffline()) {
             long exp = session.getOfflineExpiration();
             long remaining = exp - getTunnel().getContext().clock().now();
+            Properties props = getTunnel().getClientOptions();
+            String name = props.getProperty("inbound.nickname");
+            if (name == null) {
+                name = props.getProperty("outbound.nickname");
+                if (name == null)
+                    name = "";
+            }
             // if expires before the LS expires...
             if (remaining <= 10*60*1000) {
                 String msg;
                 if (remaining > 0)
-                    msg = "Offline signature for tunnel expires " + DataHelper.formatTime(exp);
+                    msg = "Offline signature for tunnel " + name + " expires in " + DataHelper.formatTime(exp);
                 else
-                    msg = "Offline signature for tunnel expired " + DataHelper.formatTime(exp);
+                    msg = "Offline signature for tunnel " + name + " expired " + DataHelper.formatTime(exp);
                 _log.log(Log.CRIT, msg);
                 throw new IllegalArgumentException(msg);
             }
             if (remaining < 60*24*60*60*1000L) {
-                String msg = "Offline signature for tunnel expires in " + DataHelper.formatDuration(remaining);
+                String msg = "Offline signature for tunnel " + name + " expires in " + DataHelper.formatDuration(remaining);
                 _log.logAlways(Log.WARN, msg);
                 l.log("WARNING: " + msg);
             }
