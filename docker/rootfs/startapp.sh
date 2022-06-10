@@ -22,6 +22,16 @@ for jar in `ls lib/*.jar`; do
     CLASSPATH=${CLASSPATH}:${jar}
 done
 
+if [ -f /.dockerenv ]; then
+    echo "[startapp] Running in container"
+    export IP_ADDR=$(hostname -i)
+    if echo "$IP_ADDR" | grep "172.17"; then
+        echo "[startapp] Running in docker network"
+        sed -i "s/127.0.0.1/${IP_ADDR}/g" ./clients.config ./i2ptunnel.config
+    fi
+
+fi
+
 JAVAOPTS="-Djava.net.preferIPv4Stack=false -Djava.library.path=${I2P}:${I2P}/lib -Di2p.dir.base=${I2P} -Di2p.dir.config=${HOME}/.i2p -DloggerFilenameOverride=logs/log-router-@.txt -Xmx$JVM_XMX"
 
 java -cp "${CLASSPATH}" ${JAVA_OPTS} net.i2p.router.RouterLaunch
