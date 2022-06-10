@@ -36,7 +36,7 @@ class SSU2Bitfield {
      */
     public SSU2Bitfield(int size, long offset) {
         if (size <= 0 || offset < 0)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("size " + size + " offset " + offset);
         // force mult. of 256
         size = (size + 255) & 0x7FFFFF00;
         this.size = size;

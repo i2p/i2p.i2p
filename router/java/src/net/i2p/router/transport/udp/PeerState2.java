@@ -567,12 +567,19 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                 _log.debug("Got dup ACK block: " + SSU2Bitfield.toString(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0)));
             return;
         }
-        SSU2Bitfield ackbf;
-        ackbf = SSU2Bitfield.fromACKBlock(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0));
-        if (_log.shouldDebug())
-            _log.debug("Got new ACK block: " + SSU2Bitfield.toString(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0)));
-        // calls bitSet() below
-        ackbf.forEachAndNot(_ackedMessages, this);
+        try {
+            SSU2Bitfield ackbf = SSU2Bitfield.fromACKBlock(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0));
+            if (_log.shouldDebug())
+                _log.debug("Got new ACK block: " + SSU2Bitfield.toString(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0)));
+            // calls bitSet() below
+            ackbf.forEachAndNot(_ackedMessages, this);
+        } catch (Exception e) {
+            // IllegalArgumentException, buggy ack block, let the other blocks get processed
+            if (_log.shouldWarn())
+                _log.warn("Bad ACK block\n" + SSU2Bitfield.toString(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0)) +
+                          "\nAck through " + ackThru + " acks " + acks + (ranges != null ? "\n" + HexDump.dump(ranges) : "") +
+                          "\nfrom " + this, e);
+        }
     }
 
     public void gotTermination(int reason, long count) {
