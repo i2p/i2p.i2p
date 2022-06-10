@@ -236,7 +236,7 @@ class IntroductionManager {
                 byte[] key = ua.getIntroducerKey(i);
                 if (key != null) {
                     intro = new Introducer(ua.getIntroducerHost(i).getAddress(),
-                                           ua.getIntroducerPort(i), ua.getIntroducerKey(i), tag, sexp);
+                                           ua.getIntroducerPort(i), key, tag, sexp);
                     if (_log.shouldInfo())
                         _log.info("Reusing introducer: " + ua.getIntroducerHost(i));
                 } else {
@@ -249,6 +249,7 @@ class IntroductionManager {
             }
         }
 
+        outerloop:
         for (int i = 0; i < sz && found < howMany; i++) {
             PeerState cur = peers.get(i);
             if (cur.isIPv6() != ipv6)
@@ -259,7 +260,7 @@ class IntroductionManager {
                 String b64 = hash.toBase64();
                 for (Introducer intro : introducers) {
                     if (b64.equals(intro.shash))
-                        continue;
+                        continue outerloop;
                 }
             }
             RouterInfo ri = _context.netDb().lookupRouterInfoLocally(hash);
