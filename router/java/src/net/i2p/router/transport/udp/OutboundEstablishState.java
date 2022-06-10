@@ -110,7 +110,7 @@ class OutboundEstablishState {
          */
         OB_STATE_RETRY_RECEIVED,
         /**
-         * SSU2: We have sent a second token request with a new token
+         * SSU2: We have sent a session request after receiving a retry
          * @since 0.9.54
          */
         OB_STATE_REQUEST_SENT_NEW_TOKEN

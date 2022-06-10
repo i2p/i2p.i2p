@@ -1010,7 +1010,27 @@ class IntroductionManager {
         PeerState2 alice = _nonceToAlice.remove(Long.valueOf(nonce));
         if (alice != null) {
             // We are Bob, send to Alice
-            // We don't check the signature here
+            // Debug, check the signature, but send it along even if failed
+            if (true) {
+                RouterInfo charlie = _context.netDb().lookupRouterInfoLocally(peer.getRemotePeer());
+                if (charlie != null) {
+                    byte[] signedData;
+                    if (status == 0)
+                        signedData = Arrays.copyOfRange(data, 0, data.length - 8);  // token
+                    else
+                        signedData = data;
+                    SigningPublicKey spk = charlie.getIdentity().getSigningPublicKey();
+                    if (SSU2Util.validateSig(_context, SSU2Util.RELAY_REQUEST_PROLOGUE,
+                                             _context.routerHash(), null, data, spk)) {
+                    } else {
+                        if (_log.shouldWarn())
+                            _log.warn("Signature failed relay response\n" + charlie);
+                    }
+                } else {
+                    if (_log.shouldWarn())
+                        _log.warn("Signer RI not found " + peer);
+                }
+            }
             byte[] idata = new byte[2 + data.length];
             //idata[0] = 0; // flag
             idata[1] = (byte) status;

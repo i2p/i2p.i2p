@@ -20,6 +20,7 @@ import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SessionKey;
+import net.i2p.data.SigningPublicKey;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.DeliveryStatusMessage;
@@ -1514,14 +1515,130 @@ class EstablishmentManager {
 
     /**
      *  We are Alice, we sent a RelayRequest to Bob and got a RelayResponse back.
+     *  Time and version already checked by caller.
      *
      *  SSU 2 only.
      *
-     *  @param data including token if code == 0
+     *  @param data including nonce, including token if code == 0
      *  @since 0.9.55
      */
     void receiveRelayResponse(PeerState2 bob, long nonce, int code, byte[] data) {
-        // lookup nonce, determine who signed, validate sig, send SessionRequest if code == 0
+        // don't remove unless accepted or rejected by charlie
+        OutboundEstablishState charlie;
+        Long lnonce = Long.valueOf(nonce);
+        if (code > 0 && code < 64)
+            charlie = _liveIntroductions.get(lnonce);
+        else
+            charlie = _liveIntroductions.remove(lnonce);
+        if (charlie == null) {
+            if (_log.shouldDebug())
+                _log.debug("Dup or unknown RelayResponse: " + nonce);
+            return; // already established
+        }
+        long token;
+        if (code == 0) {
+            token = DataHelper.fromLong8(data, data.length - 8);
+            data = Arrays.copyOfRange(data, 0, data.length - 8);
+        } else {
+            token = 0;
+        }
+        Hash bobHash = bob.getRemotePeer();
+        Hash charlieHash = charlie.getRemoteHostId().getPeerHash();
+        RouterInfo bobRI = _context.netDb().lookupRouterInfoLocally(bobHash);
+        RouterInfo charlieRI = _context.netDb().lookupRouterInfoLocally(charlieHash);
+        Hash signer;
+        if (code > 0 && code < 64)
+            signer = bobHash;
+        else
+            signer = charlieHash;
+        RouterInfo signerRI = _context.netDb().lookupRouterInfoLocally(signer);
+        if (signerRI != null) {
+            // validate signed data
+            SigningPublicKey spk = signerRI.getIdentity().getSigningPublicKey();
+            if (SSU2Util.validateSig(_context, SSU2Util.RELAY_REQUEST_PROLOGUE,
+                                     bobHash, null, data, spk)) {
+            } else {
+                if (_log.shouldWarn())
+                    _log.warn("Signature failed relay response\n" + signerRI);
+            }
+        } else {
+            if (_log.shouldWarn())
+                _log.warn("Signer RI not found " + signer);
+        }
+        if (code == 0) {
+            int iplen = data[9] & 0xff;
+            if (iplen != 6 && iplen != 18) {
+                if (_log.shouldWarn())
+                    _log.warn("Bad IP length " + iplen + " from " + charlie);
+                charlie.fail();
+                return;
+            }
+            boolean isIPv6 = iplen == 18;
+            int port = (int) DataHelper.fromLong(data, 10, 2);
+            byte[] ip = new byte[iplen - 2];
+            System.arraycopy(data, 12, ip, 0, iplen - 2);
+            // validate
+            if (!TransportUtil.isValidPort(port) ||
+                !_transport.isValid(ip) ||
+                _transport.isTooClose(ip) ||
+                _context.blocklist().isBlocklisted(ip)) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Bad relay resp from " + charlie + " for " + Addresses.toString(ip, port));
+                _context.statManager().addRateData("udp.relayBadIP", 1);
+                charlie.fail();
+                return;
+            }
+            InetAddress charlieIP;
+            try {
+                charlieIP = InetAddress.getByAddress(ip);
+            } catch (UnknownHostException uhe) {
+                charlie.fail();
+                return;
+            }
+            if (_log.shouldDebug())
+                _log.debug("Received RelayResponse from " + charlie + " - they are on " +
+                           Addresses.toString(ip, port));
+            if (charlieRI == null) {
+                if (_log.shouldWarn())
+                    _log.warn("Charlie RI not found " + charlie);
+                // maybe it will show up later
+                return;
+            }
+            synchronized (charlie) {
+                RemoteHostId oldId = charlie.getRemoteHostId();
+                ((OutboundEstablishState2) charlie).introduced(ip, port, token);
+                RemoteHostId newId = charlie.getRemoteHostId();
+                addOutboundToken(newId, token, _context.clock().now() + 10*1000);
+                // Swap out the RemoteHostId the state is indexed under.
+                // It was a Hash, change it to a IP/port.
+                // Remove the entry in the byClaimedAddress map as it's now in main map.
+                // Add an entry in the byHash map so additional OB pkts can find it.
+                _outboundByHash.put(charlieHash, charlie);
+                RemoteHostId claimed = charlie.getClaimedAddress();
+                if (!oldId.equals(newId)) {
+                    _outboundStates.remove(oldId);
+                    _outboundStates.put(newId, charlie);
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("RR replaced " + oldId + " with " + newId + ", claimed address was " + claimed);
+                }
+                //
+                if (claimed != null)
+                    _outboundByClaimedAddress.remove(oldId, charlie);  // only if == state
+            }
+            notifyActivity();
+        } else if (code >= 64) {
+            // that's it
+            if (_log.shouldDebug())
+                _log.debug("Received RelayResponse rejection " + code + " from charlie " + charlie);
+            charlie.fail();
+            _liveIntroductions.remove(lnonce);
+        } else {
+            // don't give up, maybe more bobs out there
+            // TODO keep track
+            if (_log.shouldDebug())
+                _log.debug("Received RelayResponse rejection " + code + " from bob " + bob);
+            notifyActivity();
+        }
     }
 
     /**
