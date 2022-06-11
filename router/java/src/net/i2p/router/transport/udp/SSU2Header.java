@@ -198,7 +198,8 @@ final class SSU2Header {
                        " version " + getVersion() + " netID " + getNetID() +
                        " srcID " + getSrcConnID() + " token " + getToken();
             }
-            return "Short header destID " + getDestConnID() + " pkt num " + getPacketNumber() + " type " + getType();
+            return "Short header destID " + getDestConnID() + " pkt num " + getPacketNumber() + " type " + getType() +
+                   " flags " + getShortHeaderFlags();
         }
     }
 

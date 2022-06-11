@@ -1330,6 +1330,7 @@ class EstablishmentManager {
                 long exp = addr.getIntroducerExpiration(i);
                 if (h != null && (exp > now || exp == 0)) {
                     PeerState bob = _transport.getPeerState(h);
+                    // TODO cross-version relaying, maybe
                     if (bob != null && bob.getVersion() == 2) {
                         if (_log.shouldDebug())
                             _log.debug("Found connected introducer " + bob + " for " + state);
@@ -1348,6 +1349,13 @@ class EstablishmentManager {
                 if (h != null && (exp > now || exp == 0)) {
                     if (_context.banlist().isBanlisted(h))
                         continue;
+                    PeerState bobState = _transport.getPeerState(h);
+                    if (bobState != null) {
+                        // presumably SSU1 or we would have used it above
+                        if (_log.shouldDebug())
+                            _log.debug("Skipping SSU1-connected introducer " + bobState + " for " + state);
+                        continue;
+                    }
                     RouterInfo bob = _context.netDb().lookupRouterInfoLocally(h);
                     if (bob != null) {
                         List<RouterAddress> addrs = _transport.getTargetAddresses(bob);

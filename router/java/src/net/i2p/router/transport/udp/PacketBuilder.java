@@ -1296,6 +1296,13 @@ class PacketBuilder {
                 bobState = transport.getPeerState(rhid);
             }
             if (bobState != null) {
+                if (bobState.getVersion() > 1) {
+                    // TODO cross-version relaying, maybe
+                    if (_log.shouldWarn())
+                        _log.warn("Cannot build SSU1 relay request for " + state.getRemoteIdentity().calculateHash()
+                                   + " through SSU2-connected introducer " + bobState);
+                    continue;
+                }
                 // established session (since 0.9.12)
                 cipherKey = bobState.getCurrentCipherKey();
                 macKey = bobState.getCurrentMACKey();

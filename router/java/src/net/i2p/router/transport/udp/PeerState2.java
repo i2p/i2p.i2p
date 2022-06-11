@@ -307,7 +307,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             }
             if (header.getDestConnID() != _rcvConnID) {
                 if (_log.shouldWarn())
-                    _log.warn("bad Dest Conn id " + header.getDestConnID() + " size " + len + " on " + this);
+                    _log.warn("bad Dest Conn id " + header + " size " + len + " on " + this);
                 return;
             }
             if (header.getType() != DATA_FLAG_BYTE) {

@@ -471,8 +471,8 @@ class PacketBuilder2 {
         if (numFragments > 1 || info.length > 1000) {
             byte[] gzipped = DataHelper.compress(info, 0, info.length, DataHelper.MAX_COMPRESSION);
             if (gzipped.length < info.length) {
-                if (_log.shouldWarn())
-                    _log.warn("Gzipping RI, max is " + max + " size was " + info.length + " size now " + gzipped.length);
+                if (_log.shouldInfo())
+                    _log.info("Gzipping RI, max is " + max + " size was " + info.length + " size now " + gzipped.length);
                 gzip = true;
                 info = gzipped;
                 numFragments = info.length / max;
@@ -485,8 +485,8 @@ class PacketBuilder2 {
         if (numFragments > 1) {
             if (numFragments > 15)
                 throw new IllegalArgumentException();
-            if (_log.shouldWarn())
-                _log.warn("RI size " + info.length + " requires " + numFragments + " packets");
+            if (_log.shouldInfo())
+                _log.info("RI size " + info.length + " requires " + numFragments + " packets");
             len = max;
         } else {
             len = info.length;
@@ -570,8 +570,8 @@ class PacketBuilder2 {
         encryptSessionConfirmed(packet0, state.getHandshakeState(), state.getMTU(), count, addPadding, isIPv6,
                                 hdrKey1, hdrKey2, block, state.getNextToken());
         int total = pkt.getLength();
-        if (_log.shouldWarn())
-            _log.warn("Building " + count + " fragmented session confirmed packets" +
+        if (_log.shouldInfo())
+            _log.info("Building " + count + " fragmented session confirmed packets" +
                       " max data: " + max +
                       " RI block size: " + blockSize +
                       " total data size: " + total);

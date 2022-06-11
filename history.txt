@@ -1,5 +1,21 @@
+2022-06-11 zzz
+ * SSU: Don't send SSU1 relay request to SSU2 peer
+
+2022-06-10 zzz
+ * SSU: Fix for HMAC NPE take 2
+ * SSU2: Continue work on relay
+
+2022-06-08 zzz
+ * NetDb: Bypass checks on lookups of our router hash
+ * SSU: Request RI from introducers if missing
+ * SSU2: Set timer to remove peer test state
+
 2022-06-07 zzz
+ * SSU: Ban IP on bad handshake signature
  * SSU2: Peer test fixes
+ * Transport:
+   - Don't requeue message after multiple failures
+   - Don't remove from netdb after a failure
 
 2022-06-06 zzz
  * Console: Add deadlock detector
