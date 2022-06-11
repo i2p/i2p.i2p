@@ -726,6 +726,11 @@ class IntroductionManager {
             _context.statManager().addRateData("udp.receiveRelayRequestBadTag", 1);
             return;
         }
+        if (charlie.getVersion() != 1) {
+            if (_log.shouldWarn())
+                _log.warn("Receive SSU1 relay request from " + alice  + " for SSU2 " + charlie);
+            return;
+        }
         if (_log.shouldDebug())
             _log.debug("Receive relay request from " + alice 
                       + " for tag " + tag
@@ -798,7 +803,10 @@ class IntroductionManager {
                 _log.warn("Relay tag not found " + tag + " from " + alice);
             rcode = SSU2Util.RELAY_REJECT_BOB_NO_TAG;
         } else if (charlie.getVersion() != 2) {
-            return;
+            if (_log.shouldWarn())
+                _log.warn("Receive SSU2 relay request from " + alice  + " for SSU1 " + charlie);
+            // add a code for this?
+            rcode = SSU2Util.RELAY_REJECT_BOB_NO_TAG;
         } else {
             aliceRI = _context.netDb().lookupRouterInfoLocally(alice.getRemotePeer());
             if (aliceRI != null) {
