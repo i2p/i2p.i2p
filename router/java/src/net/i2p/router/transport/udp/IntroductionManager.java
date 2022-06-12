@@ -855,12 +855,8 @@ class IntroductionManager {
         } else {
             // send rejection to Alice
             SigningPrivateKey spk = _context.keyManager().getSigningPrivateKey();
-            int iplen = data[13] & 0xff;
-            int testPort = (int) DataHelper.fromLong(data, 14, 2);
-            byte[] testIP = new byte[iplen - 2];
-            System.arraycopy(data, 16, testIP, 0, iplen - 2);
             data = SSU2Util.createRelayResponseData(_context, _context.routerHash(), rcode,
-                                                    nonce, testIP, testPort, spk, 0);
+                                                    nonce, null, 0, spk, 0);
             if (data == null) {
                 if (_log.shouldWarn())
                     _log.warn("sig fail");
@@ -954,6 +950,21 @@ class IntroductionManager {
                 rcode = SSU2Util.RELAY_REJECT_CHARLIE_UNKNOWN_ALICE;
             }
         }
+        byte[] ourIP = null;
+        RouterAddress ourra = _transport.getCurrentExternalAddress(isIPv6);
+        if (ourra != null) {
+            ourIP = ourra.getIP();
+            if (ourIP == null) {
+                if (_log.shouldWarn())
+                    _log.warn("No IP to send in relay response");
+                rcode = SSU2Util.RELAY_REJECT_CHARLIE_ADDRESS;
+            }
+        } else {
+            if (_log.shouldWarn())
+                _log.warn("No address to send in relay response");
+            rcode = SSU2Util.RELAY_REJECT_CHARLIE_ADDRESS;
+        }
+        int ourPort = _transport.getRequestedPort();
 
         // generate our signed data
         // we sign it even if rejecting, not required though
@@ -967,7 +978,7 @@ class IntroductionManager {
         }
         SigningPrivateKey spk = _context.keyManager().getSigningPrivateKey();
         data = SSU2Util.createRelayResponseData(_context, bob.getRemotePeer(), rcode,
-                                                nonce, testIP, testPort, spk, token);
+                                                nonce, ourIP, ourPort, spk, token);
         if (data == null) {
             if (_log.shouldWarn())
                 _log.warn("sig fail");

@@ -152,6 +152,11 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         if (_currentState != OutboundState.OB_STATE_PENDING_INTRO)
             return;
         introduced(ip, port);
+        try {
+            _bobSocketAddress = new InetSocketAddress(InetAddress.getByAddress(ip), port);
+        } catch (UnknownHostException uhe) {
+            throw new IllegalArgumentException("bad IP", uhe);
+        }
         _token = token;
         createNewState(_routerAddress);
     }

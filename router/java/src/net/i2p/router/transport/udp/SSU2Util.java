@@ -252,7 +252,8 @@ final class SSU2Util {
      *  Make the data for the relay response block
      *
      *  @param h Bob hash to be included in sig, not included in data
-     *  @param ip non-null
+     *  @param ip may be null
+     *  @param port ignored if ip is null
      *  @param token if nonzero, append it
      *  @return null on failure
      *  @since 0.9.55
@@ -260,14 +261,20 @@ final class SSU2Util {
     public static byte[] createRelayResponseData(I2PAppContext ctx, Hash h, int code,
                                                  long nonce, byte[] ip, int port,
                                                  SigningPrivateKey spk, long token) {
-        int datalen = 12 + ip.length;
+        int datalen = 10;
+        if (ip != null)
+            datalen += 2 + ip.length;
         byte[] data = new byte[datalen];
         DataHelper.toLong(data, 0, 4, nonce);
         DataHelper.toLong(data, 4, 4, ctx.clock().now() / 1000);
         data[8] = 2;  // version
-        data[9] = (byte) (ip.length + 2);
-        DataHelper.toLong(data, 10, 2, port);
-        System.arraycopy(ip, 0, data, 12, ip.length);
+        if (ip != null) {
+            data[9] = (byte) (ip.length + 2);
+            DataHelper.toLong(data, 10, 2, port);
+            System.arraycopy(ip, 0, data, 12, ip.length);
+        } else {
+            // data[9] = 0;
+        }
         Signature sig = sign(ctx, RELAY_RESPONSE_PROLOGUE, h, null, data, datalen, spk);
         if (sig == null)
             return null;

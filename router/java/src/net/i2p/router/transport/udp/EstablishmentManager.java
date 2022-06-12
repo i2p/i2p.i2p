@@ -1283,8 +1283,10 @@ class EstablishmentManager {
                 break;
 
               case OB_STATE_INTRODUCED:
-                handlePendingIntro(state);
-                return;
+                if (_log.shouldDebug())
+                    _log.debug("Send Session Request after introduction to: " + state);
+                packet = _builder2.buildSessionRequestPacket(state2);
+                break;
 
               default:
                 if (_log.shouldWarn())
@@ -1458,11 +1460,17 @@ class EstablishmentManager {
         } else {
             ourra = _transport.getCurrentExternalAddress(false);
         }
-        if (ourra == null)
+        if (ourra == null) {
+            if (_log.shouldWarn())
+                _log.warn("No address to send in relay request");
             return;
+        }
         byte[] ourIP = ourra.getIP();
-        if (ourIP == null)
+        if (ourIP == null) {
+            if (_log.shouldWarn())
+                _log.warn("No IP to send in relay request");
             return;
+         }
         int ourPort = _transport.getRequestedPort();
         byte[] data = SSU2Util.createRelayRequestData(_context, bob.getRemotePeer(), charlie.getRemoteIdentity().getHash(),
                                                       charlie.getIntroNonce(), tag, ourIP, ourPort,
