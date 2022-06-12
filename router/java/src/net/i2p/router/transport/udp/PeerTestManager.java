@@ -314,7 +314,7 @@ class PeerTestManager {
                 SigningPrivateKey spk = _context.keyManager().getSigningPrivateKey();
                 PeerState2 bob = (PeerState2) test.getBob();
                 // TODO only create this once
-                byte[] data = SSU2Util.createPeerTestData(_context, bob.getRemotePeer(), _context.routerHash(),
+                byte[] data = SSU2Util.createPeerTestData(_context, bob.getRemotePeer(), null,
                                                           ALICE, test.getNonce(), bob.getOurIP(), bob.getOurPort(), spk);
                 if (data == null) {
                     if (_log.shouldWarn())
