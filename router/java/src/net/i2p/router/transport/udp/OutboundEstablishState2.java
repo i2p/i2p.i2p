@@ -94,7 +94,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             if (ra.getTransportStyle().equals(UDPTransport.STYLE2)) {
                 mtu = PeerState2.DEFAULT_MTU;
             } else {
-                if (_bobIP.length == 16)
+                if (_bobIP != null && _bobIP.length == 16)
                     mtu = PeerState2.DEFAULT_SSU_IPV6_MTU;
                 else
                     mtu = PeerState2.DEFAULT_SSU_IPV4_MTU;
@@ -104,7 +104,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             if (ra.getTransportStyle().equals(UDPTransport.STYLE2)) {
                 mtu = Math.min(Math.max(mtu, PeerState2.MIN_MTU), PeerState2.MAX_MTU);
             } else {
-                if (_bobIP.length == 16)
+                if (_bobIP != null && _bobIP.length == 16)
                     mtu = Math.min(Math.max(mtu, PeerState2.MIN_SSU_IPV6_MTU), PeerState2.MAX_SSU_IPV6_MTU);
                 else
                     mtu = Math.min(Math.max(mtu, PeerState2.MIN_SSU_IPV4_MTU), PeerState2.MAX_SSU_IPV4_MTU);
@@ -559,7 +559,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
 
     @Override
     public String toString() {
-        return "OES2 " + _remoteHostId +
+        return "OES2 " + _remotePeer.getHash().toBase64().substring(0, 6) + ' ' + _remoteHostId +
                " lifetime: " + DataHelper.formatDuration(getLifetime()) +
                " Rcv ID: " + _rcvConnID +
                " Send ID: " + _sendConnID +

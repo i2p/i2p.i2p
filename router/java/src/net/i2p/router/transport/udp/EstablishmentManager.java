@@ -1201,21 +1201,28 @@ class EstablishmentManager {
         } else {
             InboundEstablishState2 state2 = (InboundEstablishState2) state;
             InboundEstablishState.InboundState istate = state2.getState();
-            if (istate == IB_STATE_CREATED_SENT) {
+            switch (istate) {
+              case IB_STATE_CREATED_SENT:
                 if (_log.shouldInfo())
                     _log.info("Retransmit created to: " + state);
                 // if already sent, get from the state to retx
                 pkt = state2.getRetransmitSessionCreatedPacket();
-            } else if (istate == IB_STATE_REQUEST_RECEIVED) {
+                break;
+
+              case IB_STATE_REQUEST_RECEIVED:
                 if (_log.shouldDebug())
                     _log.debug("Send created to: " + state);
                 pkt = _builder2.buildSessionCreatedPacket(state2);
-            } else if (istate == IB_STATE_TOKEN_REQUEST_RECEIVED ||
-                       istate == IB_STATE_REQUEST_BAD_TOKEN_RECEIVED) {
+                break;
+
+              case IB_STATE_TOKEN_REQUEST_RECEIVED:
+              case IB_STATE_REQUEST_BAD_TOKEN_RECEIVED:
                 if (_log.shouldDebug())
                     _log.debug("Send retry to: " + state);
                 pkt = _builder2.buildRetryPacket(state2);
-            } else {
+                break;
+
+              default:
                 if (_log.shouldWarn())
                     _log.warn("Unhandled state " + istate + " on " + state);
                 return;
@@ -1252,23 +1259,34 @@ class EstablishmentManager {
         } else {
             OutboundEstablishState2 state2 = (OutboundEstablishState2) state;
             OutboundEstablishState.OutboundState ostate = state2.getState();
-            if (ostate == OB_STATE_REQUEST_SENT ||
-                ostate == OB_STATE_REQUEST_SENT_NEW_TOKEN) {
+            switch (ostate) {
+              case OB_STATE_REQUEST_SENT:
+              case OB_STATE_REQUEST_SENT_NEW_TOKEN:
                 if (_log.shouldInfo())
                     _log.info("Retransmit Session Request to: " + state);
                 // if already sent, get from the state to retx
                 packet = state2.getRetransmitSessionRequestPacket();
-            } else if (ostate == OB_STATE_NEEDS_TOKEN ||
-                       ostate == OB_STATE_TOKEN_REQUEST_SENT) {
+                break;
+
+              case OB_STATE_NEEDS_TOKEN:
+              case OB_STATE_TOKEN_REQUEST_SENT:
                 if (_log.shouldDebug())
                     _log.debug("Send Token Request to: " + state);
                 packet = _builder2.buildTokenRequestPacket(state2);
-            } else if (ostate == OB_STATE_UNKNOWN ||
-                       ostate == OB_STATE_RETRY_RECEIVED) {
+                break;
+
+              case OB_STATE_UNKNOWN:
+              case OB_STATE_RETRY_RECEIVED:
                 if (_log.shouldDebug())
                     _log.debug("Send Session Request to: " + state);
                 packet = _builder2.buildSessionRequestPacket(state2);
-            } else {
+                break;
+
+              case OB_STATE_INTRODUCED:
+                handlePendingIntro(state);
+                return;
+
+              default:
                 if (_log.shouldWarn())
                     _log.warn("Unhandled state " + ostate + " on " + state);
                 return;
@@ -1446,7 +1464,7 @@ class EstablishmentManager {
         if (ourIP == null)
             return;
         int ourPort = _transport.getRequestedPort();
-        byte[] data = SSU2Util.createRelayRequestData(_context, bob.getRemotePeer(), charlie.getRemoteHostId().getPeerHash(),
+        byte[] data = SSU2Util.createRelayRequestData(_context, bob.getRemotePeer(), charlie.getRemoteIdentity().getHash(),
                                                       charlie.getIntroNonce(), tag, ourIP, ourPort,
                                                       _context.keyManager().getSigningPrivateKey());
         if (data == null) {
@@ -1563,11 +1581,11 @@ class EstablishmentManager {
         if (signerRI != null) {
             // validate signed data
             SigningPublicKey spk = signerRI.getIdentity().getSigningPublicKey();
-            if (SSU2Util.validateSig(_context, SSU2Util.RELAY_REQUEST_PROLOGUE,
+            if (SSU2Util.validateSig(_context, SSU2Util.RELAY_RESPONSE_PROLOGUE,
                                      bobHash, null, data, spk)) {
             } else {
                 if (_log.shouldWarn())
-                    _log.warn("Signature failed relay response\n" + signerRI);
+                    _log.warn("Signature failed relay response " + code + " as alice from:\n" + signerRI);
             }
         } else {
             if (_log.shouldWarn())
@@ -2151,7 +2169,7 @@ class EstablishmentManager {
         _outboundStates.remove(outboundState.getRemoteHostId(), outboundState);
         if (outboundState.getState() != OB_STATE_CONFIRMED_COMPLETELY) {
             if (_log.shouldDebug())
-                _log.debug("Expired: " + outboundState + " Lifetime: " + outboundState.getLifetime());
+                _log.debug("Expired: " + outboundState);
             OutNetMessage msg;
             while ((msg = outboundState.getNextQueuedMessage()) != null) {
                 _transport.failed(msg, "Expired during failed establish");
@@ -2177,6 +2195,8 @@ class EstablishmentManager {
      *  @since 0.9.2
      */
     private void processExpired(InboundEstablishState inboundState) {
+        if (_log.shouldWarn())
+            _log.warn("Expired: " + inboundState);
         _inboundStates.remove(inboundState.getRemoteHostId());
         OutNetMessage msg;
         while ((msg = inboundState.getNextQueuedMessage()) != null) {

@@ -577,8 +577,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             // IllegalArgumentException, buggy ack block, let the other blocks get processed
             if (_log.shouldWarn())
                 _log.warn("Bad ACK block\n" + SSU2Bitfield.toString(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0)) +
-                          "\nAck through " + ackThru + " acks " + acks + (ranges != null ? "\n" + HexDump.dump(ranges) : "") +
-                          "\nfrom " + this, e);
+                          "\nAck through " + ackThru + " acnt " + acks + (ranges != null ? "Ranges:\n" + HexDump.dump(ranges) : "") +
+                          "from " + this, e);
         }
     }
 

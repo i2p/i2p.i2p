@@ -304,7 +304,6 @@ final class SSU2Util {
         byte[] buf = new byte[len];
         System.arraycopy(prologue, 0, buf, 0, prologue.length);
         System.arraycopy(h.getData(), 0, buf, prologue.length, Hash.HASH_LENGTH);
-        System.arraycopy(h.getData(), 0, buf, prologue.length, Hash.HASH_LENGTH);
         int off = prologue.length + Hash.HASH_LENGTH;
         if (h2 != null) {
             System.arraycopy(h2.getData(), 0, buf, off, Hash.HASH_LENGTH);
@@ -320,6 +319,7 @@ final class SSU2Util {
      *  and then the provided data which ends with a signature of the specified type.
      *
      *  @param h2 may be null
+     *  @param data not including relay response token
      */
     public static boolean validateSig(I2PAppContext ctx, byte[] prologue, Hash h, Hash h2, byte[] data, SigningPublicKey spk) {
         SigType type = spk.getType();

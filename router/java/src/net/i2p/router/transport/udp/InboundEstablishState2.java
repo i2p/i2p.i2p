@@ -484,8 +484,11 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         if (sid != _sendConnID)
             throw new GeneralSecurityException("Conn ID mismatch: 1: " + _sendConnID + " 2: " + sid);
         long token = DataHelper.fromLong8(data, off + 24);
-        if (token != _token)
-            throw new GeneralSecurityException("Token mismatch: 1: " + _token + " 2: " + token);
+        if (token != _token) {
+            // most likely a retransmitted session request with the old invalid token
+            // TODO should we retransmit retry in this case?
+            throw new GeneralSecurityException("Token mismatch: expected: " + _token + " got: " + token);
+        }
         _handshakeState.start();
         _handshakeState.mixHash(data, off, 32);
         //if (_log.shouldDebug())
@@ -788,7 +791,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         buf.append(" lifetime: ").append(DataHelper.formatDuration(getLifetime()));
         buf.append(" Rcv ID: ").append(_rcvConnID);
         buf.append(" Send ID: ").append(_sendConnID);
-        buf.append(" RelayTag: ").append(_sentRelayTag);
+        if (_sentRelayTag > 0)
+            buf.append(" RelayTag: ").append(_sentRelayTag);
         buf.append(' ').append(_currentState);
         return buf.toString();
     }

@@ -825,7 +825,7 @@ class IntroductionManager {
                     // TODO add timer to remove from _nonceToAlice
                 } else {
                     if (_log.shouldWarn())
-                        _log.warn("Signature failed relay intro\n" + aliceRI);
+                        _log.warn("Signature failed relay request\n" + aliceRI);
                     rcode = SSU2Util.RELAY_REJECT_BOB_SIGFAIL;
                 }
             } else {
@@ -867,7 +867,7 @@ class IntroductionManager {
                  return;
             }
             if (_log.shouldInfo())
-                _log.info("Send relay response rejection " + rcode + " to " + alice);
+                _log.info("Send relay response rejection as bob " + rcode + " to alice " + alice);
             packet = _builder2.buildRelayResponse(data, alice);
         }
         _transport.send(packet);
@@ -975,7 +975,7 @@ class IntroductionManager {
         }
         UDPPacket packet = _builder2.buildRelayResponse(data, bob);
         if (_log.shouldDebug())
-            _log.debug("Send relay response " + " nonce " + nonce + " to " + bob);
+            _log.debug("Send relay response " + rcode + " as charlie " + " nonce " + nonce + " to bob " + bob);
         _transport.send(packet);
         if (rcode == SSU2Util.RELAY_ACCEPT) {
             // send hole punch with the same data we sent to Bob
@@ -1030,11 +1030,11 @@ class IntroductionManager {
                     else
                         signedData = data;
                     SigningPublicKey spk = charlie.getIdentity().getSigningPublicKey();
-                    if (SSU2Util.validateSig(_context, SSU2Util.RELAY_REQUEST_PROLOGUE,
-                                             _context.routerHash(), null, data, spk)) {
+                    if (SSU2Util.validateSig(_context, SSU2Util.RELAY_RESPONSE_PROLOGUE,
+                                             _context.routerHash(), null, signedData, spk)) {
                     } else {
                         if (_log.shouldWarn())
-                            _log.warn("Signature failed relay response\n" + charlie);
+                            _log.warn("Signature failed relay response as bob from charlie:\n" + charlie);
                     }
                 } else {
                     if (_log.shouldWarn())
@@ -1047,12 +1047,12 @@ class IntroductionManager {
             System.arraycopy(data, 0, idata, 2, data.length);
             UDPPacket packet = _builder2.buildRelayResponse(idata, alice);
             if (_log.shouldDebug())
-                _log.debug("Send relay response " + " nonce " + nonce + " to " + alice);
+                _log.debug("Got relay response " + status + " as bob, forward " + " nonce " + nonce + " to " + alice);
             _transport.send(packet);
         } else {
             // We are Alice, give to EstablishmentManager to check sig and process
             if (_log.shouldDebug())
-                _log.debug("Got relay response " + " nonce " + nonce + " from " + peer);
+                _log.debug("Got relay response " + status + " as alice " + " nonce " + nonce + " from " + peer);
             _transport.getEstablisher().receiveRelayResponse(peer, nonce, status, data);
         }
     }
