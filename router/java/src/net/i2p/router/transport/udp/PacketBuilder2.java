@@ -398,7 +398,7 @@ class PacketBuilder2 {
     public UDPPacket buildSessionCreatedPacket(InboundEstablishState2 state) {
         long n = _context.random().signedNextInt() & 0xFFFFFFFFL;
         UDPPacket packet = buildLongPacketHeader(state.getSendConnID(), n, SESSION_CREATED_FLAG_BYTE,
-                                                 state.getRcvConnID(), state.getToken());
+                                                 state.getRcvConnID(), 0);
         DatagramPacket pkt = packet.getPacket();
         
         byte sentIP[] = state.getSentIP();
@@ -937,10 +937,11 @@ class PacketBuilder2 {
     }
 
     /**
+     *  Also used for hole punch with a relay request block.
      *  Also used for retry with ptBlock = null
      *
      *  @param packet containing only 32 byte header
-     *  @param ptBlock null for retry
+     *  @param ptBlock Peer Test or Relay Request block. Null for retry.
      */
     private void encryptPeerTest(UDPPacket packet, byte[] chachaKey, long n,
                                  byte[] hdrKey1, byte[] hdrKey2, byte[] ip, int port,
@@ -975,12 +976,12 @@ class PacketBuilder2 {
             pkt.setLength(pkt.getLength() + len + MAC_LEN);
         } catch (RuntimeException re) {
             if (!_log.shouldWarn())
-                _log.error("Bad retry/test msg out", re);
+                _log.error("Bad retry/test/holepunch msg out", re);
             throw re;
         } catch (GeneralSecurityException gse) {
             if (!_log.shouldWarn())
-                _log.error("Bad retry/test msg out", gse);
-            throw new RuntimeException("Bad retry/test msg out", gse);
+                _log.error("Bad retry/test/holepunch msg out", gse);
+            throw new RuntimeException("Bad retry/test/holepunch msg out", gse);
         }
         SSU2Header.encryptLongHeader(packet, hdrKey1, hdrKey2);
     }

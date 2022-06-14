@@ -33,6 +33,7 @@ import net.i2p.router.transport.TransportUtil;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import static net.i2p.router.transport.udp.InboundEstablishState.InboundState.*;
 import static net.i2p.router.transport.udp.OutboundEstablishState.OutboundState.*;
+import static net.i2p.router.transport.udp.OutboundEstablishState2.IntroState.*;
 import static net.i2p.router.transport.udp.SSU2Util.*;
 import net.i2p.router.util.DecayingHashSet;
 import net.i2p.router.util.DecayingBloomFilter;
@@ -1340,23 +1341,49 @@ class EstablishmentManager {
                 _log.debug("Send relay request for " + state + " with our intro key as " + _transport.getIntroKey());
             state.introSent();
         } else {
+            // walk through the state machine for each SSU2 introducer
+            OutboundEstablishState2 state2 = (OutboundEstablishState2) state;
             // establish() above ensured there is at least one valid v2 introducer
             // Look for a connected peer, if found, use the first one only.
-            long now = _context.clock().now();
             UDPAddress addr = state.getRemoteAddress();
             int count = addr.getIntroducerCount();
             for (int i = 0; i < count; i++) {
                 Hash h = addr.getIntroducerHash(i);
-                long exp = addr.getIntroducerExpiration(i);
-                if (h != null && (exp > now || exp == 0)) {
-                    PeerState bob = _transport.getPeerState(h);
-                    // TODO cross-version relaying, maybe
-                    if (bob != null && bob.getVersion() == 2) {
+                if (h != null) {
+                    PeerState bob = null;
+                    OutboundEstablishState2.IntroState istate = state2.getIntroState(h);
+                    switch (istate) {
+                        case INTRO_STATE_INIT:
+                        case INTRO_STATE_CONNECTING:
+                            bob = _transport.getPeerState(h);
+                            if (bob != null) {
+                                if (bob.getVersion() == 2) {
+                                    istate = INTRO_STATE_CONNECTED;
+                                    state2.setIntroState(h, istate);
+                                } else {
+                                    // TODO cross-version relaying, maybe
+                                    istate = INTRO_STATE_REJECTED;
+                                    state2.setIntroState(h, istate);
+                                }
+                            }
+                            break;
+
+                        case INTRO_STATE_CONNECTED:
+                            bob = _transport.getPeerState(h);
+                            if (bob == null) {
+                                istate = INTRO_STATE_DISCONNECTED;
+                                state2.setIntroState(h, istate);
+                            }
+                            break;
+
+                    }
+                    if (bob != null && istate == INTRO_STATE_CONNECTED) {
                         if (_log.shouldDebug())
                             _log.debug("Found connected introducer " + bob + " for " + state);
                         long tag = addr.getIntroducerTag(i);
                         sendRelayRequest(tag, (PeerState2) bob, state);
-                        state.introSent();
+                        // this transitions the state
+                        state2.introSent(h);
                         return;
                     }
                 }
@@ -1365,19 +1392,20 @@ class EstablishmentManager {
             boolean sent = false;
             for (int i = 0; i < count; i++) {
                 Hash h = addr.getIntroducerHash(i);
-                long exp = addr.getIntroducerExpiration(i);
-                if (h != null && (exp > now || exp == 0)) {
-                    if (_context.banlist().isBanlisted(h))
-                        continue;
-                    PeerState bobState = _transport.getPeerState(h);
-                    if (bobState != null) {
-                        // presumably SSU1 or we would have used it above
-                        if (_log.shouldDebug())
-                            _log.debug("Skipping SSU1-connected introducer " + bobState + " for " + state);
-                        continue;
+                if (h != null) {
+                    RouterInfo bob = null;
+                    OutboundEstablishState2.IntroState istate = state2.getIntroState(h);
+                    OutboundEstablishState2.IntroState oldState = istate;
+                    switch (istate) {
+                        case INTRO_STATE_INIT:
+                        case INTRO_STATE_LOOKUP_SENT:
+                        case INTRO_STATE_HAS_RI:
+                            bob = _context.netDb().lookupRouterInfoLocally(h);
+                            if (bob != null)
+                                istate = INTRO_STATE_HAS_RI;
+                            break;
                     }
-                    RouterInfo bob = _context.netDb().lookupRouterInfoLocally(h);
-                    if (bob != null) {
+                    if (bob != null && istate == INTRO_STATE_HAS_RI) {
                         List<RouterAddress> addrs = _transport.getTargetAddresses(bob);
                         for (RouterAddress ra : addrs) {
                             byte[] ip = ra.getIP();
@@ -1399,16 +1427,23 @@ class EstablishmentManager {
                                 DatabaseLookupMessage dlm = new DatabaseLookupMessage(_context);
                                 dlm.setSearchKey(h);
                                 dlm.setSearchType(DatabaseLookupMessage.Type.RI);
+                                long now = _context.clock().now();
                                 dlm.setMessageExpiration(now + 10*1000);
                                 dlm.setFrom(_context.routerHash());
                                 OutNetMessage m = new OutNetMessage(_context, dlm, now + 10*1000, OutNetMessage.PRIORITY_MY_NETDB_LOOKUP, bob);
                                 establish(m);
+                                istate = INTRO_STATE_CONNECTING;
                                 // for now, just wait until this method is called again,
                                 // hopefully somebody has connected
                                 break;
                             }
                         }
                     }
+                    // if we didn't try to connect, it must have had a bad RI
+                    if (istate == INTRO_STATE_HAS_RI)
+                        istate = INTRO_STATE_REJECTED;
+                    if (oldState != istate)
+                        state2.setIntroState(h, istate);
                 }
             }
             if (sent) {
@@ -1419,15 +1454,17 @@ class EstablishmentManager {
             // Otherwise, look up the RIs first.
             for (int i = 0; i < count; i++) {
                 Hash h = addr.getIntroducerHash(i);
-                long exp = addr.getIntroducerExpiration(i);
-                if (h != null && (exp > now || exp == 0)) {
-                    if (_context.banlist().isBanlisted(h))
-                        continue;
-                    if (_log.shouldDebug())
-                        _log.debug("Looking up introducer " + h + " for " + state);
-                    // TODO on success job
-                    _context.netDb().lookupRouterInfo(h, null, null, 10*1000);
-                    sent = true;
+                if (h != null) {
+                    OutboundEstablishState2.IntroState istate = state2.getIntroState(h);
+                    if (istate == INTRO_STATE_INIT) {
+                        if (_log.shouldDebug())
+                            _log.debug("Looking up introducer " + h + " for " + state);
+                        istate = INTRO_STATE_LOOKUP_SENT;
+                        state2.setIntroState(h, istate);
+                        // TODO on success job
+                        _context.netDb().lookupRouterInfo(h, null, null, 10*1000);
+                        sent = true;
+                    }
                 }
             }
             if (sent) {
@@ -1569,6 +1606,9 @@ class EstablishmentManager {
                 _log.debug("Dup or unknown RelayResponse: " + nonce);
             return; // already established
         }
+        if (charlie.getVersion() != 2)
+            return;
+        OutboundEstablishState2 charlie2 = (OutboundEstablishState2) charlie;
         long token;
         if (code == 0) {
             token = DataHelper.fromLong8(data, data.length - 8);
@@ -1581,10 +1621,17 @@ class EstablishmentManager {
         RouterInfo bobRI = _context.netDb().lookupRouterInfoLocally(bobHash);
         RouterInfo charlieRI = _context.netDb().lookupRouterInfoLocally(charlieHash);
         Hash signer;
-        if (code > 0 && code < 64)
+        OutboundEstablishState2.IntroState istate;
+        if (code > 0 && code < 64) {
             signer = bobHash;
-        else
+            istate = INTRO_STATE_BOB_REJECT;
+        } else {
             signer = charlieHash;
+            if (code == 0)
+                istate = INTRO_STATE_SUCCESS;
+            else
+                istate = INTRO_STATE_CHARLIE_REJECT;
+        }
         RouterInfo signerRI = _context.netDb().lookupRouterInfoLocally(signer);
         if (signerRI != null) {
             // validate signed data
@@ -1594,6 +1641,7 @@ class EstablishmentManager {
             } else {
                 if (_log.shouldWarn())
                     _log.warn("Signature failed relay response " + code + " as alice from:\n" + signerRI);
+                istate = INTRO_STATE_FAILED;
             }
         } else {
             if (_log.shouldWarn())
@@ -1604,6 +1652,8 @@ class EstablishmentManager {
             if (iplen != 6 && iplen != 18) {
                 if (_log.shouldWarn())
                     _log.warn("Bad IP length " + iplen + " from " + charlie);
+                istate = INTRO_STATE_FAILED;
+                charlie2.setIntroState(bobHash, istate);
                 charlie.fail();
                 return;
             }
@@ -1619,6 +1669,8 @@ class EstablishmentManager {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Bad relay resp from " + charlie + " for " + Addresses.toString(ip, port));
                 _context.statManager().addRateData("udp.relayBadIP", 1);
+                istate = INTRO_STATE_FAILED;
+                charlie2.setIntroState(bobHash, istate);
                 charlie.fail();
                 return;
             }
@@ -1626,6 +1678,8 @@ class EstablishmentManager {
             try {
                 charlieIP = InetAddress.getByAddress(ip);
             } catch (UnknownHostException uhe) {
+                istate = INTRO_STATE_FAILED;
+                charlie2.setIntroState(bobHash, istate);
                 charlie.fail();
                 return;
             }
@@ -1635,6 +1689,7 @@ class EstablishmentManager {
             if (charlieRI == null) {
                 if (_log.shouldWarn())
                     _log.warn("Charlie RI not found " + charlie);
+                charlie2.setIntroState(bobHash, istate);
                 // maybe it will show up later
                 return;
             }
@@ -1659,11 +1714,13 @@ class EstablishmentManager {
                 if (claimed != null)
                     _outboundByClaimedAddress.remove(oldId, charlie);  // only if == state
             }
+            charlie2.setIntroState(bobHash, istate);
             notifyActivity();
         } else if (code >= 64) {
             // that's it
             if (_log.shouldDebug())
                 _log.debug("Received RelayResponse rejection " + code + " from charlie " + charlie);
+            charlie2.setIntroState(bobHash, istate);
             charlie.fail();
             _liveIntroductions.remove(lnonce);
         } else {
@@ -1671,6 +1728,7 @@ class EstablishmentManager {
             // TODO keep track
             if (_log.shouldDebug())
                 _log.debug("Received RelayResponse rejection " + code + " from bob " + bob);
+            charlie2.setIntroState(bobHash, istate);
             notifyActivity();
         }
     }

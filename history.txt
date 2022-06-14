@@ -1,3 +1,13 @@
+2022-06-14 zzz
+ * SSU2:
+   - Add per-introducer relay state machine
+   - Enable relay
+
+2022-06-12 zzz
+ * SSU2:
+   - Fix peer test msg 1 signature
+   - Relay fixes
+
 2022-06-11 zzz
  * SSU: Don't send SSU1 relay request to SSU2 peer
 

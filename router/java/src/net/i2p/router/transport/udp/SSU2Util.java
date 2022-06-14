@@ -19,7 +19,7 @@ final class SSU2Util {
     public static final int PROTOCOL_VERSION = 2;
 
     // features
-    public static final boolean ENABLE_RELAY = false;
+    public static final boolean ENABLE_RELAY = true;
     public static final boolean ENABLE_PEER_TEST = true;
     public static final boolean ENABLE_PATH_CHALLENGE = false;
 
