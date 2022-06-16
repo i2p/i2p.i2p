@@ -286,7 +286,7 @@ class SSU2Payload {
                 case BLOCK_RELAYRESP: {
                     if (isHandshake)
                         throw new IOException("Illegal block in handshake: " + type);
-                    if (len < 62) // 22 byte data w/ IPv4 + 40 byte DSA sig
+                    if (len < 52) // 12 byte data w/o IP or token + 40 byte DSA sig
                         throw new IOException("Bad length for RELAYRESP: " + len);
                     int resp = payload[i + 1] & 0xff; // skip flag
                     byte[] data = new byte[len - 2];

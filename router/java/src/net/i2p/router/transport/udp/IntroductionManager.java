@@ -992,8 +992,8 @@ class IntroductionManager {
             // send hole punch with the same data we sent to Bob
             if (_log.shouldDebug())
                 _log.debug("Send hole punch to " + Addresses.toString(testIP, testPort));
-            long rcvId = (nonce << 32) | nonce;
-            long sendId = ~rcvId;
+            long sendId = (nonce << 32) | nonce;
+            long rcvId = ~sendId;
             packet = _builder2.buildHolePunch(aliceIP, testPort, aliceIntroKey, sendId, rcvId, data);
             _transport.send(packet);
         }
