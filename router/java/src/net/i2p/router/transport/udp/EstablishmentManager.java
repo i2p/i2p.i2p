@@ -160,6 +160,7 @@ class EstablishmentManager {
     // SSU 2
     private static final int MAX_TOKENS = 512;
     public static final long IB_TOKEN_EXPIRATION = 60*60*1000L;
+    private static final long MAX_SKEW = 2*60*1000;
 
 
     public EstablishmentManager(RouterContext ctx, UDPTransport transport) {
@@ -1617,7 +1618,7 @@ class EstablishmentManager {
             token = 0;
         }
         Hash bobHash = bob.getRemotePeer();
-        Hash charlieHash = charlie.getRemoteHostId().getPeerHash();
+        Hash charlieHash = charlie.getRemoteIdentity().getHash();
         RouterInfo bobRI = _context.netDb().lookupRouterInfoLocally(bobHash);
         RouterInfo charlieRI = _context.netDb().lookupRouterInfoLocally(charlieHash);
         Hash signer;
@@ -1636,16 +1637,19 @@ class EstablishmentManager {
         if (signerRI != null) {
             // validate signed data
             SigningPublicKey spk = signerRI.getIdentity().getSigningPublicKey();
-            if (SSU2Util.validateSig(_context, SSU2Util.RELAY_RESPONSE_PROLOGUE,
+            if (!SSU2Util.validateSig(_context, SSU2Util.RELAY_RESPONSE_PROLOGUE,
                                      bobHash, null, data, spk)) {
-            } else {
                 if (_log.shouldWarn())
                     _log.warn("Signature failed relay response " + code + " as alice from:\n" + signerRI);
                 istate = INTRO_STATE_FAILED;
+                charlie2.setIntroState(bobHash, istate);
+                charlie.fail();
+                return;
             }
         } else {
             if (_log.shouldWarn())
                 _log.warn("Signer RI not found " + signer);
+            return;
         }
         if (code == 0) {
             int iplen = data[9] & 0xff;
@@ -1657,7 +1661,6 @@ class EstablishmentManager {
                 charlie.fail();
                 return;
             }
-            boolean isIPv6 = iplen == 18;
             int port = (int) DataHelper.fromLong(data, 10, 2);
             byte[] ip = new byte[iplen - 2];
             System.arraycopy(data, 12, ip, 0, iplen - 2);
@@ -1669,15 +1672,6 @@ class EstablishmentManager {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Bad relay resp from " + charlie + " for " + Addresses.toString(ip, port));
                 _context.statManager().addRateData("udp.relayBadIP", 1);
-                istate = INTRO_STATE_FAILED;
-                charlie2.setIntroState(bobHash, istate);
-                charlie.fail();
-                return;
-            }
-            InetAddress charlieIP;
-            try {
-                charlieIP = InetAddress.getByAddress(ip);
-            } catch (UnknownHostException uhe) {
                 istate = INTRO_STATE_FAILED;
                 charlie2.setIntroState(bobHash, istate);
                 charlie.fail();
@@ -1695,24 +1689,29 @@ class EstablishmentManager {
             }
             synchronized (charlie) {
                 RemoteHostId oldId = charlie.getRemoteHostId();
-                ((OutboundEstablishState2) charlie).introduced(ip, port, token);
-                RemoteHostId newId = charlie.getRemoteHostId();
-                addOutboundToken(newId, token, _context.clock().now() + 10*1000);
-                // Swap out the RemoteHostId the state is indexed under.
-                // It was a Hash, change it to a IP/port.
-                // Remove the entry in the byClaimedAddress map as it's now in main map.
-                // Add an entry in the byHash map so additional OB pkts can find it.
-                _outboundByHash.put(charlieHash, charlie);
-                RemoteHostId claimed = charlie.getClaimedAddress();
-                if (!oldId.equals(newId)) {
-                    _outboundStates.remove(oldId);
-                    _outboundStates.put(newId, charlie);
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("RR replaced " + oldId + " with " + newId + ", claimed address was " + claimed);
+                if (oldId.getIP() == null) {
+                    // relay response before hole punch
+                    ((OutboundEstablishState2) charlie).introduced(ip, port, token);
+                    RemoteHostId newId = charlie.getRemoteHostId();
+                    addOutboundToken(newId, token, _context.clock().now() + 10*1000);
+                    // Swap out the RemoteHostId the state is indexed under.
+                    // It was a Hash, change it to a IP/port.
+                    // Remove the entry in the byClaimedAddress map as it's now in main map.
+                    // Add an entry in the byHash map so additional OB pkts can find it.
+                    _outboundByHash.put(charlieHash, charlie);
+                    RemoteHostId claimed = charlie.getClaimedAddress();
+                    if (!oldId.equals(newId)) {
+                        _outboundStates.remove(oldId);
+                        _outboundStates.put(newId, charlie);
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("RR replaced " + oldId + " with " + newId + ", claimed address was " + claimed);
+                    }
+                    //
+                    if (claimed != null)
+                        _outboundByClaimedAddress.remove(oldId, charlie);  // only if == state
+                } else {
+                    // TODO validate same IP/port as in hole punch?
                 }
-                //
-                if (claimed != null)
-                    _outboundByClaimedAddress.remove(oldId, charlie);  // only if == state
             }
             charlie2.setIntroState(bobHash, istate);
             notifyActivity();
@@ -1745,6 +1744,8 @@ class EstablishmentManager {
         RemoteHostId id = new RemoteHostId(from.getAddress(), fromPort);
         OutboundEstablishState state = _outboundStates.get(id);
         if (state != null) {
+            // this is the usual case, we already received the RelayResponse (1 RTT)
+            // before the HolePunch (1 1/2 RTT)
             boolean sendNow = state.receiveHolePunch();
             if (sendNow) {
                 if (_log.shouldDebug())
@@ -1786,14 +1787,47 @@ class EstablishmentManager {
         chacha.initializeKey(introKey, 0);
         long n = DataHelper.fromLong(data, off + PKT_NUM_OFFSET, 4);
         chacha.setNonce(n);
+        HPCallback cb = new HPCallback(id);
+        long now = _context.clock().now();
+        long nonce;
         try {
             // decrypt in-place
             chacha.decryptWithAd(data, off, LONG_HEADER_SIZE,
                                  data, off + LONG_HEADER_SIZE, data, off + LONG_HEADER_SIZE, len - LONG_HEADER_SIZE);
             int payloadLen = len - (LONG_HEADER_SIZE + MAC_LEN);
-            SSU2Payload.PayloadCallback cb = new HPCallback(id);
             SSU2Payload.processPayload(_context, cb, data, off + LONG_HEADER_SIZE, payloadLen, false);
-            // TODO process cb fields
+            if (cb._respCode != 0) {
+                if (_log.shouldWarn())
+                    _log.warn("Bad HolePunch response: " + cb._respCode);
+                return;
+            }
+            long skew = cb._timeReceived - now;
+            if (skew > MAX_SKEW || skew < 0 - MAX_SKEW) {
+                if (_log.shouldWarn())
+                    _log.warn("Too skewed in hole punch from " + id);
+                return;
+            }
+            nonce = DataHelper.fromLong(cb._respData, 0, 4);
+            if (nonce != (rcvConnID & 0xFFFFFFFFL) ||
+                nonce != ((rcvConnID >> 32) & 0xFFFFFFFFL)) {
+                if (_log.shouldWarn())
+                    _log.warn("Bad nonce in hole punch from " + id);
+                return;
+            }
+            long time = DataHelper.fromLong(cb._respData, 4, 4) * 1000;
+            skew = time - now;
+            if (skew > MAX_SKEW || skew < 0 - MAX_SKEW) {
+                if (_log.shouldWarn())
+                    _log.warn("Too skewed in hole punch from " + id);
+                return;
+            }
+            int ver = cb._respData[8] & 0xff;
+            if (ver != 2) {
+                if (_log.shouldWarn())
+                    _log.warn("Bad hole punch version " + ver + " from " + id);
+                return;
+            }
+            // check signature below
         } catch (Exception e) {
             if (_log.shouldWarn())
                 _log.warn("Bad HolePunch packet:\n" + HexDump.dump(data, off, len), e);
@@ -1805,19 +1839,141 @@ class EstablishmentManager {
         // TODO now we can look up by nonce instead if we want
         OutboundEstablishState state = _outboundStates.get(id);
         if (state != null) {
-            boolean sendNow = state.receiveHolePunch();
-            if (sendNow) {
-                if (_log.shouldDebug())
-                    _log.debug("Hole punch from " + state + ", sending SessionRequest now");
-                notifyActivity();
+            if (_log.shouldInfo())
+                _log.info("Hole punch after RelayResponse from " + state);
+        } else {
+            // This is the usual case, we received the HolePunch (1 1/2 RTT)
+            // before the RelayResponse (2 RTT), lookup by nonce.
+            state = _liveIntroductions.remove(Long.valueOf(nonce));
+            if (state != null) {
+                if (_log.shouldInfo())
+                    _log.info("Hole punch before RelayResponse from " + state);
             } else {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Hole punch from " + state + ", already sent SessionRequest");
+                    _log.info("No state found for SSU2 hole punch from " + id);
+                return;
+            }
+        }
+        if (state.getVersion() != 2)
+            return;
+        OutboundEstablishState2 state2 = (OutboundEstablishState2) state;
+        Hash charlieHash = state.getRemoteIdentity().getHash();
+        RouterInfo charlieRI = _context.netDb().lookupRouterInfoLocally(charlieHash);
+        if (charlieRI != null) {
+            // validate signed data, but we don't necessarily know which Bob
+            SigningPublicKey spk = charlieRI.getIdentity().getSigningPublicKey();
+            UDPAddress addr = state.getRemoteAddress();
+            int count = addr.getIntroducerCount();
+            data = Arrays.copyOfRange(cb._respData, 0, cb._respData.length - 8);
+            boolean ok = false;
+            loop:
+            for (int i = 0; i < count; i++) {
+                Hash h = addr.getIntroducerHash(i);
+                if (h != null) {
+                    OutboundEstablishState2.IntroState istate = state2.getIntroState(h);
+                    switch (istate) {
+                        // probably not signed by this introducer
+                        case INTRO_STATE_INIT:
+                        case INTRO_STATE_EXPIRED:
+                        case INTRO_STATE_REJECTED:
+                        case INTRO_STATE_CONNECT_FAILED:
+                        case INTRO_STATE_BOB_REJECT:
+                        case INTRO_STATE_CHARLIE_REJECT:
+                        case INTRO_STATE_FAILED:
+                        case INTRO_STATE_INVALID:
+                        case INTRO_STATE_DISCONNECTED:
+                             continue;
+
+                        // maybe or definitely signed by this introducer
+                        case INTRO_STATE_LOOKUP_SENT:
+                        case INTRO_STATE_HAS_RI:
+                        case INTRO_STATE_CONNECTING:
+                        case INTRO_STATE_CONNECTED:
+                        case INTRO_STATE_RELAY_REQUEST_SENT:
+                        case INTRO_STATE_RELAY_CHARLIE_ACCEPTED:
+                        case INTRO_STATE_LOOKUP_FAILED:
+                        case INTRO_STATE_RELAY_RESPONSE_TIMEOUT:
+                        case INTRO_STATE_SUCCESS:
+                        default:
+                            if (SSU2Util.validateSig(_context, SSU2Util.RELAY_RESPONSE_PROLOGUE,
+                                                     h, null, data, spk)) {
+                                if (_log.shouldInfo())
+                                    _log.info("Good sig hole punch, credit " + h.toBase64() + " on " + state);
+                                state2.setIntroState(h, INTRO_STATE_SUCCESS);
+                                ok = true;
+                                break loop;
+                            }
+                            break;
+                    }
+                }
+            }
+            if (!ok) {
+                if (_log.shouldWarn())
+                    _log.warn("Signature failed hole punch on " + state);
+                return;
+            }
+
+            int iplen = data[9] & 0xff;
+            if (iplen != 6 && iplen != 18) {
+                if (_log.shouldWarn())
+                    _log.warn("Bad IP length " + iplen + " from " + state);
+                state.fail();
+                return;
+            }
+            int port = (int) DataHelper.fromLong(data, 10, 2);
+            byte[] ip = new byte[iplen - 2];
+            System.arraycopy(data, 12, ip, 0, iplen - 2);
+            // validate
+            if (!TransportUtil.isValidPort(port) ||
+                !_transport.isValid(ip) ||
+                _transport.isTooClose(ip) ||
+                _context.blocklist().isBlocklisted(ip)) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Bad hole punch from " + state + " for " + Addresses.toString(ip, port));
+                _context.statManager().addRateData("udp.relayBadIP", 1);
+                state.fail();
+                return;
+            }
+            if (_log.shouldDebug())
+                _log.debug("Received hole punch from " + state + " - they are on " +
+                           Addresses.toString(ip, port));
+            synchronized (state) {
+                RemoteHostId oldId = state.getRemoteHostId();
+                if (oldId.getIP() == null) {
+                    // hole punch before relay response
+                    long token = DataHelper.fromLong8(cb._respData, cb._respData.length - 8);
+                    state2.introduced(ip, port, token);
+                    RemoteHostId newId = state.getRemoteHostId();
+                    addOutboundToken(newId, token, now + 10*1000);
+                    // Swap out the RemoteHostId the state is indexed under.
+                    // It was a Hash, change it to a IP/port.
+                    // Remove the entry in the byClaimedAddress map as it's now in main map.
+                    // Add an entry in the byHash map so additional OB pkts can find it.
+                    _outboundByHash.put(charlieHash, state);
+                    RemoteHostId claimed = state.getClaimedAddress();
+                    if (!oldId.equals(newId)) {
+                        _outboundStates.remove(oldId);
+                        _outboundStates.put(newId, state);
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("HP replaced " + oldId + " with " + newId + ", claimed address was " + claimed);
+                    }
+                    //
+                    if (claimed != null)
+                        _outboundByClaimedAddress.remove(oldId, state);  // only if == state
+                } else {
+                    // TODO validate same IP/port as in response?
+                }
+            }
+            boolean sendNow = state.receiveHolePunch();
+            if (sendNow) {
+                if (_log.shouldInfo())
+                    _log.info("Send SessionRequest after HolePunch from " + state);
+                notifyActivity();
             }
         } else {
-            // HolePunch received before RelayResponse, and we didn't know the IP/port, or it changed
-            if (_log.shouldLog(Log.INFO))
-                _log.info("No state found for SSU2 hole punch from " + id);
+            if (_log.shouldWarn())
+                _log.warn("Charlie RI not found " + state);
+            return;
         }
     }
 
@@ -2358,6 +2514,7 @@ class EstablishmentManager {
         do {
             token = _context.random().nextLong();
         } while (token == 0);
+        // TODO shorten expiration based on _inboundTokens size
         long expires = _context.clock().now() + IB_TOKEN_EXPIRATION;
         Token tok = new Token(token, expires);
         synchronized(_inboundTokens) {
@@ -2399,12 +2556,12 @@ class EstablishmentManager {
      *
      *  @since 0.9.55
      */
-    private class HPCallback implements SSU2Payload.PayloadCallback {
+    private static class HPCallback implements SSU2Payload.PayloadCallback {
         private final RemoteHostId _from;
         public long _timeReceived;
         public byte[] _aliceIP;
         public int _alicePort;
-        public int _respCode;
+        public int _respCode = 999;
         public byte[] _respData;
 
         public HPCallback(RemoteHostId from) {

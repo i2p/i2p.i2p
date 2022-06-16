@@ -358,6 +358,25 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         return rv;
     }
 
+    /**
+     *  Overridden because we don't have to wait for Relay Response first.
+     *
+     *  @return true if we should send the SessionRequest now
+     *  @since 0.9.55
+     */
+    @Override
+    synchronized boolean receiveHolePunch() {
+        if (_currentState == OutboundState.OB_STATE_PENDING_INTRO)
+            _currentState = OutboundState.OB_STATE_INTRODUCED;
+        else if (_currentState != OutboundState.OB_STATE_INTRODUCED)
+            return false;
+        if (_requestSentCount > 0)
+            return false;
+        long now = _context.clock().now();
+        _nextSend = now;
+        return true;
+    }
+
     // SSU 2 things
 
     @Override
@@ -666,7 +685,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         synchronized(_introducers) {
             old = _introducers.put(h, state);
         }
-        if (_log.shouldDebug())
+        if (old != state && _log.shouldDebug())
             _log.debug("Change state for introducer " + h.toBase64() + " from " + old + " to " + state + " on " + this);
     }
 
