@@ -115,13 +115,13 @@ public final class SigUtil {
         }
         if (pk instanceof ECPublicKey) {
             ECPublicKey k = (ECPublicKey) pk;
-            AlgorithmParameterSpec spec = k.getParams();
+            ECParameterSpec spec = k.getParams();
             SigType type;
-            if (spec.equals(SigType.ECDSA_SHA256_P256.getParams()))
+            if (ECConstants.equals(spec, ECConstants.P256_SPEC))
                 type = SigType.ECDSA_SHA256_P256;
-            else if (spec.equals(SigType.ECDSA_SHA384_P384.getParams()))
+            else if (ECConstants.equals(spec, ECConstants.P384_SPEC))
                 type = SigType.ECDSA_SHA384_P384;
-            else if (spec.equals(SigType.ECDSA_SHA512_P521.getParams()))
+            else if (ECConstants.equals(spec, ECConstants.P521_SPEC))
                 type = SigType.ECDSA_SHA512_P521;
             else
                 throw new InvalidKeyException("Unknown EC type");

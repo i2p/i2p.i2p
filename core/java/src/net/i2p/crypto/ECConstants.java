@@ -334,4 +334,20 @@ final class ECConstants {
     //public static final ECParameterSpec K571_SPEC = genSpec("sect571k1", "K-571", null);
 
 
+    /**
+     *  There is no ECParameterSpec.equals().
+     *  Needed to load family keys on Android via SigUtil.fromJavaKey().
+     *
+     *  @since 0.9.55
+     */
+    public static boolean equals(ECParameterSpec s1, ECParameterSpec s2) {
+        if (s1 == s2)
+            return true;
+        // do this field by field, nothing has equals()
+        // but the BigIntegers, however they do have defined hashcodes
+        return s1.getCofactor() == s2.getCofactor() &&                          // int
+               s1.getCurve().hashCode() == s2.getCurve().hashCode() &&          // EllipticCurve
+               s1.getGenerator().hashCode() == s2.getGenerator().hashCode() &&  // ECPoint
+               s1.getOrder().equals(s2.getOrder());                             // BigInteger
+    }
 }
