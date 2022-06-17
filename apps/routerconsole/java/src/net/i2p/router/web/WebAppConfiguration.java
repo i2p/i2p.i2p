@@ -106,6 +106,8 @@ public class WebAppConfiguration implements Configuration {
         if (ctxPath.equals("/susidns")) {
             // Old installs don't have this in their wrapper.config classpath
             cp = "addressbook.jar";
+            // Java 11+ fix to prevent dup contexts
+            wac.setParentLoaderPriority(true);
         } else if (pluginDir.exists()) {
             File consoleDir = new File(pluginDir, "console");
             Properties props = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
