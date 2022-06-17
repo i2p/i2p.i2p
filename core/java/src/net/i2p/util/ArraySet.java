@@ -1,4 +1,4 @@
-package net.i2p.router.util;
+package net.i2p.util;
 
 import java.io.Serializable;
 import java.util.AbstractSet;
@@ -10,15 +10,19 @@ import java.util.Set;
 
 /**
  *  A small, fast Set with a maximum size, backed by a fixed-size array.
+ *  Much more space-efficient than HashSet.
  *  Unsynchronized, not thread-safe.
  *  Null elements are not permitted.
- *  Not appropriate for large Sets.
  *
- *  @since 0.9.25
+ *  Not appropriate for large Sets that are modified.
+ *  add(), remove(), and contains() are O(n).
+ *  Warning: addAll() and the Collection constructor are O(n**2).
+ *
+ *  @since 0.9.25, moved to net.i2p.util in 0.9.55
  */
 public class ArraySet<E> extends AbstractSet<E> implements Set<E> {
     public static final int MAX_CAPACITY = 32;
-    private final Object[] _entries;
+    protected final Object[] _entries;
     private final boolean _throwOnFull;
     private int _size;
     private int _overflowIndex;
@@ -33,12 +37,51 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E> {
     }
 
     /**
-     *  A fixed capacity of MAX_CAPACITY.
+     *  A fixed capacity of max(MAX_CAPACITY, c.size())
      *  Adds over capacity will throw a SetFullException.
-     *  @throws SetFullException if more than MAX_CAPACITY unique elements in c.
+     *
+     *  @since 0.9.55
+     */
+    public ArraySet(Set<? extends E> c) {
+        this(c, MAX_CAPACITY);
+    }
+
+    /**
+     *  A fixed capacity of max(capacity, c.size())
+     *  Adds over capacity will throw a SetFullException.
+     *
+     *  @since 0.9.55
+     */
+    public ArraySet(Set<? extends E> c, int capacity) {
+        this(Math.max(capacity, c.size()));
+        // we avoid the O(n**2) behavior of addAll()
+        for (E e : c) {
+            _entries[_size++] = e;
+        }
+    }
+
+    /**
+     *  A fixed capacity of max(MAX_CAPACITY, c.size()), which may be more than
+     *  the resulting set size if there are duplicates in c.
+     *  Adds over capacity will throw a SetFullException.
+     *
+     *  Warning: O(n**2).
      */
     public ArraySet(Collection<? extends E> c) {
-        this();
+        this(c, MAX_CAPACITY);
+    }
+
+    /**
+     *  A fixed capacity of max(capacity, c.size()), which may be more than
+     *  the resulting set size if there are duplicates in c.
+     *  Adds over capacity will throw a SetFullException.
+     *
+     *  Warning: O(n**2).
+     *
+     *  @since 0.9.55
+     */
+    public ArraySet(Collection<? extends E> c, int capacity) {
+        this(Math.max(capacity, c.size()));
         addAll(c);
     }
 
@@ -46,7 +89,7 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E> {
      *  Adds over capacity will throw a SetFullException.
      *
      *  @param capacity the maximum size
-     *  @throws IllegalArgumentException if capacity less than 1 or more than MAX_CAPACITY.
+     *  @throws IllegalArgumentException if capacity less than 1.
      */
     public ArraySet(int capacity) {
         this(capacity, true);
@@ -61,10 +104,10 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E> {
      *  If throwOnFull is true, adds over capacity will throw a SetFullException.
      *
      *  @param capacity the maximum size
-     *  @throws IllegalArgumentException if capacity less than 1 or more than MAX_CAPACITY.
+     *  @throws IllegalArgumentException if capacity less than 1.
      */
     public ArraySet(int capacity, boolean throwOnFull) {
-        if (capacity <= 0 || capacity > MAX_CAPACITY)
+        if (capacity <= 0)
             throw new IllegalArgumentException("bad capacity");
         _entries = new Object[capacity];
         _throwOnFull = throwOnFull;
@@ -73,7 +116,7 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E> {
     /**
      *  @return -1 if not found or if o is null
      */
-    private int indexOf(Object o) {
+    protected int indexOf(Object o) {
         if (o != null) {
             for (int i = 0; i < _size; i++) {
                 if (o.equals(_entries[i]))
@@ -96,6 +139,22 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E> {
             _entries[i] = o;
             return false;
         }
+        addUnique(o);
+        return true;
+    }
+
+    /**
+     *  Unconditionally add o to the set.
+     *  This avoids the O(n) time of add(), but it's the caller's
+     *  responsibility to ensure that o is not a duplicate.
+     *  Any duplicate added will appear in the iterator.
+     *
+     *  @param o non-null, NPE will not be thrown
+     *  @throws SetFullException if throwOnFull was true in constructor
+     *  @since 0.9.55
+     */
+    public void addUnique(E o) {
+        int i;
         if (_size >= _entries.length) {
             if (_throwOnFull)
                 throw new SetFullException();
@@ -109,7 +168,6 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E> {
             i = _size++;
         }
         _entries[i] = o;
-        return true;
     }
 
     @Override
