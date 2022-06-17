@@ -10,12 +10,10 @@ package net.i2p.util;
  */
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Properties map that has its keySet ordered consistently (via the key's lexicographical ordering).
@@ -41,16 +39,14 @@ public class OrderedProperties extends Properties {
     public Set<Object> keySet() {
         if (size() <= 1)
             return super.keySet();
-        return Collections.unmodifiableSortedSet(new TreeSet<Object>(super.keySet()));
+        return new UnmodifiableSortedSet(super.keySet());
     }
 
     @Override
     public Set<Map.Entry<Object, Object>> entrySet() {
         if (size() <= 1)
             return super.entrySet();
-        TreeSet<Map.Entry<Object, Object>> rv = new TreeSet<Map.Entry<Object, Object>>(ECOMP);
-        rv.addAll(super.entrySet());
-        return Collections.unmodifiableSortedSet(rv);
+        return new UnmodifiableSortedSet(super.entrySet(), ECOMP);
     }
 
     private static class EntryComparator implements Comparator<Map.Entry<Object, Object>>, Serializable {
