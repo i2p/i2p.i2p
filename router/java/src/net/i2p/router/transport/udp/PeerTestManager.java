@@ -32,6 +32,7 @@ import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.HexDump;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -838,7 +839,67 @@ class PeerTestManager {
      * @since 0.9.54
      */
     public void receiveTest(RemoteHostId from, PeerState2 fromPeer, int msg, int status, Hash h, byte[] data) {
-        receiveTest(from, fromPeer, msg, status, h, data, null, 0);
+        if (status == 0 && (msg == 2 || msg == 4) && !_context.banlist().isBanlisted(h))
+            receiveTest(from, fromPeer, msg, h, data, 0);
+        else
+            receiveTest(from, fromPeer, msg, status, h, data, null, 0);
+    }
+
+    /**
+     * Status 0 only, Msg 2 and 4 only, SSU 2 only.
+     * Bob should have sent us the RI, but maybe it's in the block
+     * after this, or maybe it's in a different packet.
+     * Check for RI, if not found, return true to retry, unless retryCount is at the limit.
+     * Creates the timer if retryCount == 0.
+     *
+     * We are Alice for msg 4, Charlie for msg 2.
+     *
+     * @return true if RI found, false to delay and retry.
+     * @since 0.9.55
+     */
+    private boolean receiveTest(RemoteHostId from, PeerState2 fromPeer, int msg, Hash h, byte[] data, int retryCount) {
+        if (retryCount < 5) {
+            RouterInfo ri = _context.netDb().lookupRouterInfoLocally(h);
+            if (ri == null) {
+                if (_log.shouldInfo())
+                    _log.info("Delay after " + retryCount + " retries, no RI for " + h.toBase64());
+                if (retryCount == 0)
+                    new DelayTest(from, fromPeer, msg, h, data);
+                return false;
+            }
+        }
+        receiveTest(from, fromPeer, msg, 0, h, data, null, 0);
+        return true;
+    }
+
+    /** 
+     * Wait for RI.
+     * @since 0.9.55
+     */
+    private class DelayTest extends SimpleTimer2.TimedEvent {
+        private final RemoteHostId from;
+        private final PeerState2 fromPeer;
+        private final int msg;
+        private final Hash hash;
+        private final byte[] data;
+        private volatile int count;
+        private static final long DELAY = 50;
+
+        public DelayTest(RemoteHostId f, PeerState2 fp, int m, Hash h, byte[] d) {
+            super(_context.simpleTimer2());
+            from = f;
+            fromPeer = fp;
+            msg = m;
+            hash = h;
+            data = d;
+            schedule(DELAY);
+        }
+
+        public void timeReached() {
+            boolean ok = receiveTest(from, fromPeer, msg, hash, data, ++count);
+            if (!ok)
+                reschedule(DELAY << count);
+        }
     }
 
     /**
@@ -1102,7 +1163,7 @@ class PeerTestManager {
                         }
                     } else {
                         if (_log.shouldWarn())
-                            _log.warn("Alice RI not found " + h);
+                            _log.warn("Alice RI not found " + h + " for peer test from " + fromPeer);
                         rcode = SSU2Util.TEST_REJECT_CHARLIE_UNKNOWN_ALICE;
                     }
                 }

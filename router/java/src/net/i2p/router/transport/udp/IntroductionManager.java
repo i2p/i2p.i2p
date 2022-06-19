@@ -27,6 +27,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.transport.TransportUtil;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer2;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -235,11 +236,18 @@ class IntroductionManager {
                 Introducer intro;
                 byte[] key = ua.getIntroducerKey(i);
                 if (key != null) {
+                    // SSU 1
+                    //// debug, replace SSU 1 with SSU 2 if available for slots 1-2
+                    //// leave slot 0 for SSU 1
+                    //// this will churn the SSU 1 introducers, oh well
+                    if (preferV2 && i > 0)
+                        continue;
                     intro = new Introducer(ua.getIntroducerHost(i).getAddress(),
                                            ua.getIntroducerPort(i), key, tag, sexp);
                     if (_log.shouldInfo())
                         _log.info("Reusing introducer: " + ua.getIntroducerHost(i));
                 } else {
+                    // SSU 2
                     intro = new Introducer(ua.getIntroducerHash(i), tag, sexp);
                     if (_log.shouldInfo())
                         _log.info("Reusing introducer: " + ua.getIntroducerHash(i));
@@ -879,6 +887,73 @@ class IntroductionManager {
      *  @since 0.9.55
      */
     void receiveRelayIntro(PeerState2 bob, Hash alice, byte[] data) {
+        receiveRelayIntro(bob, alice, data, 0);
+    }
+
+    /**
+     *  We are Charlie and we got this from Bob.
+     *  Bob should have sent us the RI, but maybe it's in the block
+     *  after this, or maybe it's in a different packet.
+     *  Check for RI, if not found, return true to retry, unless retryCount is at the limit.
+     *  Creates the timer if retryCount == 0.
+     *
+     *  SSU 2 only.
+     *
+     *  @return true if RI found, false to delay and retry.
+     *  @since 0.9.55
+     */
+    private boolean receiveRelayIntro(PeerState2 bob, Hash alice, byte[] data, int retryCount) {
+        RouterInfo aliceRI = null;
+        if (retryCount < 5 && !_context.banlist().isBanlisted(alice)) {
+            aliceRI = _context.netDb().lookupRouterInfoLocally(alice);
+            if (aliceRI == null) {
+                if (_log.shouldInfo())
+                    _log.info("Delay after " + retryCount + " retries, no RI for " + alice.toBase64());
+                if (retryCount == 0)
+                    new DelayIntro(bob, alice, data);
+                return false;
+            }
+        }
+        receiveRelayIntro(bob, alice, data, aliceRI);
+        return true;
+    }
+
+    /** 
+     * Wait for RI.
+     * @since 0.9.55
+     */
+    private class DelayIntro extends SimpleTimer2.TimedEvent {
+        private final PeerState2 bob;
+        private final Hash alice;
+        private final byte[] data;
+        private volatile int count;
+        private static final long DELAY = 50;
+
+        public DelayIntro(PeerState2 b, Hash a, byte[] d) {
+            super(_context.simpleTimer2());
+            bob = b;
+            alice = a;
+            data = d;
+            schedule(DELAY);
+        }
+
+        public void timeReached() {
+            boolean ok = receiveRelayIntro(bob, alice, data, ++count);
+            if (!ok)
+                reschedule(DELAY << count);
+        }
+    }
+
+    /**
+     *  We are Charlie and we got this from Bob.
+     *  Send a HolePunch to Alice, who will soon be sending us a SessionRequest.
+     *  And send a RelayResponse to bob.
+     *
+     *  SSU 2 only.
+     *
+     *  @since 0.9.55
+     */
+    private void receiveRelayIntro(PeerState2 bob, Hash alice, byte[] data, RouterInfo aliceRI) {
         long nonce = DataHelper.fromLong(data, 0, 4);
         long tag = DataHelper.fromLong(data, 4, 4);
         long time = DataHelper.fromLong(data, 8, 4) * 1000;
@@ -912,7 +987,6 @@ class IntroductionManager {
             return;
         }
 
-        RouterInfo aliceRI = null;
         SessionKey aliceIntroKey = null;
         int rcode;
         PeerState aps = _transport.getPeerState(alice);
@@ -927,8 +1001,7 @@ class IntroductionManager {
             rcode = SSU2Util.RELAY_REJECT_CHARLIE_ADDRESS;
         } else {
             // bob should have sent it to us. Don't bother to lookup
-            // remotely if he didn't, or it was out-of-order or lost.
-            aliceRI = _context.netDb().lookupRouterInfoLocally(alice);
+            // remotely if he didn't, or it was lost.
             if (aliceRI != null) {
                 // validate signed data
                 SigningPublicKey spk = aliceRI.getIdentity().getSigningPublicKey();
@@ -946,7 +1019,7 @@ class IntroductionManager {
                 }
             } else {
                 if (_log.shouldWarn())
-                    _log.warn("Alice RI not found " + alice);
+                    _log.warn("Alice RI not found " + alice + " for relay intro from " + bob);
                 rcode = SSU2Util.RELAY_REJECT_CHARLIE_UNKNOWN_ALICE;
             }
         }
@@ -985,8 +1058,8 @@ class IntroductionManager {
              return;
         }
         UDPPacket packet = _builder2.buildRelayResponse(data, bob);
-        if (_log.shouldDebug())
-            _log.debug("Send relay response " + rcode + " as charlie " + " nonce " + nonce + " to bob " + bob);
+        if (_log.shouldInfo())
+            _log.info("Send relay response " + rcode + " as charlie " + " nonce " + nonce + " to bob " + bob);
         _transport.send(packet);
         if (rcode == SSU2Util.RELAY_ACCEPT) {
             // send hole punch with the same data we sent to Bob
