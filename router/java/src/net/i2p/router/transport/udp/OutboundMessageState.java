@@ -100,9 +100,16 @@ class OutboundMessageState implements CDPQEntry {
         else
             _i2npMessage.toRawByteArray(_messageBuf);
         _fragmentSize = _peer.fragmentSize();
-        int numFragments = totalSize / _fragmentSize;
-        if (numFragments * _fragmentSize < totalSize)
-            numFragments++;
+        // SSU2 first frag can be 5 bytes bigger
+        int first = _fragmentSize;
+        if (peer.getVersion() > 1)
+            first += SSU2Util.DATA_FOLLOWON_EXTRA_SIZE;
+        int numFragments = 1;
+        if (first < totalSize) {
+            numFragments += (totalSize - first) / _fragmentSize;
+            if (first + ((numFragments - 1) * _fragmentSize) < totalSize)
+                numFragments++;
+        }
         // This should never happen, as 534 bytes * 64 fragments > 32KB, and we won't bid on > 32KB
         if (numFragments > InboundMessageState.MAX_FRAGMENTS)
             throw new IllegalArgumentException("Fragmenting a " + totalSize + " message into " + numFragments + " fragments - too many!");
@@ -441,19 +448,23 @@ class OutboundMessageState implements CDPQEntry {
 
     /**
      * The size in bytes of the fragment.
-     * Does NOT include any SSU overhead.
+     * Does NOT include any SSU overhead (SSU2 is 3 for all fragments, + 5 for followon fragments)
      *
      * @param fragmentNum the number of the fragment
      * @return the size of the fragment specified by the number
      */
     public int fragmentSize(int fragmentNum) {
-        if (fragmentNum + 1 == _numFragments) {
-            int valid = _messageBuf.length;
-            if (valid <= _fragmentSize)
-                return valid;
-            // bugfix 0.8.12
-            int mod = valid % _fragmentSize;
-            return mod == 0 ? _fragmentSize : mod;
+        if (fragmentNum == 0) {
+            // SSU2 first frag is 5 bytes bigger
+            int fs = _fragmentSize;
+            if (_peer.getVersion() > 1)
+                fs += SSU2Util.DATA_FOLLOWON_EXTRA_SIZE;
+            return Math.min(_messageBuf.length, fs);
+        } else if (fragmentNum + 1 == _numFragments) {
+            int last = _messageBuf.length - (fragmentNum * _fragmentSize);
+            if (_peer.getVersion() > 1)
+                last -= SSU2Util.DATA_FOLLOWON_EXTRA_SIZE;
+            return last;
         } else {
             return _fragmentSize;
         }
@@ -469,6 +480,9 @@ class OutboundMessageState implements CDPQEntry {
      */
     public int writeFragment(byte out[], int outOffset, int fragmentNum) {
         int start = _fragmentSize * fragmentNum;
+        // SSU2 first frag is 5 bytes bigger
+        if (fragmentNum > 0 && _peer.getVersion() > 1)
+            start += SSU2Util.DATA_FOLLOWON_EXTRA_SIZE;
         int toSend = fragmentSize(fragmentNum);
         int end = start + toSend;
         if (end <= _messageBuf.length && outOffset + toSend <= out.length) {
