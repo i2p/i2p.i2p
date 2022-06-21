@@ -237,7 +237,7 @@ class UDPSorters {
     static class SendCountComparator extends PeerComparator {
         @Override
         public int compare(PeerState l, PeerState r) {
-            long rv = l.getPacketsTransmitted() - r.getPacketsTransmitted();
+            long rv = l.getMessagesSent() - r.getMessagesSent();
             if (rv == 0) // fallback on alpha
                 return super.compare(l, r);
             else
@@ -248,7 +248,7 @@ class UDPSorters {
     static class RecvCountComparator extends PeerComparator {
         @Override
         public int compare(PeerState l, PeerState r) {
-            long rv = l.getPacketsReceived() - r.getPacketsReceived();
+            long rv = l.getMessagesReceived() - r.getMessagesReceived();
             if (rv == 0) // fallback on alpha
                 return super.compare(l, r);
             else
