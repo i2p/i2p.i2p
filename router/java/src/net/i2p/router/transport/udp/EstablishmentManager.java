@@ -415,6 +415,17 @@ class EstablishmentManager {
                                 version = 1;
                         }
                     }
+                    if (version == 2) {
+                        int mtu = addr.getMTU();
+                        if (mtu > 0 && mtu < PeerState2.MIN_MTU) {
+                            if (ra.getTransportStyle().equals("SSU2")) {
+                                _transport.markUnreachable(toHash);
+                                _transport.failed(msg, "MTU too small");
+                                return;
+                            }
+                            version = 1;
+                        }
+                    }
                     if (version == 1) {
                         keyBytes = addr.getIntroKey();
                     } else {
@@ -2435,6 +2446,8 @@ class EstablishmentManager {
      *  @since 0.9.54
      */
     public void addOutboundToken(RemoteHostId peer, long token, long expires) {
+        // so we don't use a token about to expire
+        expires -= 2*60*1000;
         if (expires < _context.clock().now())
             return;
         Token tok = new Token(token, expires);

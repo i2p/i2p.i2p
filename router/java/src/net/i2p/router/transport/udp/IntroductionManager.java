@@ -1059,7 +1059,8 @@ class IntroductionManager {
         }
         UDPPacket packet = _builder2.buildRelayResponse(data, bob);
         if (_log.shouldInfo())
-            _log.info("Send relay response " + rcode + " as charlie " + " nonce " + nonce + " to bob " + bob);
+            _log.info("Send relay response " + rcode + " as charlie " + " nonce " + nonce + " to bob " + bob +
+                      " for alice " + Addresses.toString(testIP, testPort) + ' ' + aliceRI);
         _transport.send(packet);
         if (rcode == SSU2Util.RELAY_ACCEPT) {
             // send hole punch with the same data we sent to Bob

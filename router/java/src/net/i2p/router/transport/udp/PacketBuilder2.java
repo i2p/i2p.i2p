@@ -60,6 +60,7 @@ class PacketBuilder2 {
     static final int TYPE_CONF = 71;
     static final int TYPE_SREQ = 72;
     static final int TYPE_CREAT = 73;
+    static final int TYPE_DESTROY = 74;
 
     /** IPv4 only */
     public static final int IP_HEADER_SIZE = PacketBuilder.IP_HEADER_SIZE;
@@ -100,6 +101,7 @@ class PacketBuilder2 {
     /**
      *  Will a packet to 'peer' that already has 'numFragments' fragments
      *  totalling 'curDataSize' bytes fit another fragment?
+     *  This includes the 3 byte block overhead, but NOT the 5 byte followon fragment overhead.
      *
      *  This doesn't leave anything for acks or anything else.
      *
@@ -279,7 +281,7 @@ class PacketBuilder2 {
         if (_log.shouldWarn()) {
             int maxMTU = PeerState2.MAX_MTU;
             off += MAC_LEN;
-            if (off + ipHeaderSize > maxMTU) {
+            if (off + ipHeaderSize > currentMTU) {
                 _log.warn("Size is " + off + " for " + packet +
                        " data size " + dataSize +
                        " pkt size " + (off + ipHeaderSize) +
@@ -340,11 +342,24 @@ class PacketBuilder2 {
 
     /**
      *  Build a data packet with a termination block.
-     *  This will also include acks and padding.
+     *  This will also include acks, a new token block, and padding.
      */
     public UDPPacket buildSessionDestroyPacket(int reason, PeerState2 peer) {
+            if (_log.shouldWarn())
+                _log.warn("Sending termination " + reason + " to : " + peer);
+        List<Block> blocks = new ArrayList<Block>(2);
+        if (peer.getKeyEstablishedTime() - _context.clock().now() > EstablishmentManager.IB_TOKEN_EXPIRATION / 2 &&
+            !_context.router().gracefulShutdownInProgress()) {
+            // update token
+            EstablishmentManager.Token token = _transport.getEstablisher().getInboundToken(peer.getRemoteHostId());
+            Block block = new SSU2Payload.NewTokenBlock(token.token, token.expires);
+            blocks.add(block);
+        }
         Block block = new SSU2Payload.TerminationBlock(reason, peer.getReceivedMessages().getHighestSet());
-        return buildPacket(Collections.emptyList(), Collections.singletonList(block), peer);
+        blocks.add(block);
+        UDPPacket packet = buildPacket(Collections.emptyList(), blocks, peer);
+        packet.setMessageType(TYPE_DESTROY);
+        return packet;
     }
     
     /**

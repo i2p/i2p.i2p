@@ -125,6 +125,7 @@ final class SSU2Util {
     public static final int TEST_REJECT_BOB_NO_CHARLIE = 2;
     public static final int TEST_REJECT_BOB_LIMIT = 3;
     public static final int TEST_REJECT_BOB_SIGFAIL = 4;
+    public static final int TEST_REJECT_BOB_ADDRESS = 5;
     public static final int TEST_REJECT_CHARLIE_UNSPEC = 64;
     public static final int TEST_REJECT_CHARLIE_ADDRESS = 65;
     public static final int TEST_REJECT_CHARLIE_LIMIT = 66;

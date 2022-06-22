@@ -202,8 +202,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     public void gotRI(RouterInfo ri, boolean isHandshake, boolean flood) throws DataFormatException {
-        if (_log.shouldDebug())
-            _log.debug("Got RI block: " + ri);
+        //if (_log.shouldDebug())
+        //    _log.debug("Got RI block: " + ri);
         if (isHandshake)
             throw new DataFormatException("RI in Sess Req");
         if (_receivedUnconfirmedIdentity != null)
@@ -275,7 +275,9 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                     mtu = PeerState2.DEFAULT_SSU_IPV4_MTU;
             }
         } else {
-            // TODO if too small, give up now
+            // if too small, give up now
+            if (mtu < PeerState2.MIN_MTU)
+                throw new DataFormatException("MTU too small " + mtu);
             if (ra.getTransportStyle().equals(UDPTransport.STYLE2)) {
                 mtu = Math.min(Math.max(mtu, PeerState2.MIN_MTU), PeerState2.MAX_MTU);
             } else {
@@ -369,6 +371,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     public void gotToken(long token, long expires) {
+        if (_log.shouldDebug())
+            _log.debug("Got token: " + token + " expires " + DataHelper.formatTime(expires) + " on " + this);
         if (_receivedConfirmedIdentity == null)
             throw new IllegalStateException("RI must be first");
         _transport.getEstablisher().addOutboundToken(_remoteHostId, token, expires);

@@ -563,14 +563,16 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     public void gotACK(long ackThru, int acks, byte[] ranges) {
         int hc = (((int) ackThru) << 8) ^ (acks << 24) ^ DataHelper.hashCode(ranges);
         if (_lastAckHashCode.getAndSet(hc) == hc) {
-            if (_log.shouldDebug())
-                _log.debug("Got dup ACK block: " + SSU2Bitfield.toString(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0)));
+            //if (_log.shouldDebug())
+            //    _log.debug("Got dup ACK block: " + SSU2Bitfield.toString(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0)));
             return;
         }
         try {
             SSU2Bitfield ackbf = SSU2Bitfield.fromACKBlock(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0));
             if (_log.shouldDebug())
-                _log.debug("Got new ACK block: " + SSU2Bitfield.toString(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0)));
+                _log.debug("Got new ACK block from " +
+                           _remotePeer.toBase64().substring(0,6) + ' ' +
+                           SSU2Bitfield.toString(ackThru, acks, ranges, (ranges != null ? ranges.length / 2 : 0)));
             // calls bitSet() below
             ackbf.forEachAndNot(_ackedMessages, this);
         } catch (Exception e) {
@@ -583,8 +585,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotTermination(int reason, long count) {
-        if (_log.shouldDebug())
-            _log.debug("Got TERMINATION block, reason: " + reason + " count: " + count + " on " + this);
+        if (_log.shouldInfo())
+            _log.info("Got TERMINATION block, reason: " + reason + " count: " + count + " on " + this);
         _transport.getEstablisher().receiveSessionDestroy(_remoteHostId, this);
     }
 

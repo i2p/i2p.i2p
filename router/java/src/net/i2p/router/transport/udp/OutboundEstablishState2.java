@@ -155,9 +155,11 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                     mtu = PeerState2.DEFAULT_SSU_IPV4_MTU;
             }
         } else {
-            // TODO if too small, give up now
+            // If too small, give up now
+            if (mtu < PeerState2.MIN_MTU)
+                throw new IllegalArgumentException("MTU " + mtu + " too small for " + remotePeer.getHash());
             if (ra.getTransportStyle().equals(UDPTransport.STYLE2)) {
-                mtu = Math.min(Math.max(mtu, PeerState2.MIN_MTU), PeerState2.MAX_MTU);
+                mtu = Math.min(mtu, PeerState2.MAX_MTU);
             } else {
                 if (_bobIP != null && _bobIP.length == 16)
                     mtu = Math.min(Math.max(mtu, PeerState2.MIN_SSU_IPV6_MTU), PeerState2.MAX_SSU_IPV6_MTU);
@@ -321,6 +323,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     public void gotToken(long token, long expires) {
+        if (_log.shouldDebug())
+            _log.debug("Got token: " + token + " expires " + DataHelper.formatTime(expires) + " on " + this);
         _transport.getEstablisher().addOutboundToken(_remoteHostId, token, expires);
     }
 
