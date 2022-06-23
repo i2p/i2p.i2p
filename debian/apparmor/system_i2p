@@ -5,6 +5,10 @@
 profile system_i2p flags=(complain) {
   #include <abstractions/i2p>
 
+  #
+  #  Additional rules required when running as a service.
+  #
+
   owner /{,lib/live/mount/overlay/}var/lib/i2p/** rwk,
   owner /{,lib/live/mount/overlay/}var/lib/i2p/i2p-config/eepsite/cgi-bin rix,
   owner /{,lib/live/mount/overlay/}var/log/i2p/* rw,

@@ -18,8 +18,10 @@
 
   # Needed by Java
   @{PROC}                                                 r,
+  @{PROC}/cgroups                                         r,
   owner @{PROC}/[0-9]*/                                   r,
   owner @{PROC}/[0-9]*/cgroup                             r,
+  owner @{PROC}/[0-9]*/coredump_filter                    rw,
   owner @{PROC}/[0-9]*/mountinfo                          r,
   owner @{PROC}/[0-9]*/status                             r,
   @{PROC}/[0-9]*/net/ipv6_route                           r,
@@ -60,7 +62,9 @@
   /usr/share/java/wrapper*.jar                            r,
 
   # Dependent packages
+  /usr/share/java/eclipse-jdt-core-*.jar                  r,
   /usr/share/java/libintl.jar                             r,
+  /usr/share/java/libintl-*.jar                           r,
   /usr/share/java/glassfish-appserv-jstl.jar              r,
   /usr/share/maven-repo/jstl/jstl/1.2/jstl-1.2.jar        r,
   /usr/share/java/gnu-getopt.jar                          r,
@@ -68,7 +72,9 @@
   /usr/share/java/jetty9-*.jar                            r,
   /usr/share/java/json-simple.jar                         r,
   /usr/share/java/json-simple-*.jar                       r,
+  /usr/share/java/jsp-api.jar                             r,
   /usr/share/java/jsp-api-*.jar                           r,
+  /usr/share/java/servlet-api.jar                         r,
   /usr/share/java/servlet-api-*.jar                       r,
   /usr/share/java/standard.jar                            r,
   /usr/share/java/standard-*.jar                          r,
