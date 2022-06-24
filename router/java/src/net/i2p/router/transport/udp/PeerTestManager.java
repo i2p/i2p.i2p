@@ -1055,6 +1055,21 @@ class PeerTestManager {
                         _log.warn("Msg 1 status " + status);
                     return;
                 }
+                // IP/port checks
+                if (testIP == null ||
+                    isIPv6 != fromPeer.isIPv6() ||
+                    !TransportUtil.isValidPort(testPort) ||
+                    !_transport.isValid(testIP) ||
+                    _transport.isTooClose(testIP) ||
+                    // exact match for IPv4, /64 for IPv6
+                    !DataHelper.eq(fromPeer.getRemoteIP(), 0, testIP, 0, isIPv6 ? 8 : 4)) {
+                    if (_log.shouldWarn())
+                        _log.warn("Invalid PeerTest address: " + Addresses.toString(testIP, testPort));
+                    UDPPacket packet = _packetBuilder2.buildPeerTestToAlice(SSU2Util.TEST_REJECT_BOB_ADDRESS,
+                                                                            Hash.FAKE_HASH, data, fromPeer);
+                    _transport.send(packet);
+                    return;
+                }
                 Hash alice = fromPeer.getRemotePeer();
                 RouterInfo aliceRI = _context.netDb().lookupRouterInfoLocally(alice);
                 if (aliceRI == null) {
