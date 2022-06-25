@@ -4,7 +4,7 @@
 #       (if a different version, change the GMP_VER= line below)
 #
 
-export GMP_VER=6.2.0
+export GMP_VER=6.2.1
 export GMP_TARVER=${GMP_VER}
 export GMP_DIR="gmp-$GMP_VER"
 export GMP_TAR="gmp-$GMP_TARVER.tar.bz2"
