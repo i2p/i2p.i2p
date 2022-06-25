@@ -34,11 +34,15 @@ public class MTU {
      * altough we could perhaps just look for the first non-loopback address.
      * But the MTU of the default route probably isn't relevant.
      *
+     * For SSU2 MTU, values lower than PeerState2.MIN_MTU may be returned,
+     * so the caller can determine if SSU2 should be supported.
+     *
      * @param ia null ok
+     * @param isSSU2 if true, calculate SSU2 MTU
      * @return 0 if Java 5, or if not bound to an address;
-     *         limited to range MIN_MTU to LARGE_MTU.
+     *         limited to range MIN_MTU to LARGE_MTU for SSU 1.
      */
-    public static int getMTU(InetAddress ia) {
+    public static int getMTU(InetAddress ia, boolean isSSU2) {
         if (ia == null || !hasMTU)
             return 0;
         Enumeration<NetworkInterface> ifcs;
@@ -93,6 +97,8 @@ public class MTU {
                                     ip[2] == 0x04 && ip[3] == 0x70)
                                     return 1472;
                             }
+                            if (isSSU2)
+                                return Math.min(mtu, PeerState2.MAX_MTU);
                             return rectify(isIPv6, mtu);
                         } catch (SocketException se) {
                             // ignore
@@ -159,7 +165,8 @@ public class MTU {
                     for(Enumeration<InetAddress> addrs =  ifc.getInetAddresses(); addrs.hasMoreElements();) {
                         InetAddress addr = addrs.nextElement();
                         System.out.println("MTU for " + addr.getHostAddress() + " is " + ifc.getMTU() +
-                                           " I2P MTU is " + getMTU(addr));
+                                           "; I2P MTU is " + getMTU(addr, false) +
+                                           "; SSU2 MTU is " + getMTU(addr, true));
                     }
                 }
             }

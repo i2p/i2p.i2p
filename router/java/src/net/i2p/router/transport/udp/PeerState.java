@@ -405,9 +405,9 @@ public class PeerState {
         _mtu = PeerState2.MIN_MTU;
         _mtuReceive = PeerState2.MIN_MTU;
         if (_remoteIP.length == 4) {
-            _largeMTU = transport.getMTU(false);
+            _largeMTU = transport.getSSU2MTU(false);
         } else {
-            _largeMTU = transport.getMTU(true);
+            _largeMTU = transport.getSSU2MTU(true);
         }
         _minMTU = PeerState2.MIN_MTU;
         // RFC 5681 sec. 3.1

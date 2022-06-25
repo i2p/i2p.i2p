@@ -1,3 +1,16 @@
+2022-06-25 zzz
+ * SSU: MTU fixes for IPv6 and SSU2
+
+2022-06-24 zzz
+ * SSU2: Peer test message 1 checks
+
+2022-06-23 zzz
+ * Debian: Update apparmor profile
+ * JBigI: Drop 32-bit OSX libs
+
+2022-06-22 zzz
+ * SSU: PMTU improvements
+
 2022-06-20 zzz
  * SSU2:
    - Fix overhead calculation for followon fragments
