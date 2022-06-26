@@ -1006,7 +1006,6 @@ a:active img[src="/themes/console/images/i2plogo.png"] {
 .main#dns {
     padding: 0 0 3px;
     min-width: 650px !important;
-    background: #000;
 }
 
 .main#webmail,
