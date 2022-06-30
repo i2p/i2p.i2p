@@ -2064,16 +2064,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             for (int i = 0; i < count; i++) {
                 long exp = ua.getIntroducerExpiration(i);
                 if (exp > 0 && exp < now + INTRODUCER_EXPIRATION_MARGIN) {
-                    if (_log.shouldWarn())
-                        _log.warn((ipv6 ? "IPv6" : "IPv4") + " Introducer " + i + " expiring soon, need to replace");
+                    if (_log.shouldInfo())
+                        _log.info((ipv6 ? "IPv6" : "IPv4") + " Introducer " + i + " expiring soon, need to replace");
                     continue;
                 }
                 long tag = ua.getIntroducerTag(i);
                 if (_introManager.isInboundTagValid(tag)) {
                     valid++;
                 } else {
-                    if (_log.shouldWarn())
-                        _log.warn((ipv6 ? "IPv6" : "IPv4") + " Introducer " + i + " no longer connected, need to replace");
+                    if (_log.shouldInfo())
+                        _log.info((ipv6 ? "IPv6" : "IPv4") + " Introducer " + i + " no longer connected, need to replace");
                 }
             }
             long sinceSelected = now - (ipv6 ? _v6IntroducersSelectedOn : _v4IntroducersSelectedOn);

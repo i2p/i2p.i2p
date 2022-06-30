@@ -2523,12 +2523,22 @@ class EstablishmentManager {
      *  @since 0.9.54
      */
     public Token getInboundToken(RemoteHostId peer) {
+        return getInboundToken(peer, IB_TOKEN_EXPIRATION);
+    }
+
+    /**
+     *  Get a token that can be used later for the peer to connect to us
+     *
+     *  @param expiration time from now
+     *  @since 0.9.55
+     */
+    public Token getInboundToken(RemoteHostId peer, long expiration) {
         long token;
         do {
             token = _context.random().nextLong();
         } while (token == 0);
         // TODO shorten expiration based on _inboundTokens size
-        long expires = _context.clock().now() + IB_TOKEN_EXPIRATION;
+        long expires = _context.clock().now() + expiration;
         Token tok = new Token(token, expires);
         synchronized(_inboundTokens) {
             _inboundTokens.put(peer, tok);

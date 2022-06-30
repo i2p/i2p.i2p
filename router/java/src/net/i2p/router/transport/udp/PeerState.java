@@ -1329,6 +1329,7 @@ public class PeerState {
      */
     synchronized void packetReceived(int size) {
         _packetsReceived++;
+        // SSU2 overhead header + MAC == SSU overhead IV + MAC
         if (_remoteIP.length == 4) {
             size += OVERHEAD_SIZE;
         } else {
