@@ -59,7 +59,7 @@ cygwin*)
 darwin*|osx)
         COMPILEFLAGS="-fPIC -Wall"
         INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/$BUILD_OS -I/usr/local/include"
-        LINKFLAGS="-dynamiclib -framework JavaVM"
+        LINKFLAGS="-dynamiclib"
         LIBFILE="libjbigi.jnilib";;
 sunos*|openbsd*|netbsd*|*freebsd*|linux*)
         if [ $BUILD_OS = "sunos" ]; then
