@@ -5,15 +5,15 @@ ENV APP_HOME="/i2p"
 WORKDIR /tmp/build
 COPY . .
 
-RUN add-pkg --virtual build-base gettext tar bzip2 apache-ant openjdk8 \
+RUN add-pkg --virtual build-base gettext tar bzip2 apache-ant openjdk17 \
     && ant preppkg-linux-only \
     && rm -rf pkg-temp/osid pkg-temp/lib/wrapper pkg-temp/lib/wrapper.* \
-    && del-pkg build-base gettext tar bzip2 apache-ant openjdk8
+    && del-pkg build-base gettext tar bzip2 apache-ant openjdk17
 
 FROM jlesage/baseimage:alpine-3.15-glibc
 ENV APP_HOME="/i2p"
 
-RUN add-pkg openjdk8-jre
+RUN add-pkg openjdk17-jre
 WORKDIR ${APP_HOME}
 COPY --from=builder /tmp/build/pkg-temp .
 
