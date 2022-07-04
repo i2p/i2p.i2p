@@ -44,6 +44,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
     private final Log _log;
     private final DatabaseLookupMessage _message;
     private boolean _replyKeyConsumed;
+    private final Hash _us;
 
     private final static int MAX_ROUTERS_RETURNED = 3;
     private final static int CLOSENESS_THRESHOLD = 8; // FNDF.MAX_TO_FLOOD + 1
@@ -58,8 +59,9 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
     
     public HandleDatabaseLookupMessageJob(RouterContext ctx, DatabaseLookupMessage receivedMessage, RouterIdentity from, Hash fromHash) {
         super(ctx);
-        _log = getContext().logManager().getLog(HandleDatabaseLookupMessageJob.class);
+        _log = ctx.logManager().getLog(HandleDatabaseLookupMessageJob.class);
         _message = receivedMessage;
+        _us = ctx.routerHash();
     }
     
     protected boolean answerAllQueries() { return false; }
@@ -69,7 +71,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         Hash fromKey = _message.getFrom();
         TunnelId toTunnel = _message.getReplyTunnel();
         Hash searchKey = _message.getSearchKey();
-        if (toTunnel == null && fromKey.equals(getContext().routerHash())) {
+        if (toTunnel == null && fromKey.equals(_us)) {
             if (_log.shouldWarn())
                 // exploratory, no reply key/tag. i2pd bug?
                 //_log.warn("Dropping dbLookup with replies going to us:\n" + _message);
@@ -78,7 +80,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         }
 
         // If we are hidden we should not get queries, log and return
-        if (getContext().router().isHidden()) {
+        if (getContext().router().isHidden() && !searchKey.equals(_us)) {
             if (_log.shouldLog(Log.WARN)) {
                 _log.warn("Uninvited dbLookup received with replies going to " + fromKey
                            + " (tunnel " + toTunnel + ")");
@@ -175,13 +177,13 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO &&
                    lookupType != DatabaseLookupMessage.Type.LS) {
             RouterInfo info = (RouterInfo) dbe;
-            if (searchKey.equals(getContext().routerHash())) {
+            if (searchKey.equals(_us)) {
                 sendData(searchKey, info, fromKey, toTunnel);
             } else if (info.isCurrent(EXPIRE_DELAY)) {
-                if ( (info.isHidden()) || (isUnreachable(info) && !publishUnreachable()) ) {
+                if (info.isHidden()) {
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Not answering a query for a netDb peer who isn't reachable");
-                    Set<Hash> us = Collections.singleton(getContext().routerHash());
+                        _log.debug("Not answering a query for a hidden peer");
+                    Set<Hash> us = Collections.singleton(_us);
                     sendClosest(searchKey, us, fromKey, toTunnel);
                 } else {
                     // send that routerInfo to the _message.getFromHash peer
@@ -228,18 +230,17 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         // convert the new EXPL type flag to the old-style FAKE_HASH
         // to pass to findNearestRouters()
         Set<Hash> dontInclude = _message.getDontIncludePeers();
-        Hash us = getContext().routerHash();
         if (dontInclude == null && lookupType == DatabaseLookupMessage.Type.EXPL) {
             dontInclude = new HashSet<Hash>(2);
-            dontInclude.add(us);
+            dontInclude.add(_us);
             dontInclude.add(Hash.FAKE_HASH);
         } else if (dontInclude == null) {
-            dontInclude = Collections.singleton(us);
+            dontInclude = Collections.singleton(_us);
         } else if (lookupType == DatabaseLookupMessage.Type.EXPL) {
-            dontInclude.add(us);
+            dontInclude.add(_us);
             dontInclude.add(Hash.FAKE_HASH);
         } else {
-            dontInclude.add(us);
+            dontInclude.add(_us);
         }
         // Honor flag to exclude all floodfills
         //if (dontInclude.contains(Hash.FAKE_HASH)) {
@@ -249,21 +250,8 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                                                        dontInclude);
     }
 
-    private static boolean isUnreachable(RouterInfo info) {
-        if (info == null) return true;
-        String cap = info.getCapabilities();
-        return cap.indexOf(Router.CAPABILITY_REACHABLE) >= 0;
-    }
-    
-    public static final String PROP_PUBLISH_UNREACHABLE = "router.publishUnreachableRouters";
-    public static final boolean DEFAULT_PUBLISH_UNREACHABLE = true;
-    
-    private boolean publishUnreachable() {
-        return getContext().getProperty(PROP_PUBLISH_UNREACHABLE, DEFAULT_PUBLISH_UNREACHABLE);
-    }
-    
     private boolean weAreClosest(Set<Hash> routerHashSet) {
-        return routerHashSet.contains(getContext().routerHash());
+        return routerHashSet.contains(_us);
     }
     
     private void sendData(Hash key, DatabaseEntry data, Hash toPeer, TunnelId replyTunnel) {
@@ -289,7 +277,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             _log.debug("Sending closest routers to key " + key + ": # peers = " 
                        + routerHashes.size() + " tunnel " + replyTunnel);
         DatabaseSearchReplyMessage msg = new DatabaseSearchReplyMessage(getContext());
-        msg.setFromHash(getContext().routerHash());
+        msg.setFromHash(_us);
         msg.setSearchKey(key);
         int i = 0;
         for (Hash h : routerHashes) {
@@ -314,7 +302,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
     }
     
     private void sendThroughTunnel(I2NPMessage message, Hash toPeer, TunnelId replyTunnel) {
-        if (getContext().routerHash().equals(toPeer)) {
+        if (_us.equals(toPeer)) {
             // if we are the gateway, act as if we received it
             TunnelGatewayMessage m = new TunnelGatewayMessage(getContext());
             m.setMessage(message);
