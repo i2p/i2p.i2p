@@ -25,12 +25,12 @@ class IPThrottler {
      */
     public boolean shouldThrottle(byte[] ip) {
         // for IPv4 we simply use the IP;
-        // for IPv6 we use a secure hash as an attacker could select the lower bytes
+        // for IPv6 we use a hash of the first 8 bytes
         Integer key;
         if (ip.length == 4)
             key = toInt(ip);
         else
-            key = Integer.valueOf(SipHash.hashCode(ip));
+            key = hashCode(ip);
         return _counter.increment(key) > _max;
     }
 
@@ -38,6 +38,15 @@ class IPThrottler {
         int rv = 0;
         for (int i = 0; i < 4; i++)
             rv |= (ip[i] & 0xff) << ((3-i)*8);
+        return Integer.valueOf(rv);
+    }
+
+    /** @since 0.9.55 */
+    private static Integer hashCode(byte ip[]) {
+        int rv = 0;
+        for (int i = 0; i < 8; i++) {
+            rv ^= ip[i] << (i * 4);
+        }
         return Integer.valueOf(rv);
     }
 

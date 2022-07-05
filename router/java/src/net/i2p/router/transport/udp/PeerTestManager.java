@@ -984,21 +984,8 @@ class PeerTestManager {
                 return;
             }
         }
-        if (_throttle.shouldThrottle(fromIP)) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("PeerTest throttle from " + Addresses.toString(fromIP, fromPort));
-            return;
-        }
 
         // common checks
-
-
-        // use the same counter for both from and to IPs
-        if (_throttle.shouldThrottle(testIP)) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("PeerTest throttle to " + Addresses.toString(testIP, testPort));
-            return;
-        }
 
         if (msg >= 1 && msg <= 4) {
             if (fromPeer == null) {
@@ -1066,6 +1053,14 @@ class PeerTestManager {
                     if (_log.shouldWarn())
                         _log.warn("Invalid PeerTest address: " + Addresses.toString(testIP, testPort));
                     UDPPacket packet = _packetBuilder2.buildPeerTestToAlice(SSU2Util.TEST_REJECT_BOB_ADDRESS,
+                                                                            Hash.FAKE_HASH, data, fromPeer);
+                    _transport.send(packet);
+                    return;
+                }
+                if (_throttle.shouldThrottle(fromIP)) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("PeerTest throttle from " + Addresses.toString(fromIP, fromPort));
+                    UDPPacket packet = _packetBuilder2.buildPeerTestToAlice(SSU2Util.TEST_REJECT_BOB_LIMIT,
                                                                             Hash.FAKE_HASH, data, fromPeer);
                     _transport.send(packet);
                     return;
@@ -1157,6 +1152,9 @@ class PeerTestManager {
                           !_transport.isValid(testIP) ||
                          _transport.isTooClose(testIP)) {
                     rcode = SSU2Util.TEST_REJECT_CHARLIE_ADDRESS;
+                } else if (_throttle.shouldThrottle(fromIP) ||
+                           _throttle.shouldThrottle(testIP)) {
+                    rcode = SSU2Util.TEST_REJECT_CHARLIE_LIMIT;
                 } else {
                     // bob should have sent it to us. Don't bother to lookup
                     // remotely if he didn't, or it was out-of-order or lost.
