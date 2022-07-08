@@ -221,6 +221,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                         if (_sessConfSentCount >= MAX_SESS_CONF_RETX) {
                             if (_log.shouldWarn())
                                 _log.warn("Fail, no Sess Conf ACK rcvd on " + this);
+                            UDPPacket pkt = _transport.getBuilder2().buildSessionDestroyPacket(SSU2Util.REASON_FRAME_TIMEOUT, this);
+                            _transport.send(pkt);
                             _transport.dropPeer(this, false, "No Sess Conf ACK rcvd");
                             _sessConfForReTX = null;
                             return null;
