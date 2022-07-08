@@ -1,5 +1,13 @@
 package net.i2p.router.transport.udp;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -42,6 +50,7 @@ import net.i2p.util.HexDump;
 import net.i2p.util.I2PThread;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
 
@@ -161,6 +170,7 @@ class EstablishmentManager {
     private static final int MAX_TOKENS = 512;
     public static final long IB_TOKEN_EXPIRATION = 60*60*1000L;
     private static final long MAX_SKEW = 2*60*1000;
+    private static final String TOKEN_FILE = "ssu2tokens.txt";
 
 
     public EstablishmentManager(RouterContext ctx, UDPTransport transport) {
@@ -216,6 +226,8 @@ class EstablishmentManager {
     }
     
     public synchronized void startup() {
+        if (_enableSSU2)
+            loadTokens();
         _alive = true;
         I2PThread t = new I2PThread(new Establisher(), "UDP Establisher", true);
         t.start();
@@ -223,6 +235,8 @@ class EstablishmentManager {
 
     public synchronized void shutdown() { 
         _alive = false;
+        if (_enableSSU2)
+            saveTokens();
         notifyActivity();
     }
     
@@ -2482,6 +2496,8 @@ class EstablishmentManager {
     public void ipChanged(boolean isIPv6) {
         if (!_enableSSU2)
             return;
+        if (_log.shouldWarn())
+            _log.warn("IP changed, ipv6? " + isIPv6);
         int len = isIPv6 ? 16 : 4;
         // expire while we're at it
         long now = _context.clock().now();
@@ -2572,6 +2588,156 @@ class EstablishmentManager {
         public Token(long tok, long exp) {
             token = tok; expires = exp;
         }
+    }
+
+    /**
+     *  Format:
+     *
+     *<pre>
+     *  4 ourIPv4addr ourIPv4port
+     *  6 ourIPv6addr ourIPv6port
+     *  I addr port token exp
+     *  O addr port token exp
+     *</pre>
+     *
+     *  @since 0.9.55
+     */
+    private void loadTokens() {
+        File f = new File(_context.getConfigDir(), TOKEN_FILE);
+        String ourV4Port = Integer.toString(_transport.getExternalPort(false));
+        String ourV6Port = Integer.toString(_transport.getExternalPort(true));
+        String ourV4Addr;
+        RouterAddress addr = _transport.getCurrentAddress(false);
+        if (addr != null)
+            ourV4Addr = addr.getHost();
+        else
+            ourV4Addr = null;
+        String ourV6Addr;
+        addr = _transport.getCurrentAddress(true);
+        if (addr != null)
+            ourV6Addr = addr.getHost();
+        else
+            ourV6Addr = null;
+        if (_log.shouldDebug())
+            _log.debug("Loading SSU2 tokens for " + ourV4Addr + ' ' + ourV4Port + ' ' + ourV6Addr + ' ' + ourV6Port);
+        InputStream in = null;
+        try {
+            in = new BufferedInputStream(new FileInputStream(f));
+            boolean v4Match = false;
+            boolean v6Match = false;
+            long now = _context.clock().now();
+            int count = 0;
+            synchronized(_inboundTokens) {
+                synchronized(_outboundTokens) {
+                    String line;
+                    while ((line = DataHelper.readLine(in)) != null) {
+                        if (line.startsWith("#"))
+                            continue;
+                        String[] s = DataHelper.split(line, " ", 5);
+                        if (s.length < 3)
+                            continue;
+                        if (s[0].equals("4")) {
+                            v4Match = s[1].equals(ourV4Addr) && s[2].trim().equals(ourV4Port);
+                            //if (_log.shouldWarn())
+                            //    _log.warn("V4 match? " + v4Match + ' ' + line);
+                        } else if (s[0].equals("6")) {
+                            v6Match = s[1].equals(ourV6Addr) && s[2].trim().equals(ourV6Port);
+                            //if (_log.shouldWarn())
+                            //    _log.warn("V6 match? " + v6Match + ' ' + line);
+                        } else if ((s[0].equals("I") || s[0].equals("O"))  && s.length == 5) {
+                            boolean isV6 = s[1].contains(":");
+                            if ((isV6 && !v6Match) || (!isV6 && !v4Match))
+                                continue;
+                            try {
+                                long exp = Long.parseLong(s[4].trim());
+                                if (exp > now) {
+                                    byte[] ip = Addresses.getIPOnly(s[1]);
+                                    if (ip != null) {
+                                        int port = Integer.parseInt(s[2]);
+                                        long tok = Long.parseLong(s[3]);
+                                        RemoteHostId id = new RemoteHostId(ip, port);
+                                        Token token = new Token(tok, exp);
+                                        if (s[0].equals("I"))
+                                            _inboundTokens.put(id, token);
+                                        else
+                                            _outboundTokens.put(id, token);
+                                        count++;
+                                    }
+                                }
+                            } catch (NumberFormatException nfe) {}
+                        }
+                    }
+                }
+            }
+            if (_log.shouldDebug())
+                _log.debug("Loaded " + count + " SSU2 tokens");
+        } catch (IOException ioe) {
+            if (_log.shouldWarn())
+                _log.warn("Failed to load SSU2 tokens", ioe);
+        } finally {
+            if (in != null) {
+                try { in.close(); } catch (IOException ioe) {}
+                f.delete();
+            }
+        }
+    }
+
+    /**
+     *  @since 0.9.55
+     */
+    private void saveTokens() {
+        File f = new File(_context.getConfigDir(), TOKEN_FILE);
+        PrintWriter out = null;
+        try {
+            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(f), "ISO-8859-1")));
+            out.println("# SSU2 tokens, format: IPv4/IPv6/In/Out addr port token expiration");
+            RouterAddress addr = _transport.getCurrentAddress(false);
+            if (addr != null) {
+                String us = addr.getHost();
+                if (us != null)
+                    out.println("4 " + us + ' ' + _transport.getExternalPort(false));
+            }
+            addr = _transport.getCurrentAddress(true);
+            if (addr != null) {
+                String us = addr.getHost();
+                if (us != null)
+                    out.println("6 " + us + ' ' + _transport.getExternalPort(true));
+            }
+            long now = _context.clock().now();
+            int count = 0;
+            synchronized(_inboundTokens) {
+                for (Map.Entry<RemoteHostId, Token> e : _inboundTokens.entrySet()) {
+                     Token token = e.getValue();
+                     long exp = token.expires;
+                     if (exp <= now)
+                         continue;
+                     RemoteHostId id = e.getKey();
+                     out.println("I " + Addresses.toString(id.getIP()) + ' ' + id.getPort() + ' ' + token.token + ' ' + exp);
+                     count++;
+                }
+            }
+            synchronized(_outboundTokens) {
+                for (Map.Entry<RemoteHostId, Token> e : _outboundTokens.entrySet()) {
+                     Token token = e.getValue();
+                     long exp = token.expires;
+                     if (exp <= now)
+                         continue;
+                     RemoteHostId id = e.getKey();
+                     out.println("O " + Addresses.toString(id.getIP()) + ' ' + id.getPort() + ' ' + token.token + ' ' + exp);
+                     count++;
+                }
+            }
+            if (out.checkError())
+                throw new IOException("Failed write to " + f);
+            if (_log.shouldDebug())
+                _log.debug("Stored " + count + " SSU2 tokens to " + f);
+        } catch (IOException ioe) {
+            if (_log.shouldWarn())
+                _log.warn("Error writing the SSU2 tokens file", ioe);
+        } finally {
+            if (out != null) out.close();
+        }
+
     }
 
     /**

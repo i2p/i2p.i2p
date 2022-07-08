@@ -717,13 +717,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _context.router().saveConfig(changes, null);
         }
 
-        _handler.startup();
         _fragments.startup();
         _inboundFragments.startup();
         _pusher = new PacketPusher(_context, _fragments, _endpoints);
         _pusher.startup();
-        // must be after pusher
-        _establisher.startup();
         if (USE_PRIORITY)
             _refiller.startup();
         //if (SHOULD_FLOOD_PEERS)
@@ -820,6 +817,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             else
                 setReachabilityStatus(Status.REJECT_UNSOLICITED);
         }
+        // must be after pusher and setting external addresses
+        _establisher.startup();
+        _handler.startup();
         rebuildExternalAddress(false, false);
     }
     
