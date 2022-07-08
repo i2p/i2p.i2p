@@ -35,6 +35,7 @@ import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.SessionKey;
+import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.Banlist;
@@ -98,10 +99,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private long _lastInboundReceivedOn;
     private final DHSessionKeyBuilder.Factory _dhFactory;
     private final SSUHMACGenerator _hmac;
-    private int _mtu;
-    private int _mtu_ipv6;
-    private int _mtu_ssu2;
-    private int _mtu_ssu2_ipv6;
+    private int _mtu = PeerState.MIN_MTU;
+    private int _mtu_ipv6 = PeerState.MIN_IPV6_MTU;
+    private int _mtu_ssu2 = PeerState2.MIN_SSU_IPV4_MTU;
+    private int _mtu_ssu2_ipv6 = PeerState2.MIN_SSU_IPV6_MTU;
     private boolean _mismatchLogged;
     private final int _networkID;
 
@@ -1098,13 +1099,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 mtu = PeerState.LARGE_MTU;
             _mtu = mtu;
         }
-        if (_enableSSU2) {
+        if (_enableSSU2 && addr != null) {
             int mtussu2 = MTU.getMTU(addr, true);
-            if (mtussu2 < PeerState2.MIN_MTU) {
+            if (mtussu2 > 0 && mtussu2 < PeerState2.MIN_MTU) {
                 _log.logAlways(Log.WARN, "Low MTU " + mtussu2 + " for interface " + addr + ", consider disabling SSU2");
                 mtussu2 = PeerState2.MIN_MTU;
             }
-            if (addr != null && addr.getAddress().length == 16) {
+            if (addr.getAddress().length == 16) {
                 _mtu_ssu2_ipv6 = mtussu2;
             } else {
                 _mtu_ssu2 = mtussu2;
@@ -1975,8 +1976,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         PeerState altByIdent = null;
         if (peer.getRemotePeer() != null) {
-            dropPeerCapacities(peer);
-            
             if (shouldBanlist) {
                 markUnreachable(peer.getRemotePeer());
                 //_context.banlist().banlistRouter(peer.getRemotePeer(), "dropped after too many retries", STYLE);
@@ -2123,32 +2122,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             return rv;
         }
     }
-    
-    /**
-     * Make sure we don't think this dropped peer is capable of doing anything anymore...
-     *
-     */
-    private void dropPeerCapacities(PeerState peer) {
-        /*
-        RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer.getRemotePeer());
-        if (info != null) {
-            String capacities = info.getOptions().getProperty(UDPAddress.PROP_CAPACITY);
-            if (capacities != null) {
-                for (int i = 0; i < capacities.length(); i++) {
-                    char capacity = capacities.charAt(i);
-                    int cap = capacity - 'A';
-                    if ( (cap < 0) || (cap >= _peersByCapacity.length) ) 
-                        continue;
-                    List peers = _peersByCapacity[cap];
-                    synchronized (peers) {
-                        peers.remove(peer);
-                    }
-                }
-            }
-        }
-         */
-    }
-    
+
     /**
      *  This sends it directly out, bypassing OutboundMessageFragments.
      *  The only queueing is for the bandwidth limiter.
