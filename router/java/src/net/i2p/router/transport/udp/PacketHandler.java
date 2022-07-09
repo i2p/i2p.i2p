@@ -590,7 +590,7 @@ class PacketHandler {
             if (skew > GRACE_PERIOD) {
                 _context.statManager().addRateData("udp.droppedInvalidSkew", skew);
                 if (state != null && skew > 4 * GRACE_PERIOD && state.getPacketsReceived() <= 0) {
-                    _transport.sendDestroy(state);
+                    _transport.sendDestroy(state, SSU2Util.REASON_SKEW);
                     _transport.dropPeer(state, true, "Clock skew");
                     if (state.getRemotePort() == 65520) {
                         // distinct port of buggy router
@@ -615,7 +615,7 @@ class PacketHandler {
             } else if (skew < 0 - GRACE_PERIOD) {
                 _context.statManager().addRateData("udp.droppedInvalidSkew", 0-skew);
                 if (state != null && skew < 0 - (4 * GRACE_PERIOD) && state.getPacketsReceived() <= 0) {
-                    _transport.sendDestroy(state);
+                    _transport.sendDestroy(state, SSU2Util.REASON_SKEW);
                     _transport.dropPeer(state, true, "Clock skew");
                     if (state.getRemotePort() == 65520) {
                         // distinct port of buggy router

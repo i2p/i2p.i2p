@@ -1870,7 +1870,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                         else
                             _context.banlist().banlistRouterForever(peerHash, "Not in our network: " + id);
                         if (peer != null)
-                            sendDestroy(peer);
+                            sendDestroy(peer, SSU2Util.REASON_NETID);
                         dropPeer(peerHash, false, "Not in our network");
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Not in our network: " + entry, new Exception());
@@ -2142,9 +2142,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  Send a session destroy message, bypassing OMF and PacketPusher.
      *  BLOCKING if OB queue is full.
      *
+     *  @param reasonCode SSU2 only, ignored for SSU1
      *  @since 0.8.9
      */
-    void sendDestroy(PeerState peer) {
+    void sendDestroy(PeerState peer, int reasonCode) {
         UDPPacket pkt;
         if (peer.getVersion() == 1) {
             // peer must be fully established
@@ -2152,7 +2153,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return;
             pkt = _packetBuilder.buildSessionDestroyPacket(peer);
         } else {
-            pkt = _packetBuilder2.buildSessionDestroyPacket(SSU2Util.REASON_TIMEOUT, (PeerState2) peer);
+            pkt = _packetBuilder2.buildSessionDestroyPacket(reasonCode, (PeerState2) peer);
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending destroy to : " + peer);
@@ -2180,7 +2181,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_log.shouldInfo())
             _log.info("Sending destroy to : " + howMany + " peers");
         for (PeerState peer : _peersByIdent.values()) {
-            sendDestroy(peer);
+            sendDestroy(peer, SSU2Util.REASON_TIMEOUT);
             // 1000 per second * 48 bytes = 400 KBps
             if ((++count) % burst == 0) { 
                 try {
@@ -3242,7 +3243,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // ok, a few conseutive failures, but we /are/ getting through to them
             } else {
                 _context.statManager().addRateData("udp.dropPeerConsecutiveFailures", consecutive, msg.getPeer().getInactivityTime());
-                sendDestroy(msg.getPeer());
+                sendDestroy(msg.getPeer(), SSU2Util.REASON_FRAME_TIMEOUT);
                 dropPeer(msg.getPeer(), false, "too many failures");
             }
             //if ( (consecutive > MAX_CONSECUTIVE_FAILED) && (msg.getPeer().getInactivityTime() > DROP_INACTIVITY_TIME))
@@ -3620,7 +3621,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 if (_log.shouldDebug())
                     _log.debug("Expiring " + _expireBuffer.size() + " peers");
                 for (PeerState peer : _expireBuffer) {
-                    sendDestroy(peer);
+                    sendDestroy(peer, SSU2Util.REASON_TIMEOUT);
                     dropPeer(peer, false, "idle too long");
                     // TODO sleep to limit burst like in destroyAll() ??
                     // but we are on the timer thread...
