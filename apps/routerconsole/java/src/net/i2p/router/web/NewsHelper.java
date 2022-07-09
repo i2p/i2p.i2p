@@ -25,6 +25,8 @@ public class NewsHelper extends ContentHelper {
     public static final String PROP_LAST_CHECKED = "routerconsole.newsLastChecked";
     /** @since 0.9.4 */
     public static final String PROP_LAST_UPDATED = "routerconsole.newsLastUpdated";
+    /** @since 0.9.55 */
+    public static final String PROP_LAST_NEW_ENTRY = "routerconsole.newsLastNewEntry";
     /**
      * Default true
      * @since 0.9.21
@@ -256,7 +258,7 @@ public class NewsHelper extends ContentHelper {
      *  @since 0.9.4
      */
     public static boolean shouldShowNews(RouterContext ctx) {
-        long lastUpdated = lastUpdated(ctx);
+        long lastUpdated = lastNewEntry(ctx);
         if (lastUpdated <= 0)
             return true;
         long last = ctx.getProperty(PROP_LAST_HIDDEN, 0L);
@@ -276,7 +278,7 @@ public class NewsHelper extends ContentHelper {
      *  @since 0.9.4
      */
     public static void showNews(RouterContext ctx, boolean yes) {
-        long stamp = yes ? 0 : lastUpdated(ctx);
+        long stamp = yes ? 0 : lastNewEntry(ctx);
         ctx.router().saveConfig(PROP_LAST_HIDDEN, Long.toString(stamp));
     }
 
@@ -368,6 +370,19 @@ public class NewsHelper extends ContentHelper {
         File newsFile = new File(ctx.getRouterDir(), NEWS_FILE);
         rv = newsFile.lastModified();
         ctx.router().saveConfig(PROP_LAST_UPDATED, Long.toString(rv));
+        return rv;
+    }
+
+    /**
+     *  When we last got a new news entry
+     *  @since 0.9.55
+     */
+    private static long lastNewEntry(RouterContext ctx) {
+        long rv = ctx.getProperty(PROP_LAST_NEW_ENTRY, 0L);
+        if (rv > 0)
+            return rv;
+        rv = lastUpdated(ctx);
+        ctx.router().saveConfig(PROP_LAST_NEW_ENTRY, Long.toString(rv));
         return rv;
     }
 }

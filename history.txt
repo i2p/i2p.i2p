@@ -1,3 +1,22 @@
+2022-07-09 zzz
+ * Console: Only display news if a new entry is found
+ * SSU2: Support other reason codes in destroy message
+
+2022-07-08 zzz
+ * SSU: Initialize MTUs
+ * SSU2: Persist SSU2 tokens
+ * Transports: Don't lookup RI in wasUnreachable()
+
+2022-07-05 zzz
+ * SSU2: Fix peer test throttling
+
+2022-07-04 zzz
+ * Console: Add cancel button to netdb search form
+ * NetDB: Lookup handling cleanups
+
+2022-07-02 zzz
+ * SSU: Remove copy of peers in idle timeout checker
+
 2022-06-25 zzz
  * SSU: MTU fixes for IPv6 and SSU2
 

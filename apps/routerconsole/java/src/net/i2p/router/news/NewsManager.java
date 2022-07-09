@@ -90,7 +90,7 @@ public class NewsManager implements ClientApp {
      *  Does NOT update the NewsEntry list.
      *
      *  @param entries each one should be "entry" at the root
-     *  @return success
+     *  @return true if any new entry was written (not if changed)
      */
     public synchronized boolean storeEntries(List<Node> entries) {
         return PersistNews.store(_context, entries);

@@ -73,6 +73,8 @@ class NewsFetcher extends UpdateRunner {
     /** is the news newer */
     private boolean _isNewer;
     private boolean _success;
+    /** did we get a new news entry */
+    private boolean _gotNewEntry;
 
     private static final String TEMP_NEWS_FILE = "news.xml.temp";
     static final String PROP_BLOCKLIST_TIME = "router.blocklistVersion";
@@ -141,10 +143,14 @@ class NewsFetcher extends UpdateRunner {
                 if (get.fetch()) {
                     int status = get.getStatusCode();
                     if (status == 200 || status == 304) {
-                        Map<String, String> opts = new HashMap<String, String>(2);
+                        Map<String, String> opts = new HashMap<String, String>(3);
                         opts.put(NewsHelper.PROP_LAST_CHECKED, Long.toString(start));
-                        if (status == 200 && _isNewer)
-                            opts.put(NewsHelper.PROP_LAST_UPDATED, Long.toString(_newLastModified));
+                        if (status == 200 && _isNewer) {
+                            String lastMod = Long.toString(_newLastModified);
+                            opts.put(NewsHelper.PROP_LAST_UPDATED, lastMod);
+                            if (_gotNewEntry)
+                                opts.put(NewsHelper.PROP_LAST_NEW_ENTRY, lastMod);
+                        }
                         _context.router().saveConfig(opts, null);
                         return;
                     }
@@ -526,7 +532,7 @@ class NewsFetcher extends UpdateRunner {
                 if (nmgr != null) {
                     nmgr.addEntries(entries);
                     List<Node> nodes = NewsXMLParser.getNodes(root, "entry");
-                    nmgr.storeEntries(nodes);
+                    _gotNewEntry = nmgr.storeEntries(nodes);
                 }
             }
             // Persist any new CRL entries
