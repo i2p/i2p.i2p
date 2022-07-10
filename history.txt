@@ -1,3 +1,6 @@
+2022-07-10 zzz
+ * SSU2: Fix NACK handling
+
 2022-07-09 zzz
  * Console: Only display news if a new entry is found
  * SSU2: Support other reason codes in destroy message
