@@ -236,7 +236,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** should we flood all UDP peers with the configured rate? This is for testing only! */
     //private static final boolean SHOULD_FLOOD_PEERS = false;
     
-    private static final int MAX_CONSECUTIVE_FAILED = 5;
+    private static final int MAX_CONSECUTIVE_FAILED = 3;
     
     public static final int DEFAULT_COST = 5;
     private static final int SSU_OUTBOUND_COST = 14;
@@ -3244,7 +3244,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             } else {
                 _context.statManager().addRateData("udp.dropPeerConsecutiveFailures", consecutive, msg.getPeer().getInactivityTime());
                 sendDestroy(msg.getPeer(), SSU2Util.REASON_FRAME_TIMEOUT);
-                dropPeer(msg.getPeer(), false, "too many failures");
+                dropPeer(msg.getPeer(), true, "too many failures");
             }
             //if ( (consecutive > MAX_CONSECUTIVE_FAILED) && (msg.getPeer().getInactivityTime() > DROP_INACTIVITY_TIME))
             //    dropPeer(msg.getPeer(), false);

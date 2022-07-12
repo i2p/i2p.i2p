@@ -99,8 +99,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         int type = data[off + TYPE_OFFSET] & 0xff;
         long token = DataHelper.fromLong8(data, off + TOKEN_OFFSET);
         if (type == TOKEN_REQUEST_FLAG_BYTE) {
-            if (_log.shouldInfo())
-                _log.info("Got token request from: " + _aliceSocketAddress);
+            if (_log.shouldDebug())
+                _log.debug("Got token request from: " + _aliceSocketAddress);
             _currentState = InboundState.IB_STATE_TOKEN_REQUEST_RECEIVED;
             // decrypt in-place
             ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
@@ -472,8 +472,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     public synchronized void receiveSessionRequestAfterRetry(UDPPacket packet) throws GeneralSecurityException {
         if (_currentState != InboundState.IB_STATE_RETRY_SENT)
             throw new GeneralSecurityException("Bad state for Session Request after Retry: " + _currentState);
-        if (_log.shouldInfo())
-            _log.info("Got session request after retry from: " + _aliceSocketAddress);
+        if (_log.shouldDebug())
+            _log.debug("Got session request after retry from: " + _aliceSocketAddress);
         DatagramPacket pkt = packet.getPacket();
         SocketAddress from = pkt.getSocketAddress();
         if (!from.equals(_aliceSocketAddress))
