@@ -1246,7 +1246,7 @@ class EstablishmentManager {
               case IB_STATE_REQUEST_BAD_TOKEN_RECEIVED:
                 if (_log.shouldDebug())
                     _log.debug("Send retry to: " + state);
-                pkt = _builder2.buildRetryPacket(state2);
+                pkt = _builder2.buildRetryPacket(state2, 0);
                 break;
 
               default:
