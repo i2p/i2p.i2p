@@ -46,7 +46,7 @@ class PersistNews {
      *  Old entries are always overwritten, as they may change even without the updated date changing.
      *
      *  @param entries each one should be "entry" at the root
-     *  @return success
+     *  @return true if any new entry was written (not if changed)
      */
     public static boolean store(I2PAppContext ctx, List<Node> entries) {
         Log log = ctx.logManager().getLog(PersistNews.class);
@@ -54,7 +54,7 @@ class PersistNews {
         if (!dir.exists())
             dir.mkdirs();
         StringBuilder buf = new StringBuilder();
-        boolean rv = true;
+        boolean rv = false;
         for (Node entry : entries) {
             Node nid = entry.getNode("id");
             if (nid == null) {
@@ -70,6 +70,8 @@ class PersistNews {
             }
             String name = idToName(ctx, id);
             File file = new File(dir, name);
+            if (!rv && !file.exists())
+                rv = true;
             Writer out = null;
             try {
                 out = new OutputStreamWriter(new GZIPOutputStream(new SecureFileOutputStream(file)));
@@ -80,7 +82,6 @@ class PersistNews {
             } catch (IOException ioe) {
                 if (log.shouldWarn())
                     log.warn("failed store to " + file, ioe);
-                rv = false;
             } finally {
                 if (out != null) try { out.close(); } catch (IOException ioe) {}
             }

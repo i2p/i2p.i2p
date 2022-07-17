@@ -53,7 +53,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     private byte[] _sendHeaderEncryptKey2;
     private byte[] _rcvHeaderEncryptKey2;
     private final byte[] _rcvRetryHeaderEncryptKey2;
-    private int _mtu;
+    private final int _mtu;
     private byte[] _sessReqForReTX;
     private byte[][] _sessConfForReTX;
     private long _timeReceived;
@@ -402,8 +402,18 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     public byte[] getRcvRetryHeaderEncryptKey2() { return _rcvRetryHeaderEncryptKey2; }
     public InetSocketAddress getSentAddress() { return _bobSocketAddress; }
 
-    /** what is the largest packet we can send to the peer? */
-    public int getMTU() { return _mtu; }
+    /**
+     *  What is the largest packet we can send to the peer?
+     *  Only used for Session Confirmed packets.
+     *  Session Request is very small.
+     */
+    public int getMTU() {
+        // To avoid PMTU problems on brokered IPv6 tunnels, make it the minimum.
+        // Data phase will probe and increase if possible
+        if (_bobIP == null || _bobIP.length == 16)
+            return PeerState2.MIN_MTU;
+        return _mtu;
+    }
 
     public synchronized void receiveRetry(UDPPacket packet) throws GeneralSecurityException {
         ////// TODO state check
@@ -447,11 +457,11 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             return;
         }
         if (_timeReceived == 0)
-            throw new GeneralSecurityException("No DateTime block in Session/Token Request");
+            throw new GeneralSecurityException("No DateTime block in Retry");
         // _nextSend is now(), from packetReceived()
         _skew = _nextSend - _timeReceived;
         if (_skew > MAX_SKEW || _skew < 0 - MAX_SKEW)
-            throw new GeneralSecurityException("Skew exceeded in Session/Token Request: " + _skew);
+            throw new GeneralSecurityException("Skew exceeded in Retry: " + _skew);
         createNewState(_routerAddress);
         if (_log.shouldDebug())
             _log.debug("Received a retry on " + this);
@@ -577,6 +587,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                 byte[] save = new byte[len];
                 System.arraycopy(data, off, save, 0, len);
                 _sessConfForReTX[i] = save;
+                if (_log.shouldDebug())
+                    _log.debug("Sess conf pkt " + i + '/' + packets.length + " bytes: " + len);
             }
             if (_rcvHeaderEncryptKey2 == null)
                 _rcvHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessCreateHeader");

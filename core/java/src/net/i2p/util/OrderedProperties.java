@@ -39,14 +39,14 @@ public class OrderedProperties extends Properties {
     public Set<Object> keySet() {
         if (size() <= 1)
             return super.keySet();
-        return new UnmodifiableSortedSet(super.keySet());
+        return new UnmodifiableSortedSet<Object>(super.keySet());
     }
 
     @Override
     public Set<Map.Entry<Object, Object>> entrySet() {
         if (size() <= 1)
             return super.entrySet();
-        return new UnmodifiableSortedSet(super.entrySet(), ECOMP);
+        return new UnmodifiableSortedSet<Map.Entry<Object, Object>>(super.entrySet(), ECOMP);
     }
 
     private static class EntryComparator implements Comparator<Map.Entry<Object, Object>>, Serializable {

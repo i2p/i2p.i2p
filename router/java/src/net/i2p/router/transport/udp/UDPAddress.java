@@ -98,12 +98,32 @@ class UDPAddress {
         _isIPv4 = (_host != null && _host.contains(".")) || (caps != null && caps.contains("4"));
         _isIPv6 = (_host != null && _host.contains(":")) || (caps != null && caps.contains("6"));
 
+        final boolean ssu2only = addr.getTransportStyle().equals("SSU2");
         int cmtu = 0;
         try { 
             String mtu = addr.getOption(PROP_MTU);
             if (mtu != null) {
+                int imtu = Integer.parseInt(mtu);
                 boolean isIPv6 = _host != null && _host.contains(":");
-                cmtu = MTU.rectify(isIPv6, Integer.parseInt(mtu));
+                if (isIPv6 && imtu > 1420) {
+                    // fix for brokered tunnels with too big MTU
+                    if (imtu > 1472 && _host.startsWith("2001:470:"))
+                        imtu = 1472;
+                    else if (_host.startsWith("2a06:a004:"))
+                        imtu = 1420;
+                }
+                if (ssu2only) {
+                    // 1280 min is not enforced here, so that it may be
+                    // rejected in OES2 constructor and IES2.gotRI()
+                    cmtu = Math.min(imtu, PeerState2.MAX_MTU);
+                } else {
+                    cmtu = MTU.rectify(isIPv6, imtu);
+                }
+            } else if (_host != null) {
+                if (_host.startsWith("2001:470:"))
+                    cmtu = 1472;
+                else if (_host.startsWith("2a06:a004:"))
+                    cmtu = 1420;
             }
         } catch (NumberFormatException nfe) {}
         _mtu = cmtu;
@@ -126,7 +146,6 @@ class UDPAddress {
         InetAddress[] cintroAddresses = null;
         long[] cintroExps = null;
         Hash[] cintroHashes = null;
-        final boolean ssu2only = addr.getTransportStyle().equals("SSU2");
         final boolean ssu2enable = SSU2Util.ENABLE_RELAY && (ssu2only || "2".equals(addr.getOption("v")));
         for (int i = MAX_INTRODUCERS - 1; i >= 0; i--) {
             // This is the only one required for SSU 1 and 2

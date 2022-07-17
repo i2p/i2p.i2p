@@ -268,8 +268,10 @@ class SSU2Bitfield {
             }
             // portion that is strictly newer
             for (long bit = bf2Highest + 1; bit <= highest; bit++) {
-                bf2.set(bit);
-                cb.bitSet(bit);
+                if (get(bit)) {
+                    bf2.set(bit);
+                    cb.bitSet(bit);
+                }
             }
         }
     }
@@ -348,9 +350,24 @@ class SSU2Bitfield {
 
     public static void main(String[] args) {
         Callback cbi = new CallbackImpl();
-        int off = 100;
+        int off = 0;
         SSU2Bitfield bf = new SSU2Bitfield(256, off);
         System.out.println(bf.toString());
+
+        for (int i = 0; i < 20; i++) {
+            bf.set(i);
+        }
+        for (int i = 21; i < 31; i++) {
+            bf.set(i);
+        }
+        bf.set(35);
+        System.out.println(bf.toString());
+        System.out.println(bf.toAckBlock(10).toString());
+        SSU2Bitfield bf2 = new SSU2Bitfield(256, off);
+        bf2.set(0);
+        bf.forEachAndNot(bf2, cbi);
+        if (true) return;
+
         bf.toAckBlock(20);
 
         bf.set(off);

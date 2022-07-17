@@ -48,6 +48,7 @@ if [ "$1" != "dynamic" ]; then
             ../../gmp-${GMP_VER}/configure --with-pic;;
     esac
     make
+    make check
     sh ../../build_jbigi.sh static
 else
     shift

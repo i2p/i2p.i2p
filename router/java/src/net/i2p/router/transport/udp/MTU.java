@@ -90,12 +90,18 @@ public class MTU {
                                 log.logAlways(Log.WARN, "Unusually low MTU " + mtu + " for interface " + ia +
                                                         ", consider disabling");
                             }
-                            // fix for he.net tunnels with too big MTU
-                            if (isIPv6 && mtu > 1472) {
+                            // fix for brokered tunnels with too big MTU
+                            if (isIPv6 && mtu > 1420) {
                                 byte[] ip = addr.getAddress();
-                                if (ip[0] == 0x20 && ip[1] == 0x01 &&
+                                // he.net
+                                if (mtu > 1472 &&
+                                    ip[0] == 0x20 && ip[1] == 0x01 &&
                                     ip[2] == 0x04 && ip[3] == 0x70)
                                     return 1472;
+                                // route48.org, supports Wireguard
+                                if (ip[0] == 0x2a && ip[1] == 0x06 &&
+                                    ip[2] == (byte) 0xa0 && ip[3] == 0x04)
+                                    return 1420;
                             }
                             if (isSSU2)
                                 return Math.min(mtu, PeerState2.MAX_MTU);

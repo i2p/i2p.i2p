@@ -239,17 +239,22 @@ class PacketBuilder2 {
         }
 
         // now the other blocks, if any
+        boolean hasTermination = false;
         if (otherBlocks != null) {
             for (Block block : otherBlocks) {
                 blocks.add(block);
                 int sz = block.getTotalLength();
                 off += sz;
                 sizeWritten += sz;
+                if (block.getType() == SSU2Payload.BLOCK_TERMINATION)
+                    hasTermination = true;
             }
         }
 
         // DateTime block every so often, if room
-        if ((pktNum & (DATETIME_SEND_FREQUENCY - 1)) == DATETIME_SEND_FREQUENCY - 1 &&
+        // not allowed after termination
+        if (!hasTermination &&
+            (pktNum & (DATETIME_SEND_FREQUENCY - 1)) == DATETIME_SEND_FREQUENCY - 1 &&
             ipHeaderSize + SHORT_HEADER_SIZE + sizeWritten + 7 + MAC_LEN <= currentMTU) {
             Block block = new SSU2Payload.DateTimeBlock(_context);
             blocks.add(block);
@@ -266,6 +271,7 @@ class PacketBuilder2 {
         }
         SSU2Payload.writePayload(data, SHORT_HEADER_SIZE, blocks);
         pkt.setLength(off);
+        int length = off + ipHeaderSize;
         //if (_log.shouldDebug())
         //    _log.debug("Packet " + pktNum + " before encryption:\n" + HexDump.dump(data, 0, off));
 
@@ -286,7 +292,7 @@ class PacketBuilder2 {
                        " data size " + dataSize +
                        " pkt size " + (off + ipHeaderSize) +
                        " MTU " + currentMTU +
-                       " Fragments: " + DataHelper.toString(fragments), new Exception());
+                       " Fragments: " + DataHelper.toString(fragments) /* , new Exception() */ );
             }
         }
         
@@ -302,7 +308,7 @@ class PacketBuilder2 {
                 fragments = Collections.singletonList(fragments.get(0));
             else
                 fragments = new ArrayList<Fragment>(fragments);
-            peer.fragmentsSent(pktNum, fragments);
+            peer.fragmentsSent(pktNum, length, fragments);
         }
         return packet;
     }
@@ -433,12 +439,14 @@ class PacketBuilder2 {
      * Build a new Retry packet for the given peer, encrypting it 
      * as necessary.
      * 
+     * @param terminationCode 0 normally, nonzero to send termination block
      * @return ready to send packet, or null if there was a problem
      */
-    public UDPPacket buildRetryPacket(InboundEstablishState2 state) {
+    public UDPPacket buildRetryPacket(InboundEstablishState2 state, int terminationCode) {
         long n = _context.random().signedNextInt() & 0xFFFFFFFFL;
+        long token = terminationCode == 0 ? state.getToken() : 0;
         UDPPacket packet = buildLongPacketHeader(state.getSendConnID(), n, RETRY_FLAG_BYTE,
-                                                 state.getRcvConnID(), state.getToken());
+                                                 state.getRcvConnID(), token);
         DatagramPacket pkt = packet.getPacket();
         
         byte sentIP[] = state.getSentIP();
@@ -446,7 +454,7 @@ class PacketBuilder2 {
         int port = state.getSentPort();
         encryptRetry(packet, state.getSendHeaderEncryptKey1(), n, state.getSendHeaderEncryptKey1(),
                      state.getSendHeaderEncryptKey2(),
-                     sentIP, port);
+                     sentIP, port, terminationCode);
         pkt.setSocketAddress(state.getSentAddress());
         packet.setMessageType(TYPE_CREAT);
         packet.setPriority(PRIORITY_HIGH);
@@ -945,10 +953,18 @@ class PacketBuilder2 {
 
     /**
      *  @param packet containing only 32 byte header
+     *  @param terminationCode 0 normally, nonzero to send termination block
      */
     private void encryptRetry(UDPPacket packet, byte[] chachaKey, long n,
-                              byte[] hdrKey1, byte[] hdrKey2, byte[] ip, int port) {
-        encryptPeerTest(packet, chachaKey, n, hdrKey1, hdrKey2, ip, port, null);
+                              byte[] hdrKey1, byte[] hdrKey2, byte[] ip, int port,
+                              int terminationCode) {
+        Block block;
+        if (terminationCode != 0) {
+            block = new SSU2Payload.TerminationBlock(terminationCode, 0);
+        } else {
+            block = null;
+        }
+        encryptPeerTest(packet, chachaKey, n, hdrKey1, hdrKey2, ip, port, block);
     }
 
     /**

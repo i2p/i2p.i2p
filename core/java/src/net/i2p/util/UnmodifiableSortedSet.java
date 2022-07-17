@@ -39,6 +39,7 @@ public class UnmodifiableSortedSet<E> extends ArraySet<E> implements SortedSet<E
         this(c, null);
     }
 
+    @SuppressWarnings("unchecked")
     public UnmodifiableSortedSet(Set<? extends E> c, Comparator<? super E> comparator) {
         super(c, c.size());
         comp = comparator;
@@ -58,6 +59,7 @@ public class UnmodifiableSortedSet<E> extends ArraySet<E> implements SortedSet<E
     /**
      *  Warning: O(n**2)
      */
+    @SuppressWarnings("unchecked")
     public UnmodifiableSortedSet(Collection<? extends E> c, Comparator<? super E> comparator) {
         super(c, c.size());
         comp = comparator;
@@ -69,12 +71,14 @@ public class UnmodifiableSortedSet<E> extends ArraySet<E> implements SortedSet<E
 
     public Comparator<? super E> comparator() { return comp; }
 
+    @SuppressWarnings("unchecked")
     public E first() {
         if (isEmpty())
             throw new NoSuchElementException();
         return (E) _entries[0];
     }
 
+    @SuppressWarnings("unchecked")
     public E last() {
         int sz = size();
         if (sz <= 0)
@@ -145,6 +149,7 @@ public class UnmodifiableSortedSet<E> extends ArraySet<E> implements SortedSet<E
      *  Overridden to do binary search
      */
     @Override
+    @SuppressWarnings("unchecked")
     protected int indexOf(Object o) {
         // don't do this if comp is not initialized and array is not sorted
         if (! initialized)

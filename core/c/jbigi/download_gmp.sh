@@ -3,6 +3,11 @@
 #       This script downloads gmp-6.x.x.tar.bz2 to this directory
 #       (if a different version, change the GMP_VER= line below)
 #
+#       If you do not want any patches applied comment out the 
+#       PATCH_GMP line.
+#
+
+PATCH_GMP=true
 
 export GMP_VER=6.2.1
 export GMP_TARVER=${GMP_VER}
@@ -28,6 +33,14 @@ download_tar()
 extract_tar()
 {
   tar -xjf ${GMP_TAR} > /dev/null 2>&1 || (rm -f ${GMP_TAR} && download_tar && extract_tar || exit 1)
+  if [ ! -z $PATCH_GMP ]; then
+    cd ${GMP_DIR}
+    for p in $(ls ../patches/*.diff); do
+      echo "applying $p"
+      cat $p | patch -p1
+    done
+    cd ..
+  fi
 }
 
 if [ ! -d "$GMP_DIR" -a ! -e "$GMP_TAR" ]; then

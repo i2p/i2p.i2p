@@ -31,7 +31,7 @@ class SSU2Payload {
     private static final int BLOCK_I2NP = 3;
     private static final int BLOCK_FIRSTFRAG = 4;
     private static final int BLOCK_FOLLOWONFRAG = 5;
-    private static final int BLOCK_TERMINATION = 6;
+    public static final int BLOCK_TERMINATION = 6;
     private static final int BLOCK_RELAYREQ = 7;
     private static final int BLOCK_RELAYRESP = 8;
     private static final int BLOCK_RELAYINTRO = 9;
@@ -392,6 +392,11 @@ class SSU2Payload {
         public Block(int ttype) {
             type = ttype;
         }
+
+        /**
+         *  @since 0.9.55
+         */
+        public int getType() { return type; }
 
         /** @return new offset */
         public int write(byte[] tgt, int off) {

@@ -1329,6 +1329,7 @@ public class PeerState {
      */
     synchronized void packetReceived(int size) {
         _packetsReceived++;
+        // SSU2 overhead header + MAC == SSU overhead IV + MAC
         if (_remoteIP.length == 4) {
             size += OVERHEAD_SIZE;
         } else {
@@ -1433,8 +1434,8 @@ public class PeerState {
             _transport.failed(state, false);
             return;
 	}
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Adding to " + _remotePeer + ": " + state.getMessageId());
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Adding to " + _remotePeer + ": " + state.getMessageId());
         int rv = 0;
         // will never fail for CDPQ
         boolean fail;
@@ -1547,6 +1548,7 @@ public class PeerState {
         if (failed != null) {
             int failedSize = 0;
             int failedCount = 0;
+            boolean totalFail = false;
             for (int i = 0; i < failed.size(); i++) {
                 OutboundMessageState state = failed.get(i);
                 failedSize += state.getUnackedSize();
@@ -1557,6 +1559,8 @@ public class PeerState {
                     _transport.failed(state);
                     if (_log.shouldWarn())
                         _log.warn("Message expired: " + state + " to: " + this);
+                    if (!_isInbound && state.getSeqNum() == 0)
+                        totalFail = true; // see below
                 } else {
                     // it can not have an OutNetMessage if the source is the
                     // final after establishment message
@@ -1565,6 +1569,17 @@ public class PeerState {
                 }
             }
             if (failedSize > 0) {
+                if (totalFail) {
+                    // first outbound message failed
+                    // This also ensures that in SSU2 if we never get an ACK of the
+                    // Session Confirmed, we will fail quickly (because we don't have
+                    // a separate timer for retransmitting it)
+                    if (_log.shouldWarn())
+                        _log.warn("First message failed on " + this);
+                    _transport.sendDestroy(this, SSU2Util.REASON_FRAME_TIMEOUT);
+                    _transport.dropPeer(this, true, "OB First Message Fail");
+                    return 0;
+                }
                 // restore the window
                 synchronized(_sendWindowBytesRemainingLock) {
                     // this isn't exactly right, because some fragments may not have been sent at all,
