@@ -259,6 +259,12 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             throw new DataFormatException("bad SSU2 S");
         if (s.length != 32)
             throw new DataFormatException("bad SSU2 S len");
+        byte[] nb = new byte[32];
+        // compare to the _handshakeState
+        _handshakeState.getRemotePublicKey().getPublicKey(nb, 0);
+        if (!DataHelper.eqCT(s, 0, nb, 0, KEY_LEN))
+            throw new DataFormatException("s mismatch in RI: " + ri);
+
         if (!"2".equals(ra.getOption("v")))
             throw new DataFormatException("bad SSU2 v");
 

@@ -355,10 +355,10 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             packetReceived(payloadLen);
         } catch (GeneralSecurityException gse) {
             if (_log.shouldWarn())
-                _log.warn("Bad encrypted packet:\n" + HexDump.dump(data, off, len), gse);
+                _log.warn("Bad encrypted packet on: " + this + '\n' + HexDump.dump(data, off, len), gse);
         } catch (IndexOutOfBoundsException ioobe) {
             if (_log.shouldWarn())
-                _log.warn("Bad encrypted packet:\n" + HexDump.dump(data, off, len), ioobe);
+                _log.warn("Bad encrypted packet on: " + this + '\n' + HexDump.dump(data, off, len), ioobe);
         }
     }
 
@@ -658,8 +658,11 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     /**
      *  Record the mapping of packet number to what fragments were in it,
      *  so we can process acks.
+     *
+     *  @param length including ip/udp header, for logging only
+     *
      */
-    void fragmentsSent(long pktNum, List<PacketBuilder.Fragment> fragments) {
+    void fragmentsSent(long pktNum, int length, List<PacketBuilder.Fragment> fragments) {
         List<PacketBuilder.Fragment> old = _sentMessages.putIfAbsent(Long.valueOf(pktNum), fragments);
         if (old != null) {
             // shouldn't happen
@@ -667,7 +670,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                 _log.warn("Dup send of pkt " + pktNum + " on " + this);
         } else {
             if (_log.shouldDebug())
-                _log.debug("New data pkt " + pktNum + " sent with " + fragments.size() + " fragments on " + this);
+                _log.debug("New " + length + " byte data pkt " + pktNum + " sent with " + fragments.size() + " fragments on " + this);
         }
     }
 

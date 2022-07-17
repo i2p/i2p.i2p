@@ -239,17 +239,22 @@ class PacketBuilder2 {
         }
 
         // now the other blocks, if any
+        boolean hasTermination = false;
         if (otherBlocks != null) {
             for (Block block : otherBlocks) {
                 blocks.add(block);
                 int sz = block.getTotalLength();
                 off += sz;
                 sizeWritten += sz;
+                if (block.getType() == SSU2Payload.BLOCK_TERMINATION)
+                    hasTermination = true;
             }
         }
 
         // DateTime block every so often, if room
-        if ((pktNum & (DATETIME_SEND_FREQUENCY - 1)) == DATETIME_SEND_FREQUENCY - 1 &&
+        // not allowed after termination
+        if (!hasTermination &&
+            (pktNum & (DATETIME_SEND_FREQUENCY - 1)) == DATETIME_SEND_FREQUENCY - 1 &&
             ipHeaderSize + SHORT_HEADER_SIZE + sizeWritten + 7 + MAC_LEN <= currentMTU) {
             Block block = new SSU2Payload.DateTimeBlock(_context);
             blocks.add(block);
@@ -266,6 +271,7 @@ class PacketBuilder2 {
         }
         SSU2Payload.writePayload(data, SHORT_HEADER_SIZE, blocks);
         pkt.setLength(off);
+        int length = off + ipHeaderSize;
         //if (_log.shouldDebug())
         //    _log.debug("Packet " + pktNum + " before encryption:\n" + HexDump.dump(data, 0, off));
 
@@ -302,7 +308,7 @@ class PacketBuilder2 {
                 fragments = Collections.singletonList(fragments.get(0));
             else
                 fragments = new ArrayList<Fragment>(fragments);
-            peer.fragmentsSent(pktNum, fragments);
+            peer.fragmentsSent(pktNum, length, fragments);
         }
         return packet;
     }

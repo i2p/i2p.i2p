@@ -119,6 +119,11 @@ class UDPAddress {
                 } else {
                     cmtu = MTU.rectify(isIPv6, imtu);
                 }
+            } else if (_host != null) {
+                if (_host.startsWith("2001:470:"))
+                    cmtu = 1472;
+                else if (_host.startsWith("2a06:a004:"))
+                    cmtu = 1420;
             }
         } catch (NumberFormatException nfe) {}
         _mtu = cmtu;
