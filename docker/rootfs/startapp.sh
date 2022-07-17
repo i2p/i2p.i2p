@@ -32,6 +32,9 @@ if [ -f /.dockerenv ]; then
 
 fi
 
+# Options required for reflective access in dynamic JVM languages like Groovy and Jython
+JAVA17OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/sun.nio.fs=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/java.util.Properties=ALL-UNNAMED --add-opens java.base/java.util.Properties.defaults=ALL-UNNAMED"
+# Old java options
 JAVAOPTS="-Djava.net.preferIPv4Stack=false -Djava.library.path=${I2P}:${I2P}/lib -Di2p.dir.base=${I2P} -Di2p.dir.config=${HOME}/.i2p -DloggerFilenameOverride=logs/log-router-@.txt -Xmx$JVM_XMX"
 
 java -cp "${CLASSPATH}" ${JAVA_OPTS} net.i2p.router.RouterLaunch
