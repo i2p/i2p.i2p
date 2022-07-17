@@ -12,7 +12,7 @@ the:
 
 target, which will produce `jar` and `exe` files. If you are a developer
 who already has I2P installed, it is convenient to build updater packages
-instead of the whole installer to speed up builds and to avoid needing to
+instead of the whole installer to speed up builds and avoid needing to
 repeatedly re-run the installer. To simply build the updater `zip` files,
 run:
 
@@ -53,7 +53,7 @@ or
 ### Peripheral/External Packages: SBT
 
 The (Discontinued)Browser Bundle launcher, as well as the Mac OSX 
-launcher the `sbt` tool from the Scala project is actually used
+launcher the `sbt` tool from the Scala project is used
 underneath, but the `sbt` can still be executed by an `ant` target.
 To build the OSX launcher, run the:
 
@@ -67,7 +67,7 @@ target.
 
 ## Browsing around the source code
 
-If you're new at this, which we all was at one point, I'll have some tips.
+If you're new at this, which we all were at one point, I'll have some tips.
 
 * The [DIRECTORIES.md](DIRECTORIES.md) contains a listing of the directories
 in the I2P source code and what the code inside them is used for.
@@ -92,7 +92,7 @@ a relevant reference.
 ## Git clone depth and Git Bundles
 
 Since `git` is not resumable until a repository is cloned, it is helpful to obtain
-the copies of of i2p.i2p anonymously in one of a couple ways to make the initial clone
+the copies of i2p.i2p anonymously in one of a couple of ways to make the initial clone
 process more reliable. There are two ways to obtain a git repository reliably over I2P
 first, configure your git client according to the instructions on the [I2P Project Site](https://geti2p.net/en/docs/applications/git)
 and clone
@@ -100,7 +100,7 @@ and clone
         git clone --depth 1 git@127.0.0.1:i2p-hackers/i2p.i2p
 
 This will clone the minimum amount of i2p.i2p to have a working checkout. You can then
-resumably populate the repository with the remaining commits by running:
+presumably populate the repository with the remaining commits by running:
 
         git fetch --unshallow
 
