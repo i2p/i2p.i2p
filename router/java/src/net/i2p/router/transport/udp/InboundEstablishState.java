@@ -112,7 +112,7 @@ class InboundEstablishState {
      *  max delay including backoff
      *  This should be a little shorter than for outbound.
      */
-    protected static final long MAX_DELAY = 12*1000;
+    protected static final long MAX_DELAY = EstablishmentManager.MAX_IB_ESTABLISH_TIME;
 
     /**
      *  @param localPort Must be our external port, otherwise the signature of the
