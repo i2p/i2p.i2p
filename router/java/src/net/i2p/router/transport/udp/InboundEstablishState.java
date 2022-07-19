@@ -103,13 +103,16 @@ class InboundEstablishState {
     }
     
     /** basic delay before backoff
-     *  Transmissions at 0, 3, 9 sec
-     *  Previously: 1500 (0, 1.5, 4.5, 10.5)
+     *  Transmissions at 0, 1, 3, 7 sec
+     *  This should be a little shorter than for outbound.
      */
-    protected static final long RETRANSMIT_DELAY = 3000;
+    protected static final long RETRANSMIT_DELAY = 1000;
 
-    /** max delay including backoff */
-    protected static final long MAX_DELAY = 15*1000;
+    /**
+     *  max delay including backoff
+     *  This should be a little shorter than for outbound.
+     */
+    protected static final long MAX_DELAY = 12*1000;
 
     /**
      *  @param localPort Must be our external port, otherwise the signature of the

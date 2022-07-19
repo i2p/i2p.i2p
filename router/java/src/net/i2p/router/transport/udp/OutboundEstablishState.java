@@ -117,12 +117,15 @@ class OutboundEstablishState {
     }
     
     /** basic delay before backoff
-     *  Transmissions at 0, 3, 9 sec
-     *  Previously: 1500 (0, 1.5, 4.5, 10.5)
+     *  Transmissions at 0, 1.25, 3.75, 8.75 sec
+     *  This should be a little longer than for inbound.
      */
-    protected static final long RETRANSMIT_DELAY = 3000;
+    protected static final long RETRANSMIT_DELAY = 1250;
 
-    /** max delay including backoff */
+    /**
+     *  max delay including backoff
+     *  This should be a little longer than for inbound.
+     */
     private static final long MAX_DELAY = 15*1000;
 
     private static final long WAIT_FOR_HOLE_PUNCH_DELAY = 500;

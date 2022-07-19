@@ -81,8 +81,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     public static final int DEFAULT_MTU = MAX_MTU;
 
     private static final int BITFIELD_SIZE = 512;
-    private static final int MAX_SESS_CONF_RETX = 4;
-    private static final int SESS_CONF_RETX_TIME = 1000;
+    private static final int MAX_SESS_CONF_RETX = 5;
     private static final long SENT_MESSAGES_CLEAN_TIME = 60*1000;
 
 
@@ -213,38 +212,51 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     @Override
     List<OutboundMessageState> allocateSend(long now) {
         if (!_isInbound && _ackedMessages.getOffset() == 0 && !_ackedMessages.get(0)) {
-            UDPPacket[] packets = null;
-            synchronized(this) {
-                if (_sessConfForReTX != null) {
-                    // retransmit Session Confirmed when it's time
-                    if (_sessConfSentTime + (SESS_CONF_RETX_TIME << (_sessConfSentCount - 1)) < now) {
+            if (!checkRetransmitSessionConfirmed(_context.clock().now(), false))
+                return null;
+        }
+        return super.allocateSend(now);
+    }
+
+    /**
+     *  Only call for outbound, if we don't have ack 0 yet.
+     *
+     *  @param force ignore timer, always send
+     *  @return success, false if total fail
+     *  @since 0.9.55 split out from above
+     */
+    private boolean checkRetransmitSessionConfirmed(long now, boolean force) {
+        UDPPacket[] packets = null;
+        synchronized(this) {
+            if (_sessConfForReTX != null) {
+                // retransmit Session Confirmed when it's time
+                if (force || _sessConfSentTime + (OutboundEstablishState.RETRANSMIT_DELAY << (_sessConfSentCount - 1)) < now) {
+                    if (_sessConfSentCount >= MAX_SESS_CONF_RETX) {
                         // note: we generally won't get here, because the
                         // first outbound message will timeout before this
                         // and close the session in super.finishMessages()
-                        if (_sessConfSentCount >= MAX_SESS_CONF_RETX) {
-                            if (_log.shouldWarn())
-                                _log.warn("Fail, no Sess Conf ACK rcvd on " + this);
-                            UDPPacket pkt = _transport.getBuilder2().buildSessionDestroyPacket(SSU2Util.REASON_FRAME_TIMEOUT, this);
-                            _transport.send(pkt);
-                            _transport.dropPeer(this, true, "No Sess Conf ACK rcvd");
-                            _sessConfForReTX = null;
-                            return null;
-                        }
-                        _sessConfSentCount++;
-                        _sessConfSentTime = now;
-                        packets = getRetransmitSessionConfirmedPackets();
+                        if (_log.shouldWarn())
+                            _log.warn("Fail, no Sess Conf ACK rcvd on " + this);
+                        UDPPacket pkt = _transport.getBuilder2().buildSessionDestroyPacket(SSU2Util.REASON_FRAME_TIMEOUT, this);
+                        _transport.send(pkt);
+                        _transport.dropPeer(this, true, "No Sess Conf ACK rcvd");
+                        _sessConfForReTX = null;
+                        return false;
                     }
-                }
-            }
-            if (packets != null) {
-                if (_log.shouldInfo())
-                    _log.info("ReTX Sess Conf on " + this);
-                for (int i = 0; i < packets.length; i++) {
-                     _transport.send(packets[i]);
+                    _sessConfSentCount++;
+                    _sessConfSentTime = now;
+                    packets = getRetransmitSessionConfirmedPackets();
                 }
             }
         }
-        return super.allocateSend(now);
+        if (packets != null) {
+            if (_log.shouldInfo())
+                _log.info("ReTX Sess Conf on " + this);
+            for (int i = 0; i < packets.length; i++) {
+                 _transport.send(packets[i]);
+            }
+        }
+        return true;
     }
 
     // SSU 1 unsupported things
@@ -314,6 +326,13 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             if (header.getDestConnID() != _rcvConnID) {
                 if (_log.shouldWarn())
                     _log.warn("bad Dest Conn id " + header + " size " + len + " on " + this);
+                if (!_isInbound && _ackedMessages.getOffset() == 0 && !_ackedMessages.get(0)) {
+                    // this was probably a retransmitted session created,
+                    // sent with k_header_1 = bob's intro key, and we're
+                    // attempting to decrypt with our intro key.
+                    // resend session confirmed in response
+                    checkRetransmitSessionConfirmed(_context.clock().now(), true);
+                }
                 return;
             }
             if (header.getType() != DATA_FLAG_BYTE) {

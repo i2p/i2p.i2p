@@ -1729,8 +1729,8 @@ public class PeerState {
                         //    // ignore result, always send?
                         //    locked_shouldSend(dequeuedState);
                         //}
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Allocate sending (NEW) to " + _remotePeer + ": " + dequeuedState.getMessageId());
+                        //if (_log.shouldLog(Log.DEBUG))
+                        //    _log.debug("Allocate sending (NEW) to " + _remotePeer + ": " + dequeuedState.getMessageId());
                         if (rv == null)
                             rv = new ArrayList<OutboundMessageState>(_concurrentMessagesAllowed);
                         rv.add(dequeuedState);
@@ -1813,12 +1813,14 @@ public class PeerState {
     private boolean locked_shouldSend(OutboundMessageState state, long now) {
         synchronized(this) {
             if (allocateSendingBytes(state, now)) {
+              /***
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(_remotePeer + " Allocation allowed with "
                               + getSendWindowBytesRemaining()
                               + "/" + getSendWindowBytes()
                               + " remaining"
                               + " for message " + state.getMessageId() + ": " + state);
+               ***/
                 if (state.getPushCount() == 0)
                     _messagesSent++;
                 return true;

@@ -738,6 +738,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     public synchronized UDPPacket getRetransmitSessionCreatedPacket() {
         if (_sessCrForReTX == null)
             return null;
+        if (_log.shouldInfo())
+            _log.info("ReTX Sess Created on " + this);
         UDPPacket packet = UDPPacket.acquire(_context, false);
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
