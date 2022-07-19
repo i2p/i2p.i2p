@@ -2607,13 +2607,13 @@ class EstablishmentManager {
         String ourV4Port = Integer.toString(_transport.getExternalPort(false));
         String ourV6Port = Integer.toString(_transport.getExternalPort(true));
         String ourV4Addr;
-        RouterAddress addr = _transport.getCurrentAddress(false);
+        RouterAddress addr = _transport.getCurrentExternalAddress(false);
         if (addr != null)
             ourV4Addr = addr.getHost();
         else
             ourV4Addr = null;
         String ourV6Addr;
-        addr = _transport.getCurrentAddress(true);
+        addr = _transport.getCurrentExternalAddress(true);
         if (addr != null)
             ourV6Addr = addr.getHost();
         else
@@ -2691,13 +2691,13 @@ class EstablishmentManager {
         try {
             out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(f), "ISO-8859-1")));
             out.println("# SSU2 tokens, format: IPv4/IPv6/In/Out addr port token expiration");
-            RouterAddress addr = _transport.getCurrentAddress(false);
+            RouterAddress addr = _transport.getCurrentExternalAddress(false);
             if (addr != null) {
                 String us = addr.getHost();
                 if (us != null)
                     out.println("4 " + us + ' ' + _transport.getExternalPort(false));
             }
-            addr = _transport.getCurrentAddress(true);
+            addr = _transport.getCurrentExternalAddress(true);
             if (addr != null) {
                 String us = addr.getHost();
                 if (us != null)
