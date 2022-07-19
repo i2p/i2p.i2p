@@ -783,9 +783,12 @@ public class GeoIP {
      */
     public void add(byte ip[]) {
         // skip he.net tunnel 2001:470:: so we will get correct geoip from IPv4
+        // ditto route48
         if (ip.length == 16 &&
-            ip[0] == 0x20 && ip[1] == 0x01 &&
-            ip[2] == 0x04 && ip[3] == 0x70)
+            ((ip[0] == 0x20 && ip[1] == 0x01 &&
+              ip[2] == 0x04 && ip[3] == 0x70) ||
+             (ip[0] == 0x2a && ip[1] == 0x06 &&
+              ip[2] == (byte) 0xa0 && ip[3] == 0x04)))
             return;
         add(toLong(ip));
     }
