@@ -168,7 +168,7 @@ class EstablishmentManager {
 
     // SSU 2
     private static final int MAX_TOKENS = 512;
-    public static final long IB_TOKEN_EXPIRATION = 60*60*1000L;
+    public static final long IB_TOKEN_EXPIRATION = 2*60*60*1000L;
     private static final long MAX_SKEW = 2*60*1000;
     private static final String TOKEN_FILE = "ssu2tokens.txt";
 
@@ -2553,10 +2553,14 @@ class EstablishmentManager {
         do {
             token = _context.random().nextLong();
         } while (token == 0);
-        // TODO shorten expiration based on _inboundTokens size
-        long expires = _context.clock().now() + expiration;
-        Token tok = new Token(token, expires);
+        long now = _context.clock().now();
+        Token tok;
         synchronized(_inboundTokens) {
+            // shorten expiration based on _inboundTokens size
+            if (expiration > 2*60*1000 && _inboundTokens.size() >  MAX_TOKENS / 2)
+                expiration /= 2;
+            long expires = now + expiration;
+            tok = new Token(token, expires);
             _inboundTokens.put(peer, tok);
         }
         return tok;
