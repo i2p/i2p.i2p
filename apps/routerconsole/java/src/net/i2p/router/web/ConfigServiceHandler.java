@@ -363,10 +363,15 @@ public class ConfigServiceHandler extends FormHandler {
             String url = _context.portMapper().getConsoleURL();
             ca = new ClientAppConfig(UrlLauncher.class.getName(), "consoleBrowser",
                                      url, 5, false);
+            clients.add(ca);
         }
         try {
-            if (ca != null)
-                ClientAppConfig.writeClientAppConfig(_context, ca);
+            if (ca != null) {
+                if (ClientAppConfig.isSplitConfig(_context))
+                    ClientAppConfig.writeClientAppConfig(_context, ca);
+                else
+                    ClientAppConfig.writeClientAppConfig(_context, clients);
+            }
             addFormNotice(_t("Configuration saved successfully"));
         } catch (IOException ioe) {
             addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs"));
