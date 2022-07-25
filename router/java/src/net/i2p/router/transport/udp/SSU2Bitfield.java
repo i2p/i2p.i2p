@@ -80,7 +80,7 @@ class SSU2Bitfield {
                     shift = min_shift;
                 // round up
                 if ((shift & 0x3f) != 0)
-                    shift = 64 + (shift & 0xc0);
+                    shift = 64 + (shift & 0x7fffffc0);
                 //System.out.println("Shifting bitfield, offset was " + offset + ", now " + (offset + shift));
                 if (shift < size) {
                     // shift down
