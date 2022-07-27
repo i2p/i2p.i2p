@@ -74,7 +74,8 @@ public class StatisticsManager {
         Properties stats = new Properties();
         stats.setProperty("router.version", CoreVersion.PUBLISHED_VERSION);
         stats.setProperty(RouterInfo.PROP_NETWORK_ID, _networkID);
-        stats.setProperty(RouterInfo.PROP_CAPABILITIES, _context.router().getCapabilities());
+        String caps = _context.router().getCapabilities();
+        stats.setProperty(RouterInfo.PROP_CAPABILITIES, caps);
 
         if (_context.getBooleanPropertyDefaultTrue(PROP_PUBLISH_RANKINGS) &&
             _context.random().nextInt(RANDOM_INCLUDE_STATS) == 0 &&
@@ -142,7 +143,7 @@ public class StatisticsManager {
 
         // So that we will still get build requests - not required since 0.7.9 2010-01-12
         //stats.setProperty("stat_uptime", "90m");
-        if (FloodfillNetworkDatabaseFacade.isFloodfill(_context.router().getRouterInfo())) {
+        if (caps.indexOf(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL) >= 0) {
             int ri = _context.router().getUptime() > 30*60*1000 ?
                      _context.netDb().getKnownRouters() :
                      3000 + _context.random().nextInt(1000);   // so it isn't obvious we restarted
@@ -153,9 +154,11 @@ public class StatisticsManager {
             stats.setProperty("netdb.knownLeaseSets", String.valueOf(ls));
         }
 
+/*
         String contact = _context.getProperty(PROP_CONTACT_NAME);
         if (contact != null)
             stats.setProperty("contact", contact);
+*/
 
         String family = _context.getProperty(FamilyKeyCrypto.PROP_FAMILY_NAME);
         if (family != null) {
