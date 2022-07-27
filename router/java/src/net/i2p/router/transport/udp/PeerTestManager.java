@@ -1837,6 +1837,9 @@ class PeerTestManager {
     }
 
     /**
+     *  This is only for out-of-session messages 5-7,
+     *  where most blocks are not allowed.
+     *
      *  @since 0.9.54
      */
     private class PTCallback implements SSU2Payload.PayloadCallback {
@@ -1918,6 +1921,14 @@ class PeerTestManager {
         }
 
         public void gotTermination(int reason, long count) {
+            throw new IllegalStateException("Bad block in PT");
+        }
+
+        public void gotPathChallenge(byte[] data) {
+            throw new IllegalStateException("Bad block in PT");
+        }
+
+        public void gotPathResponse(byte[] data) {
             throw new IllegalStateException("Bad block in PT");
         }
     }

@@ -124,6 +124,16 @@ class SSU2Payload {
          *  @param lastReceived in theory could wrap around to negative, but very unlikely
          */
         public void gotTermination(int reason, long lastReceived);
+
+        /**
+         *  @since 0.9.55
+         */
+        public void gotPathChallenge(byte[] data);
+
+        /**
+         *  @since 0.9.55
+         */
+        public void gotPathResponse(byte[] data);
     }
 
     /**
@@ -350,6 +360,22 @@ class SSU2Payload {
                     int rsn = payload[i + 8] & 0xff;
                     cb.gotTermination(rsn, last);
                     gotTermination = true;
+                    break;
+
+                case BLOCK_PATHCHALLENGE:
+                    if (isHandshake)
+                        throw new IOException("Illegal block in handshake: " + type);
+                    byte[] cdata = new byte[len];
+                    System.arraycopy(payload, i, cdata, 0, len);
+                    cb.gotPathChallenge(cdata);
+                    break;
+
+                case BLOCK_PATHRESP:
+                    if (isHandshake)
+                        throw new IOException("Illegal block in handshake: " + type);
+                    byte[] rdata = new byte[len];
+                    System.arraycopy(payload, i, rdata, 0, len);
+                    cb.gotPathResponse(rdata);
                     break;
 
                 case BLOCK_PADDING:

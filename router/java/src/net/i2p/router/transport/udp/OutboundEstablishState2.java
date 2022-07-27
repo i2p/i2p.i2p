@@ -348,6 +348,14 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         _transport.getEstablisher().receiveSessionDestroy(_remoteHostId, this);
     }
 
+    public void gotPathChallenge(byte[] data) {
+        // won't be called, SSU2Payload will throw
+    }
+
+    public void gotPathResponse(byte[] data) {
+        // won't be called, SSU2Payload will throw
+    }
+
     /////////////////////////////////////////////////////////
     // end payload callbacks
     /////////////////////////////////////////////////////////

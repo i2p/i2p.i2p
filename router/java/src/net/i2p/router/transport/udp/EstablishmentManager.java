@@ -2825,6 +2825,14 @@ class EstablishmentManager {
         public void gotTermination(int reason, long count) {
             throw new IllegalStateException("Bad block in HP");
         }
+
+        public void gotPathChallenge(byte[] data) {
+            throw new IllegalStateException("Bad block in HP");
+        }
+
+        public void gotPathResponse(byte[] data) {
+            throw new IllegalStateException("Bad block in HP");
+        }
     }
 
 

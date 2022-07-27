@@ -637,6 +637,14 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         _transport.getEstablisher().receiveSessionDestroy(_remoteHostId, this);
     }
 
+    public void gotPathChallenge(byte[] data) {
+        // TODO
+    }
+
+    public void gotPathResponse(byte[] data) {
+        // TODO
+    }
+
     /////////////////////////////////////////////////////////
     // end payload callbacks
     /////////////////////////////////////////////////////////

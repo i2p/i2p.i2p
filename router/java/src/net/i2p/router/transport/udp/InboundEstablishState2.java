@@ -420,6 +420,14 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         _transport.getEstablisher().receiveSessionDestroy(_remoteHostId);
     }
 
+    public void gotPathChallenge(byte[] data) {
+        throw new IllegalStateException("Bad block in handshake");
+    }
+
+    public void gotPathResponse(byte[] data) {
+        throw new IllegalStateException("Bad block in handshake");
+    }
+
     /////////////////////////////////////////////////////////
     // end payload callbacks
     /////////////////////////////////////////////////////////
