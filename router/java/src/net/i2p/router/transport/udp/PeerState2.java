@@ -638,10 +638,18 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotPathChallenge(byte[] data) {
-        // TODO
+        if (_log.shouldInfo())
+            _log.info("Got PATH CHALLENGE block, length: " + data.length + " on " + this);
+        SSU2Payload.Block block = new SSU2Payload.PathResponseBlock(data);
+        UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.emptyList(),
+                                                             Collections.singletonList(block),
+                                                             this);
+        _transport.send(pkt);
     }
 
     public void gotPathResponse(byte[] data) {
+        if (_log.shouldInfo())
+            _log.info("Got PATH RESPONSE block, length: " + data.length + " on " + this);
         // TODO
     }
 
