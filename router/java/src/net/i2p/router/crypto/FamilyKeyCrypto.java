@@ -486,8 +486,10 @@ public class FamilyKeyCrypto {
     private void loadCerts() {
         File dir = new File(_context.getBaseDir(), CERT_DIR);
         File[] files = dir.listFiles(new FileSuffixFilter(CERT_SUFFIX));
-        if (files == null)
+        if (files == null) {
+            _log.logAlways(Log.WARN, "No family keys loaded, contact packager");
             return;
+        }
         for (File file : files) {
             String name = file.getName();
             name = name.substring(0, name.length() - CERT_SUFFIX.length());
@@ -495,8 +497,12 @@ public class FamilyKeyCrypto {
             if (spk != null)
                 _knownKeys.put(name, spk);
         }
-        if (_log.shouldInfo())
-            _log.info("Loaded " + _knownKeys.size() + " keys");
+        if (!_knownKeys.isEmpty()) {
+            if (_log.shouldInfo())
+                _log.info("Loaded " + _knownKeys.size() + " keys");
+        } else {
+            _log.logAlways(Log.WARN, "No family keys loaded, contact packager");
+        }
     }
 
     /** 
