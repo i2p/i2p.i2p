@@ -862,4 +862,46 @@ class SSU2Payload {
             return off + 8;
         }
     }
+
+    /**
+     *  @since 0.9.55
+     */
+    public static class PathChallengeBlock extends Block {
+        private final byte[] d;
+
+        public PathChallengeBlock(byte[] data) {
+            super(BLOCK_PATHCHALLENGE);
+            d = data;
+        }
+
+        public int getDataLength() {
+            return d.length;
+        }
+
+        public int writeData(byte[] tgt, int off) {
+            System.arraycopy(d, 0, tgt, off, d.length);
+            return off + d.length;
+        }
+    }
+
+    /**
+     *  @since 0.9.55
+     */
+    public static class PathResponseBlock extends Block {
+        private final byte[] d;
+
+        public PathResponseBlock(byte[] data) {
+            super(BLOCK_PATHRESP);
+            d = data;
+        }
+
+        public int getDataLength() {
+            return d.length;
+        }
+
+        public int writeData(byte[] tgt, int off) {
+            System.arraycopy(d, 0, tgt, off, d.length);
+            return off + d.length;
+        }
+    }
 }
