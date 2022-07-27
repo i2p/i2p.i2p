@@ -1249,7 +1249,7 @@ public class PeerState {
                         _log.debug("Increased MTU after " + maxPktSz + " byte packet acked on " + this);
                 }
             } else {
-                if (_mtu > _minMTU) {
+                if (_mtu > _minMTU && maxPktSz > _mtu - (MTU_STEP * 4)) {
                     _mtu = Math.max(_mtu - MTU_STEP, _minMTU);
                     _mtuDecreases++;
                     _mtuIncreases = 0;
@@ -1625,8 +1625,8 @@ public class PeerState {
                 long old = _retransmitTimer;
                 if (_retransmitTimer == 0) {
                     _retransmitTimer = now + getRTO();
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug(_remotePeer + " allocated " + rv.size() + " pushing retransmitter from " + old + " to " + _retransmitTimer);
+                    //if (_log.shouldLog(Log.DEBUG))
+                    //    _log.debug(_remotePeer + " allocated " + rv.size() + " pushing retransmitter from " + old + " to " + _retransmitTimer);
                 } else if (_fastRetransmit.get()) {
                     // right?
                     _retransmitTimer = now + getRTO();
