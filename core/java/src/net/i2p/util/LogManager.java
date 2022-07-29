@@ -797,7 +797,10 @@ public class LogManager implements Flushable {
             // try to prevent out-of-order logging at shutdown
             flush();
             // this could generate out-of-order messages
-            _writer.flushRecords(false);
+            // Gitlab #363 Mac hangs in DTG displaying the popup
+            // after right-clicking the dock icon and selecting Quit
+            if (!SystemVersion.isMac())
+                _writer.flushRecords(false);
             _writer.stopWriting();
             synchronized (_writer) {
                 _writer.notifyAll();
