@@ -172,6 +172,7 @@ final class SSU2Util {
     public static final int REASON_LIMITS = 19;
     public static final int REASON_VERSION = 20;
     public static final int REASON_NETID = 21;
+    public static final int REASON_REPLACED = 22;
 
     private SSU2Util() {}
 

@@ -75,6 +75,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private final Map<Hash, PeerState> _peersByIdent;
     /** RemoteHostId to PeerState */
     private final Map<RemoteHostId, PeerState> _peersByRemoteHost;
+    private final Map<Long, PeerState2> _peersByConnID;
     private PacketHandler _handler;
     private EstablishmentManager _establisher;
     private final MessageQueue _outboundMessages;
@@ -336,6 +337,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _log = ctx.logManager().getLog(UDPTransport.class);
         _peersByIdent = new ConcurrentHashMap<Hash, PeerState>(128);
         _peersByRemoteHost = new ConcurrentHashMap<RemoteHostId, PeerState>(128);
+        _peersByConnID = (xdh != null) ? new ConcurrentHashMap<Long, PeerState2>(32) : null;
         _dropList = new ConcurrentHashSet<RemoteHostId>(2);
         _endpoints = new CopyOnWriteArrayList<UDPEndpoint>();
         
@@ -852,6 +854,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _testEvent.setIsAlive(false);
         _peersByRemoteHost.clear();
         _peersByIdent.clear();
+        if (_peersByConnID != null)
+            _peersByConnID.clear();
         _dropList.clear();
         _introManager.reset();
         UDPPacket.clearCache();
@@ -1630,15 +1634,23 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
         return rv;
     }
-    
-    /** 
+
+    /**
      * get the state for the peer with the given ident, or null 
      * if no state exists
      */
-    PeerState getPeerState(Hash remotePeer) { 
+    PeerState getPeerState(Hash remotePeer) {
             return _peersByIdent.get(remotePeer);
     }
-    
+
+    /**
+     * Get the state by SSU2 connection ID
+     * @since 0.9.56
+     */
+    PeerState2 getPeerState(long rcvConnID) {
+        return _peersByConnID.get(Long.valueOf(rcvConnID));
+    }
+
     /** 
      * For /peers UI only. Not a public API, not for external use.
      *
@@ -1769,9 +1781,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 oldEstablishedOn = oldPeer.getKeyEstablishedTime();
             }
         }
+
+        if (peer.getVersion() == 2) {
+            PeerState2 state2 = (PeerState2) peer;
+            _peersByConnID.put(Long.valueOf(state2.getRcvConnID()), state2);
+        }
         
         RemoteHostId remoteId = peer.getRemoteHostId();
         if (oldPeer != null) {
+            sendDestroy(oldPeer, SSU2Util.REASON_REPLACED);
             oldPeer.dropOutbound();
             _introManager.remove(oldPeer);
             RemoteHostId oldID = oldPeer.getRemoteHostId();
@@ -1785,6 +1803,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     oldPeer2.dropOutbound();
                      _introManager.remove(oldPeer2);
                 }
+            }
+            if (oldPeer != peer && oldPeer.getVersion() == 2) {
+                PeerState2 state2 = (PeerState2) oldPeer;
+                _peersByConnID.remove(Long.valueOf(state2.getRcvConnID()));
             }
         }
 
@@ -1802,6 +1824,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // transfer over the old state/inbound message fragments/etc
             peer.loadFrom(oldPeer2);
             oldEstablishedOn = oldPeer2.getKeyEstablishedTime();
+            sendDestroy(oldPeer2, SSU2Util.REASON_REPLACED);
             oldPeer2.dropOutbound();
             _introManager.remove(oldPeer2);
         }
@@ -1983,6 +2006,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long now = _context.clock().now();
             _context.statManager().addRateData("udp.droppedPeer", now - peer.getLastReceiveTime(), now - peer.getKeyEstablishedTime());
             altByIdent = _peersByIdent.remove(peer.getRemotePeer());
+        }
+
+        if (peer.getVersion() == 2) {
+            PeerState2 state2 = (PeerState2) peer;
+            _peersByConnID.remove(Long.valueOf(state2.getRcvConnID()));
         }
         
         RemoteHostId remoteId = peer.getRemoteHostId();

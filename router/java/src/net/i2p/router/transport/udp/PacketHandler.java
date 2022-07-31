@@ -272,7 +272,7 @@ class PacketHandler {
                 //if (_log.shouldLog(Log.DEBUG))
                 //    _log.debug("Packet received IS for an existing peer");
                 if (state.getVersion() == 2)
-                    receiveSSU2Packet(packet, (PeerState2) state);
+                    ((PeerState2) state).receivePacket(rem, packet);
                 else
                     receivePacket(reader, packet, state);
             }
@@ -771,23 +771,6 @@ class PacketHandler {
 
     //// Begin SSU2 Handling ////
 
-    /**
-     *  Hand off to the state for processing.
-     *  Packet is decrypted in-place, no fallback
-     *  processing is possible.
-     *
-     *  Min packet data size: 40
-     *
-     *  @param packet any in-session message
-     *  @param state must be version 2, non-null
-     *  @since 0.9.54
-     */
-    private void receiveSSU2Packet(UDPPacket packet, PeerState2 state) {
-        // header and body decryption is done by PeerState2
-        // This bypasses InboundMessageStates completely.
-        // All handling of fragments and acks is done in PeerState2.
-        state.receivePacket(packet);
-    }
 
     /**
      *  Decrypt the header and hand off to the state for processing.
@@ -831,6 +814,20 @@ class PacketHandler {
                     // in group 4 receive packet
                     //if (_log.shouldDebug())
                     //    _log.debug("Does not decrypt as Session Request, Token Request, or Peer Test: " + header);
+                    if (header != null) {
+                        // conn ID decryption is the same for short and long header, with k1
+                        // presumably a data packet, either ip/port changed, or a race during establishment?
+                        // lookup peer state by conn ID, pass over for decryption with the proper k2
+                        long id = header.getDestConnID();
+                        PeerState2 ps2 = _transport.getPeerState(id);
+                        if (ps2 != null) {
+                            if (_log.shouldWarn())
+                                _log.warn("Migrated " + packet.getPacket().getLength() + " byte packet from " + from +
+                                          " for " + ps2);
+                            ps2.receivePacket(from, packet);
+                            return true;
+                        }
+                    }
                     return false;
                 }
                 type = header.getType();
@@ -925,7 +922,7 @@ class PacketHandler {
                 _establisher.receiveHolePunch(from, packet);
         } else {
             if (_log.shouldWarn())
-                _log.warn("Got unknown message " + header + " on " + state);
+                _log.warn("Got unknown SSU2 message " + header + " from " + from);
         }
         return true;
     }

@@ -310,6 +310,23 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
      *  @param packet fully encrypted, header and body decryption will be done here
      */
     void receivePacket(UDPPacket packet) {
+        receivePacket(packet.getRemoteHost(), packet);
+    }
+
+    /**
+     *  From different than expected source IP/port
+     *
+     *  @param from source address
+     *  @param packet fully encrypted, header and body decryption will be done here
+     *  @since 0.9.56
+     */
+    void receivePacket(RemoteHostId from, UDPPacket packet) {
+        if (!from.equals(_remoteHostId)) {
+            if (_log.shouldWarn())
+                _log.warn("Got packet from " + from + " expected " + _remoteHostId + " on " + this);
+            // Connection Migration TODO
+        }
+
         DatagramPacket dpacket = packet.getPacket();
         byte[] data = dpacket.getData();
         int off = dpacket.getOffset();
@@ -332,6 +349,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                     // attempting to decrypt with our intro key.
                     // resend session confirmed in response
                     checkRetransmitSessionConfirmed(_context.clock().now(), true);
+                    // alternatively, the session closed and we didn't get the termination,
+                    // and this is a new inbound session request? TODO
                 }
                 return;
             }
