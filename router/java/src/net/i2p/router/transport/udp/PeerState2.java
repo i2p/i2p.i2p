@@ -389,22 +389,11 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             int payloadLen = len - (SHORT_HEADER_SIZE + MAC_LEN);
             if (_log.shouldDebug())
                 _log.debug("New " + len + " byte pkt " + n + " rcvd on " + this);
-            processPayload(data, off + SHORT_HEADER_SIZE, payloadLen);
+            SSU2Payload.processPayload(_context, this, data, off + SHORT_HEADER_SIZE, payloadLen, false, from);
             packetReceived(payloadLen);
-        } catch (GeneralSecurityException gse) {
-            if (_log.shouldWarn())
-                _log.warn("Bad encrypted packet on: " + this + '\n' + HexDump.dump(data, off, len), gse);
-        } catch (IndexOutOfBoundsException ioobe) {
-            if (_log.shouldWarn())
-                _log.warn("Bad encrypted packet on: " + this + '\n' + HexDump.dump(data, off, len), ioobe);
-        }
-    }
-
-    private void processPayload(byte[] payload, int offset, int length) throws GeneralSecurityException {
-        try {
-            int blocks = SSU2Payload.processPayload(_context, this, payload, offset, length, false);
         } catch (Exception e) {
-            throw new GeneralSecurityException("Data payload error", e);
+            if (_log.shouldWarn())
+                _log.warn("Bad encrypted packet on: " + this + '\n' + HexDump.dump(data, off, len), e);
         }
     }
 
@@ -656,17 +645,18 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         _transport.getEstablisher().receiveSessionDestroy(_remoteHostId, this);
     }
 
-    public void gotPathChallenge(byte[] data) {
+    public void gotPathChallenge(RemoteHostId from, byte[] data) {
         if (_log.shouldInfo())
             _log.info("Got PATH CHALLENGE block, length: " + data.length + " on " + this);
         SSU2Payload.Block block = new SSU2Payload.PathResponseBlock(data);
         UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.emptyList(),
                                                              Collections.singletonList(block),
                                                              this);
+        // TODO send to from address?
         _transport.send(pkt);
     }
 
-    public void gotPathResponse(byte[] data) {
+    public void gotPathResponse(RemoteHostId from, byte[] data) {
         if (_log.shouldInfo())
             _log.info("Got PATH RESPONSE block, length: " + data.length + " on " + this);
         // TODO

@@ -181,7 +181,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     
     private void processPayload(byte[] payload, int offset, int length, boolean isHandshake) throws GeneralSecurityException {
         try {
-            int blocks = SSU2Payload.processPayload(_context, this, payload, offset, length, isHandshake);
+            int blocks = SSU2Payload.processPayload(_context, this, payload, offset, length, isHandshake, null);
             if (_log.shouldDebug())
                 _log.debug("Processed " + blocks + " blocks on " + this);
         } catch (Exception e) {
@@ -420,11 +420,11 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         _transport.getEstablisher().receiveSessionDestroy(_remoteHostId);
     }
 
-    public void gotPathChallenge(byte[] data) {
+    public void gotPathChallenge(RemoteHostId from, byte[] data) {
         throw new IllegalStateException("Bad block in handshake");
     }
 
-    public void gotPathResponse(byte[] data) {
+    public void gotPathResponse(RemoteHostId from, byte[] data) {
         throw new IllegalStateException("Bad block in handshake");
     }
 

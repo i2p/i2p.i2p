@@ -1821,7 +1821,7 @@ class EstablishmentManager {
             chacha.decryptWithAd(data, off, LONG_HEADER_SIZE,
                                  data, off + LONG_HEADER_SIZE, data, off + LONG_HEADER_SIZE, len - LONG_HEADER_SIZE);
             int payloadLen = len - (LONG_HEADER_SIZE + MAC_LEN);
-            SSU2Payload.processPayload(_context, cb, data, off + LONG_HEADER_SIZE, payloadLen, false);
+            SSU2Payload.processPayload(_context, cb, data, off + LONG_HEADER_SIZE, payloadLen, false, null);
             if (cb._respCode != 0) {
                 if (_log.shouldWarn())
                     _log.warn("Bad HolePunch response: " + cb._respCode);
@@ -2826,11 +2826,11 @@ class EstablishmentManager {
             throw new IllegalStateException("Bad block in HP");
         }
 
-        public void gotPathChallenge(byte[] data) {
+        public void gotPathChallenge(RemoteHostId from, byte[] data) {
             throw new IllegalStateException("Bad block in HP");
         }
 
-        public void gotPathResponse(byte[] data) {
+        public void gotPathResponse(RemoteHostId from, byte[] data) {
             throw new IllegalStateException("Bad block in HP");
         }
     }

@@ -126,27 +126,30 @@ class SSU2Payload {
         public void gotTermination(int reason, long lastReceived);
 
         /**
+         *  @param from null if unknown
          *  @since 0.9.55
          */
-        public void gotPathChallenge(byte[] data);
+        public void gotPathChallenge(RemoteHostId from, byte[] data);
 
         /**
+         *  @param from null if unknown
          *  @since 0.9.55
          */
-        public void gotPathResponse(byte[] data);
+        public void gotPathResponse(RemoteHostId from, byte[] data);
     }
 
     /**
      *  Incoming payload. Calls the callback for each received block.
      *
      *  @param isHandshake true for Token Req, Retry, Sess Req, Sess Created; false for Sess Confirmed
+     *  @param from for path challenge/response only, may be null
      *  @return number of blocks processed
      *  @throws IOException on major errors
      *  @throws DataFormatException on parsing of individual blocks
      *  @throws I2NPMessageException on parsing of I2NP block
      */
     public static int processPayload(I2PAppContext ctx, PayloadCallback cb,
-                                     byte[] payload, int off, int length, boolean isHandshake)
+                                     byte[] payload, int off, int length, boolean isHandshake, RemoteHostId from)
                                      throws IOException, DataFormatException, I2NPMessageException {
         int blocks = 0;
         boolean gotPadding = false;
@@ -367,7 +370,7 @@ class SSU2Payload {
                         throw new IOException("Illegal block in handshake: " + type);
                     byte[] cdata = new byte[len];
                     System.arraycopy(payload, i, cdata, 0, len);
-                    cb.gotPathChallenge(cdata);
+                    cb.gotPathChallenge(from, cdata);
                     break;
 
                 case BLOCK_PATHRESP:
@@ -375,7 +378,7 @@ class SSU2Payload {
                         throw new IOException("Illegal block in handshake: " + type);
                     byte[] rdata = new byte[len];
                     System.arraycopy(payload, i, rdata, 0, len);
-                    cb.gotPathResponse(rdata);
+                    cb.gotPathResponse(from, rdata);
                     break;
 
                 case BLOCK_PADDING:

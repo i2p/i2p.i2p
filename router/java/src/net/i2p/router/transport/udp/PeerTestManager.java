@@ -810,7 +810,7 @@ class PeerTestManager {
                                  data, off + LONG_HEADER_SIZE, data, off + LONG_HEADER_SIZE, len - LONG_HEADER_SIZE);
             int payloadLen = len - (LONG_HEADER_SIZE + MAC_LEN);
             SSU2Payload.PayloadCallback cb = new PTCallback(from);
-            SSU2Payload.processPayload(_context, cb, data, off + LONG_HEADER_SIZE, payloadLen, false);
+            SSU2Payload.processPayload(_context, cb, data, off + LONG_HEADER_SIZE, payloadLen, false, null);
         } catch (Exception e) {
             if (_log.shouldWarn())
                 _log.warn("Bad PeerTest packet:\n" + HexDump.dump(data, off, len), e);
@@ -1924,11 +1924,11 @@ class PeerTestManager {
             throw new IllegalStateException("Bad block in PT");
         }
 
-        public void gotPathChallenge(byte[] data) {
+        public void gotPathChallenge(RemoteHostId from, byte[] data) {
             throw new IllegalStateException("Bad block in PT");
         }
 
-        public void gotPathResponse(byte[] data) {
+        public void gotPathResponse(RemoteHostId from, byte[] data) {
             throw new IllegalStateException("Bad block in PT");
         }
     }
