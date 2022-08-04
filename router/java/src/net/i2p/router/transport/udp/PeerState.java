@@ -106,8 +106,6 @@ public class PeerState {
     protected volatile long _lastACKSend;
     /** when did we decide we need to ACK to this peer? */
     protected volatile long _wantACKSendSince;
-    /** have we received a packet with the ECN bit set in the current second? */
-    private boolean _currentSecondECNReceived;
     /**
      * have all of the packets received in the current second requested that
      * the previous second's ACKs be sent?
@@ -1355,7 +1353,6 @@ public class PeerState {
             congestionOccurred();
         }
         _context.statManager().addRateData("udp.congestionOccurred", _sendWindowBytes);
-        _currentSecondECNReceived = true;
         _lastReceiveTime = _context.clock().now();
     }
 
@@ -2424,6 +2421,7 @@ public class PeerState {
         buf.append(" sendACKAge: ").append(DataHelper.formatDuration(now - _lastACKSend));
         buf.append(" lifetime: ").append(DataHelper.formatDuration(now - _keyEstablishedTime));
         buf.append(" RTT: ").append(_rtt);
+        buf.append(" RTTdev: ").append(_rttDeviation);
         buf.append(" RTO: ").append(_rto);
         buf.append(" MTU: ").append(_mtu);
         buf.append(" LMTU: ").append(_largeMTU);
