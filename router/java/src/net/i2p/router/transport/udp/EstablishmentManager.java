@@ -1694,6 +1694,7 @@ class EstablishmentManager {
             if (!TransportUtil.isValidPort(port) ||
                 !_transport.isValid(ip) ||
                 _transport.isTooClose(ip) ||
+                DataHelper.eq(ip, bob.getRemoteIP()) ||
                 _context.blocklist().isBlocklisted(ip)) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Bad relay resp from " + charlie + " for " + Addresses.toString(ip, port));
