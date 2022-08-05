@@ -115,7 +115,7 @@ class IntroductionManager {
     private static final long MAX_SKEW = 2*60*1000;
     /** testing */
     private static final String PROP_PREFER_SSU2 = "i2np.ssu2.preferSSU2Introducers";
-    private static final boolean DEFAULT_PREFER_SSU2 = SSU2Util.ENABLE_RELAY && true;
+    private static final boolean DEFAULT_PREFER_SSU2 = true;
 
     public IntroductionManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
@@ -211,7 +211,7 @@ class IntroductionManager {
         if (_inbound.isEmpty()) return 0;
         List<PeerState> peers = new ArrayList<PeerState>(_inbound.values());
         int sz = peers.size();
-        boolean preferV2 = _context.getProperty(PROP_PREFER_SSU2, DEFAULT_PREFER_SSU2);
+        boolean preferV2 = _builder2 != null && _context.getProperty(PROP_PREFER_SSU2, DEFAULT_PREFER_SSU2);
         Collections.sort(peers, new PeerStateComparator(preferV2));
         int found = 0;
         long now = _context.clock().now();
@@ -222,6 +222,9 @@ class IntroductionManager {
         List<Introducer> introducers = new ArrayList<Introducer>(howMany);
         String exp = Long.toString((now + INTRODUCER_EXPIRATION) / 1000);
 
+        // try to keep a mix of v1 and v2
+        int ssu1count = 0;
+        int ssu2count = 0;
         // reuse old ones if ok
         if (current != null) {
             UDPAddress ua = new UDPAddress(current);
@@ -237,18 +240,22 @@ class IntroductionManager {
                 byte[] key = ua.getIntroducerKey(i);
                 if (key != null) {
                     // SSU 1
-                    //// debug, replace SSU 1 with SSU 2 if available for slots 1-2
-                    //// leave slot 0 for SSU 1
+                    //// Replace SSU 1 with SSU 2 if available for slot 2
+                    //// leave slots 0 and 1 for SSU 1
                     //// this will churn the SSU 1 introducers, oh well
-                    if (preferV2 && i > 0)
+                    if (preferV2 && ssu1count >= 2)
                         continue;
                     intro = new Introducer(ua.getIntroducerHost(i).getAddress(),
                                            ua.getIntroducerPort(i), key, tag, sexp);
+                    ssu1count++;
                     if (_log.shouldInfo())
                         _log.info("Reusing introducer: " + ua.getIntroducerHost(i));
                 } else {
                     // SSU 2
+                    if (ssu2count >= 2)
+                        continue;
                     intro = new Introducer(ua.getIntroducerHash(i), tag, sexp);
+                    ssu2count++;
                     if (_log.shouldInfo())
                         _log.info("Reusing introducer: " + ua.getIntroducerHash(i));
                 }
@@ -270,6 +277,8 @@ class IntroductionManager {
                     if (b64.equals(intro.shash))
                         continue outerloop;
                 }
+                if (ssu2count >= 2)
+                    continue;
             }
             RouterInfo ri = _context.netDb().lookupRouterInfoLocally(hash);
             if (ri == null) {
@@ -341,8 +350,10 @@ class IntroductionManager {
                     if (ikey == null)
                         continue;
                     intro = new Introducer(ip, port, ikey, cur.getTheyRelayToUsAs(), exp);
+                    ssu1count++;
                 } else {
                     intro = new Introducer(hash, cur.getTheyRelayToUsAs(), exp);
+                    ssu2count++;
                 }
                 introducers.add(intro);
                 found++;
