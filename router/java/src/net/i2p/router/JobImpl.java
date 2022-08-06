@@ -50,7 +50,21 @@ public abstract class JobImpl implements Job {
     public Exception getAddedBy() { return null; }
 
     public long getMadeReadyOn() { return _madeReadyOn; }
+
+    /**
+     *  Deprecated to avoid JobQueue deadlocks
+     *  @deprecated use madeReady(long)
+     */
+    @Deprecated
     public void madeReady() { _madeReadyOn = _context.clock().now(); }
+
+    /**
+     *  For JobQueue only, not for external use
+     *  @since 0.9.55
+     */
+    public void madeReady(long now) { _madeReadyOn = now; }
+
+
     public void dropped() {}
     
     /**

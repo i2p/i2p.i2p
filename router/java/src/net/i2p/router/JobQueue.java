@@ -206,7 +206,7 @@ public class JobQueue {
                         // don't skew us - its 'start after' its been queued, or later
                         job.getTiming().setStartAfter(now);
                         if (job instanceof JobImpl)
-                            ((JobImpl)job).madeReady();
+                            ((JobImpl)job).madeReady(now);
                         _readyJobs.offer(job);
                     } else {
                         _timedJobs.add(job);
@@ -559,7 +559,7 @@ public class JobQueue {
                                 lastTime = lastJob.getTiming().getStartAfter();
                                 if (timeLeft <= 0) {
                                     if (j instanceof JobImpl)
-                                        ((JobImpl)j).madeReady();
+                                        ((JobImpl)j).madeReady(now);
 
                                     _readyJobs.offer(j);
                                     iter.remove();
