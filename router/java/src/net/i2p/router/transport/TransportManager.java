@@ -87,6 +87,8 @@ public class TransportManager implements TransportEventListener {
      * @since 0.9.54
      */
     public final static String PROP_ENABLE_SSU2 = "i2np.ssu2.enable";
+    /** 1 in this many */
+    private static final int SSU2_ENABLE_PROBABILITY = 50;
     /** default true */
     public final static String PROP_ENABLE_NTCP = "i2np.ntcp.enable";
     /** default true */
@@ -259,7 +261,18 @@ public class TransportManager implements TransportEventListener {
     private void configTransports() {
         Transport udp = null;
         if (_enableUDP) {
-            X25519KeyFactory xdh = _context.getBooleanProperty(PROP_ENABLE_SSU2) ? _xdhThread : null;
+            String ssu2 = _context.getProperty(PROP_ENABLE_SSU2);
+            boolean enableSSU2 = false;
+            if (ssu2 == null) {
+                // Migration, to be removed when we change to default true
+                if (SystemVersion.isSlow() || _context.random().nextInt(SSU2_ENABLE_PROBABILITY) == 0) {
+                    enableSSU2 = true;
+                    _context.router().saveConfig(PROP_ENABLE_SSU2, "true");
+                }
+            } else {
+                enableSSU2 = Boolean.parseBoolean(ssu2);
+            }
+            X25519KeyFactory xdh = enableSSU2 ? _xdhThread : null;
             udp = new UDPTransport(_context, _dhThread, xdh);
             addTransport(udp);
             initializeAddress(udp);

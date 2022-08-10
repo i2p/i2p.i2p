@@ -1,3 +1,17 @@
+2022-08-10 zzz
+ * SSU2: Enable for Android, ARM, and 2% of others
+
+2022-08-06 zzz
+ * GeoIP 2022-08
+ * Router: Hopefully fix clock/job queue deadlock after clock shift
+
+2022-08-05 zzz
+ * SSU: Try to keep a mix of v1/v2 introducers
+
+2022-08-04 zzz
+ * i2ptunnel: New outproxy (new installs only)
+ * SSU2: Block bob's IP in relay response from charlie
+
 2022-08-02 zzz
  * SSU2: More Path challenge WIP
 
