@@ -1667,6 +1667,12 @@ input.reload[name="recheck"], input.reload[name="recheck"]:active, input.disable
      margin-left: 2px !important
 }
 
+input.disabled[name="showEdit"] {
+     background: #989 url(images/restore.png);
+     background: url(images/restore.png), linear-gradient(to bottom, #989 0%, #878 100%);
+     margin-left: 2px !important
+}
+
 input.disabled[name="recheck"]:hover {
      background-blend-mode: initial;
 }

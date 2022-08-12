@@ -1566,6 +1566,12 @@ input.reload[name="recheck"], input.disabled[name="recheck"] {
      margin: 6px 2px;
 }
 
+input.disabled[name="showEdit"] {
+     background: url(images/restore.png) no-repeat 5px center, linear-gradient(to bottom, #eeecea 50%, #ded9d5 50%);
+     padding: 5px 5px 5px 21px !important;
+     margin: 6px 2px;
+}
+
 input.reload[name="recheck"]:hover, input.reload[name="recheck"]:focus {
      background: url(images/recheck.png) no-repeat 5px center, linear-gradient(to bottom, #fff7ef 51%, #cfc1b5 52%);
 }
