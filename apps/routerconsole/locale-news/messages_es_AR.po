@@ -1,0 +1,67 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-05-05 15:14+0000\n"
+"PO-Revision-Date: 2013-07-20 14:49+0000\n"
+"Last-Translator: duck <duck@mail.i2p>\n"
+"Language-Team: Spanish (Argentina) (http://www.transifex.com/otf/I2P/language/es_AR/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: es_AR\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+
+msgid "Congratulations on getting I2P installed!"
+msgstr "¡Felicidades por conseguir instalar I2P!"
+
+msgid "Welcome to I2P!"
+msgstr "&iexcl;Bienvenido a I2P!"
+
+#, java-format
+msgid "Please {0}have patience{1} as I2P boots up and finds peers."
+msgstr "¡Por favor, tenga {0}paciencia{1} mientras I2P se arranca y encuentra otros pares!"
+
+#, java-format
+msgid ""
+"While you are waiting, please {0}adjust your bandwidth settings{1} on the "
+"{2}configuration page{3}."
+msgstr "Este es el momento ideal para adaptar tu {0}configuraci&oacute;n del ancho de banda{1} en la {2}p&aacute;gina de configuraci&oacute;n{3}."
+
+msgid ""
+"Also you can setup your browser to use the I2P proxy to reach eepsites."
+msgstr "También puede configurar su navegador para usar el proxy de I2P para ver las eepsites."
+
+msgid ""
+"Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
+"browser settings."
+msgstr "Simplemente escriba 127.0.0.1 (o localhost) puerto 4444 en la configuración de proxy de su navegador."
+
+msgid "Do not use SOCKS for this."
+msgstr "No use SOCKS para esto."
+
+#, java-format
+msgid ""
+"More information can be found on the {0}I2P browser proxy setup page{1}."
+msgstr "Puede encontrarse más información en la web{1} de configuración del proxy del navegador de {0}I2P"
+
+#, java-format
+msgid ""
+"Once you have a \"shared clients\" destination listed on the left, please "
+"{0}check out{1} our {2}FAQ{3}."
+msgstr "En cuanto veas a la izquierda una conexi&oacute;n llamada \"clientes diferentes\", puedes visitar nuestros {0}{1} {2}FAQ{3}."
+
+#, java-format
+msgid ""
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on "
+"{2}#i2p{3}."
+msgstr "Dirija su cliente de IRC hacia {0}localhost:6668{1} y salúdenos en {2}#i2p{3}."
+
+msgid "I2P Development Team"
+msgstr "Equipo de desarrollo de I2P"

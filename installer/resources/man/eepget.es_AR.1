@@ -1,0 +1,94 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH EEPGET 1 "November 27, 2021" "" I2P
+
+.SH NOMBRE
+Eepget \- Gestor de descarga de I2P
+
+.SH SINOPSIS
+\fBeepget\fP [\fIopciones\fP]\fIURL\fP
+.br
+
+.SH DESCRIPCIÓN
+.P
+Descarga un fichero de forma no interactiva vía HTTP. Están soportadas las
+transferencias tanto a través de I2P como de la Internet regular.
+.P
+Eepget puede enfrentarse a conexiones de red lentas o inestables; si una
+descarga no se completa a causa de un problema de red, seguirá intentándolo
+hasta que el fichero se haya descargado del todo (si la opción \-n está
+establecida). Si el servidor remoto lo soporta, eepget le dará instrucciones
+para que reanude la descarga desde el punto en que se interrumpió.
+
+.SH OPCIONES
+\fB\-c\fP
+.TP 
+Clearnet (red abierta). No utiliza un proxy. Lo mismo que \fB\-p\fP :0 .
+.TP 
+
+\fB\-e\fP etag
+.TP 
+Establece el valor de la etag en las cabeceras HTTP de las peticiones.
+.TP 
+
+\fB\-h\fP nombre=valor
+.TP 
+Añade una cabecera arbitraria de petición HTTP con el nombre y valor dados.
+.TP 
+
+\fB\-l\fP tamañoLínea
+.TP 
+Controla el indicador de progreso. \fB\ tamañoLínea \fP es el tamaño de una línea de progreso en caracteres. El valor predeterminado es 40.
+.TP 
+
+\fB\-m\fP volumenMarca
+.TP 
+Controla el indicador de progreso. \fB\ volumenMarca \fP es el número de bytes que cada caracter '#' representa en la línea de progreso. El valor predeterminado es 1024.
+.TP 
+
+\fB\-n\fP reintentos
+.TP 
+Especifica el número de veces a reintentar la descarga si no se completa. Si no se especifica esta opción, eepget no efectuará reintentos.
+.TP 
+
+\fB\-o\fP fichero
+.TP 
+Establece el fichero de salida al que escribir. Si no se proporciona esta opción, el nombre del fichero de salida se determinará por la URL.
+.TP 
+
+\fB\-p\fP servidor_proxy[:puerto]
+.TP 
+Especifica un servidor proxy I2P (eeproxy) a usar. Si no se especifica el puerto, eepget usará 4444. Si no se especifica esta opción, eepget usará 127.0.0.1:4444. Especifique \fB\-c\fP o \fB\-p\fP :0 para deshabilitar el eeproxy.
+.TP 
+
+\fB\-t\fP segundos
+.TP 
+Establece el tiempo de espera por inactividad. El valor predeterminado es 60 segundos.
+.TP 
+
+\fB\-u\fP nombreUsuario
+.TP 
+Establece el nombre de usuario para la autorización del proxy, si se requiere.
+.TP 
+
+\fB\-x\fP contraseña
+.TP 
+Establece la contraseña para la autorización del proxy, si se requiere. Si se especifica un nombre de usuario pero no una contraseña, EepGet solicitará la contraseña.
+
+.SH "ESTADO DE LA SALIDA"
+
+\fBeepget\fP produce una salida con estado cero cuando la transferencia se ha
+completado, y no\-cero si hubo problemas con la descarga.
+
+.SH "INFORMAR DE FALLOS"
+Por favor, introduzca una incidencia en
+.UR https://i2pgit.org/i2p\-hackers/i2p.i2p/\-/issues
+el servidor GitLab de I2P
+.UE .
+
+.SH "VEA TAMBIÉN"
+\fBi2prouter\fP(1)  \fBcurl\fP(1)  \fBwget\fP(1)
+

@@ -37,6 +37,7 @@ public class ConfigUIHelper {
         //{ "et", "ee", "Eesti", null },
         { "en", "us", "English", null },
         { "es", "es", "Español", null },
+        { "es", "ar", "Español" ,"Argentina" },
         { "fa", "ir", "Persian فارسی", null },
         { "fr", "fr", "Français", null },
         //{ "gl", "lang_gl", "Galego", null },
