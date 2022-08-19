@@ -6627,7 +6627,7 @@ msgstr "初期設定はほとんどの人には機能します。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:551
 msgid "There is a fundamental tradeoff between anonymity and performance."
-msgstr "匿名性とパフォーマンスの間には基本的なトレードオフがあります。"
+msgstr "匿名性とパフォーマンスの間には根本的な、兼ね合いがあります。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:554
 msgid ""
@@ -7335,7 +7335,7 @@ msgstr "別の I2P のインスタンスを実行していませんか？競合�
 msgid ""
 "The skew (offset) of your computer's clock relative to the network-synced "
 "time."
-msgstr "ネットワーク同期時間と比較したユーザーのコンピューター時間の歪み（オフセット）"
+msgstr "ネットワーク同期時間と比較したユーザーのコンピューター時間の歪み（オフセット）。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:634
 msgid "I2P requires your computer's time be accurate."
@@ -7546,7 +7546,7 @@ msgstr "I2P 内の IRC につなぐには？"
 msgid ""
 "A tunnel to the main IRC server network within I2P, Irc2P, is automatically "
 "started when the I2P router starts."
-msgstr "I2Pルーターが起動すると、I2P内の主なIRCサーバネットワークであるIrc2Pへのトンネルが自動的に開始されます。"
+msgstr "I2Pルーターが起動すると、I2P内の主なIRCサーバーネットワークであるIrc2Pへのトンネルが自動的に開始されます。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:722
 msgid ""
@@ -7944,7 +7944,7 @@ msgid ""
 "To learn more about how important I2P Reseed servers are, or explore other "
 "topics and what functions they perform for I2P, you can visit the {0}I2P "
 "Wiki{1}."
-msgstr "I2P 再シードサーバがどれほど重要なのか、また他の話題やI2Pのためにどのような機能を果たしているのかを調べるには、{0}I2P Wiki{1}をご覧ください。"
+msgstr "I2P 再シードサーバーがどれほど重要なのか、また他の話題やI2Pのためにどのような機能を果たしているのかを調べるには、{0}I2P Wiki{1}をご覧ください。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:554
 #, java-format

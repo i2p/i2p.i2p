@@ -402,7 +402,7 @@ msgstr "選択した添付ファイルを削除する"
 #. Integer.toString(DEFAULT_SMTPPORT));
 #: src/src/i2p/susi/webmail/WebMail.java:3100
 msgid "Email Login"
-msgstr "Eメールログイン"
+msgstr "Eメールにログイン"
 
 #. current postman hq length limits 16/12, new postman version 32/32
 #: src/src/i2p/susi/webmail/WebMail.java:3102
@@ -596,7 +596,7 @@ msgstr "メールサーバーのログインに失敗しました、ユーザー
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:749
 msgid "Logout and then login again with the correct username and password."
-msgstr "ログアウトしてから、正しいユーザー名とパスワードで再度ログインします。"
+msgstr "ログアウトしてから、正しいユーザー名とパスワードで再度ログインしてください。"
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1238
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1240

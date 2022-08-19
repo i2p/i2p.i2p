@@ -6948,7 +6948,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:443
 msgid "Further Assistance"
-msgstr ""
+msgstr "Περαιτέρω Βοήθεια"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:445
 msgid ""

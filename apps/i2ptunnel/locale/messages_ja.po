@@ -15,8 +15,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-17 13:12+0000\n"
-"PO-Revision-Date: 2022-02-17 12:18+0000\n"
-"Last-Translator: daingewuvzeevisiddfddd\n"
+"PO-Revision-Date: 2011-02-13 11:46+0000\n"
+"Last-Translator: daingewuvzeevisiddfddd, 2022\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -224,7 +224,7 @@ msgstr "種類"
 msgid ""
 "Name of tunnel to be displayed on Tunnel Manager home page and the router "
 "console sidebar"
-msgstr "トンネルマネージャのホームページとルータコンソールのサイドバーに表示するトンネルの名前"
+msgstr "トンネルマネージャのホームページとルーターコンソールのサイドバーに表示するトンネルの名前"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:270
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1123
@@ -251,13 +251,13 @@ msgstr "トンネルマネージャのホームページに表示するトンネ
 msgid ""
 "Enable this option to ensure this service is available when the router "
 "starts"
-msgstr "この設定を有効にすると、ルータの起動時にこのサービスが利用可能になります"
+msgstr "この設定を有効にすると、ルーターの起動時にこのサービスが利用可能になります"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:282
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1135
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:584
 msgid "Automatically start tunnel when router starts"
-msgstr "ルータが起動したときにトンネルを自動で開始"
+msgstr "ルーターが起動したときにトンネルを自動で開始"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:286
 msgid ""
@@ -341,7 +341,7 @@ msgid ""
 "If you are accessing a service on a remote I2P router, you may wish to "
 "connect with SSL to avoid traffic interception. The client application "
 "should be also be configured to use SSL."
-msgstr "もし遠隔のI2Pルータサービスにアクセスしているなら、トラフィックの傍受を避けるためにSSLを使って接続することをお勧めします。クライアントアプリケーションもSSLを使う設定をする必要があります。"
+msgstr "もし遠隔のI2Pルーターサービスにアクセスしているなら、トラフィックの傍受を避けるためにSSLを使って接続することをお勧めします。クライアントアプリケーションもSSLを使う設定をする必要があります。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:386
 msgid "Clients use SSL to connect to tunnel"
@@ -968,7 +968,7 @@ msgstr "あなたのアドレス帳でホストが見つからない場合に、
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1018
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2394
 msgid "Router I2CP Address"
-msgstr "ルータのI2CPアドレス"
+msgstr "ルーターのI2CPアドレス"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1022
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2398
@@ -1339,7 +1339,7 @@ msgstr "クライアントごとにユニークなローカルアドレスを設
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2247
 msgid "Only enable if you are hosting this service on multiple routers"
-msgstr "複数のルータでこのサービスをホストしている場合のみ有効にしてください。"
+msgstr "複数のルーターでこのサービスをホストしている場合のみ有効にしてください。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2251
 msgid "Optimize for Multihoming"
@@ -1492,7 +1492,7 @@ msgstr "トンネルはまだ初期化されていませんので、数分後に
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:163
 msgid "These are the local services provided by your router."
-msgstr "これらはルータが提供するローカルサービスです。"
+msgstr "これらはルーターが提供するローカルサービスです。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:165
 msgid ""
@@ -2125,7 +2125,7 @@ msgstr "I2P外のIRCネットワークも、I2P内のSOCKSアウトプロキシ�
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:322
 msgid "A basic server tunnel for hosting a generic service inside I2P."
-msgstr "I2P 内の汎用サービスをホスティングするための基本的なサーバトンネル。"
+msgstr "I2P 内の汎用サービスをホスティングするための基本的なサーバートンネル。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:326
 msgid "A server tunnel that is customized for HTTP connections."
@@ -2143,7 +2143,7 @@ msgstr "I2P 内の IRC ネットワークをホストするためのカスタマ
 msgid ""
 "Usually, a separate tunnel needs to be created for each IRC server that is "
 "to be accessible inside I2P."
-msgstr "通常、I2P内でアクセスできるIRCサーバごとに別のトンネルを作成する必要があります。"
+msgstr "通常、I2P内でアクセスできるIRCサーバーごとに別のトンネルを作成する必要があります。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:338
 msgid "Select tunnel type"
@@ -2157,7 +2157,7 @@ msgstr "トンネルに名前と詳細を設けてください。"
 msgid ""
 "These can be anything you want - they are just for ease of identifying the "
 "tunnel in the routerconsole."
-msgstr "これらは、あなたが望む何でも構いません - これらは、単にルータコンソールでトンネルを識別するためのを簡単にするためだけです。"
+msgstr "これらは、あなたが望む何でも構いません - これらは、単にルーターコンソールでトンネルを識別するためのを簡単にするためだけです。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:407
 msgid ""
@@ -2219,14 +2219,14 @@ msgstr "たいていの場合127.0.0.1のみ許可します"
 msgid ""
 "The I2P router can automatically start this tunnel for you when the router "
 "is started."
-msgstr "I2Pルータが起動すると自動的にこのトンネルを開始できます"
+msgstr "I2Pルーターが起動すると自動的にこのトンネルを開始できます"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:578
 msgid ""
 "This can be useful for frequently-used tunnels (especially server tunnels), "
 "but for tunnels that are only used occasionally it would mean that the I2P "
 "router is creating and maintaining unnecessary tunnels."
-msgstr "これは頻繁に使われるトンネル（特にサーバートンネル）には便利ですが、たまにしか使われないトンネルには、I2P ルータが不要なトンネルを作成して維持していることになります。"
+msgstr "これは頻繁に使われるトンネル（特にサーバートンネル）には便利ですが、たまにしか使われないトンネルには、I2P ルーターが不要なトンネルを作成して維持していることになります。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:604
 msgid "The wizard has now collected enough information to create your tunnel."
@@ -2242,11 +2242,11 @@ msgstr "下の保存ボタンをクリックすると、ウィザードがトン
 msgid ""
 "Because you chose to automatically start the tunnel when the router starts, "
 "you don't have to do anything further."
-msgstr "ルータ起動時にトンネルを自動的に開始するよう選んでいるため、他に何かする必要はありません。"
+msgstr "ルーター起動時にトンネルを自動的に開始するよう選んでいるため、他に何かする必要はありません。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:613
 msgid "The router will start the tunnel once it has been set up."
-msgstr "ルータが起動したらトンネルを開始します。"
+msgstr "ルーターが起動したらトンネルを開始します。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:617
 msgid ""

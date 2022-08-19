@@ -194,7 +194,7 @@ msgid ""
 "eepget will use 4444. If this option is not specified, eepget will use "
 "127.0.0.1:4444. Specify B<-c> or B<-p> :0 to disable the eeproxy."
 msgstr ""
-"使用するI2Pプロキシサーバ(eeproxy)を明示する。ポートは明示されてないとき、eepgetは4444を使用する。このオプションが明示されてないとき、eepgetは"
+"使用するI2Pプロキシサーバー(eeproxy)を明示する。ポートは明示されてないとき、eepgetは4444を使用する。このオプションが明示されてないとき、eepgetは"
 " 127.0.0.1:4444 を使用する。eeproxyを無効化するには B<-c> または B<-p> :0を明示する。"
 
 #. type: Plain text
@@ -282,7 +282,7 @@ msgstr "I2PROUTER"
 #. type: Plain text
 #: man/i2prouter.1:5
 msgid "i2prouter - start and stop the I2P router"
-msgstr "i2prouter - I2Pルータの起動と停止"
+msgstr "i2prouter - I2Pルーターの起動と停止"
 
 #. type: Plain text
 #: man/i2prouter.1:9

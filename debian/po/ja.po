@@ -4,15 +4,16 @@
 # 
 # Translators:
 # kami <b52c55627324b29125cbcfb101258463_228943>, 2015
-# タカハシ <indexial@outlook.jp>, 2014
+# daingewuvzeevisiddfddd, 2022
+# タカハシ, 2014
 # Masayuki Hatta <mhatta@mhatta.org>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
 "POT-Creation-Date: 2017-11-12 14:01+0000\n"
-"PO-Revision-Date: 2018-08-17 22:12+0000\n"
-"Last-Translator: Masayuki Hatta <mhatta@mhatta.org>\n"
+"PO-Revision-Date: 2011-10-03 21:48+0000\n"
+"Last-Translator: daingewuvzeevisiddfddd, 2022\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,7 +25,7 @@ msgstr ""
 #. Description
 #: ../i2p.templates:2001
 msgid "Should the I2P router be started at boot?"
-msgstr "I2P ルータをシステムブート時に起動しますか？"
+msgstr "I2P ルーターをシステムブート時に起動しますか？"
 
 #. Type: boolean
 #. Description
@@ -76,7 +77,7 @@ msgstr "デフォルトでは、 I2P は最大 128MB メモリまでしか使用
 msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
-msgstr "帯域幅の多いルータ、あるいはたくさんのアクティブな torrent / プラグインがあるルータも、この値を増やす必要がある場合があります。"
+msgstr "帯域幅の多いルーター、あるいはたくさんのアクティブな torrent / プラグインがあるルーターも、この値を増やす必要がある場合があります。"
 
 #. Type: boolean
 #. Description

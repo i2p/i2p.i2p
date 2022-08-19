@@ -4,6 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# daingewuvzeevisiddfddd, 2022
 # タカハシ, 2022
 # Masayuki Hatta <mhatta@mhatta.org>, 2018
 # daingewuvzeevisiddfddd, 2021
@@ -13,8 +14,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
-"PO-Revision-Date: 2022-02-14 11:11+0000\n"
-"Last-Translator: タカハシ\n"
+"PO-Revision-Date: 2013-07-20 14:50+0000\n"
+"Last-Translator: daingewuvzeevisiddfddd, 2022\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -43,7 +44,7 @@ msgstr "到達できないウェブサイト"
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:368
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:402
 msgid "Router Console"
-msgstr "ルータコンソール"
+msgstr "ルーターコンソール"
 
 #: ../java/build/Proxy.java:7 ../java/build/Proxy.java:18
 #: ../java/build/Proxy.java:30 ../java/build/Proxy.java:42
@@ -56,7 +57,7 @@ msgstr "ルータコンソール"
 #: ../java/build/Proxy.java:174 ../java/build/Proxy.java:187
 #: ../java/build/Proxy.java:199 ../java/build/Proxy.java:209
 msgid "I2P Router Console"
-msgstr "I2P ルータコンソール"
+msgstr "I2P ルーターコンソール"
 
 #: ../java/build/Proxy.java:8 ../java/build/Proxy.java:19
 #: ../java/build/Proxy.java:31 ../java/build/Proxy.java:43
@@ -111,7 +112,7 @@ msgstr "ウェブサイトに到達できません。"
 msgid ""
 "The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr "ウェブサイトはオフラインか、ネットワークが混み合っているか、あるいはルータがまだきちんとピアに統合されていません。"
+msgstr "ウェブサイトはオフラインか、ネットワークが混み合っているか、あるいはルーターがまだきちんとピアに統合されていません。"
 
 #: ../java/build/Proxy.java:14 ../java/build/Proxy.java:58
 #: ../java/build/Proxy.java:109 ../java/build/Proxy.java:129
@@ -185,7 +186,7 @@ msgstr "アドレス帳へ保存すると、この通知をもう一度見るこ
 msgid ""
 "If you do not save it, the host name will be forgotten after the next router"
 " restart."
-msgstr "保存しなければ、ホスト名はルータを再起動すると忘れられます。"
+msgstr "保存しなければ、ホスト名はルーターを再起動すると忘れられます。"
 
 #: ../java/build/Proxy.java:39
 msgid ""
@@ -241,7 +242,7 @@ msgstr "このブラウザの設定が悪いです。"
 msgid ""
 "Do not use the proxy to access the router console, localhost, or local LAN "
 "destinations."
-msgstr "ルータコンソール、ローカルホスト、またはローカルLANの宛先へアクセスするのにプロキシを使わないでください。"
+msgstr "ルーターコンソール、ローカルホスト、またはローカルLANの宛先へアクセスするのにプロキシを使わないでください。"
 
 #: ../java/build/Proxy.java:78
 msgid "Website Unknown"
@@ -253,7 +254,7 @@ msgstr "アドレス帳にウェブサイトが見つかりませんでした"
 
 #: ../java/build/Proxy.java:85
 msgid "The website was not found in your router's addressbook."
-msgstr "あなたのルータのアドレス帳にウェブサイトが見つかりませんでした。"
+msgstr "あなたのルーターのアドレス帳にウェブサイトが見つかりませんでした。"
 
 #: ../java/build/Proxy.java:86
 msgid "Check the link or find a Base 32 or Base 64 address."
@@ -386,7 +387,7 @@ msgstr "HTTPアウトプロキシが見つかりませんでした。"
 msgid ""
 "It is offline, there is network congestion, or your router is not yet well-"
 "integrated with peers."
-msgstr "オフラインであるか、ネットワークが混雑しているか、ルータがまだピアとうまく統合されていないかのいずれかです。"
+msgstr "オフラインであるか、ネットワークが混雑しているか、ルーターがまだピアとうまく統合されていないかのいずれかです。"
 
 #: ../java/build/Proxy.java:172 ../java/build/Proxy.java:178
 msgid "Warning: Request Denied"
@@ -414,7 +415,7 @@ msgstr "このプロキシは、アクセスにユーザー名とパスワード
 msgid ""
 "Please enter your username and password, or check your {0}router "
 "configuration{1} or {2}I2PTunnel configuration{3}."
-msgstr "ユーザー名とパスワードを入力、または{0}ルータ設定{1}または{2}I2Pトンネル設定{3}を確認してください。"
+msgstr "ユーザー名とパスワードを入力、または{0}ルーター設定{1}または{2}I2Pトンネル設定{3}を確認してください。"
 
 #: ../java/build/Proxy.java:184
 #, java-format
@@ -515,7 +516,7 @@ msgstr "保存せずに {0} を続行"
 msgid ""
 "You can browse to the site without saving it to the address book. The "
 "address will be remembered until you restart your I2P router."
-msgstr "アドレス帳に保存しなくても閲覧できます。アドレスはI2Pルータを再起動するまで記憶されます。"
+msgstr "アドレス帳に保存しなくても閲覧できます。アドレスはI2Pルーターを再起動するまで記憶されます。"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1453
 msgid "Continue without saving"
@@ -524,13 +525,13 @@ msgstr "保存せずに続行"
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1460
 #, java-format
 msgid "Save {0} to router address book and continue to website"
-msgstr "ルータのアドレス帳に {0} を保存し、ウェブサイトを続行"
+msgstr "ルーターのアドレス帳に {0} を保存し、ウェブサイトを続行"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1461
 msgid ""
 "This address will be saved to your Router address book where your "
 "subscription-based addresses are stored."
-msgstr "このアドレスは、購読ベースのアドレスが保存されているルータのアドレス帳に保存されます。"
+msgstr "このアドレスは、購読ベースのアドレスが保存されているルーターのアドレス帳に保存されます。"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1463
 msgid ""
@@ -662,7 +663,7 @@ msgstr "戻ってエラーを修正"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:345
 msgid "router"
-msgstr "ルータ"
+msgstr "ルーター"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:347
 msgid "local"
