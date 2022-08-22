@@ -1,3 +1,5 @@
+2022-08-22 1.9.0 released
+
 2022-08-10 zzz
  * SSU2: Enable for Android, ARM, and 2% of others
 
