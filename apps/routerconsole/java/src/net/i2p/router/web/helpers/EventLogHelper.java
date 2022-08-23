@@ -36,6 +36,7 @@ public class EventLogHelper extends FormHandler {
         EventLog.CLOCK_SHIFT, _x("Clock shifted"),
         EventLog.CRASHED, _x("Crashed"),
         EventLog.CRITICAL, _x("Critical error"),
+        EventLog.DEADLOCK, _x("Deadlock detected"),
         EventLog.INSTALLED, _x("Installed new version"),
         EventLog.INSTALL_FAILED, _x("Install failed"),
         EventLog.NETWORK, _x("Network error"),

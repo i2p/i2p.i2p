@@ -40,6 +40,7 @@ public class EventLog {
     public static final String CLOCK_SHIFT = "clockShift";
     public static final String CRASHED = "crashed";
     public static final String CRITICAL = "critical";
+    public static final String DEADLOCK = "deadlock";
     public static final String INSTALLED = "installed";
     public static final String INSTALL_FAILED = "installFailed";
     public static final String NETWORK = "network";

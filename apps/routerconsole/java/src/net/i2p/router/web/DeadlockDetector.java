@@ -4,7 +4,8 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 
-import net.i2p.I2PAppContext;
+import net.i2p.router.RouterContext;
+import net.i2p.router.util.EventLog;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
@@ -19,12 +20,12 @@ import net.i2p.util.SimpleTimer2;
  */
 class DeadlockDetector extends SimpleTimer2.TimedEvent {
 
-    private final I2PAppContext _context;
+    private final RouterContext _context;
     private final Log _log;
     private static final String PROP_INTERVAL = "router.deadlockDetectIntervalHours";
     private static final long DEFAULT_INTERVAL = 24;
 
-    public DeadlockDetector(I2PAppContext ctx) {
+    public DeadlockDetector(RouterContext ctx) {
         super(ctx.simpleTimer2());
         _context = ctx;
         _log = _context.logManager().getLog(DeadlockDetector.class);
@@ -41,6 +42,7 @@ class DeadlockDetector extends SimpleTimer2.TimedEvent {
     public void timeReached() {
         long start = System.currentTimeMillis();
         boolean detected = detect();
+        // only reschedule if not detected
         if (!detected) {
             long time = System.currentTimeMillis() - start;
             if (_log.shouldDebug())
@@ -55,7 +57,7 @@ class DeadlockDetector extends SimpleTimer2.TimedEvent {
         return detect(_context);
     }
 
-    public static boolean detect(I2PAppContext ctx) {
+    public static boolean detect(RouterContext ctx) {
         try {
             ThreadMXBean mxb = ManagementFactory.getThreadMXBean();
             long[] ids = mxb.findDeadlockedThreads();
@@ -89,6 +91,7 @@ class DeadlockDetector extends SimpleTimer2.TimedEvent {
             buf.append("\nAfter reporting, please restart your router!\n");
             Log log = ctx.logManager().getLog(DeadlockDetector.class);
             log.log(Log.CRIT, buf.toString());
+            ctx.router().eventLog().addEvent(EventLog.DEADLOCK, infos.length + " threads");
         } catch (Throwable t) {
             // class not found, unsupportedoperation, ...
             Log log = ctx.logManager().getLog(DeadlockDetector.class);
