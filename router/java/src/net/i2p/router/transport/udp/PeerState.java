@@ -208,7 +208,7 @@ public class PeerState {
     protected final UDPTransport _transport;
 
     /** have we migrated away from this peer to another newer one? */
-    private volatile boolean _dead;
+    protected volatile boolean _dead;
 
     /** The minimum number of outstanding messages (NOT fragments/packets) */
     private static final int MIN_CONCURRENT_MSGS = 8;

@@ -1645,7 +1645,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     /**
      * Get the state by SSU2 connection ID
-     * @since 0.9.56
+     * @since 0.9.55
      */
     PeerState2 getPeerState(long rcvConnID) {
         return _peersByConnID.get(Long.valueOf(rcvConnID));
@@ -1671,7 +1671,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return _peersByIdent.keySet();
     }
 
-    /** 
+    /**
      *  Remove and add to peersByRemoteHost map
      *  @since 0.9.3
      */
@@ -1688,6 +1688,24 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
         if (_log.shouldInfo() && oldPort != newPort)
             _log.info("Changed port from " + oldPort + " to " + newPort + " for " + peer);
+    }
+
+    /**
+     *  Remove and add to peersByRemoteHost map
+     *  @since 0.9.56
+     */
+    void changePeerAddress(PeerState2 peer, RemoteHostId newAddress) {
+        RemoteHostId oldAddress;
+        synchronized (_addDropLock) {
+            oldAddress = peer.getRemoteHostId();
+            if (!oldAddress.equals(newAddress)) {
+                _peersByRemoteHost.remove(oldAddress);
+                peer.changeAddress(newAddress);
+                _peersByRemoteHost.put(newAddress, peer);
+            }
+        }
+        if (_log.shouldInfo() && !oldAddress.equals(newAddress))
+            _log.info("Changed address from " + oldAddress + " to " + newAddress + " for " + peer);
     }
 
     /**

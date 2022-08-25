@@ -1,3 +1,10 @@
+2022-08-25 zzz
+ * Router: Fix deadlock via rebuildRouterAddress() and UDPTransport
+ * SSU2: Implement path challenge and connection migration
+
+2022-08-23 zzz
+ * Router: Add deadlocks to event log
+
 2022-08-22 1.9.0 released
 
 2022-08-10 zzz

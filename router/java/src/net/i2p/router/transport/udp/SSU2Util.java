@@ -21,7 +21,7 @@ final class SSU2Util {
     // features
     public static final boolean ENABLE_RELAY = true;
     public static final boolean ENABLE_PEER_TEST = true;
-    public static final boolean ENABLE_PATH_CHALLENGE = false;
+    public static final boolean ENABLE_PATH_CHALLENGE = true;
 
     // lengths
     /** 32 */
