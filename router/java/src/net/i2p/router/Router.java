@@ -41,6 +41,7 @@ import net.i2p.data.PublicKey;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.i2np.GarlicMessage;
+import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.crypto.FamilyKeyCrypto;
@@ -1003,9 +1004,11 @@ public class Router implements RouterClock.ClockShiftListener {
     public void rebuildRouterInfo(boolean blockingRebuild) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Rebuilding new routerInfo, publish inline? " + blockingRebuild, new Exception("I did it"));
+        // deadlock thru createAddresses() thru SSU REA... moved outside lock
+        List<RouterAddress> addresses = _context.commSystem().createAddresses();
         _routerInfoLock.writeLock().lock();
         try {
-            locked_rebuildRouterInfo(blockingRebuild);
+            locked_rebuildRouterInfo(addresses);
         } finally {
             _routerInfoLock.writeLock().unlock();
         }
@@ -1016,9 +1019,8 @@ public class Router implements RouterClock.ClockShiftListener {
      * Rebuild and republish our routerInfo since something significant 
      * has changed.
      *
-     * @param blockingRebuild ignored, always nonblocking
      */
-    private void locked_rebuildRouterInfo(boolean blockingRebuild) {
+    private void locked_rebuildRouterInfo(List<RouterAddress> addresses) {
         RouterInfo ri;
         if (_routerInfo != null)
             ri = new RouterInfo(_routerInfo);
@@ -1030,8 +1032,7 @@ public class Router implements RouterClock.ClockShiftListener {
             Properties stats = _context.statPublisher().publishStatistics();
             
             ri.setOptions(stats);
-            // deadlock thru createAddresses() thru SSU REA... move outside lock?
-            ri.setAddresses(_context.commSystem().createAddresses());
+            ri.setAddresses(addresses);
 
             SigningPrivateKey key = _context.keyManager().getSigningPrivateKey();
             if (key == null) {
