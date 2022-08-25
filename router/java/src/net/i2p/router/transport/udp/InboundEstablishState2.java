@@ -121,6 +121,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                     (ENFORCE_TOKEN && !_transport.getEstablisher().isInboundTokenValid(_remoteHostId, token)))) {
             if (_log.shouldInfo())
                 _log.info("Invalid token " + token + " in session request from: " + _aliceSocketAddress);
+            if (token == 0)
+                throw new GeneralSecurityException("Zero token in session request from: " + _aliceSocketAddress);
             _currentState = InboundState.IB_STATE_REQUEST_BAD_TOKEN_RECEIVED;
             _sendHeaderEncryptKey2 = introKey;
             // Generate token for the retry.
