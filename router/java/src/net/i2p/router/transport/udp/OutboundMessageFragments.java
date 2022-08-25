@@ -463,8 +463,11 @@ class OutboundMessageFragments {
             if (_log.shouldDebug())
                 _log.debug("Building packet for " + next + " to " + peer);
             int curTotalDataSize = state.fragmentSize(next.num);
-            if (next.num > 0 && peer.getVersion() > 1)
-                curTotalDataSize += SSU2Util.DATA_FOLLOWON_EXTRA_SIZE;
+            if (peer.getVersion() > 1) {
+                curTotalDataSize += SSU2Util.FIRST_FRAGMENT_HEADER_SIZE;
+                if (next.num > 0)
+                    curTotalDataSize += SSU2Util.DATA_FOLLOWON_EXTRA_SIZE;
+            }
             // now stuff in more fragments if they fit
             if (i +1 < toSend.size()) {
                 int maxAvail;

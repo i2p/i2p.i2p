@@ -1,6 +1,9 @@
 2022-08-25 zzz
  * Router: Fix deadlock via rebuildRouterAddress() and UDPTransport
- * SSU2: Implement path challenge and connection migration
+ * SSU2:
+   - Implement path challenge and connection migration
+   - Fix packets exceeding MTU by up to 3 bytes
+   - Immediately fail session request containing zero token
 
 2022-08-23 zzz
  * Router: Add deadlocks to event log
