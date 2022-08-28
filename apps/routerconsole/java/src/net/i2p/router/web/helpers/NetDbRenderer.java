@@ -121,24 +121,27 @@ class NetDbRenderer {
             if (h != null && h.length == Hash.HASH_LENGTH) {
                 Hash hash = new Hash(h);
                 RouterInfo ri = _context.netDb().lookupRouterInfoLocally(hash);
+                boolean banned = false;
                 if (ri == null) {
-                    // remote lookup
-                    LookupWaiter lw = new LookupWaiter();
-                    _context.netDb().lookupRouterInfo(hash, lw, lw, 8*1000);
-                    // just wait right here in the middle of the rendering, sure
-                    synchronized(lw) {
-                        try { lw.wait(9*1000); } catch (InterruptedException ie) {}
+                    banned = _context.banlist().isBanlisted(hash);
+                    if (!banned) {
+                        // remote lookup
+                        LookupWaiter lw = new LookupWaiter();
+                        _context.netDb().lookupRouterInfo(hash, lw, lw, 8*1000);
+                        // just wait right here in the middle of the rendering, sure
+                        synchronized(lw) {
+                            try { lw.wait(9*1000); } catch (InterruptedException ie) {}
+                        }
+                        ri = _context.netDb().lookupRouterInfoLocally(hash);
                     }
-                    ri = _context.netDb().lookupRouterInfoLocally(hash);
                 }
                 if (ri != null) {
                    renderRouterInfo(buf, ri, false, true);
                 } else {
                     buf.append("<div class=\"netdbnotfound\">");
                     buf.append(_t("Router")).append(' ');
-                    if (routerPrefix != null)
-                        buf.append(routerPrefix);
-                    buf.append(' ').append(_t("not found in network database"));
+                    buf.append(routerPrefix);
+                    buf.append(' ').append(banned ? "is banned" : _t("not found in network database"));
                     buf.append("</div>");
                 }
             } else {
