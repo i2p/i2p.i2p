@@ -632,17 +632,12 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             buf.append("<img height=\"11\" width=\"16\" alt=\"").append(c.toUpperCase(Locale.US)).append("\" title=\"");
             buf.append(countryName);
             buf.append("\" src=\"/flags.jsp?c=").append(c).append("\"> ");
-        }
-        else
+        } else {
             buf.append("<img class=\"unknownflag\" height=\"11\" width=\"16\" alt=\"??\" src=\"/flags.jsp?c=a0\" title=\"").append(_t("unknown")).append("\"> ");
-        buf.append("<tt>");
-        boolean found = _context.netDb().lookupRouterInfoLocally(peer) != null;
-        if (found)
-            buf.append("<a title=\"").append(_t("NetDb entry")).append("\" href=\"netdb?r=").append(h).append("\">");
+        }
+        buf.append("<tt><a title=\"").append(_t("NetDb entry")).append("\" href=\"netdb?r=").append(h).append("\">");
         buf.append(h, 0, 4);
-        if (found)
-            buf.append("</a>");
-        buf.append("</tt>");
+        buf.append("</a></tt>");
         return buf.toString();
     }
 
