@@ -38,6 +38,8 @@ import net.i2p.data.DataHelper;
  * This also fires off a LogWriter thread that pulls pending records off and 
  * writes them where appropriate.
  * 
+ * As of 0.9.41, this class may be overridden via I2PAppContext.setLogManager()
+ * 
  */
 public class LogManager implements Flushable {
     public final static String CONFIG_LOCATION_PROP = "loggerConfigLocation";
@@ -65,6 +67,10 @@ public class LogManager implements Flushable {
     private static final String PROP_DUP = "logger.dropDuplicates";
     /** @since 0.9.18 */
     private static final String PROP_FLUSH = "logger.flushInterval";
+    /** @since 0.9.56 */
+    private static final String PROP_GZIP = "logger.gzip";
+    /** @since 0.9.56 */
+    private static final String PROP_MIN_GZIP_SIZE = "logger.minGzipSize";
     public final static String PROP_RECORD_PREFIX = "logger.record.";
 
     public final static String DEFAULT_FORMAT = DATE + " " + PRIORITY + " [" + THREAD + "] " + CLASS + ": " + MESSAGE;
@@ -79,6 +85,9 @@ public class LogManager implements Flushable {
     public final static String DEFAULT_DEFAULTLEVEL = Log.STR_ERROR;
     public final static String DEFAULT_ONSCREENLEVEL = Log.STR_CRIT;
     private static final int MIN_FILESIZE_LIMIT = 16*1024;
+    private final static boolean DEFAULT_GZIP = false;
+    private static final int DEFAULT_MIN_GZIP_SIZE = 64*1024;
+
 
     private final I2PAppContext _context;
     private final Log _log;
@@ -133,6 +142,8 @@ public class LogManager implements Flushable {
     private final AtomicLong _droppedRecords = new AtomicLong();
     // in seconds
     private int _flushInterval = (int) (LogWriter.FLUSH_INTERVAL / 1000);
+    private boolean _gzip;
+    private long _minGzipSize;
     
     private boolean _alreadyNoticedMissingConfig;
 
@@ -452,6 +463,17 @@ public class LogManager implements Flushable {
         String str = config.getProperty(PROP_DUP);
         _dropDuplicates = str == null || Boolean.parseBoolean(str);
 
+        str = config.getProperty(PROP_GZIP);
+        _gzip = str != null ? Boolean.parseBoolean(str) : DEFAULT_GZIP;
+        if (_gzip) {
+            _minGzipSize = DEFAULT_MIN_GZIP_SIZE;
+            try {
+                str = config.getProperty(PROP_MIN_GZIP_SIZE);
+                if (str != null)
+                    _minGzipSize = Long.parseLong(str);
+            } catch (NumberFormatException nfe) {}
+        }
+
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Log set to use the base log file as " + _baseLogfilename);
         
@@ -673,6 +695,20 @@ public class LogManager implements Flushable {
         return _rotationLimit;
     }
 
+    /**
+     *  @since 0.9.56
+     */
+    boolean shouldGzip() {
+        return _gzip;
+    }
+
+    /**
+     *  @since 0.9.56
+     */
+    long getMinGzipSize() {
+        return _gzip ? _minGzipSize : Long.MAX_VALUE;
+    }
+
     /** @return success */
     public synchronized boolean saveConfig() {
         Properties props = createConfig();
@@ -712,6 +748,8 @@ public class LogManager implements Flushable {
         rv.setProperty(PROP_DISPLAYONSCREENLEVEL, Log.toLevelString(_onScreenLimit));
         rv.setProperty(PROP_CONSOLEBUFFERSIZE, Integer.toString(_consoleBufferSize));
         rv.setProperty(PROP_FLUSH, Integer.toString(_flushInterval));
+        rv.setProperty(PROP_GZIP, Boolean.toString(_gzip));
+        rv.setProperty(PROP_MIN_GZIP_SIZE, Long.toString(_minGzipSize));
 
         for (LogLimit lim : _limits) {
             rv.setProperty(PROP_RECORD_PREFIX + lim.getRootName(), Log.toLevelString(lim.getLimit()));
@@ -812,16 +850,10 @@ public class LogManager implements Flushable {
         _consoleBuffer.clear();
     }
 
-    private static final AtomicInteger __id = new AtomicInteger();
-
     private class ShutdownHook extends I2PAppThread {
-        private final int _id;
-        public ShutdownHook() {
-            _id = __id.incrementAndGet();
-        }
         @Override
         public void run() {
-            setName("Log " + _id + " shutdown ");
+            setName("Log shutdown");
             shutdown();
         }
     }
