@@ -26,6 +26,7 @@ import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.networkdb.reseed.ReseedChecker;
 import net.i2p.router.transport.TransportUtil;
 import net.i2p.router.web.CSSHelper;
+import net.i2p.router.web.DeadlockDetector;
 import net.i2p.router.web.HelperBase;
 import net.i2p.router.web.NewsHelper;
 import net.i2p.router.web.WebAppStarter;
@@ -949,6 +950,15 @@ public class SummaryHelper extends HelperBase {
                .append("\">")
                .append(_t("Check network connection and NAT/firewall"))
                .append("</a></h4>");
+        }
+
+        if (DeadlockDetector.isDeadlocked()) {
+            buf.append("<div class=\"sb_notice\"><b>")
+               .append(_t("Deadlock detected"))
+               .append(" - <a href=\"/logs\">")
+               .append(_t("Please report"))
+               .append("</a> - ").append(_t("After reporting, please restart your router"))
+               .append("</b></div>");
         }
 
         ReseedChecker checker = _context.netDb().reseedChecker();

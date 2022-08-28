@@ -3,11 +3,15 @@ package net.i2p.router.web;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.i2p.app.ClientAppManager;
+import net.i2p.app.NotificationService;
 import net.i2p.router.RouterContext;
 import net.i2p.router.util.EventLog;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
+import net.i2p.util.SystemVersion;
 
 /**
  *  Periodic check
@@ -16,14 +20,15 @@ import net.i2p.util.SimpleTimer2;
  *  In routerconsole because java.lang.management is
  *  not available in Android.
  *
- *  @since 0.9.55
+ *  @since 0.9.55, public since 0.9.56
  */
-class DeadlockDetector extends SimpleTimer2.TimedEvent {
+public class DeadlockDetector extends SimpleTimer2.TimedEvent {
 
     private final RouterContext _context;
     private final Log _log;
     private static final String PROP_INTERVAL = "router.deadlockDetectIntervalHours";
-    private static final long DEFAULT_INTERVAL = 24;
+    private static final long DEFAULT_INTERVAL = SystemVersion.isSlow() ? 12 : 4;
+    private static final AtomicBoolean _isDeadlocked = new AtomicBoolean();
 
     public DeadlockDetector(RouterContext ctx) {
         super(ctx.simpleTimer2());
@@ -58,6 +63,8 @@ class DeadlockDetector extends SimpleTimer2.TimedEvent {
     }
 
     public static boolean detect(RouterContext ctx) {
+        if (_isDeadlocked.get())
+            return true;
         try {
             ThreadMXBean mxb = ManagementFactory.getThreadMXBean();
             long[] ids = mxb.findDeadlockedThreads();
@@ -74,7 +81,8 @@ class DeadlockDetector extends SimpleTimer2.TimedEvent {
                 infos = mxb.getThreadInfo(ids, Integer.MAX_VALUE);
             }
             StringBuilder buf = new StringBuilder(2048);
-            buf.append("Deadlock detected, please report\n\n");
+            String msg1 = Messages.getString("Deadlock detected", ctx) + " - " + Messages.getString("Please report", ctx);
+            buf.append(msg1).append("\n\n");
             for (int i = 0; i < infos.length; i++) {
                 ThreadInfo info = infos[i];
                 if (info == null)
@@ -88,10 +96,20 @@ class DeadlockDetector extends SimpleTimer2.TimedEvent {
                 }
                 buf.append('\n');
             }
-            buf.append("\nAfter reporting, please restart your router!\n");
+            String msg2 = Messages.getString("After reporting, please restart your router", ctx);
+            buf.append('\n').append(msg2).append('\n');
             Log log = ctx.logManager().getLog(DeadlockDetector.class);
             log.log(Log.CRIT, buf.toString());
             ctx.router().eventLog().addEvent(EventLog.DEADLOCK, infos.length + " threads");
+            _isDeadlocked.set(true);
+            ClientAppManager cmgr = ctx.clientAppManager();
+            if (cmgr != null) {
+                NotificationService ns = (NotificationService) cmgr.getRegisteredApp("desktopgui");
+                if (ns != null) {
+                    ns.notify("Router", null, Log.CRIT, Messages.getString("Router", ctx), 
+                              msg1 + '\n' + msg2, null);
+                }
+            }
         } catch (Throwable t) {
             // class not found, unsupportedoperation, ...
             Log log = ctx.logManager().getLog(DeadlockDetector.class);
@@ -99,6 +117,15 @@ class DeadlockDetector extends SimpleTimer2.TimedEvent {
             return false;
         }
         return true;
+    }
+
+    /**
+     *  Return the results of the last test. Does not run a new test.
+     *
+     *  @since 0.9.56
+     */
+    public static boolean isDeadlocked() {
+        return _isDeadlocked.get();
     }
 
 /*
