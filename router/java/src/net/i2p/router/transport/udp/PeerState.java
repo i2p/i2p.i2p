@@ -2215,6 +2215,17 @@ public class PeerState {
     }
 
     /**
+     * SSU 2 only
+     *
+     * @since 0.9.56
+     */
+    protected boolean shouldRequestImmediateAck() {
+        synchronized(_sendWindowBytesRemainingLock) {
+            return _sendWindowBytesRemaining < _sendWindowBytes / 3;
+        }
+    }
+
+    /**
      * Transfer the basic activity/state from the old peer to the current peer
      *
      *  SSU 1 or 2.

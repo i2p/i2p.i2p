@@ -63,6 +63,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
      */
     private final SSU2Bitfield _ackedMessages;
     private final ConcurrentHashMap<Long, List<PacketBuilder.Fragment>> _sentMessages;
+    private final ACKTimer _ackTimer;
+
     private long _sentMessagesLastExpired;
     private byte[] _ourIP;
     private int _ourPort;
@@ -140,6 +142,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             // For outbound, SessionConfirmed is packet 0
             _packetNumber.set(1);
         }
+        _ackTimer = new ACKTimer();
     }
 
     // SSU 1 overrides
@@ -197,7 +200,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     protected synchronized void messagePartiallyReceived(long now) {
         if (_wantACKSendSince <= 0) {
             _wantACKSendSince = now;
-            new ACKTimer();
+            _ackTimer.schedule();
         }
     }
 
@@ -489,6 +492,11 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                 if (limitSending)
                     ECNReceived();
             }   //// !_dead
+
+            boolean ackImmediate = (header.data[SHORT_HEADER_FLAGS_OFFSET] & 0x01) != 0 && _context.getBooleanProperty("ssu2.ackImmediate");
+            if (ackImmediate) {
+                _ackTimer.scheduleImmediate();
+            }
 
         } catch (Exception e) {
             if (_log.shouldWarn())
@@ -959,15 +967,49 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     /**
+     *  Flag byte to be sent in header
+     *
+     *  @since 0.9.56
+     */
+    byte getFlags() {
+        return shouldRequestImmediateAck() ? (byte) 0x01 : 0;
+    }
+
+    /**
      *  A timer to send an ack-only packet.
      */
     private class ACKTimer extends SimpleTimer2.TimedEvent {
+
+        /**
+         *  Caller must schedule
+         */
         public ACKTimer() {
             super(_context.simpleTimer2());
+        }
+
+        /**
+         *  Ack soon, based on the current RTT
+         *
+         *  @since 0.9.56
+         */
+        public void schedule() {
             long delta = Math.max(10, Math.min(_rtt/6, ACK_FREQUENCY));
             if (_log.shouldDebug())
                 _log.debug("Sending delayed ack in " + delta + ": " + PeerState2.this);
-            schedule(delta);
+            reschedule(delta, true);
+        }
+
+        /**
+         *  Ack almost immediately
+         *
+         *  @since 0.9.56
+         */
+        public void scheduleImmediate() {
+            _wantACKSendSince = _context.clock().now();
+            long delta = Math.min(_rtt/16, 5);
+            if (_log.shouldDebug())
+                _log.debug("Sending immediate ack in " + delta + ": " + PeerState2.this);
+            reschedule(delta, true);
         }
 
         /**

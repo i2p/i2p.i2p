@@ -275,6 +275,11 @@ class PacketBuilder2 {
         //if (_log.shouldDebug())
         //    _log.debug("Packet " + pktNum + " before encryption:\n" + HexDump.dump(data, 0, off));
 
+        // ack immediate flag
+        if (numFragments > 0) {
+            data[SHORT_HEADER_FLAGS_OFFSET] = peer.getFlags();
+        }
+
         encryptDataPacket(packet, peer.getSendCipher(), pktNum, peer.getSendHeaderEncryptKey1(), peer.getSendHeaderEncryptKey2());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
         //if (_log.shouldDebug())
@@ -351,8 +356,8 @@ class PacketBuilder2 {
      *  This will also include acks, a new token block, and padding.
      */
     public UDPPacket buildSessionDestroyPacket(int reason, PeerState2 peer) {
-            if (_log.shouldWarn())
-                _log.warn("Sending termination " + reason + " to : " + peer);
+        if (_log.shouldDebug())
+            _log.debug("Sending termination " + reason + " to : " + peer);
         List<Block> blocks = new ArrayList<Block>(2);
         if (peer.getKeyEstablishedTime() - _context.clock().now() > EstablishmentManager.IB_TOKEN_EXPIRATION / 2 &&
             !_context.router().gracefulShutdownInProgress()) {

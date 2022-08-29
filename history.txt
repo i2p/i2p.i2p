@@ -1,3 +1,12 @@
+2022-08-29 zzz
+ * SSU2: Implement ack-immediate flag
+
+2022-08-28 zzz
+ * Console:
+   - Add notification and summary bar info on deadlock
+   - Linkify router hash even if not in netdb
+ * Util: Add option to gzip router logs
+
 2022-08-25 zzz
  * Router: Fix deadlock via rebuildRouterAddress() and UDPTransport
  * SSU2:
