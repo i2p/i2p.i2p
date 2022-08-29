@@ -27,6 +27,8 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.transport.TransportUtil;
 import net.i2p.router.transport.udp.InboundMessageFragments.ModifiableLong;
+import net.i2p.router.transport.udp.PacketBuilder.Fragment;
+
 import static net.i2p.router.transport.udp.SSU2Util.*;
 import net.i2p.util.HexDump;
 import net.i2p.util.Log;
@@ -573,7 +575,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         }
         if (tag > 0) {
             SSU2Payload.Block block = new SSU2Payload.RelayTagBlock(tag);
-            UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.emptyList(),
+            UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.<Fragment>emptyList(),
                                                                  Collections.singletonList(block),
                                                                  this);
             _transport.send(pkt);
@@ -766,7 +768,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         if (_log.shouldInfo())
             _log.info("Got PATH CHALLENGE block, length: " + data.length + " on " + this);
         SSU2Payload.Block block = new SSU2Payload.PathResponseBlock(data);
-        UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.emptyList(),
+        UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.<Fragment>emptyList(),
                                                              Collections.singletonList(block),
                                                              this);
         // TODO send to from address?

@@ -90,7 +90,7 @@ class IntroductionManager {
     /** map of relay tag to PeerState who have given us introduction tags */
     private final Map<Long, PeerState> _inbound;
     /** map of relay nonce to alice PeerState who requested it */
-    private final Map<Long, PeerState2> _nonceToAlice;
+    private final ConcurrentHashMap<Long, PeerState2> _nonceToAlice;
     private final Set<InetAddress> _recentHolePunches;
     private long _lastHolePunchClean;
 
