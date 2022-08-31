@@ -31,9 +31,12 @@
 - Trial Debian build: Run 'ant debcheckpatch' and fix any issues.
   Build and test a preliminary Debian build with 'ant debian' and fix any issues
 
-- Javadoc test: 'ant javadoc' and 'ant mavenCentral.deps'
+- Javadoc test: 'ant javadoc'
   with a recent Oracle JDK (12+), and fix any issues.
   Oracle JDK will error on things that OpenJDK does not!
+
+- Java 7 test: 'ant mavenCentral.deps' to ensure
+  that Android will build correcly; fix any issues
 
 
 ## A day or two before
