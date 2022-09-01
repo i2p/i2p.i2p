@@ -17,6 +17,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
+import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelDataMessage;
@@ -203,6 +204,34 @@ public class InNetMessagePool implements Service {
 
           case TunnelDataMessage.MESSAGE_TYPE:
             shortCircuitTunnelData(messageBody, fromRouterHash);
+            allowMatches = false;
+            break;
+
+          // If a DSM has a reply job, run the DSM inline
+          // so the entry is stored in the netdb before the reply job runs.
+          // FloodOnlyLookupMatchJob no longer stores the entry
+          case DatabaseStoreMessage.MESSAGE_TYPE:
+            List<OutNetMessage> origMessages = _context.messageRegistry().getOriginalMessages(messageBody);
+            HandlerJobBuilder dsmbuilder = _handlerJobBuilders[DatabaseStoreMessage.MESSAGE_TYPE];
+            Job dsmjob = dsmbuilder.createJob(messageBody, fromRouter, fromRouterHash);
+            int sz = origMessages.size();
+            if (sz > 0) {
+               // DSM inline, reply jobs on queue
+               if (dsmjob != null)
+                   dsmjob.runJob();
+               for (int i = 0; i < sz; i++) {
+                    OutNetMessage omsg = origMessages.get(i);
+                    ReplyJob job = omsg.getOnReplyJob();
+                    if (job != null) {
+                        job.setMessage(messageBody);
+                        _context.jobQueue().addJob(job);
+                    }
+                }
+            } else {
+               // DSM on queue, no reply jobs
+               if (dsmjob != null)
+                   _context.jobQueue().addJob(dsmjob);
+            }
             allowMatches = false;
             break;
 
