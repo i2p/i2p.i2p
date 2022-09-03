@@ -36,6 +36,15 @@ class NegativeLookupCache {
         this.counter.increment(h);
     }
 
+    /**
+     *  Negative cache the hash until the next clean time.
+     *
+     *  @since 0.9.56
+     */
+    public void cache(Hash h) {
+        this.counter.max(h);
+    }
+
     public boolean isCached(Hash h) {
         if (counter.count(h) >= _maxFails)
             return true;

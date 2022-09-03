@@ -11,9 +11,9 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 class FloodOnlyLookupMatchJob extends JobImpl implements ReplyJob {
-    private final Log _log;
-    private final FloodSearchJob _search;
-    private volatile boolean _success;
+    protected final Log _log;
+    protected final FloodSearchJob _search;
+    protected volatile boolean _success;
 
     public FloodOnlyLookupMatchJob(RouterContext ctx, FloodSearchJob job) {
         super(ctx);
@@ -50,8 +50,8 @@ class FloodOnlyLookupMatchJob extends JobImpl implements ReplyJob {
             return;
 
         DatabaseStoreMessage dsm = (DatabaseStoreMessage)message;
-        if (_log.shouldLog(Log.INFO))
-            _log.info(_search.getJobId() + ": got a DSM for " 
+        if (_log.shouldDebug())
+            _log.debug(_search.getJobId() + ": got a DSM for " 
                       + dsm.getKey().toBase64());
         // This store will handled by HFDSMJ.
         // Just note success here.

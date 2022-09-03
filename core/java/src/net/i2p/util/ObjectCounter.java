@@ -35,6 +35,14 @@ public class ObjectCounter<K> implements Serializable {
     }
 
     /**
+     *  Set a high value
+     *  @since 0.9.56
+     */
+    public void max(K h) {
+        map.put(h, new AtomicInteger(Integer.MAX_VALUE / 2));
+    }
+
+    /**
      *  @return current count
      */
     public int count(K h) {

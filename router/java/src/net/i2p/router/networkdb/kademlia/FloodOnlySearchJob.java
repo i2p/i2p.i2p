@@ -56,9 +56,24 @@ abstract class FloodOnlySearchJob extends FloodSearchJob {
         _timeoutMs = Math.min(timeoutMs, SearchJob.PER_FLOODFILL_PEER_TIMEOUT);
         _expiration = _timeoutMs + ctx.clock().now();
         _unheardFrom = new HashSet<Hash>(CONCURRENT_SEARCHES);
-        _replySelector = new FloodOnlyLookupSelector(getContext(), this);
-        _onReply = new FloodOnlyLookupMatchJob(getContext(), this);
-        _onTimeout = new FloodOnlyLookupTimeoutJob(getContext(), this);
+        _replySelector = new FloodOnlyLookupSelector(ctx, this);
+        _onReply = new FloodOnlyLookupMatchJob(ctx, this);
+        _onTimeout = new FloodOnlyLookupTimeoutJob(ctx, this);
+    }
+
+    /**
+     * For DirectLookupJob extension, RI only, different match job
+     *
+     * @since 0.9.56
+     */
+    protected FloodOnlySearchJob(RouterContext ctx, FloodfillNetworkDatabaseFacade facade, Hash key, Job onFind, Job onFailed, int timeoutMs) {
+        super(ctx, facade, key, onFind, onFailed, timeoutMs, false);
+        _timeoutMs = timeoutMs;
+        _expiration = _timeoutMs + ctx.clock().now();
+        _unheardFrom = new HashSet<Hash>(1);
+        _replySelector = new FloodOnlyLookupSelector(ctx, this);
+        _onReply = new DirectLookupMatchJob(ctx, this);
+        _onTimeout = new FloodOnlyLookupTimeoutJob(ctx, this);
     }
 
     public boolean shouldProcessDSRM() { return _shouldProcessDSRM; }

@@ -1379,6 +1379,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      */
     void dropAfterLookupFailed(Hash peer) {
         _context.peerManager().removeCapabilities(peer);
+        _negativeCache.cache(peer);
         _kb.remove(peer);
         //if (removed) {
         //    if (_log.shouldLog(Log.INFO))

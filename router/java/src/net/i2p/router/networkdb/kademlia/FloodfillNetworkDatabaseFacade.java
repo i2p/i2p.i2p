@@ -464,12 +464,12 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         }
         
         if (isNew) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("this is the first search for that key, fire off the FloodSearchJob");
+            if (_log.shouldDebug())
+                _log.debug("New ISJ for " + key.toBase64());
             _context.jobQueue().addJob(searchJob);
         } else {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Deferring flood search for " + key.toBase64() + " with " + _activeFloodQueries.size() + " in progress");
+            if (_log.shouldDebug())
+                _log.debug("Wait for pending ISJ for " + key.toBase64());
             searchJob.addDeferred(onFindJob, onFailedLookupJob, timeoutMs, isLease);
             // not necessarily LS
             _context.statManager().addRateData("netDb.lookupDeferred", 1, searchJob.getExpiration()-_context.clock().now());
@@ -579,6 +579,32 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
       */
     @Override
     protected void lookupBeforeDropping(Hash peer, RouterInfo info) {
+        if (_context.commSystem().isEstablished(peer)) {
+            // see DirectLookupJob
+            boolean isNew = false;
+            FloodSearchJob searchJob;
+            Job onFindJob = new DropLookupFoundJob(_context, peer, info);
+            Job onFailedLookupJob = new DropLookupFailedJob(_context, peer, info);
+            synchronized (_activeFloodQueries) {
+                searchJob = _activeFloodQueries.get(peer);
+                if (searchJob == null) {
+                    searchJob = new DirectLookupJob(_context, this, peer, info, onFindJob, onFailedLookupJob);
+                    _activeFloodQueries.put(peer, searchJob);
+                    isNew = true;
+                }
+            }
+            if (isNew) {
+                if (_log.shouldDebug())
+                    _log.debug("Direct RI lookup for " + peer.toBase64());
+                _context.jobQueue().addJob(searchJob);
+            } else {
+                if (_log.shouldDebug())
+                    _log.debug("Pending Direct RI lookup for " + peer.toBase64());
+                searchJob.addDeferred(onFindJob, onFailedLookupJob, 10*1000, false);
+            }
+            return;
+        }
+
         // following are some special situations, we don't want to
         // drop the peer in these cases
         // yikes don't do this - stack overflow //  getFloodfillPeers().size() == 0 ||
@@ -609,17 +635,17 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         // entry locally, firing no job if it gets a reply with an updated value (meaning
         // we shouldn't drop them but instead use the new data), or if they all time out,
         // firing the dropLookupFailedJob, which actually removes out local reference
+        if (_log.shouldDebug())
+            _log.debug("ISJ lookup before dropping for " + peer.toBase64() + ' ' + info.getPublished());
         search(peer, new DropLookupFoundJob(_context, peer, info), new DropLookupFailedJob(_context, peer, info), 10*1000, false);
     }
     
     private class DropLookupFailedJob extends JobImpl {
         private final Hash _peer;
-        private final RouterInfo _info;
     
         public DropLookupFailedJob(RouterContext ctx, Hash peer, RouterInfo info) {
             super(ctx);
             _peer = peer;
-            _info = info;
         }
         public String getName() { return "Lookup on failure of netDb peer timed out"; }
         public void runJob() {
@@ -639,10 +665,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         public String getName() { return "Lookup on failure of netDb peer matched"; }
         public void runJob() {
             RouterInfo updated = lookupRouterInfoLocally(_peer);
-            if ( (updated != null) && (updated.getPublished() > _info.getPublished()) ) {
-                // great, a legitimate update
-            } else {
-                // they just sent us what we already had.  kill 'em both
+            if (updated == null || updated.getPublished() <= _info.getPublished()) {
+                // they just sent us what we already had
                 dropAfterLookupFailed(_peer);
             }
         }
