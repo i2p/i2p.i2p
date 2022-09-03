@@ -828,7 +828,7 @@ public class TransportManager implements TransportEventListener {
                     config != TransportUtil.IPv6Config.IPV6_DISABLED &&
                     !t.isIPv6Firewalled()) {
                     RouterAddress ra = t.getCurrentAddress(true);
-                    if (ra == null) {
+                    if (ra == null || ra.getHost() == null) {
                         if (t.getStyle().equals(UDPTransport.STYLE)) {
                             UDPTransport udp = (UDPTransport) t;
                             ra = udp.getCurrentExternalAddress(true);

@@ -1,3 +1,7 @@
+2022-09-03 zzz
+ * NetDB: Query connected peers for their RI directly
+ * UPnP: Fix opening IPv6 ports
+
 2022-09-01 zzz
  * Router: Ensure database store message is processed before reply job (Gitlab #364)
 
