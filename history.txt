@@ -1,3 +1,32 @@
+2022-09-04 zzz
+ * SusiDNS: Fix adding to empty address book
+
+2022-09-03 zzz
+ * NetDB: Query connected peers for their RI directly
+ * UPnP: Fix opening IPv6 ports
+
+2022-09-01 zzz
+ * Router: Ensure database store message is processed before reply job (Gitlab #364)
+
+2022-08-29 zzz
+ * SSU2: Implement ack-immediate flag
+
+2022-08-28 zzz
+ * Console:
+   - Add notification and summary bar info on deadlock
+   - Linkify router hash even if not in netdb
+ * Util: Add option to gzip router logs
+
+2022-08-25 zzz
+ * Router: Fix deadlock via rebuildRouterAddress() and UDPTransport
+ * SSU2:
+   - Implement path challenge and connection migration
+   - Fix packets exceeding MTU by up to 3 bytes
+   - Immediately fail session request containing zero token
+
+2022-08-23 zzz
+ * Router: Add deadlocks to event log
+
 2022-08-22 1.9.0 released
 
 2022-08-10 zzz
