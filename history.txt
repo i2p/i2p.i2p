@@ -1,3 +1,6 @@
+2022-09-04 zzz
+ * SusiDNS: Fix adding to empty address book
+
 2022-09-03 zzz
  * NetDB: Query connected peers for their RI directly
  * UPnP: Fix opening IPv6 ports

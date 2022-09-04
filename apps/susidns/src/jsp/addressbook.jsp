@@ -77,6 +77,13 @@
 <h3 id="addrtitle"><%=intl._t("Address book")%>: <%=intl._t(book.getBook())%></h3>
 <h4 id="storagepath"><%=intl._t("Storage")%>: ${book.displayName}</h4>
 
+<%
+    // This is what does the form processing.
+    // We need to do this before any notEmpty test and before loadBookMessages() which displays the entry count.
+    // Messages will be displayed below.
+    String formMessages = book.getMessages();
+%>
+
 ${book.loadBookMessages}
 
 <% if (book.getBook().equals("private")) { %>
@@ -128,15 +135,18 @@ ${book.loadBookMessages}
 </div>
 </form>
 <% } /* book.getEntries().length() > 0 */ %>
+</c:if><% /* book.notEmpty */ %>
 
-</div>
+</div><% /* headline */ %>
 
-<div id="messages">${book.messages}<%
+<% /* need this whether book is empty or not to display the form messages */ %>
+<div id="messages"><%=formMessages%><%
    if (importMessages != null) {
        %><%=importMessages%><%
    }
 %></div>
 
+<c:if test="${book.notEmpty}">
 <div id="filter">
 <c:if test="${book.hasFilter}">
 <span><%=intl._t("Current filter")%>: <b>${book.filter}</b>
@@ -287,10 +297,12 @@ ${book.loadBookMessages}
 </table>
 <p class="buttons" id="addnewaddrbutton">
 <input class="cancel" type="reset" value="<%=intl._t("Cancel")%>" >
+<c:if test="${book.notEmpty}">
 <input class="accept" type="submit" name="action" value="<%=intl._t("Replace")%>" >
 <% if (!book.getBook().equals("published")) { %>
   <input class="add" type="submit" name="action" value="<%=intl._t("Add Alternate")%>" >
 <% } %>
+</c:if><% /* book.notEmpty */ %>
 <input class="add" type="submit" name="action" value="<%=intl._t("Add")%>" >
 </p>
 </div>
