@@ -432,7 +432,10 @@ class EstablishmentManager {
                     }
                     if (version == 2) {
                         int mtu = addr.getMTU();
-                        if (mtu > 0 && mtu < PeerState2.MIN_MTU) {
+                        boolean isIPv6 = TransportUtil.isIPv6(ra);
+                        int ourMTU = _transport.getMTU(isIPv6);
+                        if ((mtu > 0 && mtu < PeerState2.MIN_MTU) ||
+                            (ourMTU > 0 && ourMTU < PeerState2.MIN_MTU)) {
                             if (ra.getTransportStyle().equals("SSU2")) {
                                 _transport.markUnreachable(toHash);
                                 _transport.failed(msg, "MTU too small");
@@ -677,7 +680,12 @@ class EstablishmentManager {
                 return;
             }
 
-          /**** TODO
+          /****
+            // A token request or session request with a bad token is
+            // inexpensive to reply to.
+            // A token can only be used once, so a replayed session request
+            // will only generate a retry.
+            // So probably don't need a replay detector at all
             if (_replayFilter.add(state.getReceivedX(), 0, 8)) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Duplicate X in session request from: " + from);

@@ -105,6 +105,10 @@ public class MTU {
                             }
                             if (isSSU2)
                                 return Math.min(mtu, PeerState2.MAX_MTU);
+                            // don't rectify 1280 down to 1276 because that
+                            // borks a shared SSU/SSU2 address
+                            if (mtu == PeerState2.MIN_MTU)
+                                return PeerState2.MIN_MTU;
                             return rectify(isIPv6, mtu);
                         } catch (SocketException se) {
                             // ignore

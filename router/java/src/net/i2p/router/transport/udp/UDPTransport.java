@@ -2790,7 +2790,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             options.setProperty(UDPAddress.PROP_CAPACITY, caps);
             if (mtu != PeerState.LARGE_MTU && mtu > 0)
                 options.setProperty(UDPAddress.PROP_MTU, Integer.toString(mtu));
-            if (_enableSSU2)
+            if (_enableSSU2 && (mtu >= PeerState2.MIN_MTU || mtu == 0))
                 addSSU2Options(options);
             RouterAddress current = getCurrentAddress(false);
             RouterAddress addr = new RouterAddress(STYLE, options, SSU_OUTBOUND_COST);
@@ -2882,7 +2882,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 else if (config == IPV6_NOT_PREFERRED)
                     cost++;
             }
-            if (_enableSSU2)
+            if (_enableSSU2 && (mtu >= PeerState2.MIN_MTU || mtu == 0))
                 addSSU2Options(options);
             RouterAddress addr = new RouterAddress(STYLE, options, cost);
 
@@ -2952,7 +2952,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             opts.setProperty(UDPAddress.PROP_CAPACITY, isIPv6 ? CAP_IPV6 : CAP_IPV4);
             if (mtu != PeerState.LARGE_MTU && mtu > 0)
                 opts.setProperty(UDPAddress.PROP_MTU, Integer.toString(mtu));
-            if (_enableSSU2)
+            if (_enableSSU2 && (mtu >= PeerState2.MIN_MTU || mtu == 0))
                 addSSU2Options(opts);
             RouterAddress addr = new RouterAddress(STYLE, opts, SSU_OUTBOUND_COST);
             RouterAddress current = getCurrentAddress(isIPv6);
