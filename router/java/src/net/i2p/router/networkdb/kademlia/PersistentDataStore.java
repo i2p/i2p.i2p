@@ -366,7 +366,7 @@ public class PersistentDataStore extends TransientDataStore {
                 requeue(READ_DELAY);
                 return;
             }
-            long now = getContext().clock().now();
+            long now = System.currentTimeMillis();
             // check directory mod time to save a lot of object churn in scanning all the file names
             long lastMod = _dbDir.lastModified();
             // if size() (= RI + LS) is too low, call anyway to check for reseed
