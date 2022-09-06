@@ -579,6 +579,7 @@ tr.list0 {
      background: url(/themes/console/light/images/dropdown_active.png) !important;
      background-repeat: no-repeat !important;
      background-position: .5%, 15% !important;
+     padding-left: 2% !important;
 }
 
 #addrtitle.expanded {
