@@ -576,7 +576,14 @@ tr.list0 {
 }
 
 .expanded {
-     background: url(/themes/console/light/images/dropdown_active.png) !important;
+     background: url(/themes/console/dark/images/dropdown_active.png) !important;
+     background-repeat: no-repeat !important;
+     background-position: .5%, 15% !important;
+     padding-left: 2% !important;
+}
+
+.unexpanded {
+     background: url(/themes/console/dark/images/dropdown.png) !important;
      background-repeat: no-repeat !important;
      background-position: .5%, 15% !important;
      padding-left: 2% !important;

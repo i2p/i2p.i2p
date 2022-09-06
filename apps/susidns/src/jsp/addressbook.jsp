@@ -106,7 +106,7 @@ ${book.loadBookMessages}
 <% if (book.getBook().equals("local")) { %>
 <div id="bookdescription">
 <p class="bookdescription">
-<%=intl._t("This is the Local Address Book.")%> 
+<%=intl._t("This is the Local Address Book.")%>
 <%=intl._t("Use it for sites that you host on this computer.")%>
 </p>
 </div>
@@ -284,7 +284,7 @@ ${book.loadBookMessages}
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="49">
 <div id="add">
-<h3 id="addnewaddr" ><%=intl._t("Add new destination")%></h3>
+<h3 id="addnewaddr" class="unexpanded"><%=intl._t("Add new destination")%></h3>
 <table id="addnewaddrtable">
 <tr>
 <td><b><%=intl._t("Hostname")%></b></td>
@@ -315,7 +315,7 @@ ${book.loadBookMessages}
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="49">
 <div id="import">
-<h3 id="importhosts"><%=intl._t("Import from hosts.txt file")%></h3>
+<h3 id="importhosts" class="unexpanded"><%=intl._t("Import from hosts.txt file")%></h3>
 <table id="importhostsform">
 <tr>
 <td><b><%=intl._t("File")%></b></td>
