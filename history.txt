@@ -1,3 +1,7 @@
+2022-09-06 zzz
+ * NetDB: Fix reseeding when clock is skewed
+ * SSU2: Don't publish or connect if our MTU becomes too small
+
 2022-09-04 zzz
  * SusiDNS: Fix adding to empty address book
 
