@@ -286,10 +286,12 @@ public class RouterAddress extends DataStructureImpl {
         // reduce Object proliferation
         if (_transportStyle.equals("SSU"))
             _transportStyle = "SSU";
-        else if (_transportStyle.equals("NTCP"))
-            _transportStyle = "NTCP";
         else if (_transportStyle.equals("NTCP2"))
             _transportStyle = "NTCP2";
+        else if (_transportStyle.equals("NTCP"))
+            _transportStyle = "NTCP";
+        else if (_transportStyle.equals("SSU2"))
+            _transportStyle = "SSU2";
         DataHelper.readProperties(in, _options);
     }
     
