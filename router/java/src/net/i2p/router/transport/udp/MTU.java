@@ -4,7 +4,9 @@ import java.net.InetAddress;
 import java.net.Inet6Address;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
@@ -60,6 +62,8 @@ public class MTU {
             return 0;
         }
         if (ifcs != null) {
+            // save for fallback loop below, so we don't have to call getNetworkInterfaces() again
+            List<NetworkInterface> interfaces = new ArrayList<NetworkInterface>();
             while (ifcs.hasMoreElements()) {
                 NetworkInterface ifc = ifcs.nextElement();
                 try {
@@ -72,6 +76,7 @@ public class MTU {
                 } catch (SocketException e) {
                     continue;
                 }
+                interfaces.add(ifc);
                 for(Enumeration<InetAddress> addrs =  ifc.getInetAddresses(); addrs.hasMoreElements();) {
                     InetAddress addr = addrs.nextElement();
                     if (ia.equals(addr)) {
@@ -120,6 +125,59 @@ public class MTU {
                     }
                 }
             }
+
+            // didn't find a match, probably behind a NAT
+            // try again, looping through all the interfaces that were up,
+            // just get the minimum of all interfaces with addresses of that type v4/v6
+            boolean isIPv6 = ia instanceof Inet6Address;
+            int rv = 1501;
+            outer:
+            for (NetworkInterface ifc : interfaces) {
+                for(Enumeration<InetAddress> addrs =  ifc.getInetAddresses(); addrs.hasMoreElements();) {
+                    InetAddress addr = addrs.nextElement();
+                    if (isIPv6 != (addr instanceof Inet6Address))
+                        continue;
+                    if (addr.isLinkLocalAddress() ||
+                        addr.isMulticastAddress() ||
+                        addr.isAnyLocalAddress() ||
+                        addr.isLoopbackAddress())
+                        continue;
+                    if (isIPv6) {
+                        // ygg
+                        byte[] ip = addr.getAddress();
+                        if ((ip[0] & 0xfe) == 0x02)
+                            continue outer;
+                    }
+                    int mtu;
+                    try {
+                        mtu = ifc.getMTU();
+                    } catch (Throwable t) {
+                        continue outer;
+                    }
+                    if (mtu < 0)
+                        continue outer;
+                    if (isIPv6 && mtu > 1420) {
+                        byte[] ip = addr.getAddress();
+                        if (mtu > 1472 &&
+                            ip[0] == 0x20 && ip[1] == 0x01 &&
+                            ip[2] == 0x04 && ip[3] == 0x70)
+                            mtu = 1472;
+                        if (ip[0] == 0x2a && ip[1] == 0x06 &&
+                            ip[2] == (byte) 0xa0 && ip[3] == 0x04)
+                            mtu = 1420;
+                    }
+                    if (mtu < rv)
+                        rv = mtu;
+                    continue outer;
+                }
+            }
+            if (rv < 1501) {
+                if (isSSU2)
+                    return rv;
+                if (rv == PeerState2.MIN_MTU)
+                    return rv;
+                return rectify(isIPv6, rv);
+            }
         }
         return 0;
     }
@@ -144,18 +202,20 @@ public class MTU {
     }
 
     public static void main(String args[]) {
-/****
-        System.out.println("Cmd line interfaces:");
-        for (int i = 0; i < args.length; i++) {
-            try {
-                InetAddress test = InetAddress.getByName(args[i]);
-                System.out.println("MTU of " + args[i] + " is " + getMTU(test));
-            } catch (Exception e) {
-                e.printStackTrace();
+        if (args.length > 0) {
+            System.out.println("Cmd line interfaces:");
+            for (int i = 0; i < args.length; i++) {
+                try {
+                    InetAddress test = InetAddress.getByName(args[i]);
+                    System.out.println("I2P MTU of " + args[i] + " is " + getMTU(test, false) +
+                                       "; SSU2 MTU is " + getMTU(test, true));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
+
         System.out.println("All interfaces:");
-****/
         try {
             Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
             if (ifcs != null) {
