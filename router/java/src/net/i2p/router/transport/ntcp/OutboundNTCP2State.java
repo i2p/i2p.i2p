@@ -76,7 +76,6 @@ class OutboundNTCP2State implements EstablishState {
     private final HandshakeState _handshakeState;
     private final RouterInfo _aliceRI;
     private final int _aliceRISize;
-    private int _padlen1;
     private int _padlen2;
     private final int _padlen3;
     private final SessionKey _bobHash;
