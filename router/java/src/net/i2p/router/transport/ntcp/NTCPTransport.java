@@ -250,7 +250,7 @@ public class NTCPTransport extends TransportImpl {
             String s = null;
             // try to determine if we've been down for 30 days or more
             long minDowntime = _context.router().isHidden() ? MIN_DOWNTIME_TO_REKEY_HIDDEN : MIN_DOWNTIME_TO_REKEY;
-            boolean shouldRekey = _context.getEstimatedDowntime() >= minDowntime;
+            boolean shouldRekey = !allowLocal() && _context.getEstimatedDowntime() >= minDowntime;
             if (!shouldRekey) {
                 s = ctx.getProperty(PROP_NTCP2_SP);
                 if (s != null) {
