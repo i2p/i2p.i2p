@@ -1,3 +1,10 @@
+2022-09-09 zzz
+ * SSU2: Enable handling of ack-immediate flag by default
+
+2022-09-07 zzz
+ * SSU: Fallback processing for MTU detection
+ * Transports: Don't rekey noise params on testnet
+
 2022-09-06 zzz
  * NetDB: Fix reseeding when clock is skewed
  * SSU2: Don't publish or connect if our MTU becomes too small

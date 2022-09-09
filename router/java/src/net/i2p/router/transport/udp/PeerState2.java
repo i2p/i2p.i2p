@@ -493,7 +493,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                     ECNReceived();
             }   //// !_dead
 
-            boolean ackImmediate = (header.data[SHORT_HEADER_FLAGS_OFFSET] & 0x01) != 0 && _context.getBooleanProperty("ssu2.ackImmediate");
+            boolean ackImmediate = (header.data[SHORT_HEADER_FLAGS_OFFSET] & 0x01) != 0;
             if (ackImmediate) {
                 _ackTimer.scheduleImmediate();
             }
