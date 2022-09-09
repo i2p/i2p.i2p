@@ -515,7 +515,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         blocks.add(new SSU2Payload.DateTimeBlock(_context));
         blocks.add(new SSU2Payload.AddressBlock(toIP.getAddress(), toPort));
         blocks.add(new SSU2Payload.PathChallengeBlock(_pathChallengeData));
-        UDPPacket packet = _transport.getBuilder2().buildPacket(Collections.emptyList(), blocks, this);
+        UDPPacket packet = _transport.getBuilder2().buildPacket(Collections.<Fragment>emptyList(), blocks, this);
         // fix up IP/port
         DatagramPacket pkt = packet.getPacket();
         pkt.setAddress(toIP);
@@ -799,7 +799,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                         _mtu = MIN_MTU;
                         EstablishmentManager.Token token = _transport.getEstablisher().getInboundToken(from);
                         SSU2Payload.Block block = new SSU2Payload.NewTokenBlock(token.token, token.expires);
-                        UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.emptyList(),
+                        UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.<Fragment>emptyList(),
                                                                              Collections.singletonList(block),
                                                                              this);
                         _transport.send(pkt);
