@@ -356,10 +356,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     }
     
     /** unused, see override */
-    protected void createHandlers() {
-        //_context.inNetMessagePool().registerHandlerJobBuilder(DatabaseLookupMessage.MESSAGE_TYPE, new DatabaseLookupMessageHandler(_context));
-        //_context.inNetMessagePool().registerHandlerJobBuilder(DatabaseStoreMessage.MESSAGE_TYPE, new DatabaseStoreMessageHandler(_context));
-    }
+    protected void createHandlers() {}
     
     /**
      * Get the routers closest to that key in response to a remote lookup

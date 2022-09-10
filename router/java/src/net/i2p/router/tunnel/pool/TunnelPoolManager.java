@@ -54,12 +54,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         _context = ctx;
         _log = ctx.logManager().getLog(TunnelPoolManager.class);
         
-        //HandlerJobBuilder builder = new HandleTunnelCreateMessageJob.Builder(ctx);
-        //ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelCreateMessage.MESSAGE_TYPE, builder);
-        //HandlerJobBuilder b = new TunnelMessageHandlerBuilder(ctx);
-        //ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelGatewayMessage.MESSAGE_TYPE, b);
-        //ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelDataMessage.MESSAGE_TYPE, b);
-
         _clientInboundPools = new ConcurrentHashMap<Hash, TunnelPool>(4);
         _clientOutboundPools = new ConcurrentHashMap<Hash, TunnelPool>(4);
         _clientPeerSelector = new ClientPeerSelector(ctx);

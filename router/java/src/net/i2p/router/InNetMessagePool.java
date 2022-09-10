@@ -119,18 +119,6 @@ public class InNetMessagePool implements Service {
         _handlerJobBuilders[i2npMessageType] = builder;
         return old;
     }
-  
-    /**
-     * @return previous builder for this message type, or null
-     * @throws ArrayIndexOutOfBoundsException if i2npMessageType is greater than MAX_I2NP_MESSAGE_TYPE
-     * @deprecated unused
-     */
-    @Deprecated
-    public synchronized HandlerJobBuilder unregisterHandlerJobBuilder(int i2npMessageType) {
-        HandlerJobBuilder old = _handlerJobBuilders[i2npMessageType];
-        _handlerJobBuilders[i2npMessageType] = null;
-        return old;
-    }
     
     /**
      * Add a new message to the pool.
