@@ -553,42 +553,6 @@ public class ProfileOrganizer {
     }
 
     /**
-     * Return a set of Hashes for peers that are well integrated into the network.
-     *
-     * @deprecated unused
-     */
-    @Deprecated
-    public void selectWellIntegratedPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {
-        selectWellIntegratedPeers(howMany, exclude, matches, 0, null);
-    }
-
-    /**
-     * Return a set of Hashes for peers that are well integrated into the network.
-     *
-     * @param mask 0-4 Number of bytes to match to determine if peers in the same IP range should
-     *             not be in the same tunnel. 0 = disable check; 1 = /8; 2 = /16; 3 = /24; 4 = exact IP match
-     * @since 0.9.53 added ipSet param
-     * @deprecated unused
-     */
-    @Deprecated
-    public void selectWellIntegratedPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, int mask, MaskedIPSet ipSet) {
-        getReadLock();
-        try {
-            locked_selectPeers(_wellIntegratedPeers, howMany, exclude, matches, mask, ipSet);
-        } finally { releaseReadLock(); }
-        if (matches.size() < howMany) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("selectWellIntegrated("+howMany+"), not enough integrated (" + matches.size() + ") going on to notFailing");
-            selectNotFailingPeers(howMany, exclude, matches, mask, ipSet);
-        } else {            
-            if (_log.shouldDebug())
-                _log.debug("selectWellIntegrated("+howMany+"), found enough well integrated (" + matches.size() + ")");
-        }
-        
-        return;
-    }
-
-    /**
      * Return a set of Hashes for peers that are not failing, preferring ones that
      * we are already talking with
      *
@@ -773,7 +737,7 @@ public class ProfileOrganizer {
      * I'm not quite sure why you'd want this... (other than for failover from the better results)
      *
      */
-    public void selectFailingPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {
+    private void selectFailingPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {
         getReadLock();
         try {
             locked_selectPeers(_failingPeers, howMany, exclude, matches);
