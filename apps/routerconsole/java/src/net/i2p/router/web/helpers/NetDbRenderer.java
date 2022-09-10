@@ -1111,11 +1111,15 @@ class NetDbRenderer {
             if (family != null) {
                 FamilyKeyCrypto fkc = _context.router().getFamilyKeyCrypto();
                 if (fkc != null) {
+                    String f = DataHelper.stripHTML(family);
                     buf.append("<tr><td><b>").append(_t("Family"))
                        .append(":</b><td colspan=\"2\"><span class=\"netdb_info\">")
                        .append(fkc.verify(info) == FamilyKeyCrypto.Result.STORED_KEY ? "Verified" : "Unverified")
-                       .append(' ').append(DataHelper.stripHTML(family))
-                       .append("</span></td></tr>\n");
+                       .append(" <a href=\"/netdb?fam=")
+                       .append(f)
+                       .append("\">")
+                       .append(f)
+                       .append("</a></span></td></tr>\n");
                 }
             }
         }
@@ -1137,10 +1141,10 @@ class NetDbRenderer {
         int rv = 0;
         for (RouterAddress addr : info.getAddresses()) {
             String style = addr.getTransportStyle();
-            if (style.equals("NTCP") || style.equals("NTCP2")) {
+            if (style.equals("NTCP2") || style.equals("NTCP")) {
                 rv |= NTCP;
-            } else if (style.equals("SSU")) {
-                if (addr.getOption("iport0") != null)
+            } else if (style.equals("SSU") || style.equals("SSU2")) {
+                if (addr.getOption("itag0") != null)
                     rv |= SSUI;
                 else
                     rv |= SSU;
