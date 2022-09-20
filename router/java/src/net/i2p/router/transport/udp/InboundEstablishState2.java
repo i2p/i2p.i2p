@@ -419,8 +419,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     public void gotTermination(int reason, long count) {
-        if (_log.shouldWarn())
-            _log.warn("Got TERMINATION block, reason: " + reason + " count: " + count);
+        if (_log.shouldInfo())
+            _log.info("Got TERMINATION block, reason: " + reason + " count: " + count);
         // this sets the state to FAILED
         fail();
         _transport.getEstablisher().receiveSessionDestroy(_remoteHostId);
@@ -607,8 +607,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                     return null;
                 }
             }
-            if (_log.shouldWarn())
-                _log.warn("Got sess conf frag " + frag + '/' + totalfrag + " len " + len + " on " + this);
+            if (_log.shouldDebug())
+                _log.debug("Got sess conf frag " + frag + '/' + totalfrag + " len " + len + " on " + this);
             byte[] fragdata;
             if (frag == 0) {
                 // preserve header
@@ -624,8 +624,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             int totalsize = 0;
             for (int i = 0; i < totalfrag; i++) {
                 if (_sessConfFragments[i] == null) {
-                    if (_log.shouldWarn())
-                        _log.warn("Still missing at least one sess conf frag on " + this);
+                    if (_log.shouldDebug())
+                        _log.debug("Still missing at least one sess conf frag on " + this);
                     // there is no facility to ack individual fragments
                     //packetReceived();
                     return null;
@@ -643,8 +643,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                 System.arraycopy(f, 0, data, joff, f.length);
                 joff += f.length;
             }
-            if (_log.shouldWarn())
-                _log.warn("Have all " + totalfrag + " sess conf frags, total length " + len + " on " + this);
+            if (_log.shouldDebug())
+                _log.debug("Have all " + totalfrag + " sess conf frags, total length " + len + " on " + this);
         }
         _handshakeState.mixHash(data, off, SHORT_HEADER_SIZE);
         //if (_log.shouldDebug())
@@ -778,8 +778,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             _currentState = InboundState.IB_STATE_COMPLETE;
             if (_queuedDataPackets != null) {
                 for (UDPPacket packet : _queuedDataPackets) {
-                    if (_log.shouldWarn())
-                        _log.warn("Passing possible data " + packet + " to PeerState2: " + this);
+                    if (_log.shouldInfo())
+                        _log.info("Passing possible data " + packet + " to PeerState2: " + this);
                     _pstate.receivePacket(packet);
                     packet.release();
                 }
@@ -802,8 +802,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                     _log.warn("Not queueing possible data " + packet + ", too many queued on " + this);
                 return;
             }
-            if (_log.shouldWarn())
-                _log.warn("Queueing possible data " + packet + " on " + this);
+            if (_log.shouldInfo())
+                _log.info("Queueing possible data " + packet + " on " + this);
             // have to copy it because PacketHandler will release
             DatagramPacket pkt = packet.getPacket();
             UDPPacket packet2 = UDPPacket.acquire(_context, true);
@@ -814,8 +814,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             _queuedDataPackets.add(packet2);
         } else {
             // case 2, race, decrypt header and pass over
-            if (_log.shouldWarn())
-                _log.warn("Passing possible data " + packet + " to PeerState2: " + this);
+            if (_log.shouldInfo())
+                _log.info("Passing possible data " + packet + " to PeerState2: " + this);
             _pstate.receivePacket(packet);
         }
     }
