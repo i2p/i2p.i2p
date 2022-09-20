@@ -774,7 +774,7 @@ public class TunnelConfig {
                 config.setProperty(TunnelController.PROP_PROXIES, _proxyList);
         }
 
-        // Proxy auth including migration to MD5
+        // Proxy auth including migration to MD5 and SHA256
         if (TunnelController.TYPE_HTTP_CLIENT.equals(_type) || TunnelController.TYPE_CONNECT.equals(_type)) {
             // Migrate even if auth is disabled
             // go get the old from custom options that updateConfigGeneric() put in there
@@ -796,6 +796,17 @@ public class TunnelConfig {
                         config.remove(ppw);
                     }
                 }
+                // SHA256 RFC 7616
+                String psha256 = OPT + I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_PREFIX +
+                                 user + I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_SHA256_SUFFIX;
+                if (config.getProperty(psha256) == null) {
+                    // not in there, add it
+                    String realm = _type.equals(TunnelController.TYPE_HTTP_CLIENT) ? I2PTunnelHTTPClient.AUTH_REALM
+                                                              : I2PTunnelConnectClient.AUTH_REALM;
+                    String hex = PasswordManager.sha256Hex(realm, user, pw);
+                    if (hex != null)
+                        config.setProperty(psha256, hex);
+                }
             }
             // New user/password
             String auth = _otherOptions.get(I2PTunnelHTTPClientBase.PROP_AUTH);
@@ -809,6 +820,11 @@ public class TunnelConfig {
                     String hex = PasswordManager.md5Hex(realm, _newProxyUser, _newProxyPW);
                     if (hex != null)
                         config.setProperty(pmd5, hex);
+                    String psha256 = OPT + I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_PREFIX +
+                                     _newProxyUser + I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_SHA256_SUFFIX;
+                    hex = PasswordManager.sha256Hex(realm, _newProxyUser, _newProxyPW);
+                    if (hex != null)
+                        config.setProperty(psha256, hex);
                 }
             }
         }

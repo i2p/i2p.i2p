@@ -92,11 +92,9 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             "Cache-Control: no-cache\r\n" +
             "Connection: close\r\n"+
             "Proxy-Connection: close\r\n"+
-            "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.5\r\n" + // try to get a UTF-8-encoded response back for the password
-            "Proxy-Authenticate: ";
+            "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.5\r\n"; // try to get a UTF-8-encoded response back for the password
     // put the auth type and realm in between
     private static final String ERR_AUTH2 =
-            "\r\n" +
             "\r\n" +
             "<html><body><H1>I2P ERROR: PROXY AUTHENTICATION REQUIRED</H1>" +
             "This proxy is configured to require authentication.";
@@ -346,6 +344,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     /** new style MD5 auth */
     public static final String PROP_PROXY_DIGEST_PREFIX = "proxy.auth.";
     public static final String PROP_PROXY_DIGEST_SUFFIX = ".md5";
+    public static final String PROP_PROXY_DIGEST_SHA256_SUFFIX = ".sha256";
     public static final String BASIC_AUTH = "basic";
     public static final String DIGEST_AUTH = "digest";
 
@@ -526,6 +525,19 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                 _log.info("Bad digest request: " + DataHelper.toString(args));
             return AuthResult.AUTH_BAD_REQ;
         }
+        // RFC 7616
+        String algorithm = args.get("algorithm");
+        boolean isSHA256 = false;
+        if (algorithm != null) {
+            algorithm = algorithm.toLowerCase(Locale.US);
+            if (algorithm.equals("sha-256")) {
+                isSHA256 = true;
+            } else if (!algorithm.equals("md5")) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Bad digest request: " + DataHelper.toString(args));
+                return AuthResult.AUTH_BAD_REQ;
+            }
+        }
         // nonce check
         AuthResult check = verifyNonce(nonce, nc);
         if (check != AuthResult.AUTH_GOOD) {
@@ -535,17 +547,17 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         }
         // get H(A1) == stored password
         String ha1 = getTunnel().getClientOptions().getProperty(PROP_PROXY_DIGEST_PREFIX + user +
-                                                                PROP_PROXY_DIGEST_SUFFIX);
+                                                                (isSHA256 ? PROP_PROXY_DIGEST_SHA256_SUFFIX : PROP_PROXY_DIGEST_SUFFIX));
         if (ha1 == null) {
             _log.logAlways(Log.WARN, "HTTP proxy authentication failed, user: " + user);
             return AuthResult.AUTH_BAD;
         }
         // get H(A2)
         String a2 = method + ':' + uri;
-        String ha2 = PasswordManager.md5Hex(a2);
+        String ha2 = isSHA256 ? PasswordManager.sha256Hex(a2) : PasswordManager.md5Hex(a2);
         // response check
         String kd = ha1 + ':' + nonce + ':' + nc + ':' + cnonce + ':' + qop + ':' + ha2;
-        String hkd = PasswordManager.md5Hex(kd);
+        String hkd = isSHA256 ? PasswordManager.sha256Hex(kd) : PasswordManager.md5Hex(kd);
         if (!response.equals(hkd)) {
             _log.logAlways(Log.WARN, "HTTP proxy authentication failed, user: " + user);
             if (_log.shouldLog(Log.INFO))
@@ -631,17 +643,43 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
      */
     protected String getAuthError(boolean isStale) {
         boolean isDigest = isDigestAuthRequired();
-        return
-            ERR_AUTH1 +
-            (isDigest ? "Digest" : "Basic") +
-            " realm=\"" + getRealm() + '"' +
-            (isDigest ? ", nonce=\"" + getNonce() + "\"," +
-                        " algorithm=MD5," +
-                        " charset=UTF-8," +     // RFC 7616/7617
-                        " qop=\"auth\"" +
-                        (isStale ? ", stale=true" : "")
-                      : "") +
-            ERR_AUTH2;
+        StringBuilder buf = new StringBuilder(512);
+        buf.append(ERR_AUTH1)
+           .append("Proxy-Authenticate: ")
+           .append(isDigest ? "Digest" : "Basic")
+           .append(" realm=\"" + getRealm() + '"');
+        if (isDigest) {
+            String nonce = getNonce();
+            // RFC 7616 most-preferred first, client accepts first that he supports
+            // This is also compatible with eepget < 0.9.56 that will use the last one
+            // Do we have a SHA256 hash for any user?
+            for (String k : getTunnel().getClientOptions().stringPropertyNames()) {
+                if (k.startsWith(PROP_PROXY_DIGEST_PREFIX) &&
+                    k.endsWith(PROP_PROXY_DIGEST_SHA256_SUFFIX)) {
+                    // SHA-256, RFC 7616
+                    buf.append(", nonce=\"" + nonce + "\"," +
+                               " algorithm=SHA-256," +
+                               " charset=UTF-8," +
+                               " qop=\"auth\"");
+                    if (isStale)
+                        buf.append(", stale=true");
+                    buf.append("\r\n" +
+                               "Proxy-Authenticate: Digest" +
+                               " realm=\"" + getRealm() + '"');
+                    break;
+                }
+            }
+
+            buf.append(", nonce=\"" + nonce + "\"," +
+                       " algorithm=MD5," +
+                       " charset=UTF-8," +     // RFC 7616/7617
+                       " qop=\"auth\"");
+            if (isStale)
+                buf.append(", stale=true");
+        }
+        buf.append("\r\n")
+           .append(ERR_AUTH2);
+        return buf.toString();
     }
 
     /**

@@ -1785,20 +1785,38 @@ public class EepGet {
                     // use standard alphabet
                     authMode = AUTH_MODE.BASIC;
                     authChallenge = auth.substring(6);
+                    args = parseAuthArgs(authChallenge);
                 }
             } else if (authLC.startsWith("digest ")) {
-                // better than anything
-                authMode = AUTH_MODE.DIGEST;
-                authChallenge = auth.substring(7);
+                // RFC 7616 take the first one that we support
+                if (authMode != AUTH_MODE.DIGEST) {
+                    String ac = auth.substring(7);
+                    Map<String, String> aargs = parseAuthArgs(ac);
+                    String algo = aargs.get("algorithm");
+                    if (algo != null) {
+                        algo = algo.toLowerCase(Locale.US);
+                        if (!algo.equals("sha-256") && !algo.equals("md5")) {
+                            if (_log.shouldWarn())
+                                _log.warn("Unsupported auth algorithm " + algo);
+                            return;
+                        }
+                    }
+                    authMode = AUTH_MODE.DIGEST;
+                    authChallenge = ac;
+                    args = aargs;
+                } else {
+                    if (_log.shouldDebug())
+                        _log.debug("Ignoring auth algorithm " + auth);
+                }
             } else {
                 // better than NONE only
                 if (authMode == AUTH_MODE.NONE) {
                     authMode = AUTH_MODE.UNKNOWN;
                     authChallenge = null;
+                    args = null;
                 }
             }
             nonceCount = 0;
-            args = null;
         }
 
         public String getAuthHeader(String method, String uri) throws IOException {
@@ -1812,8 +1830,6 @@ public class EepGet {
                 case DIGEST:
                     if (authChallenge == null)
                         throw new IOException("Bad proxy auth response");
-                    if (args == null)
-                        args = parseAuthArgs(authChallenge);
                     Map<String, String> outArgs = generateAuthArgs(method, uri);
                     if (outArgs == null)
                         throw new IOException("Bad proxy auth response");
@@ -1842,7 +1858,14 @@ public class EepGet {
             String nonce = args.get("nonce");
             String qop = args.get("qop");
             String opaque = args.get("opaque");
-            //String algorithm = args.get("algorithm");
+            // RFC 7616
+            String algorithm = args.get("algorithm");
+            boolean isSHA256 = false;
+            if (algorithm == null)
+                algorithm = "MD5";
+            else
+                isSHA256 = algorithm.toLowerCase(Locale.US).equals("sha-256");
+            rv.put("algorithm", algorithm);
             //String stale = args.get("stale");
             if (realm == null || nonce == null) {
                 if (_log.shouldLog(Log.INFO))
@@ -1872,13 +1895,14 @@ public class EepGet {
             }
 
             // get H(A1)
-            String ha1 = PasswordManager.md5Hex(username + ':' + realm + ':' + password);
+            String a1 = username + ':' + realm + ':' + password;
+            String ha1 = isSHA256 ? PasswordManager.sha256Hex(a1) : PasswordManager.md5Hex(a1);
             // get H(A2)
             String a2 = method + ':' + uri;
-            String ha2 = PasswordManager.md5Hex(a2);
+            String ha2 = isSHA256 ? PasswordManager.sha256Hex(a2) : PasswordManager.md5Hex(a2);
             // response
             String kd = ha1 + ':' + nonce + kdMiddle + ':' + ha2;
-            rv.put("response", '"' + PasswordManager.md5Hex(kd) + '"');
+            rv.put("response", '"' + (isSHA256 ? PasswordManager.sha256Hex(kd) : PasswordManager.md5Hex(kd)) + '"');
             return rv;
         }
 

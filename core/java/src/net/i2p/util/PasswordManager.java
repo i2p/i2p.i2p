@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.SHA256Generator;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
@@ -230,6 +231,38 @@ public class PasswordManager {
             return md.digest();
         } catch (NoSuchAlgorithmException nsae) {}
         return null;
+    }
+
+    /**
+     *  Straight SHA256, no salt
+     *  Will return the SHA256 sum of "user:subrealm:pw", compatible with RFC 7616.
+     *  NOT currently supported by Jetty.
+     *
+     *  @param subrealm to be used in creating the checksum
+     *  @param user non-null, non-empty, already trimmed
+     *  @param pw non-null, plain text, already trimmed
+     *  @return lower-case hex with leading zeros, 32 chars, or null on error
+     *  @since 0.9.56
+     */
+    public static String sha256Hex(String subrealm, String user, String pw) {
+        String fullpw = user + ':' + subrealm + ':' + pw;
+        return sha256Hex(fullpw);
+    }
+
+    /**
+     *  Return the SHA256 sum of the data, compatible with RFC 7616.
+     *  NOT currently supported by Jetty.
+     *
+     *  @param fullpw non-null, plain text, already trimmed
+     *  @return lower-case hex with leading zeros, 64 chars, or null on error
+     *  @since 0.9.56
+     */
+    public static String sha256Hex(String fullpw) {
+        byte[] data = DataHelper.getUTF8(fullpw);
+        byte[] sum = new byte[32];
+        SHA256Generator.getInstance().calculateHash(data, 0, data.length, sum, 0);
+        // adds leading zeros if necessary
+        return DataHelper.toString(sum);
     }
 
     /**

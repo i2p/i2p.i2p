@@ -1,3 +1,6 @@
+2022-09-20 zzz
+ * i2ptunnel, eepget: Add support for SHA-256 digest proxy auth (RFC 7616)
+
 2022-09-09 zzz
  * SSU2: Enable handling of ack-immediate flag by default
 
@@ -38,7 +41,7 @@
 2022-08-23 zzz
  * Router: Add deadlocks to event log
 
-2022-08-22 1.9.0 released
+2022-08-22 1.9.0 (API 0.9.55) released
 
 2022-08-10 zzz
  * SSU2: Enable for Android, ARM, and 2% of others
@@ -229,7 +232,7 @@
  * Crypto: Throw checked exception from ElGamal
    so console key import reports the correct error
 
-2022-05-23 1.8.0 released
+2022-05-23 1.8.0 (API 0.9.54) released
 
 2022-05-19 zzz
  * Pull translations from Transifex
@@ -377,7 +380,7 @@
  * Update: Add notification for new version
  * Util: Speed up PRNG nextInt() and nextLong()
 
-2022-02-21 1.7.0 released
+2022-02-21 1.7.0 (API 0.9.53) released
 
 2022-02-18 zzz
  * Update translations
@@ -492,7 +495,7 @@
  * Console: NetDB search form improvements
  * i2ptunnel: Increase priority for IRC and standard tunnels
 
-2021-11-29 1.6.1 released
+2021-11-29 1.6.1 (API 0.9.52) released
 
 2021-11-29 zzz
  * Tunnels: Fix NPE in BuildHandler
@@ -575,7 +578,7 @@
  * Router: Increase rekey probability
  * Tunnels: Enable sending short build messages
 
-2021-08-23 1.5.0 released
+2021-08-23 1.5.0 (API 0.9.51) released
 
 2021-08-20 zzz
  * Update GeoIP and translations
