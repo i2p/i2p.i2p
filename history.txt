@@ -1,3 +1,9 @@
+2022-09-23 zzz
+ * SSU2:
+   - Fail handshakes while inside sync
+   - Convert 1276 MTU to 1280 to workaround bug in 1.9.0
+   - Ensure min packet size for pings
+
 2022-09-20 zzz
  * i2ptunnel, eepget: Add support for SHA-256 digest proxy auth (RFC 7616)
 

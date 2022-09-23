@@ -328,6 +328,7 @@ class PacketBuilder2 {
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
         int off = SHORT_HEADER_SIZE;
+        // plenty of room
         Block block = getPadding(0, 1280);
         List<Block> blocks = Collections.singletonList(block);
         off += block.getTotalLength();
@@ -1144,12 +1145,17 @@ class PacketBuilder2 {
                 throw new IllegalArgumentException("Bad data msg", e);
             }
         }
-        pkt.setLength(len + MAC_LEN);
+        len += MAC_LEN;
+        pkt.setLength(len);
+        if (len < MIN_DATA_LEN)
+            _log.error("Packet too short " + len, new Exception());
         SSU2Header.encryptShortHeader(packet, hdrKey1, hdrKey2);
     }
 
     /**
      *  @param len current length of the packet including IP/UDP header
+     *             (unless header subtracted from max)
+     *             If len == 0 ensure 8 byte block minimum
      *  @param max max length of the packet
      *  @return null if no room
      */
@@ -1158,10 +1164,14 @@ class PacketBuilder2 {
         if (maxpadlen < 0)
             return null;
         int padlen;
-        if (maxpadlen == 0)
+        if (maxpadlen == 0) {
             padlen = 0;
-        else
+        } else {
             padlen = _context.random().nextInt(maxpadlen + 1);
+            // ping packets, ensure 40 byte minimum packet size
+            if (len == 0)
+                padlen += 5;
+        }
         return new SSU2Payload.PaddingBlock(padlen);
     }
 
