@@ -288,6 +288,9 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                 else
                     mtu = PeerState2.DEFAULT_SSU_IPV4_MTU;
             }
+        } else if (mtu == 1276 && ra.getTransportStyle().equals("SSU")) {
+            // workaround for bug in 1.9.0
+            mtu = PeerState2.MIN_MTU;
         } else {
             // if too small, give up now
             if (mtu < PeerState2.MIN_MTU)
