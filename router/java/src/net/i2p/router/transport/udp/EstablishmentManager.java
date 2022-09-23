@@ -767,7 +767,7 @@ class EstablishmentManager {
         } catch (GeneralSecurityException gse) {
             if (_log.shouldWarn())
                 _log.warn("Corrupt Session Confirmed on: " + state, gse);
-            state.fail();
+            // state called fail()
             return;
         }
         InboundEstablishState.InboundState istate = state.getState();
@@ -819,7 +819,7 @@ class EstablishmentManager {
         } catch (GeneralSecurityException gse) {
             if (_log.shouldWarn())
                 _log.warn("Corrupt Session Created on: " + state, gse);
-            state.fail();
+            // state called fail()
             return;
         }
         notifyActivity();
@@ -839,7 +839,7 @@ class EstablishmentManager {
         } catch (GeneralSecurityException gse) {
             if (_log.shouldWarn())
                 _log.warn("Corrupt Retry from: " + state, gse);
-            state.fail();
+            // state called fail()
             return;
         }
         notifyActivity();

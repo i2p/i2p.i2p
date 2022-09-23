@@ -359,8 +359,19 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     /////////////////////////////////////////////////////////
     // end payload callbacks
     /////////////////////////////////////////////////////////
-    
+
     // SSU 1 overrides
+
+    /**
+     *  Overridden to destroy the handshake state
+     *  @since 0.9.56
+     */
+    @Override
+    public synchronized void fail() {
+        if (_handshakeState != null)
+            _handshakeState.destroy();
+        super.fail();
+    }
 
     @Override
     public synchronized boolean validateSessionCreated() {
@@ -424,6 +435,21 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     public synchronized void receiveRetry(UDPPacket packet) throws GeneralSecurityException {
+        try {
+            locked_receiveRetry(packet);
+        } catch (GeneralSecurityException gse) {
+            if (_log.shouldDebug())
+                _log.debug("Retry error", gse);
+            // fail inside synch rather than have Est. Mgr. do it to prevent races
+            fail();
+            throw gse;
+        }
+    }
+
+    /**
+     *  @since 0.9.56
+     */
+    private void locked_receiveRetry(UDPPacket packet) throws GeneralSecurityException {
         ////// TODO state check
         DatagramPacket pkt = packet.getPacket();
         SocketAddress from = pkt.getSocketAddress();
@@ -452,10 +478,6 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             chacha.decryptWithAd(data, off, LONG_HEADER_SIZE,
                                  data, off + LONG_HEADER_SIZE, data, off + LONG_HEADER_SIZE, len - LONG_HEADER_SIZE);
             processPayload(data, off + LONG_HEADER_SIZE, len - (LONG_HEADER_SIZE + MAC_LEN), true);
-        } catch (GeneralSecurityException gse) {
-            if (_log.shouldDebug())
-                _log.debug("Retry error", gse);
-            throw gse;
         } finally {
             chacha.destroy();
         }
@@ -477,6 +499,26 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     public synchronized void receiveSessionCreated(UDPPacket packet) throws GeneralSecurityException {
+        try {
+            locked_receiveSessionCreated(packet);
+        } catch (GeneralSecurityException gse) {
+            if (_log.shouldDebug()) {
+                DatagramPacket pkt = packet.getPacket();
+                byte data[] = pkt.getData();
+                int off = pkt.getOffset();
+                int len = pkt.getLength();
+                _log.debug("Session create error, State at failure: " + _handshakeState + '\n' + net.i2p.util.HexDump.dump(data, off, len), gse);
+            }
+            // fail inside synch rather than have Est. Mgr. do it to prevent races
+            fail();
+            throw gse;
+        }
+    }
+
+    /**
+     *  @since 0.9.56
+     */
+    private void locked_receiveSessionCreated(UDPPacket packet) throws GeneralSecurityException {
         if (_currentState != OutboundState.OB_STATE_REQUEST_SENT &&
             _currentState != OutboundState.OB_STATE_REQUEST_SENT_NEW_TOKEN) {
             // ignore dups
@@ -506,13 +548,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         //    _log.debug("State after mixHash 2: " + _handshakeState);
 
         // decrypt in-place
-        try {
-            _handshakeState.readMessage(data, off + LONG_HEADER_SIZE, len - LONG_HEADER_SIZE, data, off + LONG_HEADER_SIZE);
-        } catch (GeneralSecurityException gse) {
-            if (_log.shouldDebug())
-                _log.debug("Session create error, State at failure: " + _handshakeState + '\n' + net.i2p.util.HexDump.dump(data, off, len), gse);
-            throw gse;
-        }
+        _handshakeState.readMessage(data, off + LONG_HEADER_SIZE, len - LONG_HEADER_SIZE, data, off + LONG_HEADER_SIZE);
         //if (_log.shouldDebug())
         //    _log.debug("State after sess cr: " + _handshakeState);
         _timeReceived = 0;

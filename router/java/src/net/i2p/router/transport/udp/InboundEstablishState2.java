@@ -437,7 +437,19 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     /////////////////////////////////////////////////////////
     // end payload callbacks
     /////////////////////////////////////////////////////////
-    
+
+    // SSU 1 overrides
+
+    /**
+     *  Overridden to destroy the handshake state
+     *  @since 0.9.56
+     */
+    @Override
+    public synchronized void fail() {
+        _handshakeState.destroy();
+        super.fail();
+    }
+
     // SSU 1 unsupported things
 
     @Override
@@ -566,6 +578,21 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
      *         or null if more fragments to go
      */
     public synchronized PeerState2 receiveSessionConfirmed(UDPPacket packet) throws GeneralSecurityException {
+        try {
+            return locked_receiveSessionConfirmed(packet);
+        } catch (GeneralSecurityException gse) {
+            if (_log.shouldDebug())
+                _log.debug("Session confirmed error", gse);
+            // fail inside synch rather than have Est. Mgr. do it to prevent races
+            fail();
+            throw gse;
+        }
+    }
+
+    /**
+     *  @since 0.9.56
+     */
+    private PeerState2 locked_receiveSessionConfirmed(UDPPacket packet) throws GeneralSecurityException {
         if (_currentState != InboundState.IB_STATE_CREATED_SENT &&
             _currentState != InboundState.IB_STATE_CONFIRMED_PARTIALLY)
             throw new GeneralSecurityException("Bad state for Session Confirmed: " + _currentState);
