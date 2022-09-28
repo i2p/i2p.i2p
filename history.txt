@@ -1,3 +1,7 @@
+2022-09-28 zzz
+ * Installer: Fix error on Windows when username contains a space (gitlab #367)
+ * SSU2: Enable by default
+
 2022-09-23 zzz
  * SSU2:
    - Fail handshakes while inside sync
