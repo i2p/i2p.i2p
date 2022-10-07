@@ -25,9 +25,9 @@ done
 if [ -f /.dockerenv ]; then
     echo "[startapp] Running in container"
     export IP_ADDR=$(hostname -i)
-    if echo "$IP_ADDR" | grep "172.17"; then
+    if echo "$IP_ADDR" | grep "172."; then
         echo "[startapp] Running in docker network"
-        sed -i "s/127.0.0.1/${IP_ADDR}/g" ./clients.config ./i2ptunnel.config
+        sed -i "s/127.0.0.1/0.0.0.0/g" ./clients.config ./i2ptunnel.config
     fi
 
 fi
