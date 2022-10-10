@@ -57,6 +57,7 @@ import net.i2p.router.util.EventLog;
 import net.i2p.router.util.RandomIterator;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
+import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.SimpleTimer;
@@ -76,6 +77,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** RemoteHostId to PeerState */
     private final Map<RemoteHostId, PeerState> _peersByRemoteHost;
     private final Map<Long, PeerState2> _peersByConnID;
+    private final Map<Long, Object> _recentlyClosedConnIDs;
     private PacketHandler _handler;
     private EstablishmentManager _establisher;
     private final MessageQueue _outboundMessages;
@@ -166,6 +168,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int DROPLIST_PERIOD = 10*60*1000;
     public static final String STYLE = "SSU";
     public static final String PROP_INTERNAL_PORT = "i2np.udp.internalPort";
+    private static final Object DUMMY = Integer.valueOf(0);
 
     /** now unused, we pick a random port
      *  @deprecated unused
@@ -338,6 +341,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _peersByIdent = new ConcurrentHashMap<Hash, PeerState>(128);
         _peersByRemoteHost = new ConcurrentHashMap<RemoteHostId, PeerState>(128);
         _peersByConnID = (xdh != null) ? new ConcurrentHashMap<Long, PeerState2>(32) : null;
+        _recentlyClosedConnIDs = (xdh != null) ? new LHMCache<Long, Object>(24) : null;
         _dropList = new ConcurrentHashSet<RemoteHostId>(2);
         _endpoints = new CopyOnWriteArrayList<UDPEndpoint>();
         
@@ -856,6 +860,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _peersByIdent.clear();
         if (_peersByConnID != null)
             _peersByConnID.clear();
+        if (_recentlyClosedConnIDs != null) {
+            synchronized(_addDropLock) {
+                _recentlyClosedConnIDs.clear();
+            }
+        }
         _dropList.clear();
         _introManager.reset();
         UDPPacket.clearCache();
@@ -1651,6 +1660,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return _peersByConnID.get(Long.valueOf(rcvConnID));
     }
 
+    /**
+     * Was the state for this SSU2 receive connection ID recently closed?
+     * @since 0.9.56
+     */
+    boolean wasRecentlyClosed(long rcvConnID) {
+        Long id = Long.valueOf(rcvConnID);
+        synchronized(_addDropLock) {
+            return _recentlyClosedConnIDs.get(id) != null;
+        }
+    }
+
     /** 
      * For /peers UI only. Not a public API, not for external use.
      *
@@ -1824,7 +1844,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
             if (oldPeer != peer && oldPeer.getVersion() == 2) {
                 PeerState2 state2 = (PeerState2) oldPeer;
-                _peersByConnID.remove(Long.valueOf(state2.getRcvConnID()));
+                Long id = Long.valueOf(state2.getRcvConnID());
+                _recentlyClosedConnIDs.put(id, DUMMY);
+                _peersByConnID.remove(id);
             }
         }
 
@@ -2028,7 +2050,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         if (peer.getVersion() == 2) {
             PeerState2 state2 = (PeerState2) peer;
-            _peersByConnID.remove(Long.valueOf(state2.getRcvConnID()));
+            Long id = Long.valueOf(state2.getRcvConnID());
+            // for now, we don't save the PeerState2 for doing termination retransmissions,
+            // but we may in the future
+            _recentlyClosedConnIDs.put(id, DUMMY);
+            _peersByConnID.remove(id);
         }
         
         RemoteHostId remoteId = peer.getRemoteHostId();
