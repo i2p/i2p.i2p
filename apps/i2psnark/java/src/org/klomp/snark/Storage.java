@@ -87,7 +87,7 @@ public class Storage implements Closeable
   /** bigger than this will be rejected */
   public static final int MAX_PIECE_SIZE = 32*1024*1024;
   /** The maximum number of pieces in a torrent. */
-  public static final int MAX_PIECES = 32*1024;
+  public static final int MAX_PIECES = 64*1024;
   public static final long MAX_TOTAL_SIZE = MAX_PIECE_SIZE * (long) MAX_PIECES;
   public static final int PRIORITY_SKIP = -9;
   public static final int PRIORITY_NORMAL = 0;
