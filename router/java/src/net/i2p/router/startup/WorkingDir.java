@@ -80,14 +80,14 @@ public class WorkingDir {
         } else {
             String home = System.getProperty("user.home");
             if (isWindows) {
-                String appdata = System.getenv("LOCALAPPDATA");
-                if (appdata != null) {
-                    home = appdata;
+                String localappdata = System.getenv("LOCALAPPDATA");
+                if (localappdata != null) {
+                    home = localappdata;
                 }
                 // Don't mess with existing Roaming Application Data installs,
                 // in case somebody is using roaming appdata for a reason
                 // already. In new installs, use local appdata by default. -idk
-                appdata = System.getenv("APPDATA");
+                String appdata = System.getenv("APPDATA");
                 if (appdata != null) {
                     File checkOld = new File(appdata, WORKING_DIR_DEFAULT_WINDOWS);
                     if (checkOld.exists() && checkOld.isDirectory()){
@@ -106,6 +106,7 @@ public class WorkingDir {
                             if (routerConfig.exists() && clientAppsConfig.exists())
                                 home = appdata;
                         }
+                        System.err.println("System is Windows: " + home);
                     }
                 }
                 dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT_WINDOWS);
@@ -391,7 +392,7 @@ public class WorkingDir {
                 }
                 out.println(s);
             }
-            System.err.println("Copied " + oldFile + " with modifications");
+            System.err.println("Copied file " + oldFile + " with modifications");
             if (out.checkError())
                 throw new IOException("Failed write to " + newFile);
             return true;
@@ -456,7 +457,7 @@ public class WorkingDir {
                 System.err.println("FAILED copy " + src.getPath());
                 return false;
             }
-            System.err.println("Created " + targetDir.getPath());
+            System.err.println("Created Directory " + targetDir.getPath());
         }
         // SecureDirectory is a File so this works for non-directories too
         File targetFile = new SecureDirectory(targetDir, src.getName());
@@ -473,7 +474,7 @@ public class WorkingDir {
                 System.err.println("FAILED copy " + src.getPath());
                 return false;
             }
-            System.err.println("Created " + targetFile.getPath());
+            System.err.println("Created File " + targetFile.getPath());
         }
         boolean rv = true;
         for (int i = 0; i < children.length; i++) {
@@ -497,7 +498,7 @@ public class WorkingDir {
             in = new FileInputStream(src);
             out = new SecureFileOutputStream(dst);
             DataHelper.copy(in, out);
-            System.err.println("Copied " + src.getPath());
+            System.err.println("Copied File " + src.getPath());
         } catch (IOException ioe) {
             System.err.println("FAILED copy " + src.getPath() + ": " + ioe);
             rv = false;
