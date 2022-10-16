@@ -3,7 +3,7 @@
  <programGroup defaultName="I2P" location="startMenu" />
  <shortcut name="Open I2P Profile Folder (service)"
           target="explorer"
-          commandLine="&quot;%allusersprofile%\Application Data\i2p&quot;"
+          commandLine="&quot;%programdata%\i2p&quot;"
           iconFile="%systemroot%\system32\shell32.dll"
           iconIndex="3"
           initialState="normal"

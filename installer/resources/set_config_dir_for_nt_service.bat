@@ -11,7 +11,7 @@ if "%1"=="uninstall" (
 ) else (
     FINDSTR /I "^wrapper.java.additional.5=-Di2p.dir.config=" %_WRAPPER_CONF%
     if not errorlevel 1 goto end
-    echo wrapper.java.additional.5=-Di2p.dir.config="%ALLUSERSPROFILE%\Application Data\i2p" >> %_WRAPPER_CONF%
+    echo wrapper.java.additional.5=-Di2p.dir.config="%PROGRAMDATA%\i2p" >> %_WRAPPER_CONF%
     goto end
 )
 

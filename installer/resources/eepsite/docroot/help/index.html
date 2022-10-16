@@ -51,8 +51,9 @@
         Package install, running as a service: <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/</code>
       </li>
       <li><b>Windows</b><br>
-        <code dir="ltr">%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
-      </li>        
+        Standard install: <code dir="ltr">%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
+        Windows Service install: <code dir="ltr">%PROGRAMDATA%\I2P\eepsite\docroot\</code>
+      </li>
       <li><b>Mac</b><br>
         <code dir="ltr">/Users/(user)/Library/Application Support/i2p</code>
       </li>
@@ -95,15 +96,15 @@
       <li>Enter the name and paste the destination into your <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">address book</a>.
          Click "Add" to save the new entry.
       </li>
-      <li>In your browser, enter in your website name (<i>something</i>.i2p) and you should be right back here. 
+      <li>In your browser, enter in your website name (<i>something</i>.i2p) and you should be right back here.
           Hopefully it worked!
       </li>
       <li>Before you tell the world about your new website, you should add some content.
           Go to the server's root directory <a href="#dir">listed above</a> and replace the index.html redirect page with your own content.
       </li>
-    </ul>            
+    </ul>
 
-    <p>Directory listings are enabled, so you may host files from a subdirectory without providing a page with links to the files. 
+    <p>Directory listings are enabled, so you may host files from a subdirectory without providing a page with links to the files.
       You may change the appearance of the directory by supplying an edited <a href="lib/jetty-dir.css">jetty-dir.css</a> file for each directory.
       The <a href="lib/">lib subdirectory</a> demonstrates a custom style.
       The <a href="lib/resources">resources subdirectory</a> demonstrates the default style.
@@ -120,14 +121,14 @@
 
     <h2>Register your own I2P Domain</h2>
 
-    <p>Now it is time to add your website to an I2P address book hosted by a site such as <a href="http://stats.i2p/" target="_blank">stats.i2p</a>. 
+    <p>Now it is time to add your website to an I2P address book hosted by a site such as <a href="http://stats.i2p/" target="_blank">stats.i2p</a>.
       You must enter your website name and Destination (or Registration Authentication string) on one or more of these sites.
     </p><p>Some registration sites require the Destination.
       If so, highlight and copy the entire Local destination on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.
       Make sure you copy the whole thing, it is over 500 characters.
     </p><p>Some registration sites, including <a href="http://stats.i2p/i2p/addkey.html" target="_blank">stats.i2p</a>, require the Registration Authentication string.
       It is found on the <a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">Registration Authentication page</a> linked from the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service configuration page</a>.
-      Copy the entire authentication string and paste it on the registration page. 
+      Copy the entire authentication string and paste it on the registration page.
       Make sure you copy the whole thing, it is over 500 characters.
       Describe your site briefly if the site requests this information.
       If your site is a HTTP service, leave the checkbox selected; if not, unselect it.
@@ -146,14 +147,14 @@
       <li><code dir="ltr">http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)
       </li>
     </ul>
-    
-    <p>If you are in a hurry and can't wait a few hours, you can tell people to use a "jump" address helper redirection service. 
+
+    <p>If you are in a hurry and can't wait a few hours, you can tell people to use a "jump" address helper redirection service.
       This will work within a few minutes of your registering your hostname on the same site.
-      Test it yourself first by entering <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code> into your browser. 
+      Test it yourself first by entering <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code> into your browser.
       Once it is working, you can tell others to use it.
     </p>
 
-    <p>Some people check website lists such as <a href="http://identiguy.i2p/" target="_blank">Identiguy's eepsite status list</a> or <a href="http://no.i2p/browse/" target="_blank">no.i2p's active host list</a> for new eepsites, so your site may start getting some traffic. 
+    <p>Some people check website lists such as <a href="http://identiguy.i2p/" target="_blank">Identiguy's eepsite status list</a> or <a href="http://no.i2p/browse/" target="_blank">no.i2p's active host list</a> for new eepsites, so your site may start getting some traffic.
       There are plenty of other ways to tell people. Here are a few ideas:
     </p>
 
@@ -171,21 +172,21 @@
 
     <h2>Using an alternative webserver to host your site</h2>
 
-    <p>This site (and the I2P router console) is running on the <a href="https://en.wikipedia.org/wiki/Jetty_(web_server)" target="_blank">Jetty webserver</a>, but you may wish to use a different webserver to host your content. 
+    <p>This site (and the I2P router console) is running on the <a href="https://en.wikipedia.org/wiki/Jetty_(web_server)" target="_blank">Jetty webserver</a>, but you may wish to use a different webserver to host your content.
       To maintain anonymity, be sure that your webserver is configured to only allow connections from localhost (127.0.0.1), and check the documentation to ensure your webserver isn't advertising details that may compromise your anonymity.
     </p>
 
      <p>To configure your webserver for use on I2P, you may either use the existing webserver tunnel and <a href="http://127.0.0.1:7657/configclients">disable the default webserver</a> from running, or create a new HTTP Server tunnel in the <a href="http://127.0.0.1:7657/i2ptunnelmgr">Hidden Services Manager</a>.
        Ensure that the listening port configured for the webserver (7658 by default) is also configured in the Hidden Services settings.
-       For example, if your webserver is listening by default on address 127.0.0.1 port 80, you'd need to also ensure that the Target port in the Hidden Service Manager settings page for the service is also configured to port 80. 
-        </p> 
+       For example, if your webserver is listening by default on address 127.0.0.1 port 80, you'd need to also ensure that the Target port in the Hidden Service Manager settings page for the service is also configured to port 80.
+        </p>
 
-        <p>Beware that a poorly configured webserver or web appplication can leak potentially compromising information such as 
+        <p>Beware that a poorly configured webserver or web appplication can leak potentially compromising information such as
           your real IP address or server details that may reduce your anonymity or assist a hacker.
           We recommend using the default server unless you feel comfortable doing server administration.
           Please ensure your web server is secure prior to placing it online.
           There are plenty of guides online, for example if you search for "nginx security hardening guide" you will find a number of guides that have good recommendations.
-        </p> 
+        </p>
 
         <p>There is one important issue with the Apache web server.
           The <code dir="ltr">mod_status</code> and <code dir="ltr">mod_info</code> Apache modules are enabled by default on some operating systems.
