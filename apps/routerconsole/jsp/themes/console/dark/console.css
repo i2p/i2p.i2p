@@ -1087,8 +1087,6 @@ div.news {
 
 div.news li {
     text-align: justify;
-    list-style: url(images/info_dark.png);
-    list-style: none;
     margin: 0;
     padding: 5px 5px 5px 0;
     vertical-align: middle;
@@ -1098,7 +1096,6 @@ div.news li {
     font-size: 9.5pt;
     border-bottom: 1px dotted #524b5e;
     margin-bottom: 5px;
-    text-transform: capitalize;
 }
 
 div.news h4 {
@@ -1728,7 +1725,7 @@ a:active tt {
     list-style-type: square;
 }
 
-div.main li {
+div.main li, div.news li {
     text-align: left;
     margin: 2px 0 2px 30px;
     padding: 2px 20px 2px 0;
