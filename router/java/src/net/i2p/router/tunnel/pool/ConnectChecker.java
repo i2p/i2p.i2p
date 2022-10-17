@@ -22,10 +22,12 @@ public class ConnectChecker {
 
     private static final int NTCP_V4 = 0x01;
     private static final int SSU_V4 = 0x02;
-    public static final int ANY_V4 = NTCP_V4 | SSU_V4;
+    private static final int SSU2_V4 = 0x10;
+    public static final int ANY_V4 = NTCP_V4 | SSU_V4 | SSU2_V4;
     private static final int NTCP_V6 = 0x04;
     private static final int SSU_V6 = 0x08;
-    private static final int ANY_V6 = NTCP_V6 | SSU_V6;
+    private static final int SSU2_V6 = 0x20;
+    private static final int ANY_V6 = NTCP_V6 | SSU_V6 | SSU2_V6;
 
 
     public ConnectChecker(RouterContext context) {
@@ -47,6 +49,14 @@ public class ConnectChecker {
      */
     protected boolean isSSUDisabled() {
         return !ctx.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP);
+    }
+
+    /**
+     *  Is SSU2 enabled?
+     *  @since 0.9.56
+     */
+    private boolean isSSU2Enabled() {
+        return ctx.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_SSU2);
     }
 
     /**
@@ -201,8 +211,11 @@ public class ConnectChecker {
                 // TODO look at force-firewalled settings per-transport
                 if (!isNTCPDisabled())
                     ct |= NTCP_V6;
-                if (!isSSUDisabled())
+                if (!isSSUDisabled()) {
                     ct |= SSU_V6;
+                    if (isSSU2Enabled())
+                        ct |= SSU2_V6;
+                }
                 break;
 
             case IPV4_OK_IPV6_UNKNOWN:
@@ -212,8 +225,11 @@ public class ConnectChecker {
             default:
                 if (!isNTCPDisabled())
                     ct |= NTCP_V4;
-                if (!isSSUDisabled())
+                if (!isSSUDisabled()) {
                     ct |= SSU_V4;
+                    if (isSSU2Enabled())
+                        ct |= SSU2_V4;
+                }
                 break;
         }
         return ct;
@@ -240,8 +256,11 @@ public class ConnectChecker {
                     // TODO ipv6
                     if (!isNTCPDisabled())
                         cf |= NTCP_V4;
-                    if (!isSSUDisabled())
+                    if (!isSSUDisabled()) {
                         cf |= SSU_V4;
+                        if (isSSU2Enabled())
+                            cf |= SSU2_V4;
+                    }
                 } else {
                     cf = getConnectMask(a);
                 }
@@ -254,8 +273,11 @@ public class ConnectChecker {
             case IPV4_UNKNOWN_IPV6_FIREWALLED:
                 if (!isNTCPDisabled())
                     cf |= NTCP_V4 | NTCP_V6;
-                if (!isSSUDisabled())
+                if (!isSSUDisabled()) {
                     cf |= SSU_V4 | SSU_V6;
+                    if (isSSU2Enabled())
+                        cf |= SSU2_V4 | SSU2_V6;
+                }
                 break;
 
             case IPV4_DISABLED_IPV6_OK:
@@ -263,8 +285,11 @@ public class ConnectChecker {
             case IPV4_DISABLED_IPV6_FIREWALLED:
                 if (!isNTCPDisabled())
                     cf |= NTCP_V6;
-                if (!isSSUDisabled())
+                if (!isSSUDisabled()) {
                     cf |= SSU_V6;
+                    if (isSSU2Enabled())
+                        cf |= SSU2_V6;
+                }
                 break;
 
             case DIFFERENT:
@@ -278,8 +303,11 @@ public class ConnectChecker {
             default:
                 if (!isNTCPDisabled())
                     cf |= NTCP_V4;
-                if (!isSSUDisabled())
+                if (!isSSUDisabled()) {
                     cf |= SSU_V4;
+                    if (isSSU2Enabled())
+                        cf |= SSU2_V4;
+                }
                 break;
         }
         return cf;
@@ -298,31 +326,104 @@ public class ConnectChecker {
         for (RouterAddress ra : addrs) {
             String style = ra.getTransportStyle();
             String host = ra.getHost();
-            if ("NTCP".equals(style) || "NTCP2".equals(style)) {
+            if ("NTCP2".equals(style)) {
                 if (host != null) {
                     if (host.contains(":"))
                         rv |= NTCP_V6;
                     else
                         rv |= NTCP_V4;
+                } else {
+                    String caps = ra.getOption("caps");
+                    if (caps != null) {
+                        if (caps.contains("4"))
+                            rv |= NTCP_V4;
+                        if (caps.contains("6"))
+                            rv |= NTCP_V6;
+                    }
                 }
             } else if ("SSU".equals(style)) {
+                boolean v2 = ra.getOption("v") != null;
                 if (host == null) {
-                    for (int i = 0; i < 2; i++) {
-                        String ihost = ra.getOption(IHOST[i]);
-                        if (ihost == null)
-                            break;
-                        if (ihost.contains(":"))
-                            rv |= SSU_V6;
-                        else
+                    String caps = ra.getOption("caps");
+                    boolean v4 = false;
+                    boolean v6 = false;
+                    if (caps != null) {
+                        if (caps.contains("4")) {
+                            v4 = true;
                             rv |= SSU_V4;
+                            if (v2)
+                                rv |= SSU2_V4;
+                        }
+                        if (caps.contains("6")) {
+                            v6 = true;
+                            rv |= SSU_V6;
+                            if (v2)
+                                rv |= SSU2_V6;
+                        }
+                    }
+                    if (!v4 && !v6) {
+                        // ihost only for v1
+                        for (int i = 0; i < 2; i++) {
+                            String ihost = ra.getOption(IHOST[i]);
+                            if (ihost == null)
+                                break;
+                            if (ihost.contains(":"))
+                                rv |= SSU_V6;
+                            else
+                                rv |= SSU_V4;
+                        }
                     }
                 } else if (host.contains(":")) {
                     rv |= SSU_V6;
+                    if (v2)
+                        rv |= SSU2_V6;
                 } else {
                     rv |= SSU_V4;
+                    if (v2)
+                        rv |= SSU2_V4;
+                }
+            } else if ("SSU2".equals(style)) {
+                if (host == null) {
+                    String caps = ra.getOption("caps");
+                    if (caps != null) {
+                        if (caps.contains("4"))
+                            rv |= SSU2_V4;
+                        if (caps.contains("6"))
+                            rv |= SSU2_V6;
+                    }
+                } else if (host.contains(":")) {
+                    rv |= SSU2_V6;
+                } else {
+                    rv |= SSU2_V4;
                 }
             }
         }
         return rv;
     }
+
+/*
+    public static void main(String[] args) throws Exception {
+        if (args.length != 2) {
+            System.err.println("Usage: ConnectChecker from-ri.dat to-ri.dat");
+            System.exit(1);
+        }
+        RouterInfo from = new RouterInfo();
+        RouterInfo to = new RouterInfo();
+        java.io.FileInputStream is = new java.io.FileInputStream(args[0]);
+        from.readBytes(is);
+        is.close();
+        is = new java.io.FileInputStream(args[1]);
+        to.readBytes(is);
+        is.close();
+        Collection<RouterAddress> fa = from.getAddresses();
+        Collection<RouterAddress> ta = to.getAddresses();
+        int fm = getConnectMask(fa);
+        int tm = getConnectMask(ta);
+        System.out.println("From:\n" + from);
+        System.out.println("To:\n" + to);
+        System.out.println("From mask: " + fm);
+        System.out.println("To mask: " + tm);
+        System.out.println("Can connect? " + ((fm & tm) != 0));
+    }
+*/
 }
