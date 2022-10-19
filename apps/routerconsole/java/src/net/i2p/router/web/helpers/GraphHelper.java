@@ -15,7 +15,6 @@ import net.i2p.router.web.CSSHelper;
 import net.i2p.router.web.FormHandler;
 import static net.i2p.router.web.GraphConstants.*;
 import net.i2p.router.web.HelperBase;
-import net.i2p.router.web.NavHelper;
 import net.i2p.router.web.StatSummarizer;
 import net.i2p.router.web.SummaryListener;
 import net.i2p.stat.Rate;

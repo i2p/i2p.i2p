@@ -101,6 +101,7 @@ public class RouterConsoleRunner implements RouterApp {
 
     private final RouterContext _context;
     private final ClientAppManager _mgr;
+    private final NavHelper _navHelper;
     private volatile ClientAppState _state = UNINITIALIZED;
     private Server _server;
     private static ScheduledExecutorScheduler _jettyTimer;
@@ -179,6 +180,7 @@ public class RouterConsoleRunner implements RouterApp {
     public RouterConsoleRunner(RouterContext ctx, ClientAppManager mgr, String args[]) {
         _context = ctx;
         _mgr = mgr;
+        _navHelper = new NavHelper();
         if (args.length == 0) {
             // _listenHost and _webAppsDir are defaulted below
             _listenPort = Integer.toString(DEFAULT_LISTEN_PORT);
@@ -248,6 +250,7 @@ public class RouterConsoleRunner implements RouterApp {
         try {
             _server.stop();
         } catch (Exception ie) {}
+        _mgr.unregister(_navHelper);
         PortMapper portMapper = _context.portMapper();
         portMapper.unregister(PortMapper.SVC_CONSOLE);
         portMapper.unregister(PortMapper.SVC_HTTPS_CONSOLE);
@@ -814,6 +817,8 @@ public class RouterConsoleRunner implements RouterApp {
         // This also prevents one webapp from breaking the whole thing
         List<String> notStarted = new ArrayList<String>();
         if (_server.isRunning()) {
+            if (_mgr != null)
+                _mgr.register(_navHelper);
             File dir = new File(_webAppsDir);
             File files[] = dir.listFiles(WAR_FILTER);
             if (files != null) {

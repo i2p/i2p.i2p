@@ -37,7 +37,7 @@ public class CodedIconRendererServlet extends HttpServlet {
      protected void doGet(HttpServletRequest srq, HttpServletResponse srs) throws ServletException, IOException {
          byte[] data;
          String name = srq.getParameter("plugin");
-         data  = NavHelper.getBinary(name);
+         data  = NavHelper.getInstance().getBinary(name);
          
          //set as many headers as are common to any outcome
          

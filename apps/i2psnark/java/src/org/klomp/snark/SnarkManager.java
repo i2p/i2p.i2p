@@ -29,6 +29,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.app.ClientApp;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.ClientAppState;
+import net.i2p.app.NavService;
 import net.i2p.app.NotificationService;
 import net.i2p.client.I2PClient;
 import net.i2p.client.streaming.I2PSocketManager.DisconnectListener;
@@ -291,12 +292,21 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
      */
     public void start() {
         _running = true;
+        ClientAppManager cmgr = _context.clientAppManager();
         if ("i2psnark".equals(_contextName)) {
             // Register with the ClientAppManager so the rpc plugin can find us
             // only if default instance
-            ClientAppManager cmgr = _context.clientAppManager();
             if (cmgr != null)
                 cmgr.register(this);
+        } else {
+            // Register link with NavHelper
+            if (cmgr != null) {
+                NavService nav = (NavService) cmgr.getRegisteredApp("NavHelper");
+                if (nav != null) {
+                    String name = DataHelper.stripHTML(_contextPath.substring(1));
+                    nav.registerApp(name, name, _contextPath, null, "/themes/console/images/i2psnark.png");
+                }
+            }
         }
         _monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor", true);
         _monitor.start();
@@ -377,11 +387,20 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
         _connectionAcceptor.halt();
         _idleChecker.cancel();
         stopAllTorrents(true);
+        ClientAppManager cmgr = _context.clientAppManager();
         if ("i2psnark".equals(_contextName)) {
             // only if default instance
-            ClientAppManager cmgr = _context.clientAppManager();
             if (cmgr != null)
                 cmgr.unregister(this);
+        } else {
+            // Unregister link with NavHelper
+            if (cmgr != null) {
+                NavService nav = (NavService) cmgr.getRegisteredApp("NavHelper");
+                if (nav != null) {
+                    String name = DataHelper.stripHTML(_contextPath.substring(1));
+                    nav.unregisterApp(name);
+                }
+            }
         }
         if (_log.shouldWarn())
             _log.warn("Snark stop() end");

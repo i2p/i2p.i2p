@@ -140,7 +140,7 @@ public class HomeHelper extends HelperBase {
     
     /** @since 0.9.47 */
     public String getPlugins() {
-        List<App> plugins = NavHelper.getClientApps(_context);
+        List<App> plugins = NavHelper.getInstance(_context).getClientApps(_context);
         String table = pluginTable(plugins);
         if (table.length() == 0) {
             return "";

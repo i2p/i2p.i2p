@@ -8,11 +8,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientApp;
+import net.i2p.app.ClientAppManager;
+import net.i2p.app.ClientAppState;
+import net.i2p.app.NavService;
 
-public class NavHelper {
+public class NavHelper implements NavService, ClientApp {
     // both indexed by standard (untranslated) app name
-    private static final Map<String, App> _apps = new ConcurrentHashMap<String, App>(4);
-    private static final Map<String, byte[]> _binary = new ConcurrentHashMap<String, byte[]>(4);
+    private final Map<String, App> _apps = new ConcurrentHashMap<String, App>(4);
+    private final Map<String, byte[]> _binary = new ConcurrentHashMap<String, byte[]>(4);
     
     /**
      * To register a new client application so that it shows up on the router
@@ -27,7 +31,7 @@ public class NavHelper {
      * @param iconpath path-only URL starting with /, HTML escaped, or null
      * @since 0.9.20 added iconpath parameter
      */
-    public static void registerApp(String appName, String displayName, String path, String tooltip, String iconpath) {
+    public void registerApp(String appName, String displayName, String path, String tooltip, String iconpath) {
         if (iconpath != null && !iconpath.startsWith("/"))
             iconpath = null;
         _apps.put(appName, new App(displayName, tooltip, path, iconpath));
@@ -36,7 +40,7 @@ public class NavHelper {
     /**
      * @param name standard name for the app
      */
-    public static void unregisterApp(String name) {
+    public void unregisterApp(String name) {
         _apps.remove(name);
     }
     
@@ -46,7 +50,7 @@ public class NavHelper {
      *  @return null if not found
      *  @since 0.9.25
      */
-    public static byte[] getBinary(String name){
+    public byte[] getBinary(String name){
         if(name != null)
             return _binary.get(name);
         else
@@ -58,7 +62,7 @@ public class NavHelper {
      *  @param name plugin name
      *  @since 0.9.25
      */
-    public static void setBinary(String name, byte[] arr){
+    public void setBinary(String name, byte[] arr){
         _binary.put(name, arr);
     }
 
@@ -67,7 +71,7 @@ public class NavHelper {
      *  Translated string is loaded by PluginStarter
      *  @return map of translated name to HTML string, or null if none
      */
-    public static Map<String, String> getClientAppLinks() {
+    public Map<String, String> getClientAppLinks() {
         if (_apps.isEmpty())
             return null;
         Map<String, String> rv = new HashMap<String, String>(_apps.size());
@@ -97,7 +101,7 @@ public class NavHelper {
      *  @param name standard app name
      *  @since 0.9.45
      */
-    private static void getClientAppImg(StringBuilder buf, String name, String iconpath) {
+    private void getClientAppImg(StringBuilder buf, String name, String iconpath) {
             if (iconpath != null) {
                 buf.append("<img src=\"").append(iconpath).append("\" height=\"16\" width=\"16\" alt=\"\">");
             } else if (name.equals("orchid")) {
@@ -115,7 +119,7 @@ public class NavHelper {
      *  @return non-null, possibly empty, unsorted
      *  @since 0.9, public since 0.9.33, was package private
      */
-    public static List<App> getClientApps(I2PAppContext ctx) {
+    public List<App> getClientApps(I2PAppContext ctx) {
         if (_apps.isEmpty())
             return Collections.emptyList();
         List<App> rv = new ArrayList<App>(_apps.size());
@@ -140,4 +144,45 @@ public class NavHelper {
         }
         return rv;
     }
+
+    /** @since 0.9.56 */
+    public static NavHelper getInstance() {
+        return getInstance(I2PAppContext.getGlobalContext());
+    }
+
+    /** @since 0.9.56 */
+    public static NavHelper getInstance(I2PAppContext ctx) {
+        ClientAppManager cmgr = ctx.clientAppManager();
+        if (cmgr != null)
+            return (NavHelper) cmgr.getRegisteredApp("NavHelper");
+        return null;
+    }
+
+    /////// ClientApp methods
+
+    /** @since 0.9.56 */
+    public void startup() {}
+
+    /** @since 0.9.56 */
+    public void shutdown(String[] args) {
+        _apps.clear();
+        _binary.clear();
+    }
+
+    /** @since 0.9.56 */
+    public ClientAppState getState() {
+        return ClientAppState.RUNNING;
+    }
+
+    /** @since 0.9.56 */
+    public String getName() {
+        return "NavHelper";
+    }
+
+    /** @since 0.9.56 */
+    public String getDisplayName() {
+        return "Nav Helper";
+    }
+
+    /////// end ClientApp methods
 }

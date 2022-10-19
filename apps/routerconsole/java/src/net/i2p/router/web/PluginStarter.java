@@ -434,7 +434,7 @@ public class PluginStarter implements Runnable {
         if(fullprop != null && fullprop.length() > 1){
             byte[] decoded = Base64.decode(fullprop);
             if(decoded != null) {
-                NavHelper.setBinary(appName, decoded);
+                NavHelper.getInstance(ctx).setBinary(appName, decoded);
                 iconfile = "/Plugins/pluginicon?plugin=" + appName;
             } else {
                 iconfile = "/themes/console/images/plugin.png";
@@ -546,7 +546,7 @@ public class PluginStarter implements Runnable {
             String tip = stripHTML(props, "consoleLinkTooltip_" + Messages.getLanguage(ctx));
             if (tip == null)
                 tip = stripHTML(props, "consoleLinkTooltip");
-            NavHelper.registerApp(appName, name, url, tip, iconfile);
+            NavHelper.getInstance(ctx).registerApp(appName, name, url, tip, iconfile);
         }
 
         return true;
@@ -627,7 +627,7 @@ public class PluginStarter implements Runnable {
         //}
 
         // remove summary bar link
-        NavHelper.unregisterApp(appName);
+        NavHelper.getInstance(ctx).unregisterApp(appName);
 
         return true;
     }
