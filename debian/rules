@@ -118,10 +118,10 @@ endif
 	ln -sf /usr/share/java/jetty9-xml.jar $(CURDIR)/apps/jetty/jettylib/jetty-xml.jar
 	ln -sf /usr/share/java/jetty9-server.jar $(CURDIR)/apps/jetty/jettylib/org.mortbay.jetty.jar
 	ln -sf /usr/share/java/jetty9-jmx.jar $(CURDIR)/apps/jetty/jettylib/org.mortbay.jmx.jar
-	@# following two are from libservlet3.1-java which is a dependency of libjetty9-java
-	ln -sf /usr/share/java/servlet-api-3.1.jar $(CURDIR)/apps/jetty/jettylib/javax.servlet.jar
+	@# following two are formerly from libservlet3.1-java, now in their own packages
+	ln -sf /usr/share/java/servlet-api.jar $(CURDIR)/apps/jetty/jettylib/javax.servlet.jar
 	@# this is roughly the same as tomcat8-jsp-api.jar, we use this one
-	ln -sf /usr/share/java/jsp-api-2.3.jar $(CURDIR)/apps/jetty/jettylib/jsp-api.jar
+	ln -sf /usr/share/java/jsp-api.jar $(CURDIR)/apps/jetty/jettylib/jsp-api.jar
 
 	@# debian and ubuntu: buster, disco
 	@/bin/echo -e "with-libtomcat9-java=true" >> $(CURDIR)/override.properties

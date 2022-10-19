@@ -26,11 +26,10 @@ usr/share/java/jetty9-xml.jar usr/share/i2p/lib/jetty-xml.jar
 usr/share/java/jetty9-server.jar usr/share/i2p/lib/org.mortbay.jetty.jar
 # legacy name in lib/
 usr/share/java/jetty9-jmx.jar usr/share/i2p/lib/org.mortbay.jmx.jar
-# following two are from libservlet3.1-java which is a dependency of libjetty9-java
 # legacy name in lib/
-usr/share/java/servlet-api-3.1.jar usr/share/i2p/lib/javax.servlet.jar
+usr/share/java/servlet-api.jar usr/share/i2p/lib/javax.servlet.jar
 # combined into javax.servlet.jar in non-package builds
-usr/share/java/jsp-api-2.3.jar usr/share/i2p/lib/jsp-api.jar
+usr/share/java/jsp-api.jar usr/share/i2p/lib/jsp-api.jar
 
 
 # comment out if not building with libtomcat9-java
