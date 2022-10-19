@@ -128,7 +128,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
      *
      *  @param ih the Info Hash (torrent)
      *  @param max maximum number of peers to return
-     *  @param maxWait the maximum time to wait (ms) must be > 0
+     *  @param maxWait the maximum time to wait (ms) must be greater than 0
      *  @param fast if true, don't wait for dest, no retx, ...
      *  @return null on fail or if fast is true
      */
