@@ -678,12 +678,12 @@ input.show:hover {
 }
 
 input.markall {
-     background: #eee url(images/book.png) no-repeat 6px center;
+     background: #eee url(../images/selection.png) no-repeat 6px center;
      padding: 5px 7px 5px 24px;
 }
 
 input.markall:hover {
-     background: #fff url(images/book.png) no-repeat 6px center;
+     background: #fff url(../images/selection.png) no-repeat 6px center;
 }
 
 input.new {

@@ -1146,6 +1146,56 @@ input.refresh {
    padding-left: 30px !important;
 }
 
+input.reply {
+   background: url(../images/reply.png) 8px center no-repeat, #1F1A24 !important;;
+   padding-left: 30px !important;
+}
+
+input.replyall {
+   background: url(../images/reply-all.png) 8px center no-repeat, #1F1A24 !important;;
+   padding-left: 30px !important;
+}
+
+input.forward {
+   background: url(../images/forward.png) 8px center no-repeat, #1F1A24 !important;;
+   padding-left: 30px !important;
+}
+
+input.saveas {
+   background: url(../images/save.png) 8px center no-repeat, #1F1A24 !important;;
+   padding-left: 30px !important;
+}
+
+input.delete, input.delete_attachment, input.really_delete {
+   background: url(/themes/console/images/buttons/delete.png) 8px center no-repeat, #1F1A24 !important;;
+   padding-left: 30px !important;
+}
+
+input.prev {
+   background: url(images/previous.png) 8px center no-repeat, #1F1A24 !important;;
+   padding-left: 30px !important;
+}
+
+input.next {
+   background: url(images/next.png) 8px center no-repeat, #1F1A24 !important;;
+   padding-left: 30px !important;
+}
+
+input.moveto, input.list {
+   background: url(images/folder.png) 8px center no-repeat, #1F1A24 !important;;
+   padding-left: 30px !important;
+}
+
+input.markall {
+   background: url(../images/selection.png) 8px center no-repeat, #1F1A24 !important;;
+   padding-left: 30px !important;
+}
+
+input.clearselection {
+   background: url(../images/none.png) 8px center no-repeat, #1F1A24 !important;;
+   padding-left: 30px !important;
+}
+
 a.mailhelp {
     background: url(images/help.png) 8px center no-repeat, #1F1A24 !important;
     padding-left: 30px !important;
