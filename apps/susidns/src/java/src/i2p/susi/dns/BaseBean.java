@@ -104,10 +104,10 @@ public class BaseBean
         // Fetch routerconsole theme (or use our default if it doesn't exist)
         String theme = _context.getProperty(RC_PROP_THEME_NAME, DEFAULT_THEME);
         // Apply any override
-        debug("Theme test 1: " + theme);
+        //debug("Theme test 1: " + theme);
         theme = properties.getProperty(PROP_THEME_NAME, theme);
         // remap deprecated themes
-        debug("Theme test 2: " + theme);
+        //debug("Theme test 2: " + theme);
         if (theme.equals("midnight")) {
             if (_context.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD))
                 theme = "dark";
@@ -115,7 +115,7 @@ public class BaseBean
             if (_context.getProperty(PROP_DISABLE_OLD, DEFAULT_DISABLE_OLD))
                 theme = "light";
         }
-        debug("Theme test 3: " + theme);
+        //debug("Theme test 3: " + theme);
         // Ensure that theme exists
         String[] themes = getThemes();
         boolean themeExists = false;
