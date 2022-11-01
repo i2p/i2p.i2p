@@ -1,3 +1,26 @@
+2022-11-01 zzz
+ * GeoIP 2022-11-01
+ * SSU:
+   - Fail SSU2 on all session request after retry errors
+   - Prefer in China
+
+2022-10-19 zzz
+ * Console: Register NavHelper with ClientAppManager as NavService
+ * Debian: Change dependency from transitional package libservlet3.1-java
+   to libjsp-api-java and libservlet-api-java
+ * i2psnark: Register additional instances with NavService
+ * SusiMail: Add icons to the buttons that were missing them (dark theme)
+
+2022-10-17 zzz
+ * Console: CSS fixes for lists in news entries
+ * Tunnels: ConnectChecker fixes
+
+2022-10-16 zzz
+ * SSU2: Use from port in hole punch if different from relay response port
+
+2022-10-15 zzz
+ * i2psnark: Increase piece limit to 64K
+
 2022-10-10 zzz
  * SSU2: Track recently-closed sessions (gitlab #370)
 
