@@ -2359,11 +2359,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // also introduce us, also bid aggressively so we are preferred over NTCP.
             // (Otherwise we only talk UDP to those that are firewalled, and we will
             // never get any introducers)
+            if (alwaysPreferUDP()) {
+                if (haveCapacity(90))
+                    return _cachedBid[SLOW_PREFERRED_BID];
+                if (cost > DEFAULT_COST)
+                    return _cachedBid[NEAR_CAPACITY_COST_BID];
+                return _cachedBid[NEAR_CAPACITY_BID];
+            }
             int count = _peersByIdent.size();
             boolean ipv6 = TransportUtil.isIPv6(addr);
-            if (alwaysPreferUDP()) {
-                return _cachedBid[SLOW_PREFERRED_BID];
-            } else if ((!ipv6 && count < _min_peers) ||
+            if ((!ipv6 && count < _min_peers) ||
                        (ipv6 && _haveIPv6Address && count < _min_v6_peers) ||
                        (introducersRequired(ipv6) &&
                         addr.getOption(UDPAddress.PROP_CAPACITY) != null &&
@@ -2435,12 +2440,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     private boolean preferUDP() {
         String pref = _context.getProperty(PROP_PREFER_UDP, DEFAULT_PREFER_UDP);
-        return (pref != null) && ! "false".equals(pref);
+        return !"false".equals(pref);
     }
     
     private boolean alwaysPreferUDP() {
-        String pref = _context.getProperty(PROP_PREFER_UDP, DEFAULT_PREFER_UDP);
-        return (pref != null) && "always".equals(pref);
+        return "always".equals(_context.getProperty(PROP_PREFER_UDP)) ||
+               "cn".equals(_context.commSystem().getOurCountry());
     }
     
     /**
