@@ -57,6 +57,8 @@ final class SSU2Util {
     public static final int HEADER_PROT_2_OFFSET = PKT_NUM_OFFSET;
 
     public static final int PADDING_MAX = 32;
+    public static final int PADDING_MAX_SESSION_REQUEST = 32;
+    public static final int PADDING_MAX_SESSION_CREATED = 32;
 
     // data size minimums, not including IP/UDP headers
 

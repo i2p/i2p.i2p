@@ -871,7 +871,7 @@ class PacketBuilder2 {
                 blocks.add(block);
             }
             // plenty of room
-            block = getPadding(len, 1280);
+            block = getPadding(len, 1280, PADDING_MAX_SESSION_REQUEST);
             len += block.getTotalLength();
             blocks.add(block);
 
@@ -930,7 +930,7 @@ class PacketBuilder2 {
                 blocks.add(block);
             }
             // plenty of room
-            block = getPadding(len, 1280);
+            block = getPadding(len, 1280, PADDING_MAX_SESSION_CREATED);
             len += block.getTotalLength();
             blocks.add(block);
 
@@ -1160,7 +1160,20 @@ class PacketBuilder2 {
      *  @return null if no room
      */
     private Block getPadding(int len, int max) {
-        int maxpadlen = Math.min(max - len, PADDING_MAX) - SSU2Payload.BLOCK_HEADER_SIZE;
+        return getPadding(len, max, PADDING_MAX);
+    }
+
+    /**
+     *  @param len current length of the packet including IP/UDP header
+     *             (unless header subtracted from max)
+     *             If len == 0 ensure 8 byte block minimum
+     *  @param max max length of the packet
+     *  @param maxPadding max length of the padding (not including block header)
+     *  @return null if no room
+     *  @since 0.9.56
+     */
+    private Block getPadding(int len, int max, int maxPadding) {
+        int maxpadlen = Math.min(max - len, maxPadding) - SSU2Payload.BLOCK_HEADER_SIZE;
         if (maxpadlen < 0)
             return null;
         int padlen;
