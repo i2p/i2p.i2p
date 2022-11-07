@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Scanner;
 
 import net.i2p.I2PAppContext;
 import net.i2p.app.*;
@@ -173,6 +174,147 @@ public class UrlLauncher implements ClientApp {
     }
 
     /**
+     * Obtains the default browser for the Windows platform, which by now should
+     * be Edgium in the worst-case scenario but in case it isn't, we can use this
+     * function to figure it out. It can find:
+     *
+     * 1. The current user's HTTPS default browser if they configured it to be
+     * non-default
+     * 2. The current user's HTTP default browser if they configured it to be
+     * non-default
+     * 3. Edgium if it's available
+     * 4. iexplore if it's not
+     *
+     * and it will return the first one we find in exactly that order.
+     *
+     * Adapted from:
+     * https://stackoverflow.com/questions/15852885/me...
+     *
+     * @param url containing full scheme, i.e. http://127.0.0.1:7657
+     * @return path to command[0] and target URL[1] to the default browser ready for execution, or null if not found
+     * @since 2.0.0
+     */
+    public String getDefaultWindowsBrowser(String url) {
+        String defaultBrowser;
+        String key;
+        if (url.startsWith("https://")){
+            // User-Configured HTTPS Browser
+            key = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\Shell\\Associations\\URLAssociations\\https\\UserChoice";
+        } else {
+            // User-Configure HTTP Browser
+            key = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\Shell\\Associations\\URLAssociations\\http\\UserChoice";
+        }
+        defaultBrowser = getDefaultOutOfRegistry(key);
+        if (defaultBrowser != null)
+            return defaultBrowser;
+        // MSEdge on pretty much everything after Windows 7
+        key = "HKEY_CLASSES_ROOT\\MSEdgeHTM\\shell\\open\\command";
+        defaultBrowser = getDefaultOutOfRegistry(key);
+        if (defaultBrowser != null)
+            return defaultBrowser;
+        // iexplore usually, depends on the Windows, sometimes Edge
+        key = "HKEY_CLASSES_ROOT\\http\\shell\\open\\command";
+        defaultBrowser = getDefaultOutOfRegistry(key);
+        if (defaultBrowser != null)
+            return defaultBrowser;
+        return "C:\\Program Files\\Internet Explorer\\iexplore.exe";
+    }
+
+    /**
+     * obtains a value matching a key contained in the windows registry at a path
+     * represented by hkeyquery
+     *
+     * @param hkeyquery registry entry to ask for.
+     * @param key key to retrieve value from
+     * @param additionalArgs additional arguments to pass to the `REG QUERY` command
+     * @return either a registry "Default" value or null if one does not exist/is empty
+     * @since 2.0.0
+     */
+    private String registryQuery(String hkeyquery, String key) {
+        try {
+            // Get registry where we find the default browser
+            String[] cmd = {"REG", "QUERY", hkeyquery};
+            Process process = Runtime.getRuntime().exec(cmd);
+            Scanner kb = new Scanner(process.getInputStream());
+            while (kb.hasNextLine()) {
+                String line = kb.nextLine().trim();
+                if (line.startsWith(key)) {
+                    String[] splitLine = line.split("  ");
+                    kb.close();
+                    String finalValue = splitLine[splitLine.length - 1].trim();
+                    if (!finalValue.equals("")) {
+                        return finalValue;
+                    }
+                }
+            }
+            // Match wasn't found, still need to close Scanner
+            kb.close();
+        } catch (Exception e) {
+            if (_log.shouldError())
+                _log.error(hkeyquery, e);
+        }
+        return null;
+    }
+
+    /**
+     * If following a query back to the Default value doesn't work then what
+     * we have is a "ProgID" which will be registered in \HKEY_CLASSES_ROOT\%ProgId%,
+     * and will have an entry \shell\open\command, where \shell\open\command yields the
+     * value that contains the command it needs. This function takes a registry query
+     * in the same format as getDefaultOutOfRegistry but instead of looking for the
+     * default entry
+     *
+     * @param hkeyquery
+     * @return the command required to run the application referenced in hkeyquery, or null
+     * @since 2.0.0
+     */
+    private String followUserConfiguredBrowserToCommand(String hkeyquery) {
+        String progIdValue = registryQuery(hkeyquery,"ProgId");
+        return followProgIdToCommand(progIdValue);
+    }
+
+    /**
+     * Cross-references a progId obtained by followUserConfiguredBrowserToCommand against
+     * HKEY_CLASSES_ROOT\%ProgId%\shell\open\command, which holds the value of the command
+     * which we need to run to launch the default browser.
+     *
+     * @param hkeyquery
+     * @return the command required to run the application referenced in hkeyquery, or null
+     * @since 2.0.0
+     */
+    private String followProgIdToCommand(String progid) {
+        String hkeyquery = "HKEY_CLASSES_ROOT\\"+progid+"\\shell\\open\\command";
+        String finalValue = registryQuery(hkeyquery, "(Default)");
+        if (finalValue != null) {
+            if (!finalValue.equals(""))
+                return finalValue;
+        }
+        return null;
+    }
+
+    /**
+     * obtains a default browsing command out of the Windows registry.
+     *
+     * @param hkeyquery registry entry to ask for.
+     * @return either a registry "Default" value or null if one does not exist/is empty
+     * @since 2.0.0
+     */
+    private String getDefaultOutOfRegistry(String hkeyquery) {
+        String defaultValue = registryQuery(hkeyquery, "Default");
+        if (defaultValue != null) {
+            if (!defaultValue.equals(""))
+                return defaultValue;
+        }else{
+            defaultValue = followUserConfiguredBrowserToCommand(hkeyquery);
+            if (defaultValue != null) {
+                if (!defaultValue.equals(""))
+                    return defaultValue;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Discovers the operating system the installer is running under and tries
      * to launch the given URL using the default browser for that platform; if
      * unsuccessful, an attempt is made to launch the URL using the most common
@@ -216,43 +358,10 @@ public class UrlLauncher implements ClientApp {
                     return true;
             } else if (SystemVersion.isWindows()) {
                 String[] browserString  = new String[] { "C:\\Program Files\\Internet Explorer\\iexplore.exe", "-nohome", url };
-                File foo = new File(_context.getTempDir(), "browser" + _context.random().nextLong() + ".reg");
-                String[] args = new String[] { "regedit", "/E", foo.getAbsolutePath(), "HKEY_CLASSES_ROOT\\http\\shell\\open\\command" };
-                if (_log.shouldDebug()) _log.debug("Execute: " + Arrays.toString(args));
-                boolean ok = _shellCommand.executeSilentAndWait(args);
-                if (ok) {
-                    BufferedReader bufferedReader = null;
-                    try {
-                        bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(foo), "UTF-16"));
-                        for (String line; (line = bufferedReader.readLine()) != null; ) {
-                            // @="\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" -osint -url \"%1\""
-                            if (line.startsWith("@=")) {
-                                if (_log.shouldDebug()) _log.debug("From RegEdit: " + line);
-                                line = line.substring(2).trim();
-                                if (line.startsWith("\"") && line.endsWith("\""))
-                                    line = line.substring(1, line.length() - 1);
-                                line = line.replace("\\\\", "\\");
-                                line = line.replace("\\\"", "\"");
-                                if (_log.shouldDebug()) _log.debug("Mod RegEdit: " + line);
-                                // "C:\Program Files (x86)\Mozilla Firefox\firefox.exe" -osint -url "%1"
-                                // use the whole line
-                                String[] aarg = parseArgs(line, url);
-                                if (aarg.length > 0) {
-                                    browserString = aarg;
-                                    break;
-                                }
-                            }
-                        }
-                    } catch (IOException e) {
-                        if (_log.shouldWarn())
-                            _log.warn("Reading regedit output", e);
-                    } finally {
-                        if (bufferedReader != null)
-                            try { bufferedReader.close(); } catch (IOException ioe) {}
-                        foo.delete();
-                    }
-                } else if (_log.shouldWarn()) {
-                    _log.warn("Regedit Failed: " + Arrays.toString(args));
+                String line = getDefaultWindowsBrowser(url);
+                String[] aarg = parseArgs(line, url);
+                if (aarg.length > 0) {
+                    browserString = aarg;
                 }
                 if (_log.shouldDebug()) _log.debug("Execute: " + Arrays.toString(browserString));
                 if (_shellCommand.executeSilentAndWaitTimed(browserString, 5))
