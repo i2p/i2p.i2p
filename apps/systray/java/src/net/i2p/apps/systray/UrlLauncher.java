@@ -191,10 +191,10 @@ public class UrlLauncher implements ClientApp {
      * https://stackoverflow.com/questions/15852885/me...
      *
      * @param url containing full scheme, i.e. http://127.0.0.1:7657
-     * @return path to command[0] and target URL[1] to the default browser ready for execution, or null if not found
+     * @return path to command[0] and target URL[1] to the default browser ready for execution, non-null
      * @since 2.0.0
      */
-    public String getDefaultWindowsBrowser(String url) {
+    private String getDefaultWindowsBrowser(String url) {
         String defaultBrowser;
         String key;
         if (url.startsWith("https://")){
