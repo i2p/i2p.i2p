@@ -2,6 +2,7 @@
  * GeoIP 2022-11-01
  * SSU:
    - Fail SSU2 on all session request after retry errors
+   - Temporarily ban peer after inbound handshake failure
    - Prefer in China
 
 2022-10-19 zzz
