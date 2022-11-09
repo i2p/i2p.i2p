@@ -15,7 +15,7 @@ Versions are as follows:
 Min version	Max version	Uses src pkg	Copied to Debian
 -----------	-----------	------------	----------------
 bionic		--		bionic		--
-focal		kinetic		bionic		buster, bullseye, bookworm, sid
+focal		lunar		bionic		buster, bullseye, bookworm, sid
 
 Unsupported (Java 7):
 precise		saucy   	precise		wheezy
