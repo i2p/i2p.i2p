@@ -33,7 +33,7 @@
  import org.eclipse.jetty.security.authentication.DigestAuthenticator;
  import org.eclipse.jetty.server.AbstractConnector;
  import org.eclipse.jetty.server.ConnectionFactory;
-@@ -981,6 +983,8 @@
+@@ -986,6 +988,8 @@
              } else {
                  HashLoginService realm = new CustomHashLoginService(JETTY_REALM, context.getContextPath(),
                                                                      ctx.logManager().getLog(RouterConsoleRunner.class));
@@ -42,7 +42,7 @@
                  sec.setLoginService(realm);
                  sec.setAuthenticator(authenticator);
                  String[] role = new String[] {JETTY_ROLE};
-@@ -988,7 +992,7 @@
+@@ -993,7 +997,7 @@
                      String user = e.getKey();
                      String pw = e.getValue();
                      Credential cred = Credential.getCredential(MD5_CREDENTIAL_TYPE + pw);
@@ -51,7 +51,7 @@
                      Constraint constraint = new Constraint(user, JETTY_ROLE);
                      constraint.setAuthenticate(true);
                      ConstraintMapping cm = new ConstraintMapping();
-@@ -1008,7 +1012,7 @@
+@@ -1013,7 +1017,7 @@
                          try {
                              // each char truncated to 8 bytes
                              String user2 = new String(b2, "ISO-8859-1");
@@ -60,7 +60,7 @@
                              constraint = new Constraint(user2, JETTY_ROLE);
                              constraint.setAuthenticate(true);
                              cm = new ConstraintMapping();
-@@ -1019,7 +1023,7 @@
+@@ -1024,7 +1028,7 @@
                              // each UTF-8 byte as a char
                              // this is what chrome does
                              String user3 = new String(b1, "ISO-8859-1");
