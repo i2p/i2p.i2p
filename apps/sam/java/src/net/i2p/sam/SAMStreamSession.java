@@ -164,7 +164,7 @@ class SAMStreamSession implements SAMMessageSess {
             allprops.setProperty("i2cp.dontPublishLeaseSet", "true");
         String name = allprops.getProperty("inbound.nickname");
         if (name == null || name.trim().isEmpty()) {
-            name = "SAM TCP Client";
+            name = getClass().getSimpleName().equals("PrimarySession") ? "SAM Mux Client" : "SAM TCP Client";
             allprops.setProperty("inbound.nickname", name);
         }
         String name2 = allprops.getProperty("outbound.nickname");
