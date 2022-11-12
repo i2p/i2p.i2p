@@ -389,15 +389,35 @@ abstract class IRCFilter {
             }
             return s;
         }
-        
+
         if("USER".equals(command)) {
-            if (field.length < idx + 2)
+            // USER <username> <hostname> <servername> <realname> (RFC 1459)
+            // USER <user> <mode> <unused> <realname> (RFC 2812)
+            // <realname> may contain spaces, and thus must be prefixed with a colon.
+            if (field.length < idx + 3)
                 return s;  // invalid, allow server response
-            int cidx = field[idx + 1].lastIndexOf(':');
+            // Replace hostname/servername; pass numeric mode and unused '*' through unchanged
+            String hostname = field[idx + 1];
+            try {
+                Integer.parseInt(hostname);
+                // mode
+            } catch (NumberFormatException nfe) {
+                hostname = "hostname";
+            }
+            // Warning: max field size is 4, so servername or unused is combined with realname
+            // in field[idx + 2]
+            String servername;
+            if (field[idx + 2].startsWith("* "))
+                servername = "*";
+            else
+                servername = "localhost";
+            String realname;
+            int cidx = field[idx + 2].lastIndexOf(':');
             if (cidx < 0)
-                return "USER user hostname localhost :realname";
-            String realname = field[idx + 1].substring(cidx + 1);
-            String ret = "USER " + field[idx] + " hostname localhost :" + realname;
+                realname = "realname";
+            else
+                realname = field[idx + 2].substring(cidx + 1);
+            String ret = "USER " + field[idx] + ' ' + hostname + ' ' + servername + " :" + realname;
             return ret;
         }
 

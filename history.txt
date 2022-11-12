@@ -1,3 +1,9 @@
+2022-11-12 zzz
+ * i2ptunnel: Fix IRC USER filtering
+
+2022-11-09 zzz
+ * SAM: Add warning at startup if not bound to localhost
+
 2022-11-01 zzz
  * GeoIP 2022-11-01
  * SSU:
