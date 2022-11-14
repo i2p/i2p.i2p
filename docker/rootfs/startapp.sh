@@ -24,12 +24,13 @@ done
 
 if [ -f /.dockerenv ]; then
     echo "[startapp] Running in container"
-    export IP_ADDR=$(hostname -i)
-    if echo "$IP_ADDR" | grep "172.17"; then
+    if [ -z "$IP_ADDR" ]; then
+        export IP_ADDR=$(hostname -i)
         echo "[startapp] Running in docker network"
-        sed -i "s/127.0.0.1/${IP_ADDR}/g" ./clients.config ./i2ptunnel.config
     fi
-
+    echo "[startapp] setting reachable IP to container IP $IP_ADDR"
+    find . -name '*.config' -exec sed -i "s/127.0.0.1/$IP_ADDR/g" {} \;
+    find . -name '*.config' -exec sed -i "s/localhost/$IP_ADDR/g" {} \;
 fi
 
 # Options required for reflective access in dynamic JVM languages like Groovy and Jython
@@ -38,4 +39,3 @@ JAVA17OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/su
 JAVAOPTS="-Djava.net.preferIPv4Stack=false -Djava.library.path=${I2P}:${I2P}/lib -Di2p.dir.base=${I2P} -Di2p.dir.config=${HOME}/.i2p -DloggerFilenameOverride=logs/log-router-@.txt -Xmx$JVM_XMX"
 
 java -cp "${CLASSPATH}" ${JAVA_OPTS} net.i2p.router.RouterLaunch
-

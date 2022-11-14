@@ -28,6 +28,17 @@ docker build -t i2p .
 
 ### Running a container
 
+#### Environment Variables
+
+It is possible to set the IP address where the I2P router is accessible by setting
+the `IP_ADDR` environment variable in your `docker run` command or your `docker-compose`
+file. For example, if you want to make your I2P router listen on all addresses, then
+you should pass `-e IP_ADDR=0.0.0.0` to your `docker run` command.
+
+It is also possible to configure the memory available to the I2P router using
+environment variables. To do this, use the: `JVM_XMX` environment variable by passing,
+for example, `-e JVM_XMX=256m`.
+
 #### Volumes
 The container requires a volume for the configuration data to be mounted.  Optionally, you can mount a separate volume for torrent ("i2psnark") downloads.  See the example below.
 
