@@ -10,7 +10,12 @@ version: "3.5"
 services:
     i2p:
         image: geti2p/i2p
-        network_mode: host
+        ports:
+            - 127.0.0.1:4444:4444
+            - 127.0.0.1:6668:6668
+            - 127.0.0.1:7657:7657
+            - 54321:12345
+            - 54321:12345/udp
         volumes:
             - ./i2pconfig:/i2p/.i2p
             - ./i2ptorrents:/i2psnark
@@ -23,7 +28,7 @@ Note that this quick-start approach is not recommended for production deployment
 ### Building an image
 There is an i2P image available over at [DockerHub](https://hub.docker.com).  If you do not want to use that one, you can build one yourself:
 ```
-docker build -t i2p .
+docker build -t geti2p/i2p .
 ```
 
 ### Running a container
@@ -70,16 +75,19 @@ A best-practices guide for cloud deployments is beyond the scope of this documen
 
 #### Example
 Here is an example container that mounts `i2phome` as home directory, `i2ptorrents` for torrents, and opens HTTP Proxy, IRC, Router Console and I2NP Protocols.  It also limits the memory available to the JVM to 256MB.
+
 ```
+docker build -t geti2p/i2p .
+# I2NP port needs TCP and UDP.  Change the 54321 to something random, greater than 1024.
 docker run \
     -e JVM_XMX=256m \
     -v i2phome:/i2p/.i2p \
     -v i2ptorrents:/i2psnark \
-    -p 4444:4444 \
-    -p 6668:6668 \
-    -p 7657:7657 \
+    -p 127.0.0.1:4444:4444 \
+    -p 127.0.0.1:6668:6668 \
+    -p 127.0.0.1:7657:7657 \
     -p 54321:12345 \
-    -p 54321:12345/udp \  # I2NP port needs TCP and UDP.  Change the 54321 to something random, greater than 1024.
-    i2p:latest
+    -p 54321:12345/udp \
+    geti2p/i2p:latest
 ```
 
