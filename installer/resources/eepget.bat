@@ -71,14 +71,14 @@ if not defined JAVA (set JAVA="%JAVA_PATH%\bin\java.exe")
 
 :eepget
 ::
-:: The binary in %JAVA% should exist, assuming it was set by us. Perhaps it
+:: The binary in "%JAVA%" should exist, assuming it was set by us. Perhaps it
 :: won't if the user specified it manually. Let's check to be sure.
 ::
-if not exist %JAVA% (
-    echo. Could not find %JAVA%. Please ensure that the variable JAVA
+if not exist "%JAVA%" (
+    echo. Could not find "%JAVA%". Please ensure that the variable JAVA
     echo. refers to a path that exists.
     goto end
 )
-%JAVA% -cp "%_I2PHOME%\lib\i2p.jar" net.i2p.util.EepGet %1 %2 %3 %4 %5
+"%JAVA%" -cp "%_I2PHOME%\lib\i2p.jar" net.i2p.util.EepGet %1 %2 %3 %4 %5
 
 :end
