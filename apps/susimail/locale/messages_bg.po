@@ -257,7 +257,7 @@ msgstr[1] ""
 #: src/src/i2p/susi/webmail/WebMail.java:2310
 #: src/src/i2p/susi/webmail/WebMail.java:3267
 msgid "No messages"
-msgstr ""
+msgstr "Няма съобщения"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2318
 msgid "Show Message"

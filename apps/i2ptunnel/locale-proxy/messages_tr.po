@@ -595,7 +595,7 @@ msgstr "Şifreleme anahtarı"
 msgid ""
 "You must either enter a PSK encryption key provided by the server operator, "
 "or generate a DH encryption key and send that to the server operator."
-msgstr "Sunucu işletmesi tarafından sağlanan bir PSK şifreleme anahtarı yazmalı ya da bir DH şifreleme anahtarı üreterek sunucu işletmecisine göndermelisiniz."
+msgstr "Sunucu işletmesi tarafından sağlanan bir PSK şifreleme anahtarı yazmalı ya da bir Diffie-Hellman şifreleme anahtarı üreterek sunucu işletmecisine göndermelisiniz."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1527
 msgid "Ask the server operator for help."
@@ -607,7 +607,7 @@ msgstr "PSK şifreleme anahtarını yazın"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1533
 msgid "Generate new DH encryption key"
-msgstr "Yeni bir DH şifreleme anahtarı üretin"
+msgstr "Yeni bir Diffie-Hellman şifreleme anahtarı üretin"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1541
 msgid "Lookup password"

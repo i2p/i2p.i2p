@@ -1667,7 +1667,7 @@ msgstr "I2Pクライアントトンネル"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:464
 msgid "Interface"
-msgstr "インタフェース"
+msgstr "インターフェース"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:479
 msgid "Edit Tunnel Settings for"

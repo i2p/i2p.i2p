@@ -15,20 +15,21 @@
 # jackjack <root@waka.site40.net>, 2011
 # syl_, 2015-2016
 # Towinet, 2013-2016
+# vex vex, 2022
 # zzzi2p, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-02-09 19:13+0000\n"
-"PO-Revision-Date: 2022-02-09 19:23+0000\n"
-"Last-Translator: AO <ao@localizationlab.org>\n"
+"PO-Revision-Date: 2011-02-13 12:00+0000\n"
+"Last-Translator: vex vex, 2022\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fr\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #: ../java/src/org/klomp/snark/IdleChecker.java:76
 msgid "No more torrents running."
@@ -52,7 +53,7 @@ msgstr "Magnet"
 #: ../java/src/org/klomp/snark/SnarkManager.java:2572
 #: ../java/src/org/klomp/snark/SnarkManager.java:2627
 msgid "Unable to connect to I2P"
-msgstr ""
+msgstr "Impossible de se connecter à I2P"
 
 #: ../java/src/org/klomp/snark/Snark.java:597
 #: ../java/src/org/klomp/snark/SnarkManager.java:1727
@@ -72,7 +73,7 @@ msgstr "clair"
 #. Translators: Translate "ubergine" as "aubergine" or "eggplant" or "purple"
 #: ../java/src/org/klomp/snark/SnarkManager.java:146
 msgid "ubergine"
-msgstr ""
+msgstr "aubergine"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:146
 msgid "vanilla"
@@ -785,6 +786,7 @@ msgid "1 torrent"
 msgid_plural "{0} torrents"
 msgstr[0] "1 torrent"
 msgstr[1] "{0} torrents"
+msgstr[2] "{0} torrents"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:758
 #, java-format
@@ -792,6 +794,7 @@ msgid "1 connected peer"
 msgid_plural "{0} connected peers"
 msgstr[0] "1 pair connecté"
 msgstr[1] "{0} pairs connectés"
+msgstr[2] "{0} pairs connectés"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:765
 #, java-format
@@ -799,6 +802,7 @@ msgid "1 DHT peer"
 msgid_plural "{0} DHT peers"
 msgstr[0] "1 pair de la table de hachage distribuée"
 msgstr[1] "{0} pairs de la table de hachage distribuée"
+msgstr[2] "{0} pairs de la table de hachage distribuée"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:773
 msgid "Dest"
@@ -1018,6 +1022,7 @@ msgid "1 peer"
 msgid_plural "{0} peers"
 msgstr[0] "1 pair"
 msgstr[1] "{0} pairs"
+msgstr[2] "{0} pairs"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1716
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1717
@@ -1035,6 +1040,7 @@ msgid "Seeding to {0} peer"
 msgid_plural "Seeding to {0} peers"
 msgstr[0] "Propagation vers {0} pair"
 msgstr[1] "Propagation vers {0} pairs"
+msgstr[2] "Propagation vers {0} pairs"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1731
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1747
@@ -1062,6 +1068,7 @@ msgid "Downloading from {0} peer"
 msgid_plural "Downloading from {0} peers"
 msgstr[0] "Téléchargement à partir d’{0} pair"
 msgstr[1] "Téléchargement à partir de {0} pairs"
+msgstr[2] "Téléchargement à partir de {0} pairs"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1763
 #, java-format
@@ -1069,6 +1076,7 @@ msgid "Connected to {0} peer"
 msgid_plural "Connected to {0} peers"
 msgstr[0] "Connecté à {0} pair"
 msgstr[1] "Connecté à {0} pairs"
+msgstr[2] "Connecté à {0} pairs"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1763
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1764
@@ -1531,6 +1539,7 @@ msgid "1 hop"
 msgid_plural "{0} hops"
 msgstr[0] "1 saut"
 msgstr[1] "{0} sauts"
+msgstr[2] "{0} sauts"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2844
 #, java-format
@@ -1538,11 +1547,12 @@ msgid "1 tunnel"
 msgid_plural "{0} tunnels"
 msgstr[0] "1 tunnel"
 msgstr[1] "{0} tunnels"
+msgstr[2] "{0} tunnels"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3121
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3428
 msgid "Edit Torrent"
-msgstr ""
+msgstr "Modifier Torrent"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3131
 msgid "Torrent file"
@@ -1637,7 +1647,7 @@ msgstr "Forcer une revérification"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4205
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4544
 msgid "Torrent must be stopped"
-msgstr ""
+msgstr "Torrent doit être arrêté"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3425
 msgid "Check integrity of the downloaded files"
@@ -1645,7 +1655,7 @@ msgstr "Vérifier l’intégrité des fichiers téléchargés"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3434
 msgid "Add or remove trackers"
-msgstr ""
+msgstr "Ajouter ou enlever les traqueurs"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3444
 msgid "Download files in order"
@@ -1772,6 +1782,7 @@ msgid "1 star"
 msgid_plural "{0} stars"
 msgstr[0] "1 étoile"
 msgstr[1] "{0} étoiles"
+msgstr[2] "{0} étoiles"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4068
 msgid "No rating"
@@ -1817,7 +1828,7 @@ msgstr "Traqueur"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4273
 msgid "Add Tracker"
-msgstr ""
+msgstr "Ajouter un traqueur"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4313
 msgid "Save Changes"

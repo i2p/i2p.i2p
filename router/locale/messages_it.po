@@ -7,6 +7,7 @@
 # Translators:
 # zzzi2p, 2019
 # SebastianoPistore <SebastianoPistore.info@protonmail.ch>, 2021
+# lonnic, 2022
 # 
 msgid ""
 msgstr ""
@@ -14,13 +15,13 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-18 13:32+0000\n"
 "PO-Revision-Date: 2019-12-19 14:09+0000\n"
-"Last-Translator: SebastianoPistore <SebastianoPistore.info@protonmail.ch>, 2021\n"
+"Last-Translator: lonnic, 2022\n"
 "Language-Team: Italian (https://www.transifex.com/otf/teams/12694/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: it\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #. * IPv4 OK, IPv6 OK or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:370
@@ -158,7 +159,7 @@ msgstr "Abbandono delle richieste tunnel: Troppo lento"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:270
 msgid "Dropping tunnel requests: High job lag"
-msgstr ""
+msgstr "Abbandono delle richieste tunnel: Carico elevato"
 
 #. don't even bother, since we are so overloaded locally
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:464
@@ -167,7 +168,7 @@ msgstr "Abbandono delle richieste tunnel: Carico troppo elevato"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:747
 msgid "Rejecting tunnels: Hidden mode"
-msgstr ""
+msgstr "Rifiutando i tunnel: modalità nascosta"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:775
 msgid "Rejecting tunnels: Request overload"

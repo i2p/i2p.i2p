@@ -1133,7 +1133,7 @@ msgstr "Gidiş"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1721
 msgid "Encrypt Leaseset"
-msgstr "Kiralama Kümesi'ni Şifrele"
+msgstr "\"Kiralama kümesi\" (LeaseSet) şifrelensin"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1730
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1740
@@ -1705,7 +1705,7 @@ msgstr "Kayıt Yardımcısı"
 msgid ""
 "This service uses encrypted leasesets. Registration is not recommended. "
 "Registration authentication is disabled."
-msgstr "Bu hizmet Şifrelenmiş Kiralama Kümeleri kullanır. Kayıt olmak gerekmez. Kayıt kimliği doğrulaması devre dışıdır."
+msgstr "Bu hizmet \"Şifrelenmiş kiralama kümeleri\" (EncryptedLeaseSets) kullanır. Kayıt olmak gerekmez. Kayıt kimliği doğrulaması devre dışıdır."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:246
 msgid ""

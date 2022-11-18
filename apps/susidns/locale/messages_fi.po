@@ -5,13 +5,14 @@
 # 
 # Translators:
 # Jorma Karvonen <karvonen.jorma@gmail.com>, 2015
+# PyryV, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-08-14 13:36+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
-"Last-Translator: Jorma Karvonen <karvonen.jorma@gmail.com>, 2015\n"
+"Last-Translator: PyryV, 2022\n"
 "Language-Team: Finnish (http://www.transifex.com/otf/I2P/language/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -73,13 +74,13 @@ msgstr "Avain"
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:265
 #, java-format
 msgid "Type {0}"
-msgstr ""
+msgstr "Tyyppi {0}"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:252
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:259
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:262
 msgid "DSA 1024 bit"
-msgstr ""
+msgstr "DSA 1024-bittinen"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:195
 #, java-format
@@ -99,15 +100,15 @@ msgstr[1] ""
 #, java-format
 msgid "One result for search."
 msgid_plural "{0} results for search."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Yksi tulos haulle."
+msgstr[1] "{0} tulosta haulle."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:213
 #, java-format
 msgid "Address book contains 1 entry."
 msgid_plural "Address book contains {0} entries."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Osoitekirja sisältää 1 merkintää."
+msgstr[1] "Osoitekirja sisältää {0} merkintää."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:229
 #, java-format
@@ -195,7 +196,7 @@ msgstr ""
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:387
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:402
 msgid "Delete Entry"
-msgstr ""
+msgstr "Poista Merkintä"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:336
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:349
@@ -232,16 +233,16 @@ msgstr ""
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:317
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:687
 msgid "Add Alternate"
-msgstr ""
+msgstr "lisää Vaihtoehtoinen"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:366
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:391
 msgid "Address book saved."
-msgstr ""
+msgstr "Osoitekirja tallennettu."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:369
 msgid "ERROR: Could not write address book file."
-msgstr ""
+msgstr "VIRHE: Osoitekirja tiedostoa ei pystytty tallentamaan."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:374
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:108
@@ -270,7 +271,7 @@ msgstr "Tallenna"
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:101
 msgid "Configuration saved."
-msgstr ""
+msgstr "Asetukset tallennettu."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:102
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:155
@@ -281,7 +282,7 @@ msgstr "Lataa uudelleen"
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:104
 msgid "Configuration reloaded."
-msgstr ""
+msgstr "Asetukset ladattu uudelleen."
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:117
 #, java-format
@@ -295,7 +296,7 @@ msgstr ""
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:301
 msgid "Manually added via SusiDNS"
-msgstr ""
+msgstr "Lisätty manuaalisesti SusiDNS:n kautta."
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:327
 #, java-format
@@ -318,23 +319,23 @@ msgstr "Sinun on kirjoitettava tiedosto"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:571
 msgid "No entries found in file"
-msgstr ""
+msgstr "Tiedostosta ei löytynyt merkintöjä"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:581
 #, java-format
 msgid "Imported from file {0}"
-msgstr ""
+msgstr "Tuotu tiedostosta {0}"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:583
 msgid "Imported from file"
-msgstr ""
+msgstr "Tuotu tiedostosta"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:595
 #, java-format
 msgid "Loaded {0} entry from file"
 msgid_plural "Loaded {0} entries from file"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Lisätty {0} merkintä tiedostosta"
+msgstr[1] "Lisätty {0} merkintää tiedostosta"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:599
 #, java-format
@@ -345,7 +346,7 @@ msgstr[1] ""
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:605
 msgid "Import from file failed"
-msgstr ""
+msgstr "Tuonti tiedostosta epäonnistui"
 
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:148
 msgid ""
@@ -456,11 +457,11 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:272
 msgid "This is the Local Address Book."
-msgstr ""
+msgstr "Tämä on paikallinen osoitekirja."
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:275
 msgid "Use it for sites that you host on this computer."
-msgstr ""
+msgstr "Käytä sitä sivustoille joita ylläpidät tällä tietokoneella."
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:282
 msgid ""
@@ -470,7 +471,7 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:311
 msgid "Export in hosts.txt format"
-msgstr ""
+msgstr "Vie hosts.txt formaatissa"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:336
 msgid "Current filter"
@@ -478,7 +479,7 @@ msgstr "Nykyinen suodatin"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:340
 msgid "clear filter"
-msgstr ""
+msgstr "tyhjennä suodatin"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:368
 msgid "Filter"
@@ -504,7 +505,7 @@ msgstr "Tietokoneen nimi"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:437
 msgid "Link (b32)"
-msgstr ""
+msgstr "Linkki (b32)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:439
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:374
@@ -521,7 +522,7 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:515
 msgid "Base 32 address"
-msgstr ""
+msgstr "Base 32 osoite"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:521
 msgid "Helper link to share host address with option to add to address book"
@@ -529,11 +530,11 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:527
 msgid "More information on this entry"
-msgstr ""
+msgstr "Lisätietoa tästä merkinnästä"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:530
 msgid "details"
-msgstr ""
+msgstr "lisätiedot"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:550
 msgid "Mark for deletion"
@@ -547,11 +548,11 @@ msgstr "Peru"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:651
 msgid "This address book is empty."
-msgstr ""
+msgstr "Tämä osoitekirja on tyhjä."
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:671
 msgid "Add new destination"
-msgstr ""
+msgstr "Lisää uusi päämäärä"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:677
 msgid "Destination or Base 32 Address"
@@ -697,7 +698,7 @@ msgstr "Julkinen avain"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:322
 msgid "ElGamal 2048 bit"
-msgstr ""
+msgstr "ElGamal 2048 bittiä"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:326
 msgid "Signing Key"
@@ -753,7 +754,7 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:204
 msgid "What is the address book?"
-msgstr ""
+msgstr "Mikä on osoitekirja?"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:206
 msgid "The address book application is part of your I2P installation."

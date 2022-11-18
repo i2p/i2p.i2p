@@ -32,25 +32,26 @@ i2prouter \- 启动和停止 I2P 路由器
 仅当I2P服务已在运行时重启。
 
 .IP \fBgraceful\fP
-自然关闭I2P（最多可能需要11分钟）
+平滑关闭I2P（最多可能需要11分钟）
 
 .IP \fBinstall\fP
-Install initscript to start I2P automatically when the system boots.
+安装initscript以在系统启动时自动启动I2P。
 
 .IP \fBremove\fP
-Uninstall initscript that was installed with \fBinstall\fP
+卸载与\fBinstall\fP一起安装的initscript
 
 .IP \fBstatus\fP
-Prints whether the I2P service is running.
+显示I2P服务是否在运行。
 
 .IP \fBdump\fP
-Dumps the current threads into \fBwrapper.log\fP.
+将当前的线程转储保存到\fBwrapper.log\fP。
 
 .SH 报告漏洞
-Please enter an issue on
+请在
 .UR https://i2pgit.org/i2p\-hackers/i2p.i2p/\-/issues
-the I2P GitLab server
+I2P GitLab服务器
 .UE .
+上输入一个问题。
 
 .SH 另见
 \fBi2prouter\-nowrapper\fP(1)

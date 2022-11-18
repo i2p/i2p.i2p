@@ -668,7 +668,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:349
 msgid "private"
-msgstr ""
+msgstr "privat"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:362
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:396

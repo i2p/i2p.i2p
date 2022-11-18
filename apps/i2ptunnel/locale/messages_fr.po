@@ -4,31 +4,32 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# AO_LL <ao@localizationlab.org>, 2018-2021
+# AO <ao@localizationlab.org>, 2018-2021
 # Boxoa590, 2012-2013
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
-# AO_LL <ao@localizationlab.org>, 2017-2018
+# AO <ao@localizationlab.org>, 2017-2018
 # Boxoa590, 2013
 # Boxoa590, 2012
 # 88debc4075076105339fa4916a2f6c30, 2017
 # syl_, 2016
 # Towinet, 2013-2016
 # 88debc4075076105339fa4916a2f6c30, 2016
+# vex vex, 2022
 # zzzi2p, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-17 13:12+0000\n"
-"PO-Revision-Date: 2021-11-17 13:34+0000\n"
-"Last-Translator: AO_LL <ao@localizationlab.org>\n"
+"PO-Revision-Date: 2011-02-13 11:46+0000\n"
+"Last-Translator: vex vex, 2022\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fr\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:498
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:508
@@ -41,6 +42,7 @@ msgid "{0} inbound tunnel"
 msgid_plural "{0} inbound tunnels"
 msgstr[0] "{0} tunnel entrant"
 msgstr[1] "{0} tunnels entrants"
+msgstr[2] "{0} tunnels entrants"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:547
 #, java-format
@@ -48,6 +50,7 @@ msgid "{0} outbound tunnel"
 msgid_plural "{0} outbound tunnels"
 msgstr[0] "{0} tunnel sortant"
 msgstr[1] "{0} tunnels sortants"
+msgstr[2] "{0} tunnels sortants"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:549
 #, java-format
@@ -55,6 +58,7 @@ msgid "{0} inbound, {0} outbound tunnel"
 msgid_plural "{0} inbound, {0} outbound tunnels"
 msgstr[0] "{0} tunnel entrant, {0} tunnel sortant"
 msgstr[1] "{0} tunnels entrants, {0} tunnels sortants "
+msgstr[2] "{0} tunnels entrants, {0} tunnels sortants "
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:553
 msgid "lower bandwidth and reliability"
@@ -507,6 +511,7 @@ msgid "{0} hop tunnel"
 msgid_plural "{0} hop tunnel"
 msgstr[0] "Tunnel à {0} saut"
 msgstr[1] "Tunnel à {0} sauts"
+msgstr[2] "Tunnel à {0} sauts"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:540
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1428
@@ -642,6 +647,7 @@ msgid "{0} backup tunnel"
 msgid_plural "{0} backup tunnels"
 msgstr[0] "{0} tunnel de secours"
 msgstr[1] "{0} tunnels de secours"
+msgstr[2] "{0} tunnels de secours"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:650
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1635
@@ -1381,7 +1387,7 @@ msgstr "Limitation de la bande passante du serveur"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2300
 msgid "Inbound connection limits"
-msgstr ""
+msgstr "Limites de connexion entrant"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2302
 msgid "Per Minute"
@@ -1447,7 +1453,7 @@ msgstr "Total de demandes de pages Web par jour avant que l’accès au serveur 
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2340
 msgid "Max concurrent connections"
-msgstr ""
+msgstr "Connexions concurrentes maximum"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2342
 msgid "Maximum number of simultaneous client connections"

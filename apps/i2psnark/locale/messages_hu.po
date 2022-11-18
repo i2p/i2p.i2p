@@ -9,13 +9,14 @@
 # omgitsadalek <mihalymokus76@gmail.com>, 2013
 # Nyul Csoki <csokinyul@i2pmail.org>, 2021
 # benewfy <benewfy@gmail.com>, 2015
+# vargaviktor <viktor.varga@gmail.com>, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-02-09 19:13+0000\n"
-"PO-Revision-Date: 2022-02-09 19:23+0000\n"
-"Last-Translator: AdminLMH <lehetmashogy@i2pmail.org>\n"
+"PO-Revision-Date: 2011-02-13 12:00+0000\n"
+"Last-Translator: vargaviktor <viktor.varga@gmail.com>, 2022\n"
 "Language-Team: Hungarian (http://www.transifex.com/otf/I2P/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -45,7 +46,7 @@ msgstr "Mágnes"
 #: ../java/src/org/klomp/snark/SnarkManager.java:2572
 #: ../java/src/org/klomp/snark/SnarkManager.java:2627
 msgid "Unable to connect to I2P"
-msgstr ""
+msgstr "Sikertelen csatlakozás az I2P-hez"
 
 #: ../java/src/org/klomp/snark/Snark.java:597
 #: ../java/src/org/klomp/snark/SnarkManager.java:1727
@@ -65,11 +66,11 @@ msgstr "világos"
 #. Translators: Translate "ubergine" as "aubergine" or "eggplant" or "purple"
 #: ../java/src/org/klomp/snark/SnarkManager.java:146
 msgid "ubergine"
-msgstr ""
+msgstr "lila"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:146
 msgid "vanilla"
-msgstr ""
+msgstr "vanília"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:997
 #: ../java/src/org/klomp/snark/SnarkManager.java:1151
@@ -1535,7 +1536,7 @@ msgstr[1] "{0} alagút"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3121
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3428
 msgid "Edit Torrent"
-msgstr ""
+msgstr "Torrent szerkesztése"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3131
 msgid "Torrent file"
@@ -1630,7 +1631,7 @@ msgstr "Újraellenőrzés kényszerítése"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4205
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4544
 msgid "Torrent must be stopped"
-msgstr ""
+msgstr "A Torrentet le kell állítani"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3425
 msgid "Check integrity of the downloaded files"
@@ -1638,7 +1639,7 @@ msgstr "A letöltött fájlok épségének ellenőrzése"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3434
 msgid "Add or remove trackers"
-msgstr ""
+msgstr "Tracker-ek hozzáadása vagy eltávolítása"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3444
 msgid "Download files in order"
@@ -1810,8 +1811,8 @@ msgstr "Követő (tracker)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4273
 msgid "Add Tracker"
-msgstr ""
+msgstr "Tracker hozzáadása"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4313
 msgid "Save Changes"
-msgstr ""
+msgstr "Változtatások mentése"

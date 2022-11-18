@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-10 16:21+0000\n"
+"POT-Creation-Date: 2022-11-09 12:45+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
 "Last-Translator: zzzi2p, 2020\n"
 "Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/otf/I2P/language/uk_UA/)\n"
@@ -55,20 +55,20 @@ msgstr "Заблокований по хешу маршрутизатора"
 msgid "IP banned by blocklist.txt entry {0}"
 msgstr "IP заблокований по запису в blocklist.txt: {0}"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1448
+#: ../../../router/java/src/net/i2p/router/Router.java:1452
 #: ../java/src/net/i2p/router/web/helpers/ConfigRestartBean.java:69
 msgid "Restart imminent"
 msgstr "Перезапуск неминучий"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1450
+#: ../../../router/java/src/net/i2p/router/Router.java:1454
 #: ../java/src/net/i2p/router/web/helpers/ConfigRestartBean.java:71
 msgid "Shutdown imminent"
 msgstr "Зупинка неминуча"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1951
+#: ../../../router/java/src/net/i2p/router/Router.java:1955
 #: ../../../router/java/src/net/i2p/router/sybil/Analysis.java:854
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1048
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1053
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1051
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1056
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:882
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:889
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:896
@@ -167,52 +167,52 @@ msgstr "Відомі швидкісні піри"
 msgid "Size of tunnel acceptor backlog"
 msgstr "Розмір тунелю черги завдань одержувача"
 
-#: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:637
+#: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:636
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHelper.java:68
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:150
 msgid "unknown"
 msgstr "невідомо"
 
-#: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:641
+#: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:638
 msgid "NetDb entry"
 msgstr "показати опис в NetDB"
 
 #. This used to be "no common transports" but it is almost always no
 #. transports at all
-#: ../../../router/java/src/net/i2p/router/transport/GetBidsJob.java:74
+#: ../../../router/java/src/net/i2p/router/transport/GetBidsJob.java:79
 msgid "No transports (hidden or starting up?)"
 msgstr "Немає транспортних протоколів (в прихованому режимі чи запущений нещодавно?)"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:915
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:917
 msgid "Unsupported signature type"
 msgstr "Непідтримуваний тип підпису"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:933
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:935
 msgid "No support for our signature type"
 msgstr "Немає підтримки для нашого типу підпису"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:937
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:939
 msgid "Unreachable on any transport"
 msgstr "Недосяжний через жодний транспортний протокол"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:1042
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:1044
 #: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:395
 msgid "UPnP is not enabled"
 msgstr "UPnP не ввімкнено"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1043
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1066
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:31
 msgid "Service"
 msgstr "Сервіс"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1048
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1071
 msgid "WAN Common Interface Configuration"
 msgstr "Загальна конфігурація WAN-інтерфейсів"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1049
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1070
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1088
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1107
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1072
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1093
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1111
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1130
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:106
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:308
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:472
@@ -220,94 +220,94 @@ msgstr "Загальна конфігурація WAN-інтерфейсів"
 msgid "Status"
 msgstr "Статус"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1051
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1074
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1095
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1097
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1118
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:66
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:577
 msgid "Type"
 msgstr "Тип"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1053
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1076
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1099
 msgid "Upstream"
 msgstr "Висхідний канал"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1055
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1078
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1101
 msgid "Downstream"
 msgstr "Низхідний канал"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1069
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1092
 msgid "WAN PPP Connection"
 msgstr "WAN PPP-з'єднання"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1072
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1090
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1095
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1113
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:630
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:656
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:690
 msgid "Uptime"
 msgstr "Аптайм"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1080
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1097
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1103
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1120
 msgid "External IP"
 msgstr "Зовнішній IP"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1083
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1106
 msgid "Layer 3 Forwarding"
 msgstr "Layer 3 пересилка"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1084
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1107
 msgid "Default Connection Service"
 msgstr "Служба з'єднання за замовчуванням"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1087
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1110
 msgid "WAN IP Connection"
 msgstr "WAN IP з'єднання"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1106
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1129
 msgid "WAN Ethernet Link Configuration"
 msgstr "Налаштування з'єднання WAN Ethernet"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1126
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1149
 msgid "Found Device"
 msgstr "Знайдено пристрій"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1128
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1151
 msgid "Subdevice"
 msgstr "Підпристрій"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1155
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1178
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:40
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:577
 msgid "UPnP Status"
 msgstr "Стан UPnP"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1163
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1186
 msgid "Disabled UPnP Devices"
 msgstr "Вимкнені UPnP пристрої"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1197
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1220
 msgid "UPnP has not found any UPnP-aware, compatible device on your LAN."
 msgstr "В вашій локальній мережі не знайдено жодного пристрою сумісного з UPnP"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1208
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1231
 #, java-format
 msgid "The current external IP address reported by UPnP is {0}"
 msgstr "Теперішня зовнішня IP-адреса, повідомлена UPnP: {0}"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1210
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1233
 msgid "The current external IP address is not available."
 msgstr "Теперішня зовнішня IP-адреса не доступна."
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1214
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1237
 #, java-format
 msgid "UPnP reports the maximum downstream bit rate is {0}bits/sec"
 msgstr "UPnP повідомляє максимальну вхідну швидкість {0}біт/с"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1216
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1239
 #, java-format
 msgid "UPnP reports the maximum upstream bit rate is {0}bits/sec"
 msgstr "UPnP повідомляє максимальну вихідну швидкість {0}біт/с"
@@ -316,20 +316,21 @@ msgstr "UPnP повідомляє максимальну вихідну швид
 #. {1,number,#####} prevents 12345 from being output as 12,345 in the English
 #. locale.
 #. If you want the digit separator in your locale, translate as {1}.
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1232
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1255
 #, java-format
 msgid "{0} port {1,number,#####} was successfully forwarded by UPnP."
 msgstr "{0} порт {1,number,#####} успішно пропущено через UPnP."
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1234
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1257
 #, java-format
 msgid "{0} port {1,number,#####} was not forwarded by UPnP."
 msgstr "{0} порт {1,number,#####} не пропущено через UPnP."
 
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:900
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:138
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:427
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1028
+#: ../java/src/net/i2p/router/web/DeadlockDetector.java:109
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:142
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:430
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1031
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:539
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:829
 #: ../java/strings/Strings.java:53
@@ -337,17 +338,17 @@ msgid "Router"
 msgstr "Роутер"
 
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:901
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:860
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:872
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:884
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:861
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:873
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:885
 msgid "Update available"
 msgstr "Оновлення доступно"
 
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:901
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:844
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:861
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:873
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:885
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:845
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:862
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:874
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:886
 #, java-format
 msgid "Version {0}"
 msgstr "Версія {0}"
@@ -381,7 +382,7 @@ msgstr "Невдала передача з {0}"
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1361
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1443
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1467
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:839
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:840
 msgid "Update downloaded"
 msgstr "Оновлення завантажено"
 
@@ -425,7 +426,7 @@ msgid "HTTP client proxy tunnel must be running"
 msgstr "Тунель для HTTP проксі повинен працювати"
 
 #: ../java/src/net/i2p/router/update/DevSU3UpdateChecker.java:83
-#: ../java/src/net/i2p/router/update/NewsFetcher.java:274
+#: ../java/src/net/i2p/router/update/NewsFetcher.java:280
 #: ../java/src/net/i2p/router/update/UnsignedUpdateChecker.java:88
 #, java-format
 msgid "Requires Java version {0} but installed Java version is {1}"
@@ -438,19 +439,19 @@ msgstr "Необхідна Java версії {0} але встановлено J
 msgid "Updating"
 msgstr "Оновлення"
 
-#: ../java/src/net/i2p/router/update/NewsFetcher.java:236
+#: ../java/src/net/i2p/router/update/NewsFetcher.java:242
 msgid "In-network updates disabled. Check package manager."
 msgstr "Стандартні оновлення відключено. Перевірте пакетний менеджер."
 
-#: ../java/src/net/i2p/router/update/NewsFetcher.java:242
+#: ../java/src/net/i2p/router/update/NewsFetcher.java:248
 msgid "No write permission for I2P install directory."
 msgstr "Немає прав на запис для директорії, де встановлено I2P."
 
-#: ../java/src/net/i2p/router/update/NewsFetcher.java:256
+#: ../java/src/net/i2p/router/update/NewsFetcher.java:262
 msgid "No update certificates installed."
 msgstr ""
 
-#: ../java/src/net/i2p/router/update/NewsFetcher.java:264
+#: ../java/src/net/i2p/router/update/NewsFetcher.java:270
 #, java-format
 msgid "You must first update to version {0}"
 msgstr "Спосатку потрібно оновити до версії {0}"
@@ -842,70 +843,70 @@ msgstr "Зробити дамп потоків"
 msgid "Threads dumped to {0}"
 msgstr "Дамп потоків збережено до {0}"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:280
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:283
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:657
 msgid "View console on startup"
 msgstr "Відкривати консоль при запуску"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:282
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:285
 msgid "Console is to be shown on startup"
 msgstr "Консоль буде відкриватись при запуску"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:283
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:286
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:659
 msgid "Do not view console on startup"
 msgstr "Не відкривати консоль при запуску"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:285
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:288
 msgid "Console is not to be shown on startup"
 msgstr "Консоль не буде відкриватись при запуску"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:286
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:289
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:641
 msgid "Force GC"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:288
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:291
 msgid "Full garbage collection requested"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:289
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:292
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:583
 msgid "Show systray icon"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:291
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:294
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:587
 msgid "Hide systray icon"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:332
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:335
 msgid "Service installed"
 msgstr "Сервіс встановлено"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:334
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:337
 msgid "Warning: unable to install the service"
 msgstr "Попередження: неможливо встановити сервіс"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:341
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:344
 msgid "Service removed"
 msgstr "Сервіс вилучено"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:343
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:346
 msgid "Warning: unable to remove the service"
 msgstr "Попередження: неможливо видалити сервіс"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:367
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:416
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:375
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:424
 #: ../java/src/net/i2p/router/web/helpers/ConfigAdvancedHandler.java:93
 #: ../java/src/net/i2p/router/web/helpers/ConfigAdvancedHandler.java:115
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:416
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:421
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:77
 msgid "Configuration saved successfully"
 msgstr "Налаштування збережено успішно"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:369
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:418
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:377
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:426
 #: ../java/src/net/i2p/router/web/helpers/ConfigAdvancedHandler.java:95
 #: ../java/src/net/i2p/router/web/helpers/ConfigAdvancedHandler.java:117
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:254
@@ -914,7 +915,7 @@ msgstr "Налаштування збережено успішно"
 #: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:58
 #: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:114
 #: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:133
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:418
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:423
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:133
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:187
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:79
@@ -923,33 +924,33 @@ msgid ""
 "error logs"
 msgstr "Помилка при збереженні налаштувань (застосовано, але не збереежено), перегляньте логи помилок"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:388
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:403
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:396
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:411
 msgid "Enabled system tray"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:393
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:401
 msgid "Disabled system tray"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:399
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:407
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:675
 #: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:56
 #: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:112
 #: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:131
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:359
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:433
 #: ../java/src/net/i2p/router/web/helpers/ConfigStatsHandler.java:125
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:121
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:145
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:510
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:509
 msgid "Restart required to take effect"
 msgstr "Для застосування змін потрібен перезапуск"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:408
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:416
 msgid "Failed to start systray"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:410
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:418
 msgid "Failed to stop systray"
 msgstr ""
 
@@ -1014,7 +1015,7 @@ msgstr "Оновлення частоти оновлення на {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:243
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:126
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:415
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:414
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:317
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:348
 msgid "Never"
@@ -1059,6 +1060,22 @@ msgstr "Лише завантажити і перевірити"
 msgid "Download, verify, and restart"
 msgstr "Завантажити, перевірити і перезапустити"
 
+#: ../java/src/net/i2p/router/web/DeadlockDetector.java:84
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:39
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:957
+msgid "Deadlock detected"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/DeadlockDetector.java:84
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:959
+msgid "Please report"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/DeadlockDetector.java:99
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:960
+msgid "After reporting, please restart your router"
+msgstr ""
+
 #: ../java/src/net/i2p/router/web/FormHandler.java:264
 msgid ""
 "Invalid form submission, probably because you used the 'back' or 'reload' "
@@ -1071,25 +1088,25 @@ msgid ""
 "browser."
 msgstr "Якщо проблема не усунута, переконайтеся, що cookies увімкнені у вашому браузері."
 
-#: ../java/src/net/i2p/router/web/NewsHelper.java:302
+#: ../java/src/net/i2p/router/web/NewsHelper.java:304
 #, java-format
 msgid "News last updated {0} ago."
 msgstr "Останні новини {0} назад"
 
-#: ../java/src/net/i2p/router/web/NewsHelper.java:308
+#: ../java/src/net/i2p/router/web/NewsHelper.java:310
 #, java-format
 msgid "News last checked {0} ago."
 msgstr "Останній раз новини перевірялись {0} назад"
 
-#: ../java/src/net/i2p/router/web/NewsHelper.java:317
+#: ../java/src/net/i2p/router/web/NewsHelper.java:319
 msgid "Hide news"
 msgstr "Сховати новини"
 
-#: ../java/src/net/i2p/router/web/NewsHelper.java:320
+#: ../java/src/net/i2p/router/web/NewsHelper.java:322
 msgid "Show news"
 msgstr "Показати новини"
 
-#: ../java/src/net/i2p/router/web/NewsHelper.java:324
+#: ../java/src/net/i2p/router/web/NewsHelper.java:326
 msgid "Show all news"
 msgstr "Показати всі новини"
 
@@ -1116,7 +1133,7 @@ msgid "Plugin update check complete"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/StatSummarizer.java:435
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:256
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:255
 msgid "Bandwidth usage"
 msgstr "Використання мережі"
 
@@ -1174,9 +1191,9 @@ msgstr "Забанені Піри"
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:170
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:75
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:131
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1070
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1073
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:159
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:627
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:628
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:189
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:385
 msgid "none"
@@ -1239,8 +1256,8 @@ msgid "Local Router Family Certificate"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:91
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:435
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1111
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:438
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1115
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:873
 msgid "Family"
 msgstr ""
@@ -1445,7 +1462,7 @@ msgstr "Додати клієнт"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:132
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1049
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:601
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:602
 msgid "Client"
 msgstr "Клієнт"
 
@@ -1508,8 +1525,8 @@ msgid "Plugin"
 msgstr "Модуль"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:292
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:431
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:883
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:434
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:886
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:316
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:482
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:97
@@ -1591,7 +1608,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/ConfigHomeHandler.java:22
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:25
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:27
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1146
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1156
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:569
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:589
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:605
@@ -1603,7 +1620,7 @@ msgstr "Видалити обране"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigHomeHandler.java:23
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:26
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1166
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1176
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:567
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:575
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:587
@@ -1761,19 +1778,19 @@ msgid "Cancel"
 msgstr "Скасувати"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:63
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:593
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:623
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:596
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:626
 msgid "Destination"
 msgstr "Призначення"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:64
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:366
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1075
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1085
 msgid "Name"
 msgstr "Назва"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:67
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1063
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1066
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:613
 msgid "Encryption Key"
 msgstr "Ключ шифрування"
@@ -1793,7 +1810,7 @@ msgstr "Термін дії спливає"
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:97
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:132
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:137
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:586
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:589
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:581
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:593
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:603
@@ -1948,7 +1965,7 @@ msgid "Peers"
 msgstr "Піри"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:32
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1099
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1102
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:580
 msgid "Stats"
 msgstr "Статистика"
@@ -1985,129 +2002,129 @@ msgstr ""
 msgid "Save changes"
 msgstr "Зберегти зміни"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:228
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:229
 msgid "Updating IP address"
 msgstr "Оновлюю IP-адреси"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:250
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:251
 msgid "Updating IPv6 setting"
 msgstr "Оновлюю налаштування IPv6"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:267
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:269
 msgid "Disabling TCP completely"
 msgstr "Повністю вимикаю TCP"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:272
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:274
 #, java-format
 msgid "Updating TCP address to {0}"
 msgstr "Оновлення адреси TCP на {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:279
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:281
 msgid "Disabling inbound TCP"
 msgstr "Відключення вхідного TCP"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:281
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:283
 msgid "Updating inbound TCP address to auto"
 msgstr "Оновлення адреси вхідного TCP на автоматичну"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:294
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:299
 #, java-format
 msgid "Updating TCP port to {0}"
 msgstr "Оновлення TCP-порта на {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:296
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:321
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:301
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:326
 msgid "Warning - ports less than 1024 are not recommended"
 msgstr "Попередження: порти менше 1024 не рекомендовані"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:300
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:327
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:305
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:332
 msgid "Invalid port"
 msgstr "Неправильний порт"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:305
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:310
 msgid "Updating inbound TCP port to auto"
 msgstr "Оновлення вхадного порту TCP на автоматичний"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:319
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:324
 #, java-format
 msgid "Updating UDP port to {0}"
 msgstr "Оновлення UDP-порта на {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:344
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:349
 msgid "Gracefully restarting into Hidden Router Mode"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:346
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:351
 msgid "Gracefully restarting to exit Hidden Router Mode"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:356
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:361
 msgid "Enabling UPnP"
 msgstr "Увімкнення UPnP"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:358
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:363
 msgid "Disabling UPnP"
 msgstr "Вимкнення UPnP"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:367
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:372
 msgid "Enabling laptop mode"
 msgstr "Вмикаю режим ноутбука"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:369
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:374
 msgid "Disabling laptop mode"
 msgstr "Вимикаю режим ноутбука"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:376
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:381
 msgid "Disabling inbound IPv4"
 msgstr "Відключаю вхідний IPv4"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:378
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:383
 msgid "Enabling inbound IPv4"
 msgstr "Включаю вхідний IPv4"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:386
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:391
 msgid "Disabling inbound IPv6"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:388
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:393
 msgid "Enabling inbound IPv6"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:396
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:401
 msgid "Disabling UDP"
 msgstr "Вимикаю UDP"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:398
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:403
 msgid "Enabling UDP"
 msgstr "Вмикаю UDP"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:405
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:410
 msgid "Requiring SSU introducers"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:463
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:470
 msgid "Invalid address"
 msgstr "Неправильні адреси"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:469
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:476
 #, java-format
 msgid "The address {0} is not publicly routable"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:494
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:501
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:102
 msgid "Updating bandwidth share percentage"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:514
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:529
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:521
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:536
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:118
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:133
 msgid "Invalid bandwidth"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:534
+#: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:541
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:137
 msgid "Updated bandwidth limits"
 msgstr ""
@@ -2567,28 +2584,28 @@ msgstr ""
 msgid "Embed Email and Torrent applications in the console"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:233
+#: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:234
 msgid "Add a user and password to enable."
 msgstr "Додайте користувача і пароль, щоб активувати."
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:237
+#: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:238
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:362
 msgid "Mark for deletion"
 msgstr "Позначити для видалення"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:239
+#: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:240
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:364
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1073
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1083
 msgid "Remove"
 msgstr "Видалити"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:241
-#: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:256
+#: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:242
+#: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:257
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:621
 msgid "Username"
 msgstr "Ім’я користувача"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:258
+#: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:259
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:623
 msgid "Password"
 msgstr "Пароль"
@@ -2621,261 +2638,261 @@ msgstr "Розбився"
 msgid "Critical error"
 msgstr "Критична помилка"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:39
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:40
 msgid "Installed new version"
 msgstr "Встановлено нову версію"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:40
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:41
 msgid "Install failed"
 msgstr "Встановлення невдале"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:41
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:42
 msgid "Network error"
 msgstr "Помилка мережі"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:42
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:46
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:43
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:47
 msgid "New router identity"
 msgstr "Нова ідентифікація маршрутизатора"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:43
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:44
 msgid "Disabled floodfill"
 msgstr "Floodfill деактивовано"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:44
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:45
 msgid "Out of memory error"
 msgstr "Помилка: недостатньо пам’яті"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:45
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:46
 msgid "Reachability change"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:47
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:48
 msgid "Reseeded router"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:48
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:49
 msgid "Soft restart"
 msgstr "М’який перезапуск"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:49
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:50
 msgid "Started router"
 msgstr "Роутер запущено"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:50
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:51
 msgid "Stopped router"
 msgstr "Роутер зупинено"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:51
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:52
 msgid "Updated router"
 msgstr "Роутер оновлено"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:52
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:53
 msgid "Watchdog warning"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:101
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:102
 msgid "Display Events"
 msgstr "Показувати події"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:105
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:106
 msgid "Events since"
 msgstr "Події від"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:110
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:111
 msgid "Event type"
 msgstr "Тип події"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:116
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:150
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:117
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:151
 msgid "All events"
 msgstr "Всі події"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:121
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:122
 msgid "Filter events"
 msgstr "Фільтрувати події"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:172
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:173
 msgid "No events found"
 msgstr "Подій не знайдено"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:173
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:174
 #, java-format
 msgid "No events found in previous {0}"
 msgstr "В попередньому {0} подій не знайдено"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:176
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:177
 #, java-format
 msgid "No \"{0}\" events found"
 msgstr "Подій \"{0}\" не знайдено"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:177
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:178
 #, java-format
 msgid "No \"{0}\" events found in previous {1}"
 msgstr "Подій \"{0}\" не знайдено в попередньому {1}"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:181
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:182
 #: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:156
 msgid "Time"
 msgstr "Час"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:184
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:185
 msgid "Event"
 msgstr "Подія"
 
-#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:186
+#: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:187
 msgid "Details"
 msgstr "Деталі"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:181
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:180
 msgid "Combined bandwidth graph"
 msgstr ""
 
 #. e.g. "statname for 60m"
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:203
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:269
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:202
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:268
 #, java-format
 msgid "{0} for {1}"
 msgstr "{0} для {1}"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:271
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:270
 #, java-format
 msgid "ending {0} ago"
 msgstr "завершується {0} тому"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:274
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:273
 msgid "Return to main graphs page"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:289
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:288
 msgid "Larger"
 msgstr "Більше"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:295
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:294
 msgid "Smaller"
 msgstr "Менше"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:301
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:300
 msgid "Taller"
 msgstr "Вище"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:307
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:306
 msgid "Shorter"
 msgstr "Нижче"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:313
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:312
 msgid "Wider"
 msgstr "Ширше"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:319
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:318
 msgid "Narrower"
 msgstr "Вужче"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:326
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:325
 msgid "Larger interval"
 msgstr "Більший інтервал"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:332
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:331
 msgid "Smaller interval"
 msgstr "Менший інтервал"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:339
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:338
 msgid "Previous interval"
 msgstr "Попередній інтервал"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:350
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:349
 msgid "Next interval"
 msgstr "Наступний інтервал"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:357
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:356
 msgid "Plot averages"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:357
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:356
 msgid "plot events"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:391
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:390
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:254
 msgid "Configure Graph Display"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:391
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:390
 msgid "Select Stats"
 msgstr "Вибрати статистику"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:396
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:395
 msgid ""
 "Note: Dimensions are for graph only (excludes title, labels and legend)."
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:397
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:396
 msgid "Graph size"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:398
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:397
 msgid "pixels wide"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:399
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:398
 msgid "pixels high"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:401
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:400
 msgid "Display period"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:401
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:400
 msgid "minutes"
 msgstr "хвилин"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:404
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:403
 msgid "Refresh delay"
 msgstr "Затримка оновлення"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:420
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:419
 msgid "Plot type"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:421
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:420
 msgid "Averages"
 msgstr "Середні показники"
 
 #. 7 days
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:422
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:421
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:525
 msgid "Events"
 msgstr "Події"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:423
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:422
 msgid "Hide legend"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:428
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:427
 msgid "Do not show legend on graphs"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:429
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:428
 msgid "UTC"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:434
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:433
 msgid "Use UTC time on graphs"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:435
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:434
 msgid "Persistence"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:440
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:439
 msgid "Store graph data on disk"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:441
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:440
 msgid "Save settings and redraw graphs"
 msgstr "Зберегти налаштування і перемалювати графіки"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:508
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:507
 msgid "Graph settings saved"
 msgstr "Налагтування графікі збережено"
 
@@ -2998,9 +3015,9 @@ msgstr "I2P Pastebin"
 msgid "Pastebin for I2P users"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:85
-msgid "Easy anonymous file sharing"
-msgstr ""
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:88
+msgid "I2P News"
+msgstr "Новини I2P"
 
 #. "git.repo.i2p" + S + _x("A public anonymous Git hosting site - supports
 #. pulling via Git and HTTP and pushing via SSH") + S + "http://git.repo.i2p/"
@@ -3019,14 +3036,8 @@ msgstr ""
 #. + I + "education.png" + S +
 #. "killyourtv.i2p" + S + _x("Debian and Tahoe-LAFS repositories") + S +
 #. "http://killyourtv.i2p/" + S + I + "television_delete.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:85
-msgid "MuWire"
-msgstr "MuWire"
-
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:88
-msgid "I2P News"
-msgstr "Новини I2P"
-
+#. _x("MuWire") + S + _x("Easy anonymous file sharing") + S +
+#. "http://muwire.i2p/" + S + I + "muwire.png" + S +
 #. _x("Open4You") + S + _x("Free I2P Site hosting with PHP and MySQL") + S +
 #. "http://open4you.i2p/" + S + I + "open4you-logo.png" + S +
 #. _x("Pastebin") + S + _x("Encrypted I2P Pastebin") + S +
@@ -3077,7 +3088,7 @@ msgid "Technical documentation"
 msgstr "Технічна документація"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:106
-msgid "Trac Wiki"
+msgid "I2P Wiki"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:107
@@ -3248,226 +3259,226 @@ msgid ""
 "your IP address in the network database."
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:141
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:456
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:144
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:459
 msgid "not found in network database"
 msgstr "не знайдено в мережевій базі даних"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:186
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:463
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:796
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:852
-msgid "Previous Page"
-msgstr "Попередня сторінка"
-
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:188
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:189
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:466
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:799
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:855
+msgid "Previous Page"
+msgstr "Попередня сторінка"
+
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:191
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:469
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:802
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:858
 msgid "Page"
 msgstr "Сторінка"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:433
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:929
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:436
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:932
 msgid "Country"
 msgstr "Країна"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:441
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:444
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:736
 msgid "Port"
 msgstr "Порт"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:443
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:446
 msgid "MTU"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:455
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:458
 #: ../java/strings/Strings.java:55
 msgid "Transport"
 msgstr "Транспорт"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:470
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:803
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:858
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:473
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:806
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:861
 msgid "Next Page"
 msgstr "Наступна сторінка"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:546
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:549
 msgid "Manually Configure Floodfill Participation"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:547
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:550
 msgid "Configure Floodfill Participation"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:583
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:586
 msgid "LeaseSet"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:589
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:592
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:343
 msgid "Local"
 msgstr "Локальний"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:592
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:595
 msgid "Unpublished"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:617
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:640
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:620
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:643
 msgid "Add to address book"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:619
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:642
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:622
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:645
 msgid "Add to local address book"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:653
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:656
 #, java-format
 msgid "Published {0} ago"
 msgstr "Опубліковано {0} тому"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:659
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:681
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:733
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:662
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:684
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:736
 #, java-format
 msgid "Expires in {0}"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:661
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:683
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:735
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:664
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:686
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:738
 #, java-format
 msgid "Expired {0} ago"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:723
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:726
 msgid "Lease"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:727
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:730
 msgid "Tunnel"
 msgstr "Тунель"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:773
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:776
 msgid "Not initialized"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:876
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:879
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:444
 msgid "Network Database Router Statistics"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:883
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:905
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:929
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:886
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:908
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:932
 msgid "Count"
 msgstr "Кількість"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:905
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:908
 msgid "Transports"
 msgstr "Транспорти"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1025
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1028
 msgid "Our Router Identity"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1038
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1041
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:840
 msgid "View extended router info"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1040
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1043
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:841
 msgid "Full entry"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1046
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:240
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1049
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:241
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:936
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:554
 msgid "Hidden"
 msgstr "Приховано"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1046
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1049
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:936
 msgid "Updated"
 msgstr "Оновлено"
 
 #. shouldnt happen
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1051
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1057
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1054
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1060
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1188
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:939
 msgid "Published"
 msgstr "Опубліковано"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1061
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1064
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:941
 msgid "Signing Key"
 msgstr "Підписуючий ключ"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1067
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1070
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:37
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:944
 msgid "Addresses"
 msgstr "Адреси"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1086
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1089
 msgid "cost"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1126
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1133
 msgid "Hidden or starting up"
 msgstr "Прихований або ще запускається"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1126
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1133
 msgid "SSU"
 msgstr "SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1126
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1133
 msgid "SSU with introducers"
 msgstr "SSU з посередниками"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1127
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1134
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:45
 msgid "NTCP"
 msgstr "NTCP"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1127
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1134
 msgid "NTCP and SSU"
 msgstr "NTCP і SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1127
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1134
 msgid "NTCP and SSU with introducers"
 msgstr "NTCP і SSU з посередниками"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1128
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1135
 msgid "IPv6 Only SSU, introducers"
 msgstr "IPv6 тільки SSU, посередники"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1128
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1135
 msgid "IPv6 SSU"
 msgstr "IPv6 SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1128
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1135
 msgid "IPv6 SSU, introducers"
 msgstr "IPv6 SSU, посередники"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1129
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1136
 msgid "IPv6 NTCP"
 msgstr "IPv6 NTCP"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1129
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1136
 msgid "IPv6 NTCP, SSU"
 msgstr "IPv6 NTCP, SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1129
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1136
 msgid "IPv6 NTCP, SSU, introducers"
 msgstr "IPv6 NTCP, SSU, посередники"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1129
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1136
 msgid "IPv6 Only NTCP, SSU, introducers"
 msgstr "IPv6 тільки NTCP, SSU, посередники"
 
@@ -3596,7 +3607,7 @@ msgstr "Час який пройшов після встановлення з'є
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:258
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:319
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:493
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1111
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1121
 msgid "Up"
 msgstr "Підключений"
 
@@ -4352,7 +4363,7 @@ msgstr "Статус тунелю"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:62
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:361
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:584
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:585
 msgid "Local Tunnels"
 msgstr ""
 
@@ -4503,7 +4514,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:515
 msgid "Debug"
-msgstr ""
+msgstr "Налагодження"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:518
 msgid "View router debug information"
@@ -4776,87 +4787,87 @@ msgstr ""
 msgid "Backlog"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:238
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:239
 #, java-format
 msgid "ERR-Clock Skew of {0}"
 msgstr "ПОМИЛКА-Відхилення годинника {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:243
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:244
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:550
 msgid "Testing"
 msgstr "Тестування"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:273
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:274
 msgid "ERR-Private TCP Address"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:277
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:278
 msgid "ERR-SymmetricNAT"
 msgstr "ERR-SymmetricNAT"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:283
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:284
 msgid "WARN-Firewalled with Inbound TCP Enabled"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:288
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:289
 msgid "WARN-Firewalled and Floodfill"
 msgstr "Попередження: за фаєрволом і floodfill"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:294
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:295
 msgid "Disconnected - check network connection"
 msgstr "Від’єднано, перевірте мережевий кабель"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:297
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:298
 msgid ""
 "ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and "
 "restart"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:307
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:308
 msgid "ERR-No Active Peers, Check Network Connection and Firewall"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:310
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:311
 msgid "ERR-UDP Disabled and Inbound TCP host/port not set"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:312
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:313
 msgid "WARN-Firewalled with UDP Disabled"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:581
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:582
 msgid "Add/remove/edit &amp; control your client and server tunnels"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:599
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:600
 msgid "Hidden Service"
 msgstr "Прихований сервіз"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:603
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:604
 msgid "Show tunnels"
 msgstr "Показати тунелі"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:614
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:615
 msgid "Leases expired"
 msgstr ""
 
 #. yellow light
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:614
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:615
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:616
 msgid "Rebuilding"
 msgstr ""
 
 #. green light
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:618
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:619
 msgid "Ready"
 msgstr "Готово"
 
 #. yellow light
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:622
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:623
 msgid "Building"
 msgstr "Побудова"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:622
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:623
 msgid "Building tunnels"
 msgstr "Побудова тунелів"
 
@@ -4864,21 +4875,21 @@ msgstr "Побудова тунелів"
 #. nicely under 'local destinations' in the summary bar
 #. note that if the wording changes in i2ptunnel.config, we have to
 #. keep the old string here as well for existing installs
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:637
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:638
 #: ../java/strings/Strings.java:35
 msgid "shared clients"
 msgstr "колективні клієнти"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:841
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:842
 msgid "Click Restart to install"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:843
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:844
 msgid "Click Shutdown and restart to install"
 msgstr ""
 
 #. Note to translators: parameter is a version, e.g. "0.8.4"
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:908
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:909
 #, java-format
 msgid "Download {0} Update"
 msgstr "Завантажити оновлення {0}"
@@ -4887,7 +4898,7 @@ msgstr "Завантажити оновлення {0}"
 #. <br> is optional, to help the browser make the lines even in the button
 #. If the translation is shorter than the English, you should probably not
 #. include <br>
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:916
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:917
 #, java-format
 msgid "Download Signed<br>Development Update<br>{0}"
 msgstr ""
@@ -4896,61 +4907,61 @@ msgstr ""
 #. <br> is optional, to help the browser make the lines even in the button
 #. If the translation is shorter than the English, you should probably not
 #. include <br>
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:924
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:925
 #, java-format
 msgid "Download Unsigned<br>Update {0}"
 msgstr "Завантажити підписане<br>оновлення {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:948
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:949
 msgid "Help with firewall configuration"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:950
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:951
 msgid "Check network connection and NAT/firewall"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:976
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:986
 msgid ""
 "Attempt to download router reference files (if automatic reseed has failed)"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:977
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:987
 msgid "Reseed"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1077
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1087
 msgid "Order"
 msgstr "Порядок"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1101
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1111
 msgid "Top"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1106
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1116
 msgid "Move to top"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1116
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1126
 msgid "Move up"
 msgstr "Вгору"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1124
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1134
 msgid "Down"
 msgstr "Вниз"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1129
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1139
 msgid "Move down"
 msgstr "Вниз"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1134
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1144
 msgid "Bottom"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1139
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1149
 msgid "Move to bottom"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1150
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1160
 msgid "Select a section to add"
 msgstr ""
 

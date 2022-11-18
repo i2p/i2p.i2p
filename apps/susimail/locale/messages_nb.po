@@ -267,7 +267,7 @@ msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:2323
 msgid "New Message"
-msgstr ""
+msgstr "Ny melding"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2325
 msgid "Configuration"

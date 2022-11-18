@@ -9,9 +9,10 @@
 # cedpren <cedpren@gmail.com>, 2011
 # 0f759dd1ea6c4c76cedc299039ca4f23_7584d04 <454cc45058db9632179dc8079c0c1af3_5311>, 2013
 # foo <foo@bar>, 2009
+# Juan Jaramillo <juanda097@protonmail.ch>, 2022
 # mixxy, 2011
-# punkibastardo <punkibastardo@gmail.com>, 2011, 2012
-# punkibastardo <punkibastardo@gmail.com>, 2011
+# punkibastardo <transifex.symons@slmail.me>, 2011, 2012
+# punkibastardo <transifex.symons@slmail.me>, 2011
 # strel, 2014-2018
 # fa1e5d1b5b1ea91a38c4e92aeae85c31_060014a, 2013
 msgid ""
@@ -20,13 +21,13 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-08-14 13:36+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
-"Last-Translator: strel, 2014-2018\n"
+"Last-Translator: Juan Jaramillo <juanda097@protonmail.ch>, 2022\n"
 "Language-Team: Spanish (http://www.transifex.com/otf/I2P/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:132
 #, java-format
@@ -96,6 +97,7 @@ msgid "One result for search within filtered list."
 msgid_plural "{0} results for search within filtered list."
 msgstr[0] "Un resultado por búsqueda dentro de la lista de elementos filtrados."
 msgstr[1] "{0} resultados para la búsqueda dentro de la lista de elementos filtrados."
+msgstr[2] "{0} resultados para la búsqueda dentro de la lista de elementos filtrados."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:199
 #, java-format
@@ -103,6 +105,7 @@ msgid "Filtered list contains 1 entry."
 msgid_plural "Filtered list contains {0} entries."
 msgstr[0] "La lista de elementos filtrados contiene una entrada."
 msgstr[1] "La lista de elementos filtrados contiene {0} entradas."
+msgstr[2] "La lista de elementos filtrados contiene {0} entradas."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:204
 #, java-format
@@ -110,6 +113,7 @@ msgid "One result for search."
 msgid_plural "{0} results for search."
 msgstr[0] "Un resultado para la búsqueda."
 msgstr[1] "{0} resultados para la búsqueda"
+msgstr[2] "{0} resultados para la búsqueda"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:213
 #, java-format
@@ -117,6 +121,7 @@ msgid "Address book contains 1 entry."
 msgid_plural "Address book contains {0} entries."
 msgstr[0] "La libreta de direcciones contiene una entrada."
 msgstr[1] "La libreta de direcciones contiente {0} entradas."
+msgstr[2] "La libreta de direcciones contiente {0} entradas."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:229
 #, java-format
@@ -156,7 +161,7 @@ msgstr "El nombre del host {0} ya se encuentra en la libreta de direcciones, aun
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:279
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:286
 msgid "Unable to resolve Base 32 address"
-msgstr ""
+msgstr "No se puede resolver la dirección Base 32"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:309
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:318
@@ -227,6 +232,7 @@ msgid "1 destination deleted."
 msgid_plural "{0} destinations deleted."
 msgstr[0] "Una dirección de destino ha sido eliminada."
 msgstr[1] "{0} direcciones de destino han sido eliminadas."
+msgstr[2] "{0} direcciones de destino han sido eliminadas."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:355
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:384
@@ -344,6 +350,7 @@ msgid "Loaded {0} entry from file"
 msgid_plural "Loaded {0} entries from file"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:599
 #, java-format
@@ -351,6 +358,7 @@ msgid "Skipped {0} duplicate entry from file"
 msgid_plural "Skipped {0} duplicate entries from file"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:605
 msgid "Import from file failed"

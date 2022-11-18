@@ -218,15 +218,15 @@ msgstr "Açık izleyiciler devre dışı bırakıldı - değişikliklerin etkili
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1306
 msgid "Enabled DHT."
-msgstr "DHT etkinleştirildi."
+msgstr "\"Dağıtılmış karma tablosu\" (DHT) etkinleştirildi."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1308
 msgid "Disabled DHT."
-msgstr "DHT devre dışı bırakıldı."
+msgstr "\"Dağıtılmış karma tablosu\" (DHT) devre dışı bırakıldı."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1310
 msgid "DHT change requires tunnel shutdown and reopen"
-msgstr "DHT değişikliği için tünelin kapatılıp yeniden açılması gerekir."
+msgstr "\"Dağıtılmış karma tablosu\" (DHT) değişikliği için tünelin kapatılıp yeniden açılması gerekir."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1317
 msgid "Enabled Ratings."
@@ -341,14 +341,14 @@ msgstr "HATA - \"{0}\" kişisel torrenti içinde herhangi bir I2P izleyicisi yok
 msgid ""
 "Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers and"
 " DHT only."
-msgstr "Uyarı - \"{0}\" içinde herhangi bir I2P izleyici yok. Yalnızca I2P açık izleyicileri ve DHT üzerinde duyurulacak."
+msgstr "Uyarı - \"{0}\" içinde herhangi bir I2P izleyici yok. Yalnızca I2P açık izleyicileri ve \"Dağıtılmış karma tablosu\" (DHT) üzerinde duyurulacak."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1660
 #, java-format
 msgid ""
 "Warning - No I2P trackers in \"{0}\", and open trackers are disabled, will "
 "announce to DHT only."
-msgstr "Uyarı - \"{0}\" içinde herhangi bir I2P izleyici yok ve I2P açık izleyicileri devre dışı bırakılmış. Yalnızca DHT üzerinde duyurulacak."
+msgstr "Uyarı - \"{0}\" içinde herhangi bir I2P izleyici yok ve I2P açık izleyicileri devre dışı bırakılmış. Yalnızca \"Dağıtılmış karma tablosu\" (DHT) üzerinde duyurulacak."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1662
 #, java-format
@@ -356,7 +356,7 @@ msgid ""
 "Warning - No I2P trackers in \"{0}\", and DHT and open trackers are "
 "disabled, you should enable open trackers or DHT before starting the "
 "torrent."
-msgstr "Uyarı - \"{0}\" içinde herhangi bir I2P izleyici yok. I2P açık izleyicileri ve DHT devre dışı bırakılmış. Torrenti başlatmadan önce açık izleyicileri ya da DHT özelliğini etkinleştirin."
+msgstr "Uyarı - \"{0}\" içinde herhangi bir I2P izleyici yok. I2P açık izleyicileri ve \"Dağıtılmış karma tablosu\" (DHT) devre dışı bırakılmış. Torrenti başlatmadan önce açık izleyicileri ya da \"Dağıtılmış karma tablosu\" (DHT) özelliğini etkinleştirin."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1688
 #, java-format
@@ -397,7 +397,7 @@ msgid ""
 "Open trackers are disabled and we have no DHT peers. Fetch of {0} may not "
 "succeed until you start another torrent, enable open trackers, or enable "
 "DHT."
-msgstr "Açık izleyiciler devre dışı bırakılmış ve herhangi bir DHT eşi yok. Başka bir torrent başlatılana kadar {0} alınamayabilir. Açık izleyicileri ya da DHT özelliğini etkinleştirin."
+msgstr "Açık izleyiciler devre dışı bırakılmış ve herhangi bir \"Dağıtılmış karma tablosu\" (DHT) eşi yok. Başka bir torrent başlatılana kadar {0} alınamayabilir. Açık izleyicileri ya da \"Dağıtılmış karma tablosu\" (DHT) özelliğini etkinleştirin."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1823
 #, java-format
@@ -551,7 +551,7 @@ msgstr "{0} torrenti denetlenirken bir sorun çıktı"
 #: ../java/src/org/klomp/snark/TrackerClient.java:245
 #, java-format
 msgid "No valid trackers for {0} - enable opentrackers or DHT?"
-msgstr "{0} için geçerli bir izleyici yok. Açık izleyiciler ya da DHT özelliği etkinleştirilsin mi?"
+msgstr "{0} için geçerli bir izleyici yok. Açık izleyiciler ya da \"Dağıtılmış karma tablosu\" (DHT) özelliği etkinleştirilsin mi?"
 
 #: ../java/src/org/klomp/snark/UpdateHandler.java:49
 #: ../java/src/org/klomp/snark/UpdateRunner.java:233
@@ -787,8 +787,8 @@ msgstr[1] "{0} eş bağlı"
 #, java-format
 msgid "1 DHT peer"
 msgid_plural "{0} DHT peers"
-msgstr[0] "1 DHT eş"
-msgstr[1] "{0} DHT eş"
+msgstr[0] "1 \"Dağıtılmış karma tablosu\" (DHT) eşi"
+msgstr[1] "{0} \"Dağıtılmış karma tablosu\" (DHT) eşi"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:773
 msgid "Dest"
@@ -800,7 +800,7 @@ msgstr "Bu oturum için hedef (kimlik)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:800
 msgid "Dht Debug"
-msgstr "Dht hata ayıklama"
+msgstr "\"Dağıtılmış karma tablosu\" (DHT) hata ayıklama"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:916
 msgid "First"
@@ -1430,11 +1430,11 @@ msgstr "Bu seçenek etkinleştirildiğinde, torrentler torrent dosyasında liste
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2631
 msgid "Enable DHT"
-msgstr "DHT kullanılsın"
+msgstr "\"Dağıtılmış karma tablosu\" (DHT) kullanılsın"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2635
 msgid "Use DHT to find additional peers"
-msgstr "Bu seçenek etkinleştirildiğinde, ek eşleri bulmak için DHT kullanılır"
+msgstr "Bu seçenek etkinleştirildiğinde, ek eşleri bulmak için \"Dağıtılmış karma tablosu\" (DHT) kullanılır"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2639
 msgid "Enable Ratings"

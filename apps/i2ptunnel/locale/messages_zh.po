@@ -10,11 +10,12 @@
 # gzs, 2019
 # a7c0396e818c2941c33529bda1f6bf1b_d554568 <93d1ed349b85f9981f2c90624c315cde_129513>, 2013
 # xkimo_daeee <michael_ies@yahoo.com>, 2014
+# a478a116a491ba89a1cee347ebcf239b_fd74b84, 2022
 # a7c0396e818c2941c33529bda1f6bf1b_d554568 <93d1ed349b85f9981f2c90624c315cde_129513>, 2017
 # 黃彥儒 <r1235613@gmail.com>, 2014
 # Scott Rhodes <starring169@gmail.com>, 2020-2021
 # SF W, 2019
-# uzmintid Xun <1109673069@qq.com>, 2017
+# 27bc57984b2c3dde32a36ec9a8dba140_ab3c34d <b30483e306d3a20fef2e71c80cfb7529_618507>, 2017
 # walking <walking@i2pmail.org>, 2011
 # walking <waling@mail.i2p>, 2013
 # walking <walking@i2pmail.org>, 2011
@@ -23,13 +24,14 @@
 # YFdyh000 <yfdyh000@gmail.com>, 2016
 # YFdyh000 <yfdyh000@gmail.com>, 2014-2017
 # yue gao <gaoyue@iie.ac.cn>, 2017
+# 天空Blond, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-17 13:12+0000\n"
 "PO-Revision-Date: 2011-02-13 11:46+0000\n"
-"Last-Translator: Fosworn D4, 2022\n"
+"Last-Translator: a478a116a491ba89a1cee347ebcf239b_fd74b84, 2022\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/otf/I2P/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -354,7 +356,7 @@ msgid ""
 "If you are accessing a service on a remote I2P router, you may wish to "
 "connect with SSL to avoid traffic interception. The client application "
 "should be also be configured to use SSL."
-msgstr "如果你远程使用 I2P 路由器访问一个服务，你可能希望能够使用 SSL 建立连接以避免通信被拦截。同样，客户端应用也应该被配置为使用 SSL。"
+msgstr "如果你在远程 I2P 路由上访问一个服务，你可能希望能够使用 SSL 建立连接以避免通信流量被拦截。同样地，客户端应用也应该被配置为使用 SSL。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:386
 msgid "Clients use SSL to connect to tunnel"
@@ -419,7 +421,7 @@ msgstr "不推荐 b32 地址。"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:465
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:641
 msgid "Shared Client"
-msgstr "共享客户端"
+msgstr "共享带宽客户端"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:470
 msgid ""
@@ -455,7 +457,7 @@ msgstr "高级网络设置"
 msgid ""
 "Note: When this client proxy is configured to share tunnels, then these "
 "options are for all the shared proxy clients!"
-msgstr "注意：当此客户端代理配置为共享隧道时，这些选项适用于所有的共享代理客户端！"
+msgstr "注意：当此客户端代理配置为共享隧道时，这些选项适用于所有的共享隧道客户端！"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:525
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1405
@@ -588,7 +590,7 @@ msgstr "+/- 0-2 跳点变化幅度"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:615
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1502
 msgid "not recommended"
-msgstr "不建议"
+msgstr "不推荐"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:626
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1513
@@ -1912,7 +1914,7 @@ msgstr "Base32"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:697
 msgid "Alt Base32"
-msgstr ""
+msgstr "其他Base32地址"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:706
 msgid "Incoming I2P Port Routing"

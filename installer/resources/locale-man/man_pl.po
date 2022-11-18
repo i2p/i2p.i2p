@@ -6,12 +6,13 @@
 # 
 # Translators:
 # ☆Verdulo, 2017
+# Waldemar Napora, 2022
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2021-11-27 13:31-0000\n"
-"Last-Translator: ☆Verdulo, 2017\n"
+"Last-Translator: Waldemar Napora, 2022\n"
 "Language-Team: Polish (https://www.transifex.com/otf/teams/12694/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -267,9 +268,12 @@ msgstr "ZGŁASZANIE BŁĘDÓW"
 #. type: Plain text
 #: man/eepget.1:98 man/i2prouter.1:59 man/i2prouter-nowrapper.1:29
 msgid ""
-"Please enter an issue on E<.UR https://i2pgit.org/i2p-"
-"hackers/i2p.i2p/-/issues> the I2P GitLab server E<.UE .>"
+"Please enter an issue on E<.UR "
+"https://i2pgit.org/i2p-hackers/i2p.i2p/-/issues> the I2P GitLab server E<.UE"
+" .>"
 msgstr ""
+"Proszę wprowadzić błąd do E<.UR "
+"https://i2pgit.org/i2p-hackers/i2p.i2p/-/issues> serwera GitLab I2P E<.UE .>"
 
 #. type: SH
 #: man/eepget.1:99 man/i2prouter.1:60 man/i2prouter-nowrapper.1:30

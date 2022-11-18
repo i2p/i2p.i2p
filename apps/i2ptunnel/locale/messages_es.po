@@ -9,8 +9,8 @@
 # 0f759dd1ea6c4c76cedc299039ca4f23_7584d04 <454cc45058db9632179dc8079c0c1af3_5311>, 2012-2013
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
-# punkibastardo <punkibastardo@gmail.com>, 2011, 2012
-# punkibastardo <punkibastardo@gmail.com>, 2011
+# punkibastardo <transifex.symons@slmail.me>, 2011, 2012
+# punkibastardo <transifex.symons@slmail.me>, 2011
 # strel, 2013-2018
 # fa1e5d1b5b1ea91a38c4e92aeae85c31_060014a, 2013
 msgid ""
@@ -25,7 +25,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:498
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:508
@@ -38,6 +38,7 @@ msgid "{0} inbound tunnel"
 msgid_plural "{0} inbound tunnels"
 msgstr[0] "{0} túnel de entrada"
 msgstr[1] "{0} túneles de entrada"
+msgstr[2] "{0} túneles de entrada"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:547
 #, java-format
@@ -45,6 +46,7 @@ msgid "{0} outbound tunnel"
 msgid_plural "{0} outbound tunnels"
 msgstr[0] "{0} túnel de salida"
 msgstr[1] "{0} túneles de salida"
+msgstr[2] "{0} túneles de salida"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:549
 #, java-format
@@ -52,6 +54,7 @@ msgid "{0} inbound, {0} outbound tunnel"
 msgid_plural "{0} inbound, {0} outbound tunnels"
 msgstr[0] "{0} de entrada, {0} túnel de salida"
 msgstr[1] "{0} túneles entrantes, {0} salientes"
+msgstr[2] "{0} túneles entrantes, {0} salientes"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:553
 msgid "lower bandwidth and reliability"
@@ -504,6 +507,7 @@ msgid "{0} hop tunnel"
 msgid_plural "{0} hop tunnel"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:540
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1428
@@ -639,6 +643,7 @@ msgid "{0} backup tunnel"
 msgid_plural "{0} backup tunnels"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:650
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1635
@@ -1903,7 +1908,7 @@ msgstr "¡Sólo expertos!"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:689
 msgid "Base32"
-msgstr ""
+msgstr "Base32"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:697
 msgid "Alt Base32"

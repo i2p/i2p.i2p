@@ -5,13 +5,14 @@
 # 
 # Translators:
 # Nyul Csoki <csokinyul@i2pmail.org>, 2021
+# vargaviktor <viktor.varga@gmail.com>, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-17 13:12+0000\n"
-"PO-Revision-Date: 2021-11-17 13:34+0000\n"
-"Last-Translator: vargaviktor <viktor.varga@gmail.com>\n"
+"PO-Revision-Date: 2011-02-13 11:46+0000\n"
+"Last-Translator: vargaviktor <viktor.varga@gmail.com>, 2022\n"
 "Language-Team: Hungarian (http://www.transifex.com/otf/I2P/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1370,7 +1371,7 @@ msgstr "Szerver Lelassítása"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2300
 msgid "Inbound connection limits"
-msgstr ""
+msgstr "Bejövő csatlakozás korlát"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2302
 msgid "Per Minute"
@@ -1436,7 +1437,7 @@ msgstr "Az összes weboldal kérések maximális száma naponta, mielőtt a szer
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2340
 msgid "Max concurrent connections"
-msgstr ""
+msgstr "Maximális egyidejű csatlakozás"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2342
 msgid "Maximum number of simultaneous client connections"
@@ -1444,7 +1445,7 @@ msgstr "Egyidőbeli kliens csatlakozások maximális száma"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2350
 msgid "POST limits"
-msgstr ""
+msgstr "POST korlát"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2352
 msgid "Per Period"
