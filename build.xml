@@ -1023,7 +1023,7 @@
                         <equals arg1="${release.number}" arg2="${api.version}"/>
                     </not>
                     <not>
-                        <matches pattern="^1\." string="${release.number}" />
+                        <matches pattern="^2\." string="${release.number}" />
                     </not>
                 </and>
             </condition>
