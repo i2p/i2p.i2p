@@ -1,3 +1,5 @@
+2022-11-21 2.0.0 (API 0.9.56) released
+
 2022-11-12 zzz
  * i2ptunnel: Fix IRC USER filtering
 
