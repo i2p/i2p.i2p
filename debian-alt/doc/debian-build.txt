@@ -71,7 +71,7 @@ reprepro includedeb stable i2p_1.xx.0-1_all.deb
 reprepro includedsc stable i2p_1.xx.0-1.dsc
 
 # copy built packages from launchpad
-for i in precise trusty xenial bionic disco eoan focal
+for i in bionic focal jammy kinetic lunar
 do
 	reprepro -v update $i
 done

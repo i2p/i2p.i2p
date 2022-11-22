@@ -77,7 +77,7 @@ Generate files to upload
   otherwise, if just fixing up the control files, patches, etc:
     debuild -S -sd -kkeyid
   (note: no space allowed in -kkeyid)
-  If you get a dpkg-checkbuilddeps error for xenial,
+  If you get a dpkg-checkbuilddeps error for bionic,
   add a -d option, e.g. debuild -d -S -sa -kkeyid
 - If patches fail, you must fix them up, either manually or with quilt
   (quilt instructions go here)
