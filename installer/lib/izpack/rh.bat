@@ -8,8 +8,8 @@
 :: the output will be the same as the original file name
 :: on success, sign it.
 ::
-set VER=5
-set FULLVER=1.%VER%.0
+set VER=0
+set FULLVER=2.%VER%.0
 set INFILE=i2pinstall_%FULLVER%_windows.exe
 set UNSIGNED=i2pinstall_%FULLVER%_windows_unsigned.exe
 set TEMPFILE=i2pinstall_%FULLVER%_windows_temp.exe
