@@ -7882,7 +7882,7 @@ b.netdb_transport {
 @media screen and (min-width: 1400px) {
     #profiles #banlist {
         border: none;
-        margin: -15px -15px -5px;
+        margin: 0 -15px -5px;
         padding: 10px 5px;
     }
     .main#help #changelog pre:not(old) {
