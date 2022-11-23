@@ -249,7 +249,7 @@ public class RouterAppManager extends ClientAppManagerImpl {
         for (Map.Entry<ClientApp, String[]> entry : _clients.entrySet()) {
             ClientApp key = entry.getKey();
             String[] val = entry.getValue();
-            list.add("[<b>" + key.getName() + "</b>] = [" + key.getClass().getName() + ' ' + Arrays.toString(val) + "] <i>" + key.getState() + "</i><br>");
+            list.add("<b>" + key.getName() + "</b>: " + key.getClass().getName() + ' ' + Arrays.toString(val) + " <i>" + key.getState() + "</i><br>");
         }
         Collections.sort(list, Collator.getInstance());
         for (String e : list) {
@@ -266,7 +266,7 @@ public class RouterAppManager extends ClientAppManagerImpl {
         for (Map.Entry<String, ClientApp> entry : _registered.entrySet()) {
             String key = entry.getKey();
             ClientApp val = entry.getValue();
-            list.add("[<b>" + key + "</b>] = [" + val.getClass().getName() + "]<br>");
+            list.add("<b>" + key + ":</b> " + val.getClass().getName() + "<br>");
         }
         Collections.sort(list, Collator.getInstance());
         for (String e : list) {
