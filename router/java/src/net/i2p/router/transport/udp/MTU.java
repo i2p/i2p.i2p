@@ -5,8 +5,11 @@ import java.net.Inet6Address;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
@@ -219,6 +222,8 @@ public class MTU {
         try {
             Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
             if (ifcs != null) {
+                // address to MTU
+                Map<InetAddress, Integer> sorted = new TreeMap<InetAddress, Integer>(new IAComparator());
                 // this is O(n**2) through the interfaces and very slow on windows
                 while (ifcs.hasMoreElements()) {
                     NetworkInterface ifc = ifcs.nextElement();
@@ -232,16 +237,29 @@ public class MTU {
                     } catch (SocketException e) {
                         continue;
                     }
-                    for(Enumeration<InetAddress> addrs =  ifc.getInetAddresses(); addrs.hasMoreElements();) {
+                    int mtu = ifc.getMTU();
+                    for (Enumeration<InetAddress> addrs =  ifc.getInetAddresses(); addrs.hasMoreElements();) {
                         InetAddress addr = addrs.nextElement();
-                        System.out.println("MTU for " + addr.getHostAddress() + " is " + ifc.getMTU() +
+                        sorted.put(addr, Integer.valueOf(mtu));
+                    }
+                }
+                for (Map.Entry<InetAddress, Integer> e : sorted.entrySet()) {
+                    InetAddress addr = e.getKey();
+                    Integer mtu = e.getValue();
+                    System.out.println("MTU for " + addr.getHostAddress() + " is " + mtu +
                                            "; I2P MTU is " + getMTU(addr, false) +
                                            "; SSU2 MTU is " + getMTU(addr, true));
-                    }
                 }
             }
         } catch (SocketException se) {
              System.out.println("no interfaces");
+        }
+    }
+
+    /** @since 0.9.57 */
+    private static class IAComparator implements Comparator<InetAddress> {
+        public int compare(InetAddress l, InetAddress r) {
+             return (l.getHostAddress()).compareTo((r.getHostAddress()));
         }
     }
 }
