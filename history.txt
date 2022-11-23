@@ -1,3 +1,21 @@
+2022-11-23 zzz
+ * Build: Add debcheckpatch to release targets
+ * CLI: Sort MTU output by address
+ * Console:
+   - Add status and banned tabs to /peers (WIP)
+   - Change mtn tunnel in help FAQ to git
+   - Cleanup /debug update and app manager sections
+   - Dark theme banlist margin fix
+   - /configlogging fixes
+ * Crypto: Don't use AccessController in I2PProvider, deprecated as of Java 17
+ * i2ptunnel:
+   - SOCKS 5 tunnel improvements and torsocks support
+   - Fix log message on config migration
+ * Router: KeysAndCert compressible padding (Proposal 161, Gitlab MR !66)
+ * SSU: Remove unneeded queue latency check in UDPSender
+ * SSU2: Increase Session Created max padding
+ * SusiDNS: Fix off-by-one in next page last item number
+
 2022-11-21 2.0.0 (API 0.9.56) released
 
 2022-11-12 zzz
