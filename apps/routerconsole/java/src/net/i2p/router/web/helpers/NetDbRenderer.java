@@ -49,6 +49,7 @@ import net.i2p.router.transport.GeoIP;
 import net.i2p.router.web.HelperBase;
 import net.i2p.router.web.Messages;
 import net.i2p.router.web.WebAppStarter;
+import net.i2p.util.ConvertToHash;
 import net.i2p.util.Log;
 import net.i2p.util.ObjectCounter;
 import net.i2p.util.Translate;
@@ -512,6 +513,8 @@ class NetDbRenderer {
     }
 
     /**
+     *  All the leasesets
+     *
      *  @param debug @since 0.7.14 sort by distance from us, display
      *               median distance, and other stuff, useful when floodfill
      */
@@ -579,6 +582,90 @@ class NetDbRenderer {
           long now = _context.clock().now();
           buf.append("<div class=\"leasesets_container\">");
           for (LeaseSet ls : leases) {
+            String distance;
+            if (debug) {
+                BigInteger dist = HashDistance.getDistance(ourRKey, ls.getRoutingKey());
+                if (ls.getReceivedAsPublished()) {
+                    if (c++ == medianCount)
+                        median = dist;
+                }
+                distance = fmt.format(biLog2(dist));
+            } else {
+                distance = null;
+            }
+            renderLeaseSet(buf, ls, debug, now, linkSusi, distance);
+            out.write(buf.toString());
+            buf.setLength(0);
+          } // for each
+          if (debug) {
+              buf.append("<table id=\"leasesetdebug\"><tr><td><b>Network data (only valid if floodfill):</b></td><td colspan=\"3\">");
+              //buf.append("</b></p><p><b>Center of Key Space (router hash): " + ourRKey.toBase64());
+              if (median != null) {
+                  double log2 = biLog2(median);
+                  buf.append("</td></tr>")
+                     .append("<tr><td><b>Median distance (bits):</b></td><td colspan=\"3\">").append(fmt.format(log2)).append("</td></tr>\n");
+                  // 2 for 4 floodfills... -1 for median
+                  // this can be way off for unknown reasons
+                  int total = (int) Math.round(Math.pow(2, 2 + 256 - 1 - log2));
+                  buf.append("<tr><td><b>Estimated total floodfills:</b></td><td colspan=\"3\">").append(total).append("</td></tr>\n");
+                  buf.append("<tr><td><b>Estimated total leasesets:</b></td><td colspan=\"3\">").append(total * rapCount / 4);
+              } else {
+                  buf.append("<i>Not floodfill or no data.</i>");
+              }
+              buf.append("</td></tr></table>\n");
+          } // median table
+          buf.append("</div>");
+        }  // !empty
+        out.write(buf.toString());
+        out.flush();
+    }
+
+    /**
+     * Single LeaseSet
+     * @since 0.9.57
+     */
+    public void renderLeaseSet(Writer out, String hostname, boolean debug) throws IOException {
+        StringBuilder buf = new StringBuilder(1024);
+        Hash hash = ConvertToHash.getHash(hostname);
+        if (hash == null) {
+            buf.append("<div class=\"netdbnotfound\">");
+            buf.append("Hostname not found").append(' ');
+            buf.append(hostname);
+            buf.append("</div>");
+        } else {
+            LeaseSet ls = _context.netDb().lookupLeaseSetLocally(hash);
+            if (ls == null) {
+                // remote lookup
+                LookupWaiter lw = new LookupWaiter();
+                _context.netDb().lookupLeaseSetRemotely(hash, lw, lw, 8*1000, null);
+                // just wait right here in the middle of the rendering, sure
+                synchronized(lw) {
+                    try { lw.wait(9*1000); } catch (InterruptedException ie) {}
+                }
+                ls = _context.netDb().lookupLeaseSetLocally(hash);
+            }
+            if (ls != null) {
+                BigInteger dist = HashDistance.getDistance(_context.routerHash(), ls.getRoutingKey());
+                DecimalFormat fmt = new DecimalFormat("#0.00");
+                String distance = fmt.format(biLog2(dist));
+                buf.append("<div class=\"leasesets_container\">");
+                renderLeaseSet(buf, ls, true, _context.clock().now(), false, distance);
+                buf.append("</div>");
+            } else {
+                buf.append("<div class=\"netdbnotfound\">");
+                buf.append(_t("LeaseSet")).append(" for ");
+                buf.append(hostname);
+                buf.append(' ').append(_t("not found in network database"));
+                buf.append("</div>");
+            }
+        }
+        out.write(buf.toString());
+        out.flush();
+    }
+
+    /** @since 0.9.57 split out from above */
+    private void renderLeaseSet(StringBuilder buf, LeaseSet ls, boolean debug, long now,
+                                boolean linkSusi, String distance) {
             // warning - will be null for non-local encrypted
             Destination dest = ls.getDestination();
             Hash key = ls.getHash();
@@ -667,12 +754,7 @@ class NetDbRenderer {
                 buf.append("<tr><td colspan=\"2\">");
                 buf.append("<b>RAP?</b> ").append(ls.getReceivedAsPublished());
                 buf.append("&nbsp;&nbsp;<b>RAR?</b> ").append(ls.getReceivedAsReply());
-                BigInteger dist = HashDistance.getDistance(ourRKey, ls.getRoutingKey());
-                if (ls.getReceivedAsPublished()) {
-                    if (c++ == medianCount)
-                        median = dist;
-                }
-                buf.append("&nbsp;&nbsp;<b>Distance: </b>").append(fmt.format(biLog2(dist)));
+                buf.append("&nbsp;&nbsp;<b>Distance: </b>").append(distance);
                 buf.append("&nbsp;&nbsp;<b>Type: </b>").append(type);
                 if (type != DatabaseEntry.KEY_TYPE_LEASESET) {
                     LeaseSet2 ls2 = (LeaseSet2) ls;
@@ -741,30 +823,6 @@ class NetDbRenderer {
             }
             buf.append("</ul></td></tr>\n");
             buf.append("</table>\n");
-            out.write(buf.toString());
-            buf.setLength(0);
-          } // for each
-          if (debug) {
-              buf.append("<table id=\"leasesetdebug\"><tr><td><b>Network data (only valid if floodfill):</b></td><td colspan=\"3\">");
-              //buf.append("</b></p><p><b>Center of Key Space (router hash): " + ourRKey.toBase64());
-              if (median != null) {
-                  double log2 = biLog2(median);
-                  buf.append("</td></tr>")
-                     .append("<tr><td><b>Median distance (bits):</b></td><td colspan=\"3\">").append(fmt.format(log2)).append("</td></tr>\n");
-                  // 2 for 4 floodfills... -1 for median
-                  // this can be way off for unknown reasons
-                  int total = (int) Math.round(Math.pow(2, 2 + 256 - 1 - log2));
-                  buf.append("<tr><td><b>Estimated total floodfills:</b></td><td colspan=\"3\">").append(total).append("</td></tr>\n");
-                  buf.append("<tr><td><b>Estimated total leasesets:</b></td><td colspan=\"3\">").append(total * rapCount / 4);
-              } else {
-                  buf.append("<i>Not floodfill or no data.</i>");
-              }
-              buf.append("</td></tr></table>\n");
-          } // median table
-          buf.append("</div>");
-        }  // !empty
-        out.write(buf.toString());
-        out.flush();
     }
 
     /**

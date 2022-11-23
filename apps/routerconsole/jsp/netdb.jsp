@@ -37,6 +37,7 @@
  <jsp:setProperty name="formhandler" property="page" value="<%=request.getParameter(\"pg\")%>" />
  <jsp:setProperty name="formhandler" property="mode" value="<%=request.getParameter(\"m\")%>" />
  <jsp:setProperty name="formhandler" property="date" value="<%=request.getParameter(\"date\")%>" />
+ <jsp:setProperty name="formhandler" property="leaseset" value="<%=request.getParameter(\"ls\")%>" />
 <%@include file="formhandler.jsi" %>
  <jsp:getProperty name="formhandler" property="netDbSummary" />
 </div></body></html>
