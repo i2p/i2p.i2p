@@ -23,6 +23,7 @@ import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.i2ptunnel.I2PTunnelClientBase;
 import net.i2p.i2ptunnel.I2PTunnelRunner;
 import net.i2p.i2ptunnel.Logging;
+import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.socks.SOCKSException;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.Log;
@@ -37,7 +38,12 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
      */
     protected static final int INITIAL_SO_TIMEOUT = 15*1000;
 
-    private HashMap<String, List<String>> proxies = null;  // port# + "" or "default" -> hostname list
+    private final HashMap<String, List<String>> proxies;  // port# + "" or "default" -> hostname list
+
+    /** @since 0.9.57 for storing passwords */
+    public static final String AUTH_REALM = "I2P SOCKS Proxy";
+    /** @since 0.9.57 */
+    public static final String PROP_OUTPROXY_TYPE = "outproxyType";
 
     //public I2PSOCKSTunnel(int localPort, Logging l, boolean ownDest) {
     //	  I2PSOCKSTunnel(localPort, l, ownDest, (EventDispatcher)null);
@@ -57,6 +63,7 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
         opts.remove("i2p.streaming.maxWindowSize");
 
         setName("SOCKS Proxy on " + tunnel.listenHost + ':' + localPort);
+        proxies = new HashMap<String, List<String>>(1);
         parseOptions();
         notifyEvent("openSOCKSTunnelResult", "ok");
     }
@@ -93,9 +100,27 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
     public static final String DEFAULT = "default";
     public static final String PROP_PROXY_DEFAULT = PROP_PROXY_PREFIX + DEFAULT;
 
+    /**
+     *  Update the outproxy list then call super.
+     *
+     *  @since 0.9.57
+     */
+    @Override
+    public void optionsUpdated(I2PTunnel tunnel) {
+        if (getTunnel() != tunnel)
+            return;
+        proxies.clear();
+        parseOptions();
+        super.optionsUpdated(tunnel);
+    }
+
     private void parseOptions() {
         Properties opts = getTunnel().getClientOptions();
-        proxies = new HashMap<String, List<String>>(1);
+        if (!opts.containsKey(PROP_PROXY_DEFAULT)) {
+            String proxyList = opts.getProperty(TunnelController.PROP_PROXIES);
+            if (proxyList != null)
+                opts.setProperty(PROP_PROXY_DEFAULT, proxyList);
+        }
         for (Map.Entry<Object, Object> e : opts.entrySet()) {
            String prop = (String)e.getKey();
            if ((!prop.startsWith(PROP_PROXY_PREFIX)) || prop.length() <= PROP_PROXY_PREFIX.length())
@@ -119,7 +144,7 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
     }
 
     public List<String> getProxies(int port) {
-        List<String> rv = proxies.get(port + "");
+        List<String> rv = proxies.get(Integer.toString(port));
         if (rv == null)
             rv = getDefaultProxies();
         return rv;

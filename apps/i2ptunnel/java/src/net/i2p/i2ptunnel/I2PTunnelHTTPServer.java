@@ -986,8 +986,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
      *  @throws RequestTooLongException if too long
      *  @throws BadRequestException on bad headers
      *  @throws IOException on other errors in the underlying stream
+     *  @since public since 0.9.57 for SOCKS
      */
-    static Map<String, List<String>> readHeaders(I2PSocket socket, InputStream in, StringBuilder command,
+    public static Map<String, List<String>> readHeaders(I2PSocket socket, InputStream in, StringBuilder command,
                                                            String[] skipHeaders, I2PAppContext ctx) throws IOException {
     	HashMap<String, List<String>> headers = new HashMap<String, List<String>>();
         StringBuilder buf = new StringBuilder(128);

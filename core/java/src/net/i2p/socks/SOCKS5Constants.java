@@ -34,6 +34,13 @@ public class SOCKS5Constants {
         public static final int CONNECT = 0x01;
         public static final int BIND = 0x02;
         public static final int UDP_ASSOCIATE = 0x03;
+        // https://github.com/torproject/torspec/blob/main/socks-extensions.txt
+        /** @since 0.9.57 */
+        public static final int TOR_RESOLVE = 0xf0;
+        /** @since 0.9.57 */
+        public static final int TOR_RESOLVE_PTR = 0xf1;
+        /** @since 0.9.57 */
+        public static final int TOR_CONNECT_DIR = 0xf2;
     }
 
     public static class Reply {

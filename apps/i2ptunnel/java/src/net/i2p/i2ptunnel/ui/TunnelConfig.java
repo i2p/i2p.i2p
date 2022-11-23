@@ -32,6 +32,7 @@ import net.i2p.i2ptunnel.I2PTunnelHTTPServer;
 import net.i2p.i2ptunnel.I2PTunnelIRCClient;
 import net.i2p.i2ptunnel.I2PTunnelServer;
 import net.i2p.i2ptunnel.TunnelController;
+import net.i2p.i2ptunnel.socks.I2PSOCKSTunnel;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.PasswordManager;
 
@@ -586,6 +587,15 @@ public class TunnelConfig {
         else
             _booleanOptions.remove(I2PTunnelHTTPClientBase.PROP_USE_OUTPROXY_PLUGIN);
     }
+
+    /**
+     *  @param s "connect" or "socks"
+     *  @since 0.9.57
+     */
+    public void setOutproxyType(String s) {
+        if (s != null)
+            _otherOptions.put(I2PSOCKSTunnel.PROP_OUTPROXY_TYPE, s.trim());
+    }
     
     /**
      * all of these are @since 0.8.3 (moved from IndexBean)
@@ -823,6 +833,20 @@ public class TunnelConfig {
                     String psha256 = OPT + I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_PREFIX +
                                      _newProxyUser + I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_SHA256_SUFFIX;
                     hex = PasswordManager.sha256Hex(realm, _newProxyUser, _newProxyPW);
+                    if (hex != null)
+                        config.setProperty(psha256, hex);
+                }
+            }
+        } else if (TunnelController.TYPE_SOCKS.equals(_type) || TunnelController.TYPE_SOCKS_IRC.equals(_type)) {
+            // As of 0.9.57, was in UI but unimplemented before,
+            // so use SHA256
+            String auth = _otherOptions.get(I2PTunnelHTTPClientBase.PROP_AUTH);
+            if (auth != null && !auth.equals("false")) {
+                if (_newProxyUser != null && _newProxyPW != null &&
+                    _newProxyUser.length() > 0 && _newProxyPW.length() > 0) {
+                    String psha256 = OPT + I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_PREFIX +
+                                     _newProxyUser + I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_SHA256_SUFFIX;
+                    String hex = PasswordManager.sha256Hex(I2PSOCKSTunnel.AUTH_REALM, _newProxyUser, _newProxyPW);
                     if (hex != null)
                         config.setProperty(psha256, hex);
                 }
@@ -1152,6 +1176,7 @@ public class TunnelConfig {
     private static final String _otherClientOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime",
         "outproxyUsername", "outproxyPassword",
+        I2PSOCKSTunnel.PROP_OUTPROXY_TYPE,
         I2PTunnelHTTPClient.PROP_JUMP_SERVERS,
         I2PTunnelHTTPClientBase.PROP_AUTH,
         I2PClient.PROP_SIGTYPE,

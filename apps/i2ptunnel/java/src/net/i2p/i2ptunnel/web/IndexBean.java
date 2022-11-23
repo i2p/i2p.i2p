@@ -1083,7 +1083,10 @@ public class IndexBean {
 
     /** all proxy auth @since 0.8.2 */
     public void setProxyAuth(String s) {
-        _config.setProxyAuth(I2PTunnelHTTPClientBase.DIGEST_AUTH);
+        String type = getType();
+        boolean isSOCKS = TunnelController.TYPE_SOCKS.equals(type) ||
+                          TunnelController.TYPE_SOCKS_IRC.equals(type);
+        _config.setProxyAuth(isSOCKS ? "true" : I2PTunnelHTTPClientBase.DIGEST_AUTH);
     }
     
     public void setProxyUsername(String s) {
@@ -1115,6 +1118,15 @@ public class IndexBean {
     public void setUseOutproxyPlugin(String moo) {
         _config.setUseOutproxyPlugin(true);
     }
+
+    /**
+     *  @param s "connect" or "socks"
+     *  @since 0.9.57
+     */
+    public void setOutproxyType(String s) {
+        _config.setOutproxyType(s);
+    }
+
 
     public void setLimitMinute(String s) {
         if (s != null) {

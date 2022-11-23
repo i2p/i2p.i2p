@@ -419,6 +419,14 @@ public class EditBean extends IndexBean {
         return _helper.getUseOutproxyPlugin(tunnel);
     }
 
+    /**
+     *  @return "connect" or "socks", default depends on tunnel type
+     *  @since 0.9.57
+     */
+    public String getOutproxyType(int tunnel) {
+        return _helper.getOutproxyType(tunnel);
+    }
+
     /** all of these are @since 0.8.3 */
     public int getLimitMinute(int tunnel) {
         return _helper.getLimitMinute(tunnel);

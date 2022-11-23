@@ -31,6 +31,7 @@ import net.i2p.i2ptunnel.I2PTunnelServer;
 import net.i2p.i2ptunnel.SSLClientUtil;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
+import net.i2p.i2ptunnel.socks.I2PSOCKSTunnel;
 import net.i2p.util.ConvertToHash;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
@@ -981,6 +982,17 @@ public class GeneralHelper {
      */
     public boolean getUseOutproxyPlugin(int tunnel) {
         return getBooleanProperty(tunnel, I2PTunnelHTTPClientBase.PROP_USE_OUTPROXY_PLUGIN, true);
+    }
+
+    /**
+     *  @return "connect" or "socks", default depends on tunnel type
+     *  @since 0.9.57
+     */
+    public String getOutproxyType(int tunnel) {
+        String type = getTunnelType(tunnel);
+        if (!type.equals("sockstunnel") && !type.equals("socksirctunnel"))
+            return "connect";
+        return getProperty(tunnel, I2PSOCKSTunnel.PROP_OUTPROXY_TYPE, "socks");
     }
 
     /** all of these are @since 0.8.3 */

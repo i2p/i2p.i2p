@@ -162,8 +162,28 @@
                     <%=intl._t("Outproxies")%>
             </th>
         </tr><tr>
-            <td colspan="2">
+<%
+                if ("sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) {
+                    %><td><%
+                } else {
+                    %><td colspan="2"><%
+                }
+%>
                 <input type="text" size="30" name="proxyList" title="<%=intl._t("Specify the .i2p address or destination (b32 or b64) of the outproxy here.")%>&nbsp;<%=intl._t("For a random selection from a pool, separate with commas e.g. server1.i2p,server2.i2p")%>" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext proxyList" />
+<%
+                if ("sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) {
+                    boolean isHTTPS = editBean.getOutproxyType(curTunnel).equals("connect");
+                  %></td><td>
+                    <b><%=intl._t("Outproxy Type")%>:</b>
+                    <span class="multiOption"
+                        <label><input value="socks" type="radio" name="outproxyType" <%=(!isHTTPS ? " checked=\"checked\"" : "")%> class="tickbox" />
+                        SOCKS</label>
+                    </span>
+                    <span class="multiOption"
+                        <label><input value="connect" type="radio" name="outproxyType" <%=(isHTTPS ? " checked=\"checked\"" : "")%> class="tickbox" />
+                        HTTPS</label><%
+                }
+%>
             </td>
         </tr>
 <%
