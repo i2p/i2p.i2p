@@ -1,7 +1,7 @@
 package net.i2p.crypto.provider;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
+//import java.security.AccessController;
+//import java.security.PrivilegedAction;
 import java.security.Provider;
 import java.security.Security;
 
@@ -24,13 +24,17 @@ public final class I2PProvider extends Provider {
         // replaced by (String,String,String) added in Java 9
         super(PROVIDER_NAME, 0.1, INFO);
 
+/*
         AccessController.doPrivileged(new PrivilegedAction<Void>() {
             @Override
             public Void run() {
+*/
                 setup();
+/*
                 return null;
             }
         });
+*/
     }
 
     private void setup() {
