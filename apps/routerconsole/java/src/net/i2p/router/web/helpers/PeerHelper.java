@@ -23,6 +23,7 @@ import net.i2p.router.transport.udp.PeerState;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.web.HelperBase;
 import static net.i2p.router.web.helpers.UDPSorters.*;
+import net.i2p.util.Addresses;
 import net.i2p.util.SystemVersion;
 
 
@@ -34,16 +35,20 @@ public class PeerHelper extends HelperBase {
     private boolean _graphical;
 
     private static final String titles[] = {
+                                            _x("Status"),
                                             _x("Addresses"),
                                              "NTCP",
                                              "SSU",
+                                             _x("Banned"),
                                              _x("UPnP Status")
                                            };
 
     private static final String links[] = {
                                             "",
+                                             "?tx=addresses",
                                              "?tx=ntcp",
                                              "?tx=ssu",
+                                             "?tx=banned",
                                              "?tx=upnp"
                                            };
 
@@ -101,7 +106,7 @@ public class PeerHelper extends HelperBase {
             return;
         }
         renderNavBar(out);
-        if (isAdvanced() && _transport == null) {
+        if (_transport == null) {
             out.write("<p id=\"upnpstatus\"><b>");
             out.write(_t("Status"));
             out.write(": ");
@@ -110,37 +115,7 @@ public class PeerHelper extends HelperBase {
         }
 
         SortedMap<String, Transport> transports = _context.commSystem().getTransports();
-        if (_transport != null && !_transport.equals("upnp")) {
-            boolean rendered = false;
-            for (Map.Entry<String, Transport> e : transports.entrySet()) {
-                String style = e.getKey();
-                Transport t = e.getValue();
-                if (style.equals("NTCP") && "ntcp".equals(_transport)) {
-                    NTCPTransport nt = (NTCPTransport) t;
-                    render(nt, out, urlBase, sortFlags);
-                    rendered = true;
-                    break;
-                } else if (style.equals("SSU") && "ssu".equals(_transport)) {
-                    UDPTransport ut = (UDPTransport) t;
-                    render(ut, out, urlBase, sortFlags);
-                    rendered = true;
-                    break;
-                } else if (style.equals(_transport)) {
-                    // pluggable (none yet)
-                    t.renderStatusHTML(out, urlBase, sortFlags);
-                    rendered = true;
-                    break;
-                }
-            }
-            if (rendered) {
-                out.write(getTransportsLegend());
-            } else {
-                out.write("<p class=\"infohelp\">" +
-                          "Transport not enabled: " +
-                          DataHelper.escapeHTML(_transport) +
-                          "</p>");
-            }
-        } else if (_transport == null) {
+        if ("addresses".equals(_transport)) {
             StringBuilder buf = new StringBuilder(4*1024);
             buf.append("<h3 id=\"transports\">").append(_t("Router Transport Addresses")).append("</h3><pre id=\"transports\">\n");
             if (!transports.isEmpty()) {
@@ -179,6 +154,98 @@ public class PeerHelper extends HelperBase {
                .append("</p></div>");
             out.write(buf.toString());
             _context.commSystem().renderStatusHTML(_out, _urlBase, _sortFlags);
+        } else if ("banned".equals(_transport)) {
+            BanlistRenderer br = new BanlistRenderer(_context);
+            br.renderStatusHTML(_out);
+        } else if (_transport != null) {
+            boolean rendered = false;
+            for (Map.Entry<String, Transport> e : transports.entrySet()) {
+                String style = e.getKey();
+                Transport t = e.getValue();
+                if (style.equals("NTCP") && "ntcp".equals(_transport)) {
+                    NTCPTransport nt = (NTCPTransport) t;
+                    render(nt, out, urlBase, sortFlags);
+                    rendered = true;
+                    break;
+                } else if (style.equals("SSU") && "ssu".equals(_transport)) {
+                    UDPTransport ut = (UDPTransport) t;
+                    render(ut, out, urlBase, sortFlags);
+                    rendered = true;
+                    break;
+                } else if (style.equals(_transport)) {
+                    // pluggable (none yet)
+                    t.renderStatusHTML(out, urlBase, sortFlags);
+                    rendered = true;
+                    break;
+                }
+            }
+            if (rendered) {
+                out.write(getTransportsLegend());
+            } else {
+                out.write("<p class=\"infohelp\">" +
+                          "Transport not enabled: " +
+                          DataHelper.escapeHTML(_transport) +
+                          "</p>");
+            }
+        } else {
+            // summary
+            StringBuilder buf = new StringBuilder(512);
+            buf.append("<h3 id=\"transports\">").append(_t("Peer Connections")).append("</h3><table><tr><th>")
+               .append(_t("Transport")).append("</th><th>")
+               .append(_t("Total")).append("</th><th>")
+               .append(_t("IPv4")).append(" <img src=\"/themes/console/images/inbound.png\" alt=\"").append(_t("Inbound")).append("\" title=\"").append(_t("Inbound")).append("\"/></th><th>")
+               .append(_t("IPv4")).append(" <img src=\"/themes/console/images/outbound.png\" alt=\"").append(_t("Outbound")).append("\" title=\"").append(_t("Outbound")).append("\"/></th><th>")
+               .append(_t("IPv6")).append(" <img src=\"/themes/console/images/inbound.png\" alt=\"").append(_t("Inbound")).append("\" title=\"").append(_t("Inbound")).append("\"/></th><th>")
+               .append(_t("IPv6")).append(" <img src=\"/themes/console/images/outbound.png\" alt=\"").append(_t("Outbound")).append("\" title=\"").append(_t("Outbound")).append("\"/></th></tr>\n");
+            boolean warnInbound = !_context.router().isHidden() && _context.router().getUptime() > 15*60*1000;
+            boolean warnIPv6 = Addresses.isConnectedIPv6();
+            int[] totals = new int[5];
+            for (Map.Entry<String, Transport> e : transports.entrySet()) {
+                String style = e.getKey();
+                Transport t = e.getValue();
+                int[] counts = t.getPeerCounts();
+                for (int idx = 0; idx < 8; idx += 4) {
+                    if (style.equals("NTCP") && idx == 0)
+                        continue;
+                    buf.append("<tr><td align=\"center\"><b>")
+                       .append(style)
+                       .append(1 + (idx / 4))
+                       .append("</b></td><td align=\"center\">");
+                    int total = 0;
+                    for (int i = 0; i < 4; i++) {
+                        total += counts[idx + i];
+                    }
+                    if (total <= 0)
+                        buf.append("<img src=\"themes/console/images/info/infowarn.png\"> ");
+                    else
+                        totals[0] += total;
+                    buf.append(total);
+                    for (int i = 0; i < 4; i++) {
+                        int cnt = counts[idx + i];
+                        buf.append("</td><td align=\"center\">");
+                        if (cnt <= 0) {
+                            if ((i >= 2 || warnIPv6) && ((i & 0x01) != 0 || warnInbound))
+                                buf.append("<img src=\"themes/console/images/info/infohelp.png\"> ");
+                        } else {
+                            totals[i + 1] += cnt;
+                        }
+                        buf.append(cnt);
+                    }
+                    buf.append("</td></tr>\n");
+                }
+            }
+            buf.append("<tr><td align=\"center\"><b>").append(_t("Total")).append("</b>");
+            for (int i = 0; i < 5; i++) {
+                int cnt = totals[i];
+                buf.append("</td><td align=\"center\">");
+                if (cnt <= 0) {
+                    if ((i >= 3 || warnIPv6) && ((i & 0x01) == 0 || warnInbound))
+                        buf.append("<img src=\"themes/console/images/info/infowarn.png\"> ");
+                }
+                buf.append("<b>").append(cnt).append("</b");
+            }
+            buf.append("</td></tr></table>\n");
+            out.write(buf.toString());
         }
         out.flush();
     }
@@ -187,12 +254,16 @@ public class PeerHelper extends HelperBase {
      *  @since 0.9.38
      */
     private int getTab() {
-        if ("ntcp".equals(_transport))
+        if ("addresses".equals(_transport))
             return 1;
-        if ("ssu".equals(_transport))
+        if ("ntcp".equals(_transport))
             return 2;
-        if ("upnp".equals(_transport))
+        if ("ssu".equals(_transport))
             return 3;
+        if ("banned".equals(_transport))
+            return 4;
+        if ("upnp".equals(_transport))
+            return 5;
         return 0;
     }
 
@@ -213,10 +284,10 @@ public class PeerHelper extends HelperBase {
                     buf.append("<span class=\"tab2\">");
                 buf.append(_t(titles[i]));
             } else {
-                if (i == 1) {
+                if (i == 2) {
                     if (!_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_NTCP))
                         continue;
-                } else if (i == 2) {
+                } else if (i == 3) {
                     if (!_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP))
                         continue;
                 }
@@ -734,7 +805,7 @@ public class PeerHelper extends HelperBase {
             //buf.append("</b></td><td>&nbsp;</td><td align=\"center\"><b>");
             buf.append("</b></td><td align=\"right\"><b>");
             buf.append(DataHelper.formatDuration2(rtoTotal/numPeers));
-            buf.append("</b></td><td align=\"center\"><b>").append(ut.getMTU(false)).append("</b></td>");
+            buf.append("</b></td><td></td>"); // MTU
         }
         buf.append("<td align=\"right\"><b>");
         buf.append(recvTotal).append("</b></td><td align=\"right\"><b>").append(sendTotal).append("</b></td>\n" +

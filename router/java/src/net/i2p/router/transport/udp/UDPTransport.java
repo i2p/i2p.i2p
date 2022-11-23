@@ -3399,6 +3399,27 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             return _peersByIdent.size();
     }
 
+    /**
+     * @return 8 bytes:
+     *         version 1 ipv4 in/out, ipv6 in/out
+     *         version 2 ipv4 in/out, ipv6 in/out
+     * @since 0.9.57
+     */
+    public int[] getPeerCounts() {
+        int[] rv = new int[8];
+        for (PeerState peer : _peersByIdent.values()) {
+            int idx = 0;
+            if (peer.getVersion() > 1)
+                idx += 4;
+            if (peer.isIPv6())
+                idx += 2;
+            if (!peer.isInbound())
+                idx++;
+            rv[idx]++;
+        }
+        return rv;
+    }
+
     public int countActivePeers() {
         long old = _context.clock().now() - 5*60*1000;
         int active = 0;

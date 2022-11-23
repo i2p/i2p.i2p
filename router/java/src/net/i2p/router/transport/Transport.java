@@ -173,6 +173,15 @@ public interface Transport {
     public int countPeers();    
     public int countActivePeers();    
     public int countActiveSendPeers();
+
+    /**
+     * @return 8 bytes:
+     *         version 1 ipv4 in/out, ipv6 in/out
+     *         version 2 ipv4 in/out, ipv6 in/out
+     * @since 0.9.57
+     */
+    public int[] getPeerCounts();
+
     public boolean haveCapacity();
     public boolean haveCapacity(int pct);
 

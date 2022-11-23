@@ -724,6 +724,25 @@ public class NTCPTransport extends TransportImpl {
     public int countPeers() {
             return _conByIdent.size();
     }
+
+    /**
+     * @return 8 bytes:
+     *         version 1 4 bytes all zeros
+     *         version 2 ipv4 in/out, ipv6 in/out
+     * @since 0.9.57
+     */
+    public int[] getPeerCounts() {
+        int[] rv = new int[8];
+        for (NTCPConnection con : _conByIdent.values()) {
+            int idx = 4;
+            if (con.isIPv6())
+                idx += 2;
+            if (!con.isInbound())
+                idx++;
+            rv[idx]++;
+        }
+        return rv;
+    }
     
     /** 
      * For /peers UI only. Not a public API, not for external use.
