@@ -183,9 +183,7 @@ class UDPSender {
      ********/
         add(packet);
     }
-    
-    private static final int MAX_HEAD_LIFETIME = 3*1000;
-    
+
     /**
      * Put it on the queue.
      * BLOCKING if queue is full (backs up PacketPusher thread)
@@ -311,11 +309,11 @@ class UDPSender {
                 _log.warn("Stop sending on " + _endpoint);
             _outboundQueue.clear();
         }
-        
-        /** @return next packet in queue. Will discard any packet older than MAX_HEAD_LIFETIME */
+
+        /** @return next packet in queue */
         private UDPPacket getNextPacket() {
             UDPPacket packet = null;
-            while ( (_keepRunning) && (packet == null || packet.getLifetime() > MAX_HEAD_LIFETIME) ) {
+            while (_keepRunning && packet == null) {
                 if (packet != null) {
                     _context.statManager().addRateData("udp.sendQueueTrimmed", 1);
                     packet.release();
