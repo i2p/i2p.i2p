@@ -123,9 +123,9 @@ Can also be configured to bind to a specific interface or all interfaces.</td></
 <td>Incoming mail from pop.postman.i2p</td>
 <td>Can be disabled or changed in the <a href="/i2ptunnelmgr">I2P Tunnel Manager</a>. 
 Can also be configured to bind to a specific interface or all interfaces.</td></tr>
-<tr><td>8998</td>
-<td>mtn.i2p2.i2p (I2P's Monotone DVCS)</td>
-<td>Can be disabled or changed in the <a href="/i2ptunnelmgr">I2P Tunnel Manager</a>. 
+<tr><td>7670</td>
+<td>gitssh.idk.i2p (I2P git repository SSH access)</td>
+<td>Can be enabled in the <a href="/i2ptunnelmgr">I2P Tunnel Manager</a>. 
 Can also be configured to bind to a specific interface or all interfaces. [Disabled by default]</td></tr>
 <tr><td>31000</td>
 <td>Local connection to wrapper control channel port</td>
