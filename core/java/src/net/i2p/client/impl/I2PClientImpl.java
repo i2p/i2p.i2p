@@ -41,6 +41,8 @@ import net.i2p.util.RandomSource;
  */
 public class I2PClientImpl implements I2PClient {
 
+    private static final int PADDING_ENTROPY = 32;
+
     /**
      * Create a destination with a DSA 1024/160 signature type and a null certificate.
      * This is not bound to the I2PClient, you must supply the data back again
@@ -93,9 +95,25 @@ public class I2PClientImpl implements I2PClient {
      */
     public Destination createDestination(OutputStream destKeyStream, Certificate cert) throws I2PException, IOException {
         Destination d = new Destination();
-        Object keypair[] = KeyGenerator.getInstance().generatePKIKeypair();
-        PublicKey publicKey = (PublicKey) keypair[0];
-        PrivateKey privateKey = (PrivateKey) keypair[1];
+        // Don't generate ElGamal keys anymore, they are unused since release 0.6 2005
+        //Object keypair[] = KeyGenerator.getInstance().generatePKIKeypair();
+        //PublicKey publicKey = (PublicKey) keypair[0];
+        //PrivateKey privateKey = (PrivateKey) keypair[1];
+        // repeating pattern to be used in pubkey and padding, so the
+        // destination will be compressible
+        byte[] rand = new byte[PADDING_ENTROPY];
+        RandomSource.getInstance().nextBytes(rand);
+        byte[] pk = new byte[PublicKey.KEYSIZE_BYTES];
+        for (int i = 0; i < pk.length; i += PADDING_ENTROPY) {
+            System.arraycopy(rand, 0, pk, i, Math.min(PADDING_ENTROPY, pk.length - i));
+        }
+        PublicKey publicKey = new PublicKey(pk);
+        // Unused private key.
+        // Could be all zeros, but make it random so SAM doesn't show a string of AAAA
+        byte[] prk = new byte[PrivateKey.KEYSIZE_BYTES];
+        RandomSource.getInstance().nextBytes(prk);
+        PrivateKey privateKey = new PrivateKey(prk);
+
         SimpleDataStructure signingKeys[];
         if (cert.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
             KeyCertificate kcert = cert.toKeyCertificate();
@@ -118,8 +136,12 @@ public class I2PClientImpl implements I2PClient {
             SigType type = kcert.getSigType();
             int len = type.getPubkeyLen();
             if (len < 128) {
-                byte[] pad = new byte[128 - len];
-                RandomSource.getInstance().nextBytes(pad);
+                int padLen = 128 - len;
+                byte[] pad = new byte[padLen];
+                // pad with the same pattern as in the public key
+                for (int i = 0; i < padLen; i += PADDING_ENTROPY) {
+                    System.arraycopy(rand, 0, pad, i, Math.min(PADDING_ENTROPY, padLen - i));
+                }
                 d.setPadding(pad);
             } else if (len > 128) {
                 System.arraycopy(signingPubKey.getData(), 128, kcert.getPayload(), KeyCertificate.HEADER_LENGTH, len - 128);

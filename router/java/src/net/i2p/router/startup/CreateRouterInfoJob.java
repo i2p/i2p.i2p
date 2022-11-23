@@ -61,9 +61,8 @@ public class CreateRouterInfoJob extends JobImpl {
     /** @since 0.9.48 */
     static final String PROP_ROUTER_ENCTYPE = "router.encType";
     private static final SigType DEFAULT_SIGTYPE = SigType.EdDSA_SHA512_Ed25519;
-    private static final EncType DEFAULT_ENCTYPE = (VersionComparator.comp(CoreVersion.VERSION, "0.9.49") >= 0) ?
-                                                   EncType.ECIES_X25519 :
-                                                   EncType.ELGAMAL_2048;
+    private static final EncType DEFAULT_ENCTYPE = EncType.ECIES_X25519;
+    private static final int PADDING_ENTROPY = 32;
 
     CreateRouterInfoJob(RouterContext ctx, Job next) {
         super(ctx);
@@ -129,7 +128,14 @@ public class CreateRouterInfoJob extends JobImpl {
                          (PublicKey.KEYSIZE_BYTES - pubkey.length());
             if (padLen > 0) {
                 padding = new byte[padLen];
-                ctx.random().nextBytes(padding);
+                if (padLen <= PADDING_ENTROPY) {
+                    ctx.random().nextBytes(padding);
+                } else {
+                    ctx.random().nextBytes(padding, 0, PADDING_ENTROPY);
+                    for (int i = PADDING_ENTROPY; i < padLen; i += PADDING_ENTROPY) {
+                        System.arraycopy(padding, 0, padding, i, Math.min(PADDING_ENTROPY, padLen - i));
+                    }
+                }
                 ident.setPadding(padding);
             } else {
                 padding = null;

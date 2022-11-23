@@ -49,12 +49,13 @@ import net.i2p.util.SecureFileOutputStream;
  * The format is:
  *<pre>
  *  - Destination (387 bytes if no certificate, otherwise longer)
- *     - Public key (256 bytes)
+ *     - Public key (256 bytes), random data as of 0.9.57 (except for RouterPrivateKeyFile)
  *     - Signing Public key (128 bytes)
  *     - Cert. type (1 byte)
  *     - Cert. length (2 bytes)
  *     - Certificate if length != 0
  *  - Private key (256 bytes for ElGamal, or length specified by key certificate)
+ *     -          All zeros as of 0.9.57 (except for RouterPrivateKeyFile)
  *  - Signing Private key (20 bytes, or length specified by key certificate)
  *  - As of 0.9.38, if the Signing Private Key is all zeros,
  *    the offline signature section (see proposal 123):
@@ -66,6 +67,13 @@ import net.i2p.util.SecureFileOutputStream;
  *
  * Total: 663 or more bytes for ElGamal, may be smaller for other enc. types
  *</pre>
+ *
+ * Destination encryption keys have been unused since 0.6 (2005).
+ * As of 0.9.57, new Destination encryption public keys are simply random data,
+ * and encryption private keys may be random data or all zeros.
+ *
+ * This class is extended by net.i2p.data.router.RouterPrivateKeyFile.
+ * RouterIdentity encryption keys ARE used and must be valid.
  *
  * @author welterde, zzz
  */
@@ -83,6 +91,8 @@ public class PrivateKeyFile {
     private Signature _offlineSignature;
     private SigningPrivateKey _transientSigningPrivKey; 
     private SigningPublicKey _transientSigningPubKey; 
+
+    private static final int PADDING_ENTROPY = 32;
 
     /**
      *  Create a new PrivateKeyFile, or modify an existing one, with various
@@ -591,9 +601,25 @@ public class PrivateKeyFile {
                     // no support for this in I2PClient,
                     // so we modify code from CreateRouterInfoJob.createRouterInfo()
                     I2PAppContext ctx = I2PAppContext.getGlobalContext();
-                    KeyPair keypair = ctx.keyGenerator().generatePKIKeys(ptype);
-                    PublicKey pub = keypair.getPublic();
-                    PrivateKey priv = keypair.getPrivate();
+                    byte[] rand = new byte[PADDING_ENTROPY];
+                    ctx.random().nextBytes(rand);
+                    PublicKey pub;
+                    PrivateKey priv;
+                    if (getClass().equals(PrivateKeyFile.class)) {
+                        // destinations don't use the encryption key
+                        byte[] bpub = new byte[ptype.getPubkeyLen()];
+                        for (int i = 0; i < bpub.length; i += PADDING_ENTROPY) {
+                             System.arraycopy(rand, 0, bpub, i, Math.min(PADDING_ENTROPY, bpub.length - i));
+                        }
+                        pub = new PublicKey(ptype, bpub);
+                        byte[] bpriv = new byte[ptype.getPrivkeyLen()];
+                        priv = new PrivateKey(ptype, bpriv);
+                    } else {
+                        // routers use the encryption key
+                        KeyPair keypair = ctx.keyGenerator().generatePKIKeys(ptype);
+                        pub = keypair.getPublic();
+                        priv = keypair.getPrivate();
+                    }
                     SimpleDataStructure signingKeypair[] = ctx.keyGenerator().generateSigningKeys(type);
                     SigningPublicKey spub = (SigningPublicKey)signingKeypair[0];
                     SigningPrivateKey spriv = (SigningPrivateKey)signingKeypair[1];
@@ -611,7 +637,9 @@ public class PrivateKeyFile {
                                  (PublicKey.KEYSIZE_BYTES - pub.length());
                     if (padLen > 0) {
                         padding = new byte[padLen];
-                        ctx.random().nextBytes(padding);
+                        for (int i = 0; i < padLen; i += PADDING_ENTROPY) {
+                            System.arraycopy(rand, 0, padding, i, Math.min(PADDING_ENTROPY, padLen - i));
+                        }
                     } else {
                         padding = null;
                     }
@@ -793,6 +821,8 @@ public class PrivateKeyFile {
     }
     
     /**
+     *  Private key may be random data or all zeros for Destinations as of 0.9.57
+     *
      *  @return null on error or if not initialized
      */
     public PrivateKey getPrivKey() {
@@ -941,6 +971,8 @@ public class PrivateKeyFile {
      *  Verify that the PublicKey matches the PrivateKey, and
      *  the SigningPublicKey matches the SigningPrivateKey.
      *
+     *  NOTE this will fail for Destinations containing random padding for the enc. key
+     *
      *  @return success
      *  @since 0.9.16
      */
@@ -956,12 +988,14 @@ public class PrivateKeyFile {
 
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder(128);
-        s.append("Destination: ");
+        StringBuilder s = new StringBuilder(1024);
+        boolean isRI = !getClass().equals(PrivateKeyFile.class) ||
+                       (privKey != null && privKey.getType() != EncType.ELGAMAL_2048);
+        s.append(isRI ? "RouterIdentity: " : "Destination: ");
         s.append(this.dest != null ? this.dest.toBase64() : "null");
         s.append("\nB32        : ");
         s.append(this.dest != null ? this.dest.toBase32() : "null");
-        if (dest != null) {
+        if (!isRI && dest != null) {
             SigningPublicKey spk = dest.getSigningPublicKey();
             SigType type = spk.getType();
             if (type == SigType.EdDSA_SHA512_Ed25519 ||
@@ -974,10 +1008,12 @@ public class PrivateKeyFile {
         }
         s.append("\nContains: ");
         s.append(this.dest);
-        s.append("\nPrivate Key: ");
-        s.append(this.privKey);
+        if (isRI) {
+            s.append("\nPrivate Key: ");
+            s.append(this.privKey);
+        }
         s.append("\nSigining Private Key: ");
-        if (isOffline()) {
+        if (!isRI && isOffline()) {
             s.append("offline\nOffline Signature Expires: ");
             s.append(new Date(getOfflineExpiration()));
             s.append("\nTransient Signing Public Key: ");
