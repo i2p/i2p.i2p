@@ -22,6 +22,7 @@ import net.i2p.data.i2np.VariableTunnelBuildReplyMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.RouterThrottleImpl;
 import net.i2p.router.Service;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.router.tunnel.pool.PooledTunnelCreatorConfig;
@@ -927,7 +928,8 @@ public class TunnelDispatcher implements Service {
             super(ctx);
             _configs = new LinkedBlockingQueue<HopConfig>();
             // 10 min no tunnels accepted + 10 min tunnel expiration
-            getTiming().setStartAfter(ctx.clock().now() + 20*60*1000);
+            long rejectStartupTime = ctx.getProperty(RouterThrottleImpl.PROP_REJECT_STARTUP_TIME, RouterThrottleImpl.DEFAULT_REJECT_STARTUP_TIME);
+            getTiming().setStartAfter(ctx.clock().now() + rejectStartupTime + 10*60*1000);
             getContext().jobQueue().addJob(LeaveTunnel.this);
         }
         
