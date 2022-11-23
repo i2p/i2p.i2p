@@ -395,8 +395,8 @@ public class TunnelControllerGroup implements ClientApp {
                     if (!ok) {
                         shouldMigrate = false;
                     } else {
-                        _log.logAlways(Log.WARN, "Using new tunnel configurations in " + dir +
-                         " - ignoring old tunnel configuration in " + cfgFile);
+                        _log.logAlways(Log.WARN, "Migrated tunnel configurations to " + dir +
+                                                 " from " + cfgFile);
                     }
                 } else {
                     _log.logAlways(Log.WARN, "Not migrating tunnel configurations");
