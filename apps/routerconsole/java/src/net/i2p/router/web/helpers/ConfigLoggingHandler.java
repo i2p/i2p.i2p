@@ -23,6 +23,7 @@ public class ConfigLoggingHandler extends FormHandler {
     private String _fileSize;
     private String _newLogClass;
     private String _newLogLevel = "WARN";
+    private boolean _logCompress;
     
     @Override
     protected void processForm() {
@@ -54,6 +55,11 @@ public class ConfigLoggingHandler extends FormHandler {
         _fileSize = (size != null ? size.trim() : null);
     }
 
+    /** @since 0.9.57 */
+    public void setLogcompress(String foo) {
+        _logCompress = true;
+    }
+
     /** @since 0.8.1 */
     public void setNewlogclass(String s) {
         if (s != null && s.length() > 0)
@@ -73,6 +79,7 @@ public class ConfigLoggingHandler extends FormHandler {
      */
     private void saveChanges() {
         boolean shouldSave = false;
+        LogManager mgr = _context.logManager();
         
         if ((_levels != null && _levels.length() > 0) || _newLogClass != null) {
             try {
@@ -81,33 +88,35 @@ public class ConfigLoggingHandler extends FormHandler {
                     props.load(new ByteArrayInputStream(DataHelper.getUTF8(_levels)));
                 if (_newLogClass != null)
                     props.setProperty(_newLogClass, _newLogLevel);
-                _context.logManager().setLimits(props);
-                shouldSave = true;
-                addFormNotice(_t("Log overrides updated"));
+                if (!props.equals(mgr.getLimits())) {
+                    shouldSave = true;
+                    mgr.setLimits(props);
+                    addFormNotice(_t("Log overrides updated"));
+                }
             } catch (IOException ioe) {
                 // shouldn't ever happen (BAIS shouldnt cause an IOE)
-                _context.logManager().getLog(ConfigLoggingHandler.class).error("Error reading from the props?", ioe);
+                mgr.getLog(ConfigLoggingHandler.class).error("Error reading from the props?", ioe);
                 addFormError("Error updating the log limits - levels not valid");
             }
-        } else if (!_context.logManager().getLimits().isEmpty()) {
-            _context.logManager().setLimits(null);
+        } else if (!mgr.getLimits().isEmpty()) {
+            mgr.setLimits(null);
             shouldSave = true;
             addFormNotice("Log limits cleared");
         }
           
         if (_defaultLevel != null) {
-            String oldDefault = _context.logManager().getDefaultLimit();
+            String oldDefault = mgr.getDefaultLimit();
             if (_defaultLevel.equals(oldDefault)) {
                 // noop
             } else {
                 shouldSave = true;
-                _context.logManager().setDefaultLimit(_defaultLevel);
+                mgr.setDefaultLimit(_defaultLevel);
                 addFormNotice("Default log level updated from " + oldDefault + " to " + _defaultLevel);
             }
         }
         
-        if (_dateFormat != null && !_dateFormat.equals(_context.logManager().getDateFormatPattern())) {
-            boolean valid = _context.logManager().setDateFormat(_dateFormat);
+        if (_dateFormat != null && !_dateFormat.equals(mgr.getDateFormatPattern())) {
+            boolean valid = mgr.setDateFormat(_dateFormat);
             if (valid) {
                 shouldSave = true;
                 addFormNotice("Date format updated");
@@ -118,10 +127,10 @@ public class ConfigLoggingHandler extends FormHandler {
         
         if (_fileSize != null) {
             int newBytes = LogManager.getFileSize(_fileSize);
-            int oldBytes = _context.logManager().getFileSize();
+            int oldBytes = mgr.getFileSize();
             if (newBytes > 0) {
                 if (oldBytes != newBytes) {
-                    _context.logManager().setFileSize(newBytes);
+                    mgr.setFileSize(newBytes);
                     shouldSave = true;
                     addFormNotice("File size updated");
                 } 
@@ -130,15 +139,22 @@ public class ConfigLoggingHandler extends FormHandler {
             }
         }
         
+        if (_logCompress != mgr.shouldGzip()) {
+            mgr.setGzip(_logCompress);
+            addFormNotice("Compression setting updated");
+            shouldSave = true;
+        }
+
+
      /*** disable
         if ( (_filename != null) && (_filename.trim().length() > 0) ) {
             _filename = _filename.trim();
-            String old = _context.logManager().getBaseLogfilename();
+            String old = mgr.getBaseLogfilename();
             if ( (old != null) && (_filename.equals(old)) ) {
                 // noop - don't update since its the same
             } else {
                 shouldSave = true;
-                _context.logManager().setBaseLogfilename(_filename);
+                mgr.setBaseLogfilename(_filename);
                 addFormNotice("Log file name pattern updated to " + _filename 
                               + " (note: will not take effect until next rotation)");
             }
@@ -147,21 +163,21 @@ public class ConfigLoggingHandler extends FormHandler {
         
         if ( (_recordFormat != null) && (_recordFormat.trim().length() > 0) ) {
             _recordFormat = _recordFormat.trim();
-            String old = new String(_context.logManager().getFormat());
+            String old = new String(mgr.getFormat());
             if (_recordFormat.equalsIgnoreCase(old)) {
                 // noop - no change
             } else {
                 char fmt[] = new char[_recordFormat.length()];
                 for (int i = 0; i < fmt.length; i++) 
                     fmt[i] = _recordFormat.charAt(i);
-                _context.logManager().setFormat(fmt);
+                mgr.setFormat(fmt);
                 shouldSave = true;
                 addFormNotice("Log record format updated");
             }
         }
         
         if (shouldSave) {
-            boolean saved = _context.logManager().saveConfig();
+            boolean saved = mgr.saveConfig();
 
             if (saved) 
                 addFormNotice(_t("Log configuration saved"));

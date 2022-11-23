@@ -9,31 +9,45 @@ import java.util.TreeSet;
 import net.i2p.data.DataHelper;
 import net.i2p.router.web.HelperBase;
 import net.i2p.util.Log;
+import net.i2p.util.LogManager;
 import net.i2p.util.Translate;
 
 public class ConfigLoggingHelper extends HelperBase {
+    private LogManager _mgr;
+
+    /** @since 0.9.57 */
+    @Override
+    public void setContextId(String contextId) {
+        super.setContextId(contextId);
+        _mgr = _context.logManager();
+    }
     
     public String getLogFilePattern() {
-        return _context.logManager().getBaseLogfilename();
+        return _mgr.getBaseLogfilename();
     }
 
     public String getRecordPattern() {
-        return new String(_context.logManager().getFormat());
+        return new String(_mgr.getFormat());
     }
 
     public String getDatePattern() {
-        return _context.logManager().getDateFormatPattern();
+        return _mgr.getDateFormatPattern();
     }
 
     public String getMaxFileSize() {
-        int bytes = _context.logManager().getFileSize();
+        int bytes = _mgr.getFileSize();
         if (bytes <= 0) return "1.00 MiB";
         return DataHelper.formatSize2(bytes, false) + 'B';
     }
 
+    /** @since 0.9.57 */
+    public String getLogCompress() {
+        return _mgr.shouldGzip() ? CHECKED : "";
+    }
+
     public String getLogLevelTable() {
         StringBuilder buf = new StringBuilder(32*1024);
-        Properties limits = _context.logManager().getLimits();
+        Properties limits = _mgr.getLimits();
         TreeSet<String> sortedLogs = new TreeSet<String>();
         for (String prefix : limits.stringPropertyNames()) {
             sortedLogs.add(prefix);
@@ -71,7 +85,7 @@ public class ConfigLoggingHelper extends HelperBase {
 
     public String getDefaultLogLevelBox() {
         StringBuilder buf = new StringBuilder(128);
-        String cur = _context.logManager().getDefaultLimit();
+        String cur = _mgr.getDefaultLimit();
         getLogLevelBox(buf, "defaultloglevel", cur, false);
         return buf.toString();
     }
@@ -98,8 +112,8 @@ public class ConfigLoggingHelper extends HelperBase {
      *  @since 0.8.1
      */
     public String getNewClassBox() {
-        List<Log> logs = _context.logManager().getLogs();
-        Set<String> limits = _context.logManager().getLimits().stringPropertyNames();
+        List<Log> logs = _mgr.getLogs();
+        Set<String> limits = _mgr.getLimits().stringPropertyNames();
         TreeSet<String> sortedLogs = new TreeSet<String>();
 
         for (Log log : logs) {

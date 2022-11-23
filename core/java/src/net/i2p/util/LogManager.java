@@ -696,10 +696,17 @@ public class LogManager implements Flushable {
     }
 
     /**
-     *  @since 0.9.56
+     *  @since 0.9.56, public since 0.9.57, was pkg private
      */
-    boolean shouldGzip() {
+    public boolean shouldGzip() {
         return _gzip;
+    }
+
+    /**
+     *  @since 0.9.57
+     */
+    public void setGzip(boolean yes) {
+        _gzip = yes;
     }
 
     /**

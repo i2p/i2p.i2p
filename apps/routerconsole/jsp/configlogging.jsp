@@ -36,6 +36,15 @@
         </tr><tr><td align="right"><b><%=intl._t("Max log file size")%>:</b></td>
           <td><input type="text" name="logfilesize" size="10" value="<jsp:getProperty name="logginghelper" property="maxFileSize" />" ></td>
           <td></td>
+<%
+   if (logginghelper.isAdvanced()) {
+%>
+        </tr><tr><td align="right"><b><%=intl._t("Compress logs?")%>:</b></td>
+          <td><input type="checkbox" class="optbox" name="logcompress" value="true" <jsp:getProperty name="logginghelper" property="logCompress" /> ></td>
+          <td></td>
+<%
+   }
+%>
         </tr><tr><td align="right"><b><%=intl._t("Default log level")%>:</b></td>
           <td><jsp:getProperty name="logginghelper" property="defaultLogLevelBox" /></td>
           <td><%=intl._t("(DEBUG and INFO are not recommended defaults, as they will drastically slow down your router)")%></td>
