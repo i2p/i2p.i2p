@@ -347,7 +347,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
             }
 
             ByteArrayOutputStream priv = new ByteArrayOutputStream(663);
-            ByteArrayOutputStream pub = new ByteArrayOutputStream(387);
+            ByteArrayOutputStream pub = new ByteArrayOutputStream(391);
             
             SAMUtils.genRandomKey(priv, pub, sigType);
             return writeString("DEST REPLY"
