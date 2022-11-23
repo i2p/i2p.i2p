@@ -2221,17 +2221,17 @@
         <echo message="full    |  release200        releaseWithJbigi200     releaseWithGeoIP200" />
     </target>
 
-    <target name="releaseit"        depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJetty, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
-    <target name="releaseWithJbigi" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndJbigi, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
-    <target name="releaseWithGeoIP" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndGeoIP, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
+    <target name="releaseit"        depends="verifyReleaseBuildNumbers, -pre-release, debcheckpatch, distclean, testscripts, updaterWithJetty, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
+    <target name="releaseWithJbigi" depends="verifyReleaseBuildNumbers, -pre-release, debcheckpatch, distclean, testscripts, updaterWithJettyAndJbigi, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
+    <target name="releaseWithGeoIP" depends="verifyReleaseBuildNumbers, -pre-release, debcheckpatch, distclean, testscripts, updaterWithJettyAndGeoIP, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
 
-    <target name="releaseRepack"          depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyRepack, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
-    <target name="releaseWithJbigiRepack" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndJbigiRepack, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
-    <target name="releaseWithGeoIPRepack" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndGeoIPRepack, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
+    <target name="releaseRepack"          depends="verifyReleaseBuildNumbers, -pre-release, debcheckpatch, distclean, testscripts, updaterWithJettyRepack, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
+    <target name="releaseWithJbigiRepack" depends="verifyReleaseBuildNumbers, -pre-release, debcheckpatch, distclean, testscripts, updaterWithJettyAndJbigiRepack, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
+    <target name="releaseWithGeoIPRepack" depends="verifyReleaseBuildNumbers, -pre-release, debcheckpatch, distclean, testscripts, updaterWithJettyAndGeoIPRepack, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
 
-    <target name="release200"          depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
-    <target name="releaseWithJbigi200" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndJbigiRepack, updater200WithJettyAndJbigi, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
-    <target name="releaseWithGeoIP200" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndGeoIPRepack, updater200WithJettyAndGeoIP, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
+    <target name="release200"          depends="verifyReleaseBuildNumbers, -pre-release, debcheckpatch, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
+    <target name="releaseWithJbigi200" depends="verifyReleaseBuildNumbers, -pre-release, debcheckpatch, distclean, testscripts, updaterWithJettyAndJbigiRepack, updater200WithJettyAndJbigi, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
+    <target name="releaseWithGeoIP200" depends="verifyReleaseBuildNumbers, -pre-release, debcheckpatch, distclean, testscripts, updaterWithJettyAndGeoIPRepack, updater200WithJettyAndGeoIP, delete-j6-update, installer5-nowindows, delete-nonwindows, installer5-windows, -releaseit" />
 
     <target name="-releaseit">
         <echo message="New version number is ${release.number}" />
@@ -2872,7 +2872,7 @@
 
     <!-- buster, sid, bionic+ -->
     <!-- same as debian-tarball but with a release tar.bz2 file name and tar prefix -->
-    <target name="debian-release-tarball" depends="getExtendedVersion, failIfNoVCS">
+    <target name="debian-release-tarball" depends="getExtendedVersion, failIfNoVCS, debcheckpatch">
         <property name="debian.tarball.name" value="i2p_${release.number}.orig.tar.bz2" />
         <property name="checkoutDir" value="../i2p-${Extended.Version}" />
         <ant target="checkoutFromVCS" />
