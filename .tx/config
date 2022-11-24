@@ -279,6 +279,7 @@ source_file = apps/i2psnark/locale/messages_en.po
 source_lang = en
 trans.ar = apps/i2psnark/locale/messages_ar.po
 trans.cs = apps/i2psnark/locale/messages_cs.po
+trans.da = apps/i2psnark/locale/messages_da.po
 trans.de = apps/i2psnark/locale/messages_de.po
 trans.el = apps/i2psnark/locale/messages_el.po
 trans.es = apps/i2psnark/locale/messages_es.po
