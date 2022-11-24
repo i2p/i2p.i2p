@@ -175,13 +175,14 @@
                     boolean isHTTPS = editBean.getOutproxyType(curTunnel).equals("connect");
                   %></td><td>
                     <b><%=intl._t("Outproxy Type")%>:</b>
-                    <span class="multiOption"
+                    <span class="multiOption">
                         <label><input value="socks" type="radio" name="outproxyType" <%=(!isHTTPS ? " checked=\"checked\"" : "")%> class="tickbox" />
                         SOCKS</label>
                     </span>
-                    <span class="multiOption"
+                    <span class="multiOption">
                         <label><input value="connect" type="radio" name="outproxyType" <%=(isHTTPS ? " checked=\"checked\"" : "")%> class="tickbox" />
-                        HTTPS</label><%
+                        HTTPS</label>
+                    </span><%
                 }
 %>
             </td>
