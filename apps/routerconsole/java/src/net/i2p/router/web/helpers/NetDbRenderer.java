@@ -448,9 +448,9 @@ class NetDbRenderer {
                 if (cost != 0)
                     buf.append("Cost ").append(cost).append(' ');
                 if (type != null)
-                    buf.append("Type ").append(type).append(' ');
+                    buf.append(_t("Type")).append(' ').append(type).append(' ');
                 if (etype != null)
-                    buf.append("Type ").append(etype).append(' ');
+                    buf.append(_t("Type")).append(' ').append(etype).append(' ');
                 if (caps != null)
                     buf.append("Caps ").append(caps).append(' ');
                 if (ssucaps != null)
@@ -755,7 +755,7 @@ class NetDbRenderer {
                 buf.append("<b>RAP?</b> ").append(ls.getReceivedAsPublished());
                 buf.append("&nbsp;&nbsp;<b>RAR?</b> ").append(ls.getReceivedAsReply());
                 buf.append("&nbsp;&nbsp;<b>Distance: </b>").append(distance);
-                buf.append("&nbsp;&nbsp;<b>Type: </b>").append(type);
+                buf.append("&nbsp;&nbsp;<b>").append(_t("Type")).append(": </b>").append(type);
                 if (type != DatabaseEntry.KEY_TYPE_LEASESET) {
                     LeaseSet2 ls2 = (LeaseSet2) ls;
                     buf.append("&nbsp;&nbsp;<b>Unpublished? </b>").append(ls2.isUnpublished());

@@ -394,7 +394,7 @@ public class NetDbHelper extends FormHandler {
                    "<tr><td colspan=\"3\" class=\"subheading\"><b>Enter one search field <i>only</i>:</b></td></tr>\n" +
                    "<tr><td>Capabilities:</td><td><input type=\"text\" name=\"caps\"></td><td>e.g. f or XOfR</td></tr>\n" +
                    "<tr><td>Cost:</td><td><input type=\"text\" name=\"cost\"></td><td></td></tr>\n" +
-                   "<tr><td>Country:</td><td><select name=\"c\"><option value=\"\" selected=\"selected\"></option>");
+                   "<tr><td>" + _t("Country") + ":</td><td><select name=\"c\"><option value=\"\" selected=\"selected\"></option>");
         Map<String, String> sorted = new TreeMap<String, String>(Collator.getInstance());
         for (Map.Entry<String, String> e : _context.commSystem().getCountries().entrySet()) {
             String tr = Messages.getString(e.getValue(), _context, Messages.COUNTRY_BUNDLE_NAME);
@@ -409,13 +409,13 @@ public class NetDbHelper extends FormHandler {
             _out.write("<option value=\"" + type + "\">" + type + "</option>\n");
         }
         _out.write("</select></td><td></td></tr>\n" +
-                   "<tr><td>Router Family:</td><td><input type=\"text\" name=\"fam\"></td><td></td></tr>\n" +
+                   "<tr><td>" + _t("Router Family") + ":</td><td><input type=\"text\" name=\"fam\"></td><td></td></tr>\n" +
                    "<tr><td>Hash Prefix:</td><td><input type=\"text\" name=\"r\"></td><td></td></tr>\n" +
-                   "<tr><td>Hostname or b32:</td><td><input type=\"text\" name=\"ls\"></td><td></td></tr>\n" +
+                   "<tr><td>" + _t("Full destination, name, Base32, or hash") + ":</td><td><input type=\"text\" name=\"ls\"></td><td></td></tr>\n" +
                    "<tr><td>IP:</td><td><input type=\"text\" name=\"ip\"></td><td>IPv4 or IPv6, /24,/16,/8 suffixes optional for IPv4, prefix ok for IPv6</td></tr>\n" +
                    "<tr><td>IPv6 Prefix:</td><td><input type=\"text\" name=\"ipv6\"></td><td></td></tr>\n" +
-                   "<tr><td>MTU:</td><td><input type=\"text\" name=\"mtu\"></td><td></td></tr>\n" +
-                   "<tr><td>Port Number:</td><td><input type=\"text\" name=\"port\"></td><td></td></tr>\n" +
+                   "<tr><td>" + _t("MTU") + ":</td><td><input type=\"text\" name=\"mtu\"></td><td></td></tr>\n" +
+                   "<tr><td>" + _t("Port") + ":</td><td><input type=\"text\" name=\"port\"></td><td></td></tr>\n" +
                    "<tr><td>Signature Type:</td><td><select name=\"type\"><option value=\"\" selected=\"selected\"></option>");
         for (SigType type : EnumSet.allOf(SigType.class)) {
             _out.write("<option value=\"" + type + "\">" + type + "</option>\n");
@@ -437,7 +437,7 @@ public class NetDbHelper extends FormHandler {
                    "<tr><td>Sybil close to:</td><td><input type=\"text\" name=\"sybil2\"></td><td>Router hash, destination hash, b32, or from address book</td>\n" +
                    "<tr><td><label for=\"closetorouter\">or Sybil close to this router:</label></td><td><input type=\"checkbox\" class=\"optbox\" value=\"1\" name=\"sybil\" id=\"closetorouter\"></td><td></td></tr>\n" +
                    "<tr><td colspan=\"3\" class=\"optionsave\">" +
-                   "<button type=\"reset\" class=\"cancel\" value=\"Cancel\">Cancel</button> " +
+                   "<button type=\"reset\" class=\"cancel\" value=\"Cancel\">" + _t("Cancel") + "</button> " +
                    "<button type=\"submit\" class=\"search\" value=\"Lookup\">Lookup</button></td></tr>\n" +
                    "</table>\n</form>\n");
     }
