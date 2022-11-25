@@ -45,7 +45,9 @@ abstract class IRCFilter {
                 // http://tools.ietf.org/html/draft-mitchell-irc-capabilities-01
                 "CAP",
                 "PROTOCTL",
-                "AWAY"
+                "AWAY",
+                "ACCOUNT",  // https://ircv3.net/specs/extensions/account-notify
+                "CHGHOST"   // https://ircv3.net/specs/extensions/chghost
         };
         _allowedInbound = new HashSet<String>(Arrays.asList(allowedCommands));
     }
