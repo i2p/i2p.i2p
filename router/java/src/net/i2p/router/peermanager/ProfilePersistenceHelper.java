@@ -360,7 +360,7 @@ class ProfilePersistenceHelper {
             
             fixupFirstHeardAbout(profile);
             return profile;
-        } catch (IOException e) {
+        } catch (Exception e) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error loading properties from " + file.getAbsolutePath(), e);
             file.delete();

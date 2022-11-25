@@ -199,7 +199,7 @@ class PeerManager {
      *  @since 0.8.8
      */
     private void loadProfilesInBackground() {
-        (new I2PThread(new ProfileLoader())).start();
+        (new I2PThread(new ProfileLoader(), "Peer Profile Loader")).start();
     }
 
     /**
