@@ -27,7 +27,6 @@ import net.i2p.crypto.EntropyHarvester;
 public class RandomSource extends SecureRandom implements EntropyHarvester {
 
     private static final long serialVersionUID = 1L;
-    private final EntropyHarvester _entropyHarvester;
     protected transient final I2PAppContext _context;
 
     /**
@@ -39,9 +38,6 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
     public RandomSource(I2PAppContext context) {
         super();
         _context = context;
-        // when we replace to have hooks for fortuna (etc), replace with
-        // a factory (or just a factory method)
-        _entropyHarvester = this;
     }
 
     /**
@@ -113,7 +109,7 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
         }
     }
 
-    public EntropyHarvester harvester() { return _entropyHarvester; }
+    public EntropyHarvester harvester() { return this; }
  
     public void feedEntropy(String source, long data, int bitoffset, int bits) {
         if (bitoffset == 0)

@@ -78,10 +78,14 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
      * Ok, so we're going to have it return between 0 and n (including 0, excluding n), since 
      * thats what it has been used for.
      *
+     * Unlike Java's Random, which throws IAE, this returns 0 if n is 0.
+     *
+     * @param n non-negative
+     * @throws IllegalArgumentException if n is negative
      */
     @Override
     public int nextInt(int n) {
-        if (n == 0) return 0;
+        if (n == 1 || n == 0) return 0;
         int rv = signedNextInt(n);
         if (rv < 0) 
             rv = 0 - rv;
@@ -134,10 +138,15 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
     /**
      * Like the modified nextInt, nextLong(n) returns a random number from 0 through n,
      * including 0, excluding n.
+     *
+     * Unlike Java's Random, which throws IAE, this returns 0 if n is 0.
+     *
+     * @param n non-negative
+     * @throws IllegalArgumentException if n is negative
      */
     @Override
     public long nextLong(long n) {
-        if (n == 0) return 0;
+        if (n == 1 || n == 0) return 0;
         long rv = nextLong();
         if (rv < 0) 
             rv = 0 - rv;
@@ -260,9 +269,6 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
         return (int)rv;
     }
     
-    @Override
-    public EntropyHarvester harvester() { return this; }
- 
     /** reseed the fortuna */
     @Override
     public void feedEntropy(String source, long data, int bitoffset, int bits) {
