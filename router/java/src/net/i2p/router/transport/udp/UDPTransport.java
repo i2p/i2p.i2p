@@ -826,7 +826,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         // must be after pusher and setting external addresses
         _establisher.startup();
         _handler.startup();
-        rebuildExternalAddress(false, false);
+        rebuildExternalAddress(false, v6only);
     }
     
     public synchronized void shutdown() {
