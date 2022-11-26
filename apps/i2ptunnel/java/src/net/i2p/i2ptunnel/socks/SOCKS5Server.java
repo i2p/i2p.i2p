@@ -523,8 +523,6 @@ class SOCKS5Server extends SOCKSServer {
                     // TODO sticky proxy selection like in HTTP client
                     int p = _context.random().nextInt(proxies.size());
                     String proxy = proxies.get(p);
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("connecting to proxy " + proxy + " for " + connHostName + " port " + connPort);
                     try {
                         destSock = outproxyConnect(t, proxy);
                     } catch (SOCKSException se) {
@@ -604,6 +602,8 @@ class SOCKS5Server extends SOCKSServer {
                 }
             }
             boolean https = "connect".equals(props.getProperty(I2PSOCKSTunnel.PROP_OUTPROXY_TYPE));
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("connecting to " + (https ? "HTTPS" : "SOCKS") + " outproxy " + proxy + " for " + connHostName + " port " + connPort);
             if (https) {
                 httpsConnect(destSock, out, connHostName, connPort, configUser, configPW);
             } else {

@@ -130,10 +130,17 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
            StringTokenizer tok = new StringTokenizer((String)e.getValue(), ", \t");
            while (tok.hasMoreTokens()) {
                String proxy = tok.nextToken().trim();
-               if (proxy.endsWith(".i2p"))
+               String host = proxy;
+               int colon = proxy.indexOf(':');
+               if (colon > 0)
+                   host = host.substring(0, colon);
+               if (host.endsWith(".i2p")) {
                    proxyList.add(proxy);
-               else
-                   _log.error("Non-i2p SOCKS outproxy: " + proxy);
+               } else {
+                   String m = "Non-i2p SOCKS outproxy: " + proxy;
+                   l.log(m);
+                   _log.error(m);
+               }
            }
            proxies.put(port, proxyList);
         }

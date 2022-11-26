@@ -1,7 +1,24 @@
+2022-11-26 zzz
+ * Console: Hide IPv4/v6 columns on /peers status tab
+ * i2ptunnel: Fix SOCKS outproxy port configuration
+ * SSU: Don't build a 4 cap address at startup if configured for IPv6-only
+ * SSU2: Avoid rare NPE handling apparent session confirmed without inbound state
+ * Util: Fast check for random nextInt(1) and nextLong(1)
+
+2022-11-25 zzz
+ * i2ptunnel: Allow IRCv3 ACCOUNT and CHGHOST through the filter
+ * Profiles: Don't let one corrupt file kill the loader thread
+
+2022-11-24 zzz
+ * Console, i2psnark standalone: Fix UI configuration for Argentinan Spanish
+ * i2psnark: Add partial Danish translation
+ * i2psnark standalone: Enable zh_TW UI configuration
+
 2022-11-23 zzz
  * Build: Add debcheckpatch to release targets
  * CLI: Sort MTU output by address
  * Console:
+   - Add LS lookup to search form
    - Add status and banned tabs to /peers (WIP)
    - Change mtn tunnel in help FAQ to git
    - Cleanup /debug update and app manager sections
@@ -15,6 +32,7 @@
  * SSU: Remove unneeded queue latency check in UDPSender
  * SSU2: Increase Session Created max padding
  * SusiDNS: Fix off-by-one in next page last item number
+ * Tunnels: Adjust expiration job start if default reject time overridden by config
 
 2022-11-21 2.0.0 (API 0.9.56) released
 
