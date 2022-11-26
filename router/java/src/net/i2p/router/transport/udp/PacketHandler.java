@@ -852,6 +852,11 @@ class PacketHandler {
                     return false;
                 }
                 type = header.getType();
+                if (type == SSU2Util.SESSION_CONFIRMED_FLAG_BYTE) {
+                    // one in a million decrypt of SSU 1 packet with type/version/netid all correct?
+                    // can't have session confirmed with null state, avoid NPE below
+                    return false;
+                }
             } else {
                 type = SSU2Util.SESSION_REQUEST_FLAG_BYTE;
             }
