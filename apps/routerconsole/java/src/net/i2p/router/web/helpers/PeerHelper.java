@@ -9,6 +9,7 @@ import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -17,6 +18,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.TransportManager;
+import net.i2p.router.transport.TransportUtil;
 import net.i2p.router.transport.ntcp.NTCPConnection;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.PeerState;
@@ -24,6 +26,7 @@ import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.web.HelperBase;
 import static net.i2p.router.web.helpers.UDPSorters.*;
 import net.i2p.util.Addresses;
+import net.i2p.util.AddressType;
 import net.i2p.util.SystemVersion;
 
 
@@ -189,16 +192,31 @@ public class PeerHelper extends HelperBase {
             }
         } else {
             // summary
+            Set<AddressType> connected = Addresses.getConnectedAddressTypes();
+            TransportUtil.IPv6Config ntcpConfig = TransportUtil.getIPv6Config(_context, "NTCP");
+            TransportUtil.IPv6Config ssuConfig = TransportUtil.getIPv6Config(_context, "SSU");
+            boolean showIPv4 = connected.contains(AddressType.IPV4) &&
+                               (ntcpConfig != TransportUtil.IPv6Config.IPV6_ONLY ||
+                                ssuConfig != TransportUtil.IPv6Config.IPV6_ONLY);
+            boolean showIPv6 = connected.contains(AddressType.IPV6) &&
+                               (ntcpConfig != TransportUtil.IPv6Config.IPV6_DISABLED ||
+                                ssuConfig != TransportUtil.IPv6Config.IPV6_DISABLED);
             StringBuilder buf = new StringBuilder(512);
             buf.append("<h3 id=\"transports\">").append(_t("Peer Connections")).append("</h3><table><tr><th>")
                .append(_t("Transport")).append("</th><th>")
-               .append(_t("Total")).append("</th><th>")
-               .append(_t("IPv4")).append(" <img src=\"/themes/console/images/inbound.png\" alt=\"").append(_t("Inbound")).append("\" title=\"").append(_t("Inbound")).append("\"/></th><th>")
-               .append(_t("IPv4")).append(" <img src=\"/themes/console/images/outbound.png\" alt=\"").append(_t("Outbound")).append("\" title=\"").append(_t("Outbound")).append("\"/></th><th>")
-               .append(_t("IPv6")).append(" <img src=\"/themes/console/images/inbound.png\" alt=\"").append(_t("Inbound")).append("\" title=\"").append(_t("Inbound")).append("\"/></th><th>")
-               .append(_t("IPv6")).append(" <img src=\"/themes/console/images/outbound.png\" alt=\"").append(_t("Outbound")).append("\" title=\"").append(_t("Outbound")).append("\"/></th></tr>\n");
+               .append(_t("Total")).append("</th>");
+            if (showIPv4) {
+                buf.append("<th>")
+                   .append(_t("IPv4")).append(" <img src=\"/themes/console/images/inbound.png\" alt=\"").append(_t("Inbound")).append("\" title=\"").append(_t("Inbound")).append("\"/></th><th>")
+                   .append(_t("IPv4")).append(" <img src=\"/themes/console/images/outbound.png\" alt=\"").append(_t("Outbound")).append("\" title=\"").append(_t("Outbound")).append("\"/></th>");
+            }
+            if (showIPv6) {
+                buf.append("<th>")
+                   .append(_t("IPv6")).append(" <img src=\"/themes/console/images/inbound.png\" alt=\"").append(_t("Inbound")).append("\" title=\"").append(_t("Inbound")).append("\"/></th><th>")
+                   .append(_t("IPv6")).append(" <img src=\"/themes/console/images/outbound.png\" alt=\"").append(_t("Outbound")).append("\" title=\"").append(_t("Outbound")).append("\"/></th>");
+            }
+            buf.append("</tr>\n");
             boolean warnInbound = !_context.router().isHidden() && _context.router().getUptime() > 15*60*1000;
-            boolean warnIPv6 = Addresses.isConnectedIPv6();
             int[] totals = new int[5];
             for (Map.Entry<String, Transport> e : transports.entrySet()) {
                 String style = e.getKey();
@@ -221,10 +239,14 @@ public class PeerHelper extends HelperBase {
                         totals[0] += total;
                     buf.append(total);
                     for (int i = 0; i < 4; i++) {
+                        if (!showIPv4 && i < 2)
+                            continue;
+                        if (!showIPv6 && i >= 2)
+                            break;
                         int cnt = counts[idx + i];
                         buf.append("</td><td align=\"center\">");
                         if (cnt <= 0) {
-                            if ((i >= 2 || warnIPv6) && ((i & 0x01) != 0 || warnInbound))
+                            if ((i & 0x01) != 0 || warnInbound)
                                 buf.append("<img src=\"themes/console/images/info/infohelp.png\"> ");
                         } else {
                             totals[i + 1] += cnt;
@@ -234,17 +256,21 @@ public class PeerHelper extends HelperBase {
                     buf.append("</td></tr>\n");
                 }
             }
-            buf.append("<tr><td align=\"center\"><b>").append(_t("Total")).append("</b>");
+            buf.append("<tr><th align=\"center\"><b>").append(_t("Total")).append("</b>");
             for (int i = 0; i < 5; i++) {
+                if (!showIPv4 && i > 0 && i < 3)
+                    continue;
+                if (!showIPv6 && i >= 3)
+                    break;
                 int cnt = totals[i];
-                buf.append("</td><td align=\"center\">");
+                buf.append("</th><th align=\"center\">");
                 if (cnt <= 0) {
-                    if ((i >= 3 || warnIPv6) && ((i & 0x01) == 0 || warnInbound))
+                    if ((i & 0x01) == 0 || warnInbound)
                         buf.append("<img src=\"themes/console/images/info/infowarn.png\"> ");
                 }
                 buf.append("<b>").append(cnt).append("</b");
             }
-            buf.append("</td></tr></table>\n");
+            buf.append("</th></tr></table>\n");
             out.write(buf.toString());
         }
         out.flush();
