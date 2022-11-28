@@ -658,7 +658,7 @@ public final class SelfSignedGenerator {
         int wrap2len = 4;
         int ext2len = oid2.length + TRUE.length + spaceFor(wrap2len);
 
-        int wrap3len = spaceFor(TRUE.length);
+        int wrap3len = spaceFor(TRUE.length + 3);  // + path length constraint INTEGER
         int ext3len = oid3.length + TRUE.length + spaceFor(wrap3len);
 
         int wrap41len = 0;
@@ -758,13 +758,17 @@ public final class SelfSignedGenerator {
             idx += oid3.length;
             System.arraycopy(TRUE, 0, rv, idx, TRUE.length);
             idx += TRUE.length;
-            // octet string wraps an sequence containing TRUE
+            // octet string wraps an sequence containing TRUE and path length constraint INTEGER
             rv[idx++] = (byte) 0x04;
             idx = intToASN1(rv, idx, wrap3len);
             rv[idx++] = (byte) 0x30;
-            idx = intToASN1(rv, idx, TRUE.length);
+            idx = intToASN1(rv, idx, TRUE.length + 3);
             System.arraycopy(TRUE, 0, rv, idx, TRUE.length);
             idx += TRUE.length;
+            // INTEGER path length = 0
+            rv[idx++] = 0x02;
+            rv[idx++] = 1;
+            rv[idx++] = 0;
         }
 
         // Key Usage (critical)
