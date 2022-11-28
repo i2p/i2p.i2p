@@ -790,8 +790,8 @@ public class GeneralHelper {
     public boolean hasEncType(int tunnel, int encType) {
         TunnelController tun = getController(tunnel);
         if (tun == null) {
-            // New clients and servers default to both
-            return encType == 4 || encType == 0;
+            // New clients and servers now default to ECIES-only
+            return encType == 4;
         }
         // migration: HTTP proxy and shared clients default to both
         String type = tun.getType();
@@ -806,9 +806,9 @@ public class GeneralHelper {
         } else if (TunnelController.TYPE_HTTP_SERVER.equals(type) ||
                    TunnelController.TYPE_IRC_SERVER.equals(type) ||
                    TunnelController.TYPE_STREAMR_SERVER.equals(type)) {
-            dflt = "4,0";
+            dflt = "4";
         } else {
-            dflt = "0";
+            dflt = "4,0";
         }
         String senc = getProperty(tunnel, "i2cp.leaseSetEncType", dflt);
         String[] senca = DataHelper.split(senc, ",");

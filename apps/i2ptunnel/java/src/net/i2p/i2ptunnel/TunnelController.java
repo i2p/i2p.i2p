@@ -891,7 +891,7 @@ public class TunnelController implements Logging {
                 if (!_config.containsKey(OPT_BUNDLE_REPLY))
                     _config.setProperty(OPT_BUNDLE_REPLY, "false");
                 if (!_config.containsKey(OPT_ENCTYPE))
-                    _config.setProperty(OPT_ENCTYPE, "4,0");
+                    _config.setProperty(OPT_ENCTYPE, "4");
             } else if (!isClient(type)) {
                 // override UI that sets it to false
                 _config.setProperty(OPT_BUNDLE_REPLY, "true");
@@ -903,7 +903,7 @@ public class TunnelController implements Logging {
                 if (!_config.containsKey(OPT_LOW_TAGS))
                     _config.setProperty(OPT_LOW_TAGS, "14");
                 if (!_config.containsKey(OPT_ENCTYPE))
-                    _config.setProperty(OPT_ENCTYPE, "4,0");
+                    _config.setProperty(OPT_ENCTYPE, "4");
             }
             // same default logic as in EditBean.getSigType() and GeneralHelper.getSigType()
             if (!isClient(type) ||
