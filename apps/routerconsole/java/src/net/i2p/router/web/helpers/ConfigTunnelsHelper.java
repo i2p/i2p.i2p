@@ -5,6 +5,7 @@ import java.util.Set;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.transport.TransportUtil;
 import net.i2p.router.web.HelperBase;
@@ -29,15 +30,16 @@ public class ConfigTunnelsHelper extends HelperBase {
         }
 
         buf.append("<table id=\"tunnelconfig\">\n");
-        TunnelPoolSettings exploratoryIn = _context.tunnelManager().getInboundSettings();
-        TunnelPoolSettings exploratoryOut = _context.tunnelManager().getOutboundSettings();
+        TunnelManagerFacade mgr = _context.tunnelManager();
+        TunnelPoolSettings exploratoryIn = mgr.getInboundSettings();
+        TunnelPoolSettings exploratoryOut = mgr.getOutboundSettings();
         
         renderForm(buf, 0, "exploratory", _t("Exploratory tunnels"), exploratoryIn, exploratoryOut);
         
         cur = 1;
         for (Destination dest : clients) {
-            TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(dest.calculateHash());
-            TunnelPoolSettings out = _context.tunnelManager().getOutboundSettings(dest.calculateHash());
+            TunnelPoolSettings in = mgr.getInboundSettings(dest.calculateHash());
+            TunnelPoolSettings out = mgr.getOutboundSettings(dest.calculateHash());
             
             if (in == null || in.getAliasOf() != null ||
                 out == null || out.getAliasOf() != null) {

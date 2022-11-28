@@ -5,6 +5,7 @@ import java.util.Map;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
+import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.web.FormHandler;
 import net.i2p.util.Log;
@@ -38,6 +39,7 @@ public class ConfigTunnelsHandler extends FormHandler {
      *
      */
     private void saveChanges() {
+        TunnelManagerFacade mgr = _context.tunnelManager();
         boolean saveRequired = false;
         Map<String, String> changes = new HashMap<String, String>();
         
@@ -56,8 +58,8 @@ public class ConfigTunnelsHandler extends FormHandler {
             TunnelPoolSettings in = null;
             TunnelPoolSettings out = null;
             if ("exploratory".equals(poolName)) {
-                in = _context.tunnelManager().getInboundSettings();
-                out = _context.tunnelManager().getOutboundSettings();
+                in = mgr.getInboundSettings();
+                out = mgr.getOutboundSettings();
             } else {
                 try {
                     client.fromBase64(poolName);
@@ -66,8 +68,8 @@ public class ConfigTunnelsHandler extends FormHandler {
                     index++;
                     continue;
                 }
-                in = _context.tunnelManager().getInboundSettings(client);
-                out = _context.tunnelManager().getOutboundSettings(client);
+                in = mgr.getInboundSettings(client);
+                out = mgr.getOutboundSettings(client);
             }
             
             if ( (in == null) || (out == null) ) {
@@ -115,15 +117,15 @@ public class ConfigTunnelsHandler extends FormHandler {
                     _log.debug("Inbound exploratory settings: " + in);
                     _log.debug("Outbound exploratory settings: " + out);
                 }
-                _context.tunnelManager().setInboundSettings(in);
-                _context.tunnelManager().setOutboundSettings(out);
+                mgr.setInboundSettings(in);
+                mgr.setOutboundSettings(out);
             } else {
                 if (_log.shouldLog(Log.DEBUG)) {
                     _log.debug("Inbound settings for " + client.toBase64() + ": " + in);
                     _log.debug("Outbound settings for " + client.toBase64() + ": " + out);
                 }
-                _context.tunnelManager().setInboundSettings(client, in);
-                _context.tunnelManager().setOutboundSettings(client, out);
+                mgr.setInboundSettings(client, in);
+                mgr.setOutboundSettings(client, out);
             }
             
             updated++;
