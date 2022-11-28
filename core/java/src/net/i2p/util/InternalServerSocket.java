@@ -23,7 +23,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  *  Can only be connected by InternalSocket.
  *
  *  Warning - this uses Piped Streams, which don't like multiple writers from threads
- *  that may vanish. If you do use multipe writers,
+ *  that may vanish. If you do use multiple writers,
  *  you may get intermittent 'write end dead' or 'pipe broken' IOExceptions on the reader side.
  *  See http://techtavern.wordpress.com/2008/07/16/whats-this-ioexception-write-end-dead/
  * @since 0.7.9
