@@ -40,7 +40,7 @@ class PacketHandler {
     private final Map<RemoteHostId, Object> _failCache;
     private final BlockingQueue<UDPPacket> _inboundQueue;
     private static final Object DUMMY = new Object();
-    private final boolean _enableSSU2;
+    private final boolean _enableSSU1, _enableSSU2;
     private final int _networkID;
     
     private static final int TYPE_POISON = -99999;
@@ -58,11 +58,12 @@ class PacketHandler {
     
     private enum AuthType { NONE, INTRO, BOBINTRO, SESSION }
 
-    PacketHandler(RouterContext ctx, UDPTransport transport, boolean enableSSU2, EstablishmentManager establisher,
+    PacketHandler(RouterContext ctx, UDPTransport transport, boolean enableSSU1, boolean enableSSU2, EstablishmentManager establisher,
                   InboundMessageFragments inbound, PeerTestManager testManager, IntroductionManager introManager) {
         _context = ctx;
         _log = ctx.logManager().getLog(PacketHandler.class);
         _transport = transport;
+        _enableSSU1 = enableSSU1;
         _enableSSU2 = enableSSU2;
         _establisher = establisher;
         _inbound = inbound;
@@ -264,7 +265,10 @@ class PacketHandler {
                             _log.debug("Packet received is not for an inbound or outbound establishment");
                         // ok, not already known establishment, try as a new one
                         // Last chance for success, using our intro key
-                        receivePacket(reader, packet, PeerType.NEW_PEER);
+                        if (_enableSSU1)
+                            receivePacket(reader, packet, PeerType.NEW_PEER);
+                        else
+                            receiveSSU2Packet(rem, packet, (InboundEstablishState2) null);
                     }
                 }
             } else {
