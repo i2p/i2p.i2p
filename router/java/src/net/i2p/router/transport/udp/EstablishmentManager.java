@@ -435,8 +435,14 @@ class EstablishmentManager {
                                 v2intros = true;
                                 break;
                             }
-                            if (!v2intros)
+                            if (!v2intros) {
+                                if (_builder == null) {
+                                    _transport.markUnreachable(toHash);
+                                    _transport.failed(msg, "No v2 introducers");
+                                    return;
+                                }
                                 version = 1;
+                            }
                         }
                     }
                     if (version == 2) {
@@ -445,7 +451,7 @@ class EstablishmentManager {
                         int ourMTU = _transport.getMTU(isIPv6);
                         if ((mtu > 0 && mtu < PeerState2.MIN_MTU) ||
                             (ourMTU > 0 && ourMTU < PeerState2.MIN_MTU)) {
-                            if (ra.getTransportStyle().equals("SSU2")) {
+                            if (_builder == null || ra.getTransportStyle().equals("SSU2")) {
                                 _transport.markUnreachable(toHash);
                                 _transport.failed(msg, "MTU too small");
                                 return;
