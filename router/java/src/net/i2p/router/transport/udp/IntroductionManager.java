@@ -85,9 +85,9 @@ class IntroductionManager {
     private final UDPTransport _transport;
     private final PacketBuilder _builder;
     private final PacketBuilder2 _builder2;
-    /** map of relay tag to PeerState that should receive the introduction */
+    /** map of relay tag to Charlie PeerState that should receive the introduction (we are Bob) */
     private final Map<Long, PeerState> _outbound;
-    /** map of relay tag to PeerState who have given us introduction tags */
+    /** map of relay tag to Bob PeerState who have given us introduction tags (we are Charlie) */
     private final Map<Long, PeerState> _inbound;
     /** map of relay nonce to alice PeerState who requested it */
     private final ConcurrentHashMap<Long, PeerState2> _nonceToAlice;
@@ -252,7 +252,7 @@ class IntroductionManager {
                         _log.info("Reusing introducer: " + ua.getIntroducerHost(i));
                 } else {
                     // SSU 2
-                    if (ssu2count >= 2)
+                    if (_builder != null && ssu2count >= 2)
                         continue;
                     intro = new Introducer(ua.getIntroducerHash(i), tag, sexp);
                     ssu2count++;
@@ -277,7 +277,7 @@ class IntroductionManager {
                     if (b64.equals(intro.shash))
                         continue outerloop;
                 }
-                if (ssu2count >= 2)
+                if (_builder != null && ssu2count >= 2)
                     continue;
             }
             RouterInfo ri = _context.netDb().lookupRouterInfoLocally(hash);
