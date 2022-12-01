@@ -225,6 +225,8 @@ public class PeerHelper extends HelperBase {
                 for (int idx = 0; idx < 8; idx += 4) {
                     if (style.equals("NTCP") && idx == 0)
                         continue;
+                    if (style.equals("SSU") && idx == 0 && !_context.getBooleanProperty(TransportManager.PROP_ENABLE_SSU1))
+                        continue;
                     buf.append("<tr><td align=\"center\"><b>")
                        .append(style)
                        .append(1 + (idx / 4))
