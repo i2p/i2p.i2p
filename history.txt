@@ -1,3 +1,13 @@
+2022-12-02 zzz
+ * Debian: Fix for stray symlinks in / (gitlab #376)
+
+2022-11-30 zzz
+ * SSU: Start work on option to disable SSU 1
+
+2022-11-28 zzz
+ * i2ptunnel: Update encryption type defaults
+ * Util: Add path length constraint = 0 to selfsigned certs
+
 2022-11-26 zzz
  * Console: Hide IPv4/v6 columns on /peers status tab
  * i2ptunnel: Fix SOCKS outproxy port configuration
