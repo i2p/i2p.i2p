@@ -416,7 +416,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 try {
                     InetAddress addr = InetAddress.getByName(ips);
                     int mtu = MTU.getMTU(addr, true);
-                    if (mtu > 0 && mtu < PeerState2.MIN_MTU) {
+                    if (mtu > 0 && mtu < PeerState2.MIN_MTU && _enableSSU1) {
                         _log.logAlways(Log.WARN, "Disabling SSU2, MTU is " + mtu + ", minimum is " + PeerState2.MIN_MTU);
                         enableSSU2 = false;
                         break;
@@ -1141,6 +1141,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     public int getMTU(boolean ipv6) {
         // TODO multiple interfaces of each type
+        if (!_enableSSU1)
+            return getSSU2MTU(ipv6);
         return ipv6 ? _mtu_ipv6 : _mtu;
     }
 
