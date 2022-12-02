@@ -106,6 +106,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private int _mtu_ipv6 = PeerState.MIN_IPV6_MTU;
     private int _mtu_ssu2 = PeerState2.MIN_SSU_IPV4_MTU;
     private int _mtu_ssu2_ipv6 = PeerState2.MIN_SSU_IPV6_MTU;
+    private final int _defaultMTU;
     private boolean _mismatchLogged;
     private final int _networkID;
 
@@ -408,6 +409,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         // SSU2 key and IV generation if required
         _enableSSU1 = dh != null;
+        _defaultMTU = _enableSSU1 ? PeerState.LARGE_MTU : PeerState2.DEFAULT_MTU;
         boolean enableSSU2 = xdh != null;
         if (enableSSU2) {
             // if any ipv4 address is lower than 1280 MTU, disable
@@ -2834,7 +2836,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 mtu = getMTU(false);
             }
             options.setProperty(UDPAddress.PROP_CAPACITY, caps);
-            if (mtu != PeerState.LARGE_MTU && mtu > 0)
+            if (mtu != _defaultMTU && mtu > 0)
                 options.setProperty(UDPAddress.PROP_MTU, Integer.toString(mtu));
             if (_enableSSU2 && (mtu >= PeerState2.MIN_MTU || mtu == 0))
                 addSSU2Options(options);
@@ -2904,7 +2906,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         // MTU since 0.9.2
         int mtu = getMTU(isIPv6);
-        if (mtu != PeerState.LARGE_MTU && mtu > 0)
+        if (mtu != _defaultMTU && mtu > 0)
             options.setProperty(UDPAddress.PROP_MTU, Integer.toString(mtu));
 
         if (directIncluded || introducersIncluded) {
@@ -2961,7 +2963,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     OrderedProperties opts = new OrderedProperties(); 
                     opts.setProperty(UDPAddress.PROP_CAPACITY, CAP_IPV6);
                     mtu = getMTU(true);
-                    if (mtu > 0)
+                    if (mtu != _defaultMTU && mtu > 0)
                         opts.setProperty(UDPAddress.PROP_MTU, Integer.toString(mtu));
                     if (_enableSSU2)
                         addSSU2Options(opts);
@@ -2996,7 +2998,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // Make an empty "4" or "6" address
             OrderedProperties opts = new OrderedProperties(); 
             opts.setProperty(UDPAddress.PROP_CAPACITY, isIPv6 ? CAP_IPV6 : CAP_IPV4);
-            if (mtu != PeerState.LARGE_MTU && mtu > 0)
+            if (mtu != _defaultMTU && mtu > 0)
                 opts.setProperty(UDPAddress.PROP_MTU, Integer.toString(mtu));
             if (_enableSSU2 && (mtu >= PeerState2.MIN_MTU || mtu == 0))
                 addSSU2Options(opts);
