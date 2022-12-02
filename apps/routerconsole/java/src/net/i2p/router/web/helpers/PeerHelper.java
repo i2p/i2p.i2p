@@ -218,6 +218,7 @@ public class PeerHelper extends HelperBase {
             buf.append("</tr>\n");
             boolean warnInbound = !_context.router().isHidden() && _context.router().getUptime() > 15*60*1000;
             int[] totals = new int[5];
+            int rows = 0;
             for (Map.Entry<String, Transport> e : transports.entrySet()) {
                 String style = e.getKey();
                 Transport t = e.getValue();
@@ -227,6 +228,7 @@ public class PeerHelper extends HelperBase {
                         continue;
                     if (style.equals("SSU") && idx == 0 && !_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_SSU1))
                         continue;
+                    rows++;
                     buf.append("<tr><td align=\"center\"><b>")
                        .append(style)
                        .append(1 + (idx / 4))
@@ -258,21 +260,24 @@ public class PeerHelper extends HelperBase {
                     buf.append("</td></tr>\n");
                 }
             }
-            buf.append("<tr><th align=\"center\"><b>").append(_t("Total")).append("</b>");
-            for (int i = 0; i < 5; i++) {
-                if (!showIPv4 && i > 0 && i < 3)
-                    continue;
-                if (!showIPv6 && i >= 3)
-                    break;
-                int cnt = totals[i];
-                buf.append("</th><th align=\"center\">");
-                if (cnt <= 0) {
-                    if ((i & 0x01) == 0 || warnInbound)
-                        buf.append("<img src=\"themes/console/images/info/infowarn.png\"> ");
+            if (rows > 1) {
+                buf.append("<tr><th align=\"center\"><b>").append(_t("Total")).append("</b>");
+                for (int i = 0; i < 5; i++) {
+                    if (!showIPv4 && i > 0 && i < 3)
+                        continue;
+                    if (!showIPv6 && i >= 3)
+                        break;
+                    int cnt = totals[i];
+                    buf.append("</th><th align=\"center\">");
+                    if (cnt <= 0) {
+                        if ((i & 0x01) == 0 || warnInbound)
+                            buf.append("<img src=\"themes/console/images/info/infowarn.png\"> ");
+                    }
+                    buf.append("<b>").append(cnt).append("</b");
                 }
-                buf.append("<b>").append(cnt).append("</b");
+                buf.append("</th></tr>");
             }
-            buf.append("</th></tr></table>\n");
+            buf.append("</table>\n");
             out.write(buf.toString());
         }
         out.flush();
