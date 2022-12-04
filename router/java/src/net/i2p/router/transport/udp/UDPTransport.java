@@ -287,6 +287,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                                                                     Status.REJECT_UNSOLICITED,
                                                                     Status.IPV4_FIREWALLED_IPV6_OK,
                                                                     Status.IPV4_SNAT_IPV6_OK,
+                                                                    Status.IPV4_SNAT_IPV6_UNKNOWN,
                                                                     Status.IPV4_FIREWALLED_IPV6_UNKNOWN);
 
     private static final Set<Status> STATUS_IPV6_FW =    EnumSet.of(Status.IPV4_OK_IPV6_FIREWALLED,
@@ -297,6 +298,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                                                                     Status.REJECT_UNSOLICITED,
                                                                     Status.IPV4_FIREWALLED_IPV6_OK,
                                                                     Status.IPV4_SNAT_IPV6_OK,
+                                                                    Status.IPV4_SNAT_IPV6_UNKNOWN,
                                                                     Status.IPV4_FIREWALLED_IPV6_UNKNOWN,
                                                                     Status.IPV4_OK_IPV6_FIREWALLED,
                                                                     Status.IPV4_UNKNOWN_IPV6_FIREWALLED,
@@ -328,6 +330,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     private static final Set<Status> STATUS_OK =         EnumSet.of(Status.OK,
                                                                     Status.IPV4_DISABLED_IPV6_OK);
+
+    private static final Set<Status> STATUS_IPV4_SNAT =  EnumSet.of(Status.DIFFERENT,
+                                                                    Status.IPV4_SNAT_IPV6_OK,
+                                                                    Status.IPV4_SNAT_IPV6_UNKNOWN);
 
 
     /**
@@ -3904,6 +3910,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return Status.DIFFERENT;
         }
         return _reachabilityStatus; 
+    }
+
+    /**
+     *  Is IPv4 Symmetric NATted?
+     *  @since 0.9.57
+     */
+    boolean isSnatted() { 
+        return STATUS_IPV4_SNAT.contains(getReachabilityStatus());
     }
 
     /**

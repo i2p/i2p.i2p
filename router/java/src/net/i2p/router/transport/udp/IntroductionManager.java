@@ -1059,7 +1059,7 @@ class IntroductionManager {
         if (rcode == SSU2Util.RELAY_ACCEPT) {
             RemoteHostId aliceID = new RemoteHostId(testIP, testPort);
             EstablishmentManager.Token tok = _transport.getEstablisher().getInboundToken(aliceID, 60*1000);
-            token = tok.token;
+            token = tok.getToken();
         } else {
             token = 0;
         }

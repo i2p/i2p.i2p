@@ -797,12 +797,16 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                             _log.warn("Migration successful, changed address from " + _remoteHostId + " to " + from + " for " + this);
                         _transport.changePeerAddress(this, from);
                         _mtu = MIN_MTU;
-                        EstablishmentManager.Token token = _transport.getEstablisher().getInboundToken(from);
-                        SSU2Payload.Block block = new SSU2Payload.NewTokenBlock(token.token, token.expires);
-                        UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.<Fragment>emptyList(),
-                                                                             Collections.singletonList(block),
-                                                                             this);
-                        _transport.send(pkt);
+                        if (isIPv6() || !_transport.isSnatted()) {
+                            EstablishmentManager.Token token = _transport.getEstablisher().getInboundToken(from);
+                            SSU2Payload.Block block = new SSU2Payload.NewTokenBlock(token);
+                            UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.<Fragment>emptyList(),
+                                                                                 Collections.singletonList(block),
+                                                                                 this);
+                            _transport.send(pkt);
+                        } else {
+                            messagePartiallyReceived();
+                        }
                     } else {
                         // caller will handle
                         // ACK-eliciting

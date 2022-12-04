@@ -361,10 +361,11 @@ class PacketBuilder2 {
             _log.debug("Sending termination " + reason + " to : " + peer);
         List<Block> blocks = new ArrayList<Block>(2);
         if (peer.getKeyEstablishedTime() - _context.clock().now() > EstablishmentManager.IB_TOKEN_EXPIRATION / 2 &&
-            !_context.router().gracefulShutdownInProgress()) {
+            !_context.router().gracefulShutdownInProgress() &&
+            (peer.isIPv6() || !_transport.isSnatted())) {
             // update token
             EstablishmentManager.Token token = _transport.getEstablisher().getInboundToken(peer.getRemoteHostId());
-            Block block = new SSU2Payload.NewTokenBlock(token.token, token.expires);
+            Block block = new SSU2Payload.NewTokenBlock(token);
             blocks.add(block);
         }
         Block block = new SSU2Payload.TerminationBlock(reason, peer.getReceivedMessages().getHighestSet());
@@ -904,6 +905,7 @@ class PacketBuilder2 {
 
     /**
      *  @param packet containing only 32 byte header
+     *  @param token may be null
      */
     private void encryptSessionCreated(UDPPacket packet, HandshakeState state,
                                        byte[] hdrKey1, byte[] hdrKey2, long relayTag,
@@ -925,7 +927,7 @@ class PacketBuilder2 {
                 blocks.add(block);
             }
             if (token != null) {
-                block = new SSU2Payload.NewTokenBlock(token.token, token.expires);
+                block = new SSU2Payload.NewTokenBlock(token);
                 len += block.getTotalLength();
                 blocks.add(block);
             }
@@ -1067,6 +1069,7 @@ class PacketBuilder2 {
      *
      *  @param packet containing only 16 byte header
      *  @param addPadding force-add exactly this size a padding block, for jumbo only
+     *  @param token may be null
      */
     private void encryptSessionConfirmed(UDPPacket packet, HandshakeState state, int mtu, int numFragments, int addPadding,
                                          boolean isIPv6, byte[] hdrKey1, byte[] hdrKey2,
@@ -1083,7 +1086,7 @@ class PacketBuilder2 {
             blocks.add(riblock);
             // only if room
             if (token != null && mtu - (SHORT_HEADER_SIZE + KEY_LEN + MAC_LEN + len + MAC_LEN) >= 15) {
-                Block block = new SSU2Payload.NewTokenBlock(token.token, token.expires);
+                Block block = new SSU2Payload.NewTokenBlock(token);
                 len += block.getTotalLength();
                 blocks.add(block);
             }

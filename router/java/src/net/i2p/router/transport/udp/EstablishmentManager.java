@@ -14,6 +14,8 @@ import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +47,8 @@ import static net.i2p.router.transport.udp.OutboundEstablishState2.IntroState.*;
 import static net.i2p.router.transport.udp.SSU2Util.*;
 import net.i2p.router.util.DecayingHashSet;
 import net.i2p.router.util.DecayingBloomFilter;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.util.Addresses;
 import net.i2p.util.HexDump;
 import net.i2p.util.I2PThread;
@@ -176,8 +180,9 @@ class EstablishmentManager {
     private static final String PROP_DISABLE_EXT_OPTS = "i2np.udp.disableExtendedOptions";
 
     // SSU 2
-    private static final int MAX_TOKENS = 512;
-    public static final long IB_TOKEN_EXPIRATION = 2*60*60*1000L;
+    private static final int MIN_TOKENS = 128;
+    private static final int MAX_TOKENS = 2048;
+    public static final long IB_TOKEN_EXPIRATION = 60*60*1000L;
     private static final long MAX_SKEW = 2*60*1000;
     private static final String TOKEN_FILE = "ssu2tokens.txt";
 
@@ -198,8 +203,10 @@ class EstablishmentManager {
         _outboundByHash = new ConcurrentHashMap<Hash, OutboundEstablishState>();
         _inboundBans = new LHMCache<RemoteHostId, Long>(32);
         if (_enableSSU2) {
-            _inboundTokens = new LHMCache<RemoteHostId, Token>(MAX_TOKENS);
-            _outboundTokens = new LHMCache<RemoteHostId, Token>(MAX_TOKENS);
+            // roughly scale based on expected traffic
+            int tokenCacheSize = Math.max(MIN_TOKENS, Math.min(MAX_TOKENS, 3 * _transport.getMaxConnections() / 4));
+            _inboundTokens = new InboundTokens(tokenCacheSize);
+            _outboundTokens = new LHMCache<RemoteHostId, Token>(tokenCacheSize);
         } else {
             _inboundTokens = null;
             _outboundTokens = null;
@@ -233,6 +240,8 @@ class EstablishmentManager {
         //_context.statManager().createRateStat("udp.queueDropSize", "How many messages were queued up when it was considered full, causing a tail drop?", "udp", UDPTransport.RATES);
         //_context.statManager().createRateStat("udp.queueAllowTotalLifetime", "When a peer is retransmitting and we probabalistically allow a new message, what is the sum of the pending message lifetimes? (period is the new message's lifetime)?", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.dupDHX", "Session request replay", "udp", new long[] { 24*60*60*1000L } );
+        if (_enableSSU2)
+            _context.statManager().createRequiredRateStat("udp.inboundTokenLifetime", "SSU2 token lifetime (ms)", "udp", new long[] { 5*60*1000L } );
     }
     
     public synchronized void startup() {
@@ -2538,14 +2547,20 @@ class EstablishmentManager {
      *  Remember a token that can be used later to connect to the peer
      *
      *  @param token nonzero
+     *  @param expires absolute time
      *  @since 0.9.54
      */
     public void addOutboundToken(RemoteHostId peer, long token, long expires) {
-        // so we don't use a token about to expire
-        expires -= 2*60*1000;
-        if (expires < _context.clock().now())
+        long now = _context.clock().now();
+        if (expires < now)
             return;
-        Token tok = new Token(token, expires);
+        if (expires > now + 2*60*1000) {
+            // don't save if symmetric natted
+            byte[] ip = peer.getIP();
+            if (ip != null && ip.length == 4 && _transport.isSnatted())
+                return;
+        }
+        Token tok = new Token(token, expires, now);
         synchronized(_outboundTokens) {
             _outboundTokens.put(peer, tok);
         }
@@ -2564,9 +2579,9 @@ class EstablishmentManager {
         }
         if (tok == null)
             return 0;
-        if (tok.expires < _context.clock().now())
+        if (tok.getExpiration() < _context.clock().now())
             return 0;
-        return tok.token;
+        return tok.getToken();
     }
 
     /**
@@ -2624,9 +2639,10 @@ class EstablishmentManager {
     }
 
     /**
-     *  Get a token that can be used later for the peer to connect to us
+     *  Get a token that can be used later for the peer to connect to us.
      *
-     *  @param expiration time from now
+     *  @param expiration time from now, will be reduced if necessary based on cache eviction time.
+     *  @return non-null
      *  @since 0.9.55
      */
     public Token getInboundToken(RemoteHostId peer, long expiration) {
@@ -2635,15 +2651,27 @@ class EstablishmentManager {
             token = _context.random().nextLong();
         } while (token == 0);
         long now = _context.clock().now();
-        Token tok;
+        // shorten expiration based on average eviction time
+        RateStat rs = _context.statManager().getRate("udp.inboundTokenLifetime");
+        if (rs != null) {
+            Rate r = rs.getRate(5*60*1000);
+            if (r != null) {
+                long lifetime = (long) (r.getAverageValue() * 0.9d); // margin
+                if (lifetime > 0) {
+                    if (lifetime < 2*60*1000)
+                        lifetime = 2*60*1000;
+                    if (lifetime < expiration)
+                        expiration = lifetime;
+                }
+            }
+        }
+        long expires = now + expiration;
+        Token tok = new Token(token, expires, now);
         synchronized(_inboundTokens) {
-            // shorten expiration based on _inboundTokens size
-            if (expiration > 2*60*1000 && _inboundTokens.size() >  MAX_TOKENS / 2)
-                expiration /= 2;
-            long expires = now + expiration;
-            tok = new Token(token, expires);
             _inboundTokens.put(peer, tok);
         }
+        if (_log.shouldDebug())
+            _log.debug("Add inbound " + tok + " for " + peer);
         return tok;
     }
 
@@ -2661,21 +2689,45 @@ class EstablishmentManager {
             tok = _inboundTokens.get(peer);
             if (tok == null)
                 return false;
-            if (tok.token != token)
+            if (tok.getToken() != token)
                 return false;
             _inboundTokens.remove(peer);
         }
-        return tok.expires >= _context.clock().now();
+        boolean rv = tok.getExpiration() >= _context.clock().now();
+        if (rv && _log.shouldDebug())
+            _log.debug("Used inbound " + tok + " for " + peer);
+        return rv;
     }
 
     public static class Token {
-        public final long token, expires;
-        public Token(long tok, long exp) {
-            token = tok; expires = exp;
+        private final long token;
+        // save space until 2106
+        private final int expires;
+        private final int added;
+
+        /**
+         *  @param exp absolute time, not relative to now
+         */
+        public Token(long tok, long exp, long now) {
+            token = tok;
+            expires = (int) (exp >> 10);
+            added = (int) (now >> 10);
+        }
+        /** @since 0.9.57 */
+        public long getToken() { return token; }
+        /** @since 0.9.57 */
+        public long getExpiration() { return (expires & 0xFFFFFFFFL) << 10; }
+        /** @since 0.9.57 */
+        public long getWhenAdded() { return (added & 0xFFFFFFFFL) << 10; }
+        /** @since 0.9.57 */
+        public String toString() {
+            return "Token " + token + " added " + DataHelper.formatTime(getWhenAdded()) + " expires " + DataHelper.formatTime(getExpiration());
         }
     }
 
     /**
+     *  Not threaded, because we're holding the token cache locks anyway.
+     *
      *  Format:
      *
      *<pre>
@@ -2741,7 +2793,7 @@ class EstablishmentManager {
                                         int port = Integer.parseInt(s[2]);
                                         long tok = Long.parseLong(s[3]);
                                         RemoteHostId id = new RemoteHostId(ip, port);
-                                        Token token = new Token(tok, exp);
+                                        Token token = new Token(tok, exp, now);
                                         if (s[0].equals("I"))
                                             _inboundTokens.put(id, token);
                                         else
@@ -2790,27 +2842,39 @@ class EstablishmentManager {
             }
             long now = _context.clock().now();
             int count = 0;
+            // Roughly speaking, the LHMCache will iterate newest-first,
+            // so when we add them back in loadTokens(), the oldest would be at
+            // the head of the map and the newest would be purged first.
+            // Sort them by expiration oldest-first so loadTokens() will
+            // put them in the LHMCache in the right order.
+            TokenComparator comp = new TokenComparator();
+            List<Map.Entry<RemoteHostId, Token>> tmp;
             synchronized(_inboundTokens) {
-                for (Map.Entry<RemoteHostId, Token> e : _inboundTokens.entrySet()) {
-                     Token token = e.getValue();
-                     long exp = token.expires;
-                     if (exp <= now)
-                         continue;
-                     RemoteHostId id = e.getKey();
-                     out.println("I " + Addresses.toString(id.getIP()) + ' ' + id.getPort() + ' ' + token.token + ' ' + exp);
-                     count++;
-                }
+                tmp = new ArrayList<Map.Entry<RemoteHostId, Token>>(_inboundTokens.entrySet());
             }
+            Collections.sort(tmp, comp);
+            for (Map.Entry<RemoteHostId, Token> e : tmp) {
+                 Token token = e.getValue();
+                 long exp = token.getExpiration();
+                 if (exp <= now)
+                     continue;
+                 RemoteHostId id = e.getKey();
+                 out.println("I " + Addresses.toString(id.getIP()) + ' ' + id.getPort() + ' ' + token.getToken() + ' ' + exp);
+                 count++;
+            }
+            tmp.clear();
             synchronized(_outboundTokens) {
-                for (Map.Entry<RemoteHostId, Token> e : _outboundTokens.entrySet()) {
-                     Token token = e.getValue();
-                     long exp = token.expires;
-                     if (exp <= now)
-                         continue;
-                     RemoteHostId id = e.getKey();
-                     out.println("O " + Addresses.toString(id.getIP()) + ' ' + id.getPort() + ' ' + token.token + ' ' + exp);
-                     count++;
-                }
+                tmp.addAll(_outboundTokens.entrySet());
+            }
+            Collections.sort(tmp, comp);
+            for (Map.Entry<RemoteHostId, Token> e : tmp) {
+                 Token token = e.getValue();
+                 long exp = token.getExpiration();
+                 if (exp <= now)
+                     continue;
+                 RemoteHostId id = e.getKey();
+                 out.println("O " + Addresses.toString(id.getIP()) + ' ' + id.getPort() + ' ' + token.getToken() + ' ' + exp);
+                 count++;
             }
             if (out.checkError())
                 throw new IOException("Failed write to " + f);
@@ -2823,6 +2887,45 @@ class EstablishmentManager {
             if (out != null) out.close();
         }
 
+    }
+
+    /**
+     * Soonest expiration first
+     * @since 0.9.57
+     */
+    private static class TokenComparator implements Comparator<Map.Entry<RemoteHostId, Token>> {
+        public int compare(Map.Entry<RemoteHostId, Token> l, Map.Entry<RemoteHostId, Token> r) {
+             long le = l.getValue().expires;
+             long re = r.getValue().expires;
+             if (le < re) return -1;
+             if (le > re) return 1;
+             return 0;
+        }
+    }
+
+    /**
+     * For inbound tokens only, to record eviction time in a stat,
+     * for use in setting expiration times.
+     *
+     * @since 0.9.57
+     */
+    private class InboundTokens extends LHMCache<RemoteHostId, Token> {
+
+        public InboundTokens(int max) {
+            super(max);
+        }
+
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<RemoteHostId, Token> eldest) {
+            boolean rv = super.removeEldestEntry(eldest);
+            if (rv) {
+                long lifetime = _context.clock().now() - eldest.getValue().getWhenAdded();
+                _context.statManager().addRateData("udp.inboundTokenLifetime", lifetime);
+                if (_log.shouldDebug())
+                    _log.debug("Remove oldest inbound " + eldest.getValue() + " for " + eldest.getKey());
+            }
+            return rv;
+        }
     }
 
     /**
@@ -2968,7 +3071,7 @@ class EstablishmentManager {
             _activity = 0;
             if (_lastFailsafe + FAILSAFE_INTERVAL < now) {
                 _lastFailsafe = now;
-                doFailsafe();
+                doFailsafe(now);
             }
 
             long nextSendTime = Math.min(handleInbound(), handleOutbound());
@@ -2991,7 +3094,7 @@ class EstablishmentManager {
         }
 
         /** @since 0.9.2 */
-        private void doFailsafe() {
+        private void doFailsafe(long now) {
             for (Iterator<OutboundEstablishState> iter = _liveIntroductions.values().iterator(); iter.hasNext(); ) {
                 OutboundEstablishState state = iter.next();
                 if (state.getLifetime() > 3*MAX_OB_ESTABLISH_TIME) {
@@ -3016,6 +3119,30 @@ class EstablishmentManager {
                         _log.warn("Failsafe remove OBBH " + state);
                 }
             }
+            int count = 0;
+            synchronized(_inboundTokens) {
+                for (Iterator<Token> iter = _inboundTokens.values().iterator(); iter.hasNext(); ) {
+                    Token tok = iter.next();
+                    if (tok.getExpiration() < now) {
+                        iter.remove();
+                        count++;
+                    }
+                }
+            }
+            if (count > 0 && _log.shouldDebug())
+                _log.debug("Expired " + count + " inbound tokens");
+            count = 0;
+            synchronized(_outboundTokens) {
+                for (Iterator<Token> iter = _outboundTokens.values().iterator(); iter.hasNext(); ) {
+                    Token tok = iter.next();
+                    if (tok.getExpiration() < now) {
+                        iter.remove();
+                        count++;
+                    }
+                }
+            }
+            if (count > 0 && _log.shouldDebug())
+                _log.debug("Expired " + count + " outbound tokens");
         }
     }
 }

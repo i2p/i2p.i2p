@@ -846,12 +846,11 @@ class SSU2Payload {
     }
 
     public static class NewTokenBlock extends Block {
-        private final long t, e;
+        private final EstablishmentManager.Token tok;
 
-        public NewTokenBlock(long token, long expires) {
+        public NewTokenBlock(EstablishmentManager.Token token) {
             super(BLOCK_NEWTOKEN);
-            t = token;
-            e = expires / 1000;
+            tok = token;
         }
 
         public int getDataLength() {
@@ -859,9 +858,9 @@ class SSU2Payload {
         }
 
         public int writeData(byte[] tgt, int off) {
-            DataHelper.toLong(tgt, off, 4, e);
+            DataHelper.toLong(tgt, off, 4, tok.getExpiration() / 1000);
             off += 4;
-            DataHelper.toLong8(tgt, off, t);
+            DataHelper.toLong8(tgt, off, tok.getToken());
             return off + 8;
         }
     }

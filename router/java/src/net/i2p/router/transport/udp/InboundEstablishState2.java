@@ -469,7 +469,12 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     public long getSendConnID() { return _sendConnID; }
     public long getRcvConnID() { return _rcvConnID; }
     public long getToken() { return _token; }
+    /**
+     *  @return may be null
+     */
     public EstablishmentManager.Token getNextToken() {
+        if (_aliceIP.length == 4 && _transport.isSnatted())
+            return null;
         return _transport.getEstablisher().getInboundToken(_remoteHostId);
     }
     public HandshakeState getHandshakeState() { return _handshakeState; }

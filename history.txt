@@ -1,3 +1,6 @@
+2022-12-04 zzz
+ * SSU2: Token improvements and fixes
+
 2022-12-02 zzz
  * Debian: Fix for stray symlinks in / (gitlab #376)
 

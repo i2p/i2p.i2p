@@ -407,7 +407,12 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     public long getSendConnID() { return _sendConnID; }
     public long getRcvConnID() { return _rcvConnID; }
     public long getToken() { return _token; }
+    /**
+     *  @return may be null
+     */
     public EstablishmentManager.Token getNextToken() {
+        if (_bobIP != null && _bobIP.length == 4 && _transport.isSnatted())
+            return null;
         return _transport.getEstablisher().getInboundToken(_remoteHostId);
     }
     public HandshakeState getHandshakeState() { return _handshakeState; }
