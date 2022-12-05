@@ -60,7 +60,7 @@ Description: Invisible Internet Project (I2P) - libjbigi library
 Package: i2p-doc
 Architecture: all
 Section: doc
-Priority: extra
+Priority: optional
 Depends: ${misc:Depends}
 Suggests: i2p, default-jdk-doc
 Description: Invisible Internet Project (I2P) - developer documentation
