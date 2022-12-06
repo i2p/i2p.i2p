@@ -2668,7 +2668,16 @@ class EstablishmentManager {
         long expires = now + expiration;
         Token tok = new Token(token, expires, now);
         synchronized(_inboundTokens) {
-            _inboundTokens.put(peer, tok);
+            Token old = _inboundTokens.put(peer, tok);
+            if (old != null && old.getExpiration() > expires - 2*60*1000) {
+                // reuse for the case where we're retransmitting terminations
+                // and it expires no sooner than 2 minutes earlier
+                if (_log.shouldDebug())
+                    _log.debug("Resend inbound " + old + " for " + peer);
+                // put it back
+                _inboundTokens.put(peer, old);
+                return old;
+            }
         }
         if (_log.shouldDebug())
             _log.debug("Add inbound " + tok + " for " + peer);
