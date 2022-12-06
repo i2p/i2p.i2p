@@ -148,7 +148,7 @@ class PacketBuilder2 {
      *
      *  @param otherBlocks may be null or empty
      */
-    public UDPPacket buildPacket(List<Fragment> fragments, List<Block> otherBlocks, PeerState2 peer) {
+    public UDPPacket buildPacket(List<Fragment> fragments, List<Block> otherBlocks, SSU2Sender peer) {
         // calculate data size
         int numFragments = fragments.size();
         int dataSize = 0;
@@ -356,13 +356,11 @@ class PacketBuilder2 {
      *  Build a data packet with a termination block.
      *  This will also include acks, a new token block, and padding.
      */
-    public UDPPacket buildSessionDestroyPacket(int reason, PeerState2 peer) {
+    public UDPPacket buildSessionDestroyPacket(int reason, SSU2Sender peer) {
         if (_log.shouldDebug())
             _log.debug("Sending termination " + reason + " to : " + peer);
         List<Block> blocks = new ArrayList<Block>(2);
-        if (peer.getKeyEstablishedTime() - _context.clock().now() > EstablishmentManager.IB_TOKEN_EXPIRATION / 2 &&
-            !_context.router().gracefulShutdownInProgress() &&
-            (peer.isIPv6() || !_transport.isSnatted())) {
+        if (peer.isIPv6() || !_transport.isSnatted()) {
             // update token
             EstablishmentManager.Token token = _transport.getEstablisher().getInboundToken(peer.getRemoteHostId());
             Block block = new SSU2Payload.NewTokenBlock(token);
