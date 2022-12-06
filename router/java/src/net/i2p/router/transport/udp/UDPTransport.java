@@ -875,6 +875,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _peersByConnID.clear();
         if (_recentlyClosedConnIDs != null) {
             synchronized(_addDropLock) {
+                for (PeerStateDestroyed psd : _recentlyClosedConnIDs.values()) {
+                    psd.kill();
+                }
                 _recentlyClosedConnIDs.clear();
             }
         }

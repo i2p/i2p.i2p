@@ -1,3 +1,6 @@
+2022-12-06 zzz
+ * SSU2: Add handler to process post-termination messages
+
 2022-12-04 zzz
  * SSU2: Token improvements and fixes
 

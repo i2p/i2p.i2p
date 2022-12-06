@@ -86,6 +86,14 @@ class PeerStateDestroyed implements SSU2Payload.PayloadCallback, SSU2Sender {
         _killTimer.schedule(MAX_LIFETIME);
     }
 
+    /**
+     *  Call at transport shutdown
+     */
+    public void kill() {
+        _ackTimer.cancel();
+        _killTimer.cancel();
+    }
+
     /// begin SSU2Sender interface ///
 
     public RemoteHostId getRemoteHostId() { return _remoteHostId; }
