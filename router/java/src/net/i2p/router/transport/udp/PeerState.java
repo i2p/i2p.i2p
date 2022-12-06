@@ -1410,8 +1410,11 @@ public class PeerState {
                 - 16); // padding safety
     }
 
-    /** @return non-null */
-    RemoteHostId getRemoteHostId() { return _remoteHostId; }
+    /**
+     *  @return non-null
+     *  @since public since 0.9.57 for SSU2Sender interface only
+     */
+    public RemoteHostId getRemoteHostId() { return _remoteHostId; }
 
     /**
      *  TODO should this use a queue, separate from the list of msgs pending an ack?
