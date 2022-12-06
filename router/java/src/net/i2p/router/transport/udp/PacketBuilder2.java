@@ -434,7 +434,8 @@ class PacketBuilder2 {
         pkt.setLength(LONG_HEADER_SIZE);
         int port = state.getSentPort();
         encryptSessionCreated(packet, state.getHandshakeState(), state.getSendHeaderEncryptKey1(),
-                              state.getSendHeaderEncryptKey2(), state.getSentRelayTag(), state.getNextToken(),
+                              state.getSendHeaderEncryptKey2(), state.getSentRelayTag(),
+                              null, // state.getNextToken(), // send with termination only
                               sentIP, port);
         pkt.setSocketAddress(state.getSentAddress());
         packet.setMessageType(TYPE_CREAT);
@@ -548,7 +549,8 @@ class PacketBuilder2 {
         pkt.setLength(SHORT_HEADER_SIZE);
         boolean isIPv6 = state.getSentIP().length == 16;
         encryptSessionConfirmed(packet, state.getHandshakeState(), state.getMTU(), 1, 0, isIPv6,
-                                state.getSendHeaderEncryptKey1(), state.getSendHeaderEncryptKey2(), block, state.getNextToken());
+                                state.getSendHeaderEncryptKey1(), state.getSendHeaderEncryptKey2(), block,
+                                null); // state.getNextToken());  // send with termination only
         pkt.setSocketAddress(state.getSentAddress());
         packet.setMessageType(TYPE_CONF);
         packet.setPriority(PRIORITY_HIGH);
