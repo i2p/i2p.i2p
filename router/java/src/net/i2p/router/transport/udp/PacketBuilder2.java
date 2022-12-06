@@ -303,7 +303,9 @@ class PacketBuilder2 {
         
         packet.setPriority(priority);
         if (fragments.isEmpty()) {
-            peer.getAckedMessages().set(pktNum); // not ack-eliciting
+            SSU2Bitfield acked =  peer.getAckedMessages();
+            if (acked != null)     // null for PeerStateDestroyed
+                acked.set(pktNum); // not ack-eliciting
             packet.markType(1);
             packet.setFragmentCount(-1);
             packet.setMessageType(TYPE_ACK);

@@ -381,12 +381,14 @@ class PacketHandler {
                         } else if (len >= SSU2Util.MIN_DATA_LEN) {
                             byte[] k1 = _transport.getSSU2StaticIntroKey();
                             long id = SSU2Header.decryptDestConnID(packet.getPacket(), k1);
-                            if (_transport.wasRecentlyClosed(id)) {
+                            PeerStateDestroyed dead = _transport.getRecentlyClosed(id);
+                            if (dead != null) {
                                 // Probably termination ack.
                                 // Prevent attempted SSU1 fallback processing and adding to fail cache
                                 if (_log.shouldDebug())
-                                    _log.debug("Dropping " + len + " byte packet from " + remoteHost +
+                                    _log.debug("Handling " + len + " byte packet from " + remoteHost +
                                                " for recently closed ID " + id);
+                                dead.receivePacket(remoteHost, packet);
                                 return;
                             }
                         }
@@ -861,12 +863,14 @@ class PacketHandler {
                             ps2.receivePacket(from, packet);
                             return true;
                         }
-                        if (_transport.wasRecentlyClosed(id)) {
+                        PeerStateDestroyed dead = _transport.getRecentlyClosed(id);
+                        if (dead != null) {
                             // Probably termination ack.
                             // Prevent attempted SSU1 fallback processing and adding to fail cache
                             if (_log.shouldDebug())
-                                _log.debug("Dropping " + packet.getPacket().getLength() + " byte packet from " + from +
+                                _log.debug("Handling " + packet.getPacket().getLength() + " byte packet from " + from +
                                            " for recently closed ID " + id);
+                            dead.receivePacket(from, packet);
                             return true;
                         }
                     }
