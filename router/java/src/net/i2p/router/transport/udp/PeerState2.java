@@ -67,6 +67,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     private long _sentMessagesLastExpired;
     private byte[] _ourIP;
     private int _ourPort;
+    private int _destroyReason;
 
     // Session Confirmed retransmit
     private byte[][] _sessConfForReTX;
@@ -328,13 +329,25 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     /**
      * @since 0.9.57
      */
-    public void setDestroyReason(int reason) { /* todo */ }
+    public void setDestroyReason(int reason) { _destroyReason = reason; }
 
     /// end SSU2Sender interface ///
 
     long getRcvConnID() { return _rcvConnID; }
     byte[] getRcvHeaderEncryptKey1() { return _rcvHeaderEncryptKey1; }
     byte[] getRcvHeaderEncryptKey2() { return _rcvHeaderEncryptKey2; }
+
+    /**
+     * @return 0 (REASON_UNSPEC) if unset
+     * @since 0.9.57 for PeerStateDestroyed
+     */
+    int getDestroyReason() { return _destroyReason; }
+
+    /**
+     * @since 0.9.57 for PeerStateDestroyed
+     */
+    CipherState getRcvCipher() { return _rcvCha; }
+
 
     void setOurAddress(byte[] ip, int port) {
         _ourIP = ip; _ourPort = port;
@@ -663,6 +676,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotToken(long token, long expires) {
+        if (_log.shouldInfo())
+            _log.info("Got TOKEN block: " + token + " expires " + DataHelper.formatTime(expires) + " on " + this);
         _transport.getEstablisher().addOutboundToken(_remoteHostId, token, expires);
     }
 

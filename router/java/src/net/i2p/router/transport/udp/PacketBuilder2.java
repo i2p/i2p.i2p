@@ -359,6 +359,7 @@ class PacketBuilder2 {
     public UDPPacket buildSessionDestroyPacket(int reason, SSU2Sender peer) {
         if (_log.shouldDebug())
             _log.debug("Sending termination " + reason + " to : " + peer);
+        peer.setDestroyReason(reason);
         List<Block> blocks = new ArrayList<Block>(2);
         if (peer.isIPv6() || !_transport.isSnatted()) {
             // update token
