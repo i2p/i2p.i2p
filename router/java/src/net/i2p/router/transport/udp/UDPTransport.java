@@ -348,7 +348,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _peersByIdent = new ConcurrentHashMap<Hash, PeerState>(128);
         _peersByRemoteHost = new ConcurrentHashMap<RemoteHostId, PeerState>(128);
         _peersByConnID = (xdh != null) ? new ConcurrentHashMap<Long, PeerState2>(32) : null;
-        _recentlyClosedConnIDs = (xdh != null) ? new LHMCache<Long, PeerStateDestroyed>(24) : null;
+        if (xdh != null) {
+            // roughly scale based on expected traffic
+            int sz = Math.max(16, Math.min(128, getMaxConnections() / 16));
+            _recentlyClosedConnIDs = new LHMCache<Long, PeerStateDestroyed>(sz);
+        } else {
+            _recentlyClosedConnIDs = null;
+        }
         _dropList = new ConcurrentHashSet<RemoteHostId>(2);
         _endpoints = new CopyOnWriteArrayList<UDPEndpoint>();
         

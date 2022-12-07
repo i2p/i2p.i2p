@@ -806,12 +806,16 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     public void gotTermination(int reason, long count) {
         if (_log.shouldInfo())
             _log.info("Got TERMINATION block, reason: " + reason + " count: " + count + " on " + this);
-        if (reason != SSU2Util.REASON_TERMINATION) {
+        if (reason == SSU2Util.REASON_TERMINATION) {
+            // this should only happen at shutdown, where we don't have a post-termination handler
+        } else {
             UDPPacket pkt = _transport.getBuilder2().buildSessionDestroyPacket(SSU2Util.REASON_TERMINATION, this);
             _transport.send(pkt);
         }
-        _transport.getEstablisher().receiveSessionDestroy(_remoteHostId, this);
-        _dead = true;
+        if (!_dead) {
+            _transport.getEstablisher().receiveSessionDestroy(_remoteHostId, this);
+            _dead = true;
+        }
     }
 
     public void gotPathChallenge(RemoteHostId from, byte[] data) {

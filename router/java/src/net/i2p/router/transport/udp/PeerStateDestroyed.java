@@ -52,15 +52,20 @@ class PeerStateDestroyed implements SSU2Payload.PayloadCallback, SSU2Sender {
     private final KillTimer _killTimer;
     private final long _destroyedOn;
     protected volatile long _wantACKSendSince;
-    private int _destroyReason;
+    // This is the mode we are in.
+    // If this is 1, we have sent a termination ack.
+    // Otherwise, this is the original reason we sent, and may possibly retransmit.
+    private volatile int _destroyReason;
 
     private static final long MAX_LIFETIME = 2*60*1000;
+    // retx at 7, 21, 49, 105
+    private static final long TERMINATION_RETX_TIME = 7*1000;
 
     /**
      *  This must be called after the first termination or termination ack
      *  was sent from PeerState2, so the next packet number is correct.
      *
-     *  @param rtt from the EstablishState, or 0 if not available
+     *  @param peer that just sent (or received and sent) a termination
      */
     public PeerStateDestroyed(RouterContext ctx, UDPTransport transport, PeerState2 peer) {
         _context = ctx;
@@ -81,7 +86,9 @@ class PeerStateDestroyed implements SSU2Payload.PayloadCallback, SSU2Sender {
         _destroyReason = peer.getDestroyReason();
         _destroyedOn = _context.clock().now();
         _ackTimer = new ACKTimer();
-        // TODO if _destroyReason != 1, schedule ack timer to resend termination
+        // if _destroyReason != 1, schedule ack timer to resend termination
+        if (_destroyReason != REASON_TERMINATION)
+            _ackTimer.schedule(TERMINATION_RETX_TIME);
         _killTimer = new KillTimer();
         _killTimer.schedule(MAX_LIFETIME);
     }
@@ -272,11 +279,16 @@ class PeerStateDestroyed implements SSU2Payload.PayloadCallback, SSU2Sender {
     public void gotTermination(int reason, long count) {
         if (_log.shouldInfo())
             _log.info("Got TERMINATION block, reason: " + reason + " (our reason " + _destroyReason + ") on " + this);
-        if (reason != SSU2Util.REASON_TERMINATION) {
+        if (reason == SSU2Util.REASON_TERMINATION) {
+            // cancel termination retx, fire kill timer sooner
+            _ackTimer.cancel();
+            _killTimer.reschedule(15*1000);
+        } else {
             // If we received a destroy besides reason_termination, send reason_termination
+            // Note that i2pd before 0.9.57 has a bug and will send a second termination in response to our first ack
             _destroyReason = SSU2Util.REASON_TERMINATION;
             messagePartiallyReceived();
-        } // else fire kill timer sooner?
+        }
     }
 
     public void gotPathChallenge(RemoteHostId from, byte[] data) {}
@@ -290,6 +302,7 @@ class PeerStateDestroyed implements SSU2Payload.PayloadCallback, SSU2Sender {
      *  A timer to send an ack+destroy packet.
      */
     private class ACKTimer extends SimpleTimer2.TimedEvent {
+        private long _delay = TERMINATION_RETX_TIME;
 
         /**
          *  Caller must schedule
@@ -304,13 +317,13 @@ class PeerStateDestroyed implements SSU2Payload.PayloadCallback, SSU2Sender {
         }
 
         /**
-         *  Send an ack-only packet, unless acks were already sent
+         *  Send a termination+ack+token packet, unless acks were already sent
          *  as indicated by _wantACKSendSince == 0.
-         *  Will not requeue unless the acks don't all fit (unlikely).
+         *  Also does retransmission, if we were the one that sent the first termination.
          */
         public void timeReached() {
             synchronized(PeerStateDestroyed.this) {
-                if (_wantACKSendSince <= 0)
+                if (_wantACKSendSince <= 0 && _destroyReason == REASON_TERMINATION)
                     return;
                 _wantACKSendSince = 0;
             }
@@ -321,6 +334,10 @@ class PeerStateDestroyed implements SSU2Payload.PayloadCallback, SSU2Sender {
             if (_log.shouldDebug())
                 _log.debug("Sending TERMINATION reason " + _destroyReason + " to " + PeerStateDestroyed.this);
             _transport.send(pkt);
+            if (_destroyReason != REASON_TERMINATION) {
+                _delay *= 2;
+                reschedule(_delay);
+            }
         }
     }
 
