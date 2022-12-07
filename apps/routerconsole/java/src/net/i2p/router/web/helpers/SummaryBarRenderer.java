@@ -843,7 +843,7 @@ class SummaryBarRenderer {
            .append(_t("The number of peers available for network database inquiries"))
            .append("\">" +
                    "<td align=\"left\"><b>")
-           .append(_t("Integrated"))
+           .append(_t("Floodfill"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getWellIntegratedPeers())
            .append("</td></tr>\n" +
