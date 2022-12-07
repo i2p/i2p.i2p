@@ -351,7 +351,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (xdh != null) {
             // roughly scale based on expected traffic
             int sz = Math.max(16, Math.min(128, getMaxConnections() / 16));
-            _recentlyClosedConnIDs = new LHMCache<Long, PeerStateDestroyed>(sz);
+            _recentlyClosedConnIDs = new DestroyedCache(sz);
         } else {
             _recentlyClosedConnIDs = null;
         }
@@ -4062,6 +4062,28 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         public void timeReached() {
             if (introducersRequired(false) || introducersRequired(true))
                 _introManager.pingIntroducers();
+        }
+    }
+
+    /**
+     * For PeerStateDestroyed, to kill the timers on overflow,
+     * else the memory won't be freed.
+     *
+     * @since 0.9.57
+     */
+    private static class DestroyedCache extends LHMCache<Long, PeerStateDestroyed> {
+
+        public DestroyedCache(int max) {
+            super(max);
+        }
+
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<Long, PeerStateDestroyed> eldest) {
+            boolean rv = super.removeEldestEntry(eldest);
+            if (rv) {
+                eldest.getValue().kill();
+            }
+            return rv;
         }
     }
 
