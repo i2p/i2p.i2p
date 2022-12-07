@@ -227,10 +227,12 @@ class UDPSorters {
         @Override
         public int compare(PeerState l, PeerState r) {
             int rv = l.getMTU() - r.getMTU();
-            if (rv == 0) // fallback on alpha
-                return super.compare(l, r);
-            else
-                return rv;
+            if (rv == 0) {
+                rv = l.getReceiveMTU() - r.getReceiveMTU();
+                if (rv == 0) // fallback on alpha
+                    return super.compare(l, r);
+            }
+            return rv;
         }
     }
 
