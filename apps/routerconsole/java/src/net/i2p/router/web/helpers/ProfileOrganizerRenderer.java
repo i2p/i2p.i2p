@@ -138,16 +138,21 @@ class ProfileOrganizerRenderer {
             switch (tier) {
                 case 1: buf.append(_t("Fast, High Capacity")); break;
                 case 2: buf.append(_t("High Capacity")); break;
-                case 3: buf.append(_t("Standard")); break;
+                case 3: /* buf.append(_t("Standard")); */ break;
                 default: buf.append(_t("Failing")); break;
             }
-            if (isIntegrated) buf.append(", ").append(_t("Integrated"));
+            if (isIntegrated) {
+                if (tier != 3)
+                    buf.append(", ");
+                buf.append(_t("Integrated"));
+            }
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
             if (info != null) {
                 // prevent HTML injection in the caps and version
                 buf.append("<td align=\"right\">").append(DataHelper.stripHTML(info.getCapabilities()));
             } else {
-                buf.append("<td align=\"right\"><i>").append(_t("unknown")).append("</i></td>");
+                //buf.append("<td align=\"right\"><i>").append(_t("unknown")).append("</i></td>");
+                buf.append("<td></td>");
             }
             buf.append("<td align=\"right\">");
             String v = info != null ? info.getOption("router.version") : null;
