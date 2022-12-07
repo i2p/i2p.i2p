@@ -433,14 +433,16 @@ class ProfileOrganizerRenderer {
     private String davg (DBHistory dbh, long rate, RateAverages ra) {
             RateStat rs = dbh.getFailedLookupRate();
             if (rs == null)
-                return "0%";
+                return NA;
             Rate r = rs.getRate(rate);
             if (r == null)
-                return "0%";
+                return NA;
             r.computeAverages(ra, false);
             if (ra.getTotalEventCount() <= 0)
-                return "0%";
+                return NA;
             double avg = 0.5 + 100 * ra.getAverage();
+            if (avg < 1.0d)
+                return NA;
             return ((int) avg) + "%";
     }
 
