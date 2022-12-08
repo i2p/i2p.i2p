@@ -666,13 +666,12 @@ class SSU2Payload {
         private final int rc;
 
         /*
+         * @param acnt 255 max
          * @param ranges nack/ack/nack/ack
          * @param rangeCount ranges length / 2
          */
         public AckBlock(long thru, int acnt, byte[] ranges, int rangeCount) {
             super(BLOCK_ACK);
-            if (rangeCount > 255)
-                throw new IllegalArgumentException();
             if (acnt > 255)
                 throw new IllegalArgumentException();
             t = thru;
