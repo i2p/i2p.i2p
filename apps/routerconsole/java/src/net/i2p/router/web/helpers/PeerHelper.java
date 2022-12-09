@@ -438,11 +438,17 @@ public class PeerHelper extends HelperBase {
             //if (ip != null)
             //    buf.append(' ').append(_context.blocklist().toStr(ip));
             buf.append("</td><td class=\"cells\" align=\"center\">");
-            if (con.isInbound())
-                buf.append("<img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"").append(_t("Inbound")).append("\"/>");
-            else
-                buf.append("<img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"").append(_t("Outbound")).append("\"/>");
-            buf.append("</td><td class=\"cells peeripv6\" align=\"center\">");
+            if (con.isInbound()) {
+                buf.append("<img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"").append(_t("Inbound"));
+                if (isAdvanced())
+                    buf.append(' ').append(Addresses.toString(con.getRemoteIP(), con.getChannel().socket().getPort()));
+            } else {
+                buf.append("<img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"").append(_t("Outbound"));
+                if (isAdvanced())
+                    buf.append(' ').append(Addresses.toString(con.getRemoteIP(), con.getRemoteAddress().getPort()));
+            }
+            buf.append("\"/>" +
+                       "</td><td class=\"cells peeripv6\" align=\"center\">");
             if (con.isIPv6())
                 buf.append("<span class=\"backlogged\">&#x2713;</span>");
             else
@@ -639,11 +645,16 @@ public class PeerHelper extends HelperBase {
             //if (ip != null)
             //    buf.append(' ').append(_context.blocklist().toStr(ip));
             buf.append("</td><td class=\"cells\" nowrap align=\"left\">");
-            if (peer.isInbound())
+            if (peer.isInbound()) {
                 buf.append("<img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"").append(_t("Inbound"));
-            else
+                if (isAdvanced())
+                    buf.append(' ').append(Addresses.toString(peer.getRemoteIP(), peer.getRemotePort()));
+            } else {
                 buf.append("<img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"").append(_t("Outbound"));
-            buf.append("\">");
+                if (isAdvanced())
+                    buf.append(' ').append(Addresses.toString(peer.getRemoteIP(), peer.getRemotePort()));
+            }
+            buf.append("\"/>");
             if (peer.getWeRelayToThemAs() > 0)
                 buf.append("&nbsp;&nbsp;<img src=\"/themes/console/images/outbound.png\" height=\"8\" width=\"12\" alt=\"^\" title=\"").append(_t("We offered to introduce them")).append("\">");
             if (peer.getTheyRelayToUsAs() > 0)
