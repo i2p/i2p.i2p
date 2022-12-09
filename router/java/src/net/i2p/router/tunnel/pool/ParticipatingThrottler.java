@@ -35,9 +35,9 @@ class ParticipatingThrottler {
 
     /** portion of the tunnel lifetime */
     private static final int LIFETIME_PORTION = 3;
-    private static final int MIN_LIMIT = 18 / LIFETIME_PORTION;
+    private static final int MIN_LIMIT = 12 / LIFETIME_PORTION;
     private static final int MAX_LIMIT = 66 / LIFETIME_PORTION;
-    private static final int PERCENT_LIMIT = 12 / LIFETIME_PORTION;
+    private static final int PERCENT_LIMIT = 9 / LIFETIME_PORTION;
     private static final long CLEAN_TIME = 11*60*1000 / LIFETIME_PORTION;
 
     public enum Result { ACCEPT, REJECT, DROP }
@@ -56,7 +56,7 @@ class ParticipatingThrottler {
         int count = counter.increment(h);
         Result rv;
         if (count > limit) {
-            if (count > limit * 3 / 2) {
+            if (count > limit * 9 / 8) {
                 //context.banlist().banlistRouter(h, "Excess participating tunnels", null, null, context.clock().now() + 30*60*1000);
                 // drop after any accepted tunnels have expired
                 //context.simpleTimer2().addEvent(new Disconnector(h), 11*60*1000);
