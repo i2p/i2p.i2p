@@ -2447,8 +2447,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         List<RouterAddress> addrs = getTargetAddresses(target);
         for (int i = 0; i < addrs.size(); i++) {
             RouterAddress addr = addrs.get(i);
-            //if (getSSUVersion(addr) == 0)
-            //    continue;
+            if (!_enableSSU1 && addr.getTransportStyle().equals("SSU") && !"2".equals(addr.getOption("v")))
+                continue;
             if (addr.getOption("itag0") == null) {
                 // No introducers
                 // Skip outbound-only or invalid address/port
