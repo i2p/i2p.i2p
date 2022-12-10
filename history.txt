@@ -1,3 +1,18 @@
+2022-12-10 zzz
+ * SSU: Update activity timestamps for relay and peer test messages
+ * SSU2: Peer Test fixes
+
+2022-12-09 zzz
+ * SSU: Don't bid on SSU1 addresses when disabled
+ * Tunnels: Tighten the hop throttle
+
+2022-12-08 zzz
+ * SSU2: Fix rare IAE creating ACK block
+
+2022-12-07 zzz
+ * Console: Profile tabs cleanup
+ * SSU2: Post-termination handler improvements
+
 2022-12-06 zzz
  * SSU2: Add handler to process post-termination messages
 

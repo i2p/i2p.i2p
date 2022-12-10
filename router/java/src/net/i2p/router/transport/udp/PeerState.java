@@ -502,12 +502,21 @@ public class PeerState {
      */
     public long getClockSkew() { return _clockSkew ; }
 
-    /** when did we last send them a packet? */
+    /**
+     *  When did we last send them a packet?
+     *  Set for data, relay, and peer test, but not acks, pings, or termination
+     */
     public long getLastSendTime() { return _lastSendTime; }
+
     /** when did we last send them a message that was ACKed? */
     public long getLastSendFullyTime() { return _lastSendFullyTime; }
-    /** when did we last receive a packet from them? */
+
+    /**
+     *  When did we last receive a packet from them?
+     *  Set for data, relay, and peer test, but not acks, pings, or termination
+     */
     public long getLastReceiveTime() { return _lastReceiveTime; }
+
     /** how many seconds have we sent packets without any ACKs received? */
     public int getConsecutiveFailedSends() { return _consecutiveFailedSends; }
 
@@ -601,9 +610,16 @@ public class PeerState {
         }
     }
 
-    /** when did we last send them a packet? */
+    /**
+     *  When did we last send them a packet?
+     *  Set for data, relay, and peer test, but not acks, pings, or termination
+     */
     void setLastSendTime(long when) { _lastSendTime = when; }
-    /** when did we last receive a packet from them? */
+
+    /**
+     *  When did we last receive a packet from them?
+     *  Set for data, relay, and peer test, but not acks, pings, or termination
+     */
     void setLastReceiveTime(long when) { _lastReceiveTime = when; }
 
     /**
@@ -1153,7 +1169,8 @@ public class PeerState {
         }
         if (_sendWindowBytes > MAX_SEND_WINDOW_BYTES)
             _sendWindowBytes = MAX_SEND_WINDOW_BYTES;
-        _lastReceiveTime = _context.clock().now();
+        long now = _context.clock().now();
+        _lastReceiveTime = now;
         _lastSendFullyTime = _lastReceiveTime;
 
         synchronized(_sendWindowBytesRemainingLock) {
@@ -1175,7 +1192,6 @@ public class PeerState {
             exitFastRetransmit();
         } else {
             // any time new data gets acked, push out the timer
-            long now = _context.clock().now();
             long oldTimer = _retransmitTimer - now;
             _retransmitTimer = now + getRTO();
             if (_log.shouldLog(Log.DEBUG))
@@ -1353,9 +1369,11 @@ public class PeerState {
             congestionOccurred();
         }
         _context.statManager().addRateData("udp.congestionOccurred", _sendWindowBytes);
-        _lastReceiveTime = _context.clock().now();
     }
 
+    /**
+     *  Same as setLastReceivedTime(now)
+     */
     void dataReceived() {
         _lastReceiveTime = _context.clock().now();
     }
