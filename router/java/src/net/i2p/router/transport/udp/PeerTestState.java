@@ -183,14 +183,26 @@ class PeerTestState {
            .append(_isIPv6 ? " IPv6" : " IPv4")
            .append(" started ").append(DataHelper.formatTime(_beginTime))
            .append(" as ").append(_ourRole.toString());
-        if (_aliceIP != null)
-            buf.append("; Alice: ").append(_aliceIP).append(':').append(_alicePort);
+        if (_aliceIP != null) {
+            buf.append("; Alice: ");
+            if (_ourRole == Role.ALICE)
+                buf.append("me");
+            else
+                buf.append(_aliceIP).append(':').append(_alicePort);
+        }
         if (_aliceIPFromCharlie != null)
             buf.append(" (fromCharlie ").append(_aliceIPFromCharlie).append(':').append(_alicePortFromCharlie).append(')');
         if (_bob != null)
-            buf.append("; Bob: ").append(_bob.toString());
-        if (_charlieIP != null)
-            buf.append(" Charlie: ").append(_charlieIP).append(':').append(_charliePort);
+            buf.append(" Bob: ").append(_bob.toString());
+        else
+            buf.append(" Bob: me");
+        if (_charlieIP != null) {
+            buf.append(" Charlie: ");
+            if (_ourRole == Role.CHARLIE)
+                buf.append("me");
+            else
+                buf.append(_charlieIP).append(':').append(_charliePort);
+        }
         if (_lastSendTime > 0)
             buf.append("; last send after ").append(_lastSendTime - _beginTime);
         if (_receiveAliceTime > 0)

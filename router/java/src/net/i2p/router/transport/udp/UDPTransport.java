@@ -3233,6 +3233,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 case DIFFERENT:
                 case IPV4_FIREWALLED_IPV6_OK:
                 case IPV4_FIREWALLED_IPV6_UNKNOWN:
+                case IPV4_SNAT_IPV6_OK:
+                case IPV4_SNAT_IPV6_UNKNOWN:
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Require IPv4 introducers, status is " + status);
                     return true;
