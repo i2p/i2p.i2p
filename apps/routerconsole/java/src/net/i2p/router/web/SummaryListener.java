@@ -86,11 +86,19 @@ public class SummaryListener implements RateSummaryListener {
             } catch (IllegalArgumentException iae) {
                 // ticket #1186
                 // apparently a corrupt file, thrown from update()
-                _log.error("Error adding", iae);
-                String path = _isPersistent ? _db.getPath() : null;
-                stopListening();
-                if (path != null)
-                    (new File(path)).delete();
+                // With rrd4j, could be time skew:
+                // IllegalArgumentException: Bad sample time: 1670674936. Last update time was 1670694462, at least one second step is required
+                String msg = iae.getMessage();
+                if (msg != null && msg.startsWith("Bad sample time:")) {
+                    if (_log.shouldWarn())
+                        _log.warn("RRD time skew", iae);
+                } else {
+                    _log.error("RRD error", iae);
+                    String path = _isPersistent ? _db.getPath() : null;
+                    stopListening();
+                    if (path != null)
+                        (new File(path)).delete();
+                }
             } catch (RrdException re) {
                 // this can happen after the time slews backwards, so don't make it an error
                 // org.jrobin.core.RrdException: Bad sample timestamp 1264343107. Last update time was 1264343172, at least one second step is required
