@@ -897,14 +897,19 @@ class PacketHandler {
                     header.getType() != SSU2Util.SESSION_REQUEST_FLAG_BYTE ||
                     header.getVersion() != 2 ||
                     header.getNetID() != _networkID) {
-                    if (_log.shouldWarn()) {
-                        if (header == null) {
-                            // packet too short, possibly token-request-after-retry? let's see...
-                            header = SSU2Header.trialDecryptLongHeader(packet, k1, k2);
-                        }
-                        _log.warn("Failed decrypt Session Request after Retry: " + header + " on " + state);
+                    // possibly token-request-after-retry? let's see...
+                    header = SSU2Header.trialDecryptLongHeader(packet, k1, k2);
+                    if (header == null ||
+                        header.getType() != SSU2Util.TOKEN_REQUEST_FLAG_BYTE ||
+                        header.getVersion() != 2 ||
+                        header.getNetID() != _networkID) {
+                        // i2pd short session request? TODO
+                        if (_log.shouldWarn())
+                            _log.warn("Failed decrypt Session/Token Request after Retry: " + header +
+                                      " len " + packet.getPacket().getLength() + " on " + state);
+                        return false;
                     }
-                    return false;
+                    //yes, retransmitted token request
                 }
                 if (header.getSrcConnID() != state.getSendConnID()) {
                     if (_log.shouldWarn())
@@ -918,7 +923,7 @@ class PacketHandler {
                         _log.warn("Bad Dest Conn id " + header + " on " + state);
                     return false;
                 }
-                type = SSU2Util.SESSION_REQUEST_FLAG_BYTE;
+                type = header.getType();
             } else {
                 // Session Confirmed or retransmitted Session Request or Token Request
                 header = SSU2Header.trialDecryptShortHeader(packet, k1, k2);

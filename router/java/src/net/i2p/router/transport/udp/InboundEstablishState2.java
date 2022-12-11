@@ -505,30 +505,39 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     /** note that we just sent a Retry packet */
     public synchronized void retryPacketSent() {
         // retry after clock skew
-        if (_currentState == InboundState.IB_STATE_FAILED ||
-            _currentState == InboundState.IB_STATE_RETRY_SENT)
+        if (_currentState == InboundState.IB_STATE_FAILED)
             return;
-        if (_currentState != InboundState.IB_STATE_REQUEST_BAD_TOKEN_RECEIVED &&
+        if (_currentState != InboundState.IB_STATE_RETRY_SENT &&
+            _currentState != InboundState.IB_STATE_REQUEST_BAD_TOKEN_RECEIVED &&
             _currentState != InboundState.IB_STATE_TOKEN_REQUEST_RECEIVED)
             throw new IllegalStateException("Bad state for Retry Sent: " + _currentState);
-        _currentState = InboundState.IB_STATE_RETRY_SENT;
         _lastSend = _context.clock().now();
-        // Won't really be retransmitted, they have 5 sec to respond or
-        // EstablishmentManager.handleInbound() will fail the connection
-        // Alice will retransmit at 1 and 3 seconds, so wait 5
-        // We're not going to wait for the 3rd retx at 7 seconds.
-        _nextSend = _lastSend + (5 * RETRANSMIT_DELAY);
+        if (_currentState == InboundState.IB_STATE_RETRY_SENT) {
+            // We received a retransmtted token request and resent the retry.
+            // Won't really be retransmitted, they have 5 sec to respond
+            // ensure we expire before retransmitting
+            _nextSend = _establishBegin + (5 * RETRANSMIT_DELAY);
+            if (_log.shouldWarn())
+                _log.warn("Retransmit retry on " + this);
+        } else {
+            _currentState = InboundState.IB_STATE_RETRY_SENT;
+            // Won't really be retransmitted, they have 5 sec to respond or
+            // EstablishmentManager.handleInbound() will fail the connection
+            // Alice will retransmit at 1 and 3 seconds, so wait 5
+            // We're not going to wait for the 3rd retx at 7 seconds.
+            _nextSend = _lastSend + (5 * RETRANSMIT_DELAY);
+        }
     }
 
     /**
      *  All exceptions thrown from here will be fatal. fail() will be called before throwing.
      */
-    public synchronized void receiveSessionRequestAfterRetry(UDPPacket packet) throws GeneralSecurityException {
+    public synchronized void receiveSessionOrTokenRequestAfterRetry(UDPPacket packet) throws GeneralSecurityException {
         try {
-            locked_receiveSessionRequestAfterRetry(packet);
+            locked_receiveSessionOrTokenRequestAfterRetry(packet);
         } catch (GeneralSecurityException gse) {
             if (_log.shouldDebug())
-                _log.debug("Session request error after retry", gse);
+                _log.debug("Session/Token request error after retry", gse);
             // fail inside synch rather than have Est. Mgr. do it to prevent races
             fail();
             throw gse;
@@ -538,11 +547,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     /**
      * @since 0.9.56
      */
-    private void locked_receiveSessionRequestAfterRetry(UDPPacket packet) throws GeneralSecurityException {
-        if (_currentState != InboundState.IB_STATE_RETRY_SENT)
-            throw new GeneralSecurityException("Bad state for Session Request after Retry: " + _currentState);
-        if (_log.shouldDebug())
-            _log.debug("Got session request after retry from: " + _aliceSocketAddress);
+    private void locked_receiveSessionOrTokenRequestAfterRetry(UDPPacket packet) throws GeneralSecurityException {
         DatagramPacket pkt = packet.getPacket();
         SocketAddress from = pkt.getSocketAddress();
         if (!from.equals(_aliceSocketAddress))
@@ -556,6 +561,26 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         long sid = DataHelper.fromLong8(data, off + 16);
         if (sid != _sendConnID)
             throw new GeneralSecurityException("Conn ID mismatch: 1: " + _sendConnID + " 2: " + sid);
+
+        int type = data[off + TYPE_OFFSET] & 0xff;
+        if (_currentState != InboundState.IB_STATE_RETRY_SENT) {
+            // not fatal
+            if (_log.shouldWarn())
+                _log.warn("Got out-of-order or retx msg " + type + " on: " + this);
+            return;
+        }
+        if (type == TOKEN_REQUEST_FLAG_BYTE) {
+            // retransmitted token request
+            if (_log.shouldWarn())
+                _log.warn("Got retx token request on: " + this);
+            // Est. mgr will resend retry and call retryPacketSent()
+            long now = _context.clock().now();
+            // rate limit
+            _nextSend = Math.max(now, _lastSend + 750);
+            return;
+        }
+        if (_log.shouldDebug())
+            _log.debug("Got session request after retry on: " + this);
         long token = DataHelper.fromLong8(data, off + 24);
         if (token != _token) {
             // most likely a retransmitted session request with the old invalid token
