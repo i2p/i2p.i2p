@@ -94,11 +94,13 @@ class PeerStateDestroyed implements SSU2Payload.PayloadCallback, SSU2Sender {
     }
 
     /**
-     *  Call at transport shutdown
+     *  Call at transport shutdown or cache eviction
      */
     public void kill() {
         _ackTimer.cancel();
         _killTimer.cancel();
+        _sendCha.destroy();
+        _rcvCha.destroy();
     }
 
     /// begin SSU2Sender interface ///
@@ -358,6 +360,8 @@ class PeerStateDestroyed implements SSU2Payload.PayloadCallback, SSU2Sender {
                 _log.debug("Done listening for " + PeerStateDestroyed.this);
             _ackTimer.cancel();
             _transport.removeRecentlyClosed(PeerStateDestroyed.this);
+            _sendCha.destroy();
+            _rcvCha.destroy();
         }
     }
 
