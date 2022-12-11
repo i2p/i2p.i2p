@@ -822,6 +822,8 @@ class EstablishmentManager {
         }
         // very basic validation that this is probably in response to a good packet.
         // we don't bother to decrypt the packet, even if it's only a token request
+        if (_transport.isTooClose(to.getIP()))
+            return;
         DatagramPacket pkt = fromPacket.getPacket();
         int off = pkt.getOffset();
         int len = pkt.getLength();

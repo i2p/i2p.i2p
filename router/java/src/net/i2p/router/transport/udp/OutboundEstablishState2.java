@@ -27,6 +27,7 @@ import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.RouterContext;
 import static net.i2p.router.transport.udp.SSU2Util.*;
+import net.i2p.time.BuildTime;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 
@@ -262,7 +263,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             if (_log.shouldDebug())
                 _log.debug("Processed " + blocks + " blocks on " + this);
         } catch (Exception e) {
-            throw new GeneralSecurityException("Session Created payload error", e);
+            throw new GeneralSecurityException("Retry or Session Created payload error", e);
         }
     }
 
@@ -346,13 +347,39 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         // this sets the state to FAILED
         fail();
         _transport.getEstablisher().receiveSessionDestroy(_remoteHostId, this);
+        Hash bob = _remotePeer.calculateHash();
         if (reason == REASON_BANNED) {
-            _context.banlist().banlistRouter(_remotePeer.calculateHash(), "They banned us", null, null, _context.clock().now() + 2*60*60*1000);
+            _context.banlist().banlistRouter(bob, "They banned us", null, null, _context.clock().now() + 2*60*60*1000);
         } else if (reason == REASON_MSG1) {
             // this is like a short ban
-            _context.banlist().banlistRouter(_remotePeer.calculateHash(), "They banned us", null, null, _context.clock().now() + 20*60*1000);
+            _context.banlist().banlistRouter(bob, "They banned us", null, null, _context.clock().now() + 20*60*1000);
+        } else if (reason == REASON_SKEW) {
+            long sendOn = _timeReceived;
+            long recvOn = _establishBegin;
+            // Positive when we are ahead of them
+            long skew = recvOn - sendOn;
+            String skewString = DataHelper.formatDuration(Math.abs(skew));
+            if (_log.shouldWarn())
+                _log.warn("Failed, clock skew " + skewString + " on " + this);
+            if (sendOn == 0) {
+                // no datetime block
+            } else if (sendOn < BuildTime.getEarliestTime() || sendOn > BuildTime.getLatestTime()) {
+                // his problem
+                _context.banlist().banlistRouter(skewString, bob, _x("Excessive clock skew: {0}"));
+            } else {
+                boolean skewOK = skew < PacketHandler.MAX_SKEW && skew > (0 - PacketHandler.MAX_SKEW);
+                if (skewOK && !_context.clock().getUpdatedSuccessfully()) {
+                    // adjust the clock one time in desperation
+                    _context.clock().setOffset(0 - skew, true);
+                    if (skew != 0)
+                        _log.logAlways(Log.WARN, "NTP failure, UDP adjusting clock by " + skewString);
+                } else {
+                    _context.banlist().banlistRouter(skewString, bob, _x("Excessive clock skew: {0}"));
+                }
+            }
+            _context.statManager().addRateData("udp.destroyedInvalidSkew", skew);
         }
-        // TODO handle other cases - skew?
+        // TODO handle other cases
     }
 
     public void gotPathChallenge(RemoteHostId from, byte[] data) {
@@ -781,5 +808,16 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                " Send ID: " + _sendConnID +
                ' ' + _currentState +
                (_introducers != null ? (" Introducers: " + _introducers.toString()) : "");
+    }
+
+    /**
+     *  Mark a string for extraction by xgettext and translation.
+     *  Use this only in static initializers.
+     *  It does not translate!
+     *  @return s
+     *  @since 0.9.57
+     */
+    private static final String _x(String s) {
+        return s;
     }
 }

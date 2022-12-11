@@ -355,8 +355,6 @@ class SSU2Payload {
                     break;
 
                 case BLOCK_TERMINATION:
-                    if (isHandshake)
-                        throw new IOException("Illegal block in handshake: " + type);
                     if (len < 9)
                         throw new IOException("Bad length for TERMINATION: " + len);
                     long last = DataHelper.fromLong8(payload, i);

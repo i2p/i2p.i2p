@@ -823,8 +823,8 @@ class IntroductionManager {
         RouterInfo aliceRI = null;
         int rcode;
         if (charlie == null) {
-            if (_log.shouldWarn())
-                _log.warn("Relay tag not found " + tag + " from " + alice);
+            if (_log.shouldInfo())
+                _log.info("Relay tag not found " + tag + " from " + alice);
             rcode = SSU2Util.RELAY_REJECT_BOB_NO_TAG;
         } else if (charlie.getVersion() != 2) {
             if (_log.shouldWarn())

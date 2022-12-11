@@ -99,7 +99,7 @@ final class SSU2Util {
     public static final int DATA_HEADER_SIZE = SHORT_HEADER_SIZE;
 
     /**
-     *  The message types, 0-10, as bytes
+     *  The message types, 0-11, as bytes
      */
     public static final byte SESSION_REQUEST_FLAG_BYTE = UDPPacket.PAYLOAD_TYPE_SESSION_REQUEST;
     public static final byte SESSION_CREATED_FLAG_BYTE = UDPPacket.PAYLOAD_TYPE_SESSION_CREATED;
@@ -110,6 +110,7 @@ final class SSU2Util {
     public static final byte TOKEN_REQUEST_FLAG_BYTE = 10;
     public static final byte HOLE_PUNCH_FLAG_BYTE = 11;
 
+    // HKDF infos
     public static final String INFO_CREATED =   "SessCreateHeader";
     public static final String INFO_CONFIRMED = "SessionConfirmed";
     public static final String INFO_DATA =      "HKDFSSU2DataKeys";
@@ -118,10 +119,12 @@ final class SSU2Util {
     public static final byte[] ZEROKEY = new byte[KEY_LEN];
 
     // relay and peer test
+    // Signature prologues
     public static final byte[] RELAY_REQUEST_PROLOGUE = DataHelper.getASCII("RelayRequestData");
     public static final byte[] RELAY_RESPONSE_PROLOGUE = DataHelper.getASCII("RelayAgreementOK");
     public static final byte[] PEER_TEST_PROLOGUE = DataHelper.getASCII("PeerTestValidate");
 
+    // test status codes
     public static final int TEST_ACCEPT = 0;
     public static final int TEST_REJECT_BOB_UNSPEC = 1;
     public static final int TEST_REJECT_BOB_NO_CHARLIE = 2;
@@ -136,6 +139,7 @@ final class SSU2Util {
     public static final int TEST_REJECT_CHARLIE_BANNED = 69;
     public static final int TEST_REJECT_CHARLIE_UNKNOWN_ALICE = 70;
 
+    // relay status codes
     public static final int RELAY_ACCEPT = 0;
     public static final int RELAY_REJECT_BOB_UNSPEC = 1;
     public static final int RELAY_REJECT_BOB_BANNED_CHARLIE = 2;
