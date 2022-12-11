@@ -54,6 +54,7 @@ import net.i2p.util.HexDump;
 import net.i2p.util.I2PThread;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
+import net.i2p.util.ObjectCounter;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
@@ -76,6 +77,7 @@ class EstablishmentManager {
     private final boolean _enableSSU2;
     private final Map<RemoteHostId, Token> _outboundTokens;
     private final Map<RemoteHostId, Token> _inboundTokens;
+    private final ObjectCounter<RemoteHostId> _terminationCounter;
 
     /** map of RemoteHostId to InboundEstablishState */
     private final ConcurrentHashMap<RemoteHostId, InboundEstablishState> _inboundStates;
@@ -185,6 +187,8 @@ class EstablishmentManager {
     public static final long IB_TOKEN_EXPIRATION = 60*60*1000L;
     private static final long MAX_SKEW = 2*60*1000;
     private static final String TOKEN_FILE = "ssu2tokens.txt";
+    // max immediate terminations to send to a peer every FAILSAFE_INTERVAL
+    private static final int MAX_TERMINATIONS = 2;
 
 
     public EstablishmentManager(RouterContext ctx, UDPTransport transport) {
@@ -207,9 +211,11 @@ class EstablishmentManager {
             int tokenCacheSize = Math.max(MIN_TOKENS, Math.min(MAX_TOKENS, 3 * _transport.getMaxConnections() / 4));
             _inboundTokens = new InboundTokens(tokenCacheSize);
             _outboundTokens = new LHMCache<RemoteHostId, Token>(tokenCacheSize);
+            _terminationCounter = new ObjectCounter<RemoteHostId>();
         } else {
             _inboundTokens = null;
             _outboundTokens = null;
+            _terminationCounter = null;
         }
 
         _activityLock = new Object();
@@ -700,29 +706,38 @@ class EstablishmentManager {
                 if (_log.shouldWarn())
                     _log.warn("Dropping inbound establish, increase " + PROP_MAX_CONCURRENT_ESTABLISH);
                 _context.statManager().addRateData("udp.establishDropped", 1);
-                return; // drop the packet
+                sendTerminationPacket(from, packet, REASON_LIMITS);
+                return;
             }
             if (_context.blocklist().isBlocklisted(from.getIP())) {
                 if (_log.shouldInfo())
                     _log.info("Receive session request from blocklisted IP: " + from);
                 _context.statManager().addRateData("udp.establishBadIP", 1);
-                return; // drop the packet
+                if (!_context.commSystem().isInStrictCountry())
+                    sendTerminationPacket(from, packet, REASON_BANNED);
+                // else drop the packet
+                return;
             }
             synchronized (_inboundBans) {
                 Long exp = _inboundBans.get(from);
                 if (exp != null) {
                     if (exp.longValue() >= _context.clock().now()) {
+                        // this is common, finally get a packet after the IES2 timeout
                         if (_log.shouldInfo())
                             _log.info("SSU 2 session request from temp. blocked peer: " + from);
                          _context.statManager().addRateData("udp.establishBadIP", 1);
-                         return; // drop the packet
+                         // use this code for a temp ban
+                         sendTerminationPacket(from, packet, REASON_MSG1);
+                         return;
                     }
                     // expired
                     _inboundBans.remove(from);
                 }
             }
-            if (!_transport.allowConnection())
-                return; // drop the packet
+            if (!_transport.allowConnection()) {
+                sendTerminationPacket(from, packet, REASON_LIMITS);
+                return;
+            }
             try {
                 state = new InboundEstablishState2(_context, _transport, packet);
             } catch (GeneralSecurityException gse) {
@@ -780,6 +795,50 @@ class EstablishmentManager {
             state.setSentRelayTag(tag);
         }
         notifyActivity();
+    }
+
+    /**
+     * Send a Retry packet with a termination code, for a rejection
+     * of a session/token request. No InboundEstablishState2 required.
+     *
+     * SSU 2 only.
+     * The inbound packet was superficially validated for type, netID, and version,
+     * so we have basic probing resistance.
+     * The Retry packet encryption is low-cost, chacha only.
+     *
+     * Rate limited to MAX_TERMINATIONS per peer every FAILSAFE_INTERVAL
+     *
+     * @param fromPacket header already decrypted, must be session or token request
+     * @param terminationCode nonzero
+     * @since 0.9.57
+     */
+    private void sendTerminationPacket(RemoteHostId to, UDPPacket fromPacket, int terminationCode) {
+        int count = _terminationCounter.increment(to);
+        if (count > MAX_TERMINATIONS) {
+            // not everybody listens or backs off...
+            if (_log.shouldWarn())
+                _log.warn("Rate limit " + count + " not sending termination to: " + to);
+            return;
+        }
+        // very basic validation that this is probably in response to a good packet.
+        // we don't bother to decrypt the packet, even if it's only a token request
+        DatagramPacket pkt = fromPacket.getPacket();
+        int off = pkt.getOffset();
+        int len = pkt.getLength();
+        if (len < MIN_LONG_DATA_LEN)
+            return;
+        byte data[] = pkt.getData();
+        int type = data[off + TYPE_OFFSET] & 0xff;
+        if (type == SSU2Util.SESSION_REQUEST_FLAG_BYTE && len < MIN_SESSION_REQUEST_LEN)
+            return;
+        long rcvConnID = DataHelper.fromLong8(data, off);
+        long sendConnID = DataHelper.fromLong8(data, off + SRC_CONN_ID_OFFSET);
+        if (rcvConnID == 0 || sendConnID == 0 || rcvConnID == sendConnID)
+            return;
+        if (_log.shouldWarn())
+            _log.warn("Send immediate termination " + terminationCode + " on type " + type + " to: " + to);
+        UDPPacket packet = _builder2.buildRetryPacket(to, pkt.getSocketAddress(), sendConnID, rcvConnID, terminationCode);
+        _transport.send(packet);
     }
     
     /** 
@@ -3155,6 +3214,7 @@ class EstablishmentManager {
             }
             if (count > 0 && _log.shouldDebug())
                 _log.debug("Expired " + count + " outbound tokens");
+            _terminationCounter.clear();
         }
     }
 }

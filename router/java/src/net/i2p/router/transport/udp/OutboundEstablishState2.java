@@ -346,6 +346,13 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         // this sets the state to FAILED
         fail();
         _transport.getEstablisher().receiveSessionDestroy(_remoteHostId, this);
+        if (reason == REASON_BANNED) {
+            _context.banlist().banlistRouter(_remotePeer.calculateHash(), "They banned us", null, null, _context.clock().now() + 2*60*60*1000);
+        } else if (reason == REASON_MSG1) {
+            // this is like a short ban
+            _context.banlist().banlistRouter(_remotePeer.calculateHash(), "They banned us", null, null, _context.clock().now() + 20*60*1000);
+        }
+        // TODO handle other cases - skew?
     }
 
     public void gotPathChallenge(RemoteHostId from, byte[] data) {
@@ -470,9 +477,9 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         if (sid != _sendConnID)
             throw new GeneralSecurityException("Conn ID mismatch: 1: " + _sendConnID + " 2: " + sid);
         long token = DataHelper.fromLong8(data, off + TOKEN_OFFSET);
-        if (token == 0)
-            throw new GeneralSecurityException("Bad token 0 in retry");
-        _token = token;
+        // continue and decrypt even if token == 0 to get and log termination reason
+        if (token != 0)
+            _token = token;
         _timeReceived = 0;
         ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
         chacha.initializeKey(_rcvHeaderEncryptKey1, 0);
@@ -491,6 +498,9 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             // termination block received
             return;
         }
+        // generally will be with termination, so do this check after
+        if (token == 0)
+            throw new GeneralSecurityException("Bad token 0 in retry");
         if (_timeReceived == 0)
             throw new GeneralSecurityException("No DateTime block in Retry");
         // _nextSend is now(), from packetReceived()

@@ -513,9 +513,11 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             throw new IllegalStateException("Bad state for Retry Sent: " + _currentState);
         _currentState = InboundState.IB_STATE_RETRY_SENT;
         _lastSend = _context.clock().now();
-        // Won't really be retransmitted, they have 9 sec to respond or
+        // Won't really be retransmitted, they have 5 sec to respond or
         // EstablishmentManager.handleInbound() will fail the connection
-        _nextSend = _lastSend + (3 * RETRANSMIT_DELAY);
+        // Alice will retransmit at 1 and 3 seconds, so wait 5
+        // We're not going to wait for the 3rd retx at 7 seconds.
+        _nextSend = _lastSend + (5 * RETRANSMIT_DELAY);
     }
 
     /**
