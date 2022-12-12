@@ -1,6 +1,8 @@
 package net.i2p.router.transport.udp;
 
+import java.util.ArrayList;
 import java.net.InetAddress;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.data.DataHelper;
@@ -31,6 +33,10 @@ class PeerTestState {
     private Hash _aliceHash;
     // SSU2 only
     private Hash _charlieHash;
+    // SSU2 BOB only
+    private byte[] _testData;
+    // SSU2 BOB only
+    private final List<Hash> _previousCharlies;
     private final long _beginTime;
     private long _lastSendTime;
     private long _receiveAliceTime;
@@ -49,6 +55,7 @@ class PeerTestState {
         _isIPv6 = isIPv6;
         _testNonce = nonce;
         _beginTime = now;
+        _previousCharlies = role == Role.BOB ? new ArrayList<Hash>(8) : null;
     }
 
     public long getNonce() { return _testNonce; }
@@ -98,6 +105,7 @@ class PeerTestState {
     }
     public InetAddress getBobIP() { return _bob.getRemoteIPAddress(); }
     public InetAddress getCharlieIP() { return _charlieIP; }
+
     /**
      * @param hash SSU2 only, null for SSU1
      * @since 0.9.54
@@ -105,8 +113,18 @@ class PeerTestState {
     public void setCharlie(InetAddress ip, int port, Hash hash) {
         _charlieIP = ip;
         _charliePort = port;
+        if (_charlieHash != null && _previousCharlies != null)
+            _previousCharlies.add(_charlieHash);
         _charlieHash = hash;
     }
+
+    /**
+     * SSU2 only, BOB only, else returns null.
+     * Does not include current charlie.
+     * @since 0.9.57
+     */
+    public List<Hash> getPreviousCharlies() { return _previousCharlies; }
+
     public InetAddress getAliceIPFromCharlie() { return _aliceIPFromCharlie; }
     public void setAliceIPFromCharlie(InetAddress ip) { _aliceIPFromCharlie = ip; }
     /**
@@ -172,7 +190,19 @@ class PeerTestState {
     /** when did we last hear from charlie? */
     public long getReceiveCharlieTime() { return _receiveCharlieTime; }
     public void setReceiveCharlieTime(long when) { _receiveCharlieTime = when; }
-    
+
+    /**
+     *  SSU2 only, we are Bob
+     *  @since 0.9.57
+     */
+    public byte[] getTestData() { return _testData; }
+
+    /**
+     *  SSU2 only, we are Bob
+     *  @since 0.9.57
+     */
+    public void setTestData(byte[] data) { _testData = data; }
+
     /** @return new value */
     public int incrementPacketsRelayed() { return _packetsRelayed.incrementAndGet(); }
     
@@ -202,6 +232,8 @@ class PeerTestState {
                 buf.append("me");
             else
                 buf.append(_charlieIP).append(':').append(_charliePort);
+            if (_previousCharlies != null && !_previousCharlies.isEmpty())
+                buf.append(" previous: ").append(_previousCharlies);
         }
         if (_lastSendTime > 0)
             buf.append("; last send after ").append(_lastSendTime - _beginTime);
