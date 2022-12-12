@@ -433,11 +433,13 @@ class OutboundMessageFragments {
                                 (peer.isIPv6() ? PacketBuilder2.MIN_IPV6_DATA_PACKET_OVERHEAD : PacketBuilder2.MIN_DATA_PACKET_OVERHEAD);
                 peer.messageRetransmitted(queued, maxPktSz);
                 // _packetsRetransmitted += toSend; // lifetime for the transport
-                _context.statManager().addRateData("udp.peerPacketsRetransmitted", peer.getPacketsRetransmitted(), peer.getPacketsTransmitted());
-                _context.statManager().addRateData("udp.packetsRetransmitted", state.getLifetime(), peer.getPacketsTransmitted());
+                long lifetime = state.getLifetime();
+                int transmitted = peer.getPacketsTransmitted();
+                _context.statManager().addRateData("udp.peerPacketsRetransmitted", peer.getPacketsRetransmitted(), transmitted);
+                _context.statManager().addRateData("udp.packetsRetransmitted", lifetime, transmitted);
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Retransmitting " + state + " to " + peer);
-                _context.statManager().addRateData("udp.sendVolleyTime", state.getLifetime(), queued);
+                _context.statManager().addRateData("udp.sendVolleyTime", lifetime, queued);
             }
         }
 

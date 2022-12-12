@@ -332,8 +332,17 @@ class InboundEstablishState {
             _currentState = InboundState.IB_STATE_CREATED_SENT;
     }
 
-    /** how long have we been trying to establish this session? */
-    public long getLifetime() { return _context.clock().now() - _establishBegin; }
+    /**
+     * how long have we been trying to establish this session?
+     */
+    public long getLifetime() { return getLifetime(_context.clock().now()); }
+
+    /**
+     * how long have we been trying to establish this session?
+     * @since 0.9.57
+     */
+    public long getLifetime(long now) { return now - _establishBegin; }
+
     public long getEstablishBeginTime() { return _establishBegin; }
 
     /**

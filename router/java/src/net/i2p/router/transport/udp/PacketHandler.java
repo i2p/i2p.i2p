@@ -448,16 +448,17 @@ class PacketHandler {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Cannot validate rcvd pkt (path) wasCached? " + alreadyFailed + ": " + packet);
 
-                _context.statManager().addRateData("udp.droppedInvalidEstablish", packet.getLifetime());
+                long lifetime = packet.getLifetime();
+                _context.statManager().addRateData("udp.droppedInvalidEstablish", lifetime);
                 switch (peerType) {
                     case INBOUND_FALLBACK:
-                        _context.statManager().addRateData("udp.droppedInvalidEstablish.inbound", packet.getLifetime(), packet.getTimeSinceReceived());
+                        _context.statManager().addRateData("udp.droppedInvalidEstablish.inbound", lifetime, packet.getTimeSinceReceived());
                         break;
                     case OUTBOUND_FALLBACK:
-                        _context.statManager().addRateData("udp.droppedInvalidEstablish.outbound", packet.getLifetime(), packet.getTimeSinceReceived());
+                        _context.statManager().addRateData("udp.droppedInvalidEstablish.outbound", lifetime, packet.getTimeSinceReceived());
                         break;
                     case NEW_PEER:
-                        _context.statManager().addRateData("udp.droppedInvalidEstablish.new", packet.getLifetime(), packet.getTimeSinceReceived());
+                        _context.statManager().addRateData("udp.droppedInvalidEstablish.new", lifetime, packet.getTimeSinceReceived());
                         break;
                 }
                 return;
@@ -903,7 +904,7 @@ class PacketHandler {
                         header.getType() != SSU2Util.TOKEN_REQUEST_FLAG_BYTE ||
                         header.getVersion() != 2 ||
                         header.getNetID() != _networkID) {
-                        // i2pd short session request? TODO
+                        // i2pd short 87 byte session request thru 0.9.56
                         if (_log.shouldWarn())
                             _log.warn("Failed decrypt Session/Token Request after Retry: " + header +
                                       " len " + packet.getPacket().getLength() + " on " + state);
@@ -928,9 +929,11 @@ class PacketHandler {
                 // Session Confirmed or retransmitted Session Request or Token Request
                 header = SSU2Header.trialDecryptShortHeader(packet, k1, k2);
                 if (header == null) {
-                    // too short
+                    // too short, perhaps SSU 1/2 confusion?
+                    // Java 0.9.55 short destroy bug?
                     if (_log.shouldWarn())
-                        _log.warn("Failed decrypt Session Confirmed on " + state);
+                        _log.warn("Session Confirmed too short len: " +
+                                  + packet.getPacket().getLength() + " on " + state);
                     return false;
                 }
                 if (header.getDestConnID() != state.getRcvConnID()) {
