@@ -2915,7 +2915,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         // if we have explicit external addresses, they had better be reachable
         String caps;
-        if (introducersRequired || !canIntroduce(isIPv6)) {
+        if (isSnatted()) {
+            caps = isIPv6 ? CAP_IPV6 : CAP_IPV4;
+        } else if (introducersRequired || !canIntroduce(isIPv6)) {
             if (!directIncluded) {
                 if (isIPv6)
                     caps = CAP_TESTING_6;
