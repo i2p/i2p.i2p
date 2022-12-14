@@ -1011,7 +1011,9 @@ class IntroductionManager {
         SessionKey aliceIntroKey = null;
         int rcode;
         PeerState aps = _transport.getPeerState(alice);
-        if (aps != null && aps.isIPv6() == isIPv6) {
+        if (_transport.isSnatted()) {
+            rcode = SSU2Util.RELAY_REJECT_CHARLIE_ADDRESS;
+        } else if (aps != null && aps.isIPv6() == isIPv6) {
             rcode = SSU2Util.RELAY_REJECT_CHARLIE_CONNECTED;
         } else if (_context.banlist().isBanlisted(alice) ||
                    _context.blocklist().isBlocklisted(testIP)) {
