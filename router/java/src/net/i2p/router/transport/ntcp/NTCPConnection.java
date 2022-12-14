@@ -904,11 +904,14 @@ public class NTCPConnection implements Closeable {
         synchronized(_writeLock) {
             if (_sender != null) {
                 sendNTCP2(dataBuf.getData(), blocks);
-                _sender.destroy();
-                // this "plugs" the NTCP2 sender, so sendNTCP2()
-                // won't send any more after the termination.
-                _sender = null;
-                new DelayedCloser();
+                // sendNTCP2() -> wantsWrite() -> pumper.processWrite() -> fail -> close() -> NPE
+                if (_sender != null) {
+                    _sender.destroy();
+                    // this "plugs" the NTCP2 sender, so sendNTCP2()
+                    // won't send any more after the termination.
+                    _sender = null;
+                    new DelayedCloser();
+                }
             }
         }
         releaseReadBuf(dataBuf);
