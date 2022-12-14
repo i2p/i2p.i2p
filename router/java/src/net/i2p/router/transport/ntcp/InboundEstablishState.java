@@ -211,7 +211,8 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             _context.clock().setOffset(1000 * (0 - _peerSkew), true);
             _peerSkew = 0;
             if (diff != 0)
-                _log.logAlways(Log.WARN, "NTP failure, NTCP adjusting clock by " + DataHelper.formatDuration(diff));
+                _log.logAlways(Log.WARN, "NTP failure, NTCP adjusting clock by " + DataHelper.formatDuration(diff) +
+                                         " source router: " + aliceHash);
         } else if (diff >= Router.CLOCK_FUDGE_FACTOR) {
             // Only banlist if we know what time it is
             _context.banlist().banlistRouter(DataHelper.formatDuration(diff),
