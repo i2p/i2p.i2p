@@ -216,6 +216,14 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         if (now >= _sentMessagesLastExpired + SENT_MESSAGES_CLEAN_TIME) {
             _sentMessagesLastExpired = now;
             if (!_sentMessages.isEmpty()) {
+                // TODO is this the right place for this check?
+                long ahead =  _packetNumber.get() - _ackedMessages.getHighestSet();
+                if (ahead > BITFIELD_SIZE) {
+                    if (_log.shouldWarn())
+                        _log.warn("Fail after " + ahead + "unacked packets on " + this);
+                    _transport.sendDestroy(this, REASON_FRAME_TIMEOUT);
+                    _transport.dropPeer(this, true, "Too many unacked packets");
+                }
                 if (_log.shouldDebug())
                     _log.debug("finishMessages() over " + _sentMessages.size() + " pending acks");
                 loop:
@@ -227,8 +235,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                             continue loop;
                     }
                     iter.remove();
-                    if (_log.shouldWarn())
-                        _log.warn("Cleaned from sentMessages: " + frags);
+                    if (_log.shouldInfo())
+                        _log.info("Cleaned from sentMessages: " + frags);
                 }
             }
         }

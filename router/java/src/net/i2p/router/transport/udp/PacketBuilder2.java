@@ -304,9 +304,14 @@ class PacketBuilder2 {
         
         packet.setPriority(priority);
         if (fragments.isEmpty()) {
-            SSU2Bitfield acked =  peer.getAckedMessages();
-            if (acked != null)     // null for PeerStateDestroyed
-                acked.set(pktNum); // not ack-eliciting
+            SSU2Bitfield acked = peer.getAckedMessages();
+            if (acked != null) {     // null for PeerStateDestroyed
+                try {
+                    acked.set(pktNum); // not ack-eliciting
+                } catch (IndexOutOfBoundsException e) {
+                    // shift too big, ignore, we're dead or about to be
+                }
+            }
             packet.markType(1);
             packet.setFragmentCount(-1);
             packet.setMessageType(TYPE_ACK);
@@ -340,7 +345,11 @@ class PacketBuilder2 {
         encryptDataPacket(packet, peer.getSendCipher(), pktNum, peer.getSendHeaderEncryptKey1(), peer.getSendHeaderEncryptKey2());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
         packet.setPriority(PRIORITY_LOW);
-        peer.getAckedMessages().set(pktNum); // not ack-eliciting
+        try {
+            peer.getAckedMessages().set(pktNum); // not ack-eliciting
+        } catch (IndexOutOfBoundsException e) {
+            // shift too big, ignore, we're dead or about to be
+        }
         return packet;
     }
 
