@@ -47,7 +47,7 @@ public final class ChaCha20 {
     public static void encrypt(byte[] key, byte[] iv,
                                byte[] plaintext, int plaintextOffset,
                                byte[] ciphertext, int ciphertextOffset, int length) {
-        encrypt(key, iv, 0, ciphertext, ciphertextOffset, plaintext, plaintextOffset, length);
+        encrypt(key, iv, 0, plaintext, plaintextOffset, ciphertext, ciphertextOffset, length);
     }
 
     /**
