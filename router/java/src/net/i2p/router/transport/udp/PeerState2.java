@@ -493,6 +493,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                                     _pathChallengeSendCount = 1;
                                     _pendingRemoteHostId = from;
                                     sendPathChallenge(dpacket.getAddress(), from.getPort());
+                                    setLastSendTime(_migrationStarted);
                                 } else {
                                     // don't attempt to switch
                                     if (_log.shouldWarn())
@@ -525,6 +526,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                                         _migrationNextSendTime = now + (PATH_CHALLENGE_DELAY << _pathChallengeSendCount);
                                         _pathChallengeSendCount++;
                                         sendPathChallenge(dpacket.getAddress(), from.getPort());
+                                        setLastSendTime(now);
                                     }
                                     limitSending = true;
                                 } else {
@@ -835,6 +837,9 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                                                              this);
         // TODO send to from address?
         _transport.send(pkt);
+        long now = _context.clock().now();
+        setLastSendTime(now);
+        setLastReceiveTime(now);
     }
 
     public void gotPathResponse(RemoteHostId from, byte[] data) {
@@ -858,6 +863,9 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                                                                                  Collections.singletonList(block),
                                                                                  this);
                             _transport.send(pkt);
+                            long now = _context.clock().now();
+                            setLastSendTime(now);
+                            setLastReceiveTime(now);
                         } else {
                             messagePartiallyReceived();
                         }
