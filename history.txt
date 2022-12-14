@@ -1,4 +1,32 @@
+2022-12-14 zzz
+ * Crypto: Fix wrong arguments order in ChaCha20 encrypt, breaking encrypted LS2
+ * NTCP:
+   - Fix rare NPE sending termination
+   - Log source of clock adjustment at startup
+ * SSU2:
+   - Catch "shift too big" IAE from acked bitfield while sending termination
+   - Drop short session request messages in packet handler
+   - Preliminary fixes for handling retransmitted retries
+   - Reject peer test or relay as Charlie if snatted
+
+2022-12-13 zzz
+ * SSU: Don't publish B cap when snatted
+ * Tunnels: Tighten the hop throttle more
+
+2022-12-12 zzz
+ * SSU2: Bob asks another Peer Test Charlie on rejection
+
+2022-12-11 zzz
+ * SSU2:
+   - Ban peer if he bans us in retry
+   - Destroy PS2 cipher states when done
+   - Handle retransmitted token request
+   - Handle skew reason in termination, possibly ban peer
+   - Send termination on inbound session/token request
+   - Wait longer for session request after retry
+
 2022-12-10 zzz
+ * Graphs: Fix RRD time skew handling
  * SSU: Update activity timestamps for relay and peer test messages
  * SSU2: Peer Test fixes
 
