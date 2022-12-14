@@ -49,8 +49,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     private final Map<Hash, IntroState> _introducers;
     private long _token;
     private HandshakeState _handshakeState;
-    private final byte[] _sendHeaderEncryptKey1;
-    private final byte[] _rcvHeaderEncryptKey1;
+    // Bob's intro key, same for send and receive
+    private final byte[] _headerEncryptKey1;
     private byte[] _sendHeaderEncryptKey2;
     private byte[] _rcvHeaderEncryptKey2;
     private final byte[] _rcvRetryHeaderEncryptKey2;
@@ -211,8 +211,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         _rcvConnID = rcid;
 
         byte[] ik = introKey.getData();
-        _sendHeaderEncryptKey1 = ik;
-        _rcvHeaderEncryptKey1 = ik;
+        _headerEncryptKey1 = ik;
         _sendHeaderEncryptKey2 = ik;
         //_rcvHeaderEncryptKey2 will be set after the Session Request message is created
         _rcvRetryHeaderEncryptKey2 = ik;
@@ -343,7 +342,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
 
     public void gotTermination(int reason, long count) {
         if (_log.shouldWarn())
-            _log.warn("Got TERMINATION block, reason: " + reason + " count: " + count);
+            _log.warn("Got TERMINATION block, reason: " + reason + " count: " + count + " on " + this);
         // this sets the state to FAILED
         fail();
         _transport.getEstablisher().receiveSessionDestroy(_remoteHostId, this);
@@ -450,8 +449,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         return _transport.getEstablisher().getInboundToken(_remoteHostId);
     }
     public HandshakeState getHandshakeState() { return _handshakeState; }
-    public byte[] getSendHeaderEncryptKey1() { return _sendHeaderEncryptKey1; }
-    public byte[] getRcvHeaderEncryptKey1() { return _rcvHeaderEncryptKey1; }
+    public byte[] getSendHeaderEncryptKey1() { return _headerEncryptKey1; }
+    public byte[] getRcvHeaderEncryptKey1() { return _headerEncryptKey1; }
     public byte[] getSendHeaderEncryptKey2() { return _sendHeaderEncryptKey2; }
     /**
      *  @return null before Session Request is sent (i.e. we sent a Token Request first)
@@ -509,7 +508,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             _token = token;
         _timeReceived = 0;
         ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
-        chacha.initializeKey(_rcvHeaderEncryptKey1, 0);
+        chacha.initializeKey(_headerEncryptKey1, 0);
         long n = DataHelper.fromLong(data, off + PKT_NUM_OFFSET, 4);
         chacha.setNonce(n);
         try {
@@ -536,7 +535,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             throw new GeneralSecurityException("Skew exceeded in Retry: " + _skew);
         createNewState(_routerAddress);
         if (_log.shouldDebug())
-            _log.debug("Received a retry on " + this);
+            _log.debug("Received a retry token " + token + " on " + this);
         _currentState = OutboundState.OB_STATE_RETRY_RECEIVED;
     }
 
@@ -718,7 +717,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                                      _remotePeer.calculateHash(),
                                      false, _rtt, sender, rcvr,
                                      _sendConnID, _rcvConnID,
-                                     _sendHeaderEncryptKey1, h_ab, h_ba);
+                                     _headerEncryptKey1, h_ab, h_ba);
             _currentState = OutboundState.OB_STATE_CONFIRMED_COMPLETELY;
             _pstate.confirmedPacketsSent(_sessConfForReTX);
             // PS2.super adds CLOCK_SKEW_FUDGE that doesn't apply here
@@ -806,6 +805,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                " lifetime: " + DataHelper.formatDuration(getLifetime()) +
                " Rcv ID: " + _rcvConnID +
                " Send ID: " + _sendConnID +
+               " Token: " + _token +
                ' ' + _currentState +
                (_introducers != null ? (" Introducers: " + _introducers.toString()) : "");
     }

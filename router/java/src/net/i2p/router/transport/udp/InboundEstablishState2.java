@@ -48,7 +48,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     private final long _token;
     private final HandshakeState _handshakeState;
     private byte[] _sendHeaderEncryptKey1;
-    private final byte[] _rcvHeaderEncryptKey1;
     private byte[] _sendHeaderEncryptKey2;
     private byte[] _rcvHeaderEncryptKey2;
     private byte[] _sessCrForReTX;
@@ -86,7 +85,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                                                   transport.getSSU2StaticPubKey(), 0);
         byte[] introKey = transport.getSSU2StaticIntroKey();
         _sendHeaderEncryptKey1 = introKey;
-        _rcvHeaderEncryptKey1 = introKey;
         //_sendHeaderEncryptKey2 set below
         //_rcvHeaderEncryptKey2 set below
         int off = pkt.getOffset();
@@ -104,7 +102,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             _currentState = InboundState.IB_STATE_TOKEN_REQUEST_RECEIVED;
             // decrypt in-place
             ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
-            chacha.initializeKey(_rcvHeaderEncryptKey1, 0);
+            chacha.initializeKey(introKey, 0);
             long n = DataHelper.fromLong(data, off + PKT_NUM_OFFSET, 4);
             chacha.setNonce(n);
             chacha.decryptWithAd(data, off, LONG_HEADER_SIZE,
@@ -119,6 +117,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         } else if (type == SESSION_REQUEST_FLAG_BYTE &&
                    (token == 0 ||
                     (ENFORCE_TOKEN && !_transport.getEstablisher().isInboundTokenValid(_remoteHostId, token)))) {
+            // i2pd thru 0.9.55 ignores zero token + termination in retry
             if (_log.shouldInfo())
                 _log.info("Invalid token " + token + " in session request from: " + _aliceSocketAddress);
             if (token == 0)
@@ -178,7 +177,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         }
         packetReceived();
         if (_log.shouldDebug())
-            _log.debug("New " + this);
+            _log.debug("New req type " + type + " len " + len + " on " + this);
     }
 
     @Override
@@ -428,8 +427,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     public void gotTermination(int reason, long count) {
-        if (_log.shouldInfo())
-            _log.info("Got TERMINATION block, reason: " + reason + " count: " + count);
+        if (_log.shouldWarn())
+            _log.warn("Got TERMINATION block, reason: " + reason + " count: " + count + " on " + this);
         // this sets the state to FAILED
         fail();
         _transport.getEstablisher().receiveSessionDestroy(_remoteHostId);
@@ -479,7 +478,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
     public HandshakeState getHandshakeState() { return _handshakeState; }
     public byte[] getSendHeaderEncryptKey1() { return _sendHeaderEncryptKey1; }
-    public byte[] getRcvHeaderEncryptKey1() { return _rcvHeaderEncryptKey1; }
+    public byte[] getRcvHeaderEncryptKey1() { return _transport.getSSU2StaticIntroKey(); }
     public byte[] getSendHeaderEncryptKey2() { return _sendHeaderEncryptKey2; }
     public synchronized byte[] getRcvHeaderEncryptKey2() { return _rcvHeaderEncryptKey2; }
     public InetSocketAddress getSentAddress() { return _aliceSocketAddress; }
@@ -574,6 +573,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             if (_log.shouldWarn())
                 _log.warn("Got retx token request on: " + this);
             // Est. mgr will resend retry and call retryPacketSent()
+            // Note that Java I2P < 0.9.57 doesn't handle retransmitted retries correctly,
+            // so this won't work for them
             long now = _context.clock().now();
             // rate limit
             _nextSend = Math.max(now, _lastSend + 750);
@@ -912,6 +913,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         buf.append(" lifetime: ").append(DataHelper.formatDuration(getLifetime()));
         buf.append(" Rcv ID: ").append(_rcvConnID);
         buf.append(" Send ID: ").append(_sendConnID);
+        buf.append(" Token: ").append(_token);
         if (_sentRelayTag > 0)
             buf.append(" RelayTag: ").append(_sentRelayTag);
         buf.append(' ').append(_currentState);
