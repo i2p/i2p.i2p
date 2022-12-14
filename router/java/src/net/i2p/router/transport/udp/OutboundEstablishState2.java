@@ -237,6 +237,16 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         createNewState(_routerAddress);
     }
 
+    /**
+     *  This will be called 0 times if we don't have a token and never get a retry;
+     *  once if we have a token;
+     *  and twice if the token we had was bad and we got a retry.
+     *  We must regenerate the handshake state if we get a new token, because
+     *  we only save the full encrypted packet for retransmission, and
+     *  the encryption changes if the token does.
+     *
+     *  caller must synch
+     */
     private void createNewState(RouterAddress addr) {
         String ss = addr.getOption("s");
         if (ss == null)
@@ -254,6 +264,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         _handshakeState.getRemotePublicKey().setPublicKey(publicKey, 0);
         _handshakeState.getLocalKeyPair().setKeys(_transport.getSSU2StaticPrivKey(), 0,
                                                   _transport.getSSU2StaticPubKey(), 0);
+        // we must invalidate any old saved session request
+        _sessReqForReTX = null;
     }
     
     private void processPayload(byte[] payload, int offset, int length, boolean isHandshake) throws GeneralSecurityException {
@@ -488,7 +500,6 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
      *  @since 0.9.56
      */
     private void locked_receiveRetry(UDPPacket packet) throws GeneralSecurityException {
-        ////// TODO state check
         DatagramPacket pkt = packet.getPacket();
         SocketAddress from = pkt.getSocketAddress();
         if (!from.equals(_bobSocketAddress))
@@ -504,8 +515,15 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
             throw new GeneralSecurityException("Conn ID mismatch: 1: " + _sendConnID + " 2: " + sid);
         long token = DataHelper.fromLong8(data, off + TOKEN_OFFSET);
         // continue and decrypt even if token == 0 to get and log termination reason
-        if (token != 0)
-            _token = token;
+        if (token != 0) {
+            if (token != _token) {
+                if (_currentState == OutboundState.OB_STATE_REQUEST_SENT_NEW_TOKEN) {
+                    // we already got a retry with a different token
+                    throw new GeneralSecurityException("Token mismatch: expected: " + _token + " got: " + token);
+                }
+                _token = token;
+            }
+        }
         _timeReceived = 0;
         ChaChaPolyCipherState chacha = new ChaChaPolyCipherState();
         chacha.initializeKey(_headerEncryptKey1, 0);
@@ -527,6 +545,17 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         // generally will be with termination, so do this check after
         if (token == 0)
             throw new GeneralSecurityException("Bad token 0 in retry");
+        // we do the state check here, after all the validation,
+        // so we can check for termination first.
+        if (_currentState != OutboundState.OB_STATE_TOKEN_REQUEST_SENT &&
+            _currentState != OutboundState.OB_STATE_REQUEST_SENT) {
+            // not fatal
+            if (_log.shouldWarn())
+                _log.warn("Got out-of-order Retry with token " + token + " on: " + this);
+            // retransmit session request, rate limit
+            _nextSend = Math.max(_context.clock().now(), _lastSend + 750);
+            return;
+        }
         if (_timeReceived == 0)
             throw new GeneralSecurityException("No DateTime block in Retry");
         // _nextSend is now(), from packetReceived()
