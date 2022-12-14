@@ -462,8 +462,8 @@ class PacketBuilder2 {
         byte sentIP[] = state.getSentIP();
         pkt.setLength(LONG_HEADER_SIZE);
         int port = state.getSentPort();
-        encryptRetry(packet, state.getSendHeaderEncryptKey1(), n, state.getSendHeaderEncryptKey1(),
-                     state.getSendHeaderEncryptKey2(),
+        byte[] introKey = state.getSendHeaderEncryptKey1();
+        encryptRetry(packet, introKey, n, introKey, introKey,
                      sentIP, port, terminationCode);
         pkt.setSocketAddress(state.getSentAddress());
         packet.setMessageType(TYPE_CREAT);
