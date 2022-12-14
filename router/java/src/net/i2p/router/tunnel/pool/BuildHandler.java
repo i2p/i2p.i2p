@@ -493,9 +493,9 @@ class BuildHandler implements Runnable {
             _log.warn("Took too long to decrypt the request: " + decryptTime + " for message " + state.msg.getUniqueId() + " received " + (timeSinceReceived+decryptTime) + " ago");
         if (req == null) {
             // no records matched, or the decryption failed.  bah
-            if (_log.shouldLog(Log.WARN)) {
-                _log.warn("The request " + state.msg.getUniqueId() + " could not be decrypted from: " + from);
-            }
+            // very common, probably very old routers confused about ECIES
+            if (_log.shouldInfo())
+                _log.info("The request " + state.msg.getUniqueId() + " could not be decrypted from: " + from);
             _context.statManager().addRateData("tunnel.dropDecryptFail", 1);
             if (from != null)
                 _context.commSystem().mayDisconnect(from);
