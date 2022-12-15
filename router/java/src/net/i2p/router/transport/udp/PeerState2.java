@@ -407,7 +407,9 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         try {
             SSU2Header.Header header = SSU2Header.trialDecryptShortHeader(packet, _rcvHeaderEncryptKey1, _rcvHeaderEncryptKey2);
             if (header == null) {
-                if (_log.shouldWarn())
+                // Java I2P thru 0.9.55 would send 35-39 byte ping packets
+                // Java I2P thru 0.9.56 retransmits session confirmed with 1-2 byte packets
+                if (len > 2 && len < 35 && _log.shouldWarn())
                     _log.warn("Inbound packet too short " + len + " on " + this);
                 return;
             }
@@ -1024,7 +1026,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             byte data[] = pkt.getData();
             int off = pkt.getOffset();
             System.arraycopy(_sessConfForReTX[i], 0, data, off, _sessConfForReTX[i].length);
-            pkt.setLength(_sessConfForReTX.length);
+            pkt.setLength(_sessConfForReTX[i].length);
             pkt.setAddress(addr);
             pkt.setPort(_remotePort);
             packet.setMessageType(PacketBuilder2.TYPE_CONF);

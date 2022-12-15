@@ -946,8 +946,7 @@ class PacketHandler {
                 // Session Confirmed or retransmitted Session Request or Token Request
                 header = SSU2Header.trialDecryptShortHeader(packet, k1, k2);
                 if (header == null) {
-                    // too short, perhaps SSU 1/2 confusion?
-                    // Java 0.9.55 short destroy bug?
+                    // Java I2P thru 0.9.56 retransmits session confirmed with 1-2 byte packets
                     if (_log.shouldWarn())
                         _log.warn("Session Confirmed too short len: " +
                                   + packet.getPacket().getLength() + " on " + state);

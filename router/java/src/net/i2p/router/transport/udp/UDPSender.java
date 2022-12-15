@@ -196,6 +196,8 @@ class UDPSender {
             _log.error("Dropping large UDP packet " + psz + " bytes: " + packet, new Exception());
             return;
         }
+        if (psz > 0 && psz < SSU2Util.MIN_DATA_LEN && _log.shouldWarn())
+            _log.warn("Small UDP packet " + psz + " bytes: " + packet, new Exception());
         if (_dummy) {
             // testing
             // back to the cache
