@@ -112,6 +112,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         INTRO_STATE_FAILED,
         /** this peer is not an introducer */
         INTRO_STATE_INVALID,
+        /** this peer is us */
+        INTRO_STATE_US,
         /** we got an accept from Charlie via this introducer */
         INTRO_STATE_SUCCESS
     }
@@ -184,6 +186,8 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                     long exp = addr.getIntroducerExpiration(i);
                     if (exp != 0 && exp < _establishBegin)
                         istate = IntroState.INTRO_STATE_EXPIRED;
+                    else if (h.equals(_context.routerHash()))
+                        istate = IntroState.INTRO_STATE_US;
                     else if (_context.banlist().isBanlisted(h))
                         istate = IntroState.INTRO_STATE_REJECTED;
                     else
