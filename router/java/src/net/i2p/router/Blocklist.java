@@ -39,6 +39,7 @@ import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 
 /**
@@ -100,10 +101,10 @@ public class Blocklist {
      *  Note that it's impossible to prevent clogging up
      *  the tables by a determined attacker, esp. on IPv6
      */
-    private static final int MAX_IPV4_SINGLES = 8192;
-    private static final int MAX_IPV6_SINGLES = 4096;
+    private static final int MAX_IPV4_SINGLES = SystemVersion.isSlow() ? 512 : 8192;
+    private static final int MAX_IPV6_SINGLES = SystemVersion.isSlow() ? 256 : 4096;
 
-    private final Set<Integer> _singleIPBlocklist = new ConcurrentHashSet<Integer>(4);
+    private final Map<Integer, Object> _singleIPBlocklist = new LHMCache<Integer, Object>(MAX_IPV4_SINGLES);
     private final Map<BigInteger, Object> _singleIPv6Blocklist = new LHMCache<BigInteger, Object>(MAX_IPV6_SINGLES);
 
     private static final Object DUMMY = Integer.valueOf(0);    
@@ -382,6 +383,7 @@ public class Blocklist {
         try {
             br = new BufferedReader(new InputStreamReader(
                     new FileInputStream(blFile), "UTF-8"));
+            String source = blFile.toString();
             String buf = null;
             while ((buf = br.readLine()) != null) {
                 Entry e = parse(buf, true);
@@ -398,7 +400,7 @@ public class Blocklist {
                 if (ip1.length == 4) {
                     if (isFeedFile) {
                         // temporary
-                        add(ip1);
+                        add(ip1, source);
                         feedcount++;
                     } else {
                         byte[] ip2 = e.ip2;
@@ -407,7 +409,7 @@ public class Blocklist {
                     }
                 } else {
                     // IPv6
-                    add(ip1);
+                    add(ip1, source);
                 }
             }
         } catch (IOException ioe) {
@@ -666,7 +668,22 @@ public class Blocklist {
     public void add(String ip) {
         byte[] pib = Addresses.getIP(ip);
         if (pib == null) return;
-        add(pib);
+        add(pib, null);
+    }
+
+    /**
+     * Maintain a simple in-memory single-IP blocklist
+     * This is used for new additions, NOT for the main list
+     * of IP ranges read in from the file.
+     *
+     * @param ip IPv4 or IPv6
+     * @param source for logging only, may be null
+     * @since 0.9.57
+     */
+    public void add(String ip, String source) {
+        byte[] pib = Addresses.getIP(ip);
+        if (pib == null) return;
+        add(pib, source);
     }
 
     /**
@@ -677,6 +694,19 @@ public class Blocklist {
      * @param ip IPv4 or IPv6
      */
     public void add(byte ip[]) {
+        add(ip, null);
+    }
+
+    /**
+     * Maintain a simple in-memory single-IP blocklist
+     * This is used for new additions, NOT for the main list
+     * of IP ranges read in from the file.
+     *
+     * @param ip IPv4 or IPv6
+     * @param source for logging only, may be null
+     * @since 0.9.57
+     */
+    public void add(byte ip[], String source) {
         boolean rv;
         if (ip.length == 4)
             rv = add(toInt(ip));
@@ -684,8 +714,13 @@ public class Blocklist {
             rv = add(new BigInteger(1, ip));
         else
             rv = false;
-        if (rv && _log.shouldInfo())
-            _log.info("Adding IP to blocklist: " + Addresses.toString(ip));
+        if (rv) {
+            // lower log level at startup when initializing from blocklist files
+            if (source == null && _log.shouldWarn())
+                _log.warn("Added: " + Addresses.toString(ip), new Exception("source"));
+            else if (_log.shouldDebug())
+                _log.debug("Added: " + Addresses.toString(ip) + " source: " + source);
+        }
     }
 
     /**
@@ -703,25 +738,36 @@ public class Blocklist {
             remove(new BigInteger(1, ip));
     }
 
+    /**
+     * @return true if it was NOT previously on the list
+     */
     private boolean add(int ip) {
-        if (_singleIPBlocklist.size() >= MAX_IPV4_SINGLES)
-            return false;
-        return _singleIPBlocklist.add(Integer.valueOf(ip));
+        Integer iip = Integer.valueOf(ip);
+        synchronized(_singleIPBlocklist) {
+            return _singleIPBlocklist.put(iip, DUMMY) == null;
+        }
     }
 
     /**
      * @since 0.9.28
      */
     private void remove(int ip) {
-        _singleIPBlocklist.remove(Integer.valueOf(ip));
+        Integer iip = Integer.valueOf(ip);
+        synchronized(_singleIPBlocklist) {
+            _singleIPBlocklist.remove(iip);
+        }
     }
 
     private boolean isOnSingleList(int ip) {
-        return _singleIPBlocklist.contains(Integer.valueOf(ip));
+        Integer iip = Integer.valueOf(ip);
+        synchronized(_singleIPBlocklist) {
+            return _singleIPBlocklist.get(iip) != null;
+        }
     }
 
     /**
      * @param ip IPv6 non-negative
+     * @return true if it was NOT previously on the list
      * @since IPv6
      */
     private boolean add(BigInteger ip) {
@@ -1152,7 +1198,9 @@ public class Blocklist {
      *  @since 0.9.48
      */
     public List<Integer> getTransientIPv4Blocks() {
-        return new ArrayList<Integer>(_singleIPBlocklist);
+        synchronized(_singleIPBlocklist) {
+            return new ArrayList<Integer>(_singleIPBlocklist.keySet());
+        }
     }
 
     /**

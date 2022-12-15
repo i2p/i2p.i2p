@@ -154,10 +154,11 @@ public class Analysis extends JobImpl implements RouterApp {
                 return;
             Blocklist bl = _context.blocklist();
             Banlist ban = _context.banlist();
+            String source = _persister.getBlocklistFile().toString();
             for (Map.Entry<String, Long> e : map.entrySet()) {
                 String s = e.getKey();
                 if (s.contains(".") || s.contains(":")) {
-                    bl.add(s);
+                    bl.add(s, source);
                 } else {
                     byte[] b = Base64.decode(s);
                     if (b != null && b.length == Hash.HASH_LENGTH) {

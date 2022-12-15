@@ -239,14 +239,23 @@ public class PersistSybil {
     }
 
     /**
+     *  Get the blocklist path
+     *
+     *  @since 0.9.57
+     */
+    File getBlocklistFile() {
+        File f = new File(_context.getConfigDir(), SDIR);
+        return new File(f, BLOCKLIST_SYBIL_FILE);
+    }
+
+    /**
      *  Read the blocklist
      *
      *  @return map of ip or hash to expiration (ms), or null on failure
      *  @since 0.9.50
      */
     Map<String, Long> readBlocklist() {
-        File f = new File(_context.getConfigDir(), SDIR);
-        f = new File(f, BLOCKLIST_SYBIL_FILE);
+        File f = getBlocklistFile();
         Map<String, Long> rv = readBlocklist(f);
         if (rv != null)
             notifyVersion(f.lastModified());
