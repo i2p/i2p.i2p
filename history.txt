@@ -1,3 +1,10 @@
+2022-12-15 zzz
+ * Router: Change transient IPv4 blocklist to LHMCache
+ * SSU: Check banlist after session confirmed
+ * SSU2:
+   - Don't attempt to connect to ourselves as an introducer
+   - Fix retransmission of session confirmed
+
 2022-12-14 zzz
  * Crypto: Fix wrong arguments order in ChaCha20 encrypt, breaking encrypted LS2
  * NTCP:
@@ -8,6 +15,7 @@
    - Drop short session request messages in packet handler
    - Preliminary fixes for handling retransmitted retries
    - Reject peer test or relay as Charlie if snatted
+   - Update activity on path challenge/response
 
 2022-12-13 zzz
  * SSU: Don't publish B cap when snatted
