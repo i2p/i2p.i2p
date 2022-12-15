@@ -189,8 +189,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             if (_log.shouldDebug())
                 _log.debug("Processed " + blocks + " blocks on " + this);
         } catch (DataFormatException dfe) {
-            // probably RI problems, ban for a while??
-            //_context.blocklist().add(_aliceIP);
             if (_log.shouldWarn())
                 _log.warn("IES2 payload error", dfe);
             throw new GeneralSecurityException("IES2 payload error: " + this, dfe);
@@ -222,8 +220,21 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         if (_receivedUnconfirmedIdentity != null)
             throw new DataFormatException("DUP RI in Sess Conf");
         _receivedUnconfirmedIdentity = ri.getIdentity();
+        // TODO instead of throwing from here, we could set a reason code,
+        // create PeerState2 + PeerStateDestroyed, and send a termination.
+        // Too hard for now. The next time he sends a session request
+        // he'll get a termination.
+        Hash h = _receivedUnconfirmedIdentity.calculateHash();
+        boolean isBanned = _context.banlist().isBanlistedForever(h);
+        if (isBanned) {
+            // validate sig to prevent spoofing
+            if (ri.verifySignature())
+               _context.blocklist().add(_aliceIP);
+            throw new DataFormatException("Router is banned: " + h.toBase64());
+        }
         if (ri.getNetworkId() != _context.router().getNetworkID()) {
-            // TODO ban
+            if (ri.verifySignature())
+               _context.blocklist().add(_aliceIP);
             throw new DataFormatException("SSU2 network ID mismatch");
         }
 
@@ -311,7 +322,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         }
         _mtu = mtu;
 
-        Hash h = _receivedUnconfirmedIdentity.calculateHash();
         try {
             RouterInfo old = _context.netDb().store(h, ri);
             if (flood && !ri.equals(old)) {

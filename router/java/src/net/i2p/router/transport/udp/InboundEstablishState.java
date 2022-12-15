@@ -11,6 +11,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
@@ -395,6 +396,15 @@ class InboundEstablishState {
                     // _x() in UDPTransport
                     _context.banlist().banlistRouterForever(_receivedUnconfirmedIdentity.calculateHash(),
                                                             "Unsupported signature type");
+                    fail();
+                }
+                Hash h = _receivedUnconfirmedIdentity.calculateHash();
+                if (_context.banlist().isBanlistedForever(h)) {
+                    // validate sig to prevent spoofing
+                    if (getConfirmedIdentity() != null)
+                       _context.blocklist().add(_aliceIP);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Router is banned: " + h.toBase64() + " on " + this);
                     fail();
                 }
             } else {
