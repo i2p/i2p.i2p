@@ -115,33 +115,56 @@ public class Banlist {
         return Collections.unmodifiableMap(_entries);
     }
     
+    /**
+     *  @return true if it WAS previously on the list
+     */
     public boolean banlistRouter(Hash peer) {
         return banlistRouter(peer, null);
     }
 
+    /**
+     *  @return true if it WAS previously on the list
+     */
     public boolean banlistRouter(Hash peer, String reason) { return banlistRouter(peer, reason, null); }
 
-    /** ick have to put the reasonCode in the front to avoid ambiguity */
+    /**
+     *  @return true if it WAS previously on the list
+     */
     public boolean banlistRouter(String reasonCode, Hash peer, String reason) {
         return banlistRouter(peer, reason, reasonCode, null, false);
     }
 
+    /**
+     *  @return true if it WAS previously on the list
+     */
     public boolean banlistRouter(Hash peer, String reason, String transport) {
         return banlistRouter(peer, reason, transport, false);
     }
 
+    /**
+     *  @return true if it WAS previously on the list
+     */
     public boolean banlistRouterForever(Hash peer, String reason) {
         return banlistRouter(peer, reason, null, true);
     }
 
+    /**
+     *  @return true if it WAS previously on the list
+     */
     public boolean banlistRouterForever(Hash peer, String reason, String reasonCode) {
         return banlistRouter(peer, reason, reasonCode, null, true);
     }
 
+    /**
+     *  @return true if it WAS previously on the list
+     */
     public boolean banlistRouter(Hash peer, String reason, String transport, boolean forever) {
         return banlistRouter(peer, reason, null, transport, forever);
     }
 
+    /**
+     *  @return true if it WAS previously on the list
+     */
     private boolean banlistRouter(Hash peer, String reason, String reasonCode, String transport, boolean forever) {
         long expireOn;
         if (forever) {
@@ -164,6 +187,7 @@ public class Banlist {
      *  @param reasonCode may be null
      *  @param expireOn absolute time, not a duration
      *  @param transport may be null
+     *  @return true if it WAS previously on the list
      *  @since 0.9.18
      */
     public boolean banlistRouter(Hash peer, String reason, String reasonCode, String transport, long expireOn) {
