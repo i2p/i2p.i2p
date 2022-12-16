@@ -52,8 +52,8 @@ public class ConfigLoggingHelper extends HelperBase {
         for (String prefix : limits.stringPropertyNames()) {
             sortedLogs.add(prefix);
         }
-        
-        buf.append("<textarea name=\"levels\" rows=\"4\" cols=\"60\" wrap=\"off\" spellcheck=\"false\">");
+        long sz = isAdvanced() ? Math.max(2, sortedLogs.size() + 1) : 4;
+        buf.append("<textarea name=\"levels\" rows=\"").append(sz).append("\" cols=\"60\" wrap=\"off\" spellcheck=\"false\">");
         for (String prefix : sortedLogs) {
             String level = limits.getProperty(prefix);
             buf.append(prefix).append('=').append(level).append('\n');
