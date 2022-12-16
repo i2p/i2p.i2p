@@ -887,7 +887,7 @@ class PacketHandler {
                     packet.getPacket().getLength() == SSU2Util.MIN_HANDSHAKE_DATA_LEN - 1) {
                     // i2pd short 87 byte session request thru 0.9.56, drop packet
                     if (_log.shouldWarn())
-                        _log.warn("Short Session Request len 87 on " + state);
+                        _log.warn("Short Session Request len 87 from " + from);
                     return true;
                 }
             } else {
@@ -960,7 +960,8 @@ class PacketHandler {
                 if (header.getPacketNumber() != 0 ||
                     header.getType() != SSU2Util.SESSION_CONFIRMED_FLAG_BYTE) {
                     if (_log.shouldWarn())
-                        _log.warn("Queue possible data packet " + header + " on: " + state);
+                        _log.warn("Queue possible data packet len: " +
+                                  packet.getPacket().getLength() + " on " + state);
                     // TODO either attempt to decrypt as a retransmitted
                     // Session Request or Token Request,
                     // or just tell establisher so it can retransmit Session Created or Retry
