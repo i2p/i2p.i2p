@@ -1922,6 +1922,36 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         if (oldEstablishedOn > 0)
             _context.statManager().addRateData("udp.alreadyConnected", oldEstablishedOn);
+
+        // the only possible reason to rebuild is if they can be an introducer for us
+        // so avoid going through rebuildIfNecessary()
+        long tag = peer.getTheyRelayToUsAs();
+        if (tag > 0) {
+            boolean ipv6 = peer.isIPv6();
+            if (introducersRequired(ipv6)) {
+                RouterAddress addr = getCurrentAddress(ipv6);
+                if (addr != null) {
+                    int count = 0;
+                    for (String p : UDPAddress.PROP_INTRO_TAG) {
+                        if (addr.getOption(p) == null)
+                            break;
+                        count++;
+                    }
+                    if (count < PUBLIC_RELAY_COUNT) {
+                        long now = _context.clock().now();
+                        synchronized (_rebuildLock) {
+                            long sinceSelected = now - (ipv6 ? _v6IntroducersSelectedOn : _v4IntroducersSelectedOn);
+                            if (count == 0 || sinceSelected > 2*60*1000) {
+                                // Rate limit to prevent rapid churn after transition to firewalled or at startup
+                                if (_log.shouldWarn())
+                                    _log.warn("Rebuilding address, new introducer added, current count " + count + ": " + peer);
+                                rebuildExternalAddress(ipv6);
+                            }
+                        }
+                    }
+                }
+            }
+        }
         
         synchronized(_rebuildLock) {
             rebuildIfNecessary();
@@ -2057,8 +2087,30 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             locked_dropPeer(peer, shouldBanlist, why);
         }
         // the only possible reason to rebuild is if they were an introducer for us
-        if (peer.getTheyRelayToUsAs() > 0)
-            rebuildIfNecessary();
+        // so avoid going through rebuildIfNecessary()
+        long tag = peer.getTheyRelayToUsAs();
+        if (tag > 0) {
+            boolean ipv6 = peer.isIPv6();
+            if (!introducersRequired(ipv6))
+                return;
+            RouterAddress addr = getCurrentAddress(ipv6);
+            if (addr == null)
+                return;
+            String stag = Long.toString(tag);
+            for (String p : UDPAddress.PROP_INTRO_TAG) {
+                String itag = addr.getOption(p);
+                if (itag == null)
+                    break;
+                if (itag.equals(stag)) {
+                    if (_log.shouldWarn())
+                        _log.warn("Rebuilding address, published introducer dropped: " + peer);
+                    synchronized (_rebuildLock) {
+                        rebuildExternalAddress(ipv6);
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     /**
