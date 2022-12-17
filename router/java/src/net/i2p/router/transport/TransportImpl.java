@@ -610,9 +610,14 @@ public abstract class TransportImpl implements Transport {
      *  @param address null to remove all
      */
     protected void replaceAddress(RouterAddress address) {
-        boolean isIPv6 = TransportUtil.isIPv6(address);
-        if (_log.shouldWarn())
-            _log.warn("Replacing  IPv" + (isIPv6 ? '6' : '4') + " address with " + address, new Exception());
+        boolean isIPv6;
+        if (address != null) {
+            isIPv6 = TransportUtil.isIPv6(address);
+            if (_log.shouldWarn())
+                _log.warn("Replacing  IPv" + (isIPv6 ? '6' : '4') + " address with " + address, new Exception());
+        } else {
+            isIPv6 = false;
+        }
         int sz;
         synchronized(_currentAddresses) {
             if (address == null) {
