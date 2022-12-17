@@ -1,3 +1,14 @@
+2022-12-17 zzz
+ * Console: Fix UDP disabled error when SSU 1 disabled
+ * SSU:
+   - Don't call rebuildIfNecessary() from dropPeer() and addPeer() every time
+   - Don't call test forceRunSoon() in addPeer() every time
+   - Fix IP closeness check when firewalled
+ * SSU2:
+   - Immediately remove establish state from EstablishmentManager on fatal error
+   - Send in-session termination after certain session confirmed errors
+ * Transport: Fix multiple v4/v6 RouterAddresses
+
 2022-12-15 zzz
  * Router: Change transient IPv4 blocklist to LHMCache
  * SSU: Check banlist after session confirmed
