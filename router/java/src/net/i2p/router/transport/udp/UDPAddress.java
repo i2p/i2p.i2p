@@ -54,7 +54,7 @@ class UDPAddress {
     private static final String[] PROP_INTRO_HOST;
     private static final String[] PROP_INTRO_PORT;
     private static final String[] PROP_INTRO_IKEY;
-    private static final String[] PROP_INTRO_TAG;
+    static final String[] PROP_INTRO_TAG;
     private static final String[] PROP_INTRO_EXP;
     private static final String[] PROP_INTRO_HASH;
     static {
