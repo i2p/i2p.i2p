@@ -302,8 +302,8 @@ public class SummaryHelper extends HelperBase {
             case IPV4_UNKNOWN_IPV6_FIREWALLED:
             case IPV4_DISABLED_IPV6_UNKNOWN:
             default:
-                RouterAddress ra = routerInfo.getTargetAddress("SSU");
-                if (ra == null && _context.router().getUptime() > 5*60*1000) {
+                List<RouterAddress> ra = routerInfo.getTargetAddresses("SSU", "SSU2");
+                if (ra.isEmpty() && _context.router().getUptime() > 5*60*1000) {
                     if (getActivePeers() <= 0)
                         return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-No Active Peers, Check Network Connection and Firewall"));
                     else if (_context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME) == null ||
