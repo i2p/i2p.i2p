@@ -1049,17 +1049,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     boolean isTooClose(byte[] ip) {
         if (allowLocal())
             return false;
-        for (RouterAddress addr : getCurrentAddresses()) {
-            byte[] myip = addr.getIP();
-            if (myip == null || ip.length != myip.length)
-                continue;
-            if (ip.length == 4) {
-                if (DataHelper.eq(ip, 0, myip, 0, 2))
-                    return true;
-            } else if (ip.length == 16) {
-                if (DataHelper.eq(ip, 0, myip, 0, 4))
-                    return true;
-            }
+        byte[] myip = ip.length == 16 ? _lastOurIPv6 : _lastOurIPv4;
+        if (myip == null)
+            return false;
+        if (ip.length == 4) {
+            if (DataHelper.eq(ip, 0, myip, 0, 2))
+                return true;
+        } else if (ip.length == 16) {
+            if (DataHelper.eq(ip, 0, myip, 0, 4))
+                return true;
         }
         return false;
     }
