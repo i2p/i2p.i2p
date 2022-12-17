@@ -180,7 +180,7 @@ class PeerStateDestroyed implements SSU2Payload.PayloadCallback, SSU2Sender {
             }
             if (header.getType() != DATA_FLAG_BYTE) {
                 if (_log.shouldWarn())
-                    _log.warn("bad data pkt type " + (header.getType() & 0xff) + " size " + len + " on " + this);
+                    _log.warn("bad data pkt type " + header.getType() + " size " + len + " on " + this);
                 return;
             }
             long n = header.getPacketNumber();
@@ -356,8 +356,8 @@ class PeerStateDestroyed implements SSU2Payload.PayloadCallback, SSU2Sender {
         }
 
         public void timeReached() {
-            if (_log.shouldDebug())
-                _log.debug("Done listening for " + PeerStateDestroyed.this);
+            //if (_log.shouldDebug())
+            //    _log.debug("Done listening for " + PeerStateDestroyed.this);
             _ackTimer.cancel();
             _transport.removeRecentlyClosed(PeerStateDestroyed.this);
             _sendCha.destroy();

@@ -429,7 +429,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             }
             if (header.getType() != DATA_FLAG_BYTE) {
                 if (_log.shouldWarn())
-                    _log.warn("bad data pkt type " + (header.getType() & 0xff) + " size " + len + " on " + this);
+                    _log.warn("bad data pkt type " + header.getType() + " size " + len + " on " + this);
                 // TODO if it's early:
                 // If inbound, could be a retransmitted Session Confirmed,
                 // ack it again.
