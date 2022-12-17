@@ -188,7 +188,20 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             int blocks = SSU2Payload.processPayload(_context, this, payload, offset, length, isHandshake, null);
             if (_log.shouldDebug())
                 _log.debug("Processed " + blocks + " blocks on " + this);
+        } catch (RIException rie) {
+            int reason = rie.getReason();
+            PeerStateDestroyed psd = createPeerStateDestroyed(reason);
+            _transport.addRecentlyClosed(psd);
+            UDPPacket pkt = _transport.getBuilder2().buildSessionDestroyPacket(reason, psd);
+            _transport.send(pkt);
+            if (_log.shouldWarn()) {
+                if (_log.shouldDebug())
+                    _log.debug("Sending TERMINATION reason " + reason + " to " + psd);
+                _log.warn("IES2 payload error", rie);
+            }
+            throw new GeneralSecurityException("IES2 payload error: " + this, rie);
         } catch (DataFormatException dfe) {
+            // no in-session response possible
             if (_log.shouldWarn())
                 _log.warn("IES2 payload error", dfe);
             throw new GeneralSecurityException("IES2 payload error: " + this, dfe);
@@ -212,6 +225,13 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             _log.debug("Got OPTIONS block");
     }
 
+    /**
+     *   For most errors here we throw a RIException with a reason code,
+     *   which is caught in processPayload() to create a PeerStateDestroyed
+     *   and send a termination with that reason.
+     *
+     *   Plain DataFormatExceptions indicate you may not respond in-session.
+     */
     public void gotRI(RouterInfo ri, boolean isHandshake, boolean flood) throws DataFormatException {
         //if (_log.shouldDebug())
         //    _log.debug("Got RI block: " + ri);
@@ -220,23 +240,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         if (_receivedUnconfirmedIdentity != null)
             throw new DataFormatException("DUP RI in Sess Conf");
         _receivedUnconfirmedIdentity = ri.getIdentity();
-        // TODO instead of throwing from here, we could set a reason code,
-        // create PeerState2 + PeerStateDestroyed, and send a termination.
-        // Too hard for now. The next time he sends a session request
-        // he'll get a termination.
-        Hash h = _receivedUnconfirmedIdentity.calculateHash();
-        boolean isBanned = _context.banlist().isBanlistedForever(h);
-        if (isBanned) {
-            // validate sig to prevent spoofing
-            if (ri.verifySignature())
-               _context.blocklist().add(_aliceIP);
-            throw new DataFormatException("Router is banned: " + h.toBase64());
-        }
-        if (ri.getNetworkId() != _context.router().getNetworkID()) {
-            if (ri.verifySignature())
-               _context.blocklist().add(_aliceIP);
-            throw new DataFormatException("SSU2 network ID mismatch");
-        }
 
         // try to find the right address, because we need the MTU
         boolean isIPv6 = _aliceIP.length == 16;
@@ -287,8 +290,27 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         if (!DataHelper.eqCT(s, 0, nb, 0, KEY_LEN))
             throw new DataFormatException("s mismatch in RI: " + ri);
 
+        _sendHeaderEncryptKey1 = ik;
+
+        // only after here can we throw RIExceptions and send a response in-session
+        // because we have his ikey and we verified he's the owner of the RI
+
+        Hash h = _receivedUnconfirmedIdentity.calculateHash();
+        boolean isBanned = _context.banlist().isBanlistedForever(h);
+        if (isBanned) {
+            // validate sig to prevent spoofing
+            if (ri.verifySignature())
+               _context.blocklist().add(_aliceIP);
+            throw new RIException("Router is banned: " + h.toBase64(), REASON_BANNED);
+        }
+        if (ri.getNetworkId() != _context.router().getNetworkID()) {
+            if (ri.verifySignature())
+               _context.blocklist().add(_aliceIP);
+            throw new RIException("SSU2 network ID mismatch", REASON_NETID);
+        }
+
         if (!"2".equals(ra.getOption("v")))
-            throw new DataFormatException("bad SSU2 v");
+            throw new RIException("bad SSU2 v", REASON_VERSION);
 
         String smtu = ra.getOption(UDPAddress.PROP_MTU);
         int mtu = 0;
@@ -310,7 +332,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         } else {
             // if too small, give up now
             if (mtu < PeerState2.MIN_MTU)
-                throw new DataFormatException("MTU too small " + mtu);
+                throw new RIException("MTU too small " + mtu, REASON_OPTIONS);
             if (ra.getTransportStyle().equals(UDPTransport.STYLE2)) {
                 mtu = Math.min(Math.max(mtu, PeerState2.MIN_MTU), PeerState2.MAX_MTU);
             } else {
@@ -336,12 +358,17 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             }
         } catch (IllegalArgumentException iae) {
             // generally expired/future RI
-            // don't change reason if already set as clock skew
-            throw new DataFormatException("RI store fail: " + ri, iae);
+            long now = _context.clock().now();
+            long published = ri.getPublished();
+            int reason;
+            if (published > now + 2*60*1000 || published < now - 60*60*1000)
+                reason = REASON_SKEW;
+            else
+                reason = REASON_MSG3;
+            throw new RIException("RI store fail: " + ri, reason, iae);
         }
 
         _receivedConfirmedIdentity = _receivedUnconfirmedIdentity;
-        _sendHeaderEncryptKey1 = ik;
         createPeerState();
         //_sendHeaderEncryptKey2 calculated below
     }
@@ -829,6 +856,34 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     /**
+     *  Creates a PeerStateDestroyed after msg 3 failure,
+     *  so we can send a termination and deal with subsequent in-session messages.
+     *
+     *  @since 0.9.57
+     */
+    private PeerStateDestroyed createPeerStateDestroyed(int reason) {
+        byte[] ckd = _handshakeState.getChainingKey();
+        byte[] k_ab = new byte[32];
+        byte[] k_ba = new byte[32];
+        HKDF hkdf = new HKDF(_context);
+        hkdf.calculate(ckd, ZEROLEN, k_ab, k_ba, 0);
+        byte[] d_ab = new byte[32];
+        byte[] h_ab = new byte[32];
+        byte[] d_ba = new byte[32];
+        byte[] h_ba = new byte[32];
+        hkdf.calculate(k_ab, ZEROLEN, INFO_DATA, d_ab, h_ab, 0);
+        hkdf.calculate(k_ba, ZEROLEN, INFO_DATA, d_ba, h_ba, 0);
+        ChaChaPolyCipherState sender = new ChaChaPolyCipherState();
+        sender.initializeKey(d_ba, 0);
+        ChaChaPolyCipherState rcvr = new ChaChaPolyCipherState();
+        rcvr.initializeKey(d_ab, 0);
+        _handshakeState.destroy();
+        return new PeerStateDestroyed(_context, _transport, _remoteHostId,
+                                      _sendConnID, _rcvConnID, sender, rcvr,
+                                      _sendHeaderEncryptKey1, h_ba, h_ab, reason);
+    }
+
+    /**
      * note that we just sent the SessionCreated packet
      * and save it for retransmission
      */
@@ -888,6 +943,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
      * @param packet with header still encrypted
      */
     public synchronized void queuePossibleDataPacket(UDPPacket packet) {
+        if (_currentState == InboundState.IB_STATE_FAILED)
+            return;
         if (_pstate == null) {
             // case 1, race or out-of-order, queue until we have the peerstate
             if (_queuedDataPackets == null) {
@@ -928,5 +985,24 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             buf.append(" RelayTag: ").append(_sentRelayTag);
         buf.append(' ').append(_currentState);
         return buf.toString();
+    }
+
+    /**
+     *  For throwing out of gotRI()
+     *  @since 0.9.57
+     */
+    private static class RIException extends DataFormatException {
+        private final int rsn;
+        public RIException(String msg, int reason) {
+            super(msg);
+            rsn = reason;
+        }
+        public RIException(String msg, int reason, Throwable t) {
+            super(msg, t);
+            rsn = reason;
+        }
+        public int getReason() { return rsn; }
+        @Override
+        public String getMessage() { return "Code " + rsn + ": " + super.getMessage(); }
     }
 }

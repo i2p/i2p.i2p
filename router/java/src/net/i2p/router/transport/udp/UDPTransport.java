@@ -1696,6 +1696,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     /**
+     * Start listening for packets on a destroyed connection
+     * @since 0.9.57
+     */
+    void addRecentlyClosed(PeerStateDestroyed peer) {
+        Long id = Long.valueOf(peer.getRcvConnID());
+        synchronized(_addDropLock) {
+            _recentlyClosedConnIDs.put(id, peer);
+        }
+    }
+
+    /**
      * Stop listening for packets on a destroyed connection
      * @since 0.9.57
      */
