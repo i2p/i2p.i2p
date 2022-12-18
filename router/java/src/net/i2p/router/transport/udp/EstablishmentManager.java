@@ -1661,7 +1661,8 @@ class EstablishmentManager {
             if (_log.shouldWarn())
                 _log.warn("No IP to send in relay request");
             return;
-         }
+        }
+        // Bob should already have our RI, especially if we just connected; we do not resend it here.
         int ourPort = _transport.getRequestedPort();
         byte[] data = SSU2Util.createRelayRequestData(_context, bob.getRemotePeer(), charlie.getRemoteIdentity().getHash(),
                                                       charlie.getIntroNonce(), tag, ourIP, ourPort,
@@ -3220,6 +3221,7 @@ class EstablishmentManager {
             if (count > 0 && _log.shouldDebug())
                 _log.debug("Expired " + count + " outbound tokens");
             _terminationCounter.clear();
+            _transport.getIntroManager().cleanup();
         }
     }
 }

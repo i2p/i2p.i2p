@@ -1047,6 +1047,13 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     /**
+     * @since 0.9.57
+     */
+    boolean isDead() {
+        return _dead;
+    }
+
+    /**
      *  A timer to send an ack-only packet.
      */
     private class ACKTimer extends SimpleTimer2.TimedEvent {

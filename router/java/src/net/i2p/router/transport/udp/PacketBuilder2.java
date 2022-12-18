@@ -625,7 +625,6 @@ class PacketBuilder2 {
         int count = 1 + ((remaining + maxAddl - 1) / maxAddl);
 
         // put jumbo into the first packet, we will put data0 back below
-        // TODO if last packet is less than 8 bytes the header decryption will fail, add padding
         byte[] jumbo = new byte[overhead + addPadding + block.getTotalLength()];
         System.arraycopy(data0, off, jumbo, 0, SHORT_HEADER_SIZE);
         pkt.setData(jumbo);
@@ -804,11 +803,21 @@ class PacketBuilder2 {
      *  In-session.
      *
      *  @param signedData flag + alice hash + signed data
+     *  @param riBlock to include, may be null
      *  @return non-null
      */
-    UDPPacket buildRelayIntro(byte[] signedData, PeerState2 charlie) {
+    UDPPacket buildRelayIntro(byte[] signedData, Block riBlock, PeerState2 charlie) {
         Block block = new SSU2Payload.RelayIntroBlock(signedData);
-        UDPPacket rv = buildPacket(Collections.<Fragment>emptyList(), Collections.singletonList(block), charlie);
+        List<Block> blocks;
+        if (riBlock != null) {
+            // RouterInfo must be first
+            blocks = new ArrayList<Block>(2);
+            blocks.add(riBlock);
+            blocks.add(block);
+        } else {
+            blocks = Collections.singletonList(block);
+        }
+        UDPPacket rv = buildPacket(Collections.<Fragment>emptyList(), blocks, charlie);
         rv.setMessageType(TYPE_INTRO);
         return rv;
     }

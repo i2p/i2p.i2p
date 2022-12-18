@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -157,8 +158,8 @@ class IntroductionManager {
             added = true;
             _inbound.put(Long.valueOf(id2), peer);
         }
-        if (added &&_log.shouldLog(Log.DEBUG))
-            _log.debug("adding peer " + peer);
+        //if (added &&_log.shouldLog(Log.DEBUG))
+        //    _log.debug("adding peer " + peer);
     }
     
     public void remove(PeerState peer) {
@@ -170,8 +171,8 @@ class IntroductionManager {
         if (id2 > 0) {
             _inbound.remove(Long.valueOf(id2));
         }
-        if ((id > 0 || id2 > 0) &&_log.shouldLog(Log.DEBUG))
-            _log.debug("removing peer " + peer);
+        //if ((id > 0 || id2 > 0) &&_log.shouldLog(Log.DEBUG))
+        //    _log.debug("removing peer " + peer);
     }
     
     /**
@@ -823,8 +824,8 @@ class IntroductionManager {
         RouterInfo aliceRI = null;
         int rcode;
         if (charlie == null) {
-            if (_log.shouldInfo())
-                _log.info("Relay tag not found " + tag + " from " + alice);
+            if (_log.shouldDebug())
+                _log.debug("Relay tag not found " + tag + " from " + alice);
             rcode = SSU2Util.RELAY_REJECT_BOB_NO_TAG;
         } else if (charlie.getVersion() != 2) {
             if (_log.shouldWarn())
@@ -846,19 +847,21 @@ class IntroductionManager {
                     } else {
                         rcode = SSU2Util.RELAY_ACCEPT;
                     }
-                    // TODO add timer to remove from _nonceToAlice
+                    // _nonceToAlice entries will be expired by cleanup()
                 } else {
                     if (_log.shouldWarn())
                         _log.warn("Signature failed relay request\n" + aliceRI);
                     rcode = SSU2Util.RELAY_REJECT_BOB_SIGFAIL;
                 }
             } else {
+                // we do not set a timer to wait for alice's RI to come in.
+                // we should have already had it.
+                // Java I2P does not send her RI before the relay request.
                 if (_log.shouldWarn())
                     _log.warn("Alice RI not found " + alice);
                 rcode = SSU2Util.RELAY_REJECT_BOB_UNKNOWN_ALICE;
             }
         }
-        UDPPacket packet;
         if (rcode == SSU2Util.RELAY_ACCEPT) {
             // Send Alice RI and forward data in a Relay Intro to Charlie
             if (_log.shouldInfo())
@@ -866,16 +869,45 @@ class IntroductionManager {
                       + " for tag " + tag
                       + " nonce " + nonce
                       + " and relaying with " + charlie);
-            DatabaseStoreMessage dbsm = new DatabaseStoreMessage(_context);
-            dbsm.setEntry(aliceRI);
-            dbsm.setMessageExpiration(now + 10*1000);
-            _transport.send(dbsm, charlie);
+
             // put alice hash in intro data
             byte[] idata = new byte[1 + Hash.HASH_LENGTH + data.length];
             //idata[0] = 0; // flag
             System.arraycopy(alice.getRemotePeer().getData(), 0, idata, 1, Hash.HASH_LENGTH);
             System.arraycopy(data, 0, idata, 1 + Hash.HASH_LENGTH, data.length);
-            packet = _builder2.buildRelayIntro(idata, (PeerState2) charlie);
+
+            // See if our RI will compress enough to fit in the relay intro packet,
+            // as this makes everything go smoother and faster.
+            // Overhead total is 185 IPv4, 217 IPv6
+            int avail = charlie.getMTU() -
+                        ((charlie.isIPv6() ? PacketBuilder2.MIN_IPV6_DATA_PACKET_OVERHEAD : PacketBuilder2.MIN_DATA_PACKET_OVERHEAD) +
+                         SSU2Payload.BLOCK_HEADER_SIZE +     // relay intro block header
+                         idata.length +                      // relay intro block payload
+                         SSU2Payload.BLOCK_HEADER_SIZE +     // RI block header
+                         2                                   // RI block flag/frag bytes
+                        );
+            byte[] info = aliceRI.toByteArray();
+            byte[] gzipped = DataHelper.compress(info, 0, info.length, DataHelper.MAX_COMPRESSION);
+            if (_log.shouldDebug())
+                _log.debug("Alice RI: " + info.length + " bytes uncompressed, " + gzipped.length +
+                           " compressed, charlie MTU " + charlie.getMTU() + ", available " + avail);
+            boolean gzip = gzipped.length < info.length;
+            if (gzip)
+                info = gzipped;
+
+            if (info.length <= avail) {
+                SSU2Payload.RIBlock riblock = new SSU2Payload.RIBlock(info,  0, info.length, false, gzip, 0, 1);
+                UDPPacket packet = _builder2.buildRelayIntro(idata, riblock, (PeerState2) charlie);
+                _transport.send(packet);
+            } else {
+                DatabaseStoreMessage dbsm = new DatabaseStoreMessage(_context);
+                dbsm.setEntry(aliceRI);
+                dbsm.setMessageExpiration(now + 10*1000);
+                _transport.send(dbsm, charlie);
+                UDPPacket packet = _builder2.buildRelayIntro(idata, null, (PeerState2) charlie);
+                // delay because dbsm is queued, we want it to get there first
+                new DelaySend(packet, 40);
+            }
             charlie.setLastSendTime(now);
         } else {
             // send rejection to Alice
@@ -888,11 +920,11 @@ class IntroductionManager {
                  return;
             }
             if (_log.shouldInfo())
-                _log.info("Send relay response rejection as bob " + rcode + " to alice " + alice);
-            packet = _builder2.buildRelayResponse(data, alice);
+                _log.info("Send relay response rejection as bob, reason: " + rcode + " to alice " + alice);
+            UDPPacket packet = _builder2.buildRelayResponse(data, alice);
             alice.setLastSendTime(now);
+            _transport.send(packet);
         }
-        _transport.send(packet);
     }
 
     /**
@@ -962,6 +994,26 @@ class IntroductionManager {
             boolean ok = receiveRelayIntro(bob, alice, data, ++count);
             if (!ok)
                 reschedule(DELAY << count);
+        }
+    }
+
+    /** 
+     * Simple fix for RI DSM getting there before RelayIntro.
+     * Most times not needed as the compressed RI will fit in the packet with the RelayIntro.
+     * SSU2 only.
+     * @since 0.9.57
+     */
+    private class DelaySend extends SimpleTimer2.TimedEvent {
+        private final UDPPacket pkt;
+
+        public DelaySend(UDPPacket packet, long delay) {
+            super(_context.simpleTimer2());
+            pkt = packet;
+            schedule(delay);
+        }
+
+        public void timeReached() {
+           _transport.send(pkt);
         }
     }
 
@@ -1157,14 +1209,14 @@ class IntroductionManager {
             idata[1] = (byte) status;
             System.arraycopy(data, 0, idata, 2, data.length);
             UDPPacket packet = _builder2.buildRelayResponse(idata, alice);
-            if (_log.shouldDebug())
-                _log.debug("Got relay response " + status + " as bob, forward " + " nonce " + nonce + " to " + alice);
+            if (_log.shouldInfo())
+                _log.info("Got relay response " + status + " as bob, forward " + " nonce " + nonce + " to " + alice);
             _transport.send(packet);
             alice.setLastSendTime(now);
         } else {
             // We are Alice, give to EstablishmentManager to check sig and process
-            if (_log.shouldDebug())
-                _log.debug("Got relay response " + status + " as alice " + " nonce " + nonce + " from " + peer);
+            if (_log.shouldInfo())
+                _log.info("Got relay response " + status + " as alice " + " nonce " + nonce + " from " + peer);
             _transport.getEstablisher().receiveRelayResponse(peer, nonce, status, data);
         }
     }
@@ -1215,4 +1267,20 @@ class IntroductionManager {
                (!_transport.isTooClose(ip)) &&
                (!_context.blocklist().isBlocklisted(ip));
     }
+
+    /** 
+     * Loop and cleanup _nonceToAlice
+     * Called from EstablishmentManager doFailSafe() so we don't need a cleaner timer here.
+     * @since 0.9.57
+     */
+    public void cleanup() {
+        if (_nonceToAlice.isEmpty())
+            return;
+        for (Iterator<PeerState2> iter = _nonceToAlice.values().iterator(); iter.hasNext(); ) {
+            PeerState2 state = iter.next();
+            if (state.isDead())
+                iter.remove();
+        }
+    }
+
 }
