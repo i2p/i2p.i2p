@@ -49,6 +49,7 @@ import net.i2p.router.transport.GeoIP;
 import net.i2p.router.web.HelperBase;
 import net.i2p.router.web.Messages;
 import net.i2p.router.web.WebAppStarter;
+import net.i2p.util.Addresses;
 import net.i2p.util.ConvertToHash;
 import net.i2p.util.Log;
 import net.i2p.util.ObjectCounter;
@@ -196,6 +197,7 @@ class NetDbRenderer {
             Set<RouterInfo> routers = _context.netDb().getRouters();
             int ipMode = 0;
             String ipArg = ip;  // save for error message
+            String altIPv6 = null;
             if (ip != null) {
                 if (ip.endsWith("/24")) {
                     ipMode = 1;
@@ -205,6 +207,13 @@ class NetDbRenderer {
                     ipMode = 3;
                 } else if (ip.indexOf(':') > 0) {
                     ipMode = 4;
+                    if (ip.endsWith("::")) {
+                        // truncate for prefix search
+                        ip = ip.substring(0, ip.length() - 1);
+                    } else {
+                        // We don't canonicalize as we search, so create alt string to check also
+                        altIPv6 = getAltIPv6(ip);
+                    }
                 }
                 if (ipMode > 0 && ipMode < 4) {
                     for (int i = 0; i < ipMode; i++) {
@@ -212,6 +221,15 @@ class NetDbRenderer {
                         if (last > 0)
                             ip = ip.substring(0, last + 1);
                     }
+                }
+            }
+            if (ipv6 != null) {
+                if (ipv6.endsWith("::")) {
+                    // truncate for prefix search
+                    ipv6 = ipv6.substring(0, ipv6.length() - 1);
+                } else {
+                    // We don't canonicalize as we search, so create alt string to check also
+                    altIPv6 = getAltIPv6(ipv6);
                 }
             }
             String familyArg = family;  // save for error message
@@ -311,7 +329,8 @@ class NetDbRenderer {
                             }
                         } else {
                             String host = ra.getHost();
-                            if (host != null && host.startsWith(ip)) {
+                            if (host != null && (host.startsWith(ip) ||
+                                                 (altIPv6 != null && host.startsWith(altIPv6)))) {
                                 if (skipped < toSkip) {
                                     skipped++;
                                     break;
@@ -367,7 +386,8 @@ class NetDbRenderer {
                 } else if (ipv6 != null) {
                     for (RouterAddress ra : ri.getAddresses()) {
                         String host = ra.getHost();
-                        if (host != null && host.startsWith(ipv6)) {
+                        if (host != null && (host.startsWith(ipv6) ||
+                                             (altIPv6 != null && host.startsWith(altIPv6)))) {
                             if (skipped < toSkip) {
                                 skipped++;
                                 break;
@@ -1224,6 +1244,29 @@ class NetDbRenderer {
         else if (rv == 8)
             rv = 0;
         return rv;
+    }
+
+    /**
+     *  If ipv6 is in compressed form, return expanded form.
+     *  If ipv6 is in expanded form, return compressed form.
+     *  Else return null.
+     *
+     *  @param ip ipv6 only, not ending with ::
+     *  @return alt string or null
+     *  @since 0.9.57
+     */
+    private static String getAltIPv6(String ip) {
+        if (ip.contains("::")) {
+            // convert to expanded
+            byte[] bip = Addresses.getIP(ip);
+            if (bip != null)
+                return Addresses.toString(bip);
+        } else if (ip.contains(":0:")) {
+            // convert to canonical
+            // https://stackoverflow.com/questions/7043983/ipv6-address-into-compressed-form-in-java
+            return ip.replaceAll("((?:(?:^|:)0+\\b){2,}):?(?!\\S*\\b\\1:0+\\b)(\\S*)", "::$2").replaceFirst("^0::","::");
+        }		
+        return null;
     }
 
     /** translate a string */
