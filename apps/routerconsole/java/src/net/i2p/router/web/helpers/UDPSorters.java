@@ -155,7 +155,7 @@ class UDPSorters {
     static class SkewComparator extends PeerComparator {
         @Override
         public int compare(PeerState l, PeerState r) {
-            long rv = Math.abs(l.getClockSkew()) - Math.abs(r.getClockSkew());
+            long rv = l.getClockSkew() - r.getClockSkew();
             if (rv == 0) // fallback on alpha
                 return super.compare(l, r);
             else

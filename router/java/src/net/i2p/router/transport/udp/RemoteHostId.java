@@ -62,7 +62,7 @@ final class RemoteHostId {
         if (_ip != null) {
             return Addresses.toString(_ip, _port);
         } else {
-            return _peerHash.toString();
+            return _peerHash.toBase64();
         }
     }
 }

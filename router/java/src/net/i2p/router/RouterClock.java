@@ -42,6 +42,7 @@ public class RouterClock extends Clock {
     /** use system time for this */
     private long _lastChanged;
     private int _lastStratum;
+    private long _lastProposedOffset;
     private final RouterTimestamper _timeStamper;
 
     /**
@@ -109,6 +110,7 @@ public class RouterClock extends Clock {
      */
     private synchronized void setOffset(long offsetMs, boolean force, int stratum) {
         long delta = offsetMs - _offset;
+        long systemNow = System.currentTimeMillis();
         if (!force) {
             if (!_isSystemClockBad && (offsetMs > MAX_OFFSET || offsetMs < 0 - MAX_OFFSET)) {
                 Log log = getLog();
@@ -118,7 +120,7 @@ public class RouterClock extends Clock {
             }
             
             // only allow substantial modifications before the first 10 minutes
-            if (_alreadyChanged && (System.currentTimeMillis() - _startedOn > 10 * 60 * 1000)) {
+            if (_alreadyChanged && (systemNow - _startedOn > 10 * 60 * 1000)) {
                 if ( (delta > MAX_LIVE_OFFSET) || (delta < 0 - MAX_LIVE_OFFSET) ) {
                     Log log = getLog();
                     if (log.shouldLog(Log.WARN))
@@ -137,7 +139,7 @@ public class RouterClock extends Clock {
 
             // only listen to a worse stratum if it's been a while
             if (_alreadyChanged && stratum > _lastStratum &&
-                System.currentTimeMillis() - _lastChanged < MIN_DELAY_FOR_WORSE_STRATUM) {
+                systemNow - _lastChanged < MIN_DELAY_FOR_WORSE_STRATUM) {
                 Log log = getLog();
                 if (log.shouldLog(Log.DEBUG))
                     log.debug("Ignoring update from a stratum " + stratum +
@@ -181,7 +183,7 @@ public class RouterClock extends Clock {
         // a previous step adjustment.
         // This allows NTP to trump a peer offset after a soft restart
         if (_alreadyChanged &&
-            (stratum >= _lastStratum || System.currentTimeMillis() - _startedOn > 60*1000)) {
+            (stratum >= _lastStratum || systemNow - _startedOn > 60*1000)) {
             // Update the target offset, slewing will take care of the rest
             if (delta > 15*1000)
                 getLog().logAlways(Log.WARN, "Warning - Updating target clock offset to " + offsetMs + "ms from " + _offset + "ms, Stratum " + stratum);
@@ -200,19 +202,40 @@ public class RouterClock extends Clock {
             }
         } else {
             Log log = getLog();
-            if (log.shouldLog(Log.INFO))
-                log.info("Initializing clock offset to " + offsetMs + "ms, Stratum " + stratum);
-            _alreadyChanged = true;
-            if (_context.getBooleanProperty(PROP_DISABLE_ADJUSTMENT)) {
-                log.error("Clock adjustment disabled", new Exception());
+            // For setting the clock based on peer skew (DEFAULT_STRATUM)
+            // we require a simple consensus of two consecutive peers
+            // to be within 1 minute of each other, and take the average.
+            if (stratum < DEFAULT_STRATUM ||
+                (_lastProposedOffset != 0 && Math.abs(_lastProposedOffset - offsetMs) < 60*1000)) {
+                if (stratum >= DEFAULT_STRATUM && _lastProposedOffset != 0) {
+                    // within 30 sec of each other, take the average
+                    offsetMs = (_lastProposedOffset + offsetMs) / 2;
+                    delta = offsetMs - _offset;
+                }
+                if (log.shouldInfo())
+                    log.info("Initializing clock offset to " + offsetMs + "ms, Stratum " + stratum, new Exception());
+                _alreadyChanged = true;
+                _lastProposedOffset = 0;
+                if (_context.getBooleanProperty(PROP_DISABLE_ADJUSTMENT)) {
+                    log.error("Clock adjustment disabled", new Exception());
+                } else {
+                    _offset = offsetMs;
+                    _desiredOffset = offsetMs;
+                    // this is used by the JobQueue
+                    fireOffsetChanged(delta);
+                }
             } else {
-                _offset = offsetMs;
-                _desiredOffset = offsetMs;
-                // this is used by the JobQueue
-                fireOffsetChanged(delta);
+                if (log.shouldInfo())
+                    log.info("Pending clock offset " + offsetMs + "ms, Stratum " + stratum, new Exception());
+                // so we know we were here
+                if (offsetMs == 0)
+                    _lastProposedOffset = 1;
+                else
+                    _lastProposedOffset = offsetMs;
+                return;
             }
         }
-        _lastChanged = System.currentTimeMillis();
+        _lastChanged = systemNow;
         _lastStratum = stratum;
 
     }

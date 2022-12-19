@@ -319,8 +319,8 @@ class OutboundNTCP2State implements EstablishState {
                 // We are Alice, he is Bob, adjust to match Bob
                 _context.clock().setOffset(1000 * (0 - _peerSkew), true);
                 _peerSkew = 0;
-                _log.logAlways(Log.WARN, "NTP failure, NTCP adjusting clock by " + DataHelper.formatDuration(diff) +
-                                         " source router: " + _con.getRemotePeer().calculateHash());
+                _log.logAlways(Log.WARN, "NTP failure, NTCP adjusted clock by " + DataHelper.formatDuration(diff) +
+                                         " source router: " + _con.getRemotePeer().calculateHash().toBase64());
             }
             changeState(State.OB_GOT_HXY);
             _received = 0;

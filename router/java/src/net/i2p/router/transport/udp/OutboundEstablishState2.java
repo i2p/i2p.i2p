@@ -382,12 +382,19 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                 // his problem
                 _context.banlist().banlistRouter(skewString, bob, _x("Excessive clock skew: {0}"));
             } else {
-                boolean skewOK = skew < PacketHandler.MAX_SKEW && skew > (0 - PacketHandler.MAX_SKEW);
-                if (skewOK && !_context.clock().getUpdatedSuccessfully()) {
+                if (!_context.clock().getUpdatedSuccessfully()) {
                     // adjust the clock one time in desperation
                     _context.clock().setOffset(0 - skew, true);
                     if (skew != 0)
-                        _log.logAlways(Log.WARN, "NTP failure, UDP adjusting clock by " + skewString);
+                        _log.logAlways(Log.WARN, "NTP failure, SSU2 adjusted clock by " + skewString +
+                                                 " source router: " + bob.toBase64());
+
+                    if (!_context.clock().getUpdatedSuccessfully()) {
+                        // clock update was either rejected or is pending.
+                        // ban the router briefly so the other transport does not try it,
+                        // and we will get a 2nd opinion.
+                        _context.banlist().banlistRouter(bob, _x("Excessive clock skew: {0}"), skewString, null, _context.clock().now() + 5*60*1000);
+                    }
                 } else {
                     _context.banlist().banlistRouter(skewString, bob, _x("Excessive clock skew: {0}"));
                 }
@@ -635,17 +642,29 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         if (_timeReceived == 0)
             throw new GeneralSecurityException("No DateTime block in Session/Token Request");
         // _nextSend is now(), from packetReceived()
-        _skew = _nextSend - _timeReceived;
+        if (_requestSentCount == 1)
+            _rtt = (int) (_nextSend - _requestSentTime);
+        _skew = (_nextSend - _timeReceived) - (_rtt / 2);
+        if (!_context.clock().getUpdatedSuccessfully() &&
+            _timeReceived > BuildTime.getEarliestTime() &&
+            _timeReceived < BuildTime.getLatestTime()) {
+            // adjust the clock one time, so we don't have to wait for NTCP to do it
+            _context.clock().setOffset(0 - _skew, true);
+            if (_skew != 0) {
+                String skewString = DataHelper.formatDuration(Math.abs(_skew));
+                Hash bob = _remotePeer.calculateHash();
+                _log.logAlways(Log.WARN, "NTP failure, SSU2 adjusted clock by " + skewString +
+                                         " source router: " + bob.toBase64());
+            }
+        }
+        // Unlikely, we would have gotten a termination from him and failed already,
+        // unless our skew limit is stricter than bob's.
         if (_skew > MAX_SKEW || _skew < 0 - MAX_SKEW)
-            throw new GeneralSecurityException("Skew exceeded in Session/Token Request: " + _skew);
+            throw new GeneralSecurityException("Skew exceeded in Session Created: " + _skew);
         _sessReqForReTX = null;
         _sendHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessionConfirmed");
 
         _currentState = OutboundState.OB_STATE_CREATED_RECEIVED;
-
-        if (_requestSentCount == 1) {
-            _rtt = (int) (_nextSend - _requestSentTime);
-        }
     }
 
     /**

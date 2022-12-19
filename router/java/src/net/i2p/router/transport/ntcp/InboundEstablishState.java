@@ -204,16 +204,18 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         long rtt = _context.clock().now() - _con.getCreated();
         _peerSkew -= ((rtt / 2) + 500) / 1000;
         long diff = 1000*Math.abs(_peerSkew);
-        if (!_context.clock().getUpdatedSuccessfully()) {
+        boolean skewOK = diff < Router.CLOCK_FUDGE_FACTOR;
+        if (skewOK && !_context.clock().getUpdatedSuccessfully()) {
             // Adjust the clock one time in desperation
             // This isn't very likely, outbound will do it first
+            // Don't adjust to large skews inbound.
             // We are Bob, she is Alice, adjust to match Alice
             _context.clock().setOffset(1000 * (0 - _peerSkew), true);
             _peerSkew = 0;
             if (diff != 0)
-                _log.logAlways(Log.WARN, "NTP failure, NTCP adjusting clock by " + DataHelper.formatDuration(diff) +
-                                         " source router: " + aliceHash);
-        } else if (diff >= Router.CLOCK_FUDGE_FACTOR) {
+                _log.logAlways(Log.WARN, "NTP failure, NTCP adjusted clock by " + DataHelper.formatDuration(diff) +
+                                         " source router: " + aliceHash.toBase64());
+        } else if (!skewOK) {
             // Only banlist if we know what time it is
             _context.banlist().banlistRouter(DataHelper.formatDuration(diff),
                                              aliceHash,

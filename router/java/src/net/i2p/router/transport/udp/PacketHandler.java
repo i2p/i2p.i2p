@@ -611,13 +611,19 @@ class PacketHandler {
             }
             _context.statManager().addRateData("udp.receivePacketSkew", skew);
 
-            if (skewOK && !_context.clock().getUpdatedSuccessfully()) {
+            if (!_enableSSU2 && !_context.clock().getUpdatedSuccessfully()) {
                 // adjust the clock one time in desperation
-                // this doesn't seem to work for big skews, we never get anything back,
-                // so we have to wait for NTCP to do it
                 _context.clock().setOffset(0 - skew, true);
                 if (skew != 0) {
-                    _log.logAlways(Log.WARN, "NTP failure, UDP adjusting clock by " + DataHelper.formatDuration(Math.abs(skew)));
+                    String source;
+                    if (state != null)
+                        source = state.getRemotePeer().toBase64();
+                    else if (outState != null)
+                        source = outState.getRemoteHostId().toString();
+                    else
+                        source = packet.getRemoteHost().toString();
+                    _log.logAlways(Log.WARN, "NTP failure, SSU1 adjusted clock by " + DataHelper.formatDuration(Math.abs(skew)) +
+                                             " source " + source);
                     skew = 0;
                 }
             }

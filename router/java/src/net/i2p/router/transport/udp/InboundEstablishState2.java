@@ -650,7 +650,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         if (_timeReceived == 0)
             throw new GeneralSecurityException("No DateTime block in Session Request");
         // _nextSend is now(), from packetReceived()
-        _skew = _nextSend - _timeReceived;
+        _rtt = (int) (_nextSend - _lastSend);
+        _skew = (_nextSend - _timeReceived) - (_rtt / 2);
         if (_skew > MAX_SKEW || _skew < 0 - MAX_SKEW) {
             // send another retry with termination
             UDPPacket retry = _transport.getBuilder2().buildRetryPacket(this, SSU2Util.REASON_SKEW);
@@ -659,7 +660,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         }
         _sendHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessCreateHeader");
         _currentState = InboundState.IB_STATE_REQUEST_RECEIVED;
-        _rtt = (int) (_nextSend - _lastSend);
     }
 
     /**
