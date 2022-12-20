@@ -1,3 +1,20 @@
+2022-12-20 zzz
+ * SSU2: Peer test improvements and fixes
+
+2022-12-19 zzz
+ * CLI: Add NewsHandler CLI to fetch news from servers
+ * Console: Fix IPv6 searches for compressed/expanded address format
+ * Router: Time initialization fixes and cleanups
+   - Require two peers that agree for transports to initialize time
+   - Allow SSU2 to initialize time even for large skews
+   - Do not allow NTCP2 inbound to initialize time for large skews
+   - Adjust SSU2 skew for RTT
+   - Disable SSU1 time initialization when SSU2 is enabled
+   - Round time sent in NTCP2 DateTime block
+
+2022-12-18 zzz
+ * SSU2: Compress and bundle Alice RI with relay intro
+
 2022-12-17 zzz
  * Console: Fix UDP disabled error when SSU 1 disabled
  * SSU:
@@ -11,8 +28,8 @@
 
 2022-12-15 zzz
  * Router: Change transient IPv4 blocklist to LHMCache
- * SSU: Check banlist after session confirmed
  * SSU2:
+   - Check banlist after session confirmed
    - Don't attempt to connect to ourselves as an introducer
    - Fix retransmission of session confirmed
 
