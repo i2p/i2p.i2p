@@ -1258,7 +1258,7 @@ class NetDbRenderer {
     private static String getAltIPv6(String ip) {
         if (ip.contains("::")) {
             // convert to expanded
-            byte[] bip = Addresses.getIP(ip);
+            byte[] bip = Addresses.getIPOnly(ip);
             if (bip != null)
                 return Addresses.toString(bip);
         } else if (ip.contains(":0:")) {

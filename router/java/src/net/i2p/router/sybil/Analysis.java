@@ -559,7 +559,7 @@ public class Analysis extends JobImpl implements RouterApp {
             String last = _context.getProperty("i2np.lastIP");
             if (last == null)
                 return;
-            ourIP = Addresses.getIP(last);
+            ourIP = Addresses.getIPOnly(last);
             if (ourIP == null)
                 return;
         }

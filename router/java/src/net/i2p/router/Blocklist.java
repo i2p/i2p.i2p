@@ -666,7 +666,7 @@ public class Blocklist {
      * @param ip IPv4 or IPv6
      */
     public void add(String ip) {
-        byte[] pib = Addresses.getIP(ip);
+        byte[] pib = Addresses.getIPOnly(ip);
         if (pib == null) return;
         add(pib, null);
     }
@@ -681,7 +681,7 @@ public class Blocklist {
      * @since 0.9.57
      */
     public void add(String ip, String source) {
-        byte[] pib = Addresses.getIP(ip);
+        byte[] pib = Addresses.getIPOnly(ip);
         if (pib == null) return;
         add(pib, source);
     }
@@ -876,7 +876,7 @@ public class Blocklist {
      * @param ip IPv4 or IPv6
      */
     public boolean isBlocklisted(String ip) {
-        byte[] pib = Addresses.getIP(ip);
+        byte[] pib = Addresses.getIPOnly(ip);
         if (pib == null) return false;
         return isBlocklisted(pib);
     }
