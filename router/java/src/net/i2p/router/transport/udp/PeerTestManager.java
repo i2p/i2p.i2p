@@ -1193,16 +1193,8 @@ class PeerTestManager {
                 // send alice RI to charlie
                 if (_log.shouldDebug())
                     _log.debug("Send Alice RI and msg 2 to charlie on " + state);
-                // TODO see if Alide RI will compress enough to fit in the peer test packet
-                DatabaseStoreMessage dbsm = new DatabaseStoreMessage(_context);
-                dbsm.setEntry(aliceRI);
-                dbsm.setMessageExpiration(now + 10*1000);
-                _transport.send(dbsm, charlie);
                 // forward to charlie, don't bother to validate signed data
-                UDPPacket packet = _packetBuilder2.buildPeerTestToCharlie(alice, data, (PeerState2) charlie);
-                // delay because dbsm is queued, we want it to get there first
-                new DelaySend(packet, 100);
-                charlie.setLastSendTime(now);
+                sendRIandPT(aliceRI, -1, alice, data, (PeerState2) charlie, now);
                 break;
             }
 
@@ -1328,15 +1320,7 @@ class PeerTestManager {
                                     _log.info("Charlie response " + status + " picked a new one " + charlie + " on " + state);
                                 state.setCharlie(charlie.getRemoteIPAddress(), charlie.getRemotePort(), charlie.getRemotePeer());
                                 state.setLastSendTime(now);
-                                // TODO see if Alice RI will compress enough to fit in the peer test packet
-                                DatabaseStoreMessage dbsm = new DatabaseStoreMessage(_context);
-                                dbsm.setEntry(aliceRI);
-                                dbsm.setMessageExpiration(now + 10*1000);
-                                _transport.send(dbsm, charlie);
-                                UDPPacket packet = _packetBuilder2.buildPeerTestToCharlie(alice, state.getTestData(), (PeerState2) charlie);
-                                // delay because dbsm is queued, we want it to get there first
-                                new DelaySend(packet, 100);
-                                charlie.setLastSendTime(now);
+                                sendRIandPT(aliceRI, -1, alice, state.getTestData(), (PeerState2) charlie, now);
                                 break;
                             }
                         }
@@ -1353,11 +1337,6 @@ class PeerTestManager {
                     // Alice would need it to verify sig, but not worth the bandwidth
                     if (_log.shouldDebug())
                         _log.debug("Send Charlie RI to alice on " + state);
-                    // TODO see if Charlie RI will compress enough to fit in the peer test packet
-                    DatabaseStoreMessage dbsm = new DatabaseStoreMessage(_context);
-                    dbsm.setEntry(charlieRI);
-                    dbsm.setMessageExpiration(now + 10*1000);
-                    _transport.send(dbsm, alice);
                     if (true) {
                         // Debug - validate signed data
                         // we forward it to alice even on failure
@@ -1377,13 +1356,7 @@ class PeerTestManager {
                 // FIXME this will probably get there before the RI
                 if (_log.shouldDebug())
                     _log.debug("Send msg 4 status " + status + " to alice on " + state);
-                UDPPacket packet = _packetBuilder2.buildPeerTestToAlice(status, charlie, data, alice);
-                // delay because dbsm is queued, we want it to get there first
-                if (charlieRI != null)
-                    new DelaySend(packet, 100);
-                else
-                    _transport.send(packet);
-                alice.setLastSendTime(now);
+                sendRIandPT(charlieRI, status, charlie, data, alice, now);
                 // overwrite alice-signed test data with charlie-signed data in case we need to retransmit
                 state.setStatus(status);
                 state.setSendAliceTime(now);
@@ -2124,6 +2097,67 @@ class PeerTestManager {
             state.setLastSendTime(now);
             reschedule(Math.min(RESEND_TIMEOUT, remaining));
         }
+    }
+
+    /** 
+     * Send RI and Peer Test. SSU2 only. We are Bob.
+     *
+     * Msg 2 Bob to Charlie with Alice's RI
+     * Msg 4 Bob to Alice with Charlie's RI
+     *
+     * @param ri may be null, but hopefully not
+     * @param status -1 for msg 2, nonnegative for msg 4
+     * @param hash alice for msg 2, charlie for msg 4
+     * @param data signed peer test data
+     * @param to charlie for msg 2, alice for msg 4
+     * @since 0.9.57
+     */
+    private void sendRIandPT(RouterInfo ri, int status, Hash hash, byte[] data, PeerState2 to, long now) {
+        boolean delay = false;
+        SSU2Payload.RIBlock riblock = null;
+        if (ri != null) {
+            // See if the RI will compress enough to fit in the peer test packet,
+            // as this makes everything go smoother and faster.
+            // Overhead total is 183 via IPv4, 203 via IPv6 (w/ IPv4 addr in data)
+            // Overhead total is 195 via IPv4, 215 via IPv6 (w/ IPv6 addr in data)
+            int avail = to.getMTU() -
+                        ((to.isIPv6() ? PacketBuilder2.MIN_IPV6_DATA_PACKET_OVERHEAD : PacketBuilder2.MIN_DATA_PACKET_OVERHEAD) +
+                         SSU2Payload.BLOCK_HEADER_SIZE +     // peer test block header
+                         3 +                                 // peer test block msgnum/code/flag
+                         Hash.HASH_LENGTH +                  // peer test block hash
+                         data.length +                       // peer test block signed data
+                         SSU2Payload.BLOCK_HEADER_SIZE +     // RI block header
+                         2                                   // RI block flag/frag bytes
+                        );
+            byte[] info = ri.toByteArray();
+            byte[] gzipped = DataHelper.compress(info, 0, info.length, DataHelper.MAX_COMPRESSION);
+            if (_log.shouldDebug())
+                _log.debug("RI: " + info.length + " bytes uncompressed, " + gzipped.length +
+                           " compressed, MTU " + to.getMTU() + ", available " + avail);
+            boolean gzip = gzipped.length < info.length;
+            if (gzip)
+                info = gzipped;
+            if (info.length <= avail) {
+                riblock = new SSU2Payload.RIBlock(info,  0, info.length, false, gzip, 0, 1);
+            } else {
+                DatabaseStoreMessage dbsm = new DatabaseStoreMessage(_context);
+                dbsm.setEntry(ri);
+                dbsm.setMessageExpiration(now + 10*1000);
+                _transport.send(dbsm, to);
+                delay = true;
+            }
+        }
+        UDPPacket packet;
+        if (status < 0)
+            packet = _packetBuilder2.buildPeerTestToCharlie(hash, data, riblock, to);
+        else
+            packet = _packetBuilder2.buildPeerTestToAlice(status, hash, data, riblock, to);
+        // delay because dbsm is queued, we want it to get there first
+        if (delay)
+            new DelaySend(packet, 100);
+        else
+           _transport.send(packet);
+        to.setLastSendTime(now);
     }
 
     /** 

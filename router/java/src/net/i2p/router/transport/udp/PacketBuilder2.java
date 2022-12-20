@@ -728,8 +728,31 @@ class PacketBuilder2 {
      * @return ready to send packet, non-null
      */
     public UDPPacket buildPeerTestToAlice(int code, Hash charlieHash, byte[] signedData, PeerState2 alice) {
+        return buildPeerTestToAlice(code, charlieHash, signedData, null, alice);
+    }
+
+    /**
+     * Build a packet as Bob to Alice, with the response from Charlie,
+     * or a rejection by Bob.
+     * In-session, message 4.
+     *
+     * @param charlieHash fake hash (all zeros) if rejected by bob
+     * @param riBlock to include, may be null
+     * @return ready to send packet, non-null
+     * @since 0.9.57
+     */
+    public UDPPacket buildPeerTestToAlice(int code, Hash charlieHash, byte[] signedData, Block riBlock, PeerState2 alice) {
         Block block = new SSU2Payload.PeerTestBlock(4, code, charlieHash, signedData);
-        UDPPacket rv = buildPacket(Collections.<Fragment>emptyList(), Collections.singletonList(block), alice);
+        List<Block> blocks;
+        if (riBlock != null) {
+            // RouterInfo must be first
+            blocks = new ArrayList<Block>(2);
+            blocks.add(riBlock);
+            blocks.add(block);
+        } else {
+            blocks = Collections.singletonList(block);
+        }
+        UDPPacket rv = buildPacket(Collections.<Fragment>emptyList(), blocks, alice);
         rv.setMessageType(TYPE_TTA);
         return rv;
     }
@@ -761,11 +784,21 @@ class PacketBuilder2 {
      * Build a packet as Bob to Charlie to help test Alice.
      * In-session, message 2.
      *
+     * @param riBlock to include, may be null
      * @return ready to send packet, non-null
      */
-    public UDPPacket buildPeerTestToCharlie(Hash aliceHash, byte[] signedData, PeerState2 charlie) {
+    public UDPPacket buildPeerTestToCharlie(Hash aliceHash, byte[] signedData, Block riBlock, PeerState2 charlie) {
         Block block = new SSU2Payload.PeerTestBlock(2, 0, aliceHash, signedData);
-        UDPPacket rv = buildPacket(Collections.<Fragment>emptyList(), Collections.singletonList(block), charlie);
+        List<Block> blocks;
+        if (riBlock != null) {
+            // RouterInfo must be first
+            blocks = new ArrayList<Block>(2);
+            blocks.add(riBlock);
+            blocks.add(block);
+        } else {
+            blocks = Collections.singletonList(block);
+        }
+        UDPPacket rv = buildPacket(Collections.<Fragment>emptyList(), blocks, charlie);
         rv.setMessageType(TYPE_TBC);
         return rv;
     }
