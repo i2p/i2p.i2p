@@ -452,7 +452,7 @@ public class Analysis extends JobImpl implements RouterApp {
                     for (RouterAddress ra : ri.getAddresses()) {
                         byte[] ip = ra.getIP();
                         if (ip != null)
-                            _context.blocklist().add(ip);
+                            _context.blocklist().add(ip, "Sybil " + h.toBase64());
                         String host = ra.getHost();
                         if (host != null)
                             blocks.add(host);
