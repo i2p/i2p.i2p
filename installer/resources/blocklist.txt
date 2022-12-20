@@ -72,6 +72,8 @@ Friend of the Chinese Floodfill Flooder:159.226.40.3
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:198.51.100.0/24
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:203.0.113.0/24
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:224.0.0.0/3
+wildcard:0;0;0;0;0;0;0;0
+localhost:0;0;0;0;0;0;0;1
 Sybil:45.32.60.71
 Sybil:45.32.62.37
 Sybil:45.32.125.149
