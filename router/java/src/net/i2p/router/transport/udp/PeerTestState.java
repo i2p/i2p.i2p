@@ -42,6 +42,8 @@ class PeerTestState {
     private long _receiveAliceTime;
     private long _receiveBobTime;
     private long _receiveCharlieTime;
+    private long _sendAliceTime;
+    private int _status;
     private final AtomicInteger _packetsRelayed = new AtomicInteger();
     
     public enum Role {ALICE, BOB, CHARLIE};
@@ -198,13 +200,39 @@ class PeerTestState {
     public void setReceiveCharlieTime(long when) { _receiveCharlieTime = when; }
 
     /**
-     *  SSU2 only, we are Bob
+     * when did we send to alice, SSU2 Bob only
+     * @since 0.9.57
+     */
+    public long getSendAliceTime() { return _sendAliceTime; }
+
+    /**
+     * when did we send to alice, SSU2 Bob only
+     * @since 0.9.57
+     */
+    public void setSendAliceTime(long when) { _sendAliceTime = when; }
+
+    /**
+     * what code did we send to alice, SSU2 Bob only
+     * @since 0.9.57
+     */
+    public int getStatus() { return _status; }
+
+    /**
+     * what code did we send to alice, SSU2 Bob only
+     * @since 0.9.57
+     */
+    public void setStatus(int status) { _status = status; }
+
+    /**
+     *  Get for retransmission.
+     *  SSU2 only, we are Alice, Bob or Charlie
      *  @since 0.9.57
      */
     public byte[] getTestData() { return _testData; }
 
     /**
-     *  SSU2 only, we are Bob
+     *  Save for retransmission.
+     *  SSU2 only, we are Alice, Bob or Charlie
      *  @since 0.9.57
      */
     public void setTestData(byte[] data) { _testData = data; }
