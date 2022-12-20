@@ -483,6 +483,9 @@ public abstract class Addresses {
      *  Caches numeric addresses only.
      *  Will resolve but not cache DNS addresses.
      *
+     *  DEPRECATED for IPs in RouterAddresses, blocklists, etc.,
+     *  use getI2POnly() which avoids getByName() in most cases.
+     *
      *  Unlike InetAddress.getByName(), we do NOT allow numeric IPs
      *  of the form d.d.d, d.d, or d, as these are almost certainly mistakes.
      *
@@ -512,7 +515,6 @@ public abstract class Addresses {
                     _negativeCache.remove(host);
                 }
             }
-            //I2PAppContext.getGlobalContext().logManager().getLog(Addresses.class).error("lookup of " + host, new Exception("I did it"));
             try {
                 rv = InetAddress.getByName(host).getAddress();
                 if (isIPAddress(host)) {
@@ -534,6 +536,9 @@ public abstract class Addresses {
      *  Caching version of InetAddress.getByName(host).getAddress(), which is slow.
      *  Resolves literal IP addresses only, will not cause a DNS lookup.
      *  Will return null for hostnames.
+     *
+     *  PREFERRED for IPs in RouterAddresses, blocklists, etc. over getI2P()
+     *  because it avoids getByName() in most cases.
      *
      *  Unlike InetAddress.getByName(), we do NOT allow numeric IPs
      *  of the form d.d.d, d.d, or d, as these are almost certainly mistakes.
@@ -570,8 +575,6 @@ public abstract class Addresses {
                         _IPAddress.put(host, rv);
                     }
                 } catch (UnknownHostException uhe) {}
-            //} else {
-            //    I2PAppContext.getGlobalContext().logManager().getLog(Addresses.class).warn("Not looking up " + host, new Exception("I did it"));
             }
         }
         return rv;
@@ -702,14 +705,8 @@ public abstract class Addresses {
         return InetAddressUtils.isIPv4Address(host) || InetAddressUtils.isIPv6Address(host);
     }
 
-    /**
-     *  Because InetAddress.getByName() is slow, esp. on Windows
-     *
-     *  @param host w.x.y.z only
-     *  @return 4 bytes or null
-     *  @since 0.9.50
-     */
-    private static byte[] getIPv4(String host) {
+/*
+    private static byte[] oldGetIPv4(String host) {
         String[] s = DataHelper.split(host, "\\.", 4);
         if (s.length != 4)
             return null;
@@ -727,14 +724,7 @@ public abstract class Addresses {
         return rv;
     }
 
-    /**
-     *  Because InetAddress.getByName() is slow, esp. on Windows
-     *
-     *  @param host full 0:1:2:3:4:5:6:7 only, no ::
-     *  @return 16 bytes or null
-     *  @since 0.9.50
-     */
-    private static byte[] getIPv6(String host) {
+    private static byte[] oldGetIPv6(String host) {
         String[] s = DataHelper.split(host, ":", 8);
         if (s.length != 8)
             return null;
@@ -751,6 +741,83 @@ public abstract class Addresses {
         } catch (NumberFormatException nfe) {
             return null;
         }
+        return rv;
+    }
+*/
+
+    /**
+     *  Because InetAddress.getByName() is slow, esp. on Windows.
+     *  Also avoids split(), Integer.parseInt(), and object churn.
+     *
+     *  @param host w.x.y.z only
+     *  @return 4 bytes or null
+     *  @since 0.9.50
+     */
+    private static byte[] getIPv4(String host) {
+        byte[] rv = new byte[4];
+        int b = 0;
+        int dots = 0;
+        int len = host.length();
+        for (int i = 0; i < len; i++) {
+            char c = host.charAt(i);
+            if (c == '.') {
+               if (i == 0 || i == len - 1 || dots == 3 || b > 255 || host.charAt(i - 1) == '.')
+                   return null;
+               rv[dots++] = (byte) b;
+               b = 0;
+            } else if (c >= '0' && c <= '9') {
+               b *= 10;
+               b += c - '0';
+            } else {
+               return null;
+            }
+        }
+        if (dots != 3 || b > 255)
+            return null;
+        rv[3] = (byte) b;
+        return rv;
+    }
+
+    /**
+     *  Because InetAddress.getByName() is slow, esp. on Windows.
+     *  Also avoids split(), Integer.parseInt(), and object churn.
+     *
+     *  @param host full 0:1:2:3:4:5:6:7 only, no ::
+     *  @return 16 bytes or null
+     *  @since 0.9.50
+     */
+    private static byte[] getIPv6(String host) {
+        byte[] rv = new byte[16];
+        int b = 0;
+        int j = 0;
+        int colons = 0;
+        int len = host.length();
+        for (int i = 0; i < len; i++) {
+            char c = host.charAt(i);
+            if (c == ':') {
+               if (i == 0 || i == len - 1 || colons == 7 || b > 65535 || host.charAt(i - 1) == ':')
+                   return null;
+               rv[j++] = (byte) (b >> 8);
+               rv[j++] = (byte) b;
+               colons++;
+               b = 0;
+            } else if (c >= '0' && c <= '9') {
+               b <<= 4;
+               b |= c - '0';
+            } else if (c >= 'a' && c <= 'f') {
+               b <<= 4;
+               b |= 10 + c - 'a';
+            } else if (c >= 'A' && c <= 'F') {
+               b <<= 4;
+               b |= 10 + c - 'A';
+            } else {
+               return null;
+            }
+        }
+        if (colons != 7 || b > 65535)
+            return null;
+        rv[14] = (byte) (b >> 8);
+        rv[15] = (byte) b;
         return rv;
     }
 
@@ -938,6 +1005,7 @@ public abstract class Addresses {
      *  Print out the local addresses
      */
     public static void main(String[] args) {
+        //test(); if (true) return;
         System.out.println("Connected Address Types: " + getConnectedAddressTypes() + '\n');
         System.out.println("External IPv4 Addresses:");
         Set<String> a = getAddresses(false, false, false);
@@ -1015,6 +1083,85 @@ public abstract class Addresses {
         // Windows 8.1 Java 1.8.0_66 netbook appx. 200ms + 50ms/interface
         System.out.println("scan time:    " + DataHelper.formatDuration(time));
     }
+
+/*
+    // test results (linux):
+    // new is about 10x faster than old
+    // InetAddress about the same as old for IPv4, about 4x slower for IPv6
+    private static void test() {
+        String[] tt = { "1.2.3.4", "0.0.0.0", "255.255.255.255", "", "a", "1", "1.2", "1.2.3",
+                        ".1.2.3", "1.2.3.", "266.1.2.3", "1.266.2.3", "1.2.3.266", "1.2.3.4.5" };
+        for (String t : tt) {
+            byte[] b = getIPv4(t);
+            System.out.println(t + " -> " + toString(b));
+        }
+        tt = new String[] { "a:B:c:D:e:f:1:2", "aaaa:bbbb:CCC:dd:e:f:111:2222", "a", "1", "1:2", "1::2:3:4:5:6:7:8",
+                            ":1:2:3:4:5:6:7", "2:3:4:5:6:7:8:", "x:2:3:4:5:6:7:8", "::1", "::", "",
+                            "99999:2:3:4:5:6:7:8" };
+        for (String t : tt) {
+            byte[] b = getIPv6(t);
+            System.out.println(t + " -> " + toString(b));
+        }
+        int runs = 1000;
+        for (int i = 0; i < runs; i++) {
+            try {
+                InetAddress.getByName("192.168.142.117").getAddress();
+                InetAddress.getByName("aaaa:bbbb:cccc:dddd:eeee:ffff:1111:2222").getAddress();
+            } catch (Exception e) {}
+            oldGetIPv4("192.168.142.117");
+            oldGetIPv6("aaaa:bbbb:cccc:dddd:eeee:ffff:1111:2222");
+            getIPv4("192.168.142.117");
+            getIPv6("aaaa:bbbb:cccc:dddd:eeee:ffff:1111:2222");
+        }
+        runs = 10*1000*1000;
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < runs; i++) {
+            oldGetIPv4("192.168.142.117");
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("old ipv4 took " + (end - start));
+        start = end;
+
+        for (int i = 0; i < runs; i++) {
+            getIPv4("192.168.142.117");
+        }
+        end = System.currentTimeMillis();
+        System.out.println("new ipv4 took " + (end - start));
+        start = end;
+
+        for (int i = 0; i < runs; i++) {
+            try {
+                InetAddress.getByName("192.168.142.117").getAddress();
+                InetAddress.getByName("aaaa:bbbb:cccc:dddd:eeee:ffff:1111:2222").getAddress();
+            } catch (Exception e) {}
+        }
+        end = System.currentTimeMillis();
+        System.out.println("INA ipv4 took " + (end - start));
+        start = end;
+
+        for (int i = 0; i < runs; i++) {
+            oldGetIPv6("192.168.142.117");
+        }
+        end = System.currentTimeMillis();
+        System.out.println("old ipv6 took " + (end - start));
+        start = end;
+
+        for (int i = 0; i < runs; i++) {
+            getIPv6("192.168.142.117");
+        }
+        end = System.currentTimeMillis();
+        System.out.println("new ipv6 took " + (end - start));
+
+        for (int i = 0; i < runs; i++) {
+            try {
+                InetAddress.getByName("aaaa:bbbb:cccc:dddd:eeee:ffff:1111:2222").getAddress();
+            } catch (Exception e) {}
+        }
+        end = System.currentTimeMillis();
+        System.out.println("INA ipv6 took " + (end - start));
+        start = end;
+    }
+*/
 
     /** @since 0.9.34 */
     private static void print(Set<String> a) {
