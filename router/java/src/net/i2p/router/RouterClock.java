@@ -168,13 +168,13 @@ public class RouterClock extends Clock {
                         if (log.shouldWarn())
                             log.warn("Ignoring clock offset " + offsetMs + "ms (current " + _offset +
                                        "ms) since it would increase peer clock skew from " + currentPeerClockSkew +
-                                       "ms to " + predictedPeerClockSkew + "ms. Stratrum: " + stratum);
+                                       "ms to " + predictedPeerClockSkew + "ms. Stratum: " + stratum);
                         return;
                     } else {
                         if (log.shouldInfo())
                             log.info("Approving clock offset " + offsetMs + "ms (current " + _offset +
                                        "ms) since it would decrease peer clock skew from " + currentPeerClockSkew +
-                                       "ms to " + predictedPeerClockSkew + "ms. Stratrum: " + stratum);
+                                       "ms to " + predictedPeerClockSkew + "ms. Stratum: " + stratum);
                     }
             } // check sanity
         }
