@@ -111,14 +111,33 @@ public class CommandLine {
     protected static void printCommands(List<String> classes) {
         System.err.println("Available commands:");
         List<String> cmds = new ArrayList<String>(classes.size());
+        int max = 0;
         for (String cls : classes) {
             String ccmd = cls.substring(cls.lastIndexOf('.') + 1).toLowerCase(Locale.US);
             cmds.add(ccmd);
+            if (ccmd.length() > max)
+                max = ccmd.length();
         }
         Collections.sort(cmds);
+        StringBuilder buf = new StringBuilder(80);
         for (String cmd : cmds) {
-            System.err.println("    " + cmd);
+            int len = buf.length();
+            if (len == 0)
+                buf.append("    ");
+            buf.append(cmd);
+            if (len > 80 - max) {
+                System.err.println(buf);
+                buf.setLength(0);
+            } else {
+                int spc = 1 + max - cmd.length();
+                for (int i = 0; i < spc; i++) {
+                    buf.append(' ');
+                }
+            }
         }
+        if (buf.length() > 0)
+            System.out.println(buf);
+        System.err.println();
         System.err.println("Enter \"help command\" for detailed help.");
     }
 }
