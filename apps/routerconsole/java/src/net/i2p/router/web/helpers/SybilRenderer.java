@@ -134,8 +134,8 @@ public class SybilRenderer {
         Hash us = _context.routerHash();
         Analysis analysis = Analysis.getInstance(_context);
         List<RouterInfo> ris = null;
-        if (mode != 0 && mode < 12) {
-            if (mode >= 2 && mode <= 6) {
+        if (mode != 0 && (mode < 12 || mode == 17 || mode == 18)) {
+            if (mode >= 2 && (mode <= 6 || mode == 17 || mode == 18)) {
                 // review all routers for family and IP analysis
                 ris = analysis.getAllRouters(us);
             } else {
@@ -159,8 +159,10 @@ public class SybilRenderer {
                    "</li><li><a href=\"netdb?f=3&amp;m=2\">Same Family</a>" +
                    "</li><li><a href=\"netdb?f=3&amp;m=3\">IP close to us</a>" +
                    "</li><li><a href=\"netdb?f=3&amp;m=4\">Same IP</a>" +
-                   "</li><li><a href=\"netdb?f=3&amp;m=5\">Same /24</a>" +
-                   "</li><li><a href=\"netdb?f=3&amp;m=6\">Same /16</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=5\">Same IPv4 /24</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=6\">Same IPv4 /16</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=17\">Same IPv6 /64</a>" +
+                   "</li><li><a href=\"netdb?f=3&amp;m=18\">Same IPv6 /48</a>" +
                    "</li><li><a href=\"netdb?f=3&amp;m=7\">Pair distance</a>" +
                    "</li><li><a href=\"netdb?f=3&amp;m=8\">Close to us</a>" +
                    "</li><li><a href=\"netdb?f=3&amp;m=9\">Close to us tomorrow</a>" +
@@ -189,6 +191,10 @@ public class SybilRenderer {
             renderIP24Summary(out, buf, analysis, ris, points);
         } else if (mode == 6) {
             renderIP16Summary(out, buf, analysis, ris, points);
+        } else if (mode == 17) {
+            renderIP64Summary(out, buf, analysis, ris, points);
+        } else if (mode == 18) {
+            renderIP48Summary(out, buf, analysis, ris, points);
         } else if (mode == 7) {
             renderPairSummary(out, buf, analysis, ris, points);
         } else if (mode == 8) {
@@ -385,8 +391,10 @@ public class SybilRenderer {
         List<RouterInfo> ri32 = new ArrayList<RouterInfo>(4);
         List<RouterInfo> ri24 = new ArrayList<RouterInfo>(4);
         List<RouterInfo> ri16 = new ArrayList<RouterInfo>(4);
-        analysis.calculateIPGroupsUs(ris, points, ri32, ri24, ri16);
-        renderIPGroupsUs(out, buf, ri32, ri24, ri16);
+        List<RouterInfo> ri64 = new ArrayList<RouterInfo>(4);
+        List<RouterInfo> ri48 = new ArrayList<RouterInfo>(4);
+        analysis.calculateIPGroupsUs(ris, points, ri32, ri24, ri16, ri64, ri48);
+        renderIPGroupsUs(out, buf, ri32, ri24, ri16, ri64, ri48);
     }
 
     /**
@@ -411,6 +419,22 @@ public class SybilRenderer {
     private void renderIP16Summary(Writer out, StringBuilder buf, Analysis analysis, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         Map<Integer, List<RouterInfo>> map = analysis.calculateIPGroups16(ris, points);
         renderIPGroups16(out, buf, map);
+    }
+
+    /**
+     *  @since 0.9.57
+     */
+    private void renderIP64Summary(Writer out, StringBuilder buf, Analysis analysis, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
+        Map<Long, List<RouterInfo>> map = analysis.calculateIPGroups64(ris, points);
+        renderIPGroups64(out, buf, map);
+    }
+
+    /**
+     *  @since 0.9.57
+     */
+    private void renderIP48Summary(Writer out, StringBuilder buf, Analysis analysis, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
+        Map<Long, List<RouterInfo>> map = analysis.calculateIPGroups48(ris, points);
+        renderIPGroups48(out, buf, map);
     }
 
     /**
@@ -565,16 +589,17 @@ public class SybilRenderer {
         writeBuf(out, buf);
     }
 
-    private static class FooComparator implements Comparator<Integer>, Serializable {
-         private final Map<Integer, List<RouterInfo>> _o;
-         public FooComparator(Map<Integer, List<RouterInfo>> o) { _o = o;}
-         public int compare(Integer l, Integer r) {
+    private static class FooComparator<K extends Comparable> implements Comparator<K>, Serializable {
+         private final Map<K, List<RouterInfo>> _o;
+         public FooComparator(Map<K, List<RouterInfo>> o) { _o = o;}
+         @SuppressWarnings("unchecked")
+         public int compare(K l, K r) {
              // reverse by count
              int rv = _o.get(r).size() - _o.get(l).size();
              if (rv != 0)
                  return rv;
-             // foward by IP
-             return l.intValue() - r.intValue();
+             // forward by IP
+             return l.compareTo(r);
         }
     }
 
@@ -587,7 +612,7 @@ public class SybilRenderer {
              int rv = _o.get(r).size() - _o.get(l).size();
              if (rv != 0)
                  return rv;
-             // foward by name
+             // forward by name
              return _comp.compare(l, r);
         }
     }
@@ -596,7 +621,8 @@ public class SybilRenderer {
      *
      */
     private void renderIPGroupsUs(Writer out, StringBuilder buf, List<RouterInfo> ri32,
-                                  List<RouterInfo> ri24, List<RouterInfo> ri16) throws IOException {
+                                  List<RouterInfo> ri24, List<RouterInfo> ri16,
+                                  List<RouterInfo> ri64, List<RouterInfo> ri48) throws IOException {
         buf.append("<h3 id=\"ourIP\" class=\"sybils\">Routers close to Our IP</h3>");
         boolean found = false;
         for (RouterInfo info : ri32) {
@@ -608,14 +634,28 @@ public class SybilRenderer {
         }
         for (RouterInfo info : ri24) {
              buf.append("<p id=\"sybil_info\"><b>");
-             buf.append("Same /24 as us");
+             buf.append("Same IPv4 /24 as us");
              buf.append(":</b></p>");
              renderRouterInfo(buf, info, null, false, false);
              found = true;
         }
         for (RouterInfo info : ri16) {
              buf.append("<p id=\"sybil_info\"><b>");
-             buf.append("Same /16 as us");
+             buf.append("Same IPv4 /16 as us");
+             buf.append(":</b></p>");
+             renderRouterInfo(buf, info, null, false, false);
+             found = true;
+        }
+        for (RouterInfo info : ri64) {
+             buf.append("<p id=\"sybil_info\"><b>");
+             buf.append("Same IPv6 /64 as us");
+             buf.append(":</b></p>");
+             renderRouterInfo(buf, info, null, false, false);
+             found = true;
+        }
+        for (RouterInfo info : ri48) {
+             buf.append("<p id=\"sybil_info\"><b>");
+             buf.append("Same IPv6 /48 as us");
              buf.append(":</b></p>");
              renderRouterInfo(buf, info, null, false, false);
              found = true;
@@ -629,9 +669,9 @@ public class SybilRenderer {
      *
      */
     private void renderIPGroups32(Writer out, StringBuilder buf, Map<Integer, List<RouterInfo>> map) throws IOException {
-        buf.append("<h3 id=\"sameIP\" class=\"sybils\">Routers with the Same IP</h3>");
+        buf.append("<h3 id=\"sameIP\" class=\"sybils\">Routers with the same IPv4</h3>");
         List<Integer> foo = new ArrayList<Integer>(map.keySet());
-        Collections.sort(foo, new FooComparator(map));
+        Collections.sort(foo, new FooComparator<Integer>(map));
         boolean found = false;
         for (Integer ii : foo) {
             List<RouterInfo> ris = map.get(ii);
@@ -659,9 +699,9 @@ public class SybilRenderer {
      *
      */
     private void renderIPGroups24(Writer out, StringBuilder buf, Map<Integer, List<RouterInfo>> map) throws IOException {
-        buf.append("<h3 id=\"same24\" class=\"sybils\">Routers in the Same /24 (2 minimum)</h3>");
+        buf.append("<h3 id=\"same24\" class=\"sybils\">Routers in the same IPv4 /24</h3>");
         List<Integer> foo = new ArrayList<Integer>(map.keySet());
-        Collections.sort(foo, new FooComparator(map));
+        Collections.sort(foo, new FooComparator<Integer>(map));
         boolean found = false;
         for (Integer ii : foo) {
             List<RouterInfo> ris = map.get(ii);
@@ -688,9 +728,9 @@ public class SybilRenderer {
      *
      */
     private void renderIPGroups16(Writer out, StringBuilder buf, Map<Integer, List<RouterInfo>> map) throws IOException {
-        buf.append("<h3 id=\"same16\" class=\"sybils\">Routers in the Same /16 (4 minimum)</h3>");
+        buf.append("<h3 id=\"same16\" class=\"sybils\">Routers in the same IPv4 /16 (4 minimum)</h3>");
         List<Integer> foo = new ArrayList<Integer>(map.keySet());
-        Collections.sort(foo, new FooComparator(map));
+        Collections.sort(foo, new FooComparator<Integer>(map));
         boolean found = false;
         for (Integer ii : foo) {
             List<RouterInfo> ris = map.get(ii);
@@ -699,6 +739,67 @@ public class SybilRenderer {
             int i0 = i >> 8;
             int i1 = i & 0xff;
             String sip = i0 + "." + i1 + ".0.0/16";
+            buf.append("<p class=\"sybil_info\"><b>").append(count).append(" routers with IP <a href=\"/netdb?ip=")
+               .append(sip).append("&amp;sybil\">").append(sip)
+               .append("</a></b></p>");
+            for (RouterInfo info : ris) {
+                found = true;
+                renderRouterInfo(buf, info, null, false, false);
+            }
+        }
+        if (!found)
+            buf.append("<p class=\"notfound\">None</p>");
+        writeBuf(out, buf);
+    }
+
+    /**
+     * @since 0.9.57
+     */
+    private void renderIPGroups64(Writer out, StringBuilder buf, Map<Long, List<RouterInfo>> map) throws IOException {
+        buf.append("<h3 id=\"same64\" class=\"sybils\">Routers in the same IPv6 /64</h3>");
+        List<Long> foo = new ArrayList<Long>(map.keySet());
+        Collections.sort(foo, new FooComparator<Long>(map));
+        boolean found = false;
+        for (Long ii : foo) {
+            List<RouterInfo> ris = map.get(ii);
+            int count = ris.size();
+            long i = ii.longValue();
+            int i0 = (int) ((i >> 48) & 0xffff);
+            int i2 = (int) ((i >> 32) & 0xffff);
+            int i4 = (int) ((i >> 16) & 0xffff);
+            int i6 = (int) (i & 0xffff);
+            String sip = Integer.toString(i0, 16) + ":" + Integer.toString(i2, 16) + ':' +
+                         Integer.toString(i4, 16) + ':' + Integer.toString(i6, 16) + "::";
+            buf.append("<p class=\"sybil_info\"><b>").append(count).append(" routers with IP <a href=\"/netdb?ip=")
+               .append(sip).append("&amp;sybil\">").append(sip)
+               .append("</a></b></p>");
+            for (RouterInfo info : ris) {
+                found = true;
+                renderRouterInfo(buf, info, null, false, false);
+            }
+        }
+        if (!found)
+            buf.append("<p class=\"notfound\">None</p>");
+        writeBuf(out, buf);
+    }
+
+    /**
+     * @since 0.9.57
+     */
+    private void renderIPGroups48(Writer out, StringBuilder buf, Map<Long, List<RouterInfo>> map) throws IOException {
+        buf.append("<h3 id=\"same48\" class=\"sybils\">Routers in the same IPv6 /48 (4 minimum)</h3>");
+        List<Long> foo = new ArrayList<Long>(map.keySet());
+        Collections.sort(foo, new FooComparator<Long>(map));
+        boolean found = false;
+        for (Long ii : foo) {
+            List<RouterInfo> ris = map.get(ii);
+            int count = ris.size();
+            long i = ii.longValue();
+            int i0 = (int) ((i >> 32) & 0xffff);
+            int i2 = (int) ((i >> 16) & 0xffff);
+            int i4 = (int) (i & 0xffff);
+            String sip = Integer.toString(i0, 16) + ":" + Integer.toString(i2, 16) + ':' +
+                         Integer.toString(i4, 16) + "::";
             buf.append("<p class=\"sybil_info\"><b>").append(count).append(" routers with IP <a href=\"/netdb?ip=")
                .append(sip).append("&amp;sybil\">").append(sip)
                .append("</a></b></p>");

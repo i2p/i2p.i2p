@@ -85,8 +85,15 @@ public class Analysis extends JobImpl implements RouterApp {
     private static final double POINTS_US32 = 25.0;
     private static final double POINTS_US24 = 20.0;
     private static final double POINTS_US16 = 10.0;
+
+    // IPv6 since 0.9.57, likely to be on top of IPv4, so make lower
+    private static final double POINTS_V6_US64 = 12.5;
+    private static final double POINTS_V6_US48 = 5.0;
+    private static final double POINTS64 = 2.0;
+    private static final double POINTS48 = 0.5;
+
     private static final double POINTS_FAMILY = -10.0;
-    private static final double POINTS_FAMILY_VERIFIED = POINTS_FAMILY * 2;
+    private static final double POINTS_FAMILY_VERIFIED = POINTS_FAMILY * 4;
     private static final double POINTS_NONFF = -5.0;
     private static final double POINTS_BAD_FAMILY = 20.0;
     private static final double POINTS_BAD_OUR_FAMILY = 100.0;
@@ -374,13 +381,14 @@ public class Analysis extends JobImpl implements RouterApp {
 
         // IP analysis
         calculateIPGroupsFamily(ris, points);
-        List<RouterInfo> ri32 = new ArrayList<RouterInfo>(4);
-        List<RouterInfo> ri24 = new ArrayList<RouterInfo>(4);
-        List<RouterInfo> ri16 = new ArrayList<RouterInfo>(4);
-        calculateIPGroupsUs(ris, points, ri32, ri24, ri16);
+        // unused here, just for the console, so use the same for all of them
+        List<RouterInfo> dummy = new DummyList();
+        calculateIPGroupsUs(ris, points, dummy, dummy, dummy, dummy, dummy);
         calculateIPGroups32(ris, points);
         calculateIPGroups24(ris, points);
         calculateIPGroups16(ris, points);
+        calculateIPGroups64(ris, points);
+        calculateIPGroups48(ris, points);
 
         // Pairwise distance analysis
         List<Pair> pairs = new ArrayList<Pair>(PAIRMAX);
@@ -425,6 +433,15 @@ public class Analysis extends JobImpl implements RouterApp {
         if (_context.getProperty(PROP_BLOCK, DEFAULT_BLOCK))
             doBlocking(points);
         return points;
+    }
+
+    /**
+     *  @since 0.9.57
+     */
+    private static class DummyList extends ArrayList<RouterInfo> {
+        public DummyList() { super(0); }
+        @Override
+        public boolean add(RouterInfo ri) { return true; }
     }
 
     /**
@@ -546,45 +563,117 @@ public class Analysis extends JobImpl implements RouterApp {
     }
 
     /**
+     * v6 only
+     * @since 0.9.57
+     */
+    private static byte[] getIPv6(RouterInfo ri) {
+        for (RouterAddress ra : ri.getAddresses()) {
+            byte[] rv = ra.getIP();
+            if (rv != null && rv.length == 16)
+                return rv;
+        }
+        return null;
+    }
+
+    /**
      *  @param ri32 out parameter
      *  @param ri24 out parameter
      *  @param ri16 out parameter
+     *  @param ri64 out parameter
+     *  @param ri48 out parameter
      *  @since 0.9.38 split out from renderIPGroupsUs()
      */
     public void calculateIPGroupsUs(List<RouterInfo> ris, Map<Hash, Points> points,
-                                    List<RouterInfo> ri32, List<RouterInfo> ri24, List<RouterInfo> ri16) {
+                                    List<RouterInfo> ri32, List<RouterInfo> ri24, List<RouterInfo> ri16,
+                                    List<RouterInfo> ri64, List<RouterInfo> ri48) {
         RouterInfo us = _context.router().getRouterInfo();
         byte[] ourIP = getIP(us);
         if (ourIP == null) {
             String last = _context.getProperty("i2np.lastIP");
-            if (last == null)
-                return;
-            ourIP = Addresses.getIPOnly(last);
-            if (ourIP == null)
-                return;
+            if (last != null)
+                ourIP = Addresses.getIPOnly(last);
         }
-        String reason32 = "Same IP as <a href=\"/netdb?ip=" +
-                          ourIP[0] + '.' + ourIP[1] + '.' + ourIP[2] + '.' + ourIP[3] + "&amp;sybil\">us</a>";
-        String reason24 = "Same /24 IP as <a href=\"/netdb?ip=" +
-                          ourIP[0] + '.' + ourIP[1] + '.' + ourIP[2] + ".0/24&amp;sybil\">us</a>";
-        String reason16 = "Same /16 IP as <a href=\"/netdb?ip=" +
-                          ourIP[0] + '.' + ourIP[1] + ".0.0/16&amp;sybil\">us</a>";
+        byte[] ourIPv6 = getIPv6(us);
+        if (ourIPv6 == null) {
+            String last = _context.getProperty("i2np.lastIPv6");
+            if (last != null)
+                ourIPv6 = Addresses.getIPOnly(last);
+        }
+        if (ourIP == null && ourIPv6 == null)
+            return;
+
+        String reason32;
+        String reason24;
+        String reason16;
+        String reason64;
+        String reason48;
+
+        if (ourIP != null) {
+            reason32 = "Same IP as <a href=\"/netdb?ip=" +
+                       Addresses.toString(ourIP) +
+                       "&amp;sybil\">us</a>";
+            reason24 = "Same IPv4 /24 as <a href=\"/netdb?ip=" +
+                       (ourIP[0] & 0xff) + '.' +
+                       (ourIP[1] & 0xff) + '.' +
+                       (ourIP[2] & 0xff) +
+                       ".0/24&amp;sybil\">us</a>";
+            reason16 = "Same IPv4 /16 as <a href=\"/netdb?ip=" +
+                       (ourIP[0] & 0xff) + '.' +
+                       (ourIP[1] & 0xff) +
+                       ".0.0/16&amp;sybil\">us</a>";
+        } else {
+            reason32 = null;
+            reason24 = null;
+            reason16 = null;
+        }
+        if (ourIPv6 != null) {
+            reason64 = "Same IPv6 /64 as <a href=\"/netdb?ip=" +
+                        Integer.toString(((ourIPv6[0] << 8) & 0xff00) | (ourIPv6[1] & 0xff), 16) + ':' +
+                        Integer.toString(((ourIPv6[2] << 8) & 0xff00) | (ourIPv6[3] & 0xff), 16) + ':' +
+                        Integer.toString(((ourIPv6[4] << 8) & 0xff00) | (ourIPv6[5] & 0xff), 16) + ':' +
+                        Integer.toString(((ourIPv6[6] << 8) & 0xff00) | (ourIPv6[7] & 0xff), 16) +
+                        "::&amp;sybil\">us</a>";
+            reason48 = "Same IPv6 /48 as <a href=\"/netdb?ip=" +
+                        Integer.toString(((ourIPv6[0] << 8) & 0xff00) | (ourIPv6[1] & 0xff), 16) + ':' +
+                        Integer.toString(((ourIPv6[2] << 8) & 0xff00) | (ourIPv6[3] & 0xff), 16) + ':' +
+                        Integer.toString(((ourIPv6[4] << 8) & 0xff00) | (ourIPv6[5] & 0xff), 16) +
+                        "::&amp;sybil\">us</a>";
+        } else {
+            reason64 = null;
+            reason48 = null;
+        }
         for (RouterInfo info : ris) {
-            byte[] ip = getIP(info);
-            if (ip == null)
-                continue;
-            if (ip[0] == ourIP[0] && ip[1] == ourIP[1]) {
-                if (ip[2] == ourIP[2]) {
-                    if (ip[3] == ourIP[3]) {
-                        addPoints(points, info.getHash(), POINTS_US32, reason32);
-                        ri32.add(info);
+            if (ourIP != null) {
+                byte[] ip = getIP(info);
+                if (ip == null)
+                    continue;
+                if (ip[0] == ourIP[0] && ip[1] == ourIP[1]) {
+                    if (ip[2] == ourIP[2]) {
+                        if (ip[3] == ourIP[3]) {
+                            addPoints(points, info.getHash(), POINTS_US32, reason32);
+                            ri32.add(info);
+                        } else {
+                            addPoints(points, info.getHash(), POINTS_US24, reason24);
+                            ri24.add(info);
+                        }
                     } else {
-                        addPoints(points, info.getHash(), POINTS_US24, reason24);
-                        ri24.add(info);
+                        addPoints(points, info.getHash(), POINTS_US16, reason16);
+                        ri16.add(info);
                     }
-                } else {
-                    addPoints(points, info.getHash(), POINTS_US16, reason16);
-                    ri16.add(info);
+                }
+            }
+            if (ourIPv6 != null) {
+                byte[] ip = getIPv6(info);
+                if (ip == null)
+                    continue;
+                if (DataHelper.eq(ip, 0, ourIPv6, 0, 6)) {
+                    if (ip[6] == ourIPv6[6] && ip[7] == ourIPv6[7]) {
+                        addPoints(points, info.getHash(), POINTS_V6_US64, reason64);
+                        ri64.add(info);
+                    } else {
+                        addPoints(points, info.getHash(), POINTS_V6_US48, reason48);
+                        ri48.add(info);
+                    }
                 }
             }
         }
@@ -666,7 +755,7 @@ public class Analysis extends JobImpl implements RouterApp {
             int i0 = i >> 16;
             int i1 = (i >> 8) & 0xff;
             int i2 = i & 0xff;
-            String reason = "Same /24 IP with <a href=\"/netdb?ip=" +
+            String reason = "Same IPv4 /24 with <a href=\"/netdb?ip=" +
                             i0 + '.' + i1 + '.' + i2 + ".0/24&amp;sybil\">" +
                             (count - 1) + " other" + (( count > 2) ? "s" : "") + "</a>";
             for (RouterInfo info : ris) {
@@ -717,7 +806,7 @@ public class Analysis extends JobImpl implements RouterApp {
             int i = ii.intValue();
             int i0 = i >> 8;
             int i1 = i & 0xff;
-            String reason = "Same /16 IP with <a href=\"/netdb?ip=" +
+            String reason = "Same IPv4 /16 with <a href=\"/netdb?ip=" +
                             i0 + '.' + i1 + ".0.0/16&amp;sybil\">" +
                             (count - 1) + " other" + (( count > 2) ? "s" : "") + "</a>";
             for (RouterInfo info : ris) {
@@ -727,6 +816,129 @@ public class Analysis extends JobImpl implements RouterApp {
                 if ((ip[0] & 0xff) != i0)
                     continue;
                 if ((ip[1] & 0xff) != i1)
+                    continue;
+                e.getValue().add(info);
+                addPoints(points, info.getHash(), point, reason);
+            }
+        }
+        return rv;
+    }
+
+    /**
+     *  @since 0.9.57
+     */
+    public Map<Long, List<RouterInfo>> calculateIPGroups64(List<RouterInfo> ris, Map<Hash, Points> points) {
+        ObjectCounter<Long> oc = new ObjectCounter<Long>();
+        for (RouterInfo info : ris) {
+            byte[] ip = getIPv6(info);
+            if (ip == null)
+                continue;
+            Long x = Long.valueOf(DataHelper.fromLong8(ip, 0));
+            oc.increment(x);
+        }
+        Map<Long, List<RouterInfo>> rv = new HashMap<Long, List<RouterInfo>>();
+        for (Long ii : oc.objects()) {
+            int count = oc.count(ii);
+            if (count >= 2)
+                rv.put(ii, new ArrayList<RouterInfo>(count));
+        }
+        for (Map.Entry<Long, List<RouterInfo>> e : rv.entrySet()) {
+            Long ii = e.getKey();
+            int count = oc.count(ii);
+            double point = POINTS64 * (count - 1);
+            long i = ii.longValue();
+            int i0 = (int) ((i >> 56) & 0xff);
+            int i1 = (int) ((i >> 48) & 0xff);
+            int i2 = (int) ((i >> 40) & 0xff);
+            int i3 = (int) ((i >> 32) & 0xff);
+            int i4 = (int) ((i >> 24) & 0xff);
+            int i5 = (int) ((i >> 16) & 0xff);
+            int i6 = (int) ((i >> 8) & 0xff);
+            int i7 = (int) (i & 0xff);
+            String reason = "Same IPv6 /64 with <a href=\"/netdb?ip=" +
+                            Integer.toString((i0 << 8) | i1, 16) + ':' +
+                            Integer.toString((i2 << 8) | i3, 16) + ':' +
+                            Integer.toString((i4 << 8) | i5, 16) + ':' +
+                            Integer.toString((i6 << 8) | i7, 16) +
+                            "::&amp;sybil\">" +
+                            (count - 1) + " other" + (( count > 2) ? "s" : "") + "</a>";
+            for (RouterInfo info : ris) {
+                byte[] ip = getIPv6(info);
+                if (ip == null)
+                    continue;
+                if ((ip[0] & 0xff) != i0)
+                    continue;
+                if ((ip[1] & 0xff) != i1)
+                    continue;
+                if ((ip[2] & 0xff) != i2)
+                    continue;
+                if ((ip[3] & 0xff) != i3)
+                    continue;
+                if ((ip[4] & 0xff) != i4)
+                    continue;
+                if ((ip[5] & 0xff) != i5)
+                    continue;
+                if ((ip[6] & 0xff) != i6)
+                    continue;
+                if ((ip[7] & 0xff) != i7)
+                    continue;
+                e.getValue().add(info);
+                addPoints(points, info.getHash(), point, reason);
+            }
+        }
+        return rv;
+    }
+
+    /**
+     *  @since 0.9.57
+     */
+    public Map<Long, List<RouterInfo>> calculateIPGroups48(List<RouterInfo> ris, Map<Hash, Points> points) {
+        ObjectCounter<Long> oc = new ObjectCounter<Long>();
+        for (RouterInfo info : ris) {
+            byte[] ip = getIPv6(info);
+            if (ip == null)
+                continue;
+            Long x = Long.valueOf(DataHelper.fromLong(ip, 0, 6));
+            oc.increment(x);
+        }
+        Map<Long, List<RouterInfo>> rv = new HashMap<Long, List<RouterInfo>>();
+        for (Long ii : oc.objects()) {
+            int count = oc.count(ii);
+            if (count >= 4)
+                rv.put(ii, new ArrayList<RouterInfo>(count));
+        }
+        for (Map.Entry<Long, List<RouterInfo>> e : rv.entrySet()) {
+            Long ii = e.getKey();
+            int count = oc.count(ii);
+            double point = POINTS48 * (count - 1);
+            long i = ii.longValue();
+            int i0 = (int) ((i >> 40) & 0xff);
+            int i1 = (int) ((i >> 32) & 0xff);
+            int i2 = (int) ((i >> 24) & 0xff);
+            int i3 = (int) ((i >> 16) & 0xff);
+            int i4 = (int) ((i >> 8) & 0xff);
+            int i5 = (int) (i & 0xff);
+            String reason = "Same IPv6 /48 with <a href=\"/netdb?ip=" +
+                            Integer.toString((i0 << 8) | i1, 16) + ':' +
+                            Integer.toString((i2 << 8) | i3, 16) + ':' +
+                            Integer.toString((i4 << 8) | i5, 16) +
+                            "::&amp;sybil\">" +
+                            (count - 1) + " other" + (( count > 2) ? "s" : "") + "</a>";
+            for (RouterInfo info : ris) {
+                byte[] ip = getIPv6(info);
+                if (ip == null)
+                    continue;
+                if ((ip[0] & 0xff) != i0)
+                    continue;
+                if ((ip[1] & 0xff) != i1)
+                    continue;
+                if ((ip[2] & 0xff) != i2)
+                    continue;
+                if ((ip[3] & 0xff) != i3)
+                    continue;
+                if ((ip[4] & 0xff) != i4)
+                    continue;
+                if ((ip[5] & 0xff) != i5)
                     continue;
                 e.getValue().add(info);
                 addPoints(points, info.getHash(), point, reason);
