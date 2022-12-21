@@ -982,7 +982,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (v == null ||
             addr.getOption("i") == null ||
             addr.getOption("s") == null ||
-            (!SSU2Util.ENABLE_RELAY && (addr.getHost() == null || addr.getPort() <= 0)) ||
             (!v.equals(SSU2_VERSION) && !v.startsWith(SSU2_VERSION_ALT))) {
             // his address is SSU1 or is outbound SSU2 only
             return (rv == 1 && _enableSSU1) ? 1 : 0;
@@ -2521,9 +2520,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // introducers
                 String caps = addr.getOption(UDPAddress.PROP_CAPACITY);
                 if (caps != null && caps.contains(CAP_IPV6) && !_haveIPv6Address)
-                    continue;
-                // Skip SSU2 with introducers until we support relay
-                if (_enableSSU2 && !SSU2Util.ENABLE_RELAY && addr.getTransportStyle().equals(STYLE2))
                     continue;
             }
             return addr;
@@ -4064,8 +4060,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     PeerState pickTestPeer(PeerTestState.Role peerRole, int version, boolean isIPv6, RemoteHostId dontInclude) {
         if (peerRole == ALICE)
             throw new IllegalArgumentException();
-        if (peerRole == CHARLIE && version != 1 && !SSU2Util.ENABLE_PEER_TEST)
-            return null;
         List<PeerState> peers = new ArrayList<PeerState>(_peersByIdent.values());
         for (Iterator<PeerState> iter = new RandomIterator<PeerState>(peers); iter.hasNext(); ) {
             PeerState peer = iter.next();
@@ -4073,8 +4067,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // Skip SSU2 until we have support for peer test
                 version = peer.getVersion();
                 if (version != 1) {
-                    if (!SSU2Util.ENABLE_PEER_TEST)
-                        continue;
                     // we must know our IP/port
                     PeerState2 bob = (PeerState2) peer;
                     if (bob.getOurIP() == null || bob.getOurPort() <= 0)

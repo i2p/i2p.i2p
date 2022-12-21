@@ -1000,13 +1000,11 @@ class PacketHandler {
         } else if (type == SSU2Util.PEER_TEST_FLAG_BYTE) {
             if (_log.shouldDebug())
                 _log.debug("Got a Peer Test");
-            if (SSU2Util.ENABLE_PEER_TEST)
-                _testManager.receiveTest(from, packet);
+            _testManager.receiveTest(from, packet);
         } else if (type == SSU2Util.HOLE_PUNCH_FLAG_BYTE) {
             if (_log.shouldDebug())
                 _log.debug("Got a Hole Punch");
-            if (SSU2Util.ENABLE_RELAY)
-                _establisher.receiveHolePunch(from, packet);
+            _establisher.receiveHolePunch(from, packet);
         } else {
             if (_log.shouldWarn())
                 _log.warn("Got unknown SSU2 message " + header + " from " + from);

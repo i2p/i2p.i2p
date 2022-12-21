@@ -18,11 +18,6 @@ import net.i2p.data.SigningPublicKey;
 final class SSU2Util {
     public static final int PROTOCOL_VERSION = 2;
 
-    // features
-    public static final boolean ENABLE_RELAY = true;
-    public static final boolean ENABLE_PEER_TEST = true;
-    public static final boolean ENABLE_PATH_CHALLENGE = true;
-
     // lengths
     /** 32 */
     public static final int KEY_LEN = EncType.ECIES_X25519.getPubkeyLen();

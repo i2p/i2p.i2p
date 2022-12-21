@@ -146,7 +146,7 @@ class UDPAddress {
         InetAddress[] cintroAddresses = null;
         long[] cintroExps = null;
         Hash[] cintroHashes = null;
-        final boolean ssu2enable = SSU2Util.ENABLE_RELAY && (ssu2only || "2".equals(addr.getOption("v")));
+        final boolean ssu2enable = ssu2only || "2".equals(addr.getOption("v"));
         for (int i = MAX_INTRODUCERS - 1; i >= 0; i--) {
             // This is the only one required for SSU 1 and 2
             String t = addr.getOption(PROP_INTRO_TAG[i]);

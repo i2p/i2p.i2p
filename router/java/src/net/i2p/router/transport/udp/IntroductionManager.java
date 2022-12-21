@@ -141,9 +141,6 @@ class IntroductionManager {
     
     public void add(PeerState peer) {
         if (peer == null) return;
-        // Skip SSU2 until we have support for relay
-        if (peer.getVersion() != 1 && !SSU2Util.ENABLE_RELAY)
-            return;
         // let's not use an introducer on a privileged port, sounds like trouble
         if (!TransportUtil.isValidPort(peer.getRemotePort()))
             return;
@@ -272,7 +269,7 @@ class IntroductionManager {
                 continue;
             Hash hash = cur.getRemotePeer();
             // dup check of reused SSU2 introducers
-            if (SSU2Util.ENABLE_RELAY && cur.getVersion() > 1) {
+            if (cur.getVersion() > 1) {
                 String b64 = hash.toBase64();
                 for (Introducer intro : introducers) {
                     if (b64.equals(intro.shash))

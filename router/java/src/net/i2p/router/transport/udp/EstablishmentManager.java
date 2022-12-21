@@ -511,7 +511,7 @@ class EstablishmentManager {
                                                        requestIntroduction,
                                                        sessionKey, addr, _transport.getDHFactory());
                     } else if (version == 2) {
-                        boolean requestIntroduction = SSU2Util.ENABLE_RELAY && !isIndirect &&
+                        boolean requestIntroduction = !isIndirect &&
                                                       _transport.introducersMaybeRequired(TransportUtil.isIPv6(ra));
                         state = new OutboundEstablishState2(_context, _transport, maybeTo, to,
                                                             toIdentity, requestIntroduction, sessionKey, ra, addr);
@@ -788,8 +788,7 @@ class EstablishmentManager {
                 _log.debug("Receive DUP session/token request from: " + state);
         }
         // call for both Session and Token request, why not
-        if (SSU2Util.ENABLE_RELAY &&
-            state.isIntroductionRequested() &&
+        if (state.isIntroductionRequested() &&
             state.getSentRelayTag() == 0 &&     // only set once
             state.getSentPort() >= 1024 &&
             _transport.canIntroduce(state.getSentIP().length == 16)) {

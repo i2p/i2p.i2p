@@ -479,8 +479,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                         case MIGRATION_STATE_NONE:
                             if (!from.equals(_remoteHostId)) {
                                 // QUIC: Must be highest set to protect against reordered packets
-                                if (SSU2Util.ENABLE_PATH_CHALLENGE &&
-                                    from.getIP().length == _remoteHostId.getIP().length &&
+                                if (from.getIP().length == _remoteHostId.getIP().length &&
                                     n == _receivedMessages.getHighestSet() &&
                                     TransportUtil.isValidPort(from.getPort()) &&
                                     _transport.isValid(from.getIP())) {
@@ -621,8 +620,6 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotRelayTagRequest() {
-        if (!ENABLE_RELAY)
-            return;
         if (_log.shouldInfo())
             _log.info("Got RELAY TAG REQUEST on " + this);
         long tag = getWeRelayToThemAs();
@@ -643,8 +640,6 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotRelayTag(long tag) {
-        if (!ENABLE_RELAY)
-            return;
         long old = getTheyRelayToUsAs();
         if (old != 0) {
             if (_log.shouldWarn())
@@ -656,32 +651,24 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotRelayRequest(byte[] data) {
-        if (!ENABLE_RELAY)
-            return;
         _transport.getIntroManager().receiveRelayRequest(this, data);
         // Relay blocks are ACK-eliciting
         messagePartiallyReceived();
     }
 
     public void gotRelayResponse(int status, byte[] data) {
-        if (!ENABLE_RELAY)
-            return;
         _transport.getIntroManager().receiveRelayResponse(this, status, data);
         // Relay blocks are ACK-eliciting
         messagePartiallyReceived();
     }
 
     public void gotRelayIntro(Hash aliceHash, byte[] data) {
-        if (!ENABLE_RELAY)
-            return;
         _transport.getIntroManager().receiveRelayIntro(this, aliceHash, data);
         // Relay blocks are ACK-eliciting
         messagePartiallyReceived();
     }
 
     public void gotPeerTest(int msg, int status, Hash h, byte[] data) {
-        if (!ENABLE_PEER_TEST)
-            return;
         _transport.getPeerTestManager().receiveTest(_remoteHostId, this, msg, status, h, data);
         // Peer Test block is ACK-eliciting
         messagePartiallyReceived();

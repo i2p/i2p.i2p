@@ -315,8 +315,6 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     public void gotRelayTag(long tag) {
-        if (!ENABLE_RELAY)
-            return;
         if (_log.shouldDebug())
             _log.debug("Got relay tag " + tag);
         _receivedRelayTag = tag;
