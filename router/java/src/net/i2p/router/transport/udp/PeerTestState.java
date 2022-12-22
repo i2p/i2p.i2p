@@ -43,6 +43,7 @@ class PeerTestState {
     private long _receiveBobTime;
     private long _receiveCharlieTime;
     private long _sendAliceTime;
+    private long _sendCharlieTime;
     private int _status;
     private final AtomicInteger _packetsRelayed = new AtomicInteger();
     
@@ -212,6 +213,18 @@ class PeerTestState {
     public void setSendAliceTime(long when) { _sendAliceTime = when; }
 
     /**
+     * when did we send to Charlie, SSU2 Alice only
+     * @since 0.9.57
+     */
+    public long getSendCharlieTime() { return _sendCharlieTime; }
+
+    /**
+     * when did we send to Charlie, SSU2 Alice only
+     * @since 0.9.57
+     */
+    public void setSendCharlieTime(long when) { _sendCharlieTime = when; }
+
+    /**
      * what code did we send to alice, SSU2 Bob only
      * @since 0.9.57
      */
@@ -277,10 +290,14 @@ class PeerTestState {
         }
         if (_lastSendTime > 0)
             buf.append("; last send after ").append(_lastSendTime - _beginTime);
+        if (_sendAliceTime > 0)
+            buf.append("; last send to Alice ").append(DataHelper.formatTime(_sendAliceTime));
         if (_receiveAliceTime > 0)
             buf.append("; rcvd from Alice after ").append(_receiveAliceTime - _beginTime);
         if (_receiveBobTime > 0)
             buf.append("; rcvd from Bob after ").append(_receiveBobTime - _beginTime);
+        if (_sendCharlieTime > 0)
+            buf.append("; last send to Charlie ").append(DataHelper.formatTime(_sendCharlieTime));
         if (_receiveCharlieTime > 0)
             buf.append("; rcvd from Charlie after ").append(_receiveCharlieTime - _beginTime);
         buf.append("; pkts relayed: ").append(_packetsRelayed.get());
