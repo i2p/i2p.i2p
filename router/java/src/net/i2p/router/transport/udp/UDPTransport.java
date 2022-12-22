@@ -334,6 +334,29 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                                                                     Status.IPV4_SNAT_IPV6_OK,
                                                                     Status.IPV4_SNAT_IPV6_UNKNOWN);
 
+    // States where we cannot be a v4 Charlie
+    private static final Set<Status> STATUS_IPV4_NO_TEST = EnumSet.of(Status.DIFFERENT,
+                                                                      Status.DISCONNECTED,
+                                                                      Status.HOSED,
+                                                                      Status.UNKNOWN,
+                                                                      Status.IPV4_UNKNOWN_IPV6_OK,
+                                                                      Status.IPV4_UNKNOWN_IPV6_FIREWALLED,
+                                                                      Status.IPV4_DISABLED_IPV6_OK,
+                                                                      Status.IPV4_DISABLED_IPV6_UNKNOWN,
+                                                                      Status.IPV4_DISABLED_IPV6_FIREWALLED,
+                                                                      Status.IPV4_SNAT_IPV6_OK,
+                                                                      Status.IPV4_SNAT_IPV6_UNKNOWN);
+
+    // States where we cannot be a v6 Charlie
+    private static final Set<Status> STATUS_IPV6_NO_TEST = EnumSet.of(Status.DIFFERENT,
+                                                                      Status.DISCONNECTED,
+                                                                      Status.HOSED,
+                                                                      Status.UNKNOWN,
+                                                                      Status.IPV4_OK_IPV6_UNKNOWN,
+                                                                      Status.IPV4_FIREWALLED_IPV6_UNKNOWN,
+                                                                      Status.IPV4_DISABLED_IPV6_UNKNOWN,
+                                                                      Status.IPV4_SNAT_IPV6_UNKNOWN);
+
 
     /**
      *  @param dh non-null to enable SSU1
@@ -2980,7 +3003,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         // if we have explicit external addresses, they had better be reachable
         String caps;
-        if (isSnatted()) {
+        if (!canTestAsCharlie(isIPv6)) {
+            // we could still be a Bob, but we don't have separate caps for Bob and Charlie
             caps = isIPv6 ? CAP_IPV6 : CAP_IPV4;
         } else if (introducersRequired || !canIntroduce(isIPv6)) {
             if (!directIncluded) {
@@ -4043,6 +4067,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     boolean isSnatted() { 
         return STATUS_IPV4_SNAT.contains(getReachabilityStatus());
+    }
+
+    /**
+     *  Can we be a Charlie right now?
+     *  @return true if we can participate
+     *  @since 0.9.57
+     */
+    boolean canTestAsCharlie(boolean ipv6) {
+        Status status = getReachabilityStatus();
+        if (ipv6)
+            return !STATUS_IPV6_NO_TEST.contains(status);
+        return !STATUS_IPV4_NO_TEST.contains(status);
     }
 
     /**

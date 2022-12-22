@@ -1225,7 +1225,7 @@ class PeerTestManager {
                 SessionKey aliceIntroKey = null;
                 int rcode;
                 PeerState aps = _transport.getPeerState(h);
-                if (_transport.isSnatted()) {
+                if (!_transport.canTestAsCharlie(isIPv6)) {
                     rcode = SSU2Util.TEST_REJECT_CHARLIE_ADDRESS;
                 } else if (aps != null && aps.isIPv6() == isIPv6) {
                     rcode = SSU2Util.TEST_REJECT_CHARLIE_CONNECTED;
