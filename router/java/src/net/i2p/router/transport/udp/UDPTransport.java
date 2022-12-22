@@ -752,9 +752,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         //    _flooder.startup();
         _expireEvent.setIsAlive(true);
         _reachabilityStatus = Status.UNKNOWN;
-        _testEvent.setIsAlive(true); // this queues it for 3-6 minutes in the future...
+        _testEvent.setIsAlive(true);
         boolean v6only = getIPv6Config() == IPV6_ONLY;
-        _testEvent.forceRunSoon(v6only, 10*1000); // lets requeue it for Real Soon
 
         // set up external addresses
         // REA param is false;
@@ -786,12 +785,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     localOpts.setProperty(UDPAddress.PROP_HOST, newIP);
                     RouterAddress local = new RouterAddress(getPublishStyle(), localOpts, DEFAULT_COST);
                     replaceCurrentExternalAddress(local, true);
-                    if (isIPv6Firewalled() || _context.getBooleanProperty(PROP_IPV6_FIREWALLED)) {
+                    if (isIPv6Firewalled()) {
                         setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_FIREWALLED, true);
+                    } else if (_context.getBooleanProperty(PROP_IPV6_FIREWALLED)) {
+                        setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_FIREWALLED, true);
+                        // this must be after the setReachabilityStatus() call
+                        _testEvent.forceRunSoon(true, v6only ? 10*1000 : 60*1000);
                     } else {
                         _lastInboundIPv6 = _context.clock().now();
                         setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK, true);
                         rebuildExternalAddress(newIP, newPort, false);
+                        // this must be after the setReachabilityStatus() call
+                        _testEvent.forceRunSoon(true, v6only ? 10*1000 : 60*1000);
                     }
                 } else {
                     // save the external address but don't publish it
@@ -806,6 +811,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     } else {
                         setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
                         rebuildExternalAddress(newIP, newPort, false);
+                        // this must be after the setReachabilityStatus() call
+                        if (!v6only)
+                            _testEvent.forceRunSoon(false, 10*1000);
                     }
                 }
                 if (save && !newIP.equals(oldIP)) {
@@ -835,6 +843,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // force _haveIPv6Address to false, or else we get 'no endpoint' errors
             // If we are bound only to v6 addresses,
             // override getIPv6Config() ?
+        } else {
+            if ((!v6only && !isIPv4Firewalled()) || (v6only && !isIPv6Firewalled()))
+                _testEvent.forceRunSoon(v6only, 10*1000);
         }
         if (isIPv4Firewalled()) {
             if (_lastInboundIPv6 > 0)
@@ -3860,6 +3871,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     /**
+     *  1) Merge IPv4 or IPv6 newStatus into the current IPv4+IPv6 status
+     *  2a) If current status changed, call rebuildExternalAddress()
+     *  2b) Otherwise, If we need to retest, call PeerTestEvent.forceRunSoon()
+     *
      *  @param isIPv6 Is the change an IPv6 change?
      */
     private void locked_setReachabilityStatus(Status newStatus, boolean isIPv6) { 
@@ -3889,8 +3904,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
             if (runtest || old != _reachabilityStatusPending) {
                 if (_log.shouldWarn())
-                    _log.warn("Old status: " + old + " unchanged after update: UNKNOWN, reschedule test! ipv6? " + isIPv6);
-                _testEvent.forceRunSoon(isIPv6);
+                    _log.warn("Old status: " + old + " unchanged after update: UNKNOWN, reschedule test soon, ipv6? " + isIPv6);
+                // 60 sec, greater than MIN_TEST_FREQUENCY, so that IPv6 will get a chance if IPv4, and vice versa
+                _testEvent.forceRunSoon(isIPv6, 60*1000);
             } else {
                 // run a little sooner than usual
                 _testEvent.forceRunSoon(isIPv6, 5*60*1000);
