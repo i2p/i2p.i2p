@@ -1,5 +1,19 @@
+2022-12-22 zzz
+ * SSU:
+   - Further restrict states to publish peer test cap
+   - Peer test scheduling fixes
+ * SSU2:
+   - Further restrict states to be a peer test Charlie
+   - Peer test fixes
+
+2022-12-21 zzz
+ * CLI: Add a "help" command, improve command listing
+ * Router: Add IPv6 analysis to Sybil checker
+
 2022-12-20 zzz
+ * Router: Add IPv6 localhost and wildcard to blocklist
  * SSU2: Peer test improvements and fixes
+ * Util: Speed up IP string to byte conversion
 
 2022-12-19 zzz
  * CLI: Add NewsHandler CLI to fetch news from servers
