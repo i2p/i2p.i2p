@@ -531,6 +531,15 @@ public class SimpleTimer2 {
             }
         }
 
+        /**
+         *  So the critical "please report" message above isn't so ugly
+         *  @since 0.9.57
+         */
+        @Override
+        public String toString() {
+            return getClass().getSimpleName();
+        }
+
         /** 
          * Simple interface for events to be queued up and notified on expiration
          * the time requested has been reached (this call should NOT block,
