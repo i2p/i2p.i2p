@@ -223,9 +223,32 @@ class PeerTestManager {
                                                _context.clock().now());
         if (bob.getVersion() == 2) {
             PeerState2 b2 = (PeerState2) bob;
+            // We test our current address, NOT the IP we have with Bob, which may have changed since,
+            // especially with IPv6 transient addresses,
+            // but there also could be a connection migration in progress.
+            boolean ipv6 = b2.isIPv6();
+            byte[] ourIP = b2.getOurIP();
+            int ourPort = b2.getOurPort();
+            RouterAddress ra = _transport.getCurrentExternalAddress(ipv6);
+            if (ra != null) {
+                byte[] testIP = ra.getIP();
+                if (testIP != null) {
+                    // do a comparison just for logging, and then switch
+                    int testPort = ra.getPort();
+                    if (ourPort != testPort || !DataHelper.eq(ourIP, testIP)) {
+                        if (_log.shouldWarn())
+                            _log.warn("Test IP mismatch: " + Addresses.toString(testIP, testPort) +
+                                      ", ours with Bob: " + Addresses.toString(ourIP, ourPort) + " on " + test);
+                        ourIP = testIP;
+                        ourPort = testPort;
+                        // this should still work
+                    }
+                }
+            }
+
             try {
-                InetAddress addr = InetAddress.getByAddress(b2.getOurIP());
-                test.setAlice(addr, b2.getOurPort(), _context.routerHash());
+                InetAddress addr = InetAddress.getByAddress(ourIP);
+                test.setAlice(addr, ourPort, _context.routerHash());
             } catch (UnknownHostException uhe) {
                 if (_log.shouldWarn())
                     _log.warn("Unable to get our IP", uhe);
@@ -347,7 +370,8 @@ class PeerTestManager {
                 if (data == null) {
                     SigningPrivateKey spk = _context.keyManager().getSigningPrivateKey();
                     data = SSU2Util.createPeerTestData(_context, bob2.getRemotePeer(), null,
-                                                       ALICE, test.getNonce(), bob2.getOurIP(), bob2.getOurPort(), spk);
+                                                       ALICE, test.getNonce(),
+                                                       test.getAliceIP().getAddress(), test.getAlicePort(), spk);
                     if (data == null) {
                         if (_log.shouldWarn())
                             _log.warn("sig fail");
@@ -1189,6 +1213,9 @@ class PeerTestManager {
                 int alicePort = fromPeer.getRemotePort();
                 state = new PeerTestState(BOB, null, isIPv6, nonce, now);
                 state.setAlice(fromPeer);
+                // This is the IP/port we're connected to alice on.
+                // not necessarily matching the test IP/port, but it's just for logging.
+                // If we need the test ip/port for anything or want to log it, we could change it.
                 state.setAlice(aliceIP, alicePort, alice);
                 state.setCharlie(charlie.getRemoteIPAddress(), charlie.getRemotePort(), charlie.getRemotePeer());
                 state.setReceiveAliceTime(now);
@@ -1440,7 +1467,7 @@ class PeerTestManager {
                                         }
                                     }
                                 } else {
-                                    // i2pd Bob picks firewalled Charlie
+                                    // i2pd Bob picks firewalled Charlie, allow it
                                     if (_log.shouldWarn())
                                         _log.warn("Charlie IP not found: " + test + '\n' + ra);
                                     charlieIP = PENDING_IP;
@@ -1557,6 +1584,7 @@ class PeerTestManager {
                     try {
                         test.setCharlie(InetAddress.getByAddress(fromIP), fromPort, test.getCharlieHash());
                     } catch (UnknownHostException uhe) {}
+                    // TODO, if charlie is snatted, we won't know it when handling msg 7
                 } else {
                     // msg 5 after msg 4, charlie is not firewalled
                     byte[] oldIP = charlieIP.getAddress();
@@ -1576,18 +1604,9 @@ class PeerTestManager {
                         if (_log.shouldWarn())
                             _log.warn("Charlie port mismatch, msg 4: " + Addresses.toString(oldIP, oldPort) +
                                       ", msg 5: " + Addresses.toString(fromIP, fromPort) + " on " + test);
-                        if (TransportUtil.isValidPort(fromPort)) {
-                            // Charlie is snatted or confused about his port, update port and keep going
-                            test.setCharlie(charlieIP, fromPort, h);
-                        } else {
-                            // Don't like charlie's port, stop here, assume good unless snatted
-                            if (!_transport.isSnatted()) {
-                                test.setAliceIPFromCharlie(test.getAliceIP());
-                                test.setAlicePortFromCharlie(test.getAlicePort());
-                            }
-                            testComplete();
-                            return;
-                        }
+                        // Charlie is snatted or confused about his port, update port and keep going
+                        // TransportUtil.isValidPort(fromPort) already checked at the top
+                        test.setCharlie(charlieIP, fromPort, h);
                     }
                 }
                 // Do NOT set this here, only for msg 7, this is how testComplete() knows we got msg 7
@@ -1648,9 +1667,29 @@ class PeerTestManager {
                                                                         sendId, rcvId, data);
                 _transport.send(packet);
                 state.incrementPacketsRelayed();
-                // for now, ignore address block, we could pass it to externalAddressReceived()
                 // we should be done, but stick around in case we get a retransmitted msg 6
                 //_activeTests.remove(lNonce);
+                if (addrBlockIP != null) {
+                    if (_transport.isValid(addrBlockIP) &&
+                        TransportUtil.isValidPort(addrBlockPort)) {
+                        RouterAddress ra = _transport.getCurrentExternalAddress(isIPv6);
+                        if (ra != null) {
+                            if (addrBlockPort != ra.getPort() || !DataHelper.eq(addrBlockIP, ra.getIP())) {
+                                if (_log.shouldWarn())
+                                    _log.warn("Alice said we had a different IP/port: " +
+                                              Addresses.toString(addrBlockIP, addrBlockPort) + " on " + state);
+                            }
+                        }
+                        // We already call externalAddressReceived() for every outbound connection from EstablishmentManager
+                        // and we don't do SNAT detection there
+                        // _transport.externalAddressReceived(state.getAliceHash(), addrBlockIP, addrBlockPort)
+                    } else {
+                        if (_log.shouldWarn())
+                            _log.warn("Alice said we had an invalid IP/port: " +
+                                      Addresses.toString(addrBlockIP, addrBlockPort) + " on " + state);
+                        // TODO ban alice or put on a list?
+                    }
+                }
                 break;
             }
 
@@ -1708,6 +1747,18 @@ class PeerTestManager {
                                   Addresses.toString(addrBlockIP, addrBlockPort) + " on " + test);
                     _context.statManager().addRateData("udp.testBadIP", 1);
                     // TODO ban charlie or put on a list?
+                } else {
+                    RouterAddress ra = _transport.getCurrentExternalAddress(isIPv6);
+                    if (ra != null) {
+                        if (addrBlockPort != ra.getPort() || !DataHelper.eq(addrBlockIP, ra.getIP())) {
+                            if (_log.shouldWarn())
+                                _log.warn("Charlie said we had a different IP/port: " +
+                                          Addresses.toString(addrBlockIP, addrBlockPort) + " on " + test);
+                        }
+                    }
+                    // We already call externalAddressReceived() for every outbound connection from EstablishmentManager
+                    // and we don't do SNAT detection there
+                    // _transport.externalAddressReceived(state.getCharlieHash(), addrBlockIP, addrBlockPort)
                 }
                 testComplete();
                 break;

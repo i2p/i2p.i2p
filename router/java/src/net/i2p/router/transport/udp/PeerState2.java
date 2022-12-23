@@ -356,11 +356,28 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
      */
     CipherState getRcvCipher() { return _rcvCha; }
 
-
+    /**
+     *  For initialization by IES2/OES2 only.
+     */
     void setOurAddress(byte[] ip, int port) {
         _ourIP = ip; _ourPort = port;
     }
+
+    /**
+     *  As received in the Address Block in the handshake,
+     *  or subsequently in the data phase.
+     *  Unvalidated.
+     *  Also, if a transient IPv6 address, may be deprecated and not match
+     *  our current non-deprecated IPv6 address.
+     */
     byte[] getOurIP() { return _ourIP; }
+
+
+    /**
+     *  As received in the Address Block in the handshake,
+     *  or subsequently in the data phase.
+     *  Unvalidated.
+     */
     int getOurPort() { return _ourPort; }
 
     /**
@@ -616,6 +633,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotAddress(byte[] ip, int port) {
+        // TODO validate
         _ourIP = ip; _ourPort = port;
     }
 
