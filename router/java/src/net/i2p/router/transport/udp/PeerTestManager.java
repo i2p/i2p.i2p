@@ -1888,8 +1888,8 @@ class PeerTestManager {
             
             // we send two packets below, but increment just once
             if (state.incrementPacketsRelayed() > MAX_RELAYED_PER_TEST_CHARLIE) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Too many, not retransmitting: " + state);
+                if (_log.shouldDebug())
+                    _log.debug("Too many, not retransmitting: " + state);
                 return;
             }
             
@@ -1992,8 +1992,8 @@ class PeerTestManager {
                 state = new PeerTestState(BOB, null, isIPv6, nonce, now);
             } else {
                 if (state.getReceiveAliceTime() > now - (RESEND_TIMEOUT / 2)) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Too soon, not retransmitting: " + state);
+                    if (_log.shouldDebug())
+                        _log.debug("Too soon, not retransmitting: " + state);
                     return;
                 }
             }
@@ -2005,8 +2005,8 @@ class PeerTestManager {
             state.setReceiveAliceTime(now);
             
             if (state.incrementPacketsRelayed() > MAX_RELAYED_PER_TEST_BOB) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Too many, not retransmitting: " + state);
+                if (_log.shouldDebug())
+                    _log.debug("Too many, not retransmitting: " + state);
                 return;
             }
             
@@ -2053,14 +2053,14 @@ class PeerTestManager {
 
         long now = _context.clock().now();
         if (state.getReceiveCharlieTime() > now - (RESEND_TIMEOUT / 2)) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Too soon, not retransmitting: " + state);
+            if (_log.shouldDebug())
+                _log.debug("Too soon, not retransmitting: " + state);
             return;
         }
 
         if (state.incrementPacketsRelayed() > MAX_RELAYED_PER_TEST_BOB) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Too many, not retransmitting: " + state);
+            if (_log.shouldDebug())
+                _log.debug("Too many, not retransmitting: " + state);
             return;
         }
         state.setReceiveCharlieTime(now);
@@ -2091,14 +2091,14 @@ class PeerTestManager {
                                            long nonce, PeerTestState state) {
         long now = _context.clock().now();
         if (state.getReceiveAliceTime() > now - (RESEND_TIMEOUT / 2)) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Too soon, not retransmitting: " + state);
+            if (_log.shouldDebug())
+                _log.debug("Too soon, not retransmitting: " + state);
             return;
         }
 
         if (state.incrementPacketsRelayed() > MAX_RELAYED_PER_TEST_CHARLIE) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Too many, not retransmitting: " + state);
+            if (_log.shouldDebug())
+                _log.debug("Too many, not retransmitting: " + state);
             return;
         }
         state.setReceiveAliceTime(now);

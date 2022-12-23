@@ -262,13 +262,11 @@ class PeerTestState {
            .append(" as ").append(_ourRole.toString());
         if (_aliceIP != null) {
             buf.append("; Alice: ");
-            if (_ourRole == Role.ALICE) {
-                buf.append("me");
-            } else {
-                buf.append(_aliceIP).append(':').append(_alicePort);
-                if (_aliceHash != null)
-                    buf.append(' ').append(_aliceHash.toBase64().substring(0, 6));
-            }
+            if (_ourRole == Role.ALICE)
+                buf.append("me ");
+            buf.append(_aliceIP).append(':').append(_alicePort);
+            if (_aliceHash != null)
+                buf.append(' ').append(_aliceHash.toBase64().substring(0, 6));
         }
         if (_aliceIPFromCharlie != null)
             buf.append(" (fromCharlie ").append(_aliceIPFromCharlie).append(':').append(_alicePortFromCharlie).append(')');
