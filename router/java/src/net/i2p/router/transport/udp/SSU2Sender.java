@@ -1,5 +1,6 @@
 package net.i2p.router.transport.udp;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.List;
 
@@ -17,7 +18,7 @@ interface SSU2Sender {
     InetAddress getRemoteIPAddress();
     int getRemotePort();
     int getMTU();
-    long getNextPacketNumber();
+    long getNextPacketNumber() throws IOException;
     long getSendConnID();
     CipherState getSendCipher();
     byte[] getSendHeaderEncryptKey1();

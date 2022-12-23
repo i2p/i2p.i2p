@@ -1,5 +1,6 @@
 package net.i2p.router.transport.udp;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -73,7 +74,7 @@ class PeerStateDestroyed implements SSU2Payload.PayloadCallback, SSU2Sender {
         _log = ctx.logManager().getLog(PeerStateDestroyed.class);
         _remoteHostId = peer.getRemoteHostId();
         _mtu = peer.getMTU();
-        _packetNumber = new AtomicInteger((int) peer.getNextPacketNumber());
+        _packetNumber = new AtomicInteger((int) peer.getNextPacketNumberNoThrow());
         _sendConnID = peer.getSendConnID();
         _rcvConnID = peer.getRcvConnID();
         _sendCha = peer.getSendCipher();
@@ -370,10 +371,12 @@ class PeerStateDestroyed implements SSU2Payload.PayloadCallback, SSU2Sender {
             // If we received a destroy, send reason_termination
             // otherwise, send the original reason.
 
-            UDPPacket pkt = _transport.getBuilder2().buildSessionDestroyPacket(_destroyReason, PeerStateDestroyed.this);
-            if (_log.shouldDebug())
-                _log.debug("Sending TERMINATION reason " + _destroyReason + " to " + PeerStateDestroyed.this);
-            _transport.send(pkt);
+            try {
+                UDPPacket pkt = _transport.getBuilder2().buildSessionDestroyPacket(_destroyReason, PeerStateDestroyed.this);
+                if (_log.shouldDebug())
+                    _log.debug("Sending TERMINATION reason " + _destroyReason + " to " + PeerStateDestroyed.this);
+                _transport.send(pkt);
+            } catch (IOException ioe) {}
             if (_destroyReason != REASON_TERMINATION) {
                 _delay *= 2;
                 reschedule(_delay);

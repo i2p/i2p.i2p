@@ -1934,9 +1934,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Peer already connected (PBRH): old=" + oldPeer2 + " new=" + peer);
             // transfer over the old state/inbound message fragments/etc
+            // Send destroy before loadFrom(), because loadFrom() sets dead = true
+            sendDestroy(oldPeer2, SSU2Util.REASON_REPLACED);
             peer.loadFrom(oldPeer2);
             oldEstablishedOn = oldPeer2.getKeyEstablishedTime();
-            sendDestroy(oldPeer2, SSU2Util.REASON_REPLACED);
             oldPeer2.dropOutbound();
             _introManager.remove(oldPeer2);
         }
@@ -2351,7 +2352,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return;
             pkt = _packetBuilder.buildSessionDestroyPacket(peer);
         } else {
-            pkt = _packetBuilder2.buildSessionDestroyPacket(reasonCode, (PeerState2) peer);
+            try {
+                pkt = _packetBuilder2.buildSessionDestroyPacket(reasonCode, (PeerState2) peer);
+            } catch (IOException ioe) {
+                return;
+            }
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending destroy to : " + peer);
@@ -3826,10 +3831,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                         // or else session will stay open forever?
                         //peer.setLastSendTime(now);
                         UDPPacket ping;
-                        if (peer.getVersion() == 2)
-                            ping = _packetBuilder2.buildPing((PeerState2) peer);
-                        else
+                        if (peer.getVersion() == 2) {
+                            try {
+                                ping = _packetBuilder2.buildPing((PeerState2) peer);
+                            } catch (IOException ioe) {
+                                continue;
+                            }
+                        } else {
                             ping = _packetBuilder.buildPing(peer);
+                        }
                         send(ping);
                         peer.setLastPingTime(now);
                         // If external port is different, it may be changing the port for every

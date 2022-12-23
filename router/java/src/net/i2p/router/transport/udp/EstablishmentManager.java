@@ -1534,9 +1534,12 @@ class EstablishmentManager {
                         if (_log.shouldDebug())
                             _log.debug("Found connected introducer " + bob + " for " + state);
                         long tag = addr.getIntroducerTag(i);
-                        sendRelayRequest(tag, (PeerState2) bob, state);
+                        boolean ok = sendRelayRequest(tag, (PeerState2) bob, state);
                         // this transitions the state
-                        state2.introSent(h);
+                        if (ok)
+                            state2.introSent(h);
+                        else
+                            state2.setIntroState(h, INTRO_STATE_DISCONNECTED);
                         return;
                     }
                 }
@@ -1637,9 +1640,10 @@ class EstablishmentManager {
      *  SSU 2 only.
      *
      *  @param charlie must be SSU2
+     *  @return success
      *  @since 0.9.55
      */
-    private void sendRelayRequest(long tag, PeerState2 bob, OutboundEstablishState charlie) {
+    private boolean sendRelayRequest(long tag, PeerState2 bob, OutboundEstablishState charlie) {
         // pick our IP based on what address we're connecting to
         UDPAddress cra = charlie.getRemoteAddress();
         RouterAddress ourra;
@@ -1653,13 +1657,13 @@ class EstablishmentManager {
         if (ourra == null) {
             if (_log.shouldWarn())
                 _log.warn("No address to send in relay request");
-            return;
+            return false;
         }
         byte[] ourIP = ourra.getIP();
         if (ourIP == null) {
             if (_log.shouldWarn())
                 _log.warn("No IP to send in relay request");
-            return;
+            return false;
         }
         // Bob should already have our RI, especially if we just connected; we do not resend it here.
         int ourPort = _transport.getRequestedPort();
@@ -1669,13 +1673,19 @@ class EstablishmentManager {
         if (data == null) {
             if (_log.shouldWarn())
                 _log.warn("sig fail");
-             return;
+            return false;
         }
-        UDPPacket packet = _builder2.buildRelayRequest(data, bob);
+        UDPPacket packet;
+        try {
+            packet = _builder2.buildRelayRequest(data, bob);
+        } catch (IOException ioe) {
+            return false;
+        }
         if (_log.shouldDebug())
             _log.debug("Send relay request to " + bob + " for " + charlie);
         _transport.send(packet);
         bob.setLastSendTime(_context.clock().now());
+        return true;
     }
 
     /**

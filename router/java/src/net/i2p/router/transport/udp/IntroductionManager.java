@@ -1,5 +1,6 @@
 package net.i2p.router.transport.udp;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -527,11 +528,13 @@ class IntroductionManager {
                     _log.debug("Pinging introducer: " + cur);
                 cur.setLastPingTime(now);
                 UDPPacket ping;
-                if (cur.getVersion() == 2)
-                    ping = _builder2.buildPing((PeerState2) cur);
-                else
-                    ping = _builder.buildPing(cur);
-                _transport.send(ping);
+                try {
+                    if (cur.getVersion() == 2)
+                        ping = _builder2.buildPing((PeerState2) cur);
+                    else
+                        ping = _builder.buildPing(cur);
+                    _transport.send(ping);
+                } catch (IOException ioe) {}
             }
         }
     }
@@ -892,21 +895,29 @@ class IntroductionManager {
             if (gzip)
                 info = gzipped;
 
-            if (info.length <= avail) {
-                SSU2Payload.RIBlock riblock = new SSU2Payload.RIBlock(info,  0, info.length, false, gzip, 0, 1);
-                UDPPacket packet = _builder2.buildRelayIntro(idata, riblock, (PeerState2) charlie);
-                _transport.send(packet);
-            } else {
-                DatabaseStoreMessage dbsm = new DatabaseStoreMessage(_context);
-                dbsm.setEntry(aliceRI);
-                dbsm.setMessageExpiration(now + 10*1000);
-                _transport.send(dbsm, charlie);
-                UDPPacket packet = _builder2.buildRelayIntro(idata, null, (PeerState2) charlie);
-                // delay because dbsm is queued, we want it to get there first
-                new DelaySend(packet, 40);
+            try {
+                if (info.length <= avail) {
+                    SSU2Payload.RIBlock riblock = new SSU2Payload.RIBlock(info,  0, info.length, false, gzip, 0, 1);
+                    UDPPacket packet = _builder2.buildRelayIntro(idata, riblock, (PeerState2) charlie);
+                    _transport.send(packet);
+                } else {
+                    DatabaseStoreMessage dbsm = new DatabaseStoreMessage(_context);
+                    dbsm.setEntry(aliceRI);
+                    dbsm.setMessageExpiration(now + 10*1000);
+                    _transport.send(dbsm, charlie);
+                    UDPPacket packet = _builder2.buildRelayIntro(idata, null, (PeerState2) charlie);
+                    // delay because dbsm is queued, we want it to get there first
+                    new DelaySend(packet, 40);
+                }
+                charlie.setLastSendTime(now);
+                return;
+            } catch (IOException ioe) {
+                rcode = SSU2Util.RELAY_REJECT_BOB_UNSPEC;
+                // fall thru to send reject
             }
-            charlie.setLastSendTime(now);
-        } else {
+        }
+
+        try {
             // send rejection to Alice
             SigningPrivateKey spk = _context.keyManager().getSigningPrivateKey();
             data = SSU2Util.createRelayResponseData(_context, _context.routerHash(), rcode,
@@ -921,7 +932,7 @@ class IntroductionManager {
             UDPPacket packet = _builder2.buildRelayResponse(data, alice);
             alice.setLastSendTime(now);
             _transport.send(packet);
-        }
+        } catch (IOException ioe) {}
     }
 
     /**
@@ -1129,20 +1140,24 @@ class IntroductionManager {
                 _log.warn("sig fail");
              return;
         }
-        UDPPacket packet = _builder2.buildRelayResponse(data, bob);
-        if (_log.shouldInfo())
-            _log.info("Send relay response " + rcode + " as charlie " + " nonce " + nonce + " to bob " + bob +
-                      " with token " + token +
-                      " for alice " + Addresses.toString(testIP, testPort) + ' ' + aliceRI);
-        _transport.send(packet);
-        bob.setLastSendTime(now);
+        try {
+            UDPPacket packet = _builder2.buildRelayResponse(data, bob);
+            if (_log.shouldInfo())
+                _log.info("Send relay response " + rcode + " as charlie " + " nonce " + nonce + " to bob " + bob +
+                          " with token " + token +
+                          " for alice " + Addresses.toString(testIP, testPort) + ' ' + aliceRI);
+            _transport.send(packet);
+            bob.setLastSendTime(now);
+        } catch (IOException ioe) {
+            return;
+        }
         if (rcode == SSU2Util.RELAY_ACCEPT) {
             // send hole punch with the same data we sent to Bob
             if (_log.shouldDebug())
                 _log.debug("Send hole punch to " + Addresses.toString(testIP, testPort));
             long sendId = (nonce << 32) | nonce;
             long rcvId = ~sendId;
-            packet = _builder2.buildHolePunch(aliceIP, testPort, aliceIntroKey, sendId, rcvId, data);
+            UDPPacket packet = _builder2.buildHolePunch(aliceIP, testPort, aliceIntroKey, sendId, rcvId, data);
             _transport.send(packet);
         }
     }
@@ -1205,11 +1220,13 @@ class IntroductionManager {
             //idata[0] = 0; // flag
             idata[1] = (byte) status;
             System.arraycopy(data, 0, idata, 2, data.length);
-            UDPPacket packet = _builder2.buildRelayResponse(idata, alice);
-            if (_log.shouldInfo())
-                _log.info("Got relay response " + status + " as bob, forward " + " nonce " + nonce + " to " + alice);
-            _transport.send(packet);
-            alice.setLastSendTime(now);
+            try {
+                UDPPacket packet = _builder2.buildRelayResponse(idata, alice);
+                if (_log.shouldInfo())
+                    _log.info("Got relay response " + status + " as bob, forward " + " nonce " + nonce + " to " + alice);
+                _transport.send(packet);
+                alice.setLastSendTime(now);
+            } catch (IOException ioe) {}
         } else {
             // We are Alice, give to EstablishmentManager to check sig and process
             if (_log.shouldInfo())

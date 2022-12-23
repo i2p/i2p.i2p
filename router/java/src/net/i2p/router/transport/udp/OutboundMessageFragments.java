@@ -1,5 +1,6 @@
 package net.i2p.router.transport.udp;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -507,10 +508,15 @@ class OutboundMessageFragments {
             }
 
             UDPPacket pkt;
-            if (peer.getVersion() == 1)
+            if (peer.getVersion() == 1) {
                 pkt = _builder.buildPacket(sendNext, peer, remaining, newFullAckCount, partialACKBitfields);
-            else
-                pkt = _builder2.buildPacket(sendNext, (PeerState2) peer);
+            } else {
+                try {
+                    pkt = _builder2.buildPacket(sendNext, (PeerState2) peer);
+                } catch (IOException ioe) {
+                    pkt = null;
+                }
+            }
             if (pkt != null) {
                 if (_log.shouldDebug())
                     _log.debug("Built packet with " + sendNext.size() + " fragments totalling " + curTotalDataSize +

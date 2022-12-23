@@ -1,5 +1,6 @@
 package net.i2p.router.transport.udp;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -136,8 +137,10 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         if (isInbound) {
             // Send immediate ack of Session Confirmed
             _receivedMessages.set(0);
-            UDPPacket ack = transport.getBuilder2().buildACK(this);
-            transport.send(ack);
+            try {
+                UDPPacket ack = transport.getBuilder2().buildACK(this);
+                transport.send(ack);
+            } catch (IOException ioe) {}
         } else {
             // For outbound, SessionConfirmed is packet 0
             _packetNumber.set(1);
@@ -274,8 +277,10 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                         // and close the session in super.finishMessages()
                         if (_log.shouldWarn())
                             _log.warn("Fail, no Sess Conf ACK rcvd on " + this);
-                        UDPPacket pkt = _transport.getBuilder2().buildSessionDestroyPacket(SSU2Util.REASON_FRAME_TIMEOUT, this);
-                        _transport.send(pkt);
+                        try {
+                            UDPPacket pkt = _transport.getBuilder2().buildSessionDestroyPacket(SSU2Util.REASON_FRAME_TIMEOUT, this);
+                            _transport.send(pkt);
+                        } catch (IOException ioe) {}
                         _transport.dropPeer(this, true, "No Sess Conf ACK rcvd");
                         _sessConfForReTX = null;
                         return false;
@@ -316,7 +321,22 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
      * starts at 1 for Alice (0 is Session Confirmed) and 0 for Bob
      * @since public since 0.9.57 for SSU2Sender interface only
      */
-    public long getNextPacketNumber() { return _packetNumber.getAndIncrement(); }
+    public long getNextPacketNumber() throws IOException {
+         if (_dead) {
+             IOException ioe = new IOException("Peer is dead: " + _remotePeer.toBase64());
+             if (_log.shouldWarn())
+                 _log.warn("Dead: " + this, ioe);
+             throw ioe;
+         }
+         return _packetNumber.getAndIncrement();
+    }
+
+    /**
+     * For PeerStateDestroyed only, after we are dead
+     * @since 0.9.57
+     */
+    protected long getNextPacketNumberNoThrow() { return _packetNumber.getAndIncrement(); }
+
     /**
      * @since public since 0.9.57 for SSU2Sender interface only
      */
@@ -583,12 +603,14 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         blocks.add(new SSU2Payload.DateTimeBlock(_context));
         blocks.add(new SSU2Payload.AddressBlock(toIP.getAddress(), toPort));
         blocks.add(new SSU2Payload.PathChallengeBlock(_pathChallengeData));
-        UDPPacket packet = _transport.getBuilder2().buildPacket(Collections.<Fragment>emptyList(), blocks, this);
-        // fix up IP/port
-        DatagramPacket pkt = packet.getPacket();
-        pkt.setAddress(toIP);
-        pkt.setPort(toPort);
-        _transport.send(packet);
+        try {
+            UDPPacket packet = _transport.getBuilder2().buildPacket(Collections.<Fragment>emptyList(), blocks, this);
+            // fix up IP/port
+            DatagramPacket pkt = packet.getPacket();
+            pkt.setAddress(toIP);
+            pkt.setPort(toPort);
+            _transport.send(packet);
+        } catch (IOException ioe) {}
     }
 
     /////////////////////////////////////////////////////////
@@ -650,10 +672,12 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         }
         if (tag > 0) {
             SSU2Payload.Block block = new SSU2Payload.RelayTagBlock(tag);
-            UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.<Fragment>emptyList(),
-                                                                 Collections.singletonList(block),
-                                                                 this);
-            _transport.send(pkt);
+            try {
+                UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.<Fragment>emptyList(),
+                                                                     Collections.singletonList(block),
+                                                                     this);
+                _transport.send(pkt);
+            } catch (IOException ioe) {}
         }
     }
 
@@ -826,8 +850,10 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         if (reason == SSU2Util.REASON_TERMINATION) {
             // this should only happen at shutdown, where we don't have a post-termination handler
         } else {
-            UDPPacket pkt = _transport.getBuilder2().buildSessionDestroyPacket(SSU2Util.REASON_TERMINATION, this);
-            _transport.send(pkt);
+            try {
+                UDPPacket pkt = _transport.getBuilder2().buildSessionDestroyPacket(SSU2Util.REASON_TERMINATION, this);
+                _transport.send(pkt);
+            } catch (IOException ioe) {}
         }
         if (!_dead) {
             _transport.getEstablisher().receiveSessionDestroy(_remoteHostId, this);
@@ -839,14 +865,16 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         if (_log.shouldInfo())
             _log.info("Got PATH CHALLENGE block, length: " + data.length + " on " + this);
         SSU2Payload.Block block = new SSU2Payload.PathResponseBlock(data);
-        UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.<Fragment>emptyList(),
-                                                             Collections.singletonList(block),
-                                                             this);
-        // TODO send to from address?
-        _transport.send(pkt);
-        long now = _context.clock().now();
-        setLastSendTime(now);
-        setLastReceiveTime(now);
+        try {
+            UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.<Fragment>emptyList(),
+                                                                 Collections.singletonList(block),
+                                                                 this);
+            // TODO send to from address?
+            _transport.send(pkt);
+            long now = _context.clock().now();
+            setLastSendTime(now);
+            setLastReceiveTime(now);
+        } catch (IOException ioe) {}
     }
 
     public void gotPathResponse(RemoteHostId from, byte[] data) {
@@ -866,13 +894,15 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                         if (isIPv6() || !_transport.isSnatted()) {
                             EstablishmentManager.Token token = _transport.getEstablisher().getInboundToken(from);
                             SSU2Payload.Block block = new SSU2Payload.NewTokenBlock(token);
-                            UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.<Fragment>emptyList(),
-                                                                                 Collections.singletonList(block),
-                                                                                 this);
-                            _transport.send(pkt);
-                            long now = _context.clock().now();
-                            setLastSendTime(now);
-                            setLastReceiveTime(now);
+                            try {
+                                UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.<Fragment>emptyList(),
+                                                                                     Collections.singletonList(block),
+                                                                                     this);
+                                _transport.send(pkt);
+                                long now = _context.clock().now();
+                                setLastSendTime(now);
+                                setLastReceiveTime(now);
+                            } catch (IOException ioe) {}
                         } else {
                             messagePartiallyReceived();
                         }
@@ -1109,10 +1139,12 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                 }
                 _wantACKSendSince = 0;
             }
-            UDPPacket ack = _transport.getBuilder2().buildACK(PeerState2.this);
-            if (_log.shouldDebug())
-                _log.debug("ACKTimer sending acks to " + PeerState2.this);
-            _transport.send(ack);
+            try {
+                UDPPacket ack = _transport.getBuilder2().buildACK(PeerState2.this);
+                if (_log.shouldDebug())
+                    _log.debug("ACKTimer sending acks to " + PeerState2.this);
+                _transport.send(ack);
+            } catch (IOException ioe) {}
         }
     }
 }

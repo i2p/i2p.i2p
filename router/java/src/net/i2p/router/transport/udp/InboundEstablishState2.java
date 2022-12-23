@@ -192,13 +192,15 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             int reason = rie.getReason();
             PeerStateDestroyed psd = createPeerStateDestroyed(reason);
             _transport.addRecentlyClosed(psd);
-            UDPPacket pkt = _transport.getBuilder2().buildSessionDestroyPacket(reason, psd);
-            _transport.send(pkt);
-            if (_log.shouldWarn()) {
-                if (_log.shouldDebug())
-                    _log.debug("Sending TERMINATION reason " + reason + " to " + psd);
-                _log.warn("IES2 payload error", rie);
-            }
+            try {
+                UDPPacket pkt = _transport.getBuilder2().buildSessionDestroyPacket(reason, psd);
+                _transport.send(pkt);
+                if (_log.shouldWarn()) {
+                    if (_log.shouldDebug())
+                        _log.debug("Sending TERMINATION reason " + reason + " to " + psd);
+                    _log.warn("IES2 payload error", rie);
+                }
+            } catch (IOException ioe) {}
             throw new GeneralSecurityException("IES2 payload error: " + this, rie);
         } catch (DataFormatException dfe) {
             // no in-session response possible

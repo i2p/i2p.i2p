@@ -1,5 +1,6 @@
 package net.i2p.router.transport.udp;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketAddress;
@@ -129,9 +130,9 @@ class PacketBuilder2 {
      * this method writes exactly one fragment.
      * For no fragments use buildAck().
      *
-     * @return null on error
+     * @throws IOException if peer is dead
      */
-    public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState2 peer) {
+    public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState2 peer) throws IOException {
         List<Fragment> frags = Collections.singletonList(new Fragment(state, fragment));
         return buildPacket(frags, peer);
     }
@@ -139,8 +140,9 @@ class PacketBuilder2 {
     /*
      *  Multiple fragments
      *
+     *  @throws IOException if peer is dead
      */
-    public UDPPacket buildPacket(List<Fragment> fragments, PeerState2 peer) {
+    public UDPPacket buildPacket(List<Fragment> fragments, PeerState2 peer) throws IOException {
         return buildPacket(fragments, null, peer);
     }
 
@@ -148,8 +150,9 @@ class PacketBuilder2 {
      *  Multiple fragments and optional other blocks.
      *
      *  @param otherBlocks may be null or empty
+     *  @throws IOException if peer is dead
      */
-    public UDPPacket buildPacket(List<Fragment> fragments, List<Block> otherBlocks, SSU2Sender peer) {
+    public UDPPacket buildPacket(List<Fragment> fragments, List<Block> otherBlocks, SSU2Sender peer) throws IOException {
         // calculate data size
         int numFragments = fragments.size();
         int dataSize = 0;
@@ -187,6 +190,7 @@ class PacketBuilder2 {
         }
 
         // make the packet
+        // IOE thrown from here if peer is dead
         long pktNum = peer.getNextPacketNumber();
         UDPPacket packet = buildShortPacketHeader(peer.getSendConnID(), pktNum, DATA_FLAG_BYTE);
         DatagramPacket pkt = packet.getPacket();
@@ -329,8 +333,11 @@ class PacketBuilder2 {
     /**
      * A DATA packet with padding only.
      * We use this for keepalive purposes.
+     *
+     * @throws IOException if peer is dead
      */
-    public UDPPacket buildPing(PeerState2 peer) {
+    public UDPPacket buildPing(PeerState2 peer) throws IOException {
+        // IOE thrown from here if peer is dead
         long pktNum = peer.getNextPacketNumber();
         UDPPacket packet = buildShortPacketHeader(peer.getSendConnID(), pktNum, DATA_FLAG_BYTE);
         DatagramPacket pkt = packet.getPacket();
@@ -358,17 +365,19 @@ class PacketBuilder2 {
      *  An ack packet is just a data packet with no data.
      *  See buildPacket() for format.
      *
-     *
+     *  @throws IOException if peer is dead
      */
-    public UDPPacket buildACK(PeerState2 peer) {
+    public UDPPacket buildACK(PeerState2 peer) throws IOException {
         return buildPacket(Collections.<Fragment>emptyList(), peer);
     }
 
     /**
      *  Build a data packet with a termination block.
      *  This will also include acks, a new token block, and padding.
+     *
+     *  @throws IOException if peer is dead
      */
-    public UDPPacket buildSessionDestroyPacket(int reason, SSU2Sender peer) {
+    public UDPPacket buildSessionDestroyPacket(int reason, SSU2Sender peer) throws IOException {
         if (_log.shouldDebug())
             _log.debug("Sending termination " + reason + " to : " + peer);
         peer.setDestroyReason(reason);
@@ -690,8 +699,9 @@ class PacketBuilder2 {
      * In-session, message 1.
      *
      * @return ready to send packet, non-null
+     * @throws IOException if peer is dead
      */
-    public UDPPacket buildPeerTestFromAlice(byte[] signedData, PeerState2 bob) {
+    public UDPPacket buildPeerTestFromAlice(byte[] signedData, PeerState2 bob) throws IOException {
         Block block = new SSU2Payload.PeerTestBlock(1, 0, null, signedData);
         UDPPacket rv = buildPacket(Collections.<Fragment>emptyList(), Collections.singletonList(block), bob);
         rv.setMessageType(TYPE_TFA);
@@ -726,8 +736,9 @@ class PacketBuilder2 {
      *
      * @param charlieHash fake hash (all zeros) if rejected by bob
      * @return ready to send packet, non-null
+     * @throws IOException if peer is dead
      */
-    public UDPPacket buildPeerTestToAlice(int code, Hash charlieHash, byte[] signedData, PeerState2 alice) {
+    public UDPPacket buildPeerTestToAlice(int code, Hash charlieHash, byte[] signedData, PeerState2 alice) throws IOException {
         return buildPeerTestToAlice(code, charlieHash, signedData, null, alice);
     }
 
@@ -739,9 +750,10 @@ class PacketBuilder2 {
      * @param charlieHash fake hash (all zeros) if rejected by bob
      * @param riBlock to include, may be null
      * @return ready to send packet, non-null
+     * @throws IOException if peer is dead
      * @since 0.9.57
      */
-    public UDPPacket buildPeerTestToAlice(int code, Hash charlieHash, byte[] signedData, Block riBlock, PeerState2 alice) {
+    public UDPPacket buildPeerTestToAlice(int code, Hash charlieHash, byte[] signedData, Block riBlock, PeerState2 alice) throws IOException {
         Block block = new SSU2Payload.PeerTestBlock(4, code, charlieHash, signedData);
         List<Block> blocks;
         if (riBlock != null) {
@@ -786,8 +798,9 @@ class PacketBuilder2 {
      *
      * @param riBlock to include, may be null
      * @return ready to send packet, non-null
+     * @throws IOException if peer is dead
      */
-    public UDPPacket buildPeerTestToCharlie(Hash aliceHash, byte[] signedData, Block riBlock, PeerState2 charlie) {
+    public UDPPacket buildPeerTestToCharlie(Hash aliceHash, byte[] signedData, Block riBlock, PeerState2 charlie) throws IOException {
         Block block = new SSU2Payload.PeerTestBlock(2, 0, aliceHash, signedData);
         List<Block> blocks;
         if (riBlock != null) {
@@ -808,8 +821,9 @@ class PacketBuilder2 {
      * In-session, message 3.
      *
      * @return ready to send packet, non-null
+     * @throws IOException if peer is dead
      */
-    public UDPPacket buildPeerTestToBob(int code, byte[] signedData, PeerState2 bob) {
+    public UDPPacket buildPeerTestToBob(int code, byte[] signedData, PeerState2 bob) throws IOException {
         Block block = new SSU2Payload.PeerTestBlock(3, code, null, signedData);
         UDPPacket rv = buildPacket(Collections.<Fragment>emptyList(), Collections.singletonList(block), bob);
         rv.setMessageType(TYPE_TCB);
@@ -822,8 +836,9 @@ class PacketBuilder2 {
      *
      *  @param signedData flag + signed data
      *  @return non-null
+     *  @throws IOException if peer is dead
      */
-    UDPPacket buildRelayRequest(byte[] signedData, PeerState2 bob) {
+    UDPPacket buildRelayRequest(byte[] signedData, PeerState2 bob) throws IOException {
         Block block = new SSU2Payload.RelayRequestBlock(signedData);
         UDPPacket rv = buildPacket(Collections.<Fragment>emptyList(), Collections.singletonList(block), bob);
         rv.setMessageType(TYPE_RREQ);
@@ -838,8 +853,9 @@ class PacketBuilder2 {
      *  @param signedData flag + alice hash + signed data
      *  @param riBlock to include, may be null
      *  @return non-null
+     *  @throws IOException if peer is dead
      */
-    UDPPacket buildRelayIntro(byte[] signedData, Block riBlock, PeerState2 charlie) {
+    UDPPacket buildRelayIntro(byte[] signedData, Block riBlock, PeerState2 charlie) throws IOException {
         Block block = new SSU2Payload.RelayIntroBlock(signedData);
         List<Block> blocks;
         if (riBlock != null) {
@@ -862,8 +878,9 @@ class PacketBuilder2 {
      *  @param signedData flag + response code + signed data + optional token
      *  @param state Alice or Bob
      *  @return non-null
+     *  @throws IOException if peer is dead
      */
-    UDPPacket buildRelayResponse(byte[] signedData, PeerState2 state) {
+    UDPPacket buildRelayResponse(byte[] signedData, PeerState2 state) throws IOException {
         Block block = new SSU2Payload.RelayResponseBlock(signedData);
         UDPPacket rv = buildPacket(Collections.<Fragment>emptyList(), Collections.singletonList(block), state);
         rv.setMessageType(TYPE_RESP);
