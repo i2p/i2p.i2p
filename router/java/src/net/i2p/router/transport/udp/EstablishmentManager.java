@@ -2172,9 +2172,13 @@ class EstablishmentManager {
     }
 
     /**
-     *  Note that while a SessionConfirmed could in theory be fragmented,
+     *  SSU 1 and 2.
+     *
+     *  For SSU 1, while a SessionConfirmed could in theory be fragmented,
      *  in practice a RouterIdentity is 387 bytes and a single fragment is 512 bytes max,
      *  so it will never be fragmented.
+     *
+     *  For SSU 2, it contains a full router info, so it may be fragmented.
      *
      *  Caller must synch on state.
      */
@@ -2187,15 +2191,19 @@ class EstablishmentManager {
                 _log.warn("SessionCreated validate failed: " + state);
             return;
         }
-        
-        if (!_transport.isValid(state.getReceivedIP()) || !_transport.isValid(state.getRemoteHostId().getIP())) {
+
+        byte[] ip = state.getReceivedIP();
+        int port = state.getReceivedPort();
+        // don't need to revalidate the remoteHostID IP, we did that before we started
+        // not isValidPort() because we could be snatted
+        if (!_transport.isValid(ip) || port < 1024) {
             state.fail();
             return;
         }
-        
+
         // gives us the opportunity to "detect" our external addr
-        _transport.externalAddressReceived(state.getRemoteIdentity().calculateHash(), state.getReceivedIP(), state.getReceivedPort());
-        
+        _transport.externalAddressReceived(state.getRemoteIdentity().calculateHash(), ip, port);
+
         int version = state.getVersion();
         UDPPacket packets[];
         if (version == 1) {
