@@ -742,6 +742,9 @@ public class Blocklist {
      * @return true if it was NOT previously on the list
      */
     private boolean add(int ip) {
+        // save space, don't put in both
+        if (isPermanentlyBlocklisted(ip))
+            return false;
         Integer iip = Integer.valueOf(ip);
         synchronized(_singleIPBlocklist) {
             return _singleIPBlocklist.put(iip, DUMMY) == null;
@@ -1193,6 +1196,8 @@ public class Blocklist {
      *  Single IPs blocked until restart. Unsorted.
      *
      *  Public for console only, not a public API
+     *  As of 0.9.57, will not contain IPs permanently banned,
+     *  except for ones banned permanently after being added to the transient list.
      *
      *  @return a copy, unsorted
      *  @since 0.9.48
