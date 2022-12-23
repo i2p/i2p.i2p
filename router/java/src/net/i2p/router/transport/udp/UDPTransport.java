@@ -1732,9 +1732,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     void addRecentlyClosed(PeerStateDestroyed peer) {
         Long id = Long.valueOf(peer.getRcvConnID());
+        PeerStateDestroyed oldPSD;
         synchronized(_addDropLock) {
-            _recentlyClosedConnIDs.put(id, peer);
+            oldPSD = _recentlyClosedConnIDs.putIfAbsent(id, peer);
         }
+        if (oldPSD != null)
+            peer.kill();
     }
 
     /**
@@ -1922,7 +1925,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (oldPeer != peer && oldPeer.getVersion() == 2) {
                 PeerState2 state2 = (PeerState2) oldPeer;
                 Long id = Long.valueOf(state2.getRcvConnID());
-                _recentlyClosedConnIDs.put(id, new PeerStateDestroyed(_context, this, state2));
+                PeerStateDestroyed newPSD = new PeerStateDestroyed(_context, this, state2);
+                PeerStateDestroyed oldPSD = _recentlyClosedConnIDs.putIfAbsent(id, newPSD);
+                if (oldPSD != null)
+                    newPSD.kill();
                 _peersByConnID.remove(id);
             }
         }
@@ -2178,9 +2184,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (peer.getVersion() == 2) {
             PeerState2 state2 = (PeerState2) peer;
             Long id = Long.valueOf(state2.getRcvConnID());
-            // for now, we don't save the PeerState2 for doing termination retransmissions,
-            // but we may in the future
-            _recentlyClosedConnIDs.put(id, new PeerStateDestroyed(_context, this, state2));
+            PeerStateDestroyed newPSD = new PeerStateDestroyed(_context, this, state2);
+            PeerStateDestroyed oldPSD = _recentlyClosedConnIDs.putIfAbsent(id, newPSD);
+            if (oldPSD != null)
+                newPSD.kill();
             _peersByConnID.remove(id);
         }
         
