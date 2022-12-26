@@ -32,6 +32,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.update.UpdateManager;
 import net.i2p.update.UpdateType;
 import net.i2p.util.Addresses;
@@ -708,12 +709,33 @@ public class Blocklist {
      */
     public void add(byte ip[], String source) {
         boolean rv;
-        if (ip.length == 4)
+        if (ip.length == 4) {
+            // don't ever block ourselves
+            String us = _context.getProperty(UDPTransport.PROP_IP);
+            if (us != null) {
+                byte[] usb = Addresses.getIP(us);
+                if (usb != null && DataHelper.eq(usb, ip)) {
+                    if (_log.shouldWarn())
+                        _log.warn("Not adding our own IP " + us, new Exception());
+                    return;
+                }
+            }
             rv = add(toInt(ip));
-        else if (ip.length == 16)
+        } else if (ip.length == 16) {
+            // don't ever block ourselves
+            String us = _context.getProperty(UDPTransport.PROP_IPV6);
+            if (us != null) {
+                byte[] usb = Addresses.getIP(us);
+                if (usb != null && DataHelper.eq(usb, ip)) {
+                    if (_log.shouldWarn())
+                        _log.warn("Not adding our own IP " + us, new Exception());
+                    return;
+                }
+            }
             rv = add(new BigInteger(1, ip));
-        else
-            rv = false;
+        } else {
+            return;
+        }
         if (rv) {
             // lower log level at startup when initializing from blocklist files
             if (source == null && _log.shouldWarn())
