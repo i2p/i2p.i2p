@@ -3,6 +3,7 @@ package net.i2p.router.web.helpers;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,6 +18,8 @@ import net.i2p.data.TunnelId;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
+import net.i2p.router.TunnelManagerFacade;
+import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.tunnel.HopConfig;
 import net.i2p.router.tunnel.pool.TunnelPool;
 import net.i2p.router.web.HelperBase;
@@ -37,8 +40,9 @@ class TunnelRenderer {
     }
 
     public void renderStatusHTML(Writer out) throws IOException {
-        TunnelPool ei = _context.tunnelManager().getInboundExploratoryPool();
-        TunnelPool eo = _context.tunnelManager().getOutboundExploratoryPool();
+        TunnelManagerFacade tm = _context.tunnelManager();
+        TunnelPool ei = tm.getInboundExploratoryPool();
+        TunnelPool eo = tm.getOutboundExploratoryPool();
         out.write("<h3 class=\"tabletitle\" id=\"exploratorytunnels\"><a name=\"exploratory\" ></a>" + _t("Exploratory tunnels"));
         // links are set to float:right in CSS so they will be displayed in reverse order
         out.write(" <a href=\"/configtunnels#exploratory\" title=\"" + _t("Configure tunnels") + "\">[" + _t("configure") + "]</a>");
@@ -46,37 +50,26 @@ class TunnelRenderer {
         out.write("</h3>\n");
         renderPool(out, ei, eo);
 
-        List<Hash> destinations = null;
-        Map<Hash, TunnelPool> clientInboundPools = _context.tunnelManager().getInboundClientPools();
-        Map<Hash, TunnelPool> clientOutboundPools = _context.tunnelManager().getOutboundClientPools();
-        destinations = new ArrayList<Hash>(clientInboundPools.keySet());
+        Map<Hash, TunnelPool> clientInboundPools = tm.getInboundClientPools();
         boolean debug = _context.getBooleanProperty(HelperBase.PROP_ADVANCED);
-        for (int i = 0; i < destinations.size(); i++) {
-            Hash client = destinations.get(i);
+        // display name to in pool
+        List<TunnelPool> sorted = new ArrayList<TunnelPool>(clientInboundPools.values());
+        if (sorted.size() > 1)
+            DataHelper.sort(sorted, new TPComparator());
+        for (TunnelPool in : sorted) {
+            Hash client = in.getSettings().getDestination();
             boolean isLocal = _context.clientManager().isLocal(client);
             if ((!isLocal) && (!debug))
                 continue;
-            TunnelPool in = clientInboundPools.get(client);
-            TunnelPool outPool = clientOutboundPools.get(client);
-            if ((in != null && in.getSettings().getAliasOf() != null) ||
+            TunnelPool outPool = tm.getOutboundPool(client);
+            if (in.getSettings().getAliasOf() != null ||
                 (outPool != null && outPool.getSettings().getAliasOf() != null)) {
                 // skip aliases, we will print a header under the main tunnel pool below
                 continue;
             }
-            // TODO the following code is duplicated in SummaryHelper
-            String name = (in != null) ? in.getSettings().getDestinationNickname() : null;
-            if ( (name == null) && (outPool != null) )
-                name = outPool.getSettings().getDestinationNickname();
             String b64 = client.toBase64().substring(0, 4);
-            String dname;
-            if (name == null) {
-                name = b64;
-                dname = client.toBase32();
-            } else {
-                dname = DataHelper.escapeHTML(_t(name));
-            }
             out.write("<h3 class=\"tabletitle\" id=\"" + b64
-                      + "\" >" + _t("Client tunnels for {0}", dname));
+                      + "\" >" + _t("Client tunnels for {0}", getTunnelName(in)));
             if (isLocal) {
                 // links are set to float:right in CSS so they will be displayed in reverse order
                 out.write(" <a href=\"/configtunnels#" + b64 + "\" title=\"" + _t("Configure tunnels for session") + "\">[" + _t("configure") + "]</a>");
@@ -85,7 +78,7 @@ class TunnelRenderer {
             } else {
                 out.write(" (" + _t("dead") + ")</h3>\n");
             }
-            if (in != null) {
+
                 // list aliases
                 Set<Hash> aliases = in.getSettings().getAliases();
                 if (aliases != null) {
@@ -105,7 +98,7 @@ class TunnelRenderer {
                         }
                     }
                 }     
-            }         
+
             renderPool(out, in, outPool);
         }
 
@@ -234,6 +227,37 @@ class TunnelRenderer {
                  return 1;
              return 0;
         }
+    }
+
+    /**
+     *  Sort tunnels by the name of the tunnel
+     *  @since 0.9.57
+     */
+    private class TPComparator implements Comparator<TunnelPool> {
+         private final Collator _comp = Collator.getInstance();
+         public int compare(TunnelPool l, TunnelPool r) {
+             int rv = _comp.compare(getTunnelName(l), getTunnelName(r));
+             if (rv != 0)
+                 return rv;
+             return l.getSettings().getDestination().toBase32().compareTo(r.getSettings().getDestination().toBase32());
+        }
+    }
+
+    /**
+     *  Get display name for the tunnel
+     *  @since 0.9.57
+     */
+    private String getTunnelName(TunnelPool in) {
+        TunnelPoolSettings ins = in.getSettings();
+        String name = ins.getDestinationNickname();
+        if (name == null) {
+            TunnelPoolSettings outPool = _context.tunnelManager().getOutboundSettings(ins.getDestination());
+            if (outPool != null)
+                name = outPool.getDestinationNickname();
+        }
+        if (name != null)
+            return DataHelper.escapeHTML(_t(name));
+        return ins.getDestination().toBase32();
     }
 
     /** @since 0.9.35 */

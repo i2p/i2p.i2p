@@ -10,7 +10,10 @@ package net.i2p.i2ptunnel.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -357,6 +360,41 @@ public class IndexBean {
     public int getTunnelCount() {
         if (_group == null) return 0;
         return _group.getControllers().size();
+    }
+
+    /**
+     *  Return tunnel numbers of clients or servers only, sorted by tunnel name
+     *  @param isClient true for clients, false for servers
+     *  @return non-null, may be empty
+     *  @since 0.9.57
+     */
+    public List<Integer> getControllerNumbers(boolean isClient) {
+        if (_group == null)
+            return Collections.emptyList();
+        List<TunnelController> all = _group.getControllers();
+        List<Integer> rv = new ArrayList<Integer>(all.size());
+        for (int i = 0; i < all.size(); i++) {
+            TunnelController tc = all.get(i);
+            if (tc.isClient() == isClient)
+                rv.add(Integer.valueOf(i));
+        }
+        if (rv.size() > 1)
+            Collections.sort(rv, new TCComparator());
+        return rv;
+    }
+
+    /**
+     *  Sort tunnel numbers by the name of the tunnel
+     *  @since 0.9.57
+     */
+    private class TCComparator implements Comparator<Integer> {
+         private final Collator _comp = Collator.getInstance();
+         public int compare(Integer l, Integer r) {
+             int rv = _comp.compare(getTunnelName(l), getTunnelName(r));
+             if (rv != 0)
+                 return rv;
+             return l.compareTo(r);
+        }
     }
     
     /**

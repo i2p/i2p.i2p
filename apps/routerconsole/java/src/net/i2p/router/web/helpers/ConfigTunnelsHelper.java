@@ -1,10 +1,15 @@
 package net.i2p.router.web.helpers;
 
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.transport.TransportUtil;
@@ -23,44 +28,76 @@ public class ConfigTunnelsHelper extends HelperBase {
         buf.append("<input type=\"hidden\" name=\"pool.0\" value=\"exploratory\" >\n");
         int cur = 1;
         Set<Destination> clients = _context.clientManager().listClients();
+        TunnelManagerFacade mgr = _context.tunnelManager();
+        // display name to in pool
+        List<TunnelPoolSettings> sorted = new ArrayList<TunnelPoolSettings>(clients.size());
         for (Destination dest : clients) {
+            TunnelPoolSettings in = mgr.getInboundSettings(dest.calculateHash());
+            if (in != null)
+                sorted.add(in);
+        }
+        if (sorted.size() > 1)
+            DataHelper.sort(sorted, new TPComparator());
+        for (TunnelPoolSettings in : sorted) {
             buf.append("<input type=\"hidden\" name=\"pool.").append(cur).append("\" value=\"");
-            buf.append(dest.calculateHash().toBase64()).append("\" >\n");    
+            buf.append(in.getDestination().toBase64()).append("\" >\n");
             cur++;
         }
 
         buf.append("<table id=\"tunnelconfig\">\n");
-        TunnelManagerFacade mgr = _context.tunnelManager();
         TunnelPoolSettings exploratoryIn = mgr.getInboundSettings();
         TunnelPoolSettings exploratoryOut = mgr.getOutboundSettings();
         
         renderForm(buf, 0, "exploratory", _t("Exploratory tunnels"), exploratoryIn, exploratoryOut);
         
         cur = 1;
-        for (Destination dest : clients) {
-            TunnelPoolSettings in = mgr.getInboundSettings(dest.calculateHash());
-            TunnelPoolSettings out = mgr.getOutboundSettings(dest.calculateHash());
-            
-            if (in == null || in.getAliasOf() != null ||
+        for (TunnelPoolSettings in : sorted) {
+            Hash h = in.getDestination();
+            TunnelPoolSettings out = mgr.getOutboundSettings(h);
+
+            if (in.getAliasOf() != null ||
                 out == null || out.getAliasOf() != null) {
                 cur++;
                 continue;
             }
-            
-            String name = in.getDestinationNickname();
-            if (name == null) {
-                name = out.getDestinationNickname();
-                if (name == null)
-                    name = dest.calculateHash().toBase32();
-            }
-        
-            String prefix = dest.calculateHash().toBase64().substring(0,4);
-            renderForm(buf, cur, prefix, _t("Client tunnels for {0}", DataHelper.escapeHTML(_t(name))), in, out);
+
+            String prefix = h.toBase64().substring(0,4);
+            renderForm(buf, cur, prefix, _t("Client tunnels for {0}", getTunnelName(in)), in, out);
             cur++;
         }
-        
+
         buf.append("</table>\n");
         return buf.toString();
+    }
+
+    /**
+     *  Sort tunnels by the name of the tunnel
+     *  @since 0.9.57
+     */
+    private class TPComparator implements Comparator<TunnelPoolSettings> {
+         private final Collator _comp = Collator.getInstance();
+         public int compare(TunnelPoolSettings l, TunnelPoolSettings r) {
+             int rv = _comp.compare(getTunnelName(l), getTunnelName(r));
+             if (rv != 0)
+                 return rv;
+             return l.getDestination().toBase32().compareTo(r.getDestination().toBase32());
+        }
+    }
+
+    /**
+     *  Get display name for the tunnel
+     *  @since 0.9.57
+     */
+    private String getTunnelName(TunnelPoolSettings ins) {
+        String name = ins.getDestinationNickname();
+        if (name == null) {
+            TunnelPoolSettings outPool = _context.tunnelManager().getOutboundSettings(ins.getDestination());
+            if (outPool != null)
+                name = outPool.getDestinationNickname();
+        }
+        if (name != null)
+            return DataHelper.escapeHTML(_t(name));
+        return ins.getDestination().toBase32();
     }
 
     private static final int WARN_LENGTH = 4;

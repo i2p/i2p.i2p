@@ -85,8 +85,7 @@
         <th class="tunnelControl"><%=intl._t("Control")%></th>
     </tr>
 <%
-        for (int curServer = 0; curServer < indexBean.getTunnelCount(); curServer++) {
-            if (indexBean.isClient(curServer)) continue;
+        for (int curServer : indexBean.getControllerNumbers(false)) {
 %>
     <tr class="tunnelProperties">
         <td class="tunnelName">
@@ -258,8 +257,7 @@
         <th class="tunnelControl"><%=intl._t("Control")%></th>
     </tr>
 <%
-        for (int curClient = 0; curClient < indexBean.getTunnelCount(); curClient++) {
-            if (!indexBean.isClient(curClient)) continue;
+        for (int curClient : indexBean.getControllerNumbers(true)) {
 %>
     <tr class="tunnelProperties">
         <td class="tunnelName">
