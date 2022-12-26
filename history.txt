@@ -1,3 +1,15 @@
+2022-12-26 zzz
+ * Console: Sort tunnels by name on /tunnels, /configtunnels, /i2ptunnel
+ * Router: Don't blocklist our own IP
+ * SSU:
+   - Fix NPE when SSU2 disabled
+   - Redesign peer test symmetric NAT detection
+
+2022-12-23 zzz
+ * SSU2:
+   - More peer test fixes
+   - Refactor in-session PacketBuilder2 methods to throw IOE
+
 2022-12-22 zzz
  * SSU:
    - Further restrict states to publish peer test cap
