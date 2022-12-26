@@ -499,17 +499,23 @@ public class RouterThrottleImpl implements RouterThrottle {
     
     private double getTunnelGrowthFactor() {
         try {
-            return Double.parseDouble(_context.getProperty("router.tunnelGrowthFactor", "1.3"));
+            String p = _context.getProperty("router.tunnelGrowthFactor");
+            if (p == null)
+                return 1.3d;
+            return Double.parseDouble(p);
         } catch (NumberFormatException nfe) {
-            return 1.3;
+            return 1.3d;
         }
     }
 
     private double getTunnelTestTimeGrowthFactor() {
         try {
-            return Double.parseDouble(_context.getProperty("router.tunnelTestTimeGrowthFactor", "1.3"));
+            String p = _context.getProperty("router.tunnelTestTimeGrowthFactor");
+            if (p == null)
+                return 1.3d;
+            return Double.parseDouble(p);
         } catch (NumberFormatException nfe) {
-            return 1.3;
+            return 1.3d;
         }
     }
     
