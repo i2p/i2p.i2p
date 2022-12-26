@@ -1291,7 +1291,7 @@ class IntroductionManager {
      * @since 0.9.57
      */
     public void cleanup() {
-        if (_nonceToAlice.isEmpty())
+        if (_nonceToAlice == null || _nonceToAlice.isEmpty())
             return;
         for (Iterator<PeerState2> iter = _nonceToAlice.values().iterator(); iter.hasNext(); ) {
             PeerState2 state = iter.next();
