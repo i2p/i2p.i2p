@@ -181,6 +181,10 @@ class PeerTestManager {
     }
     private static final int PENDING_PORT = 99999;
 
+    // Preliminary
+    private static final boolean ENABLE_SSU2_SYMNAT_TEST = true;
+
+
     /**
      *  Have seen peer tests (as Alice) get stuck (_currentTest != null)
      *  so I've thrown some synchronizization on the methods;
@@ -296,7 +300,8 @@ class PeerTestManager {
                         testComplete();
                     return;
                 }
-                long timeSinceSend = _context.clock().now() - state.getLastSendTime();
+                long now = _context.clock().now();
+                long timeSinceSend = now - state.getLastSendTime();
                 if (timeSinceSend >= RESEND_TIMEOUT) {
                     int sent = state.incrementPacketsRelayed();
                     if (sent > MAX_RELAYED_PER_TEST_ALICE) {
@@ -315,9 +320,20 @@ class PeerTestManager {
                         // received from Bob, but no reply from Charlie.  send it to 
                         // Bob again so he pokes Charlie
                         // We don't resend to Bob for SSU2; Charlie will retransmit.
-                        if (state.getBob().getVersion() == 1)
+                        if (state.getBob().getVersion() == 1) {
                             sendTestToBob();
-                        // TODO if version 2 and long enough, send msg 6 anyway
+                        } else if (ENABLE_SSU2_SYMNAT_TEST) {
+                            // if version 2 and it's been long enough, and Charlie isn't firewalled, send msg 6 anyway
+                            // This allows us to detect Symmetric NAT.
+                            // We don't have his IP/port if he's firewalled, and we wouldn't trust his answer
+                            // anyway as he could be symmetric natted.
+                            // After this, we will ignore any msg 5 received
+                            if (now - bobTime > 5000 && state.getCharliePort() != PENDING_PORT) {
+                                if (_log.shouldWarn())
+                                    _log.warn("Continuing test w/o msg 5: " + state);
+                                sendTestToCharlie();
+                            }
+                        }
                     } else if (bobTime <= 0) {
                         // received from Charlie, but no reply from Bob.  Send it to 
                         // Bob again so he retransmits his reply.
@@ -331,8 +347,19 @@ class PeerTestManager {
                         // second message from Charlie yet
                         sendTestToCharlie();
                     }
-                    // retx at 4, 10, 17, 25 elapsed time
-                    reschedule(RESEND_TIMEOUT + (sent*1000));
+                    if (bobTime > 0 && charlieTime <= 0) {
+                        if (state.getBeginTime() + MAX_CHARLIE_LIFETIME < now) {
+                            if (!_currentTestComplete)
+                                testComplete();
+                            return;
+                        }
+                        // earlier because charlie will go away at 15 sec
+                        // retx at 4, 6, 9, 13 elapsed time
+                        reschedule(sent*1000);
+                    } else {
+                        // retx at 4, 10, 17, 25 elapsed time
+                        reschedule(RESEND_TIMEOUT + (sent*1000));
+                    }
                 } else {
                     reschedule(RESEND_TIMEOUT - timeSinceSend);
                 }
@@ -637,6 +664,57 @@ class PeerTestManager {
      * we have successfully received the second PeerTest from a Charlie.
      *
      * call from a synchronized method
+     *
+     * Old SSU 1 test result state machine:
+     * ref: SSU 1 doc http://i2p-projekt.i2p/en/docs/transport/ssu
+     *
+     *<pre>
+     * If Alice does not get msg 5:  FIREWALLED
+     *
+     * If Alice gets msg 5:
+     * .. If Alice does not get msg 4:  UNKNOWN (says the SSU 1 spec,
+     *                                             but Java I2P proceeds for SSU 1)
+     * .. If Alice does not get msg 7:  UNKNOWN
+     * .. If Alice gets msgs 4/5/7 and IP/port match:  OK
+     * .. If Alice gets msgs 4/5/7 and IP/port do not match:  SYMNAT
+     *</pre>
+     *
+     * New SSU 1/2 test result state machine:
+     *
+     *<pre>
+     * If Alice does not get msg 5:
+     * .. If Alice does not get msg 4:  UNKNOWN
+     * .. If Alice does not get msg 7:  UNKNOWN
+     * .. If Alice gets msgs 4/7 and IP/port match:  FIREWALLED
+     * .. If Alice gets msgs 4/7 and IP matches, port does not match:  SYMNAT, but needs confirmation with 2nd test
+     * .. If Alice gets msgs 4/7 and IP does not match, port matches:  FIREWALLED, address change?
+     * .. If Alice gets msgs 4/7 and both IP and port do not match:  SYMNAT, address change?
+     *
+     * If Alice gets msg 5:
+     * .. If Alice does not get msg 4:  OK unless currently SYMNAT, else UNKNOWN
+     *                                       (in SSU2 have to stop here anyway)
+     * .. If Alice does not get msg 7:  OK unless currently SYMNAT, else UNKNOWN
+     * .. If Alice gets msgs 4/5/7 and IP/port match:  OK
+     * .. If Alice gets msgs 4/5/7 and IP matches, port does not match:  OK, charlie is probably sym. natted
+     * .. If Alice gets msgs 4/5/7 and IP does not match, port matches:  OK, address change?
+     * .. If Alice gets msgs 4/5/7 and both IP and port do not match:  OK, address change?
+     *</pre>
+     *
+     * Simplified version:
+     *
+     *<pre>
+     * 4 5 7  Result             Notes
+     * -----  ------             -----
+     * n n n  UNKNOWN
+     * y n n  FIREWALLED           (unless currently SYMNAT)
+     * n y n  OK                   (unless currently SYMNAT, which is unlikely)
+     * y y n  OK                   (unless currently SYMNAT, which is unlikely)
+     * n n y  n/a                  (can't send msg 6)
+     * y n y  FIREWALLED or SYMNAT (requires sending msg 6 w/o rcv msg 5)
+     * n y y  n/a                  (can't send msg 6)
+     * y y y  OK
+     *</pre>
+     *
      */
     private void testComplete() {
         _currentTestComplete = true;
@@ -651,15 +729,50 @@ class PeerTestManager {
 
         boolean isIPv6 = test.isIPv6();
         Status status;
-        if (test.getAlicePortFromCharlie() > 0) {
+        int apfc = test.getAlicePortFromCharlie();
+        if (apfc > 0) {
             // we received a second message (7) from charlie
-            if ( (test.getAlicePort() == test.getAlicePortFromCharlie()) &&
-                 (test.getAliceIP() != null) && (test.getAliceIPFromCharlie() != null) &&
-                 (test.getAliceIP().equals(test.getAliceIPFromCharlie())) ) {
-                status = isIPv6 ? Status.IPV4_UNKNOWN_IPV6_OK : Status.IPV4_OK_IPV6_UNKNOWN;
+            // With ENABLE_SSU2_SYMNAT_TEST, we may not have gotten the first message (5)
+            InetAddress aIP = test.getAliceIP();
+            InetAddress aIPfc = test.getAliceIPFromCharlie();
+            if (test.getAlicePort() == apfc &&
+                aIP != null &&
+                aIP.equals(aIPfc)) {
+                // everything matches
+                if (test.getReceiveCharlieTime() <= 0) {
+                    // SSU2 ENABLE_SSU2_SYMNAT_TEST only, msg 5 not received, msg 7 received
+                    status = isIPv6 ? Status.IPV4_UNKNOWN_IPV6_FIREWALLED : Status.IPV4_FIREWALLED_IPV6_UNKNOWN;
+                    if (_log.shouldWarn())
+                        _log.warn("Test complete w/o msg 5, " + status + " on " + test);
+                } else {
+                    // Got msgs 5 and 7, everything good
+                    status = isIPv6 ? Status.IPV4_UNKNOWN_IPV6_OK : Status.IPV4_OK_IPV6_UNKNOWN;
+                }
             } else {
-                // we don't have a SNAT state for IPv6
-                status = isIPv6 ? Status.IPV4_UNKNOWN_IPV6_FIREWALLED : Status.IPV4_SNAT_IPV6_UNKNOWN;
+                // IP/port mismatch
+                if (test.getAlicePort() == apfc) {
+                    // Port matched, only IP was different
+                    // Dot it go
+                    if (_transport.isSymNatted()) {
+                        status = Status.UNKNOWN;
+                    } else if (test.getReceiveCharlieTime() <= 0) {
+                        // SSU2 ENABLE_SSU2_SYMNAT_TEST only, msg 5 not received, msg 7 received
+                        status = isIPv6 ? Status.IPV4_UNKNOWN_IPV6_FIREWALLED : Status.IPV4_FIREWALLED_IPV6_UNKNOWN;
+                    } else {
+                        status = isIPv6 ? Status.IPV4_UNKNOWN_IPV6_OK : Status.IPV4_OK_IPV6_UNKNOWN;
+                    }
+                } else {
+                    // SYMMETRIC NAT!
+                    // SSU2 ENABLE_SSU2_SYMNAT_TEST only, msg 5 may or may not have been received
+                    // For SSU1, or SSU2 with SNAT_TEST disabled, it's very difficult to get here,
+                    // as we don't send msg 6 w/o receiving msg 5, and if we're symmetric natted, we
+                    // won't get msg 5 unless the port happened to be open with Charlie due to
+                    // previous activity.
+                    // We don't have a SNAT state for IPv6, so set FIREWALLED.
+                    status = isIPv6 ? Status.IPV4_UNKNOWN_IPV6_FIREWALLED : Status.IPV4_SNAT_IPV6_UNKNOWN;
+                    if (_log.shouldWarn())
+                        _log.warn("Test complete, SYMMETRIC NAT! " + status);
+                }
             }
         } else if (test.getReceiveCharlieTime() > 0) {
             // we received only one message (5) from charlie
@@ -1635,6 +1748,7 @@ class PeerTestManager {
                         if (!_transport.isSymNatted()) {
                             test.setAliceIPFromCharlie(test.getAliceIP());
                             test.setAlicePortFromCharlie(test.getAlicePort());
+                            _transport.markUnreachable(test.getCharlieHash());
                         }
                         testComplete();
                         return;
@@ -1747,7 +1861,26 @@ class PeerTestManager {
                     return;
                 }
                 if (test.getReceiveCharlieTime() <= 0) {
-                   // ??
+                    // ENABLE_SSU2_SYMNAT_TEST only, msg 5 not received
+                    if (_log.shouldWarn())
+                        _log.warn("Got msg 7 w/o msg 5 from Charlie " + from + " on " + test);
+                    // Do additional mismatch checks here, since we don't have msg 5.
+                    InetAddress charlieIP = test.getCharlieIP();
+                    // should always be non-null
+                    if (charlieIP != null) {
+                        // compare msg 4 IP/port to msg 7 IP/port
+                        byte[] oldIP = charlieIP.getAddress();
+                        int oldPort = test.getCharliePort();
+                        if (fromPort != oldPort || !DataHelper.eq(fromIP, oldIP)) {
+                            // If Charlie is confused or symmetric natted, we don't want to become symmetric natted ourselves.
+                            if (_log.shouldWarn())
+                                _log.warn("Charlie IP/port mismatch, msg 4: " + Addresses.toString(oldIP, oldPort) +
+                                          ", msg 7: " + Addresses.toString(fromIP, fromPort) + " on " + test);
+                            fail();
+                            return;
+                        }
+                    }
+                    // OK, here we go with the snat test
                 }
                 // this is our second charlie, yay!
                 // Do NOT set this here, this is only for msg 5
@@ -1785,18 +1918,59 @@ class PeerTestManager {
                                   Addresses.toString(addrBlockIP, addrBlockPort) + " on " + test);
                     _context.statManager().addRateData("udp.testBadIP", 1);
                     // TODO ban charlie or put on a list?
+                    // complete test without setting AliceIPFromCharlie or AlicePortFromCHarlie,
+                    // the result will be OK
                 } else {
-                    RouterAddress ra = _transport.getCurrentExternalAddress(isIPv6);
-                    if (ra != null) {
-                        if (addrBlockPort != ra.getPort() || !DataHelper.eq(addrBlockIP, ra.getIP())) {
-                            if (_log.shouldWarn())
-                                _log.warn("Charlie said we had a different IP/port: " +
-                                          Addresses.toString(addrBlockIP, addrBlockPort) + " on " + test);
+                    // More sanity checks here.
+                    // we compare to the test address,
+                    // however our address may have changed during the test
+                    boolean portok = addrBlockPort == test.getAlicePort();
+                    boolean IPok = DataHelper.eq(addrBlockIP, test.getAliceIP().getAddress());
+                    if (!portok || !IPok) {
+                        if (_log.shouldWarn())
+                            _log.warn("Charlie said we had a different IP/port: " +
+                                      Addresses.toString(addrBlockIP, addrBlockPort) + " on " + test);
+                        if (test.getReceiveCharlieTime() > 0) {
+                            // if we did get msg 5, it's almost impossible for us to be symmetric natted.
+                            // It's much more likely that Charlie is symmetric natted.
+                            // However, our temporary IPv6 IP could have changed.
+                            // testComplete() will deal with it
+                            if (IPok) {
+                                // Port different. Charlie probably symmetric natted.
+                                // The result will be OK
+                                // Note that charlie is probably not reachable
+                                _transport.markUnreachable(test.getCharlieHash());
+                                // Reset port so testComplete() will return success.
+                                test.setAlicePortFromCharlie(test.getAlicePort());
+                                // set bad so we don't call externalAddressReceived()
+                                bad = true;
+                            } else if (portok) {
+                                // Our IP changed?
+                                // The result will be SNAT
+                                // we will call externalAddressReceived()
+                            } else {
+                                // Both IP and port changed, don't trust it
+                                // The result will be OK
+                                // Note that charlie is probably not reachable
+                                _transport.markUnreachable(test.getCharlieHash());
+                                // Reset IP and port so testComplete() will return success.
+                                test.setAliceIPFromCharlie(test.getAliceIP());
+                                test.setAlicePortFromCharlie(test.getAlicePort());
+                                // set bad so we don't call externalAddressReceived()
+                                bad = true;
+                            }
+                        } else {
+                            // ENABLE_SSU2_SYMNAT_TEST only, msg 5 not received
+                            // If we did not get msg 5, hard to say which of us is to blame.
+                            // the result will be SNAT
+                            // we will call externalAddressReceived()
+                            // Let UDPTransport figure it out.
                         }
                     }
                     // We already call externalAddressReceived() for every outbound connection from EstablishmentManager
-                    // and we don't do SNAT detection there
-                    // _transport.externalAddressReceived(state.getCharlieHash(), addrBlockIP, addrBlockPort)
+                    // but we can use this also to update our address faster
+                    if (!bad)
+                        _transport.externalAddressReceived(state.getCharlieHash(), addrBlockIP, addrBlockPort);
                 }
                 testComplete();
                 break;
