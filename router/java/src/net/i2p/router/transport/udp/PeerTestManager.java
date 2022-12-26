@@ -512,12 +512,7 @@ class PeerTestManager {
                 if (bobRI == null || VersionComparator.comp(bobRI.getVersion(), "0.9.52") >= 0) {
                     if (_log.shouldInfo())
                         _log.info("Bob replied to us (Alice) with intro key " + fromPeer);
-                    // reset all state
-                    // so testComplete() will return UNKNOWN
-                    test.setAlicePortFromCharlie(0);
-                    test.setReceiveCharlieTime(0);
-                    test.setReceiveBobTime(0);
-                    testComplete();
+                    fail();
                     return;
                 }
             }
@@ -535,12 +530,7 @@ class PeerTestManager {
                 // check every time.
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Bad IP length " + ipSize + " from bob's reply: " + from);
-                // reset all state
-                // so testComplete() will return UNKNOWN
-                test.setAlicePortFromCharlie(0);
-                test.setReceiveCharlieTime(0);
-                test.setReceiveBobTime(0);
-                testComplete();
+                fail();
                 return;
             }
             byte ip[] = new byte[ipSize];
@@ -588,8 +578,8 @@ class PeerTestManager {
                 // this is our second charlie, yay!
                 try {
                     int testPort = testInfo.readPort();
-                    if (testPort == 0)
-                        throw new UnknownHostException("port 0");
+                    if (testPort < 1024)
+                        throw new UnknownHostException("port " + testPort);
                     test.setAlicePortFromCharlie(testPort);
                     byte ip[] = new byte[testInfo.readIPSize()];
                     int ipSize = ip.length;
@@ -599,9 +589,32 @@ class PeerTestManager {
                         throw new UnknownHostException("bad sz - expect v6? " + expectV6 + " act sz: " + ipSize);
                     testInfo.readIP(ip, 0);
                     InetAddress addr = InetAddress.getByAddress(ip);
-                    test.setAliceIPFromCharlie(addr);
+
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Receive test reply from Charlie: " + test);
+                    boolean portok = testPort == test.getAlicePort();
+                    boolean IPok = DataHelper.eq(ip, test.getAliceIP().getAddress());
+                    if (!portok || !IPok) {
+                        if (_log.shouldWarn())
+                            _log.warn("Charlie said we had a different IP/port: " +
+                                      Addresses.toString(ip, testPort) + " on " + test);
+                        // Since we did get msg 5, it's almost impossible for us to be symmetric natted.
+                        // It's much more likely that Charlie is symmetric natted.
+                        // However, our IP could have changed.
+                        // Force result to OK
+                        // testComplete() will deal with it
+                        if (!portok) {
+                            // Port different. Charlie probably symmetric natted.
+                            // Reset port so testComplete() will return success.
+                            test.setAlicePortFromCharlie(test.getAlicePort());
+                        }
+                        if (!IPok) {
+                            // Our IP changed?
+                            // Reset IP so testComplete() will return success.
+                            addr = test.getAliceIP();
+                        }
+                    }
+                    test.setAliceIPFromCharlie(addr);
                     if (test.getReceiveBobTime() > 0)
                         testComplete();
                 } catch (UnknownHostException uhe) {

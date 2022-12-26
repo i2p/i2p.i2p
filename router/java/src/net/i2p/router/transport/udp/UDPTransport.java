@@ -4131,13 +4131,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     PeerState pickTestPeer(PeerTestState.Role peerRole, int version, boolean isIPv6, RemoteHostId dontInclude) {
         if (peerRole == ALICE)
             throw new IllegalArgumentException();
+        // if we are or may be symmetric natted, require SSU2 so we don't let an SSU1 test change the state
+        boolean requireV2 = peerRole == BOB && !isIPv6 && _enableSSU2 &&
+                            (isSymNatted() || STATUS_IPV4_SYMNAT.contains(_reachabilityStatusPending));
         List<PeerState> peers = new ArrayList<PeerState>(_peersByIdent.values());
         for (Iterator<PeerState> iter = new RandomIterator<PeerState>(peers); iter.hasNext(); ) {
             PeerState peer = iter.next();
             if (peerRole == BOB) {
-                // Skip SSU2 until we have support for peer test
                 version = peer.getVersion();
-                if (version != 1) {
+                if (version == 1) {
+                    if (requireV2)
+                        continue;
+                } else {
                     // we must know our IP/port
                     PeerState2 bob = (PeerState2) peer;
                     if (bob.getOurIP() == null || bob.getOurPort() <= 0)
