@@ -501,7 +501,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
      *  @return may be null
      */
     public EstablishmentManager.Token getNextToken() {
-        if (_aliceIP.length == 4 && _transport.isSnatted())
+        if (_aliceIP.length == 4 && _transport.isSymNatted())
             return null;
         return _transport.getEstablisher().getInboundToken(_remoteHostId);
     }

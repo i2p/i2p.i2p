@@ -521,7 +521,8 @@ class IntroductionManager {
         long now = _context.clock().now();
         long pingCutoff = now - (105 * 60 * 1000);
         long inactivityCutoff = now - (UDPTransport.MIN_EXPIRE_TIMEOUT / 2);
-        for (PeerState cur : _inbound.values()) {
+        for (Iterator<PeerState> iter = _inbound.values().iterator(); iter.hasNext(); ) {
+            PeerState cur = iter.next();
             if (cur.getIntroducerTime() > pingCutoff &&
                 cur.getLastSendOrPingTime() < inactivityCutoff) {
                 if (_log.shouldDebug())
@@ -534,7 +535,9 @@ class IntroductionManager {
                     else
                         ping = _builder.buildPing(cur);
                     _transport.send(ping);
-                } catch (IOException ioe) {}
+                } catch (IOException ioe) {
+                    iter.remove();
+                }
             }
         }
     }
@@ -1071,7 +1074,7 @@ class IntroductionManager {
         SessionKey aliceIntroKey = null;
         int rcode;
         PeerState aps = _transport.getPeerState(alice);
-        if (_transport.isSnatted()) {
+        if (_transport.isSymNatted()) {
             rcode = SSU2Util.RELAY_REJECT_CHARLIE_ADDRESS;
         } else if (aps != null && aps.isIPv6() == isIPv6) {
             rcode = SSU2Util.RELAY_REJECT_CHARLIE_CONNECTED;

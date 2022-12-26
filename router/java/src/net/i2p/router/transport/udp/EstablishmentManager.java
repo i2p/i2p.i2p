@@ -2642,7 +2642,7 @@ class EstablishmentManager {
         if (expires > now + 2*60*1000) {
             // don't save if symmetric natted
             byte[] ip = peer.getIP();
-            if (ip != null && ip.length == 4 && _transport.isSnatted())
+            if (ip != null && ip.length == 4 && _transport.isSymNatted())
                 return;
         }
         Token tok = new Token(token, expires, now);

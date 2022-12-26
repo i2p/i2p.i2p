@@ -465,7 +465,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
      *  @return may be null
      */
     public EstablishmentManager.Token getNextToken() {
-        if (_bobIP != null && _bobIP.length == 4 && _transport.isSnatted())
+        if (_bobIP != null && _bobIP.length == 4 && _transport.isSymNatted())
             return null;
         return _transport.getEstablisher().getInboundToken(_remoteHostId);
     }

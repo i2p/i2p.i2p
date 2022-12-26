@@ -664,7 +664,7 @@ class PeerTestManager {
         } else if (test.getReceiveCharlieTime() > 0) {
             // we received only one message (5) from charlie
             // change in 0.9.57; previously returned UNKNOWN always
-            if (_transport.isSnatted()) {
+            if (_transport.isSymNatted()) {
                 status = Status.UNKNOWN;
             } else {
                 // assume good
@@ -1546,7 +1546,7 @@ class PeerTestManager {
                             _log.warn("Charlie IP mismatch, msg 4: " + Addresses.toString(charlieIP.getAddress(), charliePort) +
                                       ", msg 5: " + Addresses.toString(oldIP.getAddress(), oldPort) + " on " + test);
                         // stop here, assume good unless snatted
-                        if (!_transport.isSnatted()) {
+                        if (!_transport.isSymNatted()) {
                             test.setAliceIPFromCharlie(test.getAliceIP());
                             test.setAlicePortFromCharlie(test.getAlicePort());
                         }
@@ -1557,11 +1557,11 @@ class PeerTestManager {
                             _log.warn("Charlie port mismatch, msg 4: " + Addresses.toString(charlieIP.getAddress(), charliePort) +
                                       ", msg 5: " + Addresses.toString(oldIP.getAddress(), oldPort) + " on " + test);
                         if (TransportUtil.isValidPort(charliePort)) {
-                            // Charlie is snatted or confused about his port, update port and keep going
+                            // Charlie is symmetric natted or confused about his port, update port and keep going
                             test.setCharlie(charlieIP, charliePort, h);
                         } else {
-                            // Don't like charlie's port, stop here, assume good unless snatted
-                            if (!_transport.isSnatted()) {
+                            // Don't like charlie's port, stop here, assume good unless symmetric natted
+                            if (!_transport.isSymNatted()) {
                                 test.setAliceIPFromCharlie(test.getAliceIP());
                                 test.setAlicePortFromCharlie(test.getAlicePort());
                             }
@@ -1621,7 +1621,7 @@ class PeerTestManager {
                     try {
                         test.setCharlie(InetAddress.getByAddress(fromIP), fromPort, test.getCharlieHash());
                     } catch (UnknownHostException uhe) {}
-                    // TODO, if charlie is snatted, we won't know it when handling msg 7
+                    // TODO, if charlie is symmetric natted, we won't know it when handling msg 7
                 } else {
                     // msg 5 after msg 4, charlie is not firewalled
                     byte[] oldIP = charlieIP.getAddress();
@@ -1630,8 +1630,9 @@ class PeerTestManager {
                         if (_log.shouldWarn())
                             _log.warn("Charlie IP mismatch, msg 4: " + Addresses.toString(oldIP, oldPort) +
                                       ", msg 5: " + Addresses.toString(fromIP, fromPort) + " on " + test);
-                        // stop here, assume good unless snatted
-                        if (!_transport.isSnatted()) {
+                        // stop here, assume good unless symmetric natted,
+                        // and note that charlie is probably not reachable
+                        if (!_transport.isSymNatted()) {
                             test.setAliceIPFromCharlie(test.getAliceIP());
                             test.setAlicePortFromCharlie(test.getAlicePort());
                         }
@@ -1641,7 +1642,7 @@ class PeerTestManager {
                         if (_log.shouldWarn())
                             _log.warn("Charlie port mismatch, msg 4: " + Addresses.toString(oldIP, oldPort) +
                                       ", msg 5: " + Addresses.toString(fromIP, fromPort) + " on " + test);
-                        // Charlie is snatted or confused about his port, update port and keep going
+                        // Charlie is snymmetric natted or confused about his port, update port and keep going
                         // TransportUtil.isValidPort(fromPort) already checked at the top
                         test.setCharlie(charlieIP, fromPort, h);
                     }
@@ -1774,8 +1775,8 @@ class PeerTestManager {
                     } else {
                         bad = true;
                     }
-                } else if (!_transport.isSnatted()) {
-                    // assume good if we aren't snatted
+                } else if (!_transport.isSymNatted()) {
+                    // assume good if we aren't symmetric natted
                     test.setAlicePortFromCharlie(test.getAlicePort());
                 }
                 if (bad) {

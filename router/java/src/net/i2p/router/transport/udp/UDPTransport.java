@@ -330,7 +330,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final Set<Status> STATUS_OK =         EnumSet.of(Status.OK,
                                                                     Status.IPV4_DISABLED_IPV6_OK);
 
-    private static final Set<Status> STATUS_IPV4_SNAT =  EnumSet.of(Status.DIFFERENT,
+    private static final Set<Status> STATUS_IPV4_SYMNAT =  EnumSet.of(Status.DIFFERENT,
                                                                     Status.IPV4_SNAT_IPV6_OK,
                                                                     Status.IPV4_SNAT_IPV6_UNKNOWN);
 
@@ -1372,7 +1372,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                           TransportUtil.isValidPort(ourPort);
         boolean explicitSpecified = explicitAddressSpecified();
         boolean inboundRecent;
-        if (ourIP.length == 4)
+        boolean isIPv6 = ourIP.length == 16;
+        if (!isIPv6)
             inboundRecent = _lastInboundReceivedOn + ALLOW_IP_CHANGE_INTERVAL > System.currentTimeMillis();
         else
             inboundRecent = _lastInboundIPv6 + ALLOW_IP_CHANGE_INTERVAL > _context.clock().now();
@@ -1405,7 +1406,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             return;
         }
 
-        RouterAddress addr = getCurrentExternalAddress(ourIP.length == 16);
+        RouterAddress addr = getCurrentExternalAddress(isIPv6);
         if (inboundRecent && addr != null && addr.getPort() > 0 && addr.getHost() != null) {
             // use OS clock since its an ordering thing, not a time thing
             // Note that this fails us if we switch from one IP to a second, then back to the first,
@@ -1413,46 +1414,47 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // leaving us thinking the second IP is still good.
             if (_log.shouldDebug())
                 _log.debug("Ignoring IP address suggestion, since we have received an inbound con recently");
-        } else {
-            // New IP
+            return;
+        }
+
+            // Still could be the same IP/port, we don't check until changeAddress() below.
             boolean changeIt = false;
+            Hash lastFrom = null;
             synchronized(this) {
-                if (ourIP.length == 4) {
+                if (!isIPv6) {
                     if (from.equals(_lastFromv4) || !eq(_lastOurIPv4, _lastOurPortv4, ourIP, ourPort)) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("The router " + from + " told us we have a new IP - " 
                                       + Addresses.toString(ourIP, ourPort) + ".  Wait until somebody else tells us the same thing.");
                     } else {
                         changeIt = true;
+                        lastFrom = _lastFromv4;
                     }
                     _lastFromv4 = from;
                     _lastOurIPv4 = ourIP;
                     _lastOurPortv4 = ourPort;
-                } else if (ourIP.length == 16) {
+                } else {
                     if (from.equals(_lastFromv6) || !eq(_lastOurIPv6, _lastOurPortv6, ourIP, ourPort)) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("The router " + from + " told us we have a new IP - " 
                                       + Addresses.toString(ourIP, ourPort) + ".  Wait until somebody else tells us the same thing.");
                     } else {
                         changeIt = true;
+                        lastFrom = _lastFromv6;
                     }
                     _lastFromv6 = from;
                     _lastOurIPv6 = ourIP;
                     _lastOurPortv6 = ourPort;
-                } else {
-                    return;
                 }
             }
             if (changeIt) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info(from + " and another peer agree we have the IP " 
-                              + Addresses.toString(ourIP, ourPort) + ".  Changing address.");
+                if (_log.shouldInfo())
+                    _log.info(from + " and " + lastFrom + " agree our address is " + Addresses.toString(ourIP, ourPort));
                 // Never change port for IPv6 or if we have UPnP
                 if (_haveUPnP || ourIP.length == 16)
                     ourPort = 0;
                 changeAddress(ourIP, ourPort);
             }
-        }
     }
     
     /**
@@ -4082,8 +4084,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  Is IPv4 Symmetric NATted?
      *  @since 0.9.57
      */
-    boolean isSnatted() { 
-        return STATUS_IPV4_SNAT.contains(getReachabilityStatus());
+    boolean isSymNatted() { 
+        return STATUS_IPV4_SYMNAT.contains(getReachabilityStatus());
     }
 
     /**

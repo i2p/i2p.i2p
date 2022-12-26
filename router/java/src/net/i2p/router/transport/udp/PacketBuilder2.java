@@ -382,7 +382,7 @@ class PacketBuilder2 {
             _log.debug("Sending termination " + reason + " to : " + peer);
         peer.setDestroyReason(reason);
         List<Block> blocks = new ArrayList<Block>(2);
-        if (peer.isIPv6() || !_transport.isSnatted()) {
+        if (peer.isIPv6() || !_transport.isSymNatted()) {
             // update token
             EstablishmentManager.Token token = _transport.getEstablisher().getInboundToken(peer.getRemoteHostId());
             Block block = new SSU2Payload.NewTokenBlock(token);

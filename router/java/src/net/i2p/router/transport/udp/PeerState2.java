@@ -849,13 +849,11 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             _log.info("Got TERMINATION block, reason: " + reason + " count: " + count + " on " + this);
         if (reason == SSU2Util.REASON_TERMINATION) {
             // this should only happen at shutdown, where we don't have a post-termination handler
-        } else {
+        } else if (!_dead) {
             try {
                 UDPPacket pkt = _transport.getBuilder2().buildSessionDestroyPacket(SSU2Util.REASON_TERMINATION, this);
                 _transport.send(pkt);
             } catch (IOException ioe) {}
-        }
-        if (!_dead) {
             _transport.getEstablisher().receiveSessionDestroy(_remoteHostId, this);
             _dead = true;
         }
@@ -891,7 +889,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                             _log.warn("Migration successful, changed address from " + _remoteHostId + " to " + from + " for " + this);
                         _transport.changePeerAddress(this, from);
                         _mtu = MIN_MTU;
-                        if (isIPv6() || !_transport.isSnatted()) {
+                        if (isIPv6() || !_transport.isSymNatted()) {
                             EstablishmentManager.Token token = _transport.getEstablisher().getInboundToken(from);
                             SSU2Payload.Block block = new SSU2Payload.NewTokenBlock(token);
                             try {
