@@ -332,8 +332,24 @@ public class TunnelPool {
         if (_settings.getLength() == 0 && _settings.getLengthVariance() == 0)
             return 1;
         int rv = _settings.getTotalQuantity();
-        if (!_settings.isExploratory())
+        if (!_settings.isExploratory()) {
+            if (rv <= 1)
+                return rv;
+            // throttle client tunnel builds in times of congestion
+            int fails = _consecutiveBuildTimeouts.get();
+            if (fails > 4) {
+                if (fails > 8) {
+                    rv = 1;
+                    if (_log.shouldWarn())
+                        _log.warn("Limit to 1 tunnel after " + fails + " consec. build timeouts on " + this);
+                } else if (rv > 2) {
+                    rv--;
+                    if (_log.shouldWarn())
+                        _log.warn("Limit to " + rv + " tunnels after " + fails + " consec. build timeouts on " + this);
+                }
+            }
             return rv;
+        }
         // TODO high-bw non-ff also
         if (_context.netDb().floodfillEnabled() &&
             _context.router().getUptime() > 5*60*1000) {

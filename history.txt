@@ -1,3 +1,6 @@
+2022-12-29 zzz
+ * Tunnels: Limit requested client tunnels during congestion
+
 2022-12-26 zzz
  * Console: Sort tunnels by name on /tunnels, /configtunnels, /i2ptunnel
  * Router: Don't blocklist our own IP
