@@ -1263,8 +1263,7 @@ class NetDbRenderer {
                 return Addresses.toString(bip);
         } else if (ip.contains(":0:")) {
             // convert to canonical
-            // https://stackoverflow.com/questions/7043983/ipv6-address-into-compressed-form-in-java
-            return ip.replaceAll("((?:(?:^|:)0+\\b){2,}):?(?!\\S*\\b\\1:0+\\b)(\\S*)", "::$2").replaceFirst("^0::","::");
+            return Addresses.toCanonicalString(ip);
         }		
         return null;
     }

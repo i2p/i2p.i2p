@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import net.i2p.apache.http.conn.util.InetAddressUtils;
 
@@ -54,6 +55,11 @@ public abstract class Addresses {
     /** 12 char hex lower case */
     private static final Set<String> _macCache = new HashSet<String>();
     private static final boolean TEST_IPV6_ONLY = false;
+
+    // Convert IPv6 to canonical RFC 5952
+    // https://stackoverflow.com/questions/7043983/ipv6-address-into-compressed-form-in-java
+    private static final String RFC5952_MATCH = "((?:(?:^|:)0+\\b){2,}):?(?!\\S*\\b\\1:0+\\b)(\\S*)";
+    private static final Pattern RFC5952_PATTERN = Pattern.compile(RFC5952_MATCH);
 
     /**
      *  Do we have any address of this type?
@@ -434,6 +440,65 @@ public abstract class Addresses {
     }
 
     /**
+     *  Same as toString() but returns IPv6 in compressed form, ref. RFC 5952
+     *  @since 0.9.57
+     */
+    public static String toCanonicalString(byte[] addr) {
+        if (addr == null)
+            return "null";
+        try {
+            String rv = InetAddress.getByAddress(addr).getHostAddress();
+            if (addr.length == 16)
+                rv = x_toCanonicalString(rv);
+            return rv;
+        } catch (UnknownHostException uhe) {
+            return "bad IP length " + addr.length;
+        }
+    }
+
+    /**
+     *  Same as toString() but returns IPv6 in compressed form, ref. RFC 5952
+     *  @since 0.9.57
+     */
+    public static String toCanonicalString(byte[] addr, int port) {
+        if (addr == null)
+            return "null:" + port;
+        try {
+            String ip = InetAddress.getByAddress(addr).getHostAddress();
+            if (addr.length != 16)
+                return ip + ':' + port;
+            ip = x_toCanonicalString(ip);
+            return '[' + ip + "]:" + port;
+        } catch (UnknownHostException uhe) {
+            return "(bad IP length " + addr.length + "):" + port;
+        }
+    }
+
+    /**
+     *  Converts IPv6 to compressed form, ref. RFC 5952. IPv4 returned unchanged.
+     *  @since 0.9.57
+     */
+    public static String toCanonicalString(String host) {
+        if (host == null)
+            return "null";
+        if (host.indexOf(':') < 0)
+            return host;
+        return x_toCanonicalString(host);
+    }
+
+    /**
+     *  Internal
+     *  @param host non-null
+     *  @since 0.9.57
+     */
+    private static String x_toCanonicalString(String host) {
+        String rv =  RFC5952_PATTERN.matcher(host).replaceAll("::$2");
+        if (rv.startsWith("0::"))
+            rv = rv.substring(1);
+        return rv;
+    }
+
+    /**
      *  Convenience method to convert and validate a port String
      *  without throwing an exception.
      *  Does not trim.
@@ -560,11 +625,11 @@ public abstract class Addresses {
         if (rv == null) {
             if (isIPAddress(host)) {
                 try {
-                    if (host.contains(".")) {
+                    if (host.indexOf('.') > 0) {
                         rv = getIPv4(host);
                         if (rv == null)
                             return null;
-                    } else if (host.contains(":") && !host.contains("::")) {
+                    } else if (host.indexOf(':') >= 0 && !host.contains("::")) {
                         rv = getIPv6(host);
                         if (rv == null)
                             return null;
@@ -1015,26 +1080,26 @@ public abstract class Addresses {
         print(a);
         System.out.println("\nAll External Addresses (except deprecated IPv6):");
         a = getAddresses(false, false, true);
-        print(a);
+        printCanonical(a);
         byte[] ygg = getYggdrasilAddress();
         if (ygg != null) {
             System.out.println("\nYggdrasil Address:");
-            System.out.println(toString(ygg));
+            System.out.println(toCanonicalString(ygg));
         }
         System.out.println("\nAll External and Local Addresses (may include deprecated IPv6):");
         a = getAddresses(true, false, true);
-        print(a);
+        printCanonical(a);
         System.out.println("\nAll addresses:");
         long time = System.currentTimeMillis();
         a = getAddresses(true, true, true);
         time = System.currentTimeMillis() - time;
-        print(a);
+        printCanonical(a);
         System.out.println("\nIPv6 address flags:");
+        StringBuilder buf = new StringBuilder(64);
         for (String s : a) {
             if (!s.contains(":"))
                 continue;
-            StringBuilder buf = new StringBuilder(64);
-            buf.append(s);
+            buf.append(toCanonicalString(s));
             Inet6Address addr;
             try {
                 addr = (Inet6Address) InetAddress.getByName(buf.toString());
@@ -1057,13 +1122,12 @@ public abstract class Addresses {
                 }
             } catch (UnknownHostException uhe) {}
             System.out.println(buf.toString());
+            buf.setLength(0);
         }
 
         System.out.println("\nMac addresses:");
         Set<String> macs = new TreeSet<String>();
-        StringBuilder buf = new StringBuilder(17);
         for (String m : _macCache) {
-            buf.setLength(0);
             int i = 0;
             while(true) {
                 buf.append(m.substring(i, i+2));
@@ -1073,6 +1137,7 @@ public abstract class Addresses {
                 buf.append(':');
             }
             macs.add(buf.toString());
+            buf.setLength(0);
         }
         print(macs);
         System.out.println("\nHas IPv4?     " + isConnected() +
@@ -1170,6 +1235,17 @@ public abstract class Addresses {
         } else {
             for (String s : a) {
                 System.out.println(s);
+            }
+        }
+    }
+
+    /** @since 0.9.57 */
+    private static void printCanonical(Set<String> a) {
+        if (a.isEmpty()) {
+            System.out.println("none");
+        } else {
+            for (String s : a) {
+                System.out.println(toCanonicalString(s));
             }
         }
     }
