@@ -338,10 +338,14 @@ public class TunnelPool {
             // throttle client tunnel builds in times of congestion
             int fails = _consecutiveBuildTimeouts.get();
             if (fails > 4) {
-                if (fails > 8) {
+                if (fails > 12) {
                     rv = 1;
                     if (_log.shouldWarn())
                         _log.warn("Limit to 1 tunnel after " + fails + " consec. build timeouts on " + this);
+                } else if (fails > 8) {
+                    rv = Math.max(1, rv / 3);
+                    if (_log.shouldWarn())
+                        _log.warn("Limit to " + rv + " tunnels after " + fails + " consec. build timeouts on " + this);
                 } else if (rv > 2) {
                     rv--;
                     if (_log.shouldWarn())
