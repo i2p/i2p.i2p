@@ -186,10 +186,12 @@ public class HTTPMUSocket
 			
 		try {
 			ssdpMultiSock.leaveGroup(ssdpMultiGroup, ssdpMultiIf);
-            ssdpMultiSock.close();
+			ssdpMultiSock.close();
 			ssdpMultiSock = null;
-		}
-		catch (Exception e) {
+		} catch (Throwable e) {
+                        // I2P was Exception
+			// Oracle 19 Windows 10
+			// java.lang.AssertionError: java.net.BindException: Cannot assign requested address: no further information
 			//Debug.warning(e);
 			return false;
 		}
