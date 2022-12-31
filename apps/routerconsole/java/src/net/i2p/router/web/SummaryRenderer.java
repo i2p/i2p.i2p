@@ -41,18 +41,34 @@ class SummaryRenderer {
     private final Log _log;
     private final SummaryListener _listener;
     private final I2PAppContext _context;
+    private static final Color TRANSPARENT = new Color(0, 0, 0, 0);
+    // light theme
     private static final Color BACK_COLOR = new Color(246, 246, 255);
-    private static final Color SHADEA_COLOR = new Color(246, 246, 255);
-    private static final Color SHADEB_COLOR = new Color(246, 246, 255);
+    private static final Color SHADEA_COLOR = BACK_COLOR;
+    private static final Color SHADEB_COLOR = BACK_COLOR;
     private static final Color GRID_COLOR = new Color(100, 100, 100, 75);
     private static final Color MGRID_COLOR = new Color(255, 91, 91, 110);
     private static final Color FONT_COLOR = new Color(51, 51, 63);
-    private static final Color FRAME_COLOR = new Color(51, 51, 63);
+    private static final Color FRAME_COLOR = FONT_COLOR;
     private static final Color AREA_COLOR = new Color(100, 160, 200, 200);
     private static final Color LINE_COLOR = new Color(0, 30, 110, 255);
     private static final Color RESTART_BAR_COLOR = new Color(223, 13, 13, 255);
+    // dark theme adapted from I2P+
+    private static final Color BACK_COLOR_DARK = new Color(16, 16, 16);
+    private static final Color SHADEA_COLOR_DARK = BACK_COLOR_DARK;
+    private static final Color SHADEB_COLOR_DARK = BACK_COLOR_DARK;
+    private static final Color GRID_COLOR_DARK = new Color(244, 244, 190, 50);
+    private static final Color MGRID_COLOR_DARK = new Color(200, 200, 0, 50);
+    private static final Color FONT_COLOR_DARK = new Color(244, 244, 190);
+    private static final Color FRAME_COLOR_DARK = TRANSPARENT;
+    private static final Color AREA_COLOR_DARK = new Color(0, 72, 8, 220);
+    private static final Color LINE_COLOR_DARK = new Color(100, 200, 160);
+    private static final Color RESTART_BAR_COLOR_DARK = new Color(200, 16, 48, 220);
+    private static final Color AXIS_COLOR_DARK = new Color(244, 244, 190, 200);
+    private static final Color CANVAS_COLOR_DARK = new Color(20, 20, 20);
+
     // hide the arrow, full transparent
-    private static final Color ARROW_COLOR = new Color(0, 0, 0, 0);
+    private static final Color ARROW_COLOR = TRANSPARENT;
     private static final boolean IS_WIN = SystemVersion.isWindows();
     private static final String DEFAULT_FONT_NAME = IS_WIN ?
             "Lucida Console" : "Monospaced";
@@ -128,13 +144,27 @@ class SummaryRenderer {
             RrdGraphDef def = new RrdGraphDef(start/1000, end/1000);
 
             // Override defaults
-            def.setColor(ElementsNames.back,   BACK_COLOR);
-            def.setColor(ElementsNames.shadea, SHADEA_COLOR);
-            def.setColor(ElementsNames.shadeb, SHADEB_COLOR);
-            def.setColor(ElementsNames.grid,   GRID_COLOR);
-            def.setColor(ElementsNames.mgrid,  MGRID_COLOR);
-            def.setColor(ElementsNames.font,   FONT_COLOR);
-            def.setColor(ElementsNames.frame,  FRAME_COLOR);
+            boolean isDark = !_context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME).equals(CSSHelper.DEFAULT_THEME);
+            if (isDark) {
+                def.setColor(ElementsNames.back,   BACK_COLOR_DARK);
+                def.setColor(ElementsNames.shadea, SHADEA_COLOR_DARK);
+                def.setColor(ElementsNames.shadeb, SHADEB_COLOR_DARK);
+                def.setColor(ElementsNames.grid,   GRID_COLOR_DARK);
+                def.setColor(ElementsNames.mgrid,  MGRID_COLOR_DARK);
+                def.setColor(ElementsNames.font,   FONT_COLOR_DARK);
+                def.setColor(ElementsNames.frame,  FRAME_COLOR_DARK);
+                def.setColor(ElementsNames.xaxis,  AXIS_COLOR_DARK);
+                def.setColor(ElementsNames.yaxis,  AXIS_COLOR_DARK);
+                def.setColor(ElementsNames.canvas, CANVAS_COLOR_DARK);
+            } else {
+                def.setColor(ElementsNames.back,   BACK_COLOR);
+                def.setColor(ElementsNames.shadea, SHADEA_COLOR);
+                def.setColor(ElementsNames.shadeb, SHADEB_COLOR);
+                def.setColor(ElementsNames.grid,   GRID_COLOR);
+                def.setColor(ElementsNames.mgrid,  MGRID_COLOR);
+                def.setColor(ElementsNames.font,   FONT_COLOR);
+                def.setColor(ElementsNames.frame,  FRAME_COLOR);
+            }
             def.setColor(ElementsNames.arrow,  ARROW_COLOR);
 
             // improve text legibility
@@ -211,10 +241,11 @@ class SummaryRenderer {
             //    def.vrule(started / 1000, RESTART_BAR_COLOR, _t("Restart"), 4.0f);
 
             def.datasource(plotName, path, plotName, SummaryListener.CF, _listener.getBackendFactory());
+            Color areaColor = isDark ? AREA_COLOR_DARK : AREA_COLOR;
             if (descr.length() > 0) {
-                def.area(plotName, AREA_COLOR, descr + "\\l");
+                def.area(plotName, areaColor, descr + "\\l");
             } else {
-                def.area(plotName, AREA_COLOR);
+                def.area(plotName, areaColor);
             }
             if (!hideLegend) {
                 Variable var = new Variable.AVERAGE();
@@ -234,7 +265,8 @@ class SummaryRenderer {
                 String path2 = lsnr2.getData().getPath();
                 String descr2 = _t(lsnr2.getRate().getRateStat().getDescription());
                 def.datasource(plotName2, path2, plotName2, SummaryListener.CF, lsnr2.getBackendFactory());
-                def.line(plotName2, LINE_COLOR, descr2 + "\\l", 2);
+                Color lineColor = isDark ? LINE_COLOR_DARK : LINE_COLOR;
+                def.line(plotName2, lineColor, descr2 + "\\l", 2);
                 if (!hideLegend) {
                     Variable var = new Variable.AVERAGE();
                     def.datasource("avg2", plotName2, var);
@@ -251,6 +283,7 @@ class SummaryRenderer {
                 // '07 Jul 21:09' with month name in the system locale
                 // TODO: Fix Arabic time display
                 Map<Long, String> events = ((RouterContext)_context).router().eventLog().getEvents(EventLog.STARTED, start);
+                Color restartBarColor = isDark ? RESTART_BAR_COLOR_DARK : RESTART_BAR_COLOR;
                 if (localTime) {
                     for (Map.Entry<Long, String> event : events.entrySet()) {
                         long started = event.getKey().longValue();
@@ -262,7 +295,7 @@ class SummaryRenderer {
                             } else {
                                 legend = _t("Restart") + ' ' + DataHelper.formatTime(started) + " [" + event.getValue() + "]\\l";
                             }
-                            def.vrule(started / 1000, RESTART_BAR_COLOR, legend, 2.0f);
+                            def.vrule(started / 1000, restartBarColor, legend, 2.0f);
                         }
                     }
                     def.comment(DataHelper.formatTime(start) + " — " + DataHelper.formatTime(end) + "\\r");
@@ -278,7 +311,7 @@ class SummaryRenderer {
                             } else {
                                 legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " [" + event.getValue() + "]\\l";
                             }
-                            def.vrule(started / 1000, RESTART_BAR_COLOR, legend, 2.0f);
+                            def.vrule(started / 1000, restartBarColor, legend, 2.0f);
                         }
                     }
                     def.comment(sdf.format(new Date(start)) + " — " + sdf.format(new Date(end)) + " UTC\\r");

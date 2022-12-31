@@ -1394,14 +1394,8 @@ div.widepanel h3 {
 }
 
 .graphspanel img:not(old) {
-    background: #fff;
-    border: #ccc;
-    filter: invert(1);
-    mix-blend-mode: lighten;
-}
-
-.graphspanel img:not(old) {
-    border: 1px solid #fcf;
+    background: #222;
+    border: 1px solid #222;
 }
 
 .graphspanel a img:not(old) {
