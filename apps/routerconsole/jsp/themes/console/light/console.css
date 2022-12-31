@@ -1676,6 +1676,7 @@ hr+#newsStatus+#newsDisplay {
     white-space: nowrap;
     margin-left: 10px;
     color: #337;
+    float: right;
 }
 
 .newsAuthor {
