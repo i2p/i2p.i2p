@@ -2114,8 +2114,8 @@ button:active {
     transform: scale(1);
 }
 
-img[src*="bound"],
-img[src*="bound"]:hover {
+img[src*="bound.png"],
+img[src*="bound.png"]:hover {
     filter: sepia(100%) hue-rotate(70deg) !important;
 }
 
