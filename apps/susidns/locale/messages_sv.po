@@ -161,13 +161,13 @@ msgstr "Det gick inte att lösa Base 32-adressen"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:318
 #, java-format
 msgid "Destination added for {0}."
-msgstr "Mål tillagt för {0}."
+msgstr "Destination tillagt för {0}."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:311
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:320
 #, java-format
 msgid "Destination changed for {0}."
-msgstr "Mål ändrat för {0}."
+msgstr "Destination ändrat för {0}."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:313
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:322
@@ -182,7 +182,7 @@ msgstr "Ogiltigt Base 32-värdnamn."
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:322
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:336
 msgid "Invalid Base 64 destination."
-msgstr "Ogiltigt Base64 mål."
+msgstr "Ogiltigt Base64-destination."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:329
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:342
@@ -216,7 +216,7 @@ msgstr "Ta bort valda"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:379
 #, java-format
 msgid "Destination {0} deleted."
-msgstr "Mål {0} borttaget."
+msgstr "Destinationen {0} borttaget."
 
 #. parameter will always be >= 2
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:353
@@ -224,8 +224,8 @@ msgstr "Mål {0} borttaget."
 #, java-format
 msgid "1 destination deleted."
 msgid_plural "{0} destinations deleted."
-msgstr[0] "1 mål borttaget."
-msgstr[1] "{0} mål borttagna."
+msgstr[0] "1 destination borttagen."
+msgstr[1] "{0} destinationer borttagna."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:355
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:384
@@ -308,12 +308,12 @@ msgstr "Manuellt tillagda via SusiDNS"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:327
 #, java-format
 msgid "Failed to add Destination for {0} to naming service {1}"
-msgstr "Kunde inte lägga till målet för {0} till namntjänsten {1}"
+msgstr "Kunde inte lägga till destinationen för {0} till namntjänsten {1}"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:370
 #, java-format
 msgid "Failed to delete Destination for {0} from naming service {1}"
-msgstr "Det gick inte att ta bort målet för {0} från namntjänsten {1}"
+msgstr "Det gick inte att ta bort destinationen för {0} från namntjänsten {1}"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:412
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:384
@@ -490,7 +490,7 @@ msgstr "rensa filter"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:368
 msgid "Filter"
-msgstr "Filter"
+msgstr "Filtera"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:385
 msgid "other"
@@ -517,7 +517,7 @@ msgstr "Länk (b32)"
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:439
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:374
 msgid "Destination"
-msgstr "Mål"
+msgstr "Destination"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:453
 msgid "Select hosts for deletion from address book"
@@ -559,7 +559,7 @@ msgstr "Den här adressboken är tom."
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:671
 msgid "Add new destination"
-msgstr "Lägg till nytt mål"
+msgstr "Lägg till ny destination"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:677
 msgid "Destination or Base 32 Address"

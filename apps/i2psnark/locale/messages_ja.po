@@ -100,7 +100,7 @@ msgstr "最低合計アップローダー数の上限は{0}です"
 #: ../java/src/org/klomp/snark/SnarkManager.java:1076
 #, java-format
 msgid "Up BW limit changed to {0}KBps"
-msgstr "アップロード帯域制限は{0}Kbpsに変更されました"
+msgstr "アップロード帯域幅の上限は{0}Kbpsに変更されました"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1078
 #, java-format
@@ -1287,7 +1287,7 @@ msgstr "トレントと、ダウンロードした、または共有したファ
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2448
 msgid "Files readable by all"
-msgstr "ファイルが全てに読み取り可能"
+msgstr "ファイルが全員に読み取り可能"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2452
 msgid ""
@@ -1359,7 +1359,7 @@ msgstr "メインページのトレントの状態の更新頻度"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2552
 msgid "Never"
-msgstr "二度としない"
+msgstr "行わない"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2559
 msgid "Startup delay"

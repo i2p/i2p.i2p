@@ -55,7 +55,7 @@ msgstr "Magnet"
 #: ../java/src/org/klomp/snark/SnarkManager.java:2572
 #: ../java/src/org/klomp/snark/SnarkManager.java:2627
 msgid "Unable to connect to I2P"
-msgstr ""
+msgstr "Det går inte att ansluta till I2P"
 
 #: ../java/src/org/klomp/snark/Snark.java:597
 #: ../java/src/org/klomp/snark/SnarkManager.java:1727

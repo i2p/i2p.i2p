@@ -1884,7 +1884,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:597
 msgid "Private Key File for old Destination"
-msgstr ""
+msgstr "Privat nyckelfil för gammal destination"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:601
 msgid "Generate Authentication"
@@ -2001,7 +2001,7 @@ msgstr "Tunnelnamn och beskrivning"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:220
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:661
 msgid "Tunnel destination"
-msgstr "Mål för tunnel"
+msgstr "Tunneldestination"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:226
 msgid "Binding address and port"
@@ -2188,7 +2188,7 @@ msgstr ""
 msgid ""
 "Type in the I2P destination of the service that this client tunnel should "
 "connect to."
-msgstr "Ange I2P mål för tjänsten som tunneln skall ansluta till."
+msgstr "Ange I2P-destination för tjänsten som tunneln skall ansluta till."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:431
 msgid ""

@@ -2896,7 +2896,7 @@ msgstr "Inbyggd anonym Bittorrentklient"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:47
 msgid "Local web server for hosting your own content on I2P"
-msgstr ""
+msgstr "Lokal webbserver för att hosta ditt eget innehåll på I2P"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:47
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:303
@@ -2954,7 +2954,7 @@ msgstr "Hantera insticksmoduler"
 #. "http://bobthebuilder.i2p/" + S + I + "script_gear.png" + S +
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:69
 msgid "Dev Forum"
-msgstr "Utv forum"
+msgstr "Utv-forum"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:69
 msgid "Development forum"
@@ -2981,7 +2981,7 @@ msgstr "Gemenskapsforum"
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:74
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:452
 msgid "I2P Forum"
-msgstr "I2P forum"
+msgstr "I2P-forum"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:75
 msgid "Community git project hosting"
@@ -2989,7 +2989,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:75
 msgid "Git Project Hosting"
-msgstr ""
+msgstr "Git-projekthosting"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:76
 msgid "I2P Pastebin"
@@ -3316,7 +3316,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:622
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:645
 msgid "Add to local address book"
-msgstr ""
+msgstr "Lägg till i lokal adressbok"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:656
 #, java-format
@@ -4398,7 +4398,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:261
 msgid "Local web Server"
-msgstr ""
+msgstr "Lokal webbserver"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:287
 msgid ""
@@ -5793,7 +5793,7 @@ msgstr "Routernyckelringen används för att dekryptera krypterade leaseSets."
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:553
 msgid ""
 "The keyring may contain keys for local or remote encrypted destinations."
-msgstr "Nyckelringen kan innehålla nycklar för krypterad lokala eller fjärrmål ."
+msgstr "Nyckelringen kan innehålla nycklar för krypterad lokala eller fjärrdestinationer."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:559
 msgid "Manual Keyring Addition"
@@ -5801,11 +5801,11 @@ msgstr "Lägg till nycklar manuellt"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:561
 msgid "Enter keys for encrypted remote destinations here."
-msgstr "Ange nycklar för krypterad fjärr mål här."
+msgstr "Ange nycklar för krypterad fjärrdestination här."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:569
 msgid "Keys for local destinations must be entered on the"
-msgstr "Nycklar för lokal mål måste anges på"
+msgstr "Nycklar för lokal destination måste anges på"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:571
 msgid "I2PTunnel page"
@@ -6854,7 +6854,7 @@ msgstr "Välkommen till I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:437
 msgid "I2P Address Book"
-msgstr ""
+msgstr "I2P-adressbok"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:439
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:440
@@ -7867,17 +7867,17 @@ msgstr "Välj språk"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:480
 msgid "This project is supported by volunteer translators on Transifex."
-msgstr "Detta projekt stöds av frivilliga översättare på Transifex."
+msgstr "Det här projektet stöds av frivilliga översättare på Transifex."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:482
 msgid "This helps keep I2P accessible to everyone all over the world."
-msgstr "Det här hjälper till att hålla I2P tillgänglig för alla över hela världen."
+msgstr "Det här hjälper till att hålla I2P tillgängligt för alla över hela världen."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:484
 msgid ""
 "Thank you to all of the volunteers all over the world who help make I2P "
 "accessible."
-msgstr "Tack till alla volontärer över hela världen som hjälper till att göra I2P tillgänglig."
+msgstr "Tack till alla volontärer över hela världen som hjälper till att göra I2P tillgängligt."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:486
 #, java-format

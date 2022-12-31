@@ -201,7 +201,7 @@ msgstr "Om du inte vill besöka värden, klicka på \"tillbaka\"-knappen i din w
 #: ../java/build/Proxy.java:46 ../java/build/Proxy.java:119
 #: ../java/build/Proxy.java:125
 msgid "Warning: Invalid Destination"
-msgstr "Varning: Ogiltigt Mål"
+msgstr "Varning: Ogiltig destination"
 
 #: ../java/build/Proxy.java:47
 msgid "The Base32 address is invalid."
@@ -236,7 +236,7 @@ msgstr "Fel: Förfrågan Nekad"
 
 #: ../java/build/Proxy.java:75
 msgid "Error: Local Access"
-msgstr "Fel: Lokal Åtkomst"
+msgstr "Fel: Lokal åtkomst"
 
 #: ../java/build/Proxy.java:76
 msgid "Your browser is misconfigured."
@@ -246,7 +246,7 @@ msgstr "Din webbläsare är felkonfigurerad."
 msgid ""
 "Do not use the proxy to access the router console, localhost, or local LAN "
 "destinations."
-msgstr "Använd inte proxyn för åtkomst till routerkonsolen, localhost eller lokala LAN mål."
+msgstr "Använd inte proxyn för åtkomst till routerkonsolen, localhost eller lokala LAN-destination."
 
 #: ../java/build/Proxy.java:78
 msgid "Website Unknown"
@@ -343,7 +343,7 @@ msgstr "Ställ in en utproxy i I2PTunnel."
 
 #: ../java/build/Proxy.java:140 ../java/build/Proxy.java:146
 msgid "Warning: Destination Key Conflict"
-msgstr "Varning: Konflikt för Mål-nyckeln"
+msgstr "Varning: Konflikt för destinationsnyckeln"
 
 #: ../java/build/Proxy.java:147
 msgid ""
@@ -471,7 +471,7 @@ msgstr "Det här verkar vara en dåligt destination:"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:693
 msgid "i2paddresshelper cannot help you with a destination like that!"
-msgstr "i2padresshjälp kan inte hjälpa dig med ett sådant  mål!"
+msgstr "i2padresshjälp kan inte hjälpa dig med en sådan destination!"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:765
 #, java-format
@@ -509,7 +509,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1445
 msgid "Destination"
-msgstr "Mål"
+msgstr "Destination"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1451
 #, java-format

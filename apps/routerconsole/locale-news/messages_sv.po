@@ -73,4 +73,4 @@ msgid ""
 msgstr "Peka din IRC-klient till {0}localhost:6668{1} och säg hej till oss på {2}#i2p{3}."
 
 msgid "I2P Development Team"
-msgstr "I2P utvecklarteam"
+msgstr "I2P-utvecklarteam"
