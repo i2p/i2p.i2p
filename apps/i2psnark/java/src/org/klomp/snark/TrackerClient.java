@@ -94,7 +94,8 @@ public class TrackerClient implements Runnable {
   private static final Hash DSA_ONLY_TRACKER = ConvertToHash.getHash("cfmqlafjfmgkzbt4r3jsfyhgsr5abgxryl6fnz3d3y5a365di5aa.b32.i2p");
 
   private final I2PSnarkUtil _util;
-  private final MetaInfo meta;
+  // non-final for reinitialize()
+  private MetaInfo meta;
   private final String infoHash;
   private final String peerID;
   private final String additionalTrackerURL;
@@ -267,7 +268,21 @@ public class TrackerClient implements Runnable {
   }
 
   /**
+   *  Call after editing torrent
+   *  @since 0.9.57
+   */
+  public synchronized void reinitialize() {
+      if (!_initialized || !stop)
+          return;
+      trackers.clear();
+      backupTrackers.clear();
+      meta = snark.getMetaInfo();
+      setup();
+  }
+
+  /**
    *  Do this one time only (not every time it is started).
+   *  Unless torrent was edited.
    *  @since 0.9.1
    */
   private void setup() {
