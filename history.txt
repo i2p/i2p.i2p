@@ -1,3 +1,13 @@
+2022-12-31 zzz
+ * Console: Change color palette for graphs on dark theme
+ * i2psnark:
+   - Update tracker list after editing torrent (Gitlab #380)
+   - Throttle torrent startup to prevent OOMs
+
+2022-12-30 zzz
+ * UPnP: Catch AssertionError when closing SSDP multicast socket
+ * Util: Add methods to convert IPv6 addresses to canonical RFC 5952 strings
+
 2022-12-29 zzz
  * Tunnels: Limit requested client tunnels during congestion
 
