@@ -1978,7 +1978,18 @@ input.starttorrent {
 }
 
 input.reload {
-     padding: 5px 8px 5px 8px !important;
+     background: url(../vanilla/images/restore.png) left 6px center no-repeat;
+     background-size: 12px 12px;
+}
+
+input.reload[name="recheck"] {
+     background: url(../vanilla/images/recheck.png) left 6px center no-repeat;
+     background-size: 12px 12px;
+}
+
+input.create {
+     background: url(images/create.png) left 6px center no-repeat;
+     background-size: 12px 12px;
 }
 
 /* end priorities */

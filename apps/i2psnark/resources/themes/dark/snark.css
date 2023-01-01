@@ -2269,7 +2269,18 @@ hr.debug:last-child {
 }
 
 input.reload {
-     padding: 5px 10px 5px 10px !important;
+     background: url(../ubergine/images/restore.png) left 6px center no-repeat;
+     background-size: 12px 12px;
+}
+
+input.reload[name="recheck"] {
+     background: url(../ubergine/images/recheck.png) left 6px center no-repeat;
+     background-size: 12px 12px;
+}
+
+input.create {
+     background: url(images/create.png) left 6px center no-repeat;
+     background-size: 12px 12px;
 }
 
 input.starttorrent {
