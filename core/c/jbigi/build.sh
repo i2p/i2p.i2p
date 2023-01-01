@@ -39,13 +39,13 @@ cd bin/local
 
 echo "Building..."
 if [ "$1" != "dynamic" ]; then
-    case `uname -sr` in
+    case $(uname -sr) in
         Darwin*)
             # --with-pic is required for static linking
-            ../../gmp-${GMP_VER}/configure --with-pic;;
+            ../../gmp-"${GMP_VER}"/configure --with-pic;;
         *)
             # and it's required for ASLR
-            ../../gmp-${GMP_VER}/configure --with-pic;;
+            ../../gmp-"${GMP_VER}"/configure --with-pic;;
     esac
     make
     make check
@@ -55,13 +55,13 @@ else
     sh ../../build_jbigi.sh dynamic
 fi
 
-cp *jbigi???* ../../lib/
+cp -- *jbigi???* ../../lib/
 echo 'Library copied to lib/'
 cd ../..
 
 if [ "$1" != "notest" ]; then
     if [ -z "$I2P" ]; then
-        if [ -r $HOME/i2p/lib/i2p.jar ]; then
+        if [ -r "$HOME/i2p/lib/i2p.jar" ]; then
             I2P="$HOME/i2p"
         elif [ -r /usr/share/i2p/lib/i2p.jar ]; then
             I2P="/usr/share/i2p"
