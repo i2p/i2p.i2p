@@ -102,7 +102,7 @@ case "$TARGET" in
     MINGW*|CYGWIN*|windows*)
         [ -z "$JAVA_HOME" ] && JAVA_HOME="/c/software/j2sdk1.4.2_05"
         CFLAGS="${CFLAGS} -Wall"
-        INCLUDES="-I. -Iinclude -I${JAVA_HOME}/include/ -I${JAVA_HOME}/include/$HOST/"
+        INCLUDES="-I. -Iinclude -I\"${JAVA_HOME}/include/\" -I\"${JAVA_HOME}/include/$HOST/\""
         LDFLAGS="${LDFLAGS} -shared -static -static-libgcc -Wl,--kill-at"
         LIBFILE="lib/freenet/support/CPUInformation/jcpuid-${ARCH}-windows.dll";;
     Darwin*)
