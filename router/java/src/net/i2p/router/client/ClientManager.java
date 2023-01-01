@@ -89,7 +89,7 @@ class ClientManager {
     /** 2 bytes, save 65535 for unknown */
     private static final int MAX_SESSION_ID = 65534;
     private static final String PROP_MAX_SESSIONS = "i2cp.maxSessions";
-    private static final int DEFAULT_MAX_SESSIONS = 100;
+    private static final int DEFAULT_MAX_SESSIONS = 50;
     /** 65535 */
     public static final SessionId UNKNOWN_SESSION_ID = new SessionId(MAX_SESSION_ID + 1);
 
@@ -431,6 +431,8 @@ class ClientManager {
      *  @since 0.9.12
      */
     private SessionId locked_getNextSessionId() { 
+        if (_ctx.commSystem().isDummy())
+            return null;
         int max = Math.max(1, Math.min(2048, _ctx.getProperty(PROP_MAX_SESSIONS, DEFAULT_MAX_SESSIONS)));
         if (_runnerSessionIds.size() >= max) {
             _log.logAlways(Log.WARN, "Session refused, max is " + max + ", increase " + PROP_MAX_SESSIONS);

@@ -835,6 +835,8 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 msg = "Failed to bind to the router on " + _options.getProperty(PROP_DOMAIN_SOCKET) + " and build tunnels";
             else
                 msg = "Cannot connect to the router on " + _hostname + ':' + _portNum + " and build tunnels";
+            if (ioe.getMessage() != null)
+                msg += " - " + ioe.getMessage();
             throw new I2PSessionException(getPrefix() + msg, ioe);
         } finally {
             if (success) {

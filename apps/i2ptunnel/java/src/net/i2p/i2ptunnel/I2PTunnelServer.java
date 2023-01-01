@@ -380,7 +380,9 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 else
                     msg = "Unable to connect to the router at " + getTunnel().host + ':' + portNum +
                              " and build tunnels for the server at " + remoteHost.getHostAddress() + ':' + remotePort;
-                if (++retries < MAX_RETRIES) {
+                String exmsg = ise.getMessage();
+                boolean fail = exmsg != null && exmsg.contains("session limit exceeded");
+                if (!fail && ++retries < MAX_RETRIES) {
                     msg += ", retrying in " + (RETRY_DELAY / 1000) + " seconds";
                     this.l.log(msg);
                     _log.error(msg);
