@@ -1,0 +1,8 @@
+{
+  "name": "I2P Console JS",
+  "version": "0.9.57",
+  "description": "Webapp JS",
+  "repository": "https://github.com/i2p/i2p.i2p",
+  "author": "I2P Team",
+  "license": "GPLv2"
+}

@@ -979,6 +979,21 @@
         <echo message="Warning, javadoc embeds timestamps in the output, run with 'TZ=UTC ant javadoc' if you plan to distribute" />
     </target>
 
+    <!-- sudo apt install jsdoc-toolkit -->
+    <target name="jsdoc">
+        <exec executable="jsdoc" failonerror="true">
+                <arg value="-d=build/jsdoc" />
+                <arg value="-P" />
+                <arg value="installer/resources/package.json" />
+                <arg value="-r" />
+                <arg value="apps/i2psnark/resources/js" />
+                <arg value="apps/i2ptunnel/jsp/js" />
+                <arg value="apps/routerconsole/jsp/js" />
+                <arg value="apps/susidns/src/js" />
+                <arg value="apps/susimail/src/js" />
+        </exec>
+    </target>
+
     <!-- sets release.number and api.version -->
     <target name="getReleaseNumber">
         <loadfile srcfile="core/java/src/net/i2p/CoreVersion.java" property="release.number">
