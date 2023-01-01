@@ -13,11 +13,12 @@ export GMP_VER=6.2.1
 export GMP_TARVER=${GMP_VER}
 export GMP_DIR="gmp-$GMP_VER"
 export GMP_TAR="gmp-$GMP_TARVER.tar.bz2"
-
+export GMP_TAR_MIRROR="https://ftp.gnu.org/gnu/gmp/" # This mirror works
+#export GMP_TAR_MIRROR="https://gmplib.org/download/gmp/" #This is the upstream, but they have an expired TLS certificate.
 
 download_tar()
 {
-  GMP_TAR_URL="https://gmplib.org/download/gmp/${GMP_TAR}"
+  GMP_TAR_URL="${GMP_TAR_MIRROR}${GMP_TAR}"
   if [ $(which wget) ]; then
     echo "Downloading $GMP_TAR_URL"
     wget -N --progress=dot $GMP_TAR_URL
