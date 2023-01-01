@@ -384,7 +384,7 @@ public class I2PSnarkServlet extends BasicServlet {
         String newURL = req.getParameter("newURL");
         if (newURL != null && newURL.trim().length() > 0 && req.getMethod().equals("GET"))
             _manager.addMessage(_t("Click \"Add torrent\" button to fetch torrent"));
-        out.write("<div class=\"page\"><div id=\"mainsection\" class=\"mainsection\">");
+        out.write("<div id=\"page\" class=\"page\"><div id=\"mainsection\" class=\"mainsection\">");
 
         writeMessages(out, isConfigure, peerString);
 
@@ -1337,6 +1337,9 @@ public class I2PSnarkServlet extends BasicServlet {
         } else if ("Create".equals(action)) {
             String baseData = req.getParameter("nofilter_baseFile");
             if (baseData != null && baseData.trim().length() > 0) {
+                // drag and drop, no js
+                if (baseData.startsWith("file://"))
+                    baseData = baseData.substring(7);
                 File baseFile = new File(baseData.trim());
                 if (!baseFile.isAbsolute())
                     baseFile = new File(_manager.getDataDir(), baseData);
@@ -2312,19 +2315,19 @@ public class I2PSnarkServlet extends BasicServlet {
 
         out.write("<hr>\n<table border=\"0\"><tr><td>");
         out.write(_t("From URL"));
-        out.write(":<td><input type=\"text\" name=\"nofilter_newURL\" size=\"85\" value=\"" + newURL + "\" spellcheck=\"false\"" +
+        out.write(":<td><input type=\"text\" id=\"nofilter_newURL\" name=\"nofilter_newURL\" size=\"85\" value=\"" + newURL + "\" spellcheck=\"false\"" +
                   " title=\"");
         out.write(_t("Enter the torrent file download URL (I2P only), magnet link, or info hash"));
         out.write("\">\n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>");
-        out.write("<input type=\"submit\" class=\"add\" value=\"");
+        out.write("<input type=\"submit\" id=\"addButton\" class=\"add\" value=\"");
         out.write(_t("Add torrent"));
         out.write("\" name=\"foo\" ><br>\n" +
                   "<tr><td>");
 
         out.write(_t("Data dir"));
-        out.write(":<td><input type=\"text\" name=\"nofilter_newDir\" size=\"85\" value=\"\" spellcheck=\"false\"" +
+        out.write(":<td><input type=\"text\" id=\"nofilter_newDir\" name=\"nofilter_newDir\" size=\"85\" value=\"\" spellcheck=\"false\"" +
                   " title=\"");
         out.write(_t("Enter the directory to save the data in (default {0})", _manager.getDataDir().getAbsolutePath()));
         out.write("\"></td></tr>\n");
@@ -2350,11 +2353,11 @@ public class I2PSnarkServlet extends BasicServlet {
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
         out.write(_t("Data to seed"));
         out.write(":<td>"
-                  + "<input type=\"text\" name=\"nofilter_baseFile\" size=\"85\" value=\""
+                  + "<input type=\"text\" id=\"nofilter_baseFile\" name=\"nofilter_baseFile\" size=\"85\" value=\""
                   + "\" spellcheck=\"false\" title=\"");
         out.write(_t("File or directory to seed (full path or within the directory {0} )",
                     _manager.getDataDir().getAbsolutePath() + File.separatorChar));
-        out.write("\" > <input type=\"submit\" class=\"create\" value=\"");
+        out.write("\" > <input type=\"submit\" id=\"createButton\" class=\"create\" value=\"");
         out.write(_t("Create torrent"));
         out.write("\" name=\"foo\" >" +
                   "<tr><td>\n");
