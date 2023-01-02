@@ -30,13 +30,13 @@ public class TunnelHistory {
     private RateStat _failRate;
     private final String _statGroup;
     
-    /** probabalistic tunnel rejection due to a flood of requests - essentially unused */
+    /** probabalistic tunnel rejection due to a flood of requests - infrequent */
     public static final int TUNNEL_REJECT_PROBABALISTIC_REJECT = 10;
-    /** tunnel rejection due to temporary cpu/job/tunnel overload - essentially unused */
+    /** tunnel rejection due to temporary cpu/job/tunnel overload - rare */
     public static final int TUNNEL_REJECT_TRANSIENT_OVERLOAD = 20;
-    /** tunnel rejection due to excess bandwidth usage */
+    /** tunnel rejection due to excess bandwidth usage - used for most rejections even if not really for bandwidth */
     public static final int TUNNEL_REJECT_BANDWIDTH = 30;
-    /** tunnel rejection due to system failure - essentially unused */
+    /** tunnel rejection due to system failure - not currently used */
     public static final int TUNNEL_REJECT_CRIT = 50;
     
     public TunnelHistory(RouterContext context, String statGroup) {
