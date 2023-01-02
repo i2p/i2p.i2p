@@ -157,6 +157,13 @@ echo "INCLUDES:$INCLUDES"
 
 echo "Compiling C code..."
 rm -f ${LIBFILE}
-"${CC_PREFIX}""${CC}" ${CFLAGS} ${LDFLAGS} ${INCLUDES} "${WINDOWS_INCLUDES}" "${WINDOWS_INCLUDES_HOST}" src/*.c -o "${LIBFILE}" || (echo "Failed to compile ${LIBFILE}"; exit 1)
+case "$TARGET" in
+    MINGW*|CYGWIN*|windows*)
+        "${CC_PREFIX}""${CC}" ${CFLAGS} ${LDFLAGS} ${INCLUDES} "${WINDOWS_INCLUDES}" "${WINDOWS_INCLUDES_HOST}" src/*.c -o "${LIBFILE}" || (echo "Failed to compile ${LIBFILE}"; exit 1)
+        ;;
+    *)
+        "${CC_PREFIX}""${CC}" ${CFLAGS} ${LDFLAGS} ${INCLUDES} src/*.c -o "${LIBFILE}" || (echo "Failed to compile ${LIBFILE}"; exit 1)
+        ;;
+esac
 "${CC_PREFIX}"strip "${LIBFILE}" || (echo "Failed to strip ${LIBFILE}" ; exit 1)
 echo Built "$(dirname "$0")"/"${LIBFILE}"
