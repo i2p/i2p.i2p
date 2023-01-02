@@ -35,12 +35,13 @@ class CapacityCalculator {
     public static double calc(PeerProfile profile) {
         double capacity;
 
+        TunnelHistory history = profile.getTunnelHistory();
         if (tooOld(profile)) { 
             capacity = 1;
         } else {
             RateStat acceptStat = profile.getTunnelCreateResponseTime();
-            RateStat rejectStat = profile.getTunnelHistory().getRejectionRate();
-            RateStat failedStat = profile.getTunnelHistory().getFailedRate();
+            RateStat rejectStat = history.getRejectionRate();
+            RateStat failedStat = history.getFailedRate();
         
             double capacity10m = estimateCapacity(acceptStat, rejectStat, failedStat, 10*60*1000);
             // if we actively know they're bad, who cares if they used to be good?
@@ -62,9 +63,9 @@ class CapacityCalculator {
         // incremented the rejection counter, since they were only temporary)
         RouterContext context = profile.getContext();
         long now = context.clock().now();
-        if (profile.getTunnelHistory().getLastRejectedTransient() > now - 5*60*1000)
+        if (history.getLastRejectedTransient() > now - 5*60*1000)
             capacity = 1;
-        else if (profile.getTunnelHistory().getLastRejectedProbabalistic() > now - 5*60*1000)
+        else if (history.getLastRejectedProbabalistic() > now - 5*60*1000)
             capacity -= context.random().nextInt(5);
 
         // boost new profiles
