@@ -40,7 +40,7 @@ if [ -z "$BITS" ]; then
   elif test "${UNAME#*aarch64}" != "$UNAME"; then
     BITS=64
   else
- 
+
     echo "Unable to detect default setting for BITS variable"
     exit 1
   fi
@@ -102,7 +102,9 @@ case "$TARGET" in
     MINGW*|CYGWIN*|windows*)
         [ -z "$JAVA_HOME" ] && JAVA_HOME="/c/software/j2sdk1.4.2_05"
         CFLAGS="${CFLAGS} -Wall"
-        INCLUDES="-I. -Iinclude -I\"${JAVA_HOME}/include/\" -I\"${JAVA_HOME}/include/$HOST/\""
+        INCLUDES="-I. -Iinclude"
+        WINDOWS_INCLUDES=-I"${JAVA_HOME}/include/"
+        WINDOWS_INCLUDES_HOST=-I"${JAVA_HOME}/include/$HOST/"
         LDFLAGS="${LDFLAGS} -shared -static -static-libgcc -Wl,--kill-at"
         LIBFILE="lib/freenet/support/CPUInformation/jcpuid-${ARCH}-windows.dll";;
     Darwin*)
@@ -155,6 +157,6 @@ echo "INCLUDES:$INCLUDES"
 
 echo "Compiling C code..."
 rm -f ${LIBFILE}
-"${CC_PREFIX}""${CC}" ${CFLAGS} ${LDFLAGS} ${INCLUDES} src/*.c -o "${LIBFILE}" || (echo "Failed to compile ${LIBFILE}"; exit 1)
+"${CC_PREFIX}""${CC}" ${CFLAGS} ${LDFLAGS} ${INCLUDES} "${WINDOWS_INCLUDES}" "${WINDOWS_INCLUDES_HOST}" src/*.c -o "${LIBFILE}" || (echo "Failed to compile ${LIBFILE}"; exit 1)
 "${CC_PREFIX}"strip "${LIBFILE}" || (echo "Failed to strip ${LIBFILE}" ; exit 1)
 echo Built "$(dirname "$0")"/"${LIBFILE}"
