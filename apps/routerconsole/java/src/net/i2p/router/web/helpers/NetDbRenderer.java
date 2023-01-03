@@ -847,6 +847,7 @@ class NetDbRenderer {
 
     /**
      *  @param mode 0: charts only; 1: full routerinfos; 2: abbreviated routerinfos
+     *         mode 3: Same as 0 but sort countries by count
      */
     public void renderStatusHTML(Writer out, int pageSize, int page, int mode) throws IOException {
         if (!_context.netDb().isInitialized()) {
@@ -1005,9 +1006,24 @@ class NetDbRenderer {
         // country table
         List<String> countryList = new ArrayList<String>(countries.objects());
         if (!countryList.isEmpty()) {
-            Collections.sort(countryList, new CountryComparator());
+            if (mode == 3)
+                Collections.sort(countryList, new CountryCountComparator(countries));
+            else
+                Collections.sort(countryList, new CountryComparator());
             buf.append("<table id=\"netdbcountrylist\">\n");
-            buf.append("<tr><th align=\"left\">" + _t("Country") + "</th><th>" + _t("Count") + "</th></tr>\n");
+            buf.append("<tr><th align=\"left\">");
+            if (mode == 3)
+                buf.append("<a href=\"/netdb\" title=\"").append(_t("Sort by country")).append("\">");
+            buf.append(_t("Country"));
+            if (mode == 3)
+                buf.append("</a>");
+            buf.append("</th><th>");
+            if (mode == 0)
+                buf.append("<a href=\"/netdb?s=1\" title=\"").append(_t("Sort by count")).append("\">");
+            buf.append(_t("Count"));
+            if (mode == 0)
+                buf.append("</a>");
+            buf.append("</th></tr>\n");
             for (String country : countryList) {
                 int num = countries.count(country);
                 buf.append("<tr><td><a href=\"/netdb?c=").append(country).append("\">");
@@ -1068,6 +1084,31 @@ class NetDbRenderer {
          }
 
          public int compare(String l, String r) {
+             return coll.compare(getTranslatedCountry(l),
+                                 getTranslatedCountry(r));
+        }
+    }
+
+    /**
+     *  Reverse sort by count, then forward by translated name.
+     *
+     *  @since 0.9.57
+     */
+    private class CountryCountComparator implements Comparator<String> {
+         private static final long serialVersionUID = 1L;
+         private final ObjectCounter<String> counts;
+         private final Collator coll;
+
+         public CountryCountComparator(ObjectCounter<String> counts) {
+             super();
+             this.counts = counts;
+             coll = Collator.getInstance(new Locale(Messages.getLanguage(_context)));
+         }
+
+         public int compare(String l, String r) {
+             int rv = counts.count(r) - counts.count(l);
+             if (rv != 0)
+                 return rv;
              return coll.compare(getTranslatedCountry(l),
                                  getTranslatedCountry(r));
         }

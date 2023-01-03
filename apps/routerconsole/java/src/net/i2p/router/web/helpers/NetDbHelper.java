@@ -25,7 +25,7 @@ public class NetDbHelper extends FormHandler {
     private String _routerPrefix;
     private String _version;
     private String _country;
-    private String _family, _caps, _ip, _sybil, _mtu, _ssucaps, _ipv6, _transport, _hostname;
+    private String _family, _caps, _ip, _sybil, _mtu, _ssucaps, _ipv6, _transport, _hostname, _sort;
     private int _full, _port, _cost, _page, _mode;
     private long _date;
     private int _limit = DEFAULT_LIMIT;
@@ -217,6 +217,12 @@ public class NetDbHelper extends FormHandler {
                 _page = 0;
         } catch (NumberFormatException nfe) {}
     }
+
+
+    /** @since 0.9.57 */
+    public void setSort(String f) {
+        _sort = f;
+    }
     
     /**
      *  call for non-text-mode browsers
@@ -309,6 +315,8 @@ public class NetDbHelper extends FormHandler {
             } else if (_full == 4) {
                 renderLookupForm();
             } else {
+                if (_full == 0 && _sort != null)
+                    _full = 3;
                 renderer.renderStatusHTML(_out, _limit, _page, _full);
             }
         } catch (IOException ioe) {

@@ -38,6 +38,7 @@
  <jsp:setProperty name="formhandler" property="mode" value="<%=request.getParameter(\"m\")%>" />
  <jsp:setProperty name="formhandler" property="date" value="<%=request.getParameter(\"date\")%>" />
  <jsp:setProperty name="formhandler" property="leaseset" value="<%=request.getParameter(\"ls\")%>" />
+ <jsp:setProperty name="formhandler" property="sort" value="<%=request.getParameter(\"s\")%>" />
 <%@include file="formhandler.jsi" %>
  <jsp:getProperty name="formhandler" property="netDbSummary" />
 </div></body></html>
