@@ -238,7 +238,7 @@ public class PeerHelper extends HelperBase {
                         total += counts[idx + i];
                     }
                     if (total <= 0)
-                        buf.append("<img src=\"themes/console/images/info/infowarn.png\"> ");
+                        buf.append("<b>**</b> ");
                     else
                         totals[0] += total;
                     buf.append(total);
@@ -251,7 +251,7 @@ public class PeerHelper extends HelperBase {
                         buf.append("</td><td align=\"center\">");
                         if (cnt <= 0) {
                             if ((i & 0x01) != 0 || warnInbound)
-                                buf.append("<img src=\"themes/console/images/info/infohelp.png\"> ");
+                                buf.append("<b>**</b> ");
                         } else {
                             totals[i + 1] += cnt;
                         }
@@ -271,7 +271,7 @@ public class PeerHelper extends HelperBase {
                     buf.append("</th><th align=\"center\">");
                     if (cnt <= 0) {
                         if ((i & 0x01) == 0 || warnInbound)
-                            buf.append("<img src=\"themes/console/images/info/infowarn.png\"> ");
+                            buf.append("<b>**</b> ");
                     }
                     buf.append("<b>").append(cnt).append("</b");
                 }
