@@ -1,3 +1,14 @@
+2023-01-03 zzz
+ * Console: Add link to sort netdb country chart by count
+
+2023-01-01 zzz
+ * GeoIP 2023-01-01
+ * I2CP: Reduce session limit to 50, limit is 0 for vmCommSystem
+ * i2psnark:
+   - Add missing button icons (dark/light themes)
+   - Prep for JS DnD (Gitlab MR !73)
+ * i2ptunnel: Do not retry if session limit exceeded
+
 2022-12-31 zzz
  * Console: Change color palette for graphs on dark theme
  * i2psnark:
