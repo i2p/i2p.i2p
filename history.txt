@@ -1,3 +1,9 @@
+2023-01-08 zzz
+ * AppArmor: Allow classes.jsa in other locations
+ * SSU:
+   - Fix NPE handling SSU1 peer test msg 7
+   - Build fix for Java 7
+
 2023-01-03 zzz
  * Console: Add link to sort netdb country chart by count
 
