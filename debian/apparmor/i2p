@@ -41,9 +41,7 @@
   /usr/lib/jvm/*/jre/bin/java                             rix,
   /usr/lib/jvm/*/jre/bin/keytool                          rix,
 
-  # */client/classes.jsa is only found (and needed) in 32-bit JVMs.
-  /usr/lib/jvm/*/jre/lib/i386/client/classes.jsa          m,
-  /usr/lib/jvm/*/jre/lib/i386/client/classes.jsa          m,
+  /usr/lib/jvm/**/classes.jsa                             m,
 
   # needed for I2P's graphs
   /usr/share/java/java-atk-wrapper.jar                    r,
