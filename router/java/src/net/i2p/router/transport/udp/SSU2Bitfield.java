@@ -24,13 +24,6 @@ class SSU2Bitfield {
     // before offset
     private int highestSet = -1;
 
-    private static final long[] MASKS = new long[64];
-    static {
-        for (int i = 0; i < 64; i++) {
-            MASKS[i] = 1L << i;
-        }
-    }
-
     /**
      * Creates a new SSU2Bitfield that represents <code>size</code> unset bits.
      */
@@ -99,7 +92,7 @@ class SSU2Bitfield {
                 bit -= shift;
             }
             int index = (int) (bit >> 6);
-            long mask = MASKS[((int) bit) & 0x3F];
+            long mask = 1L << (((int) bit) & 0x3F);
             rv = (bitfield[index] & mask) != 0;
             if (!rv) {
                 bitfield[index] |= mask;
@@ -123,7 +116,7 @@ class SSU2Bitfield {
         if (bit < 0 || bit >= size)
             return false;
         int index = (int) (bit >> 6);
-        long mask = MASKS[(int) (bit & 0x3F)];
+        long mask = 1L << (((int) bit) & 0x3F);
         return (bitfield[index] & mask) != 0;
     }
 
