@@ -1,3 +1,9 @@
+i2p (2.1.0-1ubuntu1) focal; urgency=medium
+
+  * New upstream version 2.1.0
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 11 Jan 2023 12:12:12 +0000
+
 i2p (2.0.0-2ubuntu1) focal; urgency=medium
 
   * Fix stray char in links file causing symlinks in /

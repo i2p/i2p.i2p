@@ -1,2 +1,3 @@
 0001-path-substitution.patch
 0002-jetty-compatibility.patch
+0004-getopt-build.patch
