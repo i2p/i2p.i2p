@@ -26,7 +26,7 @@ public class NetDbHelper extends FormHandler {
     private String _version;
     private String _country;
     private String _family, _caps, _ip, _sybil, _mtu, _ssucaps, _ipv6, _transport, _hostname, _sort;
-    private int _full, _port, _cost, _page, _mode;
+    private int _full, _port, _cost, _page, _mode, _highPort;
     private long _date;
     private int _limit = DEFAULT_LIMIT;
     private boolean _lease;
@@ -116,8 +116,16 @@ public class NetDbHelper extends FormHandler {
 
     /** @since 0.9.28 */
     public void setPort(String f) {
+        if (f == null)
+            return;
         try {
-            _port = Integer.parseInt(f);
+            int dash = f.indexOf('-');
+            if (dash > 0) {
+                _port = Integer.parseInt(f.substring(0, dash).trim());
+                _highPort = Integer.parseInt(f.substring(dash + 1).trim());
+            } else {
+                _port = Integer.parseInt(f.trim());
+            }
         } catch (NumberFormatException nfe) {}
     }
 
@@ -300,7 +308,7 @@ public class NetDbHelper extends FormHandler {
                 _ssucaps != null || _transport != null || _cost != 0 || _etype != null) {
                 renderer.renderRouterInfoHTML(_out, _limit, _page,
                                               _routerPrefix, _version, _country,
-                                              _family, _caps, _ip, _sybil, _port, _type, _etype,
+                                              _family, _caps, _ip, _sybil, _port, _highPort, _type, _etype,
                                               _mtu, _ipv6, _ssucaps, _transport, _cost);
             } else if (_lease) {
                 renderer.renderLeaseSetHTML(_out, _debug);
@@ -423,7 +431,7 @@ public class NetDbHelper extends FormHandler {
                    "<tr><td>IP:</td><td><input type=\"text\" name=\"ip\"></td><td>IPv4 or IPv6, /24,/16,/8 suffixes optional for IPv4, prefix ok for IPv6</td></tr>\n" +
                    "<tr><td>IPv6 Prefix:</td><td><input type=\"text\" name=\"ipv6\"></td><td></td></tr>\n" +
                    "<tr><td>" + _t("MTU") + ":</td><td><input type=\"text\" name=\"mtu\"></td><td></td></tr>\n" +
-                   "<tr><td>" + _t("Port") + ":</td><td><input type=\"text\" name=\"port\"></td><td></td></tr>\n" +
+                   "<tr><td>" + _t("Port") + " or Port Range:</td><td><input type=\"text\" name=\"port\"></td><td>e.g. 1024-1028</td></tr>\n" +
                    "<tr><td>Signature Type:</td><td><select name=\"type\"><option value=\"\" selected=\"selected\"></option>");
         for (SigType type : EnumSet.allOf(SigType.class)) {
             _out.write("<option value=\"" + type + "\">" + type + "</option>\n");
