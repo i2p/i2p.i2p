@@ -204,14 +204,15 @@ class Connection {
      */
     public boolean packetSendChoke(long timeoutMs) throws IOException, InterruptedException {
         long start = _context.clock().now();
+        long now = start;
         long writeExpire = start + timeoutMs;  // only used if timeoutMs > 0
         boolean started = false;
         while (true) {
-            long timeLeft = writeExpire - _context.clock().now();
+            long timeLeft = writeExpire - now;
             synchronized (_outboundPackets) {
                 if (!started)
                     _context.statManager().addRateData("stream.chokeSizeBegin", _outboundPackets.size());
-                if (start + 5*60*1000 < _context.clock().now()) // ok, 5 minutes blocking?  I dont think so
+                if (start + 5*60*1000 < now) // ok, 5 minutes blocking?  I dont think so
                     return false;
                 
                 // no need to wait until the other side has ACKed us before sending the first few wsize
@@ -265,6 +266,7 @@ class Connection {
                             throw ie;
                         } //10*1000
                     }
+                    now = _context.clock().now();
                 } else {
                     _context.statManager().addRateData("stream.chokeSizeEnd", _outboundPackets.size());
                     return true;
@@ -352,7 +354,7 @@ class Connection {
         // this just sends the packet - no retries or whatnot
         if (_outboundQueue.enqueue(reply)) {
             _unackedPacketsReceived.set(0);
-            _lastSendTime = _context.clock().now();
+            _lastSendTime = now;
             resetActivityTimer();
         }
     }
@@ -1197,7 +1199,8 @@ class Connection {
      * timeout period, setting the error accordingly.
      */
     void waitForConnect() {
-        long expiration = _context.clock().now() + _options.getConnectTimeout();
+        long now = _context.clock().now();
+        long expiration = now + _options.getConnectTimeout();
         while (true) {
             if (_connected.get() && (_receiveStreamId.get() > 0) && (_sendStreamId.get() > 0) ) {
                 // w00t
@@ -1217,7 +1220,7 @@ class Connection {
                 return;
             }
             
-            long timeLeft = expiration - _context.clock().now();
+            long timeLeft = expiration - now;
             if ( (timeLeft <= 0) && (_options.getConnectTimeout() > 0) ) {
                 if (_connectionError == null) {
                     _connectionError = "Connection timed out";
@@ -1323,8 +1326,9 @@ class Connection {
                         _log.warn("Closing (inactivity) " + toString());
                     if (_log.shouldLog(Log.DEBUG)) {
                         StringBuilder buf = new StringBuilder(128);
-                        buf.append("last sent was: ").append(_context.clock().now() - _lastSendTime);
-                        buf.append("ms ago, last received was: ").append(_context.clock().now()-_lastReceivedOn);
+                        long now = _context.clock().now();
+                        buf.append("last sent was: ").append(now - _lastSendTime);
+                        buf.append("ms ago, last received was: ").append(now -_lastReceivedOn);
                         buf.append("ms ago, inactivity timeout is: ").append(_options.getInactivityTimeout());
                         _log.debug(buf.toString());
                     }
@@ -1380,7 +1384,8 @@ class Connection {
             buf.append(_remotePeer.toBase32());
         else
             buf.append("unknown");
-        buf.append(" up ").append(DataHelper.formatDuration(_context.clock().now() - _createdOn));
+        long now = _context.clock().now();
+        buf.append(" up ").append(DataHelper.formatDuration(now - _createdOn));
         buf.append(" wsize: ").append(_options.getWindowSize());
         buf.append(" cwin: ").append(_congestionWindowEnd - _highestAckedThrough);
         buf.append(" rtt: ").append(_options.getRTT());
@@ -1406,17 +1411,17 @@ class Connection {
         }
         
         if (getResetSent())
-            buf.append(" reset sent ").append(DataHelper.formatDuration(_context.clock().now() - getResetSentOn())).append(" ago");
+            buf.append(" reset sent ").append(DataHelper.formatDuration(now - getResetSentOn())).append(" ago");
         if (getResetReceived())
-            buf.append(" reset rcvd ").append(DataHelper.formatDuration(_context.clock().now() - getDisconnectScheduledOn())).append(" ago");
+            buf.append(" reset rcvd ").append(DataHelper.formatDuration(now - getDisconnectScheduledOn())).append(" ago");
         if (getCloseSentOn() > 0) {
             buf.append(" close sent ");
-            long timeSinceClose = _context.clock().now() - getCloseSentOn();
+            long timeSinceClose = now - getCloseSentOn();
             buf.append(DataHelper.formatDuration(timeSinceClose));
             buf.append(" ago");
         }
         if (getCloseReceivedOn() > 0)
-            buf.append(" close rcvd ").append(DataHelper.formatDuration(_context.clock().now() - getCloseReceivedOn())).append(" ago");
+            buf.append(" close rcvd ").append(DataHelper.formatDuration(now - getCloseReceivedOn())).append(" ago");
         buf.append(" sent: ").append(1 + _lastSendId.get());
         buf.append(" rcvd: ").append(1 + _inputStream.getHighestBlockId() - missing);
         buf.append(" ackThru ").append(_highestAckedThrough);
