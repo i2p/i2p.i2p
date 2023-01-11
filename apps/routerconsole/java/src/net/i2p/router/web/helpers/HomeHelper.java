@@ -315,17 +315,22 @@ public class HomeHelper extends HelperBase {
                 url = app.url;
                 // check for disabled webapps and other things
                 if (url.equals("/dns")) {
-                    if (!pm.isRegistered("susidns"))
+                    if (!pm.isRegistered(PortMapper.SVC_SUSIDNS))
                         continue;
                 } else if (url.equals("/webmail")) {
-                    if (!pm.isRegistered("susimail"))
+                    if (!pm.isRegistered(PortMapper.SVC_SUSIMAIL))
                         continue;
                 } else if (url.equals("/torrents")) {
-                    if (!pm.isRegistered("i2psnark"))
+                    if (!pm.isRegistered(PortMapper.SVC_I2PSNARK))
                         continue;
                 } else if (url.equals("/i2ptunnelmgr")) {
-                    if (!pm.isRegistered("i2ptunnel"))
+                    if (!pm.isRegistered(PortMapper.SVC_I2PTUNNEL))
                         continue;
+                    // need both webapp and TCG, but we aren't refreshing
+                    // the icons, so let's not do this
+                    //ClientAppManager cmgr = _context.clientAppManager();
+                    //if (cmgr != null && cmgr.getRegisteredApp("i2ptunnel") == null)
+                    //    continue;
                 } else if (url.equals("/configplugins")) {
                     if (!PluginStarter.pluginsEnabled(_context))
                         continue;

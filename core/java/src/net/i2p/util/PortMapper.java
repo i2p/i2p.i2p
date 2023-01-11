@@ -60,6 +60,10 @@ public class PortMapper {
     /**
      *  To indicate presence, alternative to WebAppStarter.isWebappRunning().
      *  For actual base URL, use getConsoleURL()
+     *
+     *  Note: This is only the webapp. Also requires TCG running to be useful.
+     *  The webapp does not start TCG.
+     *
      *  @since 0.9.34
      */
     public static final String SVC_I2PTUNNEL = "i2ptunnel";
