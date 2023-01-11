@@ -31,7 +31,6 @@
         <echo message="  installer-windows: build the GUI installer (Windows only)" />
         <echo message="  installer-nowindows: build the GUI installer (all but Windows)" />
         <echo message="  installer5, installer5-linux, installer5-nowindows, installer5-windows: use IzPack 5" />
-        <echo message="  bundle:    (GIT ONLY!) generate a git bundle and a corresponding torrent." />
         <echo message="  tarball:   tar the full install into i2p.tar.bz2 (extracts to build a new clean install)" />
         <echo message="  git-bundle:    (GIT ONLY!) generate a git bundle and a corresponding torrent." />
         <!--<echo message="  bundleRelease:    (GIT ONLY!) generate a git bundle only up to the most recent tag, and a corresponding torrent." />-->
@@ -3051,6 +3050,8 @@
 		<checksum file="portable-win32.zip" forceOverwrite="yes"/>
 		<move file="portable" tofile="pkg-temp"/>
 	</target>
+
+    <target name="bundle" depends="git-bundle"/>
     <target name="git-bundle" depends="pkg">
         <exec executable="git" failonerror="true">
             <arg value="bundle" />
