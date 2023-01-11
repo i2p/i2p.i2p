@@ -74,6 +74,7 @@
 <b>Processor:</b> <%=net.i2p.util.NativeBigInteger.cpuModel()%> (<%=net.i2p.util.NativeBigInteger.cpuType()%>)<br>
 <b>JBigI status:</b> <%=net.i2p.util.NativeBigInteger.loadStatus()%><br>
 <b>Encoding:</b> <%=System.getProperty("file.encoding")%><br>
-<b>Charset:</b> <%=java.nio.charset.Charset.defaultCharset().name()%></p>
-<p><%=intl._t("Note that system information, log timestamps, and log messages may provide clues to your location; please review everything you include in a bug report.")%></p>
+<b>Charset:</b> <%=java.nio.charset.Charset.defaultCharset().name()%><br>
+<b>Service:</b> <%=net.i2p.util.SystemVersion.isService()%><br>
+</p><p><%=intl._t("Note that system information, log timestamps, and log messages may provide clues to your location; please review everything you include in a bug report.")%></p>
 </div></body></html>
