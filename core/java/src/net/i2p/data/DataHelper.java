@@ -528,6 +528,8 @@ public class DataHelper {
         try {
             fos = new SecureFileOutputStream(tmpFile);
             out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(fos, "UTF-8")));
+            if (file.getName().equals("router.config"))
+                out.println("# WARNING: Do NOT copy this file from one router to another, this may cause serious problems.");
             out.println("# NOTE: This I2P config file must use UTF-8 encoding");
             out.println("# Last saved: " + formatTime(System.currentTimeMillis()));
             for (Map.Entry<Object, Object> entry : props.entrySet()) {
