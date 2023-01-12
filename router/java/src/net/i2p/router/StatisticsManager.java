@@ -35,16 +35,19 @@ public class StatisticsManager {
     private final String _networkID;
     
     public final static String PROP_PUBLISH_RANKINGS = "router.publishPeerRankings";
-    private static final String PROP_CONTACT_NAME = "netdb.contact";
+    //private static final String PROP_CONTACT_NAME = "netdb.contact";
     /** enhance anonymity by only including build stats one out of this many times */
     private static final int RANDOM_INCLUDE_STATS = 16;
+    //// remove after release ////
+    private static final boolean SIMPLE_STATS = CoreVersion.PUBLISHED_VERSION.equals("0.9.58");
 
     private final DecimalFormat _fmt;
     private final DecimalFormat _pct;
 
     public StatisticsManager(RouterContext context) {
         _context = context;
-        _fmt = new DecimalFormat("###,##0.00", new DecimalFormatSymbols(Locale.UK));
+        _fmt = SIMPLE_STATS ? new DecimalFormat("0.00") :
+                              new DecimalFormat("###,##0.00", new DecimalFormatSymbols(Locale.UK));
         _pct = new DecimalFormat("#0.00%", new DecimalFormatSymbols(Locale.UK));
         _log = context.logManager().getLog(StatisticsManager.class);
         // null for some tests
@@ -238,7 +241,25 @@ public class StatisticsManager {
         }
     }
     
+    /**
+     *  Simple format, only what stats.i2p needs:
+     *<pre>
+     *  average
+     *</pre>
+     *
+     *  Previous format:
+     *<pre>
+     *  avg;extreme avg;pct of lifetime avg;
+     *  if lifetime total event time greater than zero:
+     *       lastEventSaturation;lastSaturationLimit;extremeEventSaturation;extremeSaturationLimit;
+     *  event count;
+     *  if number of periods greater than zero:
+     *       avg freq;exteremeEventCount;lifetimeEventCount;
+     *</pre>
+     */
     private String renderRate(Rate rate, boolean fudgeQuantity) {
+        if (SIMPLE_STATS)
+            return num(rate.getAverageValue());
         StringBuilder buf = new StringBuilder(128);
         buf.append(num(rate.getAverageValue())).append(';');
         buf.append(num(rate.getExtremeAverageValue())).append(';');
@@ -296,7 +317,17 @@ public class StatisticsManager {
         }
     }
     
+    /**
+     *  Simple format, only what stats.i2p needs:
+     *<pre>
+     *  0;0;0;percent or event count
+     *</pre>
+     *
+     *  Previous format: see above
+     */
     private String renderRate(Rate rate, double fudgeQuantity) {
+        if (SIMPLE_STATS)
+            return "0;0;0;" + num(fudgeQuantity);
         StringBuilder buf = new StringBuilder(128);
         buf.append(num(rate.getAverageValue())).append(';');
         buf.append(num(rate.getExtremeAverageValue())).append(';');
@@ -310,6 +341,7 @@ public class StatisticsManager {
     }
 
     /* report the same data for tx and rx, for enhanced anonymity */
+/*
     private void includeAverageThroughput(Properties stats) {
         RateStat sendRate = _context.statManager().getRate("bw.sendRate");
         RateStat recvRate = _context.statManager().getRate("bw.recvRate");
@@ -325,6 +357,7 @@ public class StatisticsManager {
         stats.setProperty("stat_bandwidthSendBps.60m", str);
         stats.setProperty("stat_bandwidthReceiveBps.60m", str);
     }
+*/
 
     private static String getPeriod(Rate rate) { return DataHelper.formatDuration(rate.getPeriod()); }
 
