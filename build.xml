@@ -3052,7 +3052,7 @@
 	</target>
 
     <target name="bundle" depends="git-bundle"/>
-    <target name="git-bundle" depends="pkg">
+    <target name="git-bundle" depends="buildI2PSnark">
         <exec executable="git" failonerror="true">
             <arg value="bundle" />
             <arg value="create" />
