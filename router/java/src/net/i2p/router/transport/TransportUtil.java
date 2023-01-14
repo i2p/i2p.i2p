@@ -299,7 +299,9 @@ public abstract class TransportUtil {
      */
     public static boolean isValidPort(int port) {
         // update log message below if you update this list
-        return port >= 1024 &&
+        // do the fast check first
+        return (port >= MIN_RANDOM_PORT && port <= MAX_RANDOM_PORT) || (
+               port >= 1024 &&
                port <= 65535 &&
                port != 1900 &&  // UPnP SSDP
                port != 1719 &&  // H.323
@@ -316,14 +318,14 @@ public abstract class TransportUtil {
                (!(port >= 6665 && port <= 6669)) && // IRC and alternates
                port != 6697 &&  // IRC+TLS
                (!(port >= 7650 && port <= 7668)) && // standard I2P range
+               port != 7070 &&  // i2pd console
                port != 9001 &&  // Tor
                port != 9030 &&  // Tor
                port != 9050 &&  // Tor
                port != 9100 &&  // network printer
                port != 9150 &&  // Tor browser
-               // do not block anything in 9151 - 30777, this is the standard random selection range
                port != 31000 && // Wrapper
-               port != 32000;   // Wrapper
+               port != 32000);   // Wrapper
     }
 
     /**
@@ -332,7 +334,7 @@ public abstract class TransportUtil {
      */
     public static void logInvalidPort(Log log, String transportStyle, int port) {
         log.error("Specified " + transportStyle + " port " + port + " is not valid, selecting a new port");
-        log.error("Invalid ports are: 0-1023, 1719, 1720, 1900, 2049, 2827, 3659, 4045, 4444, 4445, 5060, 5061, 6000, 6665-6669, 6697, 7650-7668, 9001, 9030, 9050, 9100, 9150, 31000, 32000, 65536+");
+        log.error("Invalid ports are: 0-1023, 1719, 1720, 1900, 2049, 2827, 3659, 4045, 4444, 4445, 5060, 5061, 6000, 6665-6669, 6697, 7650-7668, 7070, 9001, 9030, 9050, 9100, 9150, 31000, 32000, 65536+");
     }
 
     /**
