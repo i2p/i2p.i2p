@@ -783,6 +783,11 @@ class NetDbRenderer {
                 buf.append("&nbsp;&nbsp;<b>RAR?</b> ").append(ls.getReceivedAsReply());
                 buf.append("&nbsp;&nbsp;<b>Distance: </b>").append(distance);
                 buf.append("&nbsp;&nbsp;<b>").append(_t("Type")).append(": </b>").append(type);
+                byte[] padding = dest.getPadding();
+                if (padding != null && padding.length >= 64) {
+                    if (DataHelper.eq(padding, 0, padding, 32, 32))
+                        buf.append("&nbsp;&nbsp;<b>Compressible?</b> true");
+                }
                 if (type != DatabaseEntry.KEY_TYPE_LEASESET) {
                     LeaseSet2 ls2 = (LeaseSet2) ls;
                     buf.append("&nbsp;&nbsp;<b>Unpublished? </b>").append(ls2.isUnpublished());
@@ -826,7 +831,6 @@ class NetDbRenderer {
                 buf.append("</td></tr>\n<tr><td colspan=\"2\">");
                 buf.append("<b>Routing Key:</b> ").append(ls.getRoutingKey().toBase64());
                 buf.append("</td></tr>");
-
             }
 
             buf.append("\n<tr><td colspan=\"2\"><ul class=\"netdb_leases\">");
@@ -1189,11 +1193,19 @@ class NetDbRenderer {
             buf.append("<td><b>").append(_t("Published")).append("</td><td colspan=\"2\">:</b> in ")
                .append(DataHelper.formatDuration2(0-age)).append("<span class=\"netdb_info\">???</span>");
         }
+        boolean debug = _context.getBooleanProperty(HelperBase.PROP_ADVANCED);
         if (full) {
             buf.append("</td></tr><tr><td><b>").append(_t("Signing Key")).append(":</b></td><td colspan=\"2\">")
                .append(info.getIdentity().getSigningPublicKey().getType());
             buf.append("</td></tr><tr><td><b>").append(_t("Encryption Key")).append(":</b></td><td colspan=\"2\">")
                .append(info.getIdentity().getPublicKey().getType());
+            if (debug) {
+                byte[] padding = info.getIdentity().getPadding();
+                if (padding != null && padding.length >= 64) {
+                    if (DataHelper.eq(padding, 0, padding, 32, 32))
+                        buf.append("</td></tr><tr><td><b>Compressible:</b></td><td colspan=\"2\">true");
+                }
+            }
         }
         buf.append("</td></tr>\n<tr>")
            .append("<td><b>").append(_t("Addresses")).append(":</b></td><td colspan=\"2\"");
@@ -1208,7 +1220,6 @@ class NetDbRenderer {
                 Collections.sort(laddrs, new RAComparator());
                 addrs = laddrs;
             }
-            boolean debug = _context.getBooleanProperty(HelperBase.PROP_ADVANCED);
             for (RouterAddress addr : addrs) {
                 String style = addr.getTransportStyle();
                 buf.append("<br><b class=\"netdb_transport\">").append(DataHelper.stripHTML(style)).append(":</b>");
@@ -1221,6 +1232,8 @@ class NetDbRenderer {
                 for (Map.Entry<Object, Object> e : p.entrySet()) {
                     String name = (String) e.getKey();
                     String val = (String) e.getValue();
+                    if (name.equals("host"))
+                        val = Addresses.toCanonicalString(val);
                     buf.append(" <span class=\"nowrap\"><span class=\"netdb_name\">").append(_t(DataHelper.stripHTML(name)))
                        .append(":</span> <span class=\"netdb_info\">").append(DataHelper.stripHTML(val)).append("</span></span>&nbsp;");
                 }
