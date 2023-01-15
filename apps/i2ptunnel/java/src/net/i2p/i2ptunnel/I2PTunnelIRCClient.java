@@ -137,7 +137,18 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase {
             if (clientDest == null)
                 throw new UnknownHostException("Could not resolve " + addr.getHostName());
             int port = addr.getPort();
-            i2ps = createI2PSocket(clientDest, port);
+            try {
+                i2ps = createI2PSocket(clientDest, port);
+            } catch (RuntimeException re) {
+                // tunnel build failure
+                _log.error("Error connecting", re);
+                try {
+                    String name = addr != null ? addr.getHostName() : "undefined";
+                    String msg = ":" + name + " 499 you :" + re.getMessage() + "\r\n";
+                    s.getOutputStream().write(DataHelper.getUTF8(msg));
+                } catch (IOException ioe) {}
+                throw re;
+            }
             i2ps.setReadTimeout(readTimeout);
             StringBuffer expectedPong = new StringBuffer();
             DCCHelper dcc = _dccEnabled ? new DCC(s.getLocalAddress().getAddress()) : null;
