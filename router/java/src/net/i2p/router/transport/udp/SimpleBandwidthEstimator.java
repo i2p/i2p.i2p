@@ -87,7 +87,14 @@ class SimpleBandwidthEstimator implements BandwidthEstimator {
      * @return the current bandwidth estimate in bytes/ms.
      */
     public float getBandwidthEstimate() {
-        long now = _context.clock().now();
+        return getBandwidthEstimate(_context.clock().now());
+    }
+
+    /**
+     * @return the current bandwidth estimate in bytes/ms.
+     * @since 0.9.58
+     */
+    public float getBandwidthEstimate(long now) {
         // avoid deadlock
         int rtt = _state.getRTT();
         // anti-aliasing filter

@@ -25,7 +25,6 @@ import net.i2p.router.transport.udp.InboundMessageFragments.ModifiableLong;
 import net.i2p.router.util.CachedIteratorCollection;
 import net.i2p.router.util.CoDelPriorityBlockingQueue;
 import net.i2p.router.util.PriBlockingQueue;
-import net.i2p.util.BandwidthEstimator;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
@@ -116,7 +115,7 @@ public class PeerState {
     /** how many bytes can we send to the peer in the current second */
     private int _sendWindowBytesRemaining;
     private final Object _sendWindowBytesRemainingLock = new Object();
-    private final BandwidthEstimator _bwEstimator;
+    private final SimpleBandwidthEstimator _bwEstimator;
     // smoothed value, for display only
     private int _receiveBps;
     private int _receiveBytes;
@@ -640,13 +639,21 @@ public class PeerState {
      * The Westwood+ bandwidth estimate
      * @return the smoothed send transfer rate
      */
-    public int getSendBps() { return (int) (_bwEstimator.getBandwidthEstimate() * 1000); }
+    public int getSendBps(long now) { return (int) (_bwEstimator.getBandwidthEstimate(now) * 1000); }
 
     /**
      * An approximation, for display only
      * @return the smoothed receive transfer rate
      */
-    public synchronized int getReceiveBps() { return _receiveBps; }
+    public synchronized int getReceiveBps(long now) {
+        long duration = now - _receivePeriodBegin;
+        if (duration >= 1000) {
+            _receiveBps = (int)(0.9f*_receiveBps + 0.1f*(_receiveBytes * (1000f/duration)));
+            _receiveBytes = 0;
+            _receivePeriodBegin = now;
+        }
+        return _receiveBps;
+    }
 
     int incrementConsecutiveFailedSends() {
         synchronized(_outboundMessages) {
@@ -870,7 +877,7 @@ public class PeerState {
             bwe = -1;  // for log below
         } else {
             _sendWindowBytes = getVersion() == 2 ? PeerState2.MAX_MTU : (isIPv6() ? MAX_IPV6_MTU : LARGE_MTU);
-            bwe = _bwEstimator.getBandwidthEstimate();
+            bwe = _bwEstimator.getBandwidthEstimate(now);
             _slowStartThreshold = Math.max( (int)(bwe * _rtt), 2 * _mtu);
         }
 

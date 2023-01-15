@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.router.transport.udp.PeerState;
 
@@ -120,9 +121,11 @@ class UDPSorters {
     }
 
     static class RateInComparator extends PeerComparator {
+        private final long now = I2PAppContext.getGlobalContext().clock().now();
+
         @Override
         public int compare(PeerState l, PeerState r) {
-            int rv = l.getReceiveBps() - r.getReceiveBps();
+            int rv = l.getReceiveBps(now) - r.getReceiveBps(now);
             if (rv == 0) // fallback on alpha
                 return super.compare(l, r);
             else
@@ -131,9 +134,11 @@ class UDPSorters {
     }
 
     static class RateOutComparator extends PeerComparator {
+        private final long now = I2PAppContext.getGlobalContext().clock().now();
+
         @Override
         public int compare(PeerState l, PeerState r) {
-            int rv = l.getSendBps() - r.getSendBps();
+            int rv = l.getSendBps(now) - r.getSendBps(now);
             if (rv == 0) // fallback on alpha
                 return super.compare(l, r);
             else

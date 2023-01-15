@@ -5598,12 +5598,10 @@ img+tt {
 
 /* /peers */
 
-#ntcpconnections th:nth-child(6),
 #ntcpconnections th:nth-child(7),
 #ntcpconnections th:nth-child(8),
 #ntcpconnections th:nth-child(9),
 #ntcpconnections th:nth-child(10),
-#ntcpconnections td:nth-child(6),
 #ntcpconnections td:nth-child(7),
 #ntcpconnections td:nth-child(8),
 #ntcpconnections td:nth-child(9),
@@ -5624,7 +5622,6 @@ img+tt {
 #ntcpconnections .tablefooter td:nth-child(3),
 #ntcpconnections .tablefooter td:nth-child(4),
 #ntcpconnections .tablefooter td:nth-child(5),
-#ntcpconnections .tablefooter td:nth-child(6),
 #udpconnections .tablefooter td:nth-child(3),
 #udpconnections .tablefooter td:nth-child(4),
 #udpconnections .tablefooter td:nth-child(7),

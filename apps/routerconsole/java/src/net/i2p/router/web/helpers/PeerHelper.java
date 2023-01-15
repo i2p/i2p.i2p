@@ -3,6 +3,7 @@ package net.i2p.router.web.helpers;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
+import java.math.RoundingMode;
 import java.util.Comparator;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -418,8 +419,8 @@ public class PeerHelper extends HelperBase {
                    .append("\">").append(_t("Dir")).append("</a></th>" +
                    "<th>").append(_t("IPv6")).append("</th>" +
                    "<th>").append(_t("Version")).append("</th>" +
-                   "<th align=\"right\"><a href=\"#def.idle\">").append(_t("Idle")).append("</a></th>" +
-                   "<th align=\"right\"><a href=\"#def.rate\">").append(_t("In/Out")).append("</a></th>" +
+                   "<th><a href=\"#def.idle\">").append(_t("Idle")).append("</a></th>" +
+                   "<th><a href=\"#def.rate\">").append(_t("In/Out")).append("</a></th>" +
                    "<th align=\"right\"><a href=\"#def.up\">").append(_t("Up")).append("</a></th>" +
                    "<th align=\"right\"><a href=\"#def.skew\">").append(_t("Skew")).append("</a></th>" +
                    "<th align=\"right\"><a href=\"#def.recv\">").append(_t("RX")).append("</a></th>" +
@@ -518,8 +519,13 @@ public class PeerHelper extends HelperBase {
     }
 
     private static final NumberFormat _rateFmt = new DecimalFormat("#,##0.00");
+    static {
+        _rateFmt.setRoundingMode(RoundingMode.HALF_UP);
+    }
 
     private static String formatRate(float rate) {
+        if (rate < 0.005f)
+            return "0";
         synchronized (_rateFmt) { return _rateFmt.format(rate); }
     }
 
@@ -704,8 +710,8 @@ public class PeerHelper extends HelperBase {
             buf.append("<span class=\"left\">").append(DataHelper.formatDuration2(idleOut));
             buf.append("</span></td>");
  
-            int recvBps = (idleIn > 15*1000 ? 0 : peer.getReceiveBps());
-            int sendBps = (idleOut > 15*1000 ? 0 : peer.getSendBps());
+            int recvBps = peer.getReceiveBps(now);
+            int sendBps = peer.getSendBps(now);
 
             buf.append("<td class=\"cells\" align=\"center\" nowrap><span class=\"right\">");
             buf.append(formatKBps(recvBps));
@@ -892,8 +898,13 @@ public class PeerHelper extends HelperBase {
     }
 
     private static final DecimalFormat _fmt = new DecimalFormat("#,##0.00");
+    static {
+        _fmt.setRoundingMode(RoundingMode.HALF_UP);
+    }
 
     private static final String formatKBps(int bps) {
+        if (bps < 5)
+            return "0";
         synchronized (_fmt) {
             return _fmt.format((float)bps/1000);
         }
