@@ -47,8 +47,7 @@ public class ConfigTunnelsHandler extends FormHandler {
             _log.debug("Saving changes, with props = " + _settings + ".");
         
         int updated = 0;
-        int index = 0;
-        while (true) {
+        for (int index = 0;  ; index++) {
             Object val = _settings.get("pool." + index);
             if (val == null) break;
             Hash client = new Hash();
@@ -65,7 +64,6 @@ public class ConfigTunnelsHandler extends FormHandler {
                     client.fromBase64(poolName);
                 } catch (DataFormatException dfe) {
                     addFormError("Internal error (pool name could not resolve - " + poolName + ").");
-                    index++;
                     continue;
                 }
                 in = mgr.getInboundSettings(client);
@@ -74,14 +72,12 @@ public class ConfigTunnelsHandler extends FormHandler {
             
             if ( (in == null) || (out == null) ) {
                 addFormError("Internal error (pool settings cound not be found for " + poolName + ").");
-                index++;
                 continue;
             }
             
             Object di = _settings.get(index + ".depthInbound");
             if (di == null) {
                 // aliased pools
-                index++;
                 continue;
             }
             in.setLength(getInt(di));
@@ -110,9 +106,6 @@ public class ConfigTunnelsHandler extends FormHandler {
                                                    TunnelPoolSettings.PROP_BACKUP_QUANTITY, in.getBackupQuantity()+"");
                 changes.put(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + 
                                                    TunnelPoolSettings.PROP_BACKUP_QUANTITY, out.getBackupQuantity()+"");
-            }
-            
-            if ("exploratory".equals(poolName)) {
                 if (_log.shouldLog(Log.DEBUG)) {
                     _log.debug("Inbound exploratory settings: " + in);
                     _log.debug("Outbound exploratory settings: " + out);
@@ -126,11 +119,10 @@ public class ConfigTunnelsHandler extends FormHandler {
                 }
                 mgr.setInboundSettings(client, in);
                 mgr.setOutboundSettings(client, out);
+                updated++;
             }
             
-            updated++;
             saveRequired = true;
-            index++;
         }
         
         if (updated > 0)
