@@ -164,6 +164,8 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
     /** 
      * Because getDefaultOptions() in super() is protected
      * @since 0.8.2
+     *
+     * This will throw IAE on tunnel build failure
      */
     public I2PSocketOptions buildOptions(Properties overrides) {
         Properties defaultOpts = getTunnel().getClientOptions();

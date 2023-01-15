@@ -473,7 +473,17 @@ class SOCKS5Server extends SOCKSServer {
                 if (_log.shouldDebug())
                     _log.debug("connecting to " + connHostName + "...");
                 Properties overrides = new Properties();
-                I2PSocketOptions sktOpts = t.buildOptions(overrides);
+                I2PSocketOptions sktOpts;
+                try {
+                    sktOpts = t.buildOptions(overrides);
+                } catch (RuntimeException re) {
+                    // tunnel build failure
+                    _log.error("socks error", re);
+                    try {
+                        sendRequestReply(Reply.GENERAL_SOCKS_SERVER_FAILURE, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
+                    } catch (IOException ioe) {}
+                    throw re;
+                }
                 sktOpts.setPort(connPort);
                 destSock = t.createI2PSocket(dest, sktOpts);
             } else if (hostLowerCase.equals("localhost") || connHostName.equals("127.0.0.1") ||
@@ -525,6 +535,13 @@ class SOCKS5Server extends SOCKSServer {
                     String proxy = proxies.get(p);
                     try {
                         destSock = outproxyConnect(t, proxy);
+                    } catch (RuntimeException re) {
+                        // tunnel build failure
+                        _log.error("socks error", re);
+                        try {
+                            sendRequestReply(Reply.GENERAL_SOCKS_SERVER_FAILURE, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
+                        } catch (IOException ioe) {}
+                        throw re;
                     } catch (SOCKSException se) {
                         try {
                             sendRequestReply(Reply.HOST_UNREACHABLE, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
