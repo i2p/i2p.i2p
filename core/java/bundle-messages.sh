@@ -110,6 +110,7 @@ do
             if [ $? -ne 0 ]
             then
                 echo "ERROR - msgfmt failed on ${i}, not updating translations"
+                echo "sudo apt install gettext, or put require.gettext=false in override.properties"
                 # msgfmt leaves the class file there so the build would work the next time
                 find build -name messages_${LG}.class -exec rm -f {} \;
                 RC=1
@@ -128,6 +129,7 @@ do
             if [ $? -ne 0 ]
             then
                 echo "ERROR - msgfmt failed on ${i}, not updating translations"
+                echo "sudo apt install gettext, or put require.gettext=false in override.properties"
                 # msgfmt leaves the class file there so the build would work the next time
                 find build/obj -name messages_${LG}.class -exec rm -f {} \;
                 RC=1
