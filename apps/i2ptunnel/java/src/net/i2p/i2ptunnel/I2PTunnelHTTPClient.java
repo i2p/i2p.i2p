@@ -270,6 +270,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
      * Warning, this does not make a copy of I2PTunnel's client options,
      * it modifies them directly.
      * unused?
+     *
+     * This will throw IAE on tunnel build failure
      */
     @Override
     protected I2PSocketOptions getDefaultOptions() {
@@ -293,6 +295,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
      * Warning, this does not make a copy of I2PTunnel's client options,
      * it modifies them directly.
      * Do not use overrides for per-socket options.
+     *
+     * This will throw IAE on tunnel build failure
      */
     @Override
     protected I2PSocketOptions getDefaultOptions(Properties overrides) {
@@ -1379,7 +1383,21 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             // 1 == disconnect.  see ConnectionOptions in the new streaming lib, which i
             // dont want to hard link to here
             //opts.setProperty("i2p.streaming.inactivityTimeoutAction", ""+1);
-            I2PSocketOptions sktOpts = getDefaultOptions(opts);
+            I2PSocketOptions sktOpts;
+            try {
+                sktOpts = getDefaultOptions(opts);
+            } catch (RuntimeException re) {
+                // tunnel build failure
+                StringBuilder buf = new StringBuilder(128);
+                buf.append("HTTP/1.1 503 Service Unavailable");
+                if (re.getMessage() != null)
+                    buf.append(" - ").append(re.getMessage());
+                buf.append("\r\n\r\n");
+                try {
+                    out.write(buf.toString().getBytes("UTF-8"));
+                } catch (IOException ioe) {}
+                throw re;
+            }
             if (remotePort > 0)
                 sktOpts.setPort(remotePort);
             i2ps = createI2PSocket(clientDest, sktOpts);
