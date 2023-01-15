@@ -26,7 +26,7 @@ public class NetDbHelper extends FormHandler {
     private String _version;
     private String _country;
     private String _family, _caps, _ip, _sybil, _mtu, _ssucaps, _ipv6, _transport, _hostname, _sort;
-    private int _full, _port, _cost, _page, _mode, _highPort;
+    private int _full, _port, _cost, _page, _mode, _highPort, _icount;
     private long _date;
     private int _limit = DEFAULT_LIMIT;
     private boolean _lease;
@@ -226,10 +226,16 @@ public class NetDbHelper extends FormHandler {
         } catch (NumberFormatException nfe) {}
     }
 
-
     /** @since 0.9.57 */
     public void setSort(String f) {
         _sort = f;
+    }
+    
+    /** @since 0.9.58 */
+    public void setIntros(String f) {
+        try {
+            _icount = Integer.parseInt(f);
+        } catch (NumberFormatException nfe) {}
     }
     
     /**
@@ -305,11 +311,12 @@ public class NetDbHelper extends FormHandler {
             if (_routerPrefix != null || _version != null || _country != null ||
                 _family != null || _caps != null || _ip != null || _sybil != null ||
                 _port != 0 || _type != null || _mtu != null || _ipv6 != null ||
-                _ssucaps != null || _transport != null || _cost != 0 || _etype != null) {
+                _ssucaps != null || _transport != null || _cost != 0 || _etype != null ||
+                _icount > 0) {
                 renderer.renderRouterInfoHTML(_out, _limit, _page,
                                               _routerPrefix, _version, _country,
                                               _family, _caps, _ip, _sybil, _port, _highPort, _type, _etype,
-                                              _mtu, _ipv6, _ssucaps, _transport, _cost);
+                                              _mtu, _ipv6, _ssucaps, _transport, _cost, _icount);
             } else if (_lease) {
                 renderer.renderLeaseSetHTML(_out, _debug);
             } else if (_hostname != null) {
@@ -428,6 +435,7 @@ public class NetDbHelper extends FormHandler {
                    "<tr><td>" + _t("Router Family") + ":</td><td><input type=\"text\" name=\"fam\"></td><td></td></tr>\n" +
                    "<tr><td>Hash Prefix:</td><td><input type=\"text\" name=\"r\"></td><td></td></tr>\n" +
                    "<tr><td>" + _t("Full destination, name, Base32, or hash") + ":</td><td><input type=\"text\" name=\"ls\"></td><td></td></tr>\n" +
+                   "<tr><td>Min. Introducer Count:</td><td><input type=\"text\" name=\"i\"></td><td></td></tr>\n" +
                    "<tr><td>IP:</td><td><input type=\"text\" name=\"ip\"></td><td>IPv4 or IPv6, /24,/16,/8 suffixes optional for IPv4, prefix ok for IPv6</td></tr>\n" +
                    "<tr><td>IPv6 Prefix:</td><td><input type=\"text\" name=\"ipv6\"></td><td></td></tr>\n" +
                    "<tr><td>" + _t("MTU") + ":</td><td><input type=\"text\" name=\"mtu\"></td><td></td></tr>\n" +

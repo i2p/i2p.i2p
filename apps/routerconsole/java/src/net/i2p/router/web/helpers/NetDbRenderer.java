@@ -110,7 +110,7 @@ class NetDbRenderer {
                                      String country, String family, String caps,
                                      String ip, String sybil, int port, int highPort, SigType type, EncType etype,
                                      String mtu, String ipv6, String ssucaps,
-                                     String tr, int cost) throws IOException {
+                                     String tr, int cost, int icount) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
         List<Hash> sybils = sybil != null ? new ArrayList<Hash>(128) : null;
         if (".".equals(routerPrefix)) {
@@ -185,6 +185,13 @@ class NetDbRenderer {
                 ubuf.append("&amp;cost=").append(cost);
             if (sybil != null)
                 ubuf.append("&amp;sybil=").append(sybil);
+            String itag;
+            if (icount > 0) {
+                ubuf.append("&amp;i=").append(icount);
+                itag = "itag" + (icount - 1);
+            } else {
+                itag = null;
+            }
             if (page > 0) {
                 buf.append("<div class=\"netdbnotfound\">" +
                            "<a href=\"/netdb?pg=").append(page)
@@ -447,6 +454,24 @@ class NetDbRenderer {
                             break;
                         }
                     }
+                } else if (itag != null) {
+                    for (RouterAddress ra : ri.getAddresses()) {
+                        if (ra.getOption(itag) != null) {
+                            if (skipped < toSkip) {
+                                skipped++;
+                                break;
+                            }
+                            if (written++ >= pageSize) {
+                                morePages = true;
+                                break outerloop;
+                            }
+                            renderRouterInfo(buf, ri, false, true);
+                            if (sybil != null)
+                                sybils.add(key);
+                            notFound = false;
+                            break;
+                        }
+                    }
                 }
             }
             if (notFound) {
@@ -484,6 +509,8 @@ class NetDbRenderer {
                     buf.append("Caps ").append(ssucaps).append(' ');
                 if (tr != null)
                     buf.append(_t("Transport")).append(' ').append(tr).append(' ');
+                if (icount > 0)
+                    buf.append("with ").append(icount).append(" introducers ");
                 buf.append(_t("not found in network database"));
                 buf.append("</div>");
             } else if (page > 0 || morePages) {
