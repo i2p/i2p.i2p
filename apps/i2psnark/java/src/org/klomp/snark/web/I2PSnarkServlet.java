@@ -57,6 +57,8 @@ import org.klomp.snark.Storage;
 import org.klomp.snark.Tracker;
 import org.klomp.snark.TrackerClient;
 import org.klomp.snark.URIUtil;
+import org.klomp.snark.bencode.BEValue;
+import org.klomp.snark.bencode.InvalidBEncodingException;
 import org.klomp.snark.dht.DHT;
 import org.klomp.snark.comments.Comment;
 import org.klomp.snark.comments.CommentSet;
@@ -2007,30 +2009,73 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (ch.startsWith("WebSeed@")) {
                     out.write(ch);
                 } else {
+                    // most clients start -xx, see
+                    // BT spec or libtorrent identify_client.cpp
+                    // Base64 encode -xx
+                    // Anything starting with L is -xx and has an Az version
+                    // snark is 9 nulls followed by 3 3 3 (binary), see Snark
+                    // PeerID.toString() skips nulls
+                    // Base64 encode '\3\3\3' = AwMD
+                    boolean addVersion = true;
                     ch = ch.substring(0, 4);
                     String client;
                     if ("AwMD".equals(ch))
                         client = _t("I2PSnark");
                     else if ("LUJJ".equals(ch))
-                        client = "BiglyBT" + getAzVersion(pid.getID());
+                        client = "BiglyBT";
                     else if ("LUFa".equals(ch))
-                        client = "Vuze" + getAzVersion(pid.getID());
+                        client = "Vuze";
                     else if ("LVhE".equals(ch))
-                        client = "XD" + getAzVersion(pid.getID());
+                        client = "XD";
+                    else if (ch.startsWith("LV")) // LVCS 1.0.2?; LVRS 1.0.4
+                        client = "Transmission";
+                    else if ("LUtU".equals(ch))
+                        client = "KTorrent";
+                    // libtorrent and downstreams
+                    // https://www.libtorrent.org/projects.html
+                    else if ("LURF".equals(ch))  // DL
+                        client = "Deluge";
+                    else if ("LXFC".equals(ch))  // qB
+                        client = "qBitorrent";
+                    else if ("LUxU".equals(ch))  // LT
+                        client = "libtorrent";
+                    // ancient below here
                     else if ("ZV".equals(ch.substring(2,4)) || "VUZP".equals(ch))
                         client = "Robert" + getRobtVersion(pid.getID());
-                    else if (ch.startsWith("LV")) // LVCS 1.0.2?; LVRS 1.0.4
-                        client = "Transmission" + getAzVersion(pid.getID());
-                    else if ("LUtU".equals(ch))
-                        client = "KTorrent" + getAzVersion(pid.getID());
                     else if ("CwsL".equals(ch))
                         client = "I2PSnarkXL";
                     else if ("BFJT".equals(ch))
                         client = "I2PRufus";
                     else if ("TTMt".equals(ch))
                         client = "I2P-BT";
-                    else
-                        client = _t("Unknown") + " (" + ch + ')';
+                    else {
+                        // get client + version from handshake
+                        client = null;
+                        Map<String, BEValue> handshake = peer.getHandshakeMap();
+                        if (handshake != null) {
+                            BEValue bev = handshake.get("v");
+                            if (bev != null) {
+                                try {
+                                    String s = bev.getString();
+                                    if (s.length() > 0) {
+                                        if (s.length() > 64)
+                                            s = s.substring(0, 64);
+                                        client = DataHelper.escapeHTML(s);
+                                        addVersion = false;
+                                    }
+                                 } catch (InvalidBEncodingException ibee) {}
+                             }
+                         }
+                         if (client == null)
+                            client = _t("Unknown") + " (" + ch + ')';
+                    }
+
+                    if (addVersion) {
+                        byte[] id = pid.getID();
+                        if (id != null && id[0] == '-')
+                            client += getAzVersion(id);
+                    }
+
                     out.write(client + "&nbsp;<tt title=\"");
                     out.write(_t("Destination (identity) of peer"));
                     out.write("\">" + peer.toString().substring(5, 9)+ "</tt>");
