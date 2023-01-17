@@ -214,6 +214,8 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         String s = getTunnel().getClientOptions().getProperty(PROP_SSL_OUTPROXIES);
         if (s == null)
             return null;
+        // default config typo fix
+        s = s.replace("exit.storymcloud.i2p", "exit.stormycloud.i2p");
         String[] p = DataHelper.split(s, "[,; \r\n\t]");
         int size = p.length;
         if (size == 0)

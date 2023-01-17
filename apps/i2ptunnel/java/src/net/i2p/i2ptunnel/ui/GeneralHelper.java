@@ -974,7 +974,10 @@ public class GeneralHelper {
     }
 
     public String getSslProxies(int tunnel) {
-        return getProperty(tunnel, I2PTunnelHTTPClient.PROP_SSL_OUTPROXIES, "");
+        String rv = getProperty(tunnel, I2PTunnelHTTPClient.PROP_SSL_OUTPROXIES, "");
+        // default config typo fix
+        rv = rv.replace("exit.storymcloud.i2p", "exit.stormycloud.i2p");
+        return rv;
     }
 
     /**
