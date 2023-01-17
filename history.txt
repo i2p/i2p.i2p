@@ -1,4 +1,21 @@
-2023-01-11 zzz
+2023-01-17 zzz
+ * i2psnark:
+   - Add basic search box
+   - Recognize more clients
+ * i2ptunnel: Fix typo for SSL outproxy host
+
+2023-01-15 zzz
+ * Console:
+   - Fix displayed BPS for SSU peers
+   - Add netdb search by introducer count
+ * i2ptunnel:
+   - Interrupt client tunnel build when stop button is clicked
+   - Return error message from IRC client on failure to build tunnels
+   - Return 503 from HTTP client on failure to build tunnels
+   - Return error code from SOCKS client on failure to build tunnels
+
+2023-01-12 zzz
+ * Router: Simplify published stats values
  * SAM: Abort tunnel build if control socket closes
 
 2023-01-11 zzz
