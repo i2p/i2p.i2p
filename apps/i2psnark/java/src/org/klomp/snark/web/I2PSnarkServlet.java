@@ -933,7 +933,7 @@ public class I2PSnarkServlet extends BasicServlet {
             // for buttons, keep the search term
             String sParam = req.getParameter("nf_s");
             if (sParam != null) {
-                buf.append("<input type=\"hidden\" name=\"s\" value=\"")
+                buf.append("<input type=\"hidden\" name=\"nf_s\" value=\"")
                    .append(DataHelper.escapeHTML(sParam)).append("\" >\n");
             }
         }
