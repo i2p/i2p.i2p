@@ -29,12 +29,12 @@ function requestAjax2(refreshtime) {
                 query = "";
             }
             var q = new URLSearchParams(query);
-            q.set("s", search);
+            q.set("nf_s", encodeURIComponent(search));
             query = "?" + q.toString();
         } else {
             if (query != null) {
                 var q = new URLSearchParams(query);
-                q.delete("s");
+                q.delete("nf_s");
                 var newq = q.toString();
                 if (newq != null && newq.length > 0) {
                     query = "?" + newq;

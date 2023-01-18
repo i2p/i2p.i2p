@@ -26,6 +26,8 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
     private static final Pattern parameterValuePattern = Pattern.compile(SystemVersion.isWindows() ? WIN_PATTERN : NON_WIN_PATTERN);
     private static final Pattern headerValuePattern = Pattern.compile("^[a-zA-Z0-9()\\-=\\*\\.\\?;,+\\/:&_ \"]*$");
     private static final String NOFILTER = "nofilter_";
+    // shorter flavor
+    private static final String NOFILTER2 = "nf_";
 
     public XSSRequestWrapper(HttpServletRequest servletRequest) {
         super(servletRequest);
@@ -33,11 +35,12 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
 
     /**
      *  Parameter names starting with "nofilter_" will not be filtered.
+     *  As of 0.9.58, names starting with "nf_" will not be filtered.
      */
     @Override
     public String[] getParameterValues(String parameter) {
         String[] values = super.getParameterValues(parameter);
-        if (parameter.startsWith(NOFILTER))
+        if (parameter.startsWith(NOFILTER) || parameter.startsWith(NOFILTER2))
             return values;
 
         if (values == null) {
@@ -70,11 +73,12 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
 
     /**
      *  Parameter names starting with "nofilter_" will not be filtered.
+     *  As of 0.9.58, names starting with "nf_" will not be filtered.
      */
     @Override
     public String getParameter(String parameter) {
         String value = super.getParameter(parameter);
-        if (parameter.startsWith(NOFILTER))
+        if (parameter.startsWith(NOFILTER) || parameter.startsWith(NOFILTER2))
             return value;
         String rv = stripXSS(value, parameterValuePattern);
         if (value != null && rv == null) {
@@ -86,6 +90,7 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
 
     /**
      *  Parameter names starting with "nofilter_" will not be filtered.
+     *  As of 0.9.58, names starting with "nf_" will not be filtered.
      */
     @Override
     public Map<String, String[]> getParameterMap() {

@@ -231,7 +231,6 @@ _:-ms-lang(x), .snarkNav:last-child[href="/i2psnark/"] {
 
 #search {
      display: inline-block;
-     float: right;
      position: absolute;
      top: 6px;
      right: 3px;

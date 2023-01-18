@@ -387,13 +387,12 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("</div>\n");
 
         if (!isConfigure) {
-            String search = req.getParameter("s");
+            String search = req.getParameter("nf_s");
             if (_manager.getTorrents().size() > 1 || (search != null && search.length() > 0)) {
                 out.write("<form class=\"search\" id = \"search\" action=\"" + _contextPath + "\" method=\"GET\">" +
-                          "<input type=\"text\" name=\"s\" size=\"20\" class=\"search\" id=\"searchbox\"");
-                String s = req.getParameter("s");
-                if (s != null)
-                    out.write(" value=\"" + DataHelper.escapeHTML(s) + '"');
+                          "<input type=\"text\" name=\"nf_s\" size=\"20\" class=\"search\" id=\"searchbox\"");
+                if (search != null)
+                    out.write(" value=\"" + DataHelper.escapeHTML(search) + '"');
                 out.write(">" +
                           "<input type=\"reset\" class=\"cancel\" id=\"searchcancel\" value=\"\">" +
                           "</form>\n");
@@ -507,7 +506,7 @@ public class I2PSnarkServlet extends BasicServlet {
 
         // search
         boolean isSearch = false;
-        String search = req.getParameter("s");
+        String search = req.getParameter("nf_s");
         if (search != null && search.length() > 0) {
             List<Snark> matches = search(search, snarks);
             if (matches != null) {
@@ -851,12 +850,17 @@ public class I2PSnarkServlet extends BasicServlet {
     /**
      *  search torrents for matching terms
      *
-     *  @param search non-null
-     *  @param snarks unmodified
-     *  @return null if no valid search, or matching torrents in same order
+     *  @param search non-null and %-encoded, will be decoded here
+     *  @param snarks unmodified, order will be honored
+     *  @return null if not a valid search, or matching torrents in same order, possibly empty
      *  @since 0.9.58
      */
     private static List<Snark> search(String search, Collection<Snark> snarks) {
+        try {
+            search = decodePath(search);
+        } catch (IOException ioe) {
+            return null;
+        }
         List<String> searchList = null;
         String[] terms = DataHelper.split(search, " ");
         for (int i = 0; i < terms.length; i++) {
@@ -927,7 +931,7 @@ public class I2PSnarkServlet extends BasicServlet {
                .append(action).append("\" >\n");
         } else {
             // for buttons, keep the search term
-            String sParam = req.getParameter("s");
+            String sParam = req.getParameter("nf_s");
             if (sParam != null) {
                 buf.append("<input type=\"hidden\" name=\"s\" value=\"")
                    .append(DataHelper.escapeHTML(sParam)).append("\" >\n");
@@ -987,15 +991,15 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append(st);
         }
         if (s == null) {
-            s = req.getParameter("s");
+            s = req.getParameter("nf_s");
             if (s != null)
                 s = DataHelper.escapeHTML(s);
         }
         if (s != null && !s.equals("")) {
             if (buf.length() <= 0)
-                buf.append("?s=");
+                buf.append("?nf_s=");
             else
-                buf.append("&amp;s=");
+                buf.append("&amp;nf_s=");
             buf.append(s);
         }
         return buf.toString();
@@ -1555,7 +1559,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 _manager.addMessage(_t("Error creating torrent - you must enter a file or directory"));
             }
         } else if ("StopAll".equals(action)) {
-            String search = req.getParameter("s");
+            String search = req.getParameter("nf_s");
             if (search != null && search.length() > 0) {
                 List<Snark> matches = search(search, _manager.getTorrents());
                 if (matches != null) {
@@ -1567,7 +1571,7 @@ public class I2PSnarkServlet extends BasicServlet {
             }
             _manager.stopAllTorrents(false);
         } else if ("StartAll".equals(action)) {
-            String search = req.getParameter("s");
+            String search = req.getParameter("nf_s");
             if (search != null && search.length() > 0) {
                 List<Snark> matches = search(search, _manager.getTorrents());
                 if (matches != null) {

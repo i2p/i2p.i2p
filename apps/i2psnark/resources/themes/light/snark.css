@@ -229,6 +229,27 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      background: #f60 url(images/button_tracker_active.png) 8px center no-repeat;
 }
 
+#search {
+     display: inline-block;
+     position: absolute;
+     top: 6px;
+     right: 3px;
+}
+
+#searchbox {
+     background: #f60 url(/themes/console/images/buttons/search.png) 7px center no-repeat !important;
+     margin: 2px 4px 2px 24px !important;
+     padding: 4px 32px 4px 32px !important;
+     color: black;
+}
+
+#searchcancel {
+     background: url(images/cancel.png);
+     margin: 2px 4px 2px -28px;
+     color: transparent;
+     border: none;
+}
+
 /* end top nav */
 
 /* screenlog */

@@ -272,6 +272,27 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
      transition: ease box-shadow 0.1s;
 }
 
+#search {
+     display: inline-block;
+     position: absolute;
+     top: 6px;
+     right: 3px;
+}
+
+#searchbox {
+     background: #f60 url(/themes/console/images/buttons/search.png) 7px center no-repeat !important;
+     margin: 2px 4px 2px 24px !important;
+     padding: 4px 32px 4px 32px !important;
+     color: black;
+}
+
+#searchcancel {
+     background: url(images/cancel.png);
+     margin: 2px 4px 2px -28px;
+     color: transparent;
+     border: none;
+}
+
 /* end topnav */
 
 /* screenlog */
