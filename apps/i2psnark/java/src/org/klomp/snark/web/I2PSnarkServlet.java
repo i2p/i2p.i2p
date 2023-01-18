@@ -342,7 +342,8 @@ public class I2PSnarkServlet extends BasicServlet {
                       "var deleteMessage1 = \"" + _t("Are you sure you want to delete the file \\''{0}\\'' (downloaded data will not be deleted) ?") + "\";\n" +
                       "var deleteMessage2 = \"" + _t("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?") + "\";\n" +
                       "</script>\n" +
-                      "<script src=\".resources/js/delete.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
+                      "<script src=\".resources/js/delete.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n" +
+                      "<script src=\".resources/js/search.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
         }
         out.write(HEADER_A + _themePath + HEADER_B);
 
@@ -381,18 +382,24 @@ public class I2PSnarkServlet extends BasicServlet {
                     out.write(" <a href=\"" + t.baseURL + "\" class=\"snarkNav nav_tracker\" target=\"_blank\">" + t.name + "</a>\n");
                 }
             }
-            if (_manager.getTorrents().size() > 1) {
+        }
+        // end snarkNavBar
+        out.write("</div>\n");
+
+        if (!isConfigure) {
+            String search = req.getParameter("s");
+            if (_manager.getTorrents().size() > 1 || (search != null && search.length() > 0)) {
                 out.write("<form class=\"search\" id = \"search\" action=\"" + _contextPath + "\" method=\"GET\">" +
-                          "<input type=\"text\" name=\"s\" size=\"20\" class=\"search snarkNav\" id=\"searchbox\"");
+                          "<input type=\"text\" name=\"s\" size=\"20\" class=\"search\" id=\"searchbox\"");
                 String s = req.getParameter("s");
                 if (s != null)
                     out.write(" value=\"" + DataHelper.escapeHTML(s) + '"');
                 out.write(">" +
-                          "<input type=\"reset\" class=\"cancel snarkNav\" value=\"\">" +
+                          "<input type=\"reset\" class=\"cancel\" id=\"searchcancel\" value=\"\">" +
                           "</form>\n");
             }
         }
-        out.write("</div>\n");
+
         String newURL = req.getParameter("newURL");
         if (newURL != null && newURL.trim().length() > 0 && req.getMethod().equals("GET"))
             _manager.addMessage(_t("Click \"Add torrent\" button to fetch torrent"));
@@ -846,7 +853,7 @@ public class I2PSnarkServlet extends BasicServlet {
      *
      *  @param search non-null
      *  @param snarks unmodified
-     *  @return null if no valid search, or matching torrents in same order, empty if no match
+     *  @return null if no valid search, or matching torrents in same order
      *  @since 0.9.58
      */
     private static List<Snark> search(String search, Collection<Snark> snarks) {

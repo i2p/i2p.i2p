@@ -229,6 +229,28 @@ _:-ms-lang(x), .snarkNav:last-child[href="/i2psnark/"] {
      border-radius: 2px 0 0 2px;
 }
 
+#search {
+     display: inline-block;
+     float: right;
+     position: absolute;
+     top: 6px;
+     right: 3px;
+}
+
+#searchbox {
+     background: #f60 url(/themes/console/images/buttons/search.png) 7px center no-repeat !important;
+     margin: 2px 4px 2px 24px !important;
+     padding: 4px 32px 4px 32px !important;
+     color: black;
+}
+
+#searchcancel {
+     background: url(images/cancel.png);
+     margin: 2px 4px 2px -28px;
+     color: transparent;
+     border: none;
+}
+
 /* end topnav */
 
 /* screenlogger */

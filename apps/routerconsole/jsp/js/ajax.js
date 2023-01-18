@@ -6,6 +6,11 @@
 
 var fails = 0;
 
+/**
+ *
+ *  @param refresh as of 0.9.58, if less than or equal to zero, do not reschedule
+ *
+ */
 function ajax(url, target, refresh) {
   // native XMLHttpRequest object
   if (window.XMLHttpRequest) {
@@ -28,6 +33,11 @@ function ajax(url, target, refresh) {
   }
 }
 
+/**
+ *
+ *  @param refresh as of 0.9.58, if less than or equal to zero, do not reschedule
+ *
+ */
 function ajaxDone(url, target, refresh) {
   // only if req is "loaded"
   if (req.readyState == 4) {
@@ -51,7 +61,9 @@ function ajaxDone(url, target, refresh) {
       graph.style.backgroundImage = "url(/viewstat.jsp?stat=bw.combined&periodCount=20&width=220&height=50&hideLegend=true&hideGrid=true&time=" + new Date().getTime();
     }
 
-    setTimeout(function() {ajax(url, target, refresh);}, refresh);
+    if (refresh > 0) {
+      setTimeout(function() {ajax(url, target, refresh);}, refresh);
+    }
   }
 }
 
