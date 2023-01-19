@@ -367,7 +367,7 @@ public class I2PSnarkServlet extends BasicServlet {
         else
             out.write(_contextName);
         if (!_context.isRouterContext()) {
-            out.write(' ' + CoreVersion.VERSION);
+            out.write(' ' + SnarkManager.FULL_VERSION);
         }
         out.write("</a>");
         List<Tracker> sortedTrackers = null;

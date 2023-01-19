@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.i2p.CoreVersion;
-
 /**
  * Simple command line access to various utilities.
  * Not a public API. Subject to change.
@@ -38,7 +36,7 @@ public class CommandLine extends net.i2p.util.CommandLine {
     }
 
     private static void usage(List<String> classes) {
-        System.err.println("I2PSnark version " + CoreVersion.VERSION + '\n' +
+        System.err.println("I2PSnark version " + SnarkManager.FULL_VERSION + '\n' +
                            "USAGE: java -jar /path/to/i2psnark.jar command [args]");
         printCommands(classes);
     }

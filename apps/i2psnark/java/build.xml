@@ -298,6 +298,12 @@
             value="url(/i2psnark/.resources/themes/ubergine/images/" >
             <include name="**/*.css" />
         </replace>
+        <replace dir="build/standalone-resources/.resources/themes"
+            summary="true"
+            token="url(/themes/console/images/buttons/"
+            value="url(/i2psnark/.resources/icons/" >
+            <include name="**/*.css" />
+        </replace>
 
         <!-- Rather than pulling in all the console theme images, let's just specify the ones we need -->
         <copy file="../../routerconsole/jsp/themes/console/images/transparent.gif"
@@ -308,6 +314,8 @@
               todir="build/standalone-resources/.resources/themes/light/images" />
         <copy file="../../routerconsole/jsp/themes/console/images/info/errortriangle.png"
               todir="build/standalone-resources/.resources/themes/ubergine/images" />
+        <copy file="../../routerconsole/jsp/themes/console/images/buttons/search.png"
+              todir="build/standalone-resources/.resources/icons" />
 
         <mkdir dir="build/standalone-resources/.resources/js" />
         <copy file="../../routerconsole/jsp/js/ajax.js" todir="build/standalone-resources/.resources/js" />

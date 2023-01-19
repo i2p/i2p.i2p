@@ -15,6 +15,8 @@ import net.i2p.jetty.I2PLogger;
 import net.i2p.jetty.JettyStart;
 import net.i2p.util.SystemVersion;
 
+import org.klomp.snark.SnarkManager;
+
 /**
  *  @since moved from ../web and fixed in 0.9.27
  */
@@ -71,7 +73,7 @@ public class RunStandalone {
     public void start() {
         try {
             String url = "http://" + _host + ':' + _port + "/i2psnark/";
-            System.out.println("Starting i2psnark at " + url);
+            System.out.println("Starting i2psnark " + SnarkManager.FULL_VERSION + " at " + url);
             startTrayApp();
             _jettyStart.startup();
             try {

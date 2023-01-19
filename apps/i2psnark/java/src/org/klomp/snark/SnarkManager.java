@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.CoreVersion;
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientApp;
 import net.i2p.app.ClientAppManager;
@@ -174,6 +175,9 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
     private static final String SUBDIR_PREFIX = "s";
     private static final String B64 = Base64.ALPHABET_I2P;
     private static final int MAX_MESSAGES = 100;
+    private static final String EXTRA = "";
+    /** @since 0.9.58 */
+    public static final String FULL_VERSION = CoreVersion.VERSION + EXTRA;
 
     /**
      *  "name", "announceURL=websiteURL" pairs
