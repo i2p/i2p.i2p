@@ -1964,6 +1964,7 @@ class PeerTestManager {
                     // More sanity checks here.
                     // we compare to the test address,
                     // however our address may have changed during the test
+                    Hash charlieHash = test.getCharlieHash();
                     boolean portok = addrBlockPort == test.getAlicePort();
                     boolean IPok = DataHelper.eq(addrBlockIP, test.getAliceIP().getAddress());
                     if (!portok || !IPok) {
@@ -1979,7 +1980,8 @@ class PeerTestManager {
                                 // Port different. Charlie probably symmetric natted.
                                 // The result will be OK
                                 // Note that charlie is probably not reachable
-                                _transport.markUnreachable(test.getCharlieHash());
+                                if (charlieHash != null)
+                                    _transport.markUnreachable(charlieHash);
                                 // Reset port so testComplete() will return success.
                                 test.setAlicePortFromCharlie(test.getAlicePort());
                                 // set bad so we don't call externalAddressReceived()
@@ -1992,7 +1994,8 @@ class PeerTestManager {
                                 // Both IP and port changed, don't trust it
                                 // The result will be OK
                                 // Note that charlie is probably not reachable
-                                _transport.markUnreachable(test.getCharlieHash());
+                                if (charlieHash != null)
+                                    _transport.markUnreachable(charlieHash);
                                 // Reset IP and port so testComplete() will return success.
                                 test.setAliceIPFromCharlie(test.getAliceIP());
                                 test.setAlicePortFromCharlie(test.getAlicePort());
@@ -2009,8 +2012,8 @@ class PeerTestManager {
                     }
                     // We already call externalAddressReceived() for every outbound connection from EstablishmentManager
                     // but we can use this also to update our address faster
-                    if (!bad)
-                        _transport.externalAddressReceived(state.getCharlieHash(), addrBlockIP, addrBlockPort);
+                    if (!bad && charlieHash != null)
+                        _transport.externalAddressReceived(charlieHash, addrBlockIP, addrBlockPort);
                 }
                 testComplete();
                 break;
