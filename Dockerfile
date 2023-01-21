@@ -13,7 +13,7 @@ RUN add-pkg --virtual build-base gettext tar bzip2 apache-ant openjdk17 \
 FROM jlesage/baseimage:alpine-3.15-glibc
 ENV APP_HOME="/i2p"
 
-RUN add-pkg openjdk17-jre
+RUN add-pkg openjdk17-jre ttf-dejavu
 WORKDIR ${APP_HOME}
 COPY --from=builder /tmp/build/pkg-temp .
 
