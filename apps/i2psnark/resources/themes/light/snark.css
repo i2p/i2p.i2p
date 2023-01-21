@@ -249,10 +249,10 @@ button::-moz-focus-inner, input::-moz-focus-inner {
 
 #searchcancel {
      background: url(images/delete.png) 0px center no-repeat;
-     margin: 2px 4px 2px -28px;
+     margin: 2px 4px 2px 4px;
      color: transparent;
      border: none;
-     width: 12px;
+     width: 20px;
 }
 
 /* end top nav */
