@@ -1099,6 +1099,15 @@ public class NTCPTransport extends TransportImpl {
                             _log.warn("Already listening on " + addr);
                         return null;
                     }
+                    // if UDP only changed external port and not internal port,
+                    // do not rebind internally and restart, just change the address
+                    int eport = _context.getProperty(UDPTransport.PROP_EXTERNAL_PORT, 0);
+                    int iport = _context.getProperty(UDPTransport.PROP_INTERNAL_PORT, 0);
+                    if (port == eport && iport > 0 && eport != iport) {
+                        if (_log.shouldWarn())
+                            _log.warn("External port changed to " + eport + ", keep listening on internal port " + iport);
+                        return null;
+                    }
                     // FIXME support multiple binds
                     // FIXME just close and unregister
                     stopWaitAndRestart();
@@ -1617,6 +1626,8 @@ public class NTCPTransport extends TransportImpl {
         String cport = _context.getProperty(PROP_I2NP_NTCP_PORT);
         if (cport != null && cport.length() > 0) {
             nport = cport;
+            if (port > 0 && !nport.equals(Integer.toString(port)))
+                _log.logAlways(Log.WARN, "UDP detected external port is " + port + " but TCP configured port is " + nport);
         } else if (_context.getBooleanPropertyDefaultTrue(PROP_I2NP_NTCP_AUTO_PORT)) {
             // 0.9.6 change
             // This wasn't quite right, as udpAddr is the EXTERNAL port and we really
