@@ -1,3 +1,19 @@
+2023-01-21 zzz
+ * Console:
+   - Remove ERR- and WARN- prefixes from status strings
+   - Catch graph error in Docker (Gitlab #383)
+ * NTCP: Do not rebind internal port if only SSU external port changed
+ * SSU:
+   - Eliminate Symmetric NAT errors for "full cone" NATs
+   - Fix rare peer test NPE
+   - Fix initial SSU2 MTU when SSU1 disabled
+
+2023-01-19 zzz
+ * Build: Add i2psnark-release target
+
+2023-01-18 zzz
+ * i2psnark: Search CSS and JS
+
 2023-01-17 zzz
  * i2psnark:
    - Add basic search box
