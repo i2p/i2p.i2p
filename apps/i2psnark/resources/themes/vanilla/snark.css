@@ -275,20 +275,25 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
 #search {
      display: inline-block;
      position: absolute;
-     top: 6px;
+     top: 8px;
      right: 3px;
 }
 
 #searchbox {
-     background: #f60 url(/themes/console/images/buttons/search.png) 7px center no-repeat !important;
+     background: #efe6e0 url(/themes/console/images/buttons/search.png) 7px center no-repeat !important;
      margin: 2px 4px 2px 24px !important;
      padding: 4px 32px 4px 32px !important;
-     color: black;
+     color: #2f1500;
+}
+
+#searchbox:focus, #searchbox:active {
+     background: #fffcdf url(/themes/console/images/buttons/search.png) 7px center no-repeat !important;
+     color: #5f1227;
 }
 
 #searchcancel {
-     background: url(images/cancel.png);
-     margin: 2px 4px 2px -28px;
+     background: url(images/delete.png) 7px center no-repeat;
+     margin: 2px 4px 2px -30px;
      color: transparent;
      border: none;
 }

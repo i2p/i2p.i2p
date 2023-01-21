@@ -232,22 +232,27 @@ button::-moz-focus-inner, input::-moz-focus-inner {
 #search {
      display: inline-block;
      position: absolute;
-     top: 6px;
-     right: 3px;
+     top: 10px;
+     right: 6px;
 }
 
 #searchbox {
-     background: #f60 url(/themes/console/images/buttons/search.png) 7px center no-repeat !important;
+     background: #f8f8ff url(/themes/console/images/buttons/search.png) 7px center no-repeat !important;
      margin: 2px 4px 2px 24px !important;
      padding: 4px 32px 4px 32px !important;
-     color: black;
+     color: #47475f;
+}
+
+#searchbox:focus, #searchbox:active {
+     color: #19191f;
 }
 
 #searchcancel {
-     background: url(images/cancel.png);
+     background: url(images/delete.png) 0px center no-repeat;
      margin: 2px 4px 2px -28px;
      color: transparent;
      border: none;
+     width: 12px;
 }
 
 /* end top nav */

@@ -237,10 +237,15 @@ _:-ms-lang(x), .snarkNav:last-child[href="/i2psnark/"] {
 }
 
 #searchbox {
-     background: #f60 url(/themes/console/images/buttons/search.png) 7px center no-repeat !important;
+     background: #212 url(/themes/console/images/buttons/search.png) 7px center no-repeat !important;
      margin: 2px 4px 2px 24px !important;
      padding: 4px 32px 4px 32px !important;
-     color: black;
+     color: #f60;
+}
+
+#searchbox:focus, #searchbox:active {
+     background: #f60 url(/themes/console/images/buttons/search.png) 7px center no-repeat !important;
+     color: #fff;
 }
 
 #searchcancel {
