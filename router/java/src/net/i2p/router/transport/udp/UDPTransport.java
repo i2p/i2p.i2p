@@ -104,8 +104,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private final SSUHMACGenerator _hmac;
     private int _mtu = PeerState.MIN_MTU;
     private int _mtu_ipv6 = PeerState.MIN_IPV6_MTU;
-    private int _mtu_ssu2 = PeerState2.MIN_SSU_IPV4_MTU;
-    private int _mtu_ssu2_ipv6 = PeerState2.MIN_SSU_IPV6_MTU;
+    private int _mtu_ssu2;
+    private int _mtu_ssu2_ipv6;
     private final int _defaultMTU;
     private boolean _mismatchLogged;
     private final int _networkID;
@@ -444,6 +444,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         // SSU2 key and IV generation if required
         _enableSSU1 = dh != null;
         _defaultMTU = _enableSSU1 ? PeerState.LARGE_MTU : PeerState2.DEFAULT_MTU;
+        _mtu_ssu2 = _enableSSU1 ? PeerState2.MIN_SSU_IPV4_MTU : PeerState2.MIN_MTU;
+        _mtu_ssu2_ipv6 = _enableSSU1 ? PeerState2.MIN_SSU_IPV6_MTU : PeerState2.MIN_MTU;
         boolean enableSSU2 = xdh != null;
         if (enableSSU2) {
             // if any ipv4 address is lower than 1280 MTU, disable
