@@ -34,14 +34,21 @@
         </javac>
     </target>
 
-    <target name="listChangedFiles" if="mtn.available" >
-        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
-            <arg value="list" />
-            <arg value="changed" />
+    <target name="listChangedFiles" if="git.available" >
+        <exec executable="git" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="status" />
+            <arg value="-s" />
+            <arg value="--porcelain" />
+            <arg value="-uno" />
             <arg value="." />
         </exec>
+        <!-- trim flags -->
+        <exec executable="sed" inputstring="${workspace.changes}" outputproperty="workspace.changes.sed" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-e" />
+            <arg value="s/^[MTADRCU ]*//" />
+        </exec>
         <!-- \n in an attribute value generates an invalid manifest -->
-        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+        <exec executable="tr" inputstring="${workspace.changes.sed}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="-s" />
             <arg value="[:space:]" />
             <arg value="," />

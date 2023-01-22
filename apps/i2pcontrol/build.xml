@@ -92,7 +92,29 @@
         </javac>
     </target>
 
-    <target name="jar" depends="compile">
+    <target name="listChangedFiles" if="git.available" >
+        <exec executable="git" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="status" />
+            <arg value="-s" />
+            <arg value="--porcelain" />
+            <arg value="-uno" />
+            <arg value="." />
+            <arg value="../resources" />
+        </exec>
+        <!-- trim flags -->
+        <exec executable="sed" inputstring="${workspace.changes}" outputproperty="workspace.changes.sed" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-e" />
+            <arg value="s/^[MTADRCU ]*//" />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes.sed}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
+    </target>
+
+    <target name="jar" depends="compile, listChangedFiles">
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
         <jar destfile="build/i2pcontrol.jar" basedir="./build/obj" includes="**/*.class" >
@@ -108,7 +130,7 @@
         </jar>
     </target>    
 
-    <target name="socketJar" depends="compileSocketJar">
+    <target name="socketJar" depends="compileSocketJar, listChangedFiles">
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
         <jar destfile="build/i2pcontrol.jar" basedir="./build/obj" includes="**/*.class" >
@@ -124,7 +146,7 @@
         </jar>
     </target>    
 
-    <target name="war" depends="compile" >
+    <target name="war" depends="compile, listChangedFiles" >
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
         <war destfile="build/jsonrpc.war" webxml="web.xml" >
