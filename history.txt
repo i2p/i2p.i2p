@@ -1,7 +1,12 @@
+2023-01-22 zzz
+ * Build: Fix list of changed files in manifests
+ * i2psnark: Add max files per torrent config
+
 2023-01-21 zzz
  * Console:
    - Remove ERR- and WARN- prefixes from status strings
    - Catch graph error in Docker (Gitlab #383)
+ * i2psnark: Search box CSS
  * NTCP: Do not rebind internal port if only SSU external port changed
  * SSU:
    - Eliminate Symmetric NAT errors for "full cone" NATs
