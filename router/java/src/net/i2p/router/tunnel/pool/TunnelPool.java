@@ -616,7 +616,7 @@ public class TunnelPool {
         long et = now - _lastRateUpdate;
         if (et > 2*60*1000) {
             long bw = 1024 * (_lifetimeProcessed - _lastLifetimeProcessed) * 1000 / et;   // Bps
-            _context.statManager().addRateData(_rateName, bw, 0);
+            _context.statManager().addRateData(_rateName, bw);
             _lastRateUpdate = now;
             _lastLifetimeProcessed = _lifetimeProcessed;
         }
@@ -969,7 +969,7 @@ public class TunnelPool {
                        + " soon " + expireSoon + " later " + expireLater
                        + " std " + wanted + " inProgress " + inProgress + " fallback " + fallback 
                        + " for " + toString());
-            _context.statManager().addRateData(rateName, rv + inProgress, 0);
+            _context.statManager().addRateData(rateName, rv + inProgress);
             return rv;
         }
 
@@ -1022,7 +1022,7 @@ public class TunnelPool {
         
         int rv = countHowManyToBuild(allowZeroHop, expire30s, expire90s, expire150s, expire210s, expire270s, 
                                    expireLater, wanted, inProgress, fallback);
-        _context.statManager().addRateData(rateName, (rv > 0 || inProgress > 0) ? 1 : 0, 0);
+        _context.statManager().addRateData(rateName, (rv > 0 || inProgress > 0) ? 1 : 0);
         return rv;
 
     }
