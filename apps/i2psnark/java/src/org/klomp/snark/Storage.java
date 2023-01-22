@@ -288,9 +288,13 @@ public class Storage implements Closeable
    *  @throws IOException if too many total files
    */
   private void addFiles(List<File> l, File f) throws IOException {
+    int max = _util.getMaxFilesPerTorrent();
     if (!f.isDirectory()) {
-        if (l.size() >= SnarkManager.MAX_FILES_PER_TORRENT)
-            throw new IOException("Too many files, limit is " + SnarkManager.MAX_FILES_PER_TORRENT + ", zip them?");
+        if (l.size() >= max)
+            throw new IOException(_util.getString("Too many files in \"{0}\" ({1})!", metainfo.getName(), l.size()) +
+                                  " - limit is " + max + ", zip them or set " +
+                                  SnarkManager.PROP_MAX_FILES_PER_TORRENT + '=' + l.size() + " in " +
+                                  SnarkManager.CONFIG_FILE + " and restart");
         l.add(f);
     } else {
         File[] files = f.listFiles();
