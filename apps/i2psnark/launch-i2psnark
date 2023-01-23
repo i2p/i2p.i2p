@@ -35,5 +35,6 @@ raiseopenfilesulimit() {
 
 raiseopenfilesulimit
 
-I2P="."
-java $JAVA_OPTS -jar "$I2P/i2psnark.jar"
+I2P="`dirname $0`"
+cd "$I2P"
+java $JAVA_OPTS -jar i2psnark.jar
