@@ -142,6 +142,8 @@ public class Router implements RouterClock.ClockShiftListener {
     private static final String PROP_JBIGI = "jbigi.loadedResource";
     private static final String PROP_JBIGI_PROCESSOR = "jbigi.lastProcessor";
     public static final String UPDATE_FILE = "i2pupdate.zip";
+    //// remove after release ////
+    private static final boolean CONGESTION_CAPS = net.i2p.CoreVersion.PUBLISHED_VERSION.equals("0.9.58");
         
     private static final int SHUTDOWN_WAIT_SECS = 60;
 
@@ -1096,6 +1098,14 @@ public class Router implements RouterClock.ClockShiftListener {
     
     public static final char CAPABILITY_REACHABLE = 'R';
     public static final char CAPABILITY_UNREACHABLE = 'U';
+
+    /** @since 0.9.58, proposal 162 */
+    public static final char CAPABILITY_CONGESTION_MODERATE = 'D';
+    /** @since 0.9.58, proposal 162 */
+    public static final char CAPABILITY_CONGESTION_SEVERE = 'E';
+    /** @since 0.9.58, proposal 162 */
+    public static final char CAPABILITY_NO_TUNNELS = 'G';
+
     /** for testing */
     public static final String PROP_FORCE_UNREACHABLE = "router.forceUnreachable";
 
@@ -1184,6 +1194,8 @@ public class Router implements RouterClock.ClockShiftListener {
         
         if (hidden || _context.getBooleanProperty(PROP_FORCE_UNREACHABLE)) {
             rv.append(CAPABILITY_UNREACHABLE);
+            if (CONGESTION_CAPS)
+                rv.append(CAPABILITY_NO_TUNNELS);
             return rv.toString();
         }
         switch (_context.commSystem().getStatus()) {
@@ -1213,6 +1225,31 @@ public class Router implements RouterClock.ClockShiftListener {
             default:
                 // no explicit capability
                 break;
+        }
+
+        char cong = 0;
+        int maxTunnels = _context.getProperty(RouterThrottleImpl.PROP_MAX_TUNNELS, RouterThrottleImpl.DEFAULT_MAX_TUNNELS);
+        if (maxTunnels <= 0) {
+            cong = CAPABILITY_NO_TUNNELS;
+        } else if (maxTunnels <= 50 || SystemVersion.isSlow()) {
+            cong = CAPABILITY_CONGESTION_MODERATE;
+        } else {
+            int numTunnels = _context.tunnelManager().getParticipatingCount();
+            if (numTunnels > 9 * maxTunnels / 10) {
+                cong = CAPABILITY_CONGESTION_SEVERE;
+            } else if (numTunnels > 8 * maxTunnels / 10) {
+                cong = CAPABILITY_CONGESTION_MODERATE;
+            } else {
+                // TODO
+            }
+        }
+        if (cong != 0) {
+            if (CONGESTION_CAPS) {
+                rv.append(cong);
+            } else {
+                if (_log.shouldWarn())
+                    _log.warn("Congestion cap: " + cong);
+            }
         }
         return rv.toString();
     }
