@@ -26,6 +26,7 @@ import net.i2p.router.web.HelperBase;
 import net.i2p.router.web.Messages;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
+import net.i2p.util.ObjectCounterUnsafe;
 
 /**
  *  For /tunnels.jsp, used by TunnelHelper.
@@ -138,8 +139,9 @@ class TunnelRenderer {
                           recv + "</span></td>");
             else
                 out.write("<td class=\"cells\" align=\"center\">n/a</td>");
-            if (cfg.getReceiveFrom() != null)
-                out.write("<td class=\"cells\" align=\"center\"><span class=\"tunnel_peer\">" + netDbLink(cfg.getReceiveFrom()) +"</span></td>");
+            Hash from = cfg.getReceiveFrom();
+            if (from != null)
+                out.write("<td class=\"cells\" align=\"center\"><span class=\"tunnel_peer\">" + netDbLink(from) +"</span></td>");
             else
                 out.write("<td class=\"cells\">&nbsp;</td>");
             long send = cfg.getSendTunnelId();
@@ -147,8 +149,9 @@ class TunnelRenderer {
                 out.write("<td class=\"cells\" align=\"center\" title=\"" + _t("Tunnel identity") + "\"><span class=\"tunnel_id\">" + send +"</span></td>");
             else
                 out.write("<td class=\"cells\">&nbsp;</td>");
-            if (cfg.getSendTo() != null)
-                out.write("<td class=\"cells\" align=\"center\"><span class=\"tunnel_peer\">" + netDbLink(cfg.getSendTo()) +"</span></td>");
+            Hash to = cfg.getSendTo();
+            if (to != null)
+                out.write("<td class=\"cells\" align=\"center\"><span class=\"tunnel_peer\">" + netDbLink(to) +"</span></td>");
             else
                 out.write("<td class=\"cells\">&nbsp;</td>");
             long timeLeft = cfg.getExpiration() - now;
@@ -164,9 +167,9 @@ class TunnelRenderer {
                 lifetime = 10*60;
             long bps = 1024L * count / lifetime;
             out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatSize2Decimal(bps) + "Bps</td>");
-            if (cfg.getSendTo() == null)
+            if (to == null)
                 out.write("<td class=\"cells\" align=\"center\">" + _t("Outbound Endpoint") + "</td>");
-            else if (cfg.getReceiveFrom() == null)
+            else if (from == null)
                 out.write("<td class=\"cells\" align=\"center\">" + _t("Inbound Gateway") + "</td>");
             else
                 out.write("<td class=\"cells\" align=\"center\">" + _t("Participant") + "</td>");
@@ -181,6 +184,49 @@ class TunnelRenderer {
         else if (displayed <= 0)
             out.write("<div class=\"statusnotes\"><b>" + _t("none") + "</b></div>\n");
         out.write("<div class=\"statusnotes\"><b>" + _t("Lifetime bandwidth usage") + ":&nbsp;&nbsp;" + DataHelper.formatSize2(processed*1024) + "B</b></div>\n");
+
+            if (debug && participating.size() > 1) {
+                // peer table sorted by number of tunnels
+                ObjectCounterUnsafe<Hash> counts = new ObjectCounterUnsafe<Hash>();
+                ObjectCounterUnsafe<Hash> bws = new ObjectCounterUnsafe<Hash>();
+                for (int i = 0; i < participating.size(); i++) {
+                    HopConfig cfg = participating.get(i);
+                    Hash from = cfg.getReceiveFrom();
+                    Hash to = cfg.getSendTo();
+                    int msgs = cfg.getProcessedMessagesCount();
+                    if (from != null) {
+                        counts.increment(from);
+                        if (msgs > 0)
+                            bws.add(from, msgs);
+                    }
+                    if (to != null) {
+                        counts.increment(to);
+                        if (msgs > 0)
+                            bws.add(to, msgs);
+                    }
+                }
+                // sort and output
+                out.write("<h3 class=\"tabletitle\">Peers in multiple participating tunnels (including inactive)</h3>\n");
+                out.write("<table class=\"tunneldisplay tunnels_participating\"><tr><th>" + _t("Router") + "</th><th>" + _t("Tunnels") + "</th><th>"
+                          + _t("Usage") + "</th></tr>\n");
+                displayed = 0;
+                List<Hash> sort = counts.sortedObjects();
+                for (Hash h : sort) {
+                    int count = counts.count(h);
+                    if (count <= 1)
+                        break;
+                    if (++displayed > DISPLAY_LIMIT)
+                        break;
+                    out.write("<tr><td class=\"cells\" align=\"center\"><span class=\"tunnel_peer\">" + netDbLink(h) + "</span></td>\n");
+                    out.write("<td class=\"cells\" align=\"center\">" + count + "</td>\n");
+                    out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatSize2(bws.count(h) * 1024) + "B</td></tr>\n");
+                }
+                out.write("</table>\n");
+                if (displayed <= 0)
+                    out.write("<div class=\"statusnotes\"><b>" + _t("none") + "</b></div>\n");
+            }
+
+
         } else {   // bwShare > 12
             out.write("<div class=\"statusnotes noparticipate\"><b>" + _t("Not enough shared bandwidth to build participating tunnels.") +
                       "</b> <a href=\"config\">[" + _t("Configure") + "]</a></div>\n");
