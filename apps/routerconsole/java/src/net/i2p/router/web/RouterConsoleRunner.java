@@ -40,6 +40,7 @@ import net.i2p.util.Addresses;
 import net.i2p.util.FileSuffixFilter;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.OrderedProperties;
 import net.i2p.util.PortMapper;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.I2PSSLSocketFactory;
@@ -1125,7 +1126,7 @@ public class RouterConsoleRunner implements RouterApp {
     }
 
     public static Properties webAppProperties(String dir) {
-        Properties rv = new Properties();
+        Properties rv = new OrderedProperties();
         // String webappConfigFile = _context.getProperty(PROP_WEBAPP_CONFIG_FILENAME, DEFAULT_WEBAPP_CONFIG_FILENAME);
         String webappConfigFile = DEFAULT_WEBAPP_CONFIG_FILENAME;
         File cfgFile = new File(dir, webappConfigFile);
