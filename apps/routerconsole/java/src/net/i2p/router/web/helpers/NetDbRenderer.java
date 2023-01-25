@@ -52,7 +52,7 @@ import net.i2p.router.web.WebAppStarter;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConvertToHash;
 import net.i2p.util.Log;
-import net.i2p.util.ObjectCounter;
+import net.i2p.util.ObjectCounterUnsafe;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
 
@@ -935,8 +935,8 @@ class NetDbRenderer {
             buf.setLength(0);
         }
 
-        ObjectCounter<String> versions = new ObjectCounter<String>();
-        ObjectCounter<String> countries = new ObjectCounter<String>();
+        ObjectCounterUnsafe<String> versions = new ObjectCounterUnsafe<String>();
+        ObjectCounterUnsafe<String> countries = new ObjectCounterUnsafe<String>();
         int[] transportCount = new int[TNAMES.length];
 
         int skipped = 0;
@@ -1137,10 +1137,10 @@ class NetDbRenderer {
      */
     private class CountryCountComparator implements Comparator<String> {
          private static final long serialVersionUID = 1L;
-         private final ObjectCounter<String> counts;
+         private final ObjectCounterUnsafe<String> counts;
          private final Collator coll;
 
-         public CountryCountComparator(ObjectCounter<String> counts) {
+         public CountryCountComparator(ObjectCounterUnsafe<String> counts) {
              super();
              this.counts = counts;
              coll = Collator.getInstance(new Locale(Messages.getLanguage(_context)));

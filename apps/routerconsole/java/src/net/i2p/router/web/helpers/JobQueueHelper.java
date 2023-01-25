@@ -14,7 +14,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.router.Job;
 import net.i2p.router.JobStats;
 import net.i2p.router.web.HelperBase;
-import net.i2p.util.ObjectCounter;
+import net.i2p.util.ObjectCounterUnsafe;
 
 public class JobQueueHelper extends HelperBase {
     
@@ -79,7 +79,7 @@ public class JobQueueHelper extends HelperBase {
         buf.append("<h3 id=\"readyjobs\">")
            .append(_t("Ready/waiting jobs")).append(": ").append(readyJobs.size())
            .append("</h3><ol>");
-        ObjectCounter<String> counter = new ObjectCounter<String>();
+        ObjectCounterUnsafe<String> counter = new ObjectCounterUnsafe<String>();
         for (int i = 0; i < readyJobs.size(); i++) {
             Job j = readyJobs.get(i);
             counter.increment(j.getName());
@@ -129,7 +129,7 @@ public class JobQueueHelper extends HelperBase {
     }
     
     /** @since 0.9.5 */
-    private void getJobCounts(StringBuilder buf, ObjectCounter<String> counter) {
+    private void getJobCounts(StringBuilder buf, ObjectCounterUnsafe<String> counter) {
         List<String> names = new ArrayList<String>(counter.objects());
         if (names.size() < 4)
             return;
@@ -232,10 +232,10 @@ public class JobQueueHelper extends HelperBase {
 
     /** @since 0.9.5 */
     private static class JobCountComparator implements Comparator<String>, Serializable {
-         private final ObjectCounter<String> _counter;
+         private final ObjectCounterUnsafe<String> _counter;
          private final Collator coll = Collator.getInstance();
 
-         public JobCountComparator(ObjectCounter<String> counter) {
+         public JobCountComparator(ObjectCounterUnsafe<String> counter) {
              _counter = counter;
          }
 
