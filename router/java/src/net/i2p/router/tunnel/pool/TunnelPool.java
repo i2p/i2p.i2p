@@ -166,6 +166,7 @@ public class TunnelPool {
     private TunnelInfo selectTunnel(boolean allowRecurseOnFail) {
         boolean avoidZeroHop = !_settings.getAllowZeroHop();
         
+        long now = _context.clock().now();
         synchronized (_tunnels) {
             if (_tunnels.isEmpty()) {
                 if (_log.shouldLog(Log.WARN))
@@ -181,7 +182,7 @@ public class TunnelPool {
                         if (_lastSelectedIdx >= _tunnels.size())
                             _lastSelectedIdx = 0;
                         TunnelInfo info = _tunnels.get(_lastSelectedIdx);
-                        if ( (info.getLength() > 1) && (info.getExpiration() > _context.clock().now()) ) {
+                        if (info.getLength() > 1 && info.getExpiration() > now) {
                             // avoid outbound tunnels where the 1st hop is backlogged
                             if (_settings.isInbound() || !_context.commSystem().isBacklogged(info.getPeer(1))) {
                                 return info;
@@ -201,7 +202,7 @@ public class TunnelPool {
                 // randomly
                 for (int i = 0; i < _tunnels.size(); i++) {
                     TunnelInfo info = _tunnels.get(i);
-                    if (info.getExpiration() > _context.clock().now()) {
+                    if (info.getExpiration() > now) {
                         // avoid outbound tunnels where the 1st hop is backlogged
                         if (_settings.isInbound() || info.getLength() <= 1 ||
                             !_context.commSystem().isBacklogged(info.getPeer(1))) {
@@ -243,12 +244,13 @@ public class TunnelPool {
     TunnelInfo selectTunnel(Hash closestTo) {
         boolean avoidZeroHop = !_settings.getAllowZeroHop();
         TunnelInfo rv = null;
+        long now = _context.clock().now();
         synchronized (_tunnels) {
             if (!_tunnels.isEmpty()) {
                 if (_tunnels.size() > 1)
                     Collections.sort(_tunnels, new TunnelInfoComparator(closestTo, avoidZeroHop));
                 for (TunnelInfo info : _tunnels) {
-                    if (info.getExpiration() > _context.clock().now()) {
+                    if (info.getExpiration() > now) {
                         rv = info;
                         break;
                     }
