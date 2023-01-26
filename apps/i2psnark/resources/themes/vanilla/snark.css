@@ -294,8 +294,13 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
 #searchcancel {
      background: url(images/delete.png) 7px center no-repeat;
      margin: 2px 4px 2px -30px;
+     padding: 0px 14px;
      color: transparent;
      border: none;
+}
+
+#searchcancel.disabled {
+     display: none;
 }
 
 /* end topnav */

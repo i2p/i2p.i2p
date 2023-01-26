@@ -12,7 +12,7 @@ function initSearch()
 	if (sch != null) {
 		var box = document.getElementById("searchbox");
 		var cxl = document.getElementById("searchcancel");
-		sch.addEventListener("reset", function(event) {
+		cxl.addEventListener("click", function(event) {
 			if (box.value !== "") {
 				box.value = "";
 				requestAjax2(-1);
@@ -35,6 +35,8 @@ function initSearch()
 		} else {
 			cxl.classList.add("disabled");
 		}
+                // so we don't get the link popup
+		cxl.removeAttribute("href");
 	}
 }
 

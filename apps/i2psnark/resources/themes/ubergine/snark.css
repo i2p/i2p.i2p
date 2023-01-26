@@ -249,10 +249,15 @@ _:-ms-lang(x), .snarkNav:last-child[href="/i2psnark/"] {
 }
 
 #searchcancel {
-     background: url(images/cancel.png);
+     background: url(images/cancel.png) no-repeat;
      margin: 2px 4px 2px -28px;
+     padding: 0px 12px;
      color: transparent;
      border: none;
+}
+
+#searchcancel.disabled {
+     display: none;
 }
 
 /* end topnav */
