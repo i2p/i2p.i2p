@@ -28,8 +28,10 @@
             // update disable boolean
             intl.setDisableRefresh(d);
         }
+/*
         if (false && !intl.getDisableRefresh())
             out.print("<noscript><iframe src=\"/summaryframe.jsp" + newDelay + "\" height=\"1500\" width=\"200\" scrolling=\"auto\" frameborder=\"0\" title=\"sidepanel\"></noscript>\n");
+*/
     }
 %>
 <div class="routersummary">
@@ -46,6 +48,7 @@
         out.print("</a>");
     }
 
+/*
     // d and allowIFrame defined above
     if (false && !intl.getDisableRefresh()) {
         out.print("</div><noscript></iframe></noscript>\n");
@@ -63,7 +66,10 @@
         out.print("</button>\n" +
                   "</form></div></noscript></div>\n");
     } else {
+*/
         out.print("</div>\n");
+/*
     }
+*/
 %>
 </div>
