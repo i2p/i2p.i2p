@@ -225,6 +225,13 @@ public class LogsHelper extends HelperBase {
     }
 
     /**
+     * @since 0.9.58
+     */
+    public String getRevision() {
+        return getAtt("Base-Revision");
+    }
+
+    /**
      * @since 0.9.58 pulled out from above
      */
     private String getAtt(String a) {
