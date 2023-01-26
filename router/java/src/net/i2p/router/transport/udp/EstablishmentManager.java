@@ -826,10 +826,10 @@ class EstablishmentManager {
         if (_transport.isTooClose(to.getIP()))
             return;
         DatagramPacket pkt = fromPacket.getPacket();
-        int off = pkt.getOffset();
         int len = pkt.getLength();
         if (len < MIN_LONG_DATA_LEN)
             return;
+        int off = pkt.getOffset();
         byte data[] = pkt.getData();
         int type = data[off + TYPE_OFFSET] & 0xff;
         if (type == SSU2Util.SESSION_REQUEST_FLAG_BYTE && len < MIN_SESSION_REQUEST_LEN)
