@@ -52,6 +52,7 @@ test:ant:
         - echo junit.home=/usr/share/java >> override.properties
         - echo hamcrest.home=/usr/share/java >> override.properties
         - echo mockito.home=/usr/share/java >> override.properties
+        - echo build.built-by=GitHub Actions >> override.properties
     script:
         - ant test
     only:
