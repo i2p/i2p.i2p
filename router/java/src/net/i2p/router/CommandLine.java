@@ -23,6 +23,7 @@ public class CommandLine extends net.i2p.util.CommandLine {
         "net.i2p.router.RouterVersion",
         "net.i2p.router.crypto.FamilyKeyCrypto",
         "net.i2p.router.naming.BlockfileNamingService",
+        "net.i2p.router.networkdb.reseed.Reseeder",
         "net.i2p.router.peermanager.ProfileOrganizer",
         "net.i2p.router.tasks.CryptoChecker",
         "net.i2p.router.time.NtpClient",
