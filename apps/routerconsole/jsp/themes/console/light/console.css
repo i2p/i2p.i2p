@@ -7563,7 +7563,6 @@ b.netdb_transport {
     word-break: break-all;
     margin-bottom: 5px;
     padding-bottom: 0;
-    max-height: 600px;
     overflow: auto;
 }
 
