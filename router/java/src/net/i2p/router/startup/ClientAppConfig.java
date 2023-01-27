@@ -15,7 +15,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.FileSuffixFilter;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
-import net.i2p.util.ObjectCounter;
+import net.i2p.util.ObjectCounterUnsafe;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SystemVersion;
@@ -349,7 +349,7 @@ public class ClientAppConfig {
      */
     public synchronized static void writeClientAppConfig(I2PAppContext ctx, List<ClientAppConfig> apps) throws IOException {
         // Gather the set of config files
-        ObjectCounter<File> counter = new ObjectCounter<File>();
+        ObjectCounterUnsafe<File> counter = new ObjectCounterUnsafe<File>();
         for (ClientAppConfig cac : apps) {
             File f = cac.configFile;
             if (f == null)
