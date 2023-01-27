@@ -1,4 +1,5 @@
-FROM jlesage/baseimage:alpine-3.15-glibc as builder
+FROM jlesage/baseimage:alpine-3.17-v3.4.2 as builder
+RUN install-glibc
 
 ENV APP_HOME="/i2p"
 
@@ -10,7 +11,7 @@ RUN add-pkg --virtual build-base gettext tar bzip2 apache-ant openjdk17 \
     && rm -rf pkg-temp/osid pkg-temp/lib/wrapper pkg-temp/lib/wrapper.* \
     && del-pkg build-base gettext tar bzip2 apache-ant openjdk17
 
-FROM jlesage/baseimage:alpine-3.15-glibc
+FROM jlesage/baseimage:alpine-3.17-v3.4.2
 ENV APP_HOME="/i2p"
 
 RUN add-pkg openjdk17-jre ttf-dejavu
