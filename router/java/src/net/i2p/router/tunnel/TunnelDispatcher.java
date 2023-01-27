@@ -949,7 +949,7 @@ public class TunnelDispatcher implements Service {
             long now = getContext().clock().now() + LEAVE_BATCH_TIME; // leave all expiring in next 10 sec
             long nextTime = now + 10*60*1000;
             while ((cur = _configs.peek()) != null) {
-                long exp = cur.getExpiration() + (2 * Router.CLOCK_FUDGE_FACTOR) + LEAVE_BATCH_TIME;
+                long exp = cur.getExpiration() + (3 * Router.CLOCK_FUDGE_FACTOR / 2) + LEAVE_BATCH_TIME;
                 if (exp < now) {
                     _configs.poll();
                     if (_log.shouldLog(Log.INFO))
