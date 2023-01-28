@@ -1280,7 +1280,7 @@ public class Reseeder {
                         }
                         zipf.close();
                         if (old > 0) {
-                            System.out.println("Test failed for " + host + ", returned " + ri + " old router infos");
+                            System.out.println("Test failed for " + host + ", returned " + old + " old router infos");
                             fail++;
                         } else if (ri >= 50) {
                             System.out.println("Test passed for " + host + ", returned " + ri + " router infos");
