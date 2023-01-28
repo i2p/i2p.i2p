@@ -1755,8 +1755,27 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
 
         @Override
         public String toString() {
-            return "VersionAvailable \"" + version + "\" " + sourceMap +
-                   (constraint != null ? (" \"" + constraint + '"') : "");
+            StringBuilder buf = new StringBuilder(128);
+            buf.append("Version ").append(version).append(' ');
+            for (Map.Entry<UpdateMethod, List<URI>> e : sourceMap.entrySet()) {
+                buf.append(e.getKey());
+                List<URI> u = e.getValue();
+                if (u.isEmpty()) {
+                    buf.append(' ');
+                } else {
+                    buf.append('=');
+                    if (u.size() > 1)
+                        buf.append('[');
+                    for (URI uri : u) {
+                        buf.append(uri).append(' ');
+                    }
+                    if (u.size() > 1)
+                        buf.append(']');
+                }
+            }
+            if (constraint != null)
+                buf.append(" \"").append(constraint).append('"');
+            return buf.toString();
         }
     }
 

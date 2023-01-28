@@ -54,7 +54,14 @@
 %><tr><td><b>Encoding:</b></td><td><%=System.getProperty("file.encoding")%></td></tr>
 <tr><td><b>Charset:</b></td><td><%=java.nio.charset.Charset.defaultCharset().name()%></td></tr>
 <tr><td><b>Service:</b></td><td><%=net.i2p.util.SystemVersion.isService()%></td></tr>
-<tr><td><b>Built By:</b></td><td><jsp:getProperty name="logsHelper" property="builtBy" /></tbody></table>
+<%
+   String rev = logsHelper.getRevision();
+   if (rev.length() == 40) {
+%><tr><td><b>Revision:</b></td><td><%=rev%></td></tr>
+<%
+   }
+%><tr><td><b>Built:</b></td><td><jsp:getProperty name="logsHelper" property="buildDate" /></td></tr>
+<tr><td><b>Built By:</b></td><td><jsp:getProperty name="logsHelper" property="builtBy" /></td></tr></tbody></table>
 
 <h3 class="tabletitle"><%=intl._t("Critical Logs")%><%
     String consoleNonce = net.i2p.router.web.CSSHelper.getNonce();

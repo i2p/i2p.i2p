@@ -46,7 +46,6 @@ import net.i2p.stat.RateAverages;
 import net.i2p.stat.RateStat;
 import net.i2p.util.ConvertToHash;
 import net.i2p.util.Log;
-import net.i2p.util.ObjectCounter;
 import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;

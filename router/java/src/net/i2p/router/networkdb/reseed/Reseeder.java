@@ -1219,15 +1219,102 @@ public class Reseeder {
         return Translate.getString(n, s, p, _context, BUNDLE_NAME);
     }
 
-/******
-    public static void main(String args[]) {
-        if ( (args != null) && (args.length == 1) && (!Boolean.parseBoolean(args[0])) ) {
-            System.out.println("Not reseeding, as requested");
-            return; // not reseeding on request
+    /**
+     *  @since 0.9.58
+     */
+    public static void main(String args[]) throws Exception {
+        if (args.length == 1 && args[0].equals("help")) {
+            System.out.println("Usage: reseeder [https://hostname/ ...]");
+            System.exit(1);
         }
-        System.out.println("Reseeding");
-        Reseeder reseedHandler = new Reseeder();
-        reseedHandler.requestReseed();
+        File f = new File("certificates");
+        if (!f.exists()) {
+            System.out.println("Must be run from $I2P or have symlink to $I2P/certificates in this directory");
+            System.exit(1);
+        }
+        String[] urls = (args.length > 0) ? args : DataHelper.split(DEFAULT_SSL_SEED_URL, ",");
+        int pass = 0, fail = 0;
+        SSLEepGet.SSLState sslState = null;
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        for (String url : urls) {
+            url += SU3_FILENAME + NETID_PARAM + '2';
+            URI uri = new URI(url);
+            String host = uri.getHost();
+            System.out.println("Testing " + host);
+            File su3 = new File(host + ".su3");
+            su3.delete();
+            try {
+                SSLEepGet get;
+                if (sslState == null) {
+                    get = new SSLEepGet(ctx, su3.getPath(), url);
+                    sslState = get.getSSLState();
+                } else {
+                    get = new SSLEepGet(ctx, su3.getPath(), url, sslState);
+                }
+                if (get.fetch()) {
+                    int rc = get.getStatusCode();
+                    if (rc == 200) {
+                        SU3File su3f = new SU3File(su3);
+                        File zip = new File(host + ".zip");
+                        zip.delete();
+                        su3f.verifyAndMigrate(zip);
+                        SU3File.main(new String[] {"showversion", su3.getPath()});
+                        String version = su3f.getVersionString();
+                        long ver = Long.parseLong(version.trim()) * 1000;
+                        long cutoff = System.currentTimeMillis() - MAX_FILE_AGE / 4;
+                        if (ver < cutoff)
+                            throw new IOException("su3 file too old");
+                        java.util.zip.ZipFile zipf = new java.util.zip.ZipFile(zip);
+                        java.util.Enumeration<? extends java.util.zip.ZipEntry> entries = zipf.entries();
+                        int ri = 0, old = 0;
+                        while (entries.hasMoreElements()) {
+                            java.util.zip.ZipEntry entry = (java.util.zip.ZipEntry) entries.nextElement();
+                            net.i2p.data.router.RouterInfo r = new net.i2p.data.router.RouterInfo();
+                            InputStream in = zipf.getInputStream(entry);
+                            r.readBytes(in);
+                            in.close();
+                            if (r.getPublished() > cutoff)
+                                ri++;
+                            else
+                                old++;
+                        }
+                        zipf.close();
+                        if (old > 0) {
+                            System.out.println("Test failed for " + host + ", returned " + old + " old router infos");
+                            fail++;
+                        } else if (ri >= 50) {
+                            System.out.println("Test passed for " + host + ", returned " + ri + " router infos");
+                            pass++;
+                        } else {
+                            System.out.println("Test failed for " + host + ", returned only " + ri + " router infos");
+                            fail++;
+                        }
+                    } else {
+                        System.out.println("Test failed for " + host + " return code: " + rc);
+                        su3.delete();
+                        fail++;
+                    }
+                } else {
+                    int rc = get.getStatusCode();
+                    System.out.println("Test failed for " + host + " return code: " + rc);
+                    su3.delete();
+                    fail++;
+                }
+            } catch (Exception ioe) {
+                System.out.println("Test failed for " + host + ": " + ioe);
+                ioe.printStackTrace();
+                if (su3.exists()) {
+                    try {
+                        SU3File.main(new String[] {"showversion", su3.getPath()});
+                    } catch (Exception e) {}
+                    su3.delete();
+                }
+                fail++;
+            }
+            System.out.println();
+        }
+        System.out.println("Passed: " + pass + "; Failed: " + fail);
+        if (fail > 0)
+            System.exit(1);
     }
-******/
 }

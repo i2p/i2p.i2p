@@ -23,6 +23,9 @@ import net.i2p.util.UIMessages;
 
 public class LogsHelper extends HelperBase {
 
+    // cache so we only load once
+    Attributes att;
+
     private static final String _jstlVersion = jstlVersion();
 
     private static final int MAX_WRAPPER_LINES = 250;
@@ -206,23 +209,46 @@ public class LogsHelper extends HelperBase {
         rv[2] = DataHelper.escapeHTML(f.getName()).replace(" ", "%20");
         return rv;
     }
-   
+
     /**
      * @since 0.9.35
      */
     public String getBuiltBy() {
-        File libDir = _context.getLibDir();
-        File f = new File(libDir, "i2p.jar");
-        Attributes att = FileDumpHelper.attributes(f);
+        return getAtt("Built-By");
+    }
+
+    /**
+     * @since 0.9.58
+     */
+    public String getBuildDate() {
+        return getAtt("Build-Date");
+    }
+
+    /**
+     * @since 0.9.58
+     */
+    public String getRevision() {
+        return getAtt("Base-Revision");
+    }
+
+    /**
+     * @since 0.9.58 pulled out from above
+     */
+    private String getAtt(String a) {
+        if (att == null) {
+            File libDir = _context.getLibDir();
+            File f = new File(libDir, "i2p.jar");
+            att = FileDumpHelper.attributes(f);
+        }
         if (att != null) {
-            String s = FileDumpHelper.getAtt(att, "Built-By");
+            String s = FileDumpHelper.getAtt(att, a);
             if (s != null) {
                 return s;
             }
         }
         return "Undefined";
     }
-    
+
     private final static String NL = System.getProperty("line.separator");
 
     /** formats in forward order */

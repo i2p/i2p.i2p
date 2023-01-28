@@ -541,7 +541,7 @@ abstract class BuildRequestor {
         public void runJob() {
             _exec.buildComplete(_cfg, OTHER_FAILURE);
             getContext().profileManager().tunnelTimedOut(_cfg.getPeer(1));
-            getContext().statManager().addRateData("tunnel.buildFailFirstHop", 1, 0);
+            getContext().statManager().addRateData("tunnel.buildFailFirstHop", 1);
             // static, no _log
             //System.err.println("Cant contact first hop for " + _cfg);
         }

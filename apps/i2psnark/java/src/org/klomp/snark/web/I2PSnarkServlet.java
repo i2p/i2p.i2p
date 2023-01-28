@@ -326,7 +326,8 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("<script src=\".resources/js/configui.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
         } else {
             delay = _manager.getRefreshDelaySeconds();
-            if (delay > 0) {
+            // init for search even if refresh disabled
+            //if (delay > 0) {
                 String jsPfx = _context.isRouterContext() ? "" : ".resources";
                 String downMsg = _context.isRouterContext() ? _t("Router is down") : _t("I2PSnark has stopped");
                 // fallback to metarefresh when javascript is disabled
@@ -337,7 +338,7 @@ public class I2PSnarkServlet extends BasicServlet {
                           "var ajaxDelay = " + (delay * 1000) + ";\n" +
                           "</script>\n" +
                           "<script src=\".resources/js/initajax.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
-            }
+            //}
             out.write("<script nonce=\"" + cspNonce + "\" type=\"text/javascript\">\n"  +
                       "var deleteMessage1 = \"" + _t("Are you sure you want to delete the file \\''{0}\\'' (downloaded data will not be deleted) ?") + "\";\n" +
                       "var deleteMessage2 = \"" + _t("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?") + "\";\n" +
@@ -394,7 +395,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (search != null)
                     out.write(" value=\"" + DataHelper.escapeHTML(search) + '"');
                 out.write(">" +
-                          "<input type=\"reset\" class=\"cancel\" id=\"searchcancel\" value=\"\">" +
+                          "<a class=\"cancel\" id=\"searchcancel\" href=\"" + _contextPath + "/\"></a>" +
                           "</form>\n");
             }
         }

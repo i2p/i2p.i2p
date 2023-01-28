@@ -117,14 +117,21 @@
 
     <!-- the jar without the latest message classes from the jsps -->
     <target name="listChangedFiles" depends="jarUpToDate" if="shouldListChanges" >
-        <exec executable="mtn" outputproperty="workspace.changes.j" errorproperty="mtn.error2" failifexecutionfails="false" >
-            <arg value="list" />
-            <arg value="changed" />
+        <exec executable="git" outputproperty="workspace.changes.j" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="status" />
+            <arg value="-s" />
+            <arg value="--porcelain" />
+            <arg value="-uno" />
             <arg value="." />
             <arg value="../locale" />
         </exec>
+        <!-- trim flags -->
+        <exec executable="sed" inputstring="${workspace.changes.j}" outputproperty="workspace.changes.j.sed" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-e" />
+            <arg value="s/^[MTADRCU ]*//" />
+        </exec>
         <!-- \n in an attribute value generates an invalid manifest -->
-        <exec executable="tr" inputstring="${workspace.changes.j}" outputproperty="workspace.changes.j.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+        <exec executable="tr" inputstring="${workspace.changes.j.sed}" outputproperty="workspace.changes.j.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="-s" />
             <arg value="[:space:]" />
             <arg value="," />
@@ -211,7 +218,7 @@
                 <not>
                     <isset property="jar.uptodate" />
                 </not>
-                <isset property="mtn.available" />
+                <isset property="git.available" />
             </and>
         </condition>
     </target>
@@ -332,13 +339,23 @@
     </target>
 
     <target name="listChangedFiles2" depends="warUpToDate" if="shouldListChanges2" >
-        <exec executable="mtn" outputproperty="workspace.changes.w" errorproperty="mtn.error2" failifexecutionfails="false" >
-            <arg value="list" />
-            <arg value="changed" />
+        <exec executable="git" outputproperty="workspace.changes.w" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="status" />
+            <arg value="-s" />
+            <arg value="--porcelain" />
+            <arg value="-uno" />
             <arg value="../jsp" />
+            <arg value="../resources" />
+            <arg value="src/net/i2p/router/web/helpers" />
+            <arg value="src/net/i2p/router/web/servlets" />
+        </exec>
+        <!-- trim flags -->
+        <exec executable="sed" inputstring="${workspace.changes.w}" outputproperty="workspace.changes.w.sed" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-e" />
+            <arg value="s/^[MTADRCU ]*//" />
         </exec>
         <!-- \n in an attribute value generates an invalid manifest -->
-        <exec executable="tr" inputstring="${workspace.changes.w}" outputproperty="workspace.changes.w.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+        <exec executable="tr" inputstring="${workspace.changes.w.sed}" outputproperty="workspace.changes.w.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="-s" />
             <arg value="[:space:]" />
             <arg value="," />
@@ -376,12 +393,12 @@
             <srcfiles dir= "build/obj" includes="net/i2p/router/web/helpers/*.class net/i2p/router/web/servlets/*.class" />
             <srcfiles dir= "../resources" />
         </uptodate>
-        <condition property="shouldListChanges" >
+        <condition property="shouldListChanges2" >
             <and>
                 <not>
-                    <isset property="jar.uptodate" />
+                    <isset property="war.uptodate" />
                 </not>
-                <isset property="mtn.available" />
+                <isset property="git.available" />
             </and>
         </condition>
     </target>

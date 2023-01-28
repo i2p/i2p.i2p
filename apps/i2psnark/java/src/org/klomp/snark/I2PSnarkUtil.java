@@ -77,6 +77,7 @@ public class I2PSnarkUtil implements DisconnectListener {
     private DHT _dht;
     private long _startedTime;
     private final DisconnectListener _discon;
+    private int _maxFilesPerTorrent = SnarkManager.DEFAULT_MAX_FILES_PER_TORRENT;
 
     private static final int EEPGET_CONNECT_TIMEOUT = 45*1000;
     private static final int EEPGET_CONNECT_TIMEOUT_SHORT = 5*1000;
@@ -241,6 +242,11 @@ public class I2PSnarkUtil implements DisconnectListener {
 
     /** @since 0.9.1 */
     public File getTempDir() { return _tmpDir; }
+
+    /** @since 0.9.58 */
+    public int getMaxFilesPerTorrent() { return _maxFilesPerTorrent; }
+    /** @since 0.9.58 */
+    public void setMaxFilesPerTorrent(int max) { _maxFilesPerTorrent = Math.max(max, 1); }
 
     /**
      * Connect to the router, if we aren't already

@@ -46,7 +46,7 @@ class LoadRouterInfoJob extends JobImpl {
     private RouterInfo _us;
     private static final AtomicBoolean _keyLengthChecked = new AtomicBoolean();
     // 1 chance in this many to rekey if the defaults changed
-    private static final int REKEY_PROBABILITY = 4;
+    private static final int REKEY_PROBABILITY = 1;
     
     public LoadRouterInfoJob(RouterContext ctx) {
         super(ctx);

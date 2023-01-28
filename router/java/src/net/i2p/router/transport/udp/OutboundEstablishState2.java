@@ -6,6 +6,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -766,6 +767,11 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                            "\nGenerated header key 2 for A->B:  " + Base64.encode(h_ab) +
                            "\nGenerated header key 2 for B->A:  " + Base64.encode(h_ba));
             ****/
+            Arrays.fill(ckd, (byte) 0);
+            Arrays.fill(k_ab, (byte) 0);
+            Arrays.fill(k_ba, (byte) 0);
+            Arrays.fill(d_ab, (byte) 0);
+            Arrays.fill(d_ba, (byte) 0);
             _handshakeState.destroy();
             if (_requestSentCount == 1)
                 _rtt = (int) ( _context.clock().now() - _lastSend );

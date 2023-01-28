@@ -16,12 +16,12 @@
 <div class="main" id="debug">
 
 <div class="confignav">
-<span class="tab"><a href="#debug_portmapper">Port Mapper</a></span>
-<span class="tab"><a href="#appmanager">App Manager</a></span>
-<span class="tab"><a href="#updatemanager">Update Manager</a></span>
-<span class="tab"><a href="#skm">Router Session Key Manager</a></span>
-<span class="tab"><a href="#cskm0">Client Session Key Managers</a></span>
-<span class="tab"><a href="#dht">Router DHT</a></span>
+<span class="tab"><a href="/debug">Port Mapper</a></span>
+<span class="tab"><a href="/debug?d=1">App Manager</a></span>
+<span class="tab"><a href="/debug?d=2">Update Manager</a></span>
+<span class="tab"><a href="/debug?d=3">Router Session Key Manager</a></span>
+<span class="tab"><a href="/debug?d=4">Client Session Key Managers</a></span>
+<span class="tab"><a href="/debug?d=5">Router DHT</a></span>
 </div>
 
 <%
@@ -29,6 +29,9 @@
      *  Quick and easy place to put debugging stuff
      */
     net.i2p.router.RouterContext ctx = (net.i2p.router.RouterContext) net.i2p.I2PAppContext.getGlobalContext();
+
+String dd = request.getParameter("d");
+if (dd == null || dd.equals("0")) {
 
     /*
      *  Print out the status for the PortMapper
@@ -40,6 +43,8 @@
      */
     net.i2p.util.InternalServerSocket.renderStatusHTML(out);
 
+} else if (dd.equals("1")) {
+
     /*
      *  Print out the status for the AppManager
      */
@@ -48,6 +53,7 @@
     ctx.routerAppManager().renderStatusHTML(out);
             out.print("</div>");
 
+} else if (dd.equals("2")) {
 
     /*
      *  Print out the status for the UpdateManager
@@ -63,14 +69,20 @@
     out.print("</div>");
     }
 
+} else if (dd.equals("3")) {
+
     /*
      *  Print out the status for all the SessionKeyManagers
      */
     out.print("<div class=\"debug_section\" id=\"skm\">");
     out.print("<h2>Router Session Key Manager</h2>");
     ctx.sessionKeyManager().renderStatusHTML(out);
-    java.util.Set<net.i2p.data.Destination> clients = ctx.clientManager().listClients();
     out.print("</div>");
+
+} else if (dd.equals("4")) {
+
+    out.print("<h2>Client Session Key Managers</h2>");
+    java.util.Set<net.i2p.data.Destination> clients = ctx.clientManager().listClients();
     int i = 0;
     for (net.i2p.data.Destination dest : clients) {
         net.i2p.data.Hash h = dest.calculateHash();
@@ -92,12 +104,15 @@
             out.print("</div>");
         }
     }
+} else if (dd.equals("5")) {
 
     /*
      *  Print out the status for the NetDB
      */
     out.print("<h2 id=\"dht\">Router DHT</h2>");
     ctx.netDb().renderStatusHTML(out);
+
+}
 
 %>
 </div></body></html>

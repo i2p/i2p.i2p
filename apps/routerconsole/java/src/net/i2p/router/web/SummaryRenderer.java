@@ -349,9 +349,14 @@ class SummaryRenderer {
                 // NPE here if system is missing fonts - see ticket #915
                 graph = new RrdGraph(def);
             } catch (NullPointerException npe) {
-                _log.error("Error rendering", npe);
+                _log.error("Error rendering graph", npe);
                 StatSummarizer.setDisabled(_context);
-                throw new IOException("Error rendering - disabling graph generation. Missing font? See http://trac.i2p2.i2p/ticket/915");
+                throw new IOException("Error rendering - disabling graph generation. Missing font?");
+            } catch (Error e) {
+                // Docker InternalError see Gitlab #383
+                _log.error("Error rendering graph", e);
+                StatSummarizer.setDisabled(_context);
+                throw new IOException("Error rendering - disabling graph generation. Missing font?");
             }
             int totalWidth = graph.getRrdGraphInfo().getWidth();
             int totalHeight = graph.getRrdGraphInfo().getHeight();

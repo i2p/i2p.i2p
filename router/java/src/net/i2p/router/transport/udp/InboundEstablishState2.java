@@ -7,6 +7,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -829,6 +830,11 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                        "\nGenerated header key 2 for A->B:  " + Base64.encode(h_ab) +
                        "\nGenerated header key 2 for B->A:  " + Base64.encode(h_ba));
        ****/
+        Arrays.fill(ckd, (byte) 0);
+        Arrays.fill(k_ab, (byte) 0);
+        Arrays.fill(k_ba, (byte) 0);
+        Arrays.fill(d_ab, (byte) 0);
+        Arrays.fill(d_ba, (byte) 0);
         _handshakeState.destroy();
         if (_createdSentCount == 1)
             _rtt = (int) ( _context.clock().now() - _lastSend );

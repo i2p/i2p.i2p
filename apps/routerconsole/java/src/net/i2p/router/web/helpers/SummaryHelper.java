@@ -237,7 +237,7 @@ public class SummaryHelper extends HelperBase {
         long skew = _context.commSystem().getFramedAveragePeerClockSkew(33);
         // Display the actual skew, not the offset
         if (Math.abs(skew) > 30*1000)
-            return new NetworkStateMessage(NetworkState.CLOCKSKEW, _t("ERR-Clock Skew of {0}", DataHelper.formatDuration2(Math.abs(skew))));
+            return new NetworkStateMessage(NetworkState.CLOCKSKEW, fixup(_t("ERR-Clock Skew of {0}", DataHelper.formatDuration2(Math.abs(skew)))));
         if (_context.router().isHidden())
             return new NetworkStateMessage(NetworkState.HIDDEN, _t("Hidden"));
         RouterInfo routerInfo = _context.router().getRouterInfo();
@@ -272,22 +272,22 @@ public class SummaryHelper extends HelperBase {
                 // TODO set IPv6 arg based on configuration?
                 if (TransportUtil.isPubliclyRoutable(ip, true))
                     return new NetworkStateMessage(NetworkState.RUNNING, txstatus);
-                return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-Private TCP Address"));
+                return new NetworkStateMessage(NetworkState.ERROR, fixup(_t("ERR-Private TCP Address")));
 
             case IPV4_SNAT_IPV6_UNKNOWN:
             case DIFFERENT:
-                return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-SymmetricNAT"));
+                return new NetworkStateMessage(NetworkState.ERROR, fixup(_t("ERR-SymmetricNAT")));
 
             case REJECT_UNSOLICITED:
                 state = NetworkState.FIREWALLED;
             case IPV4_DISABLED_IPV6_FIREWALLED:
                 if (routerInfo.getTargetAddress("NTCP") != null)
-                    return new NetworkStateMessage(NetworkState.WARN, _t("WARN-Firewalled with Inbound TCP Enabled"));
+                    return new NetworkStateMessage(NetworkState.WARN, fixup(_t("WARN-Firewalled with Inbound TCP Enabled")));
                 // fall through...
             case IPV4_FIREWALLED_IPV6_OK:
             case IPV4_FIREWALLED_IPV6_UNKNOWN:
                 if (((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled())
-                    return new NetworkStateMessage(NetworkState.WARN, _t("WARN-Firewalled and Floodfill"));
+                    return new NetworkStateMessage(NetworkState.WARN, fixup(_t("WARN-Firewalled and Floodfill")));
                 //if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)
                 //    return new NetworkStateMessage(NetworkState.WARN, _t("WARN-Firewalled and Fast"));
                 return new NetworkStateMessage(state, txstatus);
@@ -296,7 +296,7 @@ public class SummaryHelper extends HelperBase {
                 return new NetworkStateMessage(NetworkState.TESTING, _t("Disconnected - check network connection"));
 
             case HOSED:
-                return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart"));
+                return new NetworkStateMessage(NetworkState.ERROR, fixup(_t("ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart")));
 
             case UNKNOWN:
                 state = NetworkState.TESTING;
@@ -306,15 +306,37 @@ public class SummaryHelper extends HelperBase {
                 List<RouterAddress> ra = routerInfo.getTargetAddresses("SSU", "SSU2");
                 if (ra.isEmpty() && _context.router().getUptime() > 5*60*1000) {
                     if (getActivePeers() <= 0)
-                        return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-No Active Peers, Check Network Connection and Firewall"));
+                        return new NetworkStateMessage(NetworkState.ERROR, fixup(_t("ERR-No Active Peers, Check Network Connection and Firewall")));
                     else if (_context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME) == null ||
                         _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_PORT) == null)
-                        return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-UDP Disabled and Inbound TCP host/port not set"));
+                        return new NetworkStateMessage(NetworkState.ERROR, fixup(_t("ERR-UDP Disabled and Inbound TCP host/port not set")));
                     else
-                        return new NetworkStateMessage(NetworkState.WARN, _t("WARN-Firewalled with UDP Disabled"));
+                        return new NetworkStateMessage(NetworkState.WARN, fixup(_t("WARN-Firewalled with UDP Disabled")));
                 }
                 return new NetworkStateMessage(state, txstatus);
         }
+    }
+
+    /**
+     *  Make the already-translated ERR- and WARN- strings a little prettier
+     *  @since 0.9.58
+     */
+    private static String fixup(String s) {
+        if (s.startsWith("ERR-")) {
+            s = s.substring(4);
+        } else if (s.startsWith("ERR -")) {
+            s = s.substring(5);
+        } else if (s.startsWith("WARN-")) {
+            s = s.substring(5);
+        } else if (s.startsWith("WARN -")) {
+            s = s.substring(6);
+        } else {
+            // translated
+            int d = s.indexOf('-');
+            if (d > 0 && d < 10)
+                s = s.substring(d + 1);
+        }
+        return s;
     }
 
     /**

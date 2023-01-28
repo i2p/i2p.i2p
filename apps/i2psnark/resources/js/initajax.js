@@ -55,7 +55,9 @@ function requestAjax2(refreshtime) {
 }
 
 function initAjax() {
-    setTimeout(requestAjax1, ajaxDelay);
+    if (ajaxDelay > 0) {
+        setTimeout(requestAjax1, ajaxDelay);
+    }
 }
 
 document.addEventListener("DOMContentLoaded", function() {
