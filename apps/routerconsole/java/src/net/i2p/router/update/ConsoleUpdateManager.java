@@ -165,7 +165,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         DummyHandler dh = new DummyHandler(_context, this);
         register((Checker)dh, TYPE_DUMMY, METHOD_DUMMY, 0);
         register((Updater)dh, TYPE_DUMMY, METHOD_DUMMY, 0);
-        VersionAvailable dummyVA = new VersionAvailable("", "", METHOD_DUMMY, Collections.<URI> emptyList());
+        VersionAvailable dummyVA = new VersionAvailable("0", "", METHOD_DUMMY, Collections.<URI> emptyList());
         _available.put(new UpdateItem(TYPE_DUMMY, ""), dummyVA);
         // register news before router, so we don't fire off an update
         // right at instantiation if the news is already indicating a new version
