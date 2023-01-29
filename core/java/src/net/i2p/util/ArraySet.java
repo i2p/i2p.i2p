@@ -85,6 +85,26 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E> {
         addAll(c);
     }
 
+
+    /**
+     *  A fixed capacity of arr.length.
+     *  Adds over capacity will throw a SetFullException.
+     *  arr must not contain duplicates, no checks are done.
+     *  arr may contain nulls but they must be at the end.
+     *
+     *  @since 0.9.58
+     */
+    public ArraySet(E[] arr) {
+        _entries = arr;
+        int i;
+        for (i = 0; i < arr.length; i++) {
+            if (arr[i] == null)
+                break;
+        }
+        _size = i;
+        _throwOnFull = true;
+    }
+
     /**
      *  Adds over capacity will throw a SetFullException.
      *
@@ -207,6 +227,17 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E> {
 
     public int size() {
         return _size;
+    }
+
+    /**
+     *  @throws IndexOutOfBoundsException
+     *  @since 0.9.58
+     */
+    @SuppressWarnings("unchecked")
+    public E get(int index) {
+        if (index < 0 || index > _size - 1)
+            throw new IndexOutOfBoundsException();
+        return (E) _entries[index];
     }
 
     /**
