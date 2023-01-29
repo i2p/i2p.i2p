@@ -73,7 +73,7 @@ public class RandomIterator<E> implements Iterator<E> {
     private final BitSet served;
 
     /** The amount of items served so far */
-    private int servedCount = 0;
+    private int servedCount;
     private final List<E> list;
     private final int LIST_SIZE;
 
@@ -182,6 +182,7 @@ public class RandomIterator<E> implements Iterator<E> {
         throw new UnsupportedOperationException();
     }
 
+/*
     public static void main(String[] args) {
         testAndroid();
         test(0);
@@ -200,6 +201,7 @@ public class RandomIterator<E> implements Iterator<E> {
             System.out.println(iter.next().toString());
         }
     }
+*/
 
     /**
      *  Test case from android ticket above
