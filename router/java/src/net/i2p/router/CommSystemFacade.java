@@ -13,7 +13,6 @@ import java.io.Writer;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -171,7 +170,7 @@ public abstract class CommSystemFacade implements Service {
      *  @return the hashes of all the routers we are connected to, non-null
      *  @since 0.9.34
      */
-    public abstract Set<Hash> getEstablished();
+    public abstract List<Hash> getEstablished();
     
     /** @since 0.8.13 */
     public boolean isDummy() { return true; }
@@ -395,9 +394,11 @@ public abstract class CommSystemFacade implements Service {
         IPV4_UNKNOWN_IPV6_OK(STATUS_IPV4_UNKNOWN_IPV6_OK, _x("IPv4: Testing; IPv6: OK")),
         IPV4_FIREWALLED_IPV6_OK(STATUS_IPV4_FIREWALLED_IPV6_OK, _x("IPv4: Firewalled; IPv6: OK")),
         IPV4_DISABLED_IPV6_OK(STATUS_IPV4_DISABLED_IPV6_OK, _x("IPv4: Disabled; IPv6: OK")),
+        /** IPv4 symmetric NAT (not source NAT) */
         IPV4_SNAT_IPV6_OK(STATUS_IPV4_SNAT_IPV6_OK, _x("IPv4: Symmetric NAT; IPv6: OK")),
         /** IPv4 symmetric NAT, IPv6 firewalled or disabled or no address */
         DIFFERENT(STATUS_DIFFERENT, _x("Symmetric NAT")),
+        /** IPv4 symmetric NAT (not source NAT) */
         IPV4_SNAT_IPV6_UNKNOWN(STATUS_IPV4_SNAT_IPV6_UNKNOWN, _x("IPv4: Symmetric NAT; IPv6: Testing")),
         IPV4_FIREWALLED_IPV6_UNKNOWN(STATUS_IPV4_FIREWALLED_IPV6_UNKNOWN, _x("IPv4: Firewalled; IPv6: Testing")),
         /** IPv4 firewalled, IPv6 firewalled or disabled or no address */

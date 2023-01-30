@@ -1803,11 +1803,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** 
      * Connected peers.
      *
-     * @return not a copy, do not modify
+     * @return a copy, modifiable
      * @since 0.9.34
      */
-    public Set<Hash> getEstablished() {
-        return _peersByIdent.keySet();
+    public List<Hash> getEstablished() {
+        return new ArrayList<Hash>(_peersByIdent.keySet());
     }
 
     /**

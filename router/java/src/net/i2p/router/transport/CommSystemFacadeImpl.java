@@ -183,10 +183,10 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
 
     /**
-     *  @return a new set, may be modified
+     *  @return a new list, may be modified
      *  @since 0.9.34
      */    
-    public Set<Hash> getEstablished() {
+    public List<Hash> getEstablished() {
         return _manager.getEstablished();
     }
 

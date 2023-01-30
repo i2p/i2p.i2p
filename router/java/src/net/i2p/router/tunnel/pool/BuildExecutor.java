@@ -121,7 +121,7 @@ class BuildExecutor implements Runnable {
         CommSystemFacade csf = _context.commSystem();
         if (csf.getStatus() == Status.DISCONNECTED)
             return 0;
-        if (csf.isDummy() && csf.getEstablished().size() <= 0)
+        if (csf.isDummy() && csf.countActivePeers() <= 0)
             return 0;
         int maxKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
         int allowed = maxKBps / 6; // Max. 1 concurrent build per 6 KB/s outbound

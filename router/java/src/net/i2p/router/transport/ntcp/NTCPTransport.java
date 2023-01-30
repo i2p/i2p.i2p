@@ -760,12 +760,12 @@ public class NTCPTransport extends TransportImpl {
      * @return a copy, modifiable
      * @since 0.9.34
      */
-    public Set<Hash> getEstablished() {
-        Set<Hash> rv = new HashSet<Hash>(_conByIdent.keySet());
+    public List<Hash> getEstablished() {
+        List<Hash> rv = new ArrayList<Hash>(_conByIdent.size());
         for (Map.Entry<Hash, NTCPConnection> e : _conByIdent.entrySet()) {
             NTCPConnection con = e.getValue();
-            if (!con.isEstablished() || con.isClosed())
-                rv.remove(e.getKey());
+            if (con.isEstablished() && !con.isClosed())
+                rv.add(e.getKey());
         }
         return rv;
     }

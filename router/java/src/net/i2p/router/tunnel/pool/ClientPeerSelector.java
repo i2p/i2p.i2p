@@ -1,7 +1,6 @@
 package net.i2p.router.tunnel.pool;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -14,6 +13,7 @@ import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelPoolSettings;
 import static net.i2p.router.peermanager.ProfileOrganizer.Slice.*;
 import net.i2p.router.util.MaskedIPSet;
+import net.i2p.util.ArraySet;
 
 /**
  * Pick peers randomly out of the fast pool, and put them into tunnels
@@ -52,6 +52,8 @@ class ClientPeerSelector extends TunnelPeerSelector {
             boolean v6Only = isIPv6Only();
             boolean ntcpDisabled = isNTCPDisabled();
             boolean ssuDisabled = isSSUDisabled();
+            // for these cases, check the closest hop up front,
+            // otherwise, will be done in checkTunnel() at the end
             boolean checkClosestHop = v6Only || ntcpDisabled || ssuDisabled;
             boolean hidden = ctx.router().isHidden() ||
                              ctx.router().getRouterInfo().getAddressCount() <= 0 ||
@@ -65,21 +67,27 @@ class ClientPeerSelector extends TunnelPeerSelector {
                 return selectExplicit(settings, length);
 
             Set<Hash> exclude = getExclude(isInbound, false);
-            Set<Hash> matches = new HashSet<Hash>(length);
+            Set<Hash> matches = new ArraySet<Hash>(length);
             if (length == 1) {
                 // closest-hop restrictions
-                if (checkClosestHop) {
-                    Set<Hash> moreExclude = getClosestHopExclude(isInbound);
-                    if (moreExclude != null)
-                        exclude.addAll(moreExclude);
-                }
+                if (checkClosestHop)
+                    exclude = getClosestHopExclude(isInbound, exclude);
+                if (isInbound)
+                    exclude = new IBGWExcluder(exclude);
+                else
+                    exclude = new OBEPExcluder(exclude);
                 // 1-hop, IP restrictions not required here
                 if (hiddenInbound) {
-                    // SANFP adds all not-connected to exclude, so make a copy
-                    Set<Hash> SANFPExclude = new HashSet<Hash>(exclude);
-                    ctx.profileOrganizer().selectActiveNotFailingPeers(1, SANFPExclude, matches);
+                    // TODO this doesn't pick from fast
+                    ctx.profileOrganizer().selectActiveNotFailingPeers(1, exclude, matches);
                 }
                 if (matches.isEmpty()) {
+                    if (hiddenInbound) {
+                        // No connected peers found, give up now
+                        if (log.shouldWarn())
+                            log.warn("CPS SANFP hidden closest IB no active peers found, returning null");
+                        return null;
+                    }
                     // ANFP does not fall back to non-connected
                     ctx.profileOrganizer().selectFastPeers(length, exclude, matches);
                 }
@@ -95,34 +103,30 @@ class ClientPeerSelector extends TunnelPeerSelector {
                 // group 0 or 1 if two hops, otherwise group 0
                 Set<Hash> lastHopExclude;
                 if (isInbound) {
-                    // exclude existing OBEPs to get some diversity ?
-                    // closest-hop restrictions
-                    if (checkClosestHop) {
-                        Set<Hash> moreExclude = getClosestHopExclude(false);
-                        if (moreExclude != null) {
-                            moreExclude.addAll(exclude);
-                            lastHopExclude = moreExclude;
-                        } else {
-                            lastHopExclude = exclude;
-                        }
+                    if (checkClosestHop && !hidden) {
+                        // exclude existing OBEPs to get some diversity ?
+                        // closest-hop restrictions
+                        lastHopExclude = getClosestHopExclude(true, exclude);
                     } else {
-                         lastHopExclude = exclude;
+                        lastHopExclude = exclude;
                     }
+                    if (log.shouldInfo())
+                        log.info("CPS SFP closest IB " + lastHopExclude);
                 } else {
-                    lastHopExclude = exclude;
+                    lastHopExclude = new OBEPExcluder(exclude);
+                    if (log.shouldInfo())
+                        log.info("CPS SFP OBEP " + lastHopExclude);
                 }
                 if (hiddenInbound) {
                     // IB closest hop
                     if (log.shouldInfo())
-                        log.info("CPS SANFP closest IB exclude " + lastHopExclude.size());
-                    // SANFP adds all not-connected to exclude, so make a copy
-                    Set<Hash> SANFPExclude = new HashSet<Hash>(lastHopExclude);
-                    ctx.profileOrganizer().selectActiveNotFailingPeers(1, SANFPExclude, matches, ipRestriction, ipSet);
+                        log.info("CPS SANFP hidden closest IB " + lastHopExclude);
+                    ctx.profileOrganizer().selectActiveNotFailingPeers(1, lastHopExclude, matches, ipRestriction, ipSet);
                     if (matches.isEmpty()) {
-                        if (log.shouldInfo())
-                            log.info("CPS SFP closest IB exclude " + lastHopExclude.size());
-                        // ANFP does not fall back to non-connected
-                        ctx.profileOrganizer().selectFastPeers(1, lastHopExclude, matches, randomKey, length == 2 ? SLICE_0_1 : SLICE_0, ipRestriction, ipSet);
+                        // No connected peers found, give up now
+                        if (log.shouldWarn())
+                            log.warn("CPS SANFP hidden closest IB no active peers found, returning null");
+                        return null;
                     }
                 } else if (hiddenOutbound) {
                     // OBEP
@@ -178,15 +182,13 @@ class ClientPeerSelector extends TunnelPeerSelector {
                     }
                     if (pickFurthest) {
                         if (log.shouldInfo())
-                            log.info("CPS SANFP OBEP exclude " + lastHopExclude.size());
-                        // SANFP adds all not-connected to exclude, so make a copy
-                        Set<Hash> SANFPExclude = new HashSet<Hash>(lastHopExclude);
-                        ctx.profileOrganizer().selectActiveNotFailingPeers(1, SANFPExclude, matches, ipRestriction, ipSet);
+                            log.info("CPS SANFP OBEP " + lastHopExclude);
+                        ctx.profileOrganizer().selectActiveNotFailingPeers(1, lastHopExclude, matches, ipRestriction, ipSet);
                         if (matches.isEmpty()) {
-                            // ANFP does not fall back to non-connected
-                            if (log.shouldInfo())
-                                log.info("CPS SFP OBEP exclude " + lastHopExclude.size());
-                            ctx.profileOrganizer().selectFastPeers(1, lastHopExclude, matches, randomKey, length == 2 ? SLICE_0_1 : SLICE_0, ipRestriction, ipSet);
+                            // No connected peers found, give up now
+                            if (log.shouldWarn())
+                                log.warn("CPS SANFP hidden OBEP no active peers found, returning null");
+                            return null;
                         }
                     } else {
                         ctx.profileOrganizer().selectFastPeers(1, lastHopExclude, matches, randomKey, length == 2 ? SLICE_0_1 : SLICE_0, ipRestriction, ipSet);
@@ -203,6 +205,8 @@ class ClientPeerSelector extends TunnelPeerSelector {
                 if (length > 2) {
                     // middle hop(s)
                     // group 2 or 3
+                    if (log.shouldInfo())
+                        log.info("CPS SFP middle " + exclude);
                     ctx.profileOrganizer().selectFastPeers(length - 2, exclude, matches, randomKey, SLICE_2_3, ipRestriction, ipSet);
                     matches.remove(ctx.routerHash());
                     if (matches.size() > 1) {
@@ -219,20 +223,25 @@ class ClientPeerSelector extends TunnelPeerSelector {
 
                 // IBGW or OB first hop
                 // group 2 or 3 if two hops, otherwise group 1
-                if (!isInbound) {
+                if (isInbound) {
+                    exclude = new IBGWExcluder(exclude);
+                    if (log.shouldInfo())
+                        log.info("CPS SFP IBGW " + exclude);
+                } else {
                     // exclude existing IBGWs to get some diversity ?
-                    // closest-hop restrictions
-                    if (checkClosestHop) {
-                        Set<Hash> moreExclude = getClosestHopExclude(true);
-                        if (moreExclude != null)
-                            exclude.addAll(moreExclude);
-                    }
+                    // OB closest-hop restrictions
+                    if (checkClosestHop)
+                        exclude = getClosestHopExclude(false, exclude);
+                    if (log.shouldInfo())
+                        log.info("CPS SFP closest OB " + exclude);
                 }
                 // TODO exclude IPv6-only at IBGW? Caught in checkTunnel() below
                 ctx.profileOrganizer().selectFastPeers(1, exclude, matches, randomKey, length == 2 ? SLICE_2_3 : SLICE_1, ipRestriction, ipSet);
                 matches.remove(ctx.routerHash());
                 rv.addAll(matches);
             }
+            if (log.shouldInfo())
+                log.info("CPS " + length + (isInbound ? " IB " : " OB ") + "final: " + exclude);
             if (rv.size() < length) {
                 // not enough peers to build the requested size
                 // client tunnels do not use overrides
@@ -255,9 +264,91 @@ class ClientPeerSelector extends TunnelPeerSelector {
         else
             rv.add(ctx.routerHash());
         if (rv.size() > 1) {
-            if (!checkTunnel(isInbound, rv))
+            if (!checkTunnel(isInbound, false, rv))
                 rv = null;
         }
         return rv;
+    }
+
+    /**
+     *  A Set of Hashes that automatically adds to the
+     *  Set in the contains() check.
+     *
+     *  So we don't need to generate the exclude set up front.
+     *
+     *  @since 0.9.58
+     */
+    private class IBGWExcluder extends ExcluderBase {
+
+        /**
+         *  Automatically check if peer is connected
+         *  and add the Hash to the set if not.
+         *
+         *  @param set not copied, contents will be modified by all methods
+         */
+        public IBGWExcluder(Set<Hash> set) {
+            super(set);
+        }
+
+        /**
+         *  Automatically check if peer is connected
+         *  and add the Hash to the set if not.
+         *
+         *  @param o a Hash
+         *  @return true if peer should be excluded
+         */
+        public boolean contains(Object o) {
+            if (s.contains(o))
+                return true;
+            Hash h = (Hash) o;
+            boolean rv = !allowAsIBGW(h);
+            if (rv) {
+                s.add(h);
+                if (log.shouldDebug())
+                    log.debug("CPS IBGW exclude " + h.toBase64());
+            }
+            return rv;
+        }
+    }
+
+    /**
+     *  A Set of Hashes that automatically adds to the
+     *  Set in the contains() check.
+     *
+     *  So we don't need to generate the exclude set up front.
+     *
+     *  @since 0.9.58
+     */
+    private class OBEPExcluder extends ExcluderBase {
+
+        /**
+         *  Automatically check if peer is connected
+         *  and add the Hash to the set if not.
+         *
+         *  @param set not copied, contents will be modified by all methods
+         */
+        public OBEPExcluder(Set<Hash> set) {
+            super(set);
+        }
+
+        /**
+         *  Automatically check if peer is connected
+         *  and add the Hash to the set if not.
+         *
+         *  @param o a Hash
+         *  @return true if peer should be excluded
+         */
+        public boolean contains(Object o) {
+            if (s.contains(o))
+                return true;
+            Hash h = (Hash) o;
+            boolean rv = !allowAsOBEP(h);
+            if (rv) {
+                s.add(h);
+                if (log.shouldDebug())
+                    log.debug("CPS OBEP exclude " + h.toBase64());
+            }
+            return rv;
+        }
     }
 }

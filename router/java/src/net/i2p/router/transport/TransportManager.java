@@ -667,20 +667,22 @@ public class TransportManager implements TransportEventListener {
     }    
     
     /**
-     *  @return a new set, may be modified
+     *  @return a new list, may be modified
      *  @since 0.9.34
      */
-    public Set<Hash> getEstablished() {
-        // for efficiency. NTCP is modifiable, SSU isn't
+    public List<Hash> getEstablished() {
+        // for efficiency
         Transport t = _transports.get("NTCP");
-        Set<Hash> rv;
+        List<Hash> rv = null;
         if (t != null)
             rv = t.getEstablished();
-        else
-            rv = new HashSet<Hash>(256);
         t = _transports.get("SSU");
-        if (t != null)
-            rv.addAll(t.getEstablished());
+        if (t != null) {
+            if (rv != null)
+                rv.addAll(t.getEstablished());
+            else
+                rv = t.getEstablished();
+        }
         return rv;
     }
     

@@ -1,3 +1,24 @@
+2023-01-30 zzz
+ * Tunnels: Refactor peer selection
+
+2023-01-27 zzz
+ * Console: Debug page cleanups
+ * Tools: Add CLI reseed test
+ * Tunnels: Reduce grace period from 120 to 90 sec.
+
+2023-01-26 zzz
+ * Console: Add revision and build date to version info
+ * i2psnark: Search fixes
+
+2023-01-25 zzz
+ * Util: New thread-unsafe version of ObjectCounter
+
+2023-01-24 zzz
+ * Router: Preliminary support for congestion caps (proposal 162)
+
+2023-01-23 zzz
+ * i2psnark standalone: Fix running from outside the directory
+
 2023-01-22 zzz
  * Build: Fix list of changed files in manifests
  * i2psnark: Add max files per torrent config

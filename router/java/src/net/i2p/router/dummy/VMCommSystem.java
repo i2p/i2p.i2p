@@ -3,10 +3,10 @@ package net.i2p.router.dummy;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.i2p.data.Hash;
 import net.i2p.data.i2np.I2NPMessage;
@@ -67,10 +67,10 @@ public class VMCommSystem extends CommSystemFacade {
 
     public boolean isEstablished(Hash peer) { return _commSystemFacades.containsKey(peer); }
 
-    public Set<Hash> getEstablished() {
-        Set<Hash> rv;
+    public List<Hash> getEstablished() {
+        List<Hash> rv;
         synchronized (_commSystemFacades) {
-            rv = new HashSet<Hash>(_commSystemFacades.keySet());
+            rv = new ArrayList<Hash>(_commSystemFacades.keySet());
         }
         Hash us = _context.routerHash();
         if (us != null)
