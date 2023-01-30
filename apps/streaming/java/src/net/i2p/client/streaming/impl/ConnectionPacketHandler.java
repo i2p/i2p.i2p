@@ -285,6 +285,7 @@ class ConnectionPacketHandler {
         if (isSYN && (packet.getSendStreamId() <= 0) ) {
             // don't honor the ACK 0 in SYN packets received when the other side
             // has obviously not seen our messages
+            // and ignore NACKs
             fastAck = false;
         } else {
             fastAck = ack(con, packet.getAckThrough(), packet.getNacks(), packet, isNew, choke);
@@ -650,8 +651,9 @@ class ConnectionPacketHandler {
             packet.isFlagSet(Packet.FLAG_SYNCHRONIZE | Packet.FLAG_CLOSE | Packet.FLAG_SIGNATURE_INCLUDED)) {
             // we need a valid signature
             SigningPublicKey spk = con.getRemoteSPK();
+            // inbound SYNs are now verifed in ConnectionManager; Packet caches the result
             ByteArray ba = _cache.acquire();
-            boolean sigOk = packet.verifySignature(_context, spk, null);
+            boolean sigOk = packet.verifySignature(_context, spk, ba.getData());
             _cache.release(ba);
             if (!sigOk) {
                 throw new I2PException("Received unsigned / forged packet: " + packet);

@@ -79,6 +79,7 @@ class Packet {
     private int _resendDelay;
     private int _flags;
     private ByteArray _payload;
+    private boolean _sigVerified;
     // the next four are set only if the flags say so
     protected Signature _optionSignature;
     protected Destination _optionFrom;
@@ -466,18 +467,15 @@ class Packet {
         cur += 4;
         if (_nacks != null) {
             // if max win is ever > 255, limit to 255
-            DataHelper.toLong(buffer, cur, 1, _nacks.length);
-            cur++;
+            buffer[cur++] = (byte) _nacks.length;
             for (int i = 0; i < _nacks.length; i++) {
                 DataHelper.toLong(buffer, cur, 4, _nacks[i]);
                 cur += 4;
             }
         } else {
-            DataHelper.toLong(buffer, cur, 1, 0);
-            cur++;
+            buffer[cur++] = 0;
         }
-        DataHelper.toLong(buffer, cur, 1, _resendDelay > 0 ? _resendDelay : 0);
-        cur++;
+        buffer[cur++] = _resendDelay > 0 ? ((byte) _resendDelay) : 0;
         DataHelper.toLong(buffer, cur, 2, _flags);
         cur += 2;
 
@@ -782,6 +780,8 @@ class Packet {
      *         false otherwise.
      */
     public boolean verifySignature(I2PAppContext ctx, SigningPublicKey altSPK, byte buffer[]) {
+        if (_sigVerified)
+            return true;
         if (!isFlagSet(FLAG_SIGNATURE_INCLUDED)) return false;
         if (_optionSignature == null) return false;
         SigningPublicKey spk = _optionFrom != null ? _optionFrom.getSigningPublicKey() : altSPK;
@@ -852,7 +852,9 @@ class Packet {
                 l.warn("Signature failed on " + toString(), iae);
             ok = false;
         }
-        if (!ok) {
+        if (ok) {
+            _sigVerified = true;
+        } else {
             Log l = ctx.logManager().getLog(Packet.class);
             if (l.shouldLog(Log.WARN))
                 l.warn("Signature failed on " + toString() + " using SPK " + spk);

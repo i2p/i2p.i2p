@@ -214,9 +214,14 @@ class MessageInputStream extends InputStream {
      *  Adds the ack-through and nack fields to a packet we are building for transmission
      */
     public void updateAcks(PacketLocal packet) {
-        synchronized (_dataLock) {
-            packet.setAckThrough(_highestBlockId);
-            packet.setNacks(locked_getNacks());
+        if (packet.getSendStreamId() > 0 || !packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
+            synchronized (_dataLock) {
+                packet.setAckThrough(_highestBlockId);
+                packet.setNacks(locked_getNacks());
+            }
+        } else {
+            // do not send NACK 0 for retransmitted SYNs
+            packet.setAckThrough(-1);
         }
     }
     

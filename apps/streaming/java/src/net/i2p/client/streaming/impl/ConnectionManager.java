@@ -16,6 +16,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
+import net.i2p.util.ByteCache;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.ConvertToHash;
 import net.i2p.util.LHMCache;
@@ -54,6 +55,7 @@ class ConnectionManager {
     /** since 0.9, each manager instantiates its own timer */
     private final SimpleTimer2 _timer;
     private final Map<Long, Object> _recentlyClosed;
+    private final ByteCache _cache = ByteCache.getInstance(32, 4*1024);
     private static final Object DUMMY = new Object();
 
     /** cache of the property to detect changes */
@@ -84,6 +86,8 @@ class ConnectionManager {
 
     /**
      *  Manage all conns for this session
+     *
+     *  @param session the primary session, packets may come in on subsessions also
      */
     public ConnectionManager(I2PAppContext context, 
                              I2PSession session, 
@@ -237,6 +241,21 @@ class ConnectionManager {
      *         or if the connection was rejected
      */
     public Connection receiveConnection(Packet synPacket) {
+        Destination from = synPacket.getOptionalFrom();
+        if (from == null) {
+            if (_log.shouldWarn())
+                _log.warn("SYN w/o FROM: " + synPacket);
+            return null;
+        }
+        ByteArray ba = _cache.acquire();
+        boolean sigOk = synPacket.verifySignature(_context, ba.getData());
+        _cache.release(ba);
+        if (!sigOk) {
+            if (_log.shouldWarn())
+                _log.warn("Received unsigned / forged SYN apparently from " + from.toBase32() + ": " + synPacket);
+            return null;
+        }
+
         boolean reject = false;
         int retryAfter = 0;
 
@@ -261,9 +280,6 @@ class ConnectionManager {
         _context.statManager().addRateData("stream.receiveActive", 1);
         
         if (reject) {
-            Destination from = synPacket.getOptionalFrom();
-            if (from == null)
-                return null;
             String resp = _defaultOptions.getLimitAction();
             if ("drop".equals(resp)) {
                 // always drop
