@@ -241,7 +241,7 @@ public class PeerProfile {
     
     /**
      *  When did we first hear about this peer?
-     *  @return greater than zero, set to now in consturctor
+     *  @return greater than zero, set to now in constructor
      */
     public synchronized long getFirstHeardAbout() { return _firstHeardAbout; }
 
