@@ -275,6 +275,11 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         if (uptime <= 11*60*1000) {
             failPct = 100 - MIN_NONFAILING_PCT;
         } else {
+            // If well connected or ff, don't pick from high cap
+            // even during congestion, because congestion starts from the top
+            if (active > 500 || ctx.netDb().floodfillEnabled())
+                return false;
+
             failPct = getExploratoryFailPercentage();
             //Log l = ctx.logManager().getLog(getClass());
             //if (l.shouldLog(Log.DEBUG))
