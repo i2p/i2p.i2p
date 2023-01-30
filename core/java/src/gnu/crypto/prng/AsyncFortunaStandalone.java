@@ -7,6 +7,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import net.i2p.I2PAppContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * fortuna instance that tries to avoid blocking if at all possible by using separate
@@ -25,7 +26,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
      * The router must override this via the prng.buffers property in the router context.
      */
     private static final int DEFAULT_BUFFERS = 2;
-    private static final int DEFAULT_BUFSIZE = 256*1024;
+    private static final int DEFAULT_BUFSIZE = SystemVersion.isAndroid() ? 64*1024 : 256*1024;
     private final int _bufferCount;
     private final int _bufferSize;
     /** the lock */
@@ -39,7 +40,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
     private AsyncBuffer _currentBuffer;
 
     public AsyncFortunaStandalone(I2PAppContext context) {
-        super();
+        super(context.getBooleanProperty("prng.useDevRandom") && !SystemVersion.isWindows() && !SystemVersion.isSlow());
         _bufferCount = Math.max(context.getProperty("prng.buffers", DEFAULT_BUFFERS), 2);
         _bufferSize = Math.max(context.getProperty("prng.bufferSize", DEFAULT_BUFSIZE), 16*1024);
         _emptyBuffers = new LinkedBlockingQueue<AsyncBuffer>(_bufferCount);

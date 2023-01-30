@@ -103,33 +103,34 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
   private static final int SEED_FILE_SIZE = 64;
   static final int NUM_POOLS = 32;
   static final int MIN_POOL_SIZE = 64;
-  final Generator generator;
-  final MessageDigest[] pools;
-  long lastReseed;
-  int pool;
-  int pool0Count;
-  int reseedCount;
-  //static long refillCount = 0;
-  //static long lastRefill = System.currentTimeMillis();
+  protected final IRandomStandalone generator;
+  protected final MessageDigest[] pools;
+  protected long lastReseed;
+  private int pool;
+  protected int pool0Count;
+  protected int reseedCount;
 
   public static final String SEED = "gnu.crypto.prng.fortuna.seed";
 
-  public FortunaStandalone()
-  {
+  public FortunaStandalone() {
+      this(false);
+  }
+
+  /**
+   *  @since 0.9.58
+   */
+  public FortunaStandalone(boolean useDevRandom) {
     super("Fortuna i2p");
-    generator = new Generator();
+    generator = useDevRandom ? new DevRandom() : new Generator();
     pools = new MessageDigest[NUM_POOLS];
     for (int i = 0; i < NUM_POOLS; i++)
       pools[i] = SHA256Generator.getDigestInstance();
-    lastReseed = 0;
-    pool = 0;
-    pool0Count = 0;
     allocBuffer();
   }
 
   /** Unused, see AsyncFortunaStandalone */
   protected void allocBuffer() {
-    buffer = new byte[4*1024*1024]; //256]; // larger buffer to reduce churn
+    buffer = new byte[64*1024];
   }
 
   /** Unused, see AsyncFortunaStandalone */
@@ -213,7 +214,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
    * right; Fortuna itself is basically a wrapper around this generator
    * that manages reseeding in a secure way.
    */
-  public static class Generator extends BasePRNGStandalone implements Cloneable
+  private static class Generator extends BasePRNGStandalone implements Cloneable
   {
 
     private static final int LIMIT = 1 << 20;

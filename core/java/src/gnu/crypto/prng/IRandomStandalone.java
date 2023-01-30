@@ -119,6 +119,11 @@ public interface IRandomStandalone extends Cloneable {
    byte nextByte() throws IllegalStateException;
 
    /**
+    *  @since 0.9.58 added to interface
+    */
+   public void nextBytes(byte[] out) throws IllegalStateException;
+
+   /**
      * <p>Fills the designated byte array, starting from byte at index
      * <code>offset</code>, for a maximum of <code>length</code> bytes with the
      * output of this generator instance.
