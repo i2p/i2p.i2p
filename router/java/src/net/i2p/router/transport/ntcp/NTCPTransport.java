@@ -1600,10 +1600,11 @@ public class NTCPTransport extends TransportImpl {
      */
     private synchronized boolean externalAddressReceived(byte[] ip, boolean isIPv6, int port) {
         // FIXME just take first address for now
-        // FIXME if SSU set to hostname, NTCP will be set to IP
+        // Warning, this returns null when isIPv6 == true and it's an empty "46" address
+        // See below
         RouterAddress oldAddr = getCurrentAddress(isIPv6);
         if (_log.shouldLog(Log.INFO))
-            _log.info("Changing NTCP Address? was " + oldAddr);
+            _log.info("Changing NTCP IPv" + (isIPv6 ? '6' : '4') + " Address? was " + oldAddr);
 
         OrderedProperties newProps = new OrderedProperties();
         int cost;
@@ -1703,6 +1704,25 @@ public class NTCPTransport extends TransportImpl {
                 newAddr.setCost(DEFAULT_COST);
             changed = true;
         } else if (ohost == null || ohost.length() <= 0) {
+            // SSU2 told us to remove our IPv6 address
+            // getCurrentAddress(true) returns null for a "46" address
+            // Get v4 address and see if it has a "6" in it,
+            // if not, put in a "6" address
+            if (isIPv6 && _haveIPv6Address && oldAddr == null && ip == null && port <= 0) {
+                RouterAddress v4Addr = getCurrentAddress(false);
+                if (v4Addr != null) {
+                    String caps = v4Addr.getOption("caps");
+                    if (caps != null && caps.contains(CAP_IPV6)) {
+                        if (_log.shouldInfo())
+                            _log.info("No old host, no new host, no change to NTCP Address");
+                        return false;
+                    }
+                }
+                if (_log.shouldInfo())
+                    _log.info("IPv6 now firewalled, adding 6 address");
+                setOutboundNTCP2Address(true);
+                return true;
+            }
             if (_log.shouldInfo())
                 _log.info("No old host, no new host, no change to NTCP Address");
             return false;
@@ -1746,11 +1766,10 @@ public class NTCPTransport extends TransportImpl {
         } else {
             // IPv6
             // We have an IPv4 address, IPv6 transitioned to firewalled,
-            // so just remove the v6 address
-            // TODO '6' address
             if (_log.shouldInfo())
-                _log.info("IPv6 now firewalled");
-            newAddr = null;
+                _log.info("IPv6 now firewalled, adding 6 address");
+            setOutboundNTCP2Address(true);
+            return true;
         }
 
         // stopListening stops the pumper, readers, and writers, so required even if
@@ -1767,7 +1786,10 @@ public class NTCPTransport extends TransportImpl {
         //while (isAlive()) {
         //    try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
         //}
-        restartListening(newAddr, isIPv6);
+
+        // do not restart on transition to firewalled
+        if (ip != null || port > 0)
+            restartListening(newAddr, isIPv6);
         if (_log.shouldLog(Log.WARN))
             _log.warn("Updating NTCP Address (ipv6? " + isIPv6 + ") with " + newAddr);
         return true;     	
