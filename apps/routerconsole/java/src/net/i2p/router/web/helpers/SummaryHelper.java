@@ -635,7 +635,7 @@ public class SummaryHelper extends HelperBase {
                     buf.append("server.png\" alt=\"Server\" title=\"").append(_t("Hidden Service")).append("\">");
                 else
                     buf.append("client.png\" alt=\"Client\" title=\"").append(_t("Client")).append("\">");
-                buf.append("</td><td align=\"left\"><b><a href=\"tunnels#").append(h.toBase64().substring(0,4));
+                buf.append("</td><td align=\"left\"><b><a href=\"tunnels#").append(h.toBase64(), 0, 4);
                 buf.append("\" target=\"_top\" title=\"").append(_t("Show tunnels")).append("\">");
                 // Increase permitted max length of tunnel name & handle overflow with css
                 if (name.length() <= 32)

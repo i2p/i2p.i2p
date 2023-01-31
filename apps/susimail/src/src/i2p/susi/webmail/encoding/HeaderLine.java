@@ -159,7 +159,7 @@ public class HeaderLine extends Encoding {
 			return str + "\r\n";
 		// Output encoded.
 		StringBuilder out = new StringBuilder();
-		out.append(str.substring(0, l));
+		out.append(str, 0, l);
 		int start = l;
 		StringBuilder qc = new StringBuilder(16);
 		for (int i = start; i < str.length(); i++) {

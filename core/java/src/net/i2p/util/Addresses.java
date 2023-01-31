@@ -935,7 +935,7 @@ public abstract class Addresses {
                 buf.setLength(0);
                 int i = 0;
                 while(true) {
-                    buf.append(as.substring(i, i+4));
+                    buf.append(as, i, i+4);
                     i += 4;
                     if (i >= 32)
                         break;
@@ -1130,7 +1130,7 @@ public abstract class Addresses {
         for (String m : _macCache) {
             int i = 0;
             while(true) {
-                buf.append(m.substring(i, i+2));
+                buf.append(m, i, i+2);
                 i += 2;
                 if (i >= 12)
                     break;

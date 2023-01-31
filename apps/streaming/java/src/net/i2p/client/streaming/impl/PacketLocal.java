@@ -309,14 +309,14 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
                 buf.append(" from ");
                 Destination local = _session.getMyDestination();
                 if (local != null)
-                    buf.append(local.calculateHash().toBase64().substring(0,4));
+                    buf.append(local.calculateHash().toBase64(), 0, 4);
                 else
                     buf.append("unknown");
                 
                 buf.append(" to ");
                 Destination remote = con.getRemotePeer();
                 if (remote != null)
-                    buf.append(remote.calculateHash().toBase64().substring(0,4));
+                    buf.append(remote.calculateHash().toBase64(), 0, 4);
                 else
                     buf.append("unknown");
                 

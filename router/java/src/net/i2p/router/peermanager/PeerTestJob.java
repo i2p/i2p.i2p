@@ -228,7 +228,7 @@ class PeerTestJob extends JobImpl {
         @Override
         public String toString() {
             StringBuilder buf = new StringBuilder(64);
-            buf.append("Test peer ").append(_peer.toBase64().substring(0,4));
+            buf.append("Test peer ").append(_peer.toBase64(), 0, 4);
             buf.append(" with nonce ").append(_nonce);
             return buf.toString();
         }

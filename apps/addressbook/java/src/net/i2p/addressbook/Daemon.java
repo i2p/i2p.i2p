@@ -697,7 +697,7 @@ class Daemon {
             StringBuilder buf = new StringBuilder(16);
             final int sz = dests.size();
             for (int i = 0; i < sz; i++) {
-                buf.append(dests.get(i).toBase64().substring(0, 6));
+                buf.append(dests.get(i).toBase64(), 0, 6);
                 if (i != sz - 1)
                     buf.append(", ");
             }

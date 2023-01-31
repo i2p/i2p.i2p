@@ -613,7 +613,7 @@ class PacketBuilder {
         StringBuilder msg = null;
         if (_log.shouldLog(Log.DEBUG)) {
             msg = new StringBuilder(128);
-            msg.append("building ACK packet to ").append(peer.getRemotePeer().toBase64().substring(0,6));
+            msg.append("building ACK packet to ").append(peer.getRemotePeer().toBase64(), 0, 6);
         }
 
         int fullACKCount = 0;

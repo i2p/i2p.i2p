@@ -392,7 +392,7 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
             buf.append(" client ").append(Base64.encode(_destination.getData(), 0, 3));
         buf.append(": GW ");
         for (int i = 0; i < _peers.length; i++) {
-            buf.append(_peers[i].toBase64().substring(0,4));
+            buf.append(_peers[i].toBase64(), 0, 4);
             long id = _config[i].getReceiveTunnelId();
             if (id != 0) {
                 // don't show for "me" at OBGW or IBEP

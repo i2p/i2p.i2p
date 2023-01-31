@@ -730,7 +730,7 @@ class NetDbRenderer {
                 buf.append(" <b>(").append(_t("Encrypted")).append(")</b>");
             buf.append("</th>");
             if (_context.clientManager().isLocal(key)) {
-                buf.append("<th><a href=\"tunnels#" + key.toBase64().substring(0,4) + "\">" + _t("Local") + "</a> ");
+                buf.append("<th><a href=\"tunnels#").append(key.toBase64(), 0, 4).append("\">").append(_t("Local")).append("</a> ");
                 boolean unpublished = ! _context.clientManager().shouldPublishLeaseSet(key);
                 if (unpublished)
                     buf.append("<b>").append(_t("Unpublished")).append("</b> ");
@@ -739,7 +739,7 @@ class NetDbRenderer {
                 if (in != null && in.getDestinationNickname() != null)
                     buf.append(DataHelper.escapeHTML(in.getDestinationNickname()));
                 else
-                    buf.append(dest.toBase64().substring(0, 6));
+                    buf.append(dest.toBase64(), 0, 6);
                 buf.append("</th></tr>\n");
                 // we don't show a b32 or addressbook links if encrypted
                 if (type != DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
@@ -772,7 +772,7 @@ class NetDbRenderer {
                     String b32 = key.toBase32();
                     buf.append("<code>");
                     if (dest != null)
-                        buf.append(dest.toBase64().substring(0, 6));
+                        buf.append(dest.toBase64(), 0, 6);
                     else
                         buf.append("n/a");
                     buf.append("</code></th>" +
@@ -839,7 +839,7 @@ class NetDbRenderer {
                 }
                 if (type == DatabaseEntry.KEY_TYPE_LEASESET) {
                     buf.append("</td></tr>\n<tr><td colspan=\"2\"><b>Encryption Key:</b> ELGAMAL_2048 ")
-                       .append(ls.getEncryptionKey().toBase64().substring(0, 20))
+                       .append(ls.getEncryptionKey().toBase64(), 0, 20)
                        .append("&hellip;");
                 } else if (type == DatabaseEntry.KEY_TYPE_LS2) {
                     LeaseSet2 ls2 = (LeaseSet2) ls;
@@ -851,7 +851,7 @@ class NetDbRenderer {
                         else
                             buf.append("Unsupported type ").append(pk.getUnknownTypeCode());
                         buf.append(' ')
-                           .append(pk.toBase64().substring(0, 20))
+                           .append(pk.toBase64(), 0, 20)
                            .append("&hellip;");
                     }
                 }
@@ -1183,7 +1183,7 @@ class NetDbRenderer {
     private void renderRouterInfo(StringBuilder buf, RouterInfo info, boolean isUs, boolean full) {
         String hash = info.getIdentity().getHash().toBase64();
         buf.append("<table class=\"netdbentry\">" +
-                   "<tr id=\"").append(hash.substring(0, 6)).append("\"><th colspan=\"2\"");
+                   "<tr id=\"").append(hash, 0, 6).append("\"><th colspan=\"2\"");
         if (isUs) {
             buf.append(" id=\"our-info\"><b>").append(_t("Our Router Identity")).append(":</b> <code>")
                .append(hash).append("</code></th><th>");
@@ -1199,7 +1199,7 @@ class NetDbRenderer {
             }
             if (!full) {
                 buf.append("<a title=\"").append(_t("View extended router info"))
-                   .append("\" class=\"viewfullentry\" href=\"netdb?r=").append(hash.substring(0, 6))
+                   .append("\" class=\"viewfullentry\" href=\"netdb?r=").append(hash, 0, 6)
                    .append("\" >[").append(_t("Full entry")).append("]</a>");
             }
         }

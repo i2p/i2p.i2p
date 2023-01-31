@@ -2447,7 +2447,7 @@ public class PeerState {
     public String toString() {
         StringBuilder buf = new StringBuilder(256);
         buf.append(_remoteHostId.toString());
-        buf.append(' ').append(_remotePeer.toBase64().substring(0,6));
+        buf.append(' ').append(_remotePeer.toBase64(), 0, 6);
 
         if (getVersion() == 2)
             buf.append(_isInbound? " IB2 " : " OB2 ");

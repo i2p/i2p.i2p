@@ -1935,7 +1935,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         StringBuilder buf = new StringBuilder(32);
         buf.append("Session: ");
         if (_myDestination != null)
-            buf.append(_myDestination.calculateHash().toBase64().substring(0, 4));
+            buf.append(_myDestination.calculateHash().toBase64(), 0, 4);
         else
             buf.append("[null dest]");
         buf.append(getPrefix());

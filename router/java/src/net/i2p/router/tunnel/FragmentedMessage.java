@@ -290,7 +290,7 @@ class FragmentedMessage {
         buf.append(" last received? ").append(_lastReceived);
         buf.append(" lifetime: ").append(DataHelper.formatDuration(_context.clock().now()-_createdOn));
         if (_toRouter != null) {
-            buf.append(" targetting ").append(_toRouter.toBase64().substring(0,4));
+            buf.append(" targetting ").append(_toRouter.toBase64(), 0, 4);
             if (_toTunnel != null)
                 buf.append(":").append(_toTunnel.getTunnelId());
         }

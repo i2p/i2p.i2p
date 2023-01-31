@@ -147,7 +147,7 @@ public class FileDumpHelper extends HelperBase {
                 buf.append("<br>");
             if (linkrev)
                 buf.append("<a href=\"").append(LINK).append(s).append("\">");
-            buf.append("<span class=\"revision\"><tt>").append(s.substring(0, 20)).append("</tt>" +
+            buf.append("<span class=\"revision\"><tt>").append(s, 0, 20).append("</tt>" +
                        "<br>" +
                        "<tt>").append(s.substring(20)).append("</tt></span>");
             if (linkrev)

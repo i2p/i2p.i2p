@@ -1338,7 +1338,7 @@ public class TunnelPool {
             if (_settings.getDestinationNickname() != null)
                 rv.append(_settings.getDestinationNickname());
             else
-                rv.append(_settings.getDestination().toBase64().substring(0,4));
+                rv.append(_settings.getDestination().toBase64(), 0, 4);
             return rv.toString();
         }
             

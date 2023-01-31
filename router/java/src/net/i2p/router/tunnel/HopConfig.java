@@ -181,7 +181,7 @@ public class HopConfig {
             buf.append(_receiveTunnel.getTunnelId());
         }
         if (_sendTo != null) {
-            buf.append(" send to ").append(_sendTo.toBase64().substring(0,4)).append(":");
+            buf.append(" send to ").append(_sendTo.toBase64(), 0, 4).append(":");
             if (_sendTunnel != null)
                 buf.append(_sendTunnel.getTunnelId());
         }

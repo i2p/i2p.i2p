@@ -266,7 +266,7 @@ class PeerTestState {
                 buf.append("me ");
             buf.append(_aliceIP).append(':').append(_alicePort);
             if (_aliceHash != null)
-                buf.append(' ').append(_aliceHash.toBase64().substring(0, 6));
+                buf.append(' ').append(_aliceHash.toBase64(), 0, 6);
         }
         if (_aliceIPFromCharlie != null)
             buf.append(" (fromCharlie ").append(_aliceIPFromCharlie).append(':').append(_alicePortFromCharlie).append(')');
@@ -281,7 +281,7 @@ class PeerTestState {
             } else {
                 buf.append(_charlieIP).append(':').append(_charliePort);
                 if (_charlieHash != null)
-                    buf.append(' ').append(_charlieHash.toBase64().substring(0, 6));
+                    buf.append(' ').append(_charlieHash.toBase64(), 0, 6);
             }
             if (_previousCharlies != null && !_previousCharlies.isEmpty())
                 buf.append(" previous: ").append(_previousCharlies);
