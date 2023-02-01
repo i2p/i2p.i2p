@@ -5471,7 +5471,7 @@ div.ag2 {
 div.app {
     float: left;
     padding: 2px 0 0 !important;
-    min-width: 70px;
+    min-width: 140px;
     margin: 2px 3px 5px;
     text-align: center !important;
     padding-top: 4px;
@@ -5635,7 +5635,6 @@ a:focus .app img {
     text-align: center;
     vertical-align: bottom;
     line-height: 95%;
-    text-transform: lowercase;
     border: none;
     width: 136px;
     min-width: 72px;
@@ -5656,7 +5655,7 @@ a:focus .app img {
 }
 
 .applabel a {
-    max-width: 116px;
+    width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
