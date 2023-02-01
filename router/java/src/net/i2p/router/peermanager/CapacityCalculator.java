@@ -49,7 +49,6 @@ class CapacityCalculator {
             if (capacity10m <= 0) {
                 capacity = 0;
             } else {
-                double capacity30m = estimateCapacity(acceptStat, rejectStat, failedStat, 30*60*1000);
                 double capacity60m = estimateCapacity(acceptStat, rejectStat, failedStat, 60*60*1000);
                 double capacity1d  = estimateCapacity(acceptStat, rejectStat, failedStat, 24*60*60*1000);
 
@@ -62,10 +61,9 @@ class CapacityCalculator {
                     capacity10m /= 4;
                 }
 
-                capacity = capacity10m * periodWeight(10*60*1000) + 
-                           capacity30m * periodWeight(30*60*1000) + 
-                           capacity60m * periodWeight(60*60*1000) + 
-                           capacity1d  * periodWeight(24*60*60*1000);
+                capacity = capacity10m * 0.4 + 
+                           capacity60m * 0.5 + 
+                           capacity1d  * 0.1;
             }
         }
 
@@ -180,16 +178,6 @@ class CapacityCalculator {
             return val;
         } else {
             return 0.0d;
-        }
-    }
-    
-    private static double periodWeight(int period) {
-        switch (period) {
-            case 10*60*1000: return .4;
-            case 30*60*1000: return .3;
-            case 60*60*1000: return .2;
-            case 24*60*60*1000: return .1;
-            default: throw new IllegalArgumentException("undefined period passed, period [" + period + "]???");
         }
     }
 }

@@ -192,12 +192,12 @@ class ProfileOrganizerRenderer {
                 ok = false;
             }
             RateAverages ra = RateAverages.getTemp();
-            Rate failed = prof.getTunnelHistory().getFailedRate().getRate(30*60*1000);
+            Rate failed = prof.getTunnelHistory().getFailedRate().getRate(60*60*1000);
             long fails = failed.computeAverages(ra, false).getTotalEventCount();
             if (ok && fails == 0) {
                 buf.append(_t("OK"));
             } else if (fails > 0) {
-                Rate accepted = prof.getTunnelCreateResponseTime().getRate(30*60*1000);
+                Rate accepted = prof.getTunnelCreateResponseTime().getRate(60*60*1000);
                 long total = fails + accepted.computeAverages(ra, false).getTotalEventCount();
                 if (total / fails <= 10)   // hide if < 10%
                     buf.append(' ').append(fails).append('/').append(total).append(' ').append(_t("Test Fails"));
