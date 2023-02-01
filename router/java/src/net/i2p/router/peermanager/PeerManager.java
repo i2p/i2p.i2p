@@ -54,7 +54,7 @@ class PeerManager {
      *  This must also be less than 10 minutes, which is the shortest
      *  Rate contained in the profile, as the Rates must be coalesced.
      */
-    private static final long REORGANIZE_TIME_LONG = 351*1000;
+    static final long REORGANIZE_TIME_LONG = 351*1000;
     /** After first two hours of uptime ~= 246 */
     static final int REORGANIZES_PER_DAY = (int) (24*60*60*1000L / REORGANIZE_TIME_LONG);
     private static final long STORE_TIME = 19*60*60*1000;

@@ -26,9 +26,10 @@ public class TunnelHistory {
     private volatile long _lastRejectedProbabalistic;
     private final AtomicLong _lifetimeFailed = new AtomicLong();
     private volatile long _lastFailed;
-    private RateStat _rejectRate;
-    private RateStat _failRate;
+    private final RateStat _rejectRate;
+    private final RateStat _failRate;
     private final String _statGroup;
+    static final long[] RATES = new long[] { 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000l };
     
     /** probabalistic tunnel rejection due to a flood of requests - infrequent */
     public static final int TUNNEL_REJECT_PROBABALISTIC_REJECT = 10;
@@ -43,12 +44,8 @@ public class TunnelHistory {
         _context = context;
         _log = context.logManager().getLog(TunnelHistory.class);
         _statGroup = statGroup;
-        createRates(statGroup);
-    }
-    
-    private void createRates(String statGroup) {
-        _rejectRate = new RateStat("tunnelHistory.rejectRate", "How often does this peer reject a tunnel request?", statGroup, new long[] { 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _failRate = new RateStat("tunnelHistory.failRate", "How often do tunnels this peer accepts fail?", statGroup, new long[] { 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _rejectRate = new RateStat("tunnelHistory.rejectRate", "How often does this peer reject a tunnel request?", statGroup, RATES);
+        _failRate = new RateStat("tunnelHistory.failRate", "How often do tunnels this peer accepts fail?", statGroup, RATES);
     }
     
     /** total tunnels the peer has agreed to participate in */
@@ -85,19 +82,19 @@ public class TunnelHistory {
      */
     public void incrementRejected(int severity) {
         _lifetimeRejected.incrementAndGet();
+        long now = _context.clock().now();
         if (severity >= TUNNEL_REJECT_CRIT) {
-            _lastRejectedCritical = _context.clock().now();
-            _rejectRate.addData(1);
+            _lastRejectedCritical = now;
         } else if (severity >= TUNNEL_REJECT_BANDWIDTH) {
-            _lastRejectedBandwidth = _context.clock().now();
-            _rejectRate.addData(1);
+            _lastRejectedBandwidth = now;
         } else if (severity >= TUNNEL_REJECT_TRANSIENT_OVERLOAD) {
-            _lastRejectedTransient = _context.clock().now();
-            // dont increment the reject rate in this case
+            _lastRejectedTransient = now;
         } else if (severity >= TUNNEL_REJECT_PROBABALISTIC_REJECT) {
-            _lastRejectedProbabalistic = _context.clock().now();
-            // dont increment the reject rate in this case
+            _lastRejectedProbabalistic = now;
         }
+        // a rejection is always a rejection, don't factor based on severity,
+        // which could impact our ability to avoid a congested peer
+        _rejectRate.addData(1);
     }
 
     /**
@@ -194,14 +191,9 @@ public class TunnelHistory {
         _lifetimeRejected.set(getLong(props, "tunnels.lifetimeRejected"));
         try {
             _rejectRate.load(props, "tunnelHistory.rejectRate", true);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Loading tunnelHistory.rejectRate");
             _failRate.load(props, "tunnelHistory.failRate", true);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Loading tunnelHistory.failRate");
         } catch (IllegalArgumentException iae) {
-            _log.warn("TunnelHistory rates are corrupt, resetting", iae);
-            createRates(_statGroup);
+            _log.warn("TunnelHistory rates are corrupt", iae);
         }
     }
     

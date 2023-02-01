@@ -34,9 +34,10 @@ class CapacityCalculator {
     
     public static double calc(PeerProfile profile) {
         double capacity;
-
+        RouterContext context = profile.getContext();
+        long now = context.clock().now();
         TunnelHistory history = profile.getTunnelHistory();
-        if (tooOld(profile)) { 
+        if (tooOld(profile, now)) {
             capacity = 1;
         } else {
             RateStat acceptStat = profile.getTunnelCreateResponseTime();
@@ -51,22 +52,22 @@ class CapacityCalculator {
                 double capacity30m = estimateCapacity(acceptStat, rejectStat, failedStat, 30*60*1000);
                 double capacity60m = estimateCapacity(acceptStat, rejectStat, failedStat, 60*60*1000);
                 double capacity1d  = estimateCapacity(acceptStat, rejectStat, failedStat, 24*60*60*1000);
-        
+
+                // now take into account recent tunnel rejections
+                long cutoff = now - PeerManager.REORGANIZE_TIME_LONG;
+                if (history.getLastRejectedProbabalistic() > cutoff) {
+                    capacity10m /= 2;
+                } else if (history.getLastRejectedTransient() > cutoff) {
+                    // never happens
+                    capacity10m /= 4;
+                }
+
                 capacity = capacity10m * periodWeight(10*60*1000) + 
                            capacity30m * periodWeight(30*60*1000) + 
                            capacity60m * periodWeight(60*60*1000) + 
                            capacity1d  * periodWeight(24*60*60*1000);
             }
-        }        
-        
-        // now take into account non-rejection tunnel rejections (which haven't 
-        // incremented the rejection counter, since they were only temporary)
-        RouterContext context = profile.getContext();
-        long now = context.clock().now();
-        if (history.getLastRejectedTransient() > now - 5*60*1000)
-            capacity = 1;
-        else if (history.getLastRejectedProbabalistic() > now - 5*60*1000)
-            capacity -= context.random().nextInt(5);
+        }
 
         // boost new profiles
         if (now - profile.getFirstHeardAbout() < 45*60*1000)
@@ -115,11 +116,8 @@ class CapacityCalculator {
      * If we haven't heard from them in an hour, they aren't too useful.
      *
      */
-    private static boolean tooOld(PeerProfile profile) {
-        if (profile.getIsActive(60*60*1000)) 
-            return false;
-        else 
-            return true;
+    private static boolean tooOld(PeerProfile profile, long now) {
+        return !profile.getIsActive(60*60*1000, now);
     }
     
     /**

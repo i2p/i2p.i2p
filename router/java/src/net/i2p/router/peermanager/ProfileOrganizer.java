@@ -902,6 +902,7 @@ public class ProfileOrganizer {
         if (numToPromote > 0) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Need to explicitly promote " + numToPromote + " peers to the fast group");
+            long now = _context.clock().now();
             for (PeerProfile cur : _strictCapacityOrder) {
                 if ( (!_fastPeers.containsKey(cur.getPeer())) && (!cur.getIsFailing()) ) {
                     if (!isSelectable(cur.getPeer())) {
@@ -910,7 +911,7 @@ public class ProfileOrganizer {
                         //     _log.info("skip unknown peer from fast promotion: " + cur.getPeer().toBase64());
                         continue;
                     }
-                    if (!cur.getIsActive()) {
+                    if (!cur.getIsActive(now)) {
                         // skip inactive
                         // if (_log.shouldLog(Log.INFO))
                         //     _log.info("skip inactive peer from fast promotion: " + cur.getPeer().toBase64());
@@ -991,8 +992,9 @@ public class ProfileOrganizer {
      */
     private void locked_unfailAsNecessary() {
         int notFailingActive = 0;
+        long now = _context.clock().now();
         for (PeerProfile peer : _notFailingPeers.values()) {
-            if (peer.getIsActive())
+            if (peer.getIsActive(now))
                 notFailingActive++;
             if (notFailingActive >= MIN_NOT_FAILING_ACTIVE) {
                 // we've got enough, no need to try further
@@ -1005,7 +1007,7 @@ public class ProfileOrganizer {
         if (needToUnfail > 0) {
             int unfailed = 0;
             for (PeerProfile best : _strictCapacityOrder) {
-                if ( (best.getIsActive()) && (best.getIsFailing()) ) {
+                if ( (best.getIsActive(now)) && (best.getIsFailing()) ) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("All peers were failing, so we have overridden the failing flag for one of the most reliable active peers (" + best.getPeer().toBase64() + ")");
                     best.setIsFailing(false);
@@ -1035,11 +1037,12 @@ public class ProfileOrganizer {
         double totalCapacity = 0;
         double totalIntegration = 0;
         Set<PeerProfile> reordered = new TreeSet<PeerProfile>(_comp);
+        long now = _context.clock().now();
         for (PeerProfile profile : allPeers) {
             if (_us.equals(profile.getPeer())) continue;
             
             // only take into account active peers that aren't failing
-            if (profile.getIsFailing() || (!profile.getIsActive()))
+            if (profile.getIsFailing() || (!profile.getIsActive(now)))
                 continue;
         
             // dont bother trying to make sense of things below the baseline
@@ -1557,9 +1560,10 @@ public class ProfileOrganizer {
         organizer.reorganize();
         DecimalFormat fmt = new DecimalFormat("0000.0");
         
+        long now = ctx.clock().now();
         for (Hash peer : organizer.selectAllPeers()) {
             PeerProfile profile = organizer.getProfile(peer);
-            if (!profile.getIsActive()) {
+            if (!profile.getIsActive(now)) {
                 System.out.println("Peer " + peer.toBase64().substring(0,4) 
                            + " [" + (organizer.isFast(peer) ? "IF+R" : 
                                      organizer.isHighCapacity(peer) ? "IR  " :
@@ -1567,7 +1571,7 @@ public class ProfileOrganizer {
                            + " Speed:\t" + fmt.format(profile.getSpeedValue())
                            + " Capacity:\t" + fmt.format(profile.getCapacityValue())
                            + " Integration:\t" + fmt.format(profile.getIntegrationValue())
-                           + " Active?\t" + profile.getIsActive() 
+                           + " Active?\t" + profile.getIsActive(now) 
                            + " Failing?\t" + profile.getIsFailing());
             } else {
                 System.out.println("Peer " + peer.toBase64().substring(0,4) 
@@ -1577,7 +1581,7 @@ public class ProfileOrganizer {
                            + " Speed:\t" + fmt.format(profile.getSpeedValue())
                            + " Capacity:\t" + fmt.format(profile.getCapacityValue())
                            + " Integration:\t" + fmt.format(profile.getIntegrationValue())
-                           + " Active?\t" + profile.getIsActive() 
+                           + " Active?\t" + profile.getIsActive(now) 
                            + " Failing?\t" + profile.getIsFailing());
             }
         }
