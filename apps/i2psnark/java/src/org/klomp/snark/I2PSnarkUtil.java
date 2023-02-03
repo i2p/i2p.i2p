@@ -1,8 +1,15 @@
 package org.klomp.snark;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -13,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -28,6 +36,7 @@ import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.Base32;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.util.ConcurrentHashSet;
@@ -36,7 +45,9 @@ import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFile;
+import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 
 import org.klomp.snark.dht.DHT;
@@ -834,5 +845,91 @@ public class I2PSnarkUtil implements DisconnectListener {
     /** ngettext @since 0.7.14 */
     public String getString(int n, String s, String p) {
         return Translate.getString(n, s, p, _context, BUNDLE_NAME);
+    }
+
+    private static final boolean SHOULD_SYNC = !(SystemVersion.isAndroid() || SystemVersion.isARM());
+    private static final Pattern ILLEGAL_KEY =  Pattern.compile("[#=\\r\\n;]");
+    private static final Pattern ILLEGAL_VALUE =  Pattern.compile("[\\r\\n]");
+
+    /**
+     *  Same as DataHelper.loadProps() but allows '#' in values,
+     *  so we can have filenames with '#' in them in torrent config files.
+     *  '#' must be in column 1 for a comment.
+     *
+     *  @since 0.9.58
+     */
+    static void loadProps(Properties props, File f) throws IOException {
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"), 1024);
+            String line = null;
+            while ( (line = in.readLine()) != null) {
+                if (line.trim().length() <= 0) continue;
+                if (line.charAt(0) == '#') continue;
+                if (line.charAt(0) == ';') continue;
+                int split = line.indexOf('=');
+                if (split <= 0) continue;
+                String key = line.substring(0, split);
+                String val = line.substring(split+1).trim();
+                props.setProperty(key, val);
+            }
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+        }
+    }
+    
+    /**
+     *  Same as DataHelper.loadProps() but allows '#' in values,
+     *  so we can have filenames with '#' in them in torrent config files.
+     *  '#' must be in column 1 for a comment.
+     *
+     *  @since 0.9.58
+     */
+    static void storeProps(Properties props, File file) throws IOException {
+        FileOutputStream fos = null;
+        PrintWriter out = null;
+        IOException ioe = null;
+        File tmpFile = new File(file.getPath() + ".tmp");
+        try {
+            fos = new SecureFileOutputStream(tmpFile);
+            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(fos, "UTF-8")));
+            out.println("# NOTE: This I2P config file must use UTF-8 encoding");
+            out.println("# Last saved: " + DataHelper.formatTime(System.currentTimeMillis()));
+            for (Map.Entry<Object, Object> entry : props.entrySet()) {
+                String name = (String) entry.getKey();
+                String val = (String) entry.getValue();
+                if (ILLEGAL_KEY.matcher(name).find()) {
+                    if (ioe == null)
+                        ioe = new IOException("Invalid character (one of \"#;=\\r\\n\") in key: \"" +
+                                              name + "\" = \"" + val + '\"');
+                    continue;
+                }
+                if (ILLEGAL_VALUE.matcher(val).find()) {
+                    if (ioe == null)
+                        ioe = new IOException("Invalid character (one of \"\\r\\n\") in value: \"" +
+                                              name + "\" = \"" + val + '\"');
+                    continue;
+                }
+                out.println(name + "=" + val);
+            }
+            if (SHOULD_SYNC) {
+                out.flush();
+                fos.getFD().sync();
+            }
+            out.close();
+            if (out.checkError()) {
+                out = null;
+                tmpFile.delete();
+                throw new IOException("Failed to write properties to " + tmpFile);
+            }
+            out = null;
+            if (!FileUtil.rename(tmpFile, file))
+                throw new IOException("Failed rename from " + tmpFile + " to " + file);
+        } finally {
+            if (out != null) out.close();
+            if (fos != null) try { fos.close(); } catch (IOException e) {}
+        }
+        if (ioe != null)
+            throw ioe;
     }
 }

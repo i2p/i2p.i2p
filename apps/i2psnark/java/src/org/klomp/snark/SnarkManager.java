@@ -727,7 +727,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
         File conf = configFile(_configDir, ih);
         synchronized(_configLock) {  // one lock for all
             try {
-                DataHelper.loadProps(rv, conf);
+                I2PSnarkUtil.loadProps(rv, conf);
             } catch (IOException ioe) {}
         }
         return rv;
@@ -2309,7 +2309,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
         if (!subdir.exists())
             subdir.mkdirs();
         try {
-            DataHelper.storeProps(config, conf);
+            I2PSnarkUtil.storeProps(config, conf);
             if (_log.shouldInfo())
                 _log.info("Saved config to " + conf /* , new Exception() */ );
         } catch (IOException ioe) {
