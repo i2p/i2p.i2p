@@ -110,8 +110,8 @@ public class DataHelper {
         }
     }
 
-    private static final Pattern ILLEGAL_KEY =  Pattern.compile("[#=\r\n;]");
-    private static final Pattern ILLEGAL_VALUE =  Pattern.compile("[#\r\n]");
+    private static final Pattern ILLEGAL_KEY =  Pattern.compile("[#=\\r\\n;]");
+    private static final Pattern ILLEGAL_VALUE =  Pattern.compile("[#\\r\\n]");
 
     /**
      *  The default formatting for date/time, current locale, local time zone
@@ -535,13 +535,13 @@ public class DataHelper {
             for (Map.Entry<Object, Object> entry : props.entrySet()) {
                 String name = (String) entry.getKey();
                 String val = (String) entry.getValue();
-                if (ILLEGAL_KEY.matcher(name).matches()) {
+                if (ILLEGAL_KEY.matcher(name).find()) {
                     if (iae == null)
                         iae = new IllegalArgumentException("Invalid character (one of \"#;=\\r\\n\") in key: \"" +
                                                            name + "\" = \"" + val + '\"');
                     continue;
                 }
-                if (ILLEGAL_VALUE.matcher(val).matches()) {
+                if (ILLEGAL_VALUE.matcher(val).find()) {
                     if (iae == null)
                         iae = new IllegalArgumentException("Invalid character (one of \"#\\r\\n\") in value: \"" +
                                                            name + "\" = \"" + val + '\"');
