@@ -1893,7 +1893,7 @@ public class I2PSnarkServlet extends BasicServlet {
                                ":</b> " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
             } else if (isRunning && curPeers > 0 && !showPeers) {
-                statusString = toThemeImg("stalled", "", _t("Stalled") + " (" + ngettext("Connected to {0} peer", "Connected to {0} peers", curPeers)) + "</td>" +
+                statusString = toThemeImg("stalled", "", _t("Stalled") + " (" + ngettext("Connected to {0} peer", "Connected to {0} peers", curPeers) + ")") + "</td>" +
                                "<td class=\"snarkTorrentStatus\"><b>" + _t("Stalled") +
                                ":</b> <a href=\"" + uri + getQueryString(req, b64, null, null) + '#' + b64Short + "\">" +
                                curPeers + thinsp(noThinsp) +
