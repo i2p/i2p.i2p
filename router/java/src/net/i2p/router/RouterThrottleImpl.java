@@ -293,7 +293,7 @@ public class RouterThrottleImpl implements RouterThrottle {
         // of another tunnel?
         rs = _context.statManager().getRate("tunnel.participatingMessageCountAvgPerTunnel");
         r = null;
-        double messagesPerTunnel = DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE;
+        double messagesPerTunnel = 0;
         if (rs != null) {
             r = rs.getRate(60*1000);
             if (r != null) 
@@ -345,7 +345,7 @@ public class RouterThrottleImpl implements RouterThrottle {
         return TUNNEL_ACCEPT;
     }
 
-    private static final int DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE = 40; // .067KBps
+    static final int DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE = 40; // .067KBps
     /** also limited to 90% - see below */
     private static final int MIN_AVAILABLE_BPS = 4*1024; // always leave at least 4KBps free when allowing
     private static final String LIMIT_STR = _x("Rejecting tunnels: Bandwidth limit");

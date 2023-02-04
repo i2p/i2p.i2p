@@ -174,7 +174,7 @@ public class TunnelDispatcher implements Service {
         // estimate for RouterThrottleImpl
         ctx.statManager().createRequiredRateStat("tunnel.participatingMessageCountAvgPerTunnel", 
                                          "Estimate of participating messages per tunnel lifetime", "Tunnels", 
-                                         new long[] { 60*1000l });
+                                         new long[] { 60*1000, 20*60*1000 });
         ctx.statManager().createRateStat("tunnel.ownedMessageCount", 
                                          "How many messages are sent through a tunnel we created (period == failures)?", "Tunnels", 
                                          new long[] { 60*1000l, 10*60*1000l, 60*60*1000l });

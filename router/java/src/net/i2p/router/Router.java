@@ -58,6 +58,8 @@ import net.i2p.router.transport.UPnPScannerCallback;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.util.EventLog;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateAverages;
 import net.i2p.stat.RateStat;
 import net.i2p.stat.StatManager;
 import net.i2p.util.ByteCache;
@@ -1194,8 +1196,8 @@ public class Router implements RouterClock.ClockShiftListener {
         
         if (hidden || _context.getBooleanProperty(PROP_FORCE_UNREACHABLE)) {
             rv.append(CAPABILITY_UNREACHABLE);
-            if (CONGESTION_CAPS)
-                rv.append(CAPABILITY_NO_TUNNELS);
+            //if (CONGESTION_CAPS)
+            //    rv.append(CAPABILITY_NO_TUNNELS);
             return rv.toString();
         }
         switch (_context.commSystem().getStatus()) {
@@ -1240,7 +1242,39 @@ public class Router implements RouterClock.ClockShiftListener {
             } else if (numTunnels > 8 * maxTunnels / 10) {
                 cong = CAPABILITY_CONGESTION_MODERATE;
             } else {
-                // TODO
+                // this is a greatly simplified version of RouterThrottleImpl.acceptTunnelRequest()
+                long lag = _context.jobQueue().getMaxLag();
+                if (lag > 500) {
+                    cong = CAPABILITY_CONGESTION_SEVERE;
+                } else if (lag > 300) {
+                    cong = CAPABILITY_CONGESTION_MODERATE;
+                } else {
+                    double bwLim = getSharePercentage() * 1024 *
+                                   Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
+                                            _context.bandwidthLimiter().getOutboundKBytesPerSecond());
+                    if (bwLim < 4*1024) {
+                        cong = CAPABILITY_NO_TUNNELS;
+                    } else {
+                        RateStat rs = _context.statManager().getRate("tunnel.participatingMessageCountAvgPerTunnel");
+                        double messagesPerTunnel = 0;
+                        if (rs != null) {
+                            Rate r = rs.getRate(20*60*1000);
+                            if (r != null) {
+                                RateAverages ra = RateAverages.getTemp();
+                                messagesPerTunnel = r.computeAverages(ra, true).getAverage();
+                            }
+                        }
+                        if (messagesPerTunnel < RouterThrottleImpl.DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE)
+                            messagesPerTunnel = RouterThrottleImpl.DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE;
+                        double bpsAllocated = messagesPerTunnel * numTunnels * 1024 / (10 * 60);
+                        if (_log.shouldInfo())
+                            _log.info("bps allocated: " + bpsAllocated + " bw limit: " + bwLim);
+                        if (bpsAllocated > 0.9 * bwLim)
+                            cong = CAPABILITY_CONGESTION_SEVERE;
+                        else if (bpsAllocated > 0.8 * bwLim)
+                            cong = CAPABILITY_CONGESTION_MODERATE;
+                    }
+                }
             }
         }
         if (cong != 0) {
