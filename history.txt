@@ -1,5 +1,29 @@
+2023-02-04 zzz
+ * Router:
+   - Continue work on congestion caps (proposal 162)
+   - Stat cleanup
+
+2023-02-03 zzz
+ * i2psnark: Fix failure on torrents with '#' in the name
+ * Util: Fix check for illegal chars in storeProps()
+
+2023-02-01 zzz
+ * Console: Don't list same client SKM twice on /debug for subsessions
+ * Profiles:
+   - Count all build rejections in tunnel history
+   - Remove 30m tunnel history rates
+ * Ratchet: Don't bundle LS with ratchet ACK
+
 2023-01-30 zzz
- * Tunnels: Refactor peer selection
+ * Blocklist:
+   - Don't maintain IPv6 blocklist unless we have an IPv6 address
+   - Don't read in same-country blocklist unless configured or in strict country
+ * NTCP2: Ensure we publish a "6" address on transition to firewalled
+ * Streaming: Refactor sig checking
+ * Tunnels:
+   - Refactor peer selection
+   - Improve expl. build success in well-connected routers during congestion
+ * Util: Add experimental config to bypass Fortuna and just use /dev/random
 
 2023-01-27 zzz
  * Console: Debug page cleanups
