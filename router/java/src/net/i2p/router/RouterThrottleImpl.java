@@ -532,28 +532,6 @@ public class RouterThrottleImpl implements RouterThrottle {
         return (long)lagRate.getAverageValue();
     }
     
-    public double getInboundRateDelta() {
-        RateStat receiveRate = _context.statManager().getRate("transport.sendMessageSize");
-        if (receiveRate == null)
-            return 0;
-        double nowBps = getBps(receiveRate.getRate(60*1000));
-        double fiveMinBps = getBps(receiveRate.getRate(5*60*1000));
-        double hourBps = getBps(receiveRate.getRate(60*60*1000));
-        double dailyBps = getBps(receiveRate.getRate(24*60*60*1000));
-        
-        if (nowBps < 0) return 0;
-        if (dailyBps > 0) return nowBps - dailyBps;
-        if (hourBps > 0) return nowBps - hourBps;
-        if (fiveMinBps > 0) return nowBps - fiveMinBps;
-        return 0;
-    }
-
-    private static double getBps(Rate rate) {
-        if (rate == null) return -1;
-        double bytes = rate.getLastTotalValue();
-        return (bytes*1000.0d)/rate.getPeriod(); 
-    }
-    
     public String getTunnelStatus() {
         return _tunnelStatus;
     }

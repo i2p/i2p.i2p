@@ -260,9 +260,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         ctx.statManager().createFrequencyStat("client.sendMessageFailFrequency", "How often does a client fail to send a message?", "ClientMessages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.sendMessageSize", "How large are messages sent by the client?", "ClientMessages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRequiredRateStat("client.sendAckTime", "Message round trip time (ms)", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.timeoutCongestionTunnel", "How lagged our tunnels are when a send times out?", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.timeoutCongestionMessage", "How fast we process messages locally when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.timeoutCongestionInbound", "How much faster we are receiving data than our average bps when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        //ctx.statManager().createRateStat("client.timeoutCongestionTunnel", "How lagged our tunnels are when a send times out?", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        //ctx.statManager().createRateStat("client.timeoutCongestionMessage", "How fast we process messages locally when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        //ctx.statManager().createRateStat("client.timeoutCongestionInbound", "How much faster we are receiving data than our average bps when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         //ctx.statManager().createRateStat("client.leaseSetFoundLocally", "How often we tried to look for a leaseSet and found it locally?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.leaseSetFoundRemoteTime", "How long we tried to look for a remote leaseSet (when we succeeded)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.leaseSetFailedRemoteTime", "How long we tried to look for a remote leaseSet (when we failed)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
@@ -965,16 +965,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                        " out " + _outTunnel + " in " + _lease + " ack " + _inTunnel +
                        " after " + sendTime + "ms");
         
-        long messageDelay = getContext().throttle().getMessageDelay();
-        long tunnelLag = getContext().throttle().getTunnelLag();
-        long inboundDelta = (long)getContext().throttle().getInboundRateDelta();
-            
-        getContext().statManager().addRateData("client.timeoutCongestionTunnel", tunnelLag, 1);
-        getContext().statManager().addRateData("client.timeoutCongestionMessage", messageDelay, 1);
-        getContext().statManager().addRateData("client.timeoutCongestionInbound", inboundDelta, 1);
-    
         clearCaches();
-        getContext().messageHistory().sendPayloadMessage(_clientMessageId.getMessageId(), false, sendTime);
+        //getContext().messageHistory().sendPayloadMessage(_clientMessageId.getMessageId(), false, sendTime);
         long nonce = _clientMessage.getMessageNonce();
         if (nonce > 0)
             getContext().clientManager().messageDeliveryStatusUpdate(_from, _clientMessageId, nonce, status);
