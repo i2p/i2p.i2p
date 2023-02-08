@@ -7480,7 +7480,6 @@ b.netdb_transport {
 .buckets {
     margin-top: -13px;
     margin-bottom: 15px;
-    max-height: 600px;
     overflow: auto;
     word-break: break-all;
 }
