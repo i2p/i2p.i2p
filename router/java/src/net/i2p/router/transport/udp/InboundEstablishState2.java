@@ -248,6 +248,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         boolean isIPv6 = _aliceIP.length == 16;
         List<RouterAddress> addrs = _transport.getTargetAddresses(ri);
         RouterAddress ra = null;
+        String mismatchMessage = null;
         for (RouterAddress addr : addrs) {
             // skip SSU 1 address w/o "s"
             if (addrs.size() > 1 && addr.getTransportStyle().equals("SSU") && addr.getOption("s") == null)
@@ -266,6 +267,20 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                     continue;
             }
             ra = addr;
+            byte[] infoIP = ra.getIP();
+            if (infoIP != null && infoIP.length == _aliceIP.length) {
+                if (isIPv6) {
+                    if ((((int) infoIP[0]) & 0xfe) == 0x02)
+                        continue; // ygg
+                    if (DataHelper.eq(_aliceIP, 0, infoIP, 0, 8))
+                        continue;
+                } else {
+                    if (DataHelper.eq(_aliceIP, infoIP))
+                        continue;
+                }
+                // We will ban and throw below after checking signature
+                mismatchMessage = "IP mismatch actual IP " + Addresses.toString(_aliceIP) + " in RI: ";
+            }
             break;
         }
 
@@ -310,6 +325,13 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             if (ri.verifySignature())
                _context.blocklist().add(_aliceIP);
             throw new RIException("SSU2 network ID mismatch", REASON_NETID);
+        }
+
+        if (mismatchMessage != null) {
+            _context.banlist().banlistRouter(h, "IP mismatch", null, null, _context.clock().now() + 2*60*60*1000);
+            if (ri.verifySignature())
+                _context.blocklist().add(_aliceIP);
+            throw new RIException(mismatchMessage + ri, REASON_BANNED);
         }
 
         if (!"2".equals(ra.getOption("v")))

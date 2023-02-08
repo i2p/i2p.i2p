@@ -629,15 +629,32 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             throw new DataFormatException("no NTCP in RI: " + ri);
         }
         String s = null;
+        String mismatchMessage = null;
+        byte[] realIP = _con.getRemoteIP();
         for (RouterAddress addr : addrs) {
             String v = addr.getOption("v");
             if (v == null ||
                 (!v.equals(NTCPTransport.NTCP2_VERSION) && !v.startsWith(NTCPTransport.NTCP2_VERSION_ALT))) {
                  continue;
             }
-            s = addr.getOption("s");
-            if (s != null)
-                break;
+            if (s == null)
+                s = addr.getOption("s");
+            if (realIP != null) {
+                byte[] infoIP = addr.getIP();
+                if (infoIP != null && infoIP.length == realIP.length) {
+                    if (infoIP.length == 16) {
+                        if ((((int) infoIP[0]) & 0xfe) == 0x02)
+                            continue; // ygg
+                        if (DataHelper.eq(realIP, 0, infoIP, 0, 8))
+                            continue;
+                    } else {
+                        if (DataHelper.eq(realIP, infoIP))
+                            continue;
+                    }
+                    // We will ban and throw below after checking s
+                    mismatchMessage = "IP mismatch actual IP " + Addresses.toString(realIP) + " in RI: ";
+                }
+            }
         }
         if (s == null) {
             _msg3p2FailReason = NTCPConnection.REASON_S_MISMATCH;
@@ -661,6 +678,14 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         boolean ok = verifyInbound(h);
         if (!ok)
             throw new DataFormatException("NTCP2 verifyInbound() fail");
+
+        // s is verified, we may now ban the hash
+        if (mismatchMessage != null) {
+            _context.banlist().banlistRouter(h, "IP mismatch", null, null, _context.clock().now() + 2*60*60*1000);
+            _msg3p2FailReason = NTCPConnection.REASON_BANNED;
+            throw new DataFormatException(mismatchMessage + ri);
+        }
+
         try {
             RouterInfo old = _context.netDb().store(h, ri);
             if (flood && !ri.equals(old)) {
