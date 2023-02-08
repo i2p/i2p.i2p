@@ -223,20 +223,20 @@ class FloodfillPeerSelector extends PeerSelector {
         long installed = _context.getProperty("router.firstInstalled", 0L);
         boolean enforceHeard = installed > 0 && (now - installed) > INSTALL_AGE;
 
-        double maxFailRate = 100;
+        double maxFailRate = 0.95;
         if (_context.router().getUptime() > 60*60*1000) {
             RateStat rs = _context.statManager().getRate("peer.failedLookupRate");
             if (rs != null) {
                 Rate r = rs.getRate(60*60*1000);
                 if (r != null) {
                     double currentFailRate = r.getAverageValue();
-                    maxFailRate = Math.max(0.20d, 1.5d * currentFailRate);
+                    maxFailRate = Math.min(0.95d, Math.max(0.20d, 1.25d * currentFailRate));
                 }
             }
         }
 
         // 5 == FNDF.MAX_TO_FLOOD + 1
-        int limit = Math.max(5, howMany + 2);
+        int limit = Math.max(5, howMany * 2);
         limit = Math.min(limit, sorted.size());
         MaskedIPSet maskedIPs = new MaskedIPSet(limit * 3);
         // split sorted list into 3 sorted lists
@@ -248,7 +248,7 @@ class FloodfillPeerSelector extends PeerSelector {
             if (entry == null)
                 break;  // shouldn't happen
             // put anybody in the same /16 at the end
-            RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
+            RouterInfo info = (RouterInfo) _context.netDb().lookupLocallyWithoutValidation(entry);
             MaskedIPSet entryIPs = new MaskedIPSet(_context, entry, info, 2);
             boolean sameIP = false;
             for (String ip : entryIPs) {
@@ -373,7 +373,7 @@ class FloodfillPeerSelector extends PeerSelector {
             // ... unless they are really bad
             if (_context.banlist().isBanlistedForever(entry))
                 return;
-            RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
+            RouterInfo info = (RouterInfo) _context.netDb().lookupLocallyWithoutValidation(entry);
             //if (info == null)
             //    return;
             
@@ -419,7 +419,7 @@ class FloodfillPeerSelector extends PeerSelector {
             // (Forever banlisted ones are excluded in add() above)
             for (Iterator<Hash> iter = new RandomIterator<Hash>(_floodfillMatches); (found < howMany) && iter.hasNext(); ) {
                 Hash entry = iter.next();
-                RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
+                RouterInfo info = (RouterInfo) _context.netDb().lookupLocallyWithoutValidation(entry);
                 if (info != null && now - info.getPublished() > 3*60*60*1000) {
                     badff.add(entry);
                     if (_log.shouldLog(Log.DEBUG))
