@@ -84,10 +84,10 @@ public class ConnectChecker {
         boolean ust = to.equals(us);
         if (ust && ctx.commSystem().isEstablished(from))
             return true;
-        RouterInfo rt = ctx.netDb().lookupRouterInfoLocally(to);
+        RouterInfo rt = (RouterInfo) ctx.netDb().lookupLocallyWithoutValidation(to);
         if (rt == null)
             return true;
-        RouterInfo rf = ctx.netDb().lookupRouterInfoLocally(from);
+        RouterInfo rf = (RouterInfo) ctx.netDb().lookupLocallyWithoutValidation(from);
         if (rf == null)
             return true;
         int ct;
