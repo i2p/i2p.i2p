@@ -756,11 +756,11 @@ public class ProfileOrganizer {
         } finally { releaseReadLock(); }
     }
     
-    private static final long MIN_EXPIRE_TIME = 2*60*60*1000;
+    private static final long MIN_EXPIRE_TIME = 60*60*1000;
     private static final long MAX_EXPIRE_TIME = 6*60*60*1000;
-    private static final long ADJUST_EXPIRE_TIME = 60*1000;
+    private static final long ADJUST_EXPIRE_TIME = 5*60*1000;
     private static final int ENOUGH_PROFILES = 600;
-    private long _currentExpireTime = MAX_EXPIRE_TIME;
+    private long _currentExpireTime = 2*60*60*1000;
 
     /**
      * Place peers into the correct tier, as well as expand/contract and even drop profiles
@@ -1393,7 +1393,7 @@ public class ProfileOrganizer {
             return false; // never select a banlisted peer
         }
             
-        RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
+        RouterInfo info = (RouterInfo) _context.netDb().lookupLocallyWithoutValidation(peer);
         if (null != info) {
             if (info.isHidden()) {
                if (_log.shouldLog(Log.WARN))
