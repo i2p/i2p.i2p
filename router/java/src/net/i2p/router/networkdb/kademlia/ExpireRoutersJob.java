@@ -13,10 +13,12 @@ import java.util.Set;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterInfo;
+import net.i2p.data.router.RouterKeyGenerator;
 import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Go through the routing table pick routers that are
@@ -33,6 +35,7 @@ class ExpireRoutersJob extends JobImpl {
     
     /** rerun fairly often, so the fails don't queue up too many netdb searches at once */
     private final static long RERUN_DELAY_MS = 5*60*1000;
+    private static final int LIMIT_ROUTERS = SystemVersion.isSlow() ? 1000 : 4000;
     
     public ExpireRoutersJob(RouterContext ctx, KademliaNetworkDatabaseFacade facade) {
         super(ctx);
@@ -62,24 +65,53 @@ class ExpireRoutersJob extends JobImpl {
     private int expireKeys() {
         Set<Hash> keys = _facade.getAllRouters();
         keys.remove(getContext().routerHash());
-        if (keys.size() < 150)
+        int count = keys.size();
+        if (count < 150)
             return 0;
+        RouterKeyGenerator gen = getContext().routerKeyGenerator();
+        long now = getContext().clock().now();
+        long cutoff = now - 30*60*1000;
+        boolean isFF = _facade.floodfillEnabled();
+        byte[] ourRKey = isFF ? getContext().routerHash().getData() : null;
+        int pdrop = Math.max(10, Math.min(50, (100 * count / LIMIT_ROUTERS) - 100));
         int removed = 0;
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Expiring routers, count = " + count + " drop probability " + (count > LIMIT_ROUTERS ? pdrop : 0) + '%');
         for (Hash key : keys) {
             // Don't expire anybody we are connected to
-            if (!getContext().commSystem().isEstablished(key)) {
-                DatabaseEntry e = _facade.lookupLocallyWithoutValidation(key);
-                if (e != null &&
-                    e.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
-                    try {
-                        if (_facade.validate((RouterInfo) e) != null) {
-                            _facade.dropAfterLookupFailed(key);
-                            removed++;
-                        }
-                    } catch (IllegalArgumentException iae) {
+            if (getContext().commSystem().isEstablished(key))
+                continue;
+            DatabaseEntry e = _facade.lookupLocallyWithoutValidation(key);
+            if (e == null)
+                continue;
+            if (count > LIMIT_ROUTERS) {
+                // aggressive drop strategy
+                if (e.getDate() < cutoff) {
+                    if (isFF) {
+                        // don't drop very close to us
+                        byte[] rkey = gen.getRoutingKey(key).getData();
+                        int distance = (((rkey[0] ^ ourRKey[0]) & 0xff) << 8) |
+                                        ((rkey[1] ^ ourRKey[1]) & 0xff);
+                        // they have to be within 1/256 of the keyspace
+                        if (distance < 256)
+                            continue;
+                        // TODO maybe: long until = gen.getTimeTillMidnight();
+                    }
+                    if (getContext().random().nextInt(100) < pdrop) {
                         _facade.dropAfterLookupFailed(key);
                         removed++;
                     }
+                }
+            } else {
+                // normal drop strategy
+                try {
+                    if (_facade.validate((RouterInfo) e) != null) {
+                        _facade.dropAfterLookupFailed(key);
+                        removed++;
+                    }
+                } catch (IllegalArgumentException iae) {
+                    _facade.dropAfterLookupFailed(key);
+                    removed++;
                 }
             }
         }
