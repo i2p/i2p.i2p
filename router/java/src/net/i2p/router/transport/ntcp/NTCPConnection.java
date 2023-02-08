@@ -1411,6 +1411,7 @@ public class NTCPConnection implements Closeable {
      * @since 0.9.36
      */
     synchronized void failInboundEstablishment(CipherState sender, byte[] sip_ba, int reason) {
+        byte[] ip = getRemoteIP();
         _sender = sender;
         _sendSipk1 = fromLong8LE(sip_ba, 0);
         _sendSipk2 = fromLong8LE(sip_ba, 8);
@@ -1422,6 +1423,7 @@ public class NTCPConnection implements Closeable {
         _nextInfoTime = Long.MAX_VALUE;
         _paddingConfig = OUR_PADDING;
         sendTermination(reason, 0);
+        _transport.getPumper().blockIP(ip);
     }
 
     /** 
@@ -1710,6 +1712,8 @@ public class NTCPConnection implements Closeable {
                 _log.info("Got Termination: " + reason + " total rcvd: " + lastReceived + " on " + NTCPConnection.this);
             // close() calls destroy() sets _terminated
             close();
+            if (reason == REASON_BANNED && _remotePeer != null)
+                _context.banlist().banlistRouter(_remotePeer.calculateHash(), "They banned us", null, null, _context.clock().now() + 2*60*60*1000);
         }
 
         public void gotUnknown(int type, int len) {

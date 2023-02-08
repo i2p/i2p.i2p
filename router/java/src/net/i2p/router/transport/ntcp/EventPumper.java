@@ -87,7 +87,7 @@ class EventPumper implements Runnable {
     private static final long FAILSAFE_ITERATION_FREQ = 2*1000l;
     private static final int FAILSAFE_LOOP_COUNT = 512;
     private static final long SELECTOR_LOOP_DELAY = 200;
-    private static final long BLOCKED_IP_FREQ = 3*60*1000;
+    private static final long BLOCKED_IP_FREQ = 12*60*1000;
 
     /** tunnel test now disabled, but this should be long enough to allow an active tunnel to get started */
     private static final long MIN_EXPIRE_IDLE_TIME = 120*1000l;
@@ -911,6 +911,18 @@ class EventPumper implements Runnable {
             expireTimedOut();
             _lastExpired = now;
         }
+    }
+
+    /**
+     *  Temp. block inbound from this IP
+     *
+     *  @since 0.9.58
+     */
+    public void blockIP(byte[] ip) {
+        if (ip == null)
+            return;
+        ByteArray ba = new ByteArray(ip);
+        _blockedIPs.increment(ba);
     }
 
     private long _lastExpired;
