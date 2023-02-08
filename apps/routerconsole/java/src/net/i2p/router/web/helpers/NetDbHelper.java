@@ -415,7 +415,7 @@ public class NetDbHelper extends FormHandler {
                    "<input type=\"hidden\" name=\"nonce\" value=\"" + _newNonce + "\" >\n" +
                    "<table id=\"netdblookup\"><tr><th colspan=\"3\">Network Database Search</th></tr>\n" +
                    "<tr><td colspan=\"3\" class=\"subheading\"><b>Enter one search field <i>only</i>:</b></td></tr>\n" +
-                   "<tr><td>Capabilities:</td><td><input type=\"text\" name=\"caps\"></td><td>e.g. f or XOfR</td></tr>\n" +
+                   "<tr><td>Capabilities:</td><td><input type=\"text\" name=\"caps\"></td><td>e.g. f or XfR</td></tr>\n" +
                    "<tr><td>Cost:</td><td><input type=\"text\" name=\"cost\"></td><td></td></tr>\n" +
                    "<tr><td>" + _t("Country") + ":</td><td><select name=\"c\"><option value=\"\" selected=\"selected\"></option>");
         Map<String, String> sorted = new TreeMap<String, String>(Collator.getInstance());
