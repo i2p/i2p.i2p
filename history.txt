@@ -1,3 +1,30 @@
+2023-02-08 zzz
+ * Console:
+   - Add routing key to router infos (advanced)
+   - Debug page sockets table cleanup
+   - Load router infos more efficiently
+ * NetDB:
+   - Don't explore if we have enough RIs
+   - Further restrict what RIs we lookup before dropping
+   - Implement faster RI expiration mode
+   - Increase closest-floodfill search size
+   - Reduce min RI expiration
+   - Reduce max floodfill fail rate
+   - Replace Set with List in ExpireLeasesJob for efficiency
+   - Set max routers to load at startup
+ * NTCP2:
+   - Ban peers that ban us
+   - Block IP on failed inbound
+   - Increase temp. inbound IP block time
+   - Route RI block of another router to InNetMessagePool
+ * Router:
+   - Don't set congestion cap at startup because of high job lag
+ * Sybil:
+   - Don't do pair distance check unless enough memory
+   - Thread analyzer at reduced priority
+ * Transports: Check RI in handshake for matching IP
+ * Tunnels: Load RIs more efficiently in peer selector
+
 2023-02-04 zzz
  * Router:
    - Continue work on congestion caps (proposal 162)
