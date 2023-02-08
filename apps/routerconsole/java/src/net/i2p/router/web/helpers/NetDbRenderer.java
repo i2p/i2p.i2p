@@ -38,6 +38,7 @@ import net.i2p.data.LeaseSet2;
 import net.i2p.data.PublicKey;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
+import net.i2p.data.router.RouterKeyGenerator;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
@@ -123,7 +124,7 @@ class NetDbRenderer {
             byte[] h = Base64.decode(routerPrefix);
             if (h != null && h.length == Hash.HASH_LENGTH) {
                 Hash hash = new Hash(h);
-                RouterInfo ri = _context.netDb().lookupRouterInfoLocally(hash);
+                RouterInfo ri = (RouterInfo) _context.netDb().lookupLocallyWithoutValidation(hash);
                 boolean banned = false;
                 if (ri == null) {
                     banned = _context.banlist().isBanlisted(hash);
@@ -135,7 +136,7 @@ class NetDbRenderer {
                         synchronized(lw) {
                             try { lw.wait(9*1000); } catch (InterruptedException ie) {}
                         }
-                        ri = _context.netDb().lookupRouterInfoLocally(hash);
+                        ri = (RouterInfo) _context.netDb().lookupLocallyWithoutValidation(hash);
                     }
                 }
                 if (ri != null) {
@@ -608,16 +609,21 @@ class NetDbRenderer {
            .append("]</a></th></tr>\n")
            .append("<tr><td><b>Total Leasesets:</b></td><td colspan=\"3\">").append(leases.size()).append("</td></tr>\n");
         if (debug) {
+            RouterKeyGenerator gen = _context.routerKeyGenerator();
             buf.append("<tr><td><b>Published (RAP) Leasesets:</b></td><td colspan=\"3\">").append(netdb.getKnownLeaseSets()).append("</td></tr>\n")
-               .append("<tr><td><b>Mod Data:</b></td><td>").append(DataHelper.getUTF8(_context.routerKeyGenerator().getModData())).append("</td>")
-               .append("<td><b>Last Changed:</b></td><td>").append(DataHelper.formatTime(_context.routerKeyGenerator().getLastChanged())).append("</td></tr>\n")
-               .append("<tr><td><b>Next Mod Data:</b></td><td>").append(DataHelper.getUTF8(_context.routerKeyGenerator().getNextModData())).append("</td>")
-               .append("<td><b>Change in:</b></td><td>").append(DataHelper.formatDuration(_context.routerKeyGenerator().getTimeTillMidnight())).append("</td></tr>\n");
+               .append("<tr><td><b>Mod Data:</b></td><td>").append(DataHelper.getUTF8(gen.getModData())).append("</td>")
+               .append("<td><b>Last Changed:</b></td><td>").append(DataHelper.formatTime(gen.getLastChanged())).append("</td></tr>\n")
+               .append("<tr><td><b>Next Mod Data:</b></td><td>").append(DataHelper.getUTF8(gen.getNextModData())).append("</td>")
+               .append("<td><b>Change in:</b></td><td>").append(DataHelper.formatDuration(gen.getTimeTillMidnight())).append("</td></tr>\n");
         }
         int ff = _context.peerManager().getPeersByCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL).size();
         buf.append("<tr><td><b>Known Floodfills:</b></td><td colspan=\"3\">").append(ff).append("</td></tr>\n")
-           .append("<tr><td><b>Currently Floodfill?</b></td><td colspan=\"3\">").append(netdb.floodfillEnabled() ? "yes" : "no").append("</td></tr>\n");
-        buf.append("</table>\n");
+           .append("<tr><td><b>Currently Floodfill?</b></td><td>").append(netdb.floodfillEnabled() ? "yes" : "no");
+        if (debug)
+            buf.append("</td><td><b>Routing Key:</b></td><td>").append(ourRKey.toBase64());
+        else
+            buf.append("</td><td colspan=\"2\">");
+        buf.append("</td></tr>\n</table>\n");
 
         if (leases.isEmpty()) {
             //if (!debug)
@@ -1227,6 +1233,8 @@ class NetDbRenderer {
             buf.append("</td></tr><tr><td><b>").append(_t("Encryption Key")).append(":</b></td><td colspan=\"2\">")
                .append(info.getIdentity().getPublicKey().getType());
             if (debug) {
+                buf.append("</td></tr>\n<tr><td><b>Routing Key:</b></td><td colspan=\"2\">").append(info.getRoutingKey().toBase64());
+                buf.append("</td></tr>");
                 byte[] padding = info.getIdentity().getPadding();
                 if (padding != null && padding.length >= 64) {
                     if (DataHelper.eq(padding, 0, padding, 32, 32))
