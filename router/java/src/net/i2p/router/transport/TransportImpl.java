@@ -614,7 +614,7 @@ public abstract class TransportImpl implements Transport {
         if (address != null) {
             isIPv6 = TransportUtil.isIPv6(address);
             if (_log.shouldWarn())
-                _log.warn("Replacing  IPv" + (isIPv6 ? '6' : '4') + " address with " + address, new Exception());
+                _log.warn("Replacing IPv" + (isIPv6 ? '6' : '4') + " address with " + address, new Exception());
         } else {
             isIPv6 = false;
         }
