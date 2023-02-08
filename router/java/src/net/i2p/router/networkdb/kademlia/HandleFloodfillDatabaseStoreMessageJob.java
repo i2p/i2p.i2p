@@ -9,9 +9,9 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.util.Collection;
-import java.util.Date;
 
 import net.i2p.data.DatabaseEntry;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
@@ -60,9 +60,6 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
     }
     
     public void runJob() {
-        //if (_log.shouldLog(Log.DEBUG))
-        //    _log.debug("Handling database store message");
-
         long recvBegin = System.currentTimeMillis();
         
         String invalidMessage = null;
@@ -75,10 +72,8 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         int type = entry.getType();
         if (DatabaseEntry.isLeaseSet(type)) {
             getContext().statManager().addRateData("netDb.storeLeaseSetHandled", 1);
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Handling dbStore of leaseset " + _message);
-                //_log.info("Handling dbStore of leasset " + key + " with expiration of " 
-                //          + new Date(_message.getLeaseSet().getEarliestLeaseDate()));
+            if (_log.shouldDebug())
+                _log.debug("Handling dbStore of leaseset " + _message);
    
             try {
                 // Never store a leaseSet for a local dest received from somebody else.
@@ -110,7 +105,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 //boolean rap = ls.getReceivedAsPublished();
                 //if (_log.shouldLog(Log.INFO))
                 //    _log.info("oldrap? " + oldrap + " oldrar? " + oldrar + " newrap? " + rap);
-                LeaseSet match = getContext().netDb().store(key, ls);
+                LeaseSet match = _facade.store(key, ls);
                 if (match == null) {
                     wasNew = true;
                 } else if (match.getEarliestLeaseDate() < ls.getEarliestLeaseDate()) {
@@ -151,9 +146,9 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
             RouterInfo ri = (RouterInfo) entry;
             getContext().statManager().addRateData("netDb.storeRouterInfoHandled", 1);
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Handling dbStore of router " + key + " with publishDate of " 
-                          + new Date(ri.getPublished()));
+            if (_log.shouldDebug())
+                _log.debug("Handling dbStore of router " + key + " with publishDate of " 
+                           + DataHelper.formatTime(ri.getPublished()));
             try {
                 // Never store our RouterInfo received from somebody else.
                 // This generally happens from a FloodfillVerifyStoreJob.
@@ -231,7 +226,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
 
         // flood it
         if (invalidMessage == null &&
-            getContext().netDb().floodfillEnabled() &&
+            _facade.floodfillEnabled() &&
             _message.getReplyToken() > 0) {
             if (wasNew) {
                 // DOS prevention
@@ -267,7 +262,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         TunnelId replyTunnel = _message.getReplyTunnel();
         // A store of our own RI, only if we are not FF
         DatabaseStoreMessage msg2;
-        if (getContext().netDb().floodfillEnabled() ||
+        if (_facade.floodfillEnabled() ||
             storedKey.equals(getContext().routerHash())) {
             // don't send our RI if the store was our RI (from PeerTestJob)
             msg2 = null;
