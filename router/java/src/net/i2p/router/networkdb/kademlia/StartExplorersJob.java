@@ -17,6 +17,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Fire off search jobs for random keys from the explore pool, up to MAX_PER_RUN
@@ -48,6 +49,9 @@ class StartExplorersJob extends JobImpl {
     private static final int LOW_ROUTERS = 2 * MIN_ROUTERS;
     /** explore slowly if we have more than this many routers */
     private static final int MAX_ROUTERS = 2 * LOW_ROUTERS;
+    // must be lower than LIMIT_ROUTERS in HandleFloodfillDatabaseStoreMessageJob
+    // because exploration does not register a reply job
+    private static final int LIMIT_ROUTERS = SystemVersion.isSlow() ? 800 : 3000;
     private static final int MIN_FFS = 50;
     static final int LOW_FFS = 2 * MIN_FFS;
 
@@ -63,13 +67,13 @@ class StartExplorersJob extends JobImpl {
     public String getName() { return "Start Explorers Job"; }
 
     public void runJob() {
+        int count = _facade.getDataStore().size();
         if (! (_facade.floodfillEnabled() ||
+               count > LIMIT_ROUTERS ||
                getContext().jobQueue().getMaxLag() > MAX_LAG ||
                getContext().throttle().getMessageDelay() > MAX_MSG_DELAY ||
-               // message delay limit also?
                getContext().router().gracefulShutdownInProgress())) {
             int num = MAX_PER_RUN;
-            int count = _facade.getDataStore().size();
             if (count < MIN_ROUTERS)
                 num *= 15;  // at less than 3x MIN_RESEED, explore extremely aggressively
             else if (count < LOW_ROUTERS)
