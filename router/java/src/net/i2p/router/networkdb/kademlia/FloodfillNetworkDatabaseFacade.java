@@ -16,11 +16,15 @@ import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.router.RouterKeyGenerator;
+import net.i2p.router.peermanager.DBHistory;
+import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
@@ -402,7 +406,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     public static boolean isFloodfill(RouterInfo peer) {
         if (peer == null) return false;
         String caps = peer.getCapabilities();
-        return caps.indexOf(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL) >= 0;
+        return caps.indexOf(CAPABILITY_FLOODFILL) >= 0;
     }
 
     public List<RouterInfo> getKnownRouterData() {
@@ -609,10 +613,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         // drop the peer in these cases
         // yikes don't do this - stack overflow //  getFloodfillPeers().size() == 0 ||
         // yikes2 don't do this either - deadlock! // getKnownRouters() < MIN_REMAINING_ROUTERS ||
+        long uptime = _context.router().getUptime();
         int knownRouters = getKBucketSetSize();
         if (info.getNetworkId() == _networkID &&
             (knownRouters < MIN_REMAINING_ROUTERS ||
-             _context.router().getUptime() < DONT_FAIL_PERIOD ||
+             uptime < DONT_FAIL_PERIOD ||
              _context.commSystem().countActivePeers() <= MIN_ACTIVE_PEERS)) {
             if (_log.shouldInfo())
                 _log.info("Not failing " + peer.toBase64() + " as we are just starting up or have problems");
@@ -631,6 +636,80 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             super.lookupBeforeDropping(peer, info);
             return; 
         }
+
+        // The following doesn't kick in most of the time, because of
+        // the MAX_DB_BEFORE_SKIPPING_SEARCH check above,
+        // that value is pretty small compared to typical netdb sizes.
+
+        String caps = info.getCapabilities();
+        if (caps.indexOf(Router.CAPABILITY_UNREACHABLE) >= 0 ||
+            caps.indexOf(Router.CAPABILITY_BW32) >= 0) {
+            super.lookupBeforeDropping(peer, info);
+            return; 
+        }
+        if (caps.indexOf(CAPABILITY_FLOODFILL) >= 0) {
+            PeerProfile prof = _context.profileOrganizer().getProfile(peer);
+            if (prof == null) {
+                //_log.warn("skip lookup no profile " + peer.toBase64());
+                super.lookupBeforeDropping(peer, info);
+                return; 
+            }
+            // classification similar to that in FloodfillPeerSelector
+            long now = _context.clock().now();
+            long installed = _context.getProperty("router.firstInstalled", 0L);
+            boolean enforceHeard = installed > 0 && (now - installed) > 2*60*60*1000;
+            if (enforceHeard && prof.getFirstHeardAbout() > now - 3*60*60*1000) {
+                //_log.warn("skip lookup new " + DataHelper.formatTime(prof.getFirstHeardAbout()) + ' ' + peer.toBase64());
+                super.lookupBeforeDropping(peer, info);
+                return; 
+            }
+            DBHistory hist = prof.getDBHistory();
+            if (hist == null) {
+                //_log.warn("skip lookup no dbhist " + peer.toBase64());
+                super.lookupBeforeDropping(peer, info);
+                return; 
+            }
+            long cutoff = now - 30*60*1000;
+            long lastLookupSuccess = hist.getLastLookupSuccessful();
+            long lastStoreSuccess = hist.getLastStoreSuccessful();
+            if (uptime > 30*60*1000 &&
+                lastLookupSuccess < cutoff &&
+                lastStoreSuccess < cutoff) {
+                //_log.warn("skip lookup no db success " + peer.toBase64());
+                super.lookupBeforeDropping(peer, info);
+                return; 
+            }
+            cutoff = now - 2*60*60*1000;
+            long lastLookupFailed = hist.getLastLookupFailed();
+            long lastStoreFailed = hist.getLastStoreFailed();
+            if (lastLookupFailed > cutoff ||
+                lastStoreFailed > cutoff ||
+                lastLookupFailed > lastLookupSuccess ||
+                lastStoreFailed > lastStoreSuccess) {
+                //_log.warn("skip lookup dbhist store fail " + DataHelper.formatTime(lastStoreFailed) + " lookup fail " + DataHelper.formatTime(lastLookupFailed) + ' ' + peer.toBase64());
+                super.lookupBeforeDropping(peer, info);
+                return; 
+            }
+            double maxFailRate = 0.95;
+            if (_context.router().getUptime() > 60*60*1000) {
+                RateStat rs = _context.statManager().getRate("peer.failedLookupRate");
+                if (rs != null) {
+                    Rate r = rs.getRate(60*60*1000);
+                    if (r != null) {
+                        double currentFailRate = r.getAverageValue();
+                        maxFailRate = Math.min(0.95d, Math.max(0.20d, 1.25d * currentFailRate));
+                    }
+                }
+            }
+            double failRate = hist.getFailedLookupRate().getRate(60*60*1000).getAverageValue();
+            if (failRate >= 1 || failRate > maxFailRate) {
+                //_log.warn("skip lookup fail rate " + failRate + " max " + maxFailRate + ' ' + peer.toBase64());
+                super.lookupBeforeDropping(peer, info);
+                return; 
+            }
+        }
+
+
         // this sends out the search to the floodfill peers even if we already have the
         // entry locally, firing no job if it gets a reply with an updated value (meaning
         // we shouldn't drop them but instead use the new data), or if they all time out,
