@@ -1244,10 +1244,11 @@ public class Router implements RouterClock.ClockShiftListener {
             } else {
                 // this is a greatly simplified version of RouterThrottleImpl.acceptTunnelRequest()
                 long lag = _context.jobQueue().getMaxLag();
-                if (lag > 500) {
-                    cong = CAPABILITY_CONGESTION_SEVERE;
-                } else if (lag > 300) {
-                    cong = CAPABILITY_CONGESTION_MODERATE;
+                if (lag > 300 && getUptime() > 10*60*1000) {
+                    if (lag > 500)
+                        cong = CAPABILITY_CONGESTION_SEVERE;
+                    else
+                        cong = CAPABILITY_CONGESTION_MODERATE;
                 } else {
                     double bwLim = getSharePercentage() * 1024 *
                                    Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
