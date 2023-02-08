@@ -138,7 +138,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      * know anyone or just started up) -- see validate() below
      */
     private final static long ROUTER_INFO_EXPIRATION = 27*60*60*1000l;
-    private final static long ROUTER_INFO_EXPIRATION_MIN = 90*60*1000l;
+    private final static long ROUTER_INFO_EXPIRATION_MIN = 60*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_SHORT = 75*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_FLOODFILL = 60*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_INTRODUCED = 54*60*1000l;
@@ -1166,7 +1166,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         // As the net grows this won't be sufficient, and we'll have to implement
         // flushing some from memory, while keeping all on disk.
         long adjustedExpiration;
-        if (floodfillEnabled())
+        if (floodfillEnabled() || (_ds != null && _ds.size() > 5000))
             adjustedExpiration = ROUTER_INFO_EXPIRATION_FLOODFILL;
         else
             adjustedExpiration = Math.min(ROUTER_INFO_EXPIRATION,
