@@ -1653,8 +1653,19 @@ public class NTCPConnection implements Closeable {
             if (_log.shouldDebug())
                 _log.debug("Got updated RI");
             _messagesRead.incrementAndGet();
+            Hash h = ri.getHash();
+            Hash ph = _remotePeer.calculateHash();
+            if (!h.equals(ph)) {
+                if (h.equals(_context.routerHash()))
+                    return;
+                // make a fake DBSM message and send it to the InNetMessagePool
+                DatabaseStoreMessage dbsm = new DatabaseStoreMessage(_context);
+                dbsm.setEntry(ri);
+                dbsm.setMessageExpiration(_context.clock().now() + 10*1000);
+                _transport.messageReceived(dbsm, null, ph, 0, 1000); // fake size
+                return;
+            }
             try {
-                Hash h = ri.getHash();
                 if (h.equals(_context.routerHash()))
                     return;
                 RouterInfo old = _context.netDb().store(h, ri);
