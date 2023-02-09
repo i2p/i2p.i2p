@@ -243,16 +243,17 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     
     public synchronized void shutdown() {
         _initialized = false;
+        if (!_context.commSystem().isDummy() &&
+            _context.router().getUptime() > ROUTER_INFO_EXPIRATION_FLOODFILL + 10*60*1000 + 60*1000) {
+            // expire inline before saving RIs in _ds.stop()
+            Job erj = new ExpireRoutersJob(_context, this);
+            erj.runJob();
+        }
         if (_kb != null)
             _kb.clear();
-        // don't null out _kb, it can cause NPEs in concurrent operations
-        //_kb = null;
         if (_ds != null)
             _ds.stop();
-        // don't null out _ds, it can cause NPEs in concurrent operations
-        //_ds = null;
-        _exploreKeys.clear(); // hope this doesn't cause an explosion, it shouldn't.
-        // _exploreKeys = null;
+        _exploreKeys.clear();
         if (_negativeCache != null)
             _negativeCache.clear();
         _blindCache.shutdown();
