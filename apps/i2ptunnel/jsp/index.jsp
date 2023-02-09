@@ -294,13 +294,13 @@
                 case IndexBean.STANDBY:
           %><div class="statusStarting text" title="<%=intl._t("Standby")%>"><%=intl._t("Standby")%></div>
         </td><td class="tunnelControl">
-            <a class="control" title="Stop this Tunnel" href="list?nonce=<%=nextNonce%>&amp;action=stop&amp;tunnel=<%=curClient%>"><%=intl._t("Stop")%></a>
+            <a class="control" title="<%=intl._t("Stop this Tunnel")%>" href="list?nonce=<%=nextNonce%>&amp;action=stop&amp;tunnel=<%=curClient%>"><%=intl._t("Stop")%></a>
 <%
                 break;
                 case IndexBean.RUNNING:
           %><div class="statusRunning text" title="<%=intl._t("Running")%>"><%=intl._t("Running")%></div>
         </td><td class="tunnelControl">
-            <a class="control" title="Stop this Tunnel" href="list?nonce=<%=nextNonce%>&amp;action=stop&amp;tunnel=<%=curClient%>"><%=intl._t("Stop")%></a>
+            <a class="control" title="<%=intl._t("Stop this Tunnel")%>" href="list?nonce=<%=nextNonce%>&amp;action=stop&amp;tunnel=<%=curClient%>"><%=intl._t("Stop")%></a>
 <%
                 break;
                 case IndexBean.NOT_RUNNING:
