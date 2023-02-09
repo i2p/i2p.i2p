@@ -626,9 +626,10 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
 
         // should we skip the search?
         if (_floodfillEnabled ||
+            knownRouters > MAX_DB_BEFORE_SKIPPING_SEARCH ||
             _context.jobQueue().getMaxLag() > 500 ||
-            _context.banlist().isBanlistedForever(peer) ||
-            knownRouters > MAX_DB_BEFORE_SKIPPING_SEARCH) {
+            _context.router().gracefulShutdownInProgress() ||
+            _context.banlist().isBanlistedForever(peer)) {
             // don't try to overload ourselves (e.g. failing 3000 router refs at
             // once, and then firing off 3000 netDb lookup tasks)
             // Also don't queue a search if we have plenty of routerinfos
