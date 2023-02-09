@@ -136,7 +136,8 @@ class PeerManager {
                 try {
                     _log.debug("Periodic profile store start");
                     storeProfiles();
-                    _persistenceHelper.deleteOldProfiles(EXPIRE_AGE);
+                    if (shouldDecay)
+                        _persistenceHelper.deleteOldProfiles(EXPIRE_AGE);
                     _log.debug("Periodic profile store end");
                 } catch (Throwable t) {
                     _log.log(Log.CRIT, "Error storing profiles", t);
