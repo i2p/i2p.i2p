@@ -17,7 +17,9 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.net.URL;
 
+import java.awt.MenuItem;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingWorker;
 import javax.swing.event.MenuKeyEvent;
@@ -43,6 +45,8 @@ abstract class TrayManager {
     ///Our tray icon, or null if unsupported
     protected TrayIcon trayIcon;
     protected volatile boolean _showNotifications;
+    protected MenuItem  _notificationItem1, _notificationItem2;
+    protected JMenuItem _jnotificationItem1, _jnotificationItem2;
 
     private static final String PNG_DIR = "/desktopgui/resources/images/";
     private static final String MAC_ICON = "itoopie_black_24.png";
@@ -286,6 +290,89 @@ abstract class TrayManager {
         }
 */
         return 0;
+    }
+
+    /**
+     *  Does not save. See InternalTrayManager.
+     *
+     *  @since 0.9.58 moved up from InternalTrayManager
+     */
+    protected void configureNotifications(boolean enable) {
+        _showNotifications = enable;
+    }
+
+    /**
+     *  Initializes _notificationItem 1 and 2
+     *
+     *  @since 0.9.58 pulled out of InternalTrayManager
+     */
+    protected void initializeNotificationItems() {
+        final MenuItem notificationItem2 = new MenuItem(_t("Enable notifications"));
+        notificationItem2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                new SwingWorker<Object, Object>() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        configureNotifications(true);
+                        return null;
+                    }
+                }.execute();
+            }
+        });
+        _notificationItem2 = notificationItem2;
+
+        final MenuItem notificationItem1 = new MenuItem(_t("Disable notifications"));
+        notificationItem1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                new SwingWorker<Object, Object>() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        configureNotifications(false);
+                        return null;
+                    }
+                }.execute();
+            }
+        });
+        _notificationItem1 = notificationItem1;
+    }
+
+    /**
+     *  Initializes _jnotificationItem 1 and 2
+     *
+     *  @since 0.9.58 pulled out of InternalTrayManager
+     */
+    protected void initializeJNotificationItems() {
+        final JMenuItem notificationItem2 = new JMenuItem(_t("Enable notifications"));
+        notificationItem2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                new SwingWorker<Object, Object>() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        configureNotifications(true);
+                        return null;
+                    }
+                }.execute();
+            }
+        });
+        _jnotificationItem2 = notificationItem2;
+
+        final JMenuItem notificationItem1 = new JMenuItem(_t("Disable notifications"));
+        notificationItem1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                new SwingWorker<Object, Object>() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        configureNotifications(false);
+                        return null;
+                    }
+                }.execute();
+            }
+        });
+        _jnotificationItem1 = notificationItem1;
     }
 
     protected String _t(String s) {

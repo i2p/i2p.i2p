@@ -51,6 +51,9 @@ class ExternalTrayManager extends TrayManager {
             }
         });
         popup.add(startItem);
+        initializeNotificationItems();
+        popup.add(_notificationItem2);
+        popup.add(_notificationItem1);
         return popup;
     }
 
@@ -79,6 +82,9 @@ class ExternalTrayManager extends TrayManager {
             }
         });
         popup.add(startItem);
+        initializeJNotificationItems();
+        popup.add(_jnotificationItem2);
+        popup.add(_jnotificationItem1);
         return popup;
     }
 
@@ -86,5 +92,14 @@ class ExternalTrayManager extends TrayManager {
      * Update the menu
      * @since 0.9.26
      */
-    protected void updateMenu() {}
+    protected void updateMenu() {
+        if (_notificationItem1 != null)
+            _notificationItem1.setEnabled(_showNotifications);
+        if (_notificationItem2 != null)
+            _notificationItem2.setEnabled(!_showNotifications);
+        if (_jnotificationItem1 != null)
+            _jnotificationItem1.setVisible(_showNotifications);
+        if (_jnotificationItem2 != null)
+            _jnotificationItem2.setVisible(!_showNotifications);
+    }
 }

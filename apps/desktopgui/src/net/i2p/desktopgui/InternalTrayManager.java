@@ -32,11 +32,9 @@ class InternalTrayManager extends TrayManager {
     private final Log log;
     private final Main _main;
     private MenuItem _statusItem, _browserItem, _configItem, _restartItem, _stopItem,
-                     _restartHardItem, _stopHardItem, _cancelItem,
-                     _notificationItem1, _notificationItem2;
+                     _restartHardItem, _stopHardItem, _cancelItem;
     private JMenuItem _jstatusItem, _jbrowserItem, _jconfigItem, _jrestartItem, _jstopItem,
-                      _jrestartHardItem, _jstopHardItem, _jcancelItem,
-                      _jnotificationItem1, _jnotificationItem2;
+                      _jrestartHardItem, _jstopHardItem, _jcancelItem;
 
     private static final boolean CONSOLE_ENABLED = Desktop.isDesktopSupported() &&
                                                    Desktop.getDesktop().isSupported(Action.BROWSE);
@@ -86,33 +84,6 @@ class InternalTrayManager extends TrayManager {
         }
 
         PopupMenu desktopguiConfigurationLauncher = new PopupMenu(_t("Configure I2P System Tray"));
-        final MenuItem notificationItem2 = new MenuItem(_t("Enable notifications"));
-        notificationItem2.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                new SwingWorker<Object, Object>() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        configureNotifications(true);
-                        return null;
-                    }
-                }.execute();
-            }
-        });
-
-        final MenuItem notificationItem1 = new MenuItem(_t("Disable notifications"));
-        notificationItem1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                new SwingWorker<Object, Object>() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        configureNotifications(false);
-                        return null;
-                    }
-                }.execute();
-            }
-        });
 
         MenuItem configSubmenu = new MenuItem(_t("Disable system tray"));
         configSubmenu.addActionListener(new ActionListener() {
@@ -214,8 +185,9 @@ class InternalTrayManager extends TrayManager {
             popup.add(browserLauncher);
             popup.addSeparator();
         }
-        desktopguiConfigurationLauncher.add(notificationItem2);
-        desktopguiConfigurationLauncher.add(notificationItem1);
+        initializeNotificationItems();
+        desktopguiConfigurationLauncher.add(_notificationItem2);
+        desktopguiConfigurationLauncher.add(_notificationItem1);
         desktopguiConfigurationLauncher.add(configSubmenu);
         popup.add(desktopguiConfigurationLauncher);
         popup.addSeparator();
@@ -230,8 +202,6 @@ class InternalTrayManager extends TrayManager {
         _statusItem = statusItem;
         _browserItem = browserLauncher;
         _configItem = desktopguiConfigurationLauncher;
-        _notificationItem1 = notificationItem1;
-        _notificationItem2 = notificationItem2;
         _restartItem = restartItem;
         _stopItem = stopItem;
         _restartHardItem = restartItem2;
@@ -270,33 +240,6 @@ class InternalTrayManager extends TrayManager {
         }
 
         JMenu desktopguiConfigurationLauncher = new JMenu(_t("Configure I2P System Tray"));
-        final JMenuItem notificationItem2 = new JMenuItem(_t("Enable notifications"));
-        notificationItem2.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                new SwingWorker<Object, Object>() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        configureNotifications(true);
-                        return null;
-                    }
-                }.execute();
-            }
-        });
-
-        final JMenuItem notificationItem1 = new JMenuItem(_t("Disable notifications"));
-        notificationItem1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                new SwingWorker<Object, Object>() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        configureNotifications(false);
-                        return null;
-                    }
-                }.execute();
-            }
-        });
 
         JMenuItem configSubmenu = new JMenuItem(_t("Disable system tray"));
         configSubmenu.addActionListener(new ActionListener() {
@@ -398,8 +341,9 @@ class InternalTrayManager extends TrayManager {
             popup.add(browserLauncher);
             popup.addSeparator();
         }
-        desktopguiConfigurationLauncher.add(notificationItem2);
-        desktopguiConfigurationLauncher.add(notificationItem1);
+        initializeJNotificationItems();
+        desktopguiConfigurationLauncher.add(_jnotificationItem2);
+        desktopguiConfigurationLauncher.add(_jnotificationItem1);
         desktopguiConfigurationLauncher.add(configSubmenu);
         popup.add(desktopguiConfigurationLauncher);
         popup.addSeparator();
@@ -414,8 +358,6 @@ class InternalTrayManager extends TrayManager {
         _jstatusItem = statusItem;
         _jbrowserItem = browserLauncher;
         _jconfigItem = desktopguiConfigurationLauncher;
-        _jnotificationItem1 = notificationItem1;
-        _jnotificationItem2 = notificationItem2;
         _jrestartItem = restartItem;
         _jstopItem = stopItem;
         _jrestartHardItem = restartItem2;
@@ -511,7 +453,8 @@ class InternalTrayManager extends TrayManager {
     /**
      *  @since 0.9.53
      */
-    private void configureNotifications(boolean enable) {
+    @Override
+    protected void configureNotifications(boolean enable) {
         _showNotifications = enable;
         String value = Boolean.toString(enable);
         if (!_context.router().saveConfig(PROP_NOTIFICATIONS, value))
