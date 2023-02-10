@@ -170,7 +170,7 @@ public class RouterInfoHandler implements RequestHandler {
                 && (!_context.router().gracefulShutdownInProgress())
                 && !_context.clientManager().isAlive())
             return (NETWORK_STATUS.ERROR_I2CP);
-        long skew = _context.commSystem().getFramedAveragePeerClockSkew(33);
+        long skew = _context.commSystem().getFramedAveragePeerClockSkew(10);
         // Display the actual skew, not the offset
         if (Math.abs(skew) > 60 * 1000)
             return NETWORK_STATUS.ERROR_CLOCK_SKEW;

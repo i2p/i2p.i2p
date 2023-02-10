@@ -234,7 +234,7 @@ public class SummaryHelper extends HelperBase {
         // Warn based on actual skew from peers, not update status, so if we successfully offset
         // the clock, we don't complain.
         //if (!_context.clock().getUpdatedSuccessfully())
-        long skew = _context.commSystem().getFramedAveragePeerClockSkew(33);
+        long skew = _context.commSystem().getFramedAveragePeerClockSkew(10);
         // Display the actual skew, not the offset
         if (Math.abs(skew) > 30*1000)
             return new NetworkStateMessage(NetworkState.CLOCKSKEW, fixup(_t("ERR-Clock Skew of {0}", DataHelper.formatDuration2(Math.abs(skew)))));

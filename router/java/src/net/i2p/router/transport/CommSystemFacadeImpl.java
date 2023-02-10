@@ -682,7 +682,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         public void timeReached() {
              // use the same % as in RouterClock so that check will never fail
              // This is their our offset w.r.t. them...
-             long peerOffset = getFramedAveragePeerClockSkew(33);
+             long peerOffset = getFramedAveragePeerClockSkew(10);
              if (peerOffset == 0)
                  return;
              long currentOffset = _context.clock().getOffset();

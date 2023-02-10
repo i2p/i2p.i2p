@@ -155,7 +155,7 @@ public class RouterClock extends Clock {
                 // This may get called very early at startup, before RouterContext.initAll() is completed,
                 // so the comm system may be null. Avoid NPE.
                 CommSystemFacade csf = ((RouterContext)_context).commSystem();
-                long currentPeerClockSkew = (csf != null) ? csf.getFramedAveragePeerClockSkew(33) : 0;
+                long currentPeerClockSkew = (csf != null) ? csf.getFramedAveragePeerClockSkew(10) : 0;
 
                     // Predict the effect of applying the proposed clock offset
                     long predictedPeerClockSkew = currentPeerClockSkew + delta;
