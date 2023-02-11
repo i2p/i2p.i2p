@@ -62,6 +62,8 @@ public abstract class DatabaseEntry extends DataStructureImpl {
     // synch: this
     private Hash _currentRoutingKey;
     private long _routingKeyGenMod;
+    protected boolean _receivedAsPublished;
+    protected boolean _receivedAsReply;
 
     /**
      * A common interface to the timestamp of the two subclasses.
@@ -253,4 +255,33 @@ public abstract class DatabaseEntry extends DataStructureImpl {
             return false;
         return DSAEngine.getInstance().verifySignature(_signature, data, spk);
     }
+    
+    /**
+     * If true, we received this LeaseSet by a remote peer publishing it to
+     * us, rather than by searching for it ourselves or locally creating it.
+     * Default false.
+     *
+     * @since 0.9.58 moved up from LeaseSet
+     */
+    public boolean getReceivedAsPublished() { return _receivedAsPublished; }
+
+    /**
+     * @since 0.9.58 moved up from LeaseSet
+     */
+    public void setReceivedAsPublished(boolean received) { _receivedAsPublished = received; }
+
+    /**
+     * If true, we received this LeaseSet by searching for it
+     * Default false.
+     *
+     * @since 0.7.14, moved up from LeaseSet in 0.9.58
+     */
+    public boolean getReceivedAsReply() { return _receivedAsReply; }
+
+    /**
+     * set to true
+     *
+     * @since 0.7.14, moved up from LeaseSet in 0.9.58
+     */
+    public void setReceivedAsReply() { _receivedAsReply = true; }
 }

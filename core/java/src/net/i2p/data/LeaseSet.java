@@ -68,8 +68,6 @@ public class LeaseSet extends DatabaseEntry {
     protected SigningPublicKey _signingKey;
     // Keep leases in the order received, or else signature verification will fail!
     protected final List<Lease> _leases;
-    protected boolean _receivedAsPublished;
-    private boolean _receivedAsReply;
     private Hash _receivedBy;
     // Store these since isCurrent() and getEarliestLeaseDate() are called frequently
     private long _firstExpiration;
@@ -186,29 +184,6 @@ public class LeaseSet extends DatabaseEntry {
             throw new IllegalArgumentException("Signing key type mismatch");
         _signingKey = key;
     }
-    
-    /**
-     * If true, we received this LeaseSet by a remote peer publishing it to
-     * us, rather than by searching for it ourselves or locally creating it.
-     * Default false.
-     */
-    public boolean getReceivedAsPublished() { return _receivedAsPublished; }
-
-    /** Default false */
-    public void setReceivedAsPublished(boolean received) { _receivedAsPublished = received; }
-
-    /**
-     * If true, we received this LeaseSet by searching for it
-     * Default false.
-     * @since 0.7.14
-     */
-    public boolean getReceivedAsReply() { return _receivedAsReply; }
-
-    /**
-     * set to true
-     * @since 0.7.14
-     */
-    public void setReceivedAsReply() { _receivedAsReply = true; }
 
     /**
      * The Hash of the local client that received this LS,

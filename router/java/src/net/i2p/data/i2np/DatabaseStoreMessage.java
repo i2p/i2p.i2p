@@ -41,6 +41,7 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
     private long _replyToken;
     private TunnelId _replyTunnel;
     private Hash _replyGateway;
+    private boolean _receivedAsReply;
     
     public DatabaseStoreMessage(I2PAppContext context) {
         super(context);
@@ -101,6 +102,23 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
     public Hash getReplyGateway() { return _replyGateway; }
     public void setReplyGateway(Hash peer) { _replyGateway = peer; }
     
+    /**
+     * If true, we received this by searching for it.
+     * Note that searches may query multiple peers in parallel;
+     * only the first reply may have this set, and a reply
+     * received after the reply job times out will not have this set.
+     * Default false.
+     *
+     * @since 0.9.58
+     */
+    public boolean getReceivedAsReply() { return _receivedAsReply; }
+
+    /**
+     * set to true
+     * @since 0.9.58
+     */
+    public void setReceivedAsReply() { _receivedAsReply = true; }
+
     public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
