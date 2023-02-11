@@ -1212,19 +1212,19 @@ class NetDbRenderer {
         buf.append("</th></tr>\n<tr>");
         long age = _context.clock().now() - info.getPublished();
         if (isUs && _context.router().isHidden()) {
-            buf.append("<td><b>").append(_t("Hidden")).append(", ").append(_t("Updated")).append(":</b></td>")
-               .append("<td colspan=\"2\"><span class=\"netdb_info\">")
+            buf.append("<td><b>").append(_t("Hidden")).append(", ").append(_t("Updated")).append(":</b></td>" +
+                       "<td colspan=\"2\"><span class=\"netdb_info\">")
                .append(_t("{0} ago", DataHelper.formatDuration2(age)))
                .append("</span>");
         } else if (age > 0) {
-            buf.append("<td><b>").append(_t("Published")).append(":</b></td>")
-               .append("<td colspan=\"2\"><span class=\"netdb_info\">")
+            buf.append("<td><b>").append(_t("Published")).append(":</b></td>" +
+                       "<td colspan=\"2\"><span class=\"netdb_info\">")
                .append(_t("{0} ago", DataHelper.formatDuration2(age)))
                .append("</span>");
         } else {
-            // shouldnt happen
-            buf.append("<td><b>").append(_t("Published")).append("</td><td colspan=\"2\">:</b> in ")
-               .append(DataHelper.formatDuration2(0-age)).append("<span class=\"netdb_info\">???</span>");
+            // published slightly in the future
+            buf.append("<td><b>").append(_t("Published")).append(":</b></td><td colspan=\"2\"><span class=\"netdb_info\">")
+               .append(DataHelper.formatDuration2(0-age)).append(" from now???</span>");
         }
         boolean debug = _context.getBooleanProperty(HelperBase.PROP_ADVANCED);
         if (full) {
