@@ -73,13 +73,16 @@ class ExpireRoutersJob extends JobImpl {
         RouterKeyGenerator gen = getContext().routerKeyGenerator();
         long now = getContext().clock().now();
         long cutoff = now - 30*60*1000;
+        boolean almostMidnight = gen.getTimeTillMidnight() < FloodfillNetworkDatabaseFacade.NEXT_RKEY_RI_ADVANCE_TIME - 30*60*1000;
         Hash us = getContext().routerHash();
         boolean isFF = _facade.floodfillEnabled();
         byte[] ourRKey = isFF ? us.getData() : null;
-        int pdrop = Math.max(10, Math.min(50, (100 * count / LIMIT_ROUTERS) - 100));
+        // chance in 128
+        int pdrop = Math.max(10, Math.min(80, (128 * count / LIMIT_ROUTERS) - 128));
         int removed = 0;
         if (_log.shouldLog(Log.INFO))
-            _log.info("Expiring routers, count = " + count + " drop probability " + (count > LIMIT_ROUTERS ? pdrop : 0) + '%');
+            _log.info("Expiring routers, count = " + count + " drop probability " +
+                      (count > LIMIT_ROUTERS ? pdrop * 100 / 128 : 0) + '%');
         for (Map.Entry<Hash, DatabaseEntry> entry : entries) {
             DatabaseEntry e = entry.getValue();
             if (e.getType() != DatabaseEntry.KEY_TYPE_ROUTERINFO) {
@@ -103,9 +106,16 @@ class ExpireRoutersJob extends JobImpl {
                         // they have to be within 1/256 of the keyspace
                         if (distance < 256)
                             continue;
-                        // TODO maybe: long until = gen.getTimeTillMidnight();
+                        if (almostMidnight) {
+                            // almost midnight, recheck with tomorrow's keys
+                            rkey = gen.getNextRoutingKey(key).getData();
+                            distance = (((rkey[0] ^ ourRKey[0]) & 0xff) << 8) |
+                                        ((rkey[1] ^ ourRKey[1]) & 0xff);
+                            if (distance < 256)
+                                continue;
+                        }
                     }
-                    if (getContext().random().nextInt(100) < pdrop) {
+                    if (getContext().random().nextInt(128) < pdrop) {
                         _facade.dropAfterLookupFailed(key);
                         removed++;
                     }

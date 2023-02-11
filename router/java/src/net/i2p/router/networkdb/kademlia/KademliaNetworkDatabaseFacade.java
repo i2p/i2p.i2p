@@ -294,8 +294,6 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         } catch (IOException ioe) {
             throw new RuntimeException("Unable to initialize netdb storage", ioe);
         }
-        //_ds = new TransientDataStore();
-//        _exploreKeys = new HashSet(64);
         _dbDir = dbDir;
         _negativeCache = new NegativeLookupCache(_context);
         _blindCache.startup();
@@ -307,14 +305,20 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         
         // expire old leases
         Job elj = new ExpireLeasesJob(_context, this);
-        elj.getTiming().setStartAfter(_context.clock().now() + 2*60*1000);
+        long now = _context.clock().now();
+        elj.getTiming().setStartAfter(now + 11*60*1000);
         _context.jobQueue().addJob(elj);
         
         //// expire some routers
         // Don't run until after RefreshRoutersJob has run, and after validate() will return invalid for old routers.
         if (!_context.commSystem().isDummy()) {
             Job erj = new ExpireRoutersJob(_context, this);
-            erj.getTiming().setStartAfter(_context.clock().now() + ROUTER_INFO_EXPIRATION_FLOODFILL + 10*60*1000);
+            boolean isFF = _context.getBooleanProperty(FloodfillMonitorJob.PROP_FLOODFILL_PARTICIPANT);
+            long down = _context.router().getEstimatedDowntime();
+            long delay = (down == 0 || (!isFF && down > 30*60*1000) || (isFF && down > 24*60*60*1000)) ?
+                         ROUTER_INFO_EXPIRATION_FLOODFILL + 10*60*1000 :
+                         10*60*1000;
+            erj.getTiming().setStartAfter(now + delay);
             _context.jobQueue().addJob(erj);
         }
         
@@ -333,7 +337,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             // We're trying to minimize the ff connections to lessen the load on the 
             // floodfills, and in any case let's try to build some real expl. tunnels first.
             // No rush, it only runs every 30m.
-            _exploreJob.getTiming().setStartAfter(_context.clock().now() + EXPLORE_JOB_DELAY);
+            _exploreJob.getTiming().setStartAfter(now + EXPLORE_JOB_DELAY);
             _context.jobQueue().addJob(_exploreJob);
         } else {
             _log.warn("Operating in quiet mode - not exploring or pushing data proactively, simply reactively");
