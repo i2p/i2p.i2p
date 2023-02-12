@@ -408,6 +408,8 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
      * @return true if yes
      */
     private boolean filterUnreachable(boolean isInbound, boolean isExploratory) {
+        return true;
+/*
         if (SystemVersion.isSlow() || ctx.router().getUptime() < 65*60*1000)
             return true;
         if (isExploratory) {
@@ -427,6 +429,7 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
                 return ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE, DEFAULT_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE);
             }
         }
+*/
     }
 
 
@@ -440,6 +443,8 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
      * @return true unless configured otherwise
      */
     protected boolean filterSlow(boolean isInbound, boolean isExploratory) {
+        return true;
+/*
         if (isExploratory) {
             if (isInbound)
                 return ctx.getProperty(PROP_INBOUND_EXPLORATORY_EXCLUDE_SLOW, true);
@@ -451,6 +456,7 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
             else
                 return ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_SLOW, true);
         }
+*/
     }
 
     /** see HashComparator */
