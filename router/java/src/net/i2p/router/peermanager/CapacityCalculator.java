@@ -33,6 +33,10 @@ class CapacityCalculator {
     private static final double PENALTY_L_CAP = 1;
     private static final double PENALTY_NO_R_CAP = 1;
     private static final double PENALTY_U_CAP = 2;
+    private static final double PENALTY_LAST_SEND_FAIL = 4;
+    private static final double PENALTY_RECENT_SEND_FAIL = 4;
+    private static final double BONUS_LAST_SEND_SUCCESS = 1;
+    private static final double BONUS_RECENT_SEND_SUCCESS = 1;
     // we make this a bonus for non-ff, not a penalty for ff, so we
     // don't drive the ffs below the default
     private static final double BONUS_NON_FLOODFILL = 1.0;
@@ -113,9 +117,29 @@ class CapacityCalculator {
                     capacity -= PENALTY_U_CAP;
                 if (caps.indexOf(Router.CAPABILITY_BW32) >= 0)
                     capacity -= PENALTY_L_CAP;
+/* TODO
+                if (caps.indexOf(Router.CAPABILITY_CONGESTION_MODERATE) >= 0)
+                    capacity -= PENALTY_D_CAP;
+                else if (caps.indexOf(Router.CAPABILITY_CONGESTION_SEVERE) >= 0)
+                    capacity -= PENALTY_E_CAP;
+                else if (caps.indexOf(Router.CAPABILITY_NO_TUNNELS) >= 0)
+                    capacity -= PENALTY_G_CAP;
+*/
             } else {
                 capacity -= PENALTY_NO_RI;
             }
+        }
+
+        long lastGood = profile.getLastSendSuccessful();
+        long lastBad = profile.getLastSendFailed();
+        if (lastBad > lastGood) {
+            capacity -= PENALTY_LAST_SEND_FAIL;
+            if (lastGood > now - 30*60*1000)
+                capacity += PENALTY_RECENT_SEND_FAIL;
+        } else if (lastGood > 0) {
+            capacity += BONUS_LAST_SEND_SUCCESS;
+            if (lastGood > now - 30*60*1000)
+                capacity += BONUS_RECENT_SEND_SUCCESS;
         }
 
         // a tiny tweak to break ties and encourage closeness, -.25 to +.25
