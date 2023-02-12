@@ -1,3 +1,24 @@
+2023-02-12 zzz
+ * NetDB:
+   - Don't create profile unless peer is reachable
+   - Store handler updates
+ * Profiles: Limit storage and memory usage
+
+2023-02-11 zzz
+ * NetDB:
+   - Expiration tweaks
+   - Increase flood thottle time
+
+2023-02-10 zzz
+ * Router: Tighten skew calculation window
+
+2023-02-09 zzz
+ * DTG: Support notification disable/enable in non-router context
+ * NetDB:
+   - Don't lookup before dropping after shutdown initiated
+   - Improve efficiency of ExpireRoutersJob
+ * Profiles: Don't delete old profiles from disk until 90m uptime
+
 2023-02-08 zzz
  * Console:
    - Add routing key to router infos (advanced)
