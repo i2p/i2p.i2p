@@ -44,7 +44,7 @@ class ProfileOrganizerRenderer {
         Set<Hash> peers = _organizer.selectAllPeers();
 
         long now = _context.clock().now();
-        long hideBefore = now - 90*60*1000;
+        long hideBefore = now - 45*60*1000;
 
         Set<PeerProfile> order = new TreeSet<PeerProfile>(mode == 2 ? new HashComparator() : new ProfileComparator());
         int older = 0;
