@@ -303,7 +303,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                         }
                     }
                 }
-                if (shouldStore)
+                if (shouldStore && ri.getCapabilities().indexOf(Router.CAPABILITY_REACHABLE) >= 0)
                     getContext().profileManager().heardAbout(key);
             } catch (UnsupportedCryptoException uce) {
                 invalidMessage = uce.getMessage();

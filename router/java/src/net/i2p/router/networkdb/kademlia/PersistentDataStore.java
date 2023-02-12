@@ -557,18 +557,19 @@ public class PersistentDataStore extends TransientDataStore {
                     fis = new BufferedInputStream(fis);
                     RouterInfo ri = new RouterInfo();
                     ri.readBytes(fis, true);  // true = verify sig on read
+                    Hash h = ri.getIdentity().calculateHash();
                     if (ri.getNetworkId() != _networkID) {
                         corrupt = true;
                         if (_log.shouldLog(Log.ERROR))
                             _log.error("The router "
-                                       + ri.getIdentity().calculateHash().toBase64() 
+                                       + h.toBase64() 
                                        + " is from a different network");
-                    } else if (!ri.getIdentity().calculateHash().equals(_key)) {
+                    } else if (!h.equals(_key)) {
                         // prevent injection from reseeding
                         // this is checked in KNDF.validate() but catch it sooner and log as error.
                         corrupt = true;
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn(ri.getIdentity().calculateHash() + " does not match " + _key + " from " + _routerFile);
+                            _log.warn(h + " does not match " + _key + " from " + _routerFile);
                     } else if (ri.getPublished() <= _knownDate) {
                         // Don't store but don't delete
                         if (_log.shouldLog(Log.WARN))
@@ -576,15 +577,16 @@ public class PersistentDataStore extends TransientDataStore {
                     } else if (getContext().blocklist().isBlocklisted(ri)) {
                         corrupt = true;
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn(ri.getHash() + " is blocklisted");
+                            _log.warn(h + " is blocklisted");
                     } else {
                         try {
                             // persist = false so we don't write what we just read
-                            _facade.store(ri.getIdentity().getHash(), ri, false);
+                            _facade.store(h, ri, false);
                             // when heardAbout() was removed from TransientDataStore, it broke
                             // profile bootstrapping for new routers,
                             // so add it here.
-                            getContext().profileManager().heardAbout(ri.getIdentity().getHash(), ri.getPublished());
+                            if (ri.getCapabilities().indexOf(Router.CAPABILITY_REACHABLE) >= 0)
+                                getContext().profileManager().heardAbout(h, ri.getPublished());
                         } catch (IllegalArgumentException iae) {
                             if (_log.shouldLog(Log.INFO))
                                 _log.info("Refused locally loaded routerInfo - deleting", iae);
