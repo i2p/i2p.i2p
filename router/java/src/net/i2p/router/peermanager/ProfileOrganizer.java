@@ -385,6 +385,8 @@ public class ProfileOrganizer {
     }
     
     /**
+     *  Only for console
+     *
      *  @return true if successful, false if not found
      */
     public boolean exportProfile(Hash profile, OutputStream out) throws IOException {
@@ -1550,7 +1552,7 @@ public class ProfileOrganizer {
         organizer.setUs(Hash.FAKE_HASH);
         ProfilePersistenceHelper helper = new ProfilePersistenceHelper(ctx);
         for (int i = 0; i < args.length; i++) {
-            PeerProfile profile = helper.readProfile(new java.io.File(args[i]));
+            PeerProfile profile = helper.readProfile(new java.io.File(args[i]), 0);
             if (profile == null) {
                 System.err.println("Could not load profile " + args[i]);
                 continue;

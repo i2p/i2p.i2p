@@ -57,8 +57,9 @@ class PeerManager {
     static final long REORGANIZE_TIME_LONG = 351*1000;
     /** After first two hours of uptime ~= 246 */
     static final int REORGANIZES_PER_DAY = (int) (24*60*60*1000L / REORGANIZE_TIME_LONG);
-    private static final long STORE_TIME = 19*60*60*1000;
-    private static final long EXPIRE_AGE = 3*24*60*60*1000;
+    private static final long STORE_TIME = 2*60*60*1000;
+    // for profiles stored to disk
+    private static final long EXPIRE_AGE = 3*60*60*1000;
     
     public static final String TRACKED_CAPS = "" +
         FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL +
@@ -136,8 +137,11 @@ class PeerManager {
                 try {
                     _log.debug("Periodic profile store start");
                     storeProfiles();
-                    if (shouldDecay)
-                        _persistenceHelper.deleteOldProfiles(EXPIRE_AGE);
+                    if (shouldDecay) {
+                        int count = _persistenceHelper.deleteOldProfiles(EXPIRE_AGE);
+                        if (count > 0 && _log.shouldInfo())
+                            _log.info("Deleted " + count + " old profiles");
+                    }
                     _log.debug("Periodic profile store end");
                 } catch (Throwable t) {
                     _log.log(Log.CRIT, "Error storing profiles", t);
@@ -158,17 +162,25 @@ class PeerManager {
         // Don't overwrite disk profiles when testing
         if (_context.commSystem().isDummy())
             return;
+        long now = _context.clock().now();
+        long cutoff = now - EXPIRE_AGE;
         // lock in case shutdown bumps into periodic store
         if (!_storeLock.compareAndSet(false, true))
             return;
+        int i = 0;
+        int total;
         try {
             Set<Hash> peers = selectPeers();
+            total = peers.size();
             for (Hash peer : peers) {
-                storeProfile(peer);
+                if (storeProfile(peer, cutoff))
+                    i++;
             }
         } finally {
             _storeLock.set(false);
         }
+        if (_log.shouldInfo())
+            _log.info("Stored " + i + " out of " + total + " profiles");
     }
 
     /** @since 0.8.8 */
@@ -183,12 +195,18 @@ class PeerManager {
         return _organizer.selectAllPeers();
     }
 
-    void storeProfile(Hash peer) {
-        if (peer == null) return;
+    /**
+     *  @param cutoff only store if last successful send newer than this (absolute time)
+     *  @return success
+     */
+    private boolean storeProfile(Hash peer, long cutoff) {
         PeerProfile prof = _organizer.getProfile(peer);
-        if (prof == null) return;
-        if (true)
-            _persistenceHelper.writeProfile(prof);
+        if (prof == null) return false;
+        if (prof.getLastSendSuccessful() > cutoff) {
+            if (_persistenceHelper.writeProfile(prof))
+                return true;
+        }
+        return false;
     }
 
     /**
@@ -219,12 +237,12 @@ class PeerManager {
      *  This may take a long time - 30 seconds or more
      */
     void loadProfiles() {
-        Set<PeerProfile> profiles = _persistenceHelper.readProfiles();
+        List<PeerProfile> profiles = _persistenceHelper.readProfiles();
         for (PeerProfile prof : profiles) {
                 _organizer.addProfile(prof);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Profile for " + prof.getPeer().toBase64() + " loaded");
         }
+        if (_log.shouldInfo())
+            _log.info("Loaded " + profiles.size() + " profiles");
     }
     
     /**
