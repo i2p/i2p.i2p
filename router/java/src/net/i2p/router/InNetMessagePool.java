@@ -204,6 +204,8 @@ public class InNetMessagePool implements Service {
             Job dsmjob = dsmbuilder.createJob(messageBody, fromRouter, fromRouterHash);
             int sz = origMessages.size();
             if (sz > 0) {
+               DatabaseStoreMessage dbsm = (DatabaseStoreMessage) messageBody;
+               dbsm.setReceivedAsReply();
                // DSM inline, reply jobs on queue
                if (dsmjob != null)
                    dsmjob.runJob();
