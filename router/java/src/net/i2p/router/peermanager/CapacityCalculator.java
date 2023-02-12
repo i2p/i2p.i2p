@@ -1,6 +1,7 @@
 package net.i2p.router.peermanager;
 
 import net.i2p.data.router.RouterInfo;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
@@ -28,6 +29,10 @@ class CapacityCalculator {
     private static final double BONUS_SAME_COUNTRY = 0;
     private static final double BONUS_XOR = .25;
     private static final double PENALTY_UNREACHABLE = 2;
+    private static final double PENALTY_NO_RI = 2;
+    private static final double PENALTY_L_CAP = 1;
+    private static final double PENALTY_NO_R_CAP = 1;
+    private static final double PENALTY_U_CAP = 2;
     // we make this a bonus for non-ff, not a penalty for ff, so we
     // don't drive the ffs below the default
     private static final double BONUS_NON_FLOODFILL = 1.0;
@@ -74,6 +79,7 @@ class CapacityCalculator {
         if (profile.isEstablished())
             capacity += BONUS_ESTABLISHED;
 
+/*
         // boost same country
         if (profile.isSameCountry()) {
             double bonus = BONUS_SAME_COUNTRY;
@@ -85,6 +91,7 @@ class CapacityCalculator {
             }
             capacity += bonus;
         }
+*/
 
         // penalize unreachable peers
         if (profile.wasUnreachable())
@@ -95,9 +102,20 @@ class CapacityCalculator {
         // null for tests
         NetworkDatabaseFacade ndb =  context.netDb();
         if (ndb != null) {
-            RouterInfo ri = ndb.lookupRouterInfoLocally(profile.getPeer());
-            if (!FloodfillNetworkDatabaseFacade.isFloodfill(ri))
-                capacity += BONUS_NON_FLOODFILL;
+            RouterInfo ri = (RouterInfo) ndb.lookupLocallyWithoutValidation(profile.getPeer());
+            if (ri != null) {
+                if (!FloodfillNetworkDatabaseFacade.isFloodfill(ri))
+                    capacity += BONUS_NON_FLOODFILL;
+                String caps = ri.getCapabilities();
+                if (caps.indexOf(Router.CAPABILITY_REACHABLE) < 0)
+                    capacity -= PENALTY_NO_R_CAP;
+                if (caps.indexOf(Router.CAPABILITY_UNREACHABLE) >= 0)
+                    capacity -= PENALTY_U_CAP;
+                if (caps.indexOf(Router.CAPABILITY_BW32) >= 0)
+                    capacity -= PENALTY_L_CAP;
+            } else {
+                capacity -= PENALTY_NO_RI;
+            }
         }
 
         // a tiny tweak to break ties and encourage closeness, -.25 to +.25
