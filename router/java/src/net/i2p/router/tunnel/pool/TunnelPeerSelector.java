@@ -340,8 +340,8 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
         return ctx.getProperty("router.excludePeerCaps", DEFAULT_EXCLUDE_CAPS);
     }
 
-    /** NTCP2 */
-    private static final String MIN_VERSION = "0.9.36";
+    /** Short ECIES tunnel build messages (1.5.0) */
+    private static final String MIN_VERSION = "0.9.51";
 
     /**
      *  Should the peer be excluded based on its published caps?
