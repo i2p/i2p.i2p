@@ -460,17 +460,6 @@ public class SummaryHelper extends HelperBase {
     }
 
     /**
-     * How many peers the router ranks as failing.
-     * @since 0.9.32 uncommented
-     */
-    public int getFailingPeers() {
-        if (_context == null)
-            return 0;
-        else
-            return _context.profileOrganizer().countFailingPeers();
-    }
-
-    /**
      * How many peers are banned.
      * @since 0.9.32 uncommented
      */
