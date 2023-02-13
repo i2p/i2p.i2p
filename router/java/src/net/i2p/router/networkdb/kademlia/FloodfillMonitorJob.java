@@ -194,7 +194,7 @@ class FloodfillMonitorJob extends JobImpl {
         for (Hash peer : floodfillPeers) {
             PeerProfile profile = getContext().profileOrganizer().getProfile(peer);
             if (profile == null || profile.getLastHeardFrom() < before ||
-                profile.getIsFailing() || getContext().banlist().isBanlisted(peer) ||
+                getContext().banlist().isBanlisted(peer) ||
                 getContext().commSystem().wasUnreachable(peer))
                 failcount++;
         }

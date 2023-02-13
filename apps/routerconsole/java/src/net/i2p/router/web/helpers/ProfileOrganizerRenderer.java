@@ -114,7 +114,6 @@ class ProfileOrganizerRenderer {
             } else if (_organizer.isHighCapacity(peer)) {
                 tier = 2;
                 reliable++;
-            } else if (_organizer.isFailing(peer)) {
             } else {
                 tier = 3;
             }
@@ -181,10 +180,6 @@ class ProfileOrganizerRenderer {
             boolean ok = true;
             if (_context.banlist().isBanlisted(peer)) {
                 buf.append(_t("Banned"));
-                ok = false;
-            }
-            if (prof.getIsFailing()) {
-                buf.append(' ').append(_t("Failing"));
                 ok = false;
             }
             if (_context.commSystem().wasUnreachable(peer)) {
@@ -385,20 +380,11 @@ class ProfileOrganizerRenderer {
                 } else {
                     return -1;
                 }
-            } else if (_context.profileOrganizer().isFailing(left.getPeer())) {
-                if (_context.profileOrganizer().isFailing(right.getPeer())) {
-                    return super.compare(left, right);
-                } else {
-                    return 1;
-                }
             } else {
-                // left is not failing
                 if (_context.profileOrganizer().isFast(right.getPeer())) {
                     return 1;
                 } else if (_context.profileOrganizer().isHighCapacity(right.getPeer())) {
                     return 1;
-                } else if (_context.profileOrganizer().isFailing(right.getPeer())) {
-                    return -1;
                 } else {
                     return super.compare(left, right);
                 }
