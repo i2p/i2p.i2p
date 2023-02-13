@@ -24,7 +24,7 @@ class CapacityCalculator {
 
     // total of all possible bonuses should be less than 4, since
     // crappy peers start at 1 and the base is 5.
-    private static final double BONUS_NEW = 0.85;
+    private static final double PENALTY_NEW = 4;
     private static final double BONUS_ESTABLISHED = 0.65;
     private static final double BONUS_SAME_COUNTRY = 0;
     private static final double BONUS_XOR = .25;
@@ -46,7 +46,10 @@ class CapacityCalculator {
         RouterContext context = profile.getContext();
         long now = context.clock().now();
         TunnelHistory history = profile.getTunnelHistory();
-        if (tooOld(profile, now)) {
+        long down = context.router().getEstimatedDowntime();
+        long up = context.router().getUptime();
+        boolean enableAgeChecks = (down > 0 && down < 45*60*1000) || up > 60*60*1000;
+        if (enableAgeChecks && tooOld(profile, now)) {
             capacity = 1;
         } else {
             RateStat acceptStat = profile.getTunnelCreateResponseTime();
@@ -76,9 +79,13 @@ class CapacityCalculator {
             }
         }
 
-        // boost new profiles
-        if (now - profile.getFirstHeardAbout() < 45*60*1000)
-            capacity += BONUS_NEW;
+        // penalize new profiles
+        if (enableAgeChecks) {
+            long firstHeard = profile.getFirstHeardAbout();
+            long ago = now - firstHeard;
+            if (ago < 2*60*60*1000)
+                capacity -= PENALTY_NEW * (2*60*60*1000 - ago) / 2*60*60*1000;
+        }
         // boost connected peers
         if (profile.isEstablished())
             capacity += BONUS_ESTABLISHED;
