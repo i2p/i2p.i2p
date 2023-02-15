@@ -939,6 +939,7 @@ public class Router implements RouterClock.ClockShiftListener {
             _context.commSystem().initGeoIP();
 
             if (!SystemVersion.isSlow() &&
+                !_context.getBooleanProperty("i2np.allowLocal") &&
                 _context.getProperty(Analysis.PROP_FREQUENCY, Analysis.DEFAULT_FREQUENCY) > 0) {
                 // registers and starts itself
                 Analysis.getInstance(_context);
