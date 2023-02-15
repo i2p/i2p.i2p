@@ -408,7 +408,10 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
      * @return true if yes
      */
     private boolean filterUnreachable(boolean isInbound, boolean isExploratory) {
-        return true;
+        if (!isExploratory)
+            return true;
+        // give them some cover without killing our success rate
+        return ctx.random().nextInt(4) != 0;
 /*
         if (SystemVersion.isSlow() || ctx.router().getUptime() < 65*60*1000)
             return true;
