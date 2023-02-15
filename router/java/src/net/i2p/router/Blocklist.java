@@ -105,7 +105,7 @@ public class Blocklist {
      *  Note that it's impossible to prevent clogging up
      *  the tables by a determined attacker, esp. on IPv6
      */
-    private static final int MAX_IPV4_SINGLES = SystemVersion.isSlow() ? 512 : 8192;
+    private static final int MAX_IPV4_SINGLES = SystemVersion.isSlow() ? 2048 : 8192;
     private static final int MAX_IPV6_SINGLES = SystemVersion.isSlow() ? 256 : 4096;
 
     private final Map<Integer, Object> _singleIPBlocklist = new LHMCache<Integer, Object>(MAX_IPV4_SINGLES);
@@ -411,15 +411,15 @@ public class Blocklist {
                 }
                 byte[] ip1 = e.ip1;
                 if (ip1.length == 4) {
-                    if (isFeedFile) {
-                        // temporary
-                        add(ip1, source);
-                        feedcount++;
-                    } else {
+                    //if (isFeedFile) {
+                    //    // temporary
+                    //    add(ip1, source);
+                    //    feedcount++;
+                    //} else {
                         byte[] ip2 = e.ip2;
                         store(ip1, ip2, blocklist, count++);
                         ipcount += 1 + toInt(ip2) - toInt(ip1); // includes dups, oh well
-                    }
+                    //}
                 } else {
                     // IPv6
                     add(ip1, source);
@@ -452,7 +452,8 @@ public class Blocklist {
             _log.info("Stats for " + blFile);
             _log.info("Removed " + badcount + " bad entries and comment lines");
             _log.info("Read " + read + " valid entries from the blocklist " + blFile);
-            _log.info("Blocking " + (isFeedFile ? feedcount : ipcount) + " IPs and " + peercount + " hashes");
+            //_log.info("Blocking " + (isFeedFile ? feedcount : ipcount) + " IPs and " + peercount + " hashes");
+            _log.info("Blocking " + ipcount + " IPs and " + peercount + " hashes");
             _log.info("Blocklist processing finished, time: " + (_context.clock().now() - start));
         }
         return count;
