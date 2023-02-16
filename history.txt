@@ -1,8 +1,29 @@
+2023-02-16 zzz
+ * Transports: Add new inbound connection throttler
+
+2023-02-15 zzz
+ * Router:
+   - Disable Sybil analysis when in test mode
+   - Store feed blocklist in main array for efficiency
+ * Tunnels: Re-enable using U routers in some expl. tunnels
+
+2023-02-13 zzz
+ * Profiles:
+   - Change the new-router bonus to a penalty
+   - Remove unused failing peers map
+
 2023-02-12 zzz
+ * Console: Reduce max age of displayed profiles
  * NetDB:
    - Don't create profile unless peer is reachable
    - Store handler updates
- * Profiles: Limit storage and memory usage
+ * Profiles:
+   - Adjust capacity for send success/failure
+   - Don't create new profile on message or lookup failures
+   - Downrate capacity of slow/unreachable peers
+   - Limit storage and memory usage
+ * Router: Increase min version for tunnels and netdb to 0.9.51
+ * Tunnels: Don't build through U routers
 
 2023-02-11 zzz
  * NetDB:

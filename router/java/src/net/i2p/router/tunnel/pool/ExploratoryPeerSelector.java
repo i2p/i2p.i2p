@@ -166,6 +166,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
                 if (!furthest.isEmpty()) {
                     furthestHop = furthest.get(0);
                     exclude.add(furthestHop);
+                    ctx.commSystem().exemptIncoming(furthestHop);
                     length--;
                 }
             }
@@ -224,6 +225,8 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
             if (!checkTunnel(isInbound, true, rv))
                 rv = null;
         }
+        if (isInbound && rv != null && rv.size() > 1)
+            ctx.commSystem().exemptIncoming(rv.get(1));
         return rv;
     }
 

@@ -67,7 +67,7 @@ class ClientPeerSelector extends TunnelPeerSelector {
                 return selectExplicit(settings, length);
 
             Set<Hash> exclude = getExclude(isInbound, false);
-            Set<Hash> matches = new ArraySet<Hash>(length);
+            ArraySet<Hash> matches = new ArraySet<Hash>(length);
             if (length == 1) {
                 // closest-hop restrictions
                 if (checkClosestHop)
@@ -190,6 +190,7 @@ class ClientPeerSelector extends TunnelPeerSelector {
                                 log.warn("CPS SANFP hidden OBEP no active peers found, returning null");
                             return null;
                         }
+                        ctx.commSystem().exemptIncoming(matches.get(0));
                     } else {
                         ctx.profileOrganizer().selectFastPeers(1, lastHopExclude, matches, randomKey, length == 2 ? SLICE_0_1 : SLICE_0, ipRestriction, ipSet);
                     }
@@ -267,6 +268,8 @@ class ClientPeerSelector extends TunnelPeerSelector {
             if (!checkTunnel(isInbound, false, rv))
                 rv = null;
         }
+        if (isInbound && rv != null && rv.size() > 1)
+            ctx.commSystem().exemptIncoming(rv.get(1));
         return rv;
     }
 

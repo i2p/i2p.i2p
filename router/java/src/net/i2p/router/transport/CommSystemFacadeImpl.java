@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -32,7 +33,9 @@ import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.util.EventLog;
 import net.i2p.util.Addresses;
 import net.i2p.util.AddressType;
+import net.i2p.util.ArraySet;
 import net.i2p.util.I2PThread;
+import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
@@ -44,6 +47,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     private final RouterContext _context;
     private final TransportManager _manager;
     private final GeoIP _geoIP;
+    private final Map<String, Object> _exemptIncoming;
     private volatile boolean _netMonitorStatus;
     private boolean _wasStarted;
 
@@ -55,6 +59,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
 
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
     private static final String COUNTRY_BUNDLE_NAME = "net.i2p.router.countries.messages";
+    private static final Object DUMMY = Integer.valueOf(0);
     
     public CommSystemFacadeImpl(RouterContext context) {
         _context = context;
@@ -63,6 +68,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         _netMonitorStatus = true;
         _geoIP = new GeoIP(_context);
         _manager = new TransportManager(_context);
+        _exemptIncoming = new LHMCache<String, Object>(128);
     }
     
     public synchronized void startup() {
@@ -357,6 +363,62 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     @Override
     public void notifyRemoveAddress(boolean ipv6) {
         _manager.externalAddressRemoved(Transport.AddressSource.SOURCE_SSU, ipv6);
+    }
+
+    /**
+     *  Exempt this router hash from any incoming throttles or rejections
+     *
+     *  @since 0.9.58
+     */
+    @Override
+    public void exemptIncoming(Hash peer) {
+        if (_manager.isEstablished(peer))
+            return;
+        RouterInfo ri = (RouterInfo) _context.netDb().lookupLocallyWithoutValidation(peer);
+        if (ri == null)
+            return;
+        Collection<RouterAddress> addrs = ri.getAddresses();
+        ArraySet<String> ips = new ArraySet<String>(addrs.size());
+        for (RouterAddress addr : addrs) {
+            String ip = addr.getHost();
+            if (ip == null)
+                continue;
+            // Add IPv6 even if we don't have an address, not worth the check
+            ips.add(Addresses.toCanonicalString(ip));
+        }
+        int sz = ips.size();
+        if (sz > 0) {
+            synchronized(_exemptIncoming) {
+                for (int i = 0; i < sz; i++) {
+                    _exemptIncoming.put(ips.get(i), DUMMY);
+                }
+            }
+        }
+    }
+
+    /**
+     *  Is this IP exempt from any incoming throttles or rejections
+     *
+     *  @param ip canonical string
+     *  @since 0.9.58
+     */
+    @Override
+    public boolean isExemptIncoming(String ip) {
+        synchronized(_exemptIncoming) {
+            return _exemptIncoming.containsKey(ip);
+        }
+    }
+
+    /**
+     *  Remove this IP from the exemptions
+     *
+     *  @param ip canonical string
+     *  @since 0.9.58
+     */
+    public void removeExemption(String ip) {
+        synchronized(_exemptIncoming) {
+            _exemptIncoming.remove(ip);
+        }
     }
 
     /**

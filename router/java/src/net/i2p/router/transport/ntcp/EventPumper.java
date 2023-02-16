@@ -24,12 +24,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.ByteArray;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateAverages;
+import net.i2p.stat.RateStat;
 import net.i2p.util.TryCache;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
@@ -54,7 +56,7 @@ class EventPumper implements Runnable {
     private final Queue<ServerSocketChannel> _wantsRegister = new ConcurrentLinkedQueue<ServerSocketChannel>();
     private final Queue<NTCPConnection> _wantsConRegister = new ConcurrentLinkedQueue<NTCPConnection>();
     private final NTCPTransport _transport;
-    private final ObjectCounter<ByteArray> _blockedIPs;
+    private final ObjectCounter<String> _blockedIPs;
     private long _expireIdleWriteTime;
     private static final boolean _useDirect = false;
     private final boolean _nodelay;
@@ -124,13 +126,14 @@ class EventPumper implements Runnable {
         _log = ctx.logManager().getLog(getClass());
         _transport = transport;
         _expireIdleWriteTime = MAX_EXPIRE_IDLE_TIME;
-        _blockedIPs = new ObjectCounter<ByteArray>();
+        _blockedIPs = new ObjectCounter<String>();
         _context.statManager().createRateStat("ntcp.pumperKeySetSize", "", "ntcp", new long[] {10*60*1000} );
         //_context.statManager().createRateStat("ntcp.pumperKeysPerLoop", "", "ntcp", new long[] {10*60*1000} );
         _context.statManager().createRateStat("ntcp.pumperLoopsPerSecond", "", "ntcp", new long[] {10*60*1000} );
         _context.statManager().createRateStat("ntcp.zeroRead", "", "ntcp", new long[] {10*60*1000} );
         _context.statManager().createRateStat("ntcp.zeroReadDrop", "", "ntcp", new long[] {10*60*1000} );
         _context.statManager().createRateStat("ntcp.dropInboundNoMessage", "", "ntcp", new long[] {10*60*1000} );
+        _context.statManager().createRequiredRateStat("ntcp.inboundConn", "Inbound NTCP Connection", "ntcp", new long[] { 60*1000L } );
         _nodelay = ctx.getBooleanPropertyDefaultTrue(PROP_NODELAY);
     }
     
@@ -492,31 +495,39 @@ class EventPumper implements Runnable {
                 return;
             chan.configureBlocking(false);
 
-            if (!_transport.allowConnection()) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Receive session request but at connection limit: " + chan.socket().getInetAddress());
-                try { chan.close(); } catch (IOException ioe) { }
-                return;
-            }
-
             byte[] ip = chan.socket().getInetAddress().getAddress();
+            String ba = Addresses.toString(ip);
             if (_context.blocklist().isBlocklisted(ip)) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Receive session request from blocklisted IP: " + chan.socket().getInetAddress());
+                    _log.warn("Receive session request from blocklisted IP: " + ba);
                 try { chan.close(); } catch (IOException ioe) { }
                 return;
+            }
+            if (!_context.commSystem().isExemptIncoming(Addresses.toCanonicalString(ba))) {
+                if (!_transport.allowConnection()) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Receive session request but at connection limit: " + ba);
+                    try { chan.close(); } catch (IOException ioe) { }
+                    return;
+                }
+
+                int count = _blockedIPs.count(ba);
+                if (count > 0) {
+                    count = _blockedIPs.increment(ba);
+                    if (_log.shouldLog(Log.WARN))
+                       _log.warn("Blocking accept of IP with count " + count + ": " + ba);
+                    _context.statManager().addRateData("ntcp.dropInboundNoMessage", count);
+                    try { chan.close(); } catch (IOException ioe) { }
+                    return;
+                }
+
+                if (!shouldAllowInboundEstablishment()) {
+                    try { chan.close(); } catch (IOException ioe) { }
+                    return;
+                }
             }
 
-            ByteArray ba = new ByteArray(ip);
-            int count = _blockedIPs.count(ba);
-            if (count > 0) {
-                count = _blockedIPs.increment(ba);
-                if (_log.shouldLog(Log.WARN))
-                   _log.warn("Blocking accept of IP with count " + count + ": " + Addresses.toString(ip));
-                _context.statManager().addRateData("ntcp.dropInboundNoMessage", count);
-                try { chan.close(); } catch (IOException ioe) { }
-                return;
-            }
+            _context.statManager().addRateData("ntcp.inboundConn", 1);
 
             if (shouldSetKeepAlive(chan))
                 chan.socket().setKeepAlive(true);
@@ -530,6 +541,60 @@ class EventPumper implements Runnable {
         } catch (IOException ioe) {
             _log.error("Error accepting", ioe);
         }
+    }
+
+    /**
+     * Should we allow another inbound establishment?
+     * Used to throttle outbound hole punches.
+     * @since 0.9.2
+     */
+    private boolean shouldAllowInboundEstablishment() {
+        RateStat rs = _context.statManager().getRate("ntcp.inboundConn");
+        if (rs == null)
+            return true;
+        Rate r = rs.getRate(60*1000);
+        if (r == null)
+            return true;
+        int last;
+        long periodStart;
+        RateAverages ra = RateAverages.getTemp();
+        synchronized(r) {
+            last = (int) r.getLastEventCount();
+            periodStart = r.getLastCoalesceDate();
+            r.computeAverages(ra, true);
+        }
+        // compare incoming conns per ms, min of 1 per second or 60/minute
+        if (last < 15)
+            last = 15;
+        int total = (int) ra.getTotalEventCount();
+        int current = total - last;
+        if (current <= 0)
+            return true;
+        // getLastEventCount() is normalized to the rate, so we use the canonical period
+        int lastPeriod = 60*1000;
+        double avg = ra.getAverage();
+        int currentTime = (int) (_context.clock().now() - periodStart);
+        if (currentTime <= 5*1000)
+            return true;
+        // compare incoming conns per ms
+        // both of these are scaled by actual period in coalesce
+        float lastRate = last / (float) lastPeriod;
+        float currentRate = (float) (current / (double) currentTime);
+        float factor = _transport.haveCapacity(95) ? 1.05f : 0.95f;
+        float minThresh = factor * lastRate;
+        if (currentRate > minThresh) {
+            // chance in 128
+            // max out at about 25% over the last rate
+            int probAccept = Math.max(1, ((int) (4 * 128 * currentRate / minThresh)) - 512);
+            if (probAccept >= 128 || _context.random().nextInt(128) < probAccept) {
+                if (_log.shouldWarn())
+                    _log.warn("Probabalistic drop incoming (p=" + probAccept  +
+                              "/128 last rate " + last + "/min current rate " +
+                              (int) (currentRate * 60*1000));
+                return false;
+            }
+        }
+        return true; 
     }
     
     private void processConnect(SelectionKey key) {
@@ -605,10 +670,10 @@ class EventPumper implements Runnable {
                         int count;
                         if (addr != null) {
                             byte[] ip = addr.getAddress();
-                            ByteArray ba = new ByteArray(ip);
+                            String ba = Addresses.toString(ip);
                             count = _blockedIPs.increment(ba);
                             if (_log.shouldLog(Log.WARN))
-                                _log.warn("EOF on inbound before receiving any, blocking IP " + Addresses.toString(ip) + " with count " + count + ": " + con);
+                                _log.warn("EOF on inbound before receiving any, blocking IP " + ba + " with count " + count + ": " + con);
                         } else {
                             count = 1;
                             if (_log.shouldLog(Log.WARN))
@@ -684,10 +749,10 @@ class EventPumper implements Runnable {
                 byte[] ip = con.getRemoteIP();
                 int count;
                 if (ip != null) {
-                    ByteArray ba = new ByteArray(ip);
+                    String ba = Addresses.toString(ip);
                     count = _blockedIPs.increment(ba);
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Blocking IP " + Addresses.toString(ip) + " with count " + count + ": " + con, ioe);
+                        _log.warn("Blocking IP " + ba + " with count " + count + ": " + con, ioe);
                 } else {
                     count = 1;
                     if (_log.shouldLog(Log.WARN))
@@ -921,7 +986,7 @@ class EventPumper implements Runnable {
     public void blockIP(byte[] ip) {
         if (ip == null)
             return;
-        ByteArray ba = new ByteArray(ip);
+        String ba = Addresses.toString(ip);
         _blockedIPs.increment(ba);
     }
 

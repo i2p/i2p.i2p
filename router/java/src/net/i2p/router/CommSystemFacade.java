@@ -225,6 +225,27 @@ public abstract class CommSystemFacade implements Service {
      */
     public void initGeoIP() {}
 
+    /**
+     *  Exempt this router hash from any incoming throttles or rejections
+     *
+     *  @since 0.9.58
+     */
+    public void exemptIncoming(Hash peer) {}
+
+    /**
+     *  Is this IP exempt from any incoming throttles or rejections
+     *
+     *  @since 0.9.58
+     */
+    public boolean isExemptIncoming(String ip) { return false; }
+
+    /**
+     *  Remove this IP from the exemptions
+     *
+     *  @since 0.9.58
+     */
+    public void removeExemption(String ip) {}
+
     /*
      *  Reachability status codes
      *
