@@ -303,35 +303,33 @@ class ProfileOrganizerRenderer {
            .append("Caps").append(":</b></td><td>").append(_t("capabilities in the netDb, not used to determine profiles"))
            .append("</td></tr>");
         buf.append("<tr id=\"capabilities_key\"><td colspan=\"2\"><table><tbody>");
-/*
         buf.append("<tr><td>&nbsp;</td>")
-           .append("<td><b>B</b></td><td>").append(_t("SSU Testing")).append("</td>")
-           .append("<td><b>C</b></td><td>").append(_t("SSU Introducer")).append("</td>")
-           .append("<td>&nbsp;</td></tr>");
-*/
-        buf.append("<tr><td>&nbsp;</td>")
+           .append("<td><b>D</b></td><td>").append(_t("Congested")).append("</td>")
+           .append("<td><b>E</b></td><td>").append(_t("Severely congested")).append("</td>" +
+                   "<td>&nbsp;</td></tr>" +
+                   "<tr><td>&nbsp;</td>")
            .append("<td><b>f</b></td><td>").append(_t("Floodfill")).append("</td>")
-/*
-           .append("<td><b>H</b></td><td>").append(_t("Hidden")).append("</td>")
-*/
+           .append("<td><b>G</b></td><td>").append(_t("Not accepting tunnels")).append("</td>" +
+                   "<td>&nbsp;</td></tr>" +
+                   "<tr><td>&nbsp;</td>")
            .append("<td><b>K</b></td><td>").append(_t("Under {0} shared bandwidth", Router.MIN_BW_L + " KBps")).append("</td>")
-           .append("<td>&nbsp;</td></tr>");
-        buf.append("<tr><td>&nbsp;</td>")
-           .append("<td><b>L</b></td><td>").append(_t("{0} shared bandwidth", range(Router.MIN_BW_L, Router.MIN_BW_M))).append("</td>")
+           .append("<td><b>L</b></td><td>").append(_t("{0} shared bandwidth", range(Router.MIN_BW_L, Router.MIN_BW_M))).append("</td>" +
+                   "<td>&nbsp;</td></tr>" +
+                   "<tr><td>&nbsp;</td>")
            .append("<td><b>M</b></td><td>").append(_t("{0} shared bandwidth", range(Router.MIN_BW_M, Router.MIN_BW_N))).append("</td>")
-           .append("<td>&nbsp;</td></tr>");
-        buf.append("<tr><td>&nbsp;</td>")
-           .append("<td><b>N</b></td><td>").append(_t("{0} shared bandwidth", range(Router.MIN_BW_N, Router.MIN_BW_O))).append("</td>")
+           .append("<td><b>N</b></td><td>").append(_t("{0} shared bandwidth", range(Router.MIN_BW_N, Router.MIN_BW_O))).append("</td>" +
+                   "<td>&nbsp;</td></tr>" +
+                   "<tr><td>&nbsp;</td>")
            .append("<td><b>O</b></td><td>").append(_t("{0} shared bandwidth", range(Router.MIN_BW_O, Router.MIN_BW_P))).append("</td>")
-           .append("<td>&nbsp;</td></tr>");
-        buf.append("<tr><td>&nbsp;</td>")
-           .append("<td><b>P</b></td><td>").append(_t("{0} shared bandwidth", range(Router.MIN_BW_P, Router.MIN_BW_X))).append("</td>")
+           .append("<td><b>P</b></td><td>").append(_t("{0} shared bandwidth", range(Router.MIN_BW_P, Router.MIN_BW_X))).append("</td>"  +
+                   "<td>&nbsp;</td></tr>" +
+                   "<tr><td>&nbsp;</td>")
            .append("<td><b>R</b></td><td>").append(_t("Reachable")).append("</td>")
-           .append("<td>&nbsp;</td></tr>");
-        buf.append("<tr><td>&nbsp;</td>")
-           .append("<td><b>U</b></td><td>").append(_t("Unreachable")).append("</td>")
+           .append("<td><b>U</b></td><td>").append(_t("Unreachable")).append("</td>" +
+                   "<td>&nbsp;</td></tr>" +
+                   "<tr><td>&nbsp;</td>")
            .append("<td><b>X</b></td><td>").append(_t("Over {0} shared bandwidth", Math.round(Router.MIN_BW_X * 1.024f) + " KBps")).append("</td>")
-           .append("<td>&nbsp;</td></tr>");
+           .append("<td>&nbsp;</td><td>&nbsp;</td></tr>");
         buf.append("</tbody></table></td></tr>"); // profile_defs
         buf.append("<tr><td><b>")
            .append(_t("speed"))
