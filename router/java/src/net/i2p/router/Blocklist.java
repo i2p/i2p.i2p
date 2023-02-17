@@ -722,7 +722,6 @@ public class Blocklist {
      *
      * @param ip IPv4 or IPv6
      * @param source for logging only, may be null
-     * @return true if added
      * @since 0.9.57
      */
     public void add(byte ip[], String source) {
