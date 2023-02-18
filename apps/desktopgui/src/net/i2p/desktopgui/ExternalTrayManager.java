@@ -59,6 +59,7 @@ class ExternalTrayManager extends TrayManager {
 
     public JPopupMenu getSwingMainMenu() {
         JPopupMenu popup = new JPopupMenu();
+/*
         JMenuItem startItem = new JMenuItem(_t("Start I2P"));
         startItem.addActionListener(new ActionListener() {
             @Override
@@ -82,6 +83,7 @@ class ExternalTrayManager extends TrayManager {
             }
         });
         popup.add(startItem);
+*/
         initializeJNotificationItems();
         popup.add(_jnotificationItem2);
         popup.add(_jnotificationItem1);
