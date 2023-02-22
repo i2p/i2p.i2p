@@ -1,25 +1,28 @@
-FROM jlesage/baseimage:alpine-3.15-glibc as builder
+FROM alpine:3.17.1 as builder
 
 ENV APP_HOME="/i2p"
 
 WORKDIR /tmp/build
 COPY . .
 
-RUN add-pkg --virtual build-base gettext tar bzip2 apache-ant openjdk17 \
+RUN apk add --virtual build-base gettext tar bzip2 apache-ant openjdk17 \
     && echo "build.built-by=Docker" >> override.properties \
+
     && ant preppkg-linux-only \
     && rm -rf pkg-temp/osid pkg-temp/lib/wrapper pkg-temp/lib/wrapper.* \
-    && del-pkg build-base gettext tar bzip2 apache-ant openjdk17
+    && apk del build-base gettext tar bzip2 apache-ant openjdk17
 
-FROM jlesage/baseimage:alpine-3.15-glibc
+FROM alpine:3.17.1
 ENV APP_HOME="/i2p"
 
-RUN add-pkg openjdk17-jre ttf-dejavu
+RUN apk add openjdk17-jre ttf-dejavu
+
 WORKDIR ${APP_HOME}
 COPY --from=builder /tmp/build/pkg-temp .
 
 # "install" i2p by copying over installed files
-COPY docker/rootfs/ /
+COPY --chown=root:root docker/rootfs/ /
+RUN chmod +x /startapp.sh
 
 # Mount home and snark
 VOLUME ["${APP_HOME}/.i2p"]
@@ -35,3 +38,4 @@ LABEL \
       org.label-schema.vcs-url="https://github.com/i2p/i2p.i2p" \
       org.label-schema.schema-version="1.0"
 
+ENTRYPOINT ["/startapp.sh"]
