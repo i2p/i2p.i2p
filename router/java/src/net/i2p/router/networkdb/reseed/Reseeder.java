@@ -111,6 +111,7 @@ public class Reseeder {
         //
         // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
         // ----------------------------------           ------------------------     -------------------------     ---------------
+        "https://i2p.ghativega.in/"           + ',' +   // arnavbhatt288_at_mail.i2p.crt // CA
         "https://reseed-pl.i2pd.xyz/"         + ',' +   // r4sas-reseed_at_mail.i2p.crt // CA
         "https://reseed-fr.i2pd.xyz/"         + ',' +   // r4sas-reseed_at_mail.i2p.crt // CA
         "https://www2.mk16.de/"               + ',' +   // i2p-reseed_at_mk16.de.crt // CA
