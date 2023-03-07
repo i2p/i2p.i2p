@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P susimail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-11 15:33+0000\n"
+"POT-Creation-Date: 2023-03-06 14:52+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -17,6 +17,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: src/src/i2p/susi/webmail/MailCache.java:529
+#: src/src/i2p/susi/webmail/WebMail.java:2414
+#, java-format
+msgid "{0} new message"
+msgid_plural "{0} new messages"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/src/i2p/susi/webmail/MailCache.java:532
+#: src/src/i2p/susi/webmail/WebMail.java:2337
+msgid "Email"
+msgstr ""
 
 #: src/src/i2p/susi/webmail/MailPart.java:321
 #, java-format
@@ -270,17 +283,6 @@ msgstr ""
 #: src/src/i2p/susi/webmail/WebMail.java:2326
 msgid "Configuration"
 msgstr ""
-
-#: src/src/i2p/susi/webmail/WebMail.java:2337
-msgid "Email"
-msgstr ""
-
-#: src/src/i2p/susi/webmail/WebMail.java:2414
-#, java-format
-msgid "{0} new message"
-msgid_plural "{0} new messages"
-msgstr[0] ""
-msgstr[1] ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:2417
 msgid "No new messages"
