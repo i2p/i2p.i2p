@@ -66,7 +66,7 @@ public class HomeHelper extends HelperBase {
         //"anoncoin.i2p" + S + _x("The Anoncoin project") + S + "http://anoncoin.i2p/" + S + I + "anoncoin_32.png" + S +
         //"colombo-bt.i2p" + S + _x("The Italian Bittorrent Resource") + S + "http://colombo-bt.i2p/" + S + I + "colomboicon.png" + S +
         //_x("Dev Builds") + S + _x("Development builds of I2P") + S + "http://bobthebuilder.i2p/" + S + I + "script_gear.png" + S +
-        _x("Dev Forum") + S + _x("Development forum") + S + "http://zzz.i2p/" + S + I + "group_gear.png" + S +
+        //_x("Dev Forum") + S + _x("Development forum") + S + "http://zzz.i2p/" + S + I + "group_gear.png" + S +
         //_x("diftracker") + S + _x("Bittorrent tracker") + S + "http://diftracker.i2p/" + S + I + "i2psnark.png" + S +
         //"echelon.i2p" + S + _x("I2P Applications") + S + "http://echelon.i2p/" + S + I + "echelon.png" + S +
         //"exchanged.i2p" + S + _x("Anonymous cryptocurrency exchange") + S + "http://exchanged.i2p/" + S + I + "exchanged.png" + S +
@@ -105,7 +105,7 @@ public class HomeHelper extends HelperBase {
         _x("I2P Technical Docs") + S + _x("Technical documentation") + S + "http://i2p-projekt.i2p/how" + S + I + "education.png" + S +
         _x("I2P Wiki") + S + S + "http://wiki.i2p-projekt.i2p/" + S + I + "trac_wiki.png" + S +
         _x("I2P Bug Reports") + S + _x("Bug tracker") + S + "http://git.idk.i2p/i2p-hackers/i2p.i2p/-/issues" + S + I + "bug.png" + S +
-        "stats.i2p" + S + _x("I2P Network Statistics") + S + "http://stats.i2p/cgi-bin/dashboard.cgi" + S + I + "chart_bar.png" + S +
+        //"stats.i2p" + S + _x("I2P Network Statistics") + S + "http://stats.i2p/cgi-bin/dashboard.cgi" + S + I + "chart_bar.png" + S +
         "";
 
     public boolean shouldShowWelcome() {
