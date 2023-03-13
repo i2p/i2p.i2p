@@ -21,7 +21,7 @@
 
 - BuildTime: Don't have to do this every release, but update the
   EARLIEST and EARLIEST_LONG values in core/java/src/net/i2p/time/BuildTime.java
-  to the current date, more or less.
+  to the current date, more or less.(or use `ant bumpBuildTime`)
 
 - Tickets: Check if any blocker or critical tickets for this release remain open;
   get them fixed and closed, or reclassified.
