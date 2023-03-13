@@ -250,6 +250,31 @@ class ConnectionManager {
         ByteArray ba = _cache.acquire();
         boolean sigOk = synPacket.verifySignature(_context, ba.getData());
         _cache.release(ba);
+        if (sigOk) {
+            long[] nacks = synPacket.getNacks();
+            if (nacks != null && nacks.length == 8) {
+                // we use the packet's session because it may be a subsession
+                Hash hash = synPacket.getSession().getMyDestination().calculateHash();
+                byte[] h = hash.getData();
+                for (int i = 0; i < 8; i++) {
+                    if (nacks[i] != DataHelper.fromLong(h, i << 2, 4)) {
+                        if (_log.shouldWarn()) {
+                            // glue it back together for logging only
+                            byte[] g = new byte[32];
+                            for (int j = 0; j < 8; j++) {
+                                DataHelper.toLong(g, j << 2, 4, nacks[j]);
+                            }
+                            Hash ghash = new Hash(g);
+                            _log.warn("Sig passed but hash failed, expected: " + hash.toBase32() + " got: " + ghash.toBase32());
+                        }
+                        sigOk = false;
+                        break;
+                    }
+                }
+                if (sigOk && _log.shouldWarn())
+                    _log.warn("Validated SYN NACKS from: " + from.toBase32());
+            }
+        }
         if (!sigOk) {
             if (_log.shouldWarn())
                 _log.warn("Received unsigned / forged SYN apparently from " + from.toBase32() + ": " + synPacket);

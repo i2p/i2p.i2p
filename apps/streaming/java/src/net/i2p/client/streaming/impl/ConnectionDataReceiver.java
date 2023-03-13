@@ -2,6 +2,7 @@ package net.i2p.client.streaming.impl;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 /**
@@ -205,6 +206,14 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
             packet.setFlag(Packet.FLAG_SYNCHRONIZE);
             packet.setOptionalFrom();
             packet.setOptionalMaxSize(_connection.getOptions().getMaxMessageSize());
+            if (!_connection.isInbound()) {
+                byte[] h = _connection.getRemotePeer().calculateHash().getData();
+                long[] fakeNacks = new long[8];
+                for (int i = 0; i < 8; i++) {
+                    fakeNacks[i] = DataHelper.fromLong(h, i << 2, 4);
+                }
+                packet.setNacks(fakeNacks);
+            }
         }
         packet.setLocalPort(_connection.getLocalPort());
         packet.setRemotePort(_connection.getPort());
