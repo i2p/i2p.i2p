@@ -1,3 +1,9 @@
+i2p (2.2.0-1ubuntu1) focal; urgency=medium
+
+  * New upstream version 2.2.0
+
+ -- eyedeekay <hankhill19580@gmail.com>  Wed, 14 Mar 2023 12:12:12 +0000
+
 i2p (2.1.0-1ubuntu1) focal; urgency=medium
 
   * New upstream version 2.1.0
