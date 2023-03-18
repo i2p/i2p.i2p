@@ -22,7 +22,7 @@ for jar in `ls lib/*.jar`; do
     CLASSPATH=${CLASSPATH}:${jar}
 done
 
-if [ -f /.dockerenv ]; then
+if [ -f /.dockerenv ] || [ -f /run/.containerenv ]; then
     echo "[startapp] Running in container"
     if [ -z "$IP_ADDR" ]; then
         export IP_ADDR=$(hostname -i)
