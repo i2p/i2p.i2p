@@ -20,10 +20,23 @@ import net.i2p.router.transport.crypto.X25519KeyFactory;
 import net.i2p.util.Log;
 
 /**
- * Hacked up in-VM comm system for talking between contexts.  It doesn't even
- * generate any routerAddresses, but instead tracks the peers through a singleton.
+ * Hacked up in-VM comm system for talking between contexts within the same Java
+ * virtual machine.  It doesn't  generate any routerAddresses, but instead tracks
+ * the peers through a singleton.  It cannot connect to anything outside of its
+ * own Java VM.  It does not implement TCP, UDP, and therefore no NTCP or SSU.
  * Currently, the comm system doesn't even inject any lag, though it could (later).
- * It does honor the standard transport stats though, but not the TCP specific ones.
+ * It does honor the standard transport stats though, but no TCP or UDP specific
+ * ones (since UDP and TCP are not implemented).
+ *
+ * Typically, VMCommSystem is enabled by developers when it is desirable to
+ * test the router without enabling a real comm system.  For a variety of
+ * testing purposes, it can be advantageous to start the router in a mode
+ * where contact with the actual network is disabled.
+ *
+ * VMCommSystem can be enabled with the following setting in the
+ * router.config file:
+ *
+ * i2p.vmCommSystem=true
  *
  * FOR DEBUGGING AND LOCAL TESTING ONLY.
  */
