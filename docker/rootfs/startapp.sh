@@ -11,7 +11,7 @@ fi
 # Explicitly define HOME otherwise it might not have been set
 export HOME=/i2p
 
-export I2P=${HOME}/i2p
+export I2P=${HOME}
 
 echo "Starting I2P"
 
@@ -31,6 +31,7 @@ if [ -f /.dockerenv ]; then
     echo "[startapp] setting reachable IP to container IP $IP_ADDR"
     find . -name '*.config' -exec sed -i "s/127.0.0.1/$IP_ADDR/g" {} \;
     find . -name '*.config' -exec sed -i "s/localhost/$IP_ADDR/g" {} \;
+    
 fi
 
 # Options required for reflective access in dynamic JVM languages like Groovy and Jython
