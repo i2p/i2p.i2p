@@ -18,14 +18,14 @@ echo "Starting I2P"
 cd $HOME
 export CLASSPATH=.
 
-for jar in `ls lib/*.jar`; do
+for jar in lib/*.jar; do
     CLASSPATH=${CLASSPATH}:${jar}
 done
 
 if [ -f /.dockerenv ] || [ -f /run/.containerenv ]; then
     echo "[startapp] Running in container"
     if [ -z "$IP_ADDR" ]; then
-        export IP_ADDR=$(hostname -i)
+        export IP_ADDR="$(hostname -i)"
         echo "[startapp] Running in docker network"
     fi
     echo "[startapp] setting reachable IP to container IP $IP_ADDR"
@@ -39,4 +39,4 @@ JAVA17OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/su
 # Old java options
 JAVAOPTS="-Djava.net.preferIPv4Stack=false -Djava.library.path=${I2P}:${I2P}/lib -Di2p.dir.base=${I2P} -Di2p.dir.config=${HOME}/.i2p -DloggerFilenameOverride=logs/log-router-@.txt -Xmx$JVM_XMX"
 
-java -cp "${CLASSPATH}" ${JAVA_OPTS} net.i2p.router.RouterLaunch
+java -cp "${CLASSPATH}" ${JAVAOPTS} net.i2p.router.RouterLaunch
