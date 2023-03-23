@@ -1241,7 +1241,7 @@
 
     <target name="pkgclean" depends="deletepkg-temp">
         <delete>
-            <fileset dir="." includes="i2p.tar.bz2 install.jar i2pupdate.zip i2pupdate200.zip" />
+            <fileset dir="." includes="i2p.tar.bz2 install.jar install.tmp.jar i2pupdate.zip i2pupdate200.zip" />
         </delete>
     </target>
 
@@ -1844,7 +1844,8 @@
 
     <!-- IzPack 4 -->
     <target name="installer" depends="preppkg, buildProperties, izpack-patches, buildUtilityJar" >
-        <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
+        <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.tmp.jar" installerType="standard" basedir="${basedir}" />
+        <move file="${basedir}/install.tmp.jar" tofile="${basedir}/install.jar" />
         <ant target="installerexe" />
     </target>
 
@@ -1875,7 +1876,8 @@
     </target>
 
     <target name="installer5" depends="izpack5-patches, preppkg, buildProperties, buildUtilityJar" >
-        <izpack5 input="${basedir}/installer/install5.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
+        <izpack5 input="${basedir}/installer/install5.xml" output="${basedir}/install.tmp.jar" installerType="standard" basedir="${basedir}" />
+        <move file="${basedir}/install.tmp.jar" tofile="${basedir}/install.jar" />
         <ant target="installer5exe" />
     </target>
 
@@ -2000,7 +2002,8 @@
     <!-- IzPack 4 -->
     <target name="installer-windows" depends="clean, preppkg-windows-only, izpack-patches, buildUtilityJar" >
         <fixcrlf srcdir="pkg-temp" includes="*.config *.bat *.cmd **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="crlf"/>
-        <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
+        <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.tmp.jar" installerType="standard" basedir="${basedir}" />
+        <move file="${basedir}/install.tmp.jar" tofile="${basedir}/install.jar" />
         <ant target="installerexe" />
         <delete file="${basedir}/install.jar" />
         <move file="${basedir}/i2pinstall.exe" tofile="${basedir}/i2pinstall_${full.version}_windows.exe" />
@@ -2009,7 +2012,8 @@
     <!-- IzPack 5 -->
     <target name="installer5-windows" depends="clean, izpack5-patches, preppkg-windows-only, buildUtilityJar" >
         <fixcrlf srcdir="pkg-temp" includes="*.config *.bat *.cmd **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="crlf"/>
-        <izpack5 input="${basedir}/installer/install5.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
+        <izpack5 input="${basedir}/installer/install5.xml" output="${basedir}/install.tmp.jar" installerType="standard" basedir="${basedir}" />
+        <move file="${basedir}/install.tmp.jar" tofile="${basedir}/install.jar" />
         <ant target="installer5exe" />
         <delete file="${basedir}/install.jar" />
         <move file="${basedir}/i2pinstall.exe" tofile="${basedir}/i2pinstall_${full.version}_windows.exe" />
