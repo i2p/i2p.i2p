@@ -46,7 +46,7 @@ public class StatisticsManager {
 
     public StatisticsManager(RouterContext context) {
         _context = context;
-        _fmt = SIMPLE_STATS ? new DecimalFormat("0.00") :
+        _fmt = SIMPLE_STATS ? new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.UK)) :
                               new DecimalFormat("###,##0.00", new DecimalFormatSymbols(Locale.UK));
         _pct = new DecimalFormat("#0.00%", new DecimalFormatSymbols(Locale.UK));
         _log = context.logManager().getLog(StatisticsManager.class);
