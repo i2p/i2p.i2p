@@ -74,7 +74,7 @@
   - Add any new ones to .tx/config (use your own judgement on which to include
     based on minimum translated percentage)
   - `tx pull`
-  - `ant testcripts` to verify that all updated translations are valid
+  - `ant testscripts` to verify that all updated translations are valid
   - For any invalid that break the test, fix up the po file manually, or fix on
     tx and pull again, or (if new) comment out in .tx/config (add a comment why)
     and delete the po file.
