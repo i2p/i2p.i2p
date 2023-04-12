@@ -62,3 +62,4 @@ sloccount.sc
 # TODO: why does this file appear?
 apps/routerconsole/jsp/favicon.ico
 .tx
+/*.sh
