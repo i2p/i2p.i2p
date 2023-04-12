@@ -4,7 +4,7 @@
  * Update Tor Browser User-Agent String
  * Update local GeoIP database
  * Remove invalid signing keys from old installs
- * Update Tomcat version in Ubuntu Lunar
+ * Update Tomcat version in Ubuntu Lunar and Debian Sid
  * Release version 2.2.1/0.9.58
 
 2023-03-13 idk
