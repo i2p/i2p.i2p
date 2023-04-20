@@ -1,226 +1,220 @@
-i2p (2.2.1-1~bionic+1) bionic; urgency=medium
+i2p (2.2.1-1~lunar+1) lunar; urgency=medium
 
   * New upstream version 2.2.1
 
  -- idk <hankhill19580@gmail.com>  Mon, 17 Apr 2023 02:57:29 +0000
 
-i2p (2.2.0-2~bionic+1) bionic; urgency=medium
+i2p (2.2.0-1~lunar+1) lunar; urgency=medium
 
   * New upstream version 2.2.0
 
  -- eyedeekay <hankhill19580@gmail.com>  Wed, 14 Mar 2023 12:12:12 +0000
 
-i2p (2.1.0-2~bionic+1) bionic; urgency=medium
-
-  * Fix build failure
-
- -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 11 Jan 2023 13:13:13 +0000
-
-i2p (2.1.0-1~bionic+1) bionic; urgency=medium
+i2p (2.1.0-1~lunar+1) lunar; urgency=medium
 
   * New upstream version 2.1.0
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 11 Jan 2023 12:12:12 +0000
 
-i2p (2.0.0-1~bionic+1) bionic; urgency=medium
+i2p (2.0.0-2~lunar+1) lunar; urgency=medium
+
+  * Fix stray char in links file causing symlinks in /
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Fri, 02 Dec 2022 18:18:18 +0000
+
+i2p (2.0.0-1~lunar+1) lunar; urgency=medium
 
   * New upstream version 2.0.0
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 22 Nov 2022 12:12:12 +0000
 
-i2p (1.9.0-1~bionic+1) bionic; urgency=medium
+i2p (1.9.0-1~lunar+1) lunar; urgency=medium
 
   * New upstream version 1.9.0
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 23 Aug 2022 12:12:12 +0000
 
-i2p (1.8.0-1~bionic+1) bionic; urgency=medium
+i2p (1.8.0-1~lunar+1) lunar; urgency=medium
 
   * New upstream version 1.8.0
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 24 May 2022 12:12:12 +0000
 
-i2p (1.7.0-1~bionic+1) bionic; urgency=medium
+i2p (1.7.0-1~lunar+1) lunar; urgency=medium
 
   * New upstream version 1.7.0
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 22 Feb 2022 12:12:12 +0000
 
-i2p (1.6.1-1~bionic+1) bionic; urgency=medium
+i2p (1.6.1-1~lunar+1) lunar; urgency=medium
 
   * New upstream version 1.6.1
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 30 Nov 2021 12:12:12 +0000
 
-i2p (1.5.0-1~bionic+1) bionic; urgency=medium
+i2p (1.5.0-2~lunar+1) lunar; urgency=medium
 
   * New upstream version 1.5.0
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 25 Aug 2021 12:12:12 +0000
 
-i2p (0.9.50-1~bionic+1) bionic; urgency=medium
+i2p (0.9.50-1~lunar+1) lunar; urgency=medium
 
   * New upstream version 0.9.50
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 19 May 2021 12:12:12 +0000
 
-i2p (0.9.49-1~bionic+1) bionic; urgency=medium
+i2p (0.9.49-1~lunar+1) lunar; urgency=medium
 
   * New upstream version 0.9.49
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 17 Feb 2021 12:12:12 +0000
 
-i2p (0.9.48-1~bionic+1) bionic; urgency=medium
+i2p (0.9.48-1~lunar+1) lunar; urgency=medium
 
   * New upstream version 0.9.48
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 02 Dec 2020 12:12:12 +0000
 
-i2p (0.9.47-1~bionic+1) bionic; urgency=medium
+i2p (0.9.47-1~lunar+1) lunar; urgency=medium
 
   * New upstream version 0.9.47
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 25 Aug 2020 12:12:12 +0000
 
-i2p (0.9.46-1~bionic+1) bionic; urgency=medium
+i2p (0.9.46-1~lunar+1) eoan; urgency=medium
 
   * New upstream version 0.9.46
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 26 May 2020 12:12:12 +0000
 
-i2p (0.9.45-1ubuntu1) bionic; urgency=medium
+i2p (0.9.45-1~disco+1) disco; urgency=medium
 
   * New upstream version 0.9.45
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Mon, 24 Feb 2020 12:12:12 +0000
 
-i2p (0.9.44-1ubuntu1) bionic; urgency=medium
+i2p (0.9.44-1~disco+1) disco; urgency=medium
 
   * New upstream version 0.9.44
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Sun, 01 Dec 2019 12:12:12 +0000
 
-i2p (0.9.43-1ubuntu1) bionic; urgency=medium
+i2p (0.9.43-1~disco+1) disco; urgency=medium
 
   * New upstream version 0.9.43
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 22 Oct 2019 12:12:12 +0000
 
-i2p (0.9.42-1ubuntu1) bionic; urgency=medium
+i2p (0.9.42-1~disco+1) disco; urgency=medium
 
   * New upstream version 0.9.42
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 28 Aug 2019 12:12:12 +0000
 
-i2p (0.9.41-1ubuntu1) bionic; urgency=medium
+i2p (0.9.41-1~disco+1) disco; urgency=medium
 
   * New upstream version 0.9.41
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 3 Jul 2019 12:12:12 +0000
 
-i2p (0.9.40-1ubuntu1) bionic; urgency=medium
+i2p (0.9.40-1~disco+1) disco; urgency=medium
 
   * New upstream version 0.9.40
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 8 May 2019 12:12:12 +0000
 
-i2p (0.9.39-2ubuntu1) bionic; urgency=medium
-
-  * Fix compatibility with Jetty 9.4
-
- -- zzz on i2p (key signing) <zzz@i2pmail.org>  Fri, 19 Apr 2019 12:12:12 +0000
-
-i2p (0.9.39-1ubuntu1) bionic; urgency=medium
+i2p (0.9.39-1~disco+1) disco; urgency=medium
 
   * New upstream version 0.9.39
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Fri, 22 Mar 2019 12:12:12 +0000
 
-i2p (0.9.38-1ubuntu1) bionic; urgency=medium
+i2p (0.9.38-1~disco+1) disco; urgency=medium
 
   * New upstream version 0.9.38
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 23 Jan 2019 12:12:12 +0000
 
-i2p (0.9.37-1ubuntu1) bionic; urgency=medium
+i2p (0.9.37-1~lunar+1) bionic; urgency=medium
 
   * New upstream version 0.9.37
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Fri, 05 Oct 2018 12:12:12 +0000
 
-i2p (0.9.36-2ubuntu1) bionic; urgency=medium
+i2p (0.9.36-2~lunar+1) bionic; urgency=medium
 
   * New upstream version 0.9.36
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 23 Aug 2018 12:12:12 +0000
 
-i2p (0.9.35-1ubuntu1) artful; urgency=medium
+i2p (0.9.35-1~lunar+1) artful; urgency=medium
 
   * New upstream version 0.9.35
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 27 Jun 2018 12:12:12 +0000
 
-i2p (0.9.34-2ubuntu1) artful; urgency=medium
+i2p (0.9.34-2~lunar+1) artful; urgency=medium
 
   * New upstream version 0.9.34
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 11 Apr 2018 12:12:12 +0000
 
-i2p (0.9.33-1ubuntu1) artful; urgency=medium
+i2p (0.9.33-1~lunar+1) artful; urgency=medium
 
   * New upstream version 0.9.33
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 30 Jan 2018 12:12:12 +0000
 
-i2p (0.9.32-1ubuntu1) xenial; urgency=medium
+i2p (0.9.32-1~lunar+1) xenial; urgency=medium
 
   * New upstream version 0.9.32
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 08 Nov 2017 12:12:12 +0000
 
-i2p (0.9.31-1ubuntu1) xenial; urgency=medium
+i2p (0.9.31-1~lunar+1) xenial; urgency=medium
 
   * New upstream version 0.9.31
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 09 Aug 2017 12:12:12 +0000
 
-i2p (0.9.30-3ubuntu1) xenial; urgency=medium
+i2p (0.9.30-3~lunar+1) xenial; urgency=medium
 
   * New upstream version 0.9.30
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 03 May 2017 12:12:12 +0000
 
-i2p (0.9.29-1ubuntu1) trusty; urgency=medium
+i2p (0.9.29-1~lunar+1) trusty; urgency=medium
 
   * New upstream version 0.9.29
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Mon, 27 Feb 2017 12:12:12 +0000
 
-i2p (0.9.28-1ubuntu1) trusty; urgency=medium
+i2p (0.9.28-1~lunar+1) trusty; urgency=medium
 
   * New upstream version 0.9.28
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 13 Dec 2016 12:12:12 +0000
 
-i2p (0.9.27-1-1ubuntu1) trusty; urgency=medium
+i2p (0.9.27-1-1~lunar+1) trusty; urgency=medium
 
   * New upstream version 0.9.27
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Mon, 17 Oct 2016 12:12:12 +0000
 
-i2p (0.9.26-1ubuntu1) trusty; urgency=medium
+i2p (0.9.26-1~lunar+1) trusty; urgency=medium
 
   * New upstream version 0.9.26
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 07 Jun 2016 12:12:12 +0000
 
-i2p (0.9.25-1ubuntu1) trusty; urgency=medium
+i2p (0.9.25-1~lunar+1) trusty; urgency=medium
 
   * New upstream version 0.9.25
 
  -- zzz on i2p (key signing) <zzz@i2pmail.org>  Sat, 26 Mar 2016 12:12:12 +0000
 
-i2p (0.9.24-1ubuntu1) trusty; urgency=medium
+i2p (0.9.24-1~lunar+1) trusty; urgency=medium
 
   * Upload to PPA
 
