@@ -49,7 +49,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <form action="configplugins" method="POST">
 <table id="plugininstall" class="configtable">
 <tr id="url"><td class="infohelp" colspan="2">
- <%=intl._t("Look for available plugins on {0}.", "<a href=\"http://i2pwiki.i2p/index.php?title=Plugins\" target=\"_blank\">i2pwiki.i2p</a>")%>
+ <%=intl._t("Look for available plugins on {0}.", "<a href=\"http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target=\"_blank\">i2pwiki.i2p</a>")%>
 </td></tr>
 <tr><th colspan="2">
  <%=intl._t("Installation from URL")%>
