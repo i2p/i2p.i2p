@@ -11,6 +11,7 @@
 # foo <foo@bar>, 2009
 # punkibastardo <transifex.symons@slmail.me>, 2011, 2012
 # punkibastardo <transifex.symons@slmail.me>, 2011
+# Rodrigo Lledó <rodhos92@gmail.com>, 2023
 # strel, 2013-2018
 # fa1e5d1b5b1ea91a38c4e92aeae85c31_060014a, 2013
 msgid ""
@@ -19,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-17 13:12+0000\n"
 "PO-Revision-Date: 2011-02-13 11:46+0000\n"
-"Last-Translator: strel, 2013-2018\n"
+"Last-Translator: Rodrigo Lledó <rodhos92@gmail.com>, 2023\n"
 "Language-Team: Spanish (http://www.transifex.com/otf/I2P/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -426,7 +427,7 @@ msgstr "El tráfico de todos los clientes con esta característica habilitada se
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:481
 msgid "Share tunnels with other clients?"
-msgstr ""
+msgstr "¿Compartir túneles con otros clientes?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:499
 msgid "Enable DCC"
@@ -456,7 +457,7 @@ msgstr "Nota: ¡Cuando este cliente proxy esté configurado para compartir túne
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:525
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1405
 msgid "Tunnel Length Options"
-msgstr ""
+msgstr "Opciones de longitud del túnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:527
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1416
@@ -505,29 +506,29 @@ msgstr "Longitud de cada túnel"
 #, java-format
 msgid "{0} hop tunnel"
 msgid_plural "{0} hop tunnel"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{0} túnel de salto"
+msgstr[1] "{0} túneles de salto"
+msgstr[2] "{0} túneles de salto"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:540
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1428
 msgid "no anonymity"
-msgstr ""
+msgstr "sin anonimato"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:545
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1433
 msgid "low anonymity"
-msgstr ""
+msgstr "anonimato bajo"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:550
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1438
 msgid "medium anonymity"
-msgstr ""
+msgstr "anonimato medio"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:555
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1443
 msgid "high anonymity"
-msgstr ""
+msgstr "anonimato alto"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:587
 msgid "Level of Randomization for Tunnel Length"

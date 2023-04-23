@@ -126,7 +126,7 @@ msgstr " {0}再試行{1}するとよいかもしれません。"
 #: ../java/build/Proxy.java:118 ../java/build/Proxy.java:130
 #: ../java/build/Proxy.java:171 ../java/build/Proxy.java:196
 msgid "Could not find the following destination:"
-msgstr "以下の宛先が見つかりませんでした:"
+msgstr "右の宛先が見つかりませんでした:"
 
 #: ../java/build/Proxy.java:16 ../java/build/Proxy.java:22
 #: ../java/build/Proxy.java:160 ../java/build/Proxy.java:166

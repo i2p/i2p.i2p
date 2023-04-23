@@ -4,7 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# daingewuvzeevisiddfddd, 2022
+# daingewuvzeevisiddfddd, 2022-2023
 # タカハシ, 2013-2014
 # タカハシ, 2022
 # heizi <lv.kjsn.29yr@gmail.com>, 2016
@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-17 13:12+0000\n"
 "PO-Revision-Date: 2011-02-13 11:46+0000\n"
-"Last-Translator: daingewuvzeevisiddfddd, 2022\n"
+"Last-Translator: daingewuvzeevisiddfddd, 2022-2023\n"
 "Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -852,7 +852,7 @@ msgstr "Acceptヘッダーをブロックしない"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:869
 msgid "Allow SSL to I2P addresses when enabled"
-msgstr "有効のとき、I2PアドレスにSSLを使用可能にする"
+msgstr "有効にしたとき、I2PアドレスにSSLを使用可能にする"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:873
 msgid "Allow SSL to I2P addresses"
@@ -1671,7 +1671,7 @@ msgstr "インターフェース"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:479
 msgid "Edit Tunnel Settings for"
-msgstr "次のトンネル設定の編集"
+msgstr "このトンネル設定を編集"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:531
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:534

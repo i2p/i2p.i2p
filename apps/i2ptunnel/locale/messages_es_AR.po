@@ -417,7 +417,7 @@ msgstr "El tráfico de todos los clientes con esta característica habilitada se
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:481
 msgid "Share tunnels with other clients?"
-msgstr ""
+msgstr "¿Compartir túneles con otros clientes?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:499
 msgid "Enable DCC"
@@ -447,7 +447,7 @@ msgstr "Nota: ¡Cuando este cliente proxy esté configurado para compartir túne
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:525
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1405
 msgid "Tunnel Length Options"
-msgstr ""
+msgstr "Opciones de longitud del túnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:527
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1416
@@ -496,29 +496,29 @@ msgstr "Longitud de cada túnel"
 #, java-format
 msgid "{0} hop tunnel"
 msgid_plural "{0} hop tunnel"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{0} túnel de salto"
+msgstr[1] "{0} túneles de salto"
+msgstr[2] "{0} túneles de salto"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:540
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1428
 msgid "no anonymity"
-msgstr ""
+msgstr "sin anonimato"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:545
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1433
 msgid "low anonymity"
-msgstr ""
+msgstr "bajo anonimato"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:550
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1438
 msgid "medium anonymity"
-msgstr ""
+msgstr "anonimato medio"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:555
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1443
 msgid "high anonymity"
-msgstr ""
+msgstr "anonimato alto"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:587
 msgid "Level of Randomization for Tunnel Length"
