@@ -119,6 +119,10 @@ public class InNetMessagePool implements Service {
         _handlerJobBuilders[i2npMessageType] = builder;
         return old;
     }
+
+    public int add(I2NPMessage messageBody, RouterIdentity fromRouter, Hash fromRouterHash) {
+        return add(messageBody, fromRouter, fromRouterHash, 0);
+    }
     
     /**
      * Add a new message to the pool.
@@ -134,7 +138,10 @@ public class InNetMessagePool implements Service {
      * @return -1 for some types of errors but not all; 0 otherwise
      *         (was queue length, long ago)
      */
-    public int add(I2NPMessage messageBody, RouterIdentity fromRouter, Hash fromRouterHash) {
+    public int add(I2NPMessage messageBody,
+                   RouterIdentity fromRouter,
+                   Hash fromRouterHash,
+                   long msgIDBloomXor) {
         final MessageHistory history = _context.messageHistory();
         final boolean doHistory = history.getDoLog();
 
@@ -158,7 +165,11 @@ public class InNetMessagePool implements Service {
             // just validate the expiration
             invalidReason = _context.messageValidator().validateMessage(exp);
         } else {
-            invalidReason = _context.messageValidator().validateMessage(messageBody.getUniqueId(), exp);
+            if (msgIDBloomXor == 0)
+                invalidReason = _context.messageValidator().validateMessage(messageBody.getUniqueId(), exp);
+            else
+                invalidReason = _context.messageValidator().validateMessage(messageBody.getUniqueId()
+                                                                            ^ msgIDBloomXor, exp);
         }
         
         if (invalidReason != null) {
