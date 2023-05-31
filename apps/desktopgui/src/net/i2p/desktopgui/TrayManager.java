@@ -4,6 +4,7 @@ import java.awt.AWTException;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
@@ -16,8 +17,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import java.awt.MenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -28,6 +31,8 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.MenuCallback;
+import net.i2p.app.MenuHandle;
 import net.i2p.apps.systray.UrlLauncher;
 import net.i2p.desktopgui.i18n.DesktopguiTranslator;
 import net.i2p.util.Log;
@@ -47,6 +52,9 @@ abstract class TrayManager {
     protected volatile boolean _showNotifications;
     protected MenuItem  _notificationItem1, _notificationItem2;
     protected JMenuItem _jnotificationItem1, _jnotificationItem2;
+    private final AtomicInteger _id = new AtomicInteger();
+    private final List<MenuInternal> _menus;
+    private JPopupMenu _jPopupMenu;
 
     private static final String PNG_DIR = "/desktopgui/resources/images/";
     private static final String MAC_ICON = "itoopie_black_24.png";
@@ -61,6 +69,7 @@ abstract class TrayManager {
     protected TrayManager(I2PAppContext ctx, boolean useSwing) {
         _appContext = ctx;
         _useSwing = useSwing;
+        _menus = new ArrayList<MenuInternal>();
     }
     
     /**
@@ -109,6 +118,7 @@ abstract class TrayManager {
         frame.setMinimumSize(new Dimension(0, 0));
         frame.setSize(0, 0);
         final JPopupMenu menu = getSwingMainMenu();
+        _jPopupMenu = menu;
         menu.setFocusable(true);
         frame.add(menu);
         TrayIcon ti = new TrayIcon(getTrayImage(), tooltip, null);
@@ -373,6 +383,165 @@ abstract class TrayManager {
             }
         });
         _jnotificationItem1 = notificationItem1;
+    }
+
+    /////// MenuService delegation methods
+
+    /**
+     *  @since 0.9.59
+     */
+    public MenuHandle addMenu(String message, final MenuCallback callback, MenuHandle p) {
+        MenuInternal parent = p != null ? (MenuInternal) p : null;
+        final int id = _id.incrementAndGet();
+        final MenuInternal rv;
+        if (_useSwing) {
+            final JMenuItem m = new JMenuItem(message);
+            rv = new MenuInternal(null, m, callback, id);
+            m.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    new SwingWorker<Object, Object>() {
+                        @Override
+                        protected Object doInBackground() throws Exception {
+                            rv.cb.clicked(rv);
+                            return null;
+                        }
+                    }.execute();
+                }
+            });
+            _jPopupMenu.add(m);
+        } else {
+            final MenuItem m = new MenuItem(message);
+            rv = new MenuInternal(m, null, callback, id);
+            m.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    new SwingWorker<Object, Object>() {
+                        @Override
+                        protected Object doInBackground() throws Exception {
+                            rv.cb.clicked(rv);
+                            return null;
+                        }
+                    }.execute();
+                }
+            });
+            trayIcon.getPopupMenu().add(m);
+        }
+        synchronized(_menus) {
+            _menus.add(rv);
+        }
+        updateMenu();
+        return rv;
+    }
+
+    /**
+     *  @since 0.9.59
+     */
+    public void removeMenu(MenuHandle item) {
+        MenuInternal mi = (MenuInternal) item;
+        if (_useSwing) {
+            _jPopupMenu.remove(mi.jm);
+        } else {
+            trayIcon.getPopupMenu().remove(mi.m);
+        }
+        updateMenu();
+    }
+
+    /**
+     *  @since 0.9.59
+     */
+    public void showMenu(MenuHandle item) {
+        MenuInternal mi = (MenuInternal) item;
+        mi.setVisible(true);
+        updateMenu();
+    }
+
+    /**
+     *  @since 0.9.59
+     */
+    public void hideMenu(MenuHandle item) {
+        MenuInternal mi = (MenuInternal) item;
+        mi.setVisible(false);
+        updateMenu();
+    }
+
+    /**
+     *  @since 0.9.59
+     */
+    public void enableMenu(MenuHandle item) {
+        MenuInternal mi = (MenuInternal) item;
+        mi.setEnabled(true);
+        updateMenu();
+    }
+
+    /**
+     *  @since 0.9.59
+     */
+    public void disableMenu(MenuHandle item) {
+        MenuInternal mi = (MenuInternal) item;
+        mi.setEnabled(false);
+        updateMenu();
+    }
+
+    /**
+     *  @since 0.9.59
+     */
+    public void updateMenu(String message, MenuHandle item) {
+        MenuInternal mi = (MenuInternal) item;
+        mi.setText(message);
+        updateMenu();
+    }
+
+    /////// MenuService internals
+
+    /**
+     *  @since 0.9.59
+     */
+    private MenuInternal getMenu(int id) {
+        synchronized(_menus) {
+            for (MenuInternal mi : _menus) {
+                 if (mi.getID() == id)
+                     return mi;
+            }
+        }
+        return null;
+    }
+
+    /**
+     *  @since 0.9.59
+     */
+    private static class MenuInternal implements MenuHandle {
+        private final MenuItem m;
+        private final JMenuItem jm;
+        private final MenuCallback cb;
+        private final int id;
+
+        public MenuInternal(MenuItem mm, JMenuItem jmm, MenuCallback cbb, int idd) {
+            m = mm; jm = jmm; cb = cbb; id = idd;
+        }
+
+        public int getID() { return id; }
+
+        private void setEnabled(boolean yes) {
+            if (m != null)
+                m.setEnabled(yes);
+            else
+                jm.setEnabled(yes);
+        }
+
+        private void setVisible(boolean yes) {
+            if (m != null)
+                m.setEnabled(yes);
+            else
+                jm.setVisible(yes);
+        }
+
+        private void setText(String text) {
+            if (m != null)
+                m.setLabel(text);
+            else
+                jm.setText(text);
+        }
     }
 
     protected String _t(String s) {

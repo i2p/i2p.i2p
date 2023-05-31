@@ -17,6 +17,9 @@ import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.ClientAppState;
 import static net.i2p.app.ClientAppState.*;
+import net.i2p.app.MenuCallback;
+import net.i2p.app.MenuHandle;
+import net.i2p.app.MenuService;
 import net.i2p.app.NotificationService;
 import net.i2p.desktopgui.router.RouterManager;
 import net.i2p.router.RouterContext;
@@ -29,7 +32,7 @@ import net.i2p.util.I2PProperties.I2PPropertyCallback;
 /**
  * The main class of the application.
  */
-public class Main implements RouterApp, NotificationService {
+public class Main implements RouterApp, NotificationService, MenuService {
 
     // non-null
     private final I2PAppContext _appContext;
@@ -243,6 +246,89 @@ public class Main implements RouterApp, NotificationService {
      */
     public boolean update(int id, String title, String message, String path) {
         return false;
+    }
+
+    /////// MenuService methods
+
+    /**
+     *  Menu will start out shown and enabled, in the root menu
+     *
+     *  @param message for the menu, translated
+     *  @param callback fired on click
+     *  @return null on error
+     *  @since 0.9.59
+     */
+    public MenuHandle addMenu(String message, MenuCallback callback) {
+        return addMenu(message, callback, null);
+    }
+
+    /**
+     *  Menu will start out enabled, as a submenu
+     *
+     *  @param message for the menu, translated
+     *  @param callback fired on click
+     *  @param parent the parent menu this will be a submenu of, or null for top level
+     *  @return null on error
+     *  @since 0.9.59
+     */
+    public MenuHandle addMenu(String message, MenuCallback callback, MenuHandle parent) {
+        if (_trayManager == null)
+            return null;
+        return _trayManager.addMenu(message, callback, parent);
+    }
+
+    /**
+     *  @since 0.9.59
+     */
+    public void removeMenu(MenuHandle item) {
+        if (_trayManager == null)
+            return;
+        _trayManager.removeMenu(item);
+    }
+
+    /**
+     *  @since 0.9.59
+     */
+    public void showMenu(MenuHandle item) {
+        if (_trayManager == null)
+            return;
+        _trayManager.showMenu(item);
+    }
+
+    /**
+     *  @since 0.9.59
+     */
+    public void hideMenu(MenuHandle item) {
+        if (_trayManager == null)
+            return;
+        _trayManager.hideMenu(item);
+    }
+
+    /**
+     *  @since 0.9.59
+     */
+    public void enableMenu(MenuHandle item) {
+        if (_trayManager == null)
+            return;
+        _trayManager.enableMenu(item);
+    }
+
+    /**
+     *  @since 0.9.59
+     */
+    public void disableMenu(MenuHandle item) {
+        if (_trayManager == null)
+            return;
+        _trayManager.disableMenu(item);
+    }
+
+    /**
+     *  @since 0.9.59
+     */
+    public void updateMenu(String message, MenuHandle item) {
+        if (_trayManager == null)
+            return;
+        _trayManager.updateMenu(message, item);
     }
 
     /////// ClientApp methods
