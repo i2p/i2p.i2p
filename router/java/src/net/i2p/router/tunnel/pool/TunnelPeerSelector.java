@@ -42,7 +42,7 @@ import net.i2p.util.VersionComparator;
  */
 public abstract class TunnelPeerSelector extends ConnectChecker {
 
-    private static final String DEFAULT_EXCLUDE_CAPS = String.valueOf(Router.CAPABILITY_BW12);
+    private static final String DEFAULT_EXCLUDE_CAPS = String.valueOf(Router.CAPABILITY_BW12)+String.valueOf(Router.CAPABILITY_CONGESTION_SEVERE);
 
     protected TunnelPeerSelector(RouterContext context) {
         super(context);
