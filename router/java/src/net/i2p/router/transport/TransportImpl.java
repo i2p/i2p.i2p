@@ -531,7 +531,7 @@ public abstract class TransportImpl implements Transport {
 
         //// this functionality is built into the InNetMessagePool
         //String type = inMsg.getClass().getName();
-        //MessageHistory.getInstance().receiveMessage(type, inMsg.getUniqueId(), inMsg.getMessageExpiration(), remoteIdentHash, true);
+        //MessageHistory.getInstance().receiveMessage(type, inMsg.getRawUniqueId(), inMsg.getMessageExpiration(), remoteIdentHash, true);
 
         if (_listener != null) {
             _listener.messageReceived(inMsg, remoteIdent, remoteIdentHash);

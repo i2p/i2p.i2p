@@ -8,6 +8,8 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
+import java.util.Random;
+
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.i2np.DatabaseLookupMessage;
@@ -25,6 +27,7 @@ public class FloodfillDatabaseLookupMessageHandler implements HandlerJobBuilder 
     private RouterContext _context;
     private FloodfillNetworkDatabaseFacade _facade;
     private Log _log;
+    private final long _msgIDBloomXor = new Random().nextLong();    
 
     public FloodfillDatabaseLookupMessageHandler(RouterContext context, FloodfillNetworkDatabaseFacade facade) {
         _context = context;
@@ -47,7 +50,7 @@ public class FloodfillDatabaseLookupMessageHandler implements HandlerJobBuilder 
 
         DatabaseLookupMessage dlm = (DatabaseLookupMessage)receivedMessage;
         if (!_facade.shouldThrottleLookup(dlm.getFrom(), dlm.getReplyTunnel())) {
-            Job j = new HandleFloodfillDatabaseLookupMessageJob(_context, dlm, from, fromHash);
+            Job j = new HandleFloodfillDatabaseLookupMessageJob(_context, dlm, from, fromHash, _msgIDBloomXor);
             //if (false) {
             //    // might as well inline it, all the heavy lifting is queued up in later jobs, if necessary
             //    j.runJob();

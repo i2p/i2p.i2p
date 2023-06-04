@@ -642,7 +642,7 @@ class BuildHandler implements Runnable {
             getContext().messageHistory().tunnelRejected(_state.fromHash, new TunnelId(_req.readReceiveTunnelId()), _nextPeer, 
                                                          // this is all disabled anyway
                                                          //"rejected because we couldn't find " + _nextPeer + ": " +
-                                                         //_state.msg.getUniqueId() + "/" + _req.readNextTunnelId());
+                                                         //_state.msg.getRawUniqueId() + "/" + _req.readNextTunnelId());
                                                          "lookup fail");
         }
     }
@@ -962,7 +962,7 @@ class BuildHandler implements Runnable {
             _context.messageHistory().tunnelRejected(from, new TunnelId(ourId), nextPeer, 
                                                      // this is all disabled anyway
                                                      //"rejecting for " + response + ": " +
-                                                     //state.msg.getUniqueId() + "/" + ourId + "/" + req.readNextTunnelId() + " delay " +
+                                                     //state.msg.getRawUniqueId() + "/" + ourId + "/" + req.readNextTunnelId() + " delay " +
                                                      //recvDelay + " as " +
                                                      //(isOutEnd ? "outbound endpoint" : isInGW ? "inbound gw" : "participant"));
                                                      Integer.toString(response));

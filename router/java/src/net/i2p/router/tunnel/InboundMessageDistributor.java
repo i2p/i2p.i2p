@@ -1,5 +1,7 @@
 package net.i2p.router.tunnel;
 
+import java.util.Random;
+
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
@@ -33,8 +35,8 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
     private final Log _log;
     private final Hash _client;
     private final GarlicMessageReceiver _receiver;
-    private String _clientNickname;
-    private final long _msgIdBloomXor;
+    private final String _clientNickname;
+    private final long _msgIDBloomXor;
     /**
      *  @param client null for router tunnel
      */
@@ -53,10 +55,10 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                            + " b32: " + _client.toBase32()
                            + ") InboundMessageDistributor with tunnel pool settings: " + clienttps);
             _clientNickname = clienttps.getDestinationNickname();
-            _msgIdBloomXor = clienttps.getMsgIdBloomXor();
+            _msgIDBloomXor = clienttps.getMsgIdBloomXor();
         } else {
             _clientNickname = "NULL/Expl";
-            _msgIdBloomXor = 0;
+            _msgIDBloomXor = new Random().nextLong();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Initializing null or exploratory InboundMessageDistributor");
         }
@@ -215,10 +217,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                               + " (for client " + _clientNickname + " ("
                               + ((_client != null) ? _client.toBase32() : "null")
                               + ") to target=NULL/tunnel=NULL " + msg);
-                if (_msgIdBloomXor == 0)
-                    _context.inNetMessagePool().add(msg, null, null);
-                else
-                    _context.inNetMessagePool().add(msg, null, null, _msgIdBloomXor);
+                _context.inNetMessagePool().add(msg, null, null, _msgIDBloomXor);
             }
         } else if (_context.routerHash().equals(target)) {
             if (type == GarlicMessage.MESSAGE_TYPE)
@@ -292,10 +291,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                                         _log.info("Storing garlic LS down tunnel for: " + dsm.getKey() + " sent to: "
                                                   + _clientNickname + " ("
                                                   + (_client != null ? _client.toBase32() : ") router"));
-                                    if (_msgIdBloomXor == 0)
-                                        _context.inNetMessagePool().add(dsm, null, null);
-                                    else
-                                        _context.inNetMessagePool().add(dsm, null, null, _msgIdBloomXor);
+                                    _context.inNetMessagePool().add(dsm, null, null, _msgIDBloomXor);
                             } else {                                        
                                 if (_client != null) {
                                     // drop it, since the data we receive shouldn't include router 
@@ -317,10 +313,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                                 if (_log.shouldLog(Log.INFO))
                                     _log.info("Storing garlic RI down tunnel (" + _clientNickname
                                               + ") for: " + dsm.getKey());
-                                if (_msgIdBloomXor == 0)
-                                    _context.inNetMessagePool().add(dsm, null, null);
-                                else
-                                    _context.inNetMessagePool().add(dsm, null, null, _msgIdBloomXor);
+                                _context.inNetMessagePool().add(dsm, null, null, _msgIDBloomXor);
                             }
                 } else if (_client != null && type == DatabaseSearchReplyMessage.MESSAGE_TYPE) {
                     // DSRMs show up here now that replies are encrypted
@@ -339,10 +332,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                         orig = newMsg;
                      }
                    ****/
-                    if (_msgIdBloomXor == 0)
-                        _context.inNetMessagePool().add(orig, null, null);
-                    else
-                        _context.inNetMessagePool().add(orig, null, null, _msgIdBloomXor);
+                    _context.inNetMessagePool().add(orig, null, null, _msgIDBloomXor);
                 } else if (type == DataMessage.MESSAGE_TYPE) {
                         // a data message targetting the local router is how we send load tests (real
                         // data messages target destinations)
@@ -359,10 +349,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                                        + _clientNickname + " (" + _client.toBase32() + ") : "
                                        + data, new Exception("cause"));
                 } else {
-                            if (_msgIdBloomXor == 0)
-                                _context.inNetMessagePool().add(data, null, null);
-                            else
-                                _context.inNetMessagePool().add(data, null, null, _msgIdBloomXor);
+                        _context.inNetMessagePool().add(data, null, null, _msgIDBloomXor);
                 }
                 return;
 

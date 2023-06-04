@@ -9,6 +9,7 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 import net.i2p.data.Hash;
@@ -57,6 +58,8 @@ class StartExplorersJob extends JobImpl {
 
     private static final long MAX_LAG = 100;
     private static final long MAX_MSG_DELAY = 1500;
+
+    private final long _msgIDBloomXor = new Random().nextLong();
     
     public StartExplorersJob(RouterContext context, KademliaNetworkDatabaseFacade facade) {
         super(context);
@@ -99,7 +102,7 @@ class StartExplorersJob extends JobImpl {
                 // This is very effective so we don't need to do it often
                 boolean realexpl = !((needffs && getContext().random().nextInt(2) == 0) ||
                                     (lowffs && getContext().random().nextInt(4) == 0));
-                ExploreJob j = new ExploreJob(getContext(), _facade, key, realexpl);
+                ExploreJob j = new ExploreJob(getContext(), _facade, key, realexpl, _msgIDBloomXor);
                 if (delay > 0)
                     j.getTiming().setStartAfter(getContext().clock().now() + delay);
                 getContext().jobQueue().addJob(j);

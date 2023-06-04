@@ -56,6 +56,7 @@ class SearchJob extends JobImpl {
     private long _startedOn;
     private boolean _floodfillPeersExhausted;
     private int _floodfillSearchesOutstanding;
+    private final long _msgIDBloomXor;
     
     private static final int SEARCH_BREDTH = 3; // 10 peers at a time 
     /** only send the 10 closest "dont tell me about" refs */
@@ -91,7 +92,7 @@ class SearchJob extends JobImpl {
      * 
      */
     public SearchJob(RouterContext context, KademliaNetworkDatabaseFacade facade, Hash key,
-                     Job onSuccess, Job onFailure, long timeoutMs, boolean keepStats, boolean isLease) {
+                     Job onSuccess, Job onFailure, long timeoutMs, boolean keepStats, boolean isLease, long msgIDBloomXor) {
         super(context);
         if ( (key == null) || (key.getData() == null) ) 
             throw new IllegalArgumentException("Search for null key?");
@@ -107,6 +108,7 @@ class SearchJob extends JobImpl {
         _peerSelector = facade.getPeerSelector();
         _startedOn = -1;
         _expiration = getContext().clock().now() + timeoutMs;
+        _msgIDBloomXor = msgIDBloomXor;
         getContext().statManager().addRateData("netDb.searchCount", 1);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Search (" + getClass().getName() + " for " + key, new Exception("Search enqueued by"));
@@ -500,7 +502,7 @@ class SearchJob extends JobImpl {
         SearchUpdateReplyFoundJob reply = new SearchUpdateReplyFoundJob(getContext(), router, _state, _facade, this);
         SendMessageDirectJob j = new SendMessageDirectJob(getContext(), msg, to,
                                                           reply, new FailedJob(getContext(), router), sel, timeout,
-                                                          OutNetMessage.PRIORITY_EXPLORATORY);
+                                                          OutNetMessage.PRIORITY_EXPLORATORY, _msgIDBloomXor);
         if (FloodfillNetworkDatabaseFacade.isFloodfill(router))
             _floodfillSearchesOutstanding++;
         j.runJob();

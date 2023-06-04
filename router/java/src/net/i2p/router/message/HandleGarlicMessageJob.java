@@ -36,6 +36,9 @@ import net.i2p.util.Log;
 public class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.CloveReceiver {
     private final Log _log;
     private final GarlicMessage _message;
+    private final long _msgIDBloomXorLocal;
+    private final long _msgIDBloomXorRouter;
+    private final long _msgIDBloomXorTunnel;
     //private RouterIdentity _from;
     //private Hash _fromHash;
     //private Map _cloves; // map of clove Id --> Expiration of cloves we've already seen
@@ -49,12 +52,15 @@ public class HandleGarlicMessageJob extends JobImpl implements GarlicMessageRece
      *  @param from ignored
      *  @param fromHash ignored
      */
-    public HandleGarlicMessageJob(RouterContext context, GarlicMessage msg, RouterIdentity from, Hash fromHash) {
+    public HandleGarlicMessageJob(RouterContext context, GarlicMessage msg, RouterIdentity from, Hash fromHash, long msgIDBloomXorLocal, long msgIDBloomXorRouter, long msgIDBloomXorTunnel) {
         super(context);
         _log = context.logManager().getLog(HandleGarlicMessageJob.class);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Garlic Message not down a tunnel from [" + from + "]");
         _message = msg;
+        _msgIDBloomXorLocal = msgIDBloomXorLocal;
+        _msgIDBloomXorRouter = msgIDBloomXorRouter;
+        _msgIDBloomXorTunnel = msgIDBloomXorTunnel;
         //_from = from;
         //_fromHash = fromHash;
         //_cloves = new HashMap();
@@ -74,7 +80,9 @@ public class HandleGarlicMessageJob extends JobImpl implements GarlicMessageRece
             case DeliveryInstructions.DELIVERY_MODE_LOCAL:
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("local delivery instructions for clove: " + data);
-                getContext().inNetMessagePool().add(data, null, null);
+                // Here we are adding the message to the InNetMessagePool and it is Local. Xor the messageID with
+                // a long unique to the router/session.
+                getContext().inNetMessagePool().add(data, null, null, _msgIDBloomXorLocal);
                 return;
             case DeliveryInstructions.DELIVERY_MODE_DESTINATION:
                 // i2pd bug with DLM to ratchet router
@@ -86,14 +94,18 @@ public class HandleGarlicMessageJob extends JobImpl implements GarlicMessageRece
                 if (getContext().routerHash().equals(instructions.getRouter())) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("router delivery instructions targetting us");
-                    getContext().inNetMessagePool().add(data, null, null);
+                    // Here we are adding the message to the InNetMessagePool and it is for us. Xor the messageID with
+                    // a long unique to the router/session.
+                    getContext().inNetMessagePool().add(data, null, null, _msgIDBloomXorRouter);
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("router delivery instructions targetting " 
                                    + instructions.getRouter().toBase64().substring(0,4) + " for " + data);
+                    // we don't need to use the msgIDBloomXorRouter here because we have already handled the case
+                    // where the message will be added to the InNetMessagePool(see SendMessageDirectJob 159-179)
                     SendMessageDirectJob j = new SendMessageDirectJob(getContext(), data, 
                                                                       instructions.getRouter(), 
-                                                                      10*1000, ROUTER_PRIORITY);
+                                                                      10*1000, ROUTER_PRIORITY, _msgIDBloomXorRouter);
                     // run it inline (adds to the outNetPool if it has the router info, otherwise queue a lookup)
                     j.runJob(); 
                     //getContext().jobQueue().addJob(j);
@@ -107,9 +119,10 @@ public class HandleGarlicMessageJob extends JobImpl implements GarlicMessageRece
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("tunnel delivery instructions targetting " 
                                + instructions.getRouter().toBase64().substring(0,4) + " for " + data);
+                // Here we do Xor the messageID in case it is added to the InNetMessagePool(see SendMessageDirectJob 159-179)
                 SendMessageDirectJob job = new SendMessageDirectJob(getContext(), gw, 
                                                                     instructions.getRouter(), 
-                                                                    10*1000, TUNNEL_PRIORITY);
+                                                                    10*1000, TUNNEL_PRIORITY, _msgIDBloomXorTunnel);
                 // run it inline (adds to the outNetPool if it has the router info, otherwise queue a lookup)
                 job.runJob(); 
                 // getContext().jobQueue().addJob(job);

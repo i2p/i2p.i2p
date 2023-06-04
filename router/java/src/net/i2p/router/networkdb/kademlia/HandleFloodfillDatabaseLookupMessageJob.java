@@ -26,8 +26,8 @@ import net.i2p.router.networkdb.HandleDatabaseLookupMessageJob;
  *
  */
 public class HandleFloodfillDatabaseLookupMessageJob extends HandleDatabaseLookupMessageJob {
-    public HandleFloodfillDatabaseLookupMessageJob(RouterContext ctx, DatabaseLookupMessage receivedMessage, RouterIdentity from, Hash fromHash) {
-        super(ctx, receivedMessage, from, fromHash);    
+    public HandleFloodfillDatabaseLookupMessageJob(RouterContext ctx, DatabaseLookupMessage receivedMessage, RouterIdentity from, Hash fromHash, long msgIDBloomXor) {
+        super(ctx, receivedMessage, from, fromHash, msgIDBloomXor);
     }
     
     /**
