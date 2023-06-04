@@ -120,9 +120,24 @@ public class InNetMessagePool implements Service {
         return old;
     }
 
-    //public int add(I2NPMessage messageBody, RouterIdentity fromRouter, Hash fromRouterHash) {
-        //return add(messageBody, fromRouter, fromRouterHash, 0);
-    //}
+    /**
+     * Add a new message to the pool.
+     * If there is 
+     * a HandlerJobBuilder for the inbound message type, the message is loaded
+     * into a job created by that builder and queued up for processing instead
+     * (though if the builder doesn't create a job, it is added to the pool).
+     * Equivalent to the 4-argument version with a 0-value msgIDBloomXor
+     *
+     * @param messageBody non-null
+     * @param fromRouter may be null
+     * @param fromRouterHash may be null, calculated from fromRouter if null
+     *
+     * @return -1 for some types of errors but not all; 0 otherwise
+     *         (was queue length, long ago)
+     */
+    public int add(I2NPMessage messageBody, RouterIdentity fromRouter, Hash fromRouterHash) {
+        return add(messageBody, fromRouter, fromRouterHash, 0);
+    }
     
     /**
      * Add a new message to the pool.
@@ -130,6 +145,7 @@ public class InNetMessagePool implements Service {
      * a HandlerJobBuilder for the inbound message type, the message is loaded
      * into a job created by that builder and queued up for processing instead
      * (though if the builder doesn't create a job, it is added to the pool)
+     * if msgIDBloomXor is 0 the Xor factor is 0, therefore the ID is returned unchanged.
      *
      * @param messageBody non-null
      * @param fromRouter may be null
