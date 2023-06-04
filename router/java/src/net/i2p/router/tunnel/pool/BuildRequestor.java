@@ -325,7 +325,7 @@ abstract class BuildRequestor {
             }
         }
         //if (log.shouldLog(Log.DEBUG))
-        //    log.debug("Tunnel build message " + msg.getUniqueId() + " created in " + createTime
+        //    log.debug("Tunnel build message " + msg.getRawUniqueId() + " created in " + createTime
         //              + "ms and dispatched in " + (System.currentTimeMillis()-beforeDispatch));
         return true;
     }

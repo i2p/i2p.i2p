@@ -165,7 +165,7 @@ public class VMCommSystem extends CommSystemFacade {
                 else
                     ReceiveJob.this.getContext().statManager().addRateData("transport.receiveMessageLarge", 1, 1);
 
-                _ctx.inNetMessagePool().add(msg, null, _from);
+                _ctx.inNetMessagePool().add(msg, null, _from, 0);
             } catch (I2NPMessageException e) {
                 _log.error("Error reading/formatting a VM message? Something is not right...", e);
             }

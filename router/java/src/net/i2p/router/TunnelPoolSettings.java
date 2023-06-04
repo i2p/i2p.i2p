@@ -86,7 +86,7 @@ public class TunnelPoolSettings {
     private static final int MAX_PRIORITY = 25;
     private static final int EXPLORATORY_PRIORITY = 30;
 
-    private final long _msgIdBloomXor;
+    private final long _msgIDBloomXor;
 
     /**
      *  Exploratory tunnel
@@ -118,7 +118,7 @@ public class TunnelPoolSettings {
         _IPRestriction = DEFAULT_IP_RESTRICTION;
         _unknownOptions = new Properties();
         _randomKey = generateRandomKey();
-        _msgIdBloomXor = RandomSource.getInstance().nextLong();
+        _msgIDBloomXor = RandomSource.getInstance().nextLong();
 
         if (_isExploratory && !_isInbound)
             _priority = EXPLORATORY_PRIORITY;
@@ -290,7 +290,7 @@ public class TunnelPoolSettings {
      */
     public Properties getUnknownOptions() { return _unknownOptions; }
 
-    public long getMsgIdBloomXor() { return _msgIdBloomXor; }
+    public long getMsgIdBloomXor() { return _msgIDBloomXor; }
 
     /**
      *  Defaults in props are NOT honored.

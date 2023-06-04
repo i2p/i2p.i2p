@@ -50,19 +50,21 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
     // must be lower than LIMIT_ROUTERS in StartExplorersJob
     // because exploration does not register a reply job
     private static final int LIMIT_ROUTERS = SystemVersion.isSlow() ? 1000 : 4000;
+    private final long _msgIDBloomXor;
 
     /**
      * @param receivedMessage must never have reply token set if it came down a tunnel
      */
     public HandleFloodfillDatabaseStoreMessageJob(RouterContext ctx, DatabaseStoreMessage receivedMessage,
                                                   RouterIdentity from, Hash fromHash,
-                                                  FloodfillNetworkDatabaseFacade facade) {
+                                                  FloodfillNetworkDatabaseFacade facade, long msgIDBloomXor) {
         super(ctx);
         _log = ctx.logManager().getLog(getClass());
         _message = receivedMessage;
         _from = from;
         _fromHash = fromHash;
         _facade = facade;
+        _msgIDBloomXor = msgIDBloomXor;
     }
     
     public void runJob() {
@@ -417,10 +419,10 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             return;
         }
         if (toUs) {
-            Job send = new SendMessageDirectJob(getContext(), msg, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY);
+            Job send = new SendMessageDirectJob(getContext(), msg, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY, _msgIDBloomXor);
             send.runJob();
             if (msg2 != null) {
-                Job send2 = new SendMessageDirectJob(getContext(), msg2, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY);
+                Job send2 = new SendMessageDirectJob(getContext(), msg2, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY, _msgIDBloomXor);
                 send2.runJob();
             }
             return;
@@ -492,10 +494,10 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                     out2 = tgm2;
                 }
             }
-            Job send = new SendMessageDirectJob(getContext(), out1, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY);
+            Job send = new SendMessageDirectJob(getContext(), out1, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY, _msgIDBloomXor);
             send.runJob();
             if (msg2 != null) {
-                Job send2 = new SendMessageDirectJob(getContext(), out2, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY);
+                Job send2 = new SendMessageDirectJob(getContext(), out2, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY, _msgIDBloomXor);
                 send2.runJob();
             }
             return;

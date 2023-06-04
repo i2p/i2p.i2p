@@ -111,7 +111,7 @@ public class TransportManager implements TransportEventListener {
 
     private static final long UPNP_REFRESH_TIME = UPnP.LEASE_TIME_SECONDS * 1000L / 3;
 
-    private final long _msgIdBloomXor;
+    private final long _msgIDBloomXor;
 
     public TransportManager(RouterContext context) {
         _context = context;
@@ -136,7 +136,7 @@ public class TransportManager implements TransportEventListener {
         _dhThread = (_enableUDP || enableNTCP2) ? new DHSessionKeyBuilder.PrecalcRunner(context) : null;
         // always created, even if NTCP2 is not enabled, because ratchet needs it
         _xdhThread = new X25519KeyFactory(context);
-        _msgIdBloomXor = _context.random().nextLong();
+        _msgIDBloomXor = _context.random().nextLong();
     }
 
     /**
@@ -968,7 +968,7 @@ public class TransportManager implements TransportEventListener {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("I2NPMessage received: " + message.getClass().getSimpleName() /*, new Exception("Where did I come from again?") */ );
         try {
-            _context.inNetMessagePool().add(message, fromRouter, fromRouterHash, _msgIdBloomXor);
+            _context.inNetMessagePool().add(message, fromRouter, fromRouterHash, _msgIDBloomXor);
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Added to in pool");
         } catch (IllegalArgumentException iae) {

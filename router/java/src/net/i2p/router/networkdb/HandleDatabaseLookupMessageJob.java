@@ -45,6 +45,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
     private final DatabaseLookupMessage _message;
     private boolean _replyKeyConsumed;
     private final Hash _us;
+    private final long _msgIDBloomXor;
 
     private final static int MAX_ROUTERS_RETURNED = 3;
     private final static int CLOSENESS_THRESHOLD = 8; // FNDF.MAX_TO_FLOOD + 1
@@ -57,11 +58,12 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
      */
     public final static long EXPIRE_DELAY = 60*60*1000;
     
-    public HandleDatabaseLookupMessageJob(RouterContext ctx, DatabaseLookupMessage receivedMessage, RouterIdentity from, Hash fromHash) {
+    public HandleDatabaseLookupMessageJob(RouterContext ctx, DatabaseLookupMessage receivedMessage, RouterIdentity from, Hash fromHash, long msgIDBloomXor) {
         super(ctx);
         _log = ctx.logManager().getLog(HandleDatabaseLookupMessageJob.class);
         _message = receivedMessage;
         _us = ctx.routerHash();
+        _msgIDBloomXor = msgIDBloomXor;
     }
     
     protected boolean answerAllQueries() { return false; }
@@ -295,7 +297,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Sending reply directly to " + toPeer);
-            Job send = new SendMessageDirectJob(getContext(), message, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY);
+            Job send = new SendMessageDirectJob(getContext(), message, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY, _msgIDBloomXor);
             send.runJob();
             //getContext().netDb().lookupRouterInfo(toPeer, send, null, REPLY_TIMEOUT);
         }
@@ -338,7 +340,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             m.setMessage(message);
             m.setMessageExpiration(message.getMessageExpiration());
             m.setTunnelId(replyTunnel);
-            SendMessageDirectJob j = new SendMessageDirectJob(getContext(), m, toPeer, 10*1000, MESSAGE_PRIORITY);
+            SendMessageDirectJob j = new SendMessageDirectJob(getContext(), m, toPeer, 10*1000, MESSAGE_PRIORITY, _msgIDBloomXor);
             j.runJob();
             //getContext().jobQueue().addJob(j);
         }
