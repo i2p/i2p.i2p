@@ -8,8 +8,6 @@ package net.i2p.router.message;
  *
  */
 
-import java.util.Random;
-
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.i2np.GarlicMessage;
@@ -17,6 +15,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.HandlerJobBuilder;
 import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
+import net.i2p.util.RandomSource;
 
 /**
  * HandlerJobBuilder to build jobs to handle GarlicMessages
@@ -35,9 +34,9 @@ public class GarlicMessageHandler implements HandlerJobBuilder {
     
     public GarlicMessageHandler(RouterContext context) {
         _context = context;
-        _msgIDBloomXorLocal = new Random().nextLong();
-        _msgIDBloomXorRouter = new Random().nextLong();
-        _msgIDBloomXorTunnel = new Random().nextLong();
+        _msgIDBloomXorLocal = RandomSource.getInstance().nextLong();
+        _msgIDBloomXorRouter = RandomSource.getInstance().nextLong();
+        _msgIDBloomXorTunnel = RandomSource.getInstance().nextLong();
     }
 
     public GarlicMessageHandler(RouterContext context, long msgIDBloomXorLocal, long msgIDBloomXorRouter, long msgIDBloomXorTunnel) {

@@ -8,8 +8,6 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
-import java.util.Random;
-
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.i2np.DatabaseStoreMessage;
@@ -17,6 +15,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.HandlerJobBuilder;
 import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
+import net.i2p.util.RandomSource;
 
 /**
  * Create a HandleDatabaseStoreMessageJob whenever a DatabaseStoreMessage arrives
@@ -25,7 +24,7 @@ import net.i2p.router.RouterContext;
 public class FloodfillDatabaseStoreMessageHandler implements HandlerJobBuilder {
     private RouterContext _context;
     private FloodfillNetworkDatabaseFacade _facade;
-    private final long _msgIDBloomXor = new Random().nextLong();
+    private final long _msgIDBloomXor = RandomSource.getInstance().nextLong();
     
     public FloodfillDatabaseStoreMessageHandler(RouterContext context, FloodfillNetworkDatabaseFacade facade) {
         _context = context;

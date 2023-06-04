@@ -1,7 +1,5 @@
 package net.i2p.router.tunnel;
 
-import java.util.Random;
-
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
@@ -25,6 +23,7 @@ import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.message.GarlicMessageReceiver;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.Log;
+import net.i2p.util.RandomSource;
 
 /**
  * When a message arrives at the inbound tunnel endpoint, this distributor
@@ -58,7 +57,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
             _msgIDBloomXor = clienttps.getMsgIdBloomXor();
         } else {
             _clientNickname = "NULL/Expl";
-            _msgIDBloomXor = new Random().nextLong();
+            _msgIDBloomXor = RandomSource.getInstance().nextLong();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Initializing null or exploratory InboundMessageDistributor");
         }
