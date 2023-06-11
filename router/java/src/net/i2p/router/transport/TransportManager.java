@@ -136,7 +136,7 @@ public class TransportManager implements TransportEventListener {
         _dhThread = (_enableUDP || enableNTCP2) ? new DHSessionKeyBuilder.PrecalcRunner(context) : null;
         // always created, even if NTCP2 is not enabled, because ratchet needs it
         _xdhThread = new X25519KeyFactory(context);
-        _msgIDBloomXor = _context.random().nextLong();
+        _msgIDBloomXor = _context.random().nextLong(I2NPMessage.MAX_ID_VALUE);
     }
 
     /**

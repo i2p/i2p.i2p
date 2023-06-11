@@ -8,6 +8,7 @@ import java.util.Properties;
 import net.i2p.data.Base64;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.RandomSource;
@@ -118,7 +119,7 @@ public class TunnelPoolSettings {
         _IPRestriction = DEFAULT_IP_RESTRICTION;
         _unknownOptions = new Properties();
         _randomKey = generateRandomKey();
-        _msgIDBloomXor = RandomSource.getInstance().nextLong();
+        _msgIDBloomXor = RandomSource.getInstance().nextLong(I2NPMessage.MAX_ID_VALUE);
 
         if (_isExploratory && !_isInbound)
             _priority = EXPLORATORY_PRIORITY;

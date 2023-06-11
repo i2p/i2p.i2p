@@ -34,9 +34,9 @@ public class GarlicMessageHandler implements HandlerJobBuilder {
     
     public GarlicMessageHandler(RouterContext context) {
         _context = context;
-        _msgIDBloomXorLocal = RandomSource.getInstance().nextLong();
-        _msgIDBloomXorRouter = RandomSource.getInstance().nextLong();
-        _msgIDBloomXorTunnel = RandomSource.getInstance().nextLong();
+        _msgIDBloomXorLocal = RandomSource.getInstance().nextLong(I2NPMessage.MAX_ID_VALUE);
+        _msgIDBloomXorRouter = RandomSource.getInstance().nextLong(I2NPMessage.MAX_ID_VALUE);
+        _msgIDBloomXorTunnel = RandomSource.getInstance().nextLong(I2NPMessage.MAX_ID_VALUE);
     }
 
     public GarlicMessageHandler(RouterContext context, long msgIDBloomXorLocal, long msgIDBloomXorRouter, long msgIDBloomXorTunnel) {
