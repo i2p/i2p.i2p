@@ -24,7 +24,7 @@ import net.i2p.util.RandomSource;
 public class FloodfillDatabaseStoreMessageHandler implements HandlerJobBuilder {
     private RouterContext _context;
     private FloodfillNetworkDatabaseFacade _facade;
-    private final long _msgIDBloomXor = RandomSource.getInstance().nextLong();
+    private final long _msgIDBloomXor = RandomSource.getInstance().nextLong(I2NPMessage.MAX_ID_VALUE);
     
     public FloodfillDatabaseStoreMessageHandler(RouterContext context, FloodfillNetworkDatabaseFacade facade) {
         _context = context;

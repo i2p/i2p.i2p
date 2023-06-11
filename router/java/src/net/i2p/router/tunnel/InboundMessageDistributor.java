@@ -57,7 +57,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
             _msgIDBloomXor = clienttps.getMsgIdBloomXor();
         } else {
             _clientNickname = "NULL/Expl";
-            _msgIDBloomXor = RandomSource.getInstance().nextLong();
+            _msgIDBloomXor = RandomSource.getInstance().nextLong(I2NPMessage.MAX_ID_VALUE);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Initializing null or exploratory InboundMessageDistributor");
         }

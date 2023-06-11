@@ -13,6 +13,7 @@ import java.util.Set;
 
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterInfo;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -59,7 +60,7 @@ class StartExplorersJob extends JobImpl {
     private static final long MAX_LAG = 100;
     private static final long MAX_MSG_DELAY = 1500;
 
-    private final long _msgIDBloomXor = RandomSource.getInstance().nextLong();
+    private final long _msgIDBloomXor = RandomSource.getInstance().nextLong(I2NPMessage.MAX_ID_VALUE);
     
     public StartExplorersJob(RouterContext context, KademliaNetworkDatabaseFacade facade) {
         super(context);
