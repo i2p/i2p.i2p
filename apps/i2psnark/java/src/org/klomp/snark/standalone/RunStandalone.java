@@ -8,8 +8,6 @@ import java.util.Properties;
 import org.eclipse.jetty.util.log.Log;
 
 import net.i2p.I2PAppContext;
-import net.i2p.app.MenuCallback;
-import net.i2p.app.MenuHandle;
 import net.i2p.apps.systray.UrlLauncher;
 import net.i2p.data.DataHelper;
 import net.i2p.desktopgui.ExternalMain;
@@ -135,22 +133,9 @@ public class RunStandalone {
                 System.setProperty("java.awt.headless", "false");
                 ExternalMain dtg = new ExternalMain(_context, _context.clientAppManager(), null);
                 dtg.startup();
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ie) {}
-                Callback cb = new Callback();
-                MenuHandle mh = dtg.addMenu("i2psnark is running", cb);
-                if (mh == null)
-                    System.out.println("addMenu failed!");
             }
         } catch (Throwable t) {
             t.printStackTrace();
-        }
-    }
-
-    private static class Callback implements MenuCallback {
-        public void clicked(MenuHandle handle) {
-            System.out.println("Clicked! " + handle.getID());
         }
     }
 }
