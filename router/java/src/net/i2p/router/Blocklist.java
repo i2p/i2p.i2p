@@ -147,7 +147,7 @@ public class Blocklist {
         _blocklistFeedFile = new File(BLOCKLIST_FEED_FILE);
         _haveIPv6 = TransportUtil.getIPv6Config(_context, "SSU") != TransportUtil.IPv6Config.IPV6_DISABLED &&
                     Addresses.isConnectedIPv6();
-        _singleIPv6Blocklist = _haveIPv6 ? new LHMCache<BigInteger, Object>(MAX_IPV6_SINGLES) : null;
+        Blocklist = _haveIPv6 ? new LHMCache<BigInteger, Object>(MAX_IPV6_SINGLES) : null;
     }
 
 
@@ -294,7 +294,8 @@ public class Blocklist {
             _singleIPBlocklist.clear();
         }
         synchronized(_singleIPv6Blocklist) {
-            _singleIPv6Blocklist.clear();
+            if (_singleIPv6Blocklist != null)
+                _singleIPv6Blocklist.clear();
         }
     }
 
@@ -895,7 +896,8 @@ public class Blocklist {
      */
     private boolean add(BigInteger ip) {
         synchronized(_singleIPv6Blocklist) {
-            return _singleIPv6Blocklist.put(ip, DUMMY) == null;
+            if (_singleIPv6Blocklist != null)
+                return _singleIPv6Blocklist.put(ip, DUMMY) == null;
         }
     }
 
@@ -905,7 +907,8 @@ public class Blocklist {
      */
     private void remove(BigInteger ip) {
         synchronized(_singleIPv6Blocklist) {
-            _singleIPv6Blocklist.remove(ip);
+            if (_singleIPv6Blocklist != null)
+                _singleIPv6Blocklist.remove(ip);
         }
     }
 
@@ -915,7 +918,8 @@ public class Blocklist {
      */
     private boolean isOnSingleList(BigInteger ip) {
         synchronized(_singleIPv6Blocklist) {
-            return _singleIPv6Blocklist.get(ip) != null;
+            if (_singleIPv6Blocklist != null)
+                return _singleIPv6Blocklist.get(ip) != null;
         }
     }
 
@@ -1361,7 +1365,8 @@ public class Blocklist {
         if (!_haveIPv6)
             return Collections.<BigInteger>emptyList();
         synchronized(_singleIPv6Blocklist) {
-            return new ArrayList<BigInteger>(_singleIPv6Blocklist.keySet());
+            if (_singleIPv6Blocklist != null)
+                return new ArrayList<BigInteger>(_singleIPv6Blocklist.keySet());
         }
     }
 
