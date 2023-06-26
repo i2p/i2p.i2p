@@ -293,9 +293,10 @@ public class Blocklist {
         synchronized(_singleIPBlocklist) {
             _singleIPBlocklist.clear();
         }
-        synchronized(_singleIPv6Blocklist) {
-            if (_singleIPv6Blocklist != null)
+        if (_singleIPv6Blocklist != null) {
+            synchronized(_singleIPv6Blocklist) {
                 _singleIPv6Blocklist.clear();
+            }
         }
     }
 
