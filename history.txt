@@ -1,3 +1,11 @@
+2023-06-28 idk
+ * Cache stores of multihomed leaseSets when stored from multihome peers,
+  and if our local leaseSet is not in the keyspace return the multihome instead
+ * When updating a leaseSet because recieving it as published always make a
+  complete copy of the leaseSet before merging the flags.
+ * Rate-Limit lookups
+ * I2P 2.3.0
+
 2023-05-29 idk
  * adds "virtual contexts" to bloom filter, where each entity that
   passes an i2np message to the bloom filter xor's the messageID with a random, local value.

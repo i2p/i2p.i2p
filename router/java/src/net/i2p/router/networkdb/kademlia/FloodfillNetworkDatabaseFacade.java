@@ -39,7 +39,16 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     private final Set<Hash> _verifiesInProgress;
     private FloodThrottler _floodThrottler;
     private LookupThrottler _lookupThrottler;
+    private LookupThrottler _lookupThrottlerBurst;
+    private LookupThrottler _lookupBanner;
+    private LookupThrottler _lookupBannerBurst;
     private final Job _ffMonitor;
+    private final int BAN_LOOKUP_BASE = 50;
+    private final int BAN_LOOKUP_BASE_INTERVAL = 5*60*1000;
+    private final int BAN_LOOKUP_BURST = 10;
+    private final int BAN_LOOKUP_BURST_INTERVAL = 15*1000;
+    private final int DROP_LOOKUP_BURST = 10;
+    private final int DROP_LOOKUP_BURST_INTERVAL = 30*1000;
 
     /**
      *  This is the flood redundancy. Entries are
@@ -84,6 +93,9 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         super.startup();
         _context.jobQueue().addJob(_ffMonitor);
         _lookupThrottler = new LookupThrottler();
+        _lookupBanner = new LookupThrottler(BAN_LOOKUP_BASE, BAN_LOOKUP_BASE_INTERVAL);
+        _lookupThrottlerBurst = new LookupThrottler(DROP_LOOKUP_BURST, DROP_LOOKUP_BURST_INTERVAL);
+        _lookupBannerBurst = new LookupThrottler(BAN_LOOKUP_BURST, BAN_LOOKUP_BURST_INTERVAL);
 
         boolean isFF = _context.getBooleanProperty(FloodfillMonitorJob.PROP_FLOODFILL_PARTICIPANT);
         long down = _context.router().getEstimatedDowntime();
@@ -180,13 +192,37 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         // of the flooding - instead, send them to a random floodfill peer so *they* can flood 'em out.
         // perhaps statistically adjust this so we are the source every 1/N times... or something.
         if (floodfillEnabled() && (ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)) {
-            flood(ds);
-            if (onSuccess != null) 
-                _context.jobQueue().addJob(onSuccess);
+            //if (!chanceOfFloodingOurOwn(-1)) {
+                flood(ds);
+                if (onSuccess != null)
+                    _context.jobQueue().addJob(onSuccess);
+            //} else {
+            //    _context.jobQueue().addJob(new FloodfillStoreJob(_context, this, key, ds, onSuccess, onFailure, sendTimeout, toIgnore));
+            //} Less sure I should do this this time around. TODO: figure out how this should adjust
         } else {
             _context.jobQueue().addJob(new FloodfillStoreJob(_context, this, key, ds, onSuccess, onFailure, sendTimeout, toIgnore));
         }
     }
+
+    /* TODO: figure out how this should work
+    private boolean chanceOfFloodingOurOwn(int percent) {
+        if (percent < 0) {
+            // make percent equal to 1-peer.failedLookupRate by retrieving it from the stats
+            RateStat percentRate = _context.statManager().getRate("netDb.failedLookupRate");
+            if (percentRate != null)
+                percent = (1-(int)percentRate.getLifetimeAverageValue())*100;
+            else {
+                _log.warn("chanceOfFloodingOurOwn() could not find netDb.failedLookupRate");
+                return false;
+            }
+        }
+        // if the router has been up for at least an hour
+        if (_context.router().getUptime() > 60*60*1000) {
+            // then 30% of the time return true
+            return Math.random() < (percent / 100.0f);
+        }
+        return false;
+    }*/
 
     /**
      *  Increments and tests.
@@ -203,6 +239,21 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     boolean shouldThrottleLookup(Hash from, TunnelId id) {
         // null before startup
         return _lookupThrottler == null || _lookupThrottler.shouldThrottle(from, id);
+    }
+
+    boolean shouldBanLookup(Hash from, TunnelId id) {
+        // null before startup
+        return _lookupBanner == null || _lookupBanner.shouldThrottle(from, id);
+    }
+
+    boolean shouldThrottleBurstLookup(Hash from, TunnelId id) {
+        // null before startup
+        return _lookupThrottler == null || _lookupThrottlerBurst.shouldThrottle(from, id);
+    }
+
+    boolean shouldBanBurstLookup(Hash from, TunnelId id) {
+        // null before startup
+        return _lookupBanner == null || _lookupBannerBurst.shouldThrottle(from, id);
     }
 
     /**

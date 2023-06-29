@@ -31,6 +31,7 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
+import net.i2p.router.message.OutboundCache;
 import net.i2p.router.message.SendMessageDirectJob;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
@@ -90,14 +91,24 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 // somebody has our keys... 
                 // This could happen with multihoming - where it's really important to prevent
                 // storing the other guy's leaseset, it will confuse us badly.
+                LeaseSet ls = (LeaseSet) entry;
                 if (getContext().clientManager().isLocal(key)) {
-                    //getContext().statManager().addRateData("netDb.storeLocalLeaseSetAttempt", 1, 0);
+                    getContext().statManager().addRateData("netDb.storeLocalLeaseSetAttempt", 1, 0);
                     // throw rather than return, so that we send the ack below (prevent easy attack)
                     dontBlamePeer = true;
+                    // store the peer in the outboundCache instead so that we can reply back with it without confusing ourselves.
+                    if (ls.isCurrent(Router.CLOCK_FUDGE_FACTOR / 4)) {
+                        if (_facade.validate(key, ls) == null) {
+                            LeaseSet compareLeasesetDate = getContext().clientMessagePool().getCache().multihomedCache.get(key);
+                            if (compareLeasesetDate == null)
+                                getContext().clientMessagePool().getCache().multihomedCache.put(key, ls);
+                            else if (compareLeasesetDate.getEarliestLeaseDate() < ls.getEarliestLeaseDate())
+                                getContext().clientMessagePool().getCache().multihomedCache.put(key, ls);
+                        }
+                    }
                     throw new IllegalArgumentException("Peer attempted to store local leaseSet: " +
                                                        key.toBase32());
                 }
-                LeaseSet ls = (LeaseSet) entry;
                 //boolean oldrar = ls.getReceivedAsReply();
                 //boolean oldrap = ls.getReceivedAsPublished();
                 // If this was received as a response to a query,
@@ -109,7 +120,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 // receive in response to our own lookups.
                 // See ../HDLMJ for more info
                 if (!ls.getReceivedAsReply())
-                    ls.setReceivedAsPublished(true);
+                    ls.setReceivedAsPublished();
                 //boolean rap = ls.getReceivedAsPublished();
                 //if (_log.shouldLog(Log.INFO))
                 //    _log.info("oldrap? " + oldrap + " oldrar? " + oldrar + " newrap? " + rap);
@@ -162,9 +173,9 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 if (_message.getReceivedAsReply()) {
                     ri.setReceivedAsReply();
                     if (_message.getReplyToken() > 0)
-                        ri.setReceivedAsPublished(true);
+                        ri.setReceivedAsPublished();
                 } else {
-                    ri.setReceivedAsPublished(true);
+                    ri.setReceivedAsPublished();
                 }
             }
             if (_log.shouldInfo()) {

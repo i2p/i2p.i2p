@@ -95,6 +95,15 @@ public class OutboundCache {
      */
     final Map<HashPair, Long> lastReplyRequestCache = new ConcurrentHashMap<HashPair, Long>(64);
 
+
+    /**
+     * This cache is used to keep track of when we recieve a leaseSet from a router
+     * we are multihomed with, or otherwise are asked to store a valid routerInfo for
+     * a destination which we also host.
+     */
+
+    public final ConcurrentHashMap<Hash, LeaseSet> multihomedCache = new ConcurrentHashMap<Hash, LeaseSet>(64);
+
     private final RouterContext _context;
 
     private static final int CLEAN_INTERVAL = 5*60*1000;
