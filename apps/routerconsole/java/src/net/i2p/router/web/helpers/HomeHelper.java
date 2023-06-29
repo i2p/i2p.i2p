@@ -95,8 +95,8 @@ public class HomeHelper extends HelperBase {
         //_x("The Tin Hat") + S + _x("Privacy guides and tutorials") + S + "http://secure.thetinhat.i2p/" + S + I + "thetinhat.png" + S +
         //_x("Ugha's Wiki") + S + S + "http://ugha.i2p/" + S + I + "billiard_marker.png" + S +
         //"sponge.i2p" + S + _x("Seedless and the Robert BitTorrent applications") + S + "http://sponge.i2p/" + S + I + "user_astronaut.png" + S +
-        "notbob.i2p" + S + _x("Not Bob's Address Servies") + S + "http://notbob.i2p/" + S + I + "notbob.png" + S +
-        "[Ramble]" + S + _x("Ramble user-moderated forum aggregator") + S + "http://ramble.i2p/" + S + I + "notbob.png" + S +
+        "notbob.i2p" + S + _x("Not Bob's Address Servies") + S + "http://notbob.i2p/" + S + I + "notblob.png" + S +
+        "[Ramble]" + S + _x("Ramble user-moderated forum aggregator") + S + "http://ramble.i2p/" + S + I + "ramble.png" + S +
         "";
 
     // No commas allowed in text strings!
