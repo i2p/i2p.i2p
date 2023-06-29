@@ -889,7 +889,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      * @throws UnsupportedCryptoException if that's why it failed.
      * @return reason why the entry is not valid, or null if it is valid
      */
-    private String validate(Hash key, LeaseSet leaseSet) throws UnsupportedCryptoException {
+    public String validate(Hash key, LeaseSet leaseSet) throws UnsupportedCryptoException {
         if (!key.equals(leaseSet.getHash())) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Invalid store attempt! key does not match leaseSet.destination!  key = "
@@ -981,18 +981,31 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             if (rv != null && rv.getEarliestLeaseDate() >= leaseSet.getEarliestLeaseDate()) {
                 if (_log.shouldDebug())
                     _log.debug("Not storing older " + key);
-                // if it hasn't changed, no need to do anything
-                // except copy over the flags
-                Hash to = leaseSet.getReceivedBy();
-                if (to != null) {
-                    rv.setReceivedBy(to);
-                } else if (leaseSet.getReceivedAsReply()) {
-                    rv.setReceivedAsReply();
-                }
-                if (leaseSet.getReceivedAsPublished()) {
-                    rv.setReceivedAsPublished(true);
-                }
-                return rv;
+                // TODO: Determine if this deep equals is actually truly necessary as part of this test or if the date is actually enough
+                if (rv.equals(leaseSet)) {
+                    if (_log.shouldDebug())
+                        _log.debug("Updating leaseSet found in Datastore " + key);
+                    /** - DatabaseEntry.java note
+                     * we used to just copy the flags here but due to concerns about crafted
+                     * entries being used to "follow" a leaseSet from one context to another,
+                     * i.e. sent to a client vs sent to a router. Copying the entire leaseSet,
+                     * flags and all, limits the ability of the attacker craft leaseSet entries
+                     * maliciously.
+                     */
+                    _ds.put(key, leaseSet);
+                    rv = (LeaseSet)_ds.get(key);
+                    Hash to = leaseSet.getReceivedBy();
+                    if (to != null) {
+                        rv.setReceivedBy(to);
+                    } else if (leaseSet.getReceivedAsReply()) {
+                        rv.setReceivedAsReply();
+                    }
+                    if (leaseSet.getReceivedAsPublished()) {
+                        rv.setReceivedAsPublished();
+                    }
+                    return rv;
+                }// TODO: Is there any reason to do anything here, if the fields are somehow unequal?
+                // Like, is there any case where this is not true? I don't think it's possible for it to be.
             }
         } catch (ClassCastException cce) {
             throw new IllegalArgumentException("Attempt to replace RI with " + leaseSet);

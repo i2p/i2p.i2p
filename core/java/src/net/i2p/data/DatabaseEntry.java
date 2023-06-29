@@ -263,12 +263,20 @@ public abstract class DatabaseEntry extends DataStructureImpl {
      *
      * @since 0.9.58 moved up from LeaseSet
      */
-    public boolean getReceivedAsPublished() { return _receivedAsPublished; }
+    public boolean getReceivedAsPublished() { 
+        return _receivedAsPublished;
+    }
 
     /**
      * @since 0.9.58 moved up from LeaseSet
+     * 
+     * use this carefully, when updating the flags make sure the old and new
+     * leaseSet are actually equivalent, or simply copy over the reply value,
+     * see KademliaNetworkDatabaseFacade.java line 997 for more information.
      */
-    public void setReceivedAsPublished(boolean received) { _receivedAsPublished = received; }
+    public void setReceivedAsPublished() {
+        _receivedAsPublished = true; 
+    }
 
     /**
      * If true, we received this LeaseSet by searching for it
@@ -276,12 +284,16 @@ public abstract class DatabaseEntry extends DataStructureImpl {
      *
      * @since 0.7.14, moved up from LeaseSet in 0.9.58
      */
-    public boolean getReceivedAsReply() { return _receivedAsReply; }
+    public boolean getReceivedAsReply() {
+        return _receivedAsReply; 
+    }
 
     /**
      * set to true
      *
      * @since 0.7.14, moved up from LeaseSet in 0.9.58
      */
-    public void setReceivedAsReply() { _receivedAsReply = true; }
+    public void setReceivedAsReply() {
+        _receivedAsReply = true;
+    }
 }

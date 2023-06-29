@@ -48,14 +48,39 @@ public class FloodfillDatabaseLookupMessageHandler implements HandlerJobBuilder 
         _context.statManager().addRateData("netDb.lookupsReceived", 1);
 
         DatabaseLookupMessage dlm = (DatabaseLookupMessage)receivedMessage;
-        if (!_facade.shouldThrottleLookup(dlm.getFrom(), dlm.getReplyTunnel())) {
+
+        if (_facade.shouldBanLookup(dlm.getFrom(), dlm.getReplyTunnel())) {
+            if (_log.shouldLog(Log.WARN)) {
+                _log.warn("Possibly throttling " + dlm.getSearchType() + " lookup request for " + dlm.getSearchKey() + " because requests are being sent extremely fast, reply was to: " + dlm.getFrom() + " tunnel: " + dlm.getReplyTunnel());    
+                _context.statManager().addRateData("netDb.repeatedLookupsDropped", 1);
+            }
+            /* 
+             * We don't do this yet, but we do ban routers who do much faster bursts of lookups
+             * _context.banlist().banlistRouter(dlm.getFrom(), " <b>➜</b> Excessive lookup requests", null, null, _context.clock().now() + 4*60*60*1000);
+             * _context.commSystem().mayDisconnect(dlm.getFrom());
+             * _context.statManager().addRateData("netDb.lookupsDropped", 1);
+             * return null;
+             */
+        }
+        if (_facade.shouldBanBurstLookup(dlm.getFrom(), dlm.getReplyTunnel())) {
+            if (_log.shouldLog(Log.WARN)) {
+                _log.warn("Banning " + dlm.getSearchType() + " lookup request for " + dlm.getSearchKey() + " because requests are being sent extremely fast in a very short time, reply was to: " + dlm.getFrom() + " tunnel: " + dlm.getReplyTunnel());    
+                _context.statManager().addRateData("netDb.repeatedBurstLookupsDropped", 1);
+            }
+            _context.banlist().banlistRouter(dlm.getFrom(), " <b>➜</b> Excessive lookup requests, burst", null, null, _context.clock().now() + 4*60*60*1000);
+            _context.commSystem().mayDisconnect(dlm.getFrom());
+            _context.statManager().addRateData("netDb.lookupsDropped", 1);
+            return null;
+        }
+        if ((!_facade.shouldThrottleLookup(dlm.getFrom(), dlm.getReplyTunnel()) && !_facade.shouldThrottleBurstLookup(dlm.getFrom(), dlm.getReplyTunnel())) 
+            || _context.routerHash().equals(dlm.getFrom())) {
             Job j = new HandleFloodfillDatabaseLookupMessageJob(_context, dlm, from, fromHash, _msgIDBloomXor);
             //if (false) {
             //    // might as well inline it, all the heavy lifting is queued up in later jobs, if necessary
             //    j.runJob();
             //    return null;
             //} else {                
-                return j;
+            return j;
             //}
         } else {
             if (_log.shouldLog(Log.WARN)) 
