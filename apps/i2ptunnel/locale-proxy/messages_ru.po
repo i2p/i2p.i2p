@@ -17,15 +17,16 @@
 # ValdikSS <iam@valdikss.org.ru>, 2017,2019-2021
 # brianhopes <voganc-12@live.ru>, 2015
 # yume, 2014-2015
+# Артём Котлубай <artemkotlubai@yandex.ru>, 2023
 # Василий Суматохин <basilbasilbasil@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
-"PO-Revision-Date: 2021-02-14 21:16+0000\n"
-"Last-Translator: ValdikSS <iam@valdikss.org.ru>\n"
-"Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
+"PO-Revision-Date: 2013-07-20 14:50+0000\n"
+"Last-Translator: Артём Котлубай <artemkotlubai@yandex.ru>, 2023\n"
+"Language-Team: Russian (Russia) (http://app.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -127,7 +128,7 @@ msgstr "Возможно, сайт отключен, сеть перегруже
 #: ../java/build/Proxy.java:109 ../java/build/Proxy.java:129
 #, java-format
 msgid "You may want to {0}retry{1}."
-msgstr "Вы можете {0}повторить{1} операцию."
+msgstr "Вы можете {0}повторить{1} действие."
 
 #: ../java/build/Proxy.java:15 ../java/build/Proxy.java:27
 #: ../java/build/Proxy.java:48 ../java/build/Proxy.java:59
@@ -158,7 +159,7 @@ msgstr "Внешний прокси, вероятно, выключен, но т
 msgid ""
 "You may want to {0}retry{1} as this will randomly reselect an outproxy from "
 "the pool you have defined {2}here{3} (if you have more than one configured)."
-msgstr "Вы можете {0}повторить{1} операцию (это случайным образом выберет прокси-сервер из определенного {2}здесь{3} списка, если вы настроили более одного прокси-сервера)."
+msgstr "Вы можете {0}повторить{1} операцию (это случайным образом выберет прокси-сервер из определённого {2}здесь{3} списка, если вы настроили более одного прокси-сервера)."
 
 #: ../java/build/Proxy.java:26 ../java/build/Proxy.java:170
 #: ../java/build/Proxy.java:195 ../java/build/Proxy.java:216
@@ -170,17 +171,17 @@ msgstr "Если проблема продолжит появляться, вы 
 
 #: ../java/build/Proxy.java:28
 msgid "Information: New Host Name"
-msgstr "Информация: Новый доменный адрес"
+msgstr "Сведения: Новый доменный адрес"
 
 #: ../java/build/Proxy.java:34
 msgid "Information: New Host Name with Address Helper"
-msgstr "Информация: Новый доменный адрес с AddressHelper"
+msgstr "Сведения: новый доменный адрес от адресного помощника"
 
 #: ../java/build/Proxy.java:35
 msgid ""
 "The address helper link you followed is for a new host name that is not in "
 "your address book."
-msgstr "Ссылка AddressHelper, по которой вы прошли, ведет на домен, не внесенный в адресную книгу."
+msgstr "Ссылка адресного помощника, по которой вы перешли, ведёт на домен, не внесённый в адресную книгу."
 
 #: ../java/build/Proxy.java:36
 msgid "You may save this host name to your local address book."
@@ -210,7 +211,7 @@ msgstr "Локальный адрес назначения"
 
 #: ../java/build/Proxy.java:47
 msgid "The Base32 address is invalid."
-msgstr "Некорректный адрес Base32."
+msgstr "Недействительный адрес Base32."
 
 #: ../java/build/Proxy.java:56
 msgid "The website was not reachable, because its lease set was not found."
@@ -223,25 +224,25 @@ msgstr "Сайт, вероятно, выключен, но также возмо
 
 #: ../java/build/Proxy.java:60 ../java/build/Proxy.java:66
 msgid "Warning: Invalid Request URI"
-msgstr "Предупреждение: Некорректный URI запроса"
+msgstr "Предупреждение: недействительный адрес запроса"
 
 #: ../java/build/Proxy.java:67
 msgid "The request URI is invalid, and probably contains illegal characters."
-msgstr "Некорректный URI запроса. Возможно, он содержит недопустимые символы."
+msgstr "Недействительный адрес запроса. Возможно, он содержит недопустимые символы."
 
 #: ../java/build/Proxy.java:68
 msgid ""
 "If you clicked a link, check the end of the URI for any characters the "
 "browser has mistakenly added on."
-msgstr "Если вы прошли по ссылке, проверьте конец URI на наличие символов, ошибочно добавленных браузером."
+msgstr "Если вы прошли по ссылке, проверьте конец адреса на наличие символов, ошибочно добавленных браузером."
 
 #: ../java/build/Proxy.java:69
 msgid "Error: Request Denied"
-msgstr "Ошибка: Отказ в выполнении запроса"
+msgstr "Ошибка: отказ в выполнении запроса"
 
 #: ../java/build/Proxy.java:75
 msgid "Error: Local Access"
-msgstr "Ошибка: Локальный адрес"
+msgstr "Ошибка: локальный адрес"
 
 #: ../java/build/Proxy.java:76
 msgid "Your browser is misconfigured."
@@ -263,7 +264,7 @@ msgstr "Сайт не найден в адресной книге"
 
 #: ../java/build/Proxy.java:85
 msgid "The website was not found in your router's addressbook."
-msgstr "Сайт не найден в вашей адресной книге маршрутизатора."
+msgstr "Сайт не найден в адресной книге маршрутизатора."
 
 #: ../java/build/Proxy.java:86
 msgid "Check the link or find a Base 32 or Base 64 address."
@@ -285,7 +286,7 @@ msgstr "В противном случае найдите ссылку Base32 и
 msgid ""
 "Seeing this page often? See {0}the FAQ{1} for help in {2}adding some "
 "subscriptions{3} to your addressbook."
-msgstr "Если вы слишком часто попадаете на эту страницу, то обратитесь к {0}FAQ{1} за инструкциями по {2}добавлению подписок{3} адресной книги."
+msgstr "Если вы слишком часто попадаете на эту страницу, то обратитесь к {0}ЧАВО{1} за инструкциями по {2}добавлению подписок{3} адресной книги."
 
 #: ../java/build/Proxy.java:98
 msgid ""
@@ -320,7 +321,7 @@ msgstr "Внимание: требуется авторизация"
 msgid ""
 "The website destination specified was not valid, or was otherwise "
 "unreachable."
-msgstr "Указанный адрес сайт недействителен или недоступен."
+msgstr "Указанный адрес сайта недействителен или недоступен."
 
 #: ../java/build/Proxy.java:127
 msgid ""
@@ -330,11 +331,11 @@ msgstr "Возможно, вы вставили неправильную стр�
 
 #: ../java/build/Proxy.java:128
 msgid "The I2P host could also be offline."
-msgstr "Сайт I2P также может быть отключен."
+msgstr "Сайт I2P также может быть отключён."
 
 #: ../java/build/Proxy.java:131 ../java/build/Proxy.java:137
 msgid "Warning: No Outproxy Configured"
-msgstr "Предупреждение: Выходной прокси-сервер не настроен"
+msgstr "Предупреждение: выходной прокси-сервер не настроен"
 
 #: ../java/build/Proxy.java:138
 msgid ""
@@ -348,13 +349,13 @@ msgstr "Пожалуйста, настройте выходной прокси-�
 
 #: ../java/build/Proxy.java:140 ../java/build/Proxy.java:146
 msgid "Warning: Destination Key Conflict"
-msgstr "Предупреждение: Конфликт ключа назначения"
+msgstr "Предупреждение: конфликт ключа назначения"
 
 #: ../java/build/Proxy.java:147
 msgid ""
 "The address helper link you followed specifies a different destination key "
 "than the entry in your address book."
-msgstr "Ссылка Address Helper, по которой вы прошли, определяет ключ назначения, отличный от указанного в адресной книге."
+msgstr "Ссылка адресного помощника, по которой вы перешли, определяет ключ назначения, отличный от указанного в адресной книге."
 
 #: ../java/build/Proxy.java:148
 msgid ""
@@ -371,7 +372,7 @@ msgstr "Для разрешения конфликта определите, к�
 
 #: ../java/build/Proxy.java:150 ../java/build/Proxy.java:156
 msgid "Warning: Bad Address Helper"
-msgstr "Предупреждение: Некорректный AddressHelper"
+msgstr "Предупреждение: недействительный адресный помощник"
 
 #: ../java/build/Proxy.java:157
 #, java-format
@@ -396,7 +397,7 @@ msgstr "HTTP-прокси не поднят"
 msgid ""
 "It is offline, there is network congestion, or your router is not yet well-"
 "integrated with peers."
-msgstr "Возможно, он отключен, сеть перегружена или ваш маршрутизатор недостаточно интегрирован с другими узлами."
+msgstr "Возможно, он отключён, сеть перегружена или ваш маршрутизатор недостаточно интегрирован с другими узлами."
 
 #: ../java/build/Proxy.java:172 ../java/build/Proxy.java:178
 msgid "Warning: Request Denied"
@@ -493,11 +494,11 @@ msgstr "Назначение {0} в адресной книге"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:777
 msgid "Conflicting address helper destination"
-msgstr "Конфликтующие назначения address helper"
+msgstr "Конфликтующие назначения адресного помощника"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1224
 msgid "Corrupt Base32 address"
-msgstr "Адрес Base32 поврежден"
+msgstr "Адрес Base32 повреждён"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1304
 msgid "Destination lease set not found"
@@ -631,11 +632,11 @@ msgstr "Требуется ввести пароль, предоставленн
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:196
 #, java-format
 msgid "Added via address helper from {0}"
-msgstr "Добавлено через address helper из {0}"
+msgstr "Добавлено через адресного помощника из {0}"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:198
 msgid "Added via address helper"
-msgstr "Добавлен через address helper"
+msgstr "Добавлен через адресного помощника"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:235
 msgid "Missing lookup password"
@@ -680,7 +681,7 @@ msgstr "локальный"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:349
 msgid "private"
-msgstr "приватная"
+msgstr "Личная"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:362
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:396

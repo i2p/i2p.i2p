@@ -12,14 +12,15 @@
 # Roman Azarenko <x12ozmouse@ya.ru>, 2013
 # sr4d <sr4d@bitmessage.ch>, 2014
 # varnav, 2013
+# Артём Котлубай <artemkotlubai@yandex.ru>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-10-06 13:42+0000\n"
-"PO-Revision-Date: 2020-07-24 10:25+0000\n"
-"Last-Translator: Irina Fedulova <istartlin@gmail.com>\n"
-"Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
+"PO-Revision-Date: 2012-12-22 15:05+0000\n"
+"Last-Translator: Артём Котлубай <artemkotlubai@yandex.ru>, 2023\n"
+"Language-Team: Russian (Russia) (http://app.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -34,12 +35,12 @@ msgstr "Не удалось загрузить оболочку"
 #: ../i2prouter:1139
 #, sh-format
 msgid "$APP_LONG_NAME is already running."
-msgstr "Приложение \"$APP_LONG_NAME\" уже запущено."
+msgstr "Приложение «$APP_LONG_NAME» уже запущено."
 
 #: ../i2prouter:999
 #, sh-format
 msgid "Running $APP_LONG_NAME"
-msgstr "Приложение \"$APP_LONG_NAME\" запущено"
+msgstr "Приложение «$APP_LONG_NAME» запущено"
 
 #: ../i2prouter:1023
 #, sh-format
@@ -53,32 +54,32 @@ msgstr "Внимание: возможно, не удалось запустит
 
 #: ../i2prouter:1084 ../i2prouter:1112 ../i2prouter:1318 ../i2prouter:1607
 msgid "Must be root to perform this action."
-msgstr "Для выполнения этого действия необходимо быть root-пользователем."
+msgstr "Для выполнения этого действия необходимо быть суперпользователем."
 
 #: ../i2prouter:1128
 #, sh-format
 msgid "Starting $APP_LONG_NAME"
-msgstr "Запуск приложения \"$APP_LONG_NAME\""
+msgstr "Запуск приложения «$APP_LONG_NAME»"
 
 #: ../i2prouter:1150
 #, sh-format
 msgid "Stopping $APP_LONG_NAME"
-msgstr "Остановка приложения \"$APP_LONG_NAME\""
+msgstr "Остановка приложения «$APP_LONG_NAME»"
 
 #: ../i2prouter:1154 ../i2prouter:1222 ../i2prouter:1775
 #, sh-format
 msgid "$APP_LONG_NAME was not running."
-msgstr "Приложение \"$APP_LONG_NAME\" не было запущено."
+msgstr "Приложение «$APP_LONG_NAME» не было запущено."
 
 #: ../i2prouter:1167 ../i2prouter:1175 ../i2prouter:1237 ../i2prouter:1245
 #, sh-format
 msgid "Unable to stop $APP_LONG_NAME."
-msgstr "Невозможно остановить приложение \"$APP_LONG_NAME\"."
+msgstr "Невозможно остановить приложение «$APP_LONG_NAME»."
 
 #: ../i2prouter:1193
 #, sh-format
 msgid "Waiting for $APP_LONG_NAME to exit"
-msgstr "Ожидание завершения работы приложения \"$APP_LONG_NAME\""
+msgstr "Ожидание завершения работы приложения «$APP_LONG_NAME»"
 
 #: ../i2prouter:1207
 #, sh-format
@@ -115,33 +116,33 @@ msgstr "$APP_LONG_NAME запущено: PID:$pid, Оболочка:$STATUS, Jav
 #: ../i2prouter:1516 ../i2prouter:1554 ../i2prouter:1589
 #, sh-format
 msgid "The $APP_LONG_NAME daemon is already installed."
-msgstr "Демон $APP_LONG_NAME уже установлен."
+msgstr "Служба $APP_LONG_NAME уже установлена."
 
 #: ../i2prouter:1328 ../i2prouter:1343 ../i2prouter:1445 ../i2prouter:1477
 #: ../i2prouter:1491 ../i2prouter:1505 ../i2prouter:1519 ../i2prouter:1557
 #: ../i2prouter:1592
 #, sh-format
 msgid "Installing the $APP_LONG_NAME daemon"
-msgstr "Установка демона $APP_LONG_NAME"
+msgstr "Установка службы $APP_LONG_NAME"
 
 #: ../i2prouter:1599
 #, sh-format
 msgid "Install not currently supported for $DIST_OS"
-msgstr "В данный момент установка на $DIST_OS не поддерживается"
+msgstr " установка на $DIST_OS пока что не поддерживается"
 
 #: ../i2prouter:1615 ../i2prouter:1628 ../i2prouter:1642 ../i2prouter:1651
 #: ../i2prouter:1661 ../i2prouter:1685 ../i2prouter:1698 ../i2prouter:1710
 #: ../i2prouter:1728 ../i2prouter:1741 ../i2prouter:1755
 #, sh-format
 msgid "Removing $APP_LONG_NAME daemon"
-msgstr "Удаляется демон $APP_LONG_NAME"
+msgstr "Удаляется служба $APP_LONG_NAME"
 
 #: ../i2prouter:1621 ../i2prouter:1636 ../i2prouter:1645 ../i2prouter:1655
 #: ../i2prouter:1666 ../i2prouter:1679 ../i2prouter:1691 ../i2prouter:1704
 #: ../i2prouter:1722 ../i2prouter:1735 ../i2prouter:1749 ../i2prouter:1760
 #, sh-format
 msgid "The $APP_LONG_NAME daemon is not currently installed."
-msgstr "$APP_LONG_NAME демон сейчас не установлен."
+msgstr "$APP_LONG_NAME служба сейчас не установлена."
 
 #: ../i2prouter:1764
 #, sh-format
@@ -158,11 +159,11 @@ msgstr "Запустить в текущей консоли."
 
 #: ../i2prouter:1853
 msgid "Start in the background as a daemon process."
-msgstr "Запустить в фоне как демона."
+msgstr "Запустить в фоне как службу."
 
 #: ../i2prouter:1854
 msgid "Stop if running as a daemon or in another console."
-msgstr "Остановить, если демон запущен в другой консоли."
+msgstr "Остановить, если служба запущена в другой консоли."
 
 #: ../i2prouter:1855
 msgid "Stop gracefully, may take up to 11 minutes."
@@ -178,7 +179,7 @@ msgstr "Перезапустить только если уже запущен."
 
 #: ../i2prouter:1858
 msgid "Query the current status."
-msgstr "Текущий статус очереди."
+msgstr "Текущее состояние очереди."
 
 #: ../i2prouter:1859
 msgid "Install to start automatically when system boots."
@@ -198,8 +199,8 @@ msgstr "Пожалуйста, отредактируйте i2prouter и уста
 
 #: ../i2prouter:1879
 msgid "Running I2P as the root user is *not* recommended."
-msgstr "Запускать I2P от имени root'а *НЕ* рекомендуется."
+msgstr "Запускать I2P от суперпользователя *НЕ* желательно"
 
 #: ../i2prouter:1882
 msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
-msgstr "Чтобы всё равно запустить под root'ом, отредактируйте i2prouter и установите ALLOW_ROOT=true."
+msgstr "Чтобы всё равно запустить от суперпользователя, отредактируйте i2prouter и установите ALLOW_ROOT=true."

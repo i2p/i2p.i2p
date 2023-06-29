@@ -4,15 +4,15 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2013,2018-2022
+# Kaya Zeren <kayazeren@gmail.com>, 2013,2018-2023
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-10-06 13:42+0000\n"
-"PO-Revision-Date: 2022-02-03 06:03+0000\n"
-"Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
-"Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
+"PO-Revision-Date: 2012-12-22 15:05+0000\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2013,2018-2023\n"
+"Language-Team: Turkish (Turkey) (http://app.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -151,7 +151,7 @@ msgstr "Geçerli panoda başlat."
 
 #: ../i2prouter:1853
 msgid "Start in the background as a daemon process."
-msgstr "Arka plan hizmeti olarak başlatın."
+msgstr "Arka plan hizmeti olarak başlat."
 
 #: ../i2prouter:1854
 msgid "Stop if running as a daemon or in another console."
@@ -159,19 +159,19 @@ msgstr "Arka plan hizmeti olarak ya da başka bir panoda çalışıyorsa durdur.
 
 #: ../i2prouter:1855
 msgid "Stop gracefully, may take up to 11 minutes."
-msgstr "Uygun şekilde kapatın. 11 dakika sürebilir."
+msgstr "Uygun şekilde kapat. 11 dakika sürebilir."
 
 #: ../i2prouter:1856
 msgid "Stop if running and then start."
-msgstr "Çalışıyorsa durdurun ve başlatın."
+msgstr "Çalışıyorsa durdur ve başlat."
 
 #: ../i2prouter:1857
 msgid "Restart only if already running."
-msgstr "Yalnızca zaten çalışıyorsa yeniden başlatın."
+msgstr "Yalnızca zaten çalışıyorsa yeniden başlat."
 
 #: ../i2prouter:1858
 msgid "Query the current status."
-msgstr "Geçerli durumu öğrenin."
+msgstr "Geçerli durumu görüntüle."
 
 #: ../i2prouter:1859
 msgid "Install to start automatically when system boots."
@@ -179,11 +179,11 @@ msgstr "Sistem açılırken otomatik yüklenecek şekilde kur."
 
 #: ../i2prouter:1860
 msgid "Uninstall."
-msgstr "Kaldırın."
+msgstr "Kaldır."
 
 #: ../i2prouter:1861
 msgid "Request a Java thread dump if running."
-msgstr "Çalışıyorsa Java iş parçacığı dökümü isteyin."
+msgstr "Çalışıyorsa Java iş parçacığı dökümünü iste."
 
 #: ../i2prouter:1874
 msgid "Please edit i2prouter and set the variable RUN_AS_USER"

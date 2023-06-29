@@ -13,7 +13,7 @@ msgstr ""
 "POT-Creation-Date: 2023-03-06 14:52+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2015-2023\n"
-"Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
+"Language-Team: Turkish (Turkey) (http://app.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1332,7 +1332,7 @@ msgstr "Daraltılabilir panolar"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2653
 msgid "Your browser does not support this feature."
-msgstr "Web tarayıcınız bu özelliği desteklemiyor."
+msgstr "Tarayıcınız bu özelliği desteklemiyor."
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2656
 msgid ""
@@ -1503,7 +1503,7 @@ msgstr "Ad"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2912
 msgid "Website URL"
-msgstr "Web sitesi adresi"
+msgstr "Site adresi"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2920
 msgid "Announce URL"
@@ -1564,7 +1564,7 @@ msgstr "İzleyici listesi"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3391
 msgid "Web Seeds"
-msgstr "Web tohumları"
+msgstr "İnternet tohumları"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3413
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4469

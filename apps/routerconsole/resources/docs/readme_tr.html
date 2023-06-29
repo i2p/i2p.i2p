@@ -6,90 +6,90 @@
 I2P uygulamasını yeni başlattıysanız, sol taraftaki panoda<i>Eşler</i> bölümü altında görüntülenen <i>Etkin eş sayısı</i> bir kaç dakika içinde artmaya başlamalıdır. 
 Yönelticiniz hazır olduğunda, orada listelenen <i>Paylaşılmış istemciler</i> adında bir <i>Yerel tünel</i> ile diğer istemci ve sunucuları görebilirsiniz.
 Bunları göremiyorsanız <a href="#trouble">sorun çözme bölümüne</a> bakabilirsiniz. 
-Bu <i>Yerel tüneller</i> I2P ağıyla bağlantılar kurarak, bittorrent, e-posta, web vekil sunucusu ve diğer hizmetlerinizin çalışmasını sağlar. 
-Ağdaki bilinen tüm eşleri <a href="/netdb">"Ağ veritabanı" (NetDB)</a> bölümünde görebilirsiniz. 
+Bu <i>Yerel tüneller</i> I2P ağıyla bağlantılar kurarak, bittorrent, e-posta, internet vekil sunucusu ve diğer hizmetlerinizin çalışmasını sağlar. 
+Ağdaki bilinen tüm eşleri <a href="/netdb">"Ağ veri tabanı" (NetDB)</a> bölümünde görebilirsiniz. 
 Bunlara ek olarak, var olan <a href="/peers">Eş bağlantılarını</a> izleyebilir ve var olan <a href="/tunnels">Tüneller</a> ile durumlarını görebilirsiniz. 
 Ayrıntılı bilgi almak için <a href="/help">yardım sayfasına</a> bakabilirsiniz.</li>
 
 <li>
-<b>Ağ Bütünleştirmesi</b><br>
+<b>Ağ bütünleştirmesi</b><br>
 I2P uygulamasını başlattığınızda, yönelticinizin ağ ile bağlantı kurması (bütünleşmesi) ve diğer eşleri bulması bir kaç dakika sürer. Bu nedenle sabırlı olun. 
 I2P başladıktan sonra ve normal çalışırken, yan panodaki I2P tünel oluşturma göstergesinde "Tüneller Reddediliyor" iletisini görebilirsiniz. Bu durum normaldir.
 <i>Yerel Tünellerinizin</i> yanında yeşil daireler göründüğünde I2P ile pek çok şey yapabilirsiniz. Bunlardan bazılarını aşağıda anlatacağız.</li>
 
 </ul>
-<h3>I2P Hizmetleri</h3>
+<h3>I2P hizmetleri</h3>
 
 <ul class="links">
 <li>
-<b>Gizli Hizmetler ve Herkese Açık Web Taraması</b><br>
-I2P üzerinden gizli hizmet web sitelerine ("I2P siteleri") ve diğer hizmetlere erişebilir ve kendi hizmetlerinizi sunabilirsiniz. 
-I2P içindeki vekil sunucuyu (çıkış vekil sunucusu) kullanarak normal web sitelerine anonim olarak erişebilirsiniz. 
-<a href="https://geti2p.net/en/about/browser-config" target="_blank">Web tarayıcınızın yapılandırma ayarlarından</a> HTTP vekil sunucusunu <code>127.0.0.1 bağlantı noktası 4444</code> olarak ayarladıktan sonra, bir I2P sitesine ya da <code>http://</code> ya da <code>https://</code>adresiyle bir web sitesine bakın. 
-Normal İnternet bağlantısını kurarken çıkış sunucusu erişimini devre dışı bırakmak isterseniz, <code>false.i2p</code> dosyasında <i>Outproxies</i> bölümü altındaki çıkış sunucusu (outproxy) kaydını <a href="/i2ptunnel/edit?tunnel=0" target="_blank">I2P HTTP Vekil Sunucu Tünel Düzenleyici</a>değiştirin ya da silin. 
-<a href="#eepsites">Aşağıdaki</a> "İlginç Siteler" bölümünde I2P üzerinden sunulan bir kaç örnek site bulabilirsiniz.<br>
+<b>Gizli hizmetler ve herkese açık internet taraması</b><br>
+I2P üzerinden gizli hizmet sitelerine ("I2P siteleri") ve diğer hizmetlere erişebilir ve kendi hizmetlerinizi sunabilirsiniz. 
+I2P içindeki vekil sunucuyu (çıkış vekil sunucusu) kullanarak normal sitelere anonim olarak erişebilirsiniz. 
+<a href="https://geti2p.net/en/about/browser-config" target="_blank">Tarayıcınızın yapılandırma ayarlarından</a> HTTP vekil sunucusunu <code>127.0.0.1 bağlantı noktası 4444</code> olarak ayarladıktan sonra, bir I2P sitesine ya da <code>http://</code> ya da <code>https://</code>adresiyle bir siteye bakın. 
+Normal internet bağlantısını kurarken çıkış sunucusu erişimini devre dışı bırakmak isterseniz, <code>false.i2p</code> dosyasında <i>Outproxies</i> bölümü altındaki çıkış sunucusu (outproxy) kaydını <a href="/i2ptunnel/edit?tunnel=0" target="_blank">I2P HTTP vekil sunucu tünel düzenleyici</a> ile değiştirin ya da silin. 
+<a href="#eepsites">Aşağıdaki</a> "İlginç siteler" bölümünde I2P üzerinden sunulan bir kaç örnek site bulabilirsiniz.<br>
 Ayrıca I2P için bazı yarı resmi ya da resmi olmayan tarama araçları geliştirme girişimi var. Bazı örnekler;
 <a href="https://geti2p.net/en/download/firefox">önceden hazırlanmış Firefox tarayıcı profili</a>,
-<a href="http://idk.i2p/I2P-in-Private-Browsing-Mode-Firefox">kolay kurulan bir web eklentisi</a> ya da
+<a href="http://idk.i2p/I2P-in-Private-Browsing-Mode-Firefox">kolay kurulan bir internet eklentisi</a> ya da
 <a href="https://www.whonix.org/wiki/I2P">Whonix gibi kişisel gizliliğin sağlanmasına odaklanmış Linux dağıtımları için otomatik başlatıcılar</a>.
 Bunlar ilginç projeler olsa da, kendi güvenliğiniz için, karşı karşıya bulunduğunuz tehdit modeline uygun
 olup olmadıklarını anlamak için denedikten sonra kullanmaya karar verin.
 </li>
 
 <li>
-<b>Anonim E-posta Kullanımı</b><br>
+<b>Anonim e-posta kullanımı</b><br>
 Postman I2P temelli posta sistemine <a href="/webmail">I2P içindeki posta istemcisini</a> ya da herhangi bir dış posta istemcisi kullanılarak erişilebilir. 
 Hesaplar normal İnternet üzerindeki gibi e-posta gönderip alabilir. 
 Bir hesap edinmek için <a href="http://hq.postman.i2p/" target="_blank">hq.postman.i2p</a> adresine bakabilirsiniz.</li>
 
 <li>
-<b>Anonim Dosya Aktarımı</b><br><a href="/torrents">I2PSnark</a> I2P ile bütünleşik olarak, anonim ve şifrelenmiş BitTorrent aktarımlarının yapılmasını sağlar.</li>
+<b>Anonim dosya aktarımı</b><br><a href="/torrents">I2PSnark</a> I2P ile bütünleşik olarak, anonim ve şifrelenmiş BitTorrent aktarımlarının yapılmasını sağlar.</li>
 <li>
-<b>Anonim Sohbet</b><br>
+<b>Anonim sohbet</b><br>
 IRC istemcinizi başlatın (HexChat gibi) ve <a href="irc://127.0.0.1:6668/i2p">sunucuya</a> bağlanmak için <code>127.0.0.1 adresiyle 6668 bağlantı noktasını</code> kullanın. 
 IRC isteciniz için bir vekil sunucu yapılandırmanıza gerek yoktur. I2P size yerel bir IRC tüneli sunar (IRC istemcinizin içinden bir IRC sunucusu ya da uzak sunucu gibi yapılandırabilirsiniz). 
 <code>localhost:6668</code> ile erişebileceğiniz yerel I2P IRC tüneliniz sizi I2P üzerinde Postman, echelon ve zl0 tarafından sunulan üç IRC sunucusundan birine yönlendirir. Ancak siz ya da başkaları bunların nerede olduğunu bilemez. İletişiminiz izlenmeyi engellemek için I2P tarafından şifrelenir. 
 IRC sunucusuna bağlandıktan sonra, pek çok kanal arasından <code>#i2p-chat</code> ve <code>#i2p-dev</code> kanallarına katılmak isteyebilirsiniz. 
-I2P ayrıca izlenemeyen ve engellenmeyen anonim sohbetler için kullanılabilecek diğer IRC sunucuları, Jabber sunucuları, web sitesi temelli sohbet gibi diğer seçenekler ile uyumludur.
+I2P ayrıca izlenemeyen ve engellenmeyen anonim sohbetler için kullanılabilecek diğer IRC sunucuları, Jabber sunucuları, site temelli sohbet gibi diğer seçenekler ile uyumludur.
 I2P ağında kullandığınız sürümden bağımsız olarak kendi sunucularınızı çalıştırabilir ya da uygulama geliştirmeyi biliyorsanız kendi <a href="http://i2p-projekt.i2p/applications.html" target="_blank">I2P uygulamalarınızı</a> yazabilirsiniz.
 Hem UDP hem TCP iletişim kuralları <a href="http://i2p-projekt.i2p/techintro.html#op.transport" target="_blank">desteklenir</a>. </li>
 
 <li>
-<b>Forumlar ve Blog Yazarlığı</b><br>
+<b>Forumlar ve blog yazarlığı</b><br>
 Tüm normal blog, forum ve İçerik Yönetim Sistemi uygulamaları I2P üzerinde çalışır. Bununla birlikte güvenliğinizi korumak için ek dikkat göstermeniz ve ilgili uygulamaları kullanırken güncel ve kilitlenmiş olarak tutmanız önerilir (Php, MySql, Python, Apache gibi). 
 Ayrıca I2P üzerine çeşitli dillerde bir kaç topluluk forumu var. <a href="#eepsites">Aşağıda</a> bazı önerileri görebilirsiniz.</li>
 
 <li>
-<a name="plugins"></a><b>I2P Uygulama Ekleri</b><br>
+<a name="plugins"></a><b>I2P uygulama ekleri</b><br>
 Uygulama Eklerini kullanarak I2P üzerine blog yazma, sohbet, dosya paylaşımı gibi yeni özellikler ekleyebilirsiniz. Yazılmış ya da uyarlanmış pek çok uygulama eki <a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target="_blank">kurulmaya</a> hazır bekliyor. 
 Uygulama eklerine ve ayrıntılı bilgilere ulaşmak için <a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target="_blank">wiki.i2p-projekt.i2p</a> sitesine bakabilirsiniz. 
 Bir <a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target="_blank">geliştirici</a> iseniz, kendi uygulama eklerinizi yazmak için sunulan geliştirme çatısı ve <a href="http://i2p-projekt.i2p/plugins.html" target="_blank">belgeleri</a> kullanabilirsiniz.</li>
 
 </ul>
-<h3>ISP Üzerinde Anonim ve Şifrelenmiş Web Sitesi Barındırma</h3>
+<h3>I2P üzerinde anonim ve şifrelenmiş site barındırma</h3>
 
 <ul class="links">
 <li>
-<b>İç Web Sunucusu</b><br>
-I2P içinde kendi gizli hizmet web sitenizi ("eepsite") I2P ağı üzerinde sunabileceğiniz  bir web sunucusu bulunur: <a href="https://www.eclipse.org/jetty/" target="_blank">Jetty</a> kopyası <a href="http://127.0.0.1:7658/" target="_blank">http://127.0.0.1:7658/</a>adresini dinler.
-Kendi içeriğinizi sunmak için web sitesi dosyalarınızı <code>eepsite/docroot/</code> klasörüne (ya da standart JSP/Servlet .war dosyalarını <code>eepsite/webapps</code> klasörüne ya da  standart CGI betiklerini <code>eepsite/cgi-bin</code> klasörüne) koyabilirsiniz. 
-Ayrıca I2P üzerinde iç web sunucunun yerini alacak farklı bir web sunucusu çalıştırabilir ya da farklı bir tünel kullanabilirsiniz.</li>
+<b>İç site sunucusu</b><br>
+I2P içinde kendi gizli hizmet sitenizi ("eepsite") I2P ağı üzerinde sunabileceğiniz bir site sunucusu bulunur: <a href="https://www.eclipse.org/jetty/" target="_blank">Jetty</a> kopyası <a href="http://127.0.0.1:7658/" target="_blank">http://127.0.0.1:7658/</a>adresini dinler.
+Kendi içeriğinizi sunmak için site dosyalarınızı <code>eepsite/docroot/</code> klasörüne (ya da standart JSP/Servlet .war dosyalarını <code>eepsite/webapps</code> klasörüne ya da  standart CGI betiklerini <code>eepsite/cgi-bin</code> klasörüne) koyabilirsiniz. 
+Ayrıca I2P üzerinde iç site sunucusunun yerini alacak farklı bir site sunucusu çalıştırabilir ya da farklı bir tünel kullanabilirsiniz.</li>
 
 <li>
-<b>Tüneli Başlatma</b><br>
-Önceden yapılandırılmış <a href="/i2ptunnel/" target="_blank">I2P Web Sunucu Tüneli</a> başlatıldıktan sonra, web siteniz diğer kullanıcılar tarafından görülebilir (ancak bulunamaz).
-Web sitenizi hazırlamak ile ilgili ayrıntılı bilgi almak, bir .i2p etki alanı kaydetmek ve sitenizi diğer I2P web sunucunuz üzerinden tanıtmak için <a href="http://127.0.0.1:7658/help/" target="_blank">http://127.0.0.1:7658/help/</a> adresine bakabilirsiniz.</li>
+<b>Tüneli başlatma</b><br>
+Önceden yapılandırılmış <a href="/i2ptunnel/" target="_blank">I2P site sunucusu tüneli</a> başlatıldıktan sonra, siteniz diğer kullanıcılar tarafından görülebilir (ancak bulunamaz).
+Sitenizi hazırlamak ile ilgili ayrıntılı bilgi almak, bir .i2p etki alanı kaydetmek ve sitenizi diğer I2P site sunucunuz üzerinden tanıtmak için <a href="http://127.0.0.1:7658/help/" target="_blank">http://127.0.0.1:7658/help/</a> adresine bakabilirsiniz.</li>
 
 </ul>
 <a name="eepsites"></a>
-<h3>İlgi Çeken I2P Gizli Hizmetleri</h3>
+<h3>İlgi çeken I2P gizli hizmetleri</h3>
 
 <ul class="links twocol">
 <li>
-<b>Invisible Internet Projesi (I2P) Resmi Web Sitesi</b><br><a href="http://i2p-projekt.i2p" target="_blank">i2p-projekt.i2p</a>: <a href="https://geti2p.net/en/" target="_blank">geti2p.net</a> sitesine güvenli ve anonim bağlantılar. I2P ağının çalışması ve nasıl katkıda bulunabileceğiniz ile ilgili bilgiler almak istiyorsanız ilk bakacağınız yer burasıdır!</li>
+<b>Invisible Internet Projesi (I2P) resmi sitesi</b><br><a href="http://i2p-projekt.i2p" target="_blank">i2p-projekt.i2p</a>: <a href="https://geti2p.net/en/" target="_blank">geti2p.net</a> sitesine güvenli ve anonim bağlantılar. I2P ağının çalışması ve nasıl katkıda bulunabileceğiniz ile ilgili bilgiler almak istiyorsanız ilk bakacağınız yer burasıdır!</li>
 
 <li>
-<b>I2P Topluluk Forumları</b><br><a href="http://zzz.i2p/" target="_blank">zzz geliştirici forumlarında</a> I2P geliştirmesi ile ilgili tartışmaları bulabilirsiniz.
+<b>I2P topluluk forumları</b><br><a href="http://zzz.i2p/" target="_blank">zzz geliştirici forumlarında</a> I2P geliştirmesi ile ilgili tartışmaları bulabilirsiniz.
 
 <a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>: I2P ve ilgili diğer konular hakkında sorun ve fikirlerin tartışıldığı bir forum sitesi.</li>
 
@@ -97,72 +97,72 @@ Web sitenizi hazırlamak ile ilgili ayrıntılı bilgi almak, bir .i2p etki alan
 <b>I2P Planet</b><br><a href="http://planet.i2p/" target="_blank">planet.i2p</a>: I2P haber ve etkinliklerini tek bir noktada toplayarak yayınlayan bir RSS akışı sitesi. Topluluğu iş başında görmek için bakılması gereken iyi bir site!</li>
 
 <li>
-<b>I2P Ağ Durumu</b><br><a href="http://stats.i2p/cgi-bin/dashboard.cgi" target="_blank">stats.i2p</a>: zzz tarafından işletilen bu sitede I2P ağının durumunu çeşitli açılardan görebilirsiniz.</li>
+<b>I2P ağ durumu</b><br><a href="http://stats.i2p/cgi-bin/dashboard.cgi" target="_blank">stats.i2p</a>: zzz tarafından işletilen bu sitede I2P ağının durumunu çeşitli açılardan görebilirsiniz.</li>
 
 <li>
-<b>I2P Hata İzleyici - GitLab</b><br><a href="http://git.idk.i2p/" target="_blank">git.idk.i2p</a>: I2P sorun bildirme ve hata izleme sistemi. Bildirmek istediğiniz bir sorun varsa ziyaret edebilirsiniz. Ayrıca <a href="https://i2pgit.org/" target="_blank">https://i2pgit.org/</a> adresinden de erişilebilir.</li>
+<b>I2P hata izleyici - GitLab</b><br><a href="http://git.idk.i2p/" target="_blank">git.idk.i2p</a>: I2P sorun bildirme ve hata izleme sistemi. Bildirmek istediğiniz bir sorun varsa ziyaret edebilirsiniz. Ayrıca <a href="https://i2pgit.org/" target="_blank">https://i2pgit.org/</a> adresinden de erişilebilir.</li>
 
 <li>
-<b>I2P Ağını Keşfetmek</b><br>
+<b>I2P ağını keşfetmek</b><br>
 İlginizi çekebilecek başka pek çok gizli hizmet var. Görüntülemek istediğiniz bağlantıları izleyin, beğendiklerinizi yer imlerinize ekleyin ve sık sık ziyaret edin!<br>
 </li>
 
 </ul>
-<h2 id="trouble">Sorun Çözme ve Diğer Yardımlar</h2>
+<h2 id="trouble">Sorun çözme ve diğer yardımlar</h2>
 
 <ul class="links">
 <li>
-<b>Sabırlı Olun!</b><br>
+<b>Sabırlı olun!</b><br>
 İlk kez çalıştırdığınızda ağa giriş yapılması ve eşlerin bulunması gerektiğinden I2P ağa bağlanmakta yavaş olabilir.
 I2P yönelticiniz ne kadar uzun süre çalışırsa başarımı o kadar artar. Bu nedenle olabiliyorsa yönelticinizi 7/24 açık turun!
 30 dakika sonra <i>Etkin: [bağlı/geçmiş]</i> sayınız hala 10 değerinin altındaysa ya da <i>bütünleşilmiş</i> eşlerin toplam sayısı 5 değerinin altındaysa, olabilecek sorunlara karşı yapabileceğiniz bir kaç şey var:</li>
 
 <li>
-<b>Yapılandırmanızı ve Ayırdığınız Bant Genişliğinizi Denetleyin</b><br>
+<b>Yapılandırmanızı ve ayırdığınız bant genişliğinizi denetleyin</b><br>
 I2P uygulamasının iyi çalışması için <a href="/config">bant genişliği yapılandırma bölümünden</a>ağ bağlantınızın hızını doğru olarak belirtin.
 I2P varsayılan olarak her duruma uygun olmayan oldukça kısıtlı ayarlar ile yapılandırılmıştır. Bu nedenle lütfen bu ayarları gözden geçirmek ve gerekiyorsa düzenlemek için zaman ayırın.
 Ne kadar çok bant genişliği ayırırsanız, <i>özellikle</i> gidiş bant genişliği, ağdan o oranda yararlanırsınız.</li>
 
 <li>
-<b>Güvenlik Duvarları, Modemler ve Yönelticiler</b><br>
+<b>Güvenlik duvarları, modemler ve yönelticiler</b><br>
 Yapabiliyorsanız modeminizi, yönelticinizi, bilgisayarınızdaki güvenlik duvarını uygun şekilde ayarlayarak, I2P/Java bağlantısının herhangi bir güvenlik duvarından geçmeden İnternet üzerine çıktığından emin olun. 
 Engelleme yapan bir güvenlik duvarının arkasında olduğunuz halde kısıtlamasız bir gidiş bağlantınız varsa, I2P çalışabilir; ağa bağlanmak için geliş erişimi kapatıp <a href="http://i2p-projekt.i2p/udp.html" target="_blank">SSU IP Adresi Algılaması</a> özelliğine güvenebilirsiniz (<a href="https://en.wikipedia.org/wiki/Hole_punching_(networking)" target="_blank">güvenlik duvarını delme</a>), yan panodaki ağ durumunuz "Ağ: Güvenlik Duvarlı" olarak görüntülenir. 
 En iyi başarım için, I2P <a href="/confignet">dış bağlantı noktasının</a> İnternet üzerinde görülebilir olduğundan emin olun.
 Ayrıntılı bilgi almak için aşağıya bakabilirsiniz.</li>
 
 <li>
-<b>Vekil Sunucu Ayarlarınızı Denetleyin</b><br>
-Herhangi bir web sitesine bağlanamıyorsanız (<a href="http://i2p-projekt.i2p/" target="_blank">i2p-projekt.i2p</a> sitesine bile), web tarayıcınızın vekil sunucu ayarlarının http trafiğini (https <i>değil</i>,  socks <i>değil</i>) <code>127.0.0.1 adresini ve 4444 bağlantı noktasını</code> kullanacak şekilde ayarlayın. 
-Yardıma gerek duyarsanız web tarayıcınızı I2P ile kullanma <a href="https://geti2p.net/en/about/browser-config" target="_blank">rehberine</a> bakabilirsiniz.</li>
+<b>Vekil sunucu ayarlarınızı denetleyin</b><br>
+Herhangi bir siteye bağlanamıyorsanız (<a href="http://i2p-projekt.i2p/" target="_blank">i2p-projekt.i2p</a> sitesine bile), tarayıcınızın vekil sunucu ayarlarının http trafiğini (https <i>değil</i>,  socks <i>değil</i>) <code>127.0.0.1 adresini ve 4444 bağlantı noktasını</code> kullanacak şekilde ayarlayın. 
+Yardıma gerek duyarsanız tarayıcınızı I2P ile kullanma <a href="https://geti2p.net/en/about/browser-config" target="_blank">rehberine</a> bakabilirsiniz.</li>
 
 <li>
-<b>Günlük Kayıtlarınıza Bakın</b><br><a href="/logs">Günlük kayıtları</a> sorunu çözmenize yardımcı olabilir. 
+<b>Günlük kayıtlarınıza bakın</b><br><a href="/logs">Günlük kayıtları</a> sorunu çözmenize yardımcı olabilir. 
 Yardım almak için sorununuzu <a href="http://i2pforum.i2p/" target="_blank">forum</a> üzerine gönderebilir ya da <a href="http://paste.idk.i2p/" target="_blank">yapıştırıp</a> bağlantıyı IRC üzerinden gönderebilirsiniz.</li>
 
 <li>
-<b>Java Sürümünüzü Denetleyin</b><br>
+<b>Java sürümünüzü denetleyin</b><br>
 Java sürümünüzün güncel olduğundan emin olun.
 Java sürümünüzü <a href="/logs">günlük sayfasının üzerinde</a> görebilirsiniz.</li>
 <li>
-<b>Eski Donanımlar Üzerinde Karşılaşılan Sorunlar</b><br>
+<b>Eski donanımlar üzerinde karşılaşılan sorunlar</b><br>
 [Linux/BSD] Yönelticiyi <code>i2p/i2prouter start</code> komutu ile başlatamazsanız aynı klasördeki <code>runplain.sh</code> betiğini kullanın.
 I2P çalıştırmak için hiç bir zaman root yetkilerine gerek yoktur.</li>
 <li>
-<b>Evrensel Tak Çalıştır (UPnP) Özelliğini Etkinleştirin</b><br>
+<b>Evrensel tak çalıştır (UPnP) özelliğini etkinleştirin</b><br>
 Modem ya da yönelticiniz otomatik bağlantı noktası yönlendirmesi için büyük olasılıkla UPnP özelliğini destekliyordur.
 Modeminiz ya da yönelticiniz üzerinde UPnP özelliğinin desteklendiğinden emin olun. 
 Şimdi <a href="/">I2P yönelticiyi</a> yeniden başlatmayı deneyebilirsiniz.
 Başarılı olursa, I2P yönelticisi bağlantı sınamalarını tamamladıktan sonra I2P yan çubuğunda "Ağ: Tamam" iletisi görüntülenir.</li>
 
 <li>
-<b>Bağlantı Noktası Yönlendirin</b><br>
+<b>Bağlantı noktası yönlendirme</b><br>
 Daha iyi bir bağlantı için <a href="/confignet">I2P bağlantı noktalarını</a> modeminiz, yönelticiniz ya da güvenlik duvarınız üzerinde açın (ideal olarak hem UDP hem TCP).
-Bağlantı noktası yönlendirme hakkında ayrıntılı bilgilere web üzerinde yapacağınız basit bir arama ile erişebilirsiniz.
+Bağlantı noktası yönlendirme hakkında ayrıntılı bilgilere internet üzerinde yapacağınız basit bir arama ile erişebilirsiniz.
 Sorun yaşamanız durumunda aşağıda listelenen forumlarımıza ve IRC kanallarına bakabilirsiniz.
 I2P İnternet bağlantısının bir http ya da socks vekil sunucusu üzerinden kurulamayacağını unutmayın [yamalarınızı bekliyoruz!]. Ancak bir kez ağ bağlantısı kurulduğunda I2P üzerinden vekil sunuculara bağlanabilirsiniz.</li>
 
 <li>
-<b>Çevrimiçi Destek Alın</b><br><a href="http://i2p-projekt.i2p/" target="_blank">I2P web sitesindeki</a> bilgilere bakabilir, <a href="http://i2pforum.i2p/" target="_blank">I2P tartışma forumuna</a> ileti gönderebilir ya da I2P içindeki  Irc2P IRC ağında <a href="irc://127.0.0.1:6668/i2p">#i2p</a> ve <a href="irc://127.0.0.1:6668/i2p-chat">#i2p-chat</a> kanallarında takılabilirsiniz.
+<b>Çevrimiçi destek alma</b><br><a href="http://i2p-projekt.i2p/" target="_blank">I2P sitesindeki</a> bilgilere bakabilir, <a href="http://i2pforum.i2p/" target="_blank">I2P tartışma forumuna</a> ileti gönderebilir ya da I2P içindeki  Irc2P IRC ağında <a href="irc://127.0.0.1:6668/i2p">#i2p</a> ve <a href="irc://127.0.0.1:6668/i2p-chat">#i2p-chat</a> kanallarında takılabilirsiniz.
 Bu kanallara anonim ve şifrelenmiş I2P ağı dışından <a href="irc://irc.freenode.net/i2p">Freenode IRC</a> ile erişebilirsiniz.</li>
 
 <li>
@@ -171,13 +171,13 @@ Bir hata bildirmek için <a href="http://git.idk.i2p/" target="_blank">git.idk.i
 Geliştiriciler ile ilgili tartışmalar için <a href="http://zzz.i2p/" target="_blank">zzz geliştirici forumlarına</a>bakabilir ya da I2P IRC ağındaki <a href="irc://127.0.0.1:6668/i2p-dev">geliştirici kanalına</a> uğrayabilirsiniz. 
 Geliştiriciler kaynak kodunu <a href="http://git.idk.i2p/i2p-hackers/i2p.i2p" target="_blank">git.idk.i2p</a> üzerinde bulabilir.</li>
 <li>
-<b>Katkıda Bulunun!</b><br>
+<b>Katkıda bulunun!</b><br>
 I2P çoğunlukla mali olarak desteklenmeyen ve gönüllü katkıda bulunan topluluk üyeleri tarafından geliştirilmektedir.
 Temel barındırma ve yönetim maliyetlerini karşılamak için <a href="http://i2p-projekt.i2p/donate.html" target="_blank">bağışlarınızı</a> bekliyoruz. 
 Katkıda bulunmak isteyebilecek geliştiricileri özendirmek <a href="http://i2p-projekt.i2p/bounties.html" target="_blank">nakit ödüllerimiz</a> var ve I2P projesini büyütmek için her zaman daha fazla <a href="http://i2p-projekt.i2p/newdevelopers.html" target="_blank">Java programcısı</a>, <a href="http://i2p-projekt.i2p/newtranslators.html" target="_blank">çevirmen</a>, destekçi ve kullanıcı arıyoruz.
 I2P ağı büyüdükçe herkes daha fazla fayda görecek. Bu nedenle tüm arkadaşlarınıza I2P projesinden bahsetmenizin (ve gerektiğinde kurulum ve ayarlama işlemleri için yardım elinizi uzatmanızın) çok yardımı olur.
-Nasıl katkıda bulunabileceğiniz hakkında ayrıntılı bilgi almak için web sitesindeki <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank">gönüllüler bölümüne</a> bakabilirsiniz.</li>
+Nasıl katkıda bulunabileceğiniz hakkında ayrıntılı bilgi almak için sitedeki <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank">gönüllüler bölümüne</a> bakabilirsiniz.</li>
 
 </ul>
-<div class="topness"><a href="#top">[Başlangıca Dön]</a></div>
+<div class="topness"><a href="#top">[Başlangıca dön]</a></div>
 </div>

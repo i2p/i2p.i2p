@@ -41,6 +41,7 @@
 # yume, 2014-2015
 # yume, 2017-2019
 # Andrey Lukyanenko <operru32@yandex.ru>, 2013
+# Артём Котлубай <artemkotlubai@yandex.ru>, 2023
 # Василий Суматохин <basilbasilbasil@gmail.com>, 2019
 # Foster Snowhill, 2013
 msgid ""
@@ -49,8 +50,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-06 14:52+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
-"Last-Translator: ValdikSS <iam@valdikss.org.ru>, 2017-2022\n"
-"Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
+"Last-Translator: Артём Котлубай <artemkotlubai@yandex.ru>, 2023\n"
+"Language-Team: Russian (Russia) (http://app.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -4775,7 +4776,7 @@ msgstr "Трафик (вх./исх.)"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:978
 msgid "Used"
-msgstr "Объем"
+msgstr "Объём"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1010
 msgid "Our inbound &amp; outbound traffic for the last 20 minutes"
@@ -7880,7 +7881,7 @@ msgstr "Выберите язык"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:480
 msgid "This project is supported by volunteer translators on Transifex."
-msgstr "Этот проект поддерживается переводчиками-волонтёрами на Transifex."
+msgstr "Этот проект поддерживается переводчиками-добровольцами на Transifex."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:482
 msgid "This helps keep I2P accessible to everyone all over the world."
@@ -7890,7 +7891,7 @@ msgstr "Это помогает всем людям на земле пользо
 msgid ""
 "Thank you to all of the volunteers all over the world who help make I2P "
 "accessible."
-msgstr "Спасибо волонтёрам из разных частей света, которые помогают улучшать доступность I2P."
+msgstr "Спасибо добровольцам из разных частей света, которые помогают улучшать доступность I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:486
 #, java-format

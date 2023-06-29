@@ -9,14 +9,15 @@
 # Irina Fedulova <istartlin@gmail.com>, 2020
 # Maxym Mykhalchuk, 2015
 # Foster Snowhill, 2013
+# Артём Котлубай <artemkotlubai@yandex.ru>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
 "POT-Creation-Date: 2017-11-12 14:01+0000\n"
-"PO-Revision-Date: 2020-07-23 18:05+0000\n"
-"Last-Translator: Irina Fedulova <istartlin@gmail.com>\n"
-"Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
+"PO-Revision-Date: 2011-10-03 21:48+0000\n"
+"Last-Translator: Артём Котлубай <artemkotlubai@yandex.ru>, 2023\n"
+"Language-Team: Russian (Russia) (http://app.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -65,7 +66,7 @@ msgstr "Важно: если здесь введено имя пользоват
 #. Description
 #: ../i2p.templates:4001
 msgid "Memory that can be allocated to I2P:"
-msgstr "Объем памяти, который может быть выделен для I2P:"
+msgstr "Объём памяти, который может быть выделен для I2P:"
 
 #. Type: string
 #. Description

@@ -19,7 +19,7 @@ msgstr ""
 "POT-Creation-Date: 2023-03-06 14:52+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2013,2015-2023\n"
-"Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
+"Language-Team: Turkish (Turkey) (http://app.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -157,7 +157,7 @@ msgstr "bilinmeyen"
 
 #: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:700
 msgid "NetDb entry"
-msgstr "\"Ağ veritabanı\" (NetDB) kaydı"
+msgstr "\"Ağ veri tabanı\" (NetDB) kaydı"
 
 #. This used to be "no common transports" but it is almost always no
 #. transports at all
@@ -1235,7 +1235,7 @@ msgstr "SAM"
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:81
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:341
 msgid "Website"
-msgstr "Web sitesi"
+msgstr "Site"
 
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:85
 msgid "Local Router Family Certificate"
@@ -1313,7 +1313,7 @@ msgstr "{0} uygulama eki durduruldu"
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:190
 #, java-format
 msgid "Stopped webapp {0}"
-msgstr "Webapp {0} durduruldu"
+msgstr "{0} internet uygulaması durduruldu"
 
 #. label (IE)
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:219
@@ -1965,7 +1965,7 @@ msgstr "Uygulama ekleri"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:33
 msgid "Web Apps"
-msgstr "Web uygulamaları"
+msgstr "İnternet uygulamaları"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:34
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:490
@@ -2533,7 +2533,7 @@ msgstr "Bir kullanıcı adı yazmalısınız"
 msgid ""
 "Warning: User names outside the ISO-8859-1 character set are not "
 "recommended. Support is not standardized and varies by browser."
-msgstr "Uyarı: Kullanıcı adında ISO-8859-1 karakter kümesi dışındaki karakterlerin kullanılması önerilmez. Destek standart değildir ve web tarayıcıya göre değişir."
+msgstr "Uyarı: Kullanıcı adında ISO-8859-1 karakter kümesi dışındaki karakterlerin kullanılması önerilmez. Destek standart değildir ve tarayıcıya göre değişir."
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:110
 msgid "No password entered"
@@ -2884,7 +2884,7 @@ msgstr "Çizelge ayarları kaydedildi"
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:44
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:227
 msgid "Anonymous webmail client"
-msgstr "Anonimlik sağlayan web posta istemcisi"
+msgstr "Anonimlik sağlayan internet e-posta istemcisi"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:45
 msgid "Control your client and server tunnels"
@@ -2897,13 +2897,13 @@ msgstr "İç anonimlik sağlayan BitTorrent İstemcisi"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:47
 msgid "Local web server for hosting your own content on I2P"
-msgstr "I2P üzerinde kendi içeriğinizi sunmak için yerel web sunucusu"
+msgstr "I2P üzerinde kendi içeriğinizi sunmak için yerel site sunucusu"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:47
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:303
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:260
 msgid "Web Server"
-msgstr "Web sunucusu"
+msgstr "Site sunucusu"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:48
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:350
@@ -3033,7 +3033,7 @@ msgstr "Planet I2P"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:92
 msgid "I2P home page"
-msgstr "I2P web sitesi"
+msgstr "I2P sitesi"
 
 #. _x("I2P Plugins") + S + _x("Add-on directory") + S +
 #. "http://i2pwiki.i2p/index.php?title=Plugins" + S + I +
@@ -3044,7 +3044,7 @@ msgstr "I2P web sitesi"
 #. "http://paste.crypthost.i2p/" + S + I + "paste_plain.png" + S +
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:92
 msgid "Project Website"
-msgstr "Proje web sitesi"
+msgstr "Proje sitesi"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:103
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:432
@@ -3115,7 +3115,7 @@ msgstr "HTTP vekil sunucusu çalışmıyor"
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:229
 #, java-format
 msgid "Your browser is not properly configured to use the HTTP proxy at {0}"
-msgstr "Web tarayıcınız {0} üzerindeki HTTP vekil sunucusunu doğru olarak kullanacak şekilde yapılandırılmamış"
+msgstr "Tarayıcınız {0} üzerindeki HTTP vekil sunucusunu doğru olarak kullanacak şekilde yapılandırılmamış"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:373
 msgid "URL"
@@ -3264,13 +3264,13 @@ msgstr "Bağlantı noktası"
 msgid ""
 "Never reveal your router identity to anyone, as it is uniquely linked to "
 "your IP address in the network database."
-msgstr "Ağ veritabanında yöneltici kimliği ile IP adresi benzersiz şekilde ilişkilendirilmiş olduğundan, yöneltici kimliğiniz asla kimseyle paylaşmayın."
+msgstr "Ağ veri tabanında yöneltici kimliği ile IP adresi benzersiz şekilde ilişkilendirilmiş olduğundan, yöneltici kimliğiniz asla kimseyle paylaşmayın."
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:148
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:515
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:718
 msgid "not found in network database"
-msgstr "ağ veritabanında bulunamadı"
+msgstr "ağ veri tabanında bulunamadı"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:200
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:522
@@ -3364,7 +3364,7 @@ msgstr "Başlatılmamış"
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1005
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:444
 msgid "Network Database Router Statistics"
-msgstr "Ağ veritabanı yöneltici istatistikleri"
+msgstr "Ağ veri tabanı yöneltici istatistikleri"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1012
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1034
@@ -4041,7 +4041,7 @@ msgstr "profil yöneticisi tarafından belirlenen"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:303
 msgid "capabilities in the netDb, not used to determine profiles"
-msgstr "\"Ağ veritabanı\" (NetDB) yetenekleri, profillerin belirlenmesinde kullanılmaz"
+msgstr "\"Ağ veri tabanı\" (NetDB) yetenekleri, profillerin belirlenmesinde kullanılmaz"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:307
 msgid "Congested"
@@ -4153,7 +4153,7 @@ msgstr "İşlem kuyruğu"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:44
 msgid "Network Database"
-msgstr "Ağ veritabanı"
+msgstr "Ağ veri tabanı"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:46
 msgid "Router Limiter"
@@ -4442,7 +4442,7 @@ msgstr "RPC hizmeti"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:261
 msgid "Local web Server"
-msgstr "Yerel web sunucusu"
+msgstr "Yerel site sunucusu"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:287
 msgid ""
@@ -4483,7 +4483,7 @@ msgstr "Sağlık durumu"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:441
 msgid "NetDB"
-msgstr "\"Ağ veritabanı\" (NetDB)"
+msgstr "\"Ağ veri tabanı\" (NetDB)"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:453
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:805
@@ -4558,11 +4558,11 @@ msgstr "Etkin \"Kiralama kümeleri\" (LeaseSets) görüntülensin (hata ayıklam
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:571
 msgid "NetDB Search"
-msgstr "\"Ağ veritabanı\" (NetDB) araması"
+msgstr "\"Ağ veri tabanı\" (NetDB) araması"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:574
 msgid "Network database search tool"
-msgstr "Ağ veritabanı arama aracı"
+msgstr "Ağ veri tabanı arama aracı"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:583
 msgid "Textual router performance statistics"
@@ -4574,7 +4574,7 @@ msgstr "Sebiller"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:592
 msgid "Review possible sybils in network database"
-msgstr "Ağ veritabanındaki olası sebilleri gözden geçir"
+msgstr "Ağ veri tabanındaki olası sebilleri gözden geçir"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:609
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:669
@@ -4682,12 +4682,12 @@ msgstr "Yüksek kapasiteli"
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:843
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:907
 msgid "The number of peers available for network database inquiries"
-msgstr "Ağ veritabanı sorguları için kullanılabilecek eş sayısı"
+msgstr "Ağ veri tabanı sorguları için kullanılabilecek eş sayısı"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:852
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:916
 msgid "The total number of peers in our network database"
-msgstr "Ağ veritabanındaki toplam eş sayısı"
+msgstr "Ağ veri tabanındaki toplam eş sayısı"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:855
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:919
@@ -5187,7 +5187,7 @@ msgstr "yonelticipanosu"
 #. keep the old string here as well for existing installs
 #: ../java/strings/Strings.java:22
 msgid "Web console"
-msgstr "Web panosu"
+msgstr "İnternet panosu"
 
 #: ../java/strings/Strings.java:23
 msgid "SAM application bridge"
@@ -5199,11 +5199,11 @@ msgstr "Uygulama tünelleri"
 
 #: ../java/strings/Strings.java:25
 msgid "My I2P Site web server"
-msgstr "I2P sitemin web sunucusu"
+msgstr "I2P site sunucum"
 
 #: ../java/strings/Strings.java:26
 msgid "I2P webserver (I2P Site)"
-msgstr "I2P web sunucusu (I2P Sitesi)"
+msgstr "I2P site sunucusu (I2P sitesi)"
 
 #: ../java/strings/Strings.java:27
 msgid "Browser launch at startup"
@@ -5211,7 +5211,7 @@ msgstr "Başlangıçta açılacak tarayıcı"
 
 #: ../java/strings/Strings.java:29
 msgid "Open Router Console in web browser at startup"
-msgstr "Yöneltici panosu başlangıçta web tarayıcı içinde açılsın"
+msgstr "Yöneltici panosu başlangıçta tarayıcı içinde açılsın"
 
 #: ../java/strings/Strings.java:36
 msgid "IRC proxy"
@@ -5223,7 +5223,7 @@ msgstr "I2P sitesi"
 
 #: ../java/strings/Strings.java:38
 msgid "I2P webserver"
-msgstr "I2P web sunucusu"
+msgstr "I2P site sunucusu"
 
 #: ../java/strings/Strings.java:39
 msgid "HTTP Proxy"
@@ -5499,7 +5499,7 @@ msgstr "Bu seçenek etkinleştirildiğinde, panoda ek özellikler kullanılabili
 msgid ""
 "Extra display options are provided in the <a href=\"/netdb\">Network "
 "Database section</a>."
-msgstr "<a href=\"/netdb\">\"Ağ veritabanı\" (NetDB) bölümünde</a> ek görüntüleme seçenekleri bulunur."
+msgstr "<a href=\"/netdb\">\"Ağ veri tabanı\" (NetDB) bölümünde</a> ek görüntüleme seçenekleri bulunur."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:625
 msgid "This will also enable the installation of unsigned updates."
@@ -5515,7 +5515,7 @@ msgstr "Ayrıca <a href=\"/configsidebar\">Yan Çubuk Yapılandırması bölüm�
 msgid ""
 "This setting allows the manual selection of the browser which I2P will "
 "launch on startup."
-msgstr "Bu seçenek, I2P başlatıldığında açılacak web tarayıcının el ile seçilebilmesini sağlar."
+msgstr "Bu seçenek, I2P başlatıldığında açılacak tarayıcının el ile seçilebilmesini sağlar."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:630
 msgid ""
@@ -6131,7 +6131,7 @@ msgstr "Uygulama eki yapılandırması"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:570
 msgid "The plugins listed below are started by the webConsole client."
-msgstr "Aşağıdaki uygulama ekleri web panosu istemcisi tarafından başlatılmış."
+msgstr "Aşağıdaki uygulama ekleri internet panosu istemcisi tarafından başlatılmış."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:585
 msgid "Plugin Installation"
@@ -6513,14 +6513,14 @@ msgstr "Bazen hata ayıklaması için I2P işlemlerinin dökümünü almak yard�
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:657
 msgid "Launch browser on router startup?"
-msgstr "Yöneltici ile web tarayıcısı da başlatılsın"
+msgstr "Yöneltici ile tarayıcısı da başlatılsın"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:661
 #, java-format
 msgid ""
 "I2P''s main configuration interface is this web console, so for your "
 "convenience I2P can launch a web browser on startup pointing at {0}."
-msgstr "Temel I2P yönetim arayüzü web panosudur. Bu nedenle kolaylık sağlamak için I2P başlatılırken {0} bölümünden yapılandırılmış bir web tarayıcıyı da başlatabilir."
+msgstr "Temel I2P yönetim arayüzü internet panosudur. Bu nedenle kolaylık sağlamak için I2P başlatılırken {0} bölümünden yapılandırılmış bir tarayıcıyı da başlatabilir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:241
 msgid "config sidebar"
@@ -6648,7 +6648,7 @@ msgid ""
 "If you're not using IE, it's likely that your browser is pretending to be "
 "IE; please configure your browser (or proxy) to use a different User Agent "
 "string if you'd like to access the console themes."
-msgstr "Internet Explorer kullanmıyorsanız, web tarayıcınız IE gibi davranıyor olabilir. Pano temalarını kullanabilmek için web tarayıcınızı (ya da vekil sunucuyu) farklı bir User Agent dizgesi kullanacak şekilde yapılandırın."
+msgstr "Internet Explorer kullanmıyorsanız, tarayıcınız IE gibi davranıyor olabilir. Pano temalarını kullanabilmek için tarayıcınızı (ya da vekil sunucuyu) farklı bir User Agent dizgesi kullanacak şekilde yapılandırın."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:548
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:562
@@ -6751,11 +6751,11 @@ msgstr "Güncellemeler paket yöneticiniz üzerinden yüklenecek."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configwebapps_jsp.java:241
 msgid "config webapps"
-msgstr "web uygulaması yapılandırması"
+msgstr "internet uygulamaları yapılandırması"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configwebapps_jsp.java:557
 msgid "WebApp Configuration"
-msgstr "Web uygulaması yapılandırması"
+msgstr "İnternet uygulaması yapılandırması"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configwebapps_jsp.java:559
 msgid ""
@@ -6765,7 +6765,7 @@ msgid ""
 "(e.g. i2psnark), front-ends to another client or application which must be "
 "separately enabled (e.g. susidns, i2ptunnel), or have no web interface at "
 "all (e.g. address book)."
-msgstr "Aşağıda listelenen Java web uygulamaları web panosu istemcisi tarafından başlatılmış ve yöneltici ile aynı Java Sanal Makinası üzerinde çalışıyor. Bunlar genellikle yöneltici panosu üzerinden erişilebilen web uygulamalarıdır. Bunlar, tam uygulamalar (i2psnark gibi), ayrıca etkinleştirilmesi gereken farklı bir istemcinin ya da uygulamanın ön yüzü (susidns, i2ptunnel gibi) ya da web arayüzü olmayan (adres defteri gibi) uygulamalar olabilir."
+msgstr "Aşağıda listelenen Java internet uygulamaları internet panosu istemcisi tarafından başlatılmış ve yöneltici ile aynı Java sanal nakinesi üzerinde çalışıyor. Bunlar genellikle yöneltici panosu üzerinden erişilebilen internet uygulamalarıdır. Bunlar, tam uygulamalar (i2psnark gibi), ayrıca etkinleştirilmesi gereken farklı bir istemcinin ya da uygulamanın ön yüzü (susidns, i2ptunnel gibi) ya da internet arayüzü olmayan (adres defteri gibi) uygulamalar olabilir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configwebapps_jsp.java:561
 msgid ""
@@ -6773,7 +6773,7 @@ msgid ""
 "directory; however the .war file and web app will reappear when you update "
 "your router to a newer version, so disabling the web app here is the "
 "preferred method."
-msgstr "Bir web uygulaması webapps klasöründeki ilgili .war dosyası silinerek devre dışı bırakılabilir. Bununla birlikte yönelticiniz yeni bir sürüme güncellendiğinde .war dosyası ve web uygulaması yeniden yüklenir. Bu nedenle web uygulamasını buradan devre dışı bırakmak daha doğru olur."
+msgstr "Bir internet uygulaması webapps klasöründeki ilgili .war dosyası silinerek devre dışı bırakılabilir. Bununla birlikte yönelticiniz yeni bir sürüme güncellendiğinde .war dosyası ve internet uygulaması yeniden yüklenir. Bu nedenle internet uygulamasını buradan devre dışı bırakmak daha doğru olur."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/console_jsp.java:236
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:237
@@ -6808,7 +6808,7 @@ msgstr "Yeni sekmede aç"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:450
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:450
 msgid "Your browser does not support iFrames."
-msgstr "Web tarayıcınızda iFrame özelliği desteklenmiyor."
+msgstr "Tarayıcınızda iFrame özelliği desteklenmiyor."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:451
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:452
@@ -7014,7 +7014,7 @@ msgstr "Hızlı eşler yüksek kapasite katmanında bulunur."
 msgid ""
 "This is the number of peers your router will use for network database "
 "inquiries."
-msgstr "Bu değer, yönelticinizin ağ veritabanı sorgulamaları için kullanacağı eş sayısıdır."
+msgstr "Bu değer, yönelticinizin ağ veri tabanı sorgulamaları için kullanacağı eş sayısıdır."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:512
 msgid ""
@@ -7452,13 +7452,13 @@ msgstr "Şu anda herkese açık bir SOCKS çıkış vekil sunucusu bulunmadığ�
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:699
 msgid "How do I configure my browser to access I2P websites?"
-msgstr "I2P web sitelerine erişmek için web tarayıcımı nasıl yapılandırmalıyım?"
+msgstr "I2P sitelerine erişmek için tarayıcımı nasıl yapılandırmalıyım?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:701
 msgid ""
 "You will need to configure your browser to use the HTTP proxy server on host"
 " <code>127.0.0.1</code> port <code>4444</code>)."
-msgstr "Web tarayıcınızın vekil sunucu ayarlarını sunucu adresi <code>127.0.0.1</code> bağlantı noktası <code>4444</code>) olacak şekilde yapmanız gerekir."
+msgstr "Tarayıcınızın vekil sunucu ayarlarını sunucu adresi <code>127.0.0.1</code> bağlantı noktası <code>4444</code>) olacak şekilde yapmanız gerekir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:703
 #, java-format
@@ -7467,7 +7467,7 @@ msgstr "Ayrıntılı bilgi almak için {0} bölümüne  bakabilirsiniz."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:704
 msgid "Browser Proxy Configuration Guide"
-msgstr "Web tarayıcı vekil sunucu yapılandırma rehberi"
+msgstr "Tarayıcı vekil sunucu yapılandırma rehberi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:706
 msgid "What is an eepsite?"
@@ -7475,13 +7475,13 @@ msgstr "eepsitesi nedir?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:708
 msgid "An eepsite is a website that is hosted anonymously on the I2P network."
-msgstr "Bir eepsitesi I2P ağı üzerinde anonim olarak barındırılan bir web sitesidir."
+msgstr "Bir eepsitesi I2P ağı üzerinde anonim olarak barındırılan bir sitedir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:710
 msgid ""
 "You can access it by configuring your web browser to use I2P's HTTP proxy "
 "and browsing to the website."
-msgstr "Web tarayıcınızda I2P vekil sunucu ayarlarını yaptıktan sonra eepsitelerine erişebilirsiniz."
+msgstr "Tarayıcınızda I2P vekil sunucu ayarlarını yaptıktan sonra eepsitelerine erişebilirsiniz."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:712
 msgid "Most of the eepsites are down?"
@@ -7646,11 +7646,11 @@ msgstr "Hizmet (kapsayıcı) günlükleri"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/netdb_jsp.java:237
 msgid "network database"
-msgstr "ağ veritabanı"
+msgstr "ağ veri tabanı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/netdb_jsp.java:414
 msgid "I2P Network Database"
-msgstr "I2P ağ veritabanı"
+msgstr "I2P ağ veri tabanı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/news_jsp.java:239
 msgid "News"
@@ -7662,15 +7662,15 @@ msgstr "Son haberler"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/nowebapp_jsp.java:243
 msgid "WebApp Not Found"
-msgstr "Web uygulaması bulunamadı"
+msgstr "İnternet uygulaması bulunamadı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/nowebapp_jsp.java:436
 msgid "Web Application Not Running"
-msgstr "Web uygulaması çalışmıyor"
+msgstr "İnternet uygulaması çalışmıyor"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/nowebapp_jsp.java:438
 msgid "The requested web application is not running."
-msgstr "İstenen web uygulaması çalışmıyor."
+msgstr "İstenen internet uygulaması çalışmıyor."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/nowebapp_jsp.java:440
 #, java-format
@@ -7799,7 +7799,7 @@ msgstr "webposta"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:444
 msgid "I2P Webmail"
-msgstr "I2P Web posta"
+msgstr "I2P internet e-posta"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:331
 msgid "Bandwidth test in progress..."
@@ -7936,7 +7936,7 @@ msgstr "I2P konularını tartışmak ya da topluluktan yardım almak isterseniz,
 msgid ""
 "If you want to know more about the I2P Project itself, or the Invisible "
 "Internet in general, you can visit our {0}Project Website{1}."
-msgstr "I2P Projesi hakkında ya da genel olarak Invisible Internet Project hakkında ayrıntılı bilgi almak için {0}web sitemize{1} bakabilirsiniz."
+msgstr "I2P Projesi hakkında ya da genel olarak Invisible Internet Project hakkında ayrıntılı bilgi almak için {0}sitemize{1} bakabilirsiniz."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:576
 msgid "Bandwidth Configuration"
@@ -7968,18 +7968,18 @@ msgstr "Tarayıcınızın I2P ile çalışacak şekilde yapılandırılması ger
 msgid ""
 "We have instructions for configuring both Firefox and Chromium based "
 "browsers with I2P."
-msgstr "Firefox ve Chromium tabanlı web tarayıcıları I2P kullanmak üzere yapılandırma yönergelerimiz var."
+msgstr "Firefox ve Chromium tabanlı tarayıcıları I2P kullanmak üzere yapılandırma yönergelerimiz var."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:633
 #, java-format
 msgid "You can find these instructions on our {0}website{1}."
-msgstr "Bu yönergeleri {0}web sitemizde{1} bulabilirsiniz."
+msgstr "Bu yönergeleri {0}sitemizde{1} bulabilirsiniz."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:639
 msgid ""
 "Otherwise, the recommended way to browse I2P websites is with a separate "
 "profile in the Firefox browser."
-msgstr "Yoksa, I2P web sitelerine erişmek için Firefox tarayıcısı üzerinde ayrı bir profil kullanmanız önerilir."
+msgstr "Yoksa, I2P sitelerine erişmek için Firefox tarayıcısı üzerinde ayrı bir profil kullanmanız önerilir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:641
 #, java-format
@@ -8012,7 +8012,7 @@ msgstr "Ayrıca {0}e-posta{1} gönderip alabilirsiniz."
 msgid ""
 "Besides that, you can use the built-in {0}web server{1} so you can create, "
 "communicate, and share your content."
-msgstr "Bununla birlikte, içeriğinizi oluşturmak, iletişim kurmak ve paylaşmak için iç {0}web sunucusunu{1} kullanabilirsiniz."
+msgstr "Bununla birlikte, içeriğinizi oluşturmak, iletişim kurmak ve paylaşmak için iç {0}site sunucusunu{1} kullanabilirsiniz."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:657
 msgid ""

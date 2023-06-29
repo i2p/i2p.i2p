@@ -4,15 +4,15 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2013,2015-2022
+# Kaya Zeren <kayazeren@gmail.com>, 2013,2015-2023
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-08-14 13:36+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
-"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2013,2015-2022\n"
-"Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2013,2015-2023\n"
+"Language-Team: Turkish (Turkey) (http://app.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -164,7 +164,7 @@ msgstr "{0} için hedef değiştirildi."
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:313
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:322
 msgid "Warning - hostname does not end with \".i2p\""
-msgstr "Uyarı - sunucu adı \".i2p\" ile bitmiyor"
+msgstr "Uyarı: Sunucu adı \".i2p\" ile bitmiyor"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:320
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:334
@@ -250,7 +250,7 @@ msgstr "HATA: Adres defteri dosyasına yazılamadı."
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or "
 "\"reload\" button on your browser. Please resubmit."
-msgstr "Büyük olasılıkla web tarayıcınızdaki \"Geri\" ya da \"Yenile\" düğmesine tıkladığınızdan, gönderilen form geçersiz sayıldı. Lütfen yeniden gönderin."
+msgstr "Büyük olasılıkla tarayıcınızdaki \"Geri\" ya da \"Yenile\" düğmesine tıkladığınızdan, gönderilen form geçersiz sayıldı. Lütfen yeniden gönderin."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:376
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:110
@@ -286,7 +286,7 @@ msgstr "Yapılandırma yeniden yüklendi"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:117
 #, java-format
 msgid "{0} address book in {1} database"
-msgstr "{0} adres defteri {1} veritabanında "
+msgstr "{0} adres defteri {1} veri tabanında "
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:258
 #, java-format
@@ -625,7 +625,7 @@ msgstr "Saat cinsinden güncelleme aralığı"
 msgid ""
 "Your public hosts.txt file (choose a path within your webserver document "
 "root)"
-msgstr "Herkese açık hosts.txt dosyası (web sunucunuzun belge kök klasörü altında bir yol seçin)"
+msgstr "Herkese açık hosts.txt dosyası (site sunucunuzun belge kök klasörü altında bir yol seçin)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:259
 msgid "Your hosts.txt (don't change)"
@@ -992,7 +992,7 @@ msgstr "İsteğe bağlı,"
 
 #: build/HowSVG.java:24
 msgid "for websites"
-msgstr "Web siteleri için"
+msgstr "Siteler için"
 
 #: build/HowSVG.java:25
 msgid ""

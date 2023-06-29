@@ -9,14 +9,15 @@
 # 82f4f02557fd4886d250a2aa0aecb530_0f90749 <0cd40767d55b0248271195f29db18a8d_208365>, 2014
 # tengo <akin@rbcmail.ru>, 2013
 # ValdikSS <iam@valdikss.org.ru>, 2021
+# Артём Котлубай <artemkotlubai@yandex.ru>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-05 15:14+0000\n"
-"PO-Revision-Date: 2021-06-09 17:25+0000\n"
-"Last-Translator: ValdikSS <iam@valdikss.org.ru>\n"
-"Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
+"PO-Revision-Date: 2013-07-20 14:49+0000\n"
+"Last-Translator: Артём Котлубай <artemkotlubai@yandex.ru>, 2023\n"
+"Language-Team: Russian (Russia) (http://app.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -31,17 +32,17 @@ msgstr "Добро пожаловать в I2P!"
 
 #, java-format
 msgid "Please {0}have patience{1} as I2P boots up and finds peers."
-msgstr "Немного терпения! {0}{1} I2P-маршрутизатору потребуется пара минут для запуска модулей и первого подключения к сети I2P."
+msgstr "Немного терпения! {0}{1} I2P-маршрутизатору потребуется две минуты для запуска модулей и первого подключения к сети I2P."
 
 #, java-format
 msgid ""
 "While you are waiting, please {0}adjust your bandwidth settings{1} on the "
 "{2}configuration page{3}."
-msgstr "Пока вы ждете, самое время зайти в {2}сетевые настройки{3} и {0}выставить ограничение скорости{1} в соответствии со скоростью вашего подключения к интернету."
+msgstr "Пока вы ждёте, самое время зайти в {2}сетевые настройки{3} и {0}выставить ограничение скорости{1} в соответствии со скоростью вашего подключения к сети."
 
 msgid ""
 "Also you can setup your browser to use the I2P proxy to reach eepsites."
-msgstr "Вы также можете настроить браузер на использование I2P-прокси, чтобы иметь доступ к I2P-сайтам (eepsites)."
+msgstr "Вы также можете настроить браузер на использование I2P-прокси, чтобы иметь доступ к I2P-сайтам."
 
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
@@ -54,13 +55,13 @@ msgstr "Не используйте SOCKS для этого."
 #, java-format
 msgid ""
 "More information can be found on the {0}I2P browser proxy setup page{1}."
-msgstr "Дополнительная информация есть на {0}странице настроек I2P-прокси{1}."
+msgstr "Подробности есть на {0}странице настроек I2P-прокси{1}."
 
 #, java-format
 msgid ""
 "Once you have a \"shared clients\" destination listed on the left, please "
 "{0}check out{1} our {2}FAQ{3}."
-msgstr "{0}Не забудьте заглянуть{1} в наш {2}{3} <a href=\"http://www.i2p2.i2p/faq_ru.html\">FAQ</a>."
+msgstr "{0}Не забудьте заглянуть{1} в {2}{3} <a href=\"http://www.i2p2.i2p/faq_ru.html\">ЧАВО</a>."
 
 #, java-format
 msgid ""

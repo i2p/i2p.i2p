@@ -29,6 +29,7 @@
 # brianhopes <voganc-12@live.ru>, 2015
 # yume, 2014-2015
 # yume, 2017
+# Артём Котлубай <artemkotlubai@yandex.ru>, 2023
 # Василий Суматохин <basilbasilbasil@gmail.com>, 2019
 # Нестор Кропоткин <someone_unnoticed@mail.ru>, 2017
 msgid ""
@@ -36,9 +37,9 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-17 13:12+0000\n"
-"PO-Revision-Date: 2021-11-17 19:41+0000\n"
-"Last-Translator: ValdikSS <iam@valdikss.org.ru>\n"
-"Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
+"PO-Revision-Date: 2011-02-13 11:46+0000\n"
+"Last-Translator: Артём Котлубай <artemkotlubai@yandex.ru>, 2023\n"
+"Language-Team: Russian (Russia) (http://app.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -714,7 +715,7 @@ msgstr "оптимизировать для малых задержек (irc)"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:700
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2272
 msgid "bulk connection (downloads/websites/BT)"
-msgstr "оптимизировать для большого объема (www/bittorrent)"
+msgstr "оптимизировать для большого объёма (www/bittorrent)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:702
 msgid "Delay Connection"

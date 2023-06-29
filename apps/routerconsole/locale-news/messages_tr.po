@@ -4,15 +4,15 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2013,2015,2018-2019,2021-2022
+# Kaya Zeren <kayazeren@gmail.com>, 2013,2015,2018-2019,2021-2023
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-05 15:14+0000\n"
 "PO-Revision-Date: 2013-07-20 14:49+0000\n"
-"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2013,2015,2018-2019,2021-2022\n"
-"Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2013,2015,2018-2019,2021-2023\n"
+"Language-Team: Turkish (Turkey) (http://app.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -27,7 +27,7 @@ msgstr "I2P uygulamasına hoş geldiniz!"
 
 #, java-format
 msgid "Please {0}have patience{1} as I2P boots up and finds peers."
-msgstr "Lütfen I2P yüklenip eşleri bulana kadar {0}sabırlı olun{1}."
+msgstr "Lütfen I2P açılıp eşleri bulana kadar {0}sabırlı olun{1}."
 
 #, java-format
 msgid ""
@@ -37,12 +37,12 @@ msgstr "Beklerken, lütfen {2}yapılandırma bölümünden{3} {0}bant genişliğ
 
 msgid ""
 "Also you can setup your browser to use the I2P proxy to reach eepsites."
-msgstr "Ayrıca eepsitelerine erişmek için web tarayıcınızı I2P vekil sunucusunu kullanacak şekilde ayarlayabilirsiniz."
+msgstr "Ayrıca eepsitelerine erişmek için tarayıcınızı I2P vekil sunucusunu kullanacak şekilde ayarlayabilirsiniz."
 
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
 "browser settings."
-msgstr "web tarayıcınıza vekil sunucu adresi olarak 127.0.0.1 (ya da localhost) bağlantı noktası olarak 4444 yazın."
+msgstr "Tarayıcınıza vekil sunucu adresi olarak 127.0.0.1 (ya da localhost) bağlantı noktası olarak 4444 yazın."
 
 msgid "Do not use SOCKS for this."
 msgstr "SOCKS kullanmayın."
@@ -50,7 +50,7 @@ msgstr "SOCKS kullanmayın."
 #, java-format
 msgid ""
 "More information can be found on the {0}I2P browser proxy setup page{1}."
-msgstr "Ayrıntılı bilgi için {0}I2P web tarayıcı vekil sunucu ayarları sayfasına{1} bakabilirsiniz."
+msgstr "Ayrıntılı bilgi için {0}I2P tarayıcı vekil sunucu ayarları sayfasına{1} bakabilirsiniz."
 
 #, java-format
 msgid ""

@@ -7,7 +7,7 @@
 # Translators:
 # Erkin Batu Altunbaş <erkinbatu@gmail.com>, 2019
 # ilkeryus <ilkeryus@gmail.com>, 2019
-# Kaya Zeren <kayazeren@gmail.com>, 2022
+# Kaya Zeren <kayazeren@gmail.com>, 2023
 # 
 msgid ""
 msgstr ""
@@ -15,8 +15,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-18 13:32+0000\n"
 "PO-Revision-Date: 2019-12-19 14:09+0000\n"
-"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2022\n"
-"Language-Team: Turkish (Turkey) (https://www.transifex.com/otf/teams/12694/tr_TR/)\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2023\n"
+"Language-Team: Turkish (Turkey) (https://app.transifex.com/otf/teams/12694/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -34,7 +34,7 @@ msgstr "IPv4: Tamam; IPv6: Sınanıyor"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:372
 msgid "IPv4: OK; IPv6: Firewalled"
-msgstr "IPv4: Tamam; IPv6: Güvenlik duvarlı"
+msgstr "IPv4: Tamam; IPv6: Güvenlik duvarı arkasında"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:373
 msgid "IPv4: Testing; IPv6: OK"
@@ -72,7 +72,7 @@ msgstr "Güvenlik duvarlı"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:383
 msgid "IPv4: Testing; IPv6: Firewalled"
-msgstr "IPv4: Sınanıyor; IPv6: Güvenlik duvarlı"
+msgstr "IPv4: Sınanıyor; IPv6: Güvenlik duvarı arkasında"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:384
 msgid "IPv4: Disabled; IPv6: Testing"
@@ -80,7 +80,7 @@ msgstr "IPv4: Devre dışı; IPv6: Sınanıyor"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:385
 msgid "IPv4: Disabled; IPv6: Firewalled"
-msgstr "IPv4: Devre dışı; IPv6: Güvenlik duvarlı"
+msgstr "IPv4: Devre dışı; IPv6: Güvenlik duvarı arkasında"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:386
 msgid "Disconnected"
@@ -88,7 +88,7 @@ msgstr "Bağlantı kesildi"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:387
 msgid "Port Conflict"
-msgstr "Bağlantı Noktası Çakışması"
+msgstr "Bağlantı noktası çakışması"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:388
 msgid "Testing"
@@ -103,19 +103,19 @@ msgstr "Sınanıyor"
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:142
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:545
 msgid "Rejecting tunnels: Starting up"
-msgstr "Tünelleme red ediliyor: Başlatılıyor"
+msgstr "Tüneller red ediliyor: Başlatılıyor"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:189
 msgid "Rejecting tunnels: High message delay"
-msgstr "Tünelleme red ediliyor: Yüksek ileti gecikmesi"
+msgstr "Tüneller red ediliyor: Yüksek ileti gecikmesi"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:202
 msgid "Rejecting tunnels: Limit reached"
-msgstr "Tünelleme red ediliyor: Sınıra ulaşıldı"
+msgstr "Tüneller red ediliyor: Sınıra ulaşıldı"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:241
 msgid "Rejecting most tunnels: High number of requests"
-msgstr "Çoğu tünelleme red ediliyor: Çok sayıda istek"
+msgstr "Çoğu tünel red ediliyor: Çok sayıda istek"
 
 #. hard to do {0} from here
 #. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of
@@ -136,22 +136,22 @@ msgstr "Tüneller kabul ediliyor"
 #. always leave at least 4KBps free when allowing
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:350
 msgid "Rejecting tunnels: Bandwidth limit"
-msgstr "Tünelleme red ediliyor: Bant genişliği sınırı"
+msgstr "Tüneller red ediliyor: Bant genişliği sınırı"
 
 #. hard to do {0} from here
 #. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels:
 #. Bandwidth limit");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:420
 msgid "Rejecting most tunnels: Bandwidth limit"
-msgstr "Çoğu tünelleme red ediliyor: Bant genişliği sınırı"
+msgstr "Çoğu tüneller red ediliyor: Bant genişliği sınırı"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:550
 msgid "Rejecting tunnels: Shutting down"
-msgstr "Tünelleme red ediliyor: Kapatılıyor"
+msgstr "Tüneller red ediliyor: Kapatılıyor"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:563
 msgid "Rejecting tunnels"
-msgstr "Tünelleme red ediliyor"
+msgstr "Tüneller red ediliyor"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:260
 msgid "Dropping tunnel requests: Too slow"
