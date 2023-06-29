@@ -443,8 +443,8 @@ Index: b/installer/resources/locale/po/messages_tr.po
 ===================================================================
 --- a/installer/resources/locale/po/messages_tr.po
 +++ b/installer/resources/locale/po/messages_tr.po
-@@ -186,13 +186,13 @@ msgid "Request a Java thread dump if run
- msgstr "Çalışıyorsa Java iş parçacığı dökümü isteyin."
+@@ -186,13 +186,13 @@ msgid "Request a Java thread dump if running."
+ msgstr "Çalışıyorsa Java iş parçacığı dökümünü iste."
  
  #: ../i2prouter:1874
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
@@ -531,7 +531,7 @@ Index: b/installer/resources/locale/po/messages_ru.po
 ===================================================================
 --- a/installer/resources/locale/po/messages_ru.po
 +++ b/installer/resources/locale/po/messages_ru.po
-@@ -193,13 +193,13 @@ msgid "Request a Java thread dump if run
+@@ -193,13 +193,13 @@ msgid "Request a Java thread dump if running."
  msgstr "Запросить дамп нитей Java, если запущено."
  
  #: ../i2prouter:1874
@@ -542,13 +542,13 @@ Index: b/installer/resources/locale/po/messages_ru.po
  
  #: ../i2prouter:1879
  msgid "Running I2P as the root user is *not* recommended."
- msgstr "Запускать I2P от имени root'а *НЕ* рекомендуется."
+ msgstr "Запускать I2P от суперпользователя *НЕ* желательно"
  
  #: ../i2prouter:1882
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
--msgstr "Чтобы всё равно запустить под root'ом, отредактируйте i2prouter и установите ALLOW_ROOT=true."
+-msgstr "Чтобы всё равно запустить от суперпользователя, отредактируйте i2prouter и установите ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
-+msgstr "Чтобы всё равно запустить под root'ом, отредактируйте /etc/default/i2p и установите ALLOW_ROOT=true."
++msgstr "Чтобы всё равно запустить от суперпользователя, отредактируйте /etc/default/i2p и установите ALLOW_ROOT=true."
 Index: b/installer/resources/locale/po/messages_sv.po
 ===================================================================
 --- a/installer/resources/locale/po/messages_sv.po
