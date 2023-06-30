@@ -92,6 +92,16 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 // This could happen with multihoming - where it's really important to prevent
                 // storing the other guy's leaseset, it will confuse us badly.
                 LeaseSet ls = (LeaseSet) entry;
+                // If this was received as a response to a query,
+                // FloodOnlyLookupMatchJob called setReceivedAsReply(),
+                // and we are seeing this only as a duplicate,
+                // so we don't set the receivedAsPublished() flag.
+                // Otherwise, mark it as something we received unsolicited, so we'll answer queries 
+                // for it.  This flag must NOT get set on entries that we 
+                // receive in response to our own lookups.
+                // See ../HDLMJ for more info
+                if (!ls.getReceivedAsReply())
+                    ls.setReceivedAsPublished();
                 if (getContext().clientManager().isLocal(key)) {
                     getContext().statManager().addRateData("netDb.storeLocalLeaseSetAttempt", 1, 0);
                     // throw rather than return, so that we send the ack below (prevent easy attack)
@@ -111,16 +121,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 }
                 //boolean oldrar = ls.getReceivedAsReply();
                 //boolean oldrap = ls.getReceivedAsPublished();
-                // If this was received as a response to a query,
-                // FloodOnlyLookupMatchJob called setReceivedAsReply(),
-                // and we are seeing this only as a duplicate,
-                // so we don't set the receivedAsPublished() flag.
-                // Otherwise, mark it as something we received unsolicited, so we'll answer queries 
-                // for it.  This flag must NOT get set on entries that we 
-                // receive in response to our own lookups.
-                // See ../HDLMJ for more info
-                if (!ls.getReceivedAsReply())
-                    ls.setReceivedAsPublished();
+
                 //boolean rap = ls.getReceivedAsPublished();
                 //if (_log.shouldLog(Log.INFO))
                 //    _log.info("oldrap? " + oldrap + " oldrar? " + oldrar + " newrap? " + rap);

@@ -163,10 +163,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                     getContext().statManager().addRateData("netDb.lookupsMatchedLocalClosest", 1);
                     sendData(searchKey, ls, fromKey, toTunnel);
                 } else if (possibleMultihomed != null) {
-                    if (possibleMultihomed.isCurrent(Router.CLOCK_FUDGE_FACTOR / 4)) {
-                        // If it's in the possibleMultihomed cache, then it was definitely stored to us meaning it is effectively
-                        // always recievedAsPublished. No need to decide whether or not to answer the request like above, just
-                        // answer it so it doesn't look different from other stores.
+                    if (possibleMultihomed.isCurrent(Router.CLOCK_FUDGE_FACTOR / 4) && possibleMultihomed.getReceivedAsPublished()) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("We have local LS, possibly from a multihomed router " + searchKey + ", and somebody requested it back from us. Answering query, as if in our keyspace, to avoid attack.");
                         getContext().statManager().addRateData("netDb.lookupsMatchedLocalMultihome", 1);
@@ -192,10 +189,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             } else {
                 LeaseSet possibleMultihomed = getContext().clientMessagePool().getCache().multihomedCache.get(searchKey);
                 if (possibleMultihomed != null) {
-                    if (possibleMultihomed.isCurrent(Router.CLOCK_FUDGE_FACTOR / 4)) {
-                        // If it's in the possibleMultihomed cache, then it was definitely stored to us meaning it is effectively
-                        // always recievedAsPublished. No need to decide whether or not to answer the request like above, just
-                        // answer it so it doesn't look different from other stores.
+                    if (possibleMultihomed.isCurrent(Router.CLOCK_FUDGE_FACTOR / 4) && possibleMultihomed.getReceivedAsPublished()) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("We have local LS, possibly from a multihomed router " + searchKey + ", and somebody requested it back from us. Answering query, as if in our keyspace, to avoid attack.");
                         getContext().statManager().addRateData("netDb.lookupsMatchedLocalMultihome", 1);
