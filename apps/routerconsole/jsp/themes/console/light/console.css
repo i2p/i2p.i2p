@@ -1773,16 +1773,11 @@ h1,
     box-sizing: border-box;
     display: inline-block;
     border: 1px solid #dee2e6;
-    border-radius: 12px;
+    border-radius: 4px;
     margin: 2 1px 1px 1px !important;
-    padding: 1px 0;
+    padding: 4px 12px;
     background: #fff;
     min-width: 60px !important;
-}
-
-.tab a {
-    display: inline-block;
-    padding: 3px 14px;
 }
 
 .tab:hover a {
@@ -1791,35 +1786,31 @@ h1,
 
 .tab {
     background: #f6f6fa;
-    box-shadow: inset 0 0 0 1px #f6f6fa;
 }
 
 .tab:hover {
     background: #dee2e6;
-    box-shadow: inset 0 0 0 1px #dee2e6;
     position: relative;
     z-index: 30;
 }
 
 .tab:active {
-    box-shadow: inset 3px 2px 2px #4661A9;
+    color: #fafaff;
     background: #4661A9;
+    border-color: #4661A9;
     transition: ease box-shadow 0.05s;
 }
 
 .tab:active a {
     color: #dee2e6 !important;
-    text-shadow: 0 1px 1px #5f2d0c;
 }
 
 .tab2 {
     position: relative;
     z-index: 50;
-    padding: 4px 12px;
     color: #fafaff;
-    text-shadow: 0 1px 1px #113;
-    box-shadow: inset 1px 1px 1px rgba(31, 43, 63, 0.7);
     background: #4661A9;
+    border-color: #4661A9;
 }
 
 
