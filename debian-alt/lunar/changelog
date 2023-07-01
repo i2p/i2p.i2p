@@ -1,3 +1,9 @@
+i2p (2.3.0-1ubuntu1) lunar; urgency=medium
+
+  * New upstream version 2.3.0
+
+ -- idk <hankhill19580@gmail.com>  Sat, 1 Jul 2023 10:45:12 +0000
+
 i2p (2.2.1-1~lunar+1) lunar; urgency=medium
 
   * New upstream version 2.2.1
