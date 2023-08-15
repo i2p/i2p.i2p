@@ -19,7 +19,8 @@ import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
 
 /**
- * Build a HandleDatabaseLookupMessageJob whenever a DatabaseLookupMessage arrives
+ * Build a HandleDatabaseLookupMessageJob whenever a DatabaseLookupMessage
+ * arrives
  *
  */
 public class FloodfillDatabaseLookupMessageHandler implements HandlerJobBuilder {
@@ -32,59 +33,112 @@ public class FloodfillDatabaseLookupMessageHandler implements HandlerJobBuilder 
         _context = context;
         _facade = facade;
         _log = context.logManager().getLog(FloodfillDatabaseLookupMessageHandler.class);
-        _context.statManager().createRateStat("netDb.lookupsReceived", "How many netDb lookups have we received?", "NetworkDatabase", new long[] { 60*60*1000l });
-        _context.statManager().createRateStat("netDb.lookupsDropped", "How many netDb lookups did we drop due to throttling?", "NetworkDatabase", new long[] { 60*60*1000l });
+        _context.statManager().createRateStat("netDb.lookupsReceived", "How many netDb lookups have we received?",
+                "NetworkDatabase", new long[] { 60 * 60 * 1000l });
+        _context.statManager().createRateStat("netDb.lookupsDropped",
+                "How many netDb lookups did we drop due to throttling?", "NetworkDatabase",
+                new long[] { 60 * 60 * 1000l });
+        _context.statManager().createRateStat("netDb.lookupsDroppedDueToPriorBan",
+                "How many netDb lookups did we drop due to having a prior ban?", "NetworkDatabase",
+                new long[] { 60 * 60 * 1000l });
+        _context.statManager().createRateStat("netDb.nonFFLookupsDropped",
+                "How many netDb lookups did we drop due to us not being a floodfill?", "NetworkDatabase",
+                new long[] { 60 * 60 * 1000l });
+        _context.statManager().createRateStat("netDb.repeatedLookupsDropped",
+                "How many netDb lookups are coming in faster than we want?", "NetworkDatabase",
+                new long[] { 60 * 60 * 1000l });
+        _context.statManager().createRateStat("netDb.repeatedBurstLookupsDropped",
+                "How many netDb lookups did we drop due to burst throttling?", "NetworkDatabase",
+                new long[] { 60 * 60 * 1000l });
         // following are for ../HDLMJ
-        _context.statManager().createRateStat("netDb.lookupsHandled", "How many netDb lookups have we handled?", "NetworkDatabase", new long[] { 60*60*1000l });
-        _context.statManager().createRateStat("netDb.lookupsMatched", "How many netDb lookups did we have the data for?", "NetworkDatabase", new long[] { 60*60*1000l });
-        _context.statManager().createRateStat("netDb.lookupsMatchedLeaseSet", "How many netDb leaseSet lookups did we have the data for?", "NetworkDatabase", new long[] { 60*60*1000l });
-        _context.statManager().createRateStat("netDb.lookupsMatchedReceivedPublished", "How many netDb lookups did we have the data for that were published to us?", "NetworkDatabase", new long[] { 60*60*1000l });
-        _context.statManager().createRateStat("netDb.lookupsMatchedLocalClosest", "How many netDb lookups for local data were received where we are the closest peers?", "NetworkDatabase", new long[] { 60*60*1000l });
-        _context.statManager().createRateStat("netDb.lookupsMatchedLocalNotClosest", "How many netDb lookups for local data were received where we are NOT the closest peers?", "NetworkDatabase", new long[] { 60*60*1000l });
-        _context.statManager().createRateStat("netDb.lookupsMatchedRemoteNotClosest", "How many netDb lookups for remote data were received where we are NOT the closest peers?", "NetworkDatabase", new long[] { 60*60*1000l });
+        _context.statManager().createRateStat("netDb.lookupsHandled", "How many netDb lookups have we handled?",
+                "NetworkDatabase", new long[] { 60 * 60 * 1000l });
+        _context.statManager().createRateStat("netDb.lookupsMatched",
+                "How many netDb lookups did we have the data for?", "NetworkDatabase", new long[] { 60 * 60 * 1000l });
+        _context.statManager().createRateStat("netDb.lookupsMatchedLeaseSet",
+                "How many netDb leaseSet lookups did we have the data for?", "NetworkDatabase",
+                new long[] { 60 * 60 * 1000l });
+        _context.statManager().createRateStat("netDb.lookupsMatchedReceivedPublished",
+                "How many netDb lookups did we have the data for that were published to us?", "NetworkDatabase",
+                new long[] { 60 * 60 * 1000l });
+        _context.statManager().createRateStat("netDb.lookupsMatchedLocalClosest",
+                "How many netDb lookups for local data were received where we are the closest peers?",
+                "NetworkDatabase", new long[] { 60 * 60 * 1000l });
+        _context.statManager().createRateStat("netDb.lookupsMatchedLocalNotClosest",
+                "How many netDb lookups for local data were received where we are NOT the closest peers?",
+                "NetworkDatabase", new long[] { 60 * 60 * 1000l });
+        _context.statManager().createRateStat("netDb.lookupsMatchedRemoteNotClosest",
+                "How many netDb lookups for remote data were received where we are NOT the closest peers?",
+                "NetworkDatabase", new long[] { 60 * 60 * 1000l });
     }
 
     public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
         _context.statManager().addRateData("netDb.lookupsReceived", 1);
 
-        DatabaseLookupMessage dlm = (DatabaseLookupMessage)receivedMessage;
+        DatabaseLookupMessage dlm = (DatabaseLookupMessage) receivedMessage;
+        boolean isBanned = dlm.getFrom() != null && (_context.banlist().isBanlistedForever(dlm.getFrom()) ||
+                _context.banlist().isBanlisted(dlm.getFrom()));
+        if (isBanned) {
+            _context.statManager().addRateData("netDb.lookupsDroppedDueToPriorBan", 1);
+            return null;
+        }
+        boolean ourRI = dlm.getSearchKey() != null && dlm.getSearchKey().equals(_context.routerHash());
+        if (!_context.netDb().floodfillEnabled() && (dlm.getReplyTunnel() == null && !ourRI)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Dropping " + dlm.getSearchType() + " lookup request for " + dlm.getSearchKey()
+                        + " (we are not a floodfill), reply was to: " + dlm.getFrom() + " tunnel: "
+                        + dlm.getReplyTunnel());
+            _context.statManager().addRateData("netDb.nonFFLookupsDropped", 1);
+            return null;
+        }
 
         if (_facade.shouldBanLookup(dlm.getFrom(), dlm.getReplyTunnel())) {
             if (_log.shouldLog(Log.WARN)) {
-                _log.warn("Possibly throttling " + dlm.getSearchType() + " lookup request for " + dlm.getSearchKey() + " because requests are being sent extremely fast, reply was to: " + dlm.getFrom() + " tunnel: " + dlm.getReplyTunnel());    
+                _log.warn("Possibly throttling " + dlm.getSearchType() + " lookup request for " + dlm.getSearchKey()
+                        + " because requests are being sent extremely fast, reply was to: " + dlm.getFrom()
+                        + " tunnel: " + dlm.getReplyTunnel());
                 _context.statManager().addRateData("netDb.repeatedLookupsDropped", 1);
             }
-            /* 
-             * We don't do this yet, but we do ban routers who do much faster bursts of lookups
-             * _context.banlist().banlistRouter(dlm.getFrom(), " <b>➜</b> Excessive lookup requests", null, null, _context.clock().now() + 4*60*60*1000);
-             * _context.commSystem().mayDisconnect(dlm.getFrom());
-             * _context.statManager().addRateData("netDb.lookupsDropped", 1);
-             * return null;
+            /*
+             * TODO: Keep a close eye on this, if it results in too many bans then just back
+             * it out.
              */
-        }
-        if (_facade.shouldBanBurstLookup(dlm.getFrom(), dlm.getReplyTunnel())) {
-            if (_log.shouldLog(Log.WARN)) {
-                _log.warn("Banning " + dlm.getSearchType() + " lookup request for " + dlm.getSearchKey() + " because requests are being sent extremely fast in a very short time, reply was to: " + dlm.getFrom() + " tunnel: " + dlm.getReplyTunnel());    
-                _context.statManager().addRateData("netDb.repeatedBurstLookupsDropped", 1);
-            }
-            _context.banlist().banlistRouter(dlm.getFrom(), " <b>➜</b> Excessive lookup requests, burst", null, null, _context.clock().now() + 4*60*60*1000);
+            _context.banlist().banlistRouter(dlm.getFrom(),
+                    " <b>➜</b> Excessive lookup requests", null, null, _context.clock().now() +
+                            4 * 60 * 60 * 1000);
             _context.commSystem().mayDisconnect(dlm.getFrom());
             _context.statManager().addRateData("netDb.lookupsDropped", 1);
             return null;
         }
-        if ((!_facade.shouldThrottleLookup(dlm.getFrom(), dlm.getReplyTunnel()) && !_facade.shouldThrottleBurstLookup(dlm.getFrom(), dlm.getReplyTunnel())) 
-            || _context.routerHash().equals(dlm.getFrom())) {
+        if (_facade.shouldBanBurstLookup(dlm.getFrom(), dlm.getReplyTunnel())) {
+            if (_log.shouldLog(Log.WARN)) {
+                _log.warn("Banning " + dlm.getSearchType() + " lookup request for " + dlm.getSearchKey()
+                        + " because requests are being sent extremely fast in a very short time, reply was to: "
+                        + dlm.getFrom() + " tunnel: " + dlm.getReplyTunnel());
+                _context.statManager().addRateData("netDb.repeatedBurstLookupsDropped", 1);
+            }
+            _context.banlist().banlistRouter(dlm.getFrom(), " <b>➜</b> Excessive lookup requests, burst", null, null,
+                    _context.clock().now() + 4 * 60 * 60 * 1000);
+            _context.commSystem().mayDisconnect(dlm.getFrom());
+            _context.statManager().addRateData("netDb.lookupsDropped", 1);
+            return null;
+        }
+        if ((!_facade.shouldThrottleLookup(dlm.getFrom(), dlm.getReplyTunnel())
+                && !_facade.shouldThrottleBurstLookup(dlm.getFrom(), dlm.getReplyTunnel()))
+                || _context.routerHash().equals(dlm.getFrom())) {
             Job j = new HandleFloodfillDatabaseLookupMessageJob(_context, dlm, from, fromHash, _msgIDBloomXor);
-            //if (false) {
-            //    // might as well inline it, all the heavy lifting is queued up in later jobs, if necessary
-            //    j.runJob();
-            //    return null;
-            //} else {                
+            // if (false) {
+            // // might as well inline it, all the heavy lifting is queued up in later jobs,
+            // if necessary
+            // j.runJob();
+            // return null;
+            // } else {
             return j;
-            //}
+            // }
         } else {
-            if (_log.shouldLog(Log.WARN)) 
-                _log.warn("Dropping " + dlm.getSearchType() + " lookup request for " + dlm.getSearchKey() + " (throttled), reply was to: " + dlm.getFrom() + " tunnel: " + dlm.getReplyTunnel());
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Dropping " + dlm.getSearchType() + " lookup request for " + dlm.getSearchKey()
+                        + " (throttled), reply was to: " + dlm.getFrom() + " tunnel: " + dlm.getReplyTunnel());
             _context.statManager().addRateData("netDb.lookupsDropped", 1);
             return null;
         }

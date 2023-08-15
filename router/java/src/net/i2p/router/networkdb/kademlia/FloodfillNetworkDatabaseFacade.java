@@ -43,7 +43,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     private LookupThrottler _lookupBanner;
     private LookupThrottler _lookupBannerBurst;
     private final Job _ffMonitor;
-    private final int BAN_LOOKUP_BASE = 50;
+    private final int BAN_LOOKUP_BASE = 75;
     private final int BAN_LOOKUP_BASE_INTERVAL = 5*60*1000;
     private final int BAN_LOOKUP_BURST = 10;
     private final int BAN_LOOKUP_BURST_INTERVAL = 15*1000;
