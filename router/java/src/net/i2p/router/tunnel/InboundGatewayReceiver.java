@@ -33,7 +33,7 @@ class InboundGatewayReceiver implements TunnelGateway.Receiver {
         if (!alreadySearched)
             _config.incrementProcessedMessages();
         if (_target == null) {
-            _target = _context.netDb().lookupRouterInfoLocally(_config.getSendTo());
+            _target = _context.floodfillNetDb().lookupRouterInfoLocally(_config.getSendTo());
             if (_target == null) {
                 // It should be rare to forget the router info for the next peer
                 ReceiveJob j = null;
@@ -41,7 +41,7 @@ class InboundGatewayReceiver implements TunnelGateway.Receiver {
                     _context.statManager().addRateData("tunnel.inboundLookupSuccess", 0);
                 else
                     j = new ReceiveJob(_context, encrypted);
-                _context.netDb().lookupRouterInfo(_config.getSendTo(), j, j, MAX_LOOKUP_TIME);
+                _context.floodfillNetDb().lookupRouterInfo(_config.getSendTo(), j, j, MAX_LOOKUP_TIME);
                 return -1;
             }
         }

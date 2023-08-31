@@ -279,8 +279,8 @@ class ProfilePersistenceHelper {
                 f.delete();
             }
         }
-        if (_log.shouldWarn())
-            _log.warn("Deleted " + i + " old profiles");
+        if (_log.shouldInfo())
+            _log.info("Deleted " + i + " old profiles");
         return i;
     }
 

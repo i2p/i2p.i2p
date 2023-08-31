@@ -330,7 +330,7 @@ class EstablishmentManager {
             if (id == -1)
                 _context.banlist().banlistRouter(toHash, "No network specified", null, null, _context.clock().now() + Banlist.BANLIST_DURATION_NO_NETWORK);
             else
-                _context.banlist().banlistRouterForever(toHash, "Not in our network: " + id);
+                _context.banlist().banlistRouterHard(toHash, "Not in our network: " + id);
             if (_log.shouldWarn())
                 _log.warn("Not in our network: " + toRouterInfo, new Exception());
             _transport.markUnreachable(toHash);
@@ -1177,7 +1177,7 @@ class EstablishmentManager {
             // Lookup the peer's MTU from the netdb, since it isn't included in the protocol setup (yet)
             // TODO if we don't have RI then we will get it shortly, but too late.
             // Perhaps netdb should notify transport when it gets a new RI...
-            RouterInfo info = _context.netDb().lookupRouterInfoLocally(remote.calculateHash());
+            RouterInfo info = _context.floodfillNetDb().lookupRouterInfoLocally(remote.calculateHash());
             if (info != null) {
                 RouterAddress addr = _transport.getTargetAddress(info);
                 if (addr != null) {
@@ -1603,7 +1603,7 @@ class EstablishmentManager {
                         case INTRO_STATE_INIT:
                         case INTRO_STATE_LOOKUP_SENT:
                         case INTRO_STATE_HAS_RI:
-                            bob = _context.netDb().lookupRouterInfoLocally(h);
+                            bob = _context.floodfillNetDb().lookupRouterInfoLocally(h);
                             if (bob != null)
                                 istate = INTRO_STATE_HAS_RI;
                             break;
@@ -1665,7 +1665,7 @@ class EstablishmentManager {
                         istate = INTRO_STATE_LOOKUP_SENT;
                         state2.setIntroState(h, istate);
                         // TODO on success job
-                        _context.netDb().lookupRouterInfo(h, null, null, 10*1000);
+                        _context.floodfillNetDb().lookupRouterInfo(h, null, null, 10*1000);
                         sent = true;
                     }
                 }
@@ -1830,8 +1830,8 @@ class EstablishmentManager {
         }
         Hash bobHash = bob.getRemotePeer();
         Hash charlieHash = charlie.getRemoteIdentity().getHash();
-        RouterInfo bobRI = _context.netDb().lookupRouterInfoLocally(bobHash);
-        RouterInfo charlieRI = _context.netDb().lookupRouterInfoLocally(charlieHash);
+        RouterInfo bobRI = _context.floodfillNetDb().lookupRouterInfoLocally(bobHash);
+        RouterInfo charlieRI = _context.floodfillNetDb().lookupRouterInfoLocally(charlieHash);
         Hash signer;
         OutboundEstablishState2.IntroState istate;
         if (code > 0 && code < 64) {
@@ -1844,7 +1844,7 @@ class EstablishmentManager {
             else
                 istate = INTRO_STATE_CHARLIE_REJECT;
         }
-        RouterInfo signerRI = _context.netDb().lookupRouterInfoLocally(signer);
+        RouterInfo signerRI = _context.floodfillNetDb().lookupRouterInfoLocally(signer);
         if (signerRI != null) {
             // validate signed data
             SigningPublicKey spk = signerRI.getIdentity().getSigningPublicKey();
@@ -2073,7 +2073,7 @@ class EstablishmentManager {
             return;
         OutboundEstablishState2 state2 = (OutboundEstablishState2) state;
         Hash charlieHash = state.getRemoteIdentity().getHash();
-        RouterInfo charlieRI = _context.netDb().lookupRouterInfoLocally(charlieHash);
+        RouterInfo charlieRI = _context.floodfillNetDb().lookupRouterInfoLocally(charlieHash);
         if (charlieRI != null) {
             // validate signed data, but we don't necessarily know which Bob
             SigningPublicKey spk = charlieRI.getIdentity().getSigningPublicKey();
@@ -2431,7 +2431,7 @@ class EstablishmentManager {
                   case IB_STATE_CONFIRMED_COMPLETELY:
                     RouterIdentity remote = inboundState.getConfirmedIdentity();
                     if (remote != null) {
-                        if (_context.banlist().isBanlistedForever(remote.calculateHash())) {
+                        if (_context.banlist().isBanlistedHard(remote.calculateHash())) {
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Dropping inbound connection from permanently banlisted peer: " + remote.calculateHash());
                             // So next time we will not accept the con, rather than doing the whole handshake

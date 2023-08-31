@@ -181,7 +181,7 @@ public class TunnelDispatcher implements Service {
         ctx.statManager().createRateStat("tunnel.failedCompletelyMessages", 
                                          "How many messages are sent through a tunnel that failed prematurely (period == failures)?", "Tunnels", 
                                          new long[] { 60*1000l, 10*60*1000l, 60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.failedPartially", 
+        ctx.statManager().createRateStat("tunnel.failedPartiallyMessages",
                                          "How many messages are sent through a tunnel that only failed partially (period == failures)?", "Tunnels", 
                                          new long[] { 60*1000l, 10*60*1000l, 60*60*1000l });
         // following are for BatchedPreprocessor
@@ -226,6 +226,10 @@ public class TunnelDispatcher implements Service {
         ctx.statManager().createRateStat("tunnel.handleLoadClove", "When do we receive load test cloves", "Tunnels", new long[] { 60*60*1000 });
         // following is for PumpedTunnelGateway
         ctx.statManager().createRateStat("tunnel.dropGatewayOverflow", "Dropped message at GW, queue full", "Tunnels", new long[] { 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.inboundI2NPGarlicRIDSM", "IBMD Storing Garlic RI DSM",
+                                         "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.outboundTunnelEndpointFwdRIDSM", "OBTE Forwarding RI DSM",
+                                         "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
     }
 
     /** for IBGW */

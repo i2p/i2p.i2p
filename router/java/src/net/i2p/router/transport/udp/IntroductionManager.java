@@ -279,7 +279,7 @@ class IntroductionManager {
                 if (_builder != null && ssu2count >= 2)
                     continue;
             }
-            RouterInfo ri = _context.netDb().lookupRouterInfoLocally(hash);
+            RouterInfo ri = _context.floodfillNetDb().lookupRouterInfoLocally(hash);
             if (ri == null) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Picked peer has no local routerInfo: " + cur);
@@ -836,7 +836,7 @@ class IntroductionManager {
             // add a code for this?
             rcode = SSU2Util.RELAY_REJECT_BOB_NO_TAG;
         } else {
-            aliceRI = _context.netDb().lookupRouterInfoLocally(alice.getRemotePeer());
+            aliceRI = _context.floodfillNetDb().lookupRouterInfoLocally(alice.getRemotePeer());
             if (aliceRI != null) {
                 // validate signed data
                 SigningPublicKey spk = aliceRI.getIdentity().getSigningPublicKey();
@@ -967,9 +967,9 @@ class IntroductionManager {
         RouterInfo aliceRI = null;
         if (retryCount >= 5) {
             // last chance
-            aliceRI = _context.netDb().lookupRouterInfoLocally(alice);
+            aliceRI = _context.floodfillNetDb().lookupRouterInfoLocally(alice);
         } else if (!_context.banlist().isBanlisted(alice)) {
-            aliceRI = _context.netDb().lookupRouterInfoLocally(alice);
+            aliceRI = _context.floodfillNetDb().lookupRouterInfoLocally(alice);
             if (aliceRI == null) {
                 if (_log.shouldInfo())
                     _log.info("Delay after " + retryCount + " retries, no RI for " + alice.toBase64());
@@ -1200,7 +1200,7 @@ class IntroductionManager {
             // We are Bob, send to Alice
             // Debug, check the signature, but send it along even if failed
             if (true) {
-                RouterInfo charlie = _context.netDb().lookupRouterInfoLocally(peer.getRemotePeer());
+                RouterInfo charlie = _context.floodfillNetDb().lookupRouterInfoLocally(peer.getRemotePeer());
                 if (charlie != null) {
                     byte[] signedData;
                     if (status == 0)

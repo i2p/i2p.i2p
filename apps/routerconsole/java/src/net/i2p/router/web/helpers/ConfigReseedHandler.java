@@ -24,7 +24,7 @@ public class ConfigReseedHandler extends FormHandler {
     @Override
     protected void processForm() {
 
-        ReseedChecker checker = _context.netDb().reseedChecker();
+        ReseedChecker checker = _context.floodfillNetDb().reseedChecker();
         if (_action.equals(_t("Save changes and reseed now"))) {
             saveChanges();
             if (!checker.requestReseed()) {

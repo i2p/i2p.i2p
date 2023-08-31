@@ -129,7 +129,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
             return;
         }
         DatabaseLookupMessage lookup = buildLookup(replyTunnelInfo);
- 
+
         // If we are verifying a leaseset, use the destination's own tunnels,
         // to avoid association by the exploratory tunnel OBEP.
         // Unless it is an encrypted leaseset.
@@ -151,7 +151,9 @@ class FloodfillVerifyStoreJob extends JobImpl {
         RouterInfo peer = _facade.lookupRouterInfoLocally(_target);
         if (peer == null) {
              if (_log.shouldLog(Log.WARN))
-                 _log.warn("Fail finding target RI");
+                 _log.warn("(JobId: " + getJobId()
+                           + "; dbid: " + _facade._dbid
+                           + ") Fail looking up RI locally for target " + _target);
             _facade.verifyFinished(_key);
             return;
         }
@@ -243,7 +245,8 @@ class FloodfillVerifyStoreJob extends JobImpl {
         }
 
         if (_log.shouldLog(Log.INFO))
-            _log.info(getJobId() + ": Starting verify (stored " + _key + " to " + _sentTo + "), asking " + _target);
+            _log.info("[JobId: " + getJobId() + "; dbid: " + _facade._dbid
+                      + "]: Starting verify (stored " + _key + " to " + _sentTo + "), asking " + _target);
         _sendTime = ctx.clock().now();
         _expiration = _sendTime + VERIFY_TIMEOUT;
         ctx.messageRegistry().registerPending(new VerifyReplySelector(),
@@ -331,7 +334,18 @@ class FloodfillVerifyStoreJob extends JobImpl {
                 return _key.equals(dsm.getKey());
             } else if (type == DatabaseSearchReplyMessage.MESSAGE_TYPE) {
                 DatabaseSearchReplyMessage dsrm = (DatabaseSearchReplyMessage)message;
-                return _key.equals(dsrm.getSearchKey());
+                boolean rv = _key.equals(dsrm.getSearchKey());
+                if (rv) {
+                    if (_log.shouldInfo())
+                        _log.info("[JobId: " + getJobId() + "; dbid: " + _facade._dbid
+                                  + "DSRM key match successful.");
+                } else {
+                    if (_log.shouldWarn())
+                        _log.warn("[JobId: " + getJobId() + "; dbid: " + _facade._dbid
+                                  + "]: DSRM key mismatch for key " + _key
+                                  + " with DSRM: " + message);
+                }
+                return rv;
             }
             return false;
         }
@@ -362,7 +376,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
                     if (_log.shouldWarn())
                         _log.warn(getJobId() + ": Sent bad data for verify: " + _target);
                     pm.dbLookupFailed(_target);
-                    ctx.banlist().banlistRouterForever(_target, "Sent bad netdb data");
+                    ctx.banlist().banlistRouterHard(_target, "Sent bad netdb data");
                     ctx.statManager().addRateData("netDb.floodfillVerifyFail", delay);
                     resend();
                     return;
@@ -399,11 +413,23 @@ class FloodfillVerifyStoreJob extends JobImpl {
                 // assume 0 old, all new, 0 invalid, 0 dup
                 pm.dbLookupReply(_target,  0,
                                 dsrm.getNumReplies(), 0, 0, delay);
+                // ToDo: Clarify the following log message.
+                // This message is phrased in a manner that draws attention, and indicates
+                // the possibility of a problem that may need follow-up. But examination
+                // of the code did not provide insight as to what is being verified,
+                // and what is failing. This message will be displayed unconditionally
+                // every time a DSRM is handled here.
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn(getJobId() + ": Verify failed (DSRM) for " + _key);
+                    _log.warn(getJobId() + ": DSRM verify failed (dbid: "
+                              + _facade._dbid + ") for " + _key);
                 // only for RI... LS too dangerous?
-                if (_isRouterInfo)
+                if (_isRouterInfo) {
+                    if (_facade.isClientDb())
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("[Jobid: " + getJobId() + "; dbid: " + _facade._dbid
+                                      + "Warning! Client is starting a SingleLookupJob (DIRECT?) for RouterInfo");
                     ctx.jobQueue().addJob(new SingleLookupJob(ctx, dsrm));
+                }
             }
             // store failed, boo, hiss!
             // blame the sent-to peer, but not the verify peer
@@ -432,7 +458,12 @@ class FloodfillVerifyStoreJob extends JobImpl {
      *  So at least we'll try THREE ffs round-robin if things continue to fail...
      */
     private void resend() {
-        DatabaseEntry ds = _facade.lookupLocally(_key);
+        // It's safe to check the default netDb first, but if the lookup is for
+        // a client, nearly all RI is expected to be found in the FF netDb.
+        DatabaseEntry ds = getContext().netDb().lookupLocally(_key, _facade._dbid);
+        if ((ds == null) && _facade.isClientDb() && _isRouterInfo)
+            // It's safe to check the floodfill netDb for RI
+            ds = getContext().netDb().lookupLocally(_key, "floodfill");
         if (ds != null) {
             // By the time we get here, a minute or more after the store started, 
             // we may have already started a new store

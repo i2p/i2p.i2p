@@ -11,6 +11,7 @@ package net.i2p.client.impl;
 
 import java.io.BufferedInputStream;
 import java.io.EOFException;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -1334,7 +1335,29 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             _availabilityNotifier.stopNotifying();
         closeSocket();
         _subsessionMap.clear();
+        clearOldNetDB();
         if (_sessionListener != null) _sessionListener.disconnected(this);
+    }
+
+    private void clearOldNetDB() {
+        Destination myDest = getMyDestination();
+        if (myDest != null) {
+            String base32 = myDest.toBase32();
+            if (base32 != null) {
+                String dbid = "clients_"+base32;
+                // get the netDb directory
+                File netDbDir = new File(_context.getConfigDir(), "netDb");
+                File subNetDbDir = new File(netDbDir, dbid);
+                if (subNetDbDir.exists()) {
+                    subNetDbDir.delete();
+                }
+                File baseNetDbDir = new File(_context.getConfigDir(), "netDb");
+                File baseSubNetDbDir = new File(baseNetDbDir, dbid);
+                if (baseSubNetDbDir.exists()) {
+                    baseSubNetDbDir.delete();
+                }
+            }
+        }
     }
 
     /**

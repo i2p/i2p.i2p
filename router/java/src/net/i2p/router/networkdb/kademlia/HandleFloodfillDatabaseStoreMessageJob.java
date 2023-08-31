@@ -75,6 +75,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         // set if invalid store but not his fault
         boolean dontBlamePeer = false;
         boolean wasNew = false;
+        boolean blockStore = false;
         RouterInfo prevNetDb = null;
         Hash key = _message.getKey();
         DatabaseEntry entry = _message.getEntry();
@@ -82,15 +83,45 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         if (DatabaseEntry.isLeaseSet(type)) {
             getContext().statManager().addRateData("netDb.storeLeaseSetHandled", 1);
             if (_log.shouldDebug())
-                _log.debug("Handling dbStore of leaseset " + _message);
-   
+                _log.debug("(dbid: " + _facade._dbid
+                           + ") Starting handling of dbStore of leaseset " + _message);
+
             try {
-                // Never store a leaseSet for a local dest received from somebody else.
-                // This generally happens from a FloodfillVerifyStoreJob.
-                // If it is valid, it shouldn't be newer than what we have - unless
-                // somebody has our keys... 
-                // This could happen with multihoming - where it's really important to prevent
-                // storing the other guy's leaseset, it will confuse us badly.
+                // With the introduction of segmented netDb, the handling of
+                // local LeaseSets has changed substantially, based on the role
+                // being assumed.
+                // Role #1) The 'floodfill' netDb when the router is a FloodFill
+                //          In this case, the router would actually de-anonymize
+                //          the clients it is hosting if it refuses LeaseSets for
+                //          these clients.
+                //          The LS will be checked to make sure it arrived directly,
+                //          and handled as a normal LS.
+                // Role #2) The 'floodfill' netDb when the router is *NOT* an I2P
+                //          network Floodfill.
+                //          In this case, the 'floodfill' netDb only stores RouterInfo.
+                //          There is no use case for the 'floodfill' netDb to store any
+                //          LeaseSets when the router is not a FloodFill.
+                // Role #3) Client netDb should only receive LeaseSets from their
+                //          tunnels.  And clients will only publish their LeaseSet
+                //          out their client tunnel.
+                //          In this role, the only LeaseSet that should be rejected
+                //          is its own LeaseSet.
+                //
+                //          ToDo: Currently, the 'floodfill' netDb will be excluded
+                //          from directly receiving a client LeaseSet, due to the
+                //          way the selection of FloodFill routers are selected
+                //          when flooding a LS.
+                //          But even if the host router does not directly receive the
+                //          LeaseSets of the clients it hosts, those LeaseSets will
+                //          usually be flooded back to it.
+                //          Is this enough, or do we need to pierce the segmentation
+                //          under certain conditions?
+                //
+                //          ToDo: What considerations are needed for multihoming?
+                //          with multihoming, it's really important to prevent the
+                //          client netDb from storing the other guy's LeaseSet.
+                //          It will confuse us badly.
+
                 LeaseSet ls = (LeaseSet) entry;
                 // If this was received as a response to a query,
                 // FloodOnlyLookupMatchJob called setReceivedAsReply(),
@@ -102,7 +133,25 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 // See ../HDLMJ for more info
                 if (!ls.getReceivedAsReply())
                     ls.setReceivedAsPublished();
-                if (getContext().clientManager().isLocal(key)) {
+                if (_facade.isClientDb())
+                    if (_facade.matchClientKey(key))
+                        // In the client subDb context, the only local key to worry about
+                        // is the key for this client.
+                        blockStore = true;
+                    else
+                        blockStore = false;
+                else if (getContext().clientManager().isLocal(key))
+                    // Non-client context
+                    if (_facade.floodfillEnabled() && (_fromHash != null))
+                        blockStore = false;
+                    else
+                        // FloodFill disabled, but in the 'floodfill' netDb context.
+                        // We should never get here, the 'floodfill' netDb doesn't
+                        // store LS when FloodFill is disabled.
+                        blockStore = true;
+                else
+                    blockStore = false;
+                if (blockStore) {
                     getContext().statManager().addRateData("netDb.storeLocalLeaseSetAttempt", 1, 0);
                     // throw rather than return, so that we send the ack below (prevent easy attack)
                     dontBlamePeer = true;
@@ -116,8 +165,9 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                 getContext().clientMessagePool().getCache().multihomedCache.put(key, ls);
                         }
                     }
-                    throw new IllegalArgumentException("Peer attempted to store local leaseSet: " +
-                                                       key.toBase32());
+                    throw new IllegalArgumentException("(dbid: " + _facade._dbid
+                                                       + ") Peer attempted to store local leaseSet: "
+                                                       + key.toBase32());
                 }
                 //boolean oldrar = ls.getReceivedAsReply();
                 //boolean oldrap = ls.getReceivedAsPublished();
@@ -158,13 +208,28 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                     //    match.setReceivedAsPublished(true);
                 }
             } catch (UnsupportedCryptoException uce) {
+               if (_log.shouldError())
+                   _log.error("UCE: ", uce);
                 invalidMessage = uce.getMessage();
                 dontBlamePeer = true;
             } catch (IllegalArgumentException iae) {
+               // This is somewhat normal behavior in client netDb context,
+               // and safely handled.
+               // This is more worrisome in the floodfill netDb context.
+               // It is not expected to happen since we check if it was sent directly.
+                if (_facade.isClientDb())
+                    if (_log.shouldInfo())
+                        _log.info("LS Store IAE (safely handled): ", iae);
+                else
+                    if (_log.shouldError())
+                        _log.error("LS Store IAE (unexpected): ", iae);
                 invalidMessage = iae.getMessage();
             }
         } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
             RouterInfo ri = (RouterInfo) entry;
+            if (_log.shouldDebug())
+                _log.debug("(dbid: " + _facade._dbid
+                           + ") Starting handling of dbStore of RI " + _message);
             getContext().statManager().addRateData("netDb.storeRouterInfoHandled", 1);
             if (_fromHash == null && _from != null)
                 _fromHash = _from.getHash();
@@ -183,14 +248,37 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 String req = ((_message.getReplyToken() > 0) ? " reply req." : "") +
                              ((_fromHash == null && ri.getReceivedAsPublished()) ? " unsolicited" : "");
                 if (_fromHash == null)
-                    _log.info("Handling dbStore of router " + key.toBase64() + " published " +
-                              DataHelper.formatTime(ri.getPublished()) + req);
+                    _log.info("(dbid: " + _facade._dbid
+                              + ") Handling dbStore (_fromHash == NULL) of router "
+                              + key.toBase64() + " published "
+                              + DataHelper.formatTime(ri.getPublished())
+                              + " (ReceivedAsReply["
+                              + ri.getReceivedAsReply()
+                              + "], ReceivedAsPublished["
+                              + ri.getReceivedAsPublished()
+                              + "])" + req);
                 else if (_fromHash.equals(key))
-                    _log.info("Handling dbStore of router " + key.toBase64() + " published " +
-                              DataHelper.formatTime(ri.getPublished()) + " from that router" + req);
+                    _log.info("(dbid: " + _facade._dbid
+                              + ") Handling dbStore (_fromHash equals key) of router "
+                              + key.toBase64() + " published "
+                              + DataHelper.formatTime(ri.getPublished())
+                              + " from that router "
+                              + " (ReceivedAsReply["
+                              + ri.getReceivedAsReply()
+                              + "], ReceivedAsPublished["
+                              + ri.getReceivedAsPublished()
+                              + "])" + req);
                 else
-                    _log.info("Handling dbStore of router " + key.toBase64() + " published " +
-                              DataHelper.formatTime(ri.getPublished()) + " from: " + _fromHash.toBase64() + req);
+                    _log.info("(dbid: " + _facade._dbid
+                              + ") Handling dbStore of router "
+                              + key.toBase64() + " published "
+                              + DataHelper.formatTime(ri.getPublished())
+                              + " from: " + _fromHash.toBase64()
+                              + " (ReceivedAsReply["
+                              + ri.getReceivedAsReply()
+                              + "], ReceivedAsPublished["
+                              + ri.getReceivedAsPublished()
+                              + "])" + req);
             }
             try {
                 // Never store our RouterInfo received from somebody else.
@@ -204,6 +292,11 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                     dontBlamePeer = true;
                     throw new IllegalArgumentException("Peer attempted to store our RouterInfo");
                 }
+                // If we're in the client netDb context, log a warning since
+                // it should be rare that RI DSM are handled in the client context.
+                if (_facade.isClientDb() && _log.shouldWarn())
+                    _log.warn("[dbid: " + _facade._dbid
+                              + "]:  Handling RI dbStore in client netDb context of router " + key.toBase64());
                 boolean shouldStore = true;
                 if (ri.getReceivedAsPublished()) {
                     // these are often just dup stores from concurrent lookups
@@ -231,9 +324,10 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                             pdrop *= 3;
                                         if (pdrop > 0 && (pdrop >= 128 || getContext().random().nextInt(128) < pdrop)) {
                                             if (_log.shouldWarn())
-                                                _log.warn("Dropping new unsolicited dbStore of " + ri.getCapabilities() +
-                                                          " router " + key.toBase64() + " with distance " + distance +
-                                                          " drop probability " + (pdrop * 100 / 128));
+                                                _log.warn("(dbid: " + _facade._dbid
+                                                          + ") Dropping new unsolicited dbStore of " + ri.getCapabilities()
+                                                          + " router " + key.toBase64() + " with distance " + distance
+                                                          + " drop probability " + (pdrop * 100 / 128));
                                             shouldStore = false;
                                             // still flood if requested
                                             if (_message.getReplyToken() > 0)
@@ -251,8 +345,9 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                                 pdrop *= 3;
                                             if (pdrop > 0 && (pdrop >= 128 || getContext().random().nextInt(128) < pdrop)) {
                                                 if (_log.shouldWarn())
-                                                    _log.warn("Dropping new unsolicited dbStore of router " + key.toBase64() +
-                                                              " with distance " + distance);
+                                                    _log.warn("(dbid: " + _facade._dbid
+                                                              + ") Dropping new unsolicited dbStore of router " + key.toBase64()
+                                                              + " with distance " + distance);
                                                 shouldStore = false;
                                                 // still flood if requested
                                                 if (_message.getReplyToken() > 0)
@@ -262,7 +357,9 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                     }
                                 }
                                 if (shouldStore && _log.shouldDebug())
-                                    _log.debug("Allowing new unsolicited dbStore of router " + key.toBase64() + " with distance " + distance);
+                                    _log.debug("(dbid: " + _facade._dbid
+                                               + ") Allowing new unsolicited dbStore of router " + key.toBase64()
+                                               + " with distance " + distance);
                             } else {
                                 // non-ff
                                 // up to 100% drop rate
@@ -271,8 +368,9 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                     pdrop *= 3;
                                 if (pdrop > 0 && (pdrop >= 128 || getContext().random().nextInt(128) < pdrop)) {
                                     if (_log.shouldWarn())
-                                        _log.warn("Dropping new unsolicited dbStore of router " + key.toBase64() +
-                                                  " drop probability " + (pdrop * 100 / 128));
+                                        _log.warn("(dbid: " + _facade._dbid
+                                                  + ") Dropping new unsolicited dbStore of router " + key.toBase64()
+                                                  + " drop probability " + (pdrop * 100 / 128));
                                     shouldStore = false;
                                     // don't bother checking ban/blocklists.
                                     //wasNew = true;
@@ -280,19 +378,52 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                             }
                         }
                         if (shouldStore && _log.shouldWarn())
-                            _log.warn("Handling new unsolicited dbStore of router " + key.toBase64());
+                            _log.warn("(dbid: " + _facade._dbid
+                                      + ") Handling new unsolicited dbStore of router " + key.toBase64());
                     } else if (prevNetDb.getPublished() >= ri.getPublished()) {
                         shouldStore = false;
+                    } else {
+                        if (_log.shouldInfo()) {
+                            _log.info("(dbid: " + _facade._dbid
+                                      + ") Newer RouterInfo encountered in dbStore Message (for router "
+                                      + key.toBase64()
+                                      + ") with a pulished date ("
+                                      + ri.getPublished()
+                                      + ") newer than the one for the RI already stored in our database ("
+                                      + prevNetDb.getPublished() + ")");
+                            // new RouterIdentity prevIdentity = prevNetDb.getIdentity();
+                            // new RouterIdentity newIdentity = ri.getIdentity();
+                            if (!ri.getIdentity().getPublicKey().equals(prevNetDb.getIdentity().getPublicKey()))
+                                _log.info("(dbid: " + _facade._dbid
+                                          + ") Warning! The old ("
+                                          + prevNetDb.getIdentity().getPublicKey()
+                                          + ") and new ("
+                                          + ri.getIdentity().getPublicKey()
+                                          + ") public keys do not match!");
+                            if (!ri.getIdentity().getSigningPublicKey().equals(prevNetDb.getIdentity().getSigningPublicKey()))
+                                _log.info("(dbid: " + _facade._dbid + ") Warning! The old ("
+                                          + prevNetDb.getIdentity().getSigningPublicKey()
+                                          + ") and new ("
+                                          + ri.getIdentity().getSigningPublicKey()
+                                          + ") signing public keys do not match!");
+                            }
                     }
                 }
                 if (shouldStore) {
+                    if (_log.shouldDebug())
+                        _log.debug("[dbid: " + _facade._dbid
+                                   + "]: Storing RI with the context netDb " + key.toBase64());
                     prevNetDb = _facade.store(key, ri);
+                    if (_facade.isClientDb() && _log.shouldWarn())
+                        _log.warn("[dbid: " + _facade._dbid
+                                  + "] Storing RI to client netDb (this is rare, should have been handled by IBMD) "
+                                  + key.toBase64());
                     wasNew = ((null == prevNetDb) || (prevNetDb.getPublished() < ri.getPublished()));
                 }
                 // Check new routerinfo address against blocklist
                 if (wasNew) {
                     // TODO should we not flood temporarily banned routers either?
-                    boolean forever = getContext().banlist().isBanlistedForever(key);
+                    boolean forever = getContext().banlist().isBanlistedHard(key);
                     if (forever) {
                         wasNew = false; // don't flood
                         shouldStore = false; // don't call heardAbout()
@@ -301,7 +432,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                         if (!forever &&
                             getContext().blocklist().isBlocklisted(ri)) {
                             if (_log.shouldWarn())
-                                _log.warn("Blocklisting new peer " + key + ' ' + ri);
+                                _log.warn("(dbid: " + _facade._dbid + ") Blocklisting new peer " + key + ' ' + ri);
                             wasNew = false; // don't flood
                             shouldStore = false; // don't call heardAbout()
                         }
@@ -311,7 +442,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                         if ((!newAddr.equals(oldAddr)) &&
                             getContext().blocklist().isBlocklisted(ri)) {
                             if (_log.shouldWarn())
-                                _log.warn("New address received, Blocklisting old peer " + key + ' ' + ri);
+                                _log.warn("(dbid: " + _facade._dbid + ") New address received, Blocklisting old peer " + key + ' ' + ri);
                             wasNew = false; // don't flood
                             shouldStore = false; // don't call heardAbout()
                         }
@@ -327,7 +458,8 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             }
         } else {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Invalid DatabaseStoreMessage data type - " + type
+                _log.error("(dbid: " + _facade._dbid
+                           + ") Invalid DatabaseStoreMessage data type - " + type
                            + ": " + _message);
             // don't ack or flood
             return;
@@ -352,11 +484,12 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             } else {
                 // Should we record in the profile?
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Peer " + _fromHash.toBase64() + " sent bad data: " + invalidMessage);
+                    _log.warn("(dbid: " + _facade._dbid
+                              + ") Peer " + _fromHash.toBase64() + " sent bad data: " + invalidMessage);
             }
         } else if (invalidMessage != null && !dontBlamePeer) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Unknown peer sent bad data: " + invalidMessage);
+                _log.warn("(dbid: " + _facade._dbid + ") Unknown peer sent bad data: " + invalidMessage);
         }
 
         // flood it
@@ -368,7 +501,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 // Note this does not throttle the ack above
                 if (_facade.shouldThrottleFlood(key)) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Too many recent stores, not flooding key: " + key);
+                        _log.warn("(dbid: " + _facade._dbid + "Too many recent stores, not flooding key: " + key);
                     getContext().statManager().addRateData("netDb.floodThrottled", 1);
                     return;
                 }
@@ -407,8 +540,9 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             RouterInfo me = getContext().router().getRouterInfo();
             msg2.setEntry(me);
             if (_log.shouldWarn())
-                _log.warn("Got a store w/ reply token, but we aren't ff: from: " + _from +
-                          " fromHash: " + _fromHash + " msg: " + _message, new Exception());
+                _log.warn("(dbid: " + _facade._dbid
+                          + ") Got a store w/ reply token, but we aren't ff: from: " + _from
+                          + " fromHash: " + _fromHash + " msg: " + _message, new Exception());
         }
         Hash toPeer = _message.getReplyGateway();
         boolean toUs = getContext().routerHash().equals(toPeer);
@@ -431,6 +565,11 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             return;
         }
         if (toUs) {
+            if (_facade.isClientDb()) {
+                _log.error("Error! SendMessageDirectJob (toUs) attempted in Client netDb ("
+                           + _facade._dbid + ")! Message: " + msg);
+                return;
+            }
             Job send = new SendMessageDirectJob(getContext(), msg, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY, _msgIDBloomXor);
             send.runJob();
             if (msg2 != null) {
@@ -477,18 +616,22 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                         }
                         if (_log.shouldWarn()) {
                             if (isEstab)
-                                _log.warn("Switched to alt connected peer " + toPeer + " in LS with " + count + " leases");
+                                _log.warn("(dbid: " + _facade._dbid
+                                          + ") Switched to alt connected peer " + toPeer
+                                          + " in LS with " + count + " leases");
                             else
-                                _log.warn("Alt connected peer not found in LS with " + count + " leases");
+                                _log.warn("(dbid: " + _facade._dbid + ") Alt connected peer not found in LS with " + count + " leases");
                         }
                     } else {
                         if (_log.shouldWarn())
-                            _log.warn("Reply gw " + toPeer + ' ' + replyTunnel + " not found in LS with " + count + " leases: " + ls);
+                            _log.warn("(dbid: " + _facade._dbid
+                                      + ") Reply gw " + toPeer + ' ' + replyTunnel
+                                      + " not found in LS with " + count + " leases: " + ls);
                     }
                 }
             }
         }
-        if (isEstab) {
+        if (isEstab && !_facade.isClientDb()) {
             I2NPMessage out1 = msg;
             I2NPMessage out2 = msg2;
             if (replyTunnel != null) {
@@ -506,6 +649,12 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                     out2 = tgm2;
                 }
             }
+            if (_facade.isClientDb()) {
+                // We shouldn't be reaching this point given the above conditional.
+                _log.error("Error! SendMessageDirectJob (isEstab) attempted in Client netDb ("
+                           + _facade._dbid + ")! Message: " + out1);
+                return;
+            }
             Job send = new SendMessageDirectJob(getContext(), out1, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY, _msgIDBloomXor);
             send.runJob();
             if (msg2 != null) {
@@ -519,7 +668,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundExploratoryTunnel(toPeer);
             if (outTunnel == null) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("No outbound tunnel could be found");
+                    _log.warn("(dbid: " + _facade._dbid + ") No outbound tunnel could be found");
                 return;
             }
             getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0),

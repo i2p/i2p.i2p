@@ -97,7 +97,7 @@ public class SendMessageDirectJob extends JobImpl {
         _msgIDBloomXor = msgIDBloomXor;
         _message = message;
         _targetHash = toPeer;
-        if (timeoutMs < 10*1000) {
+        if (timeoutMs < 5*1000) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Very little time given [" + timeoutMs + "], resetting to 10s", new Exception("stingy caller!"));
             _expiration = ctx.clock().now() + 10*1000;
@@ -134,7 +134,7 @@ public class SendMessageDirectJob extends JobImpl {
                 _log.debug("Router specified, sending");
             send();
         } else {
-            _router = getContext().netDb().lookupRouterInfoLocally(_targetHash);
+            _router = getContext().floodfillNetDb().lookupRouterInfoLocally(_targetHash);
             if (_router != null) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Router not specified but lookup found it");
@@ -143,7 +143,7 @@ public class SendMessageDirectJob extends JobImpl {
                 if (!_alreadySearched) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Router not specified, so we're looking for it...");
-                    getContext().netDb().lookupRouterInfo(_targetHash, this, this, 
+                    getContext().floodfillNetDb().lookupRouterInfo(_targetHash, this, this, 
                                                           _expiration - getContext().clock().now());
                     _searchOn = getContext().clock().now();
                     _alreadySearched = true;

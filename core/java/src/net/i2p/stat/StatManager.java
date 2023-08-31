@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
 
 /** 
  * Coordinate the management of various frequencies and rates within I2P components,
@@ -22,6 +23,7 @@ import net.i2p.I2PAppContext;
  */
 public class StatManager {
     private final I2PAppContext _context;
+    private final Log _log;
 
     /** stat name to FrequencyStat */
     private final ConcurrentHashMap<String, FrequencyStat> _frequencyStats;
@@ -54,6 +56,7 @@ public class StatManager {
      */
     public StatManager(I2PAppContext context) {
         _context = context;
+        _log = context.logManager().getLog(getClass());
         _frequencyStats = new ConcurrentHashMap<String,FrequencyStat>(8);
         _rateStats = new ConcurrentHashMap<String,RateStat>(128);
         String filter = getStatFilter();
@@ -155,13 +158,21 @@ public class StatManager {
     /** update the given frequency statistic, taking note that an event occurred (and recalculating all frequencies) */
     public void updateFrequency(String name) {
         FrequencyStat freq = _frequencyStats.get(name);
-        if (freq != null) freq.eventOccurred();
+        if (freq != null)
+            freq.eventOccurred();
+        else
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid frequency stat : " + name);
     }
 
     /** update the given rate statistic, taking note that the given data point was received (and recalculating all rates) */
     public void addRateData(String name, long data, long eventDuration) {
         RateStat stat = _rateStats.get(name); // unsynchronized
-        if (stat != null) stat.addData(data, eventDuration);
+        if (stat != null)
+            stat.addData(data, eventDuration);
+        else
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid rate stat : " + name);
     }
 
     /**
@@ -171,7 +182,11 @@ public class StatManager {
      */
     public void addRateData(String name, long data) {
         RateStat stat = _rateStats.get(name); // unsynchronized
-        if (stat != null) stat.addData(data);
+        if (stat != null)
+            stat.addData(data);
+        else
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid rate stat : " + name);
     }
 
     public synchronized void coalesceStats() {

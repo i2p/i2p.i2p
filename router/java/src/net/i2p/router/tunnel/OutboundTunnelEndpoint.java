@@ -2,6 +2,7 @@ package net.i2p.router.tunnel;
 
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
+import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelDataMessage;
 import net.i2p.router.OutNetMessage;
@@ -20,6 +21,7 @@ class OutboundTunnelEndpoint {
     private final HopProcessor _processor;
     private final FragmentHandler _handler;
     private final OutboundMessageDistributor _outDistributor;
+    private int _lsdsm, _ridsm, _i2npmsg, _totalmsg;
 
     public OutboundTunnelEndpoint(RouterContext ctx, HopConfig config, HopProcessor processor) {
         _context = ctx;
@@ -28,6 +30,7 @@ class OutboundTunnelEndpoint {
         _processor = processor;
         _handler = new RouterFragmentHandler(ctx, new DefragmentedHandler());
         _outDistributor = new OutboundMessageDistributor(ctx, OutNetMessage.PRIORITY_PARTICIPATING);
+        _totalmsg = _lsdsm = _ridsm = _i2npmsg = 0;
     }
 
     public void dispatch(TunnelDataMessage msg, Hash recvFrom) {
@@ -56,6 +59,7 @@ class OutboundTunnelEndpoint {
     
     private class DefragmentedHandler implements FragmentHandler.DefragmentedReceiver {
         public void receiveComplete(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
+            _totalmsg++;
             if (toRouter == null) {
                 // Delivery type LOCAL is not supported at the OBEP
                 // We don't have any use for it yet.
@@ -69,6 +73,41 @@ class OutboundTunnelEndpoint {
                            + " to be forwarded on to "
                            + toRouter.toBase64().substring(0,4)
                            + (toTunnel != null ? ":" + toTunnel.getTunnelId() : ""));
+            if (toTunnel == null) {
+                int msgtype = msg.getType();
+                if (msgtype == DatabaseStoreMessage.MESSAGE_TYPE) {
+                    DatabaseStoreMessage dsm = (DatabaseStoreMessage)msg;
+                    if (dsm.getEntry().isRouterInfo()) {
+                        _ridsm++;
+                        _context.statManager().addRateData("tunnel.outboundTunnelEndpointFwdRIDSM", 1);
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("OBEP directly forwarding RI DSM (count: "
+                                      + _ridsm + "/" + _totalmsg + ") from tunnel id "
+                                      + _config.getReceiveTunnelId()
+                                      + " to router "
+                                      + toRouter.toBase64().substring(0,4)
+                                      + " with message: " + dsm);
+                    } else {
+                        _lsdsm++;
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("OBEP directly forwarding LS DSM (count: "
+                                      + _lsdsm + "/" + _totalmsg + ") from tunnel id "
+                                      + _config.getReceiveTunnelId()
+                                      + " to router "
+                                      + toRouter.toBase64().substring(0,4)
+                                      + " with message: " + dsm);
+                    }
+                } else {
+                    _i2npmsg++;
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("OBEP directly forwarding I2NP Message (count: "
+                                  + _i2npmsg + "/" + _totalmsg + ") from tunnel id "
+                                  + _config.getReceiveTunnelId()
+                                  + " to router "
+                                  + toRouter.toBase64().substring(0,4)
+                                  + " with message: " + msg);
+                }
+            }
             int size = msg.getMessageSize();
             // don't drop it if we are the target
             boolean toUs = _context.routerHash().equals(toRouter);

@@ -8,6 +8,7 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
@@ -79,6 +80,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     private NegativeLookupCache _negativeCache;
     protected final int _networkID;
     private final BlindCache _blindCache;
+    protected final String _dbid;
+    private Hash _localKey;
 
     /** 
      * Map of Hash to RepublishLeaseSetJob for leases we'realready managing.
@@ -169,7 +172,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     private static final int BUCKET_SIZE = 24;
     private static final int KAD_B = 4;
 
-    public KademliaNetworkDatabaseFacade(RouterContext context) {
+    public KademliaNetworkDatabaseFacade(RouterContext context, String dbid) {
         _context = context;
         _log = _context.logManager().getLog(getClass());
         _networkID = context.router().getNetworkID();
@@ -178,6 +181,10 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         _activeRequests = new HashMap<Hash, SearchJob>(8);
         _reseedChecker = new ReseedChecker(context);
         _blindCache = new BlindCache(context);
+        _dbid = dbid;
+        _localKey = null;
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Created KademliaNetworkDatabaseFacade for id: " + dbid);
         context.statManager().createRateStat("netDb.lookupDeferred", "how many lookups are deferred?", "NetworkDatabase", new long[] { 60*60*1000 });
         context.statManager().createRateStat("netDb.exploreKeySet", "how many keys are queued for exploration?", "NetworkDatabase", new long[] { 60*60*1000 });
         context.statManager().createRateStat("netDb.negativeCache", "Aborted lookup, already cached", "NetworkDatabase", new long[] { 60*60*1000l });
@@ -260,7 +267,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     }
     
     public synchronized void restart() {
-        _dbDir = _context.router().getConfigSetting(PROP_DB_DIR);
+        _dbDir = getDbDir();
         if (_dbDir == null) {
             _log.info("No DB dir specified [" + PROP_DB_DIR + "], using [" + DEFAULT_DB_DIR + "]");
             _dbDir = DEFAULT_DB_DIR;
@@ -281,20 +288,35 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
            _ds.rescan();
     }
 
-    String getDbDir() { return _dbDir; }
-    
+    String getDbDir() {
+        if (_dbDir == null) {
+            String dbDir = _context.getProperty(PROP_DB_DIR, DEFAULT_DB_DIR);
+            if (!_dbid.equals("floodfill") && _dbid != null) {
+                File subDir = new File(dbDir, _dbid);
+                if (!subDir.exists())
+                    subDir.mkdirs();
+                dbDir = subDir.toString();
+            }
+            return dbDir; 
+        }
+        return _dbDir;
+    }
+
+    public boolean isClientDb() {
+        return _dbid.startsWith("clients_");
+    }
+
     public synchronized void startup() {
         _log.info("Starting up the kademlia network database");
         RouterInfo ri = _context.router().getRouterInfo();
-        String dbDir = _context.getProperty(PROP_DB_DIR, DEFAULT_DB_DIR);
         _kb = new KBucketSet<Hash>(_context, ri.getIdentity().getHash(),
                                    BUCKET_SIZE, KAD_B, new RejectTrimmer<Hash>());
+        _dbDir = getDbDir();
         try {
-            _ds = new PersistentDataStore(_context, dbDir, this);
+            _ds = new PersistentDataStore(_context, _dbDir, this);
         } catch (IOException ioe) {
             throw new RuntimeException("Unable to initialize netdb storage", ioe);
         }
-        _dbDir = dbDir;
         _negativeCache = new NegativeLookupCache(_context);
         _blindCache.startup();
         
@@ -343,21 +365,23 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             _log.warn("Operating in quiet mode - not exploring or pushing data proactively, simply reactively");
             _log.warn("This should NOT be used in production");
         }
-        // periodically update and resign the router's 'published date', which basically
-        // serves as a version
-        Job plrij = new PublishLocalRouterInfoJob(_context);
-        // do not delay this, as this creates the RI too, and we need a good local routerinfo right away
-        //plrij.getTiming().setStartAfter(_context.clock().now() + PUBLISH_JOB_DELAY);
-        _context.jobQueue().addJob(plrij);
+        if (_dbid == null || _dbid.equals("floodfill") || _dbid.isEmpty()) {
+            // periodically update and resign the router's 'published date', which basically
+            // serves as a version
+            Job plrij = new PublishLocalRouterInfoJob(_context);
+            // do not delay this, as this creates the RI too, and we need a good local routerinfo right away
+            //plrij.getTiming().setStartAfter(_context.clock().now() + PUBLISH_JOB_DELAY);
+            _context.jobQueue().addJob(plrij);
 
-        // plrij calls publish() for us
-        //try {
-        //    publish(ri);
-        //} catch (IllegalArgumentException iae) {
-        //    _context.router().rebuildRouterInfo(true);
-        //    //_log.log(Log.CRIT, "Our local router info is b0rked, clearing from scratch", iae);
-        //    //_context.router().rebuildNewIdentity();
-        //}
+            // plrij calls publish() for us
+            //try {
+            //    publish(ri);
+            //} catch (IllegalArgumentException iae) {
+            //    _context.router().rebuildRouterInfo(true);
+            //    //_log.log(Log.CRIT, "Our local router info is b0rked, clearing from scratch", iae);
+            //    //_context.router().rebuildNewIdentity();
+            //}
+        }
     }
     
     /** unused, see override */
@@ -717,7 +741,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (ri != null) {
             if (onFindJob != null)
                 _context.jobQueue().addJob(onFindJob);
-        } else if (_context.banlist().isBanlistedForever(key)) {
+        } else if (_context.banlist().isBanlistedHard(key)) {
             if (onFailedLookupJob != null)
                 _context.jobQueue().addJob(onFailedLookupJob);
         } else if (isNegativeCached(key)) {
@@ -738,6 +762,9 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      */
     public RouterInfo lookupRouterInfoLocally(Hash key) {
         if (!_initialized) return null;
+        // Client netDb shouldn't have RI, search for RI in the floodfill netDb.
+        if (isClientDb())
+            return _context.floodfillNetDb().lookupRouterInfoLocally(key);
         DatabaseEntry ds = _ds.get(key);
         if (ds != null) {
             if (ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
@@ -781,6 +808,19 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         } catch (IllegalArgumentException iae) {
             _log.error("locally published leaseSet is not valid?", iae);
             throw iae;
+        }
+        if (_localKey != null) {
+            if (!_localKey.equals(localLeaseSet.getHash()))
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Error, the local LS hash ("
+                               + _localKey + ") does not match the published hash ("
+                               + localLeaseSet.getHash() + ")! This shouldn't happen!",
+                               new Exception());
+        } else {
+            // This will only happen once when the local LS is first published
+            _localKey = localLeaseSet.getHash();
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Local client LS key initialized to: " + _localKey);
         }
         if (!_context.clientManager().shouldPublishLeaseSet(h))
             return;
@@ -848,6 +888,13 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     @Override
     public long getLastRouterInfoPublishTime() {
         return _lastRIPublishTime;
+    }
+
+    public boolean matchClientKey(Hash key) {
+        if ((_localKey != null) && (_localKey.equals(key)))
+            return true;
+        else
+            return false;
     }
 
     /**
@@ -1054,7 +1101,9 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         String err = validate(key, leaseSet);
         if (err != null)
             throw new IllegalArgumentException("Invalid store attempt - " + err);
-        
+
+        if (_log.shouldDebug())
+            _log.debug("Storing LS to the persistent data store...");
         _ds.put(key, leaseSet);
         
         if (encls != null) {
@@ -1134,7 +1183,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                 // old i2pd bug, possibly at startup, don't ban forever
                 _context.banlist().banlistRouter(key, "No network specified", null, null, _context.clock().now() + Banlist.BANLIST_DURATION_NO_NETWORK);
             } else {
-                _context.banlist().banlistRouterForever(key, "Not in our network: " + id);
+                _context.banlist().banlistRouterHard(key, "Not in our network: " + id);
             }
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Not in our network: " + routerInfo, new Exception());
@@ -1340,7 +1389,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                         SigType type = kc.getSigType();
                         if (type == null || !type.isAvailable()) {
                             String stype = (type != null) ? type.toString() : Integer.toString(kc.getSigTypeCode());
-                            _context.banlist().banlistRouterForever(h, "Unsupported signature type " + stype);
+                            _context.banlist().banlistRouterHard(h, "Unsupported signature type " + stype);
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Unsupported sig type " + stype + " for router " + h);
                             throw new UnsupportedCryptoException("Sig type " + stype);

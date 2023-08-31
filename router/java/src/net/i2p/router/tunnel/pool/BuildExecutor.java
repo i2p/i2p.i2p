@@ -195,7 +195,7 @@ class BuildExecutor implements Runnable {
                     if (peer.equals(_context.routerHash()))
                         continue;
                     // Look up routerInfo
-                    RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
+                    RouterInfo ri = _context.floodfillNetDb().lookupRouterInfoLocally(peer);
                     // Default and detect bandwidth tier
                     String bwTier = "Unknown";
                     if (ri != null) bwTier = ri.getBandwidthTier(); // Returns "Unknown" if none recognized

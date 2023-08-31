@@ -78,12 +78,14 @@ class BanlistRenderer {
                 buf.append(" on the following transport: ").append(transports);
             if (entry.cause != null) {
                 buf.append("<br>\n");
-                if (entry.causeCode != null)
-                    buf.append(_t(entry.cause, entry.causeCode));
+                if (entry.causeComment != null)
+                    buf.append(_t(entry.cause, entry.causeComment));
                 else
                     buf.append(_t(entry.cause));
             }
             if (!key.equals(Hash.FAKE_HASH)) {
+                if (entry.causeCode == 1)
+                    buf.append(" (H)");
                 // note: CSS hides anchor text
                 buf.append(" <a href=\"configpeer?peer=").append(key.toBase64())
                    .append("#unsh\" title=\"").append(unban).append("\">[").append(unban).append("]</a>");

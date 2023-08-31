@@ -926,7 +926,7 @@ public class TransportManager implements TransportEventListener {
             if (msg.getTarget().getIdentity().getSigningPublicKey().getType() == null) {
                 // we don't support his crypto
                 _context.statManager().addRateData("transport.banlistOnUnsupportedSigType", 1);
-                _context.banlist().banlistRouterForever(peer, _x("Unsupported signature type"));
+                _context.banlist().banlistRouterHard(peer, _x("Unsupported signature type"));
             } else if (unreachableTransports >= _transports.size() && countActivePeers() > 0) {
                 // Don't banlist if we aren't talking to anybody, as we may have a network connection issue
                 // TODO if we are IPv6 only, ban for longer

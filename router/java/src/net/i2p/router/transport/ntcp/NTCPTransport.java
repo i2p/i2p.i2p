@@ -337,7 +337,6 @@ public class NTCPTransport extends TransportImpl {
         _context.statManager().addRateData("ntcp.inboundEstablished", 1);
         Hash peer = con.getRemotePeer().calculateHash();
         markReachable(peer, true);
-        //_context.banlist().unbanlistRouter(con.getRemotePeer().calculateHash());
         NTCPConnection old;
         synchronized (_conLock) {
             old = _conByIdent.put(peer, con);
@@ -549,7 +548,7 @@ public class NTCPTransport extends TransportImpl {
             if (nid == -1)
                 _context.banlist().banlistRouter(peer, "No network specified", null, null, _context.clock().now() + Banlist.BANLIST_DURATION_NO_NETWORK);
             else
-                _context.banlist().banlistRouterForever(peer, "Not in our network: " + nid);
+                _context.banlist().banlistRouterHard(peer, "Not in our network: " + nid);
             if (_log.shouldWarn())
                 _log.warn("Not in our network: " + toAddress, new Exception());
             markUnreachable(peer);

@@ -238,6 +238,20 @@ public class InNetMessagePool implements Service {
                     OutNetMessage omsg = origMessages.get(i);
                     ReplyJob job = omsg.getOnReplyJob();
                     if (job != null) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Setting ReplyJob ("
+                                       + job + ") for original message:"
+                                       + omsg + "; with reply message [id: "
+                                       + messageBody.getUniqueId()
+                                       + " Class: "
+                                       + messageBody.getClass().getSimpleName()
+                                       + "] full message: " + messageBody);
+                        else if (_log.shouldLog(Log.INFO))
+                            _log.info("Setting a ReplyJob ("
+                                      + job + ") for original message class "
+                                      + omsg.getClass().getSimpleName()
+                                      + " with reply message class "
+                                      + messageBody.getClass().getSimpleName());
                         job.setMessage(messageBody);
                         _context.jobQueue().addJob(job);
                     }
@@ -248,6 +262,11 @@ public class InNetMessagePool implements Service {
                    _context.jobQueue().addJob(dsmjob);
             }
             allowMatches = false;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Finished processing dsm (allowMatches = false) from router "
+                           + fromRouter + " / " + fromRouterHash
+                           + " origMessages.size() = " + sz
+                           + " message: " + messageBody);
             break;
 
           default:

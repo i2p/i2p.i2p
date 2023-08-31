@@ -951,8 +951,18 @@ public abstract class TransportImpl implements Transport {
 
     /** called when we establish a peer connection (outbound or inbound) */
     public void markReachable(Hash peer, boolean isInbound) {
+        // The legacy treatment for the peer has been to unban them because:
         // if *some* transport can reach them, then we shouldn't banlist 'em
-        _context.banlist().unbanlistRouter(peer);
+        // But, we really shouldn't be here if they're HARD banned.
+        // Maintain the legacy treatment, but check to see if they were
+        // even HARD banned in the first place (we've been unbanning everybody
+        // who reaches here, whether they're banned or not), then mark it
+        // with an warning-level log entry.
+        if (_context.banlist().isBanlistedHard(peer)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Unbanning HARD-banned peer (due to reachability): " + peer, new Exception("Unbanned by"));
+            _context.banlist().unbanlistRouter(peer);
+        }
         _unreachableEntries.remove(peer);
         if (!isInbound)
             markWasUnreachable(peer, false);
@@ -992,7 +1002,7 @@ public abstract class TransportImpl implements Transport {
             }
         }
 /*
-        RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
+        RouterInfo ri = _context.floodfillNetDb().lookupRouterInfoLocally(peer);
         if (ri == null)
             return false;
         String alt = getAltStyle();

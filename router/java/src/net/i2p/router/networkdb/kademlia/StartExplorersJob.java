@@ -73,6 +73,7 @@ class StartExplorersJob extends JobImpl {
     public void runJob() {
         int count = _facade.getDataStore().size();
         if (! (_facade.floodfillEnabled() ||
+               _facade.isClientDb() ||
                count > LIMIT_ROUTERS ||
                getContext().jobQueue().getMaxLag() > MAX_LAG ||
                getContext().throttle().getMessageDelay() > MAX_MSG_DELAY ||

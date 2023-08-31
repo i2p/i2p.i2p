@@ -25,6 +25,8 @@ import net.i2p.router.crypto.TransientSessionKeyManager;
 import net.i2p.router.dummy.*;
 import net.i2p.router.message.GarlicMessageParser;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseSegmentor;
+import net.i2p.router.networkdb.kademlia.SegmentedNetworkDatabaseFacade;
 import net.i2p.router.peermanager.PeerManagerFacadeImpl;
 import net.i2p.router.peermanager.ProfileManagerImpl;
 import net.i2p.router.peermanager.ProfileOrganizer;
@@ -56,7 +58,7 @@ public class RouterContext extends I2PAppContext {
     private OutNetMessagePool _outNetMessagePool;
     private MessageHistory _messageHistory;
     private OutboundMessageRegistry _messageRegistry;
-    private NetworkDatabaseFacade _netDb;
+    private SegmentedNetworkDatabaseFacade _netDb;
     private KeyManager _keyManager;
     private CommSystemFacade _commSystem;
     private ProfileOrganizer _profileOrganizer;
@@ -242,7 +244,8 @@ public class RouterContext extends I2PAppContext {
         //_messageStateMonitor = new MessageStateMonitor(this);
         _routingKeyGenerator = new RouterKeyGenerator(this);
         if (!getBooleanProperty("i2p.dummyNetDb"))
-            _netDb = new FloodfillNetworkDatabaseFacade(this); // new KademliaNetworkDatabaseFacade(this);
+            //_netDb = new FloodfillNetworkDatabaseFacade(this); // new KademliaNetworkDatabaseFacade(this);
+            _netDb = new FloodfillNetworkDatabaseSegmentor(this); // new KademliaNetworkDatabaseFacade(this);
         else
             _netDb = new DummyNetworkDatabaseFacade(this);
         _keyManager = new KeyManager(this);
@@ -369,7 +372,10 @@ public class RouterContext extends I2PAppContext {
     /**
      * Our db cache
      */
-    public NetworkDatabaseFacade netDb() { return _netDb; }
+    public SegmentedNetworkDatabaseFacade netDb() { return _netDb; }
+    public FloodfillNetworkDatabaseFacade floodfillNetDb() { return _netDb.floodfillNetDB(); }
+    public FloodfillNetworkDatabaseFacade exploratoryNetDb() { return _netDb.exploratoryNetDB(); }
+    public FloodfillNetworkDatabaseFacade clientNetDb(String id) { return _netDb.clientNetDB(id); }
     /**
      * The actual driver of the router, where all jobs are enqueued and processed.
      */

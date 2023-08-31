@@ -110,7 +110,7 @@ class LookupDestJob extends JobImpl {
                                 long exp = now + ((bd.getAuthRequired() || bd.getSecretRequired()) ? 365*24*60*60*1000L
                                                                                                    :  90*24*68*60*1000L);
                                 bd.setExpiration(exp);
-                                getContext().netDb().setBlindData(bd);
+                                getContext().netDb().setBlindData(bd, toBase32());
                             }
                             h = bd.getBlindedHash();
                             if (_log.shouldDebug())
@@ -185,11 +185,17 @@ class LookupDestJob extends JobImpl {
             if (timeout > 1500)
                 timeout -= 500;
             // TODO tell router this is an encrypted lookup, skip 38 or earlier ffs?
-            getContext().netDb().lookupDestination(_hash, done, timeout, _fromLocalDest);
+            getContext().netDb().lookupDestination(_hash, done, timeout, _fromLocalDest, toBase32());
         } else {
             // blinding decode fail
             returnFail(HostReplyMessage.RESULT_DECRYPTION_FAILURE);
         }
+    }
+
+    private String toBase32(){
+        if (_fromLocalDest != null)
+            return _fromLocalDest.toBase32();
+        return null;
     }
 
     private class DoneJob extends JobImpl {
@@ -198,10 +204,10 @@ class LookupDestJob extends JobImpl {
         }
         public String getName() { return "LeaseSet Lookup Reply to Client"; }
         public void runJob() {
-            Destination dest = getContext().netDb().lookupDestinationLocally(_hash);
+            Destination dest = getContext().netDb().lookupDestinationLocally(_hash, toBase32());
             if (dest == null && _blindData != null) {
                 // TODO store and lookup original hash instead
-                LeaseSet ls = getContext().netDb().lookupLeaseSetLocally(_hash);
+                LeaseSet ls = getContext().netDb().lookupLeaseSetLocally(_hash, toBase32());
                 if (ls != null && ls.getType() == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
                     // already decrypted
                     EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;

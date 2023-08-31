@@ -394,12 +394,12 @@ class InboundEstablishState {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Unsupported sig type from: " + toString());
                     // _x() in UDPTransport
-                    _context.banlist().banlistRouterForever(_receivedUnconfirmedIdentity.calculateHash(),
+                    _context.banlist().banlistRouterHard(_receivedUnconfirmedIdentity.calculateHash(),
                                                             "Unsupported signature type");
                     fail();
                 }
                 Hash h = _receivedUnconfirmedIdentity.calculateHash();
-                if (_context.banlist().isBanlistedForever(h)) {
+                if (_context.banlist().isBanlistedHard(h)) {
                     // validate sig to prevent spoofing
                     if (getConfirmedIdentity() != null)
                        _context.blocklist().add(_aliceIP);

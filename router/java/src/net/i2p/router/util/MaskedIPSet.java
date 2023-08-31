@@ -51,7 +51,7 @@ public class MaskedIPSet extends HashSet<String> {
       * @since 0.9.38
       */
     private static RouterInfo lookupRILocally(RouterContext ctx, Hash peer) {
-        DatabaseEntry ds = ctx.netDb().lookupLocallyWithoutValidation(peer);
+        DatabaseEntry ds = ctx.floodfillNetDb().lookupLocallyWithoutValidation(peer);
         if (ds != null) {
             if (ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
                 return (RouterInfo) ds;
