@@ -180,7 +180,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
     private boolean verifyInbound(Hash aliceHash) {
         // get inet-addr
         byte[] ip = _con.getRemoteIP();
-        if (_context.banlist().isBanlistedForever(aliceHash)) {
+        if (_context.banlist().isBanlistedHard(aliceHash)) {
             if (_log.shouldWarn())
                 _log.warn("Dropping inbound connection from permanently banlisted peer at " + Addresses.toString(ip) + " : " + aliceHash);
             // So next time we will not accept the con from this IP,
@@ -681,7 +681,9 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
 
         // s is verified, we may now ban the hash
         if (mismatchMessage != null) {
-            _context.banlist().banlistRouter(h, "IP mismatch", null, null, _context.clock().now() + 2*60*60*1000);
+            _context.banlist().banlistRouter(h, "IP mismatch", null,
+                                             _context.banlist().BANLIST_CODE_HARD,  null,
+                                             _context.clock().now() + 2*60*60*1000);
             _msg3p2FailReason = NTCPConnection.REASON_BANNED;
             throw new DataFormatException(mismatchMessage + ri);
         }
@@ -689,7 +691,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         try {
             RouterInfo old = _context.netDb().store(h, ri);
             if (flood && !ri.equals(old)) {
-                FloodfillNetworkDatabaseFacade fndf = (FloodfillNetworkDatabaseFacade) _context.netDb();
+                FloodfillNetworkDatabaseFacade fndf = (FloodfillNetworkDatabaseFacade) _context.floodfillNetDb();
                 if (fndf.floodConditional(ri)) {
                     if (_log.shouldDebug())
                         _log.debug("Flooded the RI: " + h);

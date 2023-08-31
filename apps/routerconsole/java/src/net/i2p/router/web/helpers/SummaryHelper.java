@@ -162,13 +162,13 @@ public class SummaryHelper extends HelperBase {
 
     /** allowReseed */
     public boolean allowReseed() {
-        return _context.netDb().isInitialized() &&
-               (_context.netDb().getKnownRouters() < ReseedChecker.MINIMUM) ||
+        return _context.floodfillNetDb().isInitialized() &&
+               (_context.floodfillNetDb().getKnownRouters() < ReseedChecker.MINIMUM) ||
                 _context.getBooleanProperty("i2p.alwaysAllowReseed");
     }
 
     /** subtract one for ourselves, so if we know no other peers it displays zero */
-    public int getAllPeers() { return Math.max(_context.netDb().getKnownRouters() - 1, 0); }
+    public int getAllPeers() { return Math.max(_context.floodfillNetDb().getKnownRouters() - 1, 0); }
 
     public enum NetworkState {
         HIDDEN,
@@ -286,7 +286,7 @@ public class SummaryHelper extends HelperBase {
                 // fall through...
             case IPV4_FIREWALLED_IPV6_OK:
             case IPV4_FIREWALLED_IPV6_UNKNOWN:
-                if (((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled())
+                if ((_context.floodfillNetDb()).floodfillEnabled())
                     return new NetworkStateMessage(NetworkState.WARN, fixup(_t("WARN-Firewalled and Floodfill")));
                 //if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)
                 //    return new NetworkStateMessage(NetworkState.WARN, _t("WARN-Firewalled and Fast"));
@@ -411,11 +411,11 @@ public class SummaryHelper extends HelperBase {
      */
     public boolean showFirewallWarning() {
         return _context != null &&
-               _context.netDb().isInitialized() &&
+               _context.floodfillNetDb().isInitialized() &&
                _context.router().getUptime() > 2*60*1000 &&
                (!_context.commSystem().isDummy()) &&
                _context.commSystem().countActivePeers() <= 0 &&
-               _context.netDb().getKnownRouters() > 5;
+               _context.floodfillNetDb().getKnownRouters() > 5;
     }
 
     /**
@@ -632,7 +632,7 @@ public class SummaryHelper extends HelperBase {
                 else
                     buf.append(DataHelper.escapeHTML(ServletUtil.truncate(name, 29))).append("&hellip;");
                 buf.append("</a></b></td>\n");
-                LeaseSet ls = _context.netDb().lookupLeaseSetLocally(h);
+                LeaseSet ls = _context.netDb().lookupLeaseSetHashIsClient(h);
                 if (ls != null && _context.tunnelManager().getOutboundClientTunnelCount(h) > 0) {
                     if (!ls.isCurrent(0)) {
                         // yellow light
@@ -985,7 +985,7 @@ public class SummaryHelper extends HelperBase {
                .append("</b></div>");
         }
 
-        ReseedChecker checker = _context.netDb().reseedChecker();
+        ReseedChecker checker = _context.floodfillNetDb().reseedChecker();
         String status = checker.getStatus();
         if (status.length() > 0) {
             // Show status message even if not running, timer in ReseedChecker should remove after 20 minutes

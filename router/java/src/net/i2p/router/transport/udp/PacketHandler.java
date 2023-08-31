@@ -635,7 +635,7 @@ class PacketHandler {
                     _transport.dropPeer(state, true, "Clock skew");
                     if (state.getRemotePort() == 65520) {
                         // distinct port of buggy router
-                        _context.banlist().banlistRouterForever(state.getRemotePeer(),
+                        _context.banlist().banlistRouterHard(state.getRemotePeer(),
                                                                 _x("Excessive clock skew: {0}"),
                                                                 DataHelper.formatDuration(skew));
                     } else {
@@ -660,7 +660,7 @@ class PacketHandler {
                     _transport.dropPeer(state, true, "Clock skew");
                     if (state.getRemotePort() == 65520) {
                         // distinct port of buggy router
-                        _context.banlist().banlistRouterForever(state.getRemotePeer(),
+                        _context.banlist().banlistRouterHard(state.getRemotePeer(),
                                                                 _x("Excessive clock skew: {0}"),
                                                                 DataHelper.formatDuration(0 - skew));
                     } else {

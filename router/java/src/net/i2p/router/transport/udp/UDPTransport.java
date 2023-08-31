@@ -1999,7 +1999,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         _activeThrottle.unchoke(peer.getRemotePeer());
         markReachable(peer.getRemotePeer(), peer.isInbound());
-        //_context.banlist().unbanlistRouter(peer.getRemotePeer(), STYLE);
 
         //if (SHOULD_FLOOD_PEERS)
         //    _flooder.addPeer(peer);
@@ -2084,7 +2083,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                         if (id == -1)
                             _context.banlist().banlistRouter(peerHash, "No network specified", null, null, _context.clock().now() + Banlist.BANLIST_DURATION_NO_NETWORK);
                         else
-                            _context.banlist().banlistRouterForever(peerHash, "Not in our network: " + id);
+                            _context.banlist().banlistRouterHard(peerHash, "Not in our network: " + id);
                         if (peer != null)
                             sendDestroy(peer, SSU2Util.REASON_NETID);
                         dropPeer(peerHash, false, "Not in our network");
@@ -2472,7 +2471,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 if (nid == -1)
                     _context.banlist().banlistRouter(to, "No network specified", null, null, _context.clock().now() + Banlist.BANLIST_DURATION_NO_NETWORK);
                 else
-                    _context.banlist().banlistRouterForever(to, "Not in our network: " + nid);
+                    _context.banlist().banlistRouterHard(to, "Not in our network: " + nid);
                 markUnreachable(to);
                 return null;    
             }
@@ -4213,7 +4212,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 }
             }
             // enforce IPv4/v6 advertised for all
-            RouterInfo peerInfo = _context.netDb().lookupRouterInfoLocally(peer.getRemotePeer());
+            RouterInfo peerInfo = _context.floodfillNetDb().lookupRouterInfoLocally(peer.getRemotePeer());
             if (peerInfo == null)
                 continue;
             if (isIPv6) {

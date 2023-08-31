@@ -64,9 +64,9 @@ class TunnelParticipant {
             _inboundDistributor = null; // final
 
         if ( (_config != null) && (_config.getSendTo() != null) ) {
-            _nextHopCache = _context.netDb().lookupRouterInfoLocally(_config.getSendTo());
+            _nextHopCache = _context.floodfillNetDb().lookupRouterInfoLocally(_config.getSendTo());
             if (_nextHopCache == null)
-                _context.netDb().lookupRouterInfo(_config.getSendTo(), new Found(_context), null, LONG_MAX_LOOKUP_TIME);
+                _context.floodfillNetDb().lookupRouterInfo(_config.getSendTo(), new Found(_context), null, LONG_MAX_LOOKUP_TIME);
         }
         // all createRateStat() in TunnelDispatcher
     }
@@ -76,7 +76,7 @@ class TunnelParticipant {
         public String getName() { return "Next hop info found"; }
         public void runJob() {
             if (_nextHopCache == null) {
-                _nextHopCache = _context.netDb().lookupRouterInfoLocally(_config.getSendTo());
+                _nextHopCache = _context.floodfillNetDb().lookupRouterInfoLocally(_config.getSendTo());
                 // nothing for failure since fail job is null
                 _context.statManager().addRateData("tunnel.participantLookupSuccess", 1);
             }
@@ -104,7 +104,7 @@ class TunnelParticipant {
             _config.incrementProcessedMessages();
             RouterInfo ri = _nextHopCache;
             if (ri == null)
-                ri = _context.netDb().lookupRouterInfoLocally(_config.getSendTo());
+                ri = _context.floodfillNetDb().lookupRouterInfoLocally(_config.getSendTo());
             if (ri != null) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Send off to nextHop directly (" + _config.getSendTo()
@@ -118,7 +118,7 @@ class TunnelParticipant {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Lookup the nextHop (" + _config.getSendTo()
                               + " for " + msg);
-                _context.netDb().lookupRouterInfo(_config.getSendTo(), new SendJob(_context, msg),
+                _context.floodfillNetDb().lookupRouterInfo(_config.getSendTo(), new SendJob(_context, msg),
                                                   new TimeoutJob(_context, msg), MAX_LOOKUP_TIME);
             }
         } else {
@@ -229,7 +229,7 @@ class TunnelParticipant {
             if (_nextHopCache != null) {
                 send(_config, _msg, _nextHopCache);
             } else {
-                RouterInfo ri = _context.netDb().lookupRouterInfoLocally(_config.getSendTo());
+                RouterInfo ri = _context.floodfillNetDb().lookupRouterInfoLocally(_config.getSendTo());
                 int stat;
                 if (ri != null) {
                     _nextHopCache = ri;
@@ -260,7 +260,7 @@ class TunnelParticipant {
             if (_nextHopCache != null)
                 return;
             
-            RouterInfo ri = _context.netDb().lookupRouterInfoLocally(_config.getSendTo());
+            RouterInfo ri = _context.floodfillNetDb().lookupRouterInfoLocally(_config.getSendTo());
             if (ri != null) {
                 _nextHopCache = ri;
                 if (_log.shouldLog(Log.WARN))

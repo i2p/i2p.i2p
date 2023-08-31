@@ -57,7 +57,9 @@ class ParticipatingThrottler {
         Result rv;
         if (count > limit) {
             if (count > limit * 9 / 8) {
-                //context.banlist().banlistRouter(h, "Excess participating tunnels", null, null, context.clock().now() + 30*60*1000);
+                //context.banlist().banlistRouter(h, "Excess participating tunnels", null,
+                //                                context.banlist().BANLIST_CODE_HARD, null,
+                //                                context.clock().now() + 30*60*1000);
                 // drop after any accepted tunnels have expired
                 //context.simpleTimer2().addEvent(new Disconnector(h), 11*60*1000);
                 //if (_log.shouldWarn())

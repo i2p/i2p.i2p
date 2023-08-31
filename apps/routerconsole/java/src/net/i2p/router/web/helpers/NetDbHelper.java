@@ -30,6 +30,7 @@ public class NetDbHelper extends FormHandler {
     private long _date;
     private int _limit = DEFAULT_LIMIT;
     private boolean _lease;
+    private boolean _clientOnly;
     private boolean _debug;
     private boolean _graphical;
     private SigType _type;
@@ -45,13 +46,17 @@ public class NetDbHelper extends FormHandler {
                                            _x("Local Router"),                  // 1
                                            _x("Router Lookup"),                 // 2
                                            // advanced below here
-                                           _x("All Routers"),                   // 3
-                                           _x("All Routers with Full Stats"),   // 4
+                                           _x("All Routers in Floodfill NetDB"),                   // 3
+                                           _x("All Routers in Floodfill NetDB with Full Stats"),   // 4
                                            _x("LeaseSets"),                     // 5
                                            "LeaseSet Debug",                    // 6
                                            "Sybil",                             // 7
                                            "Advanced Lookup",                   // 8
-                                           "LeaseSet Lookup"   };               // 9
+                                           "LeaseSet Lookup",                   // 9
+                                           _x("All Routers in Client NetDBs"),   // 10
+                                           _x("All Routers in Client NetDBs with Full Stats"),   // 11
+                                           _x("LeaseSets in Client NetDBs"),                     // 12
+                                          };
 
     private static final String links[] =
                                           {"",                                  // 0
@@ -63,7 +68,12 @@ public class NetDbHelper extends FormHandler {
                                            "?l=2",                              // 6
                                            "?f=3",                              // 7
                                            "?f=4",                              // 8
-                                           "" };                                // 9
+                                           "",                                  // 9
+                                           "?f=5",                              // 10
+                                           "?f=6",                              // 11
+                                           "?l=7",                              // 12
+                                          };
+                                           
 
     public void setRouter(String r) {
         if (r != null && r.length() > 0)
@@ -196,6 +206,7 @@ public class NetDbHelper extends FormHandler {
     }
 
     public void setLease(String l) {
+        _clientOnly = "7".equals(l);
         _debug = "2".equals(l);
         _lease = _debug || "1".equals(l);
     }
@@ -236,6 +247,14 @@ public class NetDbHelper extends FormHandler {
         try {
             _icount = Integer.parseInt(f);
         } catch (NumberFormatException nfe) {}
+    }
+
+    public void setClientPage(String f) {
+        try {
+
+        } catch(Exception e){
+            //if (_log.shouldLog)
+        }
     }
     
     /**
@@ -304,21 +323,27 @@ public class NetDbHelper extends FormHandler {
     /**
      *   storeWriter() must be called previously
      */
-    public String getNetDbSummary() {
+    public String getFloodfillNetDbSummary() {
+        return getNetDbSummary(null, false);
+    }
+
+    public String getNetDbSummary(String client, boolean clientOnly) {
         NetDbRenderer renderer = new NetDbRenderer(_context);
         try {
-            renderNavBar();
+            if (client == null && !clientOnly)
+                renderNavBar();
             if (_routerPrefix != null || _version != null || _country != null ||
                 _family != null || _caps != null || _ip != null || _sybil != null ||
                 _port != 0 || _type != null || _mtu != null || _ipv6 != null ||
                 _ssucaps != null || _transport != null || _cost != 0 || _etype != null ||
                 _icount > 0) {
-                renderer.renderRouterInfoHTML(_out, _limit, _page,
+                if (client == null && !clientOnly)
+                    renderer.renderRouterInfoHTML(_out, _limit, _page,
                                               _routerPrefix, _version, _country,
                                               _family, _caps, _ip, _sybil, _port, _highPort, _type, _etype,
-                                              _mtu, _ipv6, _ssucaps, _transport, _cost, _icount);
+                                              _mtu, _ipv6, _ssucaps, _transport, _cost, _icount, client, clientOnly);
             } else if (_lease) {
-                renderer.renderLeaseSetHTML(_out, _debug);
+                renderer.renderLeaseSetHTML(_out, _debug, client, _clientOnly);
             } else if (_hostname != null) {
                 renderer.renderLeaseSet(_out, _hostname, true);
             } else if (_full == 3) {
@@ -329,15 +354,27 @@ public class NetDbHelper extends FormHandler {
                 (new SybilRenderer(_context)).getNetDbSummary(_out, _newNonce, _mode, _date);
             } else if (_full == 4) {
                 renderLookupForm();
+            } else if (_full == 5) {
+                renderer.renderStatusHTML(_out, _limit, _page, _full, null, true);
+            } else if (_full == 6) {
+                renderer.renderStatusHTML(_out, _limit, _page, _full, null, true);
+            } else if (_clientOnly && client == null) {
+                for (String _client : _context.netDb().getClients()) {
+                    renderer.renderLeaseSetHTML(_out, _debug, _client, _clientOnly);
+                }
             } else {
                 if (_full == 0 && _sort != null)
                     _full = 3;
-                renderer.renderStatusHTML(_out, _limit, _page, _full);
+                renderer.renderStatusHTML(_out, _limit, _page, _full, client, clientOnly);
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
         return "";
+    }
+
+    public String getClientNetDbSummary(String client) {
+        return getNetDbSummary(client, true);
     }
 
     /**
@@ -365,6 +402,12 @@ public class NetDbHelper extends FormHandler {
             return 8;
         if (_hostname != null)
             return 9;
+        if (_full == 5)
+            return 10;
+        if (_full == 6)
+            return 11;
+        if (_clientOnly)
+            return 12;
         return 0;
     }
 
@@ -396,9 +439,9 @@ public class NetDbHelper extends FormHandler {
                     buf.append("<span class=\"tab\">");
                 buf.append("<a href=\"netdb").append(links[i]).append("\">").append(_t(titles[i])).append("</a>");
             }
-            if (span)
+            if (span) {
                 buf.append("</span>\n");
-            else if (i != titles.length - 1)
+            } else if (i != titles.length - 1)
                 buf.append("&nbsp;&nbsp;\n");
         }
         if (!span)

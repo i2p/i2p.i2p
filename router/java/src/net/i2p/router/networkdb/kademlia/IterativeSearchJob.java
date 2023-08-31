@@ -14,6 +14,7 @@ import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.I2NPMessage;
@@ -236,7 +237,8 @@ public class IterativeSearchJob extends FloodSearchJob {
         Job onTimeout = new FloodOnlyLookupTimeoutJob(getContext(), this);
         _out = getContext().messageRegistry().registerPending(replySelector, onReply, onTimeout);
         if (_log.shouldLog(Log.INFO))
-            _log.info(getJobId() + ": New ISJ for " +
+            _log.info("JobId: " + getJobId() + "; dbid: " + _facade._dbid
+                      + ": New ISJ for " +
                       (_isLease ? "LS " : "RI ") +
                       _key + " (rkey " + _rkey + ") timeout " +
                       DataHelper.formatDuration(_timeoutMs) + " toTry: "  + DataHelper.toString(_toTry));
@@ -319,7 +321,7 @@ public class IterativeSearchJob extends FloodSearchJob {
     private void sendQuery(Hash peer, int previouslyTried) {
             final RouterContext ctx = getContext();
             TunnelManagerFacade tm = ctx.tunnelManager();
-            RouterInfo ri = ctx.netDb().lookupRouterInfoLocally(peer);
+            RouterInfo ri = ctx.floodfillNetDb().lookupRouterInfoLocally(peer);
             if (ri != null) {
                 // Now that most of the netdb is Ed RIs and EC LSs, don't even bother
                 // querying old floodfills that don't know about those sig types.
@@ -392,6 +394,9 @@ public class IterativeSearchJob extends FloodSearchJob {
                 replyTunnel = null;
                 isClientReplyTunnel = false;
                 isDirect = true;
+                if (_facade.isClientDb() && _log.shouldLog(Log.WARN))
+                    _log.warn("[JobId: " + getJobId() + "; dbid: " + _facade._dbid
+                              + "]: Warning! Direct search selected in a client netDb context!");
                 ctx.statManager().addRateData("netDb.RILookupDirect", 1);
             } else {
                 if (previouslyTried <= 0) {
@@ -525,6 +530,10 @@ public class IterativeSearchJob extends FloodSearchJob {
             if (outMsg == null)
                 outMsg = dlm;
             if (isDirect) {
+                if (_facade.isClientDb() && _log.shouldLog(Log.WARN))
+                    _log.warn("[JobId: " + getJobId() + "; dbid: " + _facade._dbid
+                              + "]: Warning! Sending direct search message in a client netDb context! "
+                              + outMsg);
                 OutNetMessage m = new OutNetMessage(ctx, outMsg, outMsg.getMessageExpiration(),
                                                     OutNetMessage.PRIORITY_MY_NETDB_LOOKUP, ri);
                 // Should always succeed, we are connected already
@@ -585,12 +594,12 @@ public class IterativeSearchJob extends FloodSearchJob {
         if (peer.equals(getContext().routerHash()) ||
             peer.equals(_key))
             return;
-        if (getContext().banlist().isBanlistedForever(peer)) {
+        if (getContext().banlist().isBanlistedHard(peer)) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": banlisted peer from DSRM " + peer);
             return;
         }
-        RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(peer);
+        RouterInfo ri = getContext().floodfillNetDb().lookupRouterInfoLocally(peer);
         if (ri != null && !FloodfillNetworkDatabaseFacade.isFloodfill(ri)) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": non-ff peer from DSRM " + peer);
@@ -693,6 +702,8 @@ public class IterativeSearchJob extends FloodSearchJob {
         // we will credit the wrong one.
         int tries;
         Hash peer = null;
+        Destination dest = null;
+
         synchronized(this) {
             if (_dead) return;
             _dead = true;
@@ -703,6 +714,15 @@ public class IterativeSearchJob extends FloodSearchJob {
                 _unheardFrom.clear();
             }
         }
+
+        // Confirm success by checking for the Lease Set in local storage
+        if (_isLease) {
+            dest = getContext().floodfillNetDb().lookupDestinationLocally(_key);
+            if ((dest == null) && (_log.shouldLog(Log.WARN)))
+                _log.warn("Warning! Lease Set not found in persistent data store for key = " + _key);
+        }
+
+
         _facade.complete(_key);
         if (peer != null) {
             Long timeSent = _sentTime.get(peer);

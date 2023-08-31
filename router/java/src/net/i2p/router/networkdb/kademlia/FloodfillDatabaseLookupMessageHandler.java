@@ -33,23 +33,12 @@ public class FloodfillDatabaseLookupMessageHandler implements HandlerJobBuilder 
         _context = context;
         _facade = facade;
         _log = context.logManager().getLog(FloodfillDatabaseLookupMessageHandler.class);
-        _context.statManager().createRateStat("netDb.lookupsReceived", "How many netDb lookups have we received?",
-                "NetworkDatabase", new long[] { 60 * 60 * 1000l });
-        _context.statManager().createRateStat("netDb.lookupsDropped",
-                "How many netDb lookups did we drop due to throttling?", "NetworkDatabase",
-                new long[] { 60 * 60 * 1000l });
-        _context.statManager().createRateStat("netDb.lookupsDroppedDueToPriorBan",
-                "How many netDb lookups did we drop due to having a prior ban?", "NetworkDatabase",
-                new long[] { 60 * 60 * 1000l });
-        _context.statManager().createRateStat("netDb.nonFFLookupsDropped",
-                "How many netDb lookups did we drop due to us not being a floodfill?", "NetworkDatabase",
-                new long[] { 60 * 60 * 1000l });
-        _context.statManager().createRateStat("netDb.repeatedLookupsDropped",
-                "How many netDb lookups are coming in faster than we want?", "NetworkDatabase",
-                new long[] { 60 * 60 * 1000l });
-        _context.statManager().createRateStat("netDb.repeatedBurstLookupsDropped",
-                "How many netDb lookups did we drop due to burst throttling?", "NetworkDatabase",
-                new long[] { 60 * 60 * 1000l });
+        _context.statManager().createRateStat("netDb.lookupsReceived", "How many netDb lookups have we received?", "NetworkDatabase", new long[] { 60*60*1000l });
+        _context.statManager().createRateStat("netDb.lookupsDropped", "How many netDb lookups did we drop due to throttling?", "NetworkDatabase", new long[] { 60*60*1000l });
+        _context.statManager().createRateStat("netDb.lookupsDroppedDueToPriorBan", "How many netDb lookups did we drop due to having a prior ban?", "NetworkDatabase", new long[] { 60*60*1000l });
+        _context.statManager().createRateStat("netDb.nonFFLookupsDropped", "How many netDb lookups did we drop due to us not being a floodfill?", "NetworkDatabase", new long[] { 60*60*1000l });
+        _context.statManager().createRateStat("netDb.repeatedLookupsDropped", "How many netDb lookups are coming in faster than we want?", "NetworkDatabase", new long[] { 60*60*1000l });
+        _context.statManager().createRateStat("netDb.repeatedBurstLookupsDropped", "How many netDb lookups did we drop due to burst throttling?", "NetworkDatabase", new long[] { 60*60*1000l });
         // following are for ../HDLMJ
         _context.statManager().createRateStat("netDb.lookupsHandled", "How many netDb lookups have we handled?",
                 "NetworkDatabase", new long[] { 60 * 60 * 1000l });
@@ -75,37 +64,52 @@ public class FloodfillDatabaseLookupMessageHandler implements HandlerJobBuilder 
     public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
         _context.statManager().addRateData("netDb.lookupsReceived", 1);
 
-        DatabaseLookupMessage dlm = (DatabaseLookupMessage) receivedMessage;
-        boolean isBanned = dlm.getFrom() != null && (_context.banlist().isBanlistedForever(dlm.getFrom()) ||
-                _context.banlist().isBanlisted(dlm.getFrom()));
+        DatabaseLookupMessage dlm = (DatabaseLookupMessage)receivedMessage;
+        boolean isBanned = dlm.getFrom() != null
+                           && (_context.banlist().isBanlistedHard(dlm.getFrom())
+                           || _context.banlist().isBanlisted(dlm.getFrom()));
         if (isBanned) {
             _context.statManager().addRateData("netDb.lookupsDroppedDueToPriorBan", 1);
             return null;
         }
         boolean ourRI = dlm.getSearchKey() != null && dlm.getSearchKey().equals(_context.routerHash());
-        if (!_context.netDb().floodfillEnabled() && (dlm.getReplyTunnel() == null && !ourRI)) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Dropping " + dlm.getSearchType() + " lookup request for " + dlm.getSearchKey()
-                        + " (we are not a floodfill), reply was to: " + dlm.getFrom() + " tunnel: "
-                        + dlm.getReplyTunnel());
+        if (!_context.floodfillNetDb().floodfillEnabled() && (dlm.getReplyTunnel() == null && !ourRI)) {
+            if (_log.shouldLog(Log.WARN)) 
+                _log.warn("[dbid: " + _facade._dbid
+                          + "] Dropping " + dlm.getSearchType()
+                          + " lookup request for " + dlm.getSearchKey()
+                          + " (we are not a floodfill), reply was to: "
+                          + dlm.getFrom() + " tunnel: " + dlm.getReplyTunnel());
             _context.statManager().addRateData("netDb.nonFFLookupsDropped", 1);
             return null;
         }
 
         if (_facade.shouldBanLookup(dlm.getFrom(), dlm.getReplyTunnel())) {
             if (_log.shouldLog(Log.WARN)) {
-                _log.warn("Possibly throttling " + dlm.getSearchType() + " lookup request for " + dlm.getSearchKey()
-                        + " because requests are being sent extremely fast, reply was to: " + dlm.getFrom()
-                        + " tunnel: " + dlm.getReplyTunnel());
+                _log.warn("[dbid: " + _facade._dbid
+                          + "] Possibly throttling " + dlm.getSearchType()
+                          + " lookup request for " + dlm.getSearchKey()
+                          + " because requests are being sent extremely fast, reply was to: "
+                          + dlm.getFrom() + " tunnel: " + dlm.getReplyTunnel());
                 _context.statManager().addRateData("netDb.repeatedLookupsDropped", 1);
             }
             /*
              * TODO: Keep a close eye on this, if it results in too many bans then just back
              * it out.
              */
-            _context.banlist().banlistRouter(dlm.getFrom(),
-                    " <b>➜</b> Excessive lookup requests", null, null, _context.clock().now() +
-                            4 * 60 * 60 * 1000);
+        }
+        if (_facade.shouldBanBurstLookup(dlm.getFrom(), dlm.getReplyTunnel())) {
+            if (_log.shouldLog(Log.WARN)) {
+                _log.warn("[dbid: " + _facade._dbid
+                          + "] Banning " + dlm.getSearchType()
+                          + " lookup request for " + dlm.getSearchKey()
+                          + " because requests are being sent extremely fast in a very short time, reply was to: "
+                          + dlm.getFrom() + " tunnel: " + dlm.getReplyTunnel());
+                _context.statManager().addRateData("netDb.repeatedBurstLookupsDropped", 1);
+            }
+            _context.banlist().banlistRouter(dlm.getFrom(), " <b>➜</b> Excessive lookup requests, burst", null,
+                                             _context.banlist().BANLIST_CODE_HARD, null,
+                                             _context.clock().now() + 4*60*60*1000);
             _context.commSystem().mayDisconnect(dlm.getFrom());
             _context.statManager().addRateData("netDb.lookupsDropped", 1);
             return null;
@@ -136,9 +140,12 @@ public class FloodfillDatabaseLookupMessageHandler implements HandlerJobBuilder 
             return j;
             // }
         } else {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Dropping " + dlm.getSearchType() + " lookup request for " + dlm.getSearchKey()
-                        + " (throttled), reply was to: " + dlm.getFrom() + " tunnel: " + dlm.getReplyTunnel());
+            if (_log.shouldLog(Log.WARN)) 
+                _log.warn("[dbid: " + _facade._dbid
+                          + "] Dropping " + dlm.getSearchType()
+                          + " lookup request for " + dlm.getSearchKey()
+                          + " (throttled), reply was to: " + dlm.getFrom()
+                          + " tunnel: " + dlm.getReplyTunnel());
             _context.statManager().addRateData("netDb.lookupsDropped", 1);
             return null;
         }

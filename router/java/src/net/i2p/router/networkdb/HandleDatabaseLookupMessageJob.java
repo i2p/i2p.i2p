@@ -110,7 +110,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
 
         DatabaseLookupMessage.Type lookupType = _message.getSearchType();
         // only lookup once, then cast to correct type
-        DatabaseEntry dbe = getContext().netDb().lookupLocally(searchKey);
+        DatabaseEntry dbe = getContext().floodfillNetDb().lookupLocally(searchKey);
         int type = dbe != null ? dbe.getType() : -1;
         if (DatabaseEntry.isLeaseSet(type) &&
             (lookupType == DatabaseLookupMessage.Type.ANY || lookupType == DatabaseLookupMessage.Type.LS)) {
@@ -148,7 +148,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 // For this, we do NOT use their dontInclude list as it can't be trusted
                 // (i.e. it could mess up the closeness calculation)
                 LeaseSet possibleMultihomed = getContext().clientMessagePool().getCache().multihomedCache.get(searchKey);
-                Set<Hash> closestHashes = getContext().netDb().findNearestRouters(searchKey, 
+                Set<Hash> closestHashes = getContext().floodfillNetDb().findNearestRouters(searchKey, 
                                                                             CLOSENESS_THRESHOLD, null);
                 if (weAreClosest(closestHashes)) {
                     // It's in our keyspace, so give it to them
@@ -163,6 +163,9 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                     getContext().statManager().addRateData("netDb.lookupsMatchedLocalClosest", 1);
                     sendData(searchKey, ls, fromKey, toTunnel);
                 } else if (possibleMultihomed != null) {
+                    // If it's in the possibleMultihomed cache, then it was definitely stored to us meaning it is effectively
+                    // always recievedAsPublished. No need to decide whether or not to answer the request like above, just
+                    // answer it so it doesn't look different from other stores.
                     if (possibleMultihomed.isCurrent(Router.CLOCK_FUDGE_FACTOR / 4) && possibleMultihomed.getReceivedAsPublished()) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("We have local LS, possibly from a multihomed router " + searchKey + ", and somebody requested it back from us. Answering query, as if in our keyspace, to avoid attack.");
@@ -294,7 +297,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         // Honor flag to exclude all floodfills
         //if (dontInclude.contains(Hash.FAKE_HASH)) {
         // This is handled in FloodfillPeerSelector
-        return getContext().netDb().findNearestRouters(_message.getSearchKey(), 
+        return getContext().floodfillNetDb().findNearestRouters(_message.getSearchKey(), 
                                                        MAX_ROUTERS_RETURNED, 
                                                        dontInclude);
     }
@@ -346,7 +349,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 _log.debug("Sending reply directly to " + toPeer);
             Job send = new SendMessageDirectJob(getContext(), message, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY, _msgIDBloomXor);
             send.runJob();
-            //getContext().netDb().lookupRouterInfo(toPeer, send, null, REPLY_TIMEOUT);
+            //getContext().floodfillNetDb().lookupRouterInfo(toPeer, send, null, REPLY_TIMEOUT);
         }
     }
     

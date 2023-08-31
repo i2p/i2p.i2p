@@ -34,11 +34,12 @@ class CapacityCalculator {
     private static final double PENALTY_NO_R_CAP = 1;
     private static final double PENALTY_U_CAP = 2;
     private static final double PENALTY_LAST_SEND_FAIL = 4;
-    // congestion cap penalty not yet applied
-    //private static final double PENALTY_D_CAP = 0;
-    // congestion cap penalty not yet applied
-    //private static final double PENALTY_E_CAP = 0;
-    //private static final double PENALTY_G_CAP = 0;
+    private static final String PROP_D_CAP = "router.penaltyCapD";
+    private static final double PENALTY_CAP_D = 0.5;
+    private static final String PROP_E_CAP = "router.penaltyCapE";
+    private static final double PENALTY_CAP_E = 0.9;
+    // private static final String PROP_G_CAP = "router.gcapPenalty";
+    // private static final double PENALTY_G_CAP = 0;
     private static final double PENALTY_RECENT_SEND_FAIL = 4;
     private static final double BONUS_LAST_SEND_SUCCESS = 1;
     private static final double BONUS_RECENT_SEND_SUCCESS = 1;
@@ -116,7 +117,7 @@ class CapacityCalculator {
         // credit non-floodfill to reduce conn limit issues at floodfills
         // TODO only if we aren't floodfill ourselves?
         // null for tests
-        NetworkDatabaseFacade ndb =  context.netDb();
+        NetworkDatabaseFacade ndb =  context.floodfillNetDb();
         if (ndb != null) {
             RouterInfo ri = (RouterInfo) ndb.lookupLocallyWithoutValidation(profile.getPeer());
             if (ri != null) {
@@ -129,16 +130,27 @@ class CapacityCalculator {
                     capacity -= PENALTY_U_CAP;
                 if (caps.indexOf(Router.CAPABILITY_BW32) >= 0)
                     capacity -= PENALTY_L_CAP;
-/* TODO */
-                /*if (caps.indexOf(Router.CAPABILITY_CONGESTION_MODERATE) >= 0)
-                    capacity -= PENALTY_D_CAP;
-                else if (caps.indexOf(Router.CAPABILITY_CONGESTION_SEVERE) >= 0)
-                    capacity -= PENALTY_E_CAP;*/
-/* TODO: G caps can be excluded in TunnelPeerSelector by adding it to DEFAULT_EXCLUDE_CAPS
-                decide what other handling if any is needed here.
-                else if (caps.indexOf(Router.CAPABILITY_NO_TUNNELS) >= 0)
-                    capacity -= PENALTY_G_CAP;
-*/
+                if (caps.indexOf(Router.CAPABILITY_CONGESTION_MODERATE) >= 0) {
+                    String dcapPenalty = context.getProperty(PROP_D_CAP);
+                    if (dcapPenalty != null) {
+                        double dcap = Double.parseDouble(dcapPenalty);
+                        capacity -= dcap;
+                    } else {
+                        capacity -= PENALTY_CAP_D;
+                    }
+                } else if (caps.indexOf(Router.CAPABILITY_CONGESTION_SEVERE) >= 0){
+                    String ecapPenalty = context.getProperty(PROP_E_CAP);
+                    if (ecapPenalty != null) {
+                        double ecap = Double.parseDouble(ecapPenalty);
+                        capacity -= ecap;
+                    } else {
+                        capacity -= PENALTY_CAP_E;
+                    }
+                }
+                /* TODO: G caps can be excluded in TunnelPeerSelector by adding it to DEFAULT_EXCLUDE_CAPS */
+                // decide what other handling if any is needed here.
+                //else if (caps.indexOf(Router.CAPABILITY_NO_TUNNELS) >= 0)
+                //    capacity -= PENALTY_G_CAP;
             } else {
                 capacity -= PENALTY_NO_RI;
             }

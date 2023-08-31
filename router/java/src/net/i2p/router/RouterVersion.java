@@ -24,6 +24,7 @@ public class RouterVersion {
     /** for example "-test" */
     public final static String EXTRA = "";
     public final static String FULL_VERSION = VERSION + "-" + STATUS + BUILD + EXTRA;
+
     public static void main(String args[]) {
         System.out.println("I2P Router version: " + FULL_VERSION);
         System.out.println("Router ID: " + RouterVersion.ID);

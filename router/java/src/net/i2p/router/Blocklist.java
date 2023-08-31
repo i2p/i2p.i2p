@@ -227,11 +227,9 @@ public class Blocklist {
         // but it's important to have this initialized before we read in the netdb.
         //job.getTiming().setStartAfter(_context.clock().now() + 30*1000);
         _context.jobQueue().addJob(job);
-        if (expireInterval() > 0) {
-            Job cleanupJob = new CleanupJob();
-            cleanupJob.getTiming().setStartAfter(_context.clock().now() + expireInterval());
-            _context.jobQueue().addJob(cleanupJob);
-        }
+        Job cleanupJob = new CleanupJob();
+        cleanupJob.getTiming().setStartAfter(_context.clock().now() + expireInterval());
+        _context.jobQueue().addJob(cleanupJob);
     }
 
     /**
@@ -280,12 +278,21 @@ public class Blocklist {
             return "Expire blocklist at user-defined interval of " + expireInterval();
         }
         public void runJob() {
-            clear();
-            _lastExpired = System.currentTimeMillis();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Expiring blocklist entrys at" + _lastExpired);
+            int jobInterval;
+
+            if (expireInterval() > 0) {
+                clear();
+                _lastExpired = System.currentTimeMillis();
+                jobInterval = expireInterval();
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Expiring blocklist entrys at" + _lastExpired);
+            } else {
+                // Set the next job interval to 15 minutes when expireInterval disabled
+                jobInterval = 15 * 60 * 1000;
+            }
+
             // schedule the next one
-            super.requeue(expireInterval());
+            super.requeue(jobInterval);
         }
     }
 
@@ -361,9 +368,11 @@ public class Blocklist {
 
     private void banlistRouter(Hash peer, String reason, String comment) {
         if (expireInterval() > 0)
-            _context.banlist().banlistRouter(peer, reason, comment, null, expireInterval());
+            _context.banlist().banlistRouter(peer, reason, comment,
+                                             _context.banlist().BANLIST_CODE_HARD, null,
+                                             _context.clock().now() + expireInterval());
         else
-            _context.banlist().banlistRouterForever(peer, reason, comment);
+            _context.banlist().banlistRouterHard(peer, reason, comment);
     }
 
     /**
@@ -933,7 +942,7 @@ public class Blocklist {
      * Will not contain duplicates.
      */
     private List<byte[]> getAddresses(Hash peer) {
-        RouterInfo pinfo = _context.netDb().lookupRouterInfoLocally(peer);
+        RouterInfo pinfo = _context.netDb().lookupRouterInfoLocally(peer, null);
         if (pinfo == null)
             return Collections.emptyList();
         return getAddresses(pinfo);
@@ -1272,11 +1281,13 @@ public class Blocklist {
      * So we also stagger these jobs.
      *
      */
-    private void banlistRouter( Hash peer, String reason, String reasonCode, long duration) {
+    private void banlistRouter( Hash peer, String reason, String reasonComment, long duration) {
         if (duration > 0)
-            _context.banlist().banlistRouter(peer, reason, reasonCode, null, System.currentTimeMillis()+expireInterval());
+            _context.banlist().banlistRouter(peer, reason, reasonComment,
+                                             _context.banlist().BANLIST_CODE_HARD, null,
+                                             System.currentTimeMillis()+expireInterval());
         else
-            _context.banlist().banlistRouterForever(peer, reason, reasonCode);
+            _context.banlist().banlistRouterHard(peer, reason, reasonComment);
     }
     private synchronized void banlistRouter(Hash peer, List<byte[]> ips, long duration) {
         // This only checks one file for now, pick the best one

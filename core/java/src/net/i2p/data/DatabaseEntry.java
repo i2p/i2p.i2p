@@ -135,6 +135,16 @@ public abstract class DatabaseEntry extends DataStructureImpl {
     }
 
     /**
+     * Convenience method, is the type any variant of router info?
+     *
+     * @return true for any type of RouterInfo, false for LeaseSet, false for others
+     * @since x.x.x
+     */
+    public boolean isRouterInfo() {
+        return (getType() == KEY_TYPE_ROUTERINFO);
+    }
+
+    /**
      * Returns the raw payload data, excluding the signature, to be signed by sign().
      *
      * Most callers should use writeBytes() or toByteArray() instead.

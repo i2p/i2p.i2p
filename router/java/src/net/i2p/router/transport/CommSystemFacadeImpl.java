@@ -374,7 +374,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     public void exemptIncoming(Hash peer) {
         if (_manager.isEstablished(peer))
             return;
-        RouterInfo ri = (RouterInfo) _context.netDb().lookupLocallyWithoutValidation(peer);
+        RouterInfo ri = (RouterInfo) _context.floodfillNetDb().lookupLocallyWithoutValidation(peer);
         if (ri == null)
             return;
         Collection<RouterAddress> addrs = ri.getAddresses();
@@ -504,8 +504,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      */
     private class QueueAll implements SimpleTimer.TimedEvent {
         public void timeReached() {
-            for (Hash h : _context.netDb().getAllRouters()) {
-                RouterInfo ri = _context.netDb().lookupRouterInfoLocally(h);
+            for (Hash h : _context.floodfillNetDb().getAllRouters()) {
+                RouterInfo ri = _context.floodfillNetDb().lookupRouterInfoLocally(h);
                 if (ri == null)
                     continue;
                 byte[] ip = getIP(ri);
@@ -614,7 +614,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         //if (ip != null && ip.length == 4)
         if (ip != null)
             return _geoIP.get(ip);
-        RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
+        RouterInfo ri = _context.floodfillNetDb().lookupRouterInfoLocally(peer);
         if (ri == null)
             return null;
         ip = getValidIP(ri);

@@ -62,11 +62,11 @@ class IterativeLookupJob extends JobImpl {
                         invalidPeers++;
                         continue;
                     }
-                    if (getContext().banlist().isBanlistedForever(peer)) {
+                    if (getContext().banlist().isBanlistedHard(peer)) {
                         oldPeers++;
                         continue;
                     }
-                    RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(peer);
+                    RouterInfo ri = getContext().floodfillNetDb().lookupRouterInfoLocally(peer);
                     if (ri == null) {
                         // Take it on faith that it's ff to speed things up, we don't need the RI
                         // to query it.

@@ -132,6 +132,7 @@ class ConnectionManager {
         _context.statManager().createRateStat("stream.receiveActive", "How many streams are active when a new one is received (period being not yet dropped)", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
         // Stats for Connection
         _context.statManager().createRateStat("stream.con.windowSizeAtCongestion", "How large was our send window when we send a dup?", "Stream", new long[] { 60*60*1000 });
+        _context.statManager().createRateStat("stream.connectionReceived", "How stream connections were received", "Stream", new long[] { 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeBegin", "How many messages were outstanding when we started to choke?", "Stream", new long[] { 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeEnd", "How many messages were outstanding when we stopped being choked?", "Stream", new long[] { 60*60*1000 });
         _context.statManager().createRateStat("stream.fastRetransmit", "How long a packet has been around for if it has been resent per the fast retransmit timer?", "Stream", new long[] { 10*60*1000 });
@@ -601,7 +602,6 @@ class ConnectionManager {
                 break;
         }
         
-        _context.statManager().addRateData("stream.connectionCreated", 1);
         return con;
     }
 

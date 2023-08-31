@@ -44,7 +44,7 @@ class SingleLookupJob extends JobImpl {
                 continue;
             if (peer.equals(from)) // unusual?
                 continue;
-            RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(peer);
+            RouterInfo ri = getContext().floodfillNetDb().lookupRouterInfoLocally(peer);
             if (ri == null)
                 getContext().jobQueue().addJob(new SingleSearchJob(getContext(), peer, from));
             else if (ri.getPublished() < getContext().clock().now() - 60*60*1000 ||

@@ -42,12 +42,14 @@ class ExpireLeasesJob extends JobImpl {
 
     public void runJob() {
         List<Hash> toExpire = selectKeysToExpire();
-        _log.info("Leases to expire: " + toExpire);
         for (Hash key : toExpire) {
             _facade.fail(key);
             //_log.info("Lease " + key + " is expiring, so lets look for it again", new Exception("Expire and search"));
             //_facade.lookupLeaseSet(key, null, null, RERUN_DELAY_MS);
         }
+        _log.info("(dbid: " + _facade._dbid
+                  + "; db size: " + _facade.getKnownLeaseSets()
+                  + ") Leases expired: " + toExpire);
         //_facade.queueForExploration(toExpire); // don't do explicit searches, just explore passively
         requeue(RERUN_DELAY_MS);
     }

@@ -115,7 +115,8 @@ public class AliasedTunnelPool extends TunnelPool {
 
     @Override
     protected LeaseSet locked_buildNewLeaseSet() {
-        LeaseSet ls =  _context.netDb().lookupLeaseSetLocally(_aliasOf.getSettings().getDestination());
+        String base32 = _aliasOf.getSettings().getDestination().toBase32();
+        LeaseSet ls =  _context.netDb().lookupLeaseSetLocally(_aliasOf.getSettings().getDestination(), base32);
         if (ls == null)
             return null;
         // copy everything so it isn't corrupted

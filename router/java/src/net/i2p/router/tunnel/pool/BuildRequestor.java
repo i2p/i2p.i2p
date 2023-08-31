@@ -257,7 +257,7 @@ abstract class BuildRequestor {
             if (msg.getType() == ShortTunnelBuildMessage.MESSAGE_TYPE &&
                 !ibgw.equals(pairedTunnel.getEndpoint())) {
                 // STBM is garlic encrypted to the IBGW, to hide it from the OBEP
-                RouterInfo peer = ctx.netDb().lookupRouterInfoLocally(ibgw);
+                RouterInfo peer = ctx.floodfillNetDb().lookupRouterInfoLocally(ibgw);
                 if (peer != null) {
                     I2NPMessage enc = MessageWrapper.wrap(ctx, msg, peer);
                     if (enc != null) {
@@ -293,7 +293,7 @@ abstract class BuildRequestor {
             msg.setMessageExpiration(ctx.clock().now() + BUILD_MSG_TIMEOUT + ctx.random().nextLong(20*1000));
             // We set the OutNetMessage expiration much shorter, so that the
             // TunnelBuildFirstHopFailJob fires before the 13s build expiration.
-            RouterInfo peer = ctx.netDb().lookupRouterInfoLocally(cfg.getPeer(1));
+            RouterInfo peer = ctx.floodfillNetDb().lookupRouterInfoLocally(cfg.getPeer(1));
             if (peer == null) {
                 if (log.shouldLog(Log.WARN))
                     log.warn("Could not find the next hop to send the outbound request to: " + cfg);
@@ -334,7 +334,7 @@ abstract class BuildRequestor {
      * @since 0.9.51
      */
     private static boolean supportsShortTBM(RouterContext ctx, Hash h) {
-        RouterInfo ri = ctx.netDb().lookupRouterInfoLocally(h);
+        RouterInfo ri = ctx.floodfillNetDb().lookupRouterInfoLocally(h);
         if (ri == null)
             return false;
         if (ri.getIdentity().getPublicKey().getType() != EncType.ECIES_X25519)
@@ -481,7 +481,7 @@ abstract class BuildRequestor {
                 // erm, blank
             } else {
                 Hash peer = cfg.getPeer(hop);
-                RouterInfo peerInfo = ctx.netDb().lookupRouterInfoLocally(peer);
+                RouterInfo peerInfo = ctx.floodfillNetDb().lookupRouterInfoLocally(peer);
                 if (peerInfo == null) {
                     if (log.shouldLog(Log.WARN))
                         log.warn("Peer selected for hop " + i + "/" + hop + " was not found locally: " 

@@ -1,5 +1,7 @@
 package net.i2p.router.web.helpers;
 
+import java.util.List;
+
 import net.i2p.crypto.Blinding;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
@@ -88,85 +90,90 @@ public class ConfigKeyringHandler extends FormHandler {
                         return;
                     }
                     // from BlindCache
-                    BlindData bdold = _context.netDb().getBlindData(spk);
-                    if (bdold != null && d == null)
-                        d = bdold.getDestination();
-                    if (d != null && _context.clientManager().isLocal(d)) {
-                        // don't bother translating
-                        addFormError("Cannot add key for local destination. Enable encryption in the Hidden Services Manager.");
-                        return;
-                    }
+                    List<String> clientBase32s = _context.netDb().lookupClientBySigningPublicKey(spk);
+                    // TODO: This updates all of the blind data for all clients, turning the blind cache into a shared context for the owner of an encrypted leaseSet.
+                    // This is probably not ideal, with some social-engineering a service operator who owns an encrypted destination could associate 2 tunnels.
+                    // How realistic is it? Maybe not very, but I don't like it. Still, this is better than nothing.
+                    for (String clientBase32 : clientBase32s) {
+                        BlindData bdold = _context.netDb().getBlindData(spk, clientBase32);
+                        if (bdold != null && d == null)
+                            d = bdold.getDestination();
+                        if (d != null && _context.clientManager().isLocal(d)) {
+                            // don't bother translating
+                            addFormError("Cannot add key for local destination. Enable encryption in the Hidden Services Manager.");
+                            return;
+                        }
 
-                    SigType blindType;
-                    if (bdin != null) {
-                        blindType = bdin.getBlindedSigType();
-                    } else if (bdold != null) {
-                        blindType = bdold.getBlindedSigType();
-                    } else {
-                        blindType = Blinding.getDefaultBlindedType(spk.getType());
-                    }
+                        SigType blindType;
+                        if (bdin != null) {
+                            blindType = bdin.getBlindedSigType();
+                        } else if (bdold != null) {
+                            blindType = bdold.getBlindedSigType();
+                        } else {
+                            blindType = Blinding.getDefaultBlindedType(spk.getType());
+                        }
 
-                    int atype;
-                    PrivateKey pk;
-                    if (_mode == 4 || _mode == 5) {
-                        atype = BlindData.AUTH_PSK;
-                        // use supplied pk
-                        pk = new PrivateKey(EncType.ECIES_X25519, b);
-                    } else if (_mode == 6 || _mode == 7) {
-                        atype = BlindData.AUTH_DH;
-                        // create new pk
-                        b = new byte[32];
-                        _context.random().nextBytes(b);
-                        pk = new PrivateKey(EncType.ECIES_X25519, b);
-                    } else {
-                        // modes 2 and 3
-                        atype = BlindData.AUTH_NONE;
-                        pk = null;
-                    }
-                    if (_mode == 2 || _mode == 4 || _mode == 6)
-                        _secret = null;
-                    if (bdin != null) {
-                        // more checks based on supplied b33
-                        if (bdin.getSecretRequired() && _secret == null) {
-                            addFormError(_t("Destination requires lookup password"));
-                            return;
+                        int atype;
+                        PrivateKey pk;
+                        if (_mode == 4 || _mode == 5) {
+                            atype = BlindData.AUTH_PSK;
+                            // use supplied pk
+                            pk = new PrivateKey(EncType.ECIES_X25519, b);
+                        } else if (_mode == 6 || _mode == 7) {
+                            atype = BlindData.AUTH_DH;
+                            // create new pk
+                            b = new byte[32];
+                            _context.random().nextBytes(b);
+                            pk = new PrivateKey(EncType.ECIES_X25519, b);
+                        } else {
+                            // modes 2 and 3
+                            atype = BlindData.AUTH_NONE;
+                            pk = null;
                         }
-                        if (!bdin.getSecretRequired() && _secret != null) {
-                            addFormError(_t("Destination does not require lookup password"));
-                            return;
+                        if (_mode == 2 || _mode == 4 || _mode == 6)
+                            _secret = null;
+                        if (bdin != null) {
+                            // more checks based on supplied b33
+                            if (bdin.getSecretRequired() && _secret == null) {
+                                addFormError(_t("Destination requires lookup password"));
+                                return;
+                            }
+                            if (!bdin.getSecretRequired() && _secret != null) {
+                                addFormError(_t("Destination does not require lookup password"));
+                                return;
+                            }
+                            if (bdin.getAuthRequired() && pk == null) {
+                                addFormError(_t("Destination requires encryption key"));
+                                return;
+                            }
+                            if (!bdin.getAuthRequired() && pk != null) {
+                                addFormError(_t("Destination does not require encryption key"));
+                                return;
+                            }
                         }
-                        if (bdin.getAuthRequired() && pk == null) {
-                            addFormError(_t("Destination requires encryption key"));
-                            return;
-                        }
-                        if (!bdin.getAuthRequired() && pk != null) {
-                            addFormError(_t("Destination does not require encryption key"));
-                            return;
-                        }
-                    }
 
-                    // to BlindCache
-                    BlindData bdout;
-                    if (d != null) {
-                        bdout = new BlindData(_context, d, blindType, _secret, atype, pk);
-                    } else {
-                        bdout = new BlindData(_context, spk, blindType, _secret, atype, pk);
-                    }
-                    if (bdold != null) {
-                        if (_log.shouldDebug())
-                            _log.debug("already cached: " + bdold);
-                    }
-                    try {
-                        _context.netDb().setBlindData(bdout);
-                        addFormNotice(_t("Key for {0} added to keyring", bdout.toBase32()));
-                        if (_mode == 6 || _mode == 7) {
-                            addFormNotice(_t("Send key to server operator.") + ' ' + pk.toPublic().toBase64());
+                        // to BlindCache
+                        BlindData bdout;
+                        if (d != null) {
+                            bdout = new BlindData(_context, d, blindType, _secret, atype, pk);
+                        } else {
+                            bdout = new BlindData(_context, spk, blindType, _secret, atype, pk);
                         }
-                    } catch (IllegalArgumentException iae) {
-                        addFormError(_t("Invalid destination") + ": " + iae.getLocalizedMessage());
+                        if (bdold != null) {
+                            if (_log.shouldDebug())
+                                _log.debug("already cached: " + bdold);
+                        }
+                        try {
+                            _context.netDb().setBlindData(bdout, clientBase32);
+                            addFormNotice(_t("Key for {0} added to keyring", bdout.toBase32()));
+                            if (_mode == 6 || _mode == 7) {
+                                addFormNotice(_t("Send key to server operator.") + ' ' + pk.toPublic().toBase64());
+                            }
+                        } catch (IllegalArgumentException iae) {
+                            addFormError(_t("Invalid destination") + ": " + iae.getLocalizedMessage());
+                        }
                     }
                 }
-
         } else if (_action.equals(_t("Delete key")) && _revokes != null) {
             // these should all be b32s or b33s
             for (String p : _revokes) {
@@ -187,7 +194,7 @@ public class ConfigKeyringHandler extends FormHandler {
                         BlindData bd = Blinding.decode(_context, p);
                         if (bd != null) {
                             SigningPublicKey spk = bd.getUnblindedPubKey();
-                            removed = _context.netDb().removeBlindData(spk);
+                            removed = _context.floodfillNetDb().removeBlindData(spk);
                         }
                     } catch (IllegalArgumentException iae) {}
                 } else {

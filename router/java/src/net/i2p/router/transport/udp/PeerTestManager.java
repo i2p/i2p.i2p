@@ -519,7 +519,7 @@ class PeerTestManager {
                 // Check Bob version, drop if >= 0.9.52
                 fromPeer = test.getBob();
                 Hash bob = fromPeer.getRemotePeer();
-                RouterInfo bobRI = _context.netDb().lookupRouterInfoLocally(bob);
+                RouterInfo bobRI = _context.floodfillNetDb().lookupRouterInfoLocally(bob);
                 if (bobRI == null || VersionComparator.comp(bobRI.getVersion(), "0.9.52") >= 0) {
                     if (_log.shouldInfo())
                         _log.info("Bob replied to us (Alice) with intro key " + fromPeer);
@@ -1106,7 +1106,7 @@ class PeerTestManager {
      */
     private boolean receiveTest(RemoteHostId from, PeerState2 fromPeer, int msg, Hash h, byte[] data, int retryCount) {
         if (retryCount < 5) {
-            RouterInfo ri = _context.netDb().lookupRouterInfoLocally(h);
+            RouterInfo ri = _context.floodfillNetDb().lookupRouterInfoLocally(h);
             if (ri == null) {
                 if (_log.shouldInfo())
                     _log.info("Delay after " + retryCount + " retries, no RI for " + h.toBase64());
@@ -1356,7 +1356,7 @@ class PeerTestManager {
                     return;
                 }
                 Hash alice = fromPeer.getRemotePeer();
-                RouterInfo aliceRI = _context.netDb().lookupRouterInfoLocally(alice);
+                RouterInfo aliceRI = _context.floodfillNetDb().lookupRouterInfoLocally(alice);
                 if (aliceRI == null) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("No alice RI");
@@ -1454,7 +1454,7 @@ class PeerTestManager {
                 } else {
                     // bob should have sent it to us. Don't bother to lookup
                     // remotely if he didn't, or it was out-of-order or lost.
-                    aliceRI = _context.netDb().lookupRouterInfoLocally(h);
+                    aliceRI = _context.floodfillNetDb().lookupRouterInfoLocally(h);
                     if (aliceRI != null) {
                         // validate signed data
                         SigningPublicKey spk = aliceRI.getIdentity().getSigningPublicKey();
@@ -1537,7 +1537,7 @@ class PeerTestManager {
                         PeerState charlie = _transport.pickTestPeer(CHARLIE, 2, isIPv6, from);
                         if (charlie != null && charlie != fromPeer && !prev.contains(charlie.getRemotePeer())) {
                             Hash alice = state.getAlice().getRemotePeer();
-                            RouterInfo aliceRI = _context.netDb().lookupRouterInfoLocally(alice);
+                            RouterInfo aliceRI = _context.floodfillNetDb().lookupRouterInfoLocally(alice);
                             if (aliceRI != null) {
                                try {
                                     state.setCharlie(charlie.getRemoteIPAddress(), charlie.getRemotePort(), charlie.getRemotePeer());
@@ -1558,7 +1558,7 @@ class PeerTestManager {
                 state.setLastSendTime(now);
                 PeerState2 alice = state.getAlice();
                 Hash charlie = fromPeer.getRemotePeer();
-                RouterInfo charlieRI = (status == SSU2Util.TEST_ACCEPT) ? _context.netDb().lookupRouterInfoLocally(charlie) : null;
+                RouterInfo charlieRI = (status == SSU2Util.TEST_ACCEPT) ? _context.floodfillNetDb().lookupRouterInfoLocally(charlie) : null;
                 if (charlieRI != null) {
                     // send charlie RI to alice, only if ACCEPT.
                     // Alice would need it to verify sig, but not worth the bandwidth
@@ -1629,7 +1629,7 @@ class PeerTestManager {
                 } else {
                     // bob should have sent it to us. Don't bother to lookup
                     // remotely if he didn't, or it was out-of-order or lost.
-                    charlieRI = _context.netDb().lookupRouterInfoLocally(h);
+                    charlieRI = _context.floodfillNetDb().lookupRouterInfoLocally(h);
                     if (charlieRI != null) {
                         // validate signed data
                         SigningPublicKey spk = charlieRI.getIdentity().getSigningPublicKey();
@@ -2219,7 +2219,7 @@ class PeerTestManager {
                 _log.warn("Unable to pick a charlie (no peer), IPv6? " + isIPv6);
             return;
         }
-        charlieInfo = _context.netDb().lookupRouterInfoLocally(charlie.getRemotePeer());
+        charlieInfo = _context.floodfillNetDb().lookupRouterInfoLocally(charlie.getRemotePeer());
         if (charlieInfo == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Unable to pick a charlie (no RI), IPv6? " + isIPv6);
