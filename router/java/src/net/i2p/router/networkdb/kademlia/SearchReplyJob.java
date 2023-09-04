@@ -71,7 +71,7 @@ class SearchReplyJob extends JobImpl {
 
             boolean shouldAdd = false;
 
-            RouterInfo info = getContext().floodfillNetDb().lookupRouterInfoLocally(peer);
+            RouterInfo info = getContext().mainNetDb().lookupRouterInfoLocally(peer);
             if (info == null) {
                 // if the peer is giving us lots of bad peer references, 
                 // dont try to fetch them.
@@ -88,7 +88,7 @@ class SearchReplyJob extends JobImpl {
                     //        _log.info("Not looking for a banlisted peer...");
                     //    getContext().statManager().addRateData("netDb.searchReplyValidationSkipped", 1, 0);
                     } else {
-                        //getContext().floodfillNetDb().lookupRouterInfo(peer, new ReplyVerifiedJob(getContext(), peer), new ReplyNotVerifiedJob(getContext(), peer), _timeoutMs);
+                        //getContext().mainNetDb().lookupRouterInfo(peer, new ReplyVerifiedJob(getContext(), peer), new ReplyNotVerifiedJob(getContext(), peer), _timeoutMs);
                         //_repliesPendingVerification++;
                         shouldAdd = true;
                     }

@@ -26,14 +26,16 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
     protected final Log _log;
     private RouterContext _context;
     private Map<String, FloodfillNetworkDatabaseFacade> _subDBs = new HashMap<String, FloodfillNetworkDatabaseFacade>();
+    public static final String MAIN_DBID = "main";
+    private static final String MULTIHOME_DBID = "multihome";
 
     public FloodfillNetworkDatabaseSegmentor(RouterContext context) {
         super(context);
         _log = context.logManager().getLog(getClass());
         if (_context == null)
             _context = context;
-        FloodfillNetworkDatabaseFacade subdb = new FloodfillNetworkDatabaseFacade(_context, FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
-        _subDBs.put(FloodfillNetworkDatabaseSegmentor.MAIN_DBID, subdb);
+        FloodfillNetworkDatabaseFacade subdb = new FloodfillNetworkDatabaseFacade(_context, MAIN_DBID);
+        _subDBs.put(MAIN_DBID, subdb);
     }
 
     /*
@@ -48,7 +50,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
 
     private FloodfillNetworkDatabaseFacade GetSubNetDB(String id) {
         if (id == null || id.isEmpty()) {
-            return GetSubNetDB(FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
+            return GetSubNetDB(MAIN_DBID);
         }
         if (id.endsWith(".i2p")) {
             if (!id.startsWith("clients_"))
@@ -61,12 +63,12 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
             subdb.startup();
             subdb.createHandlers();
             if (subdb.getFloodfillPeers().size() == 0) {
-                List<RouterInfo> ris = floodfillNetDB().pickRandomFloodfillPeers();
+                List<RouterInfo> ris = mainNetDB().pickRandomFloodfillPeers();
                 for (RouterInfo ri : ris) {
                     if (_log.shouldLog(_log.DEBUG))
                         _log.debug("Seeding: " + id + " with " + ris.size() + " peers " + ri.getHash());
                     subdb.store(ri.getIdentity().getHash(), ri);
-                }   
+                }
             }
         }
         return subdb;
@@ -76,8 +78,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("(dbid: " + subdb._dbid
-                            + ") Deprecated! Arbitrary selection of this subDb",
-                            new Exception());
+                        + ") Deprecated! Arbitrary selection of this subDb",
+                        new Exception());
             // if (!subdb.isInitialized()){
             subdb.startup();
             // }
@@ -88,8 +90,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("(dbid: " + subdb._dbid
-                            + ") Deprecated! Arbitrary selection of this subDb",
-                            new Exception());
+                        + ") Deprecated! Arbitrary selection of this subDb",
+                        new Exception());
             subdb.createHandlers();
         }
     }
@@ -104,8 +106,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("(dbid: " + subdb._dbid
-                            + ") Deprecated! Arbitrary selection of this subDb",
-                            new Exception());
+                        + ") Deprecated! Arbitrary selection of this subDb",
+                        new Exception());
             subdb.shutdown();
         }
     }
@@ -130,7 +132,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         if (localRouterInfo == null)
             throw new IllegalArgumentException("localRouterInfo must not be null");
         if (localRouterInfo.getReceivedBy() == null)
-            floodfillNetDB().publish(localRouterInfo);
+            mainNetDB().publish(localRouterInfo);
     }
 
     /**
@@ -159,7 +161,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
      * and call setFloodfillEnabledFromMonitor which really sets it.
      */
     public synchronized void setFloodfillEnabled(boolean yes) {
-        floodfillNetDB().setFloodfillEnabled(yes);
+        mainNetDB().setFloodfillEnabled(yes);
     }
 
     /**
@@ -169,18 +171,18 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
      * @since 0.9.34
      */
     synchronized void setFloodfillEnabledFromMonitor(boolean yes) {
-        floodfillNetDB().setFloodfillEnabledFromMonitor(yes);
+        mainNetDB().setFloodfillEnabledFromMonitor(yes);
     }
 
     public boolean floodfillEnabled() {
-        return floodfillNetDB().floodfillEnabled();
+        return mainNetDB().floodfillEnabled();
     }
 
     /**
      * @param peer may be null, returns false if null
      */
     public boolean isFloodfill(RouterInfo peer) {
-        return floodfillNetDB().isFloodfill(peer);
+        return mainNetDB().isFloodfill(peer);
     }
 
     public List<RouterInfo> getKnownRouterData() {
@@ -188,8 +190,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("(dbid: " + subdb._dbid
-                            + ") Deprecated! Arbitrary selection of this subDb",
-                            new Exception());
+                        + ") Deprecated! Arbitrary selection of this subDb",
+                        new Exception());
             rv.addAll(subdb.getKnownRouterData());
         }
         return rv;
@@ -213,8 +215,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("(dbid: " + subdb._dbid
-                            + ") Deprecated! Arbitrary selection of this subDb",
-                            new Exception());
+                        + ") Deprecated! Arbitrary selection of this subDb",
+                        new Exception());
             return subdb.search(key, onFindJob, onFailedLookupJob, timeoutMs, isLease);
         }
         return null;
@@ -235,8 +237,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("(dbid: " + subdb._dbid
-                            + ") Deprecated! Arbitrary selection of this subDb",
-                            new Exception());
+                        + ") Deprecated! Arbitrary selection of this subDb",
+                        new Exception());
             return subdb.search(key, onFindJob, onFailedLookupJob, timeoutMs, isLease, fromLocalDest);
         }
         return null;
@@ -249,8 +251,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("(dbid: " + subdb._dbid
-                            + ") Deprecated! Arbitrary selection of this subDb",
-                            new Exception());
+                        + ") Deprecated! Arbitrary selection of this subDb",
+                        new Exception());
             subdb.complete(key);
         }
     }
@@ -265,8 +267,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("(dbid: " + subdb._dbid
-                            + ") Deprecated! Arbitrary selection of this subDb",
-                            new Exception());
+                        + ") Deprecated! Arbitrary selection of this subDb",
+                        new Exception());
             peers.addAll(subdb.getFloodfillPeers());
         }
         return peers;
@@ -277,8 +279,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("(dbid: " + subdb._dbid
-                            + ") Deprecated! Arbitrary selection of this subDb",
-                            new Exception());
+                        + ") Deprecated! Arbitrary selection of this subDb",
+                        new Exception());
             return subdb.isVerifyInProgress(h);
         }
         return false;
@@ -289,8 +291,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("(dbid: " + subdb._dbid
-                            + ") Deprecated! Arbitrary selection of this subDb",
-                            new Exception());
+                        + ") Deprecated! Arbitrary selection of this subDb",
+                        new Exception());
             subdb.verifyStarted(h);
         }
     }
@@ -300,8 +302,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("(dbid: " + subdb._dbid
-                            + ") Deprecated! Arbitrary selection of this subDb",
-                            new Exception());
+                        + ") Deprecated! Arbitrary selection of this subDb",
+                        new Exception());
             subdb.verifyFinished(h);
         }
     }
@@ -315,8 +317,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("(dbid: " + subdb._dbid
-                            + ") Deprecated! Arbitrary selection of this subDb",
-                            new Exception());
+                        + ") Deprecated! Arbitrary selection of this subDb",
+                        new Exception());
             subdb.lookupBeforeDropping(peer, info);
         }
     }
@@ -345,14 +347,14 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
             for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("(dbid: " + subdb._dbid
-                                + ") Deprecated! Arbitrary selection of this subDb",
-                                new Exception());
+                            + ") Deprecated! Arbitrary selection of this subDb",
+                            new Exception());
                 rv = subdb.lookupLocally(key);
                 if (rv != null) {
                     return rv;
                 }
             }
-            rv = this.lookupLocally(key, FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
+            rv = this.lookupLocally(key, MAIN_DBID);
             if (rv != null) {
                 return rv;
             }
@@ -373,14 +375,14 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
             for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("(dbid: " + subdb._dbid
-                                + ") Deprecated! Arbitrary selection of this subDb",
-                                new Exception());
+                            + ") Deprecated! Arbitrary selection of this subDb",
+                            new Exception());
                 rv = subdb.lookupLocallyWithoutValidation(key);
                 if (rv != null) {
                     return rv;
                 }
             }
-            rv = this.lookupLocallyWithoutValidation(key, FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
+            rv = this.lookupLocallyWithoutValidation(key, MAIN_DBID);
             if (rv != null) {
                 return rv;
             }
@@ -411,9 +413,9 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
 
     /**
      * Lookup using the client's tunnels when the client LS key is know
-     *    but the client dbid is not.
+     * but the client dbid is not.
      *
-     * @param key       The LS key for client.
+     * @param key The LS key for client.
      * @since 0.9.60
      */
     @Override
@@ -429,14 +431,14 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
             for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("(dbid: " + subdb._dbid
-                                + ") Deprecated! Arbitrary selection of this subDb",
-                                new Exception());
+                            + ") Deprecated! Arbitrary selection of this subDb",
+                            new Exception());
                 rv = subdb.lookupLeaseSetLocally(key);
                 if (rv != null) {
                     return rv;
                 }
             }
-            rv = this.lookupLeaseSetLocally(key, FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
+            rv = this.lookupLeaseSetLocally(key, MAIN_DBID);
             if (rv != null) {
                 return rv;
             }
@@ -456,15 +458,15 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
     @Override
     public RouterInfo lookupRouterInfoLocally(Hash key, String dbid) {
         if (dbid == null || dbid.isEmpty()) {
-            RouterInfo ri = floodfillNetDB().lookupRouterInfoLocally(key);
+            RouterInfo ri = mainNetDB().lookupRouterInfoLocally(key);
             if (ri != null) {
                 return ri;
             }
             for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("(dbid: " + subdb._dbid
-                                + ") Deprecated! Arbitrary selection of this subDb",
-                                new Exception());
+                            + ") Deprecated! Arbitrary selection of this subDb",
+                            new Exception());
                 ri = subdb.lookupRouterInfoLocally(key);
                 if (ri != null) {
                     return ri;
@@ -557,26 +559,13 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
             FloodfillNetworkDatabaseFacade cndb = _context.clientNetDb(b32);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("store " + key.toBase32() + " to client " + b32);
-            alsoStoreFloodfill(key, leaseSet);
             if (b32 != null)
                 return cndb.store(key, leaseSet);
         }
-        FloodfillNetworkDatabaseFacade fndb = _context.floodfillNetDb();
+        FloodfillNetworkDatabaseFacade fndb = _context.mainNetDb();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("store " + key.toBase32() + " to floodfill");
         return fndb.store(key, leaseSet);
-    }
-
-    // DELETE THIS FUNCTION WHEN YOU'RE DONE!
-    private void alsoStoreFloodfill(Hash key, LeaseSet leaseSet) {
-        FloodfillNetworkDatabaseFacade fndb = _context.floodfillNetDb();
-        if (_log.shouldLog(Log.DEBUG)) {
-            // change these comments depending on whether you store or not. For testing
-            // purposes.
-            _log.debug("don't store " + key.toBase32() + " to floodfill");
-            // _log.debug("also store " + key.toBase32() + " to floodfill");
-        }
-        // fndb.store(key, leaseSet);
     }
 
     public RouterInfo store(Hash key, RouterInfo routerInfo) {
@@ -589,7 +578,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
             if (b32 != null)
                 return cndb.store(key, routerInfo);
         }
-        FloodfillNetworkDatabaseFacade fndb = _context.floodfillNetDb();
+        FloodfillNetworkDatabaseFacade fndb = _context.mainNetDb();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("store " + key.toBase32() + " to floodfill");
         return fndb.store(key, routerInfo);
@@ -663,7 +652,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
     }
 
     public long getLastRouterInfoPublishTime() {
-        return this.floodfillNetDB().getLastRouterInfoPublishTime();
+        return this.mainNetDB().getLastRouterInfoPublishTime();
     }
 
     @Override
@@ -678,8 +667,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("(dbid: " + subdb._dbid
-                            + ") Deprecated! Arbitrary selection of this subDb",
-                            new Exception());
+                        + ") Deprecated! Arbitrary selection of this subDb",
+                        new Exception());
             return subdb.getAllRouters();
         }
         return null;
@@ -695,8 +684,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("(dbid: " + subdb._dbid
-                            + ") Deprecated! Arbitrary selection of this subDb",
-                            new Exception());
+                        + ") Deprecated! Arbitrary selection of this subDb",
+                        new Exception());
             total += subdb.getKnownRouters();
         }
         return total;
@@ -750,8 +739,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
             for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("(dbid: " + subdb._dbid
-                                + ") Deprecated! Arbitrary selection of this subDb",
-                                new Exception());
+                            + ") Deprecated! Arbitrary selection of this subDb",
+                            new Exception());
                 rv.addAll(subdb.getRouters());
             }
             return rv;
@@ -765,8 +754,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         for (FloodfillNetworkDatabaseFacade subdb : _subDBs.values()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("(dbid: " + subdb._dbid
-                            + ") Deprecated! Arbitrary selection of this subDb",
-                            new Exception());
+                        + ") Deprecated! Arbitrary selection of this subDb",
+                        new Exception());
             rv.addAll(subdb.getRouters());
         }
         return rv;
@@ -808,7 +797,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
     /** @since 0.9 */
     @Override
     public ReseedChecker reseedChecker() {
-        return floodfillNetDB().reseedChecker();
+        return mainNetDB().reseedChecker();
     };
 
     /**
@@ -868,7 +857,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
      */
     @Override
     public void routingKeyChanged() {
-        this.floodfillNetDB().routingKeyChanged();
+        this.mainNetDB().routingKeyChanged();
     }
 
     // @Override
@@ -881,13 +870,13 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
      */
 
     @Override
-    public FloodfillNetworkDatabaseFacade floodfillNetDB() {
-        return this.getSubNetDB(FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
+    public FloodfillNetworkDatabaseFacade mainNetDB() {
+        return this.getSubNetDB(MAIN_DBID);
     }
 
     @Override
     public FloodfillNetworkDatabaseFacade multiHomeNetDB() {
-        return this.getSubNetDB("multihomes");
+        return this.getSubNetDB(MULTIHOME_DBID);
     }
 
     @Override

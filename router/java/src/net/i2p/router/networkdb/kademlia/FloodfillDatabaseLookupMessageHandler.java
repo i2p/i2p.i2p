@@ -73,7 +73,7 @@ public class FloodfillDatabaseLookupMessageHandler implements HandlerJobBuilder 
             return null;
         }
         boolean ourRI = dlm.getSearchKey() != null && dlm.getSearchKey().equals(_context.routerHash());
-        if (!_context.floodfillNetDb().floodfillEnabled() && (dlm.getReplyTunnel() == null && !ourRI)) {
+        if (!_context.mainNetDb().floodfillEnabled() && (dlm.getReplyTunnel() == null && !ourRI)) {
             if (_log.shouldLog(Log.WARN)) 
                 _log.warn("[dbid: " + _facade._dbid
                           + "] Dropping " + dlm.getSearchType()

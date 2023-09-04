@@ -207,7 +207,7 @@ abstract class StoreJob extends JobImpl {
             for (Hash peer : closestHashes) {
                 DatabaseEntry ds;
                 if (_facade.isClientDb())
-                    ds = getContext().floodfillNetDb().getDataStore().get(peer);
+                    ds = getContext().mainNetDb().getDataStore().get(peer);
                 else
                     ds = _facade.getDataStore().get(peer);
                 if ( (ds == null) || !(ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) ) {
@@ -325,7 +325,7 @@ abstract class StoreJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + "(dbid: " + _facade._dbid + "): Selecting Floodfill Participants");
         if (_facade.isClientDb()) {
-            FloodfillPeerSelector ffNetDbPS = (FloodfillPeerSelector)getContext().floodfillNetDb().getPeerSelector();
+            FloodfillPeerSelector ffNetDbPS = (FloodfillPeerSelector)getContext().mainNetDb().getPeerSelector();
             rv = ffNetDbPS.selectFloodfillParticipants(rkey, numClosest, alreadyChecked, ks);
         } else {
             rv = ((FloodfillPeerSelector)_peerSelector).selectFloodfillParticipants(rkey, numClosest, alreadyChecked, ks);

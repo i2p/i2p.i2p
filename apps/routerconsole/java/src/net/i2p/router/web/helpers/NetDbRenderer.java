@@ -130,14 +130,14 @@ class NetDbRenderer {
                                      String tr, int cost, int icount, String client, boolean allClients) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
         List<Hash> sybils = sybil != null ? new ArrayList<Hash>(128) : null;
-        FloodfillNetworkDatabaseFacade netdb = _context.floodfillNetDb();
+        FloodfillNetworkDatabaseFacade netdb = _context.mainNetDb();
         if (allClients) {
-            netdb = _context.floodfillNetDb();
+            netdb = _context.mainNetDb();
         }else{
             if (client != null)
                 netdb = _context.clientNetDb(client);
             else
-                netdb = _context.floodfillNetDb();
+                netdb = _context.mainNetDb();
         }
 
         if (".".equals(routerPrefix)) {
@@ -234,7 +234,7 @@ class NetDbRenderer {
                     routers.addAll(_context.netDb().getRoutersKnownToClients());
             } else {
                 if (client == null)
-                    routers.addAll(_context.floodfillNetDb().getRouters());
+                    routers.addAll(_context.mainNetDb().getRouters());
                 else
                     routers.addAll(_context.clientNetDb(client).getRouters());
                     
@@ -617,12 +617,12 @@ class NetDbRenderer {
         DecimalFormat fmt;
         FloodfillNetworkDatabaseFacade netdb = null;
         if (clientsOnly){
-            netdb = _context.floodfillNetDb();
+            netdb = _context.mainNetDb();
         }else{
             if (client != null)
                 netdb = _context.clientNetDb(client);
             else
-                netdb = _context.floodfillNetDb();
+                netdb = _context.mainNetDb();
         }
         if (debug) {
             ourRKey = _context.routerHash();
@@ -952,7 +952,7 @@ class NetDbRenderer {
      *         mode 3: Same as 0 but sort countries by count
      */
     public void renderStatusHTML(Writer out, int pageSize, int page, int mode, String client, boolean clientsOnly) throws IOException {
-        if (!_context.floodfillNetDb().isInitialized()) {
+        if (!_context.mainNetDb().isInitialized()) {
             out.write("<div id=\"notinitialized\">");
             out.write(_t("Not initialized"));
             out.write("</div>");
@@ -973,7 +973,7 @@ class NetDbRenderer {
         } else if (clientsOnly) {
             routers.addAll(_context.netDb().getRoutersKnownToClients());   
         } else {
-            routers.addAll(_context.floodfillNetDb().getRouters());
+            routers.addAll(_context.mainNetDb().getRouters());
         }
         int toSkip = pageSize * page;
         boolean nextpg = routers.size() > toSkip + pageSize;

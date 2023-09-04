@@ -1670,7 +1670,7 @@ public class NTCPConnection implements Closeable {
                     return;
                 RouterInfo old = _context.netDb().store(h, ri);
                 if (flood && !ri.equals(old)) {
-                    FloodfillNetworkDatabaseFacade fndf = (FloodfillNetworkDatabaseFacade) _context.floodfillNetDb();
+                    FloodfillNetworkDatabaseFacade fndf = (FloodfillNetworkDatabaseFacade) _context.mainNetDb();
                     if ((old == null || ri.getPublished() > old.getPublished()) &&
                         fndf.floodConditional(ri)) {
                         if (_log.shouldDebug())

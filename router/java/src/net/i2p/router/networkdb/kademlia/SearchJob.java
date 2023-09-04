@@ -315,7 +315,7 @@ class SearchJob extends JobImpl {
                             _log.info("(dbid: " + _facade._dbid
                                       + ") Next closest peer " + peer
                                       + " was only recently referred to us, sending a search for them");
-                        getContext().floodfillNetDb().lookupRouterInfo(peer, null, null, _timeoutMs);
+                        getContext().mainNetDb().lookupRouterInfo(peer, null, null, _timeoutMs);
                     } else if (!(ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)) {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn(getJobId() + " (dbid: " + _facade._dbid
@@ -391,7 +391,7 @@ class SearchJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Current routing key for " + key + ": " + rkey);
         if (_facade.isClientDb())
-            return getContext().floodfillNetDb().getPeerSelector().selectNearestExplicit(rkey, numClosest, alreadyChecked, _facade.getKBuckets());
+            return getContext().mainNetDb().getPeerSelector().selectNearestExplicit(rkey, numClosest, alreadyChecked, _facade.getKBuckets());
         else
             return _peerSelector.selectNearestExplicit(rkey, numClosest, alreadyChecked, _facade.getKBuckets());
     }

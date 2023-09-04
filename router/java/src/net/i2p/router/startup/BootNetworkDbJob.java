@@ -21,6 +21,6 @@ class BootNetworkDbJob extends JobImpl {
     public String getName() { return "Boot Network Database"; }
     
     public void runJob() {
-        getContext().floodfillNetDb().startup();
+        getContext().mainNetDb().startup();
     }
 }

@@ -27,6 +27,7 @@ import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.message.GarlicMessageReceiver;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseSegmentor;
 import net.i2p.router.networkdb.kademlia.FloodfillDatabaseStoreMessageHandler;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;

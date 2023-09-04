@@ -110,7 +110,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
 
         DatabaseLookupMessage.Type lookupType = _message.getSearchType();
         // only lookup once, then cast to correct type
-        DatabaseEntry dbe = getContext().floodfillNetDb().lookupLocally(searchKey);
+        DatabaseEntry dbe = getContext().mainNetDb().lookupLocally(searchKey);
         int type = dbe != null ? dbe.getType() : -1;
         if (DatabaseEntry.isLeaseSet(type) &&
             (lookupType == DatabaseLookupMessage.Type.ANY || lookupType == DatabaseLookupMessage.Type.LS)) {
@@ -148,7 +148,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 // For this, we do NOT use their dontInclude list as it can't be trusted
                 // (i.e. it could mess up the closeness calculation)
                 LeaseSet possibleMultihomed = getContext().clientMessagePool().getCache().multihomedCache.get(searchKey);
-                Set<Hash> closestHashes = getContext().floodfillNetDb().findNearestRouters(searchKey, 
+                Set<Hash> closestHashes = getContext().mainNetDb().findNearestRouters(searchKey, 
                                                                             CLOSENESS_THRESHOLD, null);
                 if (weAreClosest(closestHashes)) {
                     // It's in our keyspace, so give it to them
@@ -297,7 +297,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         // Honor flag to exclude all floodfills
         //if (dontInclude.contains(Hash.FAKE_HASH)) {
         // This is handled in FloodfillPeerSelector
-        return getContext().floodfillNetDb().findNearestRouters(_message.getSearchKey(), 
+        return getContext().mainNetDb().findNearestRouters(_message.getSearchKey(), 
                                                        MAX_ROUTERS_RETURNED, 
                                                        dontInclude);
     }
@@ -349,7 +349,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 _log.debug("Sending reply directly to " + toPeer);
             Job send = new SendMessageDirectJob(getContext(), message, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY, _msgIDBloomXor);
             send.runJob();
-            //getContext().floodfillNetDb().lookupRouterInfo(toPeer, send, null, REPLY_TIMEOUT);
+            //getContext().mainNetDb().lookupRouterInfo(toPeer, send, null, REPLY_TIMEOUT);
         }
     }
     

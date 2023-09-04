@@ -248,7 +248,7 @@ class FloodfillPeerSelector extends PeerSelector {
             if (entry == null)
                 break;  // shouldn't happen
             // put anybody in the same /16 at the end
-            RouterInfo info = (RouterInfo) _context.floodfillNetDb().lookupLocallyWithoutValidation(entry);
+            RouterInfo info = (RouterInfo) _context.mainNetDb().lookupLocallyWithoutValidation(entry);
             MaskedIPSet entryIPs = new MaskedIPSet(_context, entry, info, 2);
             boolean sameIP = false;
             for (String ip : entryIPs) {
@@ -373,7 +373,7 @@ class FloodfillPeerSelector extends PeerSelector {
             // ... unless they are really bad
             if (_context.banlist().isBanlistedHard(entry))
                 return;
-            RouterInfo info = (RouterInfo) _context.floodfillNetDb().lookupLocallyWithoutValidation(entry);
+            RouterInfo info = (RouterInfo) _context.mainNetDb().lookupLocallyWithoutValidation(entry);
             //if (info == null)
             //    return;
             
@@ -419,7 +419,7 @@ class FloodfillPeerSelector extends PeerSelector {
             // (Forever banlisted ones are excluded in add() above)
             for (Iterator<Hash> iter = new RandomIterator<Hash>(_floodfillMatches); (found < howMany) && iter.hasNext(); ) {
                 Hash entry = iter.next();
-                RouterInfo info = (RouterInfo) _context.floodfillNetDb().lookupLocallyWithoutValidation(entry);
+                RouterInfo info = (RouterInfo) _context.mainNetDb().lookupLocallyWithoutValidation(entry);
                 if (info != null && now - info.getPublished() > 3*60*60*1000) {
                     badff.add(entry);
                     if (_log.shouldLog(Log.DEBUG))

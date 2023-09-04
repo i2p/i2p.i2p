@@ -25,7 +25,7 @@ public abstract class SegmentedNetworkDatabaseFacade { // extends FloodfillNetwo
 
     public abstract FloodfillNetworkDatabaseFacade getSubNetDB(String id);
 
-    public abstract FloodfillNetworkDatabaseFacade floodfillNetDB();
+    public abstract FloodfillNetworkDatabaseFacade mainNetDB();
 
     public abstract FloodfillNetworkDatabaseFacade multiHomeNetDB();
 
@@ -248,7 +248,7 @@ public abstract class SegmentedNetworkDatabaseFacade { // extends FloodfillNetwo
 
     /** @since 0.9.59 */
     public ReseedChecker reseedChecker() {
-        return floodfillNetDB().reseedChecker();
+        return mainNetDB().reseedChecker();
     };
 
     /**
@@ -259,7 +259,7 @@ public abstract class SegmentedNetworkDatabaseFacade { // extends FloodfillNetwo
      * @since IPv6
      */
     public boolean floodfillEnabled() {
-        return floodfillNetDB().floodfillEnabled();
+        return mainNetDB().floodfillEnabled();
     };
 
     /**
@@ -269,7 +269,7 @@ public abstract class SegmentedNetworkDatabaseFacade { // extends FloodfillNetwo
      * @since 0.9.59
      */
     public boolean isNegativeCachedForever(Hash key, String dbid) {
-        return floodfillNetDB().isNegativeCachedForever(key);
+        return mainNetDB().isNegativeCachedForever(key);
     }
 
     /**
@@ -278,11 +278,11 @@ public abstract class SegmentedNetworkDatabaseFacade { // extends FloodfillNetwo
      * @since 0.9.59
      */
     public BlindData getBlindData(SigningPublicKey spk) {
-        return floodfillNetDB().getBlindData(spk);
+        return mainNetDB().getBlindData(spk);
     }
 
     public List<BlindData> getLocalClientsBlindData() {
-        return floodfillNetDB().getBlindData();
+        return mainNetDB().getBlindData();
     }
 
     /**
@@ -290,7 +290,7 @@ public abstract class SegmentedNetworkDatabaseFacade { // extends FloodfillNetwo
      * @since 0.9.59
      */
     public void setBlindData(BlindData bd, String dbid) {
-        floodfillNetDB().setBlindData(bd);
+        mainNetDB().setBlindData(bd);
     }
 
     /**
@@ -299,7 +299,7 @@ public abstract class SegmentedNetworkDatabaseFacade { // extends FloodfillNetwo
      * @since 0.9.59
      */
     public List<BlindData> getBlindData(String dbid) {
-        return floodfillNetDB().getBlindData();
+        return mainNetDB().getBlindData();
     }
 
     /**
@@ -309,7 +309,7 @@ public abstract class SegmentedNetworkDatabaseFacade { // extends FloodfillNetwo
      * @since 0.9.59
      */
     public boolean removeBlindData(SigningPublicKey spk, String dbid) {
-        return floodfillNetDB().removeBlindData(spk);
+        return mainNetDB().removeBlindData(spk);
     }
 
     /**
@@ -318,17 +318,17 @@ public abstract class SegmentedNetworkDatabaseFacade { // extends FloodfillNetwo
      * @since 0.9.59
      */
     public void routingKeyChanged() {
-        floodfillNetDB().routingKeyChanged();
+        mainNetDB().routingKeyChanged();
     }
 
     public void lookupLeaseSetRemotely(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, String dbid) {
-        floodfillNetDB().lookupLeaseSetRemotely(key, onFindJob, onFailedLookupJob, timeoutMs, key);
+        mainNetDB().lookupLeaseSetRemotely(key, onFindJob, onFailedLookupJob, timeoutMs, key);
     }
     public List<String> lookupClientBySigningPublicKey(SigningPublicKey spk) {
         return Collections.emptyList();
     }
     public BlindData getBlindData(SigningPublicKey spk, String dbid) {
-        return floodfillNetDB().getBlindData(spk);
+        return mainNetDB().getBlindData(spk);
     }
 
     public abstract String getDbidByHash(Hash clientKey);

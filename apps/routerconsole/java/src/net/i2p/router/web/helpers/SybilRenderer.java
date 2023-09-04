@@ -553,7 +553,7 @@ public class SybilRenderer {
                     buf.append("<li><b>").append(s, 0, c+1).append("</b>").append(s, c+1, s.length()).append("</li>");
                 }
                 buf.append("</ul>");
-                RouterInfo ri = (RouterInfo) _context.floodfillNetDb().lookupLocallyWithoutValidation(h);
+                RouterInfo ri = (RouterInfo) _context.mainNetDb().lookupLocallyWithoutValidation(h);
                 if (ri != null) {
                     renderRouterInfo(buf, ri, null, false, false);
                 } else {

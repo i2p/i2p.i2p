@@ -1177,7 +1177,7 @@ class EstablishmentManager {
             // Lookup the peer's MTU from the netdb, since it isn't included in the protocol setup (yet)
             // TODO if we don't have RI then we will get it shortly, but too late.
             // Perhaps netdb should notify transport when it gets a new RI...
-            RouterInfo info = _context.floodfillNetDb().lookupRouterInfoLocally(remote.calculateHash());
+            RouterInfo info = _context.mainNetDb().lookupRouterInfoLocally(remote.calculateHash());
             if (info != null) {
                 RouterAddress addr = _transport.getTargetAddress(info);
                 if (addr != null) {
@@ -1603,7 +1603,7 @@ class EstablishmentManager {
                         case INTRO_STATE_INIT:
                         case INTRO_STATE_LOOKUP_SENT:
                         case INTRO_STATE_HAS_RI:
-                            bob = _context.floodfillNetDb().lookupRouterInfoLocally(h);
+                            bob = _context.mainNetDb().lookupRouterInfoLocally(h);
                             if (bob != null)
                                 istate = INTRO_STATE_HAS_RI;
                             break;
@@ -1665,7 +1665,7 @@ class EstablishmentManager {
                         istate = INTRO_STATE_LOOKUP_SENT;
                         state2.setIntroState(h, istate);
                         // TODO on success job
-                        _context.floodfillNetDb().lookupRouterInfo(h, null, null, 10*1000);
+                        _context.mainNetDb().lookupRouterInfo(h, null, null, 10*1000);
                         sent = true;
                     }
                 }
@@ -1830,8 +1830,8 @@ class EstablishmentManager {
         }
         Hash bobHash = bob.getRemotePeer();
         Hash charlieHash = charlie.getRemoteIdentity().getHash();
-        RouterInfo bobRI = _context.floodfillNetDb().lookupRouterInfoLocally(bobHash);
-        RouterInfo charlieRI = _context.floodfillNetDb().lookupRouterInfoLocally(charlieHash);
+        RouterInfo bobRI = _context.mainNetDb().lookupRouterInfoLocally(bobHash);
+        RouterInfo charlieRI = _context.mainNetDb().lookupRouterInfoLocally(charlieHash);
         Hash signer;
         OutboundEstablishState2.IntroState istate;
         if (code > 0 && code < 64) {
@@ -1844,7 +1844,7 @@ class EstablishmentManager {
             else
                 istate = INTRO_STATE_CHARLIE_REJECT;
         }
-        RouterInfo signerRI = _context.floodfillNetDb().lookupRouterInfoLocally(signer);
+        RouterInfo signerRI = _context.mainNetDb().lookupRouterInfoLocally(signer);
         if (signerRI != null) {
             // validate signed data
             SigningPublicKey spk = signerRI.getIdentity().getSigningPublicKey();
@@ -2073,7 +2073,7 @@ class EstablishmentManager {
             return;
         OutboundEstablishState2 state2 = (OutboundEstablishState2) state;
         Hash charlieHash = state.getRemoteIdentity().getHash();
-        RouterInfo charlieRI = _context.floodfillNetDb().lookupRouterInfoLocally(charlieHash);
+        RouterInfo charlieRI = _context.mainNetDb().lookupRouterInfoLocally(charlieHash);
         if (charlieRI != null) {
             // validate signed data, but we don't necessarily know which Bob
             SigningPublicKey spk = charlieRI.getIdentity().getSigningPublicKey();

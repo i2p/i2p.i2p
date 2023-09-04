@@ -342,7 +342,7 @@ class BuildHandler implements Runnable {
                 int howBad = statuses[record];
 
                     // Look up routerInfo
-                    RouterInfo ri = _context.floodfillNetDb().lookupRouterInfoLocally(peer);
+                    RouterInfo ri = _context.mainNetDb().lookupRouterInfoLocally(peer);
                     // Default and detect bandwidth tier
                     String bwTier = "Unknown";
                     if (ri != null) bwTier = ri.getBandwidthTier(); // Returns "Unknown" if none recognized
@@ -483,7 +483,7 @@ class BuildHandler implements Runnable {
                     _context.statManager().addRateData("tunnel.dropTunnelFromCongestionCapability", 1);
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Drop request, we are denying tunnels due to congestion: " + from);
-                    RouterInfo fromRI = _context.floodfillNetDb().lookupRouterInfoLocally(from);
+                    RouterInfo fromRI = _context.mainNetDb().lookupRouterInfoLocally(from);
                     if (fromRI != null){
                         String fromVersion = fromRI.getVersion();
                         // if fromVersion is greater than 0.9.58, then then ban the router due to it disrespecting our
@@ -560,7 +560,7 @@ class BuildHandler implements Runnable {
                 _context.commSystem().mayDisconnect(from);
             return -1;
         }
-        RouterInfo nextPeerInfo = _context.floodfillNetDb().lookupRouterInfoLocally(nextPeer);
+        RouterInfo nextPeerInfo = _context.mainNetDb().lookupRouterInfoLocally(nextPeer);
         if (nextPeerInfo == null) {
             // limit concurrent next-hop lookups to prevent job queue overload attacks
             int numTunnels = _context.tunnelManager().getParticipatingCount();
@@ -581,7 +581,7 @@ class BuildHandler implements Runnable {
                                + " ID: " + state.msg.getUniqueId()
                                + " handled, lookup next peer " + nextPeer
                                + " lookups: " + current + '/' + limit);
-                _context.floodfillNetDb().lookupRouterInfo(nextPeer, new HandleReq(_context, state, req, nextPeer),
+                _context.mainNetDb().lookupRouterInfo(nextPeer, new HandleReq(_context, state, req, nextPeer),
                                               new TimeoutReq(_context, state, req, nextPeer), NEXT_HOP_LOOKUP_TIMEOUT);
             } else {
                 _currentLookups.decrementAndGet();
@@ -648,7 +648,7 @@ class BuildHandler implements Runnable {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Request " + _state.msg.getUniqueId() + " handled with a successful deferred lookup: " + _req);
 
-            RouterInfo ri = getContext().floodfillNetDb().lookupRouterInfoLocally(_nextPeer);
+            RouterInfo ri = getContext().mainNetDb().lookupRouterInfoLocally(_nextPeer);
             if (ri != null) {
                 handleReq(ri, _state, _req, _nextPeer);
                 getContext().statManager().addRateData("tunnel.buildLookupSuccess", 1);

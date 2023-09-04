@@ -332,7 +332,7 @@ public class Analysis extends JobImpl implements RouterApp, Runnable {
         for (Hash ff : ffs) {
              if (ff.equals(us))
                  continue;
-             RouterInfo ri = _context.floodfillNetDb().lookupRouterInfoLocally(ff);
+             RouterInfo ri = _context.mainNetDb().lookupRouterInfoLocally(ff);
              if (ri != null)
                  ris.add(ri);
         }
@@ -344,7 +344,7 @@ public class Analysis extends JobImpl implements RouterApp, Runnable {
      *  @since 0.9.41
      */
     public List<RouterInfo> getAllRouters(Hash us) {
-        Set<RouterInfo> set = _context.floodfillNetDb().getRouters();
+        Set<RouterInfo> set = _context.mainNetDb().getRouters();
         List<RouterInfo> ris = new ArrayList<RouterInfo>(set.size());
         for (RouterInfo ri : set) {
             if (!ri.getIdentity().getHash().equals(us))
@@ -479,7 +479,7 @@ public class Analysis extends JobImpl implements RouterApp, Runnable {
             if (p >= threshold) {
                 Hash h = e.getKey();
                 blocks.add(h.toBase64());
-                RouterInfo ri = _context.floodfillNetDb().lookupRouterInfoLocally(h);
+                RouterInfo ri = _context.mainNetDb().lookupRouterInfoLocally(h);
                 if (ri != null) {
                     for (RouterAddress ra : ri.getAddresses()) {
                         byte[] ip = ra.getIP();

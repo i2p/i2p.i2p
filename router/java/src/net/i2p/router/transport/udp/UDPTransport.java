@@ -4212,7 +4212,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 }
             }
             // enforce IPv4/v6 advertised for all
-            RouterInfo peerInfo = _context.floodfillNetDb().lookupRouterInfoLocally(peer.getRemotePeer());
+            RouterInfo peerInfo = _context.mainNetDb().lookupRouterInfoLocally(peer.getRemotePeer());
             if (peerInfo == null)
                 continue;
             if (isIPv6) {

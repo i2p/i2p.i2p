@@ -68,7 +68,7 @@ public class ReseedBundler {
         int routerCount = 0;
         int copied = 0;
         long tooOld = System.currentTimeMillis() - 7*24*60*60*1000L;
-        List<RouterInfo> infos = new ArrayList<RouterInfo>(_context.floodfillNetDb().getRouters());
+        List<RouterInfo> infos = new ArrayList<RouterInfo>(_context.mainNetDb().getRouters());
         // IP to router hash
         Map<String, Hash> ipMap = new HashMap<String, Hash>(count);
         List<RouterInfo> toWrite = new ArrayList<RouterInfo>(count);

@@ -764,7 +764,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (!_initialized) return null;
         // Client netDb shouldn't have RI, search for RI in the floodfill netDb.
         if (isClientDb())
-            return _context.floodfillNetDb().lookupRouterInfoLocally(key);
+            return _context.mainNetDb().lookupRouterInfoLocally(key);
         DatabaseEntry ds = _ds.get(key);
         if (ds != null) {
             if (ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {

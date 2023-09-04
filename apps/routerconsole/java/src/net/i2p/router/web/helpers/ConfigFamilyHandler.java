@@ -45,7 +45,7 @@ public class ConfigFamilyHandler extends FormHandler {
                 if (ks.exists()) {
                     addFormError("Keystore for family " + family + " already exists! Delete or rename it first: " + ks);
                 } else {
-                    for (RouterInfo ri : _context.floodfillNetDb().getRouters()) {
+                    for (RouterInfo ri : _context.mainNetDb().getRouters()) {
                         if (family.equals(ri.getOption("family"))) {
                             addFormError("The family name \"" + family + "\" is already in use by another router. Please select a different family name.");
                             return;

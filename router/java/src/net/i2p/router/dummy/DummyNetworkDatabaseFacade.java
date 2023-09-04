@@ -186,7 +186,7 @@ public class DummyNetworkDatabaseFacade extends SegmentedNetworkDatabaseFacade {
     }
 
     @Override
-    public FloodfillNetworkDatabaseFacade floodfillNetDB() {
+    public FloodfillNetworkDatabaseFacade mainNetDB() {
         return _fndb;
     }
 

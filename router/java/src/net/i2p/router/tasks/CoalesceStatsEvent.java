@@ -69,7 +69,7 @@ public class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
         int integrated = _ctx.peerManager().countPeersByCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL);
         sm.addRateData("router.integratedPeers", integrated);
 
-        sm.addRateData("router.knownPeers", _ctx.floodfillNetDb().getKnownRouters());
+        sm.addRateData("router.knownPeers", _ctx.mainNetDb().getKnownRouters());
 
         sm.addRateData("bw.sendRate", (long)_ctx.bandwidthLimiter().getSendBps());
         sm.addRateData("bw.recvRate", (long)_ctx.bandwidthLimiter().getReceiveBps());
