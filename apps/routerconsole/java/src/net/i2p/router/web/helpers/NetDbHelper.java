@@ -360,7 +360,7 @@ public class NetDbHelper extends FormHandler {
                 renderer.renderStatusHTML(_out, _limit, _page, _full, null, true);
             } else if (_clientOnly && client == null) {
                 for (String _client : _context.netDb().getClients()) {
-                    renderer.renderLeaseSetHTML(_out, _debug, _client, _clientOnly);
+                    renderer.renderLeaseSetHTML(_out, _debug, _client, clientOnly);
                 }
             } else {
                 if (_full == 0 && _sort != null)
