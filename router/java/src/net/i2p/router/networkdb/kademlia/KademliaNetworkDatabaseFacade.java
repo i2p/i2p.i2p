@@ -291,7 +291,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     String getDbDir() {
         if (_dbDir == null) {
             String dbDir = _context.getProperty(PROP_DB_DIR, DEFAULT_DB_DIR);
-            if (!_dbid.equals("floodfill") && _dbid != null) {
+            if (!_dbid.equals(FloodfillNetworkDatabaseSegmentor.MAIN_DBID) && _dbid != null) {
                 File subDir = new File(dbDir, _dbid);
                 if (!subDir.exists())
                     subDir.mkdirs();
@@ -365,7 +365,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             _log.warn("Operating in quiet mode - not exploring or pushing data proactively, simply reactively");
             _log.warn("This should NOT be used in production");
         }
-        if (_dbid == null || _dbid.equals("floodfill") || _dbid.isEmpty()) {
+        if (_dbid == null || _dbid.equals(FloodfillNetworkDatabaseSegmentor.MAIN_DBID) || _dbid.isEmpty()) {
             // periodically update and resign the router's 'published date', which basically
             // serves as a version
             Job plrij = new PublishLocalRouterInfoJob(_context);

@@ -463,7 +463,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
         DatabaseEntry ds = getContext().netDb().lookupLocally(_key, _facade._dbid);
         if ((ds == null) && _facade.isClientDb() && _isRouterInfo)
             // It's safe to check the floodfill netDb for RI
-            ds = getContext().netDb().lookupLocally(_key, "floodfill");
+            ds = getContext().netDb().lookupLocally(_key, FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
         if (ds != null) {
             // By the time we get here, a minute or more after the store started, 
             // we may have already started a new store

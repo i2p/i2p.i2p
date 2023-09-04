@@ -32,8 +32,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         _log = context.logManager().getLog(getClass());
         if (_context == null)
             _context = context;
-        FloodfillNetworkDatabaseFacade subdb = new FloodfillNetworkDatabaseFacade(_context, "floodfill");
-        _subDBs.put("floodfill", subdb);
+        FloodfillNetworkDatabaseFacade subdb = new FloodfillNetworkDatabaseFacade(_context, FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
+        _subDBs.put(FloodfillNetworkDatabaseSegmentor.MAIN_DBID, subdb);
     }
 
     /*
@@ -48,7 +48,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
 
     private FloodfillNetworkDatabaseFacade GetSubNetDB(String id) {
         if (id == null || id.isEmpty()) {
-            return GetSubNetDB("floodfill");
+            return GetSubNetDB(FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
         }
         if (id.endsWith(".i2p")) {
             if (!id.startsWith("clients_"))
@@ -352,7 +352,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
                     return rv;
                 }
             }
-            rv = this.lookupLocally(key, "floodfill");
+            rv = this.lookupLocally(key, FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
             if (rv != null) {
                 return rv;
             }
@@ -380,7 +380,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
                     return rv;
                 }
             }
-            rv = this.lookupLocallyWithoutValidation(key, "floodfill");
+            rv = this.lookupLocallyWithoutValidation(key, FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
             if (rv != null) {
                 return rv;
             }
@@ -436,7 +436,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
                     return rv;
                 }
             }
-            rv = this.lookupLeaseSetLocally(key, "floodfill");
+            rv = this.lookupLeaseSetLocally(key, FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
             if (rv != null) {
                 return rv;
             }
@@ -882,7 +882,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
 
     @Override
     public FloodfillNetworkDatabaseFacade floodfillNetDB() {
-        return this.getSubNetDB("floodfill");
+        return this.getSubNetDB(FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
     }
 
     @Override
