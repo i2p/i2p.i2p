@@ -125,7 +125,7 @@ public class RouterInfoHandler implements RequestHandler {
 
         if (inParams.containsKey("i2p.router.netdb.knownpeers")) {
             // Why max(-1, 0) is used I don't know, it is the implementation used in the router console.
-            outParams.put("i2p.router.netdb.knownpeers", Math.max(_context.netDb().getKnownRouters(null) - 1, 0));
+            outParams.put("i2p.router.netdb.knownpeers", Math.max(_context.netDbSegmentor().getKnownRouters(null) - 1, 0));
         }
 
         if (inParams.containsKey("i2p.router.netdb.activepeers")) {
@@ -200,7 +200,7 @@ public class RouterInfoHandler implements RequestHandler {
           case CommSystemFacade.STATUS_IPV4_DISABLED_IPV6_FIREWALLED:
             if (_context.router().getRouterInfo().getTargetAddress("NTCP2") != null)
                 return NETWORK_STATUS.WARN_FIREWALLED_WITH_INBOUND_TCP;
-            if (_context.netDb().floodfillEnabled())
+            if (_context.netDbSegmentor().floodfillEnabled())
                 return NETWORK_STATUS.WARN_FIREWALLED_AND_FLOODFILL;
             if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)
                 return NETWORK_STATUS.WARN_FIREWALLED_AND_FAST;

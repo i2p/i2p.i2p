@@ -199,7 +199,7 @@ public abstract class TransportImpl implements Transport {
                     break;
             }
 
-        if (_context.netDb().floodfillEnabled()) {
+        if (_context.netDbSegmentor().floodfillEnabled()) {
             // && !SystemVersion.isWindows()) {
             def *= 17; def /= 10;
         }

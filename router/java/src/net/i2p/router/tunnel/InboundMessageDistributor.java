@@ -140,9 +140,9 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                             return;
                         RouterInfo oldri = null;
                         if (_client != null)
-                            oldri = _context.netDb().lookupRouterInfoLocally(key, _client.toBase32());
+                            oldri = _context.netDbSegmentor().lookupRouterInfoLocally(key, _client.toBase32());
                         else
-                            oldri = _context.netDb().lookupRouterInfoLocally(key, FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
+                            oldri = _context.netDbSegmentor().lookupRouterInfoLocally(key, FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
                         // only update if RI is newer and non-ff
                         if (oldri != null && oldri.getPublished() < ri.getPublished() &&
                             !FloodfillNetworkDatabaseFacade.isFloodfill(ri)) {
@@ -242,7 +242,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                 // Handling of client tunnel messages need explicit handling
                 // in the context of the client subDb.
                 if (_client != null) {
-                    String dbid = _context.netDb().getDbidByHash(_client);
+                    String dbid = _context.netDbSegmentor().getDbidByHash(_client);
                     if (dbid == null) {
                         // This error shouldn't occur.  All clients should have their own netDb.
                         if (_log.shouldLog(Log.ERROR))
@@ -271,7 +271,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                         if (dsm.getEntry().isLeaseSet()) {
                             if (_log.shouldLog(Log.INFO))
                                 _log.info("[client: " + _clientNickname + "] Saving LS DSM from client tunnel.");
-                            FloodfillDatabaseStoreMessageHandler _FDSMH = new FloodfillDatabaseStoreMessageHandler(_context, _context.netDb().getSubNetDB(dbid));
+                            FloodfillDatabaseStoreMessageHandler _FDSMH = new FloodfillDatabaseStoreMessageHandler(_context, _context.netDbSegmentor().getSubNetDB(dbid));
                             Job j = _FDSMH.createJob(msg, null, null);
                             j.runJob();
                             if (sz > 0) {
@@ -394,7 +394,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
 
                                     String dbid = null;
                                     if (_client != null)
-                                        dbid = _context.netDb().getDbidByHash(_client);
+                                        dbid = _context.netDbSegmentor().getDbidByHash(_client);
                                     if (dbid != null) {
                                         // We need to replicate some of the handling that was previously
                                         // performed when these types of messages were passed back to
@@ -407,7 +407,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                                         // ToDo: This should actually have a try and catch.
                                         if (_log.shouldLog(Log.INFO))
                                             _log.info("Store the LS in the correct dbid subDb: " + dbid);
-                                        FloodfillDatabaseStoreMessageHandler _FDSMH = new FloodfillDatabaseStoreMessageHandler(_context, _context.netDb().getSubNetDB(dbid));
+                                        FloodfillDatabaseStoreMessageHandler _FDSMH = new FloodfillDatabaseStoreMessageHandler(_context, _context.netDbSegmentor().getSubNetDB(dbid));
                                         Job j = _FDSMH.createJob(data, null, null);
                                         j.runJob();
                                         if (sz > 0) {

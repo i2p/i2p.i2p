@@ -1188,7 +1188,7 @@ public class Router implements RouterClock.ClockShiftListener {
         //    rv.append(CAPABILITY_BW256);
 
         // if prop set to true, don't tell people we are ff even if we are
-        if (_context.netDb().floodfillEnabled() &&
+        if (_context.netDbSegmentor().floodfillEnabled() &&
             !_context.getBooleanProperty("router.hideFloodfillParticipant"))
             rv.append(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL);
         
@@ -1603,7 +1603,7 @@ public class Router implements RouterClock.ClockShiftListener {
         try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the job queue", t); }
         try { _context.tunnelManager().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the tunnel manager", t); }
         try { _context.tunnelDispatcher().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the tunnel dispatcher", t); }
-        try { _context.netDb().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the networkDb", t); }
+        try { _context.netDbSegmentor().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the networkDb", t); }
         try { _context.commSystem().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the comm system", t); }
         try { _context.bandwidthLimiter().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the comm system", t); }
         try { _context.peerManager().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the peer manager", t); }

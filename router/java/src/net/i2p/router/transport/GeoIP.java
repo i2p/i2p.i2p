@@ -755,7 +755,7 @@ public class GeoIP {
      *  @since 0.9.48
      */
     private static void banCountry(RouterContext ctx, String country) {
-        for (Hash h : ctx.netDb().getAllRouters()) {
+        for (Hash h : ctx.netDbSegmentor().getAllRouters()) {
             String hisCountry = ctx.commSystem().getCountry(h);
             if (country.equals(hisCountry)) {
                 ctx.banlist().banlistRouterHard(h, "In our country");
