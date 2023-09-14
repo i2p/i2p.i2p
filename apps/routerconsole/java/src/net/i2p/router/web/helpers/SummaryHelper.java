@@ -632,7 +632,7 @@ public class SummaryHelper extends HelperBase {
                 else
                     buf.append(DataHelper.escapeHTML(ServletUtil.truncate(name, 29))).append("&hellip;");
                 buf.append("</a></b></td>\n");
-                LeaseSet ls = _context.netDb().lookupLeaseSetHashIsClient(h);
+                LeaseSet ls = _context.netDbSegmentor().lookupLeaseSetHashIsClient(h);
                 if (ls != null && _context.tunnelManager().getOutboundClientTunnelCount(h) > 0) {
                     if (!ls.isCurrent(0)) {
                         // yellow light

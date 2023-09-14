@@ -251,7 +251,7 @@ abstract class FloodSearchJob extends JobImpl {
             _search = job;
         }
         public void runJob() { 
-            if (getContext().netDb().lookupLocally(_search.getKey()) != null) {
+            if (getContext().netDbSegmentor().lookupLocally(_search.getKey()) != null) {
                 _search.success();
             } else {
                 int remaining = _search.getLookupsRemaining();

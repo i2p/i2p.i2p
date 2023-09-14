@@ -38,7 +38,7 @@ public class HandleFloodfillDatabaseLookupMessageJob extends HandleDatabaseLooku
      */
     @Override
     protected boolean answerAllQueries() {
-        if (!getContext().netDb().floodfillEnabled()) return false;
+        if (!getContext().netDbSegmentor().floodfillEnabled()) return false;
         return FloodfillNetworkDatabaseFacade.isFloodfill(getContext().router().getRouterInfo());
     }
 
@@ -52,7 +52,7 @@ public class HandleFloodfillDatabaseLookupMessageJob extends HandleDatabaseLooku
         super.sendClosest(key, routerInfoSet, toPeer, replyTunnel);
 
         // go away, you got the wrong guy, send our RI back unsolicited
-        if (!getContext().netDb().floodfillEnabled()) {
+        if (!getContext().netDbSegmentor().floodfillEnabled()) {
             // We could just call sendData(myhash, myri, toPeer, replyTunnel) but
             // that would increment the netDb.lookupsHandled and netDb.lookupsMatched stats
             DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());

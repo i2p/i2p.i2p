@@ -90,12 +90,12 @@ public class ConfigKeyringHandler extends FormHandler {
                         return;
                     }
                     // from BlindCache
-                    List<String> clientBase32s = _context.netDb().lookupClientBySigningPublicKey(spk);
+                    List<String> clientBase32s = _context.netDbSegmentor().lookupClientBySigningPublicKey(spk);
                     // TODO: This updates all of the blind data for all clients, turning the blind cache into a shared context for the owner of an encrypted leaseSet.
                     // This is probably not ideal, with some social-engineering a service operator who owns an encrypted destination could associate 2 tunnels.
                     // How realistic is it? Maybe not very, but I don't like it. Still, this is better than nothing.
                     for (String clientBase32 : clientBase32s) {
-                        BlindData bdold = _context.netDb().getBlindData(spk, clientBase32);
+                        BlindData bdold = _context.netDbSegmentor().getBlindData(spk, clientBase32);
                         if (bdold != null && d == null)
                             d = bdold.getDestination();
                         if (d != null && _context.clientManager().isLocal(d)) {
@@ -164,7 +164,7 @@ public class ConfigKeyringHandler extends FormHandler {
                                 _log.debug("already cached: " + bdold);
                         }
                         try {
-                            _context.netDb().setBlindData(bdout, clientBase32);
+                            _context.netDbSegmentor().setBlindData(bdout, clientBase32);
                             addFormNotice(_t("Key for {0} added to keyring", bdout.toBase32()));
                             if (_mode == 6 || _mode == 7) {
                                 addFormNotice(_t("Send key to server operator.") + ' ' + pk.toPublic().toBase64());

@@ -32,7 +32,7 @@ public class Republish implements SimpleTimer.TimedEvent {
         try {
             ri = _context.router().getRouterInfo();
             if (ri != null)
-                _context.netDb().publish(ri);
+                _context.netDbSegmentor().publish(ri);
         } catch (IllegalArgumentException iae) {
             Log log = _context.logManager().getLog(Router.class);
             // clock skew / shift race?

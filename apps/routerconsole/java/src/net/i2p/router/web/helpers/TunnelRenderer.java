@@ -559,7 +559,7 @@ class TunnelRenderer {
 
     /** @return cap char or ' ' */
     private char getCapacity(Hash peer) {
-        RouterInfo info = (RouterInfo) _context.netDb().lookupLocallyWithoutValidation(peer, null);
+        RouterInfo info = (RouterInfo) _context.netDbSegmentor().lookupLocallyWithoutValidation(peer, null);
         if (info != null) {
             String caps = info.getCapabilities();
             for (int i = 0; i < RouterInfo.BW_CAPABILITY_CHARS.length(); i++) {
