@@ -293,8 +293,6 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             String dbDir = _context.getProperty(PROP_DB_DIR, DEFAULT_DB_DIR);
             if (!_dbid.equals(FloodfillNetworkDatabaseSegmentor.MAIN_DBID) && _dbid != null) {
                 File subDir = new File(dbDir, _dbid);
-                if (!subDir.exists())
-                    subDir.mkdirs();
                 dbDir = subDir.toString();
             }
             return dbDir; 
@@ -313,7 +311,11 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                                    BUCKET_SIZE, KAD_B, new RejectTrimmer<Hash>());
         _dbDir = getDbDir();
         try {
-            _ds = new PersistentDataStore(_context, _dbDir, this);
+            if (!isClientDb()) {
+                _ds = new PersistentDataStore(_context, _dbDir, this);
+            } else {
+                _ds = new TransientDataStore(_context);
+            }
         } catch (IOException ioe) {
             throw new RuntimeException("Unable to initialize netdb storage", ioe);
         }
