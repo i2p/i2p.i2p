@@ -5,6 +5,7 @@ import java.io.Writer;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.HashSet;
 
 import net.i2p.data.BlindData;
 import net.i2p.data.DatabaseEntry;
@@ -18,318 +19,188 @@ import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.reseed.ReseedChecker;
 
-public abstract class SegmentedNetworkDatabaseFacade { // extends FloodfillNetworkDatabaseFacade {
+/**
+ * SegmentedNetworkDatabaseFacade
+ * 
+ * This class implements an interface for managing many netDbs as part of a
+ * single I2P instance, each representing it's own view of the network. This
+ * allows the I2P clients to operate agnostic of what information the other
+ * clients are obtaining from the network database, and prevents information
+ * intended for clients from entering the table used by the router for
+ * Floodfill operations.
+ * 
+ * The benefit of this is that we can use this to provide an effective barrier
+ * against "Context-Confusion" attacks which exploit the fact that messages sent
+ * to clients can update the routing table used by a floodfill, providing
+ * evidence that the floodfill hosts the corresponding client. When applied
+ * correctly, so that every client uses a unique subDb, the entire class of attack
+ * should be neutralized.
+ * 
+ * The drawback of this is that it makes the netDb less efficient. Clients and
+ * Floodfills who share a netDb can update the tables used by those netDbs when
+ * a Client encounters an entry obtained by a Floodfill or vice-versa. Clients also
+ * must sometimes search the netDb for keys that are owned by other clients or by
+ * a co-located Floodfill, if one exists.
+ * 
+ * In some contexts, it makes sense to view all the tables at once, especially when
+ * viewing information from the UI. The functions 'getLeases*', 'getRouters*', and
+ * 'getLocalClient*' are provided for this purpose.
+ * 
+ * In the future, this could also be extended to provide Whanau-like functionality
+ * by determining when clients and the local floodfill disagree on the content of a
+ * leaseSet.
+ * 
+ * See implementation: FloodfillNetworkDatabaseSegmentor
+ * 
+ * @author idk
+ * @since 0.9.60
+ */
+public abstract class SegmentedNetworkDatabaseFacade {
     public SegmentedNetworkDatabaseFacade(RouterContext context) {
         // super(context, null);
     }
 
-    public abstract FloodfillNetworkDatabaseFacade getSubNetDB(String id);
-
+    /**
+     * Get a sub-netDb using a string identifier
+     * 
+     * @since 0.9.60
+     */
+    protected abstract FloodfillNetworkDatabaseFacade getSubNetDB(String dbid);
+    /**
+     * Get a sub-netDb using a Hash identifier
+     * 
+     * @since 0.9.60
+     */
+    protected abstract FloodfillNetworkDatabaseFacade getSubNetDB(Hash dbid);
+    /**
+     * Get the main netDb, the one which is used if we're a floodfill
+     * 
+     * @since 0.9.60
+     */
     public abstract FloodfillNetworkDatabaseFacade mainNetDB();
-
+    /**
+     * Get the multihome netDb, the one which is used if we're a floodfill AND we
+     * have a multihome address sent to us
+     * 
+     * @since 0.9.60
+     */
     public abstract FloodfillNetworkDatabaseFacade multiHomeNetDB();
-
-    public abstract FloodfillNetworkDatabaseFacade clientNetDB(String id);
-
-    public abstract FloodfillNetworkDatabaseFacade exploratoryNetDB();
-
-    public abstract FloodfillNetworkDatabaseFacade localNetDB();
-
-    public abstract void startup();
-
+    /**
+     * Get a client netDb for a given client string identifier. Will never
+     * return the mainNetDB.
+     * 
+     * @since 0.9.60
+     */
+    public abstract FloodfillNetworkDatabaseFacade clientNetDB(String dbid);
+    /**
+     * Get a client netDb for a given client Hash identifier. Will never
+     * return the mainNetDB.
+     * 
+     * @since 0.9.60
+     */
+    public abstract FloodfillNetworkDatabaseFacade clientNetDB(Hash dbid);
+    /**
+     * Shut down the network database and all subDbs.
+     * 
+     * @since 0.9.60
+     */
     public abstract void shutdown();
-
     /**
-     * Return the RouterInfo structures for the routers closest to the given key.
-     * At most maxNumRouters will be returned
-     *
-     * @param key           The key
-     * @param maxNumRouters The maximum number of routers to return
-     * @param peersToIgnore Hash of routers not to include
-     */
-    public abstract Set<Hash> findNearestRouters(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, String dbid);
-
-    /**
-     * @return RouterInfo, LeaseSet, or null
-     * @since 0.9.59
-     */
-    public abstract DatabaseEntry lookupLocally(Hash key, String dbid);
-
-    /**
-     * Not for use without validation
+     * Lookup the leaseSet for a given key in only client dbs.
      * 
-     * @return RouterInfo, LeaseSet, or null, NOT validated
-     * @since 0.9.59
+     * @since 0.9.60
      */
-    public abstract DatabaseEntry lookupLocallyWithoutValidation(Hash key, String dbid);
-
-    public abstract void lookupLeaseSet(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, String dbid);
-
-    /**
-     * Lookup using the client's tunnels
-     * 
-     * @param fromLocalDest use these tunnels for the lookup, or null for
-     *                      exploratory
-     * @since 0.9.59
-     */
-    public abstract void lookupLeaseSet(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs,
-            Hash fromLocalDest, String dbid);
-
     public abstract LeaseSet lookupLeaseSetHashIsClient(Hash key);
-
-    public abstract LeaseSet lookupLeaseSetLocally(Hash key, String dbid);
-
-    public abstract LeaseSet lookupLeaseSetLocally(Hash key);
-
-    public abstract void lookupRouterInfo(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, String dbid);
-
-    public abstract RouterInfo lookupRouterInfoLocally(Hash key, String dbid);
-
     /**
-     * Unconditionally lookup using the client's tunnels.
-     * No success or failed jobs, no local lookup, no checks.
-     * Use this to refresh a leaseset before expiration.
-     *
-     * @param fromLocalDest use these tunnels for the lookup, or null for
-     *                      exploratory
-     * @since 0.9.59
-     */
-    public abstract void lookupLeaseSetRemotely(Hash key, Hash fromLocalDest, String dbid);
-
-    /**
-     * Unconditionally lookup using the client's tunnels.
-     *
-     * @param fromLocalDest     use these tunnels for the lookup, or null for
-     *                          exploratory
-     * @param onFindJob         may be null
-     * @param onFailedLookupJob may be null
-     * @since 0.9.59
-     */
-    public abstract void lookupLeaseSetRemotely(Hash key, Job onFindJob, Job onFailedLookupJob,
-            long timeoutMs, Hash fromLocalDest, String dbid);
-
-    /**
-     * Lookup using the client's tunnels
-     * Succeeds even if LS validation fails due to unsupported sig type
-     *
-     * @param fromLocalDest use these tunnels for the lookup, or null for
-     *                      exploratory
-     * @since 0.9.59
-     */
-    public abstract void lookupDestination(Hash key, Job onFinishedJob, long timeoutMs, Hash fromLocalDest,
-            String dbid);
-
-    /**
-     * Lookup locally in netDB and in badDest cache
-     * Succeeds even if LS validation failed due to unsupported sig type
-     *
-     * @since 0.9.59
-     */
-    public abstract Destination lookupDestinationLocally(Hash key, String dbid);
-
-    /**
-     * @return the leaseSet if another leaseSet already existed at that key
-     *
-     * @throws IllegalArgumentException if the data is not valid
-     */
-    public abstract LeaseSet store(Hash key, LeaseSet leaseSet, String dbid) throws IllegalArgumentException;
-
-    /**
-     * @return the routerInfo if another router already existed at that key
-     *
-     * @throws IllegalArgumentException if the data is not valid
-     */
-    public abstract RouterInfo store(Hash key, RouterInfo routerInfo, String dbid) throws IllegalArgumentException;
-
-    /**
-     * @return the old entry if it already existed at that key
-     * @throws IllegalArgumentException if the data is not valid
-     * @since 0.9.59
-     */
-    public DatabaseEntry store(Hash key, DatabaseEntry entry, String dbid) throws IllegalArgumentException {
-        if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
-            return getSubNetDB(dbid).store(key, (RouterInfo) entry);
-        if (entry.getType() == DatabaseEntry.KEY_TYPE_LEASESET)
-            return getSubNetDB(dbid).store(key, (LeaseSet) entry);
-        throw new IllegalArgumentException("unknown type");
-    }
-
-    public LeaseSet store(Hash key, LeaseSet leaseSet) {
-        return store(key, leaseSet, null);
-    }
-
-    public RouterInfo store(Hash key, RouterInfo routerInfo) {
-        return store(key, routerInfo, null);
-    }
-
-    /**
-     * @throws IllegalArgumentException if the local router is not valid
-     */
-    public abstract void publish(RouterInfo localRouterInfo) throws IllegalArgumentException;
-
-    public abstract void publish(LeaseSet localLeaseSet, String dbid);
-
-    public abstract void unpublish(LeaseSet localLeaseSet, String dbid);
-
-    public abstract void unpublish(LeaseSet localLeaseSet);
-
-    public abstract void fail(Hash dbEntry, String dbid);
-
-    public abstract void fail(Hash dbEntry);
-
-    /**
-     * The last time we successfully published our RI.
+     * Lookup the leaseSet for a given key locally across all dbs if dbid is
+     * null, or locally for the given dbid if it is not null. Use carefully,
+     * this function crosses db boundaries and is intended only for local use.
      * 
-     * @since 0.9.59
+     * @since 0.9.60
      */
-    public long getLastRouterInfoPublishTime(String dbid) {
-        return 0;
-    }
-
-    public long getLastRouterInfoPublishTime() {
-        return 0;
-    }
-
-    public abstract Set<Hash> getAllRouters(String dbid);
-    public abstract Set<Hash> getAllRouters();
-
-    public int getKnownRouters(String dbid) {
-        return 0;
-    }
-
-    public int getKnownRouters() {
-        return 0;
-    }
-
-    public int getKnownLeaseSets(String dbid) {
-        return 0;
-    }
-
-    public boolean isInitialized(String dbid) {
-        return true;
-    }
-
+    protected abstract LeaseSet lookupLeaseSetLocally(Hash key, String dbid);
+    /**
+     * Lookup the dbid for a given hash.
+     * 
+     * @since 0.9.60
+     */
+    public abstract String getDbidByHash(Hash clientKey);
+    /**
+     * Get a set of all sub-netDbs.
+     * 
+     * @since 0.9.60
+     */
+    public abstract Set<FloodfillNetworkDatabaseFacade> getSubNetDBs();
+    /**
+     * Get a set of all client dbid strings
+     * 
+     * @since 0.9.60
+     */
+    public abstract List<String> getClients();
+    /**
+     * Make sure the SNDF is initialized
+     */
     public boolean isInitialized() {
-        return true;
+        return mainNetDB().isInitialized();
     }
-
-    public void rescan(String dbid) {
-    }
-
-    /** Debug only - all user info moved to NetDbRenderer in router console */
-    public void renderStatusHTML(Writer out) throws IOException {
-    }
-
-    /** public for NetDbRenderer in routerconsole */
-    public Set<LeaseSet> getLeases(String dbid) {
-        return Collections.emptySet();
-    }
-
-    /** public for NetDbRenderer in routerconsole */
-    public Set<RouterInfo> getRouters(String dbid) {
-        return Collections.emptySet();
-    }
-
+    /**
+     * Get a set of all routers
+     * 
+     * @since 0.9.60
+     */
     public Set<RouterInfo> getRouters() {
-        return Collections.emptySet();
+        return mainNetDB().getRouters();
     }
 
+    /** 
+     * Get a set of all routers known to clients, which should always be zero.
+     * 
+     * @since 0.9.60 
+     */
     public Set<RouterInfo> getRoutersKnownToClients() {
-        return Collections.emptySet();
+        Set<RouterInfo> ris = new HashSet<>();
+        Set<FloodfillNetworkDatabaseFacade> fndfs = getSubNetDBs();
+        for (FloodfillNetworkDatabaseFacade fndf : fndfs) {
+            ris.addAll(fndf.getRouters());
+        }
+        return ris;
     }
 
+    /**
+     * Get a set of all leases known to all clients.
+     * 
+     * @since 0.9.60
+     */
     public Set<LeaseSet> getLeasesKnownToClients() {
-        return Collections.emptySet();
+        Set<LeaseSet> lss = new HashSet<>();
+        Set<FloodfillNetworkDatabaseFacade> fndfs = getSubNetDBs();
+        for (FloodfillNetworkDatabaseFacade fndf : fndfs) {
+            lss.addAll(fndf.getLeases());
+        }
+        return lss;
     }
-
-    public List<String> getClients() {
-        return Collections.emptyList();
-    }
-
-    /** @since 0.9.59 */
+    /**
+     * Check if the mainNetDB needs to reseed
+     *  
+     * @since 0.9.60 
+     * */
     public ReseedChecker reseedChecker() {
         return mainNetDB().reseedChecker();
     };
-
-    /**
-     * For convenience, so users don't have to cast to FNDF, and unit tests using
-     * Dummy NDF will work.
-     *
-     * @return false; FNDF overrides to return actual setting
-     * @since IPv6
-     */
-    public boolean floodfillEnabled() {
-        return mainNetDB().floodfillEnabled();
-    };
-
-    /**
-     * Is it permanently negative cached?
-     *
-     * @param key only for Destinations; for RouterIdentities, see Banlist
-     * @since 0.9.59
-     */
-    public boolean isNegativeCachedForever(Hash key, String dbid) {
-        return mainNetDB().isNegativeCachedForever(key);
-    }
-
-    /**
-     * @param spk unblinded key
-     * @return BlindData or null
-     * @since 0.9.59
-     */
-    public BlindData getBlindData(SigningPublicKey spk) {
-        return mainNetDB().getBlindData(spk);
-    }
-
-    public List<BlindData> getLocalClientsBlindData() {
-        return mainNetDB().getBlindData();
-    }
-
-    /**
-     * @param bd new BlindData to put in the cache
-     * @since 0.9.59
-     */
-    public void setBlindData(BlindData bd, String dbid) {
-        mainNetDB().setBlindData(bd);
-    }
-
     /**
      * For console ConfigKeyringHelper
      * 
-     * @since 0.9.59
+     * @since 0.9.60
      */
-    public List<BlindData> getBlindData(String dbid) {
-        return mainNetDB().getBlindData();
-    }
-
-    /**
-     * For console ConfigKeyringHelper
-     * 
-     * @return true if removed
-     * @since 0.9.59
-     */
-    public boolean removeBlindData(SigningPublicKey spk, String dbid) {
-        return mainNetDB().removeBlindData(spk);
-    }
-
-    /**
-     * Notify the netDB that the routing key changed at midnight UTC
-     *
-     * @since 0.9.59
-     */
-    public void routingKeyChanged() {
-        mainNetDB().routingKeyChanged();
-    }
-
-    public void lookupLeaseSetRemotely(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, String dbid) {
-        mainNetDB().lookupLeaseSetRemotely(key, onFindJob, onFailedLookupJob, timeoutMs, key);
-    }
     public List<String> lookupClientBySigningPublicKey(SigningPublicKey spk) {
         return Collections.emptyList();
     }
-    public BlindData getBlindData(SigningPublicKey spk, String dbid) {
-        return mainNetDB().getBlindData(spk);
+    /**
+     * For console ConfigKeyringHelper
+     * 
+     * @since 0.9.60
+     */
+    public List<BlindData> getLocalClientsBlindData() {
+        return Collections.emptyList();
     }
-
-    public abstract String getDbidByHash(Hash clientKey);
 }

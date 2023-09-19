@@ -429,7 +429,7 @@ public class Analysis extends JobImpl implements RouterApp, Runnable {
                 continue;
             if (! _context.clientManager().shouldPublishLeaseSet(client))
                 continue;
-            LeaseSet ls = _context.netDbSegmentor().lookupLeaseSetLocally(client);
+            LeaseSet ls = _context.mainNetDb().lookupLeaseSetLocally(client);
             if (ls == null)
                 continue;
             Hash rkey = ls.getRoutingKey();

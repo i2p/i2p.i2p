@@ -747,17 +747,17 @@ class NetDbRenderer {
             buf.append(hostname);
             buf.append("</div>");
         } else {
-            LeaseSet ls = _context.netDbSegmentor().lookupLeaseSetLocally(hash);
+            LeaseSet ls = _context.mainNetDb().lookupLeaseSetLocally(hash);
             if (ls == null) {
                 // remote lookup
                 LookupWaiter lw = new LookupWaiter();
                 // use-case for the exploratory netDb here?
-                _context.exploratoryNetDb().lookupLeaseSetRemotely(hash, lw, lw, 8*1000, null);
+                _context.mainNetDb().lookupLeaseSetRemotely(hash, lw, lw, 8*1000, null);
                 // just wait right here in the middle of the rendering, sure
                 synchronized(lw) {
                     try { lw.wait(9*1000); } catch (InterruptedException ie) {}
                 }
-                ls = _context.exploratoryNetDb().lookupLeaseSetLocally(hash);
+                ls = _context.mainNetDb().lookupLeaseSetLocally(hash);
             }
             if (ls != null) {
                 BigInteger dist = HashDistance.getDistance(_context.routerHash(), ls.getRoutingKey());

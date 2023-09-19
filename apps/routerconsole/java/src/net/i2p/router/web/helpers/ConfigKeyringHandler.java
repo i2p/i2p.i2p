@@ -95,7 +95,7 @@ public class ConfigKeyringHandler extends FormHandler {
                     // This is probably not ideal, with some social-engineering a service operator who owns an encrypted destination could associate 2 tunnels.
                     // How realistic is it? Maybe not very, but I don't like it. Still, this is better than nothing.
                     for (String clientBase32 : clientBase32s) {
-                        BlindData bdold = _context.netDbSegmentor().getBlindData(spk, clientBase32);
+                        BlindData bdold = _context.clientNetDb(clientBase32).getBlindData(spk);
                         if (bdold != null && d == null)
                             d = bdold.getDestination();
                         if (d != null && _context.clientManager().isLocal(d)) {
@@ -164,7 +164,7 @@ public class ConfigKeyringHandler extends FormHandler {
                                 _log.debug("already cached: " + bdold);
                         }
                         try {
-                            _context.netDbSegmentor().setBlindData(bdout, clientBase32);
+                            _context.clientNetDb(clientBase32).setBlindData(bdout);
                             addFormNotice(_t("Key for {0} added to keyring", bdout.toBase32()));
                             if (_mode == 6 || _mode == 7) {
                                 addFormNotice(_t("Send key to server operator.") + ' ' + pk.toPublic().toBase64());
