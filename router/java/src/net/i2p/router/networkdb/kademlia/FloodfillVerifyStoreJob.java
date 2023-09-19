@@ -460,10 +460,10 @@ class FloodfillVerifyStoreJob extends JobImpl {
     private void resend() {
         // It's safe to check the default netDb first, but if the lookup is for
         // a client, nearly all RI is expected to be found in the FF netDb.
-        DatabaseEntry ds = getContext().netDbSegmentor().lookupLocally(_key, _facade._dbid);
+        DatabaseEntry ds = getContext().netDbSegmentor().getSubNetDB(_facade._dbid).lookupLocally(_key);
         if ((ds == null) && _facade.isClientDb() && _isRouterInfo)
             // It's safe to check the floodfill netDb for RI
-            ds = getContext().netDbSegmentor().lookupLocally(_key, FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
+            ds = getContext().mainNetDb().lookupLocally(_key);
         if (ds != null) {
             // By the time we get here, a minute or more after the store started, 
             // we may have already started a new store

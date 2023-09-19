@@ -144,7 +144,7 @@ public class MultiRouter {
     	}
 		for(Router r : _routers) {
     		for(RouterInfo ri : riSet){
-    			r.getContext().netDbSegmentor().publish(ri);
+    			r.getContext().mainNetDb().publish(ri);
     		}
     	}
 		_out.println(riSet.size() + " RouterInfos were reseeded");

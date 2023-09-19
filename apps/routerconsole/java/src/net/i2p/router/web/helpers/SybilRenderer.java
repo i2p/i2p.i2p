@@ -493,7 +493,7 @@ public class SybilRenderer {
             Hash client = iter.next();
             if (!_context.clientManager().isLocal(client) ||
                 !_context.clientManager().shouldPublishLeaseSet(client) ||
-                _context.netDbSegmentor().lookupLeaseSetLocally(client) == null) {
+                _context.mainNetDb().lookupLeaseSetLocally(client) == null) {
                 iter.remove();
             }
         }
@@ -503,7 +503,7 @@ public class SybilRenderer {
             return;
         }
         for (Hash client : destinations) {
-            LeaseSet ls = _context.netDbSegmentor().lookupLeaseSetLocally(client);
+            LeaseSet ls = _context.mainNetDb().lookupLeaseSetLocally(client);
             if (ls == null)
                 continue;
             Hash rkey = ls.getRoutingKey();

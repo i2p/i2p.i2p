@@ -1188,7 +1188,7 @@ public class Router implements RouterClock.ClockShiftListener {
         //    rv.append(CAPABILITY_BW256);
 
         // if prop set to true, don't tell people we are ff even if we are
-        if (_context.netDbSegmentor().floodfillEnabled() &&
+        if (_context.mainNetDb().floodfillEnabled() &&
             !_context.getBooleanProperty("router.hideFloodfillParticipant"))
             rv.append(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL);
         
