@@ -155,16 +155,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                     getContext().statManager().addRateData("netDb.storeLocalLeaseSetAttempt", 1, 0);
                     // throw rather than return, so that we send the ack below (prevent easy attack)
                     dontBlamePeer = true;
-                    // store the peer in the outboundCache instead so that we can reply back with it without confusing ourselves.
-                    if (ls.isCurrent(Router.CLOCK_FUDGE_FACTOR / 4)) {
-                        if (_facade.validate(key, ls) == null) {
-                            LeaseSet compareLeasesetDate = getContext().clientMessagePool().getCache().multihomedCache.get(key);
-                            if (compareLeasesetDate == null)
-                                getContext().clientMessagePool().getCache().multihomedCache.put(key, ls);
-                            else if (compareLeasesetDate.getEarliestLeaseDate() < ls.getEarliestLeaseDate())
-                                getContext().clientMessagePool().getCache().multihomedCache.put(key, ls);
-                        }
-                    }
+                    getContext().multihomeNetDb().store(key, ls);
                     throw new IllegalArgumentException("(dbid: " + _facade._dbid
                                                        + ") Peer attempted to store local leaseSet: "
                                                        + key.toBase32());

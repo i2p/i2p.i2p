@@ -147,7 +147,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 // Only send it out if it is in our estimated keyspace.
                 // For this, we do NOT use their dontInclude list as it can't be trusted
                 // (i.e. it could mess up the closeness calculation)
-                LeaseSet possibleMultihomed = getContext().clientMessagePool().getCache().multihomedCache.get(searchKey);
+                LeaseSet possibleMultihomed = getContext().multihomeNetDb().lookupLeaseSetLocally(searchKey);
                 Set<Hash> closestHashes = getContext().mainNetDb().findNearestRouters(searchKey, 
                                                                             CLOSENESS_THRESHOLD, null);
                 if (weAreClosest(closestHashes)) {
@@ -166,20 +166,11 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                     // If it's in the possibleMultihomed cache, then it was definitely stored to us meaning it is effectively
                     // always recievedAsPublished. No need to decide whether or not to answer the request like above, just
                     // answer it so it doesn't look different from other stores.
-                    if (possibleMultihomed.isCurrent(Router.CLOCK_FUDGE_FACTOR / 4) && possibleMultihomed.getReceivedAsPublished()) {
+                    if (possibleMultihomed.getReceivedAsPublished()) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("We have local LS, possibly from a multihomed router " + searchKey + ", and somebody requested it back from us. Answering query, as if in our keyspace, to avoid attack.");
                         getContext().statManager().addRateData("netDb.lookupsMatchedLocalMultihome", 1);
                         sendData(searchKey, possibleMultihomed, fromKey, toTunnel);
-                    } else {
-                        // if it expired, remove it from the cache.
-                        getContext().clientMessagePool().getCache().multihomedCache.remove(searchKey);
-                        // Lie, pretend we don't have it
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("We have local LS " + searchKey + ", NOT answering query, out of our keyspace");
-                        getContext().statManager().addRateData("netDb.lookupsMatchedLocalNotClosest", 1);
-                        Set<Hash> routerHashSet = getNearestRouters(lookupType);
-                        sendClosest(searchKey, routerHashSet, fromKey, toTunnel);
                     }
                 } else {
                     // Lie, pretend we don't have it
@@ -190,27 +181,13 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                     sendClosest(searchKey, routerHashSet, fromKey, toTunnel);
                 }
             } else {
-                LeaseSet possibleMultihomed = getContext().clientMessagePool().getCache().multihomedCache.get(searchKey);
+                LeaseSet possibleMultihomed = getContext().multihomeNetDb().lookupLeaseSetLocally(searchKey);
                 if (possibleMultihomed != null) {
-                    if (possibleMultihomed.isCurrent(Router.CLOCK_FUDGE_FACTOR / 4) && possibleMultihomed.getReceivedAsPublished()) {
+                    if (possibleMultihomed.getReceivedAsPublished()) {
                         if (_log.shouldLog(Log.INFO))
-                            _log.info("We have local LS, possibly from a multihomed router " + searchKey + ", and somebody requested it back from us. Answering query, as if in our keyspace, to avoid attack.");
+                            _log.info("We have local LS " + searchKey + " in our multihomes cache meaning it was stored to us. Answering query with the stored LS.");
                         getContext().statManager().addRateData("netDb.lookupsMatchedLocalMultihome", 1);
                         sendData(searchKey, possibleMultihomed, fromKey, toTunnel);
-                    } else {
-                        // if it expired, remove it from the cache.
-                        getContext().clientMessagePool().getCache().multihomedCache.remove(searchKey);
-                        // It was not published to us (we looked it up, for example)
-                        // or it's local and we aren't floodfill,
-                        // or it's local and we don't publish it.
-                        // Lie, pretend we don't have it
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("We have LS " + searchKey +
-                                    ", NOT answering query - local? " + isLocal + " shouldPublish? " + shouldPublishLocal +
-                                    " RAP? " + ls.getReceivedAsPublished() + " RAR? " + ls.getReceivedAsReply());
-                        getContext().statManager().addRateData("netDb.lookupsMatchedRemoteNotClosest", 1);
-                        Set<Hash> routerHashSet = getNearestRouters(lookupType);
-                        sendClosest(searchKey, routerHashSet, fromKey, toTunnel);
                     }
                 } else {
                     // It was not published to us (we looked it up, for example)

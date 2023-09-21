@@ -481,7 +481,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     }
 
     @Override
-    public boolean floodfillEnabled() { return _floodfillEnabled; }
+    public boolean floodfillEnabled() { 
+        if (isMultihomeDb())
+            return _context.mainNetDb().floodfillEnabled();
+        return _floodfillEnabled;
+    }
     
     /**
      *  @param peer may be null, returns false if null

@@ -174,14 +174,18 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
 
     public KademliaNetworkDatabaseFacade(RouterContext context, String dbid) {
         _context = context;
+        _dbid = dbid;
         _log = _context.logManager().getLog(getClass());
         _networkID = context.router().getNetworkID();
         _peerSelector = createPeerSelector();
         _publishingLeaseSets = new HashMap<Hash, RepublishLeaseSetJob>(8);
         _activeRequests = new HashMap<Hash, SearchJob>(8);
-        _reseedChecker = new ReseedChecker(context);
+        if (isClientDb())
+            _reseedChecker = null;
+        else
+            _reseedChecker = new ReseedChecker(context);
         _blindCache = new BlindCache(context);
-        _dbid = dbid;
+        
         _localKey = null;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Created KademliaNetworkDatabaseFacade for id: " + dbid);
@@ -214,6 +218,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     /** @since 0.9 */
     @Override
     public ReseedChecker reseedChecker() {
+        if (isClientDb())
+            return null;
         return _reseedChecker;
     }
 
@@ -302,6 +308,10 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
 
     public boolean isClientDb() {
         return _dbid.startsWith("clients_");
+    }
+
+    public boolean isMultihomeDb() {
+        return _dbid.equals(FloodfillNetworkDatabaseSegmentor.MULTIHOME_DBID);
     }
 
     public synchronized void startup() {

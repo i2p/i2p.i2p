@@ -63,8 +63,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
     private RouterContext _context;
     private Map<String, FloodfillNetworkDatabaseFacade> _subDBs = new HashMap<String, FloodfillNetworkDatabaseFacade>();
     public static final String MAIN_DBID = "main";
-    private static final String MULTIHOME_DBID = "multihome";
-    private static final String EXPLORATORY_DBID = "exploratory";
+    public static final String MULTIHOME_DBID = "clients_multihome";
+    private static final String EXPLORATORY_DBID = "clients_exploratory";
     private final FloodfillNetworkDatabaseFacade _mainDbid;
     private final FloodfillNetworkDatabaseFacade _multihomeDbid;
     private final FloodfillNetworkDatabaseFacade _exploratoryDbid;
