@@ -1440,7 +1440,13 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         // are any updates
         if (_log.shouldLog(Log.INFO))
             _log.info("Dropping a lease: " + dbEntry);
-        _ds.remove(dbEntry, false);
+        try {
+            _ds.remove(dbEntry, false);
+        } catch (UnsupportedOperationException uoe) {
+            // if this happens it's because we're a TransientDataStore instead,
+            // so just call remove without the persist option.
+            _ds.remove(dbEntry);
+        }
     }
     
     /** don't use directly - see F.N.D.F. override */
