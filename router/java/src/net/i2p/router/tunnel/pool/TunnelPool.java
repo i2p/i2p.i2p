@@ -357,7 +357,7 @@ public class TunnelPool {
             return rv;
         }
         // TODO high-bw non-ff also
-        if (_context.mainNetDb().floodfillEnabled() &&
+        if (_context.netDb().floodfillEnabled() &&
             _context.router().getUptime() > 5*60*1000) {
             rv += 2;
         }

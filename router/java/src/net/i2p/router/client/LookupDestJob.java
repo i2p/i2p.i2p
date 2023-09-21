@@ -93,7 +93,7 @@ class LookupDestJob extends JobImpl {
                             SigningPublicKey spk = bd.getUnblindedPubKey();
                             BlindData bd2;
                             if (_fromLocalDest == null)
-                                bd2 = getContext().mainNetDb().getBlindData(spk);
+                                bd2 = getContext().netDb().getBlindData(spk);
                             else
                                 bd2 = getContext().clientNetDb(_fromLocalDest).getBlindData(spk);
                             if (bd2 != null) {

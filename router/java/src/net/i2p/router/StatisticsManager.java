@@ -148,11 +148,11 @@ public class StatisticsManager {
         //stats.setProperty("stat_uptime", "90m");
         if (caps.indexOf(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL) >= 0) {
             int ri = _context.router().getUptime() > 30*60*1000 ?
-                     _context.mainNetDb().getKnownRouters() :
+                     _context.netDb().getKnownRouters() :
                      3000 + _context.random().nextInt(1000);   // so it isn't obvious we restarted
             stats.setProperty("netdb.knownRouters", String.valueOf(ri));
             int ls = _context.router().getUptime() > 30*60*1000 ?
-                     _context.mainNetDb().getKnownLeaseSets() :
+                     _context.netDb().getKnownLeaseSets() :
                      30 + _context.random().nextInt(40);   // so it isn't obvious we restarted
             stats.setProperty("netdb.knownLeaseSets", String.valueOf(ls));
         }

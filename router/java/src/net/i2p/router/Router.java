@@ -924,7 +924,7 @@ public class Router implements RouterClock.ClockShiftListener {
                 changed = true;
             }
         }
-        if (_context.mainNetDb().isInitialized()) {
+        if (_context.netDb().isInitialized()) {
             if (_log.shouldWarn())
                 _log.warn("NetDB ready, publishing RI");
             // any previous calls to netdb().publish() did not
@@ -1188,7 +1188,7 @@ public class Router implements RouterClock.ClockShiftListener {
         //    rv.append(CAPABILITY_BW256);
 
         // if prop set to true, don't tell people we are ff even if we are
-        if (_context.mainNetDb().floodfillEnabled() &&
+        if (_context.netDb().floodfillEnabled() &&
             !_context.getBooleanProperty("router.hideFloodfillParticipant"))
             rv.append(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL);
         

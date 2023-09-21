@@ -105,7 +105,7 @@ class RepublishLeaseSetJob extends JobImpl {
             if (_dest != null)
                 ls = getContext().clientNetDb(_dest).lookupLeaseSetLocally(_ls.getHash());
             else
-                getContext().mainNetDb().lookupLeaseSetLocally(_ls.getHash());
+                getContext().netDb().lookupLeaseSetLocally(_ls.getHash());
                 // ^ _dest should never be null here, right? So maybe instead we return immediately?
             if (ls != null && ls.getEarliestLeaseDate() == _ls.getEarliestLeaseDate()) {
                 requeueRepublish();

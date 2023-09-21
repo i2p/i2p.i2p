@@ -194,7 +194,7 @@ public class ConfigKeyringHandler extends FormHandler {
                         BlindData bd = Blinding.decode(_context, p);
                         if (bd != null) {
                             SigningPublicKey spk = bd.getUnblindedPubKey();
-                            removed = _context.mainNetDb().removeBlindData(spk);
+                            removed = _context.netDb().removeBlindData(spk);
                         }
                     } catch (IllegalArgumentException iae) {}
                 } else {

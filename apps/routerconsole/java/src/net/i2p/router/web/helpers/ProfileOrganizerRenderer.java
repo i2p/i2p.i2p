@@ -55,7 +55,7 @@ class ProfileOrganizerRenderer {
             if (prof == null)
                 continue;
             if (mode == 2) {
-                RouterInfo info = (RouterInfo) _context.mainNetDb().lookupLocallyWithoutValidation(peer);
+                RouterInfo info = (RouterInfo) _context.netDb().lookupLocallyWithoutValidation(peer);
                 if (info != null && info.getCapabilities().indexOf('f') >= 0)
                     order.add(prof);
                 continue;
@@ -145,7 +145,7 @@ class ProfileOrganizerRenderer {
                     buf.append(", ");
                 buf.append(_t("Integrated"));
             }
-            RouterInfo info = (RouterInfo) _context.mainNetDb().lookupLocallyWithoutValidation(peer);
+            RouterInfo info = (RouterInfo) _context.netDb().lookupLocallyWithoutValidation(peer);
             if (info != null) {
                 // prevent HTML injection in the caps and version
                 buf.append("<td align=\"right\">").append(DataHelper.stripHTML(info.getCapabilities()));
@@ -244,7 +244,7 @@ class ProfileOrganizerRenderer {
             buf.append("<tr><td align=\"center\" nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(peer));
             buf.append("</td>");
-            RouterInfo info = (RouterInfo) _context.mainNetDb().lookupLocallyWithoutValidation(peer);
+            RouterInfo info = (RouterInfo) _context.netDb().lookupLocallyWithoutValidation(peer);
             if (info != null)
                 buf.append("<td align=\"center\">").append(DataHelper.stripHTML(info.getCapabilities())).append("</td>");
             else

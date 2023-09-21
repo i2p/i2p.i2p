@@ -321,7 +321,7 @@ public class IterativeSearchJob extends FloodSearchJob {
     private void sendQuery(Hash peer, int previouslyTried) {
             final RouterContext ctx = getContext();
             TunnelManagerFacade tm = ctx.tunnelManager();
-            RouterInfo ri = ctx.mainNetDb().lookupRouterInfoLocally(peer);
+            RouterInfo ri = ctx.netDb().lookupRouterInfoLocally(peer);
             if (ri != null) {
                 // Now that most of the netdb is Ed RIs and EC LSs, don't even bother
                 // querying old floodfills that don't know about those sig types.
@@ -599,7 +599,7 @@ public class IterativeSearchJob extends FloodSearchJob {
                 _log.info(getJobId() + ": banlisted peer from DSRM " + peer);
             return;
         }
-        RouterInfo ri = getContext().mainNetDb().lookupRouterInfoLocally(peer);
+        RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(peer);
         if (ri != null && !FloodfillNetworkDatabaseFacade.isFloodfill(ri)) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": non-ff peer from DSRM " + peer);
@@ -717,7 +717,7 @@ public class IterativeSearchJob extends FloodSearchJob {
 
         // Confirm success by checking for the Lease Set in local storage
         if (_isLease) {
-            dest = getContext().mainNetDb().lookupDestinationLocally(_key);
+            dest = getContext().netDb().lookupDestinationLocally(_key);
             if ((dest == null) && (_log.shouldLog(Log.WARN)))
                 _log.warn("Warning! Lease Set not found in persistent data store for key = " + _key);
         }

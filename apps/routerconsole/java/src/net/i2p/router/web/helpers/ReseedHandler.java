@@ -24,6 +24,6 @@ public class ReseedHandler extends HelperBase {
     }
     
     private void requestReseed() {
-        _context.mainNetDb().reseedChecker().requestReseed();
+        _context.netDb().reseedChecker().requestReseed();
     }
 }

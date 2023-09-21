@@ -32,7 +32,7 @@ class OutboundReceiver implements TunnelGateway.Receiver {
         _context = ctx;
         _log = ctx.logManager().getLog(OutboundReceiver.class);
         _config = cfg;
-        _nextHopCache = _context.mainNetDb().lookupRouterInfoLocally(_config.getPeer(1));
+        _nextHopCache = _context.netDb().lookupRouterInfoLocally(_config.getPeer(1));
         _priority = PRIORITY + cfg.getPriority();
         _sendFailJob = new SendFailedJob(ctx);
         // all createRateStat() in TunnelDispatcher
@@ -47,7 +47,7 @@ class OutboundReceiver implements TunnelGateway.Receiver {
             _log.debug("received encrypted, sending out " + _config + ": " + msg);
         RouterInfo ri = _nextHopCache;
         if (ri == null) {
-            ri = _context.mainNetDb().lookupRouterInfoLocally(_config.getPeer(1));
+            ri = _context.netDb().lookupRouterInfoLocally(_config.getPeer(1));
             _nextHopCache = ri;
         }
         if (ri != null) {
@@ -58,7 +58,7 @@ class OutboundReceiver implements TunnelGateway.Receiver {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("lookup of " + _config.getPeer(1)
                            + " required for " + msg);
-            _context.mainNetDb().lookupRouterInfo(_config.getPeer(1), new SendJob(_context, msg),
+            _context.netDb().lookupRouterInfo(_config.getPeer(1), new SendJob(_context, msg),
                                               new LookupFailedJob(_context), MAX_LOOKUP_TIME);
             return -1;
         }
@@ -94,7 +94,7 @@ class OutboundReceiver implements TunnelGateway.Receiver {
         public String getName() { return "OBGW send after lookup"; }
 
         public void runJob() {
-            RouterInfo ri = _context.mainNetDb().lookupRouterInfoLocally(_config.getPeer(1));
+            RouterInfo ri = _context.netDb().lookupRouterInfoLocally(_config.getPeer(1));
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("lookup of " + _config.getPeer(1)
                            + " successful? " + (ri != null));

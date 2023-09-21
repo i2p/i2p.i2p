@@ -493,7 +493,7 @@ public class SybilRenderer {
             Hash client = iter.next();
             if (!_context.clientManager().isLocal(client) ||
                 !_context.clientManager().shouldPublishLeaseSet(client) ||
-                _context.mainNetDb().lookupLeaseSetLocally(client) == null) {
+                _context.netDb().lookupLeaseSetLocally(client) == null) {
                 iter.remove();
             }
         }
@@ -503,7 +503,7 @@ public class SybilRenderer {
             return;
         }
         for (Hash client : destinations) {
-            LeaseSet ls = _context.mainNetDb().lookupLeaseSetLocally(client);
+            LeaseSet ls = _context.netDb().lookupLeaseSetLocally(client);
             if (ls == null)
                 continue;
             Hash rkey = ls.getRoutingKey();
@@ -553,7 +553,7 @@ public class SybilRenderer {
                     buf.append("<li><b>").append(s, 0, c+1).append("</b>").append(s, c+1, s.length()).append("</li>");
                 }
                 buf.append("</ul>");
-                RouterInfo ri = (RouterInfo) _context.mainNetDb().lookupLocallyWithoutValidation(h);
+                RouterInfo ri = (RouterInfo) _context.netDb().lookupLocallyWithoutValidation(h);
                 if (ri != null) {
                     renderRouterInfo(buf, ri, null, false, false);
                 } else {

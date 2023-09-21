@@ -117,7 +117,7 @@ class CapacityCalculator {
         // credit non-floodfill to reduce conn limit issues at floodfills
         // TODO only if we aren't floodfill ourselves?
         // null for tests
-        NetworkDatabaseFacade ndb =  context.mainNetDb();
+        NetworkDatabaseFacade ndb =  context.netDb();
         if (ndb != null) {
             RouterInfo ri = (RouterInfo) ndb.lookupLocallyWithoutValidation(profile.getPeer());
             if (ri != null) {

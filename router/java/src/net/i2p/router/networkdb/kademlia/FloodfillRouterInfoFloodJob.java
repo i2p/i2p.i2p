@@ -50,7 +50,7 @@ class FloodfillRouterInfoFloodJob extends JobImpl {
             dsm          = new DatabaseStoreMessage(getContext());
             dsm.setMessageExpiration(getContext().clock().now() + 10*1000);
             dsm.setEntry(getContext().router().getRouterInfo());
-            nextPeerInfo = getContext().mainNetDb().lookupRouterInfoLocally(ri);
+            nextPeerInfo = getContext().netDb().lookupRouterInfoLocally(ri);
             if(nextPeerInfo == null) {
                 continue;
             }

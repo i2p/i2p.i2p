@@ -134,7 +134,7 @@ public class SendMessageDirectJob extends JobImpl {
                 _log.debug("Router specified, sending");
             send();
         } else {
-            _router = getContext().mainNetDb().lookupRouterInfoLocally(_targetHash);
+            _router = getContext().netDb().lookupRouterInfoLocally(_targetHash);
             if (_router != null) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Router not specified but lookup found it");
@@ -143,7 +143,7 @@ public class SendMessageDirectJob extends JobImpl {
                 if (!_alreadySearched) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Router not specified, so we're looking for it...");
-                    getContext().mainNetDb().lookupRouterInfo(_targetHash, this, this, 
+                    getContext().netDb().lookupRouterInfo(_targetHash, this, this, 
                                                           _expiration - getContext().clock().now());
                     _searchOn = getContext().clock().now();
                     _alreadySearched = true;

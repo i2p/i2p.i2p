@@ -82,7 +82,7 @@ public class ConfigKeyringHelper extends HelperBase {
                 buf.append("<input value=\"").append(b32).append("\" type=\"checkbox\" name=\"revokeClient\" class=\"tickbox\"/></td><td>");
             buf.append(b32);
             buf.append("</td><td>");
-            Destination dest = _context.mainNetDb().lookupDestinationLocally(h);
+            Destination dest = _context.netDb().lookupDestinationLocally(h);
             if (dest != null && local) {
                 TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(h);
                 if (in != null && in.getDestinationNickname() != null)
