@@ -1,4 +1,4 @@
-FROM alpine:3.17.1 as builder
+FROM alpine:3.18.3 as builder
 
 ENV APP_HOME="/i2p"
 
@@ -12,7 +12,7 @@ RUN apk add --virtual build-base gettext tar bzip2 apache-ant openjdk17 \
     && rm -rf pkg-temp/osid pkg-temp/lib/wrapper pkg-temp/lib/wrapper.* \
     && apk del build-base gettext tar bzip2 apache-ant openjdk17
 
-FROM alpine:3.17.1
+FROM alpine:3.18.3
 ENV APP_HOME="/i2p"
 
 RUN apk add openjdk17-jre ttf-dejavu
