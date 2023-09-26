@@ -685,6 +685,8 @@ public class TransportManager implements TransportEventListener {
                 rv.addAll(t.getEstablished());
             else
                 rv = t.getEstablished();
+        } else if (rv == null) {
+            rv = new ArrayList<Hash>(0);
         }
         return rv;
     }
