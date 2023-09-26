@@ -1579,6 +1579,8 @@ public class I2PSnarkServlet extends BasicServlet {
                     // TODO thread it
                     int count = 0;
                     for (Snark snark : matches) {
+                        if (!snark.isStopped())
+                            continue;
                         _manager.startTorrent(snark);
                         if ((count++ & 0x0f) == 15) {
                             // try to prevent OOMs
