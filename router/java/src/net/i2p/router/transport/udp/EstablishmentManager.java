@@ -515,8 +515,16 @@ class EstablishmentManager {
                     } else if (version == 2) {
                         boolean requestIntroduction = !isIndirect &&
                                                       _transport.introducersMaybeRequired(TransportUtil.isIPv6(ra));
-                        state = new OutboundEstablishState2(_context, _transport, maybeTo, to,
-                                                            toIdentity, requestIntroduction, sessionKey, ra, addr);
+                        try {
+                            state = new OutboundEstablishState2(_context, _transport, maybeTo, to,
+                                                               toIdentity, requestIntroduction, sessionKey, ra, addr);
+                        } catch (IllegalArgumentException iae) {
+                            if (_log.shouldWarn())
+                                _log.warn("OES2 error: " + toRouterInfo, iae);
+                            _transport.markUnreachable(toHash);
+                            _transport.failed(msg, iae.getMessage());
+                            return;
+                        }
                     } else {
                         // shouldn't happen
                         _transport.failed(msg, "OB to bad addr? " + ra);

@@ -196,7 +196,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                     _introducers.put(h, istate);
                 }
             }
-        } else {
+        } else if (claimedAddress != null) {
             _token = _transport.getEstablisher().getOutboundToken(_remoteHostId);
             if (_token != 0) {
                 _currentState = OutboundState.OB_STATE_UNKNOWN;
@@ -205,6 +205,10 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                 _currentState = OutboundState.OB_STATE_NEEDS_TOKEN;
             }
             _introducers = null;
+        } else {
+            // i2pd bug fixed in 2.49.0/0.9.60, itag0-2 all zeros causes getIntroducerCount to be 0,
+            // which gets us here
+            throw new IllegalArgumentException("No address and no introducers for " + remotePeer.getHash());
         }
 
         _sendConnID = ctx.random().nextLong();
