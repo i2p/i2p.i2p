@@ -1789,6 +1789,8 @@ public class NTCPTransport extends TransportImpl {
         // do not restart on transition to firewalled
         if (ip != null || port > 0)
             restartListening(newAddr, isIPv6);
+        else
+            replaceAddress(newAddr);
         if (_log.shouldLog(Log.WARN))
             _log.warn("Updating NTCP Address (ipv6? " + isIPv6 + ") with " + newAddr);
         return true;     	
