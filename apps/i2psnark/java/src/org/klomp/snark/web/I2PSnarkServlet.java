@@ -3131,7 +3131,7 @@ public class I2PSnarkServlet extends BasicServlet {
         return escaped;
     }
 
-    private static final String DOCTYPE = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n";
+    private static final String DOCTYPE = "<!DOCTYPE html>\n";
     private static final String HEADER_A = "<link id=\"pagestyle\" href=\"";
     private static final String HEADER_B = "snark.css?" + CoreVersion.VERSION + "\" rel=\"stylesheet\" type=\"text/css\" >";
     private static final String HEADER_C = "nocollapse.css?" + CoreVersion.VERSION + "\" rel=\"stylesheet\" type=\"text/css\" >";

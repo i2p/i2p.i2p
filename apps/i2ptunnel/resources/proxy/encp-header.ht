@@ -8,7 +8,7 @@ X-Content-Type-Options: nosniff
 Referrer-Policy: no-referrer
 Content-Security-Policy: default-src 'none'; style-src 'self' 'unsafe-inline' http://proxy.i2p; form-action 'self' http://proxy.i2p; frame-ancestors 'self' http://127.0.0.1:7657/; img-src http://proxy.i2p
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html>
 <html><head>
 <title>_("Outproxy Unreachable")</title>
 <link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
