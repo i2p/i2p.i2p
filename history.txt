@@ -1,15 +1,26 @@
+2023-09-27 zzz
+ * Console: Change all DOCTYPEs to standard html (Gitlab #426)
+ * Debian: Change JRE dependency order (Gitlab #443, Debian #1024461)
+ * i2psnark: Prevent start-all from within search results erroring (Gitlab #445)
+ * NTCP2: Fix updating address on transition to firewalled (Gitlab #435)
+ * SSU2: Fix uncaught IAE caused by itags with zero values (Gitlab #415)
+ * Transport: Fix NPE during soft restart (Gitlab #437)
+
+2023-06-28 2.3.0 (API 0.9.59) released
+
 2023-06-28 idk
  * Cache stores of multihomed leaseSets when stored from multihome peers,
-  and if our local leaseSet is not in the keyspace return the multihome instead
+   and if our local leaseSet is not in the keyspace return the multihome instead
  * When updating a leaseSet because recieving it as published always make a
-  complete copy of the leaseSet before merging the flags.
+   complete copy of the leaseSet before merging the flags.
  * Rate-Limit lookups
- * I2P 2.3.0
 
 2023-05-29 idk
- * adds "virtual contexts" to bloom filter, where each entity that
-  passes an i2np message to the bloom filter xor's the messageID with a random, local value.
-  credit Xe Iaso for discovering the issue, obscuratus for the solution
+ * Adds "virtual contexts" to bloom filter, where each entity that
+   passes an i2np message to the bloom filter xor's the messageID with a random, local value.
+   credit Xe Iaso for discovering the issue, obscuratus for the solution
+
+2023-04-12 2.2.1 (API 0.9.58) released
 
 2023-04-12 idk
  * Fix missing Java options in docker/rootfs/startapp.sh
@@ -18,11 +29,18 @@
  * Update local GeoIP database
  * Remove invalid signing keys from old installs
  * Update Tomcat version in Ubuntu Lunar and Debian Sid
- * Release version 2.2.1/0.9.58
+
+2023-03-13 2.2.0 (API 0.9.58) released
 
 2023-03-13 idk
  * Send and check target destination in first streaming SYN packet
- * Release version 2.2.0/0.9.58
+
+2023-02-18 zzz
+ * DTG: Remove "Start I2P" menu item in non-router context
+ * Sybil: Don't catch all the i2pds publishing ::1
+
+2023-02-17 zzz
+ * Console: Add legend for congestion caps (proposal 162)
 
 2023-02-16 zzz
  * Transports: Add new inbound connection throttler
