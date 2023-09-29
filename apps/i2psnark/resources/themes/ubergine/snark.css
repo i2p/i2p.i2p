@@ -236,6 +236,11 @@ _:-ms-lang(x), .snarkNav:last-child[href="/i2psnark/"] {
      right: 3px;
 }
 
+.iframed #search {
+     top: 8px;
+     right: 4px;
+}
+
 #searchbox {
      background: #212 url(/themes/console/images/buttons/search.png) 7px center no-repeat !important;
      margin: 2px 4px 2px 24px !important;

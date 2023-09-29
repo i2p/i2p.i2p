@@ -231,6 +231,11 @@ _:-ms-lang(x), .snarknavbar {
      right: 9px;
 }
 
+.iframed #search {
+     top: 9px;
+     right: 5px;
+}
+
 #searchbox {
      background: #000 url(/themes/console/images/buttons/search.png) 7px center no-repeat !important;
      margin: 2px 4px 2px 24px !important;

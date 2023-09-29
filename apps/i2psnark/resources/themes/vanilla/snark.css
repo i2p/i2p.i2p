@@ -279,6 +279,11 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
      right: 3px;
 }
 
+.iframed #search {
+     top: 9px;
+     right: 2px;
+}
+
 #searchbox {
      background: #efe6e0 url(/themes/console/images/buttons/search.png) 7px center no-repeat !important;
      margin: 2px 4px 2px 24px !important;

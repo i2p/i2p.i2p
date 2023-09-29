@@ -236,6 +236,11 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      right: 6px;
 }
 
+.iframed #search {
+     top: 6px
+     right: 2px;
+}
+
 #searchbox {
      background: #f8f8ff url(/themes/console/images/buttons/search.png) 7px center no-repeat !important;
      margin: 2px 4px 2px 24px !important;
