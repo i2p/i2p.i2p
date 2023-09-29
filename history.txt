@@ -1,3 +1,7 @@
+2023-09-29 zzz
+ * SAM: Fix accept after soft restart (Gitlab #399)
+ * Transport: Disable SSU1 by default (Gitlab #427)
+
 2023-09-27 zzz
  * Console: Change all DOCTYPEs to standard html (Gitlab #426)
  * Debian: Change JRE dependency order (Gitlab #443, Debian #1024461)
