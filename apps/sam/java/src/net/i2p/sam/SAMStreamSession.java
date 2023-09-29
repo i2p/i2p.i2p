@@ -362,6 +362,13 @@ class SAMStreamSession implements SAMMessageSess {
     }
 
     /**
+     * Is the underlying streaming socket manager destroyed?
+     *
+     * @since 0.9.60
+     */
+    public boolean isDestroyed() { return socketMgr.isDestroyed(); }
+
+    /**
      * Close a connection managed by the SAM STREAM session.
      *
      * @param id Connection id
