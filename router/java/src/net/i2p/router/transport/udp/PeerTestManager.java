@@ -356,7 +356,9 @@ class PeerTestManager {
                     } else {
                         // received from both Bob and Charlie, but we haven't received a
                         // second message from Charlie yet
-                        sendTestToCharlie();
+                        if (state.getCharliePort() != PENDING_PORT)
+                            sendTestToCharlie();
+                        // else msg 5 wasn't from a valid ip/port ???
                     }
                     if (bobTime > 0 && charlieTime <= 0) {
                         if (state.getBeginTime() + MAX_CHARLIE_LIFETIME < now) {
