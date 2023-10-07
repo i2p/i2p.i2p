@@ -396,13 +396,7 @@ public class PersistentDataStore extends TransientDataStore {
         public void wakeup() {
             requeue(0);
         }
-
-        private void setNetDbReady() {
-            // Only the floodfill netDb needs to call Router::setNetDbReady()
-            if (_facade._dbid.equals(FloodfillNetworkDatabaseSegmentor.MAIN_DBID))
-                _context.router().setNetDbReady();
-        }
-
+        
         private void readFiles() {
             int routerCount = 0;
 
@@ -467,11 +461,11 @@ public class PersistentDataStore extends TransientDataStore {
                             // This is enough to let i2ptunnel get started.
                             // Do not set _initialized yet so we don't start rescanning.
                             _setNetDbReady = true;
-                            setNetDbReady();
+                            _context.router().setNetDbReady();
                         } else if (i == 500 && !_setNetDbReady) {
                             // do this for faster systems also at 500
                             _setNetDbReady = true;
-                            setNetDbReady();
+                            _context.router().setNetDbReady();
                         }
                     }
                 }
@@ -479,35 +473,23 @@ public class PersistentDataStore extends TransientDataStore {
             
             if (!_initialized) {
                 _initialized = true;
-                if (_facade.isClientDb()) {
-                    _lastReseed = _context.clock().now();
-                    _setNetDbReady = true;
-                    setNetDbReady();
-                } else if (_facade.isMultihomeDb()) {
-                    _lastReseed = _context.clock().now();
-                    _setNetDbReady = true;
-                    setNetDbReady();
-                } else if (_facade.reseedChecker().checkReseed(routerCount)) {
+                if (_facade.reseedChecker().checkReseed(routerCount)) {
                     _lastReseed = _context.clock().now();
                     // checkReseed will call wakeup() when done and we will run again
                 } else {
                     _setNetDbReady = true;
-                    setNetDbReady();
+                    _context.router().setNetDbReady();
                 }
             } else if (_lastReseed < _context.clock().now() - MIN_RESEED_INTERVAL) {
                 int count = Math.min(routerCount, size());
-                if (_facade.isClientDb()) {
-                    _lastReseed = _context.clock().now();
-                } else if (_facade.isMultihomeDb()) {
-                    _lastReseed = _context.clock().now();
-                } else if (count < MIN_ROUTERS) {
+                if (count < MIN_ROUTERS) {
                     if (_facade.reseedChecker().checkReseed(count))
                         _lastReseed = _context.clock().now();
                         // checkReseed will call wakeup() when done and we will run again
                 } else {
                     if (!_setNetDbReady) {
                         _setNetDbReady = true;
-                        setNetDbReady();
+                        _context.router().setNetDbReady();
                     }
                 }
             } else {

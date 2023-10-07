@@ -87,11 +87,11 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
             try {
                 if (entry.isRouterInfo()) {
                     RouterInfo ri = (RouterInfo) entry;
-                    getContext().netDbSegmentor().getSubNetDB(_facade._dbid).store(ri.getHash(), ri);
+                    _facade.store(ri.getHash(), ri);
                 }
                 if (entry.isLeaseSet()) {
                     LeaseSet ls = (LeaseSet) entry;
-                    getContext().netDbSegmentor().getSubNetDB(_facade._dbid).store(ls.getHash(), ls);
+                    _facade.store(ls.getHash(), ls);
                 }
             } catch (UnsupportedCryptoException iae) {
                 // don't blame the peer

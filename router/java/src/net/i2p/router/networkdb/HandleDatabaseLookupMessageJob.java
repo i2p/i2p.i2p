@@ -147,7 +147,10 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 // Only send it out if it is in our estimated keyspace.
                 // For this, we do NOT use their dontInclude list as it can't be trusted
                 // (i.e. it could mess up the closeness calculation)
-                LeaseSet possibleMultihomed = getContext().multihomeNetDb().lookupLeaseSetLocally(searchKey);
+                LeaseSet possibleMultihomed = null;
+                if (getContext().netDbSegmentor().useSubDbs()) {
+                    possibleMultihomed = getContext().multihomeNetDb().lookupLeaseSetLocally(searchKey);   
+                }
                 Set<Hash> closestHashes = getContext().netDb().findNearestRouters(searchKey, 
                                                                             CLOSENESS_THRESHOLD, null);
                 if (weAreClosest(closestHashes)) {
@@ -162,7 +165,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                         _log.info("We have local LS " + searchKey + ", answering query, in our keyspace");
                     getContext().statManager().addRateData("netDb.lookupsMatchedLocalClosest", 1);
                     sendData(searchKey, ls, fromKey, toTunnel);
-                } else if (possibleMultihomed != null) {
+                } else if (getContext().netDbSegmentor().useSubDbs() && possibleMultihomed != null) {
                     // If it's in the possibleMultihomed cache, then it was definitely stored to us meaning it is effectively
                     // always recievedAsPublished. No need to decide whether or not to answer the request like above, just
                     // answer it so it doesn't look different from other stores.
@@ -181,8 +184,11 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                     sendClosest(searchKey, routerHashSet, fromKey, toTunnel);
                 }
             } else {
-                LeaseSet possibleMultihomed = getContext().multihomeNetDb().lookupLeaseSetLocally(searchKey);
-                if (possibleMultihomed != null) {
+                LeaseSet possibleMultihomed = null;
+                if (getContext().netDbSegmentor().useSubDbs()) {
+                    possibleMultihomed = getContext().multihomeNetDb().lookupLeaseSetLocally(searchKey);
+                }
+                if ((getContext().netDbSegmentor().useSubDbs()) && possibleMultihomed != null) {
                     if (possibleMultihomed.getReceivedAsPublished()) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("We have local LS " + searchKey + " in our multihomes cache meaning it was stored to us. Answering query with the stored LS.");

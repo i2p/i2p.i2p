@@ -6,11 +6,14 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.util.SystemVersion;
 import net.i2p.router.sybil.Analysis;
 import net.i2p.router.web.FormHandler;
@@ -327,7 +330,7 @@ public class NetDbHelper extends FormHandler {
         return getNetDbSummary(null, false);
     }
 
-    public String getNetDbSummary(String client, boolean clientOnly) {
+    public String getNetDbSummary(Hash client, boolean clientOnly) {
         NetDbRenderer renderer = new NetDbRenderer(_context);
         try {
             if (client == null && !clientOnly)
@@ -359,7 +362,7 @@ public class NetDbHelper extends FormHandler {
             } else if (_full == 6) {
                 renderer.renderStatusHTML(_out, _limit, _page, _full, null, true);
             } else if (_clientOnly && client == null) {
-                for (String _client : _context.netDbSegmentor().getClients()) {
+                for (Hash _client : _context.clientManager().getPrimaryHashes()) {
                     renderer.renderLeaseSetHTML(_out, _debug, _client, clientOnly);
                 }
             } else {
@@ -373,7 +376,7 @@ public class NetDbHelper extends FormHandler {
         return "";
     }
 
-    public String getClientNetDbSummary(String client) {
+    public String getClientNetDbSummary(Hash client) {
         return getNetDbSummary(client, true);
     }
 
@@ -428,6 +431,10 @@ public class NetDbHelper extends FormHandler {
                 continue;   // can't nav to lookup
             if (i > 2 && i != tab && !isAdvanced())
                 continue;
+            if (i == 10 || i == 11) {
+                if (_context.netDbSegmentor().getRoutersKnownToClients().size() == 0)
+                    continue;
+            }
             if (i == tab) {
                 // we are there
                 if (span)
