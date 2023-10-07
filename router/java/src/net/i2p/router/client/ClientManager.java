@@ -778,7 +778,7 @@ class ClientManager {
      * This is inside the runner, so it won't be there if the runner isn't ready.
      * 
      * @param destHash destination hash associated with the client who's subDb we're looking for
-     * @return may be null if it does not exist
+     * @return may be null if it does not exist and the main netDb is not initialized
      */
     public FloodfillNetworkDatabaseFacade getClientFloodfillNetworkDatabaseFacade(Hash destHash) {
         if (destHash != null) {
