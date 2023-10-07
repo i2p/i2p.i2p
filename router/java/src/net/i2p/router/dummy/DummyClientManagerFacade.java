@@ -8,6 +8,9 @@ package net.i2p.router.dummy;
  *
  */
 
+import java.util.Collections;
+import java.util.Set;
+
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -18,6 +21,7 @@ import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 
 /**
  * Manage all interactions with clients 
@@ -49,6 +53,14 @@ public class DummyClientManagerFacade extends ClientManagerFacade {
     public SessionKeyManager getClientSessionKeyManager(Hash _dest) { return null; }
     
     public void requestLeaseSet(Hash dest, LeaseSet set) {}
-    
+    public FloodfillNetworkDatabaseFacade getClientFloodfillNetworkDatabaseFacade(Hash dbid) {
+        return null;
+    }
+    public Set<FloodfillNetworkDatabaseFacade> getClientFloodfillNetworkDatabaseFacades() {
+        return Collections.emptySet();
+    }
+    public Set<Hash> getPrimaryHashes() {
+        return Collections.emptySet();
+    }
 }
 

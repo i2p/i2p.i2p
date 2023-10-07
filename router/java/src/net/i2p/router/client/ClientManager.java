@@ -43,6 +43,8 @@ import net.i2p.router.ClientMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseSegmentor;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -769,6 +771,51 @@ class ClientManager {
         // This is fast and non-blocking, run in-line
         //_ctx.jobQueue().addJob(new HandleJob(msg));
         (new HandleJob(msg)).runJob();
+    }
+
+    /**
+     * get the FloodfillNetworkDatabaseFacade associated with a particular client destination.
+     * This is inside the runner, so it won't be there if the runner isn't ready.
+     * 
+     * @param destHash destination hash associated with the client who's subDb we're looking for
+     * @return may be null if it does not exist
+     */
+    public FloodfillNetworkDatabaseFacade getClientFloodfillNetworkDatabaseFacade(Hash destHash) {
+        if (destHash != null) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Getting subDb for desthash: " + destHash);
+            ClientConnectionRunner runner = getRunner(destHash);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("ClientManager got a runner in getClientFloodfillNetworkDatabaseFacade for " + destHash);
+            return runner.getFloodfillNetworkDatabaseFacade();
+        }
+        return null;
+    }
+
+    /**
+     * get all of the FloodfillNetworkDatabaseFacades for all of the clients.
+     * 
+     * @return non-null
+     */
+    public Set<FloodfillNetworkDatabaseFacade> getClientFloodfillNetworkDatabaseFacades() {
+        Set<FloodfillNetworkDatabaseFacade> rv = new HashSet<FloodfillNetworkDatabaseFacade>();
+        for (ClientConnectionRunner runner : _runners.values()) {
+            if (runner != null)
+                rv.add(runner.getFloodfillNetworkDatabaseFacade());
+        }
+        return rv;
+    }
+
+    /**
+     * get all the primary hashes for all the clients and return them as a set
+     * 
+     * @return
+     */
+    public Set<Hash> getPrimaryHashes() {
+        Set<Hash> rv = new HashSet<Hash>();
+        for (ClientConnectionRunner runner : _runners.values())
+            rv.add(runner.getDestHash());
+        return rv;
     }
 
     private class HandleJob extends JobImpl {

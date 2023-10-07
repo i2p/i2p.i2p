@@ -28,6 +28,7 @@ import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.Log;
 
 /**
@@ -290,4 +291,45 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
         if (_manager != null)
             _manager.unregisterMetaDest(dest);
     }
+
+    /**
+     * get the FloodfillNetworkDatabaseFacade associated with a particular client destination.
+     * This is inside the runner, so it won't be there if the runner isn't ready.
+     * 
+     * @param destHash destination hash associated with the client who's subDb we're looking for
+     * @return 
+     */
+    @Override
+    public FloodfillNetworkDatabaseFacade getClientFloodfillNetworkDatabaseFacade(Hash destHash) {
+        if (_manager != null)
+            return _manager.getClientFloodfillNetworkDatabaseFacade(destHash);
+        else
+            return null;
+    }
+
+    /**
+     * get all of the FloodfillNetworkDatabaseFacades for all of the clients.
+     * 
+     * @return
+     */
+    @Override
+    public Set<FloodfillNetworkDatabaseFacade> getClientFloodfillNetworkDatabaseFacades() {
+        if (_manager != null)
+            return _manager.getClientFloodfillNetworkDatabaseFacades();
+        else
+            return Collections.emptySet();
+    }
+
+    /**
+     * get all the primary hashes for all the clients and return them as a set
+     * 
+     * @return
+     */
+    @Override
+    public Set<Hash> getPrimaryHashes() {
+        if (_manager != null)
+            return _manager.getPrimaryHashes();
+        else
+            return Collections.emptySet();
+    }    
 }

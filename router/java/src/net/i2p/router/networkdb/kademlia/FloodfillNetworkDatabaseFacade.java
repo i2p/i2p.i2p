@@ -66,10 +66,13 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     private static final long NEXT_RKEY_LS_ADVANCE_TIME = 10*60*1000;
     private static final int NEXT_FLOOD_QTY = 2;
     
-    public FloodfillNetworkDatabaseFacade(RouterContext context, String dbid) {
+    public FloodfillNetworkDatabaseFacade(RouterContext context) {
+        this(context, FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
+    }
+    public FloodfillNetworkDatabaseFacade(RouterContext context, Hash dbid) {
         super(context, dbid);
         _activeFloodQueries = new HashMap<Hash, FloodSearchJob>();
-         _verifiesInProgress = new ConcurrentHashSet<Hash>(8);
+        _verifiesInProgress = new ConcurrentHashSet<Hash>(8);
 
         long[] rate = new long[] { 60*60*1000L };
         _context.statManager().createRequiredRateStat("netDb.successTime", "Time for successful lookup (ms)", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
@@ -123,7 +126,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     @Override
     protected void createHandlers() {
        // Only initialize the handlers for the flooodfill netDb.
-       if (super._dbid.equals(FloodfillNetworkDatabaseSegmentor.MAIN_DBID)) {
+       if (!isClientDb()) {
             if (_log.shouldInfo())
                 _log.info("[dbid: " + super._dbid +  "] Initializing the message handlers");
             _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseLookupMessage.MESSAGE_TYPE, new FloodfillDatabaseLookupMessageHandler(_context, this));

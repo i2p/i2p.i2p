@@ -23,6 +23,7 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseSegmentor;
 import net.i2p.router.networkdb.kademlia.KademliaNetworkDatabaseFacade;
 import net.i2p.router.networkdb.kademlia.SegmentedNetworkDatabaseFacade;
 
@@ -33,14 +34,10 @@ public class DummyNetworkDatabaseFacade extends SegmentedNetworkDatabaseFacade {
     
     public DummyNetworkDatabaseFacade(RouterContext ctx) {
         super(ctx);
-        _fndb  = new FloodfillNetworkDatabaseFacade(ctx, "dummy");
+        _fndb  = new FloodfillNetworkDatabaseFacade(ctx, FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
         _fndb.startup();
         _routers = Collections.synchronizedMap(new HashMap<Hash, RouterInfo>());
         _context = ctx;
-    }
-
-    public FloodfillNetworkDatabaseFacade getSubNetDB(String dbid){
-        return null;
     }
 
     public FloodfillNetworkDatabaseFacade getSubNetDB(Hash dbid){
@@ -99,11 +96,6 @@ public class DummyNetworkDatabaseFacade extends SegmentedNetworkDatabaseFacade {
     }
 
     @Override
-    public LeaseSet lookupLeaseSetLocally(Hash key, String dbid) {
-        throw new UnsupportedOperationException("Unimplemented method 'lookupLeaseSetLocally'");
-    }
-
-    @Override
     public FloodfillNetworkDatabaseFacade mainNetDB() {
         return _fndb;
     }
@@ -114,23 +106,8 @@ public class DummyNetworkDatabaseFacade extends SegmentedNetworkDatabaseFacade {
     }
 
     @Override
-    public FloodfillNetworkDatabaseFacade clientNetDB(String id) {
-        return _fndb;
-    }
-
-    @Override
     public FloodfillNetworkDatabaseFacade clientNetDB(Hash id) {
         return _fndb;
-    }
-
-    @Override
-    public String getDbidByHash(Hash clientKey) {
-        throw new UnsupportedOperationException("Unimplemented method 'lookupLeaseSetHashIsClient'");
-    }
-
-    @Override
-    public List<String> getClients() {
-        throw new UnsupportedOperationException("Unimplemented method 'getClients'");
     }
 
     @Override

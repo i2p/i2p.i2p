@@ -711,13 +711,13 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             }
             if (_log.shouldDebug())
                 _log.debug("Publishing: " + ls);
-            _context.clientNetDb(_runner.getDestHash()).publish(ls);
+            _runner.getFloodfillNetworkDatabaseFacade().publish(ls);
             if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
                 // store the decrypted ls also
                 EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
                 if (_log.shouldDebug())
                     _log.debug("Storing decrypted: " + encls.getDecryptedLeaseSet());
-                _context.clientNetDb(dest.getHash()).store(dest.getHash(), encls.getDecryptedLeaseSet());
+                _runner.getFloodfillNetworkDatabaseFacade().store(dest.getHash(), encls.getDecryptedLeaseSet());
             }
         } catch (IllegalArgumentException iae) {
             if (_log.shouldLog(Log.ERROR))
@@ -861,9 +861,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 _log.warn("Unsupported BlindingInfo type: " + message);
             return;
         }
-        BlindData obd = _context.clientNetDb(_runner.getDestHash()).getBlindData(spk);
+        BlindData obd = _runner.getFloodfillNetworkDatabaseFacade().getBlindData(spk);
         if (obd == null) {
-            _context.clientNetDb(_runner.getDestHash()).setBlindData(bd);
+            _runner.getFloodfillNetworkDatabaseFacade().setBlindData(bd);
             if (_log.shouldWarn())
                 _log.warn("New: " + bd);
         } else {
@@ -884,7 +884,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                         return;
                     }
                 }
-                _context.clientNetDb(_runner.getDestHash()).setBlindData(bd);
+                _runner.getFloodfillNetworkDatabaseFacade().setBlindData(bd);
                 if (_log.shouldWarn())
                     _log.warn("Updated: " + bd);
             } else {
@@ -893,7 +893,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 if (nexp > oexp) {
                     obd.setExpiration(nexp);
                     // to force save at shutdown
-                    _context.clientNetDb(_runner.getDestHash()).setBlindData(obd);
+                    _runner.getFloodfillNetworkDatabaseFacade().setBlindData(obd);
                     if (_log.shouldWarn())
                         _log.warn("Updated expiration: " + obd);
                 } else {

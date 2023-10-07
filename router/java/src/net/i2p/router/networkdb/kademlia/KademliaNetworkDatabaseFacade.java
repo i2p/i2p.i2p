@@ -80,7 +80,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     private NegativeLookupCache _negativeCache;
     protected final int _networkID;
     private final BlindCache _blindCache;
-    protected final String _dbid;
+    protected final Hash _dbid;
     private Hash _localKey;
 
     /** 
@@ -172,7 +172,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     private static final int BUCKET_SIZE = 24;
     private static final int KAD_B = 4;
 
-    public KademliaNetworkDatabaseFacade(RouterContext context, String dbid) {
+    public KademliaNetworkDatabaseFacade(RouterContext context, Hash dbid) {
         _context = context;
         _dbid = dbid;
         _log = _context.logManager().getLog(getClass());
@@ -297,8 +297,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     String getDbDir() {
         if (_dbDir == null) {
             String dbDir = _context.getProperty(PROP_DB_DIR, DEFAULT_DB_DIR);
-            if (!_dbid.equals(FloodfillNetworkDatabaseSegmentor.MAIN_DBID) && _dbid != null) {
-                File subDir = new File(dbDir, _dbid);
+            if (_dbid != FloodfillNetworkDatabaseSegmentor.MAIN_DBID) {
+                File subDir = new File(dbDir, _dbid.toBase32());
                 dbDir = subDir.toString();
             }
             return dbDir; 
@@ -306,12 +306,37 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         return _dbDir;
     }
 
+    /**
+     * Check if the database is a client DB.
+     *
+     * @return  true if the database is a client DB, false otherwise
+     * @since 0.9.60
+     */
     public boolean isClientDb() {
-        return _dbid.startsWith("clients_");
+        // This is a null check in disguise, don't use .equals() here.
+        // FNDS.MAIN_DBID is always null. and if _dbid is also null it is not a client Db
+        if (_dbid == FloodfillNetworkDatabaseSegmentor.MAIN_DBID)
+            return false;
+        if (_dbid.equals(FloodfillNetworkDatabaseSegmentor.MULTIHOME_DBID))
+            return false;
+        return true;
     }
 
+    
+    /**
+     * Checks if the current database is a multihome database.
+     *
+     * @return  true if the current database is a multihome database, false otherwise.
+     * @since 0.9.60
+     */
     public boolean isMultihomeDb() {
-        return _dbid.equals(FloodfillNetworkDatabaseSegmentor.MULTIHOME_DBID);
+        // This is a null check in disguise, don't use .equals() here.
+        // FNDS.MAIN_DBID is always null, and if _dbid is null it is not the multihome Db
+        if (_dbid == FloodfillNetworkDatabaseSegmentor.MAIN_DBID)
+            return false;
+        if (_dbid.equals(FloodfillNetworkDatabaseSegmentor.MULTIHOME_DBID))
+            return true;
+        return false;
     }
 
     public synchronized void startup() {
@@ -357,27 +382,29 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         }
         
         if (!QUIET) {
-            // fill the search queue with random keys in buckets that are too small
-            // Disabled since KBucketImpl.generateRandomKey() is b0rked,
-            // and anyway, we want to search for a completely random key,
-            // not a random key for a particular kbucket.
-            // _context.jobQueue().addJob(new ExploreKeySelectorJob(_context, this));
-            if (_exploreJob == null)
-                _exploreJob = new StartExplorersJob(_context, this);
-            // fire off a group of searches from the explore pool
-            // Don't start it right away, so we don't send searches for random keys
-            // out our 0-hop exploratory tunnels (generating direct connections to
-            // one or more floodfill peers within seconds of startup).
-            // We're trying to minimize the ff connections to lessen the load on the 
-            // floodfills, and in any case let's try to build some real expl. tunnels first.
-            // No rush, it only runs every 30m.
-            _exploreJob.getTiming().setStartAfter(now + EXPLORE_JOB_DELAY);
-            _context.jobQueue().addJob(_exploreJob);
+            if (!isClientDb() && !isMultihomeDb()) {
+                // fill the search queue with random keys in buckets that are too small
+                // Disabled since KBucketImpl.generateRandomKey() is b0rked,
+                // and anyway, we want to search for a completely random key,
+                // not a random key for a particular kbucket.
+                // _context.jobQueue().addJob(new ExploreKeySelectorJob(_context, this));
+                if (_exploreJob == null)
+                    _exploreJob = new StartExplorersJob(_context, this);
+                // fire off a group of searches from the explore pool
+                // Don't start it right away, so we don't send searches for random keys
+                // out our 0-hop exploratory tunnels (generating direct connections to
+                // one or more floodfill peers within seconds of startup).
+                // We're trying to minimize the ff connections to lessen the load on the 
+                // floodfills, and in any case let's try to build some real expl. tunnels first.
+                // No rush, it only runs every 30m.
+                _exploreJob.getTiming().setStartAfter(now + EXPLORE_JOB_DELAY);
+                _context.jobQueue().addJob(_exploreJob);
+            }
         } else {
             _log.warn("Operating in quiet mode - not exploring or pushing data proactively, simply reactively");
             _log.warn("This should NOT be used in production");
         }
-        if (_dbid == null || _dbid.equals(FloodfillNetworkDatabaseSegmentor.MAIN_DBID) || _dbid.isEmpty()) {
+        if (!isClientDb() && !isMultihomeDb()) {
             // periodically update and resign the router's 'published date', which basically
             // serves as a version
             Job plrij = new PublishLocalRouterInfoJob(_context);
@@ -821,18 +848,24 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             _log.error("locally published leaseSet is not valid?", iae);
             throw iae;
         }
-        if (_localKey != null) {
-            if (!_localKey.equals(localLeaseSet.getHash()))
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Error, the local LS hash ("
-                               + _localKey + ") does not match the published hash ("
-                               + localLeaseSet.getHash() + ")! This shouldn't happen!",
-                               new Exception());
-        } else {
-            // This will only happen once when the local LS is first published
-            _localKey = localLeaseSet.getHash();
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Local client LS key initialized to: " + _localKey);
+        if (!_context.netDbSegmentor().useSubDbs()){
+            String dbid = "main netDb";
+            if (isClientDb()) {
+                dbid = "client netDb: " + _dbid;
+            }
+            if (_localKey != null) {
+                if (!_localKey.equals(localLeaseSet.getHash()))
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("[" + dbid + "]" + "Error, the local LS hash ("
+                                + _localKey + ") does not match the published hash ("
+                                + localLeaseSet.getHash() + ")! This shouldn't happen!",
+                                new Exception());
+            } else {
+                // This will only happen once when the local LS is first published
+                _localKey = localLeaseSet.getHash();
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("[" + dbid + "]" + "Local client LS key initialized to: " + _localKey);
+            }
         }
         if (!_context.clientManager().shouldPublishLeaseSet(h))
             return;
@@ -1040,31 +1073,18 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             if (rv != null && rv.getEarliestLeaseDate() >= leaseSet.getEarliestLeaseDate()) {
                 if (_log.shouldDebug())
                     _log.debug("Not storing older " + key);
-                // TODO: Determine if this deep equals is actually truly necessary as part of this test or if the date is actually enough
-                if (rv.equals(leaseSet)) {
-                    if (_log.shouldDebug())
-                        _log.debug("Updating leaseSet found in Datastore " + key);
-                    /** - DatabaseEntry.java note
-                     * we used to just copy the flags here but due to concerns about crafted
-                     * entries being used to "follow" a leaseSet from one context to another,
-                     * i.e. sent to a client vs sent to a router. Copying the entire leaseSet,
-                     * flags and all, limits the ability of the attacker craft leaseSet entries
-                     * maliciously.
-                     */
-                    _ds.put(key, leaseSet);
-                    rv = (LeaseSet)_ds.get(key);
-                    Hash to = leaseSet.getReceivedBy();
-                    if (to != null) {
-                        rv.setReceivedBy(to);
-                    } else if (leaseSet.getReceivedAsReply()) {
-                        rv.setReceivedAsReply();
-                    }
-                    if (leaseSet.getReceivedAsPublished()) {
-                        rv.setReceivedAsPublished();
-                    }
-                    return rv;
-                }// TODO: Is there any reason to do anything here, if the fields are somehow unequal?
-                // Like, is there any case where this is not true? I don't think it's possible for it to be.
+                // if it hasn't changed, no need to do anything
+                // except copy over the flags
+                Hash to = leaseSet.getReceivedBy();
+                if (to != null) {
+                    rv.setReceivedBy(to);
+                } else if (leaseSet.getReceivedAsReply()) {
+                    rv.setReceivedAsReply();
+                }
+                if (leaseSet.getReceivedAsPublished()) {
+                    rv.setReceivedAsPublished();
+                }
+                return rv;
             }
         } catch (ClassCastException cce) {
             throw new IllegalArgumentException("Attempt to replace RI with " + leaseSet);
