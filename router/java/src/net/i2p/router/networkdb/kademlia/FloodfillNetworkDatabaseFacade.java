@@ -91,7 +91,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         // for ISJ
         _context.statManager().createRateStat("netDb.RILookupDirect", "Was an iterative RI lookup sent directly?", "NetworkDatabase", rate);
         // No need to start the FloodfillMonitorJob for client subDb.
-        if (super.isClientDb())
+        if (!super.isMainDb())
             _ffMonitor = null;
         else
             _ffMonitor = new FloodfillMonitorJob(_context, this);
@@ -103,7 +103,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         super.startup();
         if (_ffMonitor != null)
             _context.jobQueue().addJob(_ffMonitor);
-        if (super.isClientDb())
+        if (!super.isMainDb())
             isFF = false;
         else
             isFF = _context.getBooleanProperty(FloodfillMonitorJob.PROP_FLOODFILL_PARTICIPANT);
@@ -126,7 +126,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     @Override
     protected void createHandlers() {
        // Only initialize the handlers for the flooodfill netDb.
-       if (!isClientDb()) {
+       if (super.isMainDb()) {
             if (_log.shouldInfo())
                 _log.info("[dbid: " + super._dbid +  "] Initializing the message handlers");
             _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseLookupMessage.MESSAGE_TYPE, new FloodfillDatabaseLookupMessageHandler(_context, this));
