@@ -4680,10 +4680,8 @@ input[type="radio"] {
     width: 16px !important;
     vertical-align: sub !important;
     opacity: 1.0;
-    border: 0;
     box-shadow: none;
     cursor: pointer;
-    filter: sepia(100%) hue-rotate(185deg) drop-shadow(0 0 1px #ccf);
 }
 
 .optbox:hover,
