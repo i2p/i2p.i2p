@@ -206,7 +206,7 @@ pre {
     margin: -3px 0;
     background: url(/themes/console/images/buttons/download.png) 6px center no-repeat, linear-gradient(to bottom, #fff, #efefff);
     background-size: 14px 14px, 100% 100% !important;
-    padding: 5px 7px 5px 22px !important;
+    padding: 5px 7px 5px 25px !important;
 }
 
 .routersummary input[type=text] {
