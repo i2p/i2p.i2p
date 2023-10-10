@@ -3190,7 +3190,29 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
         if (finalShutdown && _log.shouldLog(Log.WARN))
             _log.warn("SnarkManager final shutdown");
         int count = 0;
-        for (Snark snark : _snarks.values()) {
+        Collection<Snark> snarks = _snarks.values();
+        // We do two passes so we shutdown the high-priority snarks first.
+        // Pass 1: All running, incomplete torrents,
+        // to make sure the status gets saved so there will be no recheck on restart.
+        for (Snark snark : snarks) {
+            if (!snark.isStopped()) {
+                Storage storage = snark.getStorage();
+                if (storage != null && !storage.complete()) {
+                    if (count == 0)
+                        addMessage(_t("Stopping all torrents and closing the I2P tunnel."));
+                    count++;
+                    if (finalShutdown)
+                        snark.stopTorrent(true);
+                    else
+                        stopTorrent(snark, false);
+                    if (count % 8 == 0) {
+                        try { Thread.sleep(20); } catch (InterruptedException ie) {}
+                    }
+                }
+            }
+        }
+        // Pass 2: All the rest of the torrents
+        for (Snark snark : snarks) {
             if (!snark.isStopped()) {
                 if (count == 0)
                     addMessage(_t("Stopping all torrents and closing the I2P tunnel."));
