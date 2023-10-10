@@ -8,11 +8,15 @@ import java.util.Properties;
 import org.eclipse.jetty.util.log.Log;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.MenuCallback;
+import net.i2p.app.MenuHandle;
+import net.i2p.app.MenuService;
 import net.i2p.apps.systray.UrlLauncher;
 import net.i2p.data.DataHelper;
 import net.i2p.desktopgui.ExternalMain;
 import net.i2p.jetty.I2PLogger;
 import net.i2p.jetty.JettyStart;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.SystemVersion;
 
 import org.klomp.snark.SnarkManager;
@@ -74,7 +78,7 @@ public class RunStandalone {
         try {
             String url = "http://" + _host + ':' + _port + "/i2psnark/";
             System.out.println("Starting i2psnark " + SnarkManager.FULL_VERSION + " at " + url);
-            startTrayApp();
+            MenuService dtg = startTrayApp();
             _jettyStart.startup();
             try {
                Thread.sleep(1000);
@@ -84,6 +88,8 @@ public class RunStandalone {
                 UrlLauncher launch = new UrlLauncher(_context, null, new String[] { url } );
                 launch.startup();
             }
+            if (dtg != null)
+                dtg.addMenu("Shutdown I2PSnark", new StandaloneStopper(dtg));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -126,16 +132,47 @@ public class RunStandalone {
 
     /**
      *  @since 0.9.54 adapted from RouterConsoleRunner
+     *  @return null on failure
      */
-    private void startTrayApp() {
+    private MenuService startTrayApp() {
         try {
             if (isSystrayEnabled(_context)) {
                 System.setProperty("java.awt.headless", "false");
                 ExternalMain dtg = new ExternalMain(_context, _context.clientAppManager(), null);
                 dtg.startup();
+                return dtg;
             }
         } catch (Throwable t) {
             t.printStackTrace();
         }
+        return null;
     }
+
+    /**
+     *  Callback when shutdown is clicked in systray
+     *  @since 0.9.60
+     */
+    public static class StandaloneStopper implements MenuCallback {
+        private final MenuService _ms;
+
+        public StandaloneStopper(MenuService ms) { _ms = ms; }
+
+        public void clicked(MenuHandle menu) {
+            _ms.disableMenu(menu);
+            _ms.updateMenu("I2PSnark shutting down", menu);
+            Thread t = new I2PAppThread(new StopperThread(), "Snark Stopper", true);
+            t.start();
+        }
+    }
+
+    /**
+     *  Threaded shutdown
+     *  @since 0.9.60
+     */
+    public static class StopperThread implements Runnable {
+        public void run() {
+            shutdown();
+        }
+    }
+
 }
