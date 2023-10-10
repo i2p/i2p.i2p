@@ -866,7 +866,12 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                             if (!oldSources.contains(uri)) {
                                 if (_log.shouldLog(Log.WARN))
                                     _log.warn(ui.toString() + ' ' + oldVA + " adding " + uri + " to method " + method);
-                                oldSources.add(uri);
+                                try {
+                                    oldSources.add(uri);
+                                } catch (UnsupportedOperationException uoe) {
+                                    // rare case, changed URL but it's a singleton list, replace old list
+                                    oldVA.sourceMap.put(method, Collections.singletonList(uri));
+                                }
                             }
                         }
                     } else {

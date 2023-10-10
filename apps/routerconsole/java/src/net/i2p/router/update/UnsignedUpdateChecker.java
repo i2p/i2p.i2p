@@ -3,6 +3,7 @@ package net.i2p.router.update;
 import java.net.URI;
 import java.util.List;
 
+import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.web.ConfigUpdateHandler;
 import net.i2p.update.*;
@@ -37,6 +38,7 @@ class UnsignedUpdateChecker extends UpdateRunner {
         try {
             success = fetchUnsignedHead();
         } catch (Throwable t) {
+            _log.error("Error checking for unsigned update", t);
             _mgr.notifyTaskFailed(this, "", t);
         } finally {
             _mgr.notifyCheckComplete(this, _unsignedUpdateAvailable, success);
@@ -69,7 +71,7 @@ class UnsignedUpdateChecker extends UpdateRunner {
         }
 
         //updateStatus("<b>" + _t("Checking for development build update") + "</b>");
-        try {
+        //try {
             EepHead get = new EepHead(_context, proxyHost, proxyPort, 0, url);
             if (get.fetch()) {
                 String lastmod = get.getLastModified();
@@ -92,10 +94,22 @@ class UnsignedUpdateChecker extends UpdateRunner {
                     }
                 }
                 return true;
+            } else {
+                int status = get.getStatusCode();
+                String msg;
+                if (status == 504 || status <= 0)
+                    msg = "Unable to connect to development update server " + _currentURI.getHost();
+                else if (status == 500)
+                    msg = "Development update server " + _currentURI.getHost() + " not found in address book";
+                else if (status == 404)
+                    msg = "Update file not found on development update server at " + url;
+                else
+                    msg = status + " " + DataHelper.stripHTML(get.getStatusText());
+                updateStatus("<b>" + msg + "</b>");
             }
-        } catch (Throwable t) {
-            _log.error("Error fetching the update", t);
-        }
+        //} catch (Throwable t) {
+        //    _log.error("Error fetching the update", t);
+        //}
         return false;
     }
 }
