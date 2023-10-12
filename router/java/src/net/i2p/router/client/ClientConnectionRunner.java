@@ -1190,8 +1190,8 @@ class ClientConnectionRunner {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("getFloodfillNetworkDatabaseFacade is getting the subDb for dbid: " + this.getDestHash());
         if (_floodfillNetworkDatabaseFacade == null) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("getFloodfillNetworkDatabaseFacade is null for runner", new Exception());
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("getFloodfillNetworkDatabaseFacade is null for runner");
             return _context.netDb();
         }
         return this._floodfillNetworkDatabaseFacade;

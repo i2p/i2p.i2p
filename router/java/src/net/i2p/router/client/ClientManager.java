@@ -785,6 +785,11 @@ class ClientManager {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Getting subDb for desthash: " + destHash);
             ClientConnectionRunner runner = getRunner(destHash);
+            if (runner == null){
+                if (_log.shouldLog(Log.WARN))
+                _log.warn("ClientManager got a null runner in getClientFloodfillNetworkDatabaseFacade for " + destHash);
+                return null;
+            }
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("ClientManager got a runner in getClientFloodfillNetworkDatabaseFacade for " + destHash);
             return runner.getFloodfillNetworkDatabaseFacade();
@@ -800,8 +805,11 @@ class ClientManager {
     public Set<FloodfillNetworkDatabaseFacade> getClientFloodfillNetworkDatabaseFacades() {
         Set<FloodfillNetworkDatabaseFacade> rv = new HashSet<FloodfillNetworkDatabaseFacade>();
         for (ClientConnectionRunner runner : _runners.values()) {
-            if (runner != null)
-                rv.add(runner.getFloodfillNetworkDatabaseFacade());
+            if (runner != null){
+                FloodfillNetworkDatabaseFacade fndf = runner.getFloodfillNetworkDatabaseFacade();
+                if (fndf != null)
+                    rv.add(fndf);
+            }
         }
         return rv;
     }
