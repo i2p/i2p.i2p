@@ -1,4 +1,20 @@
+2023-10-11 zzz
+ * i2ptunnel: HTTPResponseOutputStream cleanups
+
+2023-10-10 zzz
+ * Add ramble.i2p to hosts.txt
+ * i2psnark:
+   - Shutdown incomplete torrents first
+   - Add shutdown button to systray (standalone only)
+
+2023-10-09 zzz
+ * Console: Fix visibility of radio/checkboxes (light theme)
+
+2023-10-03 zzz
+ * SSU2: Prevent rare IAE in peer test timer (Gitlab #433)
+
 2023-09-29 zzz
+ * i2psnark: Search box CSS tweaks when iframed (Gitlab #448)
  * SAM: Fix accept after soft restart (Gitlab #399)
  * Transport: Disable SSU1 by default (Gitlab #427)
 
