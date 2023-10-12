@@ -32,7 +32,6 @@ import net.i2p.util.Log;
  *
  */
 class HTTPResponseOutputStream extends FilterOutputStream {
-    private final I2PAppContext _context;
     private final Log _log;
     protected ByteArray _headerBuffer;
     private boolean _headerWritten;
@@ -44,16 +43,20 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     /** lower-case, trimmed */
     protected String _contentEncoding;
 
-    private static final int CACHE_SIZE = 8*1024;
+    private static final int CACHE_SIZE = 4*1024;
     private static final ByteCache _cache = ByteCache.getInstance(8, CACHE_SIZE);
     // OOM DOS prevention
     private static final int MAX_HEADER_SIZE = 64*1024;
+    /** we ignore any potential \r, since we trim it on write anyway */
+    private static final byte NL = '\n';
+    private static final byte[] CONNECTION_CLOSE = DataHelper.getASCII("Connection: close\r\n");
+    private static final byte[] PROXY_CONNECTION_CLOSE = DataHelper.getASCII("Proxy-Connection: close\r\n");
+    private static final byte[] CRLF = DataHelper.getASCII("\r\n");
     
     public HTTPResponseOutputStream(OutputStream raw) {
         super(raw);
-        _context = I2PAppContext.getGlobalContext();
-        // all createRateStat in I2PTunnelHTTPClient.startRunning()
-        _log = _context.logManager().getLog(getClass());
+        I2PAppContext context = I2PAppContext.getGlobalContext();
+        _log = context.logManager().getLog(getClass());
         _headerBuffer = _cache.acquire();
         _buf1 = new byte[1];
     }
@@ -65,22 +68,17 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     }
 
     @Override
-    public void write(byte buf[]) throws IOException { 
-        write(buf, 0, buf.length); 
-    }
-
-    @Override
     public void write(byte buf[], int off, int len) throws IOException {
         if (_headerWritten) {
             out.write(buf, off, len);
-            //out.flush();
             return;
         }
 
         for (int i = 0; i < len; i++) {
             ensureCapacity();
-            _headerBuffer.getData()[_headerBuffer.getValid()] = buf[off+i];
-            _headerBuffer.setValid(_headerBuffer.getValid()+1);
+            int valid = _headerBuffer.getValid();
+            _headerBuffer.getData()[valid] = buf[off+i];
+            _headerBuffer.setValid(valid + 1);
 
             if (headerReceived()) {
                 writeHeader();
@@ -88,7 +86,6 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                 if (i + 1 < len) {
                     // write out the remaining
                     out.write(buf, off+i+1, len-i-1);
-                    //out.flush();
                 }
                 return;
             }
@@ -100,16 +97,19 @@ class HTTPResponseOutputStream extends FilterOutputStream {
      *  @throws IOException if the headers are too big
      */
     private void ensureCapacity() throws IOException {
-        if (_headerBuffer.getValid() >= MAX_HEADER_SIZE)
+        int valid = _headerBuffer.getValid();
+        if (valid >= MAX_HEADER_SIZE)
             throw new IOException("Max header size exceeded: " + MAX_HEADER_SIZE);
-        if (_headerBuffer.getValid() + 1 >= _headerBuffer.getData().length) {
-            int newSize = (int)(_headerBuffer.getData().length * 1.5);
+        byte[] data = _headerBuffer.getData();
+        int len = data.length;
+        if (valid + 1 >= len) {
+            int newSize = len * 2;
             ByteArray newBuf = new ByteArray(new byte[newSize]);
-            System.arraycopy(_headerBuffer.getData(), 0, newBuf.getData(), 0, _headerBuffer.getValid());
-            newBuf.setValid(_headerBuffer.getValid());
+            System.arraycopy(data, 0, newBuf.getData(), 0, valid);
+            newBuf.setValid(valid);
             newBuf.setOffset(0);
             // if we changed the ByteArray size, don't put it back in the cache
-            if (_headerBuffer.getData().length == CACHE_SIZE)
+            if (len == CACHE_SIZE)
                 _cache.release(_headerBuffer);
             _headerBuffer = newBuf;
         }
@@ -117,12 +117,18 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     
     /** are the headers finished? */
     private boolean headerReceived() {
-        if (_headerBuffer.getValid() < 3) return false;
-        byte first = _headerBuffer.getData()[_headerBuffer.getValid()-3];
-        byte second = _headerBuffer.getData()[_headerBuffer.getValid()-2];
-        byte third = _headerBuffer.getData()[_headerBuffer.getValid()-1];
-        return (isNL(second) && isNL(third)) || //   \n\n
-               (isNL(first) && isNL(third));    // \n\r\n
+        int valid = _headerBuffer.getValid();
+        if (valid < 3)
+            return false;
+        byte[] data = _headerBuffer.getData();
+        byte third = data[valid - 1];
+        if (third != NL)
+            return false;
+        byte first = data[valid - 3];
+        if (first == NL)     // \n\r\n
+            return true;
+        byte second = data[valid - 2];
+        return second == NL; //   \n\n
     }
     
     /**
@@ -134,10 +140,6 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         return line;
     }
     
-    /** we ignore any potential \r, since we trim it on write anyway */
-    private static final byte NL = '\n';
-    private static boolean isNL(byte b) { return (b == NL); }
-    
     /** ok, received, now munge & write it */
     private void writeHeader() throws IOException {
         String responseLine = null;
@@ -146,30 +148,32 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         boolean proxyConnectionSent = false;
         
         int lastEnd = -1;
-        for (int i = 0; i < _headerBuffer.getValid(); i++) {
-            if (isNL(_headerBuffer.getData()[i])) {
+        byte[] data = _headerBuffer.getData();
+        int valid = _headerBuffer.getValid();
+        for (int i = 0; i < valid; i++) {
+            if (data[i] == NL) {
                 if (lastEnd == -1) {
-                    responseLine = DataHelper.getUTF8(_headerBuffer.getData(), 0, i+1); // includes NL
+                    responseLine = DataHelper.getUTF8(data, 0, i+1); // includes NL
                     responseLine = filterResponseLine(responseLine);
                     responseLine = (responseLine.trim() + "\r\n");
-                    if (_log.shouldLog(Log.INFO))
+                    if (_log.shouldInfo())
                         _log.info("Response: " + responseLine.trim());
                     out.write(DataHelper.getUTF8(responseLine));
                 } else {
                     for (int j = lastEnd+1; j < i; j++) {
-                        if (_headerBuffer.getData()[j] == ':') {
+                        if (data[j] == ':') {
                             int keyLen = j-(lastEnd+1);
                             int valLen = i-(j+1);
                             if ( (keyLen <= 0) || (valLen < 0) )
                                 throw new IOException("Invalid header @ " + j);
-                            String key = DataHelper.getUTF8(_headerBuffer.getData(), lastEnd+1, keyLen);
+                            String key = DataHelper.getUTF8(data, lastEnd+1, keyLen);
                             String val;
                             if (valLen == 0)
                                 val = "";
                             else
-                                val = DataHelper.getUTF8(_headerBuffer.getData(), j+2, valLen).trim();
+                                val = DataHelper.getUTF8(data, j+2, valLen).trim();
                             
-                            if (_log.shouldLog(Log.INFO))
+                            if (_log.shouldInfo())
                                 _log.info("Response header [" + key + "] = [" + val + "]");
                             
                             String lcKey = key.toLowerCase(Locale.US);
@@ -179,11 +183,11 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                                     out.write(DataHelper.getASCII("Connection: " + val + "\r\n"));
                                     proxyConnectionSent = true;
                                 } else {
-                                    out.write(DataHelper.getASCII("Connection: close\r\n"));
+                                    out.write(CONNECTION_CLOSE);
                                 }
                                 connectionSent = true;
                             } else if ("proxy-connection".equals(lcKey)) {
-                                out.write(DataHelper.getASCII("Proxy-Connection: close\r\n"));
+                                out.write(PROXY_CONNECTION_CLOSE);
                                 proxyConnectionSent = true;
                             } else if ("content-encoding".equals(lcKey) && "x-i2p-gzip".equals(val.toLowerCase(Locale.US))) {
                                 _gzip = true;
@@ -210,7 +214,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                                         lcVal.contains("domain=.i2p")) {
                                         // Strip privacy-damaging "supercookies" for i2p and b32.i2p
                                         // See RFC 6265 and http://publicsuffix.org/
-                                        if (_log.shouldLog(Log.INFO))
+                                        if (_log.shouldInfo())
                                             _log.info("Stripping \"" + key + ": " + val + "\" from response ");
                                         break;
                                     }
@@ -226,21 +230,19 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         }
         
         if (!connectionSent)
-            out.write(DataHelper.getASCII("Connection: close\r\n"));
+            out.write(CONNECTION_CLOSE);
         if (!proxyConnectionSent)
-            out.write(DataHelper.getASCII("Proxy-Connection: close\r\n"));
+            out.write(PROXY_CONNECTION_CLOSE);
             
         finishHeaders();
 
         boolean shouldCompress = shouldCompress();
-        if (_log.shouldLog(Log.INFO))
+        if (_log.shouldInfo())
             _log.info("After headers: gzip? " + _gzip + " compress? " + shouldCompress);
         
-        // done, shove off
-        if (_headerBuffer.getData().length == CACHE_SIZE)
+        if (data.length == CACHE_SIZE)
             _cache.release(_headerBuffer);
-        else
-            _headerBuffer = null;
+        _headerBuffer = null;
         if (shouldCompress) {
             beginProcessing();
         }
@@ -249,13 +251,13 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     protected boolean shouldCompress() { return _gzip; }
     
     protected void finishHeaders() throws IOException {
-        out.write(DataHelper.getASCII("\r\n")); // end of the headers
+        out.write(CRLF); // end of the headers
     }
     
     @Override
     public void close() throws IOException {
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Closing " + out + " threaded?? " + shouldCompress(), new Exception("I did it"));
+        if (_log.shouldInfo())
+            _log.info("Closing " + out + " compressed? " + shouldCompress(), new Exception("I did it"));
         synchronized(this) {
             // synch with changing out field below
             super.close();
@@ -263,7 +265,6 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     }
     
     protected void beginProcessing() throws IOException {
-        //out.flush();
         OutputStream po = new GunzipOutputStream(out);
         synchronized(this) {
             out = po;
@@ -339,7 +340,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     private static void test(String name, String orig, boolean shouldPass) {
         System.out.println("====Testing: " + name + "\n" + orig + "\n------------");
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
+            OutputStream baos = new java.io.ByteArrayOutputStream(4096);
             HTTPResponseOutputStream resp = new HTTPResponseOutputStream(baos);
             resp.write(orig.getBytes());
             resp.flush();
