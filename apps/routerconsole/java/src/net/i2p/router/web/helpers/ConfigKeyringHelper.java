@@ -104,7 +104,7 @@ public class ConfigKeyringHelper extends HelperBase {
         }
         // LS2
         if (!local) {
-            List<BlindData> bdata = _context.netDbSegmentor().getLocalClientsBlindData();
+            List<BlindData> bdata = _context.netDb().getBlindData();
             if (bdata.size() > 1)
                 Collections.sort(bdata, new BDComparator());
             for (BlindData bd : bdata) {
