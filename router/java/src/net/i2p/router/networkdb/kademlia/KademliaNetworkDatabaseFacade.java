@@ -180,12 +180,13 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         _peerSelector = createPeerSelector();
         _publishingLeaseSets = new HashMap<Hash, RepublishLeaseSetJob>(8);
         _activeRequests = new HashMap<Hash, SearchJob>(8);
-        if (!isMainDb())
+        if (!isMainDb()) {
             _reseedChecker = null;
-        else
+            _blindCache = null;
+        } else {
             _reseedChecker = new ReseedChecker(context);
-        _blindCache = new BlindCache(context);
-        
+            _blindCache = new BlindCache(context);
+        }
         _localKey = null;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Created KademliaNetworkDatabaseFacade for id: " + dbid);
@@ -221,6 +222,20 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (!isMainDb())
             return null;
         return _reseedChecker;
+    }
+
+    /**
+     * We still always use a single blind cache in the main Db(for now),
+     * see issue #421 on i2pgit.org/i2p-hackers/i2p.i2p for details.
+     * This checks if we're the main DB already and returns our blind
+     * cache if we are. If not, it looks up the main Db and gets it.
+     * 
+     * @return
+     */
+    protected BlindCache blindCache() {
+        if (isMainDb())
+            return _blindCache;
+        return _context.netDb().blindCache();
     }
 
     KBucketSet<Hash> getKBuckets() { return _kb; }
@@ -269,7 +284,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         _exploreKeys.clear();
         if (_negativeCache != null)
             _negativeCache.clear();
-        _blindCache.shutdown();
+        if (isMainDb())
+            blindCache().shutdown();
     }
     
     public synchronized void restart() {
@@ -280,7 +296,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         }
         _ds.restart();
         _exploreKeys.clear();
-        _blindCache.startup();
+        if (isMainDb())
+            blindCache().startup();
 
         _initialized = true;
         
@@ -370,7 +387,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             throw new RuntimeException("Unable to initialize netdb storage", ioe);
         }
         _negativeCache = new NegativeLookupCache(_context);
-        _blindCache.startup();
+        if (isMainDb())
+            blindCache().startup();
         
         createHandlers();
         
@@ -558,7 +576,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      */
     @Override
     public BlindData getBlindData(SigningPublicKey spk) {
-        return _blindCache.getData(spk);
+        return blindCache().getData(spk);
     }
     
     /**
@@ -569,7 +587,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     public void setBlindData(BlindData bd) {
         if (_log.shouldWarn())
             _log.warn("Adding to blind cache: " + bd);
-        _blindCache.addToCache(bd);
+        blindCache().addToCache(bd);
     }
 
     /**
@@ -578,7 +596,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      */
     @Override
     public List<BlindData> getBlindData() {
-        return _blindCache.getData();
+        return blindCache().getData();
     }
 
     /**
@@ -589,7 +607,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      */
     @Override
     public boolean removeBlindData(SigningPublicKey spk) {
-        return _blindCache.removeBlindData(spk);
+        return blindCache().removeBlindData(spk);
     }
 
     /**
@@ -599,7 +617,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      */
     @Override
     public void routingKeyChanged() {
-        _blindCache.rollover();
+        blindCache().rollover();
         if (_log.shouldInfo())
             _log.info("UTC rollover, blind cache updated");
     }
@@ -620,7 +638,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             if (ls.isCurrent(Router.CLOCK_FUDGE_FACTOR)) {
                 return rv;
             } else {
-                key = _blindCache.getHash(key);
+                key = blindCache().getHash(key);
                 fail(key);
             }
         } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
@@ -676,7 +694,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         } else {
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("leaseSet not found locally, running search");
-            key = _blindCache.getHash(key);
+            key = blindCache().getHash(key);
             search(key, onFindJob, onFailedLookupJob, timeoutMs, true, fromLocalDest);
         }
         //if (_log.shouldLog(Log.DEBUG))
@@ -693,7 +711,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      */
     public void lookupLeaseSetRemotely(Hash key, Hash fromLocalDest) {
         if (!_initialized) return;
-        key = _blindCache.getHash(key);
+        key = blindCache().getHash(key);
         if (isNegativeCached(key))
             return;
         search(key, null, null, 20*1000, true, fromLocalDest);
@@ -710,7 +728,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     public void lookupLeaseSetRemotely(Hash key, Job onFindJob, Job onFailedLookupJob,
                                        long timeoutMs, Hash fromLocalDest) {
         if (!_initialized) return;
-        key = _blindCache.getHash(key);
+        key = blindCache().getHash(key);
         if (isNegativeCached(key))
             return;
         search(key, onFindJob, onFailedLookupJob, timeoutMs, true, fromLocalDest);
@@ -728,7 +746,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                 if (ls.isCurrent(Router.CLOCK_FUDGE_FACTOR)) {
                     return ls;
                 } else {
-                    key = _blindCache.getHash(key);
+                    key = blindCache().getHash(key);
                     fail(key);
                     // this was an interesting key, so either refetch it or simply explore with it
                     _exploreKeys.add(key);
@@ -764,7 +782,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                 _log.info("Negative cached, not searching dest: " + key);
             _context.jobQueue().addJob(onFinishedJob);
         } else {
-            key = _blindCache.getHash(key);
+            key = blindCache().getHash(key);
             search(key, onFinishedJob, onFinishedJob, timeoutMs, true, fromLocalDest);
         }
     }
@@ -1120,7 +1138,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             // set dest or key before validate() calls verifySignature() which
             // will do the decryption
             encls = (EncryptedLeaseSet) leaseSet;
-            BlindData bd = _blindCache.getReverseData(leaseSet.getSigningKey());
+            BlindData bd = blindCache().getReverseData(leaseSet.getSigningKey());
             if (bd != null) {
                 if (_log.shouldWarn())
                     _log.warn("Found blind data for encls: " + bd);
@@ -1162,7 +1180,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                 // recursion
                 Destination dest = decls.getDestination();
                 store(dest.getHash(), decls);
-                _blindCache.setBlinded(dest);
+                blindCache().setBlinded(dest);
             }
         } else if (type == DatabaseEntry.KEY_TYPE_LS2 || type == DatabaseEntry.KEY_TYPE_META_LS2) {
              // if it came in via garlic
@@ -1170,7 +1188,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
              if (ls2.isBlindedWhenPublished()) {
                  Destination dest = leaseSet.getDestination();
                  if (dest != null)
-                    _blindCache.setBlinded(dest, null, null);
+                    blindCache().setBlinded(dest, null, null);
             }
         }
 
