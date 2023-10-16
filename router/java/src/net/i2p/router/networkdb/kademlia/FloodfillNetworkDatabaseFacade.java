@@ -42,13 +42,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     private FloodThrottler _floodThrottler;
     private LookupThrottler _lookupThrottler;
     private LookupThrottler _lookupThrottlerBurst;
-    private LookupThrottler _lookupBanner;
-    private LookupThrottler _lookupBannerBurst;
     private final Job _ffMonitor;
-    private final int BAN_LOOKUP_BASE = 75;
-    private final int BAN_LOOKUP_BASE_INTERVAL = 5*60*1000;
-    private final int BAN_LOOKUP_BURST = 10;
-    private final int BAN_LOOKUP_BURST_INTERVAL = 15*1000;
     private final int DROP_LOOKUP_BURST = 10;
     private final int DROP_LOOKUP_BURST_INTERVAL = 30*1000;
 
@@ -103,15 +97,15 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         super.startup();
         if (_ffMonitor != null)
             _context.jobQueue().addJob(_ffMonitor);
-        if (!super.isMainDb())
+        if (!super.isMainDb()){
             isFF = false;
-        else
+            _lookupThrottler = null;
+            _lookupThrottlerBurst = null;
+        } else {
             isFF = _context.getBooleanProperty(FloodfillMonitorJob.PROP_FLOODFILL_PARTICIPANT);
-
-        _lookupThrottler = new LookupThrottler();
-        _lookupBanner = new LookupThrottler(BAN_LOOKUP_BASE, BAN_LOOKUP_BASE_INTERVAL);
-        _lookupThrottlerBurst = new LookupThrottler(DROP_LOOKUP_BURST, DROP_LOOKUP_BURST_INTERVAL);
-        _lookupBannerBurst = new LookupThrottler(BAN_LOOKUP_BURST, BAN_LOOKUP_BURST_INTERVAL);
+            _lookupThrottler = new LookupThrottler();
+            _lookupThrottlerBurst = new LookupThrottler(DROP_LOOKUP_BURST, DROP_LOOKUP_BURST_INTERVAL);
+        }
 
         long down = _context.router().getEstimatedDowntime();
         if (!_context.commSystem().isDummy() &&
@@ -262,19 +256,9 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         return _lookupThrottler == null || _lookupThrottler.shouldThrottle(from, id);
     }
 
-    boolean shouldBanLookup(Hash from, TunnelId id) {
-        // null before startup
-        return _lookupBanner == null || _lookupBanner.shouldThrottle(from, id);
-    }
-
     boolean shouldThrottleBurstLookup(Hash from, TunnelId id) {
         // null before startup
         return _lookupThrottler == null || _lookupThrottlerBurst.shouldThrottle(from, id);
-    }
-
-    boolean shouldBanBurstLookup(Hash from, TunnelId id) {
-        // null before startup
-        return _lookupBanner == null || _lookupBannerBurst.shouldThrottle(from, id);
     }
 
     /**

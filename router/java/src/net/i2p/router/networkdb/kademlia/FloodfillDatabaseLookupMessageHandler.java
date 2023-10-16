@@ -83,38 +83,6 @@ public class FloodfillDatabaseLookupMessageHandler implements HandlerJobBuilder 
             _context.statManager().addRateData("netDb.nonFFLookupsDropped", 1);
             return null;
         }
-
-        // Implementation of the banning of routers based on excessive burst DLM
-        // is pending a reliable way to discriminate between DLM that are sent
-        // and replied directly, and DLM that are forwarded by a router OBEP.
-        /*****
-        if (_facade.shouldBanLookup(dlm.getFrom(), dlm.getReplyTunnel())) {
-            if (_log.shouldLog(Log.WARN)) {
-                _log.warn("[dbid: " + _facade._dbid
-                          + "] Possibly throttling " + dlm.getSearchType()
-                          + " lookup request for " + dlm.getSearchKey()
-                          + " because requests are being sent extremely fast, reply was to: "
-                          + dlm.getFrom() + " tunnel: " + dlm.getReplyTunnel());
-                _context.statManager().addRateData("netDb.repeatedLookupsDropped", 1);
-            }
-        }
-        if (_facade.shouldBanBurstLookup(dlm.getFrom(), dlm.getReplyTunnel())) {
-            if (_log.shouldLog(Log.WARN)) {
-                _log.warn("[dbid: " + _facade._dbid
-                          + "] Banning " + dlm.getSearchType()
-                          + " lookup request for " + dlm.getSearchKey()
-                          + " because requests are being sent extremely fast in a very short time, reply was to: "
-                          + dlm.getFrom() + " tunnel: " + dlm.getReplyTunnel());
-                _context.statManager().addRateData("netDb.repeatedBurstLookupsDropped", 1);
-            }
-            _context.banlist().banlistRouter(dlm.getFrom(), " <b>➜</b> Excessive lookup requests, burst", null,
-                                             _context.banlist().BANLIST_CODE_HARD, null,
-                                             _context.clock().now() + 4*60*60*1000);
-            _context.commSystem().mayDisconnect(dlm.getFrom());
-            _context.statManager().addRateData("netDb.lookupsDropped", 1);
-            return null;
-        }
-        *****/
         if ((!_facade.shouldThrottleLookup(dlm.getFrom(), dlm.getReplyTunnel())
                 && !_facade.shouldThrottleBurstLookup(dlm.getFrom(), dlm.getReplyTunnel()))
                 || _context.routerHash().equals(dlm.getFrom())) {
