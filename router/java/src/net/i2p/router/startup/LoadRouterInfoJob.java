@@ -178,7 +178,7 @@ class LoadRouterInfoJob extends JobImpl {
                         File f = PersistentDataStore.getRouterInfoFile(getContext(), h);
                         f.delete();
                         // the banlist can be called at any time
-                        getContext().banlist().banlistRouterHard(h, "Our previous identity");
+                        getContext().banlist().banlistRouterForever(h, "Our previous identity");
                         _us = null;
                     }
                     if (sigTypeChanged)

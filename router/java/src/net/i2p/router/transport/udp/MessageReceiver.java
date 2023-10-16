@@ -233,7 +233,7 @@ class MessageReceiver {
                     // distinct port of buggy router
                     _transport.sendDestroy(ps, SSU2Util.REASON_BANNED);
                     _transport.dropPeer(ps, true, "Corrupt DSM");
-                    _context.banlist().banlistRouterHard(state.getFrom(),
+                    _context.banlist().banlistRouterForever(state.getFrom(),
                                                             "Sent corrupt message");  // don't bother translating
                 }
             }

@@ -658,7 +658,7 @@ class NewsFetcher extends UpdateRunner {
                 }
                 Hash h = Hash.create(b);
                 if (!ban.isBanlistedHard(h)) {
-                    ban.banlistRouterHard(h, reason);
+                    ban.banlistRouterForever(h, reason);
                     _context.commSystem().forceDisconnect(h);
                 }
             } else {

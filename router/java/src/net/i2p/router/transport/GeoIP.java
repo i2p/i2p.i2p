@@ -758,7 +758,7 @@ public class GeoIP {
         for (Hash h : ctx.netDb().getAllRouters()) {
             String hisCountry = ctx.commSystem().getCountry(h);
             if (country.equals(hisCountry)) {
-                ctx.banlist().banlistRouterHard(h, "In our country");
+                ctx.banlist().banlistRouterForever(h, "In our country");
             }
         }
     }
