@@ -1248,7 +1248,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                 // old i2pd bug, possibly at startup, don't ban forever
                 _context.banlist().banlistRouter(key, "No network specified", null, null, _context.clock().now() + Banlist.BANLIST_DURATION_NO_NETWORK);
             } else {
-                _context.banlist().banlistRouterHard(key, "Not in our network: " + id);
+                _context.banlist().banlistRouterForever(key, "Not in our network: " + id);
             }
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Not in our network: " + routerInfo, new Exception());
@@ -1454,7 +1454,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                         SigType type = kc.getSigType();
                         if (type == null || !type.isAvailable()) {
                             String stype = (type != null) ? type.toString() : Integer.toString(kc.getSigTypeCode());
-                            _context.banlist().banlistRouterHard(h, "Unsupported signature type " + stype);
+                            _context.banlist().banlistRouterForever(h, "Unsupported signature type " + stype);
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Unsupported sig type " + stype + " for router " + h);
                             throw new UnsupportedCryptoException("Sig type " + stype);

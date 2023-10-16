@@ -372,7 +372,7 @@ public class Blocklist {
                                              _context.banlist().BANLIST_CODE_HARD, null,
                                              _context.clock().now() + expireInterval());
         else
-            _context.banlist().banlistRouterHard(peer, reason, comment);
+            _context.banlist().banlistRouterForever(peer, reason, comment);
     }
 
     /**
@@ -1287,7 +1287,7 @@ public class Blocklist {
                                              _context.banlist().BANLIST_CODE_HARD, null,
                                              System.currentTimeMillis()+expireInterval());
         else
-            _context.banlist().banlistRouterHard(peer, reason, reasonComment);
+            _context.banlist().banlistRouterForever(peer, reason, reasonComment);
     }
     private synchronized void banlistRouter(Hash peer, List<byte[]> ips, long duration) {
         // This only checks one file for now, pick the best one

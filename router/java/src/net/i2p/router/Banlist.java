@@ -72,7 +72,7 @@ public class Banlist {
         _entries = new ConcurrentHashMap<Hash, Entry>(16);
         _context.jobQueue().addJob(new Cleanup(_context));
         // i2pd bug?
-        banlistRouterHard(Hash.FAKE_HASH, "Invalid Hash");
+        banlistRouterForever(Hash.FAKE_HASH, "Invalid Hash");
     }
     
     private class Cleanup extends JobImpl {
@@ -149,14 +149,14 @@ public class Banlist {
     /**
      *  @return true if it WAS previously on the list
      */
-    public boolean banlistRouterHard(Hash peer, String reason) {
+    public boolean banlistRouterForever(Hash peer, String reason) {
         return banlistRouter(peer, reason, null, true);
     }
 
     /**
      *  @return true if it WAS previously on the list
      */
-    public boolean banlistRouterHard(Hash peer, String reason, String reasonComment) {
+    public boolean banlistRouterForever(Hash peer, String reason, String reasonComment) {
         return banlistRouter(peer, reason, reasonComment, null, true);
     }
 

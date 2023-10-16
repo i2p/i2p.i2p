@@ -548,7 +548,7 @@ public class NTCPTransport extends TransportImpl {
             if (nid == -1)
                 _context.banlist().banlistRouter(peer, "No network specified", null, null, _context.clock().now() + Banlist.BANLIST_DURATION_NO_NETWORK);
             else
-                _context.banlist().banlistRouterHard(peer, "Not in our network: " + nid);
+                _context.banlist().banlistRouterForever(peer, "Not in our network: " + nid);
             if (_log.shouldWarn())
                 _log.warn("Not in our network: " + toAddress, new Exception());
             markUnreachable(peer);
