@@ -702,7 +702,6 @@ public class IterativeSearchJob extends FloodSearchJob {
         // we will credit the wrong one.
         int tries;
         Hash peer = null;
-        Destination dest = null;
 
         synchronized(this) {
             if (_dead) return;
@@ -714,14 +713,6 @@ public class IterativeSearchJob extends FloodSearchJob {
                 _unheardFrom.clear();
             }
         }
-
-        // Confirm success by checking for the Lease Set in local storage
-        if (_isLease) {
-            dest = getContext().netDb().lookupDestinationLocally(_key);
-            if ((dest == null) && (_log.shouldLog(Log.WARN)))
-                _log.warn("Warning! Lease Set not found in persistent data store for key = " + _key);
-        }
-
 
         _facade.complete(_key);
         if (peer != null) {
