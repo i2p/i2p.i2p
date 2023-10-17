@@ -396,7 +396,7 @@ public class LeaseSet2 extends LeaseSet {
         }
         byte rv[] = out.toByteArray();
         // if we are floodfill and this was published to us
-        if (_receivedAsPublished)
+        if (getReceivedAsPublished())
             _byteified = rv;
         return rv;
     }

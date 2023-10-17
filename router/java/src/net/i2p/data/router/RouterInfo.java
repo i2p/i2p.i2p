@@ -86,19 +86,6 @@ public class RouterInfo extends DatabaseEntry {
     public static final String PROP_CAPABILITIES = "caps";
     public static final char CAPABILITY_HIDDEN = 'H';
     private static final int MAX_ADDRESSES = 16;
-    
-    /**
-     * Hash of the client receiving the routerinfo, or null if it was sent directly.
-     */
-    private Hash _receivedBy;
-
-    public Hash getReceivedBy() {
-        return _receivedBy;
-    }
-
-    public void setReceivedBy(Hash _receivedBy) {
-        this._receivedBy = _receivedBy;
-    }
 
     /** Public string of chars which serve as bandwidth capacity markers
      * NOTE: individual chars defined in Router.java

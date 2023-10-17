@@ -62,8 +62,27 @@ public abstract class DatabaseEntry extends DataStructureImpl {
     // synch: this
     private Hash _currentRoutingKey;
     private long _routingKeyGenMod;
-    protected boolean _receivedAsPublished;
-    protected boolean _receivedAsReply;
+    private boolean _receivedAsPublished;
+    private boolean _receivedAsReply;
+
+    /**
+     * Hash of the client receiving the routerinfo, or null if it was sent directly.
+     */
+    private Hash _receivedBy;
+
+    /**
+     * The Hash of the local client that received this LS,
+     * null if the router or unknown.
+     *
+     * @since 0.9.47
+     */
+    public Hash getReceivedBy() {
+        return _receivedBy;
+    }
+
+    public void setReceivedBy(Hash receivedBy) {
+        this._receivedBy = receivedBy;
+    }
 
     /**
      * A common interface to the timestamp of the two subclasses.
