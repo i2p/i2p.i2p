@@ -258,7 +258,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
 
     boolean shouldThrottleBurstLookup(Hash from, TunnelId id) {
         // null before startup
-        return _lookupThrottler == null || _lookupThrottlerBurst.shouldThrottle(from, id);
+        return _lookupThrottlerBurst == null || _lookupThrottlerBurst.shouldThrottle(from, id);
     }
 
     /**
