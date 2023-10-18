@@ -12,6 +12,7 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
+import net.i2p.router.RouterContext;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageException;
@@ -181,7 +182,7 @@ public class SSUDemo {
     }
     
     private void peerRead(RouterInfo ri) {
-        RouterInfo old = _us.netDbSegmentor().store(ri.getIdentity().calculateHash(), ri);
+        RouterInfo old = _us.netDb().store(ri.getIdentity().calculateHash(), ri);
         if (old == null)
             newPeerRead(ri);
     }
@@ -314,7 +315,7 @@ public class SSUDemo {
             DatabaseStoreMessage m = (DatabaseStoreMessage)_msg;
             System.out.println("RECV: " + m);
             try {
-                _us.netDbSegmentor().store(m.getKey(), (RouterInfo) m.getEntry());
+                _us.netDb().store(m.getKey(), (RouterInfo) m.getEntry());
             } catch (IllegalArgumentException iae) {
                 iae.printStackTrace();
             }

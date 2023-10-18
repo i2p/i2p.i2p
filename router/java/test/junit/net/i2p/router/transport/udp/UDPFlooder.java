@@ -83,7 +83,7 @@ class UDPFlooder implements Runnable {
                     m.setMessageExpiration(_context.clock().now() + 10*1000);
                     m.setUniqueId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
                     if (true) {
-                        RouterInfo to = _context.netDbSegmentor().lookupRouterInfoLocally(peer.getRemotePeer());
+                        RouterInfo to = _context.netDb().lookupRouterInfoLocally(peer.getRemotePeer());
                         if (to == null)
                             continue;
                         OutNetMessage msg = new OutNetMessage(_context, m, m.getMessageExpiration(), 500, to);
