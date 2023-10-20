@@ -18,6 +18,7 @@ dependencies {
     compile project(':core')
     compile project(':router')
     compile project(':installer')
+    compile 'gnu.getopt:java-getopt:1.0.13'
 
     // below were providedCompile
     providedCompile project(':apps:desktopgui')

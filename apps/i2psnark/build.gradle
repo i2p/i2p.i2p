@@ -17,6 +17,9 @@ dependencies {
     compile 'gnu.getopt:java-getopt:1.0.13'
     providedCompile project(':apps:ministreaming')
     providedCompile project(':apps:jetty')
+    // this is not needed except for standalone,
+    // but we build the standalone classes even for non-standalone
+    providedCompile project(':apps:desktopgui')
 }
 
 task i2psnarkJar(type: Jar) {
