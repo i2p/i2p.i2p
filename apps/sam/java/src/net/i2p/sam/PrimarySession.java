@@ -399,6 +399,9 @@ class PrimarySession extends SAMv3StreamSession implements SAMDatagramReceiver, 
 				} else {
 					if (_log.shouldLog(Log.WARN))
 						_log.warn("No subsession found for incoming streaming connection on port " + port);
+					try {
+						i2ps.reset();
+					} catch (IOException ioe) {}
 				}
 			}
 			if (_log.shouldWarn())
