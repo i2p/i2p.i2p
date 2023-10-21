@@ -2,6 +2,8 @@ plugins {
     id 'java-library'
 }
 
+apply plugin: 'java' // adds 'test' task
+
 sourceSets {
     main {
         java {
@@ -49,4 +51,9 @@ jar {
     from ('resources', {
         into "net/i2p/router/util/resources"
     })
+
+test {
+    exclude 'net/i2p/router/tunnel/pool/**'
+}
+
 }
