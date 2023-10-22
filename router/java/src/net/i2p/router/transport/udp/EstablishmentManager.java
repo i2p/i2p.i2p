@@ -2990,10 +2990,9 @@ class EstablishmentManager {
             }
             long now = _context.clock().now();
             int count = 0;
-            // Roughly speaking, the LHMCache will iterate newest-first,
-            // so when we add them back in loadTokens(), the oldest would be at
-            // the head of the map and the newest would be purged first.
-            // Sort them by expiration oldest-first so loadTokens() will
+            // Roughly speaking, the LHMCache will iterate oldest-first,
+            // but to be sure,
+            // sort them by expiration oldest-first so loadTokens() will
             // put them in the LHMCache in the right order.
             TokenComparator comp = new TokenComparator();
             List<Map.Entry<RemoteHostId, Token>> tmp;
