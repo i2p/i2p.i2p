@@ -90,7 +90,7 @@ build_docker:
         # container, thanks to volume mount from config.toml
         DOCKER_TLS_CERTDIR: "/certs"
         # Use TLS https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#tls-enabled
-        DOCKER_HOST: tcp://docker:2376
+        # DOCKER_HOST: tcp://docker:2376
     cache:
         # The same key should be used across branches
         key: "$CI_COMMIT_REF_SLUG"
