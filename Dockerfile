@@ -7,7 +7,6 @@ COPY . .
 
 RUN apk add --virtual build-base gettext tar bzip2 apache-ant openjdk17 \
     && echo "build.built-by=Docker" >> override.properties \
-
     && ant preppkg-linux-only \
     && rm -rf pkg-temp/osid pkg-temp/lib/wrapper pkg-temp/lib/wrapper.* \
     && apk del build-base gettext tar bzip2 apache-ant openjdk17
