@@ -15,7 +15,7 @@ RUN apk add --virtual build-base gettext tar bzip2 apache-ant openjdk17 \
 FROM alpine:3.17.1
 ENV APP_HOME="/i2p"
 
-RUN apk add openjdk17-jre ttf-dejavu
+RUN apk add openjdk17-jre ttf-dejavu git
 
 WORKDIR ${APP_HOME}
 COPY --from=builder /tmp/build/pkg-temp .
