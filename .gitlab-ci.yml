@@ -72,7 +72,7 @@ build_docker:
         - docker load -i ci-exports/$CI_COMMIT_REF_SLUG.tar || docker pull $CI_REGISTRY_IMAGE:latest || true
         - docker build --cache-from $CI_REGISTRY_IMAGE:latest --tag $CI_REGISTRY_IMAGE:latest .
         - mkdir -p ci-exports/
-        - docker save $CI_REGISTRY_IMAGE:latest > ci-exports/$CI_COMMIT_REF_SLUG.tar
+        - echo docker save $CI_REGISTRY_IMAGE:latest > ci-exports/$CI_COMMIT_REF_SLUG.tar
     variables:
         # When using dind service, we need to instruct docker to talk with
         # the daemon started inside of the service. The daemon is available
