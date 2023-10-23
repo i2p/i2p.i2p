@@ -64,9 +64,9 @@ test:ant:
 # It's cached for later jobs
 build_docker:
     stage: build
-    image: docker:19.03.12
+    image: docker:24.0.6
     services:
-        - docker:19.03.12-dind
+        - docker:24.0.6-dind
     script:
         # Try to load latest branch image from local tar or from registry
         - docker load -i ci-exports/$CI_COMMIT_REF_SLUG.tar || docker pull $CI_REGISTRY_IMAGE:latest || true
