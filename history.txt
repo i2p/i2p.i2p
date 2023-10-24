@@ -1,4 +1,23 @@
-2023-10-11 zzz
+2023-10-24 zzz
+ * Netdb: Subdb lifecycle fixes (Gitlab #406)
+   - Disable RefreshRoutersJob for subdbs
+   - Cancel ExpireRoutersJob and ExpireLeasesJob at netdb shutdown
+   - Do not run ExpireRoutersJob at shutdown for subdbs
+   - Do not create _exploreKeys HashMap for subdbs, and add checks for subdbs
+   - Convert NegativeLookupCache timer to SimpleTimer2 so we may cancel it
+   - Add method to cancel NegativeLookupCache timer; cancel it when netdb shuts down
+
+2023-10-21 zzz
+ * Tests: Disable console scala tests in gradle tests
+
+2023-10-21 zzz
+ * SAM: Reset incoming socket if no subsession is matched (Gitlab #456)
+ * Tests: Exclude BuildMessageTestStandalone from gradle tests
+
+2023-10-20 zzz
+ * Build: Gradle build fixes
+
+2023-10-12 zzz
  * i2ptunnel: HTTPResponseOutputStream cleanups
 
 2023-10-10 zzz
