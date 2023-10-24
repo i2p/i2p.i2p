@@ -100,11 +100,6 @@ public class PersistentDataStore extends TransientDataStore {
     }
     
     @Override
-    public void restart() {
-        super.restart();
-    }
-    
-    @Override
     public void rescan() {
         if (_initialized)
             _readJob.wakeup();
