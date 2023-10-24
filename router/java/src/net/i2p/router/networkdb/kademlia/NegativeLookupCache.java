@@ -7,7 +7,6 @@ import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.util.LHMCache;
 import net.i2p.util.ObjectCounter;
-import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
 
 /**
@@ -19,6 +18,8 @@ class NegativeLookupCache {
     private final ObjectCounter<Hash> counter;
     private final Map<Hash, Destination> badDests;
     private final int _maxFails;
+    private final SimpleTimer2.TimedEvent cleaner;
+    private final long cleanTime;
     
     static final int MAX_FAILS = 3;
     private static final int MAX_BAD_DESTS = 128;
@@ -28,8 +29,8 @@ class NegativeLookupCache {
         this.counter = new ObjectCounter<Hash>();
         this.badDests = new LHMCache<Hash, Destination>(MAX_BAD_DESTS);
         this._maxFails = context.getProperty("netdb.negativeCache.maxFails",MAX_FAILS);
-        final long cleanTime = context.getProperty("netdb.negativeCache.cleanupInterval", CLEAN_TIME);
-        SimpleTimer2.getInstance().addPeriodicEvent(new Cleaner(), cleanTime);
+        cleanTime = context.getProperty("netdb.negativeCache.cleanupInterval", CLEAN_TIME);
+        cleaner = new Cleaner(context.simpleTimer2());
     }
 
     public void lookupFailed(Hash h) {
@@ -88,9 +89,29 @@ class NegativeLookupCache {
         }
     }
 
-    private class Cleaner implements SimpleTimer.TimedEvent {
+    /**
+     *  Stops the timer. May not be restarted.
+     *
+     *  @since 0.9.60
+     */
+    public void stop() {
+        clear();
+        cleaner.cancel();
+    }
+
+    private class Cleaner extends SimpleTimer2.TimedEvent {
+        /**
+         *  Schedules itself.
+         *
+         *  @since 0.9.60
+         */
+        public Cleaner(SimpleTimer2 pool) {
+            super(pool, cleanTime);
+        }
+
         public void timeReached() {
-            NegativeLookupCache.this.counter.clear();
+            counter.clear();
+            reschedule(cleanTime);
         }
     }
 }

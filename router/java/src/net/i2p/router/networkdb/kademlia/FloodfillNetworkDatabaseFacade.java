@@ -60,9 +60,19 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     private static final long NEXT_RKEY_LS_ADVANCE_TIME = 10*60*1000;
     private static final int NEXT_FLOOD_QTY = 2;
     
+    /**
+     *  Main DB
+     */
     public FloodfillNetworkDatabaseFacade(RouterContext context) {
         this(context, FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
     }
+
+    /**
+     *  Sub DBs
+     *
+     *  @param dbid null for main DB
+     *  @since 0.9.60
+     */
     public FloodfillNetworkDatabaseFacade(RouterContext context, Hash dbid) {
         super(context, dbid);
         _activeFloodQueries = new HashMap<Hash, FloodSearchJob>();
@@ -85,7 +95,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         // for ISJ
         _context.statManager().createRateStat("netDb.RILookupDirect", "Was an iterative RI lookup sent directly?", "NetworkDatabase", rate);
         // No need to start the FloodfillMonitorJob for client subDb.
-        if (!super.isMainDb())
+        if (!isMainDb())
             _ffMonitor = null;
         else
             _ffMonitor = new FloodfillMonitorJob(_context, this);
@@ -97,10 +107,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         super.startup();
         if (_ffMonitor != null)
             _context.jobQueue().addJob(_ffMonitor);
-        if (!super.isMainDb()){
+        if (!isMainDb()) {
             isFF = false;
-            _lookupThrottler = null;
-            _lookupThrottlerBurst = null;
         } else {
             isFF = _context.getBooleanProperty(FloodfillMonitorJob.PROP_FLOODFILL_PARTICIPANT);
             _lookupThrottler = new LookupThrottler();
@@ -108,7 +116,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         }
 
         long down = _context.router().getEstimatedDowntime();
-        if (!_context.commSystem().isDummy() &&
+        if (!_context.commSystem().isDummy() && isMainDb() &&
             (down == 0 || (!isFF && down > 30*60*1000) || (isFF && down > 24*60*60*1000))) {
             // refresh old routers
             Job rrj = new RefreshRoutersJob(_context, this);
@@ -120,7 +128,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     @Override
     protected void createHandlers() {
        // Only initialize the handlers for the flooodfill netDb.
-       if (super.isMainDb()) {
+       if (isMainDb()) {
             if (_log.shouldInfo())
                 _log.info("[dbid: " + super._dbid +  "] Initializing the message handlers");
             _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseLookupMessage.MESSAGE_TYPE, new FloodfillDatabaseLookupMessageHandler(_context, this));

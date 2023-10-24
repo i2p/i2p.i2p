@@ -34,7 +34,7 @@ public class Restarter implements Runnable {
         log.logAlways(Log.WARN, "Restarted the tunnel manager");
 
         //try { _context.peerManager().restart(); } catch (Throwable t) { log.log(Log.CRIT, "Error restarting the peer manager", t); }
-        //try { _context.netDbSegmentor().restart(); } catch (Throwable t) { log.log(Log.CRIT, "Error restarting the networkDb", t); }
+        //try { _context.netDb().restart(); } catch (Throwable t) { log.log(Log.CRIT, "Error restarting the networkDb", t); }
         //try { _context.jobQueue().restart(); } catch (Throwable t) { log.log(Log.CRIT, "Error restarting the job queue", t); }
     
         try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}

@@ -30,7 +30,6 @@ public interface DataStore {
     /** @since 0.8.3 */
     public Set<Map.Entry<Hash, DatabaseEntry>> getMapEntries();
     public void stop();
-    public void restart();
     public void rescan();
     public int countLeaseSets();
 
