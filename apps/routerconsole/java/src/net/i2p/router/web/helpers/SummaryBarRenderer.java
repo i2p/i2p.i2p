@@ -907,7 +907,7 @@ class SummaryBarRenderer {
            .append(_t("The number of peers available for network database inquiries"))
            .append("\">" +
                    "<td align=\"left\"><b>")
-           .append(_t("Integrated"))
+           .append(_t("Floodfill"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getWellIntegratedPeers())
            .append("</td></tr>\n" +
@@ -920,8 +920,6 @@ class SummaryBarRenderer {
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getAllPeers())
            .append("</td></tr>\n" +
-
-                   "<tr class=\"separator\"><td colspan=\"2\"><hr></td></tr>" +
 
                    "<tr title=\"")
            .append(_t("The number of banned peers"))
