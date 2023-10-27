@@ -1185,8 +1185,6 @@ class ClientConnectionRunner {
      * @since 0.9.60
      */
     public FloodfillNetworkDatabaseFacade getFloodfillNetworkDatabaseFacade() {
-        if (!_context.netDbSegmentor().useSubDbs())
-            return _context.netDb();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("getFloodfillNetworkDatabaseFacade is getting the subDb for dbid: " + this.getDestHash());
         if (_floodfillNetworkDatabaseFacade == null) {
