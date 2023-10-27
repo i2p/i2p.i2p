@@ -86,14 +86,6 @@ public abstract class SegmentedNetworkDatabaseFacade {
      */
     public abstract FloodfillNetworkDatabaseFacade mainNetDB();
     /**
-     * Get the multihome netDb, the one which is used if we're a floodfill AND we
-     * have a multihome address sent to us
-     * 
-     * @return may be null if the multihome netDb is not initialized
-     * @since 0.9.60
-     */
-    public abstract FloodfillNetworkDatabaseFacade multiHomeNetDB();
-    /**
      * Get a client netDb for a given client Hash identifier. Will never
      * return the mainNetDB.
      * 

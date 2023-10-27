@@ -23,17 +23,15 @@ import net.i2p.util.Log;
  * are identified by the hash of the primary session belonging to the client who "owns"
  * a particular sub-netDb.
  * 
- * There are 3 "Special" netDbs which have non-hash names:
+ * There is one "Special" netDb which has a non-hash name. This is used for the operation of
+ * router itself and not clients, in particular when acting as a floodfill:
  * 
  *  - Main NetDB: This is the netDb we use if or when we become a floodfill, and for
  *  direct interaction with other routers on the network, such as when we are communicating
  *  with a floodfill.
- *  - Multihome NetDB: This is used to stash leaseSets for our own sites when they are
- *  sent to us by a floodfill, so that we can reply when they are requested back from us
- *  regardless of our closeness to them in the routing table.
- *  - Exploratory NetDB: This is used when we want to stash a DatabaseEntry for a key
- *  during exploration but don't want it to go into the Main NetDB until we do something
- *  else with it.
+ * 
+ * It is possible that it may be advantageous some day to have other netDb's for specific use
+ * cases, but that is not the purpose of this class at this time.
  * 
  * And there are an unlimited number of "Client" netDbs. These sub-netDbs are
  * intended to contain only the information required to operate them, and as such
@@ -54,9 +52,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
     private RouterContext _context;
     private static final String PROP_NETDB_ISOLATION = "router.netdb.isolation";
     public static final Hash MAIN_DBID = null;
-    public static final Hash MULTIHOME_DBID = Hash.FAKE_HASH;
     private final FloodfillNetworkDatabaseFacade _mainDbid;
-    private final FloodfillNetworkDatabaseFacade _multihomeDbid;
 
     /**
      * Construct a new FloodfillNetworkDatabaseSegmentor with the given
@@ -71,7 +67,6 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         if (_context == null)
             _context = context;
         _mainDbid = new FloodfillNetworkDatabaseFacade(_context, MAIN_DBID);
-        _multihomeDbid = new FloodfillNetworkDatabaseFacade(_context, MULTIHOME_DBID);
     }
 
     public boolean useSubDbs() {
@@ -103,8 +98,6 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("shutdown called from FNDS, shutting down main and multihome db");
         _mainDbid.shutdown();
-        if (useSubDbs())
-            _multihomeDbid.shutdown();
     }
 
     /**
@@ -117,8 +110,6 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("startup called from FNDS, starting up main and multihome db");
         _mainDbid.startup();
-        if (useSubDbs())
-            _multihomeDbid.startup();
     }
 
     /**
@@ -257,17 +248,6 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
     }
 
     /**
-     * get the multiHome netDb, which is especially for handling multihomes
-     * 
-     * @since 0.9.60
-     * @return may be null
-     */
-    @Override
-    public FloodfillNetworkDatabaseFacade multiHomeNetDB() {
-        return _multihomeDbid;
-    }
-
-    /**
      * get the client netDb for the given id
      * Will return the "exploratory(default client)" netDb if
      * the dbid is null.
@@ -333,7 +313,6 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
             return rv;
         }
         rv.add(_mainDbid);
-        rv.add(multiHomeNetDB());
         rv.addAll(_context.clientManager().getClientFloodfillNetworkDatabaseFacades());
         return rv;
     }

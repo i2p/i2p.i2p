@@ -101,11 +101,6 @@ public class DummyNetworkDatabaseFacade extends SegmentedNetworkDatabaseFacade {
     }
 
     @Override
-    public FloodfillNetworkDatabaseFacade multiHomeNetDB() {
-        return _fndb;
-    }
-
-    @Override
     public FloodfillNetworkDatabaseFacade clientNetDB(Hash id) {
         return _fndb;
     }
