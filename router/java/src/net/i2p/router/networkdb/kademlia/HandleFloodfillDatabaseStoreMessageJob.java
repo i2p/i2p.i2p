@@ -151,9 +151,9 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                     // If we're using subdbs, store the leaseSet in the multihome DB.
                     // otherwise, throw rather than return, so that we send the ack below (prevent easy attack)
                     dontBlamePeer = true;
-                    if (getContext().netDbSegmentor().useSubDbs())
-                        getContext().multihomeNetDb().store(key, ls);
-                    else
+                    //if (getContext().netDbSegmentor().useSubDbs())
+                        //getContext().multihomeNetDb().store(key, ls);
+                    //else
                         throw new IllegalArgumentException("(dbid: " + _facade._dbid
                                                        + ") Peer attempted to store local leaseSet: "
                                                        + key.toBase32());
