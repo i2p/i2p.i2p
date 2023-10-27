@@ -866,24 +866,22 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             _log.error("locally published leaseSet is not valid?", iae);
             throw iae;
         }
-        if (!_context.netDbSegmentor().useSubDbs()){
-            String dbid = "main netDb";
-            if (isClientDb()) {
-                dbid = "client netDb: " + _dbid;
-            }
-            if (_localKey != null) {
-                if (!_localKey.equals(localLeaseSet.getHash()))
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("[" + dbid + "]" + "Error, the local LS hash ("
-                                + _localKey + ") does not match the published hash ("
-                                + localLeaseSet.getHash() + ")! This shouldn't happen!",
-                                new Exception());
-            } else {
-                // This will only happen once when the local LS is first published
-                _localKey = localLeaseSet.getHash();
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("[" + dbid + "]" + "Local client LS key initialized to: " + _localKey);
-            }
+        String dbid = "main netDb";
+        if (isClientDb()) {
+            dbid = "client netDb: " + _dbid;
+        }
+        if (_localKey != null) {
+            if (!_localKey.equals(localLeaseSet.getHash()))
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("[" + dbid + "]" + "Error, the local LS hash ("
+                            + _localKey + ") does not match the published hash ("
+                            + localLeaseSet.getHash() + ")! This shouldn't happen!",
+                            new Exception());
+        } else {
+            // This will only happen once when the local LS is first published
+            _localKey = localLeaseSet.getHash();
+            if (_log.shouldLog(Log.INFO))
+                _log.info("[" + dbid + "]" + "Local client LS key initialized to: " + _localKey);
         }
         if (!_context.clientManager().shouldPublishLeaseSet(h))
             return;
