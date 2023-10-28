@@ -777,8 +777,9 @@ class ClientManager {
      * get the FloodfillNetworkDatabaseFacade associated with a particular client destination.
      * This is inside the runner, so it won't be there if the runner isn't ready.
      * 
-     * @param destHash destination hash associated with the client who's subDb we're looking for
-     * @return may be null if it does not exist and the main netDb is not initialized
+     * @param destHash destination hash associated with the client who's subDb we're looking for, may be null
+     * @return will be null if desthash is null or client does not exist or its netDb is not initialized
+     * @since 0.9.60
      */
     public FloodfillNetworkDatabaseFacade getClientFloodfillNetworkDatabaseFacade(Hash destHash) {
         if (destHash != null) {
@@ -801,15 +802,14 @@ class ClientManager {
      * get all of the FloodfillNetworkDatabaseFacades for all of the clients.
      * 
      * @return non-null
+     * @since 0.9.60
      */
     public Set<FloodfillNetworkDatabaseFacade> getClientFloodfillNetworkDatabaseFacades() {
         Set<FloodfillNetworkDatabaseFacade> rv = new HashSet<FloodfillNetworkDatabaseFacade>();
         for (ClientConnectionRunner runner : _runners.values()) {
-            if (runner != null){
-                FloodfillNetworkDatabaseFacade fndf = runner.getFloodfillNetworkDatabaseFacade();
-                if (fndf != null)
-                    rv.add(fndf);
-            }
+            FloodfillNetworkDatabaseFacade fndf = runner.getFloodfillNetworkDatabaseFacade();
+            if (fndf != null)
+                rv.add(fndf);
         }
         return rv;
     }
@@ -817,7 +817,8 @@ class ClientManager {
     /**
      * get all the primary hashes for all the clients and return them as a set
      * 
-     * @return
+     * @return non-null
+     * @since 0.9.60
      */
     public Set<Hash> getPrimaryHashes() {
         Set<Hash> rv = new HashSet<Hash>();
