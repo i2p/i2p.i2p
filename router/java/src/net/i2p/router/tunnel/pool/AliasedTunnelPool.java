@@ -9,6 +9,7 @@ import net.i2p.data.TunnelId;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelPoolSettings;
+import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.util.Log;
 
 /**
@@ -115,9 +116,14 @@ public class AliasedTunnelPool extends TunnelPool {
 
     @Override
     protected LeaseSet locked_buildNewLeaseSet() {
-        LeaseSet ls =  _context.clientNetDb(_aliasOf.getSettings().getDestination()).lookupLeaseSetLocally(_aliasOf.getSettings().getDestination());
-        if (ls == null)
+        Hash primary = _aliasOf.getSettings().getDestination();
+        NetworkDatabaseFacade db =  _context.clientNetDb(primary);
+        LeaseSet ls =  db.lookupLeaseSetLocally(primary);
+        if (ls == null) {
+            if (_log.shouldWarn())
+                _log.warn("No primary LS " + primary + " to copy for " + getSettings().getDestination() + " in db " + db);
             return null;
+        }
         // copy everything so it isn't corrupted
         LeaseSet rv = new LeaseSet();
         for (int i = 0; i < ls.getLeaseCount(); i++) {

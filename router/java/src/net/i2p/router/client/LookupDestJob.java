@@ -21,6 +21,7 @@ import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.data.i2cp.SessionId;
 import net.i2p.router.JobImpl;
+import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -91,7 +92,7 @@ class LookupDestJob extends JobImpl {
                         try {
                             bd = Blinding.decode(context, b);
                             SigningPublicKey spk = bd.getUnblindedPubKey();
-                            BlindData bd2 = _runner.getFloodfillNetworkDatabaseFacade().getBlindData(spk);
+                            BlindData bd2 = getContext().netDb().getBlindData(spk);
                             if (bd2 != null) {
                                 // BlindData from database may have privkey or secret
                                 // check if we need it but don't have it
@@ -110,7 +111,7 @@ class LookupDestJob extends JobImpl {
                                 long exp = now + ((bd.getAuthRequired() || bd.getSecretRequired()) ? 365*24*60*60*1000L
                                                                                                    :  90*24*68*60*1000L);
                                 bd.setExpiration(exp);
-                                _runner.getFloodfillNetworkDatabaseFacade().setBlindData(bd);
+                                getContext().netDb().setBlindData(bd);
                             }
                             h = bd.getBlindedHash();
                             if (_log.shouldDebug())
@@ -185,7 +186,10 @@ class LookupDestJob extends JobImpl {
             if (timeout > 1500)
                 timeout -= 500;
             // TODO tell router this is an encrypted lookup, skip 38 or earlier ffs?
-            _runner.getFloodfillNetworkDatabaseFacade().lookupDestination(_hash, done, timeout, _fromLocalDest);
+            NetworkDatabaseFacade db = _runner.getFloodfillNetworkDatabaseFacade();
+            if (db == null)
+                db = getContext().netDb();
+            db.lookupDestination(_hash, done, timeout, _fromLocalDest);
         } else {
             // blinding decode fail
             returnFail(HostReplyMessage.RESULT_DECRYPTION_FAILURE);
@@ -204,10 +208,13 @@ class LookupDestJob extends JobImpl {
         }
         public String getName() { return "LeaseSet Lookup Reply to Client"; }
         public void runJob() {
-            Destination dest = _runner.getFloodfillNetworkDatabaseFacade().lookupDestinationLocally(_hash);
+            NetworkDatabaseFacade db = _runner.getFloodfillNetworkDatabaseFacade();
+            if (db == null)
+                db = getContext().netDb();
+            Destination dest = db.lookupDestinationLocally(_hash);
             if (dest == null && _blindData != null) {
                 // TODO store and lookup original hash instead
-                LeaseSet ls = _runner.getFloodfillNetworkDatabaseFacade().lookupLeaseSetLocally(_hash);
+                LeaseSet ls = db.lookupLeaseSetLocally(_hash);
                 if (ls != null && ls.getType() == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
                     // already decrypted
                     EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
