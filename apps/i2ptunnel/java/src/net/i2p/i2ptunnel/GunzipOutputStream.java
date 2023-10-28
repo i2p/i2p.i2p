@@ -1,5 +1,6 @@
 package net.i2p.i2ptunnel;
 
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.CRC32;
@@ -16,41 +17,39 @@ import net.i2p.data.DataHelper;
  * Note that the underlying InflaterOutputStream cannot be reused after close(),
  * so we don't have a Reusable version of this.
  *
+ * Sets up GunzipOutputStream -- InflaterOutputStream -- CRC32OutputStream -- uncompressedStream
+ *
+ * Not a public API, subject to change, not for external use.
+ *
  * Modified from net.i2p.util.ResettableGZIPInputStream to use Java 6 InflaterOutputstream
  * @since 0.9.21, public since 0.9.50 for LocalHTTPServer
  */
 public class GunzipOutputStream extends InflaterOutputStream {
     private static final int FOOTER_SIZE = 8; // CRC32 + ISIZE
-    private final CRC32 _crc32;
     private final byte _buf1[] = new byte[1];
     private boolean _complete;
+    private boolean _validated;
     private final byte _footer[] = new byte[FOOTER_SIZE];
     private long _bytesReceived;
     private long _bytesReceivedAtCompletion;
-    
+
     private enum HeaderState { MB1, MB2, CF, MT0, MT1, MT2, MT3, EF, OS, FLAGS,
                                EH1, EH2, EHDATA, NAME, COMMENT, CRC1, CRC2, DONE }
     private HeaderState _state = HeaderState.MB1;
     private int _flags;
     private int _extHdrToRead;
-    
+
     /**
      * Build a new Gunzip stream
      */
     public GunzipOutputStream(OutputStream uncompressedStream) throws IOException {
-        super(uncompressedStream, new Inflater(true));
-        _crc32 = new CRC32();
+        super(new CRC32OutputStream(uncompressedStream), new Inflater(true));
     }
-    
+
     @Override
     public void write(int b) throws IOException {
         _buf1[0] = (byte) b;
         write(_buf1, 0, 1);
-    }
-    
-    @Override
-    public void write(byte buf[]) throws IOException {
-        write(buf, 0, buf.length);
     }
 
     @Override
@@ -71,20 +70,21 @@ public class GunzipOutputStream extends InflaterOutputStream {
                 super.write(buf, i, 1);
                 if (inf.finished()) {
                     isFinished = true;
-                    _bytesReceivedAtCompletion = _bytesReceived;
+                    _bytesReceivedAtCompletion = _bytesReceived + 1;
                 }
             }
             _footer[(int) (_bytesReceived++ % FOOTER_SIZE)] = buf[i];
             if (isFinished) {
-                long footerSize = _bytesReceivedAtCompletion - _bytesReceived;
+                long footerSize = _bytesReceived - _bytesReceivedAtCompletion;
                 // could be at 7 or 8...
                 // we write the first byte of the footer to the Inflater if necessary...
                 // see comments in ResettableGZIPInputStream for details
                 if (footerSize >= FOOTER_SIZE - 1) {
+                    flush();
                     try {
                         verifyFooter();
-                        inf.reset(); // so it doesn't bitch about missing data...
                         _complete = true;
+                        _validated = true;
                         return;
                     } catch (IOException ioe) {
                         // failed at 7, retry at 8
@@ -97,7 +97,7 @@ public class GunzipOutputStream extends InflaterOutputStream {
             }
         }
     }
-    
+
     /**
      *  Inflater statistic
      */
@@ -154,21 +154,23 @@ public class GunzipOutputStream extends InflaterOutputStream {
 
     @Override
     public String toString() { 
-        return "GOS read: " + getTotalRead() + " expanded: " + getTotalExpanded() + " remaining: " + getRemaining() + " finished: " + getFinished();
+        return "GunzipOutputStream read: " + getTotalRead() + " expanded: " + getTotalExpanded() +
+               " remaining: " + getRemaining() + " finished: " + getFinished() +
+               " footer complete: " + _complete + " validated: " + _validated;
     }
 
     /**
      *  @throws IOException on CRC or length check fail
      */
     private void verifyFooter() throws IOException {
-        int idx = (int) (_bytesReceivedAtCompletion % FOOTER_SIZE);
+        int idx = (int) (_bytesReceived % FOOTER_SIZE);
         byte[] footer;
         if (idx == 0) {
             footer = _footer;
         } else {
             footer = new byte[FOOTER_SIZE];
             for (int i = 0; i < FOOTER_SIZE; i++) {
-                footer[i] = _footer[(int) ((_bytesReceivedAtCompletion + i) % FOOTER_SIZE)];
+                footer[i] = _footer[(int) ((_bytesReceived + i) % FOOTER_SIZE)];
             }
         }
         
@@ -176,12 +178,12 @@ public class GunzipOutputStream extends InflaterOutputStream {
         long expectedSize = DataHelper.fromLongLE(footer, 4, 4);
         if (expectedSize != actualSize)
             throw new IOException("gunzip expected " + expectedSize + " bytes, got " + actualSize);
-        
-        long actualCRC = _crc32.getValue();
+
+        long actualCRC = ((CRC32OutputStream) out).getValue();
         long expectedCRC = DataHelper.fromLongLE(footer, 0, 4);
         if (expectedCRC != actualCRC)
             throw new IOException("gunzip CRC fail expected 0x" + Long.toHexString(expectedCRC) +
-                                  " bytes, got 0x" + Long.toHexString(actualCRC));
+                                  ", got 0x" + Long.toHexString(actualCRC));
     }
 
     /**
@@ -323,6 +325,36 @@ public class GunzipOutputStream extends InflaterOutputStream {
         }
     }
 
+    /**
+     *  Calculate CRC32 along the way
+     *  @since 0.9.60
+     */
+    private static class CRC32OutputStream extends FilterOutputStream {
+
+        private final CRC32 _crc32;
+
+        public CRC32OutputStream(OutputStream out) {
+            super(out);
+            _crc32 = new CRC32();
+        }
+
+        @Override
+        public void write(int c) throws IOException {
+            _crc32.update(c);
+            super.write(c);
+        }
+
+        @Override
+        public void write(byte buf[], int off, int len) throws IOException {
+            _crc32.update(buf, off, len);
+            out.write(buf, off, len);
+        }
+
+        public long getValue() {
+            return _crc32.getValue();
+        }
+    }
+
 /****
     public static void main(String args[]) {
         java.util.Random r = new java.util.Random();
@@ -331,7 +363,7 @@ public class GunzipOutputStream extends InflaterOutputStream {
             r.nextBytes(b);
             if (!test(b)) return;
         }
-        for (int i = 1; i < 64*1024; i+= 29) {
+        for (int i = 1050; i < 64*1024; i+= 529) {
             byte[] b = new byte[i];
             r.nextBytes(b);
             if (!test(b)) return;
