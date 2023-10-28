@@ -50,7 +50,6 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     /** we ignore any potential \r, since we trim it on write anyway */
     private static final byte NL = '\n';
     private static final byte[] CONNECTION_CLOSE = DataHelper.getASCII("Connection: close\r\n");
-    private static final byte[] PROXY_CONNECTION_CLOSE = DataHelper.getASCII("Proxy-Connection: close\r\n");
     private static final byte[] CRLF = DataHelper.getASCII("\r\n");
     
     public HTTPResponseOutputStream(OutputStream raw) {
@@ -145,7 +144,6 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         String responseLine = null;
 
         boolean connectionSent = false;
-        boolean proxyConnectionSent = false;
         
         int lastEnd = -1;
         byte[] data = _headerBuffer.getData();
@@ -181,14 +179,12 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                                 if (val.toLowerCase(Locale.US).contains("upgrade")) {
                                     // pass through for websocket
                                     out.write(DataHelper.getASCII("Connection: " + val + "\r\n"));
-                                    proxyConnectionSent = true;
                                 } else {
                                     out.write(CONNECTION_CLOSE);
                                 }
                                 connectionSent = true;
                             } else if ("proxy-connection".equals(lcKey)) {
-                                out.write(PROXY_CONNECTION_CLOSE);
-                                proxyConnectionSent = true;
+                                // Nonstandard, strip
                             } else if ("content-encoding".equals(lcKey) && "x-i2p-gzip".equals(val.toLowerCase(Locale.US))) {
                                 _gzip = true;
                             } else if ("proxy-authenticate".equals(lcKey)) {
@@ -231,8 +227,6 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         
         if (!connectionSent)
             out.write(CONNECTION_CLOSE);
-        if (!proxyConnectionSent)
-            out.write(PROXY_CONNECTION_CLOSE);
             
         finishHeaders();
 

@@ -2,7 +2,6 @@ HTTP/1.1 400 Destination Not Found
 Content-Type: text/html; charset=UTF-8
 Cache-Control: no-cache
 Connection: close
-Proxy-Connection: close
 X-XSS-Protection: 1; mode=block
 X-Content-Type-Options: nosniff
 Referrer-Policy: no-referrer

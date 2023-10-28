@@ -52,7 +52,6 @@ public abstract class LocalHTTPServer {
          "HTTP/1.1 404 Not Found\r\n"+
          "Content-Type: text/plain\r\n"+
          "Connection: close\r\n"+
-         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "HTTP Proxy local file not found";
 
@@ -60,7 +59,6 @@ public abstract class LocalHTTPServer {
          "HTTP/1.1 409 Bad\r\n"+
          "Content-Type: text/plain\r\n"+
          "Connection: close\r\n"+
-         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "Add to addressbook failed - bad parameters";
 
@@ -68,7 +66,6 @@ public abstract class LocalHTTPServer {
          "HTTP/1.1 400 Bad\r\n"+
          "Content-Type: text/plain\r\n"+
          "Connection: close\r\n"+
-         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "B32 update failed - bad parameters";
 
@@ -77,7 +74,6 @@ public abstract class LocalHTTPServer {
          "Content-Type: text/plain\r\n" +
          "Cache-Control: max-age=86400\r\n" +
          "Connection: close\r\n"+
-         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "I2P HTTP proxy OK";
 
@@ -87,7 +83,6 @@ public abstract class LocalHTTPServer {
          "Referrer-Policy: no-referrer\r\n"+
          "Cache-Control: no-cache\r\n" +
          "Connection: close\r\n"+
-         "Proxy-Connection: close\r\n"+
          "\r\n";
 
     /**
@@ -150,7 +145,7 @@ public abstract class LocalHTTPServer {
                     out.write(type.getBytes("UTF-8"));
                     if (allowGzip && filename.endsWith(".gz"))
                         out.write("\r\nContent-Encoding: gzip".getBytes("UTF-8"));
-                    out.write("\r\nCache-Control: max-age=86400\r\nConnection: close\r\nProxy-Connection: close\r\n\r\n".getBytes("UTF-8"));
+                    out.write("\r\nCache-Control: max-age=86400\r\nConnection: close\r\n\r\n".getBytes("UTF-8"));
                     if (!allowGzip && filename.endsWith(".gz")) {
                         // gunzip on the fly. should be very rare, all browsers should support gzip
                         OutputStream out2 = new GunzipOutputStream(out);
@@ -370,7 +365,6 @@ public abstract class LocalHTTPServer {
                   "Content-Type: text/html; charset=UTF-8\r\n"+
                   "Referrer-Policy: no-referrer\r\n"+
                   "Connection: close\r\n"+
-                  "Proxy-Connection: close\r\n"+
                   "\r\n"+
                   "<html><head>"+
                   "<title>" + _t("Redirecting to {0}", idn) + "</title>\n" +
@@ -405,7 +399,6 @@ public abstract class LocalHTTPServer {
                   "Content-Type: text/html; charset=UTF-8\r\n"+
                   "Referrer-Policy: no-referrer\r\n"+
                   "Connection: close\r\n"+
-                  "Proxy-Connection: close\r\n"+
                   "\r\n"+
                   "<html><head>"+
                   "<title>" + _t("Redirecting to {0}", idn) + "</title>\n" +
