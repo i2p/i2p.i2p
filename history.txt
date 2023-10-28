@@ -1,3 +1,15 @@
+2023-10-28 zzz
+ * i2ptunnel:
+   - Remove nonstandard Proxy-Connection headers (Gitlab #452)
+   - Fix gzip footer check in GunzipOutputStream (Gitlab #458)
+ * NetDB: Fix lifecycle issues for subsessions (Gitlab #460, #406)
+   - Don't create subdb for subsession and lose ref for primary subsession;
+   - Simplify CCR.getFNDF() to simply return the subdb or null; nothing else is necessary
+   - Do not unpublish LS from main db on session shutdown; not necessary, it is not in there
+
+2023-10-25 zzz
+ * Console: Tweaks to advanced peers summary bar section
+
 2023-10-24 zzz
  * Netdb: Subdb lifecycle fixes (Gitlab #406)
    - Disable RefreshRoutersJob for subdbs
