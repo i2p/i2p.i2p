@@ -3,7 +3,6 @@ Content-Type: text/html; charset=UTF-8
 Referrer-Policy: no-referrer
 Cache-Control: no-cache
 Connection: close
-Proxy-Connection: close
 X-XSS-Protection: 1; mode=block
 X-Content-Type-Options: nosniff
 Referrer-Policy: no-referrer

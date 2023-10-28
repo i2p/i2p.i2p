@@ -67,7 +67,6 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
-         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "<html><body><H1>I2P ERROR: METHOD NOT ALLOWED</H1>"+
          "The request uses a bad protocol. "+
@@ -78,7 +77,6 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
-         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "<html><body><H1>I2P ERROR: REQUEST DENIED</H1>"+
          "Your browser is misconfigured. Do not use the proxy to access the router console or other localhost destinations.<BR>";

@@ -4,7 +4,6 @@ Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.5
 Proxy-Authenticate: Basic realm="I2P HTTP Proxy"
 Cache-Control: no-cache
 Connection: close
-Proxy-Connection: close
 X-XSS-Protection: 1; mode=block
 X-Content-Type-Options: nosniff
 Referrer-Policy: no-referrer

@@ -66,10 +66,12 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private static final String HASH_HEADER = "X-I2P-DestHash";
     private static final String DEST64_HEADER = "X-I2P-DestB64";
     private static final String DEST32_HEADER = "X-I2P-DestB32";
+    private static final String PROXY_CONN_HEADER = "proxy-connection";
     /** MUST ALL BE LOWER CASE */
     private static final String[] CLIENT_SKIPHEADERS = {HASH_HEADER.toLowerCase(Locale.US),
                                                         DEST64_HEADER.toLowerCase(Locale.US),
-                                                        DEST32_HEADER.toLowerCase(Locale.US)};
+                                                        DEST32_HEADER.toLowerCase(Locale.US),
+                                                        PROXY_CONN_HEADER};
     private static final String DATE_HEADER = "date";
     private static final String SERVER_HEADER = "server";
     private static final String X_POWERED_BY_HEADER = "x-powered-by";
@@ -77,7 +79,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     // https://httpoxy.org
     private static final String PROXY_HEADER = "proxy";
     /** MUST ALL BE LOWER CASE */
-    private static final String[] SERVER_SKIPHEADERS = {DATE_HEADER, SERVER_HEADER, X_POWERED_BY_HEADER, X_RUNTIME_HEADER, PROXY_HEADER};
+    private static final String[] SERVER_SKIPHEADERS = {DATE_HEADER, SERVER_HEADER, X_POWERED_BY_HEADER, X_RUNTIME_HEADER,
+                                                        PROXY_HEADER, PROXY_CONN_HEADER};
     /** timeout for first request line */
     private static final long HEADER_TIMEOUT = 15*1000;
     /** total timeout for the request and all the headers */
@@ -106,7 +109,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
-         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "<html><head><title>503 Service Unavailable</title></head>\n"+
          "<body><h2>503 Service Unavailable</h2>\n" +
@@ -119,7 +121,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
-         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "<html><head><title>429 Denied</title></head>\n"+
          "<body><h2>429 Denied</h2>\n" +
@@ -131,7 +132,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
-         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "<html><head><title>403 Denied</title></head>\n"+
          "<body><h2>403 Denied</h2>\n" +
@@ -143,7 +143,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
-         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "<html><head><title>503 Service Unavailable</title></head>\n"+
          "<body><h2>503 Service Unavailable</h2>\n" +
@@ -155,7 +154,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
-         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "<html><head><title>414 Request URI Too Long</title></head>\n"+
          "<body><h2>414 Request URI too long</h2>\n" +
@@ -166,7 +164,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
-         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "<html><head><title>431 Request Header Fields Too Large</title></head>\n"+
          "<body><h2>431 Request header fields too large</h2>\n" +
@@ -178,7 +175,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
-         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "<html><head><title>408 Request Timeout</title></head>\n"+
          "<body><h2>408 Request timeout</h2>\n" +
@@ -189,7 +185,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
-         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "<html><head><title>400 Bad Request</title></head>\n"+
          "<body><h2>400 Bad request</h2>\n" +

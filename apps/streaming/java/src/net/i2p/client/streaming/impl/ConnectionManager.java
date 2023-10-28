@@ -76,7 +76,6 @@ class ConnectionManager {
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-Control: no-cache\r\n"+
          "Connection: close\r\n"+
-         "Proxy-Connection: close\r\n"+
          "Retry-After: 900\r\n"+
          "\r\n"+
          "<html><head><title>429 Denied</title></head>"+
