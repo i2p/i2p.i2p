@@ -41,13 +41,12 @@ import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.router.RouterKeyGenerator;
 import net.i2p.router.JobImpl;
+import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.crypto.FamilyKeyCrypto;
-import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseSegmentor;
-import net.i2p.router.networkdb.kademlia.SegmentedNetworkDatabaseFacade;
-import net.i2p.router.util.HashDistance;   // debug
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.router.util.HashDistance;   // debug
 import static net.i2p.router.sybil.Util.biLog2;
 import net.i2p.router.transport.GeoIP;
 import net.i2p.router.web.HelperBase;
@@ -115,34 +114,9 @@ class NetDbRenderer {
                                      String ip, String sybil, int port, int highPort, SigType type, EncType etype,
                                      String mtu, String ipv6, String ssucaps,
                                      String tr, int cost, int icount) throws IOException {
-                                        renderRouterInfoHTML(out, pageSize, page,
-                                                                 routerPrefix, version,
-                                                                 country, family, caps,
-                                                                 ip, sybil, port, highPort, type, etype,
-                                                                 mtu, ipv6, ssucaps,
-                                                                 tr, cost, icount, null, false);
-                                     }
-    public void renderRouterInfoHTML(Writer out, int pageSize, int page,
-                                     String routerPrefix, String version,
-                                     String country, String family, String caps,
-                                     String ip, String sybil, int port, int highPort, SigType type, EncType etype,
-                                     String mtu, String ipv6, String ssucaps,
-                                     String tr, int cost, int icount, Hash client, boolean allClients) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
         List<Hash> sybils = sybil != null ? new ArrayList<Hash>(128) : null;
-        FloodfillNetworkDatabaseFacade netdb = _context.netDb();
-        if (allClients) {
-            netdb = _context.netDb();
-        }else{
-            if (client != null) {
-                Log _log = _context.logManager().getLog(NetDbRenderer.class);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("client subdb for: " + client);
-                netdb = _context.clientNetDb(client);
-            }
-            else
-                netdb = _context.netDb();
-        }
+        NetworkDatabaseFacade netdb = _context.netDb();
 
         if (".".equals(routerPrefix)) {
             buf.append("<table><tr><td class=\"infohelp\">")
@@ -234,15 +208,7 @@ class NetDbRenderer {
             }
             boolean notFound = true;
             Set<RouterInfo> routers = new HashSet<RouterInfo>();
-            if (allClients){
-                    routers.addAll(_context.netDbSegmentor().getRoutersKnownToClients());
-            } else {
-                if (client == null)
-                    routers.addAll(_context.netDb().getRouters());
-                else
-                    routers.addAll(_context.clientNetDb(client).getRouters());
-                    
-            }
+            routers.addAll(_context.netDb().getRouters());
             int ipMode = 0;
             String ipArg = ip;  // save for error message
             String altIPv6 = null;
@@ -611,27 +577,20 @@ class NetDbRenderer {
      *
      *  @param debug @since 0.7.14 sort by distance from us, display
      *               median distance, and other stuff, useful when floodfill
+     *  @param client null for main db; non-null for client db
      */
-    public void renderLeaseSetHTML(Writer out, boolean debug, Hash client, boolean clientsOnly) throws IOException {
+    public void renderLeaseSetHTML(Writer out, boolean debug, Hash client) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
         if (debug)
             buf.append("<p id=\"debugmode\">Debug mode - Sorted by hash distance, closest first</p>\n");
         Hash ourRKey;
         Set<LeaseSet> leases;
         DecimalFormat fmt;
-        FloodfillNetworkDatabaseFacade netdb = null;
-        if (clientsOnly){
+        NetworkDatabaseFacade netdb;
+        if (client == null)
             netdb = _context.netDb();
-        }else{
-            if (client != null) {
-                Log _log = _context.logManager().getLog(NetDbRenderer.class);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("client subdb for: " + client);
-                netdb = _context.clientNetDb(client);
-            }
-            else
-                netdb = _context.netDb();
-        }
+        else
+            netdb = _context.clientNetDb(client);
         if (debug) {
             ourRKey = _context.routerHash();
             leases = new TreeSet<LeaseSet>(new LeaseSetRoutingKeyComparator(ourRKey));
@@ -641,11 +600,7 @@ class NetDbRenderer {
             leases = new TreeSet<LeaseSet>(new LeaseSetComparator());
             fmt = null;
         }
-        if (clientsOnly)
-            leases.addAll(_context.netDbSegmentor().getLeasesKnownToClients());
-        else{
-            leases.addAll(netdb.getLeases());
-        }
+        leases.addAll(netdb.getLeases());
         int medianCount = 0;
         int rapCount = 0;
         BigInteger median = null;
@@ -658,16 +613,15 @@ class NetDbRenderer {
         } else {
             buf.append("<table id=\"leasesetsummary\">\n");
         }
-        if (clientsOnly)
-            buf.append("<tr><th colspan=\"3\">Leaseset Summary for All Clients: ").append(client).append("</th>");
-        else if (client != null)
-            buf.append("<tr><th colspan=\"3\">Leaseset Summary for Client: ").append(client).append("</th>");
-        else
-            buf.append("<tr><th colspan=\"3\">Leaseset Summary for Floodfill</th>");
-           buf.append("<th><a href=\"/configadvanced\" title=\"").append(_t("Manually Configure Floodfill Participation")).append("\">[")
-           .append(_t("Configure Floodfill Participation"))
-           .append("]</a></th></tr>\n")
-           .append("<tr><td><b>Total Leasesets:</b></td><td colspan=\"3\">").append(leases.size()).append("</td></tr>\n");
+        if (client != null) {
+            buf.append("<tr><th colspan=\"3\">Leasesets for Client: ").append(client.toBase32()).append("</th><th></th></tr>\n");
+        } else {
+            buf.append("<tr><th colspan=\"3\">Leaseset Summary for Floodfill</th>" +
+                       "<th><a href=\"/configadvanced\" title=\"").append(_t("Manually Configure Floodfill Participation")).append("\">[")
+               .append(_t("Configure Floodfill Participation"))
+               .append("]</a></th></tr>\n");
+        }
+        buf.append("<tr><td><b>Total Leasesets:</b></td><td colspan=\"3\">").append(leases.size()).append("</td></tr>\n");
         if (debug) {
             RouterKeyGenerator gen = _context.routerKeyGenerator();
             buf.append("<tr><td><b>Published (RAP) Leasesets:</b></td><td colspan=\"3\">").append(leases).append("</td></tr>\n")
@@ -676,17 +630,17 @@ class NetDbRenderer {
                .append("<tr><td><b>Next Mod Data:</b></td><td>").append(DataHelper.getUTF8(gen.getNextModData())).append("</td>")
                .append("<td><b>Change in:</b></td><td>").append(DataHelper.formatDuration(gen.getTimeTillMidnight())).append("</td></tr>\n");
         }
-        int ff = 0;
         if (client == null) {
-            ff = _context.peerManager().getPeersByCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL).size();
+            int ff = _context.peerManager().getPeersByCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL).size();
             buf.append("<tr><td><b>Known Floodfills:</b></td><td colspan=\"3\">").append(ff).append("</td></tr>\n");
             buf.append("<tr><td><b>Currently Floodfill?</b></td><td>").append(netdb.floodfillEnabled() ? "yes" : "no");
+            if (debug)
+                buf.append("</td><td><b>Routing Key:</b></td><td>").append(ourRKey.toBase64());
+            else
+                buf.append("</td><td colspan=\"2\">");
+            buf.append("</td></tr>\n");
         }
-        if (debug)
-            buf.append("</td><td><b>Routing Key:</b></td><td>").append(ourRKey.toBase64());
-        else
-            buf.append("</td><td colspan=\"2\">");
-        buf.append("</td></tr>\n</table>\n");
+        buf.append("</table>\n");
 
         if (leases.isEmpty()) {
             //if (!debug)
@@ -960,7 +914,7 @@ class NetDbRenderer {
      *  @param mode 0: charts only; 1: full routerinfos; 2: abbreviated routerinfos
      *         mode 3: Same as 0 but sort countries by count
      */
-    public void renderStatusHTML(Writer out, int pageSize, int page, int mode, Hash client, boolean clientsOnly) throws IOException {
+    public void renderStatusHTML(Writer out, int pageSize, int page, int mode) throws IOException {
         if (!_context.netDb().isInitialized()) {
             out.write("<div id=\"notinitialized\">");
             out.write(_t("Not initialized"));
@@ -977,13 +931,7 @@ class NetDbRenderer {
         Hash us = _context.routerHash();
 
         Set<RouterInfo> routers = new TreeSet<RouterInfo>(new RouterInfoComparator());
-        if (client != null) {
-            routers.addAll(_context.clientNetDb(client).getRouters());
-        } else if (clientsOnly) {
-            routers.addAll(_context.netDbSegmentor().getRoutersKnownToClients());   
-        } else {
-            routers.addAll(_context.netDb().getRouters());
-        }
+        routers.addAll(_context.netDb().getRouters());
         int toSkip = pageSize * page;
         boolean nextpg = routers.size() > toSkip + pageSize;
         StringBuilder buf = new StringBuilder(8192);
@@ -1071,19 +1019,9 @@ class NetDbRenderer {
      if (!showStats) {
 
         // the summary table
-        if (client != null) {
-            buf.append("<table id=\"netdboverview\" border=\"0\" cellspacing=\"30\"><tr><th colspan=\"3\">")
-                .append(_t("Network Database Router Statistics for Client " + client))
-                .append("</th></tr><tr><td style=\"vertical-align: top;\">");
-        } else if (clientsOnly) {
-            buf.append("<table id=\"netdboverview\" border=\"0\" cellspacing=\"30\"><tr><th colspan=\"3\">")
-                .append(_t("Network Database Router Statistics for all Clients"))
-                .append("</th></tr><tr><td style=\"vertical-align: top;\">");
-        } else {
-            buf.append("<table id=\"netdboverview\" border=\"0\" cellspacing=\"30\"><tr><th colspan=\"3\">")
-                .append(_t("Network Database Router Statistics for Floodfill Router"))
-                .append("</th></tr><tr><td style=\"vertical-align: top;\">");
-        }
+        buf.append("<table id=\"netdboverview\" border=\"0\" cellspacing=\"30\"><tr><th colspan=\"3\">");
+        buf.append(_t("Network Database Router Statistics"));
+        buf.append("</th></tr><tr><td style=\"vertical-align: top;\">");
         // versions table
         List<String> versionList = new ArrayList<String>(versions.objects());
         if (!versionList.isEmpty()) {
