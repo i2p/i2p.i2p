@@ -41,5 +41,5 @@
  <jsp:setProperty name="formhandler" property="sort" value="<%=request.getParameter(\"s\")%>" />
  <jsp:setProperty name="formhandler" property="intros" value="<%=request.getParameter(\"i\")%>" />
 <%@include file="formhandler.jsi" %>
- <jsp:getProperty name="formhandler" property="floodfillNetDbSummary" />
+ <jsp:getProperty name="formhandler" property="netDbSummary" />
 </div></body></html>
