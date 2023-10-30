@@ -68,7 +68,6 @@ public class LeaseSet extends DatabaseEntry {
     protected SigningPublicKey _signingKey;
     // Keep leases in the order received, or else signature verification will fail!
     protected final List<Lease> _leases;
-    private Hash _receivedBy;
     // Store these since isCurrent() and getEarliestLeaseDate() are called frequently
     private long _firstExpiration;
     protected long _lastExpiration;
@@ -186,21 +185,13 @@ public class LeaseSet extends DatabaseEntry {
     }
 
     /**
-     * The Hash of the local client that received this LS,
-     * null if the router or unknown.
-     *
-     * @since 0.9.47
-     */
-    public Hash getReceivedBy() { return _receivedBy; }
-
-    /**
      * Also sets receivedAsReply to true
      * @param localClient may be null
      * @since 0.9.47
      */
     public void setReceivedBy(Hash localClient) {
-        _receivedAsReply = true;
-        _receivedBy = localClient;
+        super.setReceivedBy(localClient);
+        super.setReceivedAsReply();
     }
 
     /**
@@ -331,7 +322,7 @@ public class LeaseSet extends DatabaseEntry {
         }
         byte rv[] = out.toByteArray();
         // if we are floodfill and this was published to us
-        if (_receivedAsPublished)
+        if (getReceivedAsPublished())
             _byteified = rv;
         return rv;
     }
