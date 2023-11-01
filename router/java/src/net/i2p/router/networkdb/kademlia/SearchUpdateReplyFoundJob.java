@@ -85,13 +85,12 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
             DatabaseStoreMessage msg = (DatabaseStoreMessage)message;
             DatabaseEntry entry = msg.getEntry();
             try {
-                if (entry.isRouterInfo()) {
-                    RouterInfo ri = (RouterInfo) entry;
-                    _facade.store(ri.getHash(), ri);
-                }
                 if (entry.isLeaseSet()) {
                     LeaseSet ls = (LeaseSet) entry;
                     _facade.store(ls.getHash(), ls);
+                } else {
+                    RouterInfo ri = (RouterInfo) entry;
+                    _facade.store(ri.getHash(), ri);
                 }
             } catch (UnsupportedCryptoException iae) {
                 // don't blame the peer

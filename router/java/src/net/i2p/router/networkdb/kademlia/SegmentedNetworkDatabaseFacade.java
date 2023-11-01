@@ -58,7 +58,6 @@ import net.i2p.util.Log;
  */
 public abstract class SegmentedNetworkDatabaseFacade {
     public SegmentedNetworkDatabaseFacade(RouterContext context) {
-        // super(context, null);
     }
 
     /**
@@ -95,105 +94,4 @@ public abstract class SegmentedNetworkDatabaseFacade {
      * @since 0.9.60
      */
     public abstract void startup();
-    /**
-     * Lookup the leaseSet for a given key in only client dbs.
-     * 
-     * @return may be null
-     * @since 0.9.60
-     */
-    public abstract LeaseSet lookupLeaseSetHashIsClient(Hash key);
-    /**
-     * Get a set of all sub-netDbs.
-     * 
-     * @return all the sub netDbs including the main
-     * @since 0.9.60
-     */
-    public abstract Set<FloodfillNetworkDatabaseFacade> getSubNetDBs();
-    /**
-     * Make sure the SNDF is initialized. This is overridden in
-     * FloodfillNetworkDatabaseSegmentor so that it will be false until
-     * *all* required subDbs are initialized.
-     * 
-     * @return true if the netDbs are initialized
-     * @since 0.9.60
-     */
-    public boolean isInitialized() {
-        return mainNetDB().isInitialized();
-    }
-    
-    /**
-     * list all of the RouterInfo objects known to all of the subDbs including
-     * the main subDb.
-     * 
-     * @return all of the RouterInfo objects known to all of the netDbs. non-null
-     * @since 0.9.60
-     */
-    public Set<RouterInfo> getRouters() {
-        Set<RouterInfo> rv = new HashSet<>();
-        for (FloodfillNetworkDatabaseFacade subdb : getSubNetDBs()) {
-            rv.addAll(subdb.getRouters());
-        }
-        return rv;
-    }
-
-    /** 
-     * list of the RouterInfo objects for all known peers in all client
-     * subDbs which is mostly pointless because they should normally reject
-     * them anyway.
-     * 
-     * @return non-null all the routerInfos in all of the client netDbs *only*
-     * @since 0.9.60 
-     */
-    public Set<RouterInfo> getRoutersKnownToClients() {
-        Set<RouterInfo> ris = new HashSet<>();
-        Set<FloodfillNetworkDatabaseFacade> fndfs = getSubNetDBs();
-        for (FloodfillNetworkDatabaseFacade fndf : fndfs) {
-            ris.addAll(fndf.getRouters());
-        }
-        return ris;
-    }
-
-    /**
-     * Get a set of all leases known to all clients. These will be
-     * leaseSets for destinations that the clients communicate with
-     * and the leaseSet of the client itself.
-     * 
-     * @return non-null. all the leaseSets known to all of the client netDbs
-     * @since 0.9.60
-     */
-    public Set<LeaseSet> getLeasesKnownToClients() {
-        Set<LeaseSet> lss = new HashSet<>();
-        Set<FloodfillNetworkDatabaseFacade> fndfs = getSubNetDBs();
-        for (FloodfillNetworkDatabaseFacade fndf : fndfs) {
-            lss.addAll(fndf.getLeases());
-        }
-        return lss;
-    }
-    /**
-     * Check if the mainNetDB needs to reseed
-     * 
-     * @return non-null.
-     * @since 0.9.60 
-     * */
-    public ReseedChecker reseedChecker() {
-        return mainNetDB().reseedChecker();
-    };
-    /**
-     * For console ConfigKeyringHelper
-     * 
-     * @return non-null
-     * @since 0.9.60
-     */
-    public List<Hash> lookupClientBySigningPublicKey(SigningPublicKey spk) {
-        return Collections.emptyList();
-    }
-    /**
-     * For console ConfigKeyringHelper
-     * 
-     * @return non-null
-     * @since 0.9.60
-     */
-    public List<BlindData> getLocalClientsBlindData() {
-        return Collections.emptyList();
-    }
 }

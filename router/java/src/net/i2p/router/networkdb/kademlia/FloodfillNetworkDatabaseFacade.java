@@ -290,11 +290,6 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         return true;
     }
 
-    public int minFloodfillPeers() {
-        int mfp = _context.getProperty(MINIMUM_SUBDB_PEERS, 0);
-        return mfp;
-    }
-
     /**
      *  Send to a subset of all floodfill peers.
      *  We do this to implement Kademlia within the floodfills, i.e.

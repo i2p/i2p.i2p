@@ -77,7 +77,7 @@ class OutboundTunnelEndpoint {
                 int msgtype = msg.getType();
                 if (msgtype == DatabaseStoreMessage.MESSAGE_TYPE) {
                     DatabaseStoreMessage dsm = (DatabaseStoreMessage)msg;
-                    if (dsm.getEntry().isRouterInfo()) {
+                    if (!dsm.getEntry().isLeaseSet()) {
                         _ridsm++;
                         _context.statManager().addRateData("tunnel.outboundTunnelEndpointFwdRIDSM", 1);
                         if (_log.shouldLog(Log.WARN))
