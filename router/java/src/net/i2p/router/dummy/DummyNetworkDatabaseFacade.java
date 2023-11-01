@@ -91,11 +91,6 @@ public class DummyNetworkDatabaseFacade extends SegmentedNetworkDatabaseFacade {
     public Set<Hash> findNearestRouters(Hash key, int maxNumRouters, Set<Hash> peersToIgnore) { return getAllRouters(); }
 
     @Override
-    public LeaseSet lookupLeaseSetHashIsClient(Hash key) {
-        throw new UnsupportedOperationException("Unimplemented method 'lookupLeaseSetHashIsClient'");
-    }
-
-    @Override
     public FloodfillNetworkDatabaseFacade mainNetDB() {
         return _fndb;
     }
@@ -103,10 +98,5 @@ public class DummyNetworkDatabaseFacade extends SegmentedNetworkDatabaseFacade {
     @Override
     public FloodfillNetworkDatabaseFacade clientNetDB(Hash id) {
         return _fndb;
-    }
-
-    @Override
-    public Set<FloodfillNetworkDatabaseFacade> getSubNetDBs(){
-        throw new UnsupportedOperationException("Unimplemented method 'getSubNetDBs'");
     }
 }

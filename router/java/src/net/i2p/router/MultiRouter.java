@@ -140,7 +140,7 @@ public class MultiRouter {
 
     	HashSet<RouterInfo> riSet = new HashSet<RouterInfo>();
     	for(Router r : _routers) {
-    		riSet.addAll(r.getContext().netDbSegmentor().getRouters());
+    		riSet.addAll(r.getContext().netDb().getRouters());
     	}
 		for(Router r : _routers) {
     		for(RouterInfo ri : riSet){

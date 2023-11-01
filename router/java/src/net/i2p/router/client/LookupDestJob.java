@@ -196,12 +196,6 @@ class LookupDestJob extends JobImpl {
         }
     }
 
-    private String toBase32(){
-        if (_fromLocalDest != null)
-            return _fromLocalDest.toBase32();
-        return null;
-    }
-
     private class DoneJob extends JobImpl {
         public DoneJob(RouterContext enclosingContext) { 
             super(enclosingContext);
