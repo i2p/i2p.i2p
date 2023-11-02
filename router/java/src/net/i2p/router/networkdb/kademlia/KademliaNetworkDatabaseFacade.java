@@ -178,22 +178,24 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         _dbid = dbid;
         _log = _context.logManager().getLog(getClass());
         _networkID = context.router().getNetworkID();
-        _peerSelector = createPeerSelector();
         _publishingLeaseSets = new HashMap<Hash, RepublishLeaseSetJob>(8);
         _activeRequests = new HashMap<Hash, SearchJob>(8);
-        if (!isMainDb()) {
+        if (isClientDb()) {
             _reseedChecker = null;
             _blindCache = null;
             _exploreKeys = null;
+            _erj = null;
+            _peerSelector = ((KademliaNetworkDatabaseFacade) context.netDb()).getPeerSelector();
         } else {
             _reseedChecker = new ReseedChecker(context);
             _blindCache = new BlindCache(context);
             _exploreKeys = new ConcurrentHashSet<Hash>(64);
+            // We don't have a comm system here to check for ctx.commSystem().isDummy()
+            // we'll check before starting in startup()
+            _erj = new ExpireRoutersJob(_context, this);
+            _peerSelector = createPeerSelector();
         }
         _elj = new ExpireLeasesJob(_context, this);
-        // We don't have a comm system here to check for ctx.commSystem().isDummy()
-        // we'll check before starting in startup()
-        _erj = new ExpireRoutersJob(_context, this);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Created KademliaNetworkDatabaseFacade for id: " + dbid);
         context.statManager().createRateStat("netDb.lookupDeferred", "how many lookups are deferred?", "NetworkDatabase", new long[] { 60*60*1000 });
@@ -219,13 +221,24 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         return _initialized && _ds != null && _ds.isInitialized();
     }
 
-    protected abstract PeerSelector createPeerSelector();
+    /**
+     *  Only for main DB
+     */
+    protected PeerSelector createPeerSelector() {
+       if (isClientDb())
+           throw new IllegalStateException();
+       return new FloodfillPeerSelector(_context);
+    }
+
+    /**
+     *  @return the main DB's peer selector. Client DBs do not have their own.
+     */
     public PeerSelector getPeerSelector() { return _peerSelector; }
     
     /** @since 0.9 */
     @Override
     public ReseedChecker reseedChecker() {
-        if (!isMainDb())
+        if (isClientDb())
             return null;
         return _reseedChecker;
     }
@@ -239,11 +252,14 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      * @return
      */
     protected BlindCache blindCache() {
-        if (isMainDb())
+        if (!isClientDb())
             return _blindCache;
         return _context.netDb().blindCache();
     }
 
+    /**
+     *  @return the main DB's KBucketSet. Client DBs do not have their own.
+     */
     KBucketSet<Hash> getKBuckets() { return _kb; }
     DataStore getDataStore() { return _ds; }
     
@@ -256,20 +272,20 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     
     /** @return unmodifiable set */
     public Set<Hash> getExploreKeys() {
-        if (!_initialized || !isMainDb())
+        if (!_initialized || isClientDb())
             return Collections.emptySet();
         return Collections.unmodifiableSet(_exploreKeys);
     }
     
     public void removeFromExploreKeys(Collection<Hash> toRemove) {
-        if (!_initialized || !isMainDb())
+        if (!_initialized || isClientDb())
             return;
         _exploreKeys.removeAll(toRemove);
         _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size());
     }
 
     public void queueForExploration(Collection<Hash> keys) {
-        if (!_initialized || !isMainDb())
+        if (!_initialized || isClientDb())
             return;
         for (Iterator<Hash> iter = keys.iterator(); iter.hasNext() && _exploreKeys.size() < MAX_EXPLORE_QUEUE; ) {
             _exploreKeys.add(iter.next());
@@ -281,16 +297,19 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      *  Cannot be restarted.
      */
     public synchronized void shutdown() {
+        if (_log.shouldWarn())
+            _log.warn("DB shutdown " + this);
         _initialized = false;
-        if (!_context.commSystem().isDummy() && isMainDb() &&
+        if (!_context.commSystem().isDummy() && !isClientDb() &&
             _context.router().getUptime() > ROUTER_INFO_EXPIRATION_FLOODFILL + 10*60*1000 + 60*1000) {
             // expire inline before saving RIs in _ds.stop()
             Job erj = new ExpireRoutersJob(_context, this);
             erj.runJob();
         }
         _context.jobQueue().removeJob(_elj);
-        _context.jobQueue().removeJob(_erj);
-        if (_kb != null)
+        if (_erj != null)
+            _context.jobQueue().removeJob(_erj);
+        if (_kb != null && !isClientDb())
             _kb.clear();
         if (_ds != null)
             _ds.stop();
@@ -298,7 +317,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             _exploreKeys.clear();
         if (_negativeCache != null)
             _negativeCache.stop();
-        if (isMainDb())
+        if (!isClientDb())
             blindCache().shutdown();
     }
     
@@ -341,29 +360,18 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         return true;
     }
 
-    /**
-     * Check if the database is the main netDb. This is the one we're normally using
-     * if you're acting as a floodfill.
-     * 
-     * @return true if _dbid == FNDS.MAIN_DBID
-     * @since 0.9.60
-     */
-    protected boolean isMainDb() {
-        // This is a null check in disguise, don't use equals() here.
-        // FNDS.MAIN_DBID is always null.
-        if (_dbid == FloodfillNetworkDatabaseSegmentor.MAIN_DBID)
-            return true;
-        return false;
-    }
-
     public synchronized void startup() {
-        _log.info("Starting up the kademlia network database");
+        if (_log.shouldInfo())
+            _log.info("Starting up the " + this);
         RouterInfo ri = _context.router().getRouterInfo();
         String dbDir = _context.getProperty(PROP_DB_DIR, DEFAULT_DB_DIR);
-        _kb = new KBucketSet<Hash>(_context, ri.getIdentity().getHash(),
+        if (isClientDb())
+            _kb = _context.netDb().getKBuckets();
+        else
+            _kb = new KBucketSet<Hash>(_context, ri.getIdentity().getHash(),
                                    BUCKET_SIZE, KAD_B, new RejectTrimmer<Hash>());
         try {
-            if (isMainDb()) {
+            if (!isClientDb()) {
                 _ds = new PersistentDataStore(_context, dbDir, this);
             } else {
                 _ds = new TransientDataStore(_context);
@@ -373,7 +381,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         }
         _dbDir = dbDir;
         _negativeCache = new NegativeLookupCache(_context);
-        if (isMainDb())
+        if (!isClientDb())
             blindCache().startup();
         
         createHandlers();
@@ -388,7 +396,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         
         //// expire some routers
         // Don't run until after RefreshRoutersJob has run, and after validate() will return invalid for old routers.
-        if (!_context.commSystem().isDummy()) {
+        if (!isClientDb() && !_context.commSystem().isDummy()) {
             boolean isFF = _context.getBooleanProperty(FloodfillMonitorJob.PROP_FLOODFILL_PARTICIPANT);
             long down = _context.router().getEstimatedDowntime();
             long delay = (down == 0 || (!isFF && down > 30*60*1000) || (isFF && down > 24*60*60*1000)) ?
@@ -399,7 +407,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         }
         
         if (!QUIET) {
-            if (isMainDb()) {
+            if (!isClientDb()) {
                 // fill the search queue with random keys in buckets that are too small
                 // Disabled since KBucketImpl.generateRandomKey() is b0rked,
                 // and anyway, we want to search for a completely random key,
@@ -421,7 +429,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             _log.warn("Operating in quiet mode - not exploring or pushing data proactively, simply reactively");
             _log.warn("This should NOT be used in production");
         }
-        if (isMainDb()) {
+        if (!isClientDb()) {
             // periodically update and resign the router's 'published date', which basically
             // serves as a version
             Job plrij = new PublishLocalRouterInfoJob(_context);
@@ -452,6 +460,10 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      * @param peersToIgnore can be null
      */
     public Set<Hash> findNearestRouters(Hash key, int maxNumRouters, Set<Hash> peersToIgnore) {
+        if (isClientDb()) {
+            _log.warn("Subdb", new Exception("I did it"));
+            return Collections.emptySet();
+        }
         if (!_initialized) return Collections.emptySet();
         return new HashSet<Hash>(_peerSelector.selectNearest(key, maxNumRouters, peersToIgnore, _kb));
     }
@@ -476,8 +488,16 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     }
 *****/
     
-    /** get the hashes for all known routers */
+    /**
+     *  Get the hashes for all known routers
+     *
+     *  @return empty set if this is a client DB
+     */
     public Set<Hash> getAllRouters() {
+        if (isClientDb()) {
+            _log.warn("Subdb", new Exception("I did it"));
+            return Collections.emptySet();
+        }
         if (!_initialized) return Collections.emptySet();
         Set<Map.Entry<Hash, DatabaseEntry>> entries = _ds.getMapEntries();
         Set<Hash> rv = new HashSet<Hash>(entries.size());
@@ -494,6 +514,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      *  both the kbuckets AND the data store, which was fine when the kbuckets held everything.
      *  But now that is probably not what you want.
      *  Just return the count in the data store.
+     *
+     *  @return 0 if this is a client DB
      */
     @Override
     public int getKnownRouters() { 
@@ -503,6 +525,10 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         _kb.getAll(count);
         return count.size();
 ****/
+        if (isClientDb()) {
+            _log.warn("Subdb", new Exception("I did it"));
+            return 0;
+        }
         if (_ds == null) return 0;
         int rv = 0;
         for (DatabaseEntry ds : _ds.getEntries()) {
@@ -816,12 +842,16 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      * However, this may still fire off a lookup if the RI is present but expired (and will return null).
      * This may result in deadlocks.
      * For true local only, use lookupLocallyWithoutValidation()
+     *
+     * @return null always for client dbs
      */
     public RouterInfo lookupRouterInfoLocally(Hash key) {
         if (!_initialized) return null;
         // Client netDb shouldn't have RI, search for RI in the floodfill netDb.
-        if (isClientDb())
-            return _context.netDb().lookupRouterInfoLocally(key);
+        if (isClientDb()) {
+            _log.warn("Subdb", new Exception("I did it"));
+            return null;
+        }
         DatabaseEntry ds = _ds.get(key);
         if (ds != null) {
             if (ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
@@ -905,8 +935,11 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      * Stores to local db only.
      * Overridden in FNDF to actually send to the floodfills.
      * @throws IllegalArgumentException if the local router info is invalid
+     *         or if this is a client DB
      */
     public void publish(RouterInfo localRouterInfo) throws IllegalArgumentException {
+        if (isClientDb())
+            throw new IllegalArgumentException("RI publish to client DB");
         if (!_initialized) return;
         if (_context.router().gracefulShutdownInProgress())
             return;
@@ -1342,6 +1375,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      */
     RouterInfo store(Hash key, RouterInfo routerInfo, boolean persist) throws IllegalArgumentException {
         if (!_initialized) return null;
+        if (isClientDb())
+            throw new IllegalArgumentException("RI store to client DB");
         
         RouterInfo rv;
         try {
@@ -1443,7 +1478,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         DatabaseEntry o = _ds.get(dbEntry);
         if (o == null) {
             // if we dont know the key, lets make sure it isn't a now-dead peer
-            _kb.remove(dbEntry);
+            if (_kb != null)
+                _kb.remove(dbEntry);
             _context.peerManager().removeCapabilities(dbEntry);
             return;
         }
@@ -1459,7 +1495,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         // are any updates
         if (_log.shouldLog(Log.INFO))
             _log.info("Dropping a lease: " + dbEntry);
-        if (isMainDb()) {
+        if (!isClientDb()) {
             _ds.remove(dbEntry, false);
         } else {
             // if this happens it's because we're a TransientDataStore instead,
@@ -1479,6 +1515,10 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      *  Do NOT use for leasesets.
      */
     void dropAfterLookupFailed(Hash peer) {
+        if (isClientDb()) {
+            _log.warn("Subdb", new Exception("I did it"));
+            return;
+        }
         _context.peerManager().removeCapabilities(peer);
         _negativeCache.cache(peer);
         _kb.remove(peer);
@@ -1566,9 +1606,17 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         return leases;
     }
 
-    /** public for NetDbRenderer in routerconsole */
+    /**
+     *  Public for NetDbRenderer in routerconsole
+     *
+     *  @return empty set if this is a client DB
+     */
     @Override
     public Set<RouterInfo> getRouters() {
+        if (isClientDb()) {
+            _log.warn("Subdb", new Exception("I did it"));
+            return Collections.emptySet();
+        }
         if (!_initialized) return null;
         Set<RouterInfo> routers = new HashSet<RouterInfo>();
         for (DatabaseEntry o : getDataStore().getEntries()) {
@@ -1662,6 +1710,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      */
     @Override
     public void renderStatusHTML(Writer out) throws IOException {
+        if (_kb == null)
+            return;
         out.write(_kb.toString().replace("\n", "<br>\n"));
     }
 
@@ -1670,7 +1720,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      */
     @Override
     public String toString() {
-        if (isMainDb())
+        if (!isClientDb())
             return "Main NetDB";
         return "Client NetDB " + _dbid.toBase64();
     }
