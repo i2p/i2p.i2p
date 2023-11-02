@@ -64,12 +64,13 @@
 %><link rel="icon" href="<%=theThemePath%>images/favicon.ico">
 <link id="pagestyle" href="<%=theThemePath%>console.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
 <%
-   if (intl.getLang().equals("zh")) {
+   String curlang = intl.getLang();
+   if (curlang.equals("zh")) {
        // make the fonts bigger for chinese
 %><link href="<%=theThemePath%>console_big.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
 <%
-   } else if (intl.getLang().equals("ar")) {
-       // Use RTL theme for Arabic
+   } else if (curlang.equals("ar") || curlang.equals("fa")) {
+       // Use RTL theme for Arabic and Persian
 %><link href="<%=theThemePath%>console_ar.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
 <%
    }
