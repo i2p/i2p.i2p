@@ -302,7 +302,7 @@ class ProfileOrganizerRenderer {
         buf.append("<tr><td><b>")
            .append("Caps").append(":</b></td><td>").append(_t("capabilities in the netDb, not used to determine profiles"))
            .append("</td></tr>");
-        buf.append("<tr id=\"capabilities_key\"><td colspan=\"2\"><table><tbody>");
+        buf.append("<tr><td colspan=\"2\"><table id=\"capabilities_key\"><tbody>");
         buf.append("<tr><td>&nbsp;</td>")
            .append("<td><b>D</b></td><td>").append(_t("Congested")).append("</td>")
            .append("<td><b>E</b></td><td>").append(_t("Severely congested")).append("</td>" +

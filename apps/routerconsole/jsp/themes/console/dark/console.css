@@ -5158,7 +5158,7 @@ table#thresholds td {
 }
 
 #profile_defs td:first-child {
-    width: 5% !important;
+    width: 8% !important;
     white-space: nowrap;
     text-align: right;
 }
@@ -5166,6 +5166,11 @@ table#thresholds td {
 #profile_defs td:last-child {
     white-space: normal;
     line-height: 120%;
+    text-align: left;
+}
+
+#profile_defs td:nth-child(2)::first-letter {
+    text-transform: uppercase;
 }
 
 #thresholds th,
@@ -5186,10 +5191,7 @@ table#thresholds td {
 
 #capabilities_key table td {
     padding: 3px 5px !important;
-}
-
-#capabilities_key table td:nth-child(even) {
-    width: 16px;
+    text-align: left;
 }
 
 #capabilities_key b {

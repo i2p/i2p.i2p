@@ -6516,7 +6516,7 @@ ul#banlist {
 }
 
 #profile_defs td:first-child {
-    width: 5% !important;
+    width: 8% !important;
     white-space: nowrap;
     text-align: right;
 }
@@ -6524,6 +6524,7 @@ ul#banlist {
 #profile_defs td:last-child {
     white-space: normal;
     line-height: 120%;
+    text-align: left;
 }
 
 #profile_defs td:nth-child(2)::first-letter {
@@ -6548,14 +6549,7 @@ ul#banlist {
 
 #capabilities_key table td {
     padding: 3px 5px !important;
-}
-
-#capabilities_key table td:nth-child(even) {
-    width: 16px;
-}
-
-#capabilities_key td:nth-child(2)::first-letter {
-    text-transform: none;
+    text-align: left;
 }
 
 #capabilities_key b {
