@@ -1,3 +1,18 @@
+2023-11-02 zzz
+ * NetDB: Enforce no RIs in subdbs (Gitlab #465)
+   - Throw IAE if attempting to store/publish RI to subdb
+   - Log warnings if attempting to lookup RI in subdb
+   - Revert changes to createPeerSelector()
+   - Revert peer selector changes in SearchJob and StoreJob
+   - Use common PeerSelector and KBucketSet for all dbs
+   - Revert/fix FloodfillVerifyStoreJob to looukp RIs in the main DB
+   - Don't start ExpireRoutersJob in subdbs
+   - Revert change in InboundMessageDistributor that was looking up RI in subdb
+   - Remove KNDF.isMainDb(), replace with !isClientDb()
+
+2023-10-29 zzz
+ * Console: Netdb tab fixes and cleanup (Gitlab #465)
+
 2023-10-28 zzz
  * i2ptunnel:
    - Remove nonstandard Proxy-Connection headers (Gitlab #452)
