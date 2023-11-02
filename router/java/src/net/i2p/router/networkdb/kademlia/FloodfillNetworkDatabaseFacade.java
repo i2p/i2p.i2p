@@ -95,7 +95,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         // for ISJ
         _context.statManager().createRateStat("netDb.RILookupDirect", "Was an iterative RI lookup sent directly?", "NetworkDatabase", rate);
         // No need to start the FloodfillMonitorJob for client subDb.
-        if (!isMainDb())
+        if (isClientDb())
             _ffMonitor = null;
         else
             _ffMonitor = new FloodfillMonitorJob(_context, this);
@@ -107,7 +107,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         super.startup();
         if (_ffMonitor != null)
             _context.jobQueue().addJob(_ffMonitor);
-        if (!isMainDb()) {
+        if (isClientDb()) {
             isFF = false;
         } else {
             isFF = _context.getBooleanProperty(FloodfillMonitorJob.PROP_FLOODFILL_PARTICIPANT);
@@ -116,7 +116,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         }
 
         long down = _context.router().getEstimatedDowntime();
-        if (!_context.commSystem().isDummy() && isMainDb() &&
+        if (!_context.commSystem().isDummy() && !isClientDb() &&
             (down == 0 || (!isFF && down > 30*60*1000) || (isFF && down > 24*60*60*1000))) {
             // refresh old routers
             Job rrj = new RefreshRoutersJob(_context, this);
@@ -128,7 +128,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     @Override
     protected void createHandlers() {
        // Only initialize the handlers for the flooodfill netDb.
-       if (isMainDb()) {
+       if (!isClientDb()) {
             if (_log.shouldInfo())
                 _log.info("[dbid: " + super._dbid +  "] Initializing the message handlers");
             _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseLookupMessage.MESSAGE_TYPE, new FloodfillDatabaseLookupMessageHandler(_context, this));
@@ -435,13 +435,6 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         }
     }
 
-    @Override
-    protected PeerSelector createPeerSelector() { 
-        if (_peerSelector != null)
-            return _peerSelector;
-        return new FloodfillPeerSelector(_context);
-    }
-    
     /**
      *  Public, called from console. This wakes up the floodfill monitor,
      *  which will rebuild the RI and log in the event log,
