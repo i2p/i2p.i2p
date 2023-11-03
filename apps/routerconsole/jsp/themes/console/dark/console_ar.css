@@ -82,6 +82,10 @@ input.search, input.search:focus {
      background-position: right 4px center !important;
 }
 
+.routersummaryouter {
+     margin: 0 2px 10px 5px;
+}
+
 .routersummary img[src$="i2plogo.png"] {
      margin-top: -2px !important;
      margin-left: 0 !important;
