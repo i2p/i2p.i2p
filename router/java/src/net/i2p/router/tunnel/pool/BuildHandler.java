@@ -7,11 +7,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.crypto.EncType;
-import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.EmptyProperties;
 import net.i2p.data.Hash;
-import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.TunnelId;
@@ -31,7 +29,6 @@ import net.i2p.router.HandlerJobBuilder;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.OutNetMessage;
-import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.MessageWrapper;
 import net.i2p.router.peermanager.TunnelHistory;
@@ -39,11 +36,7 @@ import net.i2p.router.tunnel.HopConfig;
 import net.i2p.router.tunnel.TunnelDispatcher;
 import static net.i2p.router.tunnel.pool.BuildExecutor.Result.*;
 import net.i2p.router.util.CDQEntry;
-import net.i2p.router.util.CoDelBlockingQueue;
-import net.i2p.stat.Rate;
-import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
-import net.i2p.util.VersionComparator;
 
 /**
  * Handle the received tunnel build message requests and replies,
@@ -77,7 +70,6 @@ class BuildHandler implements Runnable {
     private volatile boolean _isRunning;
     private final Object _startupLock = new Object();
     private ExplState _explState = ExplState.NONE;
-    private final String MIN_VERSION_HONOR_CAPS = "0.9.58";
 
     private enum ExplState { NONE, IB, OB, BOTH }
 
@@ -473,52 +465,6 @@ class BuildHandler implements Runnable {
                 _log.warn("Drop request, previous peer is banned: " + from);
             _context.commSystem().mayDisconnect(from);
             return -1;
-        }
-        // get my own RouterInfo
-        RouterInfo myRI = _context.router().getRouterInfo();
-        if (myRI != null) {
-            String caps = myRI.getCapabilities();
-            if (caps != null) {
-                if (caps.indexOf(Router.CAPABILITY_NO_TUNNELS) >= 0){
-                    _context.statManager().addRateData("tunnel.dropTunnelFromCongestionCapability", 1);
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Drop request, we are denying tunnels due to congestion: " + from);
-                    RouterInfo fromRI = _context.netDb().lookupRouterInfoLocally(from);
-                    if (fromRI != null){
-                        String fromVersion = fromRI.getVersion();
-                        // if fromVersion is greater than 0.9.58, then then ban the router due to it disrespecting our
-                        // congestion flags
-                        if (fromVersion != null){
-                            if (VersionComparator.comp(fromVersion, MIN_VERSION_HONOR_CAPS) >= 0) {
-                                _context.statManager().addRateData("tunnel.dropTunnelFromCongestionCapability"+from, 1);
-                                _context.statManager().addRateData("tunnel.dropTunnelFromCongestionCapability"+fromVersion, 1);
-                                /*
-                                TODO: Determine if it's at all reasonable to do something about routers that are forwarding tunnel
-                                builds to us from other people who are spamming tunnel builds.
-                                long knocks = _context.statManager().getRate("tunnel.dropTunnelFromVersion"+from).getLifetimeEventCount();
-                                if (knocks > 10) {
-                                    if (_log.shouldLog(Log.WARN))
-                                        _log.warn("Banning peer: " + fromRI.getHash() + " due to it disrespecting our congestion flags");
-                                    _context.banlist().banlistRouter(from, "disrespected our tunnel flags", null, false);    
-                                } else if (knocks <= 1) {
-                                    if (_log.shouldLog(Log.WARN))
-                                        _log.warn("Replying with our RouterInfo to peer:" +fromRI.getHash() + 
-                                            " to give it a chance to update their own netDb and stop asking for new tunnels");
-                                    // send the peer our RouterInfo
-                                    int TIMEOUT = 10*1000;
-                                    DatabaseStoreMessage dsm = new DatabaseStoreMessage(_context);
-                                    dsm.setMessageExpiration(_context.clock().now() + TIMEOUT);
-                                    dsm.setEntry(myRI);
-                                    OutNetMessage outMsg = new OutNetMessage(_context, dsm, _context.clock().now() + TIMEOUT, PRIORITY, fromRI);
-                                    _context.outNetMessagePool().add(outMsg);
-                                }
-                                */
-                            }
-                        }
-                    }
-                    return -1;
-                }
-            }
         }
 
         if (timeSinceReceived > (BuildRequestor.REQUEST_TIMEOUT*3)) {
