@@ -11,7 +11,6 @@ package net.i2p.router.dummy;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,27 +20,16 @@ import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.Job;
+import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.RouterContext;
-import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
-import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseSegmentor;
-import net.i2p.router.networkdb.kademlia.KademliaNetworkDatabaseFacade;
-import net.i2p.router.networkdb.kademlia.SegmentedNetworkDatabaseFacade;
 
-public class DummyNetworkDatabaseFacade extends SegmentedNetworkDatabaseFacade {
+public class DummyNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private final Map<Hash, RouterInfo> _routers;
     private final RouterContext _context;
-    private final FloodfillNetworkDatabaseFacade _fndb;
     
     public DummyNetworkDatabaseFacade(RouterContext ctx) {
-        super(ctx);
-        _fndb  = new FloodfillNetworkDatabaseFacade(ctx, FloodfillNetworkDatabaseSegmentor.MAIN_DBID);
-        _fndb.startup();
         _routers = Collections.synchronizedMap(new HashMap<Hash, RouterInfo>());
         _context = ctx;
-    }
-
-    public FloodfillNetworkDatabaseFacade getSubNetDB(Hash dbid){
-        return null;
     }
 
     public void restart() {}
@@ -89,14 +77,4 @@ public class DummyNetworkDatabaseFacade extends SegmentedNetworkDatabaseFacade {
     
     public Set<Hash> getAllRouters() { return new HashSet<Hash>(_routers.keySet()); }
     public Set<Hash> findNearestRouters(Hash key, int maxNumRouters, Set<Hash> peersToIgnore) { return getAllRouters(); }
-
-    @Override
-    public FloodfillNetworkDatabaseFacade mainNetDB() {
-        return _fndb;
-    }
-
-    @Override
-    public FloodfillNetworkDatabaseFacade clientNetDB(Hash id) {
-        return _fndb;
-    }
 }

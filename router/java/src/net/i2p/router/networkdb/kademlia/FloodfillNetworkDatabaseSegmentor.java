@@ -1,15 +1,7 @@
 package net.i2p.router.networkdb.kademlia;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import net.i2p.data.BlindData;
 import net.i2p.data.Hash;
-import net.i2p.data.LeaseSet;
-import net.i2p.data.SigningPublicKey;
-import net.i2p.data.router.RouterInfo;
+import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -48,8 +40,8 @@ import net.i2p.util.Log;
  * @since 0.9.60
  */
 public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseFacade {
-    protected final Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     //private static final String PROP_NETDB_ISOLATION = "router.netdb.isolation";
     public static final Hash MAIN_DBID = null;
     private final FloodfillNetworkDatabaseFacade _mainDbid;
@@ -62,10 +54,8 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
      * @since 0.9.60
      */
     public FloodfillNetworkDatabaseSegmentor(RouterContext context) {
-        super(context);
         _log = context.logManager().getLog(getClass());
-        if (_context == null)
-            _context = context;
+        _context = context;
         _mainDbid = new FloodfillNetworkDatabaseFacade(_context, MAIN_DBID);
     }
 
@@ -81,10 +71,10 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
      * @param  id  the ID of the FloodfillNetworkDatabaseFacade object to retrieve
      * @return     the FloodfillNetworkDatabaseFacade object corresponding to the ID or null if it does not exist.
      */
-    @Override
-    protected FloodfillNetworkDatabaseFacade getSubNetDB(Hash id) {
+    private NetworkDatabaseFacade getSubNetDB(Hash id) {
         return _context.clientManager().getClientFloodfillNetworkDatabaseFacade(id);
     }
+
 
     /**
      * If we are floodfill, turn it off and tell everybody for the _mainDbid
@@ -117,7 +107,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
      * @return may be null
      */
     @Override
-    public FloodfillNetworkDatabaseFacade mainNetDB() {
+    public NetworkDatabaseFacade mainNetDB() {
         return _mainDbid;
     }
 
@@ -130,11 +120,11 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
      * @return may be null if the client netDb does not exist
      */
     @Override
-    public FloodfillNetworkDatabaseFacade clientNetDB(Hash id) {
+    public NetworkDatabaseFacade clientNetDB(Hash id) {
         if (_log.shouldDebug())
             _log.debug("looked up clientNetDB: " + id);
         if (id != null){
-            FloodfillNetworkDatabaseFacade fndf = getSubNetDB(id);
+            NetworkDatabaseFacade fndf = getSubNetDB(id);
             if (fndf != null)
                 return fndf;
         }

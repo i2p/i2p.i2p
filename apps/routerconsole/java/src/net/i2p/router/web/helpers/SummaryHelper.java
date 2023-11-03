@@ -985,13 +985,14 @@ public class SummaryHelper extends HelperBase {
                .append("</b></div>");
         }
 
+        // checker will be null for DummyNetworkDatabaseFacade
         ReseedChecker checker = _context.netDb().reseedChecker();
-        String status = checker.getStatus();
+        String status = checker != null ? checker.getStatus() : "";
         if (status.length() > 0) {
             // Show status message even if not running, timer in ReseedChecker should remove after 20 minutes
             buf.append("<div class=\"sb_notice\"><i>").append(status).append("</i></div>");
         }
-        if (!checker.inProgress()) {
+        if (checker != null && !checker.inProgress()) {
             // If a new reseed isn't running, and the last reseed had errors, show error message
             String reseedErrorMessage = checker.getError();
             if (reseedErrorMessage.length() > 0) {

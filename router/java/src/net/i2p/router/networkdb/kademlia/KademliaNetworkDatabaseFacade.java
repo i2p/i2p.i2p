@@ -248,12 +248,13 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      * This checks if we're the main DB already and returns our blind
      * cache if we are. If not, it looks up the main Db and gets it.
      * 
-     * @return
+     * @return non-null
+     * @since 0.9.60
      */
     protected BlindCache blindCache() {
         if (!isClientDb())
             return _blindCache;
-        return _context.netDb().blindCache();
+        return ((FloodfillNetworkDatabaseFacade) _context.netDb()).blindCache();
     }
 
     /**
@@ -365,7 +366,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         RouterInfo ri = _context.router().getRouterInfo();
         String dbDir = _context.getProperty(PROP_DB_DIR, DEFAULT_DB_DIR);
         if (isClientDb())
-            _kb = _context.netDb().getKBuckets();
+            _kb = ((FloodfillNetworkDatabaseFacade) _context.netDb()).getKBuckets();
         else
             _kb = new KBucketSet<Hash>(_context, ri.getIdentity().getHash(),
                                    BUCKET_SIZE, KAD_B, new RejectTrimmer<Hash>());

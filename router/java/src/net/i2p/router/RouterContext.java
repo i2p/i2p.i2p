@@ -244,10 +244,9 @@ public class RouterContext extends I2PAppContext {
         //_messageStateMonitor = new MessageStateMonitor(this);
         _routingKeyGenerator = new RouterKeyGenerator(this);
         if (!getBooleanProperty("i2p.dummyNetDb"))
-            //_netDb = new FloodfillNetworkDatabaseFacade(this); // new KademliaNetworkDatabaseFacade(this);
-            _netDb = new FloodfillNetworkDatabaseSegmentor(this); // new KademliaNetworkDatabaseFacade(this);
+            _netDb = new FloodfillNetworkDatabaseSegmentor(this);
         else
-            _netDb = new DummyNetworkDatabaseFacade(this);
+            _netDb = new DummyNetworkDatabaseSegmentor(this);
         _keyManager = new KeyManager(this);
         if (!getBooleanProperty("i2p.vmCommSystem"))
             _commSystem = new CommSystemFacadeImpl(this);
@@ -371,10 +370,23 @@ public class RouterContext extends I2PAppContext {
 
     /**
      * Our db cache
+     * @since 0.9.60
      */
     public SegmentedNetworkDatabaseFacade netDbSegmentor() { return _netDb; }
-    public FloodfillNetworkDatabaseFacade netDb() { return _netDb.mainNetDB(); }
-    public FloodfillNetworkDatabaseFacade clientNetDb(Hash id) { return _netDb.clientNetDB(id); }
+
+    public NetworkDatabaseFacade netDb() { return _netDb.mainNetDB(); }
+
+    /**
+     * Get the client netDb for the given id.
+     * Will return the main netDb if
+     * the dbid is null or the client db is not found.
+     * 
+     * @since 0.9.60
+     * @param id may be null
+     * @return non-null
+     */
+    public NetworkDatabaseFacade clientNetDb(Hash id) { return _netDb.clientNetDB(id); }
+
     /**
      * The actual driver of the router, where all jobs are enqueued and processed.
      */

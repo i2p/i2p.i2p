@@ -1,24 +1,7 @@
 package net.i2p.router.networkdb.kademlia;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
-
-import net.i2p.data.BlindData;
-import net.i2p.data.DatabaseEntry;
-import net.i2p.data.Destination;
 import net.i2p.data.Hash;
-import net.i2p.data.LeaseSet;
-import net.i2p.data.SigningPublicKey;
-import net.i2p.data.router.RouterInfo;
-import net.i2p.router.Job;
 import net.i2p.router.NetworkDatabaseFacade;
-import net.i2p.router.RouterContext;
-import net.i2p.router.networkdb.reseed.ReseedChecker;
-import net.i2p.util.Log;
 
 /**
  * SegmentedNetworkDatabaseFacade
@@ -57,23 +40,15 @@ import net.i2p.util.Log;
  * @since 0.9.60
  */
 public abstract class SegmentedNetworkDatabaseFacade {
-    public SegmentedNetworkDatabaseFacade(RouterContext context) {
-    }
 
-    /**
-     * Get a sub-netDb using a Hash identifier
-     * 
-     * @return client subDb for hash, or null if it does not exist
-     * @since 0.9.60
-     */
-    protected abstract FloodfillNetworkDatabaseFacade getSubNetDB(Hash dbid);
     /**
      * Get the main netDb, the one which is used if we're a floodfill
      * 
      * @return may be null if main netDb is not initialized
      * @since 0.9.60
      */
-    public abstract FloodfillNetworkDatabaseFacade mainNetDB();
+    public abstract NetworkDatabaseFacade mainNetDB();
+
     /**
      * Get a client netDb for a given client Hash identifier. Will never
      * return the mainNetDB.
@@ -81,13 +56,15 @@ public abstract class SegmentedNetworkDatabaseFacade {
      * @return may be null if the client netDb does not exist
      * @since 0.9.60
      */
-    public abstract FloodfillNetworkDatabaseFacade clientNetDB(Hash dbid);
+    public abstract NetworkDatabaseFacade clientNetDB(Hash dbid);
+
     /**
      * Shut down the network databases
      * 
      * @since 0.9.60
      */
     public abstract void shutdown();
+
     /**
      * Start up the network databases
      * 
