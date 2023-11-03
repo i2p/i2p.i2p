@@ -207,7 +207,7 @@ abstract class StoreJob extends JobImpl {
             for (Hash peer : closestHashes) {
                 DatabaseEntry ds;
                 if (_facade.isClientDb())
-                    ds = getContext().netDb().getDataStore().get(peer);
+                    ds = ((FloodfillNetworkDatabaseFacade) getContext().netDb()).getDataStore().get(peer);
                 else
                     ds = _facade.getDataStore().get(peer);
                 if ( (ds == null) || !(ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) ) {
