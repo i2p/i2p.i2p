@@ -12,7 +12,7 @@
 - Review changes in English po files, fix up any necessary tagged strings in Java source
 - Revert English po files with no actual changes (i.e. with line number changes only)
 - Check in remaining English po files (and any files with changed strings)
-- Push to Transifex: `tx push -s`
+- Push to Transifex: `tx push --use-git-timestamps -s`
 - Make announcement on Transifex with checkin deadline
 
 - GeoIP: db-ip.com update is usually first of the month, time accordingly
@@ -47,7 +47,7 @@
     - See README for setup
   - `./create_new_entry.sh`
     - Entry href should be the in-net link to the release blog post
-  - `tx push -s`
+  - `tx push --use-git-timestamps -s`
   - `git commit`
 
 2. Write the draft blog post and push to Transifex:
@@ -55,7 +55,7 @@
   - Checkout i2p.www branch
   - Write draft release announcement - see i2p2www/blog/README for instructions
     - Top content should be the same as the news entry
-  - `tx push -s -r I2P.website_blog`
+  - `tx push --use-git-timestamps -s -r I2P.website_blog`
   - `git commit`
 
 3. Make announcement on Transifex asking for news translation
@@ -73,7 +73,7 @@
   - Look for newly translated languages and resources on Transifex
   - Add any new ones to .tx/config (use your own judgement on which to include
     based on minimum translated percentage)
-  - `tx pull`
+  - `tx pull --use-git-timestamps`
   - `ant testscripts` to verify that all updated translations are valid
   - For any invalid that break the test, fix up the po file manually, or fix on
     tx and pull again, or (if new) comment out in .tx/config (add a comment why)
@@ -266,7 +266,7 @@
 8. Notify downstream Debian maintainer
 
 9. Pull announcement translations:
-  - `tx pull -r I2P.website_blog`
+  - `tx pull --use-git-timestamps -r I2P.website_blog`
   Do NOT forget this step!
   - `./update-existing-po.sh`
   - `git commit i2p2www/translations/ -m "Updated translations"`
