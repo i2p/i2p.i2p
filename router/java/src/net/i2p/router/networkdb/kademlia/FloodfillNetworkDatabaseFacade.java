@@ -41,10 +41,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     private final Set<Hash> _verifiesInProgress;
     private FloodThrottler _floodThrottler;
     private LookupThrottler _lookupThrottler;
-    private LookupThrottler _lookupThrottlerBurst;
     private final Job _ffMonitor;
-    private final int DROP_LOOKUP_BURST = 10;
-    private final int DROP_LOOKUP_BURST_INTERVAL = 30*1000;
 
     /**
      *  This is the flood redundancy. Entries are
@@ -112,7 +109,6 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         } else {
             isFF = _context.getBooleanProperty(FloodfillMonitorJob.PROP_FLOODFILL_PARTICIPANT);
             _lookupThrottler = new LookupThrottler();
-            _lookupThrottlerBurst = new LookupThrottler(DROP_LOOKUP_BURST, DROP_LOOKUP_BURST_INTERVAL);
         }
 
         long down = _context.router().getEstimatedDowntime();
@@ -238,11 +234,6 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     boolean shouldThrottleLookup(Hash from, TunnelId id) {
         // null before startup
         return _lookupThrottler == null || _lookupThrottler.shouldThrottle(from, id);
-    }
-
-    boolean shouldThrottleBurstLookup(Hash from, TunnelId id) {
-        // null before startup
-        return _lookupThrottlerBurst == null || _lookupThrottlerBurst.shouldThrottle(from, id);
     }
 
     /**

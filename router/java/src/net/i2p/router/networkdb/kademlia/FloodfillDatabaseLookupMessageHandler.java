@@ -83,8 +83,7 @@ public class FloodfillDatabaseLookupMessageHandler implements HandlerJobBuilder 
             _context.statManager().addRateData("netDb.nonFFLookupsDropped", 1);
             return null;
         }
-        if ((!_facade.shouldThrottleLookup(dlm.getFrom(), dlm.getReplyTunnel())
-                && !_facade.shouldThrottleBurstLookup(dlm.getFrom(), dlm.getReplyTunnel()))
+        if (!_facade.shouldThrottleLookup(dlm.getFrom(), dlm.getReplyTunnel())
                 || _context.routerHash().equals(dlm.getFrom())) {
             Job j = new HandleFloodfillDatabaseLookupMessageJob(_context, dlm, from, fromHash, _msgIDBloomXor);
             // if (false) {
