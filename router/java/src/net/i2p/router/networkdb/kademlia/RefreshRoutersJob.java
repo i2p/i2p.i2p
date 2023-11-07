@@ -41,7 +41,7 @@ class RefreshRoutersJob extends JobImpl {
      *  Don't go faster as this overloads the expl. OBEP / IBGW
      */
     private final static long RERUN_DELAY_MS = 2500;
-    public final static long EXPIRE = 2*60*60*1000;
+    private final static long EXPIRE = 2*60*60*1000;
     private final static long NEW_LOOP_DELAY = 37*60*1000;
     private static final int ENOUGH_FFS = 3 * StartExplorersJob.LOW_FFS;
     
