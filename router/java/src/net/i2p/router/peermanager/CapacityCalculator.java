@@ -147,10 +147,6 @@ class CapacityCalculator {
                         capacity -= PENALTY_CAP_E;
                     }
                 }
-                /* TODO: G caps can be excluded in TunnelPeerSelector by adding it to DEFAULT_EXCLUDE_CAPS */
-                // decide what other handling if any is needed here.
-                //else if (caps.indexOf(Router.CAPABILITY_NO_TUNNELS) >= 0)
-                //    capacity -= PENALTY_G_CAP;
             } else {
                 capacity -= PENALTY_NO_RI;
             }
