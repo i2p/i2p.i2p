@@ -23,8 +23,8 @@ class LookupThrottler {
     private final int MAX_LOOKUPS; // DEFAULT=20
     private final long CLEAN_TIME; // DEFAULT=3*60*1000
     LookupThrottler() {
-        MAX_LOOKUPS = 20;
-        CLEAN_TIME = 3*60*1000;
+        MAX_LOOKUPS = 14;
+        CLEAN_TIME = 2*60*1000;
         this.counter = new ObjectCounter<ReplyTunnel>();
         SimpleTimer2.getInstance().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
     }
