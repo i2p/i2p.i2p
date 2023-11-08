@@ -120,13 +120,14 @@ public abstract class NetworkDatabaseFacade implements Service {
      *  @return the old entry if it already existed at that key 
      *  @throws IllegalArgumentException if the data is not valid
      *  @since 0.9.16
+     *  @deprecated unused
      */
+    @Deprecated
     public DatabaseEntry store(Hash key, DatabaseEntry entry) throws IllegalArgumentException {
-        if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
+        if (!entry.isLeaseSet())
             return store(key, (RouterInfo) entry);
-        if (entry.getType() == DatabaseEntry.KEY_TYPE_LEASESET)
+        else
             return store(key, (LeaseSet) entry);
-        throw new IllegalArgumentException("unknown type");
     }
 
     /**
