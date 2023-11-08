@@ -958,7 +958,7 @@ public abstract class TransportImpl implements Transport {
         // even HARD banned in the first place (we've been unbanning everybody
         // who reaches here, whether they're banned or not), then mark it
         // with an warning-level log entry.
-        if (_context.banlist().isBanlistedHard(peer)) {
+        if (_context.banlist().isBanlistedForever(peer)) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Unbanning HARD-banned peer (due to reachability): " + peer, new Exception("Unbanned by"));
             _context.banlist().unbanlistRouter(peer);

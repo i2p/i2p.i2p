@@ -247,7 +247,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         if (!floodfillEnabled())
             return false;
         Hash h = ds.getHash();
-        if (_context.banlist().isBanlistedHard(h))
+        if (_context.banlist().isBanlistedForever(h))
             return false;
         if (shouldThrottleFlood(h)) {
             _context.statManager().addRateData("netDb.floodThrottled", 1);
@@ -668,7 +668,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             knownRouters > MAX_DB_BEFORE_SKIPPING_SEARCH ||
             _context.jobQueue().getMaxLag() > 500 ||
             _context.router().gracefulShutdownInProgress() ||
-            _context.banlist().isBanlistedHard(peer)) {
+            _context.banlist().isBanlistedForever(peer)) {
             // don't try to overload ourselves (e.g. failing 3000 router refs at
             // once, and then firing off 3000 netDb lookup tasks)
             // Also don't queue a search if we have plenty of routerinfos

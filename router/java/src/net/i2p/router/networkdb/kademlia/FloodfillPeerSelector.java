@@ -140,7 +140,7 @@ class FloodfillPeerSelector extends PeerSelector {
         List<Hash> rv = new ArrayList<Hash>(set.size());
         for (Hash h : set) {
             if ((toIgnore != null && toIgnore.contains(h)) ||
-                _context.banlist().isBanlistedHard(h))
+                _context.banlist().isBanlistedForever(h))
                continue;
             rv.add(h);
         }
@@ -371,7 +371,7 @@ class FloodfillPeerSelector extends PeerSelector {
             //if (_context.banlist().isBanlisted(entry))
             //    return;
             // ... unless they are really bad
-            if (_context.banlist().isBanlistedHard(entry))
+            if (_context.banlist().isBanlistedForever(entry))
                 return;
             RouterInfo info = (RouterInfo) _context.netDb().lookupLocallyWithoutValidation(entry);
             //if (info == null)

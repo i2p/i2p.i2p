@@ -173,7 +173,7 @@ public class Analysis extends JobImpl implements RouterApp, Runnable {
                     if (b != null && b.length == Hash.HASH_LENGTH) {
                         Hash h = Hash.create(b);
                         long until = e.getValue().longValue();
-                        ban.banlistRouter(h, "Sybil analysis", null, ban.BANLIST_CODE_HARD, null, until);
+                        ban.banlistRouter(h, "Sybil analysis", null, null, until);
                     }
                 }
             }
@@ -497,7 +497,7 @@ public class Analysis extends JobImpl implements RouterApp, Runnable {
                     else
                         _log.warn("Banned " + h.toBase64() + " by " + reason);
                 }
-                _context.banlist().banlistRouter(h, reason, null, Banlist.BANLIST_CODE_HARD, null, blockUntil);
+                _context.banlist().banlistRouter(h, reason, null, null, blockUntil);
             }
         }
         if (!blocks.isEmpty())
@@ -1061,8 +1061,8 @@ public class Analysis extends JobImpl implements RouterApp, Runnable {
                 if (entry != null) {
                     if (entry.cause != null) {
                         buf.append(": ");
-                        if (entry.causeComment != null)
-                            buf.append(_t(entry.cause, entry.causeComment));
+                        if (entry.causeCode != null)
+                            buf.append(_t(entry.cause, entry.causeCode));
                         else
                             buf.append(_t(entry.cause));
                     }

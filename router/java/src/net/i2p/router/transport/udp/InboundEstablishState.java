@@ -399,7 +399,7 @@ class InboundEstablishState {
                     fail();
                 }
                 Hash h = _receivedUnconfirmedIdentity.calculateHash();
-                if (_context.banlist().isBanlistedHard(h)) {
+                if (_context.banlist().isBanlistedForever(h)) {
                     // validate sig to prevent spoofing
                     if (getConfirmedIdentity() != null)
                        _context.blocklist().add(_aliceIP);
