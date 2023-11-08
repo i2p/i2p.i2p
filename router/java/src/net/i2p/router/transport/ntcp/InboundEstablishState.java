@@ -180,7 +180,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
     private boolean verifyInbound(Hash aliceHash) {
         // get inet-addr
         byte[] ip = _con.getRemoteIP();
-        if (_context.banlist().isBanlistedHard(aliceHash)) {
+        if (_context.banlist().isBanlistedForever(aliceHash)) {
             if (_log.shouldWarn())
                 _log.warn("Dropping inbound connection from permanently banlisted peer at " + Addresses.toString(ip) + " : " + aliceHash);
             // So next time we will not accept the con from this IP,
@@ -674,7 +674,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         }
         _aliceIdent = ri.getIdentity();
         Hash h = _aliceIdent.calculateHash();
-        // this sets the reason
+        // this sets the reasonH
         boolean ok = verifyInbound(h);
         if (!ok)
             throw new DataFormatException("NTCP2 verifyInbound() fail");
@@ -682,7 +682,8 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         // s is verified, we may now ban the hash
         if (mismatchMessage != null) {
             _context.banlist().banlistRouter(h, "IP mismatch", null,
-                                             _context.banlist().BANLIST_CODE_HARD,  null,
+                                             //_context.banlist().BANLIST_CODE_FOREVER,
+                                             null,
                                              _context.clock().now() + 2*60*60*1000);
             _msg3p2FailReason = NTCPConnection.REASON_BANNED;
             throw new DataFormatException(mismatchMessage + ri);

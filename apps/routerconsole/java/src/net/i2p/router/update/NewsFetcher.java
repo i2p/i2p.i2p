@@ -657,7 +657,7 @@ class NewsFetcher extends UpdateRunner {
                     continue;
                 }
                 Hash h = Hash.create(b);
-                if (!ban.isBanlistedHard(h)) {
+                if (!ban.isBanlistedForever(h)) {
                     ban.banlistRouterForever(h, reason);
                     _context.commSystem().forceDisconnect(h);
                 }
@@ -681,7 +681,7 @@ class NewsFetcher extends UpdateRunner {
                 if (b == null || b.length != Hash.HASH_LENGTH)
                     continue;
                 Hash h = Hash.create(b);
-                if (ban.isBanlistedHard(h))
+                if (ban.isBanlistedForever(h))
                     ban.unbanlistRouter(h);
             } else {
                 byte[] ip = Addresses.getIP(s);

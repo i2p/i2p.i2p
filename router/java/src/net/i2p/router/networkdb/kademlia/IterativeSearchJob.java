@@ -594,7 +594,7 @@ public class IterativeSearchJob extends FloodSearchJob {
         if (peer.equals(getContext().routerHash()) ||
             peer.equals(_key))
             return;
-        if (getContext().banlist().isBanlistedHard(peer)) {
+        if (getContext().banlist().isBanlistedForever(peer)) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": banlisted peer from DSRM " + peer);
             return;

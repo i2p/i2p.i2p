@@ -824,7 +824,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (ri != null) {
             if (onFindJob != null)
                 _context.jobQueue().addJob(onFindJob);
-        } else if (_context.banlist().isBanlistedHard(key)) {
+        } else if (_context.banlist().isBanlistedForever(key)) {
             if (onFailedLookupJob != null)
                 _context.jobQueue().addJob(onFailedLookupJob);
         } else if (isNegativeCached(key)) {
