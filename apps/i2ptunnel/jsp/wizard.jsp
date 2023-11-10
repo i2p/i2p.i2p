@@ -218,7 +218,7 @@
     <tr>
         <td>
             <span class="tag"><%=intl._t("Name")%>:</span>
-                <input type="text" size="30" maxlength="50" name="name" id="name" placeholder="New Tunnel" title="<%=intl._t("Name of tunnel to be displayed on Tunnel Manager home page and the router console sidebar")%>" value="<%=(!"null".equals(request.getParameter("name")) ? net.i2p.data.DataHelper.stripHTML(request.getParameter("name")) : "" ) %>" class="freetext" />
+                <input type="text" size="30" maxlength="50" name="nofilter_name" id="name" placeholder="New Tunnel" title="<%=intl._t("Name of tunnel to be displayed on Tunnel Manager home page and the router console sidebar")%>" value="<%=(!"null".equals(request.getParameter("nofilter_name")) ? net.i2p.data.DataHelper.stripHTML(request.getParameter("nofilter_name")) : "" ) %>" class="freetext" />
         </td>
     </tr>
     <tr>
@@ -229,7 +229,7 @@
     </tr>
             <%
             } else {
-            %><input type="hidden" name="name" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("name"))%>" />
+            %><input type="hidden" name="nofilter_name" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("nofilter_name"))%>" />
             <input type="hidden" name="nofilter_description" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("nofilter_description"))%>" /><%
             } /* curPage 3 */
 
@@ -470,7 +470,7 @@
                 } %>
                 </td></tr>
                 <tr><td><%=intl._t("Tunnel name")%></td>
-                <td><%=net.i2p.data.DataHelper.stripHTML(request.getParameter("name"))%></td></tr>    
+                <td><%=net.i2p.data.DataHelper.stripHTML(request.getParameter("nofilter_name"))%></td></tr>
                 <tr><td><%=intl._t("Tunnel description")%></td>
                 <td><%=net.i2p.data.DataHelper.stripHTML(request.getParameter("nofilter_description"))%></td></tr>
                 <%

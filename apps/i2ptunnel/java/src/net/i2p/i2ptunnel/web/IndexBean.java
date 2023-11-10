@@ -710,7 +710,7 @@ public class IndexBean {
     String getType() { return _config.getType(); }
     
     /** Short name of the tunnel */
-    public void setName(String name) { 
+    public void setNofilter_name(String name) {
         _config.setName(name);
     }
     /** one line description */

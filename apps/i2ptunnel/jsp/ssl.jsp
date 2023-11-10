@@ -407,7 +407,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     // we only set the applicable server settings
                     editBean.setTunnel(tun);
                     editBean.setType(tunnelType);
-                    editBean.setName(editBean.getTunnelName(curTunnel));
+                    editBean.setNofilter_name(editBean.getTunnelName(curTunnel));
                     editBean.setTargetHost(editBean.getTargetHost(curTunnel));
                     editBean.setTargetPort(editBean.getTargetPort(curTunnel));
                     editBean.setSpoofedHost(editBean.getSpoofedHost(curTunnel));

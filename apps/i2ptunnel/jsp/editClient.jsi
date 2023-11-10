@@ -44,7 +44,7 @@
             </th>
         </tr><tr>
             <td>
-                <input type="text" size="30" maxlength="50" name="name" title="<%=intl._t("Name of tunnel to be displayed on Tunnel Manager home page and the router console sidebar")%>" value="<%=editBean.getTunnelName(curTunnel)%>" class="freetext tunnelName" />
+                <input type="text" size="30" maxlength="50" name="nofilter_name" title="<%=intl._t("Name of tunnel to be displayed on Tunnel Manager home page and the router console sidebar")%>" value="<%=editBean.getTunnelName(curTunnel)%>" class="freetext tunnelName" />
             </td><td>
                 <%=tunnelTypeName%>
             </td>
