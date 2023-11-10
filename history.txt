@@ -1,4 +1,36 @@
+2023-11-10 zzz
+ * NetDB: Lookup handler/throttler fixes
+   - Allow limited lookups when non-ff, but still disallow expl. lookups
+   - Remove unnecessary banlist checks in handler
+   - Add lower non-ff limit in throttler
+   - Fix check for our RI
+   - Remove now-unused stats
+
+2023-11-09 zzz
+ * Console: Fix published LS count on the debug LS tab
+
+2023-11-08 zzz
+ * NetDB: Fix and deprecate unused store() method
+
+2023-11-07 zzz
+ * Translations: Fix config file for v3
+
+2023-11-04 zzz
+ * NetDB: Type changes (Gitlab #402)
+   - Revert ctx.netDb() return type change
+   - Revert all DummyNetworkDatabaseFacade changes
+   - Add DummyNetworkDatabaseSegmentor
+   - FNDS/SNDF return type changes
+   - Add back casts of netDb() calls to FNDF where necessary
+   - Fix console NPE when using DummyNDF
+
+2023-11-03 zzz
+ * Console: RTL CSS tweaks
+
 2023-11-02 zzz
+ * Console:
+   - Use RTL CSS for Persian
+   - Profiles definitions CSS fixes
  * NetDB: Enforce no RIs in subdbs (Gitlab #465)
    - Throw IAE if attempting to store/publish RI to subdb
    - Log warnings if attempting to lookup RI in subdb
