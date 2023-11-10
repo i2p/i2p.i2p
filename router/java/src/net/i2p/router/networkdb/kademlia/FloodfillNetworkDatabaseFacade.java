@@ -108,7 +108,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             isFF = false;
         } else {
             isFF = _context.getBooleanProperty(FloodfillMonitorJob.PROP_FLOODFILL_PARTICIPANT);
-            _lookupThrottler = new LookupThrottler();
+            _lookupThrottler = new LookupThrottler(this);
         }
 
         long down = _context.router().getEstimatedDowntime();
