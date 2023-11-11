@@ -29,6 +29,7 @@ import gnu.getopt.Getopt;
 
 import freenet.support.CPUInformation.CPUID;
 import freenet.support.CPUInformation.UnknownCPUException;
+import net.i2p.CoreVersion;
 import net.i2p.client.impl.I2PSessionImpl;
 import net.i2p.crypto.SigUtil;
 import net.i2p.data.Base64;
@@ -76,6 +77,7 @@ import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleByteCache;
 import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
+import net.i2p.util.VersionComparator;
 
 /**
  * Main driver for the router.
@@ -145,7 +147,7 @@ public class Router implements RouterClock.ClockShiftListener {
     private static final String PROP_JBIGI_PROCESSOR = "jbigi.lastProcessor";
     public static final String UPDATE_FILE = "i2pupdate.zip";
     //// remove after release ////
-    private static final boolean CONGESTION_CAPS = net.i2p.CoreVersion.PUBLISHED_VERSION.equals("0.9.58");
+    private static final boolean CONGESTION_CAPS = VersionComparator.comp(CoreVersion.PUBLISHED_VERSION, "0.9.60") >= 0;
         
     private static final int SHUTDOWN_WAIT_SECS = 60;
 
