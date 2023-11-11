@@ -4740,7 +4740,7 @@ select {
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
     select {
-        padding: 5px 16px 5px 6px !important;
+        padding: 5px 24px 5px 6px !important;
     }
 }
 
@@ -7327,7 +7327,6 @@ b.netdb_transport {
     margin-right: 0;
 }
 
-.sybil_routerinfo td:first-child,
 .netdbentry td:first-child {
     text-align: right !important;
     padding-right: 0;

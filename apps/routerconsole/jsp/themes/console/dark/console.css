@@ -2285,7 +2285,7 @@ select {
     -moz-appearance: none;
     -webkit-appearance: none;
     appearance: none;
-    background: #332940 url(images/dropdown.png) right center no-repeat !important;
+    background: #332940 url(images/dropdown.png) right 4px center no-repeat !important;
     color: #524b5e;
     margin: 5px 10px;
     border: 1px outset #191;
@@ -2293,7 +2293,7 @@ select {
     min-width: 110px;
     font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
     font-weight: bold;
-    padding: 3px 16px 3px 4px !important;
+    padding: 3px 24px 3px 4px !important;
     cursor: pointer;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -7264,7 +7264,6 @@ b.netdb_transport {
     margin-right: 0;
 }
 
-.sybil_routerinfo td:first-child,
 .netdbentry td:first-child {
     text-align: right !important;
     padding-right: 0;
