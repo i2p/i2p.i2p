@@ -38,12 +38,15 @@ public class FloodfillDatabaseStoreMessageHandler implements HandlerJobBuilder {
     }
 
     public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
-        Job j = new HandleFloodfillDatabaseStoreMessageJob(_context, (DatabaseStoreMessage)receivedMessage, from, fromHash, _facade, _msgIDBloomXor);
-        if (false) {
-            j.runJob();
-            return null;
-        } else {
-            return j;
-        }
+        DatabaseStoreMessage dsm = (DatabaseStoreMessage)receivedMessage;
+        // store to client db if received by that client
+        Hash by = dsm.getEntry().getReceivedBy();
+        FloodfillNetworkDatabaseFacade netdb;
+        if (by != null)
+            netdb = (FloodfillNetworkDatabaseFacade) _context.clientNetDb(by);
+        else
+            netdb = _facade;
+        Job j = new HandleFloodfillDatabaseStoreMessageJob(_context, dsm, from, fromHash, netdb, _msgIDBloomXor);
+        return j;
     }
 }
