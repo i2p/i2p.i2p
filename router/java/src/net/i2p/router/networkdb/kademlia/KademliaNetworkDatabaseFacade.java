@@ -1310,12 +1310,18 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                               + " peers left " + routerInfo);
             }
         }
-        if (routerInfo.getPublished() > now + 2*Router.CLOCK_FUDGE_FACTOR) {
-            long age = routerInfo.getPublished() - now;
+        long age = now - routerInfo.getPublished();
+        if (age < 0 - 2*Router.CLOCK_FUDGE_FACTOR) {
+            String skewString = DataHelper.formatDuration(0 - age);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Peer " + routerInfo.getIdentity().getHash() + " published their routerInfo in the future?! [" 
-                          + new Date(routerInfo.getPublished()) + "]", new Exception());
-            return "Peer published " + DataHelper.formatDuration(age) + " in the future?!";
+                          + skewString + ']', new Exception());
+            if (upLongEnough && _context.commSystem().countActivePeers() >= 50) {
+                // we can be fairly confident that his clock is in the future,
+                // not that ours is in the past, so ban him for a while
+                _context.banlist().banlistRouter(routerInfo.getHash(), "Excessive clock skew: {0}", skewString, null, now + 60*60*1000);
+            }
+            return "Peer published " + skewString + " in the future?!";
         }
         if (!routerInfo.isCurrent(ROUTER_INFO_EXPIRATION_INTRODUCED)) {
             if (routerInfo.getAddresses().isEmpty())
@@ -1331,8 +1337,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
                     return "Old peer with SSU Introducers";
             }
         }
-        if (upLongEnough && (routerInfo.getPublished() < now - 2*24*60*60*1000l) ) {
-            long age = now - routerInfo.getPublished();
+        if (upLongEnough && age > 2*24*60*60*1000l) {
             return "Peer published " + DataHelper.formatDuration(age) + " ago";
         }
         if (upLongEnough && !routerInfo.isCurrent(ROUTER_INFO_EXPIRATION_SHORT)) {
