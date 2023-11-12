@@ -118,6 +118,9 @@ public class Analysis extends JobImpl implements RouterApp, Runnable {
     public static final float MIN_BLOCK_POINTS = 12.01f;
     private static final byte[] IPV6_LOCALHOST = new byte[16];
     static { IPV6_LOCALHOST[15] = 1; }
+    // i2pd bug 64:ff9b::/96
+    private static final byte[] IPV6_NAT64 = new byte[16];
+    static { IPV6_NAT64[1] = 0x64; IPV6_NAT64[2] = (byte) 0xff; IPV6_NAT64[3] = (byte) 0x9b; }
 
     /** Get via getInstance() */
     private Analysis(RouterContext ctx, ClientAppManager mgr, String[] args) {
@@ -585,8 +588,8 @@ public class Analysis extends JobImpl implements RouterApp, Runnable {
         for (RouterAddress ra : ri.getAddresses()) {
             byte[] rv = ra.getIP();
             if (rv != null && rv.length == 16)
-                // i2pd
-                if (!DataHelper.eq(rv, IPV6_LOCALHOST))
+                // i2pd bugs
+                if (!DataHelper.eq(rv, IPV6_LOCALHOST) && !DataHelper.eq(rv, 0, IPV6_NAT64, 0, 12))
                     return rv;
         }
         return null;
