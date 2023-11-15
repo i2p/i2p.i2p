@@ -3350,7 +3350,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     buf.append("</span></td></tr>");
                 }
                 List<List<String>> alist = meta.getAnnounceList();
-                List<String> annlist = new ArrayList<String>();
+                Set<String> annlist = new TreeSet<String>();
                 if (alist != null && !alist.isEmpty()) {
                     // strip non-i2p trackers
                     for (List<String> alist2 : alist) {
