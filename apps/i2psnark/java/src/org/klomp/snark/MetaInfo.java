@@ -186,11 +186,20 @@ public class MetaInfo
     if (val == null) {
         this.url_list = null;
     } else {
-        List<BEValue> bl1 = val.getList();
-        this.url_list = new ArrayList<String>(bl1.size());
-        for (BEValue bev : bl1) {
-            this.url_list.add(bev.getString());
+        List<String> urllist;
+        try {
+            List<BEValue> bl1 = val.getList();
+            urllist = new ArrayList<String>(bl1.size());
+            for (BEValue bev : bl1) {
+                urllist.add(bev.getString());
+            }
+        } catch (InvalidBEncodingException ibee) {
+            // BEP 19 says it's a list but the example there
+            // is for a single byte string, and we've seen this
+            // in the wild.
+            urllist = Collections.singletonList(val.getString());
         }
+        this.url_list = urllist;
     }
 
     // misc. optional  top-level stuff
