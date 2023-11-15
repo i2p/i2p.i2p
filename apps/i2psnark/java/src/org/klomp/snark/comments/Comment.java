@@ -32,7 +32,7 @@ public class Comment implements Comparable<Comment> {
     public static final int MAX_NAME_LEN = 32;
     // same as IRC, more or less
     private static final int MAX_TEXT_LEN = 512;
-    private static final int BUCKET_SIZE = 10*60*1000;
+    private static final int BUCKET_SIZE = 4*60*60*1000;
     private static final long TIME_SHRINK = 1000L;
     private static final int MAX_SKEW = (int) (BUCKET_SIZE / TIME_SHRINK);
     // 1/1/2005
