@@ -4406,8 +4406,8 @@ public class I2PSnarkServlet extends BasicServlet {
         if (announce != null)
             annlist.add(announce);
         if (!annlist.isEmpty()) {
-            buf.append("<tr><td colspan=\"3\"></td><td>").append("Primary").append("</td><td>")
-               .append("Delete").append("</td></tr>");
+            buf.append("<tr><td colspan=\"3\"></td><td>").append(_t("Primary")).append("</td><td>")
+               .append(_t("Delete")).append("</td></tr>");
             for (String s : annlist) {
                 int hc = s.hashCode();
                 buf.append("<tr><td>");
@@ -4439,8 +4439,8 @@ public class I2PSnarkServlet extends BasicServlet {
                 iter.remove();
         }
         if (!newTrackers.isEmpty()) {
-            buf.append("<tr><td colspan=\"3\"></td><td>").append("Primary").append("</td><td>")
-               .append("Add").append("</td></tr>");
+            buf.append("<tr><td colspan=\"3\"></td><td>").append(_t("Primary")).append("</td><td>")
+               .append(_t("Add")).append("</td></tr>");
             for (Tracker t : newTrackers) {
                 String name = t.name;
                 int hc = t.announceURL.hashCode();
