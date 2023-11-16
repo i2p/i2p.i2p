@@ -115,66 +115,24 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         if (DatabaseEntry.isLeaseSet(type) &&
             (lookupType == DatabaseLookupMessage.Type.ANY || lookupType == DatabaseLookupMessage.Type.LS)) {
             LeaseSet ls = (LeaseSet) dbe;
-            // We have to be very careful here to decide whether or not to send out the leaseSet,
-            // to avoid anonymity vulnerabilities.
-            // As this is complex, lots of comments follow...
-
-            boolean isLocal = getContext().clientManager().isLocal(ls.getHash());
-            boolean shouldPublishLocal = isLocal && getContext().clientManager().shouldPublishLeaseSet(searchKey);
-        
-            // Only answer a request for a LeaseSet if it has been published
-            // to us, or, if its local, if we would have published to ourselves
+            // Answer any request for a LeaseSet if it has been published to us.
 
             // answerAllQueries: We are floodfill
             // getReceivedAsPublished:
-            //    false for local
-            //    false for received over a tunnel
-            //    false for received in response to our lookups
-            //    true for received in a DatabaseStoreMessage unsolicited
+            //    false for received over a client tunnel(if associated with a client, goes to client subDB)
+            //    true for received in a DatabaseStoreMessage unsolicited(goes to main Db)
             if (ls.getReceivedAsPublished()) {
-                // Answer anything that was stored to us directly
-                // (i.e. "received as published" - not the result of a query, or received
-                // over a client tunnel).
-                // This is probably because we are floodfill, but also perhaps we used to be floodfill,
-                // so we don't check the answerAllQueries() flag.
-                // Local leasesets are not handled here
+                //* Answer anything that was stored to us directly.
+                //(i.e. "received as published" - not the result of a query).
+                //* LeaseSets recieved over a client tunnel will be routed into subDbs.
+                // subDbs are responsible for publishing their "own" client LeaseSets.
+                //* The "main" netDb can safely store it's own copies of a LeaseSet
+                // belonging to a Local client, when it is published back to it. Therefore,
+                // they do not require special handling and are handled here.
                 if (_log.shouldLog(Log.INFO))
                     _log.info("We have the published LS " + searchKey + ", answering query");
                 getContext().statManager().addRateData("netDb.lookupsMatchedReceivedPublished", 1);
                 sendData(searchKey, ls, fromKey, toTunnel);
-            } else if (shouldPublishLocal && answerAllQueries()) {
-                // We are floodfill, and this is our local leaseset, and we publish it.
-                // Only send it out if it is in our estimated keyspace.
-                // For this, we do NOT use their dontInclude list as it can't be trusted
-                // (i.e. it could mess up the closeness calculation)
-                Set<Hash> closestHashes = getContext().netDb().findNearestRouters(searchKey, 
-                                                                            CLOSENESS_THRESHOLD, null);
-                if (weAreClosest(closestHashes)) {
-                    // It's in our keyspace, so give it to them
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("We have local LS " + searchKey + ", answering query, in our keyspace");
-                    getContext().statManager().addRateData("netDb.lookupsMatchedLocalClosest", 1);
-                    sendData(searchKey, ls, fromKey, toTunnel);
-                } else {
-                    // Lie, pretend we don't have it
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("We have local LS " + searchKey + ", NOT answering query, out of our keyspace");
-                    getContext().statManager().addRateData("netDb.lookupsMatchedLocalNotClosest", 1);
-                    Set<Hash> routerHashSet = getNearestRouters(lookupType);
-                    sendClosest(searchKey, routerHashSet, fromKey, toTunnel);
-                }
-            } else {
-                // It was not published to us (we looked it up, for example)
-                // or it's local and we aren't floodfill,
-                // or it's local and we don't publish it.
-                // Lie, pretend we don't have it
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("We have LS " + searchKey +
-                            ", NOT answering query - local? " + isLocal + " shouldPublish? " + shouldPublishLocal +
-                            " RAP? " + ls.getReceivedAsPublished() + " RAR? " + ls.getReceivedAsReply());
-                getContext().statManager().addRateData("netDb.lookupsMatchedRemoteNotClosest", 1);
-                Set<Hash> routerHashSet = getNearestRouters(lookupType);
-                sendClosest(searchKey, routerHashSet, fromKey, toTunnel);
             }
         } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO &&
                    lookupType != DatabaseLookupMessage.Type.LS) {
@@ -250,10 +208,6 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         return getContext().netDb().findNearestRouters(_message.getSearchKey(), 
                                                        MAX_ROUTERS_RETURNED, 
                                                        dontInclude);
-    }
-
-    private boolean weAreClosest(Set<Hash> routerHashSet) {
-        return routerHashSet.contains(_us);
     }
     
     private void sendData(Hash key, DatabaseEntry data, Hash toPeer, TunnelId replyTunnel) {

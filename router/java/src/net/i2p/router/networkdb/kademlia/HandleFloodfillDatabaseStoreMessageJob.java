@@ -27,6 +27,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
+import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -75,7 +76,6 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         // set if invalid store but not his fault
         boolean dontBlamePeer = false;
         boolean wasNew = false;
-        boolean blockStore = false;
         RouterInfo prevNetDb = null;
         Hash key = _message.getKey();
         DatabaseEntry entry = _message.getEntry();
@@ -91,36 +91,28 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 // local LeaseSets has changed substantially, based on the role
                 // being assumed.
                 // Role #1) The 'floodfill' netDb when the router is a FloodFill
-                //          In this case, the router would actually de-anonymize
-                //          the clients it is hosting if it refuses LeaseSets for
-                //          these clients.
                 //          The LS will be checked to make sure it arrived directly,
                 //          and handled as a normal LS.
                 // Role #2) The 'floodfill' netDb when the router is *NOT* an I2P
                 //          network Floodfill.
-                //          In this case, the 'floodfill' netDb only stores RouterInfo.
-                //          There is no use case for the 'floodfill' netDb to store any
-                //          LeaseSets when the router is not a FloodFill.
-                // Role #3) Client netDb should only receive LeaseSets from their
-                //          tunnels.  And clients will only publish their LeaseSet
-                //          out their client tunnel.
-                //          In this role, the only LeaseSet that should be rejected
-                //          is its own LeaseSet.
+                //          In this case, the 'floodfill' netDb primarily stores RouterInfos.
+                //          However, there are a number of normal cases where it might contain
+                //          one or more LeaseSets:
+                //            1. We used to be a floodfill but aren't anymore
+                //            2. We performed a lookup without an active session locally(It won't be RAP)
+                // Role #3) Client netDb will only receive LeaseSets from their client
+                //          tunnels, and clients will only publish their LeaseSet out
+                //          their client tunnel.
+                //          In this role, the only LeaseSet store that should be rejected
+                //          is the subDb's client's own LeaseSet.
                 //
-                //          ToDo: Currently, the 'floodfill' netDb will be excluded
+                //          Currently, the 'floodfill' netDb will be excluded
                 //          from directly receiving a client LeaseSet, due to the
                 //          way the selection of FloodFill routers are selected
                 //          when flooding a LS.
                 //          But even if the host router does not directly receive the
                 //          LeaseSets of the clients it hosts, those LeaseSets will
                 //          usually be flooded back to it.
-                //          Is this enough, or do we need to pierce the segmentation
-                //          under certain conditions?
-                //
-                //          ToDo: What considerations are needed for multihoming?
-                //          with multihoming, it's really important to prevent the
-                //          client netDb from storing the other guy's LeaseSet.
-                //          It will confuse us badly.
 
                 LeaseSet ls = (LeaseSet) entry;
                 // If this was received as a response to a query,
@@ -133,30 +125,18 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 // See ../HDLMJ for more info
                 if (!ls.getReceivedAsReply())
                     ls.setReceivedAsPublished();
-                if (_facade.isClientDb())
-                    blockStore = false;
-                else if (getContext().clientManager().isLocal(key))
-                    // Non-client context
-                    if (_facade.floodfillEnabled() && (_fromHash != null))
-                        blockStore = false;
-                    else
-                        // FloodFill disabled, but in the 'floodfill' netDb context.
-                        // We should never get here, the 'floodfill' netDb doesn't
-                        // store LS when FloodFill is disabled.
-                        blockStore = true;
-                else
-                    blockStore = false;
-                if (blockStore) {
-                    getContext().statManager().addRateData("netDb.storeLocalLeaseSetAttempt", 1, 0);
-                    // If we're using subdbs, store the leaseSet in the multihome DB.
-                    // otherwise, throw rather than return, so that we send the ack below (prevent easy attack)
-                    dontBlamePeer = true;
-                    //if (getContext().netDbSegmentor().useSubDbs())
-                        //getContext().multihomeNetDb().store(key, ls);
-                    //else
+                if (_facade.isClientDb()) {
+                    // This is where we deal with what happens if a client subDB tries to store
+                    // a leaseSet which it is the owner/publisher of.
+                    // Look up a ls hash in the netDbSegmentor, and compare it to the _facade that we have.
+                    // If they are equal, reject the store.
+                    if (getContext().netDbSegmentor().clientNetDB(ls.getHash()).equals(_facade)) {
+                        getContext().statManager().addRateData("netDb.storeLocalLeaseSetToLocalClient", 1, 0);
+                        dontBlamePeer = true;
                         throw new IllegalArgumentException("(dbid: " + _facade._dbid
-                                                       + ") Peer attempted to store local leaseSet: "
-                                                       + key.toBase32());
+                            + ") Peer attempted to store local leaseSet: "
+                            + key.toBase32() + " to client subDB " + _facade + "which is it's own publisher");
+                    }
                 }
                 //boolean oldrar = ls.getReceivedAsReply();
                 //boolean oldrap = ls.getReceivedAsPublished();
@@ -202,16 +182,6 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 invalidMessage = uce.getMessage();
                 dontBlamePeer = true;
             } catch (IllegalArgumentException iae) {
-               // This is somewhat normal behavior in client netDb context,
-               // and safely handled.
-               // This is more worrisome in the floodfill netDb context.
-               // It is not expected to happen since we check if it was sent directly.
-                if (_facade.isClientDb())
-                    if (_log.shouldInfo())
-                        _log.info("LS Store IAE (safely handled): ", iae);
-                else
-                    if (_log.shouldError())
-                        _log.error("LS Store IAE (unexpected): ", iae);
                 invalidMessage = iae.getMessage();
             }
         } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
@@ -281,11 +251,11 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                     dontBlamePeer = true;
                     throw new IllegalArgumentException("Peer attempted to store our RouterInfo");
                 }
-                // If we're in the client netDb context, log a warning since
-                // it should be rare that RI DSM are handled in the client context.
+                // If we're in the client netDb context, log a warning since this is not expected.
+                // This is probably impossible but log it if we ever see it so it can be investigated.
                 if (_facade.isClientDb() && _log.shouldWarn())
                     _log.warn("[dbid: " + _facade._dbid
-                              + "]:  Handling RI dbStore in client netDb context of router " + key.toBase64());
+                        + "]:  Handling RI dbStore in client netDb context of router " + key.toBase64());
                 boolean shouldStore = true;
                 if (ri.getReceivedAsPublished()) {
                     // these are often just dup stores from concurrent lookups
@@ -395,7 +365,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                           + ") and new ("
                                           + ri.getIdentity().getSigningPublicKey()
                                           + ") signing public keys do not match!");
-                            }
+                        }
                     }
                 }
                 if (shouldStore) {
@@ -637,12 +607,6 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                     tgm2.setMessageExpiration(msg.getMessageExpiration());
                     out2 = tgm2;
                 }
-            }
-            if (_facade.isClientDb()) {
-                // We shouldn't be reaching this point given the above conditional.
-                _log.error("Error! SendMessageDirectJob (isEstab) attempted in Client netDb ("
-                           + _facade._dbid + ")! Message: " + out1);
-                return;
             }
             Job send = new SendMessageDirectJob(getContext(), out1, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY, _msgIDBloomXor);
             send.runJob();
