@@ -1,4 +1,20 @@
+2023-11-15 zzz
+ * i2psnark:
+   - Handle metainfo url-list as single byte string
+   - Increase comment bucket size to reduce duplicates
+   - Sort tracker list on details page
+
+2023-11-12 zzz
+ * Banlist: Throw if banning far in the past, to catch bugs
+ * Router: Temp. ban routers publishing in the future
+ * Sybil: Don't ban NAT64 addresses
+
+2023-11-11 zzz
+ * Console: Sybil page CSS fixes
+ * Router: Fix congestion cap publishing
+
 2023-11-10 zzz
+ * i2ptunnel: Exempt tunnel name from XSS filter (Gitlab #467)
  * NetDB: Lookup handler/throttler fixes
    - Allow limited lookups when non-ff, but still disallow expl. lookups
    - Remove unnecessary banlist checks in handler
