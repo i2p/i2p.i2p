@@ -382,6 +382,7 @@
             <arg value="../jsp/web-fragment.xml" />
             <arg value="-webapp" />
             <arg value="../jsp/" />
+            <arg value="-die" />
         </java>
         <javac debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
                release="${javac.release}"
