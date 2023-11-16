@@ -249,13 +249,13 @@
 <tr><td class="infohelp infodiv" colspan="2">
 <%=intl._t("I2P will work best if you configure your rates to match the speed of your internet connection.")%>
 </td></tr>
-<tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="wizhelper" property="inboundBurstRate" />" >
+<tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="wizhelper" property="inboundBurstRate" />" required>
 <%=intl._t("KBps In")%>
 </td><td>(<jsp:getProperty name="wizhelper" property="inboundBurstRateBits" />)</td>
 </tr>
 <tr>
 <%-- display burst, set standard, handler will fix up --%>
-<td><input style="text-align: right; width: 5em;" name="outboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="wizhelper" property="outboundBurstRate" />" >
+<td><input style="text-align: right; width: 5em;" name="outboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="wizhelper" property="outboundBurstRate" />" required>
 <%=intl._t("KBps Out")%>
 </td><td>(<jsp:getProperty name="wizhelper" property="outboundBurstRateBits" />)</td>
 </tr>
@@ -352,20 +352,20 @@
 <%
     if (ipg != FIRST_PAGE) {
 %>
-<input type="submit" class="back wizardbutton" name="prev" value="<%=intl._t("Previous")%>" >
+<input type="submit" class="back wizardbutton" name="prev" value="<%=intl._t("Previous")%>" formnovalidate>
 <%
     }
     if (ipg != LAST_PAGE) {
 %>
-<input type="submit" class="cancel wizardbutton" name="skip" value="<%=intl._t("Skip Setup")%>" >
+<input type="submit" class="cancel wizardbutton" name="skip" value="<%=intl._t("Skip Setup")%>" formnovalidate>
 <%
         if (ipg == PAGE_CHECK) {
 %>
-<input type="submit" class="cancel wizardbutton" name="skipbw" value="<%=intl._t("Skip Bandwidth Test")%>" >
+<input type="submit" class="cancel wizardbutton" name="skipbw" value="<%=intl._t("Skip Bandwidth Test")%>" formnovalidate>
 <%
         } else if (ipg == PAGE_TEST) {
 %>
-<input type="submit" class="cancel wizardbutton" name="cancelbw" value="<%=intl._t("Cancel Bandwidth Test")%>" >
+<input type="submit" class="cancel wizardbutton" name="cancelbw" value="<%=intl._t("Cancel Bandwidth Test")%>" formnovalidate>
 <%
         }
 %>

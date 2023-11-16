@@ -402,8 +402,8 @@ public class HomeHelper extends HelperBase {
         }
         buf.append("<tr id=\"addnew\"><td colspan=\"2\" align=\"center\"><b>")
            .append(_t("Add")).append(":</b>" +
-                   "</td><td align=\"left\"><input type=\"text\" name=\"nofilter_name\"></td>" +
-                   "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"nofilter_url\"></td></tr>");
+                   "</td><td align=\"left\"><input type=\"text\" name=\"nofilter_name\" required></td>" +
+                   "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"nofilter_url\" required></td></tr>");
         buf.append("</table>\n");
         return buf.toString();
     }

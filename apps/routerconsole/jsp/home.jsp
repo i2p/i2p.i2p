@@ -71,7 +71,7 @@
   <div class="search">
     <form action="/search.jsp" target="_blank" method="POST">
       <table class="search"><tr><td align="right">
-        <input size="40" type="text" class="search" name="query" />
+        <input size="40" type="text" class="search" name="query" required/>
       </td><td align="left">
         <button type="submit" value="search" class="search"><%=intl._t("Search")%></button>
       </td><td align="left">

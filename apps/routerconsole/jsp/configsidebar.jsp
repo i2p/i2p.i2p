@@ -40,7 +40,7 @@ input.default {
     else
         rval = intl.getRefresh();
 %>
- <input type="text" name="refreshInterval" value="<%=rval%>">
+ <input type="text" name="refreshInterval" value="<%=rval%>" required>
  <%=intl._t("seconds")%>
   </td>
   <td class="optionsave">

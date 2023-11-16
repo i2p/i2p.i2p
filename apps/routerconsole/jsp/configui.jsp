@@ -66,7 +66,7 @@ input.default {
  <jsp:getProperty name="uihelper" property="passwordForm" />
  <div class="formaction" id="consolepass">
   <input type="submit" name="action" class="default" value="<%=intl._t("Add user")%>" >
-  <input type="submit" name="action" class="delete" value="<%=intl._t("Delete selected")%>" >
+  <input type="submit" name="action" class="delete" value="<%=intl._t("Delete selected")%>" formnovalidate>
   <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
   <input type="submit" name="action" class="add" value="<%=intl._t("Add user")%>" >
  </div>

@@ -34,7 +34,7 @@
  <tr><td colspan="2" class="infohelp"><%=intl._t("Import the secret family key that you exported from an existing router in the family.")%></td></tr>
  <tr>
   <td><b><%=intl._t("Select secret key file")%>:</b>
-<input name="file" type="file" value="" />
+<input name="file" type="file" value="" required/>
   </td>
   <td class="optionsave">
 <input type="submit" name="action" class="download" value="<%=intl._t("Join Family")%>" />
@@ -48,7 +48,7 @@
  <tr><th colspan="2"><%=intl._t("Create New Router Family")%></th></tr>
  <tr>
   <td><b><%=intl._t("Family Name")%>:</b>
-<input name="family" type="text" size="30" value="" />
+<input name="family" type="text" size="30" value="" required/>
   </td>
   <td class="optionsave">
 <input type="submit" name="action" class="accept" value="<%=intl._t("Create Family")%>" />
