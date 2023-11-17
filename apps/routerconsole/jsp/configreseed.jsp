@@ -72,7 +72,7 @@
    String url = request.getParameter("url");
    String value = url != null ? "value=\"" + net.i2p.data.DataHelper.escapeHTML(url) + '"' : "";
 %>
-<input name="url" type="text" size="60" <%=value%> />
+<input name="url" type="text" size="60" <%=value%> required/>
   </td>
   <td class="optionsave">
 <input type="submit" name="action" class="download" value="<%=intl._t("Reseed from URL")%>" />
@@ -97,7 +97,7 @@
 <%
    } else {
 %>
-<input name="file" type="file" accept=".zip,.su3" value="" />
+<input name="file" type="file" accept=".zip,.su3" value="" required/>
 <%
    }
 %>

@@ -32,7 +32,7 @@
 <%=intl._t("Your upstream share amount (KBps Out) will determine your overall contribution to the network.")%>
 </p></td></tr>
 <%-- display burst, set standard, handler will fix up --%>
-   <tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundBurstRate" />" >
+   <tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundBurstRate" />" required>
           <%=intl._t("KBps In")%>
         </td><td>(<jsp:getProperty name="nethelper" property="inboundBurstRateBits" />)</td>
 <%--
@@ -44,7 +44,7 @@
 --%>
     </tr><tr>
 <%-- display burst, set standard, handler will fix up --%>
-        <td><input style="text-align: right; width: 5em;" name="outboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="outboundBurstRate" />" >
+        <td><input style="text-align: right; width: 5em;" name="outboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="outboundBurstRate" />" required>
          <%=intl._t("KBps Out")%>
         </td><td>(<jsp:getProperty name="nethelper" property="outboundBurstRateBits" />)</td>
 <%--

@@ -50,9 +50,9 @@ input.default {
  <jsp:getProperty name="homehelper" property="configSearch" />
  <div class="formaction" id="homesearch">
   <input type="submit" name="action" class="default" value="<%=intl._t("Add item")%>" >
-  <input type="submit" name="action" class="delete" value="<%=intl._t("Delete selected")%>" >
+  <input type="submit" name="action" class="delete" value="<%=intl._t("Delete selected")%>" formnovalidate>
   <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
-  <input type="submit" name="action" class="reload" value="<%=intl._t("Restore defaults")%>" >
+  <input type="submit" name="action" class="reload" value="<%=intl._t("Restore defaults")%>" formnovalidate>
   <input type="submit" name="action" class="add" value="<%=intl._t("Add item")%>" >
  </div>
 </form>
@@ -67,9 +67,9 @@ input.default {
  <jsp:getProperty name="homehelper" property="configServices" />
  <div class="formaction" id="homeapps">
   <input type="submit" name="action" class="default" value="<%=intl._t("Add item")%>" >
-  <input type="submit" name="action" class="delete" value="<%=intl._t("Delete selected")%>" >
+  <input type="submit" name="action" class="delete" value="<%=intl._t("Delete selected")%>" formnovalidate>
   <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
-  <input type="submit" name="action" class="reload" value="<%=intl._t("Restore defaults")%>" >
+  <input type="submit" name="action" class="reload" value="<%=intl._t("Restore defaults")%>" formnovalidate>
   <input type="submit" name="action" class="add" value="<%=intl._t("Add item")%>" >
  </div>
 </form>
@@ -81,9 +81,9 @@ input.default {
  <jsp:getProperty name="homehelper" property="configFavorites" />
  <div class="formaction" id="homesites">
   <input type="submit" name="action" class="default" value="<%=intl._t("Add item")%>" >
-  <input type="submit" name="action" class="delete" value="<%=intl._t("Delete selected")%>" >
+  <input type="submit" name="action" class="delete" value="<%=intl._t("Delete selected")%>" formnovalidate>
   <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
-  <input type="submit" name="action" class="reload" value="<%=intl._t("Restore defaults")%>" >
+  <input type="submit" name="action" class="reload" value="<%=intl._t("Restore defaults")%>" formnovalidate>
   <input type="submit" name="action" class="add" value="<%=intl._t("Add item")%>" >
  </div>
 </form>
@@ -95,9 +95,9 @@ input.default {
  <jsp:getProperty name="homehelper" property="configConfig" />
  <div class="formaction" id="homeconfig">
   <input type="submit" name="action" class="default" value="<%=intl._t("Add item")%>" >
-  <input type="submit" name="action" class="delete" value="<%=intl._t("Delete selected")%>" >
+  <input type="submit" name="action" class="delete" value="<%=intl._t("Delete selected")%>" formnovalidate>
   <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
-  <input type="submit" name="action" class="reload" value="<%=intl._t("Restore defaults")%>" >
+  <input type="submit" name="action" class="reload" value="<%=intl._t("Restore defaults")%>" formnovalidate>
   <input type="submit" name="action" class="add" value="<%=intl._t("Add item")%>" >
  </div>
 </form>
@@ -109,9 +109,9 @@ input.default {
  <jsp:getProperty name="homehelper" property="configMonitoring" />
  <div class="formaction" id="homemonitor">
   <input type="submit" name="action" class="default" value="<%=intl._t("Add item")%>" >
-  <input type="submit" name="action" class="delete" value="<%=intl._t("Delete selected")%>" >
+  <input type="submit" name="action" class="delete" value="<%=intl._t("Delete selected")%>" formnovalidate>
   <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
-  <input type="submit" name="action" class="reload" value="<%=intl._t("Restore defaults")%>" >
+  <input type="submit" name="action" class="reload" value="<%=intl._t("Restore defaults")%>" formnovalidate>
   <input type="submit" name="action" class="add" value="<%=intl._t("Add item")%>" >
  </div>
 </form>
