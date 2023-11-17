@@ -125,8 +125,6 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     protected void createHandlers() {
        // Only initialize the handlers for the flooodfill netDb.
        if (!isClientDb()) {
-            if (_log.shouldInfo())
-                _log.info("[dbid: " + super._dbid +  "] Initializing the message handlers");
             _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseLookupMessage.MESSAGE_TYPE, new FloodfillDatabaseLookupMessageHandler(_context, this));
             _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseStoreMessage.MESSAGE_TYPE, new FloodfillDatabaseStoreMessageHandler(_context, this));
         }
@@ -505,7 +503,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         
         if (isNew) {
             if (_log.shouldDebug())
-                _log.debug("[dbid: " + super._dbid
+                _log.debug("[dbid: " + this
                            + "]: New ISJ ("
                            + ((fromLocalDest != null) ? "through client tunnels" : "through exploratory tunnels")
                            + ") for " + key.toBase64());

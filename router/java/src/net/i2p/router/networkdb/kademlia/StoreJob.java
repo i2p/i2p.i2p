@@ -103,7 +103,7 @@ abstract class StoreJob extends JobImpl {
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": New store job (dbid: "
-                       + _facade._dbid + ") for\n"
+                       + _facade + ") for\n"
                        + data, new Exception("I did it"));
     }
 
@@ -187,7 +187,7 @@ abstract class StoreJob extends JobImpl {
             if (_state.getPendingCount() <= 0) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("JobId: " + getJobId()
-                              + " (dbid: " + _facade._dbid
+                              + " (dbid: " + _facade
                               + "): No more peers left and none pending");
                 fail();
             } else {
@@ -213,7 +213,7 @@ abstract class StoreJob extends JobImpl {
                 if ( (ds == null) || !(ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) ) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("JobId: " + getJobId()
-                                  + " (for dbid: " + _facade._dbid
+                                  + " (for dbid: " + _facade
                                   + "): Error selecting closest hash that wasnt a router! " + peer + " : " + ds);
                     _state.addSkipped(peer);
                     skipped++;
@@ -268,7 +268,7 @@ abstract class StoreJob extends JobImpl {
                     // // Do not store to hidden nodes
                     // if (!((RouterInfo)ds).isHidden()) {
                        if (_log.shouldLog(Log.INFO))
-                           _log.info(getJobId() + "(dbid: " + _facade._dbid
+                           _log.info(getJobId() + "(dbid: " + _facade
                                      + "): Continue sending key " + _state.getTarget()
                                      + " after " + _state.getAttemptedCount() + " tries to " + closestHashes);
                         _state.addPending(peer);
@@ -279,7 +279,7 @@ abstract class StoreJob extends JobImpl {
             }
             if (queued == 0 && _state.getPendingCount() <= 0) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info(getJobId() + "(dbid: " + _facade._dbid
+                    _log.info(getJobId() + "(dbid: " + _facade
                               + "): No more peers left after skipping " + skipped + " and none pending");
                 // queue a job to go around again rather than recursing
                 getContext().jobQueue().addJob(new WaitJob(getContext()));
@@ -395,7 +395,7 @@ abstract class StoreJob extends JobImpl {
                 // and issue a warning.
                 sendStoreThroughExploratory(msg, peer, expiration);
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("[JobId: " + getJobId() + "; dbid: " + _facade._dbid
+                    _log.warn("[JobId: " + getJobId() + "; dbid: " + _facade
                           +"]: Sending RI store (though exploratory tunnels) in a client context to "
                           + peer.getIdentity().getHash() + " with message " + msg);
             }
@@ -588,7 +588,7 @@ abstract class StoreJob extends JobImpl {
             StoreMessageSelector selector = new StoreMessageSelector(ctx, getJobId(), peer, msg.getReplyToken(), expiration);
     
             if (_log.shouldLog(Log.DEBUG)) {
-                _log.debug(getJobId() + "(dbid: " + _facade._dbid
+                _log.debug(getJobId() + "(dbid: " + _facade
                            + "): sending encrypted store through client tunnel to " + to
                            + " through " + outTunnel + ": " + sent + " with reply to "
                            + replyGW + ' ' + replyTunnelId);

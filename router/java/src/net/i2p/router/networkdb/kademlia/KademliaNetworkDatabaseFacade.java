@@ -80,7 +80,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     private NegativeLookupCache _negativeCache;
     protected final int _networkID;
     private final BlindCache _blindCache;
-    protected final Hash _dbid;
+    private final Hash _dbid;
     private final Job _elj, _erj;
 
     /** 
