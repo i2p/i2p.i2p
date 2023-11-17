@@ -89,18 +89,13 @@
 <%          } /* !streamrserver */ %>
             <td>
                 <b><%=intl._t("Port")%>:</b>
-                    <% String value = editBean.getTargetPort(curTunnel);
-                       if (value == null || "".equals(value.trim())) {
-                           out.write(" <span class=\"required\"><font color=\"red\">(");
-                           out.write(intl._t("required"));
-                           out.write(")</font></span>");
-                       }
+<%
                        String asphelp = intl._t("Specify the local port this service should be accessible from");
                        String bsphelp = intl._t("Specify the port the server is running on");
                        String ptext = canChangePort ? (isStreamrServer ? asphelp : bsphelp) : stopFirst;
                        String pdisabled = canChangePort ? "" : " readonly=\"readonly\" ";
 %>
-                <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="<%=ptext%>" value="<%=editBean.getTargetPort(curTunnel)%>" class="freetext port" placeholder="required" <%=pdisabled%>/>
+                <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="<%=ptext%>" value="<%=editBean.getTargetPort(curTunnel)%>" class="freetext port" placeholder="<%=intl._t("required")%>" required <%=pdisabled%> />
 <%          if (!isStreamrServer) { %>
                 <label title="<%=intl._t("To avoid traffic sniffing if connecting to a remote server, you can enable an SSL connection. Note that the target server must be configured to accept SSL connections.")%>"><input value="1" type="checkbox" name="useSSL"<%=(editBean.isSSLEnabled(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
                 <%=intl._t("Use SSL to connect to target")%></label>
@@ -115,16 +110,11 @@
             <td>
                 <b><%=intl._t("Port")%>:</b>
 
-<%                      String value4 = editBean.getClientPort(curTunnel);
-           	        if (value4 == null || "".equals(value4.trim())) {
-           	            out.write(" <span class=\"required\"><font color=\"red\">(");
-           	            out.write(intl._t("required"));
-           	            out.write(")</font></span>");
-           	        }
+<%
                        String csphelp = intl._t("Port required to access service (this can be a different port to the port the service is hosted on)");
                        String dsphelp = canChangePort ? csphelp : stopFirst;
 %>
-                 <input type="text" size="6" maxlength="5" name="port" title="<%=dsphelp%>" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext port" placeholder="required" <%=pdisabled%>/>
+                 <input type="text" size="6" maxlength="5" name="port" title="<%=dsphelp%>" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext port" placeholder="<%=intl._t("required")%>" required <%=pdisabled%> />
             </td>
 <%          } /* httpbidirserver */
             if (isBidirServer || isStreamrServer) {
@@ -184,17 +174,11 @@
                 <div class="displayText resetScrollLeft" title="<%=intl._t("Read Only: Local Destination (if known)")%>" tabindex="0"><%=editBean.getDestinationBase64(curTunnel)%></div>
             </td><td>
 <%
-                       String value3 = editBean.getPrivateKeyFile(curTunnel);
-                       if (value3 == null || "".equals(value3.trim())) {
-                           out.write(" <span class=\"required\"><font color=\"red\">(");
-                           out.write(intl._t("required"));
-                           out.write(")</font></span>");
-                       }
                        String htext = intl._t("Path to Private Key File");
                        String dtext = canChangeDest ? htext : stopFirst;
                        String ddisabled = canChangeDest ? "" : " readonly=\"readonly\" ";
 %>
-                <input type="text" size="30" id="privKeyFile" name="privKeyFile" title="<%=dtext%>" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" placeholder="required" <%=ddisabled%>/>
+                <input type="text" size="30" id="privKeyFile" name="privKeyFile" title="<%=dtext%>" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" placeholder="<%=intl._t("required")%>" required <%=ddisabled%> />
             </td>
         </tr>
 <%
@@ -1024,9 +1008,15 @@
             </td>
         </tr><tr>
             <td class="buttons" colspan="2">
+                    <a id="controlCancel" class="control" href="list"><%=intl._t("Cancel")%></a>
+<%
+            if (curTunnel >= 0) {
+%>
                     <input type="hidden" value="true" name="removeConfirm" />
-                    <button id="controlCancel" class="control" type="submit" name="action" value=""><%=intl._t("Cancel")%></button>
-                    <button id="controlDelete" class="control delete" type="submit" name="action" value="Delete this proxy" title="<%=intl._t("Delete this Proxy (cannot be undone)")%>"><%=intl._t("Delete")%></button>
+                    <button id="controlDelete" class="control delete" type="submit" name="action" value="Delete this proxy" title="<%=intl._t("Delete this Proxy (cannot be undone)")%>" formnovalidate><%=intl._t("Delete")%></button>
+<%
+            }
+%>
                     <button id="controlSave" class="control" type="submit" name="action" value="Save changes"><%=intl._t("Save")%></button>
             </td>
         </tr>

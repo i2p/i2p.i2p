@@ -85,17 +85,11 @@
             <td>
                 <b><%=intl._t("Port")%>:</b>
 <%
-                       String value = editBean.getClientPort(curTunnel);
-                       if (value == null || "".equals(value.trim())) {
-                           out.write(" <span class=\"required\"><font color=\"red\">(");
-                           out.write(intl._t("required"));
-                           out.write(")</font></span>");
-                       }
                       String phelp = intl._t("Specify the local port this service should be accessible from");
                       String ptext = canChangePort ? phelp : bStopFirst;
                       String pdisabled = canChangePort ? "" : " readonly=\"readonly\" ";
 %>
-                <input type="text" size="6" maxlength="5" name="port" title="<%=ptext%>" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext port" placeholder="required" <%=pdisabled%>/>
+                <input type="text" size="6" maxlength="5" name="port" title="<%=ptext%>" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext port" placeholder="<%=intl._t("required")%>" required <%=pdisabled%>/>
             </td>
 <%
             if ("streamrclient".equals(tunnelType)) {
@@ -104,13 +98,8 @@
                 <b><%=intl._t("Host")%>:</b>
 <%
                        String targetHost = editBean.getTargetHost(curTunnel);
-                       if (targetHost == null || "".equals(targetHost.trim())) {
-                           out.write(" <span class=\"required\"><font color=\"red\">(");
-                           out.write(intl._t("required"));
-                           out.write(")</font></span>");
-                       }
 %>
-                <input type="text" size="20" id="targetHost" name="targetHost" title="<%=intl._t("Hostname or IP address of the target server")%>" value="<%=targetHost%>" class="freetext host" placeholder="required" />
+                <input type="text" size="20" id="targetHost" name="targetHost" title="<%=intl._t("Hostname or IP address of the target server")%>" value="<%=targetHost%>" class="freetext host" placeholder="<%=intl._t("required")%>" required />
             </td>
 <%
             } else {
@@ -221,14 +210,7 @@
             </th>
         </tr><tr>
             <td colspan="2">
-                    <% String value2 = editBean.getClientDestination(curTunnel);
-                       if (value2 == null || "".equals(value2.trim())) {
-                           out.write(" <span class=\"required\"><font color=\"red\">(");
-                           out.write(intl._t("required"));
-                           out.write(")</font></span>");
-                       }
-%>
-                <input type="text" size="30" id="targetDestination" name="targetDestination" title="<%=intl._t("Specify the .i2p address or destination (b32 or b64) of the tunnel here.")%>&nbsp;<%=intl._t("For a random selection from a pool, separate with commas e.g. server1.i2p,server2.i2p")%>" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext destination" placeholder="required" />
+                <input type="text" size="30" id="targetDestination" name="targetDestination" title="<%=intl._t("Specify the .i2p address or destination (b32 or b64) of the tunnel here.")%>&nbsp;<%=intl._t("For a random selection from a pool, separate with commas e.g. server1.i2p,server2.i2p")%>" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext destination" placeholder="<%=intl._t("required")%>" required />
                 <%=intl._t("name, name:port, or destination")%>
 <%
                         if ("streamrclient".equals(tunnelType)) {
@@ -746,9 +728,15 @@
             </td>
         </tr><tr>
             <td class="buttons" colspan="2">
+                    <a id="controlCancel" class="control" href="list"><%=intl._t("Cancel")%></a>
+<%
+            if (curTunnel >= 0) {
+%>
                     <input type="hidden" value="true" name="removeConfirm" />
-                    <button id="controlCancel" class="control" type="submit" name="action" value=""><%=intl._t("Cancel")%></button>
-                    <button id="controlDelete" class="control delete" type="submit" name="action" value="Delete this proxy" title="<%=intl._t("Delete this Proxy (cannot be undone)")%>"><%=intl._t("Delete")%></button>
+                    <button id="controlDelete" class="control delete" type="submit" name="action" value="Delete this proxy" title="<%=intl._t("Delete this Proxy (cannot be undone)")%>" formnovalidate><%=intl._t("Delete")%></button>
+<%
+            }
+%>
                     <button id="controlSave" class="control" type="submit" name="action" value="Save changes"><%=intl._t("Save")%></button>
             </td>
         </tr>

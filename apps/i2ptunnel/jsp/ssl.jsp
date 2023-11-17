@@ -2,8 +2,7 @@
 %><%@page pageEncoding="UTF-8"
 %><%@page contentType="text/html" import="java.io.File,java.io.IOException,net.i2p.crypto.KeyStoreUtil,net.i2p.data.DataHelper,net.i2p.jetty.JettyXmlConfigurationParser"
 %><%@page
-%><?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
+%><!DOCTYPE html>
 <%
   /* right now using EditBean instead of IndexBean for getSpoofedHost() */
   /* but might want to POST to it anyway ??? */
@@ -557,14 +556,14 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <%--
 <tr><th colspan="4"><%=intl._t("Add Port Routing")%></th></tr>
 <tr><td>
-    <input type="text" size="6" maxlength="5" id="i2pPort" name="i2pPort" title="<%=intl._t("Specify the port the server is running on")%>" value="" class="freetext port" placeholder="required" />
+    <input type="text" size="6" maxlength="5" id="i2pPort" name="i2pPort" title="<%=intl._t("Specify the port the server is running on")%>" value="" class="freetext port" placeholder="<%=intl._t("required")%>" required />
 </td><td>
     <input type="text" size="20" id="websiteName" name="spoofedHost" title="<%=intl._t("Website Hostname e.g. mysite.i2p")%>" value="<%=name%>" class="freetext" />
 </td><td>
     <input value="1" type="checkbox" name="useSSL" class="tickbox" />
 </td><td>
     <input type="text" size="20" name="targetHost" title="<%=intl._t("Hostname or IP address of the target server")%>" value="<%=targetHost%>" class="freetext host" /> :
-    <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="<%=intl._t("Specify the port the server is running on")%>" value="" class="freetext port" placeholder="required" />
+    <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="<%=intl._t("Specify the port the server is running on")%>" value="" class="freetext port" placeholder="<%=intl._t("required")%>" required />
 </td></tr>
 --%>
 <tr><td colspan="4"></td></tr>

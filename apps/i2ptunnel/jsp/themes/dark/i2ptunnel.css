@@ -909,30 +909,6 @@ td.blankColumn {
      padding: 0;
 }
 
-.required:not(old) {
-     display: none;
-}
-
-input::-moz-placeholder {
-     color: #f00;
-     font-weight: bold;
-     opacity: 1;
-}
-
-::-webkit-input-placeholder {
-     color: #f00;
-     font-weight: bold;
-     opacity: 1;
-}
-
-input:focus::-moz-placeholder {
-     opacity: 0;
-}
-
-:focus::-webkit-input-placeholder {
-     opacity: 0;
-}
-
 input.tunnelName, input.tunnelDescriptionText, #userAgents {
      width: 80%;
      min-width: 280px;
@@ -1049,16 +1025,6 @@ input.tunnelName, input.tunnelDescriptionText, #userAgents {
 
 #wizardPanel p, #wizardPanel td {
      line-height: 140%;
-}
-
-#wizardPanel input::-moz-placeholder {
-     color: #bb7;
-     font-weight: normal;
-}
-
-#wizardPanel ::-webkit-input-placeholder {
-     color: #bb7;
-     font-weight: normal;
 }
 
 #wizardPanel .options {
