@@ -785,28 +785,6 @@ table#statusMessages textarea, table#statusMessages textarea:active {
      padding: 0;
 }
 
-.required:not(old) {
-     display: none;
-}
-
-input::-moz-placeholder {
-     color: #f00;
-     opacity: 1;
-}
-
-input:focus::-moz-placeholder {
-     opacity: 0;
-}
-
-::-webkit-input-placeholder {
-     color: #f00;
-     opacity: 1;
-}
-
-:focus::-webkit-input-placeholder {
-     opacity: 0;
-}
-
 input.tunnelName, input.tunnelDescriptionText, #userAgents, .freetext.tunnelDescription {
      width: 80%;
      min-width: 280px !important;
@@ -917,16 +895,6 @@ input.tunnelName, input.tunnelDescriptionText, #userAgents, .freetext.tunnelDesc
      padding: 5px 10px;
      margin: 0;
      text-align: justify;
-}
-
-#wizardPanel input::-moz-placeholder {
-     color: #999;
-     font-weight: normal;
-}
-
-#wizardPanel ::-webkit-input-placeholder {
-     color: #999;
-     font-weight: normal;
 }
 
 #wizardPanel .options {
