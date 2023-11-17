@@ -112,7 +112,7 @@ class SearchJob extends JobImpl {
         getContext().statManager().addRateData("netDb.searchCount", 1);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Search Initialized (class: " + getClass().getName()
-                       + ", dbid: " + _facade._dbid
+                       + ", dbid: " + _facade
                        + ") for " + key, new Exception("Search enqueued by"));
     }
 
@@ -120,7 +120,7 @@ class SearchJob extends JobImpl {
         if (_startedOn <= 0) 
             _startedOn = getContext().clock().now();
         if (_log.shouldLog(Log.INFO))
-            _log.info(getJobId() + " (dbid: " + _facade._dbid
+            _log.info(getJobId() + " (dbid: " + _facade
                       + "): Searching for " + _state.getTarget()); // , getAddedBy());
         searchNext();
     }
@@ -283,7 +283,7 @@ class SearchJob extends JobImpl {
             boolean onlyFloodfill = true;
             if (_floodfillPeersExhausted && onlyFloodfill && _state.getPending().isEmpty()) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn(getJobId() + " (dbid: " + _facade._dbid
+                    _log.warn(getJobId() + " (dbid: " + _facade
                               + "): no non-floodfill peers left, and no more pending.  Searched: "
                               + _state.getAttempted().size() + " failed: " + _state.getFailed().size());
                 fail();
@@ -312,13 +312,13 @@ class SearchJob extends JobImpl {
                     DatabaseEntry ds = _facade.getDataStore().get(peer);
                     if (ds == null) {
                         if (_log.shouldLog(Log.INFO))
-                            _log.info("(dbid: " + _facade._dbid
+                            _log.info("(dbid: " + _facade
                                       + ") Next closest peer " + peer
                                       + " was only recently referred to us, sending a search for them");
                         getContext().netDb().lookupRouterInfo(peer, null, null, _timeoutMs);
                     } else if (!(ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)) {
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn(getJobId() + " (dbid: " + _facade._dbid
+                            _log.warn(getJobId() + " (dbid: " + _facade
                                       + "): Error selecting closest hash that wasnt a router! " 
                                       + peer + " : " + ds.getClass().getName());
                         _state.replyTimeout(peer);
@@ -405,7 +405,7 @@ class SearchJob extends JobImpl {
             return;
         } else {
             if (_log.shouldLog(Log.INFO))
-                _log.info(getJobId() + " (dbid: " + _facade._dbid
+                _log.info(getJobId() + " (dbid: " + _facade
                           + "): Send search to " + router.getIdentity().getHash()
                           + " for " + _state.getTarget()
                           + " w/ timeout " + getPerPeerTimeoutMs(router.getIdentity().calculateHash()));
@@ -471,7 +471,7 @@ class SearchJob extends JobImpl {
 
 	
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + "(dbid: " + _facade._dbid
+            _log.debug(getJobId() + "(dbid: " + _facade
                        +"): Sending search to " + to
                        + " for " + getState().getTarget() + " w/ replies through " 
                        + inTunnel.getPeer(0) + " via tunnel " 
@@ -499,7 +499,7 @@ class SearchJob extends JobImpl {
         I2NPMessage msg = buildMessage(null, to, expiration, router);	
         if (msg == null) {
             if (_log.shouldWarn())
-                _log.warn("(dbid: " + _facade._dbid + ") Failed to create DLM to : " + router);
+                _log.warn("(dbid: " + _facade + ") Failed to create DLM to : " + router);
             getContext().jobQueue().addJob(new FailedJob(getContext(), router));
             return;
         }
@@ -511,7 +511,7 @@ class SearchJob extends JobImpl {
         SearchUpdateReplyFoundJob reply = new SearchUpdateReplyFoundJob(getContext(), router, _state, _facade, this);
         if (_facade.isClientDb()) {
             _log.error("Error! SendMessageDirectJob attempted in Client netDb ("
-                       + _facade._dbid + ")! Message: " + msg, new Exception ("backtrace..."));
+                       + _facade + ")! Message: " + msg, new Exception ("backtrace..."));
             return;
         }
         SendMessageDirectJob j = new SendMessageDirectJob(getContext(), msg, to,
@@ -570,7 +570,7 @@ class SearchJob extends JobImpl {
         long duration = _state.replyFound(peer);
         // this processing can take a while, so split 'er up
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + "(dbid: " + _facade._dbid
+            _log.debug(getJobId() + "(dbid: " + _facade
                        +"): Starting Search ReplyJob to peer " + peer
                        + " with DSRM " + message);
         getContext().jobQueue().addJob(new SearchReplyJob(getContext(), this, message, peer, duration));

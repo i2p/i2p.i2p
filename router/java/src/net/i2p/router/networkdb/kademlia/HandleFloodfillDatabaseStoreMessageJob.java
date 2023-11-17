@@ -83,7 +83,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         if (DatabaseEntry.isLeaseSet(type)) {
             getContext().statManager().addRateData("netDb.storeLeaseSetHandled", 1);
             if (_log.shouldDebug())
-                _log.debug("(dbid: " + _facade._dbid
+                _log.debug("(dbid: " + _facade
                            + ") Starting handling of dbStore of leaseset " + _message);
 
             try {
@@ -133,7 +133,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                     if (getContext().netDbSegmentor().clientNetDB(ls.getHash()).equals(_facade)) {
                         getContext().statManager().addRateData("netDb.storeLocalLeaseSetToLocalClient", 1, 0);
                         dontBlamePeer = true;
-                        throw new IllegalArgumentException("(dbid: " + _facade._dbid
+                        throw new IllegalArgumentException("(dbid: " + _facade
                             + ") Peer attempted to store local leaseSet: "
                             + key.toBase32() + " to client subDB " + _facade + "which is it's own publisher");
                     }
@@ -187,7 +187,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
             RouterInfo ri = (RouterInfo) entry;
             if (_log.shouldDebug())
-                _log.debug("(dbid: " + _facade._dbid
+                _log.debug("(dbid: " + _facade
                            + ") Starting handling of dbStore of RI " + _message);
             getContext().statManager().addRateData("netDb.storeRouterInfoHandled", 1);
             if (_fromHash == null && _from != null)
@@ -207,7 +207,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 String req = ((_message.getReplyToken() > 0) ? " reply req." : "") +
                              ((_fromHash == null && ri.getReceivedAsPublished()) ? " unsolicited" : "");
                 if (_fromHash == null)
-                    _log.info("(dbid: " + _facade._dbid
+                    _log.info("(dbid: " + _facade
                               + ") Handling dbStore (_fromHash == NULL) of router "
                               + key.toBase64() + " published "
                               + DataHelper.formatTime(ri.getPublished())
@@ -217,7 +217,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                               + ri.getReceivedAsPublished()
                               + "])" + req);
                 else if (_fromHash.equals(key))
-                    _log.info("(dbid: " + _facade._dbid
+                    _log.info("(dbid: " + _facade
                               + ") Handling dbStore (_fromHash equals key) of router "
                               + key.toBase64() + " published "
                               + DataHelper.formatTime(ri.getPublished())
@@ -228,7 +228,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                               + ri.getReceivedAsPublished()
                               + "])" + req);
                 else
-                    _log.info("(dbid: " + _facade._dbid
+                    _log.info("(dbid: " + _facade
                               + ") Handling dbStore of router "
                               + key.toBase64() + " published "
                               + DataHelper.formatTime(ri.getPublished())
@@ -254,7 +254,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 // If we're in the client netDb context, log a warning since this is not expected.
                 // This is probably impossible but log it if we ever see it so it can be investigated.
                 if (_facade.isClientDb() && _log.shouldWarn())
-                    _log.warn("[dbid: " + _facade._dbid
+                    _log.warn("[dbid: " + _facade
                         + "]:  Handling RI dbStore in client netDb context of router " + key.toBase64());
                 boolean shouldStore = true;
                 if (ri.getReceivedAsPublished()) {
@@ -283,7 +283,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                             pdrop *= 3;
                                         if (pdrop > 0 && (pdrop >= 128 || getContext().random().nextInt(128) < pdrop)) {
                                             if (_log.shouldWarn())
-                                                _log.warn("(dbid: " + _facade._dbid
+                                                _log.warn("(dbid: " + _facade
                                                           + ") Dropping new unsolicited dbStore of " + ri.getCapabilities()
                                                           + " router " + key.toBase64() + " with distance " + distance
                                                           + " drop probability " + (pdrop * 100 / 128));
@@ -304,7 +304,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                                 pdrop *= 3;
                                             if (pdrop > 0 && (pdrop >= 128 || getContext().random().nextInt(128) < pdrop)) {
                                                 if (_log.shouldWarn())
-                                                    _log.warn("(dbid: " + _facade._dbid
+                                                    _log.warn("(dbid: " + _facade
                                                               + ") Dropping new unsolicited dbStore of router " + key.toBase64()
                                                               + " with distance " + distance);
                                                 shouldStore = false;
@@ -316,7 +316,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                     }
                                 }
                                 if (shouldStore && _log.shouldDebug())
-                                    _log.debug("(dbid: " + _facade._dbid
+                                    _log.debug("(dbid: " + _facade
                                                + ") Allowing new unsolicited dbStore of router " + key.toBase64()
                                                + " with distance " + distance);
                             } else {
@@ -327,7 +327,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                     pdrop *= 3;
                                 if (pdrop > 0 && (pdrop >= 128 || getContext().random().nextInt(128) < pdrop)) {
                                     if (_log.shouldWarn())
-                                        _log.warn("(dbid: " + _facade._dbid
+                                        _log.warn("(dbid: " + _facade
                                                   + ") Dropping new unsolicited dbStore of router " + key.toBase64()
                                                   + " drop probability " + (pdrop * 100 / 128));
                                     shouldStore = false;
@@ -337,13 +337,13 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                             }
                         }
                         if (shouldStore && _log.shouldWarn())
-                            _log.warn("(dbid: " + _facade._dbid
+                            _log.warn("(dbid: " + _facade
                                       + ") Handling new unsolicited dbStore of router " + key.toBase64());
                     } else if (prevNetDb.getPublished() >= ri.getPublished()) {
                         shouldStore = false;
                     } else {
                         if (_log.shouldInfo()) {
-                            _log.info("(dbid: " + _facade._dbid
+                            _log.info("(dbid: " + _facade
                                       + ") Newer RouterInfo encountered in dbStore Message (for router "
                                       + key.toBase64()
                                       + ") with a pulished date ("
@@ -353,14 +353,14 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                             // new RouterIdentity prevIdentity = prevNetDb.getIdentity();
                             // new RouterIdentity newIdentity = ri.getIdentity();
                             if (!ri.getIdentity().getPublicKey().equals(prevNetDb.getIdentity().getPublicKey()))
-                                _log.info("(dbid: " + _facade._dbid
+                                _log.info("(dbid: " + _facade
                                           + ") Warning! The old ("
                                           + prevNetDb.getIdentity().getPublicKey()
                                           + ") and new ("
                                           + ri.getIdentity().getPublicKey()
                                           + ") public keys do not match!");
                             if (!ri.getIdentity().getSigningPublicKey().equals(prevNetDb.getIdentity().getSigningPublicKey()))
-                                _log.info("(dbid: " + _facade._dbid + ") Warning! The old ("
+                                _log.info("(dbid: " + _facade + ") Warning! The old ("
                                           + prevNetDb.getIdentity().getSigningPublicKey()
                                           + ") and new ("
                                           + ri.getIdentity().getSigningPublicKey()
@@ -370,11 +370,11 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 }
                 if (shouldStore) {
                     if (_log.shouldDebug())
-                        _log.debug("[dbid: " + _facade._dbid
+                        _log.debug("[dbid: " + _facade
                                    + "]: Storing RI with the context netDb " + key.toBase64());
                     prevNetDb = _facade.store(key, ri);
                     if (_facade.isClientDb() && _log.shouldWarn())
-                        _log.warn("[dbid: " + _facade._dbid
+                        _log.warn("[dbid: " + _facade
                                   + "] Storing RI to client netDb (this is rare, should have been handled by IBMD) "
                                   + key.toBase64());
                     wasNew = ((null == prevNetDb) || (prevNetDb.getPublished() < ri.getPublished()));
@@ -391,7 +391,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                         if (!forever &&
                             getContext().blocklist().isBlocklisted(ri)) {
                             if (_log.shouldWarn())
-                                _log.warn("(dbid: " + _facade._dbid + ") Blocklisting new peer " + key + ' ' + ri);
+                                _log.warn("(dbid: " + _facade + ") Blocklisting new peer " + key + ' ' + ri);
                             wasNew = false; // don't flood
                             shouldStore = false; // don't call heardAbout()
                         }
@@ -401,7 +401,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                         if ((!newAddr.equals(oldAddr)) &&
                             getContext().blocklist().isBlocklisted(ri)) {
                             if (_log.shouldWarn())
-                                _log.warn("(dbid: " + _facade._dbid + ") New address received, Blocklisting old peer " + key + ' ' + ri);
+                                _log.warn("(dbid: " + _facade + ") New address received, Blocklisting old peer " + key + ' ' + ri);
                             wasNew = false; // don't flood
                             shouldStore = false; // don't call heardAbout()
                         }
@@ -417,7 +417,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             }
         } else {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("(dbid: " + _facade._dbid
+                _log.error("(dbid: " + _facade
                            + ") Invalid DatabaseStoreMessage data type - " + type
                            + ": " + _message);
             // don't ack or flood
@@ -443,12 +443,12 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             } else {
                 // Should we record in the profile?
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("(dbid: " + _facade._dbid
+                    _log.warn("(dbid: " + _facade
                               + ") Peer " + _fromHash.toBase64() + " sent bad data: " + invalidMessage);
             }
         } else if (invalidMessage != null && !dontBlamePeer) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("(dbid: " + _facade._dbid + ") Unknown peer sent bad data: " + invalidMessage);
+                _log.warn("(dbid: " + _facade + ") Unknown peer sent bad data: " + invalidMessage);
         }
 
         // flood it
@@ -460,7 +460,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 // Note this does not throttle the ack above
                 if (_facade.shouldThrottleFlood(key)) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("(dbid: " + _facade._dbid + "Too many recent stores, not flooding key: " + key);
+                        _log.warn("(dbid: " + _facade + "Too many recent stores, not flooding key: " + key);
                     getContext().statManager().addRateData("netDb.floodThrottled", 1);
                     return;
                 }
@@ -499,7 +499,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             RouterInfo me = getContext().router().getRouterInfo();
             msg2.setEntry(me);
             if (_log.shouldWarn())
-                _log.warn("(dbid: " + _facade._dbid
+                _log.warn("(dbid: " + _facade
                           + ") Got a store w/ reply token, but we aren't ff: from: " + _from
                           + " fromHash: " + _fromHash + " msg: " + _message, new Exception());
         }
@@ -526,7 +526,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         if (toUs) {
             if (_facade.isClientDb()) {
                 _log.error("Error! SendMessageDirectJob (toUs) attempted in Client netDb ("
-                           + _facade._dbid + ")! Message: " + msg);
+                           + _facade + ")! Message: " + msg);
                 return;
             }
             Job send = new SendMessageDirectJob(getContext(), msg, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY, _msgIDBloomXor);
@@ -575,15 +575,15 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                         }
                         if (_log.shouldWarn()) {
                             if (isEstab)
-                                _log.warn("(dbid: " + _facade._dbid
+                                _log.warn("(dbid: " + _facade
                                           + ") Switched to alt connected peer " + toPeer
                                           + " in LS with " + count + " leases");
                             else
-                                _log.warn("(dbid: " + _facade._dbid + ") Alt connected peer not found in LS with " + count + " leases");
+                                _log.warn("(dbid: " + _facade + ") Alt connected peer not found in LS with " + count + " leases");
                         }
                     } else {
                         if (_log.shouldWarn())
-                            _log.warn("(dbid: " + _facade._dbid
+                            _log.warn("(dbid: " + _facade
                                       + ") Reply gw " + toPeer + ' ' + replyTunnel
                                       + " not found in LS with " + count + " leases: " + ls);
                     }
@@ -621,7 +621,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundExploratoryTunnel(toPeer);
             if (outTunnel == null) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("(dbid: " + _facade._dbid + ") No outbound tunnel could be found");
+                    _log.warn("(dbid: " + _facade + ") No outbound tunnel could be found");
                 return;
             }
             getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0),

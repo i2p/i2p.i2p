@@ -50,7 +50,7 @@ class ExpireRoutersJob extends JobImpl {
         if (getContext().commSystem().getStatus() != Status.DISCONNECTED) {
             int removed = expireKeys();
             if (_log.shouldLog(Log.INFO))
-                _log.info("(dbid: " + _facade._dbid
+                _log.info("(dbid: " + _facade
                           + "; db size: " + _facade.getKnownRouters()
                           + ") Routers expired: " + removed);
         }
