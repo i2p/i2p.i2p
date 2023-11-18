@@ -1,3 +1,13 @@
+2023-11-18 zzz
+ * i2psnark: Uncomment and fix local torrent file picker
+
+2023-11-17 zzz
+ * Console: Add "required" to input fields where necessary
+ * i2ptunnel: Edit and wizard form improvements
+
+2023-11-16 zzz
+ * Build: Force build to die on fatal JspC errors
+
 2023-11-15 zzz
  * i2psnark:
    - Handle metainfo url-list as single byte string
