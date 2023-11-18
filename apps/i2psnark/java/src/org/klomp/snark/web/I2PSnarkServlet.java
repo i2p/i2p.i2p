@@ -3,6 +3,7 @@ package org.klomp.snark.web;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -37,6 +38,7 @@ import net.i2p.data.Base32;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.servlet.RequestWrapper;
 import net.i2p.servlet.util.ServletUtil;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
@@ -1107,44 +1109,87 @@ public class I2PSnarkServlet extends BasicServlet {
         //    return;
         //}
         if ("Add".equals(action)) {
-            String newURL = req.getParameter("nofilter_newURL");
-         /******
-            // NOTE - newFile currently disabled in HTML form - see below
-            File f = null;
-            if ( (newFile != null) && (newFile.trim().length() > 0) )
-                f = new File(newFile.trim());
-            if ( (f != null) && (!f.exists()) ) {
-                _manager.addMessage(_t("Torrent file {0} does not exist", newFile));
+            File dd = _manager.getDataDir();
+            if (!dd.canWrite()) {
+                _manager.addMessage(_t("No write permissions for data directory") + ": " + dd);
+                return;
             }
-            if ( (f != null) && (f.exists()) ) {
-                // NOTE - All this is disabled - load from local file disabled
-                File local = new File(_manager.getDataDir(), f.getName());
-                String canonical = null;
-                try {
-                    canonical = local.getCanonicalPath();
-
-                    if (local.exists()) {
-                        if (_manager.getTorrent(canonical) != null)
-                            _manager.addMessage(_t("Torrent already running: {0}", newFile));
-                        else
-                            _manager.addMessage(_t("Torrent already in the queue: {0}", newFile));
-                    } else {
-                        boolean ok = FileUtil.copy(f.getAbsolutePath(), local.getAbsolutePath(), true);
-                        if (ok) {
-                            _manager.addMessage(_t("Copying torrent to {0}", local.getAbsolutePath()));
-                            _manager.addTorrent(canonical);
-                        } else {
-                            _manager.addMessage(_t("Unable to copy the torrent to {0}", local.getAbsolutePath()) + ' ' + _t("from {0}", f.getAbsolutePath()));
-                        }
-                    }
-                } catch (IOException ioe) {
-                    _log.warn("hrm: " + local, ioe);
+            String contentType = req.getContentType();
+            RequestWrapper reqw = new RequestWrapper(req);
+            String newURL = reqw.getParameter("nofilter_newURL");
+            String newFile = reqw.getFilename("newFile");
+            if (newFile != null && newFile.trim().length() > 0) {
+                if (!newFile.endsWith(".torrent"))
+                    newFile += ".torrent";
+                File local = new File(dd, newFile);
+                String newFile2 = Storage.filterName(newFile);
+                File local2;
+                if (!newFile.equals(newFile2)) {
+                    local2 = new File(dd, newFile2);
+                } else {
+                    local2 = null;
                 }
-            } else
-          *****/
-            if (newURL != null) {
+                if (local.exists() || (local2 != null && local2.exists())) {
+                    try {
+                        String canonical = local.getCanonicalPath();
+                        String canonical2 = local2 != null ? local2.getCanonicalPath() : null;
+                        if (_manager.getTorrent(canonical) != null ||
+                            (canonical2 != null && _manager.getTorrent(canonical2) != null))
+                            _manager.addMessage(_t("Torrent already running: {0}", canonical));
+                         else
+                            _manager.addMessage(_t("Torrent already in the queue: {0}", canonical));
+                    } catch (IOException ioe) {}
+                } else {
+                    File tmp = new File(_manager.util().getTempDir(), "newTorrent-" + _manager.util().getContext().random().nextLong() + ".torrent");
+                    InputStream in = null;
+                    OutputStream out = null;
+                    try {
+                        in = reqw.getInputStream("newFile");
+                        out = new SecureFileOutputStream(tmp);
+                        DataHelper.copy(in, out);
+                        out.close();
+                        out = null;
+                        in.close();
+                        // test that it's a valid torrent file, and get the hash to check for dups
+                        in = new FileInputStream(tmp);
+                        byte[] fileInfoHash = new byte[20];
+                        String name = MetaInfo.getNameAndInfoHash(in, fileInfoHash);
+                        try { in.close(); } catch (IOException ioe) {}
+                        Snark snark = _manager.getTorrentByInfoHash(fileInfoHash);
+                        if (snark != null) {
+                            _manager.addMessage(_t("Torrent with this info hash is already running: {0}", snark.getBaseName()));
+                            return;
+                        }
+                        if (local2 != null)
+                            local = local2;
+                        String canonical = local.getCanonicalPath();
+                        // This may take a LONG time to create the storage.
+                        boolean ok = _manager.copyAndAddTorrent(tmp, canonical, dd);
+                        if (!ok)
+                            throw new IOException("Unknown error - check logs");
+                        snark = _manager.getTorrentByInfoHash(fileInfoHash);
+                        if (snark != null)
+                            snark.startTorrent();
+                        else
+                            throw new IOException("Not found: " + canonical);
+                    } catch (IOException ioe) {
+                        _manager.addMessageNoEscape(_t("Torrent at {0} was not valid", DataHelper.escapeHTML(newFile)) + ": " + DataHelper.stripHTML(ioe.getMessage()));
+                        tmp.delete();
+                        local.delete();
+                        if (local2 != null)
+                            local2.delete();
+                        return;
+                    } catch (OutOfMemoryError oom) {
+                        _manager.addMessageNoEscape(_t("ERROR - Out of memory, cannot create torrent from {0}", DataHelper.escapeHTML(newFile)) + ": " + DataHelper.stripHTML(oom.getMessage()));
+                    } finally {
+                        if (in != null) try { in.close(); } catch (IOException ioe) {}
+                        if (out != null) try { out.close(); } catch (IOException ioe) {}
+                        tmp.delete();
+                    }
+                }
+            } else if (newURL != null && newURL.trim().length() > 0) {
                 newURL = newURL.trim();
-                String newDir = req.getParameter("nofilter_newDir");
+                String newDir = reqw.getParameter("nofilter_newDir");
                 File dir = null;
                 if (newDir != null) {
                     newDir = newDir.trim();
@@ -1171,11 +1216,6 @@ public class I2PSnarkServlet extends BasicServlet {
                             }
                         }
                     }
-                }
-                File dd = _manager.getDataDir();
-                if (!dd.canWrite()) {
-                    _manager.addMessage(_t("No write permissions for data directory") + ": " + dd);
-                    return;
                 }
                 if (newURL.startsWith("http://") || newURL.startsWith("https://")) {
                     if (isI2PTracker(newURL)) {
@@ -1240,7 +1280,7 @@ public class I2PSnarkServlet extends BasicServlet {
                                 boolean ok = _manager.copyAndAddTorrent(file, canonical, dd);
                                 if (!ok)
                                     throw new IOException("Unknown error - check logs");
-                                snark = _manager.getTorrentByBaseName(originalName);
+                                snark = _manager.getTorrentByInfoHash(fileInfoHash);
                                 if (snark != null)
                                     snark.startTorrent();
                                 else
@@ -1260,6 +1300,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 }
             } else {
                 // no file or URL specified
+                _manager.addMessage(_t("Enter URL or select torrent file"));
             }
         } else if (action.startsWith("Stop_")) {
             String torrent = action.substring(5);
@@ -2467,12 +2508,9 @@ public class I2PSnarkServlet extends BasicServlet {
             newURL = "";
         else
             newURL = DataHelper.stripHTML(newURL);    // XSS
-        //String newFile = req.getParameter("newFile");
-        //if ( (newFile == null) || (newFile.trim().length() <= 0) ) newFile = "";
 
         out.write("<div id=\"add\" class=\"snarkNewTorrent\">\n" +
-        // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
-                  "<form action=\"_post\" method=\"POST\">\n");
+                  "<form action=\"_post\" method=\"POST\" enctype=\"multipart/form-data\" accept-charset=\"UTF-8\">\n");
         writeHiddenInputs(out, req, "Add");
         out.write("<div class=\"addtorrentsection\">" +
                   "<input class=\"toggle_input\" id=\"toggle_addtorrent\" type=\"checkbox\"");
@@ -2492,11 +2530,12 @@ public class I2PSnarkServlet extends BasicServlet {
                   " title=\"");
         out.write(_t("Enter the torrent file download URL (I2P only), magnet link, or info hash"));
         out.write("\">\n");
-        // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
-        //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>");
         out.write("<input type=\"submit\" id=\"addButton\" class=\"add\" value=\"");
         out.write(_t("Add torrent"));
         out.write("\" name=\"foo\" ><br>\n" +
+                  "<tr><td>");
+        out.write(_t("From local torrent file"));
+        out.write(":<td><input type=\"file\" name=\"newFile\" accept=\".torrent\"/>\n" +
                   "<tr><td>");
 
         out.write(_t("Data dir"));

@@ -17,6 +17,11 @@
      <servlet-name>org.klomp.snark.web.I2PSnarkServlet</servlet-name>
      <servlet-class>org.klomp.snark.web.I2PSnarkServlet</servlet-class>
      <load-on-startup>1</load-on-startup>
+     <multipart-config>
+         <max-file-size>2097152</max-file-size>
+         <max-request-size>2097152</max-request-size>
+         <file-size-threshold>131072</file-size-threshold>
+    </multipart-config>
     </servlet>
 
     <servlet>
