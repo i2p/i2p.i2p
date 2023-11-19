@@ -684,11 +684,12 @@ public class Router implements RouterClock.ClockShiftListener {
             changeState(State.STARTING_1);
         }
         String last = _config.get("router.previousFullVersion");
-        if (last != null) {
+        if (last != null && !_context.getBooleanProperty("i2p.vmCommSystem")) {
             _eventLog.addEvent(EventLog.UPDATED, "from " + last + " to " + RouterVersion.FULL_VERSION);
             saveConfig("router.previousFullVersion", null);
         }
-        _eventLog.addEvent(EventLog.STARTED, RouterVersion.FULL_VERSION);
+        if (!_context.getBooleanProperty("i2p.vmCommSystem"))
+            _eventLog.addEvent(EventLog.STARTED, RouterVersion.FULL_VERSION);
         startupStuff();
         changeState(State.STARTING_2);
         _started = System.currentTimeMillis();
@@ -1640,7 +1641,8 @@ public class Router implements RouterClock.ClockShiftListener {
         // logManager shut down in finalShutdown()
         _watchdog.shutdown();
         _watchdogThread.interrupt();
-        _eventLog.addEvent(EventLog.STOPPED, Integer.toString(exitCode));
+        if (!_context.commSystem().isDummy())
+            _eventLog.addEvent(EventLog.STOPPED, Integer.toString(exitCode));
         finalShutdown(exitCode);
     }
 

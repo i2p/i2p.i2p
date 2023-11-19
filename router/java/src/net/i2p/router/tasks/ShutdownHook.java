@@ -39,7 +39,8 @@ public class ShutdownHook extends Thread {
         // Needed to make the wrapper happy, otherwise it gets confused
         // and thinks we haven't shut down, possibly because it
         // prevents other shutdown hooks from running
-        _context.router().eventLog().addEvent(EventLog.CRASHED, RouterVersion.FULL_VERSION);
+        if (!_context.commSystem().isDummy())
+            _context.router().eventLog().addEvent(EventLog.CRASHED, RouterVersion.FULL_VERSION);
         _context.router().setKillVMOnEnd(false);
         _context.router().shutdown2(Router.EXIT_HARD);
     }
