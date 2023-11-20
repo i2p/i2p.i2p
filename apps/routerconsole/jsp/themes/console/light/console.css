@@ -5257,7 +5257,7 @@ div#langsettings {
 }
 
 img.wizard.progress {
-    margin-left: -75%;
+    margin-left: -50%;
     max-height: 10%;
     max-width: 30%;
 }
