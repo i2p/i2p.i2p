@@ -1,3 +1,12 @@
+2023-11-21 zzz
+ * Addressbook: Workaround for i2p-projekt.i2p etag bug (Gitlab #454)
+ * Console: Don't list inner classes on /configlogging
+ * i2ptunnel: Add thread number to server thread names
+ * Profiles: Increase congestion cap penalties (Gitlab #412)
+
+2023-11-19 zzz
+ * Router: Don't log events in test mode
+
 2023-11-18 zzz
  * i2psnark: Uncomment and fix local torrent file picker
 
