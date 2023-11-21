@@ -118,6 +118,9 @@ public class ConfigLoggingHelper extends HelperBase {
 
         for (Log log : logs) {
             String name = log.getName();
+            // skip inner classes, the $ gets caught by the XSS filter
+            if (name.contains("$"))
+                continue;
             if (!limits.contains(name))
                 sortedLogs.add(name);
 
