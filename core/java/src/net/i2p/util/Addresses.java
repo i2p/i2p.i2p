@@ -1117,6 +1117,8 @@ public abstract class Addresses {
                         buf.append(" temporary");
                     if (isDynamic(addr))
                         buf.append(" dynamic");
+                    else
+                        buf.append(" permanent");
                     if (isDeprecated(addr))
                         buf.append(" deprecated");
                 }
