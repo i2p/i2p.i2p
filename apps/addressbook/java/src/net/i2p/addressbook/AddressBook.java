@@ -136,9 +136,17 @@ class AddressBook implements Iterable<Map.Entry<String, HostTxtEntry>> {
         File tmp = null;
         try {
             tmp = SecureFile.createTempFile("addressbook", null, I2PAppContext.getGlobalContext().getTempDir());
+            // Apache 2.4 mod_deflate etag bug workaround
+            // strip -gzip from the etag
+            // Gitlab #454
+            String loc = subscription.getLocation();
+            String etag = subscription.getEtag();
+            if (loc.startsWith("http://i2p-projekt.i2p/") && etag != null && etag.endsWith("-gzip\""))
+                etag = etag.substring(0, etag.length() - 6) + '"';
+
             EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true,
                     proxyHost, proxyPort, 0, -1l, MAX_SUB_SIZE, tmp.getAbsolutePath(), null,
-                    subscription.getLocation(), true, subscription.getEtag(), subscription.getLastModified(), null);
+                    loc, true, etag, subscription.getLastModified(), null);
             if (get.fetch()) {
                 subscription.setEtag(get.getETag());
                 subscription.setLastModified(get.getLastModified());
