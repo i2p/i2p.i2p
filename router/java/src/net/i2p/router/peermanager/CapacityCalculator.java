@@ -35,9 +35,9 @@ class CapacityCalculator {
     private static final double PENALTY_U_CAP = 2;
     private static final double PENALTY_LAST_SEND_FAIL = 4;
     private static final String PROP_D_CAP = "router.penaltyCapD";
-    private static final double PENALTY_CAP_D = 0.5;
+    private static final double PENALTY_CAP_D = 2.5;
     private static final String PROP_E_CAP = "router.penaltyCapE";
-    private static final double PENALTY_CAP_E = 0.9;
+    private static final double PENALTY_CAP_E = 4.75;
     // private static final String PROP_G_CAP = "router.gcapPenalty";
     // private static final double PENALTY_G_CAP = 0;
     private static final double PENALTY_RECENT_SEND_FAIL = 4;
@@ -133,18 +133,31 @@ class CapacityCalculator {
                 if (caps.indexOf(Router.CAPABILITY_CONGESTION_MODERATE) >= 0) {
                     String dcapPenalty = context.getProperty(PROP_D_CAP);
                     if (dcapPenalty != null) {
-                        double dcap = Double.parseDouble(dcapPenalty);
-                        capacity -= dcap;
+                        try {
+                            double dcap = Double.parseDouble(dcapPenalty);
+                            capacity -= dcap;
+                        } catch (NumberFormatException nfe) {
+                            capacity -= PENALTY_CAP_D;
+                        }
                     } else {
                         capacity -= PENALTY_CAP_D;
                     }
                 } else if (caps.indexOf(Router.CAPABILITY_CONGESTION_SEVERE) >= 0){
                     String ecapPenalty = context.getProperty(PROP_E_CAP);
                     if (ecapPenalty != null) {
-                        double ecap = Double.parseDouble(ecapPenalty);
-                        capacity -= ecap;
+                        try {
+                            double ecap = Double.parseDouble(ecapPenalty);
+                            capacity -= ecap;
+                        } catch (NumberFormatException nfe) {
+                            capacity -= PENALTY_CAP_E;
+                        }
                     } else {
-                        capacity -= PENALTY_CAP_E;
+                        // treat older than 15 minutes as D, as recommended in proposal 162
+                        long age = context.clock().now() - ri.getPublished();
+                        if (age < 15*60*1000)
+                            capacity -= PENALTY_CAP_E;
+                        else
+                            capacity -= PENALTY_CAP_D;
                     }
                 }
             } else {
