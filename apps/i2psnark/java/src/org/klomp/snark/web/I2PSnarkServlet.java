@@ -2534,7 +2534,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(_t("Add torrent"));
         out.write("\" name=\"foo\" ><br>\n" +
                   "<tr><td>");
-        out.write(_t("From local torrent file"));
+        out.write(_t("Torrent file"));
         out.write(":<td><input type=\"file\" name=\"newFile\" accept=\".torrent\"/>\n" +
                   "<tr><td>");
 
