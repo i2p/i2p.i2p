@@ -56,9 +56,6 @@ public class DummyClientManagerFacade extends ClientManagerFacade {
     public FloodfillNetworkDatabaseFacade getClientFloodfillNetworkDatabaseFacade(Hash dbid) {
         return null;
     }
-    public Set<FloodfillNetworkDatabaseFacade> getClientFloodfillNetworkDatabaseFacades() {
-        return Collections.emptySet();
-    }
     public Set<Hash> getPrimaryHashes() {
         return Collections.emptySet();
     }

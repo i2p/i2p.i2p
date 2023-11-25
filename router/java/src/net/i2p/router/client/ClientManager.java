@@ -799,22 +799,6 @@ class ClientManager {
     }
 
     /**
-     * get all of the FloodfillNetworkDatabaseFacades for all of the clients.
-     * 
-     * @return non-null
-     * @since 0.9.60
-     */
-    public Set<FloodfillNetworkDatabaseFacade> getClientFloodfillNetworkDatabaseFacades() {
-        Set<FloodfillNetworkDatabaseFacade> rv = new HashSet<FloodfillNetworkDatabaseFacade>();
-        for (ClientConnectionRunner runner : _runners.values()) {
-            FloodfillNetworkDatabaseFacade fndf = runner.getFloodfillNetworkDatabaseFacade();
-            if (fndf != null)
-                rv.add(fndf);
-        }
-        return rv;
-    }
-
-    /**
      * get all the primary hashes for all the clients and return them as a set
      * 
      * @return non-null

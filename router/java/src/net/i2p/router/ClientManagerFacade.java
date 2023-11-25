@@ -134,14 +134,6 @@ public abstract class ClientManagerFacade implements Service {
     public abstract FloodfillNetworkDatabaseFacade getClientFloodfillNetworkDatabaseFacade(Hash destHash);
 
     /**
-     * get all of the FloodfillNetworkDatabaseFacades for all of the clients.
-     * 
-     * @return non-null set of FloodfillNetworkDatabaseFacades
-     * @since 0.9.60
-     */
-    public abstract Set<FloodfillNetworkDatabaseFacade> getClientFloodfillNetworkDatabaseFacades();
-
-    /**
      * get a set of all primary hashes
      * 
      * @return non-null set of Hashes

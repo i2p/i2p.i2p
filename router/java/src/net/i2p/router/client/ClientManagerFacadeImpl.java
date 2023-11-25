@@ -308,19 +308,6 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
     }
 
     /**
-     * get all of the FloodfillNetworkDatabaseFacades for all of the clients.
-     * 
-     * @return
-     */
-    @Override
-    public Set<FloodfillNetworkDatabaseFacade> getClientFloodfillNetworkDatabaseFacades() {
-        if (_manager != null)
-            return _manager.getClientFloodfillNetworkDatabaseFacades();
-        else
-            return Collections.emptySet();
-    }
-
-    /**
      * get all the primary hashes for all the clients and return them as a set
      * 
      * @return
