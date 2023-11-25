@@ -2304,10 +2304,6 @@ input#toggle_debug:not(checked) + label {
 }
 }
 
-.dhtDebug th b:first-of-type, .dhtDebug th b:first-of-type + br + hr.debug {
-     display: none;
-}
-
 input#toggle_debug:not(checked) + label {
      padding-bottom: 2px;
 }
