@@ -2574,6 +2574,9 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
                 try { Thread.sleep(delay); } catch (InterruptedException ie) {}
                 // Remove that first message
                 _messages.clearThrough(id);
+            } else if (_context.isRouterContext()) {
+                // to wait for client manager to be up so we can get bandwidth limits
+                try { Thread.sleep(3000); } catch (InterruptedException ie) {}
             }
 
             // here because we need to delay until I2CP is up
