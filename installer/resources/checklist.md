@@ -124,7 +124,7 @@
   - `core/java/src/net/i2p/CoreVersion.java`
     - (both VERSION and PUBLISHED_VERSION)
   - `router/java/src/net/i2p/router/RouterVersion.java`
-    - (change to BUILD = 0 and EXTRA = "")
+    - (change to BUILD = 0 and EXTRA = "" and QUALIFIER = "")
 
 8. `git commit`
 
