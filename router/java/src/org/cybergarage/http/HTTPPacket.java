@@ -834,6 +834,7 @@ public class HTTPPacket
 		setHeader(HTTP.HOST, hostAddr + ":" + Integer.toString(port));
 	}
 
+/*  I2P No - we always want port also. libupnp-based devices will reject 403 without the port
 	public void setHost(String host)
 	{
 		String hostAddr = host;
@@ -841,6 +842,7 @@ public class HTTPPacket
 			hostAddr = "[" + host + "]";
 		setHeader(HTTP.HOST, hostAddr);
 	}
+*/
 	
 	public String getHost()
 	{
