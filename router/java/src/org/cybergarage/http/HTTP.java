@@ -38,7 +38,7 @@ public class HTTP
 	// Constants
 	////////////////////////////////////////////////
 	
-	public static final String HOST = "HOST";
+	public static final String HOST = "Host";
 	
 	public static final String VERSION = "1.1";
 	public static final String VERSION_10 = "1.0";
@@ -49,7 +49,7 @@ public class HTTP
 	public static final byte LF = '\n';
 	public static final String TAB = "\t";
 	
-	public static final String SOAP_ACTION = "SOAPACTION";
+	public static final String SOAP_ACTION = "SOAPAction";
 
 	public static final String M_SEARCH = "M-SEARCH";
 	public static final String NOTIFY = "NOTIFY";

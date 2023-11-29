@@ -32,7 +32,7 @@ import org.cybergarage.xml.ParserException;
 
 public class SOAPRequest extends HTTPRequest
 {
-	private final static String SOAPACTION = "SOAPACTION";
+	private final static String SOAPACTION = HTTP.SOAP_ACTION;
 	
 	////////////////////////////////////////////////
 	//	Constructor
