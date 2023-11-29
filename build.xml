@@ -441,7 +441,7 @@
         <property name="build.timestamp" value="reproducible" />
         <!-- default if not set by disableManifestClasspath -->
         <property name="manifest.classpath.name" value="Class-Path" />
-        <property name="full.version" value="${release.number}-${i2p.build.number}${build.extra}" />
+        <property name="full.version" value="${release.number}-${i2p.build.number}${build.qualifier}${build.extra}" />
         <echo message="JDK: ${java.vendor} ${java.version} (${java.runtime.name} ${java.runtime.version})" />
         <echo message="Building version ${full.version} (revision ${workspace.version})" />
     </target>
@@ -572,7 +572,7 @@
             <arg value="-e" />
             <arg value="${i2p.build.number} 1 + n" />
         </exec>
-        <echo message="Build number is now: ${new.i2p.build.number}${build.extra}" />
+        <echo message="Build number is now: ${new.i2p.build.number}${build.qualifier}${build.extra}" />
         <replaceregexp byline="true" file="router/java/src/net/i2p/router/RouterVersion.java"
             match='(^\s+public\s+final\s+static\s+long\s+BUILD\s+=\s+)[0-9]+;' replace='\1${new.i2p.build.number};'/>
     </target>
@@ -863,7 +863,7 @@
             splitindex="true"
             failonerror="true"
             additionalparam="-notimestamp"
-            doctitle="I2P Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra} (API ${api.version})"
+            doctitle="I2P Javadocs for Release ${release.number} Build ${i2p.build.number}${build.qualifier}${build.extra} (API ${api.version})"
             windowtitle="I2P Anonymous Network - Java Documentation - API Version ${api.version}">
             <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:net.i2p.apache.http.conn.ssl:net.i2p.apache.http.conn.util:net.i2p.apache.http.util:org.json.simple:com.southernstorm.noise.crypto.x25519:com.southernstorm.noise.crypto.chacha20:org.minidns:org.minidns.*" />
             <group title="Streaming Library" packages="net.i2p.client.streaming:net.i2p.client.streaming.impl" />
@@ -952,7 +952,7 @@
             packagenames="*"
             use="true"
             splitindex="true"
-            doctitle="I2P Unit Test Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra} (API ${api.version})"
+            doctitle="I2P Unit Test Javadocs for Release ${release.number} Build ${i2p.build.number}${build.qualifier}${build.extra} (API ${api.version})"
             windowtitle="I2P Anonymous Network - Java Documentation - API Version ${api.version}">
             <group title="Core SDK" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:gnu.crypto.*:gnu.gettext:org:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
             <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters" />
@@ -1069,9 +1069,22 @@
                 <striplinebreaks/>
             </filterchain>
         </loadfile>
+        <loadfile srcfile="router/java/src/net/i2p/router/RouterVersion.java" property="build.qualifier">
+            <filterchain>
+                <linecontains>
+                    <contains value="public final static String QUALIFIER" />
+                </linecontains>
+                <tokenfilter>
+                    <replaceregex pattern='.*"(.*)";' replace="\1" flags="gi" />
+                </tokenfilter>
+                <trim/>
+                <striplinebreaks/>
+            </filterchain>
+        </loadfile>
         <property name="i2p.build.number" value="??" />
         <property name="build.extra" value="" />
-        <echo message="Build number is ${i2p.build.number}${build.extra}" />
+        <property name="build.qualifier" value="" />
+        <echo message="Build number is ${i2p.build.number}${build.qualifier}${build.extra}" />
     </target>
 
     <target name="verifyReleaseBuildNumbers" depends="getReleaseNumber, getBuildNumber" >
@@ -1094,6 +1107,13 @@
             <condition>
                 <not>
                     <equals arg1="${build.extra}" arg2=""/>
+                </not>
+            </condition>
+        </fail>
+        <fail message="Non-empty qualifier build: ${build.qualifier}" >
+            <condition>
+                <not>
+                    <equals arg1="${build.qualifier}" arg2=""/>
                 </not>
             </condition>
         </fail>
