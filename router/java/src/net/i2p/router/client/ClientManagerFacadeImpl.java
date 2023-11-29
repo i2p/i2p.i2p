@@ -297,7 +297,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
      * This is inside the runner, so it won't be there if the runner isn't ready.
      * 
      * @param destHash destination hash associated with the client who's subDb we're looking for
-     * @return 
+     * @return the netdb or null
      */
     @Override
     public FloodfillNetworkDatabaseFacade getClientFloodfillNetworkDatabaseFacade(Hash destHash) {
@@ -310,7 +310,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
     /**
      * get all the primary hashes for all the clients and return them as a set
      * 
-     * @return
+     * @return all the hashes or an empty set, non-null
      */
     @Override
     public Set<Hash> getPrimaryHashes() {
