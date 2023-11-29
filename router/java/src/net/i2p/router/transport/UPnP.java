@@ -190,12 +190,12 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	 *  @return array of length 1 containing an IPv4 address, or null
 	 */
 	public DetectedIP[] getAddress() {
-		_log.info("UP&P.getAddress() is called \\o/");
+		_log.info("UPnP.getAddress() is called \\o/");
 		Service service;
 		synchronized(lock) {
 			if (!isNATPresent()) {
 				if (_log.shouldLog(Log.WARN))
-					_log.warn("No UP&P device found, detection of the external ip address using the plugin has failed");
+					_log.warn("No UPnP device found, detection of the external ip address using the plugin has failed");
 				return null;
 			}
 			service = _service;
@@ -222,7 +222,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			result = new DetectedIP(detectedIP, status);
 			
 			if (_log.shouldLog(Log.WARN))
-				_log.warn("Successful UP&P discovery :" + result);
+				_log.warn("Successful UPnP discovery :" + result);
 			
 			return new DetectedIP[] { result };
 		} catch (UnknownHostException e) {
@@ -252,7 +252,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			name += ' ' + ip;
 		if(!isIGD) {
 			if (_log.shouldInfo())
-				_log.info("UP&P non-IGD device found, ignoring " + name + ' ' + dev.getDeviceType());
+				_log.info("UPnP non-IGD device found, ignoring " + name + ' ' + dev.getDeviceType());
 			synchronized (lock) {
 				_otherUDNs.put(udn, dev);
 			}
@@ -365,12 +365,29 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 							ignore = false;
 						}
 					}
+					if (!ignore) {
+						// new one is better
+						String oldname = _router.getFriendlyName();
+						String oldudn = _router.getUDN();
+						String oldip = getIP(_router);
+						_log.logAlways(Log.WARN, "Multiple UPnP devices found");
+						_log.logAlways(Log.WARN, "To always use " + name + " at " + ip +
+						               ", add \"" + PROP_IGNORE + '=' + oldudn + "\" to advanced configuration and restart.");
+						_log.logAlways(Log.WARN, "To force use of disconnected device " + oldname + " at " + oldip +
+						               ", add \"" + PROP_IGNORE + '=' + udn + "\" to advanced configuration and restart.");
+					}
 				}
 				if (ignore) {
 					// this meets all our qualifications, but we already have one.
 					// subscribe to it, in case ours goes away
-					if (_log.shouldWarn())
-						_log.warn("UPnP ignoring additional device " + name + " UDN: " + udn);
+					String oldname = _router.getFriendlyName();
+					String oldudn = _router.getUDN();
+					String oldip = getIP(_router);
+					_log.logAlways(Log.WARN, "Multiple UPnP devices found");
+					_log.logAlways(Log.WARN, "To always use " + name + " at " + ip +
+					               ", add \"" + PROP_IGNORE + '=' + oldudn + "\" to advanced configuration and restart.");
+					_log.logAlways(Log.WARN, "To always use " + oldname + " at " + oldip +
+					               ", add \"" + PROP_IGNORE + '=' + udn + "\" to advanced configuration.");
 					_otherUDNs.put(udn, dev);
 					if (!subscriptionFailed) {
 						boolean ok = subscribe(service);
@@ -380,8 +397,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 							else
 								_log.info("Failed subscription to additional device " + name + " UDN: " + udn);
 						}
-						return;
 					}
+					return;
 				} else {
 			                String oldudn = _router.getUDN();
 					if (_log.shouldWarn()) {
@@ -422,7 +439,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			fpc.portForwardStatus(removeMap);
 
 		if (_log.shouldLog(Log.WARN))
-			_log.warn("UP&P IGD found : " + name + " UDN: " + udn + " lease time: " + dev.getLeaseTime());
+			_log.warn("UPnP IGD found : " + name + " UDN: " + udn + " lease time: " + dev.getLeaseTime());
 		
 		if (!subscriptionFailed) {
 			for (Service svc : services) {
@@ -536,7 +553,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			return;
                 String udn = dev.getUDN();
 		if (_log.shouldLog(Log.WARN))
-			_log.warn("UP&P device removed : " + dev.getFriendlyName() + " UDN: " + udn);
+			_log.warn("UPnP device removed : " + dev.getFriendlyName() + " UDN: " + udn);
 		ForwardPortCallback fpc = null;
 		Map<ForwardPort, ForwardPortStatus> removeMap = null;
 		boolean runSearch = false;
@@ -551,7 +568,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			   stringEquals(_router.getFriendlyName(), dev.getFriendlyName()) &&
 			   stringEquals(_router.getUDN(), udn)) {
 				if (_log.shouldLog(Log.WARN))
-					_log.warn("UP&P IGD device removed : " + dev.getFriendlyName());
+					_log.warn("UPnP IGD device removed : " + dev.getFriendlyName());
 				runSearch = true;
 				_router = null;
 				_service = null;
@@ -1155,8 +1172,12 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			if (ip != null)
 				sb.append("<br>IP: ").append(ip);
 			String udn = dev.getUDN();
-			if (udn != null)
+			if (udn != null) {
 				sb.append("<br>UDN: ").append(DataHelper.escapeHTML(udn));
+				sb.append("<br>");
+				sb.append(_t("To disable this device, add {0} to advanced configuration and restart.",
+				          '"' + PROP_IGNORE + '=' + DataHelper.escapeHTML(udn) + '"'));
+			}
 		}
 		listSubServices(dev, sb);
 		
@@ -1693,7 +1714,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		Set<ForwardPort> portsToDumpNow = null;
 		Set<ForwardPort> portsToForwardNow = null;
 		if (_log.shouldLog(Log.INFO))
-			_log.info("UP&P Forwarding "+ports.size()+" ports...", new Exception());
+			_log.info("UPnP Forwarding "+ports.size()+" ports...", new Exception());
 		synchronized(lock) {
 			if(forwardCallback != null && forwardCallback != cb && cb != null) {
 				_log.error("ForwardPortCallback changed from "+forwardCallback+" to "+cb+" - using new value, but this is very strange!");
