@@ -1837,10 +1837,6 @@ input#toggle_addtorrent:checked + label + hr + table, input#toggle_createtorrent
      margin: -19px 0 -12px;
 }
 
-.dhtDebug th b:first-of-type, .dhtDebug th b:first-of-type + br + hr.debug {
-     display: none;
-}
-
 input#toggle_debug:not(checked) + label {
      padding-bottom: 2px;
 }

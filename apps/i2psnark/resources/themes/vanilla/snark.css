@@ -2152,10 +2152,6 @@ hr.debug:last-child {
      border-radius: 0 0 2px 2px;
 }
 
-.dhtDebug th b:first-of-type, .dhtDebug th b:first-of-type + br + hr.debug {
-     display: none;
-}
-
 /* toggle debug view */
 
 input#toggle_debug:not(checked) + label {
