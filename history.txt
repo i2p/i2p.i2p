@@ -1,3 +1,14 @@
+2023-11-29 zzz
+ * Build: Handle QUALIFIER
+ * UPnP:
+   - Fix missing port in Host header causing failures on libupnp-based devices
+   - Fix handing of multiple IGDs
+   - Improve logging about multiple IGDs
+   - Make case of HTTP headers more standard
+
+2023-11-27 zzz
+ * i2psnark: Delay bandwidth limits check briefly
+
 2023-11-21 zzz
  * Addressbook: Workaround for i2p-projekt.i2p etag bug (Gitlab #454)
  * Console: Don't list inner classes on /configlogging
