@@ -118,14 +118,14 @@ public class ConfigUpdateHelper extends HelperBase {
         StringBuilder buf = new StringBuilder(256);
         buf.append("<select name=\"refreshFrequency\">");
         for (int i = 0; i < PERIODS.length; i++) {
-            buf.append("<option value=\"").append(PERIODS[i]);
+            buf.append("<option value=\"").append(PERIODS[i]).append("\" ");
             if (PERIODS[i] == ms)
-                buf.append('"').append(SELECTED);
+                buf.append(SELECTED);
             
             if (PERIODS[i] == -1)
-                buf.append("\">").append(_t("Never")).append("</option>\n");
+                buf.append(">").append(_t("Never")).append("</option>\n");
             else
-                buf.append("\">").append(_t("Every")).append(' ').append(DataHelper.formatDuration2(PERIODS[i])).append("</option>\n");
+                buf.append(">").append(_t("Every")).append(' ').append(DataHelper.formatDuration2(PERIODS[i])).append("</option>\n");
         }
         buf.append("</select>\n");
         return buf.toString();

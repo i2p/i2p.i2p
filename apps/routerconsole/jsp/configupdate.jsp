@@ -46,7 +46,7 @@
         <tr><td align="right"><label for="newsThroughProxy"><b><%=intl._t("Fetch news through the proxy?")%></b></label></td>
           <td><jsp:getProperty name="updatehelper" property="newsThroughProxy" /></td></tr>
       <% if (updatehelper.canInstall()) { %>
-        <tr><td align="right"><b><label for="updateThroughProxy"><%=intl._t("Update through the proxy?")%></b></label></td>
+        <tr><td align="right"><label for="updateThroughProxy"><b><%=intl._t("Update through the proxy?")%></b></label></td>
           <td><jsp:getProperty name="updatehelper" property="updateThroughProxy" /></td></tr>
       <% }   // if canInstall %>
         <tr><td align="right"><b><%=intl._t("Proxy host")%>:</b></td>
@@ -60,11 +60,11 @@
           <td><textarea cols="60" rows="6" name="updateURL" wrap="off" spellcheck="false"><jsp:getProperty name="updatehelper" property="updateURL" /></textarea></td>
         </tr><tr><td align="right"><b><%=intl._t("Trusted keys")%>:</b></td>
           <td><textarea cols="60" rows="6" name="trustedKeys" wrap="off" spellcheck="false"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea></td></tr>
-        <tr><td id="devSU3build" align="right"><b><label for="updateDevSU3"><%=intl._t("Update with signed development builds?")%></b></label></td>
+        <tr><td id="devSU3build" align="right"><label for="updateDevSU3"><b><%=intl._t("Update with signed development builds?")%></b></label></td>
           <td><jsp:getProperty name="updatehelper" property="updateDevSU3" /></td>
         </tr><tr><td align="right"><b><%=intl._t("Signed Build URL")%>:</b></td>
           <td><input type="text" size="60" name="devSU3URL" value="<jsp:getProperty name="updatehelper" property="devSU3URL" />"></td></tr>
-        <tr><td id="unsignedbuild" align="right"><b><label for="updateUnsigned"><%=intl._t("Update with unsigned development builds?")%></b></label></td>
+        <tr><td id="unsignedbuild" align="right"><label for="updateUnsigned"><b><%=intl._t("Update with unsigned development builds?")%></b></label></td>
           <td><jsp:getProperty name="updatehelper" property="updateUnsigned" /></td>
         </tr><tr><td align="right"><b><%=intl._t("Unsigned Build URL")%>:</b></td>
           <td><input type="text" size="60" name="zipURL" value="<jsp:getProperty name="updatehelper" property="zipURL" />"></td></tr>
