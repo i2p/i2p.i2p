@@ -1027,8 +1027,12 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
             default:
                 break;
         }
-        if (msg != null)
+        if (msg != null) {
             finishStatus(msg);
+        } else {
+            if (success && _t("HTTP client proxy tunnel must be running").equals(_status))
+                _status = "";
+        }
         synchronized(task) {
             task.notifyAll();
         }
