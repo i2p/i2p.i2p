@@ -328,6 +328,8 @@ h3#helpfaq {
 
 h4.sb_info {
     margin-top: -11px !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sb_info a {

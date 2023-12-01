@@ -881,6 +881,11 @@ a:active #sb_bandwidthgraph {
     height: 16px;
 }
 
+h4.sb_info {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .sb_update {
     padding: 3px 5px 0 !important;
 }
