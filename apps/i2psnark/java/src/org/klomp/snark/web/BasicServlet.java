@@ -395,11 +395,11 @@ class BasicServlet extends HttpServlet
         String rtype = response.getContentType();
         String ctype = content.getContentType();
         if (rtype != null) {
-            if (rtype.equals("application/javascript"))
+            if (rtype.contains("javascript"))
                 response.setCharacterEncoding("ISO-8859-1");
         } else if (ctype != null) {
             response.setContentType(ctype);
-            if (ctype.equals("application/javascript"))
+            if (ctype.contains("javascript"))
                 response.setCharacterEncoding("ISO-8859-1");
         }
         response.setHeader("X-Content-Type-Options", "nosniff");
