@@ -12,6 +12,14 @@ input.default {
 }
 </style>
 <%@include file="summaryajax.jsi" %>
+<%
+    if ("POST".equals(request.getMethod())) {
+        // refresh the sidebar after page loads
+%>
+<script src="/js/configupdate.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
+<%
+    }
+%>
 </head><body>
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("Configuration")%></h1>
