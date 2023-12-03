@@ -43,6 +43,8 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import gnu.getopt.Getopt;
 
@@ -142,10 +144,11 @@ public class Storage implements Closeable
   public Storage(I2PSnarkUtil util, File baseFile, String announce,
                  List<List<String>> announce_list,
                  String created_by,
-                 boolean privateTorrent, StorageListener listener)
+                 boolean privateTorrent, StorageListener listener,
+                 String ignorePattern)
     throws IOException
   {
-      this(util, baseFile, announce, announce_list, created_by, privateTorrent, null, null, listener);
+      this(util, baseFile, announce, announce_list, created_by, privateTorrent, null, null, listener, ignorePattern);
   }
 
   /**
@@ -166,7 +169,8 @@ public class Storage implements Closeable
   public Storage(I2PSnarkUtil util, File baseFile, String announce,
                  List<List<String>> announce_list,
                  String created_by,
-                 boolean privateTorrent, List<String> url_list, String comment, StorageListener listener)
+                 boolean privateTorrent, List<String> url_list, String comment, StorageListener listener,
+                 String ignorePattern)
     throws IOException
   {
     _util = util;
@@ -175,7 +179,7 @@ public class Storage implements Closeable
     this.listener = listener;
     _preserveFileNames = true;
     // Create names, rafs and lengths arrays.
-    _torrentFiles = getFiles(baseFile);
+    _torrentFiles = getFiles(baseFile, ignorePattern);
     
     long total = 0;
     ArrayList<Long> lengthsList = new ArrayList<Long>(_torrentFiles.size());
@@ -265,12 +269,12 @@ public class Storage implements Closeable
     return piece_hashes;
   }
 
-  private List<TorrentFile> getFiles(File base) throws IOException
+  private List<TorrentFile> getFiles(File base, String ignorePattern) throws IOException
   {
     if (base.getAbsolutePath().equals("/"))
         throw new IOException("Don't seed root");
     List<File> files = new ArrayList<File>();
-    addFiles(files, base);
+    addFiles(files, base, ignorePattern);
 
     int size = files.size();
     List<TorrentFile> rv = new ArrayList<TorrentFile>(size);
@@ -287,8 +291,21 @@ public class Storage implements Closeable
   /**
    *  @throws IOException if too many total files
    */
-  private void addFiles(List<File> l, File f) throws IOException {
+  private void addFiles(List<File> l, File f, String ignorePattern) throws IOException {
     int max = _util.getMaxFilesPerTorrent();
+
+    try
+      {
+        if (Pattern.matches(ignorePattern, f.getPath()))
+          {
+            return;
+          }
+      }
+    catch(PatternSyntaxException e)
+      {
+        throw new IOException("Ignore Pattern must be a valid regular expression");
+      }
+
     if (!f.isDirectory()) {
         if (l.size() >= max)
             throw new IOException(_util.getString("Too many files in \"{0}\" ({1})!", metainfo.getName(), l.size()) +
@@ -306,7 +323,7 @@ public class Storage implements Closeable
             return;
           }
         for (int i = 0; i < files.length; i++)
-          addFiles(l, files[i]);
+          addFiles(l, files[i], ignorePattern);
       }
   }
 
@@ -1761,7 +1778,7 @@ public class Storage implements Closeable
       File file = null;
       FileOutputStream out = null;
       try {
-          Storage storage = new Storage(util, base, announce, null, created_by, false, url_list, comment, null);
+          Storage storage = new Storage(util, base, announce, null, created_by, false, url_list, comment, null, null);
           MetaInfo meta = storage.getMetaInfo();
           file = new File(storage.getBaseName() + ".torrent");
           out = new FileOutputStream(file);

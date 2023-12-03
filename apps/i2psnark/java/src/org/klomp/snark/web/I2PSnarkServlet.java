@@ -1479,6 +1479,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 processTrackerForm(taction, req);
         } else if ("Create".equals(action)) {
             String baseData = req.getParameter("nofilter_baseFile");
+            String ignorePattern = req.getParameter("nofilter_ignorePattern");
             if (baseData != null && baseData.trim().length() > 0) {
                 // drag and drop, no js
                 if (baseData.startsWith("file://"))
@@ -1578,7 +1579,7 @@ public class I2PSnarkServlet extends BasicServlet {
                         // it shouldn't be THAT bad, so keep it in this thread.
                         // TODO thread it for big torrents, perhaps a la FetchAndAdd
                         boolean isPrivate = _manager.getPrivateTrackers().contains(announceURL);
-                        Storage s = new Storage(_manager.util(), baseFile, announceURL, announceList, null, isPrivate, null);
+                        Storage s = new Storage(_manager.util(), baseFile, announceURL, announceList, null, isPrivate, null, ignorePattern);
                         s.close(); // close the files... maybe need a way to pass this Storage to addTorrent rather than starting over
                         MetaInfo info = s.getMetaInfo();
                         File torrentFile = new File(_manager.getDataDir(), s.getBaseName() + ".torrent");
@@ -2573,6 +2574,12 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(_t("Create torrent"));
         out.write("\" name=\"foo\" >" +
                   "<tr><td>\n");
+	out.write(_t("Ignore Pattern"));
+	out.write(":<td>"
+                  + "<input type=\"text\" id=\"nofilter_ignorePattern\" name=\"nofilter_ignorePattern\" size=\"85\" value=\""
+                  + "\" spellcheck=\"false\" title=\"");
+	out.write(_t("Regular Expression pattern of files to ignore in path"));
+	out.write("\"><tr><td>");
         out.write(_t("Trackers"));
         out.write(":<td><table id=\"trackerselect\"><tr><td>Name</td><td align=\"center\">");
         out.write(_t("Primary"));
