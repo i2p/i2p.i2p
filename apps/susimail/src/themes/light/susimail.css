@@ -1056,11 +1056,11 @@ div#mailheader {
 }
 
 #dologin input[name="user"] {
-     background: #fafaff url(/themes/console/images/buttons/user.png) 5px 6px no-repeat !important;
+     background: #fafaff url(/themes/console/images/buttons/user.png) 5px 4px no-repeat !important;
 }
 
 #dologin input[name="pass"] {
-     background: #fafaff url(/themes/console/images/buttons/password.png) 5px 5px no-repeat !important;
+     background: #fafaff url(/themes/console/images/buttons/password.png) 5px 4px no-repeat !important;
 }
 
 #dologin input[name="user"]:focus, #dologin input[name="pass"]:focus {
