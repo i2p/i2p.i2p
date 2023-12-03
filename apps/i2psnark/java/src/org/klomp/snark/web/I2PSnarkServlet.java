@@ -339,7 +339,8 @@ public class I2PSnarkServlet extends BasicServlet {
                           "var failMessage = \"<div class=\\\"routerdown\\\"><b>" + downMsg + "<\\/b><\\/div>\";\n" +
                           "var ajaxDelay = " + (delay * 1000) + ";\n" +
                           "</script>\n" +
-                          "<script src=\".resources/js/initajax.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
+                          "<script src=\".resources/js/initajax.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n" +
+                          "<script src=\".resources/js/ignorepattern.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
             //}
             out.write("<script nonce=\"" + cspNonce + "\" type=\"text/javascript\">\n"  +
                       "var deleteMessage1 = \"" + _t("Are you sure you want to delete the file \\''{0}\\'' (downloaded data will not be deleted) ?") + "\";\n" +
@@ -2556,7 +2557,7 @@ public class I2PSnarkServlet extends BasicServlet {
     private void writeSeedForm(PrintWriter out, HttpServletRequest req, List<Tracker> sortedTrackers) throws IOException {
         out.write("<div id=\"new\" class=\"newtorrentsection\"><div class=\"snarkNewTorrent\">\n" +
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
-                  "<form action=\"_post\" method=\"POST\">\n");
+                  "<form action=\"_post\" method=\"POST\" id=\"newTorrentForm\">\n");
         writeHiddenInputs(out, req, "Create");
         out.write("<input class=\"toggle_input\" id=\"toggle_createtorrent\" type=\"checkbox\"><label class=\"toggleview\" for=\"toggle_createtorrent\">");
         out.write(toThemeImg("create"));
