@@ -1,3 +1,22 @@
+2023-12-05 zzz
+ * Build: poupdate-source
+ * i2ptunnel: Remove dup headers in error pages
+
+2023-12-02 zzz
+ * Console: Fix sidebar not immediately showing results of /configsidebar changes
+ * Susimail:
+   - Fix binary content-encoding
+   - Fix incorrect "previous" icons
+
+2023-12-01 zzz
+ * Console:
+   - Clear out "proxy must be running" status after success
+   - Don't lose tabs in log messages
+   - Fix HTML errors on /configupdate
+   - Fix sidebar not immediately showing results of manual update check
+   - Prevent overflow of sidebar status
+ * i2psnark: Change js mime type as per RFC 9239
+
 2023-11-29 zzz
  * Build: Handle QUALIFIER
  * UPnP:
