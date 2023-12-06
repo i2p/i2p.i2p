@@ -250,7 +250,7 @@ class MailPart {
 			tmpEnd = (int) counter.getRead();
 		}
 		end = tmpEnd;
-		if (encoding == null || encoding.equals("7bit") || encoding.equals("8bit")) {
+		if (encoding == null || encoding.equals("7bit") || encoding.equals("8bit") || encoding.equals("binary")) {
 			decodedLength = end - beginBody;
 		}
 		//if (Debug.getLevel() >= Debug.DEBUG)
@@ -332,7 +332,6 @@ class MailPart {
 	      			dout = out;
 			}
 			enc.decode(lin, dout);
-			//dout.getOutputStream().flush();
 		} catch (IOException ioe) {
 			if (lin != null)
 				if (_log.shouldDebug()) _log.debug("Decode IOE at in position " + lin.getRead()
@@ -346,6 +345,8 @@ class MailPart {
 		} finally {
 			if (lin != null) try { lin.close(); } catch (IOException ioe) {};
 			buffer.readComplete(true);
+			if (dout != null)
+				dout.getOutputStream().flush();
 			// let the servlet do this
 			//if (cos != null) try { cos.close(); } catch (IOException ioe) {};
 			//if (dout != null)

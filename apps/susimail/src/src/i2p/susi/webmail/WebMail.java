@@ -2516,18 +2516,25 @@ public class WebMail extends HttpServlet
 			String name3 = FilenameUtil.encodeFilenameRFC5987(name);
 			response.setHeader("Cache-Control", "public, max-age=604800");
 			if (isRaw) {
+				OutputStream out = null;
 				try {
 					response.addHeader("Content-Disposition", "inline; filename=\"" + name2 + "\"; " +
 					                   "filename*=" + name3);
 					if (part.type != null)
 						response.setContentType(part.type);
+					if (part.charset != null)
+						response.setCharacterEncoding(part.charset);
 					if (part.decodedLength >= 0)
 						response.setContentLength(part.decodedLength);
 					if (log.shouldDebug()) log.debug("Sending raw attachment " + name + " length " + part.decodedLength);
-					part.decode(0, new OutputStreamBuffer(response.getOutputStream()));
+					out = response.getOutputStream();
+					part.decode(0, new OutputStreamBuffer(out));
 					shown = true;
 				} catch (IOException e) {
 					log.error("Error sending raw attachment " + name + " length " + part.decodedLength, e);
+				} finally {
+					if (out != null)
+						try { out.close(); } catch (IOException ioe) {}
 				}
 			} else {
 				ZipOutputStream zip = null;
