@@ -1,3 +1,10 @@
+2023-12-06 zzz
+ * Susimail:
+   - Flush output to fix truncated mails
+   - Close output for attachments
+   - Fix setting encoding for attachments
+   - Set length for binary encoding
+
 2023-12-05 zzz
  * Build: poupdate-source
  * i2ptunnel: Remove dup headers in error pages
