@@ -3274,12 +3274,6 @@ public class WebMail extends HttpServlet
 		if (i == 0)
 			out.println("<tr><td colspan=\"9\" align=\"center\"><div id=\"emptymailbox\"><i>" + _t("No messages") + "</i></div></td></tr>");
 		out.println( "<tr class=\"bottombuttons\"></tr>");
-		if (folder.getPages() > 1 && i > 30) {
-			// show the buttons again if page is big
-			out.println("<tr class=\"bottombuttons\"><td colspan=\"9\" align=\"center\">");
-			showPageButtons(out, folderName, page, folder.getPages(), false);
-			out.println("</td></tr>");
-		}
 		out.println("<tr class=\"bottombuttons\"><td colspan=\"5\" align=\"left\">");
 		if (i > 0) {
 			// TODO do this in js
@@ -3309,6 +3303,12 @@ public class WebMail extends HttpServlet
 		out.print(button(CONFIGURE, _t("Settings")));
 		out.println("</td></tr>");
 		out.println( "</table>");
+		if (folder.getPages() > 1 && i > 30) {
+			// show the buttons again if page is big
+			out.println("<div class=\"topbuttons\">");
+			showPageButtons(out, folderName, page, folder.getPages(), false);
+			out.println("</div>");
+		}
 	}
 
 	/**

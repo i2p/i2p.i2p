@@ -147,7 +147,7 @@ div.header, .iframed .header {
 
 div.footer {
      border-top: none;
-     margin: -14px 0 10px;
+     margin: 14px 0 10px;
      border: 1px solid #f1f3f5;
      background: #f1f3f5;
 }
@@ -1158,11 +1158,10 @@ h3#config {
 }
 
 .topbuttons {
-     margin: -1px -1px 0;
+     margin: -1px;
      padding: 5px 5px 4px;
      text-align: center;
      border: 1px solid #7778bf;
-     border-bottom: none;
      z-index: 100;
      font-weight: bold;
      vertical-align: middle;
