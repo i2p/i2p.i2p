@@ -3264,7 +3264,7 @@ public class WebMail extends HttpServlet
 			out.println("</td><td " + jslink + ">" +
 					(mail.hasAttachment() ? "<img src=\"/susimail/icons/attach.png\" alt=\"\" title=\"" + _t("Message has an attachment") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
 					link + subj + "</a></td><td " + jslink + ">" +
-					(mail.isSpam() ? "<img src=\"/susimail/icons/flag_red.png\" alt=\"\" title=\"" + _t("Message is spam") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
+					(isSpamFolder || mail.isSpam() ? "<img src=\"/susimail/icons/flag_red.png\" alt=\"\" title=\"" + _t("Message is spam") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
 					// don't let date get split across lines
 					mail.localFormattedDate.replace(" ", "&nbsp;") + "</td><td " + jslink + ">&nbsp;</td><td align=\"right\" " + jslink + ">" +
 					((mail.getSize() > 0) ? (DataHelper.formatSize2(mail.getSize()) + 'B') : "???") + "</td></tr>" );
