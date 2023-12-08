@@ -25,7 +25,9 @@
 #     netbsd   = NetBSD
 #     unknown  = OS could not be determined
 
-HOST_OS=`uname -a`
+# Don't use uname -a because the hostname might fool us
+# uname -o is not POSIX, not supported on osx/BSD
+HOST_OS=`uname -s`
 
 if [ "X$HOST_OS" = "X" ]; then
     echo unknown
