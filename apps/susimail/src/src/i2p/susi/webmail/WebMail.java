@@ -418,7 +418,7 @@ public class WebMail extends HttpServlet
 	 */
 	private static String button2( String name, String label )
 	{
-		return "<input type=\"submit\" name=\"" + name + "\" value=\"" + label + "\" disabled>";
+		return "<input type=\"submit\" class=\"" + name + "\" name=\"" + name + "\" value=\"" + label + "\" disabled>";
 	}
 
 	/**

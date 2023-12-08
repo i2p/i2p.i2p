@@ -502,6 +502,10 @@ input[type="text"], input[type="password"] {
      font-size: 9pt;
 }
 
+select {
+     padding: 4px 5px 4px 8px !important;
+}
+
 select,
 input[type="submit"], input[type="reset"] {
      border: 1px solid #999daf;
@@ -786,7 +790,7 @@ input.nextpage:hover, input.next:hover, input[name="nextpage"]:hover {
 
 /* end pagenav */
 
-input.setpagesize, input.save {
+input.setpagesize, input.save, input.saveasdraft {
      background: #eee url(/themes/console/images/buttons/yes.png) no-repeat 6px center;
      background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 24px;
@@ -819,13 +823,13 @@ input.configure:hover {
      background: #f1f3f5;
 }
 
-input.saveas {
+input.saveas, input.saveasdraft {
      background: #eee url(../images/save.png) no-repeat 6px center;
      background: url(../images/save.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 24px;
 }
 
-input.saveas:hover {
+input.saveas:hover, input.saveasdraft:hover {
      background: #fff url(../images/save_hover.png) no-repeat 6px center;
      background: url(../images/save_hover.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
@@ -1196,7 +1200,7 @@ input.moveto {
 
 .topbuttons select.select1,
 .topbuttons input.new, .topbuttons input.refresh, .topbuttons input.logout,
-.topbuttons input.reply, .topbuttons input.replyall, .topbuttons input.forward, .topbuttons input.saveas, .topbuttons input.delete {
+.topbuttons input.reply, .topbuttons input.replyall, .topbuttons input.forward, .topbuttons input.saveas, .topbuttons input.saveasdraft, .topbuttons input.delete {
      float: left;
      margin-left: 2px;
      margin-top: 2px !important;

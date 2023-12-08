@@ -120,7 +120,20 @@ span.coloured {
      color: #327bbf;
 }
 
-p.footer, .iframed #footer, .footer hr {
+div.footer {
+     margin: 14px 0 10px;
+}
+
+p.footer {
+     margin: 0;
+     font-size: 8pt;
+     line-height: 10pt;
+     text-align: center;
+     padding: 3px;
+     color: #495057 !important;
+}
+
+.iframed .footer {
      display: none;
 }
 
@@ -162,7 +175,98 @@ div.topbuttons br {
 }
 
 .topbuttons input.next {
-     margin-bottom: -20px !important;
+     min-width: 20px !important;
+}
+
+.topbuttons input.prev {
+     min-width: 20px !important;
+}
+
+.topbuttons:not(old), .iframed .topbuttons:not(old) {
+     display: inline-block;
+     width: calc(100% - 10px);
+}
+
+/* float topbuttons, single line  */
+
+.topbuttons input {
+     float: left;
+}
+
+.topbuttons input[name="pagesize"], .topbuttons .setpagesize, .topbuttons input[onclick] {
+     float: none !important;
+}
+
+.topbuttons br {
+     display: none;
+}
+
+.topbuttons br ~ input {
+    margin: 3px 2px;
+}
+
+.topbuttons input.prev, .topbuttons input[name="prev"] {
+     margin-left: 10px;
+}
+
+.topbuttons input.list {
+     background-position: center center;
+     text-indent: -99999px;
+     padding: 5px 10px;
+}
+
+.topbuttons input[type="text"] {
+    margin: 3px 3px 5px !important;
+}
+
+#pagenav input {
+     float: none;
+     margin: 2px 1px !important;
+     padding: 5px 10px;
+}
+
+#pagenav input[name="prevpage"] {
+     margin-right: 5px !important;
+}
+
+#pagenav input[name="nextpage"] {
+     margin-left: 5px !important;
+}
+
+#pagenav input[disabled]:hover, #pagenav input[disabled]:active {
+     box-shadow: inset 0 0 0 1px #fff !important;
+}
+
+.topbuttons input[type="text"] {
+     margin: 5px;
+     padding: 4px 4px 5px !important;
+}
+
+.topbuttons div#pagenav {
+     margin-top: 10px;
+     display: inline-block;
+}
+
+.topbuttons select.select1 {
+     float: left;
+     margin-left: 2px;
+     margin-top: 4px !important;
+     border-radius: 15px;
+}
+
+table#pagenav {
+     float: right;
+     width: 200px;
+     margin: -9px 0 -1px 0;
+     padding: 2px;
+     border-collapse: separate;
+     border-spacing: 0;
+}
+
+#messagenav {
+     float: right;
+     margin-right: -1px;
+     margin-left: -7px;
 }
 
 .bottombuttons br {
@@ -200,8 +304,8 @@ table#mailbox {
 
 #mailbox th:first-child {
      padding: 0 !important;
-     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%) !important;
-     background: url(/themes/console/images/buttons/delete.png) center center no-repeat !important;
+     background: url(/themes/console/images/buttons/delete.png) center 7px no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%) !important;
+     background: url(/themes/console/images/buttons/delete.png) center 7px no-repeat !important;
 }
 
 #mailbox th:nth-child(2) {
@@ -312,13 +416,13 @@ a:link {
      font-weight: bold;
 }
 
+a:visited {
+     color: #bb7;
+}
+
 a:hover, a:visited:hover, a:focus, tr:hover td[onclick] a {
      color: #f60 !important;
      outline: none;
-}
-
-a:visited {
-     color: #272;
 }
 
 a:active, a:visited:active, tr:hover td[onclick]:active a {
@@ -411,6 +515,7 @@ table[id="mailbox"] th {
 
 table[id="mailbox"] th img {
      filter: drop-shadow(0 0 1px #f00);
+     margin: 0 3px 0 0;
 }
 
 table[id="mailbox"] th img:hover, table[id="mailbox"] th a:focus img {
@@ -593,13 +698,22 @@ input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
 input[type=submit], input.cancel {
      margin: 4px 5px;
      padding: 5px 8px !important;
-     min-width: 95px !important;
+     min-width: 65px !important;
      font: bold 9pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", Lato, "Segoe UI", Verdana, Helvetica, sans-serif;
      color: #494;
      text-align: center;
      border: 1px outset #191;
      box-shadow: 0 0 1px 1px #010;
      background: #000;
+}
+
+input.cancel {
+     background: #1F1A24 url(/themes/console/images/buttons/no.png) no-repeat 6px center !important;
+     padding: 5px 7px 5px 28px !important;
+}
+
+input.cancel:hover {
+     background: #1F1A24 url(/themes/console/images/buttons/no.png) no-repeat 6px center;
 }
 
 input[type=submit]:hover, input.cancel:hover, input[type=submit]:focus, input.cancel:focus {
@@ -659,33 +773,29 @@ input[type="text"], input[type="password"], textarea {
      font-size: 9pt;
 }
 
+#composemail input[type="text"] {
+     width: calc(100% - 20px);
+}
+
 input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
      color: #ee9 !important;
-     background: #000 !important;
      filter: drop-shadow(0 0 1px #880);
      transition: ease filter 0.3s 0s;
 }
 
 input[name="user"] {
-     padding: 5px 5px 5px 25px !important;
-}
-
-input[name="user"]:focus {
+     padding: 5px 5px 5px 30px !important;
      background: #000 url(/themes/console/images/buttons/user.png) 5px center no-repeat !important;
 }
 
 input[name="pass"] {
-     padding: 5px 5px 5px 25px !important;
-}
-
-input[name="pass"]:focus {
+     padding: 5px 5px 5px 30px !important;
      background: #000 url(/themes/console/images/buttons/password.png) 5px center no-repeat !important;
 }
 
 input.delete {
      margin-left: 5px;
 }
-
 
 input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix for oversaturated colors */
      border: 1px solid #292929;
@@ -903,16 +1013,9 @@ div#emptymailbox {
 
 table#pagenav {
      width: 30%;
-     margin: 7px auto -3px;
      border-collapse: collapse;
-     /*border-top: 1px solid #494;*/
-     background: #000;
-     background: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
-     background: repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,64,0,0.5) 2px, rgba(0,64,0,0.5) 4px), url(/themes/console/dark/images/camotile2.png), linear-gradient(to bottom, #001000, #000 75%) !important;
      background: none !important;
      background-blend-mode: normal, exclusion, normal;
-     /*filter: drop-shadow(0 -1px 2px #000);*/
-     position: absolute;
      top: -5px;
      left: 70%;
 }
@@ -927,11 +1030,11 @@ table#pagenav tr:hover td {
 
 table#pagenav td {
      white-space: nowrap;
-     font-size: 10.5pt;
+     font-size: 8pt;
      font-weight: bold;
      letter-spacing: 0.1em;
      word-spacing: 0.1em;
-     padding: 5px;
+     padding: 1px 2px;
      text-align: center;
      color: #e6e6e7;
      text-shadow: 0 1px 1px #000;
@@ -945,17 +1048,20 @@ table#pagenav td:first-child {
 
 table#pagenav td:nth-child(2) {
      padding-left: 35px;
+     padding-top: 8px;
 }
 
 table#pagenav td:nth-child(3) {
      text-align: center !important;
      width: 4%;
      white-space: nowrap;
+     padding-top: 8px;
 }
 
 table#pagenav td:last-child {
      text-align: left;
      width: 46%;
+     padding-top: 8px;
 }
 
 .topbuttons table#pagenav {
@@ -979,7 +1085,7 @@ div#prefsave { /* config page button positioning */
 }
 
 #prefsave input[type="submit"] {
-     min-width: 124px !important;
+     min-width: 100px !important;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {  /* webkit fixes */
@@ -1022,6 +1128,7 @@ div#prefsave {
 #pagenav input.firstpage {
      background: #000 url(images/first.png) center center no-repeat !important;
      background-size: 12px 12px !important;
+     text-indent: -99999px;
 }
 
 #pagenav input.firstpage:hover, #pagenav input.firstpage:focus {
@@ -1043,6 +1150,7 @@ div#prefsave {
 #pagenav input.prevpage {
      background: #000 url(images/previous.png) center center no-repeat !important;
      background-size: 12px 12px !important;
+     text-indent: -99999px;
 }
 
 #pagenav input.prevpage:hover, #pagenav input.prevpage:focus {
@@ -1064,6 +1172,7 @@ div#prefsave {
 #pagenav input.nextpage {
      background: #000 url(images/next.png) center center no-repeat !important;
      background-size: 12px 12px !important;
+     text-indent: -99999px;
 }
 
 #pagenav input.nextpage:hover, #pagenav input.nextpage:focus {
@@ -1085,6 +1194,7 @@ div#prefsave {
 #pagenav input.lastpage {
      background: #000 url(images/last.png) center center no-repeat !important;
      background-size: 12px 12px !important;
+     text-indent: -99999px;
 }
 
 #pagenav input.lastpage:hover, #pagenav input.lastpage:focus {
@@ -1103,22 +1213,41 @@ div#prefsave {
      background-size: 12px 12px !important;
 }
 
-input.switchto {
-     background: #292929 url(images/folder.png) center center no-repeat !important;
-     background-size: 12px 12px !important;
+#pagenav input[name="switchto"], #pagenav input[name="list"] {
      margin: -34px 3px 5px 3px !important;
 }
 
-input.switchto:hover,
-input.switchto:focus {
+input.switchto, input.list, input.setpagesize {
+     background: #292929 url(images/folder.png) center center no-repeat !important;
+     background-size: 16px 16px !important;
+     margin: -34px 3px 5px 3px !important;
+}
+
+#messagenav input.list {
+     background: url(images/folder.png) 11px center no-repeat, #1F1A24 !important;
+     margin: 4px 0 0 0 !important;
+     min-width: 40px !important;
+     padding: 6px !important;
+}
+
+input.switchto:hover, input.list:hover,
+input.switchto:focus, input.list:focus {
      background: #292929 url(images/folder.png) center center no-repeat !important;
      background-size: 12px 12px !important;
      border: 1px solid #f60;
 }
 
+input[type="text"][disabled] {
+     opacity: 1;
+     background: #222;
+     box-shadow: none;
+     color: #aaa;
+     filter: none;
+}
+
 input.login {
     background: url(images/login.png) 8px center no-repeat, #1F1A24 !important;
-    padding-left: 18px !important;
+    padding-left: 31px !important;
 }
 
 input.offline {
@@ -1132,67 +1261,79 @@ input.configure {
 }
 
 input.new {
-   background: url(images/edit.png) 8px center no-repeat, #1F1A24 !important;;
+   background: url(images/edit.png) 8px center no-repeat, #1F1A24 !important;
    padding-left: 30px !important;
 }
 
 input.logout {
-   background: url(images/logout.png) 8px center no-repeat, #1F1A24 !important;;
+   background: url(images/logout.png) 8px center no-repeat, #1F1A24 !important;
    padding-left: 30px !important;
 }
 
 input.refresh {
-   background: url(images/refresh.png) 8px center no-repeat, #1F1A24 !important;;
+   background: url(images/refresh.png) 8px center no-repeat, #1F1A24 !important;
    padding-left: 30px !important;
 }
 
 input.reply {
-   background: url(../images/reply.png) 8px center no-repeat, #1F1A24 !important;;
+   background: url(../images/reply.png) 8px center no-repeat, #1F1A24 !important;
    padding-left: 30px !important;
 }
 
 input.replyall {
-   background: url(../images/reply-all.png) 8px center no-repeat, #1F1A24 !important;;
+   background: url(../images/reply-all.png) 8px center no-repeat, #1F1A24 !important;
    padding-left: 30px !important;
 }
 
 input.forward {
-   background: url(../images/forward.png) 8px center no-repeat, #1F1A24 !important;;
+   background: url(../images/forward.png) 8px center no-repeat, #1F1A24 !important;
    padding-left: 30px !important;
 }
 
-input.saveas {
-   background: url(../images/save.png) 8px center no-repeat, #1F1A24 !important;;
-   padding-left: 30px !important;
+input.saveas, input.save, input.saveasdraft {
+   background: url(../images/save.png) 8px center no-repeat, #1F1A24 !important;
+   padding-left: 32px !important;
 }
 
 input.delete, input.delete_attachment, input.really_delete {
-   background: url(/themes/console/images/buttons/delete.png) 8px center no-repeat, #1F1A24 !important;;
+   background: url(/themes/console/images/buttons/delete.png) 8px center no-repeat, #1F1A24 !important;
    padding-left: 30px !important;
 }
 
 input.prev {
-   background: url(images/previous.png) 8px center no-repeat, #1F1A24 !important;;
+   background: url(images/previous.png) 8px center no-repeat, #1F1A24 !important;
    padding-left: 30px !important;
+   text-indent: -99999px;
 }
 
 input.next {
-   background: url(images/next.png) 8px center no-repeat, #1F1A24 !important;;
+   background: url(images/next.png) 8px center no-repeat, #1F1A24 !important;
    padding-left: 30px !important;
+   text-indent: -99999px;
+}
+
+input.next:disabled {
+     background: #222 url(images/next_disabled.png) center center no-repeat !important;
+     background-size: 12px 12px !important;
+}
+
+input.prev:disabled {
+     background: #222 url(images/previous_disabled.png) center center no-repeat !important;
+     background-size: 12px 12px !important;
 }
 
 input.moveto, input.list {
-   background: url(images/folder.png) 8px center no-repeat, #1F1A24 !important;;
+   background: url(images/folder.png) 8px center no-repeat, #1F1A24 !important;
    padding-left: 30px !important;
 }
 
 input.markall {
-   background: url(../images/selection.png) 8px center no-repeat, #1F1A24 !important;;
+   background: url(../images/selection.png) 8px center no-repeat, #1F1A24 !important;
    padding-left: 30px !important;
 }
 
 input.clearselection {
-   background: url(../images/none.png) 8px center no-repeat, #1F1A24 !important;;
+   background: url(../images/none.png) 8px center no-repeat, #1F1A24 !important;
    padding-left: 30px !important;
 }
 
@@ -1208,9 +1349,27 @@ a.mailcreate {
 
 select {
      margin: 11px 3px 3px 5px;
+     padding: 7px 5px 7px 10px;
+     box-shadow: 0 0 1px 1px #010;
+     font-size: 8pt;
+     font-weight: bold;
 }
 
 /* end pagenav */
+
+input.send {
+     background: #1F1A24 url(../images/send.png) no-repeat 6px center !important;
+     padding: 5px 7px 5px 28px !important;
+}
+
+input.send:hover {
+     background: #1F1A24 url(../images/send_hover.png) no-repeat 6px center !important;
+}
+
+input.new_upload {
+     background: #1F1A24 url(../images/attach.png) no-repeat 6px center !important;
+     padding: 5px 7px 5px 28px !important;
+}
 
 /* responsive layout */
 
