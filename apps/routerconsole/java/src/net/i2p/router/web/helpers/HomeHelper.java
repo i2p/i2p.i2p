@@ -178,7 +178,6 @@ Steps for the devs after approval at a meeting:
         //"sponge.i2p" + S + _x("Seedless and the Robert BitTorrent applications") + S + "http://sponge.i2p/" + S + I + "user_astronaut.png" + S +
         "notbob.i2p" + S + _x("Not Bob's Address Services") + S + "http://notbob.i2p/" + S + I + "notblob.png" + S +
         "[Ramble]" + S + _x("Ramble user-moderated forum aggregator") + S + "http://ramble.i2p/" + S + I + "ramble.png" + S +
-        "Metrics" + S + _x("I2P Network Statistics") + S + "http://metrics.i2p/" + S + I + "plugin.png" + S +
         "StormyCloud" + S + _x("StormyCloud Outproxy Services") + S + "http://stormycloud.i2p/" + S + I + "plugin.png" + S +
         "";
 
