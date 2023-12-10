@@ -39,6 +39,87 @@ public class HomeHelper extends HelperBase {
                 "</div>\n" + 
                 "</div>\n";
 
+/*
+
+Policy adapted from http://zzz.i2p/topics/236 last updated there 2016-08.
+Subject to change without notice.
+
+How to get my Eepsite added to the Router Console home page
+
+If your site is:
+
+- Broadly useful, in good taste, and of general interest to the I2P community
+- Is not an image board (chan)
+- Is not a general image host or file host unless it has strict editorial control and TOS (but even so we probably won't accept it)
+- If it contains user-generated content, or is a forum, tracker, file host, wiki, or anything allowing user comments,
+  it has English (and native language if different) terms of service posted that prohibit extremely inappropriate things.
+- If it is an index of i2p sites, it does not link to sites that are extremely inappropriate.
+- Reliably up for a few months at least
+- Will be up 24/7 except for maintenance, updates, etc
+- Decently fast (home DSL/cable is fine)
+- On a router running the current release
+
+...then contact a dev.
+
+** You MUST include the following info ** :
+
+- Affirm that you are the owner of the site in question. We do not add links to sites without permission.
+- The hostname
+- The registration authentication string, or the registration site or feed where it is available
+- An email address
+- The URL to link to
+- The URL of your English terms of service if available or necessary
+- If the site is not in English, a brief description of the site in English
+- A URL to a 32x32 transparent png icon to display. We will copy this icon into the router console source and serve it locally.
+  64x64 is ok also but it will be scaled to 32x32.
+- The license of the icon.
+- (Optional) A one or two-word label in English. If not provided we will use example.i2p
+- (Optional) a few words or a sentence in English for a popup (tooltip)
+- Affirm that you will regularly update the router to the latest release
+
+Translations will happen through our normal translation process.
+
+Other criteria:
+
+Your site should not require browsers to load clearnet resources.
+Please test your site to ensure that clearnet Javascript, CSS, fonts and images are not embedded.
+Your submission may be rejected for this reason.
+
+All decisions on inclusion will be made at a dev meeting, generally in IRC #i2p-dev
+on a Tuesday at 8 PM UTC about 2-4 weeks before a scheduled release.
+The group decision at the meeting is final.
+
+Space is limited. Not all requests will be accepted, even if they meet all the above criteria.
+
+(end of content adapted from zzz.i2p)
+
+Steps for the devs after receiving a submission:
+
+- Verify hostname was not previously used or registered anywhere by another site
+- Verify compatibility with all criteria
+- Verify icon is consistent with the console home page style and will look fine in both themes
+- Verify icon license compatibility with our licenses
+- Validate authentication string unless submitted to a registration site that does that
+- Pick the right category or discuss with submitter
+- Ensure display name is short and reasonable and translatable
+- Ensure description is short and reasonable and translatable
+- Resolve any issues with submitter
+- Add to agenda for a monthly meeting before the scheduled tag freeze
+
+Steps for the devs after approval at a meeting:
+
+- Add to the bottom of the correct category below
+- Ensure display name is tagged and does not contain commas unless the hostname alone
+- Ensure description is tagged and does not contain commas
+- Check in the icon in the right place with a description of the license in the checkin comment
+- Add to installer/resources/hosts.txt WITHOUT the authentication string and check in
+- Check in this file HomeHelper.java
+- Test
+- Add to i2p.www i2p2www/static/hosts.txt WITH the authentication string and check in
+  (don't forget this step!)
+
+*/
+
     // No commas allowed in text strings!
     static final String DEFAULT_SERVICES =
         _x("Email") + S + _x("Anonymous webmail client") + S + "/webmail" + S + I + "email.png" + S +
