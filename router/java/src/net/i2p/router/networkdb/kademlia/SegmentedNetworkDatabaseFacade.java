@@ -37,7 +37,7 @@ import net.i2p.router.NetworkDatabaseFacade;
  * See implementation: FloodfillNetworkDatabaseSegmentor
  * 
  * @author idk
- * @since 0.9.60
+ * @since 0.9.61
  */
 public abstract class SegmentedNetworkDatabaseFacade {
 
@@ -45,7 +45,7 @@ public abstract class SegmentedNetworkDatabaseFacade {
      * Get the main netDb, the one which is used if we're a floodfill
      * 
      * @return may be null if main netDb is not initialized
-     * @since 0.9.60
+     * @since 0.9.61
      */
     public abstract NetworkDatabaseFacade mainNetDB();
 
@@ -54,21 +54,21 @@ public abstract class SegmentedNetworkDatabaseFacade {
      * return the mainNetDB.
      * 
      * @return may be null if the client netDb does not exist
-     * @since 0.9.60
+     * @since 0.9.61
      */
     public abstract NetworkDatabaseFacade clientNetDB(Hash dbid);
 
     /**
      * Shut down the network databases
      * 
-     * @since 0.9.60
+     * @since 0.9.61
      */
     public abstract void shutdown();
 
     /**
      * Start up the network databases
      * 
-     * @since 0.9.60
+     * @since 0.9.61
      */
     public abstract void startup();
 }

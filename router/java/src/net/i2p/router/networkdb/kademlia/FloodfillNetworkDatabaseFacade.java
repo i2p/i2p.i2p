@@ -68,7 +68,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      *  Sub DBs
      *
      *  @param dbid null for main DB
-     *  @since 0.9.60
+     *  @since 0.9.61
      */
     public FloodfillNetworkDatabaseFacade(RouterContext context, Hash dbid) {
         super(context, dbid);

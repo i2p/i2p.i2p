@@ -35,7 +35,7 @@ class LookupThrottler {
     /**
      *  @param maxlookups when floodfill
      *  @param maxnonfflookups when not floodfill
-     *  @since 0.9.60
+     *  @since 0.9.61
      */
     LookupThrottler(FloodfillNetworkDatabaseFacade facade, int maxlookups, int maxnonfflookups, long cleanTime) {
         _facade = facade;

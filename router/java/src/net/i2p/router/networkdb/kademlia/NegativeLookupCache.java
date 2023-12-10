@@ -92,7 +92,7 @@ class NegativeLookupCache {
     /**
      *  Stops the timer. May not be restarted.
      *
-     *  @since 0.9.60
+     *  @since 0.9.61
      */
     public void stop() {
         clear();
@@ -103,7 +103,7 @@ class NegativeLookupCache {
         /**
          *  Schedules itself.
          *
-         *  @since 0.9.60
+         *  @since 0.9.61
          */
         public Cleaner(SimpleTimer2 pool) {
             super(pool, cleanTime);

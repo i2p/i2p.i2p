@@ -249,7 +249,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      * cache if we are. If not, it looks up the main Db and gets it.
      * 
      * @return non-null
-     * @since 0.9.60
+     * @since 0.9.61
      */
     protected BlindCache blindCache() {
         if (!isClientDb())
@@ -350,7 +350,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      * Check if the database is a client DB.
      *
      * @return  true if the database is a client DB, false otherwise
-     * @since 0.9.60
+     * @since 0.9.61
      */
     public boolean isClientDb() {
         // This is a null check in disguise, don't use .equals() here.
@@ -1714,7 +1714,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     }
 
     /**
-     * @since 0.9.60
+     * @since 0.9.61
      */
     @Override
     public String toString() {

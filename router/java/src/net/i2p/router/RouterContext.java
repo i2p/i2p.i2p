@@ -370,7 +370,7 @@ public class RouterContext extends I2PAppContext {
 
     /**
      * Our db cache
-     * @since 0.9.60
+     * @since 0.9.61
      */
     public SegmentedNetworkDatabaseFacade netDbSegmentor() { return _netDb; }
 
@@ -381,7 +381,7 @@ public class RouterContext extends I2PAppContext {
      * Will return the main netDb if
      * the dbid is null or the client db is not found.
      * 
-     * @since 0.9.60
+     * @since 0.9.61
      * @param id may be null
      * @return non-null
      */

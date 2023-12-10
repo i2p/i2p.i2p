@@ -37,7 +37,7 @@ import net.i2p.util.Log;
  * netDb when it's appropriate to route the netDb entry to one of the special tables.
  * 
  * @author idk
- * @since 0.9.60
+ * @since 0.9.61
  */
 public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseFacade {
     private final Log _log;
@@ -51,7 +51,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
      * RouterContext, containing a default, main netDb
      * and which is prepared to add client netDbs.
      * 
-     * @since 0.9.60
+     * @since 0.9.61
      */
     public FloodfillNetworkDatabaseSegmentor(RouterContext context) {
         _log = context.logManager().getLog(getClass());
@@ -79,7 +79,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
     /**
      * If we are floodfill, turn it off and tell everybody for the _mainDbid
      * 
-     * @since 0.9.60
+     * @since 0.9.61
      * 
      */
     public synchronized void shutdown() {
@@ -91,7 +91,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
     /**
      * Start up the _mainDbid
      * 
-     * @since 0.9.60
+     * @since 0.9.61
      * 
      */
     public synchronized void startup() {
@@ -103,7 +103,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
     /**
      * get the main netDb, which is the one we will use if we are a floodfill
      * 
-     * @since 0.9.60
+     * @since 0.9.61
      * @return may be null
      */
     @Override
@@ -116,7 +116,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
      * Will return the "main" netDb if
      * the dbid is null.
      * 
-     * @since 0.9.60
+     * @since 0.9.61
      * @return may be null if the client netDb does not exist
      */
     @Override

@@ -1163,7 +1163,7 @@ class ClientConnectionRunner {
      * If a session has not been created yet, it will return null.
      * 
      * @return the client netdb or null if no session was created yet
-     * @since 0.9.60
+     * @since 0.9.61
      */
     public FloodfillNetworkDatabaseFacade getFloodfillNetworkDatabaseFacade() {
         return _floodfillNetworkDatabaseFacade;

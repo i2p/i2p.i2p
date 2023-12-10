@@ -779,7 +779,7 @@ class ClientManager {
      * 
      * @param destHash destination hash associated with the client who's subDb we're looking for, may be null
      * @return will be null if desthash is null or client does not exist or its netDb is not initialized
-     * @since 0.9.60
+     * @since 0.9.61
      */
     public FloodfillNetworkDatabaseFacade getClientFloodfillNetworkDatabaseFacade(Hash destHash) {
         if (destHash != null) {
@@ -802,7 +802,7 @@ class ClientManager {
      * get all the primary hashes for all the clients and return them as a set
      * 
      * @return non-null
-     * @since 0.9.60
+     * @since 0.9.61
      */
     public Set<Hash> getPrimaryHashes() {
         Set<Hash> rv = new HashSet<Hash>();
