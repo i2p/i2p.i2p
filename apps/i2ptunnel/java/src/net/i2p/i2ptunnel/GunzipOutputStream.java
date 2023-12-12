@@ -327,7 +327,7 @@ public class GunzipOutputStream extends InflaterOutputStream {
 
     /**
      *  Calculate CRC32 along the way
-     *  @since 0.9.60
+     *  @since 0.9.61
      */
     private static class CRC32OutputStream extends FilterOutputStream {
 

@@ -150,7 +150,7 @@ public class RunStandalone {
 
     /**
      *  Callback when shutdown is clicked in systray
-     *  @since 0.9.60
+     *  @since 0.9.61
      */
     public static class StandaloneStopper implements MenuCallback {
         private final MenuService _ms;
@@ -167,7 +167,7 @@ public class RunStandalone {
 
     /**
      *  Threaded shutdown
-     *  @since 0.9.60
+     *  @since 0.9.61
      */
     public static class StopperThread implements Runnable {
         public void run() {
