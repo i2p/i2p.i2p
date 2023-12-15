@@ -1,3 +1,18 @@
+2023-12-15 zzz
+ * Pull translations from Transifex
+
+2023-12-14 zzz
+ * Console: Whitespace fixes on config pages
+
+2023-12-08 zzz
+ * Installer: Fix rare misidentification of OS
+
+2023-12-07 zzz
+ * Susimail:
+   - Fix placement of bottom page nav
+   - Show spam flags for all in spam folder
+   - Dark theme fixes
+
 2023-12-06 zzz
  * Susimail:
    - Flush output to fix truncated mails
