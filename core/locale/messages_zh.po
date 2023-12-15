@@ -2,49 +2,36 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# foo <foo@bar>, 2009.
+# 
 # Translators:
-# Beta Ba <linsui555@gmail.com>, 2019
-# ducki2p <ducki2p@gmail.com>, 2011
-# K <daleks@foxmail.com>, 2017
-# nobody <oiiu19@yahoo.com>, 2013-2014
-# xtoaster <zhazhenzhong@gmail.com>, 2012
-# SF W, 2019
-# Tommy Lmath <l5h5t7@qq.com>, 2016
-# uzmintid Xun <1109673069@qq.com>, 2017
-# walking <walking@i2pmail.org>, 2011
-# walking <walking@i2pmail.org>, 2011
-# walking <waling@mail.i2p>, 2013
-# walking <walking@i2pmail.org>, 2011
-# wwj402 <wwj402@gmail.com>, 2013
-# wwj402 <wwj402@gmail.com>, 2013
-# xtoaster <zhazhenzhong@gmail.com>, 2012
-# YFdyh000 <yfdyh000@gmail.com>, 2016
-# YFdyh000 <yfdyh000@gmail.com>, 2014-2017
-# xtoaster <zhazhenzhong@gmail.com>, 2012
-# xtoaster <zhazhenzhong@gmail.com>, 2012
 # zzzi2p, 2019
+# walking <walking@i2pmail.org>, 2019
+# Beta Ba <linsui@inbox.lv>, 2019
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P\n"
+"Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 17:32+0000\n"
-"PO-Revision-Date: 2019-11-24 14:55+0000\n"
-"Last-Translator: Beta Ba <linsui555@gmail.com>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/otf/I2P/language/"
-"zh_CN/)\n"
-"Language: zh_CN\n"
+"POT-Creation-Date: 2019-12-17 18:42+0000\n"
+"PO-Revision-Date: 2019-12-17 17:16+0000\n"
+"Last-Translator: Beta Ba <linsui@inbox.lv>, 2019\n"
+"Language-Team: Chinese (China) (https://app.transifex.com/otf/teams/12694/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#. NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there are several options...
-#. spaces or not, '.' or not, plural or not. Try not to make it too long, it is used in
+#. NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there
+#. are several options...
+#. spaces or not, '.' or not, plural or not. Try not to make it too long, it
+#. is used in
 #. a lot of tables.
 #. milliseconds
 #. Note to translators, may be negative or zero, 2999 maximum.
-#. {0,number,####} prevents 1234 from being output as 1,234 in the English locale.
+#. {0,number,####} prevents 1234 from being output as 1,234 in the English
+#. locale.
 #. If you want the digit separator in your locale, translate as {0}.
 #. alternates: msec, msecs
 #: ../java/src/net/i2p/data/DataHelper.java:1383
@@ -114,33 +101,28 @@ msgid "{0,number,####} μs"
 msgid_plural "{0,number,###} μs"
 msgstr[0] "{0,number,###} 微秒"
 
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "CRIT"
+msgstr "严重"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "DEBUG"
+msgstr "调试"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "ERROR"
+msgstr "错误"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "INFO"
+msgstr "信息"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "WARN"
+msgstr "警告"
+
 #: ../java/src/net/i2p/util/LogWriter.java:161
 #, java-format
 msgid "{0} similar message omitted"
 msgid_plural "{0} similar messages omitted"
-msgstr[0] ""
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:153
-msgid "CRIT"
-msgstr "严重"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-msgid "DEBUG"
-msgstr "调试"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:155
-msgid "ERROR"
-msgstr "错误"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:160
-msgid "INFO"
-msgstr "信息"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:157
-msgid "WARN"
-msgstr "警告"
-
+msgstr[0] "{0} 条相似消息已忽略"

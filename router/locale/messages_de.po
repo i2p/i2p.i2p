@@ -2,40 +2,23 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# foo <foo@bar>, 2009.
+# 
 # Translators:
-# Ashoka <martin.tastler@posteo.de>, 2013
-# blabla, 2011
-# blabla <blabla@trash-mail.com>, 2012,2014
-# blabla <blabla@trash-mail.com>, 2014-2015
-# blabla <blabla@trash-mail.com>, 2012
-# D.A. Loader <>, 2012
-# ducki2p <ducki2p@gmail.com>, 2011
-# Ettore Atalan <atalanttore@googlemail.com>, 2014-2015,2017,2019
-# Florian Maier <contact@marsmenschen.com>, 2017
-# foo <foo@bar>, 2009
-# Lars Schimmer <echelon@i2pmail.org>, 2014-2018
-# Ashoka <martin.tastler@posteo.de>, 2013
-# mixxy, 2011
-# nextloop <ga25day@mytum.de>, 2013
-# pirr <pirr@tormail.org>, 2012
-# pirr <pirr@tormail.org>, 2012
-# Forecast <taisto@web.de>, 2015,2019
-# zeroflag <zeroflag@i2pmail.org>, 2013
-# zeroflag <zeroflag@i2pmail.org>, 2013
-# zzzi2p, 2016-2017
+# zzzi2p, 2019
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P\n"
+"Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-18 13:32+0000\n"
-"PO-Revision-Date: 2019-11-24 13:40+0000\n"
-"Last-Translator: Moritz Neumann <Moritzcneumann@web.de>\n"
-"Language-Team: German (http://www.transifex.com/otf/I2P/language/de/)\n"
-"Language: de\n"
+"PO-Revision-Date: 2019-12-19 14:09+0000\n"
+"Last-Translator: zzzi2p, 2019\n"
+"Language-Team: German (https://app.transifex.com/otf/teams/12694/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. * IPv4 OK, IPv6 OK or disabled or no address
@@ -111,7 +94,8 @@ msgstr "Teste"
 
 #. NPE, too early
 #. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
-#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too low");
+#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too
+#. low");
 #. else
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:84
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:142
@@ -132,7 +116,8 @@ msgid "Rejecting most tunnels: High number of requests"
 msgstr "Weise Tunnelanfragen zurück: hohe Anzahl an Anfragen"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of tunnels");
+#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of
+#. tunnels");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:243
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:424
 msgid "Accepting most tunnels"
@@ -152,7 +137,8 @@ msgid "Rejecting tunnels: Bandwidth limit"
 msgstr "Weise Tunnelanfragen zurück: Bandbreitenbeschränkung erreicht"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels: Bandwidth limit");
+#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels:
+#. Bandwidth limit");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:420
 msgid "Rejecting most tunnels: Bandwidth limit"
 msgstr ""

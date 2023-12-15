@@ -2,30 +2,24 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# foo <foo@bar>, 2009.
+# 
 # Translators:
-# ducki2p <ducki2p@gmail.com>, 2011
-# ian chou <ertiach@hotmail.com>, 2018
-# walking <waling@mail.i2p>, 2013
-# walking <walking@i2pmail.org>, 2011
-# wwj402 <wwj402@gmail.com>, 2013
-# xtoaster <zhazhenzhong@gmail.com>, 2012
-# 0a744893951e0d1706ff74a7afccf561, 2019
-# 男孩不壞, 2016
-# 黃彥儒 <r1235613@gmail.com>, 2017
+# Mingye Wang <arthur200126@gmail.com>, 2019
+# zzzi2p, 2019
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P\n"
+"Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-18 13:32+0000\n"
-"PO-Revision-Date: 2019-11-24 13:40+0000\n"
-"Last-Translator: Po-Chun Huang <aphroteus@gmail.com>\n"
-"Language-Team: Chinese (Taiwan) (http://www.transifex.com/otf/I2P/language/"
-"zh_TW/)\n"
-"Language: zh_TW\n"
+"PO-Revision-Date: 2019-12-19 14:09+0000\n"
+"Last-Translator: zzzi2p, 2019\n"
+"Language-Team: Chinese (Taiwan) (https://app.transifex.com/otf/teams/12694/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. * IPv4 OK, IPv6 OK or disabled or no address
@@ -101,7 +95,8 @@ msgstr "測試中"
 
 #. NPE, too early
 #. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
-#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too low");
+#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too
+#. low");
 #. else
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:84
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:142
@@ -122,7 +117,8 @@ msgid "Rejecting most tunnels: High number of requests"
 msgstr "收緊共享：高請求量"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of tunnels");
+#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of
+#. tunnels");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:243
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:424
 msgid "Accepting most tunnels"
@@ -142,7 +138,8 @@ msgid "Rejecting tunnels: Bandwidth limit"
 msgstr "拒絕共享：頻寬限額"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels: Bandwidth limit");
+#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels:
+#. Bandwidth limit");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:420
 msgid "Rejecting most tunnels: Bandwidth limit"
 msgstr "收緊共享：頻寬限額"

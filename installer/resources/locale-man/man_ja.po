@@ -9,14 +9,14 @@
 # tama negi, 2020
 # タカハシ, 2022
 # zzzi2p, 2022
-# daingewuvzeevisiddfddd, 2022
+# daingewuvzeevisiddfddd, 2023
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2021-11-27 13:31-0000\n"
-"Last-Translator: daingewuvzeevisiddfddd, 2022\n"
-"Language-Team: Japanese (https://www.transifex.com/otf/teams/12694/ja/)\n"
+"Last-Translator: daingewuvzeevisiddfddd, 2023\n"
+"Language-Team: Japanese (https://app.transifex.com/otf/teams/12694/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -436,8 +436,8 @@ msgid ""
 "will not restart if it crashes.  Also, it will use the default memory size, "
 "which may not be enough for I2P."
 msgstr ""
-"サービスラッパーなしに、I2P ルーターを起動する。つまり、ルーターはクラッシュしたら再起動しない。また、デフォルトのメモリサイズを使用するが、I2P "
-"の使用に十分な数値出ない場合がある。"
+"サービスラッパーなしに、I2P ルーターを起動する。つまり、ルーターはクラッシュしたら再起動しない。また、初期設定のメモリの大きさを使用するが、I2P "
+"の使用に不足する場合がある。"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:23
