@@ -84,6 +84,7 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
             long timeToReply = _state.dataFound(_peer);
             DatabaseStoreMessage msg = (DatabaseStoreMessage)message;
             DatabaseEntry entry = msg.getEntry();
+            getContext().profileManager().dbLookupSuccessful(_peer, timeToReply);
             try {
                 if (entry.isLeaseSet()) {
                     LeaseSet ls = (LeaseSet) entry;
