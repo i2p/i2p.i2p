@@ -1,3 +1,9 @@
+2023-12-18 2.3.0 (API 0.9.61) released
+
+2023-12-15 idk
+ * Pull translations from Transifex
+ * Fix updating router profile in SearchUpdateReplyFoundJob
+
 2023-12-15 zzz
  * Pull translations from Transifex
 
