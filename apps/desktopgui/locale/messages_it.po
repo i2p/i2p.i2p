@@ -8,91 +8,101 @@
 # mkkid <jokjok@hotmail.it>, 2011
 # Leelium <bovas85@gmail.com>, 2012
 # mkkid <jokjok@hotmail.it>, 2011
-# Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>, 2016-2017
+# SebastianoPistore <SebastianoPistore.info@protonmail.ch>, 2016-2017
+# V 41bis, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-25 12:29+0000\n"
-"PO-Revision-Date: 2017-07-30 07:04+0000\n"
-"Last-Translator: Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>\n"
-"Language-Team: Italian (http://www.transifex.com/otf/I2P/language/it/)\n"
+"POT-Creation-Date: 2023-03-06 14:52+0000\n"
+"PO-Revision-Date: 2011-02-13 12:05+0000\n"
+"Last-Translator: V 41bis, 2023\n"
+"Language-Team: Italian (http://app.transifex.com/otf/I2P/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: it\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #: src/net/i2p/desktopgui/ExternalTrayManager.java:31
-#: src/net/i2p/desktopgui/ExternalTrayManager.java:59
 msgid "Start I2P"
 msgstr "Avvia I2P"
 
 #: src/net/i2p/desktopgui/ExternalTrayManager.java:44
-#: src/net/i2p/desktopgui/ExternalTrayManager.java:72
+#: src/net/i2p/desktopgui/InternalTrayManager.java:55
 msgid "I2P is starting!"
 msgstr "Avvio di I2P in corso!"
 
 #: src/net/i2p/desktopgui/ExternalTrayManager.java:44
-#: src/net/i2p/desktopgui/ExternalTrayManager.java:72
+#: src/net/i2p/desktopgui/InternalTrayManager.java:55
 msgid "Starting"
 msgstr "Avvio in corso"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:55
-#: src/net/i2p/desktopgui/InternalTrayManager.java:207
+#: src/net/i2p/desktopgui/InternalTrayManager.java:65
+#: src/net/i2p/desktopgui/InternalTrayManager.java:221
 msgid "Launch I2P Browser"
 msgstr "Lancia il browser I2P"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:76
-#: src/net/i2p/desktopgui/InternalTrayManager.java:228
+#: src/net/i2p/desktopgui/InternalTrayManager.java:86
+#: src/net/i2p/desktopgui/InternalTrayManager.java:242
 msgid "Configure I2P System Tray"
 msgstr "Configura icona di I2P nella Barra di notifica"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:77
-#: src/net/i2p/desktopgui/InternalTrayManager.java:229
-msgid "Disable"
-msgstr "Disabilita"
+#: src/net/i2p/desktopgui/InternalTrayManager.java:88
+#: src/net/i2p/desktopgui/InternalTrayManager.java:244
+msgid "Disable system tray"
+msgstr "Disattiva l'icona nella barra di Notifica"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:93
-#: src/net/i2p/desktopgui/InternalTrayManager.java:245
+#: src/net/i2p/desktopgui/InternalTrayManager.java:104
+#: src/net/i2p/desktopgui/InternalTrayManager.java:260
 msgid "Restart I2P"
 msgstr "Riavvia I2P"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:110
-#: src/net/i2p/desktopgui/InternalTrayManager.java:262
+#: src/net/i2p/desktopgui/InternalTrayManager.java:121
+#: src/net/i2p/desktopgui/InternalTrayManager.java:277
 msgid "Stop I2P"
 msgstr "Arresta I2P"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:126
-#: src/net/i2p/desktopgui/InternalTrayManager.java:278
+#: src/net/i2p/desktopgui/InternalTrayManager.java:137
+#: src/net/i2p/desktopgui/InternalTrayManager.java:293
 msgid "Restart I2P Immediately"
 msgstr "Riavvia subito I2P"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:143
-#: src/net/i2p/desktopgui/InternalTrayManager.java:295
+#: src/net/i2p/desktopgui/InternalTrayManager.java:154
+#: src/net/i2p/desktopgui/InternalTrayManager.java:310
 msgid "Stop I2P Immediately"
 msgstr "Arresta subito I2P"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:157
-#: src/net/i2p/desktopgui/InternalTrayManager.java:309
+#: src/net/i2p/desktopgui/InternalTrayManager.java:168
+#: src/net/i2p/desktopgui/InternalTrayManager.java:324
 msgid "Cancel I2P Shutdown"
 msgstr "Annulla arresto di I2P"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:363
+#: src/net/i2p/desktopgui/InternalTrayManager.java:381
 #, java-format
 msgid "Shutdown in {0}"
 msgstr "Arresto in {0}"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:365
+#: src/net/i2p/desktopgui/InternalTrayManager.java:383
 msgid "Shutdown imminent"
 msgstr "Arresto imminente"
 
 #. status translations are in the console bundle
-#: src/net/i2p/desktopgui/InternalTrayManager.java:370
+#: src/net/i2p/desktopgui/InternalTrayManager.java:388
 msgid "Network"
 msgstr "Rete"
 
 #. Windows typically has tooltips; Linux (at least Ubuntu) doesn't
-#: src/net/i2p/desktopgui/TrayManager.java:63
+#: src/net/i2p/desktopgui/TrayManager.java:75
 msgid "I2P: Right-click for menu"
 msgstr "I2P: Fai click destro per aprire il menu"
+
+#: src/net/i2p/desktopgui/TrayManager.java:310
+#: src/net/i2p/desktopgui/TrayManager.java:347
+msgid "Enable notifications"
+msgstr "Attiva le notifiche"
+
+#: src/net/i2p/desktopgui/TrayManager.java:325
+#: src/net/i2p/desktopgui/TrayManager.java:362
+msgid "Disable notifications"
+msgstr "Disattiva le notifiche"

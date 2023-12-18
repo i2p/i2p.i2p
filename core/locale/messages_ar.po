@@ -2,34 +2,34 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# foo <foo@bar>, 2009.
+# 
 # Translators:
-# Ahmed Mansour <atphalix@inbox.com>, 2011
-# ducki2p <ducki2p@gmail.com>, 2011
-# foo <foo@bar>, 2009
-# hamada <hamada@mail.i2p>, 2011
-# Tashigi OP, 2018
+# ManeraKai <manerakai@protonmail.com>, 2023
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P\n"
+"Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 17:31+0000\n"
-"PO-Revision-Date: 2019-11-24 13:40+0000\n"
-"Last-Translator: zzzi2p\n"
-"Language-Team: Arabic (http://www.transifex.com/otf/I2P/language/ar/)\n"
-"Language: ar\n"
+"POT-Creation-Date: 2019-12-17 18:42+0000\n"
+"PO-Revision-Date: 2019-12-17 17:16+0000\n"
+"Last-Translator: ManeraKai <manerakai@protonmail.com>, 2023\n"
+"Language-Team: Arabic (https://app.transifex.com/otf/teams/12694/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
-"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Language: ar\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
-#. NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there are several options...
-#. spaces or not, '.' or not, plural or not. Try not to make it too long, it is used in
+#. NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there
+#. are several options...
+#. spaces or not, '.' or not, plural or not. Try not to make it too long, it
+#. is used in
 #. a lot of tables.
 #. milliseconds
 #. Note to translators, may be negative or zero, 2999 maximum.
-#. {0,number,####} prevents 1234 from being output as 1,234 in the English locale.
+#. {0,number,####} prevents 1234 from being output as 1,234 in the English
+#. locale.
 #. If you want the digit separator in your locale, translate as {0}.
 #. alternates: msec, msecs
 #: ../java/src/net/i2p/data/DataHelper.java:1383
@@ -37,12 +37,12 @@ msgstr ""
 #, java-format
 msgid "{0,number,####} ms"
 msgid_plural "{0,number,####} ms"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "{0,number,####} ms"
+msgstr[1] "{0,number,####} ms"
+msgstr[2] "{0,number,####} ms"
+msgstr[3] "{0,number,####} ms"
+msgstr[4] "{0,number,####} ms"
+msgstr[5] "{0,number,####} ms"
 
 #. seconds
 #. alternates: secs, sec. 'seconds' is probably too long.
@@ -51,12 +51,12 @@ msgstr[5] ""
 #, java-format
 msgid "{0} sec"
 msgid_plural "{0} sec"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "{0} ثانية"
+msgstr[1] "{0} ثانية"
+msgstr[2] "{0} ثانية"
+msgstr[3] "{0} ثواني"
+msgstr[4] "{0} ثانية"
+msgstr[5] "{0} ثانية"
 
 #. minutes
 #. alternates: mins, min. 'minutes' is probably too long.
@@ -65,12 +65,12 @@ msgstr[5] ""
 #, java-format
 msgid "{0} min"
 msgid_plural "{0} min"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "{0} دقيقة"
+msgstr[1] "{0} دقيقة"
+msgstr[2] "{0} دقيقة"
+msgstr[3] "{0} دقائق"
+msgstr[4] "{0} دقيقة"
+msgstr[5] "{0} دقيقة"
 
 #. hours
 #. alternates: hrs, hr., hrs.
@@ -79,12 +79,12 @@ msgstr[5] ""
 #, java-format
 msgid "{0} hour"
 msgid_plural "{0} hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "{0} ساعة"
+msgstr[1] "{0} ساعة"
+msgstr[2] "{0} ساعة"
+msgstr[3] "{0} ساعات"
+msgstr[4] "{0} ساعة"
+msgstr[5] "{0} ساعة"
 
 #. days
 #: ../java/src/net/i2p/data/DataHelper.java:1398
@@ -92,12 +92,12 @@ msgstr[5] ""
 #, java-format
 msgid "{0} day"
 msgid_plural "{0} days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "{0} يوم"
+msgstr[1] "{0} يوم"
+msgstr[2] "{0} يوم"
+msgstr[3] "{0} أيام "
+msgstr[4] "{0} يوم "
+msgstr[5] "{0} يوم"
 
 #. years
 #: ../java/src/net/i2p/data/DataHelper.java:1401
@@ -105,47 +105,67 @@ msgstr[5] ""
 #, java-format
 msgid "{0} year"
 msgid_plural "{0} years"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "{0} سنة"
+msgstr[1] "{0} سنة"
+msgstr[2] "{0} سنة"
+msgstr[3] "{0} سنوات"
+msgstr[4] "{0} سنة"
+msgstr[5] "{0} سنة"
 
 #: ../java/src/net/i2p/data/DataHelper.java:1403
 #: ../java/src/net/i2p/data/DataHelper.java:1450
 msgid "n/a"
-msgstr ""
+msgstr "غير معلوم"
 
 #: ../java/src/net/i2p/data/DataHelper.java:1432
 #, java-format
 msgid "{0,number,####} ns"
 msgid_plural "{0,number,###} ns"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "{0,number,###} ns"
+msgstr[1] "{0,number,###} ns"
+msgstr[2] "{0,number,###} ns"
+msgstr[3] "{0,number,###} ns"
+msgstr[4] "{0,number,###} ns"
+msgstr[5] "{0,number,###} ns"
 
 #: ../java/src/net/i2p/data/DataHelper.java:1434
 #, java-format
 msgid "{0,number,####} μs"
 msgid_plural "{0,number,###} μs"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "{0,number,###} μs"
+msgstr[1] "{0,number,###} μs"
+msgstr[2] "{0,number,###} μs"
+msgstr[3] "{0,number,###} μs"
+msgstr[4] "{0,number,###} μs"
+msgstr[5] "{0,number,###} μs"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "CRIT"
+msgstr "حرج"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "DEBUG"
+msgstr "تصحيح الأخطاء"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "ERROR"
+msgstr "خطأ"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "INFO"
+msgstr "إعلام"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "WARN"
+msgstr "تحذير"
 
 #: ../java/src/net/i2p/util/LogWriter.java:161
 #, java-format
 msgid "{0} similar message omitted"
 msgid_plural "{0} similar messages omitted"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "تم تخطي {0} رسالة مشابهة"
+msgstr[1] "تم تخطي {0} راسلة مشابهة"
+msgstr[2] "تم تخطي {0} رسالة مشابهة"
+msgstr[3] "تم تخطي {0} رسائل مشابهة"
+msgstr[4] "تم تخطي {0} رسالة مشابهة"
+msgstr[5] "تم تخطي {0} رسالة مشابهة"

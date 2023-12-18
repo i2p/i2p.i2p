@@ -9,8 +9,8 @@
 # cacapo <handelsehorisont@gmail.com>, 2015
 # hottuna <i2p@robertfoss.se>, 2013
 # hottuna <i2p@robertfoss.se>, 2012
-# Jonatan Nyberg <jonatan@autistici.org>, 2017,2021-2022
-# Jonatan Nyberg <jonatan@autistici.org>, 2019-2021
+# Jonatan Nyberg, 2017,2021-2023
+# Jonatan Nyberg, 2019-2021
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2017
 # Martin Svensson <digitalmannen@gmail.com>, 2011, 2012
 msgid ""
@@ -19,8 +19,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-08-14 13:36+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
-"Last-Translator: Jonatan Nyberg <jonatan@autistici.org>, 2017,2021-2022\n"
-"Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
+"Last-Translator: Jonatan Nyberg, 2017,2021-2023\n"
+"Language-Team: Swedish (Sweden) (http://app.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -278,7 +278,7 @@ msgstr "Spara"
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:101
 msgid "Configuration saved."
-msgstr "Inställningar sparade."
+msgstr "Konfigurationen sparade."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:102
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:155
@@ -289,7 +289,7 @@ msgstr "Ladda om"
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:104
 msgid "Configuration reloaded."
-msgstr "Inställningar omladdade."
+msgstr "Konfiguration omladdad."
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:117
 #, java-format
@@ -575,7 +575,7 @@ msgstr "Arkiv"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:200
 msgid "configuration"
-msgstr "inställningar"
+msgstr "konfiguration"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:224
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:215

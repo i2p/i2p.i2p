@@ -372,7 +372,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      * incoming connections on a subsession.
      * 
      * @return connected I2PSocket, or null through 0.9.16, non-null as of 0.9.17
-     * @throws I2PException if session is closed; as of 0.9.60, this is an I2PSessionException which extends I2PException
+     * @throws I2PException if session is closed; as of 0.9.61, this is an I2PSessionException which extends I2PException
      * @throws net.i2p.client.streaming.RouterRestartException (extends I2PException) if the router is apparently restarting, since 0.9.34
      * @throws ConnectException (since 0.9.17; I2PServerSocket interface always declared it)
      * @throws SocketTimeoutException if a timeout was previously set with setSoTimeout and the timeout has been reached.
@@ -524,14 +524,14 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     }
 
     /**
-     * @throws I2PException if session is closed; as of 0.9.60, this is an I2PSessionException which extends I2PException
+     * @throws I2PException if session is closed; as of 0.9.61, this is an I2PSessionException which extends I2PException
      */
     private void verifySession() throws I2PException {
         verifySession(_connectionManager.getSession());
     }
 
     /**
-     * @throws I2PException if session is closed; as of 0.9.60, this is an I2PSessionException which extends I2PException
+     * @throws I2PException if session is closed; as of 0.9.61, this is an I2PSessionException which extends I2PException
      * @since 0.9.21
      */
     private void verifySession(I2PSession session) throws I2PException {

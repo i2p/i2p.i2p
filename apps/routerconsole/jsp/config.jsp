@@ -1,5 +1,4 @@
 <%@page contentType="text/html" %>
-<%@page trimDirectiveWhitespaces="true"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html><head>

@@ -2,62 +2,29 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# foo <foo@bar>, 2009.
+# 
 # Translators:
-# Aleksey Orekhov <opexob@yandex.ru>, 2013
-# Alexander Georgievskiy <galeksandrp@gmail.com>, 2016
-# Alexey Solomin <a.rainman@gmail.com>, 2013
-# Allclear <sypermario@icloud.com>, 2019
-# Andrey Lukyanenko <operru32@yandex.ru>, 2013
-# brianhopes <voganc-12@live.ru>, 2015
-# dimi <zhopa@mita.pp.ru>, 2013
-# ducki2p <ducki2p@gmail.com>, 2011
-# Eugene, 2013
-# Eugene, 2013
-# foo <foo@bar>, 2009
-# Foster Snowhill, 2013,2015
-# Foster Snowhill, 2015
-# Alexander Georgievskiy <galeksandrp@gmail.com>, 2016
-# gmind, 2012-2013
-# gmind, 2013
-# gmind, 2012
-# Aleksey Orekhov <opexob@yandex.ru>, 2013
-# dimi <zhopa@mita.pp.ru>, 2013
-# Maxym Mykhalchuk, 2015
-# Maxym Mykhalchuk, 2015
-# Nikolay Parukhin <parukhin@gmail.com>, 2014,2019
-# Petr Polyakov, 2014
-# Petr Polyakov, 2014
-# R4SAS, 2019
-# rineri, 2014
-# Foster Snowhill, 2013
-# Foster Snowhill, 2013
-# ValdikSS <iam@valdikss.org.ru>, 2017-2019
-# varnav, 2013
-# vertnis, 2015-2016
-# brianhopes <voganc-12@live.ru>, 2015
-# Foster Snowhill, 2013
-# yume, 2014-2015
-# yume, 2017-2019
-# Andrey Lukyanenko <operru32@yandex.ru>, 2013
-# Василий Суматохин <basilbasilbasil@gmail.com>, 2019
-# Foster Snowhill, 2013
+# Maxym Mykhalchuk, 2019
+# Foster Snowhill, 2019
+# gmind, 2019
+# yume, 2019
+# zzzi2p, 2019
+# Темак, 2023
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P\n"
+"Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-18 13:32+0000\n"
-"PO-Revision-Date: 2019-11-24 19:23+0000\n"
-"Last-Translator: ValdikSS <iam@valdikss.org.ru>\n"
-"Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/"
-"ru_RU/)\n"
-"Language: ru_RU\n"
+"PO-Revision-Date: 2019-12-19 14:09+0000\n"
+"Last-Translator: Темак, 2023\n"
+"Language-Team: Russian (Russia) (https://app.transifex.com/otf/teams/12694/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
-"%100>=11 && n%100<=14)? 2 : 3);\n"
+"Language: ru_RU\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #. * IPv4 OK, IPv6 OK or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:370
@@ -70,7 +37,7 @@ msgstr "IPv4: ОК; IPv6: проверяем"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:372
 msgid "IPv4: OK; IPv6: Firewalled"
-msgstr "IPv4: ОК; IPv6: заблокирован брандмауэром"
+msgstr "IPv4: ОК; IPv6: заблокирован межсетевым экраном"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:373
 msgid "IPv4: Testing; IPv6: OK"
@@ -78,11 +45,11 @@ msgstr "IPv4: проверяем; IPv6: ОК"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:374
 msgid "IPv4: Firewalled; IPv6: OK"
-msgstr "IPv4: заблокирован брандмауэром; IPv6: ОК"
+msgstr "IPv4: заблокирован межсетевым экраном; IPv6: ОК"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:375
 msgid "IPv4: Disabled; IPv6: OK"
-msgstr "IPv4: отключен; IPv6: OK"
+msgstr "IPv4: отключён; IPv6: OK"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:376
 msgid "IPv4: Symmetric NAT; IPv6: OK"
@@ -99,12 +66,12 @@ msgstr "IPv4: симметричная NAT; IPv6: проверяем"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:380
 msgid "IPv4: Firewalled; IPv6: Testing"
-msgstr "IPv4: заблокирован брандмауэром; IPv6: проверяем"
+msgstr "IPv4: заблокирован межсетевым экраном; IPv6: проверяем"
 
 #. * IPv4 firewalled, IPv6 firewalled or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:382
 msgid "Firewalled"
-msgstr "Заблокирован брандмауэром"
+msgstr "Заблокирован межсетевым экраном"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:383
 msgid "IPv4: Testing; IPv6: Firewalled"
@@ -112,15 +79,15 @@ msgstr "IPv4: проверяем; IPv6: заблокирован брандма�
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:384
 msgid "IPv4: Disabled; IPv6: Testing"
-msgstr "IPv4: отключен; IPv6: проверяем"
+msgstr "IPv4: отключён; IPv6: проверяем"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:385
 msgid "IPv4: Disabled; IPv6: Firewalled"
-msgstr "IPv4: отключен; IPv6: заблокирован брандмауэром"
+msgstr "IPv4: отключён; IPv6: заблокирован брандмауэром"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:386
 msgid "Disconnected"
-msgstr "Отключен от сети"
+msgstr "Отключён от сети"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:387
 msgid "Port Conflict"
@@ -132,7 +99,8 @@ msgstr "Проверяем"
 
 #. NPE, too early
 #. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
-#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too low");
+#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too
+#. low");
 #. else
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:84
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:142
@@ -153,7 +121,8 @@ msgid "Rejecting most tunnels: High number of requests"
 msgstr "Не принимаем туннели: высокое число запросов"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of tunnels");
+#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of
+#. tunnels");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:243
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:424
 msgid "Accepting most tunnels"
@@ -173,7 +142,8 @@ msgid "Rejecting tunnels: Bandwidth limit"
 msgstr "Не принимаем туннели: достигнут предел пропускной способности"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels: Bandwidth limit");
+#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels:
+#. Bandwidth limit");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:420
 msgid "Rejecting most tunnels: Bandwidth limit"
 msgstr "Не принимаем туннели: достигнут предел пропускной способности"
@@ -188,16 +158,16 @@ msgstr "Не принимаем туннели"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:260
 msgid "Dropping tunnel requests: Too slow"
-msgstr "Игнорируем запросы туннелей: время выполнения превысило ожидаемое"
+msgstr "Не учитываем запросы туннелей: время выполнения превысило ожидаемое"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:270
 msgid "Dropping tunnel requests: High job lag"
-msgstr "Игнорируем запросы туннелей: большая задержка задач"
+msgstr "Не учитываем запросы туннелей: большая задержка задач"
 
 #. don't even bother, since we are so overloaded locally
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:464
 msgid "Dropping tunnel requests: Overloaded"
-msgstr "Игнорируем запросы туннелей: слишком высокая нагрузка"
+msgstr "Не учитываем запросы туннелей: слишком высокая нагрузка"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:747
 msgid "Rejecting tunnels: Hidden mode"
@@ -214,8 +184,9 @@ msgstr "Не принимаем туннели: достигнут предел 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1024
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1057
 msgid "Dropping tunnel requests: High load"
-msgstr "Игнорируем запросы туннелей: высокая нагрузка"
+msgstr "Не учитываем запросы туннелей: высокая нагрузка"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1140
 msgid "Dropping tunnel requests: Queue time"
-msgstr "Игнорируем запросы туннелей: слишком большое время пребывания в очереди"
+msgstr ""
+"Не учитываем запросы туннелей: слишком большое время пребывания в очереди"

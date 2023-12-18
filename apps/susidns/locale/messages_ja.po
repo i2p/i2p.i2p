@@ -4,7 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# daingewuvzeevisiddfddd, 2022
+# daingewuvzeevisiddfddd, 2022-2023
 # タカハシ, 2013-2014
 # タカハシ, 2015,2022
 # rafe <rafe.kun@gmail.com>, 2015
@@ -16,8 +16,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-08-14 13:36+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
-"Last-Translator: daingewuvzeevisiddfddd, 2022\n"
-"Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
+"Last-Translator: daingewuvzeevisiddfddd, 2022-2023\n"
+"Language-Team: Japanese (http://app.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -767,7 +767,7 @@ msgstr "I2Pの宛先に、 i2p-projekt.i2p のような、人間に読める名�
 msgid ""
 "It regularly updates your hosts.txt file from distributed sources or "
 "\"subscriptions\"."
-msgstr "定期的に配布されているソース、あるいは「購読」から hosts.txt ファイルを更新します。"
+msgstr "配布されたソース、あるいは「購読」から hosts.txt ファイルを定期的に更新します。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:212
 #, java-format

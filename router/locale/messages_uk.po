@@ -2,44 +2,30 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# foo <foo@bar>, 2009.
+# 
 # Translators:
-# naeto <a89393@rmqkr.net>, 2012
-# Anton Zub <azb.0x7dc@gmail.com>, 2014
-# Denis Lysenko <gribua@gmail.com>, 2011,2015
-# Denis Lysenko <gribua@gmail.com>, 2011
-# Denis Lysenko <gribua@gmail.com>, 2011,2015
-# Denis Lysenko <gribua@gmail.com>, 2011
-# jonny_nut, 2014
-# jonny_nut, 2014
-# LinuxChata, 2014
-# LinuxChata, 2014
-# madjong <madjong@i2pmail.org>, 2015
-# madjong <madjong@i2pmail.org>, 2015
-# Maus <ru-ko@ukr.net>, 2015
-# Maxym Mykhalchuk, 2015
-# Maxym Mykhalchuk, 2015
-# naeto <a89393@rmqkr.net>, 2012
-# puxud <puxud@alivance.com>, 2014
-# puxud <puxud@alivance.com>, 2014
-# Maus <ru-ko@ukr.net>, 2015
+# Denis Lysenko <gribua@gmail.com>, 2019
+# Maxym Mykhalchuk, 2019
+# LinuxChata, 2019
+# Nick Nck <asteryx82@gmail.com>, 2019
+# madjong <madjong@i2pmail.org>, 2019
+# Maus <ru-ko@ukr.net>, 2019
+# zzzi2p, 2019
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P\n"
+"Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-18 13:32+0000\n"
-"PO-Revision-Date: 2019-11-24 13:40+0000\n"
-"Last-Translator: zzzi2p\n"
-"Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/otf/I2P/"
-"language/uk_UA/)\n"
-"Language: uk_UA\n"
+"PO-Revision-Date: 2019-12-19 14:09+0000\n"
+"Last-Translator: zzzi2p, 2019\n"
+"Language-Team: Ukrainian (Ukraine) (https://app.transifex.com/otf/teams/12694/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != "
-"11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
-"100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
-"(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+"Language: uk_UA\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
 #. * IPv4 OK, IPv6 OK or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:370
@@ -114,7 +100,8 @@ msgstr "Тестування"
 
 #. NPE, too early
 #. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
-#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too low");
+#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too
+#. low");
 #. else
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:84
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:142
@@ -135,7 +122,8 @@ msgid "Rejecting most tunnels: High number of requests"
 msgstr "Не приймаємо більшу частину тунелів: Велика кількість запитів"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of tunnels");
+#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of
+#. tunnels");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:243
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:424
 msgid "Accepting most tunnels"
@@ -155,11 +143,13 @@ msgid "Rejecting tunnels: Bandwidth limit"
 msgstr "Не приймаємо тунелі: Досягнутий ліміт пропускної спроможності"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels: Bandwidth limit");
+#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels:
+#. Bandwidth limit");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:420
 msgid "Rejecting most tunnels: Bandwidth limit"
 msgstr ""
-"Не приймаємо більшу частину тунелів: Досягнутий ліміт пропускної спроможності"
+"Не приймаємо більшу частину тунелів: Досягнутий ліміт пропускної "
+"спроможності"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:550
 msgid "Rejecting tunnels: Shutting down"

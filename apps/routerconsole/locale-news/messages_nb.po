@@ -6,14 +6,15 @@
 # Translators:
 # Allan Nordhøy <epost@anotheragency.no>, 2014
 # Allan Nordhøy <epost@anotheragency.no>, 2017
+# Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2017-09-19 18:30+0000\n"
-"Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
-"Language-Team: Norwegian Bokmål (http://www.transifex.com/otf/I2P/language/nb/)\n"
+"POT-Creation-Date: 2021-05-05 15:14+0000\n"
+"PO-Revision-Date: 2013-07-20 14:49+0000\n"
+"Last-Translator: Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2023\n"
+"Language-Team: Norwegian Bokmål (http://app.transifex.com/otf/I2P/language/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -28,7 +29,7 @@ msgstr "Velkommen til I2P!"
 
 #, java-format
 msgid "Please {0}have patience{1} as I2P boots up and finds peers."
-msgstr "{0}vær tolmodig{1} i påvente av I2P-oppstart og tilknytning til likemenn."
+msgstr "{0}Vær tålmodig{1} i påvente av I2P-oppstart og tilknytning til likemenn."
 
 #, java-format
 msgid ""
@@ -38,7 +39,7 @@ msgstr "Mens du venter, {0}gjør båndbreddeinnstillinger{1} på {2}oppsettsside
 
 msgid ""
 "Also you can setup your browser to use the I2P proxy to reach eepsites."
-msgstr "Du kan også sette opp din nettleser for bruk med I2P-mellomtjener for å nå eep-sider"
+msgstr "Du kan også sette opp din nettleser for bruk med I2P-mellomtjener for å nå eep-nettsteder."
 
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
@@ -57,10 +58,13 @@ msgstr "Mer informasjon er å finne på {0}oppsettssiden for I2P-mellomtjener{1}
 msgid ""
 "Once you have a \"shared clients\" destination listed on the left, please "
 "{0}check out{1} our {2}FAQ{3}."
-msgstr "Når du har \"delte klienter\" mål opplistet til venstre, {0}sjekk{1} vår {2}O-S-S{3}."
+msgstr "Når du har et «Delte klienter»-målpunkt listet opp til venstre, {0}sjekk{1} vår {2}O-S-S{3}."
 
 #, java-format
 msgid ""
 "Point your IRC client to {0}localhost:6668{1} and say hi to us on "
 "{2}#i2p{3}."
 msgstr "Rett din IRC-klient inn mot {0}localhost:6668{1} og si hei til oss på {2}#i2p{3}."
+
+msgid "I2P Development Team"
+msgstr ""

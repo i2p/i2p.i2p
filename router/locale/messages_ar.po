@@ -2,27 +2,24 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# foo <foo@bar>, 2009.
+# 
 # Translators:
-# Ahmed Mansour <atphalix@inbox.com>, 2011
-# ducki2p <ducki2p@gmail.com>, 2011
-# foo <foo@bar>, 2009
-# hamada <hamada@mail.i2p>, 2011
-# Tashigi OP, 2018
+# zzzi2p, 2019
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P\n"
+"Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-18 13:32+0000\n"
-"PO-Revision-Date: 2019-11-24 13:40+0000\n"
-"Last-Translator: zzzi2p\n"
-"Language-Team: Arabic (http://www.transifex.com/otf/I2P/language/ar/)\n"
-"Language: ar\n"
+"PO-Revision-Date: 2019-12-19 14:09+0000\n"
+"Last-Translator: zzzi2p, 2019\n"
+"Language-Team: Arabic (https://app.transifex.com/otf/teams/12694/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
-"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Language: ar\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #. * IPv4 OK, IPv6 OK or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:370
@@ -97,14 +94,14 @@ msgstr "جاري التجريب"
 
 #. NPE, too early
 #. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
-#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too low");
+#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too
+#. low");
 #. else
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:84
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:142
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:545
-#, fuzzy
 msgid "Rejecting tunnels: Starting up"
-msgstr "جاري التوقيف"
+msgstr ""
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:189
 msgid "Rejecting tunnels: High message delay"
@@ -119,7 +116,8 @@ msgid "Rejecting most tunnels: High number of requests"
 msgstr "توقيف غالبية الأنفاق : "
 
 #. hard to do {0} from here
-#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of tunnels");
+#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of
+#. tunnels");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:243
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:424
 msgid "Accepting most tunnels"
@@ -139,7 +137,8 @@ msgid "Rejecting tunnels: Bandwidth limit"
 msgstr "رفض الانفاق: وصل حد سرعة الاتصال"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels: Bandwidth limit");
+#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels:
+#. Bandwidth limit");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:420
 msgid "Rejecting most tunnels: Bandwidth limit"
 msgstr "رفض غالبية الانفاق: وصل حد سرعة الاتصال"
@@ -157,9 +156,8 @@ msgid "Dropping tunnel requests: Too slow"
 msgstr "تجاوز النفق: بطيئ جدا"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:270
-#, fuzzy
 msgid "Dropping tunnel requests: High job lag"
-msgstr "تجاوز النفق: ازدحام كبير"
+msgstr ""
 
 #. don't even bother, since we are so overloaded locally
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:464
@@ -167,9 +165,8 @@ msgid "Dropping tunnel requests: Overloaded"
 msgstr "تجاوز النفق: ازدحام"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:747
-#, fuzzy
 msgid "Rejecting tunnels: Hidden mode"
-msgstr "توقيف الأنفاق"
+msgstr ""
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:775
 msgid "Rejecting tunnels: Request overload"

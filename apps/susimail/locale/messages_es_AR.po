@@ -11,7 +11,7 @@ msgstr ""
 "POT-Creation-Date: 2023-03-06 14:52+0000\n"
 "PO-Revision-Date: 2011-03-11 22:21+0000\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
-"Language-Team: Spanish (Argentina) (http://www.transifex.com/otf/I2P/language/es_AR/)\n"
+"Language-Team: Spanish (Argentina) (http://app.transifex.com/otf/I2P/language/es_AR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -23,9 +23,9 @@ msgstr ""
 #, java-format
 msgid "{0} new message"
 msgid_plural "{0} new messages"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{0} mensaje nuevo"
+msgstr[1] "{0} mensajes nuevos"
+msgstr[2] "{0} mensajes nuevos"
 
 #: src/src/i2p/susi/webmail/MailCache.java:532
 #: src/src/i2p/susi/webmail/WebMail.java:2337
@@ -229,9 +229,9 @@ msgstr "Mensaje no encontrado."
 #, java-format
 msgid "1 message deleted."
 msgid_plural "{0} messages deleted."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "1 mensaje eliminado."
+msgstr[1] "{0} mensajes eliminados."
+msgstr[2] "{0} mensajes eliminados."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1735
 #: src/src/i2p/susi/webmail/WebMail.java:1744
@@ -266,9 +266,9 @@ msgstr "Cargando correos electrónicos, espere, por favor..."
 #, java-format
 msgid "1 Message"
 msgid_plural "{0} Messages"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "1 Mensaje"
+msgstr[1] "{0} Mensajes"
+msgstr[2] "{0} Mensajes"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2311
 #: src/src/i2p/susi/webmail/WebMail.java:3268

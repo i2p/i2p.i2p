@@ -2,40 +2,30 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# foo <foo@bar>, 2009.
+# 
 # Translators:
-# PolishAnon <b790979@klzlk.com>, 2011, 2012
-# Warton <businesshehe@yahoo.com>, 2011, 2012
-# Tomasz Ciborski <zenji.yamada.nihon@gmail.com>, 2015
-# Karolina <karolina@bitwylesne.pl>, 2014
-# Marek Wegrzyn <tribunalsuck@gmail.com>, 2015
-# polacco <polacco@i2pmail.org>, 2015
-# polacco <polacco@i2pmail.org>, 2012
-# polacco <polacco@i2pmail.org>, 2012,2015
-# PolishAnon <b790979@klzlk.com>, 2011-2012
-# seb, 2014
-# sebx, 2014-2015
-# Taporpo Ne <taporpone@gmail.com>, 2015
-# Tracerneo <ziolkoneo@gmail.com>, 2013
-# Verdulo :-), 2016-2017
-# Verdulo :-), 2017-2019
-# Warton <businesshehe@yahoo.com>, 2011-2012
-# Tracerneo <ziolkoneo@gmail.com>, 2013
+# PolishAnon <b790979@klzlk.com>, 2019
+# polacco <polacco@i2pmail.org>, 2019
+# erinm, 2019
+# sebx, 2019
+# Karolina <karolina@bitwylesne.pl>, 2019
+# Taporpo Ne <taporpone@gmail.com>, 2019
+# ☆Verdulo, 2019
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P\n"
+"Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-18 13:32+0000\n"
-"PO-Revision-Date: 2019-11-24 15:59+0000\n"
-"Last-Translator: Verdulo :-)\n"
-"Language-Team: Polish (http://www.transifex.com/otf/I2P/language/pl/)\n"
-"Language: pl\n"
+"PO-Revision-Date: 2019-12-19 14:09+0000\n"
+"Last-Translator: ☆Verdulo, 2019\n"
+"Language-Team: Polish (https://app.transifex.com/otf/teams/12694/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n"
-"%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n"
-"%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+"Language: pl\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
 #. * IPv4 OK, IPv6 OK or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:370
@@ -82,7 +72,7 @@ msgstr "IPv4: Za zaporą; IPv6: Testuję"
 #. * IPv4 firewalled, IPv6 firewalled or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:382
 msgid "Firewalled"
-msgstr "Za zaporą"
+msgstr "Za zaporą sieciową"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:383
 msgid "IPv4: Testing; IPv6: Firewalled"
@@ -110,7 +100,8 @@ msgstr "Testuję"
 
 #. NPE, too early
 #. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
-#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too low");
+#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too
+#. low");
 #. else
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:84
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:142
@@ -131,7 +122,8 @@ msgid "Rejecting most tunnels: High number of requests"
 msgstr "Odrzucanie tuneli: Duża liczba żądań"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of tunnels");
+#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of
+#. tunnels");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:243
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:424
 msgid "Accepting most tunnels"
@@ -151,7 +143,8 @@ msgid "Rejecting tunnels: Bandwidth limit"
 msgstr "Odrzucanie tuneli: Limit przepustowości"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels: Bandwidth limit");
+#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels:
+#. Bandwidth limit");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:420
 msgid "Rejecting most tunnels: Bandwidth limit"
 msgstr "Odrzucanie większości tuneli: Limit przepustowości"

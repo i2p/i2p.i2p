@@ -2,46 +2,35 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# foo <foo@bar>, 2009.
+# 
 # Translators:
-# Aman Elarbi <aman.elarbi@gmail.com>, 2014
-# Aman Elarbi <aman.elarbi@gmail.com>, 2014
-# attesor <random901@zoho.com>, 2012
-# Desirius <martinjefmeyers@gmail.com>, 2014
-# D. Smits <dfsmits@gmail.com>, 2017
-# ducki2p <ducki2p@gmail.com>, 2011
-# foo <foo@bar>, 2009
-# Gilles De Vylder <gilles.devylder@hotmail.com>, 2015
-# Jrnr601 <jerobben@gmail.com>, 2012
-# Jrnr601 <jerobben@gmail.com>, 2012
-# Martijn de Boer, 2016
-# Desirius <martinjefmeyers@gmail.com>, 2014-2015
-# Nathan Follens, 2015
-# Nathan Follens, 2015,2018
-# attesor <random901@zoho.com>, 2012
-# skoning <skoning@onenetbeyond.org>, 2014,2017
-# skoning <skoning@onenetbeyond.org>, 2014
-# susbarbatus <susbarbatus@i2pmail.org>, 2014
+# zzzi2p, 2019
+# ducki2p <ducki2p@gmail.com>, 2019
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P\n"
+"Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 17:32+0000\n"
-"PO-Revision-Date: 2019-11-24 13:40+0000\n"
-"Last-Translator: Desirius <martinjefmeyers@gmail.com>\n"
-"Language-Team: Dutch (http://www.transifex.com/otf/I2P/language/nl/)\n"
-"Language: nl\n"
+"POT-Creation-Date: 2019-12-17 18:42+0000\n"
+"PO-Revision-Date: 2019-12-17 17:16+0000\n"
+"Last-Translator: ducki2p <ducki2p@gmail.com>, 2019\n"
+"Language-Team: Dutch (https://app.transifex.com/otf/teams/12694/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#. NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there are several options...
-#. spaces or not, '.' or not, plural or not. Try not to make it too long, it is used in
+#. NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there
+#. are several options...
+#. spaces or not, '.' or not, plural or not. Try not to make it too long, it
+#. is used in
 #. a lot of tables.
 #. milliseconds
 #. Note to translators, may be negative or zero, 2999 maximum.
-#. {0,number,####} prevents 1234 from being output as 1,234 in the English locale.
+#. {0,number,####} prevents 1234 from being output as 1,234 in the English
+#. locale.
 #. If you want the digit separator in your locale, translate as {0}.
 #. alternates: msec, msecs
 #: ../java/src/net/i2p/data/DataHelper.java:1383
@@ -119,34 +108,29 @@ msgid_plural "{0,number,###} μs"
 msgstr[0] "{0,number,####} μs"
 msgstr[1] "{0,number,###} μs"
 
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "CRIT"
+msgstr "CRIT"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "DEBUG"
+msgstr "DEBUG"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "ERROR"
+msgstr "ERROR"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "INFO"
+msgstr "INFO"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "WARN"
+msgstr "WARN"
+
 #: ../java/src/net/i2p/util/LogWriter.java:161
 #, java-format
 msgid "{0} similar message omitted"
 msgid_plural "{0} similar messages omitted"
 msgstr[0] ""
 msgstr[1] ""
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:153
-msgid "CRIT"
-msgstr "CRIT"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-msgid "DEBUG"
-msgstr "DEBUG"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:155
-msgid "ERROR"
-msgstr "ERROR"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:160
-msgid "INFO"
-msgstr "INFO"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:70
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:157
-msgid "WARN"
-msgstr "WARN"
-

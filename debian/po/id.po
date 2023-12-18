@@ -1,17 +1,18 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the i2p package.
 # 
 # Translators:
 # Khairul Agasta <khairuldroids@gmail.com>, 2014-2015
+# Robert Dafis <robertdafis@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2015-02-18 22:14+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: Khairul Agasta <khairuldroids@gmail.com>\n"
-"Language-Team: Indonesian (http://www.transifex.com/otf/I2P/language/id/)\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2017-11-12 14:01+0000\n"
+"PO-Revision-Date: 2011-10-03 21:48+0000\n"
+"Last-Translator: Robert Dafis <robertdafis@gmail.com>, 2017\n"
+"Language-Team: Indonesian (http://app.transifex.com/otf/I2P/language/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -79,8 +80,8 @@ msgstr "Router bandwidth tinggi, seperti halnya router dengan banyak torrent / p
 #. Type: boolean
 #. Description
 #: ../i2p.templates:5001
-msgid "Run I2P daemon confined with AppArmor"
-msgstr "Jalankan daemon I2P yang dibatasi dengan AppArmor"
+msgid "Should the I2P daemon be confined with AppArmor?"
+msgstr "Apakah daemon I2P seharusnya dibatasi dengan AppArmor?"
 
 #. Type: boolean
 #. Description
