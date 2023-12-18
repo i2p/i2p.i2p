@@ -71,7 +71,7 @@ msgstr "Reciclagem"
 #. MailDir-like
 #: src/src/i2p/susi/webmail/WebMail.java:217
 msgid "Bulk Mail"
-msgstr ""
+msgstr "Correio em massa"
 
 #. untranslated, translate on use
 #: src/src/i2p/susi/webmail/WebMail.java:221
@@ -407,7 +407,7 @@ msgstr "Apagar anexos selecionados"
 #. Integer.toString(DEFAULT_SMTPPORT));
 #: src/src/i2p/susi/webmail/WebMail.java:3101
 msgid "Email Login"
-msgstr ""
+msgstr "Login por e-mail"
 
 #. current postman hq length limits 16/12, new postman version 32/32
 #: src/src/i2p/susi/webmail/WebMail.java:3103
