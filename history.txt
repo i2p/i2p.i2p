@@ -1,4 +1,4 @@
-2023-12-18 2.3.0 (API 0.9.61) released
+2023-12-18 2.4.0 (API 0.9.61) released
 
 2023-12-15 idk
  * Pull translations from Transifex
