@@ -251,6 +251,7 @@
 
 4. Announce on:
   - #i2p, #i2p-dev (also on Freenode side)
+  - Remember to update the topic on #i2p-dev
   - IRC
   - Twitter
 
