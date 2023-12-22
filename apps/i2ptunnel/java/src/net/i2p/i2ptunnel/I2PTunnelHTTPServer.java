@@ -583,6 +583,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                           ", start runners: " + (afterHandle-afterSocket) +
                           "]");
         } catch (SocketException ex) {
+            int port = socket.getLocalPort();
             try {
                 // Send a 503, so the user doesn't get an HTTP Proxy error message
                 // and blame his router or the network.
@@ -594,7 +595,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             // Don't complain too early, Jetty may not be ready.
             int level = getTunnel().getContext().clock().now() - _startedOn > START_INTERVAL ? Log.ERROR : Log.WARN;
             if (_log.shouldLog(level))
-                _log.log(level, "Error connecting to HTTP server " + remoteHost + ':' + remotePort, ex);
+                _log.log(level, "Error connecting to HTTP server " + getSocketString(port));
         } catch (IOException ex) {
             try {
                 socket.close();

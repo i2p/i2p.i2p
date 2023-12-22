@@ -804,11 +804,12 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 _log.warn("Took a while to handle the request for " + remoteHost + ':' + remotePort +
                           " [" + timeToHandle + ", socket create: " + (afterSocket-afterAccept) + "]");
         } catch (SocketException ex) {
+            int port = socket.getLocalPort();
             try {
                 socket.reset();
             } catch (IOException ioe) {}
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Error connecting to server " + remoteHost + ':' + remotePort, ex);
+                _log.error("Error connecting to server " + getSocketString(port));
         } catch (IOException ex) {
             _log.error("Error while waiting for I2PConnections", ex);
         }
@@ -837,6 +838,21 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         // don't do SSL-over-SSL
         boolean force = incomingPort == 443 || incomingPort == 22;
         return getSocket(from, host, port, force);
+    }
+
+    /**
+     *  Only for logging, to correctly show where we were trying to get to
+     *  after getSocket() throws a SocketException
+     *
+     *  @since 0.9.62
+     */
+    protected String getSocketString(int incomingPort) {
+        if (incomingPort != 0 && !_socketMap.isEmpty()) {
+            InetSocketAddress isa = _socketMap.get(Integer.valueOf(incomingPort));
+            if (isa != null)
+                return isa.toString();
+        }
+        return remoteHost.toString() + ':' + remotePort;
     }
 
     /**
