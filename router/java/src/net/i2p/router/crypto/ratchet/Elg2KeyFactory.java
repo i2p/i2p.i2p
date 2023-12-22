@@ -26,6 +26,7 @@ public class Elg2KeyFactory extends I2PThread implements KeyFactory {
 
     private final RouterContext _context;
     private final Log _log;
+    private final Elligator2 _elg2;
     private final int _minSize;
     private final int _maxSize;
     private final int _calcDelay;
@@ -45,6 +46,7 @@ public class Elg2KeyFactory extends I2PThread implements KeyFactory {
         super("EDH Precalc");
         _context = ctx;
         _log = ctx.logManager().getLog(Elg2KeyFactory.class);
+        _elg2 = new Elligator2(ctx);
         ctx.statManager().createRateStat("crypto.EDHGenerateTime", "How long it takes to create x and X", "Encryption", new long[] { 60*60*1000 });
         ctx.statManager().createRateStat("crypto.EDHUsed", "Need a DH from the queue", "Encryption", new long[] { 60*60*1000 });
         ctx.statManager().createRateStat("crypto.EDHReused", "Unused DH requeued", "Encryption", new long[] { 60*60*1000 });
@@ -150,7 +152,7 @@ public class Elg2KeyFactory extends I2PThread implements KeyFactory {
         int i = 0;
         do {
             rv = _context.keyGenerator().generatePKIKeys(EncType.ECIES_X25519);
-            enc = Elligator2.encode(rv.getPublic(), _context.random().nextBoolean());
+            enc = _elg2.encode(rv.getPublic());
             i++;
             if (enc == null && RETURN_UNUSED_TO_XDH)
                 _context.commSystem().getXDHFactory().returnUnused(rv);

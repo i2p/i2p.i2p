@@ -110,7 +110,9 @@ class Elligator2 {
      * It should be unpredictable, because it's recoverable from the representative.
      *
      * @return "representative", little endian or null on failure
+     * @deprecated
      */
+    @Deprecated
     protected static byte[] encode(PublicKey point, boolean alternative) {
         return encode(point, alternative, (byte) 0);
     }
