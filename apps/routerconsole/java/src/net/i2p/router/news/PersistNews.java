@@ -74,7 +74,7 @@ class PersistNews {
                 rv = true;
             Writer out = null;
             try {
-                out = new OutputStreamWriter(new GZIPOutputStream(new SecureFileOutputStream(file)));
+                out = new OutputStreamWriter(new GZIPOutputStream(new SecureFileOutputStream(file)), "UTF-8");
                 out.write(XML_START);
                 XMLParser.toString(buf, entry);
                 out.write(buf.toString());
