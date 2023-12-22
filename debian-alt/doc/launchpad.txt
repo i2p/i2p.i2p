@@ -12,17 +12,18 @@ than doing debian builds ourselves.
 
 Versions are as follows:
 
-Min version	Max version	Uses src pkg	Copied to Debian
------------	-----------	------------	----------------
-bionic		--		bionic		--
-focal		lunar		bionic		buster, bullseye, bookworm, sid
+Min version	Max version		Uses src pkg	Copied to Debian
+-----------	-----------		------------	----------------
+bionic		--			bionic		--
+focal		noble except lunar	bionic		buster, bullseye, bookworm, trixie, sid
+lunar		--			bionic		--
 
 Unsupported (Java 7):
-precise		saucy   	precise		wheezy
-trusty		wily		precise		jessie, stretch
+precise		saucy   		precise		wheezy
+trusty		wily			precise		jessie, stretch
 
 Unsupported (ant < 1.9.8)
-xenial		yakkety		xenial		--
+xenial		yakkety			xenial		--
 
 
 Prep (first time only)
