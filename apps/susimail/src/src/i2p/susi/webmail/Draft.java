@@ -26,6 +26,7 @@ class Draft extends Mail {
 
 	private final List<Attachment> attachments;
 	private String[] bcc;        // addresses only, enclosed by <>
+	private long size;
 	private static final String HDR_ATTACH = "X-I2P-Attachment: ";
 	public static final String HDR_BCC = "Bcc: ";
 	
@@ -40,6 +41,7 @@ class Draft extends Mail {
 	@Override
 	public synchronized void setBody(Buffer rb) {
 		super.setBody(rb);
+		size = rb.getLength();
 		MailPart part = getPart();
 		if (part != null) {
 			String[] hdrs = part.headerLines;
@@ -75,10 +77,28 @@ class Draft extends Mail {
 				if (b == null)
 					continue;
 				String path = DataHelper.getUTF8(b);
-				attachments.add(new Attachment(name, type, enc, new File(path)));
+				Attachment a = new Attachment(name, type, enc, new File(path));
+				size += a.getSize();
+				attachments.add(a);
 			}
 		}
 	}
+
+	/**
+	 * Includes size of attachments
+	 *
+	 * @since 0.9.62
+	 */
+	@Override
+	public synchronized long getSize() {
+		return size;
+	}
+
+	/**
+	 * @since 0.9.62
+	 */
+	@Override
+	public synchronized void setSize(long size) {}
 
 	@Override
 	public synchronized boolean hasAttachment() {
@@ -101,12 +121,14 @@ class Draft extends Mail {
 			return rv;
 		rv = attachments.size();
 		attachments.add(a);
+		size += a.getSize();
 		return rv;
 	}
 
 	public synchronized void removeAttachment(int index) {
 		if (index >= 0 && index < attachments.size()) {
 			Attachment a = attachments.get(index);
+			size -= a.getSize();
 			a.deleteData();
 			attachments.remove(index);
 		}
@@ -114,6 +136,7 @@ class Draft extends Mail {
 
 	public synchronized void clearAttachments() {
 		for (Attachment a : attachments) {
+			size -= a.getSize();
 			a.deleteData();
 		}
 		attachments.clear();
