@@ -1431,6 +1431,8 @@ public class BlockfileNamingService extends DummyNamingService {
     }
 
     /**
+     * Broken prior to 0.9.62, would only return one name.
+     *
      * @param options If non-null and contains the key "list", get
      *                from that list (default "hosts.txt", NOT all lists)
      *                Key "skip": skip that many entries
@@ -1502,6 +1504,7 @@ public class BlockfileNamingService extends DummyNamingService {
                             break;
                         }
                     }
+                    iter.next();
                     if (search != null && key.indexOf(search) < 0)
                         continue;
                     rv.add(key);
