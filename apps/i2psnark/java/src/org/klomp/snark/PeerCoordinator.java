@@ -452,10 +452,12 @@ class PeerCoordinator implements PeerListener
     if (metainfo == null)
         return 6;
     int pieces = metainfo.getPieces();
-    if (pieces <= 2)
+    if (pieces <= 10)
         return 4;
-    if (pieces <= 5)
-        return 6;
+    if (pieces <= 25)
+        return 10;
+    if (pieces <= 80)
+        return 16;
     //int size = metainfo.getPieceLength(0);
     int max = _util.getMaxConnections();
     // Now that we use temp files, no memory concern
