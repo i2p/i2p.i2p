@@ -1,3 +1,20 @@
+2023-12-22 zzz
+ * Blockfile: Fix bug in unused getNames()
+ * Console: Fix encoding issues in persisted news
+ * I2CP: Add router rates to bandwidth limits message
+ * i2psnark: Adjust max peers for small torrents
+ * i2ptunnel:
+   - Change return code for host-not-in-addressbook to 502
+   - Log correct server host/port on error when there are multiple targets configured
+ * NTCP2: Add key validity check
+ * Plugins: Don't auto-update in test mode
+ * Ratchet: Use correct method for Elg2 keygen
+ * Susimail: Include attachment sizes in displayed draft size
+ * Transports: Don't flood huge RIs
+ * Util:
+   - Catch OOM in timer
+   - Add 2nd order comparison in ObjectCounterUnsafe sort
+
 2023-12-18 2.4.0 (API 0.9.61) released
 
 2023-12-15 idk
