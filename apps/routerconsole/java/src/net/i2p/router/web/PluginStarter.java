@@ -117,7 +117,8 @@ public class PluginStarter implements Runnable {
     public void run() {
         deferredDeletePlugins(_context);
         if (_context.getBooleanPropertyDefaultTrue("plugins.autoUpdate") &&
-            !NewsHelper.isUpdateInProgress()) {
+            !NewsHelper.isUpdateInProgress() &&
+            !_context.commSystem().isDummy()) {
             String prev = _context.getProperty("router.previousVersion");
             if (prev != null &&
                 VersionComparator.comp(RouterVersion.VERSION, prev) > 0) {
