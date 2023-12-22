@@ -714,14 +714,24 @@ public class WebMail extends HttpServlet
 				if( user == null || user.length() == 0 ) {
 					sessionObject.error += _t("Need username for authentication.") + '\n';
 					doContinue = false;
+				} else {
+					user = user.trim();
+					if (user.endsWith("@mail.i2p")) {
+						sessionObject.error += _t("Do not include @mail.i2p in the username") + '\n';
+						doContinue = false;
+					}
 				}
 				if( pass == null || pass.length() == 0 ) {
 					sessionObject.error += _t("Need password for authentication.") + '\n';
 					doContinue = false;
+				} else {
+					pass = pass.trim();
 				}
 				if( host == null || host.length() == 0 ) {
 					sessionObject.error += _t("Need hostname for connect.") + '\n';
 					doContinue = false;
+				} else {
+					host = host.trim();
 				}
 				int pop3PortNo = 0;
 				if( pop3Port == null || pop3Port.length() == 0 ) {
@@ -729,6 +739,7 @@ public class WebMail extends HttpServlet
 					doContinue = false;
 				}
 				else {
+					pop3Port = pop3Port.trim();
 					try {
 						pop3PortNo = Integer.parseInt( pop3Port );
 						if( pop3PortNo < 0 || pop3PortNo > 65535 ) {
@@ -748,6 +759,7 @@ public class WebMail extends HttpServlet
 					doContinue = false;
 				}
 				else {
+					smtpPort = smtpPort.trim();
 					try {
 						smtpPortNo = Integer.parseInt( smtpPort );
 						if( smtpPortNo < 0 || smtpPortNo > 65535 ) {
