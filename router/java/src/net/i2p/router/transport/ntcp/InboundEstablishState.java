@@ -674,7 +674,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         }
         _aliceIdent = ri.getIdentity();
         Hash h = _aliceIdent.calculateHash();
-        // this sets the reasonH
+        // this sets the reason
         boolean ok = verifyInbound(h);
         if (!ok)
             throw new DataFormatException("NTCP2 verifyInbound() fail");

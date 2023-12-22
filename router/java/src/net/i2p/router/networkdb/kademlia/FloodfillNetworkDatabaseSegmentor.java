@@ -117,7 +117,7 @@ public class FloodfillNetworkDatabaseSegmentor extends SegmentedNetworkDatabaseF
      * the dbid is null.
      * 
      * @since 0.9.61
-     * @return may be null if the client netDb does not exist
+     * @return non-null, the main netDb if the client netDb does not exist
      */
     @Override
     public NetworkDatabaseFacade clientNetDB(Hash id) {

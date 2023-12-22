@@ -10,7 +10,6 @@ package net.i2p.router.startup;
 
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
-import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseSegmentor;
 
 /** start up the network database */
 class BootNetworkDbJob extends JobImpl {

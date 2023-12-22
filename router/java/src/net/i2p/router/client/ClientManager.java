@@ -788,7 +788,7 @@ class ClientManager {
             ClientConnectionRunner runner = getRunner(destHash);
             if (runner == null){
                 if (_log.shouldLog(Log.WARN))
-                _log.warn("ClientManager got a null runner in getClientFloodfillNetworkDatabaseFacade for " + destHash);
+                    _log.warn("ClientManager got a null runner in getClientFloodfillNetworkDatabaseFacade for " + destHash);
                 return null;
             }
             if (_log.shouldLog(Log.DEBUG))

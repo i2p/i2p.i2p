@@ -74,12 +74,15 @@ public abstract class DatabaseEntry extends DataStructureImpl {
      * The Hash of the local client that received this LS,
      * null if the router or unknown.
      *
-     * @since 0.9.47
+     * @since 0.9.61
      */
     public Hash getReceivedBy() {
         return _receivedBy;
     }
 
+    /**
+     * @since 0.9.61
+     */
     public void setReceivedBy(Hash receivedBy) {
         this._receivedBy = receivedBy;
     }

@@ -448,7 +448,6 @@ class ClientConnectionRunner {
         if (id == null)
             return;
         boolean isPrimary = false;
-        Hash dbid = getDestHash();
         for (Iterator<SessionParams> iter = _sessions.values().iterator(); iter.hasNext(); ) {
             SessionParams sp = iter.next();
             if (id.equals(sp.sessionId)) {

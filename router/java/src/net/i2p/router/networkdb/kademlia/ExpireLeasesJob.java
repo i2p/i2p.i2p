@@ -47,7 +47,8 @@ class ExpireLeasesJob extends JobImpl {
             //_log.info("Lease " + key + " is expiring, so lets look for it again", new Exception("Expire and search"));
             //_facade.lookupLeaseSet(key, null, null, RERUN_DELAY_MS);
         }
-        _log.info("(dbid: " + _facade
+        if (_log.shouldInfo())
+            _log.info("(dbid: " + _facade
                   + "; db size: " + _facade.getKnownLeaseSets()
                   + ") Leases expired: " + toExpire);
         //_facade.queueForExploration(toExpire); // don't do explicit searches, just explore passively

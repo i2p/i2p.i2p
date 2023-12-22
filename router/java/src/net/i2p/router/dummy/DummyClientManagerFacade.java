@@ -53,9 +53,17 @@ public class DummyClientManagerFacade extends ClientManagerFacade {
     public SessionKeyManager getClientSessionKeyManager(Hash _dest) { return null; }
     
     public void requestLeaseSet(Hash dest, LeaseSet set) {}
+
+    /**
+     *  @since 0.9.61
+     */
     public FloodfillNetworkDatabaseFacade getClientFloodfillNetworkDatabaseFacade(Hash dbid) {
         return null;
     }
+
+    /**
+     *  @since 0.9.61
+     */
     public Set<Hash> getPrimaryHashes() {
         return Collections.emptySet();
     }

@@ -8,7 +8,6 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
@@ -1160,7 +1159,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             throw new IllegalArgumentException("Invalid store attempt - " + err);
 
         if (_log.shouldDebug())
-            _log.debug("Storing LS to the persistent data store...");
+            _log.debug("Storing LS to the data store...");
         _ds.put(key, leaseSet);
         
         if (encls != null) {

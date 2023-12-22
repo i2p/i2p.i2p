@@ -43,7 +43,7 @@ public class ReseedChecker {
 
     /**
      *  All reseeding must be done through this instance.
-     *  Access through context.netDbSegmentor().reseedChecker(), others should not instantiate
+     *  Access through context.netDb().reseedChecker(), others should not instantiate
      *
      *  @since 0.9
      */
