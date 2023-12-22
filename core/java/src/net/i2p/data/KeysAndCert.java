@@ -210,11 +210,16 @@ public class KeysAndCert extends DataStructureImpl {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(256);
-        buf.append('[').append(getClass().getSimpleName()).append(": ");
-        buf.append("\n\tHash: ").append(getHash().toBase64());
+        String cls = getClass().getSimpleName();
+        buf.append('[').append(cls).append(": ");
+        buf.append("\n\tHash: ");
+        if (cls.equals("Destination"))
+            buf.append(getHash().toBase32());
+        else
+            buf.append(getHash().toBase64());
         buf.append("\n\tCertificate: ").append(_certificate);
         if ((_publicKey != null && _publicKey.getType() != EncType.ELGAMAL_2048) ||
-            !(this instanceof Destination)) {
+            !cls.equals("Destination")) {
             // router identities only
             buf.append("\n\tPublicKey: ").append(_publicKey);
         }
