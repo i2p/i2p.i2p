@@ -829,9 +829,11 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     protected void handleGetBWLimits(GetBandwidthLimitsMessage message) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Got BW Limits request");
-        int in = _context.bandwidthLimiter().getInboundKBytesPerSecond() * 4 / 7;
-        int out = _context.bandwidthLimiter().getOutboundKBytesPerSecond() * 4 / 7;
-        BandwidthLimitsMessage msg = new BandwidthLimitsMessage(in, out);
+        int in = _context.bandwidthLimiter().getInboundKBytesPerSecond();
+        int out = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
+        int inb = _context.bandwidthLimiter().getInboundBurstKBytesPerSecond();
+        int outb = _context.bandwidthLimiter().getOutboundBurstKBytesPerSecond();
+        BandwidthLimitsMessage msg = new BandwidthLimitsMessage(in * 4 / 7, out * 4 / 7, in, inb, out, outb, 1);
         try {
             _runner.doSend(msg);
         } catch (I2CPMessageException ime) {

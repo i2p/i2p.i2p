@@ -46,6 +46,28 @@ public class BandwidthLimitsMessage extends I2CPMessageImpl {
         data[1] = out;
     }
 
+    /**
+     * @param in Client inbound limit (KBps)
+     * @param out Client outbound limit (KBps)
+     * @param rin Router inbound limit (KBps)
+     * @param rinb Router inbound burst limit (KBps)
+     * @param rout Router outbound limit (KBps)
+     * @param routb Router outbound burst limit (KBps)
+     * @param sec Router burst time (seconds)
+     *
+     * @since 0.9.62
+     */
+    public BandwidthLimitsMessage(int in, int out, int rin, int rinb, int rout, int routb, int sec) {
+        this();
+        data[0] = in;
+        data[1] = out;
+        data[2] = rin;
+        data[3] = rinb;
+        data[4] = rout;
+        data[5] = routb;
+        data[6] = sec;
+    }
+
     public int[] getLimits() {
         return data;
     }
