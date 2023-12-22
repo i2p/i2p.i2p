@@ -1236,7 +1236,7 @@ public class Reseeder {
             System.exit(1);
         }
         String[] urls = (args.length > 0) ? args : DataHelper.split(DEFAULT_SSL_SEED_URL, ",");
-        int pass = 0, fail = 0;
+        int pass = 0, warn = 0, fail = 0;
         SSLEepGet.SSLState sslState = null;
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         for (String url : urls) {
@@ -1254,6 +1254,7 @@ public class Reseeder {
                 } else {
                     get = new SSLEepGet(ctx, su3.getPath(), url, sslState);
                 }
+                long start = System.currentTimeMillis();
                 if (get.fetch()) {
                     int rc = get.getStatusCode();
                     if (rc == 200) {
@@ -1288,6 +1289,11 @@ public class Reseeder {
                         } else if (ri >= 50) {
                             System.out.println("Test passed for " + host + ", returned " + ri + " router infos");
                             pass++;
+                            long time = System.currentTimeMillis() - start;
+                            if (time > 30*1000) {
+                                System.out.println("Test very slow for " + host + ", took " + DataHelper.formatDuration(time));
+                                warn++;
+                            }
                         } else {
                             System.out.println("Test failed for " + host + ", returned only " + ri + " router infos");
                             fail++;
@@ -1316,7 +1322,7 @@ public class Reseeder {
             }
             System.out.println();
         }
-        System.out.println("Passed: " + pass + "; Failed: " + fail);
+        System.out.println("Passed: " + pass + "; Slow: " + warn + "; Failed: " + fail);
         if (fail > 0)
             System.exit(1);
     }
