@@ -100,7 +100,10 @@ public class ObjectCounterUnsafe<K> {
      */
     private class ObjComparator implements Comparator<K> {
         public int compare(K l, K r) {
-            return (map.get(r).c - map.get(l).c);
+            int rv = map.get(r).c - map.get(l).c;
+            if (rv != 0)
+                return rv;
+            return l.toString().compareTo(r.toString());
         }
     }
 }
