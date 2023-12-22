@@ -1,4 +1,4 @@
-HTTP/1.1 500 Domain Not Found
+HTTP/1.1 502 Domain Not Found
 Content-Type: text/html; charset=UTF-8
 Cache-Control: no-cache
 Connection: close
