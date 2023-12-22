@@ -462,7 +462,6 @@ public class RouterInfo extends DatabaseEntry {
         return true;
     }
     
-    
     /**
      * Pull the first workable target address for the given transport.
      * Use to check for any address. For all addresses, use getTargetAddresses(),
@@ -610,10 +609,11 @@ public class RouterInfo extends DatabaseEntry {
                 _isValid = DSAEngine.getInstance().verifySignature(_signature, hash, _identity.getSigningPublicKey());
                 _validated = true;
             } else {
+                // doValidate will log
                 doValidate();
             }
             if (!_isValid) {
-                throw new DataFormatException("Bad sig");
+                throw new DataFormatException("Bad RouterInfo signature");
             }
         }
 
