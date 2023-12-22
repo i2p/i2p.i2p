@@ -205,6 +205,8 @@ class SSU2Payload {
                         } else {
                             bais = new ByteArrayInputStream(payload, i + 2, len - 2);
                         }
+                        if (bais.available() >= 4*1024)
+                            flood = false;
                         alice.readBytes(bais, true);
                         cb.gotRI(alice, isHandshake, flood);
                     } else {

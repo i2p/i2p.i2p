@@ -120,7 +120,7 @@ class NTCP2Payload {
                     RouterInfo alice = new RouterInfo();
                     ByteArrayInputStream bais = new ByteArrayInputStream(payload, i + 1, len - 1);
                     alice.readBytes(bais, true);
-                    cb.gotRI(alice, isHandshake, (flag & 0x01) != 0);
+                    cb.gotRI(alice, isHandshake, (flag & 0x01) != 0 && len < 4*1024);
                     break;
 
                 case BLOCK_I2NP:
