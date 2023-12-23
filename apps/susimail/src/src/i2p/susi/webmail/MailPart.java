@@ -57,7 +57,7 @@ class MailPart {
 	private static final OutputStream DUMMY_OUTPUT = new DummyOutputStream();
 	public final String[] headerLines;
 	public final String type, encoding, name,
-		description, disposition, charset, version;
+		description, disposition, charset, version, multipart_type, cid;
 	/** begin, end, and beginBody are relative to readBuffer.getOffset().
          *  begin is before the headers
          *  beginBody is after the headers
@@ -125,6 +125,8 @@ class MailPart {
 		String x_encoding = null;
 		String x_disposition = null;
 		String x_type = null;
+		String x_multipart_type = null;
+		String x_cid = null;
 		boolean x_multipart = false;
 		boolean x_message = false;
 		String x_name = null;
@@ -159,10 +161,14 @@ class MailPart {
 				str = getHeaderLineAttribute( headerLines[i], "boundary" );
 				if( str != null )
 					boundary = str;
-				if (x_type.startsWith( "multipart" ) && boundary != null )
+				if (x_type.startsWith( "multipart" ) && boundary != null ) {
 					x_multipart = true;
-				else if (x_type.startsWith( "message" ) )
+					str = getHeaderLineAttribute( headerLines[i], "type" );
+					if (str != null)
+						x_multipart_type = str;
+				} else if (x_type.startsWith("message")) {
 					x_message = true;
+				}
 				str = getHeaderLineAttribute( headerLines[i], "name" );
 				if( str != null )
 					x_name = str;
@@ -176,12 +182,21 @@ class MailPart {
 			else if( hlc.startsWith( "mime-version: " ) ) {
 				x_version = getFirstAttribute( headerLines[i] );
 			}
+			else if (hlc.startsWith( "content-id: ")) {
+				x_cid = getFirstAttribute( headerLines[i] );
+				if (x_cid.startsWith("<"))
+					x_cid = x_cid.substring(1);
+				if (x_cid.endsWith(">"))
+					x_cid = x_cid.substring(0, x_cid.length() - 1);
+			}
 		}
 
 		encoding = x_encoding;
 		disposition = x_disposition;
 		type = x_type;
 		multipart = x_multipart;
+		multipart_type = x_multipart_type;
+		cid = x_cid;
 		message = x_message;
 		name = x_name;
 		charset = x_charset;
@@ -504,6 +519,8 @@ class MailPart {
 			"\tmultipart?\t" + multipart +
 			"\n\tmessage?\t" + message +
 			"\n\ttype:\t" + type +
+			"\n\tmultipart type:\t" + multipart_type +
+			"\n\tcid:\t" + cid +
 			"\n\tencoding:\t" + encoding +
 			"\n\tname:\t" + name +
 			"\n\tdescription:\t" + description +
