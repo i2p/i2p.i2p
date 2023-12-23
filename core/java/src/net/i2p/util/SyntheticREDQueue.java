@@ -1,9 +1,7 @@
-package net.i2p.router.transport;
+package net.i2p.util;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
-import net.i2p.util.BandwidthEstimator;
-import net.i2p.util.Log;
 
 /**
  *  A "synthetic" queue in that it doesn't actually queue anything.
@@ -45,9 +43,9 @@ import net.i2p.util.Log;
  *
  *  Adapted from: Linux kernel tcp_westwood.c (GPLv2)
  *
- *  @since 0.9.50 adapted from streaming
+ *  @since 0.9.50 adapted from streaming; moved from transport in 0.9.62
  */
-class SyntheticREDQueue implements BandwidthEstimator {
+public class SyntheticREDQueue implements BandwidthEstimator {
 
     private final I2PAppContext _context;
     private final Log _log;
@@ -94,7 +92,7 @@ class SyntheticREDQueue implements BandwidthEstimator {
      *
      *  @param bwBps the output rate of the queue in Bps
      */
-    SyntheticREDQueue(I2PAppContext ctx, int bwBps) {
+    public SyntheticREDQueue(I2PAppContext ctx, int bwBps) {
         // the goal is to drop here rather than let the traffic
         // get through to UDP-Sender CoDel and get dropped there,
         // when we're at the default 80% share or below.
@@ -369,6 +367,8 @@ class SyntheticREDQueue implements BandwidthEstimator {
                 ' ' + DataHelper.formatSize2Decimal((long) (_bKFiltered * 1000), false) +
                 "Bps, avg_qsize " +
                 DataHelper.formatSize2((long) _avgQSize, false) +
-                "B]";
+                "B, limit " +
+                DataHelper.formatSize2Decimal((long) _bwBps, false) +
+                "Bps]";
     }
 }
