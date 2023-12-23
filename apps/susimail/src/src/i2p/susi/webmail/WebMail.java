@@ -2481,7 +2481,11 @@ public class WebMail extends HttpServlet
 					}
 				}
 				if (showRefresh || sessionObject.error.length() > 0 || sessionObject.info.length() > 0) {
-					out.println("<div class=\"notifications\">");
+					out.print("<div class=\"notifications\"");
+					// if errors, put at the top
+					if (sessionObject.error.length() > 0)
+						out.print(" id=\"errornotifications\"");
+					out.println(">");
 					if (sessionObject.error.length() > 0)
 						out.println("<p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p>");
 					if (sessionObject.info.length() > 0 || showRefresh) {
