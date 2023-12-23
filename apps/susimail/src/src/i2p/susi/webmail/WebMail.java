@@ -166,6 +166,7 @@ public class WebMail extends HttpServlet
 	private static final String SHOW = "show";
 	private static final String DOWNLOAD = "download";
 	private static final String RAW_ATTACHMENT = "att";
+	private static final String DRAFT_ATTACHMENT = "datt";
 
 	private static final String MARKALL = "markall";
 	private static final String CLEAR = "clearselection";
@@ -1617,6 +1618,50 @@ public class WebMail extends HttpServlet
 
 
 	/**
+	 * Process thumbnail link in compose view
+	 * Draft attachments are stored in the SessionObject and identified by hashcode only.
+	 *
+	 * @since 0.9.62
+	 */
+	private static void processDraftAttachmentLink(SessionObject sessionObject,
+	                                               RequestWrapper request, HttpServletResponse response)
+	{
+		String str = request.getParameter(DRAFT_ATTACHMENT);
+		if (str != null) {
+			InputStream in = null;
+			OutputStream out = null;
+			try {
+				if (sessionObject.attachments != null) {
+					int hc = Integer.parseInt(str);
+					for (Attachment att : sessionObject.attachments) {
+						if (hc == att.hashCode()) {
+							String ct = att.getContentType();
+							if (ct != null)
+								response.setContentType(ct);
+							response.setContentLength((int) att.getSize());
+							response.setHeader("Cache-Control", "public, max-age=3600");
+							in = att.getData();
+							out = response.getOutputStream();
+							DataHelper.copy(in, out);
+							return;
+						}
+					}
+				}
+			} catch (NumberFormatException nfe ) {
+			} catch (IOException ioe ) {
+			} finally {
+				if (in != null) try { in.close(); } catch (IOException ioe) {}
+				if (out != null) try { out.close(); } catch (IOException ioe) {}
+			}
+		}
+		// error if we get here
+		try {
+			response.sendError(404, _t("Attachment not found."));
+		} catch (IOException ioe) {}
+	}
+
+
+	/**
 	 * Process save-as link in message view
 	 *
 	 * @param sessionObject
@@ -2181,6 +2226,10 @@ public class WebMail extends HttpServlet
 					if (newUIDL != null)
 						q += '=' + newUIDL;
 					sendRedirect(httpRequest, response, q);
+					return;
+				}
+				if (request.getParameter(DRAFT_ATTACHMENT) != null) {
+					processDraftAttachmentLink(sessionObject, request, response);
 					return;
 				}
 			}
@@ -3101,7 +3150,13 @@ public class WebMail extends HttpServlet
 				} else {
 					out.println("<tr><td align=\"right\">&nbsp;</td>");
 				}
-				out.println("<td id=\"attachedfile\" align=\"left\"><label><input type=\"checkbox\" class=\"optbox\" name=\"check" + attachment.hashCode() + "\" value=\"1\">&nbsp;" + quoteHTML(attachment.getFileName()) + "</label></td></tr>");
+				out.println("<td id=\"attachedfile\" align=\"left\"><label><input type=\"checkbox\" class=\"optbox\" name=\"check" + attachment.hashCode() + "\" value=\"1\">&nbsp;" + quoteHTML(attachment.getFileName()) + "</label>");
+				out.println(DataHelper.formatSize2(attachment.getSize()) + 'B');
+				String type = attachment.getContentType();
+				if (type != null && type.startsWith("image/")) {
+					out.println("<img class=\"thumb\" alt=\"\" src=\"" + myself + '?' + DRAFT_ATTACHMENT + '=' + attachment.hashCode() + "\">");
+				}
+				out.println("</td></tr>");
 			}
 			// TODO disable in JS if none selected
 			out.println("<tr class=\"bottombuttons\"><td>&nbsp;</td><td align=\"left\" id=\"deleteattached\">" +

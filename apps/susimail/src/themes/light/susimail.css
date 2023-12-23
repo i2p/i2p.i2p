@@ -1413,6 +1413,12 @@ td p.error {
      margin: 8px 3px 0 0;
 }
 
+img.thumb {
+     margin: 0px 8px;
+     max-height: 64px;
+     max-width: 128px;
+}
+
 #prefsave {
      margin-top: 4px;
      padding-top: 10px;

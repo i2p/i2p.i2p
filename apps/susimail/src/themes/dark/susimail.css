@@ -995,6 +995,12 @@ div.attached {
      background: none;
 }
 
+img.thumb {
+     margin: 0px 8px;
+     max-height: 64px;
+     max-width: 128px;
+}
+
 div#emptymailbox {
      padding: 20px 10px;
 }
