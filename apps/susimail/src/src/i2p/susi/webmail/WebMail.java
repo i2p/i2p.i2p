@@ -3277,7 +3277,7 @@ public class WebMail extends HttpServlet
 			}
 			folder.setCurrentPage(page);
 		}
-		showPageButtons(out, folderName, page, folder.getPages(), true);
+		showPageButtons(out, sessionObject.user, folderName, page, folder.getPages(), true);
 		out.println("</div>");
 
 		String curSort = folder.getCurrentSortBy();
@@ -3406,7 +3406,7 @@ public class WebMail extends HttpServlet
 		if (folder.getPages() > 1 && i > 30) {
 			// show the buttons again if page is big
 			out.println("<div class=\"topbuttons\">");
-			showPageButtons(out, folderName, page, folder.getPages(), false);
+			showPageButtons(out, sessionObject.user, folderName, page, folder.getPages(), false);
 			out.println("</div>");
 		}
 	}
@@ -3415,8 +3415,13 @@ public class WebMail extends HttpServlet
 	 *  Folder selector, then, if pages greater than 1:
 	 *  first prev next last
 	 */
-	private static void showPageButtons(PrintWriter out, String folderName, int page, int pages, boolean outputHidden) {
+	private static void showPageButtons(PrintWriter out, String user, String folderName, int page, int pages, boolean outputHidden) {
 		out.println("<table id=\"pagenav\"><tr><td>");
+		if (!user.contains("@")) {
+			String domain = Config.getProperty( CONFIG_SENDER_DOMAIN, "mail.i2p" );
+			user += '@' + domain;
+		}
+		out.println(DataHelper.escapeHTML(user) + "&nbsp;&nbsp;&nbsp;&nbsp;");
 		String name = folderName.equals(DIR_FOLDER) ? "Inbox" : folderName;
 		out.println(_t("Folder") + ": " + _t(name) + "&nbsp;&nbsp;&nbsp;&nbsp;");  // TODO css to center it
 		out.println(button(SWITCH_TO, _t("Change to Folder") + ':'));
