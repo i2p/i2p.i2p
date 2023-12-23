@@ -141,10 +141,6 @@ span.coloured {
      color: #327BBF;
 }
 
-div.header, .iframed .header {
-     display: none;
-}
-
 div.footer {
      border-top: none;
      margin: 14px 0 10px;
@@ -161,8 +157,10 @@ p.footer {
      color: #495057 !important;
 }
 
-.iframed .footer {
-     display: none;
+img.footer {
+     max-height: 32px;
+     max-width: 64px;
+     margin: 0 1px -4px 0;
 }
 
 p.mailbody {
@@ -408,18 +406,6 @@ table#mailbox {
 
 form {
      line-height: 160%
-}
-
-.header + form {
-     border: 1px solid #7778bf;
-     border-radius: 2px 2px 0 0;
-     background: #f4f4ff;
-     background: linear-gradient(to bottom, #f8f8ff, #f2f2ff);
-     box-shadow: 0 0 0 1px #fff;
-}
-
-.iframed .header + form {
-     margin-bottom: 0;
 }
 
 #message_full {

@@ -50,10 +50,6 @@ body.iframed {
      outline: none;
 }
 
-div.header {
-     padding: 8px 5px 12px 5px;
-}
-
 hr {
      color: #494;
      background: #494;
@@ -133,22 +129,16 @@ p.footer {
      color: #495057 !important;
 }
 
-.iframed .footer {
-     display: none;
+img.footer {
+     max-height: 32px;
+     max-width: 64px;
+     margin: 0 1px -4px 0;
 }
 
 p.mailbody, textarea {
      font: 9pt "Noto Mono", "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      margin: 0 5px;
      text-align: left;
-}
-
-.header {
-     display: none;
-}
-
-.iframed .header {
-     display: none;
 }
 
 div.topbuttons {

@@ -2371,8 +2371,6 @@ public class WebMail extends HttpServlet
 				sessionObject.addNonce(nonce);
 				out.println(
 					"<div class=\"page\">" +
-					// hidden by CSS
-					//"<div class=\"header\"><img class=\"header\" src=\"" + sessionObject.imgPath + "susimail.png\" alt=\"Susimail\"></div>\n" +
 					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">\n" +
 					"<input type=\"hidden\" name=\"" + SUSI_NONCE + "\" value=\"" + nonce + "\">\n" +
 					// we use this to know if the user thought he was logged in at the time
@@ -2469,8 +2467,12 @@ public class WebMail extends HttpServlet
 				else if( state == State.CONFIG )
 					showConfig(out, folder);
 
-				//out.println( "</form><div id=\"footer\"><hr><p class=\"footer\">susimail v0." + version +" " + ( RELEASE ? "release" : "development" ) + " &copy; 2004-2005 <a href=\"mailto:susi23@mail.i2p\">susi</a></div></div></body>\n</html>");
-				out.println( "</form><div class=\"footer\"><p class=\"footer\">susimail &copy; 2004-2005 susi</p></div></div></body>\n</html>");
+				out.println("</form>\n");
+
+				out.println("<div class=\"footer\"><p class=\"footer\">\n" +
+				            "<img class=\"footer\" src=\"" + myself + "themes/images/susimail.png\" alt=\"susimail\">\n" +
+				            "&copy; 2004-2005 susi</p></div>");
+				out.println("</div></body>\n</html>");
 				out.flush();
 		}  // synch sessionObject
 	}
