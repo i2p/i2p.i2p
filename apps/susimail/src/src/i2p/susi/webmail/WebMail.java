@@ -2450,7 +2450,7 @@ public class WebMail extends HttpServlet
 				 * now write body
 				 */
 				if( state == State.AUTH )
-					showLogin( out );
+					showLogin(out, _t("Add a new user").equals(request.getParameter(USER)));
 
 				else if (state == State.LOADING)
 					showLoading(out, sessionObject, request);
@@ -3112,7 +3112,7 @@ public class WebMail extends HttpServlet
 	 *
 	 * @param out
 	 */
-	private static void showLogin( PrintWriter out )
+	private static void showLogin(PrintWriter out, boolean addNew)
 	{
 		//boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_PORTS_FIXED, "true" ));
 		//String host = Config.getProperty(CONFIG_HOST, DEFAULT_HOST);
@@ -3121,8 +3121,36 @@ public class WebMail extends HttpServlet
 
 		out.println( "<div id=\"dologin\"><h1>" + _t("Email Login") + "</h1><table cellspacing=\"3\" cellpadding=\"5\">\n" +
 			// current postman hq length limits 16/12, new postman version 32/32
-			"<tr><td align=\"right\" width=\"30%\">" + _t("User") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + USER + "\" value=\"" + "\"> @mail.i2p</td></tr>\n" +
-			"<tr><td align=\"right\" width=\"30%\">" + _t("Password") + "</td><td width=\"40%\" align=\"left\"><input type=\"password\" size=\"32\" name=\"pass\" value=\"" + "\"></td></tr>\n");
+			"<tr><td align=\"right\" width=\"30%\">" + _t("User") + "</td><td width=\"40%\" align=\"left\">");
+		boolean fixedPorts = Boolean.parseBoolean(Config.getProperty(CONFIG_PORTS_FIXED, "true"));
+		if (fixedPorts && !addNew) {
+			String host = Config.getProperty(CONFIG_HOST, DEFAULT_HOST);
+			int port = DEFAULT_POP3PORT;
+			String pop3Port = Config.getProperty(CONFIG_PORTS_POP3, Integer.toString(DEFAULT_POP3PORT));
+			try { port = Integer.parseInt(pop3Port); } catch (NumberFormatException nfe) {}
+			List<String> users = PersistentMailCache.getAllUsers(host, port);
+			int sz = users.size();
+			if (sz > 1) {
+				out.println("<select name=\"" + USER + "\">");
+				for (String user : users) {
+					out.println("<option>" + DataHelper.escapeHTML(user) + "</option>");
+				}
+				out.println("<option>" + _t("Add a new user") + "</option>");
+				out.println("</select>");
+			} else if (sz == 1) {
+				// For the common case, stuff the form so the browser will fill in the password.
+				// User can change it to create a new one.
+				out.println("<input type=\"text\" size=\"32\" name=\"" + USER + "\" value=\"" + DataHelper.escapeHTML(users.get(0)) + "\">");
+			} else {
+				out.println("<input type=\"text\" size=\"32\" name=\"" + USER + "\" value=\"\">");
+			}
+		} else {
+			out.println("<input type=\"text\" size=\"32\" name=\"" + USER + "\" value=\"\">");
+		}
+		out.println(" @mail.i2p</td></tr>\n");
+
+
+		out.println("<tr><td align=\"right\" width=\"30%\">" + _t("Password") + "</td><td width=\"40%\" align=\"left\"><input type=\"password\" size=\"32\" name=\"pass\" value=\"" + "\"></td></tr>\n");
 		// which is better?
 		out.println(
 			"<tr><td colspan=\"2\"><hr></td></tr>\n" +

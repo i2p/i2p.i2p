@@ -318,6 +318,41 @@ class PersistentMailCache {
 		return base;
 	}
 
+	/**
+	 *  @return non-null, sorted, possibly empty
+	 *  @since 0.9.62
+	 */
+	public static List<String> getAllUsers(String host, int port) {
+		File f = new SecureDirectory(I2PAppContext.getGlobalContext().getConfigDir(), DIR_SUSI);
+		if (!f.exists())
+			return Collections.emptyList();
+		f = new SecureDirectory(f, DIR_CACHE);
+		if (!f.exists())
+			return Collections.emptyList();
+		File[] files = f.listFiles();
+		if (files == null || files.length == 0)
+			return Collections.emptyList();
+		List<String> rv = new ArrayList<String>(files.length);
+		String suff = host + port;
+		for (File d : files) {
+			if (!d.isDirectory())
+				continue;
+			String name = d.getName();
+			if (!name.startsWith(CACHE_PREFIX))
+				continue;
+			name = name.substring(CACHE_PREFIX.length());
+			String dec = Base64.decodeToString(name);
+			if (dec == null)
+				continue;
+			if (dec.endsWith(suff))
+				dec = dec.substring(0, dec.length() - suff.length());
+			rv.add(dec);
+		}			
+		if (rv.size() > 1)
+			Collections.sort(rv);
+		return rv;
+	}
+
 	public File getHeaderFile(String uidl) {
 		return getFile(uidl, HDR_SUFFIX);
 	}
