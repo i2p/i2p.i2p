@@ -49,6 +49,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.servlet.util.ServletUtil;
 import net.i2p.util.Log;
@@ -127,6 +128,8 @@ class Mail {
 			setHeader(rb, rb.getInputStream(), true);
 		} catch (IOException ioe) {
 			// TODO...
+			if (_log.shouldWarn())
+				_log.warn("Header read error", ioe);
 		}
 	}
 
@@ -524,6 +527,13 @@ class Mail {
 							contentType = line.substring(13).trim();
 						} else if (hlc.startsWith("message-id:")) {
 							messageID = line.substring(11).trim();
+						} else if (hlc.startsWith("x-uidl:")) {
+							// shouldn't happen unless you imported or
+							// copied external emails to the cache
+							if (!uidl.equals(line.substring(7).trim()) && _log.shouldWarn())
+								_log.warn("UIDL mismatch, may be unable to load body later. Original: " + uidl +
+								          " b64: " + Base64.encode(uidl) +
+								          " header: " + line.substring(7).trim());
 						}
 					}
 				}
