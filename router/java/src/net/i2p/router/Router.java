@@ -146,8 +146,7 @@ public class Router implements RouterClock.ClockShiftListener {
     private static final String PROP_JBIGI = "jbigi.loadedResource";
     private static final String PROP_JBIGI_PROCESSOR = "jbigi.lastProcessor";
     public static final String UPDATE_FILE = "i2pupdate.zip";
-    //// remove after release ////
-    private static final boolean CONGESTION_CAPS = VersionComparator.comp(CoreVersion.PUBLISHED_VERSION, "0.9.60") >= 0;
+    private static final boolean CONGESTION_CAPS = true;
         
     private static final int SHUTDOWN_WAIT_SECS = 60;
 
