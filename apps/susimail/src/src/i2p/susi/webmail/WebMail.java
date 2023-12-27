@@ -1127,6 +1127,9 @@ public class WebMail extends HttpServlet
 		           buttonPressed(request, RAW_ATTACHMENT)) {
 			// GET params
 			state = State.SHOW;
+		} else if (buttonPressed(request, DRAFT_ATTACHMENT)) {
+			// GET params
+			state = State.NEW;
 		}
 
 		/*
