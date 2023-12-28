@@ -335,8 +335,8 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                 }
                             }
                         }
-                        if (shouldStore && _log.shouldWarn())
-                            _log.warn("(dbid: " + _facade
+                        if (shouldStore && _log.shouldDebug())
+                            _log.debug("(dbid: " + _facade
                                       + ") Handling new unsolicited dbStore of router " + key.toBase64());
                     } else if (prevNetDb.getPublished() >= ri.getPublished()) {
                         shouldStore = false;
