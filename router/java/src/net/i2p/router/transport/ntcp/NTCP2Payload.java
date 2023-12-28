@@ -117,10 +117,12 @@ class NTCP2Payload {
 
                 case BLOCK_ROUTERINFO:
                     int flag = payload[i] & 0xff;
+                    if (len - 1 > RouterInfo.MAX_UNCOMPRESSED_SIZE)
+                        throw new DataFormatException("RI too big: " + (len - 1));
                     RouterInfo alice = new RouterInfo();
                     ByteArrayInputStream bais = new ByteArrayInputStream(payload, i + 1, len - 1);
                     alice.readBytes(bais, true);
-                    cb.gotRI(alice, isHandshake, (flag & 0x01) != 0 && len < 4*1024);
+                    cb.gotRI(alice, isHandshake, (flag & 0x01) != 0 && len < 3*1024);
                     break;
 
                 case BLOCK_I2NP:

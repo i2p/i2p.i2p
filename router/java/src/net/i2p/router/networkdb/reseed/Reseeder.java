@@ -24,6 +24,7 @@ import net.i2p.crypto.SU3File;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.RouterClock;
 import net.i2p.router.RouterContext;
 import net.i2p.router.util.EventLog;
@@ -911,7 +912,7 @@ public class Reseeder {
                     String name = f.getName();
                     if (name.length() != ROUTERINFO_PREFIX.length() + 44 + ROUTERINFO_SUFFIX.length() ||
                         name.equals(ourB64) ||
-                        f.length() > 10*1024 ||
+                        f.length() > RouterInfo.MAX_UNCOMPRESSED_SIZE ||
                         f.lastModified() < minTime ||
                         !name.startsWith(ROUTERINFO_PREFIX) ||
                         !name.endsWith(ROUTERINFO_SUFFIX) ||
