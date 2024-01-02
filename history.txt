@@ -1,3 +1,22 @@
+2024-01-02 zzz
+ * Console: News fetch improvements (Gitlab MR !163)
+ * Router: Enforce max RI size (Gitlab MR !168)
+ * Susimail: Speed up initial loading (Gitlab MR !162)
+ * Tunnels: Peer selection adjustments (Gitlab MR !167)
+
+2023-12-23 zzz
+ * Susimail:
+   - Add dropdown on login page for multiple accounts
+   - Add logo to footer
+   - Add regex util (WIP)
+   - Auto-resize compose box
+   - Extract multipart type and content id (WIP)
+   - Logging enhancements on file read failures
+   - Put error messages at the top
+   - Show size and thumbnail of draft attachments
+   - Show user name on folder view
+ * Util: Move SyntheticREDQueue from router to core
+
 2023-12-22 zzz
  * Blockfile: Fix bug in unused getNames()
  * Console: Fix encoding issues in persisted news
@@ -219,7 +238,7 @@
 2023-06-28 idk
  * Cache stores of multihomed leaseSets when stored from multihome peers,
    and if our local leaseSet is not in the keyspace return the multihome instead
- * When updating a leaseSet because recieving it as published always make a
+ * When updating a leaseSet because receiving it as published always make a
    complete copy of the leaseSet before merging the flags.
  * Rate-Limit lookups
 
