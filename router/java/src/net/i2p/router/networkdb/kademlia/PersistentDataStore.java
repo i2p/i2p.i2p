@@ -541,6 +541,12 @@ public class PersistentDataStore extends TransientDataStore {
          *  @since 0.9.58
          */
         public boolean read() {
+            if (_routerFile.length() > RouterInfo.MAX_UNCOMPRESSED_SIZE) {
+                if (_log.shouldWarn())
+                    _log.warn("RI file too big " + _routerFile.length() + ": " + _routerFile);
+                _routerFile.delete();
+                return false;
+            }
             if (!shouldRead()) return false;
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Reading " + _routerFile);
