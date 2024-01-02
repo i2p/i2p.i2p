@@ -33,8 +33,8 @@ class Sorters {
 		 *  Gets mail from the cache, checks for null, then compares
 		 */
 		public int compare(String arg0, String arg1) {
-			Mail a = mailCache.getMail( arg0, MailCache.FetchMode.CACHE_ONLY );
-			Mail b = mailCache.getMail( arg1, MailCache.FetchMode.CACHE_ONLY );
+			Mail a = mailCache.getMail(arg0, MailCache.FetchMode.HEADER_CACHE_ONLY);
+			Mail b = mailCache.getMail(arg1, MailCache.FetchMode.HEADER_CACHE_ONLY);
 			if (a == null)
 				return (b == null) ? 0 : 1;
 			if (b == null)

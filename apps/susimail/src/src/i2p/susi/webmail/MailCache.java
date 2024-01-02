@@ -48,6 +48,7 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.NotificationService;
+import net.i2p.data.Base64;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
@@ -61,7 +62,7 @@ import net.i2p.util.Log;
 class MailCache {
 	
 	public enum FetchMode {
-		HEADER, ALL, CACHE_ONLY
+		HEADER, ALL, CACHE_ONLY, HEADER_CACHE_ONLY
 	}
 
 	private final POP3MailBox mailbox;
@@ -326,12 +327,12 @@ class MailCache {
 	}
 
 	/**
-	 * Fetch any needed data from pop3 server, unless mode is CACHE_ONLY,
+	 * Fetch any needed data from pop3 server, unless mode is CACHE_ONLY or HEADER_CACHE_ONLY,
 	 * or this isn't the Inbox.
-	 * Blocking unless mode is CACHE_ONLY.
+	 * Blocking for a long time unless mode is CACHE_ONLY or HEADER_CACHE_ONLY.
 	 * 
 	 * @param uidl message id to get
-	 * @param mode CACHE_ONLY to not pull from pop server
+	 * @param mode CACHE_ONLY or HEADER_CACHE_ONLY to not pull from pop server
 	 * @return An e-mail or null
 	 */
         @SuppressWarnings({"unchecked", "rawtypes"})
@@ -368,12 +369,35 @@ class MailCache {
 			
 		if (mode == FetchMode.HEADER) {
 			if (!mail.hasHeader()) {
+				if (_log.shouldInfo()) _log.info("Fetching mail header from server for b64: " + Base64.encode(uidl));
 				Buffer buf = mailbox.getHeader(uidl);
 				if (buf != null)
 					mail.setHeader(buf);
 			}
-		} else if (mode == FetchMode.ALL) {
-			if(!mail.hasBody()) {
+		} else if (mode == FetchMode.HEADER_CACHE_ONLY) {
+			if (!mail.hasHeader()) {
+				// shouldn't happen
+				if (disk.getMail(mail, true)) {
+					if (_log.shouldWarn()) _log.warn("Loaded deferred header from disk cache for b64: " + Base64.encode(uidl));
+					return mail;
+				} else {
+					if (_log.shouldWarn()) _log.warn("Failed to load deferred header from disk cache for b64: " + Base64.encode(uidl));
+				}
+			}
+		} else if (!mail.hasBody()) {
+			// CACHE_ONLY or ALL
+			if (disk.getFullFile(uidl).exists()) {
+				// body was not loaded at startup but we have it, load it now
+				if (disk.getMail(mail, false)) {
+					if (_log.shouldDebug()) _log.debug("Loaded deferred body from disk cache for b64: " + Base64.encode(uidl));
+					return mail;
+				}
+				if (_log.shouldWarn()) _log.warn("Failed to load deferred body from disk cache for b64: " + Base64.encode(uidl));
+			} else {
+				if (_log.shouldWarn()) _log.warn("We do not have body in disk cache for b64: " + Base64.encode(uidl));
+			}
+			if (mode == FetchMode.ALL) {
+				if (_log.shouldInfo()) _log.info("Fetching mail body from server for b64: " + Base64.encode(uidl));
 				File file = new File(_context.getTempDir(), "susimail-new-" + _context.random().nextLong());
 				Buffer rb = mailbox.getBody(uidl, new FileBuffer(file));
 				if (rb != null) {
@@ -384,8 +408,6 @@ class MailCache {
 					}
 				}
 			}
-		} else {
-			// else if it wasn't in cache, too bad
 		}
 		return mail;
 	}
@@ -405,7 +427,7 @@ class MailCache {
 	 */
         @SuppressWarnings({"unchecked", "rawtypes"})
 	public boolean getMail(FetchMode mode) {
-		if (mode == FetchMode.CACHE_ONLY)
+		if (mode == FetchMode.CACHE_ONLY || mode == FetchMode.HEADER_CACHE_ONLY)
 			throw new IllegalArgumentException();
 		if (mailbox == null) {
 			if (_log.shouldDebug()) _log.debug("getMail() mode " + mode + " called on wrong folder " + getFolderName(), new Exception());

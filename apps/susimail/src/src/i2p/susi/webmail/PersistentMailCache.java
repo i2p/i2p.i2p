@@ -462,10 +462,26 @@ class PersistentMailCache {
 			mail = new Draft(uidl);
 		else
 			mail = new Mail(uidl);
-		if (headerOnly)
+		if (headerOnly) {
 			mail.setHeader(rb);
-		else
+		} else if (isDrafts) {
+			// drafts always have FULL_SUFFIX but
+			// may not actually have a real body or part.
+			// If we don't call setBody(), it has
+			// a null part and we NPE on the compose page.
+			// Attachments are stored in separate files so
+			// these are all small.
 			mail.setBody(rb);
+		} else {
+			// Deferred loading, body will be loaded
+			// on-demand in MailCache.getMail()
+			// We set the size of the gzipped file to be the
+			// size so the UI doesn't have ?? in it.
+			// The size will be corrected if and when the body is read.
+			//mail.setBody(rb);
+			mail.setHeader(rb);
+			mail.setSize(f.length());
+		}
 		return mail;
 	}
 
