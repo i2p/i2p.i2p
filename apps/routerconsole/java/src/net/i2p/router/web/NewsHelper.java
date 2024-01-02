@@ -27,6 +27,8 @@ public class NewsHelper extends ContentHelper {
     public static final String PROP_LAST_UPDATED = "routerconsole.newsLastUpdated";
     /** @since 0.9.55 */
     public static final String PROP_LAST_NEW_ENTRY = "routerconsole.newsLastNewEntry";
+    /** @since 0.9.62 */
+    public static final String PROP_LAST_LANG = "routerconsole.newsLastLanguage";
     /**
      * Default true
      * @since 0.9.21

@@ -67,7 +67,7 @@ public class NewsHandler extends UpdateHandler implements Checker {
             //updateSources.add(new URI(BACKUP_NEWS_URL));
             updateSources.add(new URI(_context.getProperty(PROP_BACKUP_NEWS_URL_SU3, DEFAULT_BACKUP_NEWS_URL_SU3)));
         } catch (URISyntaxException use) {}
-        UpdateRunner update = new NewsFetcher(_context, _mgr, updateSources);
+        UpdateRunner update = new NewsFetcher(_context, _mgr, updateSources, maxTime);
         return update;
     }
 
