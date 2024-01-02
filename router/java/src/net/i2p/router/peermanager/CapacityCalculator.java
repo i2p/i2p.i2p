@@ -159,6 +159,8 @@ class CapacityCalculator {
                         else
                             capacity -= PENALTY_CAP_D;
                     }
+                } else if (caps.indexOf(Router.CAPABILITY_NO_TUNNELS) >= 0) {
+                    capacity = 0;
                 }
             } else {
                 capacity -= PENALTY_NO_RI;

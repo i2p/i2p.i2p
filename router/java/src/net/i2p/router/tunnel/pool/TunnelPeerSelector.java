@@ -42,7 +42,9 @@ import net.i2p.util.VersionComparator;
  */
 public abstract class TunnelPeerSelector extends ConnectChecker {
 
-    private static final String DEFAULT_EXCLUDE_CAPS = String.valueOf(Router.CAPABILITY_BW12)+String.valueOf(Router.CAPABILITY_CONGESTION_SEVERE);//+String.valueOf(Router.CAPABILITY_CONGESTION_MODERATE);
+    private static final String DEFAULT_EXCLUDE_CAPS = String.valueOf(Router.CAPABILITY_BW12) +
+                                                       String.valueOf(Router.CAPABILITY_CONGESTION_SEVERE) +
+                                                       String.valueOf(Router.CAPABILITY_NO_TUNNELS);
 
     protected TunnelPeerSelector(RouterContext context) {
         super(context);
@@ -231,8 +233,14 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
         if (info == null)
             return true;
 
+        // reduce load on floodfills
+        String caps = info.getCapabilities();
+        if (isExploratory &&
+            caps.indexOf(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL) >= 0 &&
+            ctx.random().nextInt(4) != 0)
+            return true;
+
         if (filterUnreachable(isInbound, isExploratory)) {
-            String caps = info.getCapabilities();
             if (caps.indexOf(Router.CAPABILITY_UNREACHABLE) >= 0)
                 return true;
         }
@@ -340,8 +348,8 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
         return ctx.getProperty("router.excludePeerCaps", DEFAULT_EXCLUDE_CAPS);
     }
 
-    /** Short ECIES tunnel build messages (1.5.0) */
-    private static final String MIN_VERSION = "0.9.51";
+    /** SSU2 fixes (2.1.0), Congestion fixes (2.2.0) */
+    private static final String MIN_VERSION = "0.9.58";
 
     /**
      *  Should the peer be excluded based on its published caps?
