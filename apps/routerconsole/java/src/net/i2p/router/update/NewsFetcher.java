@@ -70,6 +70,9 @@ class NewsFetcher extends UpdateRunner {
     private long _newLastModified;
     private final File _newsFile;
     private final File _tempFile;
+    private final long _timeout;
+    private final boolean _showStatus;
+    private String _failMsg;
     /** is the news newer */
     private boolean _isNewer;
     private boolean _success;
@@ -80,14 +83,28 @@ class NewsFetcher extends UpdateRunner {
     static final String PROP_BLOCKLIST_TIME = "router.blocklistVersion";
     private static final String BLOCKLIST_DIR = "docs/feed/blocklist";
     private static final String BLOCKLIST_FILE = "blocklist.txt";
+    private static final long DEFAULT_TIMEOUT = 60*1000;
     
     public NewsFetcher(RouterContext ctx, ConsoleUpdateManager mgr, List<URI> uris) { 
+        this(ctx, mgr, uris, DEFAULT_TIMEOUT);
+    }
+
+    /**
+     *  @param timeout if less than 60 seconds, we assume this was manually initiated,
+     *                 and we will log status to the sidebar
+     *  @since 0.9.62
+     */
+    public NewsFetcher(RouterContext ctx, ConsoleUpdateManager mgr, List<URI> uris, long timeout) { 
         super(ctx, mgr, NEWS, uris);
         _newsFile = new File(ctx.getRouterDir(), NewsHelper.NEWS_FILE);
         _tempFile = new File(ctx.getTempDir(), "tmp-" + ctx.random().nextLong() + TEMP_NEWS_FILE);
-        long lastMod = NewsHelper.lastUpdated(ctx);
-        if (lastMod > 0)
-            _lastModified = RFC822Date.to822Date(lastMod);
+        _timeout = timeout;
+        _showStatus = timeout < DEFAULT_TIMEOUT;
+        if (!langChanged()) {
+            long lastMod = NewsHelper.lastUpdated(ctx);
+            if (lastMod > 0)
+                _lastModified = RFC822Date.to822Date(lastMod);
+        }
     }
 
     @Override
@@ -140,7 +157,7 @@ class NewsFetcher extends UpdateRunner {
                 long start = _context.clock().now();
                 // will be adjusted in headerReceived() below
                 _newLastModified = start;
-                if (get.fetch()) {
+                if (get.fetch(_timeout)) {
                     int status = get.getStatusCode();
                     if (status == 200 || status == 304) {
                         Map<String, String> opts = new HashMap<String, String>(3);
@@ -148,12 +165,39 @@ class NewsFetcher extends UpdateRunner {
                         if (status == 200 && _isNewer) {
                             String lastMod = Long.toString(_newLastModified);
                             opts.put(NewsHelper.PROP_LAST_UPDATED, lastMod);
+                            String lang = Translate.getLanguage(_context);
+                            opts.put(NewsHelper.PROP_LAST_LANG, lang);
                             if (_gotNewEntry)
                                 opts.put(NewsHelper.PROP_LAST_NEW_ENTRY, lastMod);
                         }
                         _context.router().saveConfig(opts, null);
+                        if (_failMsg != null) {
+                            // from checkForUpdates()
+                            _mgr.notifyComplete(this, "<b>" + _failMsg + "</b>");
+                        } else if (_showStatus) {
+                            if (status == 200)
+                                _mgr.notifyComplete(this, "News updated from " + _currentURI.getHost());
+                            else
+                                _mgr.notifyComplete(this, "No new news available from " + _currentURI.getHost());
+                        }
                         return;
                     }
+                } else {
+                    int status = get.getStatusCode();
+                    String msg;
+                    if (status == 504 || status <= 0)
+                        msg = "Unable to connect to news server " + _currentURI.getHost();
+                    else if (status == 500)
+                        msg = "News server " + _currentURI.getHost() + " not found in address book";
+                    else if (status == 404)
+                        msg = "News file not found on news server at " + newsURL;
+                    else
+                        msg = status + " " + DataHelper.stripHTML(get.getStatusText());
+                    // only display if manually initiated
+                    if (_showStatus)
+                        updateStatus("<b>" + msg + "</b>");
+                    if (_log.shouldWarn())
+                        _log.warn(msg);
                 }
             } catch (Throwable t) {
                 _log.error("Error fetching the news", t);
@@ -194,6 +238,17 @@ class NewsFetcher extends UpdateRunner {
             return uri;
         }
     }
+
+    /**
+     *  @since 0.9.62
+     */
+    private boolean langChanged() {
+        String old = _context.getProperty(NewsHelper.PROP_LAST_LANG);
+        if (old == null)
+            return false;
+        String lang = Translate.getLanguage(_context);
+        return !lang.equals(old);
+    }
     
     // Fake XML parsing
     // Line must contain this, and full entry must be on one line
@@ -213,6 +268,7 @@ class NewsFetcher extends UpdateRunner {
     // unused
     //private static final String I2P_SUD_KEY = "sudi2p";
     //private static final String I2P_SU2_KEY = "su2i2p";
+
     /**
      *  @since 0.9.52
      */
@@ -325,6 +381,7 @@ class NewsFetcher extends UpdateRunner {
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error checking the news for an update", ioe);
+            _failMsg = "Error checking the news for an update: " + ioe;
             return;
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
@@ -486,9 +543,38 @@ class NewsFetcher extends UpdateRunner {
         _success = true;
     }
 
-    /** override to prevent status update */
+    /**
+     * override for status update
+     * @since 0.9.62
+     */
     @Override
-    public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {}
+    public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause) {
+        // only display if manually initiated
+        if (_showStatus) {
+            String msg = "Unable to connect to news server " + url + ": " + DataHelper.stripHTML(cause.toString());
+            updateStatus("<b>" + msg + "</b>");
+            if (_log.shouldWarn())
+                _log.warn(msg);
+        }
+        // update manager will also log
+        _mgr.notifyAttemptFailed(this, url, null);
+    }
+
+    /**
+     * override for status update
+     */
+    @Override
+    public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
+        // only display if manually initiated
+        if (_showStatus) {
+            String msg = "Failed downloading news from " + url;
+            updateStatus("<b>" + msg + "</b>");
+            if (_log.shouldWarn())
+                _log.warn(msg);
+        }
+        // update manager will also log
+        _mgr.notifyAttemptFailed(this, url, null);
+    }
 
     /**
      *  Process the fetched su3 news file _tempFile.
