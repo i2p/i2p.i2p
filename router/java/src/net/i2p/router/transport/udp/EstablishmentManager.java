@@ -842,14 +842,18 @@ class EstablishmentManager {
             else
                 _log.debug("Receive DUP session/token request from: " + state);
         }
+
+        // Wait until we have RI
+        // sentRelayTag remains 0 and will not be sent in SessionConfirmed
+        // See InboundEstablishState2
         // call for both Session and Token request, why not
-        if (state.isIntroductionRequested() &&
-            state.getSentRelayTag() == 0 &&     // only set once
-            state.getSentPort() >= 1024 &&
-            _transport.canIntroduce(state.getSentIP().length == 16)) {
-            long tag = 1 + _context.random().nextLong(MAX_TAG_VALUE);
-            state.setSentRelayTag(tag);
-        }
+        //if (state.isIntroductionRequested() &&
+        //    state.getSentRelayTag() == 0 &&     // only set once
+        //    state.getSentPort() >= 1024 &&
+        //    _transport.canIntroduce(state.getSentIP().length == 16)) {
+        //    long tag = 1 + _context.random().nextLong(MAX_TAG_VALUE);
+        //    state.setSentRelayTag(tag);
+        //}
         notifyActivity();
     }
 
@@ -1175,11 +1179,13 @@ class EstablishmentManager {
             peer = new PeerState(_context, _transport,
                                  state.getSentIP(), state.getSentPort(), remote.calculateHash(), true, state.getRTT(),
                                  state.getCipherKey(), state.getMACKey());
+            peer.setWeRelayToThemAs(state.getSentRelayTag());
         } else {
             InboundEstablishState2 state2 = (InboundEstablishState2) state;
             peer = state2.getPeerState();
+            // now handled in IES2.createPeerState()
+            //peer.setWeRelayToThemAs(state.getSentRelayTag());
         }
-        peer.setWeRelayToThemAs(state.getSentRelayTag());
 
         if (version == 1) {
             // Lookup the peer's MTU from the netdb, since it isn't included in the protocol setup (yet)

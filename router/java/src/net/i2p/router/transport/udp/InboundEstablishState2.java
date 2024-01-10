@@ -25,12 +25,14 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.transport.TransportImpl;
 import static net.i2p.router.transport.udp.SSU2Util.*;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
+import net.i2p.util.VersionComparator;
 
 /**
  * Data for a new connection being established, where the remote peer has
@@ -63,6 +65,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     // testing
     private static final boolean ENFORCE_TOKEN = true;
     private static final long MAX_SKEW = 2*60*1000L;
+    // SSU2 fixes (2.1.0)
+    private static final String MIN_RELAY_VERSION = "0.9.57";
 
 
     /**
@@ -398,6 +402,32 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         }
 
         _receivedConfirmedIdentity = _receivedUnconfirmedIdentity;
+        // deferred relay tag request handling, now that we have the RI
+        // formerly in EstablishmentManager.receiveSessionOrTokenReques()
+        if (_introductionRequested) {
+            if (getSentPort() < 1024 ||
+                !_transport.canIntroduce(isIPv6)) {
+                _introductionRequested = false;
+            } else if (VersionComparator.comp(ri.getVersion(), MIN_RELAY_VERSION) < 0) {
+                _introductionRequested = false;
+                String caps = ri.getCapabilities();
+                if (_log.shouldWarn())
+                    _log.warn("Not offering to relay to router version " + ri.getVersion() + " caps " + caps + ": " + this);
+            } else {
+                String caps = ri.getCapabilities();
+                // may be requesting relay for ipv4/6 if reachable on the other
+                // or may be starting up and not know if reachable or not
+                if (caps.indexOf(Router.CAPABILITY_REACHABLE) < 0 ||
+                    _context.random().nextInt(4) == 0) {
+                    // leave it set to true; createPeerState() will copy to PS2,
+                    // who will send the relay tag with ACK 0
+                } else {
+                    _introductionRequested = false;
+                    if (_log.shouldWarn())
+                        _log.warn("Not offering to relay to router version " + ri.getVersion() + " caps " + caps + ": " + this);
+                }
+            }
+        }
         createPeerState();
         //_sendHeaderEncryptKey2 calculated below
     }
@@ -419,7 +449,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
 
     public void gotRelayTagRequest() {
         if (_log.shouldDebug())
-            _log.debug("Got relay tag request");
+            _log.debug("Got relay tag request on " + this);
         _introductionRequested = true;
     }
 
@@ -877,6 +907,12 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         RouterAddress ra = _transport.getCurrentExternalAddress(isIPv6);
         if (ra != null)
             _pstate.setOurAddress(ra.getIP(), ra.getPort());
+        if (_introductionRequested) {
+            long tag = 1 + _context.random().nextLong(EstablishmentManager.MAX_TAG_VALUE);
+            setSentRelayTag(tag);
+            _pstate.setWeRelayToThemAs(tag);
+        }
+        _pstate.sendAck0();
     }
 
     /**
