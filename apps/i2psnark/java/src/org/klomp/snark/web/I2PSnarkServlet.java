@@ -348,6 +348,7 @@ public class I2PSnarkServlet extends BasicServlet {
                       "<script src=\".resources/js/delete.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n" +
                       "<script src=\".resources/js/search.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
         }
+        out.write("<script src=\"/js/iframeResizer.contentWindow.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
         out.write(HEADER_A + _themePath + HEADER_B);
 
         //  ...and inject CSS to display panels uncollapsed

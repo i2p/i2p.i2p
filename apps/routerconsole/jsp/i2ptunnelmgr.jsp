@@ -25,6 +25,7 @@
 <%@include file="css.jsi" %>
 <%=intl.title("Hidden Services Manager")%>
 <script src="/js/iframed.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
+<script src="/js/iframeResizer.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
 <script nonce="<%=cspNonce%>" type="text/javascript">
 /* @license http://creativecommons.org/publicdomain/zero/1.0/legalcode CC0-1.0 */
@@ -56,6 +57,7 @@
           injectClass(f);
           injectClassSpecific(f);
           resizeFrame(f);
+          iFrameResize({ log: false }, '#i2ptunnelframe')
       }, true);
   }
 

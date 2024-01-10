@@ -36,6 +36,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title><%=intl._t("subscriptions")%> - susidns</title>
 <link rel="stylesheet" type="text/css" href="<%=subs.getTheme()%>susidns.css?<%=net.i2p.CoreVersion.VERSION%>">
+<script src="/js/iframeResizer.contentWindow.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 <script src="js/messages.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 </head>
 <body>

@@ -2401,6 +2401,7 @@ public class WebMail extends HttpServlet
 					out.println( "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes\" />\n" +
 						"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "mobile.css?" + CoreVersion.VERSION + "\" />" );
 				}
+				out.println("<script src=\"/js/iframeResizer.contentWindow.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 				if(state != State.AUTH)
 					out.println("<link rel=\"stylesheet\" href=\"themes/print.css?" + CoreVersion.VERSION + "\" type=\"text/css\" media=\"print\" />");
 				if (state == State.NEW) {
