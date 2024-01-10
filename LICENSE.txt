@@ -332,6 +332,13 @@ Applications:
    GPLv2 (or any later version)
    See licenses/LICENSE-GPLv2.txt
 
+   SusiMail Pagedown:
+   Original Markdown Copyright (c) 2004-2005 John Gruber
+   Original Showdown code copyright (c) 2007 John Fraser
+   Modifications and bugfixes (c) 2009 Dana Robinson
+   Modifications and bugfixes (c) 2009-2014 Stack Exchange Inc.
+   See licenses/LICENSE-pagedown.txt
+
    Systray (systray.jar):
    Public domain.
 
