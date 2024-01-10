@@ -28,6 +28,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
     <link href="<%=editBean.getTheme()%>i2ptunnel.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css" /> 
+    <script src="/js/iframeResizer.contentWindow.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 <style type='text/css'>
 input.default { width: 1px; height: 1px; visibility: hidden; }
 </style>

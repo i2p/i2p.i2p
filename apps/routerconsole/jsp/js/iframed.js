@@ -38,6 +38,9 @@ function resizeFrame(f) {
 
         // Delete the div
         document.body.removeChild(scrollDiv);
+
+        // a little extra just in case there's some margin in the iframe
+        totalHeight += 20;
     }
 
     f.style.height = totalHeight + "px";
