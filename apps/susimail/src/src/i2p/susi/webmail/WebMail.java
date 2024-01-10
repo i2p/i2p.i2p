@@ -2419,6 +2419,10 @@ public class WebMail extends HttpServlet
 					// TODO JS?
 			                out.println("<meta http-equiv=\"refresh\" content=\"5;url=" + myself + "\">");
 					// TODO we don't need the form below
+				} else if (state == State.SHOW) {
+					out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "markdown.css?" + CoreVersion.VERSION + "\">");
+					out.println("<script src=\"/susimail/js/markdown.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
+					out.println("<script src=\"/susimail/js/Markdown.Converter.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 				}
 				out.println("<script src=\"/susimail/js/notifications.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 				out.print("</head>\n<body>");
