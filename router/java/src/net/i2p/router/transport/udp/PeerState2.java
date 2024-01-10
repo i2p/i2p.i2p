@@ -115,6 +115,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
 
 
     /**
+     *  If inbound, caller MUST immediately call setWeRelayToThemAs() (if nonzero) and sendAck0().
+     *
      *  @param rtt from the EstablishState, or 0 if not available
      */
     public PeerState2(RouterContext ctx, UDPTransport transport,
@@ -135,17 +137,40 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         _sentMessages = new ConcurrentHashMap<Long, List<PacketBuilder.Fragment>>(32);
         _sentMessagesLastExpired = _keyEstablishedTime;
         if (isInbound) {
-            // Send immediate ack of Session Confirmed
+            // Prep for immediate ack of Session Confirmed
             _receivedMessages.set(0);
-            try {
-                UDPPacket ack = transport.getBuilder2().buildACK(this);
-                transport.send(ack);
-            } catch (IOException ioe) {}
+            // ACK 0 now sent in sendAck0() below
         } else {
             // For outbound, SessionConfirmed is packet 0
             _packetNumber.set(1);
         }
         _ackTimer = new ACKTimer();
+    }
+
+    /**
+     *  Send immediate ACK 0 of Session Confirmed. Inbound only.
+     *  Bundle relay tag if requested, see InboundEstablishState2.
+     *
+     *  @since 0.9.62
+     */
+    void sendAck0() {
+        if (!_isInbound)
+            return;
+        long tag = getWeRelayToThemAs();
+        try {
+            UDPPacket pkt;
+            if (tag > 0) {
+                SSU2Payload.Block block = new SSU2Payload.RelayTagBlock(tag);
+                pkt = _transport.getBuilder2().buildPacket(Collections.<Fragment>emptyList(),
+                                                           Collections.singletonList(block),
+                                                           this);
+                if (_log.shouldInfo())
+                    _log.info("Sending ack 0 with tag " + tag + " on " + this);
+            } else {
+                pkt = _transport.getBuilder2().buildACK(this);
+            }
+            _transport.send(pkt);
+        } catch (IOException ioe) {}
     }
 
     // SSU 1 overrides
