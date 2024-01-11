@@ -1,3 +1,11 @@
+2024-01-10 zzz
+ * Console: Fix iframe size issues
+ * Susimail: Add markdown js for plain text content
+ * SSU2: Delay sending relay tag
+
+2024-01-08 zzz
+ * Transport: Ignore SSU1 enable config
+
 2024-01-02 zzz
  * Console: News fetch improvements (Gitlab MR !163)
  * Router: Enforce max RI size (Gitlab MR !168)
