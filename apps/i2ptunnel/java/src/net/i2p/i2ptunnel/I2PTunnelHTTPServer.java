@@ -138,6 +138,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "<p>Inproxy access denied. You must run <a href=\"https://geti2p.net/\">I2P</a> to access this site.</p>\n" +
          "</body></html>";
 
+/*
     private final static String ERR_SSL =
          "HTTP/1.1 503 Service Unavailable\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
@@ -148,6 +149,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "<body><h2>503 Service Unavailable</h2>\n" +
          "<p>This I2P website is not configured for SSL.</p>\n" +
          "</body></html>";
+*/
 
     private final static String ERR_REQUEST_URI_TOO_LONG =
          "HTTP/1.1 414 Request URI too long\r\n"+
@@ -291,13 +293,10 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             if (socket.getLocalPort() == 443) {
                 if (getTunnel().getClientOptions().getProperty("targetForPort.443") == null) {
                     try {
-                        socket.getOutputStream().write(ERR_SSL.getBytes("UTF-8"));
-                    } catch (IOException ioe) {
-                    } finally {
-                        try {
-                            socket.close();
-                        } catch (IOException ioe) {}
-                    }
+                        // can't write non-ssl error message
+                        // client side already sent 200 to browser
+                        socket.reset();
+                    } catch (IOException ioe) {}
                     return;
                 }
                 Socket s = getSocket(socket.getPeerDestination().calculateHash(), 443);
@@ -321,27 +320,27 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                                       CLIENT_SKIPHEADERS, getTunnel().getContext());
             } catch (SocketTimeoutException ste) {
                 try {
-                    socket.getOutputStream().write(ERR_REQUEST_TIMEOUT.getBytes("UTF-8"));
+                    sendError(socket, ERR_REQUEST_TIMEOUT);
                 } catch (IOException ioe) {
                 } finally {
-                     try { socket.close(); } catch (IOException ioe) {}
+                    try { socket.close(); } catch (IOException ioe) {}
                 }
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Error in the HTTP request from " + peerB32, ste);
                 return;
             } catch (EOFException eofe) {
                 try {
-                    socket.getOutputStream().write(ERR_BAD_REQUEST.getBytes("UTF-8"));
+                    sendError(socket, ERR_BAD_REQUEST);
                 } catch (IOException ioe) {
                 } finally {
-                     try { socket.close(); } catch (IOException ioe) {}
+                    try { socket.close(); } catch (IOException ioe) {}
                 }
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Error in the HTTP request from " + peerB32, eofe);
                 return;
             } catch (LineTooLongException ltle) {
                 try {
-                    socket.getOutputStream().write(ERR_HEADERS_TOO_LARGE.getBytes("UTF-8"));
+                    sendError(socket, ERR_HEADERS_TOO_LARGE);
                 } catch (IOException ioe) {
                 } finally {
                      try { socket.close(); } catch (IOException ioe) {}
@@ -351,7 +350,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 return;
             } catch (RequestTooLongException rtle) {
                 try {
-                    socket.getOutputStream().write(ERR_REQUEST_URI_TOO_LONG.getBytes("UTF-8"));
+                    sendError(socket, ERR_REQUEST_URI_TOO_LONG);
                 } catch (IOException ioe) {
                 } finally {
                      try { socket.close(); } catch (IOException ioe) {}
@@ -361,7 +360,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 return;
             } catch (BadRequestException bre) {
                 try {
-                    socket.getOutputStream().write(ERR_BAD_REQUEST.getBytes("UTF-8"));
+                    sendError(socket, ERR_BAD_REQUEST);
                 } catch (IOException ioe) {
                 } finally {
                      try { socket.close(); } catch (IOException ioe) {}
@@ -398,7 +397,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 try {
                     // Send a 403, so the user doesn't get an HTTP Proxy error message
                     // and blame his router or the network.
-                    socket.getOutputStream().write(ERR_INPROXY.getBytes("UTF-8"));
+                    sendError(socket, ERR_INPROXY);
                 } catch (IOException ioe) {}
                 try {
                     socket.close();
@@ -419,7 +418,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                                 _log.warn("Refusing access from: " + peerB32 +
                                           " with Referer: " + referer);
                             try {
-                                socket.getOutputStream().write(ERR_INPROXY.getBytes("UTF-8"));
+                                sendError(socket, ERR_INPROXY);
                             } catch (IOException ioe) {}
                             try {
                                 socket.close();
@@ -446,7 +445,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                                         _log.warn("Refusing access from: " + peerB32 +
                                                   " with User-Agent: " + ua);
                                     try {
-                                        socket.getOutputStream().write(ERR_INPROXY.getBytes("UTF-8"));
+                                        sendError(socket, ERR_INPROXY);
                                     } catch (IOException ioe) {}
                                     try {
                                         socket.close();
@@ -468,7 +467,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                                     _log.warn("Refusing access from: " + peerB32 +
                                               " with empty User-Agent");
                                 try {
-                                    socket.getOutputStream().write(ERR_INPROXY.getBytes("UTF-8"));
+                                    sendError(socket, ERR_INPROXY);
                                 } catch (IOException ioe) {}
                                 try {
                                     socket.close();
@@ -490,7 +489,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     try {
                         // Send a 429, so the user doesn't get an HTTP Proxy error message
                         // and blame his router or the network.
-                        socket.getOutputStream().write(ERR_DENIED.getBytes("UTF-8"));
+                        sendError(socket, ERR_DENIED);
                     } catch (IOException ioe) {}
                     try {
                         socket.close();
@@ -587,7 +586,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             try {
                 // Send a 503, so the user doesn't get an HTTP Proxy error message
                 // and blame his router or the network.
-                socket.getOutputStream().write(ERR_UNAVAILABLE.getBytes("UTF-8"));
+                sendError(socket, ERR_UNAVAILABLE);
             } catch (IOException ioe) {}
             try {
                 socket.close();
@@ -608,7 +607,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             try {
                 // Send a 503, so the user doesn't get an HTTP Proxy error message
                 // and blame his router or the network.
-                socket.getOutputStream().write(ERR_UNAVAILABLE.getBytes("UTF-8"));
+                sendError(socket, ERR_UNAVAILABLE);
             } catch (IOException ioe) {}
             try {
                 socket.close();
@@ -616,6 +615,17 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("OOM in HTTP server", oom);
         }
+    }
+
+    /**
+     *  Send the message, unless port 443, then just reset
+     *  @since 0.9.62
+     */
+    private static void sendError(I2PSocket socket, String resp) throws IOException {
+        if (socket.getLocalPort() == 443)
+            socket.reset();
+        else
+            socket.getOutputStream().write(resp.getBytes("UTF-8"));
     }
     
     private static class CompressedRequestor implements Runnable {

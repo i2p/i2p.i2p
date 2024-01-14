@@ -1405,7 +1405,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     data = null;
                     response = SUCCESS_RESPONSE.getBytes("UTF-8");
                 }
-                t = new I2PTunnelRunner(s, i2ps, sockLock, data, response, mySockets, onTimeout);
+                // no OnTimeout, we can't send HTTP error responses after sending SUCCESS_RESPONSE.
+                t = new I2PTunnelRunner(s, i2ps, sockLock, data, response, mySockets, (OnTimeout) null);
             } else {
                 byte[] data = newRequest.toString().getBytes("ISO-8859-1");
                 t = new I2PTunnelHTTPClientRunner(s, i2ps, sockLock, data, mySockets, onTimeout);
