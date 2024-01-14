@@ -110,7 +110,7 @@ public class Destination extends KeysAndCert {
         _publicKey = pk;
         _signingKey = sk;
         _certificate = c;
-        _padding = padding;
+        setPadding(padding);
     }
 
     /**
@@ -122,10 +122,7 @@ public class Destination extends KeysAndCert {
         int cur = offset;
         System.arraycopy(_publicKey.getData(), 0, target, cur, PublicKey.KEYSIZE_BYTES);
         cur += PublicKey.KEYSIZE_BYTES;
-        if (_padding != null) {
-            System.arraycopy(_padding, 0, target, cur, _padding.length);
-            cur += _padding.length;
-        }
+        cur = writePaddingBytes(target, cur);
         int spkTrunc = Math.min(SigningPublicKey.KEYSIZE_BYTES, _signingKey.length());
         System.arraycopy(_signingKey.getData(), 0, target, cur, spkTrunc);
         cur += spkTrunc;
@@ -166,8 +163,13 @@ public class Destination extends KeysAndCert {
         if (_certificate.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
             // cert data included in keys
             rv += 7;
-            if (_padding != null)
-                rv += _padding.length;
+            if (_paddingBlocks > 1) {
+                rv += 32 * _paddingBlocks;
+            } else {
+                byte[] padding = getPadding();
+                if (padding != null)
+                    rv += padding.length;
+            }
         } else {
             rv += _certificate.size();
         }
