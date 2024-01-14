@@ -1,5 +1,6 @@
-package net.i2p.i2ptunnel;
+package net.i2p.i2ptunnel.util;
 
+import java.io.EOFException;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -7,7 +8,10 @@ import java.util.zip.CRC32;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterOutputStream;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.i2ptunnel.util.LimitOutputStream.DoneCallback;
+import net.i2p.util.Log;
 
 /**
  * Gunzip implementation per 
@@ -22,7 +26,7 @@ import net.i2p.data.DataHelper;
  * Not a public API, subject to change, not for external use.
  *
  * Modified from net.i2p.util.ResettableGZIPInputStream to use Java 6 InflaterOutputstream
- * @since 0.9.21, public since 0.9.50 for LocalHTTPServer
+ * @since 0.9.21, public since 0.9.50 for LocalHTTPServer, moved to util in 0.9.62
  */
 public class GunzipOutputStream extends InflaterOutputStream {
     private static final int FOOTER_SIZE = 8; // CRC32 + ISIZE
@@ -38,12 +42,28 @@ public class GunzipOutputStream extends InflaterOutputStream {
     private HeaderState _state = HeaderState.MB1;
     private int _flags;
     private int _extHdrToRead;
+    private final DoneCallback _callback;
+    private final Log _log;
 
+    private static final OutputStream DUMMY_OUT = new DummyOutputStream();
+    
     /**
      * Build a new Gunzip stream
      */
     public GunzipOutputStream(OutputStream uncompressedStream) throws IOException {
+        this(uncompressedStream, null);
+    }
+
+    /**
+     * With a callback when done
+     *
+     * @param cb may be null
+     * @since 0.9.62
+     */
+    public GunzipOutputStream(OutputStream uncompressedStream, DoneCallback cb) throws IOException {
         super(new CRC32OutputStream(uncompressedStream), new Inflater(true));
+        _log = I2PAppContext.getGlobalContext().logManager().getLog(GunzipOutputStream.class);
+        _callback = cb;
     }
 
     @Override
@@ -57,7 +77,10 @@ public class GunzipOutputStream extends InflaterOutputStream {
         if (_complete) {
             // shortcircuit so the inflater doesn't try to refill 
             // with the footer's data (which would fail, causing ZLIB err)
-            return;
+            IOException ioe = new EOFException("Extra data written to gunzipper");
+            if (_log.shouldWarn())
+               _log.warn("EOF", ioe);
+            throw ioe;
         }
         boolean isFinished = inf.finished();
         for (int i = off; i < off + len; i++) {
@@ -85,6 +108,8 @@ public class GunzipOutputStream extends InflaterOutputStream {
                         verifyFooter();
                         _complete = true;
                         _validated = true;
+                        if (_callback != null)
+                            _callback.streamDone();
                         return;
                     } catch (IOException ioe) {
                         // failed at 7, retry at 8
@@ -147,6 +172,8 @@ public class GunzipOutputStream extends InflaterOutputStream {
 
     @Override
     public void close() throws IOException {
+        if (_log.shouldWarn())
+            _log.warn("Closing " + this);
         _complete = true;
         _state = HeaderState.DONE;
         super.close();
