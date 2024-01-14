@@ -28,7 +28,7 @@ import net.i2p.data.Destination;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SigningPublicKey;
-import net.i2p.i2ptunnel.GunzipOutputStream;
+import net.i2p.i2ptunnel.util.GunzipOutputStream;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.util.FileUtil;
 import net.i2p.util.PortMapper;

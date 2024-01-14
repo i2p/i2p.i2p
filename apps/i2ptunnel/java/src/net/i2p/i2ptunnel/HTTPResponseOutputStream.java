@@ -16,6 +16,7 @@ import java.util.Locale;
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
+import net.i2p.i2ptunnel.util.GunzipOutputStream;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
