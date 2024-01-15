@@ -451,11 +451,13 @@ class ClientManager {
 
     /**
      * Distribute message to a local or remote destination.
+     *
+     * @param sender non-null
      * @param msgId the router's ID for this message
      * @param messageNonce the client's ID for this message
      * @param flags ignored for local
      */
-    void distributeMessage(Destination fromDest, Destination toDest, Payload payload,
+    void distributeMessage(ClientConnectionRunner sender, Destination fromDest, Destination toDest, Payload payload,
                            MessageId msgId, long messageNonce, long expiration, int flags) { 
         ClientConnectionRunner runner;
         if (_ctx.getBooleanProperty(PROP_DISABLE_LOOPBACK)) {
@@ -467,22 +469,19 @@ class ClientManager {
         if (runner != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Message " + msgId + " is targeting a local destination.  distribute it as such");
-            ClientConnectionRunner sender = getRunner(fromDest);
-            if (sender == null) {
-                // sender went away
-                return;
+            if (runner != sender) {
+                // run this inline so we don't clog up the job queue
+                Job j = new DistributeLocal(toDest, runner, sender, fromDest, payload, msgId, messageNonce);
+                //_ctx.jobQueue().addJob(j);
+                j.runJob();
+            } else {
+                if (_log.shouldWarn())
+                    _log.warn("Loopback attempt from client " + fromDest.getHash());
+                int rc = MessageStatusMessage.STATUS_SEND_FAILURE_LOOPBACK;
+                sender.updateMessageDeliveryStatus(fromDest, msgId, messageNonce, rc);
             }
-            // run this inline so we don't clog up the job queue
-            Job j = new DistributeLocal(toDest, runner, sender, fromDest, payload, msgId, messageNonce);
-            //_ctx.jobQueue().addJob(j);
-            j.runJob();
         } else if (!_metaDests.isEmpty() && _metaDests.contains(toDest)) {
             // meta dests don't have runners but are local, and you can't send to them
-            ClientConnectionRunner sender = getRunner(fromDest);
-            if (sender == null) {
-                // sender went away
-                return;
-            }
             int rc = MessageStatusMessage.STATUS_SEND_FAILURE_BAD_LEASESET;
             sender.updateMessageDeliveryStatus(fromDest, msgId, messageNonce, rc);
         } else {

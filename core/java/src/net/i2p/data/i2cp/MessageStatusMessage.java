@@ -189,6 +189,13 @@ public class MessageStatusMessage extends I2CPMessageImpl {
      */
     public final static int STATUS_SEND_FAILURE_META_LEASESET = 22;
 
+    /**
+     *  Message was attempted to be sent to the same Destination.
+     *  This is a guaranteed failure.
+     *  @since 0.9.62
+     */
+    public final static int STATUS_SEND_FAILURE_LOOPBACK = 23;
+
     // NOTE:
     // Add any new status codes to handlers in:
     // net.i2p.client.impl.MessageState
