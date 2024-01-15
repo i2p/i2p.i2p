@@ -806,7 +806,7 @@ class ClientConnectionRunner {
         // the following blocks as described above
         Destination fromDest = getDestination(message.getSessionId());
         if (fromDest != null)
-            _manager.distributeMessage(fromDest, dest, payload,
+            _manager.distributeMessage(this, fromDest, dest, payload,
                                        id, message.getNonce(), expiration, flags);
         // else log error?
         //long timeToDistribute = _context.clock().now() - beforeDistribute;

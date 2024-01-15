@@ -56,19 +56,16 @@ class LocalClientManager extends ClientManager {
      * @param flags ignored for local
      */
     @Override
-    void distributeMessage(Destination fromDest, Destination toDest, Payload payload,
+    void distributeMessage(ClientConnectionRunner sender, Destination fromDest, Destination toDest, Payload payload,
                            MessageId msgId, long messageNonce, long expiration, int flags) { 
         // check if there is a runner for it
-        ClientConnectionRunner sender = getRunner(fromDest);
         ClientConnectionRunner runner = getRunner(toDest);
         if (runner != null) {
             if (dropX1000 > 0) {
                 if (100 * 1000 * _ctx.random().nextFloat() < dropX1000) {
                     System.out.println("Message " + msgId + " DROPPED randomly");
-                    if (sender != null) {
-                        // pretend success
-                        sender.updateMessageDeliveryStatus(fromDest, msgId, messageNonce, MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS);
-                    }
+                    // pretend success
+                    sender.updateMessageDeliveryStatus(fromDest, msgId, messageNonce, MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS);
                 }
             }
             if (latency > 0 || jitter > 0) {
@@ -83,15 +80,12 @@ class LocalClientManager extends ClientManager {
                 }
             }
             boolean ok = runner.receiveMessage(toDest, fromDest, payload);
-            if (sender != null) {
-                int rc = ok ? MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL : MessageStatusMessage.STATUS_SEND_FAILURE_LOCAL;
-                sender.updateMessageDeliveryStatus(fromDest, msgId, messageNonce, rc);
-            }
+            int rc = ok ? MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL : MessageStatusMessage.STATUS_SEND_FAILURE_LOCAL;
+            sender.updateMessageDeliveryStatus(fromDest, msgId, messageNonce, rc);
         } else {
             // remote.  ignore.
             System.out.println("Message " + msgId + " is targeting a REMOTE destination - DROPPED");
-            if (sender != null)
-                sender.updateMessageDeliveryStatus(fromDest, msgId, messageNonce, MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE);
+            sender.updateMessageDeliveryStatus(fromDest, msgId, messageNonce, MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE);
         }
     }
 
@@ -113,10 +107,8 @@ class LocalClientManager extends ClientManager {
 
         public void timeReached() {
             boolean ok = r.receiveMessage(td, fd, pl);
-            if (s != null) {
-                int rc = ok ? MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL : MessageStatusMessage.STATUS_SEND_FAILURE_LOCAL;
-                s.updateMessageDeliveryStatus(fd, id, nonce, rc);
-            }
+            int rc = ok ? MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL : MessageStatusMessage.STATUS_SEND_FAILURE_LOCAL;
+            s.updateMessageDeliveryStatus(fd, id, nonce, rc);
         }
     }
 

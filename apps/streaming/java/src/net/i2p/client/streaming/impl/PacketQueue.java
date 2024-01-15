@@ -324,6 +324,7 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
             case MessageStatusMessage.STATUS_SEND_FAILURE_DESTINATION:
             case MessageStatusMessage.STATUS_SEND_FAILURE_BAD_LEASESET:
             case MessageStatusMessage.STATUS_SEND_FAILURE_EXPIRED_LEASESET:
+            case MessageStatusMessage.STATUS_SEND_FAILURE_LOOPBACK:
             case SendMessageStatusListener.STATUS_CANCELLED:
                 if (con.getHighestAckedThrough() >= 0) {
                     // a retxed SYN succeeded before the first SYN failed
