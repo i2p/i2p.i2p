@@ -1,7 +1,18 @@
+2024-01-15 zzz
+ * I2CP: Prevent loopback messages to same session (i2pd Github #2005, Gitlab MR !173)
+ * i2psnark: Bandwidth limiter improvements (Gitlab MR !164)
+
+2024-01-14 zzz
+ * Data: Store compressed RI and LS in compressed form (Gitlab MR !171)
+ * i2ptunnel:
+   - Add utilities for keepalive (WIP) (Gitlab MR !166)
+   - Don't send HTML errors on CONNECT sockets (Gitlab MR !175)
+ * Transport: Remove SSU1 code from PacketHandler (Gitlab MR !174)
+
 2024-01-10 zzz
- * Console: Fix iframe size issues
- * Susimail: Add markdown js for plain text content
- * SSU2: Delay sending relay tag
+ * Console: Fix iframe size issues (Gitlab MR !160)
+ * Susimail: Add markdown js for plain text content (Gitlab MR !161)
+ * SSU2: Delay sending relay tag (Gitlab MR !169)
 
 2024-01-08 zzz
  * Transport: Ignore SSU1 enable config
