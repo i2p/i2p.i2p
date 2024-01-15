@@ -73,6 +73,7 @@ class PeerConnectionOut implements Runnable
   {
     try
       {
+        boolean shouldThrottleRequests = false;
         while (!quit && peer.isConnected())
           {
             Message m = null;
@@ -89,7 +90,7 @@ class PeerConnectionOut implements Runnable
 
             synchronized(sendQueue)
               {
-                while (!quit && peer.isConnected() && sendQueue.isEmpty())
+                while (!quit && peer.isConnected() && (shouldThrottleRequests || sendQueue.isEmpty()))
                   {
                     try
                       {
@@ -98,12 +99,13 @@ class PeerConnectionOut implements Runnable
                         // dout.flush();
                         
                         // Wait till more data arrives.
-                        sendQueue.wait(60*1000);
+                        sendQueue.wait(shouldThrottleRequests ? 5000 : 60*1000);
                       }
                     catch (InterruptedException ie)
                       {
                         /* ignored */
                       }
+                    shouldThrottleRequests = false;
                   }
                 state = peer.state;
                 if (!quit && state != null && peer.isConnected())
@@ -125,7 +127,6 @@ class PeerConnectionOut implements Runnable
                           {
                             if (state.choking) {
                               it.remove();
-                              //SimpleTimer.getInstance().removeEvent(nm.expireEvent);
                               if (peer.supportsFast()) {
                                   Message r = new Message(Message.REJECT, nm.piece, nm.begin, nm.length);
                                   if (_log.shouldLog(Log.DEBUG))
@@ -135,23 +136,50 @@ class PeerConnectionOut implements Runnable
                             }
                             nm = null;
                           }
-                        else if (nm.type == Message.REQUEST && state.choked)
+                        else if (nm.type == Message.REQUEST)
                           {
-                            it.remove();
-                            //SimpleTimer.getInstance().removeEvent(nm.expireEvent);
-                            nm = null;
+                            if (state.choked) {
+                                it.remove();
+                                nm = null;
+                            } else if (shouldThrottleRequests) {
+                                // previous request in queue throttled, skip this one too
+                                if (_log.shouldWarn())
+                                    _log.warn("Additional throttle: " + nm + " to " + peer);
+                                nm = null;
+                            } else if (!peer.shouldRequest(nm.length)) {
+                                // request throttle, skip this and all others in this loop
+                                if (_log.shouldWarn())
+                                    _log.warn("Throttle: " + nm + " to " + peer);
+                                shouldThrottleRequests = true;
+                                nm = null;
+                            }
                           }
                           
                         if (nm != null)
                           {
                             m = nm;
-                            //SimpleTimer.getInstance().removeEvent(nm.expireEvent);
                             it.remove();
                           }
                       }
                     if (m == null) {
-                      m = sendQueue.poll();
-                      //SimpleTimer.getInstance().removeEvent(m.expireEvent);
+                        m = sendQueue.peek();
+                        if (m != null && m.type == Message.PIECE) {
+                            // bandwidth limiting
+                            // Pieces are the last thing in the queue to be sent so we can
+                            // simply wait right here and then loop
+                            if (!peer.shouldSend(Math.min(m.length, PeerState.PARTSIZE))) {
+                                if (_log.shouldWarn())
+                                    _log.warn("Throttle: " + m + " to " + peer);
+                                try {
+                                    sendQueue.wait(5000);
+                                } catch (InterruptedException ie) {}
+                                continue;
+                            }
+                        } else if (m != null && m.type == Message.REQUEST) {
+                            if (shouldThrottleRequests)
+                                continue;
+                        }
+                        m = sendQueue.poll();
                     }
                   }
               }
@@ -178,17 +206,14 @@ class PeerConnectionOut implements Runnable
                 // only count the rest of the upload after sendMessage().
                 int remainder = 0;
                 if (m.type == Message.PIECE) {
-                  if (m.len <= PeerState.PARTSIZE) {
-                     state.uploaded(m.len);
-                  } else {
-                     state.uploaded(PeerState.PARTSIZE);
+                  // first PARTSIZE was signalled in shouldSend() above
+                  if (m.len > PeerState.PARTSIZE)
                      remainder = m.len - PeerState.PARTSIZE;
-                  }
                 }
 
                 m.sendMessage(dout);
                 if (remainder > 0)
-                  state.uploaded(remainder);
+                    peer.uploaded(remainder);
                 m = null;
               }
           }

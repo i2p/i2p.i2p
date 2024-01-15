@@ -6,6 +6,7 @@ package org.klomp.snark;
 
 import java.util.Properties;
 
+import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
@@ -32,7 +33,9 @@ class BWLimits {
             session.connect();
             rv = session.bandwidthLimits();
             session.destroySession();
-        } catch (I2PSessionException ise) {}
+        } catch (I2PSessionException ise) {
+            I2PAppContext.getGlobalContext().logManager().getLog(BWLimits.class).warn("BWL fail", ise);
+        }
         return rv;
     }
 

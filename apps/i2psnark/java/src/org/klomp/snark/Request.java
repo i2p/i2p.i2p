@@ -74,8 +74,8 @@ class Request
   /**
    *  @since 0.9.1
    */
-  public void read(DataInputStream din) throws IOException {
-      piece.read(din, off, len);
+  public void read(DataInputStream din, BandwidthListener bwl) throws IOException {
+      piece.read(din, off, len, bwl);
   }
 
   /**

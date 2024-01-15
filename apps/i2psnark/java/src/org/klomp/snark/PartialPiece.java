@@ -2,6 +2,7 @@ package org.klomp.snark;
 
 import java.io.DataInputStream;
 import java.io.DataOutput;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -43,6 +44,7 @@ class PartialPiece implements Comparable<PartialPiece> {
     private RandomAccessFile raf;
     private final int pclen;
     private final File tempDir;
+    private final BitField bitfield;
 
     private static final int BUFSIZE = PeerState.PARTSIZE;
     private static final ByteCache _cache = ByteCache.getInstance(16, BUFSIZE);
@@ -66,6 +68,7 @@ class PartialPiece implements Comparable<PartialPiece> {
         this.pclen = len;
         //this.createdTime = 0;
         this.tempDir = tempDir;
+        bitfield = new BitField((len + PeerState.PARTSIZE - 1) / PeerState.PARTSIZE);
 
         // temps for finals
         byte[] tbs = null;
@@ -98,22 +101,27 @@ class PartialPiece implements Comparable<PartialPiece> {
         //tfile = SecureFile.createTempFile("piece", null, tempDir);
         // debug
         tempfile = SecureFile.createTempFile("piece_" + piece.getId() + '_', null, tempDir);
-        //I2PAppContext.getGlobalContext().logManager().getLog(PartialPiece.class).warn("Created " + tempfile);
-        // tfile.deleteOnExit() ???
         raf = new RandomAccessFile(tempfile, "rw");
-        // Do not preallocate the file space.
-        // Not necessary to call setLength(), file is extended when written
-        //traf.setLength(len);
     }
 
     /**
      *  Convert this PartialPiece to a request for the next chunk.
-     *  Used by PeerState only. This depends on the downloaded value
-     *  as set by setDownloaded() or read().
+     *  Used by PeerState only.
+     *
+     *  @return null if complete
      */
-
     public synchronized Request getRequest() {
-        return new Request(this, this.off, Math.min(this.pclen - this.off, PeerState.PARTSIZE));
+        int chunk = off / PeerState.PARTSIZE;
+        int sz = bitfield.size();
+        for (int i = chunk; i < sz; i++) {
+            if (!bitfield.get(i))
+                return new Request(this, off, Math.min(pclen - off, PeerState.PARTSIZE));
+            if (i == sz - 1)
+                off = pclen;
+            else
+                off += PeerState.PARTSIZE;
+        }
+        return null;
     }
 
     /** piece number */
@@ -129,27 +137,19 @@ class PartialPiece implements Comparable<PartialPiece> {
     }
 
     /**
-     *  How many bytes are good - as set by setDownloaded() or read()
+     *  @since 0.9.62
+     */
+    public synchronized boolean isComplete() {
+         return bitfield.complete();
+    }
+
+    /**
+     *  How many consecutive bytes are good - as set by read().
+     *  There may be more good bytes after "holes".
      */
     public synchronized int getDownloaded() {
          return this.off;
     }
-
-    /**
-     *  Call this if necessary before returning a PartialPiece to the PeerCoordinator.
-     *  We do not use a bitmap to track individual chunks received.
-     *  Any chunks after a 'hole' will be lost.
-     *  @since 0.9.1
-     */
-    public synchronized void setDownloaded(int offset) {
-         this.off = offset;
-    }
-
-/****
-    public long getCreated() {
-         return this.createdTime;
-    }
-****/
 
     /**
      *  Piece must be complete.
@@ -200,13 +200,47 @@ class PartialPiece implements Comparable<PartialPiece> {
      *
      *  @since 0.9.1
      */
-    public void read(DataInputStream din, int offset, int len) throws IOException {
+    public void read(DataInputStream din, int offset, int len, BandwidthListener bwl) throws IOException {
+        if (offset % PeerState.PARTSIZE != 0)
+            throw new IOException("Bad offset " + offset);
+        int chunk = offset / PeerState.PARTSIZE;
+        // We read the data before checking if we have the chunk,
+        // because otherwise we'd have to break the peer connection
         if (bs != null) {
-            din.readFully(bs, offset, len);
+            // Don't use readFully() so we may update the BandwidthListener as we go
+            //in.readFully(bs, offset, len);
+            int offs = offset;
+            int toRead = len;
+            while (toRead > 0) {
+                int numRead = din.read(bs, offs, toRead);
+                if (numRead < 0)
+                    throw new EOFException();
+                offs += numRead;
+                toRead -= numRead;
+                bwl.downloaded(numRead);
+            }
             synchronized (this) {
-                // only works for in-order chunks
-                if (this.off == offset)
-                    this.off += len;
+                if (bitfield.get(chunk)) {
+                    warn("Already have chunk " + chunk + " on " + this);
+                } else {
+                    bitfield.set(chunk);
+                    if (this.off == offset) {
+                        this.off += len;
+                        // if this filled in a hole, advance off
+                        int sz = bitfield.size();
+                        for (int i = chunk + 1; i < sz; i++) {
+                            if (!bitfield.get(i))
+                                break;
+                            warn("Hole filled in before chunk " + i + " on " + this + ' ' + bitfield);
+                            if (i == sz - 1)
+                                off = pclen;
+                            else
+                                off += PeerState.PARTSIZE;
+                        }
+                    } else {
+                        warn("Out of order chunk " + chunk + " on " + this + ' ' + bitfield);
+                    }
+                }
             }
         } else {
             // read in fully before synching on raf
@@ -219,15 +253,46 @@ class PartialPiece implements Comparable<PartialPiece> {
                 ba = null;
                 tmp = new byte[len];
             }
-            din.readFully(tmp);
+
+            // Don't use readFully() so we may update the BandwidthListener as we go
+            //din.readFully(tmp);
+            int offs = 0;
+            int toRead = len;
+            while (toRead > 0) {
+                int numRead = din.read(tmp, offs, toRead);
+                if (numRead < 0)
+                    throw new EOFException();
+                offs += numRead;
+                toRead -= numRead;
+                bwl.downloaded(numRead);
+            }
+
             synchronized (this) {
-                if (raf == null)
-                    createTemp();
-                raf.seek(offset);
-                raf.write(tmp);
-                // only works for in-order chunks
-                if (this.off == offset)
-                    this.off += len;
+                if (bitfield.get(chunk)) {
+                    warn("Already have chunk " + chunk + " on " + this);
+                } else {
+                    if (raf == null)
+                        createTemp();
+                    raf.seek(offset);
+                    raf.write(tmp);
+                    bitfield.set(chunk);
+                    if (this.off == offset) {
+                        this.off += len;
+                        // if this filled in a hole, advance off
+                        int sz = bitfield.size();
+                        for (int i = chunk + 1; i < sz; i++) {
+                            if (!bitfield.get(i))
+                                break;
+                            warn("Hole filled in before chunk " + i + " on " + this + ' ' + bitfield);
+                            if (i == sz - 1)
+                                off = pclen;
+                            else
+                                off += PeerState.PARTSIZE;
+                        }
+                    } else {
+                        warn("Out of order chunk " + chunk + " on " + this + ' ' + bitfield);
+                    }
+                }
             }
             if (ba != null)
                 _cache.release(ba, false);
@@ -300,7 +365,6 @@ class PartialPiece implements Comparable<PartialPiece> {
         try {
             raf.close();
         } catch (IOException ioe) {
-            I2PAppContext.getGlobalContext().logManager().getLog(PartialPiece.class).warn("Error closing " + raf, ioe);
         }
         tempfile.delete();
     }
@@ -338,5 +402,12 @@ class PartialPiece implements Comparable<PartialPiece> {
     @Override
     public String toString() {
         return "Partial(" + piece.getId() + ',' + off + ',' + pclen + ')';
+    }
+
+    /**
+     *  @since 0.9.62
+     */
+    public static void warn(String s) {
+        I2PAppContext.getGlobalContext().logManager().getLog(PartialPiece.class).warn(s);
     }
 }

@@ -121,36 +121,6 @@ interface PeerListener
   ByteArray gotRequest(Peer peer, int piece, int off, int len);
 
   /**
-   * Called when a (partial) piece has been downloaded from the peer.
-   *
-   * @param peer the Peer from which size bytes where downloaded.
-   * @param size the number of bytes that where downloaded.
-   */
-  void downloaded(Peer peer, int size);
-
-  /**
-   * Called when a (partial) piece has been uploaded to the peer.
-   *
-   * @param peer the Peer to which size bytes where uploaded.
-   * @param size the number of bytes that where uploaded.
-   */
-  void uploaded(Peer peer, int size);
-
-  /**
-   * Called when we are downloading from the peer and need to ask for
-   * a new piece. Might be called multiple times before
-   * <code>gotPiece()</code> is called.
-   *
-   * @param peer the Peer that will be asked to provide the piece.
-   * @param bitfield a BitField containing the pieces that the other
-   * side has.
-   *
-   * @return one of the pieces from the bitfield that we want or -1 if
-   * we are no longer interested in the peer.
-   */
-  int wantPiece(Peer peer, BitField bitfield);
-
-  /**
    * Called when we are downloading from the peer and may need to ask for
    * a new piece. Returns true if wantPiece() or getPartialPiece() would return a piece.
    *

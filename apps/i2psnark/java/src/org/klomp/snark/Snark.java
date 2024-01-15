@@ -608,7 +608,7 @@ public class Snark
         if (_log.shouldLog(Log.INFO))
             _log.info("Starting PeerCoordinator, ConnectionAcceptor, and TrackerClient");
         activity = "Collecting pieces";
-        coordinator = new PeerCoordinator(_util, id, infoHash, meta, storage, this, this);
+        coordinator = new PeerCoordinator(_util, id, infoHash, meta, storage, this, this, completeListener.getBandwidthListener());
         coordinator.setUploaded(savedUploaded);
         if (_peerCoordinatorSet != null) {
             // multitorrent
@@ -1468,31 +1468,6 @@ public class Snark
     if (_log.shouldLog(Log.DEBUG))
         _log.debug("Total uploaders: " + totalUploaders + " Limit: " + limit);
     return totalUploaders > limit;
-  }
-
-  /**
-   *  Is i2psnark as a whole over its limit?
-   */
-  public boolean overUpBWLimit() {
-    if (_peerCoordinatorSet == null)
-      return false;
-    long total = 0;
-    for (PeerCoordinator c : _peerCoordinatorSet) {
-      if (!c.halted())
-        total += c.getCurrentUploadRate();
-    }
-    long limit = 1024l * _util.getMaxUpBW();
-    if (_log.shouldLog(Log.INFO))
-        _log.info("Total up bw: " + total + " Limit: " + limit);
-    return total > limit;
-  }
-
-  /**
-   * Is a particular peer who has this recent download rate (in Bps) over our upstream bandwidth limit?
-   */
-  public boolean overUpBWLimit(long total) {
-    long limit = 1024l * _util.getMaxUpBW();
-    return total > limit;
   }
 
   /**
