@@ -319,6 +319,13 @@ class UpdateRunner implements UpdateTask, CompleteListener {
         return _smgr.shouldAutoStart();
     }
 
+    /**
+     * @since 0.9.62
+     */
+    public BandwidthListener getBandwidthListener() {
+        return _smgr.getBandwidthListener();
+    }
+
     //////// end CompleteListener methods
 
     private static String linkify(String url) {

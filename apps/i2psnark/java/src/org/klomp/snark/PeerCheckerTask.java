@@ -113,8 +113,7 @@ class PeerCheckerTask implements Runnable
             uploaded += upload;
             long download = peer.getDownloaded();
             downloaded += download;
-	    peer.setRateHistory(upload, download);
-            peer.resetCounters();
+            peer.setRateHistory();
 
             if (_log.shouldLog(Log.DEBUG)) {
                 _log.debug(peer + ":"
@@ -127,10 +126,9 @@ class PeerCheckerTask implements Runnable
             }
 
             // Choke a percentage of them rather than all so it isn't so drastic...
-            // unless this torrent is over the limit all by itself.
-            // choke 5/8 of the time when seeding and 3/8 when leeching
+            // choke 3/8 of the time when seeding and 1/4 when leeching
             boolean overBWLimitChoke = upload > 0 &&
-                                       ((overBWLimit && (random.nextInt(8) > (coordinator.completed() ? 2 : 4))) ||
+                                       ((overBWLimit && (random.nextInt(8) > (coordinator.completed() ? 4 : 5))) ||
                                         (coordinator.overUpBWLimit(uploaded)));
 
             // If we are at our max uploaders and we have lots of other

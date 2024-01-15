@@ -157,7 +157,7 @@ class PeerConnectionIn implements Runnable
                 Request req = ps.getOutstandingRequest(piece, begin, len);
                 if (req != null)
                   {
-                    req.read(din);
+                    req.read(din, peer);
                     if (_log.shouldLog(Log.DEBUG)) 
                         _log.debug("Received data(" + piece + "," + begin + ") from " + peer);
                     ps.pieceMessage(req);

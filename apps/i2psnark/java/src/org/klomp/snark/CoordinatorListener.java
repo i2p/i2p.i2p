@@ -42,15 +42,5 @@ interface CoordinatorListener
    */
   public boolean overUploadLimit(int uploaders);
 
-  /**
-   *  Is i2psnark as a whole over its limit?
-   */
-  public boolean overUpBWLimit();
-
-  /**
-   * Is a particular peer who has this recent download rate (in Bps) over our upstream bandwidth limit?
-   */
-  public boolean overUpBWLimit(long total);
-
   public void addMessage(String message);
 }

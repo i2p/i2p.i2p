@@ -40,7 +40,7 @@ import net.i2p.util.Log;
 import org.klomp.snark.bencode.BEValue;
 import org.klomp.snark.bencode.InvalidBEncodingException;
 
-public class Peer implements Comparable<Peer>
+public class Peer implements Comparable<Peer>, BandwidthListener
 {
   protected final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
   // Identifying property, the peer id of the other side.
@@ -239,7 +239,7 @@ public class Peer implements Comparable<Peer>
    *
    * @param uploadOnly if we are complete with skipped files, i.e. a partial seed
    */
-  public void runConnection(I2PSnarkUtil util, PeerListener listener, BitField bitfield,
+  public void runConnection(I2PSnarkUtil util, PeerListener listener, BandwidthListener bwl, BitField bitfield,
                             MagnetState mState, boolean uploadOnly) {
     if (state != null)
       throw new IllegalStateException("Peer already started");
@@ -288,7 +288,7 @@ public class Peer implements Comparable<Peer>
 
         PeerConnectionIn in = new PeerConnectionIn(this, din);
         PeerConnectionOut out = new PeerConnectionOut(this, dout);
-        PeerState s = new PeerState(this, listener, metainfo, in, out);
+        PeerState s = new PeerState(this, listener, bwl, metainfo, in, out);
         
         if ((options & OPTION_EXTENSION) != 0) {
             if (_log.shouldLog(Log.DEBUG))
@@ -651,12 +651,17 @@ public class Peer implements Comparable<Peer>
     return (s == null) || s.choked;
   }
 
+  /////// begin BandwidthListener interface ///////
+
   /**
    * Increment the counter.
    * @since 0.8.4
    */
   public void downloaded(int size) {
       downloaded.addAndGet(size);
+      PeerState s = state;
+      if (s != null)
+          s.getBandwidthListener().downloaded(size);
   }
 
   /**
@@ -665,6 +670,9 @@ public class Peer implements Comparable<Peer>
    */
   public void uploaded(int size) {
       uploaded.addAndGet(size);
+      PeerState s = state;
+      if (s != null)
+          s.getBandwidthListener().uploaded(size);
   }
 
   /**
@@ -688,13 +696,115 @@ public class Peer implements Comparable<Peer>
   }
 
   /**
+   * Returns the average rate in Bps
+   */
+  public long getUploadRate()
+  {
+    return PeerCoordinator.getRate(uploaded_old);
+  }
+
+  public long getDownloadRate()
+  {
+    return PeerCoordinator.getRate(downloaded_old);
+  }
+
+  /**
+   * Should we send this many bytes?
+   * Do NOT call uploaded() after this.
+   * @since 0.9.62
+   */
+  public boolean shouldSend(int size) {
+    PeerState s = state;
+    if (s != null) {
+        boolean rv = s.getBandwidthListener().shouldSend(size);
+        if (rv)
+            uploaded.addAndGet(size);
+        return rv;
+    }
+    return false;
+  }
+
+  /**
+   * Should we request this many bytes?
+   * @since 0.9.62
+   */
+  public boolean shouldRequest(int size) {
+    PeerState s = state;
+    if (s != null)
+        return s.getBandwidthListener().shouldRequest(this, size);
+    return false;
+  }
+
+  /**
+   * Should we request this many bytes?
+   * @since 0.9.62
+   */
+  public boolean shouldRequest(Peer peer, int size) {
+    if (peer != this)
+        return false;
+    PeerState s = state;
+    if (s != null)
+        return s.getBandwidthListener().shouldRequest(this, size);
+    return false;
+  }
+
+  /**
+   * Current limit in Bps
+   * @since 0.9.62
+   */
+  public long getUpBWLimit() {
+    PeerState s = state;
+    if (s != null)
+      return s.getBandwidthListener().getUpBWLimit();
+    return Integer.MAX_VALUE;
+  }
+
+  /**
+   *  Is snark as a whole over its limit?
+   * @since 0.9.62
+   */
+  public boolean overUpBWLimit()
+  {
+      PeerState s = state;
+      if (s != null)
+        return s.getBandwidthListener().overUpBWLimit();
+      return false;
+  }
+
+  /**
+   * Current limit in Bps
+   * @since 0.9.62
+   */
+  public long getDownBWLimit() {
+    PeerState s = state;
+    if (s != null)
+      return s.getBandwidthListener().getDownBWLimit();
+    return Integer.MAX_VALUE;
+  }
+
+  /**
+   * Are we currently over the limit?
+   * @since 0.9.62
+   */
+  public boolean overDownBWLimit() {
+    PeerState s = state;
+    if (s != null)
+      return s.getBandwidthListener().overDownBWLimit();
+    return false;
+  }
+
+  /**
+   * Push the total uploaded/downloaded onto a RATE_DEPTH deep stack
    * Resets the downloaded and uploaded counters to zero.
    */
-  public void resetCounters()
-  {
-      downloaded.set(0);
-      uploaded.set(0);
+  void setRateHistory() {
+    long up = uploaded.getAndSet(0);
+    PeerCoordinator.setRate(up, uploaded_old);
+    long down = downloaded.getAndSet(0);
+    PeerCoordinator.setRate(down, downloaded_old);
   }
+
+  /////// end BandwidthListener interface ///////
   
   public long getInactiveTime() {
       PeerState s = state;
@@ -759,28 +869,6 @@ public class Peer implements Comparable<Peer>
     if (s == null || s.bitfield == null)
         return false;
     return s.bitfield.complete();
-  }
-
-  /**
-   * Push the total uploaded/downloaded onto a RATE_DEPTH deep stack
-   */
-  public void setRateHistory(long up, long down)
-  {
-    PeerCoordinator.setRate(up, uploaded_old);
-    PeerCoordinator.setRate(down, downloaded_old);
-  }
-
-  /**
-   * Returns the 4-minute-average rate in Bps
-   */
-  public long getUploadRate()
-  {
-    return PeerCoordinator.getRate(uploaded_old);
-  }
-
-  public long getDownloadRate()
-  {
-    return PeerCoordinator.getRate(downloaded_old);
   }
 
   /** @since 0.9.31 */

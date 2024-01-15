@@ -83,4 +83,9 @@ public interface CompleteListener {
      * @since 0.9.42
      */
     public boolean shouldAutoStart();
+
+    /**
+     * @since 0.9.62
+     */
+    public BandwidthListener getBandwidthListener();
 }

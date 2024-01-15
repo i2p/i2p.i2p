@@ -122,7 +122,7 @@ class WebPeer extends Peer implements EepGet.StatusListener {
    * @param uploadOnly if we are complete with skipped files, i.e. a partial seed
    */
   @Override
-  public void runConnection(I2PSnarkUtil util, PeerListener listener, BitField ignore,
+  public void runConnection(I2PSnarkUtil util, PeerListener listener, BandwidthListener bwl, BitField ignore,
                             MagnetState mState, boolean uploadOnly) {
       if (uploadOnly)
           return;
@@ -204,6 +204,8 @@ class WebPeer extends Peer implements EepGet.StatusListener {
                       if (i >= maxRequests)
                           break;
                       Request r = outstandingRequests.get(i);
+                      if (!shouldRequest(r.len))
+                          break;
                       if (r.getPiece() == piece &&
                           lastRequest.off + lastRequest.len == r.off) {
                           requests.add(r);
@@ -340,7 +342,7 @@ class WebPeer extends Peer implements EepGet.StatusListener {
                               Request req = iter.next();
                               if (dis.available() < req.len)
                                   break;
-                              req.read(dis);
+                              req.read(dis, this);
                               iter.remove();
                               if (_log.shouldWarn())
                                   _log.warn("Saved chunk " + req + " recvd before failure");
@@ -363,7 +365,7 @@ class WebPeer extends Peer implements EepGet.StatusListener {
                   _log.debug("Fetch of piece: " + piece + " chunks: " + requests.size() + " offset: " + off + " torrent offset: " + toff + " len: " + tlen + " successful");
               DataInputStream dis = new DataInputStream(new ByteArrayInputStream(out.toByteArray()));
               for (Request req : requests) {
-                  req.read(dis);
+                  req.read(dis, this);
               }
 
               PartialPiece pp = last.getPartialPiece();
@@ -519,6 +521,29 @@ class WebPeer extends Peer implements EepGet.StatusListener {
       return false;
   }
 
+  // begin BandwidthListener interface overrides
+  // Because super doesn't have a PeerState
+
+  /**
+   * @since 0.9.62
+   */
+  @Override
+  public void downloaded(int size) {
+      super.downloaded(size);
+      _coordinator.downloaded(size);
+  }
+
+  /**
+   * Should we request this many bytes?
+   * @since 0.9.62
+   */
+  @Override
+  public boolean shouldRequest(int size) {
+      return _coordinator.shouldRequest(this, size);
+  }
+
+  // end BandwidthListener interface overrides
+
   // private methods below here implementing parts of PeerState
 
   private synchronized void addRequest() {
@@ -548,7 +573,8 @@ class WebPeer extends Peer implements EepGet.StatusListener {
                   Request req = new Request(nextPiece,nextBegin, nextLength);
                   outstandingRequests.add(req);
                   lastRequest = req;
-                  this.notifyAll();
+                  if (shouldRequest(maxLength))
+                      this.notifyAll();
               }
           }
       }
@@ -567,7 +593,8 @@ class WebPeer extends Peer implements EepGet.StatusListener {
               Request r = pp.getRequest();
               outstandingRequests.add(r);
               lastRequest = r;
-              this.notifyAll();
+              if (shouldRequest(r.len))
+                  this.notifyAll();
               return true;
           } else {
               if (_log.shouldLog(Log.WARN))
@@ -653,8 +680,6 @@ class WebPeer extends Peer implements EepGet.StatusListener {
 
     public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {
         lastRcvd = System.currentTimeMillis();
-        downloaded(currentWrite);
-        listener.downloaded(this, currentWrite);
     }
 
     public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause) {}

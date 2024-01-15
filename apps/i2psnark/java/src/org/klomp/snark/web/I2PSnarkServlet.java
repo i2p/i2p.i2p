@@ -48,6 +48,7 @@ import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 import net.i2p.util.UIMessages;
 
+import org.klomp.snark.BandwidthListener;
 import org.klomp.snark.I2PSnarkUtil;
 import org.klomp.snark.MagnetURI;
 import org.klomp.snark.MetaInfo;
@@ -835,6 +836,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     out.write(' ');
                     out.write(_t("Dht Debug"));
                     out.write("</label><div id=\"dhtDebugInner\">");
+                    out.write(_manager.getBandwidthListener().toString());
                     out.write(dht.renderStatusHTML());
                     out.write("</div></div></th>");
                 }
@@ -1452,6 +1454,7 @@ public class I2PSnarkServlet extends BasicServlet {
             String i2cpOpts = buildI2CPOpts(req);
             String upLimit = req.getParameter("upLimit");
             String upBW = req.getParameter("upBW");
+            String downBW = req.getParameter("downBW");
             String refreshDel = req.getParameter("refreshDelay");
             String startupDel = req.getParameter("startupDelay");
             String pageSize = req.getParameter("pageSize");
@@ -1467,7 +1470,7 @@ public class I2PSnarkServlet extends BasicServlet {
             boolean collapsePanels = req.getParameter("collapsePanels") != null;
             _manager.updateConfig(dataDir, filesPublic, autoStart, smartSort, refreshDel, startupDel, pageSize,
                                   seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts,
-                                  upLimit, upBW, useOpenTrackers, useDHT, theme,
+                                  upLimit, upBW, downBW, useOpenTrackers, useDHT, theme,
                                   lang, ratings, comments, commentsName, collapsePanels);
             // update servlet
             try {
@@ -2826,7 +2829,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(":<td><input type=\"text\" name=\"upBW\" class=\"r\" value=\""
                   + _manager.util().getMaxUpBW() + "\" size=\"4\" maxlength=\"4\""
                   + " title=\"");
-        out.write(_t("Maximum bandwidth allocated for uploading"));
+        out.write(_t("Maximum bandwidth allocated"));
         out.write("\"> KBps <td id=\"bwHelp\"><i>");
         out.write(_t("Half available bandwidth recommended."));
         if (_context.isRouterContext()) {
@@ -2836,6 +2839,24 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write(_t("Configure"));
             out.write("]</a>");
         }
+        out.write("\n" +
+
+                  "<tr><td>");
+        out.write(_t("Down bandwidth limit"));
+        out.write(":<td><input type=\"text\" name=\"downBW\" class=\"r\" value=\""
+                  + (_manager.getBandwidthListener().getDownBWLimit() / 1000) + "\" size=\"4\" maxlength=\"4\""
+                  + " title=\"");
+        out.write(_t("Maximum bandwidth allocated"));
+        out.write("\"> KBps <td id=\"bwHelp\"><i>");
+        out.write(_t("Half available bandwidth recommended."));
+        if (_context.isRouterContext()) {
+            out.write("</i> <a href=\"/config.jsp\" target=\"blank\" title=\"");
+            out.write(_t("View or change router bandwidth"));
+            out.write("\">[");
+            out.write(_t("Configure"));
+            out.write("]</a>");
+        }
+
         out.write("\n<tr><td><label for=\"useOpenTrackers\">");
         out.write(_t("Use open trackers also"));
         out.write(":</label><td colspan=\"2\"><input type=\"checkbox\" class=\"optbox\" name=\"useOpenTrackers\" id=\"useOpenTrackers\" value=\"true\" "
