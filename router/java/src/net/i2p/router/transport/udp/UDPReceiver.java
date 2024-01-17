@@ -248,8 +248,8 @@ class UDPReceiver {
                         _socket.receive(dpacket);
                     //}
                     int size = dpacket.getLength();
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("After blocking socket.receive: packet is " + size + " bytes on " + System.identityHashCode(packet));
+                    //if (_log.shouldDebug())
+                    //    _log.debug("After blocking socket.receive: packet is " + size + " bytes on " + System.identityHashCode(packet));
                     packet.resetBegin();
             
                     // and block after we know how much we read but before
@@ -261,7 +261,7 @@ class UDPReceiver {
                     if (_context.commSystem().isDummy()) {
                         // testing
                         packet.release();
-                    } else if (size > 0) {
+                    } else if (size >= SSU2Util.MIN_DATA_LEN) {
                         //FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestInbound(size, "UDP receiver");
                         //_context.bandwidthLimiter().requestInbound(req, size, "UDP receiver");
                         FIFOBandwidthLimiter.Request req =
@@ -280,11 +280,9 @@ class UDPReceiver {
                         receive(packet);
                         //_context.statManager().addRateData("udp.receivePacketSize", size);
                     } else {
-                        _context.statManager().addRateData("udp.receiveHolePunch", 1);
-                        // nat hole punch packets are 0 bytes
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("Received a 0 byte udp packet from " + dpacket.getAddress() + ":" + dpacket.getPort());
-                        _transport.getEstablisher().receiveHolePunch(dpacket.getAddress(), dpacket.getPort());
+                        // SSU1 had 0 byte hole punch, SSU2 does not
+                        if (_log.shouldWarn())
+                            _log.warn("Dropping short " + size + " byte udp packet from " + dpacket.getAddress() + ":" + dpacket.getPort());
                         packet.release();
                     }
                 } catch (IOException ioe) {
