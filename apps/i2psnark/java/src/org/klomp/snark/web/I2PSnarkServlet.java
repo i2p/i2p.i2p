@@ -346,7 +346,8 @@ public class I2PSnarkServlet extends BasicServlet {
                       "var deleteMessage2 = \"" + _t("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?") + "\";\n" +
                       "</script>\n" +
                       "<script src=\".resources/js/delete.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n" +
-                      "<script src=\".resources/js/search.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
+                      "<script src=\".resources/js/search.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n" +
+                      "<script src=\".resources/js/dnd.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
         }
         out.write(HEADER_A + _themePath + HEADER_B);
 
@@ -2535,7 +2536,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("\" name=\"foo\" ><br>\n" +
                   "<tr><td>");
         out.write(_t("Torrent file"));
-        out.write(":<td><input type=\"file\" name=\"newFile\" accept=\".torrent\"/>\n" +
+        out.write(":<td><input type=\"file\" name=\"newFile\" id=\"newFile\" accept=\".torrent\"/>\n" +
                   "<tr><td>");
 
         out.write(_t("Data dir"));
