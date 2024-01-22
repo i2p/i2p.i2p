@@ -647,6 +647,15 @@ input.new_upload {
      float: right;
 }
 
+#new_upload.highlight {
+     background: #f60 url(images/attach.png);
+}
+
+#new_filename.highlight {
+     background: #f60;
+     color: #fff;
+}
+
 * {
      outline: none;
 }
@@ -1000,7 +1009,7 @@ div.attached {
 }
 
 img.thumb {
-     margin: 0px 8px;
+     margin: 0px 8px -10px 8px;
      max-height: 64px;
      max-width: 128px;
 }
