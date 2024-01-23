@@ -1061,7 +1061,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         try {
             URI u = new URI(uri);
             String h = u.getHost();
-            String hu = IDN.toUnicode(h);
+            String hu = IDN.toUnicode(h, IDN.ALLOW_UNASSIGNED);
             if (hu == null || h.equals(hu))
                 return uri;
             int idx = uri.indexOf(h);
@@ -1083,7 +1083,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
              return host;
         if (!host.contains("xn--"))
              return host;
-        return IDN.toUnicode(host);
+        return IDN.toUnicode(host, IDN.ALLOW_UNASSIGNED);
     }
 
     /**

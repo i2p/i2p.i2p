@@ -89,7 +89,7 @@ public class AddressBean
 	 */
 	public static String toUnicode(String host) {
 		if (haveIDN)
-			return IDN.toUnicode(host);
+			return IDN.toUnicode(host, IDN.ALLOW_UNASSIGNED);
 		return host;
 	}
 
@@ -99,7 +99,7 @@ public class AddressBean
 	 */
 	public boolean isIDN()
 	{
-		return haveIDN && !IDN.toUnicode(name).equals(name);
+		return haveIDN && !IDN.toUnicode(name, IDN.ALLOW_UNASSIGNED).equals(name);
 	}
 
 	private static final char DOT = '.';
