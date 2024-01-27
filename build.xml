@@ -1203,6 +1203,7 @@
         <ant dir="installer/resources/locale" target="distclean" />
         <ant dir="installer/tools/java" target="distclean" />
         <delete dir="installer/lib/izpack5/patches/java/build" quiet="true" />
+        <delete dir="reproducible/build" />
 	<!--
 		NOTE! We need to turn off the default excludes for these
 		patterns to work.
