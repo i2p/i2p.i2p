@@ -6,11 +6,11 @@ class RrdDouble<U extends RrdUpdater<U>> extends RrdPrimitive<U> {
     private double cache;
     private boolean cached = false;
 
-    RrdDouble(RrdUpdater<U> updater, boolean isConstant) throws IOException {
+    RrdDouble(RrdUpdater<U> updater, boolean isConstant) {
         super(updater, RrdDouble.RRD_DOUBLE, isConstant);
     }
 
-    RrdDouble(RrdUpdater<U> updater) throws IOException {
+    RrdDouble(RrdUpdater<U> updater) {
         super(updater, RrdDouble.RRD_DOUBLE, false);
     }
 

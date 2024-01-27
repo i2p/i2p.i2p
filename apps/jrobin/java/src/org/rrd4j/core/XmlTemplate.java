@@ -24,8 +24,8 @@ public abstract class XmlTemplate {
     private static final Pattern PATTERN = Pattern.compile(PATTERN_STRING);
 
     protected Element root;
-    private HashMap<String, Object> valueMap = new HashMap<>();
-    private HashSet<Node> validatedNodes = new HashSet<>();
+    private final HashMap<String, Object> valueMap = new HashMap<>();
+    private final HashSet<Node> validatedNodes = new HashSet<>();
 
     /**
      * <p>Constructor for XmlTemplate.</p>
@@ -85,7 +85,7 @@ public abstract class XmlTemplate {
      * @param value value to be set in the XML template
      */
     public void setVariable(String name, int value) {
-        valueMap.put(name, Integer.valueOf(value));
+        valueMap.put(name, value);
     }
 
     /**
@@ -97,7 +97,7 @@ public abstract class XmlTemplate {
      * @param value value to be set in the XML template
      */
     public void setVariable(String name, long value) {
-        valueMap.put(name, Long.valueOf(value));
+        valueMap.put(name, value);
     }
 
     /**
@@ -109,7 +109,7 @@ public abstract class XmlTemplate {
      * @param value value to be set in the XML template
      */
     public void setVariable(String name, double value) {
-        valueMap.put(name, Double.valueOf(value));
+        valueMap.put(name, value);
     }
 
     /**
@@ -185,7 +185,7 @@ public abstract class XmlTemplate {
     /**
      * Returns the list of variables that should be set in this template.
      *
-     * @return List of variable names as an array of strings.
+     * @return Array of variable names as an array of strings.
      */
     public String[] getVariables() {
         ArrayList<String> list = new ArrayList<>();
@@ -198,7 +198,7 @@ public abstract class XmlTemplate {
             }
         }
 
-        return list.toArray(new String[list.size()]);
+        return list.toArray(new String[0]);
     }
 
     /**
@@ -301,7 +301,7 @@ public abstract class XmlTemplate {
             String var = matcher.group(1);
             if (valueMap.containsKey(var)) {
                 // mapping found
-                result.append(templateValue.substring(lastMatchEnd, matcher.start()));
+                result.append(templateValue, lastMatchEnd, matcher.start());
                 result.append(valueMap.get(var).toString());
                 lastMatchEnd = matcher.end();
             }

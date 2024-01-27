@@ -396,7 +396,7 @@ class RpnCalculator {
             @Override
             void do_method(RpnCalculator c, State s) {
                 TimeZone tz = s.getTimeZone();
-                c.push((double)(c.timestamps[s.slot] + ((long) tz.getOffset(c.timestamps[s.slot]) / 1000D)));
+                c.push(c.timestamps[s.slot] + ((long) tz.getOffset(c.timestamps[s.slot]) / 1000D));
             }
         },
         TKN_YEAR("YEAR") {
@@ -569,7 +569,7 @@ class RpnCalculator {
                 }
 
                 /* the real calculation */
-                double val = Double.NaN;
+                double val;
 
                 /* the info on the datasource */
                 double[] vals = c.dataProcessor.getValues(c.tokens[s.rpi-1].variable);
@@ -615,7 +615,7 @@ class RpnCalculator {
                 val = Double.NaN;
                 if (s.token.id == TKN_PREDICT) {  /* the average */
                     if (count > 0) {
-                        val = sum / (double) count;
+                        val = sum / count;
                     }
                 } else {
                     if (count > 1) { /* the sigma case */
@@ -649,14 +649,14 @@ class RpnCalculator {
     private static final PerfectStringHash perfect;
     static
     {
-        List<String> tokenStrings = new ArrayList<String>(Token_Symbol.values().length);
+        List<String> tokenStrings = new ArrayList<>(Token_Symbol.values().length);
         for(Token_Symbol s: Token_Symbol.values()) {
             if(! s.token_string.isEmpty()) {
                 tokenStrings.add(s.token_string);
             }
         }
 
-        String[] array = tokenStrings.toArray(new String[tokenStrings.size()]);
+        String[] array = tokenStrings.toArray(new String[0]);
         perfect = new PerfectStringHash(array);
         symbols = new Token_Symbol[tokenStrings.size()];
         for(Token_Symbol s: Token_Symbol.values()) {
@@ -683,7 +683,7 @@ class RpnCalculator {
         this.sourceName = sourceName;
         this.dataProcessor = dataProcessor;
         this.timestamps = dataProcessor.getTimestamps();
-        this.timeStep = (double)(timestamps[1] - timestamps[0]);
+        this.timeStep = (timestamps[1] - timestamps[0]);
         this.calculatedValues = new double[timestamps.length];
         this.sourcesNames = Arrays.asList(dataProcessor.getSourceNames());
         String[] tokensString = rpnExpression.split(" *, *");
@@ -767,7 +767,7 @@ class RpnCalculator {
 
     private static final class RpnStack {
         private static final int MAX_STACK_SIZE = 1000;
-        private double[] stack = new double[MAX_STACK_SIZE];
+        private final double[] stack = new double[MAX_STACK_SIZE];
         private int pos = 0;
 
         void push(double x) {

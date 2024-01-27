@@ -48,14 +48,14 @@ public class LinearInterpolator extends Plottable {
         LEFT,
         RIGHT,
         LINEAR,
-        REGRESSION;
+        REGRESSION
     }
 
     private int lastIndexUsed = 0;
     private Method interpolationMethod = Method.LINEAR;
 
-    private long[] timestamps;
-    private double[] values;
+    private final long[] timestamps;
+    private final double[] values;
 
     // used only if INTERPOLATE_BESTFIT is specified
     double b0 = Double.NaN;
@@ -117,6 +117,7 @@ public class LinearInterpolator extends Plottable {
         for (int i = 0; i < timestamps.length - 1 && ok; i++) {
             if (timestamps[i] >= timestamps[i + 1]) {
                 ok = false;
+                break;
             }
         }
         if (!ok) {

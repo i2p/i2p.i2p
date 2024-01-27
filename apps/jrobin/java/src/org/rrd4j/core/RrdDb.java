@@ -131,7 +131,7 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
             try (DataImporter rrdImporter = resoleImporter(externalPath, importer)) {
                 if (usePool) {
                     try (RrdDb db = resolvePool(pool).requestRrdDb(rrdUri, factory, importer)) {
-                    };
+                    }
                 } else {
                     try (RrdDb db = new RrdDb(path, rrdUri, null, rrdImporter, factory, null)) {
                     }
@@ -210,7 +210,7 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
         }
 
         /**
-         * Internal method used to memorized the pool, without generating a loop
+         * Internal method used to memorize the pool, without generating a loop
          * @param pool
          * @return
          */
@@ -1220,7 +1220,7 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
      * <p>
      * Use <code>original.xml</code> file to create the corresponding RRDTool file
      * (from your command line):
-     *
+     * <p>
      * <code>rrdtool restore copy.rrd original.xml</code>
      *
      * @param filename Path to XML file which will be created.

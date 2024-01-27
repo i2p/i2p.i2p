@@ -143,7 +143,7 @@ public class Archive implements RrdUpdater<Archive> {
             }
         }
         // update robin in bulk
-        int bulkUpdateCount = (int) Math.min(numUpdates / steps.get(), (long) rows.get());
+        int bulkUpdateCount = (int) Math.min(numUpdates / steps.get(), rows.get());
         robin.bulkStore(value, bulkUpdateCount);
         // update remaining steps
         long remainingUpdates = numUpdates % steps.get();

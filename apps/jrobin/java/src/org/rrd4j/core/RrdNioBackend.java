@@ -29,7 +29,7 @@ public class RrdNioBackend extends ByteBufferBackend implements RrdFileBackend {
     private static final Object unsafe;
     static {
         // Temporary variable, because destinations variables are final
-        // And it interfere with exceptions
+        // And it interferes with exceptions
         Method cleanerMethodTemp;
         Method cleanMethodTemp;
         Method invokeCleanerTemp;
@@ -99,11 +99,7 @@ public class RrdNioBackend extends ByteBufferBackend implements RrdFileBackend {
         }
         try {
             if (!readOnly && threadPool != null) {
-                Runnable syncRunnable = new Runnable() {
-                    public void run() {
-                        sync();
-                    }
-                };
+                Runnable syncRunnable = this::sync;
                 syncRunnableHandle = threadPool.scheduleWithFixedDelay(syncRunnable, syncPeriod, syncPeriod, TimeUnit.SECONDS);
             }
         } catch (RuntimeException rte) {
@@ -193,7 +189,7 @@ public class RrdNioBackend extends ByteBufferBackend implements RrdFileBackend {
     }
 
     @Override
-    public String getCanonicalPath() throws IOException {
+    public String getCanonicalPath() {
         return Paths.get(getPath()).toAbsolutePath().normalize().toString();
     }
 

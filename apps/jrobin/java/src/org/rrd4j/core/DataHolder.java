@@ -17,7 +17,7 @@ public interface DataHolder {
     * Constant that defines the default {@link RrdDbPool} usage policy. Defaults to <code>false</code>
     * (i.e. the pool will not be used to fetch data from RRD files)
     */
-   public static final boolean DEFAULT_POOL_USAGE_POLICY = false;
+   boolean DEFAULT_POOL_USAGE_POLICY = false;
 
     /**
      * Returns boolean value representing {@link org.rrd4j.core.RrdDbPool RrdDbPool} usage policy.
@@ -164,7 +164,7 @@ public interface DataHolder {
     /**
      * Creates a datasource that performs a variable calculation on an
      * another named datasource to yield a single combined timestamp/value.
-     *
+     * <p>
      * Requires that the other datasource has already been defined; otherwise, it'll
      * end up with no data
      *

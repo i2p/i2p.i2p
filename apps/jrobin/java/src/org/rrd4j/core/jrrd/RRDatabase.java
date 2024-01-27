@@ -63,10 +63,10 @@ public class RRDatabase implements Closeable {
         rrdFile = new RRDFile(file);
         header = new Header(rrdFile);
 
-        nameindex = new HashMap<String, Integer>(header.dsCount);
+        nameindex = new HashMap<>(header.dsCount);
 
         // Load the data sources
-        dataSources = new ArrayList<DataSource>(header.dsCount);
+        dataSources = new ArrayList<>(header.dsCount);
 
         for (int i = 0; i < header.dsCount; i++) {
             DataSource ds = new DataSource(rrdFile);
@@ -75,7 +75,7 @@ public class RRDatabase implements Closeable {
         }
 
         // Load the archives
-        archives = new ArrayList<Archive>(header.rraCount);
+        archives = new ArrayList<>(header.rraCount);
 
         for (int i = 0; i < header.rraCount; i++) {
             Archive archive = new Archive(this);
@@ -214,7 +214,7 @@ public class RRDatabase implements Closeable {
 
     ArrayList<Archive> getArchiveList(ConsolidationFunctionType type) {
 
-        ArrayList<Archive> subset = new ArrayList<Archive>();
+        ArrayList<Archive> subset = new ArrayList<>();
 
         for (Archive archive : archives) {
             if (archive.getType().equals(type)) {
@@ -449,7 +449,7 @@ public class RRDatabase implements Closeable {
      * Outputs the content of the database to the given print stream
      * as a stream of XML. The XML format is almost identical to that produced by
      * <a href="http://people.ee.ethz.ch/~oetiker/webtools/rrdtool/manual/rrddump.html">rrdtool dump</a>
-     * 
+     * <p>
      * A flush is issued at the end of the XML generation, so auto flush of the PrintStream can be set to false
      *
      * @param s the PrintStream to send the XML to.
@@ -470,7 +470,7 @@ public class RRDatabase implements Closeable {
         s.print("\t<lastupdate> ");
         s.print(lastUpdate.getTime() / 1000);
         s.print(" </lastupdate> <!-- ");
-        s.print(lastUpdate.toString());
+        s.print(lastUpdate);
         s.println(" -->");
         s.println();
 

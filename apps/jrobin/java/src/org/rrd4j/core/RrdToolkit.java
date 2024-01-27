@@ -540,7 +540,7 @@ public class RrdToolkit {
         }
         List<String> fileList = new LinkedList<>();
         traverseDirectory(new File(directory), extension, resursive, fileList);
-        String[] result = fileList.toArray(new String[fileList.size()]);
+        String[] result = fileList.toArray(new String[0]);
         Arrays.sort(result);
         return result;
     }

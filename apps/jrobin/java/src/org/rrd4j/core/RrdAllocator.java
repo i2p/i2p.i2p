@@ -1,7 +1,5 @@
 package org.rrd4j.core;
 
-import java.io.IOException;
-
 /**
  * An internal usage class.
  *
@@ -14,7 +12,7 @@ public class RrdAllocator {
         super();
     }
 
-    long allocate(long byteCount) throws IOException {
+    long allocate(long byteCount) {
         long pointer = allocationPointer;
         allocationPointer += byteCount;
         return pointer;

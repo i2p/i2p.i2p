@@ -14,6 +14,7 @@ public class ConstantLine extends Line {
         this.value = value;
     }
 
+    @Override
     void assignValues(DataProcessor dproc) {
         values = new double[dproc.getTimestamps().length];
         Arrays.fill(values, value);

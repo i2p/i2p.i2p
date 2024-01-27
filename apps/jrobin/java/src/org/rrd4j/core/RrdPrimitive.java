@@ -7,16 +7,16 @@ abstract class RrdPrimitive<U extends RrdUpdater<U>> {
     static final int RRD_INT = 0, RRD_LONG = 1, RRD_DOUBLE = 2, RRD_STRING = 3;
     static final int[] RRD_PRIM_SIZES = {4, 8, 8, 2 * STRING_LENGTH};
 
-    private RrdBackend backend;
-    private int byteCount;
+    private final RrdBackend backend;
+    private final int byteCount;
     private final long pointer;
     private final boolean cachingAllowed;
 
-    RrdPrimitive(RrdUpdater<U> updater, int type, boolean isConstant) throws IOException {
+    RrdPrimitive(RrdUpdater<U> updater, int type, boolean isConstant) {
         this(updater, type, 1, isConstant);
     }
 
-    RrdPrimitive(RrdUpdater<U> updater, int type, int count, boolean isConstant) throws IOException {
+    RrdPrimitive(RrdUpdater<U> updater, int type, int count, boolean isConstant) {
         this.backend = updater.getRrdBackend();
         this.byteCount = RRD_PRIM_SIZES[type] * count;
         this.pointer = updater.getRrdAllocator().allocate(byteCount);

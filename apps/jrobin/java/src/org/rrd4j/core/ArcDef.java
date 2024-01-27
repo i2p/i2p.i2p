@@ -14,7 +14,6 @@ import org.rrd4j.ConsolFun;
  * </ul>
  * For the complete explanation of all archive definition parameters, see RRDTool's
  * <a href="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html" target="man">rrdcreate man page</a>
- * 
  *
  * @author Sasa Markovic
  */

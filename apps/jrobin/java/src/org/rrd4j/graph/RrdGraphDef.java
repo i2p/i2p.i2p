@@ -172,9 +172,9 @@ public class RrdGraphDef implements RrdGraphConstants, DataHolder {
     Stroke tickStroke = TICK_STROKE;
     DownSampler downsampler = null;
 
-    final List<Source> sources = new ArrayList<Source>();
-    final List<CommentText> comments = new ArrayList<CommentText>();
-    final List<PlotElement> plotElements = new ArrayList<PlotElement>();
+    final List<Source> sources = new ArrayList<>();
+    final List<CommentText> comments = new ArrayList<>();
+    final List<PlotElement> plotElements = new ArrayList<>();
 
     /**
      * Creates RrdGraphDef object and sets default time span (default ending time is 'now',
@@ -580,9 +580,9 @@ public class RrdGraphDef implements RrdGraphConstants, DataHolder {
 
     /**
      * Sets image format.
-     * ImageIO is used to save the image, so any supported format by ImageIO can be used, and it can be extended using https://github.com/geosolutions-it/imageio-ext.
+     * ImageIO is used to save the image, so any supported format by ImageIO can be used, and it can be extended using <a href="https://github.com/geosolutions-it/imageio-ext">...</a>.
      *
-     * @param imageFormat Any value as return by {@link javax.imageio.ImageIO#getReaderFormatNames}
+     * @param imageFormat Any value as return by {@link ImageIO#getReaderFormatNames}
      */
     public void setImageFormat(String imageFormat) {
         this.imageFormat = imageFormat;
@@ -590,7 +590,7 @@ public class RrdGraphDef implements RrdGraphConstants, DataHolder {
 
     /**
      * Sets background image.
-     * ImageIO is used to download, so any supported format by ImageIO can be used, and it can be extended using https://github.com/geosolutions-it/imageio-ext.
+     * ImageIO is used to download, so any supported format by ImageIO can be used, and it can be extended using <a href="https://github.com/geosolutions-it/imageio-ext">...</a>.
      *
      * @param backgroundImage Path to background image
      */
@@ -600,7 +600,7 @@ public class RrdGraphDef implements RrdGraphConstants, DataHolder {
 
     /**
      * Sets background image.
-     * ImageIO is used to download, so any supported format by ImageIO can be used, and it can be extended using https://github.com/geosolutions-it/imageio-ext.
+     * ImageIO is used to download, so any supported format by ImageIO can be used, and it can be extended using <a href="https://github.com/geosolutions-it/imageio-ext">...</a>.
      *
      * @param backgroundImageUrl URL to background image
      */
@@ -619,7 +619,7 @@ public class RrdGraphDef implements RrdGraphConstants, DataHolder {
 
     /**
      * Sets canvas background image. Canvas image is printed on canvas area, under canvas color and plot.
-     * ImageIO is used to download, so any supported format by ImageIO can be used, and it can be extended using https://github.com/geosolutions-it/imageio-ext.
+     * ImageIO is used to download, so any supported format by ImageIO can be used, and it can be extended using <a href="https://github.com/geosolutions-it/imageio-ext">...</a>.
      *
      * @param canvasImage Path to canvas image
      */
@@ -629,7 +629,7 @@ public class RrdGraphDef implements RrdGraphConstants, DataHolder {
 
     /**
      * Sets canvas background image. Canvas image is printed on canvas area, under canvas color and plot.
-     * ImageIO is used to download, so any supported format by ImageIO can be used, and it can be extended using https://github.com/geosolutions-it/imageio-ext.
+     * ImageIO is used to download, so any supported format by ImageIO can be used, and it can be extended using <a href="https://github.com/geosolutions-it/imageio-ext">...</a>.
      *
      * @param canvasUrl URL to canvas image
      */
@@ -648,7 +648,7 @@ public class RrdGraphDef implements RrdGraphConstants, DataHolder {
 
     /**
      * Sets overlay image. Overlay image is printed on the top of the image, once it is completely created.
-     * ImageIO is used to download, so any supported format by ImageIO can be used, and it can be extended using https://github.com/geosolutions-it/imageio-ext.
+     * ImageIO is used to download, so any supported format by ImageIO can be used, and it can be extended using <a href="https://github.com/geosolutions-it/imageio-ext">...</a>.
      *
      * @param overlayImage Path to overlay image
      */
@@ -658,7 +658,7 @@ public class RrdGraphDef implements RrdGraphConstants, DataHolder {
 
     /**
      * Sets overlay image. Overlay image is printed on the top of the image, once it is completely created.
-     * ImageIO is used to download, so any supported format by ImageIO can be used, and it can be extended using https://github.com/geosolutions-it/imageio-ext.
+     * ImageIO is used to download, so any supported format by ImageIO can be used, and it can be extended using <a href="https://github.com/geosolutions-it/imageio-ext">...</a>.
      *
      * @param overlayImage URL to overlay image
      */
@@ -1118,7 +1118,7 @@ public class RrdGraphDef implements RrdGraphConstants, DataHolder {
     /**
      * Creates a datasource that performs a variable calculation on an
      * another named datasource to yield a single combined timestamp/value.
-     *
+     * <p>
      * Requires that the other datasource has already been defined; otherwise, it'll
      * end up with no data
      *

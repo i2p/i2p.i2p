@@ -24,7 +24,7 @@ public class XmlWriter implements AutoCloseable {
     }
 
     private final PrintWriter writer;
-    private final StringBuilder indent = new StringBuilder("");
+    private final StringBuilder indent = new StringBuilder();
     private final Deque<String> openTags = new LinkedList<>();
 
     /**

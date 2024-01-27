@@ -2,7 +2,7 @@ package org.rrd4j.graph;
 
 class ValueScaler {
     static final String UNIT_UNKNOWN = "?";
-    static final String UNIT_SYMBOLS[] = {
+    static final String[] UNIT_SYMBOLS = {
             "a", "f", "p", "n", "u", "m", " ", "k", "M", "G", "T", "P", "E"
     };
     static final int SYMB_CENTER = 6;
@@ -55,8 +55,8 @@ class ValueScaler {
     }
 
     static class Scaled {
-        double value;
-        String unit;
+        final double value;
+        final String unit;
 
         public Scaled(double value, String unit) {
             this.value = value;

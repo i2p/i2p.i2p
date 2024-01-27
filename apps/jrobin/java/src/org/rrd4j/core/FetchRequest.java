@@ -17,11 +17,11 @@ import java.util.Set;
  * @author Sasa Markovic
  */
 public class FetchRequest {
-    private RrdDb parentDb;
-    private ConsolFun consolFun;
-    private long fetchStart;
-    private long fetchEnd;
-    private long resolution;
+    private final RrdDb parentDb;
+    private final ConsolFun consolFun;
+    private final long fetchStart;
+    private final long fetchEnd;
+    private final long resolution;
     private String[] filter;
 
     FetchRequest(RrdDb parentDb, ConsolFun consolFun, long fetchStart, long fetchEnd, long resolution) {
@@ -74,7 +74,7 @@ public class FetchRequest {
      * @param filter Set of datasource names to fetch data for.
      */
     public void setFilter(Set<String> filter) {
-        this.filter = filter.toArray(new String[filter.size()]);
+        this.filter = filter.toArray(new String[0]);
     }
 
     /**

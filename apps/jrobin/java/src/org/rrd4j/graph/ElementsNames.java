@@ -50,5 +50,5 @@ public enum ElementsNames {
     /**
      * The y-axis color
      */
-    yaxis;
+    yaxis
 }

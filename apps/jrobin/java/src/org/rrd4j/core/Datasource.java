@@ -28,9 +28,9 @@ public class Datasource implements RrdUpdater<Datasource> {
     private final RrdDouble<Datasource> minValue, maxValue;
 
     // state variables
-    private RrdDouble<Datasource> lastValue;
-    private RrdLong<Datasource> nanSeconds;
-    private RrdDouble<Datasource> accumValue;
+    private final RrdDouble<Datasource> lastValue;
+    private final RrdLong<Datasource> nanSeconds;
+    private final RrdDouble<Datasource> accumValue;
 
     Datasource(RrdDb parentDb, DsDef dsDef) throws IOException {
         boolean shouldInitialize = dsDef != null;
@@ -476,4 +476,3 @@ public class Datasource implements RrdUpdater<Datasource> {
         return parentDb.getRrdAllocator();
     }
 }
-

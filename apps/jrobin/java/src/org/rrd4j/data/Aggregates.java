@@ -107,7 +107,7 @@ public class Aggregates {
     public String dump() {
         StringBuilder bl = new StringBuilder();
         for(ConsolFun cf: ConsolFun.values()) {
-            bl.append(cf.name() + '=' + Util.formatDouble(this.getAggregate(cf)));
+            bl.append(cf.name()).append('=').append(Util.formatDouble(this.getAggregate(cf)));
         }
         return bl.toString();
     }

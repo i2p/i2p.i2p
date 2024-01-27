@@ -4,7 +4,7 @@ import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.IPlottable;
 
 class PDef extends Source {
-    private IPlottable plottable;
+    private final IPlottable plottable;
 
     PDef(String name, IPlottable plottable) {
         super(name);

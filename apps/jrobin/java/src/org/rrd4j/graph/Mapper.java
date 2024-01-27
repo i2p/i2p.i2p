@@ -10,10 +10,10 @@ class Mapper {
         this.im = rrdGraph.im;
         pixieX = (double) im.xsize / (double) (im.end - im.start);
         if (!gdef.logarithmic) {
-            pixieY = (double) im.ysize / (im.maxval - im.minval);
+            pixieY = im.ysize / (im.maxval - im.minval);
         }
         else {
-            pixieY = (double) im.ysize / (ValueAxisLogarithmic.log10(im.maxval) - ValueAxisLogarithmic.log10(im.minval));
+            pixieY = im.ysize / (ValueAxisLogarithmic.log10(im.maxval) - ValueAxisLogarithmic.log10(im.minval));
         }
     }
 
@@ -22,15 +22,15 @@ class Mapper {
         this.im = im;
         pixieX = (double) im.xsize / (double) (im.end - im.start);
         if (!gdef.logarithmic) {
-            pixieY = (double) im.ysize / (im.maxval - im.minval);
+            pixieY = im.ysize / (im.maxval - im.minval);
         }
         else {
-            pixieY = (double) im.ysize / (Math.log10(im.maxval) - Math.log10(im.minval));
+            pixieY = im.ysize / (Math.log10(im.maxval) - Math.log10(im.minval));
         }
     }
 
     int xtr(double mytime) {
-        return (int) ((double) im.xorigin + pixieX * (mytime - im.start));
+        return (int) (im.xorigin + pixieX * (mytime - im.start));
     }
 
     int ytr(double value) {

@@ -11,7 +11,7 @@ import java.util.Arrays;
  */
 public interface DownSampler {
 
-    public class DataSet {
+    class DataSet {
         public final long[] timestamps;
         public final double[] values;
         public DataSet(long[] timestamps, double[] values) {
@@ -25,6 +25,6 @@ public interface DownSampler {
 
     }
 
-    public DataSet downsize(long[] timestamps, double[] values);
+    DataSet downsize(long[] timestamps, double[] values);
 
 }

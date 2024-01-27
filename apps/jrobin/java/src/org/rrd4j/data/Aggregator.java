@@ -5,7 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 class Aggregator {
-    private final long timestamps[], step;
+    private final long[] timestamps;
+    private final long step;
     private final double[] values;
 
     Aggregator(long[] timestamps, double[] values) {
@@ -60,13 +61,13 @@ class Aggregator {
     }
 
     double getPercentile(long tStart, long tEnd, double percentile) {
-        List<Double> valueList = new ArrayList<Double>();
+        List<Double> valueList = new ArrayList<>();
         // create a list of included datasource values (different from NaN)
         for (int i = 0; i < timestamps.length; i++) {
             long left = Math.max(timestamps[i] - step, tStart);
             long right = Math.min(timestamps[i], tEnd);
             if (right > left && !Double.isNaN(values[i])) {
-                valueList.add(Double.valueOf(values[i]));
+                valueList.add(values[i]);
             }
         }
         // create an array to work with
@@ -74,7 +75,7 @@ class Aggregator {
         if (count > 1) {
             double[] valuesCopy = new double[count];
             for (int i = 0; i < count; i++) {
-                valuesCopy[i] = valueList.get(i).doubleValue();
+                valuesCopy[i] = valueList.get(i);
             }
             // sort array
             Arrays.sort(valuesCopy);
@@ -90,4 +91,3 @@ class Aggregator {
         return Double.NaN;
     }
 }
-

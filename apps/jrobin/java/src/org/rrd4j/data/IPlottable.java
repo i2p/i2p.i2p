@@ -16,5 +16,5 @@ public interface IPlottable {
      * @param timestamp Timestamp in seconds for the datapoint.
      * @return Double value of the datapoint.
      */
-    public double getValue(long timestamp);
+    double getValue(long timestamp);
 }

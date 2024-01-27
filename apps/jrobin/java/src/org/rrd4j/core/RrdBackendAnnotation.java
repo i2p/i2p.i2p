@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target(TYPE)
 public @interface RrdBackendAnnotation {
-    public static boolean DEFAULT_CACHING_ALLOWED = true;
+    boolean DEFAULT_CACHING_ALLOWED = true;
     String name();
     boolean cachingAllowed() default DEFAULT_CACHING_ALLOWED;
     String scheme() default "";

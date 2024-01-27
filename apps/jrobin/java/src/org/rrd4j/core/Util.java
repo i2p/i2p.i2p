@@ -54,15 +54,12 @@ public class Util {
     // directory under $USER_HOME used for demo graphs storing
     static final String RRD4J_DIR = "rrd4j-demo";
 
-    static final ThreadLocal<NumberFormat> df = new ThreadLocal<NumberFormat>() {
-        @Override
-        protected NumberFormat initialValue() {
-            DecimalFormat ldf = (DecimalFormat) NumberFormat.getNumberInstance(Locale.ENGLISH);
-            ldf.applyPattern(PATTERN);
-            ldf.setPositivePrefix("+");
-            return ldf;
-        }
-    };
+    static final ThreadLocal<NumberFormat> df = ThreadLocal.withInitial(() -> {
+        DecimalFormat ldf = (DecimalFormat) NumberFormat.getNumberInstance(Locale.ENGLISH);
+        ldf.applyPattern(PATTERN);
+        ldf.setPositivePrefix("+");
+        return ldf;
+    });
 
     private static final Pattern SPRINTF_PATTERN = Pattern.compile("([^%]|^)%([^a-zA-Z%]*)l(f|g|e)");
 

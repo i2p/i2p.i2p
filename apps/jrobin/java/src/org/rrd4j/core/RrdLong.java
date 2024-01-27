@@ -6,11 +6,11 @@ class RrdLong<U extends RrdUpdater<U>> extends RrdPrimitive<U> {
     private long cache;
     private boolean cached = false;
 
-    RrdLong(RrdUpdater<U> updater, boolean isConstant) throws IOException {
+    RrdLong(RrdUpdater<U> updater, boolean isConstant) {
         super(updater, RrdPrimitive.RRD_LONG, isConstant);
     }
 
-    RrdLong(RrdUpdater<U> updater) throws IOException {
+    RrdLong(RrdUpdater<U> updater) {
         this(updater, false);
     }
 

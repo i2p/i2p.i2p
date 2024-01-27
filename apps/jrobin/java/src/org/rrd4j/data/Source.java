@@ -34,7 +34,7 @@ abstract class Source {
      * @param tStart
      * @param tEnd
      * @return
-     * @deprecated This method is deprecated. Uses instance of {@link org.rrd4j.data.Variable}, used with DataProcessor.addDatasource(String, String, Variable)
+     * @deprecated This method is deprecated. Uses instance of {@link org.rrd4j.data.Variable}, used with {@link org.rrd4j.data.DataProcessor#addDatasource(String, String, Variable)}
      */
     @Deprecated
     Aggregates getAggregates(long tStart, long tEnd) {
@@ -47,7 +47,7 @@ abstract class Source {
      * @param tEnd
      * @param percentile
      * @return
-     * @deprecated This method is deprecated. Uses instance of {@link org.rrd4j.data.Variable.PERCENTILE}, used with DataProcessor.addDatasource(String, String, Variable)
+     * @deprecated This method is deprecated. Uses instance of {@link org.rrd4j.data.Variable.PERCENTILE}, used with {@link org.rrd4j.data.DataProcessor#addDatasource(String, String, Variable)}
      */
     @Deprecated
     double getPercentile(long tStart, long tEnd, double percentile) {

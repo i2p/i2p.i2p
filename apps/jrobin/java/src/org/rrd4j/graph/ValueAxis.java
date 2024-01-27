@@ -2,6 +2,8 @@ package org.rrd4j.graph;
 
 import java.awt.Font;
 import java.awt.Paint;
+import java.math.BigDecimal;
+import java.math.MathContext;
 
 import org.rrd4j.core.Util;
 
@@ -106,6 +108,10 @@ class ValueAxis extends Axis {
                 }
                 gridstep = selectedYLabel.grid * im.magfact;
                 labfact = findLabelFactor(selectedYLabel);
+                if(labfact == -1) {
+                    // as a fallback, use the largest label factor of the selected label
+                    labfact = selectedYLabel.labelFacts[3];
+                }
             }
         }
         else {
@@ -116,13 +122,14 @@ class ValueAxis extends Axis {
         int sgrid = (int) (im.minval / gridstep - 1);
         int egrid = (int) (im.maxval / gridstep + 1);
         double scaledstep = gridstep / im.magfact;
+        boolean fractional = isFractional(scaledstep, labfact);
         for (int i = sgrid; i <= egrid; i++) {
             int y = mapper.ytr(gridstep * i);
             if (y >= im.yorigin - im.ysize && y <= im.yorigin) {
                 if (i % labfact == 0) {
                     String graph_label;
                     if (i == 0 || im.symbol == ' ') {
-                        if (scaledstep < 1) {
+                        if (fractional) {
                             if (i != 0 && gdef.altYGrid) {
                                 graph_label = Util.sprintf(gdef.locale, labfmt, scaledstep * i);
                             }
@@ -135,7 +142,7 @@ class ValueAxis extends Axis {
                         }
                     }
                     else {
-                        if (scaledstep < 1) {
+                        if (fractional) {
                             graph_label = Util.sprintf(gdef.locale, "%4.1f %c", scaledstep * i, im.symbol);
                         }
                         else {
@@ -163,7 +170,7 @@ class ValueAxis extends Axis {
      * If the graph covers positive and negative on the y-axis, then
      * desiredMinimumLabelCount is checked as well, to ensure the chosen YLabel definition
      * will result in the required number of labels
-     * 
+     * <p>
      * Returns null if none are acceptable (none the right size or with
      * enough labels)
      */
@@ -235,6 +242,18 @@ class ValueAxis extends Axis {
     private double getScaledRange() {
         double range = im.maxval - im.minval;
         return range / im.magfact;
+    }
+
+    /**
+     * Returns true if some or all labels have fractional part (other than zero).
+     */
+    private static boolean isFractional(double scaledstep, int labfact) {
+        if (scaledstep >= 1) {
+            return false;
+        }
+        BigDecimal bd = BigDecimal.valueOf(scaledstep)
+                .multiply(BigDecimal.valueOf(labfact), MathContext.DECIMAL32);
+        return !(bd.signum() == 0 || bd.scale() <= 0 || bd.stripTrailingZeros().scale() <= 0);
     }
 
     static class YLabel {
