@@ -64,7 +64,7 @@ class RRDFile implements Constants {
             if (!ok) {
                 try {
                     close();
-                } catch (Throwable ignored) {
+                } catch (IOException ignored) {
                 }
                 // and then rethrow
             }
@@ -134,15 +134,15 @@ class RRDFile implements Constants {
         return alignment;
     }
 
-    double readDouble() throws IOException {
+    double readDouble() {
         return mappedByteBuffer.getDouble();
     }
 
-    int readInt() throws IOException {
+    int readInt() {
         return mappedByteBuffer.getInt();
     }
 
-    int readLong() throws IOException {
+    int readLong() {
         if(longSize == 4) {
             return mappedByteBuffer.getInt();
         }
@@ -151,20 +151,20 @@ class RRDFile implements Constants {
         }
     }
 
-    String readString(int maxLength) throws IOException {
+    String readString(int maxLength) {
         byte[] array = new byte[maxLength];
         mappedByteBuffer.get(array);
 
         return new String(array, 0, maxLength).trim();
     }
 
-    void skipBytes(int n) throws IOException {
+    void skipBytes(int n) {
         mappedByteBuffer.position(mappedByteBuffer.position() + n);
     }
 
-    int align(int boundary) throws IOException {
+    int align(int boundary) {
 
-        int skip = (int) (boundary - (mappedByteBuffer.position() % boundary)) % boundary;
+        int skip = (boundary - (mappedByteBuffer.position() % boundary)) % boundary;
 
         if (skip != 0) {
             mappedByteBuffer.position(mappedByteBuffer.position() + skip);
@@ -173,15 +173,15 @@ class RRDFile implements Constants {
         return skip;
     }
 
-    int align() throws IOException {
+    int align() {
         return align(alignment);
     }
 
-    long info() throws IOException {
+    long info() {
         return mappedByteBuffer.position();
     }
 
-    long getFilePointer() throws IOException {
+    long getFilePointer() {
         return mappedByteBuffer.position();
     }
 
@@ -191,13 +191,13 @@ class RRDFile implements Constants {
         }
     }
 
-    void read(ByteBuffer bb) throws IOException{
+    void read(ByteBuffer bb) {
         int count = bb.remaining();
         bb.put((ByteBuffer) mappedByteBuffer.duplicate().limit(mappedByteBuffer.position() + count));
         mappedByteBuffer.position(mappedByteBuffer.position() + count);
     }
 
-    UnivalArray getUnivalArray(int size) throws IOException {
+    UnivalArray getUnivalArray(int size) {
         return new UnivalArray(this, size);
     }
 

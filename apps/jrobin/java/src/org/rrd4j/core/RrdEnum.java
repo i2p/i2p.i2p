@@ -7,12 +7,12 @@ class RrdEnum<U extends RrdUpdater<U>, E extends Enum<E>> extends RrdPrimitive<U
     private E cache;
     private final Class<E> clazz;
 
-    RrdEnum(RrdUpdater<U> updater, boolean isConstant, Class<E> clazz) throws IOException {
+    RrdEnum(RrdUpdater<U> updater, boolean isConstant, Class<E> clazz) {
         super(updater, RrdPrimitive.RRD_STRING, isConstant);
         this.clazz = clazz;
     }
 
-    RrdEnum(RrdUpdater<U> updater, Class<E> clazz) throws IOException {
+    RrdEnum(RrdUpdater<U> updater, Class<E> clazz) {
         this(updater, false, clazz);
     }
 

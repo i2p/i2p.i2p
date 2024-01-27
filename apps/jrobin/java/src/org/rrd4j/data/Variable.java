@@ -9,7 +9,7 @@ import org.rrd4j.core.Util;
 
 /**
  *  An abstract class to help extract single value from a set of value (VDEF in rrdtool)
- *  
+ * <p>
  *  It can be used to add new fancy statistical calculation with rrd values 
  *
  */
@@ -30,7 +30,7 @@ public abstract class Variable {
         public String toString() {
             return "Value [value=" + value + ", timestamp=" + timestamp + "]";
         }
-    };
+    }
 
     public static final Value INVALIDVALUE = new Value(0, Double.NaN);
 
@@ -101,7 +101,7 @@ public abstract class Variable {
 
     /**
      * This method is call with the needed values, extracted from the datasource to do the calculation.
-     * 
+     * <p>
      * Value is to be filled with both the double value and a possible timestamp, when it's used to find
      * a specific point
      * 
@@ -111,7 +111,7 @@ public abstract class Variable {
      * @param end the end of the period
      * @return a filled Value object
      */
-    protected abstract Value fill(long timestamps[], double[] values, long start, long end);
+    protected abstract Value fill(long[] timestamps, double[] values, long start, long end);
 
     /**
      * Find the first valid data point and it's timestamp
@@ -266,8 +266,8 @@ public abstract class Variable {
      *
      */
     static final class PercentElem {
-        long timestamp;
-        double value;
+        final long timestamp;
+        final double value;
 
         PercentElem(int pos, long timestamp, double value) {
             this.timestamp = timestamp;
@@ -305,7 +305,7 @@ public abstract class Variable {
      */
     static final class ComparPercentElemen implements Comparator<PercentElem>, Serializable {
         @Override
-        public final int compare(PercentElem arg0, PercentElem arg1) {
+        public int compare(PercentElem arg0, PercentElem arg1) {
             if (Double.isNaN(arg0.value) && Double.isNaN(arg1.value))
                 return Long.signum(arg0.timestamp - arg1.timestamp);
             else if (Double.isNaN(arg0.value))
@@ -346,7 +346,7 @@ public abstract class Variable {
         @Override
         protected Value fill(long[] timestamps, double[] values, long start, long end) {
             // valuesSet will be a set with NaN packet at the start
-            SortedSet<PercentElem> valuesSet = new TreeSet<PercentElem>(new ComparPercentElemen());
+            SortedSet<PercentElem> valuesSet = new TreeSet<>(new ComparPercentElemen());
             for (int i = 0 ; i < values.length ; i++) {
                 valuesSet.add(new PercentElem(i, timestamps[i], values[i]));
             }
@@ -356,7 +356,7 @@ public abstract class Variable {
                 valuesSet = valuesSet.tailSet(new PercentElem(0, 0, Double.NEGATIVE_INFINITY ));
             }
 
-            PercentElem[] element = (PercentElem[]) valuesSet.toArray(new PercentElem[valuesSet.size()]);
+            PercentElem[] element = valuesSet.toArray(new PercentElem[0]);
             int pos = Math.round(percentile * (element.length - 1) / 100);
             // if we have anything left...
             if (pos >= 0) {
@@ -395,15 +395,13 @@ public abstract class Variable {
             double SUMxx = 0.0;
             double lslslope;
 
-            for (int i = 0; i < values.length; i++) {
-                double value = values[i];
-
+            for (double value : values) {
                 if (!Double.isNaN(value)) {
                     cnt++;
 
                     SUMx += lslstep;
                     SUMxx += lslstep * lslstep;
-                    SUMy  += value;
+                    SUMy += value;
                     SUMxy += lslstep * value;
 
                 }
@@ -438,15 +436,13 @@ public abstract class Variable {
             double lslslope;
             double lslint;
 
-            for (int i = 0; i < values.length; i++) {
-                double value = values[i];
-
+            for (double value : values) {
                 if (!Double.isNaN(value)) {
                     cnt++;
 
                     SUMx += lslstep;
                     SUMxx += lslstep * lslstep;
-                    SUMy  += value;
+                    SUMy += value;
                     SUMxy += lslstep * value;
                 }
                 lslstep++;
@@ -481,15 +477,13 @@ public abstract class Variable {
             double SUMyy = 0.0;
             double lslcorrel;
 
-            for (int i = 0; i < values.length; i++) {
-                double value = values[i];
-
+            for (double value : values) {
                 if (!Double.isNaN(value)) {
                     cnt++;
 
                     SUMx += lslstep;
                     SUMxx += lslstep * lslstep;
-                    SUMy  += value;
+                    SUMy += value;
                     SUMxy += lslstep * value;
                     SUMyy += value * value;
                 }

@@ -1,7 +1,7 @@
 package org.rrd4j.graph;
 
 class PathIterator {
-    private double[] y;
+    private final double[] y;
     private int pos = 0;
 
     PathIterator(double[] y) {

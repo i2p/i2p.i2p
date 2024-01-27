@@ -1,6 +1,7 @@
 package org.rrd4j.core;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Class to represent archive values for a single datasource. Robin class is the heart of
@@ -18,7 +19,7 @@ class RobinArray implements Robin {
     private final Archive parentArc;
     private final RrdInt<Robin> pointer;
     private final RrdDoubleArray<Robin> values;
-    private int rows;
+    private final int rows;
 
     RobinArray(Archive parentArc, int rows, boolean shouldInitialize) throws IOException {
         this.parentArc = parentArc;
@@ -104,9 +105,7 @@ class RobinArray implements Robin {
     /** {@inheritDoc} */
     public void setValues(double newValue) throws IOException {
         double[] values = new double[rows];
-        for (int i = 0; i < values.length; i++) {
-            values[i] = newValue;
-        }
+        Arrays.fill(values, newValue);
         update(values);
     }
 

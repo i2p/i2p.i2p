@@ -7,6 +7,10 @@ import java.awt.Graphics;
 import java.awt.Paint;
 import java.awt.Stroke;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
@@ -172,10 +176,27 @@ public class RrdGraph implements RrdGraphConstants {
 
     private void saveImage() throws IOException {
         if (! RrdGraphConstants.IN_MEMORY_IMAGE.equals(gdef.filename)) {
-            info.stream = worker.saveImage(gdef.filename, writer, param);
+            Path imgpath = Paths.get(gdef.filename);
+            worker.saveImage(gdef.filename, writer, param);
+            info.bytesSource = () -> {
+                try {
+                    return Files.readAllBytes(imgpath);
+                } catch (IOException e) {
+                    throw new IllegalStateException("Unable to read image bytes", e);
+                }
+            };
+            info.bytesCount = () -> {
+                try {
+                    return (int) Files.size(imgpath);
+                } catch (IOException e) {
+                    throw new IllegalStateException("Unable to read image informations", e);
+               }
+            };
         }
         else {
-            info.stream = worker.getImageBytes(writer, param);
+            byte[] content = worker.getImageBytes(writer, param);
+            info.bytesSource = () -> Arrays.copyOf(content, content.length);
+            info.bytesCount = () -> content.length;
         }
     }
 
@@ -248,10 +269,9 @@ public class RrdGraph implements RrdGraphConstants {
                 worker.drawString(gdef.title, x, y, gdef.getFont(FONTTAG_TITLE), gdef.getColor(ElementsNames.font));
             }
             if (gdef.verticalLabel != null) {
-                int x = PADDING_LEFT;
                 int y = im.yorigin - im.ysize / 2 + (int) worker.getStringWidth(gdef.verticalLabel, gdef.getFont(FONTTAG_UNIT)) / 2;
                 int ascent = (int) worker.getFontAscent(gdef.getFont(FONTTAG_UNIT));
-                worker.transform(x, y, -Math.PI / 2);
+                worker.transform(PADDING_LEFT, y, -Math.PI / 2);
                 worker.drawString(gdef.verticalLabel, 0, ascent, gdef.getFont(FONTTAG_UNIT), gdef.getColor(ElementsNames.font));
                 worker.reset();
             }
@@ -375,8 +395,7 @@ public class RrdGraph implements RrdGraphConstants {
                     im.xorigin + im.xsize + 4,
             };
             double[] Xarrow_y = {
-                    im.yorigin - 3,
-                    im.yorigin + 0,
+                    im.yorigin - 3, im.yorigin,
                     im.yorigin + 3,
             };
             worker.fillPolygon(Xarrow_x, im.yorigin + 3.0, Xarrow_y, arrowColor);
@@ -428,7 +447,7 @@ public class RrdGraph implements RrdGraphConstants {
             im.xorigin = 0;
         }
         else {
-            im.xorigin = (int) (PADDING_LEFT + im.unitslength * getFontCharWidth(FontTag.UNIT));
+            im.xorigin = (int) (PADDING_LEFT + im.unitslength * getFontCharWidth(FONTTAG_AXIS));
         }
 
         if (!gdef.onlyGraph && gdef.verticalLabel != null) {
@@ -452,7 +471,7 @@ public class RrdGraph implements RrdGraphConstants {
         }
         else {
             im.xgif = PADDING_RIGHT + im.xsize + im.xorigin;
-            im.ygif = im.yorigin + (int) (PADDING_PLOT * getFontHeight(FONTTAG_DEFAULT));
+            im.ygif = im.yorigin + (int) (PADDING_PLOT * getFontHeight(FONTTAG_AXIS));
         }
     }
 
@@ -566,10 +585,10 @@ public class RrdGraph implements RrdGraphConstants {
                 }
             }
             else {
-                im.minval = (double) im.ylabfact * im.ygridstep *
-                        Math.floor(im.minval / ((double) im.ylabfact * im.ygridstep));
-                im.maxval = (double) im.ylabfact * im.ygridstep *
-                        Math.ceil(im.maxval / ((double) im.ylabfact * im.ygridstep));
+                im.minval = im.ylabfact * im.ygridstep *
+                        Math.floor(im.minval / (im.ylabfact * im.ygridstep));
+                im.maxval = im.ylabfact * im.ygridstep *
+                        Math.ceil(im.maxval / (im.ylabfact * im.ygridstep));
             }
 
         }
@@ -658,7 +677,7 @@ public class RrdGraph implements RrdGraphConstants {
 
     private void fetchData() throws IOException {
         dproc = new DataProcessor(gdef.startTime, gdef.endTime);
-        dproc.setPixelCount(im.xsize);
+        dproc.setPixelCount(gdef.width);
         if (gdef.poolUsed) {
             dproc.setPoolUsed(gdef.poolUsed);
             dproc.setPool(gdef.getPool());

@@ -1,6 +1,5 @@
 package org.rrd4j.core.jrrd;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -21,7 +20,7 @@ import java.util.Locale;
  */
 public class Archive {
 
-    private static enum rra_par_en {RRA_cdp_xff_val, RRA_hw_alpha};
+    private enum rra_par_en {RRA_cdp_xff_val, RRA_hw_alpha}
 
     final RRDatabase db;
     /** Header offset within file in bytes */
@@ -47,7 +46,7 @@ public class Archive {
     /** Cached content */
     private double[][] values;
 
-    Archive(RRDatabase db) throws IOException {
+    Archive(RRDatabase db) {
 
         this.db = db;
 
@@ -74,9 +73,9 @@ public class Archive {
         return type;
     }
 
-    void loadCDPStatusBlocks(RRDFile file, int numBlocks) throws IOException {
+    void loadCDPStatusBlocks(RRDFile file, int numBlocks) {
 
-        cdpStatusBlocks = new ArrayList<CDPStatusBlock>();
+        cdpStatusBlocks = new ArrayList<>();
 
         for (int i = 0; i < numBlocks; i++) {
             cdpStatusBlocks.add(new CDPStatusBlock(file));
@@ -103,11 +102,11 @@ public class Archive {
         return cdpStatusBlocks.iterator();
     }
 
-    void loadCurrentRow(RRDFile file) throws IOException {
+    void loadCurrentRow(RRDFile file) {
         currentRow = file.readLong();
     }
 
-    void loadData(RRDFile file, int dsCount) throws IOException {
+    void loadData(RRDFile file, int dsCount) {
 
         dataOffset = file.getFilePointer();
 
@@ -115,8 +114,7 @@ public class Archive {
         file.skipBytes(Constants.SIZE_OF_DOUBLE * rowCount * dsCount);
     }
 
-    void loadData(DataChunk chunk)
-            throws IOException {
+    void loadData(DataChunk chunk) {
 
         long rowIndexPointer;
 
@@ -186,18 +184,14 @@ public class Archive {
 
         int cdpIndex = 0;
 
-        for (Iterator<CDPStatusBlock> i = cdpStatusBlocks.iterator(); i.hasNext();) {
-            CDPStatusBlock cdp = i.next();
-
+        for (CDPStatusBlock cdp : cdpStatusBlocks) {
             s.print(sb);
             s.print(cdpIndex);
             s.print("].value = ");
 
             double value = cdp.value;
 
-            s.println(Double.isNaN(value)
-                    ? "NaN"
-                            : numberFormat.format(value));
+            s.println(Double.isNaN(value) ? "NaN" : numberFormat.format(value));
             s.print(sb);
             s.print(cdpIndex++);
             s.print("].unknown_datapoints = ");
@@ -206,97 +200,89 @@ public class Archive {
     }
 
     void toXml(PrintStream s) {
+        s.println("\t<rra>");
+        s.print("\t\t<cf> ");
+        s.print(type);
+        s.println(" </cf>");
+        s.print("\t\t<pdp_per_row> ");
+        s.print(pdpCount);
+        s.print(" </pdp_per_row> <!-- ");
+        s.print(db.header.pdpStep * pdpCount);
+        s.println(" seconds -->");
+        s.print("\t\t<xff> ");
+        s.print(xff);
+        s.println(" </xff>");
+        s.println();
+        s.println("\t\t<cdp_prep>");
 
-        try {
-            s.println("\t<rra>");
-            s.print("\t\t<cf> ");
-            s.print(type);
-            s.println(" </cf>");
-            s.print("\t\t<pdp_per_row> ");
-            s.print(pdpCount);
-            s.print(" </pdp_per_row> <!-- ");
-            s.print(db.header.pdpStep * pdpCount);
-            s.println(" seconds -->");
-            s.print("\t\t<xff> ");
-            s.print(xff);
-            s.println(" </xff>");
-            s.println();
-            s.println("\t\t<cdp_prep>");
+        for (CDPStatusBlock cdpStatusBlock : cdpStatusBlocks) {
+            cdpStatusBlock.toXml(s);
+        }
 
-            for (int i = 0; i < cdpStatusBlocks.size(); i++) {
-                cdpStatusBlocks.get(i).toXml(s);
+        s.println("\t\t</cdp_prep>");
+        s.println("\t\t<database>");
+
+        long timer = -(rowCount - 1);
+        int counter = 0;
+        int row = currentRow;
+
+        db.rrdFile.seek(dataOffset + (row + 1) * db.header.dsCount * Constants.SIZE_OF_DOUBLE);
+
+        long lastUpdate = db.lastUpdate.getTime() / 1000;
+        int pdpStep = db.header.pdpStep;
+        NumberFormat numberFormat = new DecimalFormat("0.0000000000E0", DecimalFormatSymbols.getInstance(Locale.US));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+
+        while (counter++ < rowCount) {
+            row++;
+
+            if (row == rowCount) {
+                row = 0;
+
+                db.rrdFile.seek(dataOffset);
             }
 
-            s.println("\t\t</cdp_prep>");
-            s.println("\t\t<database>");
+            long now = (lastUpdate - lastUpdate % (pdpCount * pdpStep))
+                    + (timer * pdpCount * pdpStep);
 
-            long timer = -(rowCount - 1);
-            int counter = 0;
-            int row = currentRow;
+            timer++;
 
-            db.rrdFile.seek(dataOffset + (row + 1) * db.header.dsCount * Constants.SIZE_OF_DOUBLE);
+            s.print("\t\t\t<!-- ");
+            s.print(dateFormat.format(new Date(now * 1000)));
+            s.print(" / ");
+            s.print(now);
+            s.print(" --> ");
 
-            long lastUpdate = db.lastUpdate.getTime() / 1000;
-            int pdpStep = db.header.pdpStep;
-            NumberFormat numberFormat = new DecimalFormat("0.0000000000E0", DecimalFormatSymbols.getInstance(Locale.US));
-            SimpleDateFormat dateFormat =
-                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+            s.println("<row>");
+            for (int col = 0; col < db.header.dsCount; col++) {
+                s.print("<v> ");
 
-            while (counter++ < rowCount) {
-                row++;
+                double value = db.rrdFile.readDouble();
 
-                if (row == rowCount) {
-                    row = 0;
-
-                    db.rrdFile.seek(dataOffset);
+                // NumberFormat doesn't know how to handle NaN
+                if (Double.isNaN(value)) {
+                    s.print("NaN");
+                }
+                else {
+                    s.print(numberFormat.format(value));
                 }
 
-                long now = (lastUpdate - lastUpdate % (pdpCount * pdpStep))
-                        + (timer * pdpCount * pdpStep);
-
-                timer++;
-
-                s.print("\t\t\t<!-- ");
-                s.print(dateFormat.format(new Date(now * 1000)));
-                s.print(" / ");
-                s.print(now);
-                s.print(" --> ");
-
-                s.println("<row>");
-                for (int col = 0; col < db.header.dsCount; col++) {
-                    s.print("<v> ");
-
-                    double value = db.rrdFile.readDouble();
-
-                    // NumberFormat doesn't know how to handle NaN
-                    if (Double.isNaN(value)) {
-                        s.print("NaN");
-                    }
-                    else {
-                        s.print(numberFormat.format(value));
-                    }
-
-                    s.print(" </v>");
-                }
-
-                s.println("</row>");
+                s.print(" </v>");
             }
 
-            s.println("\t\t</database>");
-            s.println("\t</rra>");
+            s.println("</row>");
         }
-        catch (IOException e) {    // Is the best thing to do here?
-            throw new RuntimeException(e.getMessage());
-        }
+
+        s.println("\t\t</database>");
+        s.println("\t</rra>");
     }
 
     /**
      * <p>Getter for the field <code>values</code>.</p>
      *
      * @return an array of double.
-     * @throws java.io.IOException if any.
      */
-    public double[][] getValues() throws IOException {
+    public double[][] getValues() {
         if (values != null) {
             return values;
         }

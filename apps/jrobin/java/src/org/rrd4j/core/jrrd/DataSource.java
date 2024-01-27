@@ -1,6 +1,5 @@
 package org.rrd4j.core.jrrd;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.text.NumberFormat;
 
@@ -12,7 +11,7 @@ import java.text.NumberFormat;
  */
 public class DataSource {
 
-    private static enum ds_param_en { DS_mrhb_cnt, DS_min_val, DS_max_val, DS_cde }
+    private enum ds_param_en { DS_mrhb_cnt, DS_min_val, DS_max_val, DS_cde }
 
     private final long offset;
     private final long size;
@@ -24,7 +23,7 @@ public class DataSource {
     // initialized during RRDatabase construction
     private PDPStatusBlock pdpStatusBlock;
 
-    DataSource(RRDFile file) throws IOException {
+    DataSource(RRDFile file) {
 
         offset = file.getFilePointer();
         name = file.readString(Constants.DS_NAM_SIZE);
@@ -37,7 +36,7 @@ public class DataSource {
         size = file.getFilePointer() - offset;
     }
 
-    void loadPDPStatusBlock(RRDFile file) throws IOException {
+    void loadPDPStatusBlock(RRDFile file) {
         pdpStatusBlock = new PDPStatusBlock(file);
     }
 

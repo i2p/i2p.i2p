@@ -1,6 +1,5 @@
 package org.rrd4j.core.jrrd;
 
-import java.io.IOException;
 import java.io.PrintStream;
 
 /**
@@ -11,7 +10,7 @@ import java.io.PrintStream;
  */
 public class CDPStatusBlock {
 
-    private static enum cdp_par_en {
+    private enum cdp_par_en {
         CDP_val, CDP_unkn_pdp_cnt, CDP_hw_intercept, CDP_hw_last_intercept, CDP_hw_slope, 
         CDP_hw_last_slope, CDP_null_count,
         CDP_last_null_count, CDP_primary_val, CDP_secondary_val
@@ -27,7 +26,7 @@ public class CDPStatusBlock {
     final double secondary_value;
     final double primary_value;
 
-    CDPStatusBlock(RRDFile file) throws IOException {
+    CDPStatusBlock(RRDFile file) {
         //Should read MAX_CDP_PAR_EN = 10
         //Size should be 0x50
         offset = file.getFilePointer();

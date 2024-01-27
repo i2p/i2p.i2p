@@ -1,7 +1,7 @@
 package org.rrd4j.core.timespec;
 
 class TimeScanner {
-    private String dateString;
+    private final String dateString;
 
     private int pos, pos_save;
     private TimeToken token, token_save;
@@ -108,7 +108,7 @@ class TimeScanner {
     }
 
     TimeToken nextToken() {
-        StringBuilder buffer = new StringBuilder("");
+        StringBuilder buffer = new StringBuilder();
         while (pos < dateString.length()) {
             char c = dateString.charAt(pos++);
             if (Character.isWhitespace(c) || c == '_' || c == ',') {

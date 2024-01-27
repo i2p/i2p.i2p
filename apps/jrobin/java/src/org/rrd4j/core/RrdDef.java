@@ -5,10 +5,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -59,8 +59,8 @@ public class RrdDef {
     private long step = DEFAULT_STEP;
     private int version = DEFAULTVERSION;
 
-    private List<DsDef> dsDefs = new ArrayList<>();
-    private List<ArcDef> arcDefs = new ArrayList<>();
+    private final List<DsDef> dsDefs = new ArrayList<>();
+    private final List<ArcDef> arcDefs = new ArrayList<>();
 
     /**
      * <p>Creates new RRD definition object with the given path.
@@ -189,12 +189,19 @@ public class RrdDef {
 
     /**
      * Returns path for the new RRD. It's extracted from the URI. If it's an opaque URI, it return the scheme specific part.
+     * <br>
+     * It's not a reliable way to resolve an file path. Instead, one should use <code> Paths.get(def.getUri())</code>
+     * when the URI scheme is file.
      *
      * @return path to the new RRD which should be created
      */
     public String getPath() {
         if (uri.isOpaque()) {
             return uri.getSchemeSpecificPart();
+        } else if ("file".equals(uri.getScheme())) {
+            // Windows path from URI returns strange results.
+            // Ensure that's a compliant path
+            return Paths.get(uri).toString();
         } else {
             return uri.getPath();
         }
@@ -516,7 +523,7 @@ public class RrdDef {
      * @return Array of data source definition objects
      */
     public DsDef[] getDsDefs() {
-        return dsDefs.toArray(new DsDef[dsDefs.size()]);
+        return dsDefs.toArray(new DsDef[0]);
     }
 
     /**
@@ -584,13 +591,7 @@ public class RrdDef {
     }
 
     void saveSingleDatasource(String dsName) {
-        Iterator<DsDef> it = dsDefs.iterator();
-        while (it.hasNext()) {
-            DsDef dsDef = it.next();
-            if (!dsDef.getDsName().equals(dsName)) {
-                it.remove();
-            }
-        }
+        dsDefs.removeIf(dsDef -> !dsDef.getDsName().equals(dsName));
     }
 
     void removeArchive(ConsolFun consolFun, int steps) {

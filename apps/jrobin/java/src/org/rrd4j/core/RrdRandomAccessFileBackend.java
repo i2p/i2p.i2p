@@ -63,7 +63,7 @@ public class RrdRandomAccessFileBackend extends RrdBackend implements RrdFileBac
     }
 
     @Override
-    public String getCanonicalPath() throws IOException {
+    public String getCanonicalPath() {
         return Paths.get(getPath()).toAbsolutePath().normalize().toString();
     }
 

@@ -1,9 +1,8 @@
 package org.rrd4j.graph;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Class to represent successfully created Rrd4j graph. Objects of this class are created by method
@@ -12,9 +11,10 @@ import java.util.List;
 public class RrdGraphInfo {
     String filename;
     int width, height;
-    InputStream stream;
+    Supplier<byte[]> bytesSource;
+    Supplier<Integer> bytesCount;
     String imgInfo;
-    private List<String> printLines = new ArrayList<String>();
+    private final List<String> printLines = new ArrayList<>();
 
     RrdGraphInfo() {
         // cannot instantiate this class
@@ -58,16 +58,7 @@ public class RrdGraphInfo {
      * @throws IllegalStateException if the images bytes are unavailable or can't be read
      */
     public byte[] getBytes() {
-        try {
-            byte[] content = new byte[stream.available()];
-            int read = stream.read(content);
-            if (read != content.length) {
-                throw new IllegalStateException("Unable to read image buffer");
-            }
-            return content;
-        } catch (IOException e) {
-            throw new IllegalStateException("Unable to read image bytes", e);
-        }
+        return bytesSource.get();
     }
 
     /**
@@ -76,7 +67,7 @@ public class RrdGraphInfo {
      * @return An array of formatted PRINT lines
      */
     public String[] getPrintLines() {
-        return printLines.toArray(new String[printLines.size()]);
+        return printLines.toArray(new String[0]);
     }
 
     /**
@@ -95,11 +86,7 @@ public class RrdGraphInfo {
      * @throws IllegalStateException if the images bytes are unavailable
      */
     public int getByteCount() {
-        try {
-            return stream.available();
-        } catch (IOException e) {
-            throw new IllegalStateException("Unable to read image bytes", e);
-        }
+        return bytesCount.get();
     }
 
     /**

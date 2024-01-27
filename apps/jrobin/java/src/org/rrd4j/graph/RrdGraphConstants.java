@@ -293,32 +293,32 @@ public interface RrdGraphConstants {
     /**
      * The file that contains font configuration searched in the class path. The default value is <code>/rrd4jfonts.properties</code>
      */
-    public static final String PROPERTYFONTSPROPERTIES = "org.rrd4j.fonts.properties";
+    String PROPERTYFONTSPROPERTIES = "org.rrd4j.fonts.properties";
     /**
      * A possible URL to a configuration file.
      */
-    public static final String PROPERTYFONTSURL = "org.rrd4j.fonts.properties.url";
+    String PROPERTYFONTSURL = "org.rrd4j.fonts.properties.url";
     /**
-     * The name of the plain font, used to define the {@link #DEFAULT_SMALL_FONT} and the {@link GATOR_FONT}. To be found in the classpath.
+     * The name of the plain font, used to define the {@link #DEFAULT_SMALL_FONT} and the {@link RrdGraphDef#GATOR_FONT}. To be found in the classpath.
      */
-    public static final String PROPERTYFONTPLAIN = "org.rrd4j.font.plain";
+    String PROPERTYFONTPLAIN = "org.rrd4j.font.plain";
     /**
      * The name of the bold font, used to define the {@link #DEFAULT_LARGE_FONT}. To be found in the classpath.
      */
-    public static final String PROPERTYFONTBOLD = "org.rrd4j.font.bold";
+    String PROPERTYFONTBOLD = "org.rrd4j.font.bold";
     /**
-     * An URL to the plain font, used to define the {@link #DEFAULT_SMALL_FONT} and the {@link GATOR_FONT}.
+     * An URL to the plain font, used to define the {@link #DEFAULT_SMALL_FONT} and the {@link RrdGraphDef#GATOR_FONT}.
      */
-    public static final String PROPERTYFONTPLAINURL = "org.rrd4j.font.plain.url";
+    String PROPERTYFONTPLAINURL = "org.rrd4j.font.plain.url";
     /**
      * An URL to the bold font, used to define the {@link #DEFAULT_LARGE_FONT}.
      */
-    public static final String PROPERTYFONTBOLDURL = "org.rrd4j.font.bold.url";
+    String PROPERTYFONTBOLDURL = "org.rrd4j.font.bold.url";
 
     /**
      * Font constructor, to use embedded fonts. Not really useful outside internal use for RRD4J.
      */
-    static class FontConstructor {
+    class FontConstructor {
         private static final Properties fileProps = new Properties();
         static {
             refreshConf();
@@ -364,7 +364,7 @@ public interface RrdGraphConstants {
          */
         public static Font getFont(int type, int size) {
 /*
-            Function<String, InputStream> fontStream = null;
+            Function<String, InputStream> fontStream;
             String fontPath = fileProps.getProperty(type == Font.BOLD ? PROPERTYFONTBOLDURL : PROPERTYFONTPLAINURL);
             if (fontPath!= null) {
                 fontStream = s -> {
@@ -391,15 +391,15 @@ public interface RrdGraphConstants {
     /**
      * Default graph small font
      */
-    static final Font DEFAULT_SMALL_FONT = FontConstructor.getFont(Font.PLAIN, 10);
+    Font DEFAULT_SMALL_FONT = FontConstructor.getFont(Font.PLAIN, 10);
     /**
      * Default graph large font
      */
-    static final Font DEFAULT_LARGE_FONT = FontConstructor.getFont(Font.BOLD, 12);
+    Font DEFAULT_LARGE_FONT = FontConstructor.getFont(Font.BOLD, 12);
     /**
      * Font for the Gator
      */
-    static final Font GATOR_FONT = FontConstructor.getFont(Font.PLAIN, 9);
+    Font GATOR_FONT = FontConstructor.getFont(Font.PLAIN, 9);
     /**
      * Used internally
      */
@@ -466,7 +466,7 @@ public interface RrdGraphConstants {
     /**
      * Allowed font tag names which can be used in {@link org.rrd4j.graph.RrdGraphDef#setFont(org.rrd4j.graph.RrdGraphConstants.FontTag, java.awt.Font)} method
      */
-    public enum FontTag  {
+    enum FontTag  {
         /**
          * Index of the default font. Used in {@link org.rrd4j.graph.RrdGraphDef#setFont(org.rrd4j.graph.RrdGraphConstants.FontTag, java.awt.Font)}
          */
@@ -508,7 +508,7 @@ public interface RrdGraphConstants {
 
     FontTag FONTTAG_AXIS      = FontTag.AXIS;
 
-    FontTag FONTTAG_UNIT      = FontTag.AXIS;
+    FontTag FONTTAG_UNIT      = FontTag.UNIT;
 
     FontTag FONTTAG_LEGEND    = FontTag.LEGEND;
 

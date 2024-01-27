@@ -13,6 +13,7 @@ public class ConstantArea extends Area {
         this.value = value;
     }
 
+    @Override
     void assignValues(DataProcessor dproc) {
         values = new double[dproc.getTimestamps().length];
         Arrays.fill(values, value);

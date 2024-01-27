@@ -239,8 +239,8 @@ public abstract class RrdBackend {
         int count = values.length;
         byte[] image = new byte[8 * count];
         int k = 0;
-        for (int i = 0; i < count; i++) {
-            byte[] b = getDoubleBytes(values[i]);
+        for (double value : values) {
+            byte[] b = getDoubleBytes(value);
             image[k++] = b[0];
             image[k++] = b[1];
             image[k++] = b[2];

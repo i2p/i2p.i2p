@@ -43,7 +43,7 @@ class ValueAxisLogarithmic extends Axis {
         if (im.maxval == im.minval) {
             return false;
         }
-        double pixpex = (double) im.ysize / (log10(im.maxval) - log10(im.minval));
+        double pixpex = im.ysize / (log10(im.maxval) - log10(im.minval));
         if (Double.isNaN(pixpex)) {
             return false;
         }

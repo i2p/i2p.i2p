@@ -60,6 +60,7 @@ import java.util.Calendar;
  * <li>There is a strong relation between the XML template syntax and the syntax of
  * {@link org.rrd4j.core.RrdDef} class methods. If you are not sure what some XML tag means, check javadoc
  * for the corresponding class.
+ * <li>the path to the rrd can be specified either as a file path using path element or as an uri using a url tag</li>
  * <li>starting timestamp can be supplied either as a long integer
  * (like: 1000243567) or as an ISO formatted string (like: 2004-02-21 12:25:45)
  * <li>whitespaces are not harmful

@@ -1,6 +1,5 @@
 package org.rrd4j.core;
 
-import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -28,8 +27,8 @@ public class RrdMemoryBackendFactory extends RrdBackendFactory {
      *
      * Creates RrdMemoryBackend object.
      */
-    protected RrdBackend open(String id, boolean readOnly) throws IOException {
-        AtomicReference<ByteBuffer> refbb = backends.computeIfAbsent(id, i -> new AtomicReference<ByteBuffer>());
+    protected RrdBackend open(String id, boolean readOnly) {
+        AtomicReference<ByteBuffer> refbb = backends.computeIfAbsent(id, i -> new AtomicReference<>());
         return new RrdMemoryBackend(id, refbb);
     }
 

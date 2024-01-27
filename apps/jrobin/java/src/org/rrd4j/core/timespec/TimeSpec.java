@@ -20,7 +20,7 @@ public class TimeSpec {
     int wday;
     int dyear, dmonth, dday, dhour, dmin, dsec;
 
-    String dateString;
+    final String dateString;
 
     TimeSpec context;
 
@@ -135,4 +135,3 @@ public class TimeSpec {
         };
     }
 }
-

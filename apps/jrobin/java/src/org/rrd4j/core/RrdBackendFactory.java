@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  *
  * Factory classes are used to create concrete {@link org.rrd4j.core.RrdBackend} implementations.
  * Each factory creates unlimited number of specific backend objects.
- *
+ * <p>
  * Rrd4j supports six different backend types (backend factories) out of the box:
  * <ul>
  * <li>{@link org.rrd4j.core.RrdRandomAccessFileBackend}: objects of this class are created from the
@@ -88,7 +88,7 @@ public abstract class RrdBackendFactory implements Closeable {
             factories.put(safeFactory.name, safeFactory);
             defaultFactory = factories.get(DEFAULTFACTORY);
         }
-        private static RrdBackendFactory defaultFactory;
+        private static final RrdBackendFactory defaultFactory;
     }
 
     /**
@@ -541,10 +541,9 @@ public abstract class RrdBackendFactory implements Closeable {
      * Determines if the header should be validated.
      *
      * @param path Storage path
-     * @throws java.io.IOException if header validation fails
      * @return a boolean.
      */
-    protected boolean shouldValidateHeader(String path) throws IOException {
+    protected boolean shouldValidateHeader(String path) {
         return validateHeader;
     }
 
@@ -552,10 +551,9 @@ public abstract class RrdBackendFactory implements Closeable {
      * Determines if the header should be validated.
      *
      * @param uri Storage URI
-     * @throws java.io.IOException if header validation fails
      * @return a boolean.
      */
-    protected boolean shouldValidateHeader(URI uri) throws IOException {
+    protected boolean shouldValidateHeader(URI uri) {
         return shouldValidateHeader(getPath(uri));
     }
 

@@ -1,6 +1,5 @@
 package org.rrd4j.data;
 
-import java.io.IOException;
 import java.net.URI;
 
 import org.rrd4j.ConsolFun;
@@ -36,7 +35,7 @@ class Def extends Source {
         this.backend = backend;
     }
 
-    URI getCanonicalUri() throws IOException {
+    URI getCanonicalUri() {
        return rrdUri;
     }
 
@@ -52,7 +51,7 @@ class Def extends Source {
         return backend;
     }
 
-    boolean isCompatibleWith(Def def) throws IOException {
+    boolean isCompatibleWith(Def def) {
         return getCanonicalUri().equals(def.getCanonicalUri()) &&
                 getConsolFun() == def.consolFun &&
                 ((backend == null && def.backend == null) ||

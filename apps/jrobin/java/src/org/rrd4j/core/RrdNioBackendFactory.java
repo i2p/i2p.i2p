@@ -171,7 +171,7 @@ public class RrdNioBackendFactory extends RrdFileBackendFactory {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         if (syncThreadPool != null) {
             syncThreadPool.shutdown();
         }

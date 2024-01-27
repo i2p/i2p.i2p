@@ -64,10 +64,9 @@ public abstract class RrdByteArrayBackend extends ByteBufferBackend {
      * {@inheritDoc}
      *
      * <p>It will reserves a memory section as a RRD storage.</p>
-     * 
-     * @throws java.lang.IllegalArgumentException if length is bigger that the possible length.
+     *
      */
-    protected void setLength(long length) throws IOException {
+    protected void setLength(long length) {
         if (length < 0 || length > Integer.MAX_VALUE) {
             throw new IllegalArgumentException("Illegal length: " + length);
         }

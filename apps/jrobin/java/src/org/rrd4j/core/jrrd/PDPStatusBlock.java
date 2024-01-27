@@ -1,7 +1,5 @@
 package org.rrd4j.core.jrrd;
 
-import java.io.IOException;
-
 /**
  * Instances of this class model the primary data point status from an RRD file.
  *
@@ -10,14 +8,14 @@ import java.io.IOException;
  */
 public class PDPStatusBlock {
 
-    private long offset;
-    private long size;
-    String lastReading;
-    int unknownSeconds;
-    double value;
-    private static enum pdp_par_en {PDP_unkn_sec_cnt, PDP_val};
+    private final long offset;
+    private final long size;
+    final String lastReading;
+    final int unknownSeconds;
+    final double value;
+    private enum pdp_par_en {PDP_unkn_sec_cnt, PDP_val}
 
-    PDPStatusBlock(RRDFile file) throws IOException {
+    PDPStatusBlock(RRDFile file) {
 
         offset = file.getFilePointer();
         lastReading = file.readString(Constants.LAST_DS_LEN);

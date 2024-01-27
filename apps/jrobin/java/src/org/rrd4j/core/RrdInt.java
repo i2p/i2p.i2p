@@ -6,11 +6,11 @@ class RrdInt<U extends RrdUpdater<U>> extends RrdPrimitive<U> {
     private int cache;
     private boolean cached = false;
 
-    RrdInt(RrdUpdater<U> updater, boolean isConstant) throws IOException {
+    RrdInt(RrdUpdater<U> updater, boolean isConstant) {
         super(updater, RrdPrimitive.RRD_INT, isConstant);
     }
 
-    RrdInt(RrdUpdater<U> updater) throws IOException {
+    RrdInt(RrdUpdater<U> updater) {
         this(updater, false);
     }
 

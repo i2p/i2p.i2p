@@ -10,6 +10,7 @@ class Stack extends SourcedPlotElement {
         super(srcName, color, parent);
     }
 
+    @Override
     void assignValues(DataProcessor dproc) {
         double[] parentValues = parent.getValues();
         double[] procValues = dproc.getValues(srcName);
@@ -40,6 +41,7 @@ class Stack extends SourcedPlotElement {
         }
     }
 
+    @Override
     Paint getParentColor() {
         return parent.color;
     }

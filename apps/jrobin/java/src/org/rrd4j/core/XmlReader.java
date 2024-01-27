@@ -11,8 +11,9 @@ import java.util.Locale;
 
 class XmlReader extends DataImporter {
 
-    private Element root;
-    private Node[] dsNodes, arcNodes;
+    private final Element root;
+    private final Node[] dsNodes;
+    private final Node[] arcNodes;
 
     XmlReader(String xmlFilePath) throws IOException {
         root = Util.Xml.getRootElement(new File(xmlFilePath));

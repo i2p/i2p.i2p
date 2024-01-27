@@ -41,7 +41,7 @@ class Normalizer {
                     long t2 = Math.min(rawTimestamps[rawSeg], timestamps[fillSeg]);
                     if (t1 < t2) {
                         values[fillSeg] = Util.sum(values[fillSeg], (t2 - t1) * rawValues[rawSeg]);
-                        weights[fillSeg] = Util.sum(weights[fillSeg], (double)(t2 - t1));
+                        weights[fillSeg] = Util.sum(weights[fillSeg], (t2 - t1));
                     }
                     else {
                         overlap = false;

@@ -1,6 +1,7 @@
 package org.rrd4j.core;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Class to represent archive values for a single datasource. Robin class is the heart of
@@ -18,10 +19,10 @@ class RobinMatrix implements Robin {
     private final Archive parentArc;
     private final RrdInt<Archive> pointer;
     private final RrdDoubleMatrix<Archive> values;
-    private int rows;
-    private int column;
+    private final int rows;
+    private final int column;
 
-    RobinMatrix(Archive parentArc, RrdDoubleMatrix<Archive> values, RrdInt<Archive> pointer, int column) throws IOException {
+    RobinMatrix(Archive parentArc, RrdDoubleMatrix<Archive> values, RrdInt<Archive> pointer, int column) {
         this.parentArc = parentArc;
         this.pointer = pointer; 
         this.values = values;
@@ -101,9 +102,7 @@ class RobinMatrix implements Robin {
      */
     public void setValues(double newValue) throws IOException {
         double[] values = new double[rows];
-        for (int i = 0; i < values.length; i++) {
-            values[i] = newValue;
-        }
+        Arrays.fill(values, newValue);
         update(values);
     }
 

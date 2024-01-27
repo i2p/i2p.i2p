@@ -1,6 +1,5 @@
 package org.rrd4j.core.jrrd;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -19,9 +18,8 @@ class UnivalArray {
      *
      * @param file the RRdFile
      * @param size the numer of elements in the array
-     * @throws java.io.IOException if any.
      */
-    public UnivalArray(RRDFile file, int size) throws IOException {
+    public UnivalArray(RRDFile file, int size) {
         sizeoflong = file.getBits();
         buffer = ByteBuffer.allocate(size * 8);
         if(file.isBigEndian())

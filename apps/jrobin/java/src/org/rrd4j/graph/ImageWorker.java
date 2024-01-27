@@ -8,12 +8,8 @@ import java.awt.Stroke;
 import java.awt.font.LineMetrics;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Paths;
 
 import javax.imageio.IIOImage;
@@ -182,7 +178,7 @@ class ImageWorker {
 
         // Some format can't manage 16M colors images
         // JPEG don't like transparency
-        if (! imgProvider.canEncodeImage(outputImage) || "image/jpeg".equals(imgProvider.getMIMETypes()[0].toLowerCase())) {
+        if (! imgProvider.canEncodeImage(outputImage) || "image/jpeg".equalsIgnoreCase(imgProvider.getMIMETypes()[0])) {
             int w = img.getWidth();
             int h = img.getHeight();
             outputImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
@@ -208,15 +204,14 @@ class ImageWorker {
         }
     }
 
-    InputStream saveImage(String path, ImageWriter writer, ImageWriteParam iwp) throws IOException {
+    void saveImage(String path, ImageWriter writer, ImageWriteParam iwp) throws IOException {
         makeImage(Paths.get(path).toFile(), writer, iwp);
-        return new BufferedInputStream(new FileInputStream(path));
     }
 
-    InputStream getImageBytes(ImageWriter writer, ImageWriteParam iwp) throws IOException {
+    byte[] getImageBytes(ImageWriter writer, ImageWriteParam iwp) throws IOException {
         try (ByteArrayOutputStream stream = new ByteArrayOutputStream(IMG_BUFFER_CAPACITY)){
             makeImage(stream, writer, iwp);
-            return new ByteArrayInputStream(stream.toByteArray());
+            return stream.toByteArray();
         }
     }
 
