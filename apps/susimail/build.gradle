@@ -12,8 +12,8 @@ sourceSets {
 }
 
 dependencies {
-    compile project(':core')
-    providedCompile project(':apps:jetty')
+    implementation project(':core')
+    implementation project(':apps:jetty')
 }
 
 // Create the java files from the po files. The jar task will compile them.
@@ -36,6 +36,7 @@ war {
     webInf {
         into 'classes'
         from 'src/susimail.properties'
+        duplicatesStrategy 'include'
     }
     webXml = file('src/WEB-INF/web.xml')
 }

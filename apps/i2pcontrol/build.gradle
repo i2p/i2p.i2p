@@ -1,4 +1,5 @@
 plugins {
+    id 'java-library'
     id 'war'
 }
 
@@ -11,13 +12,15 @@ sourceSets {
 }
 
 dependencies {
-    providedCompile project(':router')
-    providedCompile project(':apps:jetty')
-    providedCompile files('../../installer/lib/wrapper/all/wrapper.jar')
+    api project(':router')
+    api project(':apps:jetty')
+    api files('../../installer/lib/wrapper/all/wrapper.jar')
+    api fileTree("../jetty/apache-tomcat-${tomcatVersion}")
+    api fileTree("../jetty/jetty-distribution-${jettyVersion}")
 }
 
 war {
-    archiveName 'jsonrpc.war'
+    archiveBaseName.set('jsonrpc')
     webXml = file('web.xml')
 }
 

@@ -1,3 +1,7 @@
+plugins {
+    id 'java-library'
+}
+
 sourceSets {
     main {
         java {
@@ -12,7 +16,7 @@ sourceSets {
 }
 
 dependencies {
-    compile project(':core')
-    compile project(':apps:ministreaming')
-    compile 'gnu.getopt:java-getopt:1.0.13'
+    api project(':core')
+    api project(':apps:ministreaming')
+    api 'gnu.getopt:java-getopt:1.0.13'
 }

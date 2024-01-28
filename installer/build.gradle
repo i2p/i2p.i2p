@@ -19,12 +19,12 @@ sourceSets {
 }
 
 dependencies {
-    compile project(':core')
-    runtime files('lib/wrapper/all/wrapper.jar')
+    implementation project(':core')
+    runtimeOnly files('lib/wrapper/all/wrapper.jar')
 }
 
 jar {
-    baseName 'utility'
+    archiveBaseName.set('utility')
     from project(':core').sourceSets.main.output
     include 'net/i2p/installer/**'
     include 'net/i2p/util/FileUtil.class'
@@ -34,7 +34,7 @@ jar {
 }
 
 task jbigiJar(type: Jar) {
-    baseName = 'jbigi'
+    archiveBaseName = 'jbigi'
     from sourceSets.jbigi.output
 }
 

@@ -1,3 +1,7 @@
+plugins {
+    id 'java-library'
+}
+
 apply plugin: 'application'
 
 application {
@@ -6,28 +10,28 @@ application {
 }
 
 dependencies {
-    implementation project(':router')
-    implementation project(':apps:ministreaming')
-    implementation project(':apps:streaming')
-    implementation project(':apps:i2ptunnel')
-    implementation project(':apps:jetty')
-    implementation project(':apps:i2psnark')
-    implementation project(':apps:systray')
-    implementation project(':apps:BOB')
-    implementation project(':apps:sam')
-    implementation project(':apps:routerconsole')
-    implementation project(':apps:desktopgui')
-    implementation project(':apps:jrobin')
-    implementation project(':apps:addressbook')
-    implementation project(':apps:susidns')
-    implementation project(':apps:susimail')
-    implementation project(':apps:i2pcontrol')
-    implementation project(':apps:imagegen')
-    implementation project(':core')
-    implementation project(':router')
-    implementation project(path : ':installer', configuration: 'jbigi')
-    implementation files("../apps/susidns/src/lib/standard.jar")
-    implementation files("../apps/susidns/src/lib/jstl.jar")
+    api project(':router')
+    api project(':apps:ministreaming')
+    api project(':apps:streaming')
+    api project(':apps:i2ptunnel')
+    api project(':apps:jetty')
+    api project(':apps:i2psnark')
+    api project(':apps:systray')
+    api project(':apps:BOB')
+    api project(':apps:sam')
+    api project(':apps:routerconsole')
+    api project(':apps:desktopgui')
+    api project(':apps:jrobin')
+    api project(':apps:addressbook')
+    api project(':apps:susidns')
+    api project(':apps:susimail')
+    api project(':apps:i2pcontrol')
+    api project(':apps:imagegen')
+    api project(':core')
+    api project(':router')
+    api project(path : ':installer', configuration: 'jbigi')
+    api files("../apps/susidns/src/lib/standard.jar")
+    api files("../apps/susidns/src/lib/jstl.jar")
 }
 
 import java.nio.file.*
@@ -55,7 +59,7 @@ task copyWars {
                 filter({it.getName().endsWith('war')}).each { file ->
                 println "copying war $file exists ${file.exists()}"
                 File target = new File(webappDir, file.getName())
-                Files.copy(file.toPath(), target.toPath())
+                Files.copy(file.toPath(), target.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING)
             }
         } 
     }
@@ -71,7 +75,7 @@ task copyGeoip() {
         File target = new File(geoipDir, "GeoLite2-Country.mmdb")
         File source = new File("$rootDir/installer/resources/GeoLite2-Country.mmdb.gz")
         InputStream is = new GZIPInputStream(new FileInputStream(source))
-        java.nio.file.Files.copy(is, target.toPath())
+        java.nio.file.Files.copy(is, target.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING)
     }
 }
 

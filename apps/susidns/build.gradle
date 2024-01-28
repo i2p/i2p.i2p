@@ -12,11 +12,13 @@ sourceSets {
 }
 
 dependencies {
-    providedCompile project(':core')
-    providedCompile project(':apps:jetty')
+    implementation project(':core')
+    implementation project(':apps:jetty')
 
-    implementation 'org.apache.ant:ant:1.10.10'
-    implementation fileTree("../jetty/apache-tomacat-${tomcatVersion}")
+    // seems like it should be compileOnly but that doesn't work
+    implementation 'org.apache.ant:ant:1.10.14'
+    implementation fileTree("../jetty/apache-tomcat-${tomcatVersion}")
+    implementation fileTree("../jetty/jetty-distribution-${jettyVersion}")
 }
 
 // Create the java files from the po files. The jar task will compile them.

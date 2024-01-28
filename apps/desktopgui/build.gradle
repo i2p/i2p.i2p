@@ -1,3 +1,7 @@
+plugins {
+    id 'java-library'
+}
+
 sourceSets {
     main {
         java {
@@ -8,10 +12,10 @@ sourceSets {
 }
 
 dependencies {
-    compile project(':core')
-    compile project(':router')
-    compile project(':installer')
-    compile project(':apps:systray')
+    api project(':core')
+    api project(':router')
+    api project(':installer')
+    api project(':apps:systray')
 }
 
 // Create the java files from the po files. The jar task will compile them.

@@ -362,7 +362,7 @@ distributions. See the source package for the additional license information.
    Admin Manager:
    Public domain
 
-   Gradle wrapper 5.2.1:
+   Gradle wrapper 8.5:
    (not included in most distribution packages)
-   Copyright (c) 2017 the original author or authors.
+   Copyright (c) 2023 the original author or authors.
    See licenses/LICENSE-Apache2.0.txt

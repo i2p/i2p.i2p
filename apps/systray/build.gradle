@@ -1,3 +1,7 @@
+plugins {
+    id 'java-library'
+}
+
 sourceSets {
     main {
         java {
@@ -7,5 +11,5 @@ sourceSets {
 }
 
 dependencies {
-    compile project(':core')
+    api project(':core')
 }

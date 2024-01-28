@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'scala'
-    id 'me.champeau.gradle.jmh' version '0.4.8'
+    id 'me.champeau.jmh' version '0.7.2'
 }
 
 archivesBaseName = 'i2p'
@@ -41,15 +41,16 @@ sourceSets {
 }
 
 dependencies {
-    implementation 'gnu.getopt:java-getopt:1.0.13'
-    implementation 'org.gnu.gettext:libintl:0.18.3'
+    api 'gnu.getopt:java-getopt:1.0.13'
+    api 'org.gnu.gettext:libintl:0.18.3'
 
     if (project.hasProperty("with.jbigi")) {
         runtimeOnly project(path: ':installer', configuration: 'jbigi')
     }
 
-    testCompile "org.scala-lang:scala-library:2.12.4"
-    testCompile 'org.scalatest:scalatest_2.12:3.0.4'
+    // don't use 2.12.4, stack overflow: https://github.com/sbt/zinc/issues/1010
+    testImplementation "org.scala-lang:scala-library:2.12.5"
+    testImplementation 'org.scalatest:scalatest_2.12:3.0.4'
 }
 
 if (System.getenv("TARGET_JAVA_HOME") == null && JavaVersion.current() != JavaVersion.VERSION_1_7) {
@@ -65,6 +66,7 @@ if (System.getenv("TARGET_JAVA_HOME") == null && JavaVersion.current() != JavaVe
         args = ['-R', 'build/classes/scala/test', '-o']
         classpath = sourceSets.test.runtimeClasspath
     }
+
     test.dependsOn scalaTest
 }
 
@@ -94,7 +96,7 @@ configurations {
     tests
 }
 task testJar(type: Jar) {
-    baseName = 'i2p-test'
+    archiveBaseName = 'i2p-test'
     dependsOn classes
     from sourceSets.test.output
 }

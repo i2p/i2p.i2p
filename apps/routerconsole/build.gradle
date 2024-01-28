@@ -1,4 +1,5 @@
 plugins {
+    id 'java-library'
     id 'war'
     id 'scala'
 }
@@ -15,21 +16,24 @@ sourceSets {
 }
 
 dependencies {
-    compile project(':core')
-    compile project(':router')
-    compile project(':installer')
-    compile 'gnu.getopt:java-getopt:1.0.13'
+    api project(':core')
+    api project(':router')
+    api project(':installer')
+    api 'gnu.getopt:java-getopt:1.0.13'
 
-    // below were providedCompile
-    providedCompile project(':apps:desktopgui')
-    providedCompile project(':apps:systray')
-    providedCompile project(':apps:jetty')
-    providedCompile project(':apps:jrobin')
+    api project(':apps:desktopgui')
+    api project(':apps:systray')
+    api project(':apps:jetty')
+    api project(':apps:jrobin')
+    api files('../../installer/lib/wrapper/all/wrapper.jar')
+    api fileTree("../jetty/jetty-distribution-${jettyVersion}")
 
-    implementation 'org.apache.ant:ant:1.10.10'
-    implementation fileTree("../jetty/apache-tomacat-${tomcatVersion}")
-    testCompile "org.scala-lang:scala-library:2.12.4"
-    testCompile 'org.scalatest:scalatest_2.12:3.0.4'
+    // seems like it should be compileOnly but that doesn't work
+    implementation 'org.apache.ant:ant:1.10.14'
+    api fileTree("../jetty/apache-tomcat-${tomcatVersion}")
+    // don't use 2.12.4, stack overflow: https://github.com/sbt/zinc/issues/1010
+    testImplementation "org.scala-lang:scala-library:2.12.5"
+    testImplementation 'org.scalatest:scalatest_2.12:3.0.4'
 }
 
 if (System.getenv("TARGET_JAVA_HOME") == null && JavaVersion.current() != JavaVersion.VERSION_1_7) {
@@ -173,6 +177,7 @@ war.dependsOn(bundle,precompileJsp)
 
 
 war {
+    duplicatesStrategy 'exclude'
     rootSpec.exclude('**/*.jar')
     rootSpec.exclude('/com/vuze/**/*')
     rootSpec.exclude('/edu/internet2/**/*')
