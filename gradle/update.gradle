@@ -86,23 +86,25 @@ task prepUpdate(type: Copy) {
 task updaterRouter(type: Zip) {
     description 'makes an i2pupdate.zip file containing core and router jars only'
     dependsOn prepUpdateRouter
-    archiveName 'i2pupdate.zip'
-    destinationDir file('.')
+    // https://stackoverflow.com/questions/54501697/gradle-war-plugin-how-to-change-name-of-an-archive
+    // https://discuss.gradle.org/t/destinationdir-is-deprecated-archivename-is-deprecated/31586
+    archiveFileName.set('i2pupdate.zip')
+    destinationDirectory.set(file('.'))
     from 'pkg-temp'
 }
 
 task updaterSmall(type: Zip) {
     description 'makes an i2pupdate.zip file with a subset of the resources'
     dependsOn prepUpdateSmall
-    archiveName 'i2pupdate.zip'
-    destinationDir file('.')
+    archiveFileName.set('i2pupdate.zip')
+    destinationDirectory.set(file('.'))
     from 'pkg-temp'
 }
 
 task updater(type: Zip) {
     description 'makes an i2pupdate.zip file'
     dependsOn prepUpdate
-    archiveName 'i2pupdate.zip'
-    destinationDir file('.')
+    archiveFileName.set('i2pupdate.zip')
+    destinationDirectory.set(file('.'))
     from 'pkg-temp'
 }

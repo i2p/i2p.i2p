@@ -14,8 +14,9 @@ sourceSets {
 }
 
 dependencies {
-    providedCompile project(':core')
-    providedCompile project(':apps:jetty')
+    implementation project(':core')
+    implementation project(':apps:jetty')
+    implementation fileTree("../jetty/apache-tomcat-${tomcatVersion}")
 }
 
 war {

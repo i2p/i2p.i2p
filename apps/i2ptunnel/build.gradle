@@ -1,4 +1,5 @@
 plugins {
+    id 'java-library'
     id 'war'
 }
 
@@ -18,13 +19,14 @@ sourceSets {
 }
 
 dependencies {
-    compile project(':core')
-    providedCompile project(':apps:ministreaming')
-    compile 'gnu.getopt:java-getopt:1.0.13'
-    providedCompile project(':apps:jetty')
+    api project(':core')
+    api project(':apps:ministreaming')
+    api 'gnu.getopt:java-getopt:1.0.13'
+    api project(':apps:jetty')
 
-    implementation 'org.apache.ant:ant:1.10.10'
-    implementation fileTree("../jetty/apache-tomacat-${tomcatVersion}")
+    // seems like it should be compileOnly but that doesn't work
+    implementation 'org.apache.ant:ant:1.10.14'
+    api fileTree("../jetty/apache-tomcat-${tomcatVersion}")
 }
 
 // Create the java files from the po files. The jar task will compile them.
@@ -159,12 +161,12 @@ task tempBeansJar(type: Jar) {
     include '**/EditBean.class'
     include '**/ui/*.class'
     include '**/IndexBean.class'
-    baseName = 'temp-beans'
+    archiveBaseName = 'temp-beans'
 }
 
 // only for android
 task uiJar(type: Jar) {
-    baseName = 'i2ptunnel-ui'
+    archiveBaseName = 'i2ptunnel-ui'
     from sourceSets.main.output
     include '**/ui/*.class'
     manifest {
@@ -177,6 +179,7 @@ artifacts {
 }
 
 war {
+    duplicatesStrategy 'exclude'
     include '**/EditBean.class'
     include '**/ui/*.class'
     include '**/IndexBean.class'

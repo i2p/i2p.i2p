@@ -1,3 +1,7 @@
+plugins {
+    id 'java-library'
+}
+
 archivesBaseName = 'jetty-i2p'
 
 sourceSets {
@@ -9,30 +13,30 @@ sourceSets {
 }
 
 dependencies {
-    ext.jettyVersion = '9.3.29.v20201019'
+    ext.jettyVersion = '9.3.30.v20211001'
     ext.tomcatVersion = "${tomcatVersion}"
-    compile project(':core')
-    compile 'org.eclipse.jetty:jetty-http:' + ext.jettyVersion
-    compile 'org.eclipse.jetty:jetty-io:' + ext.jettyVersion
-    compile 'org.eclipse.jetty:jetty-security:' + ext.jettyVersion
-    compile 'org.eclipse.jetty:jetty-server:' + ext.jettyVersion
-    compile 'org.eclipse.jetty:jetty-servlet:' + ext.jettyVersion
-    compile 'org.eclipse.jetty:jetty-util:' + ext.jettyVersion
-    compile 'org.eclipse.jetty:jetty-xml:' + ext.jettyVersion
-    runtime 'org.eclipse.jetty:apache-jsp:' + ext.jettyVersion
-    runtime 'org.eclipse.jetty:jetty-continuation:' + ext.jettyVersion
-    compile 'org.eclipse.jetty:jetty-deploy:' + ext.jettyVersion
-    runtime 'org.eclipse.jetty:jetty-jmx:' + ext.jettyVersion
-    runtime 'org.eclipse.jetty:jetty-rewrite:' + ext.jettyVersion
-    runtime 'org.eclipse.jetty:jetty-servlets:' + ext.jettyVersion
-    runtime 'org.eclipse.jetty:jetty-start:' + ext.jettyVersion
-    compile 'org.eclipse.jetty:jetty-webapp:' + ext.jettyVersion
-    compile 'org.apache.tomcat:tomcat-api:' + ext.tomcatVersion
-    runtime 'org.apache.tomcat:tomcat-el-api:' + ext.tomcatVersion
-    runtime 'org.apache.tomcat:tomcat-jasper:' + ext.tomcatVersion
-    runtime 'org.apache.tomcat:tomcat-jasper-el:' + ext.tomcatVersion
-    runtime 'org.apache.tomcat:tomcat-jsp-api:' + ext.tomcatVersion
-    runtime 'org.apache.tomcat:tomcat-juli:' + ext.tomcatVersion
-    runtime 'org.apache.tomcat:tomcat-util:' + ext.tomcatVersion
-    runtime 'org.apache.tomcat:tomcat-util-scan:' + ext.tomcatVersion
+    api project(':core')
+    api 'org.eclipse.jetty:jetty-http:' + ext.jettyVersion
+    api 'org.eclipse.jetty:jetty-io:' + ext.jettyVersion
+    api 'org.eclipse.jetty:jetty-security:' + ext.jettyVersion
+    api 'org.eclipse.jetty:jetty-server:' + ext.jettyVersion
+    api 'org.eclipse.jetty:jetty-servlet:' + ext.jettyVersion
+    api 'org.eclipse.jetty:jetty-util:' + ext.jettyVersion
+    api 'org.eclipse.jetty:jetty-xml:' + ext.jettyVersion
+    api 'org.eclipse.jetty:apache-jsp:' + ext.jettyVersion
+    api 'org.eclipse.jetty:jetty-continuation:' + ext.jettyVersion
+    api 'org.eclipse.jetty:jetty-deploy:' + ext.jettyVersion
+    api 'org.eclipse.jetty:jetty-jmx:' + ext.jettyVersion
+    api 'org.eclipse.jetty:jetty-rewrite:' + ext.jettyVersion
+    api 'org.eclipse.jetty:jetty-servlets:' + ext.jettyVersion
+    api 'org.eclipse.jetty:jetty-start:' + ext.jettyVersion
+    api 'org.eclipse.jetty:jetty-webapp:' + ext.jettyVersion
+    api 'org.apache.tomcat:tomcat-api:' + ext.tomcatVersion
+    api 'org.apache.tomcat:tomcat-el-api:' + ext.tomcatVersion
+    api 'org.apache.tomcat:tomcat-jasper:' + ext.tomcatVersion
+    api 'org.apache.tomcat:tomcat-jasper-el:' + ext.tomcatVersion
+    api 'org.apache.tomcat:tomcat-jsp-api:' + ext.tomcatVersion
+    api 'org.apache.tomcat:tomcat-juli:' + ext.tomcatVersion
+    api 'org.apache.tomcat:tomcat-util:' + ext.tomcatVersion
+    api 'org.apache.tomcat:tomcat-util-scan:' + ext.tomcatVersion
 }

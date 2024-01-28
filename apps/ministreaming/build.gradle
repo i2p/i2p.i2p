@@ -44,7 +44,7 @@ configurations {
     tests
 }
 task testJar(type: Jar) {
-    baseName = 'mstreaming-test'
+    archiveBaseName = 'mstreaming-test'
     dependsOn classes
     from sourceSets.test.output
 }
