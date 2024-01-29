@@ -633,6 +633,17 @@ public final class DSAEngine {
             jsig.initSign(privKey, _context.random());
             jsig.update(data, offset, len);
             sigbytes = jsig.sign();
+            if (type.getBaseAlgorithm() == SigAlgo.RSA) {
+                // verify to prevent corrupted sig key factoring
+                // (RSA fault attack) https://eprint.iacr.org/2023/1711.pdf
+                SigningPrivateKey priv = SigUtil.fromJavaKey(privKey, type);
+                SigningPublicKey pub = priv.toPublic();
+                PublicKey pubKey = SigUtil.toJavaKey(pub);
+                jsig.initVerify(pubKey);
+                jsig.update(data, offset, len);
+                if (!jsig.verify(sigbytes))
+                    throw new GeneralSecurityException("Verify of RSA Signature failed");
+            }
         }
         return SigUtil.fromJavaSig(sigbytes, type);
     }
@@ -681,6 +692,17 @@ public final class DSAEngine {
             jsig.initSign(privKey, _context.random());
             jsig.update(hash.getData());
             sigbytes = jsig.sign();
+            if (type.getBaseAlgorithm() == SigAlgo.RSA) {
+                // verify to prevent corrupted sig key factoring
+                // (RSA fault attack) https://eprint.iacr.org/2023/1711.pdf
+                SigningPrivateKey priv = SigUtil.fromJavaKey(privKey, type);
+                SigningPublicKey pub = priv.toPublic();
+                PublicKey pubKey = SigUtil.toJavaKey(pub);
+                jsig.initVerify(pubKey);
+                jsig.update(hash.getData());
+                if (!jsig.verify(sigbytes))
+                    throw new GeneralSecurityException("Verify of RSA Signature failed");
+            }
         }
         return SigUtil.fromJavaSig(sigbytes, type);
     }
