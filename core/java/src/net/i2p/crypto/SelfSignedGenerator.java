@@ -676,6 +676,9 @@ public final class SelfSignedGenerator {
             altNames.add("localhost");
             altNames.add("127.0.0.1");
             altNames.add("::1");
+            // RFC 9476
+            if (cname.endsWith(".i2p"))
+                altNames.add(cname + ".alt");
         }
         for (String n : altNames) {
             int len;
