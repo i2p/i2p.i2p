@@ -2,9 +2,7 @@ package net.i2p.crypto;
 
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import static net.i2p.crypto.x25519.spec.X25519Spec.X25519_SPEC;
 import net.i2p.data.Hash;
@@ -156,18 +154,25 @@ public enum EncType {
         return type.isAvailable();
     }
 
-    private static final Map<Integer, EncType> BY_CODE = new HashMap<Integer, EncType>();
+    private static final EncType[] BY_CODE;
 
     static {
-        for (EncType type : EncType.values()) {
-            if (BY_CODE.put(Integer.valueOf(type.getCode()), type) != null)
+        EncType[] values = values();
+        int max = values[values.length - 1].getCode();
+        BY_CODE = new EncType[max + 1];
+        for (EncType type : values) {
+            int i = type.getCode();
+            if (BY_CODE[i] != null)
                 throw new IllegalStateException("Duplicate EncType code");
+            BY_CODE[i] = type;
         }
     }
 
     /** @return null if not supported */
     public static EncType getByCode(int code) {
-        return BY_CODE.get(Integer.valueOf(code));
+        if (code < 0 || code >= BY_CODE.length)
+            return null;
+        return BY_CODE[code];
     }
 
     /**
