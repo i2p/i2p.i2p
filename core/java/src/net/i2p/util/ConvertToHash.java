@@ -33,6 +33,10 @@ public class ConvertToHash {
         if (peer == null)
             return null;
         String peerLC = peer.toLowerCase(Locale.US);
+        if (peerLC.endsWith(".i2p.alt")) {
+            peer = peer.substring(0, peer.length() - 4);
+            peerLC = peerLC.substring(0, peer.length() - 4);
+        }
         // b64 hash
         if (peer.length() == 44 && !peerLC.endsWith(".i2p")) {
             byte[] b = Base64.decode(peer);
