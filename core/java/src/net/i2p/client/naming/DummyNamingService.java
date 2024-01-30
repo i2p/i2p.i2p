@@ -55,6 +55,10 @@ public class DummyNamingService extends NamingService {
      */
     @Override
     public Destination lookup(String hostname, Properties lookupOptions, Properties storedOptions) {
+        if (hostname.endsWith(".i2p.alt")) {
+            // RFC 9476
+            hostname = hostname.substring(0, hostname.length() - 4);
+        }
         Destination d = getCache(hostname);
         if (d != null)
             return d;

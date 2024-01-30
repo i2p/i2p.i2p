@@ -762,6 +762,10 @@ public class BlockfileNamingService extends DummyNamingService {
      */
     @Override
     public Destination lookup(String hostname, Properties lookupOptions, Properties storedOptions) {
+        if (hostname.endsWith(".i2p.alt")) {
+            // RFC 9476
+            hostname = hostname.substring(0, hostname.length() - 4);
+        }
         Destination rv = lookup2(hostname, lookupOptions, storedOptions);
         if (rv == null) {
             // if hostname starts with "www.", strip and try again
