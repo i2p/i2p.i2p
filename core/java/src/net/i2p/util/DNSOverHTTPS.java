@@ -2,6 +2,7 @@ package net.i2p.util;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
@@ -535,8 +536,10 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
         Type type = Type.V4_ONLY;
         boolean error = false;
         boolean testall = false;
+        boolean decode = false;
+        boolean process = false;
         String url = null;
-        Getopt g = new Getopt("dnsoverhttps", args, "46fstu:");
+        Getopt g = new Getopt("dnsoverhttps", args, "46fstu:dp");
         try {
             int c;
             while ((c = g.getopt()) != -1) {
@@ -549,8 +552,22 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
                     type = Type.V6_ONLY;
                     break;
 
+                case 'd':
+                    if (decode || process || testall)
+                        error = true;
+                    else
+                        decode = true;
+                    break;
+
                 case 'f':
                     type = Type.V4_PREFERRED;
+                    break;
+
+                case 'p':
+                    if (decode || process || testall)
+                        error = true;
+                    else
+                        process = true;
                     break;
 
                 case 's':
@@ -613,6 +630,14 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
                 clearCaches();
             }
             System.out.println("Test complete: " + pass + " pass, " + fail + " fail");
+        } else if (decode) {
+            decodeStamp(hostname, true);
+        } else if (process) {
+            try {
+                decodeStamps(hostname);
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
         } else {
             String result = (new DNSOverHTTPS(I2PAppContext.getGlobalContext())).lookup(hostname, type, url);
             if (result != null)
@@ -629,6 +654,124 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
                            "             [-t] (test all servers)\n" +
                            "             [-u 'https://host/dns-query?...&'] (request from this URL only)\n" +
                            "             [-4] (IPv4 only) (default)\n" +
-                           "             [-6] (IPv6 only)");
+                           "             [-6] (IPv6 only)\n" +
+                           "DNSOverHTTPS -d sdns://... (decode server stamp)\n" +
+                           "DNSOverHTTPS -p doh-resolvers.md (decode all server stamps in file)");
+    }
+
+    /**
+     *  Decode sdns:// stamps
+     *  e.g. sdns://AgMAAAAAAAAADjE2My40Ny4xMTcuMTc2oMwQYNOcgym2K2-8fQ1t-TCYabmB5-Y5LVzY-kCPTYDmIEROvWe7g_iAezkh6TiskXi4gr1QqtsRIx8ETPXwjffOEGFkbC5hZGZpbHRlci5uZXQKL2Rucy1xdWVyeQ
+     *  Ref: https://dnscrypt.info/stamps-specifications/
+     *
+     *  @return the URL, or null on error or if not a DoH (type 2) stamp
+     *  @since 0.9.62
+     */
+    private static String decodeStamp(String sdns, boolean log) {
+        byte[] d = null;
+        try {
+            if (!sdns.startsWith("sdns://")) {
+                if (log) System.out.println("Must start with sdns://");
+                return null;
+            }
+            sdns = sdns.substring(7);
+            sdns = sdns.replace("_", "~");
+            d = Base64.decode(sdns);
+            if (d == null) {
+                if (log) System.out.println("Bad encoding");
+                return null;
+            }
+            int type = d[0] & 0xff;
+            // little endian, ignore last 7 bytes
+            int props = d[1] & 0xff;
+            int len = d[9] & 0xff;
+            String addr = "n/a";
+            if (len > 0) {
+                try {
+                    addr = new String(d, 10, len, "ISO-8859-1");
+                } catch (IOException ioe) {}
+            }
+            String host = "";
+            String path = "/";
+            if (type == 0x02) {
+                int off = 10 + len;
+                int vlen = d[off++] & 0xff;
+                // skip VLP of hashes
+                while ((vlen & 0x80) != 0) {
+                    off += vlen & 0x7f;
+                    vlen = d[off++] & 0xff;
+                }
+                off += vlen;
+                len = d[off++] & 0xff;
+                if (len > 0) {
+                    try {
+                        host = new String(d, off, len, "ISO-8859-1");
+                    } catch (IOException ioe) {}
+                    off += len;
+                }
+                len = d[off++] & 0xff;
+                if (len > 0) {
+                    try {
+                        path = new String(d, off, len, "ISO-8859-1");
+                    } catch (IOException ioe) {}
+                    off += len;
+                }
+            }
+            String url = (type == 2 && host.length() > 0) ? "https://" + host + path : null;
+            if (log) {
+                if (url != null)
+                    System.out.print(url + ' ');
+                if (type == 1)
+                    System.out.print("DNSCrypt");
+                else if (type == 2)
+                    System.out.print("DoH");
+                else if (type == 3)
+                    System.out.print("DNSoverTLS");
+                else if (type == 4)
+                    System.out.print("DNSoverQUIC");
+                else if (type == 5)
+                    System.out.print("oDoH");
+                else if (type == 0x81)
+                    System.out.print("DNSCrypt-relay");
+                else if (type == 0x85)
+                    System.out.print("oDoH-relay");
+                else
+                    System.out.print("unknown-" + type);
+                System.out.println(" logs? " + ((props & 0x01) == 0) +
+                                   " filters? " + ((props & 0x02) == 0) +
+                                   " IP: " + addr);
+            }
+            return url;
+        } catch (IndexOutOfBoundsException ioobe) {
+            if (log) {
+                System.out.println("Failed: " + ioobe);
+                //ioobe.printStackTrace();
+                System.out.println(HexDump.dump(d));
+            }
+            return null;
+        }
+    }
+
+    /**
+     *  Decode sdns:// stamps found in file
+     *
+     *  @return the URL, or null on error or if not a DoH (type 2) stamp
+     *  @since 0.9.62
+     */
+    private static void decodeStamps(String file) throws IOException {
+        BufferedReader in = null;
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            in = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
+            String line = null;
+            while ( (line = in.readLine()) != null) {
+                line = line.trim();
+                if (!line.startsWith("sdns://"))
+                    continue;
+                decodeStamp(line, true);
+            }
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+        }
     }
 }
