@@ -3,6 +3,8 @@
  */
 package net.i2p.i2ptunnel;
 
+import java.util.Properties;
+
 import net.i2p.client.I2PSession;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.EventDispatcherImpl;
@@ -109,6 +111,17 @@ public abstract class I2PTunnelTask extends EventDispatcherImpl {
     public void disconnected(I2PSession session) {
         routerDisconnected();
         getTunnel().removeSession(session);
+    }
+
+    /**
+     *  @since 0.9.62
+     */
+    protected boolean getBooleanOption(String opt, boolean dflt) {
+        Properties opts = getTunnel().getClientOptions();
+        String o = opts.getProperty(opt);
+        if (o != null)
+            return Boolean.parseBoolean(o);
+        return dflt;
     }
 
     /**
