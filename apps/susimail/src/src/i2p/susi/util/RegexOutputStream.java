@@ -3,6 +3,7 @@ package i2p.susi.util;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Locale;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -10,6 +11,7 @@ import net.i2p.util.Log;
 
 /**
  * Replace patterns with a simple regex on the fly.
+ * Case insensitive.
  *
  * @since 0.9.62
  */
@@ -34,7 +36,7 @@ public class RegexOutputStream extends FilterOutputStream {
         super(out);
         if (pattern.length() == 0 || pattern.startsWith("*") || pattern.endsWith("*") || pattern.contains("**"))
             throw new IllegalArgumentException();
-        match = pattern;
+        match = pattern.toLowerCase(Locale.US);
         repl = replace;
         noMatch = onNoMatch;
         buf = new StringBuilder(64);
@@ -60,7 +62,7 @@ public class RegexOutputStream extends FilterOutputStream {
                     found = true;
                 }
             }
-        } else if (m == c) {
+        } else if (m == Character.toLowerCase(c)) {
             pushit(c);
             idx++;
             if (idx == match.length()) {

@@ -276,6 +276,10 @@ td[colspan="9"] hr {
      padding: 0 10px !important;
 }
 
+iframe {
+     background: #ccc;
+}
+
 table#mailbox {
      margin-bottom: 0;
 }
