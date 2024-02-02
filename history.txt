@@ -1,3 +1,35 @@
+2024-02-02 zzz
+ * i2ptunnel: Implement client-side persistence (Gitlab MR !176)
+ * susimail: Add support for HTML email (Gitlab MR !177)
+
+2024-01-31 zzz
+ * CLI: Add sdns stamp decoder
+
+2024-01-30 zzz
+ * Naming: Add .i2p.alt support
+ * Util: DoH server list update
+
+2024-01-29 zzz
+ * Crypto:
+   - More efficient enum lookup by code
+   - Verify RSA sigs after signing
+ * i2psnark: Sanitize unicode LTR/RTL control chars
+ * Util: Add .alt to selfsigned cert alt names
+
+2024-01-28 zzz
+ * Build: Update gradlew to 8.5 (Gitlab MR !180)
+
+2024-01-27 zzz
+ * Console: Update RRD4J to 3.9 (Gitlab MR !178)
+ * Transport: Remove SSU1 code from EstablishmentManager (Gitlab MR !179)
+
+2024-01-23 zzz
+ * i2ptunnel, susidns: Fix IDN decoding for newer codepoints
+
+2024-01-22 zzz
+ * i2psnark: Add drag-and-drop for torrent files and links (Gitlab MR !165)
+ * susimail: Add drag-and-drop for attachments (Gitlab MR !171)
+
 2024-01-15 zzz
  * I2CP: Prevent loopback messages to same session (i2pd Github #2005, Gitlab MR !173)
  * i2psnark: Bandwidth limiter improvements (Gitlab MR !164)
