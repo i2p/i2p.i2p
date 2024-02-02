@@ -124,7 +124,7 @@ tr.mailbody td {
 }
 
 .mailbody p.info {
-     margin: -32px 0 0;
+     margin: 20px 20px 0 !important;
      display: block;
      border: 1px solid #447;
      border-radius: 2px;
@@ -1331,6 +1331,10 @@ tr.bottombuttons table#pagenav {
 
 tr.bottombuttons:empty {
      display: none;
+}
+
+iframe {
+     background: #eee;
 }
 
 #composemail .bottombuttons {

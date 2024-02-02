@@ -33,6 +33,7 @@ import i2p.susi.util.FilenameUtil;
 import i2p.susi.util.Folder;
 import i2p.susi.util.Folder.SortOrder;
 import i2p.susi.util.OutputStreamBuffer;
+import i2p.susi.util.RegexOutputStream;
 import i2p.susi.util.StringBuilderWriter;
 import i2p.susi.webmail.Messages;
 import static i2p.susi.webmail.Sorters.*;
@@ -57,6 +58,8 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -108,6 +111,8 @@ public class WebMail extends HttpServlet
 	private static final int DEFAULT_SMTPPORT = 7659;
 
 	private enum State { AUTH, LOADING, LIST, SHOW, NEW, CONFIG }
+	/** @since 0.9.62 */
+	private enum HtmlMode { NONE, LINK, ALLOW, PREFER }
 
 	// TODO generate from servlet name to allow for renaming or multiple instances
 	private static final String myself = "/susimail/";
@@ -166,7 +171,9 @@ public class WebMail extends HttpServlet
 	private static final String SHOW = "show";
 	private static final String DOWNLOAD = "download";
 	private static final String RAW_ATTACHMENT = "att";
+	private static final String CID_ATTACHMENT = "cid";
 	private static final String DRAFT_ATTACHMENT = "datt";
+	private static final String HTML = "html";
 
 	private static final String MARKALL = "markall";
 	private static final String CLEAR = "clearselection";
@@ -241,6 +248,9 @@ public class WebMail extends HttpServlet
 
 	private static final String CONFIG_COMPOSER_COLS = "composer.cols";
 	private static final String CONFIG_COMPOSER_ROWS = "composer.rows";
+
+	private static final String CONFIG_HTML_ALLOWED = "view.html.allowed";
+	private static final String CONFIG_HTML_PREFERRED = "view.html.preferred";
 
 	private static final String CONFIG_COPY_TO_SENT = "composer.copy.to.sent";
 	static final String CONFIG_LEAVE_ON_SERVER = "pop3.leave.on.server";
@@ -442,7 +452,7 @@ public class WebMail extends HttpServlet
 		} else {
 			buf.append("<a class=\"sort\" href=\"").append(myself).append("?page=").append(page).append("&amp;sort=-")
 			    .append(name).append("&amp;folder=").append(folder).append("\">");
-			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3up.png\" border=\"0\" alt=\"^\" style=\"opacity: 0.4;\">");
+			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3up.png\" border=\"0\" alt=\"^\">");
 			buf.append("</a>\n");
 		}
 		if (name.equals(currentName) && currentOrder == SortOrder.DOWN) {
@@ -450,7 +460,7 @@ public class WebMail extends HttpServlet
 		} else {
 			buf.append("<a class=\"sort\" href=\"").append(myself).append("?page=").append(page).append("&amp;sort=")
 			    .append(name).append("&amp;folder=").append(folder).append("\">");
-			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3down.png\" border=\"0\" alt=\"v\" style=\"opacity: 0.4;\">");
+			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3down.png\" border=\"0\" alt=\"v\">");
 			buf.append("</a>");
 		}
 		return buf.toString();
@@ -471,7 +481,7 @@ public class WebMail extends HttpServlet
 	/**
 	 * recursively render all mail body parts
 	 *
-	 * 1. if type is multipart/alternative, look for text/plain section and ignore others
+	 * 1. if type is multipart/alternative, look for preferred section and ignore others
 	 * 2. if type is multipart/*, recursively call all these parts
 	 * 3. if type is text/plain (or mail is not mime), print out
 	 * 4. in all other cases print out message, that part is not displayed
@@ -479,14 +489,17 @@ public class WebMail extends HttpServlet
 	 * @param out
 	 * @param mailPart
 	 * @param level is increased by recursively calling sub parts
+	 * @param html use html styling
+	 * @param allowHtml allow display of text/html parts
 	 */
-	private static void showPart( PrintWriter out, MailPart mailPart, int level, boolean html )
+	private static void showPart(PrintWriter out, MailPart mailPart, int level, boolean html, HtmlMode allowHtml)
 	{
 		String br = html ? "<br>\r\n" : "\r\n";
 
 		if( html ) {
 			out.println( "<!-- " );
 			out.println( "Debug: Showing Mail Part at level " + level + " with ID " + mailPart.getID());
+			out.println( "Debug: HTML Mode: " + allowHtml);
 			out.println( "Debug: Mail Part headers follow");
 			for( int i = 0; i < mailPart.headerLines.length; i++ ) {
 				// fix Content-Type: multipart/alternative; boundary="----------8CDE39ECAF2633"
@@ -496,38 +509,87 @@ public class WebMail extends HttpServlet
 		}
 
 		if( mailPart.multipart ) {
-			if( mailPart.type.equals("multipart/alternative")) {
+			if (mailPart.type.equals("multipart/alternative") ||
+			    mailPart.type.equals("multipart/related")) {
 				MailPart chosen = null;
+				String preferred = html && allowHtml == HtmlMode.PREFER ? "text/html" : "text/plain";
 				for( MailPart subPart : mailPart.parts ) {
-					if( subPart.type != null && subPart.type.equals("text/plain"))
+					// check for multipart/related type=text/html RFC 2387
+					if (preferred.equals(subPart.type) || preferred.equals(subPart.multipart_type)) {
 						chosen = subPart;
+						break;
+					}
+				}
+				if (chosen == null) {
+					String backup = html && allowHtml != HtmlMode.NONE ? "text/html" : "text/plain";
+					if (!backup.equals(preferred)) {
+						for (MailPart subPart : mailPart.parts ) {
+							if (backup.equals(subPart.type) || backup.equals(subPart.multipart_type)) {
+								chosen = subPart;
+								break;
+							}
+						}
+					}
 				}
 				if( chosen != null ) {
-					showPart( out, chosen, level + 1, html );
+					showPart(out, chosen, level + 1, html, allowHtml);
 					if (html) {
-						// DEBUG
 						for (MailPart subPart : mailPart.parts) {
 							if (chosen.equals(subPart))
 								continue;
-							out.println( "<!-- " );
-							out.println( "Debug: Not showing alternative Mail Part at level " + (level + 1) + " with ID " + subPart.getID());
-							out.println( "Debug: Mail Part headers follow");
-							for( int i = 0; i < subPart.headerLines.length; i++ ) {
-								out.println( subPart.headerLines[i].replace("--", "&#45;&#45;") );
+							if ("text/html".equals(subPart.type) ||
+							    "text/html".equals(subPart.multipart_type)) {
+								out.println( "<!-- " );
+								out.println( "Debug: Not showing alternative Mail Part at level " + (level + 1) + " with ID " + subPart.getID());
+								out.println( "Debug: HTML Mode: " + allowHtml);
+								out.println( "Debug: Mail Part headers follow");
+								for( int i = 0; i < subPart.headerLines.length; i++ ) {
+									out.println( subPart.headerLines[i].replace("--", "&#45;&#45;") );
+								}
+								out.println( "-->" );
+								if (allowHtml != HtmlMode.NONE) {
+									out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\">" );
+									out.println("<p class=\"info\"><a href=\"" + myself + '?' +
+									            SHOW + '=' + Base64.encode(subPart.uidl) +
+									            "&amp;" + HTML + "=1\">" +
+									            _t("View email as HTML") + "</a></p>");
+									out.println( "</td></tr>" );
+								}
+							} else if ("text/plain".equals(subPart.type) ||
+							           "text/plain".equals(subPart.multipart_type)) {
+								out.println( "<!-- " );
+								out.println( "Debug: Not showing alternative Mail Part at level " + (level + 1) + " with ID " + subPart.getID());
+								out.println( "Debug: HTML Mode: " + allowHtml);
+								out.println( "Debug: Mail Part headers follow");
+								for( int i = 0; i < subPart.headerLines.length; i++ ) {
+									out.println( subPart.headerLines[i].replace("--", "&#45;&#45;") );
+								}
+								out.println( "-->" );
+								if (allowHtml != HtmlMode.NONE) {
+									out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\">" );
+									out.println("<p class=\"info\"><a href=\"" + myself + '?' +
+									            SHOW + '=' + Base64.encode(subPart.uidl) +
+									            "&amp;" + HTML + "=0\">" +
+									            _t("View email as plain text") + "</a></p>");
+									out.println( "</td></tr>" );
+								}
+							} else {
+								// show as attachment
+								// if image is loaded as a CID in the iframe, we will still show it as an attachment also
+								showPart(out, subPart, level + 1, html, allowHtml);
 							}
-							out.println( "-->" );
 						}
 					}
 					return;
 				}
 			}
 			for( MailPart part : mailPart.parts ) {
-				showPart( out, part, level + 1, html );
+				showPart(out, part, level + 1, html, allowHtml);
 			}
 		}
 		else if( mailPart.message ) {
 			for( MailPart part : mailPart.parts ) {
-				showPart( out, part, level + 1, html );
+				showPart(out, part, level + 1, html, allowHtml);
 			}
 		}
 		else {
@@ -548,7 +610,8 @@ public class WebMail extends HttpServlet
 				showBody = true;
 			}
 			if (!showBody && mailPart.type != null) {
-				if( mailPart.type.equals("text/plain")) {
+				if (mailPart.type.equals("text/plain") ||
+				    (html && allowHtml != HtmlMode.NONE && mailPart.type.equals("text/html"))) {
 					showBody = true;
 				}
 				else
@@ -564,7 +627,18 @@ public class WebMail extends HttpServlet
 			}
 			if( html )
 				out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\">" );
-			if( showBody ) {
+			if (html && allowHtml != HtmlMode.NONE && showBody && "text/html".equals(mailPart.type)) {
+				out.println("<iframe src=\"" + myself + '?' + RAW_ATTACHMENT + '=' +
+					 mailPart.getID() +
+					 "&amp;" + B64UIDL + '=' + Base64.encode(mailPart.uidl) +
+					 "\" name=\"mailhtmlframe" + mailPart.getID() +
+					 "\" id=\"mailhtmlframe" + mailPart.getID() +
+					 "\" class=\"iframedsusi\" width=\"100%\" height=\"100%\" scrolling=\"auto\" frameborder=\"0\" border=\"0\" allowtransparency=\"true\"></iframe>");
+				out.println("</td></tr><tr class=\"mailbody\"><td colspan=\"2\" align=\"center\">" );
+				out.println("<p class=\"info\"><i>" + _t("To protect your privacy, SusiMail has blocked remote content in this message.") + "</i>");
+				out.println("<noscript><br><i>" + _t("Enable javascript for improved display of this message.") + "</i></noscript></p>");
+				// TODO scrolling=no if js is on
+			} else if (showBody) {
 				if( html )
 					out.println( "<p class=\"mailbody\"><br>" );
 				String charset = mailPart.charset;
@@ -1124,7 +1198,8 @@ public class WebMail extends HttpServlet
 					sessionObject.reallyDelete = false;
 			}
 		} else if (buttonPressed(request, DOWNLOAD) ||
-		           buttonPressed(request, RAW_ATTACHMENT)) {
+		           buttonPressed(request, RAW_ATTACHMENT) ||
+		           buttonPressed(request, CID_ATTACHMENT)) {
 			// GET params
 			state = State.SHOW;
 		} else if (buttonPressed(request, DRAFT_ATTACHMENT)) {
@@ -1198,7 +1273,7 @@ public class WebMail extends HttpServlet
 							pw.println( _t("On {0} {1} wrote:", mail.formattedDate + " UTC", to));
 							StringBuilderWriter text2 = new StringBuilderWriter();
 							PrintWriter pw2 = new PrintWriter( text2 );
-							showPart( pw2, part, 0, TEXT_ONLY );
+							showPart(pw2, part, 0, TEXT_ONLY, HtmlMode.NONE);
 							pw2.flush();
 							String[] lines = DataHelper.split(text2.toString(), "\r\n");
 							for( int i = 0; i < lines.length; i++ )
@@ -1293,7 +1368,7 @@ public class WebMail extends HttpServlet
 							if( mail.dateString != null )
 								pw.print( "Date: " + mail.dateString );
 							pw.println();
-							showPart( pw, part, 0, TEXT_ONLY );
+							showPart(pw, part, 0, TEXT_ONLY, HtmlMode.NONE);
 							pw.println( "----  " + _t("end forwarded mail") + "  ----" );
 							pw.flush();
 						}
@@ -1595,16 +1670,33 @@ public class WebMail extends HttpServlet
 	{
 		String str = request.getParameter(DOWNLOAD);
 		boolean isRaw = false;
+		boolean isCID = false;
 		if (str == null) {
 			str = request.getParameter(RAW_ATTACHMENT);
+			if (str == null) {
+				str = request.getParameter(CID_ATTACHMENT);
+				isCID = true;
+			}
 			isRaw = true;
 		}
 		if( str != null ) {
 			try {
-				int id = Integer.parseInt( str );
 				MailCache mc = getCurrentMailCache(sessionObject, request);
 				Mail mail = (mc != null) ? mc.getMail(showUIDL, MailCache.FetchMode.ALL) : null;
-				MailPart part = mail != null ? getMailPartFromID(mail.getPart(), id) : null;
+				MailPart part = null;
+				if (mail != null) {
+					if (isCID) {
+						// strip @ part, see RFC 2045
+						// https://stackoverflow.com/questions/39577386/the-precise-format-of-content-id-header
+						int idx = str.indexOf('@');
+						if (idx > 0)
+							str = str.substring(0, idx);
+						part = getMailPartFromID(mail.getPart(), str);
+					} else {
+						int id = Integer.parseInt( str );
+						part = getMailPartFromID(mail.getPart(), id);
+					}
+				}
 				if( part != null ) {
 					if (sendAttachment(sessionObject, part, response, isRaw))
 						return true;
@@ -1705,6 +1797,35 @@ public class WebMail extends HttpServlet
 		if (part.getID() == id)
 			return part;
 
+		if( part.multipart || part.message ) {
+			for( MailPart p : part.parts ) {
+				MailPart subPart = getMailPartFromID(p, id);
+				if( subPart != null )
+					return subPart;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Recursive.
+	 * @param id a content-id, without the surrounding &lt;&gt; or trailing @ part
+	 * @return the part or null
+	 * @since 0.9.62
+	 */
+	private static MailPart getMailPartFromID(MailPart part, String id) {
+		if( part == null )
+			return null;
+		if (id.equals(part.cid))
+			return part;
+		if (part.cid != null) {
+			// strip @ and try again,
+			int idx = part.cid.indexOf('@');
+			if (idx > 0) {
+				if (id.equals(part.cid.substring(0, idx)))
+					return part;
+			}
+		}
 		if( part.multipart || part.message ) {
 			for( MailPart p : part.parts ) {
 				MailPart subPart = getMailPartFromID(p, id);
@@ -2070,10 +2191,27 @@ public class WebMail extends HttpServlet
 		boolean isMobile = (forceMobileConsole || isMobile(httpRequest.getHeader("User-Agent")));
 
 		httpRequest.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
-                response.setHeader("X-Frame-Options", "SAMEORIGIN");
-                response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; media-src 'none'");
-                response.setHeader("X-XSS-Protection", "1; mode=block");
+		response.setHeader("X-Frame-Options", "SAMEORIGIN");
+		// very strict CSP for HTML emails in iframes
+		if (httpRequest.getParameter(RAW_ATTACHMENT) != null ||
+		    httpRequest.getParameter(CID_ATTACHMENT) != null ||
+		    httpRequest.getParameter(DRAFT_ATTACHMENT) != null) {
+			// we don't even let the iframe get to the console, it must be within /susimail/
+			String me = "127.0.0.1:7657";
+			String requrl = httpRequest.getRequestURL().toString();
+			try {
+				URI uri = new URI(requrl);
+				me = uri.getHost() + ':' + uri.getPort();
+			} catch(URISyntaxException use) {}
+			// img-src allows for cid: urls that were fixed up by RegexOutputStream
+			response.setHeader("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; script-src " + me + "/js/iframeResizer.contentWindow.js; form-action 'none'; frame-ancestors " + me + myself + "; object-src 'none'; media-src 'none'; img-src " + me + myself + "; font-src 'none'; frame-src 'none'; worker-src 'none'");
+			// character encoding will be set in sendAttachment()
+		} else {
+			response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self'; script-src 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; media-src 'none'; img-src 'self'");
+			response.setCharacterEncoding("UTF-8");
+		}
+		response.setHeader("Permissions-Policy", "accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), display-capture(), fullscreen=(self), geolocation=(), gyroscope=(), interest-cohort=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), vibrate=(), vr=()");
+		response.setHeader("X-XSS-Protection", "1; mode=block");
 		response.setHeader("X-Content-Type-Options", "nosniff");
 		response.setHeader("Referrer-Policy", "no-referrer");
 		response.setHeader("Accept-Ranges", "none");
@@ -2424,6 +2562,9 @@ public class WebMail extends HttpServlet
 					out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "markdown.css?" + CoreVersion.VERSION + "\">");
 					out.println("<script src=\"/susimail/js/markdown.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 					out.println("<script src=\"/susimail/js/Markdown.Converter.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
+					out.println("<script src=\"/susimail/js/iframer.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
+					out.println("<script src=\"/js/iframed.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
+					out.println("<script src=\"/js/iframeResizer.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 				}
 				out.println("<script src=\"/susimail/js/notifications.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 				out.print("</head>\n<body>");
@@ -2523,8 +2664,24 @@ public class WebMail extends HttpServlet
 				else if( state == State.LIST )
 					showFolder( out, sessionObject, mc, request );
 
-				else if( state == State.SHOW )
-					showMessage(out, sessionObject, mc, showUIDL, buttonPressed(request, DELETE));
+				else if( state == State.SHOW ) {
+					// Determine what HtmlMode we're going to show the mail in
+					boolean disable = isMobile ||
+					                  !CSPDetector.supportsCSP(httpRequest.getHeader("User-Agent"));
+					boolean link = !disable;
+					String hp = httpRequest.getParameter(HTML);
+					boolean allow = link &&
+					                ("1".equals(hp)) ||
+					                 (!"0".equals(hp) &&
+					                  Boolean.parseBoolean(Config.getProperty(CONFIG_HTML_ALLOWED, "true")));
+					boolean prefer = allow &&
+					                 ("1".equals(hp)) ||
+					                  (!"0".equals(hp) &&
+					                   Boolean.parseBoolean(Config.getProperty(CONFIG_HTML_PREFERRED, "true")));
+					HtmlMode allowHTML = prefer ? HtmlMode.PREFER : allow ? HtmlMode.ALLOW :
+					                     link ? HtmlMode.LINK : HtmlMode.NONE;
+					showMessage(out, sessionObject, mc, showUIDL, buttonPressed(request, DELETE), allowHTML);
+				}
 
 				else if( state == State.NEW )
 					showCompose( out, sessionObject, request );
@@ -2603,10 +2760,23 @@ public class WebMail extends HttpServlet
 						response.setContentType(part.type);
 					if (part.charset != null)
 						response.setCharacterEncoding(part.charset);
-					if (part.decodedLength >= 0)
-						response.setContentLength(part.decodedLength);
-					if (log.shouldDebug()) log.debug("Sending raw attachment " + name + " length " + part.decodedLength);
 					out = response.getOutputStream();
+					if ("text/html".equals(part.type)) {
+						// inject the js into the iframe
+						// For content without <head>, we put it at the end and hope for the best.
+						out = new RegexOutputStream(out, "<head>",
+						                            "<head>\n\n<!--injected by susimail-->\n<script src=\"/js/iframeResizer.contentWindow.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n",
+						                            "\n<!--injected by susimail-->\n<script src=\"/js/iframeResizer.contentWindow.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
+						// convert cid: urls to /susimail/?cid= urls
+						out = new RegexOutputStream(out, " src=\"cid:",
+						                            " src=\"/susimail/?msg=" + Base64.encode(part.uidl) + "&amp;cid=",
+						                            null);
+						// don't set content length, as it may change due to replacements
+					} else {
+						if (part.decodedLength >= 0)
+							response.setContentLength(part.decodedLength);
+					}
+					if (log.shouldDebug()) log.debug("Sending raw attachment " + name + " length " + part.decodedLength);
 					part.decode(0, new OutputStreamBuffer(out));
 					shown = true;
 				} catch (IOException e) {
@@ -3501,9 +3671,10 @@ public class WebMail extends HttpServlet
 	 * @param out
 	 * @param sessionObject
 	 * @param reallyDelete was the delete button pushed, if so, show the really delete? message
+	 * @param allowHtml allow display of text/html parts
 	 */
 	private static void showMessage(PrintWriter out, SessionObject sessionObject, MailCache mc,
-	                                String showUIDL, boolean reallyDelete)
+	                                String showUIDL, boolean reallyDelete, HtmlMode allowHTML)
 	{
 		if (reallyDelete) {
 			out.println( "<p class=\"error\">" + _t("Really delete this message?") + ' ' +
@@ -3611,7 +3782,7 @@ public class WebMail extends HttpServlet
 					"</table></td></tr>\n" );
 			if( mail.hasPart()) {
 				mail.setNew(false);
-				showPart( out, mail.getPart(), 0, SHOW_HTML );
+				showPart(out, mail.getPart(), 0, SHOW_HTML, allowHTML);
 			}
 			else {
 				out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\"><p class=\"error\">" + _t("Could not fetch mail body.") + "</p></td></tr>\n" );
