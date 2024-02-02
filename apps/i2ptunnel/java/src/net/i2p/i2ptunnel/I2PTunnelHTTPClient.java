@@ -40,6 +40,7 @@ import net.i2p.i2ptunnel.localServer.LocalHTTPServer;
 import net.i2p.util.ConvertToHash;
 import net.i2p.util.DNSOverHTTPS;
 import net.i2p.util.EventDispatcher;
+import net.i2p.util.InternalSocket;
 import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
 
@@ -98,6 +99,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     // overrides
     private static final String PROP_UA_I2P = "httpclient.userAgent.i2p";
     private static final String PROP_UA_CLEARNET = "httpclient.userAgent.outproxy";
+    public static final String OPT_KEEPALIVE_BROWSER = "keepalive.browser";
+    public static final String OPT_KEEPALIVE_I2P = "keepalive.i2p";
+
+    // how long to wait for another request on the same socket
+    // Firefox timeout appears to be about 114 seconds, so it will close before we do.
+    static final int BROWSER_KEEPALIVE_TIMEOUT = 2*60*1000;
+    private static final boolean DEFAULT_KEEPALIVE_BROWSER = true;
+    private static final boolean DEFAULT_KEEPALIVE_I2P = true;
 
     /**
      *  These are backups if the xxx.ht error page is missing.
@@ -396,11 +405,39 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         String currentProxy = null;
         long requestId = __requestId.incrementAndGet();
         boolean shout = false;
+        boolean isConnect = false;
+        boolean isHead = false;
         I2PSocket i2ps = null;
         try {
             s.setSoTimeout(INITIAL_SO_TIMEOUT);
             out = s.getOutputStream();
             InputReader reader = new InputReader(s.getInputStream());
+            int requestCount = 0;
+            // HTTP Persistent Connections (RFC 2616)
+            // for the local browser-to-client-proxy socket.
+            // Keep it very simple.
+            // Will be set to false for non-GET/HEAD, non-HTTP/1.1,
+            // Connection: close, InternalSocket,
+            // or after analysis of the response headers in HTTPResponseOutputStream,
+            // or on errors in I2PTunnelRunner.
+            boolean keepalive = getBooleanOption(OPT_KEEPALIVE_BROWSER, DEFAULT_KEEPALIVE_BROWSER) &&
+                                !(s instanceof InternalSocket);
+
+          // indent
+          do {   // while (keepalive)
+          // indent
+
+            if (requestCount > 0) {
+                try {
+                    s.setSoTimeout(BROWSER_KEEPALIVE_TIMEOUT);
+                } catch (IOException ioe) {
+                    if (_log.shouldInfo())
+                        _log.info("Socket closed before request #" + requestCount);
+                    return;
+                }
+                if (_log.shouldInfo())
+                    _log.info("Keepalive, awaiting request #" + requestCount);
+            }
             String line, method = null, protocol = null, host = null, destination = null;
             String hostLowerCase = null;
             StringBuilder newRequest = new StringBuilder();
@@ -422,10 +459,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
 
                 String lowercaseLine = line.toLowerCase(Locale.US);
 
-                if(method == null) { // first line (GET /base64/realaddr)
-                    if(_log.shouldLog(Log.DEBUG)) {
-                        _log.debug(getPrefix(requestId) + "First line [" + line + "]");
-                    }
+                if(method == null) {
+                    // first line GET/POST/etc.
+                    if (_log.shouldInfo())
+                        _log.info(getPrefix(requestId) + "req #" + requestCount + " first line [" + line + "]");
 
                     String[] params = DataHelper.split(line, " ", 3);
                     if(params.length != 3) {
@@ -472,12 +509,19 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                      ****/
                     }
 
-                    method = params[0];
-                    if (method.toUpperCase(Locale.US).equals("CONNECT")) {
+                    method = params[0].toUpperCase(Locale.US);
+                    if (method.equals("HEAD")) {
+                        isHead = true;
+                    } else if (method.equals("CONNECT")) {
                         // this makes things easier later, by spoofing a
                         // protocol so the URI parser find the host and port
                         // For in-net outproxy, will be fixed up below
                         request = "https://" + request + '/';
+                        isConnect = true;
+                        keepalive = false;
+                    } else if (!method.equals("GET")) {
+                        // POST, PUT, ...
+                        keepalive = false;
                     }
 
                     // Now use the Java URI parser
@@ -559,6 +603,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     }
 
                     String protocolVersion = params[2];
+                    if (!protocolVersion.equals("HTTP/1.1"))
+                        keepalive = false;
 
                     protocol = requestURI.getScheme();
                     host = requestURI.getHost();
@@ -641,8 +687,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                 break;
                             }
                           ******/
-                        } else if ("https".equals(protocol) ||
-                                   method.toUpperCase(Locale.US).equals("CONNECT")) {
+                        } else if ("https".equals(protocol) || isConnect) {
                             remotePort = 443;
                         } else {
                             remotePort = 80;
@@ -806,19 +851,21 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             host = getHostName(addressHelper);
                         }
 
-                        // now strip everything but path and query from URI
                         targetRequest = requestURI.toASCIIString();
-                        String newURI = requestURI.getRawPath();
-                        if(query != null) {
-                            newURI += '?' + query;
-                        }
-                        try {
-                            requestURI = new URI(newURI);
-                        } catch(URISyntaxException use) {
-                            // shouldnt happen
-                            _log.warn(request, use);
-                            method = null;
-                            break;
+                        if (!isConnect) {
+                            // now strip everything but path and query from URI
+                            String newURI = requestURI.getRawPath();
+                            if(query != null) {
+                                newURI += '?' + query;
+                            }
+                            try {
+                                requestURI = new URI(newURI);
+                            } catch(URISyntaxException use) {
+                                // shouldnt happen
+                                _log.warn(request, use);
+                                method = null;
+                                break;
+                            }
                         }
 
                     // end of (host endsWith(".i2p"))
@@ -844,8 +891,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                     int rPort = requestURI.getPort();
                                     if (rPort > 0)
                                         remotePort = rPort;
-                                    else if ("https".equals(protocol) ||
-                                             method.toUpperCase(Locale.US).equals("CONNECT"))
+                                    else if ("https".equals(protocol) || isConnect)
                                         remotePort = 443;
                                     else
                                         remotePort = 80;
@@ -864,8 +910,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             if(_log.shouldLog(Log.DEBUG)) {
                                 _log.debug("Before selecting outproxy for " + host);
                             }
-                            if ("https".equals(protocol) ||
-                                method.toUpperCase(Locale.US).equals("CONNECT"))
+                            if ("https".equals(protocol) || isConnect)
                                 currentProxy = selectSSLProxy(hostLowerCase);
                             else
                                 currentProxy = selectProxy(hostLowerCase);
@@ -921,16 +966,22 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         break;
                     }
 
-                    if (method.toUpperCase(Locale.US).equals("CONNECT")) {
+                    if (isConnect) {
                         // fix up the change to requestURI above to get back to the original host:port
-                        line = method + ' ' + requestURI.getHost() + ':' + requestURI.getPort() + ' ' + protocolVersion;
+                        if (usingInternalOutproxy || usingWWWProxy)
+                            line = method + ' ' + requestURI.getHost() + ':' + requestURI.getPort() + ' ' + protocolVersion;
+                        else
+                            line = method + ' ' + host + ':' + remotePort + ' ' + protocolVersion;
                     } else {
                         line = method + ' ' + requestURI.toASCIIString() + ' ' + protocolVersion;
                     }
 
                     if(_log.shouldLog(Log.DEBUG)) {
+                        _log.debug(getPrefix(requestId) + "REQ   : \"" + request + "\"");
+                        _log.debug(getPrefix(requestId) + "REQURI: \"" + requestURI + "\"");
                         _log.debug(getPrefix(requestId) + "NEWREQ: \"" + line + "\"");
                         _log.debug(getPrefix(requestId) + "HOST  : \"" + host + "\"");
+                        _log.debug(getPrefix(requestId) + "RPORT : \"" + remotePort + "\"");
                         _log.debug(getPrefix(requestId) + "DEST  : \"" + destination + "\"");
                     }
 
@@ -941,11 +992,22 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         if (lowercaseLine.contains("upgrade")) {
                             // pass through for websocket
                             preserveConnectionHeader = true;
+                            keepalive = false;
+                        } else if (lowercaseLine.contains("keep-alive")) {
+                            // pass through
+                            if (!keepalive)
+                                continue;
+                            // pass through
+                            preserveConnectionHeader = true;
                         } else {
+                            if (lowercaseLine.contains("close"))
+                                keepalive = false;
                             continue;
                         }
                     } else if (lowercaseLine.startsWith("keep-alive: ") ||
                                lowercaseLine.startsWith("proxy-connection: ")) {
+                        if (lowercaseLine.contains("close"))
+                            keepalive = false;
                         continue;
                     } else if (lowercaseLine.startsWith("host: ") && !usingWWWProxy && !usingInternalOutproxy) {
                         // Note that we only pass the original Host: line through to the outproxy
@@ -1053,8 +1115,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     if(ok != null) {
                         gzip = Boolean.parseBoolean(ok);
                     }
-                    if(gzip && !usingInternalServer &&
-                       !method.toUpperCase(Locale.US).equals("CONNECT")) {
+                    if(gzip && !usingInternalServer && !isConnect) {
                         // according to rfc2616 s14.3, this *should* force identity, even if
                         // an explicit q=0 for gzip doesn't.  tested against orion.i2p, and it
                         // seems to work.
@@ -1063,7 +1124,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         if (!usingInternalOutproxy)
                             newRequest.append("X-Accept-Encoding: x-i2p-gzip;q=1.0, identity;q=0.5, deflate;q=0, gzip;q=0, *;q=0\r\n");
                     }
-                    if(!shout && !method.toUpperCase(Locale.US).equals("CONNECT")) {
+                    if(!shout && !isConnect) {
                         if(!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_USER_AGENT))) {
                             // let's not advertise to external sites that we are from I2P
                             String ua;
@@ -1110,12 +1171,16 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 }
             } // end header processing
 
-            if(_log.shouldLog(Log.DEBUG)) {
-                _log.debug(getPrefix(requestId) + "NewRequest header: [" + newRequest.toString() + "]");
-            }
+            if (newRequest.length() > 0 && _log.shouldDebug())
+                _log.debug(getPrefix(requestId) + "NewRequest header: [" + newRequest + ']');
 
             if(method == null || (destination == null && !usingInternalOutproxy)) {
-                //l.log("No HTTP method found in the request.");
+                if (requestCount > 0) {
+                    // SocketTimeout, normal to get here for persistent connections,
+                    // because DataHelper.readLine() returns null on EOF
+                    return;
+                }
+                _log.debug("No HTTP method found in the request.");
                 try {
                     if (protocol != null && "http".equals(protocol.toLowerCase(Locale.US))) {
                         out.write(getErrorPage("denied", ERR_REQUEST_DENIED).getBytes("UTF-8"));
@@ -1134,6 +1199,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             }
 
             // Authorization
+            // Yes, this is sent and checked for every request on a persistent connection
             AuthResult result = authorize(s, requestId, method, authorization);
             if (result != AuthResult.AUTH_GOOD) {
                 if(_log.shouldLog(Log.WARN)) {
@@ -1175,7 +1241,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 OnTimeout onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
                 byte[] data;
                 byte[] response;
-                if (method.toUpperCase(Locale.US).equals("CONNECT")) {
+                if (isConnect) {
                     data = null;
                     response = SUCCESS_RESPONSE.getBytes("UTF-8");
                 } else {
@@ -1320,7 +1386,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             }
 
             // as of 0.9.35, allowInternalSSL defaults to true, and overridden to true unless PROP_SSL_SET is set
-            if (method.toUpperCase(Locale.US).equals("CONNECT") &&
+            if (isConnect &&
                 !usingWWWProxy &&
                 getTunnel().getClientOptions().getProperty(PROP_SSL_SET) != null &&
                 !Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_INTERNAL_SSL, "true"))) {
@@ -1368,33 +1434,51 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 return;
             }
 
-            Properties opts = new Properties();
-            //opts.setProperty("i2p.streaming.inactivityTimeout", ""+120*1000);
-            // 1 == disconnect.  see ConnectionOptions in the new streaming lib, which i
-            // dont want to hard link to here
-            //opts.setProperty("i2p.streaming.inactivityTimeoutAction", ""+1);
-            I2PSocketOptions sktOpts;
-            try {
-                sktOpts = getDefaultOptions(opts);
-            } catch (RuntimeException re) {
-                // tunnel build failure
-                StringBuilder buf = new StringBuilder(128);
-                buf.append("HTTP/1.1 503 Service Unavailable");
-                if (re.getMessage() != null)
-                    buf.append(" - ").append(re.getMessage());
-                buf.append("\r\n\r\n");
+            // Close persistent I2PSocket if destination or port changes
+            // and open a new one.
+            // We do not maintain a pool of open I2PSockets or look for
+            // an available one. Keep it very simple.
+            // As long as the traffic keeps going to the same place
+            // we will keep reusing it.
+            // While we should be able to reuse it if only the port changes,
+            // that should be extremely rare, so don't bother.
+            // For common use patterns including outproxy use,
+            // this should still be quite effective.
+            if (i2ps == null || i2ps.isClosed() ||
+                remotePort != i2ps.getPort() ||
+                !clientDest.equals(i2ps.getPeerDestination())) {
+                if (i2ps != null) {
+                    if (_log.shouldInfo())
+                        _log.info("Old socket closed or different dest/port, opening new one");
+                    try { i2ps.close(); } catch (IOException ioe) {}
+                }
+                Properties opts = new Properties();
+                //opts.setProperty("i2p.streaming.inactivityTimeout", ""+120*1000);
+                // 1 == disconnect.  see ConnectionOptions in the new streaming lib, which i
+                // dont want to hard link to here
+                //opts.setProperty("i2p.streaming.inactivityTimeoutAction", ""+1);
+                I2PSocketOptions sktOpts;
                 try {
-                    out.write(buf.toString().getBytes("UTF-8"));
-                } catch (IOException ioe) {}
-                throw re;
+                    sktOpts = getDefaultOptions(opts);
+                } catch (RuntimeException re) {
+                    // tunnel build failure
+                    StringBuilder buf = new StringBuilder(128);
+                    buf.append("HTTP/1.1 503 Service Unavailable");
+                    if (re.getMessage() != null)
+                        buf.append(" - ").append(re.getMessage());
+                    buf.append("\r\n\r\n");
+                    try {
+                        out.write(buf.toString().getBytes("UTF-8"));
+                    } catch (IOException ioe) {}
+                    throw re;
+                }
+                if (remotePort > 0)
+                    sktOpts.setPort(remotePort);
+                i2ps = createI2PSocket(clientDest, sktOpts);
             }
-            if (remotePort > 0)
-                sktOpts.setPort(remotePort);
-            i2ps = createI2PSocket(clientDest, sktOpts);
-            boolean isConnect = method.toUpperCase(Locale.US).equals("CONNECT");
-            OnTimeout onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy,
-                                                currentProxy, requestId, hostLowerCase, isConnect);
+
             I2PTunnelRunner t;
+            I2PTunnelHTTPClientRunner hrunner = null;
             if (isConnect) {
                 byte[] data;
                 byte[] response;
@@ -1409,7 +1493,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 t = new I2PTunnelRunner(s, i2ps, sockLock, data, response, mySockets, (OnTimeout) null);
             } else {
                 byte[] data = newRequest.toString().getBytes("ISO-8859-1");
-                t = new I2PTunnelHTTPClientRunner(s, i2ps, sockLock, data, mySockets, onTimeout);
+                OnTimeout onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy,
+                                                    currentProxy, requestId, hostLowerCase, isConnect);
+                boolean keepaliveI2P = keepalive && getBooleanOption(OPT_KEEPALIVE_I2P, DEFAULT_KEEPALIVE_I2P);
+                hrunner = new I2PTunnelHTTPClientRunner(s, i2ps, sockLock, data, mySockets, onTimeout,
+                                                        keepaliveI2P, keepalive, isHead);
+                t = hrunner;
             }
             if (usingWWWProxy) {
                 t.setSuccessCallback(new OnProxySuccess(currentProxy, hostLowerCase, isConnect));
@@ -1417,7 +1506,26 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             // we are called from an unlimited thread pool, so run inline
             //t.start();
             t.run();
+
+            // I2PTunnelHTTPClientRunner spins off the browser-to-i2p thread and keeps
+            // the i2p-to-socket copier in-line. So we won't get here until the i2p socket is closed.
+            // check if whatever was in the response does not allow keepalive
+            if (keepalive && hrunner != null && !hrunner.getKeepAliveSocket())
+                break;
+            // The old I2P socket was closed, null it out so we'll get a new one
+            // next time around
+            if (hrunner != null && !hrunner.getKeepAliveI2P())
+                i2ps = null;
+            // go around again
+            requestCount++;
+
+          // indent
+          } while (keepalive);
+          // indent
+
         } catch(IOException ex) {
+            // This is normal for keepalive when the browser closed the socket,
+            // or a SocketTimeoutException if we gave up first
             if(_log.shouldLog(Log.INFO)) {
                 _log.info(getPrefix(requestId) + "Error trying to connect", ex);
             }
