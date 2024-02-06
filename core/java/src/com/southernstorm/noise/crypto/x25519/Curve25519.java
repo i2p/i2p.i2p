@@ -469,6 +469,7 @@ public final class Curve25519 {
 	 * @param offset Offset into the result buffer.
 	 * @param privateKey The private key to use in the evaluation.
 	 * @param publicKey The public key to use in the evaluation, or null
+	 *                  MUST have MSB high bit cleared, i.e. publicKey[31] &amp; 0x80 == 0
 	 * if the base point of the curve should be used.
 	 */
 	public static void eval(byte[] result, int offset, byte[] privateKey, byte[] publicKey)
