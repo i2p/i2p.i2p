@@ -28,7 +28,7 @@ public class I2PTunnelHTTPServerTest extends TestCase {
 		headerString += "BLAH: something\r\n";
 		headerString += "\r\n";
 		InputStream in = fillInputStream(headerString);
-		Map<String, List<String>> headers = I2PTunnelHTTPServer.readHeaders(null, in, new StringBuilder(128), new String[0], I2PAppContext.getGlobalContext());
+		Map<String, List<String>> headers = I2PTunnelHTTPServer.readHeaders(null, in, new StringBuilder(128), new String[0], I2PAppContext.getGlobalContext(), 15*1000);
 		assertEquals(headers.size(), 1); //One header
 	}
 	
@@ -38,7 +38,7 @@ public class I2PTunnelHTTPServerTest extends TestCase {
 		headerString += "someHeader: oh my, duplication!\r\n";
 		headerString += "\r\n";
 		InputStream in = fillInputStream(headerString);
-		Map<String, List<String>> headers = I2PTunnelHTTPServer.readHeaders(null, in, new StringBuilder(128), new String[0], I2PAppContext.getGlobalContext());
+		Map<String, List<String>> headers = I2PTunnelHTTPServer.readHeaders(null, in, new StringBuilder(128), new String[0], I2PAppContext.getGlobalContext(), 15*1000);
 		assertEquals(headers.size(), 1);
 		assertEquals(headers.get("someHeader").size(), 2);
 	}
@@ -51,7 +51,7 @@ public class I2PTunnelHTTPServerTest extends TestCase {
 		headerString += "\r\n";
 		InputStream in = fillInputStream(headerString);
 		StringBuilder builder = new StringBuilder(128);
-		Map<String, List<String>> headers = I2PTunnelHTTPServer.readHeaders(null, in, builder, new String[0], I2PAppContext.getGlobalContext());
+		Map<String, List<String>> headers = I2PTunnelHTTPServer.readHeaders(null, in, builder, new String[0], I2PAppContext.getGlobalContext(), 15*1000);
 		String result = I2PTunnelHTTPServer.formatHeaders(headers, builder);
 		int first = result.indexOf("abc");
 		assertTrue(first >= 0);
