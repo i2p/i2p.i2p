@@ -1,3 +1,6 @@
+2024-02-14 zzz
+ * i2ptunnel: Implement server-side persistence (Gitlab MR !181)
+
 2024-02-02 zzz
  * i2ptunnel: Implement client-side persistence (Gitlab MR !176)
  * susimail: Add support for HTML email (Gitlab MR !177)
