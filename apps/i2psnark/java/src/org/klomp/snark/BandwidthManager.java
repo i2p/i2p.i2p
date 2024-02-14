@@ -16,7 +16,7 @@ import net.i2p.util.SyntheticREDQueue;
  *  BandwidthManager (total)
  *      PeerCoordinator (per-torrent)
  *          Peer/WebPeer (per-connection)
- *<pre>
+ *</pre>
  *
  *  Here at the top, we use SyntheticRedQueues for accurate
  *  and current moving averages of up, down, and requested bandwidth.
