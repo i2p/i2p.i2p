@@ -670,7 +670,7 @@ class SOCKS5Server extends SOCKSServer {
         pout.flush();
         // eat the response and headers
         buf.setLength(0);
-        I2PTunnelHTTPServer.readHeaders(destSock, null, buf, _skipHeaders, _context);
+        I2PTunnelHTTPServer.readHeaders(destSock, null, buf, _skipHeaders, _context, 15*1000);
         String[] f = DataHelper.split(buf.toString(), " ", 2);
         if (f.length < 2)
             throw new IOException("Bad response from proxy");
