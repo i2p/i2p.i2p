@@ -449,6 +449,7 @@
     <target name="compileTest">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
+        <property name="junit.home" value="${ant.home}/lib/" />
         <!-- We need the ant runtime, as it includes junit -->
         <javac srcdir="./src:./test/junit" debug="true" source="${javac.version}" target="${javac.version}"
                release="${javac.release}"
@@ -459,6 +460,7 @@
             <classpath>
                 <pathelement location="../../../core/java/build/i2p.jar" />
                 <pathelement location="../../ministreaming/java/build/mstreaming.jar" />
+                <pathelement location="${junit.home}/junit4.jar" />
             </classpath>
         </javac>
     </target>
@@ -469,6 +471,9 @@
                 <pathelement path="${classpath}" />
                 <pathelement location="./build/obj" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
+                <pathelement location="../../ministreaming/java/build/mstreaming.jar" />
+                <pathelement location="../../streaming/java/build/streaming.jar" />
+                <pathelement location="${junit.home}/junit4.jar" />
             </classpath>
             <batchtest>
                 <fileset dir="./test/junit/">
