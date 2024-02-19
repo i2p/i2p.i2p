@@ -33,10 +33,9 @@ jobs:
 
   javadoc-latest:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
       - name: GetText
         run: sudo apt install gettext
       - uses: actions/checkout@v4
