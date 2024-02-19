@@ -30,10 +30,12 @@ jobs:
         with:
           name: I2P-install.jar-${{ github.sha }}
           path: install.jar
-  
+
   javadoc-latest:
     runs-on: ubuntu-latest
-
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: GetText
         run: sudo apt install gettext
@@ -57,4 +59,11 @@ jobs:
         with:
           name: I2P-javadoc-${{ github.sha }}.zip
           path: javadoc.zip
-
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload javadocs to github page
+          path: 'build/javadoc'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
