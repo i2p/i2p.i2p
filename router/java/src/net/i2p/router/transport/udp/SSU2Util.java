@@ -71,13 +71,6 @@ final class SSU2Util {
     public static final int MIN_SESSION_REQUEST_LEN = MIN_HANDSHAKE_DATA_LEN;
     /** 88 */
     public static final int MIN_SESSION_CREATED_LEN = MIN_HANDSHAKE_DATA_LEN;
-    /**
-     * 380
-     * Any RI, even compressed, will be at least 400 bytes.
-     * It has a minimum 387 byte ident and 40 byte sig, neither is compressible.
-     * Use 300 just to be safe for compression.
-     */
-    public static final int MIN_SESSION_CONFIRMED_LEN = SHORT_HEADER_SIZE + KEY_LEN + MAC_LEN + 300 + MAC_LEN;
 
     /** 3 byte block header */
     public static final int FIRST_FRAGMENT_HEADER_SIZE = SSU2Payload.BLOCK_HEADER_SIZE;
