@@ -275,10 +275,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     private static final String MIN_SIGTYPE_VERSION = "0.9.17";
 
-    /**
-     *  IPv6 Peer Testing supported
-     */
-    private static final String MIN_V6_PEER_TEST_VERSION = "0.9.27";
+    // SSU2 stable
+    private static final String MIN_PEER_TEST_VERSION = "0.9.59";
 
     // various state bitmaps
 
@@ -4215,11 +4213,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             RouterInfo peerInfo = _context.netDb().lookupRouterInfoLocally(peer.getRemotePeer());
             if (peerInfo == null)
                 continue;
-            if (isIPv6) {
-                String v = peerInfo.getVersion();
-                if (VersionComparator.comp(v, MIN_V6_PEER_TEST_VERSION) < 0)
-                    continue;
-            }
+            String v = peerInfo.getVersion();
+            if (VersionComparator.comp(v, MIN_PEER_TEST_VERSION) < 0)
+                continue;
             ip = null;
             List<RouterAddress> addrs = getTargetAddresses(peerInfo);
             for (RouterAddress addr : addrs) {
