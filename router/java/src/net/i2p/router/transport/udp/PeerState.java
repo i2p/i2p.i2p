@@ -812,6 +812,7 @@ public class PeerState {
      *  @since 0.9.52
      */
     protected synchronized void messagePartiallyReceived(long now) {
+        _lastReceiveTime = now;
         if (_wantACKSendSince <= 0) {
             _wantACKSendSince = now;
             new ACKTimer();
@@ -1177,8 +1178,7 @@ public class PeerState {
         if (_sendWindowBytes > MAX_SEND_WINDOW_BYTES)
             _sendWindowBytes = MAX_SEND_WINDOW_BYTES;
         long now = _context.clock().now();
-        _lastReceiveTime = now;
-        _lastSendFullyTime = _lastReceiveTime;
+        _lastSendFullyTime = now;
 
         synchronized(_sendWindowBytesRemainingLock) {
             _sendWindowBytesRemaining += bytesACKed;
