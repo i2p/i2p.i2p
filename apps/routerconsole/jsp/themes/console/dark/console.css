@@ -1775,16 +1775,11 @@ code {
 }
 
 a:link,
+a:visited,
 h2 a:link,
+h2 a:visited,
 #graphopts a:visited {
     color: #7778bf;
-    text-decoration: none;
-    font-weight: bold;
-    word-wrap: break-word;
-}
-
-a:visited {
-    color: #7b7;
     text-decoration: none;
     font-weight: bold;
     word-wrap: break-word;
@@ -1961,10 +1956,6 @@ h2.welcome {
     vertical-align: middle;
     margin: 15px 0 12px 0 !important;
     word-wrap: break-word;
-}
-
-h2 a:visited {
-    color: #191;
 }
 
 h2 a:hover {
