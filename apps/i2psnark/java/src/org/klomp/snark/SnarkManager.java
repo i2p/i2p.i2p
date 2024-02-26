@@ -1197,7 +1197,9 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
         if (dataDir != null && !dataDir.equals(getDataDir().getAbsolutePath())) {
             dataDir = DataHelper.stripHTML(dataDir.trim());
             File dd = areFilesPublic() ? new File(dataDir) : new SecureDirectory(dataDir);
-            if (!dd.isAbsolute()) {
+            if (_util.connected()) {
+                addMessage(_t("Stop all torrents before changing data directory"));
+            } else if (!dd.isAbsolute()) {
                 addMessage(_t("Data directory must be an absolute path") + ": " + dataDir);
             } else if (!dd.exists() && !dd.mkdirs()) {
                 // save this tag for now, may need it again
@@ -1213,10 +1215,16 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
                     addMessage(_t("No write permissions for data directory") + ": " + dataDir);
                 changed = true;
                 interruptMonitor = true;
-                _config.setProperty(PROP_DIR, dataDir);
+                synchronized (_snarks) {
+                    for (Snark snark : _snarks.values()) {
+                        // leave magnets alone, remove everything else
+                        if (snark.getMetaInfo() != null)
+                             stopTorrent(snark, true);
+                    }
+                    _config.setProperty(PROP_DIR, dataDir);
+                }
                 addMessage(_t("Data directory changed to {0}", dataDir));
             }
-
         }
 
 	// Standalone (app context) language.
