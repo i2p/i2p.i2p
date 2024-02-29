@@ -826,8 +826,17 @@ class PeerTestManager {
                 status = isIPv6 ? Status.IPV4_UNKNOWN_IPV6_OK : Status.IPV4_OK_IPV6_UNKNOWN;
             }
         } else if (test.getReceiveBobTime() > 0) {
-            // we received a message from bob (4) but no messages from charlie
-            status = isIPv6 ? Status.IPV4_UNKNOWN_IPV6_FIREWALLED : Status.IPV4_FIREWALLED_IPV6_UNKNOWN;
+            // We received a message from bob (4) but no messages from charlie
+            // i2pd bobs pick firewalled charlies, if we don't hear from them we call it unknown,
+            // otherwise we get a lot of false positives, almost always on IPv6.
+            // This appears to be a i2pd bug on the charlie side?
+            if (isIPv6 && PENDING_IP.equals(test.getCharlieIP())) {
+                if (_log.shouldWarn())
+                    _log.warn("Test complete, no response from firewalled Charlie, will retest");
+                status = Status.UNKNOWN;
+            } else {
+                status = isIPv6 ? Status.IPV4_UNKNOWN_IPV6_FIREWALLED : Status.IPV4_FIREWALLED_IPV6_UNKNOWN;
+            }
         } else {
             // we never received anything from bob or charlie,
             // ignoring us, or unable to get a Charlie to respond
