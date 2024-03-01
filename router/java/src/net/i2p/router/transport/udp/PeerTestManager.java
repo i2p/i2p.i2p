@@ -1674,10 +1674,19 @@ class PeerTestManager {
                                     }
                                 } else {
                                     // i2pd Bob picks firewalled Charlie, allow it
-                                    if (_log.shouldWarn())
-                                        _log.warn("Charlie IP not found: " + test + '\n' + ra);
-                                    charlieIP = PENDING_IP;
-                                    charliePort = PENDING_PORT;
+                                    // but only if B cap is published. i2pd through 0.9.61 would pick address without B cap
+                                    // and i2pd charlie would agree without B cap
+                                    String caps = ra.getOption(UDPAddress.PROP_CAPACITY);
+                                    if (caps != null && caps.indexOf(UDPAddress.CAPACITY_TESTING) >= 0) {
+                                        if (_log.shouldWarn())
+                                            _log.warn("Charlie IP not found: " + test + '\n' + ra);
+                                        charlieIP = PENDING_IP;
+                                        charliePort = PENDING_PORT;
+                                    } else {
+                                        // fail
+                                        if (_log.shouldWarn())
+                                            _log.warn("Bob picked Charlie without B cap: " + test + '\n' + ra);
+                                    }
                                 }
                             } else {
                                 if (_log.shouldWarn())
