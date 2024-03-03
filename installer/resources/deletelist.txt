@@ -122,6 +122,8 @@ certificates/reseed/backup_at_mail.i2p.crt
 certificates/reseed/bugme_at_mail.i2p.crt
 certificates/ssl/i2p.mooo.com.crt
 certificates/plugin/zab_at_mail.i2p.crt
+certificates/reseed/null_at_i2pmail.org.crt
+certificates/reseed/reheatedburger_at_protonmail.com.crt
 # moved css
 docs/themes/console/dark/i2ptunnel.css
 docs/themes/console/light/i2ptunnel.css

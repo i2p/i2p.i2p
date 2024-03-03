@@ -112,8 +112,9 @@ public class Reseeder {
         //
         // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
         // ----------------------------------           ------------------------     -------------------------     ---------------
-        "https://reseed.us.prestium.org/"     + ',' +   // null_at_i2pmail.org.crt   // CA
-        "https://reseed.is.prestium.org/"     + ',' +   // reheatedburger_at_protonmail.com.crt // CA
+        "https://reseed.stormycloud.org/"     + ',' +   // admin_at_stormycloud.org.crt // CA
+        //"https://reseed.us.prestium.org/"     + ',' +   // null_at_i2pmail.org.crt   // CA
+        //"https://reseed.is.prestium.org/"     + ',' +   // reheatedburger_at_protonmail.com.crt // CA
         "https://i2p.ghativega.in/"           + ',' +   // arnavbhatt288_at_mail.i2p.crt // CA
         "https://reseed-pl.i2pd.xyz/"         + ',' +   // r4sas-reseed_at_mail.i2p.crt // CA
         "https://reseed-fr.i2pd.xyz/"         + ',' +   // r4sas-reseed_at_mail.i2p.crt // CA
