@@ -207,7 +207,7 @@ function initDND()
 			event.preventDefault();
 			event.dataTransfer.dropEffect = "none";
 			alert("Go to page 1 to drag and drop");
-		}
+		});
 	}
 }
 
