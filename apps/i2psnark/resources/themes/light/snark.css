@@ -1282,6 +1282,24 @@ thead a:active img {
      width: 80%;
 }
 
+.addtorrentsection input[type="text"], .newtorrentsection input[type="text"] {
+     width: 80%;
+}
+
+.addtorrentsection td:nth-child(2) {
+     text-align: left;
+}
+
+#addButton.highlight {
+     background: #f60 url(images/add.png) left 6px center no-repeat;
+     background-size: 12px 12px;
+}
+
+#newFile.highlight {
+     background: #f60;
+     color: #fff;
+}
+
 .addtorrentsection tr:first-child td > *, .newtorrentsection tr:first-child td > * {
      vertical-align: middle;
 }
@@ -2028,6 +2046,7 @@ input.create {
 /* configs */
 
 #configs td:nth-child(2) {
+     text-align: left;
      white-space: nowrap;
 }
 

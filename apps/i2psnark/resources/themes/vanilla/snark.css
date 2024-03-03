@@ -1853,6 +1853,24 @@ img[src$="details.png"] {
      width: calc(100% - 200px);
 }
 
+.addtorrentsection input[type="text"], .newtorrentsection input[type="text"] {
+     width: 80%;
+}
+
+.addtorrentsection td:nth-child(2) {
+     text-align: left;
+}
+
+#addButton.highlight {
+     background: #f60 url(images/add.png) no-repeat 5px center;
+     padding: 5px 5px 5px 21px !important;
+}
+
+#newFile.highlight {
+     background: #f60;
+     color: #fff;
+}
+
 .snarkConfig tr:nth-last-child(4) td, .trackerconfig tr:nth-last-child(4) td {
      padding-bottom: 10px;
 }
@@ -2286,6 +2304,7 @@ input#toggle_debug:checked + label + #dhtDebugInner {
 }
 
 #configs td:nth-child(2) {
+     text-align: left;
      white-space: nowrap;
 }
 

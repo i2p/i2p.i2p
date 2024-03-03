@@ -1527,6 +1527,24 @@ input[size="85"] {
      margin-left: 5px !important;
 }
 
+.addtorrentsection input[type="text"], .newtorrentsection input[type="text"] {
+     width: 80%;
+}
+
+.addtorrentsection td:nth-child(2) {
+     text-align: left;
+}
+
+#addButton.highlight {
+     background: #f60 url(images/add.png) left 6px center no-repeat !important;
+     background-size: 12px 12px !important;
+}
+
+#newFile.highlight {
+     background: #f60;
+     color: #fff;
+}
+
 select {
      background: #332940 url(images/dropdown.png) right center no-repeat !important;
      -moz-appearance: none;
@@ -2326,6 +2344,7 @@ input.starttorrent {
 }
 
 #configs td:nth-child(2) {
+     text-align: left;
      white-space: nowrap;
 }
 
