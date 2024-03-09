@@ -586,6 +586,17 @@ class BasicServlet extends HttpServlet
     protected static String addPaths(String base, String path) {
         if (path == null)
             return base;
+        if (path.equals("/")) {
+            // Java 17 and below:
+            // (new File("foo", "/")).toString() = "foo/"
+            // (new File("foo/", "/")).toString() = "foo/"
+            // Java 21:
+            // (new File("foo", "/")).toString() = "foo"
+            // (new File("foo/", "/")).toString() = "foo"
+            if (base.endsWith("/"))
+                return base;
+            return base + path;
+        }
         String rv = (new File(base, path)).toString();
         if (SystemVersion.isWindows())
             rv = rv.replace("\\", "/");
