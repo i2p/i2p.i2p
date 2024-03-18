@@ -55,9 +55,9 @@ jobs:
           echo "build.built-by=GitHub Actions" >> override.properties
           echo "noExe=true" >> override.properties
       - name: build with Ant
-        run: ant distclean javadoc
+        run: ant distclean javadoc updater
       - name: zip javadoc
-        run: zip -r javadoc.zip build/javadoc
+        run: zip -r javadoc.zip build/javadoc i2pupdate.zip
       - name: Upload javadoc.zip
         uses: actions/upload-artifact@v4
         with:
