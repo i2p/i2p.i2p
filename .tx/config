@@ -495,6 +495,7 @@ trans.es = installer/resources/locale/po/messages_es.po
 trans.es_AR = installer/resources/locale/po/messages_es_AR.po
 trans.fi = installer/resources/locale/po/messages_fi.po
 trans.fr = installer/resources/locale/po/messages_fr.po
+trans.hu = installer/resources/locale/po/messages_hu.po
 trans.id = installer/resources/locale/po/messages_id.po
 trans.it = installer/resources/locale/po/messages_it.po
 trans.ja = installer/resources/locale/po/messages_ja.po
