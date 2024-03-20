@@ -587,6 +587,7 @@ trans.hu = apps/ministreaming/locale/messages_hu.po
 ;; Java converts id to in
 trans.id = apps/ministreaming/locale/messages_in.po
 trans.it = apps/ministreaming/locale/messages_it.po
+trans.ja = apps/ministreaming/locale/messages_ja.po
 trans.ko = apps/ministreaming/locale/messages_ko.po
 trans.nb = apps/ministreaming/locale/messages_nb.po
 trans.nl = apps/ministreaming/locale/messages_nl.po
