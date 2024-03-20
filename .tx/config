@@ -651,14 +651,14 @@ source_lang = en
 trans.az = installer/resources/eepsite/docroot/help/index_az.html
 trans.de = installer/resources/eepsite/docroot/help/index_de.html
 trans.el = installer/resources/eepsite/docroot/help/index_el.html
-;; not yet translated on TX, use old page
-;;trans.es = installer/resources/eepsite/docroot/help/index_es.html
+trans.es = installer/resources/eepsite/docroot/help/index_es.html
 trans.fa = installer/resources/eepsite/docroot/help/index_fa.html
 trans.fr = installer/resources/eepsite/docroot/help/index_fr.html
 trans.hu = installer/resources/eepsite/docroot/help/index_hu.html
 ;; Java converts id to in
 trans.id = installer/resources/eepsite/docroot/help/index_in.html
 trans.it = installer/resources/eepsite/docroot/help/index_it.html
+trans.ja = installer/resources/eepsite/docroot/help/index_ja.html
 ;; not yet translated on TX, use old page
 ;;trans.nl = installer/resources/eepsite/docroot/help/index_nl.html
 trans.pl = installer/resources/eepsite/docroot/help/index_pl.html
