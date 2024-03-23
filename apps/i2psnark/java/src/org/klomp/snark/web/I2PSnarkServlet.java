@@ -4886,7 +4886,7 @@ public class I2PSnarkServlet extends BasicServlet {
         if (newCreatedBy.equals(""))
             newCreatedBy = null;
         MetaInfo newMeta = new MetaInfo(thePrimary, meta.getName(), null, meta.getFiles(), meta.getLengths(),
-                                        meta.getPieceLength(0), meta.getPieceHashes(), meta.getTotalLength(), meta.isPrivate(),
+                                        meta.getPieceLength(0), meta.getPieceHashes(), meta.getTotalLength(), meta.getPrivateTrackerStatus(),
                                         newAnnList, newCreatedBy, meta.getWebSeedURLs(), newComment);
         if (!DataHelper.eq(meta.getInfoHash(), newMeta.getInfoHash())) {
             // shouldn't happen

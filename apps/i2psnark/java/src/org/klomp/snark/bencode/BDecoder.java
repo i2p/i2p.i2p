@@ -294,7 +294,7 @@ public class BDecoder
 
   /**
    * Returns the next bencoded value on the stream and makes sure it
-   * is a map (dictonary). If it is not a map it will throw
+   * is a map (dictionary). If it is not a map it will throw
    * InvalidBEncodingException.
    */
   public BEValue bdecodeMap() throws IOException
@@ -311,7 +311,7 @@ public class BDecoder
     c = getNextIndicator();
     while (c != 'e')
       {
-        // Dictonary keys are always strings.
+        // Dictionary keys are always strings.
         String key = bdecode().getString();
 
         // XXX ugly hack

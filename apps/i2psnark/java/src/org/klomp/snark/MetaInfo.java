@@ -63,7 +63,7 @@ public class MetaInfo
   private final int piece_length;
   private final byte[] piece_hashes;
   private final long length;
-  private final boolean privateTorrent;
+  private final int privateTorrent; // 0: not present; 1: = 1; -1: = 0
   private final List<List<String>> announce_list;
   private final String comment;
   private final String created_by;
@@ -97,7 +97,7 @@ public class MetaInfo
     this.piece_length = piece_length;
     this.piece_hashes = piece_hashes;
     this.length = length;
-    this.privateTorrent = privateTorrent;
+    this.privateTorrent = privateTorrent ? 1 : 0;
     this.announce_list = announce_list;
     this.comment = comment;
     this.created_by = created_by;
@@ -118,8 +118,36 @@ public class MetaInfo
   }
 
   /**
+   *  Preserves privateTorrent int value, for main()
+   *
+   *  @since 0.9.62
+   */
+  public MetaInfo(String announce, String name, String name_utf8, List<List<String>> files, List<Long> lengths,
+           int piece_length, byte[] piece_hashes, long length, int privateTorrent,
+           List<List<String>> announce_list, String created_by, List<String> url_list, String comment)
+  {
+    this.announce = announce;
+    this.name = name;
+    this.name_utf8 = name_utf8;
+    this.files = files == null ? null : Collections.unmodifiableList(files);
+    this.files_utf8 = null;
+    this.lengths = lengths == null ? null : Collections.unmodifiableList(lengths);
+    this.piece_length = piece_length;
+    this.piece_hashes = piece_hashes;
+    this.length = length;
+    this.privateTorrent = privateTorrent;
+    this.announce_list = announce_list;
+    this.comment = comment;
+    this.created_by = created_by;
+    this.creation_date = I2PAppContext.getGlobalContext().clock().now();
+    this.url_list = url_list;
+    this.attributes = null;
+    this.info_hash = calculateInfoHash();
+  }
+
+  /**
    * Creates a new MetaInfo from the given InputStream.  The
-   * InputStream must start with a correctly bencoded dictonary
+   * InputStream must start with a correctly bencoded dictionary
    * describing the torrent.
    * Caller must close the stream.
    */
@@ -144,7 +172,7 @@ public class MetaInfo
 
   /**
    * Creates a new MetaInfo from a Map of BEValues and the SHA1 over
-   * the original bencoded info dictonary (this is a hack, we could
+   * the original bencoded info dictionary (this is a hack, we could
    * reconstruct the bencoded stream and recalculate the hash). Will
    * NOT throw a InvalidBEncodingException if the given map does not
    * contain a valid announce string.
@@ -257,10 +285,11 @@ public class MetaInfo
         // Transmission does numbers. So does libtorrent.
         // We handle both as of 0.9.9.
         // We switch to storing as number as of 0.9.14.
-        privateTorrent = "1".equals(o) ||
+        boolean privat = "1".equals(o) ||
                          ((o instanceof Number) && ((Number) o).intValue() == 1);
+        privateTorrent = privat ? 1 : -1;
     } else {
-        privateTorrent = false;
+        privateTorrent = 0;
     }
 
     val = info.get("piece length");
@@ -477,6 +506,14 @@ public class MetaInfo
    * @since 0.9
    */
   public boolean isPrivate() {
+    return privateTorrent > 0;
+  }
+
+  /**
+   * @return 0 (default), 1 (set to 1), -1 (set to 0)
+   * @since 0.9.62
+   */
+  public int getPrivateTrackerStatus() {
     return privateTorrent;
   }
 
@@ -738,10 +775,10 @@ public class MetaInfo
     if (name_utf8 != null)
         info.put("name.utf-8", new BEValue(DataHelper.getUTF8(name_utf8)));
     // BEP 27
-    if (privateTorrent)
+    if (privateTorrent != 0)
         // switched to number in 0.9.14
         //info.put("private", new BEValue(DataHelper.getUTF8("1")));
-        info.put("private", new BEValue(Integer.valueOf(1)));
+        info.put("private", new BEValue(Integer.valueOf(privateTorrent > 0 ? 1 : 0)));
 
     info.put("piece length", new BEValue(Integer.valueOf(piece_length)));
     info.put("pieces", new BEValue(piece_hashes));
@@ -876,7 +913,7 @@ public class MetaInfo
                   List<String> urls = url_list != null ? url_list : meta.getWebSeedURLs();
                   // changes/adds creation date
                   MetaInfo meta2 = new MetaInfo(an, meta.getName(), null, meta.getFiles(), meta.getLengths(),
-                                                meta.getPieceLength(0), meta.getPieceHashes(), meta.getTotalLength(), meta.isPrivate(),
+                                                meta.getPieceLength(0), meta.getPieceHashes(), meta.getTotalLength(), meta.getPrivateTrackerStatus(),
                                                 meta.getAnnounceList(), cb, urls, cm);
                   java.io.File from = new java.io.File(args[i]);
                   java.io.File to = new java.io.File(args[i] + ".bak");
