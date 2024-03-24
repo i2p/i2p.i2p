@@ -428,6 +428,7 @@ trans.id = apps/susimail/locale/messages_in.po
 trans.it = apps/susimail/locale/messages_it.po
 trans.ja = apps/susimail/locale/messages_ja.po
 trans.ko = apps/susimail/locale/messages_ko.po
+trans.ku = apps/susimail/locale/messages_ku.po
 trans.mg = apps/susimail/locale/messages_mg.po
 trans.nb = apps/susimail/locale/messages_nb.po
 trans.nl = apps/susimail/locale/messages_nl.po
