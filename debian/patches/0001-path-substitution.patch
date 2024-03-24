@@ -531,7 +531,7 @@ Index: b/installer/resources/locale/po/messages_ru.po
 ===================================================================
 --- a/installer/resources/locale/po/messages_ru.po
 +++ b/installer/resources/locale/po/messages_ru.po
-@@ -193,13 +193,13 @@ msgid "Request a Java thread dump if running."
+@@ -194,13 +194,13 @@ msgid "Request a Java thread dump if running."
  msgstr "Запросить дамп нитей Java, если запущено."
  
  #: ../i2prouter:1874
@@ -641,7 +641,7 @@ Index: b/installer/resources/locale/po/messages_ja.po
 ===================================================================
 --- a/installer/resources/locale/po/messages_ja.po
 +++ b/installer/resources/locale/po/messages_ja.po
-@@ -187,13 +187,13 @@ msgid "Request a Java thread dump if run
+@@ -188,13 +188,13 @@ msgid "Request a Java thread dump if run
  msgstr "起動中の場合、 Java スレッドダンプを要求"
  
  #: ../i2prouter:1874

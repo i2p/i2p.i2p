@@ -37,7 +37,7 @@ Index: b/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.java
 ============================================================
 --- a/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.java
 +++ b/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.java
-@@ -1099,8 +1099,8 @@ public class RouterConsoleRunner impleme
+@@ -1100,8 +1100,8 @@ public class RouterConsoleRunner impleme
          }
  
          @Override
