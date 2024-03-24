@@ -1,0 +1,184 @@
+<div lang="cs">
+
+<ul class="links">
+<li>
+<b>Start</b><br>
+Po startu I2P by se měl počet <i>Aktivních peerů</i> viditelný v levém bočním sloupci v sekci <i>Peers</i>, začít během následujících minut zvyšovat.
+Jakmile je router připraven, uvidíte tam také <i>Místní tunel</i> nazvaný <i>Sdílení klienti</i>, včetně dalších klientů a serverů.
+Pokud se tak nestane, podívejte se do sekce řešení problémů <a href="#trouble">níže</a>.
+Tyto <i>Místní tunely</i> poskytují připojení do sítě I2P, které umožňuje funkci bittorrentu, e-mailu, web proxy a dalším.
+Vaše <a href="/netdb">Síťová databáze</a> obsahuje všechny známé peery v síti.
+Kromě toho můžete sledovat stávající <a href="/peers">Peer připojení</a> a zobrazit stávající <a href="/tunnels">Tunely</a> a jejich stav.
+Více informací je dostupných na <a href="/help">stránce nápovědy</a>.</li>
+
+<li>
+<b>Síťová integrace</b><br>
+Po zahájení startu I2P může trvat několik minut, než dojde k bootstrapu (integraci) vašeho routeru do sítě a nalezení dalších peerů, buďte trpěliví.
+Během startu I2P a v průběhu běhu může indikátor připravenosti I2P tunelu ukazovat "Odmítání tunelů"; nejde o problém.
+Jakmile jsou indikovány zelené kruhy vedle vašich <i>Místních tunelů</i>, máte široký výběr možností, co s I2P dělat. Níže vám některé představujeme.</li>
+
+</ul>
+<h3>Služby na I2P</h3>
+
+<ul class="links">
+<li>
+<b>Skryté služby a prohlížení veřejného webu</b><br>
+Pomocí I2P můžete přistupovat k webovým stránkám skrytých služeb ("I2P stránky") a k dalším službám, včetně hostování vlastních služeb.
+Také můžete přistupovat na běžný web, anonymně pomocí vestavěné I2P webové proxy (outproxy).
+<a href="https://geti2p.net/en/about/browser-config" target="_blank">Nastavte svůj prohlížeč</a> tak, aby používal HTTP proxy <code>127.0.0.1 port 4444</code> a potom otevřete adresu I2P stránky  <code>http://</code> nebo <code>https://</code>.
+Pokud si přejete vypnout nebo změnit přístup outproxy k ne-anonymnímu internetu, odeberte nebo změňte outproxy záznam na <code>false.i2p</code> pod možností <i>Outproxies</i> v <a href="/i2ptunnel/edit?tunnel=0" target="_blank">I2P HTTP Proxy Tunel Editoru</a>.
+V sekci "Zajímavé stránky" <a href="#eepsites">níže</a>, uvádíme několik stránek hostovaných na I2P.<br>
+Jsou zde i neoficiální pokusy o tvorbu nástrojů na prohlížení I2P,
+včetně <a href="https://geti2p.net/en/download/firefox">přednastaveného profilu prohlížeče Firefox</a>,
+<a href="http://idk.i2p/I2P-in-Private-Browsing-Mode-Firefox">snadno instalovatelného rozšíření WebExtension</a>,
+nebo <a href="https://www.whonix.org/wiki/I2P">automatické spouštěče pro operační systémy zaměřené na anonymitu uživatele, kterým je například Whonix</a>.
+Jde o zajímavé projekty, ale prosím prozkoumejte je zda skutečně splňují vaše požadavky na soukromí
+před tím, než jim dáte svou důvěru.</li>
+
+<li>
+<b>Anonymní e-mail</b><br>
+Postman je e-mailový systém založený na I2P, který je přístupný přes <a href="/webmail">e-mailového klienta vestavěného v I2P</a> nebo přes externího e-mailového klienta.
+Účty mohou poslat a obdržet e-maily z běžného internetu.
+Pro účet navštivte <a href="http://hq.postman.i2p/" target="_blank">hq.postman.i2p</a>.</li>
+
+<li>
+<b>Anonymní přenos souboru</b><br><a href="/torrents">I2PSnark</a> je vestavěný v I2P, poskytuje anonymní, šifrované přenosy BitTorrent.</li>
+<li>
+<b>Anonymní chat</b><br>
+Spusťte vlastního IRC klienta (např. HexChat) a připojte se k <a href="irc://127.0.0.1:6668/i2p">serveru</a> na <code>127.0.0.1 port 6668</code>.
+Nepotřebujete nastavovat proxy ve svém IRC klientu; I2P vytváří místní IRC tunel (nastavený ve vašem IRC klientu jako IRC server nebo vzdálený hostitel).
+Váš místní I2P IRC tunel na <code>localhost:6668</code> vás přesměruje na jeden ze tří IRC serverů hostovaných na I2P díky Postman, echelon a zl0. Ani vy ani druhá strana komunikace nezná umístění toho druhého. Vaše komunikace je šifrována při přenosu I2P s cílem předejít zachycení.
+Jakmile budete připraveni, <code>#i2p-chat</code> a <code>#i2p-dev</code> jsou jen dva z možných kanálů, ke kterým se můžete připojit.
+I2P je také vhodný pro anonymní chat bez cenzury a monitorování, také pro alternativní IRC servery, Jabber servery, chat na webové stránce a další.
+Můžete provozovat vlastní servery na I2P v kterékoliv distribuci a nebo pokud jste vývojář, můžete napsat vlastní <a href="http://i2p-projekt.i2p/applications.html" target="_blank">I2P aplikace</a>.
+Protokoly UDP a TCP jsou <a href="http://i2p-projekt.i2p/techintro.html#op.transport" target="_blank">podporovány</a>.</li>
+
+<li>
+<b>Fóra a blogování</b><br>
+Všechen běžný software pro blogování, fórum a CMS, poběží přes I2P, přes to je doporučeno dát si pozor na zabezpečení při nastavování a udržování veškerého softwaru (např.. Php, MySql, Python, Apache) aktuálního a zabezpečeného!
+Také zde fungují fóra, která na I2P provozuje komunita v různých jazycích; pro doporučení se podívejte <a href="#eepsites">níže</a>.</li>
+
+<li>
+<a name="plugins"></a><b>Pluginy pro I2P</b><br>
+Rozšiřte použitelnost I2P instalací pluginů pro: blogování, chat, sdílení souborů a dalších pluginů již napsaných nebo portovaných a čekajících na vaší <a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target="_blank">instalaci</a>!
+Prohlížejte pluginy a související informace na <a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target="_blank">wiki.i2p-projekt.i2p</a>.
+Jste-li <a href="http://wiki.i2p-projekt.i2p/wiki/index.php/Plugins" target="_blank">vývojář</a>, kompletní framework pro psaní vlastních pluginů je poskytnut v <a href="http://i2p-projekt.i2p/plugins.html" target="_blank">dokumentaci</a>.</li>
+
+</ul>
+<h3>Anonymní a šifrovaný web hosting na I2P</h3>
+
+<ul class="links">
+<li>
+<b>Vestavěný Web-Server</b><br>
+I2P má vestavěný webový server pro hostování vašich vlastních webových stránek skryté služby ("eepsite") na síti I2P: <a href="https://www.eclipse.org/jetty/" target="_blank">Jetty</a> instance naslouchající na <a href="http://127.0.0.1:7658/" target="_blank">http://127.0.0.1:7658/</a>.
+Pro hostování vlastního obsahu umístěte své soubory do adresáře <code>eepsite/docroot/</code> (nebo umístěte jakékoliv běžné JSP/Servlet .war soubory do <code>eepsite/webapps</code> a nebo běžné CGI skripty do <code>eepsite/cgi-bin</code>) a ony se objeví.
+Také můžete provozovat jakoukoliv alternativní platformu webového serveru přes I2P a nahradit vestavěný server nebo ho provozovat na jiném tunelu.</li>
+
+<li>
+<b>Spusťte váš tunel</b><br>
+Po spuštění přednastaveného <a href="/i2ptunnel/" target="_blank">I2P webserver tunelu</a> bude vaše webová stránka viditelná (ale ne vyhledatelná) druhým.
+Podrobné pokyny pro spuštění vlastní webové stránky, registraci .i2p domény a propagaci vaší stránky, jsou dostupné na stránce vašeho I2P web serveru <a href="http://127.0.0.1:7658/help/" target="_blank">http://127.0.0.1:7658/help/</a>.</li>
+
+</ul>
+<a name="eepsites"></a>
+<h3>Zajímavé I2P-skryté služby</h3>
+
+<ul class="links twocol">
+<li>
+<b>Invisible Internet Project (I2P) oficiální webová stránka</b><br><a href="http://i2p-projekt.i2p" target="_blank">i2p-projekt.i2p</a>: Bezpečné a anonymní připojení k <a href="https://geti2p.net/en/" target="_blank">geti2p.net</a>. Pokud se chcete dozvědět více o tom, jak funguje I2P a nebo jak můžete spolupracovat, navštivte tuto stránku!</li>
+
+<li>
+<b>I2P komunitní fóra</b><br><a href="http://zzz.i2p/" target="_blank">zzz's vývojářská fóra</a> hostují diskuze k vývoji I2P.
+
+<a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>: Fórum pro diskuzi I2P problémů, nápadů a souvisejících témat.</li>
+
+<li>
+<b>I2P planeta</b><br><a href="http://planet.i2p/" target="_blank">planet.i2p</a>: Stránka RSS agregátoru, která shromažďuje I2P novinky a události na jednom místě. Na tomto místě vidíte práci komunity!</li>
+
+<li>
+<b>Zdraví sítě I2P</b><br><a href="http://stats.i2p/cgi-bin/dashboard.cgi" target="_blank">stats.i2p</a>: Zjistěte různé aspekty výkonu sítě pomocí této stránky pro monitoring I2P, kterou provozuje zzz.</li>
+
+<li>
+<b>I2P Bug Tracker - GitLab</b><br><a href="http://git.idk.i2p/" target="_blank">git.idk.i2p</a>: Systém pro hlášení chyb a potíží s I2P. Navštivte ho, pokud chcete nahlásit potíže. Také dostupné na <a href="https://i2pgit.org/" target="_blank">https://i2pgit.org/</a>
+</li>
+
+<li>
+<b>Objevte I2P</b><br>
+Existuje mnohem více skrytých služeb - jednoduše použijte odkazy pod těmi, které vidíte, založte si oblíbené a navštěvujte je!<br>
+</li>
+
+</ul>
+<h2 id="trouble">Odstraňování problémů a další pomoc</h2>
+
+<ul class="links">
+<li>
+<b>Buďte trpěliví!</b><br>
+I2P může při prvním spuštění trvat delší dobu, než se integruje do sítě a najde peery.
+Čím déle I2P router běží, tím výkonnější bude, proto pokud možno, zkuste nechat běžet router co nejdéle, ideálně 24/7!
+Pokud za 30 minut váš počet <i>Aktivní: [připojeno/nedávné]</i> je méně než 10 peerů, nebo celkový počet <i>Integrovaných/vestavěných</i> peerů je méně než 5, je zde několik věcí, které můžete zkusit pro kontrolu problémů:</li>
+
+<li>
+<b>Zkontrolujte vaše nastavení a šířku pásma</b><br>
+I2P funguje nejlépe, pokud správně uvedete rychlost vašeho síťového připojení v <a href="/config">sekci nastavení šířky pásma</a>.
+Ve výchozím stavu je I2P nastaven s konzervativními hodnotami, které nebudou vhodné v mnoha případech, věnujte prosím nějaký čas kontrole nastavení a opravě tam, kde to bude nezbytné.
+Čím širší pásmo datového přenosu nastavíte, <i>konkrétně</i> rychlost nahrávání, tím větší budete mít užitek ze sítě.</li>
+
+<li>
+<b>Firewally, modemy a routery</b><br>
+Tam, kde to bude možné, prosím zajistěte, aby I2P/Java byl povolen přístup z internetu bez omezení firewallem tak, že nastavíte váš modem/router/pc firewall.
+Pokud jste za striktním firewallem, ale máte neomezený odchozí přístup, I2P může i tak fungovat; můžete vypnout příchozí přístup a spolehnout se na <a href="http://i2p-projekt.i2p/udp.html" target="_blank">SSU IP Address detekci</a> (<a href="https://en.wikipedia.org/wiki/Hole_punching_(networking)" target="_blank">firewall hole punching</a>) že vás připojí k síti a stav sítě v bočním sloupci bude "Síť: Firewalled".
+Pro nejlepší výkon se prosím ujistěte, že I2P <a href="/confignet">externí port</a> je viditelný z internetu.
+Detaily najdete níže.</li>
+
+<li>
+<b>Zkontrolujte nastavení proxy</b><br>
+Pokud nevidíte žádné webové stránky (ani <a href="http://i2p-projekt.i2p/" target="_blank">i2p-projekt.i2p</a>), ujistěte se, že proxy server nastavený ve vašem internetovém prohlížeči je nastaven na http přístup (<i>ne</i> https, <i>ne</i> socks) a <code>127.0.0.1 port 4444</code>.
+Pokud potřebujete pomoc, zde je <a href="https://geti2p.net/en/about/browser-config" target="_blank">průvodce</a> nastavením prohlížeče pro použití I2P.</li>
+
+<li>
+<b>Zkontrolujte logy</b><br><a href="/logs">Logy</a> mohou být užitečné při řešení problémů.
+Můžete chtít vložit jejich části na <a href="http://i2pforum.i2p/" target="_blank">fórum</a> pro získání podpory a nebo možná <a href="http://paste.idk.i2p/" target="_blank">vložit</a> a odkázat z IRC.</li>
+
+<li>
+<b>Ověřte si, že máte aktuální Javu</b><br>
+Ujistěte se, že máte poslední verzi Java.
+Zkontrolujte verzi Java v horní části <a href="/logs">stránky logů</a>.</li>
+<li>
+<b>Potíže při běhu na zastaralém hardware</b><br>
+[Linux/BSD] Pokud nemůžete spustit router pomocí <code>i2p/i2prouter start</code> zkuste <code>runplain.sh</code> skript ve stejném adresáři.
+Oprávnění root nejsou nikdy vyžadována ke spuštění I2P.</li>
+<li>
+<b>Zapněte Universal Plug and Play (UPnP)</b><br>
+Váš modem nebo router pravděpodobně podporuje UPnP pro automatické přesměrování portů.
+Ujistěte se, že UPnP podpora je zapnutá v nastavení modemu nebo routeru.
+Nyní zkuste restartovat <a href="/">I2P router</a>.
+Pokud je to úspěšné, I2P by měl v bočním panelu po dokončení testů připojení hlásit "Síť: OK".</li>
+
+<li>
+<b>Přesměrování portu</b><br>
+Otevřete <a href="/confignet">I2P port</a> na svém modemu, routeru a/nebo na firewall(ech) pro lepší připojení (ideálně UDP i TCP).
+Více informací jak přesměrovat port byste měli snadno najít pomocí internetového vyhledávače.
+Pokud budete mít potíže, můžete požádat o pomoc na našich fórech a IRC kanálech uvedených níže.
+Berte na vědomí, že I2P nepodporuje připojení k internetu pomocí http nebo socks proxy [patche jsou vítány!], můžete se ale připojit k proxy přes samotný I2P, jakmile se připojíte k síti.</li>
+
+<li>
+<b>Získání podpory online</b><br>
+Můžete být vhodné zkontrolovat informace na <a href="http://i2p-projekt.i2p/" target="_blank">I2P webové stránce</a>, napsat na <a href="http://i2pforum.i2p/" target="_blank">I2P diskuzní fórum</a> nebo přejít na <a href="irc://127.0.0.1:6668/i2p">#i2p</a> nebo <a href="irc://127.0.0.1:6668/i2p-chat">#i2p-chat</a> interní IRC kanály I2P sítě - Irc2P.
+Tyto kanály jsou také dostupné mimo šifrovanou anonymní síť I2P, na<a href="irc://irc.freenode.net/i2p">Freenode IRC</a>.</li>
+
+<li>
+<b>Hlášení chyb</b><br>
+Pro nahlášení chyby prosím odešlete ticket na <a href="http://git.idk.i2p/" target="_blank">git.idk.i2p</a> nebo přes běžný internet na <a href="https://i2pgit.org/" target="_blank">https://i2pgit.org/</a>.
+Pro diskuzi ohledně vývoje prosím navštivte <a href="http://zzz.i2p/" target="_blank">zzz vývojářské fórum</a> nebo <a href="irc://127.0.0.1:6668/i2p-dev">vývojářský kanál</a> na IRC síti I2P.
+Vývojáři mohou procházet zdrojový kód na <a href="http://git.idk.i2p/i2p-hackers/i2p.i2p" target="_blank">git.idk.i2p</a>.</li>
+<li>
+<b>Zapojte se!</b><br>
+Vývoj a údržba I2P převážně nejsou finančně podporovány, ale provádí je dobrovolníci.
+Rádi přijmeme <a href="http://i2p-projekt.i2p/donate.html" target="_blank">dary</a>, které používáme na úhradu důležitých hostingových a administrativních nákladů.
+Máme <a href="http://i2p-projekt.i2p/bounties.html" target="_blank">cash bounties</a>, kde odměňujeme I2P vývojáře. Také stále hledáme další<a href="http://i2p-projekt.i2p/newdevelopers.html" target="_blank">Java kodery</a>, <a href="http://i2p-projekt.i2p/newtranslators.html" target="_blank">překladatele</a>, marketéry a uživatelé, kteří pomohou I2P růst.
+Čím větší bude síť I2P, tím větší užitek z toho budou mít všichni. Pomůže i říci o I2P svým známým (a pomoci s instalací a nastavením pokud to bude potřeba).
+Pro další informace o tom, jak se můžete zapojit, navštivte webovou <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank">stránku dobrovolníků</a>.</li>
+
+</ul>
+<div class="topness"><a href="#top">[Návrat nahoru]</a></div>
+</div>
