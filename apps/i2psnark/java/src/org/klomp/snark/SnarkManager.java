@@ -242,7 +242,9 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
         // psi go - unregistered
         "uajd4nctepxpac4c4bdyrdw7qvja2a5u3x25otfhkptcjgd53ioq.b32.i2p",
         // Vuze - unregistered
-        "crs2nugpvoqygnpabqbopwyjqettwszth6ubr2fh7whstlos3a6q.b32.i2p"
+        "crs2nugpvoqygnpabqbopwyjqettwszth6ubr2fh7whstlos3a6q.b32.i2p",
+        "opentracker.r4sas.i2p", "punzipidirfqspstvzpj6gb4tkuykqp6quurj6e23bgxcxhdoe7q.b32.i2p",
+        "opentracker.skank.i2p", "by7luzwhx733fhc5ug2o75dcaunblq2ztlshzd7qvptaoa73nqua.b32.i2p"
     }));
 
     static {
