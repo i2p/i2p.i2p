@@ -689,6 +689,13 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             throw new DataFormatException(mismatchMessage + ri);
         }
 
+        if (ri.getCapabilities().equals("LU") && ri.getVersion().equals("0.9.56")) {
+            _context.banlist().banlistRouter(h, "Slow", null,
+                                             null, _context.clock().now() + 2*60*60*1000);
+            _msg3p2FailReason = NTCPConnection.REASON_BANNED;
+            throw new DataFormatException("Old and slow: " + h);
+        }
+
         try {
             RouterInfo old = _context.netDb().store(h, ri);
             if (flood && !ri.equals(old)) {

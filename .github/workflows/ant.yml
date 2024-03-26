@@ -93,22 +93,22 @@ jobs:
           echo "javac.compilerargs=-bootclasspath $HOME/openjdk-7/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar:$HOME/openjdk-7/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jce.jar -Xlint:all" >> override.properties
       - name: build with Ant
         run: ./installer/resources/maven-dev-release.sh 1
-      - name: Upload installer.jar
+      - name: Upload servlet-i2p.jar
         uses: actions/upload-artifact@v4
         with:
           name: servlet-i2p-${{ github.sha }}.jar
           path: pkg-mavencentral/servlet-i2p*.jar
-      - name: Upload installer.jar
+      - name: Upload streaming.jar
         uses: actions/upload-artifact@v4
         with:
           name: streaming-${{ github.sha }}.jar
           path: pkg-mavencentral/streaming*.jar
-      - name: Upload installer.jar
+      - name: Upload mstreaming.jar
         uses: actions/upload-artifact@v4
         with:
           name: mstreaming-${{ github.sha }}.jar
           path: pkg-mavencentral/mstreaming*.jar
-      - name: Upload installer.jar
+      - name: Upload router.jar
         uses: actions/upload-artifact@v4
         with:
           name: router-${{ github.sha }}.jar

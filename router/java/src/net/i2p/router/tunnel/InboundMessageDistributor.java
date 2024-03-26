@@ -262,9 +262,12 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
             case DeliveryInstructions.DELIVERY_MODE_LOCAL:
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("local delivery instructions for clove: " + data.getClass().getSimpleName());
-                if (type == GarlicMessage.MESSAGE_TYPE) {
+                switch (type) {
+                  case GarlicMessage.MESSAGE_TYPE:
                     _receiver.receive((GarlicMessage)data);
-                } else if (type == DatabaseStoreMessage.MESSAGE_TYPE) {
+                    break;
+
+                  case DatabaseStoreMessage.MESSAGE_TYPE:
                         // Treat db store explicitly here (not in HandleFloodfillDatabaseStoreMessageJob),
                         // since we don't want to republish (or flood)
                         // unnecessarily. Reply tokens ignored.
@@ -318,7 +321,9 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                                               + ") for: " + dsm.getKey());
                                 _context.inNetMessagePool().add(dsm, null, null, _msgIDBloomXor);
                             }
-                } else if (_client != null && type == DatabaseSearchReplyMessage.MESSAGE_TYPE) {
+                        break;
+
+                  case DatabaseSearchReplyMessage.MESSAGE_TYPE:
                     // DSRMs show up here now that replies are encrypted
                     // TODO: Strip in IterativeLookupJob etc. instead, depending on
                     // LS or RI and client or expl., so that we can safely follow references
@@ -336,24 +341,37 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                      }
                    ****/
                     _context.inNetMessagePool().add(orig, null, null, _msgIDBloomXor);
-                } else if (type == DataMessage.MESSAGE_TYPE) {
+                    break;
+
+                  case DataMessage.MESSAGE_TYPE:
                         // a data message targetting the local router is how we send load tests (real
                         // data messages target destinations)
                         _context.statManager().addRateData("tunnel.handleLoadClove", 1);
                         data = null;
                         //_context.inNetMessagePool().add(data, null, null);
-                } else if (_client != null && type != DeliveryStatusMessage.MESSAGE_TYPE &&
-                           type != OutboundTunnelBuildReplyMessage.MESSAGE_TYPE) {
-                            // drop it, since the data we receive shouldn't include other stuff, 
-                            // as that might open an attack vector
+                        break;
+
+                  case DeliveryStatusMessage.MESSAGE_TYPE:
+                  case OutboundTunnelBuildReplyMessage.MESSAGE_TYPE:
+                        _context.inNetMessagePool().add(data, null, null, _msgIDBloomXor);
+                        break;
+
+                  default:
+                        // drop it, since the data we receive shouldn't include other stuff, 
+                        // as that might open an attack vector
+                        if (_client != null) {
                             _context.statManager().addRateData("tunnel.dropDangerousClientTunnelMessage", 1, 
                                                                data.getType());
                             _log.error("Dropped dangerous message received down a tunnel for "
                                        + _clientNickname + " (" + _client.toBase32() + ") : "
                                        + data, new Exception("cause"));
-                } else {
-                        _context.inNetMessagePool().add(data, null, null, _msgIDBloomXor);
-                }
+                        } else {
+                            _log.error("Dropped dangerous message received down an expl. tunnel "
+                                       + data, new Exception("cause"));
+                        }
+                        break;
+
+                } // switch (type)
                 return;
 
             case DeliveryInstructions.DELIVERY_MODE_DESTINATION:

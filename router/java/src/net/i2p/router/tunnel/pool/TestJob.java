@@ -76,20 +76,19 @@ class TestJob extends JobImpl {
         if (ctx.router().gracefulShutdownInProgress())
             return;   // don't reschedule
         _found = false;
-        // note: testing with exploratory tunnels always, even if the tested tunnel
-        // is a client tunnel (per _cfg.getDestination())
-        // should we test with the tunnel that we exposed the creation with?
-        // (accessible as _cfg.getPairedTunnel())
-        _replyTunnel = null;
-        _outTunnel = null;
+        boolean isExpl = _pool.getSettings().isExploratory();
         if (_cfg.isInbound()) {
             _replyTunnel = _cfg;
-            // TODO if testing is re-enabled, pick closest to far end
-            _outTunnel = ctx.tunnelManager().selectOutboundTunnel();
+            if (isExpl)
+                _outTunnel = ctx.tunnelManager().selectOutboundTunnel();
+            else
+                _outTunnel = ctx.tunnelManager().selectOutboundTunnel(_pool.getSettings().getDestination());
             _otherTunnel = (PooledTunnelCreatorConfig) _outTunnel;
         } else {
-            // TODO if testing is re-enabled, pick closest to far end
-            _replyTunnel = ctx.tunnelManager().selectInboundTunnel();
+            if (isExpl)
+                _replyTunnel = ctx.tunnelManager().selectInboundTunnel();
+            else
+                _replyTunnel = ctx.tunnelManager().selectInboundTunnel(_pool.getSettings().getDestination());
             _outTunnel = _cfg;
             _otherTunnel = (PooledTunnelCreatorConfig) _replyTunnel;
         }
@@ -109,7 +108,7 @@ class TestJob extends JobImpl {
             m.setMessageId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
             ReplySelector sel = new ReplySelector(m.getMessageId(), testExpiration);
             OnTestReply onReply = new OnTestReply();
-            OnTestTimeout onTimeout = new OnTestTimeout();
+            OnTestTimeout onTimeout = new OnTestTimeout(now);
             OutNetMessage msg = ctx.messageRegistry().registerPending(sel, onReply, onTimeout);
             onReply.setSentMessage(msg);
             sendTest(m, testPeriod);
@@ -122,37 +121,42 @@ class TestJob extends JobImpl {
         // remembering that key+tag so that we can decrypt it later.  this means we can do the
         // garlic encryption without any ElGamal (yay)
         final RouterContext ctx = getContext();
-        MessageWrapper.OneTimeSession sess;
-        if (_cfg.isInbound() && !_pool.getSettings().isExploratory()) {
-            // to client. false means don't force AES
-            sess = MessageWrapper.generateSession(ctx, _pool.getSettings().getDestination(), testPeriod, false);
+        if (ctx.random().nextInt(4) != 0) {
+            MessageWrapper.OneTimeSession sess;
+            if (_cfg.isInbound() && !_pool.getSettings().isExploratory()) {
+                // to client. false means don't force AES
+                sess = MessageWrapper.generateSession(ctx, _pool.getSettings().getDestination(), testPeriod, false);
+            } else {
+                // to router. AES or ChaCha.
+                sess = MessageWrapper.generateSession(ctx, testPeriod);
+            }
+            if (sess == null) {
+                scheduleRetest();
+                return;
+            }
+            if (sess.tag != null) {
+                // AES
+                _encryptTag = sess.tag;
+                m = MessageWrapper.wrap(ctx, m, sess.key, sess.tag);
+            } else {
+                // ratchet
+                _ratchetEncryptTag = sess.rtag;
+                m = MessageWrapper.wrap(ctx, m, sess.key, sess.rtag);
+            }
+            if (m == null) {
+                // overloaded / unknown peers / etc
+                scheduleRetest();
+                return;
+            }
         } else {
-            // to router. AES or ChaCha.
-            sess = MessageWrapper.generateSession(ctx, testPeriod);
-        }
-        if (sess == null) {
-            scheduleRetest();
-            return;
-        }
-        GarlicMessage msg;
-        if (sess.tag != null) {
-            // AES
-            _encryptTag = sess.tag;
-            msg = MessageWrapper.wrap(ctx, m, sess.key, sess.tag);
-        } else {
-            // ratchet
-            _ratchetEncryptTag = sess.rtag;
-            msg = MessageWrapper.wrap(ctx, m, sess.key, sess.rtag);
-        }
-        if (msg == null) {
-            // overloaded / unknown peers / etc
-            scheduleRetest();
-            return;
+            // Periodically send unencrypted DSM to provide cover for netdb replies
+            if (_log.shouldDebug())
+                _log.debug("Sending garlic test unencrypted");
         }
         _id = __id.getAndIncrement();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending garlic test #" + _id + " of " + _outTunnel + " / " + _replyTunnel);
-        ctx.tunnelDispatcher().dispatchOutbound(msg, _outTunnel.getSendTunnelId(0),
+        ctx.tunnelDispatcher().dispatchOutbound(m, _outTunnel.getSendTunnelId(0),
                                                          _replyTunnel.getReceiveTunnelId(0),
                                                          _replyTunnel.getPeer(0));
     }
@@ -327,17 +331,17 @@ class TestJob extends JobImpl {
     private class OnTestTimeout extends JobImpl {
         private final long _started;
 
-        public OnTestTimeout() { 
+        public OnTestTimeout(long now) {
             super(TestJob.this.getContext()); 
-            _started = getContext().clock().now();
+            _started = now;
         }
 
         public String getName() { return "Tunnel test timeout"; }
 
         public void runJob() {
-            //if (_log.shouldLog(Log.WARN))
-            //    _log.warn("Tunnel test #" + _id + " timeout: found? " + _found);
-            if (!_found) {
+            if (_log.shouldDebug())
+                _log.debug("Tunnel test #" + _id + " timeout: found? " + _found);
+            if (!_found && (_encryptTag != null || _ratchetEncryptTag != null)) {
                 // don't clog up the SKM with old one-tag tagsets
                 SessionKeyManager skm;
                 if (_cfg.isInbound() && !_pool.getSettings().isExploratory()) {
@@ -364,6 +368,8 @@ class TestJob extends JobImpl {
                             rskm.consumeTag(_ratchetEncryptTag);
                     }
                 }
+            }
+            if (!_found) {
                 testFailed(getContext().clock().now() - _started);
             }
         }
