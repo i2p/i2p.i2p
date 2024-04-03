@@ -136,7 +136,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     protected final static int MIN_REMAINING_ROUTERS = MIN_RESEED - 10;
     
     /** 
-     * limits for accepting a dbDtore of a router (unless we dont 
+     * limits for accepting a dbStore of a router (unless we don't 
      * know anyone or just started up) -- see validate() below
      */
     private final static long ROUTER_INFO_EXPIRATION = 27*60*60*1000l;
