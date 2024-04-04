@@ -10,6 +10,7 @@ function initTextarea() {
 	tx.removeAttribute("rows");
 	tx.style.height = 0;
 	tx.setAttribute("style", "height:" + Math.max(225, tx.scrollHeight) + "px;overflow-y:hidden;");
+	tx.style.height = Math.max(225, tx.scrollHeight) + "px";
 	tx.addEventListener("input", onTextareaInput, false);
 }
 
