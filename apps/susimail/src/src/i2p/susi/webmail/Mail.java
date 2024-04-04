@@ -92,7 +92,7 @@ class Mail {
 	private MailPart part;
         /** May be null. Non-empty if non-null. Not HTML escaped. */
 	String[] to, cc;        // addresses only, enclosed by <>
-	private boolean isNew, isSpam;
+	private boolean isNew, isSpam, headersParsed;
 	public String contentType;
 	public String messageID; // as received, trimmed only, probably enclosed with <>, not HTML escaped
 
@@ -175,7 +175,6 @@ class Mail {
 		// In the common case where we have the body, we only parse the headers once.
 		// we always re-set the header, even if it was non-null before,
 		// as we have to parse them to find the start of the body
-		// and who knows, the headers could have changed.
 		//if (header == null)
 		//	setHeader(rb);
 		body = rb;
@@ -444,6 +443,9 @@ class Mail {
 						if (_log.shouldDebug()) _log.debug("EOF hit before \\r\\n\\r\\n in Mail");
 					// Fixme UTF-8 to bytes to UTF-8
 					headerLines = DataHelper.split(new String(decoded.getContent(), decoded.getOffset(), decoded.getLength()), "\r\n");
+					// only do this once
+					if (headersParsed)
+						return headerLines;
 					for (int j = 0; j < headerLines.length; j++) {
 						String line = headerLines[j];
 						if( line.length() == 0 )
@@ -536,6 +538,7 @@ class Mail {
 								          " header: " + line.substring(7).trim());
 						}
 					}
+					headersParsed = true;
 				}
 				catch( Exception e ) {
 					error += "Error parsing mail header: " + e.getClass().getName() + '\n';
