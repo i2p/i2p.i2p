@@ -11,6 +11,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.i2p.I2PAppContext;
+
 /**
  *  @since 0.9.14
  */
@@ -33,8 +35,9 @@ public class XSSFilter implements Filter {
             // We need to send the error quickly, if we just throw a ServletException,
             // the data keeps coming and the connection gets reset.
             // This way we at least get the error to the browser.
+            I2PAppContext.getGlobalContext().logManager().getLog(XSSFilter.class).error("XSS Filter Error", ise);
             try {
-                ((HttpServletResponse)response).sendError(413, ise.getMessage());
+                ((HttpServletResponse)response).sendError(413, "XSS Filter " + ise.getMessage());
             } catch (IllegalStateException ise2) {
                 // Committed, probably wasn't a multipart form error after all
             }

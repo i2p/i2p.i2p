@@ -25,7 +25,7 @@ public class OutputStreamBuffer implements Buffer {
 	}
 
 	/**
-	 * @return new OutputStreamOutputStream
+	 * @return the OutputStream
 	 */
 	public OutputStream getOutputStream() {
 		return _out;

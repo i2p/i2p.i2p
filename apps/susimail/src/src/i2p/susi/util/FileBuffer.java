@@ -60,9 +60,10 @@ public class FileBuffer implements Buffer {
 	 * @return new FileOutputStream
 	 */
 	public synchronized OutputStream getOutputStream() throws IOException {
-		if (_os != null)
-			throw new IllegalStateException();
-		_os = new SecureFileOutputStream(_file);
+		//if (_os != null)
+		//	throw new IllegalStateException();
+		if (_os == null)
+			_os = new SecureFileOutputStream(_file);
 		return _os;
 	}
 
