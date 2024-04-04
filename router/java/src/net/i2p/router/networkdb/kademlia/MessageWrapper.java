@@ -188,7 +188,7 @@ public class MessageWrapper {
 
     /**
      *  Create a single key and tag, for receiving a single encrypted message,
-     *  and register it with the client's session key manager, to expire in the time specified.
+     *  and register it with our router's session key manager, to expire in the time specified.
      *  The recipient can then send us an AES- or ChaCha- encrypted message,
      *  avoiding full ElGamal or ECIES.
      *

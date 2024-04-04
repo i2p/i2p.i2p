@@ -1,3 +1,41 @@
+2024-03-26 zzz
+ * NetDB: Store message handling changes
+ * Transports: Incoming connection checks
+ * Tunnels:
+   - Refactor message distribution
+   - Tunnel test changes
+
+2024-03-23 zzz
+ * i2psnark: Preserve private=0 in torrent files
+
+2024-03-20 zzz
+ * New translations for some subsystems: Japanese, Hungarian, Slovenian, Estonian
+
+2024-03-09 zzz
+ * i2psnark: Fix buttons on torrent details page (JRE 21)
+
+2024-03-03 zzz
+ * i2psnark:
+   - Fix DnD js syntax error
+   - Add torrent section and config page CSS fixes (non-default themes)
+
+2024-03-01 zzz
+ * SSU2: Cancel peer test if Bob picked a Charlie without a B cap
+
+2024-02-29 zzz
+ * SSU2: Treat IPv6 peer test result as unknown if no response from firewalled Charlie
+
+2024-02-26 zzz
+ * Console: Use same color for visted links (dark theme)
+ * i2psnark:
+   - Don't allow changing data dir when connected
+   - Delete all torrents except magnets when changing data dir
+
+2024-02-25 zzz
+ * SSU2:
+   - Increase min version for peer test
+   - Update last rcv time when receiving data, not acks
+
 2024-02-14 zzz
  * i2ptunnel: Implement server-side persistence (Gitlab MR !181)
 
