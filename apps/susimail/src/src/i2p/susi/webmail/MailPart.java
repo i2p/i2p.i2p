@@ -56,6 +56,7 @@ class MailPart {
 
 	private static final OutputStream DUMMY_OUTPUT = new DummyOutputStream();
 	public final String[] headerLines;
+	/** encoding non-null */
 	public final String type, encoding, name,
 		description, disposition, charset, version, multipart_type, cid;
 	/** begin, end, and beginBody are relative to readBuffer.getOffset().
@@ -191,6 +192,9 @@ class MailPart {
 			}
 		}
 
+		// RFC 2045 Sec. 6.1: 7bit is the default
+		if (x_encoding == null)
+			x_encoding = "7bit";
 		encoding = x_encoding;
 		disposition = x_disposition;
 		type = x_type;
@@ -265,7 +269,7 @@ class MailPart {
 			tmpEnd = (int) counter.getRead();
 		}
 		end = tmpEnd;
-		if (encoding == null || encoding.equals("7bit") || encoding.equals("8bit") || encoding.equals("binary")) {
+		if (encoding.equals("7bit") || encoding.equals("8bit") || encoding.equals("binary")) {
 			decodedLength = end - beginBody;
 		}
 		//if (Debug.getLevel() >= Debug.DEBUG)
@@ -325,15 +329,9 @@ class MailPart {
 	 *  @since 0.9.13
 	 */
 	public synchronized void decode(int offset, Buffer out) throws IOException {
-		String encg = encoding;
-		if (encg == null) {
-			//throw new DecodingException("No encoding specified");
-			if (_log.shouldDebug()) _log.debug("Warning: no transfer encoding found, fallback to 7bit.");
-			encg = "7bit";       
-		}
-		Encoding enc = EncodingFactory.getEncoding(encg);
+		Encoding enc = EncodingFactory.getEncoding(encoding);
 		if(enc == null)
-			throw new DecodingException(_t("No encoder found for encoding \\''{0}\\''.", WebMail.quoteHTML(encg)));
+			throw new DecodingException(_t("No encoder found for encoding \\''{0}\\''.", WebMail.quoteHTML(encoding)));
 		InputStream in = null;
 		LimitInputStream lin = null;
 		CountingOutputStream cos = null;
