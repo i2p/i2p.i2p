@@ -1338,6 +1338,28 @@ public class WebMail extends HttpServlet
 										out.writeComplete(ok);
 									}
 								}
+							} else if ("text/html".equals(part.type)) {
+								// HTML-only email, add as attachment
+								attachments = new ArrayList<Attachment>(1);
+								MailCache drafts = sessionObject.caches.get(DIR_DRAFTS);
+								String temp = "susimail-attachment-" + ctx.random().nextLong();
+								File f;
+								if (drafts != null) {
+									f = new File(drafts.getAttachmentDir(), temp);
+								} else {
+									f = new File(ctx.getTempDir(), temp);
+								}
+								Buffer out = new FileBuffer(f);
+								boolean ok = false;
+								try {
+									part.decode(0, out);
+									ok = true;
+									attachments.add(new Attachment("email.html", part.type, part.encoding, f));
+								} catch (IOException e) {
+									sessionObject.error += _t("Error reading uploaded file: {0}", e.getMessage()) + '\n';
+								} finally {
+									out.writeComplete(ok);
+								}
 							}
 							subject = mail.subject;
 							if (!(subject.startsWith("Fwd:") ||
