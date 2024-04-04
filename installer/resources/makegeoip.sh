@@ -1,6 +1,7 @@
 #!/bin/sh
 #
 # Fetch the latest file from db-ip.com
+# please run this from the root of your i2p.i2p checkout (2 directories up, cd ../../)
 #
 rm -f dbip-country-lite-*
 VER=`date +%Y-%m`
