@@ -359,16 +359,13 @@ class MailCache {
 		}
 		if (mail.markForDeletion)
 			return null;
-		// if not in inbox, we can't fetch, this is what we have
-		if (mailbox == null)
-			return mail;
 
 		long sz = mail.getSize();
 		if (mode == FetchMode.HEADER && sz > 0 && sz <= FETCH_ALL_SIZE)
 			mode = FetchMode.ALL;
 			
 		if (mode == FetchMode.HEADER) {
-			if (!mail.hasHeader()) {
+			if (!mail.hasHeader() && mailbox != null) {
 				if (_log.shouldInfo()) _log.info("Fetching mail header from server for b64: " + Base64.encode(uidl));
 				Buffer buf = mailbox.getHeader(uidl);
 				if (buf != null)
@@ -396,7 +393,7 @@ class MailCache {
 			} else {
 				if (_log.shouldWarn()) _log.warn("We do not have body in disk cache for b64: " + Base64.encode(uidl));
 			}
-			if (mode == FetchMode.ALL) {
+			if (mode == FetchMode.ALL && mailbox != null) {
 				if (_log.shouldInfo()) _log.info("Fetching mail body from server for b64: " + Base64.encode(uidl));
 				File file = new File(_context.getTempDir(), "susimail-new-" + _context.random().nextLong());
 				Buffer rb = mailbox.getBody(uidl, new FileBuffer(file));

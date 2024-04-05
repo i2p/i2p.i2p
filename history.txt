@@ -1,5 +1,7 @@
 2024-04-05 zzz
- * Susimail: Fix truncation of quoted-printable encoded attachments
+ * Susimail:
+   - Fix truncation of quoted-printable encoded attachments
+   - Fix loading mail bodies in non-inbox/drafts folders
  * Translation updates
 
 2024-04-04 zzz
