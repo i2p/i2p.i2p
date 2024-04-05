@@ -5,15 +5,16 @@
 # 
 # Translators:
 # A5h8d0wf0x <littleslyfoxie28@gmail.com>, 2014
+# slrslr, 2024
 # slrslr, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-05 15:14+0000\n"
-"PO-Revision-Date: 2021-07-08 14:30+0000\n"
-"Last-Translator: slrslr\n"
-"Language-Team: Czech (http://www.transifex.com/otf/I2P/language/cs/)\n"
+"PO-Revision-Date: 2013-07-20 14:49+0000\n"
+"Last-Translator: slrslr, 2024\n"
+"Language-Team: Czech (http://app.transifex.com/otf/I2P/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -38,7 +39,7 @@ msgstr "Prosím {0}upravte nastavení datového přenosu{1} na stránce {2}nasta
 
 msgid ""
 "Also you can setup your browser to use the I2P proxy to reach eepsites."
-msgstr "Také můžete nastavit váš prohlížeč aby používal I2P proxy k dosažení eepsites."
+msgstr "Také můžete nastavit váš prohlížeč aby používal I2P proxy k dosažení eepstránek."
 
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "

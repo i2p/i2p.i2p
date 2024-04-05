@@ -17,51 +17,52 @@ Eepget \- I2P Transferidor
 Download a file non\-interactively via HTTP. Transfers through both I2P and
 the regular Internet are supported.
 .P
-Eepget is able to cope with slow or unstable network connections; if a
-download is not successful because of a network problem, it will keep
-retrying until the whole file has been retrieved (if the \-n option is set).
-If supported by the remote server, eepget will instruct the server to
-continue the download from the point of interruption.
+Eepget é capaz de lidar com conexões de rede lentas ou instáveis; Se um
+download não for bem\-sucedido devido a um problema de rede, ele continuará
+tentando novamente até que o arquivo inteiro tenha sido recuperado (se a
+opção \-n estiver definida). Se suportado pelo servidor remoto, o eepget
+instruirá o servidor a continuar o download a partir do ponto de
+interrupção.
 
 .SH OPÇÕES
 \fB\-c\fP
 .TP 
-Clearnet. Do not use a proxy. Same as \fB\-p\fP :0 .
+Clearnet. Não use um proxy. O mesmo que \fB\-p\fP :0 .
 .TP 
 
 \fB\-e\fP etag
 .TP 
-Sets the etag value in the request headers.
+Define o valor etag nos cabeçalhos de solicitação.
 .TP 
 
 \fB\-h\fP name=value
 .TP 
-Adds an arbitrary request header with the given name and value.
+Adiciona um cabeçalho de solicitação arbitrário com o nome e o valor fornecidos.
 .TP 
 
 \fB\-l\fP lineLen
 .TP 
-Controls the progress display. \fB\ lineLen \fP is the length of one progress line in characters. The default is 40.
+Controla a exibição de progresso. \fB\ lineLen \fP é o comprimento de uma linha de progresso em caracteres. O padrão é 40.
 .TP 
 
 \fB\-m\fP markSize
 .TP 
-Controls the progress display. \fB\ markSize \fP is the number of bytes one '#' character represents. The default is 1024.
+Controla a exibição de progresso. \fB\ markSize \fP é o número de bytes que um caractere '#' representa. O padrão é 1024.
 .TP 
 
 \fB\-n\fP retries
 .TP 
-Specify the number of times to retry downloading if the download isn't successful. If this option is not specified, eepget will not retry.
+Especifique o número de vezes que o download for repetido se o download não for bem\-sucedido. Se essa opção não for especificada, o eepget não tentará novamente.
 .TP 
 
 \fB\-o\fP file
 .TP 
-Sets the output file to write to. If this option is not given, the output filename will be determined by the URL.
+Define o arquivo de saída para gravar. Se essa opção não for fornecida, o nome do arquivo de saída será determinado pela URL.
 .TP 
 
 \fB\-p\fP proxy_host[:port]
 .TP 
-Specify an I2P proxy server (eeproxy) to use. If the port is not specified, eepget will use 4444. If this option is not specified, eepget will use 127.0.0.1:4444. Specify \fB\-c\fP or \fB\-p\fP :0 to disable the eeproxy.
+Especifique um servidor proxy I2P (eeproxy) a ser usado. Se a porta não for especificada, eepget usará 4444. Se essa opção não for especificada, eepget usará 127.0.0.1:4444. Especificar \fB\-c\fP ou \fB\-p\fP :0 para desativar o eeproxy.
 .TP 
 
 \fB\-t\fP segundos
@@ -76,15 +77,15 @@ Defina o nome de usuário para a autorização do proxy, se necessário.
 
 \fB\-x\fP palavra\-passe
 .TP 
-Sets the password for proxy authorization, if required. If a username is specified but not a password, EepGet will prompt for the password.
+Define a senha para autorização de proxy, se necessário. Se um nome de usuário for especificado, mas não uma senha, o EepGet solicitará a senha.
 
 .SH "STATUS DE SAÍDA"
 
-\fBeepget\fP exits with status zero upon successful transfer and non\-zero if
-there were problems with the download.
+\fBeepget\fP sai com status zero após a transferência bem\-sucedida e diferente
+de zero se houver problemas com o download.
 
 .SH "COMUNICAR ERROS"
-Please enter an issue on
+Por favor, insira um problema em
 .UR https://i2pgit.org/i2p\-hackers/i2p.i2p/\-/issues
 the I2P GitLab server
 .UE .

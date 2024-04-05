@@ -1836,17 +1836,17 @@ msgstr "Encriptado"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:604
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:618
 msgid "Encrypted with lookup password"
-msgstr ""
+msgstr "Criptografado com senha de pesquisa"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:140
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:596
 msgid "Blinded with lookup password"
-msgstr ""
+msgstr "Blinded com senha de pesquisa"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:142
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:592
 msgid "Blinded"
-msgstr ""
+msgstr "Cego"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHandler.java:94
 msgid "Log overrides updated"
@@ -3228,7 +3228,7 @@ msgstr "Em execução"
 
 #: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:155
 msgid "Dropped"
-msgstr ""
+msgstr "Deixou cair"
 
 #: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:157
 #: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:159
@@ -4112,7 +4112,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:846
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:910
 msgid "Floodfill"
-msgstr ""
+msgstr "Enchimento"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:312
 msgid "Not accepting tunnels"
@@ -5817,7 +5817,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:590
 msgid "Prevents server discovery by floodfills"
-msgstr ""
+msgstr "Impede a descoberta do servidor por preenchimentos de inundação"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:594
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:612
@@ -5841,7 +5841,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:628
 msgid "Optional lookup password"
-msgstr ""
+msgstr "Optional lookup password"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:239
 msgid "config logging"

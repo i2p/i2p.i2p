@@ -5089,7 +5089,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:115
 msgid "Rate"
-msgstr ""
+msgstr "Ставка"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:115
 msgid "Role"

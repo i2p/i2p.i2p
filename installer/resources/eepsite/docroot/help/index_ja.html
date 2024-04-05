@@ -113,47 +113,48 @@
     </ul>
 <h2>所有する I2P ドメインを登録</h2>
 
-    <p>Now it is time to add your website to an I2P address book hosted by a site such as <a href="http://stats.i2p/" target="_blank">stats.i2p</a>. 
-      You must enter your website name and Destination (or Registration Authentication string) on one or more of these sites.</p>
-<p>Some registration sites require the Destination.
-      If so, highlight and copy the entire Local destination on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.
-      Make sure you copy the whole thing, it is over 500 characters.</p>
-<p>Some registration sites, including <a href="http://stats.i2p/i2p/addkey.html" target="_blank">stats.i2p</a>, require the Registration Authentication string.
-      It is found on the <a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">Registration Authentication page</a> linked from the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service configuration page</a>.
-      Copy the entire authentication string and paste it on the registration page. 
-      Make sure you copy the whole thing, it is over 500 characters.
-      Describe your site briefly if the site requests this information.
-      If your site is a HTTP service, leave the checkbox selected; if not, unselect it.</p>
-<p>For all registration sites, read through the Terms of Service carefully.
-      Click the "Submit" button.
-      Verify the submission was successful.
-      Since many routers periodically get address book updates from these sites, within several hours others will be able to find your website by simply entering your hostname in their browser.</p>
+    <p>今は、<a href="http://stats.i2p/" target="_blank">stats.i2p</a>のようなサイトにホストされているI2Pのアドレス帳へ、あなたのウェブサイトを追加する時です。
+　そのようなサイト上で、ウェブサイト名と宛先（または登録認証文字列）を入力する必要があります。</p>
+<p>いくつかの登録サイトは宛先を必要とします。
+　その場合には、<a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">秘匿サービス設定ページ</a>上で宛先全体をハイライトとコピーしてください。
+　500字を超えるその宛先の全体をコピーすることに留意してください。</p>
+<p><a href="http://stats.i2p/i2p/addkey.html" target="_blank">stats.i2p</a>を含むいくつかの登録サイトでは、登録認証文字列が必要です。
+　登録認証文字列は、<a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">秘匿サービス設定ページ</a>からリンクされている<a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">登録認証ページ</a>上で見つかります。
+　認証文字列の全体をコピーして、登録ページ上に貼り付けてください。
+　500字を超えるその宛先の全体をコピーすることに留意してください。
+　登録サイトであなたのサイトの簡潔な説明が必要ならば、述べてください。
+　あなたのサイトがHTTPサービスならば、チェックボックスが選択されたままにしてください。そうでなければ、選択しないでください。</p>
+<p>全ての登録サイトで入念に利用規約を通読してください。
+　"Submit"ボタンをクリックしてください。
+　送信が成功したことを確認してください。
+　たくさんのルーターがそれらの登録サイトからアドレス帳更新の定期的な入手を行ってからは、ブラウザ内で単にあなたのホスト名を入力することによって、あなたのウェブサイトが見つかるようになります。</p>
 
-    <h2>Adding Addressbook Subscriptions</h2>
+    <h2>アドレス帳の購読を追加</h2>
 
-    <p>Speaking of address book updates, this would be a good time to add some more addressbooks to your own subscription list.
-       Go to your <a href="http://127.0.0.1:7657/susidns/subscriptions">Subscriptions Configuration page</a> and add one or more for an automatically updated list of new hosts:</p>
+    <p>アドレス帳の更新といえば、これはあなたが持つ購読一覧にいくつか更にアドレス帳を追加するための良い機会です。
+　<a href="http://127.0.0.1:7657/susidns/subscriptions">購読設定ページ</a>へ行き、新規ホストが自動的に更新される一覧を追加してください:</p>
 
     <ul>
 <li>
-<code dir="ltr">http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
+<code dir="ltr">http://stats.i2p/cgi-bin/newhosts.txt</code> （<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>）</li>
     </ul>
-<p>If you are in a hurry and can't wait a few hours, you can tell people to use a "jump" address helper redirection service. 
-      This will work within a few minutes of your registering your hostname on the same site.
-      Test it yourself first by entering <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code> into your browser. 
-      Once it is working, you can tell others to use it.</p>
+<p>急いでいて数時間待てなければ、"jump"アドレスヘルパー転送サービスを使用するように、人々へ伝えてください。
+　これは、同じサイト上で登録するホスト名が数分以内に機能します。
+　これを試用するには、始めにあなたのブラウザ内へ <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code>を入力します。
+　一度機能していたら、それを使うよう、他者に伝えることができます。</p>
 
     <p>Some people check website lists such as <a href="http://identiguy.i2p/" target="_blank">Identiguy's eepsite status list</a> or <a href="http://no.i2p/browse/" target="_blank">no.i2p's active host list</a> for new eepsites, so your site may start getting some traffic. 
       There are plenty of other ways to tell people. Here are a few ideas:</p>
 
     <ul>
-<li>Post a message on the <a href="http://i2pforum.i2p/" target="_blank">I2P forum</a> telling everyone about your new I2P website!</li>
-      <li>Tell people about it on the #i2p or #i2p-chat channels on IRC.</li>
+<li>
+<a href="http://i2pforum.i2p/" target="_blank">I2Pフォーラム</a>上にメッセージを投稿して、あなたの新規I2Pウェブサイトについて皆に伝えましょう！</li>
+      <li>それについて、IRC上の #i2p または #i2p-chat チャンネル上で皆に伝えてください。</li>
       <li>Put it on the <a href="http://i2pwiki.i2p/index.php?title=Eepsite/Services" target="_blank">I2PWiki Eepsite Index</a>
 </li>
     </ul>
-<p>Note that some sites recommend pasting in that really long destination.
-      You can if you want, but if you have successfully registered your hostname on a registration service, tested it using a jump service, and waited 24 hours for the address book update to propagate to others, that shouldn't be necessary.</p>
+<p>いくつかのサイトでは、本当に長い宛先を貼り付けることを推奨することに注意してください。
+　しかし、登録サービス上でホスト名の登録に成功し、ジャンプサービスを使ってテストし、アドレス帳の更新が他の人に伝播するのを24時間（訳注：購読しているホスト一覧を取得する初期設定の間隔が24時間）待ったのであれば、その必要はないはずです。</p>
 
     <h2>Using an alternative webserver to host your site</h2>
 
@@ -177,20 +178,21 @@
 
     <h2>助けを得る方法</h2>
 
-        <p>If you have any questions, the following places are available for support:</p>
+        <p>何か疑問があるならば、下記に支援を受けるために利用可能な場所があります:</p>
 
         <ul>
-<li>Our IRC support channel:<ul>
-<li><a href="irc://irc.freenode.net/i2p">#i2p on Freenode</a></li>
-                <li>Anonymously using your local <a href="irc://127.0.0.1:6668/i2p">I2P IRC tunnel</a>.</li>
+<li>我々のIRC支援チャンネル:<ul>
+<li><a href="irc://irc.freenode.net/i2p">Freenode上の#i2p</a></li>
+                <li>匿名で訪れるには、ローカルで<a href="irc://127.0.0.1:6668/i2p">I2PのIRCトンネル</a>を使用してください。</li>
              </ul>
 </li>
-<li>The project forum <a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>.</li>
+<li>プロジェクトのフォーラム<a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>
+</li>
             <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">I2PWiki Eepsite Hosting guide</a></li>
         </ul>
 <hr>
-<div class="notify">This page, the project website and the router console need translations!
-          Please help the project grow by <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank"> getting involved</a> or <a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators" target="_blank">translating</a>.</div>
+<div class="notify">このページ、プロジェクトのウェブサイト、ルーターコンソールには翻訳が必要です！
+　<a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank">参加する</a>か<a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators" target="_blank">翻訳する</a>ことによって、プロジェクトの成長を手助けしてください。</div>
         <hr>
 </div>
 </body>

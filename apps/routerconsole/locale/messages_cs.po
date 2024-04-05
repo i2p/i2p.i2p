@@ -5,7 +5,7 @@
 # 
 # Translators:
 # A5h8d0wf0x <littleslyfoxie28@gmail.com>, 2014
-# slrslr, 2022-2023
+# slrslr, 2022-2024
 # Pavel Pavel <tmp478523792@gmail.com>, 2016
 # Waseihou Watashi <waseihou@gmail.com>, 2012
 msgid ""
@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-05 17:34+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
-"Last-Translator: slrslr, 2022-2023\n"
+"Last-Translator: slrslr, 2022-2024\n"
 "Language-Team: Czech (http://app.transifex.com/otf/I2P/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -268,7 +268,7 @@ msgstr "Podzařízení"
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1178
 #, java-format
 msgid "To disable this device, add {0} to advanced configuration and restart."
-msgstr ""
+msgstr "Pro vypnutí tohoto zařízení přidejte {0} do pokročilého nastavení a restartujte."
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1199
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:47
@@ -278,7 +278,7 @@ msgstr "UPnP Stav"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1207
 msgid "Disabled UPnP Devices"
-msgstr "UPnP zařízení odpojeno"
+msgstr "Vypnutá UPnP zařízení"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1241
 msgid "UPnP has not found any UPnP-aware, compatible device on your LAN."
@@ -438,7 +438,7 @@ msgstr "Aktualizace v síti jsou vypnuté. Zkontrolujte správce balíčků."
 
 #: ../java/src/net/i2p/router/update/NewsFetcher.java:248
 msgid "No write permission for I2P install directory."
-msgstr "Chybí právo zápisu do adresáře I2P instalace."
+msgstr "Chybí právo zápisu do složky I2P instalace."
 
 #: ../java/src/net/i2p/router/update/NewsFetcher.java:262
 msgid "No update certificates installed."
@@ -491,7 +491,7 @@ msgstr "Plugin stažen"
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:562
 #, java-format
 msgid "Cannot create plugin directory {0}"
-msgstr "Není možné vytvořit adresář pluginu {0}"
+msgstr "Není možné vytvořit složku pluginu {0}"
 
 #. updateStatus("<b>" + "Plugin contains an invalid key" + ' ' + pubkey + ' '
 #. + signer + "</b>");
@@ -599,7 +599,7 @@ msgstr "Plugin vyžaduje Java verze {0} nebo nižší"
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:529
 #, java-format
 msgid "Cannot copy plugin to directory {0}"
-msgstr "Není možné zkopírovat adresář pluginu {0}"
+msgstr "Není možné zkopírovat složku pluginu {0}"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:539
 msgid "Plugin will be installed on next restart."
@@ -866,12 +866,12 @@ msgstr "Úplný garbage collection vyžádán"
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:292
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:590
 msgid "Show systray icon"
-msgstr ""
+msgstr "Ukázat ikonu systémové lišty"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:294
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:594
 msgid "Hide systray icon"
-msgstr ""
+msgstr "Skrýt ikonu systémové lišty"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:335
 msgid "Service installed"
@@ -920,11 +920,11 @@ msgstr "Chyba při ukládání nastavení (použito ale neuloženo) - prosím po
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:396
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:411
 msgid "Enabled system tray"
-msgstr ""
+msgstr "Zapnuta ikona systémové lišty"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:401
 msgid "Disabled system tray"
-msgstr ""
+msgstr "Vypnuta systémová lišta"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:407
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:675
@@ -941,11 +941,11 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:416
 msgid "Failed to start systray"
-msgstr ""
+msgstr "Selhal start systémové lišty"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:418
 msgid "Failed to stop systray"
-msgstr ""
+msgstr "Selhalo zastavení systémové lišty"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:149
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:411
@@ -1004,7 +1004,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:242
 #, java-format
 msgid "Updating refresh frequency to {0}"
-msgstr ""
+msgstr "Aktualizace frekvence obnovení na {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:243
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:126
@@ -1073,13 +1073,13 @@ msgstr ""
 msgid ""
 "Invalid form submission, probably because you used the 'back' or 'reload' "
 "button on your browser. Please resubmit."
-msgstr "Neplatně odeslaný formulář, nejspíše jste použili tlačítka 'Zpět' nebo 'Znovu načíst' ve vašem prohlížeči. Prosím odešlete formulář znovu."
+msgstr "Neplatné podání formuláře, nejspíše jste použili tlačítka 'Zpět' nebo 'Znovu načíst' ve vašem prohlížeči. Prosím odešlete formulář znovu."
 
 #: ../java/src/net/i2p/router/web/FormHandler.java:266
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
-msgstr ""
+msgstr "Pokud problém přetrvává, ověřte, že máte v prohlížeči zapnuté cookies."
 
 #: ../java/src/net/i2p/router/web/NewsHelper.java:304
 #, java-format
@@ -1128,7 +1128,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/StatSummarizer.java:435
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:255
 msgid "Bandwidth usage"
-msgstr ""
+msgstr "Využití datového přenosu"
 
 #: ../java/src/net/i2p/router/web/SummaryRenderer.java:216
 #, java-format
@@ -1176,7 +1176,7 @@ msgstr "Restart"
 
 #: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:49
 msgid "Banned Peers"
-msgstr ""
+msgstr "Zakázaní peeři"
 
 #: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:51
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:94
@@ -1199,7 +1199,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:71
 msgid "Permanently banned"
-msgstr ""
+msgstr "Trvale zakázáno"
 
 #: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:73
 #, java-format
@@ -1209,7 +1209,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:75
 #, java-format
 msgid "Banned until restart or in {0}"
-msgstr ""
+msgstr "Zakázáno do restartu nebo {0}"
 
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:31
 msgid "Local SSL Certificates"
@@ -1237,7 +1237,7 @@ msgstr "I2PTunel"
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:61
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:66
 msgid "SAM"
-msgstr ""
+msgstr "SAM"
 
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:76
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:81
@@ -1862,7 +1862,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:57
 #: ../java/strings/Strings.java:50
 msgid "Bandwidth"
-msgstr "Šířka pásma"
+msgstr "Datový přenos"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:30
 msgid "Home Page"
@@ -2112,19 +2112,19 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:501
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:102
 msgid "Updating bandwidth share percentage"
-msgstr ""
+msgstr "Aktualizace procenta sdílení datového přenosu"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:521
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:536
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:118
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:133
 msgid "Invalid bandwidth"
-msgstr ""
+msgstr "Neplatný datový přenos"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:541
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:137
 msgid "Updated bandwidth limits"
-msgstr ""
+msgstr "Aktualizovány limity datového přenosu"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHelper.java:259
 msgid "Add hostname or IP"
@@ -2149,7 +2149,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:24
 #, java-format
 msgid "Manually banned via {0}"
-msgstr ""
+msgstr "Ručně zakázáno pomocí {0}"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:26
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:35
@@ -2164,7 +2164,7 @@ msgstr "Peer"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:26
 msgid "banned until restart"
-msgstr ""
+msgstr "zakázáno do restartu"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:29
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:40
@@ -2179,11 +2179,11 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:35
 msgid "unbanned"
-msgstr ""
+msgstr "zákaz zrušen"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:37
 msgid "is not currently banned"
-msgstr ""
+msgstr "momentálně není zakázáno"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:41
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:626
@@ -2205,7 +2205,7 @@ msgstr "Nepodporováno"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:23
 msgid "IPs Banned Until Restart"
-msgstr "IPs Zakázáno Až Do Restartu"
+msgstr "IP zakázány až do restartu"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:34
 msgid "IPv4 Addresses"
@@ -2217,7 +2217,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:81
 msgid "IPs Permanently Banned"
-msgstr "IPs Je Trvale Zakázáno"
+msgstr "IP trvale zakázány"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:86
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:113
@@ -2341,7 +2341,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigStatsHandler.java:124
 msgid "Full statistics disabled"
-msgstr ""
+msgstr "Úplné statistiky vypnuty"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigStatsHandler.java:128
 #, java-format
@@ -2356,15 +2356,15 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:41
 msgid "Refresh disabled"
-msgstr "Aktualizace stavu vypnuta"
+msgstr "Obnovení vypnuto"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:46
 msgid "Refresh interval changed"
-msgstr ""
+msgstr "Změněn interval obnovení"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:49
 msgid "Refresh interval must be a number"
-msgstr ""
+msgstr "Interval obnovení musí být číslem"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:52
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:593
@@ -2379,7 +2379,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:59
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:152
 msgid "Sidebar will refresh shortly."
-msgstr ""
+msgstr "Boční panel bude brzy obnoven."
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:56
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:595
@@ -2539,7 +2539,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:85
 msgid "Refresh the page to view."
-msgstr ""
+msgstr "Pro zobrazení obnovte stránku."
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:95
 msgid "No user name entered"
@@ -2658,7 +2658,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:44
 msgid "Disabled floodfill"
-msgstr ""
+msgstr "Vypnuto floodfill"
 
 #: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:45
 msgid "Out of memory error"
@@ -2747,7 +2747,7 @@ msgstr "Detaily"
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:180
 msgid "Combined bandwidth graph"
-msgstr ""
+msgstr "Kombinovaný graf datového přenosu"
 
 #. e.g. "statname for 60m"
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:202
@@ -2849,7 +2849,7 @@ msgstr "minut"
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:403
 msgid "Refresh delay"
-msgstr ""
+msgstr "Prodleva obnovení"
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:419
 msgid "Plot type"
@@ -2930,11 +2930,11 @@ msgstr ""
 #. S + "/confighome" + S + I + "info/home.png" + S +
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:54
 msgid "Configure Bandwidth"
-msgstr ""
+msgstr "Nastavit datový přenos"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:54
 msgid "I2P Bandwidth Configuration"
-msgstr ""
+msgstr "I2P nastavení datového přenosu"
 
 #. FIXME wasn't escaped
 #. _x("Configure UI") + S + _x("Select console theme & language & set optional
@@ -2953,7 +2953,7 @@ msgstr "Nápověda"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:59
 msgid "I2P Router Help"
-msgstr ""
+msgstr "I2P router pomoc"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:60
 msgid "Install and configure I2P plugins"
@@ -3115,7 +3115,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:111
 msgid "Bug tracker"
-msgstr ""
+msgstr "Index chyb"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:111
 msgid "I2P Bug Reports"
@@ -3232,7 +3232,7 @@ msgstr "Shrnutí"
 #: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:83
 #: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:197
 msgid "File location"
-msgstr ""
+msgstr "Umístění souboru"
 
 #: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:194
 msgid "File not found"
@@ -3347,7 +3347,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:757
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:413
 msgid "Local"
-msgstr ""
+msgstr "Místní"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:760
 msgid "Unpublished"
@@ -3407,7 +3407,7 @@ msgstr "Počet"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1052
 msgid "Transports"
-msgstr ""
+msgstr "Transporty"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1081
 msgid "Sort by country"
@@ -3429,7 +3429,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1227
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:941
 msgid "Full entry"
-msgstr ""
+msgstr "Celý záznam"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1233
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:242
@@ -3454,7 +3454,7 @@ msgstr "Zveřejněný"
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1249
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1041
 msgid "Signing Key"
-msgstr ""
+msgstr "Podepisovací klíč"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1264
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:43
@@ -3557,7 +3557,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:151
 msgid "UPnP disabled on the device"
-msgstr ""
+msgstr "UPnP vypnuto na zařízení"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:152
 msgid "Software firewall interference with UPnP"
@@ -3579,7 +3579,7 @@ msgstr ""
 msgid ""
 "UPnP may be enabled or disabled on the Network Configuration page, but a "
 "change requires a router restart to take effect."
-msgstr ""
+msgstr "UPnP může být zapnuto nebo vypnuto na stránce nastavení sítě. Změna ale vyžaduje restart routeru."
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:206
 msgid "Peer Connections"
@@ -3607,7 +3607,7 @@ msgstr "IPv6"
 msgid ""
 "Your transport connection limits are automatically set based on your "
 "configured bandwidth."
-msgstr "Vaše limity spojení pro přeneos jsou automaticky nastaveny v závislosti na nastavení přenosové rychlosti."
+msgstr "Vaše limity spojení pro přenos jsou automaticky nastaveny v závislosti na nastavení datového přenosu."
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:352
 msgid ""
@@ -3628,7 +3628,7 @@ msgstr "Vzdálený sdíleč určený hashem routru."
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:419
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:596
 msgid "Dir"
-msgstr "Adresář"
+msgstr "Složka"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:357
 msgid "Inbound connection"
@@ -3827,7 +3827,7 @@ msgstr "Seřadit podle odchozí rychlosti "
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:610
 msgid "Sort by connection uptime"
-msgstr "Seřadit podle doby běhu připojení."
+msgstr "Seřadit podle doby dostupnosti připojení."
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:612
 msgid "Sort by clock skew"
@@ -4114,7 +4114,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:315
 #, java-format
 msgid "Under {0} shared bandwidth"
-msgstr ""
+msgstr "Pod {0} sdíleného datového přenosu"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:316
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:319
@@ -4128,7 +4128,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:247
 #, java-format
 msgid "{0} shared bandwidth"
-msgstr ""
+msgstr "{0} sdíleného datového přenosu"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:327
 msgid "Reachable"
@@ -4138,7 +4138,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:248
 #, java-format
 msgid "Over {0} shared bandwidth"
-msgstr ""
+msgstr "Přes {0} sdíleného datového přenosu"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:335
 msgid "speed"
@@ -4172,7 +4172,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:352
 msgid "is the peer banned, or unreachable, or failing tunnel tests?"
-msgstr ""
+msgstr "je peer zakázán nebo nedostupný nebo selhává při testech tunelu?"
 
 #. 2
 #: ../java/src/net/i2p/router/web/helpers/ProfilesHelper.java:16
@@ -4186,7 +4186,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:38
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:528
 msgid "Bandwidth Limiter"
-msgstr ""
+msgstr "Omezovač datového přenosu"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:39
 msgid "Client Messages"
@@ -4365,7 +4365,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configwebapps_jsp.java:448
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:263
 msgid "Configuration"
-msgstr "Konfigurace"
+msgstr "Nastavení"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:46
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:412
@@ -4411,7 +4411,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:58
 msgid "Bandwidth Graph"
-msgstr "Graf připojení"
+msgstr "Graf datového přenosu"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:60
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1071
@@ -4559,7 +4559,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:488
 msgid "Advanced Configuration"
-msgstr "Pokročilá konfigurace"
+msgstr "Pokročilá nastavení"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:498
 msgid "Certs"
@@ -4750,16 +4750,16 @@ msgstr "Známí"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:925
 msgid "The number of banned peers"
-msgstr ""
+msgstr "Počet zakázaných peerů"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:947
 msgid "Configure router bandwidth allocation"
-msgstr ""
+msgstr "Nastavte přidělenou datového přenosu routeru"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:949
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:470
 msgid "Bandwidth in/out"
-msgstr ""
+msgstr "Datový přenos dovnitř/ven"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:976
 msgid "Used"
@@ -4787,7 +4787,7 @@ msgstr ""
 msgid ""
 "Tunnels we are participating in, directly contributing bandwidth to the "
 "network"
-msgstr ""
+msgstr "Tunely, kterých se účastníme, přímo přispíváme síti svým datovým přenosem"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1047
 msgid "Participating"
@@ -4882,11 +4882,11 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:312
 msgid "ERR-UDP Disabled and Inbound TCP host/port not set"
-msgstr ""
+msgstr "ERR-UDP vypnuto a příchozí TCP host/port nenastaven"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:314
 msgid "WARN-Firewalled with UDP Disabled"
-msgstr ""
+msgstr "WARN-Firewalled s vypnutým UDP"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:606
 msgid "Add/remove/edit &amp; control your client and server tunnels"
@@ -4980,7 +4980,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1012
 msgid "Reseed"
-msgstr ""
+msgstr "Reseed"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1112
 msgid "Order"
@@ -5120,12 +5120,12 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:186
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:456
 msgid "Lifetime bandwidth usage"
-msgstr ""
+msgstr "Celoživotní využití datového přenosu"
 
 #. bwShare > 12
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:231
 msgid "Not enough shared bandwidth to build participating tunnels."
-msgstr ""
+msgstr "Nedostatek sdíleného datového přenosu pro vytvoření participujících tunelů."
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:232
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:605
@@ -5135,7 +5135,7 @@ msgstr "Konfigurovat"
 #. renderPeers(out);
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:236
 msgid "Bandwidth Tiers"
-msgstr ""
+msgstr "Úrovně datového přenosu"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:368
 msgid "Inbound or outbound?"
@@ -5160,7 +5160,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:415
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:420
 msgid "Bandwidth tier"
-msgstr ""
+msgstr "Úroveň datového přenosu"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:442
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:450
@@ -5182,33 +5182,33 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:59
 msgid "Bandwidth test completed successfully"
-msgstr ""
+msgstr "Test datového přenosu úspěšně dokončen"
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:61
 msgid "Bandwidth test failed"
-msgstr ""
+msgstr "Test datového přenosu selhal"
 
 #. didn't run at all?
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:63
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:66
 msgid "Bandwidth test did not complete"
-msgstr ""
+msgstr "Test datového přenosu nebyl dokončen"
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:148
 msgid "Bandwidth test started"
-msgstr ""
+msgstr "Test datového přenosu začal"
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:150
 msgid "Bandwidth test is already running"
-msgstr ""
+msgstr "Test datového přenosu již běží"
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:159
 msgid "Bandwidth test cancelled"
-msgstr ""
+msgstr "Test datového přenosu zrušen"
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:161
 msgid "Bandwidth test was not running"
-msgstr ""
+msgstr "Test datového přenosu neběžel"
 
 #. wars for ConfigClientsHelper
 #: ../java/strings/Strings.java:12
@@ -5373,7 +5373,7 @@ msgstr "Router neběží"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:239
 msgid "configure bandwidth"
-msgstr ""
+msgstr "nastavit datový přenos"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:530
 msgid "Advanced Network Configuration"
@@ -5392,20 +5392,20 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:535
 msgid "You may change your bandwidth limits here."
-msgstr ""
+msgstr "Zde můžete změnit své limity datového přenosu."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:536
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:479
 msgid ""
 "The more bandwidth you make available, the more you help the network and "
 "improve your own anonymity, so please take the time to review the settings."
-msgstr ""
+msgstr "Čím více datového přenosu dáte k dispozici, tím více pomůžete síti a vylepšíte vlastní anonymitu. Proto prosím věnujte čas kontrole nastavení."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:537
 msgid ""
 "If you are unsure of your network's speed, use the <a "
 "href=\"/welcome?page=3\">Bandwidth Test</a>."
-msgstr ""
+msgstr "Pokud si nejste jisti rychlostí vaší sítě, použijte <a href=\"/welcome?page=3\">Test datového přenosu</a>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:538
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:481
@@ -5450,7 +5450,7 @@ msgstr ""
 msgid ""
 "Please enable sharing (participating in tunnels) by configuring more "
 "bandwidth. "
-msgstr ""
+msgstr "Prosím zapněte sdílení (participace tunelů) nastavením více datového přenosu."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:571
 msgid ""
@@ -5467,7 +5467,7 @@ msgstr ""
 msgid ""
 "The higher the share bandwidth the more you improve your anonymity and help "
 "the network."
-msgstr ""
+msgstr "Čím vyšší je sdílený datový přenos, tím lepší je vaše anonymita a pomoc síti."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:239
 msgid "config advanced"
@@ -5519,7 +5519,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:570
 msgid "Disable"
-msgstr "Zakázat"
+msgstr "Vypnout"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:574
 msgid "Advanced I2P Configuration"
@@ -5590,7 +5590,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:638
 msgid "To disable participation completely, set to 0."
-msgstr ""
+msgstr "Pro úplné vypnutí účasti nastavte na 0."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:242
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:242
@@ -5757,7 +5757,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:594
 msgid "Disabled - Clients outside this Java process may not connect"
-msgstr ""
+msgstr "Vypnuto - Klienti mimo tento Java proces se nepřipojí"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:600
 msgid "I2CP Interface"
@@ -6000,7 +6000,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:600
 msgid "Disable UPnP IP address detection"
-msgstr ""
+msgstr "Vypnout UPnP rozpoznání IP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:604
 msgid "Ignore local interface IP address"
@@ -6031,7 +6031,7 @@ msgstr ""
 msgid ""
 "Disable inbound (Firewalled by home network, ISP, DS-Lite, or carrier-grade "
 "NAT)"
-msgstr ""
+msgstr "Vypnout příchozí (Za firewallem místní sítě, ISP, DS-Lite nebo carrier-grade NAT)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:628
 msgid "IPv6 Configuration"
@@ -6051,11 +6051,11 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:644
 msgid "Disable IPv6"
-msgstr ""
+msgstr "Vypnout IPv6"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:648
 msgid "Use IPv6 only (disable IPv4)"
-msgstr ""
+msgstr "Používat jen IPv6 (vypnout IPv4)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:650
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:662
@@ -6065,7 +6065,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:654
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:716
 msgid "Disable inbound (Firewalled)"
-msgstr ""
+msgstr "Vypnout příchozí (za firewallem)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:656
 msgid "Action when IP changes"
@@ -6079,7 +6079,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:664
 msgid "UDP Configuration"
-msgstr ""
+msgstr "UDP nastavení"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:666
 msgid "UDP port:"
@@ -6093,7 +6093,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:676
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:720
 msgid "Completely disable"
-msgstr ""
+msgstr "Úplně vypnout"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:678
 msgid "(select only if behind a firewall that blocks outbound UDP)"
@@ -6152,7 +6152,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:587
 msgid ""
 "Banning will prevent the participation of this peer in tunnels you create."
-msgstr ""
+msgstr "Zakázání předejde účasti tohoto peera v tunelech, které vytvoříte."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:606
 msgid "Adjust Profile Bonuses"
@@ -6172,7 +6172,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:647
 msgid "Banned IPs"
-msgstr ""
+msgstr "Zakázané IP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:242
 msgid "config plugins"
@@ -6513,11 +6513,11 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:584
 msgid "Systray integration"
-msgstr ""
+msgstr "Integrace systémové lišty"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:586
 msgid "Control the system tray icon"
-msgstr ""
+msgstr "Ovládat ikonu systémové lišty"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:603
 msgid "Run on startup"
@@ -6581,7 +6581,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:569
 msgid "Refresh Interval"
-msgstr ""
+msgstr "Interval obnovení"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:583
 msgid "seconds"
@@ -6661,7 +6661,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:564
 msgid "High CPU and/or high outbound bandwidth usage may result."
-msgstr ""
+msgstr "Může mít za následek vyšší využití CPU a/nebo vyšší odchozí datový přenos."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:567
 msgid "Change these settings with care, and adjust them if you have problems."
@@ -6694,7 +6694,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:541
 msgid "Theme selection disabled for Internet Explorer, sorry."
-msgstr ""
+msgstr "Výběr vzhledu je vypnut pro Internet Explorer, promiňte."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:543
 msgid ""
@@ -6752,7 +6752,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:576
 msgid "Refresh frequency"
-msgstr ""
+msgstr "Frekvence obnovení"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:582
 msgid "Update policy"
@@ -6826,7 +6826,7 @@ msgid ""
 "directory; however the .war file and web app will reappear when you update "
 "your router to a newer version, so disabling the web app here is the "
 "preferred method."
-msgstr ""
+msgstr "Webová aplikace může být také vypnuta odebráním souboru .war ze složky webapps; avšak soubor .war a webová aplikace se znovu objeví po aktualizaci routeru na novou verzi, vypnutí webové aplikace na tomto místě je preferovaná metoda."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/console_jsp.java:237
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:238
@@ -7009,7 +7009,7 @@ msgstr ""
 msgid ""
 "This section indicates your average bandwidth speeds and total usage for the"
 " session."
-msgstr ""
+msgstr "Tato sekce ukazuje váš průměrný datový přenos a celkové využití v rámci relace."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:475
 msgid "All values are in bytes per second, not bits per second."
@@ -7019,7 +7019,7 @@ msgstr ""
 msgid ""
 "You may change your bandwidth limits on the <a href=\"config\">Bandwidth "
 "Configuration page</a>."
-msgstr ""
+msgstr "Můžete změnit vaše limity datového přenosu na <a href=\"config\">stránce nastavení datového přenosu</a>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:487
 msgid ""
@@ -7031,7 +7031,7 @@ msgstr ""
 msgid ""
 "This may range from 8-10 to several hundred, depending on your total "
 "bandwidth, shared bandwidth, and locally-generated traffic."
-msgstr ""
+msgstr "Toto může mít rozsah od 8-10 do několika stovek, v závislosti na vašem celkovém datovém přenosu, síleném přenosu a místním přenosu."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:491
 msgid "The second number is the number of peers seen in the last hour or so."
@@ -7088,7 +7088,7 @@ msgid ""
 "This number is not the total size of the network; it may vary widely "
 "depending on your total bandwidth, shared bandwidth, and locally-generated "
 "traffic."
-msgstr ""
+msgstr "Číslo není celkovou velikostí sítě; může se velmi lišit v závislosti na vašem celkovém datovém přenosu, sdíleném přenosu a místním přenosu."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:525
 msgid ""
@@ -7186,14 +7186,14 @@ msgstr ""
 msgid ""
 "You have configured I2P to share more than 128KBps of bandwidth, but you are"
 " firewalled."
-msgstr ""
+msgstr "Nastavili jste, aby I2P sdílel více než 128 KB/s datového přenosu, jste ale za firewallem."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:571
 msgid ""
 "While I2P will work fine in this configuration, if you really have over "
 "128KBps of bandwidth to share, it will be much more helpful to the network "
 "if you open your firewall."
-msgstr ""
+msgstr "I2P bude pod tímto nastavením fungovat bez problémů, pokud skutečně máte ke sdílení více než 128 KB/s datového přenosu. Pro síť bude mnohem užitečnější pokud otevřete váš firewall."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:573
 msgid "WARN - Firewalled and Floodfill"
@@ -7227,15 +7227,15 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:585
 msgid "Please open your firewall or disable inbound TCP above."
-msgstr ""
+msgstr "Prosím otevřete váš firewall nebo výše vypněte příchozí TCP."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:587
 msgid "WARN - Firewalled with UDP Disabled"
-msgstr ""
+msgstr "WARN - Za firewallem s vypnutým UDP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:589
 msgid "You have configured inbound TCP, however you have disabled UDP."
-msgstr ""
+msgstr "Nastavili jste příchozí TCP, avšak máte vypnuté UDP."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:591
 msgid ""
@@ -7275,7 +7275,7 @@ msgstr ""
 msgid ""
 "Correct the address or disable inbound TCP on the Network Configuration "
 "page."
-msgstr ""
+msgstr "Opravte adresu nebo vypněte příchozí TCP na stránce nastavení sítě."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:607
 msgid "ERR - SymmetricNAT"
@@ -7322,13 +7322,13 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:623
 msgid "ERR - UDP Disabled and Inbound TCP host/port not set"
-msgstr ""
+msgstr "ERR - UDP vypnuto a příchozí TCP host/port není nastaven"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:625
 msgid ""
 "You have not configured inbound TCP with an address and port on the Network "
 "Configuration page, however you have disabled UDP."
-msgstr ""
+msgstr "Nenastavili jste příchozí TCP s adresou a portem na stránce nastavení sítě, avšak máte vypnuto UDP."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:627
 msgid "Therefore your router cannot accept inbound connections."
@@ -7392,7 +7392,7 @@ msgstr ""
 msgid ""
 "My router has been up for several minutes and has zero or very few "
 "connections"
-msgstr ""
+msgstr "Můj router běží několik minut a má nula nebo jen pár připojení"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:660
 msgid ""
@@ -7416,7 +7416,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:666
 msgid "My router has very few active peers, is this OK?"
-msgstr ""
+msgstr "Můj router má velmi málo aktivních peerů, je to v pořádku?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:668
 msgid "If your router has 10 or more active peers, everything is fine."
@@ -7430,7 +7430,7 @@ msgstr ""
 msgid ""
 "The best way to stay connected to the network is to <a "
 "href=\"/config\">share more bandwidth</a>."
-msgstr ""
+msgstr "Nejlepší způsob jak zůstat připojen k síti je <a href=\"/config\">sdílení většího datového přenosu</a>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:674
 msgid ""
@@ -7485,7 +7485,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:692
 msgid ""
 "How do I access IRC, BitTorrent, or other services on the regular Internet?"
-msgstr ""
+msgstr "Jak přistoupím k IRC, BitTorrentu nebo jiným službám na běžném internetu?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:694
 msgid ""
@@ -7563,7 +7563,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:725
 msgid "How do I connect to IRC within I2P?"
-msgstr ""
+msgstr "Jak se připojím k IRC v rámci I2P?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:727
 msgid ""
@@ -7592,7 +7592,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:735
 msgid "What ports does I2P use?"
-msgstr ""
+msgstr "Které porty používá I2P?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:737
 msgid "Local ports"
@@ -7756,7 +7756,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:380
 msgid "Refresh (s)"
-msgstr ""
+msgstr "Obnovení (s.)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:383
 msgid "Enable"
@@ -7765,7 +7765,7 @@ msgstr "Zapnout"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:393
 #, java-format
 msgid "Disable {0} Refresh"
-msgstr ""
+msgstr "Vypnout {0} obnovení"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:263
 msgid "torrents"
@@ -7809,13 +7809,13 @@ msgstr ""
 msgid ""
 "The quantity may vary widely depending on network demand, your shared "
 "bandwidth, and amount of locally-generated traffic."
-msgstr ""
+msgstr "Množství se může velmi lišit v závislosti na síťových požadavcích, vašemu sdílenému datovému přenosu a velikosti místního přenosu."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:465
 msgid ""
 "The recommended method for limiting participating tunnels is to change your "
 "share percentage on the <a href=\"config\">Bandwidth Configuration page</a>."
-msgstr ""
+msgstr "Doporučená metoda omezení participujících tunelů je změna vašeho procenta sdílení na <a href=\"config\">stránce nastavení datového přenosu</a>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:467
 msgid ""
@@ -7856,11 +7856,11 @@ msgstr "I2P Webmail"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:332
 msgid "Bandwidth test in progress..."
-msgstr ""
+msgstr "Test datového přenosu probíhá..."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:334
 msgid "Bandwidth test is complete, click Next"
-msgstr ""
+msgstr "Test datového přenosu je dokončen, klikněte na Další"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:479
 msgid "Select Language"
@@ -7901,7 +7901,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:521
 msgid "Bandwidth Test"
-msgstr ""
+msgstr "Test datového přenosu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:523
 msgid "Let's check your internet connection!"
@@ -7911,13 +7911,13 @@ msgstr ""
 msgid ""
 "Bandwidth participation not only makes your speed and connection to the I2P "
 "network better, but also helps everyone using the network."
-msgstr ""
+msgstr "Participace datového přenosu vylepšuje vaši rychlost a připojení k I2P síti a také pomáhá všem, kdo používají síť."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:527
 msgid ""
 "When everyone is sharing as much bandwidth as possible, everyone gets to "
 "have better performance and privacy by sharing participating traffic."
-msgstr ""
+msgstr "Pokud každý sdílí tolik datového přenosu kolik je možné, každý získá lepší výkon a soukromí díky sdílení datového přenosu při participaci."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:529
 msgid ""
@@ -7939,7 +7939,7 @@ msgstr ""
 msgid ""
 "If you do not wish to run the M-Lab bandwidth test, you can skip it and "
 "configure your bandwidth later."
-msgstr ""
+msgstr "Pokud nechcete spouštět test datového přenosu M-Lab, přeskočte ho a nastavte váš datový přenos později."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:537
 #, java-format
@@ -7953,13 +7953,13 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:547
 msgid "Bandwidth Test in Progress"
-msgstr ""
+msgstr "Test datového přenosu probíhá"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:549
 msgid ""
 "Javascript is disabled - wait 60 seconds for the bandwidth test to complete "
 "and then click Next"
-msgstr ""
+msgstr "Javascript je vypnut - čekejte 60 sekund pro dokončení testu datového přenosu a potom klikněte na Další"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:551
 msgid ""
@@ -7967,7 +7967,7 @@ msgid ""
 "bandwidth, obtaining an initial set of peers from a reseed server, making "
 "its first few connections, and getting integrated with the rest of the "
 "network."
-msgstr ""
+msgstr "Při přípravě I2P router software probíhá test vašeho datového přenosu, získání prvních peerů od reseed serveru, navazování prvních spojení a integrace se zbytkem sítě."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:553
 #, java-format
@@ -7993,14 +7993,14 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:577
 msgid "Bandwidth Configuration"
-msgstr ""
+msgstr "Nastavení datového přenosu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:609
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:616
 msgid ""
 "By donating your bandwidth to participating traffic, you not only help "
 "others, you improve your own anonymity and performance."
-msgstr ""
+msgstr "Tím, že darujete váš datový přenos pro participaci, pomáháte ostatním a také vylepšujete svou anonymitu a výkon."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:611
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:618
@@ -8142,11 +8142,11 @@ msgstr "Přeskočit nastavení"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:712
 msgid "Skip Bandwidth Test"
-msgstr ""
+msgstr "Přeskočit test datového přenosu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:718
 msgid "Cancel Bandwidth Test"
-msgstr ""
+msgstr "Zrušit test datového přenosu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:724
 msgid "Next"

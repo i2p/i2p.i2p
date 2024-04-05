@@ -6,7 +6,7 @@
 # 
 # Translators:
 # zzzi2p, 2019
-# slrslr, 2021
+# slrslr, 2024
 # 
 msgid ""
 msgstr ""
@@ -14,8 +14,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-18 13:32+0000\n"
 "PO-Revision-Date: 2019-12-19 14:09+0000\n"
-"Last-Translator: slrslr, 2021\n"
-"Language-Team: Czech (https://www.transifex.com/otf/teams/12694/cs/)\n"
+"Last-Translator: slrslr, 2024\n"
+"Language-Team: Czech (https://app.transifex.com/otf/teams/12694/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -45,7 +45,7 @@ msgstr "IPv4: Firewalled; IPv6: OK"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:375
 msgid "IPv4: Disabled; IPv6: OK"
-msgstr "IPv4: Zakázáno, IPv6: OK"
+msgstr "IPv4: Vypnuto, IPv6: OK"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:376
 msgid "IPv4: Symmetric NAT; IPv6: OK"

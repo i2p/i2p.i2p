@@ -4,7 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Cauan Henrique Zorzenon <cauanzorzenon@gmail.com>, 2023
+# Cauan Henrique Zorzenon <cauanzorzenon@gmail.com>, 2023-2024
 # testsubject67 <deborinha97@hotmail.com>, 2014
 # Eduardo Rodrigues, 2021
 # L., 2013
@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-04 23:26+0000\n"
 "PO-Revision-Date: 2011-02-13 11:46+0000\n"
-"Last-Translator: Cauan Henrique Zorzenon <cauanzorzenon@gmail.com>, 2023\n"
+"Last-Translator: Cauan Henrique Zorzenon <cauanzorzenon@gmail.com>, 2023-2024\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/otf/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1140,7 +1140,7 @@ msgstr "Entrante"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1483
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1574
 msgid "Level of Randomization for Tunnel Depth"
-msgstr ""
+msgstr "Nível de randomização para profundidade do túnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1531
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1676
@@ -1155,12 +1155,12 @@ msgstr "Criptografar Leaseset"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1749
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2185
 msgid "Allow all clients to connect to this service"
-msgstr ""
+msgstr "Permitir que todos os clientes se conectem a este serviço"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1759
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1789
 msgid "Send key to all users."
-msgstr ""
+msgstr "Enviar chave para todos os usuários."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1763
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1793
@@ -1170,53 +1170,53 @@ msgstr "Encriptado"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1773
 msgid "Prevents server discovery by floodfills"
-msgstr ""
+msgstr "Impede a descoberta do servidor por preenchimentos de inundação"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1777
 msgid "Blinded"
-msgstr ""
+msgstr "Blinded"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1783
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1808
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1821
 msgid "Send password to all users."
-msgstr ""
+msgstr "Enviar senha para todos os usuários."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1787
 msgid "Blinded with lookup password"
-msgstr ""
+msgstr "Blinded com senha de pesquisa"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1795
 msgid "Send key and password to all users."
-msgstr ""
+msgstr "Enviar chave e senha para todos os usuários."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1799
 msgid "Encrypted with lookup password"
-msgstr ""
+msgstr "Criptografado com senha de pesquisa"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1801
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1807
 msgid "Send individual key to each user."
-msgstr ""
+msgstr "Envie uma chave individual para cada usuário."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1805
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1818
 msgid "Encrypted with per-user key"
-msgstr ""
+msgstr "Criptografado com chave por usuário"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1812
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1825
 msgid "Encrypted with lookup password and per-user key"
-msgstr ""
+msgstr "Criptografado com senha de pesquisa e chave por usuário"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1814
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1820
 msgid "Enter key from each user."
-msgstr ""
+msgstr "Digite a chave de cada usuário."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1838
 msgid "Optional lookup password"
-msgstr ""
+msgstr "Senha de pesquisa opcional"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1853
 msgid "Encryption Key"
@@ -1224,21 +1224,21 @@ msgstr "Chave criptográfica"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1881
 msgid "Encryption key required to access this service"
-msgstr ""
+msgstr "Chave de criptografia necessária para acessar este serviço"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1895
 msgid "Revoke"
-msgstr ""
+msgstr "Revogar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1897
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1934
 msgid "Client Name"
-msgstr ""
+msgstr "Nome do Cliente"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1899
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1942
 msgid "Client Key"
-msgstr ""
+msgstr "Chave do Cliente"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1916
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1948
@@ -1251,23 +1251,23 @@ msgstr "Adicionar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2064
 msgid "Recommended for blinded and encrypted destinations"
-msgstr ""
+msgstr "Recomendado para destinos cegos e criptografados"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2106
 msgid "Alternate private key file"
-msgstr ""
+msgstr "Arquivo de chave privada alternativo"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2120
 msgid "Alternate local destination"
-msgstr ""
+msgstr "Destino local alternativo"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2122
 msgid "Read Only: Alternate Local Destination"
-msgstr ""
+msgstr "Somente leitura: destino local alternativo"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2181
 msgid "Tunnel Access Control Options"
-msgstr ""
+msgstr "Opções de controle de acesso ao túnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2183
 msgid "Restricted Access List"
@@ -1275,105 +1275,105 @@ msgstr "Liste de acessos restritos"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2191
 msgid "Prevent listed clients from connecting to this service"
-msgstr ""
+msgstr "Impedir que os clientes listados se conectem a este serviço"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2195
 msgid "Deny List"
-msgstr ""
+msgstr "Negar lista"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2197
 msgid "Only allow listed clients to connect to this service"
-msgstr ""
+msgstr "Permitir que apenas os clientes listados se conectem a este serviço"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2201
 msgid "Allow List"
-msgstr ""
+msgstr "Lista de permissões"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2203
 msgid "Access List Description"
-msgstr ""
+msgstr "Descrição da Lista de Acesso"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2205
 msgid "Specify clients, 1 per line"
-msgstr ""
+msgstr "Especificar clientes, 1 por linha"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2207
 msgid "Control access to this service"
-msgstr ""
+msgstr "Controlar o acesso a este serviço"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2211
 msgid "Filter Definition File"
-msgstr ""
+msgstr "Arquivo de definição de filtro"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2213
 msgid "You can define an advanced filter for this tunnel."
-msgstr ""
+msgstr "Você pode definir um filtro avançado para este túnel."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2215
 msgid "Format Specification"
-msgstr ""
+msgstr "Especificação de formato"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2217
 msgid "Absolute path to file containing filter definition"
-msgstr ""
+msgstr "Caminho absoluto para o arquivo que contém a definição do filtro"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2221
 msgid "Server Access Options"
-msgstr ""
+msgstr "Opções de Acesso ao Servidor"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2227
 msgid "Prevent clients from accessing this service via an inproxy"
-msgstr ""
+msgstr "Impedir que os clientes acessem esse serviço por meio de um inproxy"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2231
 msgid "Block Access via Inproxies"
-msgstr ""
+msgstr "Bloquear acesso via Inproxies"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2235
 msgid "Block Accesses containing Referers"
-msgstr ""
+msgstr "Bloquear acessos contendo Referers"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2237
 msgid "Deny User-Agents matching these strings (probably from inproxies)"
-msgstr ""
+msgstr "Negar User-Agents correspondentes a essas cadeias de caracteres (provavelmente de inproxies)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2241
 msgid "Block these User-Agents"
-msgstr ""
+msgstr "Bloquear estes User-Agents"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2243
 msgid "comma separated, e.g. Mozilla,Opera (case-sensitive)"
-msgstr ""
+msgstr "vírgula separada, por exemplo, Mozilla, Opera (diferencia maiúsculas de minúsculas)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2250
 msgid ""
 "Use unique IP addresses for each connecting client (local non-SSL servers "
 "only)"
-msgstr ""
+msgstr "Use endereços IP exclusivos para cada cliente de conexão (somente servidores locais não SSL)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2254
 msgid "Unique Local Address per Client"
-msgstr ""
+msgstr "Endereço Local Exclusivo por Cliente"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2256
 msgid "Only enable if you are hosting this service on multiple routers"
-msgstr ""
+msgstr "Habilite somente se você estiver hospedando esse serviço em vários roteadores"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2260
 msgid "Optimize for Multihoming"
-msgstr ""
+msgstr "Otimize para Multihoming"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2262
 msgid "Tunnel Performance Options"
-msgstr ""
+msgstr "Opções de desempenho do túnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2295
 msgid "Number of tunnels to keep open to maintain availability of service"
-msgstr ""
+msgstr "Número de túneis a manter abertos para manter a disponibilidade do serviço"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2301
 msgid "Period of inactivity before tunnel number is reduced"
-msgstr ""
+msgstr "Período de inatividade antes que o número do túnel seja reduzido"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2305
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2375
@@ -1384,50 +1384,50 @@ msgstr "minutos"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2307
 msgid "Server Throttling"
-msgstr ""
+msgstr "Limitação do servidor"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2309
 msgid "Inbound connection limits"
-msgstr ""
+msgstr "Limites de conexão de entrada"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2311
 msgid "Per Minute"
-msgstr ""
+msgstr "Por Minuto"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2313
 msgid "Per Hour"
-msgstr ""
+msgstr "Por Hora"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2315
 msgid "Per Day"
-msgstr ""
+msgstr "Por Dia"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2317
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2365
 msgid "Per Client"
-msgstr ""
+msgstr "Por Cliente"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2320
 msgid "unlimited"
-msgstr ""
+msgstr "ilimitado"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2323
 msgid ""
 "Maximum number of web page requests per minute for a unique client before "
 "access to the server is blocked"
-msgstr ""
+msgstr "Número máximo de solicitações de página da Web por minuto para um cliente exclusivo antes que o acesso ao servidor seja bloqueado"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2327
 msgid ""
 "Maximum number of web page requests per hour for a unique client before "
 "access to the server is blocked"
-msgstr ""
+msgstr "Número máximo de solicitações de página da Web por hora para um cliente exclusivo antes que o acesso ao servidor seja bloqueado"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2331
 msgid ""
 "Maximum number of web page requests per day for a unique client before "
 "access to the server is blocked"
-msgstr ""
+msgstr "Número máximo de solicitações de página da Web por dia para um cliente exclusivo antes que o acesso ao servidor seja bloqueado"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2335
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2377
@@ -1438,27 +1438,27 @@ msgstr "Total"
 msgid ""
 "Total number of web page requests per minute before access to the server is "
 "blocked"
-msgstr ""
+msgstr "Número total de solicitações de página da Web por minuto antes que o acesso ao servidor seja bloqueado"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2341
 msgid ""
 "Total number of web page requests per hour before access to the server is "
 "blocked"
-msgstr ""
+msgstr "Número total de solicitações de página da Web por hora antes que o acesso ao servidor seja bloqueado"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2345
 msgid ""
 "Total number of web page requests per day before access to the server is "
 "blocked"
-msgstr ""
+msgstr "Número total de solicitações de página da Web por dia antes que o acesso ao servidor seja bloqueado"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2349
 msgid "Max concurrent connections"
-msgstr ""
+msgstr "Máximo de conexões simultâneas"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2351
 msgid "Maximum number of simultaneous client connections"
-msgstr ""
+msgstr "Número máximo de conexões de cliente simultâneas"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2359
 msgid "POST limits"
@@ -1470,53 +1470,53 @@ msgstr "Por período"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2363
 msgid "Ban Duration"
-msgstr ""
+msgstr "Duração da proibição"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2367
 msgid ""
 "Maximum number of post requests permitted for a unique client for the "
 "configured time span"
-msgstr ""
+msgstr "Número máximo de solicitações de postagem permitidas para um cliente exclusivo para o período de tempo configurado"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2371
 msgid ""
 "If a client exceeds the maximum number of post requests per allocated "
 "period, enforce a ban for this number of minutes"
-msgstr ""
+msgstr "Se um cliente exceder o número máximo de solicitações de postagem por período alocado, aplique uma proibição para esse número de minutos"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2379
 msgid "Total number of post requests permitted for the configured time span"
-msgstr ""
+msgstr "Número total de solicitações de postagem permitidas para o período de tempo configurado"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2383
 msgid ""
 "If the maximum number of post requests per allocated period is exceeded, "
 "enforce a global access ban for this number of minutes"
-msgstr ""
+msgstr "Se o número máximo de solicitações de postagem por período alocado for excedido, aplique uma proibição de acesso global para esse número de minutos"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2389
 msgid "POST limit period"
-msgstr ""
+msgstr "Período limite POST"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2391
 msgid ""
 "Time span for the maximum number of post requests to be reached before a ban"
 " is triggered"
-msgstr ""
+msgstr "Período de tempo para que o número máximo de pedidos de correio seja atingido antes de uma proibição ser desencadeada"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2451
 msgid "Tunnels not initialized yet; please retry in a few moments."
-msgstr ""
+msgstr "Túneis ainda não inicializados; Por favor, tente novamente em alguns momentos."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:163
 msgid "These are the local services provided by your router."
-msgstr ""
+msgstr "Estes são os serviços locais fornecidos pelo seu roteador."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:165
 msgid ""
 "By default, most of your client services (email, HTTP proxy, IRC) will share"
 " the same set of tunnels and be listed as \"Shared Clients\"."
-msgstr ""
+msgstr "Por padrão, a maioria dos seus serviços de cliente (e-mail, proxy HTTP, IRC) compartilhará o mesmo conjunto de túneis e será listada como \"Clientes Compartilhados\"."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:177
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:638
@@ -1576,19 +1576,19 @@ msgstr "Controle"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:240
 msgid "Edit Server Tunnel Settings for"
-msgstr ""
+msgstr "Editar configurações de túnel do servidor para"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:255
 msgid "Test HTTPS server, bypassing I2P"
-msgstr ""
+msgstr "Testar servidor HTTPS, ignorando I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:263
 msgid "Test HTTP server, bypassing I2P"
-msgstr ""
+msgstr "Testar servidor HTTP, ignorando I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:284
 msgid "Test HTTP server through I2P"
-msgstr ""
+msgstr "Testar servidor HTTP através de I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:293
 msgid "No Preview"
@@ -1915,7 +1915,7 @@ msgstr "Especialistas apenas!"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:689
 msgid "Base32"
-msgstr ""
+msgstr "Base32"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:697
 msgid "Alt Base32"

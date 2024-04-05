@@ -368,7 +368,7 @@ msgstr "若要从一个池中随机选择，用英文逗号分隔，如 server1.
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:412
 msgid "Outproxy Type"
-msgstr ""
+msgstr "出口代理类型"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:426
 msgid "SSL Outproxies"

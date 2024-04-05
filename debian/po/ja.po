@@ -4,7 +4,7 @@
 # 
 # Translators:
 # kami <b52c55627324b29125cbcfb101258463_228943>, 2015
-# daingewuvzeevisiddfddd, 2022
+# daingewuvzeevisiddfddd, 2022,2024
 # タカハシ, 2014
 # Masayuki Hatta <mhatta@mhatta.org>, 2018
 msgid ""
@@ -13,8 +13,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
 "POT-Creation-Date: 2017-11-12 14:01+0000\n"
 "PO-Revision-Date: 2011-10-03 21:48+0000\n"
-"Last-Translator: daingewuvzeevisiddfddd, 2022\n"
-"Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
+"Last-Translator: daingewuvzeevisiddfddd, 2022,2024\n"
+"Language-Team: Japanese (http://app.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -77,7 +77,7 @@ msgstr "デフォルトでは、 I2P は最大 128MB メモリまでしか使用
 msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
-msgstr "帯域幅の多いルーター、あるいはたくさんのアクティブな torrent / プラグインがあるルーターも、この値を増やす必要がある場合があります。"
+msgstr "帯域幅の多いルーター、あるいはたくさんの動作しているtorrentやプラグインがあるルーターも、この値を増やす必要がある場合があります。"
 
 #. Type: boolean
 #. Description
