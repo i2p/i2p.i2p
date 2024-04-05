@@ -196,6 +196,5 @@ public class QuotedPrintable extends Encoding {
 			 */
 			out.write(c);
 		}
-		bout.writeComplete(true);
 	}
 }
