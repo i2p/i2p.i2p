@@ -1,3 +1,15 @@
+2024-04-05 zzz
+ * Susimail: Fix truncation of quoted-printable encoded attachments
+ * Translation updates
+
+2024-04-04 zzz
+ * Susimail:
+   - Only parse mail headers once
+   - Fix initialization of textarea height
+   - Fix 413 error forwarding email with attachments
+   - Fix forwarding email with attachments lacking specified encoding
+   - Fix forwarding html-only email
+
 2024-03-26 zzz
  * NetDB: Store message handling changes
  * Transports: Incoming connection checks
