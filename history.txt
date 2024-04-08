@@ -1,3 +1,7 @@
+2024-04-08 idk
+ * Router:
+   - Release I2P 2.5.0, API version 0.9.62
+
 2024-04-05 zzz
  * Susimail:
    - Fix truncation of quoted-printable encoded attachments
