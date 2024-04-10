@@ -1,4 +1,4 @@
-i2p (2.5.0-1~ubuntu1) UNRELEASED; urgency=medium
+i2p (2.5.0-1~ubuntu1) focal; urgency=medium
 
   * New upstream version 2.5.0
 
@@ -1138,7 +1138,7 @@ i2p (0.8.5-3) stable; urgency=low
 
 i2p (0.8.5-2) stable; urgency=low
 
-  * Change debconf priority to medium. 
+  * Change debconf priority to medium.
   * RUN_DAEMON defaults to false. Earlier versions defaulted to true. Since
     the priority is changing, this should as well.
   * Split jbigi into its own source package
@@ -1167,12 +1167,12 @@ i2p (0.8.4-3) stable; urgency=low
 
 i2p (0.8.4-2) stable; urgency=low
 
-  * Stop including /usr/share/i2p/lib/jbigi.jar. 
+  * Stop including /usr/share/i2p/lib/jbigi.jar.
   * Compile a dynamic jbigi and create a new package, libjbigi-jni. Since I
     can't get jcpuid to compile I take this library from jbigi.jar.
     Unfortunately it was not compiled with -fPIC, causing lintian to complain.
-    Additionally it is a 32bit compile, forcing libc-i386 to be installed on 
-    amd64 boxes. 
+    Additionally it is a 32bit compile, forcing libc-i386 to be installed on
+    amd64 boxes.
   * Add dependency on libc-i386 because of jcpuid and a build-dep on unzip for
     the same reason.
   * Don't display errors generated from chowning files that don't exist.
