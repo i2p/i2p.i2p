@@ -143,7 +143,9 @@ class KBucketImpl<T extends SimpleDataStructure> implements KBucket<T> {
     public String toString() {
         StringBuilder buf = new StringBuilder(1024);
         buf.append(_entries.size());
-        buf.append(" entries in (").append(_begin).append(',').append(_end);
+        buf.append(" entries in (").append(_begin);
+        if (_end != _begin)
+            buf.append('-').append(_end);
         buf.append(") : ").append(_entries.toString());
         return buf.toString();
     }
