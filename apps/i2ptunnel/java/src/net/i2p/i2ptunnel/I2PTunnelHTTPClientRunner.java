@@ -173,7 +173,7 @@ public class I2PTunnelHTTPClientRunner extends I2PTunnelRunner {
      *  Thread the I2P socket close, so we don't hold up
      *  the next request if the browser socket is keepalive.
      *
-     *  @since 0.9.xx
+     *  @since 0.9.62
      */
     private class I2PSocketCloser extends I2PAppThread {
         private final InputStream in;
