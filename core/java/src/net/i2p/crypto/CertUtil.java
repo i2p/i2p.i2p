@@ -619,7 +619,7 @@ public final class CertUtil {
     }
 
     // threshold for warning
-    private static final long CHECK = 120*24*60*60*1000L;
+    private static final long CHECK = 180*24*60*60*1000L;
 
     /**
      *  For use in the build process.
