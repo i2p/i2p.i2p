@@ -259,10 +259,12 @@
             <attribute name="Build-Date" value="${build.timestamp}" />
             <attribute name="Base-Revision" value="${workspace.version}" />
             <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+            <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+            <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
             <!-- this is so Jetty will report its version correctly -->
             <section name="org/eclipse/jetty/server/" >
                 <attribute name="Implementation-Vendor" value="Eclipse.org - Jetty" />
-                <attribute name="Implementation-Version" value="8.1.17.v20150415" />
+                <attribute name="Implementation-Version" value="${jetty.ver}" />
             </section>
         </manifest>
       </jar>
