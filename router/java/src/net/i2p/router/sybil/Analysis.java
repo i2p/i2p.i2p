@@ -1,5 +1,6 @@
 package net.i2p.router.sybil;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -166,7 +167,9 @@ public class Analysis extends JobImpl implements RouterApp, Runnable {
                 return;
             Blocklist bl = _context.blocklist();
             Banlist ban = _context.banlist();
-            String source = _persister.getBlocklistFile().toString();
+            File file = _persister.getBlocklistFile();
+            String source = file.toString();
+            String when = DataHelper.formatTime(file.lastModified());
             for (Map.Entry<String, Long> e : map.entrySet()) {
                 String s = e.getKey();
                 if (s.contains(".") || s.contains(":")) {
@@ -176,7 +179,7 @@ public class Analysis extends JobImpl implements RouterApp, Runnable {
                     if (b != null && b.length == Hash.HASH_LENGTH) {
                         Hash h = Hash.create(b);
                         long until = e.getValue().longValue();
-                        ban.banlistRouter(h, "Sybil analysis", null, null, until);
+                        ban.banlistRouter(h, "Sybil analysis {0}", when, null, until);
                     }
                 }
             }
