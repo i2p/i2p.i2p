@@ -1255,7 +1255,7 @@ public class WebMail extends HttpServlet
 					MailPart part = mail != null ? mail.getPart() : null;
 					if (part != null) {
 						StringBuilderWriter text = new StringBuilderWriter();
-						String from = null, to = null, cc = null, bcc = null, subject = null;
+						String to = null, cc = null, bcc = null, subject = null;
 						List<Attachment> attachments = null;
 						if( reply || replyAll ) {
 							if( mail.reply != null && Mail.validateAddress( mail.reply ) )
@@ -1406,7 +1406,7 @@ public class WebMail extends HttpServlet
 						}
 						// Store as draft here, put draft UIDL in sessionObject,
 						// then P-R-G in processRequest()
-						StringBuilder draft = composeDraft(sessionObject, from, to, cc, bcc,
+						StringBuilder draft = composeDraft(sessionObject, null, to, cc, bcc,
 						                                   subject, text.toString(), attachments);
 						String draftuidl = ctx.random().nextLong() + "drft";
 						boolean ok = saveDraft(sessionObject, draftuidl, draft);
@@ -2928,8 +2928,7 @@ public class WebMail extends HttpServlet
 
 		boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_SENDER_FIXED, "true" ));
 		if (fixed) {
-			String domain = Config.getProperty( CONFIG_SENDER_DOMAIN, "mail.i2p" );
-			from = "<" + sessionObject.user + "@" + domain + ">";
+			from = getDefaultSender(sessionObject);
 		}
 		ArrayList<String> toList = new ArrayList<String>();
 		ArrayList<String> ccList = new ArrayList<String>();
@@ -3324,25 +3323,7 @@ public class WebMail extends HttpServlet
 		boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_SENDER_FIXED, "true" ));
 
 		if (from.length() <= 0 || !fixed) {
-			String user = sessionObject.user;
-			String name = Config.getProperty(CONFIG_SENDER_NAME);
-			if (name != null) {
-				name = name.trim();
-				if (name.contains(" "))
-					from = '"' + name + "\" ";
-				else
-					from = name + ' ';
-			} else {
-				from = "";
-			}
-			if (user.contains("@")) {
-				from += '<' + user + '>';
-			} else {
-				String domain = Config.getProperty( CONFIG_SENDER_DOMAIN, "mail.i2p" );
-				if (from.length() == 0)
-					from = user + ' ';
-				from += '<' + user + '@' + domain + '>';
-			}
+			from = getDefaultSender(sessionObject);
 		}
 
 		out.println( "<div id=\"composemail\"><table id=\"newmail\" cellspacing=\"0\" cellpadding=\"5\">\n" +
@@ -3379,6 +3360,37 @@ public class WebMail extends HttpServlet
 				    "</td></tr>");
 		}
 		out.println( "</table></div>" );
+	}
+
+	/**
+	 *  The sender string
+	 *
+	 *  @return non-null
+	 *  @since 0.9.63 pulled out of showCompose()
+	 *
+	 */
+	private static String getDefaultSender(SessionObject sessionObject) {
+		String from;
+		String user = sessionObject.user;
+		String name = Config.getProperty(CONFIG_SENDER_NAME);
+		if (name != null && name.length() > 0) {
+			name = name.trim();
+			if (name.contains(" "))
+				from = '"' + name + "\" ";
+			else
+				from = name + ' ';
+		} else {
+			from = "";
+		}
+		if (user.contains("@")) {
+			from += '<' + user + '>';
+		} else {
+			String domain = Config.getProperty(CONFIG_SENDER_DOMAIN, "mail.i2p");
+			if (from.length() == 0)
+				from = user + ' ';
+			from += '<' + user + '@' + domain + '>';
+		}
+		return from;
 	}
 
 	/**
