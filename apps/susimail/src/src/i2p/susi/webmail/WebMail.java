@@ -414,6 +414,8 @@ public class WebMail extends HttpServlet
 			buf.append(" beforePopup\"");
 		else
 			buf.append('"');
+		if (name.equals(NEW_UPLOAD))
+			buf.append(" id=\"" + NEW_UPLOAD + '"');
 		// These are icons only now, via the CSS, so add a tooltip
 		if (name.equals(FIRSTPAGE) || name.equals(PREVPAGE) || name.equals(NEXTPAGE) || name.equals(LASTPAGE) ||
 		    name.equals(PREV) || name.equals(LIST) || name.equals(NEXT))
@@ -2604,7 +2606,7 @@ public class WebMail extends HttpServlet
 				                                                   Long.toString(ctx.random().nextLong());
 				sessionObject.addNonce(nonce);
 				out.println(
-					"<div class=\"page\">" +
+					"<div class=\"page\" id=\"page\">" +
 					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">\n" +
 					"<input type=\"hidden\" name=\"" + SUSI_NONCE + "\" value=\"" + nonce + "\">\n" +
 					// we use this to know if the user thought he was logged in at the time
