@@ -912,6 +912,7 @@ public class SummaryHelper extends HelperBase {
             devSU3Avail = false;
         }
         if ((avail || unsignedAvail || devSU3Avail) &&
+            !_context.commSystem().isDummy() &&
             !NewsHelper.isUpdateInProgress() &&
             !_context.router().gracefulShutdownInProgress() &&
             _context.portMapper().isRegistered(PortMapper.SVC_HTTP_PROXY) &&  // assume using proxy for now
