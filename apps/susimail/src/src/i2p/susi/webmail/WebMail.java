@@ -67,11 +67,13 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -1282,27 +1284,35 @@ public class WebMail extends HttpServlet
 						}
 						if( replyAll ) {
 							/*
-							 * extract additional recipients
+							 * extract additional recipients and dedup
 							 */
+							String us = '<' + sessionObject.user + '@' + Config.getProperty(CONFIG_SENDER_DOMAIN, "mail.i2p") + '>';
 							StringBuilder buf = new StringBuilder();
-							String pad = "";
-							// TODO original recipients should be in the To: line, not the CC: line
 							if( mail.to != null ) {
-								for( int i = 0; i < mail.to.length; i++ ) {
+								String pad = to.length() > 0 ? ", " : "";
+								for (String s : mail.to) {
+									if (s.equals(us) || s.equals(to))
+										continue;
 									buf.append( pad );
-									buf.append(mail.to[i]);
+									buf.append(s);
 									pad = ", ";
 								}
+								if (buf.length() > 0)
+									to += buf.toString();
 							}
 							if( mail.cc != null ) {
-								for( int i = 0; i < mail.cc.length; i++ ) {
+								buf.setLength(0);
+								String pad = "";
+								for (String s : mail.cc) {
+									if (s.equals(us))
+										continue;
 									buf.append( pad );
-									buf.append(mail.cc[i]);
+									buf.append(s);
 									pad = ", ";
 								}
+								if (buf.length() > 0)
+									cc = buf.toString();
 							}
-							if( buf.length() > 0 )
-								cc = buf.toString();
 						}
 						I2PAppContext ctx = I2PAppContext.getGlobalContext();
 						if( forward ) {
@@ -3728,9 +3738,19 @@ public class WebMail extends HttpServlet
 		out.println( button( NEW, _t("New") ) + spacer);
 		boolean hasHeader = mail != null && mail.hasHeader();
 		if (hasHeader) {
-			out.println(button( REPLY, _t("Reply") ) +
-				button( REPLYALL, _t("Reply All") ) +
-				button( FORWARD, _t("Forward") ) +
+			out.println(button(REPLY, _t("Reply")));
+			// dedup sender/to/cc/us to get a true count of recipients
+			Set<String> rep = new HashSet<String>();
+			if (mail.to != null)
+				rep.addAll(Arrays.asList(mail.to));
+			if (mail.cc != null)
+				rep.addAll(Arrays.asList(mail.cc));
+			if (mail.reply == null)
+				rep.remove(mail.sender);
+			rep.remove('<' + sessionObject.user + '@' + Config.getProperty(CONFIG_SENDER_DOMAIN, "mail.i2p") + '>');
+			if (!rep.isEmpty())
+				out.println(button(REPLYALL, _t("Reply All")));
+			out.println(button( FORWARD, _t("Forward") ) +
 				button( SAVE_AS, _t("Save As")));
 			if (sessionObject.reallyDelete)
 				out.println(button2(DELETE, _t("Delete")));
