@@ -701,7 +701,6 @@ input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
 input[type=submit], input.cancel {
      margin: 4px 5px;
      padding: 5px 8px !important;
-     min-width: 65px !important;
      font: bold 9pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", Lato, "Segoe UI", Verdana, Helvetica, sans-serif;
      color: #494;
      text-align: center;
@@ -713,6 +712,7 @@ input[type=submit], input.cancel {
 input.cancel {
      background: #1F1A24 url(/themes/console/images/buttons/no.png) no-repeat 6px center !important;
      padding: 5px 7px 5px 28px !important;
+     min-width: 65px !important;
 }
 
 input.cancel:hover {
@@ -776,8 +776,9 @@ input[type="text"], input[type="password"], textarea {
      font-size: 9pt;
 }
 
-#composemail input[type="text"] {
+#composemail textarea, #composemail input[type="text"] {
      width: calc(100% - 20px);
+     min-width: 565px;
 }
 
 input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
@@ -942,7 +943,7 @@ div#composemail {
 }
 
 #composemail table {
-     width: auto;
+     width: 90%;
      margin: auto;
 }
 
