@@ -245,6 +245,7 @@ class Mail {
 			!contentType.contains("text/plain") &&
 			!contentType.contains("text/html") &&
 			!contentType.contains("multipart/alternative") &&
+			!contentType.contains("multipart/related") &&
 			!contentType.contains("multipart/signed");
 	}
 
