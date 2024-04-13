@@ -77,7 +77,7 @@ class Mail {
 
 	private long size;
 	public String sender,   // as received, trimmed only, not HTML escaped
-		reply,
+		reply,          // address only, enclosed by <>
 		subject,	// as received, trimmed only, not HTML escaped, non-null, default ""
 		dateString,
 		//formattedSender,    // address only, enclosed with <>, not HTML escaped
@@ -243,6 +243,7 @@ class Mail {
 		// if part != null query parts instead?
 		return contentType != null &&
 			!contentType.contains("text/plain") &&
+			!contentType.contains("text/html") &&
 			!contentType.contains("multipart/alternative") &&
 			!contentType.contains("multipart/signed");
 	}
