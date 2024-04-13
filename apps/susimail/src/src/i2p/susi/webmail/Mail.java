@@ -65,8 +65,8 @@ class Mail {
 	
 	private static final String DATEFORMAT = "date.format";
 	private static final String unknown = "unknown";
-	private static final String P1 = "^[^@< \t]+@[^> \t]+$";
-	private static final String P2 = "^<[^@< \t]+@[^> \t]+>$";
+	private static final String P1 = "^[^@< \t]+@[A-Za-z0-9-]+\\.[A-Za-z0-9\\.-]+$";
+	private static final String P2 = "^<[^@< \t]+@[A-Za-z0-9-]+\\.[A-Za-z0-9\\.-]+>$";
 	private static final Pattern PATTERN1 = Pattern.compile(P1);
 	private static final Pattern PATTERN2 = Pattern.compile(P2);
 	/**
@@ -270,11 +270,11 @@ class Mail {
 		int addresses = 0;
 		
 		for( int i = 0; i < tokens.length; i++ ) {
-			if( tokens[i].matches( "^[^@< \t]+@[^> \t]+$" ) ||
-					tokens[i].matches( "^<[^@< \t]+@[^> \t]+>$" ) )
+			if (PATTERN1.matcher(tokens[i]).matches() ||
+			    PATTERN2.matcher(tokens[i]).matches())
 				addresses++;
 		}
-		return addresses == 1;
+		return addresses > 0;
 	}
 
 	/**
