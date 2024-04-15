@@ -1,6 +1,16 @@
-2024-04-08 idk
- * Router:
-   - Release I2P 2.5.0, API version 0.9.62
+2024-04-15 zzz
+ * Susimail: Don't show multipart/related CID images as attachments also
+
+2024-04-13 zzz
+ * Susimail:
+   - Reply-all improvements
+   - Add sender name to default config, use when replying
+   - Don't show attachment flag for HTML emails
+   - Increase compose form width (dark theme)
+   - Add missing div ids for DnD
+   - Improve validateAddress()
+
+2024-04-08 2.5.0 (API 0.9.62) released
 
 2024-04-05 zzz
  * Susimail:
