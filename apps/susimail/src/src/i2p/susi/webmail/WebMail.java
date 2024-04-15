@@ -577,9 +577,21 @@ public class WebMail extends HttpServlet
 									            _t("View email as plain text") + "</a></p>");
 									out.println( "</td></tr>" );
 								}
+							} else if (subPart.cid != null && subPart.type != null &&
+							           subPart.type.startsWith("image/") &&
+							           ("text/html".equals(chosen.type) || "text/html".equals(chosen.multipart_type)) &&
+							           mailPart.type.equals("multipart/related")) {
+								// assume image with CID was loaded in the iframe
+								// don't show it as an attachment also
+								out.println("<!-- ");
+								out.println("Debug: Not showing related Mail Part with CID at level " + (level + 1) + " with ID " + subPart.getID());
+								out.println("Debug: Mail Part headers follow");
+								for (int i = 0; i < subPart.headerLines.length; i++) {
+									out.println(subPart.headerLines[i].replace("--", "&#45;&#45;"));
+								}
+								out.println( "-->");
 							} else {
 								// show as attachment
-								// if image is loaded as a CID in the iframe, we will still show it as an attachment also
 								showPart(out, subPart, level + 1, html, allowHtml);
 							}
 						}
