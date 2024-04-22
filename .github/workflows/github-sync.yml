@@ -1,0 +1,21 @@
+# File: .github/workflows/repo-sync.yml
+
+on:
+  schedule:
+  - cron:  "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  repo-sync:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+    - name: repo-sync
+      uses: repo-sync/github-sync@v2
+      with:
+        source_repo: "https://i2pgit.org/i2p-hackers/i2p.i2p"
+        source_branch: "master"
+        destination_branch: "master"
+        github_token: ${{ secrets.PAT }}
