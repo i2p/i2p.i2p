@@ -226,7 +226,7 @@ class PeerTestManager {
         PeerTestState test = new PeerTestState(ALICE, bob, bobIP instanceof Inet6Address,
                                                _context.random().nextLong(MAX_NONCE),
                                                _context.clock().now());
-        if (bob.getVersion() == 2) {
+
             PeerState2 b2 = (PeerState2) bob;
             // We test our current address, NOT the IP we have with Bob, which may have changed since,
             // especially with IPv6 transient addresses,
@@ -259,18 +259,7 @@ class PeerTestManager {
                     _log.warn("Unable to get our IP", uhe);
                 return false;
             }
-        } else {
-            // set Alice IP/port, needed for receiveTestReply() checks for msg 7
-            RouterAddress ra = _transport.getCurrentExternalAddress(bob.isIPv6());
-            if (ra != null) {
-                byte[] ourIP = ra.getIP();
-                int ourPort = ra.getPort();
-                try {
-                    InetAddress addr = InetAddress.getByAddress(ourIP);
-                    test.setAlice(addr, ourPort, null);
-                } catch (UnknownHostException uhe) {}
-            }
-        }
+
         _currentTest = test;
         _currentTestComplete = false;
         
@@ -331,9 +320,7 @@ class PeerTestManager {
                         // received from Bob, but no reply from Charlie.  send it to 
                         // Bob again so he pokes Charlie
                         // We don't resend to Bob for SSU2; Charlie will retransmit.
-                        if (state.getBob().getVersion() == 1) {
-                            sendTestToBob();
-                        } else if (ENABLE_SSU2_SYMNAT_TEST) {
+                        if (ENABLE_SSU2_SYMNAT_TEST) {
                             // if version 2 and it's been long enough, and Charlie isn't firewalled, send msg 6 anyway
                             // This allows us to detect Symmetric NAT.
                             // We don't have his IP/port if he's firewalled, and we wouldn't trust his answer
@@ -400,11 +387,7 @@ class PeerTestManager {
                 _log.debug("Sending test to Bob: " + test);
             UDPPacket packet;
             PeerState bob = test.getBob();
-            if (bob.getVersion() == 1) {
-                packet = _packetBuilder.buildPeerTestFromAlice(test.getBobIP(), test.getBobPort(),
-                                                               test.getBobCipherKey(), test.getBobMACKey(),
-                                                               test.getNonce(), _transport.getIntroKey());
-            } else {
+
                 PeerState2 bob2 = (PeerState2) bob;
                 // only create this once
                 byte[] data = test.getTestData();
@@ -427,7 +410,7 @@ class PeerTestManager {
                     fail();
                     return;
                 }
-            }
+
             _transport.send(packet);
             long now = _context.clock().now();
             test.setLastSendTime(now);
@@ -451,12 +434,7 @@ class PeerTestManager {
             long now = _context.clock().now();
             test.setLastSendTime(now);
             test.setSendCharlieTime(now);
-            UDPPacket packet;
-            if (test.getBob().getVersion() == 1) {
-                packet = _packetBuilder.buildPeerTestFromAlice(test.getCharlieIP(), test.getCharliePort(),
-                                                               test.getCharlieIntroKey(), 
-                                                               test.getNonce(), _transport.getIntroKey());
-            } else {
+
                 long nonce = test.getNonce();
                 long rcvId = (nonce << 32) | nonce;
                 long sendId = ~rcvId;
@@ -471,10 +449,10 @@ class PeerTestManager {
                 data[9] = (byte) (iplen + 2);
                 DataHelper.toLong(data, 10, 2, alicePort);
                 System.arraycopy(aliceIP, 0, data, 12, iplen);
-                packet = _packetBuilder2.buildPeerTestFromAlice(test.getCharlieIP(), test.getCharliePort(),
+                UDPPacket packet = _packetBuilder2.buildPeerTestFromAlice(test.getCharlieIP(), test.getCharliePort(),
                                                                 test.getCharlieIntroKey(),
                                                                 sendId, rcvId, data);
-            }
+
             _transport.send(packet);
         } else {
             _currentTest = null;
@@ -491,197 +469,6 @@ class PeerTestManager {
      *
      */
     private static final long CHARLIE_RECENT_PERIOD = 10*60*1000;
-
-    /**
-     * Receive a PeerTest message which contains the correct nonce for our current 
-     * test. We are Alice.
-     *
-     * SSU 1 only.
-     *
-     * @param fromPeer non-null if an associated session was found, otherwise may be null
-     * @param inSession true if authenticated in-session
-     */
-    private synchronized void receiveTestReply(RemoteHostId from, PeerState fromPeer, boolean inSession,
-                                               UDPPacketReader.PeerTestReader testInfo) {
-        _context.statManager().addRateData("udp.receiveTestReply", 1);
-        PeerTestState test = _currentTest;
-        if (expired())
-            return;
-        if (_currentTestComplete)
-            return;
-        if ( (DataHelper.eq(from.getIP(), test.getBobIP().getAddress())) && (from.getPort() == test.getBobPort()) ) {
-            // The reply is from Bob
-
-            if (inSession) {
-                // i2pd has sent the Bob->Alice message in-session for a long time
-                // Java I2P switched to in-session in 0.9.52
-                //if (_log.shouldDebug())
-                //    _log.debug("Bob replied to us (Alice) in-session " + fromPeer);
-            } else {
-                // Check Bob version, drop if >= 0.9.52
-                fromPeer = test.getBob();
-                Hash bob = fromPeer.getRemotePeer();
-                RouterInfo bobRI = _context.netDb().lookupRouterInfoLocally(bob);
-                if (bobRI == null || VersionComparator.comp(bobRI.getVersion(), "0.9.52") >= 0) {
-                    if (_log.shouldInfo())
-                        _log.info("Bob replied to us (Alice) with intro key " + fromPeer);
-                    fail();
-                    return;
-                }
-            }
-
-            int ipSize = testInfo.readIPSize();
-            boolean expectV6 = test.isIPv6();
-            if ((!expectV6 && ipSize != 4) ||
-                (expectV6 && ipSize != 16)) {
-                // There appears to be an i2pd bug where Bob is sending us a zero-length IP.
-                // We could proceed without setting the IP, but then when Charlie
-                // sends us his message, we will think we are behind a symmetric NAT
-                // because the Bob and Charlie IPs won't match.
-                // Stop the test.
-                // Sometimes, the first response has an IP but a later one does not,
-                // check every time.
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Bad IP length " + ipSize + " from bob's reply: " + from);
-                fail();
-                return;
-            }
-            byte ip[] = new byte[ipSize];
-            testInfo.readIP(ip, 0);
-            try {
-                if (test.getReceiveBobTime() <= 0) {
-                    InetAddress addr = InetAddress.getByAddress(ip);
-                    int testPort = testInfo.readPort();
-                    if (testPort == 0)
-                        throw new UnknownHostException("port 0");
-                    test.setAlice(addr, testPort, null);
-                } // else ignore IP/port
-                test.setReceiveBobTime(_context.clock().now());
-
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Receive test reply from Bob: " + test);
-                if (test.getAlicePortFromCharlie() > 0)
-                    testComplete();
-            } catch (UnknownHostException uhe) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Unable to get our IP (length " + ipSize +
-                               ") from bob's reply: " + from, uhe);
-                _context.statManager().addRateData("udp.testBadIP", 1);
-            }
-        } else {
-            // The reply is from Charlie
-
-            PeerState charlieSession = _transport.getPeerState(from);
-            long recentBegin = _context.clock().now() - CHARLIE_RECENT_PERIOD;
-            if ( (charlieSession != null) && 
-                 ( (charlieSession.getLastACKSend() > recentBegin) ||
-                   (charlieSession.getLastSendTime() > recentBegin) ) ) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Bob chose a charlie we already have a session to, cancelling the test and rerunning (bob: " 
-                              + _currentTest + ", charlie: " + from + ")");
-                // why are we doing this instead of calling testComplete() ?
-                _currentTestComplete = true;
-                _context.statManager().addRateData("udp.statusKnownCharlie", 1);
-                honorStatus(Status.UNKNOWN, test.isIPv6());
-                _currentTest = null;
-                return;
-            }
-    
-            if (test.getReceiveCharlieTime() > 0) {
-                // this is our second charlie, yay!
-                try {
-                    int testPort = testInfo.readPort();
-                    if (testPort < 1024)
-                        throw new UnknownHostException("port " + testPort);
-                    test.setAlicePortFromCharlie(testPort);
-                    byte ip[] = new byte[testInfo.readIPSize()];
-                    int ipSize = ip.length;
-                    boolean expectV6 = test.isIPv6();
-                    if ((!expectV6 && ipSize != 4) ||
-                        (expectV6 && ipSize != 16))
-                        throw new UnknownHostException("bad sz - expect v6? " + expectV6 + " act sz: " + ipSize);
-                    testInfo.readIP(ip, 0);
-                    InetAddress addr = InetAddress.getByAddress(ip);
-
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Receive test reply from Charlie: " + test);
-
-                    // fixups if we didn't know our IP/port at the start
-                    int origPort = test.getAlicePort();
-                    InetAddress origAddr = test.getAliceIP();
-                    boolean portok;
-                    if (origPort > 0) {
-                        portok = testPort == origPort;
-                    } else {
-                        portok = true;
-                        test.setAlice(test.getAliceIP(), testPort, null);
-                    }
-                    boolean IPok;
-                    if (origAddr != null) {
-                        IPok = DataHelper.eq(ip, origAddr.getAddress());
-                    } else {
-                        IPok = true;
-                        test.setAlice(addr, test.getAlicePort(), null);
-                    }
-                    if (!portok || !IPok) {
-                        if (_log.shouldWarn())
-                            _log.warn("Charlie said we had a different IP/port: " +
-                                      Addresses.toString(ip, testPort) + " on " + test);
-                        // Since we did get msg 5, it's almost impossible for us to be symmetric natted.
-                        // It's much more likely that Charlie is symmetric natted.
-                        // However, our IP could have changed.
-                        // Force result to OK
-                        // testComplete() will deal with it
-                        if (!portok) {
-                            // Port different. Charlie probably symmetric natted.
-                            // Reset port so testComplete() will return success.
-                            test.setAlicePortFromCharlie(test.getAlicePort());
-                        }
-                        if (!IPok) {
-                            // Our IP changed?
-                            // Reset IP so testComplete() will return success.
-                            addr = test.getAliceIP();
-                        }
-                    }
-                    test.setAliceIPFromCharlie(addr);
-                    if (test.getReceiveBobTime() > 0)
-                        testComplete();
-                } catch (UnknownHostException uhe) {
-                    if (_log.shouldWarn())
-                        _log.warn("Charlie @ " + from + " said we were an invalid IP address: " + uhe.getMessage(), uhe);
-                    _context.statManager().addRateData("udp.testBadIP", 1);
-                }
-            } else {
-                if (test.incrementPacketsRelayed() > MAX_RELAYED_PER_TEST_ALICE) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Sent too many packets on the test: " + test);
-                    if (!_currentTestComplete)
-                        testComplete();
-                    return;
-                }
-                
-                if (_log.shouldLog(Log.INFO) && charlieSession != null)
-                    _log.info("Bob chose a charlie we last acked " + DataHelper.formatDuration(_context.clock().now() - charlieSession.getLastACKSend()) + " last sent " + DataHelper.formatDuration(_context.clock().now() - charlieSession.getLastSendTime()) + " (bob: " 
-                              + _currentTest + ", charlie: " + from + ")");
-
-                // ok, first charlie.  send 'em a packet
-                test.setReceiveCharlieTime(_context.clock().now());
-                SessionKey charlieIntroKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
-                testInfo.readIntroKey(charlieIntroKey.getData(), 0);
-                test.setCharlieIntroKey(charlieIntroKey);
-                try {
-                    test.setCharlie(InetAddress.getByAddress(from.getIP()), from.getPort(), null);
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Receive test from Charlie: " + test);
-                    sendTestToCharlie();
-                } catch (UnknownHostException uhe) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Charlie's IP is b0rked: " + from);
-                    _context.statManager().addRateData("udp.testBadIP", 1);
-                }
-            }
-        }
-    }
 
     /**
      *  Reset all state and call testComplete(). We are Alice.
@@ -863,175 +650,6 @@ class PeerTestManager {
         _transport.setReachabilityStatus(status, isIPv6);
     }
     
-    /**
-     * Entry point for all incoming packets. Most of the source and dest validation is here.
-     *
-     * SSU 1 only.
-     *
-     * Receive a test message of some sort from the given peer, queueing up any packet
-     * that should be sent in response, or if its a reply to our own current testing,
-     * adjusting our test state.
-     *
-     * We could be Alice, Bob, or Charlie.
-     *
-     * @param fromPeer non-null if an associated session was found, otherwise null
-     * @param inSession true if authenticated in-session
-     */
-    public void receiveTest(RemoteHostId from, PeerState fromPeer, boolean inSession, UDPPacketReader reader) {
-        _context.statManager().addRateData("udp.receiveTest", 1);
-        byte[] fromIP = from.getIP();
-        int fromPort = from.getPort();
-        // no need to do these checks if we received it in-session
-        if (!inSession || fromPeer == null) {
-            if (!TransportUtil.isValidPort(fromPort) ||
-                (!_transport.isValid(fromIP)) ||
-                _transport.isTooClose(fromIP) ||
-                _context.blocklist().isBlocklisted(fromIP)) {
-                // spoof check, and don't respond to privileged ports
-                if (_log.shouldWarn())
-                    _log.warn("Invalid PeerTest address: " + Addresses.toString(fromIP, fromPort));
-                _context.statManager().addRateData("udp.testBadIP", 1);
-                return;
-            }
-        } else {
-            fromPeer.setLastReceiveTime(_context.clock().now());
-        }
-
-        UDPPacketReader.PeerTestReader testInfo = reader.getPeerTestReader();
-        byte testIP[] = null;
-        int testPort = testInfo.readPort();
-
-        if (testInfo.readIPSize() > 0) {
-            testIP = new byte[testInfo.readIPSize()];
-            testInfo.readIP(testIP, 0);
-        }
-
-        if ((testPort > 0 && (!TransportUtil.isValidPort(testPort))) ||
-            (testIP != null &&
-                               ((!_transport.isValid(testIP)) ||
-                                (testIP.length != 4 && testIP.length != 16) ||
-                                _context.blocklist().isBlocklisted(testIP)))) {
-            // spoof check, and don't respond to privileged ports
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Invalid address in PeerTest: " + Addresses.toString(testIP, testPort));
-            _context.statManager().addRateData("udp.testBadIP", 1);
-            return;
-        }
-
-        // The from IP/port and message's IP/port are now validated.
-        // EXCEPT that either the message's IP could be empty or the message's port could be 0.
-        // Both of those cases should be checked in receiveXfromY() as appropriate.
-        // Also, IP could be us, check is below.
-
-        long nonce = testInfo.readNonce();
-        PeerTestState test = _currentTest;
-        if ( (test != null) && (test.getNonce() == nonce) ) {
-            // we are Alice, we initiated the test
-            receiveTestReply(from, fromPeer, inSession, testInfo);
-            return;
-        }
-
-        // we are Bob or Charlie, we are helping Alice
-
-        if (_throttle.shouldThrottle(fromIP)) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("PeerTest throttle from " + Addresses.toString(fromIP, fromPort));
-            return;
-        }
-
-        // use the same counter for both from and to IPs
-        if (testIP != null && _throttle.shouldThrottle(testIP)) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("PeerTest throttle to " + Addresses.toString(testIP, testPort));
-            return;
-        }
-
-        Long lNonce = Long.valueOf(nonce);
-        PeerTestState state = _activeTests.get(lNonce);
-
-        if (testIP != null && _transport.isTooClose(testIP)) {
-            // spoof check - have to do this after receiveTestReply(), since
-            // the field should be us there.
-            // Let's also eliminate anybody in the same /16
-            if (_recentTests.contains(lNonce)) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Got delayed reply on nonce " + nonce +
-                              " from: " + Addresses.toString(fromIP, fromPort));
-            } else {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Nearby address in PeerTest: " + Addresses.toString(testIP, testPort) +
-                              " from: " + Addresses.toString(fromIP, fromPort) +
-                              " state? " + state);
-                _context.statManager().addRateData("udp.testBadIP", 1);
-            }
-            return;
-        }
-        
-        if (state == null) {
-            // NEW TEST
-            if ( (testIP == null) || (testPort <= 0) ) {
-                // we are bob, since we haven't seen this nonce before AND its coming from alice
-                if (_activeTests.size() >= MAX_ACTIVE_TESTS) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Too many active tests, droppping from Alice " + Addresses.toString(fromIP, fromPort));
-                    return;
-                }
-                if (!inSession || fromPeer == null) {
-                    // Require an existing session to start a test,
-                    // as a way of preventing trouble
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("No session, dropping new test from Alice " + Addresses.toString(fromIP, fromPort));
-                    return;
-                }
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("test IP/port are blank coming from " + from + ", assuming we are Bob and they are alice");
-                receiveFromAliceAsBob(from, fromPeer, testInfo, nonce, null);
-            } else {
-                if (_recentTests.contains(lNonce)) {
-                    // ignore the packet, as its a holdover from a recently completed locally
-                    // initiated test
-                } else {
-                    if (_activeTests.size() >= MAX_ACTIVE_TESTS) {
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Too many active tests, droppping from Bob " + Addresses.toString(fromIP, fromPort));
-                        return;
-                    }
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("We are charlie, as the testIP/port is " + Addresses.toString(testIP, testPort) + " and the state is unknown for " + nonce);
-                    // we are charlie, since alice never sends us her IP and port, only bob does (and,
-                    // erm, we're not alice, since it isn't our nonce)
-                    receiveFromBobAsCharlie(from, fromPeer, inSession, testInfo, nonce, null);
-                }
-            }
-        } else {
-            // EXISTING TEST
-            if (state.getOurRole() == BOB) {
-                if (DataHelper.eq(fromIP, state.getAliceIP().getAddress()) && 
-                    (fromPort == state.getAlicePort()) ) {
-                    if (!inSession || fromPeer == null) {
-                        // Still should be in-session
-                        if (_log.shouldWarn())
-                            _log.warn("No session, dropping test from Alice " + Addresses.toString(fromIP, fromPort));
-                        return;
-                    }
-                    receiveFromAliceAsBob(from, fromPeer, testInfo, nonce, state);
-                } else if (DataHelper.eq(fromIP, state.getCharlieIP().getAddress()) && 
-                           (fromPort == state.getCharliePort()) ) {
-                    receiveFromCharlieAsBob(from, fromPeer, inSession, state);
-                } else {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Received from a fourth party as bob!  alice: " + state.getAliceIP() + ", charlie: " + state.getCharlieIP() + ", dave: " + from);
-                }
-            } else if (state.getOurRole() == CHARLIE) {
-                if ( (testIP == null) || (testPort <= 0) ) {
-                    receiveFromAliceAsCharlie(from, testInfo, nonce, state);
-                } else {
-                    receiveFromBobAsCharlie(from, fromPeer, inSession, testInfo, nonce, state);
-                }
-            }
-        }
-    }
-
     /**
      * Entry point for all out-of-session packets, messages 5-7 only.
      *
@@ -2120,293 +1738,6 @@ class PeerTestManager {
     }
     
     // Below here are methods for when we are Bob or Charlie
-
-    /**
-     * The packet's IP/port does not match the IP/port included in the message, 
-     * so we must be Charlie receiving a PeerTest from Bob.
-     *
-     * SSU 1 only.
-     *  
-     * @param bob non-null if received in-session, otherwise null
-     * @param inSession true if authenticated in-session
-     * @param state null if new
-     */
-    private void receiveFromBobAsCharlie(RemoteHostId from, PeerState bob, boolean inSession,
-                                         UDPPacketReader.PeerTestReader testInfo, long nonce, PeerTestState state) {
-        if (!inSession || bob == null) {
-            if (_log.shouldWarn())
-                _log.warn("Received from bob (" + from + ") as charlie w/o session");
-            return;
-        }
-
-        long now = _context.clock().now();
-        int sz = testInfo.readIPSize();
-        boolean isNew = false;
-        if (state == null) {
-            isNew = true;
-            state = new PeerTestState(CHARLIE, bob, sz == 16, nonce, now);
-        } else {
-            if (state.getReceiveBobTime() > now - (RESEND_TIMEOUT / 2)) {
-                if (_log.shouldDebug())
-                    _log.debug("Too soon, not retransmitting: " + state);
-                return;
-            }
-        }
-
-        // TODO should only do most of this if isNew
-        byte aliceIPData[] = new byte[sz];
-        try {
-            testInfo.readIP(aliceIPData, 0);
-            boolean expectV6 = state.isIPv6();
-            if ((!expectV6 && sz != 4) ||
-                (expectV6 && sz != 16))
-                throw new UnknownHostException("bad sz - expect v6? " + expectV6 + " act sz: " + sz);
-            int alicePort = testInfo.readPort();
-            if (alicePort == 0)
-                throw new UnknownHostException("port 0");
-            InetAddress aliceIP = InetAddress.getByAddress(aliceIPData);
-            InetAddress bobIP = InetAddress.getByAddress(from.getIP());
-            SessionKey aliceIntroKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
-            testInfo.readIntroKey(aliceIntroKey.getData(), 0);
-         
-            state.setAlice(aliceIP, alicePort, null);
-            state.setAliceIntroKey(aliceIntroKey);
-            state.setReceiveBobTime(now);
-            
-            // we send two packets below, but increment just once
-            if (state.incrementPacketsRelayed() > MAX_RELAYED_PER_TEST_CHARLIE) {
-                if (_log.shouldDebug())
-                    _log.debug("Too many, not retransmitting: " + state);
-                return;
-            }
-            
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Receive from Bob: " + state);
-            
-            if (isNew) {
-                Long lnonce = Long.valueOf(nonce);
-                _activeTests.put(lnonce, state);
-                new RemoveTest(lnonce, MAX_CHARLIE_LIFETIME);
-            }
-
-            state.setLastSendTime(now);
-            UDPPacket packet = _packetBuilder.buildPeerTestToBob(bobIP, from.getPort(), aliceIP, alicePort,
-                                                                 aliceIntroKey, nonce,
-                                                                 state.getBobCipherKey(), state.getBobMACKey());
-            _transport.send(packet);
-            bob.setLastSendTime(now);
-            
-            packet = _packetBuilder.buildPeerTestToAlice(aliceIP, alicePort, aliceIntroKey,
-                                                         _transport.getIntroKey(), nonce);
-            _transport.send(packet);
-        } catch (UnknownHostException uhe) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Unable to build the aliceIP from " + from + ", ip size: " + sz + " ip val: " + Base64.encode(aliceIPData), uhe);
-            _context.statManager().addRateData("udp.testBadIP", 1);
-        }
-    }
-
-    /**
-     * The PeerTest message came from the peer referenced in the message (or there wasn't
-     * any info in the message), plus we are not acting as Charlie (so we've got to be Bob).
-     *
-     * SSU 1 only.
-     *
-     * testInfo IP/port ignored
-     *
-     * @param alice non-null
-     * @param state null if new
-     */
-    private void receiveFromAliceAsBob(RemoteHostId from, PeerState alice, UDPPacketReader.PeerTestReader testInfo,
-                                       long nonce, PeerTestState state) {
-        // we are Bob, so pick a (potentially) Charlie and send Charlie Alice's info
-        PeerState charlie;
-        RouterInfo charlieInfo = null;
-        int sz = from.getIP().length;
-        boolean isIPv6 = sz == 16;
-        if (state == null) { // pick a new charlie
-            //if (from.getIP().length != 4) {
-            //    if (_log.shouldLog(Log.WARN))
-            //        _log.warn("PeerTest over IPv6 from Alice as Bob? " + from);
-            //    return;
-            //}
-            charlie = _transport.pickTestPeer(CHARLIE, alice.getVersion(), isIPv6, from);
-        } else {
-            charlie = _transport.getPeerState(new RemoteHostId(state.getCharlieIP().getAddress(), state.getCharliePort()));
-        }
-        if (charlie == null) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Unable to pick a charlie (no peer), IPv6? " + isIPv6);
-            return;
-        }
-        charlieInfo = _context.netDb().lookupRouterInfoLocally(charlie.getRemotePeer());
-        if (charlieInfo == null) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Unable to pick a charlie (no RI), IPv6? " + isIPv6);
-            return;
-        }
-        
-        // TODO should only do most of this if isNew
-        InetAddress aliceIP = null;
-        SessionKey aliceIntroKey = null;
-        try {
-            aliceIP = InetAddress.getByAddress(from.getIP());
-            aliceIntroKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
-            testInfo.readIntroKey(aliceIntroKey.getData(), 0);
-
-            RouterAddress raddr = _transport.getTargetAddress(charlieInfo);
-            if (raddr == null) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Unable to pick a charlie (no addr), IPv6? " + isIPv6);
-                return;
-            }
-            UDPAddress addr = new UDPAddress(raddr);
-            byte[] ikey = addr.getIntroKey();
-            if (ikey == null) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Unable to pick a charlie (no ikey), IPv6? " + isIPv6);
-                return;
-            }
-            SessionKey charlieIntroKey = new SessionKey(ikey);
-            
-            //UDPPacket packet = _packetBuilder.buildPeerTestToAlice(aliceIP, from.getPort(), aliceIntroKey, charlieIntroKey, nonce);
-            //_transport.send(packet);
-
-            long now = _context.clock().now();
-            boolean isNew = false;
-            if (state == null) {
-                isNew = true;
-                state = new PeerTestState(BOB, null, isIPv6, nonce, now);
-            } else {
-                if (state.getReceiveAliceTime() > now - (RESEND_TIMEOUT / 2)) {
-                    if (_log.shouldDebug())
-                        _log.debug("Too soon, not retransmitting: " + state);
-                    return;
-                }
-            }
-            state.setAlice(aliceIP, from.getPort(), null);
-            state.setAliceIntroKey(aliceIntroKey);
-            state.setAliceKeys(alice.getCurrentCipherKey(), alice.getCurrentMACKey());
-            state.setCharlie(charlie.getRemoteIPAddress(), charlie.getRemotePort(), null);
-            state.setCharlieIntroKey(charlieIntroKey);
-            state.setReceiveAliceTime(now);
-            
-            if (state.incrementPacketsRelayed() > MAX_RELAYED_PER_TEST_BOB) {
-                if (_log.shouldDebug())
-                    _log.debug("Too many, not retransmitting: " + state);
-                return;
-            }
-            
-            if (isNew) {
-                Long lnonce = Long.valueOf(nonce);
-                _activeTests.put(lnonce, state);
-                new RemoveTest(lnonce, MAX_BOB_LIFETIME);
-            }
-            
-            state.setLastSendTime(now);
-            UDPPacket packet = _packetBuilder.buildPeerTestToCharlie(aliceIP, from.getPort(), aliceIntroKey, nonce, 
-                                                                     charlie.getRemoteIPAddress(), 
-                                                                     charlie.getRemotePort(), 
-                                                                     charlie.getCurrentCipherKey(), 
-                                                                     charlie.getCurrentMACKey());
-            
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Receive from Alice: " + state);
-            
-            _transport.send(packet);
-        } catch (UnknownHostException uhe) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Unable to build the aliceIP from " + from, uhe);
-            _context.statManager().addRateData("udp.testBadIP", 1);
-        }
-    }
-    
-    /**
-     * The PeerTest message came from one of the Charlies picked for an existing test, so send Alice the
-     * packet verifying participation.
-     *
-     * testInfo IP/port ignored
-     *
-     * @param fromPeer non-null if an associated session was found, otherwise null
-     * @param inSession true if authenticated in-session
-     * @param state non-null
-     */
-    private void receiveFromCharlieAsBob(RemoteHostId from, PeerState charlie, boolean inSession, PeerTestState state) {
-        if (!inSession || charlie == null) {
-            if (_log.shouldWarn())
-                _log.warn("Received from charlie (" + from + ") as bob w/o session");
-            return;
-        }
-
-        long now = _context.clock().now();
-        if (state.getReceiveCharlieTime() > now - (RESEND_TIMEOUT / 2)) {
-            if (_log.shouldDebug())
-                _log.debug("Too soon, not retransmitting: " + state);
-            return;
-        }
-
-        if (state.incrementPacketsRelayed() > MAX_RELAYED_PER_TEST_BOB) {
-            if (_log.shouldDebug())
-                _log.debug("Too many, not retransmitting: " + state);
-            return;
-        }
-        state.setReceiveCharlieTime(now);
-        state.setLastSendTime(now);
-        
-        // In-session as of 0.9.52
-        UDPPacket packet = _packetBuilder.buildPeerTestToAlice(state.getAliceIP(), state.getAlicePort(),
-                                                               state.getAliceCipherKey(), state.getAliceMACKey(),
-                                                               state.getCharlieIntroKey(), state.getNonce());
-
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Receive from Charlie, sending Alice back the OK: " + state);
-
-        _transport.send(packet);
-    }
-    
-    /** 
-     * We are Charlie, receiving message 6, so send Alice her PeerTest message 7.
-     * We send it to wherever message 6 came from, which may be different than
-     * where we sent message 5.
-     *
-     * SSU 1 only.
-     *
-     * testInfo IP/port ignored
-     * @param state non-null
-     */
-    private void receiveFromAliceAsCharlie(RemoteHostId from, UDPPacketReader.PeerTestReader testInfo,
-                                           long nonce, PeerTestState state) {
-        long now = _context.clock().now();
-        if (state.getReceiveAliceTime() > now - (RESEND_TIMEOUT / 2)) {
-            if (_log.shouldDebug())
-                _log.debug("Too soon, not retransmitting: " + state);
-            return;
-        }
-
-        if (state.incrementPacketsRelayed() > MAX_RELAYED_PER_TEST_CHARLIE) {
-            if (_log.shouldDebug())
-                _log.debug("Too many, not retransmitting: " + state);
-            return;
-        }
-        state.setReceiveAliceTime(now);
-        state.setLastSendTime(now);
-
-        try {
-            InetAddress aliceIP = InetAddress.getByAddress(from.getIP());
-            SessionKey aliceIntroKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
-            testInfo.readIntroKey(aliceIntroKey.getData(), 0);
-            UDPPacket packet = _packetBuilder.buildPeerTestToAlice(aliceIP, from.getPort(), aliceIntroKey, _transport.getIntroKey(), nonce);
-
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Receive from Alice: " + state);
-            
-            _transport.send(packet);
-        } catch (UnknownHostException uhe) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Unable to build the aliceIP from " + from, uhe);
-            _context.statManager().addRateData("udp.testBadIP", 1);
-        }
-    }
 
     /** 
      * SSU 1 Bob/Charlie and SSU 2 Bob
