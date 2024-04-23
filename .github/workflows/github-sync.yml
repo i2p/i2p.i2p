@@ -13,6 +13,8 @@ jobs:
       with:
         persist-credentials: false
     - name: repo-sync
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       uses: repo-sync/github-sync@v2
       with:
         source_repo: "https://i2pgit.org/i2p-hackers/i2p.i2p"
