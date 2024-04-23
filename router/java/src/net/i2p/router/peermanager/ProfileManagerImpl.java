@@ -175,7 +175,6 @@ public class ProfileManagerImpl implements ProfileManager {
     public void tunnelFailed(Hash peer, int pct) {
         PeerProfile data = getProfile(peer);
         //if (data == null) return;
-        data.setLastHeardFrom(_context.clock().now());
         data.getTunnelHistory().incrementFailed(pct);
     }
     
