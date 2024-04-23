@@ -61,12 +61,28 @@ public class Folder<O extends Object> {
 		UP;
 	}
 
+	/**
+	 * @since 0.9.63
+	 */
+	public interface Selector<O> {
+		/**
+		 * @return non-null
+		 */
+		public String getSelectionKey();
+		/**
+		 * @return true if selected
+		 */
+		public boolean select(O element);
+	}
+
 	private int pages, pageSize, currentPage;
 	private O[] elements;
 	private final Map<String, Comparator<O>> sorter;
 	private SortOrder sortingDirection;
 	private Comparator<O> currentSorter;
 	private String currentSortID;
+	private Selector<O> currentSelector;
+	private List<O> selected;
 	
 	public Folder()
 	{
@@ -109,10 +125,18 @@ public class Folder<O extends Object> {
 	/**
 	 * Returns the number of pages in the folder.
          * Minimum of 1 even if empty.
+	 * If the selector is non-null, this will be the number of pages in the selected results.
+	 *
 	 * @return Returns the number of pages.
 	 */
 	public synchronized int getPages() {
-		return pages;
+		if (currentSelector == null || elements == null)
+			return pages;
+		int ps = getPageSize();
+		int rv = selected.size() / ps;
+		if (rv * ps < elements.length)
+			rv++;
+		return rv;
 	}
 
 	/**
@@ -177,6 +201,7 @@ public class Folder<O extends Object> {
 		if (elements.length > 0) {
 			this.elements = elements;
 			sort();
+			select();
 		} else {
 			this.elements = null;
 		}
@@ -286,6 +311,27 @@ public class Folder<O extends Object> {
 	}
 
 	/**
+	 * Returns an iterator containing the elements on the current page.
+	 * This iterator is over a copy of the current page, and so
+	 * is thread safe w.r.t. other operations on this folder,
+	 * but will not reflect subsequent changes, and iter.remove()
+	 * will not change the folder.
+	 *
+	 * @return Iterator containing the elements on the current page.
+	 * @since 0.9.63
+	 */
+	public synchronized Iterator<O> currentPageSelectorIterator()
+	{
+		if (currentSelector == null)
+			return currentPageIterator();
+		int pageSize = getPageSize();
+		int offset = ( currentPage - 1 ) * pageSize;
+		if (selected == null || offset > selected.size())
+			return Collections.<O>emptyList().iterator();
+		return selected.subList(offset, Math.min(selected.size(), offset + pageSize)).iterator();
+	}
+
+	/**
 	 * Turns folder to next page.
 	 */
 	public synchronized void nextPage()
@@ -370,27 +416,54 @@ public class Folder<O extends Object> {
 	public synchronized SortOrder getCurrentSortingDirection() {
 		return sortingDirection;
 	}
-	
+
 	/**
-	 * Returns the element on the current page on the given position.
+	 * Warning, this does not do the actual selection, this is done in the iterator.
+	 * Resets page to 1 if selector changed.
 	 *
-	 * @param x Position of the element on the current page.
-	 * @return Element on the current page on the given position.
+	 * @param selector may be null
+	 * @since 0.9.63
 	 */
-/****  unused, we now fetch by UIDL, not position
-	public synchronized O getElementAtPosXonCurrentPage( int x )
-	{
-		O result = null;
-		if( elements != null ) {
-			int pageSize = getPageSize();
-			int offset = ( currentPage - 1 ) * pageSize;
-			offset += x;			
-			if( offset >= 0 && offset < elements.length )
-				result = elements[offset];
+	public synchronized void setSelector(Selector<O> selector) {
+		if ((currentSelector != null && selector == null) ||
+		    (currentSelector == null && selector != null) ||
+		    (currentSelector != null && selector != null &&
+		     !currentSelector.getSelectionKey().equals(selector.getSelectionKey()))) {
+			currentPage = 1;
 		}
-		return result;
+		currentSelector = selector;
+		if (selector != null)
+			select();
+		else
+			selected = null;
 	}
-****/
+
+	/**
+	 * @return current selector or null
+	 * @since 0.9.63
+	 */
+	public synchronized Selector<O> getCurrentSelector() {
+		return currentSelector;
+	}
+
+	/**
+	 * Select and cache results
+	 * @since 0.9.63
+	 */
+	private synchronized void select() {
+		if (selected == null)
+			selected = new ArrayList<O>();
+		else
+			selected.clear();
+		if (elements == null || currentSelector == null)
+			return;
+		int sz = getSize();
+		for (int i = 0; i < sz; i++) {
+			if (currentSelector.select(elements[i])) {
+				selected.add(elements[i]);
+			}
+		}
+	}
 
 	/**
 	 * Returns the first element of the sorted folder.
@@ -467,6 +540,47 @@ public class Folder<O extends Object> {
 		}
 		return result;
 	}
+
+	/**
+	 * Retrieves the next element in the sorted array.
+	 * 
+	 * @param element
+	 * @return The next element
+	 */
+	public synchronized O getNextSelectedElement(O element)
+	{
+		if (currentSelector == null)
+			return getNextElement(element);
+		O result = null;
+		int i = selected.indexOf(element);
+		if (i != -1 && selected != null) {
+			i++;
+			if (i < selected.size())
+				result = selected.get(i);
+		}
+		return result;
+	}
+
+	/**
+	 * Retrieves the previous element in the sorted array.
+	 * 
+	 * @param element
+	 * @return The previous element
+	 */
+	public synchronized O getPreviousSelectedElement(O element)
+	{
+		if (currentSelector == null)
+			return getPreviousElement(element);
+		O result = null;
+		int i = selected.indexOf(element);
+		if (i != -1 && selected != null) {
+			i--;
+			if (i >= 0 && i < selected.size())
+				result = selected.get(i);
+		}
+		return result;
+	}
+
 	/**
 	 * Retrieves element at index i.
 	 * 

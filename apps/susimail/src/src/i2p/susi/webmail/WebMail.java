@@ -147,6 +147,7 @@ public class WebMail extends HttpServlet
 	private static final String NEXT_PAGE_NUM = "nextpagenum";
 	private static final String CURRENT_SORT = "currentsort";
 	private static final String CURRENT_FOLDER = "folder";
+	private static final String CURRENT_SEARCH = "currentsearch";
 	private static final String NEW_FOLDER  = "newfolder";
 	private static final String DRAFT_EXISTS = "draftexists";
 	private static final String DEBUG_STATE = "currentstate";
@@ -169,6 +170,7 @@ public class WebMail extends HttpServlet
 	private static final String REALLYDELETE = "really_delete";
 	private static final String MOVE_TO = "moveto";
 	private static final String SWITCH_TO = "switchto";
+	private static final String SEARCH = "s";
 	// also a GET param
 	private static final String SHOW = "show";
 	private static final String DOWNLOAD = "download";
@@ -1193,7 +1195,8 @@ public class WebMail extends HttpServlet
 			    buttonPressed( request, CLEAR ) ||
 			    buttonPressed( request, INVERT ) ||
 			    buttonPressed( request, SORT ) ||
-			    buttonPressed( request, REFRESH )) {
+			    buttonPressed( request, REFRESH ) ||
+			    buttonPressed( request, SEARCH )) {
 				state = State.LIST;
 			} else if (buttonPressed(request, PREV) ||
 			           buttonPressed(request, NEXT) ||
@@ -1221,6 +1224,9 @@ public class WebMail extends HttpServlet
 		} else if (buttonPressed(request, DRAFT_ATTACHMENT)) {
 			// GET params
 			state = State.NEW;
+		} else if (buttonPressed(request, SEARCH)) {
+			// GET params for XHR
+			return State.LIST;
 		}
 
 		/*
@@ -2614,15 +2620,31 @@ public class WebMail extends HttpServlet
 				}
 				out.println("<script src=\"/susimail/js/notifications.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 				out.print("</head>\n<body>");
-				String nonce = state == State.AUTH ? LOGIN_NONCE :
-				                                                   Long.toString(ctx.random().nextLong());
-				sessionObject.addNonce(nonce);
-				out.println(
-					"<div class=\"page\" id=\"page\">" +
-					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">\n" +
-					"<input type=\"hidden\" name=\"" + SUSI_NONCE + "\" value=\"" + nonce + "\">\n" +
-					// we use this to know if the user thought he was logged in at the time
-					"<input type=\"hidden\" name=\"" + DEBUG_STATE + "\" value=\"" + state + "\">");
+				out.println("<div class=\"page\" id=\"page\">");
+
+				if (state != State.LIST) {
+					// For all states except LIST, we have one big form for the whole page.
+					// LIST has several forms, we will output them in showFolder().
+					String nonce = state == State.AUTH ? LOGIN_NONCE :
+					                                     Long.toString(ctx.random().nextLong());
+					sessionObject.addNonce(nonce);
+					out.println("<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">\n" +
+					            "<input type=\"hidden\" name=\"" + SUSI_NONCE + "\" value=\"" + nonce + "\">\n" +
+					            // we use this to know if the user thought he was logged in at the time
+					            "<input type=\"hidden\" name=\"" + DEBUG_STATE + "\" value=\"" + state + "\">");
+					if (state != State.AUTH && state != State.CONFIG && state != State.LOADING) {
+						// maintain the search param when changing pages or folders or
+						// going to message view and back
+						String search = request.getParameter(CURRENT_SEARCH);
+						if (search == null || search.length() == 0) {
+							Folder.Selector selector = mc.getFolder().getCurrentSelector();
+							if (selector != null)
+								search = selector.getSelectionKey();
+						}
+						if (search != null && search.length() > 0)
+							out.println("<input type=\"hidden\" name=\"" + CURRENT_SEARCH + "\" value=\"" + DataHelper.escapeHTML(search) + "\">\n");
+					}
+				}
 				if (state == State.NEW) {
 					String newUIDL = request.getParameter(NEW_UIDL);
 					if (newUIDL == null || newUIDL.length() <= 0)
@@ -2646,8 +2668,6 @@ public class WebMail extends HttpServlet
 						}
 						out.println("<input type=\"hidden\" name=\"" + CUR_PAGE + "\" value=\"" + page + "\">");
 					}
-				}
-				if (state == State.SHOW || state == State.NEW || state == State.LIST) {
 					// Save sort order in case it changes later
 					String curSort = folder.getCurrentSortBy();
 					SortOrder curOrder = folder.getCurrentSortingDirection();
@@ -2698,6 +2718,7 @@ public class WebMail extends HttpServlet
 					}
 					out.println("</div>" );
 				}
+
 				/*
 				 * now write body
 				 */
@@ -2735,7 +2756,8 @@ public class WebMail extends HttpServlet
 				else if( state == State.CONFIG )
 					showConfig(out, folder);
 
-				out.println("</form>\n");
+				if (state != State.LIST)
+					out.println("</form>\n");
 
 				out.println("<div class=\"footer\"><p class=\"footer\">\n" +
 				            "<img class=\"footer\" src=\"" + myself + "themes/images/susimail.png\" alt=\"susimail\">\n" +
@@ -3484,18 +3506,9 @@ public class WebMail extends HttpServlet
 	 */
 	private static void showFolder( PrintWriter out, SessionObject sessionObject, MailCache mc, RequestWrapper request )
 	{
-		out.println("<div class=\"topbuttons\">");
-		out.println( button( NEW, _t("New") ) + spacer);
-			// In theory, these are valid and will apply to the first checked message,
-			// but that's not obvious and did it work?
-			//button( REPLY, _t("Reply") ) +
-			//button( REPLYALL, _t("Reply All") ) +
-			//button( FORWARD, _t("Forward") ) + spacer +
-			//button( DELETE, _t("Delete") ) + spacer +
 		String folderName = mc.getFolderName();
 		String floc;
 		if (folderName.equals(DIR_FOLDER)) {
-			out.println((sessionObject.isFetching ? button2(REFRESH, _t("Check Mail")) : button(REFRESH, _t("Check Mail"))) + spacer);
 			floc = "";
 		} else if (folderName.equals(DIR_DRAFTS)) {
 			floc = "";
@@ -3504,11 +3517,75 @@ public class WebMail extends HttpServlet
 		}
 		boolean isSpamFolder = folderName.equals(DIR_SPAM);
 		boolean showToColumn = folderName.equals(DIR_DRAFTS) || folderName.equals(DIR_SENT);
-		//if (Config.hasConfigFile())
-		//	out.println(button( RELOAD, _t("Reload Config") ) + spacer);
-		out.println(button( LOGOUT, _t("Logout") ));
-		int page = 1;
+		// For all states except LIST, we have one big form for the whole page.
+		// Here, for LIST, we set up 4-5 forms
+		// to deal with html rules and have a search box that works right.
+		// 1: new/checkmail/logout, inside topbuttons div
+		// 2: search, inside topbuttons div
+		// 3: change folder and page buttons, inside topbuttons div, surrounds pagenav table
+		// 4: mail delete boxes and bottombuttons div, surrounds mailbox table
+		// 5: change folder and page buttons, inside 2nd topbuttons div, surrounds pagenav table,
+		//    only shown if more than 30 mails on a page
+		//
+		// Create the common form header
+		I2PAppContext ctx = I2PAppContext.getGlobalContext();
+		String nonce = Long.toString(ctx.random().nextLong());
+		sessionObject.addNonce(nonce);
+		// for all but search
+		String form = "<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">\n";
+		StringBuilder fbf = new StringBuilder(256);
+		fbf.append("<input type=\"hidden\" name=\"").append(SUSI_NONCE).append("\" value=\"").append(nonce).append("\">\n")
+		   .append("<input type=\"hidden\" name=\"").append(DEBUG_STATE).append("\" value=\"").append(State.LIST).append("\">\n");
 		Folder<String> folder = mc.getFolder();
+		String curSort = folder.getCurrentSortBy();
+		SortOrder curOrder = folder.getCurrentSortingDirection();
+		// UP is reverse sort. DOWN is normal sort.
+		String fullSort = curOrder == SortOrder.UP ? '-' + curSort : curSort;
+		fbf.append("<input type=\"hidden\" name=\"").append(CURRENT_SORT).append("\" value=\"").append(fullSort).append("\">\n")
+		   .append("<input type=\"hidden\" name=\"").append(CURRENT_FOLDER).append("\" value=\"").append(folderName).append("\">\n");
+		String cursearch = request.getParameter(CURRENT_SEARCH);
+		String search = request.getParameter(SEARCH);
+		if (cursearch != null && cursearch.length() > 0) {
+			if (search == null) {
+				// we came from somewhere else, set search to cursearch, will set selector below
+				search = cursearch;
+			} else {
+				// we came from here, search wins, will set selector below
+			}
+		}
+		if (search != null && search.length() > 0) {
+			fbf.append("<input type=\"hidden\" name=\"").append(CURRENT_SEARCH).append("\" value=\"").append(DataHelper.escapeHTML(search)).append("\">\n");
+			Folder.Selector olds = folder.getCurrentSelector();
+			if (olds == null || !olds.getSelectionKey().equals(search)) {
+				folder.setSelector(new SearchSelector(mc, search));
+			}
+		} else if ((search == null || search.length() == 0) && folder.getCurrentSelector() != null) {
+			folder.setSelector(null);
+		}
+		String hidden = fbf.toString();
+
+		out.println("<div class=\"topbuttons\">");
+		// form 1
+		out.print(form);
+		out.print(hidden);
+		out.println( button( NEW, _t("New") ) + spacer);
+		if (folderName.equals(DIR_FOLDER))
+			out.println((sessionObject.isFetching ? button2(REFRESH, _t("Check Mail")) : button(REFRESH, _t("Check Mail"))) + spacer);
+		out.println(button( LOGOUT, _t("Logout") ));
+		out.println("</form>");
+
+		if (folder.getSize() > 1 || (search != null && search.length() > 0)) {
+			// form 2
+	                out.println("<form class=\"search\" id = \"search\" action=\"" + myself + "\" method=\"POST\">");
+			out.print(hidden);
+			out.write("<input type=\"text\" name=\"" + SEARCH + "\" size=\"20\" class=\"search\" id=\"searchbox\"");
+			if (search != null)
+				out.write(" value=\"" + DataHelper.escapeHTML(search) + '"');
+			out.println("><a class=\"cancel\" id=\"searchcancel\" href=\"" + myself + "\"></a>");
+			out.println("</form>");
+		}
+
+		int page = 1;
 		if (folder.getPages() > 1) {
 			String sp = request.getParameter(CUR_PAGE);
 			if (sp != null) {
@@ -3518,13 +3595,18 @@ public class WebMail extends HttpServlet
 			}
 			folder.setCurrentPage(page);
 		}
+		// form 3
+		out.print(form);
+		out.print(hidden);
 		showPageButtons(out, sessionObject.user, folderName, page, folder.getPages(), true);
+		out.println("</form>");
 		out.println("</div>");
 
-		String curSort = folder.getCurrentSortBy();
-		SortOrder curOrder = folder.getCurrentSortingDirection();
-		out.println("<table id=\"mailbox\" cellspacing=\"0\" cellpadding=\"5\">\n" +
-			"<tr><td colspan=\"9\"><hr></td></tr>\n<tr><th title=\"" + _t("Mark for deletion") + "\">&nbsp;</th>" +
+		// form 4
+		out.print(form);
+		out.print(hidden);
+		out.println("<table id=\"mailbox\" cellspacing=\"0\" cellpadding=\"5\">\n");
+		out.println("<tr><td colspan=\"9\"><hr></td></tr>\n<tr><th title=\"" + _t("Mark for deletion") + "\">&nbsp;</th>" +
 			thSpacer + "<th>" + sortHeader(SORT_SENDER, showToColumn ? _t("To") : _t("From"), sessionObject.imgPath, curSort, curOrder, page, folderName) + "</th>" +
 			thSpacer + "<th>" + sortHeader(SORT_SUBJECT, _t("Subject"), sessionObject.imgPath, curSort, curOrder, page, folderName) + "</th>" +
 			thSpacer + "<th>" + sortHeader(SORT_DATE, _t("Date"), sessionObject.imgPath, curSort, curOrder, page, folderName) +
@@ -3532,7 +3614,7 @@ public class WebMail extends HttpServlet
 			thSpacer + "<th>" + sortHeader(SORT_SIZE, _t("Size"), sessionObject.imgPath, curSort, curOrder, page, folderName) + "</th></tr>" );
 		int bg = 0;
 		int i = 0;
-		for (Iterator<String> it = folder.currentPageIterator(); it != null && it.hasNext(); ) {
+		for (Iterator<String> it = folder.currentPageSelectorIterator(); it != null && it.hasNext(); ) {
 			String uidl = it.next();
 			Mail mail = mc.getMail(uidl, MailCache.FetchMode.HEADER_CACHE_ONLY);
 			if (mail == null || !mail.hasHeader()) {
@@ -3644,12 +3726,80 @@ public class WebMail extends HttpServlet
 		out.print(button(CONFIGURE, _t("Settings")));
 		out.println("</td></tr>");
 		out.println( "</table>");
-		if (folder.getPages() > 1 && i > 30) {
+		out.println("</form>");
+		int ps = folder.getPageSize();
+		if (ps > 30 && (folder.getCurrentPage() - 1) * ps < folder.getSize() - 30) {
 			// show the buttons again if page is big
 			out.println("<div class=\"topbuttons\">");
+			// form 5
+			out.print(form);
+			out.print(hidden);
 			showPageButtons(out, sessionObject.user, folderName, page, folder.getPages(), false);
+			out.println("</form>");
 			out.println("</div>");
 		}
+	}
+
+	/**
+	 *  Folder callback to search mails for matching terms.
+	 *  Only subject and sender (or recipients for drafts).
+	 *  Mail bodies are not in-memory and would be very slow.
+	 *
+	 *  @since 0.9.63
+	 */
+	private static class SearchSelector implements Folder.Selector<String> {
+		private final String key;
+		private final MailCache mc;
+		private final String[] terms;
+		private final boolean isDrafts;
+
+		/**
+		 *  @param search non-null, non-empty, and %-encoded, will be decoded here
+		 */
+		public SearchSelector(MailCache cache, String search) {
+			mc = cache;
+			isDrafts = mc.getFolderName().equals(DIR_DRAFTS);
+			key = search;
+			terms = DataHelper.split(search, " ");
+			// decode
+			for (int i = 0; i < terms.length; i++) {
+				terms[i] = terms[i].toLowerCase(Locale.US);
+			}
+		}
+
+		public String getSelectionKey() {
+			return key;
+		}
+
+		public boolean select(String uidl) {
+			Mail mail = mc.getMail(uidl, MailCache.FetchMode.HEADER_CACHE_ONLY);
+			if (mail == null)
+				return false;
+			String subj = mail.subject.toLowerCase(Locale.US);
+			String sender = isDrafts ? null : mail.sender;
+			if (sender != null)
+				sender = sender.toLowerCase(Locale.US);
+			String[] to = isDrafts ? mail.to : null;
+			for (String term : terms) {
+				if (subj.contains(term))
+					return true;
+				if (sender != null && sender.contains(term))
+					return true;
+				if (to != null) {
+					for (int i = 0; i < to.length; i++) {
+						if (to[i].toLowerCase(Locale.US).contains(term))
+							return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		@Override
+		public String toString() {
+			return "Search selector for '" + key + "'";
+		}
+
 	}
 
 	/**
@@ -3794,7 +3944,11 @@ public class WebMail extends HttpServlet
 		out.println("<div id=\"messagenav\">");
 		Folder<String> folder = mc.getFolder();
 		if (hasHeader) {
-			String uidl = folder.getPreviousElement(showUIDL);
+			String uidl;
+			if (folder.getCurrentSelector() != null)
+				uidl = folder.getPreviousSelectedElement(showUIDL);
+			else
+				uidl = folder.getPreviousElement(showUIDL);
 			String text = _t("Previous");
 			if (uidl == null || folder.isFirstElement(showUIDL)) {
 				out.println(button2(PREV, text));
@@ -3809,7 +3963,11 @@ public class WebMail extends HttpServlet
 		out.println("<input type=\"hidden\" name=\"" + CUR_PAGE + "\" value=\"" + page + "\">");
 		out.println(button( LIST, _t("Back to Folder") ) + spacer);
 		if (hasHeader) {
-			String uidl = folder.getNextElement(showUIDL);
+			String uidl;
+			if (folder.getCurrentSelector() != null)
+				uidl = folder.getNextSelectedElement(showUIDL);
+			else
+				uidl = folder.getNextElement(showUIDL);
 			String text = _t("Next");
 			if (uidl == null || folder.isLastElement(showUIDL)) {
 				out.println(button2(NEXT, text));
