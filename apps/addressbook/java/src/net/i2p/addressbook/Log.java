@@ -23,10 +23,13 @@ package net.i2p.addressbook;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Date;
+
+import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  * A simple log with automatic time stamping.
@@ -57,9 +60,9 @@ class Log {
     public void append(String entry) {
         BufferedWriter bw = null;
         try {
-            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.file,
+            bw = new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(this.file,
                     true), "UTF-8"));
-            String timestamp = new Date().toString();
+            String timestamp = DataHelper.formatTime(I2PAppContext.getGlobalContext().clock().now());
             bw.write(timestamp + " -- " + entry);
             bw.newLine();
         } catch (IOException exp) {
