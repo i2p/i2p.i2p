@@ -1,3 +1,15 @@
+2024-04-25 zzz
+ * Susimail: Add search box (Gitlab MR !190)
+ * Transport: Remove SSU1 code from IMF/IMS (Gitlab MRs !189)
+
+2024-04-22 zzz
+ * Addressbook: Use standard time formatting for log
+ * Profiles: Don't update last heard time on tunnel failure
+ * Transport: Remove SSU1 code from PeerTest and IntroductionManager (Gitlab MRs !185, !186)
+
+2024-04-17 zzz
+ * Build: Update to Tomcat 9.0.88
+
 2024-04-15 zzz
  * Susimail: Don't show multipart/related CID images as attachments also
 
