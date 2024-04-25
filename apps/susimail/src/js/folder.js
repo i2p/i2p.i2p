@@ -40,7 +40,7 @@ function addClickHandler1(elem)
 function addClickHandler2(elem)
 {
 	elem.addEventListener("click", function() {
-		var form = document.forms[0];
+		var form = document.forms[3];
 		form.delete.disabled = false;
 		form.markall.disabled = true;
 		form.clearselection.disabled = false;
@@ -57,7 +57,7 @@ function addClickHandler2(elem)
 function addClickHandler3(elem)
 {
 	elem.addEventListener("click", function() {
-		var form = document.forms[0];
+		var form = document.forms[3];
 		form.delete.disabled = true;
 		form.markall.disabled = false;
 		form.clearselection.disabled = true;
@@ -82,7 +82,7 @@ function deleteboxclicked() {
 	var hasOne = false;
 	var hasAll = true;
 	var hasNone = true;
-	var form = document.forms[0];
+	var form = document.forms[3];
 	for(i = 0; i < form.elements.length; i++) {
 		var elem = form.elements[i];
 		if (elem.type == 'checkbox') {
