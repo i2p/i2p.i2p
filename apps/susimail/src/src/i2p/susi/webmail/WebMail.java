@@ -60,6 +60,7 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -147,7 +148,7 @@ public class WebMail extends HttpServlet
 	private static final String NEXT_PAGE_NUM = "nextpagenum";
 	private static final String CURRENT_SORT = "currentsort";
 	private static final String CURRENT_FOLDER = "folder";
-	private static final String CURRENT_SEARCH = "currentsearch";
+	private static final String CURRENT_SEARCH = "nf_currentsearch";
 	private static final String NEW_FOLDER  = "newfolder";
 	private static final String DRAFT_EXISTS = "draftexists";
 	private static final String DEBUG_STATE = "currentstate";
@@ -170,7 +171,7 @@ public class WebMail extends HttpServlet
 	private static final String REALLYDELETE = "really_delete";
 	private static final String MOVE_TO = "moveto";
 	private static final String SWITCH_TO = "switchto";
-	private static final String SEARCH = "s";
+	private static final String SEARCH = "nf_s";
 	// also a GET param
 	private static final String SHOW = "show";
 	private static final String DOWNLOAD = "download";
@@ -444,11 +445,12 @@ public class WebMail extends HttpServlet
 	 *
 	 * @param name
 	 * @param label
+	 * @param search may be null
 	 * @return the string
 	 */
 	private static String sortHeader(String name, String label, String imgPath,
 	                                 String currentName, SortOrder currentOrder, int page,
-	                                 String folder)
+	                                 String folder, String search)
 	{
 		StringBuilder buf = new StringBuilder(128);
 		buf.append(label).append("&nbsp;&nbsp;");
@@ -457,7 +459,13 @@ public class WebMail extends HttpServlet
 			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3up.png\" border=\"0\" alt=\"^\">\n");
 		} else {
 			buf.append("<a class=\"sort\" href=\"").append(myself).append("?page=").append(page).append("&amp;sort=-")
-			    .append(name).append("&amp;folder=").append(folder).append("\">");
+			    .append(name).append("&amp;folder=").append(folder);
+			if (search != null) {
+				try {
+				       buf.append("&amp;").append(SEARCH).append('=').append(URLEncoder.encode(search, "UTF-8"));
+				} catch (UnsupportedEncodingException uee) {}
+			}
+			buf.append("\">");
 			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3up.png\" border=\"0\" alt=\"^\">");
 			buf.append("</a>\n");
 		}
@@ -465,7 +473,13 @@ public class WebMail extends HttpServlet
 			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3down.png\" border=\"0\" alt=\"v\">");
 		} else {
 			buf.append("<a class=\"sort\" href=\"").append(myself).append("?page=").append(page).append("&amp;sort=")
-			    .append(name).append("&amp;folder=").append(folder).append("\">");
+			    .append(name).append("&amp;folder=").append(folder);
+			if (search != null) {
+				try {
+				       buf.append("&amp;").append(SEARCH).append('=').append(URLEncoder.encode(search, "UTF-8"));
+				} catch (UnsupportedEncodingException uee) {}
+			}
+			buf.append("\">");
 			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3down.png\" border=\"0\" alt=\"v\">");
 			buf.append("</a>");
 		}
@@ -2394,6 +2408,9 @@ public class WebMail extends HttpServlet
 						// always go to inbox after SEND
 						if (str != null && !str.equals(DIR_FOLDER) && !buttonPressed(request, SEND))
 							q += '&' + CURRENT_FOLDER + '=' + str;
+						str = request.getParameter(SEARCH);
+						if (str != null && str.length() > 0)
+							q += '&' + SEARCH + '=' + URLEncoder.encode(str, "UTF-8");
 						sendRedirect(httpRequest, response, q);
 						return;
 					}
@@ -3598,6 +3615,8 @@ public class WebMail extends HttpServlet
 		// form 3
 		out.print(form);
 		out.print(hidden);
+		if (search != null)
+			out.println("<input type=\"hidden\" name=\"" + SEARCH + "\" value=\"" + DataHelper.escapeHTML(search) + "\">");
 		showPageButtons(out, sessionObject.user, folderName, page, folder.getPages(), true);
 		out.println("</form>");
 		out.println("</div>");
@@ -3607,11 +3626,11 @@ public class WebMail extends HttpServlet
 		out.print(hidden);
 		out.println("<table id=\"mailbox\" cellspacing=\"0\" cellpadding=\"5\">\n");
 		out.println("<tr><td colspan=\"9\"><hr></td></tr>\n<tr><th title=\"" + _t("Mark for deletion") + "\">&nbsp;</th>" +
-			thSpacer + "<th>" + sortHeader(SORT_SENDER, showToColumn ? _t("To") : _t("From"), sessionObject.imgPath, curSort, curOrder, page, folderName) + "</th>" +
-			thSpacer + "<th>" + sortHeader(SORT_SUBJECT, _t("Subject"), sessionObject.imgPath, curSort, curOrder, page, folderName) + "</th>" +
-			thSpacer + "<th>" + sortHeader(SORT_DATE, _t("Date"), sessionObject.imgPath, curSort, curOrder, page, folderName) +
+			thSpacer + "<th>" + sortHeader(SORT_SENDER, showToColumn ? _t("To") : _t("From"), sessionObject.imgPath, curSort, curOrder, page, folderName, search) + "</th>" +
+			thSpacer + "<th>" + sortHeader(SORT_SUBJECT, _t("Subject"), sessionObject.imgPath, curSort, curOrder, page, folderName, search) + "</th>" +
+			thSpacer + "<th>" + sortHeader(SORT_DATE, _t("Date"), sessionObject.imgPath, curSort, curOrder, page, folderName, search) +
 			"</th>" +
-			thSpacer + "<th>" + sortHeader(SORT_SIZE, _t("Size"), sessionObject.imgPath, curSort, curOrder, page, folderName) + "</th></tr>" );
+			thSpacer + "<th>" + sortHeader(SORT_SIZE, _t("Size"), sessionObject.imgPath, curSort, curOrder, page, folderName, search) + "</th></tr>" );
 		int bg = 0;
 		int i = 0;
 		for (Iterator<String> it = folder.currentPageSelectorIterator(); it != null && it.hasNext(); ) {
@@ -3734,6 +3753,8 @@ public class WebMail extends HttpServlet
 			// form 5
 			out.print(form);
 			out.print(hidden);
+			if (search != null)
+				out.println("<input type=\"hidden\" name=\"" + SEARCH + "\" value=\"" + DataHelper.escapeHTML(search) + "\">");
 			showPageButtons(out, sessionObject.user, folderName, page, folder.getPages(), false);
 			out.println("</form>");
 			out.println("</div>");

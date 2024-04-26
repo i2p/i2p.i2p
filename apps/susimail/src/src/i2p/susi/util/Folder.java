@@ -196,7 +196,7 @@ public class Folder<O extends Object> {
 	 * 
 	 * @param elements Array of Os.
 	 */
-	public synchronized void setElements( O[] elements )
+	private synchronized void setElements( O[] elements )
 	{
 		if (elements.length > 0) {
 			this.elements = elements;
@@ -392,7 +392,9 @@ public class Folder<O extends Object> {
 	 */
 	public synchronized void setSortBy(String id, SortOrder direction)
 	{
+		SortOrder oldDirection = sortingDirection;
 		sortingDirection = direction;
+		Comparator<O> oldSorter = currentSorter;
 		currentSorter = sorter.get( id );
 		if (currentSorter != null) {
 			if (sortingDirection == SortOrder.UP)
@@ -400,6 +402,11 @@ public class Folder<O extends Object> {
 			currentSortID = id;
 		} else {
 			currentSortID = null;
+		}
+		// invalidate selection if sort order changed
+		if (oldDirection != sortingDirection || !DataHelper.eq(oldSorter, currentSorter)) {
+			currentSelector = null;
+			selected = null;
 		}
 	}
 	
@@ -546,6 +553,7 @@ public class Folder<O extends Object> {
 	 * 
 	 * @param element
 	 * @return The next element
+	 * @since 0.9.63
 	 */
 	public synchronized O getNextSelectedElement(O element)
 	{
@@ -566,6 +574,7 @@ public class Folder<O extends Object> {
 	 * 
 	 * @param element
 	 * @return The previous element
+	 * @since 0.9.63
 	 */
 	public synchronized O getPreviousSelectedElement(O element)
 	{
