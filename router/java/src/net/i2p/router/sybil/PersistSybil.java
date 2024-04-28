@@ -27,12 +27,14 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.Blocklist;
+import net.i2p.router.RouterVersion;
 import net.i2p.update.UpdateManager;
 import net.i2p.update.UpdateType;
 import net.i2p.util.Log;
 import net.i2p.util.FileSuffixFilter;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.VersionComparator;
 
 /**
  *  Store and retrieve analysis files from disk.
@@ -256,6 +258,14 @@ public class PersistSybil {
      */
     Map<String, Long> readBlocklist() {
         File f = getBlocklistFile();
+        String prev = _context.getProperty("router.previousFullVersion");
+        if (prev != null &&
+            VersionComparator.comp(prev, "2.5.0-3") < 0 &&
+            VersionComparator.comp(RouterVersion.FULL_VERSION, "2.5.0-3") >= 0) {
+            // clear out and start over
+            f.delete();
+            return null;
+        }
         Map<String, Long> rv = readBlocklist(f);
         if (rv != null)
             notifyVersion(f.lastModified());
