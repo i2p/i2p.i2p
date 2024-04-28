@@ -401,11 +401,11 @@ public class Analysis extends JobImpl implements RouterApp, Runnable {
         // unused here, just for the console, so use the same for all of them
         List<RouterInfo> dummy = new DummyList();
         calculateIPGroupsUs(ris, points, dummy, dummy, dummy, dummy, dummy);
-        calculateIPGroups32(ris, points);
-        calculateIPGroups24(ris, points);
-        calculateIPGroups16(ris, points);
-        calculateIPGroups64(ris, points);
-        calculateIPGroups48(ris, points);
+        //calculateIPGroups32(ris, points);
+        //calculateIPGroups24(ris, points);
+        //calculateIPGroups16(ris, points);
+        //calculateIPGroups64(ris, points);
+        //calculateIPGroups48(ris, points);
 
         // Pairwise distance analysis
         // O(n**2)

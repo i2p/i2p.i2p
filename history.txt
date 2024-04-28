@@ -1,3 +1,9 @@
+2024-04-27 zzz
+ * Sybil: Disable IP checks for now
+
+2024-04-26 zzz
+ * Susimail: Search fixes
+
 2024-04-25 zzz
  * Susimail: Add search box (Gitlab MR !190)
  * Transport: Remove SSU1 code from IMF/IMS (Gitlab MRs !189)
