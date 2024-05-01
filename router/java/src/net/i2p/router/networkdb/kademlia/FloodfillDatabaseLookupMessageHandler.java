@@ -62,7 +62,8 @@ public class FloodfillDatabaseLookupMessageHandler implements HandlerJobBuilder 
         _context.statManager().addRateData("netDb.lookupsReceived", 1);
 
         DatabaseLookupMessage dlm = (DatabaseLookupMessage)receivedMessage;
-        if (dlm.getSearchType() == DatabaseLookupMessage.Type.EXPL &&
+        DatabaseLookupMessage.Type type = dlm.getSearchType();
+        if ((type == DatabaseLookupMessage.Type.EXPL || type == DatabaseLookupMessage.Type.ANY) &&
             !_context.netDb().floodfillEnabled()) {
             if (_log.shouldLog(Log.WARN)) 
                 _log.warn("[dbid: " + _facade
