@@ -54,7 +54,11 @@ jobs:
           rm -f override.properties
           echo "build.built-by=GitHub Actions" >> override.properties
           echo "noExe=true" >> override.properties
-      - name: build with Ant
+      - name: test Debian build with Ant
+        run: ant distclean
+      - name: build mavenCentral deps with Ant
+        run: ant mavenCentral.deps
+      - name: build javadoc with Ant
         run: ant distclean javadoc updater
       - name: zip javadoc
         run: cp i2pupdate.zip build/javadoc/i2pupdate.zip && zip -r javadoc.zip build/javadoc
@@ -91,7 +95,9 @@ jobs:
           echo "build.built-by=GitHub Actions" >> override.properties
           echo "noExe=true" >> override.properties
           echo "javac.compilerargs=-bootclasspath $HOME/openjdk-7/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar:$HOME/openjdk-7/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jce.jar -Xlint:all" >> override.properties
-      - name: build with Ant
+      - name: build mavenCentral deps with Ant
+        run: ant mavenCentral.deps
+      - name: build Maven dev build with Ant
         run: ./installer/resources/maven-dev-release.sh 1
       - name: Upload servlet-i2p.jar
         uses: actions/upload-artifact@v4
