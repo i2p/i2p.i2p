@@ -325,8 +325,14 @@ class ProfilePersistenceHelper {
             profile.setIntegrationBonus((int) getLong(props, "integrationBonus"));
             profile.setSpeedBonus((int) getLong(props, "speedBonus"));
             
-            profile.setLastHeardAbout(getLong(props, "lastHeardAbout"));
-            profile.setFirstHeardAbout(getLong(props, "firstHeardAbout"));
+            long fh = getLong(props, "firstHeardAbout");
+            if (fh <= 0)
+                fh = file.lastModified();
+            profile.setFirstHeardAbout(fh);
+            long lh = getLong(props, "lastHeardAbout");
+            if (lh <= 0)
+                lh = fh;
+            profile.setLastHeardAbout(lh);
             profile.setLastSendSuccessful(getLong(props, "lastSentToSuccessfully"));
             profile.setLastSendFailed(getLong(props, "lastFailedSend"));
             profile.setLastHeardFrom(getLong(props, "lastHeardFrom"));

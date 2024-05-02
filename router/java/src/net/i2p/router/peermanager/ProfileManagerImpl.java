@@ -364,6 +364,7 @@ public class ProfileManagerImpl implements ProfileManager {
         PeerProfile prof = _context.profileOrganizer().getProfile(peer);
         if (prof == null) {
             prof = new PeerProfile(_context, peer);
+            prof.setLastHeardAbout(prof.getFirstHeardAbout());
             _context.profileOrganizer().addProfile(prof);
         }
         return prof;

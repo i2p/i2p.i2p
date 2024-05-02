@@ -269,7 +269,7 @@ public class PeerProfile {
      *  Also sets FirstHeardAbout if earlier
      */
     public synchronized void setLastHeardAbout(long when) {
-        if (_lastHeardAbout <= 0 || when > _lastHeardAbout)
+        if (when > _lastHeardAbout)
             _lastHeardAbout = when;
         // this is called by netdb PersistentDataStore, so fixup first heard
         if (when < _firstHeardAbout)

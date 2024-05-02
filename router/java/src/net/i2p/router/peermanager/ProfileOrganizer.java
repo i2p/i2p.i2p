@@ -218,6 +218,7 @@ public class ProfileOrganizer {
         if (rv != null)
             return rv;
         rv = new PeerProfile(_context, peer);
+        rv.setLastHeardAbout(rv.getFirstHeardAbout());
         rv.coalesceStats();
         if (!tryWriteLock())
             return null;
