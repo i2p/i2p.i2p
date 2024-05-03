@@ -1281,6 +1281,10 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     String validate(RouterInfo routerInfo) throws IllegalArgumentException {
         long now = _context.clock().now();
         boolean upLongEnough = _context.router().getUptime() > 60*60*1000;
+        if (!upLongEnough) {
+            long down = _context.router().getEstimatedDowntime();
+            upLongEnough = down > 0 && down < 10*60*60*1000L;
+        }
         // Once we're over MIN_ROUTERS routers, reduce the expiration time down from the default,
         // as a crude way of limiting memory usage.
         // i.e. at 2*MIN_ROUTERS routers the expiration time will be about half the default, etc.
