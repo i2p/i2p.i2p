@@ -6,6 +6,7 @@ import java.util.Set;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.TunnelId;
+import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.JobImpl;
@@ -55,12 +56,21 @@ class OutboundMessageDistributor {
     public void distribute(I2NPMessage msg, Hash target, TunnelId tunnel) {
         if (shouldDrop(target)) {
             _context.statManager().addRateData("tunnel.dropAtOBEP", 1);
-            if (_log.shouldLog(Log.WARN))
-                 _log.warn("Drop msg at OBEP (new conn throttle) to " + target + ' ' + msg);
+            if (_log.shouldWarn())
+                 _log.warn("Drop msg at OBEP (new conn throttle) to " + target.toBase64() + " type " + msg.getType());
             return;
         }
         RouterInfo info = _context.netDb().lookupRouterInfoLocally(target);
         if (info == null) {
+            if (_toRouters != null) {
+                // only if not zero-hop
+                // credit our lookup message as part. traffic
+                if (_context.tunnelDispatcher().shouldDropParticipatingMessage(TunnelDispatcher.Location.OBEP, DatabaseLookupMessage.MESSAGE_TYPE, 1024)) {
+                    if (_log.shouldWarn())
+                        _log.warn("Drop msg at OBEP (lookup bandwidth) to " + target.toBase64() + " type " + msg.getType());
+                    return;
+                }
+            }
             if (_log.shouldLog(Log.INFO))
                 _log.info("outbound distributor to " + target
                            + "." + (tunnel != null ? tunnel.getTunnelId() + "" : "")
