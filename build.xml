@@ -1435,6 +1435,7 @@
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="apps/i2psnark/i2psnark.config" todir="pkg-temp/" />
         <copy file="installer/resources/blocklist.txt" todir="pkg-temp/" />
+        <copy file="installer/resources/blocklist-tor.txt" todir="pkg-temp/" />
         <copy file="installer/resources/clients.config" todir="pkg-temp/" />
         <copy file="installer/resources/i2ptunnel.config" todir="pkg-temp/" />
         <copy file="installer/resources/wrapper.config" todir="pkg-temp/" />
@@ -1762,6 +1763,7 @@
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="installer/resources/deletelist.txt" todir="pkg-temp/" />
         <copy file="installer/resources/blocklist.txt" todir="pkg-temp/" />
+        <copy file="installer/resources/blocklist-tor.txt" todir="pkg-temp/" />
         <copy todir="pkg-temp/man/">
             <fileset dir="installer/resources/man/" />
         </copy>

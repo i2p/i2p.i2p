@@ -99,6 +99,8 @@ public class Blocklist {
     private static final String BLOCKLIST_FEED_FILE = "docs/feed/blocklist/blocklist.txt";
     /** @since 0.9.48 */
     public static final String BLOCKLIST_COUNTRY_FILE = "blocklist-country.txt";
+    /** @since 0.9.63 */
+    public static final String BLOCKLIST_TOR_FILE = "blocklist-tor.txt";
 
     /**
      *  Limits of transient (in-memory) blocklists.
@@ -123,6 +125,7 @@ public class Blocklist {
     private static final String ID_COUNTRY = "country";
     private static final String ID_USER = "user";
     public static final String ID_SYBIL = "sybil";
+    public static final String ID_TOR = "tor";
 
 
     /**
@@ -172,6 +175,8 @@ public class Blocklist {
             files.add(new BLFile(blFile, ID_LOCAL));
         }
         files.add(new BLFile(_blocklistFeedFile, ID_FEED));
+        blFile = new File(_context.getBaseDir(), BLOCKLIST_TOR_FILE);
+        files.add(new BLFile(blFile, ID_TOR));
         if (_context.router().isHidden() ||
             _context.getBooleanProperty(GeoIP.PROP_BLOCK_MY_COUNTRY)) {
             blFile = new File(_context.getConfigDir(), BLOCKLIST_COUNTRY_FILE);
