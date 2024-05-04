@@ -2141,7 +2141,7 @@ hr.debug:first-of-type {
 }
 
 hr.debug:nth-child(n+7) {
-    margin: -10px 0 4px;
+    margin: 4px 0 4px;
 }
 
 hr.debug:last-child {
@@ -2164,7 +2164,7 @@ hr.debug:last-child {
 
 #dhtDebugInner {
      text-align: left;
-     margin: -24px 0 -13px;
+     margin: 12px 0 -13px;
      padding: 0 8px 1px;
      background: #efefef;
      border-radius: 0 0 2px 2px;
@@ -2206,6 +2206,10 @@ input#toggle_debug:checked + label + #dhtDebugInner {
 .peerinfo td, .debuginfo td {
      padding-top: 5px !important;
      padding-bottom: 5px !important;
+}
+
+.peerinfo td:nth-child(2), .debuginfo td:nth-child(2) {
+     text-align: left;
 }
 
 #totals {
@@ -2829,7 +2833,7 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
 
 @media screen and (max-width: 1500px) {
 #dhtDebugInner {
-     margin-top: -21px !important;
+     margin-top: 2px !important;
      padding-top: 15px;
 }
 }
