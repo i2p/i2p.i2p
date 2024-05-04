@@ -24,10 +24,8 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
- * Search for a particular key iteratively until we either find a value, we run
- * out of peers, or the bucket the key belongs in has sufficient values in it.
- * Well, we're skipping the 'bucket gets filled up' test for now, since it'll never
- * get used (at least for a while).
+ * Send off an exploratory search for a particular key until we
+ * get a DSRM response.
  *
  */
 class ExploreJob extends SearchJob {
