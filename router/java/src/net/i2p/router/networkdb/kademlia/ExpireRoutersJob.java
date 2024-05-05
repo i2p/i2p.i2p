@@ -17,6 +17,7 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.data.router.RouterKeyGenerator;
 import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.JobImpl;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
@@ -75,6 +76,8 @@ class ExpireRoutersJob extends JobImpl {
         RouterKeyGenerator gen = getContext().routerKeyGenerator();
         long now = getContext().clock().now();
         long cutoff = now - 30*60*1000;
+        // for U routers
+        long ucutoff = now - 15*60*1000;
         boolean almostMidnight = gen.getTimeTillMidnight() < FloodfillNetworkDatabaseFacade.NEXT_RKEY_RI_ADVANCE_TIME - 30*60*1000;
         Hash us = getContext().routerHash();
         boolean isFF = _facade.floodfillEnabled();
@@ -99,7 +102,9 @@ class ExpireRoutersJob extends JobImpl {
                 continue;
             if (count > LIMIT_ROUTERS) {
                 // aggressive drop strategy
-                if (e.getDate() < cutoff) {
+                long pub = e.getDate();
+                if (pub < cutoff ||
+                    (pub < ucutoff && ((RouterInfo) e).getCapabilities().indexOf(Router.CAPABILITY_UNREACHABLE) >= 0)) {
                     if (isFF) {
                         // don't drop very close to us
                         byte[] rkey = gen.getRoutingKey(key).getData();

@@ -183,7 +183,6 @@ class FloodfillPeerSelector extends PeerSelector {
     // before we can do this. Old profiles get deleted.
     //private static final long HEARD_AGE = 48*60*60*1000L;
     private static final long HEARD_AGE = 60*60*1000L;
-    private static final long INSTALL_AGE = HEARD_AGE + (60*60*1000L);
 
     /**
      *  See above for description
@@ -220,11 +219,11 @@ class FloodfillPeerSelector extends PeerSelector {
 
         int found = 0;
         long now = _context.clock().now();
-        long installed = _context.getProperty("router.firstInstalled", 0L);
-        boolean enforceHeard = installed > 0 && (now - installed) > INSTALL_AGE;
+        boolean enforceHeard;
 
         double maxFailRate = 0.95;
         if (_context.router().getUptime() > 60*60*1000) {
+            enforceHeard = true;
             RateStat rs = _context.statManager().getRate("peer.failedLookupRate");
             if (rs != null) {
                 Rate r = rs.getRate(60*60*1000);
@@ -233,6 +232,9 @@ class FloodfillPeerSelector extends PeerSelector {
                     maxFailRate = Math.min(0.95d, Math.max(0.20d, 1.25d * currentFailRate));
                 }
             }
+        } else {
+            long down = _context.router().getEstimatedDowntime();
+            enforceHeard = down > 0 && down < 30*60*60*1000L;
         }
 
         // 5 == FNDF.MAX_TO_FLOOD + 1
@@ -281,7 +283,9 @@ class FloodfillPeerSelector extends PeerSelector {
                         maxGoodRespTime = 2 * tunnelTestTime.getAverageValue();
                 }
                 if (prof != null) {
-                    if (enforceHeard && prof.getFirstHeardAbout() > now - HEARD_AGE) {
+                    if (enforceHeard &&
+                        (prof.getLastHeardFrom() <= 0 ||
+                         prof.getFirstHeardAbout() > now - HEARD_AGE)) {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Bad (new): " + entry);
                         badff.add(entry);

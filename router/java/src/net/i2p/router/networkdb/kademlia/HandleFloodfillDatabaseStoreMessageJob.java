@@ -263,6 +263,10 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                         // actually new
                         int count = _facade.getDataStore().size();
                         if (count > LIMIT_ROUTERS) {
+                            String caps = ri.getCapabilities();
+                            boolean isU = caps.indexOf(Router.CAPABILITY_UNREACHABLE) >= 0;
+                            boolean isFF = caps.indexOf(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL) >= 0;
+                            boolean notFrom = !key.equals(_fromHash);
                             if (_facade.floodfillEnabled()) {
                                 // determine if they're "close enough"
                                 // we will still ack and flood by setting wasNew = true even if we don't store locally
@@ -278,7 +282,11 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                     if (until > FloodfillNetworkDatabaseFacade.NEXT_RKEY_RI_ADVANCE_TIME) {
                                         // appx. 90% max drop rate so even just-reseeded new routers will make it eventually
                                         int pdrop = Math.min(110, (128 * count / LIMIT_ROUTERS) - 128);
-                                        if (ri.getCapabilities().indexOf(Router.CAPABILITY_UNREACHABLE) >= 0)
+                                        if (isU)
+                                            pdrop *= 3;
+                                        if (isFF)
+                                            pdrop *= 3;
+                                        if (notFrom)
                                             pdrop *= 3;
                                         if (pdrop > 0 && (pdrop >= 128 || getContext().random().nextInt(128) < pdrop)) {
                                             if (_log.shouldWarn())
@@ -299,7 +307,11 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                                     ((rkey[1] ^ ourRKey[1]) & 0xff);
                                         if (distance >= 256) {
                                             int pdrop = Math.min(110, (128 * count / LIMIT_ROUTERS) - 128);
-                                            if (ri.getCapabilities().indexOf(Router.CAPABILITY_UNREACHABLE) >= 0)
+                                            if (isU)
+                                                pdrop *= 3;
+                                            if (isFF)
+                                                pdrop *= 3;
+                                            if (notFrom)
                                                 pdrop *= 3;
                                             if (pdrop > 0 && (pdrop >= 128 || getContext().random().nextInt(128) < pdrop)) {
                                                 if (_log.shouldWarn())
@@ -322,7 +334,11 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                 // non-ff
                                 // up to 100% drop rate
                                 int pdrop = (128 * count / LIMIT_ROUTERS) - 128;
-                                if (ri.getCapabilities().indexOf(Router.CAPABILITY_UNREACHABLE) >= 0)
+                                if (isU)
+                                    pdrop *= 3;
+                                if (isFF)
+                                    pdrop *= 3;
+                                if (notFrom)
                                     pdrop *= 3;
                                 if (pdrop > 0 && (pdrop >= 128 || getContext().random().nextInt(128) < pdrop)) {
                                     if (_log.shouldWarn())
@@ -443,11 +459,11 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 // Should we record in the profile?
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("(dbid: " + _facade
-                              + ") Peer " + _fromHash.toBase64() + " sent bad data: " + invalidMessage);
+                              + ") Peer " + _fromHash.toBase64() + " sent bad data key: " + key.toBase64() + " replyreq? " + (_message.getReplyToken() > 0) + ": " + invalidMessage);
             }
         } else if (invalidMessage != null && !dontBlamePeer) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("(dbid: " + _facade + ") Unknown peer sent bad data: " + invalidMessage);
+                _log.warn("(dbid: " + _facade + ") Unknown peer sent bad data key: " + key.toBase64() + " replyreq? " + (_message.getReplyToken() > 0) + ": " + invalidMessage);
         }
 
         // flood it

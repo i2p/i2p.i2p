@@ -395,6 +395,7 @@ public class NTCPTransport extends TransportImpl {
                             } catch (DataFormatException dfe) {
                                 if (_log.shouldWarn())
                                     _log.warn("bad address? " + target, dfe);
+                                _context.banlist().banlistRouter(ih, "Bad address", null, null, _context.clock().now() + 15*60*1000L);
                                 fail = true;
                             }
                         } else {
@@ -410,7 +411,7 @@ public class NTCPTransport extends TransportImpl {
             if (fail) {
                 // race, RI changed out from under us, maybe SSU can handle it
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("we bid on a peer who doesn't have an ntcp address? " + target);
+                    _log.warn("we bid on a peer with a bad address? " + target);
                 afterSend(msg, false);
                 return;
             }

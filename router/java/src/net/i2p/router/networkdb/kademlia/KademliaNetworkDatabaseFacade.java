@@ -1306,7 +1306,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             if (existing >= MIN_REMAINING_ROUTERS) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Expired RI " + routerInfo.getIdentity().getHash(), new Exception());
-                return "Peer expired " + DataHelper.formatDuration(age) + " ago";
+                return "RI expired " + DataHelper.formatDuration(age) + " ago";
             } else {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Even though the peer is old, we have only " + existing
@@ -1317,35 +1317,42 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (age < 0 - 2*Router.CLOCK_FUDGE_FACTOR) {
             String skewString = DataHelper.formatDuration(0 - age);
             if (_log.shouldLog(Log.INFO))
-                _log.info("Peer " + routerInfo.getIdentity().getHash() + " published their routerInfo in the future?! [" 
+                _log.info("RI " + routerInfo.getIdentity().getHash() + " published in the future?! [" 
                           + skewString + ']', new Exception());
             if (upLongEnough && _context.commSystem().countActivePeers() >= 50) {
                 // we can be fairly confident that his clock is in the future,
                 // not that ours is in the past, so ban him for a while
                 _context.banlist().banlistRouter(routerInfo.getHash(), "Excessive clock skew: {0}", skewString, null, now + 60*60*1000);
             }
-            return "Peer published " + skewString + " in the future?!";
+            return "RI published " + skewString + " in the future?!";
         }
         if (!routerInfo.isCurrent(ROUTER_INFO_EXPIRATION_INTRODUCED)) {
             if (routerInfo.getAddresses().isEmpty())
-                return "Old peer with no addresses";
+                return "Old RI with no addresses";
             // This should cover the introducers case below too
             // And even better, catches the case where the router is unreachable but knows no introducers
             if (routerInfo.getCapabilities().indexOf(Router.CAPABILITY_UNREACHABLE) >= 0)
-                return "Old peer and thinks it is unreachable";
+                return "Old RI and thinks it is unreachable";
             // Just check all the addresses, faster than getting just the SSU ones
             for (RouterAddress ra : routerInfo.getAddresses()) {
                 // Introducers change often, introducee will ping introducer for 2 hours
                 if (ra.getOption("itag0") != null)
-                    return "Old peer with SSU Introducers";
+                    return "Old RI with SSU Introducers";
             }
         }
         if (upLongEnough && age > 2*24*60*60*1000l) {
-            return "Peer published " + DataHelper.formatDuration(age) + " ago";
+            return "RI published " + DataHelper.formatDuration(age) + " ago";
         }
         if (upLongEnough && !routerInfo.isCurrent(ROUTER_INFO_EXPIRATION_SHORT)) {
             if (routerInfo.getTargetAddresses("NTCP", "NTCP2").isEmpty())
-                return "Peer published > 75m ago, SSU only without introducers";
+                return "RI published > 75m ago, SSU only without introducers";
+        }
+        for (RouterAddress ra : routerInfo.getTargetAddresses("NTCP2")) {
+            String i = ra.getOption("i");
+            if (i != null && i.length() != 24) {
+                _context.banlist().banlistRouter(routerInfo.getIdentity().calculateHash(), "Bad address", null, null, now + 15*60*1000L);
+                return "Bad NTCP2 address";
+            }
         }
         return null;
     }
@@ -1399,7 +1406,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
 
         String err = validate(key, routerInfo);
         if (err != null)
-            throw new IllegalArgumentException("Invalid store attempt - " + err);
+            throw new IllegalArgumentException("Invalid store attempt of RI " + key.toBase64() + " - " + err);
         
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("RouterInfo " + key.toBase64() + " is stored with "

@@ -11,6 +11,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.OutboundTunnelBuildReplyMessage;
 import net.i2p.data.i2np.ShortTunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
@@ -792,6 +793,8 @@ public class TunnelDispatcher implements Service {
             if (type == VariableTunnelBuildMessage.MESSAGE_TYPE || type == TunnelBuildMessage.MESSAGE_TYPE ||
                 type == ShortTunnelBuildMessage.MESSAGE_TYPE)
                 factor = 1 / 1.5f;
+            else if (type == DatabaseLookupMessage.MESSAGE_TYPE && length < 1024)
+                factor = 8f;
             else
                 factor = 1.5f;
         } else if (loc == Location.IBGW) {
