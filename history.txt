@@ -1,3 +1,20 @@
+2024-05-05 zzz
+ * NetDB: Various fixes and adjustments
+ * Pull translations from Transifex
+
+2024-05-03 zzz
+ * NetDB: Don't lookup RI if temp. banlisted
+ * Router: Add Tor blocklist
+ * Tunnels: OBEP distributor: Check and charge RI lookup bandwidth
+
+2024-05-02 zzz
+ * Profiles: Fixes for firstHeardAbout and/or lastHeardAbout being zero 
+
+2024-05-01 zzz
+ * NetDB:
+   - Limit number of DSRM entries to follow
+   - Deny old ANY lookup type to non-ff
+
 2024-04-27 zzz
  * Sybil: Disable IP checks for now
 
