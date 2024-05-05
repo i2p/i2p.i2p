@@ -31,28 +31,28 @@ msgstr "vnitřní"
 #, java-format
 msgid "{0} inbound tunnel"
 msgid_plural "{0} inbound tunnels"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{0} příchozí tunel"
+msgstr[1] "{0} příchozí tunely"
+msgstr[2] "{0} příchozích tunelů"
+msgstr[3] "{0} příchozích tunelů"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:555
 #, java-format
 msgid "{0} outbound tunnel"
 msgid_plural "{0} outbound tunnels"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{0} odchozí tunel"
+msgstr[1] "{0} odchozí tunely"
+msgstr[2] "{0} odchozích tunelů"
+msgstr[3] "{0} odchozích tunelů"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:557
 #, java-format
 msgid "{0} inbound, {0} outbound tunnel"
 msgid_plural "{0} inbound, {0} outbound tunnels"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{0} příchozí, {0} odchozí tunel"
+msgstr[1] "{0} příchozí, {0} odchozí tunely"
+msgstr[2] "{0} příchozí, {0} odchozích tunelů"
+msgstr[3] "{0} příchozí, {0} odchozích tunelů"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:561
 msgid "lower bandwidth and reliability"
@@ -70,7 +70,7 @@ msgstr "vyšší šířka pásma a spolehlivost"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:615
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:1093
 msgid "Tunnels are not initialized yet, please reload in two minutes."
-msgstr ""
+msgstr "Tunely nejsou ještě zprovozněny, prosím proveďte obnovu za dvě minuty."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:190
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:314
@@ -115,15 +115,15 @@ msgstr "Port není nastaven"
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:455
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:570
 msgid "Invalid port"
-msgstr ""
+msgstr "Neplatný port"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:458
 msgid "Warning - ports less than 1024 are not recommended"
-msgstr ""
+msgstr "Varování - porty s čísly menšími než 1024 nejsou doporučeny"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:475
 msgid "Warning - duplicate port"
-msgstr ""
+msgstr "Varování - duplicitní port"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:494
 msgid "Standard client"
@@ -131,7 +131,7 @@ msgstr "Standardní klient"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:495
 msgid "HTTP/HTTPS client"
-msgstr ""
+msgstr "HTTP/HTTPS klient"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:496
 msgid "IRC client"
@@ -180,7 +180,7 @@ msgstr "Host není nastaven"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:564
 msgid "Invalid address"
-msgstr ""
+msgstr "Neplatná adresa"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:168
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:153
@@ -188,19 +188,19 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:185
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:178
 msgid "Hidden Services Manager"
-msgstr ""
+msgstr "Manažer skrytých služeb"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:172
 msgid "Edit Client Tunnel"
-msgstr ""
+msgstr "Upravit klientský tunel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:172
 msgid "Edit Hidden Service"
-msgstr ""
+msgstr "Upravit skrytou službu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:184
 msgid "Are you sure you want to delete?"
-msgstr ""
+msgstr "Opravdu chcete smazat?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:208
 msgid "Edit proxy settings"
@@ -231,7 +231,7 @@ msgstr "Typ"
 msgid ""
 "Name of tunnel to be displayed on Tunnel Manager home page and the router "
 "console sidebar"
-msgstr ""
+msgstr "Název tunelu, který se má zobrazit na domovské stránce manažera tunelů a na bočním panelu konzole routeru"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:270
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1144
@@ -244,13 +244,13 @@ msgstr "Popis"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:272
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1146
 msgid "Auto Start Tunnel"
-msgstr ""
+msgstr "Automatické spuštění tunelu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:274
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1148
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:458
 msgid "Description of tunnel to be displayed on Tunnel Manager home page"
-msgstr ""
+msgstr "Popis tunelu, který se má zobrazit na domovské stránce manažera tunelů"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:278
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1152
@@ -258,23 +258,23 @@ msgstr ""
 msgid ""
 "Enable this option to ensure this service is available when the router "
 "starts"
-msgstr ""
+msgstr "Zapněte tuto volbu pro zajištění dostupnosti této služby po startu routeru"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:282
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1156
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:605
 msgid "Automatically start tunnel when router starts"
-msgstr ""
+msgstr "Automaticky spustit tunel po startu routeru"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:286
 msgid ""
 "The client tunnel and all other shared client tunnels must be stopped to "
 "change this setting"
-msgstr ""
+msgstr "Klientský tunel a všechny ostatní sdílené klientské tunely musí být pro změnu této volby zastaveny"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:287
 msgid "The client tunnel must be stopped to change this setting"
-msgstr ""
+msgstr "Klientský tunel musí být zastaven pro změnu této volby"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:301
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1175
@@ -303,7 +303,7 @@ msgstr "Port"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1193
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:552
 msgid "Specify the local port this service should be accessible from"
-msgstr ""
+msgstr "Stanovte místní port, na kterém bude tato služba dostupná"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:318
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:336
@@ -330,11 +330,11 @@ msgstr "Host"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1184
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:523
 msgid "Hostname or IP address of the target server"
-msgstr ""
+msgstr "Jméno hostitele nebo IP adresa cílového serveru"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:340
 msgid "Local interface (ip address) the client tunnel will be reachable from"
-msgstr ""
+msgstr "Místní rozhraní (IP adresa) na kterém bude dostupný klientský tunel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:344
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1242
@@ -345,18 +345,18 @@ msgstr "Dosažitelné (kým)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:373
 msgid "Use SSL?"
-msgstr ""
+msgstr "Použít SSL?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:375
 msgid ""
 "If you are accessing a service on a remote I2P router, you may wish to "
 "connect with SSL to avoid traffic interception. The client application "
 "should be also be configured to use SSL."
-msgstr ""
+msgstr "Pokud přistupujete ke službě na vzdáleném I2P routeru, možná se budete chtít připojit pomocí SSL, abyste předešli zachycení síťového provozu. Klientská aplikace by měla být také nastavena na používání SSL."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:379
 msgid "Clients use SSL to connect to tunnel"
-msgstr ""
+msgstr "Klienti používají SSL pro připojení k tunelu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:387
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:478
@@ -367,7 +367,7 @@ msgstr "Výstupní proxy (Outproxies)"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:428
 msgid ""
 "Specify the .i2p address or destination (b32 or b64) of the outproxy here."
-msgstr ""
+msgstr "Zde stanovte outproxy .i2p adresu nebo cíl (b32 nebo b64)."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:403
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:430
@@ -375,29 +375,29 @@ msgstr ""
 msgid ""
 "For a random selection from a pool, separate with commas e.g. "
 "server1.i2p,server2.i2p"
-msgstr ""
+msgstr "Pro náhodný výběr ze zásobníku oddělte čárkami, např. server1.i2p,server2.i2p"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:412
 msgid "Outproxy Type"
-msgstr ""
+msgstr "Typ outproxy"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:426
 msgid "SSL Outproxies"
-msgstr ""
+msgstr "SSL outproxy"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:438
 msgid "Use Outproxy Plugin"
-msgstr ""
+msgstr "Použít outproxy plugin"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:440
 msgid ""
 "If an outproxy plugin is installed (e.g. Orchid), use this instead of any "
 "configured outproxies to access websites outside of I2P"
-msgstr ""
+msgstr "Pokud je nainstalován plugin outproxy (např. Orchid), použijte ho místo jiných nastavených outproxies pro přístup k webovým stránkám mimo I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:444
 msgid "Use plugin instead of above-listed proxies if available"
-msgstr ""
+msgstr "Použijte plugin (pokud je dostupný) místo proxy vypsaných výše"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:450
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:494
@@ -407,12 +407,12 @@ msgstr "Cíl tunelu"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:452
 msgid ""
 "Specify the .i2p address or destination (b32 or b64) of the tunnel here."
-msgstr ""
+msgstr "Zde stanovte .i2p adresu tunelu nebo cíl (b32 nebo b64)."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:460
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:502
 msgid "name, name:port, or destination"
-msgstr ""
+msgstr "název, název:port, nebo cíl"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:466
 msgid "b32 not recommended"
@@ -428,25 +428,25 @@ msgid ""
 "Traffic from all clients with this feature enabled will be routed over the "
 "same set of tunnels. This will make profiling the tunnels by an adversary "
 "more difficult, but will link the clients together."
-msgstr ""
+msgstr "Síťový provoz od všech klientů, kteří mají zapnutu tuto funkci, bude směrován přes stejnou sadu tunelů. Toto ztíží profilování tunelů protivníkem, ale přesto vzájemně spojí klienty."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:495
 msgid "Share tunnels with other clients?"
-msgstr ""
+msgstr "Sdílet tunely s ostatními klienty?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:513
 msgid "Enable DCC"
-msgstr ""
+msgstr "Zapnout DCC"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:515
 msgid "Enables direct chat and file transfers, bypassing I2P"
-msgstr ""
+msgstr "Zapne přímý chat a přenosy souborů, obejde I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:519
 msgid ""
 "Enable Direct Client-to-Client protocol. Note that this will compromise your"
 " anonymity and is <i>not</i> recommended."
-msgstr ""
+msgstr "Zapněte přímý protokol klienta ke klientovi. Berte na vědomí, že toto zkompromituje vaší anonymitu a <i>není</i> doporučeno."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:525
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1412
@@ -457,12 +457,12 @@ msgstr "Rozšířená síťová nastavení"
 msgid ""
 "Note: When this client proxy is configured to share tunnels, then these "
 "options are for all the shared proxy clients!"
-msgstr ""
+msgstr "Poznámka: V případě, že je nastavena proxy klienta pro sdílení tunelů, potom tyto možnosti platí pro všechny klienty sdílené proxy!"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:539
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1414
 msgid "Tunnel Length Options"
-msgstr ""
+msgstr "Možnosti délky tunelu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:541
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1425
@@ -474,13 +474,13 @@ msgstr "Délka"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1427
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1535
 msgid "Variance"
-msgstr "Odchylka"
+msgstr "Rozptyl"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:545
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1429
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1537
 msgid "Length of each Tunnel"
-msgstr ""
+msgstr "Délka každého z tunelů"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:553
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:558
@@ -511,100 +511,100 @@ msgstr ""
 #, java-format
 msgid "{0} hop tunnel"
 msgid_plural "{0} hop tunnel"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Tunel s {0} skokem"
+msgstr[1] "Tunel se {0} skoky"
+msgstr[2] "Tunel s {0} skoky"
+msgstr[3] "Tunel s {0} skoky"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:554
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1437
 msgid "no anonymity"
-msgstr ""
+msgstr "žádná anonymita"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:559
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1442
 msgid "low anonymity"
-msgstr ""
+msgstr "nízká anonymita"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:564
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1447
 msgid "medium anonymity"
-msgstr ""
+msgstr "střední anonymita"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:569
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1452
 msgid "high anonymity"
-msgstr ""
+msgstr "vysoká anonymita"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:601
 msgid "Level of Randomization for Tunnel Length"
-msgstr ""
+msgstr "Úroveň náhodného výběru délky tunelu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:608
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1490
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1581
 msgid "0 hop variance"
-msgstr ""
+msgstr "rozptyl skoků 0"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:609
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1491
 msgid "no randomization, consistent performance"
-msgstr ""
+msgstr "žádná náhodnost, konzistentní výkon"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:613
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1495
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1585
 msgid "+ 0-1 hop variance"
-msgstr ""
+msgstr "rozptyl + 0-1 skoku"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:614
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1496
 msgid "medium randomization, lower performance"
-msgstr ""
+msgstr "střední náhodnost, nižší výkon"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:618
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1500
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1589
 msgid "+ 0-2 hop variance"
-msgstr ""
+msgstr "rozptyl + 0-2 skoků"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:619
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1501
 msgid "high randomization, very low performance"
-msgstr ""
+msgstr "vysoká náhodnost, velmi nízký výkon"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:623
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1505
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1593
 msgid "+/- 0-1 hop variance"
-msgstr ""
+msgstr "rozptyl +/- 0-1 skoku"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:624
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1506
 msgid "standard randomization, standard performance"
-msgstr ""
+msgstr "standardní náhodnost, standardní výkon"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:628
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1510
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1597
 msgid "+/- 0-2 hop variance"
-msgstr ""
+msgstr "rozptyl +/- 0-2 skoků"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:629
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1511
 msgid "not recommended"
-msgstr ""
+msgstr "není doporučeno"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:640
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1522
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1608
 msgid "hop variance"
-msgstr "odchylka hop"
+msgstr "rozptyl skoků"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:645
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1617
 msgid "Tunnel Quantity Options"
-msgstr ""
+msgstr "Možnosti množství tunelů"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:647
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1628
@@ -622,13 +622,13 @@ msgstr "Počet Záloh"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1632
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1682
 msgid "Number of Tunnels in Group"
-msgstr ""
+msgstr "Počet tunelů ve skupině"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:655
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1636
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1686
 msgid "Number of Reserve Tunnels"
-msgstr ""
+msgstr "Počet rezervních tunelů"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:663
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:668
@@ -648,34 +648,34 @@ msgstr ""
 #, java-format
 msgid "{0} backup tunnel"
 msgid_plural "{0} backup tunnels"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{0}  záložní tunel"
+msgstr[1] "{0} záložní tunely"
+msgstr[2] "{0} záložních tunelů"
+msgstr[3] "{0} záložních tunelů"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:664
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1644
 msgid "no redundancy, no added resource usage"
-msgstr ""
+msgstr "žádné zálohování, žádné využití prostředků navíc"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:669
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1649
 msgid "low redundancy, low resource usage"
-msgstr ""
+msgstr "nízké zálohování, nízké využití prostředků navíc"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:674
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1654
 msgid "medium redundancy, medium resource usage"
-msgstr ""
+msgstr "střední zálohování, střední využití prostředků navíc"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:679
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1659
 msgid "high redundancy, high resource usage"
-msgstr ""
+msgstr "vysoké zálohování, vysoké využití prostředků navíc"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:693
 msgid "Tunnel Management Options"
-msgstr ""
+msgstr "Možnosti správy tunelu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:699
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2268
@@ -689,7 +689,7 @@ msgstr "Spozdit Připojení"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:703
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2270
 msgid "Connection Profile"
-msgstr ""
+msgstr "Profil připojení"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:710
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2277
@@ -703,7 +703,7 @@ msgstr "hromadné spojení (stahování/webové stránky/BT)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:716
 msgid "Delay Connection"
-msgstr ""
+msgstr "Pozdržení připojení"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:720
 msgid "for request/response connections"
@@ -715,13 +715,13 @@ msgstr "Zpozdit otevření tunelu dokud není vyžadováno"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:734
 msgid "Conserve resources by only creating tunnels when required"
-msgstr ""
+msgstr "Ušetřete prostředky vytvořením tunelů pouze když jsou vyžadovány"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:738
 msgid ""
 "Delay opening client tunnel until activity is detected on the configured "
 "tunnel port"
-msgstr ""
+msgstr "Pozdržení otevření klientského tunelu dokud je rozpoznávána aktivita na stanoveném portu tunelu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:744
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2287
@@ -732,12 +732,12 @@ msgstr "Snížit kvantitu tunelu při nečinnosti"
 msgid ""
 "Reduce tunnel count when idle but keep tunnel open (to ensure immediate "
 "availability)"
-msgstr ""
+msgstr "Omezení počtu tunelů při nečinnosti ale zachování otevřeného tunelu (pro zajištění okamžité dostupnosti)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:750
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2291
 msgid "Reduce tunnel quantity when idle to conserve resources"
-msgstr ""
+msgstr "Omezení počtu tunelů při nečinnosti pro ušetření prostředků"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:752
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:754
@@ -749,11 +749,11 @@ msgstr "Snížený počet tunelů"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:772
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2299
 msgid "Idle period"
-msgstr ""
+msgstr "Perioda nečinnosti"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:760
 msgid "Reduced Tunnel Idle Time"
-msgstr ""
+msgstr "Snížený čas nečinnosti tunelu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:764
 msgid "Close tunnels when idle"
@@ -761,23 +761,23 @@ msgstr "Zavřít tunely při nečinnosti"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:766
 msgid "To conserve resources, close tunnels when not in use"
-msgstr ""
+msgstr "Pro ušetření prostředků zavře tunely, které nejsou použity"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:770
 msgid "Close client tunnels after specified idle period"
-msgstr ""
+msgstr "Zavře klientské tunely po stanovené periodě nečinnosti"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:774
 msgid "Close Tunnel Idle Time"
-msgstr ""
+msgstr "Čas nečinnosti zavření tunelů"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:784
 msgid "Change tunnel identity (destination) when tunnels reopen"
-msgstr ""
+msgstr "Změnit identitu tunelu (cíle) při opětovném otevření tunelů"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:786
 msgid "Retain tunnel identity (destination) when tunnels reopen"
-msgstr ""
+msgstr "Uchovat identitu tunelu (cíle) při opětovném otevření tunelů"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:792
 msgid "New Keys on Reopen"
@@ -803,17 +803,17 @@ msgid ""
 "Enabling this feature will ensure your tunnel identity (destination) remains"
 " static, for services offering features based on destination e.g. IRC user "
 "authentication"
-msgstr ""
+msgstr "Zapnutím této funkce dojde k zajištění, že identita vašeho tunelu (cíl) zůstane stejná, pro služby nabízející funkce založené na cíli, např. autentizace uživatele IRC"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:821
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1297
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2100
 msgid "Path to Private Key File"
-msgstr ""
+msgstr "Cesta k souboru soukromého klíče"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:830
 msgid "Generate key to enable persistent client tunnel identity"
-msgstr ""
+msgstr "Vygenerujte klíč pro umožnění trvalé identity klientského tunelu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:832
 msgid "File"
@@ -827,96 +827,96 @@ msgstr "Místní cíl"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:846
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1292
 msgid "Read Only: Local Destination (if known)"
-msgstr ""
+msgstr "Jen pro čtení: Místní cíl (pokud je znám)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:850
 msgid "Local Base32"
-msgstr ""
+msgstr "Místní Base32"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:861
 msgid "Tunnel Filtering Options"
-msgstr ""
+msgstr "Možnosti filtrování tunelu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:863
 msgid "HTTP Filtering"
-msgstr ""
+msgstr "HTTP filtrování"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:865
 msgid ""
 "When enabled, the user agent of your web browser or http client will not be "
 "spoofed, potentially reducing your anonymity"
-msgstr ""
+msgstr "Pokud je zapnuto, User Agent vašeho webového prohlížeče nebo http klienta nebude podvržen, což by potenciálně snížilo vaši anonymitu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:869
 msgid "Do not spoof User-Agent header"
-msgstr ""
+msgstr "Nepodvrhovat hlavičku User-Agent"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:871
 msgid ""
 "When enabled, the referer (originating page) of your web requests will not "
 "be filtered, potentially reducing your anonymity"
-msgstr ""
+msgstr "Při zapnutí nebude filtrován referent (původní stránka) vašich webových požadavků, což potenciálně sníží vaši anonymitu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:875
 msgid "Do not block Referer header"
-msgstr ""
+msgstr "Neblokovat hlavičku referent"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:877
 msgid ""
 "When enabled, the accept headers (mime types support) broadcast by your web "
 "browser will not be filtered, potentially reducing your anonymity"
-msgstr ""
+msgstr "Při zapnutí nebude vaším webovým prohlížečem filtrováno vysílání přijatých hlaviček Accept (podpora mime typů), což potenciálně sníží vaši anonymitu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:881
 msgid "Do not block Accept headers"
-msgstr ""
+msgstr "Neblokovat přijaté hlavičky Accept"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:883
 msgid "Allow SSL to I2P addresses when enabled"
-msgstr ""
+msgstr "Povolit SSL I2P adresám kde je zapnuto"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:887
 msgid "Allow SSL to I2P addresses"
-msgstr ""
+msgstr "Povolit SSL I2P adresám"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:895
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2023
 msgid "Configuration cannot be changed after destination is created"
-msgstr ""
+msgstr "Nastavení nemůže být změněno po vytvoření cíle"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:900
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1728
 msgid "Tunnel Cryptography Options"
-msgstr ""
+msgstr "Možnosti kryptografie tunelu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:904
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2032
 msgid "Signature type"
-msgstr ""
+msgstr "Typ podpisu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:908
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2036
 msgid "Legacy option (deprecated), provided for backward compatibility"
-msgstr ""
+msgstr "Původní zastaralá možnost, poskytnutá pro zpětnou kompatibilitu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:937
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2057
 msgid "This is the default, recommended option"
-msgstr ""
+msgstr "Toto je výchozí doporučená možnost"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:952
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2079
 msgid "Encryption types"
-msgstr ""
+msgstr "Typy šifrování"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:966
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2093
 msgid "Both encryption types"
-msgstr ""
+msgstr "Oba typy šifrování"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:972
 msgid "Tunnel Authentication Options"
-msgstr ""
+msgstr "Možnosti autentizace tunelu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:974
 msgid "Local Authorization"
@@ -926,11 +926,11 @@ msgstr "Místní Autorizace"
 msgid ""
 "Enable to require a username and password to access this local service (for "
 "example if hosting on a LAN)"
-msgstr ""
+msgstr "Zapněte pro vyžadování uživatelského jména a hesla pro přístup k této místní službě (např. pokud hostujete na místní síti LAN)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:980
 msgid "Require local authorization for this service"
-msgstr ""
+msgstr "Vyžadovat pro tuto službu místní autorizaci"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:982
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:998
@@ -939,7 +939,7 @@ msgstr "Uživatelské jméno"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:984
 msgid "Set username required to access this service"
-msgstr ""
+msgstr "Nastavte uživatelské jméno vyžadované pro přístup k této službě"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:986
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1004
@@ -950,7 +950,7 @@ msgstr "Heslo"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1863
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:1043
 msgid "Set password required to access this service"
-msgstr ""
+msgstr "Nastavte heslo vyžadované pro přístup k této službě"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:990
 msgid "Outproxy Authorization"
@@ -958,23 +958,23 @@ msgstr "Outproxy Autorizace"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:992
 msgid "Enable if the outproxy a username and password to access"
-msgstr ""
+msgstr "Zapněte pokud outproxy vyžaduje pro přístup uživatelské jméno a heslo"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:996
 msgid "Outproxy requires authorization"
-msgstr ""
+msgstr "Outproxy vyžaduje autorizaci"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1000
 msgid "Enter username required by outproxy"
-msgstr ""
+msgstr "Zadejte uživatelské jméno, které vyžaduje outproxy"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1006
 msgid "Enter password required by outproxy"
-msgstr ""
+msgstr "Zadejte heslo, které vyžaduje outproxy"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1016
 msgid "Tunnel Address Lookup Options"
-msgstr ""
+msgstr "Možnosti vyhledávání adresy tunelu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1018
 msgid "Jump URL List"
@@ -984,7 +984,7 @@ msgstr "Skočit v Seznamu URL"
 msgid ""
 "List of helper URLs providing jump links when a host is not found in your "
 "addressbook"
-msgstr ""
+msgstr "Seznam pomocných URL s odkazy pro případ, že není hostitel nalezen ve vašem adresáři"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1032
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2403
@@ -994,12 +994,12 @@ msgstr "Adresa Routeru I2CP"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1036
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2407
 msgid "I2CP Hostname or IP"
-msgstr ""
+msgstr "I2CP jméno hostitele nebo IP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1042
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2413
 msgid "I2CP Port Number"
-msgstr ""
+msgstr "I2CP číslo portu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1050
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2421
@@ -1009,7 +1009,7 @@ msgstr "Vlastní možnosti"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1052
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2423
 msgid "Advanced tunnel, streaming, and I2CP options"
-msgstr ""
+msgstr "Pokročilý tunel, streamování a možnosti I2CP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1056
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2427
@@ -1021,7 +1021,7 @@ msgstr "Zrušit"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1062
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2433
 msgid "Delete this Proxy (cannot be undone)"
-msgstr ""
+msgstr "Smazat tento proxy (nelze vzít zpět)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1064
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2435
@@ -1035,20 +1035,20 @@ msgstr "Uložit"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1083
 msgid "Edit Server Settings"
-msgstr ""
+msgstr "Upravit nastavení serveru"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1094
 msgid "New Server Settings"
-msgstr ""
+msgstr "Nové nastavení serveru"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1159
 msgid "The hidden service must be stopped to change this setting"
-msgstr ""
+msgstr "Skrytá služba musí být zastavena pro změnu této volby"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1194
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:533
 msgid "Specify the port the server is running on"
-msgstr ""
+msgstr "Stanovte port, na kterém server běží"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1209
 msgid ""
@@ -1108,7 +1108,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1369
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2163
 msgid "Add to local addressbook"
-msgstr "Přidat do lokální knihy kontaktů (addressbook)"
+msgstr "Přidat do lokálního adresáře"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1375
 msgid "Register, unregister or change details for hostname"
@@ -1173,11 +1173,11 @@ msgstr "Zašifrováno"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1773
 msgid "Prevents server discovery by floodfills"
-msgstr ""
+msgstr "Předchází nalezení serveru floodfilly"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1777
 msgid "Blinded"
-msgstr ""
+msgstr "Skryto"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1783
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1808
@@ -1187,7 +1187,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1787
 msgid "Blinded with lookup password"
-msgstr ""
+msgstr "Skryto pomocí vyhledávacího hesla"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1795
 msgid "Send key and password to all users."
@@ -1195,7 +1195,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1799
 msgid "Encrypted with lookup password"
-msgstr ""
+msgstr "Šifrováno vyhledávacím heslem"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1801
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1807
@@ -1219,7 +1219,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1838
 msgid "Optional lookup password"
-msgstr ""
+msgstr "Volitelné vyhledávací heslo"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1853
 msgid "Encryption Key"
@@ -1726,7 +1726,7 @@ msgstr ""
 msgid ""
 "This service uses encrypted leasesets. Registration is not recommended. "
 "Registration authentication is disabled."
-msgstr "Tato služba používá šifrované leasesety. Registrace není doporučena. Ověření registrace je vypnuto."
+msgstr "Tato služba používá šifrované sety pronájmu. Registrace není doporučena. Ověření registrace je vypnuto."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:246
 msgid ""

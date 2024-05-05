@@ -4162,7 +4162,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:47
 msgid "UDP"
-msgstr ""
+msgstr "UDP"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:64
 msgid "Statistics gathered during this router's uptime"
@@ -5218,7 +5218,7 @@ msgstr "Proxy IRC"
 
 #: ../java/strings/Strings.java:37
 msgid "I2P Site"
-msgstr ""
+msgstr "Situs I2P"
 
 #: ../java/strings/Strings.java:38
 msgid "I2P webserver"

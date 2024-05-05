@@ -102,19 +102,19 @@ msgstr "Testování"
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:142
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:545
 msgid "Rejecting tunnels: Starting up"
-msgstr "Odmítnutí tunelů: Uvádění do provozu"
+msgstr "Odmítání tunelů: Uvádění do provozu"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:189
 msgid "Rejecting tunnels: High message delay"
-msgstr "Odmítám tunely: velké spoždění zprávy"
+msgstr "Odmítání tunelů: velké zpoždění zprávy"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:202
 msgid "Rejecting tunnels: Limit reached"
-msgstr "Odmítám tunely: limit dosažen"
+msgstr "Odmítání tunelů: limit dosažen"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:241
 msgid "Rejecting most tunnels: High number of requests"
-msgstr "Odmítám tunely: velké množství požadavků"
+msgstr "Odmítání většiny tunelů: velké množství požadavků"
 
 #. hard to do {0} from here
 #. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of
@@ -135,22 +135,22 @@ msgstr "Přijetí tunelů"
 #. always leave at least 4KBps free when allowing
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:350
 msgid "Rejecting tunnels: Bandwidth limit"
-msgstr "Odmítnutí tunelů: limit rychlosti"
+msgstr "Odmítání tunelů: limit rychlosti"
 
 #. hard to do {0} from here
 #. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels:
 #. Bandwidth limit");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:420
 msgid "Rejecting most tunnels: Bandwidth limit"
-msgstr "Odmítnutí většiny tunelů: limit rychlost"
+msgstr "Odmítání většiny tunelů: limit rychlost"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:550
 msgid "Rejecting tunnels: Shutting down"
-msgstr "Odmítám tunely: vypínání"
+msgstr "Odmítání tunelů: vypínání"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:563
 msgid "Rejecting tunnels"
-msgstr "Odmítnutí tunelů"
+msgstr "Odmítání tunelů"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:260
 msgid "Dropping tunnel requests: Too slow"
@@ -167,15 +167,15 @@ msgstr "Zahazování požadavků tunelu: Přetíženo"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:747
 msgid "Rejecting tunnels: Hidden mode"
-msgstr "Odmítnutí tunelů: Skrytý režim"
+msgstr "Odmítání tunelů: Skrytý režim"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:775
 msgid "Rejecting tunnels: Request overload"
-msgstr "Odmítnutí tunelů: Přetížení mnoha požadavky"
+msgstr "Odmítání tunelů: Přetížení mnoha požadavky"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:806
 msgid "Rejecting tunnels: Connection limit"
-msgstr "Odmítnutí tunelů: Limit počtu spojení"
+msgstr "Odmítání tunelů: Limit počtu spojení"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1024
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1057

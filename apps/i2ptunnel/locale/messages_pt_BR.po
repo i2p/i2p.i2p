@@ -4,6 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Bruno Trojahn Bolzan, 2024
 # Cauan Henrique Zorzenon <cauanzorzenon@gmail.com>, 2023-2024
 # testsubject67 <deborinha97@hotmail.com>, 2014
 # Eduardo Rodrigues, 2021
@@ -16,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-04 23:26+0000\n"
 "PO-Revision-Date: 2011-02-13 11:46+0000\n"
-"Last-Translator: Cauan Henrique Zorzenon <cauanzorzenon@gmail.com>, 2023-2024\n"
+"Last-Translator: Bruno Trojahn Bolzan, 2024\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/otf/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -49,21 +50,21 @@ msgstr[2] "{0} túneis de saída"
 #, java-format
 msgid "{0} inbound, {0} outbound tunnel"
 msgid_plural "{0} inbound, {0} outbound tunnels"
-msgstr[0] "{0} túnel penetrante, {0} túnel de fuga"
-msgstr[1] "{0} túneis penetrantes, {0} túneis de fuga"
-msgstr[2] "{0} túneis penetrantes, {0} túneis de fuga"
+msgstr[0] "{0} túnel de entrada, {0} túnel de saída"
+msgstr[1] "{0} túneis de entrada, {0} túneis de saída"
+msgstr[2] "{0} túneis de entrada, {0} túneis de saída"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:561
 msgid "lower bandwidth and reliability"
-msgstr "banda-larga com taxa de dados menor e confiabilidade"
+msgstr "menor estabilidade e largura de banda"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:563
 msgid "standard bandwidth and reliability"
-msgstr "banda-larga com taxa de dados padrão e confiabilidade"
+msgstr "largura de banda e estabilidade padrão"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:565
 msgid "higher bandwidth and reliability"
-msgstr "banda-larga com taxa de dados maior e confiabilidade"
+msgstr "maior estabilidade e largura de banda"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:103
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:615
@@ -130,7 +131,7 @@ msgstr "Cliente padrão"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:495
 msgid "HTTP/HTTPS client"
-msgstr "cliente HTTP/HTTPS"
+msgstr "Cliente HTTP/HTTPS"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:496
 msgid "IRC client"
@@ -158,7 +159,7 @@ msgstr "CONNECT/SSL/HTTPS proxy"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:502
 msgid "IRC server"
-msgstr "servidor IRC"
+msgstr "Servidor IRC"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:503
 msgid "Streamr client"
@@ -510,9 +511,9 @@ msgstr "Comprimento de cada túnel"
 #, java-format
 msgid "{0} hop tunnel"
 msgid_plural "{0} hop tunnel"
-msgstr[0] "{0} Túnel de Lúpulo"
-msgstr[1] "{0} Túnel hop"
-msgstr[2] "{0} Túnel hop"
+msgstr[0] "{0} salto de túnel"
+msgstr[1] "{0} saltos de túnel"
+msgstr[2] "{0} saltos de túnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:554
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1437
@@ -527,7 +528,7 @@ msgstr "baixo anonimato"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:564
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1447
 msgid "medium anonymity"
-msgstr "Anonimato médio"
+msgstr "anonimato médio"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:569
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1452
@@ -1648,19 +1649,19 @@ msgstr "Destino"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:370
 msgid "Hostname"
-msgstr "Servidor"
+msgstr "Nome de host"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:411
 msgid "Share your site using the hostname"
-msgstr ""
+msgstr "Compartilhar seu site usando o nome de host"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:432
 msgid "Copy the hostname to the clipboard"
-msgstr ""
+msgstr "Copiar o nome de host para a área de transferência"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:435
 msgid "Copy Hostname"
-msgstr ""
+msgstr "Copiar Nome de Host"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:451
 msgid "New hidden service"
@@ -1723,19 +1724,19 @@ msgstr "Auxiliar de registro"
 msgid ""
 "This service uses encrypted leasesets. Registration is not recommended. "
 "Registration authentication is disabled."
-msgstr ""
+msgstr "Esse serviço usa leasesets criptografados. Não é recomendado o registro. A autenticação de registro está desabilitada."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:246
 msgid ""
 "Please be sure to select, copy, and paste the entire contents of the "
 "appropriate authentication data into the form of your favorite registration "
 "site"
-msgstr ""
+msgstr "Por favor, assegure-se de selecionar, copiar e colar o conteúdo inteiro dos dados de autenticação apropriados no formulário do seu site de registro favorito"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:248
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:663
 msgid "Tunnel name"
-msgstr ""
+msgstr "Nome do túnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:256
 msgid "Website name"
@@ -1743,40 +1744,40 @@ msgstr "Nome do website"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:264
 msgid "Local Destination"
-msgstr ""
+msgstr "Destino local"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:272
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:668
 msgid "Local destination is not available. Start the tunnel."
-msgstr ""
+msgstr "O destino local não está disponível. Inicie o túnel."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:279
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:675
 msgid ""
 "To enable registration verification, edit tunnel and set name (or website "
 "name) to a valid hostname ending in '.i2p'"
-msgstr ""
+msgstr "Para habilitar a verificação de registro, edite o túnel e defina o nome (ou nome do website) para um nome de host válido terminado em '.i2p'"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:285
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:681
 msgid ""
 "To enable registration verification, edit tunnel and set name to a valid "
 "hostname ending in '.i2p'"
-msgstr ""
+msgstr "Para habilitar a verificação de registro, edite o túnel e defina o nome (ou nome do website) para um nome de host válido terminado em '.i2p'"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:294
 msgid "Destination signing key is not available. Start the tunnel."
-msgstr ""
+msgstr "A chave de assinatura do destino não está disponível. Inicie o túnel."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:300
 msgid ""
 "Destination signing key is offline. Use CLI tools on the offline machine."
-msgstr ""
+msgstr "A chave de assinatura do destino está offline. Use as ferramentas de linha de comando na máquina offline."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:310
 #, java-format
 msgid "Authentication for adding host {0}"
-msgstr ""
+msgstr "Autenticação para adicionar o host {0}"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:312
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:327
@@ -1787,119 +1788,119 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:502
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:541
 msgid "Copy and paste this to the registration site"
-msgstr ""
+msgstr "Copie e cole isto no site de registro"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:317
 msgid "Advanced authentication strings"
-msgstr ""
+msgstr "String de autenticação avançadas"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:325
 #, java-format
 msgid "Authentication for removing host {0}"
-msgstr ""
+msgstr "Autenticação para remover o host {0}"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:356
 msgid "Authentication for changing name"
-msgstr ""
+msgstr "Autenticação para alterar o nome"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:370
 #, java-format
 msgid "This will change the name from {0} to {1}, using the same destination"
-msgstr ""
+msgstr "Isso alterará o nome {0} para {1}, usando o mesmo destino"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:376
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:409
 msgid "This tunnel must be configured with the new hostname."
-msgstr ""
+msgstr "Esse túnel precisa ser configurado com o novo nome de host."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:378
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:411
 msgid "Enter old hostname below."
-msgstr ""
+msgstr "Insira o nome de host antigo abaixo."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:389
 msgid "Authentication for adding alias"
-msgstr ""
+msgstr "Autenticação para adicionar apelido"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:403
 #, java-format
 msgid "This will add an alias {0} for {1}, using the same destination"
-msgstr ""
+msgstr "Isso adicionará o apelido {0} para {1}, usando o mesmo destino"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:423
 msgid "Authentication for changing destination"
-msgstr ""
+msgstr "Autenticação para alterar o destino"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:438
 #, java-format
 msgid "This will change the destination for {0}"
-msgstr ""
+msgstr "Isso alterará o destino para {0}"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:444
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:513
 msgid "This tunnel must be configured with the new destination."
-msgstr ""
+msgstr "Esse túnel precisa ser configurado com o novo destino."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:446
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:515
 msgid "Enter old destination below."
-msgstr ""
+msgstr "Insira o antigo destino abaixo."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:458
 msgid "Authentication for adding alternate destination"
-msgstr ""
+msgstr "Autenticação para adicionar destino alternativo"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:473
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:507
 #, java-format
 msgid "This will add an alternate destination for {0}"
-msgstr ""
+msgstr "Isso adicionará um destino alternativo para {0}"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:530
 msgid "Authentication for adding subdomain"
-msgstr ""
+msgstr "Autenticação para adicionar um subdomínio"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:546
 #, java-format
 msgid "This will add a subdomain {0} of {1}, with a different destination"
-msgstr ""
+msgstr "Isso adicionará o subdomínio {0} de {1}, com um destino diferente"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:552
 msgid "This tunnel must be configured with the new subdomain and destination."
-msgstr ""
+msgstr "Esse túnel precisa ser configurado com o novo subdomínio e destino."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:554
 msgid "Enter higher-level domain and destination below."
-msgstr ""
+msgstr "Entre o domínio de maior nível e o destino abaixo."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:571
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:1083
 msgid "Go back and edit the tunnel"
-msgstr ""
+msgstr "Voltar e editar o túnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:582
 msgid "Specify old name and destination"
-msgstr ""
+msgstr "Especificar o antigo nome e destino"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:584
 msgid "This is only required for advanced authentication."
-msgstr ""
+msgstr "Isso só é necessário para autenticação avançada."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:586
 msgid "See above for required items."
-msgstr ""
+msgstr "Veja acima os itens necessários."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:593
 msgid "Old hostname"
-msgstr ""
+msgstr "Antigo nome do host"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:597
 msgid "Private Key File for old Destination"
-msgstr ""
+msgstr "Arquivo da Chave Privada para o Destino antigo"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:601
 msgid "Generate Authentication"
-msgstr ""
+msgstr "Gerar autenticação"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:604
 msgid "Generate"
@@ -1907,7 +1908,7 @@ msgstr "Gerar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:182
 msgid "SSL Helper"
-msgstr ""
+msgstr "Assistente SSL"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:653
 msgid "Experts only!"
@@ -1919,24 +1920,24 @@ msgstr "Base32"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:697
 msgid "Alt Base32"
-msgstr ""
+msgstr "Base32 Alternativo"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:706
 msgid "Incoming I2P Port Routing"
-msgstr ""
+msgstr "Roteamento de Portas de Entradas da I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:708
 msgid "I2P Port"
-msgstr ""
+msgstr "Porta I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:710
 msgid "Virtual Host"
-msgstr ""
+msgstr "Host Virtual"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:712
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:790
 msgid "SSL"
-msgstr ""
+msgstr "SSL"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:714
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:784
@@ -1949,11 +1950,11 @@ msgstr "Padrão"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:782
 msgid "Jetty Server"
-msgstr ""
+msgstr "Servidor Jetty"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:786
 msgid "Configuration Files"
-msgstr ""
+msgstr "Arquivos de Configuração"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:788
 msgid "Enabled"
@@ -1965,31 +1966,31 @@ msgstr "servidor web I2P (eepsite)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:1025
 msgid "SSL is enabled"
-msgstr ""
+msgstr "O SSL está habilitado"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:1027
 msgid "Disable SSL"
-msgstr ""
+msgstr "Desabilitar SSL"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:1033
 msgid "SSL is disabled"
-msgstr ""
+msgstr "O SSL está desabilitado"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:1035
 msgid "Enable SSL"
-msgstr ""
+msgstr "Habilitar SSL"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:1041
 msgid "New Certificate Password"
-msgstr ""
+msgstr "Nova Senha de Certificado"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:1049
 msgid "Generate new SSL certificate"
-msgstr ""
+msgstr "Gerar novo certificado SSL"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:1055
 msgid "Generate SSL certificate and enable"
-msgstr ""
+msgstr "Gerar o certificado SSL e habilitar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:190
 msgid "I2P Tunnel Manager - Tunnel Creation Wizard"
@@ -2076,7 +2077,7 @@ msgstr "Tente isto se nenhum dos tipos de túneis abaixo atente seus requisitos,
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:373
 msgid "Tunnel that acts as an HTTP proxy for reaching I2P Sites inside I2P."
-msgstr ""
+msgstr "Túnel que age como um proxy HTTP para acessar Sites I2P dentro da I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:375
 msgid ""
@@ -2093,7 +2094,7 @@ msgstr "Sites web externos a I2P também pode ser alcançados desde que um proxy
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:379
 msgid "Customized client tunnel specific for IRC connections."
-msgstr ""
+msgstr "Túnel cliente customizado específico para conexões IRC."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:381
 msgid ""
@@ -2149,15 +2150,15 @@ msgstr "Um túnel de servidor básico para hospedar um serviço genérico dentro
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:407
 msgid "A server tunnel that is customized for HTTP connections."
-msgstr ""
+msgstr "Um túnel servidor que é customizado para conexões HTTP."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:409
 msgid "Use this tunnel type if you want to host an I2P Site."
-msgstr ""
+msgstr "Use esse tipo de túnel se você quiser hospedar um Site I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:411
 msgid "A customized server tunnel for hosting IRC networks inside I2P."
-msgstr ""
+msgstr "Um túnel servidor customizado para hospedar redes IRC dentro da I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:413
 msgid ""
@@ -2167,7 +2168,7 @@ msgstr "Geralmente, cada servidor IRC que vai ser acessado de dentro da rede I2P
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:419
 msgid "Select tunnel type"
-msgstr ""
+msgstr "Selecione o tipo de túnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:446
 msgid "Choose a name and description for your tunnel."
@@ -2193,7 +2194,7 @@ msgstr "Separar os múltiplos proxies com vírgulas."
 msgid ""
 "List of I2P outproxy destinations, separated with commas (e.g. "
 "proxy1.i2p,proxy2.i2p)"
-msgstr ""
+msgstr "Lista de destinos de proxy de saída I2P, separados por vírgula (por exemplo, proxy1.i2p,proxy2.i2p)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:490
 msgid ""
@@ -2205,11 +2206,11 @@ msgstr "Tipo do serviço no destino I2P que teste túnel de cliente vai conectar
 msgid ""
 "This could be the full Base64 destination key, or an I2P URL from your "
 "address book."
-msgstr ""
+msgstr "Isso pode ser a chave de destino Base64 inteira, ou uma URL I2P do seu catálogo de endereços."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:496
 msgid "Enter a b64 or .i2p address here"
-msgstr ""
+msgstr "Insira um endereço b64 ou .i2p aqui"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:517
 msgid ""
@@ -2286,15 +2287,15 @@ msgstr "Abaixo um resumo das opções que você escolheu:"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:667
 msgid "Tunnel description"
-msgstr ""
+msgstr "Descrição do túnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:693
 msgid "Binding address"
-msgstr ""
+msgstr "Vinculando endereço"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:697
 msgid "Tunnel port"
-msgstr ""
+msgstr "Porta do túnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:727
 msgid ""
@@ -2311,7 +2312,7 @@ msgstr "O assistente vai configurar os parâmetros importantes no padrão recome
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:736
 msgid "Cancel the wizard and return to Tunnel Manager home page"
-msgstr ""
+msgstr "Cancelar o assistente e retornar à página inicial do Gerenciador de Túneis"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:743
 msgid "Return to previous page"
@@ -2323,7 +2324,7 @@ msgstr "Anterior"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:753
 msgid "Save tunnel configuration"
-msgstr ""
+msgstr "Salvar a configuração de túnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:756
 msgid "Save Tunnel"
@@ -2331,15 +2332,15 @@ msgstr "Salvar túnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:762
 msgid "Finish Wizard and review tunnel settings"
-msgstr ""
+msgstr "Finalizar o Assistente e revisar as configurações de túnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:765
 msgid "Finish"
-msgstr "Terminar"
+msgstr "Finalizar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:771
 msgid "Advance to next page"
-msgstr ""
+msgstr "Avançar para a próxima página"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:774
 msgid "Next"

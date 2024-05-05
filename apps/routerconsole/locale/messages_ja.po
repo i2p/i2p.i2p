@@ -275,7 +275,7 @@ msgstr "サブデバイス"
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1178
 #, java-format
 msgid "To disable this device, add {0} to advanced configuration and restart."
-msgstr ""
+msgstr "この端末を無効にするには、高度な設定に {0} を追加して、再起動してください。"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1199
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:47
