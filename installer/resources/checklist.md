@@ -196,7 +196,7 @@
 2. Add i2pupdate-1.xx.0.su3 torrent to tracker2.postman.i2p and start seeding
 
 3. Notify the following people:
-  - All in-network update hosts
+  - All in-network update hosts(zzz(stats.i2p) and idk(mgp**.b32.i2p)), they will need the i2pupdate.su3 file
   - PPA maintainer
   - news.xml maintainer
   - backup news.xml maintainer
