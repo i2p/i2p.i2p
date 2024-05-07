@@ -1,3 +1,9 @@
+i2p (2.5.1-1~bionic+1) bionic; urgency=medium
+
+  * New upstream version 2.5.1
+
+ -- idk <hankhill19580@gmail.com>  Tue, 07 May 2024 11:18:05 -0400
+
 i2p (2.5.0-1~bionic+1) bionic; urgency=medium
 
   * New upstream version 2.5.0
