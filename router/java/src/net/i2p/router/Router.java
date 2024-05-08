@@ -1203,6 +1203,7 @@ public class Router implements RouterClock.ClockShiftListener {
             //    rv.append(CAPABILITY_NO_TUNNELS);
             return rv.toString();
         }
+        boolean forceG = false;
         switch (_context.commSystem().getStatus()) {
             case OK:
             case IPV4_OK_IPV6_UNKNOWN:
@@ -1215,18 +1216,21 @@ public class Router implements RouterClock.ClockShiftListener {
                 break;
 
             case DIFFERENT:
+            case HOSED:
+            case IPV4_SNAT_IPV6_UNKNOWN:
+                forceG = true;
+                // fall through
+
             case REJECT_UNSOLICITED:
             case IPV4_DISABLED_IPV6_FIREWALLED:
                 rv.append(CAPABILITY_UNREACHABLE);
                 break;
 
             case DISCONNECTED:
-            case HOSED:
             case UNKNOWN:
             case IPV4_UNKNOWN_IPV6_FIREWALLED:
             case IPV4_DISABLED_IPV6_UNKNOWN:
             case IPV4_FIREWALLED_IPV6_UNKNOWN:
-            case IPV4_SNAT_IPV6_UNKNOWN:
             default:
                 // no explicit capability
                 break;
@@ -1234,7 +1238,7 @@ public class Router implements RouterClock.ClockShiftListener {
 
         char cong = 0;
         int maxTunnels = _context.getProperty(RouterThrottleImpl.PROP_MAX_TUNNELS, RouterThrottleImpl.DEFAULT_MAX_TUNNELS);
-        if (maxTunnels <= 0) {
+        if (forceG || maxTunnels <= 0) {
             cong = CAPABILITY_NO_TUNNELS;
         } else if (maxTunnels <= 50 || SystemVersion.isSlow()) {
             cong = CAPABILITY_CONGESTION_MODERATE;
