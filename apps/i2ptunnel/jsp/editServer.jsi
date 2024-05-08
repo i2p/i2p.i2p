@@ -997,7 +997,7 @@
             } // !isRouterContext
 %>
     </table>
-    <table class="tunnelConfig" id="customOptions">
+    <table class="tunnelConfig" id="advancedOptions">
         <tr>
             <th colspan="2">
                 <%=intl._t("Custom options")%>
