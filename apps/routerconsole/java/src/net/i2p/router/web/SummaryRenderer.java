@@ -83,6 +83,8 @@ class SummaryRenderer {
     private static final long[] RATES = new long[] { 60*60*1000 };
     // dotted line
     private static final Stroke GRID_STROKE = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] {1, 1}, 0);
+    // hide grid
+    private static final Stroke TICK_STROKE = new BasicStroke(0);
 
     public SummaryRenderer(I2PAppContext ctx, SummaryListener lsnr) { 
         _log = ctx.logManager().getLog(SummaryRenderer.class);
@@ -337,6 +339,7 @@ class SummaryRenderer {
             def.setAntiAliasing(false);
             def.setTextAntiAliasing(true);
             def.setGridStroke(GRID_STROKE);
+            def.setTickStroke(TICK_STROKE);
             //System.out.println("Rendering: \n" + def.exportXmlTemplate());
             //System.out.println("*****************\nData: \n" + _listener.getData().dump());
             def.setWidth(width);
