@@ -1,5 +1,12 @@
-2024-05-06 idk
- * 2.5.1 Release
+2024-05-12 zzz
+ * Console: Update rrd4j to 3.9.1 preview
+
+2024-05-08 zzz
+ * i2ptunnel: Fix custom options form width (light theme)
+ * Router: Publish G cap if symmetric natted
+ * Tunnels: Validate peer RI expiration in TunnelPeerSelector
+
+2024-05-06 2.5.1 (API 0.9.62) released
 
 2024-05-05 zzz
  * NetDB: Various fixes and adjustments
