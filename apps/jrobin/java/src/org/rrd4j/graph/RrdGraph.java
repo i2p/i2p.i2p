@@ -36,7 +36,7 @@ public class RrdGraph implements RrdGraphConstants {
     };
 
     private static final int SYMBOLS_CENTER = 8;
-    private static final char[] SYMBOLS = {'y', 'z', 'a', 'f', 'p', 'n', 'µ', 'm', ' ', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'};
+    private static final char[] SYMBOLS = {'y', 'z', 'a', 'f', 'p', 'n', 'µ', 'm', ' ', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'};
 
     final RrdGraphDef gdef;
     final ImageParameters im;

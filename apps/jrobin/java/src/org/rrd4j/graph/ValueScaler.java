@@ -3,7 +3,7 @@ package org.rrd4j.graph;
 class ValueScaler {
     static final String UNIT_UNKNOWN = "?";
     static final String[] UNIT_SYMBOLS = {
-            "a", "f", "p", "n", "u", "m", " ", "k", "M", "G", "T", "P", "E"
+            "a", "f", "p", "n", "µ", "m", " ", "K", "M", "G", "T", "P", "E"
     };
     static final int SYMB_CENTER = 6;
 
