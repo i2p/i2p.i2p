@@ -66,7 +66,7 @@
         <property name="workspace.changes.tr" value="" />
         <jar destfile="./build/jrobin.jar" basedir="./build/obj" includes="**/*.class">
             <manifest>
-                <attribute name="Implementation-Version" value="3.8" />
+                <attribute name="Implementation-Version" value="3.9.1" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />

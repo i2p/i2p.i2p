@@ -300,6 +300,9 @@ public class RrdDbPool {
         RrdEntry ref;
         try {
             ref = getEntry(dburi, false);
+        } catch (IllegalStateException e) {
+            // This means that corresponding database has been already closed before, so returning immediately.
+            return;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IllegalStateException("Release interrupted for " + rrdDb.getPath(), e);

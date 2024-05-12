@@ -310,10 +310,7 @@ public abstract class RrdBackendFactory implements Closeable {
         }
         @Override
         public void clear() {
-            try {
-                backend.close();
-            } catch (IOException e) {
-            }
+            // backend doesn't need to be closed here as it already happens in RrdBackend.rrdClose()
             backend = null;
             super.clear();
         }
