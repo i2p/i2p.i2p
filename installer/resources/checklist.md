@@ -63,6 +63,8 @@
 4. Tickets: Check if any blocker or critical tickets for this release remain open;
    get them fixed and closed, or reclassified.
 
+5. Update and check in blocklist-tor.txt with `maketorblocklist.sh`
+
 
 ## On release day
 
