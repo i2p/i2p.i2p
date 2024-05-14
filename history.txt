@@ -1,3 +1,8 @@
+2024-05-14 zzz
+ * i2ptunnel: Fix keepalive bug causing truncation of chunked content
+ * Pull translations from Transifex
+ * Router: Update Tor blocklist
+
 2024-05-12 zzz
  * Console: Update rrd4j to 3.9.1 preview
 
