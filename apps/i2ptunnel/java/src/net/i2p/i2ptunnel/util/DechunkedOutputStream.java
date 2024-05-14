@@ -21,7 +21,7 @@ public class DechunkedOutputStream extends LimitOutputStream {
 
     private static final byte[] CRLF = DataHelper.getASCII("\r\n");
     
-    private enum State { LEN, CR, LF, DATA, TRAILER, DONE }
+    private enum State { LEN, CR, LF, DATA, DATACR, DATALF, TRAILER, DONE }
 
     public DechunkedOutputStream(OutputStream raw, DoneCallback callback, boolean strip) {
         super(raw, callback);
@@ -114,9 +114,34 @@ public class DechunkedOutputStream extends LimitOutputStream {
                     i += towrite - 1;
                     _remaining -= towrite;
                     if (_remaining <= 0)
-                        _state = State.LEN;
+                        _state = State.DATACR;
                     break;
                 }
+
+                // after DATA, collect CR then wait for LF
+                case DATACR: {
+                    int c = buf[off + i] & 0xff;
+                    if (c == '\r')
+                        _state = State.DATALF;
+                    else if (c == '\n')
+                        _state = State.LEN;
+                    // else no CRLF?
+                    if (!_strip)
+                        out.write(buf, off + i, 1);
+                    break;
+                }
+ 
+                // after DATA, collect LF then wait for LEN
+                case DATALF: {
+                    int c = buf[off + i] & 0xff;
+                    if (c == '\n')
+                        _state = State.LEN;
+                    // else no CRLF?
+                    if (!_strip)
+                        out.write(buf, off + i, 1);
+                    break;
+                }
+ 
  
                 // swallow and discard the Trailer headers until we find a plain CRLF
                 // we reuse _remaining here to count the size of the header
