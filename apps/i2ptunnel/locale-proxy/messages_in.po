@@ -11,9 +11,9 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
-"PO-Revision-Date: 2021-02-05 15:27+0000\n"
-"Last-Translator: Robert Dafis <robertdafis@gmail.com>\n"
-"Language-Team: Indonesian (http://www.transifex.com/otf/I2P/language/id/)\n"
+"PO-Revision-Date: 2013-07-20 14:50+0000\n"
+"Last-Translator: Robert Dafis <robertdafis@gmail.com>, 2017\n"
+"Language-Team: Indonesian (http://app.transifex.com/otf/I2P/language/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -198,7 +198,7 @@ msgstr "Peringatan: Tujuan Tidak Valid"
 
 #: ../java/build/Proxy.java:47
 msgid "The Base32 address is invalid."
-msgstr ""
+msgstr "Alamat Base32 ini tidak valid."
 
 #: ../java/build/Proxy.java:56
 msgid "The website was not reachable, because its lease set was not found."
@@ -302,7 +302,7 @@ msgstr "Situs ini mungkin sedang tidak bisa dibuka, terlalu sibuk, atau membloki
 
 #: ../java/build/Proxy.java:117
 msgid "Warning: Authorization Required"
-msgstr ""
+msgstr "Peringatan: Otorisasi Diperlukan"
 
 #: ../java/build/Proxy.java:126
 msgid ""
@@ -472,7 +472,7 @@ msgid ""
 "To visit the destination in your address book, click <a "
 "href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, "
 "click <a href=\"{1}\">here</a>."
-msgstr "Untuk mengunjungi destinasi di buku alamat anda, klik <a href=\"{0}\">di sini</a>. Untuk mengunjungi destinasi addresshelper yang konflik, kilik <a href=\"{1}\">di sini</a>."
+msgstr "Untuk mengunjungi destinasi di buku alamat Anda, klik <a href=\"{0}\">di sini</a>. Untuk mengunjungi tujuan addresshelper yang bertentangan, klik <a href=\"{1}\">disini</a>."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:774
 #, java-format
@@ -485,7 +485,7 @@ msgstr "destinasi addresshelper yang konflik"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1224
 msgid "Corrupt Base32 address"
-msgstr ""
+msgstr "Alamat Base32 ini rusak"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1304
 msgid "Destination lease set not found"
@@ -498,7 +498,7 @@ msgstr "Host"
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1441
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1502
 msgid "Base32"
-msgstr ""
+msgstr "Base32"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1445
 msgid "Destination"
@@ -513,7 +513,7 @@ msgstr "Melanjutkan ke {0} tanpa menyimpan"
 msgid ""
 "You can browse to the site without saving it to the address book. The "
 "address will be remembered until you restart your I2P router."
-msgstr "Anda dapat mengunjungi sebuah situs tanpa menyimpannya ke dalam buku alamat. Alamat situs akan disimpan sampai anda memulai-ulang router I2P anda."
+msgstr "Anda dapat mengunjungi sebuah situs tanpa menyimpannya ke dalam buku alamat. Alamat situs akan disimpan sampai Anda memulai-ulang router I2P anda."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1453
 msgid "Continue without saving"
@@ -534,7 +534,7 @@ msgstr "Alamat ini akan disimpan ke dalam buku alamat router anda di mana alamat
 msgid ""
 "If you want to keep track of sites you have added manually, add to your "
 "Local or Private address book instead."
-msgstr ""
+msgstr "JIka Anda ingin melacak situs yang Anda tambah secara manual, tambahkan alamat tersebut ke dalam buku alamat Local atau Private milik Anda."
 
 #. FIXME wasn't escaped
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1466
@@ -546,14 +546,14 @@ msgstr "Simpan & lanjutkan"
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1473
 #, java-format
 msgid "Save {0} to local address book and continue to website"
-msgstr ""
+msgstr "Simpan {0} ke dalam buku alamat local kemudian lanjut ke situsnya."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1474
 msgid ""
 "This address will be saved to your Local address book. Select this option "
 "for addresses you wish to keep separate from the main router address book, "
 "but don't mind publishing."
-msgstr ""
+msgstr "Alamat ini akan disimpan ke dalam buku alamat local. Pilih opsi ini untuk alamat yang Anda pisahkan dari buku alamat utama di router Anda namun tidak apa-apa diketahui orang lain."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1478
 #, java-format
@@ -568,19 +568,19 @@ msgstr "Alamat ini akan disimpan ke buku alamat Private untuk memastikan tidak p
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1507
 msgid "Base32 address requires lookup password"
-msgstr ""
+msgstr "Alamat Base32 membutuhkan lookup password"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1509
 msgid "Base32 address requires encryption key"
-msgstr ""
+msgstr "Alamat Base32 memerlukan encryption key"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1511
 msgid "Base32 address requires encryption key and lookup password"
-msgstr ""
+msgstr "Alamat Base32 memerlukan encryption key dan lookup password"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1513
 msgid "Base32 address decryption failure, check encryption key"
-msgstr ""
+msgstr "Gagal men-dekripsi alamat Base32, periksa encryption key"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1524
 msgid "Generate"
@@ -594,27 +594,27 @@ msgstr "Kunci enkripsi"
 msgid ""
 "You must either enter a PSK encryption key provided by the server operator, "
 "or generate a DH encryption key and send that to the server operator."
-msgstr ""
+msgstr "Anda harus memasukkan encryption key PSK yang disediakan oleh operator server, atau membuat encryption key DH dan mengirimkannya ke operator server."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1527
 msgid "Ask the server operator for help."
-msgstr ""
+msgstr "Minta bantuan operator server."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1530
 msgid "Enter PSK encryption key"
-msgstr ""
+msgstr "Masukkan PSK encryption key"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1533
 msgid "Generate new DH encryption key"
-msgstr ""
+msgstr "Buat encryption key DH yang baru"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1541
 msgid "Lookup password"
-msgstr ""
+msgstr "Lookup password"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1542
 msgid "You must enter the password provided by the server operator."
-msgstr ""
+msgstr "Masukkan password yang disediakan oleh operator server."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:196
 #, java-format
@@ -627,36 +627,36 @@ msgstr "Ditambahkan melalui alamat pembantu"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:235
 msgid "Missing lookup password"
-msgstr ""
+msgstr "Lookup password hilang"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:249
 msgid "Missing private key"
-msgstr ""
+msgstr "Private key hilang"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:254
 msgid "Invalid private key"
-msgstr ""
+msgstr "Private key tidak valid"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:287
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:306
 msgid "Your new encryption key"
-msgstr ""
+msgstr "Encryption key Anda yang baru"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:301
 msgid "Address book"
-msgstr "Address book "
+msgstr "Address book"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:311
 msgid "Copy the key and send it to the server operator."
-msgstr ""
+msgstr "Salin encryption key-nya dan kirimkan ke operator server."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:313
 msgid "After you are granted permission, you may proceed to the website."
-msgstr ""
+msgstr "Setelah Anda diberikan izin, Anda dapat melanjutkan ke situs web-nya."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:334
 msgid "Go back and fix the error"
-msgstr ""
+msgstr "Kembali dan perbaiki kesalahannya"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:345
 msgid "router"
@@ -664,7 +664,7 @@ msgstr "router"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:347
 msgid "local"
-msgstr ""
+msgstr "Lokal"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:349
 msgid "private"
@@ -684,12 +684,12 @@ msgstr "Buku Alamat"
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:376
 #, java-format
 msgid "Saved {0} to the {1} address book, redirecting now."
-msgstr ""
+msgstr "Menyimpan {0} ke buku alamat {1}, mengalihkan sekarang."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:377
 #, java-format
 msgid "Failed to save {0} to the {1} address book, redirecting now."
-msgstr ""
+msgstr "Gagal menyimpan {0} ke buku alamat {1}, mengalihkan sekarang."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:379
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:411
@@ -699,4 +699,4 @@ msgstr "Klik disini jika Anda tidak dialihkan secara otomatis."
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:409
 #, java-format
 msgid "Saved the authentication for {0}, redirecting now."
-msgstr ""
+msgstr "Menyimpan otentikasi untuk {0}, mengarahkan ulang sekarang."

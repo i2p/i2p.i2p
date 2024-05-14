@@ -5,13 +5,14 @@
 # 
 # Translators:
 # Robert Dafis <robertdafis@gmail.com>, 2017-2018
+# zzzi2p, 2024
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-05 17:34+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
-"Last-Translator: Robert Dafis <robertdafis@gmail.com>, 2017-2018\n"
+"Last-Translator: zzzi2p, 2024\n"
 "Language-Team: Indonesian (http://app.transifex.com/otf/I2P/language/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -192,7 +193,7 @@ msgstr "Konfigurasi Interface WAN umum"
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:588
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:101
 msgid "Status"
-msgstr "Status "
+msgstr "Status"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1091
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1114
@@ -208,12 +209,12 @@ msgstr "Tipe"
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1093
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1116
 msgid "Upstream"
-msgstr "Upstream "
+msgstr "Upstream"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1095
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1118
 msgid "Downstream"
-msgstr "Downstream "
+msgstr "Downstream"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1109
 msgid "WAN PPP Connection"
@@ -254,12 +255,12 @@ msgstr "Perangkat yang Ditemukan"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1168
 msgid "Subdevice"
-msgstr "Subdevice "
+msgstr "Subdevice"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1178
 #, java-format
 msgid "To disable this device, add {0} to advanced configuration and restart."
-msgstr ""
+msgstr "Untuk menonaktifkan perangkat ini, tambahkan {0} ke konfigurasi lanjutan lalu restart."
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1199
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:47
@@ -318,7 +319,7 @@ msgstr "{0} port {1,number,#####} tidak diteruskan oleh UPnP."
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:210
 #: ../java/strings/Strings.java:53
 msgid "Router"
-msgstr "Router "
+msgstr "Router"
 
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:906
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:885
@@ -585,7 +586,7 @@ msgstr "Plugin memerlukan Jetty Versi {0} atau lebih rendah"
 #: ../java/src/net/i2p/router/web/PluginStarter.java:400
 #, java-format
 msgid "Plugin requires Java version {0} or lower"
-msgstr ""
+msgstr "Plugin memerlukan Java versi {0} atau lebih rendah"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:529
 #, java-format
@@ -745,7 +746,7 @@ msgstr "Tidak ada versi baru yang ditemukan pada {0}"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:348
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:350
 msgid "I2P Router Console"
-msgstr "I2P Router Console "
+msgstr "I2P Router Console"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:235
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:553
@@ -785,7 +786,7 @@ msgstr "Restart graceful diminta"
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:254
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:577
 msgid "Hard restart"
-msgstr "Hard restart "
+msgstr "Hard restart"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:259
 msgid "Hard restart requested"
@@ -980,7 +981,7 @@ msgstr "Sedang mengupdate URL berita untuk {0}"
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:54
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:60
 msgid "internal"
-msgstr "internal "
+msgstr "internal"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:216
 #, java-format
@@ -1048,23 +1049,23 @@ msgstr "Download, verifikasi, dan restart"
 #: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:39
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:981
 msgid "Deadlock detected"
-msgstr ""
+msgstr "Deadlock terdeteksi"
 
 #: ../java/src/net/i2p/router/web/DeadlockDetector.java:84
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:983
 msgid "Please report"
-msgstr ""
+msgstr "Mohon laporkan"
 
 #: ../java/src/net/i2p/router/web/DeadlockDetector.java:99
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:984
 msgid "After reporting, please restart your router"
-msgstr ""
+msgstr "Setelah melaporkan, silakan restart router Anda"
 
 #: ../java/src/net/i2p/router/web/FormHandler.java:264
 msgid ""
 "Invalid form submission, probably because you used the 'back' or 'reload' "
 "button on your browser. Please resubmit."
-msgstr "Form submission tidak valid , mungkin karena anda menggunakan tombol 'back' atau 'reload' pada browser anda. Mohon kirimkan kembali."
+msgstr "Form submission tidak valid, mungkin karena Anda menggunakan tombol 'back' atau 'reload' pada browser anda. Mohon kirimkan kembali."
 
 #: ../java/src/net/i2p/router/web/FormHandler.java:266
 msgid ""
@@ -1107,7 +1108,7 @@ msgstr "Pemeriksaan update plugin gagal"
 #, java-format
 msgid "{0} plugin updated"
 msgid_plural "{0} plugins updated"
-msgstr[0] ""
+msgstr[0] "{0} plugin diperbarui"
 
 #: ../java/src/net/i2p/router/web/PluginStarter.java:251
 msgid "Plugin update check complete"
@@ -1208,24 +1209,24 @@ msgstr "Sertifikat SSL lokal"
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:61
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:259
 msgid "Router Console"
-msgstr "Router Console "
+msgstr "Router Console"
 
 #. I2CP
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:36
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:33
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:40
 msgid "I2CP"
-msgstr "I2CP "
+msgstr "I2CP"
 
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:47
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:52
 msgid "I2PTunnel"
-msgstr "I2PTunnel "
+msgstr "I2PTunnel"
 
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:61
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:66
 msgid "SAM"
-msgstr "SAM "
+msgstr "SAM"
 
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:76
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:81
@@ -1242,7 +1243,7 @@ msgstr "Sertifikat Router Family lokal"
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1310
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:973
 msgid "Family"
-msgstr "Family "
+msgstr "Family"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigAdvancedHandler.java:73
 msgid "Error updating the configuration - please see the error logs"
@@ -1358,7 +1359,7 @@ msgstr "Konfigurasi plugin disimpan."
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:431
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:227
 msgid "WebApp"
-msgstr "WebApp "
+msgstr "WebApp"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:431
 msgid "started"
@@ -1435,7 +1436,7 @@ msgstr "Konfigurasi interface telah disimpan"
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:408
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:409
 msgid "Edit"
-msgstr "Edit "
+msgstr "Edit"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:123
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:600
@@ -1483,7 +1484,7 @@ msgstr "Torrent"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:262
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:445
 msgid "Hidden Services Manager"
-msgstr "Hidden Services Manager "
+msgstr "Hidden Services Manager"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:247
 msgid "Identification Image Generator"
@@ -1500,11 +1501,11 @@ msgstr "Buku Alamat"
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:44
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:224
 msgid "Email"
-msgstr "Email "
+msgstr "Email"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:274
 msgid "Plugin"
-msgstr "Plugin "
+msgstr "Plugin"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:292
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:489
@@ -1548,7 +1549,7 @@ msgstr "Hentikan"
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:414
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:31
 msgid "Update"
-msgstr "Update "
+msgstr "Update"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:417
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:419
@@ -1682,33 +1683,33 @@ msgstr "Kunci untuk  {0} ditambah ke keyring"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHandler.java:68
 msgid "Lookup password required"
-msgstr ""
+msgstr "Pencarian kata sandi diperlukan"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHandler.java:89
 msgid "Requires hostname, destination, or blinded Base32"
-msgstr ""
+msgstr "Membutuhkan hostname, destination, atau blinded Base"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHandler.java:132
 msgid "Destination requires lookup password"
-msgstr ""
+msgstr "Destination membutuhkan pencarian kata sandi"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHandler.java:136
 msgid "Destination does not require lookup password"
-msgstr ""
+msgstr "Destination tidak membutuhkan pencarian kata sandi"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHandler.java:140
 msgid "Destination requires encryption key"
-msgstr ""
+msgstr "Destination membutuhkan encryption key"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHandler.java:144
 msgid "Destination does not require encryption key"
-msgstr ""
+msgstr "Destination tidak membutuhkan encryption key"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHandler.java:164
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:608
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:616
 msgid "Send key to server operator."
-msgstr ""
+msgstr "Kirim encryption key ke operator server."
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHandler.java:170
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:46
@@ -1776,11 +1777,11 @@ msgstr "Nama"
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1251
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:620
 msgid "Encryption Key"
-msgstr "Encryption Key "
+msgstr "Encryption Key"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:69
 msgid "Lookup Password"
-msgstr ""
+msgstr "Pencarian Kata Sandi"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:70
 msgid "Created"
@@ -1805,17 +1806,17 @@ msgstr "Terenkripsi"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:604
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:618
 msgid "Encrypted with lookup password"
-msgstr ""
+msgstr "Dienkripsi dengan pencarian kata sandi"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:140
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:596
 msgid "Blinded with lookup password"
-msgstr ""
+msgstr "Blinded dengan pencarian kata sandi"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:142
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:592
 msgid "Blinded"
-msgstr ""
+msgstr "Blinded"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHandler.java:94
 msgid "Log overrides updated"
@@ -1842,7 +1843,7 @@ msgstr "Pilih class untuk ditambahkan"
 #: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHelper.java:156
 #, java-format
 msgid "All classes in {0}"
-msgstr ""
+msgstr "Semua class di {0}"
 
 #. stat groups for stats.jsp
 #. See StatsGenerator for groups mapped to a display name
@@ -1850,7 +1851,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:57
 #: ../java/strings/Strings.java:50
 msgid "Bandwidth"
-msgstr "Bandwidth "
+msgstr "Bandwidth"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:30
 msgid "Home Page"
@@ -1911,11 +1912,11 @@ msgstr "Jaringan"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/viewprofile_jsp.java:384
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:415
 msgid "Sidebar"
-msgstr "Sidebar "
+msgstr "Sidebar"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:30
 msgid "UI"
-msgstr "UI "
+msgstr "UI"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:31
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:59
@@ -1932,11 +1933,11 @@ msgstr "Klien"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:32
 msgid "Keyring"
-msgstr "Keyring "
+msgstr "Keyring"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:32
 msgid "Logging"
-msgstr "Logging "
+msgstr "Logging"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:32
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:54
@@ -1946,7 +1947,7 @@ msgstr "Logging "
 #: ../java/strings/Strings.java:52
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:483
 msgid "Peers"
-msgstr "Peers "
+msgstr "Peers"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:32
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1297
@@ -1961,17 +1962,17 @@ msgstr "Plugin"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:33
 msgid "Web Apps"
-msgstr "Web Apps "
+msgstr "Web Apps"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:34
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:490
 msgid "Advanced"
-msgstr "Advanced "
+msgstr "Advanced"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:34
 #: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:454
 msgid "Router Family"
-msgstr "Router Family "
+msgstr "Router Family"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:62
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:103
@@ -2095,7 +2096,7 @@ msgstr "Alamat tidak valid"
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:476
 #, java-format
 msgid "The address {0} is not publicly routable"
-msgstr ""
+msgstr "Alamat {0} tidak dirutekan secara publik"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:501
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:102
@@ -2116,7 +2117,7 @@ msgstr "Mengupdate batas bandwidth"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHelper.java:259
 msgid "Add hostname or IP"
-msgstr ""
+msgstr "Tambahkan nama host atau IP"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHelper.java:293
 #: ../java/src/net/i2p/router/web/helpers/WizardHelper.java:243
@@ -2148,7 +2149,7 @@ msgstr "Diblokir secara manual melalui {0}"
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:94
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:223
 msgid "Peer"
-msgstr "Peer "
+msgstr "Peer"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:26
 msgid "banned until restart"
@@ -2246,11 +2247,11 @@ msgstr "Anda harus memasukkan URL"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:68
 msgid "Reseed in progress, check sidebar for status"
-msgstr ""
+msgstr "Reseed sedang berlangsung, periksa sidebar untuk status"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:70
 msgid "Reseed complete, check sidebar for status"
-msgstr ""
+msgstr "Reseed selesa, periksa sidebar untuk status"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:77
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:584
@@ -2355,13 +2356,13 @@ msgstr "Kembalikan ke default penuh"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:54
 msgid "Full sidebar default restored."
-msgstr ""
+msgstr "Full sidebar default dipulihkan."
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:55
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:59
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:152
 msgid "Sidebar will refresh shortly."
-msgstr ""
+msgstr "Sidebar akan disegarkan segera."
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:56
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:595
@@ -2370,7 +2371,7 @@ msgstr "Mengembalikan default minimal"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:58
 msgid "Minimal sidebar default restored."
-msgstr ""
+msgstr "Minimal sidebar default dipulihkan."
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:75
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:97
@@ -2419,13 +2420,13 @@ msgstr "Kesalahan dalam menyimpan konfigurasi (diterapkan tetapi tidak disimpan)
 #, java-format
 msgid "{0} hop"
 msgid_plural "{0} hops"
-msgstr[0] ""
+msgstr[0] "{0} hop"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:23
 #, java-format
 msgid "{0} tunnel"
 msgid_plural "{0} tunnels"
-msgstr[0] ""
+msgstr[0] "{0} tunnel"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:51
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:47
@@ -2463,7 +2464,7 @@ msgstr "PERINGATAN KINERJA  - pengaturan mencakup tunnel yang sangat banyak.."
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:655
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:381
 msgid "Inbound"
-msgstr "Inbound "
+msgstr "Inbound"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:147
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:212
@@ -2472,7 +2473,7 @@ msgstr "Inbound "
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:659
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:382
 msgid "Outbound"
-msgstr "Outbound "
+msgstr "Outbound"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:153
 msgid "Length"
@@ -2525,7 +2526,7 @@ msgstr "Tidak ada nama user yang dimasukkan"
 msgid ""
 "Warning: User names outside the ISO-8859-1 character set are not "
 "recommended. Support is not standardized and varies by browser."
-msgstr "Peringatan: Nama pengguna berada di luar set karakter ISO-8859-1 tidak dianjurkan. Dukungan tidak terstandar dan bervariasi pada setiap browser."
+msgstr "Peringatan: Nama pengguna yang berada di luar set karakter ISO-8859-1 tidak dianjurkan. Dukungan tidak terstandar dan bervariasi pada setiap browser."
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:110
 msgid "No password entered"
@@ -2580,12 +2581,12 @@ msgstr "Hapus"
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:257
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:628
 msgid "Username"
-msgstr "Username "
+msgstr "Username"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:259
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:630
 msgid "Password"
-msgstr "Password "
+msgstr "Password"
 
 #: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:32
 msgid "Aborted startup"
@@ -2650,7 +2651,7 @@ msgstr "Router yang menerima reseed"
 
 #: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:49
 msgid "Soft restart"
-msgstr "Soft restart "
+msgstr "Soft restart"
 
 #: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:50
 msgid "Started router"
@@ -2715,7 +2716,7 @@ msgstr "Waktu:"
 
 #: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:185
 msgid "Event"
-msgstr "Event "
+msgstr "Event"
 
 #: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:187
 msgid "Details"
@@ -2851,15 +2852,15 @@ msgstr "Tidak tunjukkan keterangan pada grafik"
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:428
 msgid "UTC"
-msgstr ""
+msgstr "UTC"
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:433
 msgid "Use UTC time on graphs"
-msgstr ""
+msgstr "Gunakan waktu UTC pada grafik"
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:434
 msgid "Persistence"
-msgstr "Persistence "
+msgstr "Persistence"
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:439
 msgid "Store graph data on disk"
@@ -2880,7 +2881,7 @@ msgstr "Klien email anonim"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:45
 msgid "Control your client and server tunnels"
-msgstr ""
+msgstr "Kontrol client dan server tunnel"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:46
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:251
@@ -2895,7 +2896,7 @@ msgstr "Server web lokal untuk hosting konten anda sendiri melalui I2P"
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:307
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:260
 msgid "Web Server"
-msgstr "Web Server "
+msgstr "Web Server"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:48
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:350
@@ -2941,7 +2942,7 @@ msgstr "Kelola plugin"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:73
 msgid "Frequently Asked Questions"
-msgstr "Frequently Asked Questions "
+msgstr "Frequently Asked Questions"
 
 #. "anoncoin.i2p" + S + _x("The Anoncoin project") + S +
 #. "http://anoncoin.i2p/" + S + I + "anoncoin_32.png" + S +
@@ -2959,7 +2960,7 @@ msgstr "Frequently Asked Questions "
 #. "http://exchanged.i2p/" + S + I + "exchanged.png" + S +
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:73
 msgid "I2P FAQ"
-msgstr "I2P FAQ "
+msgstr "I2P FAQ"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:74
 msgid "Community forum"
@@ -2968,23 +2969,23 @@ msgstr "Forum komunitas"
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:74
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:459
 msgid "I2P Forum"
-msgstr "Forum I2p "
+msgstr "Forum I2p"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:75
 msgid "Community git project hosting"
-msgstr ""
+msgstr "Hosting proyek git komunitas"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:75
 msgid "Git Project Hosting"
-msgstr ""
+msgstr "Hosting Proyek Git"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:76
 msgid "I2P Pastebin"
-msgstr ""
+msgstr "I2P Pastebin"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:76
 msgid "Pastebin for I2P users"
-msgstr ""
+msgstr "Pastebin untuk pengguna I2P"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:88
 msgid "I2P News"
@@ -3015,7 +3016,7 @@ msgstr "Berita I2P"
 #. "http://zerobin.i2p/" + S + I + "paste_plain.png" + S +
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:88
 msgid "Planet I2P"
-msgstr "Planet I2P "
+msgstr "Planet I2P"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:92
 msgid "I2P home page"
@@ -3044,11 +3045,11 @@ msgstr "Website Proyek"
 #. S + "http://sponge.i2p/" + S + I + "user_astronaut.png" + S +
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:98
 msgid "Not Bob's Address Services"
-msgstr ""
+msgstr "Not Bob's Address Services"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:99
 msgid "Ramble user-moderated forum aggregator"
-msgstr ""
+msgstr "Agregator forum yang dimoderatori pengguna Ramble"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:100
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:112
@@ -3057,7 +3058,7 @@ msgstr "Statistik jaringan I2p"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:101
 msgid "StormyCloud Outproxy Services"
-msgstr ""
+msgstr "StormyCloud Outproxy Services"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:107
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:432
@@ -3066,7 +3067,7 @@ msgstr "Log"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:107
 msgid "View the logs"
-msgstr ""
+msgstr "Lihat Log"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:108
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:422
@@ -3075,7 +3076,7 @@ msgstr "Grafik"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:108
 msgid "Visualize information about the router"
-msgstr ""
+msgstr "Memvisualisasikan informasi tentang router"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:109
 msgid "I2P Technical Docs"
@@ -3091,7 +3092,7 @@ msgstr "I2p Wiki"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:111
 msgid "Bug tracker"
-msgstr "Bug tracker "
+msgstr "Bug tracker"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:111
 msgid "I2P Bug Reports"
@@ -3105,17 +3106,17 @@ msgstr "Aplikasi"
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:166
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:620
 msgid "Configuration and Help"
-msgstr ""
+msgstr "Pengaturan dan Bantuan"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:179
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:636
 msgid "Network and Developer Information"
-msgstr ""
+msgstr "Informasi Jaringan dan Pengembang"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:191
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:604
 msgid "I2P Community Sites"
-msgstr ""
+msgstr "Situs Komunitas I2P"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:231
 msgid "The HTTP proxy is not up"
@@ -3128,7 +3129,7 @@ msgstr "Browser Anda adalah tidak dikonfigurasi dengan benar untuk menggunakan H
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:377
 msgid "URL"
-msgstr "URL "
+msgstr "URL"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:404
 msgid "Add"
@@ -3136,7 +3137,7 @@ msgstr "Tambahkan"
 
 #: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:54
 msgid "Job runners"
-msgstr "Job runners "
+msgstr "Job runners"
 
 #: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:60
 msgid "Active jobs"
@@ -3177,7 +3178,7 @@ msgstr "Total jumlah Statistik Job"
 #: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:137
 #: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:154
 msgid "Job"
-msgstr "Job "
+msgstr "Job"
 
 #: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:137
 msgid "Queued"
@@ -3245,7 +3246,7 @@ msgstr "Semua Router dengan Statistik Penuh"
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:562
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:967
 msgid "LeaseSets"
-msgstr "LeaseSets "
+msgstr "LeaseSets"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:439
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:491
@@ -3256,12 +3257,12 @@ msgstr "Negara"
 #: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:456
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:582
 msgid "Full destination, name, Base32, or hash"
-msgstr ""
+msgstr "Destinasi lengkap, nama, base 32, atau hash penuh"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:460
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:505
 msgid "MTU"
-msgstr ""
+msgstr "MTU"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:461
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:499
@@ -3273,7 +3274,7 @@ msgstr "Port"
 msgid ""
 "Never reveal your router identity to anyone, as it is uniquely linked to "
 "your IP address in the network database."
-msgstr ""
+msgstr "Jangan pernah mengungkapkan identitas router Anda kepada siapa pun, karena identitas tersebut tertaut secara unik ke alamat IP Anda di database jaringan."
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:152
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:520
@@ -3299,7 +3300,7 @@ msgstr "Halaman"
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:207
 #: ../java/strings/Strings.java:55
 msgid "Transport"
-msgstr "Transport "
+msgstr "Transport"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:534
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:950
@@ -3318,7 +3319,7 @@ msgstr "Konfigurasikan Partisipasi Floodfill"
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:734
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:751
 msgid "LeaseSet"
-msgstr "LeaseSet "
+msgstr "LeaseSet"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:757
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:413
@@ -3332,17 +3333,17 @@ msgstr "Tidak terpublikasikan"
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:785
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:808
 msgid "Add to address book"
-msgstr ""
+msgstr "Tambahkan ke Buku Alamat"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:787
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:810
 msgid "Add to local address book"
-msgstr ""
+msgstr "Tambahkan ke buku alamat lokal"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:821
 #, java-format
 msgid "Published {0} ago"
-msgstr ""
+msgstr "Dipublikasikan {0} lalu"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:827
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:849
@@ -3360,11 +3361,11 @@ msgstr "Kadaluarsa dalam {0} yang lalu"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:891
 msgid "Lease"
-msgstr "Lease "
+msgstr "Lease"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:895
 msgid "Tunnel"
-msgstr "Tunnel "
+msgstr "Tunnel"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:920
 msgid "Not initialized"
@@ -3387,15 +3388,15 @@ msgstr "Transport"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1081
 msgid "Sort by country"
-msgstr ""
+msgstr "Urutkan berdasarkan negara"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1087
 msgid "Sort by count"
-msgstr ""
+msgstr "Urutkan berdasarkan jumlah"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1212
 msgid "Our Router Identity"
-msgstr ""
+msgstr "Identitas Router Kami"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1225
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:940
@@ -3430,7 +3431,7 @@ msgstr "Telah dipublikasikan"
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1249
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1041
 msgid "Signing Key"
-msgstr "Signing Key "
+msgstr "Signing Key"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1264
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:43
@@ -3448,7 +3449,7 @@ msgstr "Tersembunyi atau sedang diaktifkan"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1328
 msgid "SSU"
-msgstr "SSU "
+msgstr "SSU"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1328
 msgid "SSU with introducers"
@@ -3457,7 +3458,7 @@ msgstr "SSU dengan introducer"
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1329
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:45
 msgid "NTCP"
-msgstr "NTCP "
+msgstr "NTCP"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1329
 msgid "NTCP and SSU"
@@ -3473,7 +3474,7 @@ msgstr "SSU yang hanya menggunakan IPv6, introducer"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1330
 msgid "IPv6 SSU"
-msgstr "IPv6 SSU "
+msgstr "IPv6 SSU"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1330
 msgid "IPv6 SSU, introducers"
@@ -3481,11 +3482,11 @@ msgstr "IPv6 SSU, introducer"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1331
 msgid "IPv6 NTCP"
-msgstr "IPv6 NTCP "
+msgstr "IPv6 NTCP"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1331
 msgid "IPv6 NTCP, SSU"
-msgstr "IPv6 NTCP, SSU "
+msgstr "IPv6 NTCP, SSU"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1331
 msgid "IPv6 NTCP, SSU, introducers"
@@ -3515,7 +3516,7 @@ msgstr "{0} hanya digunakan untuk koneksi outbound"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:145
 msgid "UPnP Overview"
-msgstr ""
+msgstr "Pengenalan UPNP"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:147
 msgid ""
@@ -3525,7 +3526,7 @@ msgstr "UPnP digunakan untuk berkomunikasi dengan Internet Gateway Devices (IGD)
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:149
 msgid "If UPnP is not working, it may be for one of the following reasons:"
-msgstr ""
+msgstr "Jika UPnP tidak berfungsi, hal ini mungkin disebabkan oleh salah satu alasan berikut:"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:150
 msgid "No UPnP-compatible device present"
@@ -3559,25 +3560,25 @@ msgstr "UPnP dapat diaktifkan atau dinonaktifkan pada halaman Network Configurat
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:206
 msgid "Peer Connections"
-msgstr ""
+msgstr "Koneksi Peer"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:208
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:265
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:969
 msgid "Total"
-msgstr "Total "
+msgstr "Total"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:211
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:212
 msgid "IPv4"
-msgstr ""
+msgstr "IPv4"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:216
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:217
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:420
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:597
 msgid "IPv6"
-msgstr "IPv6 "
+msgstr "IPv6"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:350
 msgid ""
@@ -3604,7 +3605,7 @@ msgstr "Remote peer, yang diidentifikasi oleh hash router"
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:419
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:596
 msgid "Dir"
-msgstr "Dir "
+msgstr "Dir"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:357
 msgid "Inbound connection"
@@ -3653,13 +3654,13 @@ msgstr "Sudah berapa lama koneksi ini terjalin"
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:609
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1146
 msgid "Up"
-msgstr "Up "
+msgstr "Up"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:364
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:425
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:611
 msgid "Skew"
-msgstr "Skew "
+msgstr "Skew"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:364
 msgid "The difference between the peer's clock and your own"
@@ -3669,11 +3670,11 @@ msgstr "Perbedaan antara jam peer dan milik anda"
 msgid ""
 "The congestion window, which is how many bytes can be sent without an "
 "acknowledgment"
-msgstr ""
+msgstr "Congestion window, yaitu berapa banyak byte yang bisa dikirim tanpa ada acknowledgement"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:367
 msgid "The number of sent messages awaiting acknowledgment"
-msgstr ""
+msgstr "Jumlah pesan terkirim yang menunggu acknowledgement"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:368
 msgid "The maximum number of concurrent messages to send"
@@ -3701,13 +3702,13 @@ msgstr "Batas retransmit dalam milidetik"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:374
 msgid "Maximum receive / send packet size (bytes)"
-msgstr ""
+msgstr "Ukuran paket terima maksimal / kirim (byte)"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:376
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:426
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:631
 msgid "RX"
-msgstr "RX "
+msgstr "RX"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:376
 msgid "The total number of messages received from the peer"
@@ -3717,7 +3718,7 @@ msgstr "Jumlah total pesan yang diterima dari peer"
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:427
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:633
 msgid "TX"
-msgstr "TX "
+msgstr "TX"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:377
 msgid "The total number of messages sent to the peer"
@@ -3726,7 +3727,7 @@ msgstr "Jumlah total pesan yang dikirim ke peer"
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:378
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:636
 msgid "Dup RX"
-msgstr "Dup RX "
+msgstr "Dup RX"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:378
 msgid "The total number of duplicate packets received from the peer"
@@ -3735,7 +3736,7 @@ msgstr "Jumlah total paket duplikat yang diterima dari peer"
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:379
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:638
 msgid "Dup TX"
-msgstr "Dup TX "
+msgstr "Dup TX"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:379
 msgid "The total number of packets retransmitted to the peer"
@@ -3761,7 +3762,7 @@ msgstr "Antrian keluar"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:429
 msgid "Backlogged?"
-msgstr "Backlogged? "
+msgstr "Backlogged?"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:429
 msgid "Is peer backlogged?"
@@ -3772,7 +3773,7 @@ msgstr "Adalah peer backlogged?"
 #, java-format
 msgid "{0} peer"
 msgid_plural "{0} peers"
-msgstr[0] "{0} peer "
+msgstr[0] "{0} peer"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:583
 msgid "UDP connections"
@@ -3858,25 +3859,25 @@ msgstr[0] "{0} gagal"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:752
 msgid "backlogged"
-msgstr "backlogged "
+msgstr "backlogged"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:86
 #, java-format
 msgid "Showing {0} recent profile."
 msgid_plural "Showing {0} recent profiles."
-msgstr[0] ""
+msgstr[0] "Menampilkan {0} profil terbaru."
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:88
 #, java-format
 msgid "Hiding {0} older profile."
 msgid_plural "Hiding {0} older profiles."
-msgstr[0] ""
+msgstr[0] "Menyembunyikan {0} profil lama."
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:90
 #, java-format
 msgid "Hiding {0} standard profile."
 msgid_plural "Hiding {0} standard profiles."
-msgstr[0] ""
+msgstr[0] "Menyembunyikan {0} profil standar."
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:95
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:300
@@ -3951,7 +3952,7 @@ msgstr "Konfigurasi peer"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:225
 msgid "Integ. Value"
-msgstr "Integ.  Value "
+msgstr "Integ. Value"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:226
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:989
@@ -3975,7 +3976,7 @@ msgstr "Kirim terakhir dengan buruk"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:230
 msgid "10m Resp. Time"
-msgstr "10m Resp.  Waktu:"
+msgstr "10m Resp. Waktu:"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:231
 msgid "1h Resp. Time"
@@ -4021,19 +4022,19 @@ msgstr "Threshold"
 #, java-format
 msgid "{0} fast peer"
 msgid_plural "{0} fast peers"
-msgstr[0] ""
+msgstr[0] "{0} peer cepat"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:293
 #, java-format
 msgid "{0} high capacity peer"
 msgid_plural "{0} high capacity peers"
-msgstr[0] ""
+msgstr[0] "{0} peer berkapasitas tinggi"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:295
 #, java-format
 msgid "{0} integrated peer"
 msgid_plural "{0} integrated peers"
-msgstr[0] ""
+msgstr[0] "{0} peer terintegrasi"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:300
 msgid "as determined by the profile organizer"
@@ -4045,11 +4046,11 @@ msgstr "Kemampuan di netDb tidak digunakan untuk menentukan profile"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:307
 msgid "Congested"
-msgstr ""
+msgstr "Congested"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:308
 msgid "Severely congested"
-msgstr ""
+msgstr "Sangat congested"
 
 #. 0
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:311
@@ -4057,11 +4058,11 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:846
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:910
 msgid "Floodfill"
-msgstr "Floodfill "
+msgstr "Floodfill"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:312
 msgid "Not accepting tunnels"
-msgstr ""
+msgstr "Tidak menerima tunnel"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:315
 #, java-format
@@ -4080,7 +4081,7 @@ msgstr "Di bawah {0} shared bandwidth"
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:247
 #, java-format
 msgid "{0} shared bandwidth"
-msgstr "{0} shared bandwidth "
+msgstr "{0} shared bandwidth"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:327
 msgid "Reachable"
@@ -4120,7 +4121,7 @@ msgstr "berapa banyak peer baru yang mereka informasikan kepada kita akhir-akhir
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:350
 msgid "status"
-msgstr "status "
+msgstr "status"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:352
 msgid "is the peer banned, or unreachable, or failing tunnel tests?"
@@ -4142,15 +4143,15 @@ msgstr "Pembatas bandwidth"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:39
 msgid "Client Messages"
-msgstr ""
+msgstr "Client Messages"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:42
 msgid "Inbound Messages"
-msgstr ""
+msgstr "Inbound Messages"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:43
 msgid "Job Queue"
-msgstr ""
+msgstr "Job Queue"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:44
 msgid "Network Database"
@@ -4158,7 +4159,7 @@ msgstr "Database Jaringan"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:46
 msgid "Router Limiter"
-msgstr ""
+msgstr "Router Limiter"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:47
 msgid "UDP"
@@ -4185,7 +4186,7 @@ msgstr "Langsung ke bagian"
 #. TODO this is broken for non-js
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:96
 msgid "GO"
-msgstr "GO "
+msgstr "GO"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:138
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:189
@@ -4227,11 +4228,11 @@ msgstr "Frekuensi rata-rata seumur hidup"
 #, java-format
 msgid "{0} event"
 msgid_plural "{0} events"
-msgstr[0] ""
+msgstr[0] "{0} event"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:201
 msgid "rate"
-msgstr "rate "
+msgstr "rate"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:203
 msgid "Average"
@@ -4245,7 +4246,7 @@ msgstr "Rata-rata tertinggi"
 #, java-format
 msgid "There was {0} event in this period."
 msgid_plural "There were {0} events in this period."
-msgstr[0] ""
+msgstr[0] "Ada {0} event di periode ini."
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:236
 #, java-format
@@ -4281,7 +4282,7 @@ msgstr "Nilai rata-rata seumur hidup"
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:43
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:150
 msgid "Help &amp; FAQ"
-msgstr "Help &amp; FAQ "
+msgstr "Help &amp; FAQ"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:44
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:289
@@ -4316,7 +4317,7 @@ msgstr "Konfigurasi"
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:46
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:412
 msgid "Diagnostics"
-msgstr ""
+msgstr "Diagnostik"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:47
 msgid "Router Information"
@@ -4332,11 +4333,11 @@ msgstr "Informasi Router (lengkap)"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:50
 msgid "Memory Usage Bar"
-msgstr "Memory Usage Bar "
+msgstr "Memory Usage Bar"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:51
 msgid "Network Reachability"
-msgstr "Network Reachability "
+msgstr "Network Reachability"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:52
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:790
@@ -4353,7 +4354,7 @@ msgstr "Peers (lanjutan)"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:56
 msgid "Firewall &amp; Reseed Status"
-msgstr "Status Firewall &amp; Reseed "
+msgstr "Status Firewall &amp; Reseed"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:58
 msgid "Bandwidth Graph"
@@ -4362,7 +4363,7 @@ msgstr "Grafik Bandwidth"
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:60
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1071
 msgid "Congestion"
-msgstr "Congestion "
+msgstr "Congestion"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:61
 msgid "Tunnel Status"
@@ -4381,16 +4382,16 @@ msgstr "Berita &amp; Update"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:64
 msgid "Advanced Links"
-msgstr "Advanced Links "
+msgstr "Advanced Links"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:148
 msgid "I2P Router Help &amp; FAQ"
-msgstr "I2P Router Help &amp; FAQ "
+msgstr "I2P Router Help &amp; FAQ"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:158
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:506
 msgid "Changelog"
-msgstr "Changelog "
+msgstr "Changelog"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:160
 msgid "Recent development changes to the router"
@@ -4399,7 +4400,7 @@ msgstr "Perubahan pengembangan terbaru terhadap router"
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:166
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:443
 msgid "FAQ"
-msgstr "FAQ "
+msgstr "FAQ"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:169
 msgid "A shortened version of the official Frequently Asked Questions"
@@ -4417,7 +4418,7 @@ msgstr "Informasi mengenai software dan lisensi yang digunakan oleh I2P"
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:187
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:756
 msgid "Information about the network status"
-msgstr ""
+msgstr "Informasi status jaringan"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:196
 msgid "An introduction to the router sidebar"
@@ -4425,23 +4426,23 @@ msgstr "Pengantar router sidebar"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:202
 msgid "Troubleshoot"
-msgstr "Troubleshoot "
+msgstr "Troubleshoot"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:205
 msgid "Troubleshooting &amp; Further Assistance"
-msgstr "Troubleshooting & Bantuan Lebih Lanjut "
+msgstr "Troubleshooting & Bantuan Lebih Lanjut"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:235
 msgid "I2PControl"
-msgstr ""
+msgstr "I2PControl"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:239
 msgid "RPC Service"
-msgstr ""
+msgstr "RPC Services"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:261
 msgid "Local web Server"
-msgstr ""
+msgstr "Server web lokal"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:287
 msgid ""
@@ -4470,7 +4471,7 @@ msgstr "Setelan"
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:389
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:319
 msgid "New Install Wizard"
-msgstr ""
+msgstr "Wizard Instalasi Baru"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:425
 msgid "Graph router performance"
@@ -4478,11 +4479,11 @@ msgstr "Grafik kinerja router"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:435
 msgid "Health Report"
-msgstr "Health Report "
+msgstr "Health Report"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:441
 msgid "NetDB"
-msgstr "NetDB "
+msgstr "NetDB"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:453
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:805
@@ -4521,7 +4522,7 @@ msgstr "Lihat changelog lengkap"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:515
 msgid "Debug"
-msgstr "Debug "
+msgstr "Debug"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:518
 msgid "View router debug information"
@@ -4545,7 +4546,7 @@ msgstr "Dokumentasi untuk I2P API"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:553
 msgid "Jobs"
-msgstr "Jobs "
+msgstr "Jobs"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:556
 msgid "Show the router's workload, and how it's performing"
@@ -4569,7 +4570,7 @@ msgstr "Statistik kinerja router tekstual"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:589
 msgid "Sybils"
-msgstr "Sybils "
+msgstr "Sybils"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:592
 msgid "Review possible sybils in network database"
@@ -4591,7 +4592,7 @@ msgstr "Jangan pernah mengungkapkan hal ini kepada siapapun, karena bisa mengung
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:612
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:672
 msgid "Router Info"
-msgstr "Router Info "
+msgstr "Router Info"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:617
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:643
@@ -4612,7 +4613,7 @@ msgstr "Perbedaan antara waktu disinkronkan jaringan dan waktu setempat"
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:700
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:637
 msgid "Clock Skew"
-msgstr "Clock Skew "
+msgstr "Clock Skew"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:707
 msgid ""
@@ -4622,7 +4623,7 @@ msgstr "Berapa banyak RAM digunakan I2P / total RAM tersedia untuk I2P (tidak te
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:710
 msgid "Memory"
-msgstr "Memory "
+msgstr "Memory"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:767
 msgid "See more information on the wiki"
@@ -4630,7 +4631,7 @@ msgstr "Lihat informasi lebih lanjut di wiki"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:769
 msgid "Warning: ECDSA is not available. Update your Java or OS"
-msgstr "Peringatan: ECDSA tidak tersedia. Memperbarui Java atau OS"
+msgstr "Peringatan: ECDSA tidak tersedia. Memperbarui Java atau OS Anda"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:774
 #, java-format
@@ -4723,7 +4724,7 @@ msgstr "Digunakan untuk membangun dan menguji tunnel, dan berkomunikasi dengan p
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1029
 msgid "Exploratory"
-msgstr "Exploratory "
+msgstr "Exploratory"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1035
 msgid "Tunnels we are using to provide or access services on the network"
@@ -4737,7 +4738,7 @@ msgstr "Tunnel yang kita ikut partisipasi di dalamnya, memberikan kontribusi ban
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1047
 msgid "Participating"
-msgstr "Participating "
+msgstr "Participating"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1053
 msgid ""
@@ -4748,7 +4749,7 @@ msgstr "kami menyediakan rasio tunnel hop untuk tunnel hop yang kita gunakan - n
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1056
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:469
 msgid "Share ratio"
-msgstr "Share ratio "
+msgstr "Share ratio"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1069
 msgid "What's in the router's job queue?"
@@ -4760,7 +4761,7 @@ msgstr "Menunjukkan performa router"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1079
 msgid "Job lag"
-msgstr "Job lag "
+msgstr "Job lag"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1085
 msgid "Indicates how quickly outbound messages to other I2P routers are sent"
@@ -4768,7 +4769,7 @@ msgstr "Menunjukkan seberapa cepat outbound messages dikirim kepada I2P router l
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1088
 msgid "Message delay"
-msgstr "Message delay "
+msgstr "Message delay"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1095
 msgid "Round trip time for a tunnel test"
@@ -4776,7 +4777,7 @@ msgstr "Round trip time untuk tunnel test"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1098
 msgid "Tunnel lag"
-msgstr "Tunnel lag "
+msgstr "Tunnel lag"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1105
 msgid "Queued requests from other routers to participate in tunnels"
@@ -4784,7 +4785,7 @@ msgstr "Antrian request dari router lain untuk berpartisipasi dalam tunnel"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1108
 msgid "Backlog"
-msgstr "Backlog "
+msgstr "Backlog"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:240
 #, java-format
@@ -4802,7 +4803,7 @@ msgstr "ERR-Alamat TCP Privat"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:279
 msgid "ERR-SymmetricNAT"
-msgstr "ERR-SymmetricNAT "
+msgstr "ERR-SymmetricNAT"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:285
 msgid "WARN-Firewalled with Inbound TCP Enabled"
@@ -4840,7 +4841,7 @@ msgstr "Tambah/hapus/edit & kontrol client dan server tunnel"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:624
 msgid "Hidden Service"
-msgstr "Hidden Service "
+msgstr "Hidden Service"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:628
 msgid "Show tunnels"
@@ -4926,7 +4927,7 @@ msgstr "Coba untuk men-download file reference router (jika reseed otomatis tela
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1012
 msgid "Reseed"
-msgstr "Reseed "
+msgstr "Reseed"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1112
 msgid "Order"
@@ -5001,7 +5002,7 @@ msgstr "dimatikan"
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:107
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:459
 msgid "Participating tunnels"
-msgstr "Participating tunnels "
+msgstr "Participating tunnels"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:113
 msgid "Receive on"
@@ -5018,11 +5019,11 @@ msgstr "Dikirim pada"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:115
 msgid "Rate"
-msgstr "Rate "
+msgstr "Rate"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:115
 msgid "Role"
-msgstr "Role "
+msgstr "Role"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:115
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:211
@@ -5043,16 +5044,16 @@ msgstr "masa tenggang"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:171
 msgid "Outbound Endpoint"
-msgstr "Outbound Endpoint "
+msgstr "Outbound Endpoint"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:173
 msgid "Inbound Gateway"
-msgstr "Inbound Gateway "
+msgstr "Inbound Gateway"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:175
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:375
 msgid "Participant"
-msgstr "Participant "
+msgstr "Participant"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:181
 #, java-format
@@ -5081,7 +5082,7 @@ msgstr "Konfigurasi"
 #. renderPeers(out);
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:236
 msgid "Bandwidth Tiers"
-msgstr "Bandwidth Tiers "
+msgstr "Bandwidth Tiers"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:368
 msgid "Inbound or outbound?"
@@ -5089,7 +5090,7 @@ msgstr "Inbound atau outbound?"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:369
 msgid "Gateway"
-msgstr "Gateway "
+msgstr "Gateway"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:372
 msgid "Participants"
@@ -5097,7 +5098,7 @@ msgstr "Participant"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:378
 msgid "Endpoint"
-msgstr "Endpoint "
+msgstr "Endpoint"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:413
 msgid "Locally hosted tunnel"
@@ -5106,7 +5107,7 @@ msgstr "Tunnel yang Berada di Lokal"
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:415
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:420
 msgid "Bandwidth tier"
-msgstr "Bandwidth tier "
+msgstr "Bandwidth tier"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:442
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:450
@@ -5124,37 +5125,37 @@ msgstr "keluar"
 #. Saved in CSSHelper, assume success
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:52
 msgid "Console language saved."
-msgstr ""
+msgstr "Bahasa console disimpan."
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:59
 msgid "Bandwidth test completed successfully"
-msgstr ""
+msgstr "Tes bandwidth selesai dengan sukses"
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:61
 msgid "Bandwidth test failed"
-msgstr ""
+msgstr "Tes bandwidth gagal"
 
 #. didn't run at all?
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:63
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:66
 msgid "Bandwidth test did not complete"
-msgstr ""
+msgstr "Tes bandwidth tidak selesai"
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:148
 msgid "Bandwidth test started"
-msgstr ""
+msgstr "Tes bandwidth dimulai"
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:150
 msgid "Bandwidth test is already running"
-msgstr ""
+msgstr "Tes bandwidth sedang berjalan"
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:159
 msgid "Bandwidth test cancelled"
-msgstr ""
+msgstr "Tes bandwidth dibatalkan"
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:161
 msgid "Bandwidth test was not running"
-msgstr ""
+msgstr "Tes bandwidth tidak berjalan"
 
 #. wars for ConfigClientsHelper
 #: ../java/strings/Strings.java:12
@@ -5163,34 +5164,34 @@ msgstr "address book"
 
 #: ../java/strings/Strings.java:13
 msgid "i2psnark"
-msgstr "i2psnark "
+msgstr "i2psnark"
 
 #: ../java/strings/Strings.java:14
 msgid "i2ptunnel"
-msgstr "i2ptunnel "
+msgstr "i2ptunnel"
 
 #: ../java/strings/Strings.java:15
 msgid "susimail"
-msgstr "susimail "
+msgstr "susimail"
 
 #: ../java/strings/Strings.java:16
 msgid "susidns"
-msgstr "susidns "
+msgstr "susidns"
 
 #: ../java/strings/Strings.java:17
 msgid "routerconsole"
-msgstr "routerconsole "
+msgstr "routerconsole"
 
 #. clients, taken from clients.config, for ConfigClientsHelper
 #. note that if the wording changes in clients.config, we have to
 #. keep the old string here as well for existing installs
 #: ../java/strings/Strings.java:22
 msgid "Web console"
-msgstr "Web console "
+msgstr "Web console"
 
 #: ../java/strings/Strings.java:23
 msgid "SAM application bridge"
-msgstr "SAM application bridge "
+msgstr "SAM application bridge"
 
 #: ../java/strings/Strings.java:24
 msgid "Application tunnels"
@@ -5198,11 +5199,11 @@ msgstr "Tunnel aplikasi"
 
 #: ../java/strings/Strings.java:25
 msgid "My I2P Site web server"
-msgstr ""
+msgstr "Server web Situs I2P saya"
 
 #: ../java/strings/Strings.java:26
 msgid "I2P webserver (I2P Site)"
-msgstr ""
+msgstr "I2P webserver (Situs I2P)"
 
 #: ../java/strings/Strings.java:27
 msgid "Browser launch at startup"
@@ -5222,7 +5223,7 @@ msgstr "Situs I2P"
 
 #: ../java/strings/Strings.java:38
 msgid "I2P webserver"
-msgstr "I2P webserver "
+msgstr "I2P webserver"
 
 #: ../java/strings/Strings.java:39
 msgid "HTTP Proxy"
@@ -5231,7 +5232,7 @@ msgstr "Proxy HTTP"
 #. hardcoded in i2psnark
 #: ../java/strings/Strings.java:41
 msgid "I2PSnark"
-msgstr "I2PSnark "
+msgstr "I2PSnark"
 
 #. standard themes for ConfigUIHelper
 #: ../java/strings/Strings.java:45
@@ -5248,21 +5249,21 @@ msgstr "Enkripsi"
 
 #: ../java/strings/Strings.java:54
 msgid "Stream"
-msgstr "Stream "
+msgstr "Stream"
 
 #. parameters in transport addresses (netdb.jsp)
 #. may or may not be worth translating
 #: ../java/strings/Strings.java:60
 msgid "host"
-msgstr "host "
+msgstr "host"
 
 #: ../java/strings/Strings.java:61
 msgid "key"
-msgstr "key "
+msgstr "key"
 
 #: ../java/strings/Strings.java:62
 msgid "port"
-msgstr "port "
+msgstr "port"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/certs_jsp.java:237
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/certs_jsp.java:414
@@ -5323,7 +5324,7 @@ msgstr "Konfigurasi bandwidth"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:530
 msgid "Advanced Network Configuration"
-msgstr "Advanced Network Configuration "
+msgstr "Advanced Network Configuration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:532
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:579
@@ -5334,31 +5335,31 @@ msgstr "I2p akan bekerja paling baik jika anda mengkonfigurasi rate anda sesuai 
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:534
 msgid "All sidebar values are in bytes per second, not bits per second."
-msgstr ""
+msgstr "Semua ukuran di sidebar dalam byte per detik, bukan bit per detik."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:535
 msgid "You may change your bandwidth limits here."
-msgstr ""
+msgstr "Anda dapat mengubah batas bandwidth Anda di sini."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:536
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:479
 msgid ""
 "The more bandwidth you make available, the more you help the network and "
 "improve your own anonymity, so please take the time to review the settings."
-msgstr ""
+msgstr "Semakin banyak bandwidth yang Anda sediakan, semakin banyak Anda membantu jaringan dan meningkatkan anonimitas Anda sendiri, jadi luangkan waktu untuk meninjau pengaturan."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:537
 msgid ""
 "If you are unsure of your network's speed, use the <a "
 "href=\"/welcome?page=3\">Bandwidth Test</a>."
-msgstr ""
+msgstr "Jika Anda tidak yakin dengan kecepatan jaringan Anda, gunakan <a href=\"/welcome?page=3\">Tes Bandwidth</a>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:538
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:481
 msgid ""
 "Your upstream share amount (KBps Out) will determine your overall "
 "contribution to the network."
-msgstr ""
+msgstr "Jumlah upstream share Anda (KBps Keluar) akan menentukan kontribusi Anda secara keseluruhan terhadap jaringan."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:543
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:583
@@ -5373,7 +5374,7 @@ msgstr "KBps keluar"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:557
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:596
 msgid "Share"
-msgstr "Share "
+msgstr "Share"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:564
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:589
@@ -5424,14 +5425,14 @@ msgid ""
 "Most of the router configuration options listed below are not available in "
 "the user interface, because they are rarely used or provide access to "
 "advanced settings that most users will not need."
-msgstr ""
+msgstr "Sebagian besar opsi konfigurasi router yang tercantum di bawah ini tidak tersedia di antarmuka pengguna, karena mereka jarang digunakan atau mereka menyediakan akses ke pengaturan lanjutan yang tidak diperlukan oleh sebagian besar pengguna."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:527
 msgid ""
 "You must edit your <code>router.config</code> file to add options, or, if "
 "you have added <code>routerconsole.advanced=true</code> to the router.config"
 " file, you may edit settings within the console on this page."
-msgstr ""
+msgstr "Anda harus mengedit file <code>router.config </code> Anda untuk menambahkan opsi, atau jika Anda telah menambahkan <code> routerconsole.advanced=true</code> ke file router.config, Anda dapat mengedit pengaturan dalam pengaturan console di halaman ini."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:529
 msgid "Floodfill Configuration"
@@ -5453,7 +5454,7 @@ msgstr "Router ini saat ini bukan peserta floodfill."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:552
 msgid "Enrollment"
-msgstr "Enrollment "
+msgstr "Enrollment"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:558
 msgid "Automatic"
@@ -5461,7 +5462,7 @@ msgstr "Otomatis"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:564
 msgid "Force On"
-msgstr "Force On "
+msgstr "Force On"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:570
 msgid "Disable"
@@ -5469,7 +5470,7 @@ msgstr "Matikan"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:574
 msgid "Advanced I2P Configuration"
-msgstr "Advanced I2P Configuration "
+msgstr "Advanced I2P Configuration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:591
 msgid "Some changes may require a restart to take effect."
@@ -5482,61 +5483,61 @@ msgstr "Untuk melakukan perubahan, edit file: {0}"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:617
 msgid "Advanced Configuration Help"
-msgstr ""
+msgstr "Bantuan Konfigurasi Lanjutan"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:619
 msgid "Only set this to true if you know what you are doing!"
-msgstr ""
+msgstr "Hanya setel ini ke true jika Anda tahu efeknya!"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:621
 msgid ""
 "When set to true, additional functionality will be enabled in the console "
 "and the user will be able to edit settings directly on this page"
-msgstr ""
+msgstr "Jika disetel ke true, fungsi tambahan akan diaktifkan di console dan pengguna akan dapat mengedit pengaturan langsung di halaman ini"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:625
 msgid ""
 "Extra display options are provided in the <a href=\"/netdb\">Network "
 "Database section</a>."
-msgstr ""
+msgstr "Opsi tampilan tambahan disediakan di bagian <a href=\"/netdb\">Database Jaringan</a>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:626
 msgid "This will also enable the installation of unsigned updates."
-msgstr ""
+msgstr "Ini juga akan mengaktifkan instalasi pembaruan yang tidak ditandatangani."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:627
 msgid ""
 "You may also wish to enable the advanced sidebar section on the <a "
 "href=\"/configsidebar\">Sidebar Configuration page</a>."
-msgstr ""
+msgstr "Anda mungkin juga ingin mengaktifkan bagian sidebar lanjutan di <a href=\"/configsidebar\">halaman Konfigurasi Sidebar</a>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:629
 msgid ""
 "This setting allows the manual selection of the browser which I2P will "
 "launch on startup."
-msgstr ""
+msgstr "Pengaturan ini memungkinkan pemilihan manual browser yang akan diluncurkan I2P pada saat startup."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:631
 msgid ""
 "When set to true, a configurable search bar will appear on the <a "
 "href=\"/home\">console home page</a>"
-msgstr ""
+msgstr "Saat diatur ke true, search bar yang dapat dikonfigurasi akan muncul di <a href=\"/home\"> console homepage</a>"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:635
 msgid ""
 "Additional searches may then be added on the <a href=\"/confighome\">home "
 "configuration page</a>."
-msgstr ""
+msgstr "Pencarian tambahan kemudian dapat ditambahkan pada <a href=\"/confighome\">halaman konfigurasi home</a>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:637
 msgid ""
 "Determines the maximum number of participating tunnels the router will "
 "accept."
-msgstr ""
+msgstr "Menentukan jumlah maksimum participating tunnel yang akan diterima router."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:638
 msgid "To disable participation completely, set to 0."
-msgstr ""
+msgstr "Untuk sepenuhnya menonaktifkan partisipasi, setel ke 0."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:242
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:242
@@ -5551,7 +5552,7 @@ msgstr "Anda yakin ingin menghapus {0}?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:564
 msgid "Client Configuration"
-msgstr "Client Configuration "
+msgstr "Client Configuration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:566
 msgid ""
@@ -5562,12 +5563,12 @@ msgstr "Klien Java yang tercantum di bawah ini dimulai oleh router dan dijalanka
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:574
 #, java-format
 msgid "To change client options, edit the files in the directory {0}."
-msgstr ""
+msgstr "Untuk mengubah pilihan klien, edit file di direktori {0}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:580
 #, java-format
 msgid "To change client options, edit the file {0}."
-msgstr ""
+msgstr "Untuk mengubah pilihan klien, edit file {0}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:588
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:568
@@ -5583,7 +5584,7 @@ msgstr "Hati-hati mengubah pengaturan di sini. 'Router console' dan 'application
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:242
 msgid "config router family"
-msgstr "pengaturan router family "
+msgstr "pengaturan router family"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:554
 msgid "Routers in the same family share a family key."
@@ -5624,7 +5625,7 @@ msgstr "Nama Router Family"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:594
 #, java-format
 msgid "The current router family is {0}."
-msgstr ""
+msgstr "Router Family saat ini adalah {0}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:596
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:600
@@ -5668,11 +5669,11 @@ msgstr "Gunakan home page yang lama"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:568
 msgid "Search Engines"
-msgstr "Search Engines "
+msgstr "Search Engines"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:558
 msgid "Advanced Client Interface Configuration"
-msgstr "Advanced Client Interface Configuration "
+msgstr "Advanced Client Interface Configuration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:562
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:559
@@ -5691,7 +5692,7 @@ msgstr "Banyak klien tidak mendukung SSL atau otorisasi."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:570
 msgid "External I2CP (I2P Client Protocol) Interface Configuration"
-msgstr "External I2CP (I2P Client Protocol) Interface Configuration "
+msgstr "External I2CP (I2P Client Protocol) Interface Configuration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:576
 msgid "Enabled without SSL"
@@ -5707,11 +5708,11 @@ msgstr "Dinonaktifkan - Klien di luar proses Java ini mungkin tidak terhubung"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:600
 msgid "I2CP Interface"
-msgstr "I2CP Interface "
+msgstr "I2CP Interface"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:616
 msgid "I2CP Port"
-msgstr "I2CP Port "
+msgstr "I2CP Port"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:620
 msgid "Authorization"
@@ -5736,7 +5737,7 @@ msgstr "Keyring mungkin berisi key untuk tujuan terenkripsi local atau remote."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:566
 msgid "Manual Keyring Addition"
-msgstr "Manual Keyring Addition "
+msgstr "Manual Keyring Addition"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:568
 msgid "Enter keys for encrypted remote destinations here."
@@ -5754,35 +5755,35 @@ msgstr "halaman I2PTunnel"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:598
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:622
 msgid "Enter key provided by server operator."
-msgstr ""
+msgstr "Masukkan encryption key yang disediakan oleh operator server."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:590
 msgid "Prevents server discovery by floodfills"
-msgstr ""
+msgstr "Mencegah server discovery dengan floodfill"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:594
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:612
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:630
 msgid "Enter password provided by server operator."
-msgstr ""
+msgstr "Masukkan password yang disediakan oleh operator server."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:602
 msgid "Enter key and password provided by server operator."
-msgstr ""
+msgstr "Masukkan encryption key dan password yang disediakan oleh operator server."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:606
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:614
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:626
 msgid "Key will be generated."
-msgstr ""
+msgstr "Encryption key akan dibuat."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:624
 msgid "Leave blank for DH option."
-msgstr ""
+msgstr "Biarkan kosong untuk opsi DH."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:628
 msgid "Optional lookup password"
-msgstr ""
+msgstr "Pencarian kata sandi opsional"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:239
 msgid "config logging"
@@ -5790,7 +5791,7 @@ msgstr "konfigurasi logging"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:528
 msgid "Configure I2P Logging Options"
-msgstr "Configure I2P Logging Options "
+msgstr "Configure I2P Logging Options"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:530
 msgid "View Router Logs"
@@ -5838,7 +5839,7 @@ msgstr "Ukuran file log maks"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:562
 msgid "Compress logs?"
-msgstr ""
+msgstr "Kompresikan log?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:570
 msgid "Default log level"
@@ -5852,7 +5853,7 @@ msgstr "(DEBUG dan INFO adalah default yang tidak disarankan karena akan memperl
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:576
 msgid "Log level overrides"
-msgstr "Log level overrides "
+msgstr "Log level overrides"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:580
 msgid "New override"
@@ -5864,7 +5865,7 @@ msgstr "konfigurasi jaringan"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:557
 msgid "IP and Transport Configuration"
-msgstr "IP and Transport Configuration "
+msgstr "IP and Transport Configuration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:562
 msgid "Changing these settings will restart your router."
@@ -5917,7 +5918,7 @@ msgstr "Juga, <b>Jangan masukkan alamat IP pribadi</b> seperti 127.0.0.1 atau 19
 msgid ""
 "If you specify the wrong IP address, or do not properly configure your NAT "
 "or firewall, your network performance will degrade substantially."
-msgstr ""
+msgstr "Jika anda menentukan alamat IP atau nama host yang salah, atau salah mengkonfigurasi NAT atau firewall, performa jaringan Anda akan menurun secara substansial."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:580
 msgid "When in doubt, leave the settings at the defaults."
@@ -5938,7 +5939,7 @@ msgstr "Konfigurasi IP"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:592
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:698
 msgid "Externally reachable IP address"
-msgstr ""
+msgstr "Nama alamat IP yang dapat dicapai secara eksternal"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:596
 msgid "Use all auto-detect methods"
@@ -5977,7 +5978,7 @@ msgstr "Konfigurasi IPv4"
 msgid ""
 "Disable inbound (Firewalled by home network, ISP, DS-Lite, or carrier-grade "
 "NAT)"
-msgstr ""
+msgstr "Nonaktifkan inbound (Firewalled oleh carrier-grade NAT, DS-Lite, ISP, atau jaringan rumah)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:628
 msgid "IPv6 Configuration"
@@ -6006,7 +6007,7 @@ msgstr "Gunakan IPv6 saja (nonaktifkan IPv4)"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:650
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:662
 msgid "Experimental"
-msgstr "Experimental "
+msgstr "Experimental"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:654
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:716
@@ -6085,11 +6086,11 @@ msgstr "konfigurasi peer"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:579
 msgid "Manual Peer Controls"
-msgstr "Manual Peer Controls "
+msgstr "Manual Peer Controls"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:581
 msgid "Router Hash"
-msgstr "Router Hash "
+msgstr "Router Hash"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:585
 msgid "Manually Ban / Unban a Peer"
@@ -6110,7 +6111,7 @@ msgid ""
 " and High Capacity tiers. Fast peers are used for client tunnels, and High "
 "Capacity peers are used for some exploratory tunnels. Current bonuses are "
 "displayed on the"
-msgstr "Bonus dapat positif atau negatif dan mempengaruhi inklusi peer dalam Fast dan High Capacity tier. Fast peer digunakan untuk client tunnel, dan high capacity peer digunakan untuk beberapa exploratory peer. Bonus saat ini ditampilkan di"
+msgstr "Bonus dapat bernilai positif atau negatif dan mempengaruhi inklusi peer dalam Fast dan High Capacity tier. Fast peer digunakan untuk client tunnel, dan high capacity peer digunakan untuk beberapa exploratory peer. Bonus saat ini ditampilkan di"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:610
 msgid "profiles page"
@@ -6191,7 +6192,7 @@ msgstr "Proksi itu mungkin merupakan proxy publik remote, atau mungkin berjalan 
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:562
 msgid "To use a proxy, configure the type, host, and port below."
-msgstr ""
+msgstr "Untuk menggunakan proxy, konfigurasikan tipe, nama host, dan port di bawah ini."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:564
 msgid ""
@@ -6350,7 +6351,7 @@ msgstr "HTTPS"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:708
 msgid "SOCKS 4/4a"
-msgstr "SOCKS 4/4a "
+msgstr "SOCKS 4/4a"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:714
 msgid "SOCKS 5"
@@ -6501,7 +6502,7 @@ msgstr "Anda mungkin ingin mempertimbangkan untuk mematikan dengan graceful, sep
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:638
 msgid "Debugging"
-msgstr "Debugging "
+msgstr "Debugging"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:642
 msgid ""
@@ -6523,11 +6524,11 @@ msgstr "Antarmuka konfigurasi utama I2P adalah konsol web ini, jadi untuk kenyam
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:242
 msgid "config sidebar"
-msgstr ""
+msgstr "konfigurasi sidebar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:569
 msgid "Refresh Interval"
-msgstr "Refresh Interval "
+msgstr "Refresh Interval"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:583
 msgid "seconds"
@@ -6572,7 +6573,7 @@ msgstr "Ubah opsi pilihan grafik"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:582
 msgid "Log"
-msgstr "Log "
+msgstr "Log"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:590
 msgid "Select stats for visualization on /graphs"
@@ -6652,7 +6653,7 @@ msgstr "Jika Anda tidak menggunakan IE, kemungkinan browser anda berpura-pura me
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:549
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:563
 msgid "Apply"
-msgstr "Apply "
+msgstr "Apply"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:551
 msgid "Router Console Language"
@@ -6706,11 +6707,11 @@ msgstr "Kebijakan update"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:589
 msgid "Fetch news through the proxy?"
-msgstr ""
+msgstr "Ambil berita melalui proxy?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:595
 msgid "Update through the proxy?"
-msgstr ""
+msgstr "Update melalui proxy?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:601
 msgid "Proxy host"
@@ -6718,7 +6719,7 @@ msgstr "Host proxy"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:605
 msgid "Proxy port"
-msgstr ""
+msgstr "Port proxy"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:613
 msgid "Update URLs"
@@ -6764,7 +6765,7 @@ msgid ""
 "(e.g. i2psnark), front-ends to another client or application which must be "
 "separately enabled (e.g. susidns, i2ptunnel), or have no web interface at "
 "all (e.g. address book)."
-msgstr "Aplikasi web Java yang tercantum di bawah ini dimulai oleh webConsole client dan dijalankan di JVM yang sama dengan Router I2P. Mereka biasanya adalah aplikasi web yang dapat diakses melalui router console. Mereka mungkin merupakan aplikasi lengkap (mis. I2psnark), front-end milik klien atau aplikasi lain yang harus diaktifkan secara terpisah (misalnya susidns, i2ptunnel), atau tidak memiliki antarmuka web sama sekali (misalnya buku alamat)."
+msgstr "Aplikasi web Java yang tercantum di bawah ini dimulai oleh webConsole client dan dijalankan di JVM yang sama dengan Router. Mereka biasanya adalah aplikasi web yang dapat diakses melalui router console.  Mereka mungkin merupakan aplikasi lengkap (mis. I2psnark), front-end milik klien atau aplikasi lain yang harus diaktifkan secara terpisah (misalnya susidns, i2ptunnel), atau tidak memiliki antarmuka web sama sekali (misalnya buku alamat)."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configwebapps_jsp.java:562
 msgid ""
@@ -6777,14 +6778,14 @@ msgstr "Aplikasi web mungkin juga dinonaktifkan dengan menghapus file .war dari 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/console_jsp.java:237
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:238
 msgid "home"
-msgstr "home "
+msgstr "home"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/console_jsp.java:444
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/console_jsp.java:446
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:407
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:409
 msgid "Configure Language"
-msgstr ""
+msgstr "Konfigurasi Bahasa"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/console_jsp.java:448
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:411
@@ -6793,7 +6794,7 @@ msgstr "Selamat datang di I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:444
 msgid "I2P Address Book"
-msgstr ""
+msgstr "Buku Alamat I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:446
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:447
@@ -6818,7 +6819,7 @@ msgstr "Klik disini untuk melanjutkan."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:257
 msgid "Internal Error"
-msgstr "Internal Error "
+msgstr "Internal Error"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:271
 msgid "Sorry! There has been an internal error."
@@ -6842,7 +6843,7 @@ msgstr "Rincian Kesalahan"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:283
 #, java-format
 msgid "Error {0}"
-msgstr "Error {0} "
+msgstr "Error {0}"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:305
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:446
@@ -6865,11 +6866,11 @@ msgstr "Halaman tidak ditemukan"
 msgid ""
 "Sorry! You appear to be requesting a nonexistent Router Console page or "
 "resource."
-msgstr ""
+msgstr "Maaf! Anda tampaknya meminta halaman Router Console atau resource yang tidak ada."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error_jsp.java:443
 msgid "Error 404"
-msgstr "Error 404 "
+msgstr "Error 404"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error_jsp.java:448
 msgid "not found"
@@ -6899,7 +6900,7 @@ msgstr "bantuan"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:437
 msgid "I2P Router Help and Support"
-msgstr ""
+msgstr "Bantuan dan FAQ Router I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:447
 msgid "Change Log"
@@ -6915,135 +6916,135 @@ msgid ""
 "with other aspects of the project, please see the documentation for <a "
 "href=\"http://i2p-projekt.i2p/en/get-involved\" "
 "target=\"_blank\">volunteers.</a>"
-msgstr ""
+msgstr "Jika Anda ingin membantu meningkatkan atau menerjemahkan dokumentasi, atau membantu dengan aspek-aspek lain dari proyek ini, silakan lihat dokumentasi untuk menjadi<a href = \"http://i2p-proekt.i2p/en/get-involved\" target = \" _blank \"> relawan. </a>"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:454
 msgid "Further assistance is available here:"
-msgstr ""
+msgstr "Bantuan lebih lanjut tersedia di sini:"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:456
 msgid "FAQ on i2p-projekt.i2p"
-msgstr ""
+msgstr "FAQ di I2p-projekt.i2p"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:458
 #, java-format
 msgid "You may also try {0} or {1}."
-msgstr ""
+msgstr "Anda juga dapat mencoba {0} atau {1}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:460
 msgid "I2P's IRC network"
-msgstr ""
+msgstr "Jaringan IRC I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:464
 msgid "Sidebar Information"
-msgstr ""
+msgstr "Informasi sidebar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:466
 msgid ""
 "Many of the stats on the sidebar may be <a "
 "href=\"configstats\">configured</a> to be <a href=\"graphs\">graphed</a> for"
 " further analysis."
-msgstr ""
+msgstr "Banyak statistik di sidebar yang mungkin <a href=\"configstats\">dikonfigurasi</a> untuk <a href=\"graphs\">digambarkan</a> untuk analisis lebih lanjut."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:468
 msgid ""
 "You may also customize the sections that appear on the Sidebar and their "
 "positioning on the <a href=\"configsidebar\">Sidebar Configuration page</a>."
-msgstr ""
+msgstr "Anda juga dapat menyesuaikan bagian yang muncul di Sidebar dan posisinya di <a href=\"configsidebar\">halaman Konfigurasi Sidebar</a>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:472
 msgid ""
 "This section indicates your average bandwidth speeds and total usage for the"
 " session."
-msgstr ""
+msgstr "Bagian ini menunjukkan kecepatan bandwidth rata-rata dan total penggunaan untuk sesi tersebut."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:475
 msgid "All values are in bytes per second, not bits per second."
-msgstr ""
+msgstr "Semua ukuran adalah dalam byte per detik, bukan bit per detik."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:477
 msgid ""
 "You may change your bandwidth limits on the <a href=\"config\">Bandwidth "
 "Configuration page</a>."
-msgstr ""
+msgstr "Anda dapat mengubah batas bandwidth di <a href=\"config\">halaman Konfigurasi Bandwidth</a>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:487
 msgid ""
 "The first number is the number of peers your router has sent or received a "
 "message from in the last few minutes."
-msgstr ""
+msgstr "Angka pertama adalah jumlah peer yang router Anda pernah kirim atau terima pesan dalam beberapa menit terakhir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:489
 msgid ""
 "This may range from 8-10 to several hundred, depending on your total "
 "bandwidth, shared bandwidth, and locally-generated traffic."
-msgstr ""
+msgstr "Jumlahnya mungkin berkisar antara 8-10 hingga beberapa ratus, bergantung pada total bandwidth, shared bandwidth, dan lalu lintas yang dihasilkan secara lokal."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:491
 msgid "The second number is the number of peers seen in the last hour or so."
-msgstr ""
+msgstr "Angka kedua adalah jumlah peeer yang terlihat dalam satu jam terakhir atau lebih."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:493
 msgid "Do not be concerned if these numbers vary widely."
-msgstr ""
+msgstr "Jangan khawatir jika angkanya sangat bervariasi."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:497
 msgid ""
 "This is the number of peers your router has available for building client "
 "tunnels."
-msgstr ""
+msgstr "Ini adalah jumlah peer yang tersedia pada router Anda untuk membangun client tunnel."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:499
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:507
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:515
 msgid "These peers are shown on the <a href=\"profiles\">profiles page</a>."
-msgstr ""
+msgstr "Peers ini ditampilkan di <a href=\"profiles\">halaman profil </a>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:503
 msgid ""
 "This is the number of peers your router has available for building your "
 "exploratory tunnels which are used to determine network performance."
-msgstr ""
+msgstr "Ini adalah jumlah peer yang tersedia pada router Anda untuk membangun exploratory tunnel yang digunakan untuk menentukan kinerja jaringan."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:505
 msgid "The fast peers are included in the high capacity tier."
-msgstr ""
+msgstr "Peer yang cepat dimasukkan ke dalam tingkat berkapasitas tinggi."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:511
 msgid ""
 "This is the number of peers your router will use for network database "
 "inquiries."
-msgstr ""
+msgstr "Ini adalah jumlah peer yang digunakan router Anda untuk network database inquiries"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:513
 msgid ""
 "These are usually the floodfill routers responsible for maintaining network "
 "integrity."
-msgstr ""
+msgstr "Ini biasanya adalah router floodfill yang bertanggung jawab untuk menjaga integritas jaringan."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:519
 msgid "This is the total number of peers that are known by your router."
-msgstr ""
+msgstr "Ini adalah jumlah total peer yang diketahui oleh router Anda."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:521
 msgid "This may range from under 100 to several thousand."
-msgstr ""
+msgstr "Ini dapat berkisar kurang dari 100 hingga beberapa ribu."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:523
 msgid ""
 "This number is not the total size of the network; it may vary widely "
 "depending on your total bandwidth, shared bandwidth, and locally-generated "
 "traffic."
-msgstr ""
+msgstr "Jumlah ini bukan besar total jaringan; Ini mungkin sangat bervariasi tergantung pada bandwidth total Anda, shared bandwidth, dan lalu lintas yang dihasilkan secara lokal."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:525
 msgid ""
 "I2P does not require a router to know every other router in the network."
-msgstr ""
+msgstr "I2P tidak memerlukan sebuah router untuk mengetahui setiap router lain di jaringan."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:529
 msgid "Network Help"
-msgstr ""
+msgstr "Bantuan Jaringan"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:533
 msgid ""
@@ -7236,7 +7237,7 @@ msgid ""
 "I2P does not work well behind this type of firewall. You will probably not "
 "be able to accept inbound connections, which will limit your participation "
 "in the network."
-msgstr "I2p tidak bekerja baik di belakang firewall jenis ini. Anda mungkin tidak akan mampu menerima koneksi masuk, sehingga akan membatasi partisipasi anda dalam jaringan."
+msgstr "I2p tidak bekerja baik di belakang firewall jenis ini. Anda mungkin tidak akan mampu menerima koneksi masuk, sehingga akan membatasi partisipasi Anda dalam jaringan."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:613
 msgid ""
@@ -7274,7 +7275,7 @@ msgstr "ERR-UDP dinonaktifkan dan host/port Inbound TCP tidak diatur"
 msgid ""
 "You have not configured inbound TCP with an address and port on the Network "
 "Configuration page, however you have disabled UDP."
-msgstr ""
+msgstr "Anda belum mengonfigurasi inbound TCP dengan alamat dan port pada halaman Konfigurasi Jaringan, namun Anda telah menonaktifkan UDP."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:627
 msgid "Therefore your router cannot accept inbound connections."
@@ -7304,35 +7305,35 @@ msgstr "Apakah anda sedang menjalankan I2P yang lain? Hentikan program tersebut 
 msgid ""
 "The skew (offset) of your computer's clock relative to the network-synced "
 "time."
-msgstr ""
+msgstr "Kemiringan (offset) jam komputer Anda relatif terhadap waktu yang disinkronkan ke jaringan."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:641
 msgid "I2P requires your computer's time be accurate."
-msgstr ""
+msgstr "I2P membutuhkan waktu komputer yang akurat."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:643
 msgid ""
 "If the skew is more than a few seconds, please correct the problem by "
 "adjusting your computer's time."
-msgstr ""
+msgstr "Jika kemiringannya lebih dari beberapa detik, perbaiki masalahnya dengan menyesuaikan waktu komputer Anda."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:645
 msgid ""
 "If I2P cannot connect to the internet, a reading of 0ms may be indicated."
-msgstr ""
+msgstr "Jika I2P tidak dapat terhubung ke Internet, nilai 0ms dapat mengindikasikan kalau tidak terhubung ke Internet."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:649
 msgid "Abridged I2P FAQ"
-msgstr ""
+msgstr "FAQ I2P Ringkas"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:651
 msgid "This is a shortened version of the official FAQ."
-msgstr ""
+msgstr "Ini adalah versi singkat dari Frequently Asked Questions resmi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:654
 #, java-format
 msgid "For the full version, please visit {0} or {1}."
-msgstr ""
+msgstr "Untuk versi lengkap, silakan kunjungi {0} atau {1}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:658
 msgid ""
@@ -7345,20 +7346,20 @@ msgid ""
 "If after a few minutes of uptime your router is indicating 0 Active Peers "
 "and 0 Known Peers, with a notification in the sidebar that you need to check"
 " your network connection, verify that you can access the internet."
-msgstr ""
+msgstr "Jika setelah beberapa menit uptime, router Anda menunjukkan 0 peer aktif dan 0 known peer, dengan pemberitahuan di sidebar bahwa Anda perlu memeriksa koneksi jaringan Anda, verifikasi bahwa Anda dapat mengakses internet."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:662
 msgid ""
 "If your internet connection is functional, you may need to unblock Java in "
 "your firewall."
-msgstr ""
+msgstr "Jika koneksi internet Anda berfungsi, Anda mungkin perlu membuka blokir Java di firewall Anda."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:664
 msgid ""
 "Otherwise, you may need to reseed your I2P router. Visit the <a "
 "href=\"/configreseed#reseedconfig\">Reseed Configuration page</a> and click "
 "the \"Save Changes and Reseed Now\" button."
-msgstr ""
+msgstr "Jika tidak, Anda mungkin perlu reseed router I2P Anda. Kunjungi <a href=\"/configreseed#reseedconfig\"> halaman konfigurasi reseed </a> dan klik tombol \"simpan perubahan dan reseed sekarang\"."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:666
 msgid "My router has very few active peers, is this OK?"
@@ -7366,67 +7367,67 @@ msgstr "Router memiliki peer aktif yang sangat sedikit, apakah ini OK?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:668
 msgid "If your router has 10 or more active peers, everything is fine."
-msgstr ""
+msgstr "Jika router anda memiliki 10 peer yang lebih aktif atau lebih banyak lagi, semuanya baik-baik saja."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:670
 msgid "The router should maintain connections to a few peers at all times."
-msgstr ""
+msgstr "Router harus menjaga hubungan dengan beberapa peer sepanjang waktu."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:672
 msgid ""
 "The best way to stay connected to the network is to <a "
 "href=\"/config\">share more bandwidth</a>."
-msgstr ""
+msgstr "Cara terbaik untuk tetap terhubung ke jaringan adalah dengan <a href=\"/config\"> berbagi lebih banyak bandwidth </a>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:674
 msgid ""
 "I am missing lots of hosts in my addressbook. What are some good "
 "subscription links?"
-msgstr ""
+msgstr "Saya kehilangan banyak host di addressbook saya. Apa ada link yang bagus untuk berlangganan?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:676
 #, java-format
 msgid "The default subscription is to {0} which is seldom updated."
-msgstr ""
+msgstr "Berlangganan default adalah {0} yang jarang di-update."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:678
 msgid ""
 "If you don't have another subscription, you may use \"jump\" links which are"
 " slower, but ensure that your addressbook only contains the default "
 "addresses and sites that you use."
-msgstr ""
+msgstr "Jika Anda tidak memiliki langganan lain, Anda dapat menggunakan \"jump\" link yang lebih lambat, tetapi pastikan bahwa buku alamat Anda hanya berisi alamat dan situs default yang Anda gunakan."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:680
 msgid ""
 "To speed up browsing on I2P, it's a good idea to add some addressbook "
 "subscriptions."
-msgstr ""
+msgstr "Untuk mempercepat browsing I2P, sebaiknya tambahkan beberapa langganan buku alamat."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:682
 msgid "Here are some other public addressbook subscription links."
-msgstr ""
+msgstr "Berikut adalah beberapa link berlangganan addressbook umum lainnya."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:684
 msgid ""
 "You may wish to add one or two to your <a "
 "href=\"/susidns/subscriptions\">subscription list</a>."
-msgstr ""
+msgstr "Anda mungkin ingin menambahkan satu atau dua ke <a href=\"/susidns/subscriptions\"> daftar berlangganan</a>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:686
 msgid ""
 "Note that subscribing to a hosts.txt service is an act of trust, as a "
 "malicious subscription could give you incorrect addresses, so be careful "
 "subscribing to lists from unknown sources."
-msgstr ""
+msgstr "Perhatikan bahwa berlangganan layanan hosts.txt adalah tindakan \"kepercayaan\", karena langganan jahat bisa memberikan Anda alamat yang salah, jadi berhatihatilah saat berlangganan dari sumber yang tidak dikenal. "
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:688
 msgid ""
 "The operators of these services may have various policies for listing hosts."
-msgstr ""
+msgstr "Operator dari layanan ini mungkin memiliki berbagai kebijakan untuk daftar host."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:690
 msgid "Presence on this list does not imply endorsement."
-msgstr ""
+msgstr "Kehadiran daftar ini tidak menyiratkan endorsement."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:692
 msgid ""
@@ -7437,75 +7438,75 @@ msgstr "Bagaimana cara mengakses IRC, BitTorrent, atau layanan lainnya di Intern
 msgid ""
 "Unless an outproxy has been set up for the service you want to connect to, "
 "this is not possible."
-msgstr ""
+msgstr "Kecuali jika outproxy telah disiapkan untuk layanan yang ingin Anda hubungi, ini tidak dapat dilakukan."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:696
 msgid ""
 "There are only three types of outproxies running right now: HTTP, HTTPS, and"
 " email."
-msgstr ""
+msgstr "Hanya ada tiga jenis outproxies yang sedang berjalan saat ini: HTTP, HTTPS, dan email."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:698
 msgid "Note that there is currently no public SOCKS outproxy."
-msgstr ""
+msgstr "Perhatikan bahwa saat ini tidak ada outproxy SOCKS."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:700
 msgid "How do I configure my browser to access I2P websites?"
-msgstr ""
+msgstr "Bagaimana cara mengkonfigurasi browser saya untuk mengakses situs web I2P?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:702
 msgid ""
 "You will need to configure your browser to use the HTTP proxy server on host"
 " <code>127.0.0.1</code> port <code>4444</code>)."
-msgstr ""
+msgstr "Anda perlu mengonfigurasi browser Anda untuk menggunakan server proxy HTTP pada port host <code>127.0.0.1</code> <code>4444</code>)."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:704
 #, java-format
 msgid "See the {0} for a more detailed explanation."
-msgstr ""
+msgstr "Lihat {0} untuk penjelasan yang lebih rinci."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:705
 msgid "Browser Proxy Configuration Guide"
-msgstr ""
+msgstr "Panduan Konfigurasi Proxy Browser"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:707
 msgid "What is an eepsite?"
-msgstr ""
+msgstr "Apa itu \"eepsite\"?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:709
 msgid "An eepsite is a website that is hosted anonymously on the I2P network."
-msgstr ""
+msgstr "Eepsite adalah situs web yang dihosting secara anonim di jaringan I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:711
 msgid ""
 "You can access it by configuring your web browser to use I2P's HTTP proxy "
 "and browsing to the website."
-msgstr ""
+msgstr "Anda dapat mengaksesnya dengan mengkonfigurasi browser web Anda untuk menggunakan proxy HTTP I2P dan menjelajah ke situs web."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:713
 msgid "Most of the eepsites are down?"
-msgstr ""
+msgstr "Sebagian besar eepsites tidak aktif?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:715
 msgid ""
 "If you consider every eepsite that has ever been created, yes, most of them "
 "are down."
-msgstr ""
+msgstr "Jika anda mempertimbangkan setiap eepsite yang pernah dibuat, ya, sebagian besar dari mereka sedang tidak aktif."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:718
 msgid "People and eepsites come and go."
-msgstr ""
+msgstr "Orang dan eepsites datang dan pergi."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:720
 msgid ""
 "A good way to get started in I2P is check out a list of eepsites that are "
 "currently up."
-msgstr ""
+msgstr "Cara yang baik untuk memulai di I2P adalah melihat daftar eepsites yang sedang aktif."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:722
 #, java-format
 msgid "{0} tracks active eepsites."
-msgstr ""
+msgstr "{0} melacak eepsites aktif."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:725
 msgid "How do I connect to IRC within I2P?"
@@ -7515,26 +7516,26 @@ msgstr "Bagaimana mengakses IRC dalam I2P?"
 msgid ""
 "A tunnel to the main IRC server network within I2P, Irc2P, is automatically "
 "started when the I2P router starts."
-msgstr ""
+msgstr "Tunnel ke server IRC utama dalam I2P, Irc2P, dibuat saat I2P diinstal dan otomatis dimulai saat router I2P dimulai."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:729
 msgid ""
 "To connect to it, tell your IRC client to connect to server: "
 "<code>127.0.0.1</code> port: <code>6668</code>."
-msgstr ""
+msgstr "Untuk menghubungkannya, beritahu klien IRC anda untuk terhubung ke server: <code>127.0.0.1</code> port: <code>6668</code>"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:731
 msgid ""
 "HexChat-like client users can create a new network with the server "
 "<code>127.0.0.1/6668</code>, or you can connect with the command "
 "<code>/server 127.0.0.1 6668</code>."
-msgstr ""
+msgstr "Pengguna klien seperti HexChat dapat membuat jaringan baru dengan server <code>127.0.0.1/6668</code>, atau menggunakan perintah <code>/server 127.0.0.1 6668</code>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:733
 msgid ""
 "Different IRC clients may require a different command, consult the client "
 "documentation."
-msgstr ""
+msgstr "Klien IRC yang berbeda mungkin memerlukan perintah yang berbeda, silakan baca dokumentasi klien."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:735
 msgid "What ports does I2P use?"
@@ -7548,17 +7549,17 @@ msgstr "Local port"
 msgid ""
 "These are the local I2P port mappings, listening only to local connections "
 "by default, except where noted."
-msgstr ""
+msgstr "Ini adalah pemetaan port I2P lokal, yang hanya mendengarkan koneksi lokal secara default, kecuali jika disetting lain."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:741
 msgid ""
 "Unless you require access from other machines, they should only be "
 "accessible from localhost."
-msgstr ""
+msgstr "Kecuali jika Anda memerlukan akses dari komputer lain, mereka hanya boleh diakses dari Localhost."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:745
 msgid "Function"
-msgstr ""
+msgstr "Fungsi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:747
 msgid "Notes"
@@ -7566,19 +7567,19 @@ msgstr "Catatan"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:753
 msgid "Internet facing ports"
-msgstr ""
+msgstr "Port yang menghadap internet"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:755
 msgid ""
 "I2P selects a random port to communicate with other routers when the program"
 " is run for the first time."
-msgstr ""
+msgstr "I2P memilih port acak untuk berkomunikasi dengan router lain saat program I2P dijalankan pertama kali."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:757
 msgid ""
 "The selected port is shown on the <a href=\"/confignet\">Network "
 "Configuration page</a>."
-msgstr ""
+msgstr "Port yang dipilih ditampilkan pada <a href=\"/confignet\">halaman konfigurasi jaringan </a>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:419
 msgid "Search"
@@ -7586,23 +7587,23 @@ msgstr "Cari"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jars_jsp.java:240
 msgid "Jar File Dump"
-msgstr "Jar File Dump "
+msgstr "Jar File Dump"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jobs_jsp.java:237
 msgid "job queue"
-msgstr "job queue "
+msgstr "job queue"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jobs_jsp.java:414
 msgid "I2P Router Job Queue"
-msgstr "I2P Router Job Queue "
+msgstr "I2P Router Job Queue"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:240
 msgid "logs"
-msgstr "logs "
+msgstr "logs"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:433
 msgid "I2P Router Logs"
-msgstr "I2P Router Logs "
+msgstr "I2P Router Logs"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:435
 msgid ""
@@ -7612,7 +7613,7 @@ msgstr "Mohon sertakan versi I2P anda dan informasi running environment dalam la
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:544
 msgid "Critical Logs"
-msgstr "Critical Logs "
+msgstr "Critical Logs"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:566
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:574
@@ -7621,11 +7622,11 @@ msgstr "Critical Logs "
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:624
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:636
 msgid "Clear logs"
-msgstr ""
+msgstr "Log Hapus"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:582
 msgid "Router Logs"
-msgstr "Router Logs "
+msgstr "Router Logs"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:603
 msgid "Configure router logging options"
@@ -7633,7 +7634,7 @@ msgstr "Konfigurasi pilihan router log"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:609
 msgid "Event Logs"
-msgstr "Event Logs "
+msgstr "Event Logs"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:611
 msgid "View event logs"
@@ -7641,7 +7642,7 @@ msgstr "Lihat event log"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:613
 msgid "Service (Wrapper) Logs"
-msgstr "Service (Wrapper) Logs "
+msgstr "Service (Wrapper) Logs"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/netdb_jsp.java:238
 msgid "network database"
@@ -7649,7 +7650,7 @@ msgstr "database jaringan"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/netdb_jsp.java:415
 msgid "I2P Network Database"
-msgstr "I2P Network Database "
+msgstr "I2P Network Database"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/news_jsp.java:240
 msgid "News"
@@ -7682,7 +7683,7 @@ msgstr "Koneksi peer"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/peers_jsp.java:414
 msgid "I2P Network Peers"
-msgstr "I2P Network Peers "
+msgstr "I2P Network Peers"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:237
 msgid "peer profiles"
@@ -7702,7 +7703,7 @@ msgstr "Statistik I2p Router"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:380
 msgid "Refresh (s)"
-msgstr "Refresh (s) "
+msgstr "Refresh (s)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:383
 msgid "Enable"
@@ -7719,7 +7720,7 @@ msgstr "torrent"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:445
 msgid "I2P Torrent Manager"
-msgstr "I2P Torrent Manager "
+msgstr "I2P Torrent Manager"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:240
 msgid "tunnel summary"
@@ -7727,17 +7728,17 @@ msgstr "ringkasan tunnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:433
 msgid "I2P Tunnel Summary"
-msgstr "I2P Tunnel Summary "
+msgstr "I2P Tunnel Summary"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:449
 msgid "This page shows tunnels built by and routed through your router."
-msgstr ""
+msgstr "Halaman ini menunjukkan tunnel yang dibangun oleh dan dialihkan melalui router Anda."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:453
 msgid ""
 "Tunnels built by your router and used for communication with the floodfill "
 "peers, building new tunnels, and testing existing tunnels."
-msgstr ""
+msgstr "Tunnel yang dibangun oleh router Anda dan digunakan untuk berkomunikasi dengan floodfill peer, membangun tunnel baru, dan menguji tunnel yang sudah ada."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:455
 msgid "Client tunnels"
@@ -7745,47 +7746,47 @@ msgstr "Saluran klien"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:457
 msgid "Tunnels built by your router for each client's use."
-msgstr ""
+msgstr "Tunnel yang dibangun oleh router Anda untuk penggunaan setiap klien."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:461
 msgid "Tunnels built by other routers through your router."
-msgstr ""
+msgstr "Tunnel yang dibangun oleh router lain melalui router Anda."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:463
 msgid ""
 "The quantity may vary widely depending on network demand, your shared "
 "bandwidth, and amount of locally-generated traffic."
-msgstr ""
+msgstr "Jumlahnya mungkin sangat bervariasi tergantung pada kebutuhan jaringan, bandwidth yang Anda bagikan, dan jumlah lalu lintas yang dihasilkan secara lokal."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:465
 msgid ""
 "The recommended method for limiting participating tunnels is to change your "
 "share percentage on the <a href=\"config\">Bandwidth Configuration page</a>."
-msgstr ""
+msgstr "Metode yang disarankan untuk membatasi participating tunnel adalah dengan mengubah persentase pembagian Anda di <a href=\"config\">halaman Konfigurasi Bandwidth</a>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:467
 msgid ""
 "You may also limit the total number by setting "
 "<code>router.maxParticipatingTunnels=nnn</code> on the <a "
 "href=\"configadvanced\">Advanced configuration page</a>."
-msgstr ""
+msgstr "Anda juga dapat membatasi jumlah totalnya dengan mengatur <code>router.maxParticipatingTunnels=nnn</code> pada <a href=\"configadvanced\">halaman konfigurasi lanjutan</a>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:471
 msgid ""
 "The number of participating tunnels you route for others, divided by the "
 "total number of hops in all your exploratory and client tunnels."
-msgstr ""
+msgstr "Jumlah participating tunnel yang Anda rute-kan untuk orang lain, dibagi dengan jumlah total hop di semua exploratory tunnel dan client tunnel Anda."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:473
 msgid ""
 "A number greater than 1.00 means you are contributing more tunnels to the "
 "network than you are using."
-msgstr ""
+msgstr "Angka yang lebih besar dari 1.00 berarti Anda menyumbangkan lebih banyak tunnel ke jaringan I2P daripada yang Anda gunakan."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/viewprofile_jsp.java:237
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/viewprofile_jsp.java:414
 msgid "Peer Profile"
-msgstr "Peer Profile "
+msgstr "Peer Profile"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/viewprofile_jsp.java:436
 #, java-format
@@ -7794,7 +7795,7 @@ msgstr "Profil untuk peer {0}"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:263
 msgid "webmail"
-msgstr "webmail "
+msgstr "webmail"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:445
 msgid "I2P Webmail"
@@ -7802,11 +7803,11 @@ msgstr "I2p Webmail"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:332
 msgid "Bandwidth test in progress..."
-msgstr ""
+msgstr "Tes bandwidth sedang berlangsung ..."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:334
 msgid "Bandwidth test is complete, click Next"
-msgstr ""
+msgstr "Tes bandwidth selesai, klik Next"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:479
 msgid "Select Language"
@@ -7814,98 +7815,98 @@ msgstr "Pilih Bahasa"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:481
 msgid "This project is supported by volunteer translators on Transifex."
-msgstr ""
+msgstr "Proyek ini didukung oleh penerjemah sukarelawan di Transifex."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:483
 msgid "This helps keep I2P accessible to everyone all over the world."
-msgstr ""
+msgstr "Ini membantu menjaga I2P dapat diakses oleh semua orang di seluruh dunia."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:485
 msgid ""
 "Thank you to all of the volunteers all over the world who help make I2P "
 "accessible."
-msgstr ""
+msgstr "Terima kasih kepada semua sukarelawan di seluruh dunia yang membantu membuat I2P dapat diakses."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:487
 #, java-format
 msgid ""
 "If you would like to get involved, {0}please consider the I2P translation "
 "efforts{1}."
-msgstr ""
+msgstr "Jika Anda ingin terlibat, {0} silakan pertimbangkan upaya terjemahan I2P {1}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:489
 msgid "Please select your preferred language:"
-msgstr ""
+msgstr "Pilih bahasa yang Anda inginkan:"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:509
 msgid "Select Theme"
-msgstr ""
+msgstr "Pilih Tema"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:511
 msgid "Please select your preferred theme:"
-msgstr ""
+msgstr "Silakan pilih tema pilihan Anda:"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:521
 msgid "Bandwidth Test"
-msgstr ""
+msgstr "Tes Bandwidth"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:523
 msgid "Let's check your internet connection!"
-msgstr ""
+msgstr "Ayo periksa koneksi internet Anda!"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:525
 msgid ""
 "Bandwidth participation not only makes your speed and connection to the I2P "
 "network better, but also helps everyone using the network."
-msgstr ""
+msgstr "Partisipasi bandwidth tidak hanya membuat kecepatan dan koneksi Anda ke jaringan I2P lebih baik, tetapi juga membantu semua orang yang menggunakan jaringan tersebut."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:527
 msgid ""
 "When everyone is sharing as much bandwidth as possible, everyone gets to "
 "have better performance and privacy by sharing participating traffic."
-msgstr ""
+msgstr "Ketika semua orang berbagi bandwidth sebanyak mungkin, semua orang akan mendapatkan kinerja dan privasi yang lebih baik dengan berbagi lalu lintas yang berpartisipasi."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:529
 msgid ""
 "I2P uses M-Lab, a third party service, to help you test your internet "
 "connection and find the optimal speed settings."
-msgstr ""
+msgstr "I2P menggunakan M-Lab, layanan pihak ketiga, untuk membantu Anda menguji koneksi internet Anda dan menemukan pengaturan kecepatan yang optimal."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:531
 msgid ""
 "During this time you will be connected directly to M-Lab's service with your"
 " real IP address."
-msgstr ""
+msgstr "Selama ini berlangsung, Anda akan terhubung langsung ke layanan M-Lab dengan alamat IP asli Anda."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:533
 msgid "Please review the M-Lab privacy policies linked below."
-msgstr ""
+msgstr "Harap tinjau kebijakan privasi M-Lab yang di bawah ini."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:535
 msgid ""
 "If you do not wish to run the M-Lab bandwidth test, you can skip it and "
 "configure your bandwidth later."
-msgstr ""
+msgstr "Jika Anda tidak ingin menjalankan tes bandwidth M-LAB, Anda dapat melewatkannya dan mengonfigurasi bandwidth Anda nanti."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:537
 #, java-format
 msgid "{0}M-Lab Privacy Policy{1}"
-msgstr ""
+msgstr "{0} Kebijakan Privasi M-Lab {1}"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:539
 #, java-format
 msgid "{0}M-Lab Name Server Privacy Policy{1}"
-msgstr ""
+msgstr "{0} Kebijakan Privasi M-LAB Name Server{1}"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:547
 msgid "Bandwidth Test in Progress"
-msgstr ""
+msgstr "Tes bandwidth Sedang Berlangsung"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:549
 msgid ""
 "Javascript is disabled - wait 60 seconds for the bandwidth test to complete "
 "and then click Next"
-msgstr ""
+msgstr "JavaScript dinonaktifkan - tunggu 60 detik untuk tes bandwidth selesai dan kemudian klik berikutnya"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:551
 msgid ""
@@ -7913,7 +7914,7 @@ msgid ""
 "bandwidth, obtaining an initial set of peers from a reseed server, making "
 "its first few connections, and getting integrated with the rest of the "
 "network."
-msgstr ""
+msgstr "Sementara perangkat lunak router I2P sedang bersiap -siap untuk mulai, software-nya sedang menguji bandwidth Anda, mengambil satu set peer awal dari server reseed, membuat beberapa koneksi pertamanya, dan sedang dalam proses berintegrasi kepada jaringan."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:553
 #, java-format
@@ -7921,162 +7922,162 @@ msgid ""
 "To learn more about how important I2P Reseed servers are, or explore other "
 "topics and what functions they perform for I2P, you can visit the {0}I2P "
 "Wiki{1}."
-msgstr ""
+msgstr "Untuk mempelajari lebih lanjut tentang betapa pentingnya server I2P Reseed, atau menjelajahi topik lain dan fungsi apa yang dijalankannya untuk I2P, Anda dapat mengunjungi {0}I2P Wiki{1}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:555
 #, java-format
 msgid ""
 "If you would like to discuss I2P topics or get help from the community, you "
 "can visit the {0}I2P Forums{1}."
-msgstr ""
+msgstr "Jika Anda ingin mendiskusikan topik I2P atau mendapatkan bantuan dari komunitas, Anda dapat mengunjungi {0}Forum I2P{1}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:557
 #, java-format
 msgid ""
 "If you want to know more about the I2P Project itself, or the Invisible "
 "Internet in general, you can visit our {0}Project Website{1}."
-msgstr ""
+msgstr "Jika Anda ingin mengetahui lebih banyak tentang Proyek I2P, atau Invisible Internet secara umum, Anda dapat mengunjungi {0}Situs Web Proyek{1} kami."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:577
 msgid "Bandwidth Configuration"
-msgstr ""
+msgstr "Konfigurasi Bandwidth"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:609
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:616
 msgid ""
 "By donating your bandwidth to participating traffic, you not only help "
 "others, you improve your own anonymity and performance."
-msgstr ""
+msgstr "Dengan menyumbangkan bandwidth Anda ke lalu lintas yang berpartisipasi, Anda tidak hanya membantu orang lain, Anda juga meningkatkan anonimitas dan kinerja Anda sendiri."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:611
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:618
 msgid ""
 "We recommend sharing 75% or more for I2P, but you can adjust based on your "
 "needs."
-msgstr ""
+msgstr "Kami merekomendasikan berbagi 75% atau lebih untuk I2P, tetapi Anda dapat menyesuaikan berdasarkan kebutuhan Anda."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:628
 msgid "Browser and Application Setup"
-msgstr ""
+msgstr "Pengaturan Browser dan Aplikasi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:630
 msgid "Your browser needs to be configured to work with I2P."
-msgstr ""
+msgstr "Browser Anda perlu dikonfigurasi untuk menggunakan I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:632
 msgid ""
 "We have instructions for configuring both Firefox and Chromium based "
 "browsers with I2P."
-msgstr ""
+msgstr "Kami memiliki instruksi untuk mengkonfigurasi browser berbasis Firefox dan Chromium untuk digunakan untuk I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:634
 #, java-format
 msgid "You can find these instructions on our {0}website{1}."
-msgstr ""
+msgstr "Anda dapat menemukan instruksi ini di {0}situs web kami{1}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:640
 msgid ""
 "Otherwise, the recommended way to browse I2P websites is with a separate "
 "profile in the Firefox browser."
-msgstr ""
+msgstr "Kalau tidak, cara yang disarankan untuk menelusuri situs web I2P adalah dengan profil terpisah di browser Firefox."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:642
 #, java-format
 msgid "{0}Install Firefox{1}"
-msgstr ""
+msgstr "{0}Install Firefox{1}"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:644
 #, java-format
 msgid "{0}Install the I2P Firefox profile{1}"
-msgstr ""
+msgstr "{0}Instal profil Firefox I2P{1}"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:650
 msgid ""
 "The I2P router also comes with its own versions of common, useful internet "
 "applications."
-msgstr ""
+msgstr "Router I2P juga mempunyai versi sendiri aplikasi internet sendiri."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:652
 #, java-format
 msgid "You can download files with {0}bittorrent{1}."
-msgstr ""
+msgstr "Anda dapat mengunduh file dengan {0}bittorrent{1}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:654
 #, java-format
 msgid "You can also send and receive {0}email{1}."
-msgstr ""
+msgstr "Anda juga dapat mengirim dan menerima {0}email{1}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:656
 #, java-format
 msgid ""
 "Besides that, you can use the built-in {0}web server{1} so you can create, "
 "communicate, and share your content."
-msgstr ""
+msgstr "Selain itu, Anda dapat menggunakan {0}server web{1} bawaan sehingga Anda dapat membuat, berkomunikasi, dan berbagi konten."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:658
 msgid ""
 "These applications work with I2P automatically and require no additional "
 "configuration."
-msgstr ""
+msgstr "Aplikasi-aplikasi ini berfungsi dengan I2P secara otomatis dan tidak memerlukan konfigurasi tambahan."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:660
 #, java-format
 msgid ""
 "To help make I2P addresses easier to read and remember, the I2P router also "
 "includes its built-in {0}Address Book{1}."
-msgstr ""
+msgstr "Untuk membantu membuat alamat I2P lebih mudah dibaca dan diingat, router I2P juga menyertakan {0}Buku Alamat{1} bawaan."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:662
 msgid ""
 "The Address Book is where you keep track of all your I2P \"Contacts\" by "
 "giving them human-readable names."
-msgstr ""
+msgstr "Buku alamat adalah tempat Anda melacak semua \"kontak\" I2P Anda dengan memberi mereka nama yang dapat dibaca manusia."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:664
 msgid ""
 "This can be used for the sites you like to visit, messaging contacts, or "
 "potentially any other service on I2P."
-msgstr ""
+msgstr "Ini dapat digunakan untuk situs yang ingin Anda kunjungi, mengirim pesan kepada kontak-kontak Anda, atau layanan lainnya di I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:666
 msgid ""
 "To help you get started, the address book can be used to subscribe to lists "
 "of addresses distributed by other I2P users."
-msgstr ""
+msgstr "Untuk membantu Anda memulai, buku alamat dapat digunakan untuk berlangganan daftar alamat yang didistribusikan oleh pengguna I2P lainnya."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:674
 msgid "Welcome to the Invisible Internet!"
-msgstr ""
+msgstr "Selamat datang di Invisible Internet"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:676
 msgid ""
 "It will take some time for your peers to integrate your router into the "
 "network, but while that is happening you can still explore I2P applications "
 "and get to know your way around the router console."
-msgstr ""
+msgstr "Butuh waktu bagi rekan-rekan Anda untuk mengintegrasikan router Anda ke dalam jaringan, tetapi sementara itu terjadi, Anda masih dapat menjelajahi aplikasi I2P dan membiasakan diri di router console."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:678
 #, java-format
 msgid ""
 "There is a quick guide, news about the latest release, an FAQ, and "
 "troubleshooting guide available on the {0}console{1} page."
-msgstr ""
+msgstr "Ada panduan singkat, berita tentang rilis terbaru, FAQ, dan panduan pemecahan masalah yang tersedia di halaman {0}console{1}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:680
 msgid "You may notice a message in the sidebar that I2P is rejecting tunnels."
-msgstr ""
+msgstr "Anda mungkin melihat pesan di sidebar bahwa I2P menolak tunnel."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:682
 msgid ""
 "This is normal behavior as part of the startup process, to make sure that "
 "your router is ready to help others with participating traffic."
-msgstr ""
+msgstr "Ini adalah perilaku normal sebagai bagian dari proses startup, untuk memastikan bahwa router Anda siap membantu orang lain dengan lalu lintas yang berpartisipasi."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:684
 msgid ""
 "When the connection indicators in the sidebar turn green, you are ready to "
 "explore the Invisible Internet."
-msgstr ""
+msgstr "Ketika indikator koneksi di sidebar berubah hijau, Anda siap untuk menjelajahi invisible internet ."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:699
 msgid "Previous"
@@ -8084,15 +8085,15 @@ msgstr "Sebelumnya"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:706
 msgid "Skip Setup"
-msgstr ""
+msgstr "Lewati Pengaturan"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:712
 msgid "Skip Bandwidth Test"
-msgstr ""
+msgstr "Lewati Tes Bandwidth"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:718
 msgid "Cancel Bandwidth Test"
-msgstr ""
+msgstr "Batalkan Tes Bandwidth"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:724
 msgid "Next"

@@ -12,7 +12,7 @@ msgstr ""
 "POT-Creation-Date: 2021-08-14 13:36+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
 "Last-Translator: Robert Dafis <robertdafis@gmail.com>, 2018\n"
-"Language-Team: Indonesian (http://www.transifex.com/otf/I2P/language/id/)\n"
+"Language-Team: Indonesian (http://app.transifex.com/otf/I2P/language/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -55,7 +55,7 @@ msgstr "Tidak ada"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:232
 msgid "Hashcash"
-msgstr "Hashcash "
+msgstr "Hashcash"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:234
 msgid "Hidden"
@@ -63,11 +63,11 @@ msgstr "Tersembunyi"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:236
 msgid "Signed"
-msgstr "Signed "
+msgstr "Signed"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:238
 msgid "Key"
-msgstr "Key "
+msgstr "Key"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:240
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:265
@@ -136,14 +136,14 @@ msgstr "Nama host {0} sudah ada di address book, tidak berubah."
 msgid ""
 "Host name {0} is already in address book with a different destination. Click"
 " \"Replace\" to overwrite."
-msgstr "Nama host {0} sudah ada di address book dengan destinasi yang berbeda. Klik \"Ganti\" untuk menimpa."
+msgstr "Nama host {0} sudah ada di address book dengan destinasi yang berbeda. Klik \"Ganti\" untuk menimpanya."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:284
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:291
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:279
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:286
 msgid "Unable to resolve Base 32 address"
-msgstr ""
+msgstr "Tidak dapat menemukan alamat Base32"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:309
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:318
@@ -160,12 +160,12 @@ msgstr "Destinasi diubah untuk {0}."
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:313
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:322
 msgid "Warning - hostname does not end with \".i2p\""
-msgstr ""
+msgstr "Peringatan - nama host tidak diakhiri dengan \".i2p\""
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:320
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:334
 msgid "Invalid Base 32 hostname."
-msgstr ""
+msgstr "Nama host Base 32 tidak valid"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:322
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:336
@@ -176,12 +176,12 @@ msgstr "Destinasi Base 64 tidak valid"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:342
 #, java-format
 msgid "Invalid hostname \"{0}\"."
-msgstr ""
+msgstr "Nama host \"{0}\" tidak valid."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:332
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:345
 msgid "Please enter a hostname and destination"
-msgstr ""
+msgstr "Mohon masukkan nama host dan destinasi"
 
 #. clear search when deleting
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:336
@@ -236,7 +236,7 @@ msgstr "Address book disimpan."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:369
 msgid "ERROR: Could not write address book file."
-msgstr ""
+msgstr "ERROR: Tidak dapat menulis ke dalam file address book."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:374
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:108
@@ -245,7 +245,7 @@ msgstr ""
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or "
 "\"reload\" button on your browser. Please resubmit."
-msgstr "Pengajuan formulir tidak valid, mungkin karena anda menggunakan tombol \"kembali\" atau \"muat ulang\" di browser Anda. Mohon kirimkan kembali"
+msgstr "Pengajuan formulir tidak valid, mungkin karena anda menggunakan tombol \"kembali\" atau \"muat ulang\" di browser Anda. Mohon kirimkan kembali."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:376
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:110
@@ -313,37 +313,37 @@ msgstr "Anda harus memasukkan sebuah file"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:571
 msgid "No entries found in file"
-msgstr ""
+msgstr "Tidak ada entri yang ditemukan di dalam file"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:581
 #, java-format
 msgid "Imported from file {0}"
-msgstr ""
+msgstr "Diimpor dari file {0}"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:583
 msgid "Imported from file"
-msgstr ""
+msgstr "Diimpor dari file"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:595
 #, java-format
 msgid "Loaded {0} entry from file"
 msgid_plural "Loaded {0} entries from file"
-msgstr[0] ""
+msgstr[0] "{0} entri dimuat dari file"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:599
 #, java-format
 msgid "Skipped {0} duplicate entry from file"
 msgid_plural "Skipped {0} duplicate entries from file"
-msgstr[0] ""
+msgstr[0] "Melewatkan {0} entri duplikat dari file"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:605
 msgid "Import from file failed"
-msgstr ""
+msgstr "Gagal impor dari file"
 
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:148
 msgid ""
 "Subscriptions saved, updating address book from subscription sources now."
-msgstr ""
+msgstr "Subskripsi tersimpan, sekarang sedang memperbarui address book dari sumber subsripsi."
 
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:153
 msgid "Subscriptions saved."
@@ -361,7 +361,7 @@ msgstr "Impor"
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:215
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:192
 msgid "address book"
-msgstr "address book "
+msgstr "address book"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:227
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:208
@@ -369,7 +369,7 @@ msgstr "address book "
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:190
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:199
 msgid "Overview"
-msgstr "Overview "
+msgstr "Overview"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:229
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:210
@@ -377,7 +377,7 @@ msgstr "Overview "
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:192
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:201
 msgid "Private"
-msgstr "Private "
+msgstr "Private"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:231
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:212
@@ -393,7 +393,7 @@ msgstr "Lokal"
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:196
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:205
 msgid "Router"
-msgstr "Router "
+msgstr "Router"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:235
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:216
@@ -424,7 +424,7 @@ msgstr "Konfigurasi"
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:241
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:214
 msgid "Address book"
-msgstr "Address book "
+msgstr "Address book"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:246
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:219
@@ -435,31 +435,31 @@ msgstr "Penyimpanan"
 msgid ""
 "Addresses in the Private Address Book are not shared with anyone else unless"
 " you copy them by hand."
-msgstr ""
+msgstr "Alamat di Buku Alamat Pribadi tidak dapat dibagikan kepada orang lain kecuali Anda menyalinnya dengan tangan."
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:263
 msgid ""
 "The Published Address Book is used for sharing addresses using your I2P "
 "Site."
-msgstr ""
+msgstr "Buku Alamat yang Diterbitkan digunakan untuk berbagi alamat menggunakan Situs I2P Anda."
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:265
 msgid "Sites in the Private Address Book are not published here."
-msgstr ""
+msgstr "Situs-situs di Buku Alamat Pribadi tidak dipublikasikan di sini."
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:272
 msgid "This is the Local Address Book."
-msgstr ""
+msgstr "Ini adalah Buku Alamat Lokal."
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:275
 msgid "Use it for sites that you host on this computer."
-msgstr ""
+msgstr "Gunakan Buku Alamat Lokal untuk situs yang Anda host di komputer ini."
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:282
 msgid ""
 "The Router Address Book is automatically generated by combining the "
 "Subscriptions, Local, Private, and Published address books."
-msgstr ""
+msgstr "Buku Alamat Router secara otomatis dihasilkan dengan menggabungkan buku alamat Langganan, Lokal, Pribadi, dan Diterbitkan."
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:311
 msgid "Export in hosts.txt format"
@@ -475,7 +475,7 @@ msgstr "Hapus filter"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:368
 msgid "Filter"
-msgstr "Filter "
+msgstr "Filter"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:385
 msgid "other"
@@ -497,7 +497,7 @@ msgstr "Nama host"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:437
 msgid "Link (b32)"
-msgstr "Link (b32) "
+msgstr "Link (b32)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:439
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:374
@@ -506,7 +506,7 @@ msgstr "Destinasi"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:453
 msgid "Select hosts for deletion from address book"
-msgstr ""
+msgstr "Pilih host untuk dihapus dari address book"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:501
 msgid "View larger version of identicon for this hostname"
@@ -518,7 +518,7 @@ msgstr "Alamat base 32"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:521
 msgid "Helper link to share host address with option to add to address book"
-msgstr ""
+msgstr "Helper link untuk berbagi alamat host dengan pilihan untuk ditambahkan ke addressbook"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:527
 msgid "More information on this entry"
@@ -548,11 +548,11 @@ msgstr "Tambahkan destinasi baru"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:677
 msgid "Destination or Base 32 Address"
-msgstr ""
+msgstr "Destinasi atau alamat Base 32"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:699
 msgid "Import from hosts.txt file"
-msgstr ""
+msgstr "Impor dari file host.txt"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:701
 msgid "File"
@@ -576,31 +576,31 @@ msgid ""
 "File and directory paths here are relative to the address book's working "
 "directory, which is normally ~/.i2p/addressbook/ (Linux) or "
 "%LOCALAPPDATA%\\I2P\\addressbook\\ (Windows)."
-msgstr ""
+msgstr "File dan path direktori di sini relatif terhadap working directory dari addressbook, yang biasanya ~/.i2p/addressbook/ (Linux) atau %LOCALAPPDATA%\\\\I2P\\\\addressbook\\\\ (Windows)."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:243
 msgid ""
 "If you want to manually add lines to an address book, add them to the "
 "private or local address books."
-msgstr ""
+msgstr "Jika Anda ingin menambahkan baris secara manual ke addressbook, tambahkan ke addressbook pribadi atau lokal."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:245
 msgid ""
 "The router address book and the published address book are updated by the "
 "address book application."
-msgstr ""
+msgstr "Address book dari router dan address book yang published diperbarui oleh aplikasi address book."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:247
 msgid ""
 "When you publish your address book, ALL destinations from the local and "
 "router address books appear there."
-msgstr ""
+msgstr "Saat Anda mempublikasikan address book anda, SEMUA destinasi dari address book lokal dan router muncul di sana."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:249
 msgid ""
 "Use the private address book for private destinations, these are not "
 "published."
-msgstr ""
+msgstr "Gunakan address book yang private untuk destinasi pribadi, ini tidak dipublikasikan."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:251
 msgid "Options"
@@ -626,11 +626,11 @@ msgstr "Hosts.txt milik anda (tidak berubah)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:261
 msgid "Your personal address book, these hosts will be published"
-msgstr ""
+msgstr "Address book pribadi anda, nama-nama host berikut ini akan dipublikasikan"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:263
 msgid "Your private address book, it is never published"
-msgstr ""
+msgstr "Address book pribadi anda, tidak akan pernah dipublikasikan"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:265
 msgid "Port for your eepProxy (no need to change)"
@@ -642,7 +642,7 @@ msgstr "Nama host untuk eepProxy anda (tidak perlu diubah)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:269
 msgid "Whether to update the published address book"
-msgstr ""
+msgstr "Apakah akan mengupdate address book yang dipublikasikan"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:271
 msgid ""
@@ -666,7 +666,7 @@ msgstr "Nama theme yang akan digunakan (defaultnya adalah 'light')"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:282
 msgid "Encoded Name"
-msgstr "Encoded Name "
+msgstr "Encoded Name"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:296
 msgid "Base 32 Address"
@@ -674,11 +674,11 @@ msgstr "Alamat base 32"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:304
 msgid "Base 64 Hash"
-msgstr "Hash Base 64 "
+msgstr "Hash Base 64"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:310
 msgid "Address Helper"
-msgstr "Address Helper "
+msgstr "Address Helper"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:316
 msgid "link"
@@ -686,23 +686,23 @@ msgstr "Link"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:320
 msgid "Public Key"
-msgstr "Public Key "
+msgstr "Public Key"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:322
 msgid "ElGamal 2048 bit"
-msgstr "ElGamal 2048 bit "
+msgstr "ElGamal 2048 bit"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:326
 msgid "Signing Key"
-msgstr "Signing Key "
+msgstr "Signing Key"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:332
 msgid "Certificate"
-msgstr "Certificate "
+msgstr "Certificate"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:338
 msgid "Validated"
-msgstr "Validated "
+msgstr "Validated"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:340
 msgid "no"
@@ -746,17 +746,17 @@ msgstr "Pendahuluan"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:204
 msgid "What is the address book?"
-msgstr ""
+msgstr "Apa itu address book?"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:206
 msgid "The address book application is part of your I2P installation."
-msgstr ""
+msgstr "Aplikasi addressbook adalah bagian dari instalasi I2P anda."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:208
 msgid ""
 "You can use it to connect human-readable names, like i2p-projekt.i2p, to I2P"
 " Destinations."
-msgstr ""
+msgstr "Anda dapat menggunakannya untuk menghubungkan nama-nama yang dapat dibaca manusia, seperti I2p-projekt.i2p, ke destinasi I2P."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:210
 msgid ""
@@ -774,7 +774,7 @@ msgstr "Pada konfigurasi default, address book hanya berlangganan ke {0}."
 msgid ""
 "Subscribing to additional sites is easy, just add them to your <a "
 "href=\"subscriptions\">subscriptions</a>."
-msgstr ""
+msgstr "Subskripsi ke situs tambahan itu mudah, tambahkan saja ke file <a href=\"subscriptions\">langganan</a> anda."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:216
 msgid ""
@@ -785,41 +785,41 @@ msgstr "Untuk informasi lebih lanjut tentang penamaan di I2P, lihat <a href=\"ht
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:218
 msgid "How to use the Address Book?"
-msgstr ""
+msgstr "Bagaimana cara menggunakan Address Book?"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:220
 msgid ""
 "The I2P Address Book allows you to manage addresses by sorting them into "
 "categories."
-msgstr ""
+msgstr "Buku Alamat I2P memungkinkan Anda mengelola alamat dengan menempatkannya ke dalam kategori."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:222
 msgid ""
 "You may use these categories according to how you intend to use the address."
-msgstr ""
+msgstr "Anda dapat menggunakan kategori ini sesuai dengan keinginan Anda menggunakan alamat tersebut."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:224
 msgid ""
 "Router: These addresses are added automatically, by your subscriptions. If "
 "you publish an address book, the router address book will be shared with "
 "other I2P users."
-msgstr ""
+msgstr "Router: Alamat-alamat ini ditambahkan secara otomatis, oleh subskripsi Anda. Jika Anda menerbitkan addressbook, addressbook router akan dibagikan dengan pengguna I2P lainnya."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:226
 msgid ""
 "Local: This is your personal address book, for hosts which you publish and "
 "share with others."
-msgstr ""
+msgstr "Local: Ini adalah addressbook pribadi Anda, untuk host yang Anda terbitkan dan bagikan dengan orang lain."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:228
 msgid ""
 "Private: This address book if used for addresses which you do not want to "
 "share with other I2P users."
-msgstr ""
+msgstr "Private: Addressbook ini jika digunakan untuk alamat yang tidak ingin Anda bagikan dengan pengguna I2P lainnya."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:230
 msgid "How does the address book application work?"
-msgstr ""
+msgstr "Bagaimana cara kerja aplikasi addressbook?"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:232
 msgid ""
@@ -831,14 +831,14 @@ msgstr "Aplikasi addressbook secara teratur memilah-milah subskripsi anda dan me
 msgid ""
 "Then it merges your \"local\" address book into the router address book as "
 "well."
-msgstr ""
+msgstr "Kemudian itu menggabungkan address book \"local\" Anda ke dalam address book router."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:236
 msgid ""
 "If configured, the router address book is now written to the \"published\" "
 "address book, which will be publicly available if you are running an I2P "
 "Site."
-msgstr ""
+msgstr "Jika dikonfigurasi, address book router sekarang ditulis ke address book \"dipublikasikan\", yang akan tersedia untuk publik jika Anda menjalankan situs I2P."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:238
 msgid ""
@@ -869,7 +869,7 @@ msgstr "File subskripsi berisi daftar URL i2p."
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:232
 msgid ""
 "The address book application regularly checks this list for new I2P Sites."
-msgstr ""
+msgstr "Aplikasi addressbook secara teratur memeriksa daftar ini untuk situs I2P baru."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:234
 msgid "Those URLs refer to published hosts.txt files."
@@ -913,7 +913,7 @@ msgstr "Supaya SusiDNS mendorong addressbook router Anda ke addressbook terpubli
 msgid ""
 "All hosts derived from subscriptions will appear in this address book, in "
 "addition to any you manually add here or to your Local address book."
-msgstr ""
+msgstr "Semua host yang diambil dari subscription atau langganan akan muncul di address book, termasuk yang Anda tambahkan secara manual atau dari address book local."
 
 #: build/HowSVG.java:9
 msgid "Router Addressbook"
@@ -963,7 +963,7 @@ msgstr "Jika Anda menambahkan host secara manual ke sini, host akan dimasukkan k
 
 #: build/HowSVG.java:19
 msgid "Local Addressbook"
-msgstr ""
+msgstr "Addressbook Lokal"
 
 #: build/HowSVG.java:20
 msgid "Searchable by"
@@ -977,7 +977,7 @@ msgstr "Aplikasi I2P"
 msgid ""
 "The Local, Router and Private address books collectively serve as the DNS "
 "authority for I2P applications."
-msgstr ""
+msgstr "Addressbook Local, Router, dan Privat secara bersamaan berfungsi sebagai DNS untuk aplikasi I2P."
 
 #: build/HowSVG.java:23
 msgid "Optional,"
@@ -998,7 +998,7 @@ msgstr "Jika Anda mengatur SusiDNS untuk mempublikasikan addressbook router Anda
 msgid ""
 "Addresses manually added to your Local address book will merge with your "
 "Router address book."
-msgstr ""
+msgstr "Addressbook yang ditambahkan secara manual ke addressbook lokal akan digabungkan ke dalam addressbook router."
 
 #: build/HowSVG.java:27
 msgid ""

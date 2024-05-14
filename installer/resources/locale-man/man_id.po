@@ -8,13 +8,14 @@
 # Khairul Agasta <khairuldroids@gmail.com>, 2017
 # Robert Dafis <robertdafis@gmail.com>, 2017
 # zzzi2p, 2017
+# Adrian Achyar, 2024
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2021-11-27 13:31-0000\n"
-"Last-Translator: zzzi2p, 2017\n"
-"Language-Team: Indonesian (https://www.transifex.com/otf/teams/12694/id/)\n"
+"Last-Translator: Adrian Achyar, 2024\n"
+"Language-Team: Indonesian (https://app.transifex.com/otf/teams/12694/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -271,9 +272,12 @@ msgstr "REPORTING BUGS"
 #. type: Plain text
 #: man/eepget.1:98 man/i2prouter.1:59 man/i2prouter-nowrapper.1:29
 msgid ""
-"Please enter an issue on E<.UR https://i2pgit.org/i2p-"
-"hackers/i2p.i2p/-/issues> the I2P GitLab server E<.UE .>"
+"Please enter an issue on E<.UR "
+"https://i2pgit.org/i2p-hackers/i2p.i2p/-/issues> the I2P GitLab server E<.UE"
+" .>"
 msgstr ""
+"Silakan masukkan issue di E<.UR "
+"https://i2pgit.org/i2p-hackers/i2p.i2p/-/issues> I2P GitLab server E<.UE .>"
 
 #. type: SH
 #: man/eepget.1:99 man/i2prouter.1:60 man/i2prouter-nowrapper.1:30
