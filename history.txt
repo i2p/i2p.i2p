@@ -1,3 +1,5 @@
+2024-05-15 2.5.2 (API 0.9.62) released
+
 2024-05-14 zzz
  * i2ptunnel: Fix keepalive bug causing truncation of chunked content
  * Pull translations from Transifex
