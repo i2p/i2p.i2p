@@ -2365,7 +2365,7 @@
         <echo message="    ${gpg} -u ${release.gpg.keyid} -b i2pinstall_${release.number}_windows.exe" />
         <echo message="    sha256sum i2pinstall_${release.number}_windows.exe" />
         <echo message="Don't forget to git tag -s i2p-${release.number}" />
-        <echo message="         ...and git push origin i2p-${release.number}" />
+        <echo message="         ...and git push origin tag i2p-${release.number}" />
     </target>
 
     <target name="forceJava7">

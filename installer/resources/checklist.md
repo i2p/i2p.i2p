@@ -183,8 +183,9 @@
 3. If all goes well, tag and push the release:
 
     ```
-    git tag -s i2p-0.x.xx
+    git tag -s i2p-2.x.x
     git push
+    git push origin tag i2p-2.x.x
     ```
 
 ### Distribute updates
