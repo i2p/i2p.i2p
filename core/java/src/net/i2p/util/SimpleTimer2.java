@@ -113,6 +113,7 @@ public class SimpleTimer2 {
     private static class CustomScheduledThreadPoolExecutor extends ScheduledThreadPoolExecutor {
         public CustomScheduledThreadPoolExecutor(int threads, ThreadFactory factory) {
              super(threads, factory);
+             setRemoveOnCancelPolicy(true);
         }
 
         @Override
