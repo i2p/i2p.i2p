@@ -758,9 +758,9 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                     InputStream in = new BufferedInputStream(_socket.getInputStream(), BUF_SIZE);
                     _reader = new I2CPMessageReader(in, this);
                 }
+                if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "before startReading");
+                _reader.startReading();
             }
-            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "before startReading");
-            _reader.startReading();
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Before getDate");
             Properties auth = null;
             if ((!_context.isRouterContext()) && _options.containsKey(I2PClient.PROP_USER) && _options.containsKey(I2PClient.PROP_PW)) {
