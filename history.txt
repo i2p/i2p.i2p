@@ -1,3 +1,10 @@
+2024-05-17 zzz
+ * Build: Add script to make Tor blocklist
+
+2024-05-16 zzz
+ * I2CP: Hopefully fix rare NPE
+ * Util: Remove ST2 timers from queue on cancel
+
 2024-05-15 2.5.2 (API 0.9.62) released
 
 2024-05-14 zzz
