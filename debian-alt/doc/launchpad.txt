@@ -15,7 +15,7 @@ Versions are as follows:
 Min version	Max version		Uses src pkg	Copied to Debian
 -----------	-----------		------------	----------------
 bionic		--			bionic		--
-focal		ocular except lunar	bionic		buster, bullseye, bookworm, trixie, sid
+focal		oracular except lunar	bionic		buster, bullseye, bookworm, trixie, sid
 lunar		--			bionic		-- (OBSOLETE)
 
 Unsupported (Java 7):
