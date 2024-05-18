@@ -93,7 +93,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private final IntroductionManager _introManager;
     private final ExpirePeerEvent _expireEvent;
     private final PeerTestEvent _testEvent;
-    private final PacketBuilder _packetBuilder;
     private Status _reachabilityStatus;
     private Status _reachabilityStatusPending;
     // only for logging, to be removed
@@ -407,8 +406,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _cachedBid[i] = new SharedBid(BID_VALUES[i]);
         }
 
-        _packetBuilder = (dh != null) ? new PacketBuilder(_context, this) : null;
-        _packetBuilder2 = (xdh != null) ? new PacketBuilder2(_context, this) : null;
+        _packetBuilder2 = new PacketBuilder2(_context, this);
         _fragments = new OutboundMessageFragments(_context, this, _activeThrottle);
         _inboundFragments = new InboundMessageFragments(_context, _fragments, this);
         //if (SHOULD_FLOOD_PEERS)
@@ -2397,18 +2395,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     void sendDestroy(PeerState peer, int reasonCode) {
         UDPPacket pkt;
-        if (peer.getVersion() == 1) {
-            // peer must be fully established
-            if (peer.getCurrentCipherKey() == null)
-                return;
-            pkt = _packetBuilder.buildSessionDestroyPacket(peer);
-        } else {
             try {
                 pkt = _packetBuilder2.buildSessionDestroyPacket(reasonCode, (PeerState2) peer);
             } catch (IOException ioe) {
                 return;
             }
-        }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending destroy to : " + peer);
         send(pkt);
@@ -3750,14 +3741,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     /**
-     *  @return the PacketBuilder, or null if SSU1 disabled
-     *  @since 0.9.52
-     */
-    PacketBuilder getBuilder() {
-        return _packetBuilder;
-    }
-
-    /**
      *  @return null if not configured for SSU2
      *  @since 0.9.54
      */
@@ -3891,15 +3874,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                         // or else session will stay open forever?
                         //peer.setLastSendTime(now);
                         UDPPacket ping;
-                        if (peer.getVersion() == 2) {
                             try {
                                 ping = _packetBuilder2.buildPing((PeerState2) peer);
                             } catch (IOException ioe) {
                                 continue;
                             }
-                        } else {
-                            ping = _packetBuilder.buildPing(peer);
-                        }
                         send(ping);
                         peer.setLastPingTime(now);
                         // If external port is different, it may be changing the port for every

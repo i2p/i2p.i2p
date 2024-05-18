@@ -326,17 +326,6 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
         return true;
     }
 
-    // SSU 1 unsupported things
-
-    @Override
-    List<Long> getCurrentFullACKs() { throw new UnsupportedOperationException(); }
-    @Override
-    List<Long> getCurrentResendACKs() { throw new UnsupportedOperationException(); }
-    @Override
-    void removeACKMessage(Long messageId) { throw new UnsupportedOperationException(); }
-    @Override
-    void fetchPartialACKs(List<ACKBitfield> rv) { throw new UnsupportedOperationException(); }
-
     // SSU 2 things
 
     /// begin SSU2Sender interface ///
