@@ -2054,7 +2054,7 @@
     <target name="buildRouterTest" depends="buildCoreTest">
         <ant dir="router/java/" target="jarTest" />
     </target>
-    <target name="buildTest" depends="buildRouterTest">
+    <target name="buildTest" depends="buildRouterTest, buildMinistreaming">
         <copy file="core/java/build/i2ptest.jar" todir="build" />
         <copy file="router/java/build/routertest.jar" todir="build" />
         <!-- broken -->
