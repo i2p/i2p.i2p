@@ -4,20 +4,20 @@
 // as a formal dedication to the public domain and in circumstances where
 // a public domain is not usable.
 
-var fails = 0;
+var __welcome_fails = 0;
 
 function ajax(url, target, refresh) {
   // native XMLHttpRequest object
   if (window.XMLHttpRequest) {
-    req = new XMLHttpRequest();
-    req.onreadystatechange = function() {ajaxDone(url, target, refresh);};
+    var req = new XMLHttpRequest();
+    req.onreadystatechange = function() {ajaxDone(req, url, target, refresh);};
     req.open("GET", url, true);
     // IE https://www.jamesmaurer.com/ajax-refresh-problem-w-ie-not-refreshing.asp
     req.setRequestHeader("If-Modified-Since","Sat, 1 Jan 2000 00:00:00 GMT");
     req.send(null);
     // IE/Windows ActiveX version
   } else if (window.ActiveXObject) {
-    req = new ActiveXObject("Microsoft.XMLDOM");
+    var req = new ActiveXObject("Microsoft.XMLDOM");
     if (req) {
       req.onreadystatechange = function() {ajaxDone(target);};
       req.open("GET", url, true);
@@ -28,7 +28,7 @@ function ajax(url, target, refresh) {
   }
 }
 
-function ajaxDone(url, target, refresh) {
+function ajaxDone(req, url, target, refresh) {
   // only if req is "loaded"
   if (req.readyState == 4) {
     var fail = false;
@@ -37,7 +37,7 @@ function ajaxDone(url, target, refresh) {
     // only if "OK"
     if (req.status == 200) {
       // output 1 for complete, 0 + status string for in progress
-      fails = 0;
+      __welcome_fails = 0;
       var status;
       // IE doesn't support startsWith()
       if (req.responseText.indexOf("1") == 0) {
@@ -51,9 +51,9 @@ function ajaxDone(url, target, refresh) {
       }
       document.getElementById("xhr2").innerHTML = status;
       document.getElementById(target).innerHTML = results;
-    } else if (fails == 0) {
+    } else if (__welcome_fails == 0) {
       // avoid spurious message if cancelled by user action
-      fails++;
+      __welcome_fails++;
     } else {
       document.getElementById(target).innerHTML = failMessage;
       running = false;

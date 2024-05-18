@@ -3,19 +3,19 @@
 
 function initButtons() {
 	var buttons = document.getElementsByClassName("delete1");
-	for(index = 0; index < buttons.length; index++)
+	for (var index = 0; index < buttons.length; index++)
 	{
 		var button = buttons[index];
 		addClickHandler1(button);
 	}
 	buttons = document.getElementsByClassName("markall");
-	for(index = 0; index < buttons.length; index++)
+	for (var index = 0; index < buttons.length; index++)
 	{
 		var button = buttons[index];
 		addClickHandler2(button);
 	}
 	buttons = document.getElementsByClassName("clearselection");
-	for(index = 0; index < buttons.length; index++)
+	for (var index = 0; index < buttons.length; index++)
 	{
 		var button = buttons[index];
 		addClickHandler3(button);
@@ -23,7 +23,7 @@ function initButtons() {
 	// TODO delete button, to show really-delete section or popup
 
 	buttons = document.getElementsByClassName("tdclick");
-	for(index = 0; index < buttons.length; index++)
+	for (var index = 0; index < buttons.length; index++)
 	{
 		var button = buttons[index];
 		addClickHandler4(button);
@@ -45,7 +45,7 @@ function addClickHandler2(elem)
 		form.markall.disabled = true;
 		form.clearselection.disabled = false;
 		var buttons = document.getElementsByClassName("delete1");
-		for(index = 0; index < buttons.length; index++)
+		for (var index = 0; index < buttons.length; index++)
 		{
 			var button = buttons[index];
 			button.checked = true;
@@ -62,7 +62,7 @@ function addClickHandler3(elem)
 		form.markall.disabled = false;
 		form.clearselection.disabled = true;
 		var buttons = document.getElementsByClassName("delete1");
-		for(index = 0; index < buttons.length; index++)
+		for (var index = 0; index < buttons.length; index++)
 		{
 			var button = buttons[index];
 			button.checked = false;
@@ -83,7 +83,7 @@ function deleteboxclicked() {
 	var hasAll = true;
 	var hasNone = true;
 	var form = document.forms[3];
-	for(i = 0; i < form.elements.length; i++) {
+	for (var i = 0; i < form.elements.length; i++) {
 		var elem = form.elements[i];
 		if (elem.type == 'checkbox') {
 			if (elem.checked) {

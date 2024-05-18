@@ -5,7 +5,7 @@
 
 function setupFrame() {
 	var frames = document.getElementsByClassName("iframedsusi");
-	for(index = 0; index < frames.length; index++)
+	for (var index = 0; index < frames.length; index++)
 	{
 		var frame = frames[index];
 		frame.addEventListener("load", function() {

@@ -3,7 +3,7 @@
 
 function initMarkdown() {
 	var mailbodies = document.getElementsByClassName("mailbody");
-	for(index = 0; index < mailbodies.length; index++)
+	for (var index = 0; index < mailbodies.length; index++)
 	{
 		var mailbody = mailbodies[index];
 		if (mailbody.nodeName === "P") {
