@@ -1,3 +1,7 @@
+2024-05-18 zzz
+ * Console: js global scope fixes (Gitlab MR !195)
+ * Transport: Remove SSU1 code from PacketBuilder/PeerState/OMF (Gitlab MR !193)
+
 2024-05-17 zzz
  * Build: Add script to make Tor blocklist
 
@@ -47,7 +51,7 @@
 
 2024-04-25 zzz
  * Susimail: Add search box (Gitlab MR !190)
- * Transport: Remove SSU1 code from IMF/IMS (Gitlab MRs !189)
+ * Transport: Remove SSU1 code from IMF/IMS (Gitlab MR !189)
 
 2024-04-22 zzz
  * Addressbook: Use standard time formatting for log
