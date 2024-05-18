@@ -3,7 +3,7 @@
 
 function initCopyLink() {
         var buttons = document.getElementsByClassName("tunnelHostnameCopy");
-        for (index = 0; index < buttons.length; index++) {
+        for (var index = 0; index < buttons.length; index++) {
                 var button = buttons[index];
                 addClickHandler(button);
         }

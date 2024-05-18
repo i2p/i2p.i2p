@@ -7,7 +7,7 @@
 function initConfigClients()
 {
 	var buttons = document.getElementsByClassName("delete");
-	for(index = 0; index < buttons.length; index++)
+	for (var index = 0; index < buttons.length; index++)
 	{
 		var button = buttons[index];
 		addCCClickHandler(button);

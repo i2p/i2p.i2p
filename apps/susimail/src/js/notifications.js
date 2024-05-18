@@ -3,7 +3,7 @@
 
 function initNotifications() {
 	var buttons = document.getElementsByClassName("notifications");
-	for(index = 0; index < buttons.length; index++)
+	for (var index = 0; index < buttons.length; index++)
 	{
 		var button = buttons[index];
 		addClickHandler6(button);

@@ -4,7 +4,7 @@
 // as a formal dedication to the public domain and in circumstances where
 // a public domain is not usable.
 
-var oldTheme = "light";
+var __configui_oldTheme = "light";
 
 function swapStyleSheet(theme) {
     // https://stackoverflow.com/questions/14292997/changing-style-sheet-javascript
@@ -18,7 +18,7 @@ function disableButtons(disabled) {
 }
 
 function resetStyleSheet() {
-    swapStyleSheet(oldTheme);
+    swapStyleSheet(__configui_oldTheme);
     document.getElementById("themeForm").reset();
     disableButtons(true);
 }
@@ -33,7 +33,7 @@ function initThemeSwitcher() {
         disableButtons(false);
     }
     if (dark.checked) {
-        oldTheme = "dark";
+        __configui_oldTheme = "dark";
     }
     var light = document.getElementById("light");
     light.onclick = function() {

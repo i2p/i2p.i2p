@@ -4,11 +4,12 @@
 // as a formal dedication to the public domain and in circumstances where
 // a public domain is not usable.
 
+var __configstats_checkAll = false;
+
 function initConfigStats()
 {
-	checkAll = false;
 	var buttons = document.getElementsByClassName("script");
-	for(index = 0; index < buttons.length; index++)
+	for (var index = 0; index < buttons.length; index++)
 	{
 		var button = buttons[index];
 		// toggle-foo
@@ -23,7 +24,7 @@ function addCSClickHandler(elem, category)
 function toggleAll(category)
 {
 	var inputs = document.getElementsByTagName("input");
-	for(index = 0; index < inputs.length; index++)
+	for (var index = 0; index < inputs.length; index++)
 	{
 		var classes = inputs[index].className.split(' ');
 		for (var idx = 0; idx < classes.length; idx++)
@@ -46,11 +47,11 @@ function toggleAll(category)
 				// don't toggle this one
 				continue;
 			}
-			if (checkAll == false)
+			if (__configstats_checkAll == false)
 			{
 				inputs[index].checked = 1;
 			}
-			else if (checkAll == true)
+			else if (__configstats_checkAll == true)
 			{
 				inputs[index].checked = 0;
 			}
@@ -58,13 +59,13 @@ function toggleAll(category)
 	}
 	if(category == '*')
 	{
-		if (checkAll == false)
+		if (__configstats_checkAll == false)
 		{
-			checkAll = true;
+			__configstats_checkAll = true;
 		}
-		else if (checkAll == true)
+		else if (__configstats_checkAll == true)
 		{
-			checkAll = false;
+			__configstats_checkAll = false;
 		}
 	}
 }

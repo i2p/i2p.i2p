@@ -1,12 +1,13 @@
 /* @license http://www.gnu.org/licenses/gpl-2.0.html GPL-2.0 */
 /* see also licenses/LICENSE-GPLv2.txt */
 
-let beforePopup = true;
-window.addEventListener('beforeunload', (e)=>{if (beforePopup) e.returnValue=true;} );
+var __susimail_beforePopup = true;
 
 function initPopup() {
+	window.addEventListener('beforeunload', (e)=>{if (__susimail_beforePopup) e.returnValue=true;} );
+
 	var buttons = document.getElementsByClassName("beforePopup");
-	for(index = 0; index < buttons.length; index++)
+	for (var index = 0; index < buttons.length; index++)
 	{
 		var button = buttons[index];
 		addClickHandler5(button);
@@ -16,7 +17,7 @@ function initPopup() {
 function addClickHandler5(elem)
 {
 	elem.addEventListener("click", function() {
-		beforePopup = false;
+		__susimail_beforePopup = false;
 	});
 }
 

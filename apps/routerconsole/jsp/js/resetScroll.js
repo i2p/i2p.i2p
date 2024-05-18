@@ -7,7 +7,7 @@
 function initResetScroll()
 {
 	var buttons = document.getElementsByClassName("resetScrollLeft");
-	for(index = 0; index < buttons.length; index++)
+	for (var index = 0; index < buttons.length; index++)
 	{
 		var button = buttons[index];
 		addBlurHandler(button);

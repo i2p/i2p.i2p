@@ -3,9 +3,9 @@
 
 function initTables() {
 
-var hideableTables = document.querySelectorAll("table.tunnelConfig th");
+  var hideableTables = document.querySelectorAll("table.tunnelConfig th");
 
-hideableTables.forEach(function(configTable) {
+  hideableTables.forEach(function(configTable) {
     function lookupTableRow() {
         for (var i = 0, row; (row = configTable.offsetParent.rows[i]); i++) {
             if (configTable.parentNode == row) {
@@ -64,6 +64,7 @@ hideableTables.forEach(function(configTable) {
             iiframe.height = adjustHeight;
         }
     };
+
     showAllControls()
     for (var i = 0, row; (row = hideableTables[0].offsetParent.rows[i]); i++) {
         row.style.visibility = "visible";

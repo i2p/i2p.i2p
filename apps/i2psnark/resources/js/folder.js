@@ -6,21 +6,21 @@ const setupbuttons=()=>{
 	if ( sp ) updatesetallbuttons(), sp.disabled = true, sp.className = 'disabled';
 
 	var buttons = document.getElementsByClassName("prihigh");
-	for(index = 0; index < buttons.length; index++)
+	for (var index = 0; index < buttons.length; index++)
 	{
 		var button = buttons[index];
                 if (!button.disabled)
 			addClickHandler(button);
 	}
 	buttons = document.getElementsByClassName("prinorm");
-	for(index = 0; index < buttons.length; index++)
+	for (var index = 0; index < buttons.length; index++)
 	{
 		var button = buttons[index];
                 if (!button.disabled)
 	 		addClickHandler(button);
 	}
 	buttons = document.getElementsByClassName("priskip");
-	for(index = 0; index < buttons.length; index++)
+	for (var index = 0; index < buttons.length; index++)
 	{
 		var button = buttons[index];
                 if (!button.disabled)
@@ -55,9 +55,9 @@ const priorityclicked=()=>{
 }
 
 const updatesetallbuttons=()=>{
-	let notNorm = true, notHigh = true, notSkip = true, i = 0, len, ele, elems = document.forms[0].elements;	
-	for( len = elems.length ; i < len && (notNorm || notHigh || notSkip) ; ) {
-		ele = elems[i++];
+	let notNorm = true, notHigh = true, notSkip = true, i = 0, elems = document.forms[0].elements;	
+	for (var len = elems.length ; i < len && (notNorm || notHigh || notSkip) ; ) {
+		var ele = elems[i++];
 		if (ele.type == 'radio' && !ele.checked) {
 			if (ele.className == 'prinorm') notNorm = false; 
 			else if (ele.className == 'prihigh') notHigh = false;
@@ -70,9 +70,9 @@ const updatesetallbuttons=()=>{
 }
 
 const setallnorm=()=>{
-	let i = 0, ele, elems, len, form = document.forms[0];
-	for ( elems = form.elements, len = elems.length ; i < len ; ) {
-		ele = elems[i++];
+	let i = 0, form = document.forms[0];
+	for (var elems = form.elements, len = elems.length ; i < len ; ) {
+		var ele = elems[i++];
 		if (ele.type == 'radio' && ele.className === 'prinorm') ele.checked = true;
 	}
 	document.getElementById('setallnorm').className = 'controld';
@@ -83,9 +83,9 @@ const setallnorm=()=>{
 }
 
 const setallhigh=()=>{
-	let i = 0, len, ele, elems, form = document.forms[0];
-	for( elems = form.elements, len = elems.length; i < len ; ) {
-		ele = elems[i++];
+	let i = 0, form = document.forms[0];
+	for (var elems = form.elements, len = elems.length ; i < len ; ) {
+		var ele = elems[i++];
 		if (ele.type == 'radio' && ele.className === 'prihigh') ele.checked = true;
 	}
 	document.getElementById('setallnorm').className = 'control';
@@ -96,9 +96,9 @@ const setallhigh=()=>{
 }
 
 const setallskip=()=>{
-	let i = 0, len, ele, elems, form = document.forms[0];
-	for( elems = form.elements, len = elems.length; i < len ; ) {
-		ele = elems[i++];
+	let i = 0, form = document.forms[0];
+	for (var elems = form.elements, len = elems.length ; i < len ; ) {
+		var ele = elems[i++];
 		if (ele.type == 'radio' && ele.className === 'priskip') ele.checked = true;
 	}
 	document.getElementById('setallnorm').className = 'control';

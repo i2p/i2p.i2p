@@ -4,7 +4,7 @@
 function HideMessages() {
   var hideableMessages = document.getElementsByClassName("messages");
   if (hideableMessages.length > 0) {
-    for (key in hideableMessages) {
+    for (var key in hideableMessages) {
       if (hideableMessages[key] != null) {
         hideableMessages[key].remove()
       }
@@ -60,8 +60,7 @@ function ToggleImportFormTableView() {
 
 function ToggleHowView(){
   var pHow = document.getElementsByClassName("howitworks");
-  var i;
-  for (i = 0; i < pHow.length; i++) {
+  for (var i = 0; i < pHow.length; i++) {
     pHow[i].classList.toggle("invisible");
   }
   var idHow = document.getElementById("howitworks");
@@ -72,8 +71,7 @@ function ToggleHowView(){
 
 function ToggleWhatView(){
   var pWhat = document.getElementsByClassName("whatitis");
-  var i;
-  for (i = 0; i < pWhat.length; i++) {
+  for (var i = 0; i < pWhat.length; i++) {
     pWhat[i].classList.toggle("invisible");
   }
   var idWhat = document.getElementById("whatitis");
@@ -99,8 +97,7 @@ function initClickables() {
   var d = document.getElementById("emptybook");
   if (d == null) {
     var x = document.getElementsByName("hostname");
-    var i;
-    for (i = 0; i < x.length; i++) {
+    for (var i = 0; i < x.length; i++) {
       if (x[i].value == "") {
         var buttonView = document.getElementById("addnewaddrbutton");
         if (buttonView != null) {

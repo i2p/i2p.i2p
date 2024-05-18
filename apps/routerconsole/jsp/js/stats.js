@@ -7,7 +7,7 @@
 function initStats()
 {
 	var buttons = document.getElementsByClassName("onchange");
-	for(index = 0; index < buttons.length; index++)
+	for (var index = 0; index < buttons.length; index++)
 	{
 		var button = buttons[index];
 		addSChangeHandler(button);

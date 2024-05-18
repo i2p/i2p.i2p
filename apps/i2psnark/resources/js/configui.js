@@ -4,8 +4,8 @@
 // as a formal dedication to the public domain and in circumstances where
 // a public domain is not usable.
 
-var oldTheme = "ubergine";
-var change = false;
+var __i2psnark_oldTheme = "ubergine";
+var __i2psnark_change = false;
 
 function swapStyleSheet(theme) {
     // https://stackoverflow.com/questions/14292997/changing-style-sheet-javascript
@@ -17,13 +17,13 @@ function initThemeSwitcher() {
     if (theme == null) {
         return;
     }
-    oldtheme = theme.value;
+    __i2psnark_oldtheme = theme.value;
     theme.onclick = function() {
-        if (change) {
+        if (__i2psnark_change) {
             swapStyleSheet(theme.value);
         } else {
             // skip the first click to avoid the flash
-            change = true;
+            __i2psnark_change = true;
         }
     }
 }
