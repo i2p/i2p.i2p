@@ -53,8 +53,6 @@ class OutboundMessageFragments {
     private Iterator<PeerState> _iterator;
 
     private volatile boolean _alive;
-    private final PacketBuilder _builder;
-    // null if SSU2 not enabled
     private final PacketBuilder2 _builder2;
 
     /** if we can handle more messages explicitly, set this to true */
@@ -72,7 +70,6 @@ class OutboundMessageFragments {
         _transport = transport;
         // _throttle = throttle;
         _activePeers = new ConcurrentHashSet<PeerState>(256);
-        _builder = transport.getBuilder();
         _builder2 = transport.getBuilder2();
         _alive = true;
         // _allowExcess = false;
@@ -392,34 +389,6 @@ class OutboundMessageFragments {
         if (states == null || peer == null)
             return null;
 
-        List<Long> msgIds;
-        int newFullAckCount;
-        List<ACKBitfield> partialACKBitfields;
-        int piggybackedPartialACK;
-        Set<Long> remaining;
-        int before;
-        if (peer.getVersion() == 1) {
-            // ok, simplest possible thing is to always tack on the bitfields if
-            msgIds = peer.getCurrentFullACKs();
-            newFullAckCount = msgIds.size();
-            msgIds.addAll(peer.getCurrentResendACKs());
-            partialACKBitfields = new ArrayList<ACKBitfield>();
-            peer.fetchPartialACKs(partialACKBitfields);
-            piggybackedPartialACK = partialACKBitfields.size();
-            // getCurrentFullACKs() already makes a copy, do we need to copy again?
-            // YES because buildPacket() now removes them (maybe)
-            remaining = new HashSet<Long>(msgIds);
-            before = remaining.size();
-        } else {
-            // all unused
-            msgIds = null;
-            newFullAckCount = 0;
-            partialACKBitfields = null;
-            piggybackedPartialACK = 0;
-            remaining = null;
-            before = 0;
-        }
-
         // build the list of fragments to send
         List<Fragment> toSend = new ArrayList<Fragment>(8);
         for (OutboundMessageState state : states) {
@@ -427,10 +396,7 @@ class OutboundMessageFragments {
             // per-state stats
             if (queued > 0 && state.getMaxSends() > 1) {
                 int maxPktSz = state.fragmentSize(0);
-                if (peer.getVersion() == 1)
-                    maxPktSz += (peer.isIPv6() ? PacketBuilder.MIN_IPV6_DATA_PACKET_OVERHEAD : PacketBuilder.MIN_DATA_PACKET_OVERHEAD);
-                else
-                    maxPktSz += SSU2Payload.BLOCK_HEADER_SIZE +
+                maxPktSz += SSU2Payload.BLOCK_HEADER_SIZE +
                                 (peer.isIPv6() ? PacketBuilder2.MIN_IPV6_DATA_PACKET_OVERHEAD : PacketBuilder2.MIN_DATA_PACKET_OVERHEAD);
                 peer.messageRetransmitted(queued, maxPktSz);
                 // _packetsRetransmitted += toSend; // lifetime for the transport
@@ -466,24 +432,18 @@ class OutboundMessageFragments {
             if (_log.shouldDebug())
                 _log.debug("Building packet for " + next + " to " + peer);
             int curTotalDataSize = state.fragmentSize(next.num);
-            if (peer.getVersion() > 1) {
-                curTotalDataSize += SSU2Util.FIRST_FRAGMENT_HEADER_SIZE;
-                if (next.num > 0)
-                    curTotalDataSize += SSU2Util.DATA_FOLLOWON_EXTRA_SIZE;
-            }
+            curTotalDataSize += SSU2Util.FIRST_FRAGMENT_HEADER_SIZE;
+            if (next.num > 0)
+                curTotalDataSize += SSU2Util.DATA_FOLLOWON_EXTRA_SIZE;
             // now stuff in more fragments if they fit
             if (i +1 < toSend.size()) {
-                int maxAvail;
-                if (peer.getVersion() == 1)
-                    maxAvail = PacketBuilder.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
-                else
-                    maxAvail = PacketBuilder2.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
+                int maxAvail = PacketBuilder2.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
                 // if less than 16, just use it for acks, don't even try to look for a tiny fragment
                 if (maxAvail >= 16) {
                     for (int j = i + 1; j < toSend.size(); j++) {
                         next = toSend.get(j);
                         int nextDataSize = next.state.fragmentSize(next.num);
-                        if (next.num > 0 && peer.getVersion() > 1)
+                        if (next.num > 0)
                             nextDataSize += SSU2Util.DATA_FOLLOWON_EXTRA_SIZE;
                         //if (PacketBuilder.canFitAnotherFragment(peer, sendNext.size(), curTotalDataSize, nextDataSize)) {
                         //if (_builder.canFitAnotherFragment(peer, sendNext.size(), curTotalDataSize, nextDataSize)) {
@@ -493,10 +453,7 @@ class OutboundMessageFragments {
                             j--;
                             sendNext.add(next);
                             curTotalDataSize += nextDataSize;
-                            if (peer.getVersion() == 1)
-                                maxAvail = PacketBuilder.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
-                            else
-                                maxAvail = PacketBuilder2.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
+                            maxAvail = PacketBuilder2.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
                             if (_log.shouldLog(Log.INFO))
                                 _log.info("Adding in additional " + next + " to " + peer);
                             // if less than 16, just use it for acks, don't even try to look for a tiny fragment
@@ -508,15 +465,11 @@ class OutboundMessageFragments {
             }
 
             UDPPacket pkt;
-            if (peer.getVersion() == 1) {
-                pkt = _builder.buildPacket(sendNext, peer, remaining, newFullAckCount, partialACKBitfields);
-            } else {
                 try {
                     pkt = _builder2.buildPacket(sendNext, (PeerState2) peer);
                 } catch (IOException ioe) {
                     pkt = null;
                 }
-            }
             if (pkt != null) {
                 if (_log.shouldDebug())
                     _log.debug("Built packet with " + sendNext.size() + " fragments totalling " + curTotalDataSize +
@@ -530,25 +483,6 @@ class OutboundMessageFragments {
             }
             rv.add(pkt);
 
-            if (peer.getVersion() == 1) {
-                int after = remaining.size();
-                newFullAckCount = Math.max(0, newFullAckCount - (before - after));
-                int piggybackedAck = 0;
-                if (msgIds.size() != remaining.size()) {
-                    for (int j = 0; j < msgIds.size(); j++) {
-                        Long id = msgIds.get(j);
-                        if (!remaining.contains(id)) {
-                            peer.removeACKMessage(id);
-                            piggybackedAck++;
-                        }
-                    }
-                }
-                if (piggybackedAck > 0)
-                    _context.statManager().addRateData("udp.sendPiggyback", piggybackedAck);
-                if (piggybackedPartialACK - partialACKBitfields.size() > 0)
-                    _context.statManager().addRateData("udp.sendPiggybackPartial", piggybackedPartialACK - partialACKBitfields.size(), state.getLifetime());
-            }
-
             // following for debugging and stats
             pkt.setFragmentCount(sendNext.size());
             pkt.setMessageType(msgType);  //type of first fragment
@@ -559,8 +493,7 @@ class OutboundMessageFragments {
 
         int sent = rv.size();
         peer.packetsTransmitted(sent);
-        if (newFullAckCount <= 0)
-            peer.clearWantedACKSendSince();
+        peer.clearWantedACKSendSince();
         if (_log.shouldDebug())
             _log.debug("Sent " + fragmentsToSend + " fragments of " + states.size() +
                       " messages in " + sent + " packets to " + peer);

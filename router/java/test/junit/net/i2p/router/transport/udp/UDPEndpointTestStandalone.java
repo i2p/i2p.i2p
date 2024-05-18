@@ -95,6 +95,9 @@ public class UDPEndpointTestStandalone {
             _endpoint = peer;
         }
         public void run() {
+            System.out.println("rewrite me for SSU2");
+            throw new UnsupportedOperationException("rewrite me for SSU2");
+/*
             while (!_beginTest) {
                 try { Thread.sleep(2000); } catch (InterruptedException ie) {}
             }
@@ -149,6 +152,7 @@ public class UDPEndpointTestStandalone {
                 _log.error("Test failed, " + _sentNotReceived.size() + " not received");
                 System.exit(1);
             }
+*/
         }
     }
     

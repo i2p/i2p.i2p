@@ -176,9 +176,6 @@ class PeerTestState {
     public SessionKey getCharlieIntroKey() { return _charlieIntroKey; }
     public void setCharlieIntroKey(SessionKey key) { _charlieIntroKey = key; }
 
-    public SessionKey getBobCipherKey() { return _bob.getCurrentCipherKey(); }
-    public SessionKey getBobMACKey() { return _bob.getCurrentMACKey(); }
-
     /** when did this test begin? */
     public long getBeginTime() { return _beginTime; }
 
