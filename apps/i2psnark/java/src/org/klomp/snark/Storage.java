@@ -290,10 +290,12 @@ public class Storage implements Closeable
   private void addFiles(List<File> l, File f) throws IOException {
     int max = _util.getMaxFilesPerTorrent();
     if (!f.isDirectory()) {
-        if (l.size() >= max)
-            throw new IOException(_util.getString("Too many files in \"{0}\" ({1})!", metainfo.getName(), l.size()) +
+        int sz = l.size() + 1;
+        if (sz > max)
+            throw new IOException(_util.getString("Too many files in \"{0}\" ({1})!",
+                                  (metainfo != null ? metainfo.getName() : _base.toString()), sz) +
                                   " - limit is " + max + ", zip them or set " +
-                                  SnarkManager.PROP_MAX_FILES_PER_TORRENT + '=' + l.size() + " in " +
+                                  SnarkManager.PROP_MAX_FILES_PER_TORRENT + '=' + sz + " in " +
                                   SnarkManager.CONFIG_FILE + " and restart");
         l.add(f);
     } else {
@@ -305,6 +307,13 @@ public class Storage implements Closeable
                         + "' not a normal file.");
             return;
           }
+        int sz = l.size() + files.length;
+        if (sz > max)
+            throw new IOException(_util.getString("Too many files in \"{0}\" ({1})!",
+                                  (metainfo != null ? metainfo.getName() : _base.toString()), sz) +
+                                  " - limit is " + max + ", zip them or set " +
+                                  SnarkManager.PROP_MAX_FILES_PER_TORRENT + '=' + sz + " in " +
+                                  SnarkManager.CONFIG_FILE + " and restart");
         for (int i = 0; i < files.length; i++)
           addFiles(l, files[i]);
       }
