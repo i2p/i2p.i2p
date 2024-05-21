@@ -1,3 +1,12 @@
+2024-05-21 zzz
+ * Build: maketorblocklist.sh fixups (Gitlab MR !198 by kytv)
+ * Susimail: XHR search (Gitlab MR !196)
+ * Transport: Remove SSU1 code from IES/OES/PacketReader/HMAC (Gitlab MR !197)
+ * Tunnels: Don't parse messages at the OBEP (Gitlab MR !194)
+
+2024-05-19 zzz
+ * i2psnark: Fix NPE when attempting to create torrent with too many files
+
 2024-05-18 zzz
  * Console: js global scope fixes (Gitlab MR !195)
  * Transport: Remove SSU1 code from PacketBuilder/PeerState/OMF (Gitlab MR !193)
