@@ -13,11 +13,9 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterIdentity;
-import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
-import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 
@@ -35,21 +33,15 @@ class InboundEstablishState {
     private byte _receivedX[];
     protected byte _bobIP[];
     protected final int _bobPort;
-    private final DHSessionKeyBuilder _keyBuilder;
     // SessionCreated message
-    private byte _sentY[];
     protected final byte _aliceIP[];
     protected final int _alicePort;
     protected long _sentRelayTag;
     private long _sentSignedOnTime;
-    private SessionKey _sessionKey;
-    private SessionKey _macKey;
-    private Signature _sentSignature;
     // SessionConfirmed messages - fragmented in theory but not in practice - see below
     private byte _receivedIdentity[][];
     private long _receivedSignedOnTime;
     private byte _receivedSignature[];
-    private boolean _verificationAttempted;
     // sig not verified
     protected RouterIdentity _receivedUnconfirmedIdentity;
     // identical to uncomfirmed, but sig now verified
@@ -115,25 +107,6 @@ class InboundEstablishState {
      */
     protected static final long MAX_DELAY = EstablishmentManager.MAX_IB_ESTABLISH_TIME;
 
-    /**
-     *  @param localPort Must be our external port, otherwise the signature of the
-     *                   SessionCreated message will be bad if the external port != the internal port.
-     */
-    public InboundEstablishState(RouterContext ctx, byte remoteIP[], int remotePort, int localPort,
-                                 DHSessionKeyBuilder dh, UDPPacketReader.SessionRequestReader req) {
-        _context = ctx;
-        _log = ctx.logManager().getLog(InboundEstablishState.class);
-        _aliceIP = remoteIP;
-        _alicePort = remotePort;
-        _remoteHostId = new RemoteHostId(_aliceIP, _alicePort);
-        _bobPort = localPort;
-        _currentState = InboundState.IB_STATE_UNKNOWN;
-        _establishBegin = ctx.clock().now();
-        _keyBuilder = dh;
-        _queuedMessages = new LinkedBlockingQueue<OutNetMessage>();
-        _introductionRequested = true;
-        receiveSessionRequest(req);
-    }
 
     /**
      *  For SSU2
@@ -149,7 +122,6 @@ class InboundEstablishState {
         _bobPort = 0;
         _currentState = InboundState.IB_STATE_UNKNOWN;
         _establishBegin = ctx.clock().now();
-        _keyBuilder = null;
         _queuedMessages = new LinkedBlockingQueue<OutNetMessage>();
     }
     
@@ -193,26 +165,6 @@ class InboundEstablishState {
         return _queuedMessages.poll();
     }
 
-    public synchronized void receiveSessionRequest(UDPPacketReader.SessionRequestReader req) {
-        if (_receivedX == null)
-            _receivedX = new byte[UDPPacketReader.SessionRequestReader.X_LENGTH];
-        req.readX(_receivedX, 0);
-        if (_bobIP == null)
-            _bobIP = new byte[req.readIPSize()];
-        req.readIP(_bobIP, 0);
-        byte[] ext = req.readExtendedOptions();
-        if (ext != null && ext.length >= UDPPacket.SESS_REQ_MIN_EXT_OPTIONS_LENGTH) {
-            _introductionRequested = (ext[1] & (byte) UDPPacket.SESS_REQ_EXT_FLAG_REQUEST_RELAY_TAG) != 0;
-            if (_log.shouldInfo())
-                _log.info("got sess req. w/ ext. options, need intro? " + _introductionRequested + ' ' + this);
-        }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Receive sessionRequest, BobIP = " + Addresses.toString(_bobIP));
-        if (_currentState == InboundState.IB_STATE_UNKNOWN)
-            _currentState = InboundState.IB_STATE_REQUEST_RECEIVED;
-        packetReceived();
-    }
-    
     public synchronized boolean sessionRequestReceived() { return _receivedX != null; }
     public synchronized byte[] getReceivedX() { return _receivedX; }
     public synchronized byte[] getReceivedOurIP() { return _bobIP; }
@@ -223,39 +175,11 @@ class InboundEstablishState {
      */
     public synchronized boolean isIntroductionRequested() { return _introductionRequested; }
     
-    /**
-     *  Generates session key and mac key.
-     */
-    public synchronized void generateSessionKey() throws DHSessionKeyBuilder.InvalidPublicParameterException {
-        if (_sessionKey != null) return;
-        try {
-            _keyBuilder.setPeerPublicValue(_receivedX);
-        } catch (IllegalStateException ise) {
-            throw new DHSessionKeyBuilder.InvalidPublicParameterException("reused keys?", ise);
-        }
-        _sessionKey = _keyBuilder.getSessionKey();
-        ByteArray extra = _keyBuilder.getExtraBytes();
-        _macKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
-        System.arraycopy(extra.getData(), 0, _macKey.getData(), 0, SessionKey.KEYSIZE_BYTES);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Established inbound keys.  cipher: " + Base64.encode(_sessionKey.getData())
-                       + " mac: " + Base64.encode(_macKey.getData()));
-    }
-    
-    public synchronized SessionKey getCipherKey() { return _sessionKey; }
-    public synchronized SessionKey getMACKey() { return _macKey; }
-
     /** what IP do they appear to be on? */
     public byte[] getSentIP() { return _aliceIP; }
 
     /** what port number do they appear to be coming from? */
     public int getSentPort() { return _alicePort; }
-    
-    public synchronized byte[] getSentY() {
-        if (_sentY == null)
-            _sentY = _keyBuilder.getMyPublicValueBytes();
-        return _sentY;
-    }
     
     public synchronized void fail() {
         _currentState = InboundState.IB_STATE_FAILED;
@@ -264,59 +188,6 @@ class InboundEstablishState {
     public synchronized long getSentRelayTag() { return _sentRelayTag; }
     public synchronized void setSentRelayTag(long tag) { _sentRelayTag = tag; }
     public synchronized long getSentSignedOnTime() { return _sentSignedOnTime; }
-    
-    public synchronized void prepareSessionCreated() {
-        if (_sentSignature == null) signSessionCreated();
-    }
-    
-    public synchronized Signature getSentSignature() { return _sentSignature; }
-    
-    /**
-     * Sign: Alice's IP + Alice's port + Bob's IP + Bob's port + Alice's
-     *       new relay tag + Bob's signed on time
-     */
-    private void signSessionCreated() {
-        byte signed[] = new byte[256 + 256 // X + Y
-                                 + _aliceIP.length + 2
-                                 + _bobIP.length + 2
-                                 + 4 // sent relay tag
-                                 + 4 // signed on time
-                                 ];
-        _sentSignedOnTime = _context.clock().now() / 1000;
-        
-        int off = 0;
-        System.arraycopy(_receivedX, 0, signed, off, _receivedX.length);
-        off += _receivedX.length;
-        getSentY();
-        System.arraycopy(_sentY, 0, signed, off, _sentY.length);
-        off += _sentY.length;
-        System.arraycopy(_aliceIP, 0, signed, off, _aliceIP.length);
-        off += _aliceIP.length;
-        DataHelper.toLong(signed, off, 2, _alicePort);
-        off += 2;
-        System.arraycopy(_bobIP, 0, signed, off, _bobIP.length);
-        off += _bobIP.length;
-        DataHelper.toLong(signed, off, 2, _bobPort);
-        off += 2;
-        DataHelper.toLong(signed, off, 4, _sentRelayTag);
-        off += 4;
-        DataHelper.toLong(signed, off, 4, _sentSignedOnTime);
-        
-        _sentSignature = _context.dsa().sign(signed, _context.keyManager().getSigningPrivateKey());
-        
-        if (_log.shouldLog(Log.DEBUG)) {
-            StringBuilder buf = new StringBuilder(128);
-            buf.append("Signing sessionCreated:");
-            //buf.append(" ReceivedX: ").append(Base64.encode(_receivedX));
-            //buf.append(" SentY: ").append(Base64.encode(_sentY));
-            buf.append(" Alice: ").append(Addresses.toString(_aliceIP, _alicePort));
-            buf.append(" Bob: ").append(Addresses.toString(_bobIP, _bobPort));
-            buf.append(" RelayTag: ").append(_sentRelayTag);
-            buf.append(" SignedOn: ").append(_sentSignedOnTime);
-            buf.append(" signature: ").append(Base64.encode(_sentSignature.getData()));
-            _log.debug(buf.toString());
-        }
-    }
     
     /** note that we just sent a SessionCreated packet */
     public synchronized void createdPacketSent() {
@@ -358,79 +229,6 @@ class InboundEstablishState {
     RemoteHostId getRemoteHostId() { return _remoteHostId; }
 
     /**
-     *  Note that while a SessionConfirmed could in theory be fragmented,
-     *  in practice a RouterIdentity is 387 bytes and a single fragment is 512 bytes max,
-     *  so it will never be fragmented.
-     */
-    public synchronized void receiveSessionConfirmed(UDPPacketReader.SessionConfirmedReader conf) {
-        if (_receivedIdentity == null)
-            _receivedIdentity = new byte[conf.readTotalFragmentNum()][];
-        int cur = conf.readCurrentFragmentNum();
-        if (cur >= _receivedIdentity.length) {
-            // avoid AIOOBE
-            // should do more than this, but what? disconnect?
-            fail();
-            packetReceived();
-            return;
-        }
-        if (_receivedIdentity[cur] == null) {
-            byte fragment[] = new byte[conf.readCurrentFragmentSize()];
-            conf.readFragmentData(fragment, 0);
-            _receivedIdentity[cur] = fragment;
-        }
-        
-        if (cur == _receivedIdentity.length-1) {
-            _receivedSignedOnTime = conf.readFinalFragmentSignedOnTime();
-            // TODO verify time to prevent replay attacks
-            buildIdentity();
-            if (_receivedUnconfirmedIdentity != null) {
-                SigType type = _receivedUnconfirmedIdentity.getSigningPublicKey().getType();
-                if (type != null) {
-                    int sigLen = type.getSigLen();
-                    if (_receivedSignature == null)
-                        _receivedSignature = new byte[sigLen];
-                    conf.readFinalSignature(_receivedSignature, 0, sigLen);
-                } else {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Unsupported sig type from: " + toString());
-                    // _x() in UDPTransport
-                    _context.banlist().banlistRouterForever(_receivedUnconfirmedIdentity.calculateHash(),
-                                                            "Unsupported signature type");
-                    fail();
-                }
-                Hash h = _receivedUnconfirmedIdentity.calculateHash();
-                if (_context.banlist().isBanlistedForever(h)) {
-                    // validate sig to prevent spoofing
-                    if (getConfirmedIdentity() != null)
-                       _context.blocklist().add(_aliceIP);
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Router is banned: " + h.toBase64() + " on " + this);
-                    fail();
-                }
-            } else {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Bad ident from: " + toString());
-                fail();
-            }
-        }
-        
-        if ( (_currentState == InboundState.IB_STATE_UNKNOWN) || 
-             (_currentState == InboundState.IB_STATE_REQUEST_RECEIVED) ||
-             (_currentState == InboundState.IB_STATE_CREATED_SENT) ) {
-            if (confirmedFullyReceived())
-                _currentState = InboundState.IB_STATE_CONFIRMED_COMPLETELY;
-            else
-                _currentState = InboundState.IB_STATE_CONFIRMED_PARTIALLY;
-        }
-        
-        if (_createdSentCount == 1) {
-            _rtt = (int) ( _context.clock().now() - _lastSend );
-        }	
-
-        packetReceived();
-    }
-    
-    /**
      *  Have we fully received the SessionConfirmed messages from Alice?
      *  Caller must synch on this.
      */
@@ -452,111 +250,9 @@ class InboundEstablishState {
      * Note that this isn't really confirmed - see below.
      */
     public synchronized RouterIdentity getConfirmedIdentity() {
-        if (!_verificationAttempted) {
-            verifyIdentity();
-            _verificationAttempted = true;
-        }
         return _receivedConfirmedIdentity;
     }
 
-    /**
-     *  Construct Alice's RouterIdentity.
-     *  Must have received all fragments.
-     *  Sets _receivedUnconfirmedIdentity, unless invalid.
-     *
-     *  Caller must synch on this.
-     *
-     *  @since 0.9.16 was in verifyIdentity()
-     */
-    private void buildIdentity() {
-        if (_receivedUnconfirmedIdentity != null)
-            return;   // dup pkt?
-        int frags = _receivedIdentity.length;
-        byte[] ident;
-        if (frags > 1) {
-            int identSize = 0;
-            for (int i = 0; i < _receivedIdentity.length; i++)
-                identSize += _receivedIdentity[i].length;
-            ident = new byte[identSize];
-            int off = 0;
-            for (int i = 0; i < _receivedIdentity.length; i++) {
-                int len = _receivedIdentity[i].length;
-                System.arraycopy(_receivedIdentity[i], 0, ident, off, len);
-                off += len;
-            }
-        } else {
-            // no need to copy
-            ident = _receivedIdentity[0];
-        }
-        ByteArrayInputStream in = new ByteArrayInputStream(ident); 
-        RouterIdentity peer = new RouterIdentity();
-        try {
-            peer.readBytes(in);
-            _receivedUnconfirmedIdentity = peer;
-        } catch (DataFormatException dfe) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Improperly formatted yet fully received ident", dfe);
-        } catch (IOException ioe) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Improperly formatted yet fully received ident", ioe);
-        }
-    }
-            
-
-    /**
-     * Determine if Alice sent us a valid confirmation packet.  The 
-     * identity signs: Alice's IP + Alice's port + Bob's IP + Bob's port
-     * + Alice's new relay key + Alice's signed on time
-     *
-     * Note that the protocol does not include a signature of the RouterIdentity,
-     * which could be a problem?
-     *
-     * Caller must synch on this.
-     */
-    private void verifyIdentity() {
-            if (_receivedUnconfirmedIdentity == null)
-                return;   // either not yet recvd or bad ident
-            if (_receivedSignature == null)
-                return;   // either not yet recvd or bad sig
-
-            byte signed[] = new byte[256+256 // X + Y
-                                     + _aliceIP.length + 2
-                                     + _bobIP.length + 2
-                                     + 4 // Alice's relay key
-                                     + 4 // signed on time
-                                     ];
-
-            int off = 0;
-            System.arraycopy(_receivedX, 0, signed, off, _receivedX.length);
-            off += _receivedX.length;
-            getSentY();
-            System.arraycopy(_sentY, 0, signed, off, _sentY.length);
-            off += _sentY.length;
-            System.arraycopy(_aliceIP, 0, signed, off, _aliceIP.length);
-            off += _aliceIP.length;
-            DataHelper.toLong(signed, off, 2, _alicePort);
-            off += 2;
-            System.arraycopy(_bobIP, 0, signed, off, _bobIP.length);
-            off += _bobIP.length;
-            DataHelper.toLong(signed, off, 2, _bobPort);
-            off += 2;
-            DataHelper.toLong(signed, off, 4, _sentRelayTag);
-            off += 4;
-            DataHelper.toLong(signed, off, 4, _receivedSignedOnTime);
-            Signature sig = new Signature(_receivedUnconfirmedIdentity.getSigType(), _receivedSignature);
-            boolean ok = _context.dsa().verifySignature(sig, signed, _receivedUnconfirmedIdentity.getSigningPublicKey());
-            if (ok) {
-                // todo partial spoof detection - get peer.calculateHash(),
-                // lookup in netdb locally, if not equal, fail?
-                _receivedConfirmedIdentity = _receivedUnconfirmedIdentity;
-            } else {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Signature failed from " + _receivedUnconfirmedIdentity + "\non: " + this);
-                // we can't ban the hash because it could be spoofed, but we can block the IP
-                _context.blocklist().add(_aliceIP);
-            }
-    }
-    
     /**
      *  Call from synchronized method only
      */
@@ -569,15 +265,9 @@ class InboundEstablishState {
         StringBuilder buf = new StringBuilder(128);
         buf.append("IES ");
         buf.append(Addresses.toString(_aliceIP, _alicePort));
-        //if (_receivedX != null)
-        //    buf.append(" ReceivedX: ").append(Base64.encode(_receivedX, 0, 4));
-        //if (_sentY != null)
-        //    buf.append(" SentY: ").append(Base64.encode(_sentY, 0, 4));
-        //buf.append(" Bob: ").append(Addresses.toString(_bobIP, _bobPort));
         buf.append(" lifetime: ").append(DataHelper.formatDuration(getLifetime()));
         if (_sentRelayTag > 0)
             buf.append(" RelayTag: ").append(_sentRelayTag);
-        //buf.append(" SignedOn: ").append(_sentSignedOnTime);
         buf.append(' ').append(_currentState);
         return buf.toString();
     }

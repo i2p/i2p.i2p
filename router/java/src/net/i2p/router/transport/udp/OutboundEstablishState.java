@@ -14,7 +14,6 @@ import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
-import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 
@@ -31,23 +30,18 @@ class OutboundEstablishState {
     private byte _sentX[];
     protected byte _bobIP[];
     protected int _bobPort;
-    private final DHSessionKeyBuilder.Factory _keyFactory;
-    private DHSessionKeyBuilder _keyBuilder;
     // SessionCreated message
     private byte _receivedY[];
     protected byte _aliceIP[];
     protected int _alicePort;
     protected long _receivedRelayTag;
     private long _receivedSignedOnTime;
-    private SessionKey _sessionKey;
-    private SessionKey _macKey;
     private Signature _receivedSignature;
     // includes trailing padding to mod 16
     private byte[] _receivedEncryptedSignature;
     private byte[] _receivedIV;
     // SessionConfirmed messages
     private long _sentSignedOnTime;
-    private Signature _sentSignature;
     // general status 
     protected final long _establishBegin;
     //private long _lastReceive;
@@ -131,51 +125,6 @@ class OutboundEstablishState {
     private static final long WAIT_FOR_HOLE_PUNCH_DELAY = 500;
 
     /**
-     *  @param claimedAddress an IP/port based RemoteHostId, or null if unknown
-     *  @param remoteHostId non-null, == claimedAddress if direct, or a hash-based one if indirect
-     *  @param remotePeer must have supported sig type
-     *  @param allowExtendedOptions are we allowed to send extended options to Bob?
-     *  @param needIntroduction should we ask Bob to be an introducer for us?
-               ignored unless allowExtendedOptions is true
-     *  @param introKey Bob's introduction key, as published in the netdb
-     *  @param addr non-null
-     */
-    public OutboundEstablishState(RouterContext ctx, RemoteHostId claimedAddress,
-                                  RemoteHostId remoteHostId,
-                                  RouterIdentity remotePeer, boolean allowExtendedOptions,
-                                  boolean needIntroduction,
-                                  SessionKey introKey, UDPAddress addr,
-                                  DHSessionKeyBuilder.Factory dh) {
-        _context = ctx;
-        _log = ctx.logManager().getLog(OutboundEstablishState.class);
-        if (claimedAddress != null) {
-            _bobIP = claimedAddress.getIP();
-            _bobPort = claimedAddress.getPort();
-        } else {
-            //_bobIP = null;
-            _bobPort = -1;
-        }
-        _claimedAddress = claimedAddress;
-        _remoteHostId = remoteHostId;
-        _allowExtendedOptions = allowExtendedOptions;
-        _needIntroduction = needIntroduction;
-        _remotePeer = remotePeer;
-        _introKey = introKey;
-        _queuedMessages = new LinkedBlockingQueue<OutNetMessage>();
-        _establishBegin = ctx.clock().now();
-        _remoteAddress = addr;
-        _introductionNonce = -1;
-        _keyFactory = dh;
-        if (addr.getIntroducerCount() > 0) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("new outbound establish to " + remotePeer.calculateHash() + ", with address: " + addr);
-            _currentState = OutboundState.OB_STATE_PENDING_INTRO;
-        } else {
-            _currentState = OutboundState.OB_STATE_UNKNOWN;
-        }
-    }
-    
-    /**
      *  For SSU2
      *
      *  @since 0.9.54
@@ -204,7 +153,6 @@ class OutboundEstablishState {
         _establishBegin = ctx.clock().now();
         _remoteAddress = addr;
         _introductionNonce = -1;
-        _keyFactory = null;
         if (addr.getIntroducerCount() > 0) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("new outbound establish to " + remotePeer.calculateHash() + ", with address: " + addr);
@@ -294,29 +242,6 @@ class OutboundEstablishState {
      */
     public SessionKey getIntroKey() { return _introKey; }
     
-    /** caller must synch - only call once */
-    private void prepareSessionRequest() {
-        _keyBuilder = _keyFactory.getBuilder();
-        byte X[] = _keyBuilder.getMyPublicValue().toByteArray();
-        if (X.length == 257) {
-            _sentX = new byte[256];
-            System.arraycopy(X, 1, _sentX, 0, _sentX.length);
-        } else if (X.length == 256) {
-            _sentX = X;
-        } else {
-            _sentX = new byte[256];
-            System.arraycopy(X, 0, _sentX, _sentX.length - X.length, X.length);
-        }
-    }
-
-    public synchronized byte[] getSentX() {
-        // We defer keygen until now so that it gets done in the Establisher loop,
-        // and so that we don't waste entropy on failed introductions
-        if (_sentX == null)
-            prepareSessionRequest();
-        return _sentX;
-    }
-
     /**
      * The remote side (Bob) - note that in some places he's called Charlie.
      * Warning - may change after introduction. May be null before introduction.
@@ -329,62 +254,6 @@ class OutboundEstablishState {
      */
     public synchronized int getSentPort() { return _bobPort; }
 
-    public synchronized void receiveSessionCreated(UDPPacketReader.SessionCreatedReader reader) {
-        if (_currentState == OutboundState.OB_STATE_VALIDATION_FAILED) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Session created already failed");
-            return;
-        }
-        if (_receivedY != null) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Session created already received, ignoring");
-            return; // already received
-        }
-        _receivedY = new byte[UDPPacketReader.SessionCreatedReader.Y_LENGTH];
-        reader.readY(_receivedY, 0);
-        if (_aliceIP == null)
-            _aliceIP = new byte[reader.readIPSize()];
-        reader.readIP(_aliceIP, 0);
-        _alicePort = reader.readPort();
-        _receivedRelayTag = reader.readRelayTag();
-        _receivedSignedOnTime = reader.readSignedOnTime();
-        // handle variable signature size
-        SigType type = _remotePeer.getSigningPublicKey().getType();
-        if (type == null) {
-            // shouldn't happen, we only connect to supported peers
-            fail();
-            packetReceived();
-            return;
-        }
-        int sigLen = type.getSigLen();
-        int mod = sigLen % 16;
-        int pad = (mod == 0) ? 0 : (16 - mod);
-        int esigLen = sigLen + pad;
-        _receivedEncryptedSignature = new byte[esigLen];
-        reader.readEncryptedSignature(_receivedEncryptedSignature, 0, esigLen);
-        _receivedIV = new byte[UDPPacket.IV_SIZE];
-        reader.readIV(_receivedIV, 0);
-        
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Receive session created:Sig: " + Base64.encode(_receivedEncryptedSignature)
-                       + "receivedIV: " + Base64.encode(_receivedIV)
-                       + "AliceIP: " + Addresses.toString(_aliceIP)
-                       + " RelayTag: " + _receivedRelayTag
-                       + " SignedOn: " + _receivedSignedOnTime
-                       + ' ' + this.toString());
-        
-        if (_currentState == OutboundState.OB_STATE_UNKNOWN ||
-            _currentState == OutboundState.OB_STATE_REQUEST_SENT ||
-            _currentState == OutboundState.OB_STATE_INTRODUCED ||
-            _currentState == OutboundState.OB_STATE_PENDING_INTRO)
-            _currentState = OutboundState.OB_STATE_CREATED_RECEIVED;
-
-        if (_requestSentCount == 1) {
-            _rtt = (int) (_context.clock().now() - _requestSentTime);
-        }
-        packetReceived();
-    }
-    
     /**
      * Blocking call (run in the establisher thread) to determine if the 
      * session was created properly.  If it wasn't, all the SessionCreated
@@ -396,38 +265,7 @@ class OutboundEstablishState {
      * @return true if valid
      */
     public synchronized boolean validateSessionCreated() {
-        if (_currentState == OutboundState.OB_STATE_VALIDATION_FAILED) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Session created already failed");
-            return false;
-        }
-        if (_receivedSignature != null) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Session created already validated");
-            return true;
-        }
-        
-        boolean valid = true;
-        try {
-            generateSessionKey();
-        } catch (DHSessionKeyBuilder.InvalidPublicParameterException ippe) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Peer " + getRemoteHostId() + " sent us an invalid DH parameter", ippe);
-            valid = false;
-        }
-        if (valid)
-            decryptSignature();
-        
-        if (valid && verifySessionCreated()) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Session created passed validation");
-            return true;
-        } else {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Session created failed validation, clearing state for " + _remoteHostId.toString());
-            fail();
-            return false;
-        }
+        throw new UnsupportedOperationException("see override");
     }
     
     /**
@@ -441,11 +279,6 @@ class OutboundEstablishState {
         _receivedEncryptedSignature = null;
         _receivedIV = null;
         _receivedSignature = null;
-        if (_keyBuilder != null) {
-            //if (_keyBuilder.getPeerPublicValue() == null)
-            //    _keyFactory.returnUnused(_keyBuilder);
-            _keyBuilder = null;
-        }
         // sure, there's a chance the packet was corrupted, but in practice
         // this means that Bob doesn't know his external port, so give up.
         _currentState = OutboundState.OB_STATE_VALIDATION_FAILED;
@@ -453,154 +286,11 @@ class OutboundEstablishState {
         _nextSend = _context.clock().now();
     }
     
-    /**
-     *  Generates session key and mac key.
-     *  Caller must synch on this.
-     */
-    private void generateSessionKey() throws DHSessionKeyBuilder.InvalidPublicParameterException {
-        if (_sessionKey != null) return;
-        if (_keyBuilder == null)
-            throw new DHSessionKeyBuilder.InvalidPublicParameterException("Illegal state - never generated a key builder");
-        try {
-            _keyBuilder.setPeerPublicValue(_receivedY);
-        } catch (IllegalStateException ise) {
-            throw new DHSessionKeyBuilder.InvalidPublicParameterException("reused keys?", ise);
-        }
-        _sessionKey = _keyBuilder.getSessionKey();
-        ByteArray extra = _keyBuilder.getExtraBytes();
-        _macKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
-        System.arraycopy(extra.getData(), 0, _macKey.getData(), 0, SessionKey.KEYSIZE_BYTES);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Established outbound keys.  cipher: " + _sessionKey
-                       + " mac: " + _macKey);
-    }
-    
-    /** 
-     * decrypt the signature (and subsequent pad bytes) with the 
-     * additional layer of encryption using the negotiated key along side
-     * the packet's IV
-     *
-     *  Caller must synch on this.
-     *  Only call this once! Decrypts in-place.
-     */
-    private void decryptSignature() {
-        if (_receivedEncryptedSignature == null) throw new NullPointerException("encrypted signature is null! this=" + this.toString());
-        if (_sessionKey == null) throw new NullPointerException("SessionKey is null!");
-        if (_receivedIV == null) throw new NullPointerException("IV is null!");
-        _context.aes().decrypt(_receivedEncryptedSignature, 0, _receivedEncryptedSignature, 0, 
-                               _sessionKey, _receivedIV, _receivedEncryptedSignature.length);
-        // handle variable signature size
-        SigType type = _remotePeer.getSigningPublicKey().getType();
-        // if type == null throws NPE
-        int sigLen = type.getSigLen();
-        int mod = sigLen % 16;
-        if (mod != 0) {
-            byte signatureBytes[] = new byte[sigLen];
-            System.arraycopy(_receivedEncryptedSignature, 0, signatureBytes, 0, sigLen);
-            _receivedSignature = new Signature(type, signatureBytes);
-        } else {
-            _receivedSignature = new Signature(type, _receivedEncryptedSignature);
-        }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Decrypted received signature: " + Base64.encode(_receivedSignature.getData()));
-    }
-
-    /**
-     * Verify: Alice's IP + Alice's port + Bob's IP + Bob's port + Alice's
-     *         new relay tag + Bob's signed on time
-     *  Caller must synch on this.
-     */
-    private boolean verifySessionCreated() {
-        byte signed[] = new byte[256+256 // X + Y
-                                 + _aliceIP.length + 2
-                                 + _bobIP.length + 2
-                                 + 4 // sent relay tag
-                                 + 4 // signed on time
-                                 ];
-        
-        int off = 0;
-        System.arraycopy(_sentX, 0, signed, off, _sentX.length);
-        off += _sentX.length;
-        System.arraycopy(_receivedY, 0, signed, off, _receivedY.length);
-        off += _receivedY.length;
-        System.arraycopy(_aliceIP, 0, signed, off, _aliceIP.length);
-        off += _aliceIP.length;
-        DataHelper.toLong(signed, off, 2, _alicePort);
-        off += 2;
-        System.arraycopy(_bobIP, 0, signed, off, _bobIP.length);
-        off += _bobIP.length;
-        DataHelper.toLong(signed, off, 2, _bobPort);
-        off += 2;
-        DataHelper.toLong(signed, off, 4, _receivedRelayTag);
-        off += 4;
-        DataHelper.toLong(signed, off, 4, _receivedSignedOnTime);
-        boolean valid = _context.dsa().verifySignature(_receivedSignature, signed, _remotePeer.getSigningPublicKey());
-        if (_log.shouldLog(Log.DEBUG) || (_log.shouldLog(Log.WARN) && !valid)) {
-            StringBuilder buf = new StringBuilder(128);
-            buf.append("Signed sessionCreated:");
-            buf.append(" Alice: ").append(Addresses.toString(_aliceIP, _alicePort));
-            buf.append(" Bob: ").append(Addresses.toString(_bobIP, _bobPort));
-            buf.append(" RelayTag: ").append(_receivedRelayTag);
-            buf.append(" SignedOn: ").append(_receivedSignedOnTime);
-            buf.append(" signature: ").append(Base64.encode(_receivedSignature.getData()));
-            if (valid)
-                _log.debug(buf.toString());
-            else if (_log.shouldLog(Log.WARN))
-                _log.warn("INVALID: " + buf.toString());
-        }
-        return valid;
-    }
-    
-    public synchronized SessionKey getCipherKey() { return _sessionKey; }
-    public synchronized SessionKey getMACKey() { return _macKey; }
-
     public synchronized long getReceivedRelayTag() { return _receivedRelayTag; }
     public synchronized long getSentSignedOnTime() { return _sentSignedOnTime; }
     public synchronized long getReceivedSignedOnTime() { return _receivedSignedOnTime; }
     public synchronized byte[] getReceivedIP() { return _aliceIP; }
     public synchronized int getReceivedPort() { return _alicePort; }
-    
-    /**
-     *  Let's sign everything so we can fragment properly.
-     *
-     *  Note that while a SessionConfirmed could in theory be fragmented,
-     *  in practice a RouterIdentity is 387 bytes and a single fragment is 512 bytes max,
-     *  so it will never be fragmented.
-     */
-    public synchronized void prepareSessionConfirmed() {
-        if (_sentSignedOnTime > 0)
-            return;
-        byte signed[] = new byte[256+256 // X + Y
-                             + _aliceIP.length + 2
-                             + _bobIP.length + 2
-                             + 4 // Alice's relay key
-                             + 4 // signed on time
-                             ];
-
-        _sentSignedOnTime = _context.clock().now() / 1000;
-        
-        int off = 0;
-        System.arraycopy(_sentX, 0, signed, off, _sentX.length);
-        off += _sentX.length;
-        System.arraycopy(_receivedY, 0, signed, off, _receivedY.length);
-        off += _receivedY.length;
-        System.arraycopy(_aliceIP, 0, signed, off, _aliceIP.length);
-        off += _aliceIP.length;
-        DataHelper.toLong(signed, off, 2, _alicePort);
-        off += 2;
-        System.arraycopy(_bobIP, 0, signed, off, _bobIP.length);
-        off += _bobIP.length;
-        DataHelper.toLong(signed, off, 2, _bobPort);
-        off += 2;
-        DataHelper.toLong(signed, off, 4, _receivedRelayTag);
-        off += 4;
-        DataHelper.toLong(signed, off, 4, _sentSignedOnTime);
-        // BUG - if SigningPrivateKey is null, _sentSignature will be null, leading to NPE later
-        // should we throw something from here?
-        _sentSignature = _context.dsa().sign(signed, _context.keyManager().getSigningPrivateKey());
-    }
-    
-    public synchronized Signature getSentSignature() { return _sentSignature; }
     
     /** note that we just sent the SessionConfirmed packet */
     public synchronized void confirmedPacketsSent() {

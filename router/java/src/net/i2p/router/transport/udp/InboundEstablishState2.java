@@ -552,11 +552,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         super.fail();
     }
 
-    // SSU 1 unsupported things
-
-    @Override
-    public void generateSessionKey() { throw new UnsupportedOperationException(); }
-
     // SSU 2 things
 
     public long getSendConnID() { return _sendConnID; }

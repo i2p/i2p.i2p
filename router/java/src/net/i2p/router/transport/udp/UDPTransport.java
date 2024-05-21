@@ -23,7 +23,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.i2p.CoreVersion;
 import net.i2p.crypto.EncType;
-import net.i2p.crypto.HMACGenerator;
 import net.i2p.crypto.KeyPair;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
@@ -102,7 +101,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private long _v6IntroducersSelectedOn;
     private long _lastInboundReceivedOn;
     private final DHSessionKeyBuilder.Factory _dhFactory;
-    private final SSUHMACGenerator _hmac;
     private int _mtu = PeerState.MIN_MTU;
     private int _mtu_ipv6 = PeerState.MIN_IPV6_MTU;
     private int _mtu_ssu2;
@@ -421,7 +419,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _v4IntroducersSelectedOn = -1;
         _v6IntroducersSelectedOn = -1;
         _lastInboundReceivedOn = -1;
-        _hmac = (dh != null) ? new SSUHMACGenerator() : null;
         _mtu = PeerState.LARGE_MTU;
         _mtu_ipv6 = PeerState.MIN_IPV6_MTU;
         setupPort();
@@ -939,8 +936,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         UDPPacket.clearCache();
         UDPAddress.clearCache();
         _lastInboundIPv6 = 0;
-        if (_hmac != null)
-            _hmac.clearCache();
     }
 
     /**
@@ -3707,22 +3702,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         //    _log.debug("UDP transport returning " + skews.size() + " peer clock skews.");
         return skews;
     }
-    
-    /**
-     *  @return a new DHSessionKeyBuilder, or null if SSU1 disabled
-     *  @since 0.9
-     */
-    DHSessionKeyBuilder getDHBuilder() {
-        return _enableSSU1 ? _dhFactory.getBuilder() : null;
-    }
-    
-    /**
-     *  @return the factory, or null if SSU1 disabled
-     *  @since 0.9.2
-     */
-    DHSessionKeyBuilder.Factory getDHFactory() {
-        return _dhFactory;
-    }
 
     /**
      *  @return null if not configured for SSU2
@@ -3730,14 +3709,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     X25519KeyFactory getXDHFactory() {
         return _xdhFactory;
-    }
-    
-    /**
-     *  @return the SSU HMAC, or null if SSU1 disabled
-     *  @since 0.9.42
-     */
-    HMACGenerator getHMAC() {
-        return _hmac;
     }
     
     /**
