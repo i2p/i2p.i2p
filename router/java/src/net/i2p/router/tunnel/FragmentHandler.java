@@ -12,6 +12,7 @@ import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.I2NPMessageHandler;
+import net.i2p.data.i2np.UnknownI2NPMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.ByteCache;
 import net.i2p.util.HexDump;
@@ -98,16 +99,31 @@ class FragmentHandler {
     private final DefragmentedReceiver _receiver;
     private final AtomicInteger _completed = new AtomicInteger();
     private final AtomicInteger _failed = new AtomicInteger();
+    private final boolean _isInbound;
     
     /** don't wait more than this long to completely receive a fragmented message */
     static long MAX_DEFRAGMENT_TIME = 45*1000;
     private static final ByteCache _cache = ByteCache.getInstance(512, TrivialPreprocessor.PREPROCESSED_SIZE);
 
+    /**
+     * For unit tests only, others use 3-arg constructor
+     *
+     * @deprecated
+     */
+    @Deprecated
     public FragmentHandler(RouterContext context, DefragmentedReceiver receiver) {
+        this(context, receiver, true);
+    }
+
+    /**
+     * @param isInbound true for IBEP, false for OBEP
+     */
+    public FragmentHandler(RouterContext context, DefragmentedReceiver receiver, boolean isInbound) {
         _context = context;
         _log = context.logManager().getLog(FragmentHandler.class);
         _fragmentedMessages = new HashMap<Long, FragmentedMessage>(16);
         _receiver = receiver;
+        _isInbound = isInbound;
         // all createRateStat in TunnelDispatcher
     }
     
@@ -241,8 +257,8 @@ class FragmentHandler {
         int validLength = length - offset - paddingEnd + HopProcessor.IV_LENGTH;
         System.arraycopy(preprocessed, offset + paddingEnd, preV, 0, validLength - HopProcessor.IV_LENGTH);
         System.arraycopy(preprocessed, 0, preV, validLength - HopProcessor.IV_LENGTH, HopProcessor.IV_LENGTH);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("endpoint IV: " + Base64.encode(preV, validLength - HopProcessor.IV_LENGTH, HopProcessor.IV_LENGTH));
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("endpoint IV: " + Base64.encode(preV, validLength - HopProcessor.IV_LENGTH, HopProcessor.IV_LENGTH));
         
         byte[] v = SimpleByteCache.acquire(Hash.HASH_LENGTH);
         _context.sha().calculateHash(preV, 0, validLength, v, 0);
@@ -299,9 +315,9 @@ class FragmentHandler {
      * @throws RuntimeException
      */
     private int receiveFragment(byte preprocessed[], int offset, int length) {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("CONTROL: 0x" + Integer.toHexString(preprocessed[offset] & 0xff) +
-                       " at offset " + offset);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("CONTROL: 0x" + Integer.toHexString(preprocessed[offset] & 0xff) +
+        //               " at offset " + offset);
         if (0 == (preprocessed[offset] & MASK_IS_SUBSEQUENT))
             return receiveInitialFragment(preprocessed, offset, length);
         else
@@ -410,7 +426,6 @@ class FragmentHandler {
                         msg.getExpireEvent().cancel();
                     receiveComplete(msg);
                 } else {
-                    noteReception(msg.getMessageId(), 0, msg);
                     if (msg.getExpireEvent() == null) {
                         RemoveFailed evt = new RemoveFailed(msg);
                         msg.setExpireEvent(evt);
@@ -480,7 +495,6 @@ class FragmentHandler {
                 _context.statManager().addRateData("tunnel.fragmentedComplete", msg.getFragmentCount(), msg.getLifetime());
                 receiveComplete(msg);
             } else {
-                noteReception(msg.getMessageId(), fragmentNum, msg);
                 if (msg.getExpireEvent() == null) {
                     RemoveFailed evt = new RemoveFailed(msg);
                     msg.setExpireEvent(evt);
@@ -500,12 +514,8 @@ class FragmentHandler {
         if (msg == null)
             return;
         _completed.incrementAndGet();
-        String stringified = null;
-        if (_log.shouldLog(Log.DEBUG))
-            stringified = msg.toString();
         byte data[] = null;
         try {
-            int fragmentCount = msg.getFragmentCount();
             // toByteArray destroys the contents of the message completely
             data = msg.toByteArray();
             if (data == null)
@@ -514,21 +524,24 @@ class FragmentHandler {
                 _log.debug("RECV(" + data.length + "): "); // + Base64.encode(data)  
                            //+ " " + _context.sha().calculateHash(data).toBase64());
 
-            // TODO read in as unknown message for outbound tunnels,
+            // Read in as unknown message for outbound tunnels,
             // since this will just be packaged in a TunnelGatewayMessage.
             // Not a big savings since most everything is a GarlicMessage
             // and so the readMessage() call is fast.
             // The unencrypted messages at the OBEP are (V)TBMs
             // and perhaps an occasional DatabaseLookupMessage
-            I2NPMessage m = new I2NPMessageHandler(_context).readMessage(data);
-            long id = m.getUniqueId();
-            noteReception(id, fragmentCount-1, "complete");
-            noteCompletion(id);
+            I2NPMessage m;
+            if (_isInbound) {
+                m = new I2NPMessageHandler(_context).readMessage(data);
+            } else {
+                int utype = data[0] & 0xff;
+                m = new UnknownI2NPMessage(_context, utype);
+                m.readBytes(data, utype, 1);
+            }
             _receiver.receiveComplete(m, msg.getTargetRouter(), msg.getTargetTunnel());
         } catch (I2NPMessageException ime) {
-            if (stringified == null) stringified = msg.toString();
             if (_log.shouldLog(Log.WARN)) {
-                _log.warn("Error receiving fragmented message (corrupt?): " + stringified, ime);
+                _log.warn("Error receiving fragmented message (corrupt?): " + msg, ime);
                 _log.warn("DUMP:\n" + HexDump.dump(data));
                 _log.warn("RAW:\n" + Base64.encode(data));
             }
@@ -545,18 +558,22 @@ class FragmentHandler {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("RECV unfrag(" + len + ')');
 
-            // TODO read in as unknown message for outbound tunnels,
+            // Read in as unknown message for outbound tunnels,
             // since this will just be packaged in a TunnelGatewayMessage.
             // Not a big savings since most everything is a GarlicMessage
             // and so the readMessage() call is fast.
             // The unencrypted messages at the OBEP are (V)TBMs
             // and perhaps an occasional DatabaseLookupMessage
-            I2NPMessageHandler h = new I2NPMessageHandler(_context);
-            h.readMessage(data, offset, len);
-            I2NPMessage m = h.lastRead();
-            long id = m.getUniqueId();
-            noteReception(id, 0, "complete");
-            noteCompletion(id);
+            I2NPMessage m;
+            if (_isInbound) {
+                I2NPMessageHandler h = new I2NPMessageHandler(_context);
+                h.readMessage(data, offset, len);
+                m = h.lastRead();
+            } else {
+                int utype = data[offset++] & 0xff;
+                m = new UnknownI2NPMessage(_context, utype);
+                m.readBytes(data, utype, offset, len - 1);
+            }
             _receiver.receiveComplete(m, router, tunnelId);
         } catch (I2NPMessageException ime) {
             if (_log.shouldLog(Log.WARN)) {
@@ -567,10 +584,6 @@ class FragmentHandler {
         }
     }
 
-    protected void noteReception(long messageId, int fragmentId, Object status) {}
-    protected void noteCompletion(long messageId) {}
-    protected void noteFailure(long messageId, String status) {}
-    
     /**
      * Receive messages out of the tunnel endpoint.  There should be a single 
      * instance of this object per tunnel so that it can tell what tunnel various
@@ -605,7 +618,6 @@ class FragmentHandler {
             synchronized (_msg) {
                 if (removed && !_msg.getReleased()) {
                     _failed.incrementAndGet();
-                    noteFailure(_msg.getMessageId(), _msg.toString());
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Dropped incomplete fragmented message: " + _msg);
                     _context.statManager().addRateData("tunnel.fragmentedDropped", _msg.getFragmentCount(), _msg.getLifetime());

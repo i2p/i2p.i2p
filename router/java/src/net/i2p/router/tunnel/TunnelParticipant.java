@@ -53,7 +53,7 @@ class TunnelParticipant {
         _config = config;
         _processor = processor;
         if ( (config == null) || (config.getSendTo() == null) )
-            _handler = new RouterFragmentHandler(ctx, new DefragmentedHandler());
+            _handler = new FragmentHandler(ctx, new DefragmentedHandler(), true);
         else
             _handler = null; // final
 
