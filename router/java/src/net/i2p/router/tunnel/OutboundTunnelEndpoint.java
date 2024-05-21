@@ -5,7 +5,9 @@ import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.TunnelDataMessage;
+import net.i2p.data.i2np.UnknownI2NPMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -28,7 +30,7 @@ class OutboundTunnelEndpoint {
         _log = ctx.logManager().getLog(OutboundTunnelEndpoint.class);
         _config = config;
         _processor = processor;
-        _handler = new RouterFragmentHandler(ctx, new DefragmentedHandler());
+        _handler = new FragmentHandler(ctx, new DefragmentedHandler(), false);
         _outDistributor = new OutboundMessageDistributor(ctx, OutNetMessage.PRIORITY_PARTICIPATING);
     }
 
@@ -57,6 +59,11 @@ class OutboundTunnelEndpoint {
     }
     
     private class DefragmentedHandler implements FragmentHandler.DefragmentedReceiver {
+
+        /**
+         *  Warning - as of 0.9.63, msg will be an UnknownI2NPMessage,
+         *  and must be converted before handling locally.
+         */
         public void receiveComplete(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
             if (toRouter == null) {
                 // Delivery type LOCAL is not supported at the OBEP
@@ -69,6 +76,18 @@ class OutboundTunnelEndpoint {
 
             int type = msg.getType();
             if (type == DatabaseStoreMessage.MESSAGE_TYPE) {
+                // If UnknownI2NPMessage, convert it.
+                // See FragmentHandler.receiveComplete()
+                if (msg instanceof UnknownI2NPMessage) {
+                    try {
+                        UnknownI2NPMessage umsg = (UnknownI2NPMessage) msg;
+                        msg = umsg.convert();
+                    } catch (I2NPMessageException ime) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Unable to convert to std. msg. class at zero-hop IBGW", ime);
+                        return;
+                    }
+                }
                 DatabaseStoreMessage dsm = (DatabaseStoreMessage) msg;
                 DatabaseEntry entry = dsm.getEntry();
                 if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
