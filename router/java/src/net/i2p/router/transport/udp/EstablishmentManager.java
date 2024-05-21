@@ -989,32 +989,12 @@ class EstablishmentManager {
         
         RouterIdentity remote = state.getConfirmedIdentity();
         PeerState peer;
-        int version = state.getVersion();
 
             InboundEstablishState2 state2 = (InboundEstablishState2) state;
             peer = state2.getPeerState();
             // now handled in IES2.createPeerState()
             //peer.setWeRelayToThemAs(state.getSentRelayTag());
 
-        if (version == 1) {
-            // Lookup the peer's MTU from the netdb, since it isn't included in the protocol setup (yet)
-            // TODO if we don't have RI then we will get it shortly, but too late.
-            // Perhaps netdb should notify transport when it gets a new RI...
-            RouterInfo info = _context.netDb().lookupRouterInfoLocally(remote.calculateHash());
-            if (info != null) {
-                RouterAddress addr = _transport.getTargetAddress(info);
-                if (addr != null) {
-                    String smtu = addr.getOption(UDPAddress.PROP_MTU);
-                    if (smtu != null) {
-                        try { 
-                            boolean isIPv6 = state.getSentIP().length == 16;
-                            int mtu = MTU.rectify(isIPv6, Integer.parseInt(smtu));
-                            peer.setHisMTU(mtu);
-                        } catch (NumberFormatException nfe) {}
-                    }
-                }
-            }
-        }  // else IES2 sets PS2 MTU
         // 0 is the default
         //peer.setTheyRelayToUsAs(0);
         
