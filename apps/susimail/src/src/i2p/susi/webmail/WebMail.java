@@ -172,6 +172,8 @@ public class WebMail extends HttpServlet
 	private static final String MOVE_TO = "moveto";
 	private static final String SWITCH_TO = "switchto";
 	private static final String SEARCH = "nf_s";
+	private static final String XHR1 = "xhr1";
+	private static final String XHR2 = "xhr2";
 	// also a GET param
 	private static final String SHOW = "show";
 	private static final String DOWNLOAD = "download";
@@ -2561,7 +2563,47 @@ public class WebMail extends HttpServlet
 
 			//// Begin output
 
-				PrintWriter out = response.getWriter();
+			PrintWriter out = response.getWriter();
+			if (httpRequest.getParameter(XHR1) != null) {
+				if (state != State.LIST || mc == null) {
+					response.sendError(404, "bad state");
+					return;
+				}
+				response.setContentType("text/html");
+				String search = httpRequest.getParameter(SEARCH);
+				if (_log.shouldDebug()) _log.debug("XHR1 search=" + search);
+				if (search != null && search.length() > 0) {
+					Folder.Selector olds = folder.getCurrentSelector();
+					if (olds == null || !olds.getSelectionKey().equals(search)) {
+						folder.setSelector(new SearchSelector(mc, search));
+					}
+				} else if ((search == null || search.length() == 0) && folder.getCurrentSelector() != null) {
+					folder.setSelector(null);
+				}
+				showMailbox(out, sessionObject, mc, request, search);
+			} else if (httpRequest.getParameter(XHR2) != null) {
+				if (state != State.LIST) {
+					response.sendError(404, "bad state");
+					return;
+				}
+				String search = httpRequest.getParameter(SEARCH);
+				if (_log.shouldDebug()) _log.debug("XHR2 search=" + search);
+				if (search != null && search.length() > 0) {
+					Folder.Selector olds = folder.getCurrentSelector();
+					if (olds == null || !olds.getSelectionKey().equals(search)) {
+						folder.setSelector(new SearchSelector(mc, search));
+					}
+				} else if ((search == null || search.length() == 0) && folder.getCurrentSelector() != null) {
+					folder.setSelector(null);
+				}
+				String section = httpRequest.getParameter(XHR2);
+				if ("1".equals(section) || (folder.getPageSize() > 30 && folder.getPages() > 1)) {
+					response.setContentType("text/html");
+					showPageButtons(out, sessionObject, mc, request);
+				} else {
+					response.setContentLength(0);
+				}
+			} else {
 
 				/*
 				 * build subtitle
@@ -2623,6 +2665,8 @@ public class WebMail extends HttpServlet
 					out.println("<script src=\"/susimail/js/compose.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 				} else if (state == State.LIST) {
 					out.println("<script src=\"/susimail/js/folder.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
+					out.println("<script src=\"/js/ajax.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
+					out.println("<script src=\"/susimail/js/search.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 				} else if (state == State.LOADING) {
 					// TODO JS?
 			                out.println("<meta http-equiv=\"refresh\" content=\"5;url=" + myself + "\">");
@@ -2781,6 +2825,7 @@ public class WebMail extends HttpServlet
 				            "&copy; 2004-2005 susi</p></div>");
 				out.println("</div></body>\n</html>");
 				out.flush();
+			}
 		}  // synch sessionObject
 	}
 
@@ -3524,16 +3569,6 @@ public class WebMail extends HttpServlet
 	private static void showFolder( PrintWriter out, SessionObject sessionObject, MailCache mc, RequestWrapper request )
 	{
 		String folderName = mc.getFolderName();
-		String floc;
-		if (folderName.equals(DIR_FOLDER)) {
-			floc = "";
-		} else if (folderName.equals(DIR_DRAFTS)) {
-			floc = "";
-		} else {
-			floc = '&' + CURRENT_FOLDER + '=' + folderName;
-		}
-		boolean isSpamFolder = folderName.equals(DIR_SPAM);
-		boolean showToColumn = folderName.equals(DIR_DRAFTS) || folderName.equals(DIR_SENT);
 		// For all states except LIST, we have one big form for the whole page.
 		// Here, for LIST, we set up 4-5 forms
 		// to deal with html rules and have a search box that works right.
@@ -3571,7 +3606,7 @@ public class WebMail extends HttpServlet
 			}
 		}
 		if (search != null && search.length() > 0) {
-			fbf.append("<input type=\"hidden\" name=\"").append(CURRENT_SEARCH).append("\" value=\"").append(DataHelper.escapeHTML(search)).append("\">\n");
+			fbf.append("<input type=\"hidden\" class=\"searchparam\" name=\"").append(CURRENT_SEARCH).append("\" value=\"").append(DataHelper.escapeHTML(search)).append("\">\n");
 			Folder.Selector olds = folder.getCurrentSelector();
 			if (olds == null || !olds.getSelectionKey().equals(search)) {
 				folder.setSelector(new SearchSelector(mc, search));
@@ -3615,16 +3650,62 @@ public class WebMail extends HttpServlet
 		// form 3
 		out.print(form);
 		out.print(hidden);
-		if (search != null)
-			out.println("<input type=\"hidden\" name=\"" + SEARCH + "\" value=\"" + DataHelper.escapeHTML(search) + "\">");
-		showPageButtons(out, sessionObject.user, folderName, page, folder.getPages(), true);
+		if (search == null)
+			search = "";
+		out.println("<input type=\"hidden\" class=\"searchparam\" name=\"" + SEARCH + "\" value=\"" + DataHelper.escapeHTML(search) + "\">");
+		out.println("<div id=\"pagenavdiv1\">");
+		showPageButtons(out, sessionObject.user, folderName, page, folder.getPages());
+		out.println("</div>");
 		out.println("</form>");
 		out.println("</div>");
 
 		// form 4
 		out.print(form);
 		out.print(hidden);
+		out.println("<div id=\"mailboxdiv\">");
+		showMailbox(out, sessionObject, mc, request, search);
+		out.println("</div>");
+		out.println("</form>");
+
+		int ps = folder.getPageSize();
+		if (ps > 30 && folder.getPages() > 1 && (folder.getCurrentPage() - 1) * ps < folder.getSize() - 30) {
+			// show the buttons again if page is big
+			out.println("<div class=\"topbuttons\">");
+			// form 5
+			out.print(form);
+			out.print(hidden);
+			out.println("<input type=\"hidden\" class=\"searchparam\" name=\"" + SEARCH + "\" value=\"" + DataHelper.escapeHTML(search) + "\">");
+			out.println("<div id=\"pagenavdiv2\">");
+			showPageButtons(out, sessionObject.user, folderName, page, folder.getPages());
+			out.println("</div>");
+			out.println("</form>");
+			out.println("</div>");
+		}
+	}
+
+	/**
+	 *  The mailbox table.
+	 *  Split out from showFolder() above for XHR1
+	 *
+	 *  @since 0.9.63
+	 */
+	private static void showMailbox(PrintWriter out, SessionObject sessionObject, MailCache mc, RequestWrapper request, String search) {
 		out.println("<table id=\"mailbox\" cellspacing=\"0\" cellpadding=\"5\">\n");
+		String folderName = mc.getFolderName();
+		String floc;
+		if (folderName.equals(DIR_FOLDER)) {
+			floc = "";
+		} else if (folderName.equals(DIR_DRAFTS)) {
+			floc = "";
+		} else {
+			floc = '&' + CURRENT_FOLDER + '=' + folderName;
+		}
+		boolean isSpamFolder = folderName.equals(DIR_SPAM);
+		boolean showToColumn = folderName.equals(DIR_DRAFTS) || folderName.equals(DIR_SENT);
+		Folder<String> folder = mc.getFolder();
+		String curSort = folder.getCurrentSortBy();
+		SortOrder curOrder = folder.getCurrentSortingDirection();
+		int page = folder.getCurrentPage();
 		out.println("<tr><td colspan=\"9\"><hr></td></tr>\n<tr><th title=\"" + _t("Mark for deletion") + "\">&nbsp;</th>" +
 			thSpacer + "<th>" + sortHeader(SORT_SENDER, showToColumn ? _t("To") : _t("From"), sessionObject.imgPath, curSort, curOrder, page, folderName, search) + "</th>" +
 			thSpacer + "<th>" + sortHeader(SORT_SUBJECT, _t("Subject"), sessionObject.imgPath, curSort, curOrder, page, folderName, search) + "</th>" +
@@ -3745,20 +3826,6 @@ public class WebMail extends HttpServlet
 		out.print(button(CONFIGURE, _t("Settings")));
 		out.println("</td></tr>");
 		out.println( "</table>");
-		out.println("</form>");
-		int ps = folder.getPageSize();
-		if (ps > 30 && (folder.getCurrentPage() - 1) * ps < folder.getSize() - 30) {
-			// show the buttons again if page is big
-			out.println("<div class=\"topbuttons\">");
-			// form 5
-			out.print(form);
-			out.print(hidden);
-			if (search != null)
-				out.println("<input type=\"hidden\" name=\"" + SEARCH + "\" value=\"" + DataHelper.escapeHTML(search) + "\">");
-			showPageButtons(out, sessionObject.user, folderName, page, folder.getPages(), false);
-			out.println("</form>");
-			out.println("</div>");
-		}
 	}
 
 	/**
@@ -3824,10 +3891,19 @@ public class WebMail extends HttpServlet
 	}
 
 	/**
+	 *  For XHR2
+	 *  @since 0.9.62
+	 */
+	private static void showPageButtons(PrintWriter out, SessionObject sessionObject, MailCache mc, RequestWrapper request) {
+		Folder<String> folder = mc.getFolder();
+		showPageButtons(out, sessionObject.user, mc.getFolderName(), folder.getCurrentPage(), folder.getPages());
+	}
+
+	/**
 	 *  Folder selector, then, if pages greater than 1:
 	 *  first prev next last
 	 */
-	private static void showPageButtons(PrintWriter out, String user, String folderName, int page, int pages, boolean outputHidden) {
+	private static void showPageButtons(PrintWriter out, String user, String folderName, int page, int pages) {
 		out.println("<table id=\"pagenav\"><tr><td>");
 		if (!user.contains("@")) {
 			String domain = Config.getProperty( CONFIG_SENDER_DOMAIN, "mail.i2p" );
@@ -3840,15 +3916,13 @@ public class WebMail extends HttpServlet
 		showFolderSelect(out, folderName, false);
 		if (pages > 1) {
 			out.println("</td><td>");
-			if (outputHidden)
-				out.println("<input type=\"hidden\" name=\"" + CUR_PAGE + "\" value=\"" + page + "\">");
+			out.println("<input type=\"hidden\" name=\"" + CUR_PAGE + "\" value=\"" + page + "\">");
 			String t1 = _t("First");
 			String t2 = _t("Previous");
 			if (page <= 1) {
 				out.println(button2(FIRSTPAGE, t1) + "&nbsp;" + button2(PREVPAGE, t2));
 			} else {
-				if (outputHidden)
-					out.println("<input type=\"hidden\" name=\"" + PREV_PAGE_NUM + "\" value=\"" + (page - 1) + "\">");
+				out.println("<input type=\"hidden\" name=\"" + PREV_PAGE_NUM + "\" value=\"" + (page - 1) + "\">");
 				out.println(button(FIRSTPAGE, t1) + "&nbsp;" + button(PREVPAGE, t2));
 			}
 			out.println("</td><td>" +
@@ -3859,8 +3933,7 @@ public class WebMail extends HttpServlet
 			if (page >= pages) {
 				out.println(button2(NEXTPAGE, t1) + "&nbsp;" + button2(LASTPAGE, t2));
 			} else {
-				if (outputHidden)
-					out.println("<input type=\"hidden\" name=\"" + NEXT_PAGE_NUM + "\" value=\"" + (page + 1) + "\">");
+				out.println("<input type=\"hidden\" name=\"" + NEXT_PAGE_NUM + "\" value=\"" + (page + 1) + "\">");
 				out.println(button(NEXTPAGE, t1) + "&nbsp;" + button(LASTPAGE, t2));
 			}
 		}
