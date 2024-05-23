@@ -114,6 +114,8 @@ abstract class IRCFilter {
         {
             String msg;
             msg = field[idx++];
+            if (idx < field.length)
+                msg += ' ' + field[idx];
 
             if(msg.indexOf(0x01) >= 0) // CTCP marker ^A can be anywhere, not just immediately after the ':'
             {
@@ -360,6 +362,8 @@ abstract class IRCFilter {
             if (field.length < idx + 2)
                 return s;  // invalid, allow server response
             String msg = field[idx + 1];
+            if (idx + 2 < field.length)
+                msg += ' ' + field[idx + 2];
         
             if(msg.indexOf(0x01) >= 0) // CTCP marker ^A can be anywhere, not just immediately after the ':'
             {
