@@ -826,7 +826,7 @@ input.delete {
 }
 
 input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix for oversaturated colors */
-     border: 1px solid #292929;
+     border: 1px solid #692929;
      background: #1F1A24;
      color: #e6e6e7;
      border-radius: 12px;
@@ -858,13 +858,7 @@ input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix 
      margin: 20px auto;
      width: 600px;
      padding: 0 0 10px;
-     background: #001000;
-     background: linear-gradient(to bottom, #000 0%, #010 50%);
-     background: repeating-linear-gradient(135deg, #000 1px, #000 2px, rgba(0,32,0,0.5) 2px, rgba(0,32,0,0.5) 4px), repeating-linear-gradient(45deg, #000 1px, #000 2px, rgba(0,32,0,0.5) 2px, rgba(0,32,0,0.5) 4px), linear-gradient(to bottom, #030 0%, #020);
-     background: #1F1A24;
-     background-blend-mode: normal, darken, darken, normal;
-     background-blend-mode: difference, normal;
-
+     background: #2F1A24;
 }
 
 .iframed #dologin {
@@ -880,7 +874,7 @@ input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix 
      letter-spacing:0.08em;
      word-spacing: 0.1em;
      text-align: center;
-     background: url(images/mail.png) 8px center no-repeat, #1F1A24;
+     background: url(images/mail.png) 8px center no-repeat, #3F1A24;
      text-shadow: 0 1px 1px #000;
 }
 
@@ -889,7 +883,7 @@ input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix 
      margin-bottom: -9px;
      border-collapse: collapse;
      border-spacing: 0 !important;
-     background: #1F1A24;
+     background: #2F1A24;
 }
 
 #dologin td {
@@ -904,7 +898,6 @@ input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix 
 #dologin td:last-child {
      width: 71%;
      white-space: nowrap;
-     background: #1F1A24;
 }
 
 #dologin td[colspan="2"] {
@@ -1270,7 +1263,7 @@ input.switchto, input.list, input.setpagesize {
 
 input.switchto:hover, input.list:hover,
 input.switchto:focus, input.list:focus {
-     background: #292929 url(images/folder.png) center center no-repeat !important;
+     background: #692929 url(images/folder.png) center center no-repeat !important;
      background-size: 12px 12px !important;
      border: 1px solid #f60;
 }
