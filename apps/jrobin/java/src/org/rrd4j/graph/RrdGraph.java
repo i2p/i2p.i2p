@@ -404,6 +404,10 @@ public class RrdGraph implements RrdGraphConstants {
             };
             worker.fillPolygon(Xarrow_x, im.yorigin + 3.0, Xarrow_y, arrowColor);
 
+            // I2P skip arrowheads if transparent
+            if (((Color)arrowColor).getAlpha() == 0)
+                return;
+
             //Do y axis arrow
             double[] Yarrow_x = {
                     im.xorigin - 3,

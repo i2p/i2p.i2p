@@ -1,5 +1,6 @@
 package org.rrd4j.graph;
 
+import java.awt.BasicStroke;
 import java.awt.Font;
 import java.awt.Paint;
 import java.util.Calendar;
@@ -66,6 +67,8 @@ class TimeAxis extends Axis {
 
     private void drawMinor() {
         if (!gdef.noMinorGrid) {
+            // I2P skip ticks if zero width
+            boolean ticks = ((BasicStroke)gdef.tickStroke).getLineWidth() > 0;
             adjustStartingTime(tickSetting.minorUnit, tickSetting.minorUnitCount);
             Paint color = gdef.getColor(ElementsNames.grid);
             int y0 = im.yorigin, y1 = y0 - im.ysize;
@@ -73,7 +76,8 @@ class TimeAxis extends Axis {
                 if (status == 0) {
                     long time = calendar.getTime().getTime() / 1000L;
                     int x = mapper.xtr(time);
-                    worker.drawLine(x, y0 - 1, x, y0 + 1, color, gdef.tickStroke);
+                    if (ticks)
+                        worker.drawLine(x, y0 - 1, x, y0 + 1, color, gdef.tickStroke);
                     worker.drawLine(x, y0, x, y1, color, gdef.gridStroke);
                 }
                 findNextTime(tickSetting.minorUnit, tickSetting.minorUnitCount);
@@ -82,6 +86,8 @@ class TimeAxis extends Axis {
     }
 
     private void drawMajor() {
+        // I2P skip ticks if zero width
+        boolean ticks = ((BasicStroke)gdef.tickStroke).getLineWidth() > 0;
         adjustStartingTime(tickSetting.majorUnit, tickSetting.majorUnitCount);
         Paint color = gdef.getColor(ElementsNames.mgrid);
         int y0 = im.yorigin, y1 = y0 - im.ysize;
@@ -89,7 +95,8 @@ class TimeAxis extends Axis {
             if (status == 0) {
                 long time = calendar.getTime().getTime() / 1000L;
                 int x = mapper.xtr(time);
-                worker.drawLine(x, y0 - 2, x, y0 + 2, color, gdef.tickStroke);
+                if (ticks)
+                    worker.drawLine(x, y0 - 2, x, y0 + 2, color, gdef.tickStroke);
                 worker.drawLine(x, y0, x, y1, color, gdef.gridStroke);
             }
             findNextTime(tickSetting.majorUnit, tickSetting.majorUnitCount);

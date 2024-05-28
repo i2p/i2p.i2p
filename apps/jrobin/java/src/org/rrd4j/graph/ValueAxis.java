@@ -1,5 +1,6 @@
 package org.rrd4j.graph;
 
+import java.awt.BasicStroke;
 import java.awt.Font;
 import java.awt.Paint;
 import java.math.BigDecimal;
@@ -123,6 +124,8 @@ class ValueAxis extends Axis {
         int egrid = (int) (im.maxval / gridstep + 1);
         double scaledstep = gridstep / im.magfact;
         boolean fractional = isFractional(scaledstep, labfact);
+        // I2P skip ticks if zero width
+        boolean ticks = ((BasicStroke)gdef.tickStroke).getLineWidth() > 0;
         for (int i = sgrid; i <= egrid; i++) {
             int y = mapper.ytr(gridstep * i);
             if (y >= im.yorigin - im.ysize && y <= im.yorigin) {
@@ -151,13 +154,17 @@ class ValueAxis extends Axis {
                     }
                     int length = (int) (worker.getStringWidth(graph_label, font));
                     worker.drawString(graph_label, x0 - length - PADDING_VLABEL, y + labelOffset, font, fontColor);
-                    worker.drawLine(x0 - 2, y, x0 + 2, y, mGridColor, gdef.tickStroke);
-                    worker.drawLine(x1 - 2, y, x1 + 2, y, mGridColor, gdef.tickStroke);
+                    if (ticks) {
+                        worker.drawLine(x0 - 2, y, x0 + 2, y, mGridColor, gdef.tickStroke);
+                        worker.drawLine(x1 - 2, y, x1 + 2, y, mGridColor, gdef.tickStroke);
+                    }
                     worker.drawLine(x0, y, x1, y, mGridColor, gdef.gridStroke);
                 }
                 else if (!(gdef.noMinorGrid)) {
-                    worker.drawLine(x0 - 1, y, x0 + 1, y, gridColor, gdef.tickStroke);
-                    worker.drawLine(x1 - 1, y, x1 + 1, y, gridColor, gdef.tickStroke);
+                    if (ticks) {
+                        worker.drawLine(x0 - 1, y, x0 + 1, y, gridColor, gdef.tickStroke);
+                        worker.drawLine(x1 - 1, y, x1 + 1, y, gridColor, gdef.tickStroke);
+                    }
                     worker.drawLine(x0, y, x1, y, gridColor, gdef.gridStroke);
                 }
             }
