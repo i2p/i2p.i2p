@@ -252,13 +252,13 @@ class SummaryRenderer {
             if (!hideLegend) {
                 Variable var = new Variable.AVERAGE();
                 def.datasource("avg", plotName, var);
-                def.gprint("avg", "   " + _t("Avg") + ": %.2f%s");
+                def.gprint("avg", "   " + _t("Avg") + ": %.2f %s");
                 var = new Variable.MAX();
                 def.datasource("max", plotName, var);
-                def.gprint("max", ' ' + _t("Max") + ": %.2f%S");
+                def.gprint("max", ' ' + _t("Max") + ": %.2f %S");
                 var = new Variable.LAST();
                 def.datasource("last", plotName, var);
-                def.gprint("last", ' ' + _t("Now") + ": %.2f%S\\l");
+                def.gprint("last", ' ' + _t("Now") + ": %.2f %S\\l");
             }
             String plotName2 = null;
             if (lsnr2 != null) {
@@ -272,13 +272,13 @@ class SummaryRenderer {
                 if (!hideLegend) {
                     Variable var = new Variable.AVERAGE();
                     def.datasource("avg2", plotName2, var);
-                    def.gprint("avg2", "   " + _t("Avg") + ": %.2f%s");
+                    def.gprint("avg2", "   " + _t("Avg") + ": %.2f %s");
                     var = new Variable.MAX();
                     def.datasource("max2", plotName2, var);
-                    def.gprint("max2", ' ' + _t("Max") + ": %.2f%S");
+                    def.gprint("max2", ' ' + _t("Max") + ": %.2f %S");
                     var = new Variable.LAST();
                     def.datasource("last2", plotName2, var);
-                    def.gprint("last2", ' ' + _t("Now") + ": %.2f%S\\l");
+                    def.gprint("last2", ' ' + _t("Now") + ": %.2f %S\\l");
                 }
             }
             if (!hideLegend) {
@@ -289,32 +289,32 @@ class SummaryRenderer {
                 if (localTime) {
                     for (Map.Entry<Long, String> event : events.entrySet()) {
                         long started = event.getKey().longValue();
-                        if (started > start && started < end) {
-                            String legend;
-                            if (Messages.isRTL(lang)) {
-                                // RTL languages
-                                legend = _t("Restart") + ' ' + DataHelper.formatTime(started) + " - " + event.getValue() + "\\l";
-                            } else {
-                                legend = _t("Restart") + ' ' + DataHelper.formatTime(started) + " [" + event.getValue() + "]\\l";
-                            }
-                            def.vrule(started / 1000, restartBarColor, legend, 2.0f);
+                        if (started >= end)
+                            break;
+                        String legend;
+                        if (Messages.isRTL(lang)) {
+                            // RTL languages
+                            legend = _t("Restart") + ' ' + DataHelper.formatTime(started) + " - " + event.getValue() + "\\l";
+                        } else {
+                            legend = _t("Restart") + ' ' + DataHelper.formatTime(started) + " [" + event.getValue() + "]\\l";
                         }
+                        def.vrule(started / 1000, restartBarColor, legend, 2.0f);
                     }
                     def.comment(DataHelper.formatTime(start) + " — " + DataHelper.formatTime(end) + "\\r");
                 } else {
                     SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm");
                     for (Map.Entry<Long, String> event : events.entrySet()) {
                         long started = event.getKey().longValue();
-                        if (started > start && started < end) {
-                            String legend;
-                            if (Messages.isRTL(lang)) {
-                                // RTL languages
-                                legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " - " + event.getValue() + "\\l";
-                            } else {
-                                legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " [" + event.getValue() + "]\\l";
-                            }
-                            def.vrule(started / 1000, restartBarColor, legend, 2.0f);
+                        if (started >= end)
+                            break;
+                        String legend;
+                        if (Messages.isRTL(lang)) {
+                            // RTL languages
+                            legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " - " + event.getValue() + "\\l";
+                        } else {
+                            legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " [" + event.getValue() + "]\\l";
                         }
+                        def.vrule(started / 1000, restartBarColor, legend, 2.0f);
                     }
                     def.comment(sdf.format(new Date(start)) + " — " + sdf.format(new Date(end)) + " UTC\\r");
                 }
