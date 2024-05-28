@@ -145,7 +145,10 @@ class ValueAxis extends Axis {
                         }
                     }
                     else {
-                        if (fractional) {
+                        if (im.symbol == 'm') {
+                            // I2P show 0.xxx instead of xxx m
+                            graph_label = Util.sprintf(gdef.locale, "%.3f", scaledstep * i / 1000);
+                        } else if (fractional) {
                             graph_label = Util.sprintf(gdef.locale, "%4.1f %c", scaledstep * i, im.symbol);
                         }
                         else {
