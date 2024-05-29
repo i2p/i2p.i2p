@@ -224,6 +224,7 @@ class SummaryRenderer {
             String dsNames[] = _listener.getData().getDsNames();
             String plotName;
             String descr;
+            boolean bps = false;
             if (showEvents) {
                 // include the average event count on the plot
                 plotName = dsNames[1];
@@ -235,7 +236,9 @@ class SummaryRenderer {
                 // (there are over 500 of them)
                 // but the descriptions for the default graphs are tagged in
                 // Strings.java
-                descr = _t(_listener.getRate().getRateStat().getDescription());
+                descr = _listener.getRate().getRateStat().getDescription();
+                bps = descr.toLowerCase().contains("bytes/sec");
+                descr = _t(descr);
             }
 
             //long started = ((RouterContext)_context).router().getWhenStarted();
@@ -252,33 +255,53 @@ class SummaryRenderer {
             if (!hideLegend) {
                 Variable var = new Variable.AVERAGE();
                 def.datasource("avg", plotName, var);
-                def.gprint("avg", "   " + _t("Avg") + ": %.2f %s");
+                if (bps)
+                    def.gprint("avg", "   " + _t("Avg") + ": %.2f %sBps");
+                else
+                    def.gprint("avg", "   " + _t("Avg") + ": %.2f %s");
                 var = new Variable.MAX();
                 def.datasource("max", plotName, var);
-                def.gprint("max", ' ' + _t("Max") + ": %.2f %S");
+                if (bps)
+                    def.gprint("max", ' ' + _t("Max") + ": %.2f %SBps");
+                else
+                    def.gprint("max", ' ' + _t("Max") + ": %.2f %S");
                 var = new Variable.LAST();
                 def.datasource("last", plotName, var);
-                def.gprint("last", ' ' + _t("Now") + ": %.2f %S\\l");
+                if (bps)
+                    def.gprint("last", ' ' + _t("Now") + ": %.2f %SBps\\l");
+                else
+                    def.gprint("last", ' ' + _t("Now") + ": %.2f %S\\l");
             }
             String plotName2 = null;
             if (lsnr2 != null) {
                 String dsNames2[] = lsnr2.getData().getDsNames();
                 plotName2 = dsNames2[0];
                 String path2 = lsnr2.getData().getPath();
-                String descr2 = _t(lsnr2.getRate().getRateStat().getDescription());
+                String descr2 = lsnr2.getRate().getRateStat().getDescription();
+                bps = descr2.toLowerCase().contains("bytes/sec");
+                descr2 = _t(descr2);
                 def.datasource(plotName2, path2, plotName2, SummaryListener.CF, lsnr2.getBackendFactory());
                 Color lineColor = isDark ? LINE_COLOR_DARK : LINE_COLOR;
                 def.line(plotName2, lineColor, descr2 + "\\l", 2);
                 if (!hideLegend) {
                     Variable var = new Variable.AVERAGE();
                     def.datasource("avg2", plotName2, var);
-                    def.gprint("avg2", "   " + _t("Avg") + ": %.2f %s");
+                    if (bps)
+                        def.gprint("avg2", "   " + _t("Avg") + ": %.2f %sBps");
+                    else
+                        def.gprint("avg2", "   " + _t("Avg") + ": %.2f %s");
                     var = new Variable.MAX();
                     def.datasource("max2", plotName2, var);
-                    def.gprint("max2", ' ' + _t("Max") + ": %.2f %S");
+                    if (bps)
+                        def.gprint("max2", ' ' + _t("Max") + ": %.2f %SBps");
+                    else
+                        def.gprint("max2", ' ' + _t("Max") + ": %.2f %S");
                     var = new Variable.LAST();
                     def.datasource("last2", plotName2, var);
-                    def.gprint("last2", ' ' + _t("Now") + ": %.2f %S\\l");
+                    if (bps)
+                        def.gprint("last2", ' ' + _t("Now") + ": %.2f %SBps\\l");
+                    else
+                        def.gprint("last2", ' ' + _t("Now") + ": %.2f %S\\l");
                 }
             }
             if (!hideLegend) {
