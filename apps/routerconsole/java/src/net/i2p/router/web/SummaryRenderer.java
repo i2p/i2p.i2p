@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -237,7 +238,7 @@ class SummaryRenderer {
                 // but the descriptions for the default graphs are tagged in
                 // Strings.java
                 descr = _listener.getRate().getRateStat().getDescription();
-                bps = descr.toLowerCase().contains("bytes/sec");
+                bps = descr.toLowerCase(Locale.US).contains("bytes/sec");
                 descr = _t(descr);
             }
 
@@ -278,7 +279,7 @@ class SummaryRenderer {
                 plotName2 = dsNames2[0];
                 String path2 = lsnr2.getData().getPath();
                 String descr2 = lsnr2.getRate().getRateStat().getDescription();
-                bps = descr2.toLowerCase().contains("bytes/sec");
+                bps = descr2.toLowerCase(Locale.US).contains("bytes/sec");
                 descr2 = _t(descr2);
                 def.datasource(plotName2, path2, plotName2, SummaryListener.CF, lsnr2.getBackendFactory());
                 Color lineColor = isDark ? LINE_COLOR_DARK : LINE_COLOR;
