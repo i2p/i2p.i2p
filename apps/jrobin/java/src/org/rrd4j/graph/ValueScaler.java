@@ -16,6 +16,9 @@ class ValueScaler {
     }
 
     Scaled scale(double value, boolean mustRescale) {
+        // I2P avoid NaN in legend
+        if (Double.isNaN(value))
+            value = 0.0;
         Scaled scaled;
         if (mustRescale) {
             scaled = rescale(value);
