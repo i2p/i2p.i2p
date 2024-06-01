@@ -56,7 +56,7 @@ public class ConnectChecker {
      *  @since 0.9.56
      */
     private boolean isSSU2Enabled() {
-        return ctx.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_SSU2);
+        return true;
     }
 
     /**
