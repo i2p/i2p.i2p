@@ -554,6 +554,15 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             synchronized (_leaseSetWait) {
                 _leaseSetWait.notifyAll();
             }
+            // Because of netdb isolation, a b32 lookup for a local dest ("loopback")
+            // would force the router to fetch the LS from a floodfill.
+            // Putting our dest in the lookup cache where other clients can
+            // get it allows immediate resolution.
+            Destination d = ls.getDestination();
+            Hash h = d.calculateHash();
+            synchronized (_lookupCache) {
+                _lookupCache.put(h, d);
+            }
         }
     }
 
