@@ -1,3 +1,19 @@
+2024-06-01 zzz
+ * I2CP: Store local destination in lookup cache (Gitlab #482)
+ * Transport: Remove SSU1 code from UDPTransport (Gitlab MR !197)
+
+2024-05-29 zzz
+ * Console: More graph improvements
+
+2024-05-28 zzz
+ * Console: Graph improvements
+
+2024-05-26 zzz
+ * Susimail: CSS fixups (dark theme)
+
+2024-05-23 zzz
+ * i2ptunnel: Fix CTCP ACTION (Gitlab #481)
+
 2024-05-21 zzz
  * Build: maketorblocklist.sh fixups (Gitlab MR !198 by kytv)
  * Susimail: XHR search (Gitlab MR !196)
