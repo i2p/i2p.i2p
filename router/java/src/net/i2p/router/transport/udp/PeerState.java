@@ -1687,39 +1687,6 @@ public class PeerState {
         return _transport;
     }
 
-    /**
-     *  A message ID and a timestamp. Used for the resend ACKS.
-     *
-     *  SSU 1 only.
-     *
-     *  @since 0.9.17
-     */
-    private static class ResendACK {
-        public final Long id;
-        public final long time;
-
-        public ResendACK(Long id, long time) {
-            this.id = id;
-            this.time = time;
-        }
-    }
-
-    /**
-     *  Message ID to sequence number.
-     *  Insertion order. Caller must synch.
-     *
-     *  SSU 1 only.
-     *
-     *  @since 0.9.49
-     */
-    private static class AckedMessages extends LinkedHashMap<Integer, Long> {
-
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<Integer, Long> eldest) {
-            return size() > MAX_SEND_MSGS_PENDING;
-        }
-    }
-
     // why removed? Some risk of dups in OutboundMessageFragments._activePeers ???
 
     /*
