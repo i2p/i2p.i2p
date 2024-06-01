@@ -57,19 +57,11 @@ public class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
         int active = _ctx.commSystem().countActivePeers();
         sm.addRateData("router.activePeers", active);
 
-        int activeSend = _ctx.commSystem().countActiveSendPeers();
-        sm.addRateData("router.activeSendPeers", activeSend);
-
         int fast = _ctx.profileOrganizer().countFastPeers();
         sm.addRateData("router.fastPeers", fast);
 
         int highCap = _ctx.profileOrganizer().countHighCapacityPeers();
         sm.addRateData("router.highCapacityPeers", highCap);
-
-        int integrated = _ctx.peerManager().countPeersByCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL);
-        sm.addRateData("router.integratedPeers", integrated);
-
-        sm.addRateData("router.knownPeers", _ctx.netDb().getKnownRouters());
 
         sm.addRateData("bw.sendRate", (long)_ctx.bandwidthLimiter().getSendBps());
         sm.addRateData("bw.recvRate", (long)_ctx.bandwidthLimiter().getReceiveBps());
@@ -102,6 +94,16 @@ public class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
                 double bps = (bytes*1000.0d)/rate.getPeriod(); 
                 sm.addRateData("bw.sendBps", (long)bps, 60*1000);
             }
+        }
+
+        if (_ctx.getBooleanProperty("stat.full")) {
+            int activeSend = _ctx.commSystem().countActiveSendPeers();
+            sm.addRateData("router.activeSendPeers", activeSend);
+
+            int integrated = _ctx.peerManager().countPeersByCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL);
+            sm.addRateData("router.integratedPeers", integrated);
+
+            sm.addRateData("router.knownPeers", _ctx.netDb().getKnownRouters());
         }
     }
     
