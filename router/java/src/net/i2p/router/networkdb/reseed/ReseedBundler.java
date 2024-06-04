@@ -47,8 +47,8 @@ public class ReseedBundler {
     private final static String ROUTERINFO_PREFIX = "routerInfo-";
     private final static String ROUTERINFO_SUFFIX = ".dat";
     private static final int MINIMUM = 50;
-    /** NTCP2 */
-    private static final String MIN_VERSION = "0.9.36";
+    /** Same as in TunnelPeerSelector */
+    private static final String MIN_VERSION = "0.9.58";
 
     public ReseedBundler(RouterContext ctx) {
         _context = ctx;
@@ -82,9 +82,12 @@ public class ReseedBundler {
             }
             if (ri.getPublished() < tooOld)
                 continue;
-            if (ri.getCapabilities().contains("U"))
+            String caps = ri.getCapabilities();
+            if (caps.contains("U"))
                 continue;
-            if (ri.getCapabilities().contains("K"))
+            if (caps.contains("K"))
+                continue;
+            if (caps.contains("G"))
                 continue;
             if (VersionComparator.comp(ri.getVersion(), MIN_VERSION) < 0)
                 continue;

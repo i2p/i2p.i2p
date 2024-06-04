@@ -39,6 +39,7 @@ import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SSLEepGet;
 import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
+import net.i2p.util.VersionComparator;
 
 /**
  * Moved from ReseedHandler in routerconsole. See ReseedChecker for additional comments.
@@ -69,6 +70,8 @@ public class Reseeder {
     private static final int MIN_RESEED_SERVERS = 2;
     // network ID cross-check, proposal 147, as of 0.9.42
     private static final String NETID_PARAM = "?netid=";
+    /** Same as in TunnelPeerSelector */
+    private static final String MIN_VERSION = "0.9.58";
 
     /**
      *  NOTE - URLs that are in both the standard and SSL groups must use the same hostname,
@@ -1242,6 +1245,10 @@ public class Reseeder {
         SSLEepGet.SSLState sslState = null;
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         for (String url : urls) {
+            if (!url.startsWith("https://"))
+                url = "https://" + url;
+            if (!url.endsWith("/"))
+                url += "/";
             url += SU3_FILENAME + NETID_PARAM + '2';
             URI uri = new URI(url);
             String host = uri.getHost();
@@ -1273,9 +1280,10 @@ public class Reseeder {
                         java.util.zip.ZipFile zipf = new java.util.zip.ZipFile(zip);
                         java.util.Enumeration<? extends java.util.zip.ZipEntry> entries = zipf.entries();
                         int ri = 0, old = 0;
+                        int oldver = 0, unreach = 0;
                         while (entries.hasMoreElements()) {
                             java.util.zip.ZipEntry entry = (java.util.zip.ZipEntry) entries.nextElement();
-                            net.i2p.data.router.RouterInfo r = new net.i2p.data.router.RouterInfo();
+                            RouterInfo r = new RouterInfo();
                             InputStream in = zipf.getInputStream(entry);
                             r.readBytes(in);
                             in.close();
@@ -1283,6 +1291,10 @@ public class Reseeder {
                                 ri++;
                             else
                                 old++;
+                            if (VersionComparator.comp(r.getVersion(), MIN_VERSION) < 0)
+                                oldver++;
+                            if (r.getCapabilities().indexOf('U') >= 0)
+                                unreach++;
                         }
                         zipf.close();
                         if (old > 0) {
@@ -1300,6 +1312,7 @@ public class Reseeder {
                             System.out.println("Test failed for " + host + ", returned only " + ri + " router infos");
                             fail++;
                         }
+                        System.out.println("Router infos included " + oldver + " with versions before " + MIN_VERSION + " and " + unreach + " unreachable");
                     } else {
                         System.out.println("Test failed for " + host + " return code: " + rc);
                         su3.delete();
