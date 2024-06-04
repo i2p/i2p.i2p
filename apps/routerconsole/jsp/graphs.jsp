@@ -16,6 +16,12 @@
     boolean allowRefresh = intl.allowIFrame(request.getHeader("User-Agent"));
     if (allowRefresh) {
         out.print(graphHelper.getRefreshMeta());
+%>
+<script nonce="<%=cspNonce%>" type="text/javascript">
+  var graphRefreshInterval = "<%=graphHelper.getRefresh()%>";
+</script>
+<script src="/js/graphs.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
+<%
     }
 %>
 <%@include file="summaryajax.jsi" %>
