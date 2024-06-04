@@ -1576,7 +1576,9 @@ class PeerCoordinator implements PeerListener, BandwidthListener
               }
           }
       } else if (id == ExtensionHandler.ID_HANDSHAKE) {
-          sendPeers(peer);
+          // We may not have the bitfield yet, but if we do, don't send PEX to seeds
+          if (!peer.isCompleted())
+              sendPeers(peer);
           sendDHT(peer);
           if (_util.utCommentsEnabled())
               sendCommentReq(peer);
@@ -1585,8 +1587,8 @@ class PeerCoordinator implements PeerListener, BandwidthListener
 
   /**
    *  Send a PEX message to the peer, if he supports PEX.
-   *  This just sends everybody we are connected to, we don't
-   *  track new vs. old peers yet.
+   *  This sends everybody we have connected to since the
+   *  last time we sent PEX to him.
    *  @since 0.8.4
    */
   void sendPeers(Peer peer) {
@@ -1600,14 +1602,25 @@ class PeerCoordinator implements PeerListener, BandwidthListener
           return;
       try {
           if (bev.getMap().get(ExtensionHandler.TYPE_PEX) != null) {
-              List<Peer> pList = peerList();
-              pList.remove(peer);
-              for (Iterator<Peer> iter = pList.iterator(); iter.hasNext(); ) {
-                  if (iter.next().isWebPeer())
-                      iter.remove();
+              List<Peer> pList = new ArrayList<Peer>();
+              long t = peer.getPexLastSent();
+              for (Peer p : peers) {
+                  if (p.equals(peer))
+                      continue;
+                  if (p.isWebPeer())
+                      continue;
+                  if (p.getWhenConnected() > t)
+                      pList.add(p);
               }
-              if (!pList.isEmpty())
+              if (!pList.isEmpty()) {
                   ExtensionHandler.sendPEX(peer, pList);
+                  peer.setPexLastSent(_util.getContext().clock().now());
+                  //if (_log.shouldDebug())
+                  //    _log.debug("Pex: sent " + pList.size() + " new peers to " + peer);
+              //} else {
+                  //if (_log.shouldDebug())
+                  //    _log.debug("Pex: no new peers to send to " + peer);
+              }
           }
       } catch (InvalidBEncodingException ibee) {}
   }

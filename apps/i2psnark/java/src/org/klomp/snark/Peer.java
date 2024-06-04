@@ -96,6 +96,8 @@ public class Peer implements Comparable<Peer>, BandwidthListener
   private final boolean _isIncoming;
   private int _totalCommentsSent;
   private int _maxPipeline = PeerState.MIN_PIPELINE;
+  private long connected;
+  private long pexLastSent;
 
   /**
    * Outgoing connection.
@@ -307,6 +309,7 @@ public class Peer implements Comparable<Peer>, BandwidthListener
         // We are up and running!
         state = s;
         magnetState = mState;
+        connected = util.getContext().clock().now();
         listener.connected(this);
   
         if (_log.shouldLog(Log.DEBUG))
@@ -887,5 +890,29 @@ public class Peer implements Comparable<Peer>, BandwidthListener
    */
   public boolean isWebPeer() {
       return false;
+  }
+
+  /**
+   * @when did handshake complete?
+   * @since 0.9.63
+   */
+  public long getWhenConnected() {
+      return connected;
+  }
+
+  /**
+   * @when did we last send pex peers?
+   * @since 0.9.63
+   */
+  public long getPexLastSent() {
+      return pexLastSent;
+  }
+
+  /**
+   * @when did we last send pex peers?
+   * @since 0.9.63
+   */
+  public void setPexLastSent(long now) {
+      pexLastSent = now;
   }
 }
