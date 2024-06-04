@@ -140,15 +140,40 @@ class PartialPiece implements Comparable<PartialPiece> {
      *  @since 0.9.62
      */
     public synchronized boolean isComplete() {
-         return bitfield.complete();
+        return bitfield.complete();
     }
 
     /**
-     *  How many consecutive bytes are good - as set by read().
-     *  There may be more good bytes after "holes".
+     *  Have any chunks been downloaded?
+     *
+     *  @since 0.9.63
+     */
+    public synchronized boolean hasData() {
+        return bitfield.count() > 0;
+    }
+
+    /**
+     *  Has this chunk been downloaded?
+     *
+     *  @since 0.9.63
+     */
+    public synchronized boolean hasChunk(int chunk) {
+        return bitfield.get(chunk);
+    }
+
+    /**
+     *  How many bytes are good - as set by read().
+     *  As of 0.9.63, accurately counts good bytes after "holes".
      */
     public synchronized int getDownloaded() {
-         return this.off;
+        if (bitfield.complete())
+            return pclen;
+        int sz = bitfield.count();
+        int rv = sz * PeerState.PARTSIZE;
+        int rem = pclen % PeerState.PARTSIZE;
+        if (rem != 0 && bitfield.get(sz - 1))
+            rv -= PeerState.PARTSIZE - rem;
+        return rv;
     }
 
     /**
@@ -348,8 +373,10 @@ class PartialPiece implements Comparable<PartialPiece> {
     public void release() {
         if (bs == null) {
             synchronized (this) {
-                if (raf != null)
+                if (raf != null) {
                     locked_release();
+                    raf = null;
+                }
             }
             //if (raf != null)
             //    I2PAppContext.getGlobalContext().logManager().getLog(PartialPiece.class).warn("Released " + tempfile);
@@ -378,7 +405,7 @@ class PartialPiece implements Comparable<PartialPiece> {
         int d = this.piece.compareTo(opp.piece);
         if (d != 0)
             return d;
-        return opp.off - this.off;  // reverse
+        return opp.getDownloaded() - getDownloaded();  // reverse
     }
     
     @Override
@@ -401,7 +428,7 @@ class PartialPiece implements Comparable<PartialPiece> {
 
     @Override
     public String toString() {
-        return "Partial(" + piece.getId() + ',' + off + ',' + pclen + ')';
+        return "Partial(" + piece.getId() + ',' + off + ',' + getDownloaded() + ',' + pclen + ')';
     }
 
     /**
