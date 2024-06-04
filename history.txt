@@ -1,5 +1,14 @@
+2024-06-04 zzz
+ * Console: Add js refresh on /graphs (Gitlab MR !199)
+ * i2psnark:
+   - Fix leaked requests, partial pieces, and temp files (Gitlab MR !203)
+   - Make PEX more efficient
+ * Reseed: Increase min version when creating bundles; CLI improvements
+ * Router: Add synthetic stats for client and expl. build success rate
+
 2024-06-01 zzz
  * I2CP: Store local destination in lookup cache (Gitlab #482)
+ * Router: Don't update rates for full stats when not enabled
  * Transport: Remove SSU1 code from UDPTransport (Gitlab MR !197)
 
 2024-05-29 zzz
