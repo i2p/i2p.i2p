@@ -371,7 +371,7 @@ class WebPeer extends Peer implements EepGet.StatusListener {
               PartialPiece pp = last.getPartialPiece();
               synchronized(pp) {
                   // Last chunk needed for this piece?
-                  if (pp.getLength() == pp.getDownloaded()) {
+                  if (pp.isComplete()) {
                       if (listener.gotPiece(this, pp)) {
                           if (_log.shouldDebug())
                               _log.debug("Got " + piece + ": " + this);
@@ -650,15 +650,8 @@ class WebPeer extends Peer implements EepGet.StatusListener {
       List<Request> rv = new ArrayList<Request>(pcs.size());
       for (Integer p : pcs) {
           Request req = getLowestOutstandingRequest(p.intValue());
-          if (req != null) {
-              PartialPiece pp = req.getPartialPiece();
-              synchronized(pp) {
-                  int dl = pp.getDownloaded();
-                  if (req.off != dl)
-                      req = new Request(pp, dl);
-              }
+          if (req != null)
               rv.add(req);
-          }
       }
       outstandingRequests.clear();
       return rv;

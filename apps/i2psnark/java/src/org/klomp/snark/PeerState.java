@@ -67,7 +67,7 @@ class PeerState implements DataLoader
   // Outstanding request
   private final List<Request> outstandingRequests = new ArrayList<Request>();
   /** the tail (NOT the head) of the request queue */
-  private Request lastRequest = null;
+  private Request lastRequest;
   private int currentMaxPipeline;
 
   // FIXME if piece size < PARTSIZE, pipeline could be bigger
@@ -425,7 +425,8 @@ class PeerState implements DataLoader
 
     // Last chunk needed for this piece?
     PartialPiece pp = req.getPartialPiece();
-    if (pp.isComplete())
+    boolean complete = pp.isComplete();
+    if (complete)
       {
         // warning - may block here for a while
         if (listener.gotPiece(peer, pp))
@@ -448,6 +449,25 @@ class PeerState implements DataLoader
       // ok done with this one
       synchronized(this) {
           pendingRequest = null;
+      }
+
+      // getOutstandingRequest() was called by PeerConnectionIn at the start of the chunk;
+      // if the bandwidth limiter throttled us to zero requests then, try again now
+      if (outstandingRequests.isEmpty()) {
+          addRequest();
+          if (!complete) {
+              synchronized(this) {
+                  if (outstandingRequests.isEmpty()) {
+                      // we MUST return the partial piece to PeerCoordinator,
+                      // or else we will lose it and leak the data
+                      if (_log.shouldWarn()) 
+                          _log.warn("Throttled, returned to coord. w/ data " + req);
+                      List<Request> pcs = Collections.singletonList(req);
+                      listener.savePartialPieces(this.peer, pcs);
+                      lastRequest = null;
+                  }
+              }
+          }
       }
   }
 
@@ -577,15 +597,8 @@ class PeerState implements DataLoader
       List<Request> rv = new ArrayList<Request>(pcs.size());
       for (Integer p : pcs) {
           Request req = getLowestOutstandingRequest(p.intValue());
-          if (req != null) {
-              PartialPiece pp = req.getPartialPiece();
-              synchronized(pp) {
-                  int dl = pp.getDownloaded();
-                  if (req.off != dl)
-                      req = new Request(pp, dl);
-              }
+          if (req != null)
               rv.add(req);
-          }
       }
       outstandingRequests.clear();
       pendingRequest = null;
@@ -709,12 +722,6 @@ class PeerState implements DataLoader
 
   /**
    *  BEP 6
-   *  If the peer rejects lower chunks but not higher ones, thus creating holes,
-   *  we won't figure it out and the piece will fail, since we don't currently
-   *  keep a chunk bitmap in PartialPiece.
-   *  As long as the peer rejects all the chunks, or rejects only the last chunks,
-   *  no holes are created and we will be fine. The reject messages may be in any order,
-   *  just don't make a hole when it's over.
    *
    *  @since 0.9.21
    */
@@ -738,19 +745,10 @@ class PeerState implements DataLoader
               }
           }
           if (deletedRequest != null && !haveMoreRequests) {
-              // We must return the piece to the coordinator
-              // Create a new fake request so we can set the offset correctly
-              PartialPiece pp = deletedRequest.getPartialPiece();
-              int downloaded = pp.getDownloaded();
-              Request req;
-              if (deletedRequest.off == downloaded)
-                  req = deletedRequest;
-              else
-                  req = new Request(pp, downloaded, 1);
-              List<Request> pcs = Collections.singletonList(req);
+              List<Request> pcs = Collections.singletonList(deletedRequest);
               listener.savePartialPieces(this.peer, pcs);
               if (_log.shouldWarn()) 
-                  _log.warn("Returned to coord. w/ offset " + pp.getDownloaded() + " due to reject(" + piece + ',' + begin + ',' + length + ") from " + peer);
+                  _log.warn("Returned to coord. w/ data " + deletedRequest.getPartialPiece().getDownloaded() + " due to reject(" + piece + ',' + begin + ',' + length + ") from " + peer);
           }
           if (lastRequest != null && lastRequest.getPiece() == piece &&
               lastRequest.off == begin && lastRequest.len == length)
@@ -876,7 +874,7 @@ class PeerState implements DataLoader
    *
    * This is called from several places:
    *<pre>
-   *   By getOustandingRequest() when the first part of a chunk comes in
+   *   By getOutstandingRequest() when the first part of a chunk comes in
    *   By havePiece() when somebody got a new piece completed
    *   By chokeMessage() when we receive an unchoke
    *   By setInteresting() when we are now interested
@@ -952,22 +950,32 @@ class PeerState implements DataLoader
                 isLastChunk = lastRequest.off + lastRequest.len == pieceLength;
 
                 // Last part of a piece?
-                if (isLastChunk)
-                  more_pieces = requestNextPiece();
-                else
-                  {
-                        PartialPiece nextPiece = lastRequest.getPartialPiece();
-                        int nextBegin = lastRequest.off + PARTSIZE;
-                        int maxLength = pieceLength - nextBegin;
-                        int nextLength = maxLength > PARTSIZE ? PARTSIZE
+                if (isLastChunk) {
+                    more_pieces = requestNextPiece();
+                } else {
+                    PartialPiece nextPiece = lastRequest.getPartialPiece();
+                    int nextBegin = lastRequest.off + PARTSIZE;
+                    while (true) {
+                        // don't rerequest chunks we already have
+                        if (!nextPiece.hasChunk(nextBegin / PARTSIZE)) {
+                            int maxLength = pieceLength - nextBegin;
+                            int nextLength = maxLength > PARTSIZE ? PARTSIZE
                                                               : maxLength;
-                        Request req
-                          = new Request(nextPiece,nextBegin, nextLength);
-                        outstandingRequests.add(req);
-                        if (!choked)
-                          out.sendRequest(req);
-                        lastRequest = req;
-                  }
+                            Request req = new Request(nextPiece,nextBegin, nextLength);
+                            outstandingRequests.add(req);
+                            if (!choked)
+                              out.sendRequest(req);
+                            lastRequest = req;
+                            break;
+                        } else {
+                            nextBegin += PARTSIZE;
+                            if (nextBegin >= pieceLength) {
+                                more_pieces = requestNextPiece();
+                                break;
+                            }
+                        }
+                    }
+                }
               }
           }
       }

@@ -1370,14 +1370,14 @@ class PeerCoordinator implements PeerListener, BandwidthListener
       synchronized(wantedPieces) {
           for (Request req : partials) {
               PartialPiece pp = req.getPartialPiece();
-              if (req.off > 0) {
+              if (pp.hasData()) {
                   // PartialPiece.equals() only compares piece number, which is what we want
                   int idx = partialPieces.indexOf(pp);
                   if (idx < 0) {
                       partialPieces.add(pp);
                       if (_log.shouldLog(Log.INFO))
                           _log.info("Saving orphaned partial piece (new) " + pp);
-                  } else if (idx >= 0 && pp.getDownloaded() > partialPieces.get(idx).getDownloaded()) {
+                  } else if (pp.getDownloaded() > partialPieces.get(idx).getDownloaded()) {
                       // replace what's there now
                       partialPieces.get(idx).release();
                       partialPieces.set(idx, pp);
@@ -1434,7 +1434,9 @@ class PeerCoordinator implements PeerListener, BandwidthListener
                  for(Piece piece : wantedPieces) {
                      if (piece.getId() == savedPiece) {
                          if (peer.isCompleted() && piece.getPeerCount() > 1 &&
-                             wantedPieces.size() > 2*END_GAME_THRESHOLD) {
+                             wantedPieces.size() > 2*END_GAME_THRESHOLD &&
+                             partialPieces.size() < 4 &&
+                             _random.nextInt(4) != 0) {
                              // Try to preserve rarest-first
                              // by not requesting a partial piece that at least two non-seeders also have
                              // from a seeder
@@ -1462,7 +1464,7 @@ class PeerCoordinator implements PeerListener, BandwidthListener
                          iter.remove();
                          piece.setRequested(peer, true);
                          if (_log.shouldLog(Log.INFO)) {
-                             _log.info("Restoring orphaned partial piece " + pp +
+                             _log.info("Restoring orphaned partial piece " + pp + " to " + peer +
                                        " Partial list size now: " + partialPieces.size());
                          }
                          return pp;
