@@ -70,7 +70,15 @@ public class GraphHelper extends FormHandler {
             ConfigRestartBean.getRestartTimeRemaining() < (1000 * (_refreshDelaySeconds + 30)))
             return "";
         // shorten the refresh by 3 seconds so we beat the iframe
-        return "<meta http-equiv=\"refresh\" content=\"" + (_refreshDelaySeconds - 3) + "\">";
+        return "<noscript><meta http-equiv=\"refresh\" content=\"" + (_refreshDelaySeconds - 3) + ";url=/graphs\" /></noscript>";
+    }
+
+    /**
+     *  @since 0.9.63
+     */
+    public int getRefresh() {
+        // shorten the refresh by 3 seconds so we beat the iframe
+        return _refreshDelaySeconds - 3;
     }
 
     public void setPeriodCount(String str) { 
