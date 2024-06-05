@@ -116,7 +116,7 @@ class LocalClientManager extends ClientManager {
         int dropX1000 = 0, jitter = 0, latency = 0;
         int port = ClientManagerFacadeImpl.DEFAULT_PORT;
         boolean error = false;
-        Getopt g = new Getopt("router", args, "d:j:l:p:");
+        Getopt g = new Getopt("LocalClientManager", args, "d:j:l:p:");
         try {
             int c;
             while ((c = g.getopt()) != -1) {

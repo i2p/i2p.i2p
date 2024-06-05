@@ -856,7 +856,7 @@ public class MetaInfo
       String announce = null;
       List<String> url_list = null;
       String comment = null;
-      Getopt g = new Getopt("Storage", args, "a:c:m:w:");
+      Getopt g = new Getopt("MetaInfo", args, "a:c:m:w:");
       try {
           int c;
           while ((c = g.getopt()) != -1) {

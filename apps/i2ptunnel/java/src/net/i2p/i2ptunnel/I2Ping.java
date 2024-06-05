@@ -95,7 +95,7 @@ public class I2Ping extends I2PTunnelClientBase {
       int remotePort = 0;
       boolean error = false;
       String[] argv = DataHelper.split(cmd, " ");
-      Getopt g = new Getopt("ping", argv, "t:m:n:chl:f:p:");
+      Getopt g = new Getopt("i2ping", argv, "t:m:n:chl:f:p:");
       int c;
       while ((c = g.getopt()) != -1) {
         switch (c) {

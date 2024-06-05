@@ -46,7 +46,7 @@ import net.i2p.util.FileUtil;
 public class BundleRouterInfos {
 
     /**
-     *  Usage: PersistentDataStore -i configDir -o toDir -c count
+     *  Usage: BundleRouterInfos -i configDir -o toDir -c count
      *
      *  Copy a random selection of 'count' router infos from configDir/netDb
      *  to 'toDir'. Skip your own router info, and old, hidden, unreachable, and
@@ -55,7 +55,7 @@ public class BundleRouterInfos {
      *  @since 0.9.15
      */
     public static void main(String[] args) {
-        Getopt g = new Getopt("PersistentDataStore", args, "i:o:c:");
+        Getopt g = new Getopt("BundleRouterInfos", args, "i:o:c:");
         String in = System.getProperty("user.home") + "/.i2p";
         String out = "netDb";
         int count = 200;

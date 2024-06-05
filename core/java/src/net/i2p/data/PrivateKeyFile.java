@@ -119,7 +119,7 @@ public class PrivateKeyFile {
         double days = 365;
         int mode = 0;
         boolean error = false;
-        Getopt g = new Getopt("pkf", args, "t:nuxhse:c:a:o:d:r:p:b:y:z:w:");
+        Getopt g = new Getopt("PrivateKeyFile", args, "t:nuxhse:c:a:o:d:r:p:b:y:z:w:v:V:");
         int c;
         while ((c = g.getopt()) != -1) {
           switch (c) {
