@@ -141,7 +141,7 @@ th a:active, th a:visited:active, td a:active, td a:visited:active {
      box-shadow: inset 0 0 0 1px #fff5ef, 0 0 1px 0 #4f3d36;
      box-shadow: inset 0 0 0 1px #fff5ef, 0 0 0 1px rgba(111, 96, 90, 0.3), 0 0 1px 1px rgba(79, 61, 54, 0.5);
      background: #efefef;
-     background: linear-gradient(to bottom, #efefef 50%, #cfc7c2 53%);
+     background: linear-gradient(to bottom, #efefef 15%, #cfc7c2 85%);
      text-align: center;
      transition: ease width 0.5s 0.5s;
 }
@@ -202,7 +202,7 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
 
 .nav_main:link {
      background: #fff7ef url(images/button_snark.png) 11px center no-repeat !important;
-     background: url(images/button_snark.png) 11px center no-repeat, linear-gradient(to bottom, #fff7ef 47%, rgba(207, 193, 181, 0.6) 50%), repeating-linear-gradient(45deg, #75604e 1px, #a09286 1px, #bfafa2 2px) !important;
+     background: url(images/button_snark.png) 11px center no-repeat, linear-gradient(to bottom, #fff7ef 20%, rgba(207, 193, 181, 0.6) 80%), repeating-linear-gradient(45deg, #75604e 1px, #a09286 1px, #bfafa2 2px) !important;
      background-size: 18px auto, 100% 100%, 100% 100% !important;
 }
 
@@ -219,7 +219,7 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
 
 .nav_main:hover, .nav_main:focus {
      background: #ffeadf url(images/button_snark_hover.png) 11px center no-repeat !important;
-     background: url(images/button_snark_hover.png) 11px center no-repeat, linear-gradient(to bottom, #ffeadf 47%, #cfb6a8 50%) !important;
+     background: url(images/button_snark_hover.png) 11px center no-repeat, linear-gradient(to bottom, #ffeadf 20%, #cfb6a8 80%) !important;
      background-size: 18px auto, 100% 100%, 100% 100% !important;
 }
 
@@ -235,7 +235,7 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
 
 .nav_main:active {
      background: #dfb899 url(images/button_snark_active.png) 11px center no-repeat !important;
-     background: url(images/button_snark_active.png) 11px center no-repeat, linear-gradient(to bottom, #dfb899 47%, #af9178 50%) !important;
+     background: url(images/button_snark_active.png) 11px center no-repeat, linear-gradient(to bottom, #dfb899 20%, #af9178 80%) !important;
      background-size: 18px auto, 100% 100%, 100% 100% !important;
 }
 
@@ -1287,7 +1287,7 @@ input[type="submit"], .trackerconfig input[type="submit"], input[name="savepri"]
      border: 1px solid #111;
      border-top: 0;
      background: #fff7ef;
-     background: linear-gradient(to bottom, #fff7ef 50%, rgba(207, 193, 181, 0.6) 50%), repeating-linear-gradient(135deg, #75604e 1px, #a09286 1px, #bfafa2 2px);
+     background: linear-gradient(to bottom, #fff7ef 20%, rgba(207, 193, 181, 0.6) 80%), repeating-linear-gradient(135deg, #75604e 1px, #a09286 1px, #bfafa2 2px);
      color: #444039 !important;
      box-shadow: 0 0 2px #4d453e, inset 0 0 0 1px #efe6e0;
      display: inline-block;

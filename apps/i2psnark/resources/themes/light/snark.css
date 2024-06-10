@@ -98,7 +98,7 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      width: auto;
      width: calc(100% - 22px);
      text-align: center;
-     background: linear-gradient(to bottom, #fafaff 50%, #eef 51%, #eef 100%);
+     background: linear-gradient(to bottom, #fafaff 10%, #eef 70%, #eef 100%);
  }
 
 .iframed .snarknavbar {
@@ -983,7 +983,7 @@ tr:hover .percentBarText {
      border-top: 0;
      border-radius: 0 0 3px 3px;
      background: url(/themes/console/light/images/header.png) repeat-x scroll center center;
-     background: linear-gradient(to bottom, #fff 50%, #eef 51%) !important;
+     background: linear-gradient(to bottom, #fff 10%, #eef 70%) !important;
      font-variant: small-caps !important;
      box-shadow: 0 1px 2px #ccf, inset 0 0 0 1px #fff, inset 0 0 0 1px #fff;
      display: inline-block;
@@ -1000,7 +1000,7 @@ tr:hover .percentBarText {
 }
 
 .snarkConfigTitle:hover, .toggleview:hover, .snarkConfigTitle:active, .toggleview:active, input.toggle_input:focus + .toggleview {
-     background: linear-gradient(to bottom, #fcfaf7 50%, #ffe8bf 50%, #efd9b3 100%) !important;
+     background: linear-gradient(to bottom, #fcfaf7 10%, #ffe8bf 70%, #efd9b3 100%) !important;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {

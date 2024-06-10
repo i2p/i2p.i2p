@@ -177,7 +177,7 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
 
 .snarkNav:link:first-child, .snarkNav:last-child[href="/i2psnark/"] {
      background: #310 url(images/button_snark.png) 11px center no-repeat;
-     background: url(images/button_snark.png) 11px center no-repeat, linear-gradient(to bottom, #a68058 1%, #7a6045 27%, #5e4730 50%, #2e1700 51%, #1f0f00 100%);
+     background: url(images/button_snark.png) 11px center no-repeat, linear-gradient(to bottom, #a68058 1%, #7a6045 10%, #5e4730 40%, #2e1700 90%, #1f0f00 100%);
      background-size: 18px auto, 100% 100%;
      padding-left: 28px !important;
 }
@@ -1286,7 +1286,7 @@ th.headerpriority br, .snarkTorrents thead th br {
 }
 
 .snarkConfigTitle:hover, .snarkConfigTitle:focus, label.toggleview:hover, label.toggleview:focus, .toggle_input:focus + label {
-     background: linear-gradient(to bottom, #5f475d 0%, #4f3b4f 50%, #1f001f 50%, #1f001f 100%) !important;
+     background: linear-gradient(to bottom, #5f475d 0%, #4f3b4f 20%, #1f001f 100%) !important;
      box-shadow: inset 0 0 1px #3f173f;
      color: #d2baff !important;
      transition: ease all 0.1s;
@@ -1305,7 +1305,7 @@ th.headerpriority br, .snarkTorrents thead th br {
      border: 1px solid #101;
      border-top: none;
      background: #101 url(images/snarknav.png) repeat-x scroll center center;
-     background: linear-gradient(to bottom, #4a3d49 0%, #3d303d 50%, #0d000d 50%, #0d000d 100%) !important;
+     background: linear-gradient(to bottom, #4a3d49 0%, #3d303d 20%, #0d000d 100%) !important;
      box-shadow: inset 0 0 1px 0 #313, 0 0 0 1px rgba(16, 0, 16, 0.4);
      transition: ease all 0.1s;
 }
