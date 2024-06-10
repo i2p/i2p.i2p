@@ -48,7 +48,7 @@ public class ReseedBundler {
     private final static String ROUTERINFO_SUFFIX = ".dat";
     private static final int MINIMUM = 50;
     /** Same as in TunnelPeerSelector */
-    private static final String MIN_VERSION = "0.9.58";
+    private static final String MIN_VERSION = "0.9.59";
 
     public ReseedBundler(RouterContext ctx) {
         _context = ctx;

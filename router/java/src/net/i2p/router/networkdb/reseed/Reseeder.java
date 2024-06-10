@@ -71,7 +71,7 @@ public class Reseeder {
     // network ID cross-check, proposal 147, as of 0.9.42
     private static final String NETID_PARAM = "?netid=";
     /** Same as in TunnelPeerSelector */
-    private static final String MIN_VERSION = "0.9.58";
+    private static final String MIN_VERSION = "0.9.59";
 
     /**
      *  NOTE - URLs that are in both the standard and SSL groups must use the same hostname,
