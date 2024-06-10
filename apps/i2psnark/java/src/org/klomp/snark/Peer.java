@@ -893,7 +893,7 @@ public class Peer implements Comparable<Peer>, BandwidthListener
   }
 
   /**
-   * @when did handshake complete?
+   * when did handshake complete?
    * @since 0.9.63
    */
   public long getWhenConnected() {
@@ -901,7 +901,7 @@ public class Peer implements Comparable<Peer>, BandwidthListener
   }
 
   /**
-   * @when did we last send pex peers?
+   * when did we last send pex peers?
    * @since 0.9.63
    */
   public long getPexLastSent() {
@@ -909,7 +909,7 @@ public class Peer implements Comparable<Peer>, BandwidthListener
   }
 
   /**
-   * @when did we last send pex peers?
+   * when did we last send pex peers?
    * @since 0.9.63
    */
   public void setPexLastSent(long now) {
