@@ -31,6 +31,7 @@
 		<pathelement location="${lib}/jasper-runtime.jar" />
 		<pathelement location="${lib}/jetty-util.jar" />
 		<pathelement location="${lib}/jetty-i2p.jar" />
+		<pathelement location="${lib}/jspc.jar" />
 		<pathelement location="${ant.home}/lib/ant.jar" />
 		<pathelement location="../../../core/java/build/i2p.jar" />
 		<pathelement location="../../addressbook/dist/addressbook.jar" />

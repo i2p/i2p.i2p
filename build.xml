@@ -391,7 +391,7 @@
     <target name="buildJetty" depends="buildCore" >
         <ant dir="apps/jetty" target="build" />
         <copy todir="build/" >
-            <fileset dir="apps/jetty/jettylib" excludes="ant.jar" />
+            <fileset dir="apps/jetty/jettylib" excludes="jspc.jar" />
         </copy>
     </target>
 

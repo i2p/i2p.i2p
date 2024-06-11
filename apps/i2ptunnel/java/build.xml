@@ -372,6 +372,7 @@
                 <pathelement location="../../../core/java/build/i2p.jar" />
                 <!-- required for multipart form handling in register.jsp -->
                 <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
+                <pathelement location="../../jetty/jettylib/jspc.jar" />
             </classpath>
             <arg value="-d" />
             <arg value="../jsp/WEB-INF/classes" />

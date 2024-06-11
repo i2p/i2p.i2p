@@ -32,6 +32,8 @@ import net.i2p.util.VersionComparator;
  *  https://bz.apache.org/bugzilla/show_bug.cgi?id=62674
  *
  *  We could set fork=false in build.xml, but then the paths are all wrong.
+ *
+ *  Warning - used in build process only, not included in runtime jars, not for external use.
  *  Only for use in build scripts, obviously not a public API.
  *  See apps/routerconsole/java/build.xml for more information.
  *

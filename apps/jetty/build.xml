@@ -451,7 +451,7 @@
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
         <copy todir="build/obj" file="resources/log4j.properties" />
-        <jar destfile="./jettylib/jetty-i2p.jar" basedir="./build/obj" includes="**/*.class log4j.properties" >
+        <jar destfile="./jettylib/jetty-i2p.jar" basedir="./build/obj" includes="**/*.class log4j.properties" excludes="**/JspC.class">
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
@@ -463,6 +463,9 @@
                 <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
                 <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
             </manifest>
+        </jar>
+        <!-- separate jar for JspC wrapper used only in build, not included in jetty-i2p.jar -->
+        <jar destfile="./jettylib/jspc.jar" basedir="./build/obj" includes="**/JspC.class" >
         </jar>
     </target>    
 
