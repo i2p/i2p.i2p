@@ -234,7 +234,10 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             try {
                 _filter = FilterFactory.createFilter(context, filterDefinition);
             } catch (IOException | InvalidDefinitionException bad) {
-                throw new IllegalArgumentException("Bad filter definition file: " + bad.getMessage(), bad);
+                String msg = "Bad filter definition file: " + filterDefinition + " - filtering disabled: " + bad.getMessage();
+                _log.error(msg, bad);
+                l.log(msg);
+                _filter = null;
             }
         }
 

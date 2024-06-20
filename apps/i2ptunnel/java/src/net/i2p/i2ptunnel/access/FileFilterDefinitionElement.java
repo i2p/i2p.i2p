@@ -8,7 +8,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
+import net.i2p.util.Log;
 
 /**
  * An element of filter definition that reads hashes of remote destinations
@@ -55,7 +57,16 @@ class FileFilterDefinitionElement extends FilterDefinitionElement {
             reader = new BufferedReader(new FileReader(file));
             String b32;
             while((b32 = reader.readLine()) != null) {
-                Hash hash = fromBase32(b32);
+                if (b32.length() == 0)
+                    continue;
+                Hash hash;
+                try {
+                    hash = fromBase32(b32);
+                } catch (InvalidDefinitionException bad32) {
+                    Log log = I2PAppContext.getGlobalContext().logManager().getLog(FileFilterDefinitionElement.class);
+                    log.error("Invalid access list entry \"" + b32 + "\" in " + file, bad32);
+                    continue;
+                }
                 if (map.containsKey(hash))
                     continue;
                 DestTracker newTracker = new DestTracker(hash, threshold);
@@ -64,8 +75,6 @@ class FileFilterDefinitionElement extends FilterDefinitionElement {
                     lastLoaded.put(hash, newTracker);
                 }
             }
-        } catch (InvalidDefinitionException bad32) {
-            throw new IOException("invalid access list entry", bad32);
         } finally {
             if (reader != null) {
                 try { reader.close(); } catch (IOException ignored) {}
