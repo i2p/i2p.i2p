@@ -17,9 +17,9 @@
     <servlet-name>SusiMail</servlet-name>
     <servlet-class>i2p.susi.webmail.WebMail</servlet-class>
     <multipart-config>
-      <!-- 23 MB. See SMTPClient for discussion -->
-      <max-file-size>24117248</max-file-size>
-      <max-request-size>24117248</max-request-size>
+      <!-- 7.27 MB. See SMTPClient for discussion -->
+      <max-file-size>7629902</max-file-size>
+      <max-request-size>7629902</max-request-size>
       <file-size-threshold>131072</file-size-threshold>
     </multipart-config>
   </servlet>

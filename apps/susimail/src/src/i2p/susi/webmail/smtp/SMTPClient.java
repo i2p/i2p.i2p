@@ -51,14 +51,14 @@ import net.i2p.util.Log;
 public class SMTPClient {
 	
 	/**
-	 *  31.84 MB
-	 *  smtp.postman.i2p as of 2017-12.
+	 *  10.00 MB
+	 *  smtp.postman.i2p as of 2024-06-22.
 	 *  @since 0.9.33
 	 */
-	public static final long DEFAULT_MAX_SIZE = 33388608;
+	public static final long DEFAULT_MAX_SIZE = 10485760;
 
 	/**
-	 *  About 23.25 MB.
+	 *  7629902 ~= 7.27 MB
 	 *  Base64 encodes 57 chars to 76 + \r\n on a line
 	 *  @since 0.9.33
 	 */
