@@ -392,6 +392,11 @@ public class RrdGraph implements RrdGraphConstants {
                     xaxisColor, stroke);
             worker.drawLine(im.xorigin, im.yorigin + 4, im.xorigin, im.yorigin - im.ysize - 4,
                     yaxisColor, stroke);
+
+            // I2P skip arrowheads if transparent
+            if (((Color)arrowColor).getAlpha() == 0)
+                return;
+
             //Do X axis arrow
             double[] Xarrow_x = {
                     im.xorigin + im.xsize + 4,
@@ -403,10 +408,6 @@ public class RrdGraph implements RrdGraphConstants {
                     im.yorigin + 3,
             };
             worker.fillPolygon(Xarrow_x, im.yorigin + 3.0, Xarrow_y, arrowColor);
-
-            // I2P skip arrowheads if transparent
-            if (((Color)arrowColor).getAlpha() == 0)
-                return;
 
             //Do y axis arrow
             double[] Yarrow_x = {
