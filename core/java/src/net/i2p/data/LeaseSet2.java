@@ -135,6 +135,14 @@ public class LeaseSet2 extends LeaseSet {
     }
 
     /**
+     *  @return not a copy, do not modify, or null
+     *  @since 0.9.63
+     */
+    public Properties getOptions() {
+        return _options;
+    }
+
+    /**
      *  If more than one key, return the first supported one.
      *  If none supported, return the first one.
      *
@@ -237,8 +245,7 @@ public class LeaseSet2 extends LeaseSet {
             _options.clear();
         else
             _options = new OrderedProperties();
-        if (options != null)
-            _options.putAll(options);
+        _options.putAll(options);
     }
 
     public boolean isOffline() {
