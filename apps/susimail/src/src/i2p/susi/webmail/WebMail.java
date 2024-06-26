@@ -2278,7 +2278,7 @@ public class WebMail extends HttpServlet
 			response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self'; script-src 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; media-src 'none'; img-src 'self'");
 			response.setCharacterEncoding("UTF-8");
 		}
-		response.setHeader("Permissions-Policy", "accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), display-capture(), fullscreen=(self), geolocation=(), gyroscope=(), interest-cohort=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), vibrate=(), vr=()");
+		response.setHeader("Permissions-Policy", "accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), display-capture=(), fullscreen=(self), geolocation=(), gyroscope=(), interest-cohort=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), vibrate=(), vr=()");
 		response.setHeader("X-XSS-Protection", "1; mode=block");
 		response.setHeader("X-Content-Type-Options", "nosniff");
 		response.setHeader("Referrer-Policy", "no-referrer");
