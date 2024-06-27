@@ -820,7 +820,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     }
 
     /**
-     * Divide router limit by 1.75 for overhead.
+     * Divide router limit by 1.5 for overhead.
      * This could someday give a different answer to each client.
      * But it's not enforced anywhere.
      *
@@ -833,7 +833,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         int out = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
         int inb = _context.bandwidthLimiter().getInboundBurstKBytesPerSecond();
         int outb = _context.bandwidthLimiter().getOutboundBurstKBytesPerSecond();
-        BandwidthLimitsMessage msg = new BandwidthLimitsMessage(in * 4 / 7, out * 4 / 7, in, inb, out, outb, 1);
+        BandwidthLimitsMessage msg = new BandwidthLimitsMessage(in * 2 / 3, out * 2 / 3, in, inb, out, outb, 1);
         try {
             _runner.doSend(msg);
         } catch (I2CPMessageException ime) {
