@@ -1,0 +1,64 @@
+name: mirror
+
+on:
+  push:
+    tags:
+    - 'i2p-*.*.*'
+
+jobs:
+  dl:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        sparse-checkout: |
+            changelog.txt
+    - name: download release artifacts
+      run: |
+        sudo apt-get install wget ca-certificates gpg sed curl
+        while true; do wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/i2pinstall_$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')_windows.exe && break; done
+        wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/I2P-Easy-Install-Bundle-$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')-signed.exe
+        wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/I2P-Easy-Install-Bundle-$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||').exe
+        wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/i2pinstall_$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||').jar
+        wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/i2pinstall_$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||').jar.sig
+        wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/i2pinstall_$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')_windows.exe
+        wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/i2pinstall_$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')_windows.exe.sig
+        wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/i2psource_$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||').tar.bz2
+        wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/i2psource_$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||').tar.bz2.sig
+        wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/i2pupdate-$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||').su3
+        wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/i2pupdate-$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||').su3.torrent
+        wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/i2pupdate.su3
+        wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/i2pupdate_$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||').zip
+        wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/i2pupdate_$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||').zip.sig'
+        echo "$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')" > CHANGES.md
+        echo "===========" >> CHANGES.md
+        echo "" >> CHANGES.md
+        echo "" >> CHANGES.md
+        curl https://raw.githubusercontent.com/i2p/i2p.newsxml/master/data/entries.html | sed -n '/<article/,/<\/article/p' | sed -n '1,/<\/article>/p' | sed -n '/<\/details>/,$p' | sed '1d' | sed 's/<\/\{0,1\}p>//g' | sed 's|<\/article>||g' >> CHANGES.md
+        echo "" >> CHANGES.md
+        echo "" >> CHANGES.md
+        echo '```' >> CHANGES.md
+        head -n 25 changelog.txt >> CHANGES.md
+        echo '```' >> CHANGES.md
+        echo "" >> CHANGES.md
+        echo "" >> CHANGES.md
+        echo "## Checksums" >> CHANGES.md
+        echo "" >> CHANGES.md
+        echo "" >> CHANGES.md
+        echo '```' >> CHANGES.md
+        sha256sum * >> CHANGES.md
+        echo '```' >> CHANGES.md
+        echo "" >> CHANGES.md
+        echo "" >> CHANGES.md
+        echo '```' >> CHANGES.md
+        file * >> CHANGES.md
+        echo '```' >> CHANGES.md
+        echo "" >> CHANGES.md
+        echo "" >> CHANGES.md
+        cat CHANGES.md
+    - name: Upload artifacts
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "*"
+        skipIfReleaseExists: true
+        bodyFile: "CHANGES.md"
