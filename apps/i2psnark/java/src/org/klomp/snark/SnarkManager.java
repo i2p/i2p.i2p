@@ -990,8 +990,10 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
         int up = limits[1];
         if (up > 0) {
             int maxup = getInt(PROP_UPBW_MAX, DEFAULT_MAX_UP_BW);
-            _util.setMaxUpBW(up);
-            _bwManager.setUpBWLimit(Math.min(up, maxup) * 1000L);
+            if (maxup > up)
+                maxup = up;
+            _util.setMaxUpBW(maxup);
+            _bwManager.setUpBWLimit(maxup * 1000L);
         }
         int down = limits[0];
         if (down > 0) {
