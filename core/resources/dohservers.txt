@@ -239,8 +239,6 @@ https://doh.sb/dns-query
 # SSL issues
 #https://doh.tiar.app/dns-query
 #
-# meganerd-doh
-https://snoke.meganerd.nl/dns-query
 # nextdns
 https://dns.nextdns.io/dns-query
 #
