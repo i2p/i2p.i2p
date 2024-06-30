@@ -387,14 +387,6 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
 
         // minimum version check
         String v = peer.getVersion();
-        if (v.equals("0.9.52")) {
-            // c++ bug in 2.40.0/0.9.52, drops SSU messages
-            for (RouterAddress addr : peer.getAddresses()) {
-                if (addr.getCost() == 9 && addr.getTransportStyle().equals("SSU"))
-                    return true;
-            }
-            return false;
-        }
         // quick check to skip the comparator
         if (v.equals(CoreVersion.PUBLISHED_VERSION))
             return false;
