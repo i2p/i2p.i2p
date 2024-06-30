@@ -38,10 +38,6 @@ class RequestLeaseSetJob extends JobImpl {
     
     private static final long MAX_FUDGE = 2*1000;
 
-    /** temp for testing */
-    private static final String PROP_VARIABLE = "router.variableLeaseExpiration";
-    private static final boolean DFLT_VARIABLE = true;
-
     public RequestLeaseSetJob(RouterContext ctx, ClientConnectionRunner runner, LeaseRequestState state) {
         super(ctx);
         _log = ctx.logManager().getLog(RequestLeaseSetJob.class);
@@ -94,9 +90,8 @@ class RequestLeaseSetJob extends JobImpl {
             return;
         }
         I2CPMessage msg;
-        if (getContext().getProperty(PROP_VARIABLE, DFLT_VARIABLE) &&
-            (_runner instanceof QueuedClientConnectionRunner ||
-             RequestVariableLeaseSetMessage.isSupported(_runner.getClientVersion()))) {
+        if (_runner instanceof QueuedClientConnectionRunner ||
+             RequestVariableLeaseSetMessage.isSupported(_runner.getClientVersion())) {
             // new style - leases will have individual expirations
             RequestVariableLeaseSetMessage rmsg = new RequestVariableLeaseSetMessage();
             rmsg.setSessionId(id);
