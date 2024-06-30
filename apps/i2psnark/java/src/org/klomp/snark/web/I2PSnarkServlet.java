@@ -2210,7 +2210,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     else if ("LURF".equals(ch))  // DL
                         client = "Deluge";
                     else if ("LXFC".equals(ch))  // qB
-                        client = "qBitorrent";
+                        client = "qBittorrent";
                     else if ("LUxU".equals(ch))  // LT
                         client = "libtorrent";
                     // ancient below here
