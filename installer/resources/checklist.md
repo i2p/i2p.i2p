@@ -24,6 +24,7 @@
   to the current date, more or less.(or use `ant bumpBuildTime`)
 
 - Tickets: Check if any blocker or critical tickets for this release remain open;
+  check for overlooked issues on Gitlab, Github, i2pforum.i2p, and Reddit;
   get them fixed and closed, or reclassified.
 
 - Initial review: Review the complete diff from the last release, fix any issues
@@ -187,6 +188,9 @@
     git push
     git push origin tag i2p-2.x.x
     ```
+
+    Ensure the release revision AND tag are pushed from Gitlab to Github.
+
 
 ### Distribute updates
 
