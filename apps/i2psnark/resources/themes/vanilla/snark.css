@@ -87,7 +87,6 @@ input[type="submit"], input[type="reset"], button, a:link, input[type="checkbox"
      font-size: 9pt !important;
      line-height: 160% !important;
      box-shadow: inset 0 0 3px 0 #a08160, 0 0 1px 0 #4f3d36;
-     text-align: center;
 }
 
 .iframed .page {
@@ -1782,7 +1781,6 @@ img[src$="details.png"] {
      border-radius: 2px;
      box-shadow: inset 0 0 0 1px  #efe6e0, 0 0 1px 0 #4f3d36;
      color: #ddd;
-     text-align: center;
      word-wrap: break-word;
 }
 

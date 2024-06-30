@@ -73,7 +73,6 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      border: 1px solid #7778bf;
      font-size: 9pt !important;
      line-height: 160% !important;
-     text-align: center;
      opacity: 1;
      background: linear-gradient(to right, #fff, #dfe0ff, #fff) #eef;
      background-size: 3px auto;
@@ -1529,7 +1528,6 @@ img[src$="details.png"] {
      margin: 0;
      padding: 0;
      word-wrap: break-word;
-     text-align: center;
      opacity: 1 !important;
 }
 
