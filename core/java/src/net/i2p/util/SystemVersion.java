@@ -80,8 +80,14 @@ public abstract class SystemVersion {
                           (DAEMON_USER.equals(System.getProperty("user.name")) ||
                            (_isGentoo && GENTOO_USER.equals(System.getProperty("user.name"))));
         _isService = _isLinuxService || _isWindowsService;
-        // we assume the Apple M1 is not slow, however isSlow() below will still return true until we have a jbigi
-        _isSlow = _isAndroid || _isApache || (_isArm && !_isMac) || _isGNU || _isZero || getMaxMemory() < 96*1024*1024L;
+        // We assume the Apple M1 is not slow, and we do have a jbigi for it
+        // Windows ARM will be still be slow because we don't have a jbigi for it, see isSlow()
+        // Linux ARM we assume is fast if 5 cores or more, those are probably servers,
+        // all the Raspberry Pis have 4 cores and will be classed as slow.
+        // Might be nice to draw the line between slow Rasp. Pi 3 and fast Rasp. Pi 4 but hard to do here.
+        _isSlow = _isAndroid || _isApache ||
+                  (_isArm && (!_is64 || (!_isMac && getCores() < 5))) ||
+                  _isGNU || _isZero || getMaxMemory() < 96*1024*1024L;
 
         int sdk = 0;
         if (_isAndroid) {
