@@ -238,8 +238,10 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
 
         // reduce load on floodfills
         String caps = info.getCapabilities();
-        if (isExploratory &&
-            caps.indexOf(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL) >= 0 &&
+        boolean isFF = caps.indexOf(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL) >= 0;
+        if (isFF && caps.indexOf(Router.CAPABILITY_UNREACHABLE) >= 0)
+            return true;
+        if (isExploratory && isFF &&
             ctx.random().nextInt(4) != 0)
             return true;
 
