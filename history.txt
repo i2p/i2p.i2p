@@ -1,5 +1,18 @@
+2024-07-02 zzz
+ * Jetty: Don't show null exception message in XSSFilter
+
+2024-07-01 zzz
+ * Tunnels: Peer selection tweak
+
+2024-06-30 zzz
+ * i2psnark: Fix alignment of torrent names (light/vanilla themes) (Github #76)
+ * Router: Remove ancient test code for variable leasesets
+ * Tunnels: Remove old check for buggy routers now that MIN_VERSION is higher
+ * Util: Don't classify ARM servers as slow (Github #77)
+
 2024-06-29 zzz
  * i2psnark: Fix config display of limit for max up bw after restart (Github #75)
+ * Util: Remove discontinued DoH server (Github PR #79)
 
 2024-06-27 zzz
  * I2CP: Increase % of router bandwidth reported to clients
