@@ -3695,7 +3695,7 @@ p#externaltcp {
 }
 
 img.wizard.progress {
-    margin-left: -75%;
+    margin-left: -65%;
     max-height: 10%;
     max-width: 30%;
     mix-blend-mode: exclusion;
