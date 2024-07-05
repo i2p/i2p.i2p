@@ -175,7 +175,10 @@ class I2CPMessageProducer {
     public void disconnect(I2PSessionImpl session) throws I2PSessionException {
         if (session.isClosed()) return;
         DestroySessionMessage dmsg = new DestroySessionMessage();
-        dmsg.setSessionId(session.getSessionId());
+        SessionId id = session.getSessionId();
+        if (id == null)
+            id = I2PSessionImpl.DUMMY_SESSION;
+        dmsg.setSessionId(id);
         session.sendMessage_unchecked(dmsg);
         // use DisconnectMessage only if we fail and drop connection... 
         // todo: update the code to fire off DisconnectMessage on socket error

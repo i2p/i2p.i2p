@@ -256,7 +256,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     public static final int LISTEN_PORT = I2PClient.DEFAULT_LISTEN_PORT;
 
     private static final int BUF_SIZE = 32*1024;
-    private static final SessionId DUMMY_SESSION = new SessionId(65535);
+    static final SessionId DUMMY_SESSION = new SessionId(65535);
 
     /**
      * for extension by SimpleSession (no dest)
@@ -1180,6 +1180,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
 
     /** 
      * Retrieve the session's ID
+     * @return null if unset
      */
     SessionId getSessionId() { return _sessionId; }
     void setSessionId(SessionId id) { _sessionId = id; }
