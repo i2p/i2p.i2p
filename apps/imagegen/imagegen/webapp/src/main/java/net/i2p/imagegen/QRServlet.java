@@ -162,7 +162,7 @@ public class QRServlet extends HttpServlet {
 					g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
 					// scale font
 					float shrink = Math.min(1.0f, 14.0f / text.length());
-					int pts = Math.round(shrink * 16.0f * size / 160);
+					int pts = Math.min(28, Math.round(shrink * 16.0f * size / 160));
 					Font font = new Font(DEFAULT_FONT_NAME, Font.BOLD, pts);
 					g.setFont(font);
 					Color color = Color.BLACK;
@@ -172,7 +172,7 @@ public class QRServlet extends HttpServlet {
 					double swidth = font.getStringBounds(text, 0, text.length(),
 					                                     g.getFontRenderContext()).getBounds().getWidth();
 					int x = (width - (int) swidth) / 2;
-					int y = height - 10;
+					int y = height - 6;
 					g.drawString(text, x, y);
 					if (!ImageIO.write(bi, IDENTICON_IMAGE_FORMAT, byteOut))
 						throw new IOException("ImageIO.write() fail");
