@@ -544,7 +544,7 @@ public class Rate {
         if ((obj == null) || !(obj instanceof Rate)) return false;
         if (obj == this) return true;
         Rate r = (Rate) obj;
-        if (_period != r.getPeriod() || _creationDate != r.getCreationDate())
+        if (_period != r.getPeriod())
             return false;
         if (_stat == null && r._stat == null)
             return true;
@@ -559,12 +559,14 @@ public class Rate {
      */
     @Override
     public synchronized int hashCode() {
-        return DataHelper.hashCode(_stat) ^ _period ^ ((int) _creationDate);
+        return DataHelper.hashCode(_stat) ^ _period;
     }
 
     @Override
     public synchronized String toString() {
         StringBuilder buf = new StringBuilder(2048);
+        if (_stat != null) buf.append("\n\t stat: ").append(_stat.getName());
+        buf.append("\n\t period: ").append(_period);
         buf.append("\n\t total value: ").append(getLastTotalValue());
         buf.append("\n\t highest total value: ").append(getExtremeTotalValue());
         buf.append("\n\t lifetime total value: ").append(getLifetimeTotalValue());
