@@ -5696,6 +5696,7 @@ iframe.iframed {
 
 #i2ptunnelframe {
     margin: 0 0 -5px;
+    height: 100vh !important;
 }
 
 

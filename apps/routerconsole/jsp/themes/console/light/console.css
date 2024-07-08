@@ -1468,6 +1468,7 @@ p:empty+.sb_notice {
 #i2ptunnelframe {
     margin: -4px 0 -1px;
     overflow: hidden;
+    height: 100vh !important;
 }
 
 .main#embedded {
