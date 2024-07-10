@@ -36,8 +36,9 @@
   with a recent Oracle JDK (12+), and fix any issues.
   Oracle JDK will error on things that OpenJDK does not!
 
-- Java 7 test: 'ant mavenCentral.deps' with a Java 7 bootclasspath in override.properties
-  to ensure that Android will build correcly; fix any issues
+- Java 7 test: 'ant mavenCentral.deps' with a Java 8 Compiler, Java 7 bootclasspath
+ in override.properties to ensure that Android will build correcly; fix any issues.
+ Ensure that JAVA_HOME is unset.
 
 
 ## A day or two before
