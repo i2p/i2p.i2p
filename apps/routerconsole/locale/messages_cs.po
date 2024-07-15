@@ -2509,11 +2509,11 @@ msgstr "Náhodný výběr"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:195
 msgid "Quantity"
-msgstr "Kvantita"
+msgstr "Množství"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:213
 msgid "Backup quantity"
-msgstr "Kvantita zálohy"
+msgstr "Množství záloh"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:235
 msgid "Inbound options"
@@ -3160,7 +3160,7 @@ msgstr "Přidat"
 
 #: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:54
 msgid "Job runners"
-msgstr "Běžci práce"
+msgstr "Běžící práce"
 
 #: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:60
 msgid "Active jobs"
@@ -4814,7 +4814,7 @@ msgstr "Ukazuje výkon routeru"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1079
 msgid "Job lag"
-msgstr "Lag práce"
+msgstr "Zpoždění práce"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1085
 msgid "Indicates how quickly outbound messages to other I2P routers are sent"
@@ -4830,7 +4830,7 @@ msgstr "Doba cesty tam a zpět pro otestování tunelu"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1098
 msgid "Tunnel lag"
-msgstr "Lag tunelu"
+msgstr "Zpoždění tunelu"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1105
 msgid "Queued requests from other routers to participate in tunnels"
@@ -4860,7 +4860,7 @@ msgstr "ERR symetrický NAT"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:285
 msgid "WARN-Firewalled with Inbound TCP Enabled"
-msgstr "VAROVÁNÍ-Za firewallem s vypnutým příchozím TCP"
+msgstr "VAROVÁNÍ-Za firewallem, zapnutý příchozí TCP"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:290
 msgid "WARN-Firewalled and Floodfill"
@@ -4886,7 +4886,7 @@ msgstr "ERR-UDP vypnuto a příchozí TCP host/port nenastaven"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:314
 msgid "WARN-Firewalled with UDP Disabled"
-msgstr "WARN-Firewalled s vypnutým UDP"
+msgstr "WARN-Za firewallem, vypnutý UDP"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:606
 msgid "Add/remove/edit &amp; control your client and server tunnels"
@@ -6323,7 +6323,7 @@ msgstr "FAQ"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:596
 msgid "Manual Reseed"
-msgstr "Ruční reseed"
+msgstr "Ruční reseedování"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:600
 msgid ""
@@ -6657,7 +6657,7 @@ msgid ""
 "Tunnels longer than 3 hops (for example 2 hops + 0-2 hops, 3 hops + 0-1 "
 "hops, 3 hops + 0-2 hops), or a high quantity + backup quantity, may severely"
 " reduce performance or reliability."
-msgstr "Tunely delší než 3 skoky (např. 2 skoky + 0-2 skoky, 3 skoky + 0-1 skok, 3 skoky + 0-2 skoky), nebo vysoká kvalita + množství záloh, může značně omezit výkon nebo spolehlivost."
+msgstr "Tunely delší než 3 skoky (např. 2 skoky + 0-2 skoky, 3 skoky + 0-1 skok, 3 skoky + 0-2 skoky), nebo vysoké množství + množství záloh, může značně omezit výkon nebo spolehlivost."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:564
 msgid "High CPU and/or high outbound bandwidth usage may result."
@@ -7118,7 +7118,7 @@ msgstr "Váš UDP port se nezdá být omezen firewallem."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:541
 msgid "Firewalled"
-msgstr "Firewalled"
+msgstr "Za firewallem"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:543
 msgid "Your UDP port appears to be firewalled."
@@ -7231,7 +7231,7 @@ msgstr "Prosím otevřete váš firewall nebo výše vypněte příchozí TCP."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:587
 msgid "WARN - Firewalled with UDP Disabled"
-msgstr "WARN - Za firewallem s vypnutým UDP"
+msgstr "WARN - Za firewallem, vypnutý UDP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:589
 msgid "You have configured inbound TCP, however you have disabled UDP."

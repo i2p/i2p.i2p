@@ -6489,7 +6489,7 @@ msgstr "hoặc"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:627
 msgid "Note"
-msgstr ""
+msgstr "Ghi chú"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:629
 msgid ""
