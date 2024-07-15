@@ -1,3 +1,13 @@
+2024-07-15 zzz
+ * Pull translations from Transifex
+
+2024-07-06 zzz
+ * Console: Fix tunnel.Bps.* graphs sometimes not rendering
+
+2024-07-05 zzz
+ * I2CP: Send DestroySessionMessage with dummy SessionID if unset
+ * imagegen: QR code text size/placement tweaks
+
 2024-07-02 zzz
  * Jetty: Don't show null exception message in XSSFilter
 
