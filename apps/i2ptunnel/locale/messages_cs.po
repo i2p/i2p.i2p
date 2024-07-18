@@ -171,7 +171,7 @@ msgstr "Streamr server"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:505
 msgid "HTTP bidir"
-msgstr "HTTP bidir"
+msgstr "HTTP obousměrný"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:562
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:491
@@ -726,7 +726,7 @@ msgstr "Pozdržení otevření klientského tunelu dokud je rozpoznávána aktiv
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:744
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2287
 msgid "Reduce tunnel quantity when idle"
-msgstr "Snížit kvantitu tunelu při nečinnosti"
+msgstr "Snížit množství tunelů při nečinnosti"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:746
 msgid ""
@@ -737,7 +737,7 @@ msgstr "Omezení počtu tunelů při nečinnosti ale zachování otevřeného tu
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:750
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2291
 msgid "Reduce tunnel quantity when idle to conserve resources"
-msgstr "Omezení počtu tunelů při nečinnosti pro ušetření prostředků"
+msgstr "Omezení množství tunelů při nečinnosti pro úsporu prostředků"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:752
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:754
@@ -796,7 +796,7 @@ msgstr "Vypnout"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:816
 msgid "Persistent private key"
-msgstr "Trvalý privátní klíč"
+msgstr "Trvalý soukromý klíč"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:819
 msgid ""
@@ -978,7 +978,7 @@ msgstr "Možnosti vyhledávání adresy tunelu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1018
 msgid "Jump URL List"
-msgstr "Skočit v Seznamu URL"
+msgstr "Seznamu Jump URL"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1020
 msgid ""

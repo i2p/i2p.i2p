@@ -1663,7 +1663,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/ConfigHomeHandler.java:95
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:95
 msgid "Added"
-msgstr ""
+msgstr "أً"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigHomeHandler.java:112
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:122

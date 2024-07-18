@@ -5,10 +5,9 @@
 # foo <foo@bar>, 2009.
 # 
 # Translators:
-# Danton Medrado, 2019
-# 1c13465e24d91aca4d3ddaa1bc3e7027_ae6ba28, 2019
 # Manuela Silva <mmsrs@sky.com>, 2019
 # zzzi2p, 2019
+# lecalam, 2024
 # 
 msgid ""
 msgstr ""
@@ -16,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-18 13:32+0000\n"
 "PO-Revision-Date: 2019-12-19 14:09+0000\n"
-"Last-Translator: zzzi2p, 2019\n"
+"Last-Translator: lecalam, 2024\n"
 "Language-Team: Portuguese (https://app.transifex.com/otf/teams/12694/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,57 +30,57 @@ msgstr "OK"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:371
 msgid "IPv4: OK; IPv6: Testing"
-msgstr "IPv4: OK; IPv6: A Testar"
+msgstr "IPv4: OK; IPv6: a testar"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:372
 msgid "IPv4: OK; IPv6: Firewalled"
-msgstr "IPv4: OK; IPv6: Com Firewall"
+msgstr "IPv4: OK; IPv6: com firewall"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:373
 msgid "IPv4: Testing; IPv6: OK"
-msgstr "IPv4: Testando; IPv6: OK"
+msgstr "IPv4: a testar; IPv6: OK"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:374
 msgid "IPv4: Firewalled; IPv6: OK"
-msgstr "IPv4: Com Firewall; IPv6: OK"
+msgstr "IPv4: com firewall; IPv6: OK"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:375
 msgid "IPv4: Disabled; IPv6: OK"
-msgstr "IPv4: Desativado; IPv6: OK"
+msgstr "IPv4: desativado; IPv6: OK"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:376
 msgid "IPv4: Symmetric NAT; IPv6: OK"
-msgstr "IPv4: NAT Simétrico; IPv6: OK"
+msgstr "IPv4: NAT simétrico; IPv6: OK"
 
 #. * IPv4 symmetric NAT, IPv6 firewalled or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:378
 msgid "Symmetric NAT"
-msgstr "NAT Simétrico"
+msgstr "NAT simétrico"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:379
 msgid "IPv4: Symmetric NAT; IPv6: Testing"
-msgstr "IPv4: NAT Simétrico; IPv6: A Testar"
+msgstr "IPv4: NAT simétrico; IPv6: a testar"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:380
 msgid "IPv4: Firewalled; IPv6: Testing"
-msgstr "IPv4: Com Firewall; IPv6: A Testar"
+msgstr "IPv4: com firewall; IPv6: a testar"
 
 #. * IPv4 firewalled, IPv6 firewalled or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:382
 msgid "Firewalled"
-msgstr "Com Firewall"
+msgstr "Com firewall"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:383
 msgid "IPv4: Testing; IPv6: Firewalled"
-msgstr "IPv4: A Testar; IPv6: Com Firewall"
+msgstr "IPv4: a testar; IPv6: com firewall"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:384
 msgid "IPv4: Disabled; IPv6: Testing"
-msgstr "IPv4: Desativado; IPv6: A Testar"
+msgstr "IPv4: desativado; IPv6: a testar"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:385
 msgid "IPv4: Disabled; IPv6: Firewalled"
-msgstr "IPv4: Desativado; IPv6: Com Firewall"
+msgstr "IPv4: desativado; IPv6: com firewall"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:386
 msgid "Disconnected"
@@ -89,11 +88,11 @@ msgstr "Desligado"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:387
 msgid "Port Conflict"
-msgstr "Conflito de Porta"
+msgstr "Conflito de porta"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:388
 msgid "Testing"
-msgstr "A Testar"
+msgstr "A testar"
 
 #. NPE, too early
 #. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
@@ -112,7 +111,7 @@ msgstr "A rejeitar túneis: atraso elevado de mensagem"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:202
 msgid "Rejecting tunnels: Limit reached"
-msgstr "A rejeitar túneis: atingido limite"
+msgstr "A rejeitar túneis: limite atingido"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:241
 msgid "Rejecting most tunnels: High number of requests"
@@ -156,34 +155,34 @@ msgstr "A rejeitar os túneis"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:260
 msgid "Dropping tunnel requests: Too slow"
-msgstr "A cancelar pedidos de túneis: Demasiado lento"
+msgstr "A descartar pedidos de túneis: demasiado lento"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:270
 msgid "Dropping tunnel requests: High job lag"
-msgstr "A largar pedidos de tunel: Lag Elevado"
+msgstr "A descartar pedidos de túneis: atraso de trabalhos elevado"
 
 #. don't even bother, since we are so overloaded locally
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:464
 msgid "Dropping tunnel requests: Overloaded"
-msgstr "A descartar pedidos de túnel: Sobrecarregado"
+msgstr "A descartar pedidos de túneis: sobrecarregado"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:747
 msgid "Rejecting tunnels: Hidden mode"
-msgstr "A regeitar tuneis: Modo Escondido"
+msgstr "A rejeitar túneis: modo oculto"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:775
 msgid "Rejecting tunnels: Request overload"
-msgstr "A rejeitar túneis: Sobrecarga de pedidos"
+msgstr "A rejeitar túneis: sobrecarga de pedidos"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:806
 msgid "Rejecting tunnels: Connection limit"
-msgstr "A rejeitar túneis: Limite de conexão"
+msgstr "A rejeitar túneis: limite de conexão"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1024
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1057
 msgid "Dropping tunnel requests: High load"
-msgstr "A rejeitar pedidos de túneis: Carga elevada"
+msgstr "A descartar pedidos de túneis: carga elevada"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1140
 msgid "Dropping tunnel requests: Queue time"
-msgstr "A descartar pedidos de túneis: Tempo de fila"
+msgstr "A descartar pedidos de túneis: tempo de fila"

@@ -33,7 +33,7 @@ msgstr "IPv4: OK, IPv6: Testování"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:372
 msgid "IPv4: OK; IPv6: Firewalled"
-msgstr "IPv4: OK; IPv6: Firewalled"
+msgstr "IPv4: OK; IPv6: Za firewallem"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:373
 msgid "IPv4: Testing; IPv6: OK"
@@ -41,7 +41,7 @@ msgstr "IPv4: Testování, IPv6: OK"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:374
 msgid "IPv4: Firewalled; IPv6: OK"
-msgstr "IPv4: Firewalled; IPv6: OK"
+msgstr "IPv4: Za firewallem; IPv6: OK"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:375
 msgid "IPv4: Disabled; IPv6: OK"
@@ -62,16 +62,16 @@ msgstr "IPv4: Symetrický NAT; IPv6: Testování"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:380
 msgid "IPv4: Firewalled; IPv6: Testing"
-msgstr "IPv4: Firewalled; IPv6: Testování"
+msgstr "IPv4: Za firewallem; IPv6: Testování"
 
 #. * IPv4 firewalled, IPv6 firewalled or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:382
 msgid "Firewalled"
-msgstr "Firewalled"
+msgstr "Za firewallem"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:383
 msgid "IPv4: Testing; IPv6: Firewalled"
-msgstr "IPv4: Testování; IPv6: Firewalled"
+msgstr "IPv4: Testování; IPv6: Za firewallem"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:384
 msgid "IPv4: Disabled; IPv6: Testing"
@@ -79,7 +79,7 @@ msgstr "IPv4: Vypnuto; IPv6: Testování"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:385
 msgid "IPv4: Disabled; IPv6: Firewalled"
-msgstr "IPv4: Vypnuto; IPv6: Firewalled"
+msgstr "IPv4: Vypnuto; IPv6: Za firewallem"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:386
 msgid "Disconnected"

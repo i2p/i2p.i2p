@@ -1393,7 +1393,7 @@ msgstr "Vzhled"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2729
 msgid "To change themes manually, disable universal theming"
-msgstr "Pro manuální změnu vzhledu vypněte univerzální vzhledy"
+msgstr "Pro ruční změnu vzhledu vypněte univerzální vzhledy"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2733
 msgid "Universal theming is enabled."
