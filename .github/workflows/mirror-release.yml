@@ -15,8 +15,9 @@ jobs:
             changelog.txt
     - name: download release artifacts
       run: |
-        sudo apt-get install wget ca-certificates gpg sed curl
-        while true; do wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/i2pinstall_$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')_windows.exe && break; done
+        sudo apt-get install wget ca-certificates gpg sed curl git
+        git pull --tags
+        while true; do sleep 60m; wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/i2pinstall_$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')_windows.exe && break; done
         wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/I2P-Easy-Install-Bundle-$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')-signed.exe
         wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/I2P-Easy-Install-Bundle-$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||').exe
         wget -v https://files.i2p-projekt.de/$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||')/i2pinstall_$(git describe --abbrev=0 | sed 's|i2p-||g' |sed 's|-.*||').jar
