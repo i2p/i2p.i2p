@@ -10,12 +10,12 @@ import org.scalatest.Matchers
 class CertUtilSpec extends FunSpec with Matchers {
 
   describe("CertUtil") {
-    val certFileUrl = getClass.getResource("/meeh_at_mail.i2p.crt")
+    val certFileUrl = getClass.getResource("/reseed_at_diva.exchange.crt")
     val certFile = new File(certFileUrl.toURI)
 
     it("should be able to read a certificate") {
       val cert: X509Certificate = CertUtil.loadCert(certFile)
-      assert(cert.getSubjectDN.toString === "CN=meeh@mail.i2p, OU=I2P, O=I2P Anonymous Network, L=XX, ST=XX, C=XX")
+      assert(cert.getSubjectDN.toString === "CN=reseed@diva.exchange, OU=I2P, O=I2P Anonymous Network, STREET=XX, L=XX, C=XX")
     }
 
     it("should be able to tell if it's revoked or not") {
