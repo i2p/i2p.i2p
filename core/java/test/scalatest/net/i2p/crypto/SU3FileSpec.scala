@@ -17,7 +17,7 @@ class SU3FileSpec extends FunSpec with Matchers {
   }
 
   describe("SU3File") {
-    val certFileUrl = getClass.getResource("/meeh_at_mail.i2p.crt")
+    val certFileUrl = getClass.getResource("/reseed_at_diva.exchange.crt")
     val certFile = new File(certFileUrl.toURI)
 
     val seedFileUrl = getClass.getResource("/i2pseeds.su3")
