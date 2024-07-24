@@ -5673,6 +5673,9 @@ div.app:hover .applabel {
     color: #e6e6e7;
 }
 
+iframe {
+     min-height: 100vh;
+}
 
 /* end home page */
 
@@ -5696,7 +5699,6 @@ iframe.iframed {
 
 #i2ptunnelframe {
     margin: 0 0 -5px;
-    height: 100vh !important;
 }
 
 

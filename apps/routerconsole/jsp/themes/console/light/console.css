@@ -1455,7 +1455,6 @@ p:empty+.sb_notice {
 
 #susidnsframe {
     margin: 0 0 -2px;
-    min-height: 100vh !important;
     width: 100%;
     overflow: hidden;
 }
@@ -1468,7 +1467,6 @@ p:empty+.sb_notice {
 #i2ptunnelframe {
     margin: -4px 0 -1px;
     overflow: hidden;
-    height: 100vh !important;
 }
 
 .main#embedded {
@@ -5040,6 +5038,10 @@ div.footnote hr {
     margin-top: 0;
     margin-bottom: -18px;
     margin-right: 5px;
+}
+
+iframe {
+     min-height: 100vh;
 }
 
 iframe.iframed {
