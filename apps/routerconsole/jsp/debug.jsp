@@ -22,6 +22,7 @@
 <span class="tab"><a href="/debug?d=3">Router Session Key Manager</a></span>
 <span class="tab"><a href="/debug?d=4">Client Session Key Managers</a></span>
 <span class="tab"><a href="/debug?d=5">Router DHT</a></span>
+<span class="tab"><a href="/debug?d=6">Translation Status</a></span>
 </div>
 
 <%
@@ -116,6 +117,27 @@ if (dd == null || dd.equals("0")) {
     out.print("<h2 id=\"dht\">Router DHT</h2>");
     ctx.netDb().renderStatusHTML(out);
 
+} else if (dd.equals("6")) {
+
+    /*
+     *  Print out the status of the translations
+     */
+    java.io.InputStream is = this.getClass().getResourceAsStream("/net/i2p/router/web/resources/translationstatus.html");
+    if (is == null) {
+        out.println("Translation status not available");
+    } else {
+        java.io.Reader br = null;
+        try {
+            br = new java.io.InputStreamReader(is, "UTF-8");
+            char[] buf = new char[4096];
+            int read;
+            while ( (read = br.read(buf)) >= 0) {
+                out.write(buf, 0, read);
+            }
+        } finally {
+            if (br != null) try { br.close(); } catch (java.io.IOException ioe) {}
+        }
+    }
 }
 
 %>

@@ -54,6 +54,7 @@
         <echo message="  updater200WithJbigi" />
         <echo message="  updaterSmall:   updater with the essentials only - no SAM, i2psnark, SusiMail, SusiDNS, or history.txt" />
         <echo message="  updaterRouter:  updater with the i2p.jar and router.jar only" />
+        <echo message="  translationReport: generate a translation status report" />
         <echo message="  distclean: clean up all derived files" />
         <!-- <echo message="  syndie:    generate a standalone syndie install" /> -->
         <echo message="  desktopgui: generate a standalone desktopgui install" />
@@ -290,7 +291,7 @@
         <ant dir="apps/i2psnark/java/" target="standalone" />
         -->
     </target>
-    <target name="build2" depends="builddep, jar, buildWEB" />
+    <target name="build2" depends="builddep, jar, buildWEB, bundleTranslationReport" />
     <target name="buildSmall" depends="builddepSmall, jarSmall, buildWEB" />
     <target name="buildclean" depends="distclean, build" />
 
@@ -1607,6 +1608,32 @@
         <delete file="i2pseeds.su3" />
         <zip destfile="i2pseeds.zip" basedir="pkg-temp/netDb" whenempty="fail" />
         <su3sign infile="i2pseeds.zip" sigtype="RESEED" outfile="i2pseeds.su3" su3.ver="${epoch}" />
+    </target>
+
+    <!-- text output -->
+    <target name="translationReport" depends="buildTools, builddep, jar, buildWEB" unless="no.bundle">
+        <java classname="net.i2p.util.TranslationStatus" fork="true" dir="build/" failonerror="true">
+            <classpath>
+                <pathelement location="build/i2p.jar" />
+                <pathelement location="build/tools.jar" />
+            </classpath>
+        </java>
+    </target>
+
+    <!-- stuff html output into routerconsole.war -->
+    <target name="bundleTranslationReport" depends="buildTools, builddep, jar, buildWEB" unless="no.bundle">
+        <mkdir dir="build/txstatus/WEB-INF/classes/net/i2p/router/web/resources/" />
+        <java classname="net.i2p.util.TranslationStatus" fork="true" dir="build/" failonerror="true" output="build/txstatus/WEB-INF/classes/net/i2p/router/web/resources/translationstatus.html" logError="true">
+            <classpath>
+                <pathelement location="build/i2p.jar" />
+                <pathelement location="build/tools.jar" />
+            </classpath>
+            <arg value="-h" />
+        </java>
+        <jar destfile="build/routerconsole.war" update="true" duplicate="preserve">
+            <fileset dir="build/txstatus" />
+        </jar>
+        <echo message="Translation status report bundled in routerconsole.war" />
     </target>
 
     <!-- this is no longer required, izpack 4.3.0 supports headless installs with java -jar i2pinstall.exe -console -->
