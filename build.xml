@@ -316,23 +316,23 @@
         <copy file="apps/sam/java/build/sam.jar" todir="build/" />
     </target>
 
-    <target name="buildSusiMail" depends="buildCore, buildJetty" >
+    <target name="buildSusiMail" depends="buildJetty" >
         <ant dir="apps/susimail/" target="war" />
         <copy file="apps/susimail/susimail.war" todir="build/" />
     </target>
 
     <!-- jar (not war) for testing only -->
-    <target name="buildSusiMailJar" depends="buildCore, buildJetty" >
+    <target name="buildSusiMailJar" depends="buildJetty" >
         <ant dir="apps/susimail/" target="jar" />
         <copy file="apps/susimail/susimail.jar" todir="build/" />
     </target>
 
-    <target name="buildSusiDNS" depends="buildCore, buildJetty, buildImagegen, buildAddressbook" >
+    <target name="buildSusiDNS" depends="buildImagegen, buildAddressbook" >
         <ant dir="apps/susidns/src" target="all" />
         <copy file="apps/susidns/src/susidns.war" todir="build/" />
     </target>
 
-    <target name="buildImagegen" depends="buildCore, buildJetty" >
+    <target name="buildImagegen" depends="buildJetty" >
         <ant dir="apps/imagegen" target="build" />
         <copy file="apps/imagegen/imagegen/build/imagegen.war" todir="build/" />
     </target>
@@ -369,7 +369,7 @@
         <copy file="apps/i2ptunnel/java/build/i2ptunnel-ui.jar" todir="build/" />
     </target>
 
-    <target name="buildI2PTunnel" depends="buildMinistreaming, buildJetty, buildImagegen" >
+    <target name="buildI2PTunnel" depends="buildMinistreaming, buildImagegen" >
         <ant dir="apps/i2ptunnel/java/" target="build" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
@@ -422,7 +422,7 @@
         <copy file="core/java/build/i2p.jar" todir="build/" />
     </target>
 
-    <target name="buildJrobin" depends="buildProperties" >
+    <target name="buildJrobin" depends="buildCore" >
         <ant dir="apps/jrobin/java/" target="jar" />
         <copy file="apps/jrobin/java/build/jrobin.jar" todir="build/" />
     </target>
