@@ -7555,7 +7555,7 @@ b.netdb_transport {
 .debug_tx_total td:nth-child(4),
 .debug_tx_resource td:nth-child(3),
 .debug_tx_resource td:nth-child(4) {
-    text-align: right;
+    text-align: right !important;
 }
 
 .debug_tx_center,
