@@ -1,3 +1,14 @@
+2024-07-25 zzz
+ * Console:
+   - Add translation status report (Gitlab MR !207)
+   - Convert graphs to SVG (Gitlab MR !208)
+   - Enable compression of js and svg files
+ * i2ptunnel: Additional fixes for invalid entries in filter file (Gitlab #483)
+ * imagegen: Convert identicons to SVG
+ * Installer: Fix some izpack5 translated languages
+ * rrd4j: More optimizations for graph generation
+ * Util: Add new processors for CPUID
+
 2024-07-19 2.6.0 (API 0.9.63) released
 
 2024-07-19 idk
