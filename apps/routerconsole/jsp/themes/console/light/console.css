@@ -7647,6 +7647,25 @@ b.netdb_transport {
     color: #050;
 }
 
+.debug_tx_total, .debug_tx_resource, .debug_tx_file {
+    width: auto;
+}
+
+.debug_tx_total td:nth-child(3),
+.debug_tx_total td:nth-child(4),
+.debug_tx_resource td:nth-child(3),
+.debug_tx_resource td:nth-child(4) {
+    text-align: right;
+}
+
+.debug_tx_center,
+.debug_tx_total td:nth-child(2),
+.debug_tx_resource td:nth-child(2),
+.debug_tx_file td:nth-child(2),
+.debug_tx_file td:nth-child(3) {
+    text-align: center !important;
+}
+
 
 /* end debug */
 
