@@ -1206,6 +1206,8 @@
         <ant dir="installer/tools/java" target="distclean" />
         <delete dir="installer/lib/izpack5/patches/java/build" quiet="true" />
         <delete dir="reproducible/build" />
+        <!-- custom langpacks -->
+        <delete dir="com" />
 	<!--
 		NOTE! We need to turn off the default excludes for these
 		patterns to work.
@@ -1924,6 +1926,15 @@
 
     <target name="izpack5-patches" depends="ensureIzpack5, buildProperties" >
         <ant dir="installer/lib/izpack5/patches/java/" target="jar" />
+        <!-- custom langpacks
+             Izpack tries to load the resource both from the classpath and the file system;
+             we do it this way because jaring them up and adding a pathelement to izpack5.lib.path doesn't work.
+             See installer/install5.xml for details.
+         -->
+        <mkdir dir="com/izforge/izpack/bin/langpacks/" />
+        <copy toDir="com/izforge/izpack/bin/langpacks/" >
+            <fileset dir="installer/lib/izpack5/patches/resources" />
+        </copy>
     </target>
 
     <target name="installer5" depends="izpack5-patches, preppkg, buildProperties, buildUtilityJar" >

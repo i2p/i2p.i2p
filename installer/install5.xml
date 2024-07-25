@@ -34,19 +34,81 @@ https://izpack.atlassian.net/wiki/spaces/IZPACK/pages/491730/GUI+Preferences
         <modifier key="langDisplayType" value="native" />
     </guiprefs>
 
+<!--
+  Locales:
+
+  This is poorly documented, like a lot of things in izpack, but these can
+  be 2 OR 3 character country OR language codes.
+  Whatever it is, there must be xx.xml and xx.gif files available at
+  build time or the build will error out.
+
+  At runtime, izpack loads all the JVM's locales and tries to find
+  the "best match" locale for the code. See izpack DefaultLocales.java.
+  It then uses Locale.getDisplayLanguage() on that best match to show the (translated) language name
+  when langDisplayType=native, which we set in guiprefs above.
+
+  At https://izpack.atlassian.net/wiki/spaces/IZPACK/pages/491613/Overriding+Built-in+Translations
+  it says:
+     "In IzPack, language packs are identified by a 3 character ISO country or language code.
+      Country codes are converted to lowercase.
+      Country codes are used in preference to language codes.
+      This is to handle the case where a language variation is spoken for which there is no ISO language code."
+
+  This is wrong in that 2-character country and language codes are also allowed.
+
+  It is also wrong in that, unfortunately,
+  country codes combined with "best match" can go very badly.
+  Izpack 4 used the language code "ind" for Indonesian, but
+  Izpack 5 switched to use the country code "idn" instead.
+  This worked fine on Java 8, but on Java 21, the best match finds Javanese/Jawa for "idn",
+  which is a completely different language than Indonesian.
+  See: https://old.reddit.com/r/i2p/comments/1e61lsp/wrong_country_name_indonesia_as_jawa/
+
+  Renamed or custom langpacks (xml + gif) must be checked in to
+  installer/lib/izpack5/patches/resources
+  and may then be added below, and will be bundled with the installer.
+
+  Note that the JVM's installed locales varies widely by Java version.
+  For example, as of 2024 on Ubuntu, Java 8 has 159 locales and Java 21 has 1050.
+  The selected locale may even depend on the ordering of locales returned by getAvailableLocales() in the JVM.
+
+  If no locale for any code is found, it outputs "WARNING: No locale for xx"
+  which is annoying. Even worse, if no locale found, it doesn't display the translation
+  as an option.
+  But that shouldn't stop us from including it if some JVMs have it.
+
+-->
+
     <locale>
         <langpack iso3="eng"/>
+<!--
+        Brazilian Portuguese
+        see above, wrongly matches neegatu, replaced by por.
+        Portuguese (Portugal) is prt below.
         <langpack iso3="bra"/>
+-->
+        <langpack iso3="por"/>
         <langpack iso3="cat"/>
         <langpack iso3="ces"/>
+<!--
+        Chinese
+        see above, wrongly matches Sichuan Yi (iii), replaced by zho
         <langpack iso3="chn"/>
+-->
+        <langpack iso3="zho"/>
         <langpack iso3="dan"/>
         <langpack iso3="deu"/>
         <langpack iso3="ell"/>
+        <!-- fa not found in older JVMs, may generate warning, see above -->
+        <langpack iso3="fa"/>
         <langpack iso3="fin"/>
         <langpack iso3="fra"/>
         <langpack iso3="hun"/>
+<!--
+        see above, replaced by ind
         <langpack iso3="idn"/>
+-->
+        <langpack iso3="ind"/>
         <langpack iso3="ita"/>
         <langpack iso3="jpn"/>
         <langpack iso3="kor"/>
@@ -65,10 +127,10 @@ https://izpack.atlassian.net/wiki/spaces/IZPACK/pages/491730/GUI+Preferences
         <langpack iso3="twn"/>
         <langpack iso3="ukr"/>
 <!--
+At runtime, if the JVM does not have a locale:
 "WARNING: No locale for:"
-        <langpack iso3="eus"/>
-        <langpack iso3="fa"/>
-        <langpack iso3="glg"/>
+        <langpack iso3="eus"/>    Basque
+        <langpack iso3="glg"/>    Galician
 -->
     </locale>
 
