@@ -45,7 +45,7 @@ public class StatSummarizer implements Runnable, ClientApp {
     private final Log _log;
     /** list of SummaryListener instances */
     private final List<SummaryListener> _listeners;
-    private static final int MAX_CONCURRENT_PNG = SystemVersion.isSlow() ? 1 : 3;
+    private static final int MAX_CONCURRENT_PNG = SystemVersion.isSlow() ? 3 : 8;
     private final Semaphore _sem;
     private volatile boolean _isRunning;
     private volatile Thread _thread;
