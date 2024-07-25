@@ -40,6 +40,8 @@
  in override.properties to ensure that Android will build correcly; fix any issues.
  Ensure that JAVA_HOME is unset.
 
+- Verify CI is passing on both Gitlab and Github
+
 
 ## A day or two before
 
@@ -66,6 +68,8 @@
    get them fixed and closed, or reclassified.
 
 5. Update and check in blocklist-tor.txt with `maketorblocklist.sh`
+
+6. Verify CI is passing on both Gitlab and Github
 
 
 ## On release day
