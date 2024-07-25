@@ -3,7 +3,8 @@ package freenet.support.CPUInformation;
 /**
  *  Moved out of CPUID.java
  *
- *  Ref: http://en.wikipedia.org/wiki/List_of_AMD_CPU_microarchitectures
+ *  Ref: https://en.wikipedia.org/wiki/List_of_AMD_CPU_microarchitectures
+ *  Ref: https://gmplib.org/repo/gmp/file/tip/config.guess
  *
  *  @since 0.8.7
  */
@@ -468,7 +469,7 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
           }
           break;
 
-        // Zen / Zen+ / Zen2 / Zen3 / Ryzen 3/5/7/9/Threadripper / EPYC
+        // Zen / Zen+ / Zen2 / Zen3 / Zen4 / Ryzen 3/5/7/9/Threadripper / EPYC
         // untested
           case 23:
           case 25: {
