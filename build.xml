@@ -880,7 +880,7 @@
             <group title="Imagegen Application" packages="com.docuverse.identicon:com.google.zxing:com.google.zxing.*:net.i2p.imagegen" />
             <group title="Installer Utilities" packages="net.i2p.installer" />
             <group title="Jetty Utilities" packages="net.i2p.jetty:net.i2p.servlet:net.i2p.servlet.*" />
-            <group title="RRD4J Library (jrobin.jar)" packages="org.rrd4j:org.rrd4j.*:com.tomgibara.crinch.hashing" />
+            <group title="RRD4J Library (jrobin.jar)" packages="org.rrd4j:org.rrd4j.*:com.tomgibara.crinch.hashing:net.i2p.rrd4j" />
             <group title="SAM Bridge" packages="net.i2p.sam" />
             <group title="SAM Demos" packages="net.i2p.sam.client" />
             <group title="SusiDNS Application" packages="i2p.susi.dns:net.i2p.addressbook.servlet" />

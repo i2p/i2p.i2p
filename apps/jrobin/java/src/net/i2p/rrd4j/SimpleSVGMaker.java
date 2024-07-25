@@ -114,8 +114,7 @@ public class SimpleSVGMaker {
      * @param border null for none
      * @param fill null for none
      * @param clipid as returned from defineClipID() or null for none
-     * @param id CSS id or null for none
-     * @param clz CSS class or null for none
+     * @param hints non-null
      */
     public void drawCircle(int x, int y, int radius, Color border, Color fill, BasicStroke stroke, String clipid, Map<Object, Object> hints) {
         buf.append("<circle ");
@@ -142,8 +141,7 @@ public class SimpleSVGMaker {
      * @param border null for none
      * @param fill null for none
      * @param clipid as returned from defineClipID() or null for none
-     * @param id CSS id or null for none
-     * @param clz CSS class or null for none
+     * @param hints non-null
      */
     public void drawSquare(int x, int y, int sz, Color border, Color fill, BasicStroke stroke, String clipid, Map<Object, Object> hints) {
         drawRect(x - (sz/2), y - (sz/2), sz, sz, border, fill, stroke, clipid, hints);
@@ -153,8 +151,7 @@ public class SimpleSVGMaker {
      * Draw rect
      * @param border null for none
      * @param fill null for none
-     * @param id CSS id or null for none
-     * @param clz CSS class or null for none
+     * @param hints non-null
      */
     public void drawRect(int x, int y, int width, int height, Color border, Color fill, BasicStroke stroke, String clipid, Map<Object, Object> hints) {
         buf.append("<rect ");
@@ -182,8 +179,7 @@ public class SimpleSVGMaker {
      * Draw line
      * @param color null to let CSS do it
      * @param clipid as returned from defineClipID() or null for none
-     * @param id CSS id or null for none
-     * @param clz CSS class or null for none
+     * @param hints non-null
      */
     public void drawLine(int x1, int y1, int x2, int y2, Color color, BasicStroke stroke, String clipid, Map<Object, Object> hints) {
         buf.append("<line ");
@@ -212,8 +208,7 @@ public class SimpleSVGMaker {
      * Draw polyline
      * @param color null to let CSS do it
      * @param clipid as returned from defineClipID() or null for none
-     * @param id CSS id or null for none
-     * @param clz CSS class or null for none
+     * @param hints non-null
      */
     public void drawPolyline(int[] x, int[] y, int sz, Color color, BasicStroke stroke, String clipid, Map<Object, Object> hints) {
         if (sz < 2)
@@ -251,8 +246,7 @@ public class SimpleSVGMaker {
      * Fill polygon
      * @param color null to let CSS do it
      * @param clipid as returned from defineClipID() or null for none
-     * @param id CSS id or null for none
-     * @param clz CSS class or null for none
+     * @param hints non-null
      */
     public void fillPolygon(int[] x, int[] y, int sz, Color color, String clipid, Map<Object, Object> hints) {
         if (sz < 2)
@@ -289,8 +283,7 @@ public class SimpleSVGMaker {
      * @param color null to let CSS do it
      * @param font null to let CSS do it
      * @param clipid as returned from defineClipID() or null for none
-     * @param id CSS id or null for none
-     * @param clz CSS class or null for none
+     * @param hints non-null
      */
     public void drawText(String text, int x, int y, Color color, Font font, String clipid, Map<Object, Object> hints) {
         buf.append("<text ");
