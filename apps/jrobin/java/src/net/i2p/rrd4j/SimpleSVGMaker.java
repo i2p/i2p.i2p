@@ -349,19 +349,12 @@ public class SimpleSVGMaker {
     private void addStroke(String type, Color color, BasicStroke stroke) {
         buf.append(type);
         if (color != null) {
-            // todo getRGB() #tohex & 0xffffff
-            //buf.append("=\"rgb(").append(color.getRed())
-            //   .append(',').append(color.getGreen())
-            //   .append(',').append(color.getBlue())
-            //   .append(")\" ");
-            buf.append("=\"#").append(String.format(Locale.US, "%06x", color.getRGB() & 0xffffff))
-               .append("\" ");
+            // Output RGB or RGBA. getRGB() is ARGB.
+            buf.append("=\"#").append(String.format(Locale.US, "%06x", color.getRGB() & 0xffffff));
             int alpha = color.getAlpha();
-            if (alpha < 255) {
-                buf.append(type).append("-opacity=\"")
-                   .append(String.format(Locale.US, "%.2f", alpha / 255f))
-                   .append("\" ");
-            }
+            if (alpha < 255)
+                buf.append(String.format(Locale.US, "%02x", alpha));
+            buf.append("\" ");
         } else {
             // default is black opaque, so fixup for none
             buf.append("=\"none\" ");
