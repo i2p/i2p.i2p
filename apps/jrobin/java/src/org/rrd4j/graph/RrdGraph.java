@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Paint;
 import java.awt.Stroke;
+import java.awt.Transparency;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -735,13 +736,15 @@ public class RrdGraph implements RrdGraphConstants {
                     if (c instanceof LegendText) {
                         // draw with BOX
                         worker.fillRect(x, y - box, box, box, gdef.getColor(ElementsNames.frame));
-                        Color bc = (Color) gdef.getColor(ElementsNames.back);
-                        Color lc = (Color) ((LegendText) c).legendColor;
+                        Paint bc = gdef.getColor(ElementsNames.back);
+                        Paint lc = ((LegendText) c).legendColor;
+                        boolean bt = bc.getTransparency() != Transparency.OPAQUE;
+                        boolean lt = lc.getTransparency() != Transparency.OPAQUE;
                         // no use drawing unless both the two on top have some transparency
-                        if (bc.getAlpha() < 255 && lc.getAlpha() < 255)
+                        if (bt && lt)
                             worker.fillRect(x + 1, y - box + 1, box - 2, box - 2, gdef.getColor(ElementsNames.canvas));
                         // no use drawing unless the one on top has some transparency
-                        if (lc.getAlpha() < 255)
+                        if (lt)
                             worker.fillRect(x + 1, y - box + 1, box - 2, box - 2, bc);
                         worker.fillRect(x + 1, y - box + 1, box - 2, box - 2, lc);
                         worker.drawString(c.resolvedText, x + boxSpace, y, gdef.getFont(FONTTAG_LEGEND), gdef.getColor(ElementsNames.font));
