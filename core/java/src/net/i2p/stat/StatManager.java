@@ -161,7 +161,7 @@ public class StatManager {
         if (freq != null)
             freq.eventOccurred();
         else
-            if (_log.shouldLog(Log.DEBUG)
+            if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Invalid frequency stat : " + name);
     }
 
@@ -171,7 +171,7 @@ public class StatManager {
         if (stat != null)
             stat.addData(data, eventDuration);
         else
-            if (_log.shouldLog(Log.DEBUG)
+            if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Invalid rate stat : " + name);
     }
 
@@ -185,7 +185,7 @@ public class StatManager {
         if (stat != null)
             stat.addData(data);
         else
-            if (_log.shouldLog(Log.DEBUG)
+            if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Invalid rate stat : " + name);
     }
 
