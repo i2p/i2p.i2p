@@ -937,6 +937,9 @@
             <link offline="true" href="${jettydocs.url}" packagelistLoc="installer/resources/package-lists/jetty/" />
             <link offline="true" href="${wrapperdocs.url}" packagelistLoc="installer/resources/package-lists/wrapper/" />
         </javadoc>
+        <!-- create an empty dejavu.css file to keep the browser happy -->
+        <mkdir dir="./build/javadoc/resources/fonts" />
+        <echo message="/* intentionally empty */" file="build/javadoc/resources/fonts/dejavu.css" />
     </target>
 
     <target name="javadoc-zip" depends="javadoc">
