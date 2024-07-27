@@ -37,6 +37,9 @@
             encoding="UTF-8"
             includes="**/*.java" >
             <compilerarg line="${javac.compilerargs}" />
+            <classpath>
+                <pathelement location="../../../core/java/build/i2p.jar" />
+            </classpath>
         </javac>
     </target>
 

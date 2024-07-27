@@ -53,8 +53,9 @@ if ( !rendered && ((rs != null) || fakeBw) ) {
           rendered = ss.getXML(rate, cout);
         }
       } else {
-        response.setContentType("image/png");
-        response.setHeader("Content-Disposition", "inline; filename=\"" + stat + ".png\"");
+        response.setContentType("image/svg+xml");
+        response.setCharacterEncoding("UTF-8");
+        response.setHeader("Content-Disposition", "inline; filename=\"" + stat + ".svg\"");
         response.setHeader("Cache-Control", "no-cache");
         response.setHeader("Accept-Ranges", "none");
         // http://jira.codehaus.org/browse/JETTY-1346

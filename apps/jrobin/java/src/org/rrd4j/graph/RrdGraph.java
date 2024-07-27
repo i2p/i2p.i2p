@@ -147,8 +147,7 @@ public class RrdGraph implements RrdGraphConstants {
                 drawAxis();
                 drawText();
                 drawLegend();
-                drawRules();
-                drawSpans();
+                drawRulesAndSpans();
                 gator();
                 drawOverlay();
                 saveImage();
@@ -219,13 +218,17 @@ public class RrdGraph implements RrdGraphConstants {
         }
     }
 
-    private void drawRules() {
-        worker.clip(im.xorigin + 1, im.yorigin - gdef.height - 1, gdef.width - 1, gdef.height + 2);
+    private void drawRulesAndSpans() {
+        boolean found = false;
         for (PlotElement pe : gdef.plotElements) {
             if (pe instanceof HRule) {
                 HRule hr = (HRule) pe;
                 if (hr.value >= im.minval && hr.value <= im.maxval) {
                     int y = mapper.ytr(hr.value);
+                    if (!found) {
+                        worker.clip(im.xorigin + 1, im.yorigin - gdef.height - 1, gdef.width - 1, gdef.height + 2);
+                        found = true;
+                    }
                     worker.drawLine(im.xorigin, y, im.xorigin + im.xsize, y, hr.color, hr.stroke);
                 }
             }
@@ -233,31 +236,37 @@ public class RrdGraph implements RrdGraphConstants {
                 VRule vr = (VRule) pe;
                 if (vr.timestamp >= im.start && vr.timestamp <= im.end) {
                     int x = mapper.xtr(vr.timestamp);
+                    if (!found) {
+                        worker.clip(im.xorigin + 1, im.yorigin - gdef.height - 1, gdef.width - 1, gdef.height + 2);
+                        found = true;
+                    }
                     worker.drawLine(x, im.yorigin, x, im.yorigin - im.ysize, vr.color, vr.stroke);
                 }
             }
-        }
-        worker.reset();
-    }
-
-    private void drawSpans() {
-        worker.clip(im.xorigin + 1, im.yorigin - gdef.height - 1, gdef.width - 1, gdef.height + 2);
-        for (PlotElement pe : gdef.plotElements) {
-            if (pe instanceof HSpan) {
+            else if (pe instanceof HSpan) {
                 HSpan hr = (HSpan) pe;
                 int ys = mapper.ytr(hr.start);
                 int ye = mapper.ytr(hr.end);
                 int height = ys - ye;
+                if (!found) {
+                    worker.clip(im.xorigin + 1, im.yorigin - gdef.height - 1, gdef.width - 1, gdef.height + 2);
+                    found = true;
+                }
                 worker.fillRect(im.xorigin, ys - height, im.xsize, height, hr.color);
             }
             else if (pe instanceof VSpan) {
                 VSpan vr = (VSpan) pe;
                 int xs = mapper.xtr(vr.start);
                 int xe = mapper.xtr(vr.end);
+                if (!found) {
+                    worker.clip(im.xorigin + 1, im.yorigin - gdef.height - 1, gdef.width - 1, gdef.height + 2);
+                    found = true;
+                }
                 worker.fillRect(xs, im.yorigin - im.ysize, xe - xs, im.ysize, vr.color);
             }
         }
-        worker.reset();
+        if (found)
+            worker.reset();
     }
 
     private void drawText() {
@@ -726,9 +735,15 @@ public class RrdGraph implements RrdGraphConstants {
                     if (c instanceof LegendText) {
                         // draw with BOX
                         worker.fillRect(x, y - box, box, box, gdef.getColor(ElementsNames.frame));
-                        worker.fillRect(x + 1, y - box + 1, box - 2, box - 2, gdef.getColor(ElementsNames.canvas));
-                        worker.fillRect(x + 1, y - box + 1, box - 2, box - 2, gdef.getColor(ElementsNames.back));
-                        worker.fillRect(x + 1, y - box + 1, box - 2, box - 2, ((LegendText) c).legendColor);
+                        Color bc = (Color) gdef.getColor(ElementsNames.back);
+                        Color lc = (Color) ((LegendText) c).legendColor;
+                        // no use drawing unless both the two on top have some transparency
+                        if (bc.getAlpha() < 255 && lc.getAlpha() < 255)
+                            worker.fillRect(x + 1, y - box + 1, box - 2, box - 2, gdef.getColor(ElementsNames.canvas));
+                        // no use drawing unless the one on top has some transparency
+                        if (lc.getAlpha() < 255)
+                            worker.fillRect(x + 1, y - box + 1, box - 2, box - 2, bc);
+                        worker.fillRect(x + 1, y - box + 1, box - 2, box - 2, lc);
                         worker.drawString(c.resolvedText, x + boxSpace, y, gdef.getFont(FONTTAG_LEGEND), gdef.getColor(ElementsNames.font));
                     }
                     else {

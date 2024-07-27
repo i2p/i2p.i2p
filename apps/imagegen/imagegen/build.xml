@@ -8,6 +8,7 @@
         <pathelement location="../identicon/build/identicon.jar" />
         <pathelement location="../zxing/build/zxing.jar" />
         <pathelement location="../../../build/i2p.jar" />
+        <pathelement location="../../../build/jrobin.jar" />
     </path>
 
     <target name="all" depends="war" />

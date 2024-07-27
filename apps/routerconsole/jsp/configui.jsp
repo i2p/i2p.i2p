@@ -1,5 +1,4 @@
 <%@page contentType="text/html"%>
-<%@page trimDirectiveWhitespaces="true"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html><head>
@@ -55,6 +54,7 @@ input.default {
 <div id="langsettings">
 <jsp:getProperty name="uihelper" property="langSettings" />
 <p id="helptranslate"><%=uihelper._t("Please contribute to the router console translation project! Contact the developers in #i2p-dev on IRC to help.")%>
+<%=uihelper._t("See the {0}translation status report{1}.", "<a href=\"/debug?d=6\">", "</a>")%>
 </p><hr><div class="formaction" id="langui">
 <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
 <input type="submit" name="foo" class="accept" value="<%=intl._t("Apply")%>" >

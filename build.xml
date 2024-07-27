@@ -54,6 +54,7 @@
         <echo message="  updater200WithJbigi" />
         <echo message="  updaterSmall:   updater with the essentials only - no SAM, i2psnark, SusiMail, SusiDNS, or history.txt" />
         <echo message="  updaterRouter:  updater with the i2p.jar and router.jar only" />
+        <echo message="  translationReport: generate a translation status report" />
         <echo message="  distclean: clean up all derived files" />
         <!-- <echo message="  syndie:    generate a standalone syndie install" /> -->
         <echo message="  desktopgui: generate a standalone desktopgui install" />
@@ -290,7 +291,7 @@
         <ant dir="apps/i2psnark/java/" target="standalone" />
         -->
     </target>
-    <target name="build2" depends="builddep, jar, buildWEB" />
+    <target name="build2" depends="builddep, jar, buildWEB, bundleTranslationReport" />
     <target name="buildSmall" depends="builddepSmall, jarSmall, buildWEB" />
     <target name="buildclean" depends="distclean, build" />
 
@@ -315,23 +316,23 @@
         <copy file="apps/sam/java/build/sam.jar" todir="build/" />
     </target>
 
-    <target name="buildSusiMail" depends="buildCore, buildJetty" >
+    <target name="buildSusiMail" depends="buildJetty" >
         <ant dir="apps/susimail/" target="war" />
         <copy file="apps/susimail/susimail.war" todir="build/" />
     </target>
 
     <!-- jar (not war) for testing only -->
-    <target name="buildSusiMailJar" depends="buildCore, buildJetty" >
+    <target name="buildSusiMailJar" depends="buildJetty" >
         <ant dir="apps/susimail/" target="jar" />
         <copy file="apps/susimail/susimail.jar" todir="build/" />
     </target>
 
-    <target name="buildSusiDNS" depends="buildCore, buildJetty, buildImagegen, buildAddressbook" >
+    <target name="buildSusiDNS" depends="buildImagegen, buildAddressbook" >
         <ant dir="apps/susidns/src" target="all" />
         <copy file="apps/susidns/src/susidns.war" todir="build/" />
     </target>
 
-    <target name="buildImagegen" depends="buildCore, buildJetty" >
+    <target name="buildImagegen" depends="buildJetty" >
         <ant dir="apps/imagegen" target="build" />
         <copy file="apps/imagegen/imagegen/build/imagegen.war" todir="build/" />
     </target>
@@ -368,7 +369,7 @@
         <copy file="apps/i2ptunnel/java/build/i2ptunnel-ui.jar" todir="build/" />
     </target>
 
-    <target name="buildI2PTunnel" depends="buildMinistreaming, buildJetty, buildImagegen" >
+    <target name="buildI2PTunnel" depends="buildMinistreaming, buildImagegen" >
         <ant dir="apps/i2ptunnel/java/" target="build" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
@@ -421,7 +422,7 @@
         <copy file="core/java/build/i2p.jar" todir="build/" />
     </target>
 
-    <target name="buildJrobin" depends="buildProperties" >
+    <target name="buildJrobin" depends="buildCore" >
         <ant dir="apps/jrobin/java/" target="jar" />
         <copy file="apps/jrobin/java/build/jrobin.jar" todir="build/" />
     </target>
@@ -879,7 +880,7 @@
             <group title="Imagegen Application" packages="com.docuverse.identicon:com.google.zxing:com.google.zxing.*:net.i2p.imagegen" />
             <group title="Installer Utilities" packages="net.i2p.installer" />
             <group title="Jetty Utilities" packages="net.i2p.jetty:net.i2p.servlet:net.i2p.servlet.*" />
-            <group title="RRD4J Library (jrobin.jar)" packages="org.rrd4j:org.rrd4j.*:com.tomgibara.crinch.hashing" />
+            <group title="RRD4J Library (jrobin.jar)" packages="org.rrd4j:org.rrd4j.*:com.tomgibara.crinch.hashing:net.i2p.rrd4j" />
             <group title="SAM Bridge" packages="net.i2p.sam" />
             <group title="SAM Demos" packages="net.i2p.sam.client" />
             <group title="SusiDNS Application" packages="i2p.susi.dns:net.i2p.addressbook.servlet" />
@@ -936,6 +937,9 @@
             <link offline="true" href="${jettydocs.url}" packagelistLoc="installer/resources/package-lists/jetty/" />
             <link offline="true" href="${wrapperdocs.url}" packagelistLoc="installer/resources/package-lists/wrapper/" />
         </javadoc>
+        <!-- create an empty dejavu.css file to keep the browser happy -->
+        <mkdir dir="./build/javadoc/resources/fonts" />
+        <echo message="/* intentionally empty */" file="build/javadoc/resources/fonts/dejavu.css" />
     </target>
 
     <target name="javadoc-zip" depends="javadoc">
@@ -1205,6 +1209,8 @@
         <ant dir="installer/tools/java" target="distclean" />
         <delete dir="installer/lib/izpack5/patches/java/build" quiet="true" />
         <delete dir="reproducible/build" />
+        <!-- custom langpacks -->
+        <delete dir="com" />
 	<!--
 		NOTE! We need to turn off the default excludes for these
 		patterns to work.
@@ -1609,6 +1615,32 @@
         <su3sign infile="i2pseeds.zip" sigtype="RESEED" outfile="i2pseeds.su3" su3.ver="${epoch}" />
     </target>
 
+    <!-- text output -->
+    <target name="translationReport" depends="buildTools, builddep, jar, buildWEB" unless="no.bundle">
+        <java classname="net.i2p.util.TranslationStatus" fork="true" dir="build/" failonerror="true">
+            <classpath>
+                <pathelement location="build/i2p.jar" />
+                <pathelement location="build/tools.jar" />
+            </classpath>
+        </java>
+    </target>
+
+    <!-- stuff html output into routerconsole.war -->
+    <target name="bundleTranslationReport" depends="buildTools, builddep, jar, buildWEB" unless="no.bundle">
+        <mkdir dir="build/txstatus/WEB-INF/classes/net/i2p/router/web/resources/" />
+        <java classname="net.i2p.util.TranslationStatus" fork="true" dir="build/" failonerror="true" output="build/txstatus/WEB-INF/classes/net/i2p/router/web/resources/translationstatus.html" logError="true">
+            <classpath>
+                <pathelement location="build/i2p.jar" />
+                <pathelement location="build/tools.jar" />
+            </classpath>
+            <arg value="-h" />
+        </java>
+        <jar destfile="build/routerconsole.war" update="true" duplicate="preserve">
+            <fileset dir="build/txstatus" />
+        </jar>
+        <echo message="Translation status report bundled in routerconsole.war" />
+    </target>
+
     <!-- this is no longer required, izpack 4.3.0 supports headless installs with java -jar i2pinstall.exe -console -->
     <!-- and this is no longer used by the SlackBuild -->
     <target name="tarball" depends="preppkg">
@@ -1897,6 +1929,15 @@
 
     <target name="izpack5-patches" depends="ensureIzpack5, buildProperties" >
         <ant dir="installer/lib/izpack5/patches/java/" target="jar" />
+        <!-- custom langpacks
+             Izpack tries to load the resource both from the classpath and the file system;
+             we do it this way because jaring them up and adding a pathelement to izpack5.lib.path doesn't work.
+             See installer/install5.xml for details.
+         -->
+        <mkdir dir="com/izforge/izpack/bin/langpacks/" />
+        <copy toDir="com/izforge/izpack/bin/langpacks/" >
+            <fileset dir="installer/lib/izpack5/patches/resources" />
+        </copy>
     </target>
 
     <target name="installer5" depends="izpack5-patches, preppkg, buildProperties, buildUtilityJar" >

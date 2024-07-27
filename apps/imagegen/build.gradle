@@ -16,6 +16,7 @@ sourceSets {
 dependencies {
     implementation project(':core')
     implementation project(':apps:jetty')
+    implementation project(':apps:jrobin')
     implementation fileTree("../jetty/apache-tomcat-${tomcatVersion}")
 }
 

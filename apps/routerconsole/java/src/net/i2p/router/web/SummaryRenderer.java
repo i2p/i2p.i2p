@@ -19,6 +19,7 @@ import javax.imageio.stream.MemoryCacheImageOutputStream;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.rrd4j.SimpleSVGImageWorker;
 import net.i2p.router.RouterContext;
 import net.i2p.router.util.EventLog;
 import static net.i2p.router.web.GraphConstants.*;
@@ -374,7 +375,8 @@ class SummaryRenderer {
             RrdGraph graph;
             try {
                 // NPE here if system is missing fonts - see ticket #915
-                graph = new RrdGraph(def);
+                SimpleSVGImageWorker svg = new SimpleSVGImageWorker(width, height);
+                graph = new RrdGraph(def, svg);
             } catch (NullPointerException npe) {
                 _log.error("Error rendering graph", npe);
                 StatSummarizer.setDisabled(_context);
@@ -385,13 +387,8 @@ class SummaryRenderer {
                 StatSummarizer.setDisabled(_context);
                 throw new IOException("Error rendering - disabling graph generation. Missing font?");
             }
-            int totalWidth = graph.getRrdGraphInfo().getWidth();
-            int totalHeight = graph.getRrdGraphInfo().getHeight();
-            BufferedImage img = new BufferedImage(totalWidth, totalHeight, BufferedImage.TYPE_USHORT_565_RGB);
-            Graphics gfx = img.getGraphics();
-            graph.render(gfx);
-            ios = new MemoryCacheImageOutputStream(out);
-            ImageIO.write(img, "png", ios);
+            out.write(graph.getRrdGraphInfo().getBytes());
+            out.flush();
 
             _context.statManager().addRateData("graph.renderTime", System.currentTimeMillis() - begin);
         } catch (RrdException re) {

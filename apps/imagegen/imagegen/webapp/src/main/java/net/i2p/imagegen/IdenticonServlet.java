@@ -19,6 +19,7 @@ import com.docuverse.identicon.NineBlockIdenticonRenderer2;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
+import net.i2p.rrd4j.SimpleSVGGraphics2D;
 import net.i2p.util.ConvertToHash;
 import net.i2p.util.Log;
 
@@ -67,10 +68,10 @@ public class IdenticonServlet extends HttpServlet {
 	private static final String PARAM_IDENTICON_SIZE_SHORT = "s";
 	private static final String PARAM_IDENTICON_CODE_SHORT = "c";
 	private static final String IDENTICON_IMAGE_FORMAT = "PNG";
-	private static final String IDENTICON_IMAGE_MIMETYPE = "image/png";
+	private static final String IDENTICON_IMAGE_MIMETYPE = "image/svg+xml";
 	private static final long DEFAULT_IDENTICON_EXPIRES_IN_MILLIS = 24 * 60 * 60 * 1000;
 	private int version = 1;
-	private final IdenticonRenderer renderer = new NineBlockIdenticonRenderer2();
+	private final NineBlockIdenticonRenderer2 renderer = new NineBlockIdenticonRenderer2();
 	private IdenticonCache cache;
 	private long identiconExpiresInMillis = DEFAULT_IDENTICON_EXPIRES_IN_MILLIS;
 
@@ -147,6 +148,7 @@ public class IdenticonServlet extends HttpServlet {
 			// retrieve image bytes from either cache or renderer
 			if (cache == null
 					|| (imageBytes = cache.get(identiconETag)) == null) {
+/*
 				ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
 				RenderedImage image;
 				try {
@@ -160,6 +162,20 @@ public class IdenticonServlet extends HttpServlet {
 				}
 				ImageIO.write(image, IDENTICON_IMAGE_FORMAT, byteOut);
 				imageBytes = byteOut.toByteArray();
+*/
+				SimpleSVGGraphics2D g = new SimpleSVGGraphics2D(size, size);
+				try {
+					renderer.render(g, code, size);
+				} catch (Throwable t) {
+					// java.lang.NoClassDefFoundError: Could not initialize class java.awt.GraphicsEnvironment$LocalGE
+					Log log = I2PAppContext.getGlobalContext().logManager().getLog(IdenticonServlet.class);
+					//log.logAlways(Log.WARN, "Identicon render failure: " + t);
+					log.error("Identicon render failure", t);
+					response.setStatus(403);
+					return;
+				}
+				String s = g.getSVG();
+				imageBytes = s.getBytes("UTF-8");
 				if (cache != null)
 					cache.add(identiconETag, imageBytes);
 			} else {
@@ -178,6 +194,7 @@ public class IdenticonServlet extends HttpServlet {
 
 			// return image bytes to requester
 			response.setContentType(IDENTICON_IMAGE_MIMETYPE);
+			response.setCharacterEncoding("UTF-8");
 			response.setHeader("X-Content-Type-Options", "nosniff");
 			response.setHeader("Accept-Ranges", "none");
 			response.setContentLength(imageBytes.length);

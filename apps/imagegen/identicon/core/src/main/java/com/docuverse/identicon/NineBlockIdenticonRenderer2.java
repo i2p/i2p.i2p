@@ -153,7 +153,7 @@ public class NineBlockIdenticonRenderer2 implements IdenticonRenderer {
 	}
 
 	public BufferedImage render(BigInteger code, int size) {
-		return renderQuilt(code.intValue(), size);
+		return renderQuilt(null, code.intValue(), size);
 	}
 
 	/**
@@ -172,10 +172,22 @@ public class NineBlockIdenticonRenderer2 implements IdenticonRenderer {
 	 * @return identicon image
 	 */
 	public BufferedImage render(int code, int size) {
-		return renderQuilt(code, size);
+		return renderQuilt(null, code, size);
 	}
 
-	protected BufferedImage renderQuilt(int code, int size) {
+	/**
+	 *  @param g custom Graphics2D or null
+	 *  @since 0.9.64
+	 */
+	public BufferedImage render(Graphics2D g, int code, int size) {
+		return renderQuilt(g, code, size);
+	}
+
+	/**
+	 *  @param gg custom Graphics2D or null
+	 *  @since 0.9.64
+	 */
+	protected BufferedImage renderQuilt(Graphics2D gg, int code, int size) {
 		// -------------------------------------------------
 		// PREPARE
 		//
@@ -220,9 +232,15 @@ public class NineBlockIdenticonRenderer2 implements IdenticonRenderer {
 		// RENDER
 		//
 
-		BufferedImage targetImage = new BufferedImage(size, size,
-				BufferedImage.TYPE_INT_RGB);
-		Graphics2D g = targetImage.createGraphics();
+		BufferedImage targetImage = null;
+		Graphics2D g;
+		if (gg != null) {
+			g = gg;
+		} else {
+			targetImage = new BufferedImage(size, size,
+					BufferedImage.TYPE_INT_RGB);
+			g = targetImage.createGraphics();
+                }
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -256,7 +274,8 @@ public class NineBlockIdenticonRenderer2 implements IdenticonRenderer {
 		drawPatch(g, 0, blockSize2, blockSize, cornerType, cornerTurn++,
 				cornerInvert, fillColor, strokeColor);
 
-		g.dispose();
+		if (gg == null)
+			g.dispose();
 
 		return targetImage;
 	}
