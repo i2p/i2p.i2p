@@ -161,8 +161,8 @@ public class StatManager {
         if (freq != null)
             freq.eventOccurred();
         else
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Invalid frequency stat : " + name);
+            if (_log.shouldLog(Log.DEBUG)
+                _log.debug("Invalid frequency stat : " + name);
     }
 
     /** update the given rate statistic, taking note that the given data point was received (and recalculating all rates) */
@@ -171,8 +171,8 @@ public class StatManager {
         if (stat != null)
             stat.addData(data, eventDuration);
         else
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Invalid rate stat : " + name);
+            if (_log.shouldLog(Log.DEBUG)
+                _log.debug("Invalid rate stat : " + name);
     }
 
     /**
@@ -185,8 +185,8 @@ public class StatManager {
         if (stat != null)
             stat.addData(data);
         else
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Invalid rate stat : " + name);
+            if (_log.shouldLog(Log.DEBUG)
+                _log.debug("Invalid rate stat : " + name);
     }
 
     public synchronized void coalesceStats() {
