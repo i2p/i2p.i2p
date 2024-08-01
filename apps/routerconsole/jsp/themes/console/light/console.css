@@ -5041,7 +5041,7 @@ div.footnote hr {
 }
 
 iframe {
-     min-height: 100vh;
+    height: 100vh;
 }
 
 iframe.iframed {
