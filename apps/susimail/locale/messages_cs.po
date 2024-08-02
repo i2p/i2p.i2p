@@ -83,11 +83,11 @@ msgstr "Doručené"
 
 #: src/src/i2p/susi/webmail/WebMail.java:555
 msgid "View email as HTML"
-msgstr ""
+msgstr "Zobrazit e-mail jako HTML"
 
 #: src/src/i2p/susi/webmail/WebMail.java:573
 msgid "View email as plain text"
-msgstr ""
+msgstr "Zobrazit e-mail jako prostý text"
 
 #: src/src/i2p/susi/webmail/WebMail.java:604
 msgid "unknown"
@@ -97,11 +97,11 @@ msgstr "neznámý"
 msgid ""
 "To protect your privacy, SusiMail has blocked remote content in this "
 "message."
-msgstr ""
+msgstr "Kvůli ochraně vašeho soukromí SusiMail zablokoval vzdálený obsah této zprávy."
 
 #: src/src/i2p/susi/webmail/WebMail.java:639
 msgid "Enable javascript for improved display of this message."
-msgstr ""
+msgstr "Pro lepší zobrazení této zprávy zapněte Javascript."
 
 #: src/src/i2p/susi/webmail/WebMail.java:665
 #, java-format
@@ -134,7 +134,7 @@ msgstr "K ověření je nutno zadat uživatelské jméno (username)."
 
 #: src/src/i2p/susi/webmail/WebMail.java:795
 msgid "Do not include @mail.i2p in the username"
-msgstr ""
+msgstr "V uživatelském jménu neuvádějte @mail.i2p"
 
 #: src/src/i2p/susi/webmail/WebMail.java:800
 msgid "Need password for authentication."
@@ -334,7 +334,7 @@ msgstr "Obnovte stránku pro aktualizaci"
 #: src/src/i2p/susi/webmail/WebMail.java:2659
 #: src/src/i2p/susi/webmail/WebMail.java:3379
 msgid "Add a new user"
-msgstr ""
+msgstr "Přidat nového uživatele"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2893
 #: src/src/i2p/susi/webmail/WebMail.java:3517

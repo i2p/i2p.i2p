@@ -60,7 +60,7 @@ msgstr "亮色調"
 #. Translators: Translate "ubergine" as "aubergine" or "eggplant" or "purple"
 #: ../java/src/org/klomp/snark/SnarkManager.java:151
 msgid "ubergine"
-msgstr ""
+msgstr "茄子"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:151
 msgid "vanilla"
@@ -1692,7 +1692,7 @@ msgstr "資源"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3704
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3722
 msgid "Base"
-msgstr ""
+msgstr "基础"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3720
 msgid "Resource Does Not Exist"

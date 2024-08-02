@@ -135,7 +135,7 @@ msgstr "Nové soubory nebudou veřejně přístupné"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1203
 msgid "Stop all torrents before changing data directory"
-msgstr ""
+msgstr "Před změnou datové složky zastavte všechny torrenty"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1205
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1203
@@ -506,7 +506,7 @@ msgstr "Spouštění torrentu {0}"
 #: ../java/src/org/klomp/snark/SnarkManager.java:2696
 #, java-format
 msgid "Down bandwidth limit is {0} KBps"
-msgstr ""
+msgstr "Šířka pásma stahování je {0} KB/s"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:2697
 #: ../java/src/org/klomp/snark/SnarkManager.java:2722
@@ -884,7 +884,7 @@ msgstr "Neplatná URL: Musí začínat \"{0}\" nebo \"{1}\""
 #. no file or URL specified
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1307
 msgid "Enter URL or select torrent file"
-msgstr ""
+msgstr "Zadejte URL nebo vyberte torrent soubor"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1344
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1379
@@ -1461,7 +1461,7 @@ msgstr "Limit nahrávání"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2834
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2851
 msgid "Maximum bandwidth allocated"
-msgstr ""
+msgstr "Byla přidělena maximální šířka pásma"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2836
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2853
@@ -1475,7 +1475,7 @@ msgstr "Zobrazit nebo změnit datový tok routeru"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2847
 msgid "Down bandwidth limit"
-msgstr ""
+msgstr "Omezení šířky pásma stahování"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2863
 msgid "Use open trackers also"
