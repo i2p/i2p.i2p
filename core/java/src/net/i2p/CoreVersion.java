@@ -31,7 +31,7 @@ public class CoreVersion {
      *  Otherwise, the same as PUBLISHED_VERSION.
      *  RouterVersion.FULL_VERSION is suggested for display to the user.
      */
-    public final static String VERSION = "2.6.0";
+    public final static String VERSION = "2.6.1";
 
     /**
      *  The version published in the netdb via StatisticsManager.

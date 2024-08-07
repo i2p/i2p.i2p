@@ -1,3 +1,8 @@
+2024-08-07 2.6.1 (API 0.9.63) released
+
+2024-08-07 idk
+ * update geoip database
+
 2024-07-25 zzz
  * Console:
    - Add translation status report (Gitlab MR !207)
