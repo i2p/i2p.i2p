@@ -1,8 +1,8 @@
-Index: b/apps/routerconsole/java/src/net/i2p/router/web/HostCheckHandler.java
-===================================================================
+diff --git a/apps/routerconsole/java/src/net/i2p/router/web/HostCheckHandler.java b/apps/routerconsole/java/src/net/i2p/router/web/HostCheckHandler.java
+index aad652084..b354792df 100644
 --- a/apps/routerconsole/java/src/net/i2p/router/web/HostCheckHandler.java
 +++ b/apps/routerconsole/java/src/net/i2p/router/web/HostCheckHandler.java
-@@ -15,7 +15,7 @@ import org.eclipse.jetty.server.Request;
+@@ -15,7 +15,7 @@ import net.i2p.util.Log;
  import net.i2p.util.PortMapper;
  
  import org.eclipse.jetty.server.Request;
@@ -11,16 +11,14 @@ Index: b/apps/routerconsole/java/src/net/i2p/router/web/HostCheckHandler.java
  
  /**
   * Block certain Host headers to prevent DNS rebinding attacks.
-@@ -44,19 +44,12 @@ public class HostCheckHandler extends Gz
+@@ -44,17 +44,12 @@ public class HostCheckHandler extends GzipHandler
          _listenHosts = new HashSet<String>(8);
-         setMinGzipSize(64*1024);
+         setMinGzipSize(32*1024);
          if (_context.getBooleanPropertyDefaultTrue(PROP_GZIP)) {
 -            addIncludedMimeTypes(
--                                 // our js is very small
--                                 //"application/javascript", "application/x-javascript",
+-                                 "application/javascript", "application/x-javascript",
 -                                 "application/xhtml+xml", "application/xml",
--                                 // ditto svg
--                                 //"image/svg+xml",
+-                                 "image/svg+xml",
 -                                 "text/css", "text/html", "text/plain"
 -                                );
 +            setMimeTypes("application/xhtml+xml,application/xml,text/css,text/html,text/plain");
@@ -33,11 +31,11 @@ Index: b/apps/routerconsole/java/src/net/i2p/router/web/HostCheckHandler.java
          }
      }
      
-Index: b/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.java
-============================================================
+diff --git a/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.java b/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.java
+index 31261e3de..374df3bd2 100644
 --- a/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.java
 +++ b/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.java
-@@ -1100,8 +1100,8 @@ public class RouterConsoleRunner impleme
+@@ -1100,8 +1100,8 @@ public class RouterConsoleRunner implements RouterApp {
          }
  
          @Override
