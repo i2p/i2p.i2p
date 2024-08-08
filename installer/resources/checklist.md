@@ -259,6 +259,7 @@
   - `i2p2www/pages/downloads/macros` (checksums)
   - `i2p2www/pages/site/get-involved/roadmap.html` (release date, actual release contents)
   - `i2p2www/static/news/news.xml` (no longer necessary)
+  - Rename (undraft) the blog post
   - Sync with git.idk.i2p
 
 4. Announce on:
