@@ -170,7 +170,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
     /** @since 0.9.58 */
     public static final String PROP_MAX_FILES_PER_TORRENT = "i2psnark.maxFilesPerTorrent";
 
-    public static final int MIN_UP_BW = 10;
+    public static final int MIN_UP_BW = 5;
     public static final int MIN_DOWN_BW = 2 * MIN_UP_BW;
     public static final int DEFAULT_MAX_UP_BW = 25;
     private static final int DEFAULT_MAX_DOWN_BW = 200;

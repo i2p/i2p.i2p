@@ -614,20 +614,18 @@ class PeerCoordinator implements PeerListener, BandwidthListener
     if (metainfo == null)
         return 6;
     int pieces = metainfo.getPieces();
-    if (pieces <= 10)
-        return 4;
-    if (pieces <= 25)
-        return 10;
-    if (pieces <= 80)
-        return 16;
-    //int size = metainfo.getPieceLength(0);
     int max = _util.getMaxConnections();
-    // Now that we use temp files, no memory concern
-    //if (size <= 512*1024 || completed())
-      return max;
-    //if (size <= 1024*1024)
-    //  return (max + max + 2) / 3;
-    //return (max + 2) / 3;
+    if (pieces <= 10) {
+        if (max > 4) max = 4;
+    } else if (pieces <= 25) {
+        if (max > 10) max = 10;
+    } else if (pieces <= 80) {
+        if (max > 16) max = 16;
+    }
+    long bwl = getDownBWLimit();
+    if (bwl < 32*1024)
+        max = Math.min(max, Math.max(6, (int) (I2PSnarkUtil.MAX_CONNECTIONS * bwl / (32*1024))));
+    return max;
   }
 
   public boolean halted() { return halted; }
