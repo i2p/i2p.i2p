@@ -380,8 +380,11 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
         RouterIdentity ident = peer.getIdentity();
         if (ident.getSigningPublicKey().getType() == SigType.DSA_SHA1)
             return true;
+        // Shouldn't be any ElG routers MIN_VERSION or higher, but just to make sure,
+        // and prevent large build messages.
+        // Restricting to 25519 may also allow us to remove some of the ElG tunnel build code.
         EncType type = ident.getPublicKey().getType();
-        if (!LeaseSetKeys.SET_BOTH.contains(type))
+        if (type != EncType.ECIES_X25519)
             return true;
 
         // otherwise, it contains flags we aren't trying to focus on,
