@@ -195,7 +195,7 @@ public class Destination extends KeysAndCert {
      */
     public String toBase32() {
         try {
-            return Base32.encode(getHash().getData()) + ".b32.i2p";
+            return getHash().toBase32();
         } catch (IllegalStateException ise) {
             return null;
         }
