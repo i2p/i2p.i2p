@@ -2572,6 +2572,8 @@ public class WebMail extends HttpServlet
 				}
 				response.setContentType("text/html");
 				String search = httpRequest.getParameter(SEARCH);
+				if (search != null && search.length() > 0)
+					search = decodePath(search).trim();
 				if (_log.shouldDebug()) _log.debug("XHR1 search=" + search);
 				if (search != null && search.length() > 0) {
 					Folder.Selector olds = folder.getCurrentSelector();
@@ -2588,6 +2590,8 @@ public class WebMail extends HttpServlet
 					return;
 				}
 				String search = httpRequest.getParameter(SEARCH);
+				if (search != null && search.length() > 0)
+					search = decodePath(search).trim();
 				if (_log.shouldDebug()) _log.debug("XHR2 search=" + search);
 				if (search != null && search.length() > 0) {
 					Folder.Selector olds = folder.getCurrentSelector();
@@ -2828,6 +2832,21 @@ public class WebMail extends HttpServlet
 				out.flush();
 			}
 		}  // synch sessionObject
+	}
+
+	/**
+	 *  Simple version of URIUtil.decodePath()
+	 *  Adapted from I2PSnark BasicServlet
+	 *  @since 0.9.63
+	 */
+	private static String decodePath(String path) {
+		if (path.indexOf('%') >= 0) {
+			try {
+				URI uri = new URI(path);
+				return uri.getPath();
+			} catch (URISyntaxException use) {}
+		}
+		return path;
 	}
 
 	/**
@@ -3839,7 +3858,7 @@ public class WebMail extends HttpServlet
 	private static class SearchSelector implements Folder.Selector<String> {
 		private final String key;
 		private final MailCache mc;
-		private final String[] terms;
+		private final List<String> terms;
 		private final boolean isDrafts;
 
 		/**
@@ -3849,10 +3868,11 @@ public class WebMail extends HttpServlet
 			mc = cache;
 			isDrafts = mc.getFolderName().equals(DIR_DRAFTS);
 			key = search;
-			terms = DataHelper.split(search, " ");
-			// decode
-			for (int i = 0; i < terms.length; i++) {
-				terms[i] = Normalizer.normalize(terms[i].toLowerCase(Locale.US), Normalizer.Form.NFKD);
+			String[] tms = DataHelper.split(search, " ");
+			terms = new ArrayList<String>(4);
+			for (int i = 0; i < tms.length; i++) {
+				if (tms[i].length() > 0)
+					terms.add(Normalizer.normalize(tms[i].toLowerCase(Locale.US), Normalizer.Form.NFKD));
 			}
 		}
 
