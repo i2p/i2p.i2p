@@ -62,6 +62,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.text.Collator;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -3851,7 +3852,7 @@ public class WebMail extends HttpServlet
 			terms = DataHelper.split(search, " ");
 			// decode
 			for (int i = 0; i < terms.length; i++) {
-				terms[i] = terms[i].toLowerCase(Locale.US);
+				terms[i] = Normalizer.normalize(terms[i].toLowerCase(Locale.US), Normalizer.Form.NFKD);
 			}
 		}
 
@@ -3863,10 +3864,10 @@ public class WebMail extends HttpServlet
 			Mail mail = mc.getMail(uidl, MailCache.FetchMode.HEADER_CACHE_ONLY);
 			if (mail == null)
 				return false;
-			String subj = mail.subject.toLowerCase(Locale.US);
+			String subj = Normalizer.normalize(mail.subject.toLowerCase(Locale.US), Normalizer.Form.NFKD);
 			String sender = isDrafts ? null : mail.sender;
 			if (sender != null)
-				sender = sender.toLowerCase(Locale.US);
+				sender = Normalizer.normalize(sender.toLowerCase(Locale.US), Normalizer.Form.NFKD);
 			String[] to = isDrafts ? mail.to : null;
 			for (String term : terms) {
 				if (subj.contains(term))
@@ -3875,7 +3876,7 @@ public class WebMail extends HttpServlet
 					return true;
 				if (to != null) {
 					for (int i = 0; i < to.length; i++) {
-						if (to[i].toLowerCase(Locale.US).contains(term))
+						if (Normalizer.normalize(to[i].toLowerCase(Locale.US), Normalizer.Form.NFKD).contains(term))
 							return true;
 					}
 				}
