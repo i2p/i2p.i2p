@@ -260,6 +260,8 @@ class Packet {
      * List of packet sequence numbers below the getAckThrough() value
      * have not been received.  this may be null.
      *
+     * Warning: This is different than getNACKs() in PacketLocal
+     *
      * @return List of packet sequence numbers not ACKed, or null if there are none.
      */
     public long[] getNacks() { return _nacks; }

@@ -209,6 +209,11 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
         }
     }
 
+    /**
+     * Warning: This is different than getNacks() in super
+     *
+     * @return Number of times this packet has been nacked
+     */
     public int getNACKs() { return _nackCount.get(); }
     
     /**
