@@ -104,7 +104,7 @@ public class TunnelPool {
         _started = System.currentTimeMillis();
         _lastRateUpdate = _started;
         _lastLifetimeProcessed = 0;
-        _manager.getExecutor().repoll();
+        _manager.tunnelFailed();
         if (_settings.isInbound() && !_settings.isExploratory()) {
             // we just reconnected and didn't require any new tunnel builders.
             // however, we /do/ want a leaseSet, so build one
@@ -452,7 +452,7 @@ public class TunnelPool {
         if (_settings != null) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(toString() + ": Settings updated on the pool: " + settings);
-            _manager.getExecutor().repoll(); // in case we need more
+            _manager.tunnelFailed(); // in case we need more
         }
     }
 
@@ -508,7 +508,7 @@ public class TunnelPool {
             remaining = _tunnels.size();
         }
 
-        _manager.getExecutor().repoll();
+        _manager.tunnelFailed();
             
         _lifetimeProcessed += info.getProcessedMessagesCount();
         updateRate();

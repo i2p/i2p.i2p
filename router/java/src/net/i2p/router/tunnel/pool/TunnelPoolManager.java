@@ -631,6 +631,9 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         out.add(_outboundExploratory);
     }
 
+    /**
+     *  Poke the build executor to build more tunnels.
+     */
     void tunnelFailed() { _executor.repoll(); }
 
     BuildExecutor getExecutor() { return _executor; }
