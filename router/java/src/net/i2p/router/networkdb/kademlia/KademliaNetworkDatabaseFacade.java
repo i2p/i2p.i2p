@@ -53,6 +53,7 @@ import net.i2p.router.networkdb.reseed.ReseedChecker;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Kademlia based version of the network database.
@@ -1279,9 +1280,11 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      * @since 0.9.7
      */
     String validate(RouterInfo routerInfo) throws IllegalArgumentException {
+        if (_context.commSystem().isDummy())
+            return null;
         long now = _context.clock().now();
         boolean upLongEnough = _context.router().getUptime() > 60*60*1000;
-        if (!upLongEnough) {
+        if (!upLongEnough && !SystemVersion.isAndroid()) {
             long down = _context.router().getEstimatedDowntime();
             upLongEnough = down > 0 && down < 10*60*60*1000L;
         }
