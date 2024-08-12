@@ -36,6 +36,7 @@ import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
 import net.i2p.util.SystemVersion;
+import net.i2p.util.TempDirScanner;
 import net.i2p.util.I2PProperties.I2PPropertyCallback;
 
 /**
@@ -436,6 +437,8 @@ public class I2PAppContext {
                     // good or bad ? loop and try again?
                 } else if (_tmpDir.mkdir()) {
                     _tmpDir.deleteOnExit();
+                    if (!SystemVersion.isWindows() && !SystemVersion.isMac() && !SystemVersion.isAndroid())
+                        new TempDirScanner(this);
                 } else {
                     System.err.println("WARNING: Could not create temp dir " + _tmpDir.getAbsolutePath());
                     _tmpDir = new SecureDirectory(_routerDir, "tmp");
