@@ -220,8 +220,15 @@ public class SimpleSVGMaker {
         buf.append(x[0]).append(',').append(y[0]);
         for (int i = 1; i < sz; i++) {
             // use relative coords to save a little space
-            buf.append('l');
-            buf.append(x[i] - x[i-1]).append(',').append(y[i] - y[i-1]);
+            int dx = x[i] - x[i-1];
+            int dy = y[i] - y[i-1];
+            if (dx == 0) {
+                buf.append('v').append(dy);
+            } else if (dy == 0) {
+                buf.append('h').append(dx);
+            } else {
+                buf.append('l').append(dx).append(',').append(dy);
+            }
         }
         buf.append("\" ");
         addStroke("stroke", color, stroke);
@@ -258,8 +265,15 @@ public class SimpleSVGMaker {
         buf.append(x[0]).append(',').append(y[0]);
         for (int i = 1; i < sz; i++) {
             // use relative coords to save a little space
-            buf.append('l');
-            buf.append(x[i] - x[i-1]).append(',').append(y[i] - y[i-1]);
+            int dx = x[i] - x[i-1];
+            int dy = y[i] - y[i-1];
+            if (dx == 0) {
+                buf.append('v').append(dy);
+            } else if (dy == 0) {
+                buf.append('h').append(dx);
+            } else {
+                buf.append('l').append(dx).append(',').append(dy);
+            }
         }
         buf.append("Z\" ");
         addStroke("fill", color, null);
