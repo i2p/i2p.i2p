@@ -61,15 +61,18 @@ class ExpireLeasesJob extends JobImpl {
      *
      */
     private List<Hash> selectKeysToExpire() {
+        RouterContext ctx = getContext();
         List<Hash> toExpire = new ArrayList<Hash>(128);
         for (Map.Entry<Hash, DatabaseEntry> entry : _facade.getDataStore().getMapEntries()) {
             DatabaseEntry obj = entry.getValue();
             if (obj.isLeaseSet()) {
                 LeaseSet ls = (LeaseSet)obj;
-                if (!ls.isCurrent(Router.CLOCK_FUDGE_FACTOR))
-                    toExpire.add(entry.getKey());
-                else if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Lease " + ls.getDestination().calculateHash() + " is current, no need to expire");
+                if (!ls.isCurrent(Router.CLOCK_FUDGE_FACTOR)) {
+                    Hash h = entry.getKey();
+                    toExpire.add(h);
+                    if (ctx.clientManager().isLocal(h))
+                        _log.logAlways(Log.WARN, "Expired local leaseset " + h.toBase32());
+                }
             }
         }
         return toExpire;

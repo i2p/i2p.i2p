@@ -881,6 +881,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
     private static final long PUBLISH_DELAY = 3*1000;
 
     /**
+     * Stores in local netdb, and publishes to floodfill if client manager says to
+     *
      * @throws IllegalArgumentException if the leaseSet is not valid
      */
     public void publish(LeaseSet localLeaseSet) throws IllegalArgumentException {
@@ -891,7 +893,8 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         }
         Hash h = localLeaseSet.getHash();
         try {
-            store(h, localLeaseSet);
+            // force overwrite of previous entry
+            store(h, localLeaseSet, true);
         } catch (IllegalArgumentException iae) {
             _log.error("locally published leaseSet is not valid?", iae);
             throw iae;
@@ -1078,7 +1081,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         }
         return null;
     }
-    
+
     /**
      * Store the leaseSet.
      *
@@ -1090,12 +1093,28 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
      * @return previous entry or null
      */
     public LeaseSet store(Hash key, LeaseSet leaseSet) throws IllegalArgumentException {
+        return store(key, leaseSet, false);
+    }
+
+    /**
+     * Store the leaseSet.
+     *
+     * If the store fails due to unsupported crypto, it will negative cache
+     * the hash until restart.
+     *
+     * @param force always store even if not newer
+     * @throws IllegalArgumentException if the leaseSet is not valid
+     * @throws UnsupportedCryptoException if that's why it failed.
+     * @return previous entry or null
+     * @since 0.9.64
+     */
+    public LeaseSet store(Hash key, LeaseSet leaseSet, boolean force) throws IllegalArgumentException {
         if (!_initialized) return null;
         
         LeaseSet rv;
         try {
             rv = (LeaseSet)_ds.get(key);
-            if (rv != null && rv.getEarliestLeaseDate() >= leaseSet.getEarliestLeaseDate()) {
+            if (rv != null && !force && !isNewer(leaseSet, rv)) {
                 if (_log.shouldDebug())
                     _log.debug("Not storing older " + key);
                 // if it hasn't changed, no need to do anything
@@ -1117,7 +1136,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         
         // spoof / hash collision detection
         // todo allow non-exp to overwrite exp
-        if (rv != null) {
+        if (rv != null && !force) {
             Destination d1 = leaseSet.getDestination();
             Destination d2 = rv.getDestination();
             if (d1 != null && d2 != null && !d1.equals(d2))
@@ -1159,9 +1178,10 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (err != null)
             throw new IllegalArgumentException("Invalid store attempt - " + err);
 
-        if (_log.shouldDebug())
-            _log.debug("Storing LS to the data store...");
-        _ds.put(key, leaseSet);
+        if (force)
+            _ds.forcePut(key, leaseSet);
+        else
+            _ds.put(key, leaseSet);
         
         if (encls != null) {
             // we now have decrypted it, store it as well
@@ -1204,6 +1224,24 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
        *******/
         
         return rv;
+    }
+
+    /**
+     * Utility to determine if a is newer than b.
+     * Uses publish date if a and b are both LS2, else earliest lease date.
+     *
+     * @param a non-null
+     * @param b non-null
+     * @return if a is newer than b
+     * @since 0.9.64
+     */
+    public static boolean isNewer(LeaseSet a, LeaseSet b) {
+        if (a.getType() != DatabaseEntry.KEY_TYPE_LEASESET &&
+            b.getType() != DatabaseEntry.KEY_TYPE_LEASESET) {
+            return ((LeaseSet2) a).getPublished() > ((LeaseSet2) b).getPublished();
+        } else {
+            return a.getEarliestLeaseDate() > b.getEarliestLeaseDate();
+        }
     }
     
     private static final int MIN_ROUTERS = 90;

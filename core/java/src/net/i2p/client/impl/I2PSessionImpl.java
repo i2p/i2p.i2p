@@ -105,6 +105,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     private long _offlineExpiration;
     private Signature _offlineSignature;
     protected SigningPublicKey _transientSigningPublicKey; 
+    private long _lastLS2SignTime;
 
     // subsession stuff
     // registered subsessions
@@ -1184,6 +1185,21 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      */
     SessionId getSessionId() { return _sessionId; }
     void setSessionId(SessionId id) { _sessionId = id; }
+
+    /**
+     * The published timestamp of the last LS2 we signed
+     *
+     * @return 0 if never
+     * @since 0.9.64
+     */
+    long getLastLS2SignTime() { return _lastLS2SignTime; };
+
+    /**
+     * The published timestamp of the last LS2 we signed
+     *
+     * @since 0.9.64
+     */
+    void setLastLS2SignTime(long now) { _lastLS2SignTime = now; };
 
     /** configure the listener */
     public void setSessionListener(I2PSessionListener lsnr) { _sessionListener = lsnr; }

@@ -66,11 +66,26 @@ public class LeaseSet2 extends LeaseSet {
      * Published timestamp, as received.
      * Different than getDate() or getEarliestLeaseDate(), which are the earliest lease expiration.
      *
+     * Use this for LS2 version comparison, NOT getEarliestLeaseDate(), because
+     * that will return -1 for EncryptedLS and MetaLS.
+     *
      * @return in ms, with 1 second resolution
      * @since 0.9.39
      */
     public long getPublished() {
         return _published;
+    }
+
+    /**
+     * Set published timestamp.
+     * Will be rounded to nearest second.
+     * If not called, will be set on write.
+     *
+     * @since 0.9.64
+     */
+    public void setPublished(long now) {
+        // we round it here, so comparisons during verifies aren't wrong
+        _published = ((now + 500) / 1000) * 1000;
     }
 
     /**
@@ -524,8 +539,7 @@ public class LeaseSet2 extends LeaseSet {
     protected void writeHeader(OutputStream out) throws DataFormatException, IOException {
         _destination.writeBytes(out);
         if (_published <= 0) {
-            // we round it here, so comparisons during verifies aren't wrong
-            _published = ((Clock.getInstance().now() + 500) / 1000) * 1000;
+            setPublished(Clock.getInstance().now());
         }
         long pub1k = _published / 1000;
         DataHelper.writeLong(out, 4, pub1k);

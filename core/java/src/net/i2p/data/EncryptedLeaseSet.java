@@ -310,7 +310,7 @@ public class EncryptedLeaseSet extends LeaseSet2 {
         DataHelper.writeLong(out, 2, _signingKey.getType().getCode());
         _signingKey.writeBytes(out);
         if (_published <= 0)
-            _published = Clock.getInstance().now();
+            setPublished(Clock.getInstance().now());
         DataHelper.writeLong(out, 4, _published / 1000);
         DataHelper.writeLong(out, 2, (_expires - _published) / 1000);
         DataHelper.writeLong(out, 2, _flags);

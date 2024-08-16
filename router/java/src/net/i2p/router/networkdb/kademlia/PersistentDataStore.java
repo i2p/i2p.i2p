@@ -164,6 +164,24 @@ public class PersistentDataStore extends TransientDataStore {
             _writer.queue(key, data);
         return rv;
     }
+
+    /*
+     *  Unconditionally store, bypass all newer/older checks.
+     *  Persists for RI only.
+     *
+     *  @param persist if false, call super only, don't access disk
+     *  @return success
+     *  @param key non-null
+     *  @param data non-null
+     *  @since 0.9.64
+     */
+    @Override
+    public boolean forcePut(Hash key, DatabaseEntry data) {
+        boolean rv = super.forcePut(key, data);
+        if (rv && data.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
+            _writer.queue(key, data);
+        return rv;
+    }
     
     /** How many files to write every 10 minutes. Doesn't make sense to limit it,
      *  they just back up in the queue hogging memory.
@@ -329,10 +347,11 @@ public class PersistentDataStore extends TransientDataStore {
             if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
     }
-    private long getPublishDate(DatabaseEntry data) {
+
+    private static long getPublishDate(DatabaseEntry data) {
         return data.getDate();
     }
-    
+
     /**
      *  This was mostly for manual reseeding, i.e. the user manually
      *  copies RI files to the directory. Nobody does this,

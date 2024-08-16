@@ -238,6 +238,9 @@ public class LeaseSet extends DatabaseEntry {
      * determine which LeaseSet was published more recently (later earliestLeaseSetDate
      * means it was published later)
      *
+     * Warning - do not use this for version comparison for LeaseSet2.
+     * Use LeaseSet2.getPublished() instead.
+     *
      * @return earliest end date of any lease in the set, or -1 if there are no leases
      */
     public long getEarliestLeaseDate() {

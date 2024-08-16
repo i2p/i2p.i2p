@@ -146,22 +146,11 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 LeaseSet match = _facade.store(key, ls);
                 if (match == null) {
                     wasNew = true;
-                } else if (match.getEarliestLeaseDate() < ls.getEarliestLeaseDate()) {
+                } else if (KademliaNetworkDatabaseFacade.isNewer(ls, match)) {
                     wasNew = true;
                     // If it is in our keyspace and we are talking to it
                     //if (match.getReceivedAsPublished())
                     //    ls.setReceivedAsPublished(true);
-                } else if (type != DatabaseEntry.KEY_TYPE_LEASESET &&
-                           match.getType() != DatabaseEntry.KEY_TYPE_LEASESET) {
-                    LeaseSet2 ls2 = (LeaseSet2) ls;
-                    LeaseSet2 match2 = (LeaseSet2) match;
-                    if (match2.getPublished() < ls2.getPublished()) {
-                        wasNew = true;
-                        //if (match.getReceivedAsPublished())
-                        //    ls.setReceivedAsPublished(true);
-                    } else {
-                        wasNew = false;
-                    }
                 } else {
                     wasNew = false;
                     // The FloodOnlyLookupSelector goes away after the first good reply

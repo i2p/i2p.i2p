@@ -22,6 +22,17 @@ public interface DataStore {
     public DatabaseEntry get(Hash key, boolean persist);
     public boolean put(Hash key, DatabaseEntry data);
     public boolean put(Hash key, DatabaseEntry data, boolean persist);
+
+    /*
+     *  Unconditionally store, bypass all newer/older checks
+     *
+     *  @return success
+     *  @param key non-null
+     *  @param data non-null
+     *  @since 0.9.64
+     */
+    public boolean forcePut(Hash key, DatabaseEntry data);
+
     public DatabaseEntry remove(Hash key);
     public DatabaseEntry remove(Hash key, boolean persist);
     public Set<Hash> getKeys();
