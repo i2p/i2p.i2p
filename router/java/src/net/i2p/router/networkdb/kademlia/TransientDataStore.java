@@ -190,6 +190,20 @@ class TransientDataStore implements DataStore {
         }
         return rv;
     }
+
+    /*
+     *  Unconditionally store, bypass all newer/older checks
+     *
+     *  @return success
+     *  @param key non-null
+     *  @param data non-null
+     *  @since 0.9.64
+     */
+    @Override
+    public boolean forcePut(Hash key, DatabaseEntry data) {
+        _data.put(key, data);
+        return true;
+    }
     
     @Override
     public String toString() {

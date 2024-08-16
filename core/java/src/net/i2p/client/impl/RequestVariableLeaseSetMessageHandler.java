@@ -42,19 +42,25 @@ class RequestVariableLeaseSetMessageHandler extends RequestLeaseSetMessageHandle
         boolean isLS2 = requiresLS2(session);
         LeaseSet leaseSet;
         if (isLS2) {
+            LeaseSet2 ls2;
             if (_ls2Type == DatabaseEntry.KEY_TYPE_LS2) {
-                leaseSet = new LeaseSet2();
+                ls2 = new LeaseSet2();
             } else if (_ls2Type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
-                leaseSet = new EncryptedLeaseSet();
+                ls2 = new EncryptedLeaseSet();
             } else if (_ls2Type == DatabaseEntry.KEY_TYPE_META_LS2) {
-                leaseSet = new MetaLeaseSet();
+                ls2 = new MetaLeaseSet();
             } else {
               session.propogateError("Unsupported LS2 type", new Exception());
               session.destroySession();
               return;
             }
             if (Boolean.parseBoolean(session.getOptions().getProperty("i2cp.dontPublishLeaseSet")))
-                ((LeaseSet2)leaseSet).setUnpublished();
+                ls2.setUnpublished();
+            // ensure 1-second resolution timestamp is higher than last one
+            long now = Math.max(_context.clock().now(), session.getLastLS2SignTime() + 1000);
+            ls2.setPublished(now);
+            session.setLastLS2SignTime(now);
+            leaseSet = ls2;
         } else {
             leaseSet = new LeaseSet();
         }
