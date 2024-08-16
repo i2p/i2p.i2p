@@ -1,3 +1,14 @@
+2024-08-16 zzz
+ * NetDB, I2CP: Fix tunnels going yellow for several minutes (Gitlab #487)
+
+2024-08-12 zzz
+ * Util: Add temp dir timestamper to prevent deletion by systemd
+
+2024-08-11 zzz
+ * NetDB:
+   - Don't expire entries in test mode
+   - Don't immediately expire entries for Android
+
 2024-08-09 zzz
  * i2psnark: Reduce minimum banwdith, reduce max connections if low bandwidth
  * i2psnark, susimail: Normailze strings when searching (Gitlab #488)
