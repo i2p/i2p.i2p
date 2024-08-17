@@ -797,7 +797,7 @@ public class BlockfileNamingService extends DummyNamingService {
             if (d != null)
                 return d;
             // Base32 failed?
-            if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.toLowerCase(Locale.US).endsWith(".b32.i2p"))
+            if (hostname.length() >= BASE32_HASH_LENGTH + 8 && hostname.toLowerCase(Locale.US).endsWith(".b32.i2p"))
                 return null;
         }
 
@@ -848,7 +848,7 @@ public class BlockfileNamingService extends DummyNamingService {
      */
     private List<Destination> lookupAll2(String hostname, Properties lookupOptions, List<Properties> storedOptions) {
         // only use cache for b32
-        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
+        if (hostname.length() >= BASE32_HASH_LENGTH + 8 && hostname.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
             Destination d = super.lookup(hostname, null, null);
             if (d != null) {
                 if (storedOptions != null)

@@ -126,6 +126,9 @@ class LookupDestJob extends JobImpl {
                             // h and name both null, runJob will fail immediately
                         }
                     }
+                } else {
+                    // base32 decode fail
+                    name = null;
                 }
             }
         }

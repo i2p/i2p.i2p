@@ -33,9 +33,20 @@ public class ConvertToHash {
         if (peer == null)
             return null;
         String peerLC = peer.toLowerCase(Locale.US);
+        if (peerLC.startsWith("http://")) {
+            peer = peer.substring(7);
+            peerLC = peerLC.substring(7);
+        } else if (peerLC.startsWith("https://")) {
+            peer = peer.substring(8);
+            peerLC = peerLC.substring(8);
+        }
+        if (peer.endsWith("/")) {
+            peer = peer.substring(0, peer.length() - 1);
+            peerLC = peerLC.substring(0, peerLC.length() - 1);
+        }
         if (peerLC.endsWith(".i2p.alt")) {
             peer = peer.substring(0, peer.length() - 4);
-            peerLC = peerLC.substring(0, peer.length() - 4);
+            peerLC = peerLC.substring(0, peerLC.length() - 4);
         }
         // b64 hash
         if (peer.length() == 44 && !peerLC.endsWith(".i2p")) {
