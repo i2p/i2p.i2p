@@ -319,7 +319,6 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      line-height: 120%;
      font-weight: bold;
      background: rgba(255, 255, 255, 0.25);
-     mix-blend-mode: multiply;
 }
 
 .snarkMessages li::before {
