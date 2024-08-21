@@ -58,7 +58,7 @@ jobs:
         run: ant distclean
       - name: build javadoc with Ant
         run: ant distclean javadoc updater
-      - name: zip javadoc
+      - name: zip javadoc and place update in javadoc zip
         run: cp i2pupdate.zip build/javadoc/i2pupdate.zip && zip -r javadoc.zip build/javadoc
       - name: Upload javadoc.zip
         uses: actions/upload-artifact@v4
@@ -70,7 +70,7 @@ jobs:
         with:
           # Upload javadocs to github page
           path: 'build/javadoc'
-      - name: Deploy to GitHub Pages
+      - name: Deploy javadoc and dev build to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
 
