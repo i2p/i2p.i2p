@@ -544,7 +544,12 @@ public class LeaseSet2 extends LeaseSet {
         long pub1k = _published / 1000;
         DataHelper.writeLong(out, 4, pub1k);
         // Divide separately to prevent rounding errors
-        DataHelper.writeLong(out, 2, ((_expires / 1000) - pub1k));
+        long exp = (_expires / 1000) - pub1k;
+        // writeLong() will throw if we try to write a negative, so preempt it with a better message
+        // This will only happen on the client side for leasesets we create.
+        if (exp < 0)
+            throw new DataFormatException("Leaseset expired " + (0 - exp) + " seconds ago");
+        DataHelper.writeLong(out, 2, exp);
         DataHelper.writeLong(out, 2, _flags);
         if (isOffline())
             writeOfflineBytes(out);
