@@ -770,7 +770,8 @@ public class TunnelPool {
                 return null;
         }
 
-        long expireAfter = _context.clock().now(); // + _settings.getRebuildPeriod();
+        // we don't want it to expire before the client signs it or the ff gets it
+        long expireAfter = _context.clock().now() - 10*1000;
         
         TunnelInfo zeroHopTunnel = null;
         Lease zeroHopLease = null;
