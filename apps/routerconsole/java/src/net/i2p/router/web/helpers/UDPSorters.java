@@ -287,7 +287,7 @@ class UDPSorters {
     
     static class PeerComparator implements Comparator<PeerState>, Serializable {
         public int compare(PeerState l, PeerState r) {
-            return DataHelper.compareTo(l.getRemotePeer().getData(), r.getRemotePeer().getData());
+            return HashComparator.comp(l.getRemotePeer(), r.getRemotePeer());
         }
     }
 
