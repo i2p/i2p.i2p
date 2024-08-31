@@ -549,9 +549,7 @@ public class PeerHelper extends HelperBase {
         public int compare(NTCPConnection l, NTCPConnection r) {
             if (l == null || r == null)
                 throw new IllegalArgumentException();
-            // base64 retains binary ordering
-            // UM, no it doesn't, but close enough
-            return l.getRemotePeer().calculateHash().toBase64().compareTo(r.getRemotePeer().calculateHash().toBase64());
+            return HashComparator.comp(l.getRemotePeer().calculateHash(), r.getRemotePeer().calculateHash());
         }
     }
 
