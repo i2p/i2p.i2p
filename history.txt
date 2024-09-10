@@ -1,5 +1,21 @@
+2024-09-10 zzz
+ * Console: Refactor netdb search (Gitlab MR #217)
+
+2024-08-31 zzz
+ * Console: Consolidate hash comparators (Gitlab MR #214)
+
+2024-08-23 zzz
+ * I2CP: Don't include lease about to expire in LS request
+
+2024-08-19 zzz
+ * i2psnark: Fix clear messages button (light theme) (Gitlab #479, Github #81)
+
+2024-08-17 zzz
+ * Naming: lookup fixes
+
 2024-08-16 zzz
  * NetDB, I2CP: Fix tunnels going yellow for several minutes (Gitlab #487)
+ * SVG: Optimize output for horizontal/vertical segments in paths
 
 2024-08-12 zzz
  * Util: Add temp dir timestamper to prevent deletion by systemd
