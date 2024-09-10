@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -93,7 +94,7 @@ class NetDbRenderer {
     }
 
     /**
-     *  One String must be non-null
+     *  At least one String must be non-null, non-empty
      *
      *  @param page zero-based
      *  @param routerPrefix may be null. "." for our router only
@@ -191,16 +192,6 @@ class NetDbRenderer {
             } else {
                 itag = null;
             }
-            if (page > 0) {
-                buf.append("<div class=\"netdbnotfound\">" +
-                           "<a href=\"/netdb?pg=").append(page)
-                   .append("&amp;ps=").append(pageSize).append(ubuf).append("\">");
-                buf.append(_t("Previous Page"));
-                buf.append("</a>&nbsp;&nbsp;&nbsp;");
-                buf.append(_t("Page")).append(' ').append(page + 1);
-                buf.append("</div>");
-            }
-            boolean notFound = true;
             Set<RouterInfo> routers = new HashSet<RouterInfo>();
             routers.addAll(_context.netDb().getRouters());
             int ipMode = 0;
@@ -243,238 +234,44 @@ class NetDbRenderer {
             String familyArg = family;  // save for error message
             if (family != null)
                 family = family.toLowerCase(Locale.US);
-            int toSkip = pageSize * page;
-            int skipped = 0;
-            int written = 0;
-            boolean morePages = false;
-            outerloop:
-            for (RouterInfo ri : routers) {
-                Hash key = ri.getIdentity().getHash();
-                if ((routerPrefix != null && key.toBase64().startsWith(routerPrefix)) ||
-                    (version != null && version.equals(ri.getVersion())) ||
-                    (country != null && country.equals(_context.commSystem().getCountry(key))) ||
-                    // 'O' will catch PO and XO also
-                    (caps != null && hasCap(ri, caps)) ||
-                    (type != null && type == ri.getIdentity().getSigType()) ||
-                    (etype != null && etype == ri.getIdentity().getEncType())) {
-                    if (skipped < toSkip) {
-                        skipped++;
-                        continue;
-                    }
-                    if (written++ >= pageSize) {
-                        morePages = true;
-                        break;
-                    }
-                    renderRouterInfo(buf, ri, false, true);
-                    if (sybil != null)
-                        sybils.add(key);
-                    notFound = false;
-                } else if (tr != null) {
-                    boolean found;
-                    if (tr.equals("NTCP_1")) {
-                        RouterAddress ra = ri.getTargetAddress("NTCP");
-                        found = ra != null && ra.getOption("v") == null;
-                    } else if (tr.equals("NTCP_2")) {
-                        RouterAddress ra = ri.getTargetAddress("NTCP");
-                        found = ra != null && ra.getOption("v") != null;
-                    } else if (tr.equals("SSU_1")) {
-                        RouterAddress ra = ri.getTargetAddress("SSU");
-                        found = ra != null && ra.getOption("v") == null;
-                    } else if (tr.equals("SSU_2")) {
-                        RouterAddress ra = ri.getTargetAddress("SSU");
-                        found = ra != null && ra.getOption("v") != null;
-                    } else {
-                        RouterAddress ra = ri.getTargetAddress(tr);
-                        found = ra != null;
-                    }
-                    if (!found)
-                        continue;
-                    if (skipped < toSkip) {
-                        skipped++;
-                        continue;
-                    }
-                    if (written++ >= pageSize) {
-                        morePages = true;
-                        break;
-                    }
-                    renderRouterInfo(buf, ri, false, true);
-                    if (sybil != null)
-                        sybils.add(key);
-                    notFound = false;
-                } else if (family != null) {
-                    String rifam = ri.getOption("family");
-                    if (rifam != null && rifam.toLowerCase(Locale.US).contains(family)) {
-                        if (skipped < toSkip) {
-                            skipped++;
-                            continue;
-                        }
-                        if (written++ >= pageSize) {
-                            morePages = true;
-                            break outerloop;
-                        }
-                        renderRouterInfo(buf, ri, false, true);
-                        if (sybil != null)
-                            sybils.add(key);
-                        notFound = false;
-                    }
-                } else if (ip != null) {
-                    for (RouterAddress ra : ri.getAddresses()) {
-                        if (ipMode == 0) {
-                            if (ip.equals(ra.getHost())) {
-                                if (skipped < toSkip) {
-                                    skipped++;
-                                    break;
-                                }
-                                if (written++ >= pageSize) {
-                                    morePages = true;
-                                    break outerloop;
-                                }
-                                renderRouterInfo(buf, ri, false, true);
-                                if (sybil != null)
-                                    sybils.add(key);
-                                notFound = false;
-                                break;
-                            }
-                        } else {
-                            String host = ra.getHost();
-                            if (host != null && (host.startsWith(ip) ||
-                                                 (altIPv6 != null && host.startsWith(altIPv6)))) {
-                                if (skipped < toSkip) {
-                                    skipped++;
-                                    break;
-                                }
-                                if (written++ >= pageSize) {
-                                    morePages = true;
-                                    break outerloop;
-                                }
-                                renderRouterInfo(buf, ri, false, true);
-                                if (sybil != null)
-                                    sybils.add(key);
-                                notFound = false;
-                                break;
-                            }
-                        }
-                    }
-                } else if (port != 0) {
-                    for (RouterAddress ra : ri.getAddresses()) {
-                        int raport = ra.getPort();
-                        if (port == raport ||
-                            (highPort > 0 && raport >= port && raport <= highPort)) {
-                            if (skipped < toSkip) {
-                                skipped++;
-                                break;
-                            }
-                            if (written++ >= pageSize) {
-                                morePages = true;
-                                break outerloop;
-                            }
-                            renderRouterInfo(buf, ri, false, true);
-                            if (sybil != null)
-                                sybils.add(key);
-                            notFound = false;
-                            break;
-                        }
-                    }
-                } else if (mtu != null) {
-                    for (RouterAddress ra : ri.getAddresses()) {
-                        if (mtu.equals(ra.getOption("mtu"))) {
-                            if (skipped < toSkip) {
-                                skipped++;
-                                break;
-                            }
-                            if (written++ >= pageSize) {
-                                morePages = true;
-                                break outerloop;
-                            }
-                            renderRouterInfo(buf, ri, false, true);
-                            if (sybil != null)
-                                sybils.add(key);
-                            notFound = false;
-                            break;
-                        }
-                    }
-                } else if (ipv6 != null) {
-                    for (RouterAddress ra : ri.getAddresses()) {
-                        String host = ra.getHost();
-                        if (host != null && (host.startsWith(ipv6) ||
-                                             (altIPv6 != null && host.startsWith(altIPv6)))) {
-                            if (skipped < toSkip) {
-                                skipped++;
-                                break;
-                            }
-                            if (written++ >= pageSize) {
-                                morePages = true;
-                                break outerloop;
-                            }
-                            renderRouterInfo(buf, ri, false, true);
-                            if (sybil != null)
-                                sybils.add(key);
-                            notFound = false;
-                            break;
-                        }
-                    }
-                } else if (ssucaps != null) {
-                    for (RouterAddress ra : ri.getAddresses()) {
-                        if (!"SSU".equals(ra.getTransportStyle()))
-                            continue;
-                        String racaps = ra.getOption("caps");
-                        if (racaps == null)
-                            continue;
-                        if (racaps.contains(ssucaps)) {
-                            if (skipped < toSkip) {
-                                skipped++;
-                                break;
-                            }
-                            if (written++ >= pageSize) {
-                                morePages = true;
-                                break outerloop;
-                            }
-                            renderRouterInfo(buf, ri, false, true);
-                            if (sybil != null)
-                                sybils.add(key);
-                            notFound = false;
-                            break;
-                        }
-                    }
-                } else if (cost != 0) {
-                    for (RouterAddress ra : ri.getAddresses()) {
-                        if (cost == ra.getCost()) {
-                            if (skipped < toSkip) {
-                                skipped++;
-                                break;
-                            }
-                            if (written++ >= pageSize) {
-                                morePages = true;
-                                break outerloop;
-                            }
-                            renderRouterInfo(buf, ri, false, true);
-                            if (sybil != null)
-                                sybils.add(key);
-                            notFound = false;
-                            break;
-                        }
-                    }
-                } else if (itag != null) {
-                    for (RouterAddress ra : ri.getAddresses()) {
-                        if (ra.getOption(itag) != null) {
-                            if (skipped < toSkip) {
-                                skipped++;
-                                break;
-                            }
-                            if (written++ >= pageSize) {
-                                morePages = true;
-                                break outerloop;
-                            }
-                            renderRouterInfo(buf, ri, false, true);
-                            if (sybil != null)
-                                sybils.add(key);
-                            notFound = false;
-                            break;
-                        }
-                    }
-                }
+
+            if (routerPrefix != null && !routers.isEmpty())
+                filterHashPrefix(routers, routerPrefix);
+            if (version != null && !routers.isEmpty())
+                filterVersion(routers, version);
+            if (country != null && !routers.isEmpty())
+                filterCountry(routers, country);
+            if (caps != null && !routers.isEmpty())
+                filterCaps(routers, caps);
+            if (type != null && !routers.isEmpty())
+                filterSigType(routers, type);
+            if (etype != null && !routers.isEmpty())
+                filterEncType(routers, etype);
+            if (tr != null && !routers.isEmpty())
+                filterTransport(routers, tr);
+            if (family != null && !routers.isEmpty())
+                filterFamily(routers, family);
+            if (ip != null && !routers.isEmpty()) {
+                if (ipMode == 0)
+                    filterIP(routers, ip);
+                else
+                    filterIP(routers, ip, altIPv6);
             }
-            if (notFound) {
+            if (port != 0 && !routers.isEmpty())
+                filterPort(routers, port, highPort);
+            if (mtu != null && !routers.isEmpty())
+                filterMTU(routers, mtu);
+            if (ipv6 != null && !routers.isEmpty())
+                filterIP(routers, ipv6, altIPv6);
+            if (ssucaps != null && !routers.isEmpty())
+                filterSSUCaps(routers, ssucaps);
+            if (cost != 0 && !routers.isEmpty())
+                filterCost(routers, cost);
+            if (itag != null && !routers.isEmpty())
+                filterITag(routers, itag);
+
+
+            if (routers.isEmpty()) {
                 buf.append("<div class=\"netdbnotfound\">");
                 buf.append(_t("Router")).append(' ');
                 if (routerPrefix != null)
@@ -506,35 +303,341 @@ class NetDbRenderer {
                 if (caps != null)
                     buf.append("Caps ").append(caps).append(' ');
                 if (ssucaps != null)
-                    buf.append("Caps ").append(ssucaps).append(' ');
+                    buf.append("Transport caps ").append(ssucaps).append(' ');
                 if (tr != null)
                     buf.append(_t("Transport")).append(' ').append(tr).append(' ');
                 if (icount > 0)
                     buf.append("with ").append(icount).append(" introducers ");
                 buf.append(_t("not found in network database"));
                 buf.append("</div>");
-            } else if (page > 0 || morePages) {
-                buf.append("<div class=\"netdbnotfound\">");
-                if (page > 0) {
-                    buf.append("<a href=\"/netdb?pg=").append(page)
-                       .append("&amp;ps=").append(pageSize).append(ubuf).append("\">");
-                    buf.append(_t("Previous Page"));
-                    buf.append("</a>&nbsp;&nbsp;&nbsp;");
+            } else {
+                List<RouterInfo> results = new ArrayList<RouterInfo>(routers);
+                int sz = results.size();
+                if (sz > 1)
+                    Collections.sort(results, RouterInfoComparator.getInstance());
+                boolean morePages = false;
+                int toSkip = pageSize * page;
+                int last = Math.min(toSkip + pageSize, sz - 1);
+                if (last < sz - 1)
+                    morePages = true;
+                if (page > 0 || morePages)
+                    outputPageLinks(buf, ubuf, page, pageSize, morePages);
+                for (int i = toSkip; i <= last; i++) {
+                    RouterInfo ri = results.get(i);
+                    renderRouterInfo(buf, ri, false, true);
+                    if (sybil != null)
+                        sybils.add(ri.getIdentity().getHash());
+                    if ((i & 0x07) == 0) {
+                        out.write(buf.toString());
+                        buf.setLength(0);
+                    }
                 }
-                buf.append(_t("Page")).append(' ').append(page + 1);
-                if (morePages) {
-                    buf.append("&nbsp;&nbsp;&nbsp;<a href=\"/netdb?pg=").append(page + 2)
-                       .append("&amp;ps=").append(pageSize).append(ubuf).append("\">");
-                    buf.append(_t("Next Page"));
-                    buf.append("</a>");
-                }
-                buf.append("</div>");
+                if (page > 0 || morePages)
+                    outputPageLinks(buf, ubuf, page, pageSize, morePages);
             }
         }
         out.write(buf.toString());
         out.flush();
         if (sybil != null)
             SybilRenderer.renderSybilHTML(out, _context, sybils, sybil);
+    }
+
+    /**
+     *  @since 0.9.64 split out from above
+     */
+    private void outputPageLinks(StringBuilder buf, StringBuilder ubuf, int page, int pageSize, boolean morePages) {
+        buf.append("<div class=\"netdbnotfound\">");
+        if (page > 0) {
+            buf.append("<a href=\"/netdb?pg=").append(page)
+               .append("&amp;ps=").append(pageSize).append(ubuf).append("\">");
+            buf.append(_t("Previous Page"));
+            buf.append("</a>&nbsp;&nbsp;&nbsp;");
+        }
+        buf.append(_t("Page")).append(' ').append(page + 1);
+        if (morePages) {
+            buf.append("&nbsp;&nbsp;&nbsp;<a href=\"/netdb?pg=").append(page + 2)
+               .append("&amp;ps=").append(pageSize).append(ubuf).append("\">");
+            buf.append(_t("Next Page"));
+            buf.append("</a>");
+        }
+        buf.append("</div>");
+    }
+
+    /**
+     *  Remove all non-matching from routers
+     *  @since 0.9.64 split out from above
+     */
+    private static void filterHashPrefix(Set<RouterInfo> routers, String routerPrefix) {
+        for (Iterator<RouterInfo> iter = routers.iterator(); iter.hasNext(); ) {
+            RouterInfo ri = iter.next();
+            Hash key = ri.getIdentity().getHash();
+            if (!key.toBase64().startsWith(routerPrefix))
+                iter.remove();
+        }
+    }
+
+    /**
+     *  Remove all non-matching from routers
+     *  @since 0.9.64 split out from above
+     */
+    private static void filterVersion(Set<RouterInfo> routers, String version) {
+        for (Iterator<RouterInfo> iter = routers.iterator(); iter.hasNext(); ) {
+            RouterInfo ri = iter.next();
+            if (!ri.getVersion().equals(version))
+                iter.remove();
+        }
+    }
+
+    /**
+     *  Remove all non-matching from routers
+     *  @since 0.9.64 split out from above
+     */
+    private void filterCountry(Set<RouterInfo> routers, String country) {
+        for (Iterator<RouterInfo> iter = routers.iterator(); iter.hasNext(); ) {
+            RouterInfo ri = iter.next();
+            Hash key = ri.getIdentity().getHash();
+            if (!country.equals(_context.commSystem().getCountry(key)))
+                iter.remove();
+        }
+    }
+
+    /**
+     *  Remove all non-matching from routers
+     *  @since 0.9.64 split out from above
+     */
+    private static void filterCaps(Set<RouterInfo> routers, String caps) {
+        int len = caps.length();
+        outer:
+        for (Iterator<RouterInfo> iter = routers.iterator(); iter.hasNext(); ) {
+            RouterInfo ri = iter.next();
+            String ca = ri.getCapabilities();
+            for (int i = 0; i < len; i++) {
+                // must contain all caps specified
+                if (ca.indexOf(caps.charAt(i)) < 0) {
+                    iter.remove();
+                    continue outer;
+                }
+            }
+        }
+    }
+
+    /**
+     *  Remove all non-matching from routers
+     *  @since 0.9.64 split out from above
+     */
+    private static void filterSigType(Set<RouterInfo> routers, SigType type) {
+        for (Iterator<RouterInfo> iter = routers.iterator(); iter.hasNext(); ) {
+            RouterInfo ri = iter.next();
+            if (ri.getIdentity().getSigType() != type)
+                iter.remove();
+        }
+    }
+
+    /**
+     *  Remove all non-matching from routers
+     *  @since 0.9.64 split out from above
+     */
+    private static void filterEncType(Set<RouterInfo> routers, EncType type) {
+        for (Iterator<RouterInfo> iter = routers.iterator(); iter.hasNext(); ) {
+            RouterInfo ri = iter.next();
+            if (ri.getIdentity().getEncType() != type)
+                iter.remove();
+        }
+    }
+
+
+    /**
+     *  Remove all non-matching from routers
+     *  @since 0.9.64 split out from above
+     */
+    private static void filterTransport(Set<RouterInfo> routers, String tr) {
+        String transport;
+        int mode;
+        if (tr.equals("NTCP_1")) {
+            transport = "NTCP";
+            mode = 0;
+        } else if (tr.equals("NTCP_2")) {
+            transport = "NTCP";
+            mode = 1;
+        } else if (tr.equals("SSU_1")) {
+            transport = "SSU";
+            mode = 2;
+        } else if (tr.equals("SSU_2")) {
+            transport = "SSU";
+            mode = 3;
+        } else {
+            transport = tr;
+            mode = 4;
+        }
+        for (Iterator<RouterInfo> iter = routers.iterator(); iter.hasNext(); ) {
+            RouterInfo ri = iter.next();
+            RouterAddress ra = ri.getTargetAddress(transport);
+            if (ra != null) {
+                switch (mode) {
+                    case 0:
+                    case 2:
+                        if (ra.getOption("v") == null)
+                            continue;
+                        break;
+
+                    case 1:
+                    case 3:
+                        if (ra.getOption("v") != null)
+                            continue;
+                        break;
+
+                    case 4:
+                        continue;
+
+                }
+            }
+            iter.remove();
+        }
+    }
+
+    /**
+     *  Remove all non-matching from routers
+     *  @since 0.9.64 split out from above
+     */
+    private static void filterFamily(Set<RouterInfo> routers, String family) {
+        for (Iterator<RouterInfo> iter = routers.iterator(); iter.hasNext(); ) {
+            RouterInfo ri = iter.next();
+            String fam = ri.getOption("family");
+            if (fam != null) {
+                if (fam.toLowerCase(Locale.US).contains(family))
+                    continue;
+            }
+            iter.remove();
+        }
+    }
+
+    /**
+     *  Exact match
+     *  Remove all non-matching from routers
+     *  @since 0.9.64 split out from above
+     */
+    private static void filterIP(Set<RouterInfo> routers, String ip) {
+        outer:
+        for (Iterator<RouterInfo> iter = routers.iterator(); iter.hasNext(); ) {
+            RouterInfo ri = iter.next();
+            for (RouterAddress ra : ri.getAddresses()) {
+                if (ip.equals(ra.getHost()))
+                    continue outer;
+            }
+            iter.remove();
+        }
+    }
+
+    /**
+     *  Prefix
+     *  Remove all non-matching from routers
+     *  @param altip may be null
+     *  @since 0.9.64 split out from above
+     */
+    private static void filterIP(Set<RouterInfo> routers, String ip, String altip) {
+        outer:
+        for (Iterator<RouterInfo> iter = routers.iterator(); iter.hasNext(); ) {
+            RouterInfo ri = iter.next();
+            for (RouterAddress ra : ri.getAddresses()) {
+                String host = ra.getHost();
+                if (host != null &&
+                    (host.startsWith(ip) || (altip != null && host.startsWith(altip))))
+                    continue outer;
+            }
+            iter.remove();
+        }
+    }
+
+    /**
+     *  Remove all non-matching from routers
+     *  @since 0.9.64 split out from above
+     */
+    private static void filterPort(Set<RouterInfo> routers, int port, int highPort) {
+        outer:
+        for (Iterator<RouterInfo> iter = routers.iterator(); iter.hasNext(); ) {
+            RouterInfo ri = iter.next();
+            for (RouterAddress ra : ri.getAddresses()) {
+                int raport = ra.getPort();
+                if (port == raport ||
+                    (highPort > 0 && raport >= port && raport <= highPort)) {
+                    continue outer;
+                }
+            }
+            iter.remove();
+        }
+    }
+
+    /**
+     *  Remove all non-matching from routers
+     *  @since 0.9.64 split out from above
+     */
+    private static void filterMTU(Set<RouterInfo> routers, String smtu) {
+        outer:
+        for (Iterator<RouterInfo> iter = routers.iterator(); iter.hasNext(); ) {
+            RouterInfo ri = iter.next();
+            for (RouterAddress ra : ri.getAddresses()) {
+                if (smtu.equals(ra.getOption("mtu")))
+                    continue outer;
+            }
+            iter.remove();
+        }
+    }
+
+    /**
+     *  Remove all non-matching from routers
+     *  @since 0.9.64 split out from above
+     */
+    private static void filterSSUCaps(Set<RouterInfo> routers, String caps) {
+        int len = caps.length();
+        outer:
+        for (Iterator<RouterInfo> iter = routers.iterator(); iter.hasNext(); ) {
+            RouterInfo ri = iter.next();
+            inner:
+            for (RouterAddress ra : ri.getAddresses()) {
+                String ca = ra.getOption("caps");
+                if (ca == null)
+                    continue;
+                for (int i = 0; i < len; i++) {
+                    // must contain all caps specified
+                    if (ca.indexOf(caps.charAt(i)) < 0)
+                        break inner;
+                }
+                continue outer;
+            }
+            iter.remove();
+        }
+    }
+
+    /**
+     *  Remove all non-matching from routers
+     *  @since 0.9.64 split out from above
+     */
+    private static void filterCost(Set<RouterInfo> routers, int cost) {
+        outer:
+        for (Iterator<RouterInfo> iter = routers.iterator(); iter.hasNext(); ) {
+            RouterInfo ri = iter.next();
+            for (RouterAddress ra : ri.getAddresses()) {
+                if (ra.getCost() == cost)
+                    continue outer;
+            }
+            iter.remove();
+        }
+    }
+
+    /**
+     *  Remove all non-matching from routers
+     *  @since 0.9.64 split out from above
+     */
+    private static void filterITag(Set<RouterInfo> routers, String itag) {
+        outer:
+        for (Iterator<RouterInfo> iter = routers.iterator(); iter.hasNext(); ) {
+            RouterInfo ri = iter.next();
+            for (RouterAddress ra : ri.getAddresses()) {
+                if (ra.getOption(itag) != null)
+                    continue outer;
+            }
+            iter.remove();
+        }
     }
 
     /**
