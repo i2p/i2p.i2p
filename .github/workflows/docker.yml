@@ -22,7 +22,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Set env
         run:
-          sudo apt-get install -y sed
+          sudo apt-get install -y sed;
           echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" | sed 's|master|latest|g' >> $GITHUB_ENV
       - name: Build and push
         uses: docker/build-push-action@v6
