@@ -4886,14 +4886,7 @@ public class I2PSnarkServlet extends BasicServlet {
             newComment = null;
         if (newCreatedBy.equals(""))
             newCreatedBy = null;
-        MetaInfo newMeta = new MetaInfo(thePrimary, meta.getName(), null, meta.getFiles(), meta.getLengths(),
-                                        meta.getPieceLength(0), meta.getPieceHashes(), meta.getTotalLength(), meta.getPrivateTrackerStatus(),
-                                        newAnnList, newCreatedBy, meta.getWebSeedURLs(), newComment);
-        if (!DataHelper.eq(meta.getInfoHash(), newMeta.getInfoHash())) {
-            // shouldn't happen
-            _manager.addMessage("Torrent edit failed, infohash mismatch");
-            return;
-        }
+        MetaInfo newMeta = new MetaInfo(meta, thePrimary, newAnnList, newComment, newCreatedBy);
         File f = new File(_manager.util().getTempDir(), "edit-" + _manager.util().getContext().random().nextLong() + ".torrent");
         OutputStream out = null;
         try {

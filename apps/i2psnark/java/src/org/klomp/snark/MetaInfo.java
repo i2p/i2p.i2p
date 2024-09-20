@@ -145,6 +145,29 @@ public class MetaInfo
     this.info_hash = calculateInfoHash();
   }
 
+  public MetaInfo(MetaInfo old, String new_announce, List<List<String>> new_announce_list, String new_comment, String new_created_by)
+  {
+    this.announce = new_announce;
+    this.info_hash = old.info_hash;
+    this.name = old.name;
+    this.name_utf8 = old.name_utf8;
+    this.files = old.files;
+    this.files_utf8 = old.files_utf8;
+    this.attributes = old.attributes;
+    this.lengths = old.lengths;
+    this.piece_length = old.piece_length;
+    this.piece_hashes = old.piece_hashes;
+    this.length = old.length;
+    this.privateTorrent = old.privateTorrent;
+    this.announce_list = new_announce_list;
+    this.comment = new_comment;
+    this.created_by = new_created_by;
+    this.creation_date = old.creation_date;
+    this.url_list = old.url_list;
+    this.infoMap = old.infoMap;
+    this.infoBytesLength = old.infoBytesLength;
+  }
+
   /**
    * Creates a new MetaInfo from the given InputStream.  The
    * InputStream must start with a correctly bencoded dictionary
