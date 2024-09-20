@@ -35,10 +35,7 @@ input::-moz-selection {
 
 ::selection {
      color: white;
-}
-
-::-moz-selection {
-     color: white;
+     background: #918;
 }
 
 * {
