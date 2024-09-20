@@ -4886,7 +4886,7 @@ public class I2PSnarkServlet extends BasicServlet {
             newComment = null;
         if (newCreatedBy.equals(""))
             newCreatedBy = null;
-        MetaInfo newMeta = new MetaInfo(meta, thePrimary, newAnnList, newComment, newCreatedBy);
+        MetaInfo newMeta = new MetaInfo(meta, thePrimary, newAnnList, newComment, newCreatedBy, meta.getWebSeedURLs());
         File f = new File(_manager.util().getTempDir(), "edit-" + _manager.util().getContext().random().nextLong() + ".torrent");
         OutputStream out = null;
         try {
