@@ -196,11 +196,13 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         // bugfix release 0.7.8, we weren't dividing by 1000
         packet.setResendDelay(_connection.getOptions().getResendDelay() / 1000);
         
+/*
         if (_connection.getOptions().getProfile() == ConnectionOptions.PROFILE_INTERACTIVE)
             packet.setFlag(Packet.FLAG_PROFILE_INTERACTIVE, true);
         else
             packet.setFlag(Packet.FLAG_PROFILE_INTERACTIVE, false);
-        
+*/
+       
         //if ( (!ackOnly) && (packet.getSequenceNum() <= 0) ) {
         if (isFirst) {
             packet.setFlag(Packet.FLAG_SYNCHRONIZE);

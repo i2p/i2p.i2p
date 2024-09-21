@@ -814,9 +814,15 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * @return the profile of the connection.
      */
     public int getProfile() { return _profile; }
+
+    
+    /**
+     * Set the profile for this connection.
+     * Through API 0.9.63, threw an IllegalArgumentException for any value !=1.
+     * As of API 0.9.64, all values are saved.
+     * Warning: unused.
+     */
     public void setProfile(int profile) { 
-        if (profile != PROFILE_BULK) 
-            throw new IllegalArgumentException("Only bulk is supported so far");
         _profile = profile; 
     }
     
