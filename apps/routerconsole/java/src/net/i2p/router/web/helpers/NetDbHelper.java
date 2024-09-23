@@ -7,11 +7,13 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
 import net.i2p.util.SystemVersion;
 import net.i2p.router.sybil.Analysis;
 import net.i2p.router.web.FormHandler;
@@ -41,7 +43,7 @@ public class NetDbHelper extends FormHandler {
 
     private static final int DEFAULT_LIMIT = SystemVersion.isARM() ? 250 : 500;
     private static final int DEFAULT_PAGE = 0;
-    
+
     private static final String titles[] =
                                           {_x("Summary"),                       // 0
                                            _x("Local Router"),                  // 1
@@ -70,7 +72,7 @@ public class NetDbHelper extends FormHandler {
                                            "",                                  // 9
                                            "?l=7",                              // 10
                                           };
-                                           
+
 
     public void setRouter(String r) {
         if (r != null && r.length() > 0)
@@ -238,14 +240,14 @@ public class NetDbHelper extends FormHandler {
     public void setSort(String f) {
         _sort = f;
     }
-    
+
     /** @since 0.9.58 */
     public void setIntros(String f) {
         try {
             _icount = Integer.parseInt(f);
         } catch (NumberFormatException nfe) {}
     }
-    
+
     /**
      *  call for non-text-mode browsers
      *  @since 0.9.1
@@ -253,7 +255,7 @@ public class NetDbHelper extends FormHandler {
     public void allowGraphical() {
         _graphical = true;
     }
-    
+
     /**
      *  Override to save it
      *  @since 0.9.38
@@ -338,7 +340,9 @@ public class NetDbHelper extends FormHandler {
             } else if (_full == 4) {
                 renderLookupForm();
             } else if (_clientOnly) {
-                for (Hash client : _context.clientManager().getPrimaryHashes()) {
+                TreeSet<Hash> hashes = new TreeSet<Hash>(new HashComparator());
+                hashes.addAll(_context.clientManager().getPrimaryHashes());
+                for (Hash client : hashes) {
                     renderer.renderLeaseSetHTML(_out, false, client);
                 }
             } else {
@@ -430,7 +434,7 @@ public class NetDbHelper extends FormHandler {
      *  @since 0.9.28
      */
     private void renderLookupForm() throws IOException {
-        _out.write("<form action=\"/netdb\" method=\"POST\">\n" + 
+        _out.write("<form action=\"/netdb\" method=\"POST\">\n" +
                    "<input type=\"hidden\" name=\"nonce\" value=\"" + _newNonce + "\" >\n" +
                    "<table id=\"netdblookup\"><tr><th colspan=\"3\">Network Database Search</th></tr>\n" +
                    "<tr><td>Capabilities:</td><td><input type=\"text\" name=\"caps\"></td><td>e.g. f or XfR</td></tr>\n" +

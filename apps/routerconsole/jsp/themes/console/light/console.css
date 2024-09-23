@@ -7230,6 +7230,8 @@ a[href^="configpeer?peer"]:hover {
     -moz-column-gap: 10px;
     -webkit-column-gap: 10px;
     column-gap: 10px;
+    padding: 8px;
+    border: 1px groove rgb(82, 75, 94);
 }
 
 th code {
