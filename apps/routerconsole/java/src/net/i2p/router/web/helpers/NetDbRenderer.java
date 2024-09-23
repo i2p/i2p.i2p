@@ -698,6 +698,9 @@ class NetDbRenderer {
             fmt = null;
         }
         leases.addAll(netdb.getLeases());
+        LeaseSet myLeaseSet = new LeaseSet();
+        if (netdb.getLeases().size() > 0)
+            myLeaseSet = new ArrayList<LeaseSet>(netdb.getLeases()).get(0);
         int medianCount = 0;
         int rapCount = 0;
         BigInteger median = null;
@@ -711,14 +714,77 @@ class NetDbRenderer {
             buf.append("<table id=\"leasesetsummary\">\n");
         }
         if (client != null) {
-            buf.append("<tr><th colspan=\"3\">Leasesets for Client: ").append(client.toBase32()).append("</th><th></th></tr>\n");
+            buf.append("<tr><th colspan=\"3\">").append(_t("Leasesets for Client")).append(": ");
+            buf.append(client.toBase32());
+            if (netdb.getLeases().size() > 0) {
+                TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(myLeaseSet.getHash());
+                if (in != null && in.getDestinationNickname() != null)
+                    buf.append("  -  ").append(DataHelper.escapeHTML(in.getDestinationNickname()));
+                buf.append("</th><th></th></tr>\n");
+                boolean unpublished = ! _context.clientManager().shouldPublishLeaseSet(myLeaseSet.getHash());
+                if (unpublished) {
+                    buf.append("<tr><th colspan=\"3\">").append(_t("Local")).append(" ");
+                    if (myLeaseSet.getType() == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 || _context.keyRing().get(myLeaseSet.getHash()) != null)
+                        buf.append(" <b>(").append(_t("Encrypted")).append(")</b>");
+                    buf.append(_t("Unpublished")).append(" ");
+                } else {
+                    buf.append("<tr><th colspan=\"3\">").append(_t("Local")).append(" ");
+                    if (myLeaseSet.getType() == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 || _context.keyRing().get(myLeaseSet.getHash()) != null)
+                        buf.append(" <b>(").append(_t("Encrypted")).append(")</b>");
+                    buf.append(_t("Published")).append(" ");
+                    LeaseSet2 ls2 = (LeaseSet2) myLeaseSet;
+                    long now = _context.clock().now();
+                    long pub = now - ls2.getPublished();
+                    buf.append(_t("{0} ago", DataHelper.formatDuration2(pub)));
+                    long exp;
+                    if (myLeaseSet.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+                        exp = ls2.getLatestLeaseDate() - now;
+                    } else {
+                        exp = ls2.getExpires()-now;
+                    }
+                    buf.append(" - ");
+                    if (exp > 0)
+                        buf.append(_t("Expires in {0}", DataHelper.formatDuration2(exp)));
+                    else
+                        buf.append(_t("Expired {0} ago", DataHelper.formatDuration2(0-exp)));
+                }
+                buf.append("</th><th></th></tr>\n");
+                buf.append("\n<tr><td colspan=\"2\"><ul class=\"netdb_leases\">");
+                boolean isMeta = myLeaseSet.getType() == DatabaseEntry.KEY_TYPE_META_LS2;
+                for (int i = 0; i < myLeaseSet.getLeaseCount(); i++) {
+                    Lease lease = myLeaseSet.getLease(i);
+                    buf.append("<li><b>").append(_t("Lease")).append(' ').append(i + 1).append(":</b> <span class=\"tunnel_peer\">");
+                    buf.append(_context.commSystem().renderPeerHTML(lease.getGateway()));
+                    buf.append("</span> ");
+                    if (!isMeta) {
+                        buf.append("<span class=\"netdb_tunnel\">").append(_t("Tunnel")).append(" <span class=\"tunnel_id\">")
+                        .append(lease.getTunnelId().getTunnelId()).append("</span></span> ");
+                    }
+                    if (debug) {
+                        long now = _context.clock().now();
+                        long exl = lease.getEndTime() - now;
+                        buf.append("<b class=\"netdb_expiry\">");
+                        if (exl > 0)
+                            buf.append(_t("Expires in {0}", DataHelper.formatDuration2(exl)));
+                        else
+                            buf.append(_t("Expired {0} ago", DataHelper.formatDuration2(0-exl)));
+                        buf.append("</b>");
+                    }
+                    buf.append("</li>");
+                }
+                buf.append("</ul></td></tr>\n");
+            }
+            buf.append("<tr><td><b>Total Known Remote Leasesets:</b></td><td colspan=\"3\">").append(leases.size()-1).append("</td></tr>\n");
+            buf.append("</ul></td></tr>\n" +
+                   "</table>\n");
         } else {
             buf.append("<tr><th colspan=\"3\">Leaseset Summary for Floodfill</th>" +
                        "<th><a href=\"/configadvanced\" title=\"").append(_t("Manually Configure Floodfill Participation")).append("\">[")
                .append(_t("Configure Floodfill Participation"))
                .append("]</a></th></tr>\n");
+               buf.append("<tr><td><b>Total Known Leasesets:</b></td><td colspan=\"3\">").append(leases.size()).append("</td></tr>\n");
         }
-        buf.append("<tr><td><b>Total Leasesets:</b></td><td colspan=\"3\">").append(leases.size()).append("</td></tr>\n");
+
         if (debug) {
             RouterKeyGenerator gen = _context.routerKeyGenerator();
             buf.append("<tr><td><b>Published (RAP) Leasesets:</b></td><td colspan=\"3\">").append(netdb.getKnownLeaseSets()).append("</td></tr>\n")
@@ -767,9 +833,11 @@ class NetDbRenderer {
             } else {
                 distance = null;
             }
-            renderLeaseSet(buf, ls, debug, now, linkSusi, distance);
-            out.write(buf.toString());
-            buf.setLength(0);
+            if (myLeaseSet == null || ls.getHash() != myLeaseSet.getHash()) {
+                renderLeaseSet(buf, ls, debug, now, linkSusi, distance);
+                out.write(buf.toString());
+                buf.setLength(0);
+            }
           } // for each
           if (debug) {
               buf.append("<table id=\"leasesetdebug\"><tr><td><b>Network data (only valid if floodfill):</b></td><td colspan=\"3\">");
@@ -1221,7 +1289,7 @@ class NetDbRenderer {
         out.write(buf.toString());
         out.flush();
     }
-    
+
     /**
      * Countries now in a separate bundle
      * @param code two-letter country code
@@ -1478,7 +1546,7 @@ class NetDbRenderer {
         } else if (ip.contains(":0:")) {
             // convert to canonical
             return Addresses.toCanonicalString(ip);
-        }		
+        }
         return null;
     }
 
