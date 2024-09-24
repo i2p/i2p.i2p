@@ -699,13 +699,12 @@ class NetDbRenderer {
         }
         leases.addAll(netdb.getLeases());
         LeaseSet myLeaseSet = new LeaseSet();
-        if (netdb.getLeases().size() > 0)
-            myLeaseSet = new ArrayList<LeaseSet>(netdb.getLeases()).get(0);
+        if (leases.size() > 0)
+            myLeaseSet = netdb.lookupLeaseSetLocally(client);
         int medianCount = 0;
         int rapCount = 0;
         BigInteger median = null;
         int c = 0;
-
 
         // Summary
         if (debug) {
@@ -716,7 +715,7 @@ class NetDbRenderer {
         if (client != null) {
             buf.append("<tr><th colspan=\"3\">").append(_t("Leasesets for Client")).append(": ");
             buf.append(client.toBase32());
-            if (netdb.getLeases().size() > 0) {
+            if (leases.size() > 0) {
                 TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(myLeaseSet.getHash());
                 if (in != null && in.getDestinationNickname() != null)
                     buf.append("  -  ").append(DataHelper.escapeHTML(in.getDestinationNickname()));
@@ -833,7 +832,7 @@ class NetDbRenderer {
             } else {
                 distance = null;
             }
-            if (myLeaseSet == null || ls.getHash() != myLeaseSet.getHash()) {
+            if (ls.getHash().equals(myLeaseSet.getHash())) {
                 renderLeaseSet(buf, ls, debug, now, linkSusi, distance);
                 out.write(buf.toString());
                 buf.setLength(0);
