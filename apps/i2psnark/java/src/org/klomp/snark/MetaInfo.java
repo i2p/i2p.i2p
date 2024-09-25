@@ -149,11 +149,11 @@ public class MetaInfo
    *  Will not change infohash.
    *  Retains creation date of old MetaInfo if nonzero.
    *
-   *  @parm new_announce may be null
-   *  @parm new_announce_list may be null
-   *  @parm new_comment may be null
-   *  @parm new_created_by may be null
-   *  @parm new_url_list may be null
+   *  @param new_announce may be null
+   *  @param new_announce_list may be null
+   *  @param new_comment may be null
+   *  @param new_created_by may be null
+   *  @param new_url_list may be null
    *  @since 0.9.64
    */
   public MetaInfo(MetaInfo old, String new_announce, List<List<String>> new_announce_list, String new_comment,
