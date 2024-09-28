@@ -1,3 +1,9 @@
+2024-09-21 zzz
+ * streaming: Allow i2p.streaming.profile != 1
+
+2024-09-20 zzz
+ * i2psnark: Fix broken infohash after torrent edit (Gitlab MR #216)
+
 2024-09-10 zzz
  * Console: Refactor netdb search (Gitlab MR #217)
 
