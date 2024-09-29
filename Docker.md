@@ -4,7 +4,8 @@
 If you just want to give I2P a quick try or are using it on a home network, follow these steps:
 
 1. Create two directories `i2pconfig` and `i2ptorrents`
-2. Copy the following text and save it in a file `docker-compose.yml`
+2. Create an `.env` file containing the `EXT_PORT` environment variable.
+3. Copy the following text and save it in a file `docker-compose.yml`
 ```
 version: "3.5"
 services:
@@ -14,14 +15,14 @@ services:
             - 127.0.0.1:4444:4444
             - 127.0.0.1:6668:6668
             - 127.0.0.1:7657:7657
-            - 54321:12345
-            - 54321:12345/udp
+            - "$EXT_PORT":"$EXT_PORT"
+            - "$EXT_PORT":"$EXT_PORT"/udp
         volumes:
             - ./i2pconfig:/i2p/.i2p
             - ./i2ptorrents:/i2psnark
 ```
-3. Execute `docker-compose up`
-4. Start a browser and go to `http://127.0.0.1:7657` to complete the setup wizard.
+4. Execute `docker-compose up`
+5. Start a browser and go to `http://127.0.0.1:7657` to complete the setup wizard.
 
 Note that this quick-start approach is not recommended for production deployments on remote servers.  Please read the rest of this document for more information.
 
@@ -81,13 +82,13 @@ docker build -t geti2p/i2p .
 # I2NP port needs TCP and UDP.  Change the 54321 to something random, greater than 1024.
 docker run \
     -e JVM_XMX=256m \
+    -e EXT_PORT=54321 \
     -v i2phome:/i2p/.i2p \
     -v i2ptorrents:/i2psnark \
     -p 127.0.0.1:4444:4444 \
     -p 127.0.0.1:6668:6668 \
     -p 127.0.0.1:7657:7657 \
-    -p 54321:12345 \
-    -p 54321:12345/udp \
+    -p "$EXT_PORT":"$EXT_PORT" \
+    -p "$EXT_PORT":"$EXT_PORT"/udp \
     geti2p/i2p:latest
 ```
-
