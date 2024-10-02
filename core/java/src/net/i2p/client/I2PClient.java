@@ -92,7 +92,7 @@ public interface I2PClient {
      * @param destKeyStream location from which to read the Destination, PrivateKey, and SigningPrivateKey from,
      *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param options set of options to configure the router with, if null will use System properties
-     * @return new session allowing a Destination to recieve all of its messages and send messages to any other Destination.
+     * @return new session allowing a Destination to receive all of its messages and send messages to any other Destination.
      */
     public I2PSession createSession(InputStream destKeyStream, Properties options) throws I2PSessionException;
 

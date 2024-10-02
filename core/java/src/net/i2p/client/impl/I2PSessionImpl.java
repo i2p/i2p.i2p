@@ -921,7 +921,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
 *******/
 
     /**
-     * Recieve a payload message and let the app know its available
+     * Receive a payload message and let the app know its available
      */
     public void addNewMessage(MessagePayloadMessage msg) {
         Long mid = Long.valueOf(msg.getMessageId());
@@ -1044,7 +1044,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     
     /**
      * The I2CPMessageEventListener callback.
-     * Recieve notification of some I2CP message and handle it if possible.
+     * Receive notification of some I2CP message and handle it if possible.
      *
      * We route the message based on message type AND session ID.
      *
@@ -1127,7 +1127,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
 
     /** 
      * The I2CPMessageEventListener callback.
-     * Recieve notifiation of an error reading the I2CP stream.
+     * Receive notifiation of an error reading the I2CP stream.
      * As of 0.9.41, does NOT call sessionlistener.disconnected(),
      * the I2CPMessageReader will call disconnected() also.
      *
@@ -1423,7 +1423,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
 
     /**
      * The I2CPMessageEventListener callback.
-     * Recieve notification that the I2CP connection was disconnected.
+     * Receive notification that the I2CP connection was disconnected.
      * Calls sessionlistener.disconnected()
      * @param reader unused
      */

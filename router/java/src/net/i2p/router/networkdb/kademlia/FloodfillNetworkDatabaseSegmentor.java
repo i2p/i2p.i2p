@@ -28,7 +28,7 @@ import net.i2p.util.Log;
  * And there are an unlimited number of "Client" netDbs. These sub-netDbs are
  * intended to contain only the information required to operate them, and as such
  * most of them are very small, containing only a few LeaseSets belonging to clients.
- * Each one corresponds to a Destination which can recieve information from the
+ * Each one corresponds to a Destination which can receive information from the
  * netDb, and can be indexed either by it's hash or by it's base32 address. This index
  * is known as the 'dbid' or database id.
  * 

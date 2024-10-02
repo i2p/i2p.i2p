@@ -1172,7 +1172,7 @@ class Connection {
     public long getCongestionWindowEnd() { return _congestionWindowEnd; }
     public void setCongestionWindowEnd(long endMsg) { _congestionWindowEnd = endMsg; }
 
-    /** @return the highest outbound packet we have recieved an ack for */
+    /** @return the highest outbound packet we have received an ack for */
     public long getHighestAckedThrough() { return _highestAckedThrough; }
     
     public long getLastActivityOn() {

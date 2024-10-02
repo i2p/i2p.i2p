@@ -91,7 +91,7 @@ class ClientConnectionRunner {
     protected I2CPMessageReader _reader;
     /** Used for all sessions, which must all have the same crypto keys */
     private SessionKeyManager _sessionKeyManager;
-    /** Used for leaseSets sent to and recieved from this client */
+    /** Used for leaseSets sent to and received from this client */
     private FloodfillNetworkDatabaseFacade _floodfillNetworkDatabaseFacade;
     /** 
      * This contains the last 10 MessageIds that have had their (non-ack) status 

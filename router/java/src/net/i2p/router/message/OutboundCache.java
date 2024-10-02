@@ -97,7 +97,7 @@ public class OutboundCache {
 
 
     /**
-     * This cache is used to keep track of when we recieve a leaseSet from a router
+     * This cache is used to keep track of when we receive a leaseSet from a router
      * we are multihomed with, or otherwise are asked to store a valid routerInfo for
      * a destination which we also host.
      */

@@ -124,7 +124,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             if (ls.getReceivedAsPublished()) {
                 //* Answer anything that was stored to us directly.
                 //(i.e. "received as published" - not the result of a query).
-                //* LeaseSets recieved over a client tunnel will be routed into subDbs.
+                //* LeaseSets received over a client tunnel will be routed into subDbs.
                 // subDbs are responsible for publishing their "own" client LeaseSets.
                 //* The "main" netDb can safely store it's own copies of a LeaseSet
                 // belonging to a Local client, when it is published back to it. Therefore,
