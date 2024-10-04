@@ -5,18 +5,19 @@
 # 
 # Translators:
 # Alex <hestia@riseup.net>, 2012
-# Chris Stormrider, 2017
+# ed54681d62d1fc69b1beefd9af6eb059_0c26818, 2017
 # LaScapigliata <ditri2000@hotmail.com>, 2015
 # Alex <hestia@riseup.net>, 2012
 # lixtetrax <lixtetrax@grhack.net>, 2012
+# THANOS SIOURDAKIS <siourdakisthanos@gmail.com>, 2024
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:33+0000\n"
-"PO-Revision-Date: 2017-10-30 21:21+0000\n"
-"Last-Translator: Chris Stormrider\n"
-"Language-Team: Greek (http://www.transifex.com/otf/I2P/language/el/)\n"
+"POT-Creation-Date: 2020-08-12 13:39+0000\n"
+"PO-Revision-Date: 2013-10-14 15:34+0000\n"
+"Last-Translator: THANOS SIOURDAKIS <siourdakisthanos@gmail.com>, 2024\n"
+"Language-Team: Greek (http://app.transifex.com/otf/I2P/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -763,6 +764,9 @@ msgstr "Ουαλίς και Φουτουνά"
 
 msgid "Samoa"
 msgstr "Σαμόα"
+
+msgid "Kosovo"
+msgstr "Κοσσυφοπέδιο"
 
 msgid "Yemen"
 msgstr "Υεμένη"

@@ -6,7 +6,7 @@
 # Translators:
 # A5h8d0wf0x <littleslyfoxie28@gmail.com>, 2014
 # slrslr, 2022,2024
-# Jiří Podhorecký, 2020-2021
+# Jiří Podhorecký <jirka.p@volny.cz>, 2020-2021
 # Waseihou Watashi <waseihou@gmail.com>, 2012
 msgid ""
 msgstr ""
@@ -188,7 +188,7 @@ msgstr "Neplatná adresa"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:185
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:178
 msgid "Hidden Services Manager"
-msgstr "Manažer skrytých služeb"
+msgstr "Správce skrytých služeb"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:172
 msgid "Edit Client Tunnel"

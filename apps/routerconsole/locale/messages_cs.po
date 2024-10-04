@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-05 17:34+0000\n"
+"POT-Creation-Date: 2024-07-29 20:06+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
 "Last-Translator: slrslr, 2022-2024\n"
 "Language-Team: Czech (http://app.transifex.com/otf/I2P/language/cs/)\n"
@@ -22,34 +22,34 @@ msgstr ""
 "Language: cs\n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
-#: ../../../router/java/src/net/i2p/router/Blocklist.java:352
+#: ../../../router/java/src/net/i2p/router/Blocklist.java:290
 #, java-format
 msgid "Banned by router hash: {0}"
 msgstr "Zakázáno hashem routeru: {0}"
 
-#: ../../../router/java/src/net/i2p/router/Blocklist.java:354
+#: ../../../router/java/src/net/i2p/router/Blocklist.java:292
 msgid "Banned by router hash"
 msgstr "Zakázáno hashem routeru"
 
 #. Temporary reason, until the job finishes
-#: ../../../router/java/src/net/i2p/router/Blocklist.java:1221
-#: ../../../router/java/src/net/i2p/router/Blocklist.java:1322
+#: ../../../router/java/src/net/i2p/router/Blocklist.java:1147
+#: ../../../router/java/src/net/i2p/router/Blocklist.java:1242
 #, java-format
 msgid "IP banned by blocklist.txt entry {0}"
 msgstr "IP adresa zakázána v souboru blocklist.txt, záznam {0}"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1528
+#: ../../../router/java/src/net/i2p/router/Router.java:1531
 #: ../java/src/net/i2p/router/web/helpers/ConfigRestartBean.java:69
 msgid "Restart imminent"
 msgstr "Připravuje se restart"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1530
+#: ../../../router/java/src/net/i2p/router/Router.java:1533
 #: ../java/src/net/i2p/router/web/helpers/ConfigRestartBean.java:71
 msgid "Shutdown imminent"
 msgstr "Vypínání"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:2032
-#: ../../../router/java/src/net/i2p/router/sybil/Analysis.java:1087
+#: ../../../router/java/src/net/i2p/router/Router.java:2035
+#: ../../../router/java/src/net/i2p/router/sybil/Analysis.java:1090
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1235
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1240
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:982
@@ -65,17 +65,17 @@ msgstr "Vypínání"
 msgid "{0} ago"
 msgstr "před {0}"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:236
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:241
 #, java-format
 msgid "Reseeding: got router info from file ({0} successful, {1} errors)."
 msgstr "Reseedování: načítání informací o routeru ze souboru ({0} úspěšné, {1} chyby)."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:342
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:347
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:34
 msgid "Reseeding"
 msgstr "Opětovné sdílení (reseeding)"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:364
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:369
 #, java-format
 msgid "Reseed successful, fetched {0} router info"
 msgid_plural "Reseed successful, fetched {0} router infos"
@@ -84,7 +84,7 @@ msgstr[1] "Reseed úspěšný, získány {0} router informace"
 msgstr[2] "Reseed úspěšný, získáno {0} router informací"
 msgstr[3] "Reseed úspěšný, získáno {0} router informací"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:370
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:375
 #, java-format
 msgid "Reseed fetched only 1 router."
 msgid_plural "Reseed fetched only {0} routers."
@@ -93,26 +93,26 @@ msgstr[1] "Reseed získal jen {0} routery."
 msgstr[2] "Reseed získal jen {0} routerů."
 msgstr[3] "Reseed získal jen {0} routerů."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:394
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:399
 msgid "Reseed failed."
 msgstr "Reseed selhal."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:395
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:400
 #, java-format
 msgid "See {0} for help."
 msgstr "Další informace viz. {0}."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:396
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:401
 msgid "reseed configuration page"
 msgstr "stránka nastavení reseedování"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:652
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:786
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:657
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:791
 msgid "Reseeding: fetching seed URL."
 msgstr "Reseedovaní: načítání seedované URL."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:711
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:830
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:716
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:835
 #, java-format
 msgid ""
 "Reseeding: fetching router info from seed URL ({0} successful, {1} errors)."
@@ -165,19 +165,19 @@ msgstr "Záznam NetDB"
 msgid "No transports (hidden or starting up?)"
 msgstr "Žádné transporty (skryté nebo začínající?)"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:931
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:917
 msgid "Unsupported signature type"
 msgstr "Nepodporovaný typ podpisu"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:949
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:935
 msgid "No support for our signature type"
 msgstr "Žádná podpora pro náš typ podpisu"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:953
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:939
 msgid "Unreachable on any transport"
 msgstr "Nedostupné na každém transportu"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:1058
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:1044
 #: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:395
 msgid "UPnP is not enabled"
 msgstr "UPnP není povolen"
@@ -369,7 +369,7 @@ msgstr "Žádná nová verze není k dispozici pro plugin {0}"
 #: ../java/src/net/i2p/router/update/UnsignedUpdateRunner.java:41
 #: ../java/src/net/i2p/router/update/UpdateRunner.java:155
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:166
-#: ../java/src/net/i2p/router/web/PluginStarter.java:207
+#: ../java/src/net/i2p/router/web/PluginStarter.java:208
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:617
 msgid "HTTP client proxy tunnel must be running"
 msgstr "HTTP klient proxy tunel musí běžet"
@@ -419,7 +419,7 @@ msgid "Failed copy to {0}"
 msgstr "Kopírováno do {0} selhalo"
 
 #: ../java/src/net/i2p/router/update/DevSU3UpdateChecker.java:83
-#: ../java/src/net/i2p/router/update/NewsFetcher.java:280
+#: ../java/src/net/i2p/router/update/NewsFetcher.java:336
 #: ../java/src/net/i2p/router/update/UnsignedUpdateChecker.java:90
 #, java-format
 msgid "Requires Java version {0} but installed Java version is {1}"
@@ -432,19 +432,19 @@ msgstr "Vyžaduje Java verze {0} ale nainstalována je Java verze {1}"
 msgid "Updating"
 msgstr "Aktualizace"
 
-#: ../java/src/net/i2p/router/update/NewsFetcher.java:242
+#: ../java/src/net/i2p/router/update/NewsFetcher.java:298
 msgid "In-network updates disabled. Check package manager."
 msgstr "Aktualizace v síti jsou vypnuté. Zkontrolujte správce softwarových balíčků."
 
-#: ../java/src/net/i2p/router/update/NewsFetcher.java:248
+#: ../java/src/net/i2p/router/update/NewsFetcher.java:304
 msgid "No write permission for I2P install directory."
 msgstr "Chybí právo zápisu do složky I2P instalace."
 
-#: ../java/src/net/i2p/router/update/NewsFetcher.java:262
+#: ../java/src/net/i2p/router/update/NewsFetcher.java:318
 msgid "No update certificates installed."
 msgstr "Nebyly nainstalovány žádné certifikáty aktualizace."
 
-#: ../java/src/net/i2p/router/update/NewsFetcher.java:270
+#: ../java/src/net/i2p/router/update/NewsFetcher.java:326
 #, java-format
 msgid "You must first update to version {0}"
 msgstr "Musíte nejprve aktualizovat na verzi {0}"
@@ -536,13 +536,13 @@ msgid "Plugin {0} has mismatched versions"
 msgstr "Plugin {0} má neodpovídající verze"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:434
-#: ../java/src/net/i2p/router/web/PluginStarter.java:358
+#: ../java/src/net/i2p/router/web/PluginStarter.java:359
 #, java-format
 msgid "This plugin requires I2P version {0} or higher"
 msgstr "Tento plugin vyžaduje I2P verzi {0} nebo vyšší"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:441
-#: ../java/src/net/i2p/router/web/PluginStarter.java:367
+#: ../java/src/net/i2p/router/web/PluginStarter.java:368
 #, java-format
 msgid "This plugin requires Java version {0} or higher"
 msgstr "Tento plugin vyžaduje Java verze {0} nebo vyšší"
@@ -577,21 +577,21 @@ msgid "Plugin update requires installed plugin version {0} or lower"
 msgstr "Aktualizace pluginu vyžaduje nainstalovaný plugin verze {0} nebo nižší"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:497
-#: ../java/src/net/i2p/router/web/PluginStarter.java:378
+#: ../java/src/net/i2p/router/web/PluginStarter.java:379
 #, java-format
 msgid "Plugin requires Jetty version {0} or higher"
 msgstr "Plugin vyžaduje Jetty verze {0} nebo vyšší"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:504
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:520
-#: ../java/src/net/i2p/router/web/PluginStarter.java:389
-#: ../java/src/net/i2p/router/web/PluginStarter.java:411
+#: ../java/src/net/i2p/router/web/PluginStarter.java:390
+#: ../java/src/net/i2p/router/web/PluginStarter.java:412
 #, java-format
 msgid "Plugin requires Jetty version {0} or lower"
 msgstr "Plugin vyžaduje Jetty verze {0} nebo nižší"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:512
-#: ../java/src/net/i2p/router/web/PluginStarter.java:400
+#: ../java/src/net/i2p/router/web/PluginStarter.java:401
 #, java-format
 msgid "Plugin requires Java version {0} or lower"
 msgstr "Plugin vyžaduje Java verze {0} nebo nižší"
@@ -658,14 +658,14 @@ msgstr "Žádná nová verze nebyla nalezena na {0}"
 
 #: ../java/src/net/i2p/router/web/CSSHelper.java:185
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:241
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:61
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:142
 #: ../java/strings/Strings.java:28
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/certs_jsp.java:317
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/certs_jsp.java:319
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:319
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:321
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:319
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:321
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:329
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:331
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:329
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:331
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:335
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:337
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:329
@@ -694,8 +694,8 @@ msgstr "Žádná nová verze nebyla nalezena na {0}"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:324
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:329
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:331
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:322
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:324
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:331
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:333
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:329
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:331
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configwebapps_jsp.java:329
@@ -705,8 +705,8 @@ msgstr "Žádná nová verze nebyla nalezena na {0}"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/console_jsp.java:417
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/debug_jsp.java:322
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/debug_jsp.java:324
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:347
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:349
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:351
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:261
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error_jsp.java:340
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error_jsp.java:342
@@ -714,15 +714,15 @@ msgstr "Žádná nová verze nebyla nalezena na {0}"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/events_jsp.java:333
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graph_jsp.java:348
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graph_jsp.java:350
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:336
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:338
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:345
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:347
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:331
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:333
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:300
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:302
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:381
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:348
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:350
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:352
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jars_jsp.java:327
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jars_jsp.java:329
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jobs_jsp.java:317
@@ -745,14 +745,14 @@ msgstr "Žádná nová verze nebyla nalezena na {0}"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:321
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:311
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:313
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:348
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:350
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:352
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:327
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:329
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/viewprofile_jsp.java:317
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/viewprofile_jsp.java:319
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:348
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:350
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:352
 msgid "I2P Router Console"
 msgstr "I2P konzole routeru"
 
@@ -935,7 +935,7 @@ msgstr "Vypnuta systémová lišta"
 #: ../java/src/net/i2p/router/web/helpers/ConfigStatsHandler.java:125
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:121
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:145
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:509
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:517
 msgid "Restart required to take effect"
 msgstr "Je vyžadován restart"
 
@@ -1008,7 +1008,7 @@ msgstr "Aktualizace frekvence obnovení na {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:243
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:126
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:414
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:422
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:322
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:353
 msgid "Never"
@@ -1055,17 +1055,17 @@ msgstr "Stáhnout, ověřit a restartovat"
 
 #: ../java/src/net/i2p/router/web/DeadlockDetector.java:84
 #: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:39
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:981
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:982
 msgid "Deadlock detected"
 msgstr "Rozpoznán deadlock"
 
 #: ../java/src/net/i2p/router/web/DeadlockDetector.java:84
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:983
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:984
 msgid "Please report"
 msgstr "Prosím nahlaste"
 
 #: ../java/src/net/i2p/router/web/DeadlockDetector.java:99
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:984
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:985
 msgid "After reporting, please restart your router"
 msgstr "Po nahlášení prosím restartujte router"
 
@@ -1081,38 +1081,38 @@ msgid ""
 "browser."
 msgstr "Pokud problém přetrvává, ověřte, že máte v prohlížeči zapnuté cookies."
 
-#: ../java/src/net/i2p/router/web/NewsHelper.java:304
+#: ../java/src/net/i2p/router/web/NewsHelper.java:306
 #, java-format
 msgid "News last updated {0} ago."
 msgstr "Novinky naposledy aktualizovány před {0}."
 
-#: ../java/src/net/i2p/router/web/NewsHelper.java:310
+#: ../java/src/net/i2p/router/web/NewsHelper.java:312
 #, java-format
 msgid "News last checked {0} ago."
 msgstr "Novinky naposledy zkontrolovány před {0}."
 
-#: ../java/src/net/i2p/router/web/NewsHelper.java:319
+#: ../java/src/net/i2p/router/web/NewsHelper.java:321
 msgid "Hide news"
 msgstr "Skrýt novinky"
 
-#: ../java/src/net/i2p/router/web/NewsHelper.java:322
+#: ../java/src/net/i2p/router/web/NewsHelper.java:324
 msgid "Show news"
 msgstr "Ukázat novinky"
 
-#: ../java/src/net/i2p/router/web/NewsHelper.java:326
+#: ../java/src/net/i2p/router/web/NewsHelper.java:328
 msgid "Show all news"
 msgstr "Ukázat všechny novinky"
 
-#: ../java/src/net/i2p/router/web/PluginStarter.java:190
+#: ../java/src/net/i2p/router/web/PluginStarter.java:191
 msgid "Checking for plugin updates"
 msgstr "Kontrola aktualizací pluginu"
 
-#: ../java/src/net/i2p/router/web/PluginStarter.java:205
-#: ../java/src/net/i2p/router/web/PluginStarter.java:211
+#: ../java/src/net/i2p/router/web/PluginStarter.java:206
+#: ../java/src/net/i2p/router/web/PluginStarter.java:212
 msgid "Plugin update check failed"
 msgstr "Selhala kontrola aktualizace pluginu"
 
-#: ../java/src/net/i2p/router/web/PluginStarter.java:249
+#: ../java/src/net/i2p/router/web/PluginStarter.java:250
 #, java-format
 msgid "{0} plugin updated"
 msgid_plural "{0} plugins updated"
@@ -1121,55 +1121,61 @@ msgstr[1] "{0} pluginy aktualizovány"
 msgstr[2] "{0} pluginů aktualizováno"
 msgstr[3] "{0} pluginů aktualizováno"
 
-#: ../java/src/net/i2p/router/web/PluginStarter.java:251
+#: ../java/src/net/i2p/router/web/PluginStarter.java:252
 msgid "Plugin update check complete"
 msgstr "Kontrola aktualizace pluginu je hotova"
 
 #: ../java/src/net/i2p/router/web/StatSummarizer.java:435
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:255
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:263
 msgid "Bandwidth usage"
 msgstr "Využití datového přenosu"
 
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:216
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:220
 #, java-format
 msgid "events in {0}"
 msgstr "událostí v {0}"
 
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:218
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:222
 #, java-format
 msgid "averaged for {0}"
 msgstr "průměrně {0}"
 
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:228
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:233
 msgid "Events per period"
 msgstr "Událostí za periodu"
 
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:253
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:273
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:261
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:263
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:292
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:294
 #: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:156
 #: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:158
 msgid "Avg"
 msgstr "Prům."
 
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:256
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:276
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:267
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:269
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:298
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:300
 #: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:157
 #: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:159
 msgid "Max"
 msgstr "Max"
 
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:259
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:279
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:273
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:275
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:304
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:306
 msgid "Now"
 msgstr "Nyní"
 
 #. RTL languages
 #. ctx.router().shutdown(Router.EXIT_HARD_RESTART); // never returns
 #. give the UI time to respond
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:294
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:296
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:310
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:312
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:322
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:324
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:338
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:340
 #: ../java/src/net/i2p/router/web/helpers/ConfigRestartBean.java:51
 msgid "Restart"
 msgstr "Restart"
@@ -1217,7 +1223,7 @@ msgstr "Místní SSL certifikáty"
 
 #. console
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:34
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:61
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:142
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:259
 msgid "Router Console"
 msgstr "Konzole routeru"
@@ -1483,33 +1489,33 @@ msgid "Description"
 msgstr "Popis"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:243
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:46
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:127
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:247
 msgid "Torrents"
 msgstr "Torrenty"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:245
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:45
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:126
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:41
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:358
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:262
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:445
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:447
 msgid "Hidden Services Manager"
-msgstr "Manažer skrytých služeb"
+msgstr "Správce skrytých služeb"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:247
 msgid "Identification Image Generator"
 msgstr "Generátor identifikačního obrázku"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:249
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:48
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:129
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:348
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:262
 msgid "Address Book"
 msgstr "Adresář"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:251
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:44
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:125
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:224
 msgid "Email"
 msgstr "Email"
@@ -1602,19 +1608,19 @@ msgstr "Opustit rodinu"
 #: ../java/src/net/i2p/router/web/helpers/ConfigHomeHandler.java:22
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:25
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:27
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1181
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1182
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:576
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:596
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:612
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:628
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:644
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:573
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:610
 msgid "Delete selected"
 msgstr "Smazat vybrané"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigHomeHandler.java:23
 #: ../java/src/net/i2p/router/web/helpers/ConfigSummaryHandler.java:26
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1201
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1202
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:574
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:582
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:594
@@ -1747,8 +1753,8 @@ msgstr "Vzdálené šifrované cíle"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:45
 #: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:483
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:580
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:607
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:614
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:638
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:596
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:578
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:598
@@ -1764,9 +1770,9 @@ msgstr "Vzdálené šifrované cíle"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:775
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:664
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:590
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:547
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:561
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:575
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:582
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:598
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:612
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:644
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configwebapps_jsp.java:568
 msgid "Cancel"
@@ -1779,8 +1785,8 @@ msgid "Destination"
 msgstr "Cíl"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:64
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:375
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1110
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:455
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1111
 msgid "Name"
 msgstr "Jméno"
 
@@ -1878,8 +1884,8 @@ msgstr "Síť"
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:30
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:193
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/certs_jsp.java:384
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:386
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:386
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:405
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:405
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:411
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:405
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:405
@@ -1894,20 +1900,20 @@ msgstr "Síť"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:416
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:389
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:405
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:389
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:407
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:396
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configwebapps_jsp.java:405
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/console_jsp.java:387
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/debug_jsp.java:389
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:414
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:416
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error_jsp.java:407
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/events_jsp.java:398
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graph_jsp.java:424
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:403
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:412
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:407
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:439
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:308
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:415
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:417
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jars_jsp.java:403
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jobs_jsp.java:384
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:403
@@ -1918,10 +1924,10 @@ msgstr "Síť"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/peers_jsp.java:384
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:384
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:386
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:415
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:417
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:403
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/viewprofile_jsp.java:384
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:415
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:417
 msgid "Sidebar"
 msgstr "Boční panel"
 
@@ -1967,7 +1973,7 @@ msgid "Stats"
 msgstr "Statistiky"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:33
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:153
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:233
 msgid "Plugins"
 msgstr "Pluginy"
 
@@ -1988,9 +1994,9 @@ msgstr "Rodina routeru"
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:62
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:103
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHandler.java:32
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:582
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:572
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:609
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:616
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:603
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:640
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:586
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:732
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:779
@@ -2524,8 +2530,8 @@ msgid "Outbound options"
 msgstr "Odchozí možnosti"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:29
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:571
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:577
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:608
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:614
 msgid "Add user"
 msgstr "Přidat uživatele"
 
@@ -2590,13 +2596,13 @@ msgid "Add a user and password to enable."
 msgstr "Přidejte uživatele a heslo pro zapnutí."
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:238
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:371
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:451
 msgid "Mark for deletion"
 msgstr "Označit pro smazání"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:240
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:373
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1108
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:453
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1109
 msgid "Remove"
 msgstr "Odstranit"
 
@@ -2745,194 +2751,194 @@ msgstr "Událost"
 msgid "Details"
 msgstr "Detaily"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:180
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:188
 msgid "Combined bandwidth graph"
 msgstr "Kombinovaný graf datového přenosu"
 
 #. e.g. "statname for 60m"
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:202
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:268
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:210
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:276
 #, java-format
 msgid "{0} for {1}"
 msgstr "{0} pro {1}"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:270
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:278
 #, java-format
 msgid "ending {0} ago"
 msgstr "končící před {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:273
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:281
 msgid "Return to main graphs page"
 msgstr "Návrat na hlavní stránku grafů"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:288
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:296
 msgid "Larger"
 msgstr "Větší"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:294
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:302
 msgid "Smaller"
 msgstr "Menší"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:300
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:308
 msgid "Taller"
 msgstr "Vyšší"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:306
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:314
 msgid "Shorter"
 msgstr "Kratší"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:312
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:320
 msgid "Wider"
 msgstr "Širší"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:318
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:326
 msgid "Narrower"
 msgstr "Přímější"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:325
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:333
 msgid "Larger interval"
 msgstr "Delší interval"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:331
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:339
 msgid "Smaller interval"
 msgstr "Kratší interval"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:338
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:346
 msgid "Previous interval"
 msgstr "Předchozí interval"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:349
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:357
 msgid "Next interval"
 msgstr "Další interval"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:356
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:364
 msgid "Plot averages"
 msgstr "Průměr mapy"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:356
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:364
 msgid "plot events"
 msgstr "události mapy"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:390
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:398
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:324
 msgid "Configure Graph Display"
 msgstr "Nastavit zobrazení grafu"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:390
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:398
 msgid "Select Stats"
 msgstr "Vyberte statistiky"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:395
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:403
 msgid ""
 "Note: Dimensions are for graph only (excludes title, labels and legend)."
 msgstr "Poznámka: rozměry jsou jen pro graf (vyjma titulku, označení a nápovědy)"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:396
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:404
 msgid "Graph size"
 msgstr "Velikost grafu"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:397
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:405
 msgid "pixels wide"
 msgstr "pixelů široké"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:398
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:406
 msgid "pixels high"
 msgstr "pixelů vysoké"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:400
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:408
 msgid "Display period"
 msgstr "Perioda zobrazení"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:400
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:408
 msgid "minutes"
 msgstr "minut"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:403
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:411
 msgid "Refresh delay"
 msgstr "Prodleva obnovení"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:419
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:427
 msgid "Plot type"
 msgstr "Typ mapy"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:420
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:428
 msgid "Averages"
 msgstr "Průměry"
 
 #. 7 days
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:421
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:429
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:525
 msgid "Events"
 msgstr "Události"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:422
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:430
 msgid "Hide legend"
 msgstr "Skrýt nápovědu"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:427
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:435
 msgid "Do not show legend on graphs"
 msgstr "Nezobrazovat nápovědu na grafech"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:428
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:436
 msgid "UTC"
 msgstr "UTC"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:433
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:441
 msgid "Use UTC time on graphs"
 msgstr "Použít na grafech čas UTC (GMT+0)"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:434
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:442
 msgid "Persistence"
 msgstr "Trvalost"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:439
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:447
 msgid "Store graph data on disk"
 msgstr "Ukládat data grafu na disku"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:440
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:448
 msgid "Save settings and redraw graphs"
 msgstr "Uložit nastavení a překreslit grafy"
 
-#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:507
+#: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:515
 msgid "Graph settings saved"
 msgstr "Nastavení grafu uloženo"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:44
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:125
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:227
 msgid "Anonymous webmail client"
 msgstr "Anonymní webový poštovní klient"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:45
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:126
 msgid "Control your client and server tunnels"
 msgstr "Spravujte tunely na vašem klientovi a serveru"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:46
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:127
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:251
 msgid "Built-in anonymous BitTorrent Client"
 msgstr "Vestavěný anonymní BitTorrent klient"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:47
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:128
 msgid "Local web server for hosting your own content on I2P"
 msgstr "Místní webový server pro hosting vašeho vlastního obsahu na I2P"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:47
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:307
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:128
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:387
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:260
 msgid "Web Server"
 msgstr "Webový server"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:48
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:129
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:350
 msgid "Manage your I2P hosts file here (I2P domain name resolution)"
 msgstr "Zde spravujte váš I2P hosts soubor (překlad názvů domén I2P)"
 
 #. _x("Configure Homepage") + S + _x("Configure the contents of this page") +
 #. S + "/confighome" + S + I + "info/home.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:54
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:135
 msgid "Configure Bandwidth"
 msgstr "Nastavit datový přenos"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:54
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:135
 msgid "I2P Bandwidth Configuration"
 msgstr "I2P nastavení datového přenosu"
 
@@ -2945,25 +2951,25 @@ msgstr "I2P nastavení datového přenosu"
 #. _x("Customize Sidebar") + S + _x("Customize the sidebar by adding or
 #. removing or repositioning elements") + S + "/configsidebar" + S + I +
 #. "info/sidebar.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:59
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:140
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:368
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:265
 msgid "Help"
 msgstr "Nápověda"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:59
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:140
 msgid "I2P Router Help"
 msgstr "I2P router pomoc"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:60
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:141
 msgid "Install and configure I2P plugins"
 msgstr "Nainstalujte a nastavte I2P pluginy"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:60
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:141
 msgid "Manage Plugins"
 msgstr "Spravujte pluginy"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:73
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:154
 msgid "Frequently Asked Questions"
 msgstr "Často kladené otázky"
 
@@ -2981,36 +2987,36 @@ msgstr "Často kladené otázky"
 #. + I + "echelon.png" + S +
 #. "exchanged.i2p" + S + _x("Anonymous cryptocurrency exchange") + S +
 #. "http://exchanged.i2p/" + S + I + "exchanged.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:73
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:154
 msgid "I2P FAQ"
 msgstr "I2P FAQ"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:74
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:155
 msgid "Community forum"
 msgstr "Komunitní fórum"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:74
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:155
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:459
 msgid "I2P Forum"
 msgstr "I2P fórum"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:75
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:156
 msgid "Community git project hosting"
 msgstr "Hosting komunitního projektu git"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:75
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:156
 msgid "Git Project Hosting"
 msgstr "Hosting projektu git"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:76
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:157
 msgid "I2P Pastebin"
 msgstr "I2P pastebin"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:76
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:157
 msgid "Pastebin for I2P users"
 msgstr "Pastebin pro uživatele I2P"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:88
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:169
 msgid "I2P News"
 msgstr "I2P Novinky"
 
@@ -3037,11 +3043,11 @@ msgstr "I2P Novinky"
 #. "http://open4you.i2p/" + S + I + "open4you-logo.png" + S +
 #. _x("Pastebin") + S + _x("Encrypted I2P Pastebin") + S +
 #. "http://zerobin.i2p/" + S + I + "paste_plain.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:88
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:169
 msgid "Planet I2P"
 msgstr "Planeta I2P"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:92
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:173
 msgid "I2P home page"
 msgstr "I2P domovská stránka"
 
@@ -3052,7 +3058,7 @@ msgstr "I2P domovská stránka"
 #. "http://tracker2.postman.i2p/" + S + I + "magnet.png" + S +
 #. _x("PrivateBin") + S + _x("Encrypted I2P Pastebin") + S +
 #. "http://paste.crypthost.i2p/" + S + I + "paste_plain.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:92
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:173
 msgid "Project Website"
 msgstr "Web projektu"
 
@@ -3066,95 +3072,94 @@ msgstr "Web projektu"
 #. "billiard_marker.png" + S +
 #. "sponge.i2p" + S + _x("Seedless and the Robert BitTorrent applications") +
 #. S + "http://sponge.i2p/" + S + I + "user_astronaut.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:98
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:179
 msgid "Not Bob's Address Services"
 msgstr "Ne Bobovy adresní služby"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:99
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:180
 msgid "Ramble user-moderated forum aggregator"
 msgstr "Agregátor fór moderovaný uživateli Ramble"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:100
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:112
-msgid "I2P Network Statistics"
-msgstr "Statistiky sítě I2P"
-
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:101
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:181
 msgid "StormyCloud Outproxy Services"
 msgstr "StormyCloud outproxy služby"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:107
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:187
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:432
 msgid "Logs"
 msgstr "Záznamy"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:107
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:187
 msgid "View the logs"
 msgstr "Zobrazit logy"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:108
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:188
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:422
 msgid "Graphs"
 msgstr "Grafy"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:108
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:188
 msgid "Visualize information about the router"
 msgstr "Vizualizovat informace o routeru"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:109
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:189
 msgid "I2P Technical Docs"
 msgstr "I2P tech. dokumentace"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:109
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:189
 msgid "Technical documentation"
 msgstr "Technická dokumentace"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:110
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:190
 msgid "I2P Wiki"
 msgstr "I2P wiki"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:111
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:191
 msgid "Bug tracker"
 msgstr "Index chyb"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:111
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:191
 msgid "I2P Bug Reports"
 msgstr "I2P hlášení chyb"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:139
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:192
+msgid "I2P Network Statistics"
+msgstr "Statistiky sítě I2P"
+
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:219
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:588
 msgid "Applications"
 msgstr "Aplikace"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:166
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:246
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:620
 msgid "Configuration and Help"
 msgstr "Nastavení a pomoc"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:179
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:259
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:636
 msgid "Network and Developer Information"
 msgstr "Informace k síti a vývoji"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:191
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:271
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:604
 msgid "I2P Community Sites"
 msgstr "I2P komunitní stránky"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:231
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:311
 msgid "The HTTP proxy is not up"
 msgstr "HTTP proxy neběží"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:233
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:313
 #, java-format
 msgid "Your browser is not properly configured to use the HTTP proxy at {0}"
 msgstr "Váš prohlížeč není správně nastaven pro použití HTTP proxy na {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:377
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:457
 msgid "URL"
 msgstr "URL"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:404
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:484
 msgid "Add"
 msgstr "Přidat"
 
@@ -3675,7 +3680,7 @@ msgstr "Před jak dlouhou dobou bylo toto spojení navázáno"
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:363
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:424
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:609
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1146
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1147
 msgid "Up"
 msgstr "Up"
 
@@ -4184,7 +4189,7 @@ msgid "Select search engine"
 msgstr "Vyberte vyhledávač"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:38
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:528
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:557
 msgid "Bandwidth Limiter"
 msgstr "Omezovač datového přenosu"
 
@@ -4344,8 +4349,8 @@ msgstr "I2P služby"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:45
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:338
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:424
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:424
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:445
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:445
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:454
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:445
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:435
@@ -4360,7 +4365,7 @@ msgstr "I2P služby"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:446
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:419
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:445
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:427
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:447
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:426
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configwebapps_jsp.java:448
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:263
@@ -4942,7 +4947,7 @@ msgid "Click Shutdown and restart to install"
 msgstr "Klikněte na vypnout a restartovat pro instalaci"
 
 #. Note to translators: parameter is a version, e.g. "0.8.4"
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:933
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:934
 #, java-format
 msgid "Download {0} Update"
 msgstr "Stáhněte aktualizaci {0}"
@@ -4951,7 +4956,7 @@ msgstr "Stáhněte aktualizaci {0}"
 #. <br> is optional, to help the browser make the lines even in the button
 #. If the translation is shorter than the English, you should probably not
 #. include <br>
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:941
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:942
 #, java-format
 msgid "Download Signed<br>Development Update<br>{0}"
 msgstr "Stáhněte podepsanou <br>vývojářskou aktualizaci<br>{0}"
@@ -4960,61 +4965,61 @@ msgstr "Stáhněte podepsanou <br>vývojářskou aktualizaci<br>{0}"
 #. <br> is optional, to help the browser make the lines even in the button
 #. If the translation is shorter than the English, you should probably not
 #. include <br>
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:949
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:950
 #, java-format
 msgid "Download Unsigned<br>Update {0}"
 msgstr "Stáhněte nepodepsanou <br>aktualizaci {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:973
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:974
 msgid "Help with firewall configuration"
 msgstr "Pomoc s nastavením firewallu"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:975
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:976
 msgid "Check network connection and NAT/firewall"
 msgstr "Zkontrolujte síťové připojení a NAT/firewall"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1011
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1012
 msgid ""
 "Attempt to download router reference files (if automatic reseed has failed)"
 msgstr "Zkuste stáhnout referenční soubory routeru (pokud selže automatický reseed)"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1012
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1013
 msgid "Reseed"
 msgstr "Reseed"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1112
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1113
 msgid "Order"
 msgstr "Řazení"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1136
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1137
 msgid "Top"
 msgstr "Nahoru"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1141
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1142
 msgid "Move to top"
 msgstr "Přesun nahoru"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1151
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1152
 msgid "Move up"
 msgstr "Přesun nahoru"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1159
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1160
 msgid "Down"
 msgstr "Dolů"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1164
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1165
 msgid "Move down"
 msgstr "Přesun dolů"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1169
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1170
 msgid "Bottom"
 msgstr "Dolů"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1174
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1175
 msgid "Move to bottom"
 msgstr "Přesun dolů"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1185
+#: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1186
 msgid "Select a section to add"
 msgstr "Vyberte sekci k přidání"
 
@@ -5324,8 +5329,8 @@ msgid "Certificates"
 msgstr "Certifikáty"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/certs_jsp.java:246
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:248
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:248
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:252
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:252
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:252
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:252
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:252
@@ -5340,19 +5345,19 @@ msgstr "Certifikáty"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:252
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:249
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:252
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:249
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:252
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:248
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configwebapps_jsp.java:252
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/console_jsp.java:246
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/debug_jsp.java:251
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:274
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:276
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error_jsp.java:269
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/events_jsp.java:260
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graph_jsp.java:271
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:265
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:274
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:254
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:248
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:274
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:276
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jars_jsp.java:250
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jobs_jsp.java:246
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:250
@@ -5363,232 +5368,232 @@ msgstr "Certifikáty"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/peers_jsp.java:246
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:246
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:246
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:275
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:277
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:250
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/viewprofile_jsp.java:246
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:275
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:277
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:330
 msgid "Router is down"
 msgstr "Router neběží"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:239
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:242
 msgid "configure bandwidth"
 msgstr "nastavit datový přenos"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:530
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:559
 msgid "Advanced Network Configuration"
 msgstr "Pokročilé nastavení sítě"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:532
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:561
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:579
 msgid ""
 "I2P will work best if you configure your rates to match the speed of your "
 "internet connection."
 msgstr "I2P bude nejlépe fungovat, když nastavíte vaše míry tak, aby odpovídaly rychlosti vašeho internetového připojení."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:534
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:563
 msgid "All sidebar values are in bytes per second, not bits per second."
 msgstr "Všechny hodnoty bočního panelu jsou v bajtech za sekundu, ne v bitech za sekundu."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:535
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:565
 msgid "You may change your bandwidth limits here."
 msgstr "Zde můžete změnit své limity datového přenosu."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:536
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:567
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:479
 msgid ""
 "The more bandwidth you make available, the more you help the network and "
 "improve your own anonymity, so please take the time to review the settings."
 msgstr "Čím více datového přenosu dáte k dispozici, tím více pomůžete síti a vylepšíte vlastní anonymitu. Proto prosím věnujte čas kontrole nastavení."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:537
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:569
 msgid ""
 "If you are unsure of your network's speed, use the <a "
 "href=\"/welcome?page=3\">Bandwidth Test</a>."
 msgstr "Pokud si nejste jisti rychlostí vaší sítě, použijte <a href=\"/welcome?page=3\">Test datového přenosu</a>."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:538
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:571
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:481
 msgid ""
 "Your upstream share amount (KBps Out) will determine your overall "
 "contribution to the network."
 msgstr "Vaše množství upstream sdílení (KB/s ven) určí vaše celkové přispívání síti."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:543
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:576
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:583
 msgid "KBps In"
 msgstr "KB/s dovnitř"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:551
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:584
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:590
 msgid "KBps Out"
 msgstr "KB/s ven"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:557
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:591
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:596
 msgid "Share"
 msgstr "Sdílet"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:564
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:589
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:598
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:620
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:603
 msgid "NOTE"
 msgstr "POZNÁMKA"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:566
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:600
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:605
 #, java-format
 msgid "You have configured I2P to share only {0} KBps."
 msgstr "Vaše I2P je nastaveno pro sdílení pouze {0} KB/s."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:569
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:603
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:608
 msgid "I2P requires at least 12KBps to enable sharing. "
 msgstr "I2P vyžaduje nejméně 12KB/s pro umožnění sdílení."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:570
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:604
 msgid ""
 "Please enable sharing (participating in tunnels) by configuring more "
 "bandwidth. "
 msgstr "Prosím zapněte sdílení (participace tunelů) nastavením více datového přenosu."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:571
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:605
 msgid ""
 "It improves your anonymity by creating cover traffic, and helps the network."
 msgstr "Vylepšuje to vaší anonymitu vytvořením krycího provozu a pomáhá síti."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:573
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:607
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:613
 #, java-format
 msgid "You have configured I2P to share {0} KBps."
 msgstr "Vaše I2P je nastaveno pro sdílení {0} KB/s."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:576
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:610
 msgid ""
 "The higher the share bandwidth the more you improve your anonymity and help "
 "the network."
 msgstr "Čím vyšší je sdílený datový přenos, tím lepší je vaše anonymita a pomoc síti."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:239
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:242
 msgid "config advanced"
 msgstr "nastavení pokročilé"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:526
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:555
 msgid ""
 "Most of the router configuration options listed below are not available in "
 "the user interface, because they are rarely used or provide access to "
 "advanced settings that most users will not need."
 msgstr "Většina možností nastavení routeru, které jsou vypsány níže, nejsou dostupné v uživatelském rozhraní, protože jsou zřídka kdy použity nebo poskytují přístup k pokročilým nastavením, které většina uživatelů nepotřebuje."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:527
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:557
 msgid ""
 "You must edit your <code>router.config</code> file to add options, or, if "
 "you have added <code>routerconsole.advanced=true</code> to the router.config"
 " file, you may edit settings within the console on this page."
 msgstr "Musíte upravit váš soubor <code>router.config</code> abyste přidali možnosti, nebo pokud jste přidali <code>routerconsole.advanced=true</code> do souboru router.config, můžete upravit nastavení na této stránce v rámci konzole."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:529
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:559
 msgid "Floodfill Configuration"
 msgstr "Nastavení floodfill"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:531
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:561
 msgid ""
 "Floodfill participation helps the network, but may use more of your "
 "computer's resources."
 msgstr "Spoluúčast na floodfill pomáhá síti ale využívá více prostředků vašeho počítače."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:537
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:568
 msgid "This router is currently a floodfill participant."
 msgstr "Tento router je momentálně floodfill účastníkem."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:544
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:575
 msgid "This router is not currently a floodfill participant."
 msgstr "Tento router není momentálně floodfill účastníkem."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:552
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:583
 msgid "Enrollment"
 msgstr "Nábor"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:558
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:589
 msgid "Automatic"
 msgstr "Automaticky"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:564
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:595
 msgid "Force On"
 msgstr "Vynutit zapnutí"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:570
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:601
 msgid "Disable"
 msgstr "Vypnout"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:574
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:605
 msgid "Advanced I2P Configuration"
 msgstr "Pokročilé nastavení I2P"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:591
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:622
 msgid "Some changes may require a restart to take effect."
 msgstr "Některé změny mohou vyžadovat restartování."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:595
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:626
 #, java-format
 msgid "To make changes, edit the file: {0}"
 msgstr "Změny provedete úpravou souboru: {0}"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:617
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:648
 msgid "Advanced Configuration Help"
 msgstr "Pomoc s pokročilým nastavením"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:619
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:650
 msgid "Only set this to true if you know what you are doing!"
 msgstr "Nastavte toto na pravda, pouze pokud víte co děláte!"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:621
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:652
 msgid ""
 "When set to true, additional functionality will be enabled in the console "
 "and the user will be able to edit settings directly on this page"
 msgstr "Při nastavení na pravda, budou v konzoli zapnuty dodatečné funkce a uživatel bude moci upravit nastavení přímo na této stránce"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:625
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:656
 msgid ""
 "Extra display options are provided in the <a href=\"/netdb\">Network "
 "Database section</a>."
 msgstr "Další možnosti zobrazení jsou poskytnuty v <a href=\"/netdb\">sekci síťové databáze</a>."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:626
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:659
 msgid "This will also enable the installation of unsigned updates."
 msgstr "Toto také umožní instalaci nepodepsaných aktualizací."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:627
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:661
 msgid ""
 "You may also wish to enable the advanced sidebar section on the <a "
 "href=\"/configsidebar\">Sidebar Configuration page</a>."
 msgstr "Můžete také chtít zapnout pokročilou sekci bočního panelu na <a href=\"/configsidebar\">stránce nastavení bočního panelu</a>."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:629
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:663
 msgid ""
 "This setting allows the manual selection of the browser which I2P will "
 "launch on startup."
 msgstr "Tato volba umožňuje ruční výběr prohlížeče, který I2P spustí při startu."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:631
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:665
 msgid ""
 "When set to true, a configurable search bar will appear on the <a "
 "href=\"/home\">console home page</a>"
 msgstr "Když je nastaveno na pravda, zobrazí se na <a href=\"/home\">domovské stránce konzole</a> nastavitelný vyhledávací panel."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:635
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:669
 msgid ""
 "Additional searches may then be added on the <a href=\"/confighome\">home "
 "configuration page</a>."
 msgstr "Další vyhledávání mohou být potom přidána na <a href=\"/confighome\">domovské stránce nastavení</a>."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:637
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:671
 msgid ""
 "Determines the maximum number of participating tunnels the router will "
 "accept."
 msgstr "Určuje maximální počet participujících tunelů, které router přijme."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:638
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:673
 msgid "To disable participation completely, set to 0."
 msgstr "Pro úplné vypnutí účasti nastavte na 0."
 
@@ -6684,41 +6689,46 @@ msgstr "Pro trvalé změny klientského tunelu se podívejte na"
 msgid "i2ptunnel page"
 msgstr "stránku I2PTunelu"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:239
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:242
 msgid "config UI"
 msgstr "nastavení UI"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:529
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:557
 msgid "Router Console Theme"
 msgstr "Vzhled konzole routeru"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:541
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:573
 msgid "Theme selection disabled for Internet Explorer, sorry."
 msgstr "Výběr vzhledu je vypnut pro Internet Explorer, promiňte."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:543
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:575
 msgid ""
 "If you're not using IE, it's likely that your browser is pretending to be "
 "IE; please configure your browser (or proxy) to use a different User Agent "
 "string if you'd like to access the console themes."
 msgstr "Pokud nepoužíváte IE, je pravděpodobné, že váš prohlížeč předstírá že je IE; pro přístup k vzhledům konzole prosím nastavte váš prohlížeč (nebo proxy) tak, aby používal jiný User Agent."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:549
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:563
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:584
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:600
 msgid "Apply"
 msgstr "Použít"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:551
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:586
 msgid "Router Console Language"
 msgstr "Jazyk konzole routeru"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:559
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:594
 msgid ""
 "Please contribute to the router console translation project! Contact the "
 "developers in #i2p-dev on IRC to help."
 msgstr "Prosím přispějte do překladatelského projektu konzole routeru! Pro pomoc kontaktujte vývojáře na IRC #i2p-dev."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:565
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:596
+#, java-format
+msgid "See the {0}translation status report{1}."
+msgstr "Podívejte se na {0}hlášení stavu překladu{1}."
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:602
 msgid "Router Console Password"
 msgstr "Heslo konzole routeru"
 
@@ -6845,28 +6855,28 @@ msgstr "Nastavit jazyk"
 msgid "Welcome to I2P"
 msgstr "Vítejte na I2P"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:444
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:446
 msgid "I2P Address Book"
 msgstr "I2P adresář"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:446
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:447
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:447
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:447
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:448
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:449
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:449
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:449
 msgid "Open in new tab"
 msgstr "Otevřít na nové kartě"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:450
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:451
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:451
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:451
-msgid "Your browser does not support iFrames."
-msgstr "Váš prohlížeč nepodporuje rámy iFrames."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:452
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:453
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:453
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:453
+msgid "Your browser does not support iFrames."
+msgstr "Váš prohlížeč nepodporuje rámy iFrames."
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:454
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:455
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:455
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:455
 msgid "Click here to continue."
 msgstr "Klikněte zde pro pokračování."
 
@@ -6943,7 +6953,7 @@ msgid "graphs"
 msgstr "grafy"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graph_jsp.java:468
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:433
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:442
 msgid "I2P Performance Graphs"
 msgstr "Grafy výkonu I2P"
 
@@ -7771,7 +7781,7 @@ msgstr "Vypnout {0} obnovení"
 msgid "torrents"
 msgstr "torrenty"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:445
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:447
 msgid "I2P Torrent Manager"
 msgstr "Manažer I2P torrentů"
 
@@ -7850,7 +7860,7 @@ msgstr "Profil pro peer {0}"
 msgid "webmail"
 msgstr "webmail"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:445
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:447
 msgid "I2P Webmail"
 msgstr "I2P Webmail"
 
