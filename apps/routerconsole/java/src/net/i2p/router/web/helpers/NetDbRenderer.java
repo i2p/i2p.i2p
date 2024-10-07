@@ -832,7 +832,7 @@ class NetDbRenderer {
             } else {
                 distance = null;
             }
-            if (ls.getHash().equals(myLeaseSet.getHash())) {
+            if (!ls.getHash().equals(myLeaseSet.getHash())) {
                 renderLeaseSet(buf, ls, debug, now, linkSusi, distance);
                 out.write(buf.toString());
                 buf.setLength(0);
