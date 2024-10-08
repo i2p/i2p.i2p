@@ -1,3 +1,8 @@
+2024-08-07 2.7.0 (API 0.9.64) released
+
+2024-10-08 idk
+ * Fix failing tests
+
 2024-09-21 zzz
  * streaming: Allow i2p.streaming.profile != 1
 
