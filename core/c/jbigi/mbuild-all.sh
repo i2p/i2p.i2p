@@ -70,9 +70,10 @@ OPENBSD_PLATFORM="${X86_PLATFORMS} ${MISC_OPENBSD_PLATFORMS}"
 
 # Android
 # https://developer.android.com/ndk/guides/other_build_systems
-ANDROID_64_PLATFORMS="aarch64"
-ANDROID_32_PLATFORMS="armv7a"
-
+ANDROID_ARM64_PLATFORMS="aarch64"
+ANDROID_ARM_PLATFORMS="armv7a"
+ANDROID_x86_64_PLATFORMS="x86_64"
+ANDROID_x86_PLATFORMS="i686"
 
 
 # Import gmp version variables and download gmp.
@@ -148,7 +149,7 @@ if [ ! $(which ${CC}) ]; then
 fi
 
 # Set the "_64" filname filename suffix for 64-bit builds
-if [ $BITS -ne 32 -a "$TARGET" != "android" ]; then
+if [ $BITS -ne 32 ] && [ "$UNAME" != "aarch64" ] || [ "$ANDROID_FORCE_ARM" != "true" ]; then
     [ -z $SUFFIX ] && SUFFIX="_64"
 fi
 
@@ -201,27 +202,61 @@ if [ "$TARGET" != "$BUILD_OS" ]; then
 #     esac
 #   ;;
   android)
-    ANDROID_NDK=`realpath ../../../../android-ndk-r19c`
+    ANDROID_NDK=`realpath ../../../../android-ndk-r25c`
     export TOOLCHAIN=$ANDROID_NDK/toolchains/llvm/prebuilt/linux-x86_64
-    if [ $BITS -eq 32 ]; then
+    ARCH=$(uname -m | cut -f1 -d" ")
+    android_arm () {
+      if [ $BITS -eq 32 ]; then
         HOST_CONFIGURE_FLAG=armv7a-linux-androideabi
-        export AR=$TOOLCHAIN/bin/arm-linux-androideabi-ar
-        export AS=$TOOLCHAIN/bin/arm-linux-androideabi-as
-        export CC=$TOOLCHAIN/bin/armv7a-linux-androideabi16-clang
-        export CXX=$TOOLCHAIN/bin/armv7a-linux-androideabi16-clang++
-        export LD=$TOOLCHAIN/bin/arm-linux-androideabi-ld
-        export RANLIB=$TOOLCHAIN/bin/arm-linux-androideabi-ranlib
-        export STRIP=$TOOLCHAIN/bin/arm-linux-androideabi-strip
-     else
+        export AR=$TOOLCHAIN/bin/llvm-ar
+        export AS=$TOOLCHAIN/bin/llvm-as
+        export CC=$TOOLCHAIN/bin/armv7a-linux-androideabi19-clang
+        export CXX=$TOOLCHAIN/bin/armv7a-linux-androideabi19-clang++
+        export LD=$TOOLCHAIN/bin/llvm-ld
+        export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
+        export STRIP=$TOOLCHAIN/bin/llvm-strip
+      else
         HOST_CONFIGURE_FLAG=aarch64-linux-android
-        export AR=$TOOLCHAIN/bin/aarch64-linux-android-ar
-        export AS=$TOOLCHAIN/bin/aarch64-linux-android-as
+        export AR=$TOOLCHAIN/bin/llvm-ar
+        export AS=$TOOLCHAIN/bin/llvm-as
         export CC=$TOOLCHAIN/bin/aarch64-linux-android21-clang
         export CXX=$TOOLCHAIN/bin/aarch64-linux-android21-clang++
-        export LD=$TOOLCHAIN/bin/aarch64-linux-android-ld
-        export RANLIB=$TOOLCHAIN/bin/aarch64-linux-android-ranlib
-        export STRIP=$TOOLCHAIN/bin/aarch64-linux-android-strip
-     fi
+        export LD=$TOOLCHAIN/bin/llvm-ld
+        export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
+        export STRIP=$TOOLCHAIN/bin/llvm-strip
+      fi    
+    }
+
+    if [ "$ANDROID_FORCE_ARM" == "true" ]; then
+      android_arm
+    else
+      case ${ARCH} in
+          x86_64 | amd64 | i*86)
+        if [ $BITS -eq 32 ]; then
+          HOST_CONFIGURE_FLAG=i686-linux-android
+          export AR=$TOOLCHAIN/bin/llvm-ar
+          export AS=$TOOLCHAIN/bin/llvm-as
+          export CC=$TOOLCHAIN/bin/i686-linux-android19-clang
+          export CXX=$TOOLCHAIN/bin/i686-linux-android19-clang++
+          export LD=$TOOLCHAIN/bin/llvm-ld
+          export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
+          export STRIP=$TOOLCHAIN/bin/llvm-strip
+        else
+          HOST_CONFIGURE_FLAG=x86_64-linux-android
+          export AR=$TOOLCHAIN/bin/llvm-ar
+          export AS=$TOOLCHAIN/bin/llvm-as
+          export CC=$TOOLCHAIN/bin/x86_64-linux-android21-clang
+          export CXX=$TOOLCHAIN/bin/x86_64-linux-android21-clang++
+          export LD=$TOOLCHAIN/bin/llvm-ld
+          export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
+          export STRIP=$TOOLCHAIN/bin/llvm-strip
+        fi
+          ;;
+        *arm*)
+          android_arm
+          ;;
+      esac
+    fi
     ;;
   esac
 fi
@@ -316,12 +351,33 @@ netbsd*|freebsd*|openbsd*)
 android)
         NAME="libjbigi"
         TYPE="so"
+        ARCH=$(uname -m | cut -f1 -d" ")
+        android_arm () {
         if [ $BITS -eq 32 ]; then
-            PLATFORM_LIST="${ANDROID_32_PLATFORMS}"
+            PLATFORM_LIST="${ANDROID_ARM_PLATFORMS}"
             ARCH="armv7a"
         else
-            PLATFORM_LIST="${ANDROID_64_PLATFORMS}"
+            PLATFORM_LIST="${ANDROID_ARM64_PLATFORMS}"
             ARCH="aarch64"
+        fi
+        }
+        if [ "$ANDROID_FORCE_ARM" == "true" ]; then
+          android_arm
+        else
+          case ${ARCH} in
+            x86_64 | amd64 | i*86)
+          if [ $BITS -eq 32 ]; then
+              PLATFORM_LIST="${ANDROID_x86_PLATFORMS}"
+              ARCH="i686"
+          else
+              PLATFORM_LIST="${ANDROID_x86_64_PLATFORMS}"
+              ARCH="x86_64"
+          fi
+          ;;
+            *)
+          android_arm
+          ;;
+          esac
         fi
         echo "Building Android .so for ${PLATFORM_LIST}";;
 *)
