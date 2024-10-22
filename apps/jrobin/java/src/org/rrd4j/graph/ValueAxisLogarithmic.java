@@ -113,8 +113,10 @@ class ValueAxisLogarithmic extends Axis {
             worker.drawString(graphLabel, x0 - length - PADDING_VLABEL, y + labelOffset, font, fontColor);
         };
         IntDoubleLineConsumer drawAxisLines = (y, v, p) -> {
-            worker.drawLine(x0 - 1, y, x0 + 1, y, p, gdef.tickStroke);
-            worker.drawLine(x1 - 1, y, x1 + 1, y, p, gdef.tickStroke);
+            if (gdef.drawTicks()) {
+                worker.drawLine(x0 - 1, y, x0 + 1, y, p, gdef.tickStroke);
+                worker.drawLine(x1 - 1, y, x1 + 1, y, p, gdef.tickStroke);
+            }
             worker.drawLine(x0, y, x1, y, p, gdef.gridStroke);
         };
 

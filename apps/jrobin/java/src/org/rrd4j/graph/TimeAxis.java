@@ -8,21 +8,20 @@ import java.util.Date;
 
 class TimeAxis extends Axis {
     private static final TimeAxisSetting[] tickSettings = {
-            new TimeAxisSetting(0, SECOND, 30, MINUTE, 5, MINUTE, 5, 0, HH_MM),
-            new TimeAxisSetting(2, MINUTE, 1, MINUTE, 5, MINUTE, 5, 0, HH_MM),
-            new TimeAxisSetting(5, MINUTE, 2, MINUTE, 10, MINUTE, 10, 0, HH_MM),
-            new TimeAxisSetting(10, MINUTE, 5, MINUTE, 20, MINUTE, 20, 0, HH_MM),
-            new TimeAxisSetting(30, MINUTE, 10, HOUR, 1, HOUR, 1, 0, HH_MM),
-            new TimeAxisSetting(60, MINUTE, 30, HOUR, 2, HOUR, 2, 0, HH_MM),
-            new TimeAxisSetting(180, HOUR, 1, HOUR, 6, HOUR, 6, 0, HH_MM),
-            new TimeAxisSetting(600, HOUR, 6, DAY, 1, DAY, 1, 24 * 3600, "EEE dd"),
-            new TimeAxisSetting(1800, HOUR, 12, DAY, 1, DAY, 2, 24 * 3600, "EEE dd"),
-            new TimeAxisSetting(3600, DAY, 1, WEEK, 1, WEEK, 1, 7 * 24 * 3600, "'Week 'w"),
-            new TimeAxisSetting(3 * 3600L, WEEK, 1, MONTH, 1, WEEK, 2, 7 * 24 * 3600, "'Week 'w"),
-            new TimeAxisSetting(6 * 3600L, MONTH, 1, MONTH, 1, MONTH, 1, 30 * 24 * 3600, "MMM"),
-            new TimeAxisSetting(48 * 3600L, MONTH, 1, MONTH, 3, MONTH, 3, 30 * 24 * 3600, "MMM"),
-            new TimeAxisSetting(10 * 24 * 3600L, YEAR, 1, YEAR, 1, YEAR, 1, 365 * 24 * 3600, "yy"),
-            new TimeAxisSetting(-1, MONTH, 0, MONTH, 0, MONTH, 0, 0, "")
+            new TimeAxisSetting(0, TimeUnit.SECOND, 30, TimeUnit.MINUTE, 5, TimeUnit.MINUTE, 5, 0),
+            new TimeAxisSetting(2, TimeUnit.MINUTE, 1, TimeUnit.MINUTE, 5, TimeUnit.MINUTE, 5, 0),
+            new TimeAxisSetting(5, TimeUnit.MINUTE, 2, TimeUnit.MINUTE, 10, TimeUnit.MINUTE, 10, 0),
+            new TimeAxisSetting(10, TimeUnit.MINUTE, 5, TimeUnit.MINUTE, 20, TimeUnit.MINUTE, 20, 0),
+            new TimeAxisSetting(30, TimeUnit.MINUTE, 10, TimeUnit.HOUR, 1, TimeUnit.HOUR, 1, 0),
+            new TimeAxisSetting(60, TimeUnit.MINUTE, 30, TimeUnit.HOUR, 2, TimeUnit.HOUR, 2, 0),
+            new TimeAxisSetting(180, TimeUnit.HOUR, 1, TimeUnit.HOUR, 6, TimeUnit.HOUR, 6, 0),
+            new TimeAxisSetting(600, TimeUnit.HOUR, 6, TimeUnit.DAY, 1, TimeUnit.DAY, 1, 24 * 3600),
+            new TimeAxisSetting(1800, TimeUnit.HOUR, 12, TimeUnit.DAY, 1, TimeUnit.DAY, 2, 24 * 3600),
+            new TimeAxisSetting(3600, TimeUnit.DAY, 1, TimeUnit.WEEK, 1, TimeUnit.WEEK, 1, 7 * 24 * 3600),
+            new TimeAxisSetting(3 * 3600L, TimeUnit.WEEK, 1, TimeUnit.MONTH, 1, TimeUnit.WEEK, 2, 7 * 24 * 3600),
+            new TimeAxisSetting(6 * 3600L, TimeUnit.MONTH, 1, TimeUnit.MONTH, 1, TimeUnit.MONTH, 1, 30 * 24 * 3600),
+            new TimeAxisSetting(48 * 3600L, TimeUnit.MONTH, 1, TimeUnit.MONTH, 3, TimeUnit.MONTH, 3, 30 * 24 * 3600),
+            new TimeAxisSetting(10 * 24 * 3600L, TimeUnit.YEAR, 1, TimeUnit.YEAR, 1, TimeUnit.YEAR, 1, 365 * 24 * 3600),
     };
 
     private final ImageParameters im;
@@ -76,8 +75,6 @@ class TimeAxis extends Axis {
 
     private void drawMinor() {
         if (!gdef.noMinorGrid) {
-            // I2P skip ticks if zero width
-            boolean ticks = ((BasicStroke)gdef.tickStroke).getLineWidth() > 0;
             adjustStartingTime(tickSetting.minorUnit, tickSetting.minorUnitCount);
             Paint color = gdef.getColor(ElementsNames.grid);
             int y0 = im.yorigin, y1 = y0 - im.ysize;
@@ -85,8 +82,10 @@ class TimeAxis extends Axis {
                 if (status == 0) {
                     long time = calendar.getTime().getTime() / 1000L;
                     int x = mapper.xtr(time);
-                    if (ticks)
+                    // skip ticks if zero width
+                    if (gdef.drawTicks()) {
                         worker.drawLine(x, y0 - 1, x, y0 + 1, color, gdef.tickStroke);
+                    }
                     worker.drawLine(x, y0, x, y1, color, gdef.gridStroke);
                 }
                 findNextTime(tickSetting.minorUnit, tickSetting.minorUnitCount);
@@ -95,8 +94,6 @@ class TimeAxis extends Axis {
     }
 
     private void drawMajor() {
-        // I2P skip ticks if zero width
-        boolean ticks = ((BasicStroke)gdef.tickStroke).getLineWidth() > 0;
         adjustStartingTime(tickSetting.majorUnit, tickSetting.majorUnitCount);
         Paint color = gdef.getColor(ElementsNames.mgrid);
         int y0 = im.yorigin, y1 = y0 - im.ysize;
@@ -104,8 +101,10 @@ class TimeAxis extends Axis {
             if (status == 0) {
                 long time = calendar.getTime().getTime() / 1000L;
                 int x = mapper.xtr(time);
-                if (ticks)
+                // skip ticks if zero width
+                if (gdef.drawTicks()) {
                     worker.drawLine(x, y0 - 2, x, y0 + 2, color, gdef.tickStroke);
+                }
                 worker.drawLine(x, y0, x, y1, color, gdef.gridStroke);
             }
             findNextTime(tickSetting.majorUnit, tickSetting.majorUnitCount);
@@ -131,7 +130,7 @@ class TimeAxis extends Axis {
         }
     }
 
-    private void findNextTime(int timeUnit, int timeUnitCount) {
+    private void findNextTime(TimeUnit timeUnit, int timeUnitCount) {
         switch (timeUnit) {
         case SECOND:
             calendar.add(Calendar.SECOND, timeUnitCount);
@@ -162,7 +161,7 @@ class TimeAxis extends Axis {
         return (time < im.start) ? -1 : (time > im.end) ? +1 : 0;
     }
 
-    private void adjustStartingTime(int timeUnit, int timeUnitCount) {
+    private void adjustStartingTime(TimeUnit timeUnit, int timeUnitCount) {
         calendar.setTime(new Date(im.start * 1000L));
         switch (timeUnit) {
         case SECOND:
@@ -213,14 +212,19 @@ class TimeAxis extends Axis {
     private void chooseTickSettings() {
         if (gdef.timeAxisSetting != null) {
             tickSetting = new TimeAxisSetting(gdef.timeAxisSetting);
-        }
-        else {
-            for (int i = 0; tickSettings[i].secPerPix >= 0 && secPerPix > tickSettings[i].secPerPix; i++) {
-                tickSetting = tickSettings[i];
+        } else {
+            for (TimeAxisSetting i: tickSettings) {
+                if (secPerPix < i.secPerPix) {
+                    break;
+                } else {
+                    tickSetting = i;
+                }
             }
         }
         if (gdef.timeLabelFormat != null) {
             tickSetting = tickSetting.withLabelFormat(gdef.timeLabelFormat);
+        } else {
+            gdef.formatProvider.apply(tickSetting.labelUnit).ifPresent(f -> tickSetting = tickSetting.withLabelFormat(f));
         }
     }
 

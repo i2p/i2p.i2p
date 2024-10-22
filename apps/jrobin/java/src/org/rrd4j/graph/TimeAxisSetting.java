@@ -2,12 +2,17 @@ package org.rrd4j.graph;
 
 class TimeAxisSetting {
     final long secPerPix;
-    final int minorUnit, minorUnitCount, majorUnit, majorUnitCount;
-    final int labelUnit, labelUnitCount, labelSpan;
+    final TimeUnit majorUnit;
+    final int majorUnitCount;
+    final TimeUnit minorUnit;
+    final int minorUnitCount;
+    final TimeUnit labelUnit;
+    final int labelUnitCount;
+    final int labelSpan;
     final TimeLabelFormat format;
 
-    TimeAxisSetting(long secPerPix, int minorUnit, int minorUnitCount, int majorUnit, int majorUnitCount,
-                    int labelUnit, int labelUnitCount, int labelSpan, TimeLabelFormat format) {
+    TimeAxisSetting(long secPerPix, TimeUnit minorUnit, int minorUnitCount, TimeUnit majorUnit, int majorUnitCount,
+            TimeUnit labelUnit, int labelUnitCount, int labelSpan, TimeLabelFormat format) {
         this.secPerPix = secPerPix;
         this.minorUnit = minorUnit;
         this.minorUnitCount = minorUnitCount;
@@ -17,6 +22,19 @@ class TimeAxisSetting {
         this.labelUnitCount = labelUnitCount;
         this.labelSpan = labelSpan;
         this.format = format;
+    }
+
+    TimeAxisSetting(long secPerPix, TimeUnit minorUnit, int minorUnitCount, TimeUnit majorUnit, int majorUnitCount,
+            TimeUnit labelUnit, int labelUnitCount, int labelSpan) {
+        this.secPerPix = secPerPix;
+        this.minorUnit = minorUnit;
+        this.minorUnitCount = minorUnitCount;
+        this.majorUnit = majorUnit;
+        this.majorUnitCount = majorUnitCount;
+        this.labelUnit = labelUnit;
+        this.labelUnitCount = labelUnitCount;
+        this.labelSpan = labelSpan;
+        this.format = new SimpleTimeLabelFormat(labelUnit.getLabel());
     }
 
     TimeAxisSetting(TimeAxisSetting s) {
@@ -33,20 +51,8 @@ class TimeAxisSetting {
 
     TimeAxisSetting(int minorUnit, int minorUnitCount, int majorUnit, int majorUnitCount,
                     int labelUnit, int labelUnitCount, int labelSpan, TimeLabelFormat format) {
-        this(0, minorUnit, minorUnitCount, majorUnit, majorUnitCount,
-                labelUnit, labelUnitCount, labelSpan, format);
-    }
-
-    TimeAxisSetting(long secPerPix, int minorUnit, int minorUnitCount, int majorUnit, int majorUnitCount,
-                    int labelUnit, int labelUnitCount, int labelSpan, String format) {
-        this(secPerPix, minorUnit, minorUnitCount, majorUnit, majorUnitCount,
-                labelUnit, labelUnitCount, labelSpan, new SimpleTimeLabelFormat(format));
-    }
-
-    TimeAxisSetting(int minorUnit, int minorUnitCount, int majorUnit, int majorUnitCount,
-                    int labelUnit, int labelUnitCount, int labelSpan, String format) {
-        this(0, minorUnit, minorUnitCount, majorUnit, majorUnitCount,
-                labelUnit, labelUnitCount, labelSpan, new SimpleTimeLabelFormat(format));
+        this(0, TimeUnit.resolveUnit(minorUnit), minorUnitCount, TimeUnit.resolveUnit(majorUnit), majorUnitCount,
+                TimeUnit.resolveUnit(labelUnit), labelUnitCount, labelSpan, format);
     }
 
     TimeAxisSetting withLabelFormat(TimeLabelFormat f) {

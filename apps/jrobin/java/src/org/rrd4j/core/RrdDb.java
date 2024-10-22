@@ -212,7 +212,7 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
         /**
          * Internal method used to memorize the pool, without generating a loop
          * @param pool
-         * @return
+         * @return the Builder
          */
         Builder setPoolInternal(RrdDbPool pool) {
             this.pool = pool;

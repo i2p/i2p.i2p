@@ -77,7 +77,7 @@ public class XmlWriter implements AutoCloseable {
     /**
      * Return a new {@link XmlWriter} that will format time stamp as ISO 8601 with this explicit time zone {@link ZoneId}
      * @param zid
-     * @return
+     * @return the XmlWriter
      */
     public XmlWriter withTimeZone(ZoneId zid) {
         if (indent.length() != 0 || !openTags.isEmpty()) {
@@ -90,7 +90,7 @@ public class XmlWriter implements AutoCloseable {
     /**
      * Return a new {@link XmlWriter} that will format time stamp using this {@link ZoneId}
      * @param doubleFormatter
-     * @return
+     * @return the XmlWriter
      */
     public XmlWriter withDoubleFormatter(DoubleFormater doubleFormatter) {
         if (indent.length() != 0 || !openTags.isEmpty()) {
@@ -262,7 +262,7 @@ public class XmlWriter implements AutoCloseable {
      * Format a timestamp using the configured {@link DateTimeFormatter}
      *
      * @param timestamp
-     * @return
+     * @return the formatted timestamp
      */
     public String formatTimestamp(long timestamp) {
          return timeFormatter.format(Instant.ofEpochSecond(timestamp));

@@ -214,7 +214,7 @@ public abstract class RrdBackendFactory implements Closeable {
     
     /**
      * Return the current active factories as a stream.
-     * @return
+     * @return the Stream
      * @since 3.7
      */
     public static synchronized Stream<RrdBackendFactory> getActiveFactories() {

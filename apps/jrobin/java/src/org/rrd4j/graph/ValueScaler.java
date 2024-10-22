@@ -1,11 +1,6 @@
 package org.rrd4j.graph;
 
 class ValueScaler {
-    static final String UNIT_UNKNOWN = "?";
-    static final String[] UNIT_SYMBOLS = {
-            "a", "f", "p", "n", "µ", "m", " ", "K", "M", "G", "T", "P", "E"
-    };
-    static final int SYMB_CENTER = 6;
 
     private final double base;
     private double magfact = -1; // nothing scaled before, rescale
@@ -48,16 +43,11 @@ class ValueScaler {
             sindex = (int) (Math.floor(Math.log(Math.abs(value)) / Math.log(base)));
             magfact = Math.pow(base, sindex);
         }
-        if (sindex <= SYMB_CENTER && sindex >= -SYMB_CENTER) {
-            unit = UNIT_SYMBOLS[sindex + SYMB_CENTER];
-            // I2P show 0.xxx instead of xxx m
-            if (unit.equals("m")) {
-                unit = "";
-                magfact *= 1000;
-            }
-        }
-        else {
-            unit = UNIT_UNKNOWN;
+        unit = String.valueOf(FindUnit.resolveSymbol(sindex));
+        // I2P show 0.xxx instead of xxx m
+        if (unit.equals("m")) {
+            unit = "";
+            magfact *= 1000;
         }
         return new Scaled(value / magfact, unit);
     }
