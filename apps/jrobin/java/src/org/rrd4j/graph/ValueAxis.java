@@ -37,15 +37,24 @@ class ValueAxis extends Axis {
     private final RrdGraphDef gdef;
     private final Mapper mapper;
 
-    ValueAxis(RrdGraph rrdGraph) {
-        this(rrdGraph, rrdGraph.worker);
-    }
-
+    /**
+     * Used for tests
+     *
+     * @param rrdGraph
+     * @param worker
+     */
     ValueAxis(RrdGraph rrdGraph, ImageWorker worker) {
         this.im = rrdGraph.im;
         this.gdef = rrdGraph.gdef;
         this.worker = worker;
-        this.mapper = rrdGraph.mapper;
+        this.mapper = new Mapper(this.gdef, this.im);
+    }
+
+    ValueAxis(RrdGraphGenerator generator) {
+        this.im = generator.im;
+        this.gdef = generator.gdef;
+        this.worker = generator.worker;
+        this.mapper = generator.mapper;
     }
 
     boolean draw() {

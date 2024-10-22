@@ -352,7 +352,7 @@ public class Archive implements RrdUpdater<Archive> {
         long startTime = getStartTime();
         for (int i = 0; i < rows.get(); i++) {
             long time = startTime + i * getArcStep();
-            writer.writeComment(Util.getDate(time) + " / " + time);
+            writer.writeComment(writer.formatTimestamp(time) + " / " + time);
             writer.startTag("row");
             for (Robin robin : robins) {
                 writer.writeTag("v", robin.getValue(i));

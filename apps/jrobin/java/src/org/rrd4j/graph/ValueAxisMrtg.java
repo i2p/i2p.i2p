@@ -10,15 +10,22 @@ class ValueAxisMrtg extends Axis {
     private final ImageWorker worker;
     private final RrdGraphDef gdef;
 
-    ValueAxisMrtg(RrdGraph rrdGraph) {
-        this(rrdGraph, rrdGraph.worker);
-    }
-
+    /**
+     * Used for tests
+     *
+     * @param rrdGraph
+     * @param worker
+     */
     ValueAxisMrtg(RrdGraph rrdGraph, ImageWorker worker) {
         this.im = rrdGraph.im;
         this.gdef = rrdGraph.gdef;
         this.worker = worker;
-        im.unit = gdef.unit;
+    }
+
+    ValueAxisMrtg(RrdGraphGenerator generator) {
+        this.im = generator.im;
+        this.gdef = generator.gdef;
+        this.worker = generator.worker;
     }
 
     boolean draw() {
@@ -40,14 +47,14 @@ class ValueAxisMrtg extends Axis {
         else {
             labfmt = Util.sprintf(gdef.locale, "%%4.%df", 1 - ((im.scaledstep / im.magfact > 10.0 || Math.ceil(im.scaledstep / im.magfact) == im.scaledstep / im.magfact) ? 1 : 0));
         }
-        if (im.symbol != ' ' || im.unit != null) {
+        if (im.symbol != ' ' || gdef.unit != null) {
             labfmt += " ";
         }
         if (im.symbol != ' ') {
             labfmt += Character.toString(im.symbol);
         }
-        if (im.unit != null) {
-            labfmt += im.unit;
+        if (gdef.unit != null) {
+            labfmt += gdef.unit;
         }
         for (int i = 0; i <= 4; i++) {
             int y = im.yorigin - im.ysize * i / 4;

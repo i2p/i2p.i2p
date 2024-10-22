@@ -1150,15 +1150,14 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
     }
 
     /**
-     * Writes the RRD content to OutputStream using XML format. This format
+     * Writes the RRD content to {@link XmlWriter} using XML format. This format
      * is fully compatible with RRDTool's XML dump format and can be used for conversion
      * purposes or debugging.
      *
-     * @param destination Output stream to receive XML data
+     * @param writer {@link XmlWriter} to receive XML data
      * @throws java.io.IOException Thrown in case of I/O related error
      */
-    public synchronized void dumpXml(OutputStream destination) throws IOException {
-        XmlWriter writer = new XmlWriter(destination);
+    public synchronized void dumpXml(XmlWriter writer) throws IOException {
         writer.startTag("rrd");
         // dump header
         header.appendXml(writer);
@@ -1172,6 +1171,18 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
         }
         writer.closeTag();
         writer.flush();
+    }
+
+    /**
+     * Writes the RRD content to {@link OutputStream} using XML format. This format
+     * is fully compatible with RRDTool's XML dump format and can be used for conversion
+     * purposes or debugging.
+     *
+     * @param destination Output stream to receive XML data
+     * @throws java.io.IOException Thrown in case of I/O related error
+     */
+    public synchronized void dumpXml(OutputStream destination) throws IOException {
+        dumpXml(new XmlWriter(destination));
     }
 
     /**
@@ -1193,9 +1204,10 @@ public class RrdDb implements RrdUpdater<RrdDb>, Closeable {
      * @throws java.io.IOException Thrown in case of I/O related error
      */
     public synchronized String getXml() throws IOException {
-        ByteArrayOutputStream destination = new ByteArrayOutputStream(XML_BUFFER_CAPACITY);
-        dumpXml(destination);
-        return destination.toString();
+        try (ByteArrayOutputStream destination = new ByteArrayOutputStream(XML_BUFFER_CAPACITY)) {
+            dumpXml(destination);
+            return destination.toString();
+        }
     }
 
     /**

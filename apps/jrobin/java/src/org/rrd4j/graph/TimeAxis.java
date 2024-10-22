@@ -34,18 +34,27 @@ class TimeAxis extends Axis {
     private final double secPerPix;
     private final Calendar calendar;
 
-    TimeAxis(RrdGraph rrdGraph) {
-        this(rrdGraph, rrdGraph.worker);
-    }
-
     /**
-     * Used for test
+     * Used for tests
+     *
+     * @param rrdGraph
+     * @param worker
      */
     TimeAxis(RrdGraph rrdGraph, ImageWorker worker) {
         this.im = rrdGraph.im;
         this.worker = worker;
         this.gdef = rrdGraph.gdef;
-        this.mapper = rrdGraph.mapper;
+        this.mapper = new Mapper(this.gdef, this.im);
+        this.secPerPix = (im.end - im.start) / (double) im.xsize;
+        this.calendar = Calendar.getInstance(gdef.tz, gdef.locale);
+        this.calendar.setFirstDayOfWeek(gdef.firstDayOfWeek);
+    }
+
+    TimeAxis(RrdGraphGenerator generator) {
+        this.im = generator.im;
+        this.worker = generator.worker;
+        this.gdef = generator.gdef;
+        this.mapper = generator.mapper;
         this.secPerPix = (im.end - im.start) / (double) im.xsize;
         this.calendar = Calendar.getInstance(gdef.tz, gdef.locale);
         this.calendar.setFirstDayOfWeek(gdef.firstDayOfWeek);
