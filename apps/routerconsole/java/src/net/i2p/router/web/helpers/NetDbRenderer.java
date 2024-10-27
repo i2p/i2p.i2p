@@ -700,7 +700,8 @@ class NetDbRenderer {
         leases.addAll(netdb.getLeases());
         LeaseSet myLeaseSet = new LeaseSet();
         if (leases.size() > 0)
-            myLeaseSet = netdb.lookupLeaseSetLocally(client);
+            if (client != null)
+                myLeaseSet = netdb.lookupLeaseSetLocally(client);
         int medianCount = 0;
         int rapCount = 0;
         BigInteger median = null;
