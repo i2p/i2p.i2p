@@ -1,5 +1,7 @@
 package org.rrd4j.graph;
 
+import java.util.function.DoubleUnaryOperator;
+
 class ImageParameters {
     long start, end;
     double minval, maxval;
@@ -18,5 +20,5 @@ class ImageParameters {
     int yorigin;
     int unitslength;
     int xgif, ygif;
-    String unit;
+    DoubleUnaryOperator log;
 }

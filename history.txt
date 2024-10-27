@@ -1,4 +1,7 @@
-2024-08-07 2.7.0 (API 0.9.64) released
+2024-10-22 zzz
+ * Console: Merge in more upstream rrd4j changes for 3.10
+
+2024-10-08 2.7.0 (API 0.9.64) released
 
 2024-10-08 idk
  * Fix failing tests
@@ -38,7 +41,7 @@
 
 2024-08-09 zzz
  * i2psnark: Reduce minimum banwdith, reduce max connections if low bandwidth
- * i2psnark, susimail: Normailze strings when searching (Gitlab #488)
+ * i2psnark, susimail: Normalize strings when searching (Gitlab #488)
  * susimail: Fix searches for multiple terms
  * Tunnels: Do not select ElG routers for tunnels
  * Util: Reduce number of PRNG output buffers

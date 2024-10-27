@@ -33,7 +33,7 @@ abstract class Source {
     /**
      * @param tStart
      * @param tEnd
-     * @return
+     * @return the Aggregates
      * @deprecated This method is deprecated. Uses instance of {@link org.rrd4j.data.Variable}, used with {@link org.rrd4j.data.DataProcessor#addDatasource(String, String, Variable)}
      */
     @Deprecated
@@ -46,7 +46,7 @@ abstract class Source {
      * @param tStart
      * @param tEnd
      * @param percentile
-     * @return
+     * @return the percentile
      * @deprecated This method is deprecated. Uses instance of {@link org.rrd4j.data.Variable.PERCENTILE}, used with {@link org.rrd4j.data.DataProcessor#addDatasource(String, String, Variable)}
      */
     @Deprecated

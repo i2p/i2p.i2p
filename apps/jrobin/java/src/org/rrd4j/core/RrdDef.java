@@ -633,36 +633,50 @@ public class RrdDef {
      */
     public void exportXmlTemplate(OutputStream out, boolean compatible) {
         try (XmlWriter xml = new XmlWriter(out)) {
-            xml.startTag("rrd_def");
-            if (compatible) {
-                xml.writeTag("path", getPath());
-            } else {
-                xml.writeTag("uri", getUri());
-            }
-            xml.writeTag("step", getStep());
-            xml.writeTag("start", getStartTime());
-            // datasources
-            DsDef[] dsDefs = getDsDefs();
-            for (DsDef dsDef : dsDefs) {
-                xml.startTag("datasource");
-                xml.writeTag("name", dsDef.getDsName());
-                xml.writeTag("type", dsDef.getDsType());
-                xml.writeTag("heartbeat", dsDef.getHeartbeat());
-                xml.writeTag("min", dsDef.getMinValue(), "U");
-                xml.writeTag("max", dsDef.getMaxValue(), "U");
-                xml.closeTag(); // datasource
-            }
-            ArcDef[] arcDefs = getArcDefs();
-            for (ArcDef arcDef : arcDefs) {
-                xml.startTag("archive");
-                xml.writeTag("cf", arcDef.getConsolFun());
-                xml.writeTag("xff", arcDef.getXff());
-                xml.writeTag("steps", arcDef.getSteps());
-                xml.writeTag("rows", arcDef.getRows());
-                xml.closeTag(); // archive
-            }
-            xml.closeTag(); // rrd_def
+            exportXmlTemplate(xml, compatible);
         }
+    }
+
+    /**
+     * Exports RrdDef object to output stream in XML format. Generated XML code can be parsed
+     * with {@link org.rrd4j.core.RrdDefTemplate} class.
+     * <p>If <code>compatible</code> is set to true, it returns an XML compatible with previous RRD4J's versions, using
+     * a path, instead of an URI.</p>
+     *
+     * @param xml XML writer
+     * @param compatible Compatible with previous versions.
+     */
+    public void exportXmlTemplate(XmlWriter xml, boolean compatible) {
+        xml.startTag("rrd_def");
+        if (compatible) {
+            xml.writeTag("path", getPath());
+        } else {
+            xml.writeTag("uri", getUri());
+        }
+        xml.writeTag("step", getStep());
+        xml.writeTag("start", getStartTime());
+        // datasources
+        DsDef[] dsDefs = getDsDefs();
+        for (DsDef dsDef : dsDefs) {
+            xml.startTag("datasource");
+            xml.writeTag("name", dsDef.getDsName());
+            xml.writeTag("type", dsDef.getDsType());
+            xml.writeTag("heartbeat", dsDef.getHeartbeat());
+            xml.writeTag("min", dsDef.getMinValue(), "U");
+            xml.writeTag("max", dsDef.getMaxValue(), "U");
+            xml.closeTag(); // datasource
+        }
+        ArcDef[] arcDefs = getArcDefs();
+        for (ArcDef arcDef : arcDefs) {
+            xml.startTag("archive");
+            xml.writeTag("cf", arcDef.getConsolFun());
+            xml.writeTag("xff", arcDef.getXff());
+            xml.writeTag("steps", arcDef.getSteps());
+            xml.writeTag("rows", arcDef.getRows());
+            xml.closeTag(); // archive
+        }
+        xml.closeTag(); // rrd_def
+        xml.flush();
     }
 
     /**

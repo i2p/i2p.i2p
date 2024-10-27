@@ -37,15 +37,24 @@ class ValueAxis extends Axis {
     private final RrdGraphDef gdef;
     private final Mapper mapper;
 
-    ValueAxis(RrdGraph rrdGraph) {
-        this(rrdGraph, rrdGraph.worker);
-    }
-
+    /**
+     * Used for tests
+     *
+     * @param rrdGraph
+     * @param worker
+     */
     ValueAxis(RrdGraph rrdGraph, ImageWorker worker) {
         this.im = rrdGraph.im;
         this.gdef = rrdGraph.gdef;
         this.worker = worker;
-        this.mapper = rrdGraph.mapper;
+        this.mapper = new Mapper(this.gdef, this.im);
+    }
+
+    ValueAxis(RrdGraphGenerator generator) {
+        this.im = generator.im;
+        this.gdef = generator.gdef;
+        this.worker = generator.worker;
+        this.mapper = generator.mapper;
     }
 
     boolean draw() {
@@ -124,8 +133,6 @@ class ValueAxis extends Axis {
         int egrid = (int) (im.maxval / gridstep + 1);
         double scaledstep = gridstep / im.magfact;
         boolean fractional = isFractional(scaledstep, labfact);
-        // I2P skip ticks if zero width
-        boolean ticks = ((BasicStroke)gdef.tickStroke).getLineWidth() > 0;
         for (int i = sgrid; i <= egrid; i++) {
             int y = mapper.ytr(gridstep * i);
             if (y >= im.yorigin - im.ysize && y <= im.yorigin) {
@@ -157,14 +164,16 @@ class ValueAxis extends Axis {
                     }
                     int length = (int) (worker.getStringWidth(graph_label, font));
                     worker.drawString(graph_label, x0 - length - PADDING_VLABEL, y + labelOffset, font, fontColor);
-                    if (ticks) {
+                    // skip ticks if zero width
+                    if (gdef.drawTicks()) {
                         worker.drawLine(x0 - 2, y, x0 + 2, y, mGridColor, gdef.tickStroke);
                         worker.drawLine(x1 - 2, y, x1 + 2, y, mGridColor, gdef.tickStroke);
                     }
                     worker.drawLine(x0, y, x1, y, mGridColor, gdef.gridStroke);
                 }
                 else if (!(gdef.noMinorGrid)) {
-                    if (ticks) {
+                    // skip ticks if zero width
+                    if (gdef.drawTicks()) {
                         worker.drawLine(x0 - 1, y, x0 + 1, y, gridColor, gdef.tickStroke);
                         worker.drawLine(x1 - 1, y, x1 + 1, y, gridColor, gdef.tickStroke);
                     }

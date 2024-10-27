@@ -1,16 +1,16 @@
 package org.rrd4j.core;
 
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.*;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Locale;
-import java.util.TimeZone;
 
 /**
  * Extremely simple utility class used to create XML documents.
@@ -18,22 +18,37 @@ import java.util.TimeZone;
 public class XmlWriter implements AutoCloseable {
     static final String INDENT_STR = "   ";
     private static final String STYLE = "style";
-    private static final SimpleDateFormat ISOLIKE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ", Locale.ENGLISH);
-    static {
-        ISOLIKE.setTimeZone(TimeZone.getTimeZone("UTC"));
+    private static final DateTimeFormatter ISOLIKE = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSZ")
+                                                                      .withLocale(Locale.ENGLISH)
+                                                                      .withZone(ZoneId.of("UTC"));
+    private static final String DEFAULT_NAN_STRING = Double.toString(Double.NaN);
+
+    @FunctionalInterface
+    public interface DoubleFormater {
+        String format(double value, String nanString);
     }
 
     private final PrintWriter writer;
     private final StringBuilder indent = new StringBuilder();
     private final Deque<String> openTags = new LinkedList<>();
+    private final DateTimeFormatter timeFormatter;
+    private final DoubleFormater doubleFormatter;
+
+    private XmlWriter(PrintWriter writer, DateTimeFormatter timeFormatter, DoubleFormater doubleFormatter) {
+        this.writer = writer;
+        this.timeFormatter = timeFormatter;
+        this.doubleFormatter = doubleFormatter;
+    }
 
     /**
-     * Creates XmlWriter with the specified output stream to send XML code to.
+     * Creates XmlWriter with the specified {@link OutputStream} to send XML code to.
      *
-     * @param stream Output stream which receives XML code
+     * @param stream {@link OutputStream} which receives XML code
      */
     public XmlWriter(OutputStream stream) {
         writer = new PrintWriter(stream, true);
+        timeFormatter = ISOLIKE;
+        this.doubleFormatter = (d, n) -> Util.formatDouble(d, n,true);
     }
 
     /**
@@ -44,6 +59,44 @@ public class XmlWriter implements AutoCloseable {
      */
     public XmlWriter(OutputStream stream, boolean autoFlush) {
         writer = new PrintWriter(stream, autoFlush);
+        timeFormatter = ISOLIKE;
+        this.doubleFormatter = (d, n) -> Util.formatDouble(d, n,true);
+    }
+
+    /**
+     * Creates XmlWriter with the specified {@link PrintWriter} to send XML code to.
+     *
+     * @param stream {@link PrintWriter} which receives XML code
+     */
+    public XmlWriter(PrintWriter stream) {
+        writer = stream;
+        timeFormatter = ISOLIKE;
+        this.doubleFormatter = (d, n) -> Util.formatDouble(d, n,true);
+    }
+
+    /**
+     * Return a new {@link XmlWriter} that will format time stamp as ISO 8601 with this explicit time zone {@link ZoneId}
+     * @param zid
+     * @return the XmlWriter
+     */
+    public XmlWriter withTimeZone(ZoneId zid) {
+        if (indent.length() != 0 || !openTags.isEmpty()) {
+            throw new IllegalStateException("Can't be used on a already used XmlWriter");
+        }
+        DateTimeFormatter dtf = this.timeFormatter.withZone(zid);
+        return new XmlWriter(writer, dtf, doubleFormatter);
+    }
+
+    /**
+     * Return a new {@link XmlWriter} that will format time stamp using this {@link ZoneId}
+     * @param doubleFormatter
+     * @return the XmlWriter
+     */
+    public XmlWriter withDoubleFormatter(DoubleFormater doubleFormatter) {
+        if (indent.length() != 0 || !openTags.isEmpty()) {
+            throw new IllegalStateException("Can't be used on a already used XmlWriter");
+        }
+        return new XmlWriter(writer, timeFormatter, doubleFormatter);
     }
 
     /**
@@ -110,7 +163,7 @@ public class XmlWriter implements AutoCloseable {
      * @param nanString a {@link java.lang.String} object.
      */
     public void writeTag(String tag, double value, String nanString) {
-        writeTag(tag, Util.formatDouble(value, nanString, true));
+        writeTag(tag, doubleFormatter.format(value, nanString));
     }
 
     /**
@@ -120,7 +173,7 @@ public class XmlWriter implements AutoCloseable {
      * @param value value to be placed between <code>&lt;tag&gt;</code> and <code>&lt;/tag&gt;</code>
      */
     public void writeTag(String tag, double value) {
-        writeTag(tag, Util.formatDouble(value, true));
+        writeTag(tag, doubleFormatter.format(value, DEFAULT_NAN_STRING));
     }
 
     /**
@@ -193,12 +246,26 @@ public class XmlWriter implements AutoCloseable {
      * @param comment comment string
      */
     public void writeComment(Object comment) {
-        if (comment instanceof Date) {
-            synchronized (ISOLIKE) {
-                comment = ISOLIKE.format((Date) comment);
-            }
-        }
         writer.println(indent + "<!-- " + escape(comment.toString()) + " -->");
+    }
+
+    /**
+     * Writes a timestamp using the configured {@link DateTimeFormatter} as an XML comment to output stream
+     *
+     * @param timestamp
+     */
+    public void writeComment(long timestamp) {
+        writer.println(indent + "<!-- " + escape(formatTimestamp(timestamp)) + " -->");
+    }
+
+    /**
+     * Format a timestamp using the configured {@link DateTimeFormatter}
+     *
+     * @param timestamp
+     * @return the formatted timestamp
+     */
+    public String formatTimestamp(long timestamp) {
+         return timeFormatter.format(Instant.ofEpochSecond(timestamp));
     }
 
     private static String escape(String s) {

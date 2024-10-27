@@ -173,7 +173,7 @@ public class Header implements RrdUpdater<Header> {
         writer.writeTag("version", RRDTOOL_VERSION3);
         writer.writeComment("Seconds");
         writer.writeTag("step", step.get());
-        writer.writeComment(Util.getDate(lastUpdateTime.get()));
+        writer.writeComment(lastUpdateTime.get());
         writer.writeTag("lastupdate", lastUpdateTime.get());
     }
 

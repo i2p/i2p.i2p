@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.TimeZone;
+import java.util.function.Function;
 
 import javax.imageio.ImageIO;
 
@@ -108,7 +110,8 @@ public class RrdGraphDef implements RrdGraphConstants, DataHolder {
     String filename = RrdGraphConstants.IN_MEMORY_IMAGE; // ok
     long startTime, endTime; // ok
     TimeAxisSetting timeAxisSetting = null; // ok
-    TimeLabelFormat timeLabelFormat = null; // ok
+    TimeLabelFormat timeLabelFormat = null;
+    Function<TimeUnit, Optional<TimeLabelFormat>> formatProvider = s -> Optional.empty();
     ValueAxisSetting valueAxisSetting = null; // ok
     boolean altYGrid = false; // ok
     boolean noMinorGrid = false; // ok
@@ -394,6 +397,54 @@ public class RrdGraphDef implements RrdGraphConstants, DataHolder {
      */
     public void setTimeLabelFormat(TimeLabelFormat format) {
         timeLabelFormat = format;
+    }
+
+    /**
+     * <p>This allows to keep the default major and minor grid unit, but with changing only the label formatting,
+     * that will be formatted differently according to {@link TimeUnit} chosen for the time axis.</p>
+     * <p>If the returned {@link Optional} is empty, the default formatting will be kept</p>
+     * <table border="1">
+     *     <caption>Default formatting</caption>
+     *   <thead>
+     *     <tr>
+     *       <th>{@link TimeUnit}</th>
+     *       <th>Default pattern</th>
+     *     </tr>
+     *   </thead>
+     *   <tbody>
+     *     <tr>
+     *       <td>MINUTE</td>
+     *       <td>HH:mm</td>
+     *     </tr>
+     *     <tr>
+     *       <td>HOUR</td>
+     *       <td>HH:mm</td>
+     *     </tr>
+     *     <tr>
+     *       <td>DAY</td>
+     *       <td>EEE dd</td>
+     *     </tr>
+     *     <tr>
+     *       <td>WEEK</td>
+     *       <td>'Week 'w</td>
+     *     </tr>
+     *     <tr>
+     *       <td>MONTH</td>
+     *       <td>MMM</td>
+     *     </tr>
+     *     <tr>
+     *       <td>YEAR</td>
+     *       <td>yy</td>
+     *     </tr>
+     *   </tbody>
+     * </table>
+     *
+     *
+     * @param formatProvider An {@link Optional} holding the {@link TimeLabelFormat} to use or empy to keep the default.
+     * @since 3.10
+     */
+    public void setTimeLabelFormatter(Function<TimeUnit, Optional<TimeLabelFormat>> formatProvider) {
+        this.formatProvider = formatProvider;
     }
 
     /**
@@ -1937,6 +1988,13 @@ public class RrdGraphDef implements RrdGraphConstants, DataHolder {
     @Override
     public long getStep() {
         return this.step;
+    }
+
+    /**
+     * @since 3.10
+     */
+    boolean drawTicks() {
+        return tickStroke != null && ((! (tickStroke instanceof BasicStroke)) || ((BasicStroke)tickStroke).getLineWidth() > 0);
     }
 
 }

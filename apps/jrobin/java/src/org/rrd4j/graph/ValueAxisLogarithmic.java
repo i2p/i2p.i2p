@@ -1,8 +1,7 @@
 package org.rrd4j.graph;
 
-import org.rrd4j.core.Util;
-
 import java.awt.*;
+import java.util.Locale;
 
 class ValueAxisLogarithmic extends Axis {
     private static final double[][] yloglab = {
@@ -15,22 +14,52 @@ class ValueAxisLogarithmic extends Axis {
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
     };
 
+    @FunctionalInterface
+    private interface IntDoubleLabelConsumer {
+        void accept(int a, double b, String formatPattern);
+        default void accept(int a, double b) {
+            accept(a, b, "%.0e");
+        }
+    }
+
+    @FunctionalInterface
+    private interface IntDoubleLineConsumer {
+        void accept(int a, double b, Paint color);
+    }
+
     private final ImageParameters im;
     private final ImageWorker worker;
     private final RrdGraphDef gdef;
     private final int fontHeight;
     private final Mapper mapper;
+    private final Locale locale;
 
-    ValueAxisLogarithmic(RrdGraph rrdGraph) {
-        this(rrdGraph, rrdGraph.worker);
+    /**
+     * Used for tests
+     *
+     * @param rrdGraph
+     * @param worker
+     */
+    ValueAxisLogarithmic(RrdGraph rrdGraph, ImageWorker worker, Locale locale) {
+        this.im = rrdGraph.im;
+        this.gdef = rrdGraph.gdef;
+        this.worker = worker;
+        this.fontHeight = (int) Math.ceil(worker.getFontHeight(gdef.getFont(FONTTAG_AXIS)));
+        this.mapper = new Mapper(this.gdef, this.im);
+        this.locale = locale;
     }
 
-    ValueAxisLogarithmic(RrdGraph rrdGraph, ImageWorker worker) {
+    ValueAxisLogarithmic(RrdGraphGenerator rrdGraph, ImageWorker worker, Locale locale) {
         this.im = rrdGraph.im;
         this.gdef = rrdGraph.gdef;
         this.worker = worker;
         this.fontHeight = (int) Math.ceil(worker.getFontHeight(gdef.getFont(FONTTAG_AXIS)));
         this.mapper = rrdGraph.mapper;
+        this.locale = locale;
+    }
+
+    private double findStart(double positive, int idx) {
+        return Math.pow(10, im.log.applyAsDouble(positive) - im.log.applyAsDouble(positive) % im.log.applyAsDouble(yloglab[idx][0]));
     }
 
     boolean draw() {
@@ -43,21 +72,23 @@ class ValueAxisLogarithmic extends Axis {
         if (im.maxval == im.minval) {
             return false;
         }
-        double pixpex = im.ysize / (log10(im.maxval) - log10(im.minval));
+        double pixpex = im.ysize / (im.log.applyAsDouble(im.maxval) - im.log.applyAsDouble(im.minval));
         if (Double.isNaN(pixpex)) {
             return false;
         }
-        double minstep, pixperstep;
-        int minoridx = 0, majoridx = 0;
+        int minoridx = 0;
+        int majoridx = 0;
+
+        // Find the index in yloglab for major and minor grid
         for (int i = 0; yloglab[i][0] > 0; i++) {
-            minstep = log10(yloglab[i][0]);
+            double minstep = Math.log10(yloglab[i][0]);
             for (int ii = 1; yloglab[i][ii + 1] > 0; ii++) {
                 if (yloglab[i][ii + 2] == 0) {
-                    minstep = log10(yloglab[i][ii + 1]) - log10(yloglab[i][ii]);
+                    minstep = Math.log10(yloglab[i][ii + 1]) - Math.log10(yloglab[i][ii]);
                     break;
                 }
             }
-            pixperstep = pixpex * minstep;
+            double pixperstep = pixpex * minstep;
             if (pixperstep > 5) {
                 minoridx = i;
             }
@@ -66,14 +97,32 @@ class ValueAxisLogarithmic extends Axis {
             }
         }
 
-        // Draw minor grid for positive values
-        double positiveMin = (im.minval > 0.0) ? im.minval : 0.0;
-        int x0 = im.xorigin, x1 = x0 + im.xsize;
+        double positiveMin = Math.max(im.minval, 0.0);
+        int x0 = im.xorigin;
+        int x1 = x0 + im.xsize;
         if (yloglab[minoridx][0] == 0 || yloglab[majoridx][0] == 0) {
             return false;
         }
-        for (double value = Math.pow(10, log10(positiveMin)
-                - log10(positiveMin) % log10(yloglab[minoridx][0]));
+        String zeroFormatted = String.format(locale, "%.0e", 0.0);
+        IntDoubleLabelConsumer drawAxisLabel = (y, v, f) -> {
+            String graphLabel = String.format(locale, f, v);
+            if (zeroFormatted.equals(graphLabel)) {
+                graphLabel = String.format(locale, "%.0f", v);
+            }
+            int length = (int) (worker.getStringWidth(graphLabel, font));
+            worker.drawString(graphLabel, x0 - length - PADDING_VLABEL, y + labelOffset, font, fontColor);
+        };
+        IntDoubleLineConsumer drawAxisLines = (y, v, p) -> {
+            if (gdef.drawTicks()) {
+                worker.drawLine(x0 - 1, y, x0 + 1, y, p, gdef.tickStroke);
+                worker.drawLine(x1 - 1, y, x1 + 1, y, p, gdef.tickStroke);
+            }
+            worker.drawLine(x0, y, x1, y, p, gdef.gridStroke);
+        };
+
+
+        // Draw minor grid for positive values
+        for (double value = findStart(positiveMin, minoridx);
                 value <= im.maxval;
                 value *= yloglab[minoridx][0]) {
             if (value < positiveMin) continue;
@@ -83,16 +132,13 @@ class ValueAxisLogarithmic extends Axis {
                 if (y <= im.yorigin - im.ysize) {
                     break;
                 }
-                worker.drawLine(x0 - 1, y, x0 + 1, y, gridColor, gdef.tickStroke);
-                worker.drawLine(x1 - 1, y, x1 + 1, y, gridColor, gdef.tickStroke);
-                worker.drawLine(x0, y, x1, y, gridColor, gdef.gridStroke);
+                drawAxisLines.accept(y, value, gridColor);
             }
         }
 
         // Draw minor grid for negative values
-        double negativeMin = -1.0 * ((im.maxval < 0.0) ? im.maxval : 0.0);
-        for (double value = Math.pow(10, log10(negativeMin)
-                - log10(negativeMin) % log10(yloglab[minoridx][0]));
+        double negativeMin = -1.0 * (Math.min(im.maxval, 0.0));
+        for (double value = findStart(negativeMin, minoridx);
                 value <= -1.0 * im.minval;
                 value *= yloglab[minoridx][0]) {
             if (value < negativeMin) continue;
@@ -102,9 +148,7 @@ class ValueAxisLogarithmic extends Axis {
                 if (y <= im.yorigin - im.ysize) {
                     break;
                 }
-                worker.drawLine(x0 - 1, y, x0 + 1, y, gridColor, gdef.tickStroke);
-                worker.drawLine(x1 - 1, y, x1 + 1, y, gridColor, gdef.tickStroke);
-                worker.drawLine(x0, y, x1, y, gridColor, gdef.gridStroke);
+                drawAxisLines.accept(y, value, gridColor);
             }
         }
 
@@ -113,18 +157,14 @@ class ValueAxisLogarithmic extends Axis {
         if (im.minval < 0.0 && im.maxval > 0.0) {
             skipFirst = true;
             int y = mapper.ytr(0.0);
-            worker.drawLine(x0 - 2, y, x0 + 2, y, mGridColor, gdef.tickStroke);
-            worker.drawLine(x1 - 2, y, x1 + 2, y, mGridColor, gdef.tickStroke);
-            worker.drawLine(x0, y, x1, y, mGridColor, gdef.gridStroke);
-            String graph_label = Util.sprintf(gdef.locale, "%3.0e", 0.0);
-            int length = (int) (worker.getStringWidth(graph_label, font));
-            worker.drawString(graph_label, x0 - length - PADDING_VLABEL, y + labelOffset, font, fontColor);
+            drawAxisLines.accept(y, 0.0, mGridColor);
+            drawAxisLabel.accept(y, 0.0);
         }
 
         // Draw major grid for positive values
         int iter = 0;
-        for (double value = Math.pow(10, log10(positiveMin)
-                - (log10(positiveMin) % log10(yloglab[majoridx][0])));
+        int lasty = Integer.MAX_VALUE;
+        for (double value = findStart(positiveMin, majoridx);
                 value <= im.maxval;
                 value *= yloglab[majoridx][0]) {
             if (value < positiveMin) {
@@ -140,19 +180,18 @@ class ValueAxisLogarithmic extends Axis {
                 if (y <= im.yorigin - im.ysize) {
                     break;
                 }
-                worker.drawLine(x0 - 2, y, x0 + 2, y, mGridColor, gdef.tickStroke);
-                worker.drawLine(x1 - 2, y, x1 + 2, y, mGridColor, gdef.tickStroke);
-                worker.drawLine(x0, y, x1, y, mGridColor, gdef.gridStroke);
-                String graph_label = Util.sprintf(gdef.locale, "%3.0e", value * yloglab[majoridx][i]);
-                int length = (int) (worker.getStringWidth(graph_label, font));
-                worker.drawString(graph_label, x0 - length - PADDING_VLABEL, y + labelOffset, font, fontColor);
+                // Avoid collision of labels
+                if ((lasty - y) > fontHeight) {
+                    drawAxisLines.accept(y, value, mGridColor);
+                    drawAxisLabel.accept(y, value * yloglab[majoridx][i]);
+                    lasty = y;
+                }
             }
         }
 
         // Draw major grid for negative values
         iter = 0;
-        for (double value = Math.pow(10, log10(negativeMin)
-                - (log10(negativeMin) % log10(yloglab[majoridx][0])));
+        for (double value = findStart(negativeMin, majoridx);
                 value <= -1.0 * im.minval;
                 value *= yloglab[majoridx][0]) {
             if (value < negativeMin) {
@@ -168,28 +207,12 @@ class ValueAxisLogarithmic extends Axis {
                 if (y <= im.yorigin - im.ysize) {
                     break;
                 }
-                worker.drawLine(x0 - 2, y, x0 + 2, y, mGridColor, gdef.tickStroke);
-                worker.drawLine(x1 - 2, y, x1 + 2, y, mGridColor, gdef.tickStroke);
-                worker.drawLine(x0, y, x1, y, mGridColor, gdef.gridStroke);
-                String graph_label = Util.sprintf(gdef.locale, "%3.0e", -1.0 * value * yloglab[majoridx][i]);
-                int length = (int) (worker.getStringWidth(graph_label, font));
-                worker.drawString(graph_label, x0 - length - PADDING_VLABEL, y + labelOffset, font, fontColor);
+                drawAxisLines.accept(y, value, mGridColor);
+                drawAxisLabel.accept(y, -1.0 * value * yloglab[majoridx][i]);
             }
         }
 
         return true;
     }
 
-    /**
-     * Compute logarithm for the purposes of y-axis. 
-     */
-    static double log10(double v) {
-        double lv = Math.log10(Math.abs(v));
-        if (lv < 0) {
-            // Don't cross the sign line, round to 0 if that's the case
-            return 0.0;
-        } else {
-            return Math.copySign(lv, v);
-        }
-    }
 }
