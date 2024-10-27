@@ -20,12 +20,6 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 
 
-/**
- * Utilities for Blinding EdDSA keys.
- * PRELIMINARY - Subject to change - see proposal 123
- *
- * @since 0.9.38
- */
 public final class Blinding {
 
     private static final SigType TYPE = SigType.EdDSA_SHA512_Ed25519;
@@ -70,14 +64,6 @@ public final class Blinding {
         }
     }
 
-    /**
-     *  Only for SigTypes EdDSA_SHA512_Ed25519 and RedDSA_SHA512_Ed25519.
-     *
-     *  @param key must be SigType EdDSA_SHA512_Ed25519 or RedDSA_SHA512_Ed25519
-     *  @param alpha must be SigType RedDSA_SHA512_Ed25519
-     *  @return SigType RedDSA_SHA512_Ed25519
-     *  @throws IllegalArgumentException on bad inputs or unsupported SigTypes
-     */
     public static SigningPrivateKey blind(SigningPrivateKey key, SigningPrivateKey alpha) {
         SigType type = key.getType();
         if ((type != TYPE && type != TYPER) ||
@@ -93,14 +79,7 @@ public final class Blinding {
         }
     }
 
-    /**
-     *  Only for SigType EdDSA_SHA512_Ed25519.
-     *
-     *  @param key must be SigType RedDSA_SHA512_Ed25519
-     *  @param alpha must be SigType RedDSA_SHA512_Ed25519
-     *  @return SigType EdDSA_SHA512_Ed25519
-     *  @throws IllegalArgumentException on bad inputs or unsupported SigTypes
-     */
+
     public static SigningPrivateKey unblind(SigningPrivateKey key, SigningPrivateKey alpha) {
         if (key.getType() != TYPER || alpha.getType() != TYPER)
             throw new IllegalArgumentException("Unsupported blinding from " + key.getType() + " / " + alpha.getType());
@@ -114,32 +93,13 @@ public final class Blinding {
         }
     }
 
-    /**
-     *  Generate alpha for current time.
-     *  Only for SigType EdDSA_SHA512_Ed25519.
-     *
-     *  @param destspk must be SigType EdDSA_SHA512_Ed25519
-     *  @param secret may be null or zero-length
-     *  @return SigType RedDSA_SHA512_Ed25519
-     *  @throws IllegalArgumentException on bad inputs or unsupported SigTypes
-     *  @since 0.9.39
-     */
+
     public static SigningPrivateKey generateAlpha(I2PAppContext ctx, SigningPublicKey destspk, String secret) {
         long now = ctx.clock().now();
         return generateAlpha(ctx, destspk, secret, now);
     }
 
-    /**
-     *  Generate alpha for the given time.
-     *  Only for SigType EdDSA_SHA512_Ed25519 or RedDSA_SHA512_Ed25519.
-     *
-     *  @param destspk must be SigType EdDSA_SHA512_Ed25519 or RedDSA_SHA512_Ed25519
-     *  @param secret may be null or zero-length
-     *  @param now for what time?
-     *  @return SigType RedDSA_SHA512_Ed25519
-     *  @throws IllegalArgumentException on bad inputs or unsupported SigTypes
-     *  @since 0.9.39
-     */
+
     public static SigningPrivateKey generateAlpha(I2PAppContext ctx, SigningPublicKey destspk,
                                                   String secret, long now) {
         SigType type = destspk.getType();
@@ -173,36 +133,16 @@ public final class Blinding {
         Hash salt = ctx.sha().calculateHash(in);
         hkdf.calculate(salt.getData(), data, INFO, out, out, 32);
         byte[] b = EdDSABlinding.reduce(out);
-        //net.i2p.util.Log log = ctx.logManager().getLog(Blinding.class);
-        //log.debug("Input to salt sha256:\n" + net.i2p.util.HexDump.dump(in));
-        //log.debug("salt:\n" + net.i2p.util.HexDump.dump(salt.getData()));
-        //log.debug("data:\n" + net.i2p.util.HexDump.dump(data));
-        //log.debug("hkdf output (seed):\n" + net.i2p.util.HexDump.dump(out));
-        //log.debug("alpha (seed mod l):\n" + net.i2p.util.HexDump.dump(b));
+
         return new SigningPrivateKey(TYPER, b);
     }
 
-    /**
-     *  What's the default blinded type for a given unblinded type?
-     *
-     *  @return non-null
-     *  @since 0.9.40
-     */
     public static SigType getDefaultBlindedType(SigType unblindedType) {
         if (unblindedType == TYPE)
             return TYPER;
         return unblindedType;
     }
 
-    /**
-     *  Decode a new-format b32 address.
-     *  See proposal 149.
-     *
-     *  @param address ending with ".b32.i2p"
-     *  @return BlindData structure, use getUnblindedPubKey() for the result
-     *  @throws IllegalArgumentException on bad inputs or unsupported SigTypes
-     *  @since 0.9.40
-     */
     public static BlindData decode(I2PAppContext ctx, String address) throws IllegalArgumentException {
         address = address.toLowerCase(Locale.US);
         if (!address.endsWith(".b32.i2p"))
@@ -214,17 +154,7 @@ public final class Blinding {
             throw new IllegalArgumentException("Not a new-format address");
         return decode(ctx, b);
     }
-
-    /**
-     *  Decode a new-format b32 address.
-     *  See proposal 149.
-     *  NOTE: Not for external use, use decode(String)
-     *
-     *  @param b 35+ bytes
-     *  @return BlindData structure, use getUnblindedPubKey() for the result
-     *  @throws IllegalArgumentException on bad inputs or unsupported SigTypes
-     *  @since 0.9.40
-     */
+    
     public static BlindData decode(I2PAppContext ctx, byte[] b) throws IllegalArgumentException {
         Checksum crc = new CRC32();
         crc.update(b, 3, b.length - 3);
@@ -267,26 +197,12 @@ public final class Blinding {
         return rv;
     }
 
-    /**
-     *  Encode a public key as a new-format b32 address.
-     *  See proposal 149.
-     *
-     *  @return (56 chars).b32.i2p
-     *  @throws IllegalArgumentException on bad inputs or unsupported SigTypes
-     *  @since 0.9.40
-     */
+
     public static String encode(SigningPublicKey key) throws IllegalArgumentException {
         return encode(key, false, false);
     }
 
-    /**
-     *  Encode a public key as a new-format b32 address.
-     *  See proposal 149.
-     *
-     *  @return (56 chars).b32.i2p
-     *  @throws IllegalArgumentException on bad inputs or unsupported SigTypes
-     *  @since 0.9.40
-     */
+
     public static String encode(SigningPublicKey key,
                                 boolean requireSecret, boolean requireAuth) throws IllegalArgumentException {
         SigType type = key.getType();
@@ -321,47 +237,4 @@ public final class Blinding {
         System.out.println(decode(I2PAppContext.getGlobalContext(), args[0]).toString());
     }
 
-/******
-    public static void main(String args[]) throws Exception {
-        net.i2p.data.SimpleDataStructure[] keys = KeyGenerator.getInstance().generateSigningKeys(TYPE);
-        SigningPublicKey pub = (SigningPublicKey) keys[0];
-        SigningPrivateKey priv = (SigningPrivateKey) keys[1];
-        I2PAppContext ctx = I2PAppContext.getGlobalContext();
-        //String b32 = encode(pub, null);
-        String b32 = encode(pub, true, false);
-        System.out.println("pub b32 is " + b32);
-        BlindData bd = decode(ctx, b32);
-        if (bd.getBlindedPubKey().equals(pub))
-            System.out.println("B32 test failed");
-        else
-            System.out.println("B32 test passed");
-        byte[] b = new byte[64];
-        ctx.random().nextBytes(b);
-        b = EdDSABlinding.reduce(b);
-        SigningPrivateKey alpha = new SigningPrivateKey(TYPER, b);
-        SigningPublicKey bpub = null;
-        try {
-            bpub = blind(pub, alpha);
-        } catch (Exception e) {
-            System.out.println("Blinding pubkey test failed");
-            e.printStackTrace();
-        }
-        SigningPrivateKey bpriv = null;
-        try {
-            bpriv = blind(priv, alpha);
-        } catch (Exception e) {
-            System.out.println("Blinding privkey test failed");
-            e.printStackTrace();
-        }
-        if (bpub != null && bpriv != null) {
-            SigningPublicKey bpub2 = bpriv.toPublic();
-            boolean ok = bpub2.equals(bpub);
-            System.out.println("Blinding test passed?   " + ok);
-            // unimplemented
-            //SigningPrivateKey priv2 = unblind(bpriv, alpha);
-            //ok = priv2.equals(priv);
-            //System.out.println("Unblinding test passed? " + ok);
-        }
-    }
-******/
 }
