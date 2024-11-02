@@ -5013,44 +5013,24 @@ table[id$="logs"] ul {
     vertical-align: calc(1px);
 }
 
-font[color="#cc0000"] {
-    color: #900 !important;
-}
-
 #logs li font[color="#cc0000"]::before {
-    background: #900;
-}
-
-font[color="#006600"] {
-    color: #ee7 !important;
+    background: #c00;
 }
 
 #logs li font[color="#006600"]::before {
-    background: #ee7;
-}
-
-font[color="#ff3300"] {
-    color: #990 !important;
+    background: #060;
 }
 
 #logs li font[color="#ff3300"]::before {
-    background: #990;
-}
-
-font[color="#bf00df"] {
-    color: #880 !important;
+    background: #f30;
 }
 
 #logs li font[color="#bf00df"]::before {
-    background: #880;
+    background: #c0e;
 }
 
-font[color="#000099"] {
-    color: #660 !important;
-}
-
-#logs li font[color="#000099"]::before {
-    background: #660;
+#logs li font[color="#333399"]::before {
+    background: #339;
 }
 
 

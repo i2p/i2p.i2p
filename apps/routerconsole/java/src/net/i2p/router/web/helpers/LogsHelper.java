@@ -294,7 +294,7 @@ public class LogsHelper extends HelperBase {
                    // color = "#ff00cc"; poor legibility on light backgrounds
                     color = "#bf00df";
                 else if (msg.contains(_c("INFO")))
-                    color = "#000099";
+                    color = "#333399";
                 else
                     color = "#006600";
                 buf.append("<font color=\"").append(color).append("\">");
