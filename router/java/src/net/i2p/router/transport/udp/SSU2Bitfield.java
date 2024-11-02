@@ -12,6 +12,9 @@ import net.i2p.router.transport.udp.SSU2Payload.AckBlock;
  *
  * Also contains methods to convert to/from an ACK block.
  *
+ * Locking: Most methods are synchronized here.
+ * Do not call methods with the PeerState2 lock held, chance of deadlock.
+ *
  * @since 0.9.54
  */
 class SSU2Bitfield {
