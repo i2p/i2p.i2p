@@ -102,7 +102,7 @@ class RepublishLeaseSetJob extends JobImpl {
         public void runJob() {
             // Don't requeue if there's a newer LS, KNDF will have already done that
             LeaseSet ls = _facade.lookupLeaseSetLocally(_ls.getHash());
-            if (ls != null && ls.getEarliestLeaseDate() == _ls.getEarliestLeaseDate()) {
+            if (ls != null && !KademliaNetworkDatabaseFacade.isNewer(ls, _ls)) {
                 requeueRepublish();
             } else {
                 if (_log.shouldWarn())
