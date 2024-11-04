@@ -28,6 +28,7 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.TransportUtil;
 import net.i2p.util.Addresses;
+import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 import net.i2p.util.VersionComparator;
@@ -92,8 +93,8 @@ class IntroductionManager {
     private final Map<Long, PeerState> _inbound;
     /** map of relay nonce to alice PeerState who requested it */
     private final ConcurrentHashMap<Long, PeerState2> _nonceToAlice;
-    private final Set<InetAddress> _recentHolePunches;
-    private long _lastHolePunchClean;
+    private final Map<Long, Object> _recentRelaysAsBob;
+    private static final Object DUMMY = new Object();
 
     /**
      * Limit since we ping to keep the conn open
@@ -122,8 +123,8 @@ class IntroductionManager {
         _builder2 = transport.getBuilder2();
         _outbound = new ConcurrentHashMap<Long, PeerState>(MAX_OUTBOUND);
         _inbound = new ConcurrentHashMap<Long, PeerState>(MAX_INBOUND);
-        _nonceToAlice = (_builder2 != null) ? new ConcurrentHashMap<Long, PeerState2>(MAX_INBOUND) : null;
-        _recentHolePunches = new HashSet<InetAddress>(16);
+        _nonceToAlice = new ConcurrentHashMap<Long, PeerState2>(MAX_INBOUND);
+        _recentRelaysAsBob = new LHMCache<Long, Object>(8);
         ctx.statManager().createRateStat("udp.receiveRelayIntro", "How often we get a relayed request for us to talk to someone?", "udp", UDPTransport.RATES);
         ctx.statManager().createRateStat("udp.receiveRelayRequest", "How often we receive a good request to relay to someone else?", "udp", UDPTransport.RATES);
         ctx.statManager().createRateStat("udp.receiveRelayRequestBadTag", "Received relay requests with bad/expired tag", "udp", UDPTransport.RATES);
@@ -506,6 +507,21 @@ class IntroductionManager {
             // add a code for this?
             rcode = SSU2Util.RELAY_REJECT_BOB_NO_TAG;
         } else {
+            Long lnonce = Long.valueOf(nonce);
+            boolean isDup;
+            synchronized(_recentRelaysAsBob) {
+                isDup = _recentRelaysAsBob.put(lnonce, DUMMY) != null;
+            }
+            if (isDup) {
+                // fairly common from i2pd
+                if (_log.shouldInfo())
+                    _log.info("Dropping dup relay request from " + alice 
+                          + " for tag " + tag
+                          + " nonce " + nonce
+                          + " time " + time
+                          + " and relaying with " + charlie);
+                return;
+            }
             aliceRI = _context.netDb().lookupRouterInfoLocally(alice.getRemotePeer());
             if (aliceRI != null) {
                 // validate signed data
@@ -513,7 +529,7 @@ class IntroductionManager {
                 if (SSU2Util.validateSig(_context, SSU2Util.RELAY_REQUEST_PROLOGUE,
                                          _context.routerHash(), charlie.getRemotePeer(), data, spk)) {
                     // save tag-to-alice mapping so we can forward the reply from charlie
-                    PeerState2 old = _nonceToAlice.putIfAbsent(Long.valueOf(nonce), alice);
+                    PeerState2 old = _nonceToAlice.putIfAbsent(lnonce, alice);
                     if (old != null && !old.equals(alice)) {
                         // dup tag
                         rcode = SSU2Util.RELAY_REJECT_BOB_UNSPEC;
@@ -541,6 +557,7 @@ class IntroductionManager {
                 _log.info("Receive relay request from " + alice 
                       + " for tag " + tag
                       + " nonce " + nonce
+                      + " time " + time
                       + " and relaying with " + charlie);
 
             // put alice hash in intro data
@@ -865,7 +882,8 @@ class IntroductionManager {
             return;
         }
         // Look up nonce to determine if we are Alice or Bob
-        PeerState2 alice = _nonceToAlice.remove(Long.valueOf(nonce));
+        Long lnonce = Long.valueOf(nonce);
+        PeerState2 alice = _nonceToAlice.remove(lnonce);
         if (alice != null) {
             // We are Bob, send to Alice
             // Debug, check the signature, but send it along even if failed
@@ -901,6 +919,17 @@ class IntroductionManager {
                 alice.setLastSendTime(now);
             } catch (IOException ioe) {}
         } else {
+            boolean isDup;
+            synchronized(_recentRelaysAsBob) {
+                isDup = _recentRelaysAsBob.get(lnonce) != null;
+            }
+            if (isDup) {
+                // very rare
+                if (_log.shouldInfo())
+                    _log.info("Dropping dup relay response as bob from charlie " + peer.getRemotePeer()
+                          + " for nonce " + nonce);
+                return;
+            }
             // We are Alice, give to EstablishmentManager to check sig and process
             if (_log.shouldInfo())
                 _log.info("Got relay response " + status + " as alice " + " nonce " + nonce + " from " + peer);
