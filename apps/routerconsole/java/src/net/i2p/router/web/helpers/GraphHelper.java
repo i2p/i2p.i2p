@@ -329,13 +329,13 @@ public class GraphHelper extends FormHandler {
 
             _out.write("<br>");
             if (_periodCount < MAX_C) {
-                _out.write(link(_stat, _showEvents, _periodCount * 2, _end, _width, _height));
+                _out.write(link(_stat, _showEvents, _periodCount * 3, _end, _width, _height));
                 _out.write(_t("Larger interval"));
                 _out.write("</a> - ");
             }
 
             if (_periodCount > MIN_C) {
-                _out.write(link(_stat, _showEvents, _periodCount / 2, _end, _width, _height));
+                _out.write(link(_stat, _showEvents, _periodCount / 3, _end, _width, _height));
                 _out.write(_t("Smaller interval"));
                 _out.write("</a>");
             }
