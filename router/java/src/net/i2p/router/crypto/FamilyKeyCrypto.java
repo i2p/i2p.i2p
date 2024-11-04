@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.crypto.CertUtil;
 import net.i2p.crypto.KeyStoreUtil;
@@ -51,6 +52,7 @@ public class FamilyKeyCrypto {
     private final String _fname;
     private final SigningPrivateKey _privkey;
     private final SigningPublicKey _pubkey;
+    private final AtomicInteger _failCount = new AtomicInteger();
 
     public static final String PROP_KEYSTORE_PASSWORD = "netdb.family.keystorePassword";
     public static final String PROP_FAMILY_NAME = "netdb.family.name";
@@ -280,8 +282,15 @@ public class FamilyKeyCrypto {
             isKnownKey = true;
         } else {
             Result r = _negativeCache.get(h);
-            if (r != null)
-                return r;
+            if (r != null) {
+                if ((_failCount.incrementAndGet() & 0x3f) != 0) {
+                    if (_log.shouldInfo())
+                        _log.info("Bad family (cached): " + r + ' ' + h.toBase64());
+                    return r;
+                }
+                // every once in a while, recheck in case of transient error
+                _negativeCache.remove(h);
+            }
             spk = _knownKeys.get(name);
             isKnownKey = spk != null;
             if (!isKnownKey) {
