@@ -1027,56 +1027,16 @@ class EstablishmentManager {
     }
 
     /**
-     * dont send our info immediately, just send a small data packet, and 5-10s later, 
-     * if the peer isnt banlisted, *then* send them our info.  this will help kick off
-     * the oldnet
-     * The "oldnet" was < 0.6.1.10, it is long gone.
-     * The delay really slows down the network.
-     * The peer is unbanlisted and marked reachable by addRemotePeerState() which calls markReachable()
-     * so the check below is fairly pointless.
-     * If for some strange reason an oldnet router (NETWORK_ID == 1) does show up,
-     *  it's handled in UDPTransport.messageReceived()
-     * (where it will get dropped, marked unreachable and banlisted at that time).
+     * send our info immediately
+     * TODO move to / combine with sendAck0()
      */
     private void sendInboundComplete(PeerState peer) {
-        // SimpleTimer.getInstance().addEvent(new PublishToNewInbound(peer), 10*1000);
         if (_log.shouldDebug())
             _log.debug("IB confirm: " + peer);
-        DeliveryStatusMessage dsm;
-        if (peer.getVersion() == 1) {
-            dsm = new DeliveryStatusMessage(_context);
-            dsm.setArrival(_networkID); // overloaded, sure, but future versions can check this
-                                           // This causes huge values in the inNetPool.droppedDeliveryStatusDelay stat
-                                           // so it needs to be caught in InNetMessagePool.
-            dsm.setMessageExpiration(_context.clock().now() + DATA_MESSAGE_TIMEOUT);
-            dsm.setMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
-            // sent below
-        } else {
-            // SSU 2 uses an ACK of packet 0
-            dsm = null;
-        }
+        // SSU 2 uses an ACK of packet 0
 
-        // just do this inline
-        //_context.simpleTimer2().addEvent(new PublishToNewInbound(peer), 0);
-
-            Hash hash = peer.getRemotePeer();
-            if ((hash != null) && (!_context.banlist().isBanlisted(hash)) && (!_transport.isUnreachable(hash))) {
-                // ok, we are fine with them, send them our latest info
-                //if (_log.shouldLog(Log.INFO))
-                //    _log.info("Publishing to the peer after confirm plus delay (without banlist): " + peer);
-                // bundle the two messages together for efficiency
                 DatabaseStoreMessage dbsm = getOurInfo();
-                List<I2NPMessage> msgs = new ArrayList<I2NPMessage>(2);
-                if (dsm != null)
-                    msgs.add(dsm);
-                msgs.add(dbsm);
-                _transport.send(msgs, peer);
-            } else if (dsm != null) {
-                _transport.send(dsm, peer);
-                // nuh uh.
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("NOT publishing to the peer after confirm plus delay (WITH banlist): " + (hash != null ? hash.toString() : "unknown"));
-            }
+                _transport.send(dbsm, peer);
     }
     
     /** 
