@@ -72,7 +72,9 @@ public final class ChaCha20 {
                                byte[] plaintext, int plaintextOffset,
                                byte[] ciphertext, int ciphertextOffset, int length) {
 /*
-        if (USE_SYSTEM_CHACHA && !_systemFailed && length >= MIN_LEN_FOR_SYSTEM) {
+        //if (USE_SYSTEM_CHACHA && !_systemFailed && length >= MIN_LEN_FOR_SYSTEM) {
+        // testing
+        if (USE_SYSTEM_CHACHA && !_systemFailed) {
             try {
                  if (ivOffset != 0 || iv.length != 12) {
                      byte[] niv = new byte[12];
