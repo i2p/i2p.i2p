@@ -24,6 +24,16 @@ package net.i2p.crypto;
  * DEALINGS IN THE SOFTWARE.
  */
 
+/*
+import java.lang.reflect.Constructor;
+import java.security.spec.AlgorithmParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.Cipher;
+import freenet.support.CPUInformation.CPUID;
+import freenet.support.CPUInformation.CPUInfo;
+import net.i2p.util.SystemVersion;
+*/
+
 import com.southernstorm.noise.crypto.chacha20.ChaChaCore;
 
 import net.i2p.data.DataHelper;
@@ -35,6 +45,7 @@ import net.i2p.data.DataHelper;
  * @since 0.9.39
  */
 public final class ChaCha20 {
+
 
     private ChaCha20() {}
 
@@ -60,6 +71,29 @@ public final class ChaCha20 {
     public static void encrypt(byte[] key, byte[] iv, int ivOffset,
                                byte[] plaintext, int plaintextOffset,
                                byte[] ciphertext, int ciphertextOffset, int length) {
+/*
+        if (USE_SYSTEM_CHACHA && !_systemFailed && length >= MIN_LEN_FOR_SYSTEM) {
+            try {
+                 if (ivOffset != 0 || iv.length != 12) {
+                     byte[] niv = new byte[12];
+                     System.arraycopy(iv, ivOffset, niv, 0, 12);
+                     iv = niv;
+                 }
+                 AlgorithmParameterSpec spec = (AlgorithmParameterSpec) _speccon.newInstance(iv, 1);
+                 SecretKeySpec jkey = new SecretKeySpec(key, 0, 32, "ChaCha20");
+                 // TODO This is probably the slow part, maybe cache some Ciphers
+                 Cipher c = Cipher.getInstance("ChaCha20");
+                 c.init(Cipher.ENCRYPT_MODE, jkey, spec);
+                 c.doFinal(plaintext, plaintextOffset, length, ciphertext, ciphertextOffset);
+                 return;
+            } catch (Exception e) {
+                System.out.println("System ChaCha failure");
+                e.printStackTrace();
+                _systemFailed = true;
+            }
+        }
+*/
+
         int[] input = new int[16];
         int[] output = new int[16];
         ChaChaCore.initKey256(input, key, 0);
@@ -126,8 +160,71 @@ public final class ChaCha20 {
         encrypt(key, iv, ivOffset, ciphertext, ciphertextOffset, plaintext, plaintextOffset, length);
     }
 
+/*
+    private static final boolean USE_SYSTEM_CHACHA = useSystemChaCha();
+    private static final boolean USE_AVX_CHACHA = useAVXChaCha();
+    private static final int MIN_LEN_FOR_SYSTEM = USE_SYSTEM_CHACHA ? (USE_AVX_CHACHA ? 1280 : 2500) : 0;
+    private static final Constructor<?> _speccon;
+    private static boolean _systemFailed;
+*/
+
+    /**
+     *  Requires Java 11 and JCE support.
+     *  @since 0.9.xx
+     */
+/*
+    private static boolean useSystemChaCha() {
+        if (SystemVersion.isJava11() && !SystemVersion.isAndroid() &&
+            !SystemVersion.isApache() && !SystemVersion.isGNU()) {
+            try {
+                Cipher.getInstance("ChaCha20");
+                Class.forName("javax.crypto.spec.ChaCha20ParameterSpec", false, ClassLoader.getSystemClassLoader());
+                return true;
+            } catch (Exception e) {}
+        }
+        return false;
+    }
+*/
+
+    /**
+     *  Requires Java 20, 64 bit, x86/ARM, AVX, and JCE support.
+     *  Ref: https://bugs.openjdk.org/browse/JDK-8247645
+     *  @since 0.9.xx
+     */
+/*
+    private static boolean useAVXChaCha() {
+        if (USE_SYSTEM_CHACHA &&
+            SystemVersion.isX86() && SystemVersion.is64Bit() && SystemVersion.isJava(20)) {
+            try {
+                return SystemVersion.isARM() || CPUID.getInfo().hasAVX();
+            } catch (Exception e) {}
+        }
+        return false;
+    }
+
+    static {
+        Constructor<?> con = null;
+        if (USE_SYSTEM_CHACHA) {
+            try {
+                Class<?> cl = Class.forName("javax.crypto.spec.ChaCha20ParameterSpec", true, ClassLoader.getSystemClassLoader());
+                con = cl.getConstructor(byte[].class, int.class);
+            } catch (Exception e) {
+                System.out.println("System ChaCha failure");
+                e.printStackTrace();
+                _systemFailed = true;
+            }
+        }
+        _speccon = con;
+    }
+*/
+    /**
+     *  97% of calls are 1024 bytes or less
+     *  JCE is slower or the same for smaller sizes, even with AVX/AVX2.
+     *  Even for larger sizes, the improvement is modest.
+     *  AVX512 untested.
+     */
 /****
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         // vectors as in RFC 7539
         byte[] plaintext = DataHelper.getASCII("Ladies and Gentlemen of the class of '99: If I could offer you only one tip for the future, sunscreen would be it.");
         byte[] key = new byte[32];
@@ -151,6 +248,98 @@ public final class ChaCha20 {
         byte[] out2 = new byte[plaintext.length];
         decrypt(key, iv, out, 0, out2, 0, plaintext.length);
         System.out.println("Plaintext:\n" + net.i2p.util.HexDump.dump(out2));
+
+        if (USE_SYSTEM_CHACHA) {
+            // results may change in later JVMs if this is implemented:
+            // https://bugs.openjdk.org/browse/JDK-8302007
+            boolean HAS_AVX = false;
+            boolean HAS_AVX2 = false;
+            boolean HAS_AVX512 = false;
+            try {
+                CPUInfo info = CPUID.getInfo();
+                HAS_AVX = info.hasAVX();
+                HAS_AVX2 = info.hasAVX2();
+                HAS_AVX512 = HAS_AVX2 && info.hasAVX512();
+            } catch (Exception e) {}
+            System.out.println("Java:       " + System.getProperty("java.version"));
+            System.out.println("Has AVX?    " + HAS_AVX);
+            System.out.println("Has AVX2?   " + HAS_AVX2);
+            System.out.println("Has AVX512? " + HAS_AVX512);
+            Cipher c = Cipher.getInstance("ChaCha20");
+            AlgorithmParameterSpec spec = (AlgorithmParameterSpec) _speccon.newInstance(iv, 1);
+            SecretKeySpec jkey = new SecretKeySpec(key, "ChaCha20");
+            c.init(Cipher.ENCRYPT_MODE, jkey, spec);
+            out = c.doFinal(plaintext);
+            System.out.println("Ciphertext:\n" + net.i2p.util.HexDump.dump(out));
+            c = Cipher.getInstance("ChaCha20");
+            c.init(Cipher.DECRYPT_MODE, jkey, spec);
+            out2 = c.doFinal(out);
+            System.out.println("Plaintext:\n" + net.i2p.util.HexDump.dump(out2));
+
+            System.out.println("JCE w/Poly1305 version");
+            c = Cipher.getInstance("ChaCha20-Poly1305");
+            javax.crypto.spec.IvParameterSpec ispec = new javax.crypto.spec.IvParameterSpec(iv);
+            c.init(Cipher.ENCRYPT_MODE, jkey, ispec);
+            out = c.doFinal(plaintext);
+            System.out.println("Ciphertext:\n" + net.i2p.util.HexDump.dump(out));
+            c = Cipher.getInstance("ChaCha20-Poly1305");
+            c.init(Cipher.DECRYPT_MODE, jkey, ispec);
+            out2 = c.doFinal(out);
+            System.out.println("Plaintext:\n" + net.i2p.util.HexDump.dump(out2));
+        } else {
+            System.out.println("JCE version not available, not testing");
+        }
+
+        System.out.println("Warmup");
+        test(128, 1000);
+        try { Thread.sleep(1000); } catch (InterruptedException ie) {}
+        System.out.println("\nSpeed test");
+        int runs = 10000;
+        // for some reason the second time through gives much faster results
+        for (int i = 0; i < 2; i++) {
+            test(128, runs);
+            test(1024, runs);
+            test(1280, runs);
+            test(1536, runs);
+            test(2048, runs);
+            test(2560, runs);
+            test(3072, runs);
+            test(4096, runs);
+            test(8192, runs);
+            System.out.println();
+        }
+    }
+
+    private static void test(int sz, int runs) throws Exception {
+        System.out.println("Testing " + sz + " bytes " + runs + " runs:");
+        byte[] b = new byte[sz];
+        net.i2p.util.RandomSource.getInstance().nextBytes(b);
+        byte[] key = new byte[32];
+        for (int i = 0; i < 32; i++) {
+            key[i] = (byte) i;
+        }
+        byte[] iv = new byte[12];
+        iv[7] = 0x4a;
+        long t = System.currentTimeMillis();
+        for (int i = 0; i < runs; i++) {
+            encrypt(key, iv, b, 0, b, 0, sz);
+        }
+        t = System.currentTimeMillis() - t;
+        System.out.println("Noise took " + t);
+        long noise = t;
+
+        if (USE_SYSTEM_CHACHA) {
+            t = System.currentTimeMillis();
+            for (int i = 0; i < runs; i++) {
+                Cipher c = Cipher.getInstance("ChaCha20");
+                AlgorithmParameterSpec spec = (AlgorithmParameterSpec) _speccon.newInstance(iv, 1);
+                SecretKeySpec jkey = new SecretKeySpec(key, "ChaCha20");
+                c.init(javax.crypto.Cipher.ENCRYPT_MODE, jkey, spec);
+                b = c.doFinal(b);
+            }
+            t = System.currentTimeMillis() - t;
+            System.out.println("JCE took " + t);
+        }
     }
 
     private static void dumpBlock(int[] b) {
