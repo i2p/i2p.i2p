@@ -51,22 +51,23 @@ public final class ChaChaCore {
 		
 		// Perform the 20 ChaCha rounds in groups of two.
 		for (index = 0; index < 20; index += 2) {
-	        // Column round.
-	        quarterRound(output, 0, 4, 8,  12);
-	        quarterRound(output, 1, 5, 9,  13);
-	        quarterRound(output, 2, 6, 10, 14);
-	        quarterRound(output, 3, 7, 11, 15);
+			// Column round.
+			quarterRound(output, 0, 4, 8,  12);
+			quarterRound(output, 1, 5, 9,  13);
+			quarterRound(output, 2, 6, 10, 14);
+			quarterRound(output, 3, 7, 11, 15);
 
-	        // Diagonal round.
-	        quarterRound(output, 0, 5, 10, 15);
-	        quarterRound(output, 1, 6, 11, 12);
-	        quarterRound(output, 2, 7, 8,  13);
-	        quarterRound(output, 3, 4, 9,  14);
+			// Diagonal round.
+			quarterRound(output, 0, 5, 10, 15);
+			quarterRound(output, 1, 6, 11, 12);
+			quarterRound(output, 2, 7, 8,  13);
+			quarterRound(output, 3, 4, 9,  14);
 		}
 
 		// Add the input block to the output.
-		for (index = 0; index < 16; ++index)
+		for (index = 0; index < 16; ++index) {
 			output[index] += input[index];
+		}
 	}
 
 	private static int char4(char c1, char c2, char c3, char c4)
@@ -124,7 +125,7 @@ public final class ChaChaCore {
 		output[14] = (int)iv;
 		output[15] = (int)(iv >> 32);
 	}
-	
+
 	/**
 	 * Initializes the 64-bit initialization vector and counter in a ChaCha20 block.
 	 * 
@@ -192,23 +193,21 @@ public final class ChaChaCore {
 		int value;
 		while (length >= 4) {
 			value = block[posn++];
-			output[outputOffset] = (byte)(input[inputOffset] ^ value);
-			output[outputOffset + 1] = (byte)(input[inputOffset + 1] ^ (value >> 8));
-			output[outputOffset + 2] = (byte)(input[inputOffset + 2] ^ (value >> 16));
-			output[outputOffset + 3] = (byte)(input[inputOffset + 3] ^ (value >> 24));
-			inputOffset += 4;
-			outputOffset += 4;
+			output[outputOffset++] = (byte)(input[inputOffset++] ^ value);
+			output[outputOffset++] = (byte)(input[inputOffset++] ^ (value >> 8));
+			output[outputOffset++] = (byte)(input[inputOffset++] ^ (value >> 16));
+			output[outputOffset++] = (byte)(input[inputOffset++] ^ (value >> 24));
 			length -= 4;
 		}
 		if (length == 3) {
 			value = block[posn];
-			output[outputOffset] = (byte)(input[inputOffset] ^ value);
-			output[outputOffset + 1] = (byte)(input[inputOffset + 1] ^ (value >> 8));
-			output[outputOffset + 2] = (byte)(input[inputOffset + 2] ^ (value >> 16));
+			output[outputOffset++] = (byte)(input[inputOffset++] ^ value);
+			output[outputOffset++] = (byte)(input[inputOffset++] ^ (value >> 8));
+			output[outputOffset] = (byte)(input[inputOffset] ^ (value >> 16));
 		} else if (length == 2) {
 			value = block[posn];
-			output[outputOffset] = (byte)(input[inputOffset] ^ value);
-			output[outputOffset + 1] = (byte)(input[inputOffset + 1] ^ (value >> 8));
+			output[outputOffset++] = (byte)(input[inputOffset++] ^ value);
+			output[outputOffset] = (byte)(input[inputOffset] ^ (value >> 8));
 		} else if (length == 1) {
 			value = block[posn];
 			output[outputOffset] = (byte)(input[inputOffset] ^ value);
