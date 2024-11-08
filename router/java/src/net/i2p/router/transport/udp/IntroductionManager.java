@@ -34,52 +34,7 @@ import net.i2p.util.VersionComparator;
 
 /**
  *  Keep track of inbound and outbound introductions.
- *
- *  IPv6 info: Alice-Bob communication may be via IPv4 or IPv6.
- *  Bob-Charlie communication must be via established IPv4 session as that's the only way
- *  that Bob knows Charlie's IPv4 address to give it to Alice.
- *  Alice-Charlie communication is via IPv4.
- *  If Alice-Bob is over IPv6, Alice must include her IPv4 address in
- *  the RelayRequest message.
- *
- *  From udp.html on the website:
-
-<p>Indirect session establishment by means of a third party introduction
-is necessary for efficient NAT traversal.  Charlie, a router behind a
-NAT or firewall which does not allow unsolicited inbound UDP packets,
-first contacts a few peers, choosing some to serve as introducers.  Each
-of these peers (Bob, Bill, Betty, etc) provide Charlie with an introduction
-tag - a 4 byte random number - which he then makes available to the public
-as methods of contacting him.  Alice, a router who has Charlie's published
-contact methods, first sends a RelayRequest packet to one or more of the 
-introducers, asking each to introduce her to Charlie (offering the 
-introduction tag to identify Charlie).  Bob then forwards a RelayIntro
-packet to Charlie including Alice's public IP and port number, then sends
-Alice back a RelayResponse packet containing Charlie's public IP and port
-number.  When Charlie receives the RelayIntro packet, he sends off a small
-random packet to Alice's IP and port (poking a hole in his NAT/firewall),
-and when Alice receives Bob's RelayResponse packet, she begins a new 
-full direction session establishment with the specified IP and port.</p>
-<p>
-Alice first connects to introducer Bob, who relays the request to Charlie.
-</p>
-<pre>
-        Alice                         Bob                  Charlie
-    RelayRequest ----------------------&gt;
-         &lt;-------------- RelayResponse    RelayIntro -----------&gt;
-         &lt;-------------------------------------------- HolePunch (data ignored)
-    SessionRequest --------------------------------------------&gt;
-         &lt;-------------------------------------------- SessionCreated
-    SessionConfirmed ------------------------------------------&gt;
-         &lt;-------------------------------------------- DeliveryStatusMessage
-         &lt;-------------------------------------------- DatabaseStoreMessage
-    DatabaseStoreMessage --------------------------------------&gt;
-    Data &lt;--------------------------------------------------&gt; Data
-</pre>
-
-<p>
-After the hole punch, the session is established between Alice and Charlie as in a direct establishment.
-</p>
+ *  See http://i2p-projekt.i2p/spec/ssu2 for documentation.
  */
 class IntroductionManager {
     private final RouterContext _context;
@@ -114,6 +69,12 @@ class IntroductionManager {
     private static final long INTRODUCER_EXPIRATION = 80*60*1000L;
     private static final String MIN_IPV6_INTRODUCER_VERSION = "0.9.50";
     private static final long MAX_SKEW = 2*60*1000;
+
+    /**
+     *  See receiveRelayIntro()
+     *  @since 0.9.65
+     */
+    public enum RelayIntroResult { REPLIED, DELAYED, DROPPED }
 
     public IntroductionManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
@@ -615,10 +576,16 @@ class IntroductionManager {
      *
      *  SSU 2 only.
      *
+     *  @return DELAYED if awaiting Alice RI, DROPPED on fatal error, or REPLIED if we replied to Bob with a RelayResponse
      *  @since 0.9.55
      */
-    void receiveRelayIntro(PeerState2 bob, Hash alice, byte[] data) {
-        receiveRelayIntro(bob, alice, data, 0);
+    RelayIntroResult receiveRelayIntro(PeerState2 bob, Hash alice, byte[] data) {
+        RelayIntroResult rv = receiveRelayIntro(bob, alice, data, 0);
+        if (_log.shouldInfo())
+            _log.info("Receive relay intro from bob " + bob 
+                      + " for alice " + alice.toBase64()
+                      + " result " + rv);
+        return rv;
     }
 
     /**
@@ -630,10 +597,10 @@ class IntroductionManager {
      *
      *  SSU 2 only.
      *
-     *  @return true if RI found, false to delay and retry.
+     *  @return DELAYED if should retry (no RI), DROPPED on fatal error, or REPLIED if we replied to Bob with a RelayResponse
      *  @since 0.9.55
      */
-    private boolean receiveRelayIntro(PeerState2 bob, Hash alice, byte[] data, int retryCount) {
+    private RelayIntroResult receiveRelayIntro(PeerState2 bob, Hash alice, byte[] data, int retryCount) {
         RouterInfo aliceRI = null;
         if (retryCount >= 5) {
             // last chance
@@ -645,11 +612,11 @@ class IntroductionManager {
                     _log.info("Delay after " + retryCount + " retries, no RI for " + alice.toBase64());
                 if (retryCount == 0)
                     new DelayIntro(bob, alice, data);
-                return false;
+                return RelayIntroResult.DELAYED;
             }
         }
-        receiveRelayIntro(bob, alice, data, aliceRI);
-        return true;
+        boolean rv = receiveRelayIntro(bob, alice, data, aliceRI);
+        return rv ? RelayIntroResult.REPLIED : RelayIntroResult.DROPPED;
     }
 
     /** 
@@ -672,8 +639,8 @@ class IntroductionManager {
         }
 
         public void timeReached() {
-            boolean ok = receiveRelayIntro(bob, alice, data, ++count);
-            if (!ok)
+            RelayIntroResult result = receiveRelayIntro(bob, alice, data, ++count);
+            if (result == RelayIntroResult.DELAYED)
                 reschedule(DELAY << count);
         }
     }
@@ -705,9 +672,11 @@ class IntroductionManager {
      *
      *  SSU 2 only.
      *
+     *  @return true if we replied with a relay response, false if we dropped it;
+     *               this does not indicate a successful response code
      *  @since 0.9.55
      */
-    private void receiveRelayIntro(PeerState2 bob, Hash alice, byte[] data, RouterInfo aliceRI) {
+    private boolean receiveRelayIntro(PeerState2 bob, Hash alice, byte[] data, RouterInfo aliceRI) {
         long nonce = DataHelper.fromLong(data, 0, 4);
         long tag = DataHelper.fromLong(data, 4, 4);
         long time = DataHelper.fromLong(data, 8, 4) * 1000;
@@ -716,19 +685,19 @@ class IntroductionManager {
         if (skew > MAX_SKEW || skew < 0 - MAX_SKEW) {
             if (_log.shouldWarn())
                 _log.warn("Too skewed for relay intro from " + bob);
-            return;
+            return false;
         }
         int ver = data[12] & 0xff;
         if (ver != 2) {
             if (_log.shouldWarn())
                 _log.warn("Bad relay intro version " + ver + " from " + bob);
-            return;
+            return false;
         }
         int iplen = data[13] & 0xff;
         if (iplen != 6 && iplen != 18) {
             if (_log.shouldWarn())
                 _log.warn("Bad IP length " + iplen + " from " + bob);
-            return;
+            return false;
         }
         boolean isIPv6 = iplen == 18;
         int testPort = (int) DataHelper.fromLong(data, 14, 2);
@@ -738,7 +707,7 @@ class IntroductionManager {
         try {
             aliceIP = InetAddress.getByAddress(testIP);
         } catch (UnknownHostException uhe) {
-            return;
+            return false;
         }
 
         SessionKey aliceIntroKey = null;
@@ -811,7 +780,7 @@ class IntroductionManager {
         if (data == null) {
             if (_log.shouldWarn())
                 _log.warn("sig fail");
-             return;
+             return false;
         }
         try {
             UDPPacket packet = _builder2.buildRelayResponse(data, bob);
@@ -822,7 +791,7 @@ class IntroductionManager {
             _transport.send(packet);
             bob.setLastSendTime(now);
         } catch (IOException ioe) {
-            return;
+            return false;
         }
         if (rcode == SSU2Util.RELAY_ACCEPT) {
             // send hole punch with the same data we sent to Bob
@@ -833,6 +802,7 @@ class IntroductionManager {
             UDPPacket packet = _builder2.buildHolePunch(aliceIP, testPort, aliceIntroKey, sendId, rcvId, data);
             _transport.send(packet);
         }
+        return true;
     }
 
     /**
