@@ -734,9 +734,12 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     }
 
     public void gotRelayIntro(Hash aliceHash, byte[] data) {
-        _transport.getIntroManager().receiveRelayIntro(this, aliceHash, data);
+        IntroductionManager.RelayIntroResult result = _transport.getIntroManager().receiveRelayIntro(this, aliceHash, data);
         // Relay blocks are ACK-eliciting
-        messagePartiallyReceived();
+        // but we will usually respond to Bob immediately with a relay response, which includes the ack,
+        // so only schedule an ack if we didn't respond
+        if (result != IntroductionManager.RelayIntroResult.REPLIED)
+            messagePartiallyReceived();
     }
 
     public void gotPeerTest(int msg, int status, Hash h, byte[] data) {

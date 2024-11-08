@@ -1462,7 +1462,7 @@ class EstablishmentManager {
         if (charlie == null) {
             if (_log.shouldDebug())
                 _log.debug("Dup or unknown RelayResponse: " + nonce);
-            return; // already established
+            return; // already established, or we were Bob and got a dup from Charlie
         }
         if (charlie.getVersion() != 2)
             return;
