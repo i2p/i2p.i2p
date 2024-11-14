@@ -1,3 +1,20 @@
+2024-11-14 zzz
+ * Router: Change cap for sym. nat
+
+2024-11-08 zzz
+ * SSU2: Don't send separate ack for relay intro (Gitlab MR #220)
+
+2024-11-04 zzz
+ * Console: Increase interval change for larger/smaller interval buttons on /graph
+ * Router: Periodically recheck family of negative cached RIs
+ * SSU2:
+   - Detect and drop dup relay messages as Bob
+   - More SSU1 code removal
+
+2024-11-02 zzz
+ * Console: remove dark theme override of router log colors
+ * SSU2: Hopefully fix rare deadlock
+
 2024-10-22 zzz
  * Console: Merge in more upstream rrd4j changes for 3.10
 
