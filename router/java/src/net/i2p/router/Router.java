@@ -1239,7 +1239,8 @@ public class Router implements RouterClock.ClockShiftListener {
         char cong = 0;
         int maxTunnels = _context.getProperty(RouterThrottleImpl.PROP_MAX_TUNNELS, RouterThrottleImpl.DEFAULT_MAX_TUNNELS);
         if (forceG || maxTunnels <= 0) {
-            cong = CAPABILITY_NO_TUNNELS;
+            //cong = CAPABILITY_NO_TUNNELS;
+            cong = CAPABILITY_CONGESTION_SEVERE;
         } else if (maxTunnels <= 50 || SystemVersion.isSlow()) {
             cong = CAPABILITY_CONGESTION_MODERATE;
         } else {
@@ -1261,7 +1262,8 @@ public class Router implements RouterClock.ClockShiftListener {
                                    Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
                                             _context.bandwidthLimiter().getOutboundKBytesPerSecond());
                     if (bwLim < 4*1024) {
-                        cong = CAPABILITY_NO_TUNNELS;
+                        //cong = CAPABILITY_NO_TUNNELS;
+                        cong = CAPABILITY_CONGESTION_SEVERE;
                     } else {
                         RateStat rs = _context.statManager().getRate("tunnel.participatingMessageCountAvgPerTunnel");
                         double messagesPerTunnel = 0;
