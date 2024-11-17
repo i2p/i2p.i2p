@@ -11,6 +11,7 @@ import net.i2p.data.ByteArray;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
+import net.i2p.util.SystemVersion;
 
 /**
  * A stream that we can shove data into that fires off those bytes
@@ -50,9 +51,9 @@ class MessageOutputStream extends OutputStream {
     
     /**
      *  Since this is less than i2ptunnel's i2p.streaming.connectDelay default of 1000,
-     *  we only wait 250 at the start. Guess that's ok, 1000 is too long anyway.
+     *  we only wait this long at the start. Guess that's ok, 1000 is too long anyway.
      */
-    private static final int DEFAULT_PASSIVE_FLUSH_DELAY = 175;
+    private static final int DEFAULT_PASSIVE_FLUSH_DELAY = SystemVersion.isSlow() ? 175 : 100;
 
 /****
     public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver) {
