@@ -152,9 +152,9 @@ class CapacityCalculator {
                             capacity -= PENALTY_CAP_E;
                         }
                     } else {
-                        // treat older than 15 minutes as D, as recommended in proposal 162
+                        // treat older than a few minutes as D, as recommended in proposal 162
                         long age = context.clock().now() - ri.getPublished();
-                        if (age < 15*60*1000)
+                        if (age < 30*60*1000)
                             capacity -= PENALTY_CAP_E;
                         else
                             capacity -= PENALTY_CAP_D;
