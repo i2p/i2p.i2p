@@ -937,7 +937,7 @@ public class RrdGraphDef implements RrdGraphConstants, DataHolder {
      * font is selected.
      *
      * @param smallFont Default font for graphing. Use only monospaced fonts.
-     * @deprecated Use {@link FontTag} based method instead.
+     * @deprecated Use {@link RrdGraphConstants.FontTag} based method instead.
      */
     @Deprecated
     public void setSmallFont(final Font smallFont) {
@@ -948,7 +948,7 @@ public class RrdGraphDef implements RrdGraphConstants, DataHolder {
      * Sets title font.
      *
      * @param largeFont Font to be used for graph title.
-     * @deprecated Use {@link FontTag} based method instead.
+     * @deprecated Use {@link RrdGraphConstants.FontTag} based method instead.
      */
     @Deprecated
     public void setLargeFont(final Font largeFont) {
