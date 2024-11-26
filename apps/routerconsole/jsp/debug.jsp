@@ -23,6 +23,7 @@
 <span class="tab"><a href="/debug?d=4">Client Session Key Managers</a></span>
 <span class="tab"><a href="/debug?d=5">Router DHT</a></span>
 <span class="tab"><a href="/debug?d=6">Translation Status</a></span>
+<span class="tab"><a href="/debug?d=7">Jars</a></span>
 </div>
 
 <%
@@ -138,6 +139,13 @@ if (dd == null || dd.equals("0")) {
             if (br != null) try { br.close(); } catch (java.io.IOException ioe) {}
         }
     }
+} else if (dd.equals("7")) {
+%>
+<h2>Jar File Dump</h2>
+<jsp:useBean class="net.i2p.router.web.helpers.FileDumpHelper" id="dumpHelper" scope="request" />
+<jsp:setProperty name="dumpHelper" property="contextId" value="<%=i2pcontextId%>" />
+<jsp:getProperty name="dumpHelper" property="fileSummary" />
+<%
 }
 
 %>

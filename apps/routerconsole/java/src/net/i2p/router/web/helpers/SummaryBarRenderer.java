@@ -531,6 +531,7 @@ class SummaryBarRenderer {
            .append("</a>\n");
         svcs.put(tx, rbuf.toString());
 
+/* moved to /debug tab
         tx = _t("Jars");
         rbuf.setLength(0);
         rbuf.append("<a title=\"")
@@ -539,6 +540,7 @@ class SummaryBarRenderer {
            .append(nbsp(tx))
            .append("</a>\n");
         svcs.put(tx, rbuf.toString());
+*/
 
         File javadoc = new File(_context.getBaseDir(), "docs/javadoc/index.html");
         if (javadoc.exists()) {
