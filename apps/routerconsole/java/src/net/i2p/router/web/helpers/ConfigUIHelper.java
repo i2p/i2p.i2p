@@ -121,8 +121,6 @@ public class ConfigUIHelper extends HelperBase {
         //
         // Note: any additions, also add to:
         // apps/i2psnark/java/src/org/klomp/snark/standalone/ConfigUIHelper.java
-        // apps/routerconsole/jsp/console.jsp
-        // apps/routerconsole/jsp/home.jsp
         // .tx/config
         // New lang_xx flags: Add to top-level build.xml
         // Names must be 18 chars or less (including country if specified)
@@ -148,6 +146,7 @@ public class ConfigUIHelper extends HelperBase {
         { "it", "it", "Italiano", null },
         { "ja", "jp", "Japanese 日本語", null },
         { "ko", "kr", "Korean 한국어", null },
+        { "ku", "iq", "Kurdish", null },
         { "mg", "mg", "Malagasy", null },
         { "hu", "hu", "Magyar", null },
         { "nl", "nl", "Nederlands", null },
