@@ -1,0 +1,90 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the i2p package.
+# 
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2017-11-12 14:01+0000\n"
+"PO-Revision-Date: 2011-10-03 21:48+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Chinese (Gan) (http://app.transifex.com/otf/I2P/language/gan/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: gan\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:2001
+msgid "Should the I2P router be started at boot?"
+msgstr "I2P路由應該在開機時啟動嗎?"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:2001
+msgid ""
+"The I2P router can be run as a daemon that starts automatically when your "
+"computer boots up. This is the recommended configuration."
+msgstr "I2P路由可以在開機時以進程方式自動啟動。這是建議的設定。"
+
+#. Type: string
+#. Description
+#: ../i2p.templates:3001
+msgid "I2P daemon user:"
+msgstr "I2P進程用戶:"
+
+#. Type: string
+#. Description
+#: ../i2p.templates:3001
+msgid ""
+"By default I2P is configured to run under the account i2psvc when running as"
+" a daemon. To use an **existing** I2P profile you may enter a different "
+"account name here. For example, if your previous I2P installation is at "
+"/home/user/i2p, you may enter 'user' here."
+msgstr "I2P后台服务默认以 i2psvc 账户运行。要使用*已有*的I2P配置文件，您可以输入不同的账户名。例如，如果您之前的I2P安装在 /home/user/i2p，此处可输入 'user'。"
+
+#. Type: string
+#. Description
+#: ../i2p.templates:3001
+msgid ""
+"Very important: If a user other than the default of 'i2psvc' is entered "
+"here, the chosen username *MUST* already exist."
+msgstr "重要：如果您输入默认的 'i2psvc' 以外的账户，此账户必须已经存在。"
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid "Memory that can be allocated to I2P:"
+msgstr "I2P 最多可占用内存："
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
+msgstr "默认情况下，I2P 最多只允许使用 128MB 系统内存。"
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid ""
+"High bandwidth routers, as well as routers with a lot of active torrents / "
+"plugins, may need to have this value increased."
+msgstr "如果是高带宽，大量BT下载或是插件较多的节点，请放宽此限制。"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid "Should the I2P daemon be confined with AppArmor?"
+msgstr "在 AppArmor 的沙河化下运行 I2P 守护进程？"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid ""
+"With this option enabled I2P will be sandboxed with AppArmor, restricting "
+"which files and directories may be accessed by I2P."
+msgstr "此选项将启用被 AppArmor 沙盒化的 I2P，限制 I2P 可访问的文件和目录。"

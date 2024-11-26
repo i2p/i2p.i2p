@@ -1,0 +1,67 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-05-05 15:14+0000\n"
+"PO-Revision-Date: 2013-07-20 14:49+0000\n"
+"Last-Translator: duck <duck@mail.i2p>\n"
+"Language-Team: Chinese (Gan) (http://app.transifex.com/otf/I2P/language/gan/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: gan\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Congratulations on getting I2P installed!"
+msgstr "恭喜您成功安装 I2P ！"
+
+msgid "Welcome to I2P!"
+msgstr "欢迎来到 I2P！"
+
+#, java-format
+msgid "Please {0}have patience{1} as I2P boots up and finds peers."
+msgstr "在 I2P 启动和搜索对等节点时，请{0}保持耐心{1}。"
+
+#, java-format
+msgid ""
+"While you are waiting, please {0}adjust your bandwidth settings{1} on the "
+"{2}configuration page{3}."
+msgstr "在您等候的同時，煩請在{2}設定頁面{3}裡{0}調整您的頻寬設定{1}。"
+
+msgid ""
+"Also you can setup your browser to use the I2P proxy to reach eepsites."
+msgstr "同时您也可以设置您的浏览器使用 I2P 代理访问匿名网站。"
+
+msgid ""
+"Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
+"browser settings."
+msgstr "只需在您的浏览器设置中输入 127.0.0.1（或 localhost）端口 4444 作为 HTTP 代理即可。"
+
+msgid "Do not use SOCKS for this."
+msgstr "请不要作为 SOCKS 代理使用。"
+
+#, java-format
+msgid ""
+"More information can be found on the {0}I2P browser proxy setup page{1}."
+msgstr "详情请参见 {0}I2P 浏览器代理设置页面{1}。"
+
+#, java-format
+msgid ""
+"Once you have a \"shared clients\" destination listed on the left, please "
+"{0}check out{1} our {2}FAQ{3}."
+msgstr "当页面左侧出现 \"共享客户端\" 目标后，请{0}看看{1}我们的{2}常见问题集 FAQ{3} 。"
+
+#, java-format
+msgid ""
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on "
+"{2}#i2p{3}."
+msgstr "将您的 IRC 客户端指向 {0}localhost:6668{1} 并在 {2}#i2p{3} 上和我们打招呼。"
+
+msgid "I2P Development Team"
+msgstr "I2P 开发团队"

@@ -65,7 +65,7 @@
 <link id="pagestyle" href="<%=theThemePath%>console.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
 <%
    String curlang = intl.getLang();
-   if (curlang.equals("zh")) {
+   if (curlang.equals("zh") || curlang.equals("gan")) {
        // make the fonts bigger for chinese
 %><link href="<%=theThemePath%>console_big.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
 <%

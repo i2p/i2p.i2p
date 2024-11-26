@@ -133,6 +133,7 @@ public class ConfigUIHelper extends HelperBase {
         { "cs", "cz", "Čeština", null },
         { "zh", "cn", "Chinese 中文", null },
         { "zh_TW", "tw", "Chinese 中文", "Taiwan" },
+        { "gan", "cn", "Gan Chinese 赣语", null },
         { "da", "dk", "Dansk", null },
         { "de", "de", "Deutsch", null },
         { "et", "ee", "Eesti", null },

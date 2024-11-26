@@ -1,0 +1,102 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the desktopgui package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-03-06 14:52+0000\n"
+"PO-Revision-Date: 2011-02-13 12:05+0000\n"
+"Last-Translator: duck <duck@mail.i2p>\n"
+"Language-Team: Chinese (Gan) (http://app.transifex.com/otf/I2P/language/gan/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: gan\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:31
+msgid "Start I2P"
+msgstr "啟動I2P"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:44
+#: src/net/i2p/desktopgui/InternalTrayManager.java:55
+msgid "I2P is starting!"
+msgstr " I2P 正在启动!"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:44
+#: src/net/i2p/desktopgui/InternalTrayManager.java:55
+msgid "Starting"
+msgstr "開始"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:65
+#: src/net/i2p/desktopgui/InternalTrayManager.java:221
+msgid "Launch I2P Browser"
+msgstr "启动 I2P 浏览器"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:86
+#: src/net/i2p/desktopgui/InternalTrayManager.java:242
+msgid "Configure I2P System Tray"
+msgstr "設定I2P系統文件夾"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:88
+#: src/net/i2p/desktopgui/InternalTrayManager.java:244
+msgid "Disable system tray"
+msgstr "禁用系统托盘"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:104
+#: src/net/i2p/desktopgui/InternalTrayManager.java:260
+msgid "Restart I2P"
+msgstr "重啟I2P"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:121
+#: src/net/i2p/desktopgui/InternalTrayManager.java:277
+msgid "Stop I2P"
+msgstr "停止I2P"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:137
+#: src/net/i2p/desktopgui/InternalTrayManager.java:293
+msgid "Restart I2P Immediately"
+msgstr "強制重啟I2P"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:154
+#: src/net/i2p/desktopgui/InternalTrayManager.java:310
+msgid "Stop I2P Immediately"
+msgstr "強制終止I2P"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:168
+#: src/net/i2p/desktopgui/InternalTrayManager.java:324
+msgid "Cancel I2P Shutdown"
+msgstr "取消停止I2P"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:381
+#, java-format
+msgid "Shutdown in {0}"
+msgstr "關閉於 {0}"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:383
+msgid "Shutdown imminent"
+msgstr "強制關閉"
+
+#. status translations are in the console bundle
+#: src/net/i2p/desktopgui/InternalTrayManager.java:388
+msgid "Network"
+msgstr "网络"
+
+#. Windows typically has tooltips; Linux (at least Ubuntu) doesn't
+#: src/net/i2p/desktopgui/TrayManager.java:75
+msgid "I2P: Right-click for menu"
+msgstr "I2P：右鍵開啟選單"
+
+#: src/net/i2p/desktopgui/TrayManager.java:310
+#: src/net/i2p/desktopgui/TrayManager.java:347
+msgid "Enable notifications"
+msgstr "启用通知"
+
+#: src/net/i2p/desktopgui/TrayManager.java:325
+#: src/net/i2p/desktopgui/TrayManager.java:362
+msgid "Disable notifications"
+msgstr "禁用通知"

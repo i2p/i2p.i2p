@@ -1,0 +1,90 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH EEPGET 1 "November 27, 2021" "" I2P
+
+.SH 名称
+Eepget \- I2P 下载器
+
+.SH 概要
+\fBeepget\fP [\fIoptions\fP]\fIURL\fP
+.br
+
+.SH 描述
+.P
+通过 HTTP 非交互式地下载一个文件。支持通过 I2P 和常规互联网传输。
+.P
+Eepget 能够处理缓慢或不稳定的网络连接；如果由于网络问题导致下载不成功，它将继续重试，直到检索到整个文件（如果已设定 \-n
+选项）。如果远程服务器支持，eepget 将指示服务器从中断点继续。
+
+.SH 选项
+\fB\-c\fP
+.TP 
+明网。不使用代理。同 \fB\-p\fP :0 。
+.TP 
+
+\fB\-e\fP etag
+.TP 
+设定请求头中的 etag 值。
+.TP 
+
+\fB\-h\fP 名称=值
+.TP 
+使用指定的名称和值添加任意请求头。
+.TP 
+
+\fB\-l\fP 行长度
+.TP 
+控制进度显示。\fB\ lineLen \fP 控制进度行的字符长度。默认为40。
+.TP 
+
+标记大小
+.TP 
+控制进度显示。\fB\ markSize \fP 控制进度行的字符长度。默认为1024。
+.TP 
+
+\fB\-n\fP 次重试
+.TP 
+指定在下载不成功的情况下重试下载的次数。如果不指定这个选项，eepget将不会重试。
+.TP 
+
+\fB\-o\fP 文件
+.TP 
+设置要写入的输出文件。 如果未指定此选项，输出文件名将由URL确定。
+.TP 
+
+\fB\-p\fP代理主机:[端口]
+.TP 
+指定一个要使用的I2P代理服务器(eeproxy)。如果不指定这个选项，eepget将使用127.0.0.1:4444。指定\fB\-c\fP或\fB\-p\fP:0来禁用eeproxy。
+.TP 
+
+\fB\-t\fP 秒
+.TP 
+设置不活动超时。默认是60秒。
+.TP 
+
+\fB\-u\fP 用户名
+.TP 
+如果需要的话，设置代理授权的用户名。
+.TP 
+
+\fB\-x\fP 密码
+.TP 
+如果需要的话，设置代理授权的密码。如果指定了用户名但没有密码，EepGet将提示密码。
+
+.SH 退出状态
+
+\fBeepget\fP 退出状态为 0 表示传输成功。如果下载遇到问题，则退出状态非 0。
+
+.SH 回報錯誤
+请在
+.UR https://i2pgit.org/i2p\-hackers/i2p.i2p/\-/issues
+I2P GitLab服务器
+.UE .
+上输入一个问题。
+
+.SH 另见
+\fBi2prouter\fP(1)  \fBcurl\fP(1)  \fBwget\fP(1)
+

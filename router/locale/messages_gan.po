@@ -1,0 +1,193 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# foo <foo@bar>, 2009.
+# 
+# Translators:
+# Chi-Hsun Tsai, 2024
+# 591313068a9d8b738947e39c2189fca2_35785ab, 2024
+# Maja, 2024
+# erinm, 2024
+# YFdyh000 <yfdyh000@gmail.com>, 2024
+# a478a116a491ba89a1cee347ebcf239b_fd74b84, 2024
+# Mingye Wang <arthur200126@gmail.com>, 2024
+# Beta Ba <linsui@inbox.lv>, 2024
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P routerconsole\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-12-18 13:32+0000\n"
+"PO-Revision-Date: 2019-12-19 14:09+0000\n"
+"Last-Translator: Beta Ba <linsui@inbox.lv>, 2024\n"
+"Language-Team: Chinese (Gan) (https://app.transifex.com/otf/teams/12694/gan/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: gan\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#. * IPv4 OK, IPv6 OK or disabled or no address
+#: ../java/src/net/i2p/router/CommSystemFacade.java:370
+msgid "OK"
+msgstr "正常"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:371
+msgid "IPv4: OK; IPv6: Testing"
+msgstr "IPv4: 正常; IPv6: 测试中"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:372
+msgid "IPv4: OK; IPv6: Firewalled"
+msgstr "IPv4: 正常; IPv6: 受到防火墙限制"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:373
+msgid "IPv4: Testing; IPv6: OK"
+msgstr "IPv4: 测试中; IPv6: 正常"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:374
+msgid "IPv4: Firewalled; IPv6: OK"
+msgstr "IPv4: 受到防火墙限制; IPv6: 正常"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:375
+msgid "IPv4: Disabled; IPv6: OK"
+msgstr "IPv4: 已禁用; IPv6: OK"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:376
+msgid "IPv4: Symmetric NAT; IPv6: OK"
+msgstr "IPv4: 對稱 NAT; IPv6: OK"
+
+#. * IPv4 symmetric NAT, IPv6 firewalled or disabled or no address
+#: ../java/src/net/i2p/router/CommSystemFacade.java:378
+msgid "Symmetric NAT"
+msgstr "对称 NAT"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:379
+msgid "IPv4: Symmetric NAT; IPv6: Testing"
+msgstr "IPv4: 对称 NAT; IPv6: 测试中"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:380
+msgid "IPv4: Firewalled; IPv6: Testing"
+msgstr "IPv4: 受到防火墙限制; IPv6: 测试中"
+
+#. * IPv4 firewalled, IPv6 firewalled or disabled or no address
+#: ../java/src/net/i2p/router/CommSystemFacade.java:382
+msgid "Firewalled"
+msgstr "受到防火墙限制"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:383
+msgid "IPv4: Testing; IPv6: Firewalled"
+msgstr "IPv4: 测试中; IPv6: 受到防火墙限制"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:384
+msgid "IPv4: Disabled; IPv6: Testing"
+msgstr "IPv4: 已禁用; IPv6: 測試中"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:385
+msgid "IPv4: Disabled; IPv6: Firewalled"
+msgstr "IPv4: 已禁用; IPv6: 受到防火墙限制"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:386
+msgid "Disconnected"
+msgstr "已中斷連線"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:387
+msgid "Port Conflict"
+msgstr "端口冲突"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:388
+msgid "Testing"
+msgstr "測試中"
+
+#. NPE, too early
+#. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
+#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too
+#. low");
+#. else
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:84
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:142
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:545
+msgid "Rejecting tunnels: Starting up"
+msgstr "拒絕共享：正在啟動"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:189
+msgid "Rejecting tunnels: High message delay"
+msgstr "拒絕共享：高訊息延遲"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:202
+msgid "Rejecting tunnels: Limit reached"
+msgstr "拒絕共享：隧道數限額"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:241
+msgid "Rejecting most tunnels: High number of requests"
+msgstr "拒绝多数共享隧道：请求过多"
+
+#. hard to do {0} from here
+#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of
+#. tunnels");
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:243
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:424
+msgid "Accepting most tunnels"
+msgstr "接受多数共享隧道"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:245
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:426
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:561
+msgid "Accepting tunnels"
+msgstr "接受共享隧道"
+
+#. .067KBps
+#. * also limited to 90% - see below
+#. always leave at least 4KBps free when allowing
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:350
+msgid "Rejecting tunnels: Bandwidth limit"
+msgstr "拒絕共享：頻寬限額"
+
+#. hard to do {0} from here
+#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels:
+#. Bandwidth limit");
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:420
+msgid "Rejecting most tunnels: Bandwidth limit"
+msgstr "收紧最大共享隧道：带宽限额"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:550
+msgid "Rejecting tunnels: Shutting down"
+msgstr "拒绝共享隧道：正在关闭"
+
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:563
+msgid "Rejecting tunnels"
+msgstr "拒絕參與共享隧道"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:260
+msgid "Dropping tunnel requests: Too slow"
+msgstr "忽略共享隧道请求：速度太慢"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:270
+msgid "Dropping tunnel requests: High job lag"
+msgstr "忽略共享請求：高作業延遲"
+
+#. don't even bother, since we are so overloaded locally
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:464
+msgid "Dropping tunnel requests: Overloaded"
+msgstr "忽略共享請求：路由過載"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:747
+msgid "Rejecting tunnels: Hidden mode"
+msgstr "拒絕隧道：隱身模式"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:775
+msgid "Rejecting tunnels: Request overload"
+msgstr "拒绝共享隧道：请求过多"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:806
+msgid "Rejecting tunnels: Connection limit"
+msgstr "拒绝共享隧道：连接受限"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1024
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1057
+msgid "Dropping tunnel requests: High load"
+msgstr "忽略共享請求：高負載"
+
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1140
+msgid "Dropping tunnel requests: Queue time"
+msgstr "忽略共享隧道请求：队列积压"

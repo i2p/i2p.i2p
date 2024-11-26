@@ -18,6 +18,7 @@ trans.es_AR = apps/i2ptunnel/locale/messages_es_AR.po
 trans.fa = apps/i2ptunnel/locale/messages_fa.po
 trans.fi = apps/i2ptunnel/locale/messages_fi.po
 trans.fr = apps/i2ptunnel/locale/messages_fr.po
+trans.gan = apps/i2ptunnel/locale/messages_gan.po
 trans.hu = apps/i2ptunnel/locale/messages_hu.po
 ;; Java converts id to in
 trans.id = apps/i2ptunnel/locale/messages_in.po
@@ -54,6 +55,7 @@ trans.es_AR = apps/i2ptunnel/locale-proxy/messages_es_AR.po
 trans.fa = apps/i2ptunnel/locale-proxy/messages_fa.po
 trans.fi = apps/i2ptunnel/locale-proxy/messages_fi.po
 trans.fr = apps/i2ptunnel/locale-proxy/messages_fr.po
+trans.gan = apps/i2ptunnel/locale-proxy/messages_gan.po
 trans.hu = apps/i2ptunnel/locale-proxy/messages_hu.po
 ;; Java converts id to in
 trans.id = apps/i2ptunnel/locale-proxy/messages_in.po
@@ -92,6 +94,7 @@ trans.et_EE = core/locale/messages_et.po
 trans.fa = core/locale/messages_fa.po
 trans.fi = core/locale/messages_fi.po
 trans.fr = core/locale/messages_fr.po
+trans.gan = core/locale/messages_gan.po
 trans.hu = core/locale/messages_hu.po
 ;; Java converts id to in
 trans.id = core/locale/messages_in.po
@@ -132,6 +135,7 @@ trans.et_EE = router/locale/messages_et.po
 trans.fa = router/locale/messages_fa.po
 trans.fi = router/locale/messages_fi.po
 trans.fr = router/locale/messages_fr.po
+trans.gan = router/locale/messages_gan.po
 trans.hu = router/locale/messages_hu.po
 ;; Java converts id to in
 trans.id = router/locale/messages_in.po
@@ -171,6 +175,7 @@ trans.et_EE = apps/routerconsole/locale/messages_et.po
 trans.fa = apps/routerconsole/locale/messages_fa.po
 trans.fi = apps/routerconsole/locale/messages_fi.po
 trans.fr = apps/routerconsole/locale/messages_fr.po
+trans.gan = apps/routerconsole/locale/messages_gan.po
 trans.hu = apps/routerconsole/locale/messages_hu.po
 ;; Java converts id to in
 trans.id = apps/routerconsole/locale/messages_in.po
@@ -205,6 +210,7 @@ trans.es_AR = apps/routerconsole/locale-news/messages_es_AR.po
 trans.fa = apps/routerconsole/locale-news/messages_fa.po
 trans.fi = apps/routerconsole/locale-news/messages_fi.po
 trans.fr = apps/routerconsole/locale-news/messages_fr.po
+trans.gan = apps/routerconsole/locale-news/messages_gan.po
 trans.gl = apps/routerconsole/locale-news/messages_gl.po
 ;; Java converts he to iw
 trans.he = apps/routerconsole/locale-news/messages_iw.po
@@ -299,6 +305,7 @@ trans.es_AR = apps/i2psnark/locale/messages_es_AR.po
 trans.fa = apps/i2psnark/locale/messages_fa.po
 trans.fi = apps/i2psnark/locale/messages_fi.po
 trans.fr = apps/i2psnark/locale/messages_fr.po
+trans.gan = apps/i2psnark/locale/messages_gan.po
 trans.hu = apps/i2psnark/locale/messages_hu.po
 ;; Java converts id to in
 trans.id = apps/i2psnark/locale/messages_in.po
@@ -335,6 +342,7 @@ trans.es_AR = apps/susidns/locale/messages_es_AR.po
 trans.fa = apps/susidns/locale/messages_fa.po
 trans.fi = apps/susidns/locale/messages_fi.po
 trans.fr = apps/susidns/locale/messages_fr.po
+trans.gan = apps/susidns/locale/messages_gan.po
 trans.gl = apps/susidns/locale/messages_gl.po
 trans.hu = apps/susidns/locale/messages_hu.po
 ;; Java converts id to in
@@ -372,6 +380,7 @@ trans.es_AR = apps/desktopgui/locale/messages_es_AR.po
 trans.fa = apps/desktopgui/locale/messages_fa.po
 trans.fi = apps/desktopgui/locale/messages_fi.po
 trans.fr = apps/desktopgui/locale/messages_fr.po
+trans.gan = apps/desktopgui/locale/messages_gan.po
 trans.gl = apps/desktopgui/locale/messages_gl.po
 trans.hu = apps/desktopgui/locale/messages_hu.po
 ;; Java converts id to in
@@ -418,6 +427,7 @@ trans.et_EE = apps/susimail/locale/messages_et.po
 trans.fa = apps/susimail/locale/messages_fa.po
 trans.fi = apps/susimail/locale/messages_fi.po
 trans.fr = apps/susimail/locale/messages_fr.po
+trans.gan = apps/susimail/locale/messages_gan.po
 trans.gl = apps/susimail/locale/messages_gl.po
 trans.hr = apps/susimail/locale/messages_hr.po
 trans.hu = apps/susimail/locale/messages_hu.po
@@ -497,6 +507,7 @@ trans.es = installer/resources/locale/po/messages_es.po
 trans.es_AR = installer/resources/locale/po/messages_es_AR.po
 trans.fi = installer/resources/locale/po/messages_fi.po
 trans.fr = installer/resources/locale/po/messages_fr.po
+trans.gan = installer/resources/locale/po/messages_gan.po
 trans.hu = installer/resources/locale/po/messages_hu.po
 trans.id = installer/resources/locale/po/messages_id.po
 trans.it = installer/resources/locale/po/messages_it.po
@@ -584,6 +595,7 @@ trans.es_AR = apps/ministreaming/locale/messages_es_AR.po
 trans.fa = apps/ministreaming/locale/messages_fa.po
 trans.fi = apps/ministreaming/locale/messages_fi.po
 trans.fr = apps/ministreaming/locale/messages_fr.po
+trans.gan = apps/ministreaming/locale/messages_gan.po
 trans.gl = apps/ministreaming/locale/messages_gl.po
 trans.hu = apps/ministreaming/locale/messages_hu.po
 ;; Java converts id to in
@@ -622,6 +634,7 @@ trans.es = installer/resources/locale-man/man_es.po
 trans.es_AR = installer/resources/locale-man/man_es_AR.po
 trans.fi = installer/resources/locale-man/man_fi.po
 trans.fr = installer/resources/locale-man/man_fr.po
+trans.gan = installer/resources/locale-man/man_gan.po
 trans.hu = installer/resources/locale-man/man_hu.po
 trans.id = installer/resources/locale-man/man_id.po
 trans.it = installer/resources/locale-man/man_it.po
@@ -657,6 +670,7 @@ trans.el = installer/resources/eepsite/docroot/help/index_el.html
 trans.es = installer/resources/eepsite/docroot/help/index_es.html
 trans.fa = installer/resources/eepsite/docroot/help/index_fa.html
 trans.fr = installer/resources/eepsite/docroot/help/index_fr.html
+trans.gan = installer/resources/eepsite/docroot/help/index_gan.html
 trans.hu = installer/resources/eepsite/docroot/help/index_hu.html
 ;; Java converts id to in
 trans.id = installer/resources/eepsite/docroot/help/index_in.html
@@ -688,6 +702,7 @@ trans.ar = apps/routerconsole/resources/docs/readme_ar.html
 trans.cs = apps/routerconsole/resources/docs/readme_cs.html
 trans.de = apps/routerconsole/resources/docs/readme_de.html
 trans.fr = apps/routerconsole/resources/docs/readme_fr.html
+trans.gan = apps/routerconsole/resources/docs/readme_gan.html
 trans.hu = apps/routerconsole/resources/docs/readme_hu.html
 ;; Java converts id to in
 trans.id = apps/routerconsole/resources/docs/readme_in.html
