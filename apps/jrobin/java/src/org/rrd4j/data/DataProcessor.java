@@ -260,6 +260,7 @@ public class DataProcessor implements DataHolder {
      * @return Ending timestamp in seconds
      * @deprecated Uses {@link #getEndTime()} instead.
      */
+    @Deprecated
     public long getEndingTimestamp() {
         return tEnd;
     }

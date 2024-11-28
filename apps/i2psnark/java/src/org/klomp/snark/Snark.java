@@ -252,7 +252,7 @@ public class Snark
   /**
    * from main() via parseArguments() single torrent
    *
-   * @deprecated unused
+   * unused
    */
 /****
   Snark(I2PSnarkUtil util, String torrent, String ip, int user_port,
@@ -264,7 +264,7 @@ public class Snark
   /**
    * single torrent - via router
    *
-   * @deprecated unused
+   * unused
    */
 /****
   public Snark(I2PAppContext ctx, Properties opts, String torrent,

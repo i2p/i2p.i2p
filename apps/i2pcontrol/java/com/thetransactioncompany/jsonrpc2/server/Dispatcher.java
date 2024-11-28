@@ -162,6 +162,7 @@ public class Dispatcher implements RequestHandler, NotificationHandler {
 	/**
 	 * @deprecated
 	 */
+	@Deprecated
 	public JSONRPC2Response dispatch(final JSONRPC2Request request, final MessageContext requestCtx) {
 	
 		return process(request, requestCtx);
@@ -209,6 +210,7 @@ public class Dispatcher implements RequestHandler, NotificationHandler {
 	/**
 	 * @deprecated
 	 */
+	@Deprecated
 	public void dispatch(final JSONRPC2Notification notification, final MessageContext notificationCtx) {
 	
 		process(notification, notificationCtx);
