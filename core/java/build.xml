@@ -129,6 +129,13 @@
                 <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
                 <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
                 <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
+                <!--
+                   Suppress JNI warning in JRE 24+, and eventual restriction
+                   See https://openjdk.org/jeps/472
+                   This only works for CLI with this as the named -jar argument;
+                   for normal runtime it must be suppressed in wrapper.config
+                 -->
+                <attribute name="Enable-Native-Access" value="ALL-UNNAMED" />
             </manifest>
         </jar>
     </target>
