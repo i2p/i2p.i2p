@@ -1,3 +1,18 @@
+2024-11-29 zzz
+ * Build: Prep for izpack 5.2.3 (Github #86)
+ * Transport: Better message on UPnP tab when enabled but fails to start (Github #84)
+
+2024-11-28 zzz
+ * Build: Suppress JNI warnings from Java 24 for CLI and i2psnark-standalone
+
+2024-11-26 zzz
+ * Console: Move jar dump link from summary bar to debug page tab
+ * New complete Gan Chinese translation
+
+2024-11-17 zzz
+ * Profiles: Extend time to treat E routers as severely congested
+ * Streaming: Reduce batch delay
+
 2024-11-14 zzz
  * Router: Change cap for sym. nat
 
