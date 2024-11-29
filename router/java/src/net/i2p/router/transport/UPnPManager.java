@@ -141,11 +141,11 @@ class UPnPManager {
             // If not, that's why it failed (HTTPServer won't start)
             if (!Addresses.isConnected()) {
                 if (!_disconLogged) {
-                    _log.logAlways(Log.WARN, "UPnP start failed - no network connection?");
+                    _log.logAlways(Log.WARN, _t("UPnP failed to start - no network connection?"));
                     _disconLogged = true;
                 }
             } else {
-                _log.error("UPnP start failed - port conflict?");
+                _log.error(_t("UPnP failed to start - port conflict?"));
             }
         }
     }
@@ -391,8 +391,14 @@ class UPnPManager {
      *  will take many seconds if it has vanished.
      */
     public String renderStatusHTML() {
-        if (!_isRunning)
-            return "<h3><a name=\"upnp\"></a>" + _t("UPnP is not enabled") + "</h3>\n";
+        if (!_isRunning) {
+            String msg;
+            if (Addresses.isConnected())
+                msg = _t("UPnP failed to start - port conflict?");
+            else
+                msg = _t("UPnP failed to start - no network connection?");
+            return "<h3><a name=\"upnp\"></a>" + msg + "</h3>\n";
+        }
         return _upnp.renderStatusHTML();
     }
 
