@@ -1886,8 +1886,17 @@
         <copy file="build/jetty-i2p.jar" todir="pkg-temp/lib/" />
     </target>
 
+    <!-- IzPack 4 -->
     <target name="izpack-patches" >
-            <taskdef name="izpack"
+        <echo message="*** WARNING ***" />
+        <echo message="This build target uses IzPack 4.3.5 which is bundled for convenience but is very old and unsupported." />
+        <echo message="It requires Java JDK 13 or lower with pack200, it will fail with JDK 14 or higher." />
+        <echo message="While sufficient for local use, IzPack 5 is recommended to build installers for distribution." />
+        <echo message="For updating a local install, use the updater target instead, copy i2pupdate.zip to the install directory, and restart." />
+        <echo message="For IzPack 5, install it and use one of the installer5 targets." />
+        <echo message="See http://zzz.i2p/topics/3661 for help on installing IzPack 5." />
+        <echo message="JDK: ${java.vendor} ${java.version} (${java.runtime.name} ${java.runtime.version})" />
+        <taskdef name="izpack"
                      classpath="${basedir}/installer/lib/izpack/patches.jar:${basedir}/installer/lib/izpack/standalone-compiler.jar"
                      classname="com.izforge.izpack.ant.IzPackTask" />
         <jar destfile="${basedir}/installer/lib/izpack/patches.jar"
