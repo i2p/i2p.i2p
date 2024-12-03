@@ -819,6 +819,7 @@ class NetDbRenderer {
           boolean linkSusi = _context.portMapper().isRegistered("susidns");
           long now = _context.clock().now();
           buf.append("<div class=\"leasesets_container\">");
+          boolean ldebug = debug || client != null;
           for (LeaseSet ls : leases) {
             String distance;
             if (debug) {
@@ -832,7 +833,7 @@ class NetDbRenderer {
                 distance = null;
             }
             if (!ls.getHash().equals(myLeaseSet.getHash())) {
-                renderLeaseSet(buf, ls, debug, now, linkSusi, distance);
+                renderLeaseSet(buf, ls, ldebug, now, linkSusi, distance);
                 out.write(buf.toString());
                 buf.setLength(0);
             }
