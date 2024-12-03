@@ -114,7 +114,8 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
 
                 case DatabaseStoreMessage.MESSAGE_TYPE:
                     DatabaseStoreMessage dsm = (DatabaseStoreMessage) msg;
-                    if (dsm.getEntry().getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+                    DatabaseEntry dbe = dsm.getEntry();
+                    if (dbe.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
                         // FVSJ may result in an unsolicited RI store if the peer went non-ff.
                         // We handle this safely, so we don't ask him again.
                         // Todo: if peer was ff and RI is not ff, queue for exploration in netdb (but that isn't part of the facade now)
@@ -125,7 +126,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                         Hash key = dsm.getKey();
                         if (_context.routerHash().equals(key))
                             return;
-                        RouterInfo ri = (RouterInfo) dsm.getEntry();
+                        RouterInfo ri = (RouterInfo) dbe;
                         if (!key.equals(ri.getIdentity().getHash()))
                             return;
                         if (!ri.isValid())
@@ -148,7 +149,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                         // allow DSM of our own key (used by FloodfillVerifyStoreJob)
                         // or other keys (used by IterativeSearchJob)
                         // as long as there's no reply token (we will never set a reply token but an attacker might)
-                        ((LeaseSet)dsm.getEntry()).setReceivedBy(_client);
+                        dbe.setReceivedBy(_client);
                     }
                     break;
 
@@ -178,8 +179,9 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                         _log.error("Dropping DSM w/ reply token down a expl. tunnel: " + msg);
                         return;
                     }
-                    if (dsm.getEntry().isLeaseSet())
-                        ((LeaseSet)dsm.getEntry()).setReceivedBy(_client);
+                    DatabaseEntry dbe = dsm.getEntry();
+                    if (dbe.isLeaseSet())
+                        dbe.setReceivedBy(_client);
                     break;
 
                 case DatabaseSearchReplyMessage.MESSAGE_TYPE:
@@ -277,7 +279,8 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                         dsm.setReplyTunnel(null);
                         dsm.setReplyGateway(null);
 
-                            if (dsm.getEntry().isLeaseSet()) {
+                            DatabaseEntry dbe = dsm.getEntry();
+                            if (dbe.isLeaseSet()) {
                                     // Case 1:
                                     // store of our own LS.
                                     // This is almost certainly a response to a FloodfillVerifyStoreJob search.
@@ -292,7 +295,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                                     // Or, it's a normal LS bundled with data and a MessageStatusMessage.
 
                                     // ... and inject it.
-                                    ((LeaseSet)dsm.getEntry()).setReceivedBy(_client);
+                                    dbe.setReceivedBy(_client);
                                     if (_log.shouldLog(Log.INFO))
                                         _log.info("Storing garlic LS down tunnel for: " + dsm.getKey() + " sent to: "
                                                   + _clientNickname + " ("
