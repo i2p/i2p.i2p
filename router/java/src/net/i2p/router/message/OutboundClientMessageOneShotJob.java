@@ -35,11 +35,13 @@ import net.i2p.router.ClientMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.MessageSelector;
+import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.crypto.ratchet.ReplyCallback;
+import net.i2p.router.networkdb.kademlia.KademliaNetworkDatabaseFacade;
 import net.i2p.util.Log;
 
 /**
@@ -295,9 +297,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
 
         SendJob success = new SendJob(getContext());
+        KademliaNetworkDatabaseFacade kndf = (KademliaNetworkDatabaseFacade) getContext().clientNetDb(_from.calculateHash());
         // set in constructor
         if (_leaseSet != null) {
-            if (!_leaseSet.getReceivedAsReply()) {
+            if (!kndf.isClientDb() && !_leaseSet.getReceivedAsReply()) {
                 boolean shouldFetch = true;
                 if (_leaseSet.getType() != DatabaseEntry.KEY_TYPE_LEASESET) {
                     LeaseSet2 ls2 = (LeaseSet2) _leaseSet;
@@ -307,7 +310,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                     if (_log.shouldInfo())
                         _log.info(getJobId() + ": RAP LS, firing search: " + _leaseSet.getHash().toBase32());
                     LookupLeaseSetFailedJob failed = new LookupLeaseSetFailedJob(getContext());
-                    getContext().clientNetDb(_from.calculateHash()).lookupLeaseSetRemotely(_leaseSet.getHash(), success, failed,
+                    kndf.lookupLeaseSetRemotely(_leaseSet.getHash(), success, failed,
                                                                 LS_LOOKUP_TIMEOUT, _from.calculateHash());
                 } else {
                     dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET);
@@ -330,7 +333,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                         long exp = now - _leaseSet.getLatestLeaseDate();
                         _log.info(getJobId() + ": leaseSet expired " + DataHelper.formatDuration(exp) + " ago, firing search: " + _leaseSet.getHash().toBase32());
                     }
-                    getContext().clientNetDb(_from.calculateHash()).lookupLeaseSetRemotely(_leaseSet.getHash(), _from.calculateHash());
+                    kndf.lookupLeaseSetRemotely(_leaseSet.getHash(), _from.calculateHash());
                 }
             }
             success.runJob();
@@ -340,7 +343,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 _log.debug(getJobId() + ": Send outbound client message - sending off leaseSet lookup job for " + _toString + " from client " + _from.calculateHash().toBase32());
             LookupLeaseSetFailedJob failed = new LookupLeaseSetFailedJob(getContext());
             Hash key = _to.calculateHash();
-            getContext().clientNetDb(_from.calculateHash()).lookupLeaseSet(key, success, failed, LS_LOOKUP_TIMEOUT, _from.calculateHash());
+            kndf.lookupLeaseSet(key, success, failed, LS_LOOKUP_TIMEOUT, _from.calculateHash());
         }
     }
 
@@ -422,14 +425,18 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      */
     private int getNextLease() {
         // set in runJob if found locally
-        if (_leaseSet == null || !_leaseSet.getReceivedAsReply()) {
-            _leaseSet = getContext().clientNetDb(_from.calculateHash()).lookupLeaseSetLocally(_to.calculateHash());
+        KademliaNetworkDatabaseFacade kndf = (KademliaNetworkDatabaseFacade) getContext().clientNetDb(_from.calculateHash());
+        if (_leaseSet == null || (!kndf.isClientDb() && _leaseSet.getReceivedAsPublished())) {
             if (_leaseSet == null) {
                 // shouldn't happen
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn(getJobId() + ": Lookup locally didn't find the leaseSet for " + _toString);
-                return MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET;
-            } else if (_leaseSet.getReceivedAsPublished()) {
+                _leaseSet = kndf.lookupLeaseSetLocally(_to.calculateHash());
+                if (_leaseSet == null) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn(getJobId() + ": Lookup locally didn't find the leaseSet for " + _toString);
+                    return MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET;
+                }
+            }
+            if (!kndf.isClientDb() && _leaseSet.getReceivedAsPublished()) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(getJobId() + ": Only have RAP LS for " + _toString);
                 return MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET;
