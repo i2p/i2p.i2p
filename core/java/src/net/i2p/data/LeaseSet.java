@@ -185,13 +185,13 @@ public class LeaseSet extends DatabaseEntry {
     }
 
     /**
-     * Also sets receivedAsReply to true
+     * As of 0.9.65, no longer sets receivedAsReply to true
      * @param localClient may be null
      * @since 0.9.47
      */
     public void setReceivedBy(Hash localClient) {
         super.setReceivedBy(localClient);
-        super.setReceivedAsReply();
+        //setReceivedAsReply();
     }
 
     /**
