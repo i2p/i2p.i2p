@@ -1,3 +1,6 @@
+2024-12-18 zzz
+ * NetDB: Aggressive expire for leasesets when over limits
+
 2024-11-29 zzz
  * Build: Prep for izpack 5.2.3 (Github #86)
  * Transport: Better message on UPnP tab when enabled but fails to start (Github #84)
