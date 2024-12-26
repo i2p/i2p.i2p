@@ -29,8 +29,11 @@ import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
+import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.router.util.MaskedIPSet;
 import net.i2p.router.util.RandomIterator;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.SystemVersion;
@@ -101,6 +104,7 @@ public class IterativeSearchJob extends FloodSearchJob {
      * The default single search time
      */
     private static final long SINGLE_SEARCH_TIME = 3*1000;
+    private static final long MIN_SINGLE_SEARCH_TIME = 500;
     /** the actual expire time for a search message */
     private static final long SINGLE_SEARCH_MSG_TIME = 20*1000;
     /**
@@ -549,7 +553,25 @@ public class IterativeSearchJob extends FloodSearchJob {
             // The timeout job is always run (never cancelled)
             // Note that the timeout is much shorter than the message expiration (see above)
             Job j = new IterativeTimeoutJob(ctx, peer, this);
-            long expire = Math.min(_expiration, now + _singleSearchTime);
+            // set timeout based on resp. time from profile
+            PeerProfile prof = getContext().profileOrganizer().getProfileNonblocking(peer);
+            long exp = _singleSearchTime;
+            if (prof != null && prof.getIsExpandedDB()) {
+                RateStat dbrt = prof.getDbResponseTime();
+                if (dbrt != null) {
+                    Rate r = dbrt.getRate(60*60*1000L);
+                    if (r != null) {
+                        long avg = (long) r.getAvgOrLifetimeAvg();
+                        if (avg > 0) {
+                            // We don't calculate RTO so just use a multiple of the RTT
+                            exp = Math.min(exp, Math.max(MIN_SINGLE_SEARCH_TIME, (isDirect ? 2 : 3) * avg));
+                            //if (_log.shouldInfo())
+                            //    _log.info("lookup from " + peer.toBase64() + " avg resp time " + avg + " expires " + exp);
+                        }
+                    }
+                }
+            }
+            long expire = Math.min(_expiration, now + exp);
             j.getTiming().setStartAfter(expire);
             getContext().jobQueue().addJob(j);
 
