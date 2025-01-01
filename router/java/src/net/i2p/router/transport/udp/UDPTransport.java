@@ -2669,7 +2669,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  If you have multiple messages, use the list variant,
      *  so the messages may be bundled efficiently.
      *
-     *  @param peer all messages MUST be going to this peer
+     *  @param peer the message MUST be going to this peer
      */
     void send(I2NPMessage msg, PeerState peer) {
         try {
