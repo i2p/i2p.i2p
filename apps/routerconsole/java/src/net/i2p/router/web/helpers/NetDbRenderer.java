@@ -732,21 +732,21 @@ class NetDbRenderer {
                     if (myLeaseSet.getType() == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 || _context.keyRing().get(myLeaseSet.getHash()) != null)
                         buf.append(" <b>(").append(_t("Encrypted")).append(")</b>");
                     buf.append(_t("Published")).append(" ");
-                    LeaseSet2 ls2 = (LeaseSet2) myLeaseSet;
+                    long exp = 0;
                     long now = _context.clock().now();
-                    long pub = now - ls2.getPublished();
-                    buf.append(_t("{0} ago", DataHelper.formatDuration2(pub)));
-                    long exp;
-                    if (myLeaseSet.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
-                        exp = ls2.getLatestLeaseDate() - now;
+                    if (myLeaseSet.getType() != DatabaseEntry.KEY_TYPE_LEASESET) {
+                        LeaseSet2 ls2 = (LeaseSet2) myLeaseSet;
+                        long pub = now - ls2.getPublished();
+                        buf.append(_t("{0} ago", DataHelper.formatDuration2(pub)));
+                        exp = ls2.getExpires()-now;;
+                        buf.append(" - ");
                     } else {
-                        exp = ls2.getExpires()-now;
+                        exp = myLeaseSet.getLatestLeaseDate() - now;
                     }
-                    buf.append(" - ");
                     if (exp > 0)
-                        buf.append(_t("Expires in {0}", DataHelper.formatDuration2(exp)));
-                    else
-                        buf.append(_t("Expired {0} ago", DataHelper.formatDuration2(0-exp)));
+                            buf.append(_t("Expires in {0}", DataHelper.formatDuration2(exp)));
+                        else
+                            buf.append(_t("Expired {0} ago", DataHelper.formatDuration2(0-exp)));
                 }
                 buf.append("</th><th></th></tr>\n");
                 buf.append("\n<tr><td colspan=\"2\"><ul class=\"netdb_leases\">");
