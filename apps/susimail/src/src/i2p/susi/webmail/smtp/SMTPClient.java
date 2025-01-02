@@ -230,7 +230,7 @@ public class SMTPClient {
 	 *  @return success
 	 */
 	public boolean sendMail(String host, int port, String user, String pass, String sender,
-	                        String[] recipients, StringBuilder body,
+	                        List<String> recipients, StringBuilder body,
 	                        List<Attachment> attachments, String boundary)
 	{
 		boolean mailSent = false;
@@ -318,8 +318,8 @@ public class SMTPClient {
 			if (ok) {
 				List<SendExpect> cmds = new ArrayList<SendExpect>();
 				cmds.add(new SendExpect("MAIL FROM: " + sender, 250));
-				for( int i = 0; i < recipients.length; i++ ) {
-					cmds.add(new SendExpect("RCPT TO: " + recipients[i], 250));
+				for (String r : recipients) {
+					cmds.add(new SendExpect("RCPT TO: " + r, 250));
 				}
 				cmds.add(new SendExpect("DATA", 354));
 				if (sendCmds(cmds) != cmds.size()) {

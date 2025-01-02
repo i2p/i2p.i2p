@@ -3241,7 +3241,7 @@ public class WebMail extends HttpServlet
 
 			if( ok ) {
 				Runnable es = new EmailSender(sessionObject, draft, sender,
-				                              recipients.toArray(new String[recipients.size()]),
+				                              recipients,
 				                              body, attachments, boundary);
 				Thread t = new I2PAppThread(es, "Email sender");
 				sessionObject.info += _t("Sending mail.") + '\n';
@@ -3262,11 +3262,11 @@ public class WebMail extends HttpServlet
 		private final Draft draft;
 		private final String host, user, pass, sender, boundary;
 		private final int port;
-		private final String[] recipients;
+		private final List<String> recipients;
 		private final StringBuilder body;
 		private final List<Attachment> attachments;
 
-		public EmailSender(SessionObject so, Draft d, String s, String[] recip,
+		public EmailSender(SessionObject so, Draft d, String s, List<String> recip,
 		                   StringBuilder bod, List<Attachment> att, String b) {
 			sessionObject = so; draft = d;
 			host = so.host; port = so.smtpPort; user = so.user; pass = so.pass;
