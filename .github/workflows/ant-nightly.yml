@@ -1,0 +1,127 @@
+name: Daily Workflow
+
+on:
+  schedule:
+    # This runs at 00:00 UTC every day
+    # Cron syntax: minute hour day-of-month month day-of-week
+    - cron: '0 * * * *'
+  workflow_dispatch: # Allows manual triggering
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  daily-job:
+    runs-on: ubuntu-latest
+
+    # Ensures this only runs on the master branch
+    if: github.ref == 'refs/heads/master'
+
+    steps:
+      - name: GetText
+        run: sudo apt install gettext
+      - uses: actions/checkout@v4
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+      - name : Generate override.properties
+        run: |
+          rm -f override.properties
+          echo "build.built-by=GitHub Actions" >> override.properties
+          echo "noExe=true" >> override.properties
+      - name: build with Ant
+        run: ant distclean pkg
+      - name: Upload installer.jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: I2P-install-${{ github.sha }}.jar
+          path: install.jar
+
+  javadoc-latest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: GetText
+        run: sudo apt install gettext
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name : Generate override.properties
+        run: |
+          rm -f override.properties
+          echo "build.built-by=GitHub Actions" >> override.properties
+          echo "noExe=true" >> override.properties
+      - name: test Debian build with Ant
+        run: ant distclean
+      - name: build javadoc with Ant
+        run: ant distclean javadoc updater
+      - name: zip javadoc and place update in javadoc zip
+        run: cp i2pupdate.zip build/javadoc/i2pupdate.zip && zip -r javadoc.zip build/javadoc
+      - name: Upload javadoc.zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: I2P-javadoc-${{ github.sha }}.zip
+          path: javadoc.zip
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload javadocs to github page
+          path: 'build/javadoc'
+      - name: Deploy javadoc and dev build to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  build-java7:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: GetText
+        run: sudo apt install gettext
+      - uses: actions/checkout@v4
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+      - name : Generate override.properties
+        run: |
+          git clone https://github.com/eyedeekay/openjdk-7 "$HOME/openjdk-7"
+          rm -f override.properties
+          echo "build.built-by=GitHub Actions" >> override.properties
+          echo "noExe=true" >> override.properties
+          echo "javac.compilerargs=-bootclasspath $HOME/openjdk-7/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar:$HOME/openjdk-7/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jce.jar -Xlint:all" >> override.properties
+      - name: build Maven dev build with Ant
+        run: ./installer/resources/maven-dev-release.sh 1
+      - name: Upload servlet-i2p.jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: servlet-i2p-${{ github.sha }}.jar
+          path: pkg-mavencentral/servlet-i2p*.jar
+      - name: Upload streaming.jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: streaming-${{ github.sha }}.jar
+          path: pkg-mavencentral/streaming*.jar
+      - name: Upload mstreaming.jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: mstreaming-${{ github.sha }}.jar
+          path: pkg-mavencentral/mstreaming*.jar
+      - name: Upload router.jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: router-${{ github.sha }}.jar
+          path: pkg-mavencentral/router*.jar
+      - name: Upload i2p.jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: i2p-${{ github.sha }}.jar
+          path: pkg-mavencentral/i2p*.jar
