@@ -17,8 +17,8 @@ jobs:
     - name: download release artifacts
       run: |
         sudo apt-get install wget ca-certificates gpg sed curl git
-        git pull --tags
         export I2P_VERSION=$(echo ${{ github.ref_name }} | sed 's|i2p-||g' |sed 's|-.*||')
+        echo "$I2P_VERSION"
         export ATTEMPTS=0
         while true; do
         sleep 60m
