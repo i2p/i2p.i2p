@@ -4,6 +4,7 @@ on:
   push:
     tags:
     - 'i2p-*.*.*'
+  workflow_dispatch: # Allows manual triggering
 
 jobs:
   dl:
