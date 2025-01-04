@@ -1,0 +1,105 @@
+name: Java with IzPack Snapshot Setup
+
+on: [push]
+
+permissions:
+  contents: read
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Required Packages
+        run: sudo apt install gettext
+      - name: Checkout Main Repository
+        uses: actions/checkout@v4
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4.5
+        with:
+          maven-version: '3.9.9'
+      - name: Clone IzPack Repository
+        uses: actions/checkout@v4
+        with:
+          repository: 'izpack/izpack'
+          path: 'izpack-source'
+      - name: Build IzPack Snapshot
+        working-directory: ./izpack-source
+        run: |
+          mvn clean install -DskipTests
+          find . -iname 'izpack*.jar'
+          echo "IZPACK_HOME=$GITHUB_WORKSPACE/izpack-source/izpack-dist/target/IzPack" >> $GITHUB_ENV
+          echo "$GITHUB_WORKSPACE/izpack-source/izpack-dist/target/IzPack/bin" >> $GITHUB_PATH
+          cat > auto-install.xml << EOF
+          <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+          <AutomatedInstallation langpack="eng">
+              <com.izforge.izpack.panels.HelloPanel/>
+              <com.izforge.izpack.panels.TargetPanel>
+                  <installpath>/usr/local/IzPack</installpath>
+              </com.izforge.izpack.panels.TargetPanel>
+              <com.izforge.izpack.panels.InstallPanel/>
+              <com.izforge.izpack.panels.FinishPanel/>
+          </AutomatedInstallation>
+          EOF
+
+          # Create installation directory
+          sudo mkdir -p /usr/local/IzPack
+          sudo chmod 777 /usr/local/IzPack
+
+          # Run the installer in headless mode
+          # java -jar ./izpack-dist/target/izpack-dist-*-SNAPSHOT-installer.jar auto-install.xml
+
+          java -DINSTALL_PATH=/usr/local/IzPack -jar ./izpack-dist/target/izpack-dist-*-SNAPSHOT-installer.jar -options-system
+
+          # Update environment
+          echo "/usr/local/IzPack/bin" >> $GITHUB_PATH
+          echo "IZPACK_HOME=/usr/local/IzPack" >> $GITHUB_ENV
+      - name: Generate Properties
+        run: |
+          rm -f override.properties
+          echo "build.built-by=GitHub Actions" >> override.properties
+          echo "izpack.home=${{ env.IZPACK_HOME }}" >> override.properties
+          echo "izpack5.home=${{ env.IZPACK_HOME }}" >> override.properties
+          echo "izpack5.version=5.2.4-SNAPSHOT" >> override.properties
+      - name: Verify Setup
+        run: |
+          java -version
+          ant -version
+          echo "IzPack installation directory: $IZPACK_HOME"
+          ls -l $IZPACK_HOME/bin
+      - name: Upload IzPack Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: izpack-snapshot-${{ github.sha }}
+          path: ${{ env.IZPACK_HOME }}
+          retention-days: 1
+      - name: Cache IzPack Build
+        uses: actions/cache@v3
+        with:
+          path: izpack-source
+          key: izpack-snapshot-${{ github.sha }}
+          restore-keys: |
+            izpack-snapshot-
+      - name: build with Ant - Non Windows
+        run: ant distclean pkg installer5-linux
+      - name: find installer artifacts
+        run: find . -iname 'i2p*.jar'
+      - name: Upload i2pinstall.jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: i2pinstall-${{ github.sha }}.jar
+          path: i2pinstall*.jar
+      - name: build with Ant - Windows
+        run: ant distclean pkg installer5-windows
+      - name: find installer artifacts
+        run: find . -iname 'i2p*.exe'
+      - name: Upload i2pinstall.exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: i2pinstall-${{ github.sha }}.exe
+          path: i2pinstall*.exe
