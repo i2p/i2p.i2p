@@ -34,7 +34,7 @@ https://dns.aa.net.uk/dns-query
 #https://dnses.alekberg.net/dns-query
 #
 # SSL cert issues
-https://dnsnl.alekberg.net/dns-query
+#https://dnsnl.alekberg.net/dns-query
 # SSL cert issues
 https://dnsse.alekberg.net/dns-query
 # down, see https://www.armadillodns.net/ for status
@@ -48,10 +48,10 @@ https://awan.ftp.sh/unblocked
 #
 https://doh.42l.fr/dns-query
 #
-https://doh-ch.blahdns.com/dns-query
+#https://doh-ch.blahdns.com/dns-query
 https://doh-sg.blahdns.com/dns-query
-https://doh-fi.blahdns.com/dns-query
-https://doh-jp.blahdns.com/dns-query
+#https://doh-fi.blahdns.com/dns-query
+#https://doh-jp.blahdns.com/dns-query
 https://doh-de.blahdns.com/dns-query
 #
 https://dns.blokada.org/dns-query
@@ -76,7 +76,7 @@ https://dns.digitalsize.net/dns-query
 #
 https://open.dns0.eu/
 #
-https://doh.dns4all.eu/dns-query
+#https://doh.dns4all.eu/dns-query
 #
 # dnscry.pt
 # commented out ones have SNI issues
@@ -85,9 +85,9 @@ https://abe01.dnscry.pt/dns-query
 https://ams02.dnscry.pt/dns-query
 https://atl01.dnscry.pt/dns-query
 https://ord01.dnscry.pt/dns-query
-https://coe01.dnscry.pt/dns-query
+#https://coe01.dnscry.pt/dns-query
 https://cvt01.dnscry.pt/dns-query
-https://dfw01.dnscry.pt/dns-query
+#https://dfw01.dnscry.pt/dns-query
 https://dtw01.dnscry.pt/dns-query
 https://rdu01.dnscry.pt/dns-query
 https://dus01.dnscry.pt/dns-query
@@ -103,7 +103,7 @@ https://mia01.dnscry.pt/dns-query
 https://muc01.dnscry.pt/dns-query
 https://naw01.dnscry.pt/dns-query
 https://nyc01.dnscry.pt/dns-query
-https://phl01.dnscry.pt/dns-query
+#https://phl01.dnscry.pt/dns-query
 https://phx01.dnscry.pt/dns-query
 https://pdx01.dnscry.pt/dns-query
 https://slc01.dnscry.pt/dns-query
@@ -129,23 +129,23 @@ https://dns.dnswarden.com/uncensored
 # SSL issues
 #https://rdns.faelix.net/
 #
-https://ns0.fdn.fr/dns-query
-https://ns1.fdn.fr/dns-query
+#https://ns0.fdn.fr/dns-query
+#https://ns1.fdn.fr/dns-query
 #
 https://doh.ffmuc.net/dns-query
 #
-https://doh.applied-privacy.net/query
+#https://doh.applied-privacy.net/query
 #
 https://dns.hostux.net/dns-query
 #
-https://ordns.he.net/dns-query
+#https://ordns.he.net/dns-query
 #
 # not found
 #https://jcdns.fun/dns-query
 #
 https://dns.kescher.at/dns-query
 #
-https://doh.tiar.app/dns-query
+#https://doh.tiar.app/dns-query
 https://doh.tiarap.org/dns-query
 #
 https://doh.lacontrevoie.fr/dns-query
@@ -184,7 +184,7 @@ https://dns.twnic.tw/dns-query
 #
 https://ibksturm.synology.me/dns-query
 #
-https://ibuki.cgnat.net/dns-query
+#https://ibuki.cgnat.net/dns-query
 #
 https://doh-2.seby.io/dns-query
 #https://doh.seby.io:8443/dns-query
@@ -228,7 +228,7 @@ https://dns.brahma.world/dns-query
 #https://doh.dnscrypt.uk/dns-query
 #https://v.dnscrypt.uk/dns-query
 # dnshome-doh
-https://dns.dnshome.de/dns-query
+#https://dns.dnshome.de/dns-query
 # doh-crypto-sx
 https://doh.crypto.sx/dns-query
 #
@@ -253,8 +253,8 @@ https://sky.rethinkdns.com/dns-query
 # 404
 #https://rumpelsepp.org/dns-query
 #
-https://anycast.uncensoreddns.org/dns-query
-https://unicast.uncensoreddns.org/dns-query
+#https://anycast.uncensoreddns.org/dns-query
+#https://unicast.uncensoreddns.org/dns-query
 #
 #
 #############################################
