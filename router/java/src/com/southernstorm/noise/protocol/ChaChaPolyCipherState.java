@@ -147,14 +147,14 @@ public class ChaChaPolyCipherState implements CipherState {
 	 */
 	private static void putLittleEndian64(byte[] output, int offset, long value)
 	{
-		output[offset] = (byte)value;
-		output[offset + 1] = (byte)(value >> 8);
-		output[offset + 2] = (byte)(value >> 16);
-		output[offset + 3] = (byte)(value >> 24);
-		output[offset + 4] = (byte)(value >> 32);
-		output[offset + 5] = (byte)(value >> 40);
-		output[offset + 6] = (byte)(value >> 48);
-		output[offset + 7] = (byte)(value >> 56);
+		output[offset++] = (byte)value;
+		output[offset++] = (byte)(value >> 8);
+		output[offset++] = (byte)(value >> 16);
+		output[offset++] = (byte)(value >> 24);
+		output[offset++] = (byte)(value >> 32);
+		output[offset++] = (byte)(value >> 40);
+		output[offset++] = (byte)(value >> 48);
+		output[offset] = (byte)(value >> 56);
 	}
 
 	/**
