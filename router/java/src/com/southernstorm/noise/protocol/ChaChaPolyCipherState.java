@@ -126,6 +126,8 @@ public class ChaChaPolyCipherState implements CipherState {
 		if (n == -1L)
 			throw new IllegalStateException("Nonce has wrapped around");
 		ChaChaCore.initIV(input, n++);
+		// UNCOMMENT TO RUN THE main() TEST
+		// input[13] = TEST_VECTOR_NONCE_HIGH_BYTES;
 		ChaChaCore.hash(output, input);
 		Arrays.fill(polyKey, (byte)0);
 		ChaChaCore.xorBlock(polyKey, 0, polyKey, 0, 32, output);
@@ -335,4 +337,56 @@ public class ChaChaPolyCipherState implements CipherState {
 		buf.append('\n');
 		return buf.toString();
 	}
+
+    //private static final int TEST_VECTOR_NONCE_HIGH_BYTES = 0x00000007;
+    //private static final long TEST_VECTOR_NONCE_LOW_BYTES = 0x4746454443424140L;
+
+    /**
+     *  IMPORTANT NOTE:
+     *  To run this test you must uncomment the line in
+     *  setup() above to set the high 4 bytes of the block counter,
+     *  because the test vector has a 12 byte nonce with the high 4 bytes nonzero
+     */
+/****
+    public static void main(String[] args) throws Exception {
+        // vectors as in RFC 7539
+        // adapted from https://github.com/PurpleI2P/i2pd/blob/openssl/tests/test-aeadchacha20poly1305.cpp
+        byte[] plaintext = net.i2p.data.DataHelper.getASCII("Ladies and Gentlemen of the class of '99: If I could offer you only one tip for the future, sunscreen would be it.");
+        System.out.println("Plaintext");
+        System.out.println(net.i2p.util.HexDump.dump(plaintext));
+        byte[] key = new byte[32];
+        for (int i = 0; i < 32; i++) {
+            key[i] = (byte) (i + 0x80);
+        }
+        // nonce
+        // we have to put the high 4 bytes of the IV into the counter because our code is 8/8 not 4/12
+        // 0x07, 0x00, 0x00, 0x00, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47
+        byte[] ad = { 0x50, 0x51, 0x52, 0x53, (byte) 0xc0, (byte) 0xc1, (byte) 0xc2, (byte) 0xc3, (byte) 0xc4, (byte) 0xc5, (byte) 0xc6, (byte) 0xc7 };
+        byte[] out = new byte[plaintext.length + 16];
+        ChaChaPolyCipherState cha = new ChaChaPolyCipherState();
+        cha.initializeKey(key, 0);
+        cha.setNonce(TEST_VECTOR_NONCE_LOW_BYTES);
+        cha.encryptWithAd(ad, plaintext, 0, out, 0, plaintext.length);
+        System.out.println("Ciphertext");
+        System.out.println(net.i2p.util.HexDump.dump(out));
+        System.out.println("Tag");
+        System.out.println(net.i2p.util.HexDump.dump(out, out.length - 16, 16));
+        // encrypted
+        // 0xd3, 0x1a, 0x8d, 0x34, 0x64, 0x8e, 0x60, 0xdb, 0x7b, 0x86, 0xaf, 0xbc, 0x53, 0xef, 0x7e, 0xc2,
+        // 0xa4, 0xad, 0xed, 0x51, 0x29, 0x6e, 0x08, 0xfe, 0xa9, 0xe2, 0xb5, 0xa7, 0x36, 0xee, 0x62, 0xd6,
+        // 0x3d, 0xbe, 0xa4, 0x5e, 0x8c, 0xa9, 0x67, 0x12, 0x82, 0xfa, 0xfb, 0x69, 0xda, 0x92, 0x72, 0x8b,
+        // 0x1a, 0x71, 0xde, 0x0a, 0x9e, 0x06, 0x0b, 0x29, 0x05, 0xd6, 0xa5, 0xb6, 0x7e, 0xcd, 0x3b, 0x36,
+        // 0x92, 0xdd, 0xbd, 0x7f, 0x2d, 0x77, 0x8b, 0x8c, 0x98, 0x03, 0xae, 0xe3, 0x28, 0x09, 0x1b, 0x58,
+        // 0xfa, 0xb3, 0x24, 0xe4, 0xfa, 0xd6, 0x75, 0x94, 0x55, 0x85, 0x80, 0x8b, 0x48, 0x31, 0xd7, 0xbc,
+        // 0x3f, 0xf4, 0xde, 0xf0, 0x8e, 0x4b, 0x7a, 0x9d, 0xe5, 0x76, 0xd2, 0x65, 0x86, 0xce, 0xc6, 0x4b,
+        // 0x61, 0x16
+        // tag
+        // 0x1a, 0xe1, 0x0b, 0x59, 0x4f, 0x09, 0xe2, 0x6a, 0x7e, 0x90, 0x2e, 0xcb, 0xd0, 0x60, 0x06, 0x91
+        cha.initializeKey(key, 0);
+        cha.setNonce(TEST_VECTOR_NONCE_LOW_BYTES);
+        cha.decryptWithAd(ad, out, 0, plaintext, 0, out.length);
+        System.out.println("Plaintext");
+        System.out.println(net.i2p.util.HexDump.dump(plaintext));
+    }
+****/
 }
