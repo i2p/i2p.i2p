@@ -1022,9 +1022,15 @@ public final class SelfSignedGenerator {
     }
 
     private static void usage() {
-        System.err.println("Usage: selfsignedgenerator keygen [-t type|code] [-p keystorepw] [-r crlFile.crl] publicKeyFile.crt keystore.ks localhost\n" +
-                           "       selfsignedgenerator renew  [-p keystorepw] publicKeyFile.crt keystore.ks");
+        System.err.println("Usage: selfsignedgenerator keygen [-t type|code] [-p keystorepw] [-r crlFile.crl] publicKeyFile.crt keystore.ks hostname\n" +
+                           "       selfsignedgenerator keygen [-t type|code] [-p keystorepw] [-r crlFile.crl] publicKeyFile.crt keystore.ks you@mail.i2p\n" +
+                           "       selfsignedgenerator renew  [-p keystorepw] newPublicKeyFile.crt keystore.ks");
+        StringBuilder buf = new StringBuilder(256);
+        SU3File.dumpSigTypes(buf);
+        System.err.println(buf.toString());
+        System.err.println("Default keystore password: \"" + KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD + '"');
     }
+
 /****
     private static final void test(String name, SigType type) throws Exception {
             Object[] rv = generate("cname@example.com", "ou", "o", null, "st", "c", 3652, type);
