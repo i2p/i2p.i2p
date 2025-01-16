@@ -27,6 +27,7 @@
 <jsp:useBean id="book" class="i2p.susi.dns.NamingServiceBean" scope="session" />
 <jsp:useBean id="intl" class="i2p.susi.dns.Messages" scope="application" />
 <jsp:setProperty name="book" property="*" />
+<% book.storeMethod(request.getMethod()); %>
 <jsp:setProperty name="book" property="resetDeletionMarks" value="1"/>
 <!DOCTYPE html>
 <html>

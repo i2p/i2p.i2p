@@ -47,6 +47,7 @@
    }
 %>
 <jsp:setProperty name="book" property="*" />
+<% book.storeMethod(request.getMethod()); %>
 <jsp:setProperty name="book" property="resetDeletionMarks" value="1"/>
 <c:forEach items="${paramValues.checked}" var="checked">
 <jsp:setProperty name="book" property="markedForDeletion" value="${checked}"/>
