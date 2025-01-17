@@ -245,8 +245,9 @@ public class AddressbookBean extends BaseBean
 		String message = "";
 		
 		if( action != null ) {
-                        if (_context.getBooleanProperty(PROP_PW_ENABLE) ||
-			    (serial != null && serial.equals(lastSerial))) {
+			if ("POST".equals(method) &&
+			    (_context.getBooleanProperty(PROP_PW_ENABLE) ||
+			     (serial != null && serial.equals(lastSerial)))) {
 				boolean changed = false;
 				if (action.equals(_t("Add")) || action.equals(_t("Replace"))) {
 					if( addressbook != null && hostname != null && destination != null ) {

@@ -31,6 +31,7 @@
 <jsp:useBean id="base" class="i2p.susi.dns.BaseBean" scope="session" />
 <jsp:useBean id="intl" class="i2p.susi.dns.Messages" scope="application" />
 <jsp:setProperty name="cfg" property="*" />
+<% cfg.storeMethod(request.getMethod()); %>
 <!DOCTYPE html>
 <html>
 <head>

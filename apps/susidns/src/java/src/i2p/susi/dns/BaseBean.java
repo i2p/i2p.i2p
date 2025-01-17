@@ -20,7 +20,7 @@ public class BaseBean
 {
     protected final I2PAppContext _context;
     protected final Properties properties;
-    protected String action, lastSerial, serial;
+    protected String action, lastSerial, serial, method;
 
     private long configLastLoaded;
     private static final String PRIVATE_BOOK = "private_addressbook";
@@ -170,6 +170,13 @@ public class BaseBean
      */
     public void setSerial(String serial) {
         this.serial = DataHelper.stripHTML(serial);
+    }
+
+    /**
+     * @since 0.9.65
+     */
+    public void storeMethod(String method) {
+        this.method = method;
     }
 
     /**
