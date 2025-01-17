@@ -291,7 +291,9 @@ public class I2PSnarkServlet extends BasicServlet {
 
         String nonce = req.getParameter("nonce");
         if (nonce != null) {
-            if (nonce.equals(String.valueOf(_nonce)))
+            // the clear messages button is a GET
+            if ((method.equals("POST") || "Clear".equals(req.getParameter("action"))) &&
+                nonce.equals(String.valueOf(_nonce)))
                 processRequest(req);
             else  // nonce is constant, shouldn't happen
                 _manager.addMessage("Please retry form submission (bad nonce)");
