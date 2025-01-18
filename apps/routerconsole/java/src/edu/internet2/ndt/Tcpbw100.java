@@ -778,7 +778,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					_sErrMsg = _resBundDisplayMsgs.getString("unexpectedException")
 							+ " (" + e.getClass().getName() + "): "
 							+ sMessage + "\n";
-					_log.warn(_sErrMsg, e);
+					_log.error(_sErrMsg, e);
 				}
 
 				// If test failed due to any reason, mark failure reason too
@@ -965,10 +965,12 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	 * Create the "More details" window.
 	 */
 	public void createDiagnoseWindow() {
+/*
 		if (_sServerType.compareTo("web100") == 0)
 			showStatus(_resBundDisplayMsgs.getString("getWeb100Var"));
 		else
 			showStatus(_resBundDisplayMsgs.getString("getWeb10gVar"));
+*/
 
 		// create new frame
 		if (_frameWeb100Vars == null) {
@@ -1007,7 +1009,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	 * Create the "Statistics" window.
 	 */
 	public void createStatsWindow() {
-		showStatus(_resBundDisplayMsgs.getString("printDetailedStats"));
+		//showStatus(_resBundDisplayMsgs.getString("printDetailedStats"));
 
 		// create new frame
 		if (_frameDetailedStats == null) {
@@ -2345,7 +2347,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		Message msg = new Message();
 		// Start META tests
 		if ((_yTests & NDTConstants.TEST_META) == NDTConstants.TEST_META) {
-			showStatus(_resBundDisplayMsgs.getString("metaTest"));
+			//showStatus(_resBundDisplayMsgs.getString("metaTest"));
 			_resultsTxtPane.append(_resBundDisplayMsgs
 					.getString("sendingMetaInformation") + " ");
 			_txtStatistics.append(_resBundDisplayMsgs
@@ -4574,7 +4576,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					Thread t, 
 					Throwable e) 
 				{
-					_log.warn("TG", e);
+					_log.error("Bandwidth test error", e);
 				}
 			};
 		
@@ -4594,7 +4596,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 						}catch( Throwable e ){
 						
 							if ( !( e instanceof ThreadDeath )){
-								_log.warn("TG", e);
+								_log.error("Bandwidth test error", e);
 							}
 						}finally{
 							//sem.release();
