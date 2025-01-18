@@ -35,6 +35,7 @@ import org.json.simple.Jsoner;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.util.Addresses;
 import net.i2p.util.EepGet;
 import net.i2p.util.SSLEepGet;
 import net.i2p.util.I2PAppThread;
@@ -160,7 +161,6 @@ public class MLabRunner {
                                 }
                                 if (_log.shouldWarn())
                                     _log.warn("Got response: " + DataHelper.getUTF8(b));
-                                // TODO use IP instead to avoid another lookup? - no, won't work with ssl
                                 // use "fqdn" in response instead of "url" since ndt_ssl does not have url
                                 server_host = (String)map.get("fqdn");
                                 if (server_host == null) {
@@ -171,6 +171,31 @@ public class MLabRunner {
                                 // ignore the returned port in the URL (7123) which is the applet, not the control port
                                 if (_log.shouldWarn())
                                     _log.warn("Selected server: " + server_host);
+                                // use provided IP instead to avoid another lookup,
+                                // and also, mlab sometimes hands out hostnames that do not resolve with DNS
+                                // but IPs won't work with ssl
+                                if (!useSSL) {
+                                    List<?> ips = (List<?>) map.get("ip");
+                                    if (ips != null) {
+                                        boolean ipv6 = !Addresses.isConnected();
+                                        for (Object o : ips) {
+                                            String ip = (String) o;
+                                            if (ipv6) {
+                                                if (ip.indexOf(':') >= 0) {
+                                                    server_host = ip;
+                                                    _log.warn("Using provided IP: " + server_host);
+                                                    break;
+                                                }
+                                            } else {
+                                                if (ip.indexOf('.') >= 0) {
+                                                    server_host = ip;
+                                                    _log.warn("Using provided IP: " + server_host);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             } catch (Exception e) {
                                 if (_log.shouldWarn())
                                     _log.warn("Failed to get server", e);
