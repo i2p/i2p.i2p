@@ -76,8 +76,22 @@ public class WizardHelper extends HelperBase {
     public synchronized String getTestStatus() {
         String rv = "";
         if (_runner != null) {
+            // NDT-translated string
+            // NDT has 200+ translated strings but only has 7 translations
+            // and we haven't put them up on Transifex.
+            // There's only a few commonly seen strings
+            // via showStatus(), so if they come through untranslated,
+            // try to translate those here in our bundle
             String s = _runner.getStatus();
             if (s != null) {
+                if (s.equals("ready"))
+                    s = _t("ready");
+                else if (s.equals("inbound test..."))
+                    s = _t("inbound test") + "...";
+                else if (s.equals("outbound test..."))
+                    s = _t("outbound test") + "...";
+                else if (s.equals("done"))
+                    s = _t("done");
                 rv = DataHelper.escapeHTML(s);
                 if (rv.equals(_lastTestStatus)) {
                     _lastTestCount++;
