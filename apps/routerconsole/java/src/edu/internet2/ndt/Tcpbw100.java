@@ -1055,6 +1055,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	 * </ul>
 	 */
 	public void createOptionsWindow() {
+/*
 		showStatus(_resBundDisplayMsgs.getString("showOptions"));
 
 		if (_frameOptions == null) {
@@ -1123,6 +1124,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		}
 		_frameOptions.setResizable(false);
 		_frameOptions.setVisible(true);
+*/
 	}
 
 	/**
@@ -1204,6 +1206,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		else if (source == _chkboxPreferIPv6) {
 			setsHostName(sHostName);
 		}
+/*
 		// mail to functionality
 		else if (source == _buttonMailTo) {
 			// int i; //did'nt need it
@@ -1258,6 +1261,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				_resultsTxtPane.append(_sErrMsg);
 			}
 		} // end mail-to functionality
+*/
 	} // actionPerformed()
 
 	/**
@@ -1320,7 +1324,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	 * */
 
 	public boolean test_mid(Protocol paramProtoObj) throws IOException {
-
+/*
 		// byte buff[] = new byte[8192];
 		byte buff[] = new byte[NDTConstants.MIDDLEBOX_PREDEFINED_MSS];
 
@@ -1553,6 +1557,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			// interpret results
 			middleboxResults(_sMidBoxTestResult);
 		}
+*/
 		return false;
 	}
 
@@ -1572,6 +1577,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	 *
 	 * */
 	public boolean test_sfw(Protocol protocolObj) throws IOException {
+/*
 		Message msg = new Message();
 		// start test
 		if ((_yTests & NDTConstants.TEST_SFW) == NDTConstants.TEST_SFW) {
@@ -1769,6 +1775,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		}
 
 		// completed the SFW test, hence return false
+*/
 		return false;
 	}
 
@@ -3754,6 +3761,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			_txtStatistics.append("\n");
 			// End tcp negotiated performance settings
 
+/*
 			// SFW test results
 			if ((_yTests & NDTConstants.TEST_SFW) == NDTConstants.TEST_SFW) {
 				// Results in the direction of Client to server
@@ -3822,9 +3830,11 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					break;
 				}
 			}
+*/
 
 			_txtDiagnosis.append("\n");
 
+/*
 			// Output relevant to the "More Details" tab, related to factors
 			// influencing throughput
 
@@ -3877,6 +3887,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					+ _resBundDisplayMsgs.getString("serverAcksReport") + " '"
 					+ NDTUtils.prttxt(_iS2cAck,this._resBundDisplayMsgs) + "'\n");
 			pub_diagnosis = _txtDiagnosis.getText();
+*/
 
 		} // end if (CountRTT >0)
 
