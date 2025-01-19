@@ -177,7 +177,7 @@ public class MLabRunner {
                                 if (!useSSL) {
                                     List<?> ips = (List<?>) map.get("ip");
                                     if (ips != null) {
-                                        boolean ipv6 = !Addresses.isConnected();
+                                        boolean ipv6 = !Addresses.isConnected() && Addresses.isConnectedIPv6();
                                         for (Object o : ips) {
                                             String ip = (String) o;
                                             if (ipv6) {
