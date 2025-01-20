@@ -3907,6 +3907,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	 */
 
 	public void middleboxResults(String sMidBoxTestResParam) {
+/*
 		String sServerIp;
 		String sClientIp;
 		int iMss;
@@ -4020,6 +4021,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			}
 		}
 		pub_statistics = _txtStatistics.getText();
+*/
 	} // middleboxResults()
 
 	/**
