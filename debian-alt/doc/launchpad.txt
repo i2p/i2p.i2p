@@ -15,8 +15,8 @@ Versions are as follows:
 Min version	Max version		Uses src pkg	Copied to Debian
 -----------	-----------		------------	----------------
 bionic		--			bionic		--
-focal		oracular except lunar	bionic		buster, bullseye, bookworm, trixie, sid
-lunar		--			bionic		-- (OBSOLETE)
+focal		--			bionic		--
+jammy		plucky			bionic		buster, bullseye, bookworm, trixie, sid
 
 Unsupported (Java 7):
 precise		saucy   		precise		wheezy
@@ -24,6 +24,17 @@ trusty		wily			precise		jessie, stretch
 
 Unsupported (ant < 1.9.8)
 xenial		yakkety			xenial		--
+
+
+NOTE
+----
+Due to an API change for Jetty PathSpec in jetty-9.4.30.v20200611,
+focal is NOT binary-compatible with jammy or higher, or buster or higher.
+Copying the source on launchpad with the 'rebuild the copied sources'
+doesn't work because of a duplicate name.
+So focal must be built separately, and jammy must be used
+to copy to more-recent versions and all Debian versions.
+
 
 
 Prep (first time only)
