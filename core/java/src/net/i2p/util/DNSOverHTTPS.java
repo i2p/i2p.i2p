@@ -70,7 +70,7 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
      *
      *  @since public since 0.9.54 for i2ptunnel
      */
-    public static final String UA_CLEARNET = "Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/115.0";
+    public static final String UA_CLEARNET = "Mozilla/5.0 (Windows NT 10.0; rv:128.0) Gecko/20100101 Firefox/128.0";
 
     private static final int MAX_RESPONSE_SIZE = 2048;
     private static final boolean DEBUG = false;
