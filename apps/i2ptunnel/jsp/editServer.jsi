@@ -889,9 +889,12 @@
                 <input type="text" id="reduceTime" name="reduceTime" size="4" maxlength="4" title="<%=intl._t("Period of inactivity before tunnel number is reduced")%>" value="<%=editBean.getReduceTime(curTunnel)%>" class="freetext period" />
                 <%=intl._t("minutes")%>
             </td>
-        </tr><tr>
-            <th colspan="8">
-                <%=intl._t("Server Throttling")%>
+        </tr>
+    </table>
+    <table class="tunnelConfig" id="throttleConfig">
+        <tr>
+            <th colspan="5" class="tableTop">
+            <%=intl._t("Server Throttling")%>
             </th>
         </tr><tr>
             <th colspan="5">
@@ -975,6 +978,7 @@
         </tr>
 <%             } // httpserver
 %>
+
 <%
             if (!editBean.isRouterContext()) {
 %>
