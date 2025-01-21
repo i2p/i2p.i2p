@@ -469,10 +469,12 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
           }
           break;
 
-        // Zen / Zen+ / Zen2 / Zen3 / Zen4 / Ryzen 3/5/7/9/Threadripper / EPYC
+        // Zen / Zen+ / Zen2 / Zen3 / Zen4 / Zen5 / Ryzen 3/5/7/9/Threadripper / EPYC
         // untested
-          case 23:
-          case 25: {
+          case 23: // zen / zen+ / zen2
+          case 25: // zen3 / zen3+ / zen4
+          case 26: // zen5
+          {
             // Quote wikipedia:
             // Zen is a clean sheet design that differs from the long-standing Bulldozer architecture.
             // All models support: x87, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, AES, CLMUL,
@@ -495,8 +497,10 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             // Each instruction uses its own CPUID bit.
             // As of GMP 6.2.0, the difference is only some parameter tweaks,
             // and zen2 is actually a little slower than zen.
-            isZen2Compatible = family == 25;
-            if (isZen2Compatible)
+            isZen2Compatible = family != 23;
+            if (family == 26)
+               modelString = "Ryzen/Epyc Zen 5 model " + model;
+            else if (isZen2Compatible)
                modelString = "Ryzen/Epyc Zen 3 model " + model;
             else if (model == 1)
                modelString = "Ryzen 7";
