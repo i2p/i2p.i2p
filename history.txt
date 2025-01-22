@@ -1,3 +1,30 @@
+2025-01-21 zzz
+ * Util: Recognize zen5 processors
+
+2025-01-20 zzz
+ * Build: Create jammy build to handle Jetty API change (Gitlab #496)
+
+2025-01-18 zzz
+ * BW Test:
+   - Disable some status messages
+   - Set connection timeout
+   - Tag status strings for translation
+   - Unused code removal
+   - Use IP provided by test server
+
+2025-01-17 zzz
+ * i2psnark: Require POST on forms
+ * susidns: Require POST on forms
+
+2025-01-12 zzz
+ * CLI: Improve selfsignedgenerator usage help
+
+2024-12-26 zzz
+ * NetDB:
+   - Reduce max ff response time
+   - Base lookup timeout on peer's average response time
+ * Profiles: Remove unused 10m and 24h rates for DB response time
+
 2024-12-18 zzz
  * NetDB: Aggressive expire for leasesets when over limits
 
