@@ -113,6 +113,7 @@ certificates/ssl/reseed.onion.im.crt
 certificates/reseed/meeh_at_mail.i2p.crt
 certificates/news/str4d_at_mail.i2p.crt
 certificates/router/str4d_at_mail.i2p.crt
+certificates/news/ampernand_at_gmail.com.crt
 # vanished
 certificates/news/killyourtv_at_mail.i2p.crt
 certificates/router/killyourtv_at_mail.i2p.crt
