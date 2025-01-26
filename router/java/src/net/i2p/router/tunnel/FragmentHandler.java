@@ -540,10 +540,12 @@ class FragmentHandler {
             }
             _receiver.receiveComplete(m, msg.getTargetRouter(), msg.getTargetTunnel());
         } catch (I2NPMessageException ime) {
-            if (_log.shouldLog(Log.WARN)) {
+            if (_log.shouldWarn()) {
                 _log.warn("Error receiving fragmented message (corrupt?): " + msg, ime);
-                _log.warn("DUMP:\n" + HexDump.dump(data));
-                _log.warn("RAW:\n" + Base64.encode(data));
+                if (_log.shouldInfo()) {
+                    _log.info("DUMP:\n" + HexDump.dump(data));
+                    _log.info("RAW:\n" + Base64.encode(data));
+                }
             }
         }
     }
