@@ -271,7 +271,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final String MIN_SIGTYPE_VERSION = "0.9.17";
 
     // SSU2 stable
-    private static final String MIN_PEER_TEST_VERSION = "0.9.59";
+    private static final String MIN_PEER_TEST_VERSION = "0.9.62";
 
     // various state bitmaps
 
