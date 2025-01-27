@@ -89,8 +89,9 @@ public class PersistentDataStore extends TransientDataStore {
         writer.start();
     }
 
+    // We use ReadJob.isNetDbReady() so publish() will work before the initial ReadJob is complete
     @Override
-    public boolean isInitialized() { return _initialized; }
+    public boolean isInitialized() { return _initialized || _readJob.isNetDbReady(); }
 
     // this doesn't stop the read job or the writer, maybe it should?
     @Override
@@ -411,6 +412,10 @@ public class PersistentDataStore extends TransientDataStore {
             requeue(0);
         }
         
+        public boolean isNetDbReady() {
+            return _setNetDbReady;
+        }
+        
         private void readFiles() {
             int routerCount = 0;
 
@@ -490,7 +495,7 @@ public class PersistentDataStore extends TransientDataStore {
                 if (_facade.reseedChecker().checkReseed(routerCount)) {
                     _lastReseed = _context.clock().now();
                     // checkReseed will call wakeup() when done and we will run again
-                } else {
+                } else if (!_setNetDbReady) {
                     _setNetDbReady = true;
                     _context.router().setNetDbReady();
                 }
