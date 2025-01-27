@@ -926,7 +926,7 @@ public class Router implements RouterClock.ClockShiftListener {
                 changed = true;
             }
         }
-        if (_context.netDb().isInitialized()) {
+        if (changed && _context.netDb().isInitialized()) {
             if (_log.shouldWarn())
                 _log.warn("NetDB ready, publishing RI");
             // any previous calls to netdb().publish() did not
