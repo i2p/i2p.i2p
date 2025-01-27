@@ -131,8 +131,8 @@ public class NewsManager implements ClientApp {
     public synchronized void startup() {
         changeState(STARTING);
         _currentNews = PersistNews.load(_context);
-        if (_log.shouldWarn())
-            _log.warn("Initialized with " + _currentNews.size() + " entries");
+        if (_log.shouldInfo())
+            _log.info("Initialized with " + _currentNews.size() + " entries");
         changeState(RUNNING);
         if (_cmgr != null)
             _cmgr.register(this);
