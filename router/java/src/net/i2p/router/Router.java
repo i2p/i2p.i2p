@@ -47,6 +47,7 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.crypto.FamilyKeyCrypto;
 import net.i2p.router.message.GarlicMessageHandler;
+import net.i2p.router.networkdb.PublishLocalRouterInfoJob;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.startup.CreateRouterInfoJob;
 import net.i2p.router.startup.PortableWorkingDir;
@@ -936,6 +937,11 @@ public class Router implements RouterClock.ClockShiftListener {
             // so we probably don't need to throw it to the timer queue,
             // but just to be safe
             _context.simpleTimer2().addEvent(r, 0);
+
+            // periodically update our RI and republish it to the flooodfills
+            PublishLocalRouterInfoJob plrij = new PublishLocalRouterInfoJob(_context);
+            plrij.getTiming().setStartAfter(_context.clock().now() + plrij.getDelay());
+            _context.jobQueue().addJob(plrij);
         }
         if (changed) {
             _context.commSystem().initGeoIP();

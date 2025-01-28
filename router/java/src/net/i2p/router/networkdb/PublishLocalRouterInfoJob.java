@@ -58,7 +58,6 @@ public class PublishLocalRouterInfoJob extends JobImpl {
      *  in Router.setNetDbReady(), so we probably don't need this anymore
      */
     private static final long FIRST_TIME_DELAY = 90*1000;
-    private volatile boolean _notFirstTime;
     private final AtomicInteger _runCount = new AtomicInteger();
     
     public PublishLocalRouterInfoJob(RouterContext ctx) {
@@ -92,7 +91,9 @@ public class PublishLocalRouterInfoJob extends JobImpl {
             List<RouterAddress> newAddrs = getContext().commSystem().createAddresses();
             int count = _runCount.incrementAndGet();
             RouterInfo ri = new RouterInfo(oldRI);
-            if (_notFirstTime && (count % 4) != 0 && oldAddrs.size() == newAddrs.size()) {
+            if ((count % 4) != 0 &&
+                oldAddrs.size() == newAddrs.size() &&
+                getContext().random().nextInt(32) != 0) {
                 // 3 times out of 4, we don't republish if everything is the same...
                 // If something changed, including the cost, then publish,
                 // otherwise don't.
@@ -149,19 +150,15 @@ public class PublishLocalRouterInfoJob extends JobImpl {
         } catch (DataFormatException dfe) {
             _log.error("Error signing the updated local router info!", dfe);
         }
-        if (_notFirstTime) {
-            requeue(getDelay());
-        } else {
-            // First publish after netdb ready is now done via state machine
-            // in Router.setNetDbReady(), so we probably don't need this anymore
-            // but leave it in for now, a router may have trouble publishing right away
-            requeue(FIRST_TIME_DELAY);
-            _notFirstTime = true;
-        }
+        _runCount.set(0);
+        requeue(getDelay());
     }
 
-    private long getDelay() {
-        long rv = (PUBLISH_DELAY * 3 / 4) + getContext().random().nextLong(PUBLISH_DELAY / 4);
+    /**
+     *  @since public since 0.9.65 for use by Router
+     */
+    public long getDelay() {
+        long rv = (PUBLISH_DELAY * 2 / 3) + getContext().random().nextLong(PUBLISH_DELAY / 3);
         // run 4x as often as usual publish time (see above)
         rv /= 4;
         return rv;
