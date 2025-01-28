@@ -429,23 +429,9 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
             _log.warn("Operating in quiet mode - not exploring or pushing data proactively, simply reactively");
             _log.warn("This should NOT be used in production");
         }
-        if (!isClientDb()) {
-            // periodically update and resign the router's 'published date', which basically
-            // serves as a version
-            Job plrij = new PublishLocalRouterInfoJob(_context);
-            // do not delay this, as this creates the RI too, and we need a good local routerinfo right away
-            //plrij.getTiming().setStartAfter(_context.clock().now() + PUBLISH_JOB_DELAY);
-            _context.jobQueue().addJob(plrij);
-
-            // plrij calls publish() for us
-            //try {
-            //    publish(ri);
-            //} catch (IllegalArgumentException iae) {
-            //    _context.router().rebuildRouterInfo(true);
-            //    //_log.log(Log.CRIT, "Our local router info is b0rked, clearing from scratch", iae);
-            //    //_context.router().rebuildNewIdentity();
-            //}
-        }
+        //
+        // PublishLocalRouterInfoJob is now started from Router.setNetDbReady()
+        //
     }
     
     /** unused, see override */
