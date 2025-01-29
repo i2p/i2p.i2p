@@ -115,15 +115,14 @@ public class Reseeder {
         //
         // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
         // ----------------------------------           ------------------------     -------------------------     ---------------
+        "https://coconut.incognet.io/"        + ',' +   // rambler_at_mail.i2p.crt   // CA
         "https://reseed.stormycloud.org/"     + ',' +   // admin_at_stormycloud.org.crt // CA
-        //"https://reseed.us.prestium.org/"     + ',' +   // null_at_i2pmail.org.crt   // CA
-        //"https://reseed.is.prestium.org/"     + ',' +   // reheatedburger_at_protonmail.com.crt // CA
         "https://i2p.ghativega.in/"           + ',' +   // arnavbhatt288_at_mail.i2p.crt // CA
         "https://reseed-pl.i2pd.xyz/"         + ',' +   // r4sas-reseed_at_mail.i2p.crt // CA
         "https://reseed-fr.i2pd.xyz/"         + ',' +   // r4sas-reseed_at_mail.i2p.crt // CA
         "https://www2.mk16.de/"               + ',' +   // i2p-reseed_at_mk16.de.crt // CA
         "https://reseed2.i2p.net/"            + ',' +   // echelon3_at_mail.i2p.crt  // CA
-        "https://banana.incognet.io/"         + ',' +   // rambler_at_mail.i2p.crt   // CA
+        //"https://banana.incognet.io/"         + ',' +   // rambler_at_mail.i2p.crt   // CA
         "https://reseed.diva.exchange/"       + ',' +   // reseed_at_diva.exchange.crt       // CA
         "https://reseed.i2pgit.org/"          + ',' +   // hankhill19580_at_gmail.com.crt    // CA
         "https://i2p.novg.net/"               + ',' +   // igor_at_novg.net.crt      // CA                         // Java 8+ only
