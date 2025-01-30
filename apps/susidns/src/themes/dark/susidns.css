@@ -240,10 +240,11 @@ div#filter + div#search > form {
 
 #filter a {
      border: 1px solid #292929;
+     color: #494;
      margin: 1px 0 3px;
      padding: 1px 8px;
      min-width: 12px;
-     border-radius: 2px;
+     border-radius: 10px;
      background: #1F1A24;
      /*background: linear-gradient(to bottom, #010 0%, #000 100%);*/
      font-size: 10pt;
@@ -257,7 +258,6 @@ div#filter + div#search > form {
      text-decoration: none;
      color: #da736b;
      border: 1px solid #da736b;
-     border-radius: 2px;
      background: #332940;
 }
 
@@ -275,7 +275,7 @@ div#filter + div#search > form {
      font-size: 10pt;
      font-weight: bold;
      text-transform: capitalize;
-     background-image: linear-gradient(to bottom, #1F1A24 0%, #332940 50%, #332940 51%, #332940 100%) !important;
+     background-image: linear-gradient(to bottom, #1F1A24 0%, #222730 100%) !important;
 }
 
 #filter span a, #filter span a:hover {
@@ -297,7 +297,7 @@ div#filter + div#search > form {
 
 p {
      color:#e6e6e7;
-     margin: 0 0 4px;
+     margin: 16px 0 24px 8px;
      font-size: 9pt;
      text-align: justify;
 }
@@ -367,26 +367,35 @@ ul.howtouse {
 }
 
 div#messages {
-     margin: -16px 0 25px !important;
-     z-index: 999;
-     border: 1px solid #292929;
-     box-shadow: inset 0 0 0 1px #000;
-     line-height: 120%;
+     bottom: 0;
+     left: 0;
+     position: fixed;
+     right: 0;
+     text-align: center;
+     margin: 0 -20px;
+     padding: 10px 15px;
+     z-index: 10;
+     opacity: 0.85;
+     border: 2px solid #f44;
+     background: #d22;
+     width: 25%;
+     margin: auto !important;
+     bottom: 5% !important;
+     padding-bottom: 2% !important;
+     height: 3%;
 }
 
-#messages p {
-     padding: 15px 15px 15px 40px !important;
-     background: url(/themes/console/dark/images/infohelp.png) 6px center no-repeat;
-     color: #e6e6e7;
-     padding: 5px 5px 10px;
-     margin: 0;
-     border-radius: 0;
+.iframed div#messages {
+     bottom: 22px;
+     border: none;
+     margin: 0 1px;
 }
 
-#messages + p, p.book {
-     border: 1px solid #292929;
-     background: #000 url(../images/addressbook.png) 10px center no-repeat;
-     padding: 20px 20px 20px 50px !important;
+p.messages {
+     color: #8ff;
+     text-align: center;
+     font-weight: bold;
+     margin: 7px 0 4px;
 }
 
 #messages:empty {
@@ -394,7 +403,8 @@ div#messages {
 }
 
 p#filtered {
-     padding: 12px 10px 8px 20px;
+     background: #332940 url(/themes/console/images/buttons/filter.png) 8px center no-repeat;
+     padding: 10px 250px 10px 35px !important;
      font-size: 10pt;
      margin: -14px 0 10px;
 }
@@ -436,7 +446,7 @@ a {
     color: e6e6e7;
 }
 
-a:link, #filter a:visited {
+a:link {
      color: #e6e6e7;
      text-decoration: none;
      font-weight: bold;
@@ -449,7 +459,7 @@ a:hover, a:focus {
 }
 
 a:visited {
-     color: #7b7;
+     color: #e6e6e7;
      text-decoration: none;
 }
 
@@ -476,7 +486,7 @@ td.checkbox {
 }
 
 input[type="checkbox"], input[type="radio"] {
-     filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%); /* colorize radios and checkboxes */
+     filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(170%); /* colorize radios and checkboxes */
      min-width: 16px;
      min-height: 16px;
      background: none;
@@ -579,14 +589,12 @@ tr.list0 {
      background: url(/themes/console/dark/images/dropdown_active.png) !important;
      background-repeat: no-repeat !important;
      background-position: .5%, 15% !important;
-     padding-left: 2% !important;
 }
 
 .unexpanded {
      background: url(/themes/console/dark/images/dropdown.png) !important;
      background-repeat: no-repeat !important;
      background-position: .5%, 15% !important;
-     padding-left: 2% !important;
 }
 
 #addrtitle.expanded {
@@ -658,7 +666,7 @@ p.footer {
 p.buttons, #buttons {
      text-align: right;
      margin: 5px 0 -5px;
-     padding: 0 3px;
+     padding: 4px 3px;
 }
 
 div#book + div#buttons {
@@ -681,7 +689,7 @@ div#config > textarea, div#content > textarea {
 }
 
 textarea[name="config"] {
-     height: 220px;
+     height: 280px;
      overflow-y: scroll;
      resize: none;
 }
@@ -791,7 +799,7 @@ div#add, div#import {
      margin-top: -6px;
      margin-left: -1px;
      margin-right: -1px;
-     padding: 8px 10px;
+     padding: 8px 32px;
      font-size: 10pt;
 }
 
@@ -853,11 +861,10 @@ input {
 }
 
 input[type="submit"], input[type="reset"], .fakebutton {
-     color: #e6e6e7;
      border: 1px outset #332940;
      border-radius: 12px;
      margin: 5px;
-     padding: 5px !important;
+     padding: 5px 12px !important;
      font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
      text-align: center;
      min-height: 22px !important;
@@ -875,9 +882,7 @@ input[type=submit]:active, input[type=reset]:active, .fakebutton:active {
 }
 
 input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix for oversaturated colors */
-     border: 1px groove #332940;
-     border-bottom: 1px groove #292929;
-     border-right: 1px groove #292929;
+     border: 1px groove #552990;
      background: #1F1A24 !important;
      border-radius: 12px;
 }
@@ -900,7 +905,7 @@ textarea {
      padding: 3px 5px;
      font: bold 8.5pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      border-radius: 2px;
-     width: 100%;
+     width: calc(100% - 12px);
      height: 120px;
      line-height: 140%;
      resize: none;
@@ -962,7 +967,7 @@ input[name="search"]:focus {
 
 #export {
      text-align: right;
-     margin-top: -58px;
+     margin-top: -52px;
      margin-bottom: 23px;
      padding-right: 4px;
      float: right;
@@ -973,16 +978,8 @@ input[name="search"]:focus {
      display: inline-block;
 }
 
-p#filtered {
-     padding-left: 35px !important;
-     padding-right: 250px !important;
-}
-
 p.book {
      padding-left: 35px !important;
-}
-
-#messages + p, p.book {
      border: 1px solid #292929;
      background: #332940 url(../images/addressbook.png) 5px center no-repeat;
 }

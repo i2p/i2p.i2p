@@ -451,7 +451,6 @@ div#messages {
      opacity: 0.85;
      border-top: 1px solid #fff;
      background: #113;
-
      width: 25%;
      margin: auto !important;
      bottom: 5% !important;
@@ -590,6 +589,7 @@ textarea[name="config"], textarea[name="content"] {
      box-shadow: none;
      border: 1px solid #dee2e6;
      background: #fafaff;
+     height: 260px;
      width: 100% !important;
      padding: 3px 6px !important;
      filter: none;
