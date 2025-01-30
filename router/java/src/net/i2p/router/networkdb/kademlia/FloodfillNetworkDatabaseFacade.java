@@ -28,6 +28,7 @@ import net.i2p.stat.RateStat;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
+import net.i2p.util.SimpleTimer2;
 import net.i2p.util.SystemVersion;
 
 /**
@@ -185,10 +186,42 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         // (unless maybe we used to have addresses? not worth it
         if (localRouterInfo.getAddresses().isEmpty())
             return;
-        _log.info("Publishing our RI");
-        // Don't delay, helps IB tunnel builds
-        //if (_context.router().getUptime() > PUBLISH_JOB_DELAY)
+        if (_context.router().getUptime() > PUBLISH_JOB_DELAY) {
+            _log.info("Publishing our RI");
             sendStore(localRouterInfo.getIdentity().calculateHash(), localRouterInfo, null, null, PUBLISH_TIMEOUT, null);
+        } else {
+            // transports may rapidly force republishes at startup as they collect addresses
+            // and reachability status from UPnP, peers, and peer testing
+            // so "debounce" them by delaying slightly
+            _log.info("Delay publishing our RI");
+            DelayedPublish dp = new DelayedPublish(localRouterInfo);
+            dp.schedule(3*1000);
+        }
+    }
+
+    /**
+     *  Don't actually publish unless the RI didn't change during the delay
+     *  @since 0.9.65
+     */
+    private class DelayedPublish extends SimpleTimer2.TimedEvent {
+        private final RouterInfo localRouterInfo;
+        public DelayedPublish(RouterInfo local) {
+            super(_context.simpleTimer2());
+            localRouterInfo = local;
+        }
+        public void timeReached() {
+            RouterInfo latest = _context.router().getRouterInfo();
+            // clock may skew during startup so we do an exact == check, not <=
+            if (latest.getDate() == localRouterInfo.getDate()) {
+                if (_log.shouldWarn())
+                    _log.warn("Publishing our RI after delay: " + localRouterInfo);
+                sendStore(localRouterInfo.getIdentity().calculateHash(), localRouterInfo, null, null, PUBLISH_TIMEOUT, null);
+            } else {
+                // do nothing, there's another one of these right behind us
+                if (_log.shouldWarn())
+                    _log.warn("RI changed, not publishing old one: " + localRouterInfo);
+            }
+        }
     }
     
     /**
