@@ -1,5 +1,9 @@
+2025-01-31 zzz
+ * Pull translations from Transifex
+
 2025-01-30 zzz
  * NetDB: Debounce RI publishing at startup
+ * susidns: Dark theme fixes/tweaks
 
 2025-01-29 zzz
  * NetDB: Reseed update
