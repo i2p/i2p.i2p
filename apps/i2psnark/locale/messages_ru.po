@@ -22,7 +22,7 @@
 # Foster Snowhill, 2013
 # sr4d <sr4d@bitmessage.ch>, 2014
 # t bo <tarantulko.bo@googlemail.com>, 2017
-# ValdikSS <iam@valdikss.org.ru>, 2017-2021
+# ValdikSS <iam@valdikss.org.ru>, 2017-2021,2024
 # vertnis, 2015
 # Foster Snowhill, 2013
 # yume, 2014-2015
@@ -35,7 +35,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-27 13:00+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
-"Last-Translator: R4SAS, 2023\n"
+"Last-Translator: ValdikSS <iam@valdikss.org.ru>, 2017-2021,2024\n"
 "Language-Team: Russian (Russia) (http://app.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -85,11 +85,11 @@ msgstr "светлая"
 #. Translators: Translate "ubergine" as "aubergine" or "eggplant" or "purple"
 #: ../java/src/org/klomp/snark/SnarkManager.java:151
 msgid "ubergine"
-msgstr ""
+msgstr "баклажан"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:151
 msgid "vanilla"
-msgstr "vanilla"
+msgstr "ваниль"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1046
 #: ../java/src/org/klomp/snark/SnarkManager.java:1217
@@ -157,7 +157,7 @@ msgstr "Новые файлы не будут доступны для чтени
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1203
 msgid "Stop all torrents before changing data directory"
-msgstr ""
+msgstr "Остановите все торренты перед изменением директории с данными"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1205
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1203
@@ -528,7 +528,7 @@ msgstr "Запускаем торрент: {0}"
 #: ../java/src/org/klomp/snark/SnarkManager.java:2696
 #, java-format
 msgid "Down bandwidth limit is {0} KBps"
-msgstr ""
+msgstr "Ограничение скорости скачивания {0} КБ/с"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:2697
 #: ../java/src/org/klomp/snark/SnarkManager.java:2722
@@ -805,7 +805,7 @@ msgstr "Запустить все торренты и открыть соеди�
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:780
 msgid "No torrents found."
-msgstr ""
+msgstr "Торренты не найдены."
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:782
 msgid "No torrents loaded."
@@ -906,7 +906,7 @@ msgstr "Некорректный URL: он должен начинаться с 
 #. no file or URL specified
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1307
 msgid "Enter URL or select torrent file"
-msgstr ""
+msgstr "Введите URL или выберите торрент-файл"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1344
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1379
@@ -1483,7 +1483,7 @@ msgstr "Ограничение скорости отдачи"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2834
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2851
 msgid "Maximum bandwidth allocated"
-msgstr ""
+msgstr "Максимальная пропускная способность"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2836
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2853
@@ -1497,7 +1497,7 @@ msgstr "Посмотреть/настроить ограничения скор�
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2847
 msgid "Down bandwidth limit"
-msgstr ""
+msgstr "Ограничение пропускной способности скачивания"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2863
 msgid "Use open trackers also"

@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-29 20:06+0000\n"
+"POT-Creation-Date: 2025-01-22 13:52+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
 "Last-Translator: slrslr, 2022-2024\n"
 "Language-Team: Czech (http://app.transifex.com/otf/I2P/language/cs/)\n"
@@ -38,20 +38,21 @@ msgstr "Zakázáno hashem routeru"
 msgid "IP banned by blocklist.txt entry {0}"
 msgstr "IP adresa zakázána v souboru blocklist.txt, záznam {0}"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1531
+#: ../../../router/java/src/net/i2p/router/Router.java:1533
 #: ../java/src/net/i2p/router/web/helpers/ConfigRestartBean.java:69
 msgid "Restart imminent"
 msgstr "Připravuje se restart"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1533
+#: ../../../router/java/src/net/i2p/router/Router.java:1535
 #: ../java/src/net/i2p/router/web/helpers/ConfigRestartBean.java:71
 msgid "Shutdown imminent"
 msgstr "Vypínání"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:2035
+#: ../../../router/java/src/net/i2p/router/Router.java:2037
 #: ../../../router/java/src/net/i2p/router/sybil/Analysis.java:1090
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1235
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1240
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:740
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1399
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1404
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:982
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:989
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:996
@@ -178,7 +179,6 @@ msgid "Unreachable on any transport"
 msgstr "Nedostupné na každém transportu"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:1044
-#: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:395
 msgid "UPnP is not enabled"
 msgstr "UPnP není povolen"
 
@@ -198,7 +198,7 @@ msgstr "WAN Obvyklé Nastavení Rozhraní"
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:42
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:115
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:413
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:588
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:586
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:101
 msgid "Status"
 msgstr "Status"
@@ -207,9 +207,9 @@ msgstr "Status"
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1114
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1135
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:66
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:509
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:511
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:836
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:300
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:302
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1000
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:584
 msgid "Type"
 msgstr "Typ"
@@ -230,9 +230,9 @@ msgstr "WAN PPP Připojení"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1112
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1130
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:630
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:656
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:690
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:632
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:658
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:692
 msgid "Uptime"
 msgstr "Dostupnost"
 
@@ -317,11 +317,21 @@ msgstr "{0} port {1,number,#####} byl úspěšně předán UPnP."
 msgid "{0} port {1,number,#####} was not forwarded by UPnP."
 msgstr "{0} port {1,number,#####} nebyl úspěšně předán UPnP."
 
+#: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:144
+#: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:399
+msgid "UPnP failed to start - no network connection?"
+msgstr ""
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:148
+#: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:397
+msgid "UPnP failed to start - port conflict?"
+msgstr ""
+
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:905
 #: ../java/src/net/i2p/router/web/DeadlockDetector.java:109
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:150
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:485
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1215
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:145
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:276
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1379
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:562
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:929
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:210
@@ -723,8 +733,6 @@ msgstr "Žádná nová verze nebyla nalezena na {0}"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:381
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:350
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:352
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jars_jsp.java:327
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jars_jsp.java:329
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jobs_jsp.java:317
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jobs_jsp.java:319
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:327
@@ -1180,17 +1188,17 @@ msgstr "Nyní"
 msgid "Restart"
 msgstr "Restart"
 
-#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:49
+#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:39
 msgid "Banned Peers"
 msgstr "Zakázaní peeři"
 
-#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:51
+#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:41
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:94
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:124
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:170
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:75
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:131
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1267
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1431
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:138
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:652
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:185
@@ -1199,20 +1207,20 @@ msgstr "Zakázaní peeři"
 msgid "none"
 msgstr "žádný"
 
-#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:60
+#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:50
 msgid "unban now"
 msgstr "Zrušit zákaz nyní"
 
-#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:71
+#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:61
 msgid "Permanently banned"
 msgstr "Trvale zakázáno"
 
-#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:73
+#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:63
 #, java-format
 msgid "Temporary ban expiring in {0}"
 msgstr "Dočasně zakázat s vypršením za {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:75
+#: ../java/src/net/i2p/router/web/helpers/BanlistRenderer.java:65
 #, java-format
 msgid "Banned until restart or in {0}"
 msgstr "Zakázáno do restartu nebo {0}"
@@ -1256,8 +1264,8 @@ msgid "Local Router Family Certificate"
 msgstr "Certifikát místní rodiny routeru"
 
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:91
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:493
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1310
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:284
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1474
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:973
 msgid "Family"
 msgstr "Rodina"
@@ -1461,7 +1469,7 @@ msgid "Add Client"
 msgstr "Přidat klienta"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:132
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1038
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1040
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:626
 msgid "Client"
 msgstr "Klient"
@@ -1525,14 +1533,14 @@ msgid "Plugin"
 msgstr "Plugin"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:292
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:489
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1030
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:280
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1194
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:421
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:598
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:596
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:97
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:620
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:646
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:680
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:622
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:648
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:682
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:956
 msgid "Version"
 msgstr "Verze"
@@ -1586,7 +1594,7 @@ msgstr "Musíte zadat jméno rodiny"
 #: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:55
 #: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:130
 #: ../java/src/net/i2p/router/web/helpers/ConfigReseedHandler.java:185
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:302
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:304
 msgid "Configuration saved successfully."
 msgstr "Nastavení úspěšně uloženo."
 
@@ -1752,7 +1760,7 @@ msgid "Remote encrypted destinations"
 msgstr "Vzdálené šifrované cíle"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:45
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:483
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:486
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:614
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:638
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:596
@@ -1779,8 +1787,8 @@ msgid "Cancel"
 msgstr "Zrušit"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:63
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:761
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:791
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:925
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:955
 msgid "Destination"
 msgstr "Cíl"
 
@@ -1791,7 +1799,7 @@ msgid "Name"
 msgstr "Jméno"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:67
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1251
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1415
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:620
 msgid "Encryption Key"
 msgstr "Šifrovací klíč"
@@ -1811,7 +1819,9 @@ msgstr "Vyprší"
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:97
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:132
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:137
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:754
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:728
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:733
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:918
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:588
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:600
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:610
@@ -1876,7 +1886,7 @@ msgstr "Domovská stránka"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:30
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:184
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:758
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:760
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:441
 msgid "Network"
 msgstr "Síť"
@@ -1914,7 +1924,6 @@ msgstr "Síť"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:439
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:308
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:417
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jars_jsp.java:403
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jobs_jsp.java:384
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:403
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/netdb_jsp.java:385
@@ -1938,7 +1947,7 @@ msgstr "UI"
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:31
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:59
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:468
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1021
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1023
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:210
 #: ../java/strings/Strings.java:56
 msgid "Tunnels"
@@ -1959,16 +1968,16 @@ msgstr "Logování"
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:32
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:54
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:450
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:807
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:871
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:809
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:873
 #: ../java/strings/Strings.java:52
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:483
 msgid "Peers"
 msgstr "Peery"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:32
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1297
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:580
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1461
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:582
 msgid "Stats"
 msgstr "Statistiky"
 
@@ -1987,7 +1996,7 @@ msgid "Advanced"
 msgstr "Pokročilé"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:34
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:454
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:457
 msgid "Router Family"
 msgstr "Rodina routeru"
 
@@ -2137,12 +2146,12 @@ msgid "Add hostname or IP"
 msgstr "Přidat jméno hostitele nebo IP"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHelper.java:293
-#: ../java/src/net/i2p/router/web/helpers/WizardHelper.java:243
+#: ../java/src/net/i2p/router/web/helpers/WizardHelper.java:257
 msgid "bits per second"
 msgstr "bitů za sekundu"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHelper.java:295
-#: ../java/src/net/i2p/router/web/helpers/WizardHelper.java:245
+#: ../java/src/net/i2p/router/web/helpers/WizardHelper.java:259
 #, java-format
 msgid "{0}Bytes per month maximum"
 msgstr "{0}bajtů měsíčně maximum"
@@ -2162,7 +2171,7 @@ msgstr "Ručně zakázáno pomocí {0}"
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHandler.java:37
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:356
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:417
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:592
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:590
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:94
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:223
 msgid "Peer"
@@ -2490,7 +2499,7 @@ msgstr "VAROVÁNÍ VÝKONU - Nastavení zahrnují vysokou kvantitu tunelů."
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:211
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:216
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:443
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:655
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:653
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:381
 msgid "Inbound"
 msgstr "Příchozí"
@@ -2499,7 +2508,7 @@ msgstr "Příchozí"
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:212
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:217
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:447
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:659
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:657
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:382
 msgid "Outbound"
 msgstr "Odchozí"
@@ -3230,7 +3239,7 @@ msgid "Pending"
 msgstr "Nevyřízené"
 
 #: ../java/src/net/i2p/router/web/helpers/JobQueueHelper.java:210
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:46
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:48
 msgid "Summary"
 msgstr "Shrnutí"
 
@@ -3249,287 +3258,299 @@ msgid "No log messages"
 msgstr "Žádné zprávy logu"
 
 #. 0
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:47
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:49
 msgid "Local Router"
 msgstr "Místní router"
 
 #. 1
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:48
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:50
 msgid "Router Lookup"
 msgstr "Vyhledávání routeru"
 
 #. 2
 #. advanced below here
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:50
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:52
 msgid "All Routers"
 msgstr "Všechny routery"
 
 #. 3
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:51
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:53
 msgid "All Routers with Full Stats"
 msgstr "Všechny routery s úplnými statistikami"
 
 #. 4
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:52
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:562
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:54
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:564
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:967
 msgid "LeaseSets"
 msgstr "Sety pronájmu"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:439
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:491
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1082
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:442
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:282
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1246
 msgid "Country"
 msgstr "Země"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:456
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:459
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:582
 msgid "Full destination, name, Base32, or hash"
 msgstr "Úplný cíl, jméno, Base32, nebo hash"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:460
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:505
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:463
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:296
 msgid "MTU"
 msgstr "MTU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:461
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:499
+#: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:464
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:290
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:743
 msgid "Port"
 msgstr "Port"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:123
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:118
 msgid ""
 "Never reveal your router identity to anyone, as it is uniquely linked to "
 "your IP address in the network database."
 msgstr "Nikdy neodhalte nikomu identitu svého routeru, je jednoznačně spojena v síťové databázi s vaší IP adresou."
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:152
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:520
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:736
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:147
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:311
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:900
 msgid "not found in network database"
 msgstr "nenalezeno v síťové databázi"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:204
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:527
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:943
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:999
-msgid "Previous Page"
-msgstr "Předchozí stránka"
-
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:206
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:530
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:946
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1002
-msgid "Page"
-msgstr "Stránka"
-
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:517
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:308
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:207
 #: ../java/strings/Strings.java:55
 msgid "Transport"
 msgstr "Přenos"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:534
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:950
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1005
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:353
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1107
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1163
+msgid "Previous Page"
+msgstr "Předchozí stránka"
+
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:356
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1110
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1166
+msgid "Page"
+msgstr "Stránka"
+
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:360
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1114
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1169
 msgid "Next Page"
 msgstr "Další stránka"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:620
-msgid "Manually Configure Floodfill Participation"
-msgstr "Ručně nastavte floodfill spoluúčast"
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:717
+msgid "Leasesets for Client"
+msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:621
-msgid "Configure Floodfill Participation"
-msgstr "Nastavte floodfill spoluúčast"
-
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:734
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:751
-msgid "LeaseSet"
-msgstr "SetPronájmu"
-
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:757
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:726
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:731
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:921
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:413
 msgid "Local"
 msgstr "Místní"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:760
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:729
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:924
 msgid "Unpublished"
 msgstr "Nezveřejněno"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:785
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:808
-msgid "Add to address book"
-msgstr "Přidat do adresáře"
+#. published slightly in the future
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:734
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1402
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1408
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1179
+#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1039
+msgid "Published"
+msgstr "Zveřejněný"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:787
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:810
-msgid "Add to local address book"
-msgstr "Přidat do místního adresáře"
-
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:821
-#, java-format
-msgid "Published {0} ago"
-msgstr "Zveřejněno před {0}"
-
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:827
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:849
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:902
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:747
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:768
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:991
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1013
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1066
 #, java-format
 msgid "Expires in {0}"
 msgstr "Vyprší za {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:829
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:851
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:904
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:749
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:770
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:993
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1015
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1068
 #, java-format
 msgid "Expired {0} ago"
 msgstr "Vypršelo před {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:891
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:756
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1055
 msgid "Lease"
 msgstr "Pronajmout"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:895
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:760
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1059
 msgid "Tunnel"
 msgstr "Tunel"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:920
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:780
+msgid "Manually Configure Floodfill Participation"
+msgstr "Ručně nastavte floodfill spoluúčast"
+
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:781
+msgid "Configure Floodfill Participation"
+msgstr "Nastavte floodfill spoluúčast"
+
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:898
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:915
+msgid "LeaseSet"
+msgstr "SetPronájmu"
+
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:949
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:972
+msgid "Add to address book"
+msgstr "Přidat do adresáře"
+
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:951
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:974
+msgid "Add to local address book"
+msgstr "Přidat do místního adresáře"
+
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:985
+#, java-format
+msgid "Published {0} ago"
+msgstr "Zveřejněno před {0}"
+
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1084
 msgid "Not initialized"
 msgstr "Není zprovozněno"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1023
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1187
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:444
 msgid "Network Database Router Statistics"
 msgstr "Statistiky routerů síťové databáze"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1030
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1052
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1088
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1194
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1216
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1252
 msgid "Count"
 msgstr "Počet"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1052
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1216
 msgid "Transports"
 msgstr "Transporty"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1081
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1245
 msgid "Sort by country"
 msgstr "Řadit podle země"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1087
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1251
 msgid "Sort by count"
 msgstr "Řadit podle počtu"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1212
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1376
 msgid "Our Router Identity"
 msgstr "Identita našeho routeru"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1225
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1389
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:940
 msgid "View extended router info"
 msgstr "Zobrazit rozšířené informace o routeru"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1227
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1391
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:941
 msgid "Full entry"
 msgstr "Celý záznam"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1233
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1397
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:242
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1036
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:561
 msgid "Hidden"
 msgstr "Skryté"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1233
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1397
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1036
 msgid "Updated"
 msgstr "Aktualizováno"
 
-#. published slightly in the future
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1238
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1244
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1177
-#: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1039
-msgid "Published"
-msgstr "Zveřejněný"
-
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1249
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1413
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1041
 msgid "Signing Key"
 msgstr "Podepisovací klíč"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1264
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1428
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:43
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1044
 msgid "Addresses"
 msgstr "Adresy"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1282
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1446
 msgid "cost"
 msgstr "náklady"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1328
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1492
 msgid "Hidden or starting up"
 msgstr "Skrytý nebo spouštějící se"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1328
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1492
 msgid "SSU"
 msgstr "SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1328
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1492
 msgid "SSU with introducers"
 msgstr "SSU s uvaděči"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1329
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1493
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:45
 msgid "NTCP"
 msgstr "NTCP"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1329
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1493
 msgid "NTCP and SSU"
 msgstr "NTCP a SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1329
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1493
 msgid "NTCP and SSU with introducers"
 msgstr "NTCP a SSU s uvaděči"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1330
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1494
 msgid "IPv6 Only SSU, introducers"
 msgstr "IPv6 Only SSU, uvaděči"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1330
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1494
 msgid "IPv6 SSU"
 msgstr "IPv6 SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1330
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1494
 msgid "IPv6 SSU, introducers"
 msgstr "IPv6 SSU, uvaděči"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1331
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1495
 msgid "IPv6 NTCP"
 msgstr "IPv6 NTCP"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1331
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1495
 msgid "IPv6 NTCP, SSU"
 msgstr "IPv6 NTCP, SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1331
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1495
 msgid "IPv6 NTCP, SSU, introducers"
 msgstr "IPv6 NTCP, SSU, uvaděči"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1331
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1495
 msgid "IPv6 Only NTCP, SSU, introducers"
 msgstr "IPv6 Only NTCP, SSU, uvaděči"
 
 #. 1
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:46
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:685
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:683
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:182
 #: ../java/src/net/i2p/router/web/helpers/ProfilesHelper.java:15
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:928
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:930
 msgid "Banned"
 msgstr "Zakázáno"
 
@@ -3592,7 +3613,7 @@ msgstr "Spojení s peery"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:208
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:265
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:969
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:971
 msgid "Total"
 msgstr "Celkově"
 
@@ -3604,7 +3625,7 @@ msgstr "IPv4"
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:216
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:217
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:420
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:597
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:595
 msgid "IPv6"
 msgstr "IPv6"
 
@@ -3621,7 +3642,7 @@ msgid ""
 msgstr "Pro nastavení těchto limitů přidejte nastavení i2np.ntcp.maxConnections=nnn a i2np.udp.maxConnections=nnn na stránce pokročilá nastavení."
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:354
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:297
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:293
 msgid "Definitions"
 msgstr "Definice"
 
@@ -3631,7 +3652,7 @@ msgstr "Vzdálený sdíleč určený hashem routru."
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:357
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:419
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:596
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:594
 msgid "Dir"
 msgstr "Složka"
 
@@ -3658,13 +3679,13 @@ msgstr "Doba od posledního přijetí / odeslání paketu."
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:361
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:422
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:599
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:597
 msgid "Idle"
 msgstr "Nečinný"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:362
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:423
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:604
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:602
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:368
 msgid "In/Out"
 msgstr "příchozí/odchozí"
@@ -3679,14 +3700,14 @@ msgstr "Před jak dlouhou dobou bylo toto spojení navázáno"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:363
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:424
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:609
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:607
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1147
 msgid "Up"
 msgstr "Up"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:364
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:425
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:611
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:609
 msgid "Skew"
 msgstr "Zkreslit"
 
@@ -3734,7 +3755,7 @@ msgstr "Maximální velikost paketu (bajty) přijímání / odesílání"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:376
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:426
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:631
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:629
 msgid "RX"
 msgstr "RX"
 
@@ -3744,7 +3765,7 @@ msgstr "Celkový počet zpráv přijatých od peera"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:377
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:427
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:633
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:631
 msgid "TX"
 msgstr "TX"
 
@@ -3753,7 +3774,7 @@ msgid "The total number of messages sent to the peer"
 msgstr "Celkový počet zpráv odeslaných peerovi"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:378
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:636
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:634
 msgid "Dup RX"
 msgstr "Dup RX"
 
@@ -3762,7 +3783,7 @@ msgid "The total number of duplicate packets received from the peer"
 msgstr "Celkový počet duplikovaných paketů obdržených od peeru."
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:379
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:638
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:636
 msgid "Dup TX"
 msgstr "Dup TX"
 
@@ -3775,12 +3796,12 @@ msgid "NTCP connections"
 msgstr "NTCP připojení"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:410
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:584
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:582
 msgid "Limit"
 msgstr "Limit"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:418
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:596
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:594
 msgid "Direction/Introduction"
 msgstr "Směr/Uvedení"
 
@@ -3797,7 +3818,7 @@ msgid "Is peer backlogged?"
 msgstr "Má peer nedokončenou práci?"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:507
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:836
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:834
 #, java-format
 msgid "{0} peer"
 msgid_plural "{0} peers"
@@ -3806,83 +3827,83 @@ msgstr[1] "{0} peeři"
 msgstr[2] "{0} peerů"
 msgstr[3] "{0} peerů"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:583
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:581
 msgid "UDP connections"
 msgstr "UDP připojení"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:594
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:592
 msgid "Sort by peer hash"
 msgstr "Třídit podle hashe peeru"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:600
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:598
 msgid "Sort by idle inbound"
 msgstr "Seřadit podle příchozí nečinnosti"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:602
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:600
 msgid "Sort by idle outbound"
 msgstr "Seřadit podle odchozí nečinnosti"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:605
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:603
 msgid "Sort by inbound rate"
 msgstr "Seřadit podle příchozí rychlosti"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:607
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:605
 msgid "Sort by outbound rate"
 msgstr "Seřadit podle odchozí rychlosti "
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:610
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:608
 msgid "Sort by connection uptime"
 msgstr "Seřadit podle doby dostupnosti připojení."
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:612
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:610
 msgid "Sort by clock skew"
 msgstr "Seřadit podle zkreslení času"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:616
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:614
 msgid "Sort by congestion window"
 msgstr "Seřadit podle okna přetížení"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:618
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:616
 msgid "Sort by slow start threshold"
 msgstr "Seřadit podle pomalého startu prahu"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:621
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:619
 msgid "Sort by round trip time"
 msgstr "Seřadit podle doby cesty tam a zpět"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:625
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:623
 msgid "Sort by retransmission timeout"
 msgstr "Seřadit podle časového limitu opakovaného přenosu"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:628
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:626
 msgid "Sort by outbound maximum transmit unit"
 msgstr "Seřadit podle odchozí maximální přenosové jednotky"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:632
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:630
 msgid "Sort by packets received"
 msgstr "Seřadit podle přijatých paketů"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:634
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:632
 msgid "Sort by packets sent"
 msgstr "Seředit podle odeslaných paketů"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:637
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:635
 msgid "Sort by packets received more than once"
 msgstr "Seřadit podle paketů obdržených více než jednou"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:639
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:637
 msgid "Sort by packets retransmitted"
 msgstr "Seřadit podle znovu odeslaných paketů "
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:665
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:663
 msgid "We offered to introduce them"
 msgstr "Nabídli jsme jim, že je uvedeme"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:667
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:665
 msgid "They offered to introduce us"
 msgstr "Nabídli se, že nás uvedou"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:679
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:677
 #, java-format
 msgid "{0} fail"
 msgid_plural "{0} fails"
@@ -3891,7 +3912,7 @@ msgstr[1] "{0} selhaly"
 msgstr[2] "{0}selhalo"
 msgstr[3] "{0} selhalo"
 
-#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:752
+#: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:750
 msgid "backlogged"
 msgstr "nedokončená práce"
 
@@ -3923,24 +3944,24 @@ msgstr[2] "Skrytí {0} standardních profilů."
 msgstr[3] "Skrytí {0} standardních profilů."
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:95
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:300
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:296
 msgid "Groups"
 msgstr "Skupiny"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:98
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:285
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:281
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:618
 msgid "Speed"
 msgstr "Rychlost"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:99
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:287
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:283
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:622
 msgid "Capacity"
 msgstr "Kapacita"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:100
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:289
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:285
 msgid "Integration"
 msgstr "Integrace"
 
@@ -3969,7 +3990,7 @@ msgid "Integrated"
 msgstr "Integrováno"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:186
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:328
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:324
 msgid "Unreachable"
 msgstr "Nedosažitelné"
 
@@ -4018,50 +4039,42 @@ msgid "Last Bad Send"
 msgstr "Poslední špatné odeslání"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:230
-msgid "10m Resp. Time"
-msgstr "10m čas odp."
-
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:231
 msgid "1h Resp. Time"
 msgstr "1h čas odp."
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:232
-msgid "1d Resp. Time"
-msgstr "1d čas odp."
-
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:233
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:231
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1005
 msgid "Last Good Lookup"
 msgstr "Poslední dobré vyhledání"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:234
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:232
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1012
 msgid "Last Bad Lookup"
 msgstr "Poslední špatné vyhledání"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:235
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:233
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1019
 msgid "Last Good Store"
 msgstr "Poslední dobré uložení"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:236
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:234
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1026
 msgid "Last Bad Store"
 msgstr "Poslední špatné uložení"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:237
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:235
 msgid "1h Fail Rate"
 msgstr "1h míra selhání"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:238
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:236
 msgid "1d Fail Rate"
 msgstr "1d míra selhání"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:282
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:278
 msgid "Thresholds"
 msgstr "Prahové hodnoty"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:291
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:287
 #, java-format
 msgid "{0} fast peer"
 msgid_plural "{0} fast peers"
@@ -4070,7 +4083,7 @@ msgstr[1] "{0} rychlí peeři"
 msgstr[2] "{0} rychlých peerů"
 msgstr[3] "{0} rychlých peerů"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:293
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:289
 #, java-format
 msgid "{0} high capacity peer"
 msgid_plural "{0} high capacity peers"
@@ -4079,7 +4092,7 @@ msgstr[1] "{0} vysokokapacitní peeři"
 msgstr[2] "{0} vysokokapacitních peerů"
 msgstr[3] "{0} vysokokapacitních peerů"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:295
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:291
 #, java-format
 msgid "{0} integrated peer"
 msgid_plural "{0} integrated peers"
@@ -4088,44 +4101,44 @@ msgstr[1] "{0} integrovaní peeři"
 msgstr[2] "{0} integrovaných peerů"
 msgstr[3] "{0} integrovaných peerů"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:300
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:296
 msgid "as determined by the profile organizer"
 msgstr "rozhodnuto organizátorem profilu"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:303
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:299
 msgid "capabilities in the netDb, not used to determine profiles"
 msgstr "schopnosti v netDb, nepoužívány k určení profilů"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:307
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:303
 msgid "Congested"
 msgstr "Přetíženo"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:308
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:304
 msgid "Severely congested"
 msgstr "Těžce přetíženo"
 
 #. 0
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:311
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:307
 #: ../java/src/net/i2p/router/web/helpers/ProfilesHelper.java:14
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:846
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:910
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:848
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:912
 msgid "Floodfill"
 msgstr "Floodfill"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:312
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:308
 msgid "Not accepting tunnels"
 msgstr "Nejsou přijímány tunely"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:315
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:311
 #, java-format
 msgid "Under {0} shared bandwidth"
 msgstr "Pod {0} sdíleného datového přenosu"
 
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:312
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:315
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:316
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:319
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:320
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:323
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:324
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:239
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:240
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:243
@@ -4135,47 +4148,47 @@ msgstr "Pod {0} sdíleného datového přenosu"
 msgid "{0} shared bandwidth"
 msgstr "{0} sdíleného datového přenosu"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:327
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:323
 msgid "Reachable"
 msgstr "Dosažitelné"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:331
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:327
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:248
 #, java-format
 msgid "Over {0} shared bandwidth"
 msgstr "Přes {0} sdíleného datového přenosu"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:335
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:331
 msgid "speed"
 msgstr "rychlost"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:337
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:333
 msgid ""
 "peak throughput (bytes per second) over a 1 minute period that the peer has "
 "sustained in a single tunnel"
 msgstr "nejvyšší propustnost (bajtů za sekundu) v rámci 1 minuty, kterou peer zaznamenal v jednom tunelu"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:340
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:336
 msgid "capacity"
 msgstr "kapacita"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:342
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:338
 msgid "how many tunnels can we ask them to join in an hour?"
 msgstr "připojení ke kolika tunelům po nich můžeme chtít za dobu jedné hodiny?"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:345
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:341
 msgid "integration"
 msgstr "integrace"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:347
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:343
 msgid "how many new peers have they told us about lately?"
 msgstr "o kolika nových peerech nám řekli v poslední době?"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:350
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:346
 msgid "status"
 msgstr "stav"
 
-#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:352
+#: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:348
 msgid "is the peer banned, or unreachable, or failing tunnel tests?"
 msgstr "je peer zakázán nebo nedostupný nebo selhává při testech tunelu?"
 
@@ -4398,7 +4411,7 @@ msgid "Network Reachability"
 msgstr "Síťová dosažitelnost"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:52
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:790
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:792
 msgid "Update Status"
 msgstr "Stav aktualizace"
 
@@ -4419,7 +4432,7 @@ msgid "Bandwidth Graph"
 msgstr "Graf datového přenosu"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:60
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1071
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1073
 msgid "Congestion"
 msgstr "Přetížení"
 
@@ -4434,7 +4447,7 @@ msgid "Local Tunnels"
 msgstr "Místní tunely"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:63
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1169
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1171
 msgid "News &amp; Updates"
 msgstr "Novinky &amp; aktualizace"
 
@@ -4474,7 +4487,7 @@ msgid "Information regarding software and licenses used by I2P"
 msgstr "Informace ohledně software a licencí použitých v I2P"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:187
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:756
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:758
 msgid "Information about the network status"
 msgstr "Informace o stavu sítě"
 
@@ -4544,8 +4557,8 @@ msgid "NetDB"
 msgstr "NetDB"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:453
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:805
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:869
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:807
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:871
 msgid "Show all current peer connections"
 msgstr "Ukázat všechna současná spojení peerů"
 
@@ -4558,7 +4571,7 @@ msgid "Show recent peer performance profiles"
 msgstr "Ukázat nejnovější profily výkonu peerů"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:471
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1019
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1021
 msgid "View existing tunnels and tunnel build status"
 msgstr "Zobrazit stávající tunely a stav vytvoření tunelů"
 
@@ -4590,258 +4603,250 @@ msgstr "Zobrazit informace pro ladění routeru"
 msgid "View historical log of router events"
 msgstr "Zobrazit historický log událostí routeru"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:534
-msgid "Jars"
-msgstr "Jars"
-
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:537
-msgid "Review extended info about installed .jar and .war files"
-msgstr "Prohlédněte si rozšířené informace o instalovaných souborech .jar a .war"
-
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:548
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:550
 msgid "Documentation for the I2P API"
 msgstr "Dokumentace k I2P API"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:553
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:555
 msgid "Jobs"
 msgstr "Práce"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:556
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:558
 msgid "Show the router's workload, and how it's performing"
 msgstr "Ukázat pracovní zátěž a výkon routeru"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:565
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:567
 msgid "View active leasesets (debug mode)"
 msgstr "Ukázat aktivní sety pronájmu (režim ladění)"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:571
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:573
 msgid "NetDB Search"
 msgstr "NetDB hledání"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:574
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:576
 msgid "Network database search tool"
 msgstr "Nástroj hledání v síťové databázi"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:583
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:585
 msgid "Textual router performance statistics"
 msgstr "Textové statistiky výkonu routeru"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:589
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:591
 msgid "Sybils"
 msgstr "Sybils"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:592
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:594
 msgid "Review possible sybils in network database"
 msgstr "Podívejte se na možné sybily v síťové databázi"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:609
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:669
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:611
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:671
 #, java-format
 msgid ""
 "Your Local Identity [{0}] is your unique I2P router identity, similar to an "
 "IP address but tailored to I2P. "
 msgstr "Vaše místní identita [{0}] je vaší jedinečnou identitou I2P routeru, podobnou IP adrese, přizpůsobenou I2P."
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:610
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:670
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:612
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:672
 msgid "Never disclose this to anyone, as it can reveal your real world IP."
 msgstr "Nikdy toto nikomu neukazujte, může to odhalit vaší skutečnou IP."
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:612
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:672
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:614
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:674
 msgid "Router Info"
 msgstr "Informace routeru"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:617
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:643
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:677
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:619
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:645
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:679
 msgid "The version of the I2P software we are running"
 msgstr "Verze I2P software, kterou používáme"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:627
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:653
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:687
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:629
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:655
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:689
 msgid "How long we've been running for this session"
 msgstr "Jak dlouho používáme tuto relaci"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:697
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:699
 msgid "Difference between network-synced time and local time"
 msgstr "Rozdíl mezi časem synchronizovaným po síti a místním časem"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:700
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:702
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:637
 msgid "Clock Skew"
 msgstr "Časový rozdíl"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:707
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:709
 msgid ""
 "How much RAM I2P is using / total RAM available to I2P (excludes RAM "
 "allocated to the JVM)"
 msgstr "Kolik paměti RAM používá I2P / celková paměť RAM dostupná I2P (nezahrnuje RAM přidělenou JVM)"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:710
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:712
 msgid "Memory"
 msgstr "Paměť"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:767
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:769
 msgid "See more information on the wiki"
 msgstr "Více informací najdete ve wiki"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:769
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:771
 msgid "Warning: ECDSA is not available. Update your Java or OS"
 msgstr "Varování: ECDSA není dostupná. Aktualizujte vaší Javu nebo OS"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:774
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:776
 #, java-format
 msgid "Warning: Java version {0} is no longer supported by I2P."
 msgstr "Varování: Verzi Java {0} již I2P nepodporuje."
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:776
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:778
 #, java-format
 msgid "Update Java to version {0} or higher to receive I2P updates."
 msgstr "Aktualizujte Java na verzi {0} nebo vyšší pro získání aktualizací I2P."
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:788
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:790
 msgid "Configure I2P Updates"
 msgstr "Nastavte aktualizace I2P"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:813
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:877
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:815
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:879
 msgid "Peers we've been talking to in the last few minutes/last hour"
 msgstr "Peeři se kterými jsme komunikovali v posledních několika minutách/1 hodině"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:816
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:880
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:818
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:882
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:485
 msgid "Active"
 msgstr "Aktivní"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:825
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:889
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:827
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:891
 msgid "The number of peers available for building client tunnels"
 msgstr "Počet peerů dostupných pro vytvoření klientských tunelů"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:828
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:892
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:830
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:894
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:495
 msgid "Fast"
 msgstr "Rychlé"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:834
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:898
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:836
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:900
 msgid "The number of peers available for building exploratory tunnels"
 msgstr "Počet peerů dostupných pro vytvoření průzkumných tunelů"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:837
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:901
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:839
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:903
 msgid "High capacity"
 msgstr "Vysoká kapacita"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:843
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:907
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:845
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:909
 msgid "The number of peers available for network database inquiries"
 msgstr "Počet peerů dostupných pro dotazy síťové databáze"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:852
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:916
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:854
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:918
 msgid "The total number of peers in our network database"
 msgstr "Celkový počet peerů v naší síťové databázi"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:855
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:919
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:857
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:921
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:517
 msgid "Known"
 msgstr "Známí"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:925
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:927
 msgid "The number of banned peers"
 msgstr "Počet zakázaných peerů"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:947
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:949
 msgid "Configure router bandwidth allocation"
 msgstr "Nastavte přidělenou datového přenosu routeru"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:949
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:951
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:470
 msgid "Bandwidth in/out"
 msgstr "Datový přenos dovnitř/ven"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:976
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:978
 msgid "Used"
 msgstr "Využito"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1008
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1010
 msgid "Our inbound &amp; outbound traffic for the last 20 minutes"
 msgstr "Náš příchozí &amp; odchozí provoz za posledních 20 minut"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1026
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1028
 msgid ""
 "Used for building and testing tunnels, and communicating with floodfill "
 "peers"
 msgstr "Používáno pro vytváření a testování tunelů a pro komunikaci s floodfill peery"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1029
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1031
 msgid "Exploratory"
 msgstr "Průzkumný"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1035
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1037
 msgid "Tunnels we are using to provide or access services on the network"
 msgstr "Tunely, které na síti používáme k poskytování služeb a nebo přístupu k nim"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1044
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1046
 msgid ""
 "Tunnels we are participating in, directly contributing bandwidth to the "
 "network"
 msgstr "Tunely, kterých se účastníme, přímo přispíváme síti svým datovým přenosem"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1047
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1049
 msgid "Participating"
 msgstr "Participující"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1053
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1055
 msgid ""
 "The ratio of tunnel hops we provide to tunnel hops we use - a value greater "
 "than 1.00 indicates a positive contribution to the network"
 msgstr "Poměr skoků tunelů, které poskytujeme vůči skokům tunelů, které využíváme - hodnota vyšší než 1.00 znamená pozitivní příspěvek síti"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1056
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1058
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:469
 msgid "Share ratio"
 msgstr "Poměr sdílení"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1069
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1071
 msgid "What's in the router's job queue?"
 msgstr "Co je ve frontě prací routeru?"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1076
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1078
 msgid "Indicates router performance"
 msgstr "Ukazuje výkon routeru"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1079
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1081
 msgid "Job lag"
 msgstr "Zpoždění práce"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1085
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1087
 msgid "Indicates how quickly outbound messages to other I2P routers are sent"
 msgstr "Ukazuje jak rychle jsou odesílány odchozí zprávy do jiných I2P routerů"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1088
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1090
 msgid "Message delay"
 msgstr "Prodleva zprávy"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1095
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1097
 msgid "Round trip time for a tunnel test"
 msgstr "Doba cesty tam a zpět pro otestování tunelu"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1098
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1100
 msgid "Tunnel lag"
 msgstr "Zpoždění tunelu"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1105
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1107
 msgid "Queued requests from other routers to participate in tunnels"
 msgstr "Požadavky ve frontě, od jiných routerů k účasti na tunelech"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1108
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1110
 msgid "Backlog"
 msgstr "Backlog"
 
@@ -5215,6 +5220,22 @@ msgstr "Test datového přenosu zrušen"
 msgid "Bandwidth test was not running"
 msgstr "Test datového přenosu neběžel"
 
+#: ../java/src/net/i2p/router/web/helpers/WizardHelper.java:88
+msgid "ready"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/helpers/WizardHelper.java:90
+msgid "inbound test"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/helpers/WizardHelper.java:92
+msgid "outbound test"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/helpers/WizardHelper.java:94
+msgid "done"
+msgstr "hotovo"
+
 #. wars for ConfigClientsHelper
 #: ../java/strings/Strings.java:12
 msgid "addressbook"
@@ -5358,7 +5379,6 @@ msgstr "Certifikáty"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:254
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:248
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:276
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jars_jsp.java:250
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jobs_jsp.java:246
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:250
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/netdb_jsp.java:247
@@ -7647,10 +7667,6 @@ msgstr "Vybraný port je zobrazen na <a href=\"/confignet\">stránce nastavení 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:419
 msgid "Search"
 msgstr "Hledat"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jars_jsp.java:240
-msgid "Jar File Dump"
-msgstr "Dump jar souboru"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jobs_jsp.java:237
 msgid "job queue"
