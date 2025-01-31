@@ -281,8 +281,8 @@ Index: b/installer/resources/wrapper.config
 +wrapper.java.additional.2=-Di2p.dir.base=/usr/share/i2p
  wrapper.java.additional.2.stripquotes=TRUE
  
- # Prevent the JVM from exporting stats (and thereby causing hundreds of
-@@ -146,11 +138,7 @@ wrapper.console.loglevel=INFO
+ # Suppress JNI warning in JRE 24+, and eventual restriction
+@@ -153,11 +145,7 @@ wrapper.console.loglevel=INFO
  # You may wish to change this.
  # NOTE: On Linux/Mac this is overridden in the i2prouter script; changes here will have no effect.
  # System temp directory:
@@ -295,7 +295,7 @@ Index: b/installer/resources/wrapper.config
  
  # Format of output for the log file.
  # The format consists of the tokens 'L' for log level, 'P' for prefix, 'D' for thread,
-@@ -220,11 +208,7 @@ wrapper.use_system_time=false
+@@ -227,11 +215,7 @@ wrapper.use_system_time=false
  # Linux/Mac users, do not set here, see settings in the i2prouter script.
  # Directory must exist or the wrapper will fail to start.
  # System temp directory:
@@ -308,7 +308,7 @@ Index: b/installer/resources/wrapper.config
  #
  # From i2prouter:
  #
-@@ -238,10 +222,7 @@ wrapper.use_system_time=false
+@@ -245,10 +229,7 @@ wrapper.use_system_time=false
  # Linux/Mac users, do not set here, see settings in the i2prouter script.
  # Directory must exist or the wrapper will fail to start.
  # System temp directory:
@@ -320,7 +320,7 @@ Index: b/installer/resources/wrapper.config
  
  #********************************************************************
  # Wrapper General Properties
-@@ -259,32 +240,6 @@ wrapper.umask=0022
+@@ -266,32 +247,6 @@ wrapper.umask=0022
  wrapper.java.umask=0022
  wrapper.logfile.umask=0077
  
