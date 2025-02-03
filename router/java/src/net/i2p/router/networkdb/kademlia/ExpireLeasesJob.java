@@ -37,7 +37,7 @@ class ExpireLeasesJob extends JobImpl {
     
     private final static long RERUN_DELAY_MS = 1*60*1000;
     private static final int LIMIT_LEASES_FF = 1250;
-    private static final int LIMIT_LEASES_CLIENT = SystemVersion.isSlow() ? 750 : 300;
+    private static final int LIMIT_LEASES_CLIENT = SystemVersion.isSlow() ? 300 : 750;
     
     public ExpireLeasesJob(RouterContext ctx, KademliaNetworkDatabaseFacade facade) {
         super(ctx);
