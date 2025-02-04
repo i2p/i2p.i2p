@@ -77,11 +77,11 @@ msgstr "Bandeja de entrada"
 
 #: src/src/i2p/susi/webmail/WebMail.java:555
 msgid "View email as HTML"
-msgstr ""
+msgstr "Ve correo como HTML"
 
 #: src/src/i2p/susi/webmail/WebMail.java:573
 msgid "View email as plain text"
-msgstr ""
+msgstr "Ve correo electrónico como texto"
 
 #: src/src/i2p/susi/webmail/WebMail.java:604
 msgid "unknown"

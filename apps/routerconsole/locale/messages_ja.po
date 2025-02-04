@@ -8,7 +8,7 @@
 # 432cfded806ff6b7fe5774185a19126f_b5bc177, 2013
 # kami <b52c55627324b29125cbcfb101258463_228943>, 2015
 # daingewuvzeevisiddfddd, 2021
-# daingewuvzeevisiddfddd, 2022-2024
+# daingewuvzeevisiddfddd, 2022-2025
 # g3600303 <g3600303@trbvm.com>, 2015
 # タカハシ, 2013-2014
 # タカハシ, 2015,2022
@@ -27,7 +27,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-22 13:52+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
-"Last-Translator: daingewuvzeevisiddfddd, 2022-2024\n"
+"Last-Translator: daingewuvzeevisiddfddd, 2022-2025\n"
 "Language-Team: Japanese (http://app.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -327,12 +327,12 @@ msgstr "{0} ポート {1,number,#####} は UPnP によって転送されませ�
 #: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:144
 #: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:399
 msgid "UPnP failed to start - no network connection?"
-msgstr ""
+msgstr "起動で UPnP 失敗 - ネットワーク接続なし？"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:148
 #: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:397
 msgid "UPnP failed to start - port conflict?"
-msgstr ""
+msgstr "起動で UPnP 失敗 - ポート衝突？"
 
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:905
 #: ../java/src/net/i2p/router/web/DeadlockDetector.java:109
@@ -4079,11 +4079,11 @@ msgstr "netDb の許容数、プロファイルの判断には使用されませ
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:303
 msgid "Congested"
-msgstr ""
+msgstr "混雑"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:304
 msgid "Severely congested"
-msgstr ""
+msgstr "酷く混雑"
 
 #. 0
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:307
@@ -4095,7 +4095,7 @@ msgstr "Floodfill"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:308
 msgid "Not accepting tunnels"
-msgstr ""
+msgstr "非トンネル承認中"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:311
 #, java-format
@@ -5184,15 +5184,15 @@ msgstr "帯域幅テストは実行していない"
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHelper.java:88
 msgid "ready"
-msgstr ""
+msgstr "準備完了"
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHelper.java:90
 msgid "inbound test"
-msgstr ""
+msgstr "着信テスト"
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHelper.java:92
 msgid "outbound test"
-msgstr ""
+msgstr "送信テスト"
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHelper.java:94
 msgid "done"
