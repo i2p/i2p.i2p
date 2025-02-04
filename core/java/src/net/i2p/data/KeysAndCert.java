@@ -132,7 +132,7 @@ public class KeysAndCert extends DataStructureImpl {
             return _padding;
         byte[] rv = new byte[PAD_COMP_LEN * _paddingBlocks];
         for (int i = 0; i <_paddingBlocks; i++) {
-            System.arraycopy(_padding, 0, _paddingBlocks, i * PAD_COMP_LEN, PAD_COMP_LEN);
+            System.arraycopy(_padding, 0, rv, i * PAD_COMP_LEN, PAD_COMP_LEN);
         }
         return rv;
     }
@@ -196,11 +196,11 @@ public class KeysAndCert extends DataStructureImpl {
     private void compressPadding() {
         _paddingBlocks = 0;
         // > 32 and a mult. of 32
-        if (_padding == null || (_padding.length & (2 * PAD_COMP_LEN) - 1) != PAD_COMP_LEN)
+        if (_padding == null || _padding.length <= 32 || (_padding.length & (PAD_COMP_LEN - 1)) != 0)
             return;
         int blks = _padding.length / PAD_COMP_LEN;
         for (int i = 1; i < blks; i++) {
-            if (!DataHelper.eq(_padding, 0, _padding, i, PAD_COMP_LEN)) {
+            if (!DataHelper.eq(_padding, 0, _padding, i * PAD_COMP_LEN, PAD_COMP_LEN)) {
                 return;
             }
         }
