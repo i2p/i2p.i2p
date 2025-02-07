@@ -67,9 +67,10 @@ Generate files to upload
 - cd i2p.i2p.foobar
 - copy debian-alt/(series)/* to debian/
 - edit debian/changelog to add the release at the top
-  * version MUST be 2.xx.0-1ubuntu1
+  * series MUST be bionic or focal or jammy
+  * version MUST be 2.xx.0-1ubuntu1 for jammy.
+    For bionic and focal, the names are different.
     next version for fixes would be 2.xx.0-2ubunutu1
-  * series MUST be xenial or bionic or focal
   * name and email MUST EXACTLY match what's in your GPG keyring
     or the signing will fail.
     (or add -kkeyid argument to debuild, which you must do
@@ -155,11 +156,10 @@ Release
 -------
 
 Then copy from your PPA to the i2p-maintainers PPA.
-Then in the i2p-maintainers PPA, copy focal to groovy and hirsute.
+Then in the i2p-maintainers PPA, copy to other versions as specified in the table
+at the top of this document.
 Did a new series open up since the last time you did this? Copy to the new one also.
   (select "copy existing binaries")
-  Copy xenial first and wait for it to be published in i2p-maintainers or the others will fail.
-For xenial, build and copy it separately. It is built from the "ant xenial-release-tarball" source.
 
 
 Creating milestone, release, and uploading files
