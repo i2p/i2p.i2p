@@ -445,13 +445,11 @@ public abstract class SystemVersion {
      */
     public static void main(String[] args) {
         System.out.println("64 bit   : " + is64Bit());
-        System.out.println("Java 6   : " + isJava6());
-        System.out.println("Java 7   : " + isJava7());
         System.out.println("Java 8   : " + isJava8());
         System.out.println("Java 9   : " + isJava9());
         System.out.println("Java 10  : " + isJava10());
         System.out.println("Java 11  : " + isJava11());
-        for (int i = 12; i <= 22; i++) {
+        for (int i = 12; i <= 24; i++) {
             System.out.println("Java " + i + "  : " + isJava(i));
         }
         System.out.println("Android  : " + isAndroid());
