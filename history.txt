@@ -1,4 +1,21 @@
+2025-02-07 zzz
+ * Build: Check for mismatched version in Izpack config files
+ * Crypto:
+   - Allow external use of pooled SHA256 instances
+   - Use pooled SHA256 instances in Noise lib
+ * Data:
+   - Fix compression of RouterIdentities
+   - Check key order when parsing RI mappings and fail-fast if out-of-order
+ * i2psnark: Reduce PeerCoordinator CHECK_PERIOD interval
+ * Transport:
+   - Remove old NTCP 1 stats
+   - SSU 1 removal part 10/n (UDPPacket)
+
 2025-02-04 2.8.0 (API 0.9.65) released
+
+2025-02-03 zzz
+ * Data: Fix compressible padding detection and expansion
+ * NetDB: Fix reversed conditional in ExpireLeasesJob.java
 
 2025-01-31 zzz
  * Pull translations from Transifex
