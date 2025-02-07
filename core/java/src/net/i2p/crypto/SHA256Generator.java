@@ -47,7 +47,7 @@ public final class SHA256Generator {
         MessageDigest digest = acquire();
         digest.update(source, start, len);
         byte rv[] = digest.digest();
-        release(digest);
+        releaseit(digest);
         return Hash.create(rv);
     }
     
@@ -64,11 +64,19 @@ public final class SHA256Generator {
         } catch (DigestException e) {
             throw new RuntimeException(e);
         } finally {
-            release(digest);
+            releaseit(digest);
         }
     }
     
-    private MessageDigest acquire() {
+    /**
+     *  Get a MessageDigest instance from the pool,
+     *  for uses where the one-shot calculateHash()
+     *  would require copying the data.
+     *  Return the instance via release() when done.
+     *
+     *  @since public since 0.9.66
+     */
+    public MessageDigest acquire() {
         MessageDigest rv = _digests.poll();
         if (rv != null)
             rv.reset();
@@ -77,7 +85,22 @@ public final class SHA256Generator {
         return rv;
     }
     
-    private void release(MessageDigest digest) {
+    /**
+     *  Release a digest back to the pool
+     *  @param digest must be SHA-256
+     *  @since public since 0.9.66
+     */
+    public void release(MessageDigest digest) {
+        if (!digest.getAlgorithm().equals("SHA-256"))
+            throw new IllegalArgumentException();
+        _digests.offer(digest);
+    }
+    
+    /**
+     *  Release a digest back to the pool - internal version
+     *  @since 0.9.66 renamed from release()
+     */
+    private void releaseit(MessageDigest digest) {
         _digests.offer(digest);
     }
     
