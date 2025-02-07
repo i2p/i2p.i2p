@@ -143,9 +143,9 @@ public class PublicKey extends SimpleDataStructure {
      *  The type of the returned key will be null if the kcert sigtype is null.
      *
      *  @throws IllegalArgumentException if this is already typed to a different type
-     *  @since 0.9.42
+     *  @since 0.9.42 changed from public to package private in 0.9.66, not for external use
      */
-    public PublicKey toTypedKey(KeyCertificate kcert) {
+    PublicKey toTypedKey(KeyCertificate kcert) {
         if (_data == null)
             throw new IllegalStateException();
         EncType newType = kcert.getEncType();
