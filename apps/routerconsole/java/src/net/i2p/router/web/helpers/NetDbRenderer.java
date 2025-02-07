@@ -39,6 +39,7 @@ import net.i2p.data.LeaseSet;
 import net.i2p.data.LeaseSet2;
 import net.i2p.data.PublicKey;
 import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.router.RouterKeyGenerator;
 import net.i2p.router.JobImpl;
@@ -998,10 +999,8 @@ class NetDbRenderer {
                 buf.append("&nbsp;&nbsp;<b>RAR?</b> ").append(ls.getReceivedAsReply());
                 buf.append("&nbsp;&nbsp;<b>Distance: </b>").append(distance);
                 buf.append("&nbsp;&nbsp;<b>").append(_t("Type")).append(": </b>").append(type);
-                byte[] padding = dest.getPadding();
-                if (padding != null && padding.length >= 64) {
-                    if (DataHelper.eq(padding, 0, padding, 32, 32))
-                        buf.append("&nbsp;&nbsp;<b>Compressible?</b> true");
+                if (dest.isCompressible()) {
+                    buf.append("&nbsp;&nbsp;<b>Compressible?</b> true");
                 }
                 if (type != DatabaseEntry.KEY_TYPE_LEASESET) {
                     LeaseSet2 ls2 = (LeaseSet2) ls;
@@ -1369,7 +1368,8 @@ class NetDbRenderer {
      *  to prevent vulnerabilities
      */
     private void renderRouterInfo(StringBuilder buf, RouterInfo info, boolean isUs, boolean full) {
-        String hash = info.getIdentity().getHash().toBase64();
+        RouterIdentity ident = info.getIdentity();
+        String hash = ident.getHash().toBase64();
         buf.append("<table class=\"netdbentry\">" +
                    "<tr id=\"").append(hash, 0, 6).append("\"><th colspan=\"2\"");
         if (isUs) {
@@ -1378,7 +1378,7 @@ class NetDbRenderer {
         } else {
             buf.append("><b>").append(_t("Router")).append(":</b> <code>")
                .append(hash).append("</code></th><th>");
-            String country = _context.commSystem().getCountry(info.getIdentity().getHash());
+            String country = _context.commSystem().getCountry(ident.getHash());
             if (country != null) {
                 buf.append("<a href=\"/netdb?c=").append(country).append("\">");
                 buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase(Locale.US)).append('\"');
@@ -1411,16 +1411,14 @@ class NetDbRenderer {
         boolean debug = _context.getBooleanProperty(HelperBase.PROP_ADVANCED);
         if (full) {
             buf.append("</td></tr><tr><td><b>").append(_t("Signing Key")).append(":</b></td><td colspan=\"2\">")
-               .append(info.getIdentity().getSigningPublicKey().getType());
+               .append(ident.getSigningPublicKey().getType());
             buf.append("</td></tr><tr><td><b>").append(_t("Encryption Key")).append(":</b></td><td colspan=\"2\">")
-               .append(info.getIdentity().getPublicKey().getType());
+               .append(ident.getPublicKey().getType());
             if (debug) {
                 buf.append("</td></tr>\n<tr><td><b>Routing Key:</b></td><td colspan=\"2\">").append(info.getRoutingKey().toBase64());
                 buf.append("</td></tr>");
-                byte[] padding = info.getIdentity().getPadding();
-                if (padding != null && padding.length >= 64) {
-                    if (DataHelper.eq(padding, 0, padding, 32, 32))
-                        buf.append("</td></tr><tr><td><b>Compressible:</b></td><td colspan=\"2\">true");
+                if (ident.isCompressible()) {
+                    buf.append("</td></tr><tr><td><b>Compressible:</b></td><td colspan=\"2\">true");
                 }
             }
         }
