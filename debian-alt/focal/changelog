@@ -4,24 +4,6 @@ i2p (2.8.0-3~focal+1) focal; urgency=medium
 
  -- idk <hankhill19580@gmail.com>  Wed, 5 Feb 2025 12:00:00 +0000
 
-i2p (2.8.0-2~focal+1) focal; urgency=medium
-
-  * New upstream version 2.8.0
-
- -- idk <hankhill19580@gmail.com>  Wed, 5 Feb 2025 12:00:00 +0000
-
-i2p (2.8.0-1~focal+1) focal; urgency=medium
-
-  * New upstream version 2.8.0
-
- -- idk <hankhill19580@gmail.com>  Wed, 5 Feb 2025 12:00:00 +0000
-
-i2p (2.7.1-1~focal+1) focal; urgency=medium
-
-  * TEST TEST TEST
-
- -- zzz on i2p (key signing) <zzz@i2pmail.org>  Sun, 19 Jan 2025 12:12:12 +0000
-
 i2p (2.7.0-1~ubuntu1) focal; urgency=medium
 
   * New upstream version 2.7.0
