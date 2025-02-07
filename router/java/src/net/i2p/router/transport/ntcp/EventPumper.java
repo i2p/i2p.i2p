@@ -960,7 +960,7 @@ class EventPumper implements Runnable {
                     con.close(true);
                 } catch (UnresolvedAddressException uae) {                    
                     if (_log.shouldLog(Log.WARN)) _log.warn("unresolved address connecting", uae);
-                    _context.statManager().addRateData("ntcp.connectFailedUnresolved", 1);
+                    //_context.statManager().addRateData("ntcp.connectFailedUnresolved", 1);
                     _transport.markUnreachable(con.getRemotePeer().calculateHash());
                     con.close(true);
                 } catch (CancelledKeyException cke) {
