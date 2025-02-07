@@ -1092,7 +1092,57 @@
         <echo message="Build number is ${i2p.build.number}${build.qualifier}${build.extra}" />
     </target>
 
-    <target name="verifyReleaseBuildNumbers" depends="getReleaseNumber, getBuildNumber" >
+    <!-- sets izpack.number -->
+    <target name="getIzpackNumber" depends="getReleaseNumber">
+        <loadfile srcfile="installer/install.xml" property="izpack.number">
+            <filterchain>
+                <linecontains>
+                    <contains value="&lt;appversion&gt;"/>
+                </linecontains>
+                <tokenfilter>
+                    <replaceregex pattern='&lt;appversion&gt;([0-9\.]+)&lt;/appversion&gt;' replace="\1" flags="gi" />
+                </tokenfilter>
+                <striplinebreaks/>
+                <trim/>
+            </filterchain>
+        </loadfile>
+        <echo message="Release number: ${release.number}" />
+        <echo message="Izpack version: ${izpack.number}" />
+        <fail message="Izpack version / release version mismatch, fix installer/install.xml" >
+            <condition>
+                <not>
+                    <equals arg1="${release.number}" arg2="${izpack.number}"/>
+                </not>
+            </condition>
+        </fail>
+    </target>
+
+    <!-- sets izpack5.number -->
+    <target name="getIzpack5Number" depends="getReleaseNumber">
+        <loadfile srcfile="installer/install.xml" property="izpack5.number">
+            <filterchain>
+                <linecontains>
+                    <contains value="&lt;appversion&gt;"/>
+                </linecontains>
+                <tokenfilter>
+                    <replaceregex pattern='&lt;appversion&gt;([0-9\.]+)&lt;/appversion&gt;' replace="\1" flags="gi" />
+                </tokenfilter>
+                <striplinebreaks/>
+                <trim/>
+            </filterchain>
+        </loadfile>
+        <echo message="Release number: ${release.number}" />
+        <echo message="Izpack version: ${izpack5.number}" />
+        <fail message="Izpack version / release version mismatch, fix installer/install5.xml" >
+            <condition>
+                <not>
+                    <equals arg1="${release.number}" arg2="${izpack5.number}"/>
+                </not>
+            </condition>
+        </fail>
+    </target>
+
+    <target name="verifyReleaseBuildNumbers" depends="getReleaseNumber, getBuildNumber, getIzpack5Number" >
         <fail message="Bad release number: ${release.number}" >
             <condition>
                 <or>
@@ -1887,7 +1937,7 @@
     </target>
 
     <!-- IzPack 4 -->
-    <target name="izpack-patches" >
+    <target name="izpack-patches" depends="getIzpackNumber" >
         <echo message="*** WARNING ***" />
         <echo message="This build target uses IzPack 4.3.5 which is bundled for convenience but is very old and unsupported." />
         <echo message="It requires Java JDK 13 or lower with pack200, it will fail with JDK 14 or higher." />
@@ -1936,7 +1986,7 @@
                  classname="com.izforge.izpack.ant.IzPackTask" />
     </target>
 
-    <target name="izpack5-patches" depends="ensureIzpack5, buildProperties" >
+    <target name="izpack5-patches" depends="ensureIzpack5, buildProperties, getIzpack5Number" >
         <ant dir="installer/lib/izpack5/patches/java/" target="jar" />
         <!-- custom langpacks
              Izpack tries to load the resource both from the classpath and the file system;
