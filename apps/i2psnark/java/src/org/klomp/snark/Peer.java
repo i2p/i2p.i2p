@@ -78,7 +78,7 @@ public class Peer implements Comparable<Peer>, BandwidthListener
   private final long _id;
   private final AtomicBoolean _disconnected = new AtomicBoolean();
 
-  final static long CHECK_PERIOD = PeerCoordinator.CHECK_PERIOD; // 40 seconds
+  final static long CHECK_PERIOD = PeerCoordinator.CHECK_PERIOD;
   final static int RATE_DEPTH = PeerCoordinator.RATE_DEPTH; // make following arrays RATE_DEPTH long
   private final long uploaded_old[] = {-1,-1,-1};
   private final long downloaded_old[] = {-1,-1,-1};

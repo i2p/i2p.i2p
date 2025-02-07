@@ -22,7 +22,7 @@ import net.i2p.util.SyntheticREDQueue;
  *  and current moving averages of up, down, and requested bandwidth.
  *
  *  At the lower layers, simple weighted moving averages of
- *  three buckets of 40 seconds each (2 minutes total) are used
+ *  three buckets of time PeerCoordinator.CHECK_PERIOD each are used
  *  for up and down, and requested is delegated here.
  *
  *  The lower layers must report to the next-higher layer.
