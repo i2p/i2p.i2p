@@ -147,6 +147,14 @@ public class KeysAndCert extends DataStructureImpl {
         _padding = padding;
         compressPadding();
     }
+
+    /**
+     * Is there compressible padding?
+     * @since 0.9.66
+     */
+    public boolean isCompressible() {
+        return _paddingBlocks > 1;
+    }
     
     /**
      * @throws IllegalStateException if data already set
@@ -165,6 +173,7 @@ public class KeysAndCert extends DataStructureImpl {
             byte[] pad1 = pk.getPadding(kcert);
             byte[] pad2 = spk.getPadding(kcert);
             _padding = combinePadding(pad1, pad2);
+            compressPadding();
             _certificate = kcert;
         } else {
             _publicKey = pk;
