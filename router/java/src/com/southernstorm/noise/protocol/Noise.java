@@ -30,6 +30,9 @@ import java.util.Arrays;
 
 import javax.crypto.BadPaddingException;
 
+import net.i2p.crypto.SHA256Generator;
+
+
 /**
  * Utility functions for the Noise protocol library.
  */
@@ -72,21 +75,26 @@ public final class Noise {
 	 */
 	public static MessageDigest createHash(String name) throws NoSuchAlgorithmException
 	{
-		// Look for a JCA/JCE provider first and if that doesn't work,
-		// use the fallback implementations in this library instead.
-		// The only algorithm that is required to be implemented by a
-		// JDK is "SHA-256", although "SHA-512" is fairly common as well.
 		if (name.equals("SHA256")) {
-			try {
-				return MessageDigest.getInstance("SHA-256");
-			} catch (NoSuchAlgorithmException e) {
-			}
+			return SHA256Generator.getInstance().acquire();
 		}
 		throw new NoSuchAlgorithmException("Unknown Noise hash algorithm name: " + name);
 	}
 
 	// The rest of this class consists of internal utility functions
 	// that are not part of the public API.
+
+	/**
+	 * I2P Release a hash object back to the pool.
+	 * 
+	 * @since 0.9.66
+	 */
+	static void releaseHash(MessageDigest hash)
+	{
+		if (hash.getAlgorithm().equals("SHA-256")) {
+			SHA256Generator.getInstance().release(hash);
+		}
+	}
 
 	/**
 	 * Destroys the contents of a byte array.

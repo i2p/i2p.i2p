@@ -62,6 +62,7 @@ class SymmetricState implements Destroyable, Cloneable {
 			md.digest(INIT_HASH_N, 0, 32);
 			md.update(INIT_CK_XK_SSU2, 0, 32);
 			md.digest(INIT_HASH_XK_SSU2, 0, 32);
+			Noise.releaseHash(md);
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
@@ -87,6 +88,7 @@ class SymmetricState implements Destroyable, Cloneable {
 				MessageDigest hash = Noise.createHash("SHA256");
 				hash.update(protocolNameBytes, 0, protocolNameBytes.length);
 				hash.digest(rv, 0, 32);
+				Noise.releaseHash(hash);
 			} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
@@ -403,6 +405,7 @@ class SymmetricState implements Destroyable, Cloneable {
 	public void destroy() {
 		cipher.destroy();
 		hash.reset();
+		Noise.releaseHash(hash);
 		Noise.destroy(ck);
 		Noise.destroy(h);
 		Noise.destroy(prev_h);
