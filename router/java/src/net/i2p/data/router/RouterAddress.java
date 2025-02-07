@@ -292,7 +292,9 @@ public class RouterAddress extends DataStructureImpl {
             _transportStyle = "NTCP";
         else if (_transportStyle.equals("SSU2"))
             _transportStyle = "SSU2";
-        DataHelper.readProperties(in, _options);
+        // enforce mapping order so bad ones will fail-fast
+        // before the signature check
+        DataHelper.readProperties(in, _options, true);
     }
     
     /**

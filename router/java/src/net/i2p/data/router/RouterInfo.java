@@ -606,7 +606,9 @@ public class RouterInfo extends DatabaseEntry {
                 _peers.add(peerIdentityHash);
             }
         }
-        DataHelper.readProperties(din, _options);
+        // enforce mapping order so bad ones will fail-fast
+        // before the signature check
+        DataHelper.readProperties(din, _options, true);
         _signature = new Signature(type);
         _signature.readBytes(in);
 

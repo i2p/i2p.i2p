@@ -134,7 +134,8 @@ public class DataHelper {
      * is repeated until there are no more bytes (not characters!) left as defined by the
      * first two byte integer.
      *
-     *  As of 0.9.18, throws DataFormatException on duplicate key
+     * As of 0.9.18, throws DataFormatException on duplicate key
+     * Does NOT enforce key ordering.
      *
      * @param rawStream stream to read the mapping from
      * @throws DataFormatException if the format is invalid
@@ -152,6 +153,7 @@ public class DataHelper {
      *  Ditto, load into an existing properties
      *
      *  As of 0.9.18, throws DataFormatException on duplicate key
+     *  Does NOT enforce key ordering.
      *
      *  @param props The Properties to load into.
      *               As of 0.9.38, if null, a new OrderedProperties will be created.
@@ -164,6 +166,26 @@ public class DataHelper {
      */
     public static Properties readProperties(InputStream rawStream, Properties props) 
         throws DataFormatException, IOException {
+        return readProperties(rawStream, props, false);
+    }
+
+    /**
+     *  Ditto, load into an existing properties
+     *
+     *  As of 0.9.18, throws DataFormatException on duplicate key
+     *
+     *  @param props The Properties to load into.
+     *               As of 0.9.38, if null, a new OrderedProperties will be created.
+     *  @param rawStream stream to read the mapping from
+     *  @param enforceOrder if true, throw DataFormatException if keys are not ordered
+     *  @throws DataFormatException if the format is invalid
+     *  @throws IOException if there is a problem reading the data
+     *  @return the parameter props, or (as of 0.9.38) a new OrderedProperties if props is null,
+     *                               and an immutable EmptyProperties if empty.
+     *  @since 0.9.66
+     */
+    public static Properties readProperties(InputStream rawStream, Properties props, boolean enforceOrder) 
+        throws DataFormatException, IOException {
         int size = (int) readLong(rawStream, 2);
         if (size == 0) {
             return (props != null) ? props : EmptyProperties.INSTANCE;
@@ -174,11 +196,15 @@ public class DataHelper {
         // full read guaranteed
         read(rawStream, data);
         ByteArrayInputStream in = new ByteArrayInputStream(data);
+        String prev = "";
         while (in.available() > 0) {
             String key = readString(in);
             String cached = _propertiesKeyCache.get(key);
             if (cached != null)
                 key = cached;
+            if (enforceOrder && key.compareTo(prev) <= 0)
+                throw new DataFormatException("option " + key + " out of order");
+            prev = key;
             int b = in.read();
             if (b != '=')
                 throw new DataFormatException("Bad key");
