@@ -31,12 +31,6 @@ public class AddressByNameSorter implements Comparator<AddressBean>, Serializabl
 {
 	public int compare(AddressBean a, AddressBean b)
 	{
-		if( a == null )
-			return 1;
-		
-		if( b == null )
-			return -1;
-		
 		return a.getDisplayName().compareToIgnoreCase(b.getDisplayName());
 	}	
 }
