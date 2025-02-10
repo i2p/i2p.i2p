@@ -1232,7 +1232,17 @@ public class Reseeder {
     public static void main(String args[]) throws Exception {
         if (args.length == 1 && args[0].equals("help")) {
             System.out.println("Usage: reseeder [https://hostname/ ...]");
+            System.out.println("       reseeder list");
             System.exit(1);
+        }
+        if (args.length == 1 && args[0].equals("list")) {
+            System.out.println("Configured reseeds:");
+            String[] urls = DataHelper.split(DEFAULT_SSL_SEED_URL, ",");
+            Arrays.sort(urls);
+            for (int i = 0; i < urls.length; i++) {
+                System.out.println(urls[i]);
+            }
+            System.exit(0);
         }
         File f = new File("certificates");
         if (!f.exists()) {
