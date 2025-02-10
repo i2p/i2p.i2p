@@ -44,7 +44,7 @@ class PacketHandler {
     private static final int MIN_NUM_HANDLERS = 1;  // unless < 32MB
     private static final int MAX_NUM_HANDLERS = 1;
     
-    PacketHandler(RouterContext ctx, UDPTransport transport, boolean enableSSU1, boolean enableSSU2, EstablishmentManager establisher,
+    PacketHandler(RouterContext ctx, UDPTransport transport, EstablishmentManager establisher,
                   InboundMessageFragments inbound, PeerTestManager testManager, IntroductionManager introManager) {
         _context = ctx;
         _log = ctx.logManager().getLog(PacketHandler.class);
