@@ -208,11 +208,11 @@
 
     <target name="standalone" depends="standalone_prep">
        <!-- doesn't support file permissions
-        <zip destfile="i2psnark-standalone.zip">
-          <zipfileset dir="./i2psnark/" />
+        <zip destfile="build/i2psnark-standalone.zip">
+          <zipfileset dir="./build/i2psnark/" fullpath="i2psnark" />
         </zip>
        -->
-        <exec executable="zip" failifexecutionfails="true" failonerror="true" >
+        <exec executable="zip" dir="build" failifexecutionfails="true" failonerror="true" >
             <arg value="-r" />
             <arg value="i2psnark-standalone.zip" />
             <arg value="i2psnark" />
@@ -340,34 +340,32 @@
     </target>
 
     <target name="standalone_prep" depends="standalone_jar, standalone_war">
-        <delete dir="./i2psnark" />
-        <mkdir dir="./i2psnark" />
-        <copy file="../launch-i2psnark" todir="./i2psnark/" />
-        <chmod type="file" file="./i2psnark/launch-i2psnark" perm="+x" />
-        <copy file="../launch-i2psnark.bat" todir="./i2psnark/" />
-        <mkdir dir="./i2psnark/contexts" />
-        <copy file="../standalone-context.xml" tofile="./i2psnark/contexts/context.xml" />
-        <mkdir dir="./i2psnark/docroot" />
-        <copy file="../standalone-index.html" tofile="./i2psnark/docroot/index.html" />
-        <mkdir dir="./i2psnark/webapps" />
-        <copy file="../i2psnark.war" tofile="./i2psnark/webapps/i2psnark.war" />
-        <copy file="../jetty-i2psnark.xml" tofile="./i2psnark/jetty-i2psnark.xml" />
-        <copy file="../i2psnark-appctx.config" tofile="./i2psnark/i2psnark-appctx.config" />
-        <copy file="./build/i2psnark-standalone.jar" tofile="./i2psnark/i2psnark.jar" />
-        <copy file="../readme-standalone.txt" tofile="./i2psnark/readme.txt" />
+        <delete dir="./build/i2psnark" />
+        <mkdir dir="./build/i2psnark" />
+        <copy file="../launch-i2psnark" todir="./build/i2psnark/" />
+        <chmod type="file" file="./build/i2psnark/launch-i2psnark" perm="+x" />
+        <copy file="../launch-i2psnark.bat" todir="./build/i2psnark/" />
+        <mkdir dir="./build/i2psnark/contexts" />
+        <copy file="../standalone-context.xml" tofile="./build/i2psnark/contexts/context.xml" />
+        <mkdir dir="./build/i2psnark/docroot" />
+        <copy file="../standalone-index.html" tofile="./build/i2psnark/docroot/index.html" />
+        <mkdir dir="./build/i2psnark/webapps" />
+        <copy file="../i2psnark.war" tofile="./build/i2psnark/webapps/i2psnark.war" />
+        <copy file="../jetty-i2psnark.xml" tofile="./build/i2psnark/jetty-i2psnark.xml" />
+        <copy file="../i2psnark-appctx.config" tofile="./build/i2psnark/i2psnark-appctx.config" />
+        <copy file="./build/i2psnark-standalone.jar" tofile="./build/i2psnark/i2psnark.jar" />
+        <copy file="../readme-standalone.txt" tofile="./build/i2psnark/readme.txt" />
         <!-- temp so announces work -->
-        <copy file="../../../installer/resources/hosts.txt" tofile="./i2psnark/hosts.txt" />
-        <copy todir="./i2psnark/licenses" >
+        <copy file="../../../installer/resources/hosts.txt" tofile="./build/i2psnark/hosts.txt" />
+        <copy todir="./build/i2psnark/licenses" >
             <fileset dir="../../../licenses" includes="LICENSE-GPLv2.txt, ABOUT-Jetty.html" />
         </copy>
-        <mkdir dir="./i2psnark/logs" />
+        <mkdir dir="./build/i2psnark/logs" />
     </target>
 
     <target name="clean">
         <delete dir="./build" />
         <delete file="../i2psnark.war" />
-        <delete file="./i2psnark-standalone.zip" />
-        <delete dir="./i2psnark" />
     </target>
     <target name="cleandep" depends="clean">
     </target>

@@ -2281,7 +2281,7 @@
     <!-- standalone i2psnark zip -->
     <target name="i2psnark" depends="buildStreaming, buildJetty, buildSystray, jbigi, buildDesktopGui" >
         <ant dir="apps/i2psnark/java" target="standalone" />
-        <copy file="apps/i2psnark/java/i2psnark-standalone.zip" todir="." />
+        <copy file="apps/i2psnark/java/build/i2psnark-standalone.zip" todir="." />
     </target>
     <target name="i2psnark-release" depends="distclean, i2psnark" >
         <move file="i2psnark-standalone.zip" tofile="i2psnark-standalone-${release.number}.zip" />
