@@ -16,16 +16,20 @@ body {
 button {
     color: rgb(59, 107, 191);
     border: none;
-    background: none !important;
+    background: none;
     cursor: pointer;
     text-align: left;
     display: inline;
 }
 
+button.hover {
+    background-color: #9fc;
+}
+
 .unicodeicon {
     font-size: 16pt;
     display: inline-block;
-    padding: 3px 0;
+    padding: 3px 5px 3px 0;
     vertical-align: sub;
     line-height: 16px;
     font-weight: bold;
@@ -81,11 +85,16 @@ h4 {
 }
 
 img {
-    border: none;
+    border: 1px solid rgb(68, 68, 119);
 }
 
 td:nth-child(1) {
     font-weight: bold;
+}
+
+textarea {
+    moz-user-select: all;
+    webkit-user-select: all;
 }
 
 .formaction button p {
@@ -108,7 +117,7 @@ td:nth-child(1) {
     box-shadow: rgb(187, 187, 255) 0px 0px 0px 1px inset;
     background-position: initial initial;
     background-repeat: initial initial;
-    min-height: 175px;
+    min-height: 100px;
 }
 
 .logo hr {
@@ -135,7 +144,7 @@ td:nth-child(1) {
 }
 
 .warning {
-    padding: 10px 25px 20px 75px;
+    padding: 10px 25px 30px 255px;
     text-align: start;
     color: rgb(34, 34, 34);
     margin: 0px 10px;
@@ -168,7 +177,7 @@ td:nth-child(1) {
     border-top-right-radius: 2px;
     border-bottom-right-radius: 0px;
     border-bottom-left-radius: 0px;
-    padding: 10px 10px 8px;
+    padding: 0px 2px 8px;
     font-size: 1.1rem;
 }
 
@@ -191,6 +200,7 @@ td:nth-child(1) {
     .logo {
         position: absolute;
         top: 0px;
+        min-height: 100px;
         min-width: 430px;
         width: calc(100% - 40px) !important;
         margin: 10px 5px 0px !important;
@@ -223,7 +233,7 @@ hr {
     background-color: rgb(17, 17, 51);
     height: 1px;
     border: 0px solid rgb(17, 17, 51);
-    margin: 10px 0px;
+    margin: 20px 0px;
     background-position: initial initial;
     background-repeat: initial initial;
 }
@@ -252,8 +262,7 @@ a:hover {
 }
 
 p {
-    text-align: justify;
-    line-height: 130%;
+    line-height: 140%;
 }
 
 h3 {
@@ -363,6 +372,7 @@ tr,
 td {
     font-family: 'Droid Sans', 'Noto Sans', Ubuntu, 'Segoe UI', 'Lucida Grande', Verdana, Helvetica, sans-serif;
     font-size: 10pt;
+    padding: 1px 15px 5px 1px;
 }
 
 @media screen and (max-width: 1500px) {

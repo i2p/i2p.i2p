@@ -7,7 +7,7 @@ body {
     font-style: normal;
     font-variant: normal;
     font-weight: normal;
-    font-size: 8.5pt;
+    font-size: 9pt;
     line-height: 130%;
     font-family: 'Droid Sans', 'Noto Sans', Ubuntu, 'Segoe UI', 'Bitstream Vera Sans', 'DejaVu Sans', Verdana, 'Lucida Grande', Helvetica, sans-serif;
     background-position: initial initial;
@@ -18,7 +18,35 @@ h4 {
     display: inherit;
 }
 
-#jumplinks h4 {
+button {
+    color: rgb(59, 107, 191);
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    display: inline;
+}
+
+button.hover {
+    background-color: #340;
+}
+
+.formaction button p {
+    display: block;
+    color: rgb(230, 230, 231);
+}
+
+.unicodeicon {
+    font-size: 16pt;
+    display: inline-block;
+    padding: 3px 5px 3px 0;
+    vertical-align: sub;
+    line-height: 16px;
+    font-weight: bold;
+    text-shadow: rgb(255, 255, 255) 0px 1px 1px;
+}
+
+#jumplinks h3 {
     padding-bottom: 10px;
     margin-bottom: 10px;
 }
@@ -46,12 +74,13 @@ table {
     border-collapse: collapse;
     width: 100%;
     border: 1px groove rgb(82, 75, 94);
-    padding: 1px;
+    padding: 1px 15px 5px 1px;
     font-size: 9pt;
-    margin: 1px 0px;
+    margin: 25px 0px;
 }
 
 tr {
+    padding: 1px 15px 5px 1px;
     vertical-align: middle;
 }
 
@@ -60,101 +89,50 @@ tr:nth-child(odd) {
 }
 
 td {
-    padding: 4px 6px;
+    padding: 1px 15px 5px 1px;
     color: rgb(230, 230, 231);
     vertical-align: middle;
-    border-top-width: 1px;
-    border-top-style: inset;
-    border-top-color: rgb(41, 41, 41);
 }
 
 td img {
     padding: 0px 1px 0px 2px;
 }
 
+textarea {
+    background: rgb(50, 50, 50);
+    border-color: #555;
+    color: rgb(100, 120, 245);
+    moz-user-select: all;
+    webkit-user-select: all;
+}
+
 a:link {
-    color: rgb(119, 120, 191);
+    color: rgb(100, 120, 191);
     text-decoration: none;
     font-weight: bold;
     word-wrap: break-word;
 }
 
 a:visited {
-    color: rgb(119, 120, 191);
+    color: rgb(100, 120, 191);
     text-decoration: none;
     font-weight: bold;
     word-wrap: break-word;
 }
 
 p {
-    text-align: justify;
-    line-height: 160%;
+    line-height: 140%;
 }
 
 p img:first-child {
     display: none !important;
 }
 
-h1 {
-    text-align: left;
-    color: rgb(230, 230, 231);
-    padding: 13px 15px;
-    font-size: 17pt;
-    font-weight: bold;
-    font-style: normal;
-    letter-spacing: 0.15em;
-    text-shadow: rgb(0, 17, 0) 0px 0px 2px;
-    white-space: normal;
-    background-image: url(images/header.png);
-    background-color: rgb(0, 0, 0);
-    border: 1px solid rgb(41, 41, 41);
-    border-top-left-radius: 2px;
-    border-top-right-radius: 2px;
-    border-bottom-right-radius: 0px;
-    border-bottom-left-radius: 0px;
-    line-height: 120%;
-    min-width: 620px;
-    box-shadow: rgb(0, 0, 0) 0px 1px 5px;
-    margin: 0px 5px 0px 216px !important;
-    background-position: 50% 50%;
-    background-repeat: initial initial;
-}
-
-h2 {
-    font-size: 12pt;
-    color: rgb(230, 230, 231);
-    text-shadow: rgb(0, 17, 0) 0px 0px 2px;
-    letter-spacing: 0.08em;
-    word-spacing: 0.1em;
-    padding: 10px;
-    border: 1px solid rgb(41, 41, 41);
-    border-top-left-radius: 2px;
-    border-top-right-radius: 2px;
-    border-bottom-right-radius: 2px;
-    border-bottom-left-radius: 2px;
-    vertical-align: middle;
-    word-wrap: break-word;
-    margin: 15px 0px 12px !important;
-}
-
-h2 {
-    box-shadow: rgb(0, 0, 0) 0px 0px 0px 1px inset;
-}
-
-h1 {
-    background-color: rgb(31, 26, 36);
-    box-shadow: rgb(0, 0, 0) 0px 0px 0px 1px inset;
-    text-shadow: rgb(0, 0, 0) 0px 1px 1px;
-    border: 1px groove rgb(82, 75, 94);
-    background-position: initial initial;
-    background-repeat: initial initial;
-}
-
 hr {
-    background-color: rgb(225, 219, 233);
-    height: 1px;
+    background-color: rgb(68, 68, 119);
+    height: 2px;
     border: 0px solid rgb(82, 75, 94);
-    margin: 20px 0px 10px;
+    margin: 20px 0px 20px;
     background-position: initial initial;
     background-repeat: initial initial;
 }
@@ -172,12 +150,11 @@ hr:last-child {
 }
 
 .hostadd {
-    height: 10rem;
     width: 100%;
 }
 
 .hostaddform {
-    width: 48%;
+    width: 100%;
     display: inline-block;
     vertical-align: top;
 }
@@ -187,7 +164,7 @@ hr:last-child {
     padding: 10px;
     text-align: center;
     color: rgb(34, 34, 34);
-    margin: 0px 85px;
+    margin: 0px 10px;
     border: 1px solid rgb(68, 68, 119);
     border-top-left-radius: 2px;
     border-top-right-radius: 2px;
@@ -195,18 +172,17 @@ hr:last-child {
     border-bottom-left-radius: 2px;
     background-position: initial initial;
     background-repeat: initial initial;
-    min-height: 165px;
+    min-height: 100px;
 }
+
+.logo img {
+    filter: invert(90%) hue-rotate(190deg);
+}
+
 
 .logo hr {
     margin: 8px -10px;
     height: 1px;
-    background-position: initial initial;
-    background-repeat: initial initial;
-}
-
-.warning hr {
-    background-image: linear-gradient(to right, rgb(119, 120, 191), rgb(194, 196, 239));
     background-position: initial initial;
     background-repeat: initial initial;
 }
@@ -221,7 +197,7 @@ hr:last-child {
 }
 
 .warning {
-    padding: 10px 25px 20px 75px;
+    padding: 10px 25px 30px 255px;
     text-align: start;
     margin: 0px 10px;
     min-height: 165px;
@@ -237,8 +213,12 @@ hr:last-child {
 }
 
 .warning h3 {
+    border-bottom-color: rgb(68, 68, 119);
+    border-bottom-width: 2px;
+    border-style: none none solid;
+    color: #38f;
     text-align: left;
-    padding: 10px 10px 8px;
+    padding: 0px 2px 8px;
     font-size: 1.1rem;
 }
 
@@ -302,8 +282,5 @@ td {
 @media screen and (min-width: 1500px) {
     body {
         font-size: 10pt !important;
-    }
-    h1 {
-        margin-left: 242px !important;
     }
 }
