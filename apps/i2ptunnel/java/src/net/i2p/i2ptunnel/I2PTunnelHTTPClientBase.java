@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
+import net.i2p.CoreVersion;
 import net.i2p.client.streaming.I2PSocketException;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.data.Base64;
@@ -787,6 +788,8 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             if (!url.equals("http://127.0.0.1:7657/")) {
                 DataHelper.replace(out, "http://127.0.0.1:7657/", url);
             }
+            // version the CSS
+            DataHelper.replace(out, "/proxy.css\"", "/proxy.css?" + CoreVersion.VERSION + '"');
             String rv = out.toString();
             return rv;
         } finally {
