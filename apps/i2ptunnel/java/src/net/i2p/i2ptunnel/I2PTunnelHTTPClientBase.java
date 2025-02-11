@@ -1027,7 +1027,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                         first = false;
                         out.write("<br>\n<div id=\"jumplinks\">\n<h4>");
                         out.write(_t("Click a link below for an address helper from a jump service"));
-                        out.write("</h4>\n");
+                        out.write(":</h4>\n");
                     } else {
                         out.write("<br>");
                     }
