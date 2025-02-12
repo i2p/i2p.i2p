@@ -258,8 +258,11 @@ public class KeysAndCert extends DataStructureImpl {
         return
                DataHelper.eq(_signingKey, ident._signingKey)
                && DataHelper.eq(_publicKey, ident._publicKey)
-               && Arrays.equals(_padding, ident._padding)
-               && DataHelper.eq(_certificate, ident._certificate);
+               && DataHelper.eq(_certificate, ident._certificate)
+               && (Arrays.equals(_padding, ident._padding) ||
+                   // failsafe as some code paths may not compress padding
+                   ((_paddingBlocks > 1 || ident._paddingBlocks > 1) &&
+                    Arrays.equals(getPadding(), ident.getPadding())));
     }
     
     /** the signing key has enough randomness in it to use it by itself for speed */
