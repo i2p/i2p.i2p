@@ -739,7 +739,7 @@ class NetDbRenderer {
                         LeaseSet2 ls2 = (LeaseSet2) myLeaseSet;
                         long pub = now - ls2.getPublished();
                         buf.append(_t("{0} ago", DataHelper.formatDuration2(pub)));
-                        exp = ls2.getExpires()-now;;
+                        exp = ls2.getExpires()-now;
                         buf.append(" - ");
                     } else {
                         exp = myLeaseSet.getLatestLeaseDate() - now;
