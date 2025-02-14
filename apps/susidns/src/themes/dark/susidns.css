@@ -89,9 +89,17 @@ body.iframed {
      text-transform: capitalize;
 }
 
+#navi .active,
+#navi.private .private,
+#navi.local .local,
+#navi.router .router,
+#navi.published .published {
+     border: 2px solid #7F1A24 !important;
+}
+
 #navi a, #navi a:visited {
      color: #494 !important;
-     border: 1px solid #292929;
+     border: 1px solid #4F1A24;
      display: inline-block;
      margin: 1px -2px;
      box-shadow: inset 0 0 0 1px #000, 0 0 0 1px #000;

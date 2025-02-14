@@ -81,30 +81,25 @@ object {
      border-radius: 0;
      position: static
 }
-#navi a,
-#navi a:visited {
-     margin: 2px 0;
-     
-     font-weight: bold;
-}
+
+#navi .active,
 #navi.private .private,
-#navi.master .master,
+#navi.local .local,
 #navi.router .router,
 #navi.published .published {
      background: #4661A9 !important;
-     text-shadow: none !important;
      color: #fafaff !important;
 }
-#navi a:focus,
-#navi a.active,
-#navi a.abook,
-#navi a#subs,
-#navi a#config,
-#navi a#overview {
+
+#navi a,
+#navi a:visited {
+     margin: 2px 0;
+     font-weight: bold;
+     text-shadow: none !important;
      box-sizing: border-box;
      border: 1px solid #dee2e6;
      border-radius: 12px;
-     min-width: 60px!important;
+     min-width: 60px !important;
      line-height: 130%;
      background: #f6f6fa;
      box-shadow: inset 0 0 0 1px #f6f6fa;
@@ -112,6 +107,7 @@ object {
      padding: 3px 14px;
      color: #2c4e8f
 }
+
 #navi a:hover {
      background: #dee2e6 !important;
      box-shadow: inset 0 0 0 1px #dee2e6 !important;
