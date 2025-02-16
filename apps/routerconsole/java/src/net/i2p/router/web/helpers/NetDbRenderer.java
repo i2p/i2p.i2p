@@ -1422,8 +1422,25 @@ class NetDbRenderer {
                 }
             }
         }
-        buf.append("</td></tr>\n<tr>")
-           .append("<td><b>").append(_t("Addresses")).append(":</b></td><td colspan=\"2\"");
+        buf.append("</td></tr>\n");
+        if (full) {
+            String family = info.getOption("family");
+            if (family != null) {
+                FamilyKeyCrypto fkc = _context.router().getFamilyKeyCrypto();
+                if (fkc != null) {
+                    String f = DataHelper.stripHTML(family);
+                    buf.append("<tr><td><b>").append(_t("Family"))
+                       .append(":</b><td colspan=\"2\"><span class=\"netdb_info\">")
+                       .append(fkc.verify(info) == FamilyKeyCrypto.Result.STORED_KEY ? "Verified" : "Unverified")
+                       .append(" <a href=\"/netdb?fam=")
+                       .append(f)
+                       .append("\">")
+                       .append(f)
+                       .append("</a></span></td></tr>\n");
+                }
+            }
+        }
+        buf.append("<tr><td><b>").append(_t("Addresses")).append(":</b></td><td colspan=\"2\"");
         Collection<RouterAddress> addrs = info.getAddresses();
         if (addrs.isEmpty()) {
             buf.append('>').append(_t("none"));
@@ -1464,21 +1481,6 @@ class NetDbRenderer {
                 buf.append(DataHelper.stripHTML(key)).append(" = ").append(DataHelper.stripHTML(val)).append("<br>\n");
             }
             buf.append("</code></td></tr>\n");
-            String family = info.getOption("family");
-            if (family != null) {
-                FamilyKeyCrypto fkc = _context.router().getFamilyKeyCrypto();
-                if (fkc != null) {
-                    String f = DataHelper.stripHTML(family);
-                    buf.append("<tr><td><b>").append(_t("Family"))
-                       .append(":</b><td colspan=\"2\"><span class=\"netdb_info\">")
-                       .append(fkc.verify(info) == FamilyKeyCrypto.Result.STORED_KEY ? "Verified" : "Unverified")
-                       .append(" <a href=\"/netdb?fam=")
-                       .append(f)
-                       .append("\">")
-                       .append(f)
-                       .append("</a></span></td></tr>\n");
-                }
-            }
         }
         buf.append("</table>\n");
     }
