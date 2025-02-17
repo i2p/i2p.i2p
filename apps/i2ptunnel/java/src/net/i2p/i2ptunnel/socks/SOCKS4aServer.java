@@ -21,6 +21,7 @@ import net.i2p.I2PException;
 import net.i2p.app.ClientApp;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.Outproxy;
+import net.i2p.client.naming.NamingService;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.DataFormatException;
@@ -211,7 +212,7 @@ class SOCKS4aServer extends SOCKSServer {
 
         try {
             String hostLowerCase = connHostName.toLowerCase(Locale.US);
-            if (hostLowerCase.endsWith(".i2p")) {
+            if (NamingService.isI2PHost(hostLowerCase)) {
                 Destination dest = _context.namingService().lookup(connHostName);
                 if (dest == null) {
                     try {
