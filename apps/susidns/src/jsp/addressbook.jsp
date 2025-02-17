@@ -151,7 +151,15 @@ ${book.loadBookMessages}
 <c:if test="${book.notEmpty}">
 <div id="filter">
 <c:if test="${book.hasFilter}">
-<span><%=intl._t("Current filter")%>: <b>${book.filter}</b>
+<span><%=intl._t("Current filter")%>:
+<%
+    String f = book.getFilter();
+    if ("latest".equals(f))
+        f = intl._t(f);
+    else if ("xn--".equals(f))
+        f = intl._t("other");
+%>
+<b><%=f%></b>
 <a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._t("clear filter")%></a></span>
 </c:if>
 <c:if test="${!book.hasFilter}">
@@ -186,6 +194,9 @@ ${book.loadBookMessages}
 <a href="addressbook?filter=z&amp;begin=0&amp;end=49">z</a>
 <a href="addressbook?filter=0-9&amp;begin=0&amp;end=49">0-9</a>
 <a href="addressbook?filter=xn--&amp;begin=0&amp;end=49"><%=intl._t("other")%></a>
+<% if (!book.getBook().equals("published")) { %>
+   <a href="addressbook?filter=latest&amp;begin=0&amp;end=49"><%=intl._t("latest")%></a>
+<% } %>
 <a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._t("all")%></a>
 </p>
 </div>
