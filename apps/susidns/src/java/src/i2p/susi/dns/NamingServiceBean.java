@@ -167,8 +167,9 @@ public class NamingServiceBean extends AddressbookBean
 			Map<String, Destination> results;
 			Properties searchProps = new Properties();
 			// only blockfile needs this
+			boolean sortByDate = "latest".equals(filter);
 			searchProps.setProperty("list", getFileName());
-			if (filter != null) {
+			if (filter != null && !sortByDate) {
 				String startsAt = filter.equals("0-9") ? "[0-9]" : filter;
 				searchProps.setProperty("startsWith", startsAt);
 			}
@@ -188,7 +189,7 @@ public class NamingServiceBean extends AddressbookBean
 			debug("Result count: " + results.size());
 			for (Map.Entry<String, Destination> entry : results.entrySet()) {
 				String name = entry.getKey();
-				if( filter != null && filter.length() > 0 ) {
+				if (filter != null && filter.length() > 0 && !sortByDate) {
 					if (filter.equals("0-9")) {
 						char first = name.charAt(0);
 						if( first < '0' || first > '9' )
@@ -205,15 +206,25 @@ public class NamingServiceBean extends AddressbookBean
 				}
 				String destination = entry.getValue().toBase64();
 				if (destination != null) {
-					list.addLast( new AddressBean( name, destination ) );
+					AddressBean bean = new AddressBean(name, destination);
+					if (sortByDate) {
+						Properties p = new Properties();
+						Destination d = service.lookup(name, searchProps, p);
+						if (d != null && !p.isEmpty())
+							bean.setProperties(p);
+					}
+					list.addLast(bean);
 				} else {
 					// delete it too?
 					System.err.println("Bad entry " + name + " in database " + service.getName());
 				}
 			}
 			AddressBean array[] = list.toArray(new AddressBean[list.size()]);
-			if (!(results instanceof SortedMap))
-			    Arrays.sort( array, sorter );
+			if (sortByDate) {
+				Arrays.sort(array, new AddressByDateSorter());
+			} else if (!(results instanceof SortedMap)) {
+				Arrays.sort(array, sorter);
+			}
 			entries = array;
 
 			message = generateLoadMessage();

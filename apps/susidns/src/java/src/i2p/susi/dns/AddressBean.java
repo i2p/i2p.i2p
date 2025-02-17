@@ -266,10 +266,13 @@ public class AddressBean
                 return stype.toString();
 	}
 
-	/** @since 0.8.7 */
-	private String getProp(String p) {
+	/**
+	 * @return non-null, "" if not found
+	 * @since 0.8.7, package private since 0.9.66
+	 */
+	String getProp(String p) {
 		if (props == null)
-                    return "";
+			return "";
 		String rv = props.getProperty(p);
 		return rv != null ? rv : "";
 	}
