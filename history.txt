@@ -1,3 +1,20 @@
+2025-02-17 zzz
+ * i2ptunnel: Add .i2p.alt support to HTTP and SOCKS client tunnels (MR 222)
+ * SusiDNS: Implement sort-by-added-date (MR 231)
+
+2025-02-14 zzz
+ * SusiDNS: Navbar CSS fixes/tweaks
+
+2025-02-11 zzz
+ * i2ptunnel: Proxy error page improvements
+
+2025-02-10 zzz
+ * Router: Unused stats removal
+ * Transport: More SSU1 code removal
+
+2025-02-09 zzz
+ * SusiDNS: Remove null checks in comparator
+
 2025-02-07 zzz
  * Build: Check for mismatched version in Izpack config files
  * Crypto:
