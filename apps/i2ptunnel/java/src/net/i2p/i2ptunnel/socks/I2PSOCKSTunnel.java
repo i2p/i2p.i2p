@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import net.i2p.client.naming.NamingService;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.Destination;
@@ -134,7 +135,7 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
                int colon = proxy.indexOf(':');
                if (colon > 0)
                    host = host.substring(0, colon);
-               if (host.endsWith(".i2p")) {
+               if (NamingService.isI2PHost(host)) {
                    proxyList.add(proxy);
                } else {
                    String m = "Non-i2p SOCKS outproxy: " + proxy;

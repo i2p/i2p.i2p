@@ -13,6 +13,7 @@ import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -738,6 +739,61 @@ public abstract class NamingService {
     }
 
     //// End new API for multiple Destinations
+
+    /**
+     * Is this an i2p hostname?
+     *
+     * ref: https://www.rfc-editor.org/rfc/rfc9476.html
+     *
+     * @param hostname non-null
+     * @return true if hostname (case insensitive) ends with .i2p or .i2p.alt
+     * @since 0.9.66
+     */
+    public static boolean isI2PHost(String hostname) {
+        String lc = hostname.toLowerCase(Locale.US);
+        return lc.endsWith(".i2p") || lc.endsWith(".i2p.alt");
+    }
+
+    /**
+     * Is this a b32 hostname?
+     * Does NOT validate the base32 part except for length.
+     *
+     * ref: https://www.rfc-editor.org/rfc/rfc9476.html
+     *
+     * @param hostname non-null
+     * @return true if hostname (case insensitive) ends with .b32.i2p or .b32.i2p.alt
+     *              and is long enough. May or may not be blinded.
+     * @since 0.9.66
+     */
+    public static boolean isB32Host(String hostname) {
+        int len = hostname.length();
+        if (len < 60)
+            return false;
+        String lc = hostname.toLowerCase(Locale.US);
+        return lc.endsWith(".b32.i2p") ||
+               (len >= 64 && lc.endsWith(".b32.i2p.alt"));
+    }
+
+    /**
+     * Is this a blinded ("b33") hostname?
+     * Does NOT validate the base32 part except for length.
+     * See Blinding.decode() for full validation.
+     *
+     * ref: https://www.rfc-editor.org/rfc/rfc9476.html
+     *
+     * @param hostname non-null
+     * @return true if hostname (case insensitive) ends with .b32.i2p or .b32.i2p.alt
+     *              and is long enough.
+     * @since 0.9.66
+     */
+    public static boolean isBlindedHost(String hostname) {
+        int len = hostname.length();
+        if (len < 64)
+            return false;
+        String lc = hostname.toLowerCase(Locale.US);
+        return lc.endsWith(".b32.i2p") ||
+               (len >= 68 && lc.endsWith(".b32.i2p.alt"));
+    }
 
     /**
      * WARNING - for use by I2PAppContext only - others must use

@@ -25,6 +25,7 @@ import net.i2p.app.ClientAppManager;
 import net.i2p.app.Outproxy;
 import net.i2p.client.I2PSession;
 import net.i2p.client.LookupResult;
+import net.i2p.client.naming.NamingService;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketOptions;
@@ -664,7 +665,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             host = null;
                             break;
                         }
-                    } else if(hostLowerCase.endsWith(".i2p")) {
+                    } else if(NamingService.isI2PHost(hostLowerCase)) {
                         // Destination gets the hostname
                         destination = host;
                         // Host becomes the destination's "{b32}.b32.i2p" string, or "i2p" on lookup failure
@@ -1279,7 +1280,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 }
             } else if("i2p".equals(host)) {
                 clientDest = null;
-            } else if (destination.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
+            } else if (NamingService.isB32Host(destination)) {
                 int len = destination.length();
                 if (len < 60 || (len >= 61 && len <= 63)) {
                     // 8-59 or 61-63 chars, this won't work
@@ -1289,7 +1290,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     } catch (IOException ioe) {}
                     return;
                 }
-                if (len >= 64) {
+                if (NamingService.isBlindedHost(destination)) {
                     // catch b33 errors before session lookup
                     try {
                         BlindData bd = Blinding.decode(_context, destination);
@@ -1363,7 +1364,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     header = getErrorPage("dnfp", ERR_DESTINATION_UNKNOWN);
                 } else if(ahelperPresent) {
                     header = getErrorPage("dnfb", ERR_DESTINATION_UNKNOWN);
-                } else if(destination.length() >= 60 && destination.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
+                } else if (NamingService.isB32Host(destination)) {
                     header = getErrorPage("nols", ERR_DESTINATION_UNKNOWN);
                     extraMessage = _t("Destination lease set not found");
                 } else {
@@ -1728,7 +1729,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         if(host == null) {
             return null;
         }
-        if (host.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
+        if (NamingService.isB32Host(host)) {
             return host;
         }
         Destination dest = _context.namingService().lookup(host);
