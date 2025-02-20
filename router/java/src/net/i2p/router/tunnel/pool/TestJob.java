@@ -25,7 +25,7 @@ import net.i2p.util.Log;
  *  Repeatedly test a single tunnel for its entire lifetime,
  *  or until the pool is shut down or removed from the client manager.
  *
- *  Tunnel testing is disabled by default now, except for hidden mode,
+ *  Tunnel testing is enabled by default.
  *  see TunnelPoolManager.buildComplete()
  */
 class TestJob extends JobImpl {
@@ -76,6 +76,10 @@ class TestJob extends JobImpl {
         if (ctx.router().gracefulShutdownInProgress())
             return;   // don't reschedule
         _found = false;
+        // NOTE:
+        // We now only support client-to-client and expl-to-expl testing.
+        // To support "mixed" testing, fix sendTest() to use the SKM
+        // of the inbound tunnel.
         boolean isExpl = _pool.getSettings().isExploratory();
         if (_cfg.isInbound()) {
             _replyTunnel = _cfg;
@@ -121,9 +125,14 @@ class TestJob extends JobImpl {
         // remembering that key+tag so that we can decrypt it later.  this means we can do the
         // garlic encryption without any ElGamal (yay)
         final RouterContext ctx = getContext();
+        _id = __id.getAndIncrement();
         if (ctx.random().nextInt(4) != 0) {
             MessageWrapper.OneTimeSession sess;
-            if (_cfg.isInbound() && !_pool.getSettings().isExploratory()) {
+            // NOTE:
+            // We now only support client-to-client and expl-to-expl testing.
+            // To support "mixed" testing, fix this to use the SKM
+            // of the inbound tunnel, not the tested tunnel.
+            if (!_pool.getSettings().isExploratory()) {
                 // to client. false means don't force AES
                 sess = MessageWrapper.generateSession(ctx, _pool.getSettings().getDestination(), testPeriod, false);
             } else {
@@ -153,7 +162,6 @@ class TestJob extends JobImpl {
             if (_log.shouldDebug())
                 _log.debug("Sending tunnel test unencrypted, test #" + _id);
         }
-        _id = __id.getAndIncrement();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending garlic test #" + _id + " msg ID: " + m.getUniqueId() + " of " + _outTunnel + " / " + _replyTunnel);
         ctx.tunnelDispatcher().dispatchOutbound(m, _outTunnel.getSendTunnelId(0),
