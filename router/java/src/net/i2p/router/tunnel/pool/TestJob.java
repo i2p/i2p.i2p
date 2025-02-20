@@ -151,11 +151,11 @@ class TestJob extends JobImpl {
         } else {
             // Periodically send unencrypted DSM to provide cover for netdb replies
             if (_log.shouldDebug())
-                _log.debug("Sending garlic test unencrypted");
+                _log.debug("Sending tunnel test unencrypted, test #" + _id);
         }
         _id = __id.getAndIncrement();
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending garlic test #" + _id + " of " + _outTunnel + " / " + _replyTunnel);
+            _log.debug("Sending garlic test #" + _id + " msg ID: " + m.getUniqueId() + " of " + _outTunnel + " / " + _replyTunnel);
         ctx.tunnelDispatcher().dispatchOutbound(m, _outTunnel.getSendTunnelId(0),
                                                          _replyTunnel.getReceiveTunnelId(0),
                                                          _replyTunnel.getPeer(0));
