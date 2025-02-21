@@ -1139,9 +1139,9 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
                     _bwManager.setDownBWLimit(limit * 1000L);
                     changed = true;
                     _config.setProperty(PROP_DOWNBW_MAX, Integer.toString(limit));
-                    //addMessage(_t("Up BW limit changed to {0}KBps", limit));
+                    addMessage(_t("Down BW limit changed to {0}KBps", limit));
                 } else {
-                    //addMessage(_t("Minimum up bandwidth limit is {0}KBps", MIN_UP_BW));
+                    addMessage(_t("Minimum down bandwidth limit is {0}KBps", MIN_DOWN_BW));
                 }
             }
         }
