@@ -1,11 +1,11 @@
 package net.i2p.router.tunnel.pool;
 
 import java.util.List;
+import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.ChaCha20;
 import net.i2p.crypto.EncType;
-import net.i2p.data.EmptyProperties;
 import net.i2p.data.Hash;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
@@ -34,11 +34,12 @@ abstract class BuildMessageGenerator {
      * @param peerKey Encrypt using this key.
      *                If null, replyRouter and replyTunnel are ignored,
      *                and the entire record is filled with random data
+     * @param props to go in the build record, non-null
      * @throws IllegalArgumentException if hop bigger than config
      */
     public static void createRecord(int recordNum, int hop, TunnelBuildMessage msg,
                                     TunnelCreatorConfig cfg, Hash replyRouter,
-                                    long replyTunnel, RouterContext ctx, PublicKey peerKey) {
+                                    long replyTunnel, RouterContext ctx, PublicKey peerKey, Properties props) {
         int mtype = msg.getType();
         boolean isShort = mtype == ShortTunnelBuildMessage.MESSAGE_TYPE;
         EncryptedBuildRecord erec;
@@ -46,9 +47,9 @@ abstract class BuildMessageGenerator {
             boolean isEC = peerKey.getType() == EncType.ECIES_X25519;
             BuildRequestRecord req;
             if ( (!cfg.isInbound()) && (hop + 1 == cfg.getLength()) ) //outbound endpoint
-                req = createUnencryptedRecord(ctx, cfg, hop, replyRouter, replyTunnel, isEC, isShort);
+                req = createUnencryptedRecord(ctx, cfg, hop, replyRouter, replyTunnel, isEC, isShort, props);
             else
-                req = createUnencryptedRecord(ctx, cfg, hop, null, -1, isEC, isShort);
+                req = createUnencryptedRecord(ctx, cfg, hop, null, -1, isEC, isShort, props);
             if (req == null)
                 throw new IllegalArgumentException("hop bigger than config");
             Hash peer = cfg.getPeer(hop);
@@ -90,10 +91,11 @@ abstract class BuildMessageGenerator {
      *  @param replyTunnel -1 unless we are the OBEP
      *  @param isEC must be true if isShort is true
      *  @param isShort short EC record
+     *  @param props to go in the build record, non-null
      */
     private static BuildRequestRecord createUnencryptedRecord(I2PAppContext ctx, TunnelCreatorConfig cfg, int hop,
                                                               Hash replyRouter, long replyTunnel, boolean isEC,
-                                                              boolean isShort) {
+                                                              boolean isShort, Properties props) {
         if (isShort && !isEC)
             throw new IllegalArgumentException();
         if (hop < cfg.getLength()) {
@@ -136,7 +138,7 @@ abstract class BuildMessageGenerator {
                 if (isShort) {
                     rec = new BuildRequestRecord(ctx, recvTunnelId, nextTunnelId, nextPeer,
                                                  nextMsgId,
-                                                 isInGW, isOutEnd, EmptyProperties.INSTANCE);
+                                                 isInGW, isOutEnd, props);
                 } else {
                     SessionKey layerKey = hopConfig.getLayerKey();
                     SessionKey ivKey = hopConfig.getIVKey();
@@ -146,7 +148,7 @@ abstract class BuildMessageGenerator {
                         throw new IllegalStateException();
                     rec = new BuildRequestRecord(ctx, recvTunnelId, nextTunnelId, nextPeer,
                                                  nextMsgId, layerKey, ivKey, replyKey, 
-                                                 iv, isInGW, isOutEnd, EmptyProperties.INSTANCE);
+                                                 iv, isInGW, isOutEnd, props);
                 }
             } else {
                 SessionKey layerKey = hopConfig.getLayerKey();
