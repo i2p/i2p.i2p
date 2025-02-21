@@ -18,6 +18,7 @@ import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
+import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
@@ -949,6 +950,8 @@ public class TunnelController implements Logging {
                         _config.setProperty(OPT_POST_TOTAL_MAX, Integer.toString(I2PTunnelHTTPServer.DEFAULT_POST_TOTAL_MAX));
                     }
                 }
+                if (!_config.containsKey(I2PSocketOptions.PROP_PROFILE))
+                    _config.setProperty(I2PSocketOptions.PROP_PROFILE, Integer.toString(I2PSocketOptions.PROFILE_BULK));
             }
             if (isClient(type) &&
                 (type.equals(TYPE_HTTP_CLIENT) || Boolean.parseBoolean(_config.getProperty(PROP_SHARED)))) {

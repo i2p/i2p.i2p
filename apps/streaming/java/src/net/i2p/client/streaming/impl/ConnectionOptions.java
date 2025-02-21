@@ -70,9 +70,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     
     // NOTE - almost all the options are below, but see
     // I2PSocketOptions in ministreaming for a few more
-
-    public static final int PROFILE_BULK = 1;
-    public static final int PROFILE_INTERACTIVE = 2;
     
     /** on inactivity timeout, do nothing */
     public static final int INACTIVITY_ACTION_NOOP = 0;
@@ -93,7 +90,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private static final int INITIAL_RTO = 9000; 
     
     public static final String PROP_CONNECT_DELAY = "i2p.streaming.connectDelay";
-    public static final String PROP_PROFILE = "i2p.streaming.profile";
     public static final String PROP_MAX_MESSAGE_SIZE = "i2p.streaming.maxMessageSize";
     public static final String PROP_MAX_RESENDS = "i2p.streaming.maxResends";
     public static final String PROP_INITIAL_RESEND_DELAY = "i2p.streaming.initialResendDelay";

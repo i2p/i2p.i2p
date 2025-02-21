@@ -336,6 +336,8 @@ public class I2PSnarkUtil implements DisconnectListener {
                 opts.setProperty("i2p.streaming.disableRejectLogging", "true");
             if (opts.getProperty("i2p.streaming.answerPings") == null)
                 opts.setProperty("i2p.streaming.answerPings", "false");
+            if (opts.getProperty(I2PSocketOptions.PROP_PROFILE) == null)
+                opts.setProperty(I2PSocketOptions.PROP_PROFILE, Integer.toString(I2PSocketOptions.PROFILE_BULK));
             if (opts.getProperty(I2PClient.PROP_SIGTYPE) == null)
                 opts.setProperty(I2PClient.PROP_SIGTYPE, "EdDSA_SHA512_Ed25519");
             if (opts.getProperty("i2cp.leaseSetEncType") == null)
