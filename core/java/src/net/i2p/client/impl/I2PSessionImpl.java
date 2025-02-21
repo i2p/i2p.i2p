@@ -370,7 +370,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 throw new I2PSessionException("Subsession request already pending");
             sub = new SubSession(this, privateKeyStream, opts);
             for (SubSession ss : _subsessions) {
-                 if (ss.getDecryptionKey().equals(sub.getDecryptionKey()) &&
+                 if (/*  ss.getDecryptionKey().equals(sub.getDecryptionKey()) && */
                      ss.getPrivateKey().equals(sub.getPrivateKey())) {
                     throw new I2PSessionException("Dup subsession");
                 }
@@ -1145,7 +1145,9 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
 
     /**
      * Retrieve the decryption PrivateKey 
+     * @deprecated this key is unused
      */
+    @Deprecated
     public PrivateKey getDecryptionKey() { return _privateKey; }
 
     /**

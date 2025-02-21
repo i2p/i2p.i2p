@@ -298,8 +298,9 @@ public interface I2PSession {
 
     /**
      * Retrieve the decryption PrivateKey associated with the Destination
-     *
+     * @deprecated this key is unused
      */
+    @Deprecated
     public PrivateKey getDecryptionKey();
 
     /**

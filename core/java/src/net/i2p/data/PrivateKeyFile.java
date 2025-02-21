@@ -824,7 +824,9 @@ public class PrivateKeyFile {
      *  Private key may be random data or all zeros for Destinations as of 0.9.57
      *
      *  @return null on error or if not initialized
+     *  @deprecated this key is unused
      */
+    @Deprecated
     public PrivateKey getPrivKey() {
         try {
             // call this to force initialization
