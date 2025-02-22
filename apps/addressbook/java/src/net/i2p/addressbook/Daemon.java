@@ -32,12 +32,14 @@ import java.util.Properties;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientAppManager;
 import net.i2p.client.naming.HostTxtEntry;
 import net.i2p.client.naming.NamingService;
 import net.i2p.client.naming.SingleFileNamingService;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.util.OrderedProperties;
+import net.i2p.util.PortMapper;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SystemVersion;
 
@@ -668,6 +670,13 @@ class Daemon {
                            deleted + " deleted, " +
                            invalid + " invalid, " +
                            conflict + " conflicts");
+            }
+            if (nnew > 0) {
+                ClientAppManager cmgr = I2PAppContext.getGlobalContext().clientAppManager();
+                if (cmgr != null) {
+                    int nc = cmgr.getBubbleCount(PortMapper.SVC_SUSIDNS);
+                    cmgr.setBubble(PortMapper.SVC_SUSIDNS, nc + nnew, null);
+                }
             }
     }
 

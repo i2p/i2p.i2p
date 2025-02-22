@@ -635,6 +635,25 @@ p:empty+.sb_notice {
     margin-top: 9px;
 }
 
+.notifcount {
+    background-color: #e33;
+    border: 1px solid #e33;
+    border-radius: 9px;
+    color: #fff;
+    margin: 0 6px 0 3px;
+    padding: 0 4px;
+}
+
+.notifbubble {
+    background-color: #e33;
+    border: 1px solid #e33;
+    border-radius: 9px;
+    color: #fff;
+    margin: -6px 0 0 -70px;
+    padding: 0 4px;
+    position: absolute;
+}
+
 .routersummary tr {
     background-image: none !important;
     background-color: transparent !important;

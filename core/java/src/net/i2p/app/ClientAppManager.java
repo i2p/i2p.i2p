@@ -45,4 +45,32 @@ public interface ClientAppManager {
      *  @return client app or null
      */
     public ClientApp getRegisteredApp(String name);
+
+    /**
+     *  Bubble count
+     *  @since 0.9.66
+     */
+    public int getBubbleCount(String svc);
+
+    /**
+     *  Bubble message, translated, not HTML escaped
+     *  @return null if none
+     *  @since 0.9.66
+     */
+    public String getBubbleText(String svc);
+
+    /**
+     *  Update notifications for service
+     *  @param count 0 to clear
+     *  @param text translated, not HTML escaped, null if none
+     *  @since 0.9.66
+     */
+    public void setBubble(String svc, int count, String text);
+
+    /**
+     *  Increment the count and set the text
+     *  @param text translated, not HTML escaped, null if none
+     *  @since 0.9.66
+     */
+    public void addBubble(String svc, String text);
 }

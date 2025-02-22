@@ -45,6 +45,7 @@ import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
+import net.i2p.util.PortMapper;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleTimer;
@@ -501,7 +502,10 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
     
     /** @since 0.9 */
     public void clearMessages() {
-            _messages.clear();
+        _messages.clear();
+        ClientAppManager cmgr = _context.clientAppManager();
+        if (cmgr != null)
+            cmgr.setBubble(PortMapper.SVC_I2PSNARK, 0, null);
     }
     
     /**
@@ -509,7 +513,10 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
      *  @since 0.9.33
      */
     public void clearMessages(int id) {
-            _messages.clearThrough(id);
+        _messages.clearThrough(id);
+        ClientAppManager cmgr = _context.clientAppManager();
+        if (cmgr != null)
+            cmgr.setBubble(PortMapper.SVC_I2PSNARK, 0, null);
     }
     
     /**
@@ -2876,6 +2883,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
             NotificationService ns = (NotificationService) cmgr.getRegisteredApp("desktopgui");
             if (ns != null)
                 ns.notify("I2PSnark", null, priority, _t("I2PSnark"), message, path);
+            cmgr.addBubble(PortMapper.SVC_I2PSNARK, message);
         }
         if (!_context.isRouterContext())
             System.out.println(message);

@@ -64,4 +64,32 @@ public class ClientAppManagerImpl implements ClientAppManager {
     public ClientApp getRegisteredApp(String name) {
         return _registered.get(name);
     }
+
+    /**
+     *  @return 0 always, see RouterAppManager override
+     *  @since 0.9.66
+     */
+    public int getBubbleCount(String svc) {
+        return 0;
+    }
+
+    /**
+     *  @return null always, see RouterAppManager override
+     *  @since 0.9.66
+     */
+    public String getBubbleText(String svc) {
+        return null;
+    }
+
+    /**
+     *  Does nothing, see RouterAppManager override
+     *  @since 0.9.66
+     */
+    public void setBubble(String svc, int count, String text) {}
+
+    /**
+     *  Does nothing, see RouterAppManager override
+     *  @since 0.9.66
+     */
+    public synchronized void addBubble(String svc, String text) {}
 }

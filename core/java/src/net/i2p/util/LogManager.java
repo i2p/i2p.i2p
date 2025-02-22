@@ -166,6 +166,9 @@ public class LogManager implements Flushable {
         if (context.isRouterContext()) {
             // FIXME don't start thread in constructor
             startLogWriter();
+            // for bubbles, host/port may be wrong
+            PortMapper pm = context.portMapper();
+            pm.register(PortMapper.SVC_LOGS, "127.0.0.1", 7657);
         } else {
             // Only in App Context.
             // In Router Context, the router has its own shutdown hook,

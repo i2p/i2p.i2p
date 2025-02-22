@@ -228,6 +228,10 @@ abstract class LogWriter implements Runnable {
                             String tname = Translate.getString(name, _manager.getContext(), ROUTER_BUNDLE_NAME);
                             ns.notify(name, null, priority, tname, msg, null);
                         }
+                        if (priority >= Log.CRIT) {
+                            // Console sidebar
+                            cmgr.addBubble(PortMapper.SVC_LOGS, msg);
+                        }
                     }
                 }
             }

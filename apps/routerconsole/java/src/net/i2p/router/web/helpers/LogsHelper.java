@@ -12,12 +12,14 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.jar.Attributes;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientAppManager;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
 import net.i2p.router.web.ConfigServiceHandler;
 import net.i2p.router.web.CSSHelper;
 import net.i2p.router.web.HelperBase;
 import net.i2p.router.web.RouterConsoleRunner;
+import net.i2p.util.PortMapper;
 import net.i2p.util.Translate;
 import net.i2p.util.UIMessages;
 
@@ -88,7 +90,13 @@ public class LogsHelper extends HelperBase {
      *
      */
     public String getCriticalLogs() {
-        return formatMessages(_context.logManager().getBuffer().getMostRecentCriticalMessages());
+        List<String> msgs = _context.logManager().getBuffer().getMostRecentCriticalMessages();
+        if (!msgs.isEmpty()) {
+            ClientAppManager cmgr = _context.clientAppManager();
+            if (cmgr != null)
+                cmgr.setBubble(PortMapper.SVC_LOGS, 0, null);
+        }
+        return formatMessages(msgs);
     }
 
     /**

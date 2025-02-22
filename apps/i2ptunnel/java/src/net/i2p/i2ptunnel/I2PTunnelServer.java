@@ -297,6 +297,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                     else
                         msg = "Offline signature for tunnel " + name + " alternate destination expired " + DataHelper.formatTime(exp);
                     _log.log(Log.CRIT, msg);
+                    TunnelController.addBubble(getTunnel().getContext(), msg);
                     throw new IllegalArgumentException(msg);
                 }
                 if (remaining < 60*24*60*60*1000L) {
@@ -346,6 +347,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 else
                     msg = "Offline signature for tunnel " + name + " expired " + DataHelper.formatTime(exp);
                 _log.log(Log.CRIT, msg);
+                TunnelController.addBubble(getTunnel().getContext(), msg);
                 throw new IllegalArgumentException(msg);
             }
             if (remaining < 60*24*60*60*1000L) {
@@ -394,6 +396,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                     msg += ", giving up";
                     this.l.log(msg);
                     _log.log(Log.CRIT, msg, ise);
+                    TunnelController.addBubble(getTunnel().getContext(), msg);
                     throw new IllegalArgumentException(msg, ise);
                 }
                 try { Thread.sleep(RETRY_DELAY); } catch (InterruptedException ie) {}
@@ -686,6 +689,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 String s = "Error accepting - KILLING THE TUNNEL SERVER";
                 _log.log(Log.CRIT, s, ipe);
                 l.log(s + ": " + ipe);
+                TunnelController.addBubble(getTunnel().getContext(), s);
                 // Tell TunnelController so it will change state
                 TunnelController tc = getTunnel().getController();
                 if (tc != null)

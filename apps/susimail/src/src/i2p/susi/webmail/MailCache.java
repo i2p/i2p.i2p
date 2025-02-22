@@ -52,6 +52,7 @@ import net.i2p.data.Base64;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.PortMapper;
 
 /**
  * There's one of these for each Folder.
@@ -540,16 +541,19 @@ class MailCache {
 				}
 			}
 			if (newMail > 0) {
-				// DTG popup
+				String msg = ngettext("{0} new message", "{0} new messages", newMail);
+				if (newMail == 1 && additionalMsg != null)
+					msg += additionalMsg;
 				ClientAppManager cmgr = _context.clientAppManager();
 				if (cmgr != null) {
 					NotificationService ns = (NotificationService) cmgr.getRegisteredApp("desktopgui");
 					if (ns != null) {
-						String msg = ngettext("{0} new message", "{0} new messages", newMail);
-						if (newMail == 1 && additionalMsg != null)
-							msg += additionalMsg;
+						// DTG popup
 						ns.notify("SusiMail", null, Log.INFO, _t("Email"), msg, "/susimail/");
 					}
+					// Console sidebar
+					int nc = cmgr.getBubbleCount(PortMapper.SVC_SUSIMAIL);
+					cmgr.setBubble(PortMapper.SVC_SUSIMAIL, nc + newMail, msg);
 				}
 			}
 		}

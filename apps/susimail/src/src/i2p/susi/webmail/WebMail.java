@@ -89,6 +89,7 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import net.i2p.CoreVersion;
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientAppManager;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.servlet.RequestWrapper;
@@ -96,6 +97,7 @@ import net.i2p.servlet.util.ServletUtil;
 import net.i2p.servlet.util.WriterOutputStream;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.PortMapper;
 import net.i2p.util.RFC822Date;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.Translate;
@@ -4122,7 +4124,21 @@ public class WebMail extends HttpServlet
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>" +
 					"</table></td></tr>\n" );
 			if( mail.hasPart()) {
-				mail.setNew(false);
+				if (mail.isNew()) {
+					mail.setNew(false);
+					I2PAppContext ctx = I2PAppContext.getGlobalContext();
+					ClientAppManager cmgr = ctx.clientAppManager();
+					if (cmgr != null) {
+						int nc = cmgr.getBubbleCount(PortMapper.SVC_SUSIMAIL);
+						if (nc > 0) {
+							nc--;
+							String msg = ngettext("{0} new message", "{0} new messages", nc);
+							cmgr.setBubble(PortMapper.SVC_SUSIMAIL, --nc, msg);
+						} else {
+							cmgr.setBubble(PortMapper.SVC_SUSIMAIL, 0, null);
+						}
+					}
+				}
 				showPart(out, mail.getPart(), 0, SHOW_HTML, allowHTML);
 			}
 			else {

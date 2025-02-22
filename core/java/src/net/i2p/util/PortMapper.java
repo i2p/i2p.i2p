@@ -91,6 +91,11 @@ public class PortMapper {
      *  @since 0.9.39
      */
     public static final String SVC_JSONRPC = "jsonrpc";
+    /**
+     *  For bubbles
+     *  @since 0.9.66
+     */
+    public static final String SVC_LOGS = "logs";
 
     /** @since 0.9.34 */
     public static final int DEFAULT_CONSOLE_PORT = 7657;

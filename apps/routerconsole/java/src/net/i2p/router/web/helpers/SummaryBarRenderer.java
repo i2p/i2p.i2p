@@ -226,8 +226,9 @@ class SummaryBarRenderer {
                         "<a href=\"/webmail\" target=\"_top\" title=\"")
                 .append(_t("Anonymous webmail client"))
                 .append("\">")
-                .append(nbsp(tx))
-                .append("</a></td></tr>\n");
+                .append(nbsp(tx));
+            addBubble(rbuf, PortMapper.SVC_SUSIMAIL);
+            rbuf.append("</a></td></tr>\n");
             svcs.put(tx, rbuf.toString());
         }
 
@@ -250,8 +251,9 @@ class SummaryBarRenderer {
                         "<a href=\"/torrents\" target=\"_top\" title=\"")
                 .append(_t("Built-in anonymous BitTorrent Client"))
                 .append("\">")
-                .append(nbsp(tx))
-                .append("</a></td></tr>\n");
+                .append(nbsp(tx));
+            addBubble(rbuf, PortMapper.SVC_I2PSNARK);
+            rbuf.append("</a></td></tr>\n");
             svcs.put(tx, rbuf.toString());
         }
 
@@ -297,6 +299,25 @@ class SummaryBarRenderer {
         } else {
             return "";
         }
+    }
+
+    /**
+     *  @since 0.9.66
+     */
+    private void addBubble(StringBuilder buf, String svc) {
+        ClientAppManager cmgr = _context.clientAppManager();
+        if (cmgr == null)
+            return;
+        int nc = cmgr.getBubbleCount(svc);
+        if (nc <= 0)
+            return;
+        buf.append(" <span class=\"notifcount\" ");
+        String ns = cmgr.getBubbleText(svc);
+        if (ns != null)
+            buf.append(" title=\"").append(DataHelper.escapeHTML(ns)).append("\" ");
+        buf.append('>');
+        buf.append(nc);
+        buf.append("</span>");
     }
 
     /**
@@ -349,8 +370,9 @@ class SummaryBarRenderer {
             rbuf.append("<a href=\"/dns\" target=\"_top\" title=\"")
                 .append(_t("Manage your I2P hosts file here (I2P domain name resolution)"))
                 .append("\">")
-                .append(nbsp(tx))
-                .append("</a>\n");
+                .append(nbsp(tx));
+            addBubble(rbuf, PortMapper.SVC_SUSIDNS);
+            rbuf.append("</a>\n");
             svcs.put(tx, rbuf.toString());
         }
 
@@ -360,8 +382,9 @@ class SummaryBarRenderer {
             rbuf.append("<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
                 .append(_t("Local Tunnels"))
                 .append("\">")
-                .append(nbsp(tx))
-                .append("</a>\n");
+                .append(nbsp(tx));
+            addBubble(rbuf, PortMapper.SVC_I2PTUNNEL);
+            rbuf.append("</a>\n");
             svcs.put(tx, rbuf.toString());
         }
 
@@ -434,8 +457,9 @@ class SummaryBarRenderer {
         rbuf.append("<a href=\"/logs\" target=\"_top\" title=\"")
             .append(_t("Health Report"))
             .append("\">")
-            .append(nbsp(tx))
-            .append("</a>\n");
+            .append(nbsp(tx));
+        addBubble(rbuf, PortMapper.SVC_LOGS);
+        rbuf.append("</a>\n");
         svcs.put(tx, rbuf.toString());
 
         tx = _t("NetDB");

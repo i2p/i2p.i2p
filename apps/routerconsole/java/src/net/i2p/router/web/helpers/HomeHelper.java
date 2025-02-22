@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.i2p.CoreVersion;
+import net.i2p.app.ClientAppManager;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.web.App;
@@ -388,7 +389,9 @@ Steps for the devs after approval at a meeting:
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<div class=\"appgroup\">");
         PortMapper pm = _context.portMapper();
+        ClientAppManager cmgr = _context.clientAppManager();
         for (App app : apps) {
+            String svc = null;
             String url;
             if (app.name.equals(website) && app.url.equals("http://127.0.0.1:7658/")) {
                 // fixup I2P Site link
@@ -399,27 +402,27 @@ Steps for the devs after approval at a meeting:
                 url = app.url;
                 // check for disabled webapps and other things
                 if (url.equals("/dns")) {
-                    if (!pm.isRegistered(PortMapper.SVC_SUSIDNS))
-                        continue;
+                    svc = PortMapper.SVC_SUSIDNS;
                 } else if (url.equals("/webmail")) {
-                    if (!pm.isRegistered(PortMapper.SVC_SUSIMAIL))
-                        continue;
+                    svc = PortMapper.SVC_SUSIMAIL;
                 } else if (url.equals("/torrents")) {
-                    if (!pm.isRegistered(PortMapper.SVC_I2PSNARK))
-                        continue;
+                    svc = PortMapper.SVC_I2PSNARK;
                 } else if (url.equals("/i2ptunnelmgr")) {
-                    if (!pm.isRegistered(PortMapper.SVC_I2PTUNNEL))
-                        continue;
+                    svc = PortMapper.SVC_I2PTUNNEL;
                     // need both webapp and TCG, but we aren't refreshing
                     // the icons, so let's not do this
                     //ClientAppManager cmgr = _context.clientAppManager();
                     //if (cmgr != null && cmgr.getRegisteredApp("i2ptunnel") == null)
                     //    continue;
+                } else if (url.equals("/logs")) {
+                    svc = PortMapper.SVC_LOGS;
                 } else if (url.equals("/configplugins")) {
                     if (!PluginStarter.pluginsEnabled(_context))
                         continue;
                 }
             }
+            if (svc != null && !pm.isRegistered(svc))
+                continue;
             // If an image isn't in a /themes or /images directory, it comes from a plugin.
             // tag it thus.
             String plugin = "";
@@ -432,8 +435,21 @@ Steps for the devs after approval at a meeting:
                        "<a href=\"").append(url).append("\" tabindex=\"-1\">" +
                        "<img alt=\"\" title=\"").append(app.desc).append("\" src=\"").append(app.icon)
                // version the icons because they may change
-               .append(app.icon.contains("?") ? "&amp;" : "?").append(CoreVersion.VERSION).append("\"></a>" +
-                       "</div>\n" +
+               .append(app.icon.contains("?") ? "&amp;" : "?").append(CoreVersion.VERSION).append("\">");
+            // notification bubbles
+            if (svc != null && cmgr != null) {
+                int nc = cmgr.getBubbleCount(svc);
+                if (nc > 0) {
+                    buf.append("<span class=\"notifbubble\" ");
+                    String ns = cmgr.getBubbleText(svc);
+                    if (ns != null)
+                        buf.append(" title=\"").append(DataHelper.escapeHTML(ns)).append("\" ");
+                    buf.append('>');
+                    buf.append(nc);
+                    buf.append("</span>");
+                }
+            }
+            buf.append("</a></div>\n" +
                        "<table><tr><td>" +
                        "<div class=\"applabel\">" +
                        "<a href=\"").append(url).append("\" title=\"").append(app.desc).append("\">").append(app.name).append("</a>" +

@@ -16,6 +16,7 @@ import net.i2p.app.*;
 import static net.i2p.app.ClientAppState.*;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  *  Notify the router of events, and provide methods for
@@ -30,12 +31,14 @@ public class RouterAppManager extends ClientAppManagerImpl {
     // client to args
     // this assumes clients do not override equals()
     private final ConcurrentHashMap<ClientApp, String[]> _clients;
+    private final ConcurrentHashMap<String, Bubble> _bubbles;
 
     public RouterAppManager(RouterContext ctx) {
         super(ctx);
         _context = ctx;
         _log = ctx.logManager().getLog(RouterAppManager.class);
         _clients = new ConcurrentHashMap<ClientApp, String[]>(16);
+        _bubbles = new ConcurrentHashMap<String, Bubble>(4);
         ctx.addShutdownTask(new Shutdown());
     }
 
@@ -192,6 +195,74 @@ public class RouterAppManager extends ClientAppManagerImpl {
                 _log.info("Client " + app.getDisplayName() + " UNREGISTERED AS " + app.getName());
         }
         super.unregister(app);
+        _bubbles.remove(app.getName());
+    }
+
+    /**
+     *  Bubbles
+     *  @since 0.9.66
+     */
+    private static class Bubble {
+        public final int cnt;
+        public final String text;
+
+        public Bubble(int count, String msg) {
+            cnt = count;
+            text = msg;
+        }
+    }
+
+    /**
+     *  Bubble count
+     *  @since 0.9.66
+     */
+    @Override
+    public int getBubbleCount(String svc) {
+        Bubble n = _bubbles.get(svc);
+        if (n == null)
+            return 0;
+        return n.cnt;
+    }
+
+    /**
+     *  Bubble message, translated, not HTML escaped
+     *  @return null if none
+     *  @since 0.9.66
+     */
+    @Override
+    public String getBubbleText(String svc) {
+        Bubble n = _bubbles.get(svc);
+        if (n == null)
+            return null;
+        return n.text;
+    }
+
+    /**
+     *  Update notifications for service
+     *  @param count 0 to clear
+     *  @param text translated, not HTML escaped, null if none
+     *  @since 0.9.66
+     */
+    @Override
+    public void setBubble(String svc, int count, String text) {
+        if (SystemVersion.isAndroid())
+            return;
+        if (count == 0 && text == null) {
+            _bubbles.remove(svc);
+        } else {
+            Bubble n = new Bubble(count, text);
+            _bubbles.put(svc, n);
+        }
+    }
+
+    /**
+     *  Increment the count and set the text
+     *  @param text translated, not HTML escaped, null if none
+     *  @since 0.9.66
+     */
+    @Override
+    public synchronized void addBubble(String svc, String text) {
+        setBubble(svc, getBubbleCount(svc) + 1, text);
     }
 
     /// end ClientAppManager interface
