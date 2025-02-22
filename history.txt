@@ -1,3 +1,15 @@
+2025-02-22 zzz
+ * Console: Add support for notification bubbles
+
+2025-02-21 zzz
+ * Client: Deprecate getters for unused encryption private key
+ * i2psnark: Set bulk profile
+ * i2ptunnel: Set bulk profile for servers
+ * Tunnels: Prep for bw params (prop. 168)
+
+2025-02-20 zzz
+ * Tunnels: Fix tunnel test for OB client tunnels
+
 2025-02-17 zzz
  * i2ptunnel: Add .i2p.alt support to HTTP and SOCKS client tunnels (MR 222)
  * SusiDNS: Implement sort-by-added-date (MR 231)
