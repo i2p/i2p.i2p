@@ -99,7 +99,8 @@ public class BuildMessageTestStandalone extends TestCase {
             PublicKey key = null;
             if (hop < end)
                 key = _pubKeys[hop];
-            BuildMessageGenerator.createRecord(i, hop, msg, cfg, _replyRouter, _replyTunnel, ctx, key);
+            BuildMessageGenerator.createRecord(i, hop, msg, cfg, _replyRouter, _replyTunnel,
+                                               ctx, key, EmptyProperties.INSTANCE);
         }
         BuildMessageGenerator.layeredEncrypt(ctx, msg, cfg, order);
         
