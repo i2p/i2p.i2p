@@ -34,10 +34,12 @@ import net.i2p.data.Base32;
 import net.i2p.data.Base64;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
 
 public class AddressBean
 {
-	private final String name, destination;
+	private final String name;
+	private final byte[] dest;
 	private Properties props;
 	/** available as of Java 6 */
 	static final boolean haveIDN;
@@ -55,13 +57,31 @@ public class AddressBean
 
 	public AddressBean(String name, String destination)
 	{
+		this(name, Base64.decode(destination));
+	}
+
+	/**
+	 * @since 0.9.66
+	 */
+	public AddressBean(String name, Destination destination)
+	{
+		this(name, destination.toByteArray());
+	}
+
+	/**
+	 * @since 0.9.66
+	 */
+	public AddressBean(String name, byte[] destination)
+	{
 		this.name = name;
-		this.destination = destination;
+		dest = destination;
+		if (dest == null || dest.length < 387)
+			throw new IllegalArgumentException();
 	}
 
 	public String getDestination() 
 	{
-		return destination;
+		return Base64.encode(dest);
 	}
 
 	/**
@@ -164,9 +184,6 @@ public class AddressBean
 	/** @since 0.8.7 */
 	public String getB32() 
 	{
-		byte[] dest = Base64.decode(destination);
-		if (dest == null)
-			return "";
 		byte[] hash = I2PAppContext.getGlobalContext().sha().calculateHash(dest).getData();
 		return Base32.encode(hash) + ".b32.i2p";
 	}
@@ -174,9 +191,6 @@ public class AddressBean
 	/** @since 0.9 */
 	public String getB64() 
 	{
-		byte[] dest = Base64.decode(destination);
-		if (dest == null)
-			return "";
 		return I2PAppContext.getGlobalContext().sha().calculateHash(dest).toBase64();
 	}
 
@@ -218,16 +232,10 @@ public class AddressBean
 	 * @since 0.8.7
 	 */
 	public String getCert() {
-		// (4 / 3) * (pubkey length + signing key length)
-		String cert = destination.substring(512);
-                if (cert.equals("AAAA"))
-			return _t("None");
-		byte[] enc = Base64.decode(cert);
-		if (enc == null)
-			// shouldn't happen
-			return "invalid";
-		int type = enc[0] & 0xff;
+		int type = dest[384] & 0xff;
 		switch (type) {
+			case Certificate.CERTIFICATE_TYPE_NULL:
+				return _t("None");
 			case Certificate.CERTIFICATE_TYPE_HASHCASH:
 				return _t("Hashcash");
 			case Certificate.CERTIFICATE_TYPE_HIDDEN:
@@ -246,18 +254,10 @@ public class AddressBean
 	 * @since 0.9.12
 	 */
 	public String getSigType() {
-		// (4 / 3) * (pubkey length + signing key length)
-		String cert = destination.substring(512);
-		if (cert.equals("AAAA"))
-			return _t("DSA 1024 bit");
-		byte[] enc = Base64.decode(cert);
-		if (enc == null)
-			// shouldn't happen
-			return "invalid";
-		int type = enc[0] & 0xff;
+		int type = dest[384] & 0xff;
 		if (type != Certificate.CERTIFICATE_TYPE_KEY)
 			return _t("DSA 1024 bit");
-		int st = ((enc[3] & 0xff) << 8) | (enc[4] & 0xff);
+		int st = ((dest[387] & 0xff) << 8) | (dest[388] & 0xff);
 		if (st == 0)
 			return _t("DSA 1024 bit");
 		SigType stype = SigType.getByCode(st);
