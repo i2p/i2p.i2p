@@ -1251,6 +1251,8 @@ public class Reseeder {
             System.exit(1);
         }
         String[] urls = (args.length > 0) ? args : DataHelper.split(DEFAULT_SSL_SEED_URL, ",");
+        if (args.length == 0)
+            Arrays.sort(urls);
         int pass = 0, warn = 0, fail = 0;
         SSLEepGet.SSLState sslState = null;
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
