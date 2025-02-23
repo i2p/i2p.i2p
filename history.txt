@@ -1,3 +1,7 @@
+2025-02-23 zzz
+ * SusiDNS: Reduce memory usage in AddressBean
+ * Tests: Fix build
+
 2025-02-22 zzz
  * Console: Add support for notification bubbles
 
