@@ -758,11 +758,12 @@ public class LeaseSet2 extends LeaseSet {
         java.io.File f = new java.io.File(args[0]);
         PrivateKeyFile pkf = new PrivateKeyFile(f);
         pkf.createIfAbsent(SigType.EdDSA_SHA512_Ed25519);
+        SigType type = pkf.getDestination().getSigType();
         System.out.println("Online test");
-        java.io.File f2 = new java.io.File("online-ls2.dat");
+        java.io.File f2 = new java.io.File(type + "-online-ls2.dat");
         test(pkf, f2, false);
         System.out.println("Offline test");
-        f2 = new java.io.File("offline-ls2.dat");
+        f2 = new java.io.File(type + "-offline-ls2.dat");
         test(pkf, f2, true);
     }
 
@@ -815,7 +816,7 @@ public class LeaseSet2 extends LeaseSet {
         System.out.println("Created: " + ls2);
         if (!ls2.verifySignature())
             System.out.println("Verify FAILED");
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
         ls2.writeBytes(out);
         java.io.OutputStream out2 = new java.io.FileOutputStream(outfile);
         ls2.writeBytes(out2);
