@@ -895,7 +895,7 @@ public class SybilRenderer {
     }
 
     private static void writeBuf(Writer out, StringBuilder buf) throws IOException {
-        out.write(buf.toString());
+        out.append(buf);
         out.flush();
         buf.setLength(0);
     }

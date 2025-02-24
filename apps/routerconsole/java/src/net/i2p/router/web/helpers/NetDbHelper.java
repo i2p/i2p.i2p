@@ -427,7 +427,7 @@ public class NetDbHelper extends FormHandler {
         if (!span)
             buf.append("</center>");
         buf.append("</div>\n");
-        _out.write(buf.toString());
+        _out.append(buf);
     }
 
     /**

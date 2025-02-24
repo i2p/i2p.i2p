@@ -206,7 +206,7 @@ class ProfileOrganizerRenderer {
             buf.append("&nbsp;<a title=\"").append(_t("Configure peer")).append("\" href=\"configpeer?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
             buf.append("</tr>");
             // let's not build the whole page in memory (~500 bytes per peer)
-            out.write(buf.toString());
+            out.append(buf);
             buf.setLength(0);
         }
         buf.append("</table></div>");
@@ -354,7 +354,7 @@ class ProfileOrganizerRenderer {
       ////
       }  // mode < 2
 
-        out.write(buf.toString());
+        out.append(buf);
         out.flush();
     }
 

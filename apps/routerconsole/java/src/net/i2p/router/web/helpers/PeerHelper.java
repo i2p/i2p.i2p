@@ -138,7 +138,7 @@ public class PeerHelper extends HelperBase {
                 buf.append(_t("none"));
             }
             buf.append("</pre>\n");
-            out.write(buf.toString());
+            out.append(buf);
         } else if ("upnp".equals(_transport)) {
             // UPnP Status
             StringBuilder buf = new StringBuilder(512);
@@ -156,7 +156,7 @@ public class PeerHelper extends HelperBase {
                .append("</li>\n</ul><p>")
                .append(_t("UPnP may be enabled or disabled on the Network Configuration page, but a change requires a router restart to take effect."))
                .append("</p></div>");
-            out.write(buf.toString());
+            out.append(buf);
             _context.commSystem().renderStatusHTML(_out, _urlBase, _sortFlags);
         } else if ("banned".equals(_transport)) {
             BanlistRenderer br = new BanlistRenderer(_context);
@@ -279,7 +279,7 @@ public class PeerHelper extends HelperBase {
                 buf.append("</th></tr>");
             }
             buf.append("</table>\n");
-            out.write(buf.toString());
+            out.append(buf);
         }
         out.flush();
     }
@@ -338,7 +338,7 @@ public class PeerHelper extends HelperBase {
         if (!span)
             buf.append("</center>");
         buf.append("</div>");
-        out.write(buf.toString());
+        out.append(buf);
     }
 
     /**
@@ -429,7 +429,7 @@ public class PeerHelper extends HelperBase {
                    "<th title=\"").append(_t("Is peer backlogged?")).append("\">").append(_t("Backlogged?")).append("</th>" +
                    //"<th>").append(_t("Reading?")).append("</th>" +
                    " </tr>\n");
-        out.write(buf.toString());
+        out.append(buf);
         buf.setLength(0);
         long now = _context.clock().now();
         for (NTCPConnection con : peers) {
@@ -497,7 +497,7 @@ public class PeerHelper extends HelperBase {
             //    buf.append("</td> <td class=\"cells\" align=\"center\">").append(DataHelper.formatDuration(readTime));
             //}
             buf.append("</td></tr>\n");
-            out.write(buf.toString());
+            out.append(buf);
             buf.setLength(0);
         }
 
@@ -514,7 +514,7 @@ public class PeerHelper extends HelperBase {
         }
 
         buf.append("</table></div>\n");
-        out.write(buf.toString());
+        out.append(buf);
         buf.setLength(0);
     }
 
@@ -636,7 +636,7 @@ public class PeerHelper extends HelperBase {
         buf.append("<th nowrap><span class=\"peersort\"><a href=\"#def.resent\">").append(_t("Dup TX")).append("</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, _t("Sort by packets retransmitted"), FLAG_RESEND);
         buf.append("</span></th></tr>\n");
-        out.write(buf.toString());
+        out.append(buf);
         buf.setLength(0);
         long now = _context.clock().now();
         for (PeerState peer : peers) {
@@ -807,7 +807,7 @@ public class PeerHelper extends HelperBase {
             buf.append("</td>" +
 
                        "</tr>\n");
-            out.write(buf.toString());
+            out.append(buf);
             buf.setLength(0);
 
             bpsIn += recvBps;
@@ -891,7 +891,7 @@ public class PeerHelper extends HelperBase {
         buf.append("</h3><i>(Includes retransmission required by packet loss)</i>\n");
       *****/
 
-        out.write(buf.toString());
+        out.append(buf);
         buf.setLength(0);
     }
 

@@ -329,7 +329,7 @@ class NetDbRenderer {
                     if (sybil != null)
                         sybils.add(ri.getIdentity().getHash());
                     if ((i & 0x07) == 0) {
-                        out.write(buf.toString());
+                        out.append(buf);
                         buf.setLength(0);
                     }
                 }
@@ -337,7 +337,7 @@ class NetDbRenderer {
                     outputPageLinks(buf, ubuf, page, pageSize, morePages);
             }
         }
-        out.write(buf.toString());
+        out.append(buf);
         out.flush();
         if (sybil != null)
             SybilRenderer.renderSybilHTML(out, _context, sybils, sybil);
@@ -835,7 +835,7 @@ class NetDbRenderer {
             }
             if (!ls.getHash().equals(myLeaseSet.getHash())) {
                 renderLeaseSet(buf, ls, ldebug, now, linkSusi, distance);
-                out.write(buf.toString());
+                out.append(buf);
                 buf.setLength(0);
             }
           } // for each
@@ -858,7 +858,7 @@ class NetDbRenderer {
           } // median table
           buf.append("</div>");
         }  // !empty
-        out.write(buf.toString());
+        out.append(buf);
         out.flush();
     }
 
@@ -902,7 +902,7 @@ class NetDbRenderer {
                 buf.append("</div>");
             }
         }
-        out.write(buf.toString());
+        out.append(buf);
         out.flush();
     }
 
@@ -1118,7 +1118,7 @@ class NetDbRenderer {
         if (showStats && page == 0) {
             RouterInfo ourInfo = _context.router().getRouterInfo();
             renderRouterInfo(buf, ourInfo, true, true);
-            out.write(buf.toString());
+            out.append(buf);
             buf.setLength(0);
         }
 
@@ -1143,7 +1143,7 @@ class NetDbRenderer {
                         break;
                     }
                     renderRouterInfo(buf, ri, false, full);
-                    out.write(buf.toString());
+                    out.append(buf);
                     buf.setLength(0);
                 }
                 String routerVersion = ri.getOption("router.version");
@@ -1200,7 +1200,7 @@ class NetDbRenderer {
             buf.append("</table>\n");
         }
         buf.append("</td><td style=\"vertical-align: top;\">");
-        out.write(buf.toString());
+        out.append(buf);
         buf.setLength(0);
         if (log.shouldWarn()) {
             long end = System.currentTimeMillis();
@@ -1222,7 +1222,7 @@ class NetDbRenderer {
             }
             buf.append("</table>\n");
             buf.append("</td><td style=\"vertical-align: top;\">");
-            out.write(buf.toString());
+            out.append(buf);
             buf.setLength(0);
             if (log.shouldWarn()) {
                 long end = System.currentTimeMillis();
@@ -1284,7 +1284,7 @@ class NetDbRenderer {
      //
      } // if !showStats
 
-        out.write(buf.toString());
+        out.append(buf);
         out.flush();
     }
 
