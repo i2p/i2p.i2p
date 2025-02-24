@@ -39,7 +39,7 @@ class BanlistRenderer {
         buf.append("<h3 id=\"bannedpeers\">").append(_t("Banned Peers"));
         if (entries.isEmpty()) {
             buf.append("</h3><i>").append(_t("none")).append("</i>");
-            out.write(buf.toString());
+            out.append(buf);
             return;
         } else {
             buf.append(" (").append(entries.size()).append(")</h3>");
@@ -81,7 +81,7 @@ class BanlistRenderer {
             buf.append("</li>\n");
         }
         buf.append("</ul>\n");
-        out.write(buf.toString());
+        out.append(buf);
         out.flush();
     }
 

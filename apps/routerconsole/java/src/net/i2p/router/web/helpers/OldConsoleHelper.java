@@ -75,7 +75,7 @@ public class OldConsoleHelper extends HelperBase {
         long free = Runtime.getRuntime().freeMemory()/1024;
         buf.append("<b>Memory:</b> In use: ").append((tot-free)).append("KB Free: ").append(free).append("KB <br>\n"); 
 
-        out.write(buf.toString());
+        out.append(buf);
         out.flush();
     }
     

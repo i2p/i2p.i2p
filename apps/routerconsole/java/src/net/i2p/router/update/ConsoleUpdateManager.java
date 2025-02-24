@@ -1824,7 +1824,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         buf.append("<div class=\"debug_container\">");
         toString(buf, _downloaders);
         buf.append("</div>");
-        out.write(buf.toString());
+        out.append(buf);
     }
 
     /** debug */

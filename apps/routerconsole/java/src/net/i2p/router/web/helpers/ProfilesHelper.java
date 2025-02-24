@@ -119,6 +119,6 @@ public class ProfilesHelper extends HelperBase {
         if (!span)
             buf.append("</center>");
         buf.append("</div>");
-        _out.write(buf.toString());
+        _out.append(buf);
     }
 }

@@ -81,7 +81,7 @@ public class PersistSybil {
                 buf.append(h.toBase64()).append(':');
                 p.toString(buf);
                 buf.append('\n');
-                out.write(buf.toString());
+                out.append(buf);
                 buf.setLength(0);
             }
         } finally {

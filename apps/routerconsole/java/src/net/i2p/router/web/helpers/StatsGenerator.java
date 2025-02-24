@@ -70,7 +70,7 @@ public class StatsGenerator {
 
         buf.append("<form action=\"\"><b>");
         buf.append(_t("Jump to section")).append(":</b> <select class=\"onchange\">");
-        out.write(buf.toString());
+        out.append(buf);
         buf.setLength(0);
 
         Map<String, SortedSet<String>> unsorted = _context.statManager().getStatsByGroup();
@@ -89,14 +89,14 @@ public class StatsGenerator {
             //    buf.append(stat);
             //    buf.append("</option>\n");
             //}
-            //out.write(buf.toString());
+            //out.append(buf);
             //buf.setLength(0);
         }
         // TODO this is broken for non-js
         buf.append("</select> <input type=\"submit\" value=\"").append(_t("GO")).append("\" />");
         buf.append("</form>");
 
-        out.write(buf.toString());
+        out.append(buf);
         buf.setLength(0);
 
         for (Map.Entry<String, Set<String>> entry : groups.entrySet()) {
@@ -108,7 +108,7 @@ public class StatsGenerator {
             buf.append(translateGroup(group));
             buf.append("</a></h3>");
             buf.append("<ul class=\"statlist\">");
-            out.write(buf.toString());
+            out.append(buf);
             buf.setLength(0);
             for (String stat : stats) {
                 buf.append("<li class=\"statsName\"><b><a name=\"");
@@ -120,7 +120,7 @@ public class StatsGenerator {
                     renderFrequency(stat, buf);
                 else
                     renderRate(stat, buf, showAll);
-                out.write(buf.toString());
+                out.append(buf);
                 buf.setLength(0);
             }
             out.write("</ul><br>\n");

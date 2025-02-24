@@ -908,7 +908,7 @@ public class I2PSnarkServlet extends BasicServlet {
     private void writeHiddenInputs(PrintWriter out, HttpServletRequest req, String action) {
         StringBuilder buf = new StringBuilder(256);
         writeHiddenInputs(buf, req, action);
-        out.write(buf.toString());
+        out.append(buf);
     }
 
     /**
@@ -1995,7 +1995,7 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("<a href=\"").append(encodedBaseName)
                .append("/\" title=\"").append(_t("Torrent details"))
                .append("\">");
-            out.write(buf.toString());
+            out.append(buf);
         }
         String icon;
         if (isMultiFile)
@@ -2024,7 +2024,7 @@ public class I2PSnarkServlet extends BasicServlet {
                    .append("\">");
                 toThemeImg(buf, "comment", "", "");
                 buf.append("</a>");
-                out.write(buf.toString());
+                out.append(buf);
             }
         }
 
@@ -2048,7 +2048,7 @@ public class I2PSnarkServlet extends BasicServlet {
             else
                 buf.append(_t("Open file"));
             buf.append("\">");
-            out.write(buf.toString());
+            out.append(buf);
         }
         out.write(DataHelper.escapeHTML(basename));
         if (remaining == 0 || isMultiFile)
@@ -3048,7 +3048,7 @@ public class I2PSnarkServlet extends BasicServlet {
                    "</td></tr>" +
                    "<tr class=\"spacer\"><td colspan=\"7\">&nbsp;</td></tr>\n" +  // spacer
                    "</table></div></div></form>\n");
-        out.write(buf.toString());
+        out.append(buf);
     }
 
     private void writeConfigLink(PrintWriter out) throws IOException {

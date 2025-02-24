@@ -92,7 +92,7 @@ public class JobQueueHelper extends HelperBase {
         }
         buf.append("</ol>\n");
         getJobCounts(buf, counter);
-        out.write(buf.toString());
+        out.append(buf);
         buf.setLength(0);
 
         buf.append("<h3 id=\"scheduledjobs\">")
@@ -118,14 +118,14 @@ public class JobQueueHelper extends HelperBase {
         }
         buf.append("</ol></div>\n");
         getJobCounts(buf, counter);
-        out.write(buf.toString());
+        out.append(buf);
         buf.setLength(0);
         
         buf.append("<h3 id=\"totaljobstats\">")
            .append(_t("Total Job Statistics"))
            .append("</h3>\n");
         getJobStats(buf);
-        out.write(buf.toString());
+        out.append(buf);
     }
     
     /** @since 0.9.5 */

@@ -46,7 +46,7 @@ public class ConfigKeyringHelper extends HelperBase {
                        "<input type=\"submit\" name=\"action\" class=\"delete\" value=\"").append(_t("Delete key")).append("\">" +
                        "</td></tr></table>");
         }
-        out.write(buf.toString());
+        out.append(buf);
         out.flush();
     }
 

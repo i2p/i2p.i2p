@@ -138,7 +138,7 @@ class SummaryBarRenderer {
 
             // Only output section if there's more than the <hr> to print
             if (buf.length() > 5)
-                out.write(buf.toString());
+                out.append(buf);
         }
     }
 

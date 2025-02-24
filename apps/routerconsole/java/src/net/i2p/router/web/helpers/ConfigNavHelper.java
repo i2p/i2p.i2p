@@ -92,6 +92,6 @@ public class ConfigNavHelper extends HelperBase {
         }
         if (!span)
             buf.append("</center>");
-        _out.write(buf.toString());
+        _out.append(buf);
     }
 }
