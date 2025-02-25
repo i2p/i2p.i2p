@@ -792,7 +792,7 @@ class Packet {
         
         int size = writtenSize();
         
-        if (buffer == null)
+        if (buffer == null || size > buffer.length)
             buffer = new byte[size];
         if (isFlagSet(FLAG_SIGNATURE_OFFLINE)) {
             if (_transientExpires < ctx.clock().now()) {
