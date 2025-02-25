@@ -1,3 +1,11 @@
+2025-02-25 zzz
+ * Console: Move certs page to a debug page tab
+ * Streaming: Prevent AIOOBE when verifying large signed packets
+ * SusiDNS: Add bubble support
+
+2025-02-24 zzz
+ * Console: Improve writing efficiency
+
 2025-02-23 zzz
  * SusiDNS: Reduce memory usage in AddressBean
  * Tests: Fix build
