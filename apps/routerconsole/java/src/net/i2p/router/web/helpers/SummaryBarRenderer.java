@@ -519,6 +519,7 @@ class SummaryBarRenderer {
         Map<String, String> svcs = new TreeMap<String, String>(Collator.getInstance());
         StringBuilder rbuf = new StringBuilder(128);
 
+/* moved to /debug tab
         String tx = _t("Certs");
         rbuf.append("<a target=\"_top\" title=\"")
            .append(_t("Review active encryption certificates used in console"))
@@ -526,8 +527,9 @@ class SummaryBarRenderer {
            .append(nbsp(tx))
            .append("</a>\n");
         svcs.put(tx, rbuf.toString());
+*/
 
-        tx = _t("Changelog");
+        String tx = _t("Changelog");
         rbuf.setLength(0);
         rbuf.append("<a title=\"")
            .append(_t("View full changelog"))

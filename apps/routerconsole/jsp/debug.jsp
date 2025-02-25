@@ -24,6 +24,7 @@
 <span class="tab"><a href="/debug?d=5">Router DHT</a></span>
 <span class="tab"><a href="/debug?d=6">Translation Status</a></span>
 <span class="tab"><a href="/debug?d=7">Jars</a></span>
+<span class="tab"><a href="/debug?d=8"><%=intl._t("Certificates")%></a></span>
 </div>
 
 <%
@@ -145,6 +146,14 @@ if (dd == null || dd.equals("0")) {
 <jsp:useBean class="net.i2p.router.web.helpers.FileDumpHelper" id="dumpHelper" scope="request" />
 <jsp:setProperty name="dumpHelper" property="contextId" value="<%=i2pcontextId%>" />
 <jsp:getProperty name="dumpHelper" property="fileSummary" />
+<%
+} else if (dd.equals("8")) {
+%>
+<h2><%=intl._t("Certificates")%></h2>
+<jsp:useBean class="net.i2p.router.web.helpers.CertHelper" id="certhelper" scope="request" />
+<jsp:setProperty name="certhelper" property="contextId" value="<%=i2pcontextId%>" />
+<% certhelper.storeWriter(out); %>
+<jsp:getProperty name="certhelper" property="summary" />
 <%
 }
 
