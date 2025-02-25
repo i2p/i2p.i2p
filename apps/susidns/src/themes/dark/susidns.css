@@ -59,8 +59,8 @@ body.iframed {
 /* topnav */
 
 #navi  {
-     margin: -16px auto 30px;
-     padding: 5px 3px;
+     margin: -10px auto 30px;
+     padding: 10px 3px;
      position: sticky;
      top: -1px;
      z-index: 999;
@@ -75,7 +75,7 @@ body.iframed {
 
 .iframed #navi  {
      margin: -6px -15px 30px;
-     padding: 5px 0;
+     padding: 13px 0;
      position: static;
      border-right: none;
      border-left: none;
@@ -183,6 +183,16 @@ body.iframed {
      background: #1F1A24 url(../images/overview.png) 5px center no-repeat !important;
 }
 
+.notifbubble {
+    background-color: #e33;
+    border: 1px solid #e33;
+    border-radius: 9px;
+    color: #fff;
+    margin: -16px 0 0 -4px;
+    padding: 0 4px;
+    position: absolute;
+}
+
 /* end topnav */
 
 hr {
@@ -273,7 +283,7 @@ div#filter + div#search > form {
      box-shadow: inset 3px 3px 3px #000;
 }
 
-#filter span {
+#filterheader {
      display: inline-block;
      border: 1px solid #292929;
      min-width: 300px;
@@ -286,18 +296,18 @@ div#filter + div#search > form {
      background-image: linear-gradient(to bottom, #1F1A24 0%, #222730 100%) !important;
 }
 
-#filter span a, #filter span a:hover {
+#filterheader a, #filterheader a:hover {
      border: none;
      background: none;
      margin: 0 0 0 10px;
      padding: 0;
 }
 
-#filter span a:active {
+#filterheader a:active {
      box-shadow: none;
 }
 
-#filter span b {
+#filterheader b {
      text-transform: uppercase;
      font-size: 10pt;
      margin: 0 0 0 5px;
@@ -1232,7 +1242,7 @@ body, input[type="submit"], input[type="reset"], .fakebutton, input, select, h4,
 }
 
 #navi {
-     padding: 6px 5px !important;
+     padding: 10px 5px !important;
 }
 
 #navi a {
@@ -1240,7 +1250,7 @@ body, input[type="submit"], input[type="reset"], .fakebutton, input, select, h4,
      padding: 4px 7px 5px 25px !important;
 }
 
-h3, #filter a, #filter span {
+h3, #filter a, #filterheader {
      font-size: 11pt !important;
 }
 

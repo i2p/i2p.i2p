@@ -42,6 +42,7 @@ import net.i2p.util.OrderedProperties;
 import net.i2p.util.PortMapper;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SystemVersion;
+import net.i2p.util.Translate;
 
 /**
  * Main class of addressbook.  Performs updates, and runs the main loop.
@@ -674,10 +675,19 @@ class Daemon {
             if (nnew > 0) {
                 ClientAppManager cmgr = I2PAppContext.getGlobalContext().clientAppManager();
                 if (cmgr != null) {
-                    int nc = cmgr.getBubbleCount(PortMapper.SVC_SUSIDNS);
-                    cmgr.setBubble(PortMapper.SVC_SUSIDNS, nc + nnew, null);
+                    int nc = cmgr.getBubbleCount(PortMapper.SVC_SUSIDNS) + nnew;
+                    String msg = ngettext("1 new host", "{0} new hosts", nc);
+                    cmgr.setBubble(PortMapper.SVC_SUSIDNS, nc, msg);
                 }
             }
+    }
+
+    /**
+     *  translate (ngettext) from the routerconsole bundle
+     *  @since 0.9.66
+     */
+    private static String ngettext(String s, String p, int n) {
+        return Translate.getString(n, s, p, I2PAppContext.getGlobalContext(), "net.i2p.router.web.messages");
     }
 
     /** @since 0.9.26 */

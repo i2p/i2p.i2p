@@ -56,7 +56,17 @@
 <a id="overview" class="active" href="index"><%=intl._t("Overview")%></a>&nbsp;
 <a class="abook" href="addressbook?book=private&amp;filter=none"><%=intl._t("Private")%></a>&nbsp;
 <a class="abook" href="addressbook?book=local&amp;filter=none"><%=intl._t("Local")%></a>&nbsp;
-<a class="abook" href="addressbook?book=router&amp;filter=none"><%=intl._t("Router")%></a>&nbsp;
+<a class="abook" href="addressbook?book=router&amp;filter=none"><%=intl._t("Router")%><%
+    int bubbleCount = base.getBubbleCount();
+    String bubbleText = base.getBubbleText();
+    if (bubbleCount > 0) {
+        %><span class="notifbubble" <%
+        if (bubbleText != null) {
+            %> title="<%=bubbleText%>"<%
+        }
+        %>><%=bubbleCount%></span><%
+    }
+%></a>&nbsp;
 <a class="abook" href="addressbook?book=published&amp;filter=none"><%=intl._t("Published")%></a>&nbsp;
 <a id="subs" href="subscriptions"><%=intl._t("Subscriptions")%></a>&nbsp;
 <a id="config" href="config"><%=intl._t("Configuration")%></a>

@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientAppManager;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
+import net.i2p.util.PortMapper;
 
 /**
  * Holds methods common to several Beans.
@@ -177,6 +179,26 @@ public class BaseBean
      */
     public void storeMethod(String method) {
         this.method = method;
+    }
+
+    /**
+     *  @since 0.9.66
+     */
+    public int getBubbleCount() {
+        ClientAppManager cmgr = _context.clientAppManager();
+        if (cmgr != null)
+            return cmgr.getBubbleCount(PortMapper.SVC_SUSIDNS);
+        return 0;
+    }
+
+    /**
+     *  @since 0.9.66
+     */
+    public String getBubbleText() {
+        ClientAppManager cmgr = _context.clientAppManager();
+        if (cmgr != null)
+            return cmgr.getBubbleText(PortMapper.SVC_SUSIDNS);
+        return null;
     }
 
     /**
