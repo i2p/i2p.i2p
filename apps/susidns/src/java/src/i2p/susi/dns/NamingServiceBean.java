@@ -39,12 +39,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.SortedMap;
 
+import net.i2p.app.ClientAppManager;
 import net.i2p.client.naming.NamingService;
 import net.i2p.client.naming.SingleFileNamingService;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.servlet.RequestWrapper;
+import net.i2p.util.PortMapper;
 
 /**
  *  Talk to the NamingService API instead of modifying the hosts.txt files directly,
@@ -216,6 +218,8 @@ public class NamingServiceBean extends AddressbookBean
 			AddressBean array[] = list.toArray(new AddressBean[list.size()]);
 			if (sortByDate) {
 				Arrays.sort(array, new AddressByDateSorter());
+				if (getBook().equals("router"))
+					clearBubbles();
 			} else if (!(results instanceof SortedMap)) {
 				Arrays.sort(array, sorter);
 			}
@@ -526,6 +530,15 @@ public class NamingServiceBean extends AddressbookBean
 			rv.add(ab);
 		}
 		return rv;
+	}
+
+	/**
+	 *  @since 0.9.66
+	 */
+	private void clearBubbles() {
+		ClientAppManager cmgr = _context.clientAppManager();
+		if (cmgr != null)
+			cmgr.setBubble(PortMapper.SVC_SUSIDNS, 0, null);
 	}
 
 	/**

@@ -69,7 +69,17 @@
 <a id="overview" href="index"><%=intl._t("Overview")%></a>&nbsp;
 <a class="abook private" href="addressbook?book=private&amp;filter=none"><%=intl._t("Private")%></a>&nbsp;
 <a class="abook local" href="addressbook?book=local&amp;filter=none"><%=intl._t("Local")%></a>&nbsp;
-<a class="abook router" href="addressbook?book=router&amp;filter=none"><%=intl._t("Router")%></a>&nbsp;
+<a class="abook router" href="addressbook?book=router&amp;filter=none"><%=intl._t("Router")%><%
+    int bubbleCount = book.getBubbleCount();
+    String bubbleText = book.getBubbleText();
+    if (bubbleCount > 0) {
+        %><span class="notifbubble" <%
+        if (bubbleText != null) {
+            %> title="<%=bubbleText%>"<%
+        }
+        %>><%=bubbleCount%></span><%
+    }
+%></a>&nbsp;
 <a class="abook published" href="addressbook?book=published&amp;filter=none"><%=intl._t("Published")%></a>&nbsp;
 <a id="subs" href="subscriptions"><%=intl._t("Subscriptions")%></a>&nbsp;
 <a id="config" href="config"><%=intl._t("Configuration")%></a>
@@ -151,7 +161,7 @@ ${book.loadBookMessages}
 <c:if test="${book.notEmpty}">
 <div id="filter">
 <c:if test="${book.hasFilter}">
-<span><%=intl._t("Current filter")%>:
+<span id="filterheader"><%=intl._t("Current filter")%>:
 <%
     String f = book.getFilter();
     if ("latest".equals(f))
@@ -195,7 +205,15 @@ ${book.loadBookMessages}
 <a href="addressbook?filter=0-9&amp;begin=0&amp;end=49">0-9</a>
 <a href="addressbook?filter=xn--&amp;begin=0&amp;end=49"><%=intl._t("other")%></a>
 <% if (!book.getBook().equals("published")) { %>
-   <a href="addressbook?filter=latest&amp;begin=0&amp;end=49"><%=intl._t("latest")%></a>
+   <a href="addressbook?filter=latest&amp;begin=0&amp;end=49"><%=intl._t("latest")%><%
+    if (bubbleCount > 0 && book.getBook().equals("router")) {
+        %><span class="notifbubble" <%
+        if (bubbleText != null) {
+            %> title="<%=bubbleText%>"<%
+        }
+        %>><%=bubbleCount%></span><%
+    }
+    %></a>
 <% } %>
 <a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._t("all")%></a>
 </p>
