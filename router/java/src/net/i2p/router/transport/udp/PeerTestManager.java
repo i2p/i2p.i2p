@@ -1913,6 +1913,11 @@ class PeerTestManager {
         public void gotOptions(byte[] options, boolean isHandshake) {}
 
         public void gotRI(RouterInfo ri, boolean isHandshake, boolean flood) {
+            if (ri.getPublished() < 0) {
+                if (_log.shouldWarn())
+                    _log.warn("RI DFE " + ri.getIdentity().calculateHash().toBase64());
+                return;
+            }
             try {
                 Hash h = ri.getHash();
                 if (h.equals(_context.routerHash()))

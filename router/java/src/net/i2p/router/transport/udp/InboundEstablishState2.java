@@ -249,6 +249,14 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         if (_receivedUnconfirmedIdentity != null)
             throw new DataFormatException("DUP RI in Sess Conf");
         _receivedUnconfirmedIdentity = ri.getIdentity();
+        if (ri.getPublished() < 0) {
+            // see SSU2Payload: RI format error, signature was verified there, so we can take action
+            _context.blocklist().add(_aliceIP);
+            Hash h = _receivedUnconfirmedIdentity.calculateHash();
+            _context.banlist().banlistRouter(h, "Signed bad RI", null,
+                                             null, _context.clock().now() + 4*24*60*60*1000);
+            throw new RIException("RI DFE " + h.toBase64(), REASON_BANNED);
+        }
 
         // try to find the right address, because we need the MTU
         boolean isIPv6 = _aliceIP.length == 16;

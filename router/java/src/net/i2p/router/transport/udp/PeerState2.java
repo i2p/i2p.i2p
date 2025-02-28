@@ -657,6 +657,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     public void gotRI(RouterInfo ri, boolean isHandshake, boolean flood) throws DataFormatException {
         if (_log.shouldDebug())
             _log.debug("Got RI in data phase " + ri + "\non: " + this);
+        if (ri.getPublished() < 0)
+            throw new DataFormatException("RI DFE " + ri.getIdentity().calculateHash().toBase64());
         try {
             Hash h = ri.getHash();
             if (h.equals(_context.routerHash()))
