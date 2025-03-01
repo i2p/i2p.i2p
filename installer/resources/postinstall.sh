@@ -13,7 +13,7 @@
 # user's OS
 
 if [ ! "X$1" = "X" ]; then
-    cd $1
+    cd "$1"
 fi
 
 chmod 755 ./i2prouter
