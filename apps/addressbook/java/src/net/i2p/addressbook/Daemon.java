@@ -676,7 +676,7 @@ class Daemon {
                 ClientAppManager cmgr = I2PAppContext.getGlobalContext().clientAppManager();
                 if (cmgr != null) {
                     int nc = cmgr.getBubbleCount(PortMapper.SVC_SUSIDNS) + nnew;
-                    String msg = ngettext("1 new host", "{0} new hosts", nc);
+                    String msg = ngettext("{0} new host", "{0} new hosts", nc);
                     cmgr.setBubble(PortMapper.SVC_SUSIDNS, nc, msg);
                 }
             }
