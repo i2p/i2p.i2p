@@ -134,7 +134,6 @@ abstract class BuildMessageGenerator {
             }
             BuildRequestRecord rec;
             if (isEC) {
-                // TODO pass properties from cfg
                 if (isShort) {
                     rec = new BuildRequestRecord(ctx, recvTunnelId, nextTunnelId, nextPeer,
                                                  nextMsgId,
