@@ -44,6 +44,4 @@ Supported JVMs:
   Windows: OpenJDK or Oracle from http://java.com/download
   Linux:   OpenJDK or Oracle from http://java.com/download
   FreeBSD: OpenJDK or Oracle from http://java.com/download
-  Raspberry Pi: Oracle 8 Early Access https://jdk8.java.net/download.html
-  PowerPC: IBM SDK 7 http://www.ibm.com/developerworks/java/jdk/linux/download.html
-  Other operating systems and JVMs: See https://trac.i2p2.de/wiki/java or https://geti2p.net/download
+  Other operating systems and JVMs: See https://geti2p.net/download
