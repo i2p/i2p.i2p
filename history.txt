@@ -1,3 +1,11 @@
+2025-03-01 zzz
+ * Console: Add error page test servlet
+ * GeoIP 2025-03-01
+ * Installer: Fix installation to path with spaces
+
+2025-02-28 zzz
+ * Transport: Ban routers with RI format errors if signature verifies
+
 2025-02-25 zzz
  * Console: Move certs page to a debug page tab
  * Streaming: Prevent AIOOBE when verifying large signed packets
