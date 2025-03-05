@@ -28,7 +28,7 @@ class FloodfillStoreJob extends StoreJob {
     private final FloodfillNetworkDatabaseFacade _facade;
 
     private static final String PROP_RI_VERIFY = "router.verifyRouterInfoStore";
-    private static final long RI_VERIFY_STARTUP_TIME = 3*60*60*1000L;
+    private static final long RI_VERIFY_STARTUP_TIME = 90*60*1000L;
 
     /**
      * Send a data structure to the floodfills
