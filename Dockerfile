@@ -1,4 +1,4 @@
-FROM  eclipse-temurin:17-alpine as builder
+FROM eclipse-temurin:17-alpine as builder
 
 ENV APP_HOME="/i2p"
 ARG ANT_VERSION="1.10.15"
