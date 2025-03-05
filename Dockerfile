@@ -1,20 +1,19 @@
-FROM alpine:3.17.1 as builder
+FROM  eclipse-temurin:17-alpine as builder
 
 ENV APP_HOME="/i2p"
+ARG ANT_VERSION="1.10.15"
 
 WORKDIR /tmp/build
 COPY . .
 
-RUN apk add --virtual build-base gettext tar bzip2 apache-ant openjdk17 \
+RUN apk add --no-cache gettext tar bzip2 curl \
     && echo "build.built-by=Docker" >> override.properties \
-    && ant preppkg-linux-only \
-    && rm -rf pkg-temp/osid pkg-temp/lib/wrapper pkg-temp/lib/wrapper.* \
-    && apk del build-base gettext tar bzip2 apache-ant openjdk17
+    && curl https://dlcdn.apache.org//ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.bz2 | tar -jxf - -C /opt \
+    && /opt/apache-ant-${ANT_VERSION}/bin/ant preppkg-linux-only \
+    && rm -rf pkg-temp/osid pkg-temp/lib/wrapper pkg-temp/lib/wrapper.*
 
-FROM alpine:3.17.1
+FROM eclipse-temurin:17-alpine
 ENV APP_HOME="/i2p"
-
-RUN apk add openjdk17-jre ttf-dejavu
 
 WORKDIR ${APP_HOME}
 COPY --from=builder /tmp/build/pkg-temp .
