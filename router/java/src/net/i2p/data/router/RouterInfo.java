@@ -302,7 +302,7 @@ public class RouterInfo extends DatabaseEntry {
      * Configure a set of options or statistics that the router can expose.
      * Makes a copy.
      *
-     * Warning, clears all capabilities, must be called BEFORE addCapability().
+     * Warning, clears all capabilities.
      *
      * @param options if null, clears current options
      * @throws IllegalStateException if RouterInfo is already signed
