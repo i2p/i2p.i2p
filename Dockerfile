@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-alpine as builder
+FROM docker.io/eclipse-temurin:17-alpine as builder
 
 ENV APP_HOME="/i2p"
 ARG ANT_VERSION="1.10.15"
@@ -12,7 +12,7 @@ RUN apk add --no-cache gettext tar bzip2 curl \
     && /opt/apache-ant-${ANT_VERSION}/bin/ant preppkg-linux-only \
     && rm -rf pkg-temp/osid pkg-temp/lib/wrapper pkg-temp/lib/wrapper.*
 
-FROM eclipse-temurin:17-alpine
+FROM docker.io/eclipse-temurin:17-jre-alpine
 ENV APP_HOME="/i2p"
 
 WORKDIR ${APP_HOME}
