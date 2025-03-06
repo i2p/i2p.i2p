@@ -611,18 +611,14 @@
             </th>
         </tr><tr>
             <td colspan="2">
-                <span class="multiOption" <%=ehdisabled%>>
-                    <label><input value="0" type="radio" id="startOnLoad" name="encType" <%=((has0 && !has4) ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
-                    ElGamal-2048</label>
-                </span>
-                <span class="multiOption" <%=ehdisabled%>>
-                    <label><input value="4" type="radio" id="startOnLoad" name="encType" <%=((has4 && !has0) ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
-                    ECIES-X25519</label>
-                </span>
-                <span class="multiOption" <%=ehdisabled%>>
-                    <label><input value="4,0" type="radio" id="startOnLoad" name="encType" <%=((has0 && has4) ? " checked=\"checked\"" : edisabled)%> class="tickbox" />
-                    <%=intl._t("Both encryption types")%></label>
-                </span>
+                <select id="encType" name="encType" class="selectbox" <%=ehdisabled%>>
+                    <option value="0" <%=((has0 && !has4) ? " selected=\"selected\"" : edisabled)%> >
+                    ElGamal-2048</option>
+                    <option title="<%=intl._t("This is the default, recommended option")%>" value="4" <%=((has4 && !has0) ? " selected=\"selected\"" : edisabled)%> >
+                    ECIES-X25519</option>
+                    <option value="4,0" <%=((has0 && has4) ? " selected=\"selected\"" : edisabled)%> >
+                    <%=intl._t("Both encryption types")%></option>
+                </select>
             </td>
         </tr>
 <%
