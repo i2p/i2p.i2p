@@ -650,15 +650,15 @@
                     <option title="<%=intl._t("Legacy option (deprecated), provided for backward compatibility")%>" value="0" <%=(currentSigType==0 ? " selected=\"selected\"" : disabled)%> >
                     DSA-SHA1</option>
 <%           if (editBean.isSigTypeAvailable(1)) { %>
-                    <option value="1" <%=(currentSigType==1 ? " selected=\"selected\"" : disabled)%> >
+                    <option title="<%=intl._t("Legacy option (deprecated), provided for backward compatibility")%>" value="1" <%=(currentSigType==1 ? " selected=\"selected\"" : disabled)%> >
                     ECDSA-P256</option>
 <%            }
               if (editBean.isSigTypeAvailable(2)) { %>
-                    <option value="2" <%=(currentSigType==2 ? " selected=\"selected\"" : disabled)%> >
+                    <option title="<%=intl._t("Legacy option (deprecated), provided for backward compatibility")%>" value="2" <%=(currentSigType==2 ? " selected=\"selected\"" : disabled)%> >
                     ECDSA-P384</option>
 <%            }
               if (editBean.isSigTypeAvailable(3)) { %>
-                    <option value="3" <%=(currentSigType==3 ? " selected=\"selected\"" : disabled)%> >
+                    <option title="<%=intl._t("Legacy option (deprecated), provided for backward compatibility")%>" value="3" <%=(currentSigType==3 ? " selected=\"selected\"" : disabled)%> >
                     ECDSA-P521</option>
 <%            }
               if (editBean.isSigTypeAvailable(7)) { %>
@@ -685,7 +685,7 @@
         </tr><tr>
             <td colspan="2">
                 <select id="encType" name="encType" class="selectbox" <%=ehdisabled%>>
-                    <option value="0" <%=((has0 && !has4) ? " selected=\"selected\"" : edisabled)%> >
+                    <option title="<%=intl._t("Legacy option (deprecated), provided for backward compatibility")%>" value="0" <%=((has0 && !has4) ? " selected=\"selected\"" : edisabled)%> >
                     ElGamal-2048</option>
                     <option title="<%=intl._t("This is the default, recommended option")%>" value="4" <%=((has4 && !has0) ? " selected=\"selected\"" : edisabled)%> >
                     ECIES-X25519</option>
