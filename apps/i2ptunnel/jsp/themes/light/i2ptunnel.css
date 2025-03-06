@@ -352,6 +352,10 @@ h2, h3 {
      position: relative;
 }
 
+#overview.iframed h2 {
+     display: none;
+}
+
 .iframed h2, .iframed h3 {
      margin-top: 14px;
 }

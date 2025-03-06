@@ -231,6 +231,10 @@ h2, h3 {
 
 /* end title images */
 
+#overview.iframed h2 {
+     display: none;
+}
+
 .iframed h2 {
      margin: 14px 0 -1px;
 }
