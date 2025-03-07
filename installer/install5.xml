@@ -32,6 +32,8 @@ https://izpack.atlassian.net/wiki/spaces/IZPACK/pages/491730/GUI+Preferences
 -->
         <!-- full names, not iso3 codes -->
         <modifier key="langDisplayType" value="native" />
+        <modifier key="headingPanelCounter" value="progressbar"/>
+        <modifier key="headingPanelCounterPos" value="inNavigationPanel"/>
     </guiprefs>
 
 <!--
@@ -161,6 +163,7 @@ At runtime, if the JVM does not have a locale:
 
     <resources>
         <res id="Installer.image" src="installer/resources/i2plogo.png" />
+        <res id="installer.langsel.img" src="installer/resources/i2plogo.png" />
         <res id="InfoPanel.info" src="installer/resources/readme.license.txt"/>
         <!-- <res id="ProcessPanel.Spec.xml" src="installer/resources/ProcessPanel.Spec.xml"/> -->
         <res id="shortcutSpec.xml" src="installer/resources/shortcutSpec.xml" />
