@@ -427,6 +427,10 @@
         <copy file="apps/jrobin/java/build/jrobin.jar" todir="build/" />
     </target>
 
+    <target name="buildWrapperJar" >
+        <ant dir="installer/lib/wrapper" target="jar" />
+    </target>
+
     <target name="buildProperties" depends="getGitRev, getReleaseNumber, getBuildNumber, setBuildTimestamp, disableManifestClasspath" >
         <antversion property="antversion"/>
         <fail message="FATAL: Minimum Ant version is ${ant.minimumVersion} - your Ant version is ${antversion}">
@@ -1255,6 +1259,7 @@
         <delete dir="core/c/jbigi/bin" />
         <delete dir="core/c/jbigi/lib" />
         <delete dir="core/c/jcpuid/lib" />
+        <ant dir="installer/lib/wrapper" target="distclean" />
         <ant dir="installer/resources/locale" target="distclean" />
         <ant dir="installer/tools/java" target="distclean" />
         <delete dir="installer/lib/izpack5/patches/java/build" quiet="true" />
@@ -1323,34 +1328,40 @@
         </delete>
     </target>
 
-    <target name="preppkg" depends="preppkg-linux, preppkg-freebsd, preppkg-osx, preppkg-windows, jbigi">
+    <target name="preppkg" depends="preppkg-linux, preppkg-freebsd, preppkg-osx, preppkg-windows, jbigi, buildWrapperJar">
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
+     <!--
         <copy todir="pkg-temp/lib/wrapper/solaris/">
             <fileset dir="installer/lib/wrapper/solaris/" excludes="*.txt" />
         </copy>
+      -->
      <!-- Force using the new wrapper.jar.
           The new jar with the old windows binaries will output a warning on windows.
           We do not generate release files from this target.
           See preppkg-windows-only target below.
       -->
-        <copy overwrite="true" file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
+        <copy overwrite="true" file="installer/lib/wrapper/build/wrapper.jar" todir="pkg-temp/lib" />
     </target>
 
-    <target name="preppkg-nowindows" depends="preppkg-linux, preppkg-freebsd, preppkg-osx, jbigi-nowindows">
+    <target name="preppkg-nowindows" depends="preppkg-linux, preppkg-freebsd, preppkg-osx, jbigi-nowindows, buildWrapperJar">
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
+     <!--
         <copy todir="pkg-temp/lib/wrapper/solaris/">
             <fileset dir="installer/lib/wrapper/solaris/" excludes="*.txt" />
         </copy>
-        <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
+      -->
+        <copy file="installer/lib/wrapper/build/wrapper.jar" todir="pkg-temp/lib" />
     </target>
 
     <target name="preppkgRepack" depends="preppkg-linux, preppkg-freebsd, preppkg-osx, preppkg-windows, jbigi">
         <ant target="repack200" />
         <!-- no use doing repack200 on jbigi.jar -->
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
+     <!--
         <copy todir="pkg-temp/lib/wrapper/solaris/">
             <fileset dir="installer/lib/wrapper/solaris/" excludes="*.txt" />
         </copy>
+      -->
     </target>
 
     <target name="preppkg-freebsd" depends="preppkg-unix">
@@ -1362,15 +1373,15 @@
         </copy>
     </target>
 
-    <target name="preppkg-freebsd-only" depends="preppkg-freebsd, jbigi-freebsd-only" >
+    <target name="preppkg-freebsd-only" depends="preppkg-freebsd, jbigi-freebsd-only, buildWrapperJar" >
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
-        <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
+        <copy file="installer/lib/wrapper/build/wrapper.jar" todir="pkg-temp/lib" />
     </target>
 
     <!-- only what is needed for debian, etc. -->
-    <target name="preppkg-linux-only" depends="preppkg-linux, jbigi-linux-only" >
+    <target name="preppkg-linux-only" depends="preppkg-linux, jbigi-linux-only, buildWrapperJar" >
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
-        <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
+        <copy file="installer/lib/wrapper/build/wrapper.jar" todir="pkg-temp/lib" />
     </target>
 
     <!-- This is the target called by debian/rules -->
@@ -1397,9 +1408,11 @@
     </target>
 
     <target name="preppkg-linux-nonx86" depends="preppkg-unix">
+     <!--
         <copy todir="pkg-temp/lib/wrapper/linux-ppc/">
             <fileset dir="installer/lib/wrapper/linux-ppc/" excludes="*.txt" />
         </copy>
+      -->
         <copy todir="pkg-temp/lib/wrapper/linux-armv5/">
             <fileset dir="installer/lib/wrapper/linux-armv5/" excludes="*.txt" />
         </copy>
@@ -1427,9 +1440,9 @@
         <copy file="installer/resources/uninstall_i2p_service_osx.command" todir="pkg-temp/" />
     </target>
 
-    <target name="preppkg-osx-only" depends="preppkg-osx, jbigi-osx-only" >
+    <target name="preppkg-osx-only" depends="preppkg-osx, jbigi-osx-only, buildWrapperJar" >
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
-        <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
+        <copy file="installer/lib/wrapper/build/wrapper.jar" todir="pkg-temp/lib" />
     </target>
 
     <target name="preppkg-windows" depends="preppkg-base, preplicenses-windows, buildUtilityJar, buildexe">
@@ -1455,9 +1468,9 @@
           This will not overwrite, so preppkg (for all OSes) will get the new jar with
           the old binaries, which will probably work but will output a warning.
           The windows-only installer will get the correct jar.
-        <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
+        <copy file="installer/lib/wrapper/build/wrapper.jar" todir="pkg-temp/lib" />
       -->
-        <copy overwrite="true" file="installer/lib/wrapper/win-all/wrapper.jar" todir="pkg-temp/lib" />
+        <copy overwrite="true" file="installer/lib/wrapper/win-build/wrapper.jar" todir="pkg-temp/lib" />
     </target>
 
     <!-- see targets below for conditional copying -->
@@ -3171,7 +3184,7 @@
 	<target name = "preppkg-portable-win32" depends="preppkg-portable-win32-jbigi,preppkg-portable-basic">
 			<!--wrapper - dont even think about it. i2p cosumes appreantly more mem without it on win32-->
 		<copy file="installer/lib/wrapper/win32/wrapper.dll" todir="pkg-temp/lib" />
-		<copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
+		<copy file="installer/lib/wrapper/build/wrapper.jar" todir="pkg-temp/lib" />
 		<copy file="installer/lib/wrapper/win32/I2Psvc.exe" tofile="pkg-temp/i2psvc.ex_" />
 			<!--  copy the unpack/start batchfiles -->
 		<copy todir="pkg-temp">

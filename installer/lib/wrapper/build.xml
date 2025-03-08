@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="wrapper">
+
+    <property name="javac.compilerargs" value="" />
+    <property name="javac.version" value="1.8" />
+    <property name="javac.release" value="8" />
+    <property name="build.built-by" value="unknown" />
+    <property name="build.timestamp" value="unknown" />
+    <property name="workspace.version" value="unknown" />
+    <property name="wrapper.version" value="3.5.60" />
+
+    <target name="all" depends="jar" />
+
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+
+    <target name="depend" if="depend.available">
+        <depend
+            cache="../../build"
+            srcdir="./patches" 
+            destdir="./build/obj" >
+            <classpath>
+                <pathelement location="all/wrapper.jar" />
+            </classpath>
+        </depend>
+    </target>
+
+    <target name="compilePatches" depends="depend" >
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac 
+            srcdir="./patches" 
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            release="${javac.release}"
+            destdir="./build/obj" 
+            encoding="UTF-8"
+            includeAntRuntime="false" >
+            <classpath>
+                <pathelement location="all/wrapper.jar" />
+            </classpath>
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
+    </target>
+
+    <!--
+      -  We have to make a new jar because the tanuki one is signed
+      -->
+    <target name="jar" depends="compilePatches, jarUpToDate" unless="jar.uptodate" >
+        <jar destfile="./build/wrapper.jar" basedir="./build/obj" includes="**/*.class">
+            <manifest>
+                <attribute name="Specification-Title" value="Java Service Wrapper" />
+                <attribute name="Specification-Vendor" value="Tanuki Software, Ltd." />
+                <attribute name="Specification-Version" value="${wrapper.version}" />
+                <attribute name="Implementation-Title" value="org.tanukisoftware.wrapper" />
+                <attribute name="Implementation-Vendor" value="Tanuki Software, Ltd." />
+                <attribute name="Implementation-Version" value="${wrapper.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+                <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
+            </manifest>
+            <zipfileset excludes="META-INF/* org/tanukisoftware/wrapper/bootstrap/WrapperBootstrap.class" src="all/wrapper.jar"/>
+        </jar>
+    </target>    
+
+    <target name="jarUpToDate">
+        <uptodate property="jar.uptodate" targetfile="build/wrapper.jar" >
+            <srcfiles dir= "build/obj" includes="**/*.class" />
+            <srcfiles dir= "all" />
+        </uptodate>
+    </target>    
+
+    <target name="clean" >
+        <delete dir="./build" />
+    </target>    
+    <target name="distclean" depends="clean" />
+</project>

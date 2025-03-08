@@ -26,6 +26,9 @@ For armv6, build from source following the instructions
 in linux-armv6/README.txt.
 Don't forget to strip the binaries and disable the execute bit.
 
+From the source, copy WrapperBootstrap.java to patches/
+and merge in our changes.
+
 For macosx, combine (if possible) the universal-32 and universal-64 files
 from the delta pack (each is a 2-architecture fat file)
 into a "quad-fat" binary. Instructions can be found in
