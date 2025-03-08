@@ -352,7 +352,7 @@ class TestJob extends JobImpl {
             if (!_found && (_encryptTag != null || _ratchetEncryptTag != null)) {
                 // don't clog up the SKM with old one-tag tagsets
                 SessionKeyManager skm;
-                if (_cfg.isInbound() && !_pool.getSettings().isExploratory()) {
+                if (!_pool.getSettings().isExploratory()) {
                     skm = getContext().clientManager().getClientSessionKeyManager(_pool.getSettings().getDestination());
                 } else {
                     skm = getContext().sessionKeyManager();
