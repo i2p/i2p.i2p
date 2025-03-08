@@ -468,6 +468,12 @@ public class WrapperBootstrap
             {
                 version = version.substring( 0, i );
             }
+            // I2P 24-ea
+            i = version.indexOf( "-" );
+            if ( i != -1 ) 
+            {
+                version = version.substring( 0, i );
+            }
         }
         return Integer.parseInt( version );
     }
