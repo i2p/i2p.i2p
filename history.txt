@@ -1,3 +1,12 @@
+2025-03-08 zzz
+ * Tunnels: Fix UOE on timeout of OB client tunnel test
+
+2025-03-07 zzz
+ * installer: Add logo to first panel, add progress bar
+
+2025-03-06 zzz
+ * i2ptunnel: Change encryption type radio to dropdown, update tooltips
+
 2025-03-01 zzz
  * Console: Add error page test servlet
  * GeoIP 2025-03-01
