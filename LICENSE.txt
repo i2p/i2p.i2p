@@ -128,10 +128,6 @@ Public domain except as listed below:
    Copyright (C) 2006 The Android Open Source Project
    See licenses/LICENSE-Apache2.0.txt
 
-   SSU HMAC:
-   Copyright (c) 2000 - 2004 The Legion Of The Bouncy Castle
-   See licenses/LICENSE-SHA256.txt
-
 
 Installer:
    (not included in distribution packages)
