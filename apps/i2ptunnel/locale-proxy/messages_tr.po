@@ -4,7 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Kaya Zeren <kayazeren@gmail.com>, 2016-2023
+# Kaya Zeren <kayazeren@gmail.com>, 2016-2023,2025
 # Ozancan Karataş <ozancankaratas96@outlook.com>, 2015
 # zzzi2p, 2018
 msgid ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
 "PO-Revision-Date: 2013-07-20 14:50+0000\n"
-"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2016-2023\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2016-2023,2025\n"
 "Language-Team: Turkish (Turkey) (http://app.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -110,7 +110,7 @@ msgstr "Sİteye erişilemiyor."
 msgid ""
 "The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr "Site çevrimdışı, bir ağ tıkanıklığı var ya da yönelticiniz henüz eşler ile iyi bütünleşmemiş."
+msgstr "Site çevrim dışı, bir ağ tıkanıklığı var ya da yönelticiniz henüz eşler ile iyi bütünleşmemiş."
 
 #: ../java/build/Proxy.java:14 ../java/build/Proxy.java:58
 #: ../java/build/Proxy.java:109 ../java/build/Proxy.java:129
@@ -319,7 +319,7 @@ msgstr "Yanlış Base 64 dizgesi yapıştırmış olabilirsiniz ya da izlediğin
 
 #: ../java/build/Proxy.java:128
 msgid "The I2P host could also be offline."
-msgstr "I2P sunucusu da çevrimdışı olabilir."
+msgstr "I2P sunucusu da çevrim dışı olabilir."
 
 #: ../java/build/Proxy.java:131 ../java/build/Proxy.java:137
 msgid "Warning: No Outproxy Configured"
@@ -385,7 +385,7 @@ msgstr "HTTP çıkış vekil sunucusu bulunamadı"
 msgid ""
 "It is offline, there is network congestion, or your router is not yet well-"
 "integrated with peers."
-msgstr "Çevrimdışı, bir ağ tıkanıklığı var ya da yönelticiniz henüz eşler ile iyi bütünleşmemiş."
+msgstr "Çevrim dışı, bir ağ tıkanıklığı var ya da yönelticiniz henüz eşler ile iyi bütünleşmemiş."
 
 #: ../java/build/Proxy.java:172 ../java/build/Proxy.java:178
 msgid "Warning: Request Denied"

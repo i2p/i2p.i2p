@@ -91,11 +91,11 @@ msgstr "desconocido"
 msgid ""
 "To protect your privacy, SusiMail has blocked remote content in this "
 "message."
-msgstr ""
+msgstr "Para proteger tu privacidad, SusiMail ha bloqueado contenido remoto en este mensaje."
 
 #: src/src/i2p/susi/webmail/WebMail.java:639
 msgid "Enable javascript for improved display of this message."
-msgstr ""
+msgstr "Habilita JavaScript para mejorar la visualización de este mensaje."
 
 #: src/src/i2p/susi/webmail/WebMail.java:665
 #, java-format
@@ -128,7 +128,7 @@ msgstr "Es necesario un nombre de usuario para la autentificación."
 
 #: src/src/i2p/susi/webmail/WebMail.java:795
 msgid "Do not include @mail.i2p in the username"
-msgstr ""
+msgstr "No incluyas @mail.i2p en el nombre de usuario."
 
 #: src/src/i2p/susi/webmail/WebMail.java:800
 msgid "Need password for authentication."

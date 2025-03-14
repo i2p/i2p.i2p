@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-22 13:52+0000\n"
+"POT-Creation-Date: 2025-03-05 15:28+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: Chinese (Gan) (http://app.transifex.com/otf/I2P/language/gan/)\n"
@@ -34,19 +34,19 @@ msgstr "已按路由散列值封禁"
 msgid "IP banned by blocklist.txt entry {0}"
 msgstr "已按 blocklist.txt 项 {0} 封禁 IP"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1533
+#: ../../../router/java/src/net/i2p/router/Router.java:1539
 #: ../java/src/net/i2p/router/web/helpers/ConfigRestartBean.java:69
 msgid "Restart imminent"
 msgstr "立刻重啟"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1535
+#: ../../../router/java/src/net/i2p/router/Router.java:1541
 #: ../java/src/net/i2p/router/web/helpers/ConfigRestartBean.java:71
 msgid "Shutdown imminent"
 msgstr "強制關閉"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:2037
+#: ../../../router/java/src/net/i2p/router/Router.java:2043
 #: ../../../router/java/src/net/i2p/router/sybil/Analysis.java:1090
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:740
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:741
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1399
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1404
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:982
@@ -197,9 +197,9 @@ msgstr "状态"
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1114
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1135
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:66
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:300
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:302
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1000
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:301
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:303
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1001
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:584
 msgid "Type"
 msgstr "类型"
@@ -220,9 +220,9 @@ msgstr "WAN PPP連線"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1112
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:1130
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:632
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:658
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:692
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:684
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:718
 msgid "Uptime"
 msgstr "執行時間"
 
@@ -317,10 +317,16 @@ msgstr "UPnP 启动失败 - 无网络连接？"
 msgid "UPnP failed to start - port conflict?"
 msgstr "UPnP 启动失败 - 端口冲突？"
 
+#: ../../addressbook/java/src/net/i2p/addressbook/Daemon.java:679
+#, java-format
+msgid "{0} new host"
+msgid_plural "{0} new hosts"
+msgstr[0] "{0}新主机"
+
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:905
 #: ../java/src/net/i2p/router/web/DeadlockDetector.java:109
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:145
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:276
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:146
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:277
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1379
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:562
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:929
@@ -658,10 +664,8 @@ msgstr " {0} 上未發現新版本"
 
 #: ../java/src/net/i2p/router/web/CSSHelper.java:185
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:241
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:142
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:143
 #: ../java/strings/Strings.java:28
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/certs_jsp.java:317
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/certs_jsp.java:319
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:329
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:331
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:329
@@ -1185,7 +1189,7 @@ msgstr "已封禁对等节点"
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:170
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:75
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:131
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1431
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1446
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:138
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:652
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:185
@@ -1218,7 +1222,7 @@ msgstr "本地 SSL 證書"
 
 #. console
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:34
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:142
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:143
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:259
 msgid "Router Console"
 msgstr "路由控制檯"
@@ -1251,8 +1255,8 @@ msgid "Local Router Family Certificate"
 msgstr "本地路由家族憑證"
 
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:91
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:284
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1474
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:285
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1432
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:973
 msgid "Family"
 msgstr "家族"
@@ -1456,7 +1460,7 @@ msgid "Add Client"
 msgstr "新增客戶端"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:132
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1040
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1066
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:626
 msgid "Client"
 msgstr "客户端"
@@ -1484,15 +1488,15 @@ msgid "Description"
 msgstr "描述"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:243
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:127
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:247
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:128
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:248
 msgid "Torrents"
 msgstr "Torrents"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:245
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:126
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:127
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:41
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:358
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:380
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:262
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:447
 msgid "Hidden Services Manager"
@@ -1503,14 +1507,14 @@ msgid "Identification Image Generator"
 msgstr "身份图像生成器"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:249
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:129
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:348
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:130
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:369
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:262
 msgid "Address Book"
 msgstr "地址簿"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:251
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:125
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:126
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:224
 msgid "Email"
 msgstr "电子邮件"
@@ -1520,14 +1524,14 @@ msgid "Plugin"
 msgstr "外掛"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:292
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:280
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1194
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:281
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1193
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:421
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:596
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:97
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:622
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:648
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:682
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:674
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:708
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:956
 msgid "Version"
 msgstr "版本"
@@ -1774,13 +1778,13 @@ msgid "Cancel"
 msgstr "取消"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:63
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:925
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:955
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:926
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:956
 msgid "Destination"
 msgstr "目的地"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:64
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:455
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:471
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1111
 msgid "Name"
 msgstr "名稱"
@@ -1806,9 +1810,9 @@ msgstr "有效期至"
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:97
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:132
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:137
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:728
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:733
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:918
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:729
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:734
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:919
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:588
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:600
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:610
@@ -1873,14 +1877,13 @@ msgstr "主頁"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:30
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:184
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:760
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:786
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:441
 msgid "Network"
 msgstr "网络"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:30
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:193
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/certs_jsp.java:384
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:405
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:405
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:411
@@ -1933,8 +1936,8 @@ msgstr "用户界面"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:31
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:59
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:468
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1023
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:492
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1049
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:210
 #: ../java/strings/Strings.java:56
 msgid "Tunnels"
@@ -1954,22 +1957,22 @@ msgstr "日志"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:32
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:54
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:450
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:809
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:873
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:474
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:835
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:899
 #: ../java/strings/Strings.java:52
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:483
 msgid "Peers"
 msgstr "節點"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:32
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1461
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:582
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1476
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:608
 msgid "Stats"
 msgstr "數據"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:33
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:233
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:234
 msgid "Plugins"
 msgstr "外掛程式"
 
@@ -1978,7 +1981,7 @@ msgid "Web Apps"
 msgstr "Web Apps"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:34
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:490
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:514
 msgid "Advanced"
 msgstr "高级"
 
@@ -2580,12 +2583,12 @@ msgid "Add a user and password to enable."
 msgstr "新增使用者和密碼後可啟用。"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:238
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:451
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:467
 msgid "Mark for deletion"
 msgstr "標記為刪除"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:240
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:453
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:469
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:1109
 msgid "Remove"
 msgstr "移除"
@@ -2851,7 +2854,7 @@ msgstr "平均"
 
 #. 7 days
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:429
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:525
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:551
 msgid "Events"
 msgstr "事件"
 
@@ -2887,42 +2890,42 @@ msgstr "儲存設定並重繪圖表"
 msgid "Graph settings saved"
 msgstr "圖表設定已儲存"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:125
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:126
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:227
 msgid "Anonymous webmail client"
 msgstr "匿名 Web 邮件客户端"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:126
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:127
 msgid "Control your client and server tunnels"
 msgstr "控制您的客户端和服务器隧道"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:127
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:251
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:128
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:252
 msgid "Built-in anonymous BitTorrent Client"
 msgstr "内置匿名 BitTorrent 客户端"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:128
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:129
 msgid "Local web server for hosting your own content on I2P"
 msgstr "在 I2P 上托管您自己的内容的本地网络服务器"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:128
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:387
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:260
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:129
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:388
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:262
 msgid "Web Server"
 msgstr "网络服务器"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:129
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:350
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:130
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:371
 msgid "Manage your I2P hosts file here (I2P domain name resolution)"
 msgstr "管理您的 I2P hosts 文件（I2P 域名解析表）"
 
 #. _x("Configure Homepage") + S + _x("Configure the contents of this page") +
 #. S + "/confighome" + S + I + "info/home.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:135
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:136
 msgid "Configure Bandwidth"
 msgstr "配置頻寬"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:135
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:136
 msgid "I2P Bandwidth Configuration"
 msgstr "I2P 頻寬設定"
 
@@ -2935,25 +2938,25 @@ msgstr "I2P 頻寬設定"
 #. _x("Customize Sidebar") + S + _x("Customize the sidebar by adding or
 #. removing or repositioning elements") + S + "/configsidebar" + S + I +
 #. "info/sidebar.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:140
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:368
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:141
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:391
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:265
 msgid "Help"
 msgstr "Help"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:140
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:141
 msgid "I2P Router Help"
 msgstr "I2P路由幫助"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:141
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:142
 msgid "Install and configure I2P plugins"
 msgstr "安装和配置 I2P 插件"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:141
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:142
 msgid "Manage Plugins"
 msgstr "管理插件"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:154
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:155
 msgid "Frequently Asked Questions"
 msgstr "常見問題（聯網）"
 
@@ -2971,36 +2974,36 @@ msgstr "常見問題（聯網）"
 #. + I + "echelon.png" + S +
 #. "exchanged.i2p" + S + _x("Anonymous cryptocurrency exchange") + S +
 #. "http://exchanged.i2p/" + S + I + "exchanged.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:154
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:155
 msgid "I2P FAQ"
 msgstr "I2P 常見問題解答"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:155
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:156
 msgid "Community forum"
 msgstr "社区论坛"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:155
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:156
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:459
 msgid "I2P Forum"
 msgstr "I2P 论坛"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:156
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:157
 msgid "Community git project hosting"
 msgstr "社区 git 项目托管"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:156
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:157
 msgid "Git Project Hosting"
 msgstr "Git 项目托管"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:157
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:158
 msgid "I2P Pastebin"
 msgstr "I2P Pastebin"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:157
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:158
 msgid "Pastebin for I2P users"
 msgstr "面向 I2P 用户的 Pastebin"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:169
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:170
 msgid "I2P News"
 msgstr "I2P 新聞"
 
@@ -3027,11 +3030,11 @@ msgstr "I2P 新聞"
 #. "http://open4you.i2p/" + S + I + "open4you-logo.png" + S +
 #. _x("Pastebin") + S + _x("Encrypted I2P Pastebin") + S +
 #. "http://zerobin.i2p/" + S + I + "paste_plain.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:169
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:170
 msgid "Planet I2P"
 msgstr "Planet I2P"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:173
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:174
 msgid "I2P home page"
 msgstr "I2P 主頁"
 
@@ -3042,7 +3045,7 @@ msgstr "I2P 主頁"
 #. "http://tracker2.postman.i2p/" + S + I + "magnet.png" + S +
 #. _x("PrivateBin") + S + _x("Encrypted I2P Pastebin") + S +
 #. "http://paste.crypthost.i2p/" + S + I + "paste_plain.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:173
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:174
 msgid "Project Website"
 msgstr "項目網站"
 
@@ -3056,94 +3059,94 @@ msgstr "項目網站"
 #. "billiard_marker.png" + S +
 #. "sponge.i2p" + S + _x("Seedless and the Robert BitTorrent applications") +
 #. S + "http://sponge.i2p/" + S + I + "user_astronaut.png" + S +
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:179
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:180
 msgid "Not Bob's Address Services"
 msgstr "非 Bob 的地址服务"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:180
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:181
 msgid "Ramble user-moderated forum aggregator"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:181
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:182
 msgid "StormyCloud Outproxy Services"
 msgstr "StormyCloud 出口路由服务"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:187
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:432
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:188
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:455
 msgid "Logs"
 msgstr "活動記錄"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:187
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:188
 msgid "View the logs"
 msgstr "查看日志"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:188
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:422
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:189
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:445
 msgid "Graphs"
 msgstr "圖表"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:188
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:189
 msgid "Visualize information about the router"
 msgstr "关于路由的可视化信息"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:189
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:190
 msgid "I2P Technical Docs"
 msgstr "I2P 技術資料"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:189
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:190
 msgid "Technical documentation"
 msgstr "技術文件"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:190
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:191
 msgid "I2P Wiki"
 msgstr "I2P Wiki"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:191
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:192
 msgid "Bug tracker"
 msgstr "错误跟踪器"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:191
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:192
 msgid "I2P Bug Reports"
 msgstr "I2P 错误报告"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:192
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:193
 msgid "I2P Network Statistics"
 msgstr "I2P 网络统计"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:219
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:220
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:588
 msgid "Applications"
 msgstr "应用程序"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:246
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:247
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:620
 msgid "Configuration and Help"
 msgstr "配置和帮助"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:259
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:260
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:636
 msgid "Network and Developer Information"
 msgstr "网络和开发者信息"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:271
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:272
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:604
 msgid "I2P Community Sites"
 msgstr "I2P 社区站点"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:311
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:312
 msgid "The HTTP proxy is not up"
 msgstr "HTTP 代理未启动"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:313
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:314
 #, java-format
 msgid "Your browser is not properly configured to use the HTTP proxy at {0}"
 msgstr "您的浏览器尚未配置使用 HTTP 代理 {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:457
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:473
 msgid "URL"
 msgstr "網址"
 
-#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:484
+#: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:500
 msgid "Add"
 msgstr "新增"
 
@@ -3218,17 +3221,17 @@ msgstr "掛起"
 msgid "Summary"
 msgstr "概要"
 
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:83
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:197
+#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:85
+#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:205
 msgid "File location"
 msgstr "文件位置"
 
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:194
+#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:202
 msgid "File not found"
 msgstr "檔案未找到"
 
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:203
-#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:257
+#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:211
+#: ../java/src/net/i2p/router/web/helpers/LogsHelper.java:265
 msgid "No log messages"
 msgstr "無日誌訊息"
 
@@ -3255,14 +3258,14 @@ msgstr "全部路由及完整統計"
 
 #. 4
 #: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:54
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:564
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:590
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:967
 msgid "LeaseSets"
 msgstr "租约集"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:442
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:282
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1246
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:283
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1245
 msgid "Country"
 msgstr "國家"
 
@@ -3272,157 +3275,157 @@ msgid "Full destination, name, Base32, or hash"
 msgstr "完整目标，名称，Base32，或散列值"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:463
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:296
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:297
 msgid "MTU"
 msgstr "MTU"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:464
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:290
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:291
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:743
 msgid "Port"
 msgstr "埠"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:118
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:119
 msgid ""
 "Never reveal your router identity to anyone, as it is uniquely linked to "
 "your IP address in the network database."
 msgstr "绝对不要向任何人泄露您的路由身份，因为它在网络数据库中独一无二的联系到您的 IP 地址。"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:147
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:311
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:900
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:148
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:312
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:901
 msgid "not found in network database"
 msgstr "在網路資料庫中未找到"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:308
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:309
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:207
 #: ../java/strings/Strings.java:55
 msgid "Transport"
 msgstr "傳輸"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:353
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1107
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1163
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:354
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1106
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1162
 msgid "Previous Page"
 msgstr "上一页"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:356
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1110
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1166
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:357
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1109
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1165
 msgid "Page"
 msgstr "页面"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:360
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1114
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1169
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:361
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1113
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1168
 msgid "Next Page"
 msgstr "下一页"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:717
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:718
 msgid "Leasesets for Client"
 msgstr "客户端赁集"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:726
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:731
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:921
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:727
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:732
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:922
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:413
 msgid "Local"
 msgstr "本地"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:729
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:924
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:730
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:925
 msgid "Unpublished"
 msgstr "未釋出"
 
 #. published slightly in the future
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:734
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:735
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1402
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1408
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1179
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1205
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1039
 msgid "Published"
 msgstr "釋出"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:747
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:768
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:991
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1013
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1066
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:748
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:769
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:992
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1012
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1065
 #, java-format
 msgid "Expires in {0}"
 msgstr "{0} 後過期"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:749
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:770
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:993
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1015
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1068
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:750
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:771
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:994
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1014
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1067
 #, java-format
 msgid "Expired {0} ago"
 msgstr "{0} 前過期"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:756
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1055
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:757
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1054
 msgid "Lease"
 msgstr "租賃"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:760
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1059
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:761
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1058
 msgid "Tunnel"
 msgstr "隧道"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:780
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:781
 msgid "Manually Configure Floodfill Participation"
 msgstr "手動設置 Floodfill 參與度"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:781
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:782
 msgid "Configure Floodfill Participation"
 msgstr "設定 Floodfill 參與度"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:898
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:915
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:899
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:916
 msgid "LeaseSet"
 msgstr "赁集"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:949
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:972
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:950
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:973
 msgid "Add to address book"
 msgstr "添加至地址簿"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:951
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:974
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:952
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:975
 msgid "Add to local address book"
 msgstr "添加至本地地址簿"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:985
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:986
 #, java-format
 msgid "Published {0} ago"
 msgstr "发布于 {0} 前"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1084
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1083
 msgid "Not initialized"
 msgstr "未初始化"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1187
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:444
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1186
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:468
 msgid "Network Database Router Statistics"
 msgstr "網路資料庫路由統計"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1194
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1216
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1252
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1193
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1215
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1251
 msgid "Count"
 msgstr "次數"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1216
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1215
 msgid "Transports"
 msgstr "传输"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1245
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1244
 msgid "Sort by country"
 msgstr "按国家排序"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1251
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1250
 msgid "Sort by count"
 msgstr "按计数排序"
 
@@ -3457,13 +3460,13 @@ msgstr "已更新"
 msgid "Signing Key"
 msgstr "簽名金鑰"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1428
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1443
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:43
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1044
 msgid "Addresses"
 msgstr "地址"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1446
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1461
 msgid "cost"
 msgstr "開銷"
 
@@ -3525,7 +3528,7 @@ msgstr "IPv6 僅 NTCP, SSU, 中介"
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:683
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:182
 #: ../java/src/net/i2p/router/web/helpers/ProfilesHelper.java:15
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:930
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:956
 msgid "Banned"
 msgstr "已封禁"
 
@@ -3588,7 +3591,7 @@ msgstr "对等节点连接"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:208
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:265
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:971
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:997
 msgid "Total"
 msgstr "總計"
 
@@ -4071,8 +4074,8 @@ msgstr "严重拥堵"
 #. 0
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:307
 #: ../java/src/net/i2p/router/web/helpers/ProfilesHelper.java:14
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:848
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:912
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:874
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:938
 msgid "Floodfill"
 msgstr "Floodfill"
 
@@ -4301,12 +4304,12 @@ msgid "Help &amp; FAQ"
 msgstr "幫助與常見問答"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:44
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:289
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:291
 msgid "I2P Services"
 msgstr "I2P 服務"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:45
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:338
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:359
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:445
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:445
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:454
@@ -4331,7 +4334,7 @@ msgid "Configuration"
 msgstr "設定"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:46
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:412
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:435
 msgid "Diagnostics"
 msgstr "诊断信息"
 
@@ -4356,7 +4359,7 @@ msgid "Network Reachability"
 msgstr "网络可达性"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:52
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:792
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:818
 msgid "Update Status"
 msgstr "更新状态"
 
@@ -4377,7 +4380,7 @@ msgid "Bandwidth Graph"
 msgstr "流量圖"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:60
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1073
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1099
 msgid "Congestion"
 msgstr "擁堵"
 
@@ -4386,13 +4389,13 @@ msgid "Tunnel Status"
 msgstr "隧道状态"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:62
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:361
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:383
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:609
 msgid "Local Tunnels"
 msgstr "本地隧道"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:63
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1171
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1197
 msgid "News &amp; Updates"
 msgstr "新聞和更新"
 
@@ -4404,8 +4407,16 @@ msgstr "高级连接"
 msgid "I2P Router Help &amp; FAQ"
 msgstr "I2P 使用幫助與常見問答"
 
+#. moved to /debug tab
+#. String tx = _t("Certs");
+#. rbuf.append("<a target=\"_top\" title=\"")
+#. .append(_t("Review active encryption certificates used in console"))
+#. .append("\" href=\"/certs\">")
+#. .append(nbsp(tx))
+#. .append("</a>\n");
+#. svcs.put(tx, rbuf.toString());
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:158
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:506
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:532
 msgid "Changelog"
 msgstr "更改日志"
 
@@ -4432,7 +4443,7 @@ msgid "Information regarding software and licenses used by I2P"
 msgstr "I2P 使用的软件和许可证信息"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:187
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:758
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:784
 msgid "Information about the network status"
 msgstr "关于网络状态的信息"
 
@@ -4448,350 +4459,342 @@ msgstr "故障排除"
 msgid "Troubleshooting &amp; Further Assistance"
 msgstr "故障排除 &amp; 更多帮助"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:235
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:236
 msgid "I2PControl"
 msgstr "I2P 控制"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:239
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:240
 msgid "RPC Service"
 msgstr "RPC 服务"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:261
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:263
 msgid "Local web Server"
 msgstr "本地网络服务器"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:287
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:289
 msgid ""
 "Configure startup of clients and webapps (services); manually start dormant "
 "services"
 msgstr "设置客户端及 Web 应用（服务）的启动；手动启动重要服务"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:336
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:380
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:410
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:357
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:403
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:433
 msgid "Configure I2P Router"
 msgstr "设置 I2P 路由"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:371
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:394
 msgid "Router Help and FAQ"
 msgstr "路由帮助和常见问题"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:377
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:400
 msgid "Settings"
 msgstr "設定"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:386
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:409
 msgid "Setup"
 msgstr "設定"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:389
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:412
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:319
 msgid "New Install Wizard"
 msgstr "新安装向导"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:425
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:448
 msgid "Graph router performance"
 msgstr "路由效能統計圖"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:435
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:458
 msgid "Health Report"
 msgstr "健康报告"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:441
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:465
 msgid "NetDB"
 msgstr "网络数据库"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:453
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:807
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:871
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:477
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:833
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:897
 msgid "Show all current peer connections"
 msgstr "显示所有当前对等节点连接"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:459
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:483
 msgid "Profiles"
 msgstr "摘要"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:462
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:486
 msgid "Show recent peer performance profiles"
 msgstr "显示当前对等节点的性能记录"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:471
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1021
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:495
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1047
 msgid "View existing tunnels and tunnel build status"
 msgstr "檢視現存隧道及隧道的建立狀態"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:488
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:512
 msgid "Advanced Configuration"
 msgstr "進階設定"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:498
-msgid "Certs"
-msgstr "證書"
-
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:500
-msgid "Review active encryption certificates used in console"
-msgstr "查看控制台裡面正在使用已經激活的數位憑證"
-
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:509
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:535
 msgid "View full changelog"
 msgstr "查看全部的更新日誌"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:515
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:541
 msgid "Debug"
 msgstr "除錯"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:518
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:544
 msgid "View router debug information"
 msgstr "查看路由器除錯記錄"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:528
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:554
 msgid "View historical log of router events"
 msgstr "查看路由事件的历史日志"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:550
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:576
 msgid "Documentation for the I2P API"
 msgstr "I2P API 文档"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:555
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:581
 msgid "Jobs"
 msgstr "任務"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:558
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:584
 msgid "Show the router's workload, and how it's performing"
 msgstr "显示路由工作负载及性能"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:567
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:593
 msgid "View active leasesets (debug mode)"
 msgstr "查看活动租契集（调试模式）"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:573
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:599
 msgid "NetDB Search"
 msgstr "搜索 NetDB"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:576
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:602
 msgid "Network database search tool"
 msgstr "網路資料庫搜索工具"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:585
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:611
 msgid "Textual router performance statistics"
 msgstr "路由效能文字統計"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:591
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:617
 msgid "Sybils"
 msgstr "女巫攻擊"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:594
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:620
 msgid "Review possible sybils in network database"
 msgstr "在網路資料庫中檢閱可能發生的女巫攻擊"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:611
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:671
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:637
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:697
 #, java-format
 msgid ""
 "Your Local Identity [{0}] is your unique I2P router identity, similar to an "
 "IP address but tailored to I2P. "
 msgstr "您的本地身份 [{0}] 是您的独一无二的 I2P 路由身份，类似于 IP 地址但特定于 I2P。"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:612
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:672
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:638
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:698
 msgid "Never disclose this to anyone, as it can reveal your real world IP."
 msgstr "绝对不要将它泄露给任何人，因为它能揭露您的真实世界 IP。"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:614
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:674
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:640
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:700
 msgid "Router Info"
 msgstr "路由信息"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:619
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:645
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:679
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:671
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:705
 msgid "The version of the I2P software we are running"
 msgstr "当前运行的 I2P 软件版本"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:629
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:655
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:689
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:681
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:715
 msgid "How long we've been running for this session"
 msgstr "本次路由執行時間"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:699
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:725
 msgid "Difference between network-synced time and local time"
 msgstr "网络同步时间和本地时间的差"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:702
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:728
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:637
 msgid "Clock Skew"
 msgstr "时钟偏差"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:709
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:735
 msgid ""
 "How much RAM I2P is using / total RAM available to I2P (excludes RAM "
 "allocated to the JVM)"
 msgstr "I2P 使用的内存 / I2P 可用的总内存（排除分配给 JVM 的内存）"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:712
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:738
 msgid "Memory"
 msgstr "記憶體"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:769
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:795
 msgid "See more information on the wiki"
 msgstr "在 wiki 檢視更多資訊"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:771
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:797
 msgid "Warning: ECDSA is not available. Update your Java or OS"
 msgstr "警告：ECDSA 不可用。請更新您的 Java 或作業系統"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:776
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:802
 #, java-format
 msgid "Warning: Java version {0} is no longer supported by I2P."
 msgstr "警告：Java 版本 {0} 不再受到 I2P 支援。"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:778
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:804
 #, java-format
 msgid "Update Java to version {0} or higher to receive I2P updates."
 msgstr "更新 Java 到 {0} 或更高版本以接收 I2P 更新。"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:790
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:816
 msgid "Configure I2P Updates"
 msgstr "设置 I2P 更新"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:815
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:879
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:841
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:905
 msgid "Peers we've been talking to in the last few minutes/last hour"
 msgstr "路由连接过的对等节点数量 过去数分钟/过去一小时"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:818
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:882
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:844
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:908
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:485
 msgid "Active"
 msgstr "活跃中的"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:827
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:891
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:853
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:917
 msgid "The number of peers available for building client tunnels"
 msgstr "可用来建立客户端隧道的对等节点数量"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:830
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:894
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:856
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:920
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:495
 msgid "Fast"
 msgstr "快速"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:836
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:900
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:862
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:926
 msgid "The number of peers available for building exploratory tunnels"
 msgstr "可用来建立探测隧道的对等节点数量"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:839
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:903
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:865
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:929
 msgid "High capacity"
 msgstr "高容量"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:845
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:909
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:871
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:935
 msgid "The number of peers available for network database inquiries"
 msgstr "可用来查询网络数据库的对等节点"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:854
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:918
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:880
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:944
 msgid "The total number of peers in our network database"
 msgstr "我方网络数据库中记录的对等节点总数量"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:857
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:921
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:883
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:947
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:517
 msgid "Known"
 msgstr "已知節點"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:927
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:953
 msgid "The number of banned peers"
 msgstr "已封禁对等节点数量"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:949
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:975
 msgid "Configure router bandwidth allocation"
 msgstr "設定路由的頻寬配額"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:951
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:977
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:470
 msgid "Bandwidth in/out"
 msgstr "带宽进/出"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:978
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1004
 msgid "Used"
 msgstr "已用"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1010
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1036
 msgid "Our inbound &amp; outbound traffic for the last 20 minutes"
 msgstr "过去 20 分钟我方入站 &amp; 出站流量"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1028
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1054
 msgid ""
 "Used for building and testing tunnels, and communicating with floodfill "
 "peers"
 msgstr "用来建立或测试隧道，与洪泛对等节点通信"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1031
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1057
 msgid "Exploratory"
 msgstr "探測"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1037
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1063
 msgid "Tunnels we are using to provide or access services on the network"
 msgstr "用來提供服務或訪問他人服務的隧道。"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1046
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1072
 msgid ""
 "Tunnels we are participating in, directly contributing bandwidth to the "
 "network"
 msgstr "我方參與的隧道，直接為網路貢獻頻寬"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1049
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1075
 msgid "Participating"
 msgstr "参与"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1055
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1081
 msgid ""
 "The ratio of tunnel hops we provide to tunnel hops we use - a value greater "
 "than 1.00 indicates a positive contribution to the network"
 msgstr "我方提供與使用的隧道比例 - 大於 1.00 表示對網路作出了積極貢獻"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1058
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1084
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:469
 msgid "Share ratio"
 msgstr "共享比率"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1071
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1097
 msgid "What's in the router's job queue?"
 msgstr "檢視路由的作業佇列"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1078
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1104
 msgid "Indicates router performance"
 msgstr "表示路由性能"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1081
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1107
 msgid "Job lag"
 msgstr "作業延遲"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1087
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1113
 msgid "Indicates how quickly outbound messages to other I2P routers are sent"
 msgstr "表示出站訊息發往其他I2P路由的速度"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1090
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1116
 msgid "Message delay"
 msgstr "訊息延遲"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1097
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1123
 msgid "Round trip time for a tunnel test"
 msgstr "隧道測試的往返時間"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1100
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1126
 msgid "Tunnel lag"
 msgstr "隧道延遲"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1107
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1133
 msgid "Queued requests from other routers to participate in tunnels"
 msgstr "請求佇列中來自其他路由的加入隧道請求"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1110
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1136
 msgid "Backlog"
 msgstr "積壓"
 
@@ -5289,12 +5292,10 @@ msgstr "金鑰"
 msgid "port"
 msgstr "埠"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/certs_jsp.java:237
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/certs_jsp.java:414
-msgid "Certificates"
-msgstr "證書"
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:242
+msgid "configure bandwidth"
+msgstr "配置頻寬"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/certs_jsp.java:246
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:252
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:252
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:252
@@ -5340,10 +5341,6 @@ msgstr "證書"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:330
 msgid "Router is down"
 msgstr "路由器已關閉"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:242
-msgid "configure bandwidth"
-msgstr "配置頻寬"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:559
 msgid "Advanced Network Configuration"
@@ -6819,6 +6816,11 @@ msgstr "設定語言"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:411
 msgid "Welcome to I2P"
 msgstr "欢迎使用 I2P"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/debug_jsp.java:419
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/debug_jsp.java:550
+msgid "Certificates"
+msgstr "證書"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/dns_jsp.java:446
 msgid "I2P Address Book"
