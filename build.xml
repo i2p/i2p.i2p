@@ -2816,13 +2816,16 @@
             <fileset dir="../i2p-${Extended.Version}/installer/resources/portable/" />
             <fileset dir="../i2p-${Extended.Version}/installer/resources/small/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
-            <fileset dir="../i2p-${Extended.Version}/_MTN" />
             <fileset dir="../i2p-${Extended.Version}/.git" />
             <fileset dir="../i2p-${Extended.Version}/.idea" />
             <fileset dir="../i2p-${Extended.Version}/.tx" />
-            <file name="../i2p-${Extended.Version}/.mtn-ignore" />
+            <fileset dir="../i2p-${Extended.Version}/reproducible" />
+            <fileset dir="../i2p-${Extended.Version}/.github" />
+            <file name="../i2p-${Extended.Version}/.editorconfig" />
+            <file name="../i2p-${Extended.Version}/.gitlab-ci.yml" />
+            <file name="../i2p-${Extended.Version}/.dockerignore" />
             <fileset dir="../i2p-${Extended.Version}/" includes="Docker*" />
-            <file name="../i2p-${Extended.Version}/Makefile.gcj" />
+            <fileset dir="../i2p-${Extended.Version}/docker" />
             <fileset dir="../i2p-${Extended.Version}/docs" />
             <file name="../i2p-${Extended.Version}/.travis.yml" />
             <file name="../i2p-${Extended.Version}/.gitignore" />
@@ -2892,13 +2895,16 @@
             <fileset dir="../i2p-${Extended.Version}/installer/resources/portable/" />
             <fileset dir="../i2p-${Extended.Version}/installer/resources/small/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
-            <fileset dir="../i2p-${Extended.Version}/_MTN" />
             <fileset dir="../i2p-${Extended.Version}/.git" />
             <fileset dir="../i2p-${Extended.Version}/.idea" />
             <fileset dir="../i2p-${Extended.Version}/.tx" />
-            <file name="../i2p-${Extended.Version}/.mtn-ignore" />
+            <fileset dir="../i2p-${Extended.Version}/reproducible" />
+            <fileset dir="../i2p-${Extended.Version}/.github" />
+            <file name="../i2p-${Extended.Version}/.editorconfig" />
+            <file name="../i2p-${Extended.Version}/.gitlab-ci.yml" />
+            <file name="../i2p-${Extended.Version}/.dockerignore" />
             <fileset dir="../i2p-${Extended.Version}/" includes="Docker*" />
-            <file name="../i2p-${Extended.Version}/Makefile.gcj" />
+            <fileset dir="../i2p-${Extended.Version}/docker" />
             <fileset dir="../i2p-${Extended.Version}/docs" />
             <file name="../i2p-${Extended.Version}/.travis.yml" />
             <file name="../i2p-${Extended.Version}/.gitignore" />
@@ -2971,13 +2977,16 @@
             <fileset dir="../i2p-${Extended.Version}/installer/resources/portable/" />
             <fileset dir="../i2p-${Extended.Version}/installer/resources/small/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
-            <fileset dir="../i2p-${Extended.Version}/_MTN" />
             <fileset dir="../i2p-${Extended.Version}/.git" />
             <fileset dir="../i2p-${Extended.Version}/.idea" />
             <fileset dir="../i2p-${Extended.Version}/.tx" />
-            <file name="../i2p-${Extended.Version}/.mtn-ignore" />
+            <fileset dir="../i2p-${Extended.Version}/reproducible" />
+            <fileset dir="../i2p-${Extended.Version}/.github" />
+            <file name="../i2p-${Extended.Version}/.editorconfig" />
+            <file name="../i2p-${Extended.Version}/.gitlab-ci.yml" />
+            <file name="../i2p-${Extended.Version}/.dockerignore" />
             <fileset dir="../i2p-${Extended.Version}/" includes="Docker*" />
-            <file name="../i2p-${Extended.Version}/Makefile.gcj" />
+            <fileset dir="../i2p-${Extended.Version}/docker" />
             <fileset dir="../i2p-${Extended.Version}/docs" />
             <file name="../i2p-${Extended.Version}/.travis.yml" />
             <file name="../i2p-${Extended.Version}/.gitignore" />
@@ -3037,13 +3046,16 @@
             <fileset dir="../i2p-${Extended.Version}/installer/resources/portable/" />
             <fileset dir="../i2p-${Extended.Version}/installer/resources/small/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
-            <fileset dir="../i2p-${Extended.Version}/_MTN" />
             <fileset dir="../i2p-${Extended.Version}/.git" />
             <fileset dir="../i2p-${Extended.Version}/.idea" />
             <fileset dir="../i2p-${Extended.Version}/.tx" />
-            <file name="../i2p-${Extended.Version}/.mtn-ignore" />
+            <fileset dir="../i2p-${Extended.Version}/reproducible" />
+            <fileset dir="../i2p-${Extended.Version}/.github" />
+            <file name="../i2p-${Extended.Version}/.editorconfig" />
+            <file name="../i2p-${Extended.Version}/.gitlab-ci.yml" />
+            <file name="../i2p-${Extended.Version}/.dockerignore" />
             <fileset dir="../i2p-${Extended.Version}/" includes="Docker*" />
-            <file name="../i2p-${Extended.Version}/Makefile.gcj" />
+            <fileset dir="../i2p-${Extended.Version}/docker" />
             <fileset dir="../i2p-${Extended.Version}/docs" />
             <file name="../i2p-${Extended.Version}/.travis.yml" />
             <file name="../i2p-${Extended.Version}/.gitignore" />
