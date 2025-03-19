@@ -32,7 +32,7 @@ class BanlistRenderer {
     }
 
     public void renderStatusHTML(Writer out) throws IOException {
-        StringBuilder buf = new StringBuilder(1024);
+        StringBuilder buf = new StringBuilder(2048);
         Map<Hash, Banlist.Entry> entries = new TreeMap<Hash, Banlist.Entry>(HashComparator.getInstance());
         
         entries.putAll(_context.banlist().getEntries());
@@ -79,6 +79,10 @@ class BanlistRenderer {
                    .append("#unsh\" title=\"").append(unban).append("\">[").append(unban).append("]</a>");
             }
             buf.append("</li>\n");
+            if (buf.length() > 1024) {
+                out.append(buf);
+                buf.setLength(0);
+            }
         }
         buf.append("</ul>\n");
         out.append(buf);
