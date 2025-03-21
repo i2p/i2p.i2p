@@ -1,0 +1,56 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH I2PROUTER 1 "November 27, 2021" "" I2P
+
+.SH NÁZEV
+i2prouter \- spuštění a zastavení I2P routeru
+
+.SH SOUHRN
+\fBi2prouter\fP
+{\fIconsole\fP|\fIstart\fP|\fIstop\fP|\fIgraceful\fP|\fIrestart\fP|\fIcondrestart\fP|\fIstatus\fP|\fIdump\fP|\fIinstall\fP|\fIremove\fP}
+.br
+
+.SH POPIS
+Správa služby I2P.
+
+.IP \fBconsole\fP
+Spustí I2P jako konzolovou aplikaci pod aktuálním uživatelem.
+
+.IP \fBstart\fP
+Spustí službu I2P.
+
+.IP \fBstop\fP
+Zastaví službu I2P.
+
+.IP \fBrestart\fP
+Zastaví službu I2P a pak ji spustí.
+
+.IP \fBcondrestart\fP
+Restartuje službu I2P pouze pokud již běží.
+
+.IP \fBgraceful\fP
+Zastavit I2P běžným způsobem (může trvat až 11 minut)
+
+.IP \fBinstall\fP
+Nainstalujte initscript pro automatické spuštění I2P při startu systému.
+
+.IP \fBremove\fP
+Odinstalujte initscript, který byl nainstalován pomocí \fBinstall\fP
+
+.IP \fBstatus\fP
+Vypíše, zda je služba I2P spuštěna.
+
+.IP \fBdump\fP
+Zapíše současná vlákna do \fBwrapper.log\fP.
+
+.SH "HLÁŠENÍ CHYB"
+Zadejte prosím problém na
+.UR https://i2pgit.org/i2p\-hackers/i2p.i2p/\-/issues
+serveru I2P GitLab
+.UE .
+
+.SH "TAKÉ SI PŘEČTĚTE"
+\fBi2prouter\-nowrapper\fP(1)

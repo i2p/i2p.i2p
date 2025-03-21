@@ -629,6 +629,7 @@ source_file = installer/resources/locale-man/man.pot
 source_lang = en
 trans.ar = installer/resources/locale-man/man_ar.po
 trans.az = installer/resources/locale-man/man_az.po
+trans.cs = installer/resources/locale-man/man_cs.po
 trans.de = installer/resources/locale-man/man_de.po
 trans.es = installer/resources/locale-man/man_es.po
 trans.es_AR = installer/resources/locale-man/man_es_AR.po
@@ -657,6 +658,8 @@ trans.zh_TW = installer/resources/locale-man/man_zh_TW.po
 ;; and copy new flags in build.xml copyflags-unlesspkg target,
 ;; and add to debian/i2p-router.links and debian-alt/*/i2p-router.links
 ;;
+;; If gan, zh, or zh_TW are updated, restore the eepsite_zh.css line
+;;
 file_filter = installer/resources/eepsite/docroot/help/index_<lang>.po
 type = HTML
 source_file = installer/resources/eepsite/docroot/help/index.html
@@ -665,6 +668,7 @@ source_lang = en
 ;; Merge locally or make changes on TX side before re-enabling
 ;;trans.ar = installer/resources/eepsite/docroot/help/index_ar.html
 trans.az = installer/resources/eepsite/docroot/help/index_az.html
+trans.cs = installer/resources/eepsite/docroot/help/index_cs.html
 trans.de = installer/resources/eepsite/docroot/help/index_de.html
 trans.el = installer/resources/eepsite/docroot/help/index_el.html
 trans.es = installer/resources/eepsite/docroot/help/index_es.html
@@ -680,12 +684,14 @@ trans.ja = installer/resources/eepsite/docroot/help/index_ja.html
 ;;trans.nl = installer/resources/eepsite/docroot/help/index_nl.html
 trans.pl = installer/resources/eepsite/docroot/help/index_pl.html
 trans.pt = installer/resources/eepsite/docroot/help/index_pt.html
+trans.pt_BR = installer/resources/eepsite/docroot/help/index_pt_BR.html
 trans.ro = installer/resources/eepsite/docroot/help/index_ro.html
 trans.ru_RU = installer/resources/eepsite/docroot/help/index_ru.html
 trans.sv_SE = installer/resources/eepsite/docroot/help/index_sv.html
 trans.tr_TR = installer/resources/eepsite/docroot/help/index_tr.html
 trans.uk_UA = installer/resources/eepsite/docroot/help/index_uk.html
 trans.zh_CN = installer/resources/eepsite/docroot/help/index_zh.html
+trans.zh_TW = installer/resources/eepsite/docroot/help/index_zh_TW.html
 
 [o:otf:p:I2P:r:readme]
 ;;

@@ -92,7 +92,9 @@ usr/share/java/json-simple.jar usr/share/i2p/lib/json-simple.jar
 # debian: everywhere
 usr/share/flags/countries/16x11 usr/share/i2p/docs/icons/flags
 usr/share/flags/countries/16x11/az.png usr/share/i2p/eepsite/docroot/help/lib/az.png
+usr/share/flags/countries/16x11/br.png usr/share/i2p/eepsite/docroot/help/lib/br.png
 usr/share/flags/countries/16x11/cn.png usr/share/i2p/eepsite/docroot/help/lib/cn.png
+usr/share/flags/countries/16x11/cs.png usr/share/i2p/eepsite/docroot/help/lib/cs.png
 usr/share/flags/countries/16x11/de.png usr/share/i2p/eepsite/docroot/help/lib/de.png
 usr/share/flags/countries/16x11/es.png usr/share/i2p/eepsite/docroot/help/lib/es.png
 usr/share/flags/countries/16x11/fr.png usr/share/i2p/eepsite/docroot/help/lib/fr.png
@@ -108,5 +110,6 @@ usr/share/flags/countries/16x11/ro.png usr/share/i2p/eepsite/docroot/help/lib/ro
 usr/share/flags/countries/16x11/ru.png usr/share/i2p/eepsite/docroot/help/lib/ru.png
 usr/share/flags/countries/16x11/se.png usr/share/i2p/eepsite/docroot/help/lib/se.png
 usr/share/flags/countries/16x11/tr.png usr/share/i2p/eepsite/docroot/help/lib/tr.png
+usr/share/flags/countries/16x11/tw.png usr/share/i2p/eepsite/docroot/help/lib/tw.png
 usr/share/flags/countries/16x11/ua.png usr/share/i2p/eepsite/docroot/help/lib/ua.png
 usr/share/flags/countries/16x11/us.png usr/share/i2p/eepsite/docroot/help/lib/us.png

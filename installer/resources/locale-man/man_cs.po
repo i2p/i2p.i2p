@@ -1,0 +1,473 @@
+# I2P
+# Copyright (C) 2017 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see https://www.transifex.com/otf/I2P/dashboard/
+# zzz <zzz@mail.i2p>, 2017.
+# 
+# Translators:
+# A5h8d0wf0x <littleslyfoxie28@gmail.com>, 2017
+# slrslr, 2024
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P man pages\n"
+"POT-Creation-Date: 2021-11-27 13:31-0000\n"
+"Last-Translator: slrslr, 2024\n"
+"Language-Team: Czech (https://app.transifex.com/otf/teams/12694/cs/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: cs\n"
+"POT-Revision-Date: 2021-11-27 13:31-0000\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+
+#. type: TH
+#: man/eepget.1:1
+#, no-wrap
+msgid "EEPGET"
+msgstr "EEPGET"
+
+#. type: TH
+#: man/eepget.1:1 man/i2prouter.1:1 man/i2prouter-nowrapper.1:1
+#, no-wrap
+msgid "January 26, 2017"
+msgstr "26. leden, 2017"
+
+#. type: TH
+#: man/eepget.1:1 man/i2prouter.1:1 man/i2prouter-nowrapper.1:1
+#, no-wrap
+msgid "I2P"
+msgstr "I2P"
+
+#. type: SH
+#: man/eepget.1:3 man/i2prouter.1:3 man/i2prouter-nowrapper.1:3
+#, no-wrap
+msgid "NAME"
+msgstr "NÁZEV"
+
+#. type: Plain text
+#: man/eepget.1:5
+msgid "Eepget - I2P downloader"
+msgstr "Eepget - I2P stahovač"
+
+#. type: SH
+#: man/eepget.1:6 man/i2prouter.1:6 man/i2prouter-nowrapper.1:6
+#, no-wrap
+msgid "SYNOPSIS"
+msgstr "SOUHRN"
+
+#. type: Plain text
+#: man/eepget.1:9
+msgid "B<eepget> [I<options>]I<URL>"
+msgstr "B<eepget> [I<options>]I<URL>"
+
+#. type: SH
+#: man/eepget.1:11 man/i2prouter.1:11 man/i2prouter-nowrapper.1:10
+#, no-wrap
+msgid "DESCRIPTION"
+msgstr "POPIS"
+
+#. type: Plain text
+#: man/eepget.1:15
+msgid ""
+"Download a file non-interactively via HTTP. Transfers through both I2P and "
+"the regular Internet are supported."
+msgstr ""
+"Stáhne soubor neinteraktivně prostřednictvím protokolu HTTP. Podporovány "
+"jsou přenosy přes I2P i běžný internet."
+
+#. type: Plain text
+#: man/eepget.1:21
+msgid ""
+"Eepget is able to cope with slow or unstable network connections; if a "
+"download is not successful because of a network problem, it will keep "
+"retrying until the whole file has been retrieved (if the -n option is set)."
+"  If supported by the remote server, eepget will instruct the server to "
+"continue the download from the point of interruption."
+msgstr ""
+"Eepget si poradí i s pomalým nebo nestabilním síťovým připojením; pokud "
+"stahování selže kvůli problémům v síti, bude to zkoušet tak dlouho, dokud "
+"nebude stažen celý soubor (pokud je nastavena volba -n). Pokud to vzdálený "
+"server podporuje, dá eepget serveru pokyn, aby odesílal pouze data, která "
+"ještě nebyla stažena."
+
+#. type: SH
+#: man/eepget.1:22
+#, no-wrap
+msgid "OPTIONS"
+msgstr "MOŽNOSTI"
+
+#. type: Plain text
+#: man/eepget.1:25
+msgid "B<-c>"
+msgstr "B<-c>"
+
+#. type: TP
+#: man/eepget.1:25
+#, no-wrap
+msgid "Clearnet. Do not use a proxy. Same as B<-p> :0 ."
+msgstr "Clearnet. Nepoužívá proxy server. Stejné jako B<-p> :0 ."
+
+#. type: Plain text
+#: man/eepget.1:31
+msgid "B<-e> etag"
+msgstr "B<-e> etag"
+
+#. type: TP
+#: man/eepget.1:31
+#, no-wrap
+msgid "Sets the etag value in the request headers."
+msgstr "Nastaví hodnotu etag v hlavičkách požadavků."
+
+#. type: Plain text
+#: man/eepget.1:37
+msgid "B<-h> name=value"
+msgstr "B<-h> název=hodnota"
+
+#. type: TP
+#: man/eepget.1:37
+#, no-wrap
+msgid "Adds an arbitrary request header with the given name and value."
+msgstr "Přidá libovolnou hlavičku požadavku se zadaným názvem a hodnotou."
+
+#. type: Plain text
+#: man/eepget.1:43
+msgid "B<-l> lineLen"
+msgstr "B<-l> lineLen"
+
+#. type: TP
+#: man/eepget.1:43
+#, no-wrap
+msgid ""
+"Controls the progress display. B<\\ lineLen > is the length of one progress "
+"line in characters. The default is 40."
+msgstr ""
+"Ovládá zobrazení průběhu. B<\\ lineLen > je délka jednoho řádku průběhu ve "
+"znacích. Výchozí hodnota je 40."
+
+#. type: Plain text
+#: man/eepget.1:49
+msgid "B<-m> markSize"
+msgstr "B<-m> markSize"
+
+#. type: TP
+#: man/eepget.1:49
+#, no-wrap
+msgid ""
+"Controls the progress display. B<\\ markSize > is the number of bytes one "
+"'#' character represents. The default is 1024."
+msgstr ""
+"Ovládá zobrazení průběhu. B<\\ markSize > je počet bajtů, které představuje "
+"jeden znak '#'. Výchozí hodnota je 1024."
+
+#. type: Plain text
+#: man/eepget.1:55
+msgid "B<-n> retries"
+msgstr "B<-n> opakování"
+
+#. type: TP
+#: man/eepget.1:55
+#, no-wrap
+msgid ""
+"Specify the number of times to retry downloading if the download isn't "
+"successful. If this option is not specified, eepget will not retry."
+msgstr ""
+"Zadejte počet pokusů o stažení, pokud stahování selže. Není-li tato možnost "
+"zadána, eepget se nepokusí opětovně stahovat."
+
+#. type: Plain text
+#: man/eepget.1:61
+msgid "B<-o> file"
+msgstr "B<-o> soubor"
+
+#. type: TP
+#: man/eepget.1:61
+#, no-wrap
+msgid ""
+"Sets the output file to write to. If this option is not given, the output "
+"filename will be determined by the URL."
+msgstr ""
+"Nastaví výstupní soubor, do kterého bude zapisováno. Není-li tato volba "
+"zadána, bude název výstupního souboru určen adresou URL."
+
+#. type: Plain text
+#: man/eepget.1:67
+msgid "B<-p> proxy_host[:port]"
+msgstr "B<-p> proxy_host[:port]"
+
+#. type: TP
+#: man/eepget.1:67
+#, no-wrap
+msgid ""
+"Specify an I2P proxy server (eeproxy) to use. If the port is not specified, "
+"eepget will use 4444. If this option is not specified, eepget will use "
+"127.0.0.1:4444. Specify B<-c> or B<-p> :0 to disable the eeproxy."
+msgstr ""
+"Zadejte proxy server I2P (eeproxy), který chcete použít. Pokud není port "
+"zadán, použije eepget port 4444. Pokud tato volba proxy serveru není zadána,"
+" eepget použije 127.0.0.1:4444. Zadejte B<-c> nebo B<-p>:0 pro vypnutí "
+"eeproxy."
+
+#. type: Plain text
+#: man/eepget.1:73
+msgid "B<-t> seconds"
+msgstr "B<-t> sekund"
+
+#. type: TP
+#: man/eepget.1:73
+#, no-wrap
+msgid "Sets the inactivity timeout. The default is 60 seconds."
+msgstr "Nastaví časový limit nečinnosti. Výchozí hodnota je 60 sekund."
+
+#. type: Plain text
+#: man/eepget.1:79
+msgid "B<-u> username"
+msgstr "B<-u> uživatelské jméno"
+
+#. type: TP
+#: man/eepget.1:79
+#, no-wrap
+msgid "Sets the username for proxy authorization, if required."
+msgstr ""
+"Nastaví uživatelské jméno pro autorizaci proxy serveru, je-li vyžadováno."
+
+#. type: Plain text
+#: man/eepget.1:85
+msgid "B<-x> password"
+msgstr "B<-x> heslo"
+
+#. type: TP
+#: man/eepget.1:85
+#, no-wrap
+msgid ""
+"Sets the password for proxy authorization, if required. If a username is "
+"specified but not a password, EepGet will prompt for the password."
+msgstr ""
+"Nastaví heslo pro autorizaci proxy serveru, pokud je vyžadováno. Pokud je "
+"zadáno uživatelské jméno, ale ne heslo, EepGet se zeptá na heslo."
+
+#. type: SH
+#: man/eepget.1:88
+#, no-wrap
+msgid "EXIT STATUS"
+msgstr "STAV UKONČENÍ"
+
+#. type: Plain text
+#: man/eepget.1:92
+msgid ""
+"B<eepget> exits with status zero upon successful transfer and non-zero if "
+"there were problems with the download."
+msgstr ""
+"B<eepget> skončí s nulovým stavem při úspěšném přenosu a nenulovým, pokud se"
+" při stahování vyskytly problémy."
+
+#. type: SH
+#: man/eepget.1:93 man/i2prouter.1:54 man/i2prouter-nowrapper.1:24
+#, no-wrap
+msgid "REPORTING BUGS"
+msgstr "HLÁŠENÍ CHYB"
+
+#. type: Plain text
+#: man/eepget.1:98 man/i2prouter.1:59 man/i2prouter-nowrapper.1:29
+msgid ""
+"Please enter an issue on E<.UR "
+"https://i2pgit.org/i2p-hackers/i2p.i2p/-/issues> the I2P GitLab server E<.UE"
+" .>"
+msgstr ""
+"Zadejte prosím problém na E<.UR "
+"https://i2pgit.org/i2p-hackers/i2p.i2p/-/issues> serveru I2P GitLab E<.UE .>"
+
+#. type: SH
+#: man/eepget.1:99 man/i2prouter.1:60 man/i2prouter-nowrapper.1:30
+#, no-wrap
+msgid "SEE ALSO"
+msgstr "TAKÉ SI PŘEČTĚTE"
+
+#. type: Plain text
+#: man/eepget.1:103
+msgid "B<i2prouter>(1)  B<curl>(1)  B<wget>(1)"
+msgstr "B<i2prouter>(1)  B<curl>(1)  B<wget>(1)"
+
+#. type: TH
+#: man/i2prouter.1:1
+#, no-wrap
+msgid "I2PROUTER"
+msgstr "I2PROUTER"
+
+#. type: Plain text
+#: man/i2prouter.1:5
+msgid "i2prouter - start and stop the I2P router"
+msgstr "i2prouter - spuštění a zastavení I2P routeru"
+
+#. type: Plain text
+#: man/i2prouter.1:9
+msgid ""
+"B<i2prouter> "
+"{I<console>|I<start>|I<stop>|I<graceful>|I<restart>|I<condrestart>|I<status>|I<dump>|I<install>|I<remove>}"
+msgstr ""
+"B<i2prouter> "
+"{I<console>|I<start>|I<stop>|I<graceful>|I<restart>|I<condrestart>|I<status>|I<dump>|I<install>|I<remove>}"
+
+#. type: Plain text
+#: man/i2prouter.1:13
+msgid "Control the I2P service."
+msgstr "Správa služby I2P."
+
+#. type: IP
+#: man/i2prouter.1:15
+#, no-wrap
+msgid "B<console>"
+msgstr "B<console>"
+
+#. type: Plain text
+#: man/i2prouter.1:17
+msgid "Runs I2P as a console application under the current user."
+msgstr "Spustí I2P jako konzolovou aplikaci pod aktuálním uživatelem."
+
+#. type: IP
+#: man/i2prouter.1:19
+#, no-wrap
+msgid "B<start>"
+msgstr "B<start>"
+
+#. type: Plain text
+#: man/i2prouter.1:21
+msgid "Starts the I2P service."
+msgstr "Spustí službu I2P."
+
+#. type: IP
+#: man/i2prouter.1:23
+#, no-wrap
+msgid "B<stop>"
+msgstr "B<stop>"
+
+#. type: Plain text
+#: man/i2prouter.1:25
+msgid "Stops the I2P service."
+msgstr "Zastaví službu I2P."
+
+#. type: IP
+#: man/i2prouter.1:27
+#, no-wrap
+msgid "B<restart>"
+msgstr "B<restart>"
+
+#. type: Plain text
+#: man/i2prouter.1:29
+msgid "Stops the I2P service and then starts it."
+msgstr "Zastaví službu I2P a pak ji spustí."
+
+#. type: IP
+#: man/i2prouter.1:31
+#, no-wrap
+msgid "B<condrestart>"
+msgstr "B<condrestart>"
+
+#. type: Plain text
+#: man/i2prouter.1:33
+msgid "Restart the I2P service only if it is already running."
+msgstr "Restartuje službu I2P pouze pokud již běží."
+
+#. type: IP
+#: man/i2prouter.1:35
+#, no-wrap
+msgid "B<graceful>"
+msgstr "B<graceful>"
+
+#. type: Plain text
+#: man/i2prouter.1:37
+msgid "Stop I2P gracefully (may take up to 11 minutes)"
+msgstr "Zastavit I2P běžným způsobem (může trvat až 11 minut)"
+
+#. type: IP
+#: man/i2prouter.1:39
+#, no-wrap
+msgid "B<install>"
+msgstr "B<install>"
+
+#. type: Plain text
+#: man/i2prouter.1:41
+msgid "Install initscript to start I2P automatically when the system boots."
+msgstr ""
+"Nainstalujte initscript pro automatické spuštění I2P při startu systému."
+
+#. type: IP
+#: man/i2prouter.1:43
+#, no-wrap
+msgid "B<remove>"
+msgstr "B<remove>"
+
+#. type: Plain text
+#: man/i2prouter.1:45
+msgid "Uninstall initscript that was installed with B<install>"
+msgstr "Odinstalujte initscript, který byl nainstalován pomocí B<install>"
+
+#. type: IP
+#: man/i2prouter.1:47
+#, no-wrap
+msgid "B<status>"
+msgstr "B<status>"
+
+#. type: Plain text
+#: man/i2prouter.1:49
+msgid "Prints whether the I2P service is running."
+msgstr "Vypíše, zda je služba I2P spuštěna."
+
+#. type: IP
+#: man/i2prouter.1:51
+#, no-wrap
+msgid "B<dump>"
+msgstr "B<dump>"
+
+#. type: Plain text
+#: man/i2prouter.1:53
+msgid "Dumps the current threads into B<wrapper.log>."
+msgstr "Zapíše současná vlákna do B<wrapper.log>."
+
+#. type: Plain text
+#: man/i2prouter.1:61
+msgid "B<i2prouter-nowrapper>(1)"
+msgstr "B<i2prouter-nowrapper>(1)"
+
+#. type: TH
+#: man/i2prouter-nowrapper.1:1
+#, no-wrap
+msgid "I2PROUTER-NOWRAPPER"
+msgstr "I2PROUTER-NOWRAPPER"
+
+#. type: Plain text
+#: man/i2prouter-nowrapper.1:5
+msgid "i2prouter-nowrapper - start the I2P router"
+msgstr "i2prouter-nowrapper - spusťte I2P router"
+
+#. type: Plain text
+#: man/i2prouter-nowrapper.1:8
+msgid "B<i2prouter-nowrapper>"
+msgstr "B<i2prouter-nowrapper>"
+
+#. type: Plain text
+#: man/i2prouter-nowrapper.1:14
+msgid ""
+"Start the I2P router, without the service wrapper.  This means the router "
+"will not restart if it crashes.  Also, it will use the default memory size, "
+"which may not be enough for I2P."
+msgstr ""
+"Spusťte I2P router bez wrapperu služby. To znamená, že v případě havárie "
+"routeru nedojde k jeho restartu. Také bude využíváno výchozí množství "
+"paměti, což nemusí být dostatečné pro správnou funkci I2P."
+
+#. type: Plain text
+#: man/i2prouter-nowrapper.1:23
+msgid ""
+"You should really use the B<i2prouter>(1)  script instead.  There are no "
+"options.  To stop the router, use your browser to access E<.UR "
+"http://localhost:7657/> the router console E<.UE .>"
+msgstr ""
+"Místo toho byste měli použít skript B<i2prouter>(1). Nejsou zde žádné "
+"možnosti. Chcete-li router zastavit, otevřete pomocí internetového "
+"prohlížeče konzoli routeru E<.UR http://localhost:7657/> E<.UE .>"
+
+#. type: Plain text
+#: man/i2prouter-nowrapper.1:31
+msgid "B<i2prouter>(1)"
+msgstr "B<i2prouter>(1)"

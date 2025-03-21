@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="gan">
+<html lang="zh_TW">
 <head>
 <title>I2P 公告網頁伺服器</title>
 <link rel="shortcut icon" href="favicon.ico">
@@ -56,7 +56,7 @@
 <b>Mac</b><br><code dir="ltr">/Users/(user)/Library/Application Support/i2p</code>
 </li>
     </ul>
-<p>在I2P中，隐藏服务使用以“ .b32.i2p”结尾的Base32地址或以长Base32字符串表示的Destination来寻址。
+<p>在I2P中，隐藏服务使用以“ .b32.i2p”结尾的Base32地址或以长Base64字符串表示的Destination来寻址。
 在您按照以下说明分配寄存器名称之前，可以将Base32地址用作主机名。
 目标在某种程度上类似于IP地址，并显示在
 <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">隐藏服务配置页面上</a></p>
@@ -75,20 +75,22 @@
     <ul>
 <li>为你的网站取一个名字（<i>something</i>.i2p），使用小写字母。
 你可以先在你自己的路由器的<a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">地址簿</a>中检查一下，看看你的名字是否已经被占用。
-在<a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3"> 隐藏服务配置页面</a>上的 "网站名称 "处输入你网站的新名称。
+在<a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3"> "隐藏服务配置 "页面</a>上的 "网站名称 "处输入你网站的新名称。
 这将取代默认的 "mysite.i2p"。
 另外，如果您希望在启动I2P时自动启动您的I2P网络服务器隧道，请勾选 "自动启动 "选项。
 现在您的网站将在每次启动路由器时启动。
-请务必点击 "保存".</li>
+请务必点击 "保存"。</li>
       <li>在<a href="http://127.0.0.1:7657/i2ptunnel/">隧道管理器</a>页面上点击Webserver隧道的启动按钮。
          你现在应该看到它列在<a href="http://127.0.0.1:7657/">I2P路由器控制台</a>左侧的 "本地隧道 "下 。
          您的网站已经运行在I2P网络上了</li>
       <li>突出显示并复制<a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">隐藏服务配置页</a>上的整个本地目的地。
 请确保你复制了整个内容，它超过了500个字符。</li>
       <li>输入名称并将目的地粘贴到你的<a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">address book</a>。
-点击 "添加 "以保存新条目。</li>
+点击 "添加 "以保存新条目。
+</li>
       <li>在你的浏览器中，输入你的网站名称（<i>something</i>.i2p），你应该就会回到这里。
-希望它正常工作!</li>
+希望它起作用了!
+</li>
       <li>在你告诉世界你的新网站之前，你应该添加一些内容。
 进入<a href="#dir">上面列出</a>的服务器根目录，用你自己的内容替换index.html重定向页面。</li>
     </ul>
@@ -102,7 +104,7 @@
 
     <ul>
 <li>
-<b>Firefox:</b> 首选项➜ 高级➜ 网络➜ 缓存网页内容➜ 立即清除</li>
+<b>Firefox:</b> ：首选项➜ 高级➜ 网络➜ 缓存网页内容➜ 立即清除</li>
       <li>
 <b>Chrome/Chromium:</b> 设置➜ 高级设置➜ 隐私➜ 清除浏览数据</li>
       <li>
@@ -116,7 +118,7 @@
 突出显示并复制<a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">隐藏服务配置页</a>上的整个本地目的地。
 请确保你复制了整个内容，它超过了500个字符。</p>
 <p>一些注册网站，包括<a href="http://stats.i2p/i2p/addkey.html" target="_blank">stats.i2p</a>，需要注册认证字符串。
-它可以在<a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">隐藏服务配置页面</a>的<a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">Registration Authentication</a>页面中找到。
+它可以在<a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">隐藏服务配置页面</a>链接的<a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">Registration Authentication</a>页面中找到。
 复制整个认证字符串并将其粘贴到注册页面。
 请确保你复制了整个字符串，它超过了500个字符。
 如果网站要求提供这一信息，请简要描述你的网站。
@@ -137,10 +139,10 @@
     </ul>
 <p>如果您赶时间并且不能等几个小时，可以告诉人们使用“跳转”地址帮助程序重定向服务。
    这将会在您同一站点上注册主机名后的几分钟内生效。
-  首先，通过在浏览器中输入<code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code>进入您的浏览器。
-  一旦设置完毕，您就可以告诉其他人使用跳转服务了。</p>
+  首先，通过在浏览器中输入<code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>某</i>.i2p</code>进入您的浏览器。
+  一旦运行，您就可以告诉其他人使用它。</p>
 
-    <p>有些人查看网站列表，如<a href="http://identiguy.i2p/" target="_blank">Identiguy的eepsite状态列表</a>或<a href="http://no.i2p/browse/" target="_blank">no.i2p的活跃主机列表</a>，以了解新的eepsite，因此你的网站可能刚开始就能获得一些流量。
+    <p>有些人查看网站列表，如<a href="http://identiguy.i2p/" target="_blank">Identiguy的eepsite状态列表</a>或<a href="http://no.i2p/browse/" target="_blank">no.i2p的活跃主机列表</a>，以了解新的eepsite，因此你的网站可能开始获得一些流量。
 还有很多其他方法可以告诉人们。这里有几个点子。</p>
 
     <ul>
@@ -167,7 +169,7 @@
 在将其联机之前，请确保您的Web服务器是安全的。
 在线上有很多指南，例如，如果您搜索“ nginx安全强化指南”，则会发现许多具有良好建议的指南。</p> 
 
-        <p>Apache服务器有一个重要的问题。
+        <p>Apache网络服务器有一个重要的问题。
 <code dir="ltr">mod_status</code>和<code dir="ltr">mod_info</code>模块在某些操作系统上是默认启用的。
 这些模块暴露了内部数据，当在匿名网络上使用时，会导致匿名性的严重损害。
 删除配置文件中加载这些模块的行是防止这些问题的最简单方法。</p>

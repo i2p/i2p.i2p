@@ -1,0 +1,94 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH EEPGET 1 "November 27, 2021" "" I2P
+
+.SH NÁZEV
+Eepget \- I2P stahovač
+
+.SH SOUHRN
+\fBeepget\fP [\fIoptions\fP]\fIURL\fP
+.br
+
+.SH POPIS
+.P
+Stáhne soubor neinteraktivně prostřednictvím protokolu HTTP. Podporovány
+jsou přenosy přes I2P i běžný internet.
+.P
+Eepget si poradí i s pomalým nebo nestabilním síťovým připojením; pokud
+stahování selže kvůli problémům v síti, bude to zkoušet tak dlouho, dokud
+nebude stažen celý soubor (pokud je nastavena volba \-n). Pokud to vzdálený
+server podporuje, dá eepget serveru pokyn, aby odesílal pouze data, která
+ještě nebyla stažena.
+
+.SH MOŽNOSTI
+\fB\-c\fP
+.TP 
+Clearnet. Nepoužívá proxy server. Stejné jako \fB\-p\fP :0 .
+.TP 
+
+\fB\-e\fP etag
+.TP 
+Nastaví hodnotu etag v hlavičkách požadavků.
+.TP 
+
+\fB\-h\fP název=hodnota
+.TP 
+Přidá libovolnou hlavičku požadavku se zadaným názvem a hodnotou.
+.TP 
+
+\fB\-l\fP lineLen
+.TP 
+Ovládá zobrazení průběhu. \fB\ lineLen \fP je délka jednoho řádku průběhu ve znacích. Výchozí hodnota je 40.
+.TP 
+
+\fB\-m\fP markSize
+.TP 
+Ovládá zobrazení průběhu. \fB\ markSize \fP je počet bajtů, které představuje jeden znak '#'. Výchozí hodnota je 1024.
+.TP 
+
+\fB\-n\fP opakování
+.TP 
+Zadejte počet pokusů o stažení, pokud stahování selže. Není\-li tato možnost zadána, eepget se nepokusí opětovně stahovat.
+.TP 
+
+\fB\-o\fP soubor
+.TP 
+Nastaví výstupní soubor, do kterého bude zapisováno. Není\-li tato volba zadána, bude název výstupního souboru určen adresou URL.
+.TP 
+
+\fB\-p\fP proxy_host[:port]
+.TP 
+Zadejte proxy server I2P (eeproxy), který chcete použít. Pokud není port zadán, použije eepget port 4444. Pokud tato volba proxy serveru není zadána, eepget použije 127.0.0.1:4444. Zadejte \fB\-c\fP nebo \fB\-p\fP:0 pro vypnutí eeproxy.
+.TP 
+
+\fB\-t\fP sekund
+.TP 
+Nastaví časový limit nečinnosti. Výchozí hodnota je 60 sekund.
+.TP 
+
+\fB\-u\fP uživatelské jméno
+.TP 
+Nastaví uživatelské jméno pro autorizaci proxy serveru, je\-li vyžadováno.
+.TP 
+
+\fB\-x\fP heslo
+.TP 
+Nastaví heslo pro autorizaci proxy serveru, pokud je vyžadováno. Pokud je zadáno uživatelské jméno, ale ne heslo, EepGet se zeptá na heslo.
+
+.SH "STAV UKONČENÍ"
+
+\fBeepget\fP skončí s nulovým stavem při úspěšném přenosu a nenulovým, pokud se
+při stahování vyskytly problémy.
+
+.SH "HLÁŠENÍ CHYB"
+Zadejte prosím problém na
+.UR https://i2pgit.org/i2p\-hackers/i2p.i2p/\-/issues
+serveru I2P GitLab
+.UE .
+
+.SH "TAKÉ SI PŘEČTĚTE"
+\fBi2prouter\fP(1)  \fBcurl\fP(1)  \fBwget\fP(1)
+
