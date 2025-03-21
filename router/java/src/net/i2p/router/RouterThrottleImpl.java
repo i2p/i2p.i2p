@@ -131,8 +131,8 @@ public class RouterThrottleImpl implements RouterThrottle {
      */
     public int acceptTunnelRequest() { 
         if (_context.router().gracefulShutdownInProgress()) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Refusing tunnel request since we are shutting down ASAP");
+            if (_log.shouldDebug())
+                _log.debug("Refusing tunnel request since we are shutting down soon");
             setShutdownStatus();
             // Don't use CRIT because this tells everybody we are shutting down
             return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
