@@ -5909,7 +5909,6 @@ table#leasesetsummary th a:hover {
 #leasesetdebug th a,
 #leasesetsummary a {
     font-size: 9pt;
-    text-transform: capitalize;
     letter-spacing: normal;
     word-spacing: normal;
 }
