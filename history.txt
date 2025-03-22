@@ -1,3 +1,15 @@
+2025-03-22 zzz
+ * Router: Prevent double-free of SHA256 instances from Noise
+
+2025-03-21 zzz
+ * Build: Add cs man pages, cs, pt_BR, zh_TW eepsite help pages
+
+2025-03-19 zzz
+ * Build: Remove more files from Debian source tarball
+ * Console: Reduce memory usage in BanlistRenderer
+ * i2psnark: Use torrent name instead of torrent file name in notifications
+ * i2ptunnel: Version the proxy CSS in more places
+
 2025-03-17 2.8.1 (API 0.9.65) released
 
 2025-03-14 zzz

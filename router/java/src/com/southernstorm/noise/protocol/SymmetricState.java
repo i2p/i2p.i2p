@@ -101,6 +101,7 @@ class SymmetricState implements Destroyable, Cloneable {
 	private final byte[] ck;
 	private final byte[] h;
 	private final byte[] prev_h;
+	private boolean isDestroyed;
 
 	/**
 	 * Constructs a new symmetric state object.
@@ -402,7 +403,13 @@ class SymmetricState implements Destroyable, Cloneable {
 	}
 
 	@Override
-	public void destroy() {
+	public synchronized void destroy() {
+		if (isDestroyed) {
+			// prevent double-free of hash
+			//(new Exception("Already destroyed")).printStackTrace();
+			return;
+		}
+		isDestroyed = true;
 		cipher.destroy();
 		hash.reset();
 		Noise.releaseHash(hash);

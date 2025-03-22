@@ -19,8 +19,8 @@ public class RouterVersion {
     public final static String ID = "Git";
     public final static String VERSION = CoreVersion.VERSION;
     /** for example: "beta", "alpha", "rc" */
-    public final static String QUALIFIER = "";
-    public final static long BUILD = 0;
+    public final static String QUALIFIER = "-rc";
+    public final static long BUILD = 1;
     /** for example "-test" */
     public final static String EXTRA = "";
     public final static String FULL_VERSION = VERSION + "-" + BUILD + QUALIFIER + EXTRA;
