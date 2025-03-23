@@ -782,16 +782,16 @@ class ClientManager {
      */
     public FloodfillNetworkDatabaseFacade getClientFloodfillNetworkDatabaseFacade(Hash destHash) {
         if (destHash != null) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Getting subDb for desthash: " + destHash);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Getting subDb for desthash: " + destHash);
             ClientConnectionRunner runner = getRunner(destHash);
             if (runner == null){
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("ClientManager got a null runner in getClientFloodfillNetworkDatabaseFacade for " + destHash);
                 return null;
             }
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("ClientManager got a runner in getClientFloodfillNetworkDatabaseFacade for " + destHash);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("ClientManager got a runner in getClientFloodfillNetworkDatabaseFacade for " + destHash);
             return runner.getFloodfillNetworkDatabaseFacade();
         }
         return null;
