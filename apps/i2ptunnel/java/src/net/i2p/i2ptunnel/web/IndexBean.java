@@ -43,6 +43,7 @@ import net.i2p.i2ptunnel.ui.Messages;
 import net.i2p.i2ptunnel.ui.TunnelConfig;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
+import net.i2p.util.PortMapper;
 import net.i2p.util.UIMessages;
 
 /**
@@ -223,6 +224,9 @@ public class IndexBean {
             return generateNewEncryptionKey();
         } else if ("Clear".equals(_action)) {
             _messages.clearThrough(_msgID);
+            ClientAppManager cmgr = _context.clientAppManager();
+            if (cmgr != null)
+                cmgr.setBubble(PortMapper.SVC_I2PTUNNEL, 0, null);
             return "";
         } else {
             return "Action " + _action + " unknown";
