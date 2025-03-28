@@ -1,3 +1,9 @@
+2025-03-28 zzz
+ * Update translations
+
+2025-03-26 zzz
+ * i2ptunnel: Clear bubble count when clearing status messages
+
 2025-03-22 zzz
  * Router: Prevent double-free of SHA256 instances from Noise
 
