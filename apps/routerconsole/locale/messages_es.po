@@ -1860,7 +1860,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:142
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:592
 msgid "Blinded"
-msgstr ""
+msgstr "Cegado"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigLoggingHandler.java:94
 msgid "Log overrides updated"
@@ -2705,7 +2705,7 @@ msgstr "Reinicio suave"
 
 #: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:50
 msgid "Started router"
-msgstr "El router I2P se inicio"
+msgstr "El router I2P se inició"
 
 #: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:51
 msgid "Stopped router"
@@ -3112,7 +3112,7 @@ msgstr "Registros (logs)"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:188
 msgid "View the logs"
-msgstr ""
+msgstr "Ve los registros"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:189
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:445
@@ -3306,7 +3306,7 @@ msgstr "País"
 #: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:459
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:582
 msgid "Full destination, name, Base32, or hash"
-msgstr ""
+msgstr "Destino completo, nombre, base 32, o hash"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:463
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:297
@@ -3424,7 +3424,7 @@ msgstr "LeaseSet"
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:950
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:973
 msgid "Add to address book"
-msgstr ""
+msgstr "Añade dirección a libro de direcciones"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:952
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:975
@@ -3621,7 +3621,7 @@ msgstr "UPnP puede estar habilitado o deshabilitado en la página de Configuraci
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:206
 msgid "Peer Connections"
-msgstr ""
+msgstr "Conexiones con compañeros"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:208
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:265
@@ -3918,9 +3918,9 @@ msgstr "Se han ofrecido a introducirnos"
 #, java-format
 msgid "{0} fail"
 msgid_plural "{0} fails"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{0} fallo"
+msgstr[1] "{0} fallos"
+msgstr[2] "{0} fallos"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:750
 msgid "backlogged"
@@ -4085,9 +4085,9 @@ msgstr "Umbrales"
 #, java-format
 msgid "{0} fast peer"
 msgid_plural "{0} fast peers"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{0} compañeros rápido"
+msgstr[1] "{0} compañeros rápidos"
+msgstr[2] "{0} compañeros rápidos"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:289
 #, java-format
@@ -4131,7 +4131,7 @@ msgstr "Inundación (floodfill)"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:308
 msgid "Not accepting tunnels"
-msgstr ""
+msgstr "Rechazando túneles"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:311
 #, java-format
@@ -4297,9 +4297,9 @@ msgstr "Frecuencia media del total de vida"
 #, java-format
 msgid "{0} event"
 msgid_plural "{0} events"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{0} evento"
+msgstr[1] "{0} eventos"
+msgstr[2] "{0} eventos"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:201
 msgid "rate"
@@ -4317,9 +4317,9 @@ msgstr "Promedio máximo"
 #, java-format
 msgid "There was {0} event in this period."
 msgid_plural "There were {0} events in this period."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Hubo {0} evento en este periodo."
+msgstr[1] "Hubo {0} eventos en este periodo."
+msgstr[2] "Hubo {0} eventos en este periodo."
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:236
 #, java-format
@@ -4398,11 +4398,11 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:48
 msgid "Router Information (brief)"
-msgstr ""
+msgstr "Información de router I2P (breve)"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:49
 msgid "Router Information (advanced)"
-msgstr ""
+msgstr "Información de router I2P (avanzado)"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:50
 msgid "Memory Usage Bar"
@@ -4423,7 +4423,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:55
 msgid "Peers (advanced)"
-msgstr ""
+msgstr "Pares (avanzados)"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:56
 msgid "Firewall &amp; Reseed Status"
@@ -4523,7 +4523,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:263
 msgid "Local web Server"
-msgstr ""
+msgstr "Servidor web local"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:289
 msgid ""
@@ -5190,7 +5190,7 @@ msgstr "salida"
 #. Saved in CSSHelper, assume success
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:52
 msgid "Console language saved."
-msgstr ""
+msgstr "Lengua de consola almacenada."
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHandler.java:59
 msgid "Bandwidth test completed successfully"
@@ -5280,11 +5280,11 @@ msgstr "Túneles de aplicaciones"
 
 #: ../java/strings/Strings.java:25
 msgid "My I2P Site web server"
-msgstr ""
+msgstr "El servidor web de mi sitio I2P"
 
 #: ../java/strings/Strings.java:26
 msgid "I2P webserver (I2P Site)"
-msgstr ""
+msgstr "Servidor web de I2P (eepsite)"
 
 #: ../java/strings/Strings.java:27
 msgid "Browser launch at startup"
@@ -5913,7 +5913,7 @@ msgstr "Tamaño máximo del fichero de registro"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:562
 msgid "Compress logs?"
-msgstr ""
+msgstr "Comprimir registros?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:570
 msgid "Default log level"
@@ -7393,13 +7393,13 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:641
 msgid "I2P requires your computer's time be accurate."
-msgstr ""
+msgstr "I2P requiere que el tiempo de tu computadora sea correcta."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:643
 msgid ""
 "If the skew is more than a few seconds, please correct the problem by "
 "adjusting your computer's time."
-msgstr ""
+msgstr "Si la diferencia es más de unos segundos, por favor corrige el problema por ajustar el tiempo de tu computadora."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:645
 msgid ""
@@ -7643,7 +7643,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:745
 msgid "Function"
-msgstr ""
+msgstr "Función"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:747
 msgid "Notes"
@@ -7826,7 +7826,7 @@ msgstr "Túneles de cliente"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:457
 msgid "Tunnels built by your router for each client's use."
-msgstr ""
+msgstr "Túneles hechos por tu router para el uso de cada cliente."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:461
 msgid "Tunnels built by other routers through your router."
@@ -7920,11 +7920,11 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:509
 msgid "Select Theme"
-msgstr ""
+msgstr "Selecciona Tema"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:511
 msgid "Please select your preferred theme:"
-msgstr ""
+msgstr "Por favor escoge tu tema preferido:"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:521
 msgid "Bandwidth Test"
@@ -7932,7 +7932,7 @@ msgstr "Prueba de ancho de banda"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:523
 msgid "Let's check your internet connection!"
-msgstr ""
+msgstr "Vamos a revisar tu conexión a internet!"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:525
 msgid ""
