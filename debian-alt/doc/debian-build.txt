@@ -71,7 +71,7 @@ reprepro includedeb stable i2p_1.xx.0-1_all.deb
 reprepro includedsc stable i2p_1.xx.0-1.dsc
 
 # copy built packages from launchpad
-for i in bionic focal jammy mantic noble oracular
+for i in bionic focal jammy noble oracular plucky
 do
 	reprepro -v update $i
 done
@@ -82,7 +82,6 @@ done
 # and then: reprepro -v export foo (for new foo)
 # and then: reprepro -v update foo
 # and:      reprepro -v copysrc foo buster i2p-keyring
-# and:      reprepro -v copysrc foo buster syndie
 # If you remove, you must do: reprepro clearvanished
 
 
