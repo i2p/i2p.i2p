@@ -121,8 +121,12 @@ public class NewsHandler extends UpdateHandler implements Checker {
             System.exit(1);
         }
 
-        if (lang != null)
+        if (lang != null) {
             url = url + "?lang=" + lang;
+            System.err.println("Fetching news for language " + lang);
+        } else {
+            System.err.println("Fetching news for English; use -l xx to fetch a different language");
+        }
         File file = new File("news-primary.su3");
         System.out.println("Fetching news from primary server at " + url);
         test(ctx, proxyHost, proxyPort, url, file);
