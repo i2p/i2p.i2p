@@ -147,16 +147,19 @@ public class BuildTime {
     }
 
     public static void main(String[] args) {
-        System.out.println("Hard earliest: " + new Date(EARLIEST_LONG));
+        System.out.println("Hard earliest:      " + new Date(EARLIEST_LONG));
         long date = getEarliestTime();
-        System.out.println("Earliest date: " + new Date(date));
+        System.out.println("Earliest date:      " + new Date(date));
         date = getBuildTime();
-        System.out.println("Build date:    " + new Date(date));
+        System.out.println("Build date:         " + new Date(date));
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US);
+        date = getBuildTime(fmt, "i2p.jar");
+        System.out.println("i2p.jar build date: " + (date > 0 ? new Date(date) : "not found"));
         date = System.currentTimeMillis();
-        System.out.println("System time:   " + new Date(date));
+        System.out.println("System time:        " + new Date(date));
         date = I2PAppContext.getGlobalContext().clock().now();
-        System.out.println("I2P time:      " + new Date(date));
+        System.out.println("I2P time:           " + new Date(date));
         date = getLatestTime();
-        System.out.println("Latest date:   " + new Date(date));
+        System.out.println("Latest date:        " + new Date(date));
     }
 }
