@@ -1105,8 +1105,8 @@ _:-ms-lang(x), .snarkTorrentOdd, .SnarkTorrentEven {
 
 .thumb:hover {
      margin: -5px 0 -5px -4px;
-     max-height: 80px;
-     max-width: 80px;
+     max-height: 160px;
+     max-width: 160px;
      background: #000 !important;
      transition: ease-in-out all 0.3s 0.1s;
      filter: none !important;

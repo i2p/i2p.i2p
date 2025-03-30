@@ -935,8 +935,8 @@ tr:hover .percentBarText {
 
 .thumb:hover {
      margin: 0;
-     max-height: 80px !important;
-     max-width: 80px !important;
+     max-height: 160px !important;
+     max-width: 160px !important;
      transition: ease-in-out all 0.15s;
 }
 

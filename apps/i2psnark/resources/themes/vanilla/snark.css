@@ -1177,8 +1177,8 @@ thead img.disable, img.disable:hover {
 
 .thumb:hover {
      margin: -3px 0 -2px 2px !important;
-     max-width: 80px;
-     max-height: 80px;
+     max-width: 160px;
+     max-height: 160px;
      box-shadow: none !important;
      background: #fff !important;
      transition: ease all 0.3s 0.1s;

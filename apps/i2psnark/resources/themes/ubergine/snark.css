@@ -1087,8 +1087,8 @@ tr:hover .percentBarInner {
      min-height: 16px;
      width: auto !important;
      height: auto !important;
-     max-width: 80px;
-     max-height: 80px;
+     max-width: 160px;
+     max-height: 160px;
      transition: ease-in-out all 0.3s 0.1s;
      background: #212 !important;
 }
