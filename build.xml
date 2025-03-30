@@ -597,6 +597,20 @@
             match='(^\s+private\s+static\s+final\s+long\s+EARLIEST_LONG\s+=\s+)[0-9]+ \* 1000L;' replace='\1${new.today.secs} * 1000L;'/>
     </target>
 
+    <target name="devtag" depends="getReleaseNumber, getBuildNumber, getGitRev">
+        <property name="tag" value="i2p-${release.number}-${i2p.build.number}${build.qualifier}${build.extra}" />
+        <echo message="Tagging revision ${workspace.version} with: ${tag}" />
+        <exec executable="git" failifexecutionfails="true" failonerror="true" >
+            <arg value="tag" />
+            <arg value="-m" />
+            <arg value="${tag}" />
+            <arg value="-s" />
+            <arg value="${tag}" />
+        </exec>
+        <echo message="Tagged revision ${workspace.version} with: ${tag}" />
+        <echo message="Don't forget to git push origin tag ${tag}" />
+    </target>
+
     <!-- if both present, only mtn will run -->
     <target name="checkoutFromVCS" depends="failIfNoVCS, checkoutFromGit" />
 
