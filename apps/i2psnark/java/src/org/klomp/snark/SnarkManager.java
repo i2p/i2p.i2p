@@ -2983,19 +2983,25 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
                     // don't let one bad torrent kill the whole loop
                     boolean ok = addTorrent(name, null, !shouldStart);
                     if (!ok) {
-                        addMessage(_t("Error: Could not add the torrent {0}", name));
+                        String msg = _t("Error: Could not add the torrent {0}", name);
+                        addMessage(msg);
                         _log.error("Unable to add the torrent " + name);
                         disableTorrentFile(name);
+                        dtgNotify(Log.ERROR, msg);
                         rv = false;
                     }
                 } catch (Snark.RouterException e) {
-                    addMessage(_t("Error: Could not add the torrent {0}", name) + ": " + e);
+                    String msg = _t("Error: Could not add the torrent {0}", name) + ": " + e;
+                    addMessage(msg);
                     _log.error("Unable to add the torrent " + name, e);
+                    dtgNotify(Log.ERROR, msg);
                     return false;
                 } catch (RuntimeException e) {
+                    String msg = _t("Error: Could not add the torrent {0}", name) + ": " + e;
                     addMessage(_t("Error: Could not add the torrent {0}", name) + ": " + e);
                     _log.error("Unable to add the torrent " + name, e);
                     disableTorrentFile(name);
+                    dtgNotify(Log.ERROR, msg);
                     rv = false;
                 }
                 if (shouldStart && (count++ & 0x0f) == 15) {
