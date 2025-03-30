@@ -121,7 +121,7 @@
 6. Review the complete diff from the last release:
 
     ```
-    git diff i2p-1.(xx-1).0..HEAD > out.diff
+    git diff i2p-2.(xx-1).0..HEAD > out.diff
     vi out.diff
     ```
 
@@ -205,7 +205,7 @@
   - In the i2p.newsxml branch, edit magnet links, release dates and release
     number in data/releases.json, check in and push
 
-2. Add i2pupdate-1.xx.0.su3 torrent to tracker2.postman.i2p and start seeding
+2. Add i2pupdate-2.xx.0.su3 torrent to tracker2.postman.i2p and start seeding
 
 3. Notify the following people:
   - All in-network update hosts(zzz(stats.i2p) and idk(mgp**.b32.i2p)), they will need the i2pupdate.su3 file
@@ -215,11 +215,11 @@
   - OSX launcher maintainer
   - website files maintainer
 
-4. Update Trac:
+4. Update Gitlab:
   - Add milestone and version dates
   - Increment milestone and version defaults
 
-5. Wait for a few update hosts to be ready
+5. Wait for the update hosts to be ready
 
 6. Tell news hosts to flip the switch
 
