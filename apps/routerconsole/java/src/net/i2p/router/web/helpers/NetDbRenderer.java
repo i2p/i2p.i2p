@@ -707,6 +707,8 @@ class NetDbRenderer {
         int rapCount = 0;
         BigInteger median = null;
         int c = 0;
+        boolean linkSusi = _context.portMapper().isRegistered("susidns");
+        long now = _context.clock().now();
 
         // Summary
         if (debug) {
@@ -721,59 +723,10 @@ class NetDbRenderer {
                 TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(myLeaseSet.getHash());
                 if (in != null && in.getDestinationNickname() != null)
                     buf.append("  -  ").append(DataHelper.escapeHTML(in.getDestinationNickname()));
-                buf.append("</th><th></th></tr>\n");
-                boolean unpublished = ! _context.clientManager().shouldPublishLeaseSet(myLeaseSet.getHash());
-                if (unpublished) {
-                    buf.append("<tr><th colspan=\"3\">").append(_t("Local")).append(" ");
-                    if (myLeaseSet.getType() == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 || _context.keyRing().get(myLeaseSet.getHash()) != null)
-                        buf.append(" <b>(").append(_t("Encrypted")).append(")</b>");
-                    buf.append(_t("Unpublished")).append(" ");
-                } else {
-                    buf.append("<tr><th colspan=\"3\">").append(_t("Local")).append(" ");
-                    if (myLeaseSet.getType() == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2 || _context.keyRing().get(myLeaseSet.getHash()) != null)
-                        buf.append(" <b>(").append(_t("Encrypted")).append(")</b>");
-                    buf.append(_t("Published")).append(" ");
-                    long exp = 0;
-                    long now = _context.clock().now();
-                    if (myLeaseSet.getType() != DatabaseEntry.KEY_TYPE_LEASESET) {
-                        LeaseSet2 ls2 = (LeaseSet2) myLeaseSet;
-                        long pub = now - ls2.getPublished();
-                        buf.append(_t("{0} ago", DataHelper.formatDuration2(pub)));
-                        exp = ls2.getExpires()-now;
-                        buf.append(" - ");
-                    } else {
-                        exp = myLeaseSet.getLatestLeaseDate() - now;
-                    }
-                    if (exp > 0)
-                            buf.append(_t("Expires in {0}", DataHelper.formatDuration2(exp)));
-                        else
-                            buf.append(_t("Expired {0} ago", DataHelper.formatDuration2(0-exp)));
-                }
-                buf.append("</th><th></th></tr>\n");
-                buf.append("\n<tr><td colspan=\"2\"><ul class=\"netdb_leases\">");
-                boolean isMeta = myLeaseSet.getType() == DatabaseEntry.KEY_TYPE_META_LS2;
-                for (int i = 0; i < myLeaseSet.getLeaseCount(); i++) {
-                    Lease lease = myLeaseSet.getLease(i);
-                    buf.append("<li><b>").append(_t("Lease")).append(' ').append(i + 1).append(":</b> <span class=\"tunnel_peer\">");
-                    buf.append(_context.commSystem().renderPeerHTML(lease.getGateway()));
-                    buf.append("</span> ");
-                    if (!isMeta) {
-                        buf.append("<span class=\"netdb_tunnel\">").append(_t("Tunnel")).append(" <span class=\"tunnel_id\">")
-                        .append(lease.getTunnelId().getTunnelId()).append("</span></span> ");
-                    }
-                    if (debug) {
-                        long now = _context.clock().now();
-                        long exl = lease.getEndTime() - now;
-                        buf.append("<b class=\"netdb_expiry\">");
-                        if (exl > 0)
-                            buf.append(_t("Expires in {0}", DataHelper.formatDuration2(exl)));
-                        else
-                            buf.append(_t("Expired {0} ago", DataHelper.formatDuration2(0-exl)));
-                        buf.append("</b>");
-                    }
-                    buf.append("</li>");
-                }
-                buf.append("</ul></td></tr>\n");
+                buf.append("</th><th></th></tr>\n" +
+                           "<tr><td colspan=\"3\">\n");
+                renderLeaseSet(buf, myLeaseSet, true, now, linkSusi, null);
+                buf.append("</td></tr>\n");
             }
             buf.append("<tr><td><b>Total Known Remote Leasesets:</b></td><td colspan=\"3\">").append(leases.size()-1).append("</td></tr>\n");
         } else {
@@ -817,8 +770,6 @@ class NetDbRenderer {
             medianCount = rapCount / 2;
           }
 
-          boolean linkSusi = _context.portMapper().isRegistered("susidns");
-          long now = _context.clock().now();
           buf.append("<div class=\"leasesets_container\">");
           boolean ldebug = debug || client != null;
           for (LeaseSet ls : leases) {
