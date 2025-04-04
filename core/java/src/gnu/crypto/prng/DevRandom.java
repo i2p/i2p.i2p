@@ -18,10 +18,17 @@ class DevRandom implements IRandomStandalone {
     private static final String F = "/dev/random";
     private final File file = new File(F);
 
+    /**
+     *  @since 0.9.66
+     */
+    public static boolean isSupported() {
+        return (new File(F)).canRead();
+    }
+
     public String name() { return F; }
 
     public void init(Map<String, byte[]> attributes) {
-        if (!file.canRead())
+        if (!isSupported())
             throw new IllegalStateException("Cannot open " + F);
     }
 
@@ -29,9 +36,6 @@ class DevRandom implements IRandomStandalone {
         throw new IllegalStateException("unsupported");
     }
 
-    /**
-     *  @since 0.9.58 added to interface
-     */
     public void nextBytes(byte[] out) throws IllegalStateException {
         nextBytes(out, 0, out.length);
     }

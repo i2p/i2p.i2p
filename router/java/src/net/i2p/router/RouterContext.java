@@ -170,7 +170,7 @@ public class RouterContext extends I2PAppContext {
             // or about 2 seconds per buffer - so about 200x faster
             // to fill than to drain - so we don't need too many
             long maxMemory = SystemVersion.getMaxMemory();
-            long maxBuffs = (SystemVersion.isAndroid() || SystemVersion.isARM()) ? 3 : 5;
+            long maxBuffs = 3;
             long buffs = Math.min(maxBuffs, Math.max(2, maxMemory / (21 * 1024 * 1024)));
             envProps.setProperty("prng.buffers", Long.toString(buffs));
         }
