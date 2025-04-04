@@ -40,14 +40,13 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
     private AsyncBuffer _currentBuffer;
 
     public AsyncFortunaStandalone(I2PAppContext context) {
-        super(context.getBooleanProperty("prng.useDevRandom") && !SystemVersion.isWindows() && !SystemVersion.isSlow());
+        super(context.getBooleanPropertyDefaultTrue("prng.useDevRandom") && !SystemVersion.isWindows() && !SystemVersion.isSlow());
         _bufferCount = Math.max(context.getProperty("prng.buffers", DEFAULT_BUFFERS), 2);
         _bufferSize = Math.max(context.getProperty("prng.bufferSize", DEFAULT_BUFSIZE), 16*1024);
         _emptyBuffers = new LinkedBlockingQueue<AsyncBuffer>(_bufferCount);
         _fullBuffers = new LinkedBlockingQueue<AsyncBuffer>(_bufferCount);
         _context = context;
-        context.statManager().createRateStat("prng.bufferWaitTime", "Delay for random number buffer (ms)", "Encryption", new long[] { 60*1000, 10*60*1000, 60*60*1000 } );
-        context.statManager().createRateStat("prng.bufferFillTime", "Time to fill random number buffer (ms)", "Encryption", new long[] { 60*1000, 10*60*1000, 60*60*1000 } );
+        context.statManager().createRateStat("prng.bufferFillTime", "Time to fill random number buffer (ms)", "Encryption", new long[] { 60*60*1000 } );
         _log = context.logManager().getLog(AsyncFortunaStandalone.class);
     }
     
@@ -80,12 +79,8 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
     public void seed(byte val[]) {
         Map<String, byte[]> props = Collections.singletonMap(SEED, val);
         init(props);
-        //fillBlock();
     }
   
-    @Override
-    protected void allocBuffer() {}
-    
     private static class AsyncBuffer {
         public final byte[] buffer;
 
@@ -103,7 +98,6 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
             AsyncBuffer old = _currentBuffer;
             if (old != null)
                 _emptyBuffers.offer(old);
-            long before = System.currentTimeMillis();
             AsyncBuffer nextBuffer = null;
 
             while (nextBuffer == null) {
@@ -115,11 +109,6 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
                     continue;
                 }
             }
-            long waited = System.currentTimeMillis()-before;
-            _context.statManager().addRateData("prng.bufferWaitTime", waited, 0);
-            if (waited > 10*1000 && _log.shouldLog(Log.WARN))
-                _log.warn(Thread.currentThread().getName() + ": Took " + waited
-                                   + "ms for a full PRNG buffer to be found");
             _currentBuffer = nextBuffer;
             buffer = nextBuffer.buffer;
         }
@@ -162,26 +151,22 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
     }
     
     private void doFill(byte buf[]) {
-        //long start = System.currentTimeMillis();
-        if (pool0Count >= MIN_POOL_SIZE
-            && System.currentTimeMillis() - lastReseed > 100)
-          {
-            reseedCount++;
-            //byte[] seed = new byte[0];
-            for (int i = 0; i < NUM_POOLS; i++)
+        if (pools != null) {
+            if (pool0Count >= MIN_POOL_SIZE
+                && System.currentTimeMillis() - lastReseed > 100)
               {
-                if (reseedCount % (1 << i) == 0) {
-                  generator.addRandomBytes(pools[i].digest());
-                }
+                reseedCount++;
+                //byte[] seed = new byte[0];
+                for (int i = 0; i < NUM_POOLS; i++)
+                  {
+                    if (reseedCount % (1 << i) == 0) {
+                      generator.addRandomBytes(pools[i].digest());
+                    }
+                  }
+                lastReseed = System.currentTimeMillis();
               }
-            lastReseed = System.currentTimeMillis();
-          }
+        }  // else we're using DevRandom
         generator.nextBytes(buf);
-        //long now = System.currentTimeMillis();
-        //long diff = now-lastRefill;
-        //lastRefill = now;
-        //long refillTime = now-start;
-        //System.out.println("Refilling " + (++refillCount) + " after " + diff + " for the PRNG took " + refillTime);
     }
     
 /*****
