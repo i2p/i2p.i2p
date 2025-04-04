@@ -1,3 +1,15 @@
+2025-04-04 zzz
+ * Crypto: Use /dev/random PRNG by default
+
+2025-03-31 zzz
+ * Console: Remove redundant LS rendering code
+
+2025-03-30 zzz
+ * i2psnark:
+   - Increase thumbnail size
+   - DTG/Bubble notifications on torrent add failures
+ * NetDB: Don't store old router versions to disk
+
 2025-03-29 2.8.2 (API 0.9.65) released
 
 2025-03-28 zzz
