@@ -125,7 +125,8 @@ public class ChaChaPolyCipherState implements CipherState {
 	{
 		if (n == -1L)
 			throw new IllegalStateException("Nonce has wrapped around");
-		ChaChaCore.initIV(input, n++);
+		// n will be incremented on success below
+		ChaChaCore.initIV(input, n);
 		// UNCOMMENT TO RUN THE main() TEST
 		// input[13] = TEST_VECTOR_NONCE_HIGH_BYTES;
 		ChaChaCore.hash(output, input);
@@ -235,6 +236,7 @@ public class ChaChaPolyCipherState implements CipherState {
 		poly.update(ciphertext, ciphertextOffset, length);
 		finish(adLength, length);
 		System.arraycopy(polyKey, 0, ciphertext, ciphertextOffset + length, 16);
+		n++;
 		return length + 16;
 	}
 
@@ -287,6 +289,7 @@ public class ChaChaPolyCipherState implements CipherState {
 		if ((temp & 0xFF) != 0)
 			Noise.throwBadTagException();
 		encrypt(ciphertext, ciphertextOffset, plaintext, plaintextOffset, dataLen);
+		n++;
 		return dataLen;
 	}
 
