@@ -1,7 +1,7 @@
 Wrapper build instructions (Ubuntu or Raspbian):
 
-       apt-get install default-jdk ant
-       export JAVA_HOME=/usr/lib/jvm/default-java
+       apt-get install openjdk-8-jdk-headless ant
+       export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-armhf
        ant -Dbits=32 compile-c-unix
        mv bin/wrapper bin/i2psvc
        strip --strip-unneeded bin/i2psvc lib/libwrapper.so
