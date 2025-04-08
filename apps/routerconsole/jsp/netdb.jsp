@@ -6,6 +6,8 @@
 <%@include file="css.jsi" %>
 <%=intl.title("network database")%>
 <%@include file="summaryajax.jsi" %>
+<script src="/js/ajaxchanges.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
+<script src="/js/map.js?<%=net.i2p.CoreVersion.VERSION%>" type="text/javascript"></script>
 </head><body>
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("I2P Network Database")%></h1>

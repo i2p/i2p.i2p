@@ -10,6 +10,9 @@ package net.i2p.router.web.helpers;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
 import java.math.BigInteger;         // debug
@@ -58,6 +61,7 @@ import net.i2p.util.Addresses;
 import net.i2p.util.ConvertToHash;
 import net.i2p.util.Log;
 import net.i2p.util.ObjectCounterUnsafe;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
 
@@ -1027,6 +1031,7 @@ class NetDbRenderer {
     /**
      *  @param mode 0: charts only; 1: full routerinfos; 2: abbreviated routerinfos
      *         mode 3: Same as 0 but sort countries by count
+     *         Codes greater than 16 are map codes * 16
      */
     public void renderStatusHTML(Writer out, int pageSize, int page, int mode) throws IOException {
         if (!_context.netDb().isInitialized()) {
@@ -1135,7 +1140,28 @@ class NetDbRenderer {
         // the summary table
         buf.append("<table id=\"netdboverview\" border=\"0\" cellspacing=\"30\"><tr><th colspan=\"3\">");
         buf.append(_t("Network Database Router Statistics"));
-        buf.append("</th></tr><tr><td style=\"vertical-align: top;\">");
+        buf.append("</th></tr>");
+        if (!SystemVersion.isSlow() && !_context.commSystem().isDummy()) {
+            // svg inline part 1
+            out.append(buf);
+            buf.setLength(0);
+            buf.append("<tr><td id=\"mapcontainer\" colspan=\"3\">");
+            boolean ok = embedResource(buf, "mapbase75p1.svg");
+            if (ok) {
+                out.append(buf);
+                buf.setLength(0);
+                // overlay
+                MapMaker mm = new MapMaker(_context);
+                out.write(mm.render(mode >> 4));
+                // svg inline part 2
+                embedResource(buf, "mapbase75p2.svg");
+                buf.append("</td></tr>");
+                out.append(buf);
+            }
+            buf.setLength(0);
+        }
+        mode &= 0x0f;
+        buf.append("<tr><td style=\"vertical-align: top;\">");
         // versions table
         List<String> versionList = new ArrayList<String>(versions.objects());
         if (!versionList.isEmpty()) {
@@ -1237,6 +1263,30 @@ class NetDbRenderer {
 
         out.append(buf);
         out.flush();
+    }
+
+    /**
+     * @return success
+     * @since 0.9.66
+     */
+    private boolean embedResource(StringBuilder buf, String rsc) {
+        InputStream is = this.getClass().getResourceAsStream("/net/i2p/router/web/resources/" + rsc);
+        if (is == null)
+            return false;
+        Reader br = null;
+        try {
+            br = new InputStreamReader(is, "UTF-8");
+            char[] c = new char[4096];
+            int read;
+            while ( (read = br.read(c)) >= 0) {
+                buf.append(c, 0, read);
+            }
+        } catch (IOException ioe) {
+            return false;
+        } finally {
+            if (br != null) try { br.close(); } catch (IOException ioe) {}
+        }
+        return true;
     }
 
     /**

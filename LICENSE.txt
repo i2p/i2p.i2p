@@ -316,6 +316,10 @@ Applications:
    Copyright (c) 2013-2023 David J. Bradshaw
    See licenses/LICENSE-Iframe-resizer.txt
 
+   Router Console country coordinates:
+   Adapted from Google Dataset Publishing Language to convert to Mercator
+   CC BY 4.0 https://creativecommons.org/licenses/by/4.0/
+
    SAM (sam.jar):
    Public domain.
 
