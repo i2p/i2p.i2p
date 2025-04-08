@@ -1,3 +1,11 @@
+2025-04-08 zzz
+ * Console: Add world map with locations of routers and tunnels
+ * Wrapper:
+   - Update wrapper to 3.5.60
+   - Remove Linux PPC 32-bit BE wrapper files
+   - Remove Solaris Sparc 32-bit wrapper files
+   - Add patch to fix breakage on Debian xx-ea Java versions
+
 2025-04-04 zzz
  * Crypto: Use /dev/random PRNG by default
 
