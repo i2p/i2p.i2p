@@ -4666,6 +4666,15 @@ table#netdboverview {
     margin-bottom: 10px;
 }
 
+#geomap {
+    width: 100%;
+}
+
+path.mapoverlaytunnel:hover {
+    stroke: #ff33cc;
+    stroke-width: 7;
+}
+
 #netdboverview td {
     padding: 0;
 }

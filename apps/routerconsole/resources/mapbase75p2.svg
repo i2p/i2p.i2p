@@ -1,0 +1,7 @@
+     <!-- overlay goes above here -->
+   </g>
+  </svg>
+
+  <!-- border -->
+  <rect x="0" y="0" id="frame" pathLength="1" width="1600" height="828"/>
+</svg>

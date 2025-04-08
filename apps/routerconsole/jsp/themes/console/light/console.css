@@ -5933,6 +5933,15 @@ table#leasesetsummary th a:hover {
     padding: 8px 5px 8px 32px;
 }
 
+#geomap {
+    width: 100%;
+}
+
+path.mapoverlaytunnel:hover {
+    stroke: #ff33cc;
+    stroke-width: 7;
+}
+
 #netdblookup th {
     text-transform: uppercase;
     font-size: 11pt !important;
