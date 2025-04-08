@@ -1441,10 +1441,15 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         //               + routerInfo.getOptionsMap().size() + " options on "
         //               + new Date(routerInfo.getPublished()));
     
-        _context.peerManager().setCapabilities(key, routerInfo.getCapabilities());
-        // don't store old routers to disk
-        if (persist && VersionComparator.comp(routerInfo.getVersion(), StoreJob.MIN_STORE_VERSION) < 0)
-            persist = false;
+        String caps = routerInfo.getCapabilities();
+        _context.peerManager().setCapabilities(key, caps);
+        // don't store old or unreachable routers to disk
+        if (persist) {
+            if (caps.indexOf(Router.CAPABILITY_UNREACHABLE) >= 0)
+                persist = false;
+            else if (VersionComparator.comp(routerInfo.getVersion(), StoreJob.MIN_STORE_VERSION) < 0)
+                persist = false;
+        }
         _ds.put(key, routerInfo, persist);
         if (rv == null)
             _kb.add(key);
