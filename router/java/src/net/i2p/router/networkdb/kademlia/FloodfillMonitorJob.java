@@ -41,7 +41,6 @@ class FloodfillMonitorJob extends JobImpl {
 
     private static final int MIN_FF = 5000;
     private static final int MAX_FF = 999999;
-    static final String PROP_FLOODFILL_PARTICIPANT = "router.floodfillParticipant";
     
     public FloodfillMonitorJob(RouterContext context, FloodfillNetworkDatabaseFacade facade) {
         super(context);
@@ -60,11 +59,11 @@ class FloodfillMonitorJob extends JobImpl {
             return;
         }
         boolean wasFF = _facade.floodfillEnabled();
-        boolean ff = shouldBeFloodfill();
+        boolean ff = shouldBeFloodfill(wasFF);
         _facade.setFloodfillEnabledFromMonitor(ff);
         if (ff != wasFF) {
             if (ff) {
-                if (!(getContext().getBooleanProperty(PROP_FLOODFILL_PARTICIPANT) &&
+                if (!(getContext().getBooleanProperty(FloodfillNetworkDatabaseFacade.PROP_FLOODFILL_PARTICIPANT) &&
                       getContext().router().getUptime() < 3*60*1000)) {
                     getContext().router().eventLog().addEvent(EventLog.BECAME_FLOODFILL);
                 }
@@ -100,15 +99,12 @@ class FloodfillMonitorJob extends JobImpl {
         requeue(delay);
     }
 
-    private boolean shouldBeFloodfill() {
-        if (!SigType.ECDSA_SHA256_P256.isAvailable())
-            return false;
-
+    private boolean shouldBeFloodfill(boolean wasFF) {
         // Hidden trumps netDb.floodfillParticipant=true
         if (getContext().router().isHidden())
             return false;
 
-        String enabled = getContext().getProperty(PROP_FLOODFILL_PARTICIPANT, "auto");
+        String enabled = getContext().getProperty(FloodfillNetworkDatabaseFacade.PROP_FLOODFILL_PARTICIPANT, "auto");
         if ("true".equals(enabled))
             return true;
         if ("false".equals(enabled))
@@ -116,9 +112,9 @@ class FloodfillMonitorJob extends JobImpl {
 
         // auto from here down
 
-        // Only if not shutting down...
+        // Don't change while shutting down...
         if (getContext().router().gracefulShutdownInProgress())
-            return false;
+            return wasFF;
 
         // ARM ElG decrypt is too slow
         if (SystemVersion.isSlow())
@@ -144,9 +140,19 @@ class FloodfillMonitorJob extends JobImpl {
         if ("a1".equals(country) || "a2".equals(country))
             return false;
 
-        // Only if up a while...
-        if (getContext().router().getUptime() < MIN_UPTIME)
-            return false;
+        boolean afterRestart = false;
+        // Only if up a while, or we were ff at shutdown and were only down briefly
+        if (getContext().router().getUptime() < MIN_UPTIME) {
+            // this is set at shutdown by the router
+            if (!getContext().getBooleanProperty(FloodfillNetworkDatabaseFacade.PROP_FLOODFILL_AT_RESTART))
+                return false;
+            // remove the config
+            getContext().router().saveConfig(FloodfillNetworkDatabaseFacade.PROP_FLOODFILL_AT_RESTART, null);
+            long down = getContext().router().getEstimatedDowntime();
+            if (down == 0 || down > 20*60*1000)
+                return false;
+            afterRestart = true;
+        }
 
         RouterInfo ri = getContext().router().getRouterInfo();
         if (ri == null)
@@ -172,7 +178,6 @@ class FloodfillMonitorJob extends JobImpl {
         }
 
         // Only change status every so often
-        boolean wasFF = _facade.floodfillEnabled();
         if (_lastChanged + MIN_CHANGE_DELAY > now)
             return wasFF;
 
@@ -219,13 +224,15 @@ class FloodfillMonitorJob extends JobImpl {
                 happy = happy && rate.getAvgOrLifetimeAvg() < 5;
         }
         // Only if we're pretty well integrated...
-        happy = happy && _facade.getKnownRouters() >= 400;
-        happy = happy && getContext().commSystem().countActivePeers() >= 50;
-        happy = happy && getContext().tunnelManager().getParticipatingCount() >= 25;
+        if (!afterRestart) {
+            happy = happy && _facade.getKnownRouters() >= 2000;
+            happy = happy && getContext().commSystem().countActivePeers() >= 200;
+            happy = happy && getContext().tunnelManager().getParticipatingCount() >= 250;
+        }
         happy = happy && Math.abs(getContext().clock().getOffset()) < 10*1000;
         // We need an address and no introducers
         if (happy) {
-            RouterAddress ra = getContext().router().getRouterInfo().getTargetAddress("SSU");
+            RouterAddress ra = getContext().router().getRouterInfo().getTargetAddress("SSU2");
             if (ra == null)
                 happy = false;
             else {
@@ -246,6 +253,8 @@ class FloodfillMonitorJob extends JobImpl {
 
         if (_log.shouldLog(Log.DEBUG)) {
             final RouterContext rc = getContext();
+            RouterAddress ra = getContext().router().getRouterInfo().getTargetAddress("SSU2");
+            String ssu2 = ra != null ? ra.toString() : "none";
             final String log = String.format(
                     "FF criteria breakdown: happy=%b, capabilities=%s, maxLag=%d, known=%d, " +
                     "active=%d, participating=%d, offset=%d, ssuAddr=%s ElG=%f",
@@ -256,7 +265,7 @@ class FloodfillMonitorJob extends JobImpl {
                     rc.commSystem().countActivePeers(),
                     rc.tunnelManager().getParticipatingCount(),
                     Math.abs(rc.clock().getOffset()),
-                    rc.router().getRouterInfo().getTargetAddress("SSU").toString(),
+                    ssu2,
                     elG
                     );
             _log.debug(log);

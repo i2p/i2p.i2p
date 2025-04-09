@@ -56,6 +56,14 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     static final long NEXT_RKEY_RI_ADVANCE_TIME = 45*60*1000;
     private static final long NEXT_RKEY_LS_ADVANCE_TIME = 10*60*1000;
     private static final int NEXT_FLOOD_QTY = 2;
+    /**
+     *  @since 0.9.66 moved from FloodfillMonitorJob
+     */
+    public static final String PROP_FLOODFILL_PARTICIPANT = "router.floodfillParticipant";
+    /**
+     *  @since 0.9.66
+     */
+    public static final String PROP_FLOODFILL_AT_RESTART = "router.wasFloodfill";
     
     /**
      *  Main DB
@@ -107,7 +115,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         if (isClientDb()) {
             isFF = false;
         } else {
-            isFF = _context.getBooleanProperty(FloodfillMonitorJob.PROP_FLOODFILL_PARTICIPANT);
+            isFF = _context.getBooleanProperty(PROP_FLOODFILL_PARTICIPANT);
             _lookupThrottler = new LookupThrottler(this);
         }
 

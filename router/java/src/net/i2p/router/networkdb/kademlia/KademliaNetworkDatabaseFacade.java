@@ -398,7 +398,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         //// expire some routers
         // Don't run until after RefreshRoutersJob has run, and after validate() will return invalid for old routers.
         if (!isClientDb() && !_context.commSystem().isDummy()) {
-            boolean isFF = _context.getBooleanProperty(FloodfillMonitorJob.PROP_FLOODFILL_PARTICIPANT);
+            boolean isFF = _context.getBooleanProperty(FloodfillNetworkDatabaseFacade.PROP_FLOODFILL_PARTICIPANT);
             long down = _context.router().getEstimatedDowntime();
             long delay = (down == 0 || (!isFF && down > 30*60*1000) || (isFF && down > 24*60*60*1000)) ?
                          ROUTER_INFO_EXPIRATION_FLOODFILL + 10*60*1000 :
