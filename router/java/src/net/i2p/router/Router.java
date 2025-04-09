@@ -1595,6 +1595,15 @@ public class Router implements RouterClock.ClockShiftListener {
             saveConfig("router.previousVersion", RouterVersion.VERSION);
         }
 
+        // If we are ff, are restarting, and configured for auto-ff,
+        // put a note in the config. FloodfillMonitorJob will check for
+        // and remove this config at startup.
+        if (_context.netDb().floodfillEnabled() &&
+            (exitCode == EXIT_HARD_RESTART || exitCode == EXIT_GRACEFUL_RESTART) &&
+            "auto".equals(_context.getProperty(FloodfillNetworkDatabaseFacade.PROP_FLOODFILL_PARTICIPANT, "auto"))) {
+            saveConfig(FloodfillNetworkDatabaseFacade.PROP_FLOODFILL_AT_RESTART, "true");
+        }
+
         _context.removeShutdownTasks();
 
         // All in-JVM clients should be gone by now,
