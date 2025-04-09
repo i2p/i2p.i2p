@@ -1,5 +1,12 @@
+2025-04-09 zzz
+ * Console: Use Basic auth for prometheus plugin
+ * NetDB:
+   - Fix auto-ff, broken when SSU1 was disabled
+   - Maintain ff after restart when configured for auto
+
 2025-04-08 zzz
  * Console: Add world map with locations of routers and tunnels
+ * NetDB: Don't store unreachable routers to disk
  * Wrapper:
    - Update wrapper to 3.5.60
    - Remove Linux PPC 32-bit BE wrapper files
