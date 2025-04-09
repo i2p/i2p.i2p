@@ -49,7 +49,9 @@ import net.i2p.util.SystemVersion;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.security.authentication.DigestAuthenticator;
+import org.eclipse.jetty.security.authentication.LoginAuthenticator;
 import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
@@ -116,6 +118,9 @@ public class RouterConsoleRunner implements RouterApp {
 
     // Jetty Auth
     private static final DigestAuthenticator authenticator = new DigestAuthenticator();
+    // only for prometheus plugin
+    private static final BasicAuthenticator basicAuthenticator = new BasicAuthenticator();
+    public static final String PROMETHEUS_REALM = "prometheus";
     static {
         // default changed from 0 (forever) in Jetty 6 to 60*1000 ms in Jetty 7
         authenticator.setMaxNonceAge(7*24*60*60*1000L);
@@ -985,15 +990,25 @@ public class RouterConsoleRunner implements RouterApp {
                 enable = false;
                 ctx.router().saveConfig(PROP_PW_ENABLE, "false");
             } else {
-                HashLoginService realm = new CustomHashLoginService(JETTY_REALM, context.getContextPath(),
+                // Prometheus server only supports basic auth
+                // https://github.com/prometheus/common/issues/352
+                // Jetty does not support multiple auth at once
+                // but it's coming for Jetty 12
+                // https://github.com/jetty/jetty.project/issues/5442
+                boolean isBasic = context.getContextPath().equals("/prometheus");
+                // need separate realms so the browser doesn't get them mixed up
+                String rlm = isBasic ? PROMETHEUS_REALM : JETTY_REALM;
+                HashLoginService realm = new CustomHashLoginService(rlm, context.getContextPath(),
                                                                     ctx.logManager().getLog(RouterConsoleRunner.class));
                 sec.setLoginService(realm);
-                sec.setAuthenticator(authenticator);
+                LoginAuthenticator auth = isBasic ? basicAuthenticator : authenticator;
+                sec.setAuthenticator(auth);
                 String[] role = new String[] {JETTY_ROLE};
                 for (Map.Entry<String, String> e : userpw.entrySet()) {
                     String user = e.getKey();
                     String pw = e.getValue();
-                    Credential cred = Credential.getCredential(MD5_CREDENTIAL_TYPE + pw);
+                    // for basic, the password will be the md5 hash itself
+                    Credential cred = Credential.getCredential(isBasic ? pw : MD5_CREDENTIAL_TYPE + pw);
                     realm.putUser(user, cred, role);
                     Constraint constraint = new Constraint(user, JETTY_ROLE);
                     constraint.setAuthenticate(true);
