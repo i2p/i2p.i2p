@@ -22,6 +22,8 @@ import net.i2p.util.SystemVersion;
  */
 public class EventLogHelper extends FormHandler {
     private long _from, _age;
+    private int _max;
+    private boolean _reverse = true;
     //private long _to = Long.MAX_VALUE;
     private String _event = ALL;
     // EventLog name to translated display string
@@ -82,7 +84,23 @@ public class EventLogHelper extends FormHandler {
         } catch (NumberFormatException nfe) {
             _age = 0;
             _from = 0;
-        }	
+        }
+    }
+    
+    /**
+     *  @since 0.9.66 for /logs
+     */
+    public void setMax(String s) { 
+        try {
+            _max = Integer.parseInt(s);
+        } catch (NumberFormatException nfe) {}
+    }
+    
+    /**
+     *  @since 0.9.66 for /logs
+     */
+    public void setReverse(String s) { 
+        _reverse = Boolean.parseBoolean(s);
     }
 
     //public void setTo(String s) { 
@@ -191,7 +209,11 @@ public class EventLogHelper extends FormHandler {
         buf.append("</th></tr>");
 
         List<Map.Entry<Long, String>> entries = new ArrayList<Map.Entry<Long, String>>(events.entrySet());
-        Collections.reverse(entries);
+        int sz = entries.size();
+        if (_max > 0 && sz > _max)
+            entries = entries.subList(sz - _max, sz);
+        if (_reverse)
+            Collections.reverse(entries);
         for (Map.Entry<Long, String> e : entries) {
             long time = e.getKey().longValue();
             String event = e.getValue();
@@ -210,7 +232,7 @@ public class EventLogHelper extends FormHandler {
             } else {
                  buf.append(event);
             }
-            buf.append("</td></tr>");
+            buf.append("</td></tr>\n");
         }
         buf.append("</table>");
         return buf.toString();
