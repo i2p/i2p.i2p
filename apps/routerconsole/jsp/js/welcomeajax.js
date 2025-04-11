@@ -15,16 +15,6 @@ function ajax(url, target, refresh) {
     // IE https://www.jamesmaurer.com/ajax-refresh-problem-w-ie-not-refreshing.asp
     req.setRequestHeader("If-Modified-Since","Sat, 1 Jan 2000 00:00:00 GMT");
     req.send(null);
-    // IE/Windows ActiveX version
-  } else if (window.ActiveXObject) {
-    var req = new ActiveXObject("Microsoft.XMLDOM");
-    if (req) {
-      req.onreadystatechange = function() {ajaxDone(target);};
-      req.open("GET", url, true);
-      // IE https://www.jamesmaurer.com/ajax-refresh-problem-w-ie-not-refreshing.asp
-      req.setRequestHeader("If-Modified-Since","Sat, 1 Jan 2000 00:00:00 GMT");
-      req.send(null);
-    }
   }
 }
 

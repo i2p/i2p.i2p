@@ -21,14 +21,6 @@ function ajaxchanges(url, target, changeclass, refresh) {
     req.open("GET", url, true);
     req.setRequestHeader("If-Modified-Since","Sat, 1 Jan 2000 00:00:00 GMT");
     req.send(null);
-  } else if (window.ActiveXObject) {
-    var req = new ActiveXObject("Microsoft.XMLDOM");
-    if (req) {
-      req.onreadystatechange = function() {ajaxchangesDone(target);};
-      req.open("GET", url, true);
-      req.setRequestHeader("If-Modified-Since","Sat, 1 Jan 2000 00:00:00 GMT");
-      req.send(null);
-    }
   }
 }
 
