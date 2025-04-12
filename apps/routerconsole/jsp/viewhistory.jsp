@@ -1,33 +1,61 @@
-<%@page pageEncoding="UTF-8"%><%
-/*
- * USE CAUTION WHEN EDITING
- * Trailing whitespace OR NEWLINE on the last line will cause
- * IllegalStateExceptions !!!
- *
- * Do not tag this file for translation.
- */
-response.setContentType("text/plain");
-response.setHeader("X-Content-Type-Options", "nosniff");
-response.setHeader("Accept-Ranges", "none");
-response.setDateHeader("Expires", 0);
-response.addHeader("Cache-Control", "no-store, max-age=0, no-cache, must-revalidate");
-response.addHeader("Pragma", "no-cache");
-java.io.File base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir();
-java.io.File file = new java.io.File(base, "history.txt");
-long length = file.length();
-if (length > 0)
-    response.setHeader("Content-Length", Long.toString(length));
-try {
-    net.i2p.util.FileUtil.readFile("history.txt", base.getAbsolutePath(), response.getOutputStream());
-} catch (java.io.IOException ioe) {
-    // prevent 'Committed' IllegalStateException from Jetty
-    if (!response.isCommitted()) {
-        response.sendError(403, ioe.toString());
-    }  else {
-        // not an error, happens when the browser closes the stream
-        net.i2p.I2PAppContext.getGlobalContext().logManager().getLog(getClass()).warn("Error serving history.txt", ioe);
-        // Jetty doesn't log this
-        throw ioe;
+<%@page contentType="text/html"%>
+<%@page pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html><head>
+<%@include file="css.jsi" %>
+<%=intl.title("Change Log")%>
+<%@include file="summaryajax.jsi" %>
+</head><body>
+<%@include file="summary.jsi" %>
+<h1>I2P <%=intl._t("Change Log")%></h1>
+<div class="main" id="changelog">
+<%
+    java.io.File base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir();
+    java.io.File file = new java.io.File(base, "history.txt");
+    if (file.canRead()) {
+        java.io.FileInputStream fis = null;
+        java.io.BufferedReader in = null;
+        try {
+            fis = new java.io.FileInputStream(file);
+            in = new java.io.BufferedReader(new java.io.InputStreamReader(fis, "UTF-8"));
+            String line = null;
+            while ( (line = in.readLine()) != null) {
+                if (line.length() == 0)
+                    continue;
+                if (line.endsWith(" released")) {
+                    out.write("<h2>");
+                    if (line.startsWith(" * "))   // some do, some don't
+                        line = line.substring(3);
+                    out.write(line.replace("released", intl._t("Released")));
+                    out.println("</h2>");
+                } else if (line.startsWith("20")) {
+                    out.write("<h3>");
+                    out.write(line);
+                    out.println("</h3>");
+                } else if (line.startsWith(" * ")) {
+                    out.write("<p><span class=\"star\">⭐</span> ");
+                    out.write(line, 3, line.length() - 3);
+                    out.println();
+                } else if (line.startsWith("   - ")) {
+                    out.write("<br><span class=\"bullet\">🔹</span> ");
+                    out.write(line, 5, line.length() - 5);
+                    out.println();
+                } else if (line.startsWith("---------------")) {
+                    out.println("<hr>");
+                } else if (line.startsWith("EARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE")) {
+                    out.print("<a href=\"https://git.idk.i2p/i2p-hackers/i2p.i2p/-/raw/master/history.txt\">");
+                    out.print(intl._t("Earlier history is available in the source package"));
+                    out.println("</a>");
+                } else {
+                    out.write("<br><span class=\"bullet\"></span>");  // indent same as bullet
+                    out.println(line);
+                }
+            }
+        } finally {
+            if (in != null) in.close();
+        }
+    } else {
+        %>Changelog not available<%
     }
-}
 %>
+</div></body></html>

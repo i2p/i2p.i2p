@@ -4506,24 +4506,35 @@ table#configinfo {
 }
 
 #changelog h2 {
-    padding: 10px;
-    font-size: 11pt;
+    background: #744;
+    border-radius: 10px;
+    font-size: 12pt;
+    margin: 20px 10px 20px 12px;
+    padding: 25px 10px;
     text-align: left;
-    letter-spacing: 0.08em;
-    word-spacing: 0.1em;
-    border-radius: 0;
-    margin: 0 0 -11px !important;
 }
 
-#changelog pre {
-    padding: 10px 10px 10px 20px;
-    max-height: 600px;
-    overflow-y: scroll;
+#changelog h3 {
+    background: #222;
+    border-radius: 0;
+    font-size: 11pt;
+    margin: 5px 20px 0 !important;
+    padding: 10px 4px 10px 4px;
+    text-align: left;
+}
+
+#changelog p {
+    margin: 0;
+    padding: 0 10px 5px 10px;
     width: calc(100% - 32px);
-    border-left: 1px solid #524b5e;
-    border-right: 1px solid #524b5e;
-    margin-top: 11px;
-    background: #000;
+}
+
+#changelog .star {
+    padding: 0 4px 0 25px;
+}
+
+#changelog .bullet {
+    padding: 0 4px 0 48px;
 }
 
 p#fullhistory {
@@ -7905,17 +7916,6 @@ b.netdb_transport {
         margin: 0 -15px -5px;
         padding: 10px 5px;
     }
-    .main#help #changelog pre:not(old) {
-        /*
-     columns: 550px auto;
-     column-gap: 40px;
-     column-rule: 1px dotted #151;
-*/
-        margin-left: 0;
-        padding-left: 10px;
-        width: calc(100% - 22px) !important;
-        overflow-y: hidden;
-    }
 }
 
 @media screen and (min-width: 1460px) {
@@ -7937,7 +7937,6 @@ b.netdb_transport {
     .main textarea,
     code,
     tt,
-    #changelog pre,
     ul.statlist a[name],
     ul.statlist b,
     ul.statlist li b,
