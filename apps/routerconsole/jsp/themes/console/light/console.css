@@ -6871,7 +6871,6 @@ input[name="newsURL"] {
 #reachabilityhelp,
 #advancedsettings,
 #legal,
-#changelog,
 #faq {
     border: 1px solid #dee2e6;
     border-radius: 2px;
@@ -6884,18 +6883,36 @@ input[name="newsURL"] {
     margin-top: 15px;
 }
 
-#changelog {
-    margin-bottom: 5px !important;
-    padding: 0 0 0 10px;
+#changelog h2 {
+    background: #cee !important;
+    border-radius: 10px;
+    font-size: 12pt;
+    margin: 20px 10px 20px 12px !important;
+    padding: 25px 10px;
+    text-align: left;
 }
 
-#changelog pre {
-    margin: -10px 0 0;
-    padding-top: 8px;
-    width: 100%;
-    height: 600px;
-    white-space: pre-wrap;
-    font-size: 9pt;
+#changelog h3 {
+    background: #eee !important;
+    border-radius: 0;
+    font-size: 11pt;
+    margin: 5px 20px 5px !important;
+    padding: 10px 4px 10px 4px;
+    text-align: left;
+}
+
+#changelog p {
+    margin: 0;
+    padding: 0 10px 5px 10px;
+    width: calc(100% - 32px);
+}
+
+#changelog .star {
+    padding: 0 4px 0 25px;
+}
+
+#changelog .bullet {
+    padding: 0 4px 0 48px;
 }
 
 #help h2 {
@@ -6906,10 +6923,6 @@ input[name="newsURL"] {
 
 #help h3 {
     margin-bottom: -3px;
-}
-
-#help #changelog h2 {
-    margin-right: -1px !important;
 }
 
 #help div,
@@ -8227,17 +8240,6 @@ b.netdb_transport {
 }
 
 @media screen and (min-width: 1400px) {
-    #help #changelog pre:not(old) {
-        /*
-     columns: 550px auto;
-     column-gap: 25px;
-     column-rule: 1px solid rgba(64, 64, 128, 0.5);
-*/
-        margin-left: -10px !important;
-        padding-left: 10px;
-        padding-bottom: 5px;
-        height: 75%;
-    }
     #profiles .tab:first-child,
     #profiles .tab2:first-child,
     #help .tab:first-child,
@@ -8273,7 +8275,6 @@ b.netdb_transport {
     .themelabel,
     .ui_lang,
     .applabel a,
-    #changelog pre,
     .routersummary button.download,
     #peerdefs,
     #profile_defs,

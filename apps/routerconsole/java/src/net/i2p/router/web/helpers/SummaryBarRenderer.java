@@ -155,7 +155,7 @@ class SummaryBarRenderer {
         Map<String, String> svcs = new TreeMap<String, String>(Collator.getInstance());
         StringBuilder rbuf = new StringBuilder(128);
 
-        String tx = _t("Changelog");
+        String tx = _t("Change Log");
         rbuf.append("<a href=\"/viewhistory\" target=\"_top\" title=\"")
            .append(_t("Recent development changes to the router"))
            .append("\">")
@@ -529,11 +529,11 @@ class SummaryBarRenderer {
         svcs.put(tx, rbuf.toString());
 */
 
-        String tx = _t("Changelog");
+        String tx = _t("Change Log");
         rbuf.setLength(0);
         rbuf.append("<a title=\"")
-           .append(_t("View full changelog"))
-           .append("\" href=\"/viewhistory\" target=\"_blank\">")
+           .append(_t("View full change log"))
+           .append("\" href=\"/viewhistory\" target=\"_top\">")
            .append(nbsp(tx))
            .append("</a>\n");
         svcs.put(tx, rbuf.toString());
