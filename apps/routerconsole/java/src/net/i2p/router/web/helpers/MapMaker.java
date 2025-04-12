@@ -93,12 +93,15 @@ public class MapMaker {
     private static final Color TRANSPARENT = new Color(0, 0, 0, 0);
     private static final BasicStroke STROKE = new BasicStroke(1);
     private static final BasicStroke STROKE2 = new BasicStroke(3);
+    // multiply by 16 for CGI 'f' param
     private static final int MODE_ROUTERS = 1;
     private static final int MODE_EXPL = 2;
     private static final int MODE_CLIENT = 4;
     private static final int MODE_PART = 8;
     private static final int MODE_ANIM = 16;
     private static final int MODE_FF = 32;
+    // put a dot on every country /?f=1024
+    private static final int MODE_TEST = 64;
     private static final int MODE_DEFAULT = MODE_ROUTERS | MODE_EXPL | MODE_CLIENT | MODE_ANIM;
 
     private int tunnelCount;
@@ -195,13 +198,25 @@ public class MapMaker {
         g.drawText(_t("Participating Tunnels"), 25, 800, TEXT_COLOR, large, null, hints);
         buf.append("</a>\n");
 
-        if ((mode & (MODE_ROUTERS | MODE_FF)) != 0) {
-            for (String c : countries.objects()) {
+        boolean test = (mode & MODE_TEST) != 0;
+        if (test)
+            g.drawText("TEST MODE", 25, 825, TEXT_COLOR, large, null, hints);
+
+        if ((mode & (MODE_ROUTERS | MODE_FF | MODE_TEST)) != 0) {
+            Set<String> cset;
+            if (test) {
+                cset = _context.commSystem().getCountries().keySet();
+            } else {
+                cset = countries.objects();
+            }
+            for (String c : cset) {
                 Mercator m = _mercator.get(c);
                 if (m == null)
                     continue;
-                int count = countries.count(c);
-                String title = getTranslatedCountry(c) + ": " + ngettext("{0} router", "{0} routers", count);
+                int count = test ? 1 : countries.count(c);
+                String title = getTranslatedCountry(c);
+                if (!test)
+                    title += ": " + ngettext("{0} router", "{0} routers", count);
 
                 hints.put(KEY_ELEMENT_ID, "mapoverlaytext-" + c);
                 hints.put(KEY_ELEMENT_CLASS, "mapoverlaytext dynamic");
@@ -224,7 +239,7 @@ public class MapMaker {
         }
 
         String us = _context.commSystem().getOurCountry();
-        if (us != null) {
+        if (!test && us != null) {
             Mercator mus = _mercator.get(us);
             if (mus != null) {
                 hints.put(KEY_ELEMENT_ID, "mapoverlaysquare-me");
