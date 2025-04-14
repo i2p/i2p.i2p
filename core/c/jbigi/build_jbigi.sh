@@ -79,10 +79,30 @@ sunos*|openbsd*|netbsd*|*freebsd*|linux*)
         LIBFILE="libjbigi.so";;
 android)
         BUILD_OS="linux"
-        if [ $BITS -eq 32 ]; then
-            COMPILEFLAGS="-O2 -pedantic -fomit-frame-pointer -march=armv7-a -mfloat-abi=softfp -mtune=cortex-a5 -fPIC -DPIC"
+        ARCH=$(uname -m | cut -f1 -d" ")
+        android_arm () {
+          if [ $BITS -eq 32 ]; then
+              COMPILEFLAGS="-O2 -pedantic -fomit-frame-pointer -march=armv7-a -mfloat-abi=softfp -mtune=cortex-a5 -fPIC -DPIC"
+          else
+              COMPILEFLAGS="-O2 -pedantic -march=armv8-a -Wa,--noexecstack -fPIC -DPIC"
+          fi
+        }
+        if [ "$ANDROID_FORCE_ARM" == "true" ]; then
+          android_arm
         else
-            COMPILEFLAGS="-O2 -pedantic -march=armv8-a -Wa,--noexecstack -fPIC -DPIC"
+          case ${ARCH} in
+            x86_64 | amd64 | i*86)
+            if [ $BITS -eq 32 ]; then
+                COMPILEFLAGS="-O2 -pedantic -fomit-frame-pointer -march=i686 -fPIC -DPIC"
+            else
+                # We choose x86_64-v2 because Android on x86_64 platform is just x86_64-v2 anyway
+                COMPILEFLAGS="-O2 -pedantic -march=x86-64-v2 -Wa,--noexecstack -fPIC -DPIC"
+            fi
+          ;;
+            *)
+            android_arm
+          ;;
+          esac
         fi
         LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
         INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/$BUILD_OS -I/usr/local/include"
