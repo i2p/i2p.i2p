@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -203,11 +204,14 @@ public class MapMaker {
             g.drawText("TEST MODE", 25, 825, TEXT_COLOR, large, null, hints);
 
         if ((mode & (MODE_ROUTERS | MODE_FF | MODE_TEST)) != 0) {
-            Set<String> cset;
+            Collection<String> cset;
             if (test) {
                 cset = _context.commSystem().getCountries().keySet();
             } else {
-                cset = countries.objects();
+                // we draw larger circles first, so smaller ones are on top
+                // and tooltips will be visible, at least at first.
+                // XHR will thwart this later.
+                cset = countries.sortedObjects();
             }
             for (String c : cset) {
                 Mercator m = _mercator.get(c);
