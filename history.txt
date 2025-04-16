@@ -1,3 +1,28 @@
+2025-04-16 zzz
+ * Tunnels: Implement proposal 168 (part 1)
+   - Add bw params to build requests
+   - Add bw param to build reply
+   - Reject build request if cannot allocate min bw
+   - Track allocated bw in HopConfig
+   - Track total allocated bw in TunnelDispatcher
+
+2025-04-13 zzz
+ * Console:
+   - Adjust map Mercator coordinates
+   - Ensure smaller country circles are above larger ones
+   - Remove single-point countries on map
+
+2025-04-12 zzz
+ * Console: Display changelog in html
+
+2025-04-10 zzz
+ * i2ptunnel: Reduce HTTP server thread usage
+   - Increase performance and properly enforce limits.
+   - Handle all GET and HEAD requests in the handler thread
+   - Handle POST and CONNECT in threads from the server pool, to not bypass server thread limits
+   - For POST and CONNECT, the opposite-direction (Sender) thread is still run in the client pool
+   - Ensure the server thread limit is at least the streaming max connections limit so we don't run out
+
 2025-04-09 zzz
  * Console: Use Basic auth for prometheus plugin
  * NetDB:
