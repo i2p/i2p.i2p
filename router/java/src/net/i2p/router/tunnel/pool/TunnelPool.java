@@ -141,6 +141,21 @@ public class TunnelPool {
         return _rateName;
     }
 
+    /** 
+     *  @return average bandwidth per configured tunnel in Bps
+     *  @since 0.9.66
+     */
+    public int getAvgBWPerTunnel() {
+        RateStat stat = _context.statManager().getRate(_rateName);
+        if (stat == null)
+            return 0;
+        Rate rate = stat.getRate(5*60*1000);
+        if (rate == null)
+            return 0;
+        int count = _settings.isInbound() ? _settings.getQuantity() : _settings.getTotalQuantity();
+        return (int) (((float) rate.getAvgOrLifetimeAvg()) / count);
+    }
+
     private void refreshSettings() {
         if (!_settings.isExploratory())
             return; // don't override client specified settings

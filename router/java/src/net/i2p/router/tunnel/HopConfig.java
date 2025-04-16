@@ -30,6 +30,7 @@ public class HopConfig {
     private int _oldMessagesProcessed;
     //private int _messagesSent;
     //private int _oldMessagesSent;
+    private int _allocatedBW;
     
     public HopConfig() {
         _creation = -1;
@@ -154,6 +155,22 @@ public class HopConfig {
         int rv = _messagesProcessed - _oldMessagesProcessed;
         _oldMessagesProcessed = _messagesProcessed;
         return rv;
+    }
+
+    /**
+     *  @return Bps
+     *  @since 0.9.66
+     */
+    public int getAllocatedBW() {
+        return _allocatedBW;
+    }
+
+    /**
+     *  @param bw Bps
+     *  @since 0.9.66
+     */
+    public void setAllocatedBW(int bw) {
+        _allocatedBW = bw;
     }
 
     /**

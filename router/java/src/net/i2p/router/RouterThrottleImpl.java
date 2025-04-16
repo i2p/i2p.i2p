@@ -345,7 +345,16 @@ public class RouterThrottleImpl implements RouterThrottle {
         return TUNNEL_ACCEPT;
     }
 
-    static final int DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE = 40; // .067KBps
+    /**
+     * This is the estimated number of 1 KB tunnel messages that we'll see in
+     * the 10 minute lifetime of an exploratory tunnel. We use it as a baseline
+     * minimum for estimating tunnel bandwidth, if accepted.
+     *
+     * 40 KB in 10 minutes equals 67 Bps.
+     *
+     * @since public since 0.9.66, was package private
+     */
+    public static final int DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE = 40; // .067KBps
     /** also limited to 90% - see below */
     private static final int MIN_AVAILABLE_BPS = 4*1024; // always leave at least 4KBps free when allowing
     private static final String LIMIT_STR = _x("Rejecting tunnels: Bandwidth limit");
