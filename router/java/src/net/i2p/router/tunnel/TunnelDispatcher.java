@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -91,6 +92,7 @@ public class TunnelDispatcher implements Service {
     //private long _lastDropTime;
     private final TunnelGatewayPumper _pumper;
     private final Object _joinParticipantLock = new Object();
+    private final AtomicInteger _allocatedBW = new AtomicInteger();
 
     /** for shouldDropParticipatingMessage() */
     enum Location {OBEP, PARTICIPANT, IBGW}
@@ -326,6 +328,7 @@ public class TunnelDispatcher implements Service {
         if (cfg.getExpiration() > _lastParticipatingExpiration)
             _lastParticipatingExpiration = cfg.getExpiration();
         _leaveJob.add(cfg);
+        _allocatedBW.addAndGet(cfg.getAllocatedBW());
         return true;
     }
 
@@ -353,6 +356,7 @@ public class TunnelDispatcher implements Service {
         if (cfg.getExpiration() > _lastParticipatingExpiration)
             _lastParticipatingExpiration = cfg.getExpiration();
         _leaveJob.add(cfg);
+        _allocatedBW.addAndGet(cfg.getAllocatedBW());
         return true;
     }
     
@@ -384,7 +388,15 @@ public class TunnelDispatcher implements Service {
         if (cfg.getExpiration() > _lastParticipatingExpiration)
             _lastParticipatingExpiration = cfg.getExpiration();
         _leaveJob.add(cfg);
+        _allocatedBW.addAndGet(cfg.getAllocatedBW());
         return true;
+    }
+
+    /**
+     *  @since 0.9.66
+     */
+    public int getAllocatedBW() {
+        return _allocatedBW.get();
     }
 
     public int getParticipatingCount() {
@@ -958,6 +970,7 @@ public class TunnelDispatcher implements Service {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Expiring " + cur);
                     remove(cur);
+                    _allocatedBW.addAndGet(0 - cur.getAllocatedBW());
                 } else {
                     if (exp < nextTime)
                         nextTime = exp;

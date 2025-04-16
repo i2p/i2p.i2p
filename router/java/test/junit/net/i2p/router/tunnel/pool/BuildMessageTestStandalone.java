@@ -216,13 +216,13 @@ public class BuildMessageTestStandalone extends TestCase {
             }
         }
 
-        int statuses[] = (new BuildReplyHandler(ctx)).decrypt(reply, cfg, order);
+        BuildReplyHandler.Result statuses[] = (new BuildReplyHandler(ctx)).decrypt(reply, cfg, order);
         if (statuses == null) throw new RuntimeException("bar");
         boolean allAgree = true;
         for (int i = 1; i < cfg.getLength(); i++) {
             Hash peer = cfg.getPeer(i);
             int record = order.get(i).intValue();
-            if (statuses[record] != 0)
+            if (statuses[record].code != 0)
                 allAgree = false;
         }
         

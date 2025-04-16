@@ -3,6 +3,7 @@ package net.i2p.router.tunnel.pool;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 import net.i2p.crypto.EncType;
@@ -479,6 +480,22 @@ abstract class BuildRequestor {
         
         if (log.shouldLog(Log.DEBUG))
             log.debug("Build order: " + order + " for " + cfg);
+
+        // BW properties
+        Properties props;
+        int bw = 0;
+        int variance = 0;
+        if (!useShortTBM || pool.getSettings().isExploratory()) {
+            props = EmptyProperties.INSTANCE;
+        } else {
+            bw = pool.getAvgBWPerTunnel();
+            if (bw > 7000) {
+                props = new Properties();
+                variance = 4 * bw / 10;
+            } else {
+                props = EmptyProperties.INSTANCE;
+            }
+        }
         
         for (int i = 0; i < msg.getRecordCount(); i++) {
             int hop = order.get(i).intValue();
@@ -504,9 +521,20 @@ abstract class BuildRequestor {
                 else
                     log.debug(cfg.getReplyMessageId() + ": record " + i + "/" + hop + " empty");
             }
-            // BW properties TODO
+
+            if (key != null && variance > 0) {
+                // BW properties, randomize per-hop
+                int min = bw - ctx.random().nextInt(variance);
+                int req = bw + variance + ctx.random().nextInt(variance);
+                if (log.shouldWarn())
+                    log.warn("Pool: " + pool + " min: " + min + " avg: " + bw + " req: " + req);
+                props.setProperty(PROP_MIN_BW, Integer.toString(min / 1000));
+                props.setProperty(PROP_REQ_BW, Integer.toString(req / 1000));
+                // TOOO if (i == 0 && pool.getSettings().isExploratory()) set PROP_MAX_BW
+            }
+            Properties p = key != null ? props : EmptyProperties.INSTANCE;
             BuildMessageGenerator.createRecord(i, hop, msg, cfg, replyRouter, replyTunnel,
-                                               ctx, key, EmptyProperties.INSTANCE);
+                                               ctx, key, p);
         }
         BuildMessageGenerator.layeredEncrypt(ctx, msg, cfg, order);
         //if (useShortTBM && log.shouldWarn())
