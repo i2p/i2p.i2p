@@ -32,7 +32,14 @@ public class LogsHelper extends HelperBase {
 
     private static final int MAX_WRAPPER_LINES = 250;
     private static final String PROP_LAST_WRAPPER = "routerconsole.lastWrapperLogEntry";
-
+    // Homeland Security Advisory System
+    // http://www.dhs.gov/xinfoshare/programs/Copy_of_press_release_0046.shtm
+    // but pink instead of yellow for WARN
+    private static final String COLOR_CRIT = "#cc0000";
+    private static final String COLOR_ERROR = "#ff3300";
+    private static final String COLOR_WARN = "#bf00df";
+    private static final String COLOR_INFO = "#333399";
+    private static final String COLOR_DEBUG = "#006600";
 
     /** @since 0.8.12 */
     public String getJettyVersion() {
@@ -311,35 +318,35 @@ public class LogsHelper extends HelperBase {
                 if ("crit".equals(filter))
                     buf.append("<span class=\"tab2\">" + tCRIT + " (" + crits + ")</span>");
                 else
-                    buf.append("<span class=\"tab\"><a href=\"/logs?f=crit#routerlogs\">" + tCRIT + " (" + crits + ")</a></span>");
+                    buf.append("<span class=\"tab\"><a href=\"/logs?f=crit#routerlogs\"><font color=\"" + COLOR_CRIT + "\">" + tCRIT + "</font> (" + crits + ")</a></span>");
                 buf.append(" &nbsp;&nbsp;&nbsp;&nbsp;\n");
             }
             if (errors > 0) {
                 if ("error".equals(filter))
                     buf.append("<span class=\"tab2\">" + tERROR + " (" + errors + ")</span>");
                 else
-                    buf.append("<span class=\"tab\"><a href=\"/logs?f=error#routerlogs\">" + tERROR + " (" + errors + ")</a></span>");
+                    buf.append("<span class=\"tab\"><a href=\"/logs?f=error#routerlogs\"><font color=\"" + COLOR_ERROR + "\">" + tERROR + "</font> (" + errors + ")</a></span>");
                 buf.append("&nbsp;&nbsp;&nbsp;&nbsp;\n");
             }
             if (warns > 0) {
                 if ("warn".equals(filter))
                     buf.append("<span class=\"tab2\">" + tWARN + " (" + warns + ")</span>");
                 else
-                    buf.append("<span class=\"tab\"><a href=\"/logs?f=warn#routerlogs\">" + tWARN + " (" + warns + ")</a></span>");
+                    buf.append("<span class=\"tab\"><a href=\"/logs?f=warn#routerlogs\"><font color=\"" + COLOR_WARN + "\">" + tWARN + "</font> (" + warns + ")</a></span>");
                 buf.append("&nbsp;&nbsp;&nbsp;&nbsp;\n");
             }
             if (infos > 0) {
                 if ("info".equals(filter))
-                    buf.append("<span class=\"tab2\">" + tINFO + " (" + infos + ")</span>");
+                    buf.append("<span class=\"tab2\">" + tINFO + "< (" + infos + ")</span>");
                 else
-                    buf.append("<span class=\"tab\"><a href=\"/logs?f=info#routerlogs\">" + tINFO + " (" + infos + ")</a></span>");
+                    buf.append("<span class=\"tab\"><a href=\"/logs?f=info#routerlogs\"><font color=\"" + COLOR_INFO + "\">" + tINFO + "</font> (" + infos + ")</a></span>");
                 buf.append("&nbsp;&nbsp;&nbsp;&nbsp;\n");
             }
             if (debugs > 0) {
                 if ("debug".equals(filter))
                     buf.append("<span class=\"tab2\">" + tDEBUG + " (" + debugs + ")</span>");
                 else
-                    buf.append("<span class=\"tab\"><a href=\"/logs?f=debug#routerlogs\">" + tDEBUG + " (" + debugs + ")</a></span>");
+                    buf.append("<span class=\"tab\"><a href=\"/logs?f=debug#routerlogs\"><font color=\"" + COLOR_DEBUG + "\">" + tDEBUG + "</font> (" + debugs + ")</a></span>");
                 buf.append("&nbsp;&nbsp;&nbsp;&nbsp;\n");
             }
             if (filter != null) {
@@ -377,31 +384,27 @@ public class LogsHelper extends HelperBase {
             if (colorize) {
                 // TODO this would be a lot easier if LogConsoleBuffer stored LogRecords instead of formatted strings
                 String color;
-                // Homeland Security Advisory System
-                // http://www.dhs.gov/xinfoshare/programs/Copy_of_press_release_0046.shtm
-                // but pink instead of yellow for WARN
                 if (msg.contains(tCRIT)) {
                     if (filter != null && !filter.equals("crit"))
                         continue;
-                    color = "#cc0000";
+                    color = COLOR_CRIT;
                 } else if (msg.contains(tERROR)) {
                     if (filter != null && !filter.equals("error"))
                         continue;
-                    color = "#ff3300";
+                    color = COLOR_ERROR;
                 } else if (msg.contains(tWARN)) {
-                   // color = "#ff00cc"; poor legibility on light backgrounds
                     if (filter != null && !filter.equals("warn"))
                         continue;
-                    color = "#bf00df";
+                    color = COLOR_WARN;
                 } else if (msg.contains(tINFO)) {
                     if (filter != null && !filter.equals("info"))
                         continue;
-                    color = "#333399";
+                    color = COLOR_INFO;
                 } else {
                     // skip the "similar messages" lines when filtering
                     if (filter != null && (!filter.equals("debug") || msg.contains("&uarr;&uarr;&uarr;")))
                         continue;
-                    color = "#006600";
+                    color = COLOR_DEBUG;
                 }
                 buf.append("<li><font color=\"").append(color).append("\">");
                 buf.append(msg);
