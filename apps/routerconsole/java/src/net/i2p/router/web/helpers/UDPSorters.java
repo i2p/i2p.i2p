@@ -101,22 +101,22 @@ class UDPSorters {
     static class IdleInComparator extends PeerComparator {
         @Override
         public int compare(PeerState l, PeerState r) {
-            long rv = r.getLastReceiveTime() - l.getLastReceiveTime();
+            int rv = Long.compare(r.getLastReceiveTime(), l.getLastReceiveTime());
             if (rv == 0) // fallback on alpha
                 return super.compare(l, r);
             else
-                return (int)rv;
+                return rv;
         }
     }
 
     static class IdleOutComparator extends PeerComparator {
         @Override
         public int compare(PeerState l, PeerState r) {
-            long rv = r.getLastSendTime() - l.getLastSendTime();
+            int rv = Long.compare(r.getLastSendTime(), l.getLastSendTime());
             if (rv == 0) // fallback on alpha
                 return super.compare(l, r);
             else
-                return (int)rv;
+                return rv;
         }
     }
 
@@ -149,22 +149,22 @@ class UDPSorters {
     static class UptimeComparator extends PeerComparator {
         @Override
         public int compare(PeerState l, PeerState r) {
-            long rv = r.getKeyEstablishedTime() - l.getKeyEstablishedTime();
+            int rv = Long.compare(r.getKeyEstablishedTime(), l.getKeyEstablishedTime());
             if (rv == 0) // fallback on alpha
                 return super.compare(l, r);
             else
-                return (int)rv;
+                return rv;
         }
     }
 
     static class SkewComparator extends PeerComparator {
         @Override
         public int compare(PeerState l, PeerState r) {
-            long rv = l.getClockSkew() - r.getClockSkew();
+            int rv = Long.compare(l.getClockSkew(), r.getClockSkew());
             if (rv == 0) // fallback on alpha
                 return super.compare(l, r);
             else
-                return (int)rv;
+                return rv;
         }
     }
 
@@ -207,11 +207,11 @@ class UDPSorters {
         public static final DevComparator instance() { return _instance; }
         @Override
         public int compare(PeerState l, PeerState r) {
-            long rv = l.getRTTDeviation() - r.getRTTDeviation();
+            int rv = Long.compare(l.getRTTDeviation(), r.getRTTDeviation());
             if (rv == 0) // fallback on alpha
                 return super.compare(l, r);
             else
-                return (int)rv;
+                return rv;
         }
     }
   ****/
@@ -244,44 +244,44 @@ class UDPSorters {
     static class SendCountComparator extends PeerComparator {
         @Override
         public int compare(PeerState l, PeerState r) {
-            long rv = l.getMessagesSent() - r.getMessagesSent();
+            int rv = Long.compare(l.getMessagesSent(), r.getMessagesSent());
             if (rv == 0) // fallback on alpha
                 return super.compare(l, r);
             else
-                return (int)rv;
+                return rv;
         }
     }
 
     static class RecvCountComparator extends PeerComparator {
         @Override
         public int compare(PeerState l, PeerState r) {
-            long rv = l.getMessagesReceived() - r.getMessagesReceived();
+            int rv = Long.compare(l.getMessagesReceived(), r.getMessagesReceived());
             if (rv == 0) // fallback on alpha
                 return super.compare(l, r);
             else
-                return (int)rv;
+                return rv;
         }
     }
 
     static class ResendComparator extends PeerComparator {
         @Override
         public int compare(PeerState l, PeerState r) {
-            long rv = l.getPacketsRetransmitted() - r.getPacketsRetransmitted();
+            int rv = Long.compare(l.getPacketsRetransmitted(), r.getPacketsRetransmitted());
             if (rv == 0) // fallback on alpha
                 return super.compare(l, r);
             else
-                return (int)rv;
+                return rv;
         }
     }
 
     static class DupComparator extends PeerComparator {
         @Override
         public int compare(PeerState l, PeerState r) {
-            long rv = l.getPacketsReceivedDuplicate() - r.getPacketsReceivedDuplicate();
+            int rv = Long.compare(l.getPacketsReceivedDuplicate(), r.getPacketsReceivedDuplicate());
             if (rv == 0) // fallback on alpha
                 return super.compare(l, r);
             else
-                return (int)rv;
+                return rv;
         }
     }
     
