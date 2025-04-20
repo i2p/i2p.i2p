@@ -32,6 +32,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -42,9 +43,12 @@ import java.util.SortedMap;
 import net.i2p.app.ClientAppManager;
 import net.i2p.client.naming.NamingService;
 import net.i2p.client.naming.SingleFileNamingService;
+import net.i2p.data.Base32;
+import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.servlet.RequestWrapper;
 import net.i2p.util.PortMapper;
 
@@ -184,9 +188,37 @@ public class NamingServiceBean extends AddressbookBean
 				if (limit > 0)
 					searchProps.setProperty("limit", Integer.toString(limit));
 			}
-			if (search != null && search.length() > 0)
-				searchProps.setProperty("search", search.toLowerCase(Locale.US));
-			results = service.getEntries(searchProps);
+
+			Hash reverse = null;
+			if (search != null && search.length() > 0) {
+				if (search.length() == 60 && search.endsWith(".b32.i2p")) {
+					byte[] b = Base32.decode(search.substring(0, 52));
+					if (b != null)
+						reverse = new Hash(b);
+				} else if (search.length() >= 516) {
+					byte[] b = Base64.decode(search);
+					if (b != null)
+						reverse = _context.sha().calculateHash(b);
+				}
+				if (reverse == null)
+					searchProps.setProperty("search", search.toLowerCase(Locale.US));
+			}
+			if (reverse != null) {
+				List<String> names = service.reverseLookupAll(reverse);
+				if (names != null) {
+					results = new HashMap<String, Destination>(names.size());
+					for (String name : names) {
+						Destination d = service.lookup(name, searchProps, null);
+						if (d != null)
+							results.put(name, d);
+					}
+				} else {
+					results = Collections.emptyMap();
+				}
+
+			} else {
+				results = service.getEntries(searchProps);
+			}
 
 			debug("Result count: " + results.size());
 			for (Map.Entry<String, Destination> entry : results.entrySet()) {
@@ -201,7 +233,7 @@ public class NamingServiceBean extends AddressbookBean
 						continue;
 					}
 				}
-				if( search != null && search.length() > 0 ) {
+				if (search != null && search.length() > 0 && reverse == null) {
 					if( name.indexOf( search ) == -1 ) {
 						continue;
 					}
