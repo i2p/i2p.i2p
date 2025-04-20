@@ -65,8 +65,9 @@ public class AddressbookBean extends BaseBean
 			search = search.substring(7);
 		else if (search.startsWith("https://"))
 			search = search.substring(8);
-		if (search.endsWith("/"))
-			search = search.substring(0, search.length() - 1);
+		int slash = search.indexOf('/');
+		if (slash > 0)
+			search = search.substring(0, slash);
 	}
 
 	public boolean isHasFilter()
