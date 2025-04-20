@@ -647,8 +647,8 @@ class PeerCoordinator implements PeerListener, BandwidthListener
 
     while (!removed.isEmpty()) {
         Peer peer = removed.remove(0);
+        // disconnect() calls disconnected() calls removePeerFromPieces()
         peer.disconnect();
-        removePeerFromPieces(peer);
     }
     // delete any saved orphan partial piece
     synchronized (partialPieces) {
@@ -694,7 +694,7 @@ class PeerCoordinator implements PeerListener, BandwidthListener
         if (old != null && old.getInactiveTime() > old.getMaxInactiveTime()) {
             // idle for 8 minutes, kill the old con (32KB/8min = 68B/sec minimum for one block)
             if (_log.shouldLog(Log.WARN))
-              _log.warn("Remomving old peer: " + peer + ": " + old + ", inactive for " + old.getInactiveTime());
+              _log.warn("Removing old peer: " + peer + ": " + old + ", inactive for " + old.getInactiveTime());
             peers.remove(old);
             toDisconnect = old;
             old = null;
@@ -747,7 +747,10 @@ class PeerCoordinator implements PeerListener, BandwidthListener
           }
       }
     if (toDisconnect != null) {
-        toDisconnect.disconnect(false);
+        // ensure partial pieces are returned
+        toDisconnect.disconnect(true);
+        // disconnect() calls disconnected() but will not call removePeerFromPieces()
+        // because it was removed from peers above
         removePeerFromPieces(toDisconnect);
     }
   }
