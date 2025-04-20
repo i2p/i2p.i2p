@@ -3406,6 +3406,7 @@ public class I2PSnarkServlet extends BasicServlet {
                    .append("</span></td></tr>\n");
             }
 
+            long[] dates = _manager.getSavedAddedAndCompleted(snark);
             String announce = null;
             MetaInfo meta = snark.getMetaInfo();
             if (meta != null && !showEdit) {
@@ -3513,7 +3514,6 @@ public class I2PSnarkServlet extends BasicServlet {
                        .append(DataHelper.escapeHTML(cby))
                        .append("</td></tr>\n");
                 }
-                long[] dates = _manager.getSavedAddedAndCompleted(snark);
                 if (dates[0] > 0) {
                     String date = DataHelper.formatTime(dates[0]);
                     buf.append("<tr><td>");
@@ -3572,9 +3572,29 @@ public class I2PSnarkServlet extends BasicServlet {
                    .append("</td></tr>\n");
             }
 
-            // We don't have the hash of the torrent file
-            //buf.append("<tr><td>").append(_t("Maggot link")).append(": <a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
-            //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a></td></tr>");
+            if (dates[0] > 0) {
+                String date = DataHelper.formatTime(dates[0]);
+                long sz = snark.getTotalLength();
+                long time;
+                if (storage.complete()) {
+                    time = dates[1] - dates[0];
+                } else {
+                    sz -= snark.getRemainingLength();
+                    time = _context.clock().now() - dates[0];
+                }
+                time /= 1000;
+                if (time >= 30) {
+                    long rate = sz / time;
+                    if (rate >= 100) {
+                        buf.append("<tr><td>");
+                        toThemeImg(buf, "head_rx");
+                        buf.append("</td><td><b>")
+                           .append(_t("Down Rate")).append("</b></td><td>")
+                           .append(formatSizeDec(rate))
+                           .append("ps</td></tr>\n");
+                    }
+                }
+            }
 
             buf.append("<tr id=\"torrentInfoStats\"><td>");
             toThemeImg(buf, "head_rx");
