@@ -161,7 +161,12 @@ do
                 RC=1
                 break
             fi
-            mv $TDX/messages_$LG.java $TDY
+            # fixup Enumeration code for generics
+            sed -e 's/Enumeration/Enumeration<String>/g' \
+                -e 's/Object nextElement/String nextElement/g' \
+                -e 's/return key/return (String) key/g' \
+                $TDX/messages_$LG.java > $TDY/messages_$LG.java
+            rm -f $TDX/messages_$LG.java
             rm -rf $TD
         fi
     fi
