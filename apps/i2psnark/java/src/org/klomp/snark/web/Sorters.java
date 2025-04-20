@@ -201,7 +201,11 @@ class Sorters {
             if (rv != 0)
                 return rv;
             // use reverse remaining as first tie break
-            return compLong(r.getNeededLength(), l.getNeededLength());
+            rv = compLong(r.getNeededLength(), l.getNeededLength());
+            if (rv != 0)
+                return rv;
+            // use reverse peer count as second tie break
+            return r.getPeerCount() - l.getPeerCount();
         }
 
         private static int getStatus(Snark snark) {
