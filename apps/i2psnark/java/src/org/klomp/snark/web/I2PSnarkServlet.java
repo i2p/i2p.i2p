@@ -3099,13 +3099,22 @@ public class I2PSnarkServlet extends BasicServlet {
         } catch (Throwable t) {}
         StringBuilder buf = new StringBuilder(128);
         buf.append("<select name=\"").append(selName).append("\">\n");
+        boolean found = false;
         for (int i = min; i <= max; i++) {
             buf.append("<option value=\"").append(i).append("\" ");
-            if (i == now)
+            if (i == now) {
                 buf.append("selected=\"selected\" ");
+                found = true;
+            }
             // constants to prevent tagging
             buf.append(">").append(ngettext(DUMMY1 + name, DUMMY0 + name + 's', i));
             buf.append("</option>\n");
+        }
+        if (!found) {
+            buf.append("<option value=\"").append(now).append("\" ")
+               .append("selected=\"selected\" ")
+               .append(">").append(ngettext(DUMMY1 + name, DUMMY0 + name + 's', now))
+               .append("</option>\n");
         }
         buf.append("</select>\n");
         return buf.toString();
