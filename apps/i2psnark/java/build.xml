@@ -206,12 +206,23 @@
         </exec>
     </target>
 
-    <target name="standalone" depends="standalone_prep">
-       <!-- doesn't support file permissions
+    <target name="checkwin">
+        <condition property="iswin" >
+            <os family="windows" />
+        </condition>
+    </target>
+
+    <target name="standalone" depends="standalone_prep, checkwin, zipit, zipwin">
+    </target>
+
+    <target name="zipwin" depends="standalone_prep" if="iswin">
+        <!-- doesn't support file permissions -->
         <zip destfile="build/i2psnark-standalone.zip">
           <zipfileset dir="./build/i2psnark/" fullpath="i2psnark" />
         </zip>
-       -->
+    </target>
+
+    <target name="zipit" depends="standalone_prep" unless="iswin">
         <exec executable="zip" dir="build" failifexecutionfails="true" failonerror="true" >
             <arg value="-r" />
             <arg value="i2psnark-standalone.zip" />
