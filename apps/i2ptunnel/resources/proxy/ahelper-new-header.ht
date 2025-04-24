@@ -12,7 +12,7 @@ Content-Security-Policy: default-src 'none'; style-src 'self' 'unsafe-inline' ht
 <head>
 <title>_("Information: New Host Name")</title>
 <link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
-<link href="http://proxy.i2p/themes/console/default/proxy.css" rel="stylesheet" type="text/css">
+<link blocking="render" href="http://proxy.i2p/themes/console/default/proxy.css" rel="stylesheet" type="text/css">
 </head>
 <body id="proxyNewAddressHelper">
 <div class="logo">
