@@ -732,7 +732,7 @@ class NetDbRenderer {
                 renderLeaseSet(buf, myLeaseSet, true, now, linkSusi, null);
                 buf.append("</td></tr>\n");
             }
-            buf.append("<tr><td><b>Total Known Remote Leasesets:</b></td><td colspan=\"3\">").append(leases.size()-1).append("</td></tr>\n");
+            buf.append("<tr><td><b>Total Known Remote Leasesets:</b></td><td colspan=\"3\">").append(Math.max(leases.size()-1, 0)).append("</td></tr>\n");
         } else {
             buf.append("<tr><th colspan=\"3\">Leaseset Summary for Floodfill</th>" +
                        "<th><a href=\"/configadvanced\" title=\"").append(_t("Manually Configure Floodfill Participation")).append("\">[")
