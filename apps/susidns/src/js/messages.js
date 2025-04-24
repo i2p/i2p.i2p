@@ -92,11 +92,18 @@ function initClickables() {
     clickableHeadline.addEventListener('click', ToggleStoragePathView, true);
   }
 
-  /*If the hostname field is empty, hide the add host form and show it when
-  the user clicks on the form header.*/
+  /*
+   * If the addressbook isn't empty,
+   * and the destination field is empty,
+   * hide the add host form and show it when
+   * the user clicks on the form header.
+   * Some of our add-to-addressbook links set
+   * both hostname and destination, and some
+   * only set destination.
+   */
   var d = document.getElementById("emptybook");
   if (d == null) {
-    var x = document.getElementsByName("hostname");
+    var x = document.getElementsByName("destination");
     for (var i = 0; i < x.length; i++) {
       if (x[i].value == "") {
         var buttonView = document.getElementById("addnewaddrbutton");
