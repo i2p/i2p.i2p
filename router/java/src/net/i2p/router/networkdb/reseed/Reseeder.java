@@ -116,6 +116,7 @@ public class Reseeder {
         //
         // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
         // ----------------------------------           ------------------------     -------------------------     ---------------
+        "https://cubicchaos.net:8443/"        + ',' +   // unixeno_at_cubicchaos.net.crt   // cubicchaos.net.crt
         "https://coconut.incognet.io/"        + ',' +   // rambler_at_mail.i2p.crt   // CA
         "https://reseed.stormycloud.org/"     + ',' +   // admin_at_stormycloud.org.crt // CA
         "https://i2p.ghativega.in/"           + ',' +   // arnavbhatt288_at_mail.i2p.crt // CA
@@ -1232,7 +1233,7 @@ public class Reseeder {
      */
     public static void main(String args[]) throws Exception {
         if (args.length == 1 && args[0].equals("help")) {
-            System.out.println("Usage: reseeder [https://hostname/ ...]");
+            System.out.println("Usage: reseeder [-6] [https://hostname/ ...]");
             System.out.println("       reseeder list");
             System.exit(1);
         }
@@ -1244,6 +1245,11 @@ public class Reseeder {
                 System.out.println(urls[i]);
             }
             System.exit(0);
+        }
+        boolean ipV6 = false;
+        if (args.length > 0 && args[0].equals("-6")) {
+            ipV6 = true;
+            args = Arrays.copyOfRange(args, 1, args.length);
         }
         File f = new File("certificates");
         if (!f.exists()) {
@@ -1275,6 +1281,8 @@ public class Reseeder {
                 } else {
                     get = new SSLEepGet(ctx, su3.getPath(), url, sslState);
                 }
+                if (ipV6)
+                    get.forceDNSOverHTTPS(true, true);
                 long start = System.currentTimeMillis();
                 if (get.fetch()) {
                     int rc = get.getStatusCode();
