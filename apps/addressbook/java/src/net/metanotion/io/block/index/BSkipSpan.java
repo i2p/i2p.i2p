@@ -330,8 +330,21 @@ public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V
 				break;
 			}
 //			System.out.println("i=" + i + ", Page " + curPage + ", offset " + pageCounter[0] + " ksz " + ksz + " vsz " + vsz);
-			this.keys[i] = this.keySer.construct(k);
-			this.vals[i] = this.valSer.construct(v);
+
+			try {
+				this.keys[i] = this.keySer.construct(k);
+				this.vals[i] = this.valSer.construct(v);
+			} catch (Exception e) {
+				// It's important to catch unchecked exceptions here,
+				// so we can repair corruption below.
+				// Ideally, the value deserializers should not throw
+				// unchecked exceptions, and always return null, but
+				// Destination can throw some IllegalArgumentExceptions.
+				if (this.keys[i] != null)
+					bf.log.error("Error loading key "  + this.keys[i], e);
+				else
+					bf.log.error("Error loading entry "  + i, e);
+			}
 			// Drop bad entry without throwing exception
 			if (this.keys[i] == null || this.vals[i] == null) {
 				bf.log.error("Null deserialized data in entry " + i + " page " + curPage +
