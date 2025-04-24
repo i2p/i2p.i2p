@@ -1,3 +1,23 @@
+2025-04-24 zzz
+ * Blockfile: Catch unchecked exceptions thrown from value deserializers
+ * CLI: Add -6 flag to force IPv6 reseed test
+ * i2ptunnel: Force CSS load before render on proxy error pages
+ * NetDB: Add new reseed
+
+2025-04-23 zzz
+ * i2psnark standalone: Change Ref id to refid in Jetty config file
+
+2025-04-20 zzz
+ * Build: Change Ref id to refid in Jetty config files
+ * Use Long.compare() in comparators
+ * i2psnark:
+   - Remove outstanding requests from pieces when connection is replaced
+   - Show lifetime download rate since added on details page
+   - Show current tunnel config in dropdowns even if outside normal range
+   - Add 2nd tie break for peer count when sorting by status
+   - Make standalone buildable on windows without zip
+ * SusiDNS: Add b32 and dest reverse lookups
+
 2025-04-16 zzz
  * Tunnels: Implement proposal 168 (part 1)
    - Add bw params to build requests
