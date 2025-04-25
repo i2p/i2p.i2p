@@ -573,7 +573,18 @@ public class SSLEepGet extends EepGet {
      *  @since 0.9.49
      */
     public void forceDNSOverHTTPS(boolean on) {
-        _forceDoH = on ? 2 : 1;
+        forceDNSOverHTTPS(on, false);
+    }
+
+    /**
+     *  Override the config setting, force DNSoverHTTPS on or off
+     *  Call before the fetch.
+     *  @param forceIPv6 use IPv6 for BOTH the connection to the DoH server
+     *         AND for the queried address. on must be true.
+     *  @since 0.9.66
+     */
+    public void forceDNSOverHTTPS(boolean on, boolean forceIPv6) {
+        _forceDoH = on ? (forceIPv6 ? 3 : 2) : 1;
     }
 
     ///// end of all the SSL stuff
@@ -768,7 +779,7 @@ public class SSLEepGet extends EepGet {
                 boolean useDNSOverHTTPS;
                 if (_forceDoH == 1 || _shouldProxy)
                     useDNSOverHTTPS = false;
-                else if (_forceDoH == 2)
+                else if (_forceDoH >= 2)
                     useDNSOverHTTPS = true;
                 else
                     useDNSOverHTTPS = _context.getProperty(PROP_USE_DNS_OVER_HTTPS, DEFAULT_USE_DNS_OVER_HTTPS);
@@ -777,7 +788,10 @@ public class SSLEepGet extends EepGet {
                 String ip = null;
                 if (useDNSOverHTTPS && !host.equals("dns.google") && !Addresses.isIPAddress(host)) {
                     DNSOverHTTPS doh = new DNSOverHTTPS(_context, getSSLState());
-                    ip = doh.lookup(host);
+                    if (_forceDoH == 3)
+                        ip = doh.lookup(host, DNSOverHTTPS.Type.V6_ONLY);
+                    else
+                        ip = doh.lookup(host);
                     if (ip != null) {
                         // will be used below
                         if (_log.shouldDebug())
