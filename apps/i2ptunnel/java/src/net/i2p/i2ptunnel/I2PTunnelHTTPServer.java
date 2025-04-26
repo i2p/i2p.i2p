@@ -1224,6 +1224,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     name = "Referer";
                 else if ("connection".equals(lcName))
                     name = "Connection";
+                else if ("host".equals(lcName))
+                    name = "Host";
 
                 // For incoming, we remove certain headers to prevent spoofing.
                 // For outgoing, we remove certain headers to improve anonymity.
