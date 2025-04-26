@@ -22,8 +22,6 @@ import net.i2p.util.Log;
 
 public class ConfigStatsHelper extends HelperBase {
     private Log _log;
-    private String _filter;
-    private final Set<String> _filters;
     private final Set<String> _graphs;
     /** list of names of stats which are remaining, ordered by nested groups */
     private final List<String> _stats;
@@ -33,14 +31,11 @@ public class ConfigStatsHelper extends HelperBase {
     private String _currentGroup;
     /** true if the current stat is the first in the group */
     private boolean _currentIsFirstInGroup;
-    /** true if the stat is being logged */
-    private boolean _currentIsLogged;
     private boolean _currentIsGraphed;
     private boolean _currentCanBeGraphed;
     
     public ConfigStatsHelper() {
         _stats = new ArrayList<String>();
-        _filters = new HashSet<String>();
         _graphs = new HashSet<String>();
     }
 
@@ -61,35 +56,16 @@ public class ConfigStatsHelper extends HelperBase {
         for (Set<String> stats : groups.values()) {
              _stats.addAll(stats);
         }
-        _filter = _context.statManager().getStatFilter(); 
-        if (_filter == null)
-            _filter = "";
-        
-        StringTokenizer tok = new StringTokenizer(_filter, ",");
-        while (tok.hasMoreTokens())
-            _filters.add(tok.nextToken().trim());
 
         // create a local copy of the config. Querying r.getSummaryListener()
         // lags behind, as StatSummarizer only runs once a minute.
         String specs = _context.getProperty("stat.summaries", StatSummarizer.DEFAULT_DATABASES);
-        tok = new StringTokenizer(specs, ",");
+        StringTokenizer tok = new StringTokenizer(specs, ",");
         while (tok.hasMoreTokens()) {
             _graphs.add(tok.nextToken().trim());
         }
     }
 
-    /**
-     *  Just hide for everybody unless already set.
-     *  To enable set advanced config stat.logFilters=foo before starting...
-     *  it has to be set at startup anyway for logging to be enabled at all
-     *  @since 0.9
-     */
-    public boolean shouldShowLog() {
-        return !_filters.isEmpty();
-    }
-
-    public String getFilename() { return _context.statManager().getStatFile(); }
-    
     /** 
      * move the cursor to the next known stat, returning true if a valid
      * stat is available.
@@ -143,10 +119,6 @@ public class ConfigStatsHelper extends HelperBase {
             }
         }
         
-        if (_filters.contains("*") || _filters.contains(_currentStatName))
-            _currentIsLogged = true;
-        else
-            _currentIsLogged = false;
         return true;
     }
     
@@ -172,10 +144,8 @@ public class ConfigStatsHelper extends HelperBase {
     public String getCurrentStatName() { return _currentStatName; }
     public String getCurrentGraphName() { return _currentGraphName; }
     public String getCurrentStatDescription() { return _currentStatDescription; }
-    public boolean getCurrentIsLogged() { return _currentIsLogged; }
     public boolean getCurrentIsGraphed() { return _currentIsGraphed; }
     public boolean getCurrentCanBeGraphed() { return _currentCanBeGraphed; }
-    public String getExplicitFilter() { return _filter; }
     public boolean getIsFull() {
         return _context.getBooleanProperty(StatManager.PROP_STAT_FULL);
     }

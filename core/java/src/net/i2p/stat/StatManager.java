@@ -29,22 +29,11 @@ public class StatManager {
     private final ConcurrentHashMap<String, FrequencyStat> _frequencyStats;
     /** stat name to RateStat */
     private final ConcurrentHashMap<String, RateStat> _rateStats;
-    /** may be null */
-    private StatLog _statLog;
 
     private int coalesceCounter;
     /** every this many minutes for frequencies */
     private static final int FREQ_COALESCE_RATE = 9;
 
-
-    /**
-     *  Comma-separated stats or * for all.
-     *  This property must be set at startup, or
-     *  logging is disabled.
-     */
-    public static final String PROP_STAT_FILTER = "stat.logFilters";
-    public static final String PROP_STAT_FILE = "stat.logFile";
-    public static final String DEFAULT_STAT_FILE = "stats.log";
     /** default false */
     public static final String PROP_STAT_FULL = "stat.full";
     
@@ -59,35 +48,12 @@ public class StatManager {
         _log = context.logManager().getLog(getClass());
         _frequencyStats = new ConcurrentHashMap<String,FrequencyStat>(8);
         _rateStats = new ConcurrentHashMap<String,RateStat>(128);
-        String filter = getStatFilter();
-        if (filter != null && filter.length() > 0)
-            _statLog = new BufferedStatLog(context);
     }
     
     /** @since 0.8.8 */
     public synchronized void shutdown() {
         _frequencyStats.clear();
         _rateStats.clear();
-    }
-
-    /**
-     *  Gets the default stat log for RateStats
-     *  Deprecated, unused
-     *  @return null always
-     */
-    public synchronized StatLog getStatLog() { return _statLog; }
-
-    /**
-     *  Sets the default stat log for ALL known RateStats.
-     *  Deprecated, unused
-     *  @deprecated unused
-     */
-    @Deprecated
-    public synchronized void setStatLog(StatLog log) { 
-        _statLog = log; 
-        for (RateStat rs : _rateStats.values()) {
-            rs.setStatLog(log);
-        }
     }
 
     /**
@@ -146,7 +112,6 @@ public class StatManager {
     public void createRequiredRateStat(String name, String description, String group, long periods[]) {
             if (_rateStats.containsKey(name)) return;
             RateStat rs = new RateStat(name, description, group, periods);
-            if (_statLog != null) rs.setStatLog(_statLog);
             _rateStats.putIfAbsent(name, rs);
     }
 
@@ -262,9 +227,6 @@ public class StatManager {
         }
         return groups;
     }
-
-    public String getStatFilter() { return _context.getProperty(PROP_STAT_FILTER); }
-    public String getStatFile() { return _context.getProperty(PROP_STAT_FILE, DEFAULT_STAT_FILE); }
 
     /**
      * Save memory by not creating stats unless they are required for router operation.
