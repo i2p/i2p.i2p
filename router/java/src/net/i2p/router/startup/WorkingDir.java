@@ -409,12 +409,40 @@ public class WorkingDir {
      *  Copy over the jetty.xml file with modifications
      *  It was already copied over once in migrate(), throw that out and
      *  do it again with modifications.
+     *
+     *  @return success
      */
     static boolean migrateJettyXml(File olddir, File todir, String filename, String oldString, String newString) {
         File oldFile = new File(olddir, filename);
         if (!oldFile.exists())
             return true;
         File newFile = new File(todir, filename);
+        FileInputStream in = null;
+        PrintWriter out = null;
+        try {
+            migrateFileXML(oldFile, newFile, oldString, newString, null, null);
+            System.err.println("Copied " + oldFile + " with modifications");
+            return true;
+        } catch (IOException ioe) {
+            System.err.println("FAILED copy " + oldFile + ": " + ioe);
+            return false;
+        }
+    }
+
+
+    /**
+     *  Copy over a XML file with modifications.
+     *  Will overwrite any existing newFile.
+     *
+     *  @param oldString to replace
+     *  @param newString replacement
+     *  @param oldString2 to replace, or null
+     *  @param newString2 replacement, or null
+     *  @throws IOException on all errors
+     *  @since 0.9.66
+     */
+    static void migrateFileXML(File oldFile, File newFile, String oldString, String newString,
+                               String oldString2, String newString2) throws IOException {
         FileInputStream in = null;
         PrintWriter out = null;
         try {
@@ -428,14 +456,13 @@ public class WorkingDir {
                 if (s.indexOf(oldString) >= 0) {
                     s = s.replace(oldString, newString);
                 }
+                if (oldString2 != null && s.indexOf(oldString2) >= 0) {
+                    s = s.replace(oldString2, newString2);
+                }
                 out.println(s);
             }
             out.println("<!-- Modified by I2P User dir migration script -->");
             System.err.println("Copied " + oldFile + " with modifications");
-            return true;
-        } catch (IOException ioe) {
-            System.err.println("FAILED copy " + oldFile + ": " + ioe);
-            return false;
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
             if (out != null) out.close();
