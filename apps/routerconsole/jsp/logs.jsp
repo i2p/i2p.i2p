@@ -101,7 +101,13 @@
 </h3>
 <table id="routerlogs" class="logtable"><tbody>
 <tr><td>
- <jsp:getProperty name="logsHelper" property="logs" />
+<%
+    String filter = request.getParameter("f");
+    if (filter != null)
+        out.write(logsHelper.getLogs(filter));
+    else
+        out.write(logsHelper.getLogs());
+%>
 </td></tr>
 </tbody></table>
 
@@ -111,6 +117,12 @@
  <!-- 90 days --><p><a href="events?from=7776000"><%=intl._t("View event logs")%></a></p>
 </td></tr>
 </tbody></table>
+<jsp:useBean class="net.i2p.router.web.helpers.EventLogHelper" id="eventHelper" scope="request" />
+<jsp:setProperty name="eventHelper" property="contextId" value="<%=i2pcontextId%>" />
+<jsp:setProperty name="eventHelper" property="from" value="2592000" />
+<jsp:setProperty name="eventHelper" property="max" value="10" />
+<jsp:setProperty name="eventHelper" property="reverse" value="false" />
+<jsp:getProperty name="eventHelper" property="events" />
 
 <h3 class="tabletitle" id="servicelogs"><%=intl._t("Service (Wrapper) Logs")%><%
     StringBuilder buf = new StringBuilder(24*1024);

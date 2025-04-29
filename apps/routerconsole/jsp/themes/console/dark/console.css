@@ -1905,10 +1905,6 @@ p {
     line-height: 160%;
 }
 
-p img:first-child {
-    display: none !important;
-}
-
 p:empty {
     /* kills empty paragraphs that are likely erroneous eg. see top of /profiles?f=1, /profiles */
     display: none;
@@ -2781,7 +2777,6 @@ li.noevents {
 /* /eventlogs */
 
 table#eventlog {
-    margin-top: -21px;
     margin-bottom: 10px;
 }
 
@@ -3901,7 +3896,7 @@ form[action="events"]>.formaction {
     margin-left: -21px;
 }
 
-.eventspanel th {
+#eventlog th {
     text-align: left;
     padding-left: 10px;
     font-size: 10pt;
@@ -3909,15 +3904,15 @@ form[action="events"]>.formaction {
     word-spacing: 0.1em;
 }
 
-.eventspanel table {
+#eventlog table {
     font-size: 9pt;
 }
 
-.eventspanel table tr:hover {
+#eventlog table tr:hover {
     background: #002000;
 }
 
-.eventspanel table td {
+#eventlog table td {
     padding: 5px 10px;
 }
 

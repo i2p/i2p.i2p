@@ -32,7 +32,14 @@ public class LogsHelper extends HelperBase {
 
     private static final int MAX_WRAPPER_LINES = 250;
     private static final String PROP_LAST_WRAPPER = "routerconsole.lastWrapperLogEntry";
-
+    // Homeland Security Advisory System
+    // http://www.dhs.gov/xinfoshare/programs/Copy_of_press_release_0046.shtm
+    // but pink instead of yellow for WARN
+    private static final String COLOR_CRIT = "#cc0000";
+    private static final String COLOR_ERROR = "#ff3300";
+    private static final String COLOR_WARN = "#bf00df";
+    private static final String COLOR_INFO = "#333399";
+    private static final String COLOR_DEBUG = "#006600";
 
     /** @since 0.8.12 */
     public String getJettyVersion() {
@@ -81,7 +88,17 @@ public class LogsHelper extends HelperBase {
      *  Does not call logManager.flush(); call getCriticalLogs() first to flush
      */
     public String getLogs() {
-        String str = formatMessages(_context.logManager().getBuffer().getMostRecentMessages());
+        return getLogs(null);
+    }
+
+    /**
+     *  Does not call logManager.flush(); call getCriticalLogs() first to flush
+     *
+     *  @param filter log type or null
+     *  @since 0.9.66
+     */
+    public String getLogs(String filter) {
+        String str = formatMessages(_context.logManager().getBuffer().getMostRecentMessages(), filter);
         return "<p>" + _t("File location") + ": <a href=\"/router.log\" target=\"_blank\">" +
                DataHelper.escapeHTML(_context.logManager().currentFile()) + "</a></p>" + str;
     }
@@ -96,7 +113,7 @@ public class LogsHelper extends HelperBase {
             if (cmgr != null)
                 cmgr.setBubble(PortMapper.SVC_LOGS, 0, null);
         }
-        return formatMessages(msgs);
+        return formatMessages(msgs, null);
     }
 
     /**
@@ -260,12 +277,89 @@ public class LogsHelper extends HelperBase {
     private final static String NL = System.getProperty("line.separator");
 
     /** formats in forward order */
-    private String formatMessages(List<String> msgs) {
+    private String formatMessages(List<String> msgs, String filter) {
         if (msgs.isEmpty())
             return "</td></tr><tr><td><p><i>" + _t("No log messages") + "</i></p>";
         boolean colorize = _context.getBooleanPropertyDefaultTrue("routerconsole.logs.color");
         StringBuilder buf = new StringBuilder(16*1024); 
-        buf.append("</td></tr><tr><td><ul>");
+        buf.append("</td></tr><tr><td>");
+
+        // translate once, out of the loops
+        String tCRIT = _c("CRIT");
+        String tERROR = _c("ERROR");
+        String tWARN = _c("WARN");
+        String tINFO = _c("INFO");
+        String tDEBUG = _c("DEBUG");
+
+        // filter buttons
+        int crits = 0, errors = 0, warns = 0, infos = 0, debugs = 0, types = 0;
+        for (String msg : msgs) { 
+            if (msg.contains(tCRIT)) {
+                if (crits == 0) types++;
+                crits++;
+            } else if (msg.contains(tERROR)) {
+                if (errors == 0) types++;
+                errors++;
+            } else if (msg.contains(tWARN)) {
+                if (warns == 0) types++;
+                warns++;
+            } else if (msg.contains(tINFO)) {
+                if (infos == 0) types++;
+                infos++;
+            } else if (msg.contains(tDEBUG)) {
+                if (debugs == 0) types++;
+                debugs++;
+            }
+        }
+        if (types > 1) {
+            buf.append("<p>").append(_t("Filter")).append(": ");
+            buf.append("&nbsp;&nbsp;&nbsp;&nbsp;\n");
+            if (crits > 0) {
+                if ("crit".equals(filter))
+                    buf.append("<span class=\"tab2\">" + tCRIT + " (" + crits + ")</span>");
+                else
+                    buf.append("<span class=\"tab\"><a href=\"/logs?f=crit#routerlogs\"><font color=\"" + COLOR_CRIT + "\">" + tCRIT + "</font> (" + crits + ")</a></span>");
+                buf.append(" &nbsp;&nbsp;&nbsp;&nbsp;\n");
+            }
+            if (errors > 0) {
+                if ("error".equals(filter))
+                    buf.append("<span class=\"tab2\">" + tERROR + " (" + errors + ")</span>");
+                else
+                    buf.append("<span class=\"tab\"><a href=\"/logs?f=error#routerlogs\"><font color=\"" + COLOR_ERROR + "\">" + tERROR + "</font> (" + errors + ")</a></span>");
+                buf.append("&nbsp;&nbsp;&nbsp;&nbsp;\n");
+            }
+            if (warns > 0) {
+                if ("warn".equals(filter))
+                    buf.append("<span class=\"tab2\">" + tWARN + " (" + warns + ")</span>");
+                else
+                    buf.append("<span class=\"tab\"><a href=\"/logs?f=warn#routerlogs\"><font color=\"" + COLOR_WARN + "\">" + tWARN + "</font> (" + warns + ")</a></span>");
+                buf.append("&nbsp;&nbsp;&nbsp;&nbsp;\n");
+            }
+            if (infos > 0) {
+                if ("info".equals(filter))
+                    buf.append("<span class=\"tab2\">" + tINFO + "< (" + infos + ")</span>");
+                else
+                    buf.append("<span class=\"tab\"><a href=\"/logs?f=info#routerlogs\"><font color=\"" + COLOR_INFO + "\">" + tINFO + "</font> (" + infos + ")</a></span>");
+                buf.append("&nbsp;&nbsp;&nbsp;&nbsp;\n");
+            }
+            if (debugs > 0) {
+                if ("debug".equals(filter))
+                    buf.append("<span class=\"tab2\">" + tDEBUG + " (" + debugs + ")</span>");
+                else
+                    buf.append("<span class=\"tab\"><a href=\"/logs?f=debug#routerlogs\"><font color=\"" + COLOR_DEBUG + "\">" + tDEBUG + "</font> (" + debugs + ")</a></span>");
+                buf.append("&nbsp;&nbsp;&nbsp;&nbsp;\n");
+            }
+            if (filter != null) {
+                buf.append("<a href=\"/logs#routerlogs\"><img src=\"/themes/console/images/buttons/delete.png\" title=\"")
+                   .append(_t("Remove"))
+                   .append("\" alt=\"")
+                   .append(_t("Remove"))
+                   .append("\"></a>\n");
+            }
+            buf.append("</p>\n");
+        }
+
+        buf.append("<br><ul>");
         // newest first
         // for (int i = msgs.size() - 1; i >= 0; i--) { 
         // oldest first
@@ -287,33 +381,42 @@ public class LogsHelper extends HelperBase {
             // replace \n so that exception stack traces will format correctly and will paste nicely into pastebin
             msg = msg.replace("\n", "<br>&nbsp;&nbsp;&nbsp;&nbsp;\n");
             msg = msg.replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
-            buf.append("<li>");
             if (colorize) {
                 // TODO this would be a lot easier if LogConsoleBuffer stored LogRecords instead of formatted strings
                 String color;
-                // Homeland Security Advisory System
-                // http://www.dhs.gov/xinfoshare/programs/Copy_of_press_release_0046.shtm
-                // but pink instead of yellow for WARN
-                if (msg.contains(_c("CRIT")))
-                    color = "#cc0000";
-                else if (msg.contains(_c("ERROR")))
-                    color = "#ff3300";
-                else if (msg.contains(_c("WARN")))
-                   // color = "#ff00cc"; poor legibility on light backgrounds
-                    color = "#bf00df";
-                else if (msg.contains(_c("INFO")))
-                    color = "#333399";
-                else
-                    color = "#006600";
-                buf.append("<font color=\"").append(color).append("\">");
+                if (msg.contains(tCRIT)) {
+                    if (filter != null && !filter.equals("crit"))
+                        continue;
+                    color = COLOR_CRIT;
+                } else if (msg.contains(tERROR)) {
+                    if (filter != null && !filter.equals("error"))
+                        continue;
+                    color = COLOR_ERROR;
+                } else if (msg.contains(tWARN)) {
+                    if (filter != null && !filter.equals("warn"))
+                        continue;
+                    color = COLOR_WARN;
+                } else if (msg.contains(tINFO)) {
+                    if (filter != null && !filter.equals("info"))
+                        continue;
+                    color = COLOR_INFO;
+                } else {
+                    // skip the "similar messages" lines when filtering
+                    if (filter != null && (!filter.equals("debug") || msg.contains("&uarr;&uarr;&uarr;")))
+                        continue;
+                    color = COLOR_DEBUG;
+                }
+                buf.append("<li><font color=\"").append(color).append("\">");
                 buf.append(msg);
                 buf.append("</font>");
             } else {
+                // don't bother filtering, colorize is the default
+                buf.append("<li>");
                 buf.append(msg);
             }
             buf.append("</li>\n");
         }
-        buf.append("</ul>\n");
+        buf.append("</ul><br>\n");
         
         return buf.toString();
     }
