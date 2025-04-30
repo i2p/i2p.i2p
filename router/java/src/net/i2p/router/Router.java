@@ -1345,7 +1345,8 @@ public class Router implements RouterClock.ClockShiftListener {
         KeyManager.DEFAULT_KEYDIR + '/' + KeyManager.KEYFILE_PUBLIC_ENC,
         KeyManager.DEFAULT_KEYDIR + '/' + KeyManager.KEYFILE_PRIVATE_SIGNING,
         KeyManager.DEFAULT_KEYDIR + '/' + KeyManager.KEYFILE_PUBLIC_SIGNING,
-        "sessionKeys.dat"     // no longer used
+        "sessionKeys.dat",    // no longer used
+        "ssu2tokens.txt"
     };
 
     /**
