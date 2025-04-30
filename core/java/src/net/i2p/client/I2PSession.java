@@ -489,14 +489,27 @@ public interface I2PSession {
     public static final int PROTO_STREAMING = 6;
 
     /**
-     *  Generally a signed datagram, but could
-     *  also be a raw datagram, depending on the application
+     *  A repliable and signed datagram
      */
     public static final int PROTO_DATAGRAM = 17;
 
     /**
-     *  A raw (unsigned) datagram
+     *  A raw (unsigned, unrepliable) datagram
      *  @since 0.9.2
      */
     public static final int PROTO_DATAGRAM_RAW = 18;
+
+    /**
+     *  A repliable and signed datagram.
+     *  See Proposal 163 and datagrams/Datagram2
+     *  @since 0.9.66
+     */
+    public static final int PROTO_DATAGRAM2 = 19;
+
+    /**
+     *  A repliable but unsigned datagram.
+     *  See Proposal 163 and datagrams/Datagram3
+     *  @since 0.9.66
+     */
+    public static final int PROTO_DATAGRAM3 = 20;
 }
