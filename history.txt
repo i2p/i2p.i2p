@@ -1,3 +1,20 @@
+2025-04-30 zzz
+ * I2CP: Datagram 2/3 preliminary support (Proposal163)
+ * Jetty: Migrate jetty.xml files at startup
+   to fix id and DTD issues for existing installs
+
+2025-04-29 zzz
+ * Console: Logs page improvements
+
+2025-04-27 zzz
+ * i2psnark: Remove ElGamal peer support
+
+2025-04-26 zzz
+ * i2ptunnel: Canonicalize Host header at the server proxy
+
+2025-04-25 zzz
+ * Util: Add ability to force IPv6 for SSLEepGet
+
 2025-04-24 zzz
  * Blockfile: Catch unchecked exceptions thrown from value deserializers
  * CLI: Add -6 flag to force IPv6 reseed test
@@ -8,7 +25,7 @@
  * i2psnark standalone: Change Ref id to refid in Jetty config file
 
 2025-04-20 zzz
- * Build: Change Ref id to refid in Jetty config files
+ * Build: Change Ref id to refid in Jetty config files (new installs only)
  * Use Long.compare() in comparators
  * i2psnark:
    - Remove outstanding requests from pieces when connection is replaced
