@@ -453,8 +453,11 @@ public class GeoIP {
                     }
                     out.close();
                     out = null;
-                    RouterContext ctx = (RouterContext) _context;
-                    ctx.blocklist().addCountryFile();
+                    // App context for unit tests / CLI
+                    if (_context.isRouterContext()) {
+                        RouterContext ctx = (RouterContext) _context;
+                        ctx.blocklist().addCountryFile();
+                    }
                 } catch (IOException ioe) {
                     _log.error("GeoIP2 failure", ioe);
                 }
@@ -902,10 +905,18 @@ public class GeoIP {
 
     public static void main(String args[]) {
         if (args.length <= 0) {
-            System.out.println("Usage: GeoIP ip...");
+            System.out.println("Usage: GeoIP ip...\n" +
+                               "       GeoIP -c xx   // dump all subnets for a country to " +
+                               Blocklist.BLOCKLIST_COUNTRY_FILE);
             System.exit(1);
         }
         GeoIP g = new GeoIP(I2PAppContext.getGlobalContext());
+        if (args[0].equals("-c") && args.length == 2) {
+            g.countryToIP(args[1]);
+            System.out.println("Subnets for country " + args[1] + " dumped to " +
+                               Blocklist.BLOCKLIST_COUNTRY_FILE);
+            return;
+        }
 /***
         String tests[] = {"0.0.0.0", "0.0.0.1", "0.0.0.2", "0.0.0.255", "1.0.0.0",
                                         "94.3.3.3", "77.1.2.3", "127.0.0.0", "127.127.127.127", "128.0.0.0",
@@ -923,7 +934,6 @@ public class GeoIP {
         g.blockingLookup();
         System.out.println("Lookup took " + (System.currentTimeMillis() - start));
 /***
-        g.countryToIP("af");
         for (int i = 0; i < tests.length; i++)
             System.out.println(tests[i] + " : " + g.get(tests[i]));
 ***/
