@@ -490,6 +490,8 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         Properties rv = new Properties();
         for (String key : options.stringPropertyNames()) {
             if (key.startsWith("java.") ||
+                key.startsWith("javax.") ||
+                (key.startsWith("i2p.streaming.") && !key.equals("i2p.streaming.profile")) ||
                 key.startsWith("user.") ||
                 key.startsWith("os.") ||
                 key.startsWith("sun.") ||
