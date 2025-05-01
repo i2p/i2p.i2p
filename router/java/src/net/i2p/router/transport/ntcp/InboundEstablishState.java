@@ -335,6 +335,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                     // got all we need, fail now
                     fail("Bad msg 1, X = " + Base64.encode(_X, 0, KEY_SIZE) + " remaining = " + src.remaining(), gse);
                 }
+                _transport.getPumper().blockIP(_con.getRemoteIP());
                 return;
             } catch (RuntimeException re) {
                 fail("Bad msg 1, X = " + Base64.encode(_X, 0, KEY_SIZE), re);
