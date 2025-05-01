@@ -26,16 +26,8 @@ abstract class EstablishBase implements EstablishState {
 
     // bob receives (and alice sends)
     protected final byte _X[];
-    protected final byte _hX_xor_bobIdentHash[];
     // alice receives (and bob sends)
     protected final byte _Y[];
-    protected final byte _e_hXY_tsB[];
-    /** Bob's timestamp in seconds, this is in message #2, *before* _tsA */
-    protected transient long _tsB;
-    /** Alice's timestamp in seconds, this is in message #3, *after* _tsB
-     *  Only saved for outbound. For inbound, see verifyInbound().
-     */
-    protected transient long _tsA;
     /**
      *  OUR clock minus HIS clock, in seconds
      *
@@ -43,12 +35,9 @@ abstract class EstablishBase implements EstablishState {
      *  Outbound: tsA - tsB - rtt/2
      */
     protected transient long _peerSkew;
-    protected transient byte _e_bobSig[];
 
     /** previously received encrypted block (or the IV) */
     protected byte _prevEncrypted[];
-    /** decryption buffer */
-    protected final byte _curDecrypted[];
 
     /** bytes received so far */
     protected int _received;
@@ -61,8 +50,6 @@ abstract class EstablishBase implements EstablishState {
 
     protected static final int AES_SIZE = 16;
     protected static final int XY_SIZE = 256;
-    protected static final int HXY_SIZE = 32;  //Hash.HASH_LENGTH;
-    protected static final int HXY_TSB_PAD_SIZE = HXY_SIZE + 4 + 12;  // 48
 
     protected final Object _stateLock = new Object();
     protected volatile State _state;
@@ -121,11 +108,8 @@ abstract class EstablishBase implements EstablishState {
         _log = null;
         _X = null;
         _Y = null;
-        _hX_xor_bobIdentHash = null;
-        _curDecrypted = null;
         _transport = null;
         _con = null;
-        _e_hXY_tsB = null;
     }
 
     protected EstablishBase(RouterContext ctx, NTCPTransport transport, NTCPConnection con) {
@@ -133,7 +117,6 @@ abstract class EstablishBase implements EstablishState {
         _log = ctx.logManager().getLog(getClass());
         _transport = transport;
         _con = con;
-        _hX_xor_bobIdentHash = SimpleByteCache.acquire(HXY_SIZE);
         if (_con.isInbound()) {
             _X = SimpleByteCache.acquire(XY_SIZE);
             _Y = null;
@@ -141,9 +124,6 @@ abstract class EstablishBase implements EstablishState {
             // OutboundNTCP2State does not extend this,
                 throw new IllegalStateException();
         }
-
-        _e_hXY_tsB = new byte[HXY_TSB_PAD_SIZE];
-        _curDecrypted = SimpleByteCache.acquire(AES_SIZE);
     }
 
     /** @since 0.9.16 */
@@ -241,20 +221,6 @@ abstract class EstablishBase implements EstablishState {
         // null or longer for OB
         if (_prevEncrypted != null && _prevEncrypted.length == AES_SIZE)
             SimpleByteCache.release(_prevEncrypted);
-        SimpleByteCache.release(_curDecrypted);
-        SimpleByteCache.release(_hX_xor_bobIdentHash);
-    }
-
-    /**
-     *  XOR a into b. Modifies b. a is unmodified.
-     *  @param a 32 bytes
-     *  @param b 32 bytes
-     *  @since 0.9.12
-     */
-    protected static void xor32(byte[] a, byte[] b) {
-        for (int i = 0; i < 32; i++) {
-            b[i] ^= a[i];
-        }
     }
 
     protected String prefix() { return toString(); }
