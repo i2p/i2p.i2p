@@ -714,8 +714,11 @@ public class SU3File {
                 t == SigType.RedDSA_SHA512_Ed25519)
                 continue; // not supported by keytool, and does double hashing right now
             buf.append("      ").append(t).append("\t(code: ").append(t.getCode()).append(')');
-            if (t.getCode() == DEFAULT_SIG_CODE)
+            int code = t.getCode();
+            if (code == DEFAULT_SIG_CODE)
                 buf.append(" DEFAULT");
+            else if (code < DEFAULT_SIG_CODE)
+                buf.append(" DEPRECATED");
             buf.append('\n');
         }
     }

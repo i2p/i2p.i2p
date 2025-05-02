@@ -453,11 +453,14 @@ public class PrivateKeyFile {
                 continue;
             if (t.getBaseAlgorithm().equals(SigAlgo.RSA))
                 continue;
-            if (t.getCode() == 8)
+            int code = t.getCode();
+            if (code == 8)
                 continue;
             buf.append("      ").append(t).append("\t(code: ").append(t.getCode()).append(')');
-            if (t.getCode() == 0)
+            if (code == 0)
                 buf.append(" DEFAULT");
+            if (code < 7)
+                buf.append(" DEPRECATED");
             buf.append('\n');
         }
         buf.append("\nAvailable encryption types:\n");
@@ -465,8 +468,11 @@ public class PrivateKeyFile {
             if (!t.isAvailable())
                 continue;
             buf.append("      ").append(t).append("\t(code: ").append(t.getCode()).append(')');
-            if (t.getCode() == 0)
+            int code = t.getCode();
+            if (code == 0)
                 buf.append(" DEFAULT");
+            if (code < 4)
+                buf.append(" DEPRECATED");
             buf.append('\n');
         }
         System.out.println(buf.toString());
