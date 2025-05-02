@@ -268,7 +268,7 @@ class SummaryBarRenderer {
                 String url = urls.get(i);
                 String txp = sz > 1 ? tx + ' ' + (i + 1) : tx;
                 rbuf.setLength(0);
-                rbuf.append("<tr><td><img src=\"/themes/console/images/server.png\" height=\"16\" width=\"16\" alt=\"\"></td><td align=\"left\">" +
+                rbuf.append("<tr><td><img src=\"/themes/console/images/jetty.png\" height=\"16\" width=\"16\" alt=\"\"></td><td align=\"left\">" +
                             "<a href=\"")
                     .append(url)
                     .append("\" target=\"_blank\" title=\"")
