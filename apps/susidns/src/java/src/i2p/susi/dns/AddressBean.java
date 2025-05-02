@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base32;
 import net.i2p.data.Base64;
@@ -264,6 +265,23 @@ public class AddressBean
                 if (stype == null)
 			return _t("Type {0}", st);
                 return stype.toString();
+	}
+
+	/**
+	 * Do this the easy way
+	 * @since 0.9.66
+	 */
+	public String getEncType() {
+		int type = dest[384] & 0xff;
+		if (type != Certificate.CERTIFICATE_TYPE_KEY)
+			return _t("ElGamal 2048 bit");
+		int st = ((dest[389] & 0xff) << 8) | (dest[390] & 0xff);
+		if (st == 0)
+			return _t("ElGamal 2048 bit");
+		EncType etype = EncType.getByCode(st);
+		if (etype == null)
+			return _t("Type {0}", st);
+		return etype.toString();
 	}
 
 	/**

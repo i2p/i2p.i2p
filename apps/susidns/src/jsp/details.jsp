@@ -112,7 +112,7 @@
 </tr>
 <tr class="list${book.trClass}">
 <td><%=intl._t("Public Key")%></td>
-<td><%=intl._t("ElGamal 2048 bit")%></td>
+<td><%=addr.getEncType()%></td>
 </tr>
 <tr class="list${book.trClass}">
 <td><%=intl._t("Signing Key")%></td>
