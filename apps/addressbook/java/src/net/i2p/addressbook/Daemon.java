@@ -182,6 +182,7 @@ class Daemon {
             long start = DEBUG ? System.currentTimeMillis() : 0;
             int old = 0, nnew = 0, invalid = 0, conflict = 0, total = 0;
             int deleted = 0;
+            String newname = null;
             while(iter.hasNext()) {
                 Map.Entry<String, HostTxtEntry> entry = iter.next();
                 total++;
@@ -280,6 +281,8 @@ class Daemon {
                                                 if (log != null && !success)
                                                     log.append("Add to published address book " + publishedNS.getName() + " failed for " + key);
                                             }
+                                            if (nnew == 0)
+                                                newname = key;
                                             nnew++;
                                             continue;
                                         } else {
@@ -503,6 +506,8 @@ class Daemon {
                                 // keep track for later dup check
                                 knownNames.add(key);
                             }
+                            if (nnew == 0)
+                                newname = key;
                             nnew++;
                         } else if (key == null) {
                             // 'remove' actions
@@ -677,6 +682,8 @@ class Daemon {
                 if (cmgr != null) {
                     int nc = cmgr.getBubbleCount(PortMapper.SVC_SUSIDNS) + nnew;
                     String msg = ngettext("{0} new host", "{0} new hosts", nc);
+                    if (nc == 1)
+                        msg += ": " + newname;
                     cmgr.setBubble(PortMapper.SVC_SUSIDNS, nc, msg);
                 }
             }
