@@ -304,7 +304,17 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             }
             // fast MSB check for key < 2^255
             if ((_X[KEY_SIZE - 1] & 0x80) != 0) {
-                fail("Bad PK msg 1");
+                // same probing resistance strategy as below
+                _padlen1 = _context.random().nextInt(PADDING1_FAIL_MAX) - src.remaining();
+                if (_padlen1 > 0) {
+                    if (_log.shouldWarn())
+                        _log.warn("Bad PK msg 1, X = " + Base64.encode(_X, 0, KEY_SIZE) + " with " + src.remaining() +
+                                  " more bytes, waiting for " + _padlen1 + " more bytes");
+                    changeState(State.IB_NTCP2_READ_RANDOM);
+                } else {
+                    fail("Bad PK msg 1, X = " + Base64.encode(_X, 0, KEY_SIZE) + " remaining = " + src.remaining());
+                }
+                _transport.getPumper().blockIP(_con.getRemoteIP());
                 return;
             }
 
