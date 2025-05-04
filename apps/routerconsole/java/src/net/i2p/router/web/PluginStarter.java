@@ -36,6 +36,7 @@ import net.i2p.util.FileSuffixFilter;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.OrderedProperties;
 import net.i2p.util.PortMapper;
 import net.i2p.util.SimpleTimer2;
 import net.i2p.util.SystemVersion;
@@ -804,6 +805,11 @@ public class PluginStarter implements Runnable {
      *  plugins.config
      */
     public static void storePluginProperties(Properties props) {
+        if (!(props instanceof OrderedProperties)) {
+            Properties p = new OrderedProperties();
+            p.putAll(props);
+            props = p;
+        }
         File cfgFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), CONFIG_FILE);
         try {
             DataHelper.storeProps(props, cfgFile);
