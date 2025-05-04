@@ -261,8 +261,10 @@ public class RouterAppManager extends ClientAppManagerImpl {
      *  @since 0.9.66
      */
     @Override
-    public synchronized void addBubble(String svc, String text) {
-        setBubble(svc, getBubbleCount(svc) + 1, text);
+    public void addBubble(String svc, String text) {
+        synchronized(_bubbles) {
+            setBubble(svc, getBubbleCount(svc) + 1, text);
+        }
     }
 
     /// end ClientAppManager interface
