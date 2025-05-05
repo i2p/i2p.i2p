@@ -39,8 +39,8 @@
 <p>
 <% /* note to translators - both parameters are URLs */
 %><%=intl._t("Please report bugs on {0} or {1}.",
-          "<a href=\"http://git.idk.i2p/i2p-hackers/i2p.i2p/-/issues/new\">git.idk.i2p</a>",
-          "<a href=\"https://i2pgit.org/i2p-hackers/i2p.i2p/-/issues/new\">i2pgit.org</a>")%>
+          "<a href=\"http://git.idk.i2p/I2P_Developers/i2p.i2p/issues/new\">git.idk.i2p</a>",
+          "<a href=\"https://i2pgit.org/I2P_Developers/i2p.i2p/issues/new\">i2pgit.org</a>")%>
 <p><%=intl._t("Please include this information in bug reports")%>:
 </p></div><div class="sorry" id="warning2">
 <h3><%=intl._t("Error Details")%></h3>

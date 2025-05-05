@@ -16,8 +16,8 @@
 <%=intl._t("Note that system information, log timestamps, and log messages may provide clues to your location; please review everything you include in a bug report.")%>
 <% /* note to translators - both parameters are URLs */
 %><%=intl._t("Please report bugs on {0} or {1}.",
-          "<a href=\"http://git.idk.i2p/i2p-hackers/i2p.i2p/-/issues/new\">git.idk.i2p</a>",
-          "<a href=\"https://i2pgit.org/i2p-hackers/i2p.i2p/-/issues/new\">i2pgit.org</a>")%>
+          "<a href=\"http://git.idk.i2p/I2P_Developers/i2p.i2p/issues/new\">git.idk.i2p</a>",
+          "<a href=\"https://i2pgit.org/I2P_Developers/i2p.i2p/issues/new\">i2pgit.org</a>")%>
   </td></tr>
 </tbody></table>
 

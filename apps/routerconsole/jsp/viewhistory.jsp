@@ -43,7 +43,7 @@
                 } else if (line.startsWith("---------------")) {
                     out.println("<hr>");
                 } else if (line.startsWith("EARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE")) {
-                    out.print("<a href=\"https://git.idk.i2p/i2p-hackers/i2p.i2p/-/raw/master/history.txt\">");
+                    out.print("<a href=\"https://git.idk.i2p/I2P_Developers/i2p.i2p/raw/branch/master/history.txt\">");
                     out.print(intl._t("Earlier history is available in the source package"));
                     out.println("</a>");
                 } else {
