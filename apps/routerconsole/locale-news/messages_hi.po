@@ -1,0 +1,68 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# absolutep, 2025
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-05-05 15:14+0000\n"
+"PO-Revision-Date: 2013-07-20 14:49+0000\n"
+"Last-Translator: absolutep, 2025\n"
+"Language-Team: Hindi (http://app.transifex.com/otf/I2P/language/hi/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: hi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Congratulations on getting I2P installed!"
+msgstr "I2P संस्थापन पर आपको हार्दिक शुभकामनाएँ!"
+
+msgid "Welcome to I2P!"
+msgstr "I2P में आपका स्वागत है!"
+
+#, java-format
+msgid "Please {0}have patience{1} as I2P boots up and finds peers."
+msgstr "कृपया {0} धैर्यधारण करें {1} क्योंकि I2P प्रारंभ हो रहा है एवं समकक्षों की खोज कर रहा है।"
+
+#, java-format
+msgid ""
+"While you are waiting, please {0}adjust your bandwidth settings{1} on the "
+"{2}configuration page{3}."
+msgstr "जब तक प्रतीक्षा की जा रही है, कृपया {0} {2} विन्यास पृष्ठ {3} पर जाकर अपनी संचार क्षमता {1} विन्यास सेटिंग्स को समुचित रूप से समायोजित करें।"
+
+msgid ""
+"Also you can setup your browser to use the I2P proxy to reach eepsites."
+msgstr "आप अपने ब्राउज़र को I2P प्रॉक्सी द्वारा ईपसाइट्स तक पहुँचने हेतु विन्यस्त कर सकते हैं।"
+
+msgid ""
+"Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
+"browser settings."
+msgstr "कृपया अपने ब्राउज़र की सेटिंग्स में 127.0.0.1 (या localhost) पोर्ट 4444 को HTTP प्रॉक्सी के रूप में प्रविष्ट करें।"
+
+msgid "Do not use SOCKS for this."
+msgstr "इसके लिए SOCKS का उपयोग नहीं करें।"
+
+#, java-format
+msgid ""
+"More information can be found on the {0}I2P browser proxy setup page{1}."
+msgstr "अधिक जानकारी {0}I2P ब्राउज़र प्रॉक्सी सेटअप पृष्ठ{1} पर प्राप्त की जा सकती है।"
+
+#, java-format
+msgid ""
+"Once you have a \"shared clients\" destination listed on the left, please "
+"{0}check out{1} our {2}FAQ{3}."
+msgstr "जब बाईं ओर \"साझा क्लाइंट्स\" का गंतव्य सूचीबद्ध हो जाए, तब कृपया हमारे {2}FAQ{3} का {0}अवलोकन करें{1}।"
+
+#, java-format
+msgid ""
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on "
+"{2}#i2p{3}."
+msgstr "कृपया अपने IRC क्लाइंट को {0} localhost:6668 {1} पर निर्देशित करें तथा {2}#i2p{3} पर हमें नमस्कार कहें।"
+
+msgid "I2P Development Team"
+msgstr "I2P विकास दल"

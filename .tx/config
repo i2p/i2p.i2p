@@ -216,6 +216,7 @@ trans.gan = apps/routerconsole/locale-news/messages_gan.po
 trans.gl = apps/routerconsole/locale-news/messages_gl.po
 ;; Java converts he to iw
 trans.he = apps/routerconsole/locale-news/messages_iw.po
+trans.hi = apps/routerconsole/locale-news/messages_hi.po
 trans.hu = apps/routerconsole/locale-news/messages_hu.po
 ;; Java converts id to in
 trans.id = apps/routerconsole/locale-news/messages_in.po
@@ -432,6 +433,7 @@ trans.fi = apps/susimail/locale/messages_fi.po
 trans.fr = apps/susimail/locale/messages_fr.po
 trans.gan = apps/susimail/locale/messages_gan.po
 trans.gl = apps/susimail/locale/messages_gl.po
+trans.hi = apps/susimail/locale/messages_hi.po
 trans.hr = apps/susimail/locale/messages_hr.po
 trans.hu = apps/susimail/locale/messages_hu.po
 ;; Java converts he to iw
