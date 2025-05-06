@@ -453,17 +453,17 @@ public class MapMaker {
             int tx = rotate(m.x);
             int ty = m.y + IMG_Y_OFF;
             if (tx > usx) {
-                tx -= off;
+                //tx -= off;
                 mx =  usx + off;
             } else {
-                tx += off;
+                //tx += off;
                 mx =  usx - off;
             }
             if (ty > usy) {
-                ty -= off;
+                //ty -= off;
                 my =  usy + off;
             } else {
-                ty += off;
+                //ty += off;
                 my =  usy - off;
             }
             g.drawLine(tx, ty, mx, my, PART_COLOR,
