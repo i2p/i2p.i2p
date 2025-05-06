@@ -1,0 +1,135 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# foo <foo@bar>, 2009.
+# 
+# Translators:
+# absolutep, 2025
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P routerconsole\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-12-17 18:42+0000\n"
+"PO-Revision-Date: 2019-12-17 17:16+0000\n"
+"Last-Translator: absolutep, 2025\n"
+"Language-Team: Hindi (https://app.transifex.com/otf/teams/12694/hi/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: hi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there
+#. are several options...
+#. spaces or not, '.' or not, plural or not. Try not to make it too long, it
+#. is used in
+#. a lot of tables.
+#. milliseconds
+#. Note to translators, may be negative or zero, 2999 maximum.
+#. {0,number,####} prevents 1234 from being output as 1,234 in the English
+#. locale.
+#. If you want the digit separator in your locale, translate as {0}.
+#. alternates: msec, msecs
+#: ../java/src/net/i2p/data/DataHelper.java:1383
+#: ../java/src/net/i2p/data/DataHelper.java:1436
+#, java-format
+msgid "{0,number,####} ms"
+msgid_plural "{0,number,####} ms"
+msgstr[0] ""
+msgstr[1] ""
+
+#. seconds
+#. alternates: secs, sec. 'seconds' is probably too long.
+#: ../java/src/net/i2p/data/DataHelper.java:1387
+#: ../java/src/net/i2p/data/DataHelper.java:1438
+#, java-format
+msgid "{0} sec"
+msgid_plural "{0} sec"
+msgstr[0] ""
+msgstr[1] ""
+
+#. minutes
+#. alternates: mins, min. 'minutes' is probably too long.
+#: ../java/src/net/i2p/data/DataHelper.java:1391
+#: ../java/src/net/i2p/data/DataHelper.java:1440
+#, java-format
+msgid "{0} min"
+msgid_plural "{0} min"
+msgstr[0] ""
+msgstr[1] ""
+
+#. hours
+#. alternates: hrs, hr., hrs.
+#: ../java/src/net/i2p/data/DataHelper.java:1395
+#: ../java/src/net/i2p/data/DataHelper.java:1442
+#, java-format
+msgid "{0} hour"
+msgid_plural "{0} hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#. days
+#: ../java/src/net/i2p/data/DataHelper.java:1398
+#: ../java/src/net/i2p/data/DataHelper.java:1445
+#, java-format
+msgid "{0} day"
+msgid_plural "{0} days"
+msgstr[0] ""
+msgstr[1] ""
+
+#. years
+#: ../java/src/net/i2p/data/DataHelper.java:1401
+#: ../java/src/net/i2p/data/DataHelper.java:1448
+#, java-format
+msgid "{0} year"
+msgid_plural "{0} years"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../java/src/net/i2p/data/DataHelper.java:1403
+#: ../java/src/net/i2p/data/DataHelper.java:1450
+msgid "n/a"
+msgstr "लागू नहीं"
+
+#: ../java/src/net/i2p/data/DataHelper.java:1432
+#, java-format
+msgid "{0,number,####} ns"
+msgid_plural "{0,number,###} ns"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../java/src/net/i2p/data/DataHelper.java:1434
+#, java-format
+msgid "{0,number,####} μs"
+msgid_plural "{0,number,###} μs"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "CRIT"
+msgstr "गंभीर"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "DEBUG"
+msgstr "दोषमार्जन"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "ERROR"
+msgstr "त्रुटि"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "INFO"
+msgstr "जानकारी"
+
+#: ../java/src/net/i2p/util/LogRecordFormatter.java:106
+msgid "WARN"
+msgstr "चेतावनी"
+
+#: ../java/src/net/i2p/util/LogWriter.java:161
+#, java-format
+msgid "{0} similar message omitted"
+msgid_plural "{0} similar messages omitted"
+msgstr[0] ""
+msgstr[1] ""

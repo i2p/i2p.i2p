@@ -1,0 +1,103 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the desktopgui package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# absolutep, 2025
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-03-06 14:52+0000\n"
+"PO-Revision-Date: 2011-02-13 12:05+0000\n"
+"Last-Translator: absolutep, 2025\n"
+"Language-Team: Hindi (http://app.transifex.com/otf/I2P/language/hi/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: hi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:31
+msgid "Start I2P"
+msgstr "I2P प्रारंभ करें"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:44
+#: src/net/i2p/desktopgui/InternalTrayManager.java:55
+msgid "I2P is starting!"
+msgstr "I2P प्रारंभ हो रहा है"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:44
+#: src/net/i2p/desktopgui/InternalTrayManager.java:55
+msgid "Starting"
+msgstr "प्रारंभ हो रहा है"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:65
+#: src/net/i2p/desktopgui/InternalTrayManager.java:221
+msgid "Launch I2P Browser"
+msgstr "I2P ब्राउज़र को आरंभ करें"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:86
+#: src/net/i2p/desktopgui/InternalTrayManager.java:242
+msgid "Configure I2P System Tray"
+msgstr "I2P प्रणाली की स्थापक-पट्टिका को विन्यासित करें"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:88
+#: src/net/i2p/desktopgui/InternalTrayManager.java:244
+msgid "Disable system tray"
+msgstr "प्रणाली स्थापक-पट्टिका को निष्क्रिय करें"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:104
+#: src/net/i2p/desktopgui/InternalTrayManager.java:260
+msgid "Restart I2P"
+msgstr "I2P को पुनः सञ्चालित करें"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:121
+#: src/net/i2p/desktopgui/InternalTrayManager.java:277
+msgid "Stop I2P"
+msgstr "I2P को निष्क्रिय करें"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:137
+#: src/net/i2p/desktopgui/InternalTrayManager.java:293
+msgid "Restart I2P Immediately"
+msgstr "I2P को तत्काल पुनः सञ्चालित करें"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:154
+#: src/net/i2p/desktopgui/InternalTrayManager.java:310
+msgid "Stop I2P Immediately"
+msgstr "I2P को तत्काल निष्क्रिय करें"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:168
+#: src/net/i2p/desktopgui/InternalTrayManager.java:324
+msgid "Cancel I2P Shutdown"
+msgstr "I2P निष्करण को निरस्त करें"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:381
+#, java-format
+msgid "Shutdown in {0}"
+msgstr "{0} में निष्करण होगा"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:383
+msgid "Shutdown imminent"
+msgstr "निष्करण शीघ्र होने वाला है"
+
+#. status translations are in the console bundle
+#: src/net/i2p/desktopgui/InternalTrayManager.java:388
+msgid "Network"
+msgstr "नेटवर्क"
+
+#. Windows typically has tooltips; Linux (at least Ubuntu) doesn't
+#: src/net/i2p/desktopgui/TrayManager.java:75
+msgid "I2P: Right-click for menu"
+msgstr "I2P: मेन्यू के लिए दाएँ क्लिक करें"
+
+#: src/net/i2p/desktopgui/TrayManager.java:310
+#: src/net/i2p/desktopgui/TrayManager.java:347
+msgid "Enable notifications"
+msgstr "सूचनाओं को सक्रिय करें"
+
+#: src/net/i2p/desktopgui/TrayManager.java:325
+#: src/net/i2p/desktopgui/TrayManager.java:362
+msgid "Disable notifications"
+msgstr "सूचनाओं को निष्क्रिय करें"
