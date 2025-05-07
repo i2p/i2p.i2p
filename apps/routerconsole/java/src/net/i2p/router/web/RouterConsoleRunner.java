@@ -1119,7 +1119,7 @@ public class RouterConsoleRunner implements RouterApp {
             UserIdentity rv = super.login(username, credentials, request);
             if (rv == null)
                 //_log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, webapp: " + _webapp + ", user: " + username);
-                _log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, user: " + username);
+                _log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, user: " + username + " IP: " + request.getRemoteAddr());
             return rv;
         }
     }
