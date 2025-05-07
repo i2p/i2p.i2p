@@ -477,7 +477,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                             return AuthResult.AUTH_GOOD;
                         }
                     }
-                    _log.logAlways(Log.WARN, "HTTP proxy authentication failed, user: " + user);
+                    _log.logAlways(Log.WARN, "HTTP proxy authentication failed, user: " + user + " IP: " + s.getInetAddress());
                 } catch (UnsupportedEncodingException uee) {
                     _log.error(getPrefix(requestId) + "No UTF-8 support? B64: " + authorization, uee);
                 } catch (ArrayIndexOutOfBoundsException aioobe) {
@@ -497,7 +497,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                 return AuthResult.AUTH_BAD;
             authorization = authorization.substring(7);
             Map<String, String> args = parseArgs(authorization);
-            AuthResult rv = validateDigest(method, args);
+            AuthResult rv = validateDigest(method, args, s);
             return rv;
         } else {
             _log.error("Unknown proxy authorization type configured: " + authRequired);
@@ -508,9 +508,11 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     /**
      *  Verify all of it.
      *  Ref: RFC 2617
+     *
+     *  @param s just to log the IP on failure
      *  @since 0.9.4
      */
-    private AuthResult validateDigest(String method, Map<String, String> args) {
+    private AuthResult validateDigest(String method, Map<String, String> args, Socket s) {
         String user = args.get("username");
         String realm = args.get("realm");
         String nonce = args.get("nonce");
@@ -549,7 +551,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         String ha1 = getTunnel().getClientOptions().getProperty(PROP_PROXY_DIGEST_PREFIX + user +
                                                                 (isSHA256 ? PROP_PROXY_DIGEST_SHA256_SUFFIX : PROP_PROXY_DIGEST_SUFFIX));
         if (ha1 == null) {
-            _log.logAlways(Log.WARN, "HTTP proxy authentication failed, user: " + user);
+            _log.logAlways(Log.WARN, "HTTP proxy authentication failed, user: " + user + " IP: " + s.getInetAddress());
             return AuthResult.AUTH_BAD;
         }
         // get H(A2)
@@ -559,7 +561,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         String kd = ha1 + ':' + nonce + ':' + nc + ':' + cnonce + ':' + qop + ':' + ha2;
         String hkd = isSHA256 ? PasswordManager.sha256Hex(kd) : PasswordManager.md5Hex(kd);
         if (!response.equals(hkd)) {
-            _log.logAlways(Log.WARN, "HTTP proxy authentication failed, user: " + user);
+            _log.logAlways(Log.WARN, "HTTP proxy authentication failed, user: " + user + " IP: " + s.getInetAddress());
             if (_log.shouldLog(Log.INFO))
                 _log.info("Bad digest auth: " + DataHelper.toString(args));
             return AuthResult.AUTH_BAD;
