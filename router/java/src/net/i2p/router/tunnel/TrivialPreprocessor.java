@@ -13,7 +13,7 @@ import net.i2p.util.SimpleByteCache;
 /** 
  * Do the simplest thing possible for preprocessing - for each message available,
  * turn it into the minimum number of fragmented preprocessed blocks, sending 
- * each of those out.  This does not coallesce message fragments or delay for more
+ * each of those out.  This does not coalesce message fragments or delay for more
  * optimal throughput.
  *
  * See FragmentHandler Javadoc for tunnel message fragment format

@@ -40,7 +40,7 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
     // Fastest 1 minute throughput, in bytes per minute, ordered with fastest first.
     //private final double _peakThroughput[] = new double[THROUGHPUT_COUNT];
     private long _peakThroughputCurrentTotal;
-    private long _peakThroughputLastCoallesce = System.currentTimeMillis();
+    private long _peakThroughputLastCoalesce = System.currentTimeMillis();
     private Hash _blankHash;
     private SessionKey[] _ChaReplyKeys;
     private byte[][] _ChaReplyADs;
@@ -176,11 +176,11 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
         _verifiedBytesTransferred += bytes; 
         _peakThroughputCurrentTotal += bytes;
         long now = System.currentTimeMillis();
-        long timeSince = now - _peakThroughputLastCoallesce;
+        long timeSince = now - _peakThroughputLastCoalesce;
         if (timeSince >= 60*1000) {
             long tot = _peakThroughputCurrentTotal;
             int normalized = (int) (tot * 60d*1000d / timeSince);
-            _peakThroughputLastCoallesce = now;
+            _peakThroughputLastCoalesce = now;
             _peakThroughputCurrentTotal = 0;
             if (_context != null) {
                 // skip ourselves

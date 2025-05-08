@@ -23,7 +23,7 @@ import net.i2p.util.Log;
  *     assigned QueuePreprocessor.</li>
  * <li>that QueuePreprocessor may then take off any of the TunnelGateway.Pending
  *     messages or instruct the TunnelGateway to offer it the messages again in
- *     a short while (in an attempt to coallesce them).
+ *     a short while (in an attempt to coalesce them).
  * <li>when the QueueProcessor accepts a TunnelGateway.Pending, it preprocesses
  *     it into fragments, forwarding each preprocessed fragment group through 
  *     the Sender.</li>
@@ -84,7 +84,7 @@ class PumpedTunnelGateway extends TunnelGateway {
     
     /**
      * Add a message to be sent down the tunnel, either sending it now (perhaps
-     * coallesced with other pending messages) or after a brief pause (_flushFrequency).
+     * coalesced with other pending messages) or after a brief pause (_flushFrequency).
      * If it is queued up past its expiration, it is silently dropped
      *
      * This is only for OBGWs. See TPTG override for IBGWs.

@@ -147,7 +147,7 @@ class TunnelParticipant {
     
 /****
     private int _periodMessagesTransferred;
-    private long _lastCoallesced = System.currentTimeMillis();
+    private long _lastCoalesced = System.currentTimeMillis();
 ****/
 
     /** 
@@ -161,12 +161,12 @@ class TunnelParticipant {
     private void incrementThroughput(Hash prev) {
         if (true) return;
         long now = System.currentTimeMillis();
-        long timeSince = now - _lastCoallesced;
+        long timeSince = now - _lastCoalesced;
         if (timeSince >= 60*1000) {
             int amount = 1024 * _periodMessagesTransferred;
             int normalized = (int)((double)amount * 60d*1000d / (double)timeSince);
             _periodMessagesTransferred = 0;
-            _lastCoallesced = now;
+            _lastCoalesced = now;
             _context.profileManager().tunnelDataPushed1m(prev, normalized);
         } else {
             _periodMessagesTransferred++;

@@ -1,7 +1,7 @@
 package net.i2p.stat;
 
 /**
- * Receive the state of the rate when its coallesced
+ * Receive the state of the rate when it is coalesced
  */
 public interface RateSummaryListener {
     /**

@@ -81,7 +81,7 @@ public class PeerProfile {
     /** 
      * fastest 1 minute throughput, in bytes per minute, ordered with fastest
      * first.  this is not synchronized, as we don't *need* perfection, and we only
-     * reorder/insert values on coallesce
+     * reorder/insert values on coalesce
      */
     private final float _peakThroughput[] = new float[THROUGHPUT_COUNT];
     private volatile long _peakThroughputCurrentTotal;
