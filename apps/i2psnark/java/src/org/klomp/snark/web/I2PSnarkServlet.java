@@ -884,16 +884,21 @@ public class I2PSnarkServlet extends BasicServlet {
         if (searchList == null)
             return null;
         List<Snark> matches = new ArrayList<Snark>(32);
+        loop:
         for (Snark snark : snarks) {
             String lcname = Normalizer.normalize(snark.getBaseName().toLowerCase(Locale.US), Normalizer.Form.NFKD);
-            // search for any term (OR)
             for (int j = 0; j < searchList.size(); j++) {
                 String term = searchList.get(j);
-                if (lcname.contains(term)) {
-                    matches.add(snark);
-                    break;
-                }
+                // search for any term (OR)
+                //if (lcname.contains(term)) {
+                //    matches.add(snark);
+                //    break;
+                //}
+                // search for all terms (AND)
+                if (!lcname.contains(term))
+                    continue loop;
             }
+            matches.add(snark);
         }
         return matches;
     }
