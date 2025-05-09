@@ -644,13 +644,18 @@ public class ConfigClientsHandler extends FormHandler {
      *  @since 0.8.3
      */
     private void saveInterfaceChanges() {
+        boolean restart = false;
         Map<String, String> changes = new HashMap<String, String>();
         String port = getJettyString("port");
-        if (port != null)
+        if (port != null && !port.equals(_context.getProperty(ClientManagerFacadeImpl.PROP_CLIENT_PORT, "7654"))) {
             changes.put(ClientManagerFacadeImpl.PROP_CLIENT_PORT, port);
+            restart = true;
+        }
         String intfc = getJettyString("interface");
-        if (intfc != null)
+        if (intfc != null && !intfc.equals(_context.getProperty(ClientManagerFacadeImpl.PROP_CLIENT_HOST, "127.0.0.1"))) {
             changes.put(ClientManagerFacadeImpl.PROP_CLIENT_HOST, intfc);
+            restart = true;
+        }
         String user = getJettyString("user");
         String pw = getJettyString("nofilter_pw");
         if (user != null && pw != null && user.length() > 0 && pw.length() > 0) {
@@ -661,18 +666,28 @@ public class ConfigClientsHandler extends FormHandler {
         String mode = getJettyString("mode");
         boolean disabled = "0".equals(mode);
         boolean ssl = "2".equals(mode);
-        changes.put(ConfigClientsHelper.PROP_DISABLE_EXTERNAL,
+        if (disabled != _context.getProperty(ConfigClientsHelper.PROP_DISABLE_EXTERNAL, false)) {
+            changes.put(ConfigClientsHelper.PROP_DISABLE_EXTERNAL,
                                            Boolean.toString(disabled));
-        changes.put(ConfigClientsHelper.PROP_ENABLE_SSL,
+            restart = true;
+        }
+        if (ssl != _context.getProperty(ConfigClientsHelper.PROP_ENABLE_SSL, false)) {
+            changes.put(ConfigClientsHelper.PROP_ENABLE_SSL,
                                            Boolean.toString(ssl));
+            restart = true;
+        }
         changes.put(ConfigClientsHelper.PROP_AUTH,
                                            Boolean.toString((_settings.get("auth") != null)));
         boolean all = "0.0.0.0".equals(intfc) || "0:0:0:0:0:0:0:0".equals(intfc) ||
                       "::".equals(intfc);
-        changes.put(ConfigClientsHelper.BIND_ALL_INTERFACES, Boolean.toString(all));
+        if (all != _context.getProperty(ConfigClientsHelper.BIND_ALL_INTERFACES, false)) {
+            changes.put(ConfigClientsHelper.BIND_ALL_INTERFACES, Boolean.toString(all));
+            restart = true;
+        }
         if (_context.router().saveConfig(changes, null)) {
             addFormNotice(_t("Interface configuration saved"));
-            addFormNotice(_t("Restart required to take effect"));
+            if (restart)
+                addFormNotice(_t("Restart required to take effect"));
         } else
             addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs"));
     }
