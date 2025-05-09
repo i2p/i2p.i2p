@@ -13,6 +13,7 @@ import java.io.BufferedOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
@@ -239,6 +240,13 @@ class ClientConnectionRunner {
         _sessions.clear();
     }
     
+    /**
+     *  @since 0.9.66
+     */
+    public InetAddress getAddress() {
+        return _socket.getInetAddress();
+    }
+
     /**
      *  Current client's config,
      *  will be null if session not found
