@@ -99,7 +99,7 @@ class SOCKS5Server extends SOCKSServer {
             in = new DataInputStream(clientSock.getInputStream());
             out = new DataOutputStream(clientSock.getOutputStream());
 
-            init(in, out);
+            init(in, out, clientSock.getInetAddress());
             if (manageRequest(in, out) == Command.UDP_ASSOCIATE)
                 handleUDP(in, out);
         } catch (IOException e) {
@@ -112,8 +112,10 @@ class SOCKS5Server extends SOCKSServer {
     /**
      * SOCKS5 connection initialization.  This method assumes that
      * SOCKS "VER" field has been stripped from the input stream.
+     *
+     * @param client just for logging
      */
-    private void init(DataInputStream in, DataOutputStream out) throws IOException {
+    private void init(DataInputStream in, DataOutputStream out, InetAddress client) throws IOException {
         int nMethods = in.readUnsignedByte();
         int method = Method.NO_ACCEPTABLE_METHODS;
 
@@ -131,7 +133,7 @@ class SOCKS5Server extends SOCKSServer {
           case Method.USERNAME_PASSWORD:
             _log.debug("username/password authentication required");
             sendInitReply(Method.USERNAME_PASSWORD, out);
-            verifyPassword(in, out);
+            verifyPassword(in, out, client);
             return;
 
           case Method.NO_AUTH_REQUIRED:
@@ -148,9 +150,11 @@ class SOCKS5Server extends SOCKSServer {
 
     /**
      * Wait for the username/password message and verify or throw SOCKSException on failure
+     *
+     * @param client just for logging
      * @since 0.8.2
      */
-    private void verifyPassword(DataInputStream in, DataOutputStream out) throws IOException {
+    private void verifyPassword(DataInputStream in, DataOutputStream out, InetAddress client) throws IOException {
         int c = in.readUnsignedByte();
         if (c != AUTH_VERSION) {
             _log.logAlways(Log.WARN, "SOCKS proxy authentication failed");
@@ -166,7 +170,7 @@ class SOCKS5Server extends SOCKSServer {
         String u = DataHelper.getUTF8(user);
         c = in.readUnsignedByte();
         if (c <= 0) {
-            _log.logAlways(Log.WARN, "SOCKS proxy authentication failed, user: " + u);
+            _log.logAlways(Log.WARN, "SOCKS proxy authentication failed, user: " + u + " IP: " + client);
             throw new SOCKSException("Bad authentication");
         }
         byte[] pw = new byte[c];
@@ -179,7 +183,7 @@ class SOCKS5Server extends SOCKSServer {
             String configPW = props.getProperty(psha256);
             String hex = PasswordManager.sha256Hex(I2PSOCKSTunnel.AUTH_REALM, u, p);
             if (configPW == null || !configPW.equals(hex)) {
-                _log.logAlways(Log.WARN, "SOCKS proxy authentication failed, user: " + u);
+                _log.logAlways(Log.WARN, "SOCKS proxy authentication failed, user: " + u + " IP: " + client);
                 sendAuthReply(AUTH_FAILURE, out);
                 throw new SOCKSException("SOCKS authorization failure");
             }
