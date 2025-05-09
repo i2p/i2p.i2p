@@ -50,7 +50,6 @@ import net.i2p.router.transport.TransportImpl;
 import net.i2p.router.transport.TransportManager;
 import net.i2p.router.transport.TransportUtil;
 import static net.i2p.router.transport.TransportUtil.IPv6Config.*;
-import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.transport.crypto.X25519KeyFactory;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.util.DecayingHashSet;
@@ -146,10 +145,9 @@ public class NTCPTransport extends TransportImpl {
     private final String _b64Ntcp2StaticIV;
 
     /**
-     *  @param dh unused, ignored
      *  @param xdh null to disable NTCP2
      */
-    public NTCPTransport(RouterContext ctx, DHSessionKeyBuilder.Factory dh, X25519KeyFactory xdh) {
+    public NTCPTransport(RouterContext ctx, X25519KeyFactory xdh) {
         super(ctx);
         _xdhFactory = xdh;
         _log = ctx.logManager().getLog(getClass());
