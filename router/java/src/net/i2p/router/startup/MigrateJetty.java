@@ -37,6 +37,7 @@ import net.i2p.util.VersionComparator;
  *  Also migrate jetty.xml from Jetty 7/8 to Jetty 9.
  *
  *  For each client for class org.mortbay.jetty.Server:
+ *</p>
  *<pre>
  *  Let $D be the dir that jetty.xml is in (usually ~/.i2p/eepsite)
  *  Saves $D/jetty.xml to $D/jetty6.xml
@@ -48,6 +49,7 @@ import net.i2p.util.VersionComparator;
  *  Copies $I2P/eepsite-jetty7/etc/* to $D/etc
  *  Changes main class in clients.config
  *</pre>
+ *<p>
  *  Copies clients.config to clients.config.jetty6;
  *  Saves new clients.config.
  *
