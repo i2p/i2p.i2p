@@ -245,7 +245,12 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
         // Vuze - unregistered
         "crs2nugpvoqygnpabqbopwyjqettwszth6ubr2fh7whstlos3a6q.b32.i2p",
         "opentracker.r4sas.i2p", "punzipidirfqspstvzpj6gb4tkuykqp6quurj6e23bgxcxhdoe7q.b32.i2p",
-        "opentracker.skank.i2p", "by7luzwhx733fhc5ug2o75dcaunblq2ztlshzd7qvptaoa73nqua.b32.i2p"
+        "opentracker.skank.i2p", "by7luzwhx733fhc5ug2o75dcaunblq2ztlshzd7qvptaoa73nqua.b32.i2p",
+        "opentracker.simp.i2p", "wc4sciqgkceddn6twerzkfod6p2npm733p7z3zwsjfzhc4yulita.b32.i2p",
+        "opentracker.eeptorrent.i2p", "bjnkpy2rpwwlyjgmxeolt2cnp7h4oe437mtd54hb3pve3gmjqp5a.b32.i2p",
+        "omitracker.i2p", "a5ruhsktpdhfk5w46i6yf6oqovgdlyzty7ku6t5yrrpf4qedznjq.b32.i2p",
+        // unregistered
+        "6kw6voy3v5jzmkbg4i3rlqjysre4msgarpkpme6mt5u2jw33nffa.b32.i2p"
     }));
 
     static {
