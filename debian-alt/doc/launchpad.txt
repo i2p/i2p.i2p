@@ -16,7 +16,7 @@ Min version	Max version		Uses src pkg	Copied to Debian
 -----------	-----------		------------	----------------
 bionic		--			bionic		--
 focal		--			bionic		--
-jammy		plucky			bionic		buster, bullseye, bookworm, trixie, sid
+jammy		questing		bionic		buster, bullseye, bookworm, trixie, sid
 
 Unsupported (Java 7):
 precise		saucy   		precise		wheezy
