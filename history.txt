@@ -1,3 +1,35 @@
+2025-05-14 zzz
+ * i2psnark: Tracker list updates
+
+2025-05-09 zzz
+ * Console: Only show restart required on /configi2cp when interface changes
+ * I2CP, SOCKS: Log IP on authentication failure
+ * i2psnark: Change search of multiple tokens from OR to AND
+
+2025-05-07 zzz
+ * i2ptunnel, console: Log IP on authentication failure
+
+2025-05-05 zzz
+ * Console: Fixup bug reporting links
+
+2025-05-04 zzz
+ * Plugins: Sort plugins.config when saving
+ * Router: Fix rare deadlock at shutdown
+
+2025-05-03 zzz
+ * Console: Add new hostname to addressbook bubble if count is 1
+ * NTCP: Ban and do probing resistance on MSB check fail
+
+2025-05-02 zzz
+ * CLI: Show deprecated types in privatekeyfile and su3file help
+ * SusiDNS: Show correct enctype on details page
+
+2025-05-01 zzz
+ * NTCP:
+   - Temporary ban of IP sending corrupt SessionRequest
+   - Increase temporary ban time
+   - Remove old NTCP 1 handshake buffers
+
 2025-04-30 zzz
  * I2CP: Datagram 2/3 preliminary support (Proposal163)
  * Jetty: Migrate jetty.xml files at startup
