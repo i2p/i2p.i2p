@@ -45,6 +45,8 @@ It is also possible to configure the memory available to the I2P router using
 environment variables. To do this, use the: `JVM_XMX` environment variable by passing,
 for example, `-e JVM_XMX=256m`.
 
+For advanced configuration only, you can mount the configuration file via `-v ./router.config:/i2p/router.config` to access the settings mentioned in [the i2pd configuration](https://i2pd.readthedocs.io/en/latest/user-guide/configuration/).
+
 #### Volumes
 The container requires a volume for the configuration data to be mounted.  Optionally, you can mount a separate volume for torrent ("i2psnark") downloads.  See the example below.
 
