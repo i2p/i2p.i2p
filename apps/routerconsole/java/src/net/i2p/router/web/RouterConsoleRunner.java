@@ -371,13 +371,10 @@ public class RouterConsoleRunner implements RouterApp {
     /** @since 0.9.17 */
     private void checkJavaVersion() {
         boolean noJava8 = !SystemVersion.isJava8();
-        //boolean noPack200 = (PluginStarter.pluginsEnabled(_context) || !NewsHelper.isUpdateDisabled(_context)) &&
-        //                    !FileUtil.isPack200Supported();
-        boolean noPack200 = false;
         boolean openARM = SystemVersion.isARM() && SystemVersion.isOpenJDK() && !SystemVersion.isJava9();
         boolean isZero = SystemVersion.isZeroVM();
-        boolean isJava11 = false; // SystemVersion.isJava11();
-        if (noJava8 || noPack200 || openARM || isZero || isJava11) {
+        boolean isJava17 = SystemVersion.isJava(17);
+        if (noJava8 || openARM || isZero || !isJava17) {
             String s = "Java version: " + System.getProperty("java.version") +
                        " OS: " + System.getProperty("os.name") + ' ' +
                        System.getProperty("os.arch") + ' ' +
@@ -385,16 +382,13 @@ public class RouterConsoleRunner implements RouterApp {
             net.i2p.util.Log log = _context.logManager().getLog(RouterConsoleRunner.class);
             log.logAlways(net.i2p.util.Log.WARN, s);
             System.out.println("Warning: " + s);
-            if (noJava8) {
-                s = "Java 8 or higher is required, please upgrade Java";
+            if (!isJava17) {
+                s = "Java 17 or higher will be required in a future release, please upgrade Java now to continue receiving I2P updates";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
-            if (noPack200) {
-                if (SystemVersion.isJava(14))
-                    s = "Pack200 is required for some plugins, please consider downgrading Java to 13 or lower";
-                else
-                    s = "Pack200 is required for some plugins, please consider upgrading Java";
+            if (noJava8) {
+                s = "Java 8 or higher is required, please upgrade Java";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
