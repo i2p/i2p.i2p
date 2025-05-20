@@ -10,11 +10,19 @@
 %>
 <jsp:setProperty name="tester" property="contextId" value="<%=i2pcontextId1%>" />
 <%
+    // take /dns query params and pass to the iframe
+    String isrc;
+    String query = request.getQueryString();
+    if (query != null)
+        isrc = "/susidns/addressbook?" + query;
+    else
+        isrc = "/susidns/index";
+
     // CSSHelper is also pulled in by css.jsi below...
     boolean testIFrame = tester.allowIFrame(request.getHeader("User-Agent"));
     if (!testIFrame) {
         response.setStatus(307);
-        response.setHeader("Location", "/susidns/index");
+        response.setHeader("Location", isrc);
         // force commitment
         response.getOutputStream().close();
         return;
@@ -43,11 +51,11 @@
 </script>
 </head><body>
 <%@include file="summary.jsi" %>
-<h1><%=intl._t("I2P Address Book")%> <span class="newtab"><a href="/susidns/index" target="_blank" title="<%=intl._t("Open in new tab")%>"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/newtab.png" /></a></span></h1>
+<h1><%=intl._t("I2P Address Book")%> <span class="newtab"><a href="<%=isrc%>" target="_blank" title="<%=intl._t("Open in new tab")%>"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/newtab.png" /></a></span></h1>
 <div class="main" id="dns">
-<iframe src="/susidns/index" width="100%" height="100%" frameborder="0" border="0" name="susidnsframe" id="susidnsframe" allowtransparency="true">
+<iframe src="<%=isrc%>" width="100%" height="100%" frameborder="0" border="0" name="susidnsframe" id="susidnsframe" allowtransparency="true">
 <%=intl._t("Your browser does not support iFrames.")%>
-&nbsp;<a href="/susidns/index"><%=intl._t("Click here to continue.")%></a>
+&nbsp;<a href="<%=isrc%>"><%=intl._t("Click here to continue.")%></a>
 </iframe>
 </div></body></html>
 <%

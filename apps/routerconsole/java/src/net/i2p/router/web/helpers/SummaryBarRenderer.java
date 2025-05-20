@@ -371,8 +371,14 @@ class SummaryBarRenderer {
                 .append(_t("Manage your I2P hosts file here (I2P domain name resolution)"))
                 .append("\">")
                 .append(nbsp(tx));
-            addBubble(rbuf, PortMapper.SVC_SUSIDNS);
             rbuf.append("</a>\n");
+            StringBuilder bbuf = new StringBuilder(128);
+            addBubble(bbuf, PortMapper.SVC_SUSIDNS);
+            if (bbuf.length() > 0) {
+                rbuf.append("<a href=\"/dns?book=router&amp;filter=latest\" target=\"_top\">");
+                rbuf.append(bbuf);
+                rbuf.append("</a>\n");
+            }
             svcs.put(tx, rbuf.toString());
         }
 
