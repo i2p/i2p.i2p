@@ -25,7 +25,7 @@ Content-Security-Policy: default-src 'none'; style-src 'self' 'unsafe-inline' ht
 <p>
 _("The website was not found in your router's addressbook.")
 _("Check the link or find a Base 32 or Base 64 address.")
-_("If you have the Base 64 address, {0}add it to your addressbook{1}.", "<a href=\"http://127.0.0.1:7657/susidns/addressbook?book=router\">", "</a>")
+_("If you have the Base 64 address, {0}add it to your addressbook{1}.", "<a href=\"http://127.0.0.1:7657/dns?book=router\">", "</a>")
 _("Otherwise, find a Base 32 or address helper link, or use a jump service link below.")
 </p>
 <p>

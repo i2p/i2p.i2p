@@ -762,7 +762,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                 }
                 reader.close();
                 if (!hasSusiDNS) {
-                    DataHelper.replace(out, "<a href=\"http://127.0.0.1:7657/susidns/index\">_(\"Addressbook\")</a>", "");
+                    DataHelper.replace(out, "<a href=\"http://127.0.0.1:7657/dns\">_(\"Addressbook\")</a>", "");
                 }
                 if (!hasI2PTunnel) {
                     // there are also a couple in auth-header.ht that aren't worth stripping, for auth only

@@ -306,7 +306,7 @@ public abstract class LocalHTTPServer {
                                .append(conURL).append("config\">").append(_t("Configuration")).append("</a> <a href=\"")
                                .append(conURL).append("help.jsp\">").append(_t("Help")).append("</a>");
                             if (pm.isRegistered(PortMapper.SVC_SUSIDNS)) {
-                                buf.append(" <a href=\"").append(conURL).append("susidns/index\">")
+                                buf.append(" <a href=\"").append(conURL).append("dns\">")
                                    .append(_t("Address book")).append("</a>\n");
                             }
                             buf.append("</div>" +
@@ -377,7 +377,7 @@ public abstract class LocalHTTPServer {
                   "<a href=\"" + conURL + "\" title=\"" + _t("Router Console") + "\"><img src=\"http://proxy.i2p/themes/console/images/i2plogo.png\" alt=\"I2P Router Console\" border=\"0\"></a><hr>\n" +
                   "<a href=\"" + conURL + "config\">" + _t("Configuration") + "</a> <a href=\"" + conURL + "help.jsp\">" + _t("Help") + "</a>").getBytes("UTF-8"));
         if (pm.isRegistered(PortMapper.SVC_SUSIDNS))
-            out.write((" <a href=\"" + conURL + "susidns/index\">" + _t("Address Book") + "</a>\n").getBytes("UTF-8"));
+            out.write((" <a href=\"" + conURL + "dns\">" + _t("Address Book") + "</a>\n").getBytes("UTF-8"));
         out.write(("</div>" +
                   "<div class=warning id=warning>\n" +
                   "<h3>" +
@@ -411,7 +411,7 @@ public abstract class LocalHTTPServer {
                   "<a href=\"" + conURL + "\" title=\"" + _t("Router Console") + "\"><img src=\"http://proxy.i2p/themes/console/images/i2plogo.png\" alt=\"I2P Router Console\" border=\"0\"></a><hr>\n" +
                   "<a href=\"" + conURL + "config\">" + _t("Configuration") + "</a> <a href=\"" + conURL + "help.jsp\">" + _t("Help") + "</a>").getBytes("UTF-8"));
         if (pm.isRegistered(PortMapper.SVC_SUSIDNS))
-            out.write((" <a href=\"" + conURL + "susidns/index\">" + _t("Address Book") + "</a>\n").getBytes("UTF-8"));
+            out.write((" <a href=\"" + conURL + "dns\">" + _t("Address Book") + "</a>\n").getBytes("UTF-8"));
         out.write(("</div>" +
                   "<div class=warning id=warning>\n" +
                   "<h3>" +
