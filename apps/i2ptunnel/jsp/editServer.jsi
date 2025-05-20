@@ -220,7 +220,7 @@
                     }
                     if (hasSusiDNS) {
 %>
-              <a class="control" title="<%=intl._t("Add to Private addressbook")%>" href="/susidns/addressbook.jsp?book=private&amp;hostname=<%=name%>&amp;destination=<%=b64%>#add"><%=intl._t("Add to local addressbook")%></a>
+              <a class="control" title="<%=intl._t("Add to Private addressbook")%>" href="/dns?book=private&amp;hostname=<%=name%>&amp;destination=<%=b64%>#add"><%=intl._t("Add to local addressbook")%></a>
 <%
                     }
 %>
@@ -746,7 +746,7 @@
                     }
                     if (hasSusiDNS) {
 %>
-              <a class="control" title="<%=intl._t("Add to Private addressbook")%>" href="/susidns/addressbook.jsp?book=private&amp;hostname=<%=name%>&amp;destination=<%=ab64%>#add"><%=intl._t("Add to local addressbook")%></a>
+              <a class="control" title="<%=intl._t("Add to Private addressbook")%>" href="/dns?book=private&amp;hostname=<%=name%>&amp;destination=<%=ab64%>#add"><%=intl._t("Add to local addressbook")%></a>
 <%
                     }
 %>
