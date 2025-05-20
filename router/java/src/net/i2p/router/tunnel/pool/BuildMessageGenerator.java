@@ -6,6 +6,8 @@ import java.util.Properties;
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.ChaCha20;
 import net.i2p.crypto.EncType;
+import net.i2p.crypto.KeyFactory;
+import net.i2p.crypto.KeyPair;
 import net.i2p.data.Hash;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
@@ -72,7 +74,12 @@ abstract class BuildMessageGenerator {
             byte encrypted[] = new byte[len];
             if (cfg.isInbound() && hop + 1 == cfg.getLength()) { // IBEP
                 System.arraycopy(cfg.getPeer(hop).getData(), 0, encrypted, 0, BuildRequestRecord.PEER_SIZE);
-                ctx.random().nextBytes(encrypted, BuildRequestRecord.PEER_SIZE, len - BuildRequestRecord.PEER_SIZE);
+                KeyFactory kf = ctx.commSystem().getXDHFactory();
+                KeyPair kp = kf.getKeys();
+                PublicKey pub = kp.getPublic();
+                int plen = pub.length();
+                System.arraycopy(pub.getData(), 0, encrypted, BuildRequestRecord.PEER_SIZE, plen);
+                ctx.random().nextBytes(encrypted, BuildRequestRecord.PEER_SIZE + plen, len - (BuildRequestRecord.PEER_SIZE + plen));
                 byte[] h = new byte[Hash.HASH_LENGTH];
                 ctx.sha().calculateHash(encrypted, 0, len, h, 0);
                 cfg.setBlankHash(new Hash(h));
