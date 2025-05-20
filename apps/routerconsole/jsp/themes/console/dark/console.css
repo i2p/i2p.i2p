@@ -3952,6 +3952,12 @@ p#gatherstats {
     padding: 15px 15px 15px 50px;
 }
 
+p#statusok {
+    background: #1F1A24 url(images/confirmed.png) 12px center no-repeat;
+    border: 1px solid #292929;
+    padding: 15px 15px 15px 50px;
+}
+
 p#gatherstats {
     margin-bottom: 28px !important;
 }
