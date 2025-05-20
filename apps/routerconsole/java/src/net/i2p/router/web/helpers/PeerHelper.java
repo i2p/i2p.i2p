@@ -17,6 +17,7 @@ import java.util.TreeSet;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.router.RouterAddress;
+import net.i2p.router.CommSystemFacade;
 import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.TransportManager;
 import net.i2p.router.transport.TransportUtil;
