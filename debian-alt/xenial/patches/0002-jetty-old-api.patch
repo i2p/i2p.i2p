@@ -35,7 +35,7 @@ diff --git a/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.
 index 31261e3de..374df3bd2 100644
 --- a/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.java
 +++ b/apps/routerconsole/java/src/net/i2p/router/web/RouterConsoleRunner.java
-@@ -1100,8 +1100,8 @@ public class RouterConsoleRunner implements RouterApp {
+@@ -1109,8 +1109,8 @@ public class RouterConsoleRunner implements RouterApp {
          }
  
          @Override
@@ -45,4 +45,4 @@ index 31261e3de..374df3bd2 100644
 +            UserIdentity rv = super.login(username, credentials);
              if (rv == null)
                  //_log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, webapp: " + _webapp + ", user: " + username);
-                 _log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, user: " + username);
+                 _log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, user: " + username + " IP: " + request.getRemoteAddr());

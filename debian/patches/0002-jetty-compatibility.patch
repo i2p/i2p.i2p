@@ -30,28 +30,28 @@
  import org.eclipse.jetty.security.ConstraintMapping;
  import org.eclipse.jetty.security.ConstraintSecurityHandler;
 +import org.eclipse.jetty.security.UserStore;
+ import org.eclipse.jetty.security.authentication.BasicAuthenticator;
  import org.eclipse.jetty.security.authentication.DigestAuthenticator;
- import org.eclipse.jetty.server.AbstractConnector;
- import org.eclipse.jetty.server.ConnectionFactory;
-@@ -987,6 +989,8 @@
-             } else {
-                 HashLoginService realm = new CustomHashLoginService(JETTY_REALM, context.getContextPath(),
+ import org.eclipse.jetty.security.authentication.LoginAuthenticator;
+@@ -994,6 +998,8 @@
+                 String rlm = isBasic ? PROMETHEUS_REALM : JETTY_REALM;
+                 HashLoginService realm = new CustomHashLoginService(rlm, context.getContextPath(),
                                                                      ctx.logManager().getLog(RouterConsoleRunner.class));
 +                UserStore userStore = new UserStore();
 +                realm.setUserStore(userStore);
                  sec.setLoginService(realm);
-                 sec.setAuthenticator(authenticator);
-                 String[] role = new String[] {JETTY_ROLE};
-@@ -994,7 +998,7 @@
-                     String user = e.getKey();
+                 LoginAuthenticator auth = isBasic ? basicAuthenticator : authenticator;
+                 sec.setAuthenticator(auth);
+@@ -1003,7 +1007,7 @@
                      String pw = e.getValue();
-                     Credential cred = Credential.getCredential(MD5_CREDENTIAL_TYPE + pw);
+                     // for basic, the password will be the md5 hash itself
+                     Credential cred = Credential.getCredential(isBasic ? pw : MD5_CREDENTIAL_TYPE + pw);
 -                    realm.putUser(user, cred, role);
 +                    userStore.addUser(user, cred, role);
                      Constraint constraint = new Constraint(user, JETTY_ROLE);
                      constraint.setAuthenticate(true);
                      ConstraintMapping cm = new ConstraintMapping();
-@@ -1014,7 +1018,7 @@
+@@ -1023,7 +1027,7 @@
                          try {
                              // each char truncated to 8 bytes
                              String user2 = new String(b2, "ISO-8859-1");
@@ -60,7 +60,7 @@
                              constraint = new Constraint(user2, JETTY_ROLE);
                              constraint.setAuthenticate(true);
                              cm = new ConstraintMapping();
-@@ -1025,7 +1029,7 @@
+@@ -1034,7 +1038,7 @@
                              // each UTF-8 byte as a char
                              // this is what chrome does
                              String user3 = new String(b1, "ISO-8859-1");
