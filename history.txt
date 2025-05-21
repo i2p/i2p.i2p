@@ -1,3 +1,6 @@
+2025-05-19 zzz
+ * Log warning on upcoming Java 17 requirement
+
 2025-05-14 zzz
  * i2psnark: Tracker list updates
 
