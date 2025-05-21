@@ -194,7 +194,7 @@ class ProfileOrganizerRenderer {
             } else if (fails > 0) {
                 Rate accepted = prof.getTunnelCreateResponseTime().getRate(60*60*1000);
                 long total = fails + accepted.computeAverages(ra, false).getTotalEventCount();
-                if (total / fails <= 10)   // hide if < 10%
+                if (total / fails <= 5)   // hide if < 20%
                     buf.append(' ').append(fails).append('/').append(total).append(' ').append(_t("Test Fails"));
             }
 
@@ -436,6 +436,8 @@ class ProfileOrganizerRenderer {
             double avg = 0.5 + 100 * ra.getAverage();
             if (avg < 1.0d)
                 return NA;
+            if (avg > 100d)
+                avg = 100d;
             return ((int) avg) + "%";
     }
 
