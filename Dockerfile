@@ -1,4 +1,4 @@
-FROM docker.io/eclipse-temurin:17-alpine as builder
+FROM alpine:latest as builder
 
 ENV APP_HOME="/i2p"
 ARG ANT_VERSION="1.10.15"
@@ -6,14 +6,15 @@ ARG ANT_VERSION="1.10.15"
 WORKDIR /tmp/build
 COPY . .
 
-RUN apk add --no-cache gettext tar bzip2 curl \
+RUN apk add --no-cache gettext tar bzip2 curl openjdk21 \
     && echo "build.built-by=Docker" >> override.properties \
     && curl https://dlcdn.apache.org//ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.bz2 | tar -jxf - -C /opt \
     && /opt/apache-ant-${ANT_VERSION}/bin/ant preppkg-linux-only \
     && rm -rf pkg-temp/osid pkg-temp/lib/wrapper pkg-temp/lib/wrapper.*
 
-FROM docker.io/eclipse-temurin:17-jre-alpine
+FROM alpine:latest
 ENV APP_HOME="/i2p"
+RUN apk add openjdk21
 
 WORKDIR ${APP_HOME}
 COPY --from=builder /tmp/build/pkg-temp .
