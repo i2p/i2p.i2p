@@ -21,6 +21,9 @@
         <pathelement location="${jettylib}/org.mortbay.jetty.jar" />
         <pathelement location="${jettylib}/javax.servlet.jar" />
         <pathelement location="${jettylib}/jetty-servlet.jar" />
+        <pathelement location="${jettylib}/jetty-http.jar" />
+        <pathelement location="${jettylib}/jetty-io.jar" />
+        <pathelement location="${jettylib}/jetty-webapp.jar" />
         <pathelement location="${wrapperlib}/wrapper.jar" />
         <!-- following jar only present for debian builds -->
         <pathelement location="../../core/java/build/json-simple.jar" />

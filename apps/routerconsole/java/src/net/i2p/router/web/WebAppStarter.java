@@ -17,11 +17,12 @@ import net.i2p.util.FileUtil;
 import net.i2p.util.PortMapper;
 import net.i2p.util.SecureDirectory;
 
+import org.eclipse.jetty.ee.WebAppClassLoading;
+import org.eclipse.jetty.ee8.webapp.WebAppContext;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
-import org.eclipse.jetty.webapp.WebAppContext;
 
 
 /**
@@ -57,7 +58,7 @@ public class WebAppStarter {
     // javax-annotations-api.jar
     private static final String CLASS_ANNOT4 = "javax.annotation.security.RunAs";
 
-    private static final String CLASS_CONFIG = "org.eclipse.jetty.webapp.JettyWebXmlConfiguration";
+    private static final String CLASS_CONFIG = "org.eclipse.jetty.ee8.webapp.JettyWebXmlConfiguration";
 
     private static final boolean HAS_ANNOTATION_CLASSES;
     private static final Set<String> BUILTINS = new HashSet<String>(8);
@@ -202,12 +203,15 @@ public class WebAppStarter {
         // Without the default configuration, the web.xml isn't read, and the webapp
         // won't respond to any requests, even though it appears to be running.
         // See WebAppContext.loadConfigurations() in source
-        if (classNames.length == 0)
-            classNames = wac.getDefaultConfigurationClasses();
+        if (classNames.length == 0) {
+            //classNames = wac.getDefaultConfigurationClasses();
+            // These are the defaults as documented in WebAppContext
+            classNames = new String[] { "org.eclipse.jetty.ee8.webapp.WebXMLConfiguration", "org.eclipse.jetty.ee8.webapp.JettyWebXMLConfiguration" };
+        }
         List<String> newClassNames = new ArrayList<String>(Arrays.asList(classNames));
         for (String name : newClassNames) {
              // fix for Jetty 9.4 ticket #2385
-             wac.prependServerClass("-" + name);
+             WebAppClassLoading.addHiddenClasses(wac, name);
         }
         // https://www.eclipse.org/jetty/documentation/current/using-annotations.html
         // https://www.eclipse.org/jetty/documentation/9.4.x/using-annotations-embedded.html
@@ -327,14 +331,14 @@ public class WebAppStarter {
      *  @since 0.9.41
      */
     private static ContextHandler getWebApp(ContextHandlerCollection server, String appName) {
-        Handler handlers[] = server.getHandlers();
-        if (handlers == null)
+        List<Handler> handlers = server.getHandlers();
+        if (handlers == null || handlers.isEmpty())
             return null;
         String path = '/'+ appName;
-        for (int i = 0; i < handlers.length; i++) {
-            if (!(handlers[i] instanceof ContextHandler))
+        for (Handler h : handlers) {
+            if (!(h instanceof ContextHandler))
                 continue;
-            ContextHandler ch = (ContextHandler) handlers[i];
+            ContextHandler ch = (ContextHandler) h;
             if (path.equals(ch.getContextPath()))
                 return ch;
         }
@@ -360,9 +364,7 @@ public class WebAppStarter {
      *  @since 0.9.41
      */
     private static ContextHandlerCollection getConsoleServer(Server s) {
-        Handler h = s.getChildHandlerByClass(ContextHandlerCollection.class);
-        if (h == null)
-            return null;
-        return (ContextHandlerCollection) h;
+        ContextHandlerCollection h = s.getDescendant(ContextHandlerCollection.class);
+        return h;
     }
 }

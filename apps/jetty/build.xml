@@ -16,10 +16,10 @@
     <!-- Note: Change version numbers in top-level build.xml if you update to a new Tomcat or Jetty! -->
 
     <property name="jetty.branch" value="stable-9" />
-    <property name="jetty.base" value="jetty-distribution-${jetty.ver}" />
-    <property name="jetty.sha1" value="e9f176730aea36a69c24eeba77dd0880a30492dc" />
+    <property name="jetty.base" value="jetty-home-${jetty.ver}" />
+    <property name="jetty.sha1" value="6c8b834d313bcac2e6a2e42ebaf34a249887162a" />
     <property name="jetty.filename" value="${jetty.base}.zip" />
-    <property name="jetty.url" value="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/${jetty.ver}/${jetty.filename}" />
+    <property name="jetty.url" value="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-home/${jetty.ver}/${jetty.filename}" />
     <property name="verified.filename" value="verified.txt" />
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.8" />
@@ -154,44 +154,44 @@
               start.jar: Needed for clients.config startup of eepsites
               jetty-util-xxx.jar: LifeCycle (base class for stuff), URIUtil (used in i2psnark)
               jetty-deploy, -http, -io, -security, -servlet, -webapp: All split out from main server jar in Jetty 7
-              jetty-continuation-xxx.jar: Needed? Useful?
+              jetty-continuation-xxx.jar: Old Jetty 9, now a dummy
               jetty-servlets-xxx.jar: Needed for CGI for eepsite
               jetty-sslengine-xxx.jar: Old Jetty 6, now a dummy
               jetty-java5-threadpool-xxx.jar: Old Jetty 6, now a dummy
               jetty-rewrite-handler: Not used by I2P, but only 20KB and could be useful for eepsites
-              jetty-management: Not used by I2P, but only 34KB and could be useful for eepsites, and we bundled it with Jetty 5
-              javax.servlet.jsp-2.2.0.v201112011158.jar: Required API
-              servlet-api-3.0.jar: Required API
+              jetty-management: No longer included
               All of these are available in the Ubuntu packages libjetty-java and libjetty-extra-java
         -->
         <copy preservelastmodified="true" file="${jetty.base}/start.jar" tofile="jettylib/jetty-start.jar" />
         <copy file="${jetty.base}/lib/jetty-server-${jetty.ver}.jar" tofile="jettylib/org.mortbay.jetty.jar" />
-        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-continuation-${jetty.ver}.jar" tofile="jettylib/jetty-continuation.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-deploy-${jetty.ver}.jar" tofile="jettylib/jetty-deploy.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-http-${jetty.ver}.jar" tofile="jettylib/jetty-http.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-io-${jetty.ver}.jar" tofile="jettylib/jetty-io.jar" />
-      <!-- comment out above line and uncomment below and the patches section further down if we need patches -->
-<!--
-        <jar destfile="jettylib/jetty-io.jar"  manifest="${jetty.base}/lib/jetty-io-${jetty.ver}.jar" filesetmanifest="mergewithoutmain" >
-            <zipfileset excludes="**/SslConnection*.class" src="${jetty.base}/lib/jetty-io-${jetty.ver}.jar" />
-            <zipfileset src="build/jetty-io-patch.jar" />
-        </jar>
--->
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-jmx-${jetty.ver}.jar" tofile="jettylib/org.mortbay.jmx.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-rewrite-${jetty.ver}.jar" tofile="jettylib/jetty-rewrite-handler.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-security-${jetty.ver}.jar" tofile="jettylib/jetty-security.jar" />
-        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-servlet-${jetty.ver}.jar" tofile="jettylib/jetty-servlet.jar" />
-        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-servlets-${jetty.ver}.jar" tofile="jettylib/jetty-servlets.jar" />
-<!--
-        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" tofile="jettylib/jetty-util.jar" />
--->
-      <!-- comment out above line and uncomment below and the patches section further down if we need patches -->
+
+        <!--
+              TODO move out of here
+              Debian libjetty12-java does NOT include the ee8 jars,
+              so we keep them all together here, for ease in
+              handling both the Debian and non-Debian build cases.
+         -->
+        <jar destfile="jettylib/jetty-webapp.jar"  manifest="${jetty.base}/lib/jetty-ee8-webapp-${jetty.ver}.jar" filesetmanifest="mergewithoutmain" >
+            <zipfileset src="${jetty.base}/lib/jetty-ee8-nested-${jetty.ver}.jar" />
+            <zipfileset src="${jetty.base}/lib/jetty-ee8-security-${jetty.ver}.jar" />
+            <zipfileset src="${jetty.base}/lib/jetty-ee8-webapp-${jetty.ver}.jar" />
+        </jar>
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-ee8-servlet-${jetty.ver}.jar" tofile="jettylib/jetty-servlet.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-ee8-servlets-${jetty.ver}.jar" tofile="jettylib/jetty-servlets.jar" />
+
         <jar destfile="jettylib/jetty-util.jar"  manifest="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" filesetmanifest="mergewithoutmain" >
-            <zipfileset excludes="**/JavaVersion.class" src="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" />
-            <zipfileset src="build/jetty-util-patch.jar" />
+            <zipfileset src="${jetty.base}/lib/jetty-ee-${jetty.ver}.jar" />
+            <zipfileset src="${jetty.base}/lib/jetty-session-${jetty.ver}.jar" />
+            <zipfileset src="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" />
+            <zipfileset src="${jetty.base}/lib/logging/slf4j-api-2.0.17.jar" />
         </jar>
 
-        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-webapp-${jetty.ver}.jar" tofile="jettylib/jetty-webapp.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-xml-${jetty.ver}.jar" tofile="jettylib/jetty-xml.jar" />
         <jar destfile="jettylib/jetty-java5-threadpool.jar" >
             <manifest>
@@ -199,6 +199,11 @@
             </manifest>
         </jar>
         <jar destfile="jettylib/jetty-sslengine.jar" >
+            <manifest>
+                <attribute name="Note" value="Intentionally empty" />
+            </manifest>
+        </jar>
+        <jar destfile="jettylib/jetty-continuation.jar" >
             <manifest>
                 <attribute name="Note" value="Intentionally empty" />
             </manifest>
@@ -228,7 +233,7 @@
             <!-- In Debian packages they are found in /usr/share/java/tomcat8-servlet-api.jar in the libtomcat8-java package -->
             <!-- javax/servlet/jsp/resources are dups of those in apache-jsp jar -->
           <!--
-            <zipfileset includes="javax/**/*" src="${jetty.base}/lib/apache-jsp/org.mortbay.jasper.apache-jsp-8.0.33.jar"/>
+            <zipfileset includes="javax/**/*" src="${jetty.base}/lib/ee8-apache-jsp/org.mortbay.jasper.apache-jsp-9.0.96.jar"/>
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties javax/servlet/jsp/resources/*" src="${jetty.base}/lib/jetty-schemas-3.1.jar" />
            -->
 
@@ -248,7 +253,7 @@
     <!-- ONLY if with-libtomcat8-java but NOT with-libjetty9-java (wheezy/jessie configuration) -->
     <!-- If neither with-libtomcat8-java nor with-libjetty9-java, it's merged into jasper-runtime.jar in the copyTomcatLib2 target below -->
     <target name="copyJettylib3" depends="extractJettylib, copyTomcatLib1" if="${with-libtomcat-without-libjetty}" >
-            <copy preservelastmodified="true" file="${jetty.base}/lib/apache-jsp/org.eclipse.jetty.apache-jsp-${jetty.ver}.jar" tofile="jettylib/jetty-apache-jsp.jar" />
+            <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-ee8-apache-jsp-${jetty.ver}.jar" tofile="jettylib/jetty-apache-jsp.jar" />
     </target>
 
     <!-- Tomcat.
@@ -330,7 +335,7 @@
 
             <!-- For both Apache in Jetty package and Apache package versions -->
             <!-- required Jetty initializer (see RouterConsoleRunner) -->
-            <zipfileset src="${jetty.base}/lib/apache-jsp/org.eclipse.jetty.apache-jsp-${jetty.ver}.jar"/>
+            <zipfileset src="${jetty.base}/lib/jetty-ee8-apache-jsp-${jetty.ver}.jar"/>
 
             <!-- Apache in Jetty package version -->
             <!-- Also includes javax.servlet.jsp.*, this is copied into javax.servlet.jar above -->
@@ -485,11 +490,11 @@
     </target>    
 
     <!-- empty, uncomment below if needed -->
-<!--
     <target name="buildPatches" unless="${with-libjetty9-java}" />
--->
 
+<!--
     <target name="buildPatches" depends="jarPatches" unless="${with-libjetty9-java}" />
+-->
 
     <target name="compilePatches" unless="${with-libjetty9-java}" >
         <mkdir dir="./build" />

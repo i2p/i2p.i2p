@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.eclipse.jetty.util.log.Log;
-
 import net.i2p.I2PAppContext;
 import net.i2p.app.MenuCallback;
 import net.i2p.app.MenuHandle;
@@ -44,11 +42,8 @@ public class RunStandalone {
         _context = new I2PAppContext(p);
         // Do this after we have a context
         // To take effect, must be set before any Jetty classes are loaded
-        try {
-            Log.setLog(new I2PLogger(_context));
-        } catch (Throwable t) {
-            System.err.println("INFO: I2P Jetty logging class not found, logging to stdout");
-        }
+        // https://slf4j.org/faq.html
+        System.setProperty("slf4j.provider", "net.i2p.jetty.I2PLoggingServiceProvider");
         File base = _context.getBaseDir();
         File xml = new File(base, "jetty-i2psnark.xml");
         _jettyStart = new JettyStart(_context, null, new String[] { xml.getAbsolutePath() } );

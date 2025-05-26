@@ -14,7 +14,7 @@
           and checksum in apps/jetty/build.xml
           and versions in gradle.properties and apps/jetty/build.gradle
      -->
-    <property name="jetty.ver" value="9.3.30.v20211001" />
+    <property name="jetty.ver" value="12.0.21" />
     <property name="tomcat.ver" value="9.0.88" />
 
     <!-- You probably don't want to change anything from here down -->
@@ -450,6 +450,9 @@
         <echo message="Ant: ${ant.version}" />
         <echo message="JDK: ${java.vendor} ${java.version} (${java.runtime.name} ${java.runtime.version})" />
         <echo message="Building version ${full.version} (revision ${workspace.version})" />
+        <property name="javac.version" value="17" />
+        <property name="javac.release" value="17" />
+        <echo message="Building for minimum Java version ${javac.version} release ${javac.release}" />
     </target>
 
     <target name="setBuildTimestamp" unless="${build.reproducible}" >
@@ -874,7 +877,7 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
         <!-- set if unset -->
-        <property name="javac.version" value="1.8" />
+        <property name="javac.version" value="17" />
         <javadoc access="package"
             source="${javac.version}"
             destdir="./build/javadoc"
@@ -2530,8 +2533,8 @@
         </ant>
         <ant dir="apps/jetty/">
             <!-- not used in Android -->
-            <property name="javac.version" value="1.8" />
-            <property name="javac.release" value="8" />
+            <property name="javac.version" value="17" />
+            <property name="javac.release" value="17" />
             <target name="servletJar" />
             <target name="servletJavadocJar" />
             <target name="servletSourcesJar" />

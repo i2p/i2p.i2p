@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -35,12 +36,13 @@ import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.ee8.nested.ContextHandler;
+import org.eclipse.jetty.ee8.servlet.DefaultServlet;
 import org.eclipse.jetty.util.StringUtil;
 import org.eclipse.jetty.util.URIUtil;
+import org.eclipse.jetty.util.resource.CombinedResource;
 import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.util.resource.ResourceCollection;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 
 import net.i2p.data.DataHelper;
 
@@ -76,7 +78,7 @@ public class I2PDefaultServlet extends DefaultServlet
         String rb=getInitParameter("resourceBase");
         if (rb!=null)
         {
-            try{_resourceBase=_contextHandler.newResource(rb);}
+            try{_resourceBase = ResourceFactory.root().newResource(rb);}
             catch (Exception e)
             {
                 throw new UnavailableException(e.toString());
@@ -88,7 +90,7 @@ public class I2PDefaultServlet extends DefaultServlet
         {
             if(css!=null)
             {
-                _stylesheet = Resource.newResource(css);
+                _stylesheet = ResourceFactory.root().newResource(css);
                 if(!_stylesheet.exists())
                 {
                     _stylesheet = null;
@@ -96,7 +98,7 @@ public class I2PDefaultServlet extends DefaultServlet
             }
             if(_stylesheet == null)
             {
-                _stylesheet = Resource.newResource(this.getClass().getResource("/jetty-dir.css"));
+                _stylesheet = ResourceFactory.root().newResource(this.getClass().getResource("/jetty-dir.css"));
             }
         }
         catch(Exception e)
@@ -135,7 +137,6 @@ public class I2PDefaultServlet extends DefaultServlet
      *
      * Get the resource list as a HTML directory listing.
      */
-    @Override
     protected void sendDirectory(HttpServletRequest request,
             HttpServletResponse response,
             Resource resource,
@@ -149,18 +150,18 @@ public class I2PDefaultServlet extends DefaultServlet
         }
 
         byte[] data=null;
-        String base = URIUtil.addPaths(request.getRequestURI(),URIUtil.SLASH);
+        String base = URIUtil.addPaths(request.getRequestURI(), "/");
 
         //If the DefaultServlet has a resource base set, use it
         if (_resourceBase != null)
         {
             // handle ResourceCollection
-            if (_resourceBase instanceof ResourceCollection)
-                resource=_resourceBase.addPath(pathInContext);
+            if (_resourceBase instanceof CombinedResource)
+                resource=_resourceBase.resolve(pathInContext);
         }
         //Otherwise, try using the resource base of its enclosing context handler
-        else if (_contextHandler.getBaseResource() instanceof ResourceCollection)
-            resource=_contextHandler.getBaseResource().addPath(pathInContext);
+        else if (_contextHandler.getBaseResource() instanceof CombinedResource)
+            resource=_contextHandler.getBaseResource().resolve(pathInContext);
 
         String dir = getListHTML(resource, base, pathInContext.length()>1);
         if (dir==null)
@@ -192,7 +193,7 @@ public class I2PDefaultServlet extends DefaultServlet
         if (base==null || !res.isDirectory())
             return null;
         
-        String[] ls = res.list();
+        List<Resource> ls = res.list();
         if (ls==null)
             return null;
         DataHelper.sort(ls, new FileComparator(res));
@@ -220,11 +221,11 @@ public class I2PDefaultServlet extends DefaultServlet
         DateFormat dfmt = new SimpleDateFormat(FORMAT, Locale.UK);
         TimeZone utc = TimeZone.getTimeZone("GMT");
         dfmt.setTimeZone(utc);
-        for (int i=0 ; i< ls.length ; i++)
+        for (Resource item : ls)
         {
-            Resource item;
+/* FIXME still needed?
             try {
-                item = res.addPath(ls[i]);
+                item = res.resolve(r);
             } catch (IOException ioe) { 
                 System.out.println("Skipping file in directory listing: " + ioe.getMessage());
                 continue;
@@ -243,18 +244,19 @@ public class I2PDefaultServlet extends DefaultServlet
                 System.out.println("Skipping file in directory listing: " + re.getMessage());
                 continue;
             }
+*/
             
             buf.append("\n<TR><TD><A HREF=\"");
-            String path=URIUtil.addPaths(encodedBase,URIUtil.encodePath(ls[i]));
+            String path=URIUtil.addPaths(encodedBase,URIUtil.encodePath(item.toString()));
             
             buf.append(path);
             
             boolean isDir = item.isDirectory();
             if (isDir && !path.endsWith("/"))
-                buf.append(URIUtil.SLASH);
+                buf.append('/');
             
             buf.append("\">");
-            buf.append(deTag(ls[i]));
+            buf.append(deTag(item.toString()));
             buf.append("</A></TD><TD ALIGN=right>");
             if (!isDir) {
                 buf.append(item.length());
@@ -262,7 +264,7 @@ public class I2PDefaultServlet extends DefaultServlet
             }
             buf.append("</TD><TD>");
             if (!isDir) {
-                buf.append(dfmt.format(new Date(item.lastModified())));
+                buf.append(dfmt.format(new Date(item.lastModified().toEpochMilli())));
                 buf.append(" UTC");
             }
             buf.append("</TD></TR>");
@@ -278,7 +280,7 @@ public class I2PDefaultServlet extends DefaultServlet
      *
      *  @since 0.9.51
      */
-    private static class FileComparator implements Comparator<String> {
+    private static class FileComparator implements Comparator<Resource> {
         private final Comparator<Object> _coll;
         private final Resource _base;
 
@@ -287,10 +289,8 @@ public class I2PDefaultServlet extends DefaultServlet
             _coll = Collator.getInstance(Locale.US);
         }
 
-        public int compare(String a, String b) {
+        public int compare(Resource ra, Resource rb) {
             try {
-                Resource ra = _base.addPath(a);
-                Resource rb = _base.addPath(b);
                 boolean da = ra.isDirectory();
                 boolean db = rb.isDirectory();
                 if (da && !db) return -1;
@@ -298,7 +298,7 @@ public class I2PDefaultServlet extends DefaultServlet
             } catch (Exception e) {
                 // see above
             }
-            return _coll.compare(a, b);
+            return _coll.compare(ra.toString(), rb.toString());
         }
     }
 

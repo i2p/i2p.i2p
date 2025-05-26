@@ -13,8 +13,10 @@ import net.i2p.I2PAppContext;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.Response;
+import org.eclipse.jetty.util.Callback;
 
 /**
  * Block certain Host headers to prevent DNS rebinding attacks.
@@ -23,7 +25,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
  *
  * @since 0.9.34 adapted from router console
  */
-public class HostCheckHandler extends AbstractHandler {
+public class HostCheckHandler extends Handler.Abstract {
     private final I2PAppContext _context;
     private final Set<String> _listenHosts;
     private static final String PROP_ALLOWED_HOSTS = "i2psnark.allowedHosts";
@@ -63,14 +65,13 @@ public class HostCheckHandler extends AbstractHandler {
      *  redirect HTTP to HTTPS,
      *  pass everything else to the delegate.
      */
-    public void handle(String pathInContext,
-                       Request baseRequest,
-                       HttpServletRequest httpRequest,
-                       HttpServletResponse httpResponse)
-         throws IOException, ServletException
+    @Override
+    public boolean handle(Request request,
+                          Response response,
+                          Callback callback)
+         throws Exception
     {
-
-        String host = httpRequest.getHeader("Host");
+        String host = request.getHeaders().get("Host");
         if (!allowHost(host)) {
             Log log = _context.logManager().getLog(HostCheckHandler.class);
             host = getHost(host);
@@ -79,10 +80,11 @@ public class HostCheckHandler extends AbstractHandler {
                        PROP_ALLOWED_HOSTS + '=' + host +
                        "\" in the file " + RunStandalone.APP_CONFIG_FILE.getAbsolutePath() + " and restart.";
             log.logAlways(Log.WARN, s);
-            httpResponse.sendError(403, s);
-            baseRequest.setHandled(true);
-            return;
+            Response.writeError(request, response, callback, 403, s);
+            callback.succeeded();
+            return true;
         }
+        return false;
     }
 
     /**

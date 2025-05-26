@@ -62,6 +62,8 @@
                 <pathelement location="../../systray/java/build/systray.jar" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-util.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-http.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-io.jar" />
                 <pathelement location="../../desktopgui/dist/desktopgui.jar" />
             </classpath>
         </javac>
