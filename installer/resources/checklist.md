@@ -40,7 +40,7 @@
  in override.properties to ensure that Android will build correcly; fix any issues.
  Ensure that JAVA_HOME is unset.
 
-- Verify CI is passing on both Gitlab and Github
+- Verify CI is passing on both Gitea and Github
 
 
 ## A day or two before
