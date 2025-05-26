@@ -82,7 +82,7 @@
     -  in the base context which invalidates it in our context too.
     -->
   <context-param>
-    <param-name>org.eclipse.jetty.servlet.SessionCookie</param-name>
+    <param-name>org.eclipse.jetty.session.SessionCookie</param-name>
     <param-value>SUSIMAILJSESSIONID</param-value>
   </context-param>
 

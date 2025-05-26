@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.concurrent.LinkedBlockingQueue;
-import javax.servlet.ServletRequest;
+import java.util.function.Function;
 
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientApp;
@@ -46,34 +46,38 @@ import net.i2p.util.SecureDirectory;
 import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.SystemVersion;
 
+import org.eclipse.jetty.ee8.nested.ServletConstraint;
+import org.eclipse.jetty.ee8.security.ConstraintMapping;
+import org.eclipse.jetty.ee8.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.ee8.security.SecurityHandler;
+import org.eclipse.jetty.ee8.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.ee8.security.authentication.DigestAuthenticator;
+import org.eclipse.jetty.ee8.security.authentication.LoginAuthenticator;
+import org.eclipse.jetty.ee8.servlet.ServletHandler;
+import org.eclipse.jetty.ee8.servlet.ServletHolder;
+import org.eclipse.jetty.ee8.webapp.WebAppContext;
+import org.eclipse.jetty.security.Constraint;
 import org.eclipse.jetty.security.HashLoginService;
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
-import org.eclipse.jetty.security.authentication.BasicAuthenticator;
-import org.eclipse.jetty.security.authentication.DigestAuthenticator;
-import org.eclipse.jetty.security.authentication.LoginAuthenticator;
+import org.eclipse.jetty.security.UserIdentity;
+import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.CustomRequestLog;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.NCSARequestLog;
+import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.UserIdentity;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.Session;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.handler.HandlerWrapper;
-import org.eclipse.jetty.server.handler.RequestLogHandler;
-import org.eclipse.jetty.servlet.ServletHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.webapp.WebAppContext;
-import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.resource.ResourceFactory;
+import org.eclipse.jetty.util.resource.URLResourceFactory;
 import org.eclipse.jetty.util.security.Credential;
 import org.eclipse.jetty.util.security.Credential.MD5;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
@@ -91,15 +95,8 @@ public class RouterConsoleRunner implements RouterApp {
         
     static {
         // To take effect, must be set before any Jetty classes are loaded
-        try {
-            Log.setLog(new I2PLogger());
-        } catch (Throwable t) {
-            System.err.println("INFO: I2P Jetty logging class not found, logging to wrapper log");
-        }
-        // This way it doesn't try to load Slf4jLog first
-        // This causes an NPE in AbstractLifeCycle
-        // http://dev.eclipse.org/mhonarc/lists/jetty-users/msg02587.html
-        //System.setProperty("org.eclipse.jetty.util.log.class", "net.i2p.jetty.I2PLogger");
+        // https://slf4j.org/faq.html
+        System.setProperty("slf4j.provider", "net.i2p.jetty.I2PLoggingServiceProvider");
     }
 
     private final RouterContext _context;
@@ -501,12 +498,10 @@ public class RouterConsoleRunner implements RouterApp {
             _server = new Server(qtp);
         //}
 
-        HandlerCollection hColl = new HandlerCollection();
+        Handler.Sequence hColl = new Handler.Sequence();
         ContextHandlerCollection chColl = new ContextHandlerCollection();
         HostCheckHandler chCollWrapper = new HostCheckHandler(_context);
         chCollWrapper.setHandler(chColl);
-        // gone in Jetty 7
-        //_server.addHandler(hColl);
         _server.setHandler(hColl);
         hColl.addHandler(chCollWrapper);
         hColl.addHandler(new DefaultHandler());
@@ -517,9 +512,7 @@ public class RouterConsoleRunner implements RouterApp {
             if (!logFile.isAbsolute())
                 logFile = new File(_context.getLogDir(), "logs/" + log);
             try {
-                RequestLogHandler rhl = new RequestLogHandler();
-                rhl.setRequestLog(new NCSARequestLog(logFile.getAbsolutePath()));
-                hColl.addHandler(rhl);
+                _server.setRequestLog(new CustomRequestLog(logFile.toString(), CustomRequestLog.NCSA_FORMAT));
             } catch (Exception ioe) {
                 System.err.println("ERROR: Unable to create Jetty log: " + ioe);
             }
@@ -544,7 +537,7 @@ public class RouterConsoleRunner implements RouterApp {
             _webAppsDir += '/';
 
         Set<String> listenHosts = new HashSet<String>(8);
-        HandlerWrapper rootWebApp = null;
+        LocaleWebAppHandler rootWebApp = null;
         ServletHandler rootServletHandler = null;
         List<Connector> connectors = new ArrayList<Connector>(4);
         try {
@@ -644,7 +637,8 @@ public class RouterConsoleRunner implements RouterApp {
                 }
                 if (verifyKeyStore(keyStore, altNames)) {
                     // the keystore path and password
-                    SslContextFactory sslFactory = new SslContextFactory(keyStore.getAbsolutePath());
+                    SslContextFactory.Server sslFactory = new SslContextFactory.Server();
+                    sslFactory.setKeyStorePath(keyStore.getAbsolutePath());
                     sslFactory.setKeyStorePassword(_context.getProperty(PROP_KEYSTORE_PASSWORD, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD));
                     // the X.509 cert password (if not present, verifyKeyStore() returned false)
                     sslFactory.setKeyManagerPassword(_context.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
@@ -735,11 +729,11 @@ public class RouterConsoleRunner implements RouterApp {
                 // Got a clue from this ancient post for Tomcat 6:
                 // https://bz.apache.org/bugzilla/show_bug.cgi?id=39804
                 // see also apps/jetty/build.xml
-                Class.forName("org.eclipse.jetty.apache.jsp.JettyJasperInitializer");
+                Class.forName("org.eclipse.jetty.ee8.apache.jsp.JettyJasperInitializer");
             } catch (ClassNotFoundException cnfe) {
                 System.err.println("Warning: JettyJasperInitializer not found");
             }
-            WebAppContext wac = (WebAppContext)(rootWebApp.getHandler());
+            WebAppContext wac = rootWebApp.getWebAppContext();
             initialize(_context, wac);
             WebAppStarter.setWebAppConfiguration(wac, false);
             chColl.addHandler(rootWebApp);
@@ -772,7 +766,10 @@ public class RouterConsoleRunner implements RouterApp {
         // https://bugs.eclipse.org/bugs/show_bug.cgi?id=364936
         // WARN:oejw.WebAppContext:Failed startup of context o.e.j.w.WebAppContext{/,jar:file:/.../webapps/routerconsole.war!/},/.../webapps/routerconsole.war
         // java.lang.IllegalStateException: zip file closed
-        Resource.setDefaultUseCaches(false);
+        // FIXME
+        //URLResourceFactory urlrf = new URLResourceFactory();
+        //urlrf.setUseCaches(false);
+        //ResourceFactory.registerResourceFactory("jar", urlrf);
         try {
             // start does a mapContexts()
             _server.start();
@@ -994,6 +991,8 @@ public class RouterConsoleRunner implements RouterApp {
                 String rlm = isBasic ? PROMETHEUS_REALM : JETTY_REALM;
                 HashLoginService realm = new CustomHashLoginService(rlm, context.getContextPath(),
                                                                     ctx.logManager().getLog(RouterConsoleRunner.class));
+                UserStore userStore = new UserStore();
+                realm.setUserStore(userStore);
                 sec.setLoginService(realm);
                 LoginAuthenticator auth = isBasic ? basicAuthenticator : authenticator;
                 sec.setAuthenticator(auth);
@@ -1003,8 +1002,8 @@ public class RouterConsoleRunner implements RouterApp {
                     String pw = e.getValue();
                     // for basic, the password will be the md5 hash itself
                     Credential cred = Credential.getCredential(isBasic ? pw : MD5_CREDENTIAL_TYPE + pw);
-                    realm.putUser(user, cred, role);
-                    Constraint constraint = new Constraint(user, JETTY_ROLE);
+                    userStore.addUser(user, cred, role);
+                    ServletConstraint constraint = new ServletConstraint(user, JETTY_ROLE);
                     constraint.setAuthenticate(true);
                     ConstraintMapping cm = new ConstraintMapping();
                     cm.setConstraint(constraint);
@@ -1023,8 +1022,8 @@ public class RouterConsoleRunner implements RouterApp {
                         try {
                             // each char truncated to 8 bytes
                             String user2 = new String(b2, "ISO-8859-1");
-                            realm.putUser(user2, cred, role);
-                            constraint = new Constraint(user2, JETTY_ROLE);
+                            userStore.addUser(user2, cred, role);
+                            constraint = new ServletConstraint(user2, JETTY_ROLE);
                             constraint.setAuthenticate(true);
                             cm = new ConstraintMapping();
                             cm.setConstraint(constraint);
@@ -1034,8 +1033,8 @@ public class RouterConsoleRunner implements RouterApp {
                             // each UTF-8 byte as a char
                             // this is what chrome does
                             String user3 = new String(b1, "ISO-8859-1");
-                            realm.putUser(user3, cred, role);
-                            constraint = new Constraint(user3, JETTY_ROLE);
+                            userStore.addUser(user3, cred, role);
+                            constraint = new ServletConstraint(user2, JETTY_ROLE);
                             constraint.setAuthenticate(true);
                             cm = new ConstraintMapping();
                             cm.setConstraint(constraint);
@@ -1057,7 +1056,7 @@ public class RouterConsoleRunner implements RouterApp {
         // See also:
         // http://old.nabble.com/Disable-HTTP-TRACE-in-Jetty-5.x-td12412607.html
 
-        Constraint sc = new Constraint();
+        ServletConstraint sc = new ServletConstraint();
         sc.setName("No trace");
         ConstraintMapping cm = new ConstraintMapping();
         cm.setMethod("TRACE");
@@ -1065,8 +1064,6 @@ public class RouterConsoleRunner implements RouterApp {
         cm.setPathSpec("/");
         constraints.add(cm);
 
-        sc = new Constraint();
-        sc.setName("No options");
         cm = new ConstraintMapping();
         cm.setMethod("OPTIONS");
         cm.setConstraint(sc);
@@ -1109,11 +1106,11 @@ public class RouterConsoleRunner implements RouterApp {
         }
 
         @Override
-        public UserIdentity login(String username, Object credentials, ServletRequest request) {
-            UserIdentity rv = super.login(username, credentials, request);
+        public UserIdentity login(String username, Object credentials, Request request, Function<Boolean, Session> getOrCreateSession) {
+            UserIdentity rv = super.login(username, credentials, request, getOrCreateSession);
             if (rv == null)
                 //_log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, webapp: " + _webapp + ", user: " + username);
-                _log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, user: " + username + " IP: " + request.getRemoteAddr());
+                _log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, user: " + username + " IP: " + Request.getRemoteAddr(request));
             return rv;
         }
     }

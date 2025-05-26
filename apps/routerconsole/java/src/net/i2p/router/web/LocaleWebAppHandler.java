@@ -11,11 +11,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.i2p.I2PAppContext;
 
+import org.eclipse.jetty.ee8.nested.SessionHandler;
+import org.eclipse.jetty.ee8.servlet.ServletHandler;
+import org.eclipse.jetty.ee8.webapp.WebAppContext;
+import org.eclipse.jetty.http.pathmap.MatchedResource;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.HandlerWrapper;
-import org.eclipse.jetty.server.session.SessionHandler;
-import org.eclipse.jetty.servlet.ServletHandler;
-import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.server.Response;
+import org.eclipse.jetty.util.Callback;
 
 /**
  * Convert foo.jsp to foo_xx.jsp for language xx.
@@ -26,7 +29,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
  *
  * @author zzz
  */
-public class LocaleWebAppHandler extends HandlerWrapper
+public class LocaleWebAppHandler extends Handler.Wrapper
 {
     private final I2PAppContext _context;
     private final WebAppContext _wac;
@@ -43,24 +46,24 @@ public class LocaleWebAppHandler extends HandlerWrapper
         _wac.setServletHandler(servletHandler);
         setHandler(_wac);
     }
-    
+
     /**
      *  Handle foo.jsp by converting to foo_xx.jsp
      *  for language xx, where xx is the language for the default locale,
      *  or as specified in the routerconsole.lang property.
      *  Unless language == "en".
      */
-    public void handle(String pathInContext,
-                       Request baseRequest,
-                       HttpServletRequest httpRequest,
-                       HttpServletResponse httpResponse)
-         throws IOException, ServletException
+    public boolean handle(Request request,
+                       Response response,
+                       Callback callback)
+         throws Exception
     {
-
+        String pathInContext = Request.getPathInContext(request);
+        String newPath = pathInContext;
         // transparent rewriting
         if (pathInContext.equals("/") || pathInContext.equals("/index.html")) {
             // home page
-            pathInContext = "/index.jsp";
+            newPath = "/index.jsp";
         } else if (pathInContext.equals("/favicon.ico")) {
             // pass thru unchanged
         } else if (pathInContext.indexOf('/', 1) < 0 &&
@@ -68,11 +71,10 @@ public class LocaleWebAppHandler extends HandlerWrapper
                    (!pathInContext.endsWith(".log")) &&
                    (!pathInContext.endsWith(".txt"))) {
             // add .jsp to pages at top level
-            pathInContext += ".jsp";
+            newPath += ".jsp";
         }
 
         //System.err.println("Path: " + pathInContext);
-        String newPath = pathInContext;
         //if (pathInContext.endsWith(".jsp")) {
         // We only ended up doing this for help.jsp, so save some effort
         // unless we translate more pages like this
@@ -87,9 +89,9 @@ public class LocaleWebAppHandler extends HandlerWrapper
                     String testPath = pathInContext.substring(0, len - 4) + '_' + lang + ".jsp";
                     // Do we have a servlet for the new path that isn't the catchall *.jsp?
                     @SuppressWarnings("rawtypes")
-                    Map.Entry servlet = _wac.getServletHandler().getHolderEntry(testPath);
+                    MatchedResource<ServletHandler.MappedServlet> servlet = _wac.getServletHandler().getMatchedServlet(testPath);
                     if (servlet != null) {
-                        String servletPath = (String) servlet.getKey();
+                        String servletPath = servlet.getPathSpec().getDeclaration();
                         if (servletPath != null && !servletPath.startsWith("*")) {
                             // success!!
                             //System.err.println("Servlet is: " + servletPath);
@@ -99,14 +101,20 @@ public class LocaleWebAppHandler extends HandlerWrapper
                 }
             }
         } else if (pathInContext.startsWith("/js/")) {
+            // https://stackoverflow.com/questions/78878330/how-to-set-encoding-for-httpservletrequest-and-httpservletresponse-in-jetty12-t
             // war internal
-            httpResponse.setCharacterEncoding("ISO-8859-1");
+            //response.setCharacterEncoding("ISO-8859-1");
+            // probably not doing anything
+            response.getHeaders().put("Content-Type", "text/javascript;charset=iso-8859-1");
         } else if (pathInContext.endsWith(".css")) {
             // war internal
-            httpResponse.setCharacterEncoding("UTF-8");
+            //response.setCharacterEncoding("UTF-8");
+            response.getHeaders().put("Content-Type", "text/css;charset=utf-8");
         }
         //System.err.println("New path: " + newPath);
-        super.handle(newPath, baseRequest, httpRequest, httpResponse);
+        if (!newPath.equals(pathInContext))
+            request = Request.serveAs(request, Request.newHttpURIFrom(request, newPath));
+        return super.handle(request, response, callback);
         //System.err.println("Was handled? " + httpRequest.isHandled());
     }
 
@@ -151,5 +159,12 @@ public class LocaleWebAppHandler extends HandlerWrapper
         for (Map.Entry<?,?> e : params.entrySet()) {
             context.setInitParameter((String)e.getKey(), (String)e.getValue());
         }
+    }
+    
+    /**
+     *  @since Jetty 12
+     */
+    public WebAppContext getWebAppContext() {
+        return _wac;
     }
 }
