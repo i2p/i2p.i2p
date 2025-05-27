@@ -1,5 +1,5 @@
 <?xml version="1.0"  encoding="ISO-8859-1"?>
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_10_0.dtd">
 
 <!--
 Configure a custom context for the eepsite.
@@ -8,7 +8,7 @@ This context contains only a ServletContextHandler with a default servlet
 to serve static html files and images.
 -->
 
-<Configure class="org.eclipse.jetty.servlet.ServletContextHandler">
+<Configure class="org.eclipse.jetty.ee8.servlet.ServletContextHandler">
   <Set name="contextPath">/</Set>
   <Set name="resourceBase">./eepsite/docroot/</Set>
   <Call name="setInitParameter">
@@ -19,24 +19,6 @@ to serve static html files and images.
   <Call name="setInitParameter">
     <Arg>org.eclipse.jetty.servlet.Default.dirAllowed</Arg>
     <Arg>true</Arg>
-  </Call>
-  <Call name="setMimeTypes">
-    <Arg>
-      <New class="org.eclipse.jetty.http.MimeTypes">
-        <Call name="addMimeMapping">
-          <Arg>sud</Arg>
-          <Arg>application/zip</Arg>
-        </Call>
-        <Call name="addMimeMapping">
-          <Arg>su2</Arg>
-          <Arg>application/zip</Arg>
-        </Call>
-        <Call name="addMimeMapping">
-          <Arg>xpi2p</Arg>
-          <Arg>application/zip</Arg>
-        </Call>
-      </New>
-    </Arg>
   </Call>
   <Call name="addServlet">
     <Arg>net.i2p.servlet.I2PDefaultServlet</Arg>
