@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_10_0.dtd">
 
-<!-- This configuration supports Jetty 9. Do not remove this line. -->
+<!-- This configuration supports Jetty 12. Do not remove this line. -->
 
 <!-- ========================================================================= -->
 <!-- This file configures the Jetty server.                                    -->
@@ -154,22 +154,11 @@
     <!-- =========================================================== -->
     <!-- Set handler Collection Structure                            -->
     <!-- =========================================================== -->
+    <Set name="defaultHandler">
+      <New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/>
+    </Set>
     <Set name="handler">
-      <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
-        <Set name="handlers">
-         <Array type="org.eclipse.jetty.server.Handler">
-           <Item>
-             <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
-           </Item>
-           <Item>
-             <New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/>
-           </Item>
-           <Item>
-             <New id="RequestLog" class="org.eclipse.jetty.server.handler.RequestLogHandler"/>
-           </Item>
-         </Array>
-        </Set>
-      </New>
+      <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
     </Set>
 
     <!-- =============================================================== -->
@@ -189,10 +178,6 @@
           <Set name="contexts">
             <Ref refid="Contexts" />
           </Set>
-          <Call name="setContextAttribute">
-            <Arg>org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern</Arg>
-            <Arg>.*/.*jsp-api-[^/]*\.jar$|.*/.*jsp-[^/]*\.jar$|.*/.*taglibs[^/]*\.jar$</Arg>
-          </Call>
         </New>
       </Arg>
     </Call>
@@ -211,7 +196,10 @@
     <Ref refid="DeploymentManager">
       <Call name="addAppProvider">
         <Arg>
-          <New class="org.eclipse.jetty.deploy.providers.WebAppProvider">
+          <New class="org.eclipse.jetty.deploy.providers.ContextProvider">
+            <Set name="EnvironmentName">ee8</Set>
+            <Set name="parentLoaderPriority">true</Set>
+            <Set name="configurationClasses" property="jetty.deploy.configurationClasses" />
             <Set name="monitoredDirName">./eepsite/contexts</Set>
             <Set name="scanInterval">120</Set>
           </New>
@@ -235,9 +223,11 @@
     <Ref refid="DeploymentManager">
       <Call id="webappprovider" name="addAppProvider">
         <Arg>
-          <New id="WebAppProvider" class="org.eclipse.jetty.deploy.providers.WebAppProvider">
+          <New id="WebAppProvider" class="org.eclipse.jetty.deploy.providers.ContextProvider">
+            <Set name="EnvironmentName">ee8</Set>
+            <Set name="parentLoaderPriority">true</Set>
+            <Set name="configurationClasses" property="jetty.deploy.configurationClasses" />
             <Set name="monitoredDirName">./eepsite/webapps</Set>
-	    <Set name="parentLoaderPriority">false</Set>
             <!-- this is required because Jetty can't handle jars inside wars,
                  for example in php-java-bridge's JavaBridgeTemplate.war
                  See https://bugs.eclipse.org/bugs/show_bug.cgi?id=433708
@@ -299,7 +289,6 @@
     <!-- contexts configuration (see $(jetty.home)/contexts/test.xml -->
     <!-- for an example).                                            -->
     <!-- =========================================================== -->
-    <Ref refid="RequestLog">
       <Set name="requestLog">
         <New id="RequestLogImpl" class="net.i2p.jetty.I2PRequestLog">
           <Set name="filename">./eepsite/logs/yyyy_mm_dd.request.log</Set>
@@ -313,7 +302,6 @@
           <Set name="b64">false</Set>
         </New>
       </Set>
-    </Ref>
 
     <!-- =========================================================== -->
     <!-- extra options                                               -->
