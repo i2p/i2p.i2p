@@ -206,7 +206,7 @@ public class WebAppStarter {
         if (classNames.length == 0) {
             //classNames = wac.getDefaultConfigurationClasses();
             // These are the defaults as documented in WebAppContext
-            classNames = new String[] { "org.eclipse.jetty.ee8.webapp.WebXMLConfiguration", "org.eclipse.jetty.ee8.webapp.JettyWebXMLConfiguration" };
+            classNames = new String[] { "org.eclipse.jetty.ee8.webapp.WebXmlConfiguration", "org.eclipse.jetty.ee8.webapp.JettyWebXmlConfiguration" };
         }
         List<String> newClassNames = new ArrayList<String>(Arrays.asList(classNames));
         for (String name : newClassNames) {

@@ -182,6 +182,29 @@
       </Arg>
     </Call>
 
+    <!-- Setup ee8 environment -->
+    <!-- First call needed to initialize the class and prevent NPE -->
+    <Call class="org.eclipse.jetty.util.component.Environment" name="get" >
+        <Arg>foo</Arg>
+    </Call>
+    <New id="EBuilder" class="org.eclipse.jetty.xml.EnvironmentBuilder" >
+      <Arg>ee8</Arg>
+    </New>
+    <Ref refid="EBuilder">
+      <Call id="Environment" name="build" />
+    </Ref>
+    <Ref refid="Environment">
+      <Call class="org.eclipse.jetty.util.Attributes" name="setAttribute">
+        <Arg>contextHandlerClass</Arg>
+        <Arg>org.eclipse.jetty.ee8.webapp.WebAppContext</Arg>
+      </Call>
+    </Ref>
+    <Call class="org.eclipse.jetty.util.component.Environment" name="set" >
+      <Arg>
+        <Ref refid="Environment"/>
+      </Arg>
+    </Call>
+
     <!-- =========================================================== -->
     <!-- Configure the context deployer                              -->
     <!-- A context deployer will deploy contexts described in        -->
