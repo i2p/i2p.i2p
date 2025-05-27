@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_10_0.dtd">
 
 <!-- =============================================================== -->
 <!-- This is the configuration for a standalone i2psnark and         -->
@@ -51,22 +51,11 @@
     <!-- =========================================================== -->
     <!-- Set handler Collection Structure                            --> 
     <!-- =========================================================== -->
+    <Set name="defaultHandler">
+      <New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/>
+    </Set>
     <Set name="handler">
-      <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
-        <Set name="handlers">
-         <Array type="org.eclipse.jetty.server.Handler">
-           <Item>
-             <New id="HostChecker" class="org.klomp.snark.standalone.HostCheckHandler"/>
-           </Item>
-           <Item>
-             <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
-           </Item>
-           <Item>
-             <New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/>
-           </Item>
-         </Array>
-        </Set>
-      </New>
+       <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
     </Set>
 
     <!-- =============================================================== -->
@@ -86,11 +75,30 @@
           <Set name="contexts">
             <Ref refid="Contexts" />
           </Set>
-          <Call name="setContextAttribute">
-            <Arg>org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern</Arg>
-            <Arg>.*/.*jsp-api-[^/]*\.jar$|.*/.*jsp-[^/]*\.jar$|.*/.*taglibs[^/]*\.jar$</Arg>
-          </Call>
         </New>
+      </Arg>
+    </Call>
+
+    <!-- Setup ee8 environment -->
+    <!-- First call needed to initialize the class and prevent NPE -->
+    <Call class="org.eclipse.jetty.util.component.Environment" name="get" >
+        <Arg>foo</Arg>
+    </Call>
+    <New id="EBuilder" class="org.eclipse.jetty.xml.EnvironmentBuilder" >
+      <Arg>ee8</Arg>
+    </New>
+    <Ref refid="EBuilder">
+      <Call id="Environment" name="build" />
+    </Ref>
+    <Ref refid="Environment">
+      <Call class="org.eclipse.jetty.util.Attributes" name="setAttribute">
+        <Arg>contextHandlerClass</Arg>
+        <Arg>org.eclipse.jetty.ee8.webapp.WebAppContext</Arg>
+      </Call>
+    </Ref>
+    <Call class="org.eclipse.jetty.util.component.Environment" name="set" >
+      <Arg>
+        <Ref refid="Environment"/>
       </Arg>
     </Call>
 
@@ -108,7 +116,10 @@
     <Ref refid="DeploymentManager">
       <Call name="addAppProvider">
         <Arg>
-          <New class="org.eclipse.jetty.deploy.providers.WebAppProvider">
+          <New class="org.eclipse.jetty.deploy.providers.ContextProvider">
+            <Set name="EnvironmentName">ee8</Set>
+            <Set name="parentLoaderPriority">true</Set>
+            <Set name="defaultsDescriptor">/home/zzz/.i2p/eepsite/etc/webdefault.xml</Set>
             <Set name="monitoredDirName">./contexts</Set>
             <Set name="scanInterval">0</Set>
           </New>
@@ -132,9 +143,10 @@
     <Ref refid="DeploymentManager">
       <Call id="webappprovider" name="addAppProvider">
         <Arg>
-          <New class="org.eclipse.jetty.deploy.providers.WebAppProvider">
+          <New id="WebAppProvider" class="org.eclipse.jetty.deploy.providers.ContextProvider">
+            <Set name="EnvironmentName">ee8</Set>
             <Set name="monitoredDirName">./webapps</Set>
-	    <Set name="parentLoaderPriority">false</Set>
+            <Set name="parentLoaderPriority">true</Set>
 	    <Set name="extractWars">false</Set>
             <Set name="scanInterval">0</Set>
           </New>
