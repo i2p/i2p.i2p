@@ -25,7 +25,7 @@ public class WebAppProviderConfiguration {
     public static void configure(ContextProvider wap) {
         // Not in Jetty 12 but these are the two defaults
         //String[] classNames = WebAppContext.getDefaultConfigurationClasses();
-        String[] classNames = { "org.eclipse.jetty.ee8.webapp.WebXMLConfiguration", "org.eclipse.jetty.ee8.webapp.JettyWebXMLConfiguration" };
+        String[] classNames = { "org.eclipse.jetty.ee8.webapp.WebXmlConfiguration", "org.eclipse.jetty.ee8.webapp.JettyWebXmlConfiguration" };
         int sz = classNames.length;
         String[] newClassNames = new String[sz + 1];
         for (int j = 0; j < sz; j++) {
