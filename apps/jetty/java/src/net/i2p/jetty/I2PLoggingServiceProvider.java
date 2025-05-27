@@ -49,7 +49,6 @@ public class I2PLoggingServiceProvider implements SLF4JServiceProvider {
 
         public LoggerFactory() {
             logger = new I2PLogger();
-            logger.error("I2PLogger initialized");
         }
 
         public Logger getLogger(String name) {
