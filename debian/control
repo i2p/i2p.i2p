@@ -11,7 +11,8 @@ Build-Depends: debhelper (>= 9.20160709)
  ,ant (>= 1.9.8)
  ,debconf
  ,default-jdk
- ,libjetty9-java (>= 9.4)
+ ,libjetty12-java
+ ,libslf4j2-java
  ,libjsp-api-java
  ,libservlet-api-java
  ,libtaglibs-standard-jstlel-java
@@ -80,12 +81,13 @@ Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- default-jre-headless | java11-runtime-headless | openjdk-21-jre-headless | openjdk-17-jre-headless | openjdk-11-jre-headless | java21-runtime-headless | java17-runtime-headless,
+ default-jre-headless | openjdk-21-jre-headless | openjdk-17-jre-headless | java21-runtime-headless | java17-runtime-headless,
  geoip-database,
  gettext-base,
  libgetopt-java,
  libjson-simple-java (>= 2),libjson-simple-java (<< 3),
- libjetty9-java (>= 9.4),
+ libjetty12-java,
+ libslf4j2-java,
  libjsp-api-java,
  libservlet-api-java,
  libtaglibs-standard-jstlel-java,
