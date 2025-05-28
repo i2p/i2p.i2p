@@ -13,6 +13,15 @@ import org.slf4j.spi.MDCAdapter;
  *  replacing Jetty's Service Provider that logs to stderr
  *  (wrapper log).
  *
+ *  As this is a SLF4JServiceProvider, it requires SLF4J 2.0.x.
+ *  It is enabled by setting the environment as follows:
+ *
+ *<pre>
+ *      System.setProperty("slf4j.provider", "net.i2p.jetty.I2PLoggingServiceProvider");
+ *</pre>
+ *
+ *  We do this in RouterConsoleRunner and in i2psnark RunStandalone.
+ *
  *  @since Jetty 12
  */
 public class I2PLoggingServiceProvider implements SLF4JServiceProvider {
