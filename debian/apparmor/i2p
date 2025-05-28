@@ -74,6 +74,7 @@
   /usr/share/java/servlet-api.jar                         r,
   /usr/share/java/servlet-api-*.jar                       r,
   /usr/share/java/slf4j-*.jar                             r,
+  /usr/share/maven-repo/org/slf4j/slf4j-api/2.x/slf4j-api-2.x.jar    r,
   /usr/share/java/standard.jar                            r,
   /usr/share/java/standard-*.jar                          r,
   /usr/share/java/tomcat9-*.jar                           r,
