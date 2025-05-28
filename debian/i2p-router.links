@@ -37,8 +37,8 @@ usr/share/java/jetty12-jmx.jar usr/share/i2p/lib/org.mortbay.jmx.jar
 usr/share/java/servlet-api.jar usr/share/i2p/lib/javax.servlet.jar
 # combined into javax.servlet.jar in non-package builds
 usr/share/java/jsp-api.jar usr/share/i2p/lib/jsp-api.jar
-# the libslf4j-java package does NOT provide a non-versioned file
-usr/share/java/slf4j-api-2.0.17.jar usr/share/i2p/lib/slf4j-api.jar
+# the libslf4j2-java package does NOT provide a non-versioned file except in the maven-repo dir
+usr/share/maven-repo/org/slf4j/slf4j-api/2.x/slf4j-api-2.x.jar usr/share/i2p/lib/slf4j-api.jar
 
 
 # comment out if not building with libtomcat9-java

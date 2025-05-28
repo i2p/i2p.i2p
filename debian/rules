@@ -126,8 +126,8 @@ endif
 	ln -sf /usr/share/java/servlet-api.jar $(CURDIR)/apps/jetty/jettylib/javax.servlet.jar
 	@# this is roughly the same as tomcat8-jsp-api.jar, we use this one
 	ln -sf /usr/share/java/jsp-api.jar $(CURDIR)/apps/jetty/jettylib/jsp-api.jar
-	@# the libslf4j-java package does NOT provide a non-versioned file
-	ln -sf /usr/share/java/slf4j-api-2.0.17.jar $(CURDIR)/apps/jetty/jettylib/slf4j-api.jar
+	@# the libslf4j2-java package does NOT provide a non-versioned file except in the maven-repo dir
+	ln -sf /usr/share/maven-repo/org/slf4j/slf4j-api/2.x/slf4j-api-2.x.jar $(CURDIR)/apps/jetty/jettylib/slf4j-api.jar
 
 	@# debian and ubuntu: buster, disco
 	@/bin/echo -e "with-libtomcat9-java=true" >> $(CURDIR)/override.properties
