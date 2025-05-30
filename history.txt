@@ -1,3 +1,6 @@
+2025-05-30 zzz
+ * Pull translations from Transifex
+
 2025-05-19 zzz
  * Log warning on upcoming Java 17 requirement
 
