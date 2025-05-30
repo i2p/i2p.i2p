@@ -781,7 +781,7 @@ msgstr "Etkinleştir"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1753
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2189
 msgid "Disable"
-msgstr "Devre dışı bırak"
+msgstr "Etkisizleştir"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:816
 msgid "Persistent private key"
@@ -798,7 +798,7 @@ msgstr "Bu özellik etkinleştirildiğinde, IRC kullanıcı kimliği doğrulamas
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1297
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2100
 msgid "Path to Private Key File"
-msgstr "Özel anahtar dosyası yolu"
+msgstr "Kişisel anahtar dosyası yolu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:830
 msgid "Generate key to enable persistent client tunnel identity"
@@ -1092,7 +1092,7 @@ msgstr "QR kodu üret"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1363
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2157
 msgid "Add to Private addressbook"
-msgstr "Özel adres defterine ekle"
+msgstr "Kişisel adres defterine ekle"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1369
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2163
@@ -1247,7 +1247,7 @@ msgstr "Körlenmiş ve şifrelenmiş hedefler için önerilir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2106
 msgid "Alternate private key file"
-msgstr "Alternatif özel anahtar dosyası"
+msgstr "Alternatif kişisel anahtar dosyası"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2120
 msgid "Alternate local destination"
@@ -1715,7 +1715,7 @@ msgstr "Kayıt yardımcısı"
 msgid ""
 "This service uses encrypted leasesets. Registration is not recommended. "
 "Registration authentication is disabled."
-msgstr "Bu hizmet \"Şifrelenmiş kiralama kümeleri\" (EncryptedLeaseSets) kullanır. Kayıt olmak gerekmez. Kayıt kimliği doğrulaması devre dışıdır."
+msgstr "Bu hizmet \"Şifrelenmiş kiralama kümeleri\" (EncryptedLeaseSets) kullanır. Kayıt olmak gerekmez. Kayıt kimliği doğrulaması etkisizleştirilmiştir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:246
 msgid ""
@@ -1961,11 +1961,11 @@ msgstr "SSL etkin"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:1027
 msgid "Disable SSL"
-msgstr "SSL devre dışı bırakılsın"
+msgstr "SSL etkisizleştirilsin"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:1033
 msgid "SSL is disabled"
-msgstr "SSL devre dışı"
+msgstr "SSL etkisizleştirilmiş"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:1035
 msgid "Enable SSL"
@@ -2221,7 +2221,7 @@ msgstr "İstemci tüneline yerel olarak erişilebilecek bağlantı noktası."
 msgid ""
 "How do you want this tunnel to be accessed? By just this machine, your "
 "entire subnet, or external internet?"
-msgstr "Bu tünele nasıl erişilmesini istiyorsunuz? Yalnızca bu bilgisayar üzerinden, tüm alt ağınızdan ya da dış İnternet üzerinden?"
+msgstr "Bu tünele nasıl erişilmesini istiyorsunuz? Yalnızca bu bilgisayar üzerinden, tüm alt ağınızdan ya da dış internet üzerinden?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:560
 msgid "You will most likely want to just allow 127.0.0.1"

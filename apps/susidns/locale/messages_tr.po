@@ -826,7 +826,7 @@ msgstr "Yerel: Kişisel adres defteriniz. Diğer kişiler ile paylaşmak istedi�
 msgid ""
 "Private: This address book if used for addresses which you do not want to "
 "share with other I2P users."
-msgstr "Özel: Diğer I2P kullanıcıları ile paylaşmak istemediğiniz siteler için."
+msgstr "Kişisel: Diğer I2P kullanıcıları ile paylaşmak istemediğiniz siteler için."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:253
 msgid "How does the address book application work?"
@@ -988,7 +988,7 @@ msgstr "I2P uygulamaları"
 msgid ""
 "The Local, Router and Private address books collectively serve as the DNS "
 "authority for I2P applications."
-msgstr "Yerel, yYöneltici ve kişisel adres defterleri I2P uygulamaları için bir arada çalışarak DNS hizmeti sunar."
+msgstr "Yerel, yöneltici ve kişisel adres defterleri I2P uygulamaları için bir arada çalışarak DNS hizmeti sunar."
 
 #: build/HowSVG.java:23
 msgid "Optional,"
