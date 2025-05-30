@@ -256,12 +256,10 @@ Applications:
      Zxing 3.4.1:
        See licenses/LICENSE-Apache2.0.txt
 
-   Jetty 9.3.30.v20211001 (jetty-*.jar, org.mortbay.*.jar):
+   Jetty 12.0.21 (jetty-*.jar, org.mortbay.*.jar):
    (not included in most distribution packages, except for jetty-i2p.jar)
-   See licenses/ABOUT-Jetty.html
-   See licenses/NOTICE-Jetty.html
-   See licenses/LICENSE-Apache2.0.txt
-   See licenses/LICENSE-ECLIPSE-1.0.html
+   See licenses/NOTICE-Jetty.txt
+   See licenses/LICENSE-Jetty.txt
 
    RRD4J 3.10 (jrobin.jar):
    Copyright (c) 2001-2005 Sasa Markovic and Ciaran Treanor.
