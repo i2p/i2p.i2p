@@ -183,8 +183,9 @@ public class JettyStart implements ClientApp {
                 if (!lc.isRunning()) {
                     if (lc instanceof Server) {
                         Server server = (Server) lc;
-                        // FIXME
-                        //server.insertHandler(new XI2PLocationFilter());
+                        Handler.Wrapper filter = new XI2PLocationFilter();
+                        filter.setHandler(server.getHandler());
+                        server.setHandler(filter);
                     }
                     try {
                         lc.start();
