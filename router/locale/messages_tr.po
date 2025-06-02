@@ -7,7 +7,7 @@
 # Translators:
 # Erkin Batu Altunbaş <erkinbatu@gmail.com>, 2019
 # ilkeryus <ilkeryus@gmail.com>, 2019
-# Kaya Zeren <kayazeren@gmail.com>, 2023
+# Kaya Zeren <kayazeren@gmail.com>, 2025
 # 
 msgid ""
 msgstr ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-18 13:32+0000\n"
 "PO-Revision-Date: 2019-12-19 14:09+0000\n"
-"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2023\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2025\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/otf/teams/12694/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -46,7 +46,7 @@ msgstr "IPv4: Güvenlik duvarlı; IPv6: Tamam"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:375
 msgid "IPv4: Disabled; IPv6: OK"
-msgstr "IPv4: Devre dışı; IPv6: Tamam"
+msgstr "IPv4: Etkisizleştirilmiş; IPv6: Tamam"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:376
 msgid "IPv4: Symmetric NAT; IPv6: OK"
@@ -76,11 +76,11 @@ msgstr "IPv4: Sınanıyor; IPv6: Güvenlik duvarı arkasında"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:384
 msgid "IPv4: Disabled; IPv6: Testing"
-msgstr "IPv4: Devre dışı; IPv6: Sınanıyor"
+msgstr "IPv4: Etkisizleştirilmiş; IPv6: Sınanıyor"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:385
 msgid "IPv4: Disabled; IPv6: Firewalled"
-msgstr "IPv4: Devre dışı; IPv6: Güvenlik duvarı arkasında"
+msgstr "IPv4: Etkisizleştirilmiş; IPv6: Güvenlik duvarı arkasında"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:386
 msgid "Disconnected"

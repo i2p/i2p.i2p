@@ -26,7 +26,7 @@ I2P başladıktan sonra ve normal çalışırken, yan panodaki I2P tünel oluşt
 I2P üzerinden gizli hizmet sitelerine ("I2P siteleri") ve diğer hizmetlere erişebilir ve kendi hizmetlerinizi sunabilirsiniz. 
 I2P içindeki vekil sunucuyu (çıkış vekil sunucusu) kullanarak normal sitelere anonim olarak erişebilirsiniz. 
 <a href="https://geti2p.net/en/about/browser-config" target="_blank">Tarayıcınızın yapılandırma ayarlarından</a> HTTP vekil sunucusunu <code>127.0.0.1 bağlantı noktası 4444</code> olarak ayarladıktan sonra, bir I2P sitesine ya da <code>http://</code> ya da <code>https://</code>adresiyle bir siteye bakın. 
-Normal internet bağlantısını kurarken çıkış sunucusu erişimini devre dışı bırakmak isterseniz, <code>false.i2p</code> dosyasında <i>Outproxies</i> bölümü altındaki çıkış sunucusu (outproxy) kaydını <a href="/i2ptunnel/edit?tunnel=0" target="_blank">I2P HTTP vekil sunucu tünel düzenleyici</a> ile değiştirin ya da silin. 
+Normal internet bağlantısını kurarken çıkış sunucusu erişimini etkisizleştirmek isterseniz, <code>false.i2p</code> dosyasında <i>Outproxies</i> bölümü altındaki çıkış sunucusu (outproxy) kaydını <a href="/i2ptunnel/edit?tunnel=0" target="_blank">I2P HTTP vekil sunucu tünel düzenleyici</a> ile değiştirin ya da silin. 
 <a href="#eepsites">Aşağıdaki</a> "İlginç siteler" bölümünde I2P üzerinden sunulan bir kaç örnek site bulabilirsiniz.<br>
 Ayrıca I2P için bazı yarı resmi ya da resmi olmayan tarama araçları geliştirme girişimi var. Bazı örnekler;
 <a href="https://geti2p.net/en/download/firefox">önceden hazırlanmış Firefox tarayıcı profili</a>,
@@ -39,7 +39,7 @@ olup olmadıklarını anlamak için denedikten sonra kullanmaya karar verin.
 <li>
 <b>Anonim e-posta kullanımı</b><br>
 Postman I2P temelli posta sistemine <a href="/webmail">I2P içindeki posta istemcisini</a> ya da herhangi bir dış posta istemcisi kullanılarak erişilebilir. 
-Hesaplar normal İnternet üzerindeki gibi e-posta gönderip alabilir. 
+Hesaplar normal internet üzerindeki gibi e-posta gönderip alabilir. 
 Bir hesap edinmek için <a href="http://hq.postman.i2p/" target="_blank">hq.postman.i2p</a> adresine bakabilirsiniz.</li>
 
 <li>
@@ -125,9 +125,9 @@ Ne kadar çok bant genişliği ayırırsanız, <i>özellikle</i> gidiş bant gen
 
 <li>
 <b>Güvenlik duvarları, modemler ve yönelticiler</b><br>
-Yapabiliyorsanız modeminizi, yönelticinizi, bilgisayarınızdaki güvenlik duvarını uygun şekilde ayarlayarak, I2P/Java bağlantısının herhangi bir güvenlik duvarından geçmeden İnternet üzerine çıktığından emin olun. 
+Yapabiliyorsanız modeminizi, yönelticinizi, bilgisayarınızdaki güvenlik duvarını uygun şekilde ayarlayarak, I2P/Java bağlantısının herhangi bir güvenlik duvarından geçmeden internet üzerine çıktığından emin olun. 
 Engelleme yapan bir güvenlik duvarının arkasında olduğunuz halde kısıtlamasız bir gidiş bağlantınız varsa, I2P çalışabilir; ağa bağlanmak için geliş erişimi kapatıp <a href="http://i2p-projekt.i2p/udp.html" target="_blank">SSU IP Adresi Algılaması</a> özelliğine güvenebilirsiniz (<a href="https://en.wikipedia.org/wiki/Hole_punching_(networking)" target="_blank">güvenlik duvarını delme</a>), yan panodaki ağ durumunuz "Ağ: Güvenlik Duvarlı" olarak görüntülenir. 
-En iyi başarım için, I2P <a href="/confignet">dış bağlantı noktasının</a> İnternet üzerinde görülebilir olduğundan emin olun.
+En iyi başarım için, I2P <a href="/confignet">dış bağlantı noktasının</a> internet üzerinde görülebilir olduğundan emin olun.
 Ayrıntılı bilgi almak için aşağıya bakabilirsiniz.</li>
 
 <li>
@@ -159,7 +159,7 @@ Başarılı olursa, I2P yönelticisi bağlantı sınamalarını tamamladıktan s
 Daha iyi bir bağlantı için <a href="/confignet">I2P bağlantı noktalarını</a> modeminiz, yönelticiniz ya da güvenlik duvarınız üzerinde açın (ideal olarak hem UDP hem TCP).
 Bağlantı noktası yönlendirme hakkında ayrıntılı bilgilere internet üzerinde yapacağınız basit bir arama ile erişebilirsiniz.
 Sorun yaşamanız durumunda aşağıda listelenen forumlarımıza ve IRC kanallarına bakabilirsiniz.
-I2P İnternet bağlantısının bir http ya da socks vekil sunucusu üzerinden kurulamayacağını unutmayın [yamalarınızı bekliyoruz!]. Ancak bir kez ağ bağlantısı kurulduğunda I2P üzerinden vekil sunuculara bağlanabilirsiniz.</li>
+I2P internet bağlantısının bir http ya da socks vekil sunucusu üzerinden kurulamayacağını unutmayın [yamalarınızı bekliyoruz!]. Ancak bir kez ağ bağlantısı kurulduğunda I2P üzerinden vekil sunuculara bağlanabilirsiniz.</li>
 
 <li>
 <b>Çevrim içi destek alma</b><br><a href="http://i2p-projekt.i2p/" target="_blank">I2P sitesindeki</a> bilgilere bakabilir, <a href="http://i2pforum.i2p/" target="_blank">I2P tartışma forumuna</a> ileti gönderebilir ya da I2P içindeki  Irc2P IRC ağında <a href="irc://127.0.0.1:6668/i2p">#i2p</a> ve <a href="irc://127.0.0.1:6668/i2p-chat">#i2p-chat</a> kanallarında takılabilirsiniz.

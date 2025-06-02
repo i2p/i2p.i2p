@@ -127,7 +127,7 @@ msgstr "Yenileme sıklığı {0} olarak değiştirildi"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1176
 msgid "Refresh disabled"
-msgstr "Yenileme devre dışı"
+msgstr "Yenileme etkisizleştirilmiş"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1192
 #, java-format
@@ -212,7 +212,7 @@ msgstr "Otomatik başlatma etkin"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1366
 msgid "Disabled autostart"
-msgstr "Otomatik başlatma devre dışı"
+msgstr "Otomatik başlatma etkisizleştirilmiş"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1373
 msgid "Enabled smart sort"
@@ -220,7 +220,7 @@ msgstr "Akıllı sıralama etkin"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1375
 msgid "Disabled smart sort"
-msgstr "Akıllı sıralama devre dışı"
+msgstr "Akıllı sıralama etkisizleştirilmiş"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1382
 msgid "Enabled open trackers - torrent restart required to take effect."
@@ -228,7 +228,7 @@ msgstr "Açık izleyiciler etkinleştirildi - değişikliklerin etkili olması i
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1384
 msgid "Disabled open trackers - torrent restart required to take effect."
-msgstr "Açık izleyiciler devre dışı bırakıldı - değişikliklerin etkili olması için torrenti yeniden başlatmalısınız."
+msgstr "Açık izleyiciler etkisizleştirildi - Değişikliklerin etkili olması için torrenti yeniden başlatmalısınız."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1391
 msgid "Enabled DHT."
@@ -236,7 +236,7 @@ msgstr "\"Dağıtılmış karma tablosu\" (DHT) etkinleştirildi."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1393
 msgid "Disabled DHT."
-msgstr "\"Dağıtılmış karma tablosu\" (DHT) devre dışı bırakıldı."
+msgstr "\"Dağıtılmış karma tablosu\" (DHT) etkisizleştirilmiş."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1395
 msgid "DHT change requires tunnel shutdown and reopen"
@@ -248,7 +248,7 @@ msgstr "Değerlendirmeler etkinleştirildi."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1404
 msgid "Disabled Ratings."
-msgstr "Değerlendirmeler devre dışı bırakıldı."
+msgstr "Değerlendirmeler etkisizleştirilmiş."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1411
 msgid "Enabled Comments."
@@ -256,7 +256,7 @@ msgstr "Yorumlar etkinleştirildi."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1413
 msgid "Disabled Comments."
-msgstr "Yorumlar devre dışı bırakıldı."
+msgstr "Yorumlar etkisizleştirilmiş."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1426
 #, java-format
@@ -274,7 +274,7 @@ msgstr "Daraltılabilir panolar etkinleştirildi."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1442
 msgid "Collapsible panels disabled."
-msgstr "Daraltılabilir panolar devre dışı bırakıldı."
+msgstr "Daraltılabilir panolar etkisizleştirilmiş."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1452
 msgid "Configuration unchanged."
@@ -364,7 +364,7 @@ msgstr "Uyarı - \"{0}\" içinde herhangi bir I2P izleyici yok. Yalnızca I2P a�
 msgid ""
 "Warning - No I2P trackers in \"{0}\", and open trackers are disabled, will "
 "announce to DHT only."
-msgstr "Uyarı - \"{0}\" içinde herhangi bir I2P izleyici yok ve I2P açık izleyicileri devre dışı bırakılmış. Yalnızca \"Dağıtılmış karma tablosu\" (DHT) üzerinde duyurulacak."
+msgstr "Uyarı - \"{0}\" içinde herhangi bir I2P izleyici yok ve I2P açık izleyicileri etkisizleştirilmiş. Yalnızca \"Dağıtılmış karma tablosu\" (DHT) üzerinde duyurulacak."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1744
 #, java-format
@@ -372,7 +372,7 @@ msgid ""
 "Warning - No I2P trackers in \"{0}\", and DHT and open trackers are "
 "disabled, you should enable open trackers or DHT before starting the "
 "torrent."
-msgstr "Uyarı - \"{0}\" içinde herhangi bir I2P izleyici yok. I2P açık izleyicileri ve \"Dağıtılmış karma tablosu\" (DHT) devre dışı bırakılmış. Torrenti başlatmadan önce açık izleyicileri ya da \"Dağıtılmış karma tablosu\" (DHT) özelliğini etkinleştirin."
+msgstr "Uyarı - \"{0}\" içinde herhangi bir I2P izleyici yok. I2P açık izleyicileri ve \"Dağıtılmış karma tablosu\" (DHT) etkisizleştirilmiş. Torrenti başlatmadan önce açık izleyicileri ya da \"Dağıtılmış karma tablosu\" (DHT) özelliğini etkinleştirin."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1770
 #, java-format
@@ -417,7 +417,7 @@ msgid ""
 "Open trackers are disabled and we have no DHT peers. Fetch of {0} may not "
 "succeed until you start another torrent, enable open trackers, or enable "
 "DHT."
-msgstr "Açık izleyiciler devre dışı bırakılmış ve herhangi bir \"Dağıtılmış karma tablosu\" (DHT) eşi yok. Başka bir torrent başlatılana kadar {0} alınamayabilir. Açık izleyicileri ya da \"Dağıtılmış karma tablosu\" (DHT) özelliğini etkinleştirin."
+msgstr "Açık izleyiciler etkisizleştirilmiş ve herhangi bir \"Dağıtılmış karma tablosu\" (DHT) eşi yok. Başka bir torrent başlatılana kadar {0} alınamayabilir. Açık izleyicileri ya da \"Dağıtılmış karma tablosu\" (DHT) özelliğini etkinleştirin."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1915
 #, java-format
@@ -1389,7 +1389,7 @@ msgstr "Tema"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2734
 msgid "To change themes manually, disable universal theming"
-msgstr "Temaları el ile değiştirmek için evrensel temayı devre dışı bırakın"
+msgstr "Temaları el ile değiştirmek için evrensel temayı etkisizleştirin"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2738
 msgid "Universal theming is enabled."
