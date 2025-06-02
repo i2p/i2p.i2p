@@ -1,3 +1,5 @@
+2025-03-29 2.9.0 (API 0.9.66) released
+
 2025-05-30 zzz
  * Pull translations from Transifex
 
