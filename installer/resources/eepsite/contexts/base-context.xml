@@ -10,7 +10,7 @@ to serve static html files and images.
 
 <Configure class="org.eclipse.jetty.ee8.servlet.ServletContextHandler">
   <Set name="contextPath">/</Set>
-  <Set name="resourceBase">./eepsite/docroot/</Set>
+  <Set name="baseResourceAsString">./eepsite/docroot/</Set>
   <Call name="setInitParameter">
     <Arg>org.eclipse.jetty.servlet.Default.cacheControl</Arg>
     <Arg>max-age=3600,public</Arg>
