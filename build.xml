@@ -2,8 +2,9 @@
 <project basedir="." default="all" name="i2p"
     xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
-    <!-- for javac "release" parameter -->
-    <property name="ant.minimumVersion" value="1.9.8"/>
+    <!-- for javaversion condition -->
+    <property name="ant.minimumVersion" value="1.10.2"/>
+    <property name="java.minimumVersion" value="17"/>
 
     <!-- Include property files so that values can be easily overridden.
          Users should create an override.properties file to make changes.
@@ -432,6 +433,13 @@
     </target>
 
     <target name="buildProperties" depends="getGitRev, getReleaseNumber, getBuildNumber, setBuildTimestamp, disableManifestClasspath" >
+        <fail message="FATAL: Minimum Java version is ${java.minimumVersion} - your Java version is ${java.version}">
+            <condition>
+                <not>
+                    <javaversion atleast="${java.minimumVersion}"/>
+                </not>
+            </condition>
+        </fail>
         <antversion property="antversion"/>
         <fail message="FATAL: Minimum Ant version is ${ant.minimumVersion} - your Ant version is ${antversion}">
             <condition>
