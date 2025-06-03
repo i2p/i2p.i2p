@@ -1,7 +1,7 @@
 I2P source installation instructions
 
 Prerequisites to build from source:
-	Java SDK (preferably Oracle or OpenJDK) 8 or higher
+	Java SDK (preferably Oracle or OpenJDK) 17 or higher
           Non-linux operating systems and JVMs: See https://trac.i2p2.de/wiki/java
           Certain subsystems for embedded (core, router, mstreaming, streaming, i2ptunnel) require only Java 1.6
 	Apache Ant 1.9.8 or higher
@@ -65,7 +65,7 @@ To uninstall I2P:
    rm -rf $I2PInstallDir ~/.i2p
 
 Supported JVMs:
-  All platforms: Java 1.8 or higher required
+  All platforms: Java 17 or higher required
   Windows: Latest available from http://java.com/download
   Linux:   Latest available from http://java.com/download
   Other operating systems and JVMs: See https://geti2p.net/download

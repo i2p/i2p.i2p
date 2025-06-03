@@ -7,7 +7,7 @@
   <customProcName>false</customProcName>
   <icon>resources/console.ico</icon>
   <jre>
-    <minVersion>1.8.0</minVersion>
+    <minVersion>17</minVersion>
   </jre>
   <!--
   <splash>

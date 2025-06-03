@@ -1,5 +1,5 @@
 Prerequisites to build from source:
-	Java SDK (preferably Oracle or OpenJDK) 8 or higher
+	Java SDK (preferably Oracle or OpenJDK) 17 or higher
           Non-linux operating systems and JVMs: See https://trac.i2p2.de/wiki/java
           Certain subsystems for embedded (core, router, mstreaming, streaming, i2ptunnel) require only Java 6
 	Apache Ant 1.9.8 or higher
