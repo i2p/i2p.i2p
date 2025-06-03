@@ -1249,6 +1249,10 @@
         <delete file="mavencentral-servlet-i2p.jar" />
     </target>
 
+    <target name="wrapper-distclean" >
+        <subant buildpath="installer/lib/wrapper" target="distclean" failonerror="false" />
+    </target>
+
     <target name="distclean" depends="clean">
         <delete failonerror="false" quiet="true">
             <fileset dir="." includes="i2pinstall* *.deb i2p_*.bz2 i2pupdate* i2psource* *.sig *.torrent" />
@@ -1273,7 +1277,7 @@
         <delete dir="core/c/jbigi/bin" />
         <delete dir="core/c/jbigi/lib" />
         <delete dir="core/c/jcpuid/lib" />
-        <ant dir="installer/lib/wrapper" target="distclean" />
+        <ant dir="" target="wrapper-distclean" />
         <ant dir="installer/resources/locale" target="distclean" />
         <ant dir="installer/tools/java" target="distclean" />
         <delete dir="installer/lib/izpack5/patches/java/build" quiet="true" />
