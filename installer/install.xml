@@ -9,7 +9,7 @@
             <author name="I2P" email="https://geti2p.net/"/>
         </authors>
         <url>https://geti2p.net/</url>
-        <javaversion>1.8</javaversion>
+        <javaversion>17</javaversion>
 
         <!-- use pack200 compression, saves about 33%
              see http://java.sun.com/j2se/1.5.0/docs/guide/deployment/deployment-guide/pack200.html
