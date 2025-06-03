@@ -32,13 +32,11 @@
 -->
 
 <Configure class="org.eclipse.jetty.server.handler.ContextHandler">
-  <New id="root" class="java.lang.String">
+  <New id="cgiroot" class="java.lang.String">
     <Arg>./eepsite/cgi-bin</Arg>
   </New>
-
   <Set name="contextPath">/cgi-bin</Set>
-  <Set name="baseResourceAsString"><Ref refid="root" /></Set>
-
+  <Set name="baseResourceAsString"><Ref refid="cgiroot" /></Set>
   <Set name="handler">
     <New class="org.eclipse.jetty.server.handler.PathMappingsHandler">
       <Call name="addMapping">
@@ -50,7 +48,7 @@
             <Arg>(https?)://([^/]+)(.*)</Arg>
             <!-- host:port ignored since if using a domain socket, but argument must be here -->
             <Arg>http://localhost:9000$3</Arg>
-            <Arg><Ref refid="root" /></Arg>
+            <Arg><Ref refid="cgiroot" /></Arg>
 
             <Set name="scriptPattern"><Call class="java.util.regex.Pattern" name="compile"><Arg>/cgi-bin(.+)</Arg></Call></Set>
             <Set name="fastCGISecure">false</Set>
