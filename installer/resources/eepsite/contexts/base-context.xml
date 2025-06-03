@@ -9,8 +9,11 @@ to serve static html files and images.
 -->
 
 <Configure class="org.eclipse.jetty.ee8.servlet.ServletContextHandler">
+  <New id="baseroot" class="java.lang.String">
+    <Arg>./eepsite/docroot</Arg>
+  </New>
   <Set name="contextPath">/</Set>
-  <Set name="baseResourceAsString">./eepsite/docroot/</Set>
+  <Set name="baseResourceAsString"><Ref refid="baseroot" /></Set>
   <Call name="setInitParameter">
     <Arg>org.eclipse.jetty.servlet.Default.cacheControl</Arg>
     <Arg>max-age=3600,public</Arg>
@@ -26,7 +29,9 @@ to serve static html files and images.
   </Call>
   <Call name="setErrorHandler">
     <Arg>
-      <New class="net.i2p.servlet.I2PErrorHandler" />
+      <New class="net.i2p.servlet.I2PErrorHandler">
+        <Arg><Ref refid="baseroot" /></Arg>
+      </New>
     </Arg>
   </Call>
 </Configure>
