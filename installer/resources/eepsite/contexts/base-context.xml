@@ -24,5 +24,10 @@ to serve static html files and images.
     <Arg>net.i2p.servlet.I2PDefaultServlet</Arg>
     <Arg>/</Arg>
   </Call>
+  <Call name="setErrorHandler">
+    <Arg>
+      <New class="net.i2p.servlet.I2PErrorHandler" />
+    </Arg>
+  </Call>
 </Configure>
 

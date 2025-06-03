@@ -155,7 +155,9 @@
     <!-- Set handler Collection Structure                            -->
     <!-- =========================================================== -->
     <Set name="defaultHandler">
-      <New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/>
+      <New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler">
+        <Set name="showContexts">false</Set>
+      </New>
     </Set>
     <Set name="handler">
       <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
