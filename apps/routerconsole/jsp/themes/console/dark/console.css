@@ -414,11 +414,12 @@ div.warning {
 }
 
 .routersummary h4 {
+    background: #333;
     border: 0;
     border-bottom: 0 !important;
     font-size: 8pt;
     margin: -6px -9px -8px !important;
-    padding: 6px 1px;
+    padding: 6px 2px;
     text-decoration: none !important;
     color: #e6e6e7;
     line-height: 120%;
@@ -6881,7 +6882,7 @@ form[action="events"] {
 .routersummary .firewalled::before,
 .routersummary .vmcomm::before,
 .routersummary .clockskew::before {
-    margin-right: 2px;
+    margin-right: 4px;
     vertical-align: middle;
     display: inline-block;
     filter: drop-shadow(0 0 1px rgba(192, 192, 192, 0.5));
