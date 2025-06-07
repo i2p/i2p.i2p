@@ -657,18 +657,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                         //if (_log.shouldLog(Log.DEBUG))
                         //    _log.debug(direction + ": " + len + " bytes flushed through " + (_toI2P ? "to " : "from ")
                         //               + to);
-                        if (_toI2P) {
-                            try {
-                                Thread.sleep(5);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            
-                            if (in.available() <= 0)
-                                out.flush();
-                        } else {
-                            out.flush();
-                        }
+                        out.flush();
                     }
                 }
                 //if (_log.shouldDebug())
