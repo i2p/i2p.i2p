@@ -54,6 +54,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     private final HKDF _hkdf;
     private final DecayingHashSet _replayFilter;
     private final Destination _destination;
+    private final EncType _type;
 
     /**
      * Let outbound session tags sit around for this long before expiring them.
@@ -83,7 +84,17 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      * @since 0.9.48
      */
     public RatchetSKM(RouterContext context) {
-        this(context, null);
+        this(context, null, EncType.ECIES_X25519);
+    }
+
+    /**
+     * ECIES only.
+     *
+     * @param dest null for router's SKM only
+     * @since 0.9.48
+     */
+    public RatchetSKM(RouterContext context, Destination dest) {
+        this(context, dest, EncType.ECIES_X25519);
     }
 
     /**
@@ -91,12 +102,15 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      * client manager.
      *
      * @param dest null for router's SKM only
+     * @param type the encryption type
+     * @since 0.9.67
      */
-    public RatchetSKM(RouterContext context, Destination dest) {
+    public RatchetSKM(RouterContext context, Destination dest, EncType type) {
         super(context);
         _log = context.logManager().getLog(RatchetSKM.class);
         _context = context;
         _destination = dest;
+        _type = type;
         _outboundSessions = new ConcurrentHashMap<PublicKey, OutboundSession>(64);
         _pendingOutboundSessions = new HashMap<PublicKey, List<OutboundSession>>(64);
         _inboundTagSets = new ConcurrentHashMap<RatchetSessionTag, RatchetTagSet>(128);
@@ -144,6 +158,15 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      */
     public Destination getDestination() {
         return _destination;
+    }
+
+    /**
+     *  The EncType for this SKM
+     *
+     *  @since 0.9.67
+     */
+    public EncType getType() {
+        return _type;
     }
 
     /** RatchetTagSet */
@@ -201,8 +224,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      */
     boolean createSession(PublicKey target, Destination d, HandshakeState state, ReplyCallback callback) {
         EncType type = target.getType();
-        if (type != EncType.ECIES_X25519)
-            throw new IllegalArgumentException("Bad public key type " + type);
+        if (type != _type)
+            throw new IllegalArgumentException("Bad public key type " + type + " expected " + _type);
         OutboundSession sess = new OutboundSession(target, d, null, state, callback);
         boolean isInbound = state.getRole() == HandshakeState.RESPONDER;
         if (isInbound) {
@@ -247,8 +270,8 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     boolean updateSession(PublicKey target, HandshakeState oldState, HandshakeState state,
                           ReplyCallback callback, SplitKeys split) {
         EncType type = target.getType();
-        if (type != EncType.ECIES_X25519)
-            throw new IllegalArgumentException("Bad public key type " + type);
+        if (type != _type)
+            throw new IllegalArgumentException("Bad public key type " + type + " expected " + _type);
         boolean isInbound = state.getRole() == HandshakeState.RESPONDER;
         if (isInbound) {
             // we are Bob, NSR sent

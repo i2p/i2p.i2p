@@ -196,6 +196,9 @@ public final class KeyGenerator {
             break;
 
           case ECIES_X25519:
+          case MLKEM512_X25519:
+          case MLKEM768_X25519:
+          case MLKEM1024_X25519:
             byte[] bpriv = new byte[32];
             do {
                 _context.random().nextBytes(bpriv);
@@ -238,6 +241,9 @@ public final class KeyGenerator {
             break;
 
           case ECIES_X25519:
+          case MLKEM512_X25519:
+          case MLKEM768_X25519:
+          case MLKEM1024_X25519:
             data = new byte[32];
             Curve25519.eval(data, 0, priv.getData(), null);
             break;
@@ -342,6 +348,7 @@ public final class KeyGenerator {
         }
         java.security.PublicKey pubkey = kp.getPublic();
         java.security.PrivateKey privkey = kp.getPrivate();
+
         SimpleDataStructure[] keys = new SimpleDataStructure[2];
         keys[0] = SigUtil.fromJavaKey(pubkey, type);
         keys[1] = SigUtil.fromJavaKey(privkey, type);
@@ -476,6 +483,7 @@ public final class KeyGenerator {
             System.out.println(type + " private-to-public test PASSED");
         else
             System.out.println(type + " private-to-public test FAILED");
+
         //System.out.println("privkey " + keys[1]);
         MessageDigest md = type.getDigestInstance();
         for (int i = 0; i < runs; i++) {

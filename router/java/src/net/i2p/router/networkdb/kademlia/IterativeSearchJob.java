@@ -359,7 +359,7 @@ public class IterativeSearchJob extends FloodSearchJob {
                 }
                 LeaseSetKeys lsk = ctx.keyManager().getKeys(_fromLocalDest);
                 supportsRatchet = lsk != null &&
-                                  lsk.isSupported(EncType.ECIES_X25519) &&
+                                  (lsk.isSupported(EncType.ECIES_X25519) || lsk.getPQDecryptionKey() != null) &&
                                   DatabaseLookupMessage.supportsRatchetReplies(ri);
                 supportsElGamal = !supportsRatchet &&
                                   lsk != null &&

@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.client.I2PClient;
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
@@ -50,6 +51,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.router.crypto.TransientSessionKeyManager;
 import net.i2p.router.crypto.ratchet.RatchetSKM;
+import net.i2p.router.crypto.ratchet.MuxedPQSKM;
 import net.i2p.router.crypto.ratchet.MuxedSKM;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.ConcurrentHashSet;
@@ -605,6 +607,8 @@ class ClientConnectionRunner {
             int thresh = TransientSessionKeyManager.LOW_THRESHOLD;
             boolean hasElg = false;
             boolean hasEC = false;
+            boolean hasPQ = false;
+            int pqType = 0;
             // router may be null in unit tests, avoid NPEs in ratchet
             // we won't actually be using any SKM anyway
             if (opts != null && _context.router() != null) {
@@ -620,10 +624,18 @@ class ClientConnectionRunner {
                 if (senc != null) {
                     String[] senca = DataHelper.split(senc, ",");
                     for (String sencaa : senca) {
-                        if (sencaa.equals("0"))
+                        if (sencaa.equals("0")) {
                             hasElg = true;
-                        else if (sencaa.equals("4"))
+                        } else if (sencaa.equals("4")) {
                             hasEC = true;
+                        } else if (sencaa.equals("5") || sencaa.equals("6") || sencaa.equals("7")) {
+                            if (hasPQ) {
+                                _log.error("Bad encryption type combination in i2cp.leaseSetEncType for " + dest.toBase32());
+                                return SessionStatusMessage.STATUS_INVALID;
+                            }
+                            pqType = Integer.parseInt(sencaa);
+                            hasPQ = true;
+                        }
                     }
                 } else {
                     hasElg = true;
@@ -632,12 +644,26 @@ class ClientConnectionRunner {
                 hasElg = true;
             }
             if (hasElg) {
+                if (hasPQ) {
+                    _log.error("Bad encryption type combination in i2cp.leaseSetEncType for " + dest.toBase32());
+                    return SessionStatusMessage.STATUS_INVALID;
+                }
                 TransientSessionKeyManager tskm = new TransientSessionKeyManager(_context, tags, thresh);
                 if (hasEC) {
                     RatchetSKM rskm = new RatchetSKM(_context, dest);
                     _sessionKeyManager = new MuxedSKM(tskm, rskm);
                 } else {
                     _sessionKeyManager = tskm;
+                }
+            } else if (hasPQ) {
+                if (hasEC) {
+                    // ECIES
+                    RatchetSKM rskm1 = new RatchetSKM(_context, dest);
+                    // PQ
+                    RatchetSKM rskm2 = new RatchetSKM(_context, dest, EncType.getByCode(pqType));
+                    _sessionKeyManager = new MuxedPQSKM(rskm1, rskm2);
+                } else {
+                    _sessionKeyManager = new RatchetSKM(_context, dest, EncType.getByCode(pqType));
                 }
             } else {
                 if (hasEC) {

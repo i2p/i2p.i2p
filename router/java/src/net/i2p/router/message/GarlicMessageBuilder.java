@@ -32,6 +32,7 @@ import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.RouterContext;
+import net.i2p.router.crypto.ratchet.MuxedPQSKM;
 import net.i2p.router.crypto.ratchet.MuxedSKM;
 import net.i2p.router.crypto.ratchet.RatchetSKM;
 import net.i2p.router.crypto.ratchet.RatchetSessionTag;
@@ -46,13 +47,13 @@ import net.i2p.util.Log;
 public class GarlicMessageBuilder {
 
     /**
-     *  ELGAMAL_2048 only.
+     *  ELGAMAL_2048 only; returns false for others
      *
      *  @param local non-null; do not use this method for the router's SessionKeyManager
      *  @param minTagOverride 0 for no override, &gt; 0 to override SKM's settings
      */
     static boolean needsTags(RouterContext ctx, PublicKey key, Hash local, int minTagOverride) {
-        if (key.getType() == EncType.ECIES_X25519)
+        if (LeaseSetKeys.SET_EC_PQ_ALL.contains(key.getType()))
             return false;
         SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(local);
         if (skm == null)
@@ -275,7 +276,7 @@ public class GarlicMessageBuilder {
     }
     
     /**
-     * ECIES_X25519 only.
+     * ECIES_X25519 and PQ only.
      * Called by OCMJH only.
      *
      * @param ctx scope
@@ -289,7 +290,8 @@ public class GarlicMessageBuilder {
                                            Hash from, Destination to, SessionKeyManager skm,
                                            ReplyCallback callback) {
         PublicKey key = config.getRecipientPublicKey();
-        if (key.getType() != EncType.ECIES_X25519)
+        EncType type = key.getType();
+        if (!LeaseSetKeys.SET_EC_PQ_ALL.contains(type))
             throw new IllegalArgumentException();
         Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
         GarlicMessage msg = new GarlicMessage(ctx);
@@ -300,7 +302,7 @@ public class GarlicMessageBuilder {
                 log.warn("No LSK for " + from.toBase32());
             return null;
         }
-        PrivateKey priv = lsk.getDecryptionKey(EncType.ECIES_X25519);
+        PrivateKey priv = lsk.getDecryptionKey(type);
         if (priv == null) {
             if (log.shouldWarn())
                 log.warn("No key for " + from.toBase32());
@@ -312,6 +314,9 @@ public class GarlicMessageBuilder {
             rskm = (RatchetSKM) skm;
         } else if (skm instanceof MuxedSKM) {
             rskm = ((MuxedSKM) skm).getECSKM();
+        } else if (skm instanceof MuxedPQSKM) {
+            MuxedPQSKM mskm = (MuxedPQSKM) skm;
+            rskm = type.isPQ() ? mskm.getPQSKM() : mskm.getECSKM();
         } else {
             if (log.shouldWarn())
                 log.warn("No SKM for " + from.toBase32());
@@ -338,7 +343,7 @@ public class GarlicMessageBuilder {
     
     /**
      * Encrypt from an anonymous source.
-     * ECIES_X25519 only.
+     * ECIES_X25519 only. PQ not supported.
      * Called by MessageWrapper only.
      *
      * @param ctx scope
@@ -348,7 +353,7 @@ public class GarlicMessageBuilder {
      */
     public static GarlicMessage buildECIESMessage(RouterContext ctx, GarlicConfig config) {
         PublicKey key = config.getRecipientPublicKey();
-        if (key.getType() != EncType.ECIES_X25519)
+        if (!LeaseSetKeys.SET_EC_PQ_ALL.contains(key.getType()))
             throw new IllegalArgumentException();
         Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
         GarlicMessage msg = new GarlicMessage(ctx);

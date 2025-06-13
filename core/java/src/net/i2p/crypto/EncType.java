@@ -52,14 +52,83 @@ public enum EncType {
      *  Pubkey 32 bytes; privkey 32 bytes
      *  @since 0.9.38
      */
-    ECIES_X25519(4, 32, 32, EncAlgo.ECIES, "EC/None/NoPadding", X25519_SPEC, "0.9.38");
+    ECIES_X25519(4, 32, 32, EncAlgo.ECIES, "EC/None/NoPadding", X25519_SPEC, "0.9.38"),
+
+    /**
+     *  Proposal 169.
+     *  Pubkey 32 bytes; privkey 32 bytes
+     *  @since 0.9.67
+     */
+    MLKEM512_X25519(5, 32, 32, EncAlgo.ECIES_MLKEM, "EC/None/NoPadding", X25519_SPEC, "0.9.67"),
+
+    /**
+     *  Proposal 169.
+     *  Pubkey 32 bytes; privkey 32 bytes
+     *  @since 0.9.67
+     */
+    MLKEM768_X25519(6, 32, 32, EncAlgo.ECIES_MLKEM, "EC/None/NoPadding", X25519_SPEC, "0.9.67"),
+
+    /**
+     *  Proposal 169.
+     *  Pubkey 32 bytes; privkey 32 bytes
+     *  @since 0.9.67
+     */
+    MLKEM1024_X25519(7, 32, 32, EncAlgo.ECIES_MLKEM, "EC/None/NoPadding", X25519_SPEC, "0.9.67"),
+
+    /**
+     *  For internal use only (Alice side)
+     *  Proposal 169.
+     *  Pubkey 800 bytes; privkey 1632 bytes
+     *  @since 0.9.67
+     */
+    MLKEM512_X25519_INT(100005, 800, 1632, EncAlgo.ECIES_MLKEM_INT, "EC/None/NoPadding", X25519_SPEC, "0.9.67"),
+
+    /**
+     *  For internal use only (Alice side)
+     *  Proposal 169.
+     *  Pubkey 1184 bytes; privkey 2400 bytes
+     *  @since 0.9.67
+     */
+    MLKEM768_X25519_INT(100006, 1184, 2400, EncAlgo.ECIES_MLKEM_INT, "EC/None/NoPadding", X25519_SPEC, "0.9.67"),
+
+    /**
+     *  For internal use only (Alice side)
+     *  Proposal 169.
+     *  Pubkey 1568 bytes; privkey 3168 bytes
+     *  @since 0.9.67
+     */
+    MLKEM1024_X25519_INT(100007, 1568, 3168, EncAlgo.ECIES_MLKEM_INT, "EC/None/NoPadding", X25519_SPEC, "0.9.67"),
+
+    /**
+     *  For internal use only (Bob side ciphertext)
+     *  Proposal 169.
+     *  Pubkey 768 bytes; privkey 0
+     *  @since 0.9.67
+     */
+    MLKEM512_X25519_CT(100008, 768, 0, EncAlgo.ECIES_MLKEM_INT, "EC/None/NoPadding", X25519_SPEC, "0.9.67"),
+
+    /**
+     *  For internal use only (Bob side ciphertext)
+     *  Proposal 169.
+     *  Pubkey 1088 bytes; privkey 0
+     *  @since 0.9.67
+     */
+    MLKEM768_X25519_CT(100009, 1088, 0, EncAlgo.ECIES_MLKEM_INT, "EC/None/NoPadding", X25519_SPEC, "0.9.67"),
+
+    /**
+     *  For internal use only (Bob side ciphertext)
+     *  Proposal 169.
+     *  Pubkey 1568 bytes; privkey 0
+     *  @since 0.9.67
+     */
+    MLKEM1024_X25519_CT(100010, 1568, 0, EncAlgo.ECIES_MLKEM_INT, "EC/None/NoPadding", X25519_SPEC, "0.9.67");
 
 
     private final int code, pubkeyLen, privkeyLen;
     private final EncAlgo base;
     private final String algoName, since;
     private final AlgorithmParameterSpec params;
-    private final boolean isAvail;
+    private final boolean isAvail, isPQ;
 
     /**
      *
@@ -68,7 +137,7 @@ public enum EncType {
      */
     EncType(int cod, int pubLen, int privLen, EncAlgo baseAlgo,
             String transformation, AlgorithmParameterSpec pSpec, String supportedSince) {
-        if (pubLen > 256)
+        if (pubLen > 256 && baseAlgo != EncAlgo.ECIES_MLKEM_INT)
             throw new IllegalArgumentException("fixup PublicKey for longer keys");
         code = cod;
         pubkeyLen = pubLen;
@@ -78,6 +147,7 @@ public enum EncType {
         params = pSpec;
         since = supportedSince;
         isAvail = x_isAvailable();
+        isPQ = base == EncAlgo.ECIES_MLKEM;
     }
 
     /** the unique identifier for this type */
@@ -120,11 +190,16 @@ public enum EncType {
     }
 
     private boolean x_isAvailable() {
-        if (ELGAMAL_2048 == this)
-            return true;
-        // EC types are placeholders for now
-        if (base == EncAlgo.EC)
-            return false;
+        switch (base) {
+            case ELGAMAL:
+                return true;
+
+            // EC types are placeholders for now
+            case EC:
+            // internal types
+            case ECIES_MLKEM_INT:
+                return false;
+        }
         try {
             getParams();
         } catch (InvalidParameterSpecException e) {
@@ -152,6 +227,14 @@ public enum EncType {
         if (type == null)
             return false;
         return type.isAvailable();
+    }
+
+    /**
+     *  @since 0.9.67
+     *  @return true if this is a PQ type
+     */
+    public boolean isPQ() {
+        return isPQ;
     }
 
     private static final EncType[] BY_CODE;

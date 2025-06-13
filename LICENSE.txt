@@ -128,6 +128,10 @@ Public domain except as listed below:
    Copyright (C) 2006 The Android Open Source Project
    See licenses/LICENSE-Apache2.0.txt
 
+   ML-KEM:
+   Copyright (c) 2000-2023 The Legion Of The Bouncy Castle Inc. (https://www.bouncycastle.org)
+   See licenses/LICENSE-Bouncycastle.txt
+
 
 Installer:
    (not included in distribution packages)
