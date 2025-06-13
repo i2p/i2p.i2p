@@ -1,7 +1,7 @@
 package org.bouncycastle.crypto.params;
 
 import org.bouncycastle.crypto.CipherParameters;
-import org.bouncycastle.util.Arrays;
+import org.bouncycastle.util.Util;
 
 public class ParametersWithContext
     implements CipherParameters
@@ -19,7 +19,7 @@ public class ParametersWithContext
         }
 
         this.parameters = parameters;
-        this.context = Arrays.clone(context);
+        this.context = Util.clone(context);
     }
 
     public void copyContextTo(byte[] buf, int off, int len)
@@ -34,7 +34,7 @@ public class ParametersWithContext
 
     public byte[] getContext()
     {
-        return Arrays.clone(context);
+        return Util.clone(context);
     }
 
     public int getContextLength()

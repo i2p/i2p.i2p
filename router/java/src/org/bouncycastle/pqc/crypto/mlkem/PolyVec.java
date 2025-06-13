@@ -1,6 +1,6 @@
 package org.bouncycastle.pqc.crypto.mlkem;
 
-import org.bouncycastle.util.Arrays;
+import java.util.Arrays;
 
 class PolyVec
 {

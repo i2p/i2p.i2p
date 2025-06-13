@@ -143,7 +143,8 @@ public class SHA512Digest
 
     protected CryptoServiceProperties cryptoServiceProperties()
     {
-        return Utils.getDefaultProperties(this, 256, purpose);
+        return null;
+        //return Utils.getDefaultProperties(this, 256, purpose);
     }
 }
 

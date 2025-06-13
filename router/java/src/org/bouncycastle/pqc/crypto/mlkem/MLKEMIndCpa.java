@@ -1,6 +1,8 @@
 package org.bouncycastle.pqc.crypto.mlkem;
 
-import org.bouncycastle.util.Arrays;
+import java.util.Arrays;
+
+import org.bouncycastle.util.Util;
 
 class MLKEMIndCpa
 {
@@ -51,7 +53,7 @@ class MLKEMIndCpa
         // (p, sigma) <- G(d || k)
 
         byte[] buf = new byte[64];
-        symmetric.hash_g(buf, Arrays.append(d, (byte)kyberK));
+        symmetric.hash_g(buf, Util.append(d, (byte)kyberK));
 
         byte[] publicSeed = new byte[32]; // p in docs
         byte[] noiseSeed = new byte[32]; // sigma in docs

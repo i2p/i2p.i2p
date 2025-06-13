@@ -1,9 +1,6 @@
 package org.bouncycastle.pqc.crypto.mlkem;
 
-import org.bouncycastle.crypto.EncapsulatedSecretExtractor;
-
 public class MLKEMExtractor
-    implements EncapsulatedSecretExtractor
 {
     private final MLKEMPrivateKeyParameters privateKey;
     private final MLKEMEngine engine;

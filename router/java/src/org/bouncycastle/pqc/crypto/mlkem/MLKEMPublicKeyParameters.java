@@ -1,13 +1,15 @@
 package org.bouncycastle.pqc.crypto.mlkem;
 
-import org.bouncycastle.util.Arrays;
+import java.util.Arrays;
+
+import org.bouncycastle.util.Util;
 
 public class MLKEMPublicKeyParameters
     extends MLKEMKeyParameters
 {
     static byte[] getEncoded(byte[] t, byte[] rho)
     {
-        return Arrays.concatenate(t, rho);
+        return Util.concatenate(t, rho);
     }
 
     final byte[] t;
@@ -16,8 +18,8 @@ public class MLKEMPublicKeyParameters
     public MLKEMPublicKeyParameters(MLKEMParameters params, byte[] t, byte[] rho)
     {
         super(false, params);
-        this.t = Arrays.clone(t);
-        this.rho = Arrays.clone(rho);
+        this.t = Util.clone(t);
+        this.rho = Util.clone(rho);
     }
 
     public MLKEMPublicKeyParameters(MLKEMParameters params, byte[] encoding)
@@ -34,11 +36,11 @@ public class MLKEMPublicKeyParameters
 
     public byte[] getRho()
     {
-        return Arrays.clone(rho);
+        return Util.clone(rho);
     }
 
     public byte[] getT()
     {
-        return Arrays.clone(t);
+        return Util.clone(t);
     }
 }

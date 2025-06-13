@@ -3,11 +3,9 @@ package org.bouncycastle.pqc.crypto.mlkem;
 import java.security.SecureRandom;
 
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
-import org.bouncycastle.crypto.AsymmetricCipherKeyPairGenerator;
 import org.bouncycastle.crypto.KeyGenerationParameters;
 
 public class MLKEMKeyPairGenerator
-    implements AsymmetricCipherKeyPairGenerator
 {
     private MLKEMParameters mlkemParams;
 

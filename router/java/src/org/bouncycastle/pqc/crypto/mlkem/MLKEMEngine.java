@@ -1,8 +1,9 @@
 package org.bouncycastle.pqc.crypto.mlkem;
 
 import java.security.SecureRandom;
+import java.util.Arrays;
 
-import org.bouncycastle.util.Arrays;
+import org.bouncycastle.util.Util;
 
 class MLKEMEngine
 {
@@ -219,7 +220,7 @@ class MLKEMEngine
             s,
             hashedPublicKey,
             z,
-            Arrays.concatenate(d, z)
+            Util.concatenate(d, z)
         };
     }
 
@@ -274,7 +275,7 @@ class MLKEMEngine
 
         byte[] cmp = indCpa.encrypt(publicKey, Arrays.copyOfRange(buf, 0, KyberSymBytes), Arrays.copyOfRange(kr, KyberSymBytes, kr.length));
 
-        boolean fail = !(Arrays.constantTimeAreEqual(cipherText, cmp));
+        boolean fail = !(Util.constantTimeAreEqual(cipherText, cmp));
 
         cmov(kr, implicit_rejection, KyberSymBytes, fail);
 
@@ -294,7 +295,7 @@ class MLKEMEngine
         PolyVec polyVec = new PolyVec(this);
         byte[] seed = indCpa.unpackPublicKey(polyVec, publicKeyInput);
         byte[] ek = indCpa.packPublicKey(polyVec, seed);
-        if (!Arrays.areEqual(ek, publicKeyInput))
+        if (!Arrays.equals(ek, publicKeyInput))
         {
             throw new IllegalArgumentException("Input validation: Modulus check failed for ml-kem encapsulation");
         }

@@ -1,11 +1,12 @@
 package org.bouncycastle.pqc.crypto.util;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.security.auth.DestroyFailedException;
 
 import org.bouncycastle.crypto.SecretWithEncapsulation;
-import org.bouncycastle.util.Arrays;
+import org.bouncycastle.util.Util;
 
 public class SecretWithEncapsulationImpl
     implements SecretWithEncapsulation
@@ -23,7 +24,7 @@ public class SecretWithEncapsulationImpl
 
     public byte[] getSecret()
     {
-        byte[] clone = Arrays.clone(sessionKey);
+        byte[] clone = Util.clone(sessionKey);
 
         checkDestroyed();
 
@@ -32,7 +33,7 @@ public class SecretWithEncapsulationImpl
 
     public byte[] getEncapsulation()
     {
-        byte[] clone = Arrays.clone(cipher_text);
+        byte[] clone = Util.clone(cipher_text);
 
         checkDestroyed();
 
@@ -44,8 +45,8 @@ public class SecretWithEncapsulationImpl
     {
         if (!hasBeenDestroyed.getAndSet(true))
         {
-            Arrays.clear(sessionKey);
-            Arrays.clear(cipher_text);
+            Arrays.fill(sessionKey, (byte) 0);
+            Arrays.fill(cipher_text, (byte) 0);
         }
     }
 

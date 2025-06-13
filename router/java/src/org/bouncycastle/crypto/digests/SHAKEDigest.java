@@ -145,6 +145,6 @@ public class SHAKEDigest
 
     protected CryptoServiceProperties cryptoServiceProperties()
     {
-        return Utils.getDefaultProperties(this, purpose);
+        return null;
     }
 }

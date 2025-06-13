@@ -1,10 +1,11 @@
 package org.bouncycastle.crypto.digests;
 
+import java.util.Arrays;
+
 import org.bouncycastle.crypto.CryptoServiceProperties;
 import org.bouncycastle.crypto.CryptoServicePurpose;
 import org.bouncycastle.crypto.CryptoServicesRegistrar;
 import org.bouncycastle.crypto.ExtendedDigest;
-import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.Pack;
 
 /**
@@ -438,6 +439,6 @@ public class KeccakDigest
 
     protected CryptoServiceProperties cryptoServiceProperties()
     {
-        return Utils.getDefaultProperties(this, getDigestSize() * 8, purpose);
+        return null;
     }
 }

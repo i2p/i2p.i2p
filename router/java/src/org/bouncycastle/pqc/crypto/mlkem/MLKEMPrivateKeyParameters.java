@@ -1,6 +1,8 @@
 package org.bouncycastle.pqc.crypto.mlkem;
 
-import org.bouncycastle.util.Arrays;
+import java.util.Arrays;
+
+import org.bouncycastle.util.Util;
 
 public class MLKEMPrivateKeyParameters
     extends MLKEMKeyParameters
@@ -21,12 +23,12 @@ public class MLKEMPrivateKeyParameters
     {
         super(true, params);
 
-        this.s = Arrays.clone(s);
-        this.hpk = Arrays.clone(hpk);
-        this.nonce = Arrays.clone(nonce);
-        this.t = Arrays.clone(t);
-        this.rho = Arrays.clone(rho);
-        this.seed = Arrays.clone(seed);
+        this.s = Util.clone(s);
+        this.hpk = Util.clone(hpk);
+        this.nonce = Util.clone(nonce);
+        this.t = Util.clone(t);
+        this.rho = Util.clone(rho);
+        this.seed = Util.clone(seed);
     }
 
     public MLKEMPrivateKeyParameters(MLKEMParameters params, byte[] encoding)
@@ -64,17 +66,17 @@ public class MLKEMPrivateKeyParameters
 
     public byte[] getEncoded()
     {
-        return Arrays.concatenate(new byte[][]{ s, t, rho, hpk, nonce });
+        return Util.concatenate(new byte[][]{ s, t, rho, hpk, nonce });
     }
 
     public byte[] getHPK()
     {
-        return Arrays.clone(hpk);
+        return Util.clone(hpk);
     }
 
     public byte[] getNonce()
     {
-        return Arrays.clone(nonce);
+        return Util.clone(nonce);
     }
 
     public byte[] getPublicKey()
@@ -89,21 +91,21 @@ public class MLKEMPrivateKeyParameters
 
     public byte[] getRho()
     {
-        return Arrays.clone(rho);
+        return Util.clone(rho);
     }
 
     public byte[] getS()
     {
-        return Arrays.clone(s);
+        return Util.clone(s);
     }
 
     public byte[] getT()
     {
-        return Arrays.clone(t);
+        return Util.clone(t);
     }
 
     public byte[] getSeed()
     {
-        return Arrays.clone(seed);
+        return Util.clone(seed);
     }
 }
