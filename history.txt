@@ -1,3 +1,14 @@
+2025-06-15 zzz
+ * I2CP: Add support for service records (Proposal 167) (PR 501)
+ * SSU2: Remove old active throttle code (PR 505)
+ * Stats: Remove old stat log feature (PR 503)
+
+2025-06-05 zzz
+ * i2ptunnel: Remove delay before flushing output
+
+2025-06-04 zzz
+ * Console: Add sidebar warning about Java 17
+
 2025-06-02 2.9.0 (API 0.9.66) released
 
 2025-05-30 zzz

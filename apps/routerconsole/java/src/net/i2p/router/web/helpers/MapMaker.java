@@ -51,7 +51,7 @@ import net.i2p.util.Translate;
  *
  * Also contains commented-out code to generate the mercator.txt file.
  *
- * @since 0.9.xx
+ * @since 0.9.66
  */
 public class MapMaker {
     private final RouterContext _context;
