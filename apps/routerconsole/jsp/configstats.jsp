@@ -27,19 +27,8 @@
  <input type="checkbox" class="optbox" id="enableFull" name="isFull" value="true" <%
  if (statshelper.getIsFull()) { %>checked="checked" <% } %> >
  (<%=intl._t("change requires restart to take effect")%>)</label><br>
-<%
 
-  // stats.log for devs only and grows without bounds, not recommended
-  boolean shouldShowLog = statshelper.shouldShowLog();
-  if (shouldShowLog) {
-
-%><%=intl._t("Stat file")%>: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" >
-Warning - Log with care, stat file grows without limit.<br>
-<%
-
-  }  // shouldShowLog
-
-%></p>
+</p>
  <div class="wideload">
  <table id="configstats">
  <% while (statshelper.hasMoreStats()) {
@@ -50,47 +39,21 @@ Warning - Log with care, stat file grows without limit.<br>
      <a class="script" id="toggle-<%=statshelper.getCurrentGroupName()%>" title="<%=intl._t("Toggle section graphing options")%>" href="#">[<%=intl._t("toggle all")%>]</a>
      </th></tr>
  <tr class="tablefooter">
-<%
 
-  if (shouldShowLog) {
-
-%>  <td align="center"><b><%=intl._t("Log")%></b></td>
-<%
-
-  }  // shouldShowLog
-
-%>    <td align="center"><b title="<%=intl._t("Select stats for visualization on /graphs")%>"><%=intl._t("Graph")%></b></td>
+    <td align="center"><b title="<%=intl._t("Select stats for visualization on /graphs")%>"><%=intl._t("Graph")%></b></td>
     <td></td></tr>
         <%
      } // end iterating over required groups for the current stat %>
  <tr>
-<%
 
-  if (shouldShowLog) {
-
-%>   <td align="center"><a name="<%=statshelper.getCurrentStatName()%>"></a><input type="checkbox" class="optbox <%=statshelper.getCurrentGroupName()%>" name="statList" value="<%=statshelper.getCurrentStatName()%>" <%
-     if (statshelper.getCurrentIsLogged()) { %>checked="checked" <% } %> ></td>
-<%
-
-  }  // shouldShowLog
-
-%>   <td align="center"><% if (statshelper.getCurrentCanBeGraphed()) { %><input type="checkbox" class="optbox <%=statshelper.getCurrentGroupName()%>" id="<%=statshelper.getCurrentStatName()%>" name="graphList" value="<%=statshelper.getCurrentGraphName()%>" <%
+     <td align="center"><% if (statshelper.getCurrentCanBeGraphed()) { %><input type="checkbox" class="optbox <%=statshelper.getCurrentGroupName()%>" id="<%=statshelper.getCurrentStatName()%>" name="graphList" value="<%=statshelper.getCurrentGraphName()%>" <%
        if (statshelper.getCurrentIsGraphed()) { %>checked="checked" <% } %> ><% } %></td> <% // no whitespace here so we can use td:empty to remove css pointer from inert labels %>
      <td align="left"><label for="<%=statshelper.getCurrentStatName()%>"><b><%=statshelper.getCurrentStatName()%>:</b>&nbsp;
      <%=statshelper.getCurrentStatDescription()%></label></td></tr><%
     } // end iterating over all stats
+%>
 
-  if (shouldShowLog) {
-
-%> <tr><td colspan="3"></td></tr>
- <tr><td align="center"><label><input type="checkbox" class="optbox" name="explicitFilter" ></td>
-     <td colspan="2"><%=intl._t("Advanced filter")%>:</label>
-<input type="text" name="explicitFilterValue" value="<%=statshelper.getExplicitFilter()%>" size="40" ></td></tr>
-<%
-
-  }  // shouldShowLog
-
-%>   <tr class="tablefooter"><td colspan="3" align="right" class="optionsave">
+<tr class="tablefooter"><td colspan="3" align="right" class="optionsave">
 <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
 <input type="submit" name="shouldsave" class="accept" value="<%=intl._t("Save changes")%>" >
 </td></tr>

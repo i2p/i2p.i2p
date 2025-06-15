@@ -15,18 +15,12 @@ import net.i2p.stat.StatManager;
  *
  */
 public class ConfigStatsHandler extends FormHandler {
-    private String _filename;
-    private List<String> _stats;
     private String _graphs;
-    private boolean _explicitFilter;
-    private String _explicitFilterValue;
     private boolean _isFull;
     
     public ConfigStatsHandler() {
         super();
-        _stats = new ArrayList<String>();
         _graphs = "";
-        _explicitFilter = false;
         _isFull = false;
     }
     
@@ -34,20 +28,6 @@ public class ConfigStatsHandler extends FormHandler {
     protected void processForm() {
         if (_action != null && _action.equals("foo")) {
             saveChanges();
-        }
-    }
-    
-    public void setFilename(String filename) {
-        _filename = (filename != null ? filename.trim() : null);
-    }
-
-    public void setStatList(String stats[]) {
-        if (stats != null) {
-            for (int i = 0; i < stats.length; i++) {
-                String cur = stats[i].trim();
-                if ( (cur.length() > 0) && (!_stats.contains(cur)) )
-                    _stats.add(cur);
-            }
         }
     }
 
@@ -68,8 +48,6 @@ public class ConfigStatsHandler extends FormHandler {
         }
     }
 
-    public void setExplicitFilter(String foo) { _explicitFilter = true; }
-    public void setExplicitFilterValue(String filter) { _explicitFilterValue = filter; }
     public void setIsFull(String foo) { _isFull = true; }
     
     /**
@@ -79,44 +57,11 @@ public class ConfigStatsHandler extends FormHandler {
      */
     private void saveChanges() {
         Map<String, String> changes = new HashMap<String, String>();
-        if (_filename == null)
-            _filename = StatManager.DEFAULT_STAT_FILE;
-        changes.put(StatManager.PROP_STAT_FILE, _filename);
-        
-        if (_explicitFilter) {
-            _stats.clear();
-            if (_explicitFilterValue == null)
-                _explicitFilterValue = "";
-            
-            if (_explicitFilterValue.indexOf(',') != -1) {
-                StringTokenizer tok = new StringTokenizer(_explicitFilterValue, ",");
-                while (tok.hasMoreTokens()) {
-                    String cur = tok.nextToken().trim();
-                    if ( (cur.length() > 0) && (!_stats.contains(cur)) )
-                        _stats.add(cur);
-                }
-            } else {
-                String stat = _explicitFilterValue.trim();
-                if ( (stat.length() > 0) && (!_stats.contains(stat)) )
-                    _stats.add(stat);
-            }
-        }
-        
-        StringBuilder stats = new StringBuilder();
-        for (int i = 0; i < _stats.size(); i++) {
-            stats.append(_stats.get(i));
-            if (i + 1 < _stats.size())
-                stats.append(',');
-        }
-            
-        changes.put(StatManager.PROP_STAT_FILTER, stats.toString());
         boolean graphsChanged = !_graphs.equals(_context.getProperty("stat.summaries"));
         changes.put("stat.summaries", _graphs);
         boolean fullChanged = _context.getBooleanProperty(StatManager.PROP_STAT_FULL) != _isFull;
         changes.put(StatManager.PROP_STAT_FULL, Boolean.toString(_isFull));
         _context.router().saveConfig(changes, null);
-        if (!_stats.isEmpty())
-            addFormNotice(_t("Stat filter and location updated successfully to") + ": " + stats.toString());
         if (fullChanged) {
             if (_isFull)
                 addFormNotice(_t("Full statistics enabled"));

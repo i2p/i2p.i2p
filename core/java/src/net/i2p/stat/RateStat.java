@@ -17,8 +17,6 @@ public class RateStat {
     private final String _description;
     /** actual rate objects for this statistic */
     protected final Rate[] _rates;
-    /** component we tell about events as they occur */
-    private StatLog _statLog;
 
     public RateStat(String name, String description, String group, long periods[]) {
         _statName = name;
@@ -39,17 +37,10 @@ public class RateStat {
         }
     }
 
-    /**
-     *  Sets the default stat log for this RateStat.
-     *  Deprecated, unused, to be disabled in a future release.
-     */
-    public void setStatLog(StatLog sl) { _statLog = sl; }
-    
     /** 
      * update all of the rates for the various periods with the given value.  
      */
     public void addData(long value, long eventDuration) {
-        if (_statLog != null) _statLog.addData(_groupName, _statName, value, eventDuration);
         for (Rate r: _rates)
             r.addData(value, eventDuration);
     }
@@ -60,7 +51,6 @@ public class RateStat {
      * @since 0.8.10
      */
     public void addData(long value) {
-        if (_statLog != null) _statLog.addData(_groupName, _statName, value, 0);
         for (Rate r: _rates)
             r.addData(value);
     }
