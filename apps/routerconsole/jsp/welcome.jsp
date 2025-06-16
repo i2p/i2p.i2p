@@ -132,7 +132,7 @@
     }
 %>
 </div>
-<form action="" method="POST">
+<form action="/welcome" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>">
 <input type="hidden" name="action" value="blah" >
 <input type="hidden" name="page" value="<%=(ipg + 1)%>" >
