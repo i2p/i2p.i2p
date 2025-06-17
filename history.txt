@@ -1,3 +1,7 @@
+2025-06-17 zzz
+ * Router: Store ident and hash at startup, remove lock (PR 507)
+ * Transports: Remove unused ElG DH builder (PR 508)
+
 2025-06-15 zzz
  * I2CP: Add support for service records (Proposal 167) (PR 501)
  * SSU2: Remove old active throttle code (PR 505)
