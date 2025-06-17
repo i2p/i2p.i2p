@@ -31,7 +31,6 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
-import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import static net.i2p.router.transport.ntcp.OutboundNTCP2State.*;
 import net.i2p.util.Addresses;
 import net.i2p.util.ByteArrayStream;
