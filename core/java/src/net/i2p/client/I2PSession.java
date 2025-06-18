@@ -423,6 +423,32 @@ public interface I2PSession {
     public LookupResult lookupDest2(String name, long maxWait) throws I2PSessionException;
 
     /**
+     *  Lookup a Destination by hostname.
+     *  Non-blocking.
+     *  If the result is cached or there is an immediate failure,
+     *  the result code will be something other than RESULT_DEFERRED, and the callback will NOT be called.
+     *
+     *  @param maxWait ms
+     *  @param callback to return the result, non-null
+     *  @return non-null. If result code is RESULT_DEFERRED, callback will be called later
+     *  @since 0.9.67
+     */
+    public LookupResult lookupDest(Hash h, long maxWait, LookupCallback callback) throws I2PSessionException;
+
+    /**
+     *  Lookup a Destination by hash.
+     *  Non-blocking.
+     *  If the result is cached or there is an immediate failure,
+     *  the result code will be something other than RESULT_DEFERRED, and the callback will NOT be called.
+     *
+     *  @param maxWait ms
+     *  @param callback to return the result, non-null
+     *  @return non-null. If result code is RESULT_DEFERRED, callback will be called later
+     *  @since 0.9.67
+     */
+    public LookupResult lookupDest(String name, long maxWait, LookupCallback callback) throws I2PSessionException;
+
+    /**
      *  Pass updated options to the router.
      *  Does not remove properties previously present but missing from this options parameter.
      *  Fails silently if session is not connected.
