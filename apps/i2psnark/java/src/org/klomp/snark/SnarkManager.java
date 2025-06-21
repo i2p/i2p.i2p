@@ -3081,6 +3081,13 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
      */
     public List<Tracker> getSortedTrackers() { 
         List<Tracker> rv = new ArrayList<Tracker>(_trackerMap.values());
+        if (!_util.udpEnabled()) {
+            for (Iterator<Tracker> iter = rv.iterator(); iter.hasNext(); ) {
+                 Tracker tr = iter.next();
+                 if (tr.announceURL.startsWith("udp://"))
+                     iter.remove();
+            }
+        }
         Collections.sort(rv, new IgnoreCaseComparator());
         return rv;
     }

@@ -1,5 +1,6 @@
 package org.klomp.snark;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -11,8 +12,8 @@ import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.I2PSessionMuxedListener;
 import net.i2p.client.SendMessageOptions;
-import net.i2p.client.datagram.I2PDatagramDissector;
-import net.i2p.client.datagram.I2PDatagramMaker;
+import net.i2p.client.datagram.Datagram2;
+import net.i2p.client.datagram.Datagram3;
 import net.i2p.client.datagram.I2PInvalidDatagramException;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -21,6 +22,9 @@ import net.i2p.data.Hash;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
+import org.klomp.snark.I2PSnarkUtil;
+import org.klomp.snark.TrackerClient;
+
 /**
  *  One of these for all trackers and info hashes.
  *  Ref: BEP 15, proposal 160
@@ -28,15 +32,17 @@ import net.i2p.util.SimpleTimer2;
  *  The main difference from BEP 15 is that the announce response
  *  contains a 32-byte hash instead of a 4-byte IP and a 2-byte port.
  *
- *  This implements only "fast mode".
- *  We send only repliable datagrams, and
- *  receive only raw datagrams, as follows:
+ *  We send both repliable and raw datagrams, but
+ *  we only receive raw datagrams, as follows:
  *
  *<pre>
  *  client		tracker		type
  *  ------		-------		----
- *   announce  --&gt;			repliable
- *            	&lt;-- 	ann resp	raw
+ *   conn req	-->			(repliable to query port)
+ *          	<--	conn resp	(raw from resp port)
+ *   announce  -->			(raw to resp port)
+ *            	<-- 	ann resp	(raw from resp port)
+ *          	<--	error		(raw from resp port)
  *</pre>
  *
  *  @since 0.9.53, enabled in 0.9.54
@@ -48,6 +54,8 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
     /** hook to inject and receive datagrams */
     private final I2PSession _session;
     private final I2PSnarkUtil _util;
+    /** 20 byte random id */
+    private final int _myKey;
     private final Hash _myHash;
     /** unsigned dgrams */
     private final int _rPort;
@@ -55,7 +63,10 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
     private final ConcurrentHashMap<HostPort, Tracker> _trackers;
     /** our TID to tracker */
     private final Map<Integer, ReplyWaiter> _sentQueries;
+    private final SimpleTimer2.TimedEvent _cleaner;
     private boolean _isRunning;
+
+    private static final long INIT_CONN_ID = 0x41727101980L;
 
     public static final int EVENT_NONE = 0;
     public static final int EVENT_COMPLETED = 1;
@@ -70,6 +81,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
     private static final int SEND_CRYPTO_TAGS = 8;
     private static final int LOW_CRYPTO_TAGS = 4;
 
+    private static final long CONN_EXPIRATION = 60*1000; // BEP 15
     private static final long DEFAULT_TIMEOUT = 15*1000;
     private static final long DEFAULT_QUERY_TIMEOUT = 60*1000;
     private static final long CLEAN_TIME = 163*1000;
@@ -78,8 +90,6 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
     private static final int DEFAULT_INTERVAL = 60*60;
     private static final int MIN_INTERVAL = 15*60;
     private static final int MAX_INTERVAL = 8*60*60;
-
-    private enum WaitState { INIT, SUCCESS, TIMEOUT, FAIL }
 
     /**
      *
@@ -90,9 +100,11 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
         _util = util;
         _log = ctx.logManager().getLog(UDPTrackerClient.class);
         _rPort = TrackerClient.PORT - 1;
+        _myKey = ctx.random().nextInt();
         _myHash = session.getMyDestination().calculateHash();
         _trackers = new ConcurrentHashMap<HostPort, Tracker>(8);
         _sentQueries = new ConcurrentHashMap<Integer, ReplyWaiter>(32);
+        _cleaner = new Cleaner();
     }
 
 
@@ -104,6 +116,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
             return;
         _session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM_RAW, _rPort);
         _isRunning = true;
+        _cleaner.schedule(7 * CLEAN_TIME);
     }
 
     /**
@@ -114,6 +127,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
             return;
         _isRunning = false;
         _session.removeListener(I2PSession.PROTO_DATAGRAM_RAW, _rPort);
+        _cleaner.cancel();
         _trackers.clear();
         for (ReplyWaiter w : _sentQueries.values()) {
             w.cancel();
@@ -128,7 +142,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
      *
      *  @param ih the Info Hash (torrent)
      *  @param max maximum number of peers to return
-     *  @param maxWait the maximum time to wait (ms) must be greater than 0
+     *  @param maxWait the maximum time to wait (ms) must be > 0
      *  @param fast if true, don't wait for dest, no retx, ...
      *  @return null on fail or if fast is true
      */
@@ -138,7 +152,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
                                     int event, boolean fast) {
         long now = _context.clock().now();
         long end = now + maxWait;
-        if (toPort < 0)
+        if (toPort <= 0)
             throw new IllegalArgumentException();
         Tracker tr = getTracker(toHost, toPort);
         if (tr.getDest(fast) == null) {
@@ -154,6 +168,12 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
                 _log.info("out of time after resolving: " + tr);
             return null;
         }
+        Long cid = getConnection(tr, now + toWait);
+        if (cid == null) {
+            if (_log.shouldInfo())
+                _log.info("no connection for: " + tr);
+            return null;
+        }
         if (fast) {
             toWait = 0;
         } else {
@@ -164,7 +184,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
                 return null;
             }
         }
-        ReplyWaiter w = sendAnnounce(tr, 0, ih, peerID,
+        ReplyWaiter w = sendAnnounce(tr, cid.longValue(), ih, peerID,
                                      downloaded, left, uploaded, event, max, toWait);
         if (fast)
             return null;
@@ -185,6 +205,55 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
     //////// private below here
 
     /**
+     *  @return the connection ID, or null on fail
+     */
+    private Long getConnection(Tracker tr, long untilTime) {
+        boolean shouldConnect = false;
+        synchronized(tr) {
+            boolean wasInProgress = false;
+            while(true) {
+                Long conn = tr.getConnection();
+                if (conn != null)
+                    return conn;
+                // don't resend right after somebody else failed
+                if (wasInProgress)
+                    return null;
+                long now = _context.clock().now();
+                long toWait = untilTime - now;
+                if (toWait <= 0)
+                    return null;
+                if (tr.isConnInProgress()) {
+                    wasInProgress = true;
+                    try {
+                        tr.wait(toWait);
+                    } catch (InterruptedException ie) {}
+                } else {
+                    shouldConnect = true;
+                    tr.setConnInProgress(true);
+                    break;
+                }
+            }
+        }
+        if (shouldConnect) {
+            long now = _context.clock().now();
+            long toWait = untilTime - now;
+            if (toWait <= 1000) {
+                tr.setConnInProgress(false);
+                return null;
+            }
+            ReplyWaiter w = sendConnReq(tr, toWait);
+            if (w == null) {
+                tr.setConnInProgress(false);
+                return null;
+            }
+            boolean success = waitAndRetransmit(w, untilTime);
+            if (success)
+                return tr.getConnection();
+        }
+        return null;
+      }
+
+    /**
      *  @return non-null
      */
     private Tracker getTracker(String host, int port) {
@@ -199,6 +268,40 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
 
     /**
      *  Send one time with a new tid
+     *  @param toWait > 0
+     *  @return null on failure or if toWait <= 0
+     */
+    private ReplyWaiter sendConnReq(Tracker tr, long toWait) {
+        if (toWait <= 0)
+            throw new IllegalArgumentException();
+        int tid = _context.random().nextInt();
+        byte[] payload = sendConnReq(tr, tid);
+        if (payload != null) {
+            ReplyWaiter rv = new ReplyWaiter(tid, tr, ACTION_CONNECT, payload, toWait);
+            _sentQueries.put(Integer.valueOf(tid), rv);
+            if (_log.shouldInfo())
+                _log.info("Sent: " + rv + " timeout: " + toWait);
+            return rv;
+        }
+        return null;
+    }
+
+    /**
+     *  Send one time with given tid
+     *  @return the payload or null on failure
+     */
+    private byte[] sendConnReq(Tracker tr, int tid) {
+        // same as BEP 15
+        byte[] payload = new byte[16];
+        DataHelper.toLong8(payload, 0, INIT_CONN_ID);
+        // next 4 bytes are already zero
+        DataHelper.toLong(payload, 12, 4, tid);
+        boolean rv = sendMessage(tr.getDest(true), tr.getPort(), payload, true);
+        return rv ? payload : null;
+    }
+
+    /**
+     *  Send one time with a new tid
      *  @param toWait if <= 0 does not register
      *  @return null on failure or if toWait <= 0
      */
@@ -210,7 +313,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
         byte[] payload = sendAnnounce(tr, tid, connID, ih, id, downloaded, left, uploaded, event, numWant);
         if (payload != null) {
             if (toWait > 0) {
-                ReplyWaiter rv = new ReplyWaiter(tid, tr, payload, toWait);
+                ReplyWaiter rv = new ReplyWaiter(tid, tr, ACTION_ANNOUNCE, payload, toWait);
                 _sentQueries.put(Integer.valueOf(tid), rv);
                 if (_log.shouldInfo())
                     _log.info("Sent: " + rv + " timeout: " + toWait);
@@ -242,7 +345,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
         DataHelper.toLong(payload, 80, 4, event);
         DataHelper.toLong(payload, 92, 4, numWant);
         DataHelper.toLong(payload, 96, 2, TrackerClient.PORT);
-        boolean rv = sendMessage(tr.getDest(true), tr.getPort(), payload, true);
+        boolean rv = sendMessage(tr.getDest(true), tr.getPort(), payload, false);
         return rv ? payload : null;
     }
 
@@ -257,9 +360,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
                     if (toWait <= 0)
                         return false;
                     w.wait(toWait);
-                } catch (InterruptedException ie) {
-                    return false;
-                }
+                } catch (InterruptedException ie) {}
                 switch (w.getState()) {
                     case INIT:
                         continue;
@@ -290,11 +391,12 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
      *  @return success
      */
     private boolean resend(ReplyWaiter w, long toWait) {
+        boolean repliable = w.getExpectedAction() == ACTION_CONNECT;
         Tracker tr = w.getSentTo();
         int port = tr.getPort();
         if (_log.shouldInfo())
             _log.info("Resending: " + w + " timeout: " + toWait);
-        boolean rv = sendMessage(tr.getDest(true), port, w.getPayload(), true);
+        boolean rv = sendMessage(tr.getDest(true), port, w.getPayload(), repliable);
         if (rv) {
             _sentQueries.put(Integer.valueOf(w.getID()), w);
             w.schedule(toWait);
@@ -319,28 +421,35 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
                 _log.info("send failed, no dest");
             return false;
         }
-        if (dest.calculateHash().equals(_myHash))
+        Hash to = dest.calculateHash();
+        if (to.equals(_myHash))
             throw new IllegalArgumentException("don't send to ourselves");
 
         if (repliable) {
-            I2PDatagramMaker dgMaker = new I2PDatagramMaker(_session);
-            payload = dgMaker.makeI2PDatagram(payload);
-            if (payload == null) {
+            try {
+                payload = Datagram2.make(_context, _session, payload, to);
+            } catch (DataFormatException dfe) {
                 if (_log.shouldWarn())
-                    _log.warn("DGM fail");
+                    _log.warn("DG2 fail", dfe);
+                return false;
+            }
+        } else {
+            try {
+                payload = Datagram3.make(_context, _session, payload);
+            } catch (DataFormatException dfe) {
+                if (_log.shouldWarn())
+                    _log.warn("DG3 fail", dfe);
                 return false;
             }
         }
 
         SendMessageOptions opts = new SendMessageOptions();
         opts.setDate(_context.clock().now() + 60*1000);
-        opts.setTagsToSend(SEND_CRYPTO_TAGS);
-        opts.setTagThreshold(LOW_CRYPTO_TAGS);
         if (!repliable)
             opts.setSendLeaseSet(false);
         try {
             boolean success = _session.sendMessage(dest, payload, 0, payload.length,
-                                                   repliable ? I2PSession.PROTO_DATAGRAM : I2PSession.PROTO_DATAGRAM_RAW,
+                                                   repliable ? I2PSession.PROTO_DATAGRAM2 : I2PSession.PROTO_DATAGRAM3,
                                                    _rPort, toPort, opts);
             if (success) {
                 // ...
@@ -376,36 +485,69 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
                 _log.info("Rcvd msg with no one waiting: " + tid);
             return;
         }
+        int expect = waiter.getExpectedAction();
+        if (expect != action && action != ACTION_ERROR) {
+            if (_log.shouldInfo())
+                _log.info("Got action " + action + " but wanted " + expect + " for: " + waiter);
+            waiter.gotReply(false);
+            return;
+        }
 
-        if (action == ACTION_ANNOUNCE) {
+        switch (action) {
+          case ACTION_CONNECT:
+            receiveConnection(waiter, payload, fromPort);
+            break;
+
+          case ACTION_ANNOUNCE:
             receiveAnnounce(waiter, payload);
-        } else if (action == ACTION_ERROR) {
-            receiveError(waiter, payload);
-        } else {
-            // includes ACTION_CONNECT
+            break;
+
+          case ACTION_ERROR:
+            receiveError(waiter, payload, expect);
+            break;
+
+          default:
             if (_log.shouldInfo())
                 _log.info("Rcvd msg with unknown action: " + action + " for: " + waiter);
             waiter.gotReply(false);
             Tracker tr = waiter.getSentTo();
+            tr.gotError();
+            break;
+        }
+    }
+
+    /**
+     * @param lifetime ms
+     */
+    private void receiveConnection(ReplyWaiter waiter, byte[] payload, int fromPort) {
+        Tracker tr = waiter.getSentTo();
+        if (payload.length >= 16) {
+            long cid = DataHelper.fromLong8(payload, 8);
+            long lifetime;
+            if (payload.length >= 18) {
+                // extension to BEP 15
+                lifetime = DataHelper.fromLong(payload, 16, 2) * 1000;
+            } else {
+                lifetime = CONN_EXPIRATION;
+            }
+            if (_log.shouldInfo())
+                _log.info("Rcvd connect response, id = " + cid + " lifetime = " + (lifetime / 1000) + " from " + tr);
+            tr.setConnection(cid, fromPort, lifetime);
+            waiter.gotReply(true);
+        } else {
+            waiter.gotReply(false);
             tr.gotError();
         }
     }
 
     private void receiveAnnounce(ReplyWaiter waiter, byte[] payload) {
         Tracker tr = waiter.getSentTo();
-        if (payload.length >= 22) {
+        if (payload.length >= 20) {
             int interval = Math.min(MAX_INTERVAL, Math.max(MIN_INTERVAL,
                                                            (int) DataHelper.fromLong(payload, 8, 4)));
             int leeches = (int) DataHelper.fromLong(payload, 12, 4);
             int seeds = (int) DataHelper.fromLong(payload, 16, 4);
-            int peers = (int) DataHelper.fromLong(payload, 20, 2);
-            if (22 + (peers * Hash.HASH_LENGTH) > payload.length) {
-                if (_log.shouldWarn())
-                    _log.warn("Short reply");
-                waiter.gotReply(false);
-                tr.gotError();
-                return;
-            }
+            int peers = (payload.length - 20) / Hash.HASH_LENGTH;
             if (_log.shouldInfo())
                 _log.info("Rcvd " + peers + " peers from " + tr);
             Set<Hash> hashes;
@@ -426,7 +568,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
         }
     }
 
-    private void receiveError(ReplyWaiter waiter, byte[] payload) {
+    private void receiveError(ReplyWaiter waiter, byte[] payload, int expected) {
         String msg;
         if (payload.length > 8) {
             msg = DataHelper.getUTF8(payload, 8, payload.length - 8);
@@ -437,6 +579,9 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
         waiter.gotResponse(resp);
         Tracker tr = waiter.getSentTo();
         tr.gotError();
+        if (waiter.getExpectedAction() == ACTION_ANNOUNCE) {
+            // TODO if we were waiting for an announce reply, fire off a new connection request
+        }
     }
 
     // I2PSessionMuxedListener interface ----------------
@@ -486,6 +631,43 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
     public void errorOccurred(I2PSession session, String message, Throwable error) {
         if (_log.shouldWarn())
             _log.warn("UDPTC got error msg: ", error);
+    }
+
+    /**
+     * Cleaner-upper
+     */
+    private class Cleaner extends SimpleTimer2.TimedEvent {
+
+        public Cleaner() {
+            super(SimpleTimer2.getInstance(), 7 * CLEAN_TIME);
+        }
+
+        public void timeReached() {
+            if (!_isRunning)
+                return;
+            long now = _context.clock().now();
+/********
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("UDPTC cleaner starting with " +
+                          _blacklist.size() + " in blacklist, " +
+                          _outgoingTokens.size() + " sent Tokens, " +
+                          _incomingTokens.size() + " rcvd Tokens");
+            long expire = now - MAX_TOKEN_AGE;
+            for (Iterator<Token> iter = _outgoingTokens.keySet().iterator(); iter.hasNext(); ) {
+                Token tok = iter.next();
+                if (tok.lastSeen() < expire)
+                    iter.remove();
+            }
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("UDPTC cleaner done, now with " +
+                          _blacklist.size() + " in blacklist, " +
+                          _outgoingTokens.size() + " sent Tokens, " +
+                          _incomingTokens.size() + " rcvd Tokens, " +
+                          _knownNodes.size() + " known peers, " +
+                          _sentQueries.size() + " queries awaiting response");
+*******/
+            schedule(CLEAN_TIME);
+        }
     }
 
     public static class TrackerResponse {
@@ -578,20 +760,27 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
         }
     }
 
+    private enum ConnState { INVALID, IN_PROGRESS, VALID }
+
     private class Tracker extends HostPort {
 
         private final Object destLock = new Object();
         private Destination dest;
+        // we store as a Long because all values are valid, so null is unset
+        private Long cid;
         private long expires;
         private long lastHeardFrom;
         private long lastFailed;
         private int consecFails;
+        private int responsePort;
         private int interval = DEFAULT_INTERVAL;
+        private ConnState state = ConnState.INVALID;
 
         private static final long DELAY = 15*1000;
 
         public Tracker(String host, int port) {
             super(host, port);
+            responsePort = port;
         }
 
         /**
@@ -606,10 +795,55 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
             }
         }
 
+        public synchronized void setConnInProgress(boolean yes) {
+            if (yes)
+                state = ConnState.IN_PROGRESS;
+            else if (state == ConnState.IN_PROGRESS)
+                state = ConnState.INVALID;
+        }
+
+        public synchronized boolean isConnInProgress() {
+            return state == ConnState.IN_PROGRESS;
+        }
+
+        public synchronized boolean isConnValid() {
+            return state == ConnState.VALID &&
+                   expires > _context.clock().now();
+        }
+
+        public synchronized void connFailed() {
+            replyTimeout();
+            expires = 0;
+            state = ConnState.INVALID;
+        }
+
         /** does not change state */
         public synchronized void replyTimeout() {
             consecFails++;
             lastFailed = _context.clock().now();
+        }
+
+        /**
+         * sets heardFrom
+         * @param lifetime ms
+         */
+        public synchronized void setConnection(long cid, int rport, long lifetime) {
+            this.cid = Long.valueOf(cid);
+            responsePort = rport;
+            long now = _context.clock().now();
+            lastHeardFrom = now;
+            expires = now + lifetime;
+            consecFails = 0;
+            state = ConnState.VALID;
+        }
+
+        /**
+         *  @return null if invalid
+         */
+        public synchronized Long getConnection() {
+            if (isConnValid())
+                return cid;
+            return null;
         }
 
         public synchronized int getInterval() {
@@ -629,7 +863,9 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
         public synchronized void gotError() {
             long now = _context.clock().now();
             lastHeardFrom = now;
-            consecFails = 0;
+            consecFails++;
+            state = ConnState.INVALID;
+            cid = null;
             this.notifyAll();
         }
 
@@ -640,9 +876,12 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
 
         @Override
         public String toString() {
-            return "UDP Tracker " + host + ':' + port + " hasDest? " + (dest != null);
+            return "UDP Tracker " + host + ':' + port + " hasDest? " + (dest != null) +
+                   "valid? " + isConnValid() + " conn ID: " + (cid != null ? cid : "none") + ' ' + state;
         }
     }
+
+    private enum WaitState { INIT, SUCCESS, TIMEOUT, FAIL }
 
     /**
      * Callback for replies
@@ -650,6 +889,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
     private class ReplyWaiter extends SimpleTimer2.TimedEvent {
         private final int tid;
         private final Tracker sentTo;
+        private final int action;
         private final byte[] data;
         private TrackerResponse replyObject;
         private WaitState state = WaitState.INIT;
@@ -659,10 +899,11 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
          *  Any sent data to be remembered may be stored by setSentObject().
          *  Reply object may be in getReplyObject().
          */
-        public ReplyWaiter(int tid, Tracker tracker, byte[] payload, long toWait) {
+        public ReplyWaiter(int tid, Tracker tracker, int action, byte[] payload, long toWait) {
             super(SimpleTimer2.getInstance(), toWait);
             this.tid = tid;
             sentTo = tracker;
+            this.action = action;
             data = payload;
         }
 
@@ -672,6 +913,10 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
 
         public Tracker getSentTo() {
             return sentTo;
+        }
+
+        public int getExpectedAction() {
+            return action;
         }
 
         public byte[] getPayload() {
@@ -719,7 +964,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
          */
         public synchronized void gotResponse(TrackerResponse resp) {
             replyObject = resp;
-            gotReply(true);
+            gotReply(resp.error == null);
         }
 
         /**
@@ -736,9 +981,9 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
             // don't trump success or failure
             if (state != WaitState.INIT)
                 return;
-            //if (action == ACTION_CONNECT)
-            //    sentTo.connFailed();
-            //else
+            if (action == ACTION_CONNECT)
+                sentTo.connFailed();
+            else
                 sentTo.replyTimeout();
             setState(WaitState.TIMEOUT);
             if (_log.shouldWarn())
@@ -747,7 +992,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
 
         @Override
         public String toString() {
-            return "Waiting for ID: " + tid + " to: " + sentTo + " state: " + state;
+            return "Message type: " + action + " ID: " + tid + " to: " + sentTo + " state: " + state;
         }
     }
 }

@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.i2p.data.Hash;
+
 import org.klomp.snark.bencode.BDecoder;
 import org.klomp.snark.bencode.BEValue;
 import org.klomp.snark.bencode.InvalidBEncodingException;
@@ -123,6 +125,21 @@ class TrackerInfo
   }
 ******/
 
+  /**
+   *  To convert returned UDPTracker data to the standard structure
+   *  @param hashes may be null
+   *  @param error may be null
+   *  @since 0.9.14
+   */
+  public TrackerInfo(Set<Hash> hashes, int interval, int complete, int incomplete, String error,
+                     byte[] my_id, byte[] infohash, MetaInfo metainfo, I2PSnarkUtil util) {
+      peers = getPeers(hashes, my_id, infohash, metainfo, util);
+      this.interval = interval;
+      this.complete = complete;
+      this.incomplete = incomplete;
+      failure_reason = error;
+  }
+
   /** List of Dictionaries or List of Strings */
   private static Set<Peer> getPeers(List<BEValue> l, byte[] my_id, byte[] infohash, MetaInfo metainfo, I2PSnarkUtil util)
     throws IOException
@@ -167,6 +184,31 @@ class TrackerInfo
         PeerID peerID;
         byte[] hash = new byte[HASH_LENGTH];
         System.arraycopy(l, i * HASH_LENGTH, hash, 0, HASH_LENGTH);
+        try {
+            peerID = new PeerID(hash, util);
+        } catch (InvalidBEncodingException ibe) {
+            // won't happen
+            continue;
+        }
+        peers.add(new Peer(peerID, my_id, infohash, metainfo));
+      }
+
+    return peers;
+  }
+
+  /**
+   *  From Hash to Peer
+   *  @since 0.9.14
+   */
+  private static Set<Peer> getPeers(Set<Hash> hashes, byte[] my_id,
+                                    byte[] infohash, MetaInfo metainfo, I2PSnarkUtil util) {
+    if (hashes == null)
+        return Collections.emptySet();
+    Set<Peer> peers = new HashSet<Peer>(hashes.size());
+    for (Hash h : hashes) {
+        PeerID peerID;
+        byte[] hash = new byte[HASH_LENGTH];
+        System.arraycopy(h.getData(), 0, hash, 0, HASH_LENGTH);
         try {
             peerID = new PeerID(hash, util);
         } catch (InvalidBEncodingException ibe) {
