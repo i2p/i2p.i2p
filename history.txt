@@ -1,3 +1,9 @@
+2025-06-21 zzz
+ * i2psnark: Update UDP announce support (Proposal 160) (PR 504)
+
+2025-06-18 zzz
+ * I2CP: Add asynch lookup API (PR 511)
+
 2025-06-17 zzz
  * Router: Store ident and hash at startup, remove lock (PR 507)
  * Transports: Remove unused ElG DH builder (PR 508)
