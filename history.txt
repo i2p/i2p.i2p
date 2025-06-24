@@ -1,3 +1,6 @@
+2025-06-24 zzz
+ * Crypto: Add support for MLKEM PQ hybrid ratchet (Proposal 169) (PR 517)
+
 2025-06-21 zzz
  * i2psnark: Update UDP announce support (Proposal 160) (PR 504)
 
