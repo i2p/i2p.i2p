@@ -98,6 +98,31 @@ class Pattern {
 	};
 
 	/**
+	 * @since 0.9.67
+	 */
+	private static final short[] noise_pattern_IKhfs = {
+	    FLAG_LOCAL_STATIC |
+	    FLAG_LOCAL_EPHEMERAL |
+	    FLAG_LOCAL_HYBRID |
+	    FLAG_REMOTE_STATIC |
+	    FLAG_REMOTE_EPHEMERAL |
+	    FLAG_REMOTE_HYBRID |
+	    FLAG_REMOTE_REQUIRED,
+
+	    E,
+	    ES,
+	    F,
+	    S,
+	    SS,
+	    FLIP_DIR,
+	    E,
+	    EE,
+	    F,
+	    FF,
+	    SE
+	};
+
+	/**
 	 * Look up the description information for a pattern.
 	 * 
 	 * @param name The name of the pattern.
@@ -111,6 +136,8 @@ class Pattern {
 			return noise_pattern_XK;
 		else if (name.equals("IK"))
 			return noise_pattern_IK;
+		else if (name.equals("IKhfs"))
+			return noise_pattern_IKhfs;
 		return null;
 	}
 

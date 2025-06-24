@@ -27,6 +27,7 @@ import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.crypto.ratchet.RatchetSKM;
+import net.i2p.router.crypto.ratchet.MuxedPQSKM;
 import net.i2p.router.crypto.ratchet.MuxedSKM;
 import net.i2p.router.networkdb.kademlia.MessageWrapper;
 import net.i2p.router.networkdb.kademlia.MessageWrapper.OneTimeSession;
@@ -317,6 +318,9 @@ abstract class BuildRequestor {
                     rskm.tagsReceived(ots.key, ots.rtag, 2 * BUILD_MSG_TIMEOUT);
                 } else if (replySKM instanceof MuxedSKM) {
                     MuxedSKM mskm = (MuxedSKM) replySKM;
+                    mskm.tagsReceived(ots.key, ots.rtag, 2 * BUILD_MSG_TIMEOUT);
+                } else if (replySKM instanceof MuxedPQSKM) {
+                    MuxedPQSKM mskm = (MuxedPQSKM) replySKM;
                     mskm.tagsReceived(ots.key, ots.rtag, 2 * BUILD_MSG_TIMEOUT);
                 } else {
                     // non-EC client, shouldn't happen, checked at top of createTunnelBuildMessage() below

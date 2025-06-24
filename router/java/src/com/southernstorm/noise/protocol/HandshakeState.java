@@ -39,12 +39,15 @@ public class HandshakeState implements Destroyable, Cloneable {
 	private final boolean isInitiator;
 	private DHState localKeyPair;
 	private DHState localEphemeral;
+	private DHState localHybrid;
 	private DHState remotePublicKey;
 	private DHState remoteEphemeral;
+	private DHState remoteHybrid;
 	private int action;
 	private final int requirements;
 	private int patternIndex;
 	private boolean wasCloned;
+	private boolean isDestroyed;
 
 	/**
 	 * Enumerated value that indicates that the handshake object
@@ -139,6 +142,14 @@ public class HandshakeState implements Destroyable, Cloneable {
 	public static final String protocolName3 = "Noise_N_25519_ChaChaPoly_SHA256";
 	/** SSU2 */
         public static final String protocolName4 = "Noise_XKchaobfse+hs1+hs2+hs3_25519_ChaChaPoly_SHA256";
+	/**
+	 * Hybrid Ratchet
+	 * @since 0.9.67
+	 */
+	public static final String protocolName5 = "Noise_IKhfselg2_25519+MLKEM512_ChaChaPoly_SHA256";
+	public static final String protocolName6 = "Noise_IKhfselg2_25519+MLKEM768_ChaChaPoly_SHA256";
+	public static final String protocolName7 = "Noise_IKhfselg2_25519+MLKEM1024_ChaChaPoly_SHA256";
+
 	private static final String prefix;
 	private final String patternId;
 	/** NTCP2 */
@@ -151,13 +162,24 @@ public class HandshakeState implements Destroyable, Cloneable {
 	public static final String PATTERN_ID_N_NO_RESPONSE = "N!";
 	/** SSU2 */
 	public static final String PATTERN_ID_XK_SSU2 = "XK-SSU2";
-	private static String dh;
+	/** Hybrid Base */
+	private static final String PATTERN_ID_IKHFS = "IKhfs";
+	/**
+	 * Hybrid Ratchet
+	 * @since 0.9.67
+	 */
+	public static final String PATTERN_ID_IKHFS_512 = "IKhfs512";
+	public static final String PATTERN_ID_IKHFS_768 = "IKhfs768";
+	public static final String PATTERN_ID_IKHFS_1024 = "IKhfs1024";
+
+	private static final String dh;
 	private static final String cipher;
 	private static final String hash;
 	private final short[] pattern;
 	private static final short[] PATTERN_XK;
 	private static final short[] PATTERN_IK;
 	private static final short[] PATTERN_N;
+	private static final short[] PATTERN_IKHFS;
 
 	static {
 		// Parse the protocol name into its components.
@@ -200,11 +222,28 @@ public class HandshakeState implements Destroyable, Cloneable {
 		id = components[1].substring(0, 2);
 		if (!PATTERN_ID_XK.equals(id))
 			throw new IllegalArgumentException();
+                // IK Hybrid
+		components = protocolName5.split("_");
+		id = components[1].substring(0, 5);
+		if (!PATTERN_ID_IKHFS.equals(id))
+			throw new IllegalArgumentException();
+		PATTERN_IKHFS = Pattern.lookup(id);
+		if (PATTERN_IKHFS == null)
+			throw new IllegalArgumentException("Handshake pattern is not recognized");
+		components = protocolName6.split("_");
+		id = components[1].substring(0, 5);
+		if (!PATTERN_ID_IKHFS.equals(id))
+			throw new IllegalArgumentException();
+		components = protocolName7.split("_");
+		id = components[1].substring(0, 5);
+		if (!PATTERN_ID_IKHFS.equals(id))
+			throw new IllegalArgumentException();
 	}
 
 	/**
 	 * Creates a new Noise handshake.
 	 * Noise protocol name is hardcoded.
+	 * Not for PQ Alice side.
 	 * 
 	 * @param patternId XK, IK, or N
 	 * @param role The role, HandshakeState.INITIATOR or HandshakeState.RESPONDER.
@@ -218,6 +257,26 @@ public class HandshakeState implements Destroyable, Cloneable {
 	 */
 	public HandshakeState(String patternId, int role, KeyFactory xdh) throws NoSuchAlgorithmException
 	{
+		this(patternId, role, xdh, null);
+	}
+
+	/**
+	 * Creates a new Noise handshake.
+	 * Noise protocol name is hardcoded.
+	 * 
+	 * @param patternId XK, IK, or N
+	 * @param role The role, HandshakeState.INITIATOR or HandshakeState.RESPONDER.
+	 * @param xdh The key pair factory for ephemeral keys
+	 * @param hdh The key pair factory for hybrid keys, Alice side only, or null for Bob or non-hybrid
+	 * 
+	 * @throws IllegalArgumentException The protocolName is not
+	 * formatted correctly, or the role is not recognized.
+	 * 
+	 * @throws NoSuchAlgorithmException One of the cryptographic algorithms
+	 * that is specified in the protocolName is not supported.
+	 */
+	public HandshakeState(String patternId, int role, KeyFactory xdh, KeyFactory hdh) throws NoSuchAlgorithmException
+	{
 		this.patternId = patternId;
 		if (patternId.equals(PATTERN_ID_XK))
 			pattern = PATTERN_XK;
@@ -229,6 +288,10 @@ public class HandshakeState implements Destroyable, Cloneable {
 			pattern = PATTERN_N;
 		else if (patternId.equals(PATTERN_ID_XK_SSU2))
 			pattern = PATTERN_XK;
+		else if (patternId.equals(PATTERN_ID_IKHFS_512) ||
+		         patternId.equals(PATTERN_ID_IKHFS_768) ||
+		         patternId.equals(PATTERN_ID_IKHFS_1024))
+			pattern = PATTERN_IKHFS;
 		else
 			throw new IllegalArgumentException("Handshake pattern is not recognized");
 		short flags = pattern[0];
@@ -256,10 +319,18 @@ public class HandshakeState implements Destroyable, Cloneable {
 			localKeyPair = new Curve25519DHState(xdh);
 		if ((flags & Pattern.FLAG_LOCAL_EPHEMERAL) != 0)
 			localEphemeral = new Curve25519DHState(xdh);
+		if ((flags & Pattern.FLAG_LOCAL_HYBRID) != 0) {
+			if (isInitiator && hdh == null)
+				throw new IllegalArgumentException("Hybrid patterns require hybrid key generator");
+			localHybrid = isInitiator ? new MLKEMDHState(hdh, patternId) : new MLKEMDHState(false, patternId);
+		}
 		if ((flags & Pattern.FLAG_REMOTE_STATIC) != 0)
 			remotePublicKey = new Curve25519DHState(xdh);
 		if ((flags & Pattern.FLAG_REMOTE_EPHEMERAL) != 0)
 			remoteEphemeral = new Curve25519DHState(xdh);
+		if ((flags & Pattern.FLAG_REMOTE_HYBRID) != 0) {
+			remoteHybrid = new MLKEMDHState(!isInitiator, patternId);
+		}
 		
 	}
 
@@ -294,6 +365,23 @@ public class HandshakeState implements Destroyable, Cloneable {
 			remotePublicKey = o.remotePublicKey.clone();
 		if (o.remoteEphemeral != null)
 			remoteEphemeral = o.remoteEphemeral.clone();
+		if (o.localHybrid != null) {
+			if (isInitiator) {
+				// always save Alice's local keys
+				localHybrid = o.localHybrid.clone();
+			} else {
+				if (o.wasCloned) {
+					// new keys after first time for Bob
+					localHybrid = o.localHybrid.clone();
+				} else {
+					// first time for Bob, use the eph. keys previously generated
+					localHybrid = o.localHybrid;
+					o.wasCloned = true;
+				}
+			}
+		}
+		if (o.remoteHybrid != null)
+			remoteHybrid = o.remoteHybrid.clone();
 		action = o.action;
 		if (action == SPLIT || action == COMPLETE)
 			throw new CloneNotSupportedException("clone after NSR");
@@ -419,6 +507,32 @@ public class HandshakeState implements Destroyable, Cloneable {
 			return false;
 	}
 
+	/**
+	 * Gets the keypair object for the local hybrid key.
+	 * 
+	 * I2P
+	 * 
+	 * @return The keypair, or null if a local hybrid key is not required or has not been generated.
+	 * @since 0.9.67
+	 */
+	public DHState getLocalHybridKeyPair()
+	{
+		return localHybrid;
+	}
+
+	/**
+	 * Gets the keypair object for the remote hybrid key.
+	 * 
+	 * I2P
+	 * 
+	 * @return The keypair, or null if a remote hybrid key is not required or has not been generated.
+	 * @since 0.9.67
+	 */
+	public DHState getRemoteHybridKeyPair()
+	{
+		return remoteHybrid;
+	}
+
 	// Empty value for when the prologue is not supplied.
 	private static final byte[] emptyPrologue = new byte [0];
 
@@ -472,17 +586,11 @@ public class HandshakeState implements Destroyable, Cloneable {
 		if (isInitiator) {
 			if ((requirements & LOCAL_PREMSG) != 0)
 				symmetric.mixPublicKey(localKeyPair);
-			if ((requirements & FALLBACK_PREMSG) != 0) {
-				symmetric.mixPublicKey(remoteEphemeral);
-			}
 			if ((requirements & REMOTE_PREMSG) != 0)
 				symmetric.mixPublicKey(remotePublicKey);
 		} else {
 			if ((requirements & REMOTE_PREMSG) != 0)
 				symmetric.mixPublicKey(remotePublicKey);
-			if ((requirements & FALLBACK_PREMSG) != 0) {
-				symmetric.mixPublicKey(localEphemeral);
-			}
 			if ((requirements & LOCAL_PREMSG) != 0)
 				symmetric.mixPublicKey(localKeyPair);
 		}
@@ -675,6 +783,54 @@ public class HandshakeState implements Destroyable, Cloneable {
 					}
 					break;
 
+					case Pattern.F:
+					{
+						// Generate a local hybrid keypair and add the public
+						// key to the message.  If we are running fixed vector tests,
+						// then a fixed hybrid key may have already been provided.
+						if (localHybrid == null)
+							throw new IllegalStateException("Pattern definition error");
+						byte[] shared = null;
+						if (isInitiator) {
+							// Only Alice generates a keypair
+							localHybrid.generateKeyPair();
+						} else {
+							// Only Bob. We have to do the FF part here,
+							// so we split up mixDH()
+							// and do the localHybrid.calculate() first
+							// and the mixKey() after.
+							// mixDH(localHybrid, remoteHybrid)
+                                                        // First part
+							len = localHybrid.getSharedKeyLength();
+							shared = new byte [len];
+							// this creates the ciphertext and puts it in localHybrid.publicKey
+							// IllegalArgumentException will be thrown here on bad remote key
+							localHybrid.calculate(shared, 0, remoteHybrid);
+						}
+						len = localHybrid.getPublicKeyLength();
+						macLen = symmetric.getMACLength();
+						if (space < (len + macLen))
+							throw new ShortBufferException();
+						localHybrid.getPublicKey(message, messagePosn);
+						messagePosn += symmetric.encryptAndHash(message, messagePosn, message, messagePosn, len);
+						if (!isInitiator) {
+                                                        // Second part
+							// We do the rest of the FF part here while we have the shared key
+							symmetric.mixKey(shared, 0, shared.length);
+							Noise.destroy(shared);
+						}
+					}
+					break;
+
+					
+					case Pattern.FF:
+					{
+						// DH operation with initiator and responder hybrid keys.
+						// We are Bob.
+						// This is a NOOP, we did the mixDH() in Pattern.F above.
+					}
+					break;
+
 					default:
 					{
 						// Unknown token code.  Abort.
@@ -857,6 +1013,35 @@ public class HandshakeState implements Destroyable, Cloneable {
 						mixDH(localKeyPair, remotePublicKey);
 					}
 					break;
+
+					case Pattern.F:
+					{
+						// Decrypt and read the remote hybrid ephemeral key.
+						if (remoteHybrid == null)
+							throw new IllegalStateException("Pattern definition error");
+						len = remoteHybrid.getPublicKeyLength();
+						macLen = symmetric.getMACLength();
+						if (space < (len + macLen))
+							throw new ShortBufferException();
+						byte[] temp = new byte [len];
+						try {
+							if (symmetric.decryptAndHash(message, messageOffset, temp, 0, len + macLen) != len)
+								throw new ShortBufferException();
+							remoteHybrid.setPublicKey(temp, 0);
+						} finally {
+							Noise.destroy(temp);
+						}
+						messageOffset += len + macLen;
+					}
+					break;
+	
+					case Pattern.FF:
+					{
+						// DH operation with initiator and responder hybrid keys.
+						// We are Alice.
+						mixDH(localHybrid, remoteHybrid);
+					}
+					break;
 	
 					default:
 					{
@@ -953,17 +1138,22 @@ public class HandshakeState implements Destroyable, Cloneable {
 	}
 
 	@Override
-	public void destroy() {
+	public synchronized void destroy() {
+		isDestroyed = true;
 		if (symmetric != null)
 			symmetric.destroy();
 		if (localKeyPair != null)
 			localKeyPair.destroy();
 		if (localEphemeral != null)
 			localEphemeral.destroy();
+		if (localHybrid != null)
+			localHybrid.destroy();
 		if (remotePublicKey != null)
 			remotePublicKey.destroy();
 		if (remoteEphemeral != null)
 			remoteEphemeral.destroy();
+		if (remoteHybrid != null)
+			remoteHybrid.destroy();
 	}
 	
 	/**
@@ -992,11 +1182,6 @@ public class HandshakeState implements Destroyable, Cloneable {
 	        requirements |= REMOTE_REQUIRED;
 	        requirements |= REMOTE_PREMSG;
 	    }
-	    if ((flags & (Pattern.FLAG_REMOTE_EPHEM_REQ |
-	    		      Pattern.FLAG_LOCAL_EPHEM_REQ)) != 0) {
-	        if (isFallback)
-	            requirements |= FALLBACK_PREMSG;
-	    }
 	    return requirements;
 	}
 
@@ -1022,6 +1207,8 @@ public class HandshakeState implements Destroyable, Cloneable {
 	 */
 	@Override
 	public synchronized HandshakeState clone() throws CloneNotSupportedException {
+		if (isDestroyed)
+                    throw new IllegalStateException("destroyed");
 		return new HandshakeState(this);
 	}
 
@@ -1084,6 +1271,34 @@ public class HandshakeState implements Destroyable, Cloneable {
 			buf.append("null");
 		}
 		buf.append('\n');
+
+		dh = localHybrid;
+		if (dh != null) {
+			buf.append("Local hybrid public key (e1/ekem1) : ");
+			if (dh != null && dh.hasPublicKey()) {
+				tmp = new byte[dh.getPublicKeyLength()];
+				dh.getPublicKey(tmp, 0);
+                                buf.append(tmp.length).append(" bytes ");
+				buf.append(net.i2p.data.Base64.encode(tmp));
+			} else {
+				buf.append("null");
+			}
+			buf.append('\n');
+		}
+
+		dh = remoteHybrid;
+		if (dh != null) {
+			buf.append("Remote hybrid public key (e1/ekem1) : ");
+			if (dh != null && dh.hasPublicKey()) {
+				tmp = new byte[dh.getPublicKeyLength()];
+				dh.getPublicKey(tmp, 0);
+                                buf.append(tmp.length).append(" bytes ");
+				buf.append(net.i2p.data.Base64.encode(tmp));
+			} else {
+				buf.append("null");
+			}
+			buf.append('\n');
+		}
 
 		return buf.toString();
 	}

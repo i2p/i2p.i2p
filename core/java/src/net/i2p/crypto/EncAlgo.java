@@ -11,7 +11,14 @@ public enum EncAlgo {
     EC("EC"),
 
     /** @since 0.9.38 */
-    ECIES("ECIES");
+    ECIES("ECIES"),
+
+    /** @since 0.9.67 */
+    ECIES_MLKEM("ECIES-MLKEM"),
+
+    /** @since 0.9.67 */
+    ECIES_MLKEM_INT("ECIES-MLKEM-Internal");
+
 
     private final String name;
 

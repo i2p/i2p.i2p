@@ -13,6 +13,7 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
+import net.i2p.router.crypto.ratchet.MuxedPQSKM;
 import net.i2p.router.crypto.ratchet.MuxedSKM;
 import net.i2p.router.crypto.ratchet.RatchetSessionTag;
 import net.i2p.router.crypto.ratchet.RatchetSKM;
@@ -368,6 +369,8 @@ class TestJob extends JobImpl {
                             rskm = (RatchetSKM) skm;
                         } else if (skm instanceof MuxedSKM) {
                             rskm = ((MuxedSKM) skm).getECSKM();
+                        } else if (skm instanceof MuxedPQSKM) {
+                            rskm = ((MuxedPQSKM) skm).getECSKM();
                         } else {
                             // shouldn't happen
                             rskm = null;
