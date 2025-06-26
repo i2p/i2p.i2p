@@ -253,8 +253,11 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             // see SSU2Payload: RI format error, signature was verified there, so we can take action
             _context.blocklist().add(_aliceIP);
             Hash h = _receivedUnconfirmedIdentity.calculateHash();
+            // these really hammer the floodfills, so reduce the time on floodfills
+            // so the banlist doesn't get huge
+            long time = _context.netDb().floodfillEnabled() ? 36*60*60*1000 : 4*24*60*60*1000;
             _context.banlist().banlistRouter(h, "Signed bad RI", null,
-                                             null, _context.clock().now() + 4*24*60*60*1000);
+                                             null, _context.clock().now() + time);
             throw new RIException("RI DFE " + h.toBase64(), REASON_BANNED);
         }
 
