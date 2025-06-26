@@ -553,7 +553,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
             Set<Hash> hashes;
             if (peers > 0) {
                 hashes = new HashSet<Hash>(peers);
-                for (int off = 20; off < payload.length; off += Hash.HASH_LENGTH) {
+                for (int off = 20; off <= payload.length - Hash.HASH_LENGTH; off += Hash.HASH_LENGTH) {
                     hashes.add(Hash.create(payload, off));
                 }
             } else {
