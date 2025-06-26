@@ -220,6 +220,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
 //last up May 21 2019
 //     ,"C.Tracker", "http://ri5a27ioqd4vkik72fawbcryglkmwyy4726uu5j3eg6zqh2jswfq.b32.i2p/announce=http://tracker.crypthost.i2p/tracker/index.jsp",
        ,"Simp", "http://wc4sciqgkceddn6twerzkfod6p2npm733p7z3zwsjfzhc4yulita.b32.i2p/a=http://opentracker.simp.i2p/tracker/"
+       ,"Simp-UDP", "udp://wc4sciqgkceddn6twerzkfod6p2npm733p7z3zwsjfzhc4yulita.b32.i2p:6969/=http://opentracker.simp.i2p/tracker/"
     };
     
     /** URL. This is our equivalent to router.utorrent.com for bootstrap */
