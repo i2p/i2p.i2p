@@ -2476,17 +2476,20 @@ public class I2PSnarkServlet extends BasicServlet {
     private String getShortTrackerLink(String announce, byte[] infohash) {
         StringBuilder buf = new StringBuilder(128);
         String trackerLinkUrl = getTrackerLinkUrl(announce, infohash);
-        if (announce.startsWith("http://"))
+        boolean isUDP = false;
+        if (announce.startsWith("http://")) {
             announce = announce.substring(7);
-        else if (announce.startsWith("udp://"))
+        } else if (announce.startsWith("udp://")) {
             announce = announce.substring(6);
+            isUDP = true;
+        }
         // strip path
         int slsh = announce.indexOf('/');
         if (slsh > 0)
             announce = announce.substring(0, slsh);
         if (trackerLinkUrl != null) {
             buf.append(trackerLinkUrl);
-        } else {
+        } else if (!isUDP) {
             // browsers don't like a full b64 dest, so convert it to b32
             String host = announce;
             if (host.length() >= 516) {
@@ -2515,7 +2518,8 @@ public class I2PSnarkServlet extends BasicServlet {
             announce = DataHelper.escapeHTML(announce.substring(0, 40)) + "&hellip;" +
                        DataHelper.escapeHTML(announce.substring(announce.length() - 8));
         buf.append(announce);
-        buf.append("</a>");
+        if (!isUDP)
+            buf.append("</a>");
         return buf.toString();
     }
 
