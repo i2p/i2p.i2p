@@ -2,6 +2,7 @@ package org.klomp.snark.web;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -4930,7 +4931,7 @@ public class I2PSnarkServlet extends BasicServlet {
         File f = new File(_manager.util().getTempDir(), "edit-" + _manager.util().getContext().random().nextLong() + ".torrent");
         OutputStream out = null;
         try {
-            out = new SecureFileOutputStream(f);
+            out = _manager.areFilesPublic() ? new FileOutputStream(f) : new SecureFileOutputStream(f);
             out.write(newMeta.getTorrentData());
             out.close();
             boolean ok = FileUtil.rename(f, new File(snark.getName()));
