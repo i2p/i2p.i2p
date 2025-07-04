@@ -1,3 +1,18 @@
+2025-07-04 zzz
+ * i2psnark: UDP announce fixes
+ * SSU: Increase inbound ban time
+ * Util: Android Java version detection improvements
+
+2025-07-01 zzz
+ * Streaming: Allow configured max window size higher than default
+
+2025-06-30 zzz
+ * I2CP: Don't send multiple SetDate messages to sessions with subsessions
+
+2025-06-26 zzz
+ * i2psnark: UDP announce fixes
+ * Router: Reduce and document the banlist-forever threshold
+
 2025-06-24 zzz
  * Crypto: Add support for MLKEM PQ hybrid ratchet (Proposal 169) (PR 517)
 
