@@ -165,7 +165,7 @@ class EstablishmentManager {
     /** for the DSM and or netdb store */
     private static final int DATA_MESSAGE_TIMEOUT = 10*1000;
     
-    private static final int IB_BAN_TIME = 15*60*1000;
+    private static final int IB_BAN_TIME = 39*60*1000;
 
     // SSU 2
     private static final int MIN_TOKENS = 128;
