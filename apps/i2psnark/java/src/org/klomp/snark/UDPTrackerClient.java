@@ -1,6 +1,5 @@
 package org.klomp.snark;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -38,14 +37,14 @@ import org.klomp.snark.TrackerClient;
  *<pre>
  *  client		tracker		type
  *  ------		-------		----
- *   conn req	-->			(repliable to query port)
- *          	<--	conn resp	(raw from resp port)
- *   announce  -->			(raw to resp port)
- *            	<-- 	ann resp	(raw from resp port)
- *          	<--	error		(raw from resp port)
+ *   conn req	-->			(repliable Datagram2)
+ *          	<--	conn resp	(raw)
+ *   announce  -->			(repliable Datagram3)
+ *            	<-- 	ann resp	(raw)
+ *          	<--	error		(raw)
  *</pre>
  *
- *  @since 0.9.53, enabled in 0.9.54
+ *  @since 0.9.53, unused until protocol finalized in 0.9.67
  */
 class UDPTrackerClient implements I2PSessionMuxedListener {
 
@@ -54,8 +53,6 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
     /** hook to inject and receive datagrams */
     private final I2PSession _session;
     private final I2PSnarkUtil _util;
-    /** 20 byte random id */
-    private final int _myKey;
     private final Hash _myHash;
     /** unsigned dgrams */
     private final int _rPort;
@@ -63,7 +60,6 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
     private final ConcurrentHashMap<HostPort, Tracker> _trackers;
     /** our TID to tracker */
     private final Map<Integer, ReplyWaiter> _sentQueries;
-    private final SimpleTimer2.TimedEvent _cleaner;
     private boolean _isRunning;
 
     private static final long INIT_CONN_ID = 0x41727101980L;
@@ -100,11 +96,9 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
         _util = util;
         _log = ctx.logManager().getLog(UDPTrackerClient.class);
         _rPort = TrackerClient.PORT - 1;
-        _myKey = ctx.random().nextInt();
         _myHash = session.getMyDestination().calculateHash();
         _trackers = new ConcurrentHashMap<HostPort, Tracker>(8);
         _sentQueries = new ConcurrentHashMap<Integer, ReplyWaiter>(32);
-        _cleaner = new Cleaner();
     }
 
 
@@ -116,7 +110,6 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
             return;
         _session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM_RAW, _rPort);
         _isRunning = true;
-        _cleaner.schedule(7 * CLEAN_TIME);
     }
 
     /**
@@ -127,7 +120,6 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
             return;
         _isRunning = false;
         _session.removeListener(I2PSession.PROTO_DATAGRAM_RAW, _rPort);
-        _cleaner.cancel();
         _trackers.clear();
         for (ReplyWaiter w : _sentQueries.values()) {
             w.cancel();
@@ -177,6 +169,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
         if (fast) {
             toWait = 0;
         } else {
+            now = _context.clock().now();
             toWait = end - now;
             if (toWait < 1000) {
                 if (_log.shouldInfo())
@@ -344,7 +337,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
         DataHelper.toLong(payload, 72, 8, uploaded);
         DataHelper.toLong(payload, 80, 4, event);
         DataHelper.toLong(payload, 92, 4, numWant);
-        DataHelper.toLong(payload, 96, 2, TrackerClient.PORT);
+        DataHelper.toLong(payload, 96, 2, _rPort);
         boolean rv = sendMessage(tr.getDest(true), tr.getPort(), payload, false);
         return rv ? payload : null;
     }
@@ -356,22 +349,21 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
         synchronized(w) {
             while(true) {
                 try {
-                    long toWait = untilTime - _context.clock().now();
+                    // add 100 so the ReplyWaiter will fire first on overall timeout, it will notify()
+                    long toWait = Math.min(DEFAULT_TIMEOUT, untilTime + 100 - _context.clock().now());
                     if (toWait <= 0)
                         return false;
                     w.wait(toWait);
                 } catch (InterruptedException ie) {}
                 switch (w.getState()) {
-                    case INIT:
-                        continue;
-
                     case SUCCESS:
                         return true;
 
+                    case TIMEOUT:
                     case FAIL:
                         return false;
 
-                    case TIMEOUT:
+                    case INIT:
                         if (_log.shouldInfo())
                             _log.info("Timeout: " + w);
                         long toWait = untilTime - _context.clock().now();
@@ -397,10 +389,6 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
         if (_log.shouldInfo())
             _log.info("Resending: " + w + " timeout: " + toWait);
         boolean rv = sendMessage(tr.getDest(true), port, w.getPayload(), repliable);
-        if (rv) {
-            _sentQueries.put(Integer.valueOf(w.getID()), w);
-            w.schedule(toWait);
-        }
         return rv;
     }
 
@@ -633,43 +621,6 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
             _log.warn("UDPTC got error msg: ", error);
     }
 
-    /**
-     * Cleaner-upper
-     */
-    private class Cleaner extends SimpleTimer2.TimedEvent {
-
-        public Cleaner() {
-            super(SimpleTimer2.getInstance(), 7 * CLEAN_TIME);
-        }
-
-        public void timeReached() {
-            if (!_isRunning)
-                return;
-            long now = _context.clock().now();
-/********
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("UDPTC cleaner starting with " +
-                          _blacklist.size() + " in blacklist, " +
-                          _outgoingTokens.size() + " sent Tokens, " +
-                          _incomingTokens.size() + " rcvd Tokens");
-            long expire = now - MAX_TOKEN_AGE;
-            for (Iterator<Token> iter = _outgoingTokens.keySet().iterator(); iter.hasNext(); ) {
-                Token tok = iter.next();
-                if (tok.lastSeen() < expire)
-                    iter.remove();
-            }
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("UDPTC cleaner done, now with " +
-                          _blacklist.size() + " in blacklist, " +
-                          _outgoingTokens.size() + " sent Tokens, " +
-                          _incomingTokens.size() + " rcvd Tokens, " +
-                          _knownNodes.size() + " known peers, " +
-                          _sentQueries.size() + " queries awaiting response");
-*******/
-            schedule(CLEAN_TIME);
-        }
-    }
-
     public static class TrackerResponse {
 
         private final int interval, complete, incomplete;
@@ -877,7 +828,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
         @Override
         public String toString() {
             return "UDP Tracker " + host + ':' + port + " hasDest? " + (dest != null) +
-                   "valid? " + isConnValid() + " conn ID: " + (cid != null ? cid : "none") + ' ' + state;
+                   " valid? " + isConnValid() + " conn ID: " + (cid != null ? cid : "none") + ' ' + state;
         }
     }
 
