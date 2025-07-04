@@ -217,7 +217,7 @@ public class TranslationStatus {
         String h = "Translation Summary (" + resources + " resources, " + langs.size() + " languages, " + grandtot + " strings)";
         if (_html) {
             buf2.append("<h2>" + h + "</h2>\n");
-            buf2.append("<p>Note: % translated includes compiled resources only</p>\n");
+            buf2.append("<p>Note: % translated includes compiled resources only</p><br>\n");
         } else {
             buf2.append(h);
             buf2.append("\n\nNote: % translated includes compiled resources only\n\n");
