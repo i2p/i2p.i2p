@@ -141,7 +141,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 	/** Tunnels */
 	public static final String protocolName3 = "Noise_N_25519_ChaChaPoly_SHA256";
 	/** SSU2 */
-        public static final String protocolName4 = "Noise_XKchaobfse+hs1+hs2+hs3_25519_ChaChaPoly_SHA256";
+	public static final String protocolName4 = "Noise_XKchaobfse+hs1+hs2+hs3_25519_ChaChaPoly_SHA256";
 	/**
 	 * Hybrid Ratchet
 	 * @since 0.9.67
@@ -183,7 +183,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 
 	static {
 		// Parse the protocol name into its components.
-                // XK
+		// XK
 		String[] components = protocolName.split("_");
 		if (components.length != 5)
 			throw new IllegalArgumentException("Protocol name must have 5 components");
@@ -201,7 +201,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 			throw new IllegalArgumentException("Handshake pattern is not recognized");
 		if (!dh.equals("25519"))
 			throw new IllegalArgumentException("Unknown Noise DH algorithm name: " + dh);
-                // IK
+		// IK
 		components = protocolName2.split("_");
 		id = components[1].substring(0, 2);
 		if (!PATTERN_ID_IK.equals(id))
@@ -222,7 +222,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 		id = components[1].substring(0, 2);
 		if (!PATTERN_ID_XK.equals(id))
 			throw new IllegalArgumentException();
-                // IK Hybrid
+		// IK Hybrid
 		components = protocolName5.split("_");
 		id = components[1].substring(0, 5);
 		if (!PATTERN_ID_IKHFS.equals(id))
@@ -953,7 +953,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 						messageOffset += len;
 					}
 					break;
-	
+
 					case Pattern.S:
 					{
 						// Decrypt and read the remote static key.
@@ -974,14 +974,14 @@ public class HandshakeState implements Destroyable, Cloneable {
 						messageOffset += len + macLen;
 					}
 					break;
-	
+
 					case Pattern.EE:
 					{
 						// DH operation with initiator and responder ephemeral keys.
 						mixDH(localEphemeral, remoteEphemeral);
 					}
 					break;
-	
+
 					case Pattern.ES:
 					{
 						// DH operation with initiator ephemeral and responder static keys.
@@ -991,7 +991,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 							mixDH(localKeyPair, remoteEphemeral);
 					}
 					break;
-	
+
 					case Pattern.SE:
 					{
 						// DH operation with initiator static and responder ephemeral keys.
@@ -1034,7 +1034,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 						messageOffset += len + macLen;
 					}
 					break;
-	
+
 					case Pattern.FF:
 					{
 						// DH operation with initiator and responder hybrid keys.
@@ -1042,7 +1042,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 						mixDH(localHybrid, remoteHybrid);
 					}
 					break;
-	
+
 					default:
 					{
 						// Unknown token code.  Abort.
@@ -1208,7 +1208,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 	@Override
 	public synchronized HandshakeState clone() throws CloneNotSupportedException {
 		if (isDestroyed)
-                    throw new IllegalStateException("destroyed");
+			throw new IllegalStateException("destroyed");
 		return new HandshakeState(this);
 	}
 
@@ -1278,7 +1278,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 			if (dh != null && dh.hasPublicKey()) {
 				tmp = new byte[dh.getPublicKeyLength()];
 				dh.getPublicKey(tmp, 0);
-                                buf.append(tmp.length).append(" bytes ");
+				buf.append(tmp.length).append(" bytes ");
 				buf.append(net.i2p.data.Base64.encode(tmp));
 			} else {
 				buf.append("null");
@@ -1292,7 +1292,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 			if (dh != null && dh.hasPublicKey()) {
 				tmp = new byte[dh.getPublicKeyLength()];
 				dh.getPublicKey(tmp, 0);
-                                buf.append(tmp.length).append(" bytes ");
+				buf.append(tmp.length).append(" bytes ");
 				buf.append(net.i2p.data.Base64.encode(tmp));
 			} else {
 				buf.append("null");
