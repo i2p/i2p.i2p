@@ -200,15 +200,18 @@ class SubSession extends I2PSessionMuxedImpl {
 
     /**
      * Tear down the session, and do NOT reconnect.
+     * As of 0.9.67, this does NOT destroy the primary session.
      *
      * Blocks if session has not been fully started.
      */
     @Override
     public void destroySession() {
-        _primary.destroySession();
         if (_availabilityNotifier != null)
             _availabilityNotifier.stopNotifying();
         if (_sessionListener != null) _sessionListener.disconnected(this);
+        try {
+            _producer.disconnect(this);
+        } catch (I2PSessionException ise) {}
         changeState(State.CLOSED);
     }
 
