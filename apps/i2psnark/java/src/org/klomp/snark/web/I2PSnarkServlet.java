@@ -294,10 +294,15 @@ public class I2PSnarkServlet extends BasicServlet {
         if (nonce != null) {
             // the clear messages button is a GET
             if ((method.equals("POST") || "Clear".equals(req.getParameter("action"))) &&
-                nonce.equals(String.valueOf(_nonce)))
+                nonce.equals(String.valueOf(_nonce))) {
                 processRequest(req);
-            else  // nonce is constant, shouldn't happen
+            } else if (!(method.equals("POST") || "Clear".equals(req.getParameter("action")))) {
+                // Lynx bug?
+                _manager.addMessage("Bad form method, POST required");
+            } else {
+                // nonce is constant, shouldn't happen
                 _manager.addMessage("Please retry form submission (bad nonce)");
+            }
             // P-R-G (or G-R-G to hide the params from the address bar)
             sendRedirect(req, resp, peerString);
             return;	
