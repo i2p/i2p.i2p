@@ -406,7 +406,6 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 session.destroySession();
             } catch (I2PSessionException ise) {}
         }
-        // do we need this here? subsession.destroySession() calls primary
         Destination d = session.getMyDestination();
         if (d != null)
             _context.keyRing().remove(d.calculateHash());

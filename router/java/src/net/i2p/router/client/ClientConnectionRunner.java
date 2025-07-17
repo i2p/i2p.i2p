@@ -451,6 +451,7 @@ class ClientConnectionRunner {
     
     /**
      *  Kill the session. Caller must kill runner if none left.
+     *  If the session is primary and there are subsessions, this removes all subsessions also.
      *
      *  @since 0.9.21
      */
