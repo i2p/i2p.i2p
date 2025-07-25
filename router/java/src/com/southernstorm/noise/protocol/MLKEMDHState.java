@@ -222,9 +222,9 @@ class MLKEMDHState implements DHState, Cloneable {
 
 	/**
 	 *  Side effect: If we are Bob, copies the ciphertext to our public key
-         *  so it may be written out in the message.
-         *
-         *  @throws IllegalArgumentException on bad public key modulus
+	 *  so it may be written out in the message.
+	 *
+	 *  @throws IllegalArgumentException on bad public key modulus
 	 */
 	@Override
 	public void calculate(byte[] sharedKey, int offset, DHState publicDH) {
@@ -245,7 +245,7 @@ class MLKEMDHState implements DHState, Cloneable {
 			} else {
 				throw new IllegalStateException();
 			}
-			System.out.println("Calculated shared PQ key: " + net.i2p.data.Base64.encode(sharedKey, offset, 32));
+			//System.out.println("Calculated shared PQ key: " + net.i2p.data.Base64.encode(sharedKey, offset, 32));
 		} catch (GeneralSecurityException gse) {
 			throw new IllegalArgumentException(gse);
 		}
