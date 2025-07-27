@@ -213,7 +213,7 @@ Applications:
        See licenses/LICENSE-BlockFile.txt
 
    Desktopgui (desktopgui.jar):
-   Copyright (c) Mathias De MarÃ©
+   Copyright (c) Mathias De Maré
    See licenses/LICENSE-DesktopGUI.txt
 
    Glassfish Standard Tag Library (JSTL) 1.2 (commons-el.jar):
@@ -291,7 +291,7 @@ Applications:
          - Jersey and EU flag icons: public domain, courtesy Xrmap flag
            collection http://www.arvernes.com/wiki/index.php/Xrmap
          - Guernsey and Isle of Man flags from the Open Clip Art Library, released into the public domain
-         - CuraÃ§ao, courtesy of David Benbennick, released into the public domain
+         - Curaçao, courtesy of David Benbennick, released into the public domain
          - All other flag icons: public domain, courtesy mjames@gmail.com http://www.famfamfam.com/
        FatCow icons: See licenses/LICENSE-FatCowIcons.txt
        Fugue Icons: See licenses/LICENSE-FugueIcons.txt
@@ -350,9 +350,9 @@ Applications:
    Systray (systray.jar):
    Public domain.
 
-   Tomcat 9.0.88 (jasper-runtime.jar):
+   Tomcat 9.0.107 (jasper-runtime.jar):
    (not included in most distribution packages)
-   Copyright 1999-2024 The Apache Software Foundation
+   Copyright 1999-2025 The Apache Software Foundation
    See licenses/LICENSE-Apache2.0.txt
    See licenses/NOTICE-Tomcat.txt
 
