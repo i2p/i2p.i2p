@@ -705,8 +705,14 @@
                         MLKEM1024-X25519</option>
                         <option title="<%=intl._t("experimental")%>" value="5,4" <%=((has5 && has4) ? " selected=\"selected\"" : edisabled)%> >
                         MLKEM512-X25519 + ECIES-X25519</option>
-                        <option title="<%=intl._t("experimental")%>" value="6,4" <%=((has6 && has4) ? " selected=\"selected\"" : edisabled)%> >
+<%
+                    }   // isAdvanced()
+%>
+                        <option title="<%=intl._t("beta")%>" value="6,4" <%=((has6 && has4) ? " selected=\"selected\"" : edisabled)%> >
                         MLKEM768-X25519 + ECIES-X25519</option>
+<%
+                    if (editBean.isAdvanced()) {
+%>
                         <option title="<%=intl._t("experimental")%>" value="7,4" <%=((has7 && has4) ? " selected=\"selected\"" : edisabled)%> >
                         MLKEM1024-X25519 + ECIES-X25519</option>
 <%
