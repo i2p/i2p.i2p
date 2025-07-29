@@ -925,7 +925,7 @@ class BuildHandler implements Runnable {
         int avail = 0;
         if (response == 0) {
             Properties props = req.readOptions();
-            if (props != null) {
+            if (props != null && !props.isEmpty()) {
                 int min = 0;
                 int rqu = 0;
                 String smin = props.getProperty(BuildRequestor.PROP_MIN_BW);
@@ -961,12 +961,12 @@ class BuildHandler implements Runnable {
                                         _log.warn("REJECT Part tunnel: min: " + min + " req: " + rqu + " avail: " + avail);
                                     response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
                                 } else {
-                                    if (_log.shouldWarn())
-                                        _log.warn("ACCEPT Part tunnel: min: " + min + " req: " + rqu + " avail: " + avail);
                                     if (min > 0 && rqu > 4 * min)
                                         rqu = 4 * min;
                                     if (rqu > 0 && rqu < avail)
                                         avail = rqu;
+                                    if (_log.shouldWarn())
+                                        _log.warn("ACCEPT Part tunnel: min: " + min + " req: " + rqu + " avail: " + avail);
                                 }
                             }
                         }
