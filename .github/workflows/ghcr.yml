@@ -3,10 +3,11 @@ name: Create and publish a Docker image
 
 # Cited: https://docs.github.com/en/actions/tutorials/publish-packages/publish-docker-images
 
-# Configures this workflow to run every time a change is pushed to the branch called `release`.
+# Configures this workflow to run every time a change is pushed to the branch called `master`.
 on:
   push:
-    branches: ['release']
+    branches:
+      - master
 
 # Defines two custom environment variables for the workflow. These are used for the Container registry domain, and a name for the Docker image that this workflow builds.
 env:
