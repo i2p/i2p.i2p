@@ -954,7 +954,7 @@ class NetDbRenderer {
                 buf.append("&nbsp;&nbsp;<b>RAR?</b> ").append(ls.getReceivedAsReply());
                 buf.append("&nbsp;&nbsp;<b>Distance: </b>").append(distance);
                 buf.append("&nbsp;&nbsp;<b>").append(_t("Type")).append(": </b>").append(type);
-                if (dest.isCompressible()) {
+                if (dest != null && dest.isCompressible()) {
                     buf.append("&nbsp;&nbsp;<b>Compressible?</b> true");
                 }
                 if (type != DatabaseEntry.KEY_TYPE_LEASESET) {
