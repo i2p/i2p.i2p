@@ -955,7 +955,7 @@ public class TrackerClient implements Runnable {
         long maxWait = fast ? 5*1000 : 60*1000;
         boolean small = left == 0 || event == UDPTrackerClient.EVENT_STOPPED || !coordinator.needOutboundPeers();
         int numWant = small ? 0 : _util.getMaxConnections();
-        UDPTrackerClient.TrackerResponse fetched = udptc.announce(meta.getInfoHash(), snark.getID(), numWant,
+        UDPTrackerClient.TrackerResponse fetched = udptc.announce(snark.getInfoHash(), snark.getID(), numWant,
                                                                   maxWait, tr.host, tr.port,
                                                                   downloaded, left, uploaded, event, fast);
         if (fast)
