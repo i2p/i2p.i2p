@@ -1,3 +1,21 @@
+2025-08-10 zzz
+ * Console:
+   - Hide b32 link on netdb LS tabs for encrypted LS
+   - Fix layout for final LS data section on netdb LS debug tab
+ * i2psnark: Handle UDP trackers in magnet links
+
+2025-08-09 zzz
+ * Console: Fix NPE on netdb LS debug tab rendering encrypted LS
+
+2025-07-27 zzz
+ * Crypto: Reduce YK precalc pool size
+ * I2CP: Stub out new HostLookup types for service records (proposal 167)
+ * i2ptunnel: Expose 6,4 option to non-advanced-config
+ * Tomcat 9.0.107
+
+2025-07-17 zzz
+ * I2CP: Client-side destroy session fixes
+
 2025-07-04 zzz
  * i2psnark: UDP announce fixes
  * SSU: Increase inbound ban time
