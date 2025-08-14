@@ -32,6 +32,15 @@ class AdminRunner implements Runnable {
     }
     
     public void run() {
+        // Check if connection is from localhost only
+        if (!isLocalConnection()) {
+            _log.warn("Admin connection rejected from non-localhost address");
+            try {
+                _socket.close();
+            } catch (IOException e) {}
+            return;
+        }
+        
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
             OutputStream out = _socket.getOutputStream();
@@ -45,6 +54,14 @@ class AdminRunner implements Runnable {
     
     private void runCommand(String command, OutputStream out) throws IOException {
         _log.debug("Command [" + command + "]");
+        
+        // Require authentication for sensitive admin operations
+        if (requiresAuthentication(command) && !isAuthenticated(command)) {
+            _log.warn("Unauthorized admin command attempt: " + command);
+            replyUnauthorized(out, "Authentication required for admin operations");
+            return;
+        }
+        
         if (command.indexOf("favicon") >= 0) {
             reply(out, "this is not a website");
         } else if ( (command.indexOf("routerStats.html") >= 0) || (command.indexOf("oldstats.jsp") >= 0) ) {
@@ -148,6 +165,129 @@ class AdminRunner implements Runnable {
         } else {
             return "Incorrect shutdown password specified.  Please edit your router.config appropriately." +
                    "<a href=\"/routerConsole.html\">back</a>";
+        }
+    }
+
+    /**
+     * Determine if a command requires authentication based on its sensitivity.
+     * Sensitive operations that expose internal data or allow system control require auth.
+     *
+     * @param command the admin command to check
+     * @return true if authentication is required
+     * @since 2.0.0
+     */
+    private boolean requiresAuthentication(String command) {
+        if (command == null) return true;
+        
+        // Always require authentication for sensitive operations
+        if (command.indexOf("/shutdown") >= 0 ||
+            command.indexOf("/profile/") >= 0 ||
+            command.indexOf("routerStats.html") >= 0 ||
+            command.indexOf("oldstats.jsp") >= 0) {
+            return true;
+        }
+        
+        // Basic status and favicon don't require authentication
+        if (command.indexOf("favicon") >= 0 ||
+            command.indexOf("routerConsole.html") >= 0) {
+            return false;
+        }
+        
+        // Default to requiring authentication for unknown commands
+        return true;
+    }
+    
+    /**
+     * Validate authentication for admin commands.
+     * Enhanced security check that validates against configured admin credentials.
+     *
+     * @param command the command with potential authentication credentials
+     * @return true if properly authenticated
+     * @since 2.0.0  
+     */
+    private boolean isAuthenticated(String command) {
+        if (command == null) return false;
+        
+        // For shutdown commands, password is validated in shutdown() method
+        if (command.indexOf("/shutdown") >= 0) {
+            String password = _context.router().getConfigSetting(SHUTDOWN_PASSWORD_PROP);
+            if (password == null)
+                password = _context.getProperty(SHUTDOWN_PASSWORD_PROP);
+            return password != null && command.indexOf(password) > 0;
+        }
+        
+        // For other admin commands, check for admin authentication
+        String adminAuth = _context.getProperty("router.admin.auth");
+        String adminPassword = _context.getProperty("router.admin.password");
+        
+        if (adminPassword != null) {
+            // Basic password authentication for admin commands
+            return command.indexOf(adminPassword) > 0;
+        }
+        
+        if (adminAuth != null) {
+            // Enhanced authentication token validation
+            return validateAdminAuth(command, adminAuth);
+        }
+        
+        // If no admin authentication is configured, log warning and deny access
+        _log.warn("No admin authentication configured - denying access to: " + command);
+        return false;
+    }
+    
+    /**
+     * Validate enhanced admin authentication token.
+     *
+     * @param command the command containing auth token
+     * @param expectedAuth the expected authentication token
+     * @return true if authentication is valid
+     * @since 2.0.0
+     */
+    private boolean validateAdminAuth(String command, String expectedAuth) {
+        // Extract auth token from command (implementation depends on protocol)
+        // This is a simplified validation - in production this would be more sophisticated
+        return command.indexOf(expectedAuth) > 0;
+    }
+    
+    /**
+     * Send HTTP 401 Unauthorized response for failed authentication.
+     *
+     * @param out output stream to write response
+     * @param message error message to include
+     * @throws IOException if writing fails
+     * @since 2.0.0
+     */
+    private void replyUnauthorized(OutputStream out, String message) throws IOException {
+        StringBuilder reply = new StringBuilder(512);
+        reply.append("HTTP/1.1 401 Unauthorized\n");
+        reply.append("Connection: close\n");
+        reply.append("Cache-control: no-cache\n");
+        reply.append("WWW-Authenticate: Basic realm=\"I2P Admin\"\n");
+        reply.append("Content-type: text/html\n\n");
+        reply.append("<html><head><title>401 Unauthorized</title></head>");
+        reply.append("<body><h1>401 Unauthorized</h1>");
+        reply.append("<p>").append(message).append("</p>");
+        reply.append("<p>Authentication is required to access admin functions.</p>");
+        reply.append("</body></html>");
+        
+        try {
+            out.write(DataHelper.getASCII(reply.toString()));
+            out.close();
+        } catch (IOException ioe) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error writing unauthorized response: " + message);
+            throw ioe;
+        }
+    }
+
+    
+    private boolean isLocalConnection() {
+        try {
+            InetAddress remoteAddr = _socket.getInetAddress();
+            return remoteAddr.isLoopbackAddress() || remoteAddr.isAnyLocalAddress();
+        } catch (Exception e) {
+            _log.warn("Could not determine remote address", e);
+            return false;
         }
     }
 }
