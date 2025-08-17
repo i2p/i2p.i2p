@@ -1,3 +1,8 @@
+2025-08-17 zzz
+ * NetDB: Exploration improvements and fixes
+ * Router: Fix PublishRouterInfoJob sometimes not getting started
+ * SSU2: Fix last receive time tracking
+
 2025-08-10 zzz
  * Console:
    - Hide b32 link on netdb LS tabs for encrypted LS
