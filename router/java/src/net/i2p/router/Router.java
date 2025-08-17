@@ -787,7 +787,7 @@ public class Router implements RouterClock.ClockShiftListener {
         synchronized(_configFileLock) {
             String f = getConfigFilename();
             Properties config = getConfig(_context, f);
-            // to avoid compiler errror
+            // to avoid compiler error
             Map foo = _config;
             foo.putAll(config);
         }
@@ -956,23 +956,23 @@ public class Router implements RouterClock.ClockShiftListener {
                 changed = true;
             }
         }
-        if (changed && _context.netDb().isInitialized()) {
+        if (changed) {
             if (_log.shouldWarn())
-                _log.warn("NetDB ready, publishing RI");
+                _log.warn("NetDB ready, initialized? " + _context.netDb().isInitialized());
             // any previous calls to netdb().publish() did not
             // actually publish, because netdb init was not complete
             Republish r = new Republish(_context);
             // this is called from PersistentDataStore.ReadJob,
             // so we probably don't need to throw it to the timer queue,
             // but just to be safe
-            _context.simpleTimer2().addEvent(r, 0);
+            long delay = _context.netDb().isInitialized() ? 0 : 60*1000;
+            _context.simpleTimer2().addEvent(r, delay);
 
             // periodically update our RI and republish it to the flooodfills
             PublishLocalRouterInfoJob plrij = new PublishLocalRouterInfoJob(_context);
             plrij.getTiming().setStartAfter(_context.clock().now() + plrij.getDelay());
             _context.jobQueue().addJob(plrij);
-        }
-        if (changed) {
+
             _context.commSystem().initGeoIP();
 
             if (!SystemVersion.isSlow() &&
