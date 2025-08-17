@@ -131,7 +131,7 @@ class ExploreJob extends SearchJob {
         }
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Peers we don't want to hear about: " + dontIncludePeers);
+            _log.debug("Search type: " + msg.getSearchType() + " exclude peers: " + dontIncludePeers);
         
         msg.setDontIncludePeers(dontIncludePeers);
 
@@ -202,7 +202,6 @@ class ExploreJob extends SearchJob {
      * searchNext
      *
      */
-    
     @Override
     public String getName() { return "Kademlia NetDb Explore"; }
 }
