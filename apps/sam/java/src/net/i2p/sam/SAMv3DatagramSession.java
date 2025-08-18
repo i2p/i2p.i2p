@@ -17,6 +17,7 @@ import net.i2p.client.I2PSessionException;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.util.Log;
 
 
@@ -36,15 +37,17 @@ class SAMv3DatagramSession extends SAMDatagramSession implements Session, SAMDat
 	 * Caller MUST call start().
 	 *
 	 * @param nick nickname of the session
+	 * @param version datagram version 1/2/3
 	 * @throws IOException
 	 * @throws DataFormatException
 	 * @throws I2PSessionException
 	 */
-	public SAMv3DatagramSession(String nick, SAMv3DatagramServer dgServer) 
+	public SAMv3DatagramSession(String nick, SAMv3DatagramServer dgServer, int version) 
 			throws IOException, DataFormatException, I2PSessionException, SAMException {
 		super(SAMv3Handler.sSessionsHash.get(nick).getDest(),
 				SAMv3Handler.sSessionsHash.get(nick).getProps(),
-				null  // to be replaced by this
+				null,  // to be replaced by this
+		                version
 				);
 		this.nick = nick;
 		this.recv = this;  // replacement
@@ -67,15 +70,16 @@ class SAMv3DatagramSession extends SAMDatagramSession implements Session, SAMDat
 	 * Caller MUST call start().
 	 *
 	 * @param nick nickname of the session
+	 * @param version datagram version 1/2/3
 	 * @throws IOException
 	 * @throws DataFormatException
 	 * @throws I2PSessionException
 	 * @since 0.9.25
 	 */
 	public SAMv3DatagramSession(String nick, Properties props, SAMv3Handler handler, I2PSession isess,
-	                            int listenPort, SAMv3DatagramServer dgServer) 
+	                            int listenPort, SAMv3DatagramServer dgServer, int version) 
 			throws IOException, DataFormatException, I2PSessionException {
-		super(isess, props, listenPort, null);  // to be replaced by this
+		super(isess, props, listenPort, null, version);  // to be replaced by this
 		this.nick = nick ;
 		this.recv = this ;  // replacement
 		this.server = dgServer;
@@ -88,20 +92,41 @@ class SAMv3DatagramSession extends SAMDatagramSession implements Session, SAMDat
 		if (this.clientAddress==null) {
 			this.handler.receiveDatagramBytes(sender, data, proto, fromPort, toPort);
 		} else {
-			StringBuilder buf = new StringBuilder(600);
-			buf.append(sender.toBase64());
-			if ((handler.verMajor == 3 && handler.verMinor >= 2) || handler.verMajor > 3) {
-				buf.append(" FROM_PORT=").append(fromPort).append(" TO_PORT=").append(toPort);
-			}
-			buf.append('\n');
-			String msg = buf.toString();
-			ByteBuffer msgBuf = ByteBuffer.allocate(msg.length()+data.length);
-			msgBuf.put(DataHelper.getASCII(msg));
-			msgBuf.put(data);
-			// not ByteBuffer to avoid Java 8/9 issues with flip()
-			((Buffer)msgBuf).flip();
-			this.server.send(this.clientAddress, msgBuf);
+			receiveDatagramBytes(sender.toBase64(), data, proto, fromPort, toPort);
 		}
+	}
+
+	/**
+	 * Only for Datagram3, where the sender Destination is not available, only the hash.
+	 * @since 0.9.68
+	 */
+	public void receiveDatagramBytes(Hash sender, byte[] data, int proto,
+	                                 int fromPort, int toPort) throws IOException {
+		if (this.clientAddress==null) {
+			this.handler.receiveDatagramBytes(sender, data, proto, fromPort, toPort);
+		} else {
+			receiveDatagramBytes(sender.toBase64(), data, proto, fromPort, toPort);
+		}
+	}
+
+	/**
+	 * @since 0.9.68 split out from above
+	 */
+	private void receiveDatagramBytes(String sender, byte[] data, int proto,
+	                                 int fromPort, int toPort) throws IOException {
+		StringBuilder buf = new StringBuilder(600);
+		buf.append(sender);
+		if ((handler.verMajor == 3 && handler.verMinor >= 2) || handler.verMajor > 3) {
+			buf.append(" FROM_PORT=").append(fromPort).append(" TO_PORT=").append(toPort);
+		}
+		buf.append('\n');
+		String msg = buf.toString();
+		ByteBuffer msgBuf = ByteBuffer.allocate(msg.length()+data.length);
+		msgBuf.put(DataHelper.getASCII(msg));
+		msgBuf.put(data);
+		// not ByteBuffer to avoid Java 8/9 issues with flip()
+		((Buffer)msgBuf).flip();
+		this.server.send(this.clientAddress, msgBuf);
 	}
 
 	public void stopDatagramReceiving() {
