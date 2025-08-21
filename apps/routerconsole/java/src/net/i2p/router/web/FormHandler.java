@@ -244,11 +244,6 @@ public abstract class FormHandler {
             _valid = false;
             return;
         }
-        // If passwords are turned on, all is assumed good
-        if (_context.getBooleanProperty(RouterConsoleRunner.PROP_PW_ENABLE)) {
-            _valid = true;
-            return;
-        }
         if (_nonce == null) {
             //addFormError("You trying to mess with me?  Huh?  Are you?");
             _valid = false;
