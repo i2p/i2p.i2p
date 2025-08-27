@@ -1,3 +1,19 @@
+2025-08-27 zzz
+ * NetDB: Preliminary fix for exploratory lookups
+
+2025-08-26 zzz
+ * NetDB:
+   - Fix direct lookups
+   - Handle broken direct lookups
+   - Drop exploratory lookups from floodfills
+
+2025-08-21 zzz
+ * Build: Remove ancient, unused admin code (Github PR #116)
+ * Console: Don't bypass nonce check when password is enabled (Github PR #118)
+
+2025-08-20 zzz
+ * Transports: Reduce ban time for slow routers if floodfill
+
 2025-08-17 zzz
  * NetDB: Exploration improvements and fixes
  * Router: Fix PublishRouterInfoJob sometimes not getting started
