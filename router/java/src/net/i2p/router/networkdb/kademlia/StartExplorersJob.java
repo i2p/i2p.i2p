@@ -108,7 +108,7 @@ class StartExplorersJob extends JobImpl {
                 } else if (lowffs) {
                     realexpl = getContext().random().nextInt(4) != 0;
                 } else {
-                    realexpl = true;
+                    realexpl = getContext().random().nextInt(8) != 0;
                 }
                 ExploreJob j = new ExploreJob(getContext(), _facade, key, realexpl, _msgIDBloomXor);
                 if (delay > 0)
