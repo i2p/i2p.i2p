@@ -1,3 +1,6 @@
+2025-09-01 zzz
+ * GeoIP 2025-09-01
+
 2025-08-27 zzz
  * NetDB: Preliminary fix for exploratory lookups
 
