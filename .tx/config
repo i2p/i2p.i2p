@@ -99,6 +99,7 @@ trans.hi = core/locale/messages_hi.po
 trans.hu = core/locale/messages_hu.po
 ;; Java converts id to in
 trans.id = core/locale/messages_in.po
+trans.is = core/locale/messages_is.po
 trans.it = core/locale/messages_it.po
 trans.ja = core/locale/messages_ja.po
 trans.ko = core/locale/messages_ko.po
@@ -141,6 +142,7 @@ trans.hi = router/locale/messages_hi.po
 trans.hu = router/locale/messages_hu.po
 ;; Java converts id to in
 trans.id = router/locale/messages_in.po
+trans.is = router/locale/messages_is.po
 trans.it = router/locale/messages_it.po
 trans.ja = router/locale/messages_ja.po
 trans.ko = router/locale/messages_ko.po
@@ -220,6 +222,7 @@ trans.hi = apps/routerconsole/locale-news/messages_hi.po
 trans.hu = apps/routerconsole/locale-news/messages_hu.po
 ;; Java converts id to in
 trans.id = apps/routerconsole/locale-news/messages_in.po
+trans.is = apps/routerconsole/locale-news/messages_is.po
 trans.it = apps/routerconsole/locale-news/messages_it.po
 trans.ja = apps/routerconsole/locale-news/messages_ja.po
 trans.ko = apps/routerconsole/locale-news/messages_ko.po
@@ -270,6 +273,7 @@ trans.hu = apps/routerconsole/locale-countries/messages_hu.po
 trans.he = apps/routerconsole/locale-countries/messages_iw.po
 ;; Java converts id to in
 trans.id = apps/routerconsole/locale-countries/messages_in.po
+trans.is = apps/routerconsole/locale-countries/messages_is.po
 trans.it = apps/routerconsole/locale-countries/messages_it.po
 trans.ja = apps/routerconsole/locale-countries/messages_ja.po
 trans.ko = apps/routerconsole/locale-countries/messages_ko.po
@@ -389,6 +393,7 @@ trans.hi = apps/desktopgui/locale/messages_hi.po
 trans.hu = apps/desktopgui/locale/messages_hu.po
 ;; Java converts id to in
 trans.id = apps/desktopgui/locale/messages_in.po
+trans.is = apps/desktopgui/locale/messages_is.po
 trans.it = apps/desktopgui/locale/messages_it.po
 trans.ja = apps/desktopgui/locale/messages_ja.po
 trans.ko = apps/desktopgui/locale/messages_ko.po

@@ -1,0 +1,68 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# Sveinn í Felli <sv1@fellsnet.is>, 2025
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-05-05 15:14+0000\n"
+"PO-Revision-Date: 2013-07-20 14:49+0000\n"
+"Last-Translator: Sveinn í Felli <sv1@fellsnet.is>, 2025\n"
+"Language-Team: Icelandic (http://app.transifex.com/otf/I2P/language/is/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: is\n"
+"Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
+
+msgid "Congratulations on getting I2P installed!"
+msgstr "Til hamingju með að hafa sett upp I2P !"
+
+msgid "Welcome to I2P!"
+msgstr "Velkomin í I2P !"
+
+#, java-format
+msgid "Please {0}have patience{1} as I2P boots up and finds peers."
+msgstr "Endilega sýndu {0}þolinmæði{1} á meðan I2P ræsist og finnur jafningja."
+
+#, java-format
+msgid ""
+"While you are waiting, please {0}adjust your bandwidth settings{1} on the "
+"{2}configuration page{3}."
+msgstr "Á meðan þú bíður geturðu {0}aðlagað stillingar þínar á bandbreidd{1} á {2}uppsetningarsíðunni{3}."
+
+msgid ""
+"Also you can setup your browser to use the I2P proxy to reach eepsites."
+msgstr ""
+
+msgid ""
+"Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
+"browser settings."
+msgstr ""
+
+msgid "Do not use SOCKS for this."
+msgstr "Ekki nota SOCKS fyrir þetta."
+
+#, java-format
+msgid ""
+"More information can be found on the {0}I2P browser proxy setup page{1}."
+msgstr ""
+
+#, java-format
+msgid ""
+"Once you have a \"shared clients\" destination listed on the left, please "
+"{0}check out{1} our {2}FAQ{3}."
+msgstr ""
+
+#, java-format
+msgid ""
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on "
+"{2}#i2p{3}."
+msgstr "Beindu IRC-forritinu þínu á {0}localhost:6668{1} og heilsaðu upp á okkur á {2}#i2p{3}."
+
+msgid "I2P Development Team"
+msgstr "I2P þróunarteymið"
