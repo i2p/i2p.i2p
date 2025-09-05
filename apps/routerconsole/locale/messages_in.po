@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-21 18:31+0000\n"
+"POT-Creation-Date: 2025-08-27 11:59+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
 "Last-Translator: zzzi2p, 2024\n"
 "Language-Team: Indonesian (http://app.transifex.com/otf/I2P/language/id/)\n"
@@ -36,20 +36,20 @@ msgstr "Diblokir oleh router hash"
 msgid "IP banned by blocklist.txt entry {0}"
 msgstr "IP diblokir oleh entri blocklist.txt {0}"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1540
+#: ../../../router/java/src/net/i2p/router/Router.java:1569
 #: ../java/src/net/i2p/router/web/helpers/ConfigRestartBean.java:69
 msgid "Restart imminent"
 msgstr "I2P sedang dalam proses restart"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1542
+#: ../../../router/java/src/net/i2p/router/Router.java:1571
 #: ../java/src/net/i2p/router/web/helpers/ConfigRestartBean.java:71
 msgid "Shutdown imminent"
 msgstr "I2P sedang dalam proses dimatikan"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:2053
+#: ../../../router/java/src/net/i2p/router/Router.java:2082
 #: ../../../router/java/src/net/i2p/router/sybil/Analysis.java:1090
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1400
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1405
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1402
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1407
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:982
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:989
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:996
@@ -142,12 +142,12 @@ msgstr "Peer cepat yang dikenal"
 msgid "Size of tunnel acceptor backlog"
 msgstr "Ukuran backlog tunnel penerima"
 
-#: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:698
+#: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:687
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHelper.java:68
 msgid "unknown"
 msgstr "tidak diketahui"
 
-#: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:700
+#: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:689
 msgid "NetDb entry"
 msgstr "Entri NetDb"
 
@@ -157,19 +157,19 @@ msgstr "Entri NetDb"
 msgid "No transports (hidden or starting up?)"
 msgstr "Tidak ada transport (tersembunyi atau sedang dinyalakan?)"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:917
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:900
 msgid "Unsupported signature type"
 msgstr "Jenis signatur tidak didukung"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:935
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:918
 msgid "No support for our signature type"
 msgstr "Tidak ada dukungan untuk jenis signature kami"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:939
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:922
 msgid "Unreachable on any transport"
 msgstr "Tidak terjangkau transport apa pun"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:1044
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:1027
 msgid "UPnP is not enabled"
 msgstr "UPnP tidak diaktifkan"
 
@@ -200,7 +200,7 @@ msgstr "Status"
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:66
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:305
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:307
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:956
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:958
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:588
 msgid "Type"
 msgstr "Tipe"
@@ -328,7 +328,7 @@ msgstr[0] ""
 #: ../java/src/net/i2p/router/web/DeadlockDetector.java:109
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:150
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:281
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1380
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1382
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:562
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:929
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:210
@@ -937,7 +937,7 @@ msgstr "Sistem tray dinonaktifkan"
 #: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:112
 #: ../java/src/net/i2p/router/web/helpers/ConfigFamilyHandler.java:131
 #: ../java/src/net/i2p/router/web/helpers/ConfigNetHandler.java:433
-#: ../java/src/net/i2p/router/web/helpers/ConfigStatsHandler.java:125
+#: ../java/src/net/i2p/router/web/helpers/ConfigStatsHandler.java:70
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:121
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:145
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:517
@@ -1074,13 +1074,13 @@ msgstr "Mohon laporkan"
 msgid "After reporting, please restart your router"
 msgstr "Setelah melaporkan, silakan restart router Anda"
 
-#: ../java/src/net/i2p/router/web/FormHandler.java:264
+#: ../java/src/net/i2p/router/web/FormHandler.java:259
 msgid ""
 "Invalid form submission, probably because you used the 'back' or 'reload' "
 "button on your browser. Please resubmit."
 msgstr "Form submission tidak valid, mungkin karena Anda menggunakan tombol 'back' atau 'reload' pada browser anda. Mohon kirimkan kembali."
 
-#: ../java/src/net/i2p/router/web/FormHandler.java:266
+#: ../java/src/net/i2p/router/web/FormHandler.java:261
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
@@ -1192,7 +1192,7 @@ msgstr "Peers yang Diblokir"
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:170
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:75
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:131
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1447
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1449
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:142
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:652
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:185
@@ -1259,7 +1259,7 @@ msgstr "Sertifikat Router Family lokal"
 
 #: ../java/src/net/i2p/router/web/helpers/CertHelper.java:91
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:289
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1433
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1435
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:973
 msgid "Family"
 msgstr "Family"
@@ -1463,7 +1463,7 @@ msgid "Add Client"
 msgstr "Tambah klien"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:132
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1072
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1062
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:626
 msgid "Client"
 msgstr "Klien"
@@ -1528,7 +1528,7 @@ msgstr "Plugin"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:292
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:285
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1170
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1172
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:425
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:600
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:97
@@ -1770,7 +1770,7 @@ msgstr "Destinasi remote terenkripsi"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:581
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:610
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:779
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:668
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:600
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:594
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:586
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:602
@@ -1793,7 +1793,7 @@ msgid "Name"
 msgstr "Nama"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigKeyringHelper.java:67
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1416
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1418
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:624
 msgid "Encryption Key"
 msgstr "Encryption Key"
@@ -1939,7 +1939,7 @@ msgstr "UI"
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:31
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:59
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:498
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1055
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1045
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:210
 #: ../java/strings/Strings.java:56
 msgid "Tunnels"
@@ -1960,15 +1960,15 @@ msgstr "Logging"
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:32
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:54
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:480
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:841
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:905
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:831
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:895
 #: ../java/strings/Strings.java:52
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:487
 msgid "Peers"
 msgstr "Peers"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigNavHelper.java:32
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1477
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1479
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:614
 msgid "Stats"
 msgstr "Statistik"
@@ -2001,7 +2001,7 @@ msgstr "Router Family"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:590
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:736
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:783
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:670
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:602
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:596
 msgid "Save changes"
 msgstr "Simpan perubahan"
@@ -2332,19 +2332,15 @@ msgstr[0] "Harap menunggu routing komitmen berakhir untuk {0} tunnel"
 msgid "Restart in {0}"
 msgstr "Restart dalam {0}"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigStatsHandler.java:119
-msgid "Stat filter and location updated successfully to"
-msgstr "Stat filter dan lokasi berhasil diperbarui ke"
-
-#: ../java/src/net/i2p/router/web/helpers/ConfigStatsHandler.java:122
+#: ../java/src/net/i2p/router/web/helpers/ConfigStatsHandler.java:67
 msgid "Full statistics enabled"
 msgstr "Statistik penuh diaktifkan"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigStatsHandler.java:124
+#: ../java/src/net/i2p/router/web/helpers/ConfigStatsHandler.java:69
 msgid "Full statistics disabled"
 msgstr "Statistik penuh dinonaktifkan"
 
-#: ../java/src/net/i2p/router/web/helpers/ConfigStatsHandler.java:128
+#: ../java/src/net/i2p/router/web/helpers/ConfigStatsHandler.java:73
 #, java-format
 msgid ""
 "Graph list updated, may take up to 60s to be reflected on the {0}Graphs "
@@ -3325,7 +3321,7 @@ msgstr "LeaseSets"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:442
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:287
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1222
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1224
 msgid "Country"
 msgstr "Negara"
 
@@ -3364,20 +3360,20 @@ msgid "Transport"
 msgstr "Transport"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:358
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1062
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1118
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1064
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1120
 msgid "Previous Page"
 msgstr "Halaman Sebelumnya"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:361
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1065
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1121
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1067
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1123
 msgid "Page"
 msgstr "Halaman"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:365
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1069
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1124
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1071
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1126
 msgid "Next Page"
 msgstr "Halaman Berikutnya"
 
@@ -3408,168 +3404,168 @@ msgid "Unpublished"
 msgstr "Tidak terpublikasikan"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:905
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:928
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:929
 msgid "Add to address book"
 msgstr "Tambahkan ke Buku Alamat"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:907
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:930
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:931
 msgid "Add to local address book"
 msgstr "Tambahkan ke buku alamat lokal"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:941
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:943
 #, java-format
 msgid "Published {0} ago"
 msgstr "Dipublikasikan {0} lalu"
-
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:947
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:967
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1020
-#, java-format
-msgid "Expires in {0}"
-msgstr "Kedaluwarsa dalam {0}"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:949
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:969
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1022
 #, java-format
+msgid "Expires in {0}"
+msgstr "Kedaluwarsa dalam {0}"
+
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:951
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:971
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1024
+#, java-format
 msgid "Expired {0} ago"
 msgstr "Kadaluarsa dalam {0} yang lalu"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1009
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1011
 msgid "Lease"
 msgstr "Lease"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1013
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1015
 msgid "Tunnel"
 msgstr "Tunnel"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1039
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1041
 msgid "Not initialized"
 msgstr "Tidak diaktifkan"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1142
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1144
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:474
 msgid "Network Database Router Statistics"
 msgstr "Statistik Database Router Jaringan"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1170
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1192
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1228
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1172
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1194
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1230
 msgid "Count"
 msgstr "Jumlah"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1192
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1194
 msgid "Transports"
 msgstr "Transport"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1221
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1223
 msgid "Sort by country"
 msgstr "Urutkan berdasarkan negara"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1227
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1229
 msgid "Sort by count"
 msgstr "Urutkan berdasarkan jumlah"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1377
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1379
 msgid "Our Router Identity"
 msgstr "Identitas Router Kami"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1390
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1392
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:940
 msgid "View extended router info"
 msgstr "Lihat info router yang lengkap"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1392
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1394
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:941
 msgid "Full entry"
 msgstr "Entri penuh"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1398
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1400
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:242
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1036
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:565
 msgid "Hidden"
 msgstr "Tersembunyi"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1398
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1400
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1036
 msgid "Updated"
 msgstr "Telah terupdate"
 
 #. published slightly in the future
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1403
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1409
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1211
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1405
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1411
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1201
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1039
 msgid "Published"
 msgstr "Telah dipublikasikan"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1414
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1416
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1041
 msgid "Signing Key"
 msgstr "Signing Key"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1444
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1446
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:44
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:1044
 msgid "Addresses"
 msgstr "Alamat"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1462
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1464
 msgid "cost"
 msgstr "Biaya"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1493
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1495
 msgid "Hidden or starting up"
 msgstr "Tersembunyi atau sedang diaktifkan"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1493
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1495
 msgid "SSU"
 msgstr "SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1493
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1495
 msgid "SSU with introducers"
 msgstr "SSU dengan introducer"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1494
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1496
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:45
 msgid "NTCP"
 msgstr "NTCP"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1494
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1496
 msgid "NTCP and SSU"
 msgstr "NTCP dan SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1494
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1496
 msgid "NTCP and SSU with introducers"
 msgstr "NTCP dan SSU dengan introducer"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1495
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1497
 msgid "IPv6 Only SSU, introducers"
 msgstr "SSU yang hanya menggunakan IPv6, introducer"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1495
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1497
 msgid "IPv6 SSU"
 msgstr "IPv6 SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1495
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1497
 msgid "IPv6 SSU, introducers"
 msgstr "IPv6 SSU, introducer"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1496
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1498
 msgid "IPv6 NTCP"
 msgstr "IPv6 NTCP"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1496
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1498
 msgid "IPv6 NTCP, SSU"
 msgstr "IPv6 NTCP, SSU"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1496
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1498
 msgid "IPv6 NTCP, SSU, introducers"
 msgstr "IPv6 NTCP, SSU, introducer"
 
-#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1496
+#: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:1498
 msgid "IPv6 Only NTCP, SSU, introducers"
 msgstr "Hanya IPv6 NTCP, SSU, introducers"
 
@@ -3578,7 +3574,7 @@ msgstr "Hanya IPv6 NTCP, SSU, introducers"
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:687
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:182
 #: ../java/src/net/i2p/router/web/helpers/ProfilesHelper.java:15
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:962
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:952
 msgid "Banned"
 msgstr "Diblokir"
 
@@ -3641,7 +3637,7 @@ msgstr "Koneksi Peer"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:212
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:269
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1003
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:993
 msgid "Total"
 msgstr "Total"
 
@@ -4124,8 +4120,8 @@ msgstr "Sangat congested"
 #. 0
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:307
 #: ../java/src/net/i2p/router/web/helpers/ProfilesHelper.java:14
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:880
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:944
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:870
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:934
 msgid "Floodfill"
 msgstr "Floodfill"
 
@@ -4409,7 +4405,7 @@ msgid "Network Reachability"
 msgstr "Network Reachability"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:52
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:824
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:814
 msgid "Update Status"
 msgstr "Status Update"
 
@@ -4430,7 +4426,7 @@ msgid "Bandwidth Graph"
 msgstr "Grafik Bandwidth"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:60
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1105
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1095
 msgid "Congestion"
 msgstr "Congestion"
 
@@ -4445,7 +4441,7 @@ msgid "Local Tunnels"
 msgstr "Local Tunnel"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:63
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1203
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1193
 msgid "News &amp; Updates"
 msgstr "Berita &amp; Update"
 
@@ -4566,8 +4562,8 @@ msgid "NetDB"
 msgstr "NetDB"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:483
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:839
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:903
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:829
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:893
 msgid "Show all current peer connections"
 msgstr "Tampilkan semua koneksi peer saat ini"
 
@@ -4580,7 +4576,7 @@ msgid "Show recent peer performance profiles"
 msgstr "Tampilkan profil kinerja peer terbaru"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:501
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1053
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1043
 msgid "View existing tunnels and tunnel build status"
 msgstr "Lihat tunnel yang ada dan status pembuatan tunnel"
 
@@ -4689,165 +4685,157 @@ msgstr "Berapa banyak RAM digunakan I2P / total RAM tersedia untuk I2P (tidak te
 msgid "Memory"
 msgstr "Memory"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:801
-msgid "See more information on the wiki"
-msgstr "Lihat informasi lebih lanjut di wiki"
-
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:803
-msgid "Warning: ECDSA is not available. Update your Java or OS"
-msgstr "Peringatan: ECDSA tidak tersedia. Memperbarui Java atau OS Anda"
-
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:808
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:798
 #, java-format
 msgid "Warning: Java version {0} is no longer supported by I2P."
 msgstr "Peringatan: Java versi {0} tidak lagi didukung oleh I2P."
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:810
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:800
 #, java-format
 msgid "Update Java to version {0} or higher to receive I2P updates."
 msgstr "Update Jawa ke versi {0} atau lebih tinggi untuk menerima update I2P."
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:822
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:812
 msgid "Configure I2P Updates"
 msgstr "Konfigurasi update I2P"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:847
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:911
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:837
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:901
 msgid "Peers we've been talking to in the last few minutes/last hour"
 msgstr "Peer yang kami sudah bicara dalam beberapa menit/jam terakhir"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:850
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:914
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:840
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:904
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:489
 msgid "Active"
 msgstr "Aktif"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:859
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:923
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:849
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:913
 msgid "The number of peers available for building client tunnels"
 msgstr "Jumlah peer yang tersedia untuk membangun client tunnels"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:862
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:926
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:852
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:916
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:499
 msgid "Fast"
 msgstr "Cepat"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:868
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:932
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:858
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:922
 msgid "The number of peers available for building exploratory tunnels"
 msgstr "Jumlah peer yang tersedia untuk membangun exploratory tunnel"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:871
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:935
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:861
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:925
 msgid "High capacity"
 msgstr "Kapasitas tinggi"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:877
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:941
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:867
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:931
 msgid "The number of peers available for network database inquiries"
 msgstr "Jumlah peer yang tersedia untuk network database inquirie"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:886
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:950
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:876
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:940
 msgid "The total number of peers in our network database"
 msgstr "Jumlah peer dalam database jaringan kami"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:889
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:953
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:879
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:943
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:521
 msgid "Known"
 msgstr "Diketahui"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:959
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:949
 msgid "The number of banned peers"
 msgstr "Jumlah peer yang diblokir"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:981
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:971
 msgid "Configure router bandwidth allocation"
 msgstr "Konfigurasi alokasi bandwidth router"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:983
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:973
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:474
 msgid "Bandwidth in/out"
 msgstr "Bandwidth masuk/keluar"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1010
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1000
 msgid "Used"
 msgstr "Digunakan"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1042
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1032
 msgid "Our inbound &amp; outbound traffic for the last 20 minutes"
 msgstr "Lalu lintas inbound & outbound kami dalam 20 menit terakhir"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1060
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1050
 msgid ""
 "Used for building and testing tunnels, and communicating with floodfill "
 "peers"
 msgstr "Digunakan untuk membangun dan menguji tunnel, dan berkomunikasi dengan peer floodfill"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1063
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1053
 msgid "Exploratory"
 msgstr "Exploratory"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1069
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1059
 msgid "Tunnels we are using to provide or access services on the network"
 msgstr "TUnnel yang kita gunakan untuk memberikan atau mengakses services di jaringan"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1078
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1068
 msgid ""
 "Tunnels we are participating in, directly contributing bandwidth to the "
 "network"
 msgstr "Tunnel yang kita ikut partisipasi di dalamnya, memberikan kontribusi bandwidth langsung untuk jaringan"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1081
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1071
 msgid "Participating"
 msgstr "Participating"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1087
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1077
 msgid ""
 "The ratio of tunnel hops we provide to tunnel hops we use - a value greater "
 "than 1.00 indicates a positive contribution to the network"
 msgstr "kami menyediakan rasio tunnel hop untuk tunnel hop yang kita gunakan - nilai lebih dari 1.00 menunjukkan kontribusi positif untuk jaringan"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1090
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1080
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:473
 msgid "Share ratio"
 msgstr "Share ratio"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1103
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1093
 msgid "What's in the router's job queue?"
 msgstr "Ada apa di router's job queue?"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1110
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1100
 msgid "Indicates router performance"
 msgstr "Menunjukkan performa router"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1113
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1103
 msgid "Job lag"
 msgstr "Job lag"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1119
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1109
 msgid "Indicates how quickly outbound messages to other I2P routers are sent"
 msgstr "Menunjukkan seberapa cepat outbound messages dikirim kepada I2P router lain"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1122
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1112
 msgid "Message delay"
 msgstr "Message delay"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1129
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1119
 msgid "Round trip time for a tunnel test"
 msgstr "Round trip time untuk tunnel test"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1132
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1122
 msgid "Tunnel lag"
 msgstr "Tunnel lag"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1139
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1129
 msgid "Queued requests from other routers to participate in tunnels"
 msgstr "Antrian request dari router lain untuk berpartisipasi dalam tunnel"
 
-#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1142
+#: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1132
 msgid "Backlog"
 msgstr "Backlog"
 
@@ -6625,7 +6613,7 @@ msgid "Toggle full stat collection and all graphing options"
 msgstr "Ubah pengumpulan statistik penuh dan semua pilihan grafik"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:539
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:578
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:561
 msgid "toggle all"
 msgstr "ubah semua"
 
@@ -6637,29 +6625,17 @@ msgstr "Aktifkan statistik penuh?"
 msgid "change requires restart to take effect"
 msgstr "perubahan membutuhkan restart untuk diterapkan"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:557
-msgid "Stat file"
-msgstr "File statistik"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:576
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:559
 msgid "Toggle section graphing options"
 msgstr "Ubah opsi pilihan grafik"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:586
-msgid "Log"
-msgstr "Log"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:594
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:563
 msgid "Select stats for visualization on /graphs"
 msgstr "Pilih statistik untuk visualisasi pada /grafik"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:597
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:566
 msgid "Graph"
 msgstr "Grafik"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:658
-msgid "Advanced filter"
-msgstr "Filter lanjutan"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:246
 msgid "config tunnels"

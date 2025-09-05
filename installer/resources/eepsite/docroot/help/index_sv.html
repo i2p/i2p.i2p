@@ -45,8 +45,8 @@
     <ul>
 <li>
 <b>Linux</b><br>
-        Standard install: <code dir="ltr">~/.i2p/eepsite/docroot/</code><br>
-        Package install, running as a service: <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+        Standardinstallation: <code dir="ltr">~/.i2p/eepsite/docroot/</code><br>
+        Paketinstallation, körs som en tjänst: <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/</code>
 </li>
       <li>
 <b>Windows</b><br><code dir="ltr">%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
@@ -55,24 +55,24 @@
 <b>Mac</b><br><code dir="ltr">/Users/(user)/Library/Application Support/i2p</code>
 </li>
     </ul>
-<p>In I2P, hidden services are addressed using a Base32 address ending in ".b32.i2p", or a Destination represented as a long Base64 string.
-      The Base32 address may be used as a hostname, until you register a name following the instructions below.
-      The Destination is somewhat like an IP address, and is shown on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.</p>
+<p>I I2P adresseras dolda tjänster med hjälp av en Base32-adress som slutar på ".b32.i2p", eller en destination som representeras som en lång Base64-sträng.
+      Base32-adressen kan användas som ett värdnamn tills du registrerar ett namn enligt instruktionerna nedan.
+      Destinationen är ungefär som en IP-adress och visas på <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">sidan för konfiguration av dolda tjänster</a>.</p>
 
     <p>Instruktionerna nedan beskriver hur du tilldelar ett namn som "minsida.i2p" till din webbplats och möjliggör åtkomst för andra.
        Du kan nå din webbplats lokalt via <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.</p>
 
     <h2>Så här ställer du in och annonserar din dolda tjänst</h2>
 
-     <p>Your webserver is running by default, but is not accessible by others until you start the hidden service tunnel.
-      After you start your I2P Webserver tunnel, it will be difficult for other people to find.
-      It can only be accessed with the long Destination or with the shorter Base32 address (.b32.i2p), which is a hash of the Destination.
-      You could just tell people the Destnation or the Base32 address, but thankfully I2P has an address book and several easy ways to tell people about your website.
-      Here are detailed instructions.</p>
+     <p>Din webbserver körs som standard, men är inte åtkomlig för andra förrän du startar den dolda tjänsttunneln.
+      När du har startat din I2P-webbservertunnel kommer den att vara svår för andra att hitta.
+      Den kan bara nås med den långa destinationen eller med den kortare Base32-adressen (.b32.i2p), vilket är en hash av destinationen.
+      Du kan bara berätta destinationen eller Base32-adressen för folk, men som tur är har I2P en adressbok och flera enkla sätt att berätta för folk om din webbplats.
+      Här är detaljerade instruktioner.</p>
 
     <ul>
 <li>Pick a name for your website (<i>something</i>.i2p), using lower-case.
-        You may wish to check first in your own router's <a href="http://127.0.0.1:7657/dns?book=router&amp;filter=none">address book</a> to see if your name is already taken.
+        You may wish to check first in your own router's <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">address book</a> to see if your name is already taken.
         Enter the new name for your website on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a> where it says "Website name".
         This will replace the default "mysite.i2p".
         Also, if you would like your I2P Webserver tunnel to be automatically started when you start I2P, check the "Auto Start" box.
@@ -83,12 +83,12 @@
          Your website is now running.</li>
       <li>Highlight and copy the entire Local destination on the <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">Hidden Service Configuration page</a>.
          Make sure you copy the whole thing, it is over 500 characters.</li>
-      <li>Enter the name and paste the destination into your <a href="http://127.0.0.1:7657/dns?book=router&amp;filter=none">address book</a>.
+      <li>Enter the name and paste the destination into your <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">address book</a>.
          Click "Add" to save the new entry.</li>
       <li>In your browser, enter in your website name (<i>something</i>.i2p) and you should be right back here. 
           Hopefully it worked!</li>
-      <li>Before you tell the world about your new website, you should add some content.
-          Go to the server's root directory <a href="#dir">listed above</a> and replace the index.html redirect page with your own content.</li>
+      <li>Innan du berättar om din nya webbplats bör du lägga till lite innehåll.
+          Gå till serverns rotkatalog <a href="#dir">som anges ovan</a> och ersätt omdirigeringssidan index.html med ditt eget innehåll.</li>
     </ul>
 <p>Directory listings are enabled, so you may host files from a subdirectory without providing a page with links to the files. 
       You may change the appearance of the directory by supplying an edited <a href="lib/jetty-dir.css">jetty-dir.css</a> file for each directory.

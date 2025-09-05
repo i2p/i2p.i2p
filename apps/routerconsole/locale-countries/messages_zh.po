@@ -52,7 +52,7 @@ msgid "Armenia"
 msgstr "亚美尼亚"
 
 msgid "Netherlands Antilles"
-msgstr "荷兰属地"
+msgstr "荷属安地列斯"
 
 msgid "Angola"
 msgstr "安哥拉"
@@ -352,7 +352,7 @@ msgid "India"
 msgstr "印度"
 
 msgid "British Indian Ocean Territory"
-msgstr "英属印度洋地区"
+msgstr "英属印度洋领地"
 
 msgid "Iraq"
 msgstr "伊拉克"
