@@ -1,3 +1,9 @@
+2025-09-05 zzz
+ * Translations update
+
+2025-09-03 zzz
+ * Console: New partial Icelandic translation
+
 2025-09-01 zzz
  * GeoIP 2025-09-01
 
