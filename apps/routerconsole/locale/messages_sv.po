@@ -11,6 +11,7 @@
 # cacapo <handelsehorisont@gmail.com>, 2015
 # Calle Rundgren <samaire@samaire.net>, 2013
 # cacapo <handelsehorisont@gmail.com>, 2015-2016
+# Henrik Mattsson-Mårn <h@reglage.net>, 2025
 # hottuna <i2p@robertfoss.se>, 2011,2013
 # hottuna <i2p@robertfoss.se>, 2013
 # hottuna <i2p@robertfoss.se>, 2011-2012
@@ -29,7 +30,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-27 11:59+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
-"Last-Translator: Daniel, 2016-2017,2021-2023\n"
+"Last-Translator: Henrik Mattsson-Mårn <h@reglage.net>, 2025\n"
 "Language-Team: Swedish (Sweden) (http://app.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -3671,7 +3672,7 @@ msgstr "Totalt"
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:215
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:216
 msgid "IPv4"
-msgstr ""
+msgstr "IPv4"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:220
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:221
@@ -4263,7 +4264,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:47
 msgid "UDP"
-msgstr ""
+msgstr "UDP"
 
 #: ../java/src/net/i2p/router/web/helpers/StatsGenerator.java:64
 msgid "Statistics gathered during this router's uptime"
@@ -7137,7 +7138,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:533
 msgid "Network Help"
-msgstr ""
+msgstr "Nätverkshjälp"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:537
 msgid ""
@@ -7652,7 +7653,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:749
 msgid "Function"
-msgstr ""
+msgstr "Funktion"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:751
 msgid "Notes"
