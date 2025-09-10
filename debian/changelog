@@ -1,8 +1,14 @@
+i2p (2.10.0-1~ubuntu1) jammy; urgency=medium
+
+  * New upstream version 2.10.0
+
+ -- idk <hankhill19580@gmail.com>  Wed, 10 Sep 2025 12:12:12 +0000
+
 i2p (2.9.0-1~ubuntu1) jammy; urgency=medium
 
   * New upstream version 2.9.0
 
- -- idk (key signing) <hankhill19580@gmail.com>  Tue, 3 Jun 2025 12:12:12 +0000
+ -- idk <hankhill19580@gmail.com>  Tue, 3 Jun 2025 12:12:12 +0000
 
 i2p (2.8.2-1~ubuntu1) jammy; urgency=medium
 
