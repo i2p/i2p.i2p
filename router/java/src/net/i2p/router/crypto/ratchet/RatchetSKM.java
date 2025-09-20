@@ -804,10 +804,13 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
     @Override
     public void renderStatusHTML(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(1024);
+        boolean isPQ = _type != EncType.ECIES_X25519;
 
         // inbound
-        buf.append("<h3 class=\"debug_inboundsessions\">Ratchet Inbound sessions</h3>" +
-                   "<table>");
+        buf.append("<h3 class=\"debug_inboundsessions\">");
+        if (isPQ)
+            buf.append("PQ ");
+        buf.append("Ratchet Inbound sessions</h3><table>");
         Map<PublicKey, Set<RatchetTagSet>> inboundSets = getRatchetTagSetsByPublicKey();
         int total = 0;
         int totalSets = 0;
@@ -853,8 +856,10 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
            .append("; sessions: ").append(inboundSets.size())
            .append("</th></tr>\n" +
                    "</table>" +
-                   "<h3 class=\"debug_outboundsessions\">Ratchet Outbound sessions</h3>" +
-                   "<table>");
+                   "<h3 class=\"debug_outboundsessions\">");
+        if (isPQ)
+            buf.append("PQ ");
+        buf.append("Ratchet Outbound sessions</h3><table>");
 
         // outbound
         totalSets = 0;
