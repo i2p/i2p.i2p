@@ -16,7 +16,7 @@
           and versions in gradle.properties and apps/jetty/build.gradle
      -->
     <property name="jetty.ver" value="12.0.21" />
-    <property name="tomcat.ver" value="9.0.88" />
+    <property name="tomcat.ver" value="9.0.107" />
 
     <!-- You probably don't want to change anything from here down -->
     <target name="help" depends="all" />
