@@ -15,7 +15,7 @@ import net.i2p.data.Base32;
  */
 public class MagnetURI {
 
-    private final String _tracker;
+    private final List<String> _trackers;
     private final String _name;
     private final byte[] _ih;
 
@@ -38,7 +38,7 @@ public class MagnetURI {
     public MagnetURI(I2PSnarkUtil util, String url) throws IllegalArgumentException {
         String ihash;
         String name;
-        String trackerURL = null;
+        List<String> trackerURLs = null;
         if (url.startsWith(MAGNET)) {
             // magnet:?xt=urn:btih:0691e40aae02e552cfcb57af1dca56214680c0c5&tr=http://tracker2.postman.i2p/announce.php
             String xt = getParam("xt", url);
@@ -46,7 +46,7 @@ public class MagnetURI {
             if (xt == null || !xt.startsWith("urn:btih:"))
                 throw new IllegalArgumentException();
             ihash = xt.substring("urn:btih:".length());
-            trackerURL = getTrackerParam(url);
+            trackerURLs = getTrackerParam(url);
             name = util.getString("Magnet") + ' ' + ihash;
             String dn = getParam("dn", url);
             if (dn != null)
@@ -79,7 +79,7 @@ public class MagnetURI {
             throw new IllegalArgumentException();
         _ih = ih;
         _name = name;
-        _tracker = trackerURL;
+        _trackers = trackerURLs;
     }
 
     /**
@@ -97,10 +97,18 @@ public class MagnetURI {
     }
 
     /**
-     *  @return tracker url or null
+     *  @return first valid tracker url or null
      */
     public String getTrackerURL() {
-        return _tracker;
+        return _trackers != null ? _trackers.get(0) : null;
+    }
+
+    /**
+     *  @return all valid tracker urls or null if none
+     *  @since 0.9.67 TODO to be hooked in via SnarkManager.addMagnet() and new Snark()
+     */
+    public List<String> getTrackerURLs() {
+        return _trackers;
     }
 
     /**
@@ -160,26 +168,29 @@ public class MagnetURI {
     }
 
     /**
-     *  @return first valid I2P tracker or null
+     *  @return all valid I2P trackers or null if none
      *  @since 0.9.1
      */
-    private static String getTrackerParam(String uri) {
+    private static List<String> getTrackerParam(String uri) {
         List<String> trackers = getMultiParam("tr", uri);
         if (trackers == null)
             return null;
+        List<String> rv = new ArrayList<String>(trackers.size());
         for (String t : trackers) {
             try {
                 URI u = new URI(t);
                 String protocol = u.getScheme();
                 String host = u.getHost();
-                if (protocol == null || host == null ||
-                    !protocol.toLowerCase(Locale.US).equals("http") ||
+                if (protocol == null || host == null)
+                    continue;
+                protocol = protocol.toLowerCase(Locale.US);
+                if (!(protocol.equals("http") || protocol.equals("udp")) ||
                     !host.toLowerCase(Locale.US).endsWith(".i2p"))
                     continue;
-                return t;
+                rv.add(t);
             } catch(URISyntaxException use) {}
         }
-        return null;
+        return rv.isEmpty() ? null : rv;
     }
 
     /**

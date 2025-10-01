@@ -21,8 +21,8 @@ import net.i2p.util.SystemVersion;
  * Precalculate the Y and K for ElGamal encryption operations.
  *
  * This class precalcs a set of values on its own thread, using those transparently
- * when a new instance is created.  By default, the minimum threshold for creating 
- * new values for the pool is 20, and the max pool size is 50.  Whenever the pool has
+ * when a new instance is created.
+ * Whenever the pool has
  * less than the minimum, it fills it up again to the max.  There is a delay after 
  * each precalculation so that the CPU isn't hosed during startup.
  * These three parameters are controlled by java environmental variables and 
@@ -48,8 +48,8 @@ final class YKGenerator {
     public final static String PROP_YK_PRECALC_MIN = "crypto.yk.precalc.min";
     public final static String PROP_YK_PRECALC_MAX = "crypto.yk.precalc.max";
     public final static String PROP_YK_PRECALC_DELAY = "crypto.yk.precalc.delay";
-    public final static int DEFAULT_YK_PRECALC_MIN = 20;
-    public final static int DEFAULT_YK_PRECALC_MAX = 50;
+    public final static int DEFAULT_YK_PRECALC_MIN = 3;
+    public final static int DEFAULT_YK_PRECALC_MAX = 8;
     public final static int DEFAULT_YK_PRECALC_DELAY = 200;
 
     /**
@@ -59,9 +59,9 @@ final class YKGenerator {
     public YKGenerator(I2PAppContext context) {
         ctx = context;
 
-        // add to the defaults for every 128MB of RAM, up to 1GB
+        // add to the defaults for every 128MB of RAM, up to 384MB
         long maxMemory = SystemVersion.getMaxMemory();
-        int factor = (int) Math.max(1l, Math.min(8l, 1 + (maxMemory / (128*1024*1024l))));
+        int factor = (int) Math.max(1l, Math.min(3l, 1 + (maxMemory / (128*1024*1024l))));
         int defaultMin = DEFAULT_YK_PRECALC_MIN * factor;
         int defaultMax = DEFAULT_YK_PRECALC_MAX * factor;
         MIN_NUM_BUILDERS = ctx.getProperty(PROP_YK_PRECALC_MIN, defaultMin);

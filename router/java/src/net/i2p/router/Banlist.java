@@ -69,6 +69,15 @@ public class Banlist {
     public final static long BANLIST_DURATION_NO_NETWORK = 30*24*60*60*1000L;
     public final static long BANLIST_DURATION_LOCALHOST = 2*60*60*1000;
     private final static long BANLIST_CLEANER_START_DELAY = BANLIST_DURATION_PARTIAL;
+
+    /**
+     *  A ban that expires after this will return true in isBanlistedForever().
+     *  In the transports, "forever" is treated as a hard ban, and both
+     *  inbound and outbound connections will be rejected.
+     *  Not-forever is treated as a soft ban, with outbound rejected
+     *  but inbound will be allowed and will automatically unban.
+     */
+    private static final long BANLIST_FOREVER_THRESHOLD = 24*60*60*1000L;
     
     public Banlist(RouterContext context) {
         _context = context;
@@ -336,9 +345,12 @@ public class Banlist {
         return rv;
     }
     
+    /**
+     *  @return true if banned and expires more than 24 hours from now
+     */
     public boolean isBanlistedForever(Hash peer) {
         Entry entry = _entries.get(peer);
-        return entry != null && entry.expireOn > _context.clock().now() + 2*24*60*60*1000L;
+        return entry != null && entry.expireOn > _context.clock().now() + BANLIST_FOREVER_THRESHOLD;
     }
 
     /** @deprecated moved to router console */

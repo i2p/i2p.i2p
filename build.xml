@@ -898,7 +898,7 @@
             windowtitle="I2P Anonymous Network - Java Documentation - API Version ${api.version}">
             <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:net.i2p.apache.http.conn.ssl:net.i2p.apache.http.conn.util:net.i2p.apache.http.util:org.json.simple:com.southernstorm.noise.crypto.x25519:com.southernstorm.noise.crypto.chacha20:org.minidns:org.minidns.*" />
             <group title="Streaming Library" packages="net.i2p.client.streaming:net.i2p.client.streaming.impl" />
-            <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:net.i2p.data.router:org.cybergarage:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters:com.maxmind.*:com.southernstorm.noise.*" />
+            <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:net.i2p.data.router:org.cybergarage:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters:com.maxmind.*:com.southernstorm.noise.*:org.bouncycastle:org.bouncycastle.*" />
             <group title="Router Console" packages="net.i2p.router.web:net.i2p.router.web.*:net.i2p.router.update:edu.internet2.ndt:net.i2p.router.news:com.vuze.*" />
             <!-- apps and bridges starting here, alphabetical please -->
             <group title="Addressbook Application" packages="net.i2p.addressbook:net.i2p.router.naming:net.metanotion:net.metanotion.*" />
@@ -1260,6 +1260,10 @@
         <delete file="mavencentral-servlet-i2p.jar" />
     </target>
 
+    <target name="wrapper-distclean" >
+        <subant buildpath="installer/lib/wrapper" target="distclean" failonerror="false" />
+    </target>
+
     <target name="distclean" depends="clean">
         <delete failonerror="false" quiet="true">
             <fileset dir="." includes="i2pinstall* *.deb i2p_*.bz2 i2pupdate* i2psource* *.sig *.torrent" />
@@ -1284,7 +1288,7 @@
         <delete dir="core/c/jbigi/bin" />
         <delete dir="core/c/jbigi/lib" />
         <delete dir="core/c/jcpuid/lib" />
-        <ant dir="installer/lib/wrapper" target="distclean" />
+        <ant dir="" target="wrapper-distclean" />
         <ant dir="installer/resources/locale" target="distclean" />
         <ant dir="installer/tools/java" target="distclean" />
         <delete dir="installer/lib/izpack5/patches/java/build" quiet="true" />

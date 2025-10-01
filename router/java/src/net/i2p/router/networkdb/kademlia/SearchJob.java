@@ -496,7 +496,7 @@ class SearchJob extends JobImpl {
 
         // use the 4-arg one so we pick up the override in ExploreJob
         //I2NPMessage msg = buildMessage(expiration);
-        I2NPMessage msg = buildMessage(null, to, expiration, router);	
+        I2NPMessage msg = buildMessage(null, getContext().routerHash(), expiration, router);	
         if (msg == null) {
             if (_log.shouldWarn())
                 _log.warn("(dbid: " + _facade + ") Failed to create DLM to : " + router);

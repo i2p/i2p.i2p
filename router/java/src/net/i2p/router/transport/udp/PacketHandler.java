@@ -388,29 +388,41 @@ class PacketHandler {
 
         // all good
         SSU2Header.acceptTrialDecrypt(packet, header);
-        if (type == SSU2Util.SESSION_REQUEST_FLAG_BYTE) {
+        switch (type) {
+          case SSU2Util.SESSION_REQUEST_FLAG_BYTE:
             if (_log.shouldDebug())
                 _log.debug("Got a Session Request on " + state);
             _establisher.receiveSessionOrTokenRequest(from, state, packet);
-        } else if (type == SSU2Util.TOKEN_REQUEST_FLAG_BYTE) {
+            break;
+
+          case SSU2Util.TOKEN_REQUEST_FLAG_BYTE:
             if (_log.shouldDebug())
                 _log.debug("Got a Token Request on " + state);
             _establisher.receiveSessionOrTokenRequest(from, state, packet);
-        } else if (type == SSU2Util.SESSION_CONFIRMED_FLAG_BYTE) {
+            break;
+
+          case SSU2Util.SESSION_CONFIRMED_FLAG_BYTE:
             if (_log.shouldDebug())
                 _log.debug("Got a Session Confirmed on " + state);
             _establisher.receiveSessionConfirmed(state, packet);
-        } else if (type == SSU2Util.PEER_TEST_FLAG_BYTE) {
+            break;
+
+          case SSU2Util.PEER_TEST_FLAG_BYTE:
             if (_log.shouldDebug())
                 _log.debug("Got a Peer Test");
             _testManager.receiveTest(from, packet);
-        } else if (type == SSU2Util.HOLE_PUNCH_FLAG_BYTE) {
+            break;
+
+          case SSU2Util.HOLE_PUNCH_FLAG_BYTE:
             if (_log.shouldDebug())
                 _log.debug("Got a Hole Punch");
             _establisher.receiveHolePunch(from, packet);
-        } else {
+            break;
+
+          default:
             if (_log.shouldWarn())
                 _log.warn("Got unknown SSU2 message " + header + " from " + from);
+            break;
         }
         return true;
     }

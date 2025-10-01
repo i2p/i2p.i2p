@@ -604,6 +604,9 @@
 <%
                 boolean has0 = editBean.hasEncType(curTunnel, 0);
                 boolean has4 = editBean.hasEncType(curTunnel, 4);
+                boolean has5 = editBean.hasEncType(curTunnel, 5);
+                boolean has6 = editBean.hasEncType(curTunnel, 6);
+                boolean has7 = editBean.hasEncType(curTunnel, 7);
 %>
         <tr>
             <th colspan="2" <%=ehdisabled%>>
@@ -617,7 +620,31 @@
                     <option title="<%=intl._t("This is the default, recommended option")%>" value="4" <%=((has4 && !has0) ? " selected=\"selected\"" : edisabled)%> >
                     ECIES-X25519</option>
                     <option value="4,0" <%=((has0 && has4) ? " selected=\"selected\"" : edisabled)%> >
-                    <%=intl._t("Both encryption types")%></option>
+                    ECIES-X25519 + ElGamal-2048</option>
+<%
+                    if (editBean.isAdvanced()) {
+%>
+                        <option title="<%=intl._t("experimental")%>" value="5" <%=((has5 && !has4) ? " selected=\"selected\"" : edisabled)%> >
+                        MLKEM512-X25519</option>
+                        <option title="<%=intl._t("experimental")%>" value="6" <%=((has6 && !has4) ? " selected=\"selected\"" : edisabled)%> >
+                        MLKEM768-X25519</option>
+                        <option title="<%=intl._t("experimental")%>" value="7" <%=((has7 && !has4) ? " selected=\"selected\"" : edisabled)%> >
+                        MLKEM1024-X25519</option>
+                        <option title="<%=intl._t("experimental")%>" value="5,4" <%=((has5 && has4) ? " selected=\"selected\"" : edisabled)%> >
+                        MLKEM512-X25519 + ECIES-X25519</option>
+<%
+                    }   // isAdvanced()
+%>
+                        <option title="<%=intl._t("beta")%>" value="6,4" <%=((has6 && has4) ? " selected=\"selected\"" : edisabled)%> >
+                        MLKEM768-X25519 + ECIES-X25519</option>
+<%
+                    if (editBean.isAdvanced()) {
+%>
+                        <option title="<%=intl._t("experimental")%>" value="7,4" <%=((has7 && has4) ? " selected=\"selected\"" : edisabled)%> >
+                        MLKEM1024-X25519 + ECIES-X25519</option>
+<%
+                    }   // isAdvanced()
+%>
                 </select>
             </td>
         </tr>

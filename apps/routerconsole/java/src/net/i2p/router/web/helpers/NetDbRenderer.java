@@ -794,6 +794,7 @@ class NetDbRenderer {
                 buf.setLength(0);
             }
           } // for each
+          buf.append("</div>");
           if (debug) {
               buf.append("<table id=\"leasesetdebug\"><tr><td><b>Network data (only valid if floodfill):</b></td><td colspan=\"3\">");
               //buf.append("</b></p><p><b>Center of Key Space (router hash): " + ourRKey.toBase64());
@@ -811,7 +812,6 @@ class NetDbRenderer {
               }
               buf.append("</td></tr></table>\n");
           } // median table
-          buf.append("</div>");
         }  // !empty
         out.append(buf);
         out.flush();
@@ -919,15 +919,17 @@ class NetDbRenderer {
                         buf.append(dest.toBase64(), 0, 6);
                     else
                         buf.append("n/a");
-                    buf.append("</code></th>" +
-                               "</tr>\n<tr><td");
-                    if (!linkSusi)
-                        buf.append(" colspan=\"2\"");
-                    buf.append("><a href=\"http://").append(b32).append("\">").append(b32).append("</a></td>\n");
-                    if (linkSusi && dest != null) {
-                       buf.append("<td class=\"addtobook\"><a title=\"").append(_t("Add to address book"))
-                       .append("\" href=\"/dns?book=private&amp;destination=")
-                       .append(dest.toBase64()).append("#add\">").append(_t("Add to local address book")).append("</a></td>");
+                    buf.append("</code></th>");
+                    if (dest != null) {
+                        buf.append("</tr>\n<tr><td");
+                        if (!linkSusi)
+                            buf.append(" colspan=\"2\"");
+                        buf.append("><a href=\"http://").append(b32).append("\">").append(b32).append("</a></td>\n");
+                        if (linkSusi) {
+                           buf.append("<td class=\"addtobook\"><a title=\"").append(_t("Add to address book"))
+                           .append("\" href=\"/dns?book=private&amp;destination=")
+                           .append(dest.toBase64()).append("#add\">").append(_t("Add to local address book")).append("</a></td>");
+                        }
                     }
                 }
             }
@@ -954,7 +956,7 @@ class NetDbRenderer {
                 buf.append("&nbsp;&nbsp;<b>RAR?</b> ").append(ls.getReceivedAsReply());
                 buf.append("&nbsp;&nbsp;<b>Distance: </b>").append(distance);
                 buf.append("&nbsp;&nbsp;<b>").append(_t("Type")).append(": </b>").append(type);
-                if (dest.isCompressible()) {
+                if (dest != null && dest.isCompressible()) {
                     buf.append("&nbsp;&nbsp;<b>Compressible?</b> true");
                 }
                 if (type != DatabaseEntry.KEY_TYPE_LEASESET) {

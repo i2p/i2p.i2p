@@ -6,6 +6,7 @@
 # 
 # Translators:
 # zzzi2p, 2019
+# Ilektra M. <safiragon@yahoo.gr>, 2025
 # 
 msgid ""
 msgstr ""
@@ -13,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-18 13:32+0000\n"
 "PO-Revision-Date: 2019-12-19 14:09+0000\n"
-"Last-Translator: zzzi2p, 2019\n"
+"Last-Translator: Ilektra M. <safiragon@yahoo.gr>, 2025\n"
 "Language-Team: Greek (https://app.transifex.com/otf/teams/12694/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -28,27 +29,27 @@ msgstr "ΟΚ"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:371
 msgid "IPv4: OK; IPv6: Testing"
-msgstr ""
+msgstr "IPv4: OK; IPv6: Γίνεται έλεγχος"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:372
 msgid "IPv4: OK; IPv6: Firewalled"
-msgstr ""
+msgstr "IPv4: OK; IPv6: Με τείχος προστασίας "
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:373
 msgid "IPv4: Testing; IPv6: OK"
-msgstr ""
+msgstr "IPv4: Γίνεται έλεγχος; IPv6: OK"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:374
 msgid "IPv4: Firewalled; IPv6: OK"
-msgstr ""
+msgstr "IPv4: Με τείχος προστασίας; IPv6: OK"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:375
 msgid "IPv4: Disabled; IPv6: OK"
-msgstr ""
+msgstr "IPv4: Απενεργοποιημένο; IPv6: OK"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:376
 msgid "IPv4: Symmetric NAT; IPv6: OK"
-msgstr ""
+msgstr "IPv4: Συμμετρικό NAT; IPv6: OK"
 
 #. * IPv4 symmetric NAT, IPv6 firewalled or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:378
@@ -57,28 +58,28 @@ msgstr "Συμμετρικό NAT"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:379
 msgid "IPv4: Symmetric NAT; IPv6: Testing"
-msgstr ""
+msgstr "IPv4: Συμμετρικό NAT; IPv6: Γίνεται έλεγχος"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:380
 msgid "IPv4: Firewalled; IPv6: Testing"
-msgstr ""
+msgstr "IPv4: Με τείχος προστασίας; IPv6: Γίνεται έλεγχος"
 
 #. * IPv4 firewalled, IPv6 firewalled or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:382
 msgid "Firewalled"
-msgstr ""
+msgstr "Με τείχος προστασίας"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:383
 msgid "IPv4: Testing; IPv6: Firewalled"
-msgstr ""
+msgstr "IPv4: Γίνεται έλεγχος; IPv6: Με τείχος προστασίας"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:384
 msgid "IPv4: Disabled; IPv6: Testing"
-msgstr ""
+msgstr "IPv4: Απενεργοποιημένο; IPv6: Γίνεται έλεγχος"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:385
 msgid "IPv4: Disabled; IPv6: Firewalled"
-msgstr ""
+msgstr "IPv4: Απενεργοποιημένο; IPv6: Με τείχος προστασίας "
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:386
 msgid "Disconnected"
@@ -86,7 +87,7 @@ msgstr "Αποσυνδεδεμένος"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:387
 msgid "Port Conflict"
-msgstr ""
+msgstr "Port Conflict"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:388
 msgid "Testing"
@@ -157,7 +158,7 @@ msgstr "Απόρριψη αιτημάτων για τούνελ: Καθυστέ�
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:270
 msgid "Dropping tunnel requests: High job lag"
-msgstr ""
+msgstr "Απόρριψη αιτημάτων για τούνελ: Υψηλή καθυστέρηση εργασιών"
 
 #. don't even bother, since we are so overloaded locally
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:464
@@ -166,7 +167,7 @@ msgstr "Απόρριψη αιτημάτων για τούνελ: Υπερφόρ�
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:747
 msgid "Rejecting tunnels: Hidden mode"
-msgstr ""
+msgstr "Απόρριψη τούνελ : Κρυφή λειτουργία"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:775
 msgid "Rejecting tunnels: Request overload"

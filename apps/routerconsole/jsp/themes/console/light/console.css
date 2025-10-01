@@ -292,7 +292,6 @@ h3#helpfaq {
 
 .routersummary h4 {
     border: #dee2e6;
-    border-radius: 0;
     font-size: 8.5pt;
     letter-spacing: normal;
     text-transform: none;
@@ -303,7 +302,6 @@ h3#helpfaq {
     text-decoration: none !important;
     color: #343a40;
     box-shadow: inset 0 0 0 1px #dee2e6;
-    line-height: 105%;
 }
 
 .routersummary h4::after {
@@ -852,7 +850,6 @@ p:empty+.sb_notice {
 .routersummary .warn,
 .routersummary .clockskew {
     background: rgba(255, 255, 200, 0.25);
-    box-shadow: inset 0 0 0 1px #ff0, 0 0 1px rgba(96, 96, 96, 0.5);
 }
 
 .routersummary .testing {

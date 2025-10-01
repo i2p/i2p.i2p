@@ -24,7 +24,7 @@
   to the current date, more or less.(or use `ant bumpBuildTime`)
 
 - Tickets: Check if any blocker or critical tickets for this release remain open;
-  check for overlooked issues on Gitlab, Github, i2pforum.i2p, and Reddit;
+  check for overlooked issues on Gitea, Github, i2pforum.i2p, and Reddit;
   get them fixed and closed, or reclassified.
 
 - Initial review: Review the complete diff from the last release, fix any issues
@@ -40,7 +40,7 @@
  in override.properties to ensure that Android will build correcly; fix any issues.
  Ensure that JAVA_HOME is unset.
 
-- Verify CI is passing on both Gitlab and Github
+- Verify CI is passing on both Gitea and Github
 
 
 ## A day or two before
@@ -69,7 +69,7 @@
 
 5. Update and check in blocklist-tor.txt with `maketorblocklist.sh`
 
-6. Verify CI is passing on both Gitlab and Github
+6. Verify CI is passing on both Gitea and Github
 
 
 ## On release day
@@ -194,7 +194,7 @@
     git push origin tag i2p-2.x.x
     ```
 
-    Ensure the release revision AND tag are pushed from Gitlab to Github.
+    Ensure the release revision AND tag are pushed from Gitea to Github.
 
 
 ### Distribute updates
@@ -215,7 +215,7 @@
   - OSX launcher maintainer
   - website files maintainer
 
-4. Update Gitlab:
+4. Update Gitea:
   - Add milestone and version dates
   - Increment milestone and version defaults
 
@@ -249,7 +249,7 @@
 
 2. Wait for files to be updated on download server,
    including new OSX launcher version.
-   Verify at http://download.i2p2.no/releases/
+   Verify at https://files.i2p-projekt.de/
 
 3. Website files to change:
   - Sync with git.idk.i2p

@@ -46,7 +46,7 @@ class StartExplorersJob extends JobImpl {
         The goal here is to avoid reseeding.
      */
     /** very aggressively explore if we have less than this many routers */
-    private static final int MIN_ROUTERS = 3 * KademliaNetworkDatabaseFacade.MIN_RESEED;
+    private static final int MIN_ROUTERS = 5 * KademliaNetworkDatabaseFacade.MIN_RESEED;
     /** aggressively explore if we have less than this many routers */
     private static final int LOW_ROUTERS = 2 * MIN_ROUTERS;
     /** explore slowly if we have more than this many routers */
@@ -54,7 +54,7 @@ class StartExplorersJob extends JobImpl {
     // must be lower than LIMIT_ROUTERS in HandleFloodfillDatabaseStoreMessageJob
     // because exploration does not register a reply job
     private static final int LIMIT_ROUTERS = SystemVersion.isSlow() ? 800 : 3000;
-    private static final int MIN_FFS = 50;
+    private static final int MIN_FFS = 100;
     static final int LOW_FFS = 2 * MIN_FFS;
 
     private static final long MAX_LAG = 100;
@@ -100,10 +100,16 @@ class StartExplorersJob extends JobImpl {
             boolean needffs = ffs < MIN_FFS;
             boolean lowffs = ffs < LOW_FFS;
             for (Hash key : toExplore) {
-                // Last param false means get floodfills (non-explore)
+                // false means get floodfills (non-explore)
                 // This is very effective so we don't need to do it often
-                boolean realexpl = !((needffs && getContext().random().nextInt(2) == 0) ||
-                                    (lowffs && getContext().random().nextInt(4) == 0));
+                boolean realexpl;
+                if (needffs) {
+                    realexpl = getContext().random().nextInt(2) != 0;
+                } else if (lowffs) {
+                    realexpl = getContext().random().nextInt(4) != 0;
+                } else {
+                    realexpl = getContext().random().nextInt(8) != 0;
+                }
                 ExploreJob j = new ExploreJob(getContext(), _facade, key, realexpl, _msgIDBloomXor);
                 if (delay > 0)
                     j.getTiming().setStartAfter(getContext().clock().now() + delay);

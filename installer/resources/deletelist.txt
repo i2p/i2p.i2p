@@ -114,6 +114,9 @@ certificates/reseed/meeh_at_mail.i2p.crt
 certificates/news/str4d_at_mail.i2p.crt
 certificates/router/str4d_at_mail.i2p.crt
 certificates/news/ampernand_at_gmail.com.crt
+certificates/family/i2p-dev.crt
+certificates/family/i2pd-dev.crt
+certificates/family/volatile.crt
 # vanished
 certificates/news/killyourtv_at_mail.i2p.crt
 certificates/router/killyourtv_at_mail.i2p.crt

@@ -21,7 +21,6 @@ import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.transport.Transport;
-import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.transport.crypto.X25519KeyFactory;
 import net.i2p.util.Translate;
 
@@ -206,12 +205,6 @@ public abstract class CommSystemFacade implements Service {
      *  @since 0.9.16
      */
     public void unregisterTransport(Transport t) {}
-
-    /**
-     *  Hook for pluggable transport creation.
-     *  @since 0.9.16
-     */
-    public DHSessionKeyBuilder.Factory getDHFactory() { return null; }
 
     /**
      *  Factory for making X25519 key pairs.

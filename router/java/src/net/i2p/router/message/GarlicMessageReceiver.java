@@ -65,15 +65,24 @@ public class GarlicMessageReceiver {
             if (keys != null && skm != null) {
                 decryptionKey = keys.getDecryptionKey();
                 decryptionKey2 = keys.getDecryptionKey(EncType.ECIES_X25519);
-                if (decryptionKey == null && decryptionKey2 == null) {
+                // this will return any of the PQ types
+                PrivateKey decryptionKey3 = keys.getPQDecryptionKey();
+                if (decryptionKey == null && decryptionKey2 == null && decryptionKey3 == null) {
                     if (_log.shouldWarn())
                         _log.warn("No key to decrypt for " + _clientDestination.toBase32());
                     return;
                 }
+                // ElG + PQ disallowed
                 if (decryptionKey == null) {
                     // swap
-                    decryptionKey = decryptionKey2;
-                    decryptionKey2 = null;
+                    if (decryptionKey3 != null) {
+                        // PQ first if present
+                        decryptionKey = decryptionKey3;
+                    } else {
+                        // EC only
+                        decryptionKey = decryptionKey2;
+                        decryptionKey2 = null;
+                    }
                 }
             } else {
                 if (_log.shouldLog(Log.WARN))

@@ -86,6 +86,8 @@ public class I2PSnarkUtil implements DisconnectListener {
     private boolean _areFilesPublic;
     private List<String> _openTrackers;
     private DHT _dht;
+    private boolean _enableUDP = ENABLE_UDP_TRACKER;
+    private UDPTrackerClient _udpTracker;
     private long _startedTime;
     private final DisconnectListener _discon;
     private int _maxFilesPerTorrent = SnarkManager.DEFAULT_MAX_FILES_PER_TORRENT;
@@ -99,6 +101,7 @@ public class I2PSnarkUtil implements DisconnectListener {
     public static final String PROP_MAX_BW = "i2cp.outboundBytesPerSecond";
     public static final boolean DEFAULT_USE_DHT = true;
     public static final String EEPGET_USER_AGENT = "I2PSnark";
+    private static final boolean ENABLE_UDP_TRACKER = true;
     private static final List<String> HIDDEN_I2CP_OPTS = Arrays.asList(new String[] {
         PROP_MAX_BW, "inbound.length", "outbound.length", "inbound.quantity", "outbound.quantity"
     });
@@ -355,6 +358,11 @@ public class I2PSnarkUtil implements DisconnectListener {
         }
         if (_shouldUseDHT && _manager != null && _dht == null)
             _dht = new KRPC(_context, _baseName, _manager.getSession());
+        if (_enableUDP &&_manager != null) {
+            if (_udpTracker == null)
+                _udpTracker = new UDPTrackerClient(_context, _manager.getSession(), this);
+            _udpTracker.start();
+        }
         return (_manager != null);
     }
     
@@ -381,6 +389,12 @@ public class I2PSnarkUtil implements DisconnectListener {
      */
     public DHT getDHT() { return _dht; }
 
+    /**
+     * @return null if disabled or not started
+     * @since 0.9.14
+     */
+    public UDPTrackerClient getUDPTrackerClient() { return _udpTracker; }
+
     public boolean connected() { return _manager != null; }
 
     /** @since 0.9.1 */
@@ -402,6 +416,10 @@ public class I2PSnarkUtil implements DisconnectListener {
         if (_dht != null) {
             _dht.stop();
             _dht = null;
+        }
+        if (_udpTracker != null) {
+            _udpTracker.stop();
+            _udpTracker = null;
         }
         _startedTime = 0;
         I2PSocketManager mgr = _manager;
@@ -751,6 +769,16 @@ public class I2PSnarkUtil implements DisconnectListener {
     /** @since DHT */
     public boolean shouldUseDHT() {
         return _shouldUseDHT;
+    }
+
+    /** @since 0.9.67 */
+    public void setUDPEnabled(boolean yes) {
+        _enableUDP = yes;
+    }
+
+    /** @since 0.9.67 */
+    public boolean udpEnabled() {
+        return _enableUDP;
     }
 
     /** @since 0.9.31 */

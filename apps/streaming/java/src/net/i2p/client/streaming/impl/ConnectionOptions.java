@@ -425,7 +425,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         //setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
         setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, DEFAULT_INACTIVITY_TIMEOUT));
         setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, DEFAULT_INACTIVITY_ACTION));
-        setInboundBufferSize(getMaxMessageSize() * (Connection.MAX_WINDOW_SIZE + 2));
+        setInboundBufferSize(getMaxMessageSize() * (getMaxWindowSize() + 2));
         setCongestionAvoidanceGrowthRateFactor(getInt(opts, PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR,
                                                       DEFAULT_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR));
         setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR,
@@ -487,7 +487,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, DEFAULT_INACTIVITY_TIMEOUT));
         if (opts.getProperty(PROP_INACTIVITY_ACTION) != null)
             setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, DEFAULT_INACTIVITY_ACTION));
-        setInboundBufferSize(getMaxMessageSize() * (Connection.MAX_WINDOW_SIZE + 2));
+        setInboundBufferSize(getMaxMessageSize() * (getMaxWindowSize() + 2));
         if (opts.getProperty(PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR) != null)
             setCongestionAvoidanceGrowthRateFactor(getInt(opts, PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR,
                                                           DEFAULT_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR));
@@ -843,10 +843,10 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     
     public int getMaxWindowSize() { return _maxWindowSize; }
     public void setMaxWindowSize(int msgs) { 
-        if (msgs > Connection.MAX_WINDOW_SIZE)
-            _maxWindowSize = Connection.MAX_WINDOW_SIZE;
-        else if (msgs < 1)
-            _maxWindowSize = 1;
+        if (msgs > 2 * Connection.MAX_WINDOW_SIZE)
+            _maxWindowSize = 2 * Connection.MAX_WINDOW_SIZE;
+        else if (msgs < 2)
+            _maxWindowSize = 2;
         else
             _maxWindowSize = msgs; 
     }

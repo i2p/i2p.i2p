@@ -421,7 +421,7 @@ msgid ""
 "To disable authorization, remove the configuration "
 "{0}i2ptunnel.proxy.auth=basic{1}, then stop and restart the HTTP Proxy "
 "tunnel."
-msgstr "Kimlik doğrulamasını devre dışı bırakmak için {0}i2ptunnel.proxy.auth=basic{1} yapılandırmasını silin ve HTTP vekil sunucu tünelini durdurup yeniden başlatın."
+msgstr "Kimlik doğrulamasını etkisizleştirmek için {0}i2ptunnel.proxy.auth=basic{1} yapılandırmasını silin ve HTTP vekil sunucu tünelini durdurup yeniden başlatın."
 
 #: ../java/build/Proxy.java:192
 msgid "The connection to the proxy was reset."
@@ -632,11 +632,11 @@ msgstr "Tarama parolası eksik"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:249
 msgid "Missing private key"
-msgstr "Özel anahtar eksik"
+msgstr "Kişisel anahtar eksik"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:254
 msgid "Invalid private key"
-msgstr "Özel anahtar geçersiz"
+msgstr "Kişisel anahtar geçersiz"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:287
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:306

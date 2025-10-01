@@ -9,8 +9,11 @@ package net.i2p.client.impl;
  *
  */
 
+import java.util.Properties;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.DatabaseEntry;
+import net.i2p.data.DataHelper;
 import net.i2p.data.EncryptedLeaseSet;
 import net.i2p.data.Lease;
 import net.i2p.data.Lease2;
@@ -21,6 +24,7 @@ import net.i2p.data.MetaLeaseSet;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.RequestVariableLeaseSetMessage;
 import net.i2p.util.Log;
+import net.i2p.util.OrderedProperties;
 
 /**
  * Handle I2CP RequestVariableLeaseSetMessage from the router by granting all leases,
@@ -56,6 +60,25 @@ class RequestVariableLeaseSetMessageHandler extends RequestLeaseSetMessageHandle
             }
             if (Boolean.parseBoolean(session.getOptions().getProperty("i2cp.dontPublishLeaseSet")))
                 ls2.setUnpublished();
+
+            // Service records, proposal 167
+            String k = "i2cp.leaseSetOption.0";
+            Properties props = null;
+            for (int i = 0; i < 10; i++) {
+                String v = session.getOptions().getProperty(k);
+                if (v == null)
+                    break;
+                String[] vs = DataHelper.split(v, "=", 2);
+                if (vs.length < 2)
+                    continue;
+                if (props == null)
+                    props = new OrderedProperties();
+                props.setProperty(vs[0], vs[1]);
+                k = "i2cp.leaseSetOption." + (i + 1);
+            }
+            if (props != null)
+                ls2.setOptions(props);
+
             // ensure 1-second resolution timestamp is higher than last one
             long now = Math.max(_context.clock().now(), session.getLastLS2SignTime() + 1000);
             ls2.setPublished(now);

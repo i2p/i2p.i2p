@@ -35,7 +35,6 @@ class OutboundMessageFragments {
     private final RouterContext _context;
     private final Log _log;
     private final UDPTransport _transport;
-    // private ActiveThrottle _throttle; // LINT not used ??
 
     /**
      *  Peers we are actively sending messages to.
@@ -64,11 +63,10 @@ class OutboundMessageFragments {
     static final int MAX_VOLLEYS = 10;
     private static final int MAX_WAIT = 1000;
 
-    public OutboundMessageFragments(RouterContext ctx, UDPTransport transport, ActiveThrottle throttle) {
+    public OutboundMessageFragments(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
         _log = ctx.logManager().getLog(OutboundMessageFragments.class);
         _transport = transport;
-        // _throttle = throttle;
         _activePeers = new ConcurrentHashSet<PeerState>(256);
         _builder2 = transport.getBuilder2();
         _alive = true;
@@ -106,42 +104,6 @@ class OutboundMessageFragments {
             _log.debug("Dropping peer " + peer.getRemotePeer());
         peer.dropOutbound();
         _activePeers.remove(peer);
-    }
-
-    /**
-     * Block until we allow more messages to be admitted to the active
-     * pool.  This is called by the {@link OutboundRefiller}
-     *
-     * @return true if more messages are allowed
-     */
-    public boolean waitForMoreAllowed() {
-        // test without choking.
-        // perhaps this should check the lifetime of the first activeMessage?
-        if (true) return true;
-        /*
-
-        long start = _context.clock().now();
-        int numActive = 0;
-        int maxActive = Math.max(_transport.countActivePeers(), MAX_ACTIVE);
-        while (_alive) {
-            finishMessages();
-            try {
-                synchronized (_activeMessages) {
-                    numActive = _activeMessages.size();
-                    if (!_alive)
-                        return false;
-                    else if (numActive < maxActive)
-                        return true;
-                    else if (_allowExcess)
-                        return true;
-                    else
-                        _activeMessages.wait(1000);
-                }
-                _context.statManager().addRateData("udp.activeDelay", numActive, _context.clock().now() - start);
-            } catch (InterruptedException ie) {}
-        }
-         */
-        return false;
     }
 
     /**
@@ -512,10 +474,4 @@ class OutboundMessageFragments {
     }
 ****/
 
-    /** throttle */
-    public interface ActiveThrottle {
-        public void choke(Hash peer);
-        public void unchoke(Hash peer);
-        public boolean isChoked(Hash peer);
-    }
 }

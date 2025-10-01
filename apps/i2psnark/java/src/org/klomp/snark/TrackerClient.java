@@ -28,6 +28,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -89,6 +90,7 @@ public class TrackerClient implements Runnable {
   /** No guidance in BEP 5; standard practice is K (=8) */
   private static final int DHT_ANNOUNCE_PEERS = 4;
   public static final int PORT = 6881;
+  private static final int DEFAULT_UDP_TRACKER_PORT = 6969;
   private static final int MAX_TRACKERS = 12;
   // tracker.welterde.i2p
   private static final Hash DSA_ONLY_TRACKER = ConvertToHash.getHash("cfmqlafjfmgkzbt4r3jsfyhgsr5abgxryl6fnz3d3y5a365di5aa.b32.i2p");
@@ -291,7 +293,6 @@ public class TrackerClient implements Runnable {
     // followed by the secondary open trackers
     // It's painful, but try to make sure if an open tracker is also
     // the primary tracker, that we don't add it twice.
-    // todo: check for b32 matches as well
     String primary = null;
     if (meta != null)
         primary = meta.getAnnounce();
@@ -316,37 +317,31 @@ public class TrackerClient implements Runnable {
     // announce list
     // We completely ignore the BEP 12 processing rules
     if (meta != null && !meta.isPrivate()) {
+        List<String> urls = new ArrayList<String>(16);
         List<List<String>> list = meta.getAnnounceList();
         if (list != null) {
             for (List<String> llist : list) {
                 for (String url : llist) {
-                    if (!isNewValidTracker(trackerHashes, url))
-                        continue;
-                    trackers.add(new TCTracker(url, trackers.isEmpty()));
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Additional announce (list): [" + url + "] for infoHash: " + infoHash);
+                     urls.add(url);
                 }
             }
-            if (trackers.size() > 2) {
-                // shuffle everything but the primary
-                TCTracker pri = trackers.remove(0);
-                Collections.shuffle(trackers, _util.getContext().random());
-                trackers.add(0, pri);
+        }
+        // configured open trackers
+        urls.addAll(_util.getOpenTrackers());
+        if (urls.size() > 1) {
+            Collections.shuffle(trackers, _util.getContext().random());
+            if (_util.udpEnabled()) {
+                // sort the list to put udp first so it will trump http
+                Collections.sort(urls, new URLComparator());
             }
         }
-    }
-
-    // configured open trackers
-    if (meta == null || !meta.isPrivate()) {
-        List<String> tlist = _util.getOpenTrackers();
-        for (int i = 0; i < tlist.size(); i++) {
-            String url = tlist.get(i);
+        for (String url : urls) {
             if (!isNewValidTracker(trackerHashes, url))
                 continue;
-            // opentrackers are primary if we don't have primary
-            trackers.add(new TCTracker(url, trackers.isEmpty()));
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Additional announce: [" + url + "] for infoHash: " + infoHash);
+             // first one is primary if we don't have a primary
+             trackers.add(new TCTracker(url, trackers.isEmpty()));
+             if (_log.shouldLog(Log.DEBUG))
+                 _log.debug("Additional announce: [" + url + "] for infoHash: " + infoHash);
         }
     }
 
@@ -526,18 +521,30 @@ public class TrackerClient implements Runnable {
                     if (len > 0 && downloaded > len)
                         downloaded = len;
                     left = coordinator.getLeft();
-                    String event;
-                    if (!tr.started) {
-                        event = STARTED_EVENT;
-                    } else if (newlyCompleted) {
-                        event = COMPLETED_EVENT;
+                    TrackerInfo info;
+                    if (tr.isUDP) {
+                        int event;
+                        if (!tr.started) {
+                            event = UDPTrackerClient.EVENT_STARTED;
+                        } else if (newlyCompleted) {
+                            event = UDPTrackerClient.EVENT_COMPLETED;
+                        } else {
+                            event = UDPTrackerClient.EVENT_NONE;
+                        }
+                        info = doRequest(tr, uploaded, downloaded, left, event);
                     } else {
-                        event = NO_EVENT;
+                        String event;
+                        if (!tr.started) {
+                            event = STARTED_EVENT;
+                        } else if (newlyCompleted) {
+                            event = COMPLETED_EVENT;
+                        } else {
+                            event = NO_EVENT;
+                        }
+                        info = doRequest(tr, infoHash, peerID,
+                                         uploaded, downloaded, left,
+                                         event);
                     }
-                    TrackerInfo info = doRequest(tr, infoHash, peerID,
-                                                 uploaded, downloaded, left,
-                                                 event);
-
                     snark.setTrackerProblems(null);
                     tr.trackerProblems = null;
                     tr.registerFails = 0;
@@ -839,21 +846,27 @@ public class TrackerClient implements Runnable {
         if (len > 0 && downloaded > len)
             downloaded = len;
         long left = coordinator.getLeft();
-        try
-          {
+        try {
             // Don't try to restart I2CP connection just to say goodbye
-              if (_util.connected()) {
-                  if (tr.started && (!tr.stop) && tr.trackerProblems == null)
-                      doRequest(tr, infoHash, peerID, uploaded,
-                                         downloaded, left, STOPPED_EVENT);
-              }
-          }
+            if (_util.connected()) {
+                if (tr.started && (!tr.stop) && tr.trackerProblems == null) {
+                    if (tr.isUDP) {
+                        doRequest(tr, uploaded,
+                                  downloaded, left, UDPTrackerClient.EVENT_STOPPED);
+                    } else {
+                        doRequest(tr, infoHash, peerID, uploaded,
+                                  downloaded, left, STOPPED_EVENT);
+                    }
+                }
+            }
+        }
         catch(IOException ioe) { /* ignored */ }
         tr.reset();
      }
   }
   
   /**
+   *  HTTP - blocking
    *
    *  Note: IOException message text gets displayed in the UI
    *
@@ -923,6 +936,48 @@ public class TrackerClient implements Runnable {
   }
 
   /**
+   *  UDP - blocking
+   *
+   *  @return null if _fastUnannounce && event == STOPPED
+   *  @since 0.9.54
+   */
+  private TrackerInfo doRequest(TCTracker tr, long uploaded,
+                                long downloaded, long left, int event) throws IOException {
+        UDPTrackerClient udptc = _util.getUDPTrackerClient();
+        if (udptc == null)
+            throw new IOException("no UDPTC");
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Sending UDPTrackerClient request");
+
+        tr.lastRequestTime = System.currentTimeMillis();
+        // Don't wait for a response to stopped when shutting down
+        boolean fast = _fastUnannounce && event == UDPTrackerClient.EVENT_STOPPED;
+        long maxWait = fast ? 5*1000 : 60*1000;
+        boolean small = left == 0 || event == UDPTrackerClient.EVENT_STOPPED || !coordinator.needOutboundPeers();
+        int numWant = small ? 0 : _util.getMaxConnections();
+        UDPTrackerClient.TrackerResponse fetched = udptc.announce(snark.getInfoHash(), snark.getID(), numWant,
+                                                                  maxWait, tr.host, tr.port,
+                                                                  downloaded, left, uploaded, event, fast);
+        if (fast)
+            return null;
+        if (fetched == null)
+            throw new IOException("UDP announce error to: " + tr.host);
+
+        TrackerInfo info = new TrackerInfo(fetched.getPeers(), fetched.getInterval(), fetched.getSeedCount(),
+                                           fetched.getLeechCount(), fetched.getFailureReason(),
+                                           snark.getID(), snark.getInfoHash(), snark.getMetaInfo(), _util);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("TrackerClient response: " + info);
+
+        String failure = info.getFailureReason();
+        if (failure != null)
+            throw new IOException(failure);
+
+        tr.interval = Math.max(MIN_TRACKER_ANNOUNCE_INTERVAL, info.getInterval() * 1000l);
+        return info;
+  }
+
+  /**
    * Very lazy byte[] to URL encoder.  Just encodes almost everything, even
    * some "normal" chars.
    * By not encoding about 1/4 of the chars, we make random data like hashes about 16% smaller.
@@ -969,8 +1024,12 @@ public class TrackerClient implements Runnable {
     String path = url.getPath();
     if (path == null || !path.startsWith("/"))
         return false;
-    return "http".equals(url.getScheme()) && url.getHost() != null &&
-           (url.getHost().endsWith(".i2p") || url.getHost().equals("i2p"));
+    String scheme = url.getScheme();
+    if (!("http".equals(scheme) || "udp".equals(scheme)))
+        return false;
+    String host = url.getHost();
+    return host != null &&
+           (host.endsWith(".i2p") || host.equals("i2p"));
   }
 
   /**
@@ -980,14 +1039,15 @@ public class TrackerClient implements Runnable {
    *  @return a Hash for i2p hosts only, null otherwise
    *  @since 0.9.5
    */
-  private static Hash getHostHash(String ann) {
+  private Hash getHostHash(String ann) {
     URI url;
     try {
         url = new URI(ann);
     } catch (URISyntaxException use) {
         return null;
     }
-    if (!"http".equals(url.getScheme()))
+    String scheme = url.getScheme();
+    if (!("http".equals(scheme) || (_util.udpEnabled() && "udp".equals(scheme))))
         return null;
     String host = url.getHost();
     if (host == null) {
@@ -1022,11 +1082,30 @@ public class TrackerClient implements Runnable {
     return null;
   }
 
+  /**
+   *  UDP before HTTP
+   *
+   *  @since 0.9.67
+   */
+  private static class URLComparator implements Comparator<String> {
+      public int compare(String l, String r) {
+          boolean ul = l.startsWith("udp://");
+          boolean ur = r.startsWith("udp://");
+          if (ul && !ur)
+              return -1;
+          if (ur && !ul)
+              return -1;
+          return 0;
+      }
+  }
+
   private static class TCTracker
   {
       final String announce;
       final String host;
       final boolean isPrimary;
+      final boolean isUDP;
+      final int port;
       long interval;
       long lastRequestTime;
       String trackerProblems;
@@ -1037,14 +1116,27 @@ public class TrackerClient implements Runnable {
       int seenPeers;
 
       /**
-       *  @param a must be a valid http URL with a path
+       *  @param a must be a valid http URL with a path,
+       *           or a udp URL (path is ignored)
        *  @param p true if primary
        */
       public TCTracker(String a, boolean p)
       {
           announce = a;
-          String s = a.substring(7);
-          host = s.substring(0, s.indexOf('/'));
+          URI url;
+          try {
+             url = new URI(a);
+             isUDP = "udp".equals(url.getScheme());
+             host = url.getHost();
+             int pt = url.getPort();
+             if (pt < 0) {
+                 pt = isUDP ? DEFAULT_UDP_TRACKER_PORT : 80;
+             }
+             port = pt;
+          } catch (URISyntaxException use) {
+             // shouldn't happen, already validated
+             throw new IllegalArgumentException(use);
+          }
           isPrimary = p;
           interval = INITIAL_SLEEP;
       }

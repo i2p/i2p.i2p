@@ -169,7 +169,8 @@ class I2CPMessageProducer {
     }
 
     /**
-     * Send messages to the router destroying the session and disconnecting
+     * Send a message to the router destroying the session, which could be a subsession.
+     * This does NOT close the socket.
      *
      */
     public void disconnect(I2PSessionImpl session) throws I2PSessionException {

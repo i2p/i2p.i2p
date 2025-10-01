@@ -1,3 +1,100 @@
+2025-09-08 2.10.0 (API 0.9.67) released
+
+2025-09-08 idk
+ * Pull translations from Transifex
+
+2025-09-05 zzz
+ * Translations update
+
+2025-09-03 zzz
+ * Console: New partial Icelandic translation
+
+2025-09-01 zzz
+ * GeoIP 2025-09-01
+
+2025-08-27 zzz
+ * NetDB: Preliminary fix for exploratory lookups
+
+2025-08-26 zzz
+ * NetDB:
+   - Fix direct lookups
+   - Handle broken direct lookups
+   - Drop exploratory lookups from floodfills
+
+2025-08-21 zzz
+ * Build: Remove ancient, unused admin code (Github PR #116)
+ * Console: Don't bypass nonce check when password is enabled (Github PR #118)
+
+2025-08-20 zzz
+ * Transports: Reduce ban time for slow routers if floodfill
+
+2025-08-17 zzz
+ * NetDB: Exploration improvements and fixes
+ * Router: Fix PublishRouterInfoJob sometimes not getting started
+ * SSU2: Fix last receive time tracking
+
+2025-08-10 zzz
+ * Console:
+   - Hide b32 link on netdb LS tabs for encrypted LS
+   - Fix layout for final LS data section on netdb LS debug tab
+ * i2psnark: Handle UDP trackers in magnet links
+
+2025-08-09 zzz
+ * Console: Fix NPE on netdb LS debug tab rendering encrypted LS
+
+2025-07-27 zzz
+ * Crypto: Reduce YK precalc pool size
+ * I2CP: Stub out new HostLookup types for service records (proposal 167)
+ * i2ptunnel: Expose 6,4 option to non-advanced-config
+ * Tomcat 9.0.107
+
+2025-07-17 zzz
+ * I2CP: Client-side destroy session fixes
+
+2025-07-04 zzz
+ * i2psnark: UDP announce fixes
+ * SSU: Increase inbound ban time
+ * Util: Android Java version detection improvements
+
+2025-07-01 zzz
+ * Streaming: Allow configured max window size higher than default
+
+2025-06-30 zzz
+ * I2CP: Don't send multiple SetDate messages to sessions with subsessions
+
+2025-06-26 zzz
+ * i2psnark: UDP announce fixes
+ * Router: Reduce and document the banlist-forever threshold
+
+2025-06-24 zzz
+ * Crypto: Add support for MLKEM PQ hybrid ratchet (Proposal 169) (PR 517)
+
+2025-06-21 zzz
+ * i2psnark: Update UDP announce support (Proposal 160) (PR 504)
+
+2025-06-18 zzz
+ * I2CP: Add asynch lookup API (PR 511)
+
+2025-06-17 zzz
+ * Router: Store ident and hash at startup, remove lock (PR 507)
+ * Transports: Remove unused ElG DH builder (PR 508)
+
+2025-06-15 zzz
+ * I2CP: Add support for service records (Proposal 167) (PR 501)
+ * SSU2: Remove old active throttle code (PR 505)
+ * Stats: Remove old stat log feature (PR 503)
+
+2025-06-05 zzz
+ * i2ptunnel: Remove delay before flushing output
+
+2025-06-04 zzz
+ * Console: Add sidebar warning about Java 17
+
+2025-06-02 2.9.0 (API 0.9.66) released
+
+2025-05-30 zzz
+ * Pull translations from Transifex
+
 2025-05-19 zzz
  * Log warning on upcoming Java 17 requirement
 

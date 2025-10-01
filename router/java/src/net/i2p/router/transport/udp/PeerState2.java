@@ -226,6 +226,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
      */
     @Override
     protected synchronized void messagePartiallyReceived(long now) {
+        setLastReceiveTime(now);
         if (_wantACKSendSince <= 0) {
             _wantACKSendSince = now;
             _ackTimer.schedule();

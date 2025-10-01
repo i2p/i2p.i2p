@@ -101,13 +101,14 @@ public abstract class SystemVersion {
 
         if (_isAndroid) {
             _oneDotSix = _androidSDK >= 9;
+            // java.nio.File not until 26
             _oneDotSeven = _androidSDK >= 19;
             // https://developer.android.com/studio/write/java8-support.html
-            // some stuff in 24
-            _oneDotEight = false;
-            _oneDotNine = false;
-            _oneDotTen = false;
-            _oneDotEleven = false;
+            // some stuff in 24, most in 26
+            _oneDotEight = _androidSDK >= 26;
+            _oneDotNine = _androidSDK >= 28;
+            _oneDotTen = _androidSDK >= 30;
+            _oneDotEleven = _oneDotTen;
         } else {
             String version = System.getProperty("java.version");
             // handle versions like "8-ea" or "9-internal"
@@ -333,6 +334,16 @@ public abstract class SystemVersion {
                 return _oneDotSix;
             if (minVersion.startsWith("1.7"))
                 return _oneDotSeven;
+            if (minVersion.startsWith("1.8"))
+                return _oneDotEight;
+            if (minVersion.startsWith("1.9"))
+                return _oneDotNine;
+            if (minVersion.startsWith("1.10"))
+                return _oneDotTen;
+            if (minVersion.startsWith("1.11"))
+                return _oneDotEleven;
+            if (minVersion.startsWith("1.17"))
+                return _androidSDK >= 34;
             return false;
         }
         return VersionComparator.comp(version, minVersion) >= 0;

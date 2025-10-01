@@ -124,7 +124,7 @@ class OutboundClientMessageJobHelper {
         SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(from);
         if (skm == null)
             return null;
-        boolean isECIES = recipientPK.getType() == EncType.ECIES_X25519;
+        boolean isECIES = recipientPK.getType() != EncType.ELGAMAL_2048;
         // force ack off if ECIES
         boolean ackInGarlic = isECIES ? false : requireAck;
         GarlicConfig config = createGarlicConfig(ctx, replyToken, expiration, recipientPK, dataClove,

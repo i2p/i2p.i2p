@@ -38,6 +38,7 @@ import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.I2PSessionListener;
+import net.i2p.client.LookupCallback;
 import net.i2p.client.LookupResult;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
@@ -213,6 +214,8 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      */
     private static final Map<Object, Destination> _lookupCache = new LHMCache<Object, Destination>(CACHE_MAX_SIZE);
     private static final String MIN_HOST_LOOKUP_VERSION = "0.9.11";
+    // cached failure
+    private static final LookupResult LOOKUP_FAILURE = new LkupResult(LookupResult.RESULT_FAILURE, null);
 
     /**
      * Use Unix domain socket (or similar) to connect to a router
@@ -403,7 +406,6 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 session.destroySession();
             } catch (I2PSessionException ise) {}
         }
-        // do we need this here? subsession.destroySession() calls primary
         Destination d = session.getMyDestination();
         if (d != null)
             _context.keyRing().remove(d.calculateHash());
@@ -1339,6 +1341,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         }
         
         if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "Destroy the session", new Exception("DestroySession()"));
+        clearPendingLookups();
         if (sendDisconnect) {
             if (_producer != null) {    // only null if overridden by I2PSimpleSession
                 try {
@@ -1449,6 +1452,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         }
         if (_log.shouldWarn())
             _log.warn(getPrefix() + "Disconnected", new Exception("Disconnected"));
+        clearPendingLookups();
         if (_sessionListener != null) _sessionListener.disconnected(this);
         // don't try to reconnect if it failed before GETTDATE
         if (oldState != State.OPENING && shouldReconnect()) {
@@ -1577,6 +1581,31 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     }
 
     /**
+     *  Clear out all pending lookups and bw limit requests
+     *  @since 0.9.67
+     */
+    private void clearPendingLookups() {
+        LookupWaiter w;
+        while ((w = _pendingLookups.poll()) != null) {
+            if (w.callback != null) {
+                // asynch
+                LkupResult result = new LkupResult(LookupResult.RESULT_FAILURE, null, (int) w.nonce);
+                w.callback.complete(result);
+            } else {
+                // synch
+                synchronized (w) {
+                    w.code = LookupResult.RESULT_FAILURE;
+                    w.notifyAll();
+                }
+            }
+        }
+        // if anybody is waiting for a bw message
+        synchronized (_bwReceivedLock) {
+            _bwReceivedLock.notifyAll();
+        }
+    }
+
+    /**
      *  Called by the message handler
      *  on reception of HostReplyMessage
      *  @param d non-null
@@ -1592,10 +1621,17 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                         _lookupCache.put(w.name, d);
                     _lookupCache.put(h, d);
                 }
-                synchronized (w) {
-                    w.destination = d;
-                    w.code = LookupResult.RESULT_SUCCESS;
-                    w.notifyAll();
+                if (w.callback != null) {
+                    // asynch
+                    LkupResult result = new LkupResult(LookupResult.RESULT_SUCCESS, d, (int) w.nonce);
+                    w.callback.complete(result);
+                } else {
+                    // synch
+                    synchronized (w) {
+                        w.destination = d;
+                        w.code = LookupResult.RESULT_SUCCESS;
+                        w.notifyAll();
+                    }
                 }
             }
         }
@@ -1609,9 +1645,16 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     void destLookupFailed(long nonce, int code) {
         for (LookupWaiter w : _pendingLookups) {
             if (nonce == w.nonce) {
-                synchronized (w) {
-                    w.code = code;
-                    w.notifyAll();
+                if (w.callback != null) {
+                    // asynch
+                    LkupResult result = new LkupResult(code, null, (int) nonce);
+                    w.callback.complete(result);
+                } else {
+                    // synch
+                    synchronized (w) {
+                        w.code = code;
+                        w.notifyAll();
+                    }
                 }
             }
         }
@@ -1643,6 +1686,11 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
          *  @since 0.9.43
          */
         public int code;
+        /**
+         *  the callback
+         *  @since 0.9.67
+         */
+        public final LookupCallback callback;
 
         public LookupWaiter(Hash h) {
             this(h, -1);
@@ -1653,6 +1701,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             this.hash = h;
             this.name = null;
             this.nonce = nonce;
+            callback = null;
         }
 
         /** @since 0.9.11 */
@@ -1660,6 +1709,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             this.hash = null;
             this.name = name;
             this.nonce = nonce;
+            callback = null;
         }
 
         /** Dummy, completed
@@ -1670,6 +1720,23 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             name = null;
             nonce = 0;
             destination = d;
+            callback = null;
+        }
+
+        /** @since 0.9.67 */
+        public LookupWaiter(Hash h, long nonce, LookupCallback callback) {
+            this.hash = h;
+            this.name = null;
+            this.nonce = nonce;
+            this.callback = callback;
+        }
+
+        /** @since 0.9.67 */
+        public LookupWaiter(String name, long nonce, LookupCallback callback) {
+            this.hash = null;
+            this.name = name;
+            this.nonce = nonce;
+            this.callback = callback;
         }
     }
 
@@ -1800,7 +1867,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     public LookupResult lookupDest2(String name, long maxWait) throws I2PSessionException {
         LookupWaiter waiter = x_lookupDest(name, maxWait);
         if (waiter == null)
-            return new LkupResult(LookupResult.RESULT_FAILURE, null);
+            return LOOKUP_FAILURE;
         synchronized(waiter) {
             int code = waiter.code;
             Destination d = waiter.destination;
@@ -1870,6 +1937,140 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             }
         } finally {
             _pendingLookups.remove(waiter);
+        }
+    }
+
+    /**
+     *  Lookup a Destination by hostname.
+     *  Non-blocking.
+     *  If the result is cached or there is an immediate failure,
+     *  the result code will be something other than RESULT_DEFERRED, and the callback will NOT be called.
+     *
+     *  @param maxWait ms
+     *  @param callback to return the result, non-null
+     *  @return non-null. If result code is RESULT_DEFERRED, callback will be called later
+     *  @since 0.9.67
+     */
+    public LookupResult lookupDest(Hash h, long maxWait, LookupCallback callback) throws I2PSessionException {
+        synchronized (_lookupCache) {
+            Destination rv = _lookupCache.get(h);
+            if (rv != null)
+                return new LkupResult(LookupResult.RESULT_SUCCESS, rv);
+        }
+        synchronized (_stateLock) {
+            // not before GOTDATE
+            if (STATES_CLOSED_OR_OPENING.contains(_state))
+                return LOOKUP_FAILURE;
+        }
+        if (!_routerSupportsHostLookup) {
+            // older than 0.9.11, won't happen
+            throw new I2PSessionException("Router does not support HostLookup for " + h);
+        }
+        int nonce = _lookupID.incrementAndGet() & 0x7fffffff;
+        LookupWaiter waiter = new LookupWaiter(h, nonce, callback);
+        _pendingLookups.offer(waiter);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Sending HostLookup for " + h);
+        SessionId id = _sessionId;
+        if (id == null)
+            id = DUMMY_SESSION;
+        if (maxWait > 60*1000)
+            maxWait = 60*1000;
+        try {
+            sendMessage_unchecked(new HostLookupMessage(id, h, nonce, maxWait));
+        } catch (I2PSessionException ise) {
+            _pendingLookups.remove(waiter);
+            throw ise;
+        }
+        new LookupExpiration(waiter, maxWait);
+        return new LkupResult(nonce);
+    }
+
+    /**
+     *  Lookup a Destination by hash.
+     *  Non-blocking.
+     *  If the result is cached or there is an immediate failure,
+     *  the result code will be something other than RESULT_DEFERRED, and the callback will NOT be called.
+     *
+     *  @param maxWait ms
+     *  @param callback to return the result, non-null
+     *  @return non-null. If result code is RESULT_DEFERRED, callback will be called later
+     *  @since 0.9.67
+     */
+    public LookupResult lookupDest(String name, long maxWait, LookupCallback callback) throws I2PSessionException {
+        if (name.length() == 0)
+            return LOOKUP_FAILURE;
+        // Shortcut for b64
+        if (name.length() >= 516) {
+            try {
+                Destination rv = new Destination(name);
+                return new LkupResult(LookupResult.RESULT_SUCCESS, rv);
+            } catch (DataFormatException dfe) {
+                return LOOKUP_FAILURE;
+            }
+        }
+        // won't fit in Mapping
+        if (name.length() >= 256 && !_context.isRouterContext())
+            return LOOKUP_FAILURE;
+        synchronized (_lookupCache) {
+            Destination rv = _lookupCache.get(name);
+            if (rv != null)
+                return new LkupResult(LookupResult.RESULT_SUCCESS, rv);
+        }
+        synchronized (_stateLock) {
+            // not before GOTDATE
+            if (STATES_CLOSED_OR_OPENING.contains(_state))
+                return LOOKUP_FAILURE;
+        }
+        if (!_routerSupportsHostLookup) {
+            // older than 0.9.11, won't happen
+            throw new I2PSessionException("Router does not support HostLookup for " + name);
+        }
+        int nonce = _lookupID.incrementAndGet() & 0x7fffffff;
+        LookupWaiter waiter = new LookupWaiter(name, nonce, callback);
+        _pendingLookups.offer(waiter);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Sending HostLookup for " + name);
+        SessionId id = _sessionId;
+        if (id == null)
+            id = DUMMY_SESSION;
+        if (maxWait > 60*1000)
+            maxWait = 60*1000;
+        try {
+            sendMessage_unchecked(new HostLookupMessage(id, name, nonce, maxWait));
+        } catch (I2PSessionException ise) {
+            _pendingLookups.remove(waiter);
+            throw ise;
+        }
+        new LookupExpiration(waiter, maxWait);
+        return new LkupResult(nonce);
+    }
+
+    /**
+     *  Timeout for asynch lookup, if the router does not respond.
+     *  Should rarely happen.
+     *
+     *  @since 0.9.67
+     */
+    private class LookupExpiration extends SimpleTimer2.TimedEvent {
+        private final LookupWaiter w;
+        
+        public LookupExpiration(LookupWaiter waiter, long maxWait) {
+             super(_context.simpleTimer2(), maxWait + 100);
+             w = waiter;
+        }
+
+        public void timeReached() {
+            if (_pendingLookups.remove(w)) {
+                // router should always have responded
+                if (_log.shouldWarn())
+                    _log.warn(getPrefix() + " Router did not respond to lookup " + w.nonce);
+                if (w.callback != null) {
+                    // callback should always be present
+                    LkupResult result = new LkupResult(LookupResult.RESULT_FAILURE, null, (int) w.nonce);
+                    w.callback.complete(result);
+                }
+            }
         }
     }
 

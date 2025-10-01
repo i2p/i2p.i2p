@@ -31,7 +31,6 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
-import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import static net.i2p.router.transport.ntcp.OutboundNTCP2State.*;
 import net.i2p.util.Addresses;
 import net.i2p.util.ByteArrayStream;
@@ -701,8 +700,9 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         }
 
         if (ri.getCapabilities().equals("LU") && ri.getVersion().equals("0.9.56")) {
+            long time = _context.netDb().floodfillEnabled() ? 60*60*1000 : 2*60*60*1000;
             _context.banlist().banlistRouter(h, "Slow", null,
-                                             null, _context.clock().now() + 2*60*60*1000);
+                                             null, _context.clock().now() + time);
             _msg3p2FailReason = NTCPConnection.REASON_BANNED;
             throw new DataFormatException("Old and slow: " + h);
         }

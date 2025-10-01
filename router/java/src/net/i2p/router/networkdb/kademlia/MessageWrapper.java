@@ -17,6 +17,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.crypto.TransientSessionKeyManager;
+import net.i2p.router.crypto.ratchet.MuxedPQSKM;
 import net.i2p.router.crypto.ratchet.MuxedSKM;
 import net.i2p.router.crypto.ratchet.RatchetSKM;
 import net.i2p.router.crypto.ratchet.RatchetSessionTag;
@@ -242,6 +243,8 @@ public class MessageWrapper {
             rskm = (RatchetSKM) skm;
         } else if (skm instanceof MuxedSKM) {
             rskm = ((MuxedSKM) skm).getECSKM();
+        } else if (skm instanceof MuxedPQSKM) {
+            rskm = ((MuxedPQSKM) skm).getECSKM();
         } else {
             throw new IllegalStateException("skm not a ratchet " + skm);
         }

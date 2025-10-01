@@ -644,8 +644,8 @@ public class PeerHelper extends HelperBase {
         buf.setLength(0);
         long now = _context.clock().now();
         for (PeerState peer : peers) {
-            if (now-peer.getLastReceiveTime() > 60*60*1000)
-                continue; // don't include old peers
+            //if (now-peer.getLastReceiveTime() > 60*60*1000)
+            //    continue; // don't include old peers
 
             buf.append("<tr><td class=\"cells\" align=\"left\" nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(peer.getRemotePeer()));

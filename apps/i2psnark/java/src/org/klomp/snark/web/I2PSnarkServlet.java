@@ -2,6 +2,7 @@ package org.klomp.snark.web;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -293,10 +294,15 @@ public class I2PSnarkServlet extends BasicServlet {
         if (nonce != null) {
             // the clear messages button is a GET
             if ((method.equals("POST") || "Clear".equals(req.getParameter("action"))) &&
-                nonce.equals(String.valueOf(_nonce)))
+                nonce.equals(String.valueOf(_nonce))) {
                 processRequest(req);
-            else  // nonce is constant, shouldn't happen
+            } else if (!(method.equals("POST") || "Clear".equals(req.getParameter("action")))) {
+                // Lynx bug?
+                _manager.addMessage("Bad form method, POST required");
+            } else {
+                // nonce is constant, shouldn't happen
                 _manager.addMessage("Please retry form submission (bad nonce)");
+            }
             // P-R-G (or G-R-G to hide the params from the address bar)
             sendRedirect(req, resp, peerString);
             return;	
@@ -1996,11 +2002,9 @@ public class I2PSnarkServlet extends BasicServlet {
         if (isValid) {
             // Link to local details page - note that trailing slash on a single-file torrent
             // gets us to the details page instead of the file.
-            StringBuilder buf = new StringBuilder(128);
-            buf.append("<a href=\"").append(encodedBaseName)
+            out.append("<a href=\"").append(encodedBaseName)
                .append("/\" title=\"").append(_t("Torrent details"))
                .append("\">");
-            out.append(buf);
         }
         String icon;
         if (isMultiFile)
@@ -2431,11 +2435,13 @@ public class I2PSnarkServlet extends BasicServlet {
         // temporarily hardcoded for postman* and anonymity, requires bytemonsoon patch for lookup by info_hash
         if (announce != null && (announce.startsWith("http://YRgrgTLG") || announce.startsWith("http://8EoJZIKr") ||
               announce.startsWith("http://lnQ6yoBT") || announce.startsWith("http://tracker2.postman.i2p/") ||
+              announce.startsWith("http://6a4kxkg5wp33p25qqhgwl6sj4yh4xuf5b3p3qldwgclebchm3eea.b32.i2p/") ||
               announce.startsWith("http://ahsplxkbhemefwvvml7qovzl5a2b5xo5i7lyai7ntdunvcyfdtna.b32.i2p/"))) {
             for (Tracker t : _manager.getTrackers()) {
                 String aURL = t.announceURL;
                 if (!(aURL.startsWith(announce) || // vvv hack for non-b64 announce in list vvv
                       (announce.startsWith("http://lnQ6yoBT") && aURL.startsWith("http://tracker2.postman.i2p/")) ||
+                      (announce.startsWith("http://6a4kxkg5wp33p25qqhgwl6sj4yh4xuf5b3p3qldwgclebchm3eea.b32.i2p/") && aURL.startsWith("http://tracker2.postman.i2p/")) ||
                       (announce.startsWith("http://ahsplxkbhemefwvvml7qovzl5a2b5xo5i7lyai7ntdunvcyfdtna.b32.i2p/") && aURL.startsWith("http://tracker2.postman.i2p/"))))
                     continue;
                 String baseURL = urlEncode(t.baseURL);
@@ -2475,15 +2481,20 @@ public class I2PSnarkServlet extends BasicServlet {
     private String getShortTrackerLink(String announce, byte[] infohash) {
         StringBuilder buf = new StringBuilder(128);
         String trackerLinkUrl = getTrackerLinkUrl(announce, infohash);
-        if (announce.startsWith("http://"))
+        boolean isUDP = false;
+        if (announce.startsWith("http://")) {
             announce = announce.substring(7);
+        } else if (announce.startsWith("udp://")) {
+            announce = announce.substring(6);
+            isUDP = true;
+        }
         // strip path
         int slsh = announce.indexOf('/');
         if (slsh > 0)
             announce = announce.substring(0, slsh);
         if (trackerLinkUrl != null) {
             buf.append(trackerLinkUrl);
-        } else {
+        } else if (!isUDP) {
             // browsers don't like a full b64 dest, so convert it to b32
             String host = announce;
             if (host.length() >= 516) {
@@ -2508,11 +2519,14 @@ public class I2PSnarkServlet extends BasicServlet {
         int colon = announce.indexOf(':');
         if (colon > 0)
             announce = announce.substring(0, colon);
+        if (isUDP)
+            announce = "UDP " + announce;
         if (announce.length() > 67)
             announce = DataHelper.escapeHTML(announce.substring(0, 40)) + "&hellip;" +
                        DataHelper.escapeHTML(announce.substring(announce.length() - 8));
         buf.append(announce);
-        buf.append("</a>");
+        if (!isUDP)
+            buf.append("</a>");
         return buf.toString();
     }
 
@@ -4102,11 +4116,11 @@ public class I2PSnarkServlet extends BasicServlet {
      * Just to hide non-i2p trackers from the details page.
      * @since 0.9.46
      */
-    private static boolean isI2PTracker(String url) {
+    private boolean isI2PTracker(String url) {
         try {
             URI uri = new URI(url);
             String method = uri.getScheme();
-            if (!"http".equals(method) && !"https".equals(method))
+            if (!("http".equals(method) || (_manager.util().udpEnabled() && "udp".equals(method))))
                 return false;
             String host = uri.getHost();
             if (host == null || !host.endsWith(".i2p"))
@@ -4928,7 +4942,7 @@ public class I2PSnarkServlet extends BasicServlet {
         File f = new File(_manager.util().getTempDir(), "edit-" + _manager.util().getContext().random().nextLong() + ".torrent");
         OutputStream out = null;
         try {
-            out = new SecureFileOutputStream(f);
+            out = _manager.areFilesPublic() ? new FileOutputStream(f) : new SecureFileOutputStream(f);
             out.write(newMeta.getTorrentData());
             out.close();
             boolean ok = FileUtil.rename(f, new File(snark.getName()));

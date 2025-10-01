@@ -41,6 +41,14 @@ public interface LookupResult {
     public static final int RESULT_DECRYPTION_FAILURE = HostReplyMessage.RESULT_DECRYPTION_FAILURE;
 
     /**
+     * For async calls only. Nonce will be non-zero and destination will be null.
+     * Callback will be called later with the final result and the same nonce.
+     *
+     * @since 0.9.67
+     */
+    public static final int RESULT_DEFERRED = -1;
+
+    /**
      * @return zero for success, nonzero for failure
      */
     public int getResultCode();
@@ -50,4 +58,11 @@ public interface LookupResult {
      */
     public Destination getDestination();
 
+    /**
+     * For async calls only. Nonce will be non-zero.
+     * Callback will be called later with the final result and the same nonce.
+     *
+     * @since 0.9.67
+     */
+    public int getNonce();
 }
