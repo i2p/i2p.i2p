@@ -211,6 +211,21 @@ abstract class MigrateJetty {
                     }
                     migration3success = true;
                 }
+                // jetty-gzip.xml
+                File xmlFile = new File(args[0]);
+                if (!xmlFile.isAbsolute())
+                    xmlFile = new File(ctx.getAppDir(), args[0]);
+                 xmlFile = new File(xmlFile.getParentFile(), "jetty-gzip.xml");
+                if (xmlFile.exists()) {
+                    boolean ok = backupFile(xmlFile, backupSuffix);
+                    if (ok)
+                        ok = WorkingDir.copyFile(new File(ctx.getBaseDir(), "eepsite-jetty9.3/jetty-gzip.xml"), xmlFile);
+                    if (ok)
+                        System.err.println("Modified " + xmlFile);
+                    else
+                        System.err.println("WARNING: Failed to backup up XML file " + xmlFile +
+                                           ", cannot migrate " + client);
+                }
             }
 
             System.err.println("Migrated " + client);
