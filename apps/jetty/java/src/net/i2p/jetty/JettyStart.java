@@ -81,7 +81,19 @@ public class JettyStart implements ClientApp {
         _args = args;
         _jettys = new ArrayList<LifeCycle>(args.length);
         _context = context;
-        parseArgs(args);
+        // To prevent console WebAppClassLoader from interfering
+        // by hiding jetty classses
+        // when an eepsite is started from /configclients
+        ClassLoader cl1 = ClassLoader.getSystemClassLoader();
+        ClassLoader cl2 = Thread.currentThread().getContextClassLoader();
+        if (cl1 != cl2)
+            Thread.currentThread().setContextClassLoader(cl1);
+        try {
+            parseArgs(args);
+        } finally {
+            if (cl1 != cl2)
+                Thread.currentThread().setContextClassLoader(cl2);
+        }
         _state = INITIALIZED;
     }
 
