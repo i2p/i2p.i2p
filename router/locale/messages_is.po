@@ -5,8 +5,7 @@
 # foo <foo@bar>, 2009.
 # 
 # Translators:
-# zzzi2p, 2019
-# Ilektra M. <safiragon@yahoo.gr>, 2025
+# Sveinn í Felli <sv1@fellsnet.is>, 2025
 # 
 msgid ""
 msgstr ""
@@ -14,84 +13,84 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-18 13:32+0000\n"
 "PO-Revision-Date: 2019-12-19 14:09+0000\n"
-"Last-Translator: Ilektra M. <safiragon@yahoo.gr>, 2025\n"
-"Language-Team: Greek (https://app.transifex.com/otf/teams/12694/el/)\n"
+"Last-Translator: Sveinn í Felli <sv1@fellsnet.is>, 2025\n"
+"Language-Team: Icelandic (https://app.transifex.com/otf/teams/12694/is/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: el\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: is\n"
+"Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
 
 #. * IPv4 OK, IPv6 OK or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:370
 msgid "OK"
-msgstr "ΟΚ"
+msgstr "Í lagi"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:371
 msgid "IPv4: OK; IPv6: Testing"
-msgstr "IPv4: OK; IPv6: Γίνεται έλεγχος"
+msgstr "IPv4: Í lagi; IPv6: Prófun"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:372
 msgid "IPv4: OK; IPv6: Firewalled"
-msgstr "IPv4: OK; IPv6: Με τείχος προστασίας "
+msgstr "IPv4: Í lagi; IPv6: Bak við eldvegg"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:373
 msgid "IPv4: Testing; IPv6: OK"
-msgstr "IPv4: Γίνεται έλεγχος; IPv6: OK"
+msgstr "IPv4: Prófun; IPv6: Í lagi"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:374
 msgid "IPv4: Firewalled; IPv6: OK"
-msgstr "IPv4: Με τείχος προστασίας; IPv6: OK"
+msgstr "IPv4: Bak við eldvegg; IPv6: Í lagi"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:375
 msgid "IPv4: Disabled; IPv6: OK"
-msgstr "IPv4: Απενεργοποιημένο; IPv6: OK"
+msgstr "IPv4: Óvirkt; IPv6: Í lagi"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:376
 msgid "IPv4: Symmetric NAT; IPv6: OK"
-msgstr "IPv4: Συμμετρικό NAT; IPv6: OK"
+msgstr "IPv4: Samhverft NAT; IPv6: Í lagi"
 
 #. * IPv4 symmetric NAT, IPv6 firewalled or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:378
 msgid "Symmetric NAT"
-msgstr "Συμμετρικό NAT"
+msgstr "Samhverft NAT"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:379
 msgid "IPv4: Symmetric NAT; IPv6: Testing"
-msgstr "IPv4: Συμμετρικό NAT; IPv6: Γίνεται έλεγχος"
+msgstr "IPv4: Samhverft NAT; IPv6: Prófun"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:380
 msgid "IPv4: Firewalled; IPv6: Testing"
-msgstr "IPv4: Με τείχος προστασίας; IPv6: Γίνεται έλεγχος"
+msgstr "IPv4: Bak við eldvegg; IPv6: Prófun"
 
 #. * IPv4 firewalled, IPv6 firewalled or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:382
 msgid "Firewalled"
-msgstr "Με τείχος προστασίας"
+msgstr "Bak við eldvegg"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:383
 msgid "IPv4: Testing; IPv6: Firewalled"
-msgstr "IPv4: Γίνεται έλεγχος; IPv6: Με τείχος προστασίας"
+msgstr "IPv4: Prófun; IPv6: Bak við eldvegg"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:384
 msgid "IPv4: Disabled; IPv6: Testing"
-msgstr "IPv4: Απενεργοποιημένο; IPv6: Γίνεται έλεγχος"
+msgstr "IPv4: Óvirkt; IPv6: Prófun"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:385
 msgid "IPv4: Disabled; IPv6: Firewalled"
-msgstr "IPv4: Απενεργοποιημένο; IPv6: Με τείχος προστασίας "
+msgstr "IPv4: Óvirkt; IPv6: Bak við eldvegg"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:386
 msgid "Disconnected"
-msgstr "Αποσυνδεδεμένος"
+msgstr "Aftengt"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:387
 msgid "Port Conflict"
-msgstr "Port Conflict"
+msgstr "Árekstur gátta"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:388
 msgid "Testing"
-msgstr "Δοκιμάζει"
+msgstr "Prófun"
 
 #. NPE, too early
 #. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
@@ -102,19 +101,19 @@ msgstr "Δοκιμάζει"
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:142
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:545
 msgid "Rejecting tunnels: Starting up"
-msgstr "Απόρριψη τούνελ: Εκκίνηση"
+msgstr "Hafna göngum: Er að ræsast"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:189
 msgid "Rejecting tunnels: High message delay"
-msgstr "Απόρριψη τούνελ : Υψηλή καθυστέρηση μηνύματος"
+msgstr "Hafna göngum: Mikil töf skilaboða"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:202
 msgid "Rejecting tunnels: Limit reached"
-msgstr "Απόρριψη τούνελ: Επίτευξη ορίου"
+msgstr "Hafna göngum: Takmörkum náð"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:241
 msgid "Rejecting most tunnels: High number of requests"
-msgstr "Απόρριψη των περισσοτέρων τούνελ : Υψηλός αριθμός αιτήσεων"
+msgstr "Hafna flestum göngum: Mikill fjöldi beiðna"
 
 #. hard to do {0} from here
 #. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of
@@ -122,66 +121,66 @@ msgstr "Απόρριψη των περισσοτέρων τούνελ : Υψηλ
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:243
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:424
 msgid "Accepting most tunnels"
-msgstr "Αποδοχή των περισσοτέρων τούνελ"
+msgstr "Samþykki flest göng"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:245
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:426
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:561
 msgid "Accepting tunnels"
-msgstr "Αποδοχή τούνελ"
+msgstr "Samþykki göng"
 
 #. .067KBps
 #. * also limited to 90% - see below
 #. always leave at least 4KBps free when allowing
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:350
 msgid "Rejecting tunnels: Bandwidth limit"
-msgstr "Απόρριψη τούνελ : Όριο εύρους ζώνης"
+msgstr "Hafna göngum: Takmörkuð bandbreidd"
 
 #. hard to do {0} from here
 #. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels:
 #. Bandwidth limit");
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:420
 msgid "Rejecting most tunnels: Bandwidth limit"
-msgstr "Απόρριψη των περισοτέρων τούνελ : Όριο εύρους ζώνης"
+msgstr "Hafna flestum göngum: Takmörkuð bandbreidd"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:550
 msgid "Rejecting tunnels: Shutting down"
-msgstr "Απόρριψη τούνελ : Κλείσιμο"
+msgstr "Hafna göngum: Er að slökkva"
 
 #: ../java/src/net/i2p/router/RouterThrottleImpl.java:563
 msgid "Rejecting tunnels"
-msgstr "Απόρριψη τούνελ"
+msgstr "Hafna göngum"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:260
 msgid "Dropping tunnel requests: Too slow"
-msgstr "Απόρριψη αιτημάτων για τούνελ: Καθυστέρηση"
+msgstr "Sleppi beiðnum um göng: Of hægvirkt"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:270
 msgid "Dropping tunnel requests: High job lag"
-msgstr "Απόρριψη αιτημάτων για τούνελ: Υψηλή καθυστέρηση εργασιών"
+msgstr "Sleppi beiðnum um göng: Mikil töf verka"
 
 #. don't even bother, since we are so overloaded locally
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:464
 msgid "Dropping tunnel requests: Overloaded"
-msgstr "Απόρριψη αιτημάτων για τούνελ: Υπερφόρτωση"
+msgstr "Sleppi beiðnum um göng: Of mikið álag"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:747
 msgid "Rejecting tunnels: Hidden mode"
-msgstr "Απόρριψη τούνελ : Κρυφή λειτουργία"
+msgstr "Hafna göngum: Falinn hamur"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:775
 msgid "Rejecting tunnels: Request overload"
-msgstr "Απόρριψη τούνελ: Υπερφόρτωση αιτημάτων"
+msgstr "Hafna göngum: Of margar beiðnir"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:806
 msgid "Rejecting tunnels: Connection limit"
-msgstr "Απόρριψη τούνελ: Όριο συνδέσεων"
+msgstr "Hafna göngum: Takmörkum tenginga náð"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1024
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1057
 msgid "Dropping tunnel requests: High load"
-msgstr "Απόρριψη αιτημάτων για τούνελ: Υψηλό φορτίο"
+msgstr "Sleppi beiðnum um göng: Mikið álag"
 
 #: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1140
 msgid "Dropping tunnel requests: Queue time"
-msgstr "Απόρριψη αιτημάτων για τούνελ: Χρόνος ουράς αναμονής"
+msgstr "Sleppi beiðnum um göng: Tími í biðröð"

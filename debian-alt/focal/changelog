@@ -1,3 +1,9 @@
+i2p (2.10.0-1~focal+1) focal; urgency=medium
+
+  * New upstream version 2.10.0
+
+ -- idk <hankhill19580@gmail.com>  Wed, 10 Sep 2025 12:12:12 +0000
+
 i2p (2.9.0-1~focal+1) focal; urgency=medium
 
   * New upstream version 2.9.0

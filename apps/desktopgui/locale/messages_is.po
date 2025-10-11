@@ -4,102 +4,100 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Ali <aboshanab_@hotmail.com>, 2018
-# ducki2p <ducki2p@gmail.com>, 2011
-# foo <foo@bar>, 2009
+# Sveinn í Felli <sv1@fellsnet.is>, 2025
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-06 14:52+0000\n"
 "PO-Revision-Date: 2011-02-13 12:05+0000\n"
-"Last-Translator: Ali <aboshanab_@hotmail.com>, 2018\n"
-"Language-Team: Arabic (http://app.transifex.com/otf/I2P/language/ar/)\n"
+"Last-Translator: Sveinn í Felli <sv1@fellsnet.is>, 2025\n"
+"Language-Team: Icelandic (http://app.transifex.com/otf/I2P/language/is/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ar\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Language: is\n"
+"Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
 
 #: src/net/i2p/desktopgui/ExternalTrayManager.java:31
 msgid "Start I2P"
-msgstr "ابدأ I2P"
+msgstr "Ræsa I2P"
 
 #: src/net/i2p/desktopgui/ExternalTrayManager.java:44
 #: src/net/i2p/desktopgui/InternalTrayManager.java:55
 msgid "I2P is starting!"
-msgstr "جاري تشغيل I2P"
+msgstr "I2P er að ræsa!"
 
 #: src/net/i2p/desktopgui/ExternalTrayManager.java:44
 #: src/net/i2p/desktopgui/InternalTrayManager.java:55
 msgid "Starting"
-msgstr "جاري البدأ"
+msgstr "Ræsi"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:65
 #: src/net/i2p/desktopgui/InternalTrayManager.java:221
 msgid "Launch I2P Browser"
-msgstr " تشغيل متصفح I2P"
+msgstr "Ræsa I2P-vafra"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:86
 #: src/net/i2p/desktopgui/InternalTrayManager.java:242
 msgid "Configure I2P System Tray"
-msgstr "تكوين أيقونة I2P المصغرة "
+msgstr "Stilla I2P-kerfisbakka"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:88
 #: src/net/i2p/desktopgui/InternalTrayManager.java:244
 msgid "Disable system tray"
-msgstr ""
+msgstr "Gera kerfisbakka óvirkan"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:104
 #: src/net/i2p/desktopgui/InternalTrayManager.java:260
 msgid "Restart I2P"
-msgstr "اعادة تشغيل"
+msgstr "Endurræsa I2P"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:121
 #: src/net/i2p/desktopgui/InternalTrayManager.java:277
 msgid "Stop I2P"
-msgstr "توقيف I2P"
+msgstr "Stöðva I2P"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:137
 #: src/net/i2p/desktopgui/InternalTrayManager.java:293
 msgid "Restart I2P Immediately"
-msgstr "إعادة تشغيل I2P على الفور"
+msgstr "Endurræsa I2P strax"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:154
 #: src/net/i2p/desktopgui/InternalTrayManager.java:310
 msgid "Stop I2P Immediately"
-msgstr "إيقاف تشغيل I2P على الفور"
+msgstr "Stöðva I2P strax"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:168
 #: src/net/i2p/desktopgui/InternalTrayManager.java:324
 msgid "Cancel I2P Shutdown"
-msgstr "إلغاء إيقاف تشغيل I2P"
+msgstr "Hætta við að slökkva á I2P"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:381
 #, java-format
 msgid "Shutdown in {0}"
-msgstr "توقف في مدة {0}"
+msgstr "Slekkur eftir {0}"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:383
 msgid "Shutdown imminent"
-msgstr "إغلاق وشيك"
+msgstr "Slekkur innan skamms"
 
 #. status translations are in the console bundle
 #: src/net/i2p/desktopgui/InternalTrayManager.java:388
 msgid "Network"
-msgstr "الشبكة"
+msgstr "Netkerfi"
 
 #. Windows typically has tooltips; Linux (at least Ubuntu) doesn't
 #: src/net/i2p/desktopgui/TrayManager.java:75
 msgid "I2P: Right-click for menu"
-msgstr "I2P: أنقر بالزر الأيمن للقائمة"
+msgstr "I2P: Hægri-smelltu til að sjá valmynd"
 
 #: src/net/i2p/desktopgui/TrayManager.java:310
 #: src/net/i2p/desktopgui/TrayManager.java:347
 msgid "Enable notifications"
-msgstr "تفعيل التنبيهات"
+msgstr "Virkja tilkynningar"
 
 #: src/net/i2p/desktopgui/TrayManager.java:325
 #: src/net/i2p/desktopgui/TrayManager.java:362
 msgid "Disable notifications"
-msgstr ""
+msgstr "Gera tilkynningar óvirkar"

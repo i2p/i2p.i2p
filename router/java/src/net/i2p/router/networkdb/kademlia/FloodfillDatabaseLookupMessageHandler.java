@@ -8,8 +8,11 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
+import java.util.Set;
+
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterIdentity;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.HandlerJobBuilder;
@@ -73,6 +76,50 @@ public class FloodfillDatabaseLookupMessageHandler implements HandlerJobBuilder 
                           + dlm.getFrom() + " tunnel: " + dlm.getReplyTunnel());
             _context.statManager().addRateData("netDb.nonFFLookupsDropped", 1);
             return null;
+        }
+
+        if (dlm.getReplyTunnel() == null) {
+            if (dlm.getFrom().equals(_context.routerHash())) {
+                if (fromHash != null) {
+                    // Java direct lookup bug from 0.9.19, fixed in 0.9.67
+                    // DLM from was set to target, not originator
+                    // Do them a favor and send it back to originator
+                    // Have to create a new one because we can't call setFrom() again
+                    if (_log.shouldWarn())
+                        _log.warn("[dbid: " + _facade
+                                  + "] Fixing up " + dlm.getSearchType()
+                                  + " direct lookup request from us, actually from: " + fromHash);
+                    DatabaseLookupMessage newdlm = new DatabaseLookupMessage(_context);
+                    newdlm.setFrom(fromHash);
+                    newdlm.setSearchType(type);
+                    newdlm.setSearchKey(dlm.getSearchKey());
+                    Set<Hash> dont = dlm.getDontIncludePeers();
+                    if (dont != null)
+                        newdlm.setDontIncludePeers(dont);
+                    // direct, so we presume no ratchet encryption
+                    dlm = newdlm;
+                } else {
+                    // shouldn't happen, fromHash should always be set
+                    if (_log.shouldWarn())
+                        _log.warn("[dbid: " + _facade
+                                  + "] Dropping " + dlm.getSearchType()
+                                  + " direct lookup request from us");
+                    _context.statManager().addRateData("netDb.lookupsDropped", 1);
+                    return null;
+                }
+            }
+            if (type == DatabaseLookupMessage.Type.EXPL || type == DatabaseLookupMessage.Type.ANY) {
+                RouterInfo to = _facade.lookupRouterInfoLocally(dlm.getFrom());
+                if (to != null && to.getCapabilities().indexOf(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL) >= 0) {
+                    if (_log.shouldWarn())
+                        _log.warn("[dbid: " + _facade
+                                  + "] Dropping " + dlm.getSearchType()
+                                  + " direct lookup request from floodfill "
+                                  + dlm.getFrom());
+                    _context.statManager().addRateData("netDb.lookupsDropped", 1);
+                    return null;
+                }
+            }
         }
 
         if (!_facade.shouldThrottleLookup(dlm.getFrom(), dlm.getReplyTunnel())

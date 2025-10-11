@@ -9,7 +9,8 @@
 # cacapo <handelsehorisont@gmail.com>, 2015-2016
 # hottuna <i2p@robertfoss.se>, 2013
 # hottuna <i2p@robertfoss.se>, 2012
-# Jonatan Nyberg, 2016-2017,2021-2023
+# Daniel, 2025
+# Daniel, 2016-2017,2021-2023
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2019-2020
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2017
 # WinterFairy <winterfairy@riseup.net>, 2014
@@ -19,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
 "PO-Revision-Date: 2013-07-20 14:50+0000\n"
-"Last-Translator: Jonatan Nyberg, 2016-2017,2021-2023\n"
+"Last-Translator: Daniel, 2025\n"
 "Language-Team: Swedish (Sweden) (http://app.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -309,7 +310,7 @@ msgstr "Webbplatsen kan vara tillfälligt onåbar, belastad, eller ha blockerat 
 
 #: ../java/build/Proxy.java:117
 msgid "Warning: Authorization Required"
-msgstr ""
+msgstr "Varning: Auktorisering krävs"
 
 #: ../java/build/Proxy.java:126
 msgid ""
@@ -492,7 +493,7 @@ msgstr "Motstridig hjälparadress destination"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1224
 msgid "Corrupt Base32 address"
-msgstr ""
+msgstr "Korrupt Base32-adress"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1304
 msgid "Destination lease set not found"
@@ -505,7 +506,7 @@ msgstr "Värd"
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1441
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1502
 msgid "Base32"
-msgstr ""
+msgstr "Base32"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1445
 msgid "Destination"
@@ -520,7 +521,7 @@ msgstr "Fortsätt till {0} utan att spara"
 msgid ""
 "You can browse to the site without saving it to the address book. The "
 "address will be remembered until you restart your I2P router."
-msgstr ""
+msgstr "Du kan bläddra till webbplatsen utan att spara den i adressboken. Adressen kommer att sparas tills du startar om din I2P-router."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1453
 msgid "Continue without saving"
@@ -535,7 +536,7 @@ msgstr "Spara {0} i routerns adressbok och fortsätt till webbplatsen"
 msgid ""
 "This address will be saved to your Router address book where your "
 "subscription-based addresses are stored."
-msgstr ""
+msgstr "Den här adressen sparas i routerns adressbok där dina prenumerationsbaserade adresser lagras."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1463
 msgid ""
@@ -553,14 +554,14 @@ msgstr "Spara & fortsätt"
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1473
 #, java-format
 msgid "Save {0} to local address book and continue to website"
-msgstr ""
+msgstr "Spara {0} i den lokala adressboken och fortsätt till webbplatsen"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1474
 msgid ""
 "This address will be saved to your Local address book. Select this option "
 "for addresses you wish to keep separate from the main router address book, "
 "but don't mind publishing."
-msgstr ""
+msgstr "Den här adressen sparas i din lokala adressbok. Välj det här alternativet för adresser som du vill hålla separata från routerns huvudadressbok, men som du inte har något emot att publicera."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1478
 #, java-format
@@ -575,19 +576,19 @@ msgstr "Den här adressen sparas i din privata adressbok, så att den aldrig pub
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1507
 msgid "Base32 address requires lookup password"
-msgstr ""
+msgstr "Base32-adress kräver uppslagslösenord"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1509
 msgid "Base32 address requires encryption key"
-msgstr ""
+msgstr "Base32-adressen kräver krypteringsnyckel"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1511
 msgid "Base32 address requires encryption key and lookup password"
-msgstr ""
+msgstr "Base32-adressen kräver krypteringsnyckel och uppslagslösenord"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1513
 msgid "Base32 address decryption failure, check encryption key"
-msgstr ""
+msgstr "Dekrypteringsfel för Base32-adress, kontrollera krypteringsnyckeln"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1524
 msgid "Generate"
@@ -601,27 +602,27 @@ msgstr "Krypteringsnyckel"
 msgid ""
 "You must either enter a PSK encryption key provided by the server operator, "
 "or generate a DH encryption key and send that to the server operator."
-msgstr ""
+msgstr "Du måste antingen ange en PSK-krypteringsnyckel som tillhandahålls av serveroperatören, eller generera en DH-krypteringsnyckel och skicka den till serveroperatören."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1527
 msgid "Ask the server operator for help."
-msgstr ""
+msgstr "Be serveroperatören om hjälp."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1530
 msgid "Enter PSK encryption key"
-msgstr ""
+msgstr "Ange PSK-krypteringsnyckel"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1533
 msgid "Generate new DH encryption key"
-msgstr ""
+msgstr "Generera ny DH-krypteringsnyckel"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1541
 msgid "Lookup password"
-msgstr ""
+msgstr "Uppslagslösenord"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1542
 msgid "You must enter the password provided by the server operator."
-msgstr ""
+msgstr "Du måste ange lösenordet som serveroperatören har gett dig."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:196
 #, java-format
@@ -634,20 +635,20 @@ msgstr "Tillagd via adresshjälpen "
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:235
 msgid "Missing lookup password"
-msgstr ""
+msgstr "Uppslagslösenord saknas"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:249
 msgid "Missing private key"
-msgstr ""
+msgstr "Privat nyckel saknas"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:254
 msgid "Invalid private key"
-msgstr ""
+msgstr "Ogiltig privat nyckel"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:287
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:306
 msgid "Your new encryption key"
-msgstr ""
+msgstr "Din nya krypteringsnyckel"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:301
 msgid "Address book"
@@ -655,15 +656,15 @@ msgstr "Adressbok"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:311
 msgid "Copy the key and send it to the server operator."
-msgstr ""
+msgstr "Kopiera nyckeln och skicka den till serveroperatören."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:313
 msgid "After you are granted permission, you may proceed to the website."
-msgstr ""
+msgstr "Efter att du har beviljats tillstånd kan du gå vidare till webbplatsen."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:334
 msgid "Go back and fix the error"
-msgstr ""
+msgstr "Gå tillbaka och åtgärda felet"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:345
 msgid "router"
@@ -691,12 +692,12 @@ msgstr "Adressbok"
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:376
 #, java-format
 msgid "Saved {0} to the {1} address book, redirecting now."
-msgstr ""
+msgstr "Sparad {0} i {1}-adressboken, omdirigerar nu."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:377
 #, java-format
 msgid "Failed to save {0} to the {1} address book, redirecting now."
-msgstr ""
+msgstr "Misslyckades med att spara {0} i {1}-adressboken, omdirigerar nu."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:379
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:411
@@ -706,4 +707,4 @@ msgstr "Klicka här om du inte omdirigeras automatiskt."
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:409
 #, java-format
 msgid "Saved the authentication for {0}, redirecting now."
-msgstr ""
+msgstr "Sparade autentiseringen för {0}, omdirigerar nu."

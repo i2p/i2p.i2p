@@ -357,8 +357,9 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             throw new RIException("bad SSU2 v", REASON_VERSION);
 
         if (ri.getCapabilities().equals("LU") && ri.getVersion().equals("0.9.56")) {
+            long time = _context.netDb().floodfillEnabled() ? 60*60*1000 : 2*60*60*1000;
             _context.banlist().banlistRouter(h, "Slow", null,
-                                             null, _context.clock().now() + 2*60*60*1000);
+                                             null, _context.clock().now() + time);
             if (ri.verifySignature())
                 _context.blocklist().add(_aliceIP);
             throw new RIException("Old and slow: " + h, REASON_BANNED);
