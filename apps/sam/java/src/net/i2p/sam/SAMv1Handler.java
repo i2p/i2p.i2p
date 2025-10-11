@@ -31,6 +31,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.util.Log;
 
 /**
@@ -277,7 +278,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                     rawSession = new SAMRawSession(destKeystream, props, this);
                     rawSession.start();
                 } else if (style.equals("DATAGRAM")) {
-                    datagramSession = new SAMDatagramSession(destKeystream, props,this);
+                    datagramSession = new SAMDatagramSession(destKeystream, props, this, 1);
                     datagramSession.start();
                 } else if (style.equals("STREAM")) {
                     String dir = (String) props.remove("DIRECTION");
@@ -827,6 +828,11 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
         msg.write(data);
         msg.flush();
         writeBytes(ByteBuffer.wrap(msg.toByteArray()));
+    }
+
+    public void receiveDatagramBytes(Hash sender, byte data[], int proto,
+                                     int fromPort, int toPort) throws IOException {
+        throw new UnsupportedOperationException();
     }
 
     public void stopDatagramReceiving() {

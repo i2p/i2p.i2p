@@ -500,10 +500,20 @@ class SAMv3Handler extends SAMv1Handler
                                         rawSession = v3;
 					this.session = v3;
 					v3.start();
-				} else if (style.equals("DATAGRAM")) {
+				} else if (style.equals("DATAGRAM") ||
+					   style.equals("DATAGRAM2") ||
+					   style.equals("DATAGRAM3")) {
 					detector.start();
 					SAMv3DatagramServer dgs = bridge.getV3DatagramServer(props);
-					SAMv3DatagramSession v3 = new SAMv3DatagramSession(nick, dgs);
+					int v;
+					if (style.equals("DATAGRAM")) {
+						v = 1;
+					} else if (style.equals("DATAGRAM2")) {
+						v = 2;
+					} else {
+						v = 3;
+					}
+					SAMv3DatagramSession v3 = new SAMv3DatagramSession(nick, dgs, v);
 					datagramSession = v3;
 					this.session = v3;
 					v3.start();
