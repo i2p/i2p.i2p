@@ -163,6 +163,7 @@ abstract class MigrateJetty {
                     } catch (IOException ioe) {
                         System.err.println("WARNING: Failed to migrate XML file " + xmlFile +
                                            ", cannot migrate " + client);
+                        ioe.printStackTrace();
                         continue;
                     }
                     migration2success = true;
@@ -207,6 +208,7 @@ abstract class MigrateJetty {
                     } catch (IOException ioe) {
                         System.err.println("WARNING: Failed to migrate XML file " + xmlFile +
                                            ", cannot migrate " + client);
+                        ioe.printStackTrace();
                         continue;
                     }
                     migration3success = true;
@@ -215,7 +217,8 @@ abstract class MigrateJetty {
                 File xmlFile = new File(args[0]);
                 if (!xmlFile.isAbsolute())
                     xmlFile = new File(ctx.getAppDir(), args[0]);
-                 xmlFile = new File(xmlFile.getParentFile(), "jetty-gzip.xml");
+                File base = xmlFile.getParentFile();
+                xmlFile = new File(base, "jetty-gzip.xml");
                 if (xmlFile.exists()) {
                     boolean ok = backupFile(xmlFile, backupSuffix);
                     if (ok)
@@ -225,6 +228,34 @@ abstract class MigrateJetty {
                     else
                         System.err.println("WARNING: Failed to backup up XML file " + xmlFile +
                                            ", cannot migrate " + client);
+                }
+                // contexts/base-context.xml
+                xmlFile = new File(base, "contexts/base-context.xml");
+                if (xmlFile.exists()) {
+                    try {
+                        boolean ok = backupFile(xmlFile, backupSuffix);
+                        if (ok) {
+                            File tmpFile = new File(xmlFile + ".tmp");
+                            migrateBaseContextXML(xmlFile, tmpFile);
+                            ok = FileUtil.rename(tmpFile, xmlFile);
+                            if (!ok)
+                                throw new IOException();
+                            System.err.println("Modified " + xmlFile);
+                        }
+                    } catch (IOException ioe) {
+                        System.err.println("WARNING: Failed to migrate XML file " + xmlFile +
+                                           ", cannot migrate " + client);
+                        ioe.printStackTrace();
+                    }
+                }
+                // contexts/cgi-context.xml
+                xmlFile = new File(base, "contexts/cgi-context.xml");
+                if (xmlFile.exists()) {
+                    File save = new File(xmlFile + BACKUP_SUFFIX_9_2);
+                    FileUtil.rename(xmlFile, save);
+                    System.err.println("WARNING: CGI not supported on Jetty 12 and has been disabled.");
+                    System.err.println(xmlFile + " moved to " + save);
+                    System.err.println("See http://zzz.i2p/topics/3701 for help on migrating to FCGI if required");
                 }
             }
 
@@ -386,6 +417,81 @@ abstract class MigrateJetty {
                         if (t.contains("</Ref"))
                             break;
                         out.println(t);
+                    }
+                } else {
+                    out.println(s);
+                }
+            }
+            out.println("<!-- Modified by I2P Jetty 12 migration script -->");
+            System.err.println("Copied " + oldFile + " with modifications");
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            if (out != null) out.close();
+        }
+    }
+
+    private static final String M10 = "jetty/configure.dtd";
+    private static final String R10 = "<!DOCTYPE Configure PUBLIC \"-//Jetty//Configure//EN\" \"http://www.eclipse.org/jetty/configure_10_0.dtd\">";
+
+    private static final String M11 = "org.eclipse.jetty.servlet.ServletContextHandler";
+    private static final String R11 = "<Configure class=\"org.eclipse.jetty.ee8.servlet.ServletContextHandler\">";
+
+    private static final String M12 = "<Set name=\"resourceBase\"";
+    private static final String R12 =
+           "  <Set name=\"baseResourceAsString\"><Ref refid=\"baseroot\" /></Set>\n" +
+           "  <Call name=\"setErrorHandler\">\n" +
+           "    <Arg>\n" +
+           "      <New class=\"net.i2p.servlet.I2PErrorHandler\">\n" +
+           "        <Arg><Ref refid=\"baseroot\" /></Arg>\n" +
+           "      </New>\n" +
+           "    </Arg>\n" +
+           "  </Call>";
+
+    private static final String M13 = "<Call name=\"setMimeTypes\"";
+
+    /**
+     *  Copy over a XML file with modifications.
+     *  Will overwrite any existing newFile.
+     *
+     *  @throws IOException on all errors
+     *  @since 0.9.68
+     */
+    private static void migrateBaseContextXML(File oldFile, File newFile) throws IOException {
+        FileInputStream in = null;
+        PrintWriter out = null;
+        try {
+            in = new FileInputStream(oldFile);
+            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(newFile), "UTF-8")));
+            String s = null;
+            while ((s = DataHelper.readLine(in)) != null) {
+                // readLine() doesn't strip \r
+                if (s.endsWith("\r"))
+                    s = s.substring(0, s.length() - 1);
+                if (s.contains(M10)) {
+                    out.println(R10);
+                } else if (s.contains(M11)) {
+                    out.println(R11);
+                } else if (s.contains(M12)) {
+                    int gt = s.indexOf('>');
+                    int lt = s.lastIndexOf('<');
+                    if (gt >= 0 && lt >= 0 && lt > gt) {
+                        String rb = s.substring(gt + 1, lt).trim();
+                        out.println("  <New id=\"baseroot\" class=\"java.lang.String\">");
+                        out.println("    <Arg>" + rb + "</Arg>");
+                        out.println("  </New>");
+                        out.println(R12);
+                    }
+                } else if (s.contains(M13)) {
+                    // strip to matching </Call>
+                    int i = 1;
+                    String t;
+                    while ((t = DataHelper.readLine(in)) != null) {
+                        if (t.contains("<Call"))
+                            i++;
+                        if (t.contains("</Call"))
+                            i--;
+                        if (i == 0)
+                            break;
                     }
                 } else {
                     out.println(s);
