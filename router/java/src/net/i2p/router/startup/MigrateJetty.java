@@ -449,6 +449,10 @@ abstract class MigrateJetty {
 
     private static final String M13 = "<Call name=\"setMimeTypes\"";
 
+    private static final String M14 = "org.eclipse.jetty.servlet.DefaultServlet";
+    private static final String R14 = "net.i2p.servlet.I2PDefaultServlet";
+
+
     /**
      *  Copy over a XML file with modifications.
      *  Will overwrite any existing newFile.
@@ -493,6 +497,8 @@ abstract class MigrateJetty {
                         if (i == 0)
                             break;
                     }
+                } else if (s.contains(M14)) {
+                    out.println(s.replace(M14, R14));
                 } else {
                     out.println(s);
                 }
