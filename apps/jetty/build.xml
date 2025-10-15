@@ -17,7 +17,7 @@
 
     <property name="jetty.branch" value="stable-9" />
     <property name="jetty.base" value="jetty-home-${jetty.ver}" />
-    <property name="jetty.sha1" value="6c8b834d313bcac2e6a2e42ebaf34a249887162a" />
+    <property name="jetty.sha1" value="bb0ce8db30693fa4c1450983434029e7441b8d4f" />
     <property name="jetty.filename" value="${jetty.base}.zip" />
     <property name="jetty.url" value="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-home/${jetty.ver}/${jetty.filename}" />
     <property name="verified.filename" value="verified.txt" />

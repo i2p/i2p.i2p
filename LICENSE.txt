@@ -260,7 +260,7 @@ Applications:
      Zxing 3.4.1:
        See licenses/LICENSE-Apache2.0.txt
 
-   Jetty 12.0.21 (jetty-*.jar, org.mortbay.*.jar):
+   Jetty 12.0.28 (jetty-*.jar, org.mortbay.*.jar):
    (not included in most distribution packages, except for jetty-i2p.jar)
    See licenses/NOTICE-Jetty.txt
    See licenses/LICENSE-Jetty.txt
