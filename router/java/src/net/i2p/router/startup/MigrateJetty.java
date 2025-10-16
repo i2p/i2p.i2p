@@ -200,6 +200,14 @@ abstract class MigrateJetty {
                         if (!ok)
                             throw new IOException();
 
+                        if (xmlFile.getName().equals("jetty-ssl.xml")) {
+                            System.err.println("WARNING: SSL migration to Jetty 12 is not yet implemented.");
+                            System.err.println("Cannot fully migrate " + client);
+                            System.err.println("Remove jetty-ssl.xml from the command line for the client");
+                            System.err.println("See http://zzz.i2p/topics/3702 for help on migrating SSL");
+                            continue;
+                        }
+
                         migrate9to12XML(xmlFile, tmpFile);
                         ok = FileUtil.rename(tmpFile, xmlFile);
                         if (!ok)
