@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_10_0.dtd">
 
 <!--
 Configure a custom context for the site.
@@ -8,7 +8,7 @@ This context contains only a ServletContextHandler with a default servlet
 to serve static html files and images.
 -->
 
-<Configure class="org.eclipse.jetty.servlet.ServletContextHandler">
+<Configure class="org.eclipse.jetty.ee8.servlet.ServletContextHandler">
   <Set name="contextPath">/</Set>
   <Set name="resourceBase">./docroot/</Set>
   <Call name="setInitParameter">
@@ -16,7 +16,7 @@ to serve static html files and images.
     <Arg>max-age=3600,public</Arg>
   </Call>
   <Call name="addServlet">
-    <Arg>org.eclipse.jetty.servlet.DefaultServlet</Arg>
+    <Arg>org.eclipse.jetty.ee8.servlet.DefaultServlet</Arg>
     <Arg>/</Arg>
   </Call>
 </Configure>

@@ -1,9 +1,9 @@
 package net.i2p.servlet;
 
 import org.apache.tomcat.SimpleInstanceManager;
-import org.eclipse.jetty.deploy.providers.WebAppProvider;
-import org.eclipse.jetty.webapp.Configuration;
-import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.deploy.providers.ContextProvider;
+import org.eclipse.jetty.ee8.webapp.Configuration;
+import org.eclipse.jetty.ee8.webapp.WebAppContext;
 
 import net.i2p.I2PAppContext;
 
@@ -22,8 +22,10 @@ public class WebAppProviderConfiguration {
      *  Modified from routerconsole WebAppStarter.
      *  MUST be called from jetty.xml after the WebAppProvider is created.
      */
-    public static void configure(WebAppProvider wap) {
-        String[] classNames = WebAppContext.getDefaultConfigurationClasses();
+    public static void configure(ContextProvider wap) {
+        // Not in Jetty 12 but these are the two defaults
+        //String[] classNames = WebAppContext.getDefaultConfigurationClasses();
+        String[] classNames = { "org.eclipse.jetty.ee8.webapp.WebXmlConfiguration", "org.eclipse.jetty.ee8.webapp.JettyWebXmlConfiguration" };
         int sz = classNames.length;
         String[] newClassNames = new String[sz + 1];
         for (int j = 0; j < sz; j++) {
@@ -34,7 +36,8 @@ public class WebAppProviderConfiguration {
 
         // set the temp dir while we're at it,
         // so the extracted wars don't end up in /tmp
-        wap.setTempDir(I2PAppContext.getGlobalContext().getTempDir());
+        // FIXME
+        //wap.setTempDir(I2PAppContext.getGlobalContext().getTempDir());
     }
 
     public static class WAPConfiguration implements Configuration {
@@ -54,5 +57,15 @@ public class WebAppProviderConfiguration {
         public void preConfigure(WebAppContext context) {}
 
         public void postConfigure(WebAppContext context) {}
+
+        /**
+         *  @since Jetty 12
+         */
+        public boolean abort(WebAppContext context) { return false; }
+
+        /**
+         *  @since Jetty 12
+         */
+        public boolean isEnabledByDefault() { return true; }
     }
 }

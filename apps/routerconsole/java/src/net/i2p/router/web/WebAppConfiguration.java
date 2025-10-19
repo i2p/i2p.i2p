@@ -17,9 +17,9 @@ import net.i2p.I2PAppContext;
 import net.i2p.util.FileSuffixFilter;
 
 import org.apache.tomcat.SimpleInstanceManager;
-import org.eclipse.jetty.webapp.Configuration;
-import org.eclipse.jetty.webapp.WebAppClassLoader;
-import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.ee8.webapp.Configuration;
+import org.eclipse.jetty.ee8.webapp.WebAppClassLoader;
+import org.eclipse.jetty.ee8.webapp.WebAppContext;
 
 
 /**
@@ -103,11 +103,11 @@ public class WebAppConfiguration implements Configuration {
             // Only really required if started manually, but we don't know that from here
             cp = "jetty-util.jar";
 ****/
+        // Java 11+ fix to prevent dup contexts
+        wac.setParentLoaderPriority(true);
         if (ctxPath.equals("/susidns")) {
             // Old installs don't have this in their wrapper.config classpath
             cp = "addressbook.jar";
-            // Java 11+ fix to prevent dup contexts
-            wac.setParentLoaderPriority(true);
         } else if (pluginDir.exists()) {
             File consoleDir = new File(pluginDir, "console");
             Properties props = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
@@ -223,4 +223,14 @@ public class WebAppConfiguration implements Configuration {
 
     /** @since Jetty 7 */
     public void postConfigure(WebAppContext context) {}
+
+    /**
+     *  @since Jetty 12
+     */
+    public boolean abort(WebAppContext context) { return false; }
+
+    /**
+     *  @since Jetty 12
+     */
+    public boolean isEnabledByDefault() { return true; }
 }

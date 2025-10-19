@@ -1,36 +1,62 @@
-<?xml version="1.0"  encoding="ISO-8859-1"?>
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+<?xml version="1.0"  encoding="UTF-8"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_10_0.dtd">
 
 <!--
-Configure a custom context for the eepsite.
+  CGI was removed from Jetty 12.
+  This is a FCGI replacement for the cgi-context.xml configuration which
+  served CGI scripts under /cgi-bin.
+  This does NOT serve CGI scripts under the base context.
+  Scripts may have any suffix, they do not have to be named *.cgi
 
- * CGI Servlet.
- * 
- * The cgi bin directory can be set with the "cgibinResourceBase" init parameter
- * or it will default to the resource base of the context.
- * 
- * The "commandPrefix" init parameter may be used to set a prefix to all
- * commands passed to exec. This can be used on systems that need assistance to
- * execute a particular file type. For example on windows this can be set to
- * "perl" so that perl scripts are executed.
- * 
- * The "Path" init param is passed to the exec environment as PATH. Note: Must
- * be run unpacked somewhere in the filesystem.
- * 
- * Any initParameter that starts with ENV_ is used to set an environment
- * variable with the name stripped of the leading ENV_ and using the init
- * parameter value.
+  Prerequisites:
+  - sudo apt install spawn-fcgi fcgiwrap
+
+  Create a start-fcgi script:
+
+    #!/bin/bash
+    export SKT=/var/tmp/fcgi-socket-0
+    rm -f $SKT
+    /usr/bin/spawn-fcgi -s $SKT -F 8 /usr/sbin/fcgiwrap > /var/tmp/fastcgi.log 2>&1 &
+
+  Or, to use standard sockets, edit the XML below to remove the unixDomainPath line and use:
+
+    #!/bin/bash
+    /usr/bin/spawn-fcgi -a 127.0.0.1 -p 9000 -F 8 /usr/sbin/fcgiwrap > /var/tmp/fastcgi.log 2>&1 &
+
+  Start the fcgi-server with
+    start-fcgi
+
+  Ref:
+  https://jetty.org/docs/jetty/12/operations-guide/protocols/index.html#fcgi
+
 -->
 
-<Configure class="org.eclipse.jetty.servlet.ServletContextHandler">
+<Configure class="org.eclipse.jetty.server.handler.ContextHandler">
+  <New id="cgiroot" class="java.lang.String">
+    <Arg>./eepsite/cgi-bin</Arg>
+  </New>
   <Set name="contextPath">/cgi-bin</Set>
-  <Set name="resourceBase">./eepsite/cgi-bin/</Set>
-  <Call name="setInitParameter">
-    <Arg>Path</Arg>
-    <Arg>/usr/local/bin:/bin:/usr/bin</Arg>
-  </Call>
-  <Call name="addServlet">
-    <Arg>org.eclipse.jetty.servlets.CGI</Arg>
-    <Arg>/</Arg>
-  </Call>
+  <Set name="baseResourceAsString"><Ref refid="cgiroot" /></Set>
+  <Set name="handler">
+    <New class="org.eclipse.jetty.server.handler.PathMappingsHandler">
+      <Call name="addMapping">
+        <Arg>
+          <New class="org.eclipse.jetty.http.pathmap.ServletPathSpec"><Arg>/</Arg></New>
+        </Arg>
+        <Arg>
+          <New class="org.eclipse.jetty.fcgi.proxy.FastCGIProxyHandler">
+            <Arg>(https?)://([^/]+)(.*)</Arg>
+            <!-- host:port ignored since if using a domain socket, but argument must be here -->
+            <Arg>http://localhost:9000$3</Arg>
+            <Arg><Ref refid="cgiroot" /></Arg>
+
+            <Set name="scriptPattern"><Call class="java.util.regex.Pattern" name="compile"><Arg>/cgi-bin(.+)</Arg></Call></Set>
+            <Set name="fastCGISecure">false</Set>
+            <!-- Remove this line and set the correct port above if using standard sockets -->
+            <Set name="unixDomainPath"><Call class="java.nio.file.Path" name="of"><Arg>/var/tmp/fcgi-socket-0</Arg></Call></Set>
+          </New>
+        </Arg>
+      </Call>
+    </New>
+  </Set>
 </Configure>

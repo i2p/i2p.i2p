@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_10_0.dtd">
 
-<!-- This configuration supports Jetty 9. Do not remove this line. -->
+<!-- This configuration supports Jetty 12. Do not remove this line. -->
 
 <!-- ========================================================================= -->
 <!-- If you have a 'split' directory installation, with configuration          -->

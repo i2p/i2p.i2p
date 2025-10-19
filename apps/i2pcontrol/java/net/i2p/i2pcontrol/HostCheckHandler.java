@@ -14,8 +14,10 @@ import net.i2p.util.Log;
 
 import net.i2p.apache.http.conn.util.InetAddressUtils;
 
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.HandlerWrapper;
+import org.eclipse.jetty.server.Response;
+import org.eclipse.jetty.util.Callback;
 
 /**
  * Block certain Host headers to prevent DNS rebinding attacks.
@@ -28,7 +30,7 @@ import org.eclipse.jetty.server.handler.HandlerWrapper;
  *
  * @since 0.12 copied from routerconsole
  */
-public class HostCheckHandler extends HandlerWrapper
+public class HostCheckHandler extends Handler.Wrapper
 {
     private final I2PAppContext _context;
     private final Set<String> _listenHosts;
@@ -57,14 +59,13 @@ public class HostCheckHandler extends HandlerWrapper
     /**
      *  Block by Host header, pass everything else to the delegate.
      */
-    public void handle(String pathInContext,
-                       Request baseRequest,
-                       HttpServletRequest httpRequest,
-                       HttpServletResponse httpResponse)
-         throws IOException, ServletException
+    @Override
+    public boolean handle(Request request,
+                          Response response,
+                          Callback callback)
+         throws Exception
     {
-
-        String host = httpRequest.getHeader("Host");
+        String host = request.getHeaders().get("Host");
         if (!allowHost(host)) {
             Log log = _context.logManager().getLog(HostCheckHandler.class);
             host = DataHelper.stripHTML(getHost(host));
@@ -73,11 +74,12 @@ public class HostCheckHandler extends HandlerWrapper
                        I2PControlController.PROP_ALLOWED_HOSTS + '=' + host +
                        "\" to I2PControl.conf and restart.";
             log.logAlways(Log.WARN, s);
-            httpResponse.sendError(403, s);
-            return;
+            Response.writeError(request, response, callback, 403, s);
+            callback.succeeded();
+            return true;
         }
 
-        super.handle(pathInContext, baseRequest, httpRequest, httpResponse);
+        return super.handle(request, response, callback);
     }
 
     /**

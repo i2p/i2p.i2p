@@ -2,8 +2,9 @@
 <project basedir="." default="all" name="i2p"
     xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
-    <!-- for javac "release" parameter -->
-    <property name="ant.minimumVersion" value="1.9.8"/>
+    <!-- for javaversion condition -->
+    <property name="ant.minimumVersion" value="1.10.2"/>
+    <property name="java.minimumVersion" value="17"/>
 
     <!-- Include property files so that values can be easily overridden.
          Users should create an override.properties file to make changes.
@@ -14,7 +15,7 @@
           and checksum in apps/jetty/build.xml
           and versions in gradle.properties and apps/jetty/build.gradle
      -->
-    <property name="jetty.ver" value="9.3.30.v20211001" />
+    <property name="jetty.ver" value="12.0.28" />
     <property name="tomcat.ver" value="9.0.107" />
 
     <!-- You probably don't want to change anything from here down -->
@@ -432,6 +433,13 @@
     </target>
 
     <target name="buildProperties" depends="getGitRev, getReleaseNumber, getBuildNumber, setBuildTimestamp, disableManifestClasspath" >
+        <fail message="FATAL: Minimum Java version is ${java.minimumVersion} - your Java version is ${java.version}">
+            <condition>
+                <not>
+                    <javaversion atleast="${java.minimumVersion}"/>
+                </not>
+            </condition>
+        </fail>
         <antversion property="antversion"/>
         <fail message="FATAL: Minimum Ant version is ${ant.minimumVersion} - your Ant version is ${antversion}">
             <condition>
@@ -450,6 +458,9 @@
         <echo message="Ant: ${ant.version}" />
         <echo message="JDK: ${java.vendor} ${java.version} (${java.runtime.name} ${java.runtime.version})" />
         <echo message="Building version ${full.version} (revision ${workspace.version})" />
+        <property name="javac.version" value="17" />
+        <property name="javac.release" value="17" />
+        <echo message="Building for minimum Java version ${javac.version} release ${javac.release}" />
     </target>
 
     <target name="setBuildTimestamp" unless="${build.reproducible}" >
@@ -874,7 +885,7 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
         <!-- set if unset -->
-        <property name="javac.version" value="1.8" />
+        <property name="javac.version" value="17" />
         <javadoc access="package"
             source="${javac.version}"
             destdir="./build/javadoc"
@@ -2534,8 +2545,8 @@
         </ant>
         <ant dir="apps/jetty/">
             <!-- not used in Android -->
-            <property name="javac.version" value="1.8" />
-            <property name="javac.release" value="8" />
+            <property name="javac.version" value="17" />
+            <property name="javac.release" value="17" />
             <target name="servletJar" />
             <target name="servletJavadocJar" />
             <target name="servletSourcesJar" />
@@ -2770,22 +2781,8 @@
             <arg value="-p1" />
         </exec>
         <echo />
-        <echo message="Checking debian/patches/0002-jetty-compatibility.patch" />
-        <exec executable="patch" failonerror="true" input="debian/patches/0002-jetty-compatibility.patch" >
-            <arg value="--dry-run" />
-            <arg value="-F0" />
-            <arg value="-p1" />
-        </exec>
-        <echo />
         <echo message="Checking debian/patches/0003-json-simple-3.patch" />
         <exec executable="patch" failonerror="true" input="debian/patches/0003-json-simple-3.patch" >
-            <arg value="--dry-run" />
-            <arg value="-F0" />
-            <arg value="-p1" />
-        </exec>
-        <echo />
-        <echo message="Checking debian-alt/xenial/patches/0002-jetty-old-api.patch" />
-        <exec executable="patch" failonerror="true" input="debian-alt/xenial/patches/0002-jetty-old-api.patch" >
             <arg value="--dry-run" />
             <arg value="-F0" />
             <arg value="-p1" />

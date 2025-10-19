@@ -31,6 +31,8 @@ import net.i2p.i2pcontrol.security.SecurityManager;
 import net.i2p.i2pcontrol.servlets.JSONRPC2Servlet;
 import net.i2p.i2pcontrol.servlets.configuration.ConfigurationManager;
 
+import org.eclipse.jetty.ee8.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee8.servlet.ServletHolder;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -38,8 +40,6 @@ import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
-import org.eclipse.jetty.servlet.ServletHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 import java.io.File;
@@ -238,8 +238,8 @@ public class I2PControlController implements RouterApp {
         Connector ssl = buildDefaultListener(server);
         server.addConnector(ssl);
 
-        ServletHandler sh = new ServletHandler();
-        sh.addServletWithMapping(new ServletHolder(new JSONRPC2Servlet(_context, _secMan)), "/");
+        ServletContextHandler sch = new ServletContextHandler();
+        sch.addServlet(new ServletHolder(new JSONRPC2Servlet(_context, _secMan)), "/");
         HostCheckHandler hch = new HostCheckHandler(_appContext);
         Set<String> listenHosts = new HashSet<String>(8);
         // fix up the allowed hosts set (see HostCheckHandler)
@@ -261,8 +261,8 @@ public class I2PControlController implements RouterApp {
             }
         }
         hch.setListenHosts(listenHosts);
-        hch.setHandler(sh);
-        server.getServer().setHandler(hch);
+        hch.setHandler(sch);
+        server.setHandler(hch);
 
         _conf.writeConfFile();
         return server;
@@ -282,7 +282,8 @@ public class I2PControlController implements RouterApp {
         }
 
         // the keystore path and password
-        SslContextFactory sslFactory = new SslContextFactory(_ksp.getKeyStoreLocation());
+        SslContextFactory.Server sslFactory = new SslContextFactory.Server();
+        sslFactory.setKeyStorePath(_ksp.getKeyStoreLocation());
         sslFactory.setKeyStorePassword(KeyStoreProvider.DEFAULT_KEYSTORE_PASSWORD);
         // the X.509 cert password (if not present, verifyKeyStore() returned false)
         sslFactory.setKeyManagerPassword(KeyStoreProvider.DEFAULT_CERTIFICATE_PASSWORD);

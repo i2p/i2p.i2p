@@ -78,7 +78,6 @@
         <java classname="net.i2p.servlet.util.JspC" fork="true" classpathref="cp" failonerror="true">
             <!-- these are to detect tomcat version and reproducible build setting -->
             <jvmarg value="-Dbuild.reproducible=${build.reproducible}" />
-            <jvmarg value="-Dwith-libtomcat8-java=${with-libtomcat8-java}" />
             <jvmarg value="-Dwith-libtomcat9-java=${with-libtomcat9-java}" />
             <jvmarg value="-Djasper.jar=${lib}/jasper-runtime.jar" />
             <arg value="-d" />

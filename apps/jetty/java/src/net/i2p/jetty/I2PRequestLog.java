@@ -17,23 +17,19 @@ package net.i2p.jetty;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-//import java.io.Writer; // As of Jetty 9.4.15, RequestLog interface has a Writer subinterface
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.servlet.http.Cookie;
 
-import org.eclipse.jetty.http.PathMap;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.util.DateCache;
 import org.eclipse.jetty.util.RolloverFileOutputStream;
 import org.eclipse.jetty.util.StringUtil;
-import org.eclipse.jetty.util.Utf8StringBuilder;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
-import org.eclipse.jetty.util.log.Log;
 
 /** 
  * This {@link RequestLog} implementation outputs logs in the pseudo-standard NCSA common log format.
@@ -80,10 +76,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
     private transient OutputStream _out;
     private transient OutputStream _fileOut;
     private transient DateCache _logDateCache;
-    private transient PathMap<String> _ignorePathMap;
     private transient java.io.Writer _writer;
-    private transient ArrayList<Utf8StringBuilder> _buffers;
-    private transient char[] _copy;
 
     
     public I2PRequestLog()
@@ -259,68 +252,56 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
         
         try 
         {
-            if (_ignorePathMap != null && _ignorePathMap.getMatch(request.getRequestURI()) != null)
-                return;
-            
             if (_fileOut == null)
                 return;
 
-            Utf8StringBuilder u8buf;
-            StringBuilder buf;
-            synchronized(_writer)
-            {
-                int size=_buffers.size();
-                u8buf = size==0?new Utf8StringBuilder(160):_buffers.remove(size-1);
-                buf = u8buf.getStringBuilder();
-            }
-            
-            synchronized(buf) // for efficiency until we can use StringBuilder
-            {
+            StringBuilder buf = new StringBuilder(160);
+
                 if (_logServer)
                 {
-                    buf.append(request.getServerName());
+                    buf.append(Request.getServerName(request));
                     buf.append(' ');
                 }
 
                 String addr = null;
                 if (_preferProxiedForAddress) 
                 {
-                    addr = request.getHeader("X-Forwarded-For");
+                    addr = request.getHeaders().get("X-Forwarded-For");
                 }
 
                 if (addr == null) {
                     if (_b64) {
-                        addr = request.getHeader("X-I2P-DestHash");
+                        addr = request.getHeaders().get("X-I2P-DestHash");
                         if (addr != null)
                             addr += ".i2p";
                     } else {
                         // 52chars.b32.i2p
-                        addr = request.getHeader("X-I2P-DestB32");
+                        addr = request.getHeaders().get("X-I2P-DestB32");
                     }
                     if (addr == null)
-                        addr = request.getRemoteAddr();
+                        addr = Request.getRemoteAddr(request);
                 }
 
                 buf.append(addr);
                 buf.append(" - ");
-                String user = request.getRemoteUser();
+                String user = request.getHttpURI().getUser();
                 buf.append((user == null)? " - " : user);
                 buf.append(" [");
                 if (_logDateCache!=null)
-                    buf.append(_logDateCache.format(request.getTimeStamp()));
+                    buf.append(_logDateCache.format(Request.getTimeStamp(request)));
                 else
                     //buf.append(request.getTimeStampBuffer().toString());
                     // TODO SimpleDateFormat or something
-                    buf.append(request.getTimeStamp());
+                    buf.append(Request.getTimeStamp(request));
                     
                 buf.append("] \"");
                 buf.append(request.getMethod());
                 buf.append(' ');
                 
-                u8buf.append(request.getRequestURI());
+                buf.append(request.getHttpURI().getPathQuery());
                 
                 buf.append(' ');
-                buf.append(request.getProtocol());
+                buf.append(request.getConnectionMetaData().getProtocol());
                 buf.append("\" ");
                 int status = response.getStatus();
                 if (status<=0)
@@ -330,18 +311,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
                 buf.append((char)('0'+(status%10)));
 
 
-                long responseLength=response.getContentCount();
-                // The above is what Jetty used before 9, but now
-                // it often (for large content?) returns 0 for non-cgi responses.
-                // Now, Jetty uses getLongContentLength(), but according to
-                // these threads it returns 0 for streaming (cgi) responses.
-                // So we take whichever one is nonzero, if the result was 200.
-                // See:
-                // https://dev.eclipse.org/mhonarc/lists/jetty-dev/msg02261.html
-                // and followups including this workaround:
-                // https://dev.eclipse.org/mhonarc/lists/jetty-dev/msg02267.html
-                if (responseLength == 0 && status == 200 && !"HEAD".equals(request.getMethod()))
-                    responseLength = response.getLongContentLength();
+                long responseLength = Response.getContentBytesWritten(response);
                 if (responseLength >=0)
                 {
                     buf.append(' ');
@@ -364,64 +334,30 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
                 else 
                     buf.append(" - ");
 
-            }
 
             if (!_extended && !_logCookies && !_logLatency)
             {
                 synchronized(_writer)
                 {
                     buf.append(System.getProperty("line.separator", "\n"));
-                    int l=buf.length();
-                    if (l>_copy.length)
-                        l=_copy.length;  
-                    buf.getChars(0,l,_copy,0); 
-                    _writer.write(_copy,0,l);
+                    _writer.write(buf.toString());
                     _writer.flush();
-                    u8buf.reset();
-                    _buffers.add(u8buf); 
                 }
             }
             else
             {
                 synchronized(_writer)
                 {
-                    int l=buf.length();
-                    if (l>_copy.length)
-                        l=_copy.length;  
-                    buf.getChars(0,l,_copy,0); 
-                    _writer.write(_copy,0,l);
-                    u8buf.reset();
-                    _buffers.add(u8buf); 
+                    _writer.write(buf.toString());
 
                     // TODO do outside synchronized scope
                     if (_extended)
                         logExtended(request, response, _writer);
 
-                    // TODO do outside synchronized scope
-                    if (_logCookies)
-                    {
-                        Cookie[] cookies = request.getCookies(); 
-                        if (cookies == null || cookies.length == 0)
-                            _writer.write(" -");
-                        else
-                        {
-                            _writer.write(" \"");
-                            for (int i = 0; i < cookies.length; i++) 
-                            {
-                                if (i != 0)
-                                    _writer.write(';');
-                                _writer.write(cookies[i].getName());
-                                _writer.write('=');
-                                _writer.write(cookies[i].getValue());
-                            }
-                            _writer.write('\"');
-                        }
-                    }
-
                     if (_logLatency)
                     {
                         _writer.write(' ');
-                        _writer.write(Long.toString(System.currentTimeMillis() - request.getTimeStamp()));
+                        _writer.write(Long.toString(System.currentTimeMillis() - Request.getTimeStamp(request)));
                     }
 
                     _writer.write(System.getProperty("line.separator", "\n"));
@@ -431,7 +367,8 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
         } 
         catch (IOException e) 
         {
-            Log.getLogger((String)null).warn(e);
+            System.out.println(e.toString());
+            e.printStackTrace();
         }
         
     }
@@ -441,7 +378,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
                                Response response, 
                                java.io.Writer writer) throws IOException 
     {
-        String referer = request.getHeader("Referer");
+        String referer = request.getHeaders().get("Referer");
         if (referer == null) 
             writer.write("\"-\" ");
         else 
@@ -451,7 +388,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
             writer.write("\" ");
         }
         
-        String agent = request.getHeader("User-Agent");
+        String agent = request.getHeaders().get("User-Agent");
         if (agent == null)
             writer.write("\"-\" ");
         else
@@ -474,25 +411,13 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
         {
             _fileOut = new RolloverFileOutputStream(_filename,_append,_retainDays,TimeZone.getTimeZone(_logTimeZone),_filenameDateFormat,null);
             _closeOut = true;
-            Log.getLogger((String)null).info("Opened "+getDatedFilename());
         }
         else 
             _fileOut = System.err;
         
         _out = _fileOut;
         
-        if (_ignorePaths != null && _ignorePaths.length > 0)
-        {
-            _ignorePathMap = new PathMap<String>();
-            for (int i = 0; i < _ignorePaths.length; i++) 
-                _ignorePathMap.put(_ignorePaths[i], _ignorePaths[i]);
-        }
-        else 
-            _ignorePathMap = null;
-        
         _writer = new OutputStreamWriter(_out, "UTF-8");
-        _buffers = new ArrayList<Utf8StringBuilder>();
-        _copy = new char[1024];
         super.doStart();
     }
 
@@ -500,17 +425,15 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
     protected void doStop() throws Exception
     {
         super.doStop();
-        try {if (_writer != null) _writer.flush();} catch (IOException e) {Log.getLogger((String)null).ignore(e);}
+        try {if (_writer != null) _writer.flush();} catch (IOException e) {}
         if (_out != null && _closeOut) 
-            try {_out.close();} catch (IOException e) {Log.getLogger((String)null).ignore(e);}
+            try {_out.close();} catch (IOException e) {}
             
         _out = null;
         _fileOut = null;
         _closeOut = false;
         _logDateCache = null;
         _writer = null;
-        _buffers = null;
-        _copy = null;
     }
 
     /* ------------------------------------------------------------ */

@@ -246,7 +246,8 @@ public class WorkingDir {
         success &= migrateJettyXml(oldEep, newEep, "jetty.xml", "./eepsite/", newPath);
         success &= migrateJettyXml(oldEep, newEep, "jetty-ssl.xml", "./eepsite/", newPath);
         success &= migrateJettyXml(oldEep, newEep, "contexts/base-context.xml", "./eepsite/", newPath);
-        success &= migrateJettyXml(oldEep, newEep, "contexts/cgi-context.xml", "./eepsite/", newPath);
+        // FCGI requires additional libs
+        //success &= migrateJettyXml(oldEep, newEep, "contexts/cgi-context.xml", "./eepsite/", newPath);
         success &= migrateClientsConfig(oldDirf, dirf);
         // for later news.xml updates (we don't copy initialNews.xml over anymore)
         success &= (new SecureDirectory(dirf, "docs")).mkdir();
