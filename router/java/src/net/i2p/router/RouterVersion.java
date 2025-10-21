@@ -20,13 +20,7 @@ public class RouterVersion {
     public final static String VERSION = CoreVersion.VERSION;
     /** for example: "beta", "alpha", "rc" */
     public final static String QUALIFIER = "";
-<<<<<<< HEAD
     public final static long BUILD = 2;
-||||||| c553f7806
-    public final static long BUILD = 0;
-=======
-    public final static long BUILD = 1;
->>>>>>> 32e80a18900fbeb60626e6e6d1a42191137ee897
     /** for example "-test" */
     public final static String EXTRA = "";
     public final static String FULL_VERSION = VERSION + "-" + BUILD + QUALIFIER + EXTRA;
