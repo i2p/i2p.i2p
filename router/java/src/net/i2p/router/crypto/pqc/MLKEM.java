@@ -28,11 +28,11 @@ import net.i2p.util.RandomSource;
 /**
  * Wrapper around bouncycastle
  *
- * @since 0.9.69
+ * @since 0.9.67
  */
 public final class MLKEM {
 
-    /** all non-threaded for now */
+    /** 512 and 1024 are non-threaded for now. 768 thread is started by ECIESAEADEngine. */
     public static final KeyFactory MLKEM512KeyFactory = new MLKEMFactory(EncType.MLKEM512_X25519_INT);
     public static final KeyFactory MLKEM768KeyFactory = new MLKEMFactory(EncType.MLKEM768_X25519_INT);
     public static final KeyFactory MLKEM1024KeyFactory = new MLKEMFactory(EncType.MLKEM1024_X25519_INT);
