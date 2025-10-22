@@ -35,6 +35,7 @@ import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.crypto.pqc.MLKEM;
+import net.i2p.router.crypto.pqc.MLKEMKeyFactory;
 import static net.i2p.router.crypto.ratchet.RatchetPayload.*;
 import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.Router;
@@ -58,6 +59,8 @@ public final class ECIESAEADEngine {
     private final MuxedPQEngine _muxedPQEngine;
     private final HKDF _hkdf;
     private final Elg2KeyFactory _edhThread;
+    // For now, started on demand, see getHybridKeyFactory()
+    private MLKEMKeyFactory _mlkem768Thread;
     private boolean _isRunning;
 
     private static final byte[] ZEROLEN = new byte[0];
@@ -154,6 +157,10 @@ public final class ECIESAEADEngine {
     public synchronized void shutdown() {
         _isRunning = false;
         _edhThread.shutdown();
+        synchronized(this) {
+            if (_mlkem768Thread != null)
+                _mlkem768Thread.shutdown();
+        }
     }
 
     //// start decrypt ////
@@ -419,12 +426,23 @@ public final class ECIESAEADEngine {
     /**
      * @since 0.9.67
      */
-    private static KeyFactory getHybridKeyFactory(EncType type) {
+    private KeyFactory getHybridKeyFactory(EncType type) {
         switch(type) {
           case MLKEM512_X25519:
               return MLKEM.MLKEM512KeyFactory;
+
           case MLKEM768_X25519:
-              return MLKEM.MLKEM768KeyFactory;
+              // non-threaded
+              //return MLKEM.MLKEM768KeyFactory;
+              // threaded, start on demand for now
+              synchronized(this) {
+                  if (_mlkem768Thread == null) {
+                      _mlkem768Thread = new MLKEMKeyFactory(_context, EncType.MLKEM768_X25519_INT);
+                      _mlkem768Thread.start();
+                  }
+                  return _mlkem768Thread;
+              }
+
           case MLKEM1024_X25519:
               return MLKEM.MLKEM1024KeyFactory;
           default:
