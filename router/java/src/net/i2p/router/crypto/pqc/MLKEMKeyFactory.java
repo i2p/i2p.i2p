@@ -19,6 +19,8 @@ import net.i2p.util.SystemVersion;
  *  the pairs are generated other threads,
  *  and it can fall behind.
  *
+ *  Started by ECIESAEADEngine. One type per-thread. Only used for 768, for now.
+ *
  *  @since 0.9.68 adapted from X25519KeyFactory
  */
 public class MLKEMKeyFactory extends I2PThread implements KeyFactory {
