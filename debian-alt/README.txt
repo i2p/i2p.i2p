@@ -1,20 +1,10 @@
-The files in ../debian/ are for the current stable distribution (buster).
-They should also work with bullseye, experimental, sid, testing.
+The files in ../debian/ are for the current stable distribution.
 
 Alternates are in the subdirectories here.
 To use them, copy them over the files in ../debian/  .
 
 Built file compatibility:
-trusty may be copied to vivid.
-trusty may be used for jessie with libjetty9-java from backports.
-xenial may be copied to yakkety, zesty
-bionic may be copied to cosmic
-disco may be copied to eoan, focal and groovy
-
-Not maintained:
-wheezy files are not maintained. Use the precise files instead.
-jessie files are not be maintained. Use the trusty files instead.
-stretch files may not be maintained. Use the trusty files instead.
+See doc/launchpad.txt
 
 Note on systemd:
 

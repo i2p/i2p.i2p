@@ -40,6 +40,18 @@
     <property name="javac.release" value="8" />
     <property name="manifest.classpath.name" value="Class-Path" />
 
+    <!-- fixups if we're using libbcprov.jar for bouncycastle -->
+    <condition property="source.exclude1" value="org/bouncycastle/**" else="NOTHING" >
+        <istrue value="${with-libbcprov-java}" />
+    </condition>
+    <condition property="javac.classpath.mod1" value="build/bcprov.jar:" else="" >
+        <istrue value="${with-libbcprov-java}" />
+    </condition>
+    <property name="javac.classpath.mod" value="${javac.classpath.mod1}${javac.classpath}" />
+    <condition property="bcprov.jar" value="/usr/share/java/bcprov.jar" else="" >
+        <istrue value="${with-libbcprov-java}" />
+    </condition>
+
     <target name="compile" depends="depend, dependVersion">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
@@ -50,6 +62,8 @@
                encoding="UTF-8"
                destdir="./build/obj" classpath="../../core/java/build/obj:../../core/java/build/i2p.jar:../../core/java/build/gnu-getopt.jar:../../core/java/build/httpclient.jar:../../core/java/build/httpcore.jar" >
             <compilerarg line="${javac.compilerargs}" />
+            <include name="**/*.java" />
+            <exclude name="${source.exclude1}" />
         </javac>
     </target>
 
@@ -85,7 +99,7 @@
         <jar destfile="./build/router.jar" basedir="./build/obj" >
             <manifest>
                 <!-- so people with very old wrapper.config files will still work with Jetty 6 -->
-                <attribute name="${manifest.classpath.name}" value="i2p.jar addressbook.jar jetty-i2p.jar jetty-rewrite-handler.jar jetty-start.jar jetty-util.jar" />
+                <attribute name="${manifest.classpath.name}" value="i2p.jar ${bcprov.jar} addressbook.jar jetty-i2p.jar jetty-rewrite-handler.jar jetty-start.jar jetty-util.jar" />
                 <attribute name="Specification-Title" value="I2P Router" />
                 <attribute name="Specification-Version" value="${api.version}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
@@ -262,7 +276,7 @@
         <mkdir dir="./build/obj_scala" />
         <scalac srcdir="./test/scalatest" destdir="./build/obj_scala" deprecation="on" >
             <classpath>
-                <pathelement path="${javac.classpath}" />
+                <pathelement path="${javac.classpath.mod}" />
                 <pathelement location="${scala-library.jar}" />
                 <pathelement location="${scalactic.jar}" />
                 <pathelement location="${scalatest.jar}" />
@@ -285,7 +299,7 @@
             encoding="UTF-8"
             destdir="./build/obj">
             <classpath>
-                <pathelement path="${javac.classpath}" />
+                <pathelement path="${javac.classpath.mod}" />
                 <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />
@@ -314,7 +328,7 @@
         </copy>
         <jar destfile="./build/routerscalatest.jar" basedir="./build/obj_scala_jar" includes="**/*.class">
             <manifest>
-                <attribute name="${manifest.classpath.name}" value="i2p.jar" />
+                <attribute name="${manifest.classpath.name}" value="i2p.jar ${bcprov.jar}" />
                 <attribute name="Specification-Title" value="I2P Router" />
                 <attribute name="Specification-Version" value="${api.version}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
@@ -338,7 +352,7 @@
         </copy>
         <jar destfile="./build/routertest.jar" basedir="./build/obj">
             <manifest>
-                <attribute name="${manifest.classpath.name}" value="i2ptest.jar" />
+                <attribute name="${manifest.classpath.name}" value="i2ptest.jar ${bcprov.jar}" />
                 <attribute name="Specification-Title" value="I2P Router" />
                 <attribute name="Specification-Version" value="${api.version}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
@@ -426,7 +440,7 @@
         <junit printsummary="withOutAndErr" fork="yes" showoutput="yes" >
             <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
             <classpath>
-                <pathelement path="${javac.classpath}" />
+                <pathelement path="${javac.classpath.mod}" />
                 <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />

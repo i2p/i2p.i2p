@@ -50,10 +50,10 @@ Current Runtime Dependencies
   In non-Debian builds we bundle the 2.x API portion of the 2.3.0 source code; it's removed in the Debian source package.
   Compatible with 2.x only; not compatible with 3.x.
 
-* libjetty9-java
-  For /usr/share/java/jetty9-*.jar.
+* libjetty12-java
+  For /usr/share/java/jetty12-*.jar.
   In non-Debian builds we bundle the jars; it's removed in the Debian source package.
-  This is for Jetty 9.3.x, which is the same as 9.4.x except it's Java 8 compatible.
+  This is for Jetty 12.0.x.
 
 * libtomcat9-java
   For /usr/share/java/tomcat9-*.jar.
@@ -65,21 +65,6 @@ Current Runtime Dependencies
 
 * libtaglibs-standard-*-java (stretch and later, artful and later only)
   Provides JSTL 1.2, solves the glassfish-javaee problem described below.
-
-* glassfish-javaee (wheezy, jessie, xenial and earlier only)
-  We need jstl.jar and standard.jar version 1.2.
-  This is an ancient and terrible package, but it's the only place we've found version 1.2 jars.
-  standard.jar classes are inside /usr/share/java/glassfish-appserv-jstl.jar
-  jstl.jar classes are inside /usr/share/java/glassfish-javaee.jar but we can't use it
-  because there are too many conflicting, old, unrelated classes in there, so we currently
-  bundle jstl.jar even in Debian builds.
-  We've found some other packages that contain version 1.1 jars:
-  libjakarta-taglibs-standard-java (containing standard.jar only)
-  and libjstl1.1-java (containing jstl.jar only).
-  Jetty 9 does contain JSTL 1.2 ??? but not in packages???
-  It's not clear why there isn't a libjstl1.2-java package.
-  It also isn't clear why we upgraded to 1.2 years ago, but the rest of the world didn't.
-  And it isn't clear why 1.1 won't work for us.
 
 * service-wrapper
   In non-Debian builds we bundle the jars; it's removed in the Debian source package.

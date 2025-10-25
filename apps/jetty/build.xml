@@ -140,7 +140,7 @@
            with-libtomcat9-java AND with-libjetty12-java: Trixie
            with-libjetty12-java (only): not supported
      -->
-    <target name="copyJettylib" depends="mkJettylibdir, copyJettylib1A, copyJettylib1B, copyTomcatLib1, copyJettylib2, copyJettylib3, copyTomcatLib" />
+    <target name="copyJettylib" depends="mkJettylibdir, copyJettylib1A, copyJettylib1B, copyJettylib1C, copyTomcatLib1, copyJettylib2, copyJettylib3, copyTomcatLib" />
 
     <!-- Jetty files only, files that ARE in the libjetty12-java Debian package -->
     <target name="copyJettylib1A" depends="extractJettylib, buildPatches" unless="${with-libjetty12-java}" >
@@ -169,13 +169,6 @@
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-rewrite-${jetty.ver}.jar" tofile="jettylib/jetty-rewrite-handler.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-security-${jetty.ver}.jar" tofile="jettylib/jetty-security.jar" />
 
-
-        <jar destfile="jettylib/jetty-util.jar"  manifest="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" filesetmanifest="mergewithoutmain" >
-            <zipfileset src="${jetty.base}/lib/jetty-ee-${jetty.ver}.jar" />
-            <zipfileset src="${jetty.base}/lib/jetty-session-${jetty.ver}.jar" />
-            <zipfileset src="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" />
-            <zipfileset src="${jetty.base}/lib/logging/slf4j-api-2.0.17.jar" />
-        </jar>
 
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-xml-${jetty.ver}.jar" tofile="jettylib/jetty-xml.jar" />
         <jar destfile="jettylib/jetty-java5-threadpool.jar" >
@@ -210,6 +203,30 @@
         </jar>
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-ee8-servlet-${jetty.ver}.jar" tofile="jettylib/jetty-servlet.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-ee8-servlets-${jetty.ver}.jar" tofile="jettylib/jetty-servlets.jar" />
+    </target>
+
+    <!-- jetty-util.jar, optionally including slf4j2 -->
+    <!--
+        with-jetty12   with-slf4j2
+              no           no       both in jetty-util.jar
+              no          yes       no slf4j2 in jetty-util.jar
+             yes           no       unsupported
+             yes          yes       no-op
+     -->
+    <target name="copyJettylib1C" depends="extractJettylib, buildPatches, copyJettylib1C1, copyJettylib1C2" />
+
+    <target name="copyJettylib1C1" unless="${with-libjetty12-java}" >
+        <jar destfile="jettylib/jetty-util.jar"  manifest="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" filesetmanifest="mergewithoutmain" >
+            <zipfileset src="${jetty.base}/lib/jetty-ee-${jetty.ver}.jar" />
+            <zipfileset src="${jetty.base}/lib/jetty-session-${jetty.ver}.jar" />
+            <zipfileset src="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" />
+        </jar>
+    </target>
+
+    <target name="copyJettylib1C2" unless="${with-libslf4j2-java}" >
+        <jar destfile="jettylib/jetty-util.jar" update="true" filesetmanifest="mergewithoutmain" >
+            <zipfileset src="${jetty.base}/lib/logging/slf4j-api-2.0.17.jar" />
+        </jar>
     </target>
 
     <!--
@@ -423,8 +440,9 @@
                 <pathelement location="./jettylib/jetty-webapp.jar" />
                 <pathelement location="./jettylib/jetty-xml.jar" />
                 <pathelement location="./jettylib/org.mortbay.jetty.jar" />
-                <!-- following jar only present for debian builds -->
+                <!-- following jars only present for debian builds -->
                 <pathelement location="./jettylib/tomcat-api.jar" />
+                <pathelement location="./jettylib/slf4j2-api.jar" />
             </classpath>
             <compilerarg line="${javac.compilerargs}" />
         </javac>
@@ -640,6 +658,7 @@
                 <pathelement location="../../core/java/build/gnu-getopt.jar" />
                 <pathelement location="../../core/java/build/json-simple.jar" />
                 <pathelement location="./jettylib/tomcat-api.jar" />
+                <pathelement location="./jettylib/slf4j-api.jar" />
             </classpath>
             <!-- These variables are stored in build.properties.
                   End-users can override by creating the file override.properties -->

@@ -24,6 +24,8 @@
 build:
 	@echo 'The build target is disabled. Use the appropriate binary target.'
 
+DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+
 JAVA_HOME=/usr/lib/jvm/default-java
 
 I2P=$(CURDIR)/pkg-temp
@@ -37,18 +39,6 @@ export DEBIANVERSION := $(shell dpkg-parsechangelog |awk -F' ' '/^Version:/{prin
 # required for jbigi/jcpuid build
 export BITS := $(shell dpkg-architecture -qDEB_HOST_ARCH_BITS)
 #export DEB_HOST_ARCH_CPU := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
-
-# debian: bullseye - transitioning
-JSON_SIMPLE_VERSION = $(shell dpkg -l libjson-simple-java | grep '^ii' | awk '{print $$3}')
-JSON_SIMPLE_3 = $(shell dpkg --compare-versions '$(JSON_SIMPLE_VERSION)' 'gt' '3.1.1-1~' && echo yes || echo no)
-ifeq (yes,$(JSON_SIMPLE_3))
-JSON_SIMPLE_PACKAGE = com.github.cliftonlabs.json_simple
-JSON_EXCEPTION = JsonException
-else
-JSON_SIMPLE_PACKAGE = org.json.simple
-JSON_EXCEPTION = DeserializationException
-endif
-
 
 %:
 	dh $@ --with systemd,bash-completion
@@ -68,8 +58,6 @@ override_dh_auto_clean:
 	rm -f $(CURDIR)/apps/susidns/src/lib/jstl.jar
 	rm -f $(CURDIR)/apps/susidns/src/lib/jstlel.jar
 	debconf-updatepo
-	find . -type f -name \*.java.json-simple \
-	  -exec sh -c 'file={} && mv $$file $${file%.json-simple}' \; -print
 
 override_dh_auto_build:
 
@@ -93,32 +81,14 @@ else
 	@echo "Already found deb in version, not doing anything"
 endif
 	@# build options
-	@/bin/echo -e "javac.release=17" > $(CURDIR)/override.properties
-	@/bin/echo -e "build.built-by=debian" >> $(CURDIR)/override.properties
+	@/bin/echo -e "javac.release=11" > $(CURDIR)/override.properties
+	@/bin/echo -e "build.built-by=launchpad" >> $(CURDIR)/override.properties
 	@/bin/echo -e "build.reproducible=true" >> $(CURDIR)/override.properties
 
 	@# debian and ubuntu: everywhere
 	@/bin/echo -e "with-geoip-database=true" >> $(CURDIR)/override.properties
 
-	@/bin/echo -e "with-libjetty12-java=true" >> $(CURDIR)/override.properties
-	mkdir -p $(CURDIR)/apps/jetty/jettylib
-	ln -sf /usr/share/java/jetty12-deploy.jar $(CURDIR)/apps/jetty/jettylib/jetty-deploy.jar
-	ln -sf /usr/share/java/jetty12-ee.jar $(CURDIR)/apps/jetty/jettylib/jetty-ee.jar
-	ln -sf /usr/share/java/jetty12-http.jar $(CURDIR)/apps/jetty/jettylib/jetty-http.jar
-	ln -sf /usr/share/java/jetty12-io.jar $(CURDIR)/apps/jetty/jettylib/jetty-io.jar
-	ln -sf /usr/share/java/jetty12-rewrite.jar $(CURDIR)/apps/jetty/jettylib/jetty-rewrite-handler.jar
-	ln -sf /usr/share/java/jetty12-security.jar $(CURDIR)/apps/jetty/jettylib/jetty-security.jar
-	@# debian package does NOT contain the ee8 jars
-	@#ln -sf /usr/share/java/jetty12-servlet.jar $(CURDIR)/apps/jetty/jettylib/jetty-ee8-servlet.jar
-	@#ln -sf /usr/share/java/jetty12-servlets.jar $(CURDIR)/apps/jetty/jettylib/jetty-ee8-servlets.jar
-	ln -sf /usr/share/java/jetty12-session.jar $(CURDIR)/apps/jetty/jettylib/jetty-session.jar
-	ln -sf /usr/share/java/jetty12-start.jar $(CURDIR)/apps/jetty/jettylib/jetty-start.jar
-	ln -sf /usr/share/java/jetty12-util.jar $(CURDIR)/apps/jetty/jettylib/jetty-util.jar
-	@# debian package does NOT contain the ee8 jars
-	@#ln -sf /usr/share/java/jetty12-webapp.jar $(CURDIR)/apps/jetty/jettylib/jetty-ee8-webapp.jar
-	ln -sf /usr/share/java/jetty12-xml.jar $(CURDIR)/apps/jetty/jettylib/jetty-xml.jar
-	ln -sf /usr/share/java/jetty12-server.jar $(CURDIR)/apps/jetty/jettylib/org.mortbay.jetty.jar
-	ln -sf /usr/share/java/jetty12-jmx.jar $(CURDIR)/apps/jetty/jettylib/org.mortbay.jmx.jar
+	@# No Jetty 12 in Ubuntu
 
 	@# following two are formerly from libservlet3.1-java, now in their own packages
 	ln -sf /usr/share/java/servlet-api.jar $(CURDIR)/apps/jetty/jettylib/javax.servlet.jar
@@ -168,13 +138,6 @@ endif
 	@/bin/echo -e "with-libbcprov-java=true" >> $(CURDIR)/override.properties
 	@mkdir -p $(CURDIR)/router/java/build
 	ln -sf /usr/share/java/bcprov.jar $(CURDIR)/router/java/build/bcprov.jar
-
-	@# debian: bullseye - transitioning
-	find . -type f -name \*.java -exec grep -q 'import @JSON_SIMPLE@' {} \; \
-	  -exec sed -i.json-simple \
-		    -e 's,@JSON_SIMPLE@,$(JSON_SIMPLE_PACKAGE),' \
-		    -e 's/@JSON_EXCEPTION@/$(JSON_EXCEPTION)/' \
-		    {} \; -print
 
 	@# debian: everywhere; ubuntu: trusty+
 	@/bin/echo -e "with-famfamfam-flag-png=true" >> $(CURDIR)/override.properties

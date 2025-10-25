@@ -12,29 +12,29 @@ usr/share/common-licenses/BSD usr/share/doc/i2p-router/licenses/LICENSE-BSD.txt
 # comment out if not building with libjetty12-java
 # ubuntu: NO
 # debian: in trixie sid
-usr/share/java/jetty12-apache-jsp.jar usr/share/i2p/lib/jetty-apache-jsp.jar
-usr/share/java/jetty12-deploy.jar usr/share/i2p/lib/jetty-deploy.jar
-usr/share/java/jetty12-ee.jar usr/share/i2p/lib/jetty-ee.jar
-usr/share/java/jetty12-http.jar usr/share/i2p/lib/jetty-http.jar
-usr/share/java/jetty12-io.jar usr/share/i2p/lib/jetty-io.jar
+#usr/share/java/jetty12-apache-jsp.jar usr/share/i2p/lib/jetty-apache-jsp.jar
+#usr/share/java/jetty12-deploy.jar usr/share/i2p/lib/jetty-deploy.jar
+#usr/share/java/jetty12-ee.jar usr/share/i2p/lib/jetty-ee.jar
+#usr/share/java/jetty12-http.jar usr/share/i2p/lib/jetty-http.jar
+#usr/share/java/jetty12-io.jar usr/share/i2p/lib/jetty-io.jar
 # legacy name in lib/
-usr/share/java/jetty12-rewrite.jar usr/share/i2p/lib/jetty-rewrite-handler.jar
-usr/share/java/jetty12-security.jar usr/share/i2p/lib/jetty-security.jar
+#usr/share/java/jetty12-rewrite.jar usr/share/i2p/lib/jetty-rewrite-handler.jar
+#usr/share/java/jetty12-security.jar usr/share/i2p/lib/jetty-security.jar
 # debian package does NOT contain the ee8 jars
 #usr/share/java/jetty12-ee8-servlet.jar usr/share/i2p/lib/jetty-servlet.jar
 #usr/share/java/jetty12-ee8-servlets.jar usr/share/i2p/lib/jetty-servlets.jar
-usr/share/java/jetty12-session.jar usr/share/i2p/lib/jetty-session.jar
-usr/share/java/jetty12-start.jar usr/share/i2p/lib/jetty-start.jar
-usr/share/java/jetty12-util.jar usr/share/i2p/lib/jetty-util.jar
+#usr/share/java/jetty12-session.jar usr/share/i2p/lib/jetty-session.jar
+#usr/share/java/jetty12-start.jar usr/share/i2p/lib/jetty-start.jar
+#usr/share/java/jetty12-util.jar usr/share/i2p/lib/jetty-util.jar
 # debian package does NOT contain the ee8 jars
 #usr/share/java/jetty12-ee8-webapp.jar usr/share/i2p/lib/jetty-webapp.jar
-usr/share/java/jetty12-xml.jar usr/share/i2p/lib/jetty-xml.jar
+#usr/share/java/jetty12-xml.jar usr/share/i2p/lib/jetty-xml.jar
 # legacy name in lib/
-usr/share/java/jetty12-server.jar usr/share/i2p/lib/org.mortbay.jetty.jar
+#usr/share/java/jetty12-server.jar usr/share/i2p/lib/org.mortbay.jetty.jar
 # legacy name in lib/
-usr/share/java/jetty12-jmx.jar usr/share/i2p/lib/org.mortbay.jmx.jar
+#usr/share/java/jetty12-jmx.jar usr/share/i2p/lib/org.mortbay.jmx.jar
 # the libslf4j2-java package does NOT provide a non-versioned file except in the maven-repo dir
-usr/share/maven-repo/org/slf4j/slf4j-api/2.x/slf4j-api-2.x.jar usr/share/i2p/lib/slf4j2-api.jar
+#usr/share/maven-repo/org/slf4j/slf4j-api/2.x/slf4j-api-2.x.jar usr/share/i2p/lib/slf4j2-api.jar
 
 # legacy name in lib/
 usr/share/java/servlet-api.jar usr/share/i2p/lib/javax.servlet.jar
