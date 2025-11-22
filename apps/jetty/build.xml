@@ -224,7 +224,10 @@
     </target>
 
     <target name="copyJettylib1C2" unless="${with-libslf4j2-java}" >
+<!-- overwrites instead of updating for some reason
         <jar destfile="jettylib/jetty-util.jar" update="true" filesetmanifest="mergewithoutmain" >
+-->
+        <jar destfile="jettylib/jetty-util.jar" update="true" >
             <zipfileset src="${jetty.base}/lib/logging/slf4j-api-2.0.17.jar" />
         </jar>
     </target>
