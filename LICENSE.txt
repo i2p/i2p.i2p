@@ -325,6 +325,11 @@ Applications:
    SAM (sam.jar):
    Public domain.
 
+   SLF4J API 2.0.17:
+   (not included in most distribution packages)
+   Copyright (c) 2004-2022 QOS.ch Sarl (Switzerland)
+   See licenses/LICENSE-SLF4J.txt
+
    Streaming Lib (streaming.jar):
    Public domain.
 
@@ -360,9 +365,6 @@ Other Applications and Libraries
 The following applications and libraries are not used or bundled in
 binary packages, therefore the licenses are not included in binary
 distributions. See the source package for the additional license information.
-
-   Admin Manager:
-   Public domain
 
    Gradle wrapper 8.5:
    (not included in most distribution packages)
