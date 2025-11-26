@@ -116,6 +116,7 @@ public class Reseeder {
         //
         // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
         // ----------------------------------           ------------------------     -------------------------     ---------------
+        "https://i2p.diyarciftci.xyz/"        + ',' +   // diyarciftci_at_protonmail.com.crt  // CA
         //"https://cubicchaos.net:8443/"        + ',' +   // unixeno_at_cubicchaos.net.crt   // cubicchaos.net.crt
         "https://coconut.incognet.io/"        + ',' +   // rambler_at_mail.i2p.crt   // CA
         "https://reseed.stormycloud.org/"     + ',' +   // admin_at_stormycloud.org.crt // CA
