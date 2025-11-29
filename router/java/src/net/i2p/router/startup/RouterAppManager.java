@@ -32,6 +32,7 @@ public class RouterAppManager extends ClientAppManagerImpl {
     // this assumes clients do not override equals()
     private final ConcurrentHashMap<ClientApp, String[]> _clients;
     private final ConcurrentHashMap<String, Bubble> _bubbles;
+    private static final String PROP_BUBBLES = "routerconsole.enableBubbles";
 
     public RouterAppManager(RouterContext ctx) {
         super(ctx);
@@ -218,6 +219,8 @@ public class RouterAppManager extends ClientAppManagerImpl {
      */
     @Override
     public int getBubbleCount(String svc) {
+        if (!_context.getBooleanPropertyDefaultTrue(PROP_BUBBLES))
+            return 0;
         Bubble n = _bubbles.get(svc);
         if (n == null)
             return 0;
