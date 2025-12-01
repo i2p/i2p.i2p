@@ -431,9 +431,12 @@ public class ConfigClientsHandler extends FormHandler {
                         ClassLoader save = Thread.currentThread().getContextClassLoader();
                         if (save != null)
                             Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
-                        WebAppStarter.startWebApp(_context, s, app, path.getAbsolutePath());
-                        if (save != null)
-                            Thread.currentThread().setContextClassLoader(save);
+                        try {
+                            WebAppStarter.startWebApp(_context, s, app, path.getAbsolutePath());
+                        } finally {
+                            if (save != null)
+                                Thread.currentThread().setContextClassLoader(save);
+                        }
                         addFormNoticeNoEscape(_t("WebApp") + " <a href=\"/" + app + "/\">" + _t(app) + "</a> " + _t("started") + '.');
                     } catch (Throwable e) {
                         addFormError(_t("Failed to start") + ' ' + _t(app) + ": " + e);
