@@ -207,7 +207,7 @@ class TunnelParticipant {
         long newId = _context.random().nextLong(I2NPMessage.MAX_ID_VALUE);
         _context.messageHistory().wrap("TunnelDataMessage", oldId, "TunnelDataMessage", newId);
         msg.setUniqueId(newId);
-        msg.setMessageExpiration(_context.clock().now() + 10*1000);
+        msg.setMessageExpiration(_context.clock().now() + 20*1000);
         msg.setTunnelId(config.getSendTunnel());
         OutNetMessage m = new OutNetMessage(_context, msg, msg.getMessageExpiration(), PRIORITY, ri);
         if (_log.shouldLog(Log.DEBUG))
