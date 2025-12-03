@@ -879,6 +879,7 @@ public class TunnelController implements Logging {
         // is done in the I2PTunnelServer constructor.
         String type = getType();
         if (type != null) {
+            String et = _config.getProperty(OPT_ENCTYPE);
             if (type.equals(TYPE_HTTP_SERVER)) {
                 if (!_config.containsKey(OPT_LIMIT_ACTION))
                     _config.setProperty(OPT_LIMIT_ACTION, "http");
@@ -895,8 +896,8 @@ public class TunnelController implements Logging {
                 }
                 if (!_config.containsKey(OPT_BUNDLE_REPLY))
                     _config.setProperty(OPT_BUNDLE_REPLY, "false");
-                if (!_config.containsKey(OPT_ENCTYPE))
-                    _config.setProperty(OPT_ENCTYPE, "4");
+                if (et == null || et.equals("4,0") || et.equals("4") || et.equals("0"))
+                    _config.setProperty(OPT_ENCTYPE, "6,4");
             } else if (!isClient(type)) {
                 // override UI that sets it to false
                 _config.setProperty(OPT_BUNDLE_REPLY, "true");
@@ -907,8 +908,8 @@ public class TunnelController implements Logging {
                     _config.setProperty(OPT_TAGS_SEND, "20");
                 if (!_config.containsKey(OPT_LOW_TAGS))
                     _config.setProperty(OPT_LOW_TAGS, "14");
-                if (!_config.containsKey(OPT_ENCTYPE))
-                    _config.setProperty(OPT_ENCTYPE, "4");
+                if (et == null || et.equals("4,0") || et.equals("4") || et.equals("0"))
+                    _config.setProperty(OPT_ENCTYPE, "6,4");
             }
             // same default logic as in EditBean.getSigType() and GeneralHelper.getSigType()
             if (!isClient(type) ||
@@ -960,8 +961,8 @@ public class TunnelController implements Logging {
             if (isClient(type) &&
                 (type.equals(TYPE_HTTP_CLIENT) || Boolean.parseBoolean(_config.getProperty(PROP_SHARED)))) {
                 // migration: HTTP proxy and shared clients default to both
-                if (!_config.containsKey(OPT_ENCTYPE))
-                    _config.setProperty(OPT_ENCTYPE, "4,0");
+                if (et == null || et.equals("4,0") || et.equals("4") || et.equals("0"))
+                    _config.setProperty(OPT_ENCTYPE, "6,4");
             }
         }
 
