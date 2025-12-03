@@ -343,8 +343,9 @@ public class I2PSnarkUtil implements DisconnectListener {
                 opts.setProperty(I2PSocketOptions.PROP_PROFILE, Integer.toString(I2PSocketOptions.PROFILE_BULK));
             if (opts.getProperty(I2PClient.PROP_SIGTYPE) == null)
                 opts.setProperty(I2PClient.PROP_SIGTYPE, "EdDSA_SHA512_Ed25519");
-            if (opts.getProperty("i2cp.leaseSetEncType") == null)
-                opts.setProperty("i2cp.leaseSetEncType", "4");
+            String et = opts.getProperty("i2cp.leaseSetEncType");
+            if (et == null || et.equals("4,0") || et.equals("4") || et.equals("0"))
+                opts.setProperty("i2cp.leaseSetEncType", "6,4");
             // assume compressed content
             if (opts.getProperty(I2PClient.PROP_GZIP) == null)
                 opts.setProperty(I2PClient.PROP_GZIP, "false");
