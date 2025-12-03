@@ -690,7 +690,7 @@
                 <select id="encType" name="encType" class="selectbox" <%=ehdisabled%>>
                     <option title="<%=intl._t("Legacy option (deprecated), provided for backward compatibility")%>" value="0" <%=((has0 && !has4) ? " selected=\"selected\"" : edisabled)%> >
                     ElGamal-2048</option>
-                    <option title="<%=intl._t("This is the default, recommended option")%>" value="4" <%=((has4 && !has0) ? " selected=\"selected\"" : edisabled)%> >
+                    <option value="4" <%=((has4 && !has0) ? " selected=\"selected\"" : edisabled)%> >
                     ECIES-X25519</option>
                     <option value="4,0" <%=((has0 && has4) ? " selected=\"selected\"" : edisabled)%> >
                     ECIES-X25519 + ElGamal-2048</option>
@@ -708,7 +708,7 @@
 <%
                     }   // isAdvanced()
 %>
-                        <option title="<%=intl._t("beta")%>" value="6,4" <%=((has6 && has4) ? " selected=\"selected\"" : edisabled)%> >
+                        <option title="<%=intl._t("This is the default, recommended option")%>" value="6,4" <%=((has6 && has4) ? " selected=\"selected\"" : edisabled)%> >
                         MLKEM768-X25519 + ECIES-X25519</option>
 <%
                     if (editBean.isAdvanced()) {
