@@ -1,3 +1,29 @@
+2025-12-05 zzz
+ * Build: Javadoc fixes
+
+2025-12-03 zzz
+ * i2psnark, i2ptunnel: Migrate to encTypes 6,4
+
+2025-12-01 zzz
+ * Console: Fix classloader issue starting webapps from UI
+ * Tunnels: Increase per-hop TunnelDataMessage expiration
+
+2025-11-29 zzz
+ * Console: Add config to disable bubbles
+ * Wrappper: Increase max mem to 512 MB (new installs only)
+
+2025-11-24 zzz
+ * Build: Non-Deb Jetty build fix
+
+2025-10-25 zzz
+ * Debian: Preliminary updates for Jetty 12
+
+2025-10-22 idk
+ * Ratchet: Add ML-KEM keypair precalc thread
+
+2025-10-19 idk
+ * Jetty 12.0.28 and eepsite xml migration
+
 2025-10-11 idk
  * SAM: Add support for Datagram 2/3 (Proposal 163)
 
