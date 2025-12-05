@@ -37,11 +37,11 @@ import org.klomp.snark.TrackerClient;
  *<pre>
  *  client		tracker		type
  *  ------		-------		----
- *   conn req	--&gt			(repliable Datagram2)
- *          	&lt--	conn resp	(raw)
- *   announce  --&gt			(repliable Datagram3)
- *            	&lt-- 	ann resp	(raw)
- *          	&lt--	error		(raw)
+ *   conn req	--&gt;			(repliable Datagram2)
+ *          	&lt;--	conn resp	(raw)
+ *   announce  --&gt;			(repliable Datagram3)
+ *            	&lt;-- 	ann resp	(raw)
+ *          	&lt;--	error		(raw)
  *</pre>
  *
  *  @since 0.9.53, unused until protocol finalized in 0.9.67

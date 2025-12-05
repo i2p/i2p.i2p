@@ -945,6 +945,7 @@
                 <pathelement location="apps/jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-deploy.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-http.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-io.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-security.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-servlet.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-servlets.jar" />
