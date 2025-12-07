@@ -408,7 +408,7 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         }
         
         if (!QUIET) {
-            if (!isClientDb()) {
+            if (!isClientDb() && !_context.commSystem().isDummy()) {
                 // fill the search queue with random keys in buckets that are too small
                 // Disabled since KBucketImpl.generateRandomKey() is b0rked,
                 // and anyway, we want to search for a completely random key,
