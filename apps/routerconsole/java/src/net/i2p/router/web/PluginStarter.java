@@ -1076,7 +1076,8 @@ public class PluginStarter implements Runnable {
                 if (activeThreads[i] != null) {
                     String name = activeThreads[i].getName();
                     if (!"org.eclipse.jetty.util.RolloverFileOutputStream".equals(name) &&
-                        !name.startsWith("HSQLDB Timer"))
+                        !name.startsWith("HSQLDB Timer") &&
+                        !name.startsWith("Scanner"))
                         notRollover = true;
                     if (log.shouldLog(Log.DEBUG))
                         log.debug("Found " + activeThreads[i].getState() + " thread " + name + " for " + pluginName + ": " + name);
