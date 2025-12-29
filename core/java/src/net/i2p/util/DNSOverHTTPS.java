@@ -85,6 +85,7 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
         "in-addr.arpa", "ip6.arpa", "home.arpa",
         "i2p", "onion",
         "i2p.arpa", "onion.arpa",
+        "bit", "zkey",  // namecoin, GNS
         "corp", "home", "internal", "intranet", "lan", "local", "private",
         "dhcp", "localdomain", "bbrouter", "dlink", "ctc", "intra", "loc", "modem", "ip",
         "test", "example", "invalid",
