@@ -354,7 +354,7 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
     }
 
     /** SSU2 fixes (2.1.0), Congestion fixes (2.2.0) */
-    private static final String MIN_VERSION = "0.9.59";
+    private static final String MIN_VERSION = "0.9.62";
 
     /**
      *  Should the peer be excluded based on its published caps?
