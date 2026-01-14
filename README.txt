@@ -17,7 +17,7 @@ To build:
 		ant installer-osx
 
 	Run 'ant' with no arguments to see other build options.
-	See INSTALL.txt or https://geti2p.net/download for installation instructions.
+	See INSTALL.txt or https://i2p.net/download for installation instructions.
 
 Gradle build system:
 	Full builds are not yet possible, but the command is:
@@ -30,18 +30,18 @@ Gradle build system:
 		systemProp.socksProxyPort=9150
 
 Documentation:
-	https://geti2p.net/how
+	https://i2p.net/how
 	API: http://docs.i2p-projekt.de/javadoc/
 	     or run 'ant javadoc' then start at build/javadoc/index.html
 
 Latest release:
-	https://geti2p.net/download
+	https://i2p.net/download
 
 To get development branch from source control:
-	https://geti2p.net/newdevelopers
+	https://i2p.net/newdevelopers
 
 FAQ:
-	https://geti2p.net/faq
+	https://i2p.net/faq
 
 Need help?
 	IRC irc.freenode.net #i2p
@@ -51,7 +51,7 @@ Bug reports:
 	http://git.idk.i2p/i2p-hackers/i2p.i2p/-/issues
 
 Contact information, security issues, press inquiries:
-	https://geti2p.net/en/contact
+	https://i2p.net/en/contact
 
 Twitter:
 	@i2p, @geti2p

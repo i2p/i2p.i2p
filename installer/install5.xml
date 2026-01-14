@@ -12,9 +12,9 @@
         <appname>i2p</appname>
         <appversion>2.10.0</appversion>
         <authors>
-            <author name="I2P" email="https://geti2p.net/"/>
+            <author name="I2P" email="https://i2p.net/"/>
         </authors>
-        <url>https://geti2p.net/</url>
+        <url>https://i2p.net/</url>
         <javaversion>17</javaversion>
 
         <!-- adding this element will make the installer attempt to launch itself with administrator permissions,

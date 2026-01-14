@@ -698,7 +698,7 @@ public final class SelfSignedGenerator {
         int ext5len = oid5.length + spaceFor(wrap5len);
 
         byte[] policyTextBytes = DataHelper.getASCII("This self-signed certificate is required for secure local access to I2P services.");
-        byte[] policyURIBytes = DataHelper.getASCII("https://geti2p.net/");
+        byte[] policyURIBytes = DataHelper.getASCII("https://i2p.net/");
         int wrap61len = spaceFor(policyTextBytes.length); // usernotice ia5string
         int wrap62len = oid8.length + spaceFor(wrap61len); // PQ 1 Info OID + usernotice seq.
         int wrap63len = spaceFor(policyURIBytes.length); // uri ia5string

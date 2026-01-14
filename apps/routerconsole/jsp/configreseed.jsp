@@ -51,7 +51,7 @@
 <%=intl._t("First, enter the URL below.")%>
 <%=intl._t("Then, click \"{0}\".", intl._t("Reseed from URL"))%>
 </li><li>
-<%=intl._t("See {0} for instructions on reseeding manually.", "<a href=\"https://geti2p.net/faq#manual_reseed\">" + intl._t("the FAQ") + "</a>")%>
+<%=intl._t("See {0} for instructions on reseeding manually.", "<a href=\"https://i2p.net/faq#manual_reseed\">" + intl._t("the FAQ") + "</a>")%>
 </li></ol>
 <h3 class="tabletitle"><%=intl._t("Manual Reseed")%></h3>
 <form action="" method="POST">

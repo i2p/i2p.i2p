@@ -102,10 +102,10 @@
                 <attribute name="${manifest.classpath.name}" value="i2p.jar ${bcprov.jar} addressbook.jar jetty-i2p.jar jetty-rewrite-handler.jar jetty-start.jar jetty-util.jar" />
                 <attribute name="Specification-Title" value="I2P Router" />
                 <attribute name="Specification-Version" value="${api.version}" />
-                <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Specification-Vendor" value="The I2P Project https://i2p.net/" />
                 <attribute name="Implementation-Title" value="I2P Java Router" />
                 <attribute name="Implementation-Version" value="${full.version}" />
-                <attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Implementation-Vendor" value="The I2P Project https://i2p.net/" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
@@ -220,10 +220,10 @@
             <manifest>
                 <attribute name="Specification-Title" value="I2P Router" />
                 <attribute name="Specification-Version" value="${api.version}" />
-                <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Specification-Vendor" value="The I2P Project https://i2p.net/" />
                 <attribute name="Implementation-Title" value="I2P Java Router" />
                 <attribute name="Implementation-Version" value="${full.version}" />
-                <attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Implementation-Vendor" value="The I2P Project https://i2p.net/" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
@@ -237,10 +237,10 @@
             <manifest>
                 <attribute name="Specification-Title" value="I2P Router" />
                 <attribute name="Specification-Version" value="${api.version}" />
-                <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Specification-Vendor" value="The I2P Project https://i2p.net/" />
                 <attribute name="Implementation-Title" value="I2P Java Router" />
                 <attribute name="Implementation-Version" value="${full.version}" />
-                <attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Implementation-Vendor" value="The I2P Project https://i2p.net/" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
@@ -331,10 +331,10 @@
                 <attribute name="${manifest.classpath.name}" value="i2p.jar ${bcprov.jar}" />
                 <attribute name="Specification-Title" value="I2P Router" />
                 <attribute name="Specification-Version" value="${api.version}" />
-                <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Specification-Vendor" value="The I2P Project https://i2p.net/" />
                 <attribute name="Implementation-Title" value="I2P Java Router" />
                 <attribute name="Implementation-Version" value="${full.version}" />
-                <attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Implementation-Vendor" value="The I2P Project https://i2p.net/" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
@@ -355,10 +355,10 @@
                 <attribute name="${manifest.classpath.name}" value="i2ptest.jar ${bcprov.jar}" />
                 <attribute name="Specification-Title" value="I2P Router" />
                 <attribute name="Specification-Version" value="${api.version}" />
-                <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Specification-Vendor" value="The I2P Project https://i2p.net/" />
                 <attribute name="Implementation-Title" value="I2P Java Router" />
                 <attribute name="Implementation-Version" value="${full.version}" />
-                <attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Implementation-Vendor" value="The I2P Project https://i2p.net/" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />

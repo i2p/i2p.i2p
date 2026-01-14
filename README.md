@@ -2,17 +2,17 @@
 
 This is the source code for the reference Java implementation of I2P.
 
-Latest release: [https://geti2p.net/download](https://geti2p.net/download) 
+Latest release: [https://i2p.net/download](https://i2p.net/download) 
 
 ## Installing
 
-See [INSTALL.txt](INSTALL.txt) or [https://geti2p.net/download](https://geti2p.net/download) for installation instructions.
+See [INSTALL.txt](INSTALL.txt) or [https://i2p.net/download](https://i2p.net/download) for installation instructions.
 
 ## Documentation
 
-[https://geti2p.net/how](https://geti2p.net/how)
+[https://i2p.net/how](https://i2p.net/how)
 
-FAQ: [https://geti2p.net/faq](https://geti2p.net/faq) 
+FAQ: [https://i2p.net/faq](https://i2p.net/faq) 
 
 API: [http://docs.i2p-projekt.de/javadoc/](http://docs.i2p-projekt.de/javadoc/) 
 or run 'ant javadoc' then start at build/javadoc/index.html
@@ -23,7 +23,7 @@ Please check out [HACKING.md](docs/HACKING.md) and other documents in the docs d
 
 ## Building packages from source
 
-To get development branch from source control: [https://geti2p.net/newdevelopers](https://geti2p.net/newdevelopers) 
+To get development branch from source control: [https://i2p.net/newdevelopers](https://i2p.net/newdevelopers) 
 
 ### Prerequisites
 
@@ -75,7 +75,7 @@ Need help? See the IRC channel #i2p on irc.freenode.net
 
 Bug reports: [https://i2pgit.org/i2p-hackers/i2p.i2p/-/issues](https://i2pgit.org/i2p-hackers/i2p.i2p/-/issues) [http://git.idk.i2p/i2p-hackers/i2p.i2p/-/issues](http://git.idk.i2p/i2p-hackers/i2p.i2p/-/issues)
 
-Contact information, security issues, press inquiries: [https://geti2p.net/en/contact](https://geti2p.net/en/contact) 
+Contact information, security issues, press inquiries: [https://i2p.net/en/contact](https://i2p.net/en/contact) 
 
 Twitter: [@i2p](https://twitter.com/i2p), [@geti2p](https://twitter.com/GetI2P)
 

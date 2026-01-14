@@ -12,7 +12,7 @@ you may use:
 to configure the router.
 
 If you're having trouble, check the
-website at https://geti2p.net/, or get on irc://irc.freenode.net/#i2p
+website at https://i2p.net/, or get on irc://irc.freenode.net/#i2p
 
 I2P will create and store files and configuration data in the user directory
 ~/.i2p/ on Linux and %LOCALAPPDATA%\I2P\ on Windows. This directory is created
@@ -44,4 +44,4 @@ Supported JVMs:
   Windows: OpenJDK or Oracle from http://java.com/download
   Linux:   OpenJDK or Oracle from http://java.com/download
   FreeBSD: OpenJDK or Oracle from http://java.com/download
-  Other operating systems and JVMs: See https://geti2p.net/download
+  Other operating systems and JVMs: See https://i2p.net/download

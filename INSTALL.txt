@@ -68,4 +68,4 @@ Supported JVMs:
   All platforms: Java 17 or higher required
   Windows: Latest available from http://java.com/download
   Linux:   Latest available from http://java.com/download
-  Other operating systems and JVMs: See https://geti2p.net/download
+  Other operating systems and JVMs: See https://i2p.net/download

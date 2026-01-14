@@ -140,7 +140,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "\r\n"+
          "<html><head><title>403 Denied</title></head>\n"+
          "<body><h2>403 Denied</h2>\n" +
-         "<p>Inproxy access denied. You must run <a href=\"https://geti2p.net/\">I2P</a> to access this site.</p>\n" +
+         "<p>Inproxy access denied. You must run <a href=\"https://i2p.net/\">I2P</a> to access this site.</p>\n" +
          "</body></html>";
 
 /*

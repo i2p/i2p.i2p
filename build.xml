@@ -2582,10 +2582,10 @@
         <artifact:pom id="i2ppom" groupId="net.i2p" artifactId="i2p" version="${release.number}"
                 name="I2P Core"
                 description="The core I2P APIs"
-                url="https://geti2p.net/">
+                url="https://i2p.net/">
             <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
-            <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
-            <developer name="eyedeekay" organization="I2P" organizationUrl="https://geti2p.net/"/>
+            <developer name="zzz" organization="I2P" organizationUrl="https://i2p.net/" />
+            <developer name="eyedeekay" organization="I2P" organizationUrl="https://i2p.net/"/>
             <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  url="git@github.com:i2p/i2p.i2p.git" />
@@ -2593,10 +2593,10 @@
         <artifact:pom id="routerpom" groupId="net.i2p" artifactId="router" version="${release.number}"
                 name="I2P Router"
                 description="The I2P router"
-                url="https://geti2p.net/">
+                url="https://i2p.net/">
             <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
-            <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
-            <developer name="eyedeekay" organization="I2P" organizationUrl="https://geti2p.net/"/>
+            <developer name="zzz" organization="I2P" organizationUrl="https://i2p.net/" />
+            <developer name="eyedeekay" organization="I2P" organizationUrl="https://i2p.net/"/>
             <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  url="git@github.com:i2p/i2p.i2p.git" />
@@ -2605,10 +2605,10 @@
         <artifact:pom id="mstreamingpom" groupId="net.i2p.client" artifactId="mstreaming" version="${release.number}"
                 name="I2P Ministreaming"
                 description="API, interfaces, and factory for a TCP-like set of sockets for communicating over I2P."
-                url="https://geti2p.net/en/docs/api/streaming">
+                url="https://i2p.net/en/docs/api/streaming">
             <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
-            <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
-            <developer name="eyedeekay" organization="I2P" organizationUrl="https://geti2p.net/"/>
+            <developer name="zzz" organization="I2P" organizationUrl="https://i2p.net/" />
+            <developer name="eyedeekay" organization="I2P" organizationUrl="https://i2p.net/"/>
             <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  url="git@github.com:i2p/i2p.i2p.git" />
@@ -2617,10 +2617,10 @@
         <artifact:pom id="streamingpom" groupId="net.i2p.client" artifactId="streaming" version="${release.number}"
                 name="I2P Streaming"
                 description="Implementation of a TCP-like set of sockets for communicating over I2P."
-                url="https://geti2p.net/en/docs/api/streaming">
+                url="https://i2p.net/en/docs/api/streaming">
             <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
-            <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
-            <developer name="eyedeekay" organization="I2P" organizationUrl="https://geti2p.net/"/>
+            <developer name="zzz" organization="I2P" organizationUrl="https://i2p.net/" />
+            <developer name="eyedeekay" organization="I2P" organizationUrl="https://i2p.net/"/>
             <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  url="git@github.com:i2p/i2p.i2p.git" />
@@ -2630,10 +2630,10 @@
         <artifact:pom id="servletpom" groupId="net.i2p" artifactId="servlet-i2p" version="${release.number}"
                 name="I2P Servlet classes"
                 description="Various servlet classes provided to plugins by Java I2P."
-                url="https://geti2p.net/">
+                url="https://i2p.net/">
             <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
-            <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
-            <developer name="eyedeekay" organization="I2P" organizationUrl="https://geti2p.net/"/>
+            <developer name="zzz" organization="I2P" organizationUrl="https://i2p.net/" />
+            <developer name="eyedeekay" organization="I2P" organizationUrl="https://i2p.net/"/>
             <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  url="git@github.com:i2p/i2p.i2p.git" />

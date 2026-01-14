@@ -271,7 +271,7 @@ class SAMv3Handler extends SAMv1Handler
 					execPongMessage(opcode);
 					continue;
 				} else if (domain.equals("HELP")) {
-					writeString("HELP STATUS RESULT=OK MESSAGE=https://geti2p.net/en/docs/api/samv3\n");
+					writeString("HELP STATUS RESULT=OK MESSAGE=https://i2p.net/en/docs/api/samv3\n");
 					continue;
 				} else if (domain.equals("QUIT") || domain.equals("STOP") ||
 				           domain.equals("EXIT")) {

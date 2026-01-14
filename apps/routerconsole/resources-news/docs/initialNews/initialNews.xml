@@ -11,7 +11,7 @@ _("While you are waiting, please {0}adjust your bandwidth settings{1} on the {2}
 _("Also you can setup your browser to use the I2P proxy to reach eepsites.")
 _("Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your browser settings.")
 _("Do not use SOCKS for this.")
-_("More information can be found on the {0}I2P browser proxy setup page{1}.", "<a href=\"https://geti2p.net/en/about/browser-config\">", "</a>")
+_("More information can be found on the {0}I2P browser proxy setup page{1}.", "<a href=\"https://i2p.net/en/about/browser-config\">", "</a>")
 </p>
 <p>
 _("Once you have a \"shared clients\" destination listed on the left, please {0}check out{1} our {2}FAQ{3}.", "<b>", "</b>", "<a href=\"http://i2p-projekt.i2p/faq\">", "</a>")

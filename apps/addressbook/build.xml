@@ -62,10 +62,10 @@
 				<attribute name="Main-Class" value="net.i2p.addressbook.CommandLine"/>
 				<attribute name="Specification-Title" value="I2P Address Book" />
 				<attribute name="Specification-Version" value="${api.version}" />
-				<attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+				<attribute name="Specification-Vendor" value="The I2P Project https://i2p.net/" />
 				<attribute name="Implementation-Title" value="I2P Java Address Book" />
 				<attribute name="Implementation-Version" value="${full.version}" />
-				<attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
+				<attribute name="Implementation-Vendor" value="The I2P Project https://i2p.net/" />
 				<attribute name="Built-By" value="${build.built-by}" />
 		                <attribute name="Build-Date" value="${build.timestamp}" />
 		                <attribute name="Base-Revision" value="${workspace.version}" />

@@ -1,7 +1,7 @@
 <h2><%=intl._t("Abridged I2P FAQ")%></h2>
 <p class="infohelp"><%=intl._t("This is a shortened version of the official FAQ.")%> 
 <%=intl._t("For the full version, please visit {0} or {1}.",
-"<a href=\"https://geti2p.net/faq\" target=\"_blank\">geti2p.net/faq</a>",
+"<a href=\"https://i2p.net/faq\" target=\"_blank\">i2p.net/faq</a>",
 "<a href=\"http://i2p-projekt.i2p/faq\" target=\"_blank\">i2p-projekt.i2p/faq</a>")%>
 
 <h3><%=intl._t("My router has been up for several minutes and has zero or very few connections")%></h3>
@@ -38,7 +38,7 @@
 <h3><%=intl._t("How do I configure my browser to access I2P websites?")%></h3>
 <p><%=intl._t("You will need to configure your browser to use the HTTP proxy server on host <code>127.0.0.1</code> port <code>4444</code>).")%>
 <%=intl._t("See the {0} for a more detailed explanation.",
-"<a href=\"https://geti2p.net/en/about/browser-config\" target=\"_blank\">" + intl._t("Browser Proxy Configuration Guide") + "</a>")%></p>
+"<a href=\"https://i2p.net/en/about/browser-config\" target=\"_blank\">" + intl._t("Browser Proxy Configuration Guide") + "</a>")%></p>
 
 <h3><%=intl._t("What is an eepsite?")%></h3>
 <p><%=intl._t("An eepsite is a website that is hosted anonymously on the I2P network.")%>

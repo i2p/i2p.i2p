@@ -228,7 +228,7 @@
 <%=intl._t("To learn more about how important I2P Reseed servers are, or explore other topics and what functions they perform for I2P, you can visit the {0}I2P Wiki{1}.", "<a href=\"http://wiki.i2p-projekt.i2p\" target=\"_blank\">", "</a>")%>
 <%=intl._t("If you would like to discuss I2P topics or get help from the community, you can visit the {0}I2P Forums{1}.", "<a href=\"http://i2pforum.net\" target=\"_blank\">", "</a>")%>
 <%=intl._t("If you want to know more about the I2P Project itself, or the Invisible Internet in general, you can visit our {0}Project Website{1}.",
-"<a href=\"http://geti2p.net\" target=\"_blank\">", "</a>")%>
+"<a href=\"http://i2p.net\" target=\"_blank\">", "</a>")%>
 </p>
 </div>
 <%
@@ -296,14 +296,14 @@
 <div class="wizardtext"><p>
 <%=intl._t("Your browser needs to be configured to work with I2P.")%>
 <%=intl._t("We have instructions for configuring both Firefox and Chromium based browsers with I2P.")%>
-<%=intl._t("You can find these instructions on our {0}website{1}.", "<a href=\"https://geti2p.net/htproxyports\" target=\"_blank\">", "</a>")%>
+<%=intl._t("You can find these instructions on our {0}website{1}.", "<a href=\"https://i2p.net/htproxyports\" target=\"_blank\">", "</a>")%>
 <%
         if (net.i2p.util.SystemVersion.isWindows()) {
 %>
 </p><p>
 <%=intl._t("Otherwise, the recommended way to browse I2P websites is with a separate profile in the Firefox browser.")%>
 <ol><li><%=intl._t("{0}Install Firefox{1}", "<a href=\"https://www.mozilla.org/firefox/\" target=\"_blank\">", "</a>")%>
-</li><li><%=intl._t("{0}Install the I2P Firefox profile{1}", "<a href=\"https://geti2p.net/firefox\" target=\"_blank\">", "</a>")%>
+</li><li><%=intl._t("{0}Install the I2P Firefox profile{1}", "<a href=\"https://i2p.net/firefox\" target=\"_blank\">", "</a>")%>
 </li></ol>
 <%
         } //isWindows()
