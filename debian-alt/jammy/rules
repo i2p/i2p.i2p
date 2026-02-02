@@ -91,6 +91,7 @@ endif
 	@# No Jetty 12 in Ubuntu
 
 	@# following two are formerly from libservlet3.1-java, now in their own packages
+	mkdir -p $(CURDIR)/apps/jetty/jettylib
 	ln -sf /usr/share/java/servlet-api.jar $(CURDIR)/apps/jetty/jettylib/javax.servlet.jar
 	@# this is roughly the same as tomcat8-jsp-api.jar, we use this one
 	ln -sf /usr/share/java/jsp-api.jar $(CURDIR)/apps/jetty/jettylib/jsp-api.jar

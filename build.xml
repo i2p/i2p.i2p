@@ -2985,71 +2985,72 @@
 
     <!-- jammy, noble -->
     <target name="jammy-tarball" depends="getExtendedVersion, failIfNoVCS">
-        <property name="debian.tarball.name" value="i2p_${Extended.Version}j.orig.tar.bz2" />
-        <property name="checkoutDir" value="../i2p-${Extended.Version}" />
+        <property name="debian.tarball.name" value="i2p_${release.number}j.orig.tar.bz2" />
+        <property name="Extended.Version.J" value="${full.version}j-${shortHash}"/>
+        <property name="checkoutDir" value="../i2p-${Extended.Version.J}" />
         <ant target="checkoutFromVCS" />
         <delete includeemptydirs="true" quiet="false" failonerror="false">
-            <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
-            <fileset dir="../i2p-${Extended.Version}/installer/" includes="*.xml" />
-            <fileset dir="../i2p-${Extended.Version}/installer/c/" />
-            <fileset dir="../i2p-${Extended.Version}/installer/doc/" />
-            <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
-            <fileset dir="../i2p-${Extended.Version}/installer/resources" includes="checklist.md deletelist.txt install_* geoipv6-extras.csv makegeoip* po4a.config uninstall_* *.bat net.i2p.router.plist.template" />
-            <fileset dir="../i2p-${Extended.Version}/installer/resources/Start I2P Router.app/" />
-            <fileset dir="../i2p-${Extended.Version}/installer/resources/portable/" />
-            <fileset dir="../i2p-${Extended.Version}/installer/resources/small/" />
-            <fileset dir="../i2p-${Extended.Version}/Slackware" />
-            <fileset dir="../i2p-${Extended.Version}/.git" />
-            <fileset dir="../i2p-${Extended.Version}/.idea" />
-            <fileset dir="../i2p-${Extended.Version}/.tx" />
-            <fileset dir="../i2p-${Extended.Version}/reproducible" />
-            <fileset dir="../i2p-${Extended.Version}/.github" />
-            <file name="../i2p-${Extended.Version}/.editorconfig" />
-            <file name="../i2p-${Extended.Version}/.gitlab-ci.yml" />
-            <file name="../i2p-${Extended.Version}/.dockerignore" />
-            <fileset dir="../i2p-${Extended.Version}/" includes="Docker*" />
-            <fileset dir="../i2p-${Extended.Version}/docker" />
-            <fileset dir="../i2p-${Extended.Version}/docs" />
-            <file name="../i2p-${Extended.Version}/.travis.yml" />
-            <file name="../i2p-${Extended.Version}/.gitignore" />
+            <fileset dir="../i2p-${Extended.Version.J}/debian-alt/" />
+            <fileset dir="../i2p-${Extended.Version.J}/installer/" includes="*.xml" />
+            <fileset dir="../i2p-${Extended.Version.J}/installer/c/" />
+            <fileset dir="../i2p-${Extended.Version.J}/installer/doc/" />
+            <fileset dir="../i2p-${Extended.Version.J}/installer/lib/" />
+            <fileset dir="../i2p-${Extended.Version.J}/installer/resources" includes="checklist.md deletelist.txt install_* geoipv6-extras.csv makegeoip* po4a.config uninstall_* *.bat net.i2p.router.plist.template" />
+            <fileset dir="../i2p-${Extended.Version.J}/installer/resources/Start I2P Router.app/" />
+            <fileset dir="../i2p-${Extended.Version.J}/installer/resources/portable/" />
+            <fileset dir="../i2p-${Extended.Version.J}/installer/resources/small/" />
+            <fileset dir="../i2p-${Extended.Version.J}/Slackware" />
+            <fileset dir="../i2p-${Extended.Version.J}/.git" />
+            <fileset dir="../i2p-${Extended.Version.J}/.idea" />
+            <fileset dir="../i2p-${Extended.Version.J}/.tx" />
+            <fileset dir="../i2p-${Extended.Version.J}/reproducible" />
+            <fileset dir="../i2p-${Extended.Version.J}/.github" />
+            <file name="../i2p-${Extended.Version.J}/.editorconfig" />
+            <file name="../i2p-${Extended.Version.J}/.gitlab-ci.yml" />
+            <file name="../i2p-${Extended.Version.J}/.dockerignore" />
+            <fileset dir="../i2p-${Extended.Version.J}/" includes="Docker*" />
+            <fileset dir="../i2p-${Extended.Version.J}/docker" />
+            <fileset dir="../i2p-${Extended.Version.J}/docs" />
+            <file name="../i2p-${Extended.Version.J}/.travis.yml" />
+            <file name="../i2p-${Extended.Version.J}/.gitignore" />
             <!-- gradle files -->
-            <fileset dir="../i2p-${Extended.Version}/" includes="**/build.gradle" />
-            <fileset dir="../i2p-${Extended.Version}/gradle" />
-            <file name="../i2p-${Extended.Version}/gradlew" />
-            <file name="../i2p-${Extended.Version}/gradlew.bat" />
-            <file name="../i2p-${Extended.Version}/gradle.properties" />
-            <file name="../i2p-${Extended.Version}/settings.gradle" />
+            <fileset dir="../i2p-${Extended.Version.J}/" includes="**/build.gradle" />
+            <fileset dir="../i2p-${Extended.Version.J}/gradle" />
+            <file name="../i2p-${Extended.Version.J}/gradlew" />
+            <file name="../i2p-${Extended.Version.J}/gradlew.bat" />
+            <file name="../i2p-${Extended.Version.J}/gradle.properties" />
+            <file name="../i2p-${Extended.Version.J}/settings.gradle" />
             <!-- gettext-base -->
-            <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/gettext" />
+            <fileset dir="../i2p-${Extended.Version.J}/core/java/src/gnu/gettext" />
             <!-- libgetopt-java -->
-            <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/getopt" />
+            <fileset dir="../i2p-${Extended.Version.J}/core/java/src/gnu/getopt" />
             <!-- libjson-simple-java -->
-            <fileset dir="../i2p-${Extended.Version}/core/java/src/org/json" />
+            <fileset dir="../i2p-${Extended.Version.J}/core/java/src/org/json" />
             <!-- libhttpclient-java and libhttpcore-java -->
           <!--
-            <fileset dir="../i2p-${Extended.Version}/core/java/src/org/apache/http" />
+            <fileset dir="../i2p-${Extended.Version.J}/core/java/src/org/apache/http" />
            -->
             <!-- geoip-database -->
-            <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
-            <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
-            <file name="../i2p-${Extended.Version}/installer/resources/GeoLite2-Country.mmdb.gz" />
+            <file name="../i2p-${Extended.Version.J}/installer/resources/geoip.txt" />
+            <file name="../i2p-${Extended.Version.J}/installer/resources/geoipv6.dat.gz" />
+            <file name="../i2p-${Extended.Version.J}/installer/resources/GeoLite2-Country.mmdb.gz" />
             <!-- libtomcat9-java -->
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-${tomcat.ver}" />
+            <fileset dir="../i2p-${Extended.Version.J}/apps/jetty/apache-tomcat-${tomcat.ver}" />
             <!-- libjstl1.1-java or glassfish-javaee or libtaglibs-standard -->
-            <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />
+            <file name="../i2p-${Extended.Version.J}/apps/susidns/src/lib/jstl.jar" />
             <!-- libjakarta-taglibs-standard-java or glassfish-javaee or libtaglibs-standard -->
-            <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/standard.jar" />
-            <fileset dir="../i2p-${Extended.Version}/installer/resources/icons/flags" />
+            <file name="../i2p-${Extended.Version.J}/apps/susidns/src/lib/standard.jar" />
+            <fileset dir="../i2p-${Extended.Version.J}/installer/resources/icons/flags" />
             <!-- anything added above, add in debian-release-tarball also -->
         </delete>
         <tar longfile="gnu" destfile="../${debian.tarball.name}" compression="bzip2">
-            <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${Extended.Version}">
+            <tarfileset dir="../i2p-${Extended.Version.J}" prefix="/i2p-${Extended.Version.J}">
                 <include name="**/**" />
                 <exclude name="debian/**"/>
                 <exclude name="**/*.sh"/>
                 <!-- anything added above, add in debian-release-tarball also -->
             </tarfileset>
-            <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${Extended.Version}" filemode="755">
+            <tarfileset dir="../i2p-${Extended.Version.J}" prefix="/i2p-${Extended.Version.J}" filemode="755">
                 <exclude name="debian/**" />
                 <include name="**/*.sh" />
             </tarfileset>
@@ -3060,62 +3061,63 @@
     <!-- same as jammy-tarball but with a release tar.bz2 file name and tar prefix -->
     <target name="jammy-release-tarball" depends="getExtendedVersion, failIfNoVCS, debcheckpatch">
         <property name="debian.tarball.name" value="i2p_${release.number}j.orig.tar.bz2" />
-        <property name="checkoutDir" value="../i2p-${Extended.Version}" />
+        <property name="Extended.Version.J" value="${full.version}j-${shortHash}" />
+        <property name="checkoutDir" value="../i2p-${Extended.Version.J}" />
         <ant target="checkoutFromVCS" />
         <delete includeemptydirs="true" quiet="false" failonerror="false">
-            <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
-            <fileset dir="../i2p-${Extended.Version}/installer/" includes="*.xml" />
-            <fileset dir="../i2p-${Extended.Version}/installer/c/" />
-            <fileset dir="../i2p-${Extended.Version}/installer/doc/" />
-            <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
-            <fileset dir="../i2p-${Extended.Version}/installer/resources" includes="checklist.md deletelist.txt install_* geoipv6-extras.csv makegeoip* po4a.config uninstall_* *.bat net.i2p.router.plist.template" />
-            <fileset dir="../i2p-${Extended.Version}/installer/resources/Start I2P Router.app/" />
-            <fileset dir="../i2p-${Extended.Version}/installer/resources/portable/" />
-            <fileset dir="../i2p-${Extended.Version}/installer/resources/small/" />
-            <fileset dir="../i2p-${Extended.Version}/Slackware" />
-            <fileset dir="../i2p-${Extended.Version}/.git" />
-            <fileset dir="../i2p-${Extended.Version}/.idea" />
-            <fileset dir="../i2p-${Extended.Version}/.tx" />
-            <fileset dir="../i2p-${Extended.Version}/reproducible" />
-            <fileset dir="../i2p-${Extended.Version}/.github" />
-            <file name="../i2p-${Extended.Version}/.editorconfig" />
-            <file name="../i2p-${Extended.Version}/.gitlab-ci.yml" />
-            <file name="../i2p-${Extended.Version}/.dockerignore" />
-            <fileset dir="../i2p-${Extended.Version}/" includes="Docker*" />
-            <fileset dir="../i2p-${Extended.Version}/docker" />
-            <fileset dir="../i2p-${Extended.Version}/docs" />
-            <file name="../i2p-${Extended.Version}/.travis.yml" />
-            <file name="../i2p-${Extended.Version}/.gitignore" />
+            <fileset dir="../i2p-${Extended.Version.J}/debian-alt/" />
+            <fileset dir="../i2p-${Extended.Version.J}/installer/" includes="*.xml" />
+            <fileset dir="../i2p-${Extended.Version.J}/installer/c/" />
+            <fileset dir="../i2p-${Extended.Version.J}/installer/doc/" />
+            <fileset dir="../i2p-${Extended.Version.J}/installer/lib/" />
+            <fileset dir="../i2p-${Extended.Version.J}/installer/resources" includes="checklist.md deletelist.txt install_* geoipv6-extras.csv makegeoip* po4a.config uninstall_* *.bat net.i2p.router.plist.template" />
+            <fileset dir="../i2p-${Extended.Version.J}/installer/resources/Start I2P Router.app/" />
+            <fileset dir="../i2p-${Extended.Version.J}/installer/resources/portable/" />
+            <fileset dir="../i2p-${Extended.Version.J}/installer/resources/small/" />
+            <fileset dir="../i2p-${Extended.Version.J}/Slackware" />
+            <fileset dir="../i2p-${Extended.Version.J}/.git" />
+            <fileset dir="../i2p-${Extended.Version.J}/.idea" />
+            <fileset dir="../i2p-${Extended.Version.J}/.tx" />
+            <fileset dir="../i2p-${Extended.Version.J}/reproducible" />
+            <fileset dir="../i2p-${Extended.Version.J}/.github" />
+            <file name="../i2p-${Extended.Version.J}/.editorconfig" />
+            <file name="../i2p-${Extended.Version.J}/.gitlab-ci.yml" />
+            <file name="../i2p-${Extended.Version.J}/.dockerignore" />
+            <fileset dir="../i2p-${Extended.Version.J}/" includes="Docker*" />
+            <fileset dir="../i2p-${Extended.Version.J}/docker" />
+            <fileset dir="../i2p-${Extended.Version.J}/docs" />
+            <file name="../i2p-${Extended.Version.J}/.travis.yml" />
+            <file name="../i2p-${Extended.Version.J}/.gitignore" />
             <!-- gradle files -->
-            <fileset dir="../i2p-${Extended.Version}/" includes="**/build.gradle" />
-            <fileset dir="../i2p-${Extended.Version}/gradle" />
-            <file name="../i2p-${Extended.Version}/gradlew" />
-            <file name="../i2p-${Extended.Version}/gradlew.bat" />
-            <file name="../i2p-${Extended.Version}/gradle.properties" />
-            <file name="../i2p-${Extended.Version}/settings.gradle" />
-            <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/gettext" />
-            <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/getopt" />
-            <fileset dir="../i2p-${Extended.Version}/core/java/src/org/json" />
+            <fileset dir="../i2p-${Extended.Version.J}/" includes="**/build.gradle" />
+            <fileset dir="../i2p-${Extended.Version.J}/gradle" />
+            <file name="../i2p-${Extended.Version.J}/gradlew" />
+            <file name="../i2p-${Extended.Version.J}/gradlew.bat" />
+            <file name="../i2p-${Extended.Version.J}/gradle.properties" />
+            <file name="../i2p-${Extended.Version.J}/settings.gradle" />
+            <fileset dir="../i2p-${Extended.Version.J}/core/java/src/gnu/gettext" />
+            <fileset dir="../i2p-${Extended.Version.J}/core/java/src/gnu/getopt" />
+            <fileset dir="../i2p-${Extended.Version.J}/core/java/src/org/json" />
           <!--
-            <fileset dir="../i2p-${Extended.Version}/core/java/src/org/apache/http" />
+            <fileset dir="../i2p-${Extended.Version.J}/core/java/src/org/apache/http" />
            -->
-            <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
-            <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
-            <file name="../i2p-${Extended.Version}/installer/resources/GeoLite2-Country.mmdb.gz" />
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-${tomcat.ver}" />
-            <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />
-            <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/standard.jar" />
-            <fileset dir="../i2p-${Extended.Version}/installer/resources/icons/flags" />
+            <file name="../i2p-${Extended.Version.J}/installer/resources/geoip.txt" />
+            <file name="../i2p-${Extended.Version.J}/installer/resources/geoipv6.dat.gz" />
+            <file name="../i2p-${Extended.Version.J}/installer/resources/GeoLite2-Country.mmdb.gz" />
+            <fileset dir="../i2p-${Extended.Version.J}/apps/jetty/apache-tomcat-${tomcat.ver}" />
+            <file name="../i2p-${Extended.Version.J}/apps/susidns/src/lib/jstl.jar" />
+            <file name="../i2p-${Extended.Version.J}/apps/susidns/src/lib/standard.jar" />
+            <fileset dir="../i2p-${Extended.Version.J}/installer/resources/icons/flags" />
             <!-- anything added above, add in debian-tarball also -->
         </delete>
         <tar longfile="gnu" destfile="../${debian.tarball.name}" compression="bzip2">
-            <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${release.number}">
+            <tarfileset dir="../i2p-${Extended.Version.J}" prefix="/i2p-${release.number}">
                 <include name="**/**" />
                 <exclude name="debian/**"/>
                 <exclude name="**/*.sh"/>
                 <!-- anything added above, add in debian-tarball also -->
             </tarfileset>
-            <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${release.number}" filemode="755">
+            <tarfileset dir="../i2p-${Extended.Version.J}" prefix="/i2p-${release.number}" filemode="755">
                 <exclude name="debian/**" />
                 <include name="**/*.sh" />
             </tarfileset>
