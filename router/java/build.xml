@@ -60,7 +60,15 @@
                debuglevel="lines,vars,source"
                includeAntRuntime="false"
                encoding="UTF-8"
-               destdir="./build/obj" classpath="../../core/java/build/obj:../../core/java/build/i2p.jar:../../core/java/build/gnu-getopt.jar:../../core/java/build/httpclient.jar:../../core/java/build/httpcore.jar" >
+               destdir="./build/obj" >
+            <classpath>
+                <pathelement path="${javac.classpath.mod}" />
+                <pathelement path="../../core/java/build/obj" />
+                <pathelement path="../../core/java/build/i2p.jar" />
+                <pathelement path="../../core/java/build/gnu-getopt.jar" />
+                <pathelement path="../../core/java/build/httpclient.jar" />
+                <pathelement path="../../core/java/build/httpcore.jar" />
+            </classpath>
             <compilerarg line="${javac.compilerargs}" />
             <include name="**/*.java" />
             <exclude name="${source.exclude1}" />

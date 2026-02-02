@@ -1,3 +1,18 @@
+2026-02-02 zzz
+ * Debian: Updates for trixie/resolute
+
+2026-01-20 zzz
+ * i2psnark: Increase max piece size to 64 MB
+
+2026-01-14 zzz
+ * Console, docs: Change canonical domain to i2p.net
+
+2026-01-01 zzz
+ * Increase min router version for tunnels and netdb
+
+2025-12-07 zzz
+ * NetDB: Disable ExploreJob in test mode
+
 2025-12-05 zzz
  * Build: Javadoc fixes
 

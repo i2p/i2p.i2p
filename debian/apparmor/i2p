@@ -60,6 +60,7 @@
   /usr/share/java/wrapper*.jar                            r,
 
   # Dependent packages
+  /usr/share/java/bcprov.jar                              r,
   /usr/share/java/eclipse-jdt-core-*.jar                  r,
   /usr/share/java/libintl.jar                             r,
   /usr/share/java/libintl-*.jar                           r,

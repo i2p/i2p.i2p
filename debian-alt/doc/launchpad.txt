@@ -12,10 +12,11 @@ than doing debian builds ourselves.
 
 Versions are as follows:
 
-Min version	Max version		Uses src pkg	Copied to Debian
------------	-----------		------------	----------------
-questing	resolute		jammy		trixie, sid
-jammy		noble			jammy		bullseye, bookworm
+Min version	Max version		Uses src pkg	Copied to Debian	Notes
+-----------	-----------		------------	----------------	-----
+resolute				resolute	trixie, sid		ant debian-release-tarball
+questing				jammy					Don't bother to build, use jammy
+jammy		noble			jammy		bullseye, bookworm	ant jammy-release-tarball
 
 Unsupported (No Java 17):
 bionic		--			bionic		--
@@ -46,7 +47,7 @@ Prep (first time only)
 - Make a PPA, lets call it 'test'
 - OPTIONAL: Go to i2p.packages PPA and copy over existing I2P to your PPA:
   (select "copy existing binaries")
-    bionic and higher
+    jammy and higher
 
 - you need the following packages
   sudo apt-get install devscripts dput dh_systemd bash-completion
@@ -62,9 +63,9 @@ Generate files to upload
 - cd i2p.i2p.foobar
 - copy debian-alt/(series)/* to debian/
 - edit debian/changelog to add the release at the top
-  * series MUST be bionic or focal or jammy
-  * version MUST be 2.xx.0-1ubuntu1 for jammy.
-    For bionic and focal, the names are different.
+  * series MUST be resolute
+  * version MUST be 2.xx.0-1ubuntu1 for resolute
+    For jammy, the names are different.
     next version for fixes would be 2.xx.0-2ubunutu1
   * name and email MUST EXACTLY match what's in your GPG keyring
     or the signing will fail.
@@ -73,7 +74,7 @@ Generate files to upload
      the keyid argument must be a 16-char fingerprint, not a short key.)
     run gpg -K to list your private keys
 - Remove patch files in debian/patches that are not listed in debian/patches/series
-- ant debian-release-tarball (this is currently for bionic and higher)
+- ant debian-release-tarball (this is currently for resolute and higher)
   this will make a directory ../i2p-2.xx.0-0-xxxxxxxx/
   and a tarball ../i2p_2.xx.0.orig.tar.bz2
 - cp debian/changelog ../i2p-2.xx.0-0-xxxxxxxx/debian/
@@ -85,7 +86,7 @@ Generate files to upload
   otherwise, if just fixing up the control files, patches, etc:
     debuild -S -sd -kkeyid
   (note: no space allowed in -kkeyid)
-  If you get a dpkg-checkbuilddeps error for bionic,
+  If you get a dpkg-checkbuilddeps error for jammy,
   add a -d option, e.g. debuild -d -S -sa -kkeyid
 - If patches fail, you must fix them up, either manually or with quilt
   (quilt instructions go here)

@@ -88,7 +88,25 @@ endif
 	@# debian and ubuntu: everywhere
 	@/bin/echo -e "with-geoip-database=true" >> $(CURDIR)/override.properties
 
-	@# No Jetty 12 in Ubuntu
+	@/bin/echo -e "with-libjetty12-java=true" >> $(CURDIR)/override.properties
+	mkdir -p $(CURDIR)/apps/jetty/jettylib
+	ln -sf /usr/share/java/jetty12-deploy.jar $(CURDIR)/apps/jetty/jettylib/jetty-deploy.jar
+	ln -sf /usr/share/java/jetty12-ee.jar $(CURDIR)/apps/jetty/jettylib/jetty-ee.jar
+	ln -sf /usr/share/java/jetty12-http.jar $(CURDIR)/apps/jetty/jettylib/jetty-http.jar
+	ln -sf /usr/share/java/jetty12-io.jar $(CURDIR)/apps/jetty/jettylib/jetty-io.jar
+	ln -sf /usr/share/java/jetty12-rewrite.jar $(CURDIR)/apps/jetty/jettylib/jetty-rewrite-handler.jar
+	ln -sf /usr/share/java/jetty12-security.jar $(CURDIR)/apps/jetty/jettylib/jetty-security.jar
+	@# debian package does NOT contain the ee8 jars
+	@#ln -sf /usr/share/java/jetty12-servlet.jar $(CURDIR)/apps/jetty/jettylib/jetty-ee8-servlet.jar
+	@#ln -sf /usr/share/java/jetty12-servlets.jar $(CURDIR)/apps/jetty/jettylib/jetty-ee8-servlets.jar
+	ln -sf /usr/share/java/jetty12-session.jar $(CURDIR)/apps/jetty/jettylib/jetty-session.jar
+	ln -sf /usr/share/java/jetty12-start.jar $(CURDIR)/apps/jetty/jettylib/jetty-start.jar
+	ln -sf /usr/share/java/jetty12-util.jar $(CURDIR)/apps/jetty/jettylib/jetty-util.jar
+	@# debian package does NOT contain the ee8 jars
+	@#ln -sf /usr/share/java/jetty12-webapp.jar $(CURDIR)/apps/jetty/jettylib/jetty-ee8-webapp.jar
+	ln -sf /usr/share/java/jetty12-xml.jar $(CURDIR)/apps/jetty/jettylib/jetty-xml.jar
+	ln -sf /usr/share/java/jetty12-server.jar $(CURDIR)/apps/jetty/jettylib/org.mortbay.jetty.jar
+	ln -sf /usr/share/java/jetty12-jmx.jar $(CURDIR)/apps/jetty/jettylib/org.mortbay.jmx.jar
 
 	@# following two are formerly from libservlet3.1-java, now in their own packages
 	ln -sf /usr/share/java/servlet-api.jar $(CURDIR)/apps/jetty/jettylib/javax.servlet.jar

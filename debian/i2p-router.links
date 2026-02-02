@@ -125,3 +125,9 @@ usr/share/flags/countries/16x11/tr.png usr/share/i2p/eepsite/docroot/help/lib/tr
 usr/share/flags/countries/16x11/tw.png usr/share/i2p/eepsite/docroot/help/lib/tw.png
 usr/share/flags/countries/16x11/ua.png usr/share/i2p/eepsite/docroot/help/lib/ua.png
 usr/share/flags/countries/16x11/us.png usr/share/i2p/eepsite/docroot/help/lib/us.png
+
+
+# comment out if not building with libbcprov-java 1.80 or higher
+# ubuntu: questing+
+# debian: trixie+
+usr/share/java/bcprov.jar usr/share/i2p/lib/bcprov.jar
