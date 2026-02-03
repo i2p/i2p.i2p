@@ -26,7 +26,7 @@ build:
 
 DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
 
-JAVA_HOME=/usr/lib/jvm/default-java
+JAVA_HOME=/usr/lib/jvm/java-17-openjdk-$(DEB_HOST_ARCH)
 
 I2P=$(CURDIR)/pkg-temp
 ROUTERVERSION=$(CURDIR)/router/java/src/net/i2p/router/RouterVersion.java

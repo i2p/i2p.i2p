@@ -10,7 +10,7 @@ Vcs-Git: https://salsa.debian.org/debian/i2p.git
 Build-Depends: debhelper (>= 9.20160709)
  ,ant (>= 1.10.2)
  ,debconf
- ,default-jdk
+ ,openjdk-17-jdk
  ,libjetty12-java
  ,libslf4j2-java
  ,libjsp-api-java
@@ -82,7 +82,7 @@ Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- default-jre-headless | openjdk-21-jre-headless | openjdk-17-jre-headless | java21-runtime-headless | java17-runtime-headless,
+ default-jre-headless | openjdk-25-jre-headless | openjdk-21-jre-headless | openjdk-17-jre-headless,
  geoip-database,
  gettext-base,
  libgetopt-java,
