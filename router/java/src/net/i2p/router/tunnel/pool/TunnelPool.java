@@ -557,7 +557,14 @@ public class TunnelPool {
      *  This may be called multiple times from TestJob.
      */
     void tunnelFailed(TunnelInfo cfg) {
-        fail(cfg);
+        // Don't remove if only one, just tell the manager to build more
+        if (size() > 1) {
+            fail(cfg);
+        } else {
+            if (_log.shouldWarn())
+                _log.warn(toString() + ": Deferring failure of our only Tunnel: " + cfg);
+            _manager.tunnelFailed();
+        }
         tellProfileFailed(cfg);
     }
 
@@ -568,7 +575,14 @@ public class TunnelPool {
      *  @since 0.8.13
      */
     void tunnelFailed(TunnelInfo cfg, Hash blamePeer) {
-        fail(cfg);
+        // Don't remove if only one, just tell the manager to build more
+        if (size() > 1) {
+            fail(cfg);
+        } else {
+            if (_log.shouldWarn())
+                _log.warn(toString() + ": Deferring failure of our only Tunnel: " + cfg);
+            _manager.tunnelFailed();
+        }
         _context.profileManager().tunnelFailed(blamePeer, 100);
     }
 

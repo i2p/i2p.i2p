@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -977,6 +978,26 @@ public class TunnelDispatcher implements Service {
                     break;
                 }
             }
+
+            // also remove tunnels expiring in the next ~8 minutes that have seen no traffic
+            long until = now + 8*60*1000;
+            int exp = 0;
+            for (Iterator<HopConfig> iter = _configs.iterator(); iter.hasNext(); ) {
+                cur = iter.next();
+                if (cur.getExpiration() > until)
+                    break;
+                if (cur.getProcessedMessagesCount() <= 0) {
+                    if (_log.shouldInfo())
+                        _log.info("Removing idle " + cur);
+                    iter.remove();
+                    remove(cur);
+                    _allocatedBW.addAndGet(0 - cur.getAllocatedBW());
+                    exp++;
+                }
+            }
+            if (exp > 0 && _log.shouldWarn())
+                _log.warn("Removed " + exp + " idle tunnels");
+
             getTiming().setStartAfter(nextTime);
             getContext().jobQueue().addJob(LeaveTunnel.this);
         }

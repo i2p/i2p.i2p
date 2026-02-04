@@ -45,6 +45,8 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
     private static final String DEFAULT_EXCLUDE_CAPS = String.valueOf(Router.CAPABILITY_BW12) +
                                                        String.valueOf(Router.CAPABILITY_CONGESTION_SEVERE) +
                                                        String.valueOf(Router.CAPABILITY_NO_TUNNELS);
+    private static final String ALT_EXCLUDE_CAPS = String.valueOf(Router.CAPABILITY_BW12) +
+                                                   String.valueOf(Router.CAPABILITY_NO_TUNNELS);
 
     protected TunnelPeerSelector(RouterContext context) {
         super(context);
@@ -350,7 +352,9 @@ public abstract class TunnelPeerSelector extends ConnectChecker {
      *  @return non-null, possibly empty
      */
     private static String getExcludeCaps(RouterContext ctx) {
-        return ctx.getProperty("router.excludePeerCaps", DEFAULT_EXCLUDE_CAPS);
+        // sometimes try the 'E' routers anyway
+        String dflt = (ctx.random().nextInt(4) != 0) ? DEFAULT_EXCLUDE_CAPS : ALT_EXCLUDE_CAPS;
+        return ctx.getProperty("router.excludePeerCaps", dflt);
     }
 
     /** SSU2 fixes (2.1.0), Congestion fixes (2.2.0) */
