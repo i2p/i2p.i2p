@@ -10,7 +10,7 @@ usr/share/common-licenses/BSD usr/share/doc/i2p-router/licenses/LICENSE-BSD.txt
 
 
 # comment out if not building with libjetty12-java
-# ubuntu: NO
+# ubuntu: resolute
 # debian: in trixie sid
 usr/share/java/jetty12-apache-jsp.jar usr/share/i2p/lib/jetty-apache-jsp.jar
 usr/share/java/jetty12-deploy.jar usr/share/i2p/lib/jetty-deploy.jar

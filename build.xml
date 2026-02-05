@@ -1576,11 +1576,15 @@
 
     <target name="copyjetty" depends="copyjetty-unlesspkg" >
         <copy file="build/jetty-i2p.jar" todir="pkg-temp/lib" />
+        <!-- ee8 jars not in libjetty12-java -->
+        <copy file="build/jetty-servlet.jar" todir="pkg-temp/lib" />
+        <copy file="build/jetty-servlets.jar" todir="pkg-temp/lib" />
+        <copy file="build/jetty-webapp.jar" todir="pkg-temp/lib" />
     </target>
 
-    <target name="copyjetty-unlesspkg" unless="${with-libjetty9-java}" >
+    <target name="copyjetty-unlesspkg" unless="${with-libjetty12-java}" >
         <copy todir="pkg-temp/lib" >
-            <fileset dir="build" includes="javax.servlet.jar jetty*.jar org.mortbay.*.jar" excludes="jetty-i2p.jar" />
+            <fileset dir="build" includes="javax.servlet.jar jetty*.jar org.mortbay.*.jar" excludes="jetty-i2p.jar jetty-servlet.jar jetty-servlets.jar jetty-webapp.jar" />
         </copy>
     </target>
 
@@ -2014,7 +2018,7 @@
         <condition property="izpack5.available" >
             <available file="${izpack5.home}" type="dir" />
         </condition>
-        <fail message="Error - IzPack 5.1.x must be installed at ${izpack5.home}, or set izpack5.home=/PATH/TO/IzPack in override.properties, or download from http://izpack.org/downloads/ and install" >
+        <fail message="Error - IzPack 5.x.x must be installed at ${izpack5.home}, or set izpack5.home=/PATH/TO/IzPack in override.properties, or download from http://izpack.org/downloads/ and install" >
             <condition>
                 <not>
                     <isset property="izpack5.available" />

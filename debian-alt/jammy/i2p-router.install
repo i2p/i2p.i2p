@@ -35,22 +35,23 @@ pkg-temp/lib/systray.jar usr/share/i2p/lib
 # uncomment if not building with libjetty12-java
 # ubuntu: in resolute
 # debian: in trixie
-#pkg-temp/lib/jetty-deploy.jar usr/share/i2p/lib
-#pkg-temp/lib/jetty-http.jar usr/share/i2p/lib
-#pkg-temp/lib/jetty-io.jar usr/share/i2p/lib
-#pkg-temp/lib/jetty-rewrite-handler.jar usr/share/i2p/lib
-#pkg-temp/lib/jetty-security.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-deploy.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-http.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-io.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-rewrite-handler.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-security.jar usr/share/i2p/lib
 # debian package does NOT contain the ee8 jars
 pkg-temp/lib/jetty-servlet.jar usr/share/i2p/lib
 pkg-temp/lib/jetty-servlets.jar usr/share/i2p/lib
-#pkg-temp/lib/jetty-start.jar usr/share/i2p/lib
-#pkg-temp/lib/jetty-util.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-start.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-util.jar usr/share/i2p/lib
 # debian package does NOT contain the ee8 jars
 pkg-temp/lib/jetty-webapp.jar usr/share/i2p/lib
-#pkg-temp/lib/jetty-xml.jar usr/share/i2p/lib
-#pkg-temp/lib/org.mortbay.jetty.jar usr/share/i2p/lib
-#pkg-temp/lib/org.mortbay.jmx.jar usr/share/i2p/lib
-# following two are from libservlet-api-java which is a dependency of libjetty12-java
+pkg-temp/lib/jetty-xml.jar usr/share/i2p/lib
+pkg-temp/lib/org.mortbay.jetty.jar usr/share/i2p/lib
+pkg-temp/lib/org.mortbay.jmx.jar usr/share/i2p/lib
+
+# following is from libservlet-api-java
 #pkg-temp/lib/javax.servlet.jar usr/share/i2p/lib
 
 
