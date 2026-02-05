@@ -1,3 +1,6 @@
+2026-02-05 zzz
+ * NetDB: Tweak RI drop probabilities
+
 2026-02-04 zzz
  * Router: Robustness fixes
 

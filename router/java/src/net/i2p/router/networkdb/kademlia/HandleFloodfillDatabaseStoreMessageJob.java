@@ -35,6 +35,7 @@ import net.i2p.router.message.OutboundCache;
 import net.i2p.router.message.SendMessageDirectJob;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
+import net.i2p.util.VersionComparator;
 
 /**
  * Receive DatabaseStoreMessage data and store it in the local net db
@@ -257,6 +258,8 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                             boolean isU = caps.indexOf(Router.CAPABILITY_UNREACHABLE) >= 0;
                             boolean isFF = caps.indexOf(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL) >= 0;
                             boolean notFrom = !key.equals(_fromHash);
+                            boolean isSlow = caps.indexOf(Router.CAPABILITY_BW32) >= 0;
+                            boolean isOld = VersionComparator.comp(ri.getVersion(), "0.9.62") < 0;
                             if (_facade.floodfillEnabled()) {
                                 // determine if they're "close enough"
                                 // we will still ack and flood by setting wasNew = true even if we don't store locally
@@ -278,6 +281,10 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                             pdrop *= 3;
                                         if (notFrom)
                                             pdrop *= 3;
+                                        if (isSlow)
+                                            pdrop *= 2;
+                                        if (isOld)
+                                            pdrop *= 2;
                                         if (pdrop > 0 && (pdrop >= 128 || getContext().random().nextInt(128) < pdrop)) {
                                             if (_log.shouldWarn())
                                                 _log.warn("(dbid: " + _facade
@@ -330,6 +337,10 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                     pdrop *= 3;
                                 if (notFrom)
                                     pdrop *= 3;
+                                if (isSlow)
+                                    pdrop *= 2;
+                                if (isOld)
+                                    pdrop *= 2;
                                 if (pdrop > 0 && (pdrop >= 128 || getContext().random().nextInt(128) < pdrop)) {
                                     if (_log.shouldWarn())
                                         _log.warn("(dbid: " + _facade
