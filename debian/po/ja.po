@@ -5,6 +5,7 @@
 # Translators:
 # kami <b52c55627324b29125cbcfb101258463_228943>, 2015
 # daingewuvzeevisiddfddd, 2022,2024
+# daingewuvzeevisiddfddd, 2026
 # タカハシ, 2014
 # Masayuki Hatta <mhatta@mhatta.org>, 2018
 msgid ""
@@ -13,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
 "POT-Creation-Date: 2017-11-12 14:01+0000\n"
 "PO-Revision-Date: 2011-10-03 21:48+0000\n"
-"Last-Translator: daingewuvzeevisiddfddd, 2022,2024\n"
+"Last-Translator: daingewuvzeevisiddfddd, 2026\n"
 "Language-Team: Japanese (http://app.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -49,7 +50,7 @@ msgid ""
 " a daemon. To use an **existing** I2P profile you may enter a different "
 "account name here. For example, if your previous I2P installation is at "
 "/home/user/i2p, you may enter 'user' here."
-msgstr "デフォルトでは、 I2P はデーモンとして起動時、アカウント i2psvc で起動するよう設定されています。**既存の** I2P プロファイルを使用するには、ここに異なるアカウント名を入力してください。例えば、以前の I2P インストールが /home/user/i2p であれば、ここに 'user' と入力してください。"
+msgstr "初期設定では、 I2P はデーモンとして起動する時、アカウント i2psvc の下で起動するよう設定されています。**既存の** I2P プロファイルを使用するには、ここに異なるアカウント名を入力してください。例えば、以前に I2P を /home/user/i2p にインストールしていたら、ここに 'user' と入力してください。"
 
 #. Type: string
 #. Description
@@ -57,7 +58,7 @@ msgstr "デフォルトでは、 I2P はデーモンとして起動時、アカ�
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "非常に重要: 'i2psvc' のデフォルト以外のユーザがここで入力されるなら、選択されるユーザ名は既存のものでなければ*なりません*。"
+msgstr "非常に重要: 'i2psvc' の初期設定以外の利用者がここで入力されるなら、選択される利用者名は既存のものでなければ*なりません*。"
 
 #. Type: string
 #. Description
@@ -69,7 +70,7 @@ msgstr "I2P に割り当てられうるメモリ:"
 #. Description
 #: ../i2p.templates:4001
 msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
-msgstr "デフォルトでは、 I2P は最大 128MB メモリまでしか使用を許可されていません。"
+msgstr "初期設定では、 I2P は最大 128MB メモリまでしか使用を許可されていません。"
 
 #. Type: string
 #. Description

@@ -18,7 +18,7 @@
 # Taporpo Ne <taporpone@gmail.com>, 2015
 # Tracerneo <ziolkoneo@gmail.com>, 2013
 # ☆Verdulo, 2016-2017
-# ☆Verdulo, 2021-2022,2024
+# ☆Verdulo, 2021-2022,2024,2026
 # ☆Verdulo, 2017-2020
 # Warton <businesshehe@yahoo.com>, 2011-2012
 # Tracerneo <ziolkoneo@gmail.com>, 2013
@@ -28,7 +28,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-27 11:59+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
-"Last-Translator: ☆Verdulo, 2021-2022,2024\n"
+"Last-Translator: ☆Verdulo, 2021-2022,2024,2026\n"
 "Language-Team: Polish (http://app.transifex.com/otf/I2P/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -333,21 +333,21 @@ msgstr "{0} port {1,number,#####} nie został przekierowany przez UPnP."
 #: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:144
 #: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:399
 msgid "UPnP failed to start - no network connection?"
-msgstr ""
+msgstr "Nie udało się zainicjować UPnP – czyżby brak połączenia internetowego?"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:148
 #: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:397
 msgid "UPnP failed to start - port conflict?"
-msgstr ""
+msgstr "Nie udało się zainicjować UPnP – czyżby konflikt portów?"
 
 #: ../../addressbook/java/src/net/i2p/addressbook/Daemon.java:684
 #, java-format
 msgid "{0} new host"
 msgid_plural "{0} new hosts"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{0} nowy adres"
+msgstr[1] "{0} nowe adresy"
+msgstr[2] "{0} nowych adresów"
+msgstr[3] "{0} nowych adresów"
 
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:905
 #: ../java/src/net/i2p/router/web/DeadlockDetector.java:109
@@ -3281,61 +3281,61 @@ msgstr "Filtr"
 
 #: ../java/src/net/i2p/router/web/helpers/MapMaker.java:187
 msgid "Routers"
-msgstr "Rutery"
+msgstr "Węzły"
 
 #: ../java/src/net/i2p/router/web/helpers/MapMaker.java:190
 msgid "Floodfills"
-msgstr ""
+msgstr "Floodfille"
 
 #: ../java/src/net/i2p/router/web/helpers/MapMaker.java:193
 msgid "Exploratory Tunnels"
-msgstr ""
+msgstr "Tunele rozpoznawcze"
 
 #: ../java/src/net/i2p/router/web/helpers/MapMaker.java:196
 msgid "Client Tunnels"
-msgstr ""
+msgstr "Tunele klienckie"
 
 #: ../java/src/net/i2p/router/web/helpers/MapMaker.java:199
 msgid "Participating Tunnels"
-msgstr ""
+msgstr "Tunele przekazywane"
 
 #: ../java/src/net/i2p/router/web/helpers/MapMaker.java:223
 #, java-format
 msgid "{0} router"
 msgid_plural "{0} routers"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{0} węzeł"
+msgstr[1] "{0} węzły"
+msgstr[2] "{0} węzłów"
+msgstr[3] "{0} węzłów"
 
 #: ../java/src/net/i2p/router/web/helpers/MapMaker.java:251
 msgid "My router"
-msgstr ""
+msgstr "Mój węzeł"
 
 #: ../java/src/net/i2p/router/web/helpers/MapMaker.java:389
 msgid "Inbound exploratory tunnel"
-msgstr ""
+msgstr "Przychodzący tunel rozpoznawczy"
 
 #: ../java/src/net/i2p/router/web/helpers/MapMaker.java:391
 msgid "Inbound client tunnel"
-msgstr ""
+msgstr "Przychodzący tunel kliencki"
 
 #: ../java/src/net/i2p/router/web/helpers/MapMaker.java:394
 msgid "Outbound exploratory tunnel"
-msgstr ""
+msgstr "Wychodzący tunel rozpoznawczy"
 
 #: ../java/src/net/i2p/router/web/helpers/MapMaker.java:396
 msgid "Outbound client tunnel"
-msgstr ""
+msgstr "Wychodzący tunel kliencki"
 
 #: ../java/src/net/i2p/router/web/helpers/MapMaker.java:449
 #, java-format
 msgid "{0} participating tunnel"
 msgid_plural "{0} participating tunnels"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{0} tunel przekazywany"
+msgstr[1] "{0} tunele przekazywane"
+msgstr[2] "{0} tuneli przekazywanych"
+msgstr[3] "{0} tuneli przekazywanych"
 
 #. 0
 #: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:49
@@ -3425,7 +3425,7 @@ msgstr "Następna strona"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:724
 msgid "Leasesets for Client"
-msgstr ""
+msgstr "Leasety klienta"
 
 #: ../java/src/net/i2p/router/web/helpers/NetDbRenderer.java:738
 msgid "Manually Configure Floodfill Participation"
@@ -4618,7 +4618,7 @@ msgstr "Ustawienia"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:415
 msgid "Setup"
-msgstr "Konfiguracja"
+msgstr "Kreator konfiguracji"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:418
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:323
@@ -4662,7 +4662,7 @@ msgstr "Zaawansowana konfiguracja"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:541
 msgid "View full change log"
-msgstr ""
+msgstr "Wyświetl pełną historię zmian"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:547
 msgid "Debug"
@@ -4866,7 +4866,7 @@ msgstr "Tunele, w których uczestniczymy, uczestnicząc w poprawie przepustowoś
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1071
 msgid "Participating"
-msgstr "Uczestniczące"
+msgstr "Przekazywane"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:1077
 msgid ""
@@ -5130,7 +5130,7 @@ msgstr "martwy"
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:107
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:463
 msgid "Participating tunnels"
-msgstr "Uczestniczące tunele"
+msgstr "Tunele przekazywane"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:113
 msgid "Receive on"
@@ -5190,7 +5190,7 @@ msgstr "Ograniczenie wyświetlania do {0} tuneli o najwyższym wskaźniku użyci
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:183
 msgid "Inactive participating tunnels"
-msgstr "Nieaktywne uczestniczące tunele"
+msgstr "Nieaktywne przekazywane tunele"
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:186
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:456
@@ -5200,7 +5200,7 @@ msgstr "Zużycie pasma"
 #. bwShare > 12
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:231
 msgid "Not enough shared bandwidth to build participating tunnels."
-msgstr "Brak wystarczającego pasma, aby utworzyć tunele uczestniczące."
+msgstr "Brak wystarczającego pasma, aby uczestniczyć w przekazywaniu tuneli."
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:232
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:609
@@ -5287,15 +5287,15 @@ msgstr "Test przepustowości nie został uruchomiony"
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHelper.java:88
 msgid "ready"
-msgstr ""
+msgstr "przygotowanie"
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHelper.java:90
 msgid "inbound test"
-msgstr ""
+msgstr "sprawdzam pobieranie"
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHelper.java:92
 msgid "outbound test"
-msgstr ""
+msgstr "sprawdzam wysyłanie"
 
 #: ../java/src/net/i2p/router/web/helpers/WizardHelper.java:94
 msgid "done"
@@ -5671,11 +5671,11 @@ msgstr "Dodatkowe wyszukiwarki można dodać do <a href=\"/confighome\">konfigur
 msgid ""
 "Determines the maximum number of participating tunnels the router will "
 "accept."
-msgstr "Określa maksymalną liczbę uczestniczących tuneli akceptowanych przez węzeł."
+msgstr "Określa maksymalną liczbę przekazywanych tuneli akceptowanych przez węzeł."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:677
 msgid "To disable participation completely, set to 0."
-msgstr "Aby całkowicie wyłączyć uczestnictwo, ustaw na 0."
+msgstr "Aby całkowicie wyłączyć przekazywanie, ustaw na 0."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:246
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:246
@@ -7890,7 +7890,7 @@ msgstr "Ta wartość może zmieniać się w zależności od potrzeb sieci, udost
 msgid ""
 "The recommended method for limiting participating tunnels is to change your "
 "share percentage on the <a href=\"config\">Bandwidth Configuration page</a>."
-msgstr "Zalecaną metodą zmniejszenia tuneli uczestniczących jest zmiana udostępnianego pasma na <a href=\"config\">stronie konfiguracji przepustowości</a>."
+msgstr "Zalecaną metodą zmniejszenia liczby tuneli przekazywanych jest zmiana udostępnianego pasma na <a href=\"config\">stronie konfiguracji przepustowości</a>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:471
 msgid ""
@@ -7903,7 +7903,7 @@ msgstr "Możesz także zmniejszyć całkowitą liczbę tuneli dodając <code>rou
 msgid ""
 "The number of participating tunnels you route for others, divided by the "
 "total number of hops in all your exploratory and client tunnels."
-msgstr "Liczba tuneli uczestniczących (tworzonych dla innych użytkowników sieci) dzielona na całkowitą liczbę skoków wszystkich Twoich tuneli rozpoznawczych i klienckich."
+msgstr "Liczba tuneli przekazywanych (tworzonych dla innych użytkowników sieci) dzielona na całkowitą liczbę skoków wszystkich Twoich tuneli rozpoznawczych i klienckich."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:477
 msgid ""
@@ -7913,11 +7913,11 @@ msgstr "Współczynnik większy niż 1 oznacza, że bardziej wnosisz wkład w tw
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/viewhistory_jsp.java:456
 msgid "Released"
-msgstr ""
+msgstr "wydano"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/viewhistory_jsp.java:474
 msgid "Earlier history is available in the source package"
-msgstr ""
+msgstr "Wcześniejsza historia zmian jest dostępna w kodzie źródłowym"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/viewprofile_jsp.java:241
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/viewprofile_jsp.java:418

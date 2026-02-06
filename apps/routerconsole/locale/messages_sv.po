@@ -10,6 +10,7 @@
 # Anders Nilsson <anders@devode.se>, 2015-2016
 # cacapo <handelsehorisont@gmail.com>, 2015
 # Calle Rundgren <samaire@samaire.net>, 2013
+# Daniel, 2025
 # cacapo <handelsehorisont@gmail.com>, 2015-2016
 # Henrik Mattsson-Mårn <h@reglage.net>, 2025
 # hottuna <i2p@robertfoss.se>, 2011,2013
@@ -30,7 +31,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-27 11:59+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
-"Last-Translator: Henrik Mattsson-Mårn <h@reglage.net>, 2025\n"
+"Last-Translator: Daniel, 2025\n"
 "Language-Team: Swedish (Sweden) (http://app.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -451,7 +452,7 @@ msgstr "Misslyckades med att kopiera till {0}"
 #: ../java/src/net/i2p/router/update/UnsignedUpdateChecker.java:90
 #, java-format
 msgid "Requires Java version {0} but installed Java version is {1}"
-msgstr "Kräver Java version {0} installerad Java version är {1}"
+msgstr "Kräver Java-version {0} men den installerade Java-versionen är {1}"
 
 #. set status before thread to ensure UI feedback
 #: ../java/src/net/i2p/router/update/DevSU3UpdateHandler.java:91
@@ -567,7 +568,7 @@ msgstr "Insticksmodul {0} har omatchande versioner"
 #: ../java/src/net/i2p/router/web/PluginStarter.java:360
 #, java-format
 msgid "This plugin requires I2P version {0} or higher"
-msgstr "Detta insticksmodul kräver I2P-version {0} eller högre"
+msgstr "Denna insticksmodul kräver I2P-version {0} eller högre"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:441
 #: ../java/src/net/i2p/router/web/PluginStarter.java:369
@@ -622,7 +623,7 @@ msgstr "Insticksmodulen kräver Jetty version {0} eller lägre"
 #: ../java/src/net/i2p/router/web/PluginStarter.java:402
 #, java-format
 msgid "Plugin requires Java version {0} or lower"
-msgstr "Insticksmodul kräver Java verions {0} eller lägre"
+msgstr "Insticksmodul kräver Java-version {0} eller lägre"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:529
 #, java-format
@@ -2246,7 +2247,7 @@ msgstr "IPv6 adresser"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:81
 msgid "IPs Permanently Banned"
-msgstr "IP permanent blockerat"
+msgstr "IP-adresser förbjudna permanent"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigPeerHelper.java:86
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:113
@@ -2442,7 +2443,7 @@ msgstr "Uppdaterade inställningar för alla pooler."
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHandler.java:136
 msgid "Exploratory tunnel configuration saved successfully."
-msgstr "Konfiguration för förberadande tunnlar har sparats."
+msgstr "Utforskningstunnelkonfigurationen har sparats."
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHandler.java:138
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:88
@@ -2465,14 +2466,14 @@ msgstr[1] "{0} hopp"
 #, java-format
 msgid "{0} tunnel"
 msgid_plural "{0} tunnels"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{0} tunnel"
+msgstr[1] "{0} tunnlar"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:51
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:47
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:455
 msgid "Exploratory tunnels"
-msgstr "Utforskande tunnlar"
+msgstr "Utforskningstunnlar"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigTunnelsHelper.java:65
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:73
@@ -2685,7 +2686,7 @@ msgstr "Slut på minne"
 
 #: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:48
 msgid "Reachability change"
-msgstr "Åtkomst ändrad"
+msgstr "Förändring av nåbarhet"
 
 #: ../java/src/net/i2p/router/web/helpers/EventLogHelper.java:50
 msgid "Reseeded router"
@@ -2848,19 +2849,19 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:404
 msgid "Graph size"
-msgstr ""
+msgstr "Diagramstorlek"
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:405
 msgid "pixels wide"
-msgstr ""
+msgstr "pixlar bred"
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:406
 msgid "pixels high"
-msgstr ""
+msgstr "pixlar hög"
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:408
 msgid "Display period"
-msgstr ""
+msgstr "Visningsperiod"
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:408
 msgid "minutes"
@@ -2872,11 +2873,11 @@ msgstr "Uppdateringsfördröjning"
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:427
 msgid "Plot type"
-msgstr ""
+msgstr "Diagramtyp"
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:428
 msgid "Averages"
-msgstr ""
+msgstr "Genomsnitt"
 
 #. 7 days
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:429
@@ -2886,7 +2887,7 @@ msgstr "Händelser"
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:430
 msgid "Hide legend"
-msgstr ""
+msgstr "Dölj förklaring"
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:435
 msgid "Do not show legend on graphs"
@@ -2898,11 +2899,11 @@ msgstr "UTC"
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:441
 msgid "Use UTC time on graphs"
-msgstr ""
+msgstr "Använd UTC-tid på diagram"
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:442
 msgid "Persistence"
-msgstr ""
+msgstr "Uthållighet"
 
 #: ../java/src/net/i2p/router/web/helpers/GraphHelper.java:447
 msgid "Store graph data on disk"
@@ -2923,7 +2924,7 @@ msgstr "Anonym webbmejlklient"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:127
 msgid "Control your client and server tunnels"
-msgstr ""
+msgstr "Styr dina klient- och servertunnlar"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:128
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:252
@@ -3133,7 +3134,7 @@ msgstr "Fel spårare"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:192
 msgid "I2P Bug Reports"
-msgstr "I2P felrapporter"
+msgstr "I2P-felrapporter"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:193
 msgid "I2P Network Statistics"
@@ -3275,11 +3276,11 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/MapMaker.java:193
 msgid "Exploratory Tunnels"
-msgstr ""
+msgstr "Utforskningstunnlar"
 
 #: ../java/src/net/i2p/router/web/helpers/MapMaker.java:196
 msgid "Client Tunnels"
-msgstr ""
+msgstr "Klienttunnlar"
 
 #: ../java/src/net/i2p/router/web/helpers/MapMaker.java:199
 msgid "Participating Tunnels"
@@ -3316,8 +3317,8 @@ msgstr ""
 #, java-format
 msgid "{0} participating tunnel"
 msgid_plural "{0} participating tunnels"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{0} deltagande tunnel"
+msgstr[1] "{0} deltagande tunnlar"
 
 #. 0
 #: ../java/src/net/i2p/router/web/helpers/NetDbHelper.java:49
@@ -3661,7 +3662,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:210
 msgid "Peer Connections"
-msgstr ""
+msgstr "Jämlikeanslutningar"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:212
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:269
@@ -3907,7 +3908,7 @@ msgstr "Sortera efter anslutningsdriftstid"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:614
 msgid "Sort by clock skew"
-msgstr "Sortera efter klockanvridning"
+msgstr "Sortera efter klocksnedvridning"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:618
 msgid "Sort by congestion window"
@@ -4044,7 +4045,7 @@ msgstr "OK"
 #. hide if < 20%
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:198
 msgid "Test Fails"
-msgstr "Testet misslyckades"
+msgstr "Testmisslyckanden"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:205
 #: ../java/src/net/i2p/router/web/helpers/SybilRenderer.java:943
@@ -4147,11 +4148,11 @@ msgstr "kapaciteten i netDb, används inte för att fastställa profiler"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:303
 msgid "Congested"
-msgstr ""
+msgstr "Överbelastad"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:304
 msgid "Severely congested"
-msgstr ""
+msgstr "Svårt överbelastad"
 
 #. 0
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:307
@@ -4163,7 +4164,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:308
 msgid "Not accepting tunnels"
-msgstr ""
+msgstr "Accepterar inte tunnlar"
 
 #: ../java/src/net/i2p/router/web/helpers/ProfileOrganizerRenderer.java:311
 #, java-format
@@ -4440,7 +4441,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:51
 msgid "Network Reachability"
-msgstr ""
+msgstr "Nätverksnåbarhet"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:52
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:814
@@ -4449,7 +4450,7 @@ msgstr "Uppdateringsstatus"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:53
 msgid "Restart Status"
-msgstr ""
+msgstr "Omstartsstatus"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:55
 msgid "Peers (advanced)"
@@ -4470,7 +4471,7 @@ msgstr "Trängsel"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:61
 msgid "Tunnel Status"
-msgstr ""
+msgstr "Tunnelstatus"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:62
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:389
@@ -4711,7 +4712,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:734
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:641
 msgid "Clock Skew"
-msgstr ""
+msgstr "Klocksnedvridning"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:741
 msgid ""
@@ -4762,7 +4763,7 @@ msgstr "Snabba"
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:858
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:922
 msgid "The number of peers available for building exploratory tunnels"
-msgstr "Antal jämlikar tillgängliga för att bygga undersökande tunnlar"
+msgstr "Antal jämlikar tillgängliga för att bygga utforskningstunnlar"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:861
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:925
@@ -4880,7 +4881,7 @@ msgstr "Eftersläpning"
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:240
 #, java-format
 msgid "ERR-Clock Skew of {0}"
-msgstr "FEL-Tidsfördröjning {0}"
+msgstr "FEL-Klocksnedvridning av {0}"
 
 #: ../java/src/net/i2p/router/web/helpers/SummaryHelper.java:245
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:561
@@ -5162,7 +5163,7 @@ msgstr "Livstidsbandbreddsanvändning"
 #. bwShare > 12
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:231
 msgid "Not enough shared bandwidth to build participating tunnels."
-msgstr ""
+msgstr "Inte tillräckligt med delad bandbredd för att bygga deltagande tunnlar."
 
 #: ../java/src/net/i2p/router/web/helpers/TunnelRenderer.java:232
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:609
@@ -5343,11 +5344,11 @@ msgstr "I2PSnark"
 #. standard themes for ConfigUIHelper
 #: ../java/strings/Strings.java:45
 msgid "dark"
-msgstr "mörkt"
+msgstr "mörk"
 
 #: ../java/strings/Strings.java:46
 msgid "light"
-msgstr "ljust"
+msgstr "ljus"
 
 #: ../java/strings/Strings.java:51
 msgid "Encryption"
@@ -5615,7 +5616,7 @@ msgstr ""
 msgid ""
 "This setting allows the manual selection of the browser which I2P will "
 "launch on startup."
-msgstr "Denna inställning tillåter manuellt val av webbläsare som I2P startar vid uppstart."
+msgstr "Den här inställningen möjliggör manuellt val av vilken webbläsare som I2P startar vid uppstart."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:669
 msgid ""
@@ -6459,7 +6460,7 @@ msgstr "SOCKS 5"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:724
 msgid "I2P Outproxy"
-msgstr ""
+msgstr "I2P-utproxy"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:726
 msgid "Not for initial reseed. Leave host and port blank."
@@ -6756,11 +6757,11 @@ msgstr "Hjälp till med att översätta routerkonsolprojektet. Kontakta utveckla
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:600
 #, java-format
 msgid "See the {0}translation status report{1}."
-msgstr ""
+msgstr "Se {0}översättningsstatusrapporten{1}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:606
 msgid "Router Console Password"
-msgstr "Routerkonsol lösenord"
+msgstr "Routerkonsolens lösenord"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:243
 msgid "config update"
@@ -7098,7 +7099,7 @@ msgstr ""
 msgid ""
 "This is the number of peers your router has available for building your "
 "exploratory tunnels which are used to determine network performance."
-msgstr ""
+msgstr "Detta är antalet jämlikar som din router har tillgängliga för att bygga dina utforskande tunnlar som används för att bestämma nätverkets prestanda."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:509
 msgid "The fast peers are included in the high capacity tier."
@@ -7290,13 +7291,13 @@ msgstr "Öppna dina brandvägg eller aktivera UDP."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:599
 msgid "ERR - Clock Skew"
-msgstr "FEL - Klockan är förskjuten"
+msgstr "FEL - Klocksnedvridning"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:601
 msgid ""
 "Your system's clock is skewed, which will make it difficult to participate "
 "in the network."
-msgstr "Ditt system klocka är går fel, vilket gör det svårt att delta i nätverket."
+msgstr "Ditt systems klocka är snedvriden, vilket gör det svårt att delta i nätverket."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:603
 msgid "Correct your clock setting if this error persists."
@@ -7399,7 +7400,7 @@ msgstr "Har du en annan instans av I2P som körs? Stoppa det kolliderande progra
 msgid ""
 "The skew (offset) of your computer's clock relative to the network-synced "
 "time."
-msgstr ""
+msgstr "Datorns klockas snedvridning (förskjutning) i förhållande till den nätverkssynkroniserade tiden."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:645
 msgid "I2P requires your computer's time be accurate."
@@ -7409,38 +7410,38 @@ msgstr ""
 msgid ""
 "If the skew is more than a few seconds, please correct the problem by "
 "adjusting your computer's time."
-msgstr ""
+msgstr "Om snedvridningen är mer än några sekunder, åtgärda problemet genom att justera datorns tid."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:649
 msgid ""
 "If I2P cannot connect to the internet, a reading of 0ms may be indicated."
-msgstr ""
+msgstr "Om I2P inte kan ansluta till internet kan en avläsning på 0 ms indikeras."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:653
 msgid "Abridged I2P FAQ"
-msgstr ""
+msgstr "Förkortade I2P-Vanliga frågor"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:655
 msgid "This is a shortened version of the official FAQ."
-msgstr ""
+msgstr "Det här är en förkortad version av de officiella vanliga frågorna."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:658
 #, java-format
 msgid "For the full version, please visit {0} or {1}."
-msgstr ""
+msgstr "För den fullständiga versionen, besök {0} eller {1}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:662
 msgid ""
 "My router has been up for several minutes and has zero or very few "
 "connections"
-msgstr "Min router har var igång i flera minuter och har noll eller väldigt få anslutningar"
+msgstr "Min router har varit uppkopplad i flera minuter och har inga eller väldigt få anslutningar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:664
 msgid ""
 "If after a few minutes of uptime your router is indicating 0 Active Peers "
 "and 0 Known Peers, with a notification in the sidebar that you need to check"
 " your network connection, verify that you can access the internet."
-msgstr ""
+msgstr "Om din router efter några minuters drifttid visar 0 aktiva jämlikar och 0 kända jämlikar, med ett meddelande i sidofältet om att du behöver kontrollera din nätverksanslutning, kontrollera att du har åtkomst till internet."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:666
 msgid ""
@@ -7465,7 +7466,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:674
 msgid "The router should maintain connections to a few peers at all times."
-msgstr ""
+msgstr "Routern bör upprätthålla anslutningar till ett fåtal jämlikar hela tiden."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:676
 msgid ""
@@ -7699,7 +7700,7 @@ msgstr "I2P-routerloggar"
 msgid ""
 "Please include your I2P version and running environment information in bug "
 "reports"
-msgstr ""
+msgstr "Inkludera din I2P-version och information om körmiljö i felrapporter"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:548
 msgid "Critical Logs"
@@ -7769,7 +7770,7 @@ msgstr "Gå till {0}klientkonfiguration{1} för att starta den."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/peers_jsp.java:241
 msgid "peer connections"
-msgstr "jämlike-anslutningar"
+msgstr "jämlikeanslutningar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/peers_jsp.java:418
 msgid "I2P Network Peers"
@@ -7822,13 +7823,13 @@ msgstr "I2P-tunnelsammandrag"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:453
 msgid "This page shows tunnels built by and routed through your router."
-msgstr ""
+msgstr "Den här sidan visar tunnlar som byggts av och dirigerats genom din router."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:457
 msgid ""
 "Tunnels built by your router and used for communication with the floodfill "
 "peers, building new tunnels, and testing existing tunnels."
-msgstr ""
+msgstr "Tunnlar som byggs av din router och används för kommunikation med jämlikar i översvämningsfyllningssystemet, för att bygga nya tunnlar och för att testa befintliga tunnlar."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:459
 msgid "Client tunnels"

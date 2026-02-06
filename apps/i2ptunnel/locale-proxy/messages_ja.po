@@ -5,6 +5,7 @@
 # 
 # Translators:
 # daingewuvzeevisiddfddd, 2022-2023
+# daingewuvzeevisiddfddd, 2026
 # タカハシ, 2022
 # Masayuki Hatta <mhatta@mhatta.org>, 2018
 # daingewuvzeevisiddfddd, 2021
@@ -15,8 +16,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 14:31+0000\n"
 "PO-Revision-Date: 2013-07-20 14:50+0000\n"
-"Last-Translator: daingewuvzeevisiddfddd, 2022-2023\n"
-"Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
+"Last-Translator: daingewuvzeevisiddfddd, 2026\n"
+"Language-Team: Japanese (http://app.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -339,13 +340,13 @@ msgstr "I2Pトンネルでアウトプロキシを設定してください。"
 
 #: ../java/build/Proxy.java:140 ../java/build/Proxy.java:146
 msgid "Warning: Destination Key Conflict"
-msgstr "警告: 宛先キーの衝突"
+msgstr "警告: 宛先鍵の衝突"
 
 #: ../java/build/Proxy.java:147
 msgid ""
 "The address helper link you followed specifies a different destination key "
 "than the entry in your address book."
-msgstr "辿ったアドレスヘルパーのリンクは、あなたのアドレス帳のエントリとは異なる宛先キーを指定します。"
+msgstr "辿ったアドレスヘルパーのリンクは、あなたのアドレス帳のエントリとは異なる宛先鍵を指定します。"
 
 #: ../java/build/Proxy.java:148
 msgid ""
@@ -358,7 +359,7 @@ msgid ""
 "Resolve the conflict by deciding which key you trust, and then either ignore"
 " the address helper link, or delete the host entry from your address book "
 "and click the address helper link again."
-msgstr "信頼できるキーを決定し、アドレスヘルパーリンクを無視するか、アドレス帳からホストエントリを削除してアドレスヘルパーリンクを再度クリックすることで、競合を解決します。"
+msgstr "信頼できる鍵を決定し、アドレスヘルパーリンクを無視するか、アドレス帳からホストエントリを削除してアドレスヘルパーリンクを再度クリックすることで、競合を解決します。"
 
 #: ../java/build/Proxy.java:150 ../java/build/Proxy.java:156
 msgid "Warning: Bad Address Helper"
@@ -367,7 +368,7 @@ msgstr "警告: 悪いアドレスヘルパー"
 #: ../java/build/Proxy.java:157
 #, java-format
 msgid "The helper key in the URL ({0}i2paddresshelper={1}) is not resolvable."
-msgstr "URL（{0}i2paddresshelper={1}）にあるヘルパーキーは解決不可能です。"
+msgstr "URL（{0}i2paddresshelper={1}）にあるヘルパー鍵は解決不可能です。"
 
 #: ../java/build/Proxy.java:158
 msgid "It seems to be garbage data, or a mistyped Base 32 address."
@@ -377,7 +378,7 @@ msgstr "それはゴミデータになっている、またはBase 32 アドレ�
 msgid ""
 "Check your URL to try and fix the helper key to be a valid Base 32 hostname "
 "or Base 64 key."
-msgstr "URLを確認して、ヘルパーキーが有効なBase 32ホスト名またはBase 64キーになるように修正を試みてください。"
+msgstr "URLを確認して、ヘルパー鍵が有効なBase 32ホスト名またはBase 64鍵になるように修正を試みてください。"
 
 #: ../java/build/Proxy.java:167
 msgid "The HTTP Outproxy was not found."
@@ -561,13 +562,13 @@ msgstr "このアドレスはローカルのアドレス帳に保存されます
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1478
 #, java-format
 msgid "Save {0} to private address book and continue to website"
-msgstr "プライベートのアドレス帳に {0} を保存して、ウェブサイトを続行"
+msgstr "非公開アドレス帳に {0} を保存して、ウェブサイトを続行"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1479
 msgid ""
 "This address will be saved to your Private address book, ensuring it is "
 "never published."
-msgstr "このアドレスはプライベートなアドレス帳へ保存され、公開されないことが確実になります。"
+msgstr "このアドレスは非公開アドレス帳へ保存され、公開されないことが確実になります。"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1507
 msgid "Base32 address requires lookup password"
@@ -575,15 +576,15 @@ msgstr "Base32のアドレスにはルックアップパスワードが必要で
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1509
 msgid "Base32 address requires encryption key"
-msgstr "Base32 アドレスは暗号化鍵を要求します"
+msgstr "Base32 アドレスは暗号鍵を要求します"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1511
 msgid "Base32 address requires encryption key and lookup password"
-msgstr "Base32のアドレスには暗号化キーとルックアップパスワードが必要です"
+msgstr "Base32のアドレスには暗号鍵とルックアップパスワードが必要です"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1513
 msgid "Base32 address decryption failure, check encryption key"
-msgstr "Base32アドレスの複合失敗、暗号化キーを確認してください"
+msgstr "Base32アドレスの複合失敗、暗号鍵を確認してください"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1524
 msgid "Generate"
@@ -591,13 +592,13 @@ msgstr "生成"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1525
 msgid "Encryption key"
-msgstr "暗号化鍵"
+msgstr "暗号鍵"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1526
 msgid ""
 "You must either enter a PSK encryption key provided by the server operator, "
 "or generate a DH encryption key and send that to the server operator."
-msgstr "サーバーのオペレータによって提供されるPSK暗号化鍵を入力するか、またはDH暗号化鍵を生成し、それをサーバーのオペレータへ送信するか、どちらかしなければなりません。"
+msgstr "サーバーのオペレータによって提供されるPSK暗号鍵を入力するか、またはDH暗号鍵を生成し、それをサーバーのオペレータへ送信するか、どちらかしなければなりません。"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1527
 msgid "Ask the server operator for help."
@@ -605,11 +606,11 @@ msgstr "ヘルプのためにサーバーのオペレータを尋ねてくださ
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1530
 msgid "Enter PSK encryption key"
-msgstr "PSK暗号化鍵を入力"
+msgstr "PSK暗号鍵を入力"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1533
 msgid "Generate new DH encryption key"
-msgstr "新しいDH暗号化鍵を生成"
+msgstr "新しいDH暗号鍵を生成"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1541
 msgid "Lookup password"
@@ -634,16 +635,16 @@ msgstr "ルックアップパスワードがありません"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:249
 msgid "Missing private key"
-msgstr "プライベートキーが欠落"
+msgstr "秘密鍵が欠落"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:254
 msgid "Invalid private key"
-msgstr "無効なプライベートキー"
+msgstr "無効な秘密鍵"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:287
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:306
 msgid "Your new encryption key"
-msgstr "あなたの新しい暗号化鍵"
+msgstr "あなたの新しい暗号鍵"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:301
 msgid "Address book"
@@ -651,7 +652,7 @@ msgstr "アドレス帳"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:311
 msgid "Copy the key and send it to the server operator."
-msgstr "そのキーをコピーして、サーバーのオペレータへ送信してください。"
+msgstr "その鍵をコピーして、サーバーのオペレータへ送信してください。"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:313
 msgid "After you are granted permission, you may proceed to the website."

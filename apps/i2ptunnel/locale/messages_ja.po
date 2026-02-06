@@ -5,7 +5,7 @@
 # 
 # Translators:
 # daingewuvzeevisiddfddd, 2022-2024
-# daingewuvzeevisiddfddd, 2025
+# daingewuvzeevisiddfddd, 2025-2026
 # タカハシ, 2013-2014
 # タカハシ, 2022
 # heizi <lv.kjsn.29yr@gmail.com>, 2016
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-27 11:59+0000\n"
 "PO-Revision-Date: 2011-02-13 11:46+0000\n"
-"Last-Translator: daingewuvzeevisiddfddd, 2025\n"
+"Last-Translator: daingewuvzeevisiddfddd, 2025-2026\n"
 "Language-Team: Japanese (http://app.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -791,7 +791,7 @@ msgid ""
 "Enabling this feature will ensure your tunnel identity (destination) remains"
 " static, for services offering features based on destination e.g. IRC user "
 "authentication"
-msgstr "この機能を有効にすると、例えばIRCユーザ認証のような宛先に基づく機能を提供するサービスでは、トンネル同一性（宛先） が静的なままであることが保証されます。"
+msgstr "この機能を有効にすると、例えばIRC利用者認証のような宛先に基づく機能を提供するサービスでは、トンネル同一性（宛先） が静的なままであることが保証されます。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:823
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1346
@@ -937,7 +937,7 @@ msgstr "ローカル認証"
 msgid ""
 "Enable to require a username and password to access this local service (for "
 "example if hosting on a LAN)"
-msgstr "このローカルサービス（例えばLAN上のホスティング）にアクセスするときにユーザー名とパスワードを要求するすることを有効化する"
+msgstr "このローカルサービス（例えばLAN上のホスティング）にアクセスするときに利用者名とパスワードを要求するすることを有効化する"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1029
 msgid "Require local authorization for this service"
@@ -946,11 +946,11 @@ msgstr "このサービスにローカル認証を要求する"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1031
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1047
 msgid "Username"
-msgstr "ユーザー名"
+msgstr "利用者名"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1033
 msgid "Set username required to access this service"
-msgstr "このサービスへのアクセスに要求するユーザー名を設定する"
+msgstr "このサービスへのアクセスに要求する利用者名を設定する"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1035
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1053
@@ -969,7 +969,7 @@ msgstr "アプトプロキシの認証"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1041
 msgid "Enable if the outproxy a username and password to access"
-msgstr "アウトプロキシへのアクセスにユーザー名とパスワードを有効化する"
+msgstr "アウトプロキシへのアクセスに利用者名とパスワードを有効化する"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1045
 msgid "Outproxy requires authorization"
@@ -977,7 +977,7 @@ msgstr "アウトプロキシに認証を必要"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1049
 msgid "Enter username required by outproxy"
-msgstr "アウトプロキシに必要なユーザー名を入力してください"
+msgstr "アウトプロキシに必要な利用者名を入力してください"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1055
 msgid "Enter password required by outproxy"
@@ -1114,7 +1114,7 @@ msgstr "QRコードを生成"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1412
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2253
 msgid "Add to Private addressbook"
-msgstr "プライベートのアドレス帳に追加する"
+msgstr "非公開アドレス帳に追加する"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1418
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:2259
@@ -1174,7 +1174,7 @@ msgstr "全てのクライアントがこのサービスに接続することを
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1808
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1838
 msgid "Send key to all users."
-msgstr "全ユーザーへ鍵を送信する"
+msgstr "全利用者へ鍵を送信する"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1812
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1842
@@ -1194,7 +1194,7 @@ msgstr "ブラインド"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1857
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1870
 msgid "Send password to all users."
-msgstr "全ユーザーへパスワードを送信する"
+msgstr "全利用者へパスワードを送信する"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1836
 msgid "Blinded with lookup password"
@@ -1202,7 +1202,7 @@ msgstr "ルックアップパスワードでブラインド化"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1844
 msgid "Send key and password to all users."
-msgstr "全ユーザーへ鍵とパスワードを送信する"
+msgstr "全利用者へ鍵とパスワードを送信する"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1848
 msgid "Encrypted with lookup password"
@@ -1211,22 +1211,22 @@ msgstr "ルックアップパスワードで暗号化済"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1850
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1856
 msgid "Send individual key to each user."
-msgstr "各ユーザーにここの鍵を送る"
+msgstr "各利用者にここの鍵を送る"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1854
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1867
 msgid "Encrypted with per-user key"
-msgstr "ユーザーごとの鍵で暗号化"
+msgstr "利用者ごとの鍵で暗号化"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1861
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1874
 msgid "Encrypted with lookup password and per-user key"
-msgstr "ルックアップパスワードとユーザーごとの鍵で暗号化"
+msgstr "ルックアップパスワードと利用者ごとの鍵で暗号化"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1863
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1869
 msgid "Enter key from each user."
-msgstr "各ユーザーから鍵を入力"
+msgstr "各利用者から鍵を入力"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1887
 msgid "Optional lookup password"
@@ -1530,7 +1530,7 @@ msgstr "これらはルーターが提供するローカルサービスです。
 msgid ""
 "By default, most of your client services (email, HTTP proxy, IRC) will share"
 " the same set of tunnels and be listed as \"Shared Clients\"."
-msgstr "規定では、たいていのあなたのクライアントのサービス（Eメール、HTTPプロキシ、IRC）トンネルと同じ組み合わせを共有し、\"共有クライアント\"であると一覧に記載されます。"
+msgstr "規定では、たいていのあなたのクライアントのサービス（電子メール、HTTPプロキシ、IRC）トンネルと同じ組み合わせを共有し、\"共有クライアント\"であると一覧に記載されます。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:179
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:640

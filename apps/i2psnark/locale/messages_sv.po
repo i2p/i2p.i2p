@@ -68,11 +68,11 @@ msgstr "Problem vid anslutning till I2P - kontrollera dina inställningar för I
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:152
 msgid "dark"
-msgstr "mörkt"
+msgstr "mörk"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:152
 msgid "light"
-msgstr "ljust"
+msgstr "ljus"
 
 #. Translators: Translate "ubergine" as "aubergine" or "eggplant" or "purple"
 #: ../java/src/org/klomp/snark/SnarkManager.java:152

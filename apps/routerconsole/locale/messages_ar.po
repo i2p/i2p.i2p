@@ -3697,14 +3697,14 @@ msgstr "مجموع"
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:215
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:216
 msgid "IPv4"
-msgstr ""
+msgstr "IPv4"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:220
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:221
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:424
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:599
 msgid "IPv6"
-msgstr ""
+msgstr "IPv6"
 
 #: ../java/src/net/i2p/router/web/helpers/PeerHelper.java:354
 msgid ""

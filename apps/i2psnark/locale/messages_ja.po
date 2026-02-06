@@ -6,6 +6,7 @@
 # Translators:
 # kami <b52c55627324b29125cbcfb101258463_228943>, 2014-2015
 # daingewuvzeevisiddfddd, 2022-2025
+# daingewuvzeevisiddfddd, 2025-2026
 # daingewuvzeevisiddfddd, 2020-2021
 # daingewuvzeevisiddfddd, 2021
 msgid ""
@@ -14,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-05 15:28+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
-"Last-Translator: daingewuvzeevisiddfddd, 2022-2025\n"
+"Last-Translator: daingewuvzeevisiddfddd, 2025-2026\n"
 "Language-Team: Japanese (http://app.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -288,7 +289,7 @@ msgstr "オープントラッカー一覧が変更されました - 反映には
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1494
 msgid "Private tracker list changed - affects newly created torrents only."
-msgstr "プライベートトラッカー一覧が変更されました - 新しく作成されたトレントのみに影響します"
+msgstr "非公開トラッカー一覧が変更されました - 新しく作成されたトレントのみに影響します"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1540
 #, java-format
@@ -352,7 +353,7 @@ msgstr "同じデータの場所を持つトレントは既に稼働していま
 #: ../java/src/org/klomp/snark/SnarkManager.java:1737
 #, java-format
 msgid "ERROR - No I2P trackers in private torrent \"{0}\""
-msgstr "エラー -  プライベートトレント \"{0}\" にI2Pトラッカーがありません"
+msgstr "エラー -  非公開トレント \"{0}\" にI2Pトラッカーがありません"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1739
 #, java-format
@@ -953,7 +954,7 @@ msgstr "エラー - 第一トラッカーを含めずに、代替トラッカー
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1576
 msgid "Error - Cannot mix private and public trackers in a torrent"
-msgstr "エラー - トレントの中にプライベートと公開のトラッカーを混ぜられません"
+msgstr "エラー - 個々のトレントの中に非公開と公開のトラッカーを混在させられません"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1598
 #, java-format
@@ -1318,7 +1319,7 @@ msgstr "オープン"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2620
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2987
 msgid "Private"
-msgstr "プライベート"
+msgstr "非公開"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2624
 msgid "none"
@@ -1326,7 +1327,7 @@ msgstr "なし"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2667
 msgid "Data directory"
-msgstr "データディレクトリ"
+msgstr "データのディレクトリ"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2670
 msgid "Directory where torrents and downloaded/shared files are stored"
@@ -1340,7 +1341,7 @@ msgstr "ファイルが全員に読み取り可能"
 msgid ""
 "Set file permissions to allow other local users to access the downloaded "
 "files"
-msgstr "他のローカルユーザーがダウンロードしたファイルにアクセスするために、ファイルの権限を許可に設定します。"
+msgstr "他のローカル利用者がダウンロードしたファイルにアクセスするために、ファイルの権限を許可に設定します。"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2683
 msgid "Auto start torrents"
@@ -1631,7 +1632,7 @@ msgstr "マグネットリンク"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3562
 msgid "Private torrent"
-msgstr "プライベートトレント"
+msgstr "非公開トレント"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3576
 msgid "Completion"

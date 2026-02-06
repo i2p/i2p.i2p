@@ -5,6 +5,7 @@
 # 
 # Translators:
 # daingewuvzeevisiddfddd, 2022-2024
+# daingewuvzeevisiddfddd, 2025-2026
 # タカハシ, 2014
 # rafe <rafe.kun@gmail.com>, 2015
 # daingewuvzeevisiddfddd, 2021
@@ -16,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-27 13:00+0000\n"
 "PO-Revision-Date: 2011-03-11 22:21+0000\n"
-"Last-Translator: daingewuvzeevisiddfddd, 2022-2024\n"
+"Last-Translator: daingewuvzeevisiddfddd, 2025-2026\n"
 "Language-Team: Japanese (http://app.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,7 +35,7 @@ msgstr[0] "{0} 件の新着メッセージ"
 #: src/src/i2p/susi/webmail/MailCache.java:554
 #: src/src/i2p/susi/webmail/WebMail.java:2539
 msgid "Email"
-msgstr "メール"
+msgstr "電子メール"
 
 #: src/src/i2p/susi/webmail/MailPart.java:336
 #, java-format
@@ -81,11 +82,11 @@ msgstr "受信ボックス"
 
 #: src/src/i2p/susi/webmail/WebMail.java:555
 msgid "View email as HTML"
-msgstr "HTMLとしてメールを表示"
+msgstr "HTMLとして電子メールを表示"
 
 #: src/src/i2p/susi/webmail/WebMail.java:573
 msgid "View email as plain text"
-msgstr "プレーンテキストとしてメールを表示"
+msgstr "プレーンテキストとして電子メールを表示"
 
 #: src/src/i2p/susi/webmail/WebMail.java:604
 msgid "unknown"
@@ -274,7 +275,7 @@ msgstr "設定が保存されました"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2032
 msgid "Invalid pagesize number, resetting to default value."
-msgstr "無効なページサイズ番号、デフォルトの値にリセット中"
+msgstr "無効なページサイズ番号、初期設定の値にリセット中"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2501
 #: src/src/i2p/susi/webmail/WebMail.java:3398
@@ -285,7 +286,7 @@ msgstr "ログイン"
 #: src/src/i2p/susi/webmail/WebMail.java:2644
 #: src/src/i2p/susi/webmail/WebMail.java:3415
 msgid "Loading emails, please wait..."
-msgstr "メールの読み込み中、少々お待ちください..."
+msgstr "電子メールの読み込み中、少々お待ちください..."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2511
 #, java-format
@@ -351,7 +352,7 @@ msgstr "受信者が見つかりませんでした。"
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:302
 #, java-format
 msgid "Email is too large, max is {0}"
-msgstr "Eメールが大きすぎます、最大は{0}です"
+msgstr "電子メールが大きすぎます、最大は{0}です"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3098
 #: src/src/i2p/susi/webmail/WebMail.java:3179
@@ -432,7 +433,7 @@ msgstr "選択した添付ファイルを削除する"
 #. Integer.toString(DEFAULT_SMTPPORT));
 #: src/src/i2p/susi/webmail/WebMail.java:3363
 msgid "Email Login"
-msgstr "Eメールにログイン"
+msgstr "電子メールにログイン"
 
 #. current postman hq length limits 16/12, new postman version 32/32
 #: src/src/i2p/susi/webmail/WebMail.java:3365

@@ -1556,7 +1556,7 @@ msgstr "Rensa"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:205
 msgid "Global Tunnel Control"
-msgstr "Global tunnelkontroll"
+msgstr "Global tunnelstyrning"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:207
 msgid "Tunnel Wizard"

@@ -9,13 +9,13 @@
 # tama negi, 2020
 # タカハシ, 2022
 # zzzi2p, 2022
-# daingewuvzeevisiddfddd, 2023
+# daingewuvzeevisiddfddd, 2026
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2021-11-27 13:31-0000\n"
-"Last-Translator: daingewuvzeevisiddfddd, 2023\n"
+"Last-Translator: daingewuvzeevisiddfddd, 2026\n"
 "Language-Team: Japanese (https://app.transifex.com/otf/teams/12694/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -139,7 +139,7 @@ msgstr "B<-l> lineLen"
 msgid ""
 "Controls the progress display. B<\\ lineLen > is the length of one progress "
 "line in characters. The default is 40."
-msgstr "進捗表示を制御。 B<\\ lineLen > は文字列での進捗行の長さ。デフォルトでは 40 。"
+msgstr "進捗表示を制御。 B<\\ lineLen > は文字列での進捗行の長さ。初期設定では 40 。"
 
 #. type: Plain text
 #: man/eepget.1:49
@@ -152,7 +152,7 @@ msgstr "B<-m> markSize"
 msgid ""
 "Controls the progress display. B<\\ markSize > is the number of bytes one "
 "'#' character represents. The default is 1024."
-msgstr "進捗表示を制御。B<\\ markSize > は # 一文字が表すバイト数。デフォルトでは 1024 。"
+msgstr "進捗表示を制御。B<\\ markSize > は # 一文字が表すバイト数。初期設定では 1024 。"
 
 #. type: Plain text
 #: man/eepget.1:55

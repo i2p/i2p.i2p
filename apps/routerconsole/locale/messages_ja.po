@@ -9,7 +9,7 @@
 # kami <b52c55627324b29125cbcfb101258463_228943>, 2015
 # daingewuvzeevisiddfddd, 2021
 # daingewuvzeevisiddfddd, 2022-2025
-# daingewuvzeevisiddfddd, 2025
+# daingewuvzeevisiddfddd, 2025-2026
 # g3600303 <g3600303@trbvm.com>, 2015
 # タカハシ, 2013-2014
 # タカハシ, 2015,2022
@@ -28,7 +28,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-27 11:59+0000\n"
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
-"Last-Translator: daingewuvzeevisiddfddd, 2025\n"
+"Last-Translator: daingewuvzeevisiddfddd, 2025-2026\n"
 "Language-Team: Japanese (http://app.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1461,7 +1461,7 @@ msgstr "プラグイン {0} を起動する際にエラー"
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:118
 #, java-format
 msgid "Added user {0}"
-msgstr "ユーザ {0} を追加"
+msgstr "利用者 {0} を追加"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHandler.java:688
 msgid "Interface configuration saved"
@@ -1536,7 +1536,7 @@ msgstr "アドレス帳"
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:126
 #: ../java/src/net/i2p/router/web/helpers/SummaryBarRenderer.java:224
 msgid "Email"
-msgstr "Eメール"
+msgstr "電子メール"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigClientsHelper.java:274
 msgid "Plugin"
@@ -2534,7 +2534,7 @@ msgstr "送信オプション"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:612
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:618
 msgid "Add user"
-msgstr "ユーザーを追加"
+msgstr "利用者を追加"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:81
 msgid "Theme change saved."
@@ -2550,13 +2550,13 @@ msgstr "ページを更新して表示"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:95
 msgid "No user name entered"
-msgstr "ユーザー名が入力されていません"
+msgstr "利用者名が入力されていません"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:107
 msgid ""
 "Warning: User names outside the ISO-8859-1 character set are not "
 "recommended. Support is not standardized and varies by browser."
-msgstr "警告: ISO-8859-1 文字セットの範囲外のユーザ名は推奨されません。サポートは標準化されておらず、ブラウザに依存します。"
+msgstr "警告: ISO-8859-1 文字セットの範囲外の利用者名は推奨されません。サポートは標準化されておらず、ブラウザに依存します。"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:110
 msgid "No password entered"
@@ -2572,7 +2572,7 @@ msgstr "パスワードがわからない、または使えない状態から回
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHandler.java:138
 #, java-format
 msgid "Removed user {0}"
-msgstr "ユーザー {0} を削除しました"
+msgstr "利用者 {0} を削除しました"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:60
 msgid "Set theme universally across all apps"
@@ -2590,11 +2590,11 @@ msgstr "これらのアプリケーションを組み込む場合は、ユニバ
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:76
 msgid "Embed Email and Torrent applications in the console"
-msgstr "EメールとTorrentアプリケーションをコンソールに埋め込む"
+msgstr "電子メールとTorrentアプリケーションをコンソールに埋め込む"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:235
 msgid "Add a user and password to enable."
-msgstr "ユーザー名とパスワードを追加すると有効になります"
+msgstr "利用者ユーザー名とパスワードを追加すると有効になります"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:239
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:467
@@ -2613,7 +2613,7 @@ msgstr "削除"
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:258
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:632
 msgid "Username"
-msgstr "ユーザー名"
+msgstr "利用者名"
 
 #: ../java/src/net/i2p/router/web/helpers/ConfigUIHelper.java:260
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:634
@@ -3017,7 +3017,7 @@ msgstr "I2P Pastebin"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:158
 msgid "Pastebin for I2P users"
-msgstr "I2Pユーザー用Pastebin"
+msgstr "I2P利用者用Pastebin"
 
 #: ../java/src/net/i2p/router/web/helpers/HomeHelper.java:170
 msgid "I2P News"
@@ -5503,7 +5503,7 @@ msgid ""
 "Most of the router configuration options listed below are not available in "
 "the user interface, because they are rarely used or provide access to "
 "advanced settings that most users will not need."
-msgstr "これらはほとんど使用されないか、ほとんどのユーザーが必要としない高度な設定へのアクセスを提供するので、以下の一覧に記載されたほとんどのルーター設定選択肢は、ユーザーインターフェースで利用できません。"
+msgstr "これらはほとんど使用されないか、ほとんどの利用者が必要としない高度な設定へのアクセスを提供するので、以下の一覧に記載されたほとんどのルーター設定選択肢は、ユーザーインターフェースで利用できません。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:561
 msgid ""
@@ -5571,7 +5571,7 @@ msgstr "何を設定しているかを理解している場合にのみ続行し
 msgid ""
 "When set to true, additional functionality will be enabled in the console "
 "and the user will be able to edit settings directly on this page"
-msgstr "true に設定すると、追加機能がコンソールで有効化され、ユーザーはこのページ上で設定を直接編集できるようになります。"
+msgstr "true に設定すると、追加機能がコンソールで有効化され、利用者はこのページ上で設定を直接編集できるようになります。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:660
 msgid ""
@@ -7516,7 +7516,7 @@ msgstr "接続したいサービスにアウトプロキシが設定されてい
 msgid ""
 "There are only three types of outproxies running right now: HTTP, HTTPS, and"
 " email."
-msgstr "今、稼働しているアウトプロキシは3種類だけです: HTTP、HTTPS、及びEメール。"
+msgstr "今、稼働しているアウトプロキシは3種類だけです: HTTP、HTTPS、及び電子メール。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:702
 msgid "Note that there is currently no public SOCKS outproxy."
@@ -7601,7 +7601,7 @@ msgid ""
 "HexChat-like client users can create a new network with the server "
 "<code>127.0.0.1/6668</code>, or you can connect with the command "
 "<code>/server 127.0.0.1 6668</code>."
-msgstr "HexChatのようなクライアントユーザーは、サーバー<code>127.0.0.1/6668</code>との間で新しいネットワークを作る、またはコマンド<code>/server 127.0.0.1 6668</code>で接続することができます。"
+msgstr "HexChatのようなクライアントの利用者は、サーバー<code>127.0.0.1/6668</code>との間で新しいネットワークを作るか、コマンド<code>/server 127.0.0.1 6668</code>で接続することができます。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:737
 msgid ""
@@ -8081,14 +8081,14 @@ msgstr "{0}ビットトレント{1}でファイルをダウンロードできま
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:658
 #, java-format
 msgid "You can also send and receive {0}email{1}."
-msgstr "{0}Eメール{1}の送受信もできます。"
+msgstr "{0}電子メール{1}の送受信もできます。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:660
 #, java-format
 msgid ""
 "Besides that, you can use the built-in {0}web server{1} so you can create, "
 "communicate, and share your content."
-msgstr "それ以外に、内臓の{0}ウェブブラウザ{1}を使用して、コンテンツを作成したり、通信したり、共有したりすることができます。"
+msgstr "それ以外にも、内臓の{0}ウェブサーバー{1}を使用して、コンテンツを作成したり、通信したり、共有したりすることができます。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:662
 msgid ""
@@ -8113,13 +8113,13 @@ msgstr "アドレス帳は、人間にわかりやすい名前を付けてI2Pの
 msgid ""
 "This can be used for the sites you like to visit, messaging contacts, or "
 "potentially any other service on I2P."
-msgstr "これは訪問するサイトやメッセージを送る宛先、あるいは潜在的には他のI2P上のサービスに使用することができます。"
+msgstr "これは訪問するサイトや、メッセージを送る宛先の他に、もしかすると他のI2P上の様々なサービスに使用することができます。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:670
 msgid ""
 "To help you get started, the address book can be used to subscribe to lists "
 "of addresses distributed by other I2P users."
-msgstr "アドレス帳は、他のI2Pユーザーが配布しているアドレスの一覧を購読するために使用することができます。"
+msgstr "アドレス帳は、他のI2P利用者が配布しているアドレスの一覧を購読するために使用することができます。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/welcome_jsp.java:678
 msgid "Welcome to the Invisible Internet!"
