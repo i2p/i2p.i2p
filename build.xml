@@ -959,6 +959,8 @@
                 <pathelement location="core/java/build/libintl.jar" />
                 <pathelement location="core/java/build/gnu-getopt.jar" />
                 <pathelement location="core/java/build/json-simple.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-ee.jar" />
+                <pathelement location="apps/jetty/jettylib/slf4j2-api.jar" />
             </classpath>
             <!-- These variables are stored in build.properties.
                   End-users can override by creating the file override.properties -->
