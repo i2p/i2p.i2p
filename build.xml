@@ -16,6 +16,7 @@
           and versions in gradle.properties and apps/jetty/build.gradle
      -->
     <property name="jetty.ver" value="12.0.28" />
+    <property name="jetty.ver.debian" value="12.0.17" />
     <property name="tomcat.ver" value="9.0.107" />
 
     <!-- You probably don't want to change anything from here down -->
@@ -2857,27 +2858,9 @@
             <fileset dir="../i2p-${Extended.Version}/router/java/src/org/bouncycastle" />
           <!--
             libjetty12-java
-            Delete all but ee8 jars which are not in the libjetty12 deb
+            Delete all the 12.0.28 jars, we use the 12.0.17 ee8 jars which are not in the libjetty12 deb
            -->
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/start.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-deploy-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-ee-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-http-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-io-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-jmx-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-rewrite-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-security-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-server-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-servlet-api-4.0.6.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-session-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-util-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-xml-${jetty.ver}.jar" />
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/logging" />
-          <!--
-            TODO delete all but ee8 jars when resolute gets jetty12
-            and make separate target for jammy that keeps all the jars
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}" />
-           -->
             <!-- libtomcat9-java -->
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-${tomcat.ver}" />
             <!-- libjstl1.1-java or glassfish-javaee or libtaglibs-standard -->
@@ -2953,23 +2936,9 @@
             <fileset dir="../i2p-${Extended.Version}/router/java/src/org/bouncycastle" />
           <!--
             libjetty12-java
-            Delete all but ee8 jars which are not in the libjetty12 deb
+            Delete all the 12.0.28 jars, we use the 12.0.17 ee8 jars which are not in the libjetty12 deb
            -->
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/start.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-deploy-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-ee-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-http-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-io-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-jmx-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-rewrite-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-security-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-server-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-servlet-api-4.0.6.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-session-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-util-${jetty.ver}.jar" />
-            <file name="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/jetty-xml-${jetty.ver}.jar" />
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}/lib/logging" />
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-${tomcat.ver}" />
+            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}" />
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/standard.jar" />
             <fileset dir="../i2p-${Extended.Version}/installer/resources/icons/flags" />

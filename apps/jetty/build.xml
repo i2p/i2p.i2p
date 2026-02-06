@@ -15,15 +15,28 @@
 
     <!-- Note: Change version numbers in top-level build.xml if you update to a new Tomcat or Jetty! -->
 
-    <property name="jetty.branch" value="stable-9" />
-    <property name="jetty.base" value="jetty-home-${jetty.ver}" />
+    <!--
+      -  Conditionally set the jetty version on whether we are using Debian's libjetty12-java,
+      -  because we have to bundle the ee8 jars either way,
+      -  and 12.0.17 is not compatible with 12.0.28
+     -->
+    <condition property="jetty.ver.build" value="${jetty.ver}" >
+        <not>
+            <isset property="with-libjetty12-java" />
+        </not>
+    </condition>
+    <condition property="jetty.ver.build" value="${jetty.ver.debian}" >
+        <isset property="with-libjetty12-java" />
+    </condition>
+
+    <property name="jetty.base" value="jetty-home-${jetty.ver.build}" />
     <property name="jetty.sha1" value="bb0ce8db30693fa4c1450983434029e7441b8d4f" />
     <property name="jetty.filename" value="${jetty.base}.zip" />
-    <property name="jetty.url" value="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-home/${jetty.ver}/${jetty.filename}" />
+    <property name="jetty.url" value="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-home/${jetty.ver.build}/${jetty.filename}" />
     <property name="verified.filename" value="verified.txt" />
     <property name="javac.compilerargs" value="" />
-    <property name="javac.version" value="1.8" />
-    <property name="javac.release" value="8" />
+    <property name="javac.version" value="17" />
+    <property name="javac.release" value="17" />
     <property name="manifest.classpath.name" value="Class-Path" />
 
     <!-- everything we need is in the deployer package, except for tomcat-api.jar in the full package,
@@ -38,7 +51,7 @@
     <!--
       - We now check in the jars we need to ${jetty.base}, so
       - fetchJettylib, verifyJettylib, and extractJettylib are not used unless
-      - updating to a new Jetty version by changing ${jetty.ver} and ${jetty.sha1} above.
+      - updating to a new Jetty version by changing ${jetty.ver} in ../../build.xml and ${jetty.sha1} above.
      -->
 
     <!-- verify everything we need is in jettylib/ -->
@@ -161,16 +174,16 @@
               All of these are available in the Ubuntu packages libjetty-java and libjetty-extra-java
         -->
         <copy preservelastmodified="true" file="${jetty.base}/start.jar" tofile="jettylib/jetty-start.jar" />
-        <copy file="${jetty.base}/lib/jetty-server-${jetty.ver}.jar" tofile="jettylib/org.mortbay.jetty.jar" />
-        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-deploy-${jetty.ver}.jar" tofile="jettylib/jetty-deploy.jar" />
-        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-http-${jetty.ver}.jar" tofile="jettylib/jetty-http.jar" />
-        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-io-${jetty.ver}.jar" tofile="jettylib/jetty-io.jar" />
-        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-jmx-${jetty.ver}.jar" tofile="jettylib/org.mortbay.jmx.jar" />
-        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-rewrite-${jetty.ver}.jar" tofile="jettylib/jetty-rewrite-handler.jar" />
-        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-security-${jetty.ver}.jar" tofile="jettylib/jetty-security.jar" />
+        <copy file="${jetty.base}/lib/jetty-server-${jetty.ver.build}.jar" tofile="jettylib/org.mortbay.jetty.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-deploy-${jetty.ver.build}.jar" tofile="jettylib/jetty-deploy.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-http-${jetty.ver.build}.jar" tofile="jettylib/jetty-http.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-io-${jetty.ver.build}.jar" tofile="jettylib/jetty-io.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-jmx-${jetty.ver.build}.jar" tofile="jettylib/org.mortbay.jmx.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-rewrite-${jetty.ver.build}.jar" tofile="jettylib/jetty-rewrite-handler.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-security-${jetty.ver.build}.jar" tofile="jettylib/jetty-security.jar" />
 
 
-        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-xml-${jetty.ver}.jar" tofile="jettylib/jetty-xml.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-xml-${jetty.ver.build}.jar" tofile="jettylib/jetty-xml.jar" />
         <jar destfile="jettylib/jetty-java5-threadpool.jar" >
             <manifest>
                 <attribute name="Note" value="Intentionally empty" />
@@ -196,15 +209,15 @@
           handling both the Debian and non-Debian build cases.
      -->
     <target name="copyJettylib1B" depends="extractJettylib, buildPatches" >
-        <jar destfile="jettylib/jetty-webapp.jar"  manifest="${jetty.base}/lib/jetty-ee8-webapp-${jetty.ver}.jar" filesetmanifest="mergewithoutmain" >
+        <jar destfile="jettylib/jetty-webapp.jar"  manifest="${jetty.base}/lib/jetty-ee8-webapp-${jetty.ver.build}.jar" filesetmanifest="mergewithoutmain" >
             <!-- required Jetty initializer (see RouterConsoleRunner) -->
-            <zipfileset src="${jetty.base}/lib/jetty-ee8-apache-jsp-${jetty.ver}.jar"/>
-            <zipfileset src="${jetty.base}/lib/jetty-ee8-nested-${jetty.ver}.jar" />
-            <zipfileset src="${jetty.base}/lib/jetty-ee8-security-${jetty.ver}.jar" />
-            <zipfileset src="${jetty.base}/lib/jetty-ee8-webapp-${jetty.ver}.jar" />
+            <zipfileset src="${jetty.base}/lib/jetty-ee8-apache-jsp-${jetty.ver.build}.jar"/>
+            <zipfileset src="${jetty.base}/lib/jetty-ee8-nested-${jetty.ver.build}.jar" />
+            <zipfileset src="${jetty.base}/lib/jetty-ee8-security-${jetty.ver.build}.jar" />
+            <zipfileset src="${jetty.base}/lib/jetty-ee8-webapp-${jetty.ver.build}.jar" />
         </jar>
-        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-ee8-servlet-${jetty.ver}.jar" tofile="jettylib/jetty-servlet.jar" />
-        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-ee8-servlets-${jetty.ver}.jar" tofile="jettylib/jetty-servlets.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-ee8-servlet-${jetty.ver.build}.jar" tofile="jettylib/jetty-servlet.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-ee8-servlets-${jetty.ver.build}.jar" tofile="jettylib/jetty-servlets.jar" />
     </target>
 
     <!-- jetty-util.jar, optionally including slf4j2 -->
@@ -218,10 +231,10 @@
     <target name="copyJettylib1C" depends="extractJettylib, buildPatches, copyJettylib1C1, copyJettylib1C2" />
 
     <target name="copyJettylib1C1" unless="${with-libjetty12-java}" >
-        <jar destfile="jettylib/jetty-util.jar"  manifest="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" filesetmanifest="mergewithoutmain" >
-            <zipfileset src="${jetty.base}/lib/jetty-ee-${jetty.ver}.jar" />
-            <zipfileset src="${jetty.base}/lib/jetty-session-${jetty.ver}.jar" />
-            <zipfileset src="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" />
+        <jar destfile="jettylib/jetty-util.jar"  manifest="${jetty.base}/lib/jetty-util-${jetty.ver.build}.jar" filesetmanifest="mergewithoutmain" >
+            <zipfileset src="${jetty.base}/lib/jetty-ee-${jetty.ver.build}.jar" />
+            <zipfileset src="${jetty.base}/lib/jetty-session-${jetty.ver.build}.jar" />
+            <zipfileset src="${jetty.base}/lib/jetty-util-${jetty.ver.build}.jar" />
         </jar>
     </target>
 
@@ -347,13 +360,13 @@
             The following file has the class, but /usr/share/java/jetty8-jsp.jar is empty
             We don't use this one, because we want to be consistent with Debian builds that
             must use Apache (aka libtomcat8).
-            <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/jsp/jetty-jsp-${jetty.ver}.jar" />
+            <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/jsp/jetty-jsp-${jetty.ver.build}.jar" />
            -->
 
             <!-- Apache in Jetty package version -->
             <!-- Also includes javax.servlet.jsp.*, this is copied into javax.servlet.jar above -->
           <!--
-            <zipfileset src="${jetty.base}/lib/apache-jsp/org.mortbay.jasper.apache-jsp-${jetty.ver}.jar"/>
+            <zipfileset src="${jetty.base}/lib/apache-jsp/org.mortbay.jasper.apache-jsp-${jetty.ver.build}.jar"/>
            -->
 
             <!-- Apache package version -->
@@ -534,8 +547,8 @@
             encoding="UTF-8" >
             <compilerarg line="${javac.compilerargs}" />
             <classpath>
-                <pathelement location="${jetty.base}/lib/jetty-io-${jetty.ver}.jar" />
-                <pathelement location="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" />
+                <pathelement location="${jetty.base}/lib/jetty-io-${jetty.ver.build}.jar" />
+                <pathelement location="${jetty.base}/lib/jetty-util-${jetty.ver.build}.jar" />
             </classpath>
         </javac>
 -->
