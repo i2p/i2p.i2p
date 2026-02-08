@@ -189,7 +189,7 @@ class EstablishmentManager {
         _liveIntroductions = new ConcurrentHashMap<Long, OutboundEstablishState>();
         _outboundByClaimedAddress = new ConcurrentHashMap<RemoteHostId, OutboundEstablishState>();
         _outboundByHash = new ConcurrentHashMap<Hash, OutboundEstablishState>();
-        _inboundBans = new LHMCache<RemoteHostId, Long>(32);
+        _inboundBans = new LHMCache<RemoteHostId, Long>(128);
         // roughly scale based on expected traffic
         int tokenCacheSize = Math.max(MIN_TOKENS, Math.min(MAX_TOKENS, 3 * _transport.getMaxConnections() / 4));
         _inboundTokens = new InboundTokens(tokenCacheSize);

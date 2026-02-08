@@ -3009,6 +3009,11 @@
             <file name="../i2p-${Extended.Version.J}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version.J}/installer/resources/geoipv6.dat.gz" />
             <file name="../i2p-${Extended.Version.J}/installer/resources/GeoLite2-Country.mmdb.gz" />
+          <!--
+            libjetty12-java
+            Delete all the 12.0.17 jars, we use the 12.0.28 jars
+           -->
+            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver.debian}" />
             <!-- libtomcat9-java -->
             <fileset dir="../i2p-${Extended.Version.J}/apps/jetty/apache-tomcat-${tomcat.ver}" />
             <!-- libjstl1.1-java or glassfish-javaee or libtaglibs-standard -->
@@ -3079,6 +3084,11 @@
             <file name="../i2p-${Extended.Version.J}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version.J}/installer/resources/geoipv6.dat.gz" />
             <file name="../i2p-${Extended.Version.J}/installer/resources/GeoLite2-Country.mmdb.gz" />
+          <!--
+            libjetty12-java
+            Delete all the 12.0.17 jars, we use the 12.0.28 jars
+           -->
+            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver.debian}" />
             <fileset dir="../i2p-${Extended.Version.J}/apps/jetty/apache-tomcat-${tomcat.ver}" />
             <file name="../i2p-${Extended.Version.J}/apps/susidns/src/lib/jstl.jar" />
             <file name="../i2p-${Extended.Version.J}/apps/susidns/src/lib/standard.jar" />

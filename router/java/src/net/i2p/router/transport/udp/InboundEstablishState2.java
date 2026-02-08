@@ -374,6 +374,18 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             throw new RIException("Old and slow: " + h, REASON_BANNED);
         }
 
+        if (ri.getCapabilities().indexOf('G') >= 0 &&
+            ri.getCapabilities().indexOf('X') >= 0 &&
+            ri.getCapabilities().indexOf('f') >= 0 &&
+            ri.getVersion().equals("0.9.67")) {
+            long time = _context.netDb().floodfillEnabled() ? 30*60*1000 : 60*60*1000;
+            _context.banlist().banlistRouter(h, "Refuses tunnels", null,
+                                             null, _context.clock().now() + time);
+            if (ri.verifySignature())
+                _context.blocklist().add(_aliceIP);
+            throw new RIException("Refuses tunnels: " + h, REASON_BANNED);
+        }
+
         String smtu = ra.getOption(UDPAddress.PROP_MTU);
         int mtu = 0;
         try {

@@ -256,6 +256,7 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                         if (count > LIMIT_ROUTERS) {
                             String caps = ri.getCapabilities();
                             boolean isU = caps.indexOf(Router.CAPABILITY_UNREACHABLE) >= 0;
+                            boolean isG = caps.indexOf(Router.CAPABILITY_NO_TUNNELS) >= 0;
                             boolean isFF = caps.indexOf(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL) >= 0;
                             boolean notFrom = !key.equals(_fromHash);
                             boolean isSlow = caps.indexOf(Router.CAPABILITY_BW32) >= 0;
@@ -276,6 +277,8 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                         // appx. 90% max drop rate so even just-reseeded new routers will make it eventually
                                         int pdrop = Math.min(110, (128 * count / LIMIT_ROUTERS) - 128);
                                         if (isU)
+                                            pdrop *= 3;
+                                        if (isG)
                                             pdrop *= 3;
                                         if (isFF)
                                             pdrop *= 3;
@@ -332,6 +335,8 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                 // up to 100% drop rate
                                 int pdrop = (128 * count / LIMIT_ROUTERS) - 128;
                                 if (isU)
+                                    pdrop *= 3;
+                                if (isG)
                                     pdrop *= 3;
                                 if (isFF)
                                     pdrop *= 3;
