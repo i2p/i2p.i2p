@@ -100,7 +100,7 @@
     git clone -l . /path/to/releasedir
     ```
 
-  - You must build with Java 8 or higher.
+  - You must build with Java 17 or higher.
 
 4. Create override.properties with (adjust as necessary):
 
