@@ -23,16 +23,17 @@
     <target name="help" depends="all" />
     <target name="all" >
         <echo message="Useful targets: " />
-        <echo message="  pkg:       distclean then package everything up (updater, installer)" />
+        <echo message="  pkg:       distclean then package everything up (updater, installer) - requires Java 13 or lower" />
+        <echo message="  pkg5:      distclean then package everything up using IzPack 5 (Java 14+)" />
         <echo message="  dist:      pkg and javadoc" />
         <echo message="  dist200:   pkg, updater200, and javadoc" />
-        <echo message="  installer: build the GUI installer" />
+        <echo message="  installer: build the GUI installer - requires Java 13 or lower (uses bundled IzPack 4)" />
         <echo message="  installer-freebsd: build the GUI installer (FreeBSD only)" />
         <echo message="  installer-linux: build the GUI installer (Linux only)" />
         <echo message="  installer-osx: build the GUI installer (OSX only)" />
         <echo message="  installer-windows: build the GUI installer (Windows only)" />
         <echo message="  installer-nowindows: build the GUI installer (all but Windows)" />
-        <echo message="  installer5, installer5-linux, installer5-nowindows, installer5-windows: use IzPack 5" />
+        <echo message="  installer5, installer5-linux, installer5-nowindows, installer5-windows: use IzPack 5 (Java 14+)" />
         <echo message="  tarball:   tar the full install into i2p.tar.bz2 (extracts to build a new clean install)" />
         <echo message="  git-bundle:    (GIT ONLY!) generate a git bundle and a corresponding torrent." />
         <!--<echo message="  bundleRelease:    (GIT ONLY!) generate a git bundle only up to the most recent tag, and a corresponding torrent." />-->
@@ -1352,6 +1353,8 @@
     </target>
 
     <target name="pkg" depends="distclean, updater, preppkg, installer" />
+
+    <target name="pkg5" depends="distclean, updater, preppkg, installer5" />
 
     <target name="pkg200" depends="distclean, updater200, preppkg, installer" />
 

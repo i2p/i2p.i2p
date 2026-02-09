@@ -1,8 +1,7 @@
 #!/bin/sh
-cd `dirname $0`
+LAUNCH4J="$(dirname "$0")"/launch4j.jar
 if [ -n "$JAVA_HOME" ]; then
-  $JAVA_HOME/bin/java -jar ./launch4j.jar $*
+  $JAVA_HOME/bin/java -jar "$LAUNCH4J" "$@"
 else
-  java -jar ./launch4j.jar $*
+  java -jar "$LAUNCH4J" "$@"
 fi
-cd $OLDPWD

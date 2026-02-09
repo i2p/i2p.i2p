@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+
+<!-- The Indonesian langpack -->
+<!-- translation provided by Thomas Edwin Santosa - thomas (at) katalisindonesia dot com-->
+
+<izpack:langpack version="5.0"
+                 xmlns:izpack="http://izpack.org/schema/langpack"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://izpack.org/schema/langpack http://izpack.org/schema/5.0/izpack-langpack-5.0.xsd">
+
+    <!-- Heading messages START -->
+    <str id="CheckedHelloPanel.headline" txt="Selamat Datang"/>
+    <str id="CompilePanel.headline" txt="Kompilasi Kode Sumber Java"/>
+    <str id="ConditionalUserInputPanel.headline" txt="Data Pengguna"/>
+    <str id="FinishPanel.headline" txt="Pemasangan Telah Selesai"/>
+    <str id="HelloPanel.headline" txt="Selamat Datang"/>
+    <str id="HTMLInfoPanel.headline" txt="Informasi"/>
+    <str id="HTMLLicencePanel.headline" txt="Perjanjian Lisensi"/>
+    <str id="PDFLicencePanel.headline" txt="Perjanjian Lisensi"/>
+    <str id="ImgPacksPanel.headline" txt="Pilih Paket-Paket Pemasangan"/>
+    <str id="InfoPanel.headline" txt="Informasi"/>
+    <str id="InstallPanel.headline" txt="Pemasangan"/>
+    <str id="JDKPathPanel.headline" txt="Alamat JDK"/>
+    <str id="LicencePanel.headline" txt="Perjanjian Lisensi"/>
+    <str id="PacksPanel.headline" txt="Pilih Paket-Paket Pemasangan"/>
+    <str id="ProcessPanel.headline" txt="Lakukan Proses-Proses Eksternal"/>
+    <str id="ShortcutPanel.headline" txt="Jalan-Jalan Pintas"/>
+    <str id="SimpleFinishPanel.headline" txt="Pemasangan Telah Selesai"/>
+    <str id="SummaryPanel.headline" txt="Ringkasan Data Konfigurasi"/>
+    <str id="TargetPanel.headline" txt="Alamat Tujuan"/>
+    <str id="TreePacksPanel.headline" txt="Pilih Paket-Paket Pemasangan"/>
+    <str id="UserInputPanel.headline" txt="Data Pengguna"/>
+    <str id="UserPathPanel.headline" txt="Pilih Lokasi"/>
+    <str id="InstallationTypePanel.headline" txt="Jenis Pemasangan"/>
+
+    <!-- ConsolePrompt strings -->
+    <str id="ConsolePrompt.okCancel" txt="Enter O for OK, C to Cancel: "/>
+    <str id="ConsolePrompt.yesNo" txt="Enter Y for Yes, N for No: "/>
+    <str id="ConsolePrompt.yesNoCancel" txt="Enter Y for Yes, N for No, or C to Cancel: "/>
+    <str id="ConsolePrompt.ok" txt="O"/>
+    <str id="ConsolePrompt.cancel" txt="C"/>
+    <str id="ConsolePrompt.yes" txt="Y"/>
+    <str id="ConsolePrompt.no" txt="N"/>
+
+    <!-- ConsoleInstaller strings -->
+    <str id="ConsoleInstaller.continueQuitRedisplay" txt="Press 1 to continue, 2 to quit, 3 to redisplay"/>
+    <str id="ConsoleInstaller.acceptRejectRedisplay" txt="Press 1 to accept, 2 to reject, 3 to redisplay"/>
+    <str id="ConsoleInstaller.redisplayQuit" txt="Press 1 to redisplay, 2 to quit"/>
+    <str id="ConsoleInstaller.permissionError" txt="Administrative privileges required. Please re-run the installer with administrative privileges."/>
+    <str id="ConsoleInstaller.inputSelection" txt="Input selection: "/>
+    <str id="ConsoleInstaller.pagingMore" txt="More"/>
+    <str id="ConsoleInstaller.aborted.PressedCTRL-C" txt="CTRL-C pressed"/>
+    <str id="ConsoleInstaller.aborted.LicenseRejected" txt="License rejected"/>
+    <str id="ConsoleInstaller.aborted.PressedQuit" txt="Quit pressed"/>
+    <str id="ConsoleInstaller.shutdown.pendingFileOperations" txt="There are file operations pending after reboot"/>
+    <str id="ConsoleInstaller.shutdown.rebootingNow" txt="Rebooting now automatically"/>
+    <str id="ConsoleInstaller.shutdown.done" txt="Console installation done"/>
+    <str id="ConsoleInstaller.shutdown.aborted" txt="Console installation ABORTED by the user!"/>
+    <str id="ConsoleInstaller.shutdown.failed" txt="Console installation FAILED!"/>
+
+    <!-- General installer strings -->
+    <str id="installer.title" txt="IzPack - Pemasangan "/>
+    <str id="installer.next" txt="Berikut"/>
+    <str id="installer.prev" txt="Sebelum"/>
+    <str id="installer.quit" txt="Keluar"/>
+    <str id="installer.madewith" txt="(Dibuat dengan IzPack- http://izpack.org/)"/>
+    <str id="installer.quit.title" txt="Apakah Anda yakin ingin keluar?"/>
+    <str id="installer.quit.message" txt="Ini akan membatalkan pemasangan!"/>
+    <str id="installer.warning" txt="Peringatan!"/>
+    <str id="installer.yes" txt="Ya"/>
+    <str id="installer.no" txt="Tidak"/>
+    <str id="installer.cancel" txt="Batal"/>
+    <str id="installer.error" txt="Kesalahan"/>
+    <str id="installer.help" txt="Pertolongan"/>
+    <str id="installer.help.close" txt="Tutup"/>
+    <str id="installer.of" txt="dari"/>
+    <str id="installer.step" txt="Langkah"/>
+    <str id="installer.Message" txt="Pesan"/>
+    <str id="installer.errorMessage" txt="An error occured"/>
+    <str id="installer.close" txt="Close"/>
+    <str id="installer.showDetails" txt="Show Details"/>
+    <str id="installer.hideDetails" txt="Hide Details"/>
+    <str id="installer.copy" txt="Copy"/>
+    <str id="installer.sendReport" txt="Send Report"/>
+    <str id="installer.continueQuestion" txt="Continue anyway?"/>
+    <str id="installer.cancelled" txt="Installation cancelled"/>
+    <str id="installer.started" txt="Installation started"/>
+    <str id="installer.platform" txt="Platform: {0}"/>
+    <str id="installer.version" txt="Framework: {0}"/>
+    <str id="installer.finished" txt="Installation finished"/>
+
+    <!-- Uninstaller specific strings -->
+    <str id="uninstaller.warning" txt="Ini akan menghapus aplikasi terpasang!"/>
+    <str id="uninstaller.destroytarget" txt=" Memaksa penghapusan "/>
+    <str id="uninstaller.uninstall" txt="Penghapusan"/>
+
+    <!-- The strings for the 'official' IzPack plugins -->
+    <str id="HelloPanel.welcome1" txt="Selamat datang ke pemasangan "/>
+    <str id="HelloPanel.welcome2" txt="!"/>
+    <str id="HelloPanel.authors" txt="Perangkat lunak ini dikembangkan oleh: "/>
+    <str id="HelloPanel.url" txt="Halaman rumah berada di: "/>
+
+    <str id="PrinterSelectPanel.select_printer"
+         txt="Pilihlah printer yang digunakan untuk pemasangan awal dan pengetesan."/>
+
+    <str id="CheckedHelloPanel.productAlreadyExist0" txt="Produk ini sudah terpasang di komputer ini pada lokasi "/>
+    <str id="CheckedHelloPanel.productAlreadyExist1" txt=" . Apakah Anda yakin untuk memasang entitas lain?"/>
+    <str id="CheckedHelloPanel.infoOverUninstallKey" txt="Kunci penghapusan akan dinamai: "/>
+
+    <str id="LicencePanel.info" txt="Silakan baca perjanjian lisensi berikut dengan seksama:"/>
+    <str id="LicencePanel.agree" txt="Saya menerima syarat-syarat dan kondisi-kondisi perjanjian lisensi ini."/>
+    <str id="LicencePanel.notagree"
+         txt="Saya tidak menerima syarat-syarat dan kondisi-kondisi perjanjian lisensi ini."/>
+    <str id="LicencePanel.yes" txt="Ya"/>
+    <str id="LicencePanel.no" txt="Tidak"/>
+
+    <str id="InstallationTypePanel.info" txt="Silakan pilih jenis pemasangan:"/>
+    <str id="InstallationTypePanel.modify" txt="Mengubah pemasangan"/>
+    <str id="InstallationTypePanel.normal" txt="Pemasangan baru"/>
+
+    <str id="InfoPanel.info" txt="Silakan baca informasi berikut: "/>
+
+    <str id="PathInputPanel.required" txt="Direktori yang terpilih seharusnya ada."/>
+    <str id="PathInputPanel.required.forModificationInstallation" txt="Direktori terpilih harus ada."/>
+    <str id="PathInputPanel.notValid" txt="Direktori terpilih tidak mengandung produk yang diperlukan."/>
+
+    <str id="TargetPanel.info" txt="Silakan pilih lokasi pemasangan: "/>
+    <str id="TargetPanel.browse" txt="Jelajah..."/>
+    <str id="TargetPanel.warn"
+         txt="Direktori tersebut sudah ada! Apakah Anda yakin untuk melakukan pemasangan ke sana dan kemungkinan menimpa arsip-arsip yang telah ada?"/>
+    <str id="TargetPanel.empty_target"
+         txt="Anda belum menspesifikasi lokasi tujuan! Apakah betul?"/>
+    <str id="TargetPanel.createdir" txt="Direktori tujuan akan dibuat: "/>
+    <str id="TargetPanel.nodir"
+         txt="Arsip ini bukan direktori! Silakan pilih sebuah direktori!"/>
+    <str id="TargetPanel.notwritable"
+         txt="Direktori ini tidak dapat ditulisi! Silakan pilih direktori lain!"/>
+
+    <str id="JDKPathPanel.extendedIntro"
+         txt="Aplikasi yang telah dipasang membutuhkan sebuah JDK dengan versi antara ${JDKPathPanel.minVersion} dan ${JDKPathPanel.maxVersion}. Sebuah Java Runtime Environment (JRE) tidak cukup."/>
+    <str id="JDKPathPanel.intro"
+         txt="Instalasi yang terinstal membutuhkan JDK. Sebuah Java Runtime Environment (JRE) saja tidak akan cukup."/>
+    <str id="JDKPathPanel.info" txt="Silakan pilih alamat JDK:"/>
+    <str id="JDKPathPanel.badVersion1" txt="JDK yang terpilih memiliki versi yang salah (yang ada: "/>
+    <str id="JDKPathPanel.badVersion2" txt=" yang diperlukan: "/>
+    <str id="JDKPathPanel.badVersion3" txt=") apakah JDK ini tetap akan digunakan?"/>
+    <str id="JDKPathPanel.nonValidPathInReg"
+         txt="The Windows registry contains a non-valid path for this JDK. Should this JDK be used anyway?"/>
+
+    <str id="PacksPanel.info" txt="Silakan pilih paket-paket yang ingin Anda pasang:"/>
+    <str id="PacksPanel.tip" txt="Catatan: paket-paket yang berwarna kelabu diperlukan."/>
+    <str id="PacksPanel.space" txt="Jumlah ruang yang dibutuhkan: "/>
+    <str id="PacksPanel.freespace" txt="Ruang yang ada: "/>
+    <str id="PacksPanel.description" txt="Deskripsi"/>
+    <str id="PacksPanel.dependencyList"
+         txt="Paket yang terpilih membutuhkan paket-paket berikut dipasang "/>
+    <str id="PacksPanel.dependencies" txt="Ketergantungan: "/>
+    <str id="PacksPanel.excludes" txt="Pengecualian: "/>
+    <str id="ImgPacksPanel.dependencyList" txt="Ketergantungan"/>
+    <str id="PacksPanel.notEnoughSpace"
+         txt="Ruang cakram yang diperlukan untuk pemasangan melebihi ruang cakram yang tersedia."/>
+    <str id="PacksPanel.notAscertainable" txt="tidak dapat ditetapkan"/>
+
+    <str id="InstallPanel.info" txt="Klik 'Pasang!' untuk memulai proses pemasangan"/>
+    <str id="InstallPanel.install" txt="Pasang!"/>
+    <str id="InstallPanel.tip" txt="Perkembangan pemasangan paket:"/>
+    <str id="InstallPanel.begin" txt="[Tidak ada]"/>
+    <str id="InstallPanel.finished" txt="[Selesai]"/>
+    <str id="InstallPanel.progress" txt="Perkembangan pemasangan keseluruhan:"/>
+    <str id="InstallPanel.overwrite.title" txt="Arsip sudah ada"/>
+    <str id="InstallPanel.overwrite.question" txt="Arsip berikut sudah ada. Apakah akan ditimpa?"/>
+
+    <str id="FinishPanel.success" txt="Pemasangan telah selesai dengan sukses."/>
+    <str id="FinishPanel.done" txt="Selesai"/>
+    <str id="FinishPanel.fail" txt="Pemasangan gagal!"/>
+    <str id="FinishPanel.uninst.info" txt="Program penghapusan sudah dibuat di: "/>
+    <str id="FinishPanel.auto" txt="Buat naskah pemasangan otomatis"/>
+    <str id="FinishPanel.auto.tip"
+         txt="Gunakan naskah ini untuk mengulangi pemasangan ini ke komputer lain."/>
+    <str id="FinishPanel.auto.dialog.filterdesc" txt="Arsip-arsip XML"/>
+
+    <str id="ImgPacksPanel.packs" txt="Paket-paket berikut tersedia:"/>
+    <str id="ImgPacksPanel.snap" txt="Gambaran paket:"/>
+    <str id="ImgPacksPanel.checkbox" txt=" Pasang paket berikut"/>
+
+    <str id="ShortcutPanel.headline" txt="Pemasangan Jalan Pintas"/>
+    <str id="ShortcutPanel.regular.list" txt="Pilih Kelompok Program untuk Jalan Pintas:"/>
+    <str id="ShortcutPanel.regular.default" txt="Nilai awal"/>
+    <str id="ShortcutPanel.regular.desktop" txt="Buat jalan pintas di atas meja (desktop)"/>
+    <str id="ShortcutPanel.regular.StartMenu:Start-Menu" txt="Menu-Mulai"/>
+    <str id="ShortcutPanel.regular.StartMenu:K-Menu" txt="K-Menu"/>
+    <!-- "StartMenu" is a placeholder will be replaced at runtime -->
+    <str id="ShortcutPanel.regular.create" txt="Buat Jalan Pintas pada StartMenu"/>
+    <str id="ShortcutPanel.regular.userIntro" txt="buat jalan pintas untuk:"/>
+    <str id="ShortcutPanel.regular.currentUser" txt="pengguna sekarang"/>
+    <str id="ShortcutPanel.regular.allUsers" txt="semua pengguna"/>
+
+    <str id="ShortcutPanel.alternate.apology"
+         txt="Kami minta maaf karena IzPack tidak mendukung pembuatan jalan pintas di sistem operasi ini. Untuk membuat jalan pintas, silakan lihat petunjuk sistem operasi Anda."/>
+    <str id="ShortcutPanel.alternate.targetsLabel"
+         txt="Berikut ini adalah daftar tujuan-tujuan yang kami ingin Anda akses."/>
+    <str id="ShortcutPanel.alternate.textFileExplanation"
+         txt="Anda dapat menyimpan informasi terinci mengenai tujuan-tujuan aplikasi pada arsip teks untuk referensi di kemudian hari."/>
+    <str id="ShortcutPanel.alternate.saveButton" txt="Simpan Arsip Teks"/>
+
+    <str id="ShortcutPanel.textFile.header"
+         txt="Informasi Jalan Pintas\n======================\n\nBerikut ini adalah daftar semua informasi yang relevan tentang Jalan Pintas yang dimaksud. Informasi ini dapat digunakan untuk membuat jalan pintas secara manual.\n"/>
+    <str id="ShortcutPanel.textFile.name" txt="Jalan Pintas         : "/>
+    <str id="ShortcutPanel.textFile.location" txt="Lokasi yang dimaksud : "/>
+    <str id="ShortcutPanel.textFile.description" txt="Dekripsi             : "/>
+    <str id="ShortcutPanel.textFile.target" txt="Tujuan jalan pintas  : "/>
+    <str id="ShortcutPanel.textFile.command" txt="Baris perintah       : "/>
+    <str id="ShortcutPanel.textFile.iconName" txt="Arsip ikon           : "/>
+    <str id="ShortcutPanel.textFile.iconIndex" txt="Indeks ikon          : "/>
+    <str id="ShortcutPanel.textFile.work" txt="Direktori kerja      : "/>
+
+    <str id="ShortcutPanel.location.desktop" txt="Atas Meja (Desktop)"/>
+    <str id="ShortcutPanel.location.applications" txt="Menu Aplikasi"/>
+    <str id="ShortcutPanel.location.startMenu" txt="Menu Awal"/>
+    <str id="ShortcutPanel.location.startup" txt="Grup Mulai Awal (Startup)"/>
+
+    <str id="UserInputPanel.error.caption" txt="Masalah Masukan"/>
+    <str id="UserInputPanel.search.autodetect" txt="Deteksi otomatis"/>
+
+    <str id="UserInputPanel.dir.nodirectory.message" txt="Anda harus memilih sebuah direktori yang sahih."/>
+    <str id="UserInputPanel.dir.nodirectory.caption" txt="Tidak Ada Direktori Terpilih"/>
+    <str id="UserInputPanel.dir.notdirectory.message"
+         txt="Direktori yang telah Anda pilih tidak ada atau tidak sahih."/>
+    <str id="UserInputPanel.dir.notdirectory.caption" txt="Direktori Tidak Sahih"/>
+    <str id="UserInputPanel.file.nofile.message" txt="Anda harus memilih sebuah berkas yang sahih."/>
+    <str id="UserInputPanel.file.nofile.caption" txt="Tidak Ada Berkas Terpilih"/>
+    <str id="UserInputPanel.file.notfile.message" txt="Berkas yang telah Anda pilih tidak ada atau tidak sahih."/>
+    <str id="UserInputPanel.file.notfile.caption" txt="Berkas Tidak Sahih"/>
+
+
+    <!-- more descriptive error message would be cool, like specifying what file we looked for -->
+    <str id="UserInputPanel.search.autodetect.failed.message" txt="Deteksi otomatis gagal."/>
+    <str id="UserInputPanel.search.autodetect.failed.caption" txt="Deteksi otomatis gagal."/>
+    <str id="UserInputPanel.search.autodetect.tooltip"
+         txt="Silakan periksa arsip atau direktori di alamat yang diberikan di atas."/>
+    <str id="UserInputPanel.search.location" txt="Masukkan lokasi {0}."/>
+    <str id="UserInputPanel.search.location.checkedfile" txt="Keberadaan {0} telah diperiksa."/>
+    <str id="UserInputPanel.search.browse" txt="Jelajah..."/>
+    <str id="UserInputPanel.search.wrongselection.message"
+         txt="Arsip atau direktori yang Anda pilih tidak ada atau tidak cocok."/>
+    <str id="UserInputPanel.search.wrongselection.caption" txt="Pilihan yang tidak sahih."/>
+
+    <str id="UserPathPanel.required" txt="Direktori terpilih harus ada."/>
+    <str id="UserPathPanel.info" txt="Pilih lokasi: "/>
+    <str id="UserPathPanel.browse" txt="Jelajah"/>
+    <str id="UserPathPanel.exists_warn"
+         txt="Direktori tersebut sudah ada! Apakah Anda yakin untuk melakukan pemasangan di sini dan kemungkinan menindih berkas yang telah ada?"/>
+    <str id="UserPathPanel.empty_target" txt="Anda belum menentukan lokasi target! Apakah benar?"/>
+    <str id="UserPathPanel.createdir" txt="Direktori target tersebut akan dibuat: "/>
+    <str id="UserPathPanel.nodir" txt="Berkas ini bukan suatu direktori! Silakan pilih suatu direktori!"/>
+    <str id="UserPathPanel.notwritable" txt="Direktori ini tidak dapat ditulisi! Silakan pilih direktori lain!"/>
+
+    <str id="CompilePanel.heading" txt="Kompilasi"/>
+    <str id="CompilePanel.tip" txt="Perkembangan pekerjaan kompilasi:"/>
+    <str id="CompilePanel.browse" txt="Jelajah..."/>
+    <str id="CompilePanel.browse.approve" txt="Gunakan sebagai kompiler"/>
+    <str id="CompilePanel.start" txt="Mulai"/>
+    <str id="CompilePanel.progress.initial" txt="[Silakan tekan tombol Mulai]"/>
+    <str id="CompilePanel.progress.finished" txt="[Selesai]"/>
+    <str id="CompilePanel.progress.overall" txt="Perkembangan kompilasi keseluruhan:"/>
+    <str id="CompilePanel.error" txt="Kompilasi gagal"/>
+    <str id="CompilePanel.error.reconfigure" txt="Konfigurasi ulang"/>
+    <str id="CompilePanel.error.ignore" txt="Abaikan"/>
+    <str id="CompilePanel.error.abort" txt="Batalkan"/>
+    <str id="CompilePanel.error.seebelow" txt="Lihat dibawah untuk perintah yang gagal dan keluarannya."/>
+    <str id="CompilePanel.error.nofiles" txt="Kesalahan terjadi saat melarik arsip-arsip untuk kompilasi."/>
+    <str id="CompilePanel.error.compilernotfound" txt="Kompiler tidak dapat dijalankan."/>
+    <str id="CompilePanel.error.invalidarguments" txt="Kompiler menerima argumen-argumen yang tidak sahih."/>
+    <str id="CompilePanel.error.noclassfile" txt="Kompiler tidak dapat menghasilkan arsip kelas untuk arsip sumber "/>
+    <str id="CompilePanel.choose_compiler" txt="Kompiler yang digunakan:"/>
+    <str id="CompilePanel.additional_arguments" txt="Argumen-argumen tambahan kompiler:"/>
+
+    <str id="ProcessPanel.heading" txt="Pemrosesan"/>
+
+    <!-- Strings for the summary of panels - START -->
+    <str id="SummaryPanel.info"
+         txt="Siap untuk pemasangan. Daftar data yang penting terdapat di bawah. Tekan &quot;Berikut&quot; untuk memulai pemasangan."/>
+    <str id="SummaryPanel.next" txt="Berikut"/>
+    <str id="TargetPanel.summaryCaption" txt="Lokasi pemasangan"/>
+    <str id="JDKPathPanel.summaryCaption" txt="Lokasi JDK"/>
+    <str id="PacksPanel.summaryCaption" txt="Paket-paket pemasangan yang dipilih"/>
+    <str id="ImgPacksPanel.summaryCaption" txt="Paket-paket pemasangan yang dipilih"/>
+    <str id="TreePacksPanel.summaryCaption" txt="Paket-paket pemasangan yang dipilih"/>
+    <str id="UserPathPanel.summaryCaption" txt="Lokasi Terpilih"/>
+    <!-- Strings for the summary of panels - END -->
+
+    <!-- Strings for the Registry -->
+    <str id="functionFailed.RegOpenKeyEx" txt="Tidak dapat membuka kunci registri {0}\\{1}"/>
+
+    <!-- Add your own panels specific strings here if you need or use a custom
+         langpack with the same syntax referred as resource CustomLangpack.xml_[ISO3]"
+    -->
+
+    <str id="nextmedia.title" txt="Media pemasangan berikutnya"/>
+    <str id="nextmedia.msg" txt="Pilih media pemasangan berikutnya."/>
+    <str id="nextmedia.browsebtn" txt="Jelajah"/>
+    <str id="nextmedia.okbtn" txt="Terapkan"/>
+    <str id="nextmedia.cancelbtn" txt="Batal"/>
+    <str id="nextmedia.choosertitle" txt="Pilih media pemasangan"/>
+    <str id="nextmedia.filedesc" txt="pak pemasangan (.pak*)"/>
+
+    <!-- Strings for the logging/reporting system (Messenger) -->
+
+    <!-- This string defines the time stamp format in the installation report.
+         The format details are documented in java.text.SimpleDateFormat -->
+    <str id="log.timeStamp" txt="dd-MM-yyyy [HH:mm:ss]  zzzz"/>
+
+    <!-- Strings for various purposes in the logging/reporting system  -->
+    <str id="log.reportHeading" txt="                            LAPORAN PEMASANGAN IzPack"/>
+    <str id="log.installFailed" txt="PERINGATAN!!! Pemasangan tidak berhasil!"/>
+    <str id="log.partialInstall" txt="PERINGATAN!!! Pemasangan bisa jadi telah tidak selesai dengan sukses!"/>
+    <str id="log.messageCount" txt="Laporan ini mengandung {0} pesan umum, {1} peringatan and {2} kesalahan(s)"/>
+    <str id="log.application" txt="Laporan pemasangan untuk : {0} Versi {1}"/>
+    <str id="log.timePrefix" txt="Waktu pemasangan         : {0}"/>
+    <str id="log.pathPrefix" txt="Direktori pemasangan     : {0}"/>
+    <str id="log.messageHeading" txt="                         --- Pesan-Pesan Pemasangan ---"/>
+    <str id="log.warningHeading" txt="                         --- Peringatan-Peringatan ---"/>
+    <str id="log.errorHeading" txt="                           --- Kesalahan-Kesalahan---"/>
+    <str id="log.exceptionPrefix" txt="                  >> Eksepsi: {0}"/>
+    <str id="log.messagePrefix" txt="Pesan  [{0}] - "/>
+    <str id="log.warningPrefix" txt="Warning [{0}] - "/>
+    <str id="log.errorPrefix" txt="Kesalahan [{0}] - "/>
+    <str id="log.reportWriteErrorTitle" txt="Kesalahan dalam penulisan laporan"/>
+    <str id="log.reportWriteError" txt="Tidak dapat menulis laporan pemasangan ke ''{0}''"/>
+    <str id="log.informUserTitle" txt="Masalah-Masalah Pemasangan"/>
+    <str id="log.saveLogTitle" txt="Simpan Berkas Catatan"/>
+    <str id="log.LogFileName" txt="catatanPemasangan.txt"/>
+    <str id="log.informUserFail"
+         txt="&lt;html&gt;Pemasangan tidak berhasil!&lt;br&gt;Apakah Anda ingin menulis suatu berkas catatan?&lt;/html&gt;"/>
+    <str id="log.informUserPartial"
+         txt="&lt;html&gt;Pemasangan bisa jadi telah tidak selesai dengan sukses!&lt;br&gt;Apakah Anda ingin menulis suatu berkas catatan?&lt;/html&gt;"/>
+
+    <!-- Strings for individual messages in the logging/reporting system.
+         Numbers for each category (message/warning/error) start at 0  -->
+    <str id="log.message_" txt=""/>
+
+    <str id="log.warning_" txt=""/>
+
+    <str id="log.error_0" txt="tidak dapat menulis ''{0}''"/>
+
+    <str id="InstallationGroupPanel.colNameSelected" txt="Terpilih"/>
+    <str id="InstallationGroupPanel.colNameInstallType" txt="JenisPemasangan"/>
+    <str id="InstallationGroupPanel.colNameSize" txt="Ukuran"/>
+
+    <str id="debug.changevariable" txt="ubah nilai"/>
+</izpack:langpack>
+
