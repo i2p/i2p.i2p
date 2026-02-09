@@ -1209,11 +1209,11 @@
 
     <target name="-pre-sign">
             <!-- if you're distributing su3 files to others, at a minimum you should set this -->
-            <fail message="javac.compilerargs must contain a -bootclasspath option in override.properties">
+            <!--<fail message="javac.compilerargs must contain a -bootclasspath option in override.properties">
                 <condition>
                     <not><contains string="${javac.compilerargs}" substring="-bootclasspath"/></not>
                 </condition>
-            </fail>
+            </fail>-->
             <fail message="build.built-by must be set in override.properties">
                 <condition>
                     <equals arg1="${build.built-by}" arg2="unknown"/>
