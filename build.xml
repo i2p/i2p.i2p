@@ -1506,7 +1506,7 @@
           The windows-only installer will get the correct jar.
         <copy file="installer/lib/wrapper/build/wrapper.jar" todir="pkg-temp/lib" />
       -->
-        <copy overwrite="true" file="installer/lib/wrapper/win-build/wrapper.jar" todir="pkg-temp/lib" />
+        <copy overwrite="true" file="installer/lib/wrapper/win-all/wrapper.jar" todir="pkg-temp/lib" />
     </target>
 
     <!-- see targets below for conditional copying -->
