@@ -240,9 +240,7 @@
         <fileset dir="build/obj" includes="**/standalone/*.class" />
         <zipfileset src="build/i2psnark.jar" />
         <zipfileset src="../../../core/java/build/i2p.jar" />
-      <!-- without this we get a warning about 'no JSP support' but that's it
         <zipfileset src="../../jetty/jettylib/jasper-runtime.jar"  />
-       -->
         <zipfileset src="../../jetty/jettylib/javax.servlet.jar" />
         <zipfileset src="../../jetty/jettylib/jetty-continuation.jar" />
         <zipfileset src="../../jetty/jettylib/jetty-deploy.jar" />
