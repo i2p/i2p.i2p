@@ -1,3 +1,9 @@
+i2p (2.11.0-1~ubuntu1) jammy; urgency=medium
+
+  * New upstream version 2.11.0
+
+ -- idk <hankhill19580@gmail.com>  Wed, 11 Feb 2026 12:12:12 +0000
+
 i2p (2.10.0-1~ubuntu1) jammy; urgency=medium
 
   * New upstream version 2.10.0
