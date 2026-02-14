@@ -135,10 +135,10 @@ Public domain except as listed below:
 
 Installer:
    (not included in distribution packages)
-   Launch4j 3.0.1:
+   Launch4j 3.50:
    (Launch4j is only included in the upstream source package and Windows binaries.
     Not applicable for non-Windows binaries or Debian/Launchpad packages.)
-   Copyright (c) 2004, 2008 Grzegorz Kowal
+   Copyright (c) 2004, 2021 Grzegorz Kowal
    See licenses/LICENSE-Launch4j.txt (in binary packages)
    See installer/lib/launch4j/LICENSE.txt (in source packages)
    The following projects are used by Launch4j...
@@ -159,7 +159,7 @@ Installer:
         See licenses/LICENSE-JGoodies-Forms.txt
 
         JGoodies Looks (http://www.jgoodies.com/freeware/looks/)
-        Copyright (c) 2003 JGoodies Karsten Lentzsch. All rights reserved.
+        Copyright (c) 2001-2007 JGoodies Karsten Lentzsch. All rights reserved.
         See licenses/LICENSE-JGoodies-Looks.txt
 
         Foxtrot (http://foxtrot.sourceforge.net/)
