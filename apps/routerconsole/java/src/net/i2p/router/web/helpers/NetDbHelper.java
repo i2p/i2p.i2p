@@ -452,6 +452,8 @@ public class NetDbHelper extends FormHandler {
                    "<tr><td>Encryption Type:</td><td><select name=\"etype\"><option value=\"\" selected=\"selected\"></option>");
         for (EncType type : EnumSet.allOf(EncType.class)) {
             _out.write("<option value=\"" + type + "\">" + type + "</option>\n");
+            if (type == EncType.ECIES_X25519)
+                break;
         }
         _out.write("</select></td><td></td></tr>\n" +
                    "<tr><td>" + _t("Router Family") + ":</td><td><input type=\"text\" name=\"fam\"></td><td></td></tr>\n" +
@@ -464,6 +466,8 @@ public class NetDbHelper extends FormHandler {
                    "<tr><td>" + _t("Port") + " or Port Range:</td><td><input type=\"text\" name=\"port\"></td><td>e.g. 1024-1028</td></tr>\n" +
                    "<tr><td>Signature Type:</td><td><select name=\"type\"><option value=\"\" selected=\"selected\"></option>");
         for (SigType type : EnumSet.allOf(SigType.class)) {
+            if (type.name().endsWith("ph"))
+                continue;
             _out.write("<option value=\"" + type + "\">" + type + "</option>\n");
         }
         _out.write("</select></td><td></td></tr>\n" +
