@@ -327,6 +327,43 @@ class NetDbRenderer {
                     morePages = true;
                 if (page > 0 || morePages)
                     outputPageLinks(buf, ubuf, page, pageSize, morePages);
+
+                // country map of search results
+                if (sz > 1 && !SystemVersion.isSlow() && !_context.commSystem().isDummy()) {
+                    ObjectCounterUnsafe<String> countries = new ObjectCounterUnsafe<String>();
+                    for (RouterInfo ri : results) {
+                        Hash key = ri.getIdentity().getHash();
+                        String c = _context.commSystem().getCountry(key);
+                        if (c != null)
+                            countries.increment(c);
+                    }
+                    if (!countries.objects().isEmpty()) {
+                        // svg inline part 1
+                        out.append(buf);
+                        buf.setLength(0);
+                        buf.append("<table id=\"netdboverview\" border=\"0\" cellspacing=\"30\"><tr><th colspan=\"3\">");
+                        buf.append(_t("Network Database Search Results"));
+                        buf.append("</th></tr>");
+                        buf.append("<tr><td id=\"mapcontainer\" colspan=\"3\">");
+                        boolean ok = embedResource(buf, "mapbase75p1.svg");
+                        if (ok) {
+                            out.append(buf);
+                            buf.setLength(0);
+                            // overlay
+                            MapMaker mm = new MapMaker(_context);
+                            out.write(mm.render(1, false, countries));
+                            // svg inline part 2
+                            embedResource(buf, "mapbase75p2.svg");
+                            buf.append("</td></tr>");
+                            out.append(buf);
+                            buf.setLength(0);
+                        }
+                        buf.append("</table>");
+                        out.append(buf);
+                        buf.setLength(0);
+                    }
+                }
+
                 for (int i = toSkip; i <= last; i++) {
                     RouterInfo ri = results.get(i);
                     renderRouterInfo(buf, ri, false, true);

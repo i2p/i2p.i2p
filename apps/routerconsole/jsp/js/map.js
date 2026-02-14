@@ -1,8 +1,11 @@
 /*  */
 
 function initMap() {
-  drawTunnels();
-  setTimeout(updateMap, 60 * 1000);
+  let svg = document.getElementById("mapoverlaysvg");
+  if (svg != null) {
+      drawTunnels();
+      setTimeout(updateMap, 60 * 1000);
+  }
 }
 
 function updateMap() {

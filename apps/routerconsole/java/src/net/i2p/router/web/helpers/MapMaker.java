@@ -169,18 +169,20 @@ public class MapMaker {
                     countries.increment(country);
             }
         }
-        return render(mode, countries);
+        return render(mode, true, countries);
     }
 
     /**
      * @param mode see above
      */
-    public String render(int mode, ObjectCounterUnsafe<String> countries) throws IOException {
+    public String render(int mode, boolean jsupdate, ObjectCounterUnsafe<String> countries) throws IOException {
         // only for string widths
         Graphics2D gg = new SimpleSVGGraphics2D(1, 1);
         StringBuilder buf = new StringBuilder(32768);
         SimpleSVGMaker g = new SimpleSVGMaker(buf);
-        g.startSVG(WIDTH, MAP_HEIGHT, TRANSPARENT, "mapoverlaysvg", null);
+        // map.js looks for mapoverlaysvg, if not there it won't update
+        String id = jsupdate ? "mapoverlaysvg" : "mapoverlaysvg-static";
+        g.startSVG(WIDTH, MAP_HEIGHT, TRANSPARENT, id, null);
         Font large = new Font(FONT_NAME, FONT_STYLE, FONT_SIZE);
 
         buf.append("<a href=\"/netdb?f=16\">");
