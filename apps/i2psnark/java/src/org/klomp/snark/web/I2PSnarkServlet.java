@@ -2219,6 +2219,8 @@ public class I2PSnarkServlet extends BasicServlet {
                         client = "KTorrent";
                     else if ("LUVU".equals(ch))  // ET
                         client = "EepTorrent";
+                    else if ("VElY".equals(ch))  // TIX
+                        client = "Tixati";
                     // libtorrent and downstreams
                     // https://www.libtorrent.org/projects.html
                     else if ("LURF".equals(ch))  // DL
