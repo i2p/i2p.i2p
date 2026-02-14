@@ -9,7 +9,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.i2p.I2PAppContext;
+import net.i2p.data.Base32;
+import net.i2p.router.RouterContext;
 
 import org.eclipse.jetty.ee8.nested.SessionHandler;
 import org.eclipse.jetty.ee8.servlet.ServletHandler;
@@ -31,10 +32,12 @@ import org.eclipse.jetty.util.Callback;
  */
 public class LocaleWebAppHandler extends Handler.Wrapper
 {
-    private final I2PAppContext _context;
+    private final RouterContext _context;
     private final WebAppContext _wac;
 
-    public LocaleWebAppHandler(I2PAppContext ctx, String path, String warPath,
+    private static final String PROP_COOKIE_NAME = "routerconsole.cookie";
+
+    public LocaleWebAppHandler(RouterContext ctx, String path, String warPath,
                                File tmpdir, ServletHandler servletHandler) {
         super();
         _context = ctx;
@@ -42,7 +45,19 @@ public class LocaleWebAppHandler extends Handler.Wrapper
         setInitParams(WebAppStarter.INIT_PARAMS);
         _wac.setTempDirectory(tmpdir);
         _wac.setExtractWAR(false);
-        _wac.setSessionHandler(new SessionHandler());
+        // use unique cookie per-install so we don't get nonce errors on POST
+        // if we have multiple routers on same host in different browser tabs
+        // using default JSESSIONID everywhere
+        SessionHandler sh = new SessionHandler();
+        String cookie = ctx.getProperty(PROP_COOKIE_NAME);
+        if (cookie == null) {
+            byte[] tmp = new byte[16];
+            ctx.random().nextBytes(tmp);
+            cookie = Base32.encode(tmp);
+            ctx.router().saveConfig(PROP_COOKIE_NAME, cookie);
+        }
+        sh.setSessionCookie(cookie);
+        _wac.setSessionHandler(sh);
         _wac.setServletHandler(servletHandler);
         setHandler(_wac);
     }
