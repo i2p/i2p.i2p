@@ -31,7 +31,8 @@ import net.i2p.util.SimpleByteCache;
  */
 public final class I2PDatagramMaker {
 
-    private static final int DGRAM_BUFSIZE = 32768;
+    private static final int INIT_DGRAM_BUFSIZE = 2*1024;
+    private static final int MAX_DGRAM_BUFSIZE = 61*1024;
 
     private final SHA256Generator hashGen = SHA256Generator.getInstance();
     private final DSAEngine dsaEng = DSAEngine.getInstance();
@@ -39,7 +40,7 @@ public final class I2PDatagramMaker {
     private SigningPrivateKey sxPrivKey;
     private byte[] sxDestBytes;
 
-    private final ByteArrayOutputStream sxDGram = new ByteArrayOutputStream(DGRAM_BUFSIZE);
+    private final ByteArrayOutputStream sxDGram = new ByteArrayOutputStream(INIT_DGRAM_BUFSIZE);
 
     /**
      * Construct a new I2PDatagramMaker that will be able to create I2P
@@ -85,9 +86,9 @@ public final class I2PDatagramMaker {
      * <li>Payload
      * </ol>
      *
-     * Maximum datagram size is 32768, so maximum payload size is 32341, or less for
-     * non-DSA_SHA1 destinations. Practical maximum is a few KB less due to
-     * ElGamal/AES overhead. 10 KB or less is recommended for best results.
+     * Maximum datagram size is ~64KB, so maximum payload size is a little less.
+     * Practical maximum is a few KB less due to
+     * Destination and Garlic overhead. 10 KB or less is recommended for best results.
      *
      * For DSA_SHA1 Destinations, the signature is of the SHA-256 Hash of the payload.
      *
@@ -117,18 +118,20 @@ public final class I2PDatagramMaker {
             } else {
                 sig = dsaEng.sign(payload, sxPrivKey);
             }
+            if (sig == null)
+                throw new IllegalStateException("signature failed");
             sig.writeBytes(sxDGram);
             sxDGram.write(payload);
-            if (sxDGram.size() > DGRAM_BUFSIZE)
+            if (sxDGram.size() > MAX_DGRAM_BUFSIZE)
                 throw new IllegalArgumentException("Too big");
             return sxDGram.toByteArray();
         } catch (IOException e) {
             Log log = I2PAppContext.getGlobalContext().logManager().getLog(I2PDatagramMaker.class);
-            log.error("Caught IOException", e);
+            log.error("Datagram maker error", e);
             return null;
         } catch (DataFormatException e) {
             Log log = I2PAppContext.getGlobalContext().logManager().getLog(I2PDatagramMaker.class);
-            log.error("Caught DataFormatException", e);
+            log.error("Datagram maker error", e);
             return null;
         }
     }
