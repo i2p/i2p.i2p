@@ -167,6 +167,17 @@ public class BandwidthManager implements BandwidthListener {
     }
 
     /**
+     * Clear all data in the limiters
+     *
+     * @since 0.9.69
+     */
+    public void clear() {
+        _up.clear();
+        _down.clear();
+        _req.clear();
+    }
+
+    /**
      *  In HTML for debug page
      */
     @Override

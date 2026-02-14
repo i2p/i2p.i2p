@@ -389,6 +389,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
             stopAllTorrents(true);
             _stopping = false;
         }
+        _bwManager.clear();
     }
     
     /*
@@ -425,6 +426,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
                 }
             }
         }
+        _bwManager.clear();
         if (_log.shouldWarn())
             _log.warn("Snark stop() end");
     }

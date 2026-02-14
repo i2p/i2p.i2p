@@ -358,6 +358,20 @@ public class SyntheticREDQueue implements BandwidthEstimator {
         return (((DECAY_FACTOR - 1) * a) + b) / DECAY_FACTOR;
     }
 
+    /**
+     * Clear all data in the limiters
+     *
+     * @since 0.9.69
+     */
+    public synchronized void clear() {
+        _tAck = _context.clock().now();
+        _acked = -1;
+        _tQSize = _tAck;
+        _avgQSize = 0;
+        _bKFiltered = 0;
+        _bK_ns_est = 0;
+    }
+
     @Override
     public synchronized String toString() {
         return "SREDQ[" +
