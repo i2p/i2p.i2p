@@ -11,6 +11,7 @@ package net.i2p.router;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -2001,7 +2002,7 @@ public class Router implements RouterClock.ClockShiftListener {
                     error = true;
             }
             if (error)
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("Unsupported options " + Arrays.toString(args));
         }
 
         System.out.println("Starting I2P " + RouterVersion.FULL_VERSION);
