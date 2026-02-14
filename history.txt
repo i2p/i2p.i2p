@@ -1,3 +1,11 @@
+2026-02-14 zzz
+ * Console: Show country map for netdb search results
+ * Datagrams: Use smaller initial buffer size in DG1 maker
+ * i2psnark: Clear bw limiters on session stop
+
+2026-02-10 zzz
+ * i2psnark standalone: Build fix
+
 2026-02-09 idk
  * Release I2P 2.11.0
 
