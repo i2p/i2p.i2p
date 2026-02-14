@@ -933,8 +933,6 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         if (!_initialized) return;
         if (_context.router().gracefulShutdownInProgress())
             return;
-        // This isn't really used for anything
-        // writeMyInfo(localRouterInfo);
         if (_context.router().isHidden()) return; // DE-nied!
         Hash h = localRouterInfo.getIdentity().getHash();
         store(h, localRouterInfo);
@@ -957,35 +955,6 @@ public abstract class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacad
         return _lastRIPublishTime;
     }
 
-    /**
-     * Persist the local router's info (as updated) into netDb/my.info, since
-     * ./router.info isn't always updated.  This also allows external applications
-     * to easily pick out which router a netDb directory is rooted off, which is handy
-     * for getting the freshest data.
-     *
-     */
-/***
-    private final void writeMyInfo(RouterInfo info) {
-        FileOutputStream fos = null;
-        try {
-            File dbDir = new File(_dbDir);
-            if (!dbDir.exists())
-                dbDir.mkdirs();
-            fos = new FileOutputStream(new File(dbDir, "my.info"));
-            info.writeBytes(fos);
-            fos.close();
-        } catch (IOException ioe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Unable to persist my.info?!", ioe);
-        } catch (DataFormatException dfe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error persisting my.info - our structure isn't valid?!", dfe);
-        } finally {
-            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
-        }
-    }
-***/
-    
     /**
      * Determine whether this leaseSet will be accepted as valid and current
      * given what we know now.
