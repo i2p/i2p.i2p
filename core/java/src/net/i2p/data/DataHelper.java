@@ -102,7 +102,9 @@ public class DataHelper {
             "version", "created", "upgraded", "lists",
             "a", "m", "s", "v", "notes",
             // NTCP2 RouterAddress options
-            "i"
+            "i", "pq",
+            // Tunnel BW params prop. 168
+            "l", "r", "b"
         };
         _propertiesKeyCache = new HashMap<String, String>(keys.length);
         for (int i = 0; i < keys.length; i++) {
