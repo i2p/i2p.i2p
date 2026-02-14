@@ -14,7 +14,7 @@ Versions are as follows:
 
 Min version	Max version		Uses src pkg	Copied to Debian	Notes
 -----------	-----------		------------	----------------	-----
-resolute				resolute	trixie, sid		ant debian-release-tarball
+resolute				resolute	trixie, sid		CURRENTLY BROKEN USE JAMMY - when fixed: ant debian-release-tarball
 questing				jammy					Don't bother to build, use jammy
 jammy		noble			jammy		bullseye, bookworm	ant jammy-release-tarball
 

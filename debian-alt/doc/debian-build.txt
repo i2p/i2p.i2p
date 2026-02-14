@@ -6,6 +6,10 @@ Make sure workspace revision matches what you want to release.
 # only if you didn't already do it for launchpad!
 # Otherwise make sure the i2p-1.xx.0.orig.tar.bz2 file is
 # in the dir above the source directory, and skip to next step
+
+NOTE: DEBIAN BUILDS CURRENTLY BROKEN.
+See launchpad.txt instructions to use jammy build.
+
 ant debian-release-tarball
 
 # Following instructions (and filenames) are for unstable.
@@ -71,7 +75,7 @@ reprepro includedeb stable i2p_1.xx.0-1_all.deb
 reprepro includedsc stable i2p_1.xx.0-1.dsc
 
 # copy built packages from launchpad
-for i in bionic focal jammy noble oracular plucky
+for i in bionic focal jammy noble resolute
 do
 	reprepro -v update $i
 done
@@ -86,13 +90,13 @@ done
 
 
 # No longer supported
-# wheezy jessie stretch buster
+# wheezy jessie bionic focal stretch buster
 
 
 # To copy jammy to all debian repos:
 # Note that syntax is reprepro copysrc TO FROM package!
-reprepro -v copysrc sid questing i2p
-reprepro -v copysrc trixie questing i2p
+reprepro -v copysrc sid resolute i2p
+reprepro -v copysrc trixie resolute i2p
 reprepro -v copysrc bookworm jammy i2p
 reprepro -v copysrc bullseye jammy i2p
 
