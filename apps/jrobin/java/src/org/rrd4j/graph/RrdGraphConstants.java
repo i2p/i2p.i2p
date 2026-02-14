@@ -403,7 +403,7 @@ public interface RrdGraphConstants {
     /**
      * Used internally
      */
-    double LEGEND_LEADING = 1.2; // chars
+    double LEGEND_LEADING = 1.5; // chars
     /**
      * Used internally
      */
