@@ -311,8 +311,29 @@ class NetDbRenderer {
                     buf.append("Caps ").append(caps).append(' ');
                 if (ssucaps != null)
                     buf.append("Transport caps ").append(ssucaps).append(' ');
-                if (tr != null)
-                    buf.append(_t("Transport")).append(' ').append(tr).append(' ');
+                if (tr != null) {
+                    String transport;
+                    if (tr.equals("NTCP_1")) {
+                        transport = "NTCP (v1 only)";
+                    } else if (tr.equals("NTCP_2")) {
+                        transport = "NTCP (v2 supported)";
+                    } else if (tr.equals("SSU_1")) {
+                        transport = "SSU (v1 only)";
+                    } else if (tr.equals("SSU_2")) {
+                        transport = "SSU (v2 supported)";
+                    } else if (tr.equals("NTCP2_0")) {
+                        transport = "NTCP2+MLKEM (any)";
+                    } else if (tr.equals("NTCP2_3")) {
+                        transport = "NTCP2+MLKEM512";
+                    } else if (tr.equals("NTCP2_4")) {
+                        transport = "NTCP2+MLKEM768";
+                    } else if (tr.equals("NTCP2_5")) {
+                        transport = "NTCP2+MLKEM1024";
+                    } else {
+                        transport = tr;
+                    }
+                    buf.append(_t("Transport")).append(' ').append(transport).append(' ');
+                }
                 if (icount > 0)
                     buf.append("with ").append(icount).append(" introducers ");
                 buf.append(_t("not found in network database"));
@@ -510,6 +531,18 @@ class NetDbRenderer {
         } else if (tr.equals("SSU_2")) {
             transport = "SSU";
             mode = 3;
+        } else if (tr.equals("NTCP2_0")) {
+            transport = "NTCP2";
+            mode = 5;
+        } else if (tr.equals("NTCP2_3")) {
+            transport = "NTCP2";
+            mode = 6;
+        } else if (tr.equals("NTCP2_4")) {
+            transport = "NTCP2";
+            mode = 7;
+        } else if (tr.equals("NTCP2_5")) {
+            transport = "NTCP2";
+            mode = 8;
         } else {
             transport = tr;
             mode = 4;
@@ -538,6 +571,25 @@ class NetDbRenderer {
                         case 4:
                             continue;
 
+                        case 5:
+                            if (ra.getOption("pq") != null)
+                                continue;
+                            break;
+
+                        case 6:
+                            if ("3".equals(ra.getOption("pq")))
+                                continue;
+                            break;
+
+                        case 7:
+                            if ("4".equals(ra.getOption("pq")))
+                                continue;
+                            break;
+
+                        case 8:
+                            if ("5".equals(ra.getOption("pq")))
+                                continue;
+                            break;
                     }
                 }
             } else {

@@ -476,6 +476,10 @@ public class NetDbHelper extends FormHandler {
                    "<option value=\"NTCP_1\">NTCP (v1 only)</option>\n" +
                    "<option value=\"NTCP_2\">NTCP (v2 supported)</option>\n" +
                    "<option value=\"NTCP2\">NTCP2</option>\n" +
+                   "<option value=\"NTCP2_0\">NTCP2+MLKEM (any)</option>\n" +
+                   "<option value=\"NTCP2_3\">NTCP2+MLKEM512</option>\n" +
+                   "<option value=\"NTCP2_4\">NTCP2+MLKEM768</option>\n" +
+                   "<option value=\"NTCP2_5\">NTCP2+MLKEM1024</option>\n" +
                    "<option value=\"SSU\">SSU</option>\n" +
                    "<option value=\"SSU_1\">SSU (v1 only)</option>\n" +
                    "<option value=\"SSU_2\">SSU (v2 supported)</option>\n" +
