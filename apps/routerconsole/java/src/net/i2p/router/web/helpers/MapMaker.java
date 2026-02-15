@@ -245,7 +245,7 @@ public class MapMaker {
         }
 
         String us = _context.commSystem().getOurCountry();
-        if (!test && us != null) {
+        if (!test && us != null && jsupdate) {
             Mercator mus = _mercator.get(us);
             if (mus != null) {
                 hints.put(KEY_ELEMENT_ID, "mapoverlaysquare-me");
