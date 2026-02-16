@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -24,7 +23,9 @@ import net.i2p.data.Hash;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.time.BuildTime;
 import net.i2p.util.ConcurrentHashSet;
+import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Routers are banlisted only if none of our transports can talk to them
@@ -82,7 +83,8 @@ public class Banlist {
     public Banlist(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(Banlist.class);
-        _entries = new ConcurrentHashMap<Hash, Entry>(16);
+        int max_bans = SystemVersion.isSlow() ? 2048 : 16384;
+        _entries = new LHMCache<Hash, Entry>(max_bans);
         _context.jobQueue().addJob(new Cleanup(_context));
         // i2pd bug?
         banlistRouterForever(Hash.FAKE_HASH, "Invalid Hash");
@@ -90,35 +92,29 @@ public class Banlist {
     }
     
     private class Cleanup extends JobImpl {
-        private List<Hash> _toUnbanlist;
         public Cleanup(RouterContext ctx) {
             super(ctx);
-            _toUnbanlist = new ArrayList<Hash>(4);
             getTiming().setStartAfter(ctx.clock().now() + BANLIST_CLEANER_START_DELAY);
         }
+
         public String getName() { return "Expire banned peers"; }
+
         public void runJob() {
-            _toUnbanlist.clear();
             long now = getContext().clock().now();
+            boolean logit = _log.shouldInfo();
             try {
-                for (Iterator<Map.Entry<Hash, Entry>> iter = _entries.entrySet().iterator(); iter.hasNext(); ) {
-                    Map.Entry<Hash, Entry> e = iter.next();
-                    if (e.getValue().expireOn <= now) {
-                        iter.remove();
-                        _toUnbanlist.add(e.getKey());
+                synchronized(_entries) {
+                    for (Iterator<Map.Entry<Hash, Entry>> iter = _entries.entrySet().iterator(); iter.hasNext(); ) {
+                        Map.Entry<Hash, Entry> e = iter.next();
+                        if (e.getValue().expireOn <= now) {
+                            iter.remove();
+                            if (logit)
+                                _log.info("Unbanlisting router (expired) " + e.getKey().toBase64());
+                        }
                     }
                 }
             } catch (IllegalStateException ise) {} // next time...
-            for (Hash peer : _toUnbanlist) {
-                //PeerProfile prof = _context.profileOrganizer().getProfile(peer);
-                //if (prof != null)
-                //    prof.unbanlist();
-                _context.messageHistory().unbanlist(peer);
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Unbanlisting router (expired) " + peer.toBase64());
-            }
-            
-            requeue(30*1000);
+            requeue(57*1000);
         }
     }
     
@@ -131,7 +127,9 @@ public class Banlist {
      *  Note - may contain expired entries.
      */
     public Map<Hash, Entry> getEntries() {
-        return Collections.unmodifiableMap(_entries);
+        synchronized(_entries) {
+            return Collections.unmodifiableMap(_entries);
+        }
     }
     
     /**
@@ -241,6 +239,7 @@ public class Banlist {
             e.transports.add(transport);
         }
         
+        synchronized(_entries) {
             Entry old = _entries.get(peer);
             if (old != null) {
                 wasAlready = true;
@@ -261,6 +260,7 @@ public class Banlist {
                 }
             }
             _entries.put(peer, e);
+        }
         
         if (transport == null) {
             // we hate the peer on *any* transport
@@ -269,8 +269,8 @@ public class Banlist {
         }
         //_context.tunnelManager().peerFailed(peer);
         //_context.messageRegistry().peerFailed(peer);
-        if (!wasAlready)
-            _context.messageHistory().banlist(peer, reason);
+        //if (!wasAlready)
+        //    _context.messageHistory().banlist(peer, reason);
         return wasAlready;
     }
     
@@ -289,16 +289,19 @@ public class Banlist {
                       + (transport != null ? "/" + transport : ""));
         boolean fully = false;
 
-        Entry e = _entries.remove(peer);
-        if ( (e == null) || (e.transports == null) || (transport == null) || (e.transports.size() <= 1) ) {
-            // fully unbanlisted
-            fully = true;
-        } else {
-            e.transports.remove(transport);
-            if (e.transports.isEmpty())
+        Entry e;
+        synchronized(_entries) {
+            e = _entries.remove(peer);
+            if ( (e == null) || (e.transports == null) || (transport == null) || (e.transports.size() <= 1) ) {
+                // fully unbanlisted
                 fully = true;
-            else
-                _entries.put(peer, e);
+            } else {
+                e.transports.remove(transport);
+                if (e.transports.isEmpty())
+                    fully = true;
+                else
+                    _entries.put(peer, e);
+            }
         }
 
         if (fully) {
@@ -307,7 +310,7 @@ public class Banlist {
             //    if (prof != null)
             //        prof.unbanlist();
             //}
-            _context.messageHistory().unbanlist(peer);
+            //_context.messageHistory().unbanlist(peer);
             if (_log.shouldLog(Log.INFO) && e != null)
                 _log.info("Unbanlisting router " + peer.toBase64()
                           + (transport != null ? "/" + transport : ""));
@@ -320,24 +323,26 @@ public class Banlist {
         boolean rv = false;
         boolean unbanlist = false;
 
-        Entry entry = _entries.get(peer);
-        if (entry == null) {
-            rv = false;
-        } else if (entry.expireOn <= _context.clock().now()) {
-            _entries.remove(peer);
-            unbanlist = true;
-            rv = false;
-        } else if (entry.transports == null) {
-            rv = true;
-        } else {
-            rv = entry.transports.contains(transport);
+        synchronized(_entries) {
+            Entry entry = _entries.get(peer);
+            if (entry == null) {
+                rv = false;
+            } else if (entry.expireOn <= _context.clock().now()) {
+                _entries.remove(peer);
+                unbanlist = true;
+                rv = false;
+            } else if (entry.transports == null) {
+                rv = true;
+            } else {
+                rv = entry.transports.contains(transport);
+            }
         }
         
         if (unbanlist) {
             //PeerProfile prof = _context.profileOrganizer().getProfile(peer);
             //if (prof != null)
             //    prof.unbanlist();
-            _context.messageHistory().unbanlist(peer);
+            //_context.messageHistory().unbanlist(peer);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Unbanlisting (expired) " + peer.toBase64());
         }
@@ -349,7 +354,10 @@ public class Banlist {
      *  @return true if banned and expires more than 24 hours from now
      */
     public boolean isBanlistedForever(Hash peer) {
-        Entry entry = _entries.get(peer);
+        Entry entry;
+        synchronized(_entries) {
+            entry = _entries.get(peer);
+        }
         return entry != null && entry.expireOn > _context.clock().now() + BANLIST_FOREVER_THRESHOLD;
     }
 
