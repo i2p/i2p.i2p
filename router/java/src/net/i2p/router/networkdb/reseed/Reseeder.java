@@ -1345,13 +1345,19 @@ public class Reseeder {
                         }
                         System.out.println("Router infos included " + oldver + " with versions before " + MIN_VERSION + " and " + unreach + " unreachable");
                     } else {
-                        System.out.println("Test failed for " + host + " return code: " + rc);
+                        String txt = get.getStatusText();
+                        if (txt == null)
+                            txt = "";
+                        System.out.println("Test failed for " + host + " return code: " + rc + ' ' + txt);
                         su3.delete();
                         fail++;
                     }
                 } else {
+                    String txt = get.getStatusText();
+                    if (txt == null)
+                        txt = "";
                     int rc = get.getStatusCode();
-                    System.out.println("Test failed for " + host + " return code: " + rc);
+                    System.out.println("Test failed for " + host + " return code: " + rc + ' ' + txt);
                     su3.delete();
                     fail++;
                 }
