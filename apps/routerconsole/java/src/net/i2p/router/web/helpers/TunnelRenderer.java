@@ -424,8 +424,8 @@ class TunnelRenderer {
                 else
                     out.write("<td class=\"cells\">&nbsp;</td>\n");
             }
-            int count = info.getProcessedMessagesCount() * 1024;
-            out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatSize2(count) + "B</td>\n");
+            int count = info.getProcessedMessagesCount();
+            out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatSize2(count * 1024) + "B</td>\n");
             int length = info.getLength();
             for (int j = 0; j < length; j++) {
                 Hash peer = info.getPeer(j);
