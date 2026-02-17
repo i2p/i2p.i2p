@@ -327,8 +327,8 @@ class TunnelRenderer {
         RateStat ors = _context.statManager().getRate(orname);
         if (irs == null || ors == null)
             return;
-        Rate ir = irs.getRate(5*60*1000L);
-        Rate or = ors.getRate(5*60*1000L);
+        Rate ir = irs.getRate(TunnelPool.RATE);
+        Rate or = ors.getRate(TunnelPool.RATE);
         if (ir == null || or == null)
             return;
         final String tgd = _t("Graph Data");

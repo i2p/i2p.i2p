@@ -57,6 +57,11 @@ public class TunnelPool {
     private static final int BUILD_TRIES_LENGTH_OVERRIDE_1 = 8;
     private static final int BUILD_TRIES_LENGTH_OVERRIDE_2 = 12;
     private static final long STARTUP_TIME = 30*60*1000;
+    /**
+     *  The rate for getRateName()
+     *  @since 0.9.69
+     */
+    public static final long RATE = TUNNEL_LIFETIME;
     
     TunnelPool(RouterContext ctx, TunnelPoolManager mgr, TunnelPoolSettings settings, TunnelPeerSelector sel) {
         _context = ctx;
@@ -118,7 +123,7 @@ public class TunnelPool {
         }
         _context.statManager().createRequiredRateStat(_rateName,
                                "Tunnel Bandwidth (Bytes/sec)", "Tunnels", 
-                               new long[] { 5*60*1000l });
+                               new long[] { RATE });
     }
     
     synchronized void shutdown() {
@@ -149,7 +154,7 @@ public class TunnelPool {
         RateStat stat = _context.statManager().getRate(_rateName);
         if (stat == null)
             return 0;
-        Rate rate = stat.getRate(5*60*1000);
+        Rate rate = stat.getRate(RATE);
         if (rate == null)
             return 0;
         int count = _settings.isInbound() ? _settings.getQuantity() : _settings.getTotalQuantity();
