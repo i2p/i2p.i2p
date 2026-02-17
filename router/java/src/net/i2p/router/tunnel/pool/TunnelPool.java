@@ -151,14 +151,35 @@ public class TunnelPool {
      *  @since 0.9.66
      */
     public int getAvgBWPerTunnel() {
-        RateStat stat = _context.statManager().getRate(_rateName);
-        if (stat == null)
-            return 0;
-        Rate rate = stat.getRate(RATE);
-        if (rate == null)
-            return 0;
+        int rv = 0;
+        // average from stat, which does not include current tunnels
         int count = _settings.isInbound() ? _settings.getQuantity() : _settings.getTotalQuantity();
-        return (int) (((float) rate.getAvgOrLifetimeAvg()) / count);
+        RateStat stat = _context.statManager().getRate(_rateName);
+        if (stat != null) {
+            Rate rate = stat.getRate(RATE);
+            if (rate != null)
+                rv = (int) (((float) rate.getAvgOrLifetimeAvg()) / count);
+        }
+        // average from current tunnels
+        int msgs = 0;
+        long dur = 0;
+        long now = _context.clock().now();
+        synchronized (_tunnels) {
+            count = _tunnels.size();
+            if (count > 0) {
+                for (TunnelInfo tun : _tunnels) {
+                    msgs += tun.getProcessedMessagesCount();
+                    long exp = ((TunnelCreatorConfig)tun).getExpiration();
+                    dur += now - (exp - TUNNEL_LIFETIME);
+                }
+            }
+        }
+        // average the two together
+        if (count > 0 && dur > 0) {
+            int rv2 = (int) ((1024L * 1000 * msgs / dur) / count);
+            rv = (rv + rv2) / 2;
+        }
+        return rv;
     }
 
     private void refreshSettings() {
