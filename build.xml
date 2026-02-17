@@ -895,7 +895,7 @@
             use="true"
             splitindex="true"
             failonerror="true"
-            additionalparam="-notimestamp"
+            additionalparam="-notimestamp -quiet"
             doctitle="I2P Javadocs for Release ${release.number} Build ${i2p.build.number}${build.qualifier}${build.extra} (API ${api.version})"
             windowtitle="I2P Anonymous Network - Java Documentation - API Version ${api.version}">
             <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:net.i2p.apache.http.conn.ssl:net.i2p.apache.http.conn.util:net.i2p.apache.http.util:org.json.simple:com.southernstorm.noise.crypto.x25519:com.southernstorm.noise.crypto.chacha20:org.minidns:org.minidns.*" />
