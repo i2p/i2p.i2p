@@ -496,6 +496,7 @@ abstract class BuildRequestor {
             if (bw > 7000) {
                 props = new Properties();
                 variance = 4 * bw / 10;
+                cfg.setRequestedBW(bw);
             } else {
                 props = EmptyProperties.INSTANCE;
             }

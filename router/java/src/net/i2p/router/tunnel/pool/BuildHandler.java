@@ -325,6 +325,7 @@ class BuildHandler implements Runnable {
         BuildReplyHandler.Result statuses[] = _buildReplyHandler.decrypt(msg, cfg, order);
         if (statuses != null) {
             boolean allAgree = true;
+            int allocated = 0;
             // For each peer in the tunnel
             for (int i = 0; i < cfg.getLength(); i++) {
                 Hash peer = cfg.getPeer(i);
@@ -368,7 +369,11 @@ class BuildHandler implements Runnable {
                         if (avail != null) {
                             if (_log.shouldWarn())
                                 _log.warn(msg.getUniqueId() + ": peer replied available: " + avail + "KBps");
-                            // TODO
+                            try {
+                                int av = Integer.parseInt(avail) * 1000;
+                                if (av > 0 && (allocated == 0 || av < allocated))
+                                    allocated = av;
+                            } catch (NumberFormatException nfe) {}
                         }
                     }
                 } else {
@@ -409,6 +414,8 @@ class BuildHandler implements Runnable {
                         _log.warn("Dup ID for our own tunnel " + cfg);
                     return;
                 }
+                if (allocated > 0)
+                    cfg.setAllocatedBW(allocated);
                 _exec.buildComplete(cfg, SUCCESS);
 
                 if (cfg.getTunnelPool().getSettings().isExploratory()) {
@@ -928,6 +935,7 @@ class BuildHandler implements Runnable {
             if (props != null && !props.isEmpty()) {
                 int min = 0;
                 int rqu = 0;
+                int ibgwmax = 0;
                 String smin = props.getProperty(BuildRequestor.PROP_MIN_BW);
                 if (smin != null) {
                     try {
@@ -944,7 +952,17 @@ class BuildHandler implements Runnable {
                         response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
                     }
                 }
-                if ((min > 0 || rqu > 0) && response == 0) {
+                if (isInGW) {
+                    String smax = props.getProperty(BuildRequestor.PROP_MAX_BW);
+                    if (smax != null) {
+                        try {
+                            ibgwmax = 1000 * Integer.parseInt(smax);
+                        } catch (NumberFormatException nfe) {
+                            response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
+                        }
+                    }
+                }
+                if ((min > 0 || rqu > 0 || ibgwmax > 0) && response == 0) {
                     int share = 1000 * TunnelDispatcher.getShareBandwidth(_context);
                     int max = share / 20;
                     if (min > max) {
@@ -965,8 +983,10 @@ class BuildHandler implements Runnable {
                                         rqu = 4 * min;
                                     if (rqu > 0 && rqu < avail)
                                         avail = rqu;
+                                    if (ibgwmax > 0 && ibgwmax < avail)
+                                        avail = ibgwmax;
                                     if (_log.shouldWarn())
-                                        _log.warn("ACCEPT Part tunnel: min: " + min + " req: " + rqu + " avail: " + avail);
+                                        _log.warn("ACCEPT Part tunnel: min: " + min + " req: " + rqu + " max: " + ibgwmax + " avail: " + avail);
                                 }
                             }
                         }

@@ -525,7 +525,9 @@ public class TunnelPool {
 
         _manager.tunnelFailed();
             
-        _lifetimeProcessed += info.getProcessedMessagesCount();
+        synchronized (this) {
+            _lifetimeProcessed += info.getProcessedMessagesCount();
+        }
         updateRate();
         
         long lifetimeConfirmed = info.getVerifiedBytesTransferred();
@@ -603,7 +605,9 @@ public class TunnelPool {
             _log.warn(toString() + ": Tunnel failed: " + cfg);
         _manager.tunnelFailed();
         
-        _lifetimeProcessed += cfg.getProcessedMessagesCount();
+        synchronized (this) {
+            _lifetimeProcessed += cfg.getProcessedMessagesCount();
+        }
         updateRate();
         
         if (_settings.isInbound() && !_settings.isExploratory()) {
@@ -644,12 +648,14 @@ public class TunnelPool {
 
     private void updateRate() {
         long now = _context.clock().now();
-        long et = now - _lastRateUpdate;
-        if (et > 2*60*1000) {
-            long bw = 1024 * (_lifetimeProcessed - _lastLifetimeProcessed) * 1000 / et;   // Bps
-            _context.statManager().addRateData(_rateName, bw);
-            _lastRateUpdate = now;
-            _lastLifetimeProcessed = _lifetimeProcessed;
+        synchronized (this) {
+            long et = now - _lastRateUpdate;
+            if (et > 2*60*1000) {
+                long bw = 1024 * (_lifetimeProcessed - _lastLifetimeProcessed) * 1000 / et;   // Bps
+                _context.statManager().addRateData(_rateName, bw);
+                _lastRateUpdate = now;
+                _lastLifetimeProcessed = _lifetimeProcessed;
+            }
         }
     }
 
@@ -871,7 +877,7 @@ public class TunnelPool {
         return ls;
     }
 
-    public long getLifetimeProcessed() { return _lifetimeProcessed; }
+    public synchronized long getLifetimeProcessed() { return _lifetimeProcessed; }
     
     /**
      * Keep a separate stat for each type, direction, and length of tunnel.

@@ -48,6 +48,8 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
     private final byte[][] _AESReplyIVs;
     // short record OBEP only
     private OneTimeSession _garlicReplyKeys;
+    private int _reqBW;
+    private int _allocBW;
     
     /**
      *  IV length for {@link #getAESReplyIV}
@@ -377,6 +379,34 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
     public OneTimeSession getGarlicReplyKeys() {
         return _garlicReplyKeys;
     }
+
+    /**
+     *  Bandwidth requested, or 0 if unset
+     *  @return Bps
+     *  @since 0.9.69
+     */
+    public int getRequestedBW() { return _reqBW; }
+
+    /**
+     *  Bandwidth requested, or 0 if unset
+     *  @param bw Bps
+     *  @since 0.9.69
+     */
+    public void setRequestedBW(int bw) { _reqBW = bw; }
+
+    /**
+     *  Bandwidth allocated, or 0 if unset
+     *  @return Bps
+     *  @since 0.9.69
+     */
+    public int getAllocatedBW() { return _allocBW; }
+
+    /**
+     *  Bandwidth allocated, or 0 if unset
+     *  @param bw Bps
+     *  @since 0.9.69
+     */
+    public void setAllocatedBW(int bw) { _allocBW = bw; }
 
     @Override
     public String toString() {
