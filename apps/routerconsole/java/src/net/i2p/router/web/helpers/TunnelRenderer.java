@@ -132,48 +132,7 @@ class TunnelRenderer {
             processed += cfg.getRecentMessagesCount();
             if (++displayed > DISPLAY_LIMIT)
                 continue;
-            out.write("<tr>");
-            long recv = cfg.getReceiveTunnelId();
-            if (recv != 0)
-                out.write("<td class=\"cells\" align=\"center\" title=\"" + _t("Tunnel identity") + "\"><span class=\"tunnel_id\">" +
-                          recv + "</span></td>");
-            else
-                out.write("<td class=\"cells\" align=\"center\">n/a</td>");
-            Hash from = cfg.getReceiveFrom();
-            if (from != null)
-                out.write("<td class=\"cells\" align=\"center\"><span class=\"tunnel_peer\">" + netDbLink(from) +"</span></td>");
-            else
-                out.write("<td class=\"cells\">&nbsp;</td>");
-            long send = cfg.getSendTunnelId();
-            if (send != 0)
-                out.write("<td class=\"cells\" align=\"center\" title=\"" + _t("Tunnel identity") + "\"><span class=\"tunnel_id\">" + send +"</span></td>");
-            else
-                out.write("<td class=\"cells\">&nbsp;</td>");
-            Hash to = cfg.getSendTo();
-            if (to != null)
-                out.write("<td class=\"cells\" align=\"center\"><span class=\"tunnel_peer\">" + netDbLink(to) +"</span></td>");
-            else
-                out.write("<td class=\"cells\">&nbsp;</td>");
-            long timeLeft = cfg.getExpiration() - now;
-            if (timeLeft > 0)
-                out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatDuration2(timeLeft) + "</td>");
-            else
-                out.write("<td class=\"cells\" align=\"center\">(" + _t("grace period") + ")</td>");
-            out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatSize2(count * 1024) + "B</td>");
-            int lifetime = (int) ((now - cfg.getCreation()) / 1000);
-            if (lifetime <= 0)
-                lifetime = 1;
-            if (lifetime > 10*60)
-                lifetime = 10*60;
-            long bps = 1024L * count / lifetime;
-            out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatSize2Decimal(bps) + "Bps</td>");
-            if (to == null)
-                out.write("<td class=\"cells\" align=\"center\">" + _t("Outbound Endpoint") + "</td>");
-            else if (from == null)
-                out.write("<td class=\"cells\" align=\"center\">" + _t("Inbound Gateway") + "</td>");
-            else
-                out.write("<td class=\"cells\" align=\"center\">" + _t("Participant") + "</td>");
-            out.write("</tr>\n");
+            renderTunnel(out, now, count, cfg);
         }
         if (!participating.isEmpty())
             out.write("</table>\n");
@@ -213,7 +172,7 @@ class TunnelRenderer {
                 List<Hash> sort = counts.sortedObjects();
                 for (Hash h : sort) {
                     int count = counts.count(h);
-                    if (count <= 1)
+                    if (count < 4)
                         break;
                     if (++displayed > DISPLAY_LIMIT)
                         break;
@@ -222,6 +181,7 @@ class TunnelRenderer {
                     out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatSize2(bws.count(h) * 1024) + "B</td></tr>\n");
                 }
                 out.write("</table>\n");
+
                 if (displayed <= 0)
                     out.write("<div class=\"statusnotes\"><b>" + _t("none") + "</b></div>\n");
             }
@@ -249,6 +209,55 @@ class TunnelRenderer {
                   + "<td>&nbsp;</td></tr>");
         out.write("</tbody></table>");
 
+    }
+
+    /**
+     * Output one table row for one tunnel
+     * @since 0.9.69 split out from above
+     */
+    private void renderTunnel(Writer out, long now, int count, HopConfig cfg) throws IOException {
+        out.write("<tr>");
+        long recv = cfg.getReceiveTunnelId();
+        if (recv != 0)
+            out.write("<td class=\"cells\" align=\"center\" title=\"" + _t("Tunnel identity") + "\"><span class=\"tunnel_id\">" +
+                      recv + "</span></td>");
+        else
+            out.write("<td class=\"cells\" align=\"center\">n/a</td>");
+        Hash from = cfg.getReceiveFrom();
+        if (from != null)
+            out.write("<td class=\"cells\" align=\"center\"><span class=\"tunnel_peer\">" + netDbLink(from) +"</span></td>");
+        else
+            out.write("<td class=\"cells\">&nbsp;</td>");
+        long send = cfg.getSendTunnelId();
+        if (send != 0)
+            out.write("<td class=\"cells\" align=\"center\" title=\"" + _t("Tunnel identity") + "\"><span class=\"tunnel_id\">" + send +"</span></td>");
+        else
+            out.write("<td class=\"cells\">&nbsp;</td>");
+        Hash to = cfg.getSendTo();
+        if (to != null)
+            out.write("<td class=\"cells\" align=\"center\"><span class=\"tunnel_peer\">" + netDbLink(to) +"</span></td>");
+        else
+            out.write("<td class=\"cells\">&nbsp;</td>");
+        long timeLeft = cfg.getExpiration() - now;
+        if (timeLeft > 0)
+            out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatDuration2(timeLeft) + "</td>");
+        else
+            out.write("<td class=\"cells\" align=\"center\">(" + _t("grace period") + ")</td>");
+        out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatSize2(count * 1024) + "B</td>");
+        int lifetime = (int) ((now - cfg.getCreation()) / 1000);
+        if (lifetime <= 0)
+            lifetime = 1;
+        if (lifetime > 10*60)
+            lifetime = 10*60;
+        long bps = 1024L * count / lifetime;
+        out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatSize2Decimal(bps) + "Bps</td>");
+        if (to == null)
+            out.write("<td class=\"cells\" align=\"center\">" + _t("Outbound Endpoint") + "</td>");
+        else if (from == null)
+            out.write("<td class=\"cells\" align=\"center\">" + _t("Inbound Gateway") + "</td>");
+        else
+            out.write("<td class=\"cells\" align=\"center\">" + _t("Participant") + "</td>");
+        out.write("</tr>\n");
     }
 
     /** @since 0.9.33 */
