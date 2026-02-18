@@ -484,7 +484,13 @@ class TunnelRenderer {
             out.write("<div class=\"statusnotes\"><center><b>" + _t("none") + "</b></center></div>\n");
         out.write("<div class=\"statusnotes\"><center><b>" + _t("Lifetime bandwidth usage") + ":&nbsp;&nbsp;" +
                   DataHelper.formatSize2(processedIn*1024) + "B " + _t("in") + ", " +
-                  DataHelper.formatSize2(processedOut*1024) + "B " + _t("out") + "</b></center></div>");
+                  DataHelper.formatSize2(processedOut*1024) + "B " + _t("out"));
+        out.write("</b><br><b>" + _t("Average bandwidth per tunnel") + ":&nbsp;&nbsp;");
+        if (in != null)
+            out.write(DataHelper.formatSize2Decimal(in.getAvgBWPerTunnel()) + "Bps " + _t("in") + ", ");
+        if (outPool != null)
+            out.write(DataHelper.formatSize2Decimal(outPool.getAvgBWPerTunnel()) + "Bps " + _t("out"));
+        out.write("</b></center></div>");
     }
 
 /****
