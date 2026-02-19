@@ -12,7 +12,9 @@ import com.southernstorm.noise.protocol.CipherState;
 import com.southernstorm.noise.protocol.CipherStatePair;
 import com.southernstorm.noise.protocol.HandshakeState;
 
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.HKDF;
+import net.i2p.crypto.KeyFactory;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -22,6 +24,7 @@ import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.ntcp.NTCP2Payload.Block;
+import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 
 /**
@@ -80,6 +83,7 @@ class OutboundNTCP2State implements EstablishState {
     private final int _padlen3;
     private final SessionKey _bobHash;
     private final byte[] _bobIV;
+    private final int _version;
 
     private enum State {
         OB_INIT,
@@ -103,12 +107,43 @@ class OutboundNTCP2State implements EstablishState {
         _transport = transport;
         _con = con;
         _state = State.OB_INIT;
-        _tmp = new byte[TOTAL1_MAX];
+        _version = con.getVersion();
+        int len = TOTAL1_MAX;
         try {
-            _handshakeState = new HandshakeState(HandshakeState.PATTERN_ID_XK, HandshakeState.INITIATOR, _transport.getXDHFactory());
+            String pattern;
+            KeyFactory hkf;
+            switch (_version) {
+                case 2:
+                    pattern = HandshakeState.PATTERN_ID_XK;
+                    _handshakeState = new HandshakeState(pattern, HandshakeState.INITIATOR, _transport.getXDHFactory());
+                    break;
+                case 3:
+                    pattern = HandshakeState.PATTERN_ID_XKHFS_512;
+                    // _tmp is used for both writing msg 1 and reading msg 2;
+                    // for PQ, msg 1 is larger, so we use the _INT length, not the _CT length
+                    len += MAC_SIZE + EncType.MLKEM512_X25519_INT.getPubkeyLen();
+                    hkf = ctx.eciesEngine().getHybridKeyFactory(EncType.MLKEM512_X25519);
+                    _handshakeState = new HandshakeState(pattern, HandshakeState.INITIATOR, _transport.getXDHFactory(), hkf);
+                    break;
+                case 4:
+                    pattern = HandshakeState.PATTERN_ID_XKHFS_768;
+                    len += MAC_SIZE + EncType.MLKEM768_X25519_INT.getPubkeyLen();
+                    hkf = ctx.eciesEngine().getHybridKeyFactory(EncType.MLKEM768_X25519);
+                    _handshakeState = new HandshakeState(pattern, HandshakeState.INITIATOR, _transport.getXDHFactory(), hkf);
+                    break;
+                case 5:
+                    pattern = HandshakeState.PATTERN_ID_XKHFS_1024;
+                    len += MAC_SIZE + EncType.MLKEM1024_X25519_INT.getPubkeyLen();
+                    hkf = ctx.eciesEngine().getHybridKeyFactory(EncType.MLKEM1024_X25519);
+                    _handshakeState = new HandshakeState(pattern, HandshakeState.INITIATOR, _transport.getXDHFactory(), hkf);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Bad version " + _version);
+            }
         } catch (GeneralSecurityException gse) {
             throw new IllegalStateException("bad proto", gse);
         }
+        _tmp = new byte[len];
         // save because we must know length
         _aliceRI = ctx.router().getRouterInfo();
         if (_aliceRI == null)
@@ -170,9 +205,9 @@ class OutboundNTCP2State implements EstablishState {
 
     /**
      *  Get the NTCP version
-     *  @return 2
+     *  @return 2-5
      */
-    public int getVersion() { return 2; }
+    public int getVersion() { return _version; }
 
     /**
      *  We are Alice.
@@ -243,6 +278,10 @@ class OutboundNTCP2State implements EstablishState {
         }
         if (_log.shouldDebug())
             _log.debug("After msg 1: " + _handshakeState.toString());
+
+        // PQ marker
+        if (_version != 2)
+            _tmp[KEY_SIZE - 1] |= (byte) 0x80;
 
         // encrypt key before writing
         _context.aes().encrypt(_tmp, 0, _tmp, 0, _bobHash, _bobIV, KEY_SIZE);

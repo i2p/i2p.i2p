@@ -123,6 +123,31 @@ class Pattern {
 	};
 
 	/**
+	 * @since 0.9.69
+	 */
+	private static final short[] noise_pattern_XKhfs = {
+	    FLAG_LOCAL_STATIC |
+	    FLAG_LOCAL_EPHEMERAL |
+	    FLAG_LOCAL_HYBRID |
+	    FLAG_REMOTE_STATIC |
+	    FLAG_REMOTE_EPHEMERAL |
+	    FLAG_REMOTE_HYBRID |
+	    FLAG_REMOTE_REQUIRED,
+
+	    E,
+	    ES,
+	    F,
+	    FLIP_DIR,
+	    E,
+	    EE,
+	    F,
+	    FF,
+	    FLIP_DIR,
+	    S,
+	    SE
+	};
+
+	/**
 	 * Look up the description information for a pattern.
 	 * 
 	 * @param name The name of the pattern.
@@ -138,6 +163,8 @@ class Pattern {
 			return noise_pattern_IK;
 		else if (name.equals("IKhfs"))
 			return noise_pattern_IKhfs;
+		else if (name.equals("XKhfs"))
+			return noise_pattern_XKhfs;
 		return null;
 	}
 

@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.i2p.crypto.EncType;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -49,6 +50,8 @@ abstract class EstablishBase implements EstablishState {
     protected static final int MAX_RI_SIZE = 3072;
 
     protected static final int AES_SIZE = 16;
+    // NOTE: this is the max NTCP2 padding for non-PQ because we reuse the _X buffer for padding.
+    // Increase or fix InboundEstablishState padding readin to not use _X if more is desired.
     protected static final int XY_SIZE = 256;
 
     protected final Object _stateLock = new Object();
@@ -66,11 +69,17 @@ abstract class EstablishBase implements EstablishState {
          */
         IB_NTCP2_INIT,
         /**
+         * Got X part of msg 1
+         * Next state IB_NTCP2_GOT_MSG1 or IB_NTCP2_READ_RANDOM on fail
+         * @since 0.9.36
+         */
+        IB_NTCP2_GOT_X,
+        /**
          * Got Noise part of msg 1
          * Next state IB_NTCP2_GOT_PADDING or IB_NTCP2_READ_RANDOM on fail
          * @since 0.9.36
          */
-        IB_NTCP2_GOT_X,
+        IB_NTCP2_GOT_MSG1,
         /**
          * Got msg 1 incl. padding
          * Next state IB_NTCP2_SENT_Y
@@ -118,7 +127,27 @@ abstract class EstablishBase implements EstablishState {
         _transport = transport;
         _con = con;
         if (_con.isInbound()) {
-            _X = SimpleByteCache.acquire(XY_SIZE);
+            int sz;
+            switch (NTCPTransport.PQ_INT_VERSION) {
+                case 0:
+                    sz = XY_SIZE;
+                    break;
+                case 3:
+                    sz = OutboundNTCP2State.MSG1_SIZE +
+                         OutboundNTCP2State.MAC_SIZE + EncType.MLKEM512_X25519_INT.getPubkeyLen();
+                    break;
+                case 4:
+                    sz = OutboundNTCP2State.MSG1_SIZE +
+                         OutboundNTCP2State.MAC_SIZE + EncType.MLKEM768_X25519_INT.getPubkeyLen();
+                    break;
+                case 5:
+                    sz = OutboundNTCP2State.MSG1_SIZE +
+                         OutboundNTCP2State.MAC_SIZE + EncType.MLKEM1024_X25519_INT.getPubkeyLen();
+                    break;
+                default:
+                    throw new IllegalArgumentException("Bad version");
+            }
+            _X = SimpleByteCache.acquire(sz);
             _Y = null;
         } else {
             // OutboundNTCP2State does not extend this,

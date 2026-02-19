@@ -149,6 +149,19 @@ public class HandshakeState implements Destroyable, Cloneable {
 	public static final String protocolName5 = "Noise_IKhfselg2_25519+MLKEM512_ChaChaPoly_SHA256";
 	public static final String protocolName6 = "Noise_IKhfselg2_25519+MLKEM768_ChaChaPoly_SHA256";
 	public static final String protocolName7 = "Noise_IKhfselg2_25519+MLKEM1024_ChaChaPoly_SHA256";
+	/**
+	 * Hybrid NTCP2
+	 * @since 0.9.69
+	 */
+	public static final String protocolName8 = "Noise_XKhfsaesobfse+hs2+hs3_25519+MLKEM512_ChaChaPoly_SHA256";
+	public static final String protocolName9 = "Noise_XKhfsaesobfse+hs2+hs3_25519+MLKEM768_ChaChaPoly_SHA256";
+	public static final String protocolName10 = "Noise_XKhfsaesobfse+hs2+hs3_25519+MLKEM1024_ChaChaPoly_SHA256";
+	/**
+	 * Hybrid SSU2
+	 * @since 0.9.69
+	 */
+	public static final String protocolName11 = "Noise_XKhfschaobfse+hs1+hs2+hs3_25519+MLKEM512_ChaChaPoly_SHA256";
+	public static final String protocolName12 = "Noise_XKhfschaobfse+hs1+hs2+hs3_25519+MLKEM768_ChaChaPoly_SHA256";
 
 	private static final String prefix;
 	private final String patternId;
@@ -164,6 +177,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 	public static final String PATTERN_ID_XK_SSU2 = "XK-SSU2";
 	/** Hybrid Base */
 	private static final String PATTERN_ID_IKHFS = "IKhfs";
+	private static final String PATTERN_ID_XKHFS = "XKhfs";
 	/**
 	 * Hybrid Ratchet
 	 * @since 0.9.67
@@ -171,6 +185,20 @@ public class HandshakeState implements Destroyable, Cloneable {
 	public static final String PATTERN_ID_IKHFS_512 = "IKhfs512";
 	public static final String PATTERN_ID_IKHFS_768 = "IKhfs768";
 	public static final String PATTERN_ID_IKHFS_1024 = "IKhfs1024";
+	/**
+	 * Hybrid NTCP2
+	 * @since 0.9.69
+	 */
+	public static final String PATTERN_ID_XKHFS_512 = "XKhfs512";
+	public static final String PATTERN_ID_XKHFS_768 = "XKhfs768";
+	public static final String PATTERN_ID_XKHFS_1024 = "XKhfs1024";
+	/**
+	 * Hybrid SSU2
+	 * @since 0.9.69
+	 */
+	public static final String PATTERN_ID_XKHFS_512_SSU2 = "XKhfs512-SSU2";
+	public static final String PATTERN_ID_XKHFS_768_SSU2 = "XKhfs768-SSU2";
+	// no 1024, too big
 
 	private static final String dh;
 	private static final String cipher;
@@ -180,6 +208,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 	private static final short[] PATTERN_IK;
 	private static final short[] PATTERN_N;
 	private static final short[] PATTERN_IKHFS;
+	private static final short[] PATTERN_XKHFS;
 
 	static {
 		// Parse the protocol name into its components.
@@ -238,6 +267,22 @@ public class HandshakeState implements Destroyable, Cloneable {
 		id = components[1].substring(0, 5);
 		if (!PATTERN_ID_IKHFS.equals(id))
 			throw new IllegalArgumentException();
+		// XK Hybrid
+		components = protocolName8.split("_");
+		id = components[1].substring(0, 5);
+		if (!PATTERN_ID_XKHFS.equals(id))
+			throw new IllegalArgumentException();
+		PATTERN_XKHFS = Pattern.lookup(id);
+		if (PATTERN_XKHFS == null)
+			throw new IllegalArgumentException("Handshake pattern is not recognized");
+		components = protocolName9.split("_");
+		id = components[1].substring(0, 5);
+		if (!PATTERN_ID_XKHFS.equals(id))
+			throw new IllegalArgumentException();
+		components = protocolName10.split("_");
+		id = components[1].substring(0, 5);
+		if (!PATTERN_ID_XKHFS.equals(id))
+			throw new IllegalArgumentException();
 	}
 
 	/**
@@ -292,6 +337,10 @@ public class HandshakeState implements Destroyable, Cloneable {
 		         patternId.equals(PATTERN_ID_IKHFS_768) ||
 		         patternId.equals(PATTERN_ID_IKHFS_1024))
 			pattern = PATTERN_IKHFS;
+		else if (patternId.equals(PATTERN_ID_XKHFS_512) ||
+		         patternId.equals(PATTERN_ID_XKHFS_768) ||
+		         patternId.equals(PATTERN_ID_XKHFS_1024))
+			pattern = PATTERN_XKHFS;
 		else
 			throw new IllegalArgumentException("Handshake pattern is not recognized");
 		short flags = pattern[0];

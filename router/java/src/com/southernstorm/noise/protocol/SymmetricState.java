@@ -44,6 +44,9 @@ class SymmetricState implements Destroyable, Cloneable {
 	private static final byte[] INIT_CK_IKHFS_512;
 	private static final byte[] INIT_CK_IKHFS_768;
 	private static final byte[] INIT_CK_IKHFS_1024;
+	private static final byte[] INIT_CK_XKHFS_512;
+	private static final byte[] INIT_CK_XKHFS_768;
+	private static final byte[] INIT_CK_XKHFS_1024;
 	// precalculated hash of the hash of the Noise name = mixHash(nullPrologue)
 	private static final byte[] INIT_HASH_XK = new byte[32];
 	private static final byte[] INIT_HASH_IK = new byte[32];
@@ -52,6 +55,9 @@ class SymmetricState implements Destroyable, Cloneable {
 	private static final byte[] INIT_HASH_IKHFS_512 = new byte[32];
 	private static final byte[] INIT_HASH_IKHFS_768 = new byte[32];
 	private static final byte[] INIT_HASH_IKHFS_1024 = new byte[32];
+	private static final byte[] INIT_HASH_XKHFS_512 = new byte[32];
+	private static final byte[] INIT_HASH_XKHFS_768 = new byte[32];
+	private static final byte[] INIT_HASH_XKHFS_1024 = new byte[32];
 
 	static {
 		INIT_CK_XK = initHash(HandshakeState.protocolName);
@@ -61,6 +67,9 @@ class SymmetricState implements Destroyable, Cloneable {
 	        INIT_CK_IKHFS_512 = initHash(HandshakeState.protocolName5);
 	        INIT_CK_IKHFS_768 = initHash(HandshakeState.protocolName6);
 	        INIT_CK_IKHFS_1024 = initHash(HandshakeState.protocolName7);
+	        INIT_CK_XKHFS_512 = initHash(HandshakeState.protocolName8);
+	        INIT_CK_XKHFS_768 = initHash(HandshakeState.protocolName9);
+	        INIT_CK_XKHFS_1024 = initHash(HandshakeState.protocolName10);
 		try {
 			MessageDigest md = Noise.createHash("SHA256");
 			md.update(INIT_CK_XK, 0, 32);
@@ -77,6 +86,12 @@ class SymmetricState implements Destroyable, Cloneable {
 			md.digest(INIT_HASH_IKHFS_768, 0, 32);
 			md.update(INIT_CK_IKHFS_1024, 0, 32);
 			md.digest(INIT_HASH_IKHFS_1024, 0, 32);
+			md.update(INIT_CK_XKHFS_512, 0, 32);
+			md.digest(INIT_HASH_XKHFS_512, 0, 32);
+			md.update(INIT_CK_XKHFS_768, 0, 32);
+			md.digest(INIT_HASH_XKHFS_768, 0, 32);
+			md.update(INIT_CK_XKHFS_1024, 0, 32);
+			md.digest(INIT_HASH_XKHFS_1024, 0, 32);
 			Noise.releaseHash(md);
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
@@ -160,6 +175,15 @@ class SymmetricState implements Destroyable, Cloneable {
 		} else if (patternId.equals(HandshakeState.PATTERN_ID_IKHFS_1024)) {
 			initCK = INIT_CK_IKHFS_1024;
 			initHash = INIT_HASH_IKHFS_1024;
+		} else if (patternId.equals(HandshakeState.PATTERN_ID_XKHFS_512)) {
+			initCK = INIT_CK_XKHFS_512;
+			initHash = INIT_HASH_XKHFS_512;
+		} else if (patternId.equals(HandshakeState.PATTERN_ID_XKHFS_768)) {
+			initCK = INIT_CK_XKHFS_768;
+			initHash = INIT_HASH_XKHFS_768;
+		} else if (patternId.equals(HandshakeState.PATTERN_ID_XKHFS_1024)) {
+			initCK = INIT_CK_XKHFS_1024;
+			initHash = INIT_HASH_XKHFS_1024;
 		} else {
 			throw new IllegalArgumentException("Handshake pattern is not recognized");
 		}

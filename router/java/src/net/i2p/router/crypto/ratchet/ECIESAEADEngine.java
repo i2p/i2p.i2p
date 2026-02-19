@@ -424,9 +424,9 @@ public final class ECIESAEADEngine {
     }
 
     /**
-     * @since 0.9.67
+     * @since 0.9.67, public since 0.9.69 for transports
      */
-    private KeyFactory getHybridKeyFactory(EncType type) {
+    public KeyFactory getHybridKeyFactory(EncType type) {
         switch(type) {
           case MLKEM512_X25519:
               return MLKEM.MLKEM512KeyFactory;

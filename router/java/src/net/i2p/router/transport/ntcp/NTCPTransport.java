@@ -130,6 +130,9 @@ public class NTCPTransport extends TransportImpl {
     static final String NTCP2_VERSION = Integer.toString(NTCP2_INT_VERSION);
     /** "2," */
     static final String NTCP2_VERSION_ALT = NTCP2_VERSION + ',';
+    /** 0 to disable, or 3/4/5 for enctypes 5/6/7 */
+    static final int PQ_INT_VERSION = 4;
+    static final String PQ_VERSION = Integer.toString(PQ_INT_VERSION);
     /** b64 static private key */
     public static final String PROP_NTCP2_SP = "i2np.ntcp2.sp";
     /** b64 static IV */
@@ -974,6 +977,9 @@ public class NTCPTransport extends TransportImpl {
         props.setProperty("caps", caps);
         props.setProperty("s", _b64Ntcp2StaticPubkey);
         props.setProperty("v", NTCP2_VERSION);
+        // not needed for outbound
+        //if (PQ_INT_VERSION != 0)
+        //    props.setProperty("pq", PQ_VERSION);
         RouterAddress myAddress = new RouterAddress(STYLE2, props, NTCP2_OUTBOUND_COST);
         replaceAddress(myAddress);
     }
@@ -1317,6 +1323,9 @@ public class NTCPTransport extends TransportImpl {
         // only set i if we are not firewalled
         if (props.containsKey("host")) {
             props.setProperty("i", _b64Ntcp2StaticIV);
+            // only needed for inbound
+            if (PQ_INT_VERSION != 0)
+                props.setProperty("pq", PQ_VERSION);
             props.remove("caps");
         } else {
             String caps;
@@ -1386,6 +1395,11 @@ public class NTCPTransport extends TransportImpl {
             (!v.equals(NTCP2_VERSION) && !v.startsWith(NTCP2_VERSION_ALT))) {
             // his address is NTCP1 or is outbound NTCP2 only
             return 0;
+        }
+        if (PQ_INT_VERSION != 0) {
+            String pq = addr.getOption("pq");
+            if (pq != null && pq.equals(PQ_VERSION))
+                return PQ_INT_VERSION;
         }
         // his address is NTCP2
         // do not validate the s/i b64, we will just catch it later
