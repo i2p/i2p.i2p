@@ -366,6 +366,7 @@ class NetDbRenderer {
                         buf.setLength(0);
                         buf.append("<table id=\"netdboverview\" border=\"0\" cellspacing=\"30\"><tr><th colspan=\"3\">");
                         buf.append(_t("Network Database Search Results"));
+                        buf.append(": ").append(ngettext("{0} router", "{0} routers", sz));
                         buf.append("</th></tr>");
                         buf.append("<tr><td id=\"mapcontainer\" colspan=\"3\">");
                         boolean ok = embedResource(buf, "mapbase75p1.svg");
@@ -925,8 +926,8 @@ class NetDbRenderer {
                   buf.append("</td></tr>")
                      .append("<tr><td><b>Median distance (bits):</b></td><td colspan=\"3\">").append(fmt.format(log2)).append("</td></tr>\n");
                   // 2 for 4 floodfills... -1 for median
-                  // this can be way off for unknown reasons
-                  int total = (int) Math.round(Math.pow(2, 2 + 256 - 1 - log2));
+                  // this can be way off for unknown reasons, add 2 more
+                  int total = (int) Math.round(Math.pow(2, 2 + 2 + 256 - 1 - log2));
                   buf.append("<tr><td><b>Estimated total floodfills:</b></td><td colspan=\"3\">").append(total).append("</td></tr>\n");
                   buf.append("<tr><td><b>Estimated total leasesets:</b></td><td colspan=\"3\">").append(total * rapCount / 4);
               } else {
@@ -1698,5 +1699,10 @@ class NetDbRenderer {
      */
     private String _t(String s, Object o) {
         return Messages.getString(s, o, _context);
+    }
+
+    /** translate a string */
+    private String ngettext(String s, String p, int n) {
+        return Messages.getString(n, s, p, _context);
     }
 }
