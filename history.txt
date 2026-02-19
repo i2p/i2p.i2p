@@ -1,5 +1,27 @@
+2026-02-19 zzz
+ * Transport: Add support for PQ NTCP2 (Prop. 169)
+
+2026-02-18 zzz
+ * Console: Add display of average bandwidth per tunnel
+
+2026-02-17 zzz
+ * Build: Fix Jetty javadoc link, update JavaSE javadoc link, update package-lists
+ * Console: Fix overstatement of lifetime tunnel bw usage
+ * Tunnels:
+   - More BW params handling (Prop. 168)
+   - Change tunnel bw rate stat from 5m to 10m
+   - Better average of per-tunnel bw by including current tunnels
+
+2026-02-16 zzz
+ * Router: Limit max banlist size
+
+2026-02-15 zzz
+ * Console: Add netdb search option for NTCP2 PQ transports
+
 2026-02-14 zzz
- * Console: Show country map for netdb search results
+ * Console:
+   - Show country map for netdb search results
+   - Use unique cookie per-install
  * Datagrams: Use smaller initial buffer size in DG1 maker
  * i2psnark: Clear bw limiters on session stop
 
