@@ -10,6 +10,28 @@
 
   Prerequisites:
   - sudo apt install spawn-fcgi fcgiwrap
+  - Install additional Jetty 12 jars. See below.
+
+  Copy this file to your eepsite's context dir (probably ~/.i2p/eepsite/contexts)
+  Change the cgiroot Arg to the full path to the directory containing your cgi files
+  If desired, change the contextPath (URI) for the web URI for your cgi files (currently /cgi-bin)
+
+  Install additional Jetty 12 jars (standard install only):
+  - Download https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-home/12.0.28/jetty-home-12.0.28.zip
+  - Unzip to a temporary directory
+  - Copy the following files to your I2P installation lib/ directory ($I2P/lib):
+    * lib/jetty-client-12.0.28.jar
+    * lib/jetty-proxy-12.0.28.jar
+    * lib/fcgi/jetty-fcgi-client-12.0.28.jar
+    * lib/fcgi/jetty-fcgi-proxy-12.0.28.jar
+
+  OR Install additional Jetty 12 jars (Debian/Ubuntu package install only):
+  - sudo apt install libjetty12-extra-java
+  - cd /usr/share/i2p/lib
+  - sudo ln -s /usr/share/java/jetty12-client.jar
+  - sudo ln -s /usr/share/java/jetty12-proxy.jar
+  - sudo ln -s /usr/share/java/jetty12-fcgi-client.jar
+  - sudo ln -s /usr/share/java/jetty12-fcgi-proxy.jar
 
   Create a start-fcgi script:
 
@@ -25,6 +47,9 @@
 
   Start the fcgi-server with
     start-fcgi
+  If you forget this, cgi scripts will return a 502 error.
+
+  Stop I2P and restart
 
   Ref:
   https://jetty.org/docs/jetty/12/operations-guide/protocols/index.html#fcgi
