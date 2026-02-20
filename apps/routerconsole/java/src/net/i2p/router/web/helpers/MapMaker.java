@@ -469,7 +469,7 @@ public class MapMaker {
                 my =  usy - off;
             }
             g.drawLine(tx, ty, mx, my, PART_COLOR,
-                       new BasicStroke(Math.max(3, Math.min(30, 3 * count / 2))),
+                       new BasicStroke(Math.max(3, Math.min(30, count / 2))),
                        null, hints);
             hints.clear();
         }
