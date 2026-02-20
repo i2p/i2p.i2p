@@ -1373,10 +1373,10 @@ public class NTCPTransport extends TransportImpl {
      * Get the valid NTCP version of Bob's NTCP address
      * for our outbound connections as Alice.
      *
-     * @return the valid version 1 or 2, or 0 if unusable
+     * @return the valid version 2-5, 1 for old NTCP1, or 0 if unusable
      * @since 0.9.35
      */
-    private int getNTCPVersion(RouterAddress addr) {
+    private static int getNTCPVersion(RouterAddress addr) {
         int rv;
         String style = addr.getTransportStyle();
         if (style.equals(STYLE)) {
@@ -1398,8 +1398,16 @@ public class NTCPTransport extends TransportImpl {
         }
         if (PQ_INT_VERSION != 0) {
             String pq = addr.getOption("pq");
-            if (pq != null && pq.equals(PQ_VERSION))
-                return PQ_INT_VERSION;
+            if (pq != null) {
+                if (pq.equals(PQ_VERSION))
+                    return PQ_INT_VERSION;
+                // allow outbound PQ different from our inbound
+                try {
+                    int pqn = Integer.parseInt(pq);
+                    if (pqn >= 3 && pqn <= 5)
+                        return pqn;
+                } catch (NumberFormatException nfe) {}
+            }
         }
         // his address is NTCP2
         // do not validate the s/i b64, we will just catch it later
