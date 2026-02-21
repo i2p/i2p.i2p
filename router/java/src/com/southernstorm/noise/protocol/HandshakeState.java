@@ -283,6 +283,14 @@ public class HandshakeState implements Destroyable, Cloneable {
 		id = components[1].substring(0, 5);
 		if (!PATTERN_ID_XKHFS.equals(id))
 			throw new IllegalArgumentException();
+		components = protocolName11.split("_");
+		id = components[1].substring(0, 5);
+		if (!PATTERN_ID_XKHFS.equals(id))
+			throw new IllegalArgumentException();
+		components = protocolName12.split("_");
+		id = components[1].substring(0, 5);
+		if (!PATTERN_ID_XKHFS.equals(id))
+			throw new IllegalArgumentException();
 	}
 
 	/**
@@ -339,7 +347,9 @@ public class HandshakeState implements Destroyable, Cloneable {
 			pattern = PATTERN_IKHFS;
 		else if (patternId.equals(PATTERN_ID_XKHFS_512) ||
 		         patternId.equals(PATTERN_ID_XKHFS_768) ||
-		         patternId.equals(PATTERN_ID_XKHFS_1024))
+		         patternId.equals(PATTERN_ID_XKHFS_1024) ||
+		         patternId.equals(PATTERN_ID_XKHFS_512_SSU2) ||
+		         patternId.equals(PATTERN_ID_XKHFS_768_SSU2))
 			pattern = PATTERN_XKHFS;
 		else
 			throw new IllegalArgumentException("Handshake pattern is not recognized");
