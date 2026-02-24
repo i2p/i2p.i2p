@@ -1258,6 +1258,12 @@
         <delete file="javadoc.zip" />
         <delete file="i2p.fba" />
         <delete file="${sloccount.report.file}" />
+        <delete file="mavencentral-i2p.zip" />
+        <delete file="mavencentral-router.zip" />
+        <delete file="mavencentral-mstreaming.zip" />
+        <delete file="mavencentral-streaming.zip" />
+        <delete file="mavencentral-servlet-i2p.zip" />
+        <!-- clean up old .jar bundles too -->
         <delete file="mavencentral-i2p.jar" />
         <delete file="mavencentral-router.jar" />
         <delete file="mavencentral-mstreaming.jar" />
@@ -2684,33 +2690,33 @@
         <gpgsignasc file="pkg-mavencentral/servlet-i2p-${release.number}.pom" />
         <gpgsignasc file="pkg-mavencentral/servlet-i2p-${release.number}-javadoc.jar" />
         <gpgsignasc file="pkg-mavencentral/servlet-i2p-${release.number}-sources.jar" />
-        <!-- Bundle -->
-        <jar destfile="mavencentral-i2p.jar">
+        <!-- Bundle - use zip not jar, to avoid META-INF which causes Sonatype validation errors -->
+        <zip destfile="mavencentral-i2p.zip">
             <fileset dir="./pkg-mavencentral">
                 <include name="i2p-*" />
             </fileset>
-        </jar>
-        <jar destfile="mavencentral-router.jar">
+        </zip>
+        <zip destfile="mavencentral-router.zip">
             <fileset dir="./pkg-mavencentral">
                 <include name="router-*" />
             </fileset>
-        </jar>
-        <jar destfile="mavencentral-mstreaming.jar">
+        </zip>
+        <zip destfile="mavencentral-mstreaming.zip">
             <fileset dir="./pkg-mavencentral">
                 <include name="mstreaming-*" />
             </fileset>
-        </jar>
-        <jar destfile="mavencentral-streaming.jar">
+        </zip>
+        <zip destfile="mavencentral-streaming.zip">
             <fileset dir="./pkg-mavencentral">
                 <include name="streaming-*" />
             </fileset>
-        </jar>
-        <jar destfile="mavencentral-servlet-i2p.jar">
+        </zip>
+        <zip destfile="mavencentral-servlet-i2p.zip">
             <fileset dir="./pkg-mavencentral">
                 <include name="servlet-i2p-*" />
             </fileset>
-        </jar>
-        <echo message="Now upload mavencentral-*.jar to Maven Central." />
+        </zip>
+        <echo message="Now upload mavencentral-*.zip to Maven Central." />
     </target>
 
     <target name="mavenLocal.deps" depends="buildRouter, buildStreaming">
