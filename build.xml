@@ -2661,6 +2661,13 @@
         <artifact:writepom pomRefId="mstreamingpom" file="pkg-mavencentral/mstreaming-${release.number}.pom" />
         <artifact:writepom pomRefId="streamingpom" file="pkg-mavencentral/streaming-${release.number}.pom" />
         <artifact:writepom pomRefId="servletpom" file="pkg-mavencentral/servlet-i2p-${release.number}.pom" />
+        <!-- Checksums - Sonatype requires md5 and sha1 for every artifact -->
+        <checksum algorithm="MD5" fileext=".md5">
+            <fileset dir="pkg-mavencentral" excludes="*.md5 *.sha1 *.asc" />
+        </checksum>
+        <checksum algorithm="SHA-1" fileext=".sha1">
+            <fileset dir="pkg-mavencentral" excludes="*.md5 *.sha1 *.asc" />
+        </checksum>
         <!-- Signatures -->
         <echo message="Sign the files:" />
         <input message="Enter GPG key ID (e.g. 0x12345678) for signing:" addproperty="release.gpg.keyid" />
@@ -2690,31 +2697,33 @@
         <gpgsignasc file="pkg-mavencentral/servlet-i2p-${release.number}.pom" />
         <gpgsignasc file="pkg-mavencentral/servlet-i2p-${release.number}-javadoc.jar" />
         <gpgsignasc file="pkg-mavencentral/servlet-i2p-${release.number}-sources.jar" />
-        <!-- Bundle - use zip not jar, to avoid META-INF which causes Sonatype validation errors -->
+        <!-- Bundle - use zip not jar, to avoid META-INF which causes Sonatype validation errors.
+             Files must be placed in Maven repository directory layout (groupId/artifactId/version/)
+             for the Sonatype Central Portal to accept them. -->
         <zip destfile="mavencentral-i2p.zip">
-            <fileset dir="./pkg-mavencentral">
+            <zipfileset dir="./pkg-mavencentral" prefix="net/i2p/i2p/${release.number}">
                 <include name="i2p-*" />
-            </fileset>
+            </zipfileset>
         </zip>
         <zip destfile="mavencentral-router.zip">
-            <fileset dir="./pkg-mavencentral">
+            <zipfileset dir="./pkg-mavencentral" prefix="net/i2p/router/${release.number}">
                 <include name="router-*" />
-            </fileset>
+            </zipfileset>
         </zip>
         <zip destfile="mavencentral-mstreaming.zip">
-            <fileset dir="./pkg-mavencentral">
+            <zipfileset dir="./pkg-mavencentral" prefix="net/i2p/client/mstreaming/${release.number}">
                 <include name="mstreaming-*" />
-            </fileset>
+            </zipfileset>
         </zip>
         <zip destfile="mavencentral-streaming.zip">
-            <fileset dir="./pkg-mavencentral">
+            <zipfileset dir="./pkg-mavencentral" prefix="net/i2p/client/streaming/${release.number}">
                 <include name="streaming-*" />
-            </fileset>
+            </zipfileset>
         </zip>
         <zip destfile="mavencentral-servlet-i2p.zip">
-            <fileset dir="./pkg-mavencentral">
+            <zipfileset dir="./pkg-mavencentral" prefix="net/i2p/servlet-i2p/${release.number}">
                 <include name="servlet-i2p-*" />
-            </fileset>
+            </zipfileset>
         </zip>
         <echo message="Now upload mavencentral-*.zip to Maven Central." />
     </target>
