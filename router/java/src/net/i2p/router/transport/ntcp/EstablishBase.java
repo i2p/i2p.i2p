@@ -50,9 +50,6 @@ abstract class EstablishBase implements EstablishState {
     protected static final int MAX_RI_SIZE = 3072;
 
     protected static final int AES_SIZE = 16;
-    // NOTE: this is the max NTCP2 padding for non-PQ because we reuse the _X buffer for padding.
-    // Increase or fix InboundEstablishState padding readin to not use _X if more is desired.
-    protected static final int XY_SIZE = 256;
 
     protected final Object _stateLock = new Object();
     protected volatile State _state;
@@ -127,11 +124,11 @@ abstract class EstablishBase implements EstablishState {
         _transport = transport;
         _con = con;
         if (_con.isInbound()) {
+            // NOTE: this is the max NTCP2 padding because we reuse the _X buffer for padding.
             int sz;
             switch (NTCPTransport.PQ_INT_VERSION) {
                 case 0:
-                    sz = XY_SIZE;
-                    break;
+                    //  Fall through, use same max padding as for MLKEM-512
                 case 3:
                     sz = OutboundNTCP2State.MSG1_SIZE +
                          OutboundNTCP2State.MAC_SIZE + EncType.MLKEM512_X25519_INT.getPubkeyLen();

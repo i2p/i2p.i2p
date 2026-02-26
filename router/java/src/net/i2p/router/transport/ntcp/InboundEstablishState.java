@@ -76,8 +76,6 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
     private static final int MAX_DATA_READ_BUFS = 32;
     private static final ByteCache _dataReadBufs = ByteCache.getInstance(MAX_DATA_READ_BUFS, BUFFER_SIZE);
 
-    // 287 - 64 = 223
-    private static final int PADDING1_MAX = TOTAL1_MAX - MSG1_SIZE;
     private static final int PADDING1_FAIL_MAX = 128;
     private static final int PADDING2_MAX = 64;
     // DSA RI, no options, no addresses
@@ -478,6 +476,8 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                 }
                 return;
             }
+            // we don't enforce max _padlen1 here
+            // if it is more than our buffer size we will fail below.
         }
 
         // delayed fail for probing resistance

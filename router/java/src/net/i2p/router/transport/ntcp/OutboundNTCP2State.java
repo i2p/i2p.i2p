@@ -53,8 +53,6 @@ class OutboundNTCP2State implements EstablishState {
     public static final int OPTIONS1_SIZE = 16;
     /** 64 */
     public static final int MSG1_SIZE = KEY_SIZE + OPTIONS1_SIZE + MAC_SIZE;
-    /** one less than 288 byte NTCP1 msg 1 */
-    public static final int TOTAL1_MAX = 287;
     private static final int PADDING1_MAX = 64;
     private static final int PADDING3_MAX = 64;
     public static final int OPTIONS2_SIZE = 16;
@@ -108,7 +106,7 @@ class OutboundNTCP2State implements EstablishState {
         _con = con;
         _state = State.OB_INIT;
         _version = con.getVersion();
-        int len = TOTAL1_MAX;
+        int len = MSG1_SIZE;
         try {
             String pattern;
             KeyFactory hkf;
@@ -116,6 +114,9 @@ class OutboundNTCP2State implements EstablishState {
                 case 2:
                     pattern = HandshakeState.PATTERN_ID_XK;
                     _handshakeState = new HandshakeState(pattern, HandshakeState.INITIATOR, _transport.getXDHFactory());
+                    // _tmp is used for both writing msg 1 and reading msg 2 and reading msg 1 padding.
+                    // Prior to 0.9.69, the max padding was 256; as of 0.9.69, we increase it to 880, same as MLKEM-512
+                    len += MAC_SIZE + EncType.MLKEM512_X25519_INT.getPubkeyLen();
                     break;
                 case 3:
                     pattern = HandshakeState.PATTERN_ID_XKHFS_512;
@@ -337,6 +338,8 @@ class OutboundNTCP2State implements EstablishState {
             if (_log.shouldDebug())
                 _log.debug("After msg 2: " + _handshakeState.toString());
             _padlen2 = (int) DataHelper.fromLong(options2, 2, 2);
+            // we don't enforce max _padlen1 here
+            // if it is more than our buffer size we will fail below.
             long tsB = DataHelper.fromLong(options2, 8, 4);
             long now = _context.clock().now();
             // rtt from sending #1 to receiving #2
