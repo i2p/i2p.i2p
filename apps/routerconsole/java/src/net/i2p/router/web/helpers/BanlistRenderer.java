@@ -25,30 +25,63 @@ import net.i2p.router.web.Messages;
  *  Moved from Banlist.java
  */
 class BanlistRenderer {
+    static final int PAGE_SIZE = 2048;
+    private int _pageSize = PAGE_SIZE;
+    private int _page;
+
     private final RouterContext _context;
 
     public BanlistRenderer(RouterContext context) {
         _context = context;
     }
 
+    /**
+     * @param page 0-based
+     * @since 0.9.69
+     */
+    public void setPage(int page) {
+        _page = page;
+    }
+
+    /**
+     * @since 0.9.69
+     */
+    public void setPageSize(int ps) {
+        _pageSize = ps;
+    }
+
     public void renderStatusHTML(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(2048);
         Map<Hash, Banlist.Entry> entries = new TreeMap<Hash, Banlist.Entry>(HashComparator.getInstance());
         
-        entries.putAll(_context.banlist().getEntries());
+        _context.banlist().getEntries(entries);
         buf.append("<h3 id=\"bannedpeers\">").append(_t("Banned Peers"));
-        if (entries.isEmpty()) {
+        int sz = entries.size();
+        if (sz == 0) {
             buf.append("</h3><i>").append(_t("none")).append("</i>");
             out.append(buf);
             return;
         } else {
-            buf.append(" (").append(entries.size()).append(")</h3>");
+            buf.append(" (").append(sz).append(")</h3>");
         }
+
+        boolean morePages = false;
+        int toSkip = _pageSize * _page;
+        int last = Math.min(toSkip + _pageSize, sz);
+        if (last < sz)
+            morePages = true;
+        if (_page > 0 || morePages)
+            outputPageLinks(buf, _page, _pageSize, morePages);
 
         buf.append("<ul id=\"banlist\">");
         
         String unban = _t("unban now");
+        int i = 0;
         for (Map.Entry<Hash, Banlist.Entry> e : entries.entrySet()) {
+            if (i++ < toSkip)
+                continue;
+            if (i > last)
+                break;
             Hash key = e.getKey();
             Banlist.Entry entry = e.getValue();
             long expires = entry.expireOn-_context.clock().now();
@@ -85,8 +118,31 @@ class BanlistRenderer {
             }
         }
         buf.append("</ul>\n");
+        if (_page > 0 || morePages)
+            outputPageLinks(buf, _page, _pageSize, morePages);
         out.append(buf);
         out.flush();
+    }
+
+    /**
+     *  @since 0.9.69
+     */
+    private void outputPageLinks(StringBuilder buf, int page, int pageSize, boolean morePages) {
+        buf.append("<div class=\"netdbnotfound\">");
+        if (page > 0) {
+            buf.append("<a href=\"/profiles?f=3&amp;pg=").append(page)
+               .append("&amp;ps=").append(pageSize).append("\">");
+            buf.append(_t("Previous Page"));
+            buf.append("</a>&nbsp;&nbsp;&nbsp;");
+        }
+        buf.append(_t("Page")).append(' ').append(page + 1);
+        if (morePages) {
+            buf.append("&nbsp;&nbsp;&nbsp;<a href=\"/profiles?f=3&amp;pg=").append(page + 2)
+               .append("&amp;ps=").append(pageSize).append("\">");
+            buf.append(_t("Next Page"));
+            buf.append("</a>");
+        }
+        buf.append("</div>");
     }
 
     /** translate a string */

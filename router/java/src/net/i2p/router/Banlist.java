@@ -126,9 +126,9 @@ public class Banlist {
      *  For BanlistRenderer in router console.
      *  Note - may contain expired entries.
      */
-    public Map<Hash, Entry> getEntries() {
+    public void getEntries(Map<Hash, Entry> rv) {
         synchronized(_entries) {
-            return Collections.unmodifiableMap(_entries);
+            rv.putAll(_entries);
         }
     }
     

@@ -1056,7 +1056,8 @@ public class Analysis extends JobImpl implements RouterApp, Runnable {
     private static final long DAY = 24*60*60*1000L;
 
     public void addProfilePoints(List<RouterInfo> ris, Map<Hash, Points> points) {
-        Map<Hash, Banlist.Entry> banEntries = _context.banlist().getEntries();
+        Map<Hash, Banlist.Entry> banEntries = new HashMap<Hash, Banlist.Entry>(1024);
+        _context.banlist().getEntries(banEntries);
         long now = _context.clock().now();
         RateAverages ra = RateAverages.getTemp();
         for (RouterInfo info : ris) {

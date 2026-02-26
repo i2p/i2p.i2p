@@ -8,6 +8,8 @@ import net.i2p.router.web.HelperBase;
 public class ProfilesHelper extends HelperBase {
     private int _full;
     private boolean _graphical;
+    private int _pageSize = BanlistRenderer.PAGE_SIZE;
+    private int _page;
 
     private static final String titles[] =
                                           {_x("High Capacity"),                 // 0
@@ -27,6 +29,31 @@ public class ProfilesHelper extends HelperBase {
                 _full = Integer.parseInt(f);
                 if (_full < 0 || _full > 3)
                     _full = 0;
+            } catch (NumberFormatException nfe) {}
+        }
+    }
+
+    /**
+     * @param page 1-based
+     * @since 0.9.69
+     */
+    public void setPage(String page) {
+        if (page != null) {
+            try {
+                _page = Integer.parseInt(page) - 1;
+                if (_page < 0)
+                    _page = 0;
+            } catch (NumberFormatException nfe) {}
+        }
+    }
+
+    /**
+     * @since 0.9.69
+     */
+    public void setPageSize(String ps) {
+        if (ps != null) {
+            try {
+                _pageSize = Integer.parseInt(ps);
             } catch (NumberFormatException nfe) {}
         }
     }
@@ -69,6 +96,8 @@ public class ProfilesHelper extends HelperBase {
     public String getBanlistSummary() {
         try {
             BanlistRenderer rend = new BanlistRenderer(_context);
+            rend.setPage(_page);
+            rend.setPageSize(_pageSize);
             rend.renderStatusHTML(_out);
         } catch (IOException ioe) {
             ioe.printStackTrace();

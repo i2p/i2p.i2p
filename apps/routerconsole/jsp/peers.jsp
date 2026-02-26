@@ -20,5 +20,7 @@
  <jsp:setProperty name="peerHelper" property="urlBase" value="peers.jsp" />
  <jsp:setProperty name="peerHelper" property="sort" value="<%=request.getParameter(\"sort\") != null ? request.getParameter(\"sort\") : \"\"%>" />
  <jsp:setProperty name="peerHelper" property="transport" value="<%=request.getParameter(\"tx\")%>" />
+ <jsp:setProperty name="peerHelper" property="page" value="<%=request.getParameter(\"pg\")%>" />
+ <jsp:setProperty name="peerHelper" property="pageSize" value="<%=request.getParameter(\"ps\")%>" />
  <jsp:getProperty name="peerHelper" property="peerSummary" />
 </div></body></html>

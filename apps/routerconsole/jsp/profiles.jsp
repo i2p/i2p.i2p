@@ -18,5 +18,7 @@
         profilesHelper.allowGraphical();
 %>
  <jsp:setProperty name="profilesHelper" property="full" value="<%=request.getParameter(\"f\")%>" />
+ <jsp:setProperty name="profilesHelper" property="page" value="<%=request.getParameter(\"pg\")%>" />
+ <jsp:setProperty name="profilesHelper" property="pageSize" value="<%=request.getParameter(\"ps\")%>" />
  <jsp:getProperty name="profilesHelper" property="summary" />
 </div></div></body></html>

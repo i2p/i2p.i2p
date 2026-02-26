@@ -38,6 +38,8 @@ public class PeerHelper extends HelperBase {
     private String _urlBase;
     private String _transport;
     private boolean _graphical;
+    private int _pageSize = BanlistRenderer.PAGE_SIZE;
+    private int _page;
 
     private static final String titles[] = {
                                             _x("Status"),
@@ -79,6 +81,31 @@ public class PeerHelper extends HelperBase {
 
     /** @since 0.9.38 */
     public void setTransport(String t) { _transport = t; }
+
+    /**
+     * @param page 1-based
+     * @since 0.9.69
+     */
+    public void setPage(String page) {
+        if (page != null) {
+            try {
+                _page = Integer.parseInt(page) - 1;
+                if (_page < 0)
+                    _page = 0;
+            } catch (NumberFormatException nfe) {}
+        }
+    }
+
+    /**
+     * @since 0.9.69
+     */
+    public void setPageSize(String ps) {
+        if (ps != null) {
+            try {
+                _pageSize = Integer.parseInt(ps);
+            } catch (NumberFormatException nfe) {}
+        }
+    }
 
     /**
      *  call for non-text-mode browsers
@@ -164,6 +191,8 @@ public class PeerHelper extends HelperBase {
             _context.commSystem().renderStatusHTML(_out, _urlBase, _sortFlags);
         } else if ("banned".equals(_transport)) {
             BanlistRenderer br = new BanlistRenderer(_context);
+            br.setPage(_page);
+            br.setPageSize(_pageSize);
             br.renderStatusHTML(_out);
         } else if (_transport != null) {
             boolean rendered = false;
