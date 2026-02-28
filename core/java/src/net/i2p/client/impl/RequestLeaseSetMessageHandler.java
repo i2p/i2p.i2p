@@ -92,6 +92,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
     
     /**
      *  Do we send a LeaseSet or a LeaseSet2?
+     *  As of 0.9.69, always use LS2 unless the router doesn't support it
      *
      *  Side effect: sets _ls2Type
      *
@@ -105,15 +106,21 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         if (s != null) {
             try {
                 int type = Integer.parseInt(s);
+                // override LS1 setting
+                if (type == DatabaseEntry.KEY_TYPE_LEASESET)
+                    type = DatabaseEntry.KEY_TYPE_LS2;
                 _ls2Type = type;
+/*
                 if (type != DatabaseEntry.KEY_TYPE_LEASESET)
                     return true;
+*/
             } catch (NumberFormatException nfe) {
               session.propogateError("Bad LS2 type", nfe);
               session.destroySession();
               return true;
             }
         }
+/*
         if (session.isOffline())
             return true;
         s = session.getOptions().getProperty(PROP_LS_ENCTYPE);
@@ -122,6 +129,8 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
                 return true;
         }
         return false;
+*/
+        return true;
     }
 
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
