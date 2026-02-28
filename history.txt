@@ -1,3 +1,17 @@
+2026-02-28 zzz
+ * I2CP: Force LS2 even for ElG-only
+ * SSU2: Fix rare NPE in PeerTestManager.ContinueTest
+
+2026-02-26 zzz
+ * Console: Limit banlist output, add page links
+ * Transport: Increase max padding for NTCP2 non-PQ
+
+2026-02-21 zzz
+ * Crypto: Noise initialization for SSU2-PQ (WIP)
+
+2026-02-20 zzz
+ * Transport: Support any outbound connection NTCP2-PQ version
+
 2026-02-19 zzz
  * Transport: Add support for PQ NTCP2 (Prop. 169)
 
