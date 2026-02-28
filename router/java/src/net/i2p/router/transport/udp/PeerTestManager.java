@@ -324,7 +324,8 @@ class PeerTestManager {
                             // We don't have his IP/port if he's firewalled, and we wouldn't trust his answer
                             // anyway as he could be symmetric natted.
                             // After this, we will ignore any msg 5 received
-                            if (now - bobTime > 5000 && state.getCharliePort() != PENDING_PORT) {
+                            if (now - bobTime > 5000 && state.getCharliePort() != PENDING_PORT &&
+                                state.getCharlieIntroKey() != null) {
                                 if (_log.shouldWarn())
                                     _log.warn("Continuing test w/o msg 5: " + state);
                                 sendTestToCharlie();
@@ -341,8 +342,10 @@ class PeerTestManager {
                     } else {
                         // received from both Bob and Charlie, but we haven't received a
                         // second message from Charlie yet
-                        if (state.getCharliePort() != PENDING_PORT)
+                        if (state.getCharliePort() != PENDING_PORT &&
+                            state.getCharlieIntroKey() != null) {
                             sendTestToCharlie();
+                         }
                         // else msg 5 wasn't from a valid ip/port ???
                     }
                     if (bobTime > 0 && charlieTime <= 0) {
@@ -421,6 +424,7 @@ class PeerTestManager {
     /**
      * Message 6. SSU 1 or 2. We are Alice.
      * Call from a synchronized method.
+     * _currentTest.getCharlieIntroKey() must be non-null.
      */
     private void sendTestToCharlie() {
         PeerTestState test = _currentTest;
