@@ -896,7 +896,7 @@ public class TunnelController implements Logging {
                 }
                 if (!_config.containsKey(OPT_BUNDLE_REPLY))
                     _config.setProperty(OPT_BUNDLE_REPLY, "false");
-                if (et == null || et.equals("4,0") || et.equals("4") || et.equals("0"))
+                if (et == null /* || et.equals("4,0") || et.equals("4") */ || et.equals("0"))
                     _config.setProperty(OPT_ENCTYPE, "6,4");
             } else if (!isClient(type)) {
                 // override UI that sets it to false
@@ -908,7 +908,7 @@ public class TunnelController implements Logging {
                     _config.setProperty(OPT_TAGS_SEND, "20");
                 if (!_config.containsKey(OPT_LOW_TAGS))
                     _config.setProperty(OPT_LOW_TAGS, "14");
-                if (et == null || et.equals("4,0") || et.equals("4") || et.equals("0"))
+                if (et == null /* || et.equals("4,0") || et.equals("4") */ || et.equals("0"))
                     _config.setProperty(OPT_ENCTYPE, "6,4");
             }
             // same default logic as in EditBean.getSigType() and GeneralHelper.getSigType()
@@ -961,7 +961,7 @@ public class TunnelController implements Logging {
             if (isClient(type) &&
                 (type.equals(TYPE_HTTP_CLIENT) || Boolean.parseBoolean(_config.getProperty(PROP_SHARED)))) {
                 // migration: HTTP proxy and shared clients default to both
-                if (et == null || et.equals("4,0") || et.equals("4") || et.equals("0"))
+                if (et == null /* || et.equals("4,0") || et.equals("4") */ || et.equals("0"))
                     _config.setProperty(OPT_ENCTYPE, "6,4");
             }
         }
