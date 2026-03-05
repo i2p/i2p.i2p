@@ -66,10 +66,12 @@ class MLKEMDHState implements DHState, Cloneable {
 	private MLKEMDHState(boolean isAlice, KeyFactory hdh, String patternId)
 	{
 		if (patternId.equals(HandshakeState.PATTERN_ID_IKHFS_512) ||
-		    patternId.equals(HandshakeState.PATTERN_ID_XKHFS_512)) {
+		    patternId.equals(HandshakeState.PATTERN_ID_XKHFS_512) ||
+		    patternId.equals(HandshakeState.PATTERN_ID_XKHFS_512_SSU2)) {
 			type = isAlice ? EncType.MLKEM512_X25519_INT : EncType.MLKEM512_X25519_CT;
 		} else if (patternId.equals(HandshakeState.PATTERN_ID_IKHFS_768) ||
-                           patternId.equals(HandshakeState.PATTERN_ID_XKHFS_768)) {
+                           patternId.equals(HandshakeState.PATTERN_ID_XKHFS_768) ||
+                           patternId.equals(HandshakeState.PATTERN_ID_XKHFS_768_SSU2)) {
 			type = isAlice ? EncType.MLKEM768_X25519_INT : EncType.MLKEM768_X25519_CT;
 		} else if (patternId.equals(HandshakeState.PATTERN_ID_IKHFS_1024) ||
                            patternId.equals(HandshakeState.PATTERN_ID_XKHFS_1024)) {
