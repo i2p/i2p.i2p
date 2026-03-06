@@ -372,19 +372,41 @@ public class IterativeSearchJob extends FloodSearchJob {
                         replyTunnel = tm.selectInboundTunnel(_fromLocalDest);
                     isClientReplyTunnel = replyTunnel != null;
                     if (!isClientReplyTunnel) {
+                        // sending reply down expl. tunnel gets the LS stored in the
+                        // main netdb where the client can't find it
+                      /*
                         if (previouslyTried <= 0)
                             replyTunnel = tm.selectInboundExploratoryTunnel(peer);
                         else
                             replyTunnel = tm.selectInboundTunnel();
+                       */
+                       if (_log.shouldWarn())
+                           _log.warn(getJobId() + ": ISJ from " + _facade + " for " +
+                                     (_isLease ? "LS " : "RI ") +
+                                      _key + " to " + peer +
+                                      " failed, no IB client tunnel to receive reply");
+                        failed();
+                        return;
                     }
                 } else {
                     // We don't have a way to request/get a ECIES-tagged reply,
-                    // so send it to the router SKM
+                    // sending reply down expl. tunnel gets the LS stored in the
+                    // main netdb where the client can't find it
+                  /*
                     isClientReplyTunnel = false;
                     if (previouslyTried <= 0)
                         replyTunnel = tm.selectInboundExploratoryTunnel(peer);
                     else
                         replyTunnel = tm.selectInboundTunnel();
+                   */
+                    if (_log.shouldWarn())
+                        _log.warn(getJobId() + ": ISJ from client for " +
+                                  (_isLease ? "LS " : "RI ") +
+                                  _key + " to " + peer +
+                                  " have LSK? " + (lsk != null) +
+                                  " have his RI? " + (ri != null) +
+                                  " skipped, no ratchet/elg support");
+                    return;
                 }
                 isDirect = false;
             } else if ((!_isLease) && ri != null && ctx.commSystem().isEstablished(peer)) {

@@ -166,12 +166,12 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
     /**
      *  Does this router support encrypted replies?
      *
-     *  @param to null OK
+     *  @param to null OK returns true as of 0.9.69
      *  @since 0.9.7
      */
     public static boolean supportsEncryptedReplies(RouterInfo to) {
         if (to == null)
-            return false;
+            return true;
         String v = to.getVersion();
         if (VersionComparator.comp(v, MIN_ENCRYPTION_VERSION) < 0)
             return false;
@@ -185,12 +185,14 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
     /**
      *  Does this router support ratchet replies?
      *
-     *  @param to null OK
+     *  @param to null OK returns true as of 0.9.69
      *  @since 0.9.46
      */
     public static boolean supportsRatchetReplies(RouterInfo to) {
+        // needed for ISJ where we may be querying peers we only have the hash for.
+        // there's almost no peers older than MIN_RATCHET_VERSION anyway
         if (to == null)
-            return false;
+            return true;
         String v = to.getVersion();
         if (VersionComparator.comp(v, MIN_RATCHET_VERSION) < 0)
             return false;
