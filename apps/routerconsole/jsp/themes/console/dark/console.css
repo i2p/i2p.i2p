@@ -5912,6 +5912,7 @@ table#leasesetsummary th a:hover {
 
 .addtobook a::after {
     content: url(/themes/console/images/buttons/add_address.png);
+    margin: 0px 4px 0px 15px;
 }
 
 .addtobook a:hover {

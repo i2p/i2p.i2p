@@ -2552,7 +2552,7 @@ table#wrapperlogs {
     background: #bf00df;
 }
 
-#logs li font[color="#000099"]::before {
+#logs li font[color="#333399"]::before {
     background: #009;
 }
 
@@ -6129,6 +6129,7 @@ table.leaseset td {
 
 .addtobook a::after {
     content: url(/themes/console/images/buttons/add_address.png);
+    margin: 0px 4px 0px 15px;
 }
 
 .addtobook a:hover {
