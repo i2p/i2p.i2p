@@ -452,8 +452,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             } else if (VersionComparator.comp(ri.getVersion(), MIN_RELAY_VERSION) < 0) {
                 _introductionRequested = false;
                 String caps = ri.getCapabilities();
-                if (_log.shouldWarn())
-                    _log.warn("Not offering to relay to router version " + ri.getVersion() + " caps " + caps + ": " + this);
+                if (_log.shouldDebug())
+                    _log.debug("Not offering to relay to router version " + ri.getVersion() + " caps " + caps + ": " + this);
             } else {
                 String caps = ri.getCapabilities();
                 // may be requesting relay for ipv4/6 if reachable on the other
@@ -464,8 +464,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                     // who will send the relay tag with ACK 0
                 } else {
                     _introductionRequested = false;
-                    if (_log.shouldWarn())
-                        _log.warn("Not offering to relay to router version " + ri.getVersion() + " caps " + caps + ": " + this);
+                    if (_log.shouldDebug())
+                        _log.debug("Not offering to relay to router version " + ri.getVersion() + " caps " + caps + ": " + this);
                 }
             }
         }

@@ -987,16 +987,16 @@ public class TunnelDispatcher implements Service {
                 if (cur.getExpiration() > until)
                     break;
                 if (cur.getProcessedMessagesCount() <= 0) {
-                    if (_log.shouldInfo())
-                        _log.info("Removing idle " + cur);
+                    if (_log.shouldDebug())
+                        _log.debug("Removing idle " + cur);
                     iter.remove();
                     remove(cur);
                     _allocatedBW.addAndGet(0 - cur.getAllocatedBW());
                     exp++;
                 }
             }
-            if (exp > 0 && _log.shouldWarn())
-                _log.warn("Removed " + exp + " idle tunnels");
+            if (exp > 0 && _log.shouldInfo())
+                _log.info("Removed " + exp + " idle tunnels");
 
             getTiming().setStartAfter(nextTime);
             getContext().jobQueue().addJob(LeaveTunnel.this);
