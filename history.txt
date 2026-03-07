@@ -1,3 +1,12 @@
+2026-03-06 zzz
+ * NetDB: ISJ fixes for client replies going to main db
+
+2026-03-05 zzz
+ * Crypto: Fix SSU2 MLKEM Noise init (WIP)
+
+2026-03-04 zzz
+ * i2ptunnel: Don't force-migrate 4 or 4,0 to 6,4
+
 2026-02-28 zzz
  * I2CP: Force LS2 even for ElG-only
  * SSU2: Fix rare NPE in PeerTestManager.ContinueTest
