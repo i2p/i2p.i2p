@@ -34,12 +34,12 @@ jobs:
           echo "build.built-by=GitHub Actions" >> override.properties
           echo "noExe=true" >> override.properties
       - name: build with Ant
-        run: ant distclean pkg
-      - name: Upload installer.jar
+        run: ant distclean updater
+      - name: Upload i2pupdate.zip
         uses: actions/upload-artifact@v4
         with:
-          name: I2P-install-${{ github.sha }}.jar
-          path: install.jar
+          name: I2P-update-${{ github.sha }}.zip
+          path: i2pupdate.zip
 
   javadoc-latest:
     runs-on: ubuntu-latest
