@@ -13,6 +13,7 @@
   - Install additional Jetty 12 jars. See below.
 
   Copy this file to your eepsite's context dir (probably ~/.i2p/eepsite/contexts)
+  and rename it to cgi-context.xml
   Change the cgiroot Arg to the full path to the directory containing your cgi files
   If desired, change the contextPath (URI) for the web URI for your cgi files (currently /cgi-bin)
 
