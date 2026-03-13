@@ -11,7 +11,7 @@ Build-Depends: debhelper (>= 9.20160709)
  ,ant (>= 1.10.2)
  ,debconf
  ,default-jdk
- ,libjetty12-java
+ ,libjetty12-java (>= 12.0.32-2)
  ,libslf4j2-java
  ,libjsp-api-java
  ,libservlet-api-java
@@ -87,7 +87,7 @@ Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  gettext-base,
  libgetopt-java,
  libjson-simple-java (>= 2),libjson-simple-java (<< 3),
- libjetty12-java,
+ libjetty12-java (>= 12.0.32-2),
  libslf4j2-java,
  libjsp-api-java,
  libservlet-api-java,

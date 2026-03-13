@@ -1,7 +1,7 @@
 /usr/share/i2p/blocklist.txt
 /usr/share/i2p/clients.config
 /usr/share/i2p/eepsite/contexts/base-context.xml
-/usr/share/i2p/eepsite/contexts/cgi-context.xml
+/usr/share/i2p/eepsite/contexts/cgi-context.xml.disabled
 /usr/share/i2p/eepsite/etc/webdefault.xml
 /usr/share/i2p/eepsite/jetty-jmx.xml
 /usr/share/i2p/eepsite/jetty-rewrite.xml

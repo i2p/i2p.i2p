@@ -16,7 +16,7 @@
           and versions in gradle.properties and apps/jetty/build.gradle
      -->
     <property name="jetty.ver" value="12.0.28" />
-    <property name="jetty.ver.debian" value="12.0.17" />
+    <property name="jetty.ver.debian" value="12.0.32" />
     <property name="tomcat.ver" value="9.0.107" />
 
     <!-- You probably don't want to change anything from here down -->
@@ -962,7 +962,9 @@
                 <pathelement location="core/java/build/libintl.jar" />
                 <pathelement location="core/java/build/gnu-getopt.jar" />
                 <pathelement location="core/java/build/json-simple.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-apache-jsp.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-ee.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-extra.jar" />
                 <pathelement location="apps/jetty/jettylib/slf4j2-api.jar" />
             </classpath>
             <!-- These variables are stored in build.properties.
@@ -1581,18 +1583,18 @@
         </copy>
     </target>
 
-    <target name="copyjetty" depends="copyjetty-unlesspkg" >
+    <target name="copyjetty" depends="copyjetty-unlesspkg, copyjetty-ifpkg" >
         <copy file="build/jetty-i2p.jar" todir="pkg-temp/lib" />
-        <!-- ee8 jars not in libjetty12-java -->
-        <copy file="build/jetty-servlet.jar" todir="pkg-temp/lib" />
-        <copy file="build/jetty-servlets.jar" todir="pkg-temp/lib" />
-        <copy file="build/jetty-webapp.jar" todir="pkg-temp/lib" />
     </target>
 
     <target name="copyjetty-unlesspkg" unless="${with-libjetty12-java}" >
         <copy todir="pkg-temp/lib" >
-            <fileset dir="build" includes="javax.servlet.jar jetty*.jar org.mortbay.*.jar" excludes="jetty-i2p.jar jetty-servlet.jar jetty-servlets.jar jetty-webapp.jar" />
+            <fileset dir="build" includes="javax.servlet.jar jetty*.jar org.mortbay.*.jar" excludes="jetty-i2p.jar" />
         </copy>
+    </target>
+
+    <target name="copyjetty-ifpkg" if="${with-libjetty12-java}" >
+        <copy file="build/jetty-extra.jar" todir="pkg-temp/lib" />
     </target>
 
     <target name="settomcatprop" >

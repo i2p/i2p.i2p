@@ -23,6 +23,7 @@
         <pathelement location="${jettylib}/jetty-servlet.jar" />
         <pathelement location="${jettylib}/jetty-http.jar" />
         <pathelement location="${jettylib}/jetty-io.jar" />
+        <pathelement location="${jettylib}/jetty-extra.jar" />
         <pathelement location="${jettylib}/jetty-webapp.jar" />
         <pathelement location="${wrapperlib}/wrapper.jar" />
         <!-- following jar only present for debian builds -->

@@ -108,14 +108,17 @@ endif
 	ln -sf /usr/share/java/jetty12-io.jar $(CURDIR)/apps/jetty/jettylib/jetty-io.jar
 	ln -sf /usr/share/java/jetty12-rewrite.jar $(CURDIR)/apps/jetty/jettylib/jetty-rewrite-handler.jar
 	ln -sf /usr/share/java/jetty12-security.jar $(CURDIR)/apps/jetty/jettylib/jetty-security.jar
-	@# debian package does NOT contain the ee8 jars
-	@#ln -sf /usr/share/java/jetty12-servlet.jar $(CURDIR)/apps/jetty/jettylib/jetty-ee8-servlet.jar
-	@#ln -sf /usr/share/java/jetty12-servlets.jar $(CURDIR)/apps/jetty/jettylib/jetty-ee8-servlets.jar
+	@# debian 12.0.32-2 package DOES contain these ee8 jars
+	ln -sf /usr/share/java/jetty12-ee8-apache-jsp.jar $(CURDIR)/apps/jetty/jettylib/jetty-apache-jsp.jar
+	ln -sf /usr/share/java/jetty12-ee8-servlet.jar $(CURDIR)/apps/jetty/jettylib/jetty-servlet.jar
+	ln -sf /usr/share/java/jetty12-ee8-servlets.jar $(CURDIR)/apps/jetty/jettylib/jetty-servlets.jar
+	ln -sf /usr/share/java/jetty12-ee8-webapp.jar $(CURDIR)/apps/jetty/jettylib/jetty-webapp.jar
+	@# debian 12.0.32-2 package DOES NOT contain these ee8 jars
+	@#ln -sf /usr/share/java/jetty12-ee8-nested.jar $(CURDIR)/apps/jetty/jettylib/jetty-nested.jar
+	@#ln -sf /usr/share/java/jetty12-ee8-security.jar $(CURDIR)/apps/jetty/jettylib/jetty-security.jar
 	ln -sf /usr/share/java/jetty12-session.jar $(CURDIR)/apps/jetty/jettylib/jetty-session.jar
 	ln -sf /usr/share/java/jetty12-start.jar $(CURDIR)/apps/jetty/jettylib/jetty-start.jar
 	ln -sf /usr/share/java/jetty12-util.jar $(CURDIR)/apps/jetty/jettylib/jetty-util.jar
-	@# debian package does NOT contain the ee8 jars
-	@#ln -sf /usr/share/java/jetty12-webapp.jar $(CURDIR)/apps/jetty/jettylib/jetty-ee8-webapp.jar
 	ln -sf /usr/share/java/jetty12-xml.jar $(CURDIR)/apps/jetty/jettylib/jetty-xml.jar
 	ln -sf /usr/share/java/jetty12-server.jar $(CURDIR)/apps/jetty/jettylib/org.mortbay.jetty.jar
 	ln -sf /usr/share/java/jetty12-jmx.jar $(CURDIR)/apps/jetty/jettylib/org.mortbay.jmx.jar
