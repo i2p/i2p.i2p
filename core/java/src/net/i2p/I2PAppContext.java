@@ -864,7 +864,11 @@ public class I2PAppContext {
     }
     
     /**
-     * Basic hash map
+     *  Basic hash map for LS1
+     *
+     *  Deprecated -
+     *  This is for the deprecated LS1 AES encrypted leasesets only.
+     *  LS2 encrypted leaseset data are stored in netdb BlindCache and router.blindcache.dat.
      */
     public KeyRing keyRing() {
         if (!_keyRingInitialized)

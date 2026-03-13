@@ -560,7 +560,15 @@ public class RouterContext extends I2PAppContext {
         }
     }
 
-    /** override to support storage in router.config */
+    /**
+     *  Basic hash map for LS1
+     *
+     *  overriden to support storage in router.config
+     *
+     *  Deprecated -
+     *  This is for the deprecated LS1 AES encrypted leasesets only.
+     *  LS2 encrypted leaseset data are stored in netdb BlindCache and router.blindcache.dat.
+     */
     @Override
     public KeyRing keyRing() {
         if (!_keyRingInitialized)

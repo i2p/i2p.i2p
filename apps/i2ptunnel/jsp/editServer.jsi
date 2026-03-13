@@ -452,8 +452,8 @@
 <%
                 } // mode = 10
 %>
-                <option title="<%=intl._t("Send key to all users.")%>" value="1" <%=(curEncryptMode.equals("1") ? " selected=\"selected\"" : cdisabled)%> >
-                    <%=intl._t("Encrypted")%> (AES)</option>
+                <option title="<%=intl._t("Send key to all users.")%> <%=intl._t("Legacy option (deprecated), provided for backward compatibility")%>" value="1" <%=(curEncryptMode.equals("1") ? " selected=\"selected\"" : cdisabled)%> >
+                    <%=intl._t("Encrypted")%> (Deprecated LS1 AES)</option>
 <%
                 int curSigType = editBean.getSigType(curTunnel, tunnelType);
                 boolean allowBlinding = (curSigType == 7 || curSigType == 11);

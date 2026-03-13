@@ -13,6 +13,10 @@ import net.i2p.util.KeyRing;
  *  ConcurrentHashMap with backing in the router.config file.
  *  router.keyring.key.{base64 hash, with = replaced with $}={base64 session key}
  *  Caution - not all HashMap methods are overridden.
+ *
+ *  Deprecated -
+ *  This is for the deprecated LS1 AES encrypted leasesets only.
+ *  LS2 encrypted leaseset data are stored in netdb BlindCache and router.blindcache.dat.
  */
 public class PersistentKeyRing extends KeyRing {
 

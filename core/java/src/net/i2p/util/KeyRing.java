@@ -9,7 +9,11 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 
 /**
- *  simple
+ *  See net.i2p.router.PersistentKeyRing for extension.
+ *
+ *  Deprecated -
+ *  This is for the deprecated LS1 AES encrypted leasesets only.
+ *  LS2 encrypted leaseset data are stored in netdb BlindCache and router.blindcache.dat.
  */
 public class KeyRing extends ConcurrentHashMap<Hash, SessionKey> {
     public KeyRing() {

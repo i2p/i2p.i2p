@@ -94,7 +94,7 @@ public class ConfigKeyringHelper extends HelperBase {
             }
             buf.append("</td><td>");
             if (!local)
-                buf.append(_t("Encrypted")).append(" (AES)</td><td>");
+                buf.append(_t("Encrypted")).append(" (Deprecated LS1 AES)</td><td>");
             SessionKey sk = e.getValue();
             buf.append(sk.toBase64());
             if (!local)

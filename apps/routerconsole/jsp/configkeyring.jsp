@@ -40,7 +40,7 @@
           <td align="right"><b><%=intl._t("Type")%>:</b></td>
           <td><select id="encryptMode" name="encryptMode" class="selectbox">
           <option title="<%=intl._t("Enter key provided by server operator.")%>" value="1">
-              <%=intl._t("Encrypted")%> (AES)</option>
+              <%=intl._t("Encrypted")%> (Deprecated LS1 AES)</option>
           <option title="<%=intl._t("Prevents server discovery by floodfills")%>" value="2">
               <%=intl._t("Blinded")%></option>
           <option title="<%=intl._t("Enter password provided by server operator.")%>" value="3">
