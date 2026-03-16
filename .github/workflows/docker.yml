@@ -6,6 +6,7 @@ on:
     - 'i2p-*.*.*'
     branches:
     - master
+    - docker-arm
 
 jobs:
   docker:
