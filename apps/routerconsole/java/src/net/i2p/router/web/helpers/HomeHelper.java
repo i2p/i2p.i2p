@@ -152,7 +152,7 @@ Steps for the devs after approval at a meeting:
         //_x("diftracker") + S + _x("Bittorrent tracker") + S + "http://diftracker.i2p/" + S + I + "i2psnark.png" + S +
         //"echelon.i2p" + S + _x("I2P Applications") + S + "http://echelon.i2p/" + S + I + "echelon.png" + S +
         //"exchanged.i2p" + S + _x("Anonymous cryptocurrency exchange") + S + "http://exchanged.i2p/" + S + I + "exchanged.png" + S +
-        _x("I2P FAQ") + S + _x("Frequently Asked Questions") + S + "http://i2p-projekt.i2p/faq" + S + I + "question.png" + S +
+        _x("I2P FAQ") + S + _x("Frequently Asked Questions") + S + "http://i2p-projekt.i2p/docs/overview/faq" + S + I + "question.png" + S +
         _x("I2P Forum") + S + _x("Community forum") + S + "http://i2pforum.i2p/" + S + I + "group.png" + S +
         _x("Git Project Hosting") + S + _x("Community git project hosting") + S + "http://git.idk.i2p" + S + I + "i2pgit.png" + S +
         _x("I2P Pastebin") + S + _x("Pastebin for I2P users") + S + "http://paste.idk.i2p" + S + I + "paste.png" + S +
@@ -187,7 +187,7 @@ Steps for the devs after approval at a meeting:
     static final String DEFAULT_MONITORING =
         _x("Logs") + S + _x("View the logs") + S + "/logs" + S + I + "info/logs.png" + S +
         _x("Graphs") + S + _x("Visualize information about the router") + S + "/graphs" + S + I + "chart_line.png" + S +
-        _x("I2P Technical Docs") + S + _x("Technical documentation") + S + "http://i2p-projekt.i2p/how" + S + I + "education.png" + S +
+        _x("I2P Technical Docs") + S + _x("Technical documentation") + S + "http://i2p-projekt.i2p/en/docs/overview" + S + I + "education.png" + S +
         _x("I2P Wiki") + S + S + "http://wiki.i2p-projekt.i2p/" + S + I + "trac_wiki.png" + S +
         _x("I2P Bug Reports") + S + _x("Bug tracker") + S + "http://git.idk.i2p/I2P_Developers/i2p.i2p/issues" + S + I + "bug.png" + S +
         "stats.i2p" + S + _x("I2P Network Statistics") + S + "http://stats.i2p/cgi-bin/dashboard.cgi" + S + I + "chart_bar.png" + S +
