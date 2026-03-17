@@ -1,3 +1,17 @@
+2026-03-17 zzz
+ * Console: Fix classloader issues when starting/installing plugins
+ * NetDB: Publish D cap if near conn limits
+
+2026-03-13 zzz
+ * Console: Mark LS1 encrypted leasesets as deprecated
+ * Debian: Require libjetty12-java 12.0.32-2 for trixie/resolute
+
+2026-03-12 zzz
+ * ISJ: Fail peer if it doesn't support ElG or Ratchet
+
+2026-03-10 zzz
+ * Jetty: Rename cgi-context.xml to cgi-context.xml.disabled
+
 2026-03-06 zzz
  * NetDB: ISJ fixes for client replies going to main db
 
@@ -51,8 +65,7 @@
 2026-02-10 zzz
  * i2psnark standalone: Build fix
 
-2026-02-09 idk
- * Release I2P 2.11.0
+2026-02-09 2.11.0 (API 0.9.68) released
 
 2026-02-08 zzz
  * Debian: Remove resolute jars from jammy source
