@@ -576,7 +576,18 @@ public class ConfigClientsHandler extends FormHandler {
             if (!verifyProxy())
                 return;
         }
-        if (mgr.installPlugin(app, uri)) {
+        // Can't start a webapp from a webapp with this classloader because Jetty hides config classes
+        boolean ok = false;
+        ClassLoader save = Thread.currentThread().getContextClassLoader();
+        if (save != null)
+            Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
+        try {
+            ok = mgr.installPlugin(app, uri);
+        } finally {
+            if (save != null)
+                Thread.currentThread().setContextClassLoader(save);
+        }
+        if (ok) {
             if (url.startsWith("file:"))
                 addFormNotice(_t("Installing plugin from {0}", uri.getPath()));
             else
