@@ -629,7 +629,16 @@ public class ConfigClientsHandler extends FormHandler {
 
     private void startPlugin(String app) {
         try {
-            PluginStarter.startPlugin(_context, app);
+            // Can't start a webapp from a webapp with this classloader because Jetty hides config classes
+            ClassLoader save = Thread.currentThread().getContextClassLoader();
+            if (save != null)
+                Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
+            try {
+                PluginStarter.startPlugin(_context, app);
+            } finally {
+                if (save != null)
+                    Thread.currentThread().setContextClassLoader(save);
+            }
             // linkify the app name for the message if available
             Properties props = PluginStarter.pluginProperties(_context, app);
             String name = ConfigClientsHelper.stripHTML(props, "consoleLinkName_" + Messages.getLanguage(_context));
