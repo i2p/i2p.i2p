@@ -6,6 +6,7 @@ on:
     - 'i2p-*.*.*'
     branches:
     - master
+    - docker-arm
 
 jobs:
   docker:
@@ -28,9 +29,11 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           tags: geti2p/i2p:${{ env.RELEASE_VERSION }}
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
           push: true
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           tags: geti2p/i2p.i2p:${{ env.RELEASE_VERSION }}
