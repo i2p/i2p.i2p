@@ -639,6 +639,20 @@ public class TransportManager implements TransportEventListener {
     }    
     
     /**
+     *  For debugging
+     *
+     *  @return the identifier for the transport if connected, or null
+     *  @since 0.9.69
+     */    
+    String getTransport(Hash peer) { 
+        for (Transport t : _transports.values()) {
+            if (t.isEstablished(peer))
+                return t.getStyle();
+        }
+        return null;
+    }
+    
+    /**
      *  @return a new list, may be modified
      *  @since 0.9.34
      */

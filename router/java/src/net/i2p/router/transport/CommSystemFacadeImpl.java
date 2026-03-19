@@ -186,6 +186,17 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     public boolean isEstablished(Hash peer) { 
         return _manager.isEstablished(peer); 
     }
+    
+    /**
+     *  For debugging
+     *
+     *  @return the identifier for the transport if connected, or null
+     *  @since 0.9.69
+     */    
+    @Override
+    public String getTransport(Hash peer) { 
+        return _manager.getTransport(peer); 
+    }
 
     /**
      *  @return a new list, may be modified

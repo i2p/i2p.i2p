@@ -108,6 +108,14 @@ public abstract class CommSystemFacade implements Service {
     public abstract boolean isEstablished(Hash peer);
     public byte[] getIP(Hash dest) { return null; }
     public void queueLookup(byte[] ip) {}
+
+    /**
+     *  For debugging
+     *
+     *  @return the identifier for the transport if connected, or null
+     *  @since 0.9.69
+     */    
+    public String getTransport(Hash peer) { return null; }
     
     /**
      * Tell the comm system that we may disconnect from this peer.
