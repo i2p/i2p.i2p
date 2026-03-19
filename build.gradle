@@ -79,8 +79,8 @@ subprojects {
 
 
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = 17
+    targetCompatibility = 17
 
     jar {
         // Empty attributes are set by each project. They are initialized

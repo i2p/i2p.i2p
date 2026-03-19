@@ -13,24 +13,24 @@ sourceSets {
 }
 
 dependencies {
-    ext.jettyVersion = '9.3.30.v20211001'
+    ext.jettyVersion = "${jettyVersion}"
     ext.tomcatVersion = "${tomcatVersion}"
     api project(':core')
     api 'org.eclipse.jetty:jetty-http:' + ext.jettyVersion
     api 'org.eclipse.jetty:jetty-io:' + ext.jettyVersion
-    api 'org.eclipse.jetty:jetty-security:' + ext.jettyVersion
+    api 'org.eclipse.jetty.ee8:jetty-ee8-security:' + ext.jettyVersion
     api 'org.eclipse.jetty:jetty-server:' + ext.jettyVersion
-    api 'org.eclipse.jetty:jetty-servlet:' + ext.jettyVersion
+    api 'org.eclipse.jetty.ee8:jetty-ee8-servlet:' + ext.jettyVersion
     api 'org.eclipse.jetty:jetty-util:' + ext.jettyVersion
     api 'org.eclipse.jetty:jetty-xml:' + ext.jettyVersion
-    api 'org.eclipse.jetty:apache-jsp:' + ext.jettyVersion
-    api 'org.eclipse.jetty:jetty-continuation:' + ext.jettyVersion
+    api 'org.eclipse.jetty.ee8:jetty-ee8-apache-jsp:' + ext.jettyVersion
     api 'org.eclipse.jetty:jetty-deploy:' + ext.jettyVersion
     api 'org.eclipse.jetty:jetty-jmx:' + ext.jettyVersion
+    api 'org.eclipse.jetty.ee8:jetty-ee8-nested:' + ext.jettyVersion
     api 'org.eclipse.jetty:jetty-rewrite:' + ext.jettyVersion
-    api 'org.eclipse.jetty:jetty-servlets:' + ext.jettyVersion
+    api 'org.eclipse.jetty.ee8:jetty-ee8-servlets:' + ext.jettyVersion
     api 'org.eclipse.jetty:jetty-start:' + ext.jettyVersion
-    api 'org.eclipse.jetty:jetty-webapp:' + ext.jettyVersion
+    api 'org.eclipse.jetty.ee8:jetty-ee8-webapp:' + ext.jettyVersion
     api 'org.apache.tomcat:tomcat-api:' + ext.tomcatVersion
     api 'org.apache.tomcat:tomcat-el-api:' + ext.tomcatVersion
     api 'org.apache.tomcat:tomcat-jasper:' + ext.tomcatVersion

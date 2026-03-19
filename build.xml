@@ -14,7 +14,7 @@
     <property file="build.properties"/>
     <!--  When changing, also change javadoc URL in build.properties,
           and checksum in apps/jetty/build.xml
-          and versions in gradle.properties and apps/jetty/build.gradle
+          and versions in gradle.properties
      -->
     <property name="jetty.ver" value="12.0.28" />
     <property name="jetty.ver.debian" value="12.0.32" />
