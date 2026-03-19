@@ -5,6 +5,7 @@
     <!-- for javaversion condition -->
     <property name="ant.minimumVersion" value="1.10.2"/>
     <property name="java.minimumVersion" value="17"/>
+    <property name="izpack4.maximumJavaVersion" value="13.99"/>
 
     <!-- Include property files so that values can be easily overridden.
          Users should create an override.properties file to make changes.
@@ -464,6 +465,11 @@
         <property name="javac.version" value="17" />
         <property name="javac.release" value="17" />
         <echo message="Building for minimum Java version ${javac.version} release ${javac.release}" />
+    </target>
+
+    <!-- For installer-*-oldjava targets -->
+    <target name="buildProperties-oldjava" depends="getGitRev, getReleaseNumber, getBuildNumber, setBuildTimestamp, disableManifestClasspath" >
+        <property name="full.version" value="${release.number}-${i2p.build.number}${build.qualifier}${build.extra}" />
     </target>
 
     <target name="setBuildTimestamp" unless="${build.reproducible}" >
@@ -1144,8 +1150,8 @@
             </filterchain>
         </loadfile>
         <echo message="Release number: ${release.number}" />
-        <echo message="Izpack version: ${izpack.number}" />
-        <fail message="Izpack version / release version mismatch, fix installer/install.xml" >
+        <echo message="install.xml version: ${izpack.number}" />
+        <fail message="xml version / release version mismatch, fix installer/install.xml" >
             <condition>
                 <not>
                     <equals arg1="${release.number}" arg2="${izpack.number}"/>
@@ -1169,8 +1175,8 @@
             </filterchain>
         </loadfile>
         <echo message="Release number: ${release.number}" />
-        <echo message="Izpack version: ${izpack5.number}" />
-        <fail message="Izpack version / release version mismatch, fix installer/install5.xml" >
+        <echo message="install5.xml version: ${izpack5.number}" />
+        <fail message="xml version / release version mismatch, fix installer/install5.xml" >
             <condition>
                 <not>
                     <equals arg1="${release.number}" arg2="${izpack5.number}"/>
@@ -2002,6 +2008,13 @@
         <echo message="For IzPack 5, install it and use one of the installer5 targets." />
         <echo message="See http://zzz.i2p/topics/3661 for help on installing IzPack 5." />
         <echo message="JDK: ${java.vendor} ${java.version} (${java.runtime.name} ${java.runtime.version})" />
+        <fail message="FATAL: Maximum Java version is ${izpack4.maximumJavaVersion} - your Java version is ${java.version}. Switch to a lower Java version and run ant installer-oldjava, ant installer-linux-oldjava, ant installer-windows-oldjava, or ant installer-nowindows-oldjava" >
+            <condition>
+                <not>
+                    <javaversion atmost="${izpack4.maximumJavaVersion}"/>
+                </not>
+            </condition>
+        </fail>
         <taskdef name="izpack"
                      classpath="${basedir}/installer/lib/izpack/patches.jar:${basedir}/installer/lib/izpack/standalone-compiler.jar"
                      classname="com.izforge.izpack.ant.IzPackTask" />
@@ -2015,6 +2028,13 @@
 
     <!-- IzPack 4 -->
     <target name="installer" depends="preppkg, buildProperties, izpack-patches, buildUtilityJar" >
+        <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.tmp.jar" installerType="standard" basedir="${basedir}" />
+        <move file="${basedir}/install.tmp.jar" tofile="${basedir}/install.jar" />
+        <ant target="installerexe" />
+    </target>
+
+    <target name="installer-oldjava" depends="buildProperties-oldjava, izpack-patches, buildUtilityJar" >
+        <echo message="*** WARNING ***  You must have run 'ant installer' first" />
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.tmp.jar" installerType="standard" basedir="${basedir}" />
         <move file="${basedir}/install.tmp.jar" tofile="${basedir}/install.jar" />
         <ant target="installerexe" />
@@ -2112,6 +2132,12 @@
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}.jar" installerType="standard" basedir="${basedir}" />
     </target>
 
+    <target name="installer-nowindows-oldjava" depends="izpack-patches" >
+        <echo message="*** WARNING ***  You must have run 'ant installer-nowindows' first" />
+        <fixcrlf srcdir="pkg-temp" includes="*.config **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="lf" />
+        <izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}.jar" installerType="standard" basedir="${basedir}" />
+    </target>
+
     <!-- IzPack 5 -->
     <target name="installer5-nowindows" depends="clean, izpack5-patches, preppkg-nowindows" >
         <fixcrlf srcdir="pkg-temp" includes="*.config **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="lf" />
@@ -2126,6 +2152,12 @@
 
     <!-- IzPack 4 -->
     <target name="installer-linux" depends="clean, preppkg-linux-only, izpack-patches" >
+        <fixcrlf srcdir="pkg-temp" includes="*.config **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="lf" />
+        <izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}_linux-only.jar" installerType="standard" basedir="${basedir}" />
+    </target>
+
+    <target name="installer-linux-oldjava" depends="buildProperties-oldjava, izpack-patches" >
+        <echo message="*** WARNING ***  You must have run 'ant installer-linux' first" />
         <fixcrlf srcdir="pkg-temp" includes="*.config **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="lf" />
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}_linux-only.jar" installerType="standard" basedir="${basedir}" />
     </target>
@@ -2181,6 +2213,16 @@
 
     <!-- IzPack 4 -->
     <target name="installer-windows" depends="clean, preppkg-windows-only, izpack-patches, buildUtilityJar" >
+        <fixcrlf srcdir="pkg-temp" includes="*.config *.bat *.cmd **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="crlf"/>
+        <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.tmp.jar" installerType="standard" basedir="${basedir}" />
+        <move file="${basedir}/install.tmp.jar" tofile="${basedir}/install.jar" />
+        <ant target="installerexe" />
+        <delete file="${basedir}/install.jar" />
+        <move file="${basedir}/i2pinstall.exe" tofile="${basedir}/i2pinstall_${full.version}_windows.exe" />
+    </target>
+
+    <target name="installer-windows-oldjava" depends="buildProperties-oldjava, izpack-patches, buildUtilityJar" >
+        <echo message="*** WARNING ***  You must have run 'ant installer-windows' first" />
         <fixcrlf srcdir="pkg-temp" includes="*.config *.bat *.cmd **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="crlf"/>
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.tmp.jar" installerType="standard" basedir="${basedir}" />
         <move file="${basedir}/install.tmp.jar" tofile="${basedir}/install.jar" />
