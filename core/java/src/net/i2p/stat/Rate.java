@@ -214,7 +214,6 @@ public class Rate {
     private static final int SLACK = 2000;
     public void coalesce() {
         long now = now();
-        double correctedTotalValue; // for summaryListener which divides by rounded EventCount
         synchronized (this) {
             long measuredPeriod = now - _lastCoalesceDate;
             if (measuredPeriod < _period - SLACK) {
@@ -228,15 +227,15 @@ public class Rate {
 
             // how much were we off by?  (so that we can sample down the measured values)
             float periodFactor = measuredPeriod / (float)_period;
-            _lastTotalValue = _currentTotalValue / periodFactor;
-            _lastEventCount = (int) (0.499999 + (_currentEventCount / periodFactor));
+            // no, we can't scale these, because eventCount is an int, so
+            // only totalValue scales accurately,
+            // resulting in scaling errors in getAverageValue()
+            //_lastTotalValue = _currentTotalValue / periodFactor;
+            //_lastEventCount = (int) (0.499999 + (_currentEventCount / periodFactor));
+            _lastTotalValue = _currentTotalValue;
+            _lastEventCount = _currentEventCount;
             _lastTotalEventTime = (int) (_currentTotalEventTime / periodFactor);
             _lastCoalesceDate = now;
-            if (_currentEventCount == 0)
-                correctedTotalValue = 0;
-            else
-                correctedTotalValue = _currentTotalValue *
-                                      (_lastEventCount / (double) _currentEventCount);
 
             if (_lastTotalValue >= _extremeTotalValue) {  // get the most recent if identical
                 _extremeTotalValue = _lastTotalValue;
@@ -248,8 +247,9 @@ public class Rate {
             _currentEventCount = 0;
             _currentTotalEventTime = 0;
         }
-        if (_summaryListener != null)
-            _summaryListener.add(correctedTotalValue, _lastEventCount, _lastTotalEventTime, _period);
+        RateSummaryListener rsl = _summaryListener;
+        if (rsl != null)
+            rsl.add(_lastTotalValue, _lastEventCount, _lastTotalEventTime, _period);
     }
 
     public void setSummaryListener(RateSummaryListener listener) { _summaryListener = listener; }
