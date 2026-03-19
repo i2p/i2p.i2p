@@ -84,7 +84,7 @@ class BuildExecutor implements Runnable {
         // Get stat manager, get recognized bandwidth tiers
         StatManager statMgr = _context.statManager();
         String bwTiers = RouterInfo.BW_CAPABILITY_CHARS;
-        long[] RATES = new long[] { 60*1000, 10*60*1000};
+        long[] RATES = new long[] { 60*60*1000 };
         // For each bandwidth tier, create tunnel build agree/reject/expire stats
         for (int i = 0; i < bwTiers.length(); i++) {
             String bwTier = String.valueOf(bwTiers.charAt(i));
