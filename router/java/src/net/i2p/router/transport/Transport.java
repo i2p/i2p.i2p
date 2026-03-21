@@ -174,6 +174,11 @@ public interface Transport {
     public int countActiveSendPeers();
 
     /**
+     *  @since 0.9.69 added to interface
+     */
+    public int getMaxConnections();
+
+    /**
      * @return 8 bytes:
      *         version 1 ipv4 in/out, ipv6 in/out
      *         version 2 ipv4 in/out, ipv6 in/out
