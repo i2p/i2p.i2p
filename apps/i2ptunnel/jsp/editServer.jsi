@@ -154,8 +154,17 @@
             <th class="excludeBackgroundImage"></th>
         </tr><tr>
             <td colspan="2">
-                <input type="text" size="20" id="websiteName" name="spoofedHost" title="<%=intl._t("Website Hostname e.g. mysite.i2p")%>" value="<%=editBean.getSpoofedHost(curTunnel)%>" class="freetext" />
-                <%=intl._t("(leave blank for outproxies)")%>
+<%
+                String spoof = editBean.getSpoofedHost(curTunnel);
+%>
+                <input type="text" size="20" id="websiteName" name="spoofedHost" title="<%=intl._t("Website Hostname e.g. mysite.i2p")%>" value="<%=spoof%>" class="freetext" />
+<%
+                if ("mysite.i2p".equals(spoof)) {
+                    %><font color="red"><%=intl._t("Host not set")%></font><%
+                } else {
+                    %><%=intl._t("(leave blank for outproxies)")%><%
+                }
+%>
             </td>
         </tr>
             <% }

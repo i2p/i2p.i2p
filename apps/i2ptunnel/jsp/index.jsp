@@ -160,7 +160,13 @@
                        out.write("<b>");
                        out.write(intl._t("Hostname"));
                        out.write(":</b></span> ");
-                       out.write(name);
+                       if ("mysite.i2p".equals(name)) {
+                           out.write("<font color=\"red\">");
+                           out.write(intl._t("Host not set"));
+                           out.write("</font>");
+                       } else {
+                           out.write(name);
+                       }
                    }
 %>
         </td>
