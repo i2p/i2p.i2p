@@ -460,7 +460,7 @@ public abstract class SystemVersion {
         System.out.println("Java 9   : " + isJava9());
         System.out.println("Java 10  : " + isJava10());
         System.out.println("Java 11  : " + isJava11());
-        for (int i = 12; i <= 24; i++) {
+        for (int i = 12; i <= 25; i++) {
             System.out.println("Java " + i + "  : " + isJava(i));
         }
         System.out.println("Android  : " + isAndroid());
