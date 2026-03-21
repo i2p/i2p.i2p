@@ -6,6 +6,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
+import net.i2p.router.CommSystemFacade.Status;
 import static net.i2p.router.transport.TransportUtil.IPv6Config.*;
 import static net.i2p.router.transport.udp.PeerTestState.Role.*;
 
@@ -94,6 +95,7 @@ class PeerTestEvent extends SimpleTimer2.TimedEvent {
 
     private void locked_runTest(boolean isIPv6) {
         _lastTestIPv6 = isIPv6;
+        boolean allowForce = false;
         PeerState bob = _transport.pickTestPeer(BOB, 0, isIPv6, null);
         if (bob != null) {
             if (_log.shouldLog(Log.INFO))
@@ -104,10 +106,73 @@ class PeerTestEvent extends SimpleTimer2.TimedEvent {
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Unable to run peer test, no peers available - v6? " + isIPv6);
+            if (_context.router().getUptime() > 10*60*1000 &&
+                _transport.countPeers() >= UDPTransport.MIN_PEERS &&
+                _transport.getInboundConnectionLastReceived(isIPv6) < _context.clock().now() - 10*60*1000) {
+                // if we have no test peers at all after 10 minutes, presume firewalled
+                Status old = _transport.getReachabilityStatus();
+                if (isIPv6) {
+                    switch (old) {
+                        case OK:
+                        case IPV4_OK_IPV6_UNKNOWN:
+                        case IPV4_OK_IPV6_FIREWALLED:
+                        case IPV4_UNKNOWN_IPV6_OK:
+                        case IPV4_FIREWALLED_IPV6_OK:
+                        case IPV4_DISABLED_IPV6_OK:
+                        case IPV4_SNAT_IPV6_OK:
+                        case IPV4_SNAT_IPV6_UNKNOWN:
+                        case IPV4_FIREWALLED_IPV6_UNKNOWN:
+                        case REJECT_UNSOLICITED:
+                        case IPV4_UNKNOWN_IPV6_FIREWALLED:
+                        case IPV4_DISABLED_IPV6_UNKNOWN:
+                        case IPV4_DISABLED_IPV6_FIREWALLED:
+                        case UNKNOWN:
+                            Status status = Status.IPV4_UNKNOWN_IPV6_FIREWALLED;
+                            if (_log.shouldWarn())
+                                _log.warn("Old status: " + old + " new status: " + status);
+                            _transport.setReachabilityStatus(status, isIPv6);
+                            allowForce = true;
+                            break;
+
+                        default:
+                            // SYMNAT, DISCONNECTED, HOSED, ...
+                            if (_log.shouldWarn())
+                                _log.warn("Not changing current status: " + old);
+                            break;
+                    }
+                } else {
+                    switch (old) {
+                        case OK:
+                        case IPV4_OK_IPV6_UNKNOWN:
+                        case IPV4_OK_IPV6_FIREWALLED:
+                        case IPV4_UNKNOWN_IPV6_OK:
+                        case IPV4_FIREWALLED_IPV6_OK:
+                        case IPV4_DISABLED_IPV6_OK:
+                        case IPV4_FIREWALLED_IPV6_UNKNOWN:
+                        case REJECT_UNSOLICITED:
+                        case IPV4_UNKNOWN_IPV6_FIREWALLED:
+                        case IPV4_DISABLED_IPV6_UNKNOWN:
+                        case IPV4_DISABLED_IPV6_FIREWALLED:
+                        case UNKNOWN:
+                            Status status = Status.IPV4_FIREWALLED_IPV6_UNKNOWN;
+                            if (_log.shouldWarn())
+                                _log.warn("Old status: " + old + " new status: " + status);
+                            _transport.setReachabilityStatus(status, isIPv6);
+                            allowForce = true;
+                            break;
+
+                        default:
+                            if (_log.shouldWarn())
+                                _log.warn("Not changing current status: " + old);
+                            break;
+                    }
+                }
+            }
         }
-        // We switch to NO_FORCE even if no peers,
+        // We switch to NO_FORCE unless no peers,
         // so we don't get stuck running the same test over and over
-        _forceRun &= ~(isIPv6 ? FORCE_IPV6 : FORCE_IPV4);
+        if (!allowForce)
+            _forceRun &= ~(isIPv6 ? FORCE_IPV6 : FORCE_IPV4);
     }
 
     /**

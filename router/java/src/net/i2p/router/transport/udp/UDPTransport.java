@@ -236,7 +236,7 @@ public class UDPTransport extends TransportImpl {
     private static final int SSU_OUTBOUND_COST = 14;
     static final long[] RATES = { 10*60*1000 };
     /** minimum active peers to maintain IP detection, etc. */
-    private static final int MIN_PEERS = 5;
+    static final int MIN_PEERS = 10;
     private static final int MIN_PEERS_IF_HAVE_V6 = 30;
     /** minimum peers volunteering to be introducers if we need that */
     private static final int MIN_INTRODUCER_POOL = 5;
@@ -1155,12 +1155,18 @@ public class UDPTransport extends TransportImpl {
         } else {
             // Introduced connections are still inbound, this is not evidence
             // that we are not firewalled.
-            // use OS clock since its an ordering thing, not a time thing
-            _lastInboundReceivedOn = System.currentTimeMillis(); 
+            _lastInboundReceivedOn = _context.clock().now();
             _context.statManager().addRateData("udp.inboundIPv4Conn", 1);
         }
     }
-    
+
+    /**
+     *  @since 0.9.69
+     */
+    long getInboundConnectionLastReceived(boolean isIPv6) {
+        return isIPv6 ? _lastInboundIPv6 : _lastInboundReceivedOn;
+    }
+
     // temp prevent multiples
     private boolean gotIPv4Addr = false;
     private boolean gotIPv6Addr = false;
@@ -1309,7 +1315,7 @@ public class UDPTransport extends TransportImpl {
         boolean inboundRecent;
         boolean isIPv6 = ourIP.length == 16;
         if (!isIPv6)
-            inboundRecent = _lastInboundReceivedOn + ALLOW_IP_CHANGE_INTERVAL > System.currentTimeMillis();
+            inboundRecent = _lastInboundReceivedOn + ALLOW_IP_CHANGE_INTERVAL > _context.clock().now();
         else
             inboundRecent = _lastInboundIPv6 + ALLOW_IP_CHANGE_INTERVAL > _context.clock().now();
         if (_log.shouldLog(Log.INFO))
