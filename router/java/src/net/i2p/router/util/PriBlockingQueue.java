@@ -38,7 +38,7 @@ public class PriBlockingQueue<E extends PQEntry> extends PriorityBlockingQueue<E
     public PriBlockingQueue(I2PAppContext ctx, String name, int initialCapacity) {
         super(initialCapacity, new PriorityComparator<E>());
         _context = ctx;
-        _log = ctx.logManager().getLog(PriorityBlockingQueue.class);
+        _log = ctx.logManager().getLog(PriBlockingQueue.class);
         _name = name;
         STAT_FULL = ("pbq." + name + ".full").intern();
         ctx.statManager().createRateStat(STAT_FULL, "queue full", "Router", RATES);
