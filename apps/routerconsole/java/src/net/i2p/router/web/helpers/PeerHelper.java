@@ -238,7 +238,8 @@ public class PeerHelper extends HelperBase {
             StringBuilder buf = new StringBuilder(512);
             buf.append("<h3 id=\"transports\">").append(_t("Peer Connections")).append("</h3><table><tr><th>")
                .append(_t("Transport")).append("</th><th>")
-               .append(_t("Total")).append("</th>");
+               .append(_t("Total")).append("</th><th>")
+               .append(_t("Limit")).append("</th>");
             if (showIPv4) {
                 buf.append("<th>")
                    .append(_t("IPv4")).append(" <img src=\"/themes/console/images/inbound.png\" alt=\"").append(_t("Inbound")).append("\" title=\"").append(_t("Inbound")).append("\"/></th><th>")
@@ -251,7 +252,7 @@ public class PeerHelper extends HelperBase {
             }
             buf.append("</tr>\n");
             boolean warnInbound = !_context.router().isHidden() && _context.router().getUptime() > 15*60*1000;
-            int[] totals = new int[5];
+            int[] totals = new int[6];
             int rows = 0;
             for (Map.Entry<String, Transport> e : transports.entrySet()) {
                 String style = e.getKey();
@@ -276,6 +277,10 @@ public class PeerHelper extends HelperBase {
                     else
                         totals[0] += total;
                     buf.append(total);
+                    buf.append("</td><td align=\"center\">");
+                    int limit = t.getMaxConnections();
+                    buf.append(limit);
+                    totals[1] += limit;
                     for (int i = 0; i < 4; i++) {
                         if (!showIPv4 && i < 2)
                             continue;
@@ -287,7 +292,7 @@ public class PeerHelper extends HelperBase {
                             if ((i & 0x01) != 0 || warnInbound)
                                 buf.append("<b>**</b> ");
                         } else {
-                            totals[i + 1] += cnt;
+                            totals[i + 2] += cnt;
                         }
                         buf.append(cnt);
                     }
@@ -296,15 +301,15 @@ public class PeerHelper extends HelperBase {
             }
             if (rows > 1) {
                 buf.append("<tr><th align=\"center\"><b>").append(_t("Total")).append("</b>");
-                for (int i = 0; i < 5; i++) {
-                    if (!showIPv4 && i > 0 && i < 3)
+                for (int i = 0; i < 6; i++) {
+                    if (!showIPv4 && i > 1 && i < 4)
                         continue;
-                    if (!showIPv6 && i >= 3)
+                    if (!showIPv6 && i >= 4)
                         break;
                     int cnt = totals[i];
                     buf.append("</th><th align=\"center\">");
                     if (cnt <= 0) {
-                        if ((i & 0x01) == 0 || warnInbound)
+                        if ((i & 0x01) == 1 || warnInbound)
                             buf.append("<b>**</b> ");
                     }
                     buf.append("<b>").append(cnt).append("</b");
