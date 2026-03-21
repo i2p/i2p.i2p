@@ -1710,6 +1710,10 @@ public class DataHelper {
     /**
      *  The default formatting for date/time, current locale, local time zone.
      *  Warning - NOT UTC!
+     *  Warning - may contain UTF-8 chars, output format may change between Java versions.
+     *  As of Java 21, space before the AM/PM is a narrow no-break space U+202F,
+     *  or e2 80 af.
+     *
      *  Examples:
      *  en: Aug 30, 2019 12:38 PM
      *  de: 30.08.2019 12:38
