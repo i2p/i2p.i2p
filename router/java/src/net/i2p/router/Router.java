@@ -1218,7 +1218,8 @@ public class Router implements RouterClock.ClockShiftListener {
     public String getCapabilities() {
         StringBuilder rv = new StringBuilder(4);
         boolean hidden = isHidden();
-        char bw = hidden ? CAPABILITY_BW32 : getBandwidthClass();
+        int maxTunnels = _context.getProperty(RouterThrottleImpl.PROP_MAX_TUNNELS, RouterThrottleImpl.DEFAULT_MAX_TUNNELS);
+        char bw = (hidden || maxTunnels < 20) ? CAPABILITY_BW32 : getBandwidthClass();
         rv.append(bw);
         // 512 and unlimited supported as of 0.9.18;
         // Add 256 as well for compatibility
@@ -1273,7 +1274,6 @@ public class Router implements RouterClock.ClockShiftListener {
         }
 
         char cong = 0;
-        int maxTunnels = _context.getProperty(RouterThrottleImpl.PROP_MAX_TUNNELS, RouterThrottleImpl.DEFAULT_MAX_TUNNELS);
         if (forceG || maxTunnels <= 0) {
             //cong = CAPABILITY_NO_TUNNELS;
             cong = CAPABILITY_CONGESTION_SEVERE;
