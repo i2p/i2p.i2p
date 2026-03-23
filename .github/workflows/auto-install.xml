@@ -2,15 +2,8 @@
 <!--
     IzPack 5 unattended installation options file.
     Used in GitHub Actions to install IzPack 5 non-interactively.
-
-    ${IZPACK_INSTALL_PATH} is a shell variable expanded at runtime by the workflow
-    via envsubst, so the literal string is never passed to IzPack.
-
-    Usage (from ant.yml):
-        IZPACK_INSTALL_PATH="$HOME/IzPack" envsubst < .github/workflows/auto-install.xml > /tmp/izpack-auto-install.xml
-        java -jar izpack-dist-5.2.4-installer.jar -options /tmp/izpack-auto-install.xml
 -->
 <AutoInstall>
     <langpack code="eng"/>
-    <installpath>${IZPACK_INSTALL_PATH}</installpath>
+    <installpath>/home/runner/IzPack</installpath>
 </AutoInstall>
