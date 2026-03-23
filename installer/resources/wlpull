@@ -1,0 +1,243 @@
+#!/bin/sh
+
+#
+#  Emulate 'tx pull --use-git-timestamps' by automating 'wlc download'
+#  to download updated translations to the local workspace.
+#  This is NOT the same as 'wlc pull'
+#
+#  Usage: wlpull [component [language]]
+#
+#  By the I2P project
+#  Public Domain
+#
+
+# project
+# leave blank to get from .weblate
+P=""
+# component(s)
+# leave blank to get from .weblate
+# must specify here if multiple components
+C="i2ptunnel proxy core router routerconsole welcome countries i2psnark susidns desktopgui susimail debconf i2prouter-script getopt streaming manpages eepsite readme"
+# languages
+# leave blank to get from .weblate
+L=""
+
+TMP=/var/tmp/wlpull$$
+
+if [ "$1" = "-h" -o "$1" = "-?" -o "$1" = "help" -o "$1" = "-help" -o "$1" = "--help" -o "$#" -gt 2 ]
+then
+	echo "Usage: $0 [component [language]]"
+	echo
+	echo "Note that language must be the Weblate (language) identifier, not the ISO (language_code) identifier, which is sometimes different."
+
+	exit 1
+fi
+
+wlc help 2> /dev/null
+if [ $? -ne 2 ]
+then
+	echo 'ERROR: wlc must be installed'
+	exit 1
+fi
+
+
+if [ ! -f .weblate -o ! -d .git ]
+then
+	echo 'ERROR: Must run from base git project directory with a .weblate file'
+	exit 1
+fi
+
+X=`grep 'translation =' .weblate | cut -c14-`
+if [ "$X" = "" ]
+then
+	echo 'ERROR: Must have a translation = project or translation = project/component line in the .weblate file'
+	exit 1
+fi
+
+# command line overrides
+if [ ! -z "$1" ]
+then
+	C="$1"
+fi
+if [ ! -z "$2" ]
+then
+	L="$2"
+fi
+
+if [ -z "$P" ]
+then
+	P=`echo $X | cut -d '/' -f 1`
+fi
+
+if [ -z "$C" ]
+then
+	C=`echo $X | cut -d '/' -f 2`
+	if [ -z "$C" ]
+	then
+		echo "ERROR: Must have a project/component line in the .weblate file, or specify here in $0"
+		exit 1
+	fi
+fi
+
+echo "Project:    $P"
+echo "Components: $C"
+echo "Languages:  ${L:-all}"
+echo
+
+RC=0
+
+for CX in $C
+do
+	# full component path
+        W="$P/$CX"
+	echo "Checking for updated translations in $W"
+
+	wlc list-translations "$W" > "$TMP"
+	if [ "$?" -ne 0 ]
+	then
+		echo "ERROR: wlc list-translations failed for $W - bad component name?"
+		rm -f $TMP
+		exit 1
+	fi
+	# extract params for each language
+
+	# files
+	# skip filename for english
+	FILES=`grep '^filename: ' "$TMP" | cut -c 11- | tail -n +2`
+	FILES=`echo "$FILES" | tr '\n' ' '`
+	if [ -z "$FILES" ]
+	then
+		echo "ERROR: No files found for $W"
+		exit 1
+	fi
+
+	# languages
+	# skip english
+	# NOT language_code, must be language which is the weblate identifier
+	#LANGS=`grep '^language_code: ' "$TMP" | cut -c 16- | tail -n +2`
+	LANGS=`grep '^language: ' "$TMP" | cut -c 11- | tail -n +2`
+	LANGS=`echo "$LANGS" | tr '\n' ' '`
+	if [ -z "$LANGS" ]
+	then
+		echo "ERROR: No languages found for $W"
+		exit 1
+	fi
+
+	# timestamp
+	# skip english
+        # convert spaces to _, we will undo later
+	# strip ms and TZ
+	TIMES=`grep '^last_change: ' "$TMP" | cut -c 14- | tail -n +2 | tr ' ' '_' | cut -d '.' -f 1`
+	TIMES=`echo "$TIMES" | tr '\n' ' '`
+	if [ -z "$TIMES" ]
+	then
+		echo "ERROR: No timestamps found for $W"
+		exit 1
+	fi
+
+	# percents
+	# skip english
+	# strip ms and TZ
+	PERCS=`grep '^translated_percent: ' "$TMP" | cut -c 21- | tail -n +2`
+	PERCS=`echo "$PERCS" | tr '\n' ' '`
+	if [ -z "$PERCS" ]
+	then
+		echo "ERROR: No percentages found for $W"
+		exit 1
+	fi
+
+	rm -f "$TMP"
+	# debug
+	#echo
+	#echo "Files:"
+	#echo "$FILES"
+	echo
+	echo "Found Weblate Languages:"
+	echo "$LANGS"
+	echo
+	#echo "Timestamps:"
+	#echo "$TIMES"
+	#echo
+	#echo "Percentages:"
+	#echo "$PERCS"
+	#echo
+
+	i=0
+	for LANG in $LANGS
+	do
+		i=$((i+1))
+		if [ ! -z "$L" ]
+		then
+			# if lang specified on command line, skip if this isn't it
+			if [ "$L" != "$LANG" ]
+			then
+				continue
+			fi
+		fi
+
+		PERC=`echo "$PERCS" | cut -d ' ' -f $i`
+		FILE=`echo "$FILES" | cut -d ' ' -f $i`
+		if [ ! -f "$FILE" -a -z "$L" ]
+		then
+			echo "SKIPPING $LANG ${PERC}% complete - no local file $FILE"
+			echo "Force download with $0 $CX $LANG"
+			continue
+		fi
+		# convert remote timestamp to epoch time
+		TIME=`echo "$TIMES" | cut -d ' ' -f $i | tr '_' ' '`
+		TSR=`date -u -d "$TIME" +%s`
+		if [ "$?" -ne 0 ]
+		then
+			echo "ERROR: Cannot get weblate date for $FILE"
+			exit 1
+		fi
+		# get local checkin timestamp
+		TSL=`git log -1 --format=%at "$FILE"`
+		if [ "$?" -ne 0 ]
+		then
+			echo "ERROR: Cannot get git commit date for $FILE"
+			exit 1
+		fi
+		if [ -z "$TSL" ]
+		then
+			echo "WARNING: No commits for $FILE - forcing download, don't forget to git add"
+			TSL=0
+		fi
+		# format for display
+		TSLC=`date -u -d @$TSL`
+		TSRC=`date -u -d @$TSR`
+		if [ "$TSR" -le "$TSL" ]
+		then
+			echo "SKIPPING $LANG - Weblate $TSRC older than local file $FILE committed $TSLC"
+			continue
+		fi
+		echo "DOWNLOADING $LANG - Weblate $TSRC newer than local file $FILE committed $TSLC"
+		wlc download $W/$LANG > "$TMP"
+		if [ "$?" -ne 0 ]
+		then
+			echo "FAILED to download file for $W/$LANG"
+			rm -f "$TMP"
+			RC=1
+			continue
+		fi
+		diff -q "$TMP" "$FILE" > /dev/null
+		if [ "$?" -eq 0 ]
+		then
+			# Weblate timestamp newer after initial import
+			echo "NO CHANGES in $W/$LANG for $FILE"
+			rm -f "$TMP"
+			continue
+		fi
+		mv "$TMP" "$FILE"
+		if [ "$?" -ne 0 ]
+		then
+			echo "FAILED to copy file for $W/$LANG to $FILE"
+			rm -f "$TMP"
+			RC=1
+			continue
+		fi
+		echo "DOWNLOADED language $LANG ${PERC}% complete to $FILE"
+	done
+done
+
+exit $RC
