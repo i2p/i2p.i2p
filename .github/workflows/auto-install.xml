@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--
-    IzPack 5 unattended installation options file.
-    Used in GitHub Actions to install IzPack 5 non-interactively.
--->
-<AutoInstall>
-    <langpack code="eng"/>
-    <installpath>/home/runner/IzPack</installpath>
-</AutoInstall>

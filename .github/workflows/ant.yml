@@ -26,7 +26,7 @@ jobs:
       - name: Set up IzPack 5
         run: |
           wget -q -O izpack-installer.jar https://repo1.maven.org/maven2/org/codehaus/izpack/izpack-dist/5.2.4/izpack-dist-5.2.4-installer.jar
-          java -jar izpack-installer.jar -options .github/workflows/auto-install.xml
+          java -jar izpack-installer.jar -options-auto .github/workflows/auto-install.properties
       - name : Generate override.properties
         run: |
           rm -f override.properties
