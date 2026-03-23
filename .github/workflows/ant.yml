@@ -25,8 +25,9 @@ jobs:
           distribution: 'temurin'
       - name: Set up IzPack 5
         run: |
-          wget -O izpack-installer.jar https://repo1.maven.org/maven2/org/codehaus/izpack/izpack-dist/5.2.4/izpack-dist-5.2.4-installer.jar
-          java -jar izpack-installer.jar -options .github/workflows/auto-install.xml
+          wget -q -O izpack-installer.jar https://repo1.maven.org/maven2/org/codehaus/izpack/izpack-dist/5.2.4/izpack-dist-5.2.4-installer.jar
+          IZPACK_INSTALL_PATH="$HOME/IzPack" envsubst < .github/workflows/auto-install.xml > /tmp/izpack-auto-install.xml
+          java -jar izpack-installer.jar -options /tmp/izpack-auto-install.xml
       - name : Generate override.properties
         run: |
           rm -f override.properties
