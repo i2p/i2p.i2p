@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+    IzPack 5 unattended installation options file.
+    Used in GitHub Actions to install IzPack 5 non-interactively.
+
+    Usage:
+        java -jar izpack-dist-5.2.4-installer.jar -options .github/workflows/auto-install.xml
+
+    $USER_HOME resolves to the runner's home directory (~), so IzPack will be installed
+    at ~/IzPack, which matches the default izpack5.home value in build.properties.
+-->
+<AutoInstall>
+    <langpack code="eng"/>
+    <installpath>$USER_HOME/IzPack</installpath>
+</AutoInstall>

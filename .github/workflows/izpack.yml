@@ -1,3 +1,0 @@
-# REMOVED. This file existed to verify that the newer IzPack version would fix a bug in an older version of the I2P installer.
-# It is no longer needed, and we set up the newer IzPack version the main ant CI from the IzPack binary package
-# which is more similar to the actual build process. If we need to verify something about IzPack in the future, we can add a new workflow for it.
