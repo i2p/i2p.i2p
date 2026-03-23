@@ -86,7 +86,7 @@ jobs:
           restore-keys: |
             izpack-snapshot-
       - name: build with Ant - Non Windows
-        run: ant distclean pkg installer5-linux
+        run: ant distclean pkg5 installer5-linux
       - name: find installer artifacts
         run: find . -iname 'i2p*.jar'
       - name: Upload i2pinstall.jar
@@ -95,7 +95,7 @@ jobs:
           name: i2pinstall-${{ github.sha }}.jar
           path: i2pinstall*.jar
       - name: build with Ant - Windows
-        run: ant distclean pkg installer5-windows
+        run: ant distclean pkg5 installer5-windows
       - name: find installer artifacts
         run: find . -iname 'i2p*.exe'
       - name: Upload i2pinstall.exe

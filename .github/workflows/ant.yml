@@ -29,7 +29,7 @@ jobs:
           echo "build.built-by=GitHub Actions" >> override.properties
           echo "noExe=true" >> override.properties
       - name: build with Ant
-        run: ant distclean pkg
+        run: ant distclean pkg5
       - name: Upload installer.jar
         uses: actions/upload-artifact@v4
         with:
