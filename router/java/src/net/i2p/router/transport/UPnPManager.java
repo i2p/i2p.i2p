@@ -393,7 +393,10 @@ class UPnPManager {
     public String renderStatusHTML() {
         if (!_isRunning) {
             String msg;
-            if (Addresses.isConnected())
+            // no private addresses?
+            if (UPnP.getLocalAddresses().isEmpty())
+                msg = _t("UPnP is not enabled");
+            else if (Addresses.isConnected())
                 msg = _t("UPnP failed to start - port conflict?");
             else
                 msg = _t("UPnP failed to start - no network connection?");

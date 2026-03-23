@@ -901,6 +901,11 @@ public class ControlPoint implements HTTPRequestListener
 		int bindPort = getHTTPPort();
 		HTTPServerList httpServerList = getHTTPServerList();
 		while (httpServerList.open(bindPort) == false) {
+			if (net.i2p.router.transport.UPnP.getLocalAddresses().isEmpty()) {
+				// no use retrying
+				Debug.warning("No private addresses, not starting UPnP");
+				return false;
+			}
 			retryCnt++;
 			if (UPnP.SERVER_RETRY_COUNT < retryCnt) {
 				Debug.warning("Failed to open HTTP event listener port " + bindPort);

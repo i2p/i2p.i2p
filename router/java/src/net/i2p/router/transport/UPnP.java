@@ -139,7 +139,18 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		_eventVars = new HashMap<String, String>(4);
 	}
 	
+	/**
+	 *  This will return false if there's a HTTP port conflict after 4 retries,
+	 *  OR if we don't have any local addresses.
+	 */
 	public synchronized boolean runPlugin() {
+		if (getLocalAddresses().isEmpty()) {
+			// no use trying, we will only bind to local addresses
+			// see our mod in HttpServerList.open()
+			if (_log.shouldWarn())
+				_log.warn("Not running UPnP, no local addresses");
+			return false;
+		}
 		addDeviceChangeListener(this);
 		addEventListener(this);
 		synchronized(lock) {
@@ -2007,7 +2018,12 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		Properties props = new Properties();
                 props.setProperty(PROP_ADVANCED, "true");
 		I2PAppContext ctx = new I2PAppContext(props);
-		Set<String> addrs = UPnP.getLocalAddresses();
+		Set<String> addrs = getLocalAddresses();
+		if (addrs.isEmpty()) {
+			System.err.println("Failed to search for devices, no private addresses, on public IP");
+			System.exit(1);
+		}
+		System.err.println("Binding to local addresses: " + addrs);
 		List<InetAddress> ias = new ArrayList<InetAddress>(addrs.size());
 		for (String addr : addrs) {
 			    try {
