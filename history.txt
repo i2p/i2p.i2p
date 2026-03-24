@@ -1,3 +1,15 @@
+2026-03-23 zzz
+ * Console, eepsite: HTML fixes for Weblate
+ * UPnP: Fail fast if no local addresses, don't blame on port conflict
+
+2026-03-21 zzz
+ * Console: Show conn limits on peer status page
+ * NetDB: Force L cap if very low max tunnels
+ * SSU2: Set peer test result to firewalled if no peers available to test
+
+2026-03-19 zzz
+ * Stats: Fix 60s stat getAverage() returning 20% high
+
 2026-03-17 zzz
  * Console: Fix classloader issues when starting/installing plugins
  * NetDB: Publish D cap if near conn limits
