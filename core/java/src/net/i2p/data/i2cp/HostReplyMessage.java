@@ -9,6 +9,7 @@ package net.i2p.data.i2cp;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Properties;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -27,6 +28,7 @@ public class HostReplyMessage extends I2CPMessageImpl {
     private long _reqID;
     private int _code;
     private SessionId _sessionId;
+    private Properties _options;
 
     public static final int RESULT_SUCCESS = 0;
     /** generic fail, other codes TBD */
@@ -39,6 +41,10 @@ public class HostReplyMessage extends I2CPMessageImpl {
     public static final int RESULT_SECRET_AND_KEY_REQUIRED = 4;
     /** @since 0.9.41 */
     public static final int RESULT_DECRYPTION_FAILURE = 5;
+    /** @since 0.9.69 proposal 167 */
+    public static final int RESULT_LEASESET_LOOKUP_FAILURE = 6;
+    /** @since 0.9.69 proposal 167 */
+    public static final int RESULT_LOOKUP_TYPE_UNSUPPORTED = 7;
 
     private static final long MAX_INT = (1L << 32) - 1;
 
@@ -51,6 +57,18 @@ public class HostReplyMessage extends I2CPMessageImpl {
      *  @param reqID 0 to 2**32 - 1
      */
     public HostReplyMessage(SessionId id, Destination d, long reqID) {
+        this(id, d, reqID, null);
+    }
+
+    /**
+     *  A message with RESULT_SUCCESS and a non-null Destination.
+     *
+     *  @param d non-null
+     *  @param reqID 0 to 2**32 - 1
+     *  @param options for replies to lookup types 2-4, may be null, see proposal 167
+     *  @since 0.9.69
+     */
+    public HostReplyMessage(SessionId id, Destination d, long reqID, Properties options) {
         if (id == null || d == null)
             throw new IllegalArgumentException();
         if (reqID < 0 || reqID > MAX_INT)
@@ -58,6 +76,7 @@ public class HostReplyMessage extends I2CPMessageImpl {
         _sessionId = id;
         _dest = d;
         _reqID = reqID;
+        _options = options;
     }
 
     /**
@@ -113,6 +132,14 @@ public class HostReplyMessage extends I2CPMessageImpl {
         return _dest;
     }
 
+    /**
+     *  @return non-null only if result code is zero and options are present
+     *  @since 0.9.69 see proposal 167
+     */
+    public Properties getOptions() {
+        return _options;
+    }
+
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
             _sessionId = new SessionId();
@@ -121,8 +148,15 @@ public class HostReplyMessage extends I2CPMessageImpl {
             _code = in.read();
             if (_code < 0)
                 throw new EOFException();
-            if (_code == RESULT_SUCCESS)
+            if (_code == RESULT_SUCCESS) {
                 _dest = Destination.create(in);
+                int read = 7 + _dest.size();
+                if (size - read >= 2) {
+                    // proposal 167
+                    _options = new Properties();
+                    DataHelper.readProperties(in, _options, false);  // don't enforce ordering
+                }
+            }
         } catch (DataFormatException dfe) {
             throw new I2CPMessageException("bad data", dfe);
         }
@@ -140,8 +174,11 @@ public class HostReplyMessage extends I2CPMessageImpl {
             _sessionId.writeBytes(os);
             DataHelper.writeLong(os, 4, _reqID);
             os.write((byte) _code);
-            if (_code == RESULT_SUCCESS)
+            if (_code == RESULT_SUCCESS) {
                 _dest.writeBytes(os);
+                if (_options != null)
+                    DataHelper.writeProperties(os, _options, true, false);  // utf-8, don't sort
+            }
         } catch (DataFormatException dfe) {
             throw new I2CPMessageException("bad data", dfe);
         }
