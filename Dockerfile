@@ -18,11 +18,13 @@ RUN apk add --no-cache gettext tar bzip2 curl openjdk21 \
 
 # --- Runtime stages per architecture ---
 
-FROM alpine:latest AS runtime-amd64
-RUN apk add --no-cache openjdk21 fonts-dejavu
+FROM debian:bookworm-slim AS runtime-amd64
+RUN apt-get update && apt-get install -y --no-install-recommends openjdk-17-jre-headless fonts-dejavu \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-FROM alpine:latest AS runtime-arm64
-RUN apk add --no-cache openjdk21 fonts-dejavu
+FROM debian:bookworm-slim AS runtime-arm64
+RUN apt-get update && apt-get install -y --no-install-recommends openjdk-17-jre-headless fonts-dejavu \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 FROM debian:bookworm-slim AS runtime-arm
 RUN apt-get update && apt-get install -y --no-install-recommends openjdk-17-jre-headless fonts-dejavu \
