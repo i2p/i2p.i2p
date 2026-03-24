@@ -40,7 +40,7 @@
  in override.properties to ensure that Android will build correcly; fix any issues.
  Ensure that JAVA_HOME is unset.
 
-- Verify CI is passing on both Gitea and Github
+- Verify CI is passing (green checks) on both Gitea and Github https://github.com/i2p/i2p.i2p/commits/master/
 
 
 ## A day or two before
@@ -232,6 +232,13 @@
 
 2. Upload the bundles to Maven Central via https://oss.sonatype.org
 
+3. Verify upload was successful and is visible at https://central.sonatype.com/search?q=i2p&smo=true
+
+
+### Docker build
+
+1. Verify release is tagged at https://hub.docker.com/r/geti2p/i2p.i2p/tags
+
 
 ### Android build
 
@@ -239,7 +246,9 @@
 
 2. Upload to Google Play, f-droid.i2p.io, f-droid.org, and website
 
-3. Announce on Twitter
+3. Verify Google Play acceptance
+
+4. Tell zzz to announce on Twitter
 
 
 ### Notify release
