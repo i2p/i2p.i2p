@@ -281,7 +281,7 @@ class SAMv3Handler extends SAMv1Handler
 
 				if (opcode == null) {
 					// This is not a correct message, for sure
-					if (writeString(domain + " STATUS RESULT=I2P_ERROR", "missing subcommand, enter HELP for help"))
+					if (writeString(domain + " STATUS RESULT=I2P_ERROR", "unknown command or missing subcommand, enter HELP for help"))
 						continue;
 					else
 						break;
