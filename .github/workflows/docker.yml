@@ -1,6 +1,7 @@
 name: Dockerhub
 
 on:
+  workflow_dispatch:
   push:
     tags:
     - 'i2p-*.*.*'
