@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -1093,6 +1094,16 @@ class NetDbRenderer {
                         else
                             buf.append(_t("Expired {0} ago", DataHelper.formatDuration2(0-exp)));
                         buf.append("&nbsp;&nbsp;<b>Type: </b>").append(ls2.getTransientSigningKey().getType());
+                    }
+                    Properties opts = ls2.getOptions();
+                    if (opts != null && !opts.isEmpty()) {
+                        buf.append("</tr>\n<tr><td colspan=\"2\">\n<b>");
+                        buf.append(_t("Options")).append(":</b><br>\n");
+                        for (Map.Entry<Object, Object> entry : opts.entrySet()) {
+                            String k = (String) entry.getKey();
+                            String v = (String) entry.getValue();
+                            buf.append(DataHelper.stripHTML(k)).append(" = ").append(DataHelper.stripHTML(v)).append("<br>\n");
+                        }
                     }
                 }
                 buf.append("</td></tr>\n<tr><td colspan=\"2\">");
