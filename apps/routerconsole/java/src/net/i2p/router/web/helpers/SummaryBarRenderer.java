@@ -593,14 +593,27 @@ class SummaryBarRenderer {
            .append("</a>\n");
         svcs.put(tx, rbuf.toString());
 
-        tx = _t("LeaseSets");
-        rbuf.setLength(0);
-        rbuf.append("<a title=\"")
-           .append(_t("View active leasesets (debug mode)"))
-           .append("\" href=\"/netdb?l=2\" target=\"_top\">")
-           .append(nbsp(tx))
-           .append("</a>\n");
-        svcs.put(tx, rbuf.toString());
+        if (_context.netDb().floodfillEnabled()) {
+            tx = _t("LeaseSets") + " (" + _t("Floodfill") + ')';
+            rbuf.setLength(0);
+            rbuf.append("<a title=\"")
+               .append(_t("View active leasesets (debug mode)"))
+               .append("\" href=\"/netdb?l=2\" target=\"_top\">")
+               .append(nbsp(tx))
+               .append("</a>\n");
+            svcs.put(tx, rbuf.toString());
+        }
+
+        if (!_context.clientManager().getPrimaryHashes().isEmpty()) {
+            tx = _t("LeaseSets") + " (" + _t("Client") + ')';
+            rbuf.setLength(0);
+            rbuf.append("<a title=\"")
+               .append(_t("View active leasesets (debug mode)"))
+               .append("\" href=\"/netdb?l=7\" target=\"_top\">")
+               .append(nbsp(tx))
+               .append("</a>\n");
+            svcs.put(tx, rbuf.toString());
+        }
 
         tx = _t("NetDB Search");
         rbuf.setLength(0);
