@@ -1,3 +1,9 @@
+2026-03-25 zzz
+ * I2CP: Fix LS2 options not being updated on subsession
+
+2026-03-24 zzz
+ * I2NP: HostReplyMessage updates for proposal 167 (WIP)
+
 2026-03-23 zzz
  * Console, eepsite: HTML fixes for Weblate
  * UPnP: Fail fast if no local addresses, don't blame on port conflict
