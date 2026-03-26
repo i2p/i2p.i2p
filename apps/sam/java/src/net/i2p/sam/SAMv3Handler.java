@@ -390,7 +390,6 @@ class SAMv3Handler extends SAMv1Handler
 				try {
 					Thread.sleep(1000);
 				} catch ( InterruptedException e) {}
-			rec.getThreadGroup().destroy();
 			sSessionsHash.del(session.getNick());
 		}
 	}

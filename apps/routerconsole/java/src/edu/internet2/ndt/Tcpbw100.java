@@ -4560,13 +4560,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 			}
 			
 			if ( done == 0 ){
-				_log.warn("TG destroy");
-				try{
-					thread_group.destroy();
-					break;
-				}catch( Throwable e ){
-					_log.debug("TG", e);
-				}
+				break;
 			}
 			
 			try{
@@ -4593,8 +4587,6 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 					_log.error("Bandwidth test error", e);
 				}
 			};
-		
-		_thread_group.setDaemon( true );
 		
 		Thread t = 
 			new I2PAppThread( 
