@@ -1267,6 +1267,12 @@
         <delete file="javadoc.zip" />
         <delete file="i2p.fba" />
         <delete file="${sloccount.report.file}" />
+        <delete file="mavencentral-i2p.zip" />
+        <delete file="mavencentral-router.zip" />
+        <delete file="mavencentral-mstreaming.zip" />
+        <delete file="mavencentral-streaming.zip" />
+        <delete file="mavencentral-servlet-i2p.zip" />
+        <!-- clean up old .jar bundles too -->
         <delete file="mavencentral-i2p.jar" />
         <delete file="mavencentral-router.jar" />
         <delete file="mavencentral-mstreaming.jar" />
@@ -2700,6 +2706,13 @@
         <artifact:writepom pomRefId="mstreamingpom" file="pkg-mavencentral/mstreaming-${release.number}.pom" />
         <artifact:writepom pomRefId="streamingpom" file="pkg-mavencentral/streaming-${release.number}.pom" />
         <artifact:writepom pomRefId="servletpom" file="pkg-mavencentral/servlet-i2p-${release.number}.pom" />
+        <!-- Checksums - Sonatype requires md5 and sha1 for every artifact -->
+        <checksum algorithm="MD5" fileext=".md5">
+            <fileset dir="pkg-mavencentral" excludes="*.md5 *.sha1 *.asc" />
+        </checksum>
+        <checksum algorithm="SHA-1" fileext=".sha1">
+            <fileset dir="pkg-mavencentral" excludes="*.md5 *.sha1 *.asc" />
+        </checksum>
         <!-- Signatures -->
         <echo message="Sign the files:" />
         <input message="Enter GPG key ID (e.g. 0x12345678) for signing:" addproperty="release.gpg.keyid" />
@@ -2729,33 +2742,35 @@
         <gpgsignasc file="pkg-mavencentral/servlet-i2p-${release.number}.pom" />
         <gpgsignasc file="pkg-mavencentral/servlet-i2p-${release.number}-javadoc.jar" />
         <gpgsignasc file="pkg-mavencentral/servlet-i2p-${release.number}-sources.jar" />
-        <!-- Bundle -->
-        <jar destfile="mavencentral-i2p.jar">
-            <fileset dir="./pkg-mavencentral">
+        <!-- Bundle - use zip not jar, to avoid META-INF which causes Sonatype validation errors.
+             Files must be placed in Maven repository directory layout (groupId/artifactId/version/)
+             for the Sonatype Central Portal to accept them. -->
+        <zip destfile="mavencentral-i2p.zip">
+            <zipfileset dir="./pkg-mavencentral" prefix="net/i2p/i2p/${release.number}">
                 <include name="i2p-*" />
-            </fileset>
-        </jar>
-        <jar destfile="mavencentral-router.jar">
-            <fileset dir="./pkg-mavencentral">
+            </zipfileset>
+        </zip>
+        <zip destfile="mavencentral-router.zip">
+            <zipfileset dir="./pkg-mavencentral" prefix="net/i2p/router/${release.number}">
                 <include name="router-*" />
-            </fileset>
-        </jar>
-        <jar destfile="mavencentral-mstreaming.jar">
-            <fileset dir="./pkg-mavencentral">
+            </zipfileset>
+        </zip>
+        <zip destfile="mavencentral-mstreaming.zip">
+            <zipfileset dir="./pkg-mavencentral" prefix="net/i2p/client/mstreaming/${release.number}">
                 <include name="mstreaming-*" />
-            </fileset>
-        </jar>
-        <jar destfile="mavencentral-streaming.jar">
-            <fileset dir="./pkg-mavencentral">
+            </zipfileset>
+        </zip>
+        <zip destfile="mavencentral-streaming.zip">
+            <zipfileset dir="./pkg-mavencentral" prefix="net/i2p/client/streaming/${release.number}">
                 <include name="streaming-*" />
-            </fileset>
-        </jar>
-        <jar destfile="mavencentral-servlet-i2p.jar">
-            <fileset dir="./pkg-mavencentral">
+            </zipfileset>
+        </zip>
+        <zip destfile="mavencentral-servlet-i2p.zip">
+            <zipfileset dir="./pkg-mavencentral" prefix="net/i2p/servlet-i2p/${release.number}">
                 <include name="servlet-i2p-*" />
-            </fileset>
-        </jar>
-        <echo message="Now upload mavencentral-*.jar to Maven Central." />
+            </zipfileset>
+        </zip>
+        <echo message="Now upload mavencentral-*.zip to Maven Central." />
     </target>
 
     <target name="mavenLocal.deps" depends="buildRouter, buildStreaming">
