@@ -23,7 +23,7 @@ Please check out [HACKING.md](docs/HACKING.md) and other documents in the docs d
 
 ## Building packages from source
 
-To get development branch from source control: [ttps://i2p.net/docs/development/new-developers/](https://i2p.net/docs/development/new-developers/)
+To get development branch from source control: [https://i2p.net/docs/development/new-developers/](https://i2p.net/docs/development/new-developers/)
 
 ### Prerequisites
 
