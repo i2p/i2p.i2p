@@ -10,6 +10,7 @@ See [INSTALL.txt](INSTALL.txt) or the installation instructions for your system:
 - [Windows](https://i2p.net/en/docs/guides/installing-i2p-on-windows/)
 - [macOS](https://i2p.net/en/docs/guides/installing-i2p-on-macos/)
 - [Linux](https://i2p.net/en/docs/guides/installing-i2p-on-debian-and-ubuntu/)
+- [Android](https://play.google.com/store/apps/details?id=net.i2p.android)
 
 ## Documentation
 
