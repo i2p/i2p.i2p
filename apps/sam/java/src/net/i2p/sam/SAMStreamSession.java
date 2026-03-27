@@ -348,6 +348,17 @@ class SAMStreamSession implements SAMMessageSess {
     }
 
     /**
+     * Lookup a destination through the I2CP session.
+     * Blocking.
+     *
+     * @return the Destination or null
+     * @since 0.9.69
+     */
+    public Destination lookupDest(String name) throws I2PSessionException {
+        return SAMMessageSession.lookupDest(socketMgr.getSession(), name);
+    }
+
+    /**
      * Close a SAM STREAM session.
      *
      */

@@ -211,6 +211,29 @@ abstract class SAMMessageSession implements SAMMessageSess {
     }
 
     /**
+     * Lookup a destination through the I2CP session.
+     * Blocking.
+     *
+     * @return the Destination or null
+     * @since 0.9.69
+     */
+    public Destination lookupDest(String name) throws I2PSessionException {
+        return lookupDest(session, name);
+    }
+
+    /**
+     * Lookup a destination through the I2CP session.
+     * Blocking.
+     *
+     * @return the Destination or null
+     * @since 0.9.69
+     */
+    static Destination lookupDest(I2PSession session, String name) throws I2PSessionException {
+        // session will convert b32 to hash, no need to do it here
+        return session.lookupDest(name, 10*1000);
+    }
+
+    /**
      * Close a SAM message-based session.
      */
     public void close() {

@@ -60,4 +60,13 @@ interface SAMMessageSess extends Closeable {
     public int getListenProtocol();
 
     public int getListenPort();
+
+    /**
+     * Lookup a destination through the I2CP session.
+     * Blocking.
+     *
+     * @return the Destination or null
+     * @since 0.9.69
+     */
+    public Destination lookupDest(String name) throws I2PSessionException ;
 }

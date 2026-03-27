@@ -19,6 +19,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.channels.SocketChannel;
 import java.nio.ByteBuffer;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -389,10 +390,29 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                     return writeString("NAMING REPLY RESULT=KEY_NOT_FOUND NAME=\"\" MESSAGE=\"Name=ME requires established session\"\n");
                 }
             } else {
-            	try {
-            		dest = SAMUtils.getDest(name);
-            	} catch (DataFormatException e) {
-            	}
+                try {
+                    if (name.length() >= 516 || !name.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
+                        // out of session
+                        dest = SAMUtils.getDest(name);
+                    } else if (streamSession != null) {
+                        // lookup in-session so the router will use the client tunnels to get the LS
+                        // and put the LS in the client's netdb
+                        dest = streamSession.lookupDest(name);
+                    } else if (datagramSession != null) {
+                        dest = datagramSession.lookupDest(name);
+                    } else if (rawSession != null) {
+                        dest = rawSession.lookupDest(name);
+                    } else {
+                        // out of session
+                        // leaseset will end up in the main netdb
+                        // and will have to be looked up again by the router if a message is sent to it.
+                        dest = SAMUtils.getDest(name);
+                    }
+                } catch (I2PSessionException e) {
+                    return writeString("NAMING REPLY RESULT=KEY_NOT_FOUND NAME=" + name, e.getMessage());
+                } catch (DataFormatException e) {
+                    return writeString("NAMING REPLY RESULT=KEY_NOT_FOUND NAME=" + name, e.getMessage());
+                }
             }
             
             if (dest == null) {
