@@ -386,7 +386,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Lookup for SESSION destination, but session is null");
-                    return false;
+                    return writeString("NAMING REPLY RESULT=KEY_NOT_FOUND NAME=\"\" MESSAGE=\"Name=ME requires established session\"\n");
                 }
             } else {
             	try {
