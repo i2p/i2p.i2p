@@ -191,12 +191,17 @@ do
 			echo "ERROR: Cannot get weblate date for $FILE"
 			exit 1
 		fi
-		# get local checkin timestamp
-		TSL=`git log -1 --format=%at "$FILE"`
-		if [ "$?" -ne 0 ]
+		if [ -f "$FILE" ]
 		then
-			echo "ERROR: Cannot get git commit date for $FILE"
-			exit 1
+			# get local checkin timestamp
+			TSL=`git log -1 --format=%at "$FILE"`
+			if [ "$?" -ne 0 -a -z "$L" ]
+			then
+				echo "ERROR: Cannot get git commit date for $FILE"
+				exit 1
+			fi
+		else
+			TSL=0
 		fi
 		if [ -z "$TSL" ]
 		then
@@ -220,13 +225,16 @@ do
 			RC=1
 			continue
 		fi
-		diff -q "$TMP" "$FILE" > /dev/null
-		if [ "$?" -eq 0 ]
+		if [ -f "$FILE" ]
 		then
-			# Weblate timestamp newer after initial import
-			echo "NO CHANGES in $W/$LANG for $FILE"
-			rm -f "$TMP"
-			continue
+			diff -q "$TMP" "$FILE" > /dev/null
+			if [ "$?" -eq 0 ]
+			then
+				# Weblate timestamp newer after initial import
+				echo "NO CHANGES in $W/$LANG for $FILE"
+				rm -f "$TMP"
+				continue
+			fi
 		fi
 		mv "$TMP" "$FILE"
 		if [ "$?" -ne 0 ]
