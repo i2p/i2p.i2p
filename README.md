@@ -2,20 +2,23 @@
 
 This is the source code for the reference Java implementation of I2P.
 
-Latest release: [https://i2p.net/download](https://i2p.net/download)
+Latest release: [https://i2p.net/en/downloads/](https://i2p.net/en/downloads/)
 
 ## Installing
 
-See [INSTALL.txt](INSTALL.txt) or [https://i2p.net/download](https://i2p.net/download) for installation instructions.
+See [INSTALL.txt](INSTALL.txt) or the installation instructions for your system:
+- [Windows](https://i2p.net/en/docs/guides/installing-i2p-on-windows/)
+- [macOS](https://i2p.net/en/docs/guides/installing-i2p-on-macos/)
+- [Linux](https://i2p.net/en/docs/guides/installing-i2p-on-debian-and-ubuntu/)
+- [Android](https://play.google.com/store/apps/details?id=net.i2p.android)
 
 ## Documentation
 
-[https://i2p.net/how](https://i2p.net/how)
+[https://i2p.net/en/docs/](https://i2p.net/en/docs/)
 
-FAQ: [https://i2p.net/faq](https://i2p.net/faq)
+FAQ: [https://i2p.net/en/docs/overview/faq/](https://i2p.net/en/docs/overview/faq/)
 
-API: [http://docs.i2p-projekt.de/javadoc/](http://docs.i2p-projekt.de/javadoc/)
-or run 'ant javadoc' then start at build/javadoc/index.html
+API: Run 'ant javadoc' then start at build/javadoc/index.html
 
 ## How to contribute / Hack on I2P
 
