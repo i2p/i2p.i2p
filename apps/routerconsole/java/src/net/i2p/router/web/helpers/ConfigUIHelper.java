@@ -108,69 +108,8 @@ public class ConfigUIHelper extends HelperBase {
          return rv;
     }
 
-    /**
-     *  Each language has the ISO code, the flag, the name, and the optional country name.
-     *  Alphabetical by the ISO code please.
-     *  See http://en.wikipedia.org/wiki/ISO_639-1 .
-     *  Any language-specific flag added to the icon set must be
-     *  added to the top-level build.xml for the updater.
-     *  As of 0.9.12, ISO 639-2 three-letter codes are supported also.
-     *  Note: To avoid truncation, ensure language name is no longer than 17 chars.
-     */
-    private static final String langs[][] = {
-        //
-        // Note: any additions, also add to:
-        // apps/i2psnark/java/src/org/klomp/snark/standalone/ConfigUIHelper.java
-        // .tx/config
-        // New lang_xx flags: Add to top-level build.xml
-        // Names must be 18 chars or less (including country if specified)
-        //
-        // NOTE: flag field now unused, flags are not displayed
-        //
-        { "en", "us", "English", null },
-        { "ar", "lang_ar", "Arabic عربية", null },
-        { "az", "az", "Azerbaijani", null },
-        { "cs", "cz", "Čeština", null },
-        { "zh", "cn", "Chinese 中文", null },
-        { "zh_TW", "tw", "Chinese 中文", "Taiwan" },
-        { "gan", "cn", "Gan Chinese 赣语", null },
-        { "da", "dk", "Dansk", null },
-        { "de", "de", "Deutsch", null },
-        { "et", "ee", "Eesti", null },
-        { "es", "es", "Español", null },
-        { "es_AR", "ar", "Español" ,"Argentina" },
-        { "fa", "ir", "Persian فارسی", null },
-        { "fr", "fr", "Français", null },
-        { "gl", "lang_gl", "Galego", null },
-        { "el", "gr", "Greek Ελληνικά", null },
-        { "hi", "in", "Hindi हिन्दी", null },
-        { "is", "is", "Icelandic", null },
-        { "in", "id", "bahasa Indonesia", null },
-        { "it", "it", "Italiano", null },
-        { "ja", "jp", "Japanese 日本語", null },
-        { "ko", "kr", "Korean 한국어", null },
-        { "ku", "iq", "Kurdish", null },
-        { "mg", "mg", "Malagasy", null },
-        { "hu", "hu", "Magyar", null },
-        { "nl", "nl", "Nederlands", null },
-        { "nb", "no", "Norsk (bokmål)", null },
-        { "pl", "pl", "Polski", null },
-        { "pt", "pt", "Português", null },
-        { "pt_BR", "br", "Português", "Brazil" },
-        { "ro", "ro", "Română", null },
-        { "ru", "ru", "Russian Русский", null },
-        { "sk", "sk", "Slovenčina", null },
-        { "fi", "fi", "Suomi", null },
-        { "sv", "se", "Svenska", null },
-        { "tr", "tr", "Türkçe", null },
-        { "uk", "ua", "Ukraine Українська", null },
-        { "vi", "vn", "Vietnam Tiếng Việt", null },
-        { "xx", "a1", "Untagged strings", null },
-    };
-
-
-
     public String getLangSettings() {
+        String[][] langs = Messages.LANGS;
         String clang = Messages.getLanguage(_context);
         String current = clang;
         String country = Messages.getCountry(_context);

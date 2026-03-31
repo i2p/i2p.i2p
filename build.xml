@@ -1738,6 +1738,7 @@
         <java classname="net.i2p.util.TranslationStatus" fork="true" dir="build/" failonerror="true">
             <classpath>
                 <pathelement location="build/i2p.jar" />
+                <pathelement location="build/routerconsole.jar" />
                 <pathelement location="build/tools.jar" />
             </classpath>
         </java>
@@ -1749,6 +1750,7 @@
         <java classname="net.i2p.util.TranslationStatus" fork="true" dir="build/" failonerror="true" output="build/txstatus/WEB-INF/classes/net/i2p/router/web/resources/translationstatus.html" logError="true">
             <classpath>
                 <pathelement location="build/i2p.jar" />
+                <pathelement location="build/routerconsole.jar" />
                 <pathelement location="build/tools.jar" />
             </classpath>
             <arg value="-h" />

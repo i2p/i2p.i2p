@@ -24,6 +24,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import net.i2p.I2PAppContext;
+import net.i2p.router.web.Messages;
 import net.i2p.util.ObjectCounterUnsafe;
 
 /**
@@ -214,6 +215,17 @@ public class TranslationStatus {
         // pass 3: output summary table
 
         // from here down to buf2 so we can output it first
+        // get console dropdown entries
+        Set<String> dropdown = new HashSet<String>(Messages.LANGS.length);
+        for (int i = 0; i < Messages.LANGS.length; i++) {
+            String lg = Messages.LANGS[i][0];
+            if (lg.equals("in"))
+                lg = "id";
+            else if (lg.equals("iw"))
+                lg = "he";
+            dropdown.add(lg);
+        }
+
         String h = "Translation Summary (" + resources + " resources, " + langs.size() + " languages, " + grandtot + " strings)";
         if (_html) {
             buf2.append("<h2>" + h + "</h2>\n");
@@ -223,11 +235,11 @@ public class TranslationStatus {
             buf2.append("\n\nNote: % translated includes compiled resources only\n\n");
         }
         if (_html) {
-            buf2.append("<table class=\"debug_tx_total\"><tr><th>Language<th>Language Code<th>% Translated<th>Missing Resources\n");
+            buf2.append("<table class=\"debug_tx_total\"><tr><th>Language<th>Language Code<th>% Translated<th>Missing Resources<th>In Console?\n");
         } else {
-            buf2.append("Code\t   %TX\tMissing\tLanguage");
+            buf2.append("Code\t   %TX\tMissing\tIn Console\tLanguage");
             nl2();
-            buf2.append("----\t------\t--------\t-------");
+            buf2.append("----\t------\t--------\t-------\t-------");
             nl2();
         }
         List<Locale> sorted = counts.sortedObjects();
@@ -240,9 +252,9 @@ public class TranslationStatus {
                 country = '(' + loc.getDisplayCountry() + ')';
             }
             if (_html)
-                buf2.append(String.format(Locale.US, "<tr><td>%s %s<td>%s<td>%5.1f%%<td>%d\n", lang, country, s, 100f * counts.count(loc) / grandtot, resources - bundles.count(loc)));
+                buf2.append(String.format(Locale.US, "<tr><td>%s %s<td>%s<td>%5.1f%%<td>%d<td>%s\n", lang, country, s, 100f * counts.count(loc) / grandtot, resources - bundles.count(loc), dropdown.contains(s) ? "&#x2714;" : "--"));
             else
-                buf2.append(String.format("%s\t%5.1f%%\t%s %s\n", s, 100f * counts.count(loc) / grandtot, resources - bundles.count(loc), lang, country));
+                buf2.append(String.format("%s\t%5.1f%%\t%s\t%s %s\n", s, 100f * counts.count(loc) / grandtot, resources - bundles.count(loc), dropdown.contains(s) ? "yes" : "no", lang, country));
         }
         if (_html)
             buf2.append("</table>");
@@ -381,7 +393,7 @@ public class TranslationStatus {
                     // non-java (debian, installer, man) undo conversion
                     if (lg.equals("in"))
                         njlg = "id";
-                    if (lg.equals("iw"))
+                    else if (lg.equals("iw"))
                         njlg = "he";
                 }
                 String sf;

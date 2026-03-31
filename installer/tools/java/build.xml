@@ -29,7 +29,7 @@
             release="${javac.release}"
             includeAntRuntime="false"
             encoding="UTF-8"
-            destdir="./build/obj" classpath="${javac.classpath}:../../../build/i2p.jar:../../../core/java/build/gnu-getopt.jar:../../../build/router.jar" >
+            destdir="./build/obj" classpath="${javac.classpath}:../../../build/i2p.jar:../../../core/java/build/gnu-getopt.jar:../../../build/router.jar:../../../build/routerconsole.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
