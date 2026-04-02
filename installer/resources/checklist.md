@@ -12,8 +12,8 @@
 - Review changes in English po files, fix up any necessary tagged strings in Java source
 - Revert English po files with no actual changes (i.e. with line number changes only)
 - Check in remaining English po files (and any files with changed strings)
-- Push to Transifex: `tx push --use-git-timestamps -s`
-- Make announcement on Transifex with checkin deadline
+- Weblate admin pulls from Github
+- Weblate admin makes announcement on Weblate with checkin deadline
 
 - GeoIP: db-ip.com update is usually first of the month, time accordingly
 - installer/resources/makegeoip.sh
@@ -50,7 +50,7 @@
 
 ## A day or two before
 
-1. Write the release announcement and push to Transifex:
+1. Write the release announcement, check in, and pull into Weblate:
 
   - Checkout i2p.newsxml branch
     - See README for setup
@@ -58,16 +58,18 @@
     - Entry href should be the in-net link to the release blog post
   - `tx push --use-git-timestamps -s`
   - `git commit`
+  - Weblate admin pulls from Github and announces
 
-2. Write the draft blog post and push to Transifex:
+2. Write the draft blog post, check in
 
   - Checkout i2p.www branch
   - Write draft release announcement - see i2p2www/blog/README for instructions
     - Top content should be the same as the news entry
   - `tx push --use-git-timestamps -s -r I2P.website_blog`
   - `git commit`
+  - Github CI auto-translates
 
-3. Make announcement on Transifex asking for news translation
+3. Weblate admin makes announcement asking for news translation
 
 4. Tickets: Check if any blocker or critical tickets for this release remain open;
    get them fixed and closed, or reclassified.
@@ -77,16 +79,15 @@
 6. Verify CI is passing on both Gitea and Github
 
 
-## On release day
+## On checkin deadline day
 
-### Preparation
+1. Ensure all translation updates are imported from Weblate
 
-1. Ensure all translation updates are imported from Transifex
-
-  - Look for newly translated languages and resources on Transifex
-  - Add any new ones to .tx/config (use your own judgement on which to include
+  - `installer/resources/wlpull` (requires Weblate API key)
+  - Note any new resource/language pairs logged by wlpull.
+  - Add any new ones with `installer/resources/wlpull resource language`
+    (use your own judgement on which to include
     based on minimum translated percentage)
-  - `tx pull --use-git-timestamps`
   - `ant testscripts` to verify that all updated translations are valid
   - For any invalid that break the test, fix up the po file manually, or fix on
     tx and pull again, or (if new) comment out in .tx/config (add a comment why)
@@ -95,9 +96,18 @@
   - `installer/resources/poupdate-man.sh` to generate new man page translations
     (requires po4a package)
   - `git add` for any new po files
-  - `git commit` all changed po files, and .tx/config if changed
+  - `git commit` all changed po files
 
-2. Sync with git.idk.i2p
+2. Sync with git.idk.i2p `git push`
+
+
+## On release day
+
+### Preparation
+
+1. Verify all translation updates were checked in
+
+2. Sync with git.idk.i2p `git pull`
 
 3. Start with a clean checkout:
 
@@ -114,7 +124,6 @@
     release.gpg.keyid=0xnnnnnnnn
     release.signer.su3=xxx@mail.i2p
     build.built-by=xxx
-    javac.compilerargs=-bootclasspath /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/jce.jar
     ```
 
 5. Verify that no untrusted revisions were included:
@@ -273,7 +282,7 @@
    Verify at https://files.i2p-projekt.de/
 
 3. Website files to change:
-  - Sync with git.idk.i2p
+  - Sync with git.idk.i2p `git pull`
   - `i2p2www/static/hosts.txt` if it changed (copy from i2p.i2p git branch)
   - `i2p2www/__init__.py` (release number)
   - `i2p2www/pages/downloads/list.html` (release signer, if changed)
@@ -281,7 +290,7 @@
   - `i2p2www/pages/site/get-involved/roadmap.html` (release date, actual release contents)
   - `i2p2www/static/news/news.xml` (no longer necessary)
   - Rename (undraft) the blog post
-  - Sync with git.idk.i2p
+  - Sync with git.idk.i2p `git push`
 
 4. Announce on:
   - #i2p, #i2p-dev (also on Freenode side)
