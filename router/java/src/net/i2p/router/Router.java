@@ -1277,7 +1277,7 @@ public class Router implements RouterClock.ClockShiftListener {
         if (forceG || maxTunnels <= 0) {
             //cong = CAPABILITY_NO_TUNNELS;
             cong = CAPABILITY_CONGESTION_SEVERE;
-        } else if (maxTunnels <= 50 || SystemVersion.isSlow() || !_context.commSystem().haveOutboundCapacity(90)) {
+        } else if (maxTunnels <= 50 || SystemVersion.isSlow() || !_context.commSystem().haveOutboundCapacity(94)) {
             cong = CAPABILITY_CONGESTION_MODERATE;
         } else {
             int numTunnels = _context.tunnelManager().getParticipatingCount();
