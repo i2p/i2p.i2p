@@ -1181,7 +1181,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     // because DataHelper.readLine() returns null on EOF
                     return;
                 }
-                _log.debug("No HTTP method found in the request.");
+                if (method == null)
+                    _log.debug("No HTTP method found in the request.");
+                else
+                    _log.debug("No destination found in the request.");
                 try {
                     if (protocol != null && "http".equals(protocol.toLowerCase(Locale.US))) {
                         out.write(getErrorPage("denied", ERR_REQUEST_DENIED).getBytes("UTF-8"));
@@ -1347,8 +1350,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     clientDest = _context.namingService().lookup(destination);
                 }
             } else {
-                if (_log.shouldInfo())
-                    _log.info("lookup hostname " + destination);
+                //if (_log.shouldDebug())
+                //    _log.debug("lookup hostname " + destination);
                 clientDest = _context.namingService().lookup(destination);
             }
 
@@ -1447,11 +1450,23 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             // this should still be quite effective.
             if (i2ps == null || i2ps.isClosed() ||
                 remotePort != i2ps.getPort() ||
-                !clientDest.equals(i2ps.getPeerDestination())) {
+                !clientDest.equals(i2ps.getPeerDestination()) ||
+                i2ps.getInputStream().available() > 0) {
                 if (i2ps != null) {
-                    if (_log.shouldInfo())
-                        _log.info("Old socket closed or different dest/port, opening new one");
-                    try { i2ps.close(); } catch (IOException ioe) {}
+                    int avail = i2ps.getInputStream().available();
+                    if (avail > 0) {
+                        // server side bug workaround?
+                        if (_log.shouldWarn()) {
+                            byte[] tmp = new byte[avail];
+                            i2ps.getInputStream().read(tmp);
+                            _log.warn("Resetting old socket with unread data: " + avail + '\n' + net.i2p.util.HexDump.dump(tmp));
+                        }
+                        try { i2ps.reset(); } catch (IOException ioe) {}
+                    } else {
+                        if (_log.shouldInfo())
+                            _log.info("Old socket closed or different dest/port, opening new one");
+                        try { i2ps.close(); } catch (IOException ioe) {}
+                    }
                 }
                 Properties opts = new Properties();
                 //opts.setProperty("i2p.streaming.inactivityTimeout", ""+120*1000);

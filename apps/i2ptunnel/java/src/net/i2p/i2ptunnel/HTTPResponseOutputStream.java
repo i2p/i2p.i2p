@@ -210,9 +210,18 @@ class HTTPResponseOutputStream extends FilterOutputStream {
             if (data[i] == NL) {
                 if (lastEnd == -1) {
                     String responseLine = DataHelper.getUTF8(data, 0, i+1); // includes NL
-                    responseLine = (responseLine.trim() + "\r\n");
+                    if (responseLine.charAt(0) != 'H') {
+                        // corrupt, no HTTP/x.x response
+                        if (_log.shouldWarn())
+                            _log.warn("Bad HTTP Response:\n" + net.i2p.util.HexDump.dump(data, 0, valid));
+                        _keepAliveIn = false;
+                        _keepAliveOut = false;
+                        throw new IOException("Bad HTTP Response: " + responseLine);
+                    }
+                    responseLine = responseLine.trim();
                     if (_log.shouldInfo())
-                        _log.info("Response: " + responseLine.trim());
+                        _log.info("Response: " + responseLine);
+                    responseLine = responseLine + "\r\n";
                     // Persistent conn requires HTTP/1.1
                     if (!responseLine.startsWith("HTTP/1.1 ")) {
                         _keepAliveIn = false;
