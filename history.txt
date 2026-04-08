@@ -1,5 +1,16 @@
+2026-04-04 zzz
+ * i2ptunnel: Catch corrupt HTTP responses sooner
+
+2026-04-02 zzz
+ * GeoIP 2026-04-01
+
+2026-03-31 zzz
+ * Console: Add language selection presence to translation report
+
 2026-03-27 zzz
- * SAM: Use session for b32 lookups if available
+ * SAM:
+   - Use session for b32 lookups if available
+   - Error message for NAMING LOOKUP NAME=ME out-of-session
 
 2026-03-25 zzz
  * I2CP: Fix LS2 options not being updated on subsession
