@@ -2422,7 +2422,7 @@
     <target name="findbugs" depends="build2, buildUtilityJar">
         <echo message="Starting findbugs, this will take a while..." />
         <!-- ref: https://github.com/spotbugs/spotbugs/issues/148 -->
-        <echo message="If this doesn't work with Java 9+. try Java 8" />
+        <echo message="This probably won't work. try 'ant spotbugs'" />
         <exec executable="nice" failonerror="true">
             <arg value="findbugs"/>
             <arg value="-textui"/>
@@ -2461,6 +2461,46 @@
         </exec>
         <echo message="Findbugs output stored in i2p.fba" />
         <echo message="Now run: findbugs i2p.fba" />
+    </target>
+
+    <target name="spotbugs" depends="build2, buildUtilityJar">
+        <echo message="Starting spotbugs, this will take a while..." />
+        <exec executable="nice" failonerror="true">
+            <arg value="spotbugs"/>
+            <arg value="-textui"/>
+            <arg value="-projectName"/>
+            <arg value="i2p"/>
+            <arg value="-sortByClass"/>
+            <arg value="-xml=spotbugs.xml"/>
+            <arg value="-auxclasspath"/>
+            <arg value="build/commons-el.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:build/jrobin.jar:installer/lib/wrapper/all/wrapper.jar:apps/susidns/src/lib/standard.jar:apps/susidns/src/lib/jstl.jar"/>
+            <arg value="-sourcepath"/>
+            <arg value="apps/addressbook/java/src/:apps/desktopgui/src:apps/i2pcontrol/java:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/imagegen/identicon/core/src/main/java:apps/imagegen/imagegen/webapp/src/main/java:apps/imagegen/zxing/core/src/main/java:apps/jetty/java/src:apps/jrobin/java/src:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/:installer/java/src"/>
+            <!-- start of the files to be analyzed -->
+            <arg value="build/addressbook.jar"/>
+            <arg value="build/i2p.jar"/>
+            <arg value="build/i2psnark.jar"/>
+            <arg value="build/i2psnark.war"/>
+            <arg value="build/i2ptunnel.jar"/>
+            <arg value="build/i2ptunnel.war"/>
+            <arg value="build/imagegen.war"/>
+            <arg value="build/jetty-i2p.jar"/>
+            <arg value="build/jrobin.jar"/>
+            <arg value="build/jsonrpc.war"/>
+            <arg value="build/mstreaming.jar"/>
+            <arg value="build/router.jar/"/>
+            <arg value="build/desktopgui.jar"/>
+            <arg value="build/routerconsole.jar"/>
+            <arg value="build/routerconsole.war"/>
+            <arg value="build/sam.jar"/>
+            <arg value="build/streaming.jar"/>
+            <arg value="build/susidns.war"/>
+            <arg value="build/susimail.war"/>
+            <arg value="build/systray.jar"/>
+            <arg value="build/utility.jar"/>
+        </exec>
+        <echo message="Spotbugs output stored in spotbugs.xml" />
+        <echo message="Now run: spotbugs -loadBugs spotbugs.xml" />
     </target>
 
     <!-- this is the same dependency as pkg, but with updater200 in the middle,
