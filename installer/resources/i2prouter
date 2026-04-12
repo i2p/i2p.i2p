@@ -719,13 +719,13 @@ fi
 
 prepAdditionalParams() {
     ADDITIONAL_PARA=""
-    if [ -n "$PASS_THROUGH" ] ; then
-        ADDITIONAL_PARA="--"
-    fi
-    while [ -n "$1" ] ; do
-        ADDITIONAL_PARA="$ADDITIONAL_PARA \"$1\""
-        shift
-    done
+    #if [ -n "$PASS_THROUGH" ] ; then
+    #    ADDITIONAL_PARA="--"
+    #fi
+    #while [ -n "$1" ] ; do
+    #    ADDITIONAL_PARA="$ADDITIONAL_PARA \"$1\""
+    #    shift
+    #done
 }
 
 checkUser() {
