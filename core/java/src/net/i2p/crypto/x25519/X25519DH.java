@@ -24,7 +24,7 @@ public class X25519DH {
      *
      * @param pub MUST have MSB high bit cleared, i.e. pub.getData()[31] &amp; 0x80 == 0
      * @return ECIES_X25519
-     * @throws IllegalArgumentException if not ECIES_X25519
+     * @throws IllegalArgumentException if not ECIES_X25519 or on low-order input see RFC 7748
      */
     public static SessionKey dh(PrivateKey priv, PublicKey pub) {
         if (priv.getType() != TYPE || pub.getType() != TYPE)

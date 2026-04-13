@@ -471,6 +471,7 @@ public final class Curve25519 {
 	 * @param publicKey The public key to use in the evaluation, or null
 	 *                  MUST have MSB high bit cleared, i.e. publicKey[31] &amp; 0x80 == 0
 	 * if the base point of the curve should be used.
+	 * @throws IllegalArgumentException on low-order input see RFC 7748
 	 */
 	public static void eval(byte[] result, int offset, byte[] privateKey, byte[] publicKey)
 	{
@@ -518,6 +519,7 @@ public final class Curve25519 {
 		    state.mul(state.x_2, state.x_2, state.z_3);
 
 		    // Convert x_2 into little-endian in the result buffer.
+		    byte b = 0;
 		    for (int index = 0; index < 32; ++index) {
 		    	int bit = (index * 8) % 26;
 		    	int word = (index * 8) / 26;
@@ -525,7 +527,10 @@ public final class Curve25519 {
 		    		result[offset + index] = (byte)(state.x_2[word] >> bit);
 		    	else
 		    		result[offset + index] = (byte)((state.x_2[word] >> bit) | (state.x_2[word + 1] << (26 - bit)));
+			b |= result[offset + index];
 		    }
+		    if (b == 0)
+			throw new IllegalArgumentException("low order input RFC 7748");
 		} finally {
 			// Clean up all temporary state before we exit.
 			state.destroy();

@@ -246,7 +246,7 @@ public final class ElGamalEngine {
 
         // we reuse buf here for the calculated hash
         _context.sha().calculateHash(rv, 0, payloadLen, buf, 0);
-        boolean ok = DataHelper.eq(buf, 0, val, i + 1, Hash.HASH_LENGTH);
+        boolean ok = DataHelper.eqCT(buf, 0, val, i + 1, Hash.HASH_LENGTH);
         SimpleByteCache.release(buf);
         
         long end = _context.clock().now();

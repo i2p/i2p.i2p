@@ -90,7 +90,7 @@ public final class HMAC256Generator extends HMACGenerator {
                           byte origMAC[], int origMACOffset, int origMACLength) {
         byte calc[] = acquireTmp();
         calculate(key, curData, curOffset, curLength, calc, 0);
-        boolean eq = DataHelper.eq(calc, 0, origMAC, origMACOffset, origMACLength);
+        boolean eq = DataHelper.eqCT(calc, 0, origMAC, origMACOffset, origMACLength);
         releaseTmp(calc);
         return eq;
     }
