@@ -1,3 +1,11 @@
+2026-04-12 zzz
+ * Crypto:
+   - Use constant-time comparison in ElG decrypt and HMAC verification
+   - Check for zero output in X25519 DH as recommmended by RFC 7748
+
+2026-04-12 zzz
+ * Install: Disable add'l params to i2prouter script (GH #135)
+
 2026-04-04 zzz
  * i2ptunnel: Catch corrupt HTTP responses sooner
 
