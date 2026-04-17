@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the i2p package.
-# 
+#
 # Translators:
 # Shpetim <shpetim@privacysolutions.no>, 2014
 # Shpetim <shpetim@privacysolutions.no>, 2014
@@ -13,10 +13,10 @@ msgstr ""
 "PO-Revision-Date: 2018-02-12 06:55+0000\n"
 "Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/otf/I2P/language/sq/)\n"
+"Language: sq\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sq\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. Type: boolean
@@ -31,7 +31,9 @@ msgstr "A duhet vënë në punë rrugëzuesi I2P gjatë nisjes?"
 msgid ""
 "The I2P router can be run as a daemon that starts automatically when your "
 "computer boots up. This is the recommended configuration."
-msgstr "Rrugëzuesi I2P mund të xhirohet si një demon që vihet vetvetiu në punë gjatë nisjes së kompjuterit tuaj. Ky është formësimi i këshilluar."
+msgstr ""
+"Rrugëzuesi I2P mund të xhirohet si një demon që vihet vetvetiu në punë gjatë "
+"nisjes së kompjuterit tuaj. Ky është formësimi i këshilluar."
 
 #. Type: string
 #. Description
@@ -43,11 +45,15 @@ msgstr "Përdorues demon I2P:"
 #. Description
 #: ../i2p.templates:3001
 msgid ""
-"By default I2P is configured to run under the account i2psvc when running as"
-" a daemon. To use an **existing** I2P profile you may enter a different "
-"account name here. For example, if your previous I2P installation is at "
-"/home/user/i2p, you may enter 'user' here."
-msgstr "Si parazgjedhje, I2P-ja formësohet të xhirojë nën llogarinë i2psvc, kur xhirohet si demon. Për të përdorur një profil I2P **ekzistues** mund të jepni këtu emrin e një llogarie tjetër. Për shembull, nëse instalimi juaj i mëparshëm i I2P-së gjendet te /home/user/i2p, këtu mund të jepni 'user'."
+"By default I2P is configured to run under the account i2psvc when running as "
+"a daemon. To use an **existing** I2P profile you may enter a different "
+"account name here. For example, if your previous I2P installation is at /"
+"home/user/i2p, you may enter 'user' here."
+msgstr ""
+"Si parazgjedhje, I2P-ja formësohet të xhirojë nën llogarinë i2psvc, kur "
+"xhirohet si demon. Për të përdorur një profil I2P **ekzistues** mund të "
+"jepni këtu emrin e një llogarie tjetër. Për shembull, nëse instalimi juaj i "
+"mëparshëm i I2P-së gjendet te /home/user/i2p, këtu mund të jepni 'user'."
 
 #. Type: string
 #. Description
@@ -55,7 +61,10 @@ msgstr "Si parazgjedhje, I2P-ja formësohet të xhirojë nën llogarinë i2psvc,
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "Shumë e rëndësishme: Nëse këtu jepet një përdorues tjetër nga ai parazgjedhje 'i2psvc', emri i përdoruesit i zgjedhur *DUHET* të ekzistojë tashmë."
+msgstr ""
+"Shumë e rëndësishme: Nëse këtu jepet një përdorues tjetër nga ai "
+"parazgjedhje 'i2psvc', emri i përdoruesit i zgjedhur *DUHET* të ekzistojë "
+"tashmë."
 
 #. Type: string
 #. Description
@@ -75,7 +84,9 @@ msgstr "Si parazgjedhje, I2P-ja do të lejohet të përdorë deri në 128MB RAM.
 msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
-msgstr "Rrugëzuesve <em>high bandwidth</em>, si dhe rrugëzuesve me një numër të madh rrëkesh / shtojcash aktive, mund t’u duhet kjo vlerë më e madhe."
+msgstr ""
+"Rrugëzuesve <em>high bandwidth</em>, si dhe rrugëzuesve me një numër të madh "
+"rrëkesh / shtojcash aktive, mund t’u duhet kjo vlerë më e madhe."
 
 #. Type: boolean
 #. Description
@@ -89,4 +100,7 @@ msgstr "A duhet kufizuar demoni I2P me AppArmor-in?"
 msgid ""
 "With this option enabled I2P will be sandboxed with AppArmor, restricting "
 "which files and directories may be accessed by I2P."
-msgstr "Me këtë mundësi të aktivizuar, I2P-ja do të funksionojë e kufizuar nga AppArmor-i, kufizim që ka të bëjë me se te cilat kartela dhe drejtori mund hyjë I2P-ja."
+msgstr ""
+"Me këtë mundësi të aktivizuar, I2P-ja do të funksionojë e kufizuar nga "
+"AppArmor-i, kufizim që ka të bëjë me se te cilat kartela dhe drejtori mund "
+"hyjë I2P-ja."

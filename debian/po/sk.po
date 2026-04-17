@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Jakub Srna <jaksrn@gmail.com>, 2014
 # ondy, 2015
@@ -9,15 +9,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2015-02-18 22:14+0000\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2017-11-12 14:01+0000\n"
 "PO-Revision-Date: 2017-06-30 21:32+0000\n"
 "Last-Translator: ondy\n"
 "Language-Team: Slovak (http://www.transifex.com/otf/I2P/language/sk/)\n"
+"Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sk\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #. Type: boolean
@@ -32,7 +32,9 @@ msgstr "Mal by sa I2P router spustiť pri boote?"
 msgid ""
 "The I2P router can be run as a daemon that starts automatically when your "
 "computer boots up. This is the recommended configuration."
-msgstr "I2P router sa dá spustiť ako daemon pri boote vášho počítača. Táto konfigurácia je odporúčaná."
+msgstr ""
+"I2P router sa dá spustiť ako daemon pri boote vášho počítača. Táto "
+"konfigurácia je odporúčaná."
 
 #. Type: string
 #. Description
@@ -44,11 +46,15 @@ msgstr "I2P daemon užívateľ:"
 #. Description
 #: ../i2p.templates:3001
 msgid ""
-"By default I2P is configured to run under the account i2psvc when running as"
-" a daemon. To use an **existing** I2P profile you may enter a different "
-"account name here. For example, if your previous I2P installation is at "
-"/home/user/i2p, you may enter 'user' here."
-msgstr "I2P je predvolene nastavený tak, aby v čase, keď je spustený ako daemon, bol pod účom i2psvc. Pre použitie **existujúceho** I2P profilu môžete zadať iný názov účtu. Napríklad, ak sa vaša predchádzajúca inštalácia I2P nachádza v /home/user/i2p, môžete sem zadať 'user'."
+"By default I2P is configured to run under the account i2psvc when running as "
+"a daemon. To use an **existing** I2P profile you may enter a different "
+"account name here. For example, if your previous I2P installation is at /"
+"home/user/i2p, you may enter 'user' here."
+msgstr ""
+"I2P je predvolene nastavený tak, aby v čase, keď je spustený ako daemon, bol "
+"pod účom i2psvc. Pre použitie **existujúceho** I2P profilu môžete zadať iný "
+"názov účtu. Napríklad, ak sa vaša predchádzajúca inštalácia I2P nachádza v /"
+"home/user/i2p, môžete sem zadať 'user'."
 
 #. Type: string
 #. Description
@@ -56,7 +62,9 @@ msgstr "I2P je predvolene nastavený tak, aby v čase, keď je spustený ako dae
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "Veľmi dôležité: Ak užívateľ, ktorý je sem zadaný, je iný ako predvolený 'i2psvc', zvolené užívateľské meno *MUSÍ* už existovať. "
+msgstr ""
+"Veľmi dôležité: Ak užívateľ, ktorý je sem zadaný, je iný ako predvolený "
+"'i2psvc', zvolené užívateľské meno *MUSÍ* už existovať. "
 
 #. Type: string
 #. Description
@@ -76,12 +84,16 @@ msgstr "Predvolene bude môcť I2P použiť najviac 128MB RAM."
 msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
-msgstr "Routre s vysokou šírkou pásma, rovnako aj routre s veľa aktívnymi torrentmi / pluginmi, môžu potrebovať zvýšenie tejto hodnoty."
+msgstr ""
+"Routre s vysokou šírkou pásma, rovnako aj routre s veľa aktívnymi "
+"torrentmi / pluginmi, môžu potrebovať zvýšenie tejto hodnoty."
 
 #. Type: boolean
 #. Description
 #: ../i2p.templates:5001
-msgid "Run I2P daemon confined with AppArmor"
+#, fuzzy
+#| msgid "Run I2P daemon confined with AppArmor"
+msgid "Should the I2P daemon be confined with AppArmor?"
 msgstr "Spustiť I2P daemon s obmedzením pomocou AppArmor"
 
 #. Type: boolean
@@ -90,4 +102,6 @@ msgstr "Spustiť I2P daemon s obmedzením pomocou AppArmor"
 msgid ""
 "With this option enabled I2P will be sandboxed with AppArmor, restricting "
 "which files and directories may be accessed by I2P."
-msgstr "Povolením tejto možnosti I2P bude v bežať v sandboxe pomocou AppArmor, ktorý vymedzí súbory a priečinky, ku ktorým môže I2P pristupovať."
+msgstr ""
+"Povolením tejto možnosti I2P bude v bežať v sandboxe pomocou AppArmor, ktorý "
+"vymedzí súbory a priečinky, ku ktorým môže I2P pristupovať."

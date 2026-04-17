@@ -2,7 +2,7 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the susimail package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-# 
+#
 # Translators:
 # blabla, 2011
 # blabla <blabla@trash-mail.com>, 2014
@@ -21,10 +21,10 @@ msgstr ""
 "PO-Revision-Date: 2011-03-11 22:21+0000\n"
 "Last-Translator: Ettore Atalan <atalanttore@googlemail.com>, 2017,2025\n"
 "Language-Team: German (http://app.transifex.com/otf/I2P/language/de/)\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: src/src/i2p/susi/webmail/MailCache.java:551
@@ -97,9 +97,10 @@ msgstr "unbekannt"
 
 #: src/src/i2p/susi/webmail/WebMail.java:638
 msgid ""
-"To protect your privacy, SusiMail has blocked remote content in this "
-"message."
-msgstr "Zum Schutz Ihrer Privatsphäre hat SusiMail entfernte Inhalte in dieser Nachricht blockiert."
+"To protect your privacy, SusiMail has blocked remote content in this message."
+msgstr ""
+"Zum Schutz Ihrer Privatsphäre hat SusiMail entfernte Inhalte in dieser "
+"Nachricht blockiert."
 
 #: src/src/i2p/susi/webmail/WebMail.java:639
 msgid "Enable javascript for improved display of this message."
@@ -271,7 +272,9 @@ msgstr "Keine Nachrichten zum Löschen markiert"
 #: src/src/i2p/susi/webmail/WebMail.java:1990
 #, java-format
 msgid "Host unchanged. Edit configuration file {0} to change host."
-msgstr "Server nicht geändert. Bearbeiten Sie die Konfigurationsdatei {0} um den Server zu ändern."
+msgstr ""
+"Server nicht geändert. Bearbeiten Sie die Konfigurationsdatei {0} um den "
+"Server zu ändern."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2010
 msgid "Configuration saved"
@@ -429,13 +432,10 @@ msgstr "Anhänge"
 msgid "Delete selected attachments"
 msgstr "Selektierte Anhänge löschen"
 
-#. boolean fixed = Boolean.parseBoolean(Config.getProperty(
-#. CONFIG_PORTS_FIXED, "true" ));
+#. boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_PORTS_FIXED, "true" ));
 #. String host = Config.getProperty(CONFIG_HOST, DEFAULT_HOST);
-#. String pop3 = Config.getProperty(CONFIG_PORTS_POP3,
-#. Integer.toString(DEFAULT_POP3PORT));
-#. String smtp = Config.getProperty(CONFIG_PORTS_SMTP,
-#. Integer.toString(DEFAULT_SMTPPORT));
+#. String pop3 = Config.getProperty(CONFIG_PORTS_POP3, Integer.toString(DEFAULT_POP3PORT));
+#. String smtp = Config.getProperty(CONFIG_PORTS_SMTP, Integer.toString(DEFAULT_SMTPPORT));
 #: src/src/i2p/susi/webmail/WebMail.java:3363
 msgid "Email Login"
 msgstr "Email LogIn"
@@ -632,7 +632,8 @@ msgstr "Mail Sever Login fehlgeschlagen, falscher Benutzername oder Passwort"
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:749
 msgid "Logout and then login again with the correct username and password."
-msgstr "Ausloggen und neu einloggen mit dem korrektem Benutzernamen und Passwort."
+msgstr ""
+"Ausloggen und neu einloggen mit dem korrektem Benutzernamen und Passwort."
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1238
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1240

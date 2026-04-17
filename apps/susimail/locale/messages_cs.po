@@ -2,7 +2,7 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the susimail package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-# 
+#
 # Translators:
 # A5h8d0wf0x <littleslyfoxie28@gmail.com>, 2014
 # slrslr, 2023-2024
@@ -17,11 +17,12 @@ msgstr ""
 "PO-Revision-Date: 2011-03-11 22:21+0000\n"
 "Last-Translator: slrslr, 2023-2024\n"
 "Language-Team: Czech (http://app.transifex.com/otf/I2P/language/cs/)\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: cs\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
+"<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
 #: src/src/i2p/susi/webmail/MailCache.java:551
 #: src/src/i2p/susi/webmail/WebMail.java:2626
@@ -95,9 +96,9 @@ msgstr "neznámý"
 
 #: src/src/i2p/susi/webmail/WebMail.java:638
 msgid ""
-"To protect your privacy, SusiMail has blocked remote content in this "
-"message."
-msgstr "Kvůli ochraně vašeho soukromí SusiMail zablokoval vzdálený obsah této zprávy."
+"To protect your privacy, SusiMail has blocked remote content in this message."
+msgstr ""
+"Kvůli ochraně vašeho soukromí SusiMail zablokoval vzdálený obsah této zprávy."
 
 #: src/src/i2p/susi/webmail/WebMail.java:639
 msgid "Enable javascript for improved display of this message."
@@ -431,13 +432,10 @@ msgstr "Přílohy"
 msgid "Delete selected attachments"
 msgstr "Smazat vybrané přílohy"
 
-#. boolean fixed = Boolean.parseBoolean(Config.getProperty(
-#. CONFIG_PORTS_FIXED, "true" ));
+#. boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_PORTS_FIXED, "true" ));
 #. String host = Config.getProperty(CONFIG_HOST, DEFAULT_HOST);
-#. String pop3 = Config.getProperty(CONFIG_PORTS_POP3,
-#. Integer.toString(DEFAULT_POP3PORT));
-#. String smtp = Config.getProperty(CONFIG_PORTS_SMTP,
-#. Integer.toString(DEFAULT_SMTPPORT));
+#. String pop3 = Config.getProperty(CONFIG_PORTS_POP3, Integer.toString(DEFAULT_POP3PORT));
+#. String smtp = Config.getProperty(CONFIG_PORTS_SMTP, Integer.toString(DEFAULT_SMTPPORT));
 #: src/src/i2p/susi/webmail/WebMail.java:3363
 msgid "Email Login"
 msgstr "E-mail Login"
@@ -630,11 +628,14 @@ msgstr "Žádná odpověď od serveru"
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:747
 msgid "Mail server login failed, wrong username or password."
-msgstr "Přihlášení k Mail serveru selhalo, nesprávné uživatelské jméno nebo heslo."
+msgstr ""
+"Přihlášení k Mail serveru selhalo, nesprávné uživatelské jméno nebo heslo."
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:749
 msgid "Logout and then login again with the correct username and password."
-msgstr "Odhlaste se a znovu se přihlaste pomocí správného uživatelského jména a hesla."
+msgstr ""
+"Odhlaste se a znovu se přihlaste pomocí správného uživatelského jména a "
+"hesla."
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1238
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1240

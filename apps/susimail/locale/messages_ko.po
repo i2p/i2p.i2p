@@ -2,7 +2,7 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the susimail package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-# 
+#
 # Translators:
 # HelloKS <kqwe1859@gmail.com>, 2017
 # Sehun Ahn, 2026
@@ -12,14 +12,17 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-27 13:00+0000\n"
-"PO-Revision-Date: 2011-03-11 22:21+0000\n"
-"Last-Translator: Sehun Ahn, 2026\n"
-"Language-Team: Korean (http://app.transifex.com/otf/I2P/language/ko/)\n"
+"PO-Revision-Date: 2026-03-21 17:31+0000\n"
+"Last-Translator: on9686 <on9686@users.noreply.localizationlab.weblate.cloud>"
+"\n"
+"Language-Team: Korean <https://localizationlab.weblate.cloud/projects/i2p/"
+"susimail/ko/>\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.16.2\n"
 
 #: src/src/i2p/susi/webmail/MailCache.java:551
 #: src/src/i2p/susi/webmail/WebMail.java:2626
@@ -36,7 +39,7 @@ msgstr "Email"
 #: src/src/i2p/susi/webmail/MailPart.java:336
 #, java-format
 msgid "No encoder found for encoding \\''{0}\\''."
-msgstr "인코딩 \\''{0}\\''에 맞는 인코더가 없습니다"
+msgstr "인코딩 \\''{0}\\''에 맞는 인코더가 없습니다."
 
 #. tagged in WebMail
 #: src/src/i2p/susi/webmail/Sorters.java:124
@@ -54,7 +57,7 @@ msgstr "전달:"
 #. MailDir-like
 #: src/src/i2p/susi/webmail/WebMail.java:222
 msgid "Drafts"
-msgstr "Drafts"
+msgstr "초안"
 
 #. MailDir-like
 #: src/src/i2p/susi/webmail/WebMail.java:223
@@ -64,7 +67,7 @@ msgstr "보낸 이메일"
 #. MailDir-like
 #: src/src/i2p/susi/webmail/WebMail.java:224
 msgid "Trash"
-msgstr "Trash"
+msgstr "휴지통"
 
 #. MailDir-like
 #: src/src/i2p/susi/webmail/WebMail.java:225
@@ -74,7 +77,7 @@ msgstr "대량 메일"
 #. untranslated, translate on use
 #: src/src/i2p/susi/webmail/WebMail.java:229
 msgid "Inbox"
-msgstr "Inbox"
+msgstr "받은 메일함"
 
 #: src/src/i2p/susi/webmail/WebMail.java:555
 msgid "View email as HTML"
@@ -90,13 +93,13 @@ msgstr "알수없는"
 
 #: src/src/i2p/susi/webmail/WebMail.java:638
 msgid ""
-"To protect your privacy, SusiMail has blocked remote content in this "
-"message."
-msgstr "프라이버시 보호를 위해 SusiMail은 이 메시지의 원격 콘텐츠를 차단했습니다."
+"To protect your privacy, SusiMail has blocked remote content in this message."
+msgstr ""
+"프라이버시 보호를 위해 SusiMail은 이 메시지의 원격 콘텐츠를 차단했습니다."
 
 #: src/src/i2p/susi/webmail/WebMail.java:639
 msgid "Enable javascript for improved display of this message."
-msgstr "이 메시지 표시 개선을 위해 javascript 활성화"
+msgstr "이 메시지 표시 개선을 위해 javascript 활성화."
 
 #: src/src/i2p/susi/webmail/WebMail.java:665
 #, java-format
@@ -263,7 +266,9 @@ msgstr "삭제하려는 메세지 없음."
 #: src/src/i2p/susi/webmail/WebMail.java:1990
 #, java-format
 msgid "Host unchanged. Edit configuration file {0} to change host."
-msgstr "호스트가 변경되지 않았습니다. 호스트를 변경하려면 구성 파일 {0}을 편집하십시오."
+msgstr ""
+"호스트가 변경되지 않았습니다. 호스트를 변경하려면 구성 파일 {0}을 편집하십시"
+"오."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2010
 msgid "Configuration saved"
@@ -338,7 +343,7 @@ msgstr "올바른 보낸이 주소 없음."
 #: src/src/i2p/susi/webmail/WebMail.java:3027
 #, java-format
 msgid "Found no valid address in \\''{0}\\''."
-msgstr " \\''{0}\\''에 올바른 주소 없음."
+msgstr "\\''{0}\\''에 올바른 주소 없음."
 
 #: src/src/i2p/susi/webmail/WebMail.java:3041
 msgid "No recipients found."
@@ -396,11 +401,11 @@ msgstr "수취자:"
 #: src/src/i2p/susi/webmail/WebMail.java:3320
 #: src/src/i2p/susi/webmail/WebMail.java:3776
 msgid "Cc"
-msgstr "Cc"
+msgstr "참조"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3321
 msgid "Bcc"
-msgstr "Bcc"
+msgstr "숨은 참조"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3322
 #: src/src/i2p/susi/webmail/WebMail.java:3471
@@ -420,13 +425,10 @@ msgstr "첨부파일"
 msgid "Delete selected attachments"
 msgstr "선택한 첨부파일 삭제"
 
-#. boolean fixed = Boolean.parseBoolean(Config.getProperty(
-#. CONFIG_PORTS_FIXED, "true" ));
+#. boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_PORTS_FIXED, "true" ));
 #. String host = Config.getProperty(CONFIG_HOST, DEFAULT_HOST);
-#. String pop3 = Config.getProperty(CONFIG_PORTS_POP3,
-#. Integer.toString(DEFAULT_POP3PORT));
-#. String smtp = Config.getProperty(CONFIG_PORTS_SMTP,
-#. Integer.toString(DEFAULT_SMTPPORT));
+#. String pop3 = Config.getProperty(CONFIG_PORTS_POP3, Integer.toString(DEFAULT_POP3PORT));
+#. String smtp = Config.getProperty(CONFIG_PORTS_SMTP, Integer.toString(DEFAULT_SMTPPORT));
 #: src/src/i2p/susi/webmail/WebMail.java:3363
 msgid "Email Login"
 msgstr "이메일 로그인"
@@ -455,12 +457,12 @@ msgstr "계정 생성"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3405
 msgid "Learn about I2P mail"
-msgstr "I2P 메일이란?"
+msgstr "I2P 메일이란"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3430
 #: src/src/i2p/susi/webmail/WebMail.java:3706
 msgid "New"
-msgstr "New"
+msgstr "신규"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3440
 msgid "Check Mail"
@@ -506,7 +508,7 @@ msgstr "해당 메세지들을 삭제합니까?"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3566
 msgid "Yes, really delete them!"
-msgstr "예"
+msgstr "네, 정말 삭제합니다!"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3569
 msgid "Delete Selected"
@@ -558,7 +560,7 @@ msgstr "이 메세지를 삭제합니까?"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3681
 msgid "Yes, really delete it!"
-msgstr "예"
+msgstr "네, 정말로 삭제합니다!"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3709
 msgid "Reply"

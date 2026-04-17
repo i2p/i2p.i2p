@@ -37,7 +37,7 @@ XMLFILES="\
 ./installer/i2pstandalone.xml \
 ./installer/install.xml \
 ./installer/resources/eepsite/jetty-ssl.xml
-./installer/resources/eepsite/contexts/cgi-context.xml
+./installer/resources/eepsite/contexts/cgi-context.xml.disabled
 ./installer/resources/eepsite/contexts/base-context.xml
 ./installer/resources/eepsite/jetty-rewrite.xml
 ./installer/resources/eepsite/etc/webdefault.xml

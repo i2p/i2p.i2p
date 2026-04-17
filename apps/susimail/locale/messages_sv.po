@@ -2,7 +2,7 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the susimail package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-# 
+#
 # Translators:
 # Anders Nilsson <anders@devode.se>, 2016
 # cacapo <handelsehorisont@gmail.com>, 2015
@@ -18,11 +18,12 @@ msgstr ""
 "POT-Creation-Date: 2024-03-27 13:00+0000\n"
 "PO-Revision-Date: 2011-03-11 22:21+0000\n"
 "Last-Translator: Daniel, 2025\n"
-"Language-Team: Swedish (Sweden) (http://app.transifex.com/otf/I2P/language/sv_SE/)\n"
+"Language-Team: Swedish (Sweden) (http://app.transifex.com/otf/I2P/language/"
+"sv_SE/)\n"
+"Language: sv_SE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sv_SE\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: src/src/i2p/susi/webmail/MailCache.java:551
@@ -95,9 +96,10 @@ msgstr "okänd"
 
 #: src/src/i2p/susi/webmail/WebMail.java:638
 msgid ""
-"To protect your privacy, SusiMail has blocked remote content in this "
-"message."
-msgstr "För att skydda din integritet har SusiMail blockerat fjärrinnehåll i det här meddelandet."
+"To protect your privacy, SusiMail has blocked remote content in this message."
+msgstr ""
+"För att skydda din integritet har SusiMail blockerat fjärrinnehåll i det här "
+"meddelandet."
 
 #: src/src/i2p/susi/webmail/WebMail.java:639
 msgid "Enable javascript for improved display of this message."
@@ -427,13 +429,10 @@ msgstr "Bilagor"
 msgid "Delete selected attachments"
 msgstr "Ta bort valda bilagor"
 
-#. boolean fixed = Boolean.parseBoolean(Config.getProperty(
-#. CONFIG_PORTS_FIXED, "true" ));
+#. boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_PORTS_FIXED, "true" ));
 #. String host = Config.getProperty(CONFIG_HOST, DEFAULT_HOST);
-#. String pop3 = Config.getProperty(CONFIG_PORTS_POP3,
-#. Integer.toString(DEFAULT_POP3PORT));
-#. String smtp = Config.getProperty(CONFIG_PORTS_SMTP,
-#. Integer.toString(DEFAULT_SMTPPORT));
+#. String pop3 = Config.getProperty(CONFIG_PORTS_POP3, Integer.toString(DEFAULT_POP3PORT));
+#. String smtp = Config.getProperty(CONFIG_PORTS_SMTP, Integer.toString(DEFAULT_SMTPPORT));
 #: src/src/i2p/susi/webmail/WebMail.java:3363
 msgid "Email Login"
 msgstr "E-postinloggning"
@@ -626,7 +625,8 @@ msgstr "Inget svar från servern"
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:747
 msgid "Mail server login failed, wrong username or password."
-msgstr "E-postserverinloggningen misslyckades, fel användarnamn eller lösenord."
+msgstr ""
+"E-postserverinloggningen misslyckades, fel användarnamn eller lösenord."
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:749
 msgid "Logout and then login again with the correct username and password."

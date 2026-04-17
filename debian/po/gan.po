@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the i2p package.
-# 
+#
 # Translators:
 msgid ""
 msgstr ""
@@ -10,11 +10,12 @@ msgstr ""
 "POT-Creation-Date: 2017-11-12 14:01+0000\n"
 "PO-Revision-Date: 2011-10-03 21:48+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: Chinese (Gan) (http://app.transifex.com/otf/I2P/language/gan/)\n"
+"Language-Team: Chinese (Gan) (http://app.transifex.com/otf/I2P/language/"
+"gan/)\n"
+"Language: gan\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: gan\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. Type: boolean
@@ -41,11 +42,13 @@ msgstr "I2P進程用戶:"
 #. Description
 #: ../i2p.templates:3001
 msgid ""
-"By default I2P is configured to run under the account i2psvc when running as"
-" a daemon. To use an **existing** I2P profile you may enter a different "
-"account name here. For example, if your previous I2P installation is at "
-"/home/user/i2p, you may enter 'user' here."
-msgstr "I2P后台服务默认以 i2psvc 账户运行。要使用*已有*的I2P配置文件，您可以输入不同的账户名。例如，如果您之前的I2P安装在 /home/user/i2p，此处可输入 'user'。"
+"By default I2P is configured to run under the account i2psvc when running as "
+"a daemon. To use an **existing** I2P profile you may enter a different "
+"account name here. For example, if your previous I2P installation is at /"
+"home/user/i2p, you may enter 'user' here."
+msgstr ""
+"I2P后台服务默认以 i2psvc 账户运行。要使用*已有*的I2P配置文件，您可以输入不同"
+"的账户名。例如，如果您之前的I2P安装在 /home/user/i2p，此处可输入 'user'。"
 
 #. Type: string
 #. Description

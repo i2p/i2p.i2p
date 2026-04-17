@@ -2,7 +2,7 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the susimail package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-# 
+#
 # Translators:
 # Albert, 2018
 # "blabla", 2011
@@ -24,11 +24,12 @@ msgstr ""
 "PO-Revision-Date: 2011-03-11 22:21+0000\n"
 "Last-Translator: JUAN DAVID JARAMILLO ORTIZ <juanda097@protonmail.ch>, 2025\n"
 "Language-Team: Spanish (http://app.transifex.com/otf/I2P/language/es/)\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: es\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 #: src/src/i2p/susi/webmail/MailCache.java:551
 #: src/src/i2p/susi/webmail/WebMail.java:2626
@@ -101,9 +102,10 @@ msgstr "desconocido"
 
 #: src/src/i2p/susi/webmail/WebMail.java:638
 msgid ""
-"To protect your privacy, SusiMail has blocked remote content in this "
-"message."
-msgstr "Para proteger tu privacidad, SusiMail ha bloqueado contenido remoto en este mensaje."
+"To protect your privacy, SusiMail has blocked remote content in this message."
+msgstr ""
+"Para proteger tu privacidad, SusiMail ha bloqueado contenido remoto en este "
+"mensaje."
 
 #: src/src/i2p/susi/webmail/WebMail.java:639
 msgid "Enable javascript for improved display of this message."
@@ -127,7 +129,8 @@ msgstr "Descargar adjunto {0}"
 
 #: src/src/i2p/susi/webmail/WebMail.java:725
 msgid "File is packed into a zipfile for security reasons."
-msgstr "El archivo está empaquetado en un archivo zip por razones de seguridad."
+msgstr ""
+"El archivo está empaquetado en un archivo zip por razones de seguridad."
 
 #: src/src/i2p/susi/webmail/WebMail.java:730
 #, java-format
@@ -276,7 +279,9 @@ msgstr "No hay mensajes marcados para su eliminación."
 #: src/src/i2p/susi/webmail/WebMail.java:1990
 #, java-format
 msgid "Host unchanged. Edit configuration file {0} to change host."
-msgstr "No se cambió el anfitrión. Edite el fichero de configuración {0} para cambiar de anfitrión."
+msgstr ""
+"No se cambió el anfitrión. Edite el fichero de configuración {0} para "
+"cambiar de anfitrión."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2010
 msgid "Configuration saved"
@@ -284,7 +289,8 @@ msgstr "Configuración guardada"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2032
 msgid "Invalid pagesize number, resetting to default value."
-msgstr "Tamaño de página no válida, restableciendo los valores predeterminados."
+msgstr ""
+"Tamaño de página no válida, restableciendo los valores predeterminados."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2501
 #: src/src/i2p/susi/webmail/WebMail.java:3398
@@ -435,13 +441,10 @@ msgstr "Adjuntos"
 msgid "Delete selected attachments"
 msgstr "Borrar adjuntos seleccionados"
 
-#. boolean fixed = Boolean.parseBoolean(Config.getProperty(
-#. CONFIG_PORTS_FIXED, "true" ));
+#. boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_PORTS_FIXED, "true" ));
 #. String host = Config.getProperty(CONFIG_HOST, DEFAULT_HOST);
-#. String pop3 = Config.getProperty(CONFIG_PORTS_POP3,
-#. Integer.toString(DEFAULT_POP3PORT));
-#. String smtp = Config.getProperty(CONFIG_PORTS_SMTP,
-#. Integer.toString(DEFAULT_SMTPPORT));
+#. String pop3 = Config.getProperty(CONFIG_PORTS_POP3, Integer.toString(DEFAULT_POP3PORT));
+#. String smtp = Config.getProperty(CONFIG_PORTS_SMTP, Integer.toString(DEFAULT_SMTPPORT));
 #: src/src/i2p/susi/webmail/WebMail.java:3363
 msgid "Email Login"
 msgstr "Correo de inicio de sesión "
@@ -634,11 +637,15 @@ msgstr "No hay respuesta del servidor"
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:747
 msgid "Mail server login failed, wrong username or password."
-msgstr "Error al iniciar sesión en el servidor de correo, nombre de usuario o contraseña incorrectos."
+msgstr ""
+"Error al iniciar sesión en el servidor de correo, nombre de usuario o "
+"contraseña incorrectos."
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:749
 msgid "Logout and then login again with the correct username and password."
-msgstr "Salga y vuelva a iniciar sesión con el nombre de usuario y la contraseña correctos."
+msgstr ""
+"Salga y vuelva a iniciar sesión con el nombre de usuario y la contraseña "
+"correctos."
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1238
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1240

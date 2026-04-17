@@ -1,193 +1,173 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" dir="ltr">
 <head>
-<title>Serveur Web anonyme I2P</title>
-<link rel="shortcut icon" href="favicon.ico">
-<link rel="stylesheet" type="text/css" href="lib/eepsite.css">
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Serveur Web anonyme I2P</title>
+  <link rel="shortcut icon" href="favicon.ico" />
+  <link rel="stylesheet" type="text/css" href="lib/eepsite.css" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 
    <div class="main">
 
    <div class="langbar">
-<a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
+      <a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
       <a href="index_ar.html"><img src="lib/lang_ar.png" title="عربية" alt="عربية"></a>
       <a href="index_az.html"><img src="lib/az.png" title="Azerbaijani" alt="Azerbaijani"></a>
-      <a href="index_zh.html"><img src="lib/cn.png" title="中文" alt="中文"></a>
-      <a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a>
-      <a href="index_el.html"><img src="lib/gr.png" title="Ελληνικά" alt="Ελληνικά"></a>
-      <a href="index_es.html"><img src="lib/es.png" title="Español" alt="Español"></a>
-      <a href="index_fa.html"><img src="lib/ir.png" title="فارسی" alt="فارسی"></a>
-      <a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
-      <a href="index_hu.html"><img src="lib/hu.png" title="Magyar" alt="Magyar"></a>
-      <a href="index_in.html"><img src="lib/id.png" title="bahasa Indonesia" alt="bahasa Indonesia"></a>
-      <a href="index_it.html"><img src="lib/it.png" title="Italian" alt="Italian"></a>
-      <a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a>
-      <a href="index_pl.html"><img src="lib/pl.png" title="Polish" alt="Polish"></a>
-      <a href="index_pt.html"><img src="lib/pt.png" title="Português" alt="Português"></a>
+      <a href="index_cs.html"><img src="lib/cs.png" title="中文" alt="中文"></a>
+      <a href="index_zh.html"><img src="lib/cn.png" title="Deutsch" alt="Deutsch"></a>
+      <a href="index_zh_TW.html"><img src="lib/tw.png" title="Ελληνικά" alt="Ελληνικά"></a>
+      <a href="index_gan.html"><img src="lib/cn.png" title="Español" alt="Español"></a>
+      <a href="index_de.html"><img src="lib/de.png" title="فارسی" alt="فارسی"></a>
+      <a href="index_el.html"><img src="lib/gr.png" title="Français" alt="Français"></a>
+      <a href="index_es.html"><img src="lib/es.png" title="Magyar" alt="Magyar"></a>
+      <a href="index_fa.html"><img src="lib/ir.png" title="bahasa Indonesia" alt="bahasa Indonesia"></a>
+      <a href="index_fr.html"><img src="lib/fr.png" title="Italian" alt="Italian"></a>
+      <a href="index_hu.html"><img src="lib/hu.png" title="Nederlands" alt="Nederlands"></a>
+      <a href="index_in.html"><img src="lib/id.png" title="Polish" alt="Polish"></a>
+      <a href="index_it.html"><img src="lib/it.png" title="Português" alt="Português"></a>
+      <a href="index_ja.html"><img src="lib/jp.png" title="Română" alt="Română"></a>
+      <a href="index_nl.html"><img src="lib/nl.png" title="Русский" alt="Русский"></a>
+      <a href="index_pl.html"><img src="lib/pl.png" title="Svenska" alt="Svenska"></a>
+      <a href="index_pt.html"><img src="lib/pt.png" title="Turkish" alt="Turkish"></a>
+      <a href="index_pt_BR.html"><img src="lib/br.png" title="Українська" alt="Українська"></a>
       <a href="index_ro.html"><img src="lib/ro.png" title="Română" alt="Română"></a>
       <a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a>
       <a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
       <a href="index_pl.html"><img src="lib/tr.png" title="Turkish" alt="Turkish"></a>
       <a href="index_uk.html"><img src="lib/ua.png" title="Українська" alt="Українська"></a>
-</div>
+    </div>
 
     <h1>Serveur Web anonyme I2P</h1>
 
     <h2>Guide sur les serveurs Web anonymes sur I2P</h2>
 
-    <p>Voici votre propre serveur Web anonyme I2P (habituellement appelé <i>site eep</i>).
-Pour servir votre propre contenu, modifiez simplement les fichiers situés dans le répertoire racine du serveur Web, et le site deviendra public une fois que vous aurez suivi les instructions ci-dessous.</p>
+    <p>
+      Voici votre propre serveur Web anonyme I2P (habituellement appelé <i>site eep</i>). Pour servir votre propre contenu, modifiez simplement les fichiers situés dans le répertoire racine du serveur Web, et le site deviendra public une fois que vous aurez suivi les instructions ci-dessous.
+    </p>
 
-    <p id="dir">Le répertoire racine du serveur Web se trouve dans l’un des emplacements suivants selon le système d’exploitation :</p>
+    <p id="dir">Le répertoire racine du serveur Web se trouve dans l’un des emplacements suivants selon le système d’exploitation :
+    </p>
 
     <ul>
-<li>
-<b>Linux</b><br>
-        Installation normale : <code dir="ltr">~/.i2p/eepsite/docroot/</code><br>
-        Installation par un paquet, exécuté comme service : <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/</code>
-</li>
-      <li>
-<b>Windows</b><br><code dir="ltr">%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
-</li>        
-      <li>
-<b>Mac</b><br><code dir="ltr">/Users/(user)/Library/Application Support/i2p</code>
-</li>
+      <li><b>Linux</b><br> Installation normale : <code dir="ltr">~/.i2p/eepsite/docroot/</code><br> Installation par un paquet, exécuté comme service : <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+      </li>
+      <li><b>Windows</b><br><code dir="ltr">%LOCALAPPDATA%\I2P\eepsite\docroot\</code>
+      </li>
+      <li><b>Mac</b><br><code dir="ltr">/Users/(user)/Library/Application Support/i2p</code>
+      </li>
     </ul>
-<p>Dans I2P, l’on communique avec les services cachés en utilisant une adresse Base32 qui se termine par « .b32.i2p » ou par une destination représentée par une longue chaîne Base64.
-      L’adresse Base32 peut être utilisée comme nom d’hôte, jusqu’à ce que vous lui attribuiez un nom en suivant les instructions ci-dessous.
-      La destination est d’une certaine façon semblable à une adresse IP et elle apparaît sur la <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">page Configuration des services cachés</a>.</p>
 
-    <p>Les instructions ci-dessous expliquent en détail comment attribuer un nom comme « monsite.i2p » à votre site Web et permettre aux autres d’y accéder.
-Vous pouvez accéder à votre site localement à l’adresse <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658</a>.</p>
+    <p>Dans I2P, l’on communique avec les services cachés en utilisant une adresse Base32 qui se termine par « .b32.i2p » ou par une destination représentée par une longue chaîne Base64. L’adresse Base32 peut être utilisée comme nom d’hôte, jusqu’à ce que vous lui attribuiez un nom en suivant les instructions ci-dessous. La destination est d’une certaine façon semblable à une adresse IP et elle apparaît sur la <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">page Configuration des services cachés</a>.
+    </p>
+
+    <p>Les instructions ci-dessous expliquent en détail comment attribuer un nom comme « monsite.i2p » à votre site Web et permettre aux autres d’y accéder. Vous pouvez accéder à votre site localement à l’adresse <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658</a>.
+    </p>
 
     <h2>Mettre en place et annoncer votre service caché</h2>
 
-     <p>Votre serveur Web est exécuté par défaut, mais les autres ne pourront pas y accéder tant que vous n’aurez pas démarré le tunnel de service caché.
-      Une fois que vous aurez démarré le tunnel de votre serveur Web I2P, les autres auront du mal à le trouver.
-      On ne peut y accéder que par la longue destination ou par  l’adresse Base32 plus courte (.b32.i2p), qui est à condensat de la destination.
-      Vous pourriez juste communiquer la destination ou l’adresse Base32, mais heureusement I2P offre un carnet d’adresses et plusieurs moyens faciles d’informer les autres au sujet de votre site Web.
-      Voici des instructions détaillées.</p>
+     <p>Votre serveur Web est exécuté par défaut, mais les autres ne pourront pas y accéder tant que vous n’aurez pas démarré le tunnel de service caché. Une fois que vous aurez démarré le tunnel de votre serveur Web I2P, les autres auront du mal à le trouver. On ne peut y accéder que par la longue destination ou par l’adresse Base32 plus courte (.b32.i2p), qui est à condensat de la destination. Vous pourriez juste communiquer la destination ou l’adresse Base32, mais heureusement I2P offre un carnet d’adresses et plusieurs moyens faciles d’informer les autres au sujet de votre site Web. Voici des instructions détaillées.
+    </p>
 
     <ul>
-<li>Choisissez un nom pour votre site Web (<i>quelque chose</i>.i2p) en utilisant des minuscules.
-Vous pourriez d’abord consulter le <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">carnet d’adresses</a> de votre propre routeur pour vous assurer que le nom n’est pas déjà pris.
-Saisissez le nom de votre site Web sur la <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">page Configuration des services cachés</a> dans le champ « Nom du site Web ».
-Cela remplacera le « monsite.i2p » par défaut.
-Si vous souhaitez aussi que le tunnel de votre serveur Web I2P soit lancé automatiquement lors du démarrage d’I2P, cochez la boîte « Démarrage automatique ».
-Maintenant, votre site Web sera lancé chaque fois que vous démarrerez votre routeur.
-Assurez-vous de cliquer sur « Enregistrer ».</li>
-      <li>Cliquez sur le bouton Démarrer du tunnel de votre serveur Web sur la <a href="http://127.0.0.1:7657/i2ptunnel/">page principale du gestionnaire de services cachés</a>.
-Vous devriez maintenant le voir listé sous « Tunnels locaux » sur la gauche de la <a href="http://127.0.0.1:7657/">console du routeur I2P</a>.
-Votre site Web est maintenant en fonction.</li>
-      <li>Mettez en surbrillance et copiez la destination locale entière sur la <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">page Configuration des services cachés</a>.
-Assurez-vous de tout bien copier, plus de 500 caractères.</li>
-      <li>Saisissez le nom et copiez la destination dans votre <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&amp;filter=none">carnet d’adresses</a>.
-Cliquez sur « Ajouter » pour enregistrer la nouvelle entrée.</li>
-      <li>Dans votre navigateur, saisissez le nom de votre site Web (<i>quelque chose</i>.i2p) et vous devriez revenir tout de suite ici.
-Avec un peu de chance, cela fonctionnera !</li>
-      <li>Avant d’informer le monde entier au sujet de votre nouveau site Web, vous devriez y ajouter du contenu.
-Allez sur le répertoire racine du serveur <a href="#dir">listé ci-dessus</a> et remplacez la page de redirection index.html par votre propre contenu.</li>
+      <li>Choisissez un nom pour votre site Web (<i>quelque chose</i>.i2p) en utilisant des minuscules. Vous pourriez d’abord consulter le <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&filter=none">carnet d’adresses</a> de votre propre routeur pour vous assurer que le nom n’est pas déjà pris. Saisissez le nom de votre site Web sur la <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">page Configuration des services cachés</a> dans le champ « Nom du site Web ». Cela remplacera le « monsite.i2p » par défaut. Si vous souhaitez aussi que le tunnel de votre serveur Web I2P soit lancé automatiquement lors du démarrage d’I2P, cochez la boîte « Démarrage automatique ». Maintenant, votre site Web sera lancé chaque fois que vous démarrerez votre routeur. Assurez-vous de cliquer sur « Enregistrer ».
+      </li>
+      <li>Cliquez sur le bouton Démarrer du tunnel de votre serveur Web sur la <a href="http://127.0.0.1:7657/i2ptunnel/">page principale du gestionnaire de services cachés</a>. Vous devriez maintenant le voir listé sous « Tunnels locaux » sur la gauche de la <a href="http://127.0.0.1:7657/">console du routeur I2P</a>. Votre site Web est maintenant en fonction.
+      </li>
+      <li>Mettez en surbrillance et copiez la destination locale entière sur la <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">page Configuration des services cachés</a>. Assurez-vous de tout bien copier, plus de 500 caractères.
+      </li>
+      <li>Saisissez le nom et copiez la destination dans votre <a href="http://127.0.0.1:7657/susidns/addressbook?book=router&filter=none">carnet d’adresses</a>. Cliquez sur « Ajouter » pour enregistrer la nouvelle entrée.
+      </li>
+      <li>Dans votre navigateur, saisissez le nom de votre site Web (<i>quelque chose</i>.i2p) et vous devriez revenir tout de suite ici. Avec un peu de chance, cela fonctionnera !
+      </li>
+      <li>Avant d’informer le monde entier au sujet de votre nouveau site Web, vous devriez y ajouter du contenu. Allez sur le répertoire racine du serveur <a href="#dir">listé ci-dessus</a> et remplacez la page de redirection index.html par votre propre contenu.
+      </li>
     </ul>
-<p>Le listage des répertoires est activé et vous pouvez donc héberger les fichiers d’un sous-répertoire sans avoir à fournir une page comportant des liens vers ces fichiers.
-Vous pouvez modifier l’apparence du répertoire en fournissant un fichier <a href="lib/jetty-dir.css">jetty-dir.css</a> modifié pour chaque répertoire.
-Le <a href="lib/">sous-répertoire lib</a> présente un style personnalisé.
-Le <a href="lib/resources">sous-répertoire resources</a> présente le style par défaut.
-Si vous avez besoin d’un modèle pour un site simple, vous pouvez librement adapter <a href="pagetemplate.html">cette page</a> et y <a href="lib/">associer du contenu</a>.</p>
+
+    <p>Le listage des répertoires est activé et vous pouvez donc héberger les fichiers d’un sous-répertoire sans avoir à fournir une page comportant des liens vers ces fichiers. Vous pouvez modifier l’apparence du répertoire en fournissant un fichier <a href="lib/jetty-dir.css">jetty-dir.css</a> modifié pour chaque répertoire. Le <a href="lib/">sous-répertoire lib</a> présente un style personnalisé. Le <a href="lib/resources">sous-répertoire resources</a> présente le style par défaut. Si vous avez besoin d’un modèle pour un site simple, vous pouvez librement adapter <a href="pagetemplate.html">cette page</a> et y <a href="lib/">associer du contenu</a>.
+    </p>
 
     <p>Si vous êtes revenu à cette page après avoir modifié le contenu, essayez de vider le cache de votre navigateur Web.</p>
 
     <ul>
-<li>
-<b>Firefox :</b> Options ➜ Vie privé et sécurité ➜ Cookies et données de sites ➜ Effacer les données</li>
-      <li>
-<b>Chrome/Chromium :</b> Paramètres ➜ Paramètres avancés ➜ Confidentialité et sécurité ➜ Effacer les données de navigation</li>
-      <li>
-<b>Opera :</b> Paramètres ➜ Confidentialité ➜ Effacer les données de navigation</li>
+      <li><b>Firefox :</b> Options ➜ Vie privé et sécurité ➜ Cookies et données de sites ➜ Effacer les données</li>
+      <li><b>Chrome/Chromium :</b> Paramètres ➜ Paramètres avancés ➜ Confidentialité et sécurité ➜ Effacer les données de navigation</li>
+      <li><b>Opera :</b> Paramètres ➜ Confidentialité ➜ Effacer les données de navigation</li>
     </ul>
-<h2>Référencer votre propre domaine</h2>
 
-    <p>Il est maintenant temps d'ajouter votre site web à un carnet d'adresse I2P hébergé par un site comme <a href="http://stats.i2p/" target="_blank">stats.i2p</a>.
-Vous devez saisir le nom et la destination de votre site (ou la chaîne d'authentification de référencement) sur un ou plusieurs de ces sites.</p>
-<p>Certains sites de référencement exigent la destination.
-Si c’est le cas, mettez en surbrillance et copiez la destination locale entière sur la <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">page Configuration des services cachés</a>.
-Assurez-vous de tout bien copier, plus de 500 caractères.</p>
-<p>Certains sites de référencement, dont <a href="http://stats.i2p/i2p/addkey.html" target="_blank">stats.i2p</a>, exige la chaîne d’authentification de référencement.
-Vous la trouverez sur la <a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">page d’authentification de référencement</a> en lien à partir de la <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">page Configuration des services cachés</a>.
-Copiez la chaîne d’authentification entière et collez-la sur la page de référencement.
-Assurez-vous de tout bien copier, plus de 500 caractères.
-Décrivez votre site brièvement si le site demande ces renseignements.
-Si votre site est un service HTTP, laissez la case cochée, sinon décochez-la.</p>
-<p>Pour tous les sites de référencement, lisez avec attention les conditions générales de service.
-Cliquez sur le bouton Envoyer.
-Assurez-vous que l’envoi a bien eu lieu.
-Dans la mesure où de nombreux routeurs obtiennent régulièrement des mises à jour du carnet d’adresses de ces sites, dans un délai de quelques heures les autres pourront trouver votre site Web simplement en saisissant votre nom d’hôte dans leur navigateur.</p>
+    <h2>Référencer votre propre domaine</h2>
+
+    <p>Il est maintenant temps d'ajouter votre site web à un carnet d'adresse I2P hébergé par un site comme <a href="http://stats.i2p/" target="_blank">stats.i2p</a>. Vous devez saisir le nom et la destination de votre site (ou la chaîne d'authentification de référencement) sur un ou plusieurs de ces sites.
+    </p><p>Certains sites de référencement exigent la destination. Si c’est le cas, mettez en surbrillance et copiez la destination locale entière sur la <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">page Configuration des services cachés</a>. Assurez-vous de tout bien copier, plus de 500 caractères.
+    </p><p>Certains sites de référencement, dont <a href="http://stats.i2p/i2p/addkey.html" target="_blank">stats.i2p</a>, exige la chaîne d’authentification de référencement. Vous la trouverez sur la <a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">page d’authentification de référencement</a> en lien à partir de la <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">page Configuration des services cachés</a>. Copiez la chaîne d’authentification entière et collez-la sur la page de référencement. Assurez-vous de tout bien copier, plus de 500 caractères. Décrivez votre site brièvement si le site demande ces renseignements. Si votre site est un service HTTP, laissez la case cochée, sinon décochez-la.
+    </p><p>Pour tous les sites de référencement, lisez avec attention les conditions générales de service. Cliquez sur le bouton Envoyer. Assurez-vous que l’envoi a bien eu lieu. Dans la mesure où de nombreux routeurs obtiennent régulièrement des mises à jour du carnet d’adresses de ces sites, dans un délai de quelques heures les autres pourront trouver votre site Web simplement en saisissant votre nom d’hôte dans leur navigateur.</p>
 
     <h2>Ajouter des abonnements à des carnets d’adresses</h2>
 
-    <p>Parlant de mises à jour du carnet d’adresses, le moment est propice pour ajouter d’autres carnets d’adresses à votre propre liste d’abonnements.
-Rendez-vous sur votre <a href="http://127.0.0.1:7657/susidns/subscriptions">page Configuration des abonnements</a> et ajoutez-en un ou plusieurs pour recevoir automatiquement une liste à jour des nouveaux hôtes :</p>
+    <p>Parlant de mises à jour du carnet d’adresses, le moment est propice pour ajouter d’autres carnets d’adresses à votre propre liste d’abonnements. Rendez-vous sur votre <a href="http://127.0.0.1:7657/susidns/subscriptions">page Configuration des abonnements</a> et ajoutez-en un ou plusieurs pour recevoir automatiquement une liste à jour des nouveaux hôtes :
+    </p>
 
     <ul>
-<li>
-<code dir="ltr">http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)</li>
+      <li><code dir="ltr">http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)
+      </li>
     </ul>
-<p>Si vous êtes pressé et ne pouvez pas attendre quelques heures, vous pouvez demander aux autres d’utiliser un service de redirection de d’aide d’adresse de « saut ».
-      Essayez-le d’abord vous-même en saisissant <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i> quelquechose </i>.i2p</code> dans votre navigateur.
-       Une fois que cela fonctionnera, vous pourrez dire aux autres de l’utiliser.</p>
 
-    <p>Certains utilisateurs vérifient la présence de nouveaux sites eep sur des listes de sites Web telles que la <a href="http://identiguy.i2p/" target="_blank">liste d’état de sites eep d’Identiguy</a> ou la <a href="http://no.i2p/browse/" target="_blank">liste d’hôtes actifs de no.i2p</a>, et votre site pourrait ainsi commencer à recevoir du trafic.
-Les façons d’informer les autres utilisateurs sont nombreuses. Voici quelques idées :</p>
+    <p>Si vous êtes pressé et ne pouvez pas attendre quelques heures, vous pouvez demander aux autres d’utiliser un service de redirection de d’aide d’adresse de « saut ». Essayez-le d’abord vous-même en saisissant <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i> quelquechose </i>.i2p</code> dans votre navigateur. Une fois que cela fonctionnera, vous pourrez dire aux autres de l’utiliser.
+    </p>
+
+    <p>Certains utilisateurs vérifient la présence de nouveaux sites eep sur des listes de sites Web telles que la <a href="http://identiguy.i2p/" target="_blank">liste d’état de sites eep d’Identiguy</a> ou la <a href="http://no.i2p/browse/" target="_blank">liste d’hôtes actifs de no.i2p</a>, et votre site pourrait ainsi commencer à recevoir du trafic. Les façons d’informer les autres utilisateurs sont nombreuses. Voici quelques idées :
+    </p>
 
     <ul>
-<li>Publier un message sur le <a href="http://i2pforum.i2p/" target="_blank">forum I2P</a> pour annoncer à tout le monde votre nouveau site Web I2P</li>
-      <li>En parler sur les canaux IRC #i2p ou #i2p-chat</li>
+      <li>Publier un message sur le <a href="http://i2pforum.i2p/" target="_blank">forum I2P</a> pour annoncer à tout le monde votre nouveau site Web I2P
+      </li>
+      <li>En parler sur les canaux IRC #i2p ou #i2p-chat
+      </li>
       <li>L’inscrire sur l’<a href="http://i2pwiki.i2p/index.php?title=Eepsite/Services" target="_blank">index des sites eep du wiki d’I2P</a>
-</li>
+      </li>
     </ul>
-<p>Notez que certains sites recommandent de coller cette très longue destination.
-Vous le pouvez si vous le souhaitez, mais si vous avez référencé avec succès votre nom d’hôte sur un service de référencement, l’avez testé grâce à un service de saut et que vous avez patienté 24 heures pour que la mise à jour du carnet d’adresses se propage aux autres, cela ne devrait pas être nécessaire.</p>
+
+    <p>Notez que certains sites recommandent de coller cette très longue destination. Vous le pouvez si vous le souhaitez, mais si vous avez référencé avec succès votre nom d’hôte sur un service de référencement, l’avez testé grâce à un service de saut et que vous avez patienté 24 heures pour que la mise à jour du carnet d’adresses se propage aux autres, cela ne devrait pas être nécessaire.</p>
 
     <h2>Utiliser un serveur Web de remplacement pour héberger votre site</h2>
 
-    <p>Ce site (et la console du routeur I2P) tourne sur le <a href="https://en.wikipedia.org/wiki/Jetty_(web_server)" target="_blank">serveur Web Jetty</a>, mais vous souhaitez peut-être utiliser un serveur Web différent pour héberger votre contenu.
-Pour conserver l’anonymat, assurez-vous que votre serveur Web est configuré pour n’autoriser que des connexions de l’hôte local (127.0.0.1), et consultez la documentation pour vous assurer aussi que votre serveur Web n’annonce pas des détails qui pourraient compromettre votre anonymat.</p>
+    <p>Ce site (et la console du routeur I2P) tourne sur le <a href="https://en.wikipedia.org/wiki/Jetty_(web_server)" target="_blank">serveur Web Jetty</a>, mais vous souhaitez peut-être utiliser un serveur Web différent pour héberger votre contenu. Pour conserver l’anonymat, assurez-vous que votre serveur Web est configuré pour n’autoriser que des connexions de l’hôte local (127.0.0.1), et consultez la documentation pour vous assurer aussi que votre serveur Web n’annonce pas des détails qui pourraient compromettre votre anonymat.
+    </p>
 
-     <p>Pour configurer votre serveur Web pour l’utiliser sur I2P, vous pouvez soit utiliser le tunnel du serveur Web existant et <a href="http://127.0.0.1:7657/configclients">empêcher l’exécution du serveur Web par défaut</a>, soit créer un nouveau tunnel de serveur HTTP dans le <a href="http://127.0.0.1:7657/i2ptunnelmgr">gestionnaire de services cachés</a>.
-Assurez-vous que le port d’écoute configuré sur le serveur Web (7658 par défaut) est aussi configuré dans les paramètres des services cachés.
-Par exemple, si votre serveur Web écoute par défaut l’adresse 127.0.0.1 port 80, vous devez aussi vous assurer que le port Cible du service, sur la page de paramètres du gestionnaire de services cachés, est aussi configuré sur le port 80.</p> 
+     <p>Pour configurer votre serveur Web pour l’utiliser sur I2P, vous pouvez soit utiliser le tunnel du serveur Web existant et <a href="http://127.0.0.1:7657/configclients">empêcher l’exécution du serveur Web par défaut</a>, soit créer un nouveau tunnel de serveur HTTP dans le <a href="http://127.0.0.1:7657/i2ptunnelmgr">gestionnaire de services cachés</a>. Assurez-vous que le port d’écoute configuré sur le serveur Web (7658 par défaut) est aussi configuré dans les paramètres des services cachés. Par exemple, si votre serveur Web écoute par défaut l’adresse 127.0.0.1 port 80, vous devez aussi vous assurer que le port Cible du service, sur la page de paramètres du gestionnaire de services cachés, est aussi configuré sur le port 80.
+        </p>
 
-        <p>Faites attention, car un serveur Web ou une application Web mal configurés peuvent divulguer des renseignements compromettants tels que votre vraie adresse IP ou des informations détaillées sur le serveur, ce qui pourrait compromettre votre anonymat et aider un pirate.
-Nous vous recommandons d’utiliser le serveur par défaut, à moins que vous ne préfériez assurer votre propre administration du serveur.
-Veuillez vous assurer de la sécurité de votre serveur Web avant de le mettre en ligne.
-Il existe une myriade de guides en ligne, par exemple, si vous cherchez « nginx guide renforcement sécurité » ou « nginx security hardening guide », vous trouverez nombre de guides avec de bonnes recommandations.</p> 
+        <p>Faites attention, car un serveur Web ou une application Web mal configurés peuvent divulguer des renseignements compromettants tels que votre vraie adresse IP ou des informations détaillées sur le serveur, ce qui pourrait compromettre votre anonymat et aider un pirate. Nous vous recommandons d’utiliser le serveur par défaut, à moins que vous ne préfériez assurer votre propre administration du serveur. Veuillez vous assurer de la sécurité de votre serveur Web avant de le mettre en ligne. Il existe une myriade de guides en ligne, par exemple, si vous cherchez « nginx guide renforcement sécurité » ou « nginx security hardening guide », vous trouverez nombre de guides avec de bonnes recommandations.
+        </p>
 
-        <p>Il existe un problème important avec le serveur Web Apache.
-          Les modules Apache <code dir="ltr">mod_status</code> et <code dir="ltr">mod_info</code> sont activés par défaut sur certains systèmes d’exploitation.
-          Ces modules exposent des données internes qui pourraient sérieusement compromettre votre anonymat s’ils sont utilisés sur un réseau anonyme.
-          La façon la plus simple de prévenir ces problèmes est de supprimer les lignes qui appellent ces modules dans le fichier de configuration.</p>
+        <p>Il existe un problème important avec le serveur Web Apache. Les modules Apache <code dir="ltr">mod_status</code> et <code dir="ltr">mod_info</code> sont activés par défaut sur certains systèmes d’exploitation. Ces modules exposent des données internes qui pourraient sérieusement compromettre votre anonymat s’ils sont utilisés sur un réseau anonyme. La façon la plus simple de prévenir ces problèmes est de supprimer les lignes qui appellent ces modules dans le fichier de configuration.
+        </p>
 
     <h2>Assistance supplémentaire</h2>
 
-        <p>Pour toute question, vous trouverez du soutien :</p>
+        <p>Pour toute question, vous trouverez du soutien :
+        </p>
 
         <ul>
-<li>Sur notre chaîne de soutien IRC :<ul>
-<li><a href="irc://irc.freenode.net/i2p">#i2p sur Freenode</a></li>
+          <li>Sur notre chaîne de soutien IRC :
+             <ul>
+                <li><a href="irc://irc.freenode.net/i2p">#i2p sur Freenode</a>
+                </li>
                 <li>En utilisant anonymement votre <a href="irc://127.0.0.1:6668/i2p">tunnel IRC I2P</a> local</li>
              </ul>
-</li>
-<li>Sur le forum du projet <a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>
-</li>
-            <li>Sur le <a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">guide d’hébergement de sites eep du wiki I2P</a>
-</li>
+          </li>
+          <li>Sur le forum du projet <a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>
+          </li>
+          <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">Sur le guide d’hébergement de sites eep du wiki I2P</a>
+          </li>
         </ul>
-<hr>
-<div class="notify">Cette page, le site Web du projet et la console du routeur ont besoin d’être traduits.
 
-Aidez le projet à croître <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank">en vous impliquant</a> ou <a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators" target="_blank">en traduisant</a>.</div>
         <hr>
-</div>
+        <div class="notify">
+          Cette page, le site Web du projet et la console du routeur ont besoin d’être traduits. Aidez le projet à croître <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank">en vous impliquant</a> ou <a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators" target="_blank">en traduisant</a>.
+        </div>
+        <hr>
+
+  </div>
 </body>
 </html>

@@ -3,184 +3,184 @@
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # foo <foo@bar>, 2009.
-# 
+#
 # Translators:
 # zzzi2p, 2019
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-18 13:32+0000\n"
-"PO-Revision-Date: 2019-12-19 14:09+0000\n"
-"Last-Translator: zzzi2p, 2019\n"
-"Language-Team: Korean (https://app.transifex.com/otf/teams/12694/ko/)\n"
+"POT-Creation-Date: 2021-08-11 15:33+0000\n"
+"PO-Revision-Date: 2026-03-21 17:31+0000\n"
+"Last-Translator: on9686 <on9686@users.noreply.localizationlab.weblate.cloud>"
+"\n"
+"Language-Team: Korean <https://localizationlab.weblate.cloud/projects/i2p/"
+"router/ko/>\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.16.2\n"
 
 #. * IPv4 OK, IPv6 OK or disabled or no address
-#: ../java/src/net/i2p/router/CommSystemFacade.java:370
+#: ../java/src/net/i2p/router/CommSystemFacade.java:377
 msgid "OK"
 msgstr "OK"
 
-#: ../java/src/net/i2p/router/CommSystemFacade.java:371
-msgid "IPv4: OK; IPv6: Testing"
-msgstr "IPv4: OK; IPv6: Testing"
-
-#: ../java/src/net/i2p/router/CommSystemFacade.java:372
-msgid "IPv4: OK; IPv6: Firewalled"
-msgstr "IPv4: OK; IPv6: 방화벽있음"
-
-#: ../java/src/net/i2p/router/CommSystemFacade.java:373
-msgid "IPv4: Testing; IPv6: OK"
-msgstr "IPv4: Testing; IPv6: OK"
-
-#: ../java/src/net/i2p/router/CommSystemFacade.java:374
-msgid "IPv4: Firewalled; IPv6: OK"
-msgstr "IPv4: 방화벽있음; IPv6: OK"
-
-#: ../java/src/net/i2p/router/CommSystemFacade.java:375
-msgid "IPv4: Disabled; IPv6: OK"
-msgstr "IPv4: 비활성화; IPv6: OK"
-
-#: ../java/src/net/i2p/router/CommSystemFacade.java:376
-msgid "IPv4: Symmetric NAT; IPv6: OK"
-msgstr "IPv4: 대칭 NAT; IPv6: OK"
-
-#. * IPv4 symmetric NAT, IPv6 firewalled or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:378
-msgid "Symmetric NAT"
-msgstr "대칭 NAT"
+msgid "IPv4: OK; IPv6: Testing"
+msgstr "IPv4: 정상; IPv6: 테스트 중"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:379
-msgid "IPv4: Symmetric NAT; IPv6: Testing"
-msgstr "IPv4: 대칭 NAT; IPv6: Testing"
+msgid "IPv4: OK; IPv6: Firewalled"
+msgstr "IPv4: 정상; IPv6: 방화벽 있음"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:380
-msgid "IPv4: Firewalled; IPv6: Testing"
-msgstr "IPv4: 방화벽있음; IPv6: Testing"
+msgid "IPv4: Testing; IPv6: OK"
+msgstr "IPv4: 테스트 중; IPv6: 정상"
 
-#. * IPv4 firewalled, IPv6 firewalled or disabled or no address
+#: ../java/src/net/i2p/router/CommSystemFacade.java:381
+msgid "IPv4: Firewalled; IPv6: OK"
+msgstr "IPv4: 방화벽 있음; IPv6: 정상"
+
 #: ../java/src/net/i2p/router/CommSystemFacade.java:382
-msgid "Firewalled"
-msgstr "방화벽있음"
+msgid "IPv4: Disabled; IPv6: OK"
+msgstr "IPv4: 비활성화; IPv6: 정상"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:383
-msgid "IPv4: Testing; IPv6: Firewalled"
-msgstr "IPv4: Testing; IPv6: 방화벽있음"
+msgid "IPv4: Symmetric NAT; IPv6: OK"
+msgstr "IPv4: Symmetric NAT; IPv6: 정상"
 
-#: ../java/src/net/i2p/router/CommSystemFacade.java:384
-msgid "IPv4: Disabled; IPv6: Testing"
-msgstr "IPv4: 비활성화; IPv6: Testing"
-
+#. * IPv4 symmetric NAT, IPv6 firewalled or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:385
-msgid "IPv4: Disabled; IPv6: Firewalled"
-msgstr "IPv4: Disabled; IPv6: 방화벽있음"
+msgid "Symmetric NAT"
+msgstr "Symmetric NAT"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:386
+msgid "IPv4: Symmetric NAT; IPv6: Testing"
+msgstr "IPv4: Symmetric NAT; IPv6: 테스트 중"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:387
+msgid "IPv4: Firewalled; IPv6: Testing"
+msgstr "IPv4: 방화벽 있음; IPv6: 테스트 중"
+
+#. * IPv4 firewalled, IPv6 firewalled or disabled or no address
+#: ../java/src/net/i2p/router/CommSystemFacade.java:389
+msgid "Firewalled"
+msgstr "방화벽 있음"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:390
+msgid "IPv4: Testing; IPv6: Firewalled"
+msgstr "IPv4: 테스트 중; IPv6: 방화벽 있음"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:391
+msgid "IPv4: Disabled; IPv6: Testing"
+msgstr "IPv4: 비활성화; IPv6: 테스트 중"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:392
+msgid "IPv4: Disabled; IPv6: Firewalled"
+msgstr "IPv4: 비활성화; IPv6: 방화벽 있음"
+
+#: ../java/src/net/i2p/router/CommSystemFacade.java:393
 msgid "Disconnected"
 msgstr "연결 해제"
 
-#: ../java/src/net/i2p/router/CommSystemFacade.java:387
+#: ../java/src/net/i2p/router/CommSystemFacade.java:394
 msgid "Port Conflict"
 msgstr "포트 충돌"
 
-#: ../java/src/net/i2p/router/CommSystemFacade.java:388
+#: ../java/src/net/i2p/router/CommSystemFacade.java:395
 msgid "Testing"
-msgstr "시험중"
+msgstr "테스트 중"
 
 #. NPE, too early
 #. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
-#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too
-#. low");
+#. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too low");
 #. else
-#: ../java/src/net/i2p/router/RouterThrottleImpl.java:84
-#: ../java/src/net/i2p/router/RouterThrottleImpl.java:142
-#: ../java/src/net/i2p/router/RouterThrottleImpl.java:545
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:85
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:143
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:568
 msgid "Rejecting tunnels: Starting up"
 msgstr "터널 거부중: 시작중"
 
-#: ../java/src/net/i2p/router/RouterThrottleImpl.java:189
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:190
 msgid "Rejecting tunnels: High message delay"
 msgstr "터널 거부중: 높은 메세징 딜레이"
 
-#: ../java/src/net/i2p/router/RouterThrottleImpl.java:202
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:203
 msgid "Rejecting tunnels: Limit reached"
 msgstr "터널 거부중: 한계 도달"
 
-#: ../java/src/net/i2p/router/RouterThrottleImpl.java:241
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:242
 msgid "Rejecting most tunnels: High number of requests"
 msgstr "대부분의 터널 거부중: 많은 수의 요청"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of
-#. tunnels");
-#: ../java/src/net/i2p/router/RouterThrottleImpl.java:243
-#: ../java/src/net/i2p/router/RouterThrottleImpl.java:424
+#. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of tunnels");
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:244
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:447
 msgid "Accepting most tunnels"
 msgstr "대부분의 터널 허가중"
 
-#: ../java/src/net/i2p/router/RouterThrottleImpl.java:245
-#: ../java/src/net/i2p/router/RouterThrottleImpl.java:426
-#: ../java/src/net/i2p/router/RouterThrottleImpl.java:561
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:246
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:449
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:584
 msgid "Accepting tunnels"
 msgstr "터널 허가중"
 
 #. .067KBps
 #. * also limited to 90% - see below
 #. always leave at least 4KBps free when allowing
-#: ../java/src/net/i2p/router/RouterThrottleImpl.java:350
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:351
 msgid "Rejecting tunnels: Bandwidth limit"
 msgstr "터널 거부중: 대역폭 한계"
 
 #. hard to do {0} from here
-#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels:
-#. Bandwidth limit");
-#: ../java/src/net/i2p/router/RouterThrottleImpl.java:420
+#. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels: Bandwidth limit");
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:443
 msgid "Rejecting most tunnels: Bandwidth limit"
 msgstr "대부분의 터널 거부중: 대역폭 제한"
 
-#: ../java/src/net/i2p/router/RouterThrottleImpl.java:550
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:573
 msgid "Rejecting tunnels: Shutting down"
 msgstr "터널 거부중: 종료중"
 
-#: ../java/src/net/i2p/router/RouterThrottleImpl.java:563
+#: ../java/src/net/i2p/router/RouterThrottleImpl.java:586
 msgid "Rejecting tunnels"
 msgstr "터널 거부중"
 
-#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:260
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:271
 msgid "Dropping tunnel requests: Too slow"
 msgstr "터널 요청 버리는중: 너무 느림"
 
-#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:270
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:281
 msgid "Dropping tunnel requests: High job lag"
 msgstr "터널 요청 버리는중: 높은 일감 랙"
 
 #. don't even bother, since we are so overloaded locally
-#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:464
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:476
 msgid "Dropping tunnel requests: Overloaded"
 msgstr "터널 요청 버리는중: 오버로드됨"
 
-#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:747
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:786
 msgid "Rejecting tunnels: Hidden mode"
 msgstr "터널 거부중: 히든 모드"
 
-#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:775
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:824
 msgid "Rejecting tunnels: Request overload"
 msgstr "터널 거부중: 요청 과부하"
 
-#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:806
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:855
 msgid "Rejecting tunnels: Connection limit"
 msgstr "터널 거부중: 연결 한계"
 
-#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1024
-#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1057
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1105
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1138
 msgid "Dropping tunnel requests: High load"
 msgstr "터널 요청 버리는중: 높은 로드량"
 
-#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1140
+#: ../java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1221
 msgid "Dropping tunnel requests: Queue time"
 msgstr "터널 요청 버리는중: 대기시간"

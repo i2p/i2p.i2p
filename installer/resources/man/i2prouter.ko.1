@@ -14,43 +14,43 @@ i2prouter \- I2P 라우터를 시작하거나 중지할 때 사용
 .br
 
 .SH 설명
-I2P 서비스를 조정
+I2P 서비스 제어.
 
 .IP \fBconsole\fP
-현재 유저로 I2P를 콘솔 애플리케이션으로 동작시킴
+현재 유저로 I2P를 콘솔 애플리케이션으로 실행.
 
 .IP \fBstart\fP
-I2P 서비스를 시작
+I2P 서비스 시작.
 
 .IP \fBstop\fP
-I2P 서비스를 중지
+I2P 서비스 정지.
 
 .IP \fBrestart\fP
-I2P 서비스를 종료하고 재시작
+I2P 서비스 정지 후 재시작.
 
 .IP \fBcondrestart\fP
-I2P 서비스가 실행중이라면 재시작
+I2P 서비스가 실행 중이라면 재시작.
 
 .IP \fBgraceful\fP
 우아하게 종료 (11분 이상 걸릴 수 있음)
 
 .IP \fBinstall\fP
-시스템이 켜짐젼 I2P를 자동 시작하게끔 initscript를 설치
+시스템 부팅 시 자동으로 I2P가 시작되는 initscript 설치.
 
 .IP \fBremove\fP
 \fBinstall\fP로 설치된 initscript를 삭제
 
 .IP \fBstatus\fP
-I2P 작동 여부를 출력
+I2P 작동 여부 출력.
 
 .IP \fBdump\fP
-\fBwrapper.log\fP에 현재 쓰레드를 덤프
+\fBwrapper.log\fP에 현재 스레드 덤프.
 
 .SH "REPORTING BUGS"
-Please enter an issue on
 .UR https://i2pgit.org/i2p\-hackers/i2p.i2p/\-/issues
 the I2P GitLab server
 .UE .
+에서 이슈를 입력해 주십시오
 
 .SH "SEE ALSO"
 \fBi2prouter\-nowrapper\fP(1)

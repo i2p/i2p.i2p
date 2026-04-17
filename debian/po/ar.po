@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the i2p package.
-# 
+#
 # Translators:
 # Tashigi OP, 2018
 msgid ""
@@ -12,11 +12,12 @@ msgstr ""
 "PO-Revision-Date: 2018-09-20 00:03+0000\n"
 "Last-Translator: Tashigi OP\n"
 "Language-Team: Arabic (http://www.transifex.com/otf/I2P/language/ar/)\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ar\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #. Type: boolean
 #. Description
@@ -30,7 +31,9 @@ msgstr "هل يجب أن يتمّ تشغيل موجه I2P عند اﻹقلاع؟
 msgid ""
 "The I2P router can be run as a daemon that starts automatically when your "
 "computer boots up. This is the recommended configuration."
-msgstr "يمكن تشغيل موجه I2P كخادم خفي يبدأ تلقائيًا عند تشغيل الكمبيوتر. هذه هي التهيئة الموصى بها."
+msgstr ""
+"يمكن تشغيل موجه I2P كخادم خفي يبدأ تلقائيًا عند تشغيل الكمبيوتر. هذه هي "
+"التهيئة الموصى بها."
 
 #. Type: string
 #. Description
@@ -42,11 +45,14 @@ msgstr "I2P مستخدم الخادم الخفيّ:"
 #. Description
 #: ../i2p.templates:3001
 msgid ""
-"By default I2P is configured to run under the account i2psvc when running as"
-" a daemon. To use an **existing** I2P profile you may enter a different "
-"account name here. For example, if your previous I2P installation is at "
-"/home/user/i2p, you may enter 'user' here."
-msgstr "افتراضيا يتم تهيئة I2P للعمل تحت حساب i2psvc عند تشغيله كخادم خفيّ. لاستخدام ملف I2P **موجود** مسبقًا بإمكانك إدخال اسم حساب مختلف هنا. على سبيل المثال، إذا كان تثبيت I2P السّابق في /home/user/i2p, فيمكنك إدخال 'user' هنا. "
+"By default I2P is configured to run under the account i2psvc when running as "
+"a daemon. To use an **existing** I2P profile you may enter a different "
+"account name here. For example, if your previous I2P installation is at /"
+"home/user/i2p, you may enter 'user' here."
+msgstr ""
+"افتراضيا يتم تهيئة I2P للعمل تحت حساب i2psvc عند تشغيله كخادم خفيّ. لاستخدام "
+"ملف I2P **موجود** مسبقًا بإمكانك إدخال اسم حساب مختلف هنا. على سبيل المثال، "
+"إذا كان تثبيت I2P السّابق في /home/user/i2p, فيمكنك إدخال 'user' هنا. "
 
 #. Type: string
 #. Description
@@ -54,7 +60,9 @@ msgstr "افتراضيا يتم تهيئة I2P للعمل تحت حساب i2psvc
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "مهم جدًا: إذا تمّ إدخال اسم مستخدم غير الافتراضي 'i2psvc' هنا، *فيجب* أن يكون الاسم المختار متواجدًا بالفعل."
+msgstr ""
+"مهم جدًا: إذا تمّ إدخال اسم مستخدم غير الافتراضي 'i2psvc' هنا، *فيجب* أن يكون "
+"الاسم المختار متواجدًا بالفعل."
 
 #. Type: string
 #. Description
@@ -66,7 +74,9 @@ msgstr "الذاكرة الّتي يمكن تخصيصها لـ I2P:"
 #. Description
 #: ../i2p.templates:4001
 msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
-msgstr "بشكل افتراضي ، I2P مسموحة فقط باستخدام الذاكرة العشوائية حتى سعة تصل إلى 128 ميجابايت."
+msgstr ""
+"بشكل افتراضي ، I2P مسموحة فقط باستخدام الذاكرة العشوائية حتى سعة تصل إلى 128 "
+"ميجابايت."
 
 #. Type: string
 #. Description
@@ -74,7 +84,9 @@ msgstr "بشكل افتراضي ، I2P مسموحة فقط باستخدام ال
 msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
-msgstr "قد تحتاج أجهزة التوجيه ذات النطاق الترددي العالي ، وكذلك أجهزة التوجيه مع الكثير من torrents/plugins الفعالة، إلى زيادة هذه القيمة."
+msgstr ""
+"قد تحتاج أجهزة التوجيه ذات النطاق الترددي العالي ، وكذلك أجهزة التوجيه مع "
+"الكثير من torrents/plugins الفعالة، إلى زيادة هذه القيمة."
 
 #. Type: boolean
 #. Description
@@ -88,4 +100,6 @@ msgstr "هل يجب أن يقتصر خادم I2P الخفيّ على تطبيق 
 msgid ""
 "With this option enabled I2P will be sandboxed with AppArmor, restricting "
 "which files and directories may be accessed by I2P."
-msgstr "بتفعيل هذا الخيار سيقوم I2P بفصل البرامج الّتي قيد التشغيل ومشاركتها مع AppArmor، ممّا يحدّ من الملفات والدلائل الّتي يمكن الوصول إليها بواسطة I2P."
+msgstr ""
+"بتفعيل هذا الخيار سيقوم I2P بفصل البرامج الّتي قيد التشغيل ومشاركتها مع "
+"AppArmor، ممّا يحدّ من الملفات والدلائل الّتي يمكن الوصول إليها بواسطة I2P."

@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the i2p package.
-# 
+#
 # Translators:
 # HelloKS <kqwe1859@gmail.com>, 2014-2015
 # HelloKS <kqwe1859@gmail.com>, 2017
@@ -13,10 +13,10 @@ msgstr ""
 "PO-Revision-Date: 2017-12-29 07:28+0000\n"
 "Last-Translator: HelloKS <kqwe1859@gmail.com>\n"
 "Language-Team: Korean (http://www.transifex.com/otf/I2P/language/ko/)\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. Type: boolean
@@ -31,7 +31,9 @@ msgstr "I2P 라우터가 부팅시 시작되게 할까요?"
 msgid ""
 "The I2P router can be run as a daemon that starts automatically when your "
 "computer boots up. This is the recommended configuration."
-msgstr "I2P 라우터는 컴퓨터 부팅시 자동적으로 데몬으로 실행될 수 있습니다. 설정이 권장됩니다."
+msgstr ""
+"I2P 라우터는 컴퓨터 부팅시 자동적으로 데몬으로 실행될 수 있습니다. 설정이 권"
+"장됩니다."
 
 #. Type: string
 #. Description
@@ -43,11 +45,14 @@ msgstr "I2P 데몬 유저:"
 #. Description
 #: ../i2p.templates:3001
 msgid ""
-"By default I2P is configured to run under the account i2psvc when running as"
-" a daemon. To use an **existing** I2P profile you may enter a different "
-"account name here. For example, if your previous I2P installation is at "
-"/home/user/i2p, you may enter 'user' here."
-msgstr "기본적으로 I2P는 데몬으로 실행시 i2psvc 계정으로 시작됩니다. **기존** I2P 프로필 적용을 위해선 다른 계정의 이름을 적어야 합니다. 예를 들어, 기존 I2P 설치가 /home/user/i2p에 되었다면, 여기에 'user'를 입력하세요."
+"By default I2P is configured to run under the account i2psvc when running as "
+"a daemon. To use an **existing** I2P profile you may enter a different "
+"account name here. For example, if your previous I2P installation is at /"
+"home/user/i2p, you may enter 'user' here."
+msgstr ""
+"기본적으로 I2P는 데몬으로 실행시 i2psvc 계정으로 시작됩니다. **기존** I2P 프"
+"로필 적용을 위해선 다른 계정의 이름을 적어야 합니다. 예를 들어, 기존 I2P 설치"
+"가 /home/user/i2p에 되었다면, 여기에 'user'를 입력하세요."
 
 #. Type: string
 #. Description
@@ -55,7 +60,9 @@ msgstr "기본적으로 I2P는 데몬으로 실행시 i2psvc 계정으로 시작
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "중요: 기본값인 'i2psvc' 대신 다른 유저를 이용시에, 결정된 유저는 *반드시* 이미 존재해야 합니다."
+msgstr ""
+"중요: 기본값인 'i2psvc' 대신 다른 유저를 이용시에, 결정된 유저는 *반드시* 이"
+"미 존재해야 합니다."
 
 #. Type: string
 #. Description
@@ -75,7 +82,9 @@ msgstr "기본적으로, I2P는 128MB의 램으로 동작합니다."
 msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
-msgstr "높은 대역폭의 라우터, 또는 활성화된 torrent / 플러그인을 많이 사용하는 라우터의 경우, 이 값을 증가시켜야 할 수 있습니다."
+msgstr ""
+"높은 대역폭의 라우터, 또는 활성화된 torrent / 플러그인을 많이 사용하는 라우터"
+"의 경우, 이 값을 증가시켜야 할 수 있습니다."
 
 #. Type: boolean
 #. Description
@@ -89,4 +98,6 @@ msgstr "I2P 데몬이 AppArmor로 감싸지길 원합니까?"
 msgid ""
 "With this option enabled I2P will be sandboxed with AppArmor, restricting "
 "which files and directories may be accessed by I2P."
-msgstr "이 옵션을 활성화 시 I2P는 AppArmor에 의해 샌드박싱되고, I2P가 어떤 파일과 폴더를 접근할 지 제한됩니다."
+msgstr ""
+"이 옵션을 활성화 시 I2P는 AppArmor에 의해 샌드박싱되고, I2P가 어떤 파일과 폴"
+"더를 접근할 지 제한됩니다."

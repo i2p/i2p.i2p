@@ -2,7 +2,7 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the i2ptunnel package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-# 
+#
 # Translators:
 # LaScapigliata <ditri2000@hotmail.com>, 2015
 # LOUKAS SKOUROLIAKOS, 2015
@@ -10,22 +10,25 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-05 14:31+0000\n"
-"PO-Revision-Date: 2021-02-05 15:27+0000\n"
-"Last-Translator: LaScapigliata <ditri2000@hotmail.com>\n"
-"Language-Team: Greek (http://www.transifex.com/otf/I2P/language/el/)\n"
+"POT-Creation-Date: 2021-08-11 15:33+0000\n"
+"PO-Revision-Date: 2026-03-25 01:06+0000\n"
+"Last-Translator: Ilektra Manousi "
+"<hellektra@users.noreply.localizationlab.weblate.cloud>\n"
+"Language-Team: Greek <https://localizationlab.weblate.cloud/projects/i2p/"
+"proxy/el/>\n"
+"Language: el\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: el\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.16.2\n"
 
 #: ../java/build/Proxy.java:5 ../java/build/Proxy.java:11
 #: ../java/build/Proxy.java:40 ../java/build/Proxy.java:49
 #: ../java/build/Proxy.java:55 ../java/build/Proxy.java:91
-#: ../java/build/Proxy.java:97 ../java/build/Proxy.java:111
+#: ../java/build/Proxy.java:97
 msgid "Website Unreachable"
-msgstr ""
+msgstr "Ο ιστότοπος δεν είναι προσβάσιμος"
 
 #: ../java/build/Proxy.java:6 ../java/build/Proxy.java:17
 #: ../java/build/Proxy.java:29 ../java/build/Proxy.java:41
@@ -37,9 +40,9 @@ msgstr ""
 #: ../java/build/Proxy.java:151 ../java/build/Proxy.java:161
 #: ../java/build/Proxy.java:173 ../java/build/Proxy.java:186
 #: ../java/build/Proxy.java:198 ../java/build/Proxy.java:208
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:294
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:368
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:402
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:307
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:382
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:417
 msgid "Router Console"
 msgstr "Κονσόλα Router"
 
@@ -66,9 +69,9 @@ msgstr "Κονσόλα I2P Router"
 #: ../java/build/Proxy.java:153 ../java/build/Proxy.java:163
 #: ../java/build/Proxy.java:175 ../java/build/Proxy.java:188
 #: ../java/build/Proxy.java:200 ../java/build/Proxy.java:210
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:297
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:369
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:403
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:310
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:383
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:418
 msgid "Configuration"
 msgstr "Ρυθμίσεις"
 
@@ -82,9 +85,9 @@ msgstr "Ρυθμίσεις"
 #: ../java/build/Proxy.java:154 ../java/build/Proxy.java:164
 #: ../java/build/Proxy.java:176 ../java/build/Proxy.java:189
 #: ../java/build/Proxy.java:201 ../java/build/Proxy.java:211
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:298
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:369
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:403
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:311
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:383
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:418
 msgid "Help"
 msgstr "Βοήθεια"
 
@@ -119,16 +122,17 @@ msgstr ""
 
 #: ../java/build/Proxy.java:15 ../java/build/Proxy.java:27
 #: ../java/build/Proxy.java:48 ../java/build/Proxy.java:59
-#: ../java/build/Proxy.java:90 ../java/build/Proxy.java:110
-#: ../java/build/Proxy.java:118 ../java/build/Proxy.java:130
-#: ../java/build/Proxy.java:171 ../java/build/Proxy.java:196
+#: ../java/build/Proxy.java:90 ../java/build/Proxy.java:99
+#: ../java/build/Proxy.java:110 ../java/build/Proxy.java:118
+#: ../java/build/Proxy.java:130 ../java/build/Proxy.java:171
+#: ../java/build/Proxy.java:196 ../java/build/Proxy.java:217
 msgid "Could not find the following destination:"
 msgstr ""
 
 #: ../java/build/Proxy.java:16 ../java/build/Proxy.java:22
 #: ../java/build/Proxy.java:160 ../java/build/Proxy.java:166
 msgid "Outproxy Not Found"
-msgstr ""
+msgstr "Δεν Βρέθηκε Outproxy"
 
 #: ../java/build/Proxy.java:23
 msgid ""
@@ -152,8 +156,8 @@ msgstr ""
 #: ../java/build/Proxy.java:195 ../java/build/Proxy.java:216
 #, java-format
 msgid ""
-"If you continue to have trouble you may want to edit your outproxy list "
-"{0}here{1}."
+"If you continue to have trouble you may want to edit your outproxy list {0}"
+"here{1}."
 msgstr ""
 
 #: ../java/build/Proxy.java:28
@@ -181,8 +185,8 @@ msgstr ""
 
 #: ../java/build/Proxy.java:38
 msgid ""
-"If you do not save it, the host name will be forgotten after the next router"
-" restart."
+"If you do not save it, the host name will be forgotten after the next router "
+"restart."
 msgstr ""
 
 #: ../java/build/Proxy.java:39
@@ -194,7 +198,7 @@ msgstr ""
 #: ../java/build/Proxy.java:46 ../java/build/Proxy.java:119
 #: ../java/build/Proxy.java:125
 msgid "Warning: Invalid Destination"
-msgstr ""
+msgstr "Προειδοποίηση: Μη έγκυρος Προορισμός"
 
 #: ../java/build/Proxy.java:47
 msgid "The Base32 address is invalid."
@@ -264,8 +268,8 @@ msgstr ""
 
 #: ../java/build/Proxy.java:88
 msgid ""
-"Otherwise, find a Base 32 or address helper link, or use a jump service link"
-" below."
+"Otherwise, find a Base 32 or address helper link, or use a jump service link "
+"below."
 msgstr ""
 
 #: ../java/build/Proxy.java:89
@@ -279,10 +283,6 @@ msgstr ""
 msgid ""
 "The website was not reachable, because it uses encryption options that are "
 "not supported by your I2P or Java version."
-msgstr ""
-
-#: ../java/build/Proxy.java:99 ../java/build/Proxy.java:217
-msgid "Could not connect to the following destination:"
 msgstr ""
 
 #: ../java/build/Proxy.java:100 ../java/build/Proxy.java:106
@@ -300,7 +300,7 @@ msgid ""
 "your access."
 msgstr ""
 
-#: ../java/build/Proxy.java:117
+#: ../java/build/Proxy.java:111 ../java/build/Proxy.java:117
 msgid "Warning: Authorization Required"
 msgstr ""
 
@@ -312,8 +312,8 @@ msgstr ""
 
 #: ../java/build/Proxy.java:127
 msgid ""
-"Perhaps you pasted in the wrong Base 64 string or the link you are following"
-" is bad."
+"Perhaps you pasted in the wrong Base 64 string or the link you are following "
+"is bad."
 msgstr ""
 
 #: ../java/build/Proxy.java:128
@@ -346,15 +346,17 @@ msgstr ""
 
 #: ../java/build/Proxy.java:148
 msgid ""
-"Someone could be trying to impersonate another website, or people have given"
-" two websites identical names."
-msgstr "Κάποιος θα μπορούσε να προσποιείτε μια ιστοσελίδα ή δύο άτομα να έχουν δώσει στις δύο ιστοσελίδες ίδια ονόματα."
+"Someone could be trying to impersonate another website, or people have given "
+"two websites identical names."
+msgstr ""
+"Κάποιος θα μπορούσε να προσποιείτε μια ιστοσελίδα ή δύο άτομα να έχουν δώσει "
+"στις δύο ιστοσελίδες ίδια ονόματα."
 
 #: ../java/build/Proxy.java:149
 msgid ""
-"Resolve the conflict by deciding which key you trust, and then either ignore"
-" the address helper link, or delete the host entry from your address book "
-"and click the address helper link again."
+"Resolve the conflict by deciding which key you trust, and then either ignore "
+"the address helper link, or delete the host entry from your address book and "
+"click the address helper link again."
 msgstr ""
 
 #: ../java/build/Proxy.java:150 ../java/build/Proxy.java:156
@@ -403,8 +405,7 @@ msgid "I2P HTTP Proxy Authorization Required"
 msgstr ""
 
 #: ../java/build/Proxy.java:182
-msgid ""
-"This proxy is configured to require a username and password for access."
+msgid "This proxy is configured to require a username and password for access."
 msgstr ""
 
 #: ../java/build/Proxy.java:183
@@ -417,9 +418,8 @@ msgstr ""
 #: ../java/build/Proxy.java:184
 #, java-format
 msgid ""
-"To disable authorization, remove the configuration "
-"{0}i2ptunnel.proxy.auth=basic{1}, then stop and restart the HTTP Proxy "
-"tunnel."
+"To disable authorization, remove the configuration {0}"
+"i2ptunnel.proxy.auth=basic{1}, then stop and restart the HTTP Proxy tunnel."
 msgstr ""
 
 #: ../java/build/Proxy.java:192
@@ -428,8 +428,8 @@ msgstr ""
 
 #: ../java/build/Proxy.java:193
 msgid ""
-"The proxy could be temporarily unavailable, too busy, or it has blocked your"
-" access."
+"The proxy could be temporarily unavailable, too busy, or it has blocked your "
+"access."
 msgstr ""
 
 #: ../java/build/Proxy.java:197 ../java/build/Proxy.java:203
@@ -454,249 +454,244 @@ msgstr ""
 
 #: ../java/build/Proxy.java:214
 msgid ""
-"The HTTP outproxy was not reachable, because it uses encryption options that"
-" are not supported by your I2P or Java version."
-msgstr ""
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:692
-msgid "This seems to be a bad destination:"
+"The HTTP outproxy was not reachable, because it uses encryption options that "
+"are not supported by your I2P or Java version."
 msgstr ""
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:693
+msgid "This seems to be a bad destination:"
+msgstr ""
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:694
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:765
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:766
 #, java-format
 msgid ""
-"To visit the destination in your address book, click <a "
-"href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, "
-"click <a href=\"{1}\">here</a>."
+"To visit the destination in your address book, click <a href=\"{0}\">here</"
+"a>. To visit the conflicting addresshelper destination, click <a "
+"href=\"{1}\">here</a>."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:774
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:775
 #, java-format
 msgid "Destination for {0} in address book"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:777
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:778
 msgid "Conflicting address helper destination"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1224
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1226
 msgid "Corrupt Base32 address"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1304
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1306
 msgid "Destination lease set not found"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1437
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1443
 msgid "Host"
 msgstr "Οικοδεσπότης"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1441
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1502
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1447
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1509
 msgid "Base32"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1445
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1451
 msgid "Destination"
 msgstr "Προορισμός"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1451
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1458
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1452
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1459
 msgid ""
 "You can browse to the site without saving it to the address book. The "
 "address will be remembered until you restart your I2P router."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1453
-msgid "Continue without saving"
+#. FIXME wasn't escaped
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1468
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1555
+msgid "Save & continue"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1460
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1470
 #, java-format
 msgid "Save {0} to router address book and continue to website"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1461
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1471
 msgid ""
 "This address will be saved to your Router address book where your "
 "subscription-based addresses are stored."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1463
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1473
 msgid ""
 "If you want to keep track of sites you have added manually, add to your "
 "Local or Private address book instead."
 msgstr ""
 
-#. FIXME wasn't escaped
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1466
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1548
-msgid "Save & continue"
-msgstr ""
-
-#. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1473
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1481
 #, java-format
 msgid "Save {0} to local address book and continue to website"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1474
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1482
 msgid ""
 "This address will be saved to your Local address book. Select this option "
 "for addresses you wish to keep separate from the main router address book, "
 "but don't mind publishing."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1478
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1486
 #, java-format
 msgid "Save {0} to private address book and continue to website"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1479
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1487
 msgid ""
 "This address will be saved to your Private address book, ensuring it is "
 "never published."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1507
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1514
 msgid "Base32 address requires lookup password"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1509
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1516
 msgid "Base32 address requires encryption key"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1511
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1518
 msgid "Base32 address requires encryption key and lookup password"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1513
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1520
 msgid "Base32 address decryption failure, check encryption key"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1524
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1531
 msgid "Generate"
 msgstr "Δημιουργία"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1525
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1532
 msgid "Encryption key"
 msgstr "Κρυπτογραφημένο κλειδί"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1526
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1533
 msgid ""
 "You must either enter a PSK encryption key provided by the server operator, "
 "or generate a DH encryption key and send that to the server operator."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1527
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1534
 msgid "Ask the server operator for help."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1530
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1537
 msgid "Enter PSK encryption key"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1533
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1540
 msgid "Generate new DH encryption key"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1541
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1548
 msgid "Lookup password"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1542
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1549
 msgid "You must enter the password provided by the server operator."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:196
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:209
 #, java-format
 msgid "Added via address helper from {0}"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:198
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:211
 msgid "Added via address helper"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:235
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:248
 msgid "Missing lookup password"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:249
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:262
 msgid "Missing private key"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:254
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:267
 msgid "Invalid private key"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:287
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:306
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:300
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:319
 msgid "Your new encryption key"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:301
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:314
 msgid "Address book"
 msgstr "Βιβλίο Διευθύνσεων "
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:311
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:324
 msgid "Copy the key and send it to the server operator."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:313
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:326
 msgid "After you are granted permission, you may proceed to the website."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:334
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:347
 msgid "Go back and fix the error"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:345
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:358
 msgid "router"
 msgstr "δρομολογητής"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:347
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:360
 msgid "local"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:349
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:362
 msgid "private"
 msgstr "ιδιωτικός"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:362
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:396
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:376
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:411
 #, java-format
 msgid "Redirecting to {0}"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:371
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:405
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:385
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:420
 msgid "Address Book"
 msgstr "Βιβλίο Διευθύνσεων"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:376
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:390
 #, java-format
 msgid "Saved {0} to the {1} address book, redirecting now."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:377
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:391
 #, java-format
 msgid "Failed to save {0} to the {1} address book, redirecting now."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:379
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:411
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:393
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:426
 msgid "Click here if you are not redirected automatically."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:409
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:424
 #, java-format
 msgid "Saved the authentication for {0}, redirecting now."
 msgstr ""

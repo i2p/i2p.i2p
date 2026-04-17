@@ -2,7 +2,7 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the susidns package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-# 
+#
 # Translators:
 # NoProfile, 2016
 # Reza Ghasemi, 2019
@@ -14,10 +14,10 @@ msgstr ""
 "PO-Revision-Date: 2011-02-13 12:00+0000\n"
 "Last-Translator: Reza Ghasemi, 2019\n"
 "Language-Team: Persian (http://app.transifex.com/otf/I2P/language/fa/)\n"
+"Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fa\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:152
@@ -46,8 +46,8 @@ msgstr "نام میزبان نمی تواند حاوی \"{0}\" باشد"
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:179
 #, java-format
 msgid ""
-"Host name \"{0}\" requires conversion to ASCII but the conversion library is"
-" unavailable in this JVM"
+"Host name \"{0}\" requires conversion to ASCII but the conversion library is "
+"unavailable in this JVM"
 msgstr ""
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:238
@@ -138,8 +138,8 @@ msgstr ""
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:270
 #, java-format
 msgid ""
-"Host name {0} is already in address book with a different destination. Click"
-" \"Replace\" to overwrite."
+"Host name {0} is already in address book with a different destination. Click "
+"\"Replace\" to overwrite."
 msgstr ""
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:285
@@ -259,7 +259,8 @@ msgstr ""
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
-msgstr "اگر همچنان مشکل پابرجاست، مطمئن شوید که در مرورگر شما Cookie ها فعال هستند."
+msgstr ""
+"اگر همچنان مشکل پابرجاست، مطمئن شوید که در مرورگر شما Cookie ها فعال هستند."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:100
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:136
@@ -440,14 +441,13 @@ msgstr "حافظه"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:289
 msgid ""
-"Addresses in the Private Address Book are not shared with anyone else unless"
-" you copy them by hand."
+"Addresses in the Private Address Book are not shared with anyone else unless "
+"you copy them by hand."
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:296
 msgid ""
-"The Published Address Book is used for sharing addresses using your I2P "
-"Site."
+"The Published Address Book is used for sharing addresses using your I2P Site."
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:298
@@ -586,8 +586,8 @@ msgstr ""
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:245
 msgid ""
 "File and directory paths here are relative to the address book's working "
-"directory, which is normally ~/.i2p/addressbook/ (Linux) or "
-"%LOCALAPPDATA%\\I2P\\addressbook\\ (Windows)."
+"directory, which is normally ~/.i2p/addressbook/ (Linux) or %LOCALAPPDATA%"
+"\\I2P\\addressbook\\ (Windows)."
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:247
@@ -658,14 +658,14 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:275
 msgid ""
-"File containing the etags header from the fetched subscription URLs (no need"
-" to change)"
+"File containing the etags header from the fetched subscription URLs (no need "
+"to change)"
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:277
 msgid ""
-"File containing the modification timestamp for each fetched subscription URL"
-" (no need to change)"
+"File containing the modification timestamp for each fetched subscription URL "
+"(no need to change)"
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:279
@@ -766,8 +766,8 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:231
 msgid ""
-"You can use it to connect human-readable names, like i2p-projekt.i2p, to I2P"
-" Destinations."
+"You can use it to connect human-readable names, like i2p-projekt.i2p, to I2P "
+"Destinations."
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:233
@@ -790,9 +790,8 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:239
 msgid ""
-"For more information on naming in I2P, see <a "
-"href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">the "
-"overview</a>."
+"For more information on naming in I2P, see <a href=\"http://i2p-projekt.i2p/"
+"naming.html\" target=\"_blank\">the overview</a>."
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:241
@@ -860,14 +859,14 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:263
 msgid ""
-"Hosts in the private address book can be accessed by you but their addresses"
-" are never distributed to others."
+"Hosts in the private address book can be accessed by you but their addresses "
+"are never distributed to others."
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:265
 msgid ""
-"The private address book can also be used for aliases of hosts in your other"
-" address books."
+"The private address book can also be used for aliases of hosts in your other "
+"address books."
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:193
@@ -907,8 +906,8 @@ msgstr ""
 #: build/HowSVG.java:5
 msgid ""
 "If SusiDNS is configured to publish your Router address book, the entries "
-"will appear in your Published address book and saved to a hosts.txt file for"
-" sharing."
+"will appear in your Published address book and saved to a hosts.txt file for "
+"sharing."
 msgstr ""
 
 #: build/HowSVG.java:6
@@ -959,8 +958,8 @@ msgstr ""
 
 #: build/HowSVG.java:16
 msgid ""
-"Hosts sourced from your subscriptions are added to your Router address book,"
-" and are automatically synced (by default every 12 hours)."
+"Hosts sourced from your subscriptions are added to your Router address book, "
+"and are automatically synced (by default every 12 hours)."
 msgstr ""
 
 #: build/HowSVG.java:17
@@ -969,8 +968,8 @@ msgstr ""
 
 #: build/HowSVG.java:18
 msgid ""
-"If you manually add hosts here, they will be included your Published address"
-" book (if configured)."
+"If you manually add hosts here, they will be included your Published address "
+"book (if configured)."
 msgstr ""
 
 #: build/HowSVG.java:19
@@ -1001,8 +1000,8 @@ msgstr "برای سایت ها"
 
 #: build/HowSVG.java:25
 msgid ""
-"If you configure SusiDNS to publish your Router address book, it will export"
-" a hosts.txt file containing all the hosts (by default to the root of your "
+"If you configure SusiDNS to publish your Router address book, it will export "
+"a hosts.txt file containing all the hosts (by default to the root of your "
 "eepsite)."
 msgstr ""
 

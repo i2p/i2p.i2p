@@ -2,7 +2,7 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the susimail package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-# 
+#
 # Translators:
 # bassmax, 2014
 # AO <ao@localizationlab.org>, 2018-2021
@@ -22,11 +22,12 @@ msgstr ""
 "PO-Revision-Date: 2011-03-11 22:21+0000\n"
 "Last-Translator: Some Name, 2025\n"
 "Language-Team: French (http://app.transifex.com/otf/I2P/language/fr/)\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fr\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
+"1000000 == 0 ? 1 : 2;\n"
 
 #: src/src/i2p/susi/webmail/MailCache.java:551
 #: src/src/i2p/susi/webmail/WebMail.java:2626
@@ -99,9 +100,10 @@ msgstr "inconnu"
 
 #: src/src/i2p/susi/webmail/WebMail.java:638
 msgid ""
-"To protect your privacy, SusiMail has blocked remote content in this "
-"message."
-msgstr "Pour protéger votre confidentialité, SusiMail à bloqué du contenu de ce message situé sur un serveur distant."
+"To protect your privacy, SusiMail has blocked remote content in this message."
+msgstr ""
+"Pour protéger votre confidentialité, SusiMail à bloqué du contenu de ce "
+"message situé sur un serveur distant."
 
 #: src/src/i2p/susi/webmail/WebMail.java:639
 msgid "Enable javascript for improved display of this message."
@@ -274,7 +276,9 @@ msgstr "Aucun message n’est marqué pour suppression."
 #: src/src/i2p/susi/webmail/WebMail.java:1990
 #, java-format
 msgid "Host unchanged. Edit configuration file {0} to change host."
-msgstr "L’hôte est inchangé. Modifiez le fichier de configuration {0} pour changer l’hôte."
+msgstr ""
+"L’hôte est inchangé. Modifiez le fichier de configuration {0} pour changer "
+"l’hôte."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2010
 msgid "Configuration saved"
@@ -282,7 +286,8 @@ msgstr "La configuration a été enregistrée."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2032
 msgid "Invalid pagesize number, resetting to default value."
-msgstr "La taille de page est invalide, réinitialisation à la valeur par défaut."
+msgstr ""
+"La taille de page est invalide, réinitialisation à la valeur par défaut."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2501
 #: src/src/i2p/susi/webmail/WebMail.java:3398
@@ -433,13 +438,10 @@ msgstr "Fichiers joints"
 msgid "Delete selected attachments"
 msgstr "Supprimer les fichiers joints sélectionnés"
 
-#. boolean fixed = Boolean.parseBoolean(Config.getProperty(
-#. CONFIG_PORTS_FIXED, "true" ));
+#. boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_PORTS_FIXED, "true" ));
 #. String host = Config.getProperty(CONFIG_HOST, DEFAULT_HOST);
-#. String pop3 = Config.getProperty(CONFIG_PORTS_POP3,
-#. Integer.toString(DEFAULT_POP3PORT));
-#. String smtp = Config.getProperty(CONFIG_PORTS_SMTP,
-#. Integer.toString(DEFAULT_SMTPPORT));
+#. String pop3 = Config.getProperty(CONFIG_PORTS_POP3, Integer.toString(DEFAULT_POP3PORT));
+#. String smtp = Config.getProperty(CONFIG_PORTS_SMTP, Integer.toString(DEFAULT_SMTPPORT));
 #: src/src/i2p/susi/webmail/WebMail.java:3363
 msgid "Email Login"
 msgstr "Connexion au courriel"
@@ -632,11 +634,15 @@ msgstr "Aucune réponse du serveur"
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:747
 msgid "Mail server login failed, wrong username or password."
-msgstr "Échec de connexion au serveur de courriel, nom d'utilisateur ou mot de passe erroné."
+msgstr ""
+"Échec de connexion au serveur de courriel, nom d'utilisateur ou mot de passe "
+"erroné."
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:749
 msgid "Logout and then login again with the correct username and password."
-msgstr "Déconnectez-vous puis reconnectez-vous avec le bon nom d'utilisateur et le bon mot de passe."
+msgstr ""
+"Déconnectez-vous puis reconnectez-vous avec le bon nom d'utilisateur et le "
+"bon mot de passe."
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1238
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1240
