@@ -5,7 +5,7 @@ ARG TARGETARCH
 FROM --platform=linux/amd64 alpine:latest AS builder
 
 ENV APP_HOME="/i2p"
-ARG ANT_VERSION="1.10.15"
+ARG ANT_VERSION="1.10.17"
 
 WORKDIR /tmp/build
 COPY . .
