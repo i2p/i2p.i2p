@@ -1,3 +1,10 @@
+i2p (2.12.1-1~questing+1) questing; urgency=medium
+
+  * Still based on 2.12.0
+  * Correction to orig.tar.bz2 file on launchpad
+
+ -- idk <hankhill19580@gmail.com>  Wed, 23 Apr 2026 12:12:12 +0000
+
 i2p (2.12.0-1~questing+1) questing; urgency=medium
 
   * New upstream version 2.12.0
