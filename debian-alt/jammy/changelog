@@ -1,4 +1,4 @@
-i2p (2.12.1-1~jammy+1) jammy; urgency=medium
+i2p (2.12.1-1~ubuntu2) jammy; urgency=medium
 
   * Still based on 2.12.0
   * Correction to orig.tar.bz2 file on launchpad
