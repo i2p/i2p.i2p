@@ -406,7 +406,7 @@ public final class DSAEngine {
         boolean ok;
         do {
             k = new NativeBigInteger(160, _context.random());
-            ok = k.compareTo(CryptoConstants.dsaq) != 1;
+            ok = k.compareTo(CryptoConstants.dsaq) < 0;
             ok = ok && !k.equals(BigInteger.ZERO);
             //System.out.println("K picked (ok? " + ok + "): " + k.bitLength() + ": " + k.toString());
         } while (!ok);
