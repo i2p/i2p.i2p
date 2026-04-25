@@ -157,8 +157,9 @@ public class SimpleTimer {
             
             if ( (_events.size() != _eventTimes.size()) ) {
                 _log.error("Skewed events: " + _events.size() + " for " + _eventTimes.size());
-                for (TimedEvent evt : _eventTimes.keySet()) {
-                    Long when = _eventTimes.get(evt);
+                for (Map.Entry<TimedEvent, Long> e : _eventTimes.entrySet()) {
+                    TimedEvent evt = e.getKey();
+                    Long when = e.getValue();
                     TimedEvent cur = _events.get(when);
                     if (cur != evt) {
                         _log.error("event " + evt + " @ " + when + ": " + cur);

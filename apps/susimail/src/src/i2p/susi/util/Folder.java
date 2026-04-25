@@ -557,11 +557,11 @@ public class Folder<O extends Object> {
 	 */
 	public synchronized O getNextSelectedElement(O element)
 	{
-		if (currentSelector == null)
+		if (currentSelector == null || selected == null)
 			return getNextElement(element);
 		O result = null;
 		int i = selected.indexOf(element);
-		if (i != -1 && selected != null) {
+		if (i != -1) {
 			i++;
 			if (i < selected.size())
 				result = selected.get(i);
@@ -578,11 +578,11 @@ public class Folder<O extends Object> {
 	 */
 	public synchronized O getPreviousSelectedElement(O element)
 	{
-		if (currentSelector == null)
+		if (currentSelector == null || selected == null)
 			return getPreviousElement(element);
 		O result = null;
 		int i = selected.indexOf(element);
-		if (i != -1 && selected != null) {
+		if (i != -1) {
 			i--;
 			if (i >= 0 && i < selected.size())
 				result = selected.get(i);

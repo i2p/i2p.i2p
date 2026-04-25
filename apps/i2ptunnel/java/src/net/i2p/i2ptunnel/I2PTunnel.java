@@ -231,10 +231,10 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 // fall thru for -nogui only
 
             case NOGUI:  // --nogui
-                gui = false;
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(getPrefix() + "The `-nogui' option of I2PTunnel is deprecated.\n"
                           + "Use `-cli', `-nocli' (aka `-wait') or `-die' instead.");
+                // fall thru for -nogui only
 
             case 'c':  // -c, -cli, --cli
                 gui = false;

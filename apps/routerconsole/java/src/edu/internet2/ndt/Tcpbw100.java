@@ -2487,7 +2487,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	 *
 	 */
 	public void dottcp(StatusPanel sPanel) throws IOException {
-		Socket ctlSocket = null;
+		Socket ctlSocket;
 		if (!_bIsApplication) {
 
 			//
@@ -2624,9 +2624,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 								+ "\n");
 						// create socket to host specified by user and the default port
 						// we seem to always get here, why bother trying extended above?
-						if (ctlSocket != null) {
-							try { ctlSocket.close(); } catch (IOException ioe) {}
-						}
+						try { ctlSocket.close(); } catch (IOException ioe) {}
 						ctlSocket = newSocket(hostAddress, ctlport);
 					} catch (UnknownHostException e) {
 						_log.warn("Don't know about host: " + sHostName, e);

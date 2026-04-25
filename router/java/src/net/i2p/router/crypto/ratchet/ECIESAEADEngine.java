@@ -1130,7 +1130,7 @@ public final class ECIESAEADEngine {
                                      RatchetSKM keyManager,
                                      ReplyCallback callback) {
         EncType type = target.getType();
-        if (type != priv.getType())
+        if (priv != null && type != priv.getType())
             throw new IllegalArgumentException("Key mismatch " + target + ' ' + priv);
         HandshakeState state;
         try {

@@ -238,7 +238,7 @@ public class BlindData {
     /**
      *  @since 0.9.41
      */
-    public boolean getSecretRequired() {
+    public synchronized boolean getSecretRequired() {
         return _secretRequired;
     }
 
@@ -253,7 +253,7 @@ public class BlindData {
     /**
      *  @since 0.9.41
      */
-    public boolean getAuthRequired() {
+    public synchronized boolean getAuthRequired() {
         return _authRequired;
     }
 

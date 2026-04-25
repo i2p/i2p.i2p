@@ -83,7 +83,7 @@ class ConnectionHandler {
         }
     }
 
-    public boolean getActive() { return _active; }
+    public synchronized boolean getActive() { return _active; }
     
     /**
      * Non-SYN packets with a zero SendStreamID may also be queued here so 

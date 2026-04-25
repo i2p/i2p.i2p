@@ -613,24 +613,24 @@ public class Router implements RouterClock.ClockShiftListener {
      *
      *  Warning - risk of deadlock - do not call while holding locks
      *
+     *  @param info non-null
      */
     public void setRouterInfo(RouterInfo info) { 
         _routerInfoLock.writeLock().lock();
-        if (!info.getIdentity().equals(_routerIdent)) {
-            if (_routerIdent != null)  // shouldn't happen
-                _log.log(Log.CRIT, "Changing router ident while running");
-            _routerIdent = info.getIdentity();
-            _routerHash = _routerIdent.calculateHash();
-        }
         try {
+            if (!info.getIdentity().equals(_routerIdent)) {
+                if (_routerIdent != null)  // shouldn't happen
+                    _log.log(Log.CRIT, "Changing router ident while running");
+                _routerIdent = info.getIdentity();
+                _routerHash = _routerIdent.calculateHash();
+            }
             _routerInfo = info; 
         } finally {
             _routerInfoLock.writeLock().unlock();
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("setRouterInfo() : " + info, new Exception("I did it"));
-        if (info != null)
-            _context.jobQueue().addJob(new PersistRouterInfoJob(_context));
+        _context.jobQueue().addJob(new PersistRouterInfoJob(_context));
     }
 
     /**

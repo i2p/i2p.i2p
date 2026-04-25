@@ -1170,9 +1170,11 @@ public class ProfileOrganizer {
      * matches set until it has howMany elements in it.
      *
      */
+/*
     private void locked_selectPeers(Map<Hash, PeerProfile> peers, int howMany, Set<Hash> toExclude, Set<Hash> matches) {
         locked_selectPeers(peers, howMany, toExclude, matches, 0, null);
     }
+*/
 
     /**
      *

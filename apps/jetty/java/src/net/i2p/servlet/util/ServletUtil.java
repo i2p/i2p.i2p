@@ -86,4 +86,30 @@ public class ServletUtil {
             return s.substring(0, len + 2);
         return s.substring(0, len);
     }
+
+    /**
+      * Sanitize an encoded String from getQueryString().
+      * Does not decode.
+      *
+      * @param s may be null
+      * @return s or null if s was null or s contained any problematic characters
+      * @since 0.9.70
+      */
+    public static String sanitizeQuery(String s) {
+        if (s == null)
+            return null;
+        int len = s.length();
+        for (int i = 0; i < len; i++) {
+            switch (s.charAt(i)) {
+                case '\r':
+                case '\n':
+                case '"':
+                case '\'':
+                case '<':
+                case '>':
+                    return null;
+            }
+        }
+        return s;
+    }
 }

@@ -54,7 +54,7 @@ public class Subscriber implements Sink {
             if(ctrl == 0) {
                 if (this.subscriptions.put(ms, Long.valueOf(ctx.clock().now())) == null) {
                     if (subscriptions.size() > MAX_SUBSCRIPTIONS) {
-                        subscriptions.remove(dest);
+                        subscriptions.remove(ms);
                         if (log.shouldWarn())
                             log.warn("Too many subscriptions, denying: " + ms);
                         return;

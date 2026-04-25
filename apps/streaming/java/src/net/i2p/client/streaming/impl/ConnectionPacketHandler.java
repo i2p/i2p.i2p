@@ -270,14 +270,9 @@ class ConnectionPacketHandler {
                 }
 
             } else {
-                if (isSYN) {
-                    //con.incrementUnackedPacketsReceived();
-                    con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
-                } else {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("ACK only packet received: " + packet);
-                    ackOnly = true;
-                }
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("ACK only packet received: " + packet);
+                ackOnly = true;
             }
         }
 

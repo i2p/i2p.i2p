@@ -12,7 +12,7 @@
 <%
     // take /dns query params and pass to the iframe
     String isrc;
-    String query = request.getQueryString();
+    String query = net.i2p.servlet.util.ServletUtil.sanitizeQuery(request.getQueryString());
     if (query != null)
         isrc = "/susidns/addressbook?" + query;
     else

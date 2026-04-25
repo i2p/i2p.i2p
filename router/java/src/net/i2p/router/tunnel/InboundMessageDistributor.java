@@ -23,7 +23,6 @@ import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.message.GarlicMessageReceiver;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.Log;
-import net.i2p.util.RandomSource;
 
 /**
  * When a message arrives at the inbound tunnel endpoint, this distributor
@@ -54,10 +53,11 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                            + " b32: " + _client.toBase32()
                            + ") InboundMessageDistributor with tunnel pool settings: " + clienttps);
             _clientNickname = nickname;
-            _msgIDBloomXor = clienttps.getMsgIdBloomXor();
+            _msgIDBloomXor = clienttps != null ? clienttps.getMsgIdBloomXor() :
+                                                 ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE);
         } else {
             _clientNickname = "NULL/Expl";
-            _msgIDBloomXor = RandomSource.getInstance().nextLong(I2NPMessage.MAX_ID_VALUE);
+            _msgIDBloomXor = ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Initializing null or exploratory InboundMessageDistributor");
         }

@@ -356,8 +356,7 @@ class PacketHandler {
                     for (Connection con : _manager.listConnections()) {
                         buf.append(con.toString()).append(" ");
                     }
-                    _log.debug("connections: " + buf.toString() + " sendId: " 
-                               + (sendId > 0 ? Packet.toId(sendId) : " unknown"));
+                    _log.debug("connections: " + buf.toString() + " sendId: unknown"); 
                 }
                 //packet.releasePayload();
                 _manager.getConnectionHandler().receiveNewSyn(packet);

@@ -175,7 +175,7 @@ public class I2PTunnelHTTPClientRunner extends I2PTunnelRunner {
      *
      *  @since 0.9.62
      */
-    private class I2PSocketCloser extends I2PAppThread {
+    private static class I2PSocketCloser extends I2PAppThread {
         private final InputStream in;
         private final OutputStream out;
         private final I2PSocket s;

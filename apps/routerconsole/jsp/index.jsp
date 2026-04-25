@@ -44,7 +44,7 @@
         }
     }
     buf.append(tgt);
-    String query = request.getQueryString();
+    String query = net.i2p.servlet.util.ServletUtil.sanitizeQuery(request.getQueryString());
     if (query != null)
         buf.append('?').append(query);
     response.setHeader("Location", buf.toString());

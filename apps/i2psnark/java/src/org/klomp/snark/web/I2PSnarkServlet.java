@@ -4879,7 +4879,7 @@ public class I2PSnarkServlet extends BasicServlet {
         if (oldCreatedBy == null)
             oldCreatedBy = "";
         if (toAdd.isEmpty() && toDel.isEmpty() &&
-            (primary == null || primary.equals(oldPrimary)) &&
+            (primary == null || (oldPrimary != null && primary.intValue() == oldPrimary.hashCode())) &&
             oldComment.equals(newComment) &&
             oldCreatedBy.equals(newCreatedBy)) {
             _manager.addMessage("No changes to torrent, not saved");

@@ -710,23 +710,19 @@ public class TunnelControllerGroup implements ClientApp {
     @Deprecated
     public void saveConfig() throws IOException {
         _controllersLock.readLock().lock();
-        if (shouldMigrate()) {
-            try {
+        try {
+            if (shouldMigrate()) {
                 for (TunnelController controller : _controllers) {
                     saveConfig(controller);
                 }
-            } finally {
-                _controllersLock.readLock().unlock();
-            }
-        } else {
-            try {
+            } else {
                 File cfgFile = new File(_configFile);
                 if (!cfgFile.isAbsolute())
                     cfgFile = new File(_context.getConfigDir(), _configFile);
                 saveConfig(cfgFile);
-            } finally {
-                _controllersLock.readLock().unlock();
             }
+        } finally {
+            _controllersLock.readLock().unlock();
         }
     }
 
