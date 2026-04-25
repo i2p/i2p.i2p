@@ -565,15 +565,13 @@ public class Blocklist {
             String sip = buf.substring(start1, end1);
             // IPv6
             sip = sip.replace(';', ':');
-            InetAddress pi = InetAddress.getByName(sip);
-            if (pi == null) return null;
-            ip1 = pi.getAddress();
+            ip1 = Addresses.getIPOnly(sip);
+            if (ip1 == null) return null;
             //if (ip1.length != 4)
             //    throw new UnknownHostException();
             if (start2 >= 0) {
-                pi = InetAddress.getByName(buf.substring(start2));
-                if (pi == null) return null;
-                ip2 = pi.getAddress();
+                ip2 = Addresses.getIPOnly(buf.substring(start2));
+                if (ip2 == null) return null;
                 if (ip2.length != 4)
                     throw new UnknownHostException();
                 if ((ip1[0] & 0xff) < 0x80 && (ip2[0] & 0xff) >= 0x80) {

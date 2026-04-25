@@ -624,7 +624,6 @@ public abstract class Addresses {
         }
         if (rv == null) {
             if (isIPAddress(host)) {
-                try {
                     if (host.indexOf('.') > 0) {
                         rv = getIPv4(host);
                         if (rv == null)
@@ -634,12 +633,11 @@ public abstract class Addresses {
                         if (rv == null)
                             return null;
                     } else {
-                        rv = InetAddress.getByName(host).getAddress();
+                        return null;
                     }
                     synchronized (_IPAddress) {
                         _IPAddress.put(host, rv);
                     }
-                } catch (UnknownHostException uhe) {}
             }
         }
         return rv;
