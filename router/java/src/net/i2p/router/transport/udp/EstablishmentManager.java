@@ -410,7 +410,7 @@ class EstablishmentManager {
                     // must have a valid session key
                     byte[] keyBytes;
                     int version = _transport.getSSUVersion(ra);
-                    if (isIndirect && version == 2 && ra.getTransportStyle().equals("SSU")) {
+                    if (isIndirect && version >= 2 && version <= 4 && ra.getTransportStyle().equals("SSU")) {
                         boolean v2intros = false;
                         int count = addr.getIntroducerCount();
                         long now = _context.clock().now();
@@ -428,7 +428,7 @@ class EstablishmentManager {
                             }
                         }
                     }
-                    if (version == 2) {
+                    if (version >= 2 && version <= 4) {
                         int mtu = addr.getMTU();
                         boolean isIPv6 = TransportUtil.isIPv6(ra);
                         int ourMTU = _transport.getMTU(isIPv6);
@@ -463,12 +463,12 @@ class EstablishmentManager {
                         _transport.failed(msg, "Peer has bad key, cannot establish");
                         return;
                     }
-                    if (version == 2) {
+                    if (version >= 2 && version <= 4) {
                         boolean requestIntroduction = !isIndirect &&
                                                       _transport.introducersMaybeRequired(TransportUtil.isIPv6(ra));
                         try {
                             state = new OutboundEstablishState2(_context, _transport, maybeTo, to,
-                                                               toIdentity, requestIntroduction, sessionKey, ra, addr);
+                                                               toIdentity, requestIntroduction, sessionKey, ra, addr, version);
                         } catch (IllegalArgumentException iae) {
                             if (_log.shouldWarn())
                                 _log.warn("OES2 error: " + toRouterInfo, iae);
@@ -611,8 +611,9 @@ class EstablishmentManager {
                 if (_log.shouldInfo())
                     _log.info("Receive session request from blocklisted IP: " + from);
                 _context.statManager().addRateData("udp.establishBadIP", 1);
+                // don't bother to decode header to get the real version
                 if (!_context.commSystem().isInStrictCountry())
-                    sendTerminationPacket(from, packet, REASON_BANNED);
+                    sendTerminationPacket(from, packet, 2, REASON_BANNED);
                 // else drop the packet
                 return;
             }
@@ -621,9 +622,9 @@ class EstablishmentManager {
                 // IP spoofing is used. For further study.
                 if (!shouldAllowInboundEstablishment()) {
                     if (_log.shouldWarn())
-                        _log.warn("Dropping inbound establish");
+                        _log.warn("Dropping inbound establish from " + from);
                     _context.statManager().addRateData("udp.establishDropped", 1);
-                    sendTerminationPacket(from, packet, REASON_LIMITS);
+                    sendTerminationPacket(from, packet, 2, REASON_LIMITS);
                     return;
                 }
                 synchronized (_inboundBans) {
@@ -635,7 +636,7 @@ class EstablishmentManager {
                                 _log.info("SSU 2 session request from temp. blocked peer: " + from);
                              _context.statManager().addRateData("udp.establishBadIP", 1);
                              // use this code for a temp ban
-                             sendTerminationPacket(from, packet, REASON_MSG1);
+                             sendTerminationPacket(from, packet, 2, REASON_MSG1);
                              return;
                         }
                         // expired
@@ -643,7 +644,7 @@ class EstablishmentManager {
                     }
                 }
                 if (!_transport.allowConnection()) {
-                    sendTerminationPacket(from, packet, REASON_LIMITS);
+                    sendTerminationPacket(from, packet, 2, REASON_LIMITS);
                     return;
                 }
             }
@@ -725,10 +726,11 @@ class EstablishmentManager {
      * Rate limited to MAX_TERMINATIONS per peer every FAILSAFE_INTERVAL
      *
      * @param fromPacket header already decrypted, must be session or token request
+     * @param version 2-4
      * @param terminationCode nonzero
      * @since 0.9.57
      */
-    private void sendTerminationPacket(RemoteHostId to, UDPPacket fromPacket, int terminationCode) {
+    private void sendTerminationPacket(RemoteHostId to, UDPPacket fromPacket, int version, int terminationCode) {
         int count = _terminationCounter.increment(to);
         if (count > MAX_TERMINATIONS) {
             // not everybody listens or backs off...
@@ -755,7 +757,7 @@ class EstablishmentManager {
             return;
         if (_log.shouldWarn())
             _log.warn("Send immediate termination " + terminationCode + " on type " + type + " to: " + to);
-        UDPPacket packet = _builder2.buildRetryPacket(to, pkt.getSocketAddress(), sendConnID, rcvConnID, terminationCode);
+        UDPPacket packet = _builder2.buildRetryPacket(to, pkt.getSocketAddress(), sendConnID, rcvConnID, version, terminationCode);
         _transport.send(packet);
     }
     
@@ -1329,7 +1331,7 @@ class EstablishmentManager {
                                 break;
                             }
                             int version = _transport.getSSUVersion(ra);
-                            if (version == 2) {
+                            if (version >= 2 && version <= 4) {
                                 if (_log.shouldDebug())
                                     _log.debug("Connecting to introducer " + bob + " for " + state);
                                 // arbitrary message because we have no way to connect for no reason

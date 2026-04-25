@@ -18,6 +18,7 @@ import com.southernstorm.noise.protocol.CipherState;
 import com.southernstorm.noise.protocol.HandshakeState;
 
 import net.i2p.crypto.ChaCha20;
+import net.i2p.crypto.EncType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -404,7 +405,7 @@ class PacketBuilder2 {
     public UDPPacket buildTokenRequestPacket(OutboundEstablishState2 state) {
         long n = _context.random().signedNextInt() & 0xFFFFFFFFL;
         UDPPacket packet = buildLongPacketHeader(state.getSendConnID(), n, TOKEN_REQUEST_FLAG_BYTE,
-                                                 state.getRcvConnID(), 0);
+                                                 state.getRcvConnID(), 0, state.getVersion());
         DatagramPacket pkt = packet.getPacket();
         pkt.setLength(LONG_HEADER_SIZE);
         byte[] introKey = state.getSendHeaderEncryptKey1();
@@ -424,12 +425,15 @@ class PacketBuilder2 {
      */
     public UDPPacket buildSessionRequestPacket(OutboundEstablishState2 state) {
         long n = _context.random().signedNextInt() & 0xFFFFFFFFL;
+        int ver = state.getVersion();
         UDPPacket packet = buildLongPacketHeader(state.getSendConnID(), n, SESSION_REQUEST_FLAG_BYTE,
-                                                 state.getRcvConnID(), state.getToken());
+                                                 state.getRcvConnID(), state.getToken(), ver);
         DatagramPacket pkt = packet.getPacket();
         pkt.setLength(LONG_HEADER_SIZE);
         byte[] introKey = state.getSendHeaderEncryptKey1();
-        encryptSessionRequest(packet, state.getHandshakeState(), introKey, introKey, state.needIntroduction());
+        boolean isIPv6 = state.getSentIP().length == 16;
+        encryptSessionRequest(packet, state.getHandshakeState(), isIPv6, state.getMTU(), introKey, introKey,
+                              state.needIntroduction(), ver, state.getRemoteIdentity().getHash());
         pkt.setSocketAddress(state.getSentAddress());
         packet.setMessageType(TYPE_SREQ);
         packet.setPriority(PRIORITY_HIGH);
@@ -446,16 +450,16 @@ class PacketBuilder2 {
     public UDPPacket buildSessionCreatedPacket(InboundEstablishState2 state) {
         long n = _context.random().signedNextInt() & 0xFFFFFFFFL;
         UDPPacket packet = buildLongPacketHeader(state.getSendConnID(), n, SESSION_CREATED_FLAG_BYTE,
-                                                 state.getRcvConnID(), 0);
+                                                 state.getRcvConnID(), 0, state.getVersion());
         DatagramPacket pkt = packet.getPacket();
         
         byte sentIP[] = state.getSentIP();
         pkt.setLength(LONG_HEADER_SIZE);
         int port = state.getSentPort();
-        encryptSessionCreated(packet, state.getHandshakeState(), state.getSendHeaderEncryptKey1(),
+        encryptSessionCreated(packet, state.getHandshakeState(), state.getMTU(), state.getSendHeaderEncryptKey1(),
                               state.getSendHeaderEncryptKey2(), state.getSentRelayTag(),
                               null, // state.getNextToken(), // send with termination only
-                              sentIP, port);
+                              sentIP, port, state.getVersion());
         pkt.setSocketAddress(state.getSentAddress());
         packet.setMessageType(TYPE_CREAT);
         packet.setPriority(PRIORITY_HIGH);
@@ -474,7 +478,7 @@ class PacketBuilder2 {
         long n = _context.random().signedNextInt() & 0xFFFFFFFFL;
         long token = terminationCode == 0 ? state.getToken() : 0;
         UDPPacket packet = buildLongPacketHeader(state.getSendConnID(), n, RETRY_FLAG_BYTE,
-                                                 state.getRcvConnID(), token);
+                                                 state.getRcvConnID(), token, state.getVersion());
         DatagramPacket pkt = packet.getPacket();
         
         byte sentIP[] = state.getSentIP();
@@ -498,9 +502,9 @@ class PacketBuilder2 {
      * @return ready to send packet, non-null
      * @since 0.9.57
      */
-    public UDPPacket buildRetryPacket(RemoteHostId to, SocketAddress toAddr, long destID, long srcID, int terminationCode) {
+    public UDPPacket buildRetryPacket(RemoteHostId to, SocketAddress toAddr, long destID, long srcID, int version, int terminationCode) {
         long n = _context.random().signedNextInt() & 0xFFFFFFFFL;
-        UDPPacket packet = buildLongPacketHeader(destID, n, RETRY_FLAG_BYTE, srcID, 0);
+        UDPPacket packet = buildLongPacketHeader(destID, n, RETRY_FLAG_BYTE, srcID, 0, version);
         DatagramPacket pkt = packet.getPacket();
         pkt.setLength(LONG_HEADER_SIZE);
         byte[] introKey = _transport.getSSU2StaticIntroKey();
@@ -718,7 +722,8 @@ class PacketBuilder2 {
                                             long sendID, long rcvID, byte[] signedData) {
         long n = _context.random().signedNextInt() & 0xFFFFFFFFL;
         long token = _context.random().nextLong();
-        UDPPacket packet = buildLongPacketHeader(sendID, n, PEER_TEST_FLAG_BYTE, rcvID, token);
+        // version always 2
+        UDPPacket packet = buildLongPacketHeader(sendID, n, PEER_TEST_FLAG_BYTE, rcvID, token, PROTOCOL_VERSION);
         Block block = new SSU2Payload.PeerTestBlock(6, 0, null, signedData);
         byte[] ik = introKey.getData();
         packet.getPacket().setLength(LONG_HEADER_SIZE);
@@ -780,7 +785,8 @@ class PacketBuilder2 {
                                           long sendID, long rcvID, byte[] signedData) {
         long n = _context.random().signedNextInt() & 0xFFFFFFFFL;
         long token = _context.random().nextLong();
-        UDPPacket packet = buildLongPacketHeader(sendID, n, PEER_TEST_FLAG_BYTE, rcvID, token);
+        // version always 2
+        UDPPacket packet = buildLongPacketHeader(sendID, n, PEER_TEST_FLAG_BYTE, rcvID, token, PROTOCOL_VERSION);
         int msgNum = firstSend ? 5 : 7;
         Block block = new SSU2Payload.PeerTestBlock(msgNum, 0, null, signedData);
         byte[] ik = introKey.getData();
@@ -892,10 +898,10 @@ class PacketBuilder2 {
      *
      */
     public UDPPacket buildHolePunch(InetAddress to, int port, SessionKey introKey,
-                                    long sendID, long rcvID, byte[] signedData) {
+                                    long sendID, long rcvID, int version, byte[] signedData) {
         long n = _context.random().signedNextInt() & 0xFFFFFFFFL;
         long token = _context.random().nextLong();
-        UDPPacket packet = buildLongPacketHeader(sendID, n, HOLE_PUNCH_FLAG_BYTE, rcvID, token);
+        UDPPacket packet = buildLongPacketHeader(sendID, n, HOLE_PUNCH_FLAG_BYTE, rcvID, token, version);
         Block block = new SSU2Payload.RelayResponseBlock(signedData);
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending relay hole punch to " + to + ":" + port);
@@ -913,12 +919,12 @@ class PacketBuilder2 {
      *  @param pktNum 0 - 0xFFFFFFFF
      *  @return a packet with the first 32 bytes filled in
      */
-    private UDPPacket buildLongPacketHeader(long destID, long pktNum, byte type, long srcID, long token) {
+    private UDPPacket buildLongPacketHeader(long destID, long pktNum, byte type, long srcID, long token, int version) {
         //if (_log.shouldDebug())
         //    _log.debug("Building long header destID " + destID + " pkt num " + pktNum + " type " + type + " srcID " + srcID + " token " + token);
         UDPPacket packet = buildShortPacketHeader(destID, pktNum, type);
         byte data[] = packet.getPacket().getData();
-        data[13] = PROTOCOL_VERSION;
+        data[13] = (byte) version;
         data[14] = (byte) _context.router().getNetworkID();
         DataHelper.toLong8(data, 16, srcID);
         DataHelper.toLong8(data, 24, token);
@@ -947,9 +953,11 @@ class PacketBuilder2 {
 
     /**
      *  @param packet containing only 32 byte header
+     *  @param bob only for versions 3 and 4, ignored for 2
      */
-    private void encryptSessionRequest(UDPPacket packet, HandshakeState state,
-                                       byte[] hdrKey1, byte[] hdrKey2, boolean needIntro) {
+    private void encryptSessionRequest(UDPPacket packet, HandshakeState state, boolean isIPv6, int mtu,
+                                       byte[] hdrKey1, byte[] hdrKey2, boolean needIntro,
+                                       int version, Hash bob) {
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
         int off = pkt.getOffset();
@@ -965,22 +973,52 @@ class PacketBuilder2 {
                 len += block.getTotalLength();
                 blocks.add(block);
             }
-            // plenty of room
-            block = getPadding(len, 1280, PADDING_MAX_SESSION_REQUEST);
-            len += block.getTotalLength();
-            blocks.add(block);
+            int pqlen = 0;
+            int pktlen = len;
+            int max = PeerState2.MIN_MTU;
+            switch (version) {
+                case 2:
+                    // plenty of room for padding, don't bother with len adjustments
+                    break;
+                case 3:
+                    // plenty of room for padding, don't bother with len adjustments
+                    // unless PADDING_MAX_SESSION_REQUEST is dramatically increased
+                    pqlen = MAC_LEN + EncType.MLKEM512_X25519_INT.getPubkeyLen();
+                    break;
+                case 4:
+                    pqlen = MAC_LEN + EncType.MLKEM768_X25519_INT.getPubkeyLen();
+                    // do an exact calculation for getPadding()
+                    pktlen += isIPv6 ? IPV6_HEADER_SIZE : IP_HEADER_SIZE;
+                    pktlen += UDP_HEADER_SIZE;
+                    pktlen += SESSION_HEADER_SIZE + MAC_LEN;
+                    pktlen += MAC_LEN + EncType.MLKEM768_X25519_INT.getPubkeyLen();
+                    max = mtu;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Bad version " + version);
+            }
+            // plenty of room except for version 4
+            block = getPadding(pktlen, max, PADDING_MAX_SESSION_REQUEST);
+            if (block != null) {
+                len += block.getTotalLength();
+                blocks.add(block);
+            }
+            //if (version > 2 && log.shouldWarn())
+            //    _log.warn("v" + version + " msg1 pktlen " + pktlen + " pqlen " + pqlen + " mtu " + mtu + " padding " + (block != null ? block.getTotalLength() : 0) + " max " + max);
 
             // If we skip past where the ephemeral key will be, we can
             // use the packet for the plaintext and Noise will symmetric encrypt in-place
-            SSU2Payload.writePayload(data, off + LONG_HEADER_SIZE + KEY_LEN, blocks);
+            SSU2Payload.writePayload(data, off + LONG_HEADER_SIZE + KEY_LEN + pqlen, blocks);
             state.start();
             if (_log.shouldDebug())
                 _log.debug("State after start: " + state);
+            if (version != 2)
+                state.mixHash(bob.getData(), 0, 32);
             state.mixHash(data, off, LONG_HEADER_SIZE);
             if (_log.shouldDebug())
                 _log.debug("State after mixHash 1: " + state);
-            state.writeMessage(data, off + LONG_HEADER_SIZE, data, off + LONG_HEADER_SIZE + KEY_LEN, len);
-            pkt.setLength(pkt.getLength() + KEY_LEN + len + MAC_LEN);
+            state.writeMessage(data, off + LONG_HEADER_SIZE, data, off + LONG_HEADER_SIZE + KEY_LEN + pqlen, len);
+            pkt.setLength(pkt.getLength() + KEY_LEN + len + MAC_LEN + pqlen);
         } catch (RuntimeException re) {
             if (!_log.shouldWarn())
                 _log.error("Bad msg 1 out", re);
@@ -1001,9 +1039,10 @@ class PacketBuilder2 {
      *  @param packet containing only 32 byte header
      *  @param token may be null
      */
-    private void encryptSessionCreated(UDPPacket packet, HandshakeState state,
+    private void encryptSessionCreated(UDPPacket packet, HandshakeState state, int mtu,
                                        byte[] hdrKey1, byte[] hdrKey2, long relayTag,
-                                       EstablishmentManager.Token token, byte[] ip, int port) {
+                                       EstablishmentManager.Token token, byte[] ip, int port,
+                                       int version) {
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
         int off = pkt.getOffset();
@@ -1025,23 +1064,54 @@ class PacketBuilder2 {
                 len += block.getTotalLength();
                 blocks.add(block);
             }
-            // plenty of room
-            block = getPadding(len, 1280, PADDING_MAX_SESSION_CREATED);
-            len += block.getTotalLength();
-            blocks.add(block);
+            int pqlen = 0;
+            int pktlen = len;
+            int max = PeerState2.MIN_MTU;
+            switch (version) {
+                case 2:
+                    // plenty of room for padding, don't bother with len adjustments
+                    break;
+                case 3:
+                    // plenty of room for padding, don't bother with len adjustments
+                    // unless PADDING_MAX_SESSION_CREATED is dramatically increased
+                    pqlen = MAC_LEN + EncType.MLKEM512_X25519_CT.getPubkeyLen();
+                    break;
+                case 4:
+                    pqlen = MAC_LEN + EncType.MLKEM768_X25519_CT.getPubkeyLen();
+                    // do an exact calculation for getPadding()
+                    // although even here it's close
+                    // unless PADDING_MAX_SESSION_CREATED is dramatically increased
+                    // because SessionCreated overhead is 96 bytes smaller than SessionRequest
+                    // due to a smaller key size.
+                    pktlen += ip.length == 16 ? IPV6_HEADER_SIZE : IP_HEADER_SIZE;
+                    pktlen += UDP_HEADER_SIZE;
+                    pktlen += SESSION_HEADER_SIZE + MAC_LEN;
+                    pktlen += MAC_LEN + EncType.MLKEM768_X25519_CT.getPubkeyLen();
+                    max = mtu;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Bad version " + version);
+            }
+            block = getPadding(pktlen, max, PADDING_MAX_SESSION_CREATED);
+            if (block != null) {
+                len += block.getTotalLength();
+                blocks.add(block);
+            }
+            //if (version > 2 && log.shouldWarn())
+            //    _log.warn("v" + version + " msg2 pktlen " + pktlen + " pqlen " + pqlen + " mtu " + mtu + " padding " + (block != null ? block.getTotalLength() : 0) + " max " + max);
 
             // If we skip past where the ephemeral key will be, we can
             // use the packet for the plaintext and Noise will symmetric encrypt in-place
-            SSU2Payload.writePayload(data, off + LONG_HEADER_SIZE + KEY_LEN, blocks);
+            SSU2Payload.writePayload(data, off + LONG_HEADER_SIZE + KEY_LEN + pqlen, blocks);
 
             state.mixHash(data, off, LONG_HEADER_SIZE);
             if (_log.shouldDebug())
                 _log.debug("State after mixHash 2: " + state);
-            state.writeMessage(data, off + LONG_HEADER_SIZE, data, off + LONG_HEADER_SIZE + KEY_LEN, len);
-            pkt.setLength(pkt.getLength() + KEY_LEN + len + MAC_LEN);
+            state.writeMessage(data, off + LONG_HEADER_SIZE, data, off + LONG_HEADER_SIZE + KEY_LEN + pqlen, len);
+            pkt.setLength(pkt.getLength() + KEY_LEN + len + MAC_LEN + pqlen);
         } catch (RuntimeException re) {
             if (!_log.shouldWarn())
-                _log.error("Bad msg 2 out", re);
+                _log.error("Bad msg 2 version " + version + " out", re);
             throw re;
         } catch (GeneralSecurityException gse) {
             if (!_log.shouldWarn())

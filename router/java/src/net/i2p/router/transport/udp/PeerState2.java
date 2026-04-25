@@ -64,6 +64,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     private final SSU2Bitfield _ackedMessages;
     private final ConcurrentHashMap<Long, List<PacketBuilder.Fragment>> _sentMessages;
     private final ACKTimer _ackTimer;
+    private final int _version;
 
     private long _sentMessagesLastExpired;
     private byte[] _ourIP;
@@ -108,6 +109,9 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     public static final int MIN_MTU = 1280;
     public static final int MAX_MTU = 1500;
     public static final int DEFAULT_MTU = MAX_MTU;
+    // MLKEM-768, assuming 10 byte payload
+    public static final int MIN_MLKEM768_IPV4_MTU = 1318;
+    public static final int MIN_MLKEM768_IPV6_MTU = 1338;
 
     private static final int BITFIELD_SIZE = 512;
     private static final int MAX_SESS_CONF_RETX = 5;
@@ -118,11 +122,12 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
      *  If inbound, caller MUST immediately call setWeRelayToThemAs() (if nonzero) and sendAck0().
      *
      *  @param rtt from the EstablishState, or 0 if not available
+     *  @param version 2-4 from handshake, only for UI
      */
     public PeerState2(RouterContext ctx, UDPTransport transport,
                      InetSocketAddress remoteAddress, Hash remotePeer, boolean isInbound, int rtt,
                      CipherState sendCha, CipherState rcvCha, long sendID, long rcvID,
-                     byte[] sendHdrKey1, byte[] sendHdrKey2, byte[] rcvHdrKey2) {
+                     byte[] sendHdrKey1, byte[] sendHdrKey2, byte[] rcvHdrKey2, int version) {
         super(ctx, transport, remoteAddress, remotePeer, isInbound, rtt);
         _sendConnID = sendID;
         _rcvConnID = rcvID;
@@ -144,6 +149,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             // For outbound, SessionConfirmed is packet 0
             _packetNumber.set(1);
         }
+        _version = version;
         _ackTimer = new ACKTimer();
     }
 
@@ -176,7 +182,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     // SSU 1 overrides
 
     @Override
-    public int getVersion() { return 2; }
+    public int getVersion() { return _version; }
 
     /**
      *  how much payload data can we shove in there?

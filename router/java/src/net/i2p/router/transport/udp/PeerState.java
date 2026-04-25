@@ -738,7 +738,7 @@ public class PeerState {
             // window and SST set in highestSeqNumAcked()
             bwe = -1;  // for log below
         } else {
-            _sendWindowBytes = getVersion() == 2 ? PeerState2.MAX_MTU : (isIPv6() ? MAX_IPV6_MTU : LARGE_MTU);
+            _sendWindowBytes = getVersion() >= 2 ? PeerState2.MAX_MTU : (isIPv6() ? MAX_IPV6_MTU : LARGE_MTU);
             bwe = _bwEstimator.getBandwidthEstimate(now);
             _slowStartThreshold = Math.max( (int)(bwe * _rtt), 2 * _mtu);
         }
@@ -1717,8 +1717,9 @@ public class PeerState {
         buf.append(_remoteHostId.toString());
         buf.append(' ').append(_remotePeer.toBase64(), 0, 6);
 
-        if (getVersion() == 2)
-            buf.append(_isInbound? " IB2 " : " OB2 ");
+        int ver = getVersion();
+        if (ver >= 2)
+            buf.append(_isInbound? " IB" + ver + ' ' : " OB" + ver + ' ');
         else
             buf.append(_isInbound? " IB " : " OB ");
         long now = _context.clock().now();

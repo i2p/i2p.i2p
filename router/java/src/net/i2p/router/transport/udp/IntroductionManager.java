@@ -729,6 +729,7 @@ class IntroductionManager {
         SessionKey aliceIntroKey = null;
         int rcode;
         PeerState aps = _transport.getPeerState(alice);
+        RouterAddress aliceRA = null;
         if (_transport.isSymNatted()) {
             rcode = SSU2Util.RELAY_REJECT_CHARLIE_ADDRESS;
         } else if (aps != null && aps.isIPv6() == isIPv6) {
@@ -748,7 +749,8 @@ class IntroductionManager {
                 SigningPublicKey spk = aliceRI.getIdentity().getSigningPublicKey();
                 if (SSU2Util.validateSig(_context, SSU2Util.RELAY_REQUEST_PROLOGUE,
                                          bob.getRemotePeer(), _context.routerHash(), data, spk)) {
-                    aliceIntroKey = PeerTestManager.getIntroKey(getAddress(aliceRI, isIPv6));
+                    aliceRA = getAddress(aliceRI, isIPv6);
+                    aliceIntroKey = PeerTestManager.getIntroKey(aliceRA);
                     if (aliceIntroKey != null)
                         rcode = SSU2Util.RELAY_ACCEPT;
                     else
@@ -815,7 +817,8 @@ class IntroductionManager {
                 _log.debug("Send hole punch to " + Addresses.toString(testIP, testPort));
             long sendId = (nonce << 32) | nonce;
             long rcvId = ~sendId;
-            UDPPacket packet = _builder2.buildHolePunch(aliceIP, testPort, aliceIntroKey, sendId, rcvId, data);
+            // version doesn't really matter here, just use 2
+            UDPPacket packet = _builder2.buildHolePunch(aliceIP, testPort, aliceIntroKey, sendId, rcvId, 2, data);
             _transport.send(packet);
         }
         return true;

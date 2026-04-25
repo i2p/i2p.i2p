@@ -16,6 +16,7 @@ import com.southernstorm.noise.protocol.CipherState;
 import com.southernstorm.noise.protocol.CipherStatePair;
 import com.southernstorm.noise.protocol.HandshakeState;
 
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.HKDF;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
@@ -49,6 +50,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     private final long _rcvConnID;
     private final long _sendConnID;
     private final long _token;
+    private final int _version;
     private final HandshakeState _handshakeState;
     private byte[] _sendHeaderEncryptKey1;
     private byte[] _sendHeaderEncryptKey2;
@@ -58,6 +60,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     private long _timeReceived;
     // not adjusted for RTT
     private long _skew;
+    // His MTU, will be set once on reception of SessionRequest and again on reception of SessionConfirmed
     private int _mtu;
     private PeerState2 _pstate;
     private List<UDPPacket> _queuedDataPackets;
@@ -85,9 +88,6 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         _transport = transport;
         DatagramPacket pkt = packet.getPacket();
         _aliceSocketAddress = (InetSocketAddress) pkt.getSocketAddress();
-        _handshakeState = new HandshakeState(HandshakeState.PATTERN_ID_XK_SSU2, HandshakeState.RESPONDER, transport.getXDHFactory());
-        _handshakeState.getLocalKeyPair().setKeys(transport.getSSU2StaticPrivKey(), 0,
-                                                  transport.getSSU2StaticPubKey(), 0);
         byte[] introKey = transport.getSSU2StaticIntroKey();
         _sendHeaderEncryptKey1 = introKey;
         //_sendHeaderEncryptKey2 set below
@@ -101,6 +101,50 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             throw new GeneralSecurityException("Identical Conn IDs");
         int type = data[off + TYPE_OFFSET] & 0xff;
         long token = DataHelper.fromLong8(data, off + TOKEN_OFFSET);
+        _version = data[off + VERSION_OFFSET] & 0xff;
+        String pattern;
+        int overhead = LONG_HEADER_SIZE + KEY_LEN + MAC_LEN;
+        boolean isIPv6 = _aliceIP.length == 16;
+        switch (_version) {
+            case 2:
+                pattern = HandshakeState.PATTERN_ID_XK_SSU2;
+                _handshakeState = new HandshakeState(pattern, HandshakeState.RESPONDER, _transport.getXDHFactory());
+                break;
+            case 3:
+                if (type == SESSION_REQUEST_FLAG_BYTE) {
+                    // use packet size as MTU for session created
+                    int ipOverhead = (isIPv6 ? PacketBuilder.IPV6_HEADER_SIZE : PacketBuilder.IP_HEADER_SIZE) + PacketBuilder.UDP_HEADER_SIZE;
+                    _mtu = Math.max(PeerState2.MIN_MTU, len + ipOverhead);
+                }
+                pattern = HandshakeState.PATTERN_ID_XKHFS_512_SSU2;
+                overhead += MAC_LEN + EncType.MLKEM512_X25519_INT.getPubkeyLen();
+                _handshakeState = new HandshakeState(pattern, HandshakeState.RESPONDER, _transport.getXDHFactory());
+                break;
+            case 4:
+                int ourmtu = _transport.getSSU2MTU(isIPv6);
+                int min = isIPv6 ? PeerState2.MIN_MLKEM768_IPV6_MTU : PeerState2.MIN_MLKEM768_IPV4_MTU;
+                if (ourmtu > 0 && ourmtu < min) {
+                    _currentState = InboundState.IB_STATE_FAILED;
+                    // send retry with termination
+                    UDPPacket retry = _transport.getBuilder2().buildRetryPacket(this, SSU2Util.REASON_VERSION);
+                    _transport.send(retry);
+                    throw new GeneralSecurityException("Our MTU too small for version 4 (retry sent): " + ourmtu);
+                }
+                if (type == SESSION_REQUEST_FLAG_BYTE) {
+                    // use packet size as MTU for session created
+                    int ipOverhead = (isIPv6 ? PacketBuilder.IPV6_HEADER_SIZE : PacketBuilder.IP_HEADER_SIZE) + PacketBuilder.UDP_HEADER_SIZE;
+                    _mtu = Math.max(min, len + ipOverhead);
+                }
+                pattern = HandshakeState.PATTERN_ID_XKHFS_768_SSU2;
+                overhead += MAC_LEN + EncType.MLKEM768_X25519_INT.getPubkeyLen();
+                _handshakeState = new HandshakeState(pattern, HandshakeState.RESPONDER, _transport.getXDHFactory());
+                break;
+            default:
+                // shouldn't get here, dropped in PacketHandler
+                throw new GeneralSecurityException("Bad version " + _version + " in session/token request from: " + _aliceSocketAddress);
+        }
+        _handshakeState.getLocalKeyPair().setKeys(transport.getSSU2StaticPrivKey(), 0,
+                                                  transport.getSSU2StaticPubKey(), 0);
         if (type == TOKEN_REQUEST_FLAG_BYTE) {
             if (_log.shouldDebug())
                 _log.debug("Got token request from: " + _aliceSocketAddress);
@@ -146,6 +190,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             _handshakeState.start();
             //if (_log.shouldDebug())
             //    _log.debug("State after start: " + _handshakeState);
+            if (_version != 2)
+                _handshakeState.mixHash(_context.routerHash().getData(), 0, 32);
             _handshakeState.mixHash(data, off, LONG_HEADER_SIZE);
             //if (_log.shouldDebug())
             //    _log.debug("State after mixHash 1: " + _handshakeState);
@@ -160,7 +206,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             }
             //if (_log.shouldDebug())
             //    _log.debug("State after sess req: " + _handshakeState);
-            processPayload(data, off + LONG_HEADER_SIZE, len - (LONG_HEADER_SIZE + KEY_LEN + MAC_LEN), true);
+            processPayload(data, off + LONG_HEADER_SIZE, len - overhead, true);
             _sendHeaderEncryptKey2 = SSU2Util.hkdf(_context, _handshakeState.getChainingKey(), "SessCreateHeader");
             _currentState = InboundState.IB_STATE_REQUEST_RECEIVED;
         }
@@ -186,7 +232,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     }
 
     @Override
-    public int getVersion() { return 2; }
+    public int getVersion() { return _version; }
     
     private void processPayload(byte[] payload, int offset, int length, boolean isHandshake) throws GeneralSecurityException {
         try {
@@ -435,10 +481,13 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             long now = _context.clock().now();
             long published = ri.getPublished();
             int reason;
-            if (published > now + 2*60*1000 || published < now - 60*60*1000)
+            if (published > now + 2*60*1000 || published < now - 60*60*1000) {
                 reason = REASON_SKEW;
-            else
+                // KNDF.validate() banned the router,
+                // EstMgr.processExpired() will temp. ban the IP
+            } else {
                 reason = REASON_MSG3;
+            }
             throw new RIException("RI store fail: " + ri, reason, iae);
         }
 
@@ -605,6 +654,21 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     public synchronized byte[] getRcvHeaderEncryptKey2() { return _rcvHeaderEncryptKey2; }
     public InetSocketAddress getSentAddress() { return _aliceSocketAddress; }
 
+    /**
+     *  What is the largest packet we can send to the peer?
+     *  This is based on the minimums and the size of the received SessionRequest packet.
+     *
+     *  Only used for Session Created packets for MLKEM.
+     *  Session Created is very small for non-MLKEM.
+     *
+     *  @return 1280 for non-MLKEM.
+     *  @since 0.9.70
+     */
+    public int getMTU() {
+        boolean ipv6 = _aliceIP.length == 16;
+        return Math.min(_mtu, _transport.getMTU(ipv6));
+    }
+
     @Override
     public synchronized void createdPacketSent() {
         /// todo state check
@@ -690,6 +754,9 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                 _log.warn("Got out-of-order or retx msg " + type + " on: " + this);
             return;
         }
+        int version = data[off + VERSION_OFFSET] & 0xff;
+        if (version != _version && _log.shouldWarn())
+            _log.warn("Incoming type " + type + " version mismatch was " + _version + " now " + version);
         if (type == TOKEN_REQUEST_FLAG_BYTE) {
             // retransmitted token request
             if (_log.shouldWarn())
@@ -711,6 +778,36 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             throw new GeneralSecurityException("Token mismatch: expected: " + _token + " got: " + token);
         }
         _handshakeState.start();
+        int overhead = LONG_HEADER_SIZE + KEY_LEN + MAC_LEN;
+        switch (_version) {
+            case 2:
+                break;
+            case 3: {
+                overhead += MAC_LEN + EncType.MLKEM512_X25519_INT.getPubkeyLen();
+                _handshakeState.mixHash(_context.routerHash().getData(), 0, 32);
+                // use packet size as MTU, or adjust higher if we got a previous SessionRequest that was smaller
+                boolean isIPv6 = _aliceIP.length == 16;
+                int ipOverhead = (isIPv6 ? PacketBuilder.IPV6_HEADER_SIZE : PacketBuilder.IP_HEADER_SIZE) + PacketBuilder.UDP_HEADER_SIZE;
+                int mtu = Math.max(PeerState2.MIN_MTU, len + ipOverhead);
+                if (mtu > _mtu)
+                    _mtu = mtu;
+                break;
+            }
+            case 4: {
+                overhead += MAC_LEN + EncType.MLKEM768_X25519_INT.getPubkeyLen();
+                _handshakeState.mixHash(_context.routerHash().getData(), 0, 32);
+                // use packet size as MTU, or adjust higher if we got a previous SessionRequest
+                boolean isIPv6 = _aliceIP.length == 16;
+                int ipOverhead = (isIPv6 ? PacketBuilder.IPV6_HEADER_SIZE : PacketBuilder.IP_HEADER_SIZE) + PacketBuilder.UDP_HEADER_SIZE;
+                int min = isIPv6 ? PeerState2.MIN_MLKEM768_IPV6_MTU : PeerState2.MIN_MLKEM768_IPV4_MTU;
+                int mtu = Math.max(min, len + ipOverhead);
+                if (mtu > _mtu)
+                    _mtu = mtu;
+                break;
+            }
+            default:
+                throw new GeneralSecurityException("Bad version " + _version + " in session/token request from: " + _aliceSocketAddress);
+        }
         _handshakeState.mixHash(data, off, 32);
         //if (_log.shouldDebug())
         //    _log.debug("State after mixHash 1: " + _handshakeState);
@@ -726,7 +823,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         //if (_log.shouldDebug())
         //    _log.debug("State after sess req: " + _handshakeState);
         _timeReceived = 0;
-        processPayload(data, off + LONG_HEADER_SIZE, len - (LONG_HEADER_SIZE + KEY_LEN + MAC_LEN), true);
+        processPayload(data, off + LONG_HEADER_SIZE, len - overhead, true);
         packetReceived();
         if (_currentState == InboundState.IB_STATE_FAILED) {
             // termination block received
@@ -934,7 +1031,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                                  _receivedConfirmedIdentity.calculateHash(),
                                  true, _rtt, sender, rcvr,
                                  _sendConnID, _rcvConnID,
-                                 _sendHeaderEncryptKey1, h_ba, h_ab);
+                                 _sendHeaderEncryptKey1, h_ba, h_ab, _version);
         // PS2.super adds CLOCK_SKEW_FUDGE that doesn't apply here
         _pstate.adjustClockSkew(_skew - (_rtt / 2) - PeerState.CLOCK_SKEW_FUDGE);
         _pstate.setHisMTU(_mtu);
@@ -1071,7 +1168,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     @Override
     public String toString() {            
         StringBuilder buf = new StringBuilder(128);
-        buf.append("IES2 ");
+        buf.append("IES").append(_version).append(' ');
         buf.append(Addresses.toString(_aliceIP, _alicePort));
         buf.append(" lifetime: ").append(DataHelper.formatDuration(getLifetime()));
         buf.append(" Rcv ID: ").append(_rcvConnID);

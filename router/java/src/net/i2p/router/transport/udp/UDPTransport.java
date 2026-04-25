@@ -143,8 +143,12 @@ public class UDPTransport extends TransportImpl {
     static final int SSU2_INT_VERSION = 2;
     /** "2" */
     static final String SSU2_VERSION = Integer.toString(SSU2_INT_VERSION);
-    /** "2," */
-    static final String SSU2_VERSION_ALT = SSU2_VERSION + ',';
+    /** 0 to disable in/out, or 4/3 for preferred enctypes 6/5 */
+    static final int PQ_INT_VERSION = 4;
+    /** inbound support 4,3 or 4 or 3 */
+    static final String PQ_VERSION = "4,3";
+    /** inbound support if low MTU */
+    static final String PQ_VERSION_LOW_MTU = "3";
     private final PacketBuilder2 _packetBuilder2;
     private final X25519KeyFactory _xdhFactory;
     private final byte[] _ssu2StaticPubKey;
@@ -946,16 +950,40 @@ public class UDPTransport extends TransportImpl {
         } else {
             return 0;
         }
-        // check version == "2" || version starts with "2,"
-        // and static key and intro key
-        // and, until we support relay, host and port.
+        // check version contains "2"
+        // previous check was version == "2" || version starts with "2,"
+        // so we should publish PQ with "2,4", not "4,2"
         String v = addr.getOption("v");
         if (v == null ||
             addr.getOption("i") == null ||
             addr.getOption("s") == null ||
-            (!v.equals(SSU2_VERSION) && !v.startsWith(SSU2_VERSION_ALT))) {
+            // assume single digits, no "3,12"
+            !v.contains(SSU2_VERSION)) {
             // his address is SSU1 or is outbound SSU2 only
             return 0;
+        }
+        if (PQ_INT_VERSION != 0) {
+            String pq = addr.getOption("pq");
+            if (pq != null) {
+                if (pq.indexOf('4') >= 0) {
+                    // ensure both his and our MTU are big enough
+                    String ip = addr.getHost();
+                    boolean ipv6 = ip != null && ip.indexOf(':') >= 0;
+                    int mtu = 0;
+                    String smtu = addr.getOption("mtu");
+                    if (smtu != null) {
+                        try {
+                            mtu = Integer.parseInt(smtu);
+                        } catch (NumberFormatException nfe) {}
+                    }
+                    int ourmtu = getSSU2MTU(ipv6);
+                    int min = ipv6 ? PeerState2.MIN_MLKEM768_IPV6_MTU : PeerState2.MIN_MLKEM768_IPV4_MTU;
+                    if ((mtu == 0 || mtu >= min) && (ourmtu == 0 || ourmtu >= min))
+                        return 4;
+                }
+                if (pq.indexOf('3') >= 0)
+                    return 3;
+            }
         }
         // his address is SSU2
         // do not validate the s/i b64, we will just catch it later
@@ -970,11 +998,16 @@ public class UDPTransport extends TransportImpl {
      *
      * @since 0.9.54
      */
-    private void addSSU2Options(Properties props) {
+    private void addSSU2Options(Properties props, int mtu, boolean isIPv6) {
         // Unlike in NTCP2, we need the intro key whether firewalled or not
         props.setProperty("i", _ssu2B64StaticIntroKey);
         props.setProperty("s", _ssu2B64StaticPubKey);
         props.setProperty("v", SSU2_VERSION);
+        if (PQ_INT_VERSION != 0) {
+            int min = isIPv6 ? PeerState2.MIN_MLKEM768_IPV6_MTU : PeerState2.MIN_MLKEM768_IPV4_MTU;
+            String ver = (mtu == 0 || mtu >= min) ? PQ_VERSION : PQ_VERSION_LOW_MTU;
+            props.setProperty("pq", ver);
+        }
     }
 
     /**
@@ -2914,19 +2947,19 @@ public class UDPTransport extends TransportImpl {
             TransportUtil.IPv6Config config = getIPv6Config();
             if (config == IPV6_ONLY) {
                 caps = CAP_IPV6;
-                mtu = getMTU(true);
+                mtu = getSSU2MTU(true);
             } else if (config != IPV6_DISABLED && hasIPv6Address()) {
                 caps = CAP_IPV4_IPV6;
-                mtu = getMTU(true);
+                mtu = getSSU2MTU(true);
             } else {
                 caps = CAP_IPV4;
-                mtu = getMTU(false);
+                mtu = getSSU2MTU(false);
             }
             options.setProperty(UDPAddress.PROP_CAPACITY, caps);
             if (mtu != _defaultMTU && mtu > 0)
                 options.setProperty(UDPAddress.PROP_MTU, Integer.toString(mtu));
             if (mtu >= PeerState2.MIN_MTU || mtu == 0)
-                addSSU2Options(options);
+                addSSU2Options(options, mtu, isIPv6);
             RouterAddress current = getCurrentAddress(false);
             RouterAddress addr = new RouterAddress(getPublishStyle(), options, SSU_OUTBOUND_COST);
             if (!addr.deepEquals(current)) {
@@ -2995,7 +3028,7 @@ public class UDPTransport extends TransportImpl {
         options.setProperty(UDPAddress.PROP_CAPACITY, caps);
 
         // MTU since 0.9.2
-        int mtu = getMTU(isIPv6);
+        int mtu = getSSU2MTU(isIPv6);
         if (mtu != _defaultMTU && mtu > 0)
             options.setProperty(UDPAddress.PROP_MTU, Integer.toString(mtu));
 
@@ -3016,7 +3049,7 @@ public class UDPTransport extends TransportImpl {
                     cost++;
             }
             if (mtu >= PeerState2.MIN_MTU || mtu == 0)
-                addSSU2Options(options);
+                addSSU2Options(options, mtu, isIPv6);
             RouterAddress addr = new RouterAddress(getPublishStyle(), options, cost);
 
             RouterAddress current = getCurrentAddress(isIPv6);
@@ -3047,10 +3080,10 @@ public class UDPTransport extends TransportImpl {
                     // Also make an empty "6" address
                     OrderedProperties opts = new OrderedProperties(); 
                     opts.setProperty(UDPAddress.PROP_CAPACITY, CAP_IPV6);
-                    mtu = getMTU(true);
+                    mtu = getSSU2MTU(true);
                     if (mtu != _defaultMTU && mtu > 0)
                         opts.setProperty(UDPAddress.PROP_MTU, Integer.toString(mtu));
-                    addSSU2Options(opts);
+                    addSSU2Options(opts, mtu, isIPv6);
                     RouterAddress addr6 = new RouterAddress(getPublishStyle(), opts, SSU_OUTBOUND_COST);
                     replaceAddress(addr6);
                 }
@@ -3084,7 +3117,7 @@ public class UDPTransport extends TransportImpl {
             if (mtu != _defaultMTU && mtu > 0)
                 opts.setProperty(UDPAddress.PROP_MTU, Integer.toString(mtu));
             if (mtu >= PeerState2.MIN_MTU || mtu == 0)
-                addSSU2Options(opts);
+                addSSU2Options(opts, mtu, isIPv6);
             RouterAddress addr = new RouterAddress(getPublishStyle(), opts, SSU_OUTBOUND_COST);
             RouterAddress current = getCurrentAddress(isIPv6);
             boolean wantsRebuild = !addr.deepEquals(current);
