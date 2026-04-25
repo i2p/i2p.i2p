@@ -958,8 +958,10 @@ public class WebMail extends HttpServlet
 		} else {
 			sessionObject.isFetching = true;
 			if (!mailbox.blockingConnectToServer()) {
+			        sessionObject.mailbox = null;
 				sessionObject.error += _t("Cannot connect") + '\n';
 				sessionObject.isFetching = false;
+				return State.AUTH;
 			}
 		}
 
