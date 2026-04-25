@@ -686,7 +686,7 @@ public class POP3MailBox implements NewMailListener {
 	 * @return true if connected
 	 * @since 0.9.13
 	 */
-	boolean blockingConnectToServer() {
+	public boolean blockingConnectToServer() {
 		synchronized( synchronizer ) {
 			if (isConnected())
 				return true;

@@ -957,7 +957,7 @@ public class WebMail extends HttpServlet
 			if (log.shouldDebug()) log.debug("OFFLINE MODE");
 		} else {
 			sessionObject.isFetching = true;
-			if (!mailbox.connectToServer(new ConnectWaiter(sessionObject))) {
+			if (!mailbox.blockingConnectToServer()) {
 				sessionObject.error += _t("Cannot connect") + '\n';
 				sessionObject.isFetching = false;
 			}
