@@ -36,106 +36,6 @@ import javax.crypto.ShortBufferException;
  */
 class SymmetricState implements Destroyable, Cloneable {
 	
-	// precalculated hash of the Noise name if over 32 bytes, else simply null-padded name
-	private static final byte[] INIT_CK_XK;
-	private static final byte[] INIT_CK_IK;
-	private static final byte[] INIT_CK_N;
-	private static final byte[] INIT_CK_XK_SSU2;
-	private static final byte[] INIT_CK_IKHFS_512;
-	private static final byte[] INIT_CK_IKHFS_768;
-	private static final byte[] INIT_CK_IKHFS_1024;
-	private static final byte[] INIT_CK_XKHFS_512;
-	private static final byte[] INIT_CK_XKHFS_768;
-	private static final byte[] INIT_CK_XKHFS_1024;
-	private static final byte[] INIT_CK_XKHFS_512_SSU2;
-	private static final byte[] INIT_CK_XKHFS_768_SSU2;
-	// precalculated hash of the hash of the Noise name = mixHash(nullPrologue)
-	private static final byte[] INIT_HASH_XK = new byte[32];
-	private static final byte[] INIT_HASH_IK = new byte[32];
-	private static final byte[] INIT_HASH_N = new byte[32];
-	private static final byte[] INIT_HASH_XK_SSU2 = new byte[32];
-	private static final byte[] INIT_HASH_IKHFS_512 = new byte[32];
-	private static final byte[] INIT_HASH_IKHFS_768 = new byte[32];
-	private static final byte[] INIT_HASH_IKHFS_1024 = new byte[32];
-	private static final byte[] INIT_HASH_XKHFS_512 = new byte[32];
-	private static final byte[] INIT_HASH_XKHFS_768 = new byte[32];
-	private static final byte[] INIT_HASH_XKHFS_1024 = new byte[32];
-	private static final byte[] INIT_HASH_XKHFS_512_SSU2 = new byte[32];
-	private static final byte[] INIT_HASH_XKHFS_768_SSU2 = new byte[32];
-
-	static {
-		INIT_CK_XK = initHash(HandshakeState.protocolName);
-		INIT_CK_IK = initHash(HandshakeState.protocolName2);
-		INIT_CK_N = initHash(HandshakeState.protocolName3);
-		INIT_CK_XK_SSU2 = initHash(HandshakeState.protocolName4);
-	        INIT_CK_IKHFS_512 = initHash(HandshakeState.protocolName5);
-	        INIT_CK_IKHFS_768 = initHash(HandshakeState.protocolName6);
-	        INIT_CK_IKHFS_1024 = initHash(HandshakeState.protocolName7);
-	        INIT_CK_XKHFS_512 = initHash(HandshakeState.protocolName8);
-	        INIT_CK_XKHFS_768 = initHash(HandshakeState.protocolName9);
-	        INIT_CK_XKHFS_1024 = initHash(HandshakeState.protocolName10);
-	        INIT_CK_XKHFS_512_SSU2 = initHash(HandshakeState.protocolName11);
-	        INIT_CK_XKHFS_768_SSU2 = initHash(HandshakeState.protocolName12);
-		try {
-			MessageDigest md = Noise.createHash("SHA256");
-			md.update(INIT_CK_XK, 0, 32);
-			md.digest(INIT_HASH_XK, 0, 32);
-			md.update(INIT_CK_IK, 0, 32);
-			md.digest(INIT_HASH_IK, 0, 32);
-			md.update(INIT_CK_N, 0, 32);
-			md.digest(INIT_HASH_N, 0, 32);
-			md.update(INIT_CK_XK_SSU2, 0, 32);
-			md.digest(INIT_HASH_XK_SSU2, 0, 32);
-			md.update(INIT_CK_IKHFS_512, 0, 32);
-			md.digest(INIT_HASH_IKHFS_512, 0, 32);
-			md.update(INIT_CK_IKHFS_768, 0, 32);
-			md.digest(INIT_HASH_IKHFS_768, 0, 32);
-			md.update(INIT_CK_IKHFS_1024, 0, 32);
-			md.digest(INIT_HASH_IKHFS_1024, 0, 32);
-			md.update(INIT_CK_XKHFS_512, 0, 32);
-			md.digest(INIT_HASH_XKHFS_512, 0, 32);
-			md.update(INIT_CK_XKHFS_768, 0, 32);
-			md.digest(INIT_HASH_XKHFS_768, 0, 32);
-			md.update(INIT_CK_XKHFS_1024, 0, 32);
-			md.digest(INIT_HASH_XKHFS_1024, 0, 32);
-			md.update(INIT_CK_XKHFS_512_SSU2, 0, 32);
-			md.digest(INIT_HASH_XKHFS_512_SSU2, 0, 32);
-			md.update(INIT_CK_XKHFS_768_SSU2, 0, 32);
-			md.digest(INIT_HASH_XKHFS_768_SSU2, 0, 32);
-			Noise.releaseHash(md);
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-	}
-
-	/**
-	 * @since 0.9.44
-	 */
-        private static byte[] initHash(String protocolName) {
-		byte[] protocolNameBytes;
-		try {
-			protocolNameBytes = protocolName.getBytes("UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			// If UTF-8 is not supported, then we are definitely in trouble!
-			throw new UnsupportedOperationException("UTF-8 encoding is not supported");
-		}
-		byte[] rv = new byte[32];
-		if (protocolNameBytes.length <= 32) {
-			System.arraycopy(protocolNameBytes, 0, rv, 0, protocolNameBytes.length);
-			Arrays.fill(rv, protocolNameBytes.length, 32, (byte)0);
-		} else {
-			try {
-				MessageDigest hash = Noise.createHash("SHA256");
-				hash.update(protocolNameBytes, 0, protocolNameBytes.length);
-				hash.digest(rv, 0, 32);
-				Noise.releaseHash(hash);
-			} catch (Exception e) {
-				throw new IllegalStateException(e);
-			}
-		}
-		return rv;
-	}
-
 	private final CipherState cipher;
 	private final MessageDigest hash;
 	private final byte[] ck;
@@ -145,66 +45,18 @@ class SymmetricState implements Destroyable, Cloneable {
 
 	/**
 	 * Constructs a new symmetric state object.
-	 * Noise protocol name is hardcoded.
-	 * 
-	 * @param cipherName The name of the cipher within protocolName.
-	 * @param hashName The name of the hash within protocolName.
 	 * 
 	 * @throws NoSuchAlgorithmException The cipher or hash algorithm in the
 	 * protocol name is not supported.
 	 */
-	public SymmetricState(String cipherName, String hashName, String patternId) throws NoSuchAlgorithmException
+	public SymmetricState(NoiseInit.PatternID patternId) throws NoSuchAlgorithmException
 	{
-		cipher = Noise.createCipher(cipherName);
-		hash = Noise.createHash(hashName);
+		cipher = Noise.createCipher(patternId.getCipher());
+		hash = Noise.createHash(patternId.getHash());
 		int hashLength = hash.getDigestLength();
-		ck = new byte [hashLength];
-		h = new byte [hashLength];
+		ck = patternId.getInitialCK();
+		h = patternId.getInitialH();
 		prev_h = new byte [hashLength];
-		
-		byte[] initHash, initCK;
-		if (patternId.equals(HandshakeState.PATTERN_ID_XK)) {
-			initCK = INIT_CK_XK;
-			initHash = INIT_HASH_XK;
-		} else if (patternId.equals(HandshakeState.PATTERN_ID_IK)) {
-			initCK = INIT_CK_IK;
-			initHash = INIT_HASH_IK;
-		} else if (patternId.equals(HandshakeState.PATTERN_ID_N) ||
-		           patternId.equals(HandshakeState.PATTERN_ID_N_NO_RESPONSE)) {
-			initCK = INIT_CK_N;
-			initHash = INIT_HASH_N;
-		} else if (patternId.equals(HandshakeState.PATTERN_ID_XK_SSU2)) {
-			initCK = INIT_CK_XK_SSU2;
-			initHash = INIT_HASH_XK_SSU2;
-		} else if (patternId.equals(HandshakeState.PATTERN_ID_IKHFS_512)) {
-			initCK = INIT_CK_IKHFS_512;
-			initHash = INIT_HASH_IKHFS_512;
-		} else if (patternId.equals(HandshakeState.PATTERN_ID_IKHFS_768)) {
-			initCK = INIT_CK_IKHFS_768;
-			initHash = INIT_HASH_IKHFS_768;
-		} else if (patternId.equals(HandshakeState.PATTERN_ID_IKHFS_1024)) {
-			initCK = INIT_CK_IKHFS_1024;
-			initHash = INIT_HASH_IKHFS_1024;
-		} else if (patternId.equals(HandshakeState.PATTERN_ID_XKHFS_512)) {
-			initCK = INIT_CK_XKHFS_512;
-			initHash = INIT_HASH_XKHFS_512;
-		} else if (patternId.equals(HandshakeState.PATTERN_ID_XKHFS_768)) {
-			initCK = INIT_CK_XKHFS_768;
-			initHash = INIT_HASH_XKHFS_768;
-		} else if (patternId.equals(HandshakeState.PATTERN_ID_XKHFS_1024)) {
-			initCK = INIT_CK_XKHFS_1024;
-			initHash = INIT_HASH_XKHFS_1024;
-		} else if (patternId.equals(HandshakeState.PATTERN_ID_XKHFS_512_SSU2)) {
-			initCK = INIT_CK_XKHFS_512_SSU2;
-			initHash = INIT_HASH_XKHFS_512_SSU2;
-		} else if (patternId.equals(HandshakeState.PATTERN_ID_XKHFS_768_SSU2)) {
-			initCK = INIT_CK_XKHFS_768_SSU2;
-			initHash = INIT_HASH_XKHFS_768_SSU2;
-		} else {
-			throw new IllegalArgumentException("Handshake pattern is not recognized");
-		}
-		System.arraycopy(initHash, 0, h, 0, hashLength);
-		System.arraycopy(initCK, 0, ck, 0, hashLength);
 	}
 
 	/**
@@ -219,16 +71,6 @@ class SymmetricState implements Destroyable, Cloneable {
 		prev_h = Arrays.copyOf(o.prev_h, o.prev_h.length);
 	}
 
-	/**
-	 * Gets the name of the Noise protocol. 
-	 *
-	 * @return The protocol name.
-	 */
-	public String getProtocolName()
-	{
-		return HandshakeState.protocolName;
-	}
-	
 	/**
 	 * Gets the length of MAC values in the current state.
 	 * 

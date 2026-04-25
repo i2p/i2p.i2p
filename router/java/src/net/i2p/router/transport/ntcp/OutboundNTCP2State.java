@@ -11,6 +11,7 @@ import java.util.List;
 import com.southernstorm.noise.protocol.CipherState;
 import com.southernstorm.noise.protocol.CipherStatePair;
 import com.southernstorm.noise.protocol.HandshakeState;
+import com.southernstorm.noise.protocol.NoiseInit;
 
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.HKDF;
@@ -108,18 +109,18 @@ class OutboundNTCP2State implements EstablishState {
         _version = con.getVersion();
         int len = MSG1_SIZE;
         try {
-            String pattern;
+            NoiseInit.PatternID pattern;
             KeyFactory hkf;
             switch (_version) {
                 case 2:
-                    pattern = HandshakeState.PATTERN_ID_XK;
+                    pattern = NoiseInit.PatternID.XK;
                     _handshakeState = new HandshakeState(pattern, HandshakeState.INITIATOR, _transport.getXDHFactory());
                     // _tmp is used for both writing msg 1 and reading msg 2 and reading msg 1 padding.
                     // Prior to 0.9.69, the max padding was 256; as of 0.9.69, we increase it to 880, same as MLKEM-512
                     len += MAC_SIZE + EncType.MLKEM512_X25519_INT.getPubkeyLen();
                     break;
                 case 3:
-                    pattern = HandshakeState.PATTERN_ID_XKHFS_512;
+                    pattern = NoiseInit.PatternID.XKHFS_512;
                     // _tmp is used for both writing msg 1 and reading msg 2;
                     // for PQ, msg 1 is larger, so we use the _INT length, not the _CT length
                     len += MAC_SIZE + EncType.MLKEM512_X25519_INT.getPubkeyLen();
@@ -127,13 +128,13 @@ class OutboundNTCP2State implements EstablishState {
                     _handshakeState = new HandshakeState(pattern, HandshakeState.INITIATOR, _transport.getXDHFactory(), hkf);
                     break;
                 case 4:
-                    pattern = HandshakeState.PATTERN_ID_XKHFS_768;
+                    pattern = NoiseInit.PatternID.XKHFS_768;
                     len += MAC_SIZE + EncType.MLKEM768_X25519_INT.getPubkeyLen();
                     hkf = ctx.eciesEngine().getHybridKeyFactory(EncType.MLKEM768_X25519);
                     _handshakeState = new HandshakeState(pattern, HandshakeState.INITIATOR, _transport.getXDHFactory(), hkf);
                     break;
                 case 5:
-                    pattern = HandshakeState.PATTERN_ID_XKHFS_1024;
+                    pattern = NoiseInit.PatternID.XKHFS_1024;
                     len += MAC_SIZE + EncType.MLKEM1024_X25519_INT.getPubkeyLen();
                     hkf = ctx.eciesEngine().getHybridKeyFactory(EncType.MLKEM1024_X25519);
                     _handshakeState = new HandshakeState(pattern, HandshakeState.INITIATOR, _transport.getXDHFactory(), hkf);

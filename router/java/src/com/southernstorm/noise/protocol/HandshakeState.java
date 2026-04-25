@@ -134,164 +134,8 @@ public class HandshakeState implements Destroyable, Cloneable {
 	 */
 	private static final int FALLBACK_POSSIBLE = 0x40;
 
-	/** NTCP2 */
-	public static final String protocolName = "Noise_XKaesobfse+hs2+hs3_25519_ChaChaPoly_SHA256";
-	/** Ratchet */
-	public static final String protocolName2 = "Noise_IKelg2+hs2_25519_ChaChaPoly_SHA256";
-	/** Tunnels */
-	public static final String protocolName3 = "Noise_N_25519_ChaChaPoly_SHA256";
-	/** SSU2 */
-	public static final String protocolName4 = "Noise_XKchaobfse+hs1+hs2+hs3_25519_ChaChaPoly_SHA256";
-	/**
-	 * Hybrid Ratchet
-	 * @since 0.9.67
-	 */
-	public static final String protocolName5 = "Noise_IKhfselg2_25519+MLKEM512_ChaChaPoly_SHA256";
-	public static final String protocolName6 = "Noise_IKhfselg2_25519+MLKEM768_ChaChaPoly_SHA256";
-	public static final String protocolName7 = "Noise_IKhfselg2_25519+MLKEM1024_ChaChaPoly_SHA256";
-	/**
-	 * Hybrid NTCP2
-	 * @since 0.9.69
-	 */
-	public static final String protocolName8 = "Noise_XKhfsaesobfse+hs2+hs3_25519+MLKEM512_ChaChaPoly_SHA256";
-	public static final String protocolName9 = "Noise_XKhfsaesobfse+hs2+hs3_25519+MLKEM768_ChaChaPoly_SHA256";
-	public static final String protocolName10 = "Noise_XKhfsaesobfse+hs2+hs3_25519+MLKEM1024_ChaChaPoly_SHA256";
-	/**
-	 * Hybrid SSU2
-	 * @since 0.9.69
-	 */
-	public static final String protocolName11 = "Noise_XKhfschaobfse+hs1+hs2+hs3_25519+MLKEM512_ChaChaPoly_SHA256";
-	public static final String protocolName12 = "Noise_XKhfschaobfse+hs1+hs2+hs3_25519+MLKEM768_ChaChaPoly_SHA256";
-
-	private static final String prefix;
-	private final String patternId;
-	/** NTCP2 */
-	public static final String PATTERN_ID_XK = "XK";
-	/** Ratchet */
-	public static final String PATTERN_ID_IK = "IK";
-	/** Tunnels */
-	public static final String PATTERN_ID_N = "N";
-	/** same as N but no post-mixHash needed */
-	public static final String PATTERN_ID_N_NO_RESPONSE = "N!";
-	/** SSU2 */
-	public static final String PATTERN_ID_XK_SSU2 = "XK-SSU2";
-	/** Hybrid Base */
-	private static final String PATTERN_ID_IKHFS = "IKhfs";
-	private static final String PATTERN_ID_XKHFS = "XKhfs";
-	/**
-	 * Hybrid Ratchet
-	 * @since 0.9.67
-	 */
-	public static final String PATTERN_ID_IKHFS_512 = "IKhfs512";
-	public static final String PATTERN_ID_IKHFS_768 = "IKhfs768";
-	public static final String PATTERN_ID_IKHFS_1024 = "IKhfs1024";
-	/**
-	 * Hybrid NTCP2
-	 * @since 0.9.69
-	 */
-	public static final String PATTERN_ID_XKHFS_512 = "XKhfs512";
-	public static final String PATTERN_ID_XKHFS_768 = "XKhfs768";
-	public static final String PATTERN_ID_XKHFS_1024 = "XKhfs1024";
-	/**
-	 * Hybrid SSU2
-	 * @since 0.9.69
-	 */
-	public static final String PATTERN_ID_XKHFS_512_SSU2 = "XKhfs512-SSU2";
-	public static final String PATTERN_ID_XKHFS_768_SSU2 = "XKhfs768-SSU2";
-	// no 1024, too big
-
-	private static final String dh;
-	private static final String cipher;
-	private static final String hash;
+	private final NoiseInit.PatternID patternId;
 	private final short[] pattern;
-	private static final short[] PATTERN_XK;
-	private static final short[] PATTERN_IK;
-	private static final short[] PATTERN_N;
-	private static final short[] PATTERN_IKHFS;
-	private static final short[] PATTERN_XKHFS;
-
-	static {
-		// Parse the protocol name into its components.
-		// XK
-		String[] components = protocolName.split("_");
-		if (components.length != 5)
-			throw new IllegalArgumentException("Protocol name must have 5 components");
-		prefix = components[0];
-		String id = components[1].substring(0, 2);
-		if (!PATTERN_ID_XK.equals(id))
-			throw new IllegalArgumentException();
-		dh = components[2];
-		cipher = components[3];
-		hash = components[4];
-		if (!prefix.equals("Noise") && !prefix.equals("NoisePSK"))
-			throw new IllegalArgumentException("Prefix must be Noise or NoisePSK");
-		PATTERN_XK = Pattern.lookup(id);
-		if (PATTERN_XK == null)
-			throw new IllegalArgumentException("Handshake pattern is not recognized");
-		if (!dh.equals("25519"))
-			throw new IllegalArgumentException("Unknown Noise DH algorithm name: " + dh);
-		// IK
-		components = protocolName2.split("_");
-		id = components[1].substring(0, 2);
-		if (!PATTERN_ID_IK.equals(id))
-			throw new IllegalArgumentException();
-		PATTERN_IK = Pattern.lookup(id);
-		if (PATTERN_IK == null)
-			throw new IllegalArgumentException("Handshake pattern is not recognized");
-		// N
-		components = protocolName3.split("_");
-		id = components[1];
-		if (!PATTERN_ID_N.equals(id))
-			throw new IllegalArgumentException();
-		PATTERN_N = Pattern.lookup(id);
-		if (PATTERN_N == null)
-			throw new IllegalArgumentException("Handshake pattern is not recognized");
-		// XK-SSU2
-		components = protocolName4.split("_");
-		id = components[1].substring(0, 2);
-		if (!PATTERN_ID_XK.equals(id))
-			throw new IllegalArgumentException();
-		// IK Hybrid
-		components = protocolName5.split("_");
-		id = components[1].substring(0, 5);
-		if (!PATTERN_ID_IKHFS.equals(id))
-			throw new IllegalArgumentException();
-		PATTERN_IKHFS = Pattern.lookup(id);
-		if (PATTERN_IKHFS == null)
-			throw new IllegalArgumentException("Handshake pattern is not recognized");
-		components = protocolName6.split("_");
-		id = components[1].substring(0, 5);
-		if (!PATTERN_ID_IKHFS.equals(id))
-			throw new IllegalArgumentException();
-		components = protocolName7.split("_");
-		id = components[1].substring(0, 5);
-		if (!PATTERN_ID_IKHFS.equals(id))
-			throw new IllegalArgumentException();
-		// XK Hybrid
-		components = protocolName8.split("_");
-		id = components[1].substring(0, 5);
-		if (!PATTERN_ID_XKHFS.equals(id))
-			throw new IllegalArgumentException();
-		PATTERN_XKHFS = Pattern.lookup(id);
-		if (PATTERN_XKHFS == null)
-			throw new IllegalArgumentException("Handshake pattern is not recognized");
-		components = protocolName9.split("_");
-		id = components[1].substring(0, 5);
-		if (!PATTERN_ID_XKHFS.equals(id))
-			throw new IllegalArgumentException();
-		components = protocolName10.split("_");
-		id = components[1].substring(0, 5);
-		if (!PATTERN_ID_XKHFS.equals(id))
-			throw new IllegalArgumentException();
-		components = protocolName11.split("_");
-		id = components[1].substring(0, 5);
-		if (!PATTERN_ID_XKHFS.equals(id))
-			throw new IllegalArgumentException();
-		components = protocolName12.split("_");
-		id = components[1].substring(0, 5);
-		if (!PATTERN_ID_XKHFS.equals(id))
-			throw new IllegalArgumentException();
-	}
 
 	/**
 	 * Creates a new Noise handshake.
@@ -308,7 +152,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 	 * @throws NoSuchAlgorithmException One of the cryptographic algorithms
 	 * that is specified in the protocolName is not supported.
 	 */
-	public HandshakeState(String patternId, int role, KeyFactory xdh) throws NoSuchAlgorithmException
+	public HandshakeState(NoiseInit.PatternID patternId, int role, KeyFactory xdh) throws NoSuchAlgorithmException
 	{
 		this(patternId, role, xdh, null);
 	}
@@ -328,34 +172,13 @@ public class HandshakeState implements Destroyable, Cloneable {
 	 * @throws NoSuchAlgorithmException One of the cryptographic algorithms
 	 * that is specified in the protocolName is not supported.
 	 */
-	public HandshakeState(String patternId, int role, KeyFactory xdh, KeyFactory hdh) throws NoSuchAlgorithmException
+	public HandshakeState(NoiseInit.PatternID patternId, int role, KeyFactory xdh, KeyFactory hdh) throws NoSuchAlgorithmException
 	{
 		this.patternId = patternId;
-		if (patternId.equals(PATTERN_ID_XK))
-			pattern = PATTERN_XK;
-		else if (patternId.equals(PATTERN_ID_IK))
-			pattern = PATTERN_IK;
-		else if (patternId.equals(PATTERN_ID_N))
-			pattern = PATTERN_N;
-		else if (patternId.equals(PATTERN_ID_N_NO_RESPONSE))  // same as N but no post-mixHash needed
-			pattern = PATTERN_N;
-		else if (patternId.equals(PATTERN_ID_XK_SSU2))
-			pattern = PATTERN_XK;
-		else if (patternId.equals(PATTERN_ID_IKHFS_512) ||
-		         patternId.equals(PATTERN_ID_IKHFS_768) ||
-		         patternId.equals(PATTERN_ID_IKHFS_1024))
-			pattern = PATTERN_IKHFS;
-		else if (patternId.equals(PATTERN_ID_XKHFS_512) ||
-		         patternId.equals(PATTERN_ID_XKHFS_768) ||
-		         patternId.equals(PATTERN_ID_XKHFS_1024) ||
-		         patternId.equals(PATTERN_ID_XKHFS_512_SSU2) ||
-		         patternId.equals(PATTERN_ID_XKHFS_768_SSU2))
-			pattern = PATTERN_XKHFS;
-		else
-			throw new IllegalArgumentException("Handshake pattern is not recognized");
+		pattern = patternId.getPattern();
 		short flags = pattern[0];
 		int extraReqs = 0;
-		if ((flags & Pattern.FLAG_REMOTE_REQUIRED) != 0 && patternId.length() > 1)
+		if ((flags & Pattern.FLAG_REMOTE_REQUIRED) != 0 && patternId != NoiseInit.PatternID.N)
 			extraReqs |= FALLBACK_POSSIBLE;
 		if (role == RESPONDER) {
 			// Reverse the pattern flags so that the responder is "local".
@@ -367,10 +190,10 @@ public class HandshakeState implements Destroyable, Cloneable {
 			throw new IllegalArgumentException("Role must be initiator or responder");
 
 		// Initialize this object.  This will also create the cipher and hash objects.
-		symmetric = new SymmetricState(cipher, hash, patternId);
+		symmetric = new SymmetricState(patternId);
 		isInitiator = (role == INITIATOR);
 		action = NO_ACTION;
-		requirements = extraReqs | computeRequirements(flags, prefix, role, false);
+		requirements = extraReqs | computeRequirements(flags, "", role, false);
 		patternIndex = 1;
 		
 		// Create the DH objects that we will need later.
@@ -457,7 +280,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 	 */
 	public String getProtocolName()
 	{
-		return symmetric.getProtocolName();
+		return patternId.getProtocolName();
 	}
 	
 	/**
@@ -833,7 +656,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 					case Pattern.SS:
 					{
 						// I2P N extension to IK
-						if (patternId.equals(PATTERN_ID_IK) &&
+						if (patternId == NoiseInit.PatternID.IK &&
 						    localKeyPair.isNullPublicKey()) {
 							break loop;
 						}
@@ -901,13 +724,13 @@ public class HandshakeState implements Destroyable, Cloneable {
 			// Add the payload to the message buffer and encrypt it.
 			if (payload != null) {
 				// no need to hash for N, we don't split() and no more messages follow
-				if (patternId.equals(PATTERN_ID_N_NO_RESPONSE))
+				if (patternId == NoiseInit.PatternID.N_NO_RESPONSE)
 					messagePosn += symmetric.encryptOnly(payload, payloadOffset, message, messagePosn, payloadLength);
 				else
 					messagePosn += symmetric.encryptAndHash(payload, payloadOffset, message, messagePosn, payloadLength);
 			} else {
 				// no need to hash for N, we don't split() and no more messages follow
-				if (patternId.equals(PATTERN_ID_N_NO_RESPONSE))
+				if (patternId == NoiseInit.PatternID.N_NO_RESPONSE)
 					messagePosn += symmetric.encryptOnly(message, messagePosn, message, messagePosn, 0);
 				else
 					messagePosn += symmetric.encryptAndHash(message, messagePosn, message, messagePosn, 0);
@@ -1064,7 +887,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 					case Pattern.SS:
 					{
 						// I2P N extension to IK
-						if (patternId.equals(PATTERN_ID_IK) &&
+						if (patternId == NoiseInit.PatternID.IK &&
 						    remotePublicKey.isNullPublicKey()) {
 							break loop;
 						}
@@ -1113,7 +936,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 			// Decrypt the message payload.
 			int payloadLength;
 			// no need to hash for N, we don't split() and no more messages follow
-			if (patternId.equals(PATTERN_ID_N_NO_RESPONSE))
+			if (patternId == NoiseInit.PatternID.N_NO_RESPONSE)
 				payloadLength = symmetric.decryptOnly(message, messageOffset, payload, payloadOffset, messageEnd - messageOffset);
 			else
 				payloadLength = symmetric.decryptAndHash(message, messageOffset, payload, payloadOffset, messageEnd - messageOffset);
@@ -1220,8 +1043,8 @@ public class HandshakeState implements Destroyable, Cloneable {
 	 * 
 	 * @param flags The flags from the handshake's pattern.
 	 * @param prefix The prefix from the protocol name; typically
-	 * "Noise" or "NoisePSK".
-	 * @param role The role, HandshakeState.INITIATOR or HandshakeState.RESPONDER.
+	 *               "Noise" or "NoisePSK". Unused.
+	 * @param role The role, HandshakeState.INITIATOR or HandshakeState.RESPONDER. Unused.
 	 * @param isFallback Set to true if we need the requirements for a
 	 * fallback pattern; false for a regular pattern.
 	 * 

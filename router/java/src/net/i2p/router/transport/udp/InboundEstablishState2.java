@@ -15,6 +15,7 @@ import com.southernstorm.noise.protocol.ChaChaPolyCipherState;
 import com.southernstorm.noise.protocol.CipherState;
 import com.southernstorm.noise.protocol.CipherStatePair;
 import com.southernstorm.noise.protocol.HandshakeState;
+import com.southernstorm.noise.protocol.NoiseInit;
 
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.HKDF;
@@ -102,12 +103,12 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         int type = data[off + TYPE_OFFSET] & 0xff;
         long token = DataHelper.fromLong8(data, off + TOKEN_OFFSET);
         _version = data[off + VERSION_OFFSET] & 0xff;
-        String pattern;
+        NoiseInit.PatternID pattern;
         int overhead = LONG_HEADER_SIZE + KEY_LEN + MAC_LEN;
         boolean isIPv6 = _aliceIP.length == 16;
         switch (_version) {
             case 2:
-                pattern = HandshakeState.PATTERN_ID_XK_SSU2;
+                pattern = NoiseInit.PatternID.XK_SSU2;
                 _handshakeState = new HandshakeState(pattern, HandshakeState.RESPONDER, _transport.getXDHFactory());
                 break;
             case 3:
@@ -116,7 +117,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                     int ipOverhead = (isIPv6 ? PacketBuilder.IPV6_HEADER_SIZE : PacketBuilder.IP_HEADER_SIZE) + PacketBuilder.UDP_HEADER_SIZE;
                     _mtu = Math.max(PeerState2.MIN_MTU, len + ipOverhead);
                 }
-                pattern = HandshakeState.PATTERN_ID_XKHFS_512_SSU2;
+                pattern = NoiseInit.PatternID.XKHFS_512_SSU2;
                 overhead += MAC_LEN + EncType.MLKEM512_X25519_INT.getPubkeyLen();
                 _handshakeState = new HandshakeState(pattern, HandshakeState.RESPONDER, _transport.getXDHFactory());
                 break;
@@ -135,7 +136,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                     int ipOverhead = (isIPv6 ? PacketBuilder.IPV6_HEADER_SIZE : PacketBuilder.IP_HEADER_SIZE) + PacketBuilder.UDP_HEADER_SIZE;
                     _mtu = Math.max(min, len + ipOverhead);
                 }
-                pattern = HandshakeState.PATTERN_ID_XKHFS_768_SSU2;
+                pattern = NoiseInit.PatternID.XKHFS_768_SSU2;
                 overhead += MAC_LEN + EncType.MLKEM768_X25519_INT.getPubkeyLen();
                 _handshakeState = new HandshakeState(pattern, HandshakeState.RESPONDER, _transport.getXDHFactory());
                 break;

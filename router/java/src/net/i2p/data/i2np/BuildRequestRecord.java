@@ -6,6 +6,7 @@ import java.security.GeneralSecurityException;
 import java.util.Properties;
 
 import com.southernstorm.noise.protocol.HandshakeState;
+import com.southernstorm.noise.protocol.NoiseInit;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.EncType;
@@ -429,7 +430,7 @@ public class BuildRequestRecord {
         HandshakeState state = null;
         try {
             KeyFactory kf = TEST ? TESTKF : ctx.commSystem().getXDHFactory();
-            state = new HandshakeState(HandshakeState.PATTERN_ID_N, HandshakeState.INITIATOR, kf);
+            state = new HandshakeState(NoiseInit.PatternID.N, HandshakeState.INITIATOR, kf);
             state.getRemotePublicKey().setPublicKey(toKey.getData(), 0);
             state.start();
             state.writeMessage(out, PEER_SIZE, _data, 0, _data.length);
@@ -538,7 +539,7 @@ public class BuildRequestRecord {
             HandshakeState state = null;
             try {
                 KeyFactory kf = TEST ? TESTKF : ctx.commSystem().getXDHFactory();
-                state = new HandshakeState(HandshakeState.PATTERN_ID_N, HandshakeState.RESPONDER, kf);
+                state = new HandshakeState(NoiseInit.PatternID.N, HandshakeState.RESPONDER, kf);
                 state.getLocalKeyPair().setKeys(ourKey.getData(), 0,
                                                 ourKey.toPublic().getData(), 0);
                 state.start();

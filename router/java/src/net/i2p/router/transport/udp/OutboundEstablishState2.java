@@ -15,6 +15,7 @@ import com.southernstorm.noise.protocol.ChaChaPolyCipherState;
 import com.southernstorm.noise.protocol.CipherState;
 import com.southernstorm.noise.protocol.CipherStatePair;
 import com.southernstorm.noise.protocol.HandshakeState;
+import com.southernstorm.noise.protocol.NoiseInit;
 
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.HKDF;
@@ -270,21 +271,21 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
         if (publicKey.length != 32)
             throw new IllegalArgumentException("bad SSU2 S len");
         try {
-            String pattern;
+            NoiseInit.PatternID pattern;
             KeyFactory hkf;
             switch (_version) {
                 case 2:
-                    pattern = HandshakeState.PATTERN_ID_XK_SSU2;
+                    pattern = NoiseInit.PatternID.XK_SSU2;
                     _handshakeState = new HandshakeState(pattern, HandshakeState.INITIATOR, _transport.getXDHFactory());
                     break;
                 case 3:
-                    pattern = HandshakeState.PATTERN_ID_XKHFS_512_SSU2;
+                    pattern = NoiseInit.PatternID.XKHFS_512_SSU2;
                     //len += MAC_SIZE + EncType.MLKEM512_X25519_INT.getPubkeyLen();
                     hkf = _context.eciesEngine().getHybridKeyFactory(EncType.MLKEM512_X25519);
                     _handshakeState = new HandshakeState(pattern, HandshakeState.INITIATOR, _transport.getXDHFactory(), hkf);
                     break;
                 case 4:
-                    pattern = HandshakeState.PATTERN_ID_XKHFS_768_SSU2;
+                    pattern = NoiseInit.PatternID.XKHFS_768_SSU2;
                     //len += MAC_SIZE + EncType.MLKEM768_X25519_INT.getPubkeyLen();
                     hkf = _context.eciesEngine().getHybridKeyFactory(EncType.MLKEM768_X25519);
                     _handshakeState = new HandshakeState(pattern, HandshakeState.INITIATOR, _transport.getXDHFactory(), hkf);
