@@ -22,6 +22,7 @@
 
 package com.southernstorm.noise.protocol;
 
+import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
@@ -503,7 +504,7 @@ public class HandshakeState implements Destroyable, Cloneable {
 	 * @param local Local private key object.
 	 * @param remote Remote public key object.
 	 */
-	private void mixDH(DHState local, DHState remote)
+	private void mixDH(DHState local, DHState remote) throws GeneralSecurityException
 	{
 		if (local == null || remote == null)
 			throw new IllegalStateException("Pattern definition error");
@@ -552,10 +553,12 @@ public class HandshakeState implements Destroyable, Cloneable {
 	 * @throws ShortBufferException The message buffer does not have
 	 * enough space for the handshake message. 
 	 * 
+	 * @throws GeneralSecurityException on bad keys for DH
+	 * 
 	 * @see #getAction()
 	 * @see #readMessage(byte[], int, int, byte[], int)
 	 */
-	public int writeMessage(byte[] message, int messageOffset, byte[] payload, int payloadOffset, int payloadLength) throws ShortBufferException
+	public int writeMessage(byte[] message, int messageOffset, byte[] payload, int payloadOffset, int payloadLength) throws ShortBufferException, GeneralSecurityException
 	{
 		int messagePosn = messageOffset;
 		boolean success = false;
@@ -772,10 +775,12 @@ public class HandshakeState implements Destroyable, Cloneable {
 	 * @throws BadPaddingException A MAC value in the message failed
 	 * to verify.
 	 * 
+	 * @throws GeneralSecurityException on bad keys for DH
+	 * 
 	 * @see #getAction()
 	 * @see #writeMessage(byte[], int, byte[], int, int)
 	 */
-	public int readMessage(byte[] message, int messageOffset, int messageLength, byte[] payload, int payloadOffset) throws ShortBufferException, BadPaddingException
+	public int readMessage(byte[] message, int messageOffset, int messageLength, byte[] payload, int payloadOffset) throws ShortBufferException, BadPaddingException, GeneralSecurityException
 	{
 		boolean success = false;
 		int messageEnd = messageOffset + messageLength;

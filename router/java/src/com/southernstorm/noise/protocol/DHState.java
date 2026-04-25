@@ -22,6 +22,8 @@
 
 package com.southernstorm.noise.protocol;
 
+import java.security.GeneralSecurityException;
+
 /**
  * Interface to a Diffie-Hellman algorithm for the Noise protocol.
  */
@@ -96,10 +98,11 @@ public interface DHState extends Destroyable, Cloneable {
 	 * If this object previously held only a public key, then
 	 * this function will change it into a key pair.
 	 * 
+	 * @throws GeneralSecurityException on bad keys
 	 * @deprecated use setKeys()
 	 */
 	@Deprecated
-	void setPrivateKey(byte[] key, int offset);
+	void setPrivateKey(byte[] key, int offset) throws GeneralSecurityException;
 	
 	/**
 	 * Sets the private and public keys for this object.
@@ -178,8 +181,9 @@ public interface DHState extends Destroyable, Cloneable {
 	 * 
 	 * @throws IllegalArgumentException The publicDH object is not the same
 	 * type as this object, or one of the objects does not contain a valid key.
+	 * @throws GeneralSecurityException on bad keys
 	 */
-	void calculate(byte[] sharedKey, int offset, DHState publicDH);
+	void calculate(byte[] sharedKey, int offset, DHState publicDH) throws GeneralSecurityException;
 	
 	/**
 	 * Copies the key values from another DH object of the same type.

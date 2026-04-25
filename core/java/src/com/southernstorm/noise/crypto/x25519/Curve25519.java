@@ -22,6 +22,7 @@
 
 package com.southernstorm.noise.crypto.x25519;
 
+import java.security.GeneralSecurityException;
 import java.util.Arrays;
 
 /**
@@ -471,9 +472,9 @@ public final class Curve25519 {
 	 * @param publicKey The public key to use in the evaluation, or null
 	 *                  MUST have MSB high bit cleared, i.e. publicKey[31] &amp; 0x80 == 0
 	 * if the base point of the curve should be used.
-	 * @throws IllegalArgumentException on low-order input see RFC 7748
+	 * @throws GeneralSecurityException on low-order input see RFC 7748
 	 */
-	public static void eval(byte[] result, int offset, byte[] privateKey, byte[] publicKey)
+	public static void eval(byte[] result, int offset, byte[] privateKey, byte[] publicKey) throws GeneralSecurityException
 	{
 		Curve25519 state = new Curve25519();
 		try {
@@ -530,7 +531,7 @@ public final class Curve25519 {
 			b |= result[offset + index];
 		    }
 		    if (b == 0)
-			throw new IllegalArgumentException("low order input RFC 7748");
+			throw new GeneralSecurityException("low order input RFC 7748");
 		} finally {
 			// Clean up all temporary state before we exit.
 			state.destroy();

@@ -3,6 +3,7 @@ package net.i2p.router.crypto.ratchet;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1200,7 +1201,14 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
 
                     // create new OB TS, delete old one
                     PrivateKey priv = nextKeys.getPrivate();
-                    PrivateKey sharedSecret = ECIESAEADEngine.doDH(priv, key);
+                    PrivateKey sharedSecret;
+                    try {
+                        sharedSecret = ECIESAEADEngine.doDH(priv, key);
+                    } catch (GeneralSecurityException gse) {
+                        if (_log.shouldWarn())
+                            _log.warn("Bad nextkey DH", gse);
+                        return;
+                    }
                     byte[] sk = new byte[32];
                     _hkdf.calculate(sharedSecret.getData(), ZEROLEN, INFO_7, sk);
                     SessionKey ssk = new SessionKey(sk);
@@ -1294,7 +1302,14 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
                     }
                     _hisOBKey = receivedKey;
 
-                    PrivateKey sharedSecret = ECIESAEADEngine.doDH(_myIBKeys.getPrivate(), key);
+                    PrivateKey sharedSecret;
+                    try {
+                        sharedSecret = ECIESAEADEngine.doDH(_myIBKeys.getPrivate(), key);
+                    } catch (GeneralSecurityException gse) {
+                        if (_log.shouldWarn())
+                            _log.warn("Bad nextkey DH", gse);
+                        return;
+                    }
                     int newtsID = oldtsID + 1;
                     _currentIBTagSetID = newtsID;
                     _myIBKeySendCount = 0;

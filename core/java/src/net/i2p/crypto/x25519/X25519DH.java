@@ -1,5 +1,7 @@
 package net.i2p.crypto.x25519;
 
+import java.security.GeneralSecurityException;
+
 import com.southernstorm.noise.crypto.x25519.Curve25519;
 
 import net.i2p.crypto.EncType;
@@ -30,7 +32,11 @@ public class X25519DH {
         if (priv.getType() != TYPE || pub.getType() != TYPE)
             throw new IllegalArgumentException();
         byte[] rv = new byte[32];
-        Curve25519.eval(rv, 0, priv.getData(), pub.getData());
+        try {
+            Curve25519.eval(rv, 0, priv.getData(), pub.getData());
+        } catch (GeneralSecurityException gse) {
+            throw new IllegalArgumentException("Bad keys", gse);
+        }
         return new SessionKey(rv);
     }
 

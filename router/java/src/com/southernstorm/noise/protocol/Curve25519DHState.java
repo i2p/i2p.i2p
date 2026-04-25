@@ -22,6 +22,7 @@
 
 package com.southernstorm.noise.protocol;
 
+import java.security.GeneralSecurityException;
 import java.util.Arrays;
 
 import com.southernstorm.noise.crypto.x25519.Curve25519;
@@ -112,7 +113,7 @@ class Curve25519DHState implements DHState, Cloneable {
 	 */
 	@Deprecated
 	@Override
-	public void setPrivateKey(byte[] key, int offset) {
+	public void setPrivateKey(byte[] key, int offset) throws GeneralSecurityException {
 		System.arraycopy(key, offset, privateKey, 0, 32);
 		Curve25519.eval(publicKey, 0, privateKey, null);
 		mode = 0x03;
@@ -200,7 +201,7 @@ class Curve25519DHState implements DHState, Cloneable {
 	}
 
 	@Override
-	public void calculate(byte[] sharedKey, int offset, DHState publicDH) {
+	public void calculate(byte[] sharedKey, int offset, DHState publicDH) throws GeneralSecurityException {
 		if (!(publicDH instanceof Curve25519DHState))
 			throw new IllegalArgumentException("Incompatible DH algorithms");
 		Curve25519.eval(sharedKey, offset, privateKey, ((Curve25519DHState)publicDH).publicKey);

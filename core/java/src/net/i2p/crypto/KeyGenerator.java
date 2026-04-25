@@ -206,7 +206,11 @@ public final class KeyGenerator {
                 // worth doing?
             } while (bpriv[31] == 0);
             byte[] bpub = new byte[32];
-            Curve25519.eval(bpub, 0, bpriv, null);
+            try {
+                Curve25519.eval(bpub, 0, bpriv, null);
+            } catch (GeneralSecurityException gse) {
+                throw new IllegalArgumentException("Bad keys", gse);
+            }
             pub = new PublicKey(type, bpub);
             priv = new PrivateKey(type, bpriv, pub);
             break;
@@ -245,7 +249,11 @@ public final class KeyGenerator {
           case MLKEM768_X25519:
           case MLKEM1024_X25519:
             data = new byte[32];
-            Curve25519.eval(data, 0, priv.getData(), null);
+            try {
+                Curve25519.eval(data, 0, priv.getData(), null);
+            } catch (GeneralSecurityException gse) {
+                throw new IllegalArgumentException("Bad keys", gse);
+            }
             break;
 
           default:

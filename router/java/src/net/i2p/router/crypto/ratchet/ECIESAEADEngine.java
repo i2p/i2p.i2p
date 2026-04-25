@@ -1424,7 +1424,7 @@ public final class ECIESAEADEngine {
         return enc;
     }
 
-    static final PrivateKey doDH(PrivateKey privkey, PublicKey pubkey) {
+    static final PrivateKey doDH(PrivateKey privkey, PublicKey pubkey) throws GeneralSecurityException {
         byte[] dh = new byte[KEYLEN];
         Curve25519.eval(dh, 0, privkey.getData(), pubkey.getData());
         return new PrivateKey(EncType.ECIES_X25519, dh);

@@ -236,31 +236,27 @@ class MLKEMDHState implements DHState, Cloneable {
 	 *  Side effect: If we are Bob, copies the ciphertext to our public key
 	 *  so it may be written out in the message.
 	 *
-	 *  @throws IllegalArgumentException on bad public key modulus
+	 *  @throws GeneralSecurityException on bad public key modulus
 	 */
 	@Override
-	public void calculate(byte[] sharedKey, int offset, DHState publicDH) {
+	public void calculate(byte[] sharedKey, int offset, DHState publicDH) throws GeneralSecurityException {
 		if (!(publicDH instanceof MLKEMDHState))
 			throw new IllegalArgumentException("Incompatible DH algorithms");
-		try {
-			if (hasPrivateKey()) {
-				// we are Alice
-				byte[] sk = MLKEM.decaps(type, ((MLKEMDHState)publicDH).publicKey, privateKey);
-				System.arraycopy(sk, 0, sharedKey, offset, sk.length);
-			} else if (!hasPublicKey()) {
-				// we are Bob
-				byte[][] rv = MLKEM.encaps(type, ((MLKEMDHState)publicDH).publicKey);
-				byte[] ct = rv[0];
-				byte[] sk = rv[1];
-				System.arraycopy(sk, 0, sharedKey, offset, sk.length);
-				setPublicKey(ct, 0);
-			} else {
-				throw new IllegalStateException();
-			}
-			//System.out.println("Calculated shared PQ key: " + net.i2p.data.Base64.encode(sharedKey, offset, 32));
-		} catch (GeneralSecurityException gse) {
-			throw new IllegalArgumentException(gse);
+		if (hasPrivateKey()) {
+			// we are Alice
+			byte[] sk = MLKEM.decaps(type, ((MLKEMDHState)publicDH).publicKey, privateKey);
+			System.arraycopy(sk, 0, sharedKey, offset, sk.length);
+		} else if (!hasPublicKey()) {
+			// we are Bob
+			byte[][] rv = MLKEM.encaps(type, ((MLKEMDHState)publicDH).publicKey);
+			byte[] ct = rv[0];
+			byte[] sk = rv[1];
+			System.arraycopy(sk, 0, sharedKey, offset, sk.length);
+			setPublicKey(ct, 0);
+		} else {
+			throw new IllegalStateException();
 		}
+		//System.out.println("Calculated shared PQ key: " + net.i2p.data.Base64.encode(sharedKey, offset, 32));
 	}
 
 	@Override
