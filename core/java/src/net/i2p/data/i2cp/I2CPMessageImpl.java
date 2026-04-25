@@ -35,13 +35,14 @@ public abstract class I2CPMessageImpl implements I2CPMessage {
      * @throws IOException 
      */
     public void readMessage(InputStream in) throws I2CPMessageException, IOException {
-        int length = 0;
+        int length;
         try {
             length = (int) DataHelper.readLong(in, 4);
         } catch (DataFormatException dfe) {
             throw new I2CPMessageException("Error reading the length bytes", dfe);
         }
-        if (length < 0) throw new I2CPMessageException("Invalid message length specified");
+        if (length > I2CPMessageHandler.MAX_LENGTH)
+            throw new I2CPMessageException("Invalid message length specified");
         int type = in.read();
         if (type < 0)
             throw new EOFException();
