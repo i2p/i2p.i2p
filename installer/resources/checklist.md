@@ -56,8 +56,8 @@
     - See README for setup
   - `./create_new_entry.sh`
     - Entry href should be the in-net link to the release blog post
-  - `tx push --use-git-timestamps -s`
   - `git commit`
+  - Pull from github into Weblate
   - Weblate admin pulls from Github and announces
 
 2. Write the draft blog post, check in
@@ -65,9 +65,9 @@
   - Checkout i2p.www branch
   - Write draft release announcement - see i2p2www/blog/README for instructions
     - Top content should be the same as the news entry
-  - `tx push --use-git-timestamps -s -r I2P.website_blog`
   - `git commit`
   - Github CI auto-translates
+  - Verify newsxml blog post link works
 
 3. Weblate admin makes announcement asking for news translation
 
@@ -90,9 +90,8 @@
     based on minimum translated percentage)
   - `ant testscripts` to verify that all updated translations are valid
   - For any invalid that break the test, fix up the po file manually, or fix on
-    tx and pull again, or (if new) comment out in .tx/config (add a comment why)
+    Weblate and pull again, or (if new) don't check in,
     and delete the po file.
-    See instructions in .tx/config for fixing up getopt properties files.
   - `installer/resources/poupdate-man.sh` to generate new man page translations
     (requires po4a package)
   - `git add` for any new po files
@@ -214,8 +213,6 @@
 ### Distribute updates
 
 1. Update news with new version:
-  - Add magnet links, change release dates and release number in to old-format
-    news.xml, and distribute to news hosts (no longer necessary)
   - In the i2p.newsxml branch, edit magnet links, release dates and release
     number in data/releases.json, check in and push
 
@@ -308,9 +305,3 @@
 7. Announce Launchpad and Debian builds on Twitter
 
 8. Notify downstream Debian maintainer
-
-9. Pull announcement translations:
-  - `tx pull --use-git-timestamps -r I2P.website_blog`
-  Do NOT forget this step!
-  - `./update-existing-po.sh`
-  - `git commit i2p2www/translations/ -m "Updated translations"`
