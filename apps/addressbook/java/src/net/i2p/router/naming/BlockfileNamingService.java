@@ -791,13 +791,15 @@ public class BlockfileNamingService extends DummyNamingService {
             listname = lookupOptions.getProperty("list");
 
         Destination d = null;
+        boolean isb32 = hostname.length() >= BASE32_HASH_LENGTH + 8 && hostname.toLowerCase(Locale.US).endsWith(".b32.i2p");
         // only use cache if we aren't retreiving options or specifying the list
-        if (listname == null && storedOptions == null) {
-            d = super.lookup(hostname, null, null);
+        // except support ls2 options for b32 (prop. 167)
+        if (listname == null && (storedOptions == null || isb32)) {
+            d = super.lookup(hostname, null, storedOptions);
             if (d != null)
                 return d;
             // Base32 failed?
-            if (hostname.length() >= BASE32_HASH_LENGTH + 8 && hostname.toLowerCase(Locale.US).endsWith(".b32.i2p"))
+            if (isb32)
                 return null;
         }
 

@@ -196,8 +196,11 @@ public class HostReplyMessage extends I2CPMessageImpl {
         buf.append("\n\t").append(_sessionId);
         buf.append("\n\tReqID: ").append(_reqID);
         buf.append("\n\tResult: ").append(_code);
-        if (_code == RESULT_SUCCESS)
+        if (_code == RESULT_SUCCESS) {
             buf.append("\n\tDestination: ").append(_dest);
+            if (_options != null && !_options.isEmpty())
+                buf.append("\n\tOptions: ").append(DataHelper.toString(_options));
+        }
         buf.append("]");
         return buf.toString();
     }

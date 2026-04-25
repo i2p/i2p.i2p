@@ -78,7 +78,7 @@ public class DummyNamingService extends NamingService {
             try {
                 if (hostname.length() == BASE32_HASH_LENGTH + 8) {
                     // b32
-                    d = LookupDest.lookupBase32Hash(_context, hostname.substring(0, BASE32_HASH_LENGTH));
+                    d = LookupDest.lookupBase32Hash(_context, hostname.substring(0, BASE32_HASH_LENGTH), storedOptions);
                 } else {
                     // b33
                     d = LookupDest.lookupHostname(_context, hostname);

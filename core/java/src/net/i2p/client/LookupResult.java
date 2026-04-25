@@ -1,5 +1,7 @@
 package net.i2p.client;
 
+import java.util.Properties;
+
 import net.i2p.data.Destination;
 import net.i2p.data.i2cp.HostReplyMessage;
 
@@ -41,6 +43,18 @@ public interface LookupResult {
     public static final int RESULT_DECRYPTION_FAILURE = HostReplyMessage.RESULT_DECRYPTION_FAILURE;
 
     /**
+     * See proposal 167
+     * @since 0.9.70
+     */
+    public static final int RESULT_LEASESET_LOOKUP_FAILURE = HostReplyMessage.RESULT_LEASESET_LOOKUP_FAILURE;
+
+    /**
+     * See proposal 167
+     * @since 0.9.70
+     */
+    public static final int RESULT_LOOKUP_TYPE_UNSUPPORTED = HostReplyMessage.RESULT_LOOKUP_TYPE_UNSUPPORTED;
+
+    /**
      * For async calls only. Nonce will be non-zero and destination will be null.
      * Callback will be called later with the final result and the same nonce.
      *
@@ -57,6 +71,13 @@ public interface LookupResult {
      * @return Destination on success, null on failure
      */
     public Destination getDestination();
+
+    /**
+     * See proposal 167
+     * @return options from leaseset or null
+     * @since 0.9.70
+     */
+    public Properties getOptions();
 
     /**
      * For async calls only. Nonce will be non-zero.

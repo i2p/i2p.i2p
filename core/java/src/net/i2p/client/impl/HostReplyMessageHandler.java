@@ -30,7 +30,7 @@ class HostReplyMessageHandler extends HandlerImpl {
         Destination d = msg.getDestination();
         long id = msg.getReqID();
         if (d != null) {
-            session.destReceived(id, d);
+            session.destReceived(id, d, msg.getOptions());
         } else {
             session.destLookupFailed(id, msg.getResultCode());
         }

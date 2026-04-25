@@ -257,8 +257,8 @@ class SubSession extends I2PSessionMuxedImpl {
      *  on reception of HostReplyMessage
      *  @param d non-null
      */
-    void destReceived(long nonce, Destination d) {
-        _primary.destReceived(nonce, d);
+    void destReceived(long nonce, Destination d, Properties opts) {
+        _primary.destReceived(nonce, d, opts);
     }
 
     /**

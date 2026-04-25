@@ -20,6 +20,7 @@ import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.I2PSessionMuxedListener;
+import net.i2p.client.LookupResult;
 import net.i2p.client.SendMessageOptions;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
@@ -214,22 +215,34 @@ abstract class SAMMessageSession implements SAMMessageSess {
      * Lookup a destination through the I2CP session.
      * Blocking.
      *
+     * @param lsopts out parameter, or null
      * @return the Destination or null
      * @since 0.9.69
      */
-    public Destination lookupDest(String name) throws I2PSessionException {
-        return lookupDest(session, name);
+    public Destination lookupDest(String name, Properties lsopts) throws I2PSessionException {
+        return lookupDest(session, name, lsopts);
     }
 
     /**
      * Lookup a destination through the I2CP session.
      * Blocking.
      *
+     * @param lsopts out parameter, or null
      * @return the Destination or null
      * @since 0.9.69
      */
-    static Destination lookupDest(I2PSession session, String name) throws I2PSessionException {
+    static Destination lookupDest(I2PSession session, String name, Properties lsopts) throws I2PSessionException {
         // session will convert b32 to hash, no need to do it here
+        if (lsopts != null) {
+           LookupResult res = session.lookupDest2(name, 10*1000, true);
+           if (res.getResultCode() == LookupResult.RESULT_SUCCESS) {
+               Properties opts = res.getOptions();
+               if (opts != null && !opts.isEmpty())
+                   lsopts.putAll(opts);
+               return res.getDestination();
+           }
+           return null;
+        }
         return session.lookupDest(name, 10*1000);
     }
 

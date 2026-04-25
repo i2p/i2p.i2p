@@ -5,17 +5,21 @@
 package net.i2p.router.client;
 
 import java.util.Locale;
+import java.util.Properties;
 
 import net.i2p.crypto.Blinding;
 import net.i2p.data.Base32;
 import net.i2p.data.BlindData;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Destination;
+import net.i2p.data.EmptyProperties;
 import net.i2p.data.EncryptedLeaseSet;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.LeaseSet2;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.i2cp.DestReplyMessage;
+import net.i2p.data.i2cp.HostLookupMessage;
 import net.i2p.data.i2cp.HostReplyMessage;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageException;
@@ -34,35 +38,41 @@ class LookupDestJob extends JobImpl {
     private final ClientConnectionRunner _runner;
     private final long _reqID;
     private final long _timeout;
-    private final Hash _hash;
+    private Hash _hash;
     private final String _name;
+    private Destination _dest;
     private final SessionId _sessID;
     private final Hash _fromLocalDest;
     private final BlindData _blindData;
+    private final boolean _wantsOptions;
 
     private static final long DEFAULT_TIMEOUT = 15*1000;
 
     public LookupDestJob(RouterContext context, ClientConnectionRunner runner, Hash h, Hash fromLocalDest) {
-        this(context, runner, -1, DEFAULT_TIMEOUT, null, h, null, fromLocalDest);
+        this(context, runner, -1, DEFAULT_TIMEOUT, null, HostLookupMessage.LOOKUP_HASH, h, null, null, fromLocalDest);
     }
 
     /**
-     *  One of h or name non-null.
+     *  One of h or name or dest non-null.
      *
      *  For hash or b32 name, the dest will be returned if the LS can be found,
      *  even if the dest uses unsupported crypto.
      *
      *  @param reqID must be &gt;= 0 if name != null
      *  @param sessID must non-null if reqID &gt;= 0
+     *  @param type as defined in HostLookupMessage
+     *  @param h only valid for type 0, 2, 4
+     *  @param name only valid for type 1, 3
+     *  @param dest only valid for type 4
      *  @param fromLocalDest use these tunnels for the lookup, or null for exploratory
      *  @since 0.9.11
      */
     public LookupDestJob(RouterContext context, ClientConnectionRunner runner,
-                         long reqID, long timeout, SessionId sessID, Hash h, String name,
-                         Hash fromLocalDest) {
+                         long reqID, long timeout, SessionId sessID, int type, Hash h, String name,
+                         Destination dest, Hash fromLocalDest) {
         super(context);
         _log = context.logManager().getLog(LookupDestJob.class);
-        if ((h == null && name == null) ||
+        if ((h == null && name == null && dest == null) ||
             (h != null && name != null) ||
             (reqID >= 0 && sessID == null) ||
             (reqID < 0 && name != null)) {
@@ -74,6 +84,7 @@ class LookupDestJob extends JobImpl {
         _timeout = timeout;
         _sessID = sessID;
         _fromLocalDest = fromLocalDest;
+        _wantsOptions = type >= HostLookupMessage.LOOKUP_HASH_OPT;
         BlindData bd = null;
         if (name != null && name.length() >= 60) {
             // convert a b32 lookup to a hash lookup
@@ -134,6 +145,7 @@ class LookupDestJob extends JobImpl {
         }
         _hash = h;
         _name = name;
+        _dest = dest;
         _blindData = bd;
     }
     
@@ -166,23 +178,28 @@ class LookupDestJob extends JobImpl {
             if (d != null) {
                 if (_log.shouldDebug())
                     _log.debug("Found cached b33 lookup " + _blindData.getUnblindedPubKey() + " to " + d);
-                returnDest(d);
+                returnDest(d, null);
                 return;
             }
         }
         if (_name != null) {
             // inline, ignore timeout
-            Destination d = getContext().namingService().lookup(_name);
-            if (d != null) {
+            _dest = getContext().namingService().lookup(_name);
+            if (_dest != null) {
                 if (_log.shouldDebug())
-                    _log.debug("Found name lookup " + _name + " to " + d);
-                returnDest(d);
+                    _log.debug("Found name lookup " + _name + " to " + _dest);
+                if (!_wantsOptions)
+                    returnDest(_dest, null);
+                // else fall through, we need the LS
+                _hash = _dest.calculateHash();
             } else {
                 if (_log.shouldDebug())
                     _log.debug("Failed name lookup " + _name);
                 returnFail();
             }
-        } else if (_hash != null) {
+        }
+
+        if (_hash != null) {
             DoneJob done = new DoneJob(getContext());
             // shorten timeout so we can respond before the client side times out
             long timeout = _timeout;
@@ -190,9 +207,11 @@ class LookupDestJob extends JobImpl {
                 timeout -= 500;
             // TODO tell router this is an encrypted lookup, skip 38 or earlier ffs?
             NetworkDatabaseFacade db = _runner.getFloodfillNetworkDatabaseFacade();
-            if (db == null)
-                db = getContext().netDb();
-            db.lookupDestination(_hash, done, timeout, _fromLocalDest);
+            if (_dest == null) {
+                if (db == null)
+                    db = getContext().netDb();
+                db.lookupDestination(_hash, done, timeout, _fromLocalDest);
+            }
         } else {
             // blinding decode fail
             returnFail(HostReplyMessage.RESULT_DECRYPTION_FAILURE);
@@ -208,37 +227,64 @@ class LookupDestJob extends JobImpl {
             NetworkDatabaseFacade db = _runner.getFloodfillNetworkDatabaseFacade();
             if (db == null)
                 db = getContext().netDb();
-            Destination dest = db.lookupDestinationLocally(_hash);
-            if (dest == null && _blindData != null) {
+            LeaseSet ls = null;
+            if (_wantsOptions) {
+                ls = db.lookupLeaseSetLocally(_hash);
+                if (ls != null && _dest == null)
+                    _dest = ls.getDestination();
+            } else if (_dest == null) {
+                _dest = db.lookupDestinationLocally(_hash);
+            }
+            if (_dest == null && _blindData != null) {
                 // TODO store and lookup original hash instead
-                LeaseSet ls = db.lookupLeaseSetLocally(_hash);
+                if (ls == null)
+                    ls = db.lookupLeaseSetLocally(_hash);
                 if (ls != null && ls.getType() == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
                     // already decrypted
                     EncryptedLeaseSet encls = (EncryptedLeaseSet) ls;
                     LeaseSet decls = encls.getDecryptedLeaseSet();
                     if (decls != null) {
-                        dest = decls.getDestination();
+                        _dest = decls.getDestination();
                     }
                 }
             }
-            if (dest != null) {
+            if (_dest != null) {
                 if (_log.shouldDebug())
-                    _log.debug("Found hash lookup " + _hash + " to " + dest);
-                returnDest(dest);
+                    _log.debug("Found hash lookup " + _hash + " to " + _dest);
+                if (_wantsOptions) {
+                    Properties p = null;
+                    if (ls != null && ls.getType() == DatabaseEntry.KEY_TYPE_LS2) {
+                        LeaseSet2 ls2 = (LeaseSet2) ls;
+                        p = ls2.getOptions();
+                    }
+                    returnDest(_dest, p);
+                } else {
+                    returnDest(_dest, null);
+                }
             } else {
                 if (_log.shouldDebug())
                     _log.debug("Failed hash lookup " + _hash);
-                returnFail();
+                if (_wantsOptions && ls == null)
+                    returnFail(HostReplyMessage.RESULT_LEASESET_LOOKUP_FAILURE);
+                else
+                    returnFail();
             }
         }
     }
 
-    private void returnDest(Destination d) {
+    private void returnDest(Destination d, Properties p) {
         I2CPMessage msg;
-        if (_reqID >= 0)
-            msg = new HostReplyMessage(_sessID, d, _reqID);
-        else
+        if (_reqID >= 0) {
+            if (_wantsOptions) {
+                if (p == null)
+                    p = EmptyProperties.INSTANCE;
+                msg = new HostReplyMessage(_sessID, d, _reqID, p);
+            } else {
+                msg = new HostReplyMessage(_sessID, d, _reqID);
+            }
+        } else {
             msg = new DestReplyMessage(d);
+        }
         try {
             _runner.doSend(msg);
         } catch (I2CPMessageException ime) {}

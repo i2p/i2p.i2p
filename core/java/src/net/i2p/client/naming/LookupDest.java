@@ -11,6 +11,8 @@ import net.i2p.client.I2PSessionException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSimpleClient;
+import net.i2p.client.LookupResult;
+import net.i2p.client.impl.LkupCallback;
 import net.i2p.data.Base32;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -38,12 +40,22 @@ public class LookupDest {
 
     protected LookupDest(I2PAppContext context) {}
 
-    /** @param key 52 chars (do not include the .b32.i2p suffix) */
+    /**
+     * @param key 52 chars (do not include the .b32.i2p suffix)
+     */
     static Destination lookupBase32Hash(I2PAppContext ctx, String key) throws I2PSessionException {
+        return lookupBase32Hash(ctx, key, null);
+    }
+
+    /**
+     * @param key 52 chars (do not include the .b32.i2p suffix)
+     * @param lsopts out property or null
+     */
+    static Destination lookupBase32Hash(I2PAppContext ctx, String key, Properties lsopts) throws I2PSessionException {
         byte[] h = Base32.decode(key);
         if (h == null)
             return null;
-        return lookupHash(ctx, h);
+        return lookupHash(ctx, h, lsopts);
     }
 
     /* Might be useful but not in the context of urls due to upper/lower case */
@@ -56,8 +68,12 @@ public class LookupDest {
     }
     ****/
 
-    /** @param h 32 byte hash */
-    private static Destination lookupHash(I2PAppContext ctx, byte[] h) throws I2PSessionException {
+    /**
+     * @param h 32 byte hash
+     * @param lsopts out property or null
+     * @since 0.9.70
+     */
+    private static Destination lookupHash(I2PAppContext ctx, byte[] h, Properties lsopts) throws I2PSessionException {
         Hash key = Hash.create(h);
         Destination rv = null;
         I2PClient client = new I2PSimpleClient();
@@ -66,7 +82,32 @@ public class LookupDest {
         try {
             session = client.createSession(null, opts);
             session.connect();
-            rv = session.lookupDest(key, DEFAULT_TIMEOUT);
+            if (lsopts != null) {
+                // prop. 167
+                LkupCallback cb = new LkupCallback();
+                LookupResult res = session.lookupDest(key, 10*1000, cb, true);
+                int code = res.getResultCode();
+                if (code == LookupResult.RESULT_SUCCESS) {
+                    rv = res.getDestination();
+                    Properties ropts = res.getOptions();
+                    if (ropts != null && !ropts.isEmpty())
+                        lsopts.putAll(ropts);
+                } else if (code == LookupResult.RESULT_DEFERRED) {
+                    // blocking, sit and wait for it
+                    synchronized(cb) {
+                        try { cb.wait(10*1000); } catch (InterruptedException ie) {}
+                        res = cb.getResult();
+                    }
+                    if (res != null && res.getResultCode() == LookupResult.RESULT_SUCCESS) {
+                        rv = res.getDestination();
+                        Properties ropts = res.getOptions();
+                        if (ropts != null && !ropts.isEmpty())
+                            lsopts.putAll(ropts);
+                    }  // else timeout or failure
+                } // else immediate failure
+            } else {
+               rv = session.lookupDest(key, DEFAULT_TIMEOUT);
+            }
         } finally {
             if (session != null)
                 session.destroySession();

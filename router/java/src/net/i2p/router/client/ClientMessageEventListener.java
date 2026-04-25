@@ -766,8 +766,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             // h may still be null, an LS lookup for b32 will go out expl. tunnels
         }
         _context.jobQueue().addJob(new LookupDestJob(_context, _runner, message.getReqID(),
-                                                     message.getTimeout(), sid,
-                                                     message.getHash(), message.getHostname(), h));
+                                                     message.getTimeout(), sid, message.getLookupType(),
+                                                     message.getHash(), message.getHostname(),
+                                                     message.getDestination(), h));
     }
 
     /**

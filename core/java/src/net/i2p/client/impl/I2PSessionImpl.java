@@ -206,6 +206,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     private volatile boolean _routerSupportsHostLookup;
     private volatile boolean _routerSupportsLS2;
     private volatile boolean _routerSupportsBlindingInfo;
+    private volatile boolean _routerSupportsLookupOptions;
 
     protected static final int CACHE_MAX_SIZE = SystemVersion.isAndroid() ? 32 : 128;
     /**
@@ -230,6 +231,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     private static final String MIN_FAST_VERSION = "0.9.4";
     private static final String MIN_LS2_VERSION = "0.9.38";
     private static final String MIN_BLINDINFO_VERSION = "0.9.43";
+    private static final String MIN_LOOKUP_OPTIONS_VERSION = "0.9.70";
 
     /** @param routerVersion as rcvd in the SetDateMessage, may be null for very old routers */
     void dateUpdated(String routerVersion) {
@@ -250,6 +252,9 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         _routerSupportsBlindingInfo = isrc ||
                                      (routerVersion != null && routerVersion.length() > 0 &&
                                       VersionComparator.comp(routerVersion, MIN_BLINDINFO_VERSION) >= 0);
+        _routerSupportsLookupOptions = isrc ||
+                                     (routerVersion != null && routerVersion.length() > 0 &&
+                                      VersionComparator.comp(routerVersion, MIN_LOOKUP_OPTIONS_VERSION) >= 0);
         synchronized (_stateLock) {
             if (_state == State.OPENING) {
                 changeState(State.GOTDATE);
@@ -327,6 +332,8 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         _routerSupportsHostLookup = isrc;
         _routerSupportsSubsessions = isrc;
         _routerSupportsLS2 = isrc;
+        _routerSupportsBlindingInfo = isrc;
+        _routerSupportsLookupOptions = isrc;
     }
 
     /**
@@ -1611,7 +1618,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      *  @param d non-null
      *  @since 0.9.11
      */
-    void destReceived(long nonce, Destination d) {
+    void destReceived(long nonce, Destination d, Properties opts) {
         // notify by nonce and hash
         Hash h = d.calculateHash();
         for (LookupWaiter w : _pendingLookups) {
@@ -1623,13 +1630,14 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 }
                 if (w.callback != null) {
                     // asynch
-                    LkupResult result = new LkupResult(LookupResult.RESULT_SUCCESS, d, (int) w.nonce);
+                    LkupResult result = new LkupResult(LookupResult.RESULT_SUCCESS, d, (int) w.nonce, opts);
                     w.callback.complete(result);
                 } else {
                     // synch
                     synchronized (w) {
                         w.destination = d;
                         w.code = LookupResult.RESULT_SUCCESS;
+                        w.options = opts;
                         w.notifyAll();
                     }
                 }
@@ -1691,6 +1699,11 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
          *  @since 0.9.67
          */
         public final LookupCallback callback;
+        /**
+         *  the leaseset options, see proposal 167
+         *  @since 0.9.70
+         */
+        public Properties options;
 
         public LookupWaiter(Hash h) {
             this(h, -1);
@@ -1847,7 +1860,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      *  @return null on failure
      */
     public Destination lookupDest(String name, long maxWait) throws I2PSessionException {
-        LookupWaiter waiter = x_lookupDest(name, maxWait);
+        LookupWaiter waiter = x_lookupDest(name, maxWait, false);
         if (waiter == null)
             return null;
         synchronized(waiter) {
@@ -1865,7 +1878,21 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      *  @return non-null
      */
     public LookupResult lookupDest2(String name, long maxWait) throws I2PSessionException {
-        LookupWaiter waiter = x_lookupDest(name, maxWait);
+        return lookupDest2(name, maxWait, false);
+    }
+
+    /**
+     *  Ask the router to lookup a Destination by hostname.
+     *  Blocking. See above for details.
+     *  Same as lookupDest() but with a failure code in the return value
+     *
+     *  @param maxWait ms
+     *  @param withOptions see proposal 167
+     *  @return non-null
+     *  @since 0.9.70
+     */
+    public LookupResult lookupDest2(String name, long maxWait, boolean withOptions) throws I2PSessionException {
+        LookupWaiter waiter = x_lookupDest(name, maxWait, withOptions);
         if (waiter == null)
             return LOOKUP_FAILURE;
         synchronized(waiter) {
@@ -1873,6 +1900,8 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             Destination d = waiter.destination;
             if (d == null && code == LookupResult.RESULT_SUCCESS)
                 code = LookupResult.RESULT_FAILURE;
+            if (withOptions && code == LookupResult.RESULT_SUCCESS)
+                return new LkupResult(code, d, 0, waiter.options);
             return new LkupResult(code, d);
         }
     }
@@ -1884,7 +1913,12 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      *  @since 0.9.11
      *  @return null on failure
      */
-    private LookupWaiter x_lookupDest(String name, long maxWait) throws I2PSessionException {
+    private LookupWaiter x_lookupDest(String name, long maxWait, boolean withOptions) throws I2PSessionException {
+        if (!_routerSupportsLookupOptions) {
+            withOptions = false;
+            if (_log.shouldWarn())
+                _log.warn("Lookup with options not supported by router");
+        }
         if (name.length() == 0)
             return null;
         // Shortcut for b64
@@ -1898,10 +1932,13 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         // won't fit in Mapping
         if (name.length() >= 256 && !_context.isRouterContext())
             return null;
-        synchronized (_lookupCache) {
-            Destination rv = _lookupCache.get(name);
-            if (rv != null)
-                return new LookupWaiter(rv);
+        // if options are requested, we need to ask the router
+        if (!withOptions) {
+            synchronized (_lookupCache) {
+                Destination rv = _lookupCache.get(name);
+                if (rv != null)
+                    return new LookupWaiter(rv);
+            }
         }
         if (isClosed()) {
             if (_log.shouldLog(Log.INFO))
@@ -1910,8 +1947,48 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         }
         if (!_routerSupportsHostLookup) {
             // do them a favor and convert to Hash lookup
-            if (name.length() == 60 && name.toLowerCase(Locale.US).endsWith(".b32.i2p"))
-                return new LookupWaiter(lookupDest(Hash.create(Base32.decode(name.toLowerCase(Locale.US).substring(0, 52))), maxWait));
+            if (name.length() == 60 && name.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
+                Hash h = Hash.create(Base32.decode(name.toLowerCase(Locale.US).substring(0, 52)));
+                if (withOptions) {
+                    // we only have an async call for hash-with-options
+                    LkupCallback cb = new LkupCallback();
+                    LookupResult res = lookupDest(h, maxWait, cb, true);
+                    LookupWaiter rv = new LookupWaiter((Destination) null);
+                    int code = res.getResultCode();
+                    if (code == LookupResult.RESULT_SUCCESS) {
+                        rv.destination = res.getDestination();
+                        rv.options = res.getOptions();
+                        rv.code = code;
+                        return rv;
+                    }
+                    if (code != LookupResult.RESULT_DEFERRED) {
+                        // immediate failure
+                        rv.code = code;
+                        return rv;
+                    }
+                    // blocking, sit and wait for it
+                    synchronized(cb) {
+                        try { cb.wait(maxWait); } catch (InterruptedException ie) {}
+                        res = cb.getResult();
+                    }
+                    if (res == null) {
+                        // timeout
+                        rv.code = LookupResult.RESULT_FAILURE;
+                        return rv;
+                    }
+                    code = res.getResultCode();
+                    if (code == LookupResult.RESULT_SUCCESS) {
+                        rv.destination = res.getDestination();
+                        rv.options = res.getOptions();
+                        rv.code = code;
+                        return rv;
+                    }
+                    // failure
+                    rv.code = code;
+                    return rv;
+                }
+                return new LookupWaiter(lookupDest(h, maxWait));
+            }
             // else unsupported
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Router does not support HostLookup for " + name);
@@ -1926,7 +2003,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             SessionId id = _sessionId;
             if (id == null)
                 id = DUMMY_SESSION;
-            sendMessage_unchecked(new HostLookupMessage(id, name, nonce, maxWait));
+            sendMessage_unchecked(new HostLookupMessage(id, name, nonce, maxWait, withOptions));
             try {
                 synchronized (waiter) {
                     waiter.wait(maxWait);
@@ -1941,7 +2018,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     }
 
     /**
-     *  Lookup a Destination by hostname.
+     *  Lookup a Destination by hash.
      *  Non-blocking.
      *  If the result is cached or there is an immediate failure,
      *  the result code will be something other than RESULT_DEFERRED, and the callback will NOT be called.
@@ -1952,10 +2029,34 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      *  @since 0.9.67
      */
     public LookupResult lookupDest(Hash h, long maxWait, LookupCallback callback) throws I2PSessionException {
-        synchronized (_lookupCache) {
-            Destination rv = _lookupCache.get(h);
-            if (rv != null)
-                return new LkupResult(LookupResult.RESULT_SUCCESS, rv);
+        return lookupDest(h, maxWait, callback, false);
+    }
+
+    /**
+     *  Lookup a Destination by hash.
+     *  Non-blocking.
+     *  If the result is cached or there is an immediate failure,
+     *  the result code will be something other than RESULT_DEFERRED, and the callback will NOT be called.
+     *
+     *  @param maxWait ms
+     *  @param callback to return the result, non-null
+     *  @param withOptions see proposal 167
+     *  @return non-null. If result code is RESULT_DEFERRED, callback will be called later
+     *  @since 0.9.70
+     */
+    public LookupResult lookupDest(Hash h, long maxWait, LookupCallback callback, boolean withOptions) throws I2PSessionException {
+        if (!_routerSupportsLookupOptions) {
+            withOptions = false;
+            if (_log.shouldWarn())
+                _log.warn("Lookup with options not supported by router");
+        }
+        // if options are requested, we need to ask the router
+        if (!withOptions) {
+            synchronized (_lookupCache) {
+                Destination rv = _lookupCache.get(h);
+                if (rv != null)
+                    return new LkupResult(LookupResult.RESULT_SUCCESS, rv);
+            }
         }
         synchronized (_stateLock) {
             // not before GOTDATE
@@ -1977,7 +2078,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         if (maxWait > 60*1000)
             maxWait = 60*1000;
         try {
-            sendMessage_unchecked(new HostLookupMessage(id, h, nonce, maxWait));
+            sendMessage_unchecked(new HostLookupMessage(id, h, nonce, maxWait, withOptions));
         } catch (I2PSessionException ise) {
             _pendingLookups.remove(waiter);
             throw ise;
@@ -1987,7 +2088,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     }
 
     /**
-     *  Lookup a Destination by hash.
+     *  Lookup a Destination by hostname.
      *  Non-blocking.
      *  If the result is cached or there is an immediate failure,
      *  the result code will be something other than RESULT_DEFERRED, and the callback will NOT be called.
@@ -1998,6 +2099,27 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      *  @since 0.9.67
      */
     public LookupResult lookupDest(String name, long maxWait, LookupCallback callback) throws I2PSessionException {
+        return lookupDest(name, maxWait, callback, false);
+    }
+
+    /**
+     *  Lookup a Destination by hostname.
+     *  Non-blocking.
+     *  If the result is cached or there is an immediate failure,
+     *  the result code will be something other than RESULT_DEFERRED, and the callback will NOT be called.
+     *
+     *  @param maxWait ms
+     *  @param callback to return the result, non-null
+     *  @param withOptions see proposal 167
+     *  @return non-null. If result code is RESULT_DEFERRED, callback will be called later
+     *  @since 0.9.70
+     */
+    public LookupResult lookupDest(String name, long maxWait, LookupCallback callback, boolean withOptions) throws I2PSessionException {
+        if (!_routerSupportsLookupOptions) {
+            withOptions = false;
+            if (_log.shouldWarn())
+                _log.warn("Lookup with options not supported by router");
+        }
         if (name.length() == 0)
             return LOOKUP_FAILURE;
         // Shortcut for b64
@@ -2012,10 +2134,13 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         // won't fit in Mapping
         if (name.length() >= 256 && !_context.isRouterContext())
             return LOOKUP_FAILURE;
-        synchronized (_lookupCache) {
-            Destination rv = _lookupCache.get(name);
-            if (rv != null)
-                return new LkupResult(LookupResult.RESULT_SUCCESS, rv);
+        // if options are requested, we need to ask the router
+        if (!withOptions) {
+            synchronized (_lookupCache) {
+                Destination rv = _lookupCache.get(name);
+                if (rv != null)
+                    return new LkupResult(LookupResult.RESULT_SUCCESS, rv);
+            }
         }
         synchronized (_stateLock) {
             // not before GOTDATE
@@ -2037,7 +2162,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         if (maxWait > 60*1000)
             maxWait = 60*1000;
         try {
-            sendMessage_unchecked(new HostLookupMessage(id, name, nonce, maxWait));
+            sendMessage_unchecked(new HostLookupMessage(id, name, nonce, maxWait, withOptions));
         } catch (I2PSessionException ise) {
             _pendingLookups.remove(waiter);
             throw ise;

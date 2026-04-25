@@ -144,29 +144,41 @@ class SAMUtils {
      * Resolved the specified hostname.
      *
      * @param name Hostname to be resolved
-     *
+     * @param lsopts out parameter, or null
      * @return the Destination for the specified hostname, or null if not found
      */
-    private static Destination lookupHost(String name) {
+    private static Destination lookupHost(String name, Properties lsopts) {
         NamingService ns = I2PAppContext.getGlobalContext().namingService();
-        Destination dest = ns.lookup(name);
+        Destination dest = ns.lookup(name, null, lsopts);
         return dest;
     }
-    
+
     /**
      * Resolve the destination from a key or a hostname
      *
      * @param s Hostname or key to be resolved
-     *
      * @return the Destination for the specified hostname, non-null
      * @throws DataFormatException on bad Base 64 or name not found
      */
-    public static Destination getDest(String s) throws DataFormatException
+    public static Destination getDest(String s) throws DataFormatException {
+        return getDest(s, null);
+    }
+
+    /**
+     * Resolve the destination from a key or a hostname
+     *
+     * @param s Hostname or key to be resolved
+     * @param lsopts out parameter, or null
+     * @return the Destination for the specified hostname, non-null
+     * @throws DataFormatException on bad Base 64 or name not found
+     * @since 0.9.70
+     */
+    public static Destination getDest(String s, Properties lsopts) throws DataFormatException
     {
         // NamingService caches b64 so just use it for everything
         // TODO: Add a static local cache here so SAM doesn't flush the
         // NamingService cache
-    	Destination d = lookupHost(s);
+        Destination d = lookupHost(s, lsopts);
         if (d == null) {
             String msg;
             if (s.length() >= 516)

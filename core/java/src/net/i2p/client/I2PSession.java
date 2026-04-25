@@ -423,7 +423,7 @@ public interface I2PSession {
     public LookupResult lookupDest2(String name, long maxWait) throws I2PSessionException;
 
     /**
-     *  Lookup a Destination by hostname.
+     *  Lookup a Destination by hash.
      *  Non-blocking.
      *  If the result is cached or there is an immediate failure,
      *  the result code will be something other than RESULT_DEFERRED, and the callback will NOT be called.
@@ -436,7 +436,7 @@ public interface I2PSession {
     public LookupResult lookupDest(Hash h, long maxWait, LookupCallback callback) throws I2PSessionException;
 
     /**
-     *  Lookup a Destination by hash.
+     *  Lookup a Destination by hostname.
      *  Non-blocking.
      *  If the result is cached or there is an immediate failure,
      *  the result code will be something other than RESULT_DEFERRED, and the callback will NOT be called.
@@ -447,6 +447,46 @@ public interface I2PSession {
      *  @since 0.9.67
      */
     public LookupResult lookupDest(String name, long maxWait, LookupCallback callback) throws I2PSessionException;
+
+    /**
+     *  Ask the router to lookup a Destination by hostname.
+     *  Blocking. See above for details.
+     *  Same as lookupDest() but with a failure code in the return value
+     *
+     *  @param maxWait ms
+     *  @param withOptions see proposal 167
+     *  @return non-null
+     *  @since 0.9.70
+     */
+    public LookupResult lookupDest2(String name, long maxWait, boolean withOptions) throws I2PSessionException;
+
+    /**
+     *  Lookup a Destination by hash.
+     *  Non-blocking.
+     *  If the result is cached or there is an immediate failure,
+     *  the result code will be something other than RESULT_DEFERRED, and the callback will NOT be called.
+     *
+     *  @param maxWait ms
+     *  @param callback to return the result, non-null
+     *  @param withOptions see proposal 167
+     *  @return non-null. If result code is RESULT_DEFERRED, callback will be called later
+     *  @since 0.9.70
+     */
+    public LookupResult lookupDest(Hash h, long maxWait, LookupCallback callback, boolean withOptions) throws I2PSessionException;
+
+    /**
+     *  Lookup a Destination by hostname.
+     *  Non-blocking.
+     *  If the result is cached or there is an immediate failure,
+     *  the result code will be something other than RESULT_DEFERRED, and the callback will NOT be called.
+     *
+     *  @param maxWait ms
+     *  @param callback to return the result, non-null
+     *  @param withOptions see proposal 167
+     *  @return non-null. If result code is RESULT_DEFERRED, callback will be called later
+     *  @since 0.9.70
+     */
+    public LookupResult lookupDest(String name, long maxWait, LookupCallback callback, boolean withOptions) throws I2PSessionException;
 
     /**
      *  Pass updated options to the router.
