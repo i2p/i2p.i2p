@@ -1,3 +1,12 @@
+2026-04-25 zzz
+ * Addressbook: Do not re-add hosts deleted in router address book
+ * I2CP: Add missing max length check on alternate readMessage() path
+ * I2CP, SAM: Support lookup of ls2 options (proposal 167)
+ * i2ptunnel: SOCKS4a limit max string length
+ * Transport: Fail-fast if NTCP2 msg 1 padding length is too much
+ * Transport: Add support for SSU2 PQ hybrid (proposal 169)
+ * spotbugs fixes
+
 2026-04-20 2.12.0 (API 0.9.69) released
 
 2026-04-12 zzz
