@@ -90,7 +90,7 @@ class Daemon {
      *            The log to write changes and conflicts to.
      *            May be null.
      */
-    public static void update(AddressBook local, AddressBook router,
+    private static void update(AddressBook local, AddressBook router,
             File published, SubscriptionList subscriptions, Log log) {
         for (AddressBook book : subscriptions) {
             // yes, the EepGet fetch() is done in next()
@@ -120,12 +120,13 @@ class Daemon {
      * @param subscriptions
      *            A SubscriptionList listing the remote address books to update
      *            from.
+     * @param home The directory containing addressbook's configuration files.
      * @param log
      *            The log to write changes and conflicts to.
      *            May be null.
      * @since 0.8.7
      */
-    public static void update(NamingService router, File published, SubscriptionList subscriptions, Log log) {
+    private static void update(NamingService router, File published, SubscriptionList subscriptions, File home, Log log) {
         // If the NamingService is a database, we look up as we go.
         // If it is a text file, we do things differently, to avoid O(n**2) behavior
         // when scanning large subscription results (i.e. those that return the whole file, not just the new entries) -
@@ -149,6 +150,7 @@ class Daemon {
             publishedNS = null;
         }
 
+        DeletedHosts dhosts = new DeletedHosts(home);
         Iterator<AddressBook> iter = subscriptions.iterator();
         while (iter.hasNext()) {
             // yes, the EepGet fetch() is done in next()
@@ -161,7 +163,7 @@ class Daemon {
             }
             Iterator<Map.Entry<String, HostTxtEntry>> iter2 = addressbook.iterator();
             try {
-                update(router, knownNames, publishedNS, addressbook, iter2, log);
+                update(router, knownNames, publishedNS, addressbook, iter2, dhosts, log);
             } finally {
                 if (iter2 instanceof HostTxtIterator)
                     ((HostTxtIterator) iter2).close();
@@ -178,7 +180,7 @@ class Daemon {
      */
     private static void update(NamingService router, Set<String> knownNames,
                                NamingService publishedNS, AddressBook addressbook,
-                               Iterator<Map.Entry<String, HostTxtEntry>> iter, Log log) {
+                               Iterator<Map.Entry<String, HostTxtEntry>> iter, DeletedHosts dhosts, Log log) {
             long start = DEBUG ? System.currentTimeMillis() : 0;
             int old = 0, nnew = 0, invalid = 0, conflict = 0, total = 0;
             int deleted = 0;
@@ -188,6 +190,13 @@ class Daemon {
                 total++;
                 // may be null for 'remove' entries
                 String key = entry.getKey();
+                if (key != null && dhosts.contains(key)) {
+                    if (log != null) {
+                        log.append("Skipping deleted key " + key +
+                                   ". From: " + addressbook.getLocation());
+                    }
+                    continue;
+                }
                 boolean isKnown;
                 // NOT set for text file NamingService
                 Destination oldDest;
@@ -744,7 +753,7 @@ class Daemon {
      * @param home
      *            The directory containing addressbook's configuration files.
      */
-    public static void update(Map<String, String> settings, String home) {
+    private static void update(Map<String, String> settings, File home) {
         File published = null;
         boolean should_publish = Boolean.parseBoolean(settings.get("should_publish"));
         if (should_publish) 
@@ -788,7 +797,7 @@ class Daemon {
             update(local, router, published, subscriptions, log);
         } else {
             // Naming service - no merging of local to router and published is supported.
-            update(getNamingService(settings.get("naming_service")), published, subscriptions, log);
+            update(getNamingService(settings.get("naming_service")), published, subscriptions, home, log);
         }
     }
 
@@ -845,7 +854,7 @@ class Daemon {
         File published = new File("test-published.txt");
         Log log = new Log(new File("test-log.txt"));
         SubscriptionList subscriptions = new SubscriptionList("test-sub.txt");
-        update(ns, published, subscriptions, log);
+        update(ns, published, subscriptions, new File("."), log);
         ctx.logManager().flush();
     }
     
@@ -903,7 +912,7 @@ class Daemon {
                 delay = 1;
             }
             
-            update(settings, homeFile.getAbsolutePath());
+            update(settings, homeFile);
             try {
                 synchronized (this) {
                     wait(delay * 60 * 60 * 1000);

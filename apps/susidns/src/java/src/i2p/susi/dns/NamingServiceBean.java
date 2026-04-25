@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.SortedMap;
 
+import net.i2p.addressbook.DeletedHosts;
 import net.i2p.app.ClientAppManager;
 import net.i2p.client.naming.NamingService;
 import net.i2p.client.naming.SingleFileNamingService;
@@ -428,10 +429,16 @@ public class NamingServiceBean extends AddressbookBean
 					// clear search when deleting
 					if (action.equals(_t("Delete Entry")))
 						search = null;
+					if (getBook().equals("router")) {
+						// add to delete list so they don't come back via subscription
+						DeletedHosts dh = new DeletedHosts(addressbookDir());
+						dh.add(deletionMarks);
+					}
 				}
 				if( changed ) {
 					message += "<br>" + _t("Address book saved.");
 				}
+
 			}			
 			else {
 				message = _t("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.")
