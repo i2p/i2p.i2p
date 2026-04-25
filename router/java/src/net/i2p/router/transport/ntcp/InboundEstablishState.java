@@ -441,6 +441,12 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                 return;
             }
             _padlen1 = (int) DataHelper.fromLong(options, 2, 2);
+            if (_padlen1 > _X.length) {
+                // we reuse _X to read the padding, length set in EstablishBase
+                // limits are specified in the PQ spec
+                fail("Padlen too large: " + _padlen1);
+                return;
+            }
             _msg3p2len = (int) DataHelper.fromLong(options, 4, 2);
             long tsA = DataHelper.fromLong(options, 8, 4);
             long now = _context.clock().now();
