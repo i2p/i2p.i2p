@@ -963,6 +963,8 @@ public class WebMail extends HttpServlet
 				sessionObject.isFetching = false;
 				return State.AUTH;
 			}
+
+			mailbox.startMonitoringThread(new ConnectWaiter(sessionObject));
 		}
 
 		// wait a little while so we avoid the loading page if we can

@@ -695,6 +695,11 @@ public class POP3MailBox implements NewMailListener {
 		}
 	}
 
+        public void startMonitoringThread(NewMailListener nml) {
+	    I2PAppThread t = new I2PAppThread(new RecheckRunner(nml), "POP3 Checker");
+	    t.start();
+	}
+
 	/**
 	 * Closes any existing connection first.
 	 * Then, connect to pop3 server, login with USER and PASS and try STAT then
