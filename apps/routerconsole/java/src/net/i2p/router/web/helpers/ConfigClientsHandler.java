@@ -103,6 +103,7 @@ public class ConfigClientsHandler extends FormHandler {
         // value
         if (_action.startsWith("Start ")) {
             String app = _action.substring(6);
+            app = DataHelper.stripHTML(app);
             int appnum = -1;
             try {
                 appnum = Integer.parseInt(app);
@@ -126,6 +127,7 @@ public class ConfigClientsHandler extends FormHandler {
         // value
         if (_action.startsWith("Delete ")) {
             String app = _action.substring(7);
+            app = DataHelper.stripHTML(app);
             int appnum = -1;
             try {
                 appnum = Integer.parseInt(app);
@@ -165,6 +167,7 @@ public class ConfigClientsHandler extends FormHandler {
         if (_action.startsWith("Stop ")) {
             
             String app = _action.substring(5);
+            app = DataHelper.stripHTML(app);
             int appnum = -1;
             try {
                 appnum = Integer.parseInt(app);
@@ -197,6 +200,7 @@ public class ConfigClientsHandler extends FormHandler {
         if (_action.startsWith("Update ")) {
             if (pluginsEnabled) {
                 String app = _action.substring(7);
+                app = DataHelper.stripHTML(app);
                 updatePlugin(app);
             } else {
                 addFormError("Plugins disabled");
@@ -208,6 +212,7 @@ public class ConfigClientsHandler extends FormHandler {
         if (_action.startsWith("Check ")) {
             if (pluginsEnabled) {
                 String app = _action.substring(6);
+                app = DataHelper.stripHTML(app);
                 checkPlugin(app);
             } else {
                 addFormError("Plugins disabled");
