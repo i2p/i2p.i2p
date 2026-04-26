@@ -2775,8 +2775,8 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
             dtgNotify(Log.INFO,
                       _t("Download finished: {0}", snark.getBaseName()),
                       "/i2psnark/" + linkify(snark));
+            updateStatus(snark);
         }
-        updateStatus(snark);
     }
     
     /**
