@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import gnu.getopt.Getopt;
@@ -40,7 +41,7 @@ public class NewsHandler extends UpdateHandler implements Checker {
     //private static final String BACKUP_NEWS_URL = "http://ivk5a6wfjar6hjucjmnbcea5inwmwg5b3hsv72x77xwyhbeaajja.b32.i2p/news/news.xml";
     //private static final String BACKUP_NEWS_URL_SU3 = "http://ivk5a6wfjar6hjucjmnbcea5inwmwg5b3hsv72x77xwyhbeaajja.b32.i2p/news/news.su3";
     // idk
-    private static final String BACKUP_NEWS_URL = "http://dn3tvalnjz432qkqsvpfdqrwpqkw3ye4n4i2uyfr4jexvo3sp5ka.b32.i2p/news/news.atom.xml";
+    //private static final String BACKUP_NEWS_URL = "http://dn3tvalnjz432qkqsvpfdqrwpqkw3ye4n4i2uyfr4jexvo3sp5ka.b32.i2p/news/news.atom.xml";
     private static final String DEFAULT_BACKUP_NEWS_URL_SU3 = "http://dn3tvalnjz432qkqsvpfdqrwpqkw3ye4n4i2uyfr4jexvo3sp5ka.b32.i2p/news/news.su3";
     private static final String PROP_BACKUP_NEWS_URL_SU3 = "router.backupNewsURL";
 
@@ -67,6 +68,7 @@ public class NewsHandler extends UpdateHandler implements Checker {
             //updateSources.add(new URI(BACKUP_NEWS_URL));
             updateSources.add(new URI(_context.getProperty(PROP_BACKUP_NEWS_URL_SU3, DEFAULT_BACKUP_NEWS_URL_SU3)));
         } catch (URISyntaxException use) {}
+        Collections.shuffle(updateSources, _context.random());
         UpdateRunner update = new NewsFetcher(_context, _mgr, updateSources, maxTime);
         return update;
     }
