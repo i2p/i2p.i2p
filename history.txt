@@ -1,11 +1,23 @@
+2026-04-26 zzz
+ * i2psnark: Fix autostart of completed torrents when added to the directory
+ * Update: Randomize the order of news URLs when fetching
+
 2026-04-25 zzz
  * Addressbook: Do not re-add hosts deleted in router address book
+ * Console: Sanitize plugin name in ConfigClientsHandler
+ * Crypto:
+   - Refactor Noise initialization to use enums
+   - Change RFC 7748 DH error to a checked exception
+   - Disallow DSA-SHA1 signing k=q
  * I2CP: Add missing max length check on alternate readMessage() path
  * I2CP, SAM: Support lookup of ls2 options (proposal 167)
  * i2ptunnel: SOCKS4a limit max string length
- * Transport: Fail-fast if NTCP2 msg 1 padding length is too much
- * Transport: Add support for SSU2 PQ hybrid (proposal 169)
- * spotbugs fixes
+ * Router: Don't use InetAddress.getByName() for blocklist IP conversion
+ * Spotbugs fixes
+ * Transport:
+   - Add support for SSU2 PQ hybrid (proposal 169)
+   - Fail-fast if NTCP2 msg 1 padding length is too much
+   - Fix off-by-one check of SSU2 max fragment number
 
 2026-04-20 2.12.0 (API 0.9.69) released
 
