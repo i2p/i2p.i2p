@@ -478,6 +478,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                         }
                     }
                     _log.logAlways(Log.WARN, "HTTP proxy authentication failed, user: " + user + " IP: " + s.getInetAddress());
+                    try { Thread.sleep(3000); } catch (InterruptedException ie) {}
                 } catch (UnsupportedEncodingException uee) {
                     _log.error(getPrefix(requestId) + "No UTF-8 support? B64: " + authorization, uee);
                 } catch (ArrayIndexOutOfBoundsException aioobe) {
@@ -552,6 +553,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                                                                 (isSHA256 ? PROP_PROXY_DIGEST_SHA256_SUFFIX : PROP_PROXY_DIGEST_SUFFIX));
         if (ha1 == null) {
             _log.logAlways(Log.WARN, "HTTP proxy authentication failed, user: " + user + " IP: " + s.getInetAddress());
+            try { Thread.sleep(3000); } catch (InterruptedException ie) {}
             return AuthResult.AUTH_BAD;
         }
         // get H(A2)
@@ -564,6 +566,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             _log.logAlways(Log.WARN, "HTTP proxy authentication failed, user: " + user + " IP: " + s.getInetAddress());
             if (_log.shouldLog(Log.INFO))
                 _log.info("Bad digest auth: " + DataHelper.toString(args));
+            try { Thread.sleep(3000); } catch (InterruptedException ie) {}
             return AuthResult.AUTH_BAD;
         }
         if (_log.shouldLog(Log.INFO))
