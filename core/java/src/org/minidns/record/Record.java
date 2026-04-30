@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2024 the original author or authors
  *
  * This software is licensed under the Apache License, Version 2.0,
  * the GNU Lesser General Public License version 2 or later ("LGPL")
@@ -484,8 +484,8 @@ public final class Record<D extends Data> {
      * @return True if this record is a valid answer.
      */
     public boolean isAnswer(Question q) {
-        return ((q.type == type) || (q.type == TYPE.ANY)) &&
-               ((q.clazz == clazz) || (q.clazz == CLASS.ANY)) &&
+        return (q.type == type || q.type == TYPE.ANY) &&
+               (q.clazz == clazz || q.clazz == CLASS.ANY) &&
                q.name.equals(name);
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2024 the original author or authors
  *
  * This software is licensed under the Apache License, Version 2.0,
  * the GNU Lesser General Public License version 2 or later ("LGPL")
@@ -13,7 +13,7 @@ package org.minidns.record;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -69,11 +69,7 @@ public class TXT extends Data {
             List<byte[]> extents = getExtents();
             List<String> characterStrings = new ArrayList<>(extents.size());
             for (byte[] extent : extents) {
-                try {
-                    characterStrings.add(new String(extent, "UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    throw new AssertionError(e);
-                }
+                characterStrings.add(new String(extent, StandardCharsets.UTF_8));
             }
 
             characterStringsCache = Collections.unmodifiableList(characterStrings);

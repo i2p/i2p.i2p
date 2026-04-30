@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2024 the original author or authors
  *
  * This software is licensed under the Apache License, Version 2.0,
  * the GNU Lesser General Public License version 2 or later ("LGPL")
@@ -110,7 +110,7 @@ public class NSEC extends Data {
                 }
                 int a = (type >> 3) % 32;
                 int b = type % 8;
-                bitmap[a] |= 128 >> b;
+                bitmap[a] |= (byte) (128 >> b);
             }
             if (windowBlock != -1) writeOutBlock(bitmap, dos);
         } catch (IOException e) {

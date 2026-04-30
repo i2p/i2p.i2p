@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2024 the original author or authors
  *
  * This software is licensed under the Apache License, Version 2.0,
  * the GNU Lesser General Public License version 2 or later ("LGPL")
@@ -16,11 +16,11 @@ package org.minidns.dnslabel;
  */
 public final class UnderscoreLabel extends NonLdhLabel {
 
-    protected UnderscoreLabel(String label) {
+    UnderscoreLabel(String label) {
         super(label);
     }
 
-    protected static boolean isUnderscoreLabelInternal(String label) {
+    static boolean isUnderscoreLabelInternal(String label) {
         return label.charAt(0) == '_';
     }
 }

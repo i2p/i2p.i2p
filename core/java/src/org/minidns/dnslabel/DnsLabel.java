@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2024 the original author or authors
  *
  * This software is licensed under the Apache License, Version 2.0,
  * the GNU Lesser General Public License version 2 or later ("LGPL")
@@ -13,6 +13,8 @@ package org.minidns.dnslabel;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+
+import org.minidns.util.SafeCharSequence;
 
 /**
  * A DNS label is an individual component of a DNS name. Labels are usually shown separated by dots.
@@ -29,7 +31,7 @@ import java.util.Locale;
  * @author Florian Schmaus
  *
  */
-public abstract class DnsLabel implements CharSequence, Comparable<DnsLabel> {
+public abstract class DnsLabel extends SafeCharSequence implements Comparable<DnsLabel> {
 
     /**
      * The maximum length of a DNS label in octets.
@@ -77,23 +79,27 @@ public abstract class DnsLabel implements CharSequence, Comparable<DnsLabel> {
         return getClass().getSimpleName();
     }
 
-    @Override
-    public final int length() {
-        return label.length();
-    }
-
-    @Override
-    public final char charAt(int index) {
-        return label.charAt(index);
-    }
-
-    @Override
-    public final CharSequence subSequence(int start, int end) {
-        return label.subSequence(start, end);
-    }
+    private transient String safeToStringRepresentation;
 
     @Override
     public final String toString() {
+        if (safeToStringRepresentation == null) {
+            safeToStringRepresentation = toSafeRepesentation(label);
+        }
+
+        return safeToStringRepresentation;
+    }
+
+    /**
+     * Get the raw label. Note that this may return a String containing null bytes.
+     * Those Strings are notoriously difficult to handle from a security
+     * perspective. Therefore it is recommended to use {@link #toString()} instead,
+     * which will return a sanitized String.
+     *
+     * @return the raw label.
+     * @since 1.1.0
+     */
+    public final String getRawLabel() {
         return label;
     }
 
@@ -170,10 +176,98 @@ public abstract class DnsLabel implements CharSequence, Comparable<DnsLabel> {
         return string.toLowerCase(Locale.US).startsWith("xn--");
     }
 
+    public static String toSafeRepesentation(String dnsLabel) {
+        if (consistsOnlyOfLettersDigitsHypenAndUnderscore(dnsLabel)) {
+            // This label is safe, nothing to do.
+            return dnsLabel;
+        }
+
+        StringBuilder sb = new StringBuilder(2 * dnsLabel.length());
+        for (int i = 0; i < dnsLabel.length(); i++) {
+            char c = dnsLabel.charAt(i);
+            if (isLdhOrMaybeUnderscore(c, true)) {
+                sb.append(c);
+                continue;
+            }
+
+
+            // Let's see if we found and unsafe char we want to replace.
+            switch (c) {
+            case '.':
+                sb.append('●'); // U+25CF BLACK CIRCLE;
+                break;
+            case '\\':
+                sb.append('⧷'); // U+29F7 REVERSE SOLIDUS WITH HORIZONTAL STROKE
+                break;
+            case '\u007f':
+                // Convert DEL to U+2421 SYMBOL FOR DELETE
+                sb.append('␡');
+                break;
+            case ' ':
+                sb.append('␣'); // U+2423 OPEN BOX
+                break;
+            default:
+                if (c < 32) {
+                    // First convert the ASCI control codes to the Unicode Control Pictures
+                    int substituteAsInt = c + '\u2400';
+                    assert substituteAsInt <= Character.MAX_CODE_POINT;
+                    char substitute = (char) substituteAsInt;
+                    sb.append(substitute);
+                } else if (c < 127) {
+                    // Everything smaller than 127 is now safe to directly append.
+                    sb.append(c);
+                } else if (c > 255) {
+                    throw new IllegalArgumentException("The string '" + dnsLabel
+                            + "' contains characters outside the 8-bit range: " + c + " at position " + i);
+                } else {
+                    // Everything that did not match the previous conditions is explicitly escaped.
+                    sb.append("〚"); // U+301A
+                    // Transform the char to hex notation. Note that we have ensure that c is <= 255
+                    // here, hence only two hexadecimal places are ok.
+                    String hex = String.format("%02X", (int) c);
+                    sb.append(hex);
+                    sb.append("〛"); // U+301B
+                }
+            }
+        }
+
+        return sb.toString();
+    }
+
+    private static boolean isLdhOrMaybeUnderscore(char c, boolean underscore) {
+            // CHECKSTYLE:OFF
+            return (c >= 'a' && c <= 'z')
+                    || (c >= 'A' && c <= 'Z')
+                    || (c >= '0' && c <= '9')
+                    || c == '-'
+                    || (underscore && c == '_')
+                    ;
+            // CHECKSTYLE:ON
+    }
+
+    private static boolean consistsOnlyOfLdhAndMaybeUnderscore(String string, boolean underscore) {
+        for (int i = 0; i < string.length(); i++) {
+            char c = string.charAt(i);
+            if (isLdhOrMaybeUnderscore(c, underscore)) {
+                continue;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean consistsOnlyOfLettersDigitsAndHypen(String string) {
+        return consistsOnlyOfLdhAndMaybeUnderscore(string, false);
+    }
+
+    public static boolean consistsOnlyOfLettersDigitsHypenAndUnderscore(String string) {
+        return consistsOnlyOfLdhAndMaybeUnderscore(string, true);
+    }
+
     public static class LabelToLongException extends IllegalArgumentException {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 1L;
 

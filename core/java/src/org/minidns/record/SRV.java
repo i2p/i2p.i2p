@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2024 the original author or authors
  *
  * This software is licensed under the Apache License, Version 2.0,
  * the GNU Lesser General Public License version 2 or later ("LGPL")
@@ -20,7 +20,7 @@ import org.minidns.record.Record.TYPE;
 /**
  * SRV record payload (service pointer).
  */
-public class SRV extends Data implements Comparable<SRV> {
+public class SRV extends RRWithTarget implements Comparable<SRV> {
 
     /**
      * The priority of this service. Lower values mean higher priority.
@@ -38,38 +38,24 @@ public class SRV extends Data implements Comparable<SRV> {
      */
     public final int port;
 
-    /**
-     * The target server.
-     */
-    public final DnsName target;
-
-    /**
-     * The target server.
-     *
-     * @deprecated use {@link #target} instead.
-     */
-    @Deprecated
-    public final DnsName name;
-
     public static SRV parse(DataInputStream dis, byte[] data)
         throws IOException {
         int priority = dis.readUnsignedShort();
         int weight = dis.readUnsignedShort();
         int port = dis.readUnsignedShort();
-        DnsName name = DnsName.parse(dis, data);
-        return new SRV(priority, weight, port, name);
+        DnsName target = DnsName.parse(dis, data);
+        return new SRV(priority, weight, port, target);
     }
 
-    public SRV(int priority, int weight, int port, String name) {
-        this(priority, weight, port, DnsName.from(name));
+    public SRV(int priority, int weight, int port, String target) {
+        this(priority, weight, port, DnsName.from(target));
     }
 
-    public SRV(int priority, int weight, int port, DnsName name) {
+    public SRV(int priority, int weight, int port, DnsName target) {
+        super(target);
         this.priority = priority;
         this.weight = weight;
         this.port = port;
-        this.target = name;
-        this.name = target;
     }
 
     /**
@@ -90,7 +76,7 @@ public class SRV extends Data implements Comparable<SRV> {
         dos.writeShort(priority);
         dos.writeShort(weight);
         dos.writeShort(port);
-        target.writeToStream(dos);
+        super.serialize(dos);
     }
 
     @Override

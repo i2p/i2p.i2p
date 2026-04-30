@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2024 the original author or authors
  *
  * This software is licensed under the Apache License, Version 2.0,
  * the GNU Lesser General Public License version 2 or later ("LGPL")
@@ -78,6 +78,7 @@ public class RRSIG extends Data {
      */
     private final byte[] signature;
 
+    @SuppressWarnings("JavaUtilDate")
     public static RRSIG parse(DataInputStream dis, byte[] data, int length) throws IOException {
         TYPE typeCovered = TYPE.getType(dis.readUnsignedShort());
         byte algorithm = dis.readByte();
@@ -167,6 +168,7 @@ public class RRSIG extends Data {
         dos.write(signature);
     }
 
+    @SuppressWarnings("JavaUtilDate")
     public void writePartialSignature(DataOutputStream dos) throws IOException {
         dos.writeShort(typeCovered.getValue());
         dos.writeByte(algorithmByte);

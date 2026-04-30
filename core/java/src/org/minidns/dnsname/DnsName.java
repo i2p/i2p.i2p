@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2024 the original author or authors
  *
  * This software is licensed under the Apache License, Version 2.0,
  * the GNU Lesser General Public License version 2 or later ("LGPL")
@@ -22,9 +22,10 @@ import java.util.Locale;
 
 import org.minidns.dnslabel.DnsLabel;
 import org.minidns.idna.MiniDnsIdna;
+import org.minidns.util.SafeCharSequence;
 
 /**
- * A DNS name, also called "domain name". A DNS name consists of multiple 'labels' and is subject to certain restrictions (see
+ * A DNS name, also called "domain name". A DNS name consists of multiple 'labels' (see {@link DnsLabel}) and is subject to certain restrictions (see
  * for example <a href="https://tools.ietf.org/html/rfc3696#section-2">RFC 3696 § 2.</a>).
  * <p>
  * Instances of this class can be created by using {@link #from(String)}.
@@ -43,10 +44,11 @@ import org.minidns.idna.MiniDnsIdna;
  * </ul>
  *
  * @see <a href="https://tools.ietf.org/html/rfc3696">RFC 3696</a>
+ * @see DnsLabel
  * @author Florian Schmaus
  *
  */
-public final class DnsName implements CharSequence, Serializable, Comparable<DnsName> {
+public final class DnsName extends SafeCharSequence implements Serializable, Comparable<DnsName> {
 
     /**
      * 
@@ -59,7 +61,7 @@ public final class DnsName implements CharSequence, Serializable, Comparable<Dns
     private static final String LABEL_SEP_REGEX = "[.\u3002\uFF0E\uFF61]";
 
     /**
-     * @see <a href="https://tools.ietf.org/html/rfc1035">RFC 1035 § 2.3.4.</a>
+     * See <a href="https://tools.ietf.org/html/rfc1035">RFC 1035 § 2.3.4.</a>
      */
     static final int MAX_DNSNAME_LENGTH_IN_OCTETS = 255;
 
@@ -257,6 +259,31 @@ public final class DnsName implements CharSequence, Serializable, Comparable<Dns
         }
     }
 
+    /**
+     * Return the ACE (ASCII Compatible Encoding) version of this DNS name. Note
+     * that this method may return a String containing null bytes. Those Strings are
+     * notoriously difficult to handle from a security perspective. Therefore it is
+     * recommended to use {@link #toString()} instead, which will return a sanitized
+     * String.
+     *
+     * @return the ACE version of this DNS name.
+     * @since 1.1.0
+     */
+    public String getAce() {
+        return ace;
+    }
+
+    /**
+     * Returns the raw ACE version of this DNS name. That is, the version as it was
+     * received over the wire. Most notably, this version may include uppercase
+     * letters.
+     *
+     * <b>Please refer to {@link #getAce()} for a discussion of the security
+     * implications when working with the ACE representation of a DNS name.</b>
+     *
+     * @return the raw ACE version of this DNS name.
+     * @see #getAce()
+     */
     public String getRawAce() {
         return rawAce;
     }
@@ -291,7 +318,7 @@ public final class DnsName implements CharSequence, Serializable, Comparable<Dns
 
     public DnsLabel getHostpartLabel() {
         setLabelsIfRequired();
-        return labels[labels.length];
+        return labels[labels.length - 1];
     }
 
     private void setHostnameAndDomainpartIfRequired() {
@@ -317,24 +344,31 @@ public final class DnsName implements CharSequence, Serializable, Comparable<Dns
         return size;
     }
 
-    @Override
-    public int length() {
-        return ace.length();
-    }
-
-    @Override
-    public char charAt(int index) {
-        return ace.charAt(index);
-    }
-
-    @Override
-    public CharSequence subSequence(int start, int end) {
-        return ace.subSequence(start, end);
-    }
+    private transient String safeToStringRepresentation;
 
     @Override
     public String toString() {
-        return ace;
+        if (safeToStringRepresentation == null) {
+            setLabelsIfRequired();
+            if (labels.length == 0) {
+                return ".";
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = labels.length - 1; i >= 0; i--) {
+                // Note that it is important that we append the result of DnsLabel.toString() to
+                // the StringBuilder. As only the result of toString() is the safe label
+                // representation.
+                String safeLabelRepresentation = labels[i].toString();
+                sb.append(safeLabelRepresentation);
+                if (i != 0) {
+                    sb.append('.');
+                }
+            }
+            safeToStringRepresentation = sb.toString();
+        }
+
+        return safeToStringRepresentation;
     }
 
     public static DnsName from(CharSequence name) {
@@ -367,12 +401,17 @@ public final class DnsName implements CharSequence, Serializable, Comparable<Dns
         return new DnsName(rawLabels, true);
     }
 
+    public static DnsName from(CharSequence child, DnsName parent) {
+        DnsLabel childLabel = DnsLabel.from(child.toString());
+        return DnsName.from(childLabel, parent);
+    }
+
     public static DnsName from(DnsLabel child, DnsName parent) {
         parent.setLabelsIfRequired();
 
         DnsLabel[] rawLabels = new DnsLabel[parent.rawLabels.length + 1];
         System.arraycopy(parent.rawLabels, 0, rawLabels, 0, parent.rawLabels.length);
-        rawLabels[rawLabels.length] = child;
+        rawLabels[parent.rawLabels.length] = child;
         return new DnsName(rawLabels, true);
     }
 
@@ -450,6 +489,7 @@ public final class DnsName implements CharSequence, Serializable, Comparable<Dns
      * @return The parsed domain name.
      * @throws IllegalStateException on cycles.
      */
+     @SuppressWarnings("NonApiType")
     private static DnsName parse(byte[] data, int offset, HashSet<Integer> jumps)
             throws IllegalStateException {
         int c = data[offset] & 0xff;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2024 the original author or authors
  *
  * This software is licensed under the Apache License, Version 2.0,
  * the GNU Lesser General Public License version 2 or later ("LGPL")
@@ -14,7 +14,7 @@ import org.minidns.idna.MiniDnsIdna;
 
 public final class ALabel extends XnLabel {
 
-    protected ALabel(String label) {
+    ALabel(String label) {
         super(label);
     }
 

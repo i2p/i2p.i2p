@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2024 the original author or authors
  *
  * This software is licensed under the Apache License, Version 2.0,
  * the GNU Lesser General Public License version 2 or later ("LGPL")
@@ -11,9 +11,39 @@
 package org.minidns.dnslabel;
 
 /**
- * A LDH (<b>L</b>etters, <b>D</b>igits, <b>H</b>yphen) label, which is the classical label form.
- * 
- * @see <a href="https://tools.ietf.org/html/rfc5890#section-2.3.1">RFC 5890 § 2.3.1. LDH Label</a>
+ * A LDH (<b>L</b>etters, <b>D</b>igits, <b>H</b>yphen) label, which is the
+ * classical label form.
+ * <p>
+ * Note that it is a common misconception that LDH labels can not start with a
+ * digit. The origin of this misconception is likely that
+ * <a href="https://datatracker.ietf.org/doc/html/rfc1034#section-3.5">RFC 1034
+ * § 3.5</a> specified
+ * </p>
+ * <blockquote>
+ * They [i.e, DNS labels] must start with a letter, end with a letter or digit,
+ * and have as interior characters only letters, digits, and hyphen.
+ * </blockquote>.
+ * However, this was relaxed in
+ * <a href="https://datatracker.ietf.org/doc/html/rfc1123#page-13">RFC 1123 §
+ * 2.1</a>
+ * <blockquote>
+ * One aspect of host name syntax is hereby changed: the restriction on the first
+ * character is relaxed to allow either a letter or a digit.
+ * </blockquote>
+ * and later summarized in
+ * <a href="https://datatracker.ietf.org/doc/html/rfc3696#section-2">RFC 3696 §
+ * 2</a>:
+ * <blockquote>
+ * If the hyphen is used, it is not permitted to appear at either the beginning
+ * or end of a label.
+ * </blockquote>
+ * Furthermore
+ * <a href="https://datatracker.ietf.org/doc/html/rfc5890#section-2.3.1">RFC
+ * 5890 § 2.3.1</a> only mentions the requirement that hyphen must not be the
+ * first or last character of a LDH label.
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc5890#section-2.3.1">RFC 5890 §
+ *      2.3.1. LDH Label</a>
  *
  */
 public abstract class LdhLabel extends DnsLabel {
@@ -31,17 +61,7 @@ public abstract class LdhLabel extends DnsLabel {
             return false;
         }
 
-        for (int i = 0; i < label.length(); i++) {
-            char c = label.charAt(i);
-            if ((c >= 'a' && c <= 'z')
-                    || (c >= 'A' && c <= 'Z')
-                    || (c >= '0' && c <= '9')
-                    || c == '-') {
-                continue;
-            }
-            return false;
-        }
-        return true;
+        return consistsOnlyOfLettersDigitsAndHypen(label);
     }
 
     protected static LdhLabel fromInternal(String label) {

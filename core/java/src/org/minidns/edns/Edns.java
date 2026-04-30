@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2024 the original author or authors
  *
  * This software is licensed under the Apache License, Version 2.0,
  * the GNU Lesser General Public License version 2 or later ("LGPL")
@@ -129,7 +129,7 @@ public class Edns {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "TypeParameterUnusedInFormals"})
     public <O extends EdnsOption> O getEdnsOption(OptionCode optionCode) {
         for (EdnsOption o : variablePart) {
             if (o.getOptionCode().equals(optionCode)) {

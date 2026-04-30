@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2024 the original author or authors
  *
  * This software is licensed under the Apache License, Version 2.0,
  * the GNU Lesser General Public License version 2 or later ("LGPL")
@@ -36,13 +36,15 @@ public abstract class XnLabel extends ReservedLdhLabel {
     }
 
     public static boolean isXnLabel(String label) {
-        if (!isLdhLabel(label)) {
+        if (!isReservedLdhLabel(label)) {
             return false;
         }
         return isXnLabelInternal(label);
     }
 
     static boolean isXnLabelInternal(String label) {
+        // Note that we already ensure the minimum label length here, since reserved LDH
+        // labels must start with "xn--".
         return label.substring(0, 2).toLowerCase(Locale.US).equals("xn");
     }
 }

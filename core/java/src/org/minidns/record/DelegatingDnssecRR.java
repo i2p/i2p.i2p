@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors
+ * Copyright 2015-2024 the original author or authors
  *
  * This software is licensed under the Apache License, Version 2.0,
  * the GNU Lesser General Public License version 2 or later ("LGPL")
@@ -15,6 +15,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Locale;
 
 import org.minidns.constants.DnssecConstants.DigestAlgorithm;
 import org.minidns.constants.DnssecConstants.SignatureAlgorithm;
@@ -74,10 +75,10 @@ public abstract class DelegatingDnssecRR extends Data {
     }
 
     protected static final class SharedData {
-        protected final int keyTag;
-        protected final byte algorithm;
-        protected final byte digestType;
-        protected final byte[] digest;
+        final int keyTag;
+        final byte algorithm;
+        final byte digestType;
+        final byte[] digest;
 
         private SharedData(int keyTag, byte algorithm, byte digestType, byte[] digest) {
             this.keyTag = keyTag;
@@ -128,7 +129,7 @@ public abstract class DelegatingDnssecRR extends Data {
                 .append(keyTag).append(' ')
                 .append(algorithm).append(' ')
                 .append(digestType).append(' ')
-                .append(new BigInteger(1, digest).toString(16).toUpperCase());
+                .append(new BigInteger(1, digest).toString(16).toUpperCase(Locale.ROOT));
         return sb.toString();
     }
 
@@ -145,7 +146,7 @@ public abstract class DelegatingDnssecRR extends Data {
 
     public String getDigestHex() {
         if (digestHexCache == null) {
-            digestHexCache = getDigestBigInteger().toString(16).toUpperCase();
+            digestHexCache = getDigestBigInteger().toString(16).toUpperCase(Locale.ROOT);
         }
         return digestHexCache;
     }
