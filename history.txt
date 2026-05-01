@@ -1,3 +1,21 @@
+2026-05-01 zzz
+ * Console: Specify full path to Windows service scripts
+ * Crypto: Use constant-time modPow() for ElG private key operations
+ * I2CP: Wait for queue space on internal queue close()
+ * i2psnark: Remove support for ancient name.utf-8 and path.utf-8 metainfo entries
+ * Transport:
+   - Fail-fast if NTCP2 msg 2 padding length is too much
+   - Increase SSU2 nonce replay cache size
+
+2026-04-30 zzz
+ * Util:
+   - Revert change causing failed decode of compressed IPv6 addresses
+   - Update minidns to 1.1.1
+   - Update json-simple to 2.3.1
+
+2026-04-27 zzz
+ * i2ptunnel, I2CP, SAM: Add delays on auth failure
+
 2026-04-26 zzz
  * i2psnark: Fix autostart of completed torrents when added to the directory
  * Update: Randomize the order of news URLs when fetching
