@@ -23,7 +23,9 @@ import net.i2p.util.RandomSource;
  * ref: https://en.wikipedia.org/wiki/ElGamal_signature_scheme
  *
  * @since 0.9.25
+ * @deprecated unused, unsupported by SigType or SigUtil, may need constant-time fixes
  */
+@Deprecated
 public final class ElGamalSigEngine extends Signature {
     private final MessageDigest digest;
     private ElGamalKey key;

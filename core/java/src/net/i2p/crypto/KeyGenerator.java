@@ -161,7 +161,7 @@ public final class KeyGenerator {
      */
     public SimpleDataStructure[] generatePKIKeys() {
         BigInteger a = new NativeBigInteger(getElGamalExponentSize(), _context.random());
-        BigInteger aalpha = CryptoConstants.elgg.modPow(a, CryptoConstants.elgp);
+        BigInteger aalpha = CryptoConstants.elgg.modPowCT(a, CryptoConstants.elgp);
 
         SimpleDataStructure[] keys = new SimpleDataStructure[2];
 
@@ -236,7 +236,7 @@ public final class KeyGenerator {
         switch (type) {
           case ELGAMAL_2048:
             BigInteger a = new NativeBigInteger(1, priv.toByteArray());
-            BigInteger aalpha = CryptoConstants.elgg.modPow(a, CryptoConstants.elgp);
+            BigInteger aalpha = CryptoConstants.elgg.modPowCT(a, CryptoConstants.elgp);
             try {
                 data = SigUtil.rectify(aalpha, PublicKey.KEYSIZE_BYTES);
             } catch (InvalidKeyException ike) {
@@ -289,7 +289,7 @@ public final class KeyGenerator {
             x = new NativeBigInteger(160, _context.random());
         } while (x.compareTo(CryptoConstants.dsaq) >= 0 || x.equals(BigInteger.ZERO));
 
-        BigInteger y = CryptoConstants.dsag.modPow(x, CryptoConstants.dsap);
+        BigInteger y = CryptoConstants.dsag.modPowCT(x, CryptoConstants.dsap);
         keys[0] = new SigningPublicKey();
         keys[1] = new SigningPrivateKey();
         try {
@@ -378,7 +378,7 @@ public final class KeyGenerator {
             switch (type.getBaseAlgorithm()) {
               case DSA:
                 BigInteger x = new NativeBigInteger(1, priv.toByteArray());
-                BigInteger y = CryptoConstants.dsag.modPow(x, CryptoConstants.dsap);
+                BigInteger y = CryptoConstants.dsag.modPowCT(x, CryptoConstants.dsap);
                 SigningPublicKey pub = new SigningPublicKey();
                 pub.setData(SigUtil.rectify(y, SigningPublicKey.KEYSIZE_BYTES));
                 return pub;
