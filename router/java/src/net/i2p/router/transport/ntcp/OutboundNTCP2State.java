@@ -339,8 +339,12 @@ class OutboundNTCP2State implements EstablishState {
             if (_log.shouldDebug())
                 _log.debug("After msg 2: " + _handshakeState.toString());
             _padlen2 = (int) DataHelper.fromLong(options2, 2, 2);
-            // we don't enforce max _padlen1 here
-            // if it is more than our buffer size we will fail below.
+            if (_padlen2 > _tmp.length) {
+                // we reuse _tmp to read the padding
+                // limits are specified in the PQ spec
+                fail("Padlen too large: " + _padlen2);
+                return;
+            }
             long tsB = DataHelper.fromLong(options2, 8, 4);
             long now = _context.clock().now();
             // rtt from sending #1 to receiving #2
