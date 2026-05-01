@@ -91,5 +91,5 @@ public class ClientAppManagerImpl implements ClientAppManager {
      *  Does nothing, see RouterAppManager override
      *  @since 0.9.66
      */
-    public synchronized void addBubble(String svc, String text) {}
+    public void addBubble(String svc, String text) {}
 }
