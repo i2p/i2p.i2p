@@ -330,8 +330,11 @@ public class ConfigServiceHandler extends FormHandler {
     }
     
     private void installService() {
+        File f = new File(_context.getBaseDir(), "install_i2p_service_winnt.bat");
+        String[] cmd = new String[1];
+        cmd[0] = f.getPath();
         try { 
-            Runtime.getRuntime().exec("install_i2p_service_winnt.bat");
+            Runtime.getRuntime().exec(cmd);
             addFormNotice(_t("Service installed"));
         } catch (IOException ioe) {
             addFormError(_t("Warning: unable to install the service") + " - " + ioe.getLocalizedMessage());
@@ -339,8 +342,11 @@ public class ConfigServiceHandler extends FormHandler {
     }
 
     private void uninstallService() {
+        File f = new File(_context.getBaseDir(), "uninstall_i2p_service_winnt.bat");
+        String[] cmd = new String[1];
+        cmd[0] = f.getPath();
         try { 
-            Runtime.getRuntime().exec("uninstall_i2p_service_winnt.bat");
+            Runtime.getRuntime().exec(cmd);
             addFormNotice(_t("Service removed"));
         } catch (IOException ioe) {
             addFormError(_t("Warning: unable to remove the service") + " - " + ioe.getLocalizedMessage());
