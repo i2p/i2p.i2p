@@ -405,7 +405,7 @@ void convert_mp2j(JNIEnv* env, mpz_t mvalue, jbyteArray* jvalue)
             mpz_export((void*)&buffer[1], NULL, 1, sizeof(jbyte), 1, 0, mvalue);
             // ... and invert the bits
             // This could be done all in mpz, the reverse of the above
-            for (i = 0; i <= size; i++) {
+            for (i = 0; i < size; i++) {
                 buffer[i] = ~buffer[i];
             }
         }
