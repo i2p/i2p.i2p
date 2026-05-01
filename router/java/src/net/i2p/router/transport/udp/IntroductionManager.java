@@ -85,7 +85,7 @@ class IntroductionManager {
         _outbound = new ConcurrentHashMap<Long, PeerState>(MAX_OUTBOUND);
         _inbound = new ConcurrentHashMap<Long, PeerState>(MAX_INBOUND);
         _nonceToAlice = new ConcurrentHashMap<Long, PeerState2>(MAX_INBOUND);
-        _recentRelaysAsBob = new LHMCache<Long, Object>(8);
+        _recentRelaysAsBob = new LHMCache<Long, Object>(32);
         //ctx.statManager().createRateStat("udp.receiveRelayIntro", "How often we get a relayed request for us to talk to someone?", "udp", UDPTransport.RATES);
         //ctx.statManager().createRateStat("udp.receiveRelayRequest", "How often we receive a good request to relay to someone else?", "udp", UDPTransport.RATES);
         ctx.statManager().createRateStat("udp.relayBadIP", "Received IP or port was bad", "udp", UDPTransport.RATES);
