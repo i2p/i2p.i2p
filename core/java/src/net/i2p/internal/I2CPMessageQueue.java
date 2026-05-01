@@ -53,9 +53,12 @@ public abstract class I2CPMessageQueue implements Closeable {
     public abstract I2CPMessage take() throws InterruptedException;
 
     /**
-     *  == offer(new PoisonI2CPMessage());
+     *  == put(new PoisonI2CPMessage());
+     *  Blocking if queue is full
      */
     public void close() {
-        offer(new PoisonI2CPMessage());
+        try {
+            put(new PoisonI2CPMessage());
+        } catch (InterruptedException ie) {}
     }
 }
