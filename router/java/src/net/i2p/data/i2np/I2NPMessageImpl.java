@@ -290,7 +290,7 @@ public abstract class I2NPMessageImpl implements I2NPMessage {
 
     /**
      *  Write the message with a short 5-byte header.
-     *  THe header consists of a one-byte type and a 4-byte expiration in seconds only.
+     *  The header consists of a one-byte type and a 4-byte expiration in seconds only.
      *  Used by SSU only!
      *
      *  @return the new offset (NOT the length)
@@ -354,11 +354,14 @@ public abstract class I2NPMessageImpl implements I2NPMessage {
 
     /**
      *  Read the message with a short 5-byte header.
-     *  THe header consists of a one-byte type and a 4-byte expiration in seconds only.
-     *  Used by SSU only!
+     *  The header consists of a one-byte type and a 4-byte expiration in seconds only.
+     *  Caller MUST call setUniqueId() on the returned value.
+     *  Used by SSU2 only!
      */
     public static I2NPMessage fromRawByteArray(I2PAppContext ctx, byte buffer[], int offset,
                                                int len, I2NPMessageHandler handler) throws I2NPMessageException {
+        if (len < 5)
+            throw new I2NPMessageException("Payload is too short " + len);
         int type = buffer[offset] & 0xff;
         offset++;
         I2NPMessage msg = createMessage(ctx, type);
@@ -379,7 +382,7 @@ public abstract class I2NPMessageImpl implements I2NPMessage {
 
     /**
      *  Read the message with a short 9-byte header.
-     *  THe header consists of a one-byte type, 4-byte ID, and a 4-byte expiration in seconds only.
+     *  The header consists of a one-byte type, 4-byte ID, and a 4-byte expiration in seconds only.
      *  Used by NTCP2 and SSU2 only!
      *
      *  @param handler ignored, may be null
@@ -387,6 +390,8 @@ public abstract class I2NPMessageImpl implements I2NPMessage {
      */
     public static I2NPMessage fromRawByteArrayNTCP2(I2PAppContext ctx, byte buffer[], int offset,
                                                     int len, I2NPMessageHandler handler) throws I2NPMessageException {
+        if (len < 9)
+            throw new I2NPMessageException("Payload is too short " + len);
         int type = buffer[offset] & 0xff;
         offset++;
         I2NPMessage msg = createMessage(ctx, type);
