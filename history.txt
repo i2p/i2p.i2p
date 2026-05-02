@@ -1,4 +1,7 @@
 2026-05-01 zzz
+ * Transport: Fix PQ SSU2 I2NP block header
+
+2026-05-01 zzz
  * Console: Specify full path to Windows service scripts
  * Crypto: Use constant-time modPow() for ElG private key operations
  * I2CP: Wait for queue space on internal queue close()
