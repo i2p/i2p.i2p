@@ -45,7 +45,7 @@ public abstract class DnsLabel extends SafeCharSequence implements Comparable<Dn
     /**
      * Whether or not the DNS label is validated on construction.
      */
-    public static boolean VALIDATE = true;
+    public static final boolean VALIDATE = true;
 
     public final String label;
 
