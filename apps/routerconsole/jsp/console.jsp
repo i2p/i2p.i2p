@@ -7,9 +7,6 @@
 <%=intl.title("home")%>
 <%@include file="summaryajax.jsi" %>
 </head><body>
-<%
-    String consoleNonce = net.i2p.router.web.CSSHelper.getNonce();
-%>
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("I2P Router Console")%></h1>
 <div class="news" id="news">
