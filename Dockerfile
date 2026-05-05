@@ -55,4 +55,8 @@ LABEL \
       org.label-schema.vcs-url="https://github.com/i2p/i2p.i2p" \
       org.label-schema.schema-version="1.0"
 
+RUN groupadd -r i2p && useradd -r -g i2p -d /i2p -s /sbin/nologin i2p \
+ && chown -R i2p:i2p /i2p
+USER i2p
+
 ENTRYPOINT ["/startapp.sh"]

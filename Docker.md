@@ -215,7 +215,7 @@ docker run -v i2pconfig:/i2p/.i2p -v i2ptorrents:/i2psnark ...
 Build the image locally:
 
 ```bash
-docker build -t i2p .
+docker build --build-config TARGET_ARCH=amd64 -t i2p .
 ```
 
 Multi-architecture build (requires Docker Buildx):
@@ -250,7 +250,7 @@ To achieve non-firewalled status, you must:
 
 ### Binding and Remote Access
 
-All services except I2NP are bound to `127.0.0.1` by default. This means they are only accessible from the Docker host machine (via published ports) and not from the network.
+All services except I2NP are bound to the local docker IP by default. This means they are only accessible from the Docker host machine (via published ports) and to the docker network. This is by design because the router serves other applications on the docker network. It is also not possible to work around this on the default docker network, where `localhost` resolves to the container IP and `127.0.0.1` is not used. You can expose them to the host using port-forwarding in your `docker` command or `docker-compose.yaml`.
 
 To access the Router Console from a remote machine, use an SSH tunnel:
 
