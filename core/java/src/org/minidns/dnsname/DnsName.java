@@ -76,7 +76,7 @@ public final class DnsName extends SafeCharSequence implements Serializable, Com
     /**
      * Whether or not the DNS name is validated on construction.
      */
-    public static boolean VALIDATE = true;
+    public static final boolean VALIDATE = true;
 
     /**
      * The DNS name in ASCII Compatible Encoding (ACE).

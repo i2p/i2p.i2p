@@ -142,7 +142,7 @@ class SummaryBarRenderer {
         }
     }
 
-    public String renderHelpAndFAQHTML() {
+    private String renderHelpAndFAQHTML() {
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3 id=\"helpfaq\"><a href=\"/help\" target=\"_top\" title=\"")
            .append(_t("I2P Router Help &amp; FAQ"))
@@ -215,7 +215,7 @@ class SummaryBarRenderer {
         return buf.toString();
     }
 
-    public String renderI2PServicesHTML() {
+    private String renderI2PServicesHTML() {
         // Store all items in map so they are sorted by translated name, add the plugins, then output
         Map<String, String> svcs = new TreeMap<String, String>(Collator.getInstance());
         StringBuilder rbuf = new StringBuilder(128);
@@ -351,7 +351,7 @@ class SummaryBarRenderer {
         return buf.toString();
     }
 
-    public String renderI2PInternalsHTML() {
+    private String renderI2PInternalsHTML() {
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/config\" target=\"_top\" title=\"")
            .append(_t("Configure I2P Router"))
@@ -433,7 +433,7 @@ class SummaryBarRenderer {
      *  Renders html for section containing logging, peer information, non-configuration "Admin" elements.
      *  @since 0.9.50 separates config from non config elements in "I2P Internals"
      */
-    public String renderI2PDiagnosticsHTML() {
+    private String renderI2PDiagnosticsHTML() {
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/config\" target=\"_top\" title=\"")
            .append(_t("Configure I2P Router"))
@@ -511,7 +511,7 @@ class SummaryBarRenderer {
         return buf.toString();
     }
 
-    public String renderAdvancedHTML() {
+    private String renderAdvancedHTML() {
         StringBuilder buf = new StringBuilder(512);
 
         buf.append("<h3 id=\"advanced\"><a title=\"")
@@ -649,7 +649,7 @@ class SummaryBarRenderer {
         return buf.toString();
     }
 
-    public String renderRouterInfoHTML() {
+    private String renderRouterInfoHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/netdb?r=.\" target=\"_top\" title=\"")
@@ -682,7 +682,7 @@ class SummaryBarRenderer {
         return buf.toString();
     }
 
-    public String renderShortRouterInfoHTML() {
+    private String renderShortRouterInfoHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append("<table id=\"sb_shortgeneral\">" +
@@ -709,7 +709,7 @@ class SummaryBarRenderer {
     }
 
     /** @since 0.9.32 */
-    public String renderAdvancedRouterInfoHTML() {
+    private String renderAdvancedRouterInfoHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/netdb?r=.\" target=\"_top\" title=\"")
@@ -763,12 +763,12 @@ class SummaryBarRenderer {
     }
 
     /** @since 0.9.32 */
-    public String renderMemoryBarHTML() {
+    private String renderMemoryBarHTML() {
         if (_helper == null) return "";
         return _helper.getMemoryBar();
     }
 
-    public String renderNetworkReachabilityHTML() {
+    private String renderNetworkReachabilityHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         SummaryHelper.NetworkStateMessage reachability = _helper.getReachability();
@@ -816,7 +816,7 @@ class SummaryBarRenderer {
         return buf.toString();
     }
 
-    public String renderUpdateStatusHTML() {
+    private String renderUpdateStatusHTML() {
         if (_helper == null) return "";
         String updateStatus = _helper.getUpdateStatus();
         if ("".equals(updateStatus)) return "";
@@ -830,12 +830,12 @@ class SummaryBarRenderer {
         return buf.toString();
     }
 
-    public String renderRestartStatusHTML() {
+    private String renderRestartStatusHTML() {
         if (_helper == null) return "";
         return _helper.getRestartStatus();
     }
 
-    public String renderPeersHTML() {
+    private String renderPeersHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/peers\" target=\"_top\" title=\"")
@@ -899,7 +899,7 @@ class SummaryBarRenderer {
     }
 
     /** @since 0.9.32 */
-    public String renderPeersAdvancedHTML() {
+    private String renderPeersAdvancedHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/peers\" target=\"_top\" title=\"")
@@ -972,12 +972,12 @@ class SummaryBarRenderer {
     }
 
 
-    public String renderFirewallAndReseedStatusHTML() {
+    private String renderFirewallAndReseedStatusHTML() {
         if (_helper == null) return "";
         return _helper.getFirewallAndReseedStatus();
     }
 
-    public String renderBandwidthHTML() {
+    private String renderBandwidthHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/config\" title=\"")
@@ -1022,7 +1022,7 @@ class SummaryBarRenderer {
     }
 
     /** @since 0.9.32 */
-    public String renderBandwidthGraphHTML() {
+    private String renderBandwidthGraphHTML() {
         if (_helper == null) return "";
         if (StatSummarizer.isDisabled(_context))
             return "";
@@ -1049,7 +1049,7 @@ class SummaryBarRenderer {
         return buf.toString();
     }
 
-    public String renderTunnelsHTML() {
+    private String renderTunnelsHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/tunnels\" target=\"_top\" title=\"")
@@ -1099,7 +1099,7 @@ class SummaryBarRenderer {
         return buf.toString();
     }
 
-    public String renderCongestionHTML() {
+    private String renderCongestionHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/jobs\" target=\"_top\" title=\"")
@@ -1151,7 +1151,7 @@ class SummaryBarRenderer {
         return buf.toString();
     }
 
-    public String renderTunnelStatusHTML() {
+    private String renderTunnelStatusHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(50);
         buf.append("<h4><span class=\"tunnelBuildStatus\">")
@@ -1160,13 +1160,13 @@ class SummaryBarRenderer {
         return buf.toString();
     }
 
-    public String renderDestinationsHTML() {
+    private String renderDestinationsHTML() {
         if (_helper == null) return "";
         return _helper.getDestinations();
     }
 
     /** @since 0.9.1 */
-    public String renderNewsHeadingsHTML() {
+    private String renderNewsHeadingsHTML() {
         if (_helper == null) return "";
         NewsHelper newshelper = _helper.getNewsHelper();
         if (newshelper == null || newshelper.shouldShowNews()) return "";
