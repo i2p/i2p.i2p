@@ -1,5 +1,11 @@
 package net.i2p.servlet.util;
 
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.eclipse.jetty.server.Request;
+
 /**
  * Simple utilities for servlets.
  * Consolidated from i2psnark, susimail, and routerconsole
@@ -112,4 +118,128 @@ public class ServletUtil {
         }
         return s;
     }
+
+    /**
+     *  Validate Origin header for POST requests.
+     *  Allows requests with matching Origin (same-origin), or no Origin header.
+     *  Rejects cross-origin POST requests to prevent CSRF attacks.
+     *
+     *  Ref: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Origin
+     *
+     *  @param request the HTTP request
+     *  @return true if allowed
+     *  @since 0.9.70
+     */
+    public static boolean allowOrigin(Request request) {
+        if (!request.getMethod().toUpperCase(Locale.US).equals("POST"))
+            return true;
+        return allowOrigin(request.getHeaders().get("Origin"), request.getHeaders().get("Host"), request.isSecure());
+    }
+
+    /**
+     *  Validate Origin header for POST requests.
+     *  Allows requests with matching Origin (same-origin), or no Origin header.
+     *  Rejects cross-origin POST requests to prevent CSRF attacks.
+     *
+     *  Ref: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Origin
+     *
+     *  @param request the HTTP request
+     *  @return true if allowed
+     *  @since 0.9.70
+     */
+    public static boolean allowOrigin(HttpServletRequest request) {
+        if (!request.getMethod().toUpperCase(Locale.US).equals("POST"))
+            return true;
+        return allowOrigin(request.getHeader("Origin"), request.getHeader("Host"), request.isSecure());
+    }
+
+    /**
+     *  Validate Origin header for POST requests.
+     *  Allows requests with matching Origin (same-origin), or no Origin header.
+     *  Rejects cross-origin POST requests to prevent CSRF attacks.
+     *
+     *  Ref: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Origin
+     *
+     *  @return true if allowed
+     *  @since 0.9.70 adapted from I2P+
+     */
+    private static boolean allowOrigin(String origin, String host, boolean isSecure) {
+        if (origin == null || host == null)
+            return true;
+        origin = origin.toLowerCase(Locale.US);
+        host = host.toLowerCase(Locale.US);
+
+        // Origin format: "https://host:port" or "http://host:port"
+        // Or "https://host" or "http://host"
+        // Or "null"
+        if (origin.equals("null"))
+            return true;
+
+        // Host format: "host" or "host:port"
+        // normalize host
+        StringBuilder buf = new StringBuilder(origin.length());
+        buf.append(isSecure ? "https://" : "http://");
+        buf.append(host);
+        // shortcut
+        if (origin.equals(buf.toString()))
+            return true;
+        if (host.contains("]:")) {
+            // ipv6 has port
+        } else if (host.contains("]")) {
+            buf.append(':');
+            buf.append(isSecure ? "443" : "80");
+        } else if (host.contains(":")) {
+            // ipv4 has port
+        } else {
+            buf.append(':');
+            buf.append(isSecure ? "443" : "80");
+        }
+
+        // normalize origin
+        if (origin.contains("]:")) {
+            // ipv6 has port
+        } else if (origin.contains("]")) {
+            origin += ':';
+            origin += (origin.startsWith("https:")) ? "443" : "80";
+        } else if (origin.lastIndexOf(':') > 5) {
+            // ipv4 has port
+        } else {
+            origin += ':';
+            origin += (origin.startsWith("https:")) ? "443" : "80";
+        }
+
+        return origin.equals(buf.toString());
+    }
+
+/*
+    public static void main(String[] args) {
+        test("http://localhost", "localhost");
+        test("https://localhost", "localhost");
+        test("http://localhost:80", "localhost");
+        test("https://localhost:443", "localhost");
+        test("http://localhost:80", "localhost:80");
+        test("https://localhost:443", "localhost:443");
+        test("http://1.2.3.4", "localhost");
+        test("https://1.2.3.4", "localhost");
+        test("http://localhost", "localhost:80");
+        test("https://localhost", "localhost:443");
+        test("http://1.2.3.4:99", "localhost");
+        test("https://1.2.3.4:99", "localhost");
+        test("http://[1::2]", "localhost");
+        test("http://[1::2]:99", "localhost");
+        test("http://[1::2]", "[1::2]");
+        test("http://[1::2]:99", "[1::2]");
+        test("http://[1::2]", "[1::2]:80");
+        test("http://[1::2]:99", "[1::2]:99");
+        test("https://[1::2]", "[1::2]:443");
+        test("https://[1::2]:99", "[1::2]:99");
+    }
+
+    private static void test(String o, String h) {
+        boolean a = allowOrigin(o, h, false);
+        System.out.println("Origin: " + o + " Host: " + h + " Secure? false Allow? " + a);
+        a = allowOrigin(o, h, true);
+        System.out.println("Origin: " + o + " Host: " + h + " Secure? true  Allow? " + a);
+    }
+*/
 }

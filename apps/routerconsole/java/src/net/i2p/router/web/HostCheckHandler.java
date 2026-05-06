@@ -6,6 +6,7 @@ import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.servlet.util.ServletUtil;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
@@ -87,6 +88,14 @@ public class HostCheckHandler extends GzipHandler
                        "    To allow access using the hostname \"" + host + "\",\n" +
                        "    add the line \"" + RouterConsoleRunner.PROP_ALLOWED_HOSTS + '=' + host + "\"\n" +
                        "    to advanced configuration and restart.";
+            log.logAlways(Log.WARN, s);
+            Response.writeError(request, response, callback, 403, s);
+            return true;
+        }
+
+        if (!ServletUtil.allowOrigin(request)) {
+            Log log = _context.logManager().getLog(HostCheckHandler.class);
+            String s = "Cross origin request denied";
             log.logAlways(Log.WARN, s);
             Response.writeError(request, response, callback, 403, s);
             return true;
