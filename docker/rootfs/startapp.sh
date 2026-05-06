@@ -1,5 +1,5 @@
 #!/bin/sh
-set -euo
+set -eo
 
 if [ -z "$JVM_XMX" ]; then
     echo "*** Defaulting to 512MB JVM heap limit"
@@ -74,4 +74,5 @@ JAVAOPTS="-Djava.net.preferIPv4Stack=false -Djava.library.path=${I2P}:${I2P}/lib
 
 # Execute the Java application with the constructed classpath and options
 # The `exec` command replaces the shell with the Java process, ensuring that it receives signals directly and can shut down gracefully.
-exec `java -cp "${CLASSPATH}" ${JAVAOPTS} ${JAVA17OPTS} net.i2p.router.RouterLaunch`
+
+exec -runuser i2p `java -cp "${CLASSPATH}" ${JAVAOPTS} ${JAVA17OPTS} net.i2p.router.RouterLaunch`
