@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.servlet.http.HttpSession;
+
 import net.i2p.data.DataHelper;
 import net.i2p.router.util.EventLog;
 import net.i2p.router.web.CSSHelper;
@@ -111,11 +113,20 @@ public class EventLogHelper extends FormHandler {
         _event = s;
     }
 
+    /**
+     *  For form validation
+     *  @since 0.9.70
+     */
+    public void storeSession(HttpSession session) { _session = session; }
+
+    /**
+     *  storeSession MUST be called first
+     */
     public String getForm() { 
         // too hard to use the standard formhandler.jsi / FormHandler.java session nonces
         // since graphs.jsp needs the refresh value in its <head>.
         // So just use the "shared/console nonce".
-        String nonce = CSSHelper.getNonce();
+        String nonce = CSSHelper.getNonce(_session);
         try {
             _out.write("<br><h3 id=\"displayevents\">" + _t("Display Events") + "</h3>");
             _out.write("<form action=\"events\" method=\"POST\">\n" +

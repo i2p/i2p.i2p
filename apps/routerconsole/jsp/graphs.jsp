@@ -11,6 +11,7 @@
  <jsp:setProperty name="graphHelper" property="*" />
 <%
     graphHelper.storeWriter(out);
+    graphHelper.storeSession(session);
     graphHelper.storeMethod(request.getMethod());
     // meta must be inside the head
     boolean allowRefresh = intl.allowIFrame(request.getHeader("User-Agent"));

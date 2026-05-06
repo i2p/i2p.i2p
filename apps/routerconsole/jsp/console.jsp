@@ -18,8 +18,9 @@
 <%
    }  // shouldShowNews()
 %>
- <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
- <jsp:setProperty name="updatehelper" property="contextId" value="<%=i2pcontextId%>" />
+ <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" /><%
+    updatehelper.storeSession(session);
+%><jsp:setProperty name="updatehelper" property="contextId" value="<%=i2pcontextId%>" />
  <jsp:getProperty name="updatehelper" property="newsStatus" /><br>
 </div><div class="main" id="console">
  <jsp:useBean class="net.i2p.router.web.helpers.ResourceHelper" id="contenthelper" scope="request" />

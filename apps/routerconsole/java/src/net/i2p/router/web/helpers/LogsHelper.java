@@ -11,6 +11,8 @@ import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.jar.Attributes;
 
+import javax.servlet.http.HttpSession;
+
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
 import net.i2p.crypto.SigType;
@@ -150,8 +152,8 @@ public class LogsHelper extends HelperBase {
      *  @param consoleNonce must match
      *  @since 0.9.46
      */
-    public void clearThrough(int n, int crit, long wn, long wts, String wf, String consoleNonce) {
-        if (!CSSHelper.getNonce().equals(consoleNonce))
+    public void clearThrough(int n, int crit, long wn, long wts, String wf, HttpSession session, String consoleNonce) {
+        if (!CSSHelper.validateNonce(session, consoleNonce))
             return;
         if (n >= 0)
             _context.logManager().getBuffer().getUIMessages().clearThrough(n);

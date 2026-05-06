@@ -1,5 +1,7 @@
 package net.i2p.router.web;
 
+import javax.servlet.http.HttpSession;
+
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
@@ -7,6 +9,7 @@ import net.i2p.util.PortMapper;
 
 public class ConfigUpdateHelper extends HelperBase {
     private boolean _dontInstall;
+    protected HttpSession _session;
 
     public ConfigUpdateHelper() {}
     
@@ -178,7 +181,12 @@ public class ConfigUpdateHelper extends HelperBase {
         return _context.getProperty(ConfigUpdateHandler.PROP_DEV_SU3_URL, "");
     }
 
+    public void storeSession(HttpSession session) { _session = session; }
+
+    /**
+     *  storeSession MUST be called first
+     */
     public String getNewsStatus() { 
-        return NewsHelper.status(_context);
+        return NewsHelper.status(_context, _session);
     }
 }

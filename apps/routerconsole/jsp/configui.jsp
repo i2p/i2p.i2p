@@ -25,9 +25,12 @@ input.default {
 
  <jsp:useBean class="net.i2p.router.web.helpers.ConfigUIHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
+<%
+    String consoleNonce = net.i2p.router.web.CSSHelper.getNonce(session);
+%>
 <h3 id="themeheading"><%=uihelper._t("Router Console Theme")%></h3>
  <form id="themeForm" action="" method="POST">
- <input type="hidden" name="consoleNonce" value="<%=net.i2p.router.web.CSSHelper.getNonce()%>" >
+ <input type="hidden" name="consoleNonce" value="<%=consoleNonce%>" >
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="action" value="blah" >
 <div id ="themesettings">
@@ -48,7 +51,7 @@ input.default {
 </div></div></form>
 <h3 id="langheading"><%=uihelper._t("Router Console Language")%></h3>
  <form action="" method="POST">
- <input type="hidden" name="consoleNonce" value="<%=net.i2p.router.web.CSSHelper.getNonce()%>" >
+ <input type="hidden" name="consoleNonce" value="<%=consoleNonce%>" >
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="action" value="blah" >
 <div id="langsettings">

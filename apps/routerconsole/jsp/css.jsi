@@ -57,7 +57,7 @@
    response.setHeader("Referrer-Policy", "no-referrer");
 
    String conNonceParam = request.getParameter("consoleNonce");
-   if (net.i2p.router.web.CSSHelper.getNonce().equals(conNonceParam)) {
+   if (net.i2p.router.web.CSSHelper.validateNonce(session, conNonceParam, true)) {
        intl.setLang(request.getParameter("lang"));
        intl.setNews(request.getParameter("news"));
        intl.setTheme(request.getParameter("theme"));

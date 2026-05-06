@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.servlet.http.HttpSession;
+
 import net.i2p.app.ClientAppManager;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -44,6 +46,8 @@ import net.i2p.util.SystemVersion;
  * For the full summary bar use renderSummaryBar()
  */
 public class SummaryHelper extends HelperBase {
+
+    private HttpSession _session;
 
     // Opera 10.63 doesn't have the char, TODO check UA
     //static final String THINSP = "&thinsp;/&thinsp;";
@@ -839,7 +843,7 @@ public class SummaryHelper extends HelperBase {
      *  The update status and buttons
      *  @since 0.8.13 moved from SummaryBarRenderer
      */
-    public String getUpdateStatus() {
+    public String getUpdateStatus(String nonce) {
         StringBuilder buf = new StringBuilder(512);
         // display all the time so we display the final failure message, and plugin update messages too
         String status = NewsHelper.getUpdateStatus();
@@ -916,18 +920,12 @@ public class SummaryHelper extends HelperBase {
             !NewsHelper.isUpdateInProgress() &&
             !_context.router().gracefulShutdownInProgress() &&
             _context.portMapper().isRegistered(PortMapper.SVC_HTTP_PROXY) &&  // assume using proxy for now
-            getAction() == null &&
-            getUpdateNonce() == null) {
+            getAction() == null) {
                 if (needSpace)
                     buf.append("<hr>");
-                long nonce = _context.random().nextLong();
-                String prev = System.getProperty("net.i2p.router.web.UpdateHandler.nonce");
-                if (prev != null)
-                    System.setProperty("net.i2p.router.web.UpdateHandler.noncePrev", prev);
-                System.setProperty("net.i2p.router.web.UpdateHandler.nonce", nonce+"");
                 String uri = getRequestURI();
                 buf.append("<form action=\"").append(uri).append("\" method=\"POST\">\n");
-                buf.append("<input type=\"hidden\" name=\"updateNonce\" value=\"").append(nonce).append("\" >\n");
+                buf.append("<input type=\"hidden\" name=\"consoleNonce\" value=\"").append(nonce).append("\" >\n");
                 if (avail) {
                     buf.append("<button type=\"submit\" class=\"download\" name=\"updateAction\" value=\"signed\" >")
                        // Note to translators: parameter is a version, e.g. "0.8.4"
@@ -959,15 +957,15 @@ public class SummaryHelper extends HelperBase {
      *  The restart status and buttons
      *  @since 0.8.13 moved from SummaryBarRenderer
      */
-    public String getRestartStatus() {
-        return ConfigRestartBean.renderStatus(getRequestURI(), getAction(), getConsoleNonce());
+    public String getRestartStatus(String nextNonce) {
+        return ConfigRestartBean.renderStatus(getRequestURI(), getAction(), _session, nextNonce, _consoleNonce);
     }
 
     /**
      *  The firewall status and reseed status/buttons
      *  @since 0.9 moved from SummaryBarRenderer
      */
-    public String getFirewallAndReseedStatus() {
+    public String getFirewallAndReseedStatus(String nonce) {
         StringBuilder buf = new StringBuilder(256);
         if (showFirewallWarning()) {
             buf.append("<h4 id=\"sb_warning\"><a href=\"/help#configurationhelp\" target=\"_top\" title=\"")
@@ -1002,10 +1000,6 @@ public class SummaryHelper extends HelperBase {
             // If showing the reseed link is allowed
             if (allowReseed()) {
                 // While no reseed occurring, show reseed link
-                long nonce = _context.random().nextLong();
-                String prev = System.getProperty("net.i2p.router.web.ReseedHandler.nonce");
-                if (prev != null) System.setProperty("net.i2p.router.web.ReseedHandler.noncePrev", prev);
-                System.setProperty("net.i2p.router.web.ReseedHandler.nonce", nonce+"");
                 String uri = getRequestURI();
                 buf.append("<p><form action=\"").append(uri).append("\" method=\"POST\">\n");
                 buf.append("<input type=\"hidden\" name=\"reseedNonce\" value=\"").append(nonce).append("\" >\n");
@@ -1021,6 +1015,12 @@ public class SummaryHelper extends HelperBase {
     private NewsHelper _newshelper;
     public void storeNewsHelper(NewsHelper n) { _newshelper = n; }
     public NewsHelper getNewsHelper() { return _newshelper; }
+
+    /**
+     *  For form validation
+     *  @since 0.9.70
+     */
+    public void storeSession(HttpSession session) { _session = session; }
 
     private static final String SS = Character.toString(S);
 
@@ -1045,10 +1045,14 @@ public class SummaryHelper extends HelperBase {
         ctx.router().saveConfig(PROP_SUMMARYBAR + page, buf.toString());
     }
 
-    /** output the summary bar to _out */
+    /**
+     * output the summary bar to _out
+     * storeWriter() and storeSession() must have been called
+     */
     public void renderSummaryBar() throws IOException {
         SummaryBarRenderer renderer = new SummaryBarRenderer(_context, this);
-        renderer.renderSummaryHTML(_out);
+        String nextNonce = CSSHelper.getNonce(_session);
+        renderer.renderSummaryHTML(_out, nextNonce);
     }
 
     /* below here is stuff we need to get from summarynoframe.jsp to SummaryBarRenderer */
@@ -1059,11 +1063,6 @@ public class SummaryHelper extends HelperBase {
 
     private String _consoleNonce;
     public void setConsoleNonce(String s) { _consoleNonce = s == null ? null : DataHelper.stripHTML(s); }
-    public String getConsoleNonce() { return _consoleNonce; }
-
-    private String _updateNonce;
-    public void setUpdateNonce(String s) { _updateNonce = s == null ? null : DataHelper.stripHTML(s); }
-    public String getUpdateNonce() { return _updateNonce; }
 
     private String _requestURI;
     public void setRequestURI(String s) { _requestURI = s == null ? null : DataHelper.stripHTML(s); }

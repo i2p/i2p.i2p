@@ -1,13 +1,15 @@
 package net.i2p.router.web.helpers;
 
+import javax.servlet.http.HttpSession;
+
 import net.i2p.data.DataHelper;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.web.ConfigServiceHandler;
 import net.i2p.router.web.ContextHelper;
+import net.i2p.router.web.CSSHelper;
 import net.i2p.router.web.Messages;
 import net.i2p.router.web.NewsHelper;
-import net.i2p.util.RandomSource;
 
 /**
  * simple helper to control restarts/shutdowns in the left hand nav
@@ -22,18 +24,15 @@ public class ConfigRestartBean {
     private static final String[] SET3 = {"restart", "reload", "Restart", "shutdown", "stop", "Shutdown"};
     private static final String[] SET4 = {"shutdown", "stop", "Shutdown"};
 
-    private static final String _systemNonce = Long.toString(RandomSource.getInstance().nextLong());
-
-    /** formerly System.getProperty("console.nonce") */
-    public static String getNonce() { 
-        return _systemNonce;
-    }
-
-    /** this also initiates the restart/shutdown based on action */
-    public static String renderStatus(String urlBase, String action, String nonce) {
+    /**
+     * this also initiates the restart/shutdown based on action
+     *
+     * @param systemNonce the next nonce to output in the form
+     * @param nonce the nonce to be validated for actions
+     */
+    public static String renderStatus(String urlBase, String action, HttpSession session, String systemNonce, String nonce) {
         RouterContext ctx = ContextHelper.getContext(null);
-        String systemNonce = getNonce();
-        if ( (nonce != null) && (systemNonce.equals(nonce)) && (action != null) ) {
+        if (action != null && CSSHelper.validateNonce(session, nonce)) {
             // Normal browsers send value, IE sends button label
             if ("shutdownImmediate".equals(action) || _t("Shutdown immediately", ctx).equals(action)) {
                 if (ctx.hasWrapper())

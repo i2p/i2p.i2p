@@ -140,7 +140,7 @@
     if (ipg == PAGE_LANG || ipg == PAGE_THEME) {
 %>
 <%-- needed for CSS: --%><div id="config_ui">
-<%-- needed for lang setting in css.jsi: --%><input type="hidden" name="consoleNonce" value="<%=net.i2p.router.web.CSSHelper.getNonce()%>" >
+<%-- needed for lang setting in css.jsi: --%><input type="hidden" name="consoleNonce" value="<%=net.i2p.router.web.CSSHelper.getNonce(session)%>" >
 <%
     }
     if (ipg == PAGE_LANG) {

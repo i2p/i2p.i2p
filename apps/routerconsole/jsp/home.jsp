@@ -13,8 +13,9 @@
 %>
  <jsp:setProperty name="newshelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
  <jsp:setProperty name="newshelper" property="maxLines" value="300" />
- <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
- <jsp:setProperty name="updatehelper" property="contextId" value="<%=i2pcontextId%>" />
+ <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" /><%
+    updatehelper.storeSession(session);
+%><jsp:setProperty name="updatehelper" property="contextId" value="<%=i2pcontextId%>" />
 
 <div class="routersummaryouter">
  <div class="routersummary">

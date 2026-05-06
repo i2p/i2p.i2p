@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.servlet.RequestWrapper;
@@ -38,6 +40,7 @@ public abstract class FormHandler {
     private boolean _processed;
     private boolean _valid;
     protected Writer _out;
+    protected HttpSession _session;
     
     public FormHandler() {
         _errors = new ArrayList<String>();
@@ -59,6 +62,13 @@ public abstract class FormHandler {
             t.printStackTrace();
         }
     }
+
+    /**
+     *  For nonce validation
+     *  @since 0.9.70
+     */
+    public void storeSession(HttpSession session) { _session = session; }
+
 
     public void setNonce(String val) { _nonce = val == null ? null : DataHelper.stripHTML(val); }
     public void setAction(String val) { _action = val == null ? null : DataHelper.stripHTML(val); }
@@ -245,16 +255,13 @@ public abstract class FormHandler {
             return;
         }
         if (_nonce == null) {
-            //addFormError("You trying to mess with me?  Huh?  Are you?");
             _valid = false;
             return;
         }
         
-        String sharedNonce = CSSHelper.getNonce();
-        if (sharedNonce.equals(_nonce)) {
+        if (_session != null && CSSHelper.validateNonce(_session, _nonce))
             return;
-        }
-        
+
         if (!_nonce.equals(_nonce1) && !_nonce.equals(_nonce2)) {
                 addFormError(_t("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.")
                              + ' ' +

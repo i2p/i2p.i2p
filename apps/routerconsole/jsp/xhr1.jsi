@@ -6,26 +6,30 @@
 %><jsp:useBean class="net.i2p.router.web.helpers.SummaryHelper" id="helper" scope="request" />
 <jsp:setProperty name="helper" property="contextId" value="<%=i2pcontextId%>" />
 <jsp:setProperty name="helper" property="action" value="<%=request.getParameter(\"action\")%>" />
-<jsp:setProperty name="helper" property="updateNonce" value="<%=request.getParameter(\"updateNonce\")%>" />
 <jsp:setProperty name="helper" property="consoleNonce" value="<%=request.getParameter(\"consoleNonce\")%>" /><%
     String reqURI = request.getRequestURI();
     if (reqURI.contains("/xhr1"))
         reqURI = request.getParameter("requestURI");
     helper.setRequestURI(reqURI);
     helper.storeWriter(out);
+    helper.storeSession(session);
     helper.storeNewsHelper(newshelper);
 /*
  * The following is required for the reseed button to work, although we probably
  * only need the reseedNonce property.
  */
-%><jsp:useBean class="net.i2p.router.web.helpers.ReseedHandler" id="reseed" scope="request" />
-<jsp:setProperty name="reseed" property="*" /><%
+%><jsp:useBean class="net.i2p.router.web.helpers.ReseedHandler" id="reseed" scope="request" /><%
+    // must be called before properties are set
+    reseed.storeSession(session);
+%><jsp:setProperty name="reseed" property="*" /><%
 /*
  * The following is required for the update buttons to work, although we probably
- * only need the updateNonce property.
+ * only need the consoleNonce property.
  */
-%><jsp:useBean class="net.i2p.router.web.UpdateHandler" id="update" scope="request" />
-<jsp:setProperty name="update" property="*" />
+%><jsp:useBean class="net.i2p.router.web.UpdateHandler" id="update" scope="request" /><%
+    // must be called before properties are set
+    update.storeSession(session);
+%><jsp:setProperty name="update" property="*" />
 <jsp:setProperty name="update" property="contextId" value="<%=i2pcontextId%>" /><%
     // moved to java for ease of translation
     helper.renderSummaryBar();

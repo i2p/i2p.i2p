@@ -76,15 +76,17 @@ class SummaryBarRenderer {
     /**
      *  Note - ensure all links in here are absolute, as the summary bar may be displayed
      *         on lower-level directory errors.
+     *
+     *  @param nextNonce used for news links and others, for now - move to POST?
      */
-    public void renderSummaryHTML(Writer out) throws IOException {
+    public void renderSummaryHTML(Writer out, String nextNonce) throws IOException {
         String requestURI = _helper.getRequestURI();
         String page = requestURI.replace("/", "").replace(".jsp", "");
         List<String> sections = _helper.getSummaryBarSections(page);
 
         // regardless of section order, we want to process the restart buttons first,
         // so other sections reflect the current restart state
-        String restartStatus = sections.contains("RestartStatus") ? renderRestartStatusHTML() : null;
+        String restartStatus = sections.contains("RestartStatus") ? renderRestartStatusHTML(nextNonce) : null;
 
         StringBuilder buf = new StringBuilder(1024);
         for (String section : sections) {
@@ -112,7 +114,7 @@ class SummaryBarRenderer {
             else if ("NetworkReachability".equals(section))
                 buf.append(renderNetworkReachabilityHTML());
             else if ("UpdateStatus".equals(section))
-                buf.append(renderUpdateStatusHTML());
+                buf.append(renderUpdateStatusHTML(nextNonce));
             else if ("RestartStatus".equals(section))
                 buf.append(restartStatus); // prerendered above
             else if ("Peers".equals(section))
@@ -120,7 +122,7 @@ class SummaryBarRenderer {
             else if ("PeersAdvanced".equals(section))
                 buf.append(renderPeersAdvancedHTML());
             else if ("FirewallAndReseedStatus".equals(section))
-                buf.append(renderFirewallAndReseedStatusHTML());
+                buf.append(renderFirewallAndReseedStatusHTML(nextNonce));
             else if ("Bandwidth".equals(section))
                 buf.append(renderBandwidthHTML());
             else if ("BandwidthGraph".equals(section))
@@ -134,7 +136,7 @@ class SummaryBarRenderer {
             else if ("Destinations".equals(section))
                 buf.append(renderDestinationsHTML());
             else if ("NewsHeadings".equals(section))
-                buf.append(renderNewsHeadingsHTML());
+                buf.append(renderNewsHeadingsHTML(nextNonce));
 
             // Only output section if there's more than the <hr> to print
             if (buf.length() > 5)
@@ -816,9 +818,9 @@ class SummaryBarRenderer {
         return buf.toString();
     }
 
-    private String renderUpdateStatusHTML() {
+    private String renderUpdateStatusHTML(String nextNonce) {
         if (_helper == null) return "";
-        String updateStatus = _helper.getUpdateStatus();
+        String updateStatus = _helper.getUpdateStatus(nextNonce);
         if ("".equals(updateStatus)) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/configupdate\" target=\"_top\" title=\"")
@@ -830,9 +832,9 @@ class SummaryBarRenderer {
         return buf.toString();
     }
 
-    private String renderRestartStatusHTML() {
+    private String renderRestartStatusHTML(String nextNonce) {
         if (_helper == null) return "";
-        return _helper.getRestartStatus();
+        return _helper.getRestartStatus(nextNonce);
     }
 
     private String renderPeersHTML() {
@@ -972,9 +974,9 @@ class SummaryBarRenderer {
     }
 
 
-    private String renderFirewallAndReseedStatusHTML() {
+    private String renderFirewallAndReseedStatusHTML(String nextNonce) {
         if (_helper == null) return "";
-        return _helper.getFirewallAndReseedStatus();
+        return _helper.getFirewallAndReseedStatus(nextNonce);
     }
 
     private String renderBandwidthHTML() {
@@ -1166,13 +1168,12 @@ class SummaryBarRenderer {
     }
 
     /** @since 0.9.1 */
-    private String renderNewsHeadingsHTML() {
+    private String renderNewsHeadingsHTML(String consoleNonce) {
         if (_helper == null) return "";
         NewsHelper newshelper = _helper.getNewsHelper();
         if (newshelper == null || newshelper.shouldShowNews()) return "";
         StringBuilder buf = new StringBuilder(512);
-        String consoleNonce = CSSHelper.getNonce();
-        if (consoleNonce != null) {
+
             // Get news content.
             List<NewsEntry> entries = Collections.emptyList();
             ClientAppManager cmgr = _context.clientAppManager();
@@ -1221,7 +1222,7 @@ class SummaryBarRenderer {
                 }
                 if (i > 0)
                     buf.append("</table>\n</div>\n");
-            }
+
         }
         return buf.toString();
     }

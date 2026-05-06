@@ -10,6 +10,7 @@
  <jsp:setProperty name="graphHelper" property="*" />
 <%
     graphHelper.storeWriter(out);
+    graphHelper.storeSession(session);
 %>
 <%@include file="summaryajax.jsi" %>
 </head><body>

@@ -393,7 +393,7 @@ public class GraphHelper extends FormHandler {
         // too hard to use the standard formhandler.jsi / FormHandler.java session nonces
         // since graphs.jsp needs the refresh value in its <head>.
         // So just use the "shared/console nonce".
-        String nonce = CSSHelper.getNonce();
+        String nonce = CSSHelper.getNonce(_session);
         try {
             _out.write("<br><h3 id=\"graphdisplay\">" + _t("Configure Graph Display") + " <a href=\"configstats\">[" + _t("Select Stats") + "]</a></h3>");
             _out.write("<form action=\"graphs\" method=\"POST\">\n" +

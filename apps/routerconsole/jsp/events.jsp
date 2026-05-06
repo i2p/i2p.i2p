@@ -7,10 +7,11 @@
 <%=intl.title("events")%>
  <jsp:useBean class="net.i2p.router.web.helpers.EventLogHelper" id="eventHelper" scope="request" />
  <jsp:setProperty name="eventHelper" property="contextId" value="<%=i2pcontextId%>" />
-<% /* GraphHelper sets the defaults in setContextId, so setting the properties must be after the context */ %>
+<% /* EventLogHelper sets the defaults in setContextId, so setting the properties must be after the context */ %>
  <jsp:setProperty name="eventHelper" property="*" />
 <%
     eventHelper.storeWriter(out);
+    eventHelper.storeSession(session);
     eventHelper.storeMethod(request.getMethod());
 %>
 <%@include file="summaryajax.jsi" %>

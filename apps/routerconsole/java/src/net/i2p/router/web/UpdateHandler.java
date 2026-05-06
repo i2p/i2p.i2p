@@ -1,5 +1,7 @@
 package net.i2p.router.web;
 
+import javax.servlet.http.HttpSession;
+
 import net.i2p.app.ClientAppManager;
 import net.i2p.router.RouterContext;
 import net.i2p.router.update.ConsoleUpdateManager;
@@ -26,6 +28,7 @@ public class UpdateHandler {
     protected Log _log;
     private String _action;
     private String _nonce;
+    private HttpSession _session;
     
     public UpdateHandler() {
         this(ContextHelper.getContext(null));
@@ -61,22 +64,34 @@ public class UpdateHandler {
             t.printStackTrace();
         }
     }
+
+    /**
+     *  For form validation
+     *  @since 0.9.70
+     */
+    public void storeSession(HttpSession session) { _session = session; }
     
-    /** these two can be set in either order, so call checkUpdateAction() twice */
+    /**
+     *  these two can be set in either order, so call checkUpdateAction() twice
+     *  storeSession() MUST be called first
+     */
     public void setUpdateAction(String val) {
         _action = val;
         checkUpdateAction();
     }
     
-    public void setUpdateNonce(String nonce) { 
+    /**
+     *  these two can be set in either order, so call checkUpdateAction() twice
+     *  storeSession() MUST be called first
+     */
+    public void setConsoleNonce(String nonce) { 
         _nonce = nonce;
         checkUpdateAction();
     }
 
     private void checkUpdateAction() { 
-        if (_nonce == null || _action == null) return;
-        if (_nonce.equals(System.getProperty("net.i2p.router.web.UpdateHandler.nonce")) ||
-            _nonce.equals(System.getProperty("net.i2p.router.web.UpdateHandler.noncePrev"))) {
+        if (_nonce == null || _action == null || _session == null) return;
+        if (CSSHelper.validateNonce(_session, _nonce)) {
             if (_action.contains("Unsigned")) {
                 update(ROUTER_UNSIGNED);
             } else if (_action.contains("DevSU3")) {

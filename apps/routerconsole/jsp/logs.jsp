@@ -64,7 +64,7 @@
 <tr><td><b>Built By:</b></td><td><jsp:getProperty name="logsHelper" property="builtBy" /></td></tr></tbody></table>
 
 <h3 class="tabletitle"><%=intl._t("Critical Logs")%><%
-    String consoleNonce = net.i2p.router.web.CSSHelper.getNonce();
+    String consoleNonce = net.i2p.router.web.CSSHelper.getNonce(session);
     String ct1 = request.getParameter("clear");
     String ct2 = request.getParameter("crit");
     String ct3 = request.getParameter("svc");
@@ -78,7 +78,7 @@
         try { ict2 = Integer.parseInt(ct2); } catch (NumberFormatException nfe) {}
         try { ict3 = Long.parseLong(ct3); } catch (NumberFormatException nfe) {}
         try { ict4 = Long.parseLong(ct4); } catch (NumberFormatException nfe) {}
-        logsHelper.clearThrough(ict1, ict2, ict3, ict4, ct5, ctn);
+        logsHelper.clearThrough(ict1, ict2, ict3, ict4, ct5, session, ctn);
     }
     int last = logsHelper.getLastCriticalMessageNumber();
     if (last >= 0) {

@@ -1,10 +1,14 @@
 package net.i2p.router.web;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.servlet.http.HttpSession;
+
+import net.i2p.I2PAppContext;
 import net.i2p.servlet.util.ServletUtil;
 import net.i2p.util.RandomSource;
 
@@ -36,14 +40,79 @@ public class CSSHelper extends HelperBase {
     public static final String PROP_DISABLE_OLD = "routerconsole.disableOldThemes";
     public static final boolean DEFAULT_DISABLE_OLD = true;
 
-    private static final String _consoleNonce = Long.toString(RandomSource.getInstance().nextLong());
+    private static final String SESSION_CONSOLE_NONCE = "__router.console.nonce.queue__";
+    private static final int NONCE_QUEUE_SIZE = 10;
 
     /**
-     *  formerly stored in System.getProperty("router.consoleNonce")
-     *  @since 0.9.4
+     *  Replaces static consoleNonce, updateNonce, reseedNonce, systemNonce
+     *  @param session returns an invalid nonce if null
+     *  @return a new nonce for each call
+     *  @since 0.9.70
      */
-    public static String getNonce() { 
-        return _consoleNonce;
+    @SuppressWarnings("unchecked")
+    public static String getNonce(HttpSession session) { 
+        if (session == null) {
+            //I2PAppContext.getGlobalContext().logManager().getLog(CSSHelper.class).error("getNonce() null session", new Exception());
+            return "FAIL_SESSION_NOT_SET";
+        }
+        String rv;
+        synchronized(session) {
+            LinkedList<String> nonces = (LinkedList<String>) session.getAttribute(SESSION_CONSOLE_NONCE);
+            if (nonces == null) {
+                nonces = new LinkedList<String>();
+                session.setAttribute(SESSION_CONSOLE_NONCE, nonces);
+            }
+            // add a prefix to distinguish from other nonces for debugging
+            rv = "CN" + RandomSource.getInstance().nextLong();
+            nonces.offer(rv);
+            if (nonces.size() > NONCE_QUEUE_SIZE)
+                nonces.poll();
+        }
+        return rv;
+    }
+
+    /**
+     *  Replaces static consoleNonce, updateNonce, reseedNonce, systemNonce
+     *  @param nonce returns false if null
+     *  @param session returns false if null
+     *  @return true if valid
+     *  @since 0.9.70
+     */
+    public static boolean validateNonce(HttpSession session, String nonce) { 
+        return validateNonce(session, nonce, false);
+    }
+
+    /**
+     *  Replaces static consoleNonce, updateNonce, reseedNonce, systemNonce
+     *  @param nonce returns false if null
+     *  @param session returns false if null
+     *  @param preserve if true, do not delete the nonce. Use for early checks in jsps.
+     *  @return true if valid
+     *  @since 0.9.70
+     */
+    @SuppressWarnings("unchecked")
+    public static boolean validateNonce(HttpSession session, String nonce, boolean preserve) { 
+        if (nonce == null) {
+            //I2PAppContext.getGlobalContext().logManager().getLog(CSSHelper.class).error("validateNonce() null nonce", new Exception());
+            return false;
+        }
+        if (session == null) {
+            //I2PAppContext.getGlobalContext().logManager().getLog(CSSHelper.class).error("validateNonce() null session", new Exception());
+            return false;
+        }
+        boolean rv;
+        synchronized(session) {
+            LinkedList<String> nonces = (LinkedList<String>) session.getAttribute(SESSION_CONSOLE_NONCE);
+            if (nonces != null) {
+                if (preserve)
+                    rv = nonces.lastIndexOf(nonce) >= 0;
+                else
+                    rv = nonces.removeLastOccurrence(nonce);
+            } else {
+                rv = false;
+            }
+        }
+        return rv;
     }
 
     public String getTheme(String userAgent) {

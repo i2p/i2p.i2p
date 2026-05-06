@@ -22,8 +22,9 @@
 
  <jsp:useBean class="net.i2p.router.web.ConfigUpdateHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
- <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
- <jsp:setProperty name="updatehelper" property="contextId" value="<%=i2pcontextId%>" />
+ <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" /><%
+    updatehelper.storeSession(session);
+%><jsp:setProperty name="updatehelper" property="contextId" value="<%=i2pcontextId%>" />
 <div class="messages">
  <jsp:getProperty name="updatehelper" property="newsStatus" /></div>
  <form action="" method="POST">

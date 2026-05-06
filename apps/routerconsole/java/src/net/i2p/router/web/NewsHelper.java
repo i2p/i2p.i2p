@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Reader;
 
+import javax.servlet.http.HttpSession;
+
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.update.ConsoleUpdateManager;
@@ -288,15 +290,7 @@ public class NewsHelper extends ContentHelper {
      *  @return HTML
      *  @since 0.9.4 moved from NewsFetcher
      */
-    public String status() {
-        return status(_context);
-    }
-
-    /**
-     *  @return HTML
-     *  @since 0.9.4 moved from NewsFetcher
-     */
-    public static String status(RouterContext ctx) {
+    public static String status(RouterContext ctx, HttpSession session) {
          StringBuilder buf = new StringBuilder(128);
          long now = ctx.clock().now();
          buf.append("<span id=\"newsStatus\"><i>");
@@ -314,8 +308,8 @@ public class NewsHelper extends ContentHelper {
                                            ctx));
          }
          buf.append("</i></span><span id=\"newsDisplay\">");
-         String consoleNonce = CSSHelper.getNonce();
-         if (lastUpdated > 0 && consoleNonce != null) {
+         if (lastUpdated > 0) {
+             String consoleNonce = CSSHelper.getNonce(session);
              if (shouldShowNews(ctx)) {
                  buf.append(" <a href=\"/?news=0&amp;consoleNonce=").append(consoleNonce).append("\">")
                     .append(Messages.getString("Hide news", ctx));
