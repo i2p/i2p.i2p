@@ -78,7 +78,7 @@ For more information how to run I2P in Docker, see [Docker.md](Docker.md)
 
 Need help? See the IRC channel #i2p on irc.freenode.net
 
-Bug reports: [https://i2pgit.org/I2P_Developers/i2p.i2p/-/issues](https://i2pgit.org/I2P_Developers/i2p.i2p/-/issues) [http://git.idk.i2p/I2P_Developers/i2p.i2p/-/issues](http://git.idk.i2p/I2P_Developers/i2p.i2p/-/issues)
+Bug reports: [https://i2pgit.org/I2P_Developers/i2p.i2p/issues](https://i2pgit.org/I2P_Developers/i2p.i2p/issues) [http://git.idk.i2p/I2P_Developers/i2p.i2p/issues](http://git.idk.i2p/I2P_Developers/i2p.i2p/issues)
 
 Contact information, security issues, press inquiries: [https://i2p.net/en/contact](https://i2p.net/en/contact)
 
