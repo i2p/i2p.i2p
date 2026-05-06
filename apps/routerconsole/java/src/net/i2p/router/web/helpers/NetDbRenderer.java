@@ -330,6 +330,12 @@ class NetDbRenderer {
                         transport = "NTCP2+MLKEM768";
                     } else if (tr.equals("NTCP2_5")) {
                         transport = "NTCP2+MLKEM1024";
+                    } else if (tr.equals("SSU2_0")) {
+                        transport = "SSU2+MLKEM (any)";
+                    } else if (tr.equals("SSU2_3")) {
+                        transport = "SSU2+MLKEM512";
+                    } else if (tr.equals("SSU2_4")) {
+                        transport = "SSU2+MLKEM768";
                     } else {
                         transport = tr;
                     }
@@ -545,6 +551,15 @@ class NetDbRenderer {
         } else if (tr.equals("NTCP2_5")) {
             transport = "NTCP2";
             mode = 8;
+        } else if (tr.equals("SSU2_0")) {
+            transport = "SSU2";
+            mode = 5;
+        } else if (tr.equals("SSU2_3")) {
+            transport = "SSU2";
+            mode = 9;
+        } else if (tr.equals("SSU2_4")) {
+            transport = "SSU2";
+            mode = 10;
         } else {
             transport = tr;
             mode = 4;
@@ -592,6 +607,20 @@ class NetDbRenderer {
                             if ("5".equals(ra.getOption("pq")))
                                 continue;
                             break;
+
+                        case 9: {
+                            String pq = ra.getOption("pq");
+                            if (pq != null && pq.indexOf('3') >= 0)
+                                continue;
+                            break;
+                        }
+
+                        case 10: {
+                            String pq = ra.getOption("pq");
+                            if (pq != null && pq.indexOf('4') >= 0)
+                                continue;
+                            break;
+                        }
                     }
                 }
             } else {

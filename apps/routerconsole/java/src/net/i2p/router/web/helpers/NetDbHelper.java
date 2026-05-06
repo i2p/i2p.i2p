@@ -484,6 +484,9 @@ public class NetDbHelper extends FormHandler {
                    "<option value=\"SSU_1\">SSU (v1 only)</option>\n" +
                    "<option value=\"SSU_2\">SSU (v2 supported)</option>\n" +
                    "<option value=\"SSU2\">SSU2</option>\n" +
+                   "<option value=\"SSU2_0\">SSU2+MLKEM (any)</option>\n" +
+                   "<option value=\"SSU2_3\">SSU2+MLKEM512</option>\n" +
+                   "<option value=\"SSU2_4\">SSU2+MLKEM768</option>\n" +
                    "</select></td><td></td></tr>\n" +
                    "<tr><td>Transport Capabilities:</td><td><input type=\"text\" name=\"ssucaps\"></td><td></td></tr>\n" +
                    "<tr><td>Router Version:</td><td><input type=\"text\" name=\"v\"></td><td></td></tr>\n" +
