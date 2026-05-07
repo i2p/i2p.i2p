@@ -5012,8 +5012,9 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     /**
-     *  Replaces static consoleNonce, updateNonce, reseedNonce, systemNonce
+     *  Replaces process-wide nonce
      *  @param session returns an invalid nonce if null
+     *  @param xhr true for inner XHR section
      *  @return a new nonce for each call
      *  @since 0.9.70
      */
@@ -5040,7 +5041,7 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     /**
-     *  Replaces static consoleNonce, updateNonce, reseedNonce, systemNonce
+     *  Replaces process-wide nonce
      *  @param nonce returns false if null
      *  @param session returns false if null
      *  @return true if valid
