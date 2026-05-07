@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -33,6 +34,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import net.i2p.CoreVersion;
 import net.i2p.I2PAppContext;
@@ -79,7 +81,6 @@ public class I2PSnarkServlet extends BasicServlet {
     /** generally "i2psnark" */
     private String _contextName;
     private transient SnarkManager _manager;
-    private long _nonce;
     private String _themePath;
     private String _imgPath;
     private String _lastAnnounceURL;
@@ -88,6 +89,9 @@ public class I2PSnarkServlet extends BasicServlet {
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
     private static final String WARBASE = "/.resources/";
     private static final char HELLIP = '\u2026';
+    private static final String SESSION_SNARK_NONCE1 = "__i2psnark.nonce1.queue__";
+    private static final String SESSION_SNARK_NONCE2 = "__i2psnark.nonce2.queue__";
+    private static final int NONCE_QUEUE_SIZE = 10;
  
     public I2PSnarkServlet() {
         super();
@@ -99,7 +103,6 @@ public class I2PSnarkServlet extends BasicServlet {
         String cpath = getServletContext().getContextPath();
         _contextPath = cpath == "" ? "/" : cpath;
         _contextName = cpath == "" ? DEFAULT_NAME : cpath.substring(1).replace("/", "_");
-        _nonce = _context.random().nextLong();
         // limited protection against overwriting other config files or directories
         // in case you named your war "router.war"
         // We don't handle bad characters in the context path. Don't do that.
@@ -228,12 +231,13 @@ public class I2PSnarkServlet extends BasicServlet {
             PrintWriter out = resp.getWriter();
             //if (_log.shouldLog(Log.DEBUG))
             //    _manager.addMessage((_context.clock().now() / 1000) + " xhr1 p=" + req.getParameter("p"));
-            writeMessages(out, false, peerString);
+            String xnonce = getNonce(req.getSession(), true);
+            writeMessages(out, false, peerString, xnonce);
             boolean canWrite;
             synchronized(this) {
                 canWrite = _resourceBase.canWrite();
             }
-            writeTorrents(out, req, canWrite);
+            writeTorrents(out, req, canWrite, xnonce);
             return;
         }
 
@@ -265,7 +269,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     String base = addPaths(req.getRequestURI(), "/");
                     boolean showEdit = req.getParameter("showEdit") != null;
                     String listing = getListHTML(resource, base, true, method.equals("POST") ? req.getParameterMap() : null,
-                                                 req.getParameter("sort"), showEdit);
+                                                 req.getParameter("sort"), showEdit, req.getSession());
                     if (method.equals("POST")) {
                         // P-R-G
                         sendRedirect(req, resp, showEdit ? "?showEdit" : "");
@@ -294,13 +298,12 @@ public class I2PSnarkServlet extends BasicServlet {
         if (nonce != null) {
             // the clear messages button is a GET
             if ((method.equals("POST") || "Clear".equals(req.getParameter("action"))) &&
-                nonce.equals(String.valueOf(_nonce))) {
+                validateNonce(req.getSession(), nonce)) {
                 processRequest(req);
             } else if (!(method.equals("POST") || "Clear".equals(req.getParameter("action")))) {
                 // Lynx bug?
                 _manager.addMessage("Bad form method, POST required");
             } else {
-                // nonce is constant, shouldn't happen
                 _manager.addMessage("Please retry form submission (bad nonce)");
             }
             // P-R-G (or G-R-G to hide the params from the address bar)
@@ -419,25 +422,27 @@ public class I2PSnarkServlet extends BasicServlet {
             _manager.addMessage(_t("Click \"Add torrent\" button to fetch torrent"));
         out.write("<div id=\"page\" class=\"page\"><div id=\"mainsection\" class=\"mainsection\">");
 
-        writeMessages(out, isConfigure, peerString);
+        String newNonce = getNonce(req.getSession(), false);
+        writeMessages(out, isConfigure, peerString, newNonce);
 
         if (isConfigure) {
             // end of mainsection div
             out.write("<div class=\"logshim\"></div></div>\n");
-            writeConfigForm(out, req);
-            writeTrackerForm(out, req);
+            writeConfigForm(out, req, newNonce);
+            writeTrackerForm(out, req, newNonce);
         } else {
             boolean canWrite;
             synchronized(this) {
                 canWrite = _resourceBase.canWrite();
             }
-            boolean pageOne = writeTorrents(out, req, canWrite);
+            String xnonce = getNonce(req.getSession(), true);
+            boolean pageOne = writeTorrents(out, req, canWrite, xnonce);
             // end of mainsection div
             if (pageOne) {
                 out.write("</div><div id=\"lowersection\">\n");
                 if (canWrite) {
-                    writeAddForm(out, req);
-                    writeSeedForm(out, req, sortedTrackers);
+                    writeAddForm(out, req, newNonce);
+                    writeSeedForm(out, req, sortedTrackers, newNonce);
                 }
                 writeConfigLink(out);
                 // end of lowersection div
@@ -467,7 +472,7 @@ public class I2PSnarkServlet extends BasicServlet {
         resp.setHeader("Accept-Ranges", "none");
     }
 
-    private void writeMessages(PrintWriter out, boolean isConfigure, String peerString) throws IOException {
+    private void writeMessages(PrintWriter out, boolean isConfigure, String peerString, String nonce) throws IOException {
         List<UIMessages.Message> msgs = _manager.getMessages();
         if (!msgs.isEmpty()) {
             out.write("\n<div class=\"snarkMessages\" tabindex=\"0\">" +
@@ -479,7 +484,7 @@ public class I2PSnarkServlet extends BasicServlet {
             else
                 out.write("?");
             int lastID = msgs.get(msgs.size() - 1).id;
-            out.write("action=Clear&amp;id=" + lastID + "&amp;nonce=" + _nonce + "\">");
+            out.write("action=Clear&amp;id=" + lastID + "&amp;nonce=" + nonce + "\">");
             String tx = _t("clear messages");
             out.write(toThemeImg("delete", tx, tx));
             out.write("</a>" +
@@ -496,10 +501,12 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     /**
+     *  The XHR section
+     *
      *  @param canWrite is the data directory writable?
      *  @return true if on first page
      */
-    private boolean writeTorrents(PrintWriter out, HttpServletRequest req, boolean canWrite) throws IOException {
+    private boolean writeTorrents(PrintWriter out, HttpServletRequest req, boolean canWrite, String xnonce) throws IOException {
         /** dl, ul, down rate, up rate, peers, size */
         final long stats[] = new long[6];
         String peerParam = req.getParameter("p");
@@ -509,7 +516,7 @@ public class I2PSnarkServlet extends BasicServlet {
         boolean isForm = _manager.util().connected() || !snarks.isEmpty();
         if (isForm) {
             out.write("<form action=\"_post\" method=\"POST\">\n");
-            writeHiddenInputs(out, req, null);
+            writeHiddenInputs(out, req, null, xnonce);
         }
         out.write(TABLE_HEADER);
 
@@ -718,7 +725,7 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("&nbsp;");
         } else if (_manager.util().connected()) {
             if (isDegraded)
-                out.write("<a href=\"" + _contextPath + "/?action=StopAll&amp;nonce=" + _nonce + "\"><img title=\"");
+                out.write("<a href=\"" + _contextPath + "/?action=StopAll&amp;nonce=" + xnonce + "\"><img title=\"");
             else {
                 // http://www.onenaught.com/posts/382/firefox-4-change-input-type-image-only-submits-x-and-y-not-name
                 //out.write("<input type=\"image\" name=\"action\" value=\"StopAll\" title=\"");
@@ -734,7 +741,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (s.isStopped()) {
                     // show startall too
                     if (isDegraded)
-                        out.write("<a href=\"" + _contextPath + "/?action=StartAll&amp;nonce=" + _nonce + "\"><img title=\"");
+                        out.write("<a href=\"" + _contextPath + "/?action=StartAll&amp;nonce=" + xnonce + "\"><img title=\"");
                     else
                         out.write("<input type=\"image\" name=\"action_StartAll\" value=\"foo\" title=\"");
                     out.write(_t("Start all stopped torrents"));
@@ -748,7 +755,7 @@ public class I2PSnarkServlet extends BasicServlet {
             }
         } else if ((!_manager.util().isConnecting()) && !snarks.isEmpty()) {
             if (isDegraded)
-                out.write("<a href=\"" + _contextPath + "/?action=StartAll&amp;nonce=" + _nonce + "\"><img title=\"");
+                out.write("<a href=\"" + _contextPath + "/?action=StartAll&amp;nonce=" + xnonce + "\"><img title=\"");
             else
                 out.write("<input type=\"image\" name=\"action_StartAll\" value=\"foo\" title=\"");
             out.write(_t("Start all torrents and the I2P tunnel"));
@@ -769,7 +776,7 @@ public class I2PSnarkServlet extends BasicServlet {
             Snark snark = snarks.get(i);
             boolean showPeers = showDebug || "1".equals(peerParam) || Base64.encode(snark.getInfoHash()).equals(peerParam);
             boolean hide = i < start || i >= start + pageSize;
-            displaySnark(out, req, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug, hide, isRatSort, canWrite);
+            displaySnark(out, req, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug, hide, isRatSort, canWrite, xnonce);
         }
 
         if (total == 0) {
@@ -916,9 +923,9 @@ public class I2PSnarkServlet extends BasicServlet {
      *  @param action if non-null, add it as the action
      *  @since 0.9.16
      */
-    private void writeHiddenInputs(PrintWriter out, HttpServletRequest req, String action) {
+    private void writeHiddenInputs(PrintWriter out, HttpServletRequest req, String action, String nonce) {
         StringBuilder buf = new StringBuilder(256);
-        writeHiddenInputs(buf, req, action);
+        writeHiddenInputs(buf, req, action, nonce);
         out.append(buf);
     }
 
@@ -929,9 +936,9 @@ public class I2PSnarkServlet extends BasicServlet {
      *  @param action if non-null, add it as the action
      *  @since 0.9.16
      */
-    private void writeHiddenInputs(StringBuilder buf, HttpServletRequest req, String action) {
+    private void writeHiddenInputs(StringBuilder buf, HttpServletRequest req, String action, String nonce) {
         buf.append("<input type=\"hidden\" name=\"nonce\" value=\"")
-           .append(_nonce).append("\" >\n");
+           .append(nonce).append("\" >\n");
         String peerParam = req.getParameter("p");
         if (peerParam != null) {
             buf.append("<input type=\"hidden\" name=\"p\" value=\"")
@@ -1820,7 +1827,7 @@ public class I2PSnarkServlet extends BasicServlet {
     private void displaySnark(PrintWriter out, HttpServletRequest req,
                               Snark snark, String uri, int row, long stats[], boolean showPeers,
                               boolean isDegraded, boolean noThinsp, boolean showDebug, boolean statsOnly,
-                              boolean showRatios, boolean canWrite) throws IOException {
+                              boolean showRatios, boolean canWrite, String xnonce) throws IOException {
         // stats
         long uploaded = snark.getUploaded();
         stats[0] += snark.getDownloaded();
@@ -2115,7 +2122,7 @@ public class I2PSnarkServlet extends BasicServlet {
         } else if (isRunning) {
             // Stop Button
             if (isDegraded)
-                out.write("<a href=\"" + _contextPath + "/?action=Stop_" + b64 + "&amp;nonce=" + _nonce +
+                out.write("<a href=\"" + _contextPath + "/?action=Stop_" + b64 + "&amp;nonce=" + xnonce +
                           getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
             else
                 out.write("<input type=\"image\" name=\"action_Stop_" + b64 + "\" value=\"foo\" title=\"");
@@ -2130,7 +2137,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 // Start Button
                 // This works in Opera but it's displayed a little differently, so use noThinsp here too so all 3 icons are consistent
                 if (noThinsp)
-                    out.write("<a href=\"" + _contextPath + "/?action=Start_" + b64 + "&amp;nonce=" + _nonce +
+                    out.write("<a href=\"" + _contextPath + "/?action=Start_" + b64 + "&amp;nonce=" + xnonce +
                               getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
                 else
                     out.write("<input type=\"image\" name=\"action_Start_" + b64 + "\" value=\"foo\" title=\"");
@@ -2145,7 +2152,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 // Remove Button
                 // Doesnt work with Opera so use noThinsp instead of isDegraded
                 if (noThinsp)
-                    out.write("<a href=\"" + _contextPath + "/?action=Remove_" + b64 + "&amp;nonce=" + _nonce +
+                    out.write("<a href=\"" + _contextPath + "/?action=Remove_" + b64 + "&amp;nonce=" + xnonce +
                               getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
                 else
                     out.write("<input class=\"delete1\" type=\"image\" name=\"action_Remove_" + b64 + "\" value=\"foo\" title=\"");
@@ -2164,7 +2171,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 // Delete Button
                 // Doesnt work with Opera so use noThinsp instead of isDegraded
                 if (noThinsp)
-                    out.write("<a href=\"" + _contextPath + "/?action=Delete_" + b64 + "&amp;nonce=" + _nonce +
+                    out.write("<a href=\"" + _contextPath + "/?action=Delete_" + b64 + "&amp;nonce=" + xnonce +
                               getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
                 else
                     out.write("<input class=\"delete2\" type=\"image\" name=\"action_Delete_" + b64 + "\" value=\"foo\" title=\"");
@@ -2532,7 +2539,7 @@ public class I2PSnarkServlet extends BasicServlet {
         return buf.toString();
     }
 
-    private void writeAddForm(PrintWriter out, HttpServletRequest req) throws IOException {
+    private void writeAddForm(PrintWriter out, HttpServletRequest req, String nonce) throws IOException {
         // display incoming parameter if a GET so links will work
         String newURL = req.getParameter("nofilter_newURL");
         if (newURL == null || newURL.trim().length() <= 0 || req.getMethod().equals("POST"))
@@ -2542,7 +2549,7 @@ public class I2PSnarkServlet extends BasicServlet {
 
         out.write("<div id=\"add\" class=\"snarkNewTorrent\">\n" +
                   "<form action=\"_post\" method=\"POST\" enctype=\"multipart/form-data\" accept-charset=\"UTF-8\">\n");
-        writeHiddenInputs(out, req, "Add");
+        writeHiddenInputs(out, req, "Add", nonce);
         out.write("<div class=\"addtorrentsection\">" +
                   "<input class=\"toggle_input\" id=\"toggle_addtorrent\" type=\"checkbox\"");
         if (newURL.length() > 0)
@@ -2583,11 +2590,11 @@ public class I2PSnarkServlet extends BasicServlet {
                   "</div></form></div>");
     }
 
-    private void writeSeedForm(PrintWriter out, HttpServletRequest req, List<Tracker> sortedTrackers) throws IOException {
+    private void writeSeedForm(PrintWriter out, HttpServletRequest req, List<Tracker> sortedTrackers, String nonce) throws IOException {
         out.write("<div id=\"new\" class=\"newtorrentsection\"><div class=\"snarkNewTorrent\">\n" +
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
                   "<form action=\"_post\" method=\"POST\">\n");
-        writeHiddenInputs(out, req, "Create");
+        writeHiddenInputs(out, req, "Create", nonce);
         out.write("<input class=\"toggle_input\" id=\"toggle_createtorrent\" type=\"checkbox\"><label class=\"toggleview\" for=\"toggle_createtorrent\">");
         out.write(toThemeImg("create"));
         out.write(' ');
@@ -2660,7 +2667,7 @@ public class I2PSnarkServlet extends BasicServlet {
 
     private static final int[] times = { 5, 15, 30, 60, 2*60, 5*60, 10*60, 30*60, -1 };
 
-    private void writeConfigForm(PrintWriter out, HttpServletRequest req) throws IOException {
+    private void writeConfigForm(PrintWriter out, HttpServletRequest req, String nonce) throws IOException {
         String dataDir = _manager.getDataDir().getAbsolutePath();
         boolean filesPublic = _manager.areFilesPublic();
         boolean autoStart = _manager.shouldAutoStart();
@@ -2677,7 +2684,7 @@ public class I2PSnarkServlet extends BasicServlet {
 
         out.write("<form action=\"" + _contextPath + "/configure\" method=\"POST\">\n" +
                   "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n");
-        writeHiddenInputs(out, req, "Save");
+        writeHiddenInputs(out, req, "Save", nonce);
         out.write("<span class=\"snarkConfigTitle\">");
         out.write(toThemeImg("config"));
         out.write(' ');
@@ -2983,11 +2990,11 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     /** @since 0.9 */
-    private void writeTrackerForm(PrintWriter out, HttpServletRequest req) throws IOException {
+    private void writeTrackerForm(PrintWriter out, HttpServletRequest req, String nonce) throws IOException {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<form action=\"" + _contextPath + "/configure\" method=\"POST\">\n" +
                    "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n");
-        writeHiddenInputs(buf, req, "Save2");
+        writeHiddenInputs(buf, req, "Save2", nonce);
         buf.append("<span class=\"snarkConfigTitle\">");
         toThemeImg(buf, "config");
         buf.append(' ');
@@ -3271,7 +3278,7 @@ public class I2PSnarkServlet extends BasicServlet {
      * @since 0.7.14
      */
     private String getListHTML(File xxxr, String base, boolean parent, Map<String, String[]> postParams,
-                               String sortParam, boolean showEdit) throws IOException
+                               String sortParam, boolean showEdit, HttpSession session) throws IOException
     {
         String decodedBase = decodePath(base);
         String title = decodedBase;
@@ -3297,7 +3304,7 @@ public class I2PSnarkServlet extends BasicServlet {
             String[] val = postParams.get("nonce");
             if (val != null) {
                 String nonce = val[0];
-                if (String.valueOf(_nonce).equals(nonce)) {
+                if (validateNonce(session, nonce)) {
                     if (postParams.get("savepri") != null ||
                         postParams.get("setInOrderEnabled") != null) {
                         savePriorities(snark, postParams);
@@ -3382,8 +3389,9 @@ public class I2PSnarkServlet extends BasicServlet {
         final boolean esc = ec && _manager.getSavedCommentsEnabled(snark); // per-torrent setting
         final boolean includeForm = showStopStart || showPriority || er || ec;
         if (includeForm) {
+            String nonce = getNonce(session, false);
             buf.append("<form action=\"").append(base).append("\" method=\"POST\">\n" +
-                       "<input type=\"hidden\" name=\"nonce\" value=\"").append(_nonce).append("\">\n");
+                       "<input type=\"hidden\" name=\"nonce\" value=\"").append(nonce).append("\">\n");
             if (sortParam != null) {
                 buf.append("<input type=\"hidden\" name=\"sort\" value=\"")
                    .append(DataHelper.stripHTML(sortParam)).append("\" >\n");
@@ -5001,5 +5009,65 @@ public class I2PSnarkServlet extends BasicServlet {
                 return false;
         }
         return true;
+    }
+
+    /**
+     *  Replaces static consoleNonce, updateNonce, reseedNonce, systemNonce
+     *  @param session returns an invalid nonce if null
+     *  @return a new nonce for each call
+     *  @since 0.9.70
+     */
+    @SuppressWarnings("unchecked")
+    private String getNonce(HttpSession session, boolean xhr) { 
+        if (session == null) {
+            return "FAIL_SESSION_NOT_SET";
+        }
+        String rv;
+        String att = xhr ? SESSION_SNARK_NONCE2 : SESSION_SNARK_NONCE1;
+        synchronized(session) {
+            LinkedList<String> nonces = (LinkedList<String>) session.getAttribute(att);
+            if (nonces == null) {
+                nonces = new LinkedList<String>();
+                session.setAttribute(att, nonces);
+            }
+            // add a prefix to distinguish from other nonces for debugging
+            rv = "SN" + (xhr ? 'B' : 'A') + _context.random().nextLong();
+            nonces.offer(rv);
+            if (nonces.size() > NONCE_QUEUE_SIZE)
+                nonces.poll();
+        }
+        return rv;
+    }
+
+    /**
+     *  Replaces static consoleNonce, updateNonce, reseedNonce, systemNonce
+     *  @param nonce returns false if null
+     *  @param session returns false if null
+     *  @return true if valid
+     *  @since 0.9.70
+     */
+    @SuppressWarnings("unchecked")
+    private static boolean validateNonce(HttpSession session, String nonce) { 
+        if (nonce == null) {
+            return false;
+        }
+        if (session == null) {
+            return false;
+        }
+        boolean rv;
+        synchronized(session) {
+            LinkedList<String> nonces = (LinkedList<String>) session.getAttribute(SESSION_SNARK_NONCE1);
+            if (nonces != null) {
+                rv = nonces.removeLastOccurrence(nonce);
+                if (!rv) {
+                    nonces = (LinkedList<String>) session.getAttribute(SESSION_SNARK_NONCE2);
+                    if (nonces != null)
+                        rv = nonces.removeLastOccurrence(nonce);
+                }
+            } else {
+                rv = false;
+            }
+        }
+        return rv;
     }
 }
