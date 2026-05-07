@@ -2433,7 +2433,8 @@ public class UDPTransport extends TransportImpl {
                 return null;
 
             // temp, let NTCP2 deal with him (prop. 165)
-            if (toAddress.getCapabilities().indexOf(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL) >= 0) {
+            if (toAddress.getCapabilities().indexOf(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL) >= 0 &&
+                VersionComparator.comp(toAddress.getVersion(), "0.9.70") < 0) {
                 PeerProfile prof = _context.profileOrganizer().getProfileNonblocking(to);
                 if (prof == null || prof.getLastHeardFrom() <= 0)
                     return null;
