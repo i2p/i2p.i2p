@@ -249,6 +249,8 @@ public class ConfigClientsHelper extends HelperBase {
                     desc = _t("Address Book");
                 else if (app.equals("susimail"))
                     desc = _t("Email");
+                else if (app.equals("jsonrpc"))
+                    desc = _t("I2PControl RPC Service");
                 else
                     desc = DataHelper.escapeHTML(app) + ".war";
                 boolean isConsole = RouterConsoleRunner.ROUTERCONSOLE.equals(app);
