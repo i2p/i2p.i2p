@@ -2,8 +2,10 @@
 %><%@page pageEncoding="UTF-8"
 %><%@page contentType="text/html" import="net.i2p.i2ptunnel.web.EditBean"
 %><!DOCTYPE html>
-<jsp:useBean class="net.i2p.i2ptunnel.web.EditBean" id="editBean" scope="request" />
-<jsp:useBean class="net.i2p.i2ptunnel.ui.Messages" id="intl" scope="request" />
+<jsp:useBean class="net.i2p.i2ptunnel.web.EditBean" id="editBean" scope="request" /><%
+    editBean.storeMethod(request.getMethod());
+    editBean.storeSession(session);
+%><jsp:useBean class="net.i2p.i2ptunnel.ui.Messages" id="intl" scope="request" />
 <% String pageStr = request.getParameter("page");
    /* Get the number of the page we came from */
    int lastPage = 0;
@@ -69,7 +71,7 @@
                 } %>
                 <input type="hidden" name="page" value="<%=curPage%>" />
                 <input type="hidden" name="tunnel" value="null" />
-                <input type="hidden" name="nonce" value="<%=net.i2p.i2ptunnel.web.IndexBean.getNextNonce()%>" />
+                <input type="hidden" name="nonce" value="<%=editBean.getNextNonce()%>" />
                 <%
                 /* hidden form data from other pages */
                 if (curPage != 1) {

@@ -62,7 +62,7 @@
             destdir="./build/obj" 
             includeAntRuntime="false"
             encoding="UTF-8"
-            classpath="../../../core/java/build/i2p.jar:build/i2ptunnel.jar:../../jetty/jettylib/jetty-i2p.jar:../../jetty/jettylib/jetty-util.jar:../../jetty/jettylib/jetty-xml.jar" >
+            classpath="../../../core/java/build/i2p.jar:build/i2ptunnel.jar:../../jetty/jettylib/jetty-i2p.jar:../../jetty/jettylib/jetty-util.jar:../../jetty/jettylib/jetty-xml.jar:../../jetty/jettylib/javax.servlet.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>

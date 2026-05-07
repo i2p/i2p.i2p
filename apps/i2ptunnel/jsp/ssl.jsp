@@ -7,8 +7,10 @@
   /* right now using EditBean instead of IndexBean for getSpoofedHost() */
   /* but might want to POST to it anyway ??? */
 %>
-<jsp:useBean class="net.i2p.i2ptunnel.web.EditBean" id="editBean" scope="request" />
-<jsp:useBean class="net.i2p.i2ptunnel.ui.Messages" id="intl" scope="request" />
+<jsp:useBean class="net.i2p.i2ptunnel.web.EditBean" id="editBean" scope="request" /><%
+    editBean.storeMethod(request.getMethod());
+    editBean.storeSession(session);
+%><jsp:useBean class="net.i2p.i2ptunnel.ui.Messages" id="intl" scope="request" />
 <%
    String tun = request.getParameter("tunnel");
    int curTunnel = -1;
@@ -144,7 +146,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             } else {
                 kspw = KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD;
             }
-            if (!net.i2p.i2ptunnel.web.IndexBean.haveNonce(nonce)) {
+            if (!editBean.validateNonce()) {
                 msgs.append(intl._t("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit."))
                     .append('\n')
                     .append(intl._t("If the problem persists, verify that you have cookies enabled in your browser."))
@@ -485,7 +487,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
 <form method="post" action="ssl" accept-charset="UTF-8">
 <input type="hidden" name="tunnel" value="<%=curTunnel%>" />
-<input type="hidden" name="nonce" value="<%=net.i2p.i2ptunnel.web.IndexBean.getNextNonce()%>" />
+<input type="hidden" name="nonce" value="<%=editBean.getNextNonce()%>" />
 <input type="hidden" name="type" value="<%=tunnelType%>" />
 <input type="submit" class="default" name="action" value="Save changes" />
 <table>

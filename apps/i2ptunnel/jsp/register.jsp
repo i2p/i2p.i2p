@@ -8,8 +8,10 @@
   /* right now using EditBean instead of IndexBean for getSpoofedHost() */
   /* but might want to POST to it anyway ??? */
 %>
-<jsp:useBean class="net.i2p.i2ptunnel.web.EditBean" id="editBean" scope="request" />
-<jsp:useBean class="net.i2p.i2ptunnel.ui.Messages" id="intl" scope="request" />
+<jsp:useBean class="net.i2p.i2ptunnel.web.EditBean" id="editBean" scope="request" /><%
+    editBean.storeMethod(request.getMethod());
+    editBean.storeSession(session);
+%><jsp:useBean class="net.i2p.i2ptunnel.ui.Messages" id="intl" scope="request" />
 <%
    RequestWrapper wrequest = new RequestWrapper(request);
    String tun = wrequest.getParameter("tunnel");
@@ -61,7 +63,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         name = editBean.getTunnelName(curTunnel);
 %>
                 <input type="hidden" name="tunnel" value="<%=curTunnel%>" />
-                <input type="hidden" name="nonce" value="<%=net.i2p.i2ptunnel.web.IndexBean.getNextNonce()%>" />
+                <input type="hidden" name="nonce" value="<%=editBean.getNextNonce()%>" />
                 <input type="hidden" name="type" value="<%=tunnelType%>" />
                 <input type="submit" class="default" name="action" value="Save changes" />
 <%

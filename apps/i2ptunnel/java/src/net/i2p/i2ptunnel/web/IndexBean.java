@@ -15,10 +15,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+
+import javax.servlet.http.HttpSession;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -60,11 +63,10 @@ public class IndexBean {
     protected final GeneralHelper _helper;
     private final String _fatalError;
     private String _action;
+    private String _method;
     private int _tunnel;
-    //private long _prevNonce;
-    //private long _prevNonce2;
     private String _curNonce;
-    //private long _nextNonce;
+    protected HttpSession _session;
     private int _msgID = -1;
 
     private final TunnelConfig _config;
@@ -78,14 +80,10 @@ public class IndexBean {
     public static final int NOT_RUNNING = GeneralHelper.NOT_RUNNING;
     public static final int STANDBY = GeneralHelper.STANDBY;
     
-    //static final String PROP_NONCE = IndexBean.class.getName() + ".nonce";
-    //static final String PROP_NONCE_OLD = PROP_NONCE + '2';
-    /** 3 wasn't enough for some browsers. They are reloading the page for some reason - maybe HEAD? @since 0.8.1 */
+    private static final String SESSION_I2PTUNNEL_NONCE = "__i2ptunnel.nonce.queue__";
     private static final int MAX_NONCES = 8;
-    /** store nonces in a static FIFO instead of in System Properties @since 0.8.1 */
-    private static final List<String> _nonces = new ArrayList<String>(MAX_NONCES + 1);
     private static final UIMessages _messages = new UIMessages(100);
-    private static final Map<Integer, SessionKey> _formKeys = new HashMap<Integer, SessionKey>();
+    private static final String SESSION_I2PTUNNEL_FORMKEYS = "__i2ptunnel.formkeys__";
 
     private static final String PROP_THEME_NAME = "routerconsole.theme";
     private static final String DEFAULT_THEME = "light";
@@ -111,8 +109,6 @@ public class IndexBean {
         _helper = new GeneralHelper(_context, _group);
         _fatalError = error;
         _tunnel = -1;
-        _curNonce = "-1";
-        addNonce();
         _config = new TunnelConfig();
     }
     
@@ -123,10 +119,29 @@ public class IndexBean {
         return _group != null;
     }
 
-    public static String getNextNonce() {
-        synchronized (_nonces) {
-            return _nonces.get(0);
+    /**
+     *  storeSession() must have been called
+     *  @return a new nonce for each call
+     */
+    @SuppressWarnings("unchecked")
+    public String getNextNonce() { 
+        if (_session == null) {
+            return "FAIL_SESSION_NOT_SET";
         }
+        String rv;
+        synchronized(_session) {
+            LinkedList<String> nonces = (LinkedList<String>) _session.getAttribute(SESSION_I2PTUNNEL_NONCE);
+            if (nonces == null) {
+                nonces = new LinkedList<String>();
+                _session.setAttribute(SESSION_I2PTUNNEL_NONCE, nonces);
+            }
+            // add a prefix to distinguish from other nonces for debugging
+            rv = "HSM" + _context.random().nextLong();
+            nonces.offer(rv);
+            if (nonces.size() > MAX_NONCES)
+                nonces.poll();
+        }
+        return rv;
     }
 
     public void setNonce(String nonce) {
@@ -134,25 +149,42 @@ public class IndexBean {
         _curNonce = nonce;
     }
 
-    /** add a random nonce to the head of the queue @since 0.8.1 */
-    private void addNonce() {
-        String nextNonce = Long.toString(_context.random().nextLong());
-        synchronized (_nonces) {
-            _nonces.add(0, nextNonce);
-            int sz = _nonces.size();
-            if (sz > MAX_NONCES)
-                _nonces.remove(sz - 1);
-        }
+    /**
+     * @since 0.9.70
+     */
+    public void storeMethod(String method) {
+        _method = method;
     }
 
     /**
-      * do we know this nonce?
-      * @since 0.8.1 public since 0.9.35
-      */
-    public static boolean haveNonce(String nonce) {
-        synchronized (_nonces) {
-            return _nonces.contains(nonce);
+     *  For nonce validation
+     *  @since 0.9.70
+     */
+    public void storeSession(HttpSession session) { _session = session; }
+
+    /**
+     *  storeSession() and setNonce() must have been called
+     *  @return true if valid
+     *  @since 0.9.70
+     */
+    @SuppressWarnings("unchecked")
+    public boolean validateNonce() { 
+        if (_curNonce == null) {
+            return false;
         }
+        if (_session == null) {
+            return false;
+        }
+        boolean rv;
+        synchronized(_session) {
+            LinkedList<String> nonces = (LinkedList<String>) _session.getAttribute(SESSION_I2PTUNNEL_NONCE);
+            if (nonces != null) {
+                rv = nonces.removeLastOccurrence(_curNonce);
+            } else {
+                rv = false;
+            }
+        }
+        return rv;
     }
 
     public void setAction(String action) {
@@ -185,12 +217,13 @@ public class IndexBean {
             return "";
         if (_group == null)
             return "Error - tunnels are not initialized yet";
-        // If passwords are turned on, all is assumed good
-        if (!_context.getBooleanProperty(PROP_PW_ENABLE) &&
-            !haveNonce(_curNonce))
+        // Clear messages button is a GET
+        if ( /* TODO ("POST".equals(_method) || "Clear".equals(_action)) || */
+            !validateNonce()) {
             return _t("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.")
                    + ' ' +
                    _t("If the problem persists, verify that you have cookies enabled in your browser.");
+        }
         // for any of these that call getMessage(msgs),
         // we return "", as getMessage() will add them to the returned string.
         if ("Stop all".equals(_action)) {
@@ -1349,15 +1382,21 @@ public class IndexBean {
      *  @param v Base64, or empty, or null
      *  @since 0.9.46
      */
+    @SuppressWarnings("unchecked")
     private String decrypt(String k, String v) {
         if (v == null || v.length() <= 0)
             return v;
         byte[] enc = Base64.decode(v);
         if (enc == null)
             return null;
+        if (_session == null)
+            return null;
         SessionKey key;
-        synchronized(_formKeys) {
-            key = _formKeys.get(Integer.valueOf(_tunnel));
+        synchronized(_session) {
+            Map<Integer, SessionKey> formKeys = (Map<Integer, SessionKey>) _session.getAttribute(SESSION_I2PTUNNEL_FORMKEYS);
+            if (formKeys == null)
+                return null;
+            key = formKeys.get(Integer.valueOf(_tunnel));
         }
         if (key == null)
             return null;
@@ -1382,18 +1421,26 @@ public class IndexBean {
      *  @return Base64, or empty, or null
      *  @since 0.9.46
      */
+    @SuppressWarnings("unchecked")
     protected String encrypt(int tunnel, String k, String v) {
         if (v == null || v.length() <= 0)
             return v;
         byte[] dec = DataHelper.getUTF8(v);
+        if (_session == null)
+            return null;
         SessionKey key;
-        synchronized(_formKeys) {
-            key = _formKeys.get(Integer.valueOf(tunnel));
+        synchronized(_session) {
+            Map<Integer, SessionKey> formKeys = (Map<Integer, SessionKey>) _session.getAttribute(SESSION_I2PTUNNEL_FORMKEYS);
+            if (formKeys == null) {
+                formKeys =  new HashMap<Integer, SessionKey>();
+                _session.setAttribute(SESSION_I2PTUNNEL_FORMKEYS, formKeys);
+            }
+            key = formKeys.get(Integer.valueOf(tunnel));
             if (key == null) {
                 byte[] keyb = new byte[32];
                 _context.random().nextBytes(keyb);
                 key = new SessionKey(keyb);
-                _formKeys.put(Integer.valueOf(tunnel), key);
+                formKeys.put(Integer.valueOf(tunnel), key);
             }
         }
         byte[] kb = DataHelper.getUTF8(k);

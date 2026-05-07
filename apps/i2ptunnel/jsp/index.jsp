@@ -4,8 +4,10 @@
 %><%@page contentType="text/html" import="net.i2p.i2ptunnel.web.IndexBean"
 %><?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<jsp:useBean class="net.i2p.i2ptunnel.web.IndexBean" id="indexBean" scope="request" />
-<jsp:setProperty name="indexBean" property="tunnel" /><%-- must be set before key1-4 --%>
+<jsp:useBean class="net.i2p.i2ptunnel.web.IndexBean" id="indexBean" scope="request" /><%
+    indexBean.storeMethod(request.getMethod());
+    indexBean.storeSession(session);
+%><jsp:setProperty name="indexBean" property="tunnel" /><%-- must be set before key1-4 --%>
 <jsp:setProperty name="indexBean" property="*" />
 <jsp:useBean class="net.i2p.i2ptunnel.ui.Messages" id="intl" scope="request" />
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -25,7 +27,7 @@
 </p></div>
 <%
   boolean isInitialized = indexBean.isInitialized();
-  String nextNonce = isInitialized ? net.i2p.i2ptunnel.web.IndexBean.getNextNonce() : null;
+  String nextNonce = isInitialized ? indexBean.getNextNonce() : null;
 
   // not synced, oh well
   int lastID = indexBean.getLastMessageID();
