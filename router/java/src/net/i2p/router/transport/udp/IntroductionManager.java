@@ -48,6 +48,8 @@ class IntroductionManager {
     private final Map<Long, PeerState> _inbound;
     /** map of relay nonce to alice PeerState who requested it */
     private final ConcurrentHashMap<Long, PeerState2> _nonceToAlice;
+    private final Set<Long> _recentHolePunches;
+    private long _lastHolePunchClean;
     private final Map<Long, Object> _recentRelaysAsBob;
     private static final Object DUMMY = new Object();
 
@@ -84,6 +86,7 @@ class IntroductionManager {
         _builder2 = transport.getBuilder2();
         _outbound = new ConcurrentHashMap<Long, PeerState>(MAX_OUTBOUND);
         _inbound = new ConcurrentHashMap<Long, PeerState>(MAX_INBOUND);
+        _recentHolePunches = new HashSet<Long>(16);
         _nonceToAlice = new ConcurrentHashMap<Long, PeerState2>(MAX_INBOUND);
         _recentRelaysAsBob = new LHMCache<Long, Object>(32);
         //ctx.statManager().createRateStat("udp.receiveRelayIntro", "How often we get a relayed request for us to talk to someone?", "udp", UDPTransport.RATES);
@@ -596,12 +599,81 @@ class IntroductionManager {
      *  @since 0.9.55
      */
     RelayIntroResult receiveRelayIntro(PeerState2 bob, Hash alice, byte[] data) {
+        // pull out IP to use as key for recent check, this somewhat duplicates
+        // checks below, but better than using Alice hash since Bob could spoof RIs
+        long key;
+        int iplen = data[13] & 0xff;
+        if (iplen == 6)
+            key = DataHelper.fromLong(data, 16, 4);
+        else if (iplen == 18) // first 8 bytes
+            key = DataHelper.fromLong8(data, 16);
+        else
+            return RelayIntroResult.DROPPED;
+        // basic throttle, don't bother saving per-peer send times
+        boolean tooMany = false;
+        boolean already = false;
+        long now = _context.clock().now();
+        synchronized (_recentHolePunches) {
+            if (now > _lastHolePunchClean + PUNCH_CLEAN_TIME) {
+                _recentHolePunches.clear();
+                _lastHolePunchClean = now;
+                _recentHolePunches.add(Long.valueOf(key));
+            } else {
+                tooMany = _recentHolePunches.size() >= MAX_PUNCHES;
+                if (!tooMany)
+                    already = !_recentHolePunches.add(Long.valueOf(key));
+            }
+        }
+        if (tooMany) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Rejecting - too many - RelayIntro for " + alice);
+            return sendRelayRejectLimit(bob, data);
+        }
+        if (already) {
+            // This check will trigger a lot, as Alice may send RelayRequests to
+            // several introducers at once.
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Rejecting dup RelayIntro for " + alice);
+            return sendRelayRejectLimit(bob, data);
+        }
+        if (!_transport.haveCapacity(95)) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Rejecting RelayIntro, near conn limits for " + alice);
+            return sendRelayRejectLimit(bob, data);
+        }
         RelayIntroResult rv = receiveRelayIntro(bob, alice, data, 0);
         if (_log.shouldInfo())
             _log.info("Receive relay intro from bob " + bob 
                       + " for alice " + alice.toBase64()
                       + " result " + rv);
         return rv;
+    }
+
+    /**
+     *  We are Charlie, send a limit reject to Bob.
+     *
+     *  @return DROPPED on error, or REPLIED if we replied to Bob with a RelayResponse
+     *  @since 0.9.70
+     */
+    private RelayIntroResult sendRelayRejectLimit(PeerState2 bob, byte[] data) {
+        long nonce = DataHelper.fromLong(data, 0, 4);
+        int rcode = SSU2Util.RELAY_REJECT_CHARLIE_LIMIT;
+        // don't bother sending our IP/port, as allowed by spec
+        SigningPrivateKey spk = _context.keyManager().getSigningPrivateKey();
+        byte[] rdata = SSU2Util.createRelayResponseData(_context, bob.getRemotePeer(), rcode,
+                                                        nonce, null, 0, spk, 0);
+        if (rdata == null)
+            return RelayIntroResult.DROPPED;
+        try {
+            UDPPacket packet = _builder2.buildRelayResponse(rdata, bob);
+            if (_log.shouldInfo())
+                _log.info("Send relay limit response " + rcode + " as charlie " + " nonce " + nonce + " to bob " + bob);
+            _transport.send(packet);
+            bob.setLastSendTime(_context.clock().now());
+        } catch (IOException ioe) {
+            return RelayIntroResult.DROPPED;
+        }
+        return RelayIntroResult.REPLIED;
     }
 
     /**
