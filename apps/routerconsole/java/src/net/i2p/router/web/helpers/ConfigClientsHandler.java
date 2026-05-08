@@ -100,7 +100,7 @@ public class ConfigClientsHandler extends FormHandler {
                 addFormError("Plugins disabled");
             return;
         }
-        // value
+
         if (_action.startsWith("Start ")) {
             String app = _action.substring(6);
             app = DataHelper.stripHTML(app);
@@ -124,7 +124,6 @@ public class ConfigClientsHandler extends FormHandler {
             return;
         }
 
-        // value
         if (_action.startsWith("Delete ")) {
             String app = _action.substring(7);
             app = DataHelper.stripHTML(app);
@@ -163,7 +162,6 @@ public class ConfigClientsHandler extends FormHandler {
             return;
         }
 
-        // value
         if (_action.startsWith("Stop ")) {
             
             String app = _action.substring(5);
@@ -196,7 +194,6 @@ public class ConfigClientsHandler extends FormHandler {
             return;
         }
 
-        // value
         if (_action.startsWith("Update ")) {
             if (pluginsEnabled) {
                 String app = _action.substring(7);
@@ -208,7 +205,6 @@ public class ConfigClientsHandler extends FormHandler {
             return;
         }
 
-        // value
         if (_action.startsWith("Check ")) {
             if (pluginsEnabled) {
                 String app = _action.substring(6);
@@ -220,33 +216,7 @@ public class ConfigClientsHandler extends FormHandler {
             return;
         }
 
-        // label (IE)
-        String xStart = _t("Start");
-        if (_action.toLowerCase(Locale.US).startsWith(xStart + "<span class=hide> ") &&
-                   _action.toLowerCase(Locale.US).endsWith("</span>")) {
-            // IE sucks
-            String app = _action.substring(xStart.length() + 18, _action.length() - 7);
-            int appnum = -1;
-            try {
-                appnum = Integer.parseInt(app);
-            } catch (NumberFormatException nfe) {}
-            if (appnum >= 0) {
-                startClient(appnum);
-            } else {
-                List<String> plugins = PluginStarter.getPlugins();
-                if (plugins.contains(app)) {
-                    if (pluginsEnabled)
-                        startPlugin(app);
-                    else
-                        addFormError("Plugins disabled");
-                } else {
-                    startWebApp(app);
-                }
-            }
-        } else {
-            //addFormError(_t("Unsupported") + ' ' + _action + '.');
-        }
-
+        //addFormError(_t("Unsupported") + ' ' + _action + '.');
     }
     
     private void saveClientChanges() {
