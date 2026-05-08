@@ -183,7 +183,7 @@ class SOCKS5Server extends SOCKSServer {
                              I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_SHA256_SUFFIX;
             String configPW = props.getProperty(psha256);
             String hex = PasswordManager.sha256Hex(I2PSOCKSTunnel.AUTH_REALM, u, p);
-            if (configPW == null || !configPW.equals(hex)) {
+            if (configPW == null || !DataHelper.eqCT(hex, configPW)) {
                 _log.logAlways(Log.WARN, "SOCKS proxy authentication failed, user: " + u + " IP: " + client);
                 try { Thread.sleep(3000); } catch (InterruptedException ie) {}
                 sendAuthReply(AUTH_FAILURE, out);

@@ -67,7 +67,7 @@ public class ConsolePasswordManager extends RouterPasswordManager {
         String hex = _context.getProperty(pfx + PROP_MD5);
         if (hex == null)
             return false;
-        return hex.equals(md5Hex(subrealm, user, pw));
+        return DataHelper.eqCT(md5Hex(subrealm, user, pw), hex);
     }
     
     /**

@@ -471,7 +471,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                             configPW = getTunnel().getClientOptions().getProperty(PROP_PW);
                     }
                     if (configPW != null) {
-                        if (pw.equals(configPW)) {
+                        if (DataHelper.eqCT(pw, configPW)) {
                             if (_log.shouldLog(Log.INFO))
                                 _log.info(getPrefix(requestId) + "Good auth - user: " + user + " pw: " + pw);
                             return AuthResult.AUTH_GOOD;
@@ -562,7 +562,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         // response check
         String kd = ha1 + ':' + nonce + ':' + nc + ':' + cnonce + ':' + qop + ':' + ha2;
         String hkd = isSHA256 ? PasswordManager.sha256Hex(kd) : PasswordManager.md5Hex(kd);
-        if (!response.equals(hkd)) {
+        if (!DataHelper.eqCT(response, hkd)) {
             _log.logAlways(Log.WARN, "HTTP proxy authentication failed, user: " + user + " IP: " + s.getInetAddress());
             if (_log.shouldLog(Log.INFO))
                 _log.info("Bad digest auth: " + DataHelper.toString(args));

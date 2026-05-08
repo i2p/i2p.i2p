@@ -31,8 +31,17 @@ public class PasswordManager {
     protected static final String PROP_B64 = ".b64";
     /** stored as the hex of the MD5 hash of the UTF-8 bytes. Compatible with Jetty. */
     protected static final String PROP_MD5 = ".md5";
-    /** stored as a Unix crypt string */
+
+    /**
+     *  Stored as a Unix crypt string
+     *  Originally intended as a Jetty-compatible UnixCrypt string, see man crypt(5),
+     *  but not fully implemented and insecure anyway.
+     *
+     *  @deprecated unused
+     */
+    @Deprecated
     protected static final String PROP_CRYPT = ".crypt";
+
     /** stored as the b64 of the 16 byte salt + the 32 byte hash of the UTF-8 bytes */
     protected static final String PROP_SHASH = ".shash";
 
@@ -64,7 +73,10 @@ public class PasswordManager {
         String pfx = realm;
         if (user != null && user.length() > 0)
             pfx += '.' + user;
-        return pw.equals(_context.getProperty(pfx + PROP_PW));
+        String s = _context.getProperty(pfx + PROP_PW);
+        if (s == null)
+            return false;
+        return DataHelper.eqCT(pw, s);
     }
     
     /**
@@ -80,7 +92,7 @@ public class PasswordManager {
         String b64 = _context.getProperty(pfx + PROP_B64);
         if (b64 == null)
             return false;
-        return b64.equals(Base64.encode(DataHelper.getUTF8(pw)));
+        return DataHelper.eqCT(Base64.encode(DataHelper.getUTF8(pw)), b64);
     }
     
     /**

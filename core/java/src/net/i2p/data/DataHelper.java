@@ -1129,6 +1129,33 @@ public class DataHelper {
         }
         return r == 0;
     }
+
+    /**
+     *  This throws NPE if either lhs or rhs is null.
+     *  Constant time, almost.
+     *  Warning: not constant time if secret is empty.
+     *
+     *  @param user user-supplied String, will attempt for time to be proportional to this length
+     *  @param secret internal String, will attempt for time to be independent of this length
+     *  @throws NullPointerException if either arg is null
+     *  @since 0.9.70
+     */
+    public final static boolean eqCT(String user, String secret) {
+        int ul = user.length();
+        int sl = secret.length();
+        if (ul == 0)
+            return sl == 0;
+        int v = ul ^ sl;
+        if (sl == 0) {
+            // so charAt() below works
+            secret = "\0";
+            sl = 1;
+        }
+        for (int i = 0; i < ul; i++) {
+            v |= user.charAt(i) ^ secret.charAt(i % sl);
+        }
+        return v == 0;
+    }
     
     /**
      *  Big endian compare, treats bytes as unsigned.
@@ -2242,4 +2269,26 @@ public class DataHelper {
             oidx = idx + to.length();
         }
     }
+
+/*
+    public static void main(String[] args) {
+        test("123", "123");
+        test("a", "b");
+        test("ba", "b");
+        test("ba", "baa");
+        test("", "xxx");
+        test("xxx", "");
+        test("xxx", null);
+        test(null, "xxx");
+    }
+
+    private static void test(String a, String b) {
+        try {
+            boolean r = eqCT(a, b);
+            System.out.println(" test: " + a + ' ' + b + " equals? " + r);
+        } catch (Exception e) {
+            System.out.println(" test: " + a + ' ' + b + " fails " + e);
+        }
+    }
+*/
 }
