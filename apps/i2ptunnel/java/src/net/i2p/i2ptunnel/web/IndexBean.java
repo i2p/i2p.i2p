@@ -217,8 +217,7 @@ public class IndexBean {
             return "";
         if (_group == null)
             return "Error - tunnels are not initialized yet";
-        // Clear messages button is a GET
-        if ( /* TODO ("POST".equals(_method) || "Clear".equals(_action)) || */
+        if ( !"POST".equals(_method) ||
             !validateNonce()) {
             return _t("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.")
                    + ' ' +
@@ -241,12 +240,10 @@ public class IndexBean {
             return stop();
         } else if ("start".equals(_action)) {
             return start();
-        } else if ("Save changes".equals(_action) || // IE workaround:
-                (_action.toLowerCase(Locale.US).indexOf("s</span>ave") >= 0)) {
+        } else if ("Save changes".equals(_action)) {
             saveChanges();
             return "";
-        } else if ("Delete this proxy".equals(_action) || // IE workaround:
-                (_action.toLowerCase(Locale.US).indexOf("d</span>elete") >= 0)) {
+        } else if ("Delete this proxy".equals(_action)) {
             deleteTunnel();
             return "";
         } else if ("Estimate".equals(_action)) {

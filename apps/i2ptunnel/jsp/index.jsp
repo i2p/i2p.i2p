@@ -2,8 +2,7 @@
 %><%@page pageEncoding="UTF-8"
 %><%@page trimDirectiveWhitespaces="true"
 %><%@page contentType="text/html" import="net.i2p.i2ptunnel.web.IndexBean"
-%><?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
+%><!DOCTYPE html>
 <jsp:useBean class="net.i2p.i2ptunnel.web.IndexBean" id="indexBean" scope="request" /><%
     indexBean.storeMethod(request.getMethod());
     indexBean.storeSession(session);
@@ -36,6 +35,16 @@
 %>
 <div class="panel" id="messages">
     <h2><%=intl._t("Status Messages")%></h2>
+<%
+  if (isInitialized) {
+%>
+    <form method="post" action="list" accept-charset="UTF-8">
+    <input type="hidden" name="nonce" value="<%=nextNonce%>" />
+    <input type="hidden" name="msgid" value="<%=lastID%>" />
+    <input type="hidden" name="action" value="Clear" />
+<%
+  }  // isInitialized
+%>
     <table id="statusMessagesTable">
         <tr>
             <td id="tunnelMessages">
@@ -47,13 +56,20 @@
 <%
   if (isInitialized) {
 %>
-                <a class="control" href="list?action=Clear&amp;msgid=<%=lastID%>&amp;nonce=<%=nextNonce%>"><%=intl._t("Clear")%></a>
+                <button class="control" type="submit"><%=intl._t("Clear")%></button>
 <%
   }  // isInitialized
 %>
             </td>
         </tr>
     </table>
+<%
+  if (isInitialized) {
+%>
+    </form>
+<%
+  }  // isInitialized
+%>
 </div>
 <%
   }  // !msgs.isEmpty()
@@ -61,13 +77,15 @@
 %>
 <div class="panel" id="globalTunnelControl">
     <h2><%=intl._t("Global Tunnel Control")%></h2>
+    <form method="post" action="list" accept-charset="UTF-8">
+    <input type="hidden" name="nonce" value="<%=nextNonce%>" />
     <table>
         <tr>
             <td class="buttons">
                 <a class="control" href="wizard"><%=intl._t("Tunnel Wizard")%></a>
-                <a class="control" href="list?nonce=<%=nextNonce%>&amp;action=Stop%20all"><%=intl._t("Stop All")%></a>
-                <a class="control" href="list?nonce=<%=nextNonce%>&amp;action=Start%20all"><%=intl._t("Start All")%></a>
-                <a class="control" href="list?nonce=<%=nextNonce%>&amp;action=Restart%20all"><%=intl._t("Restart All")%></a>
+                <button class="control" type="submit" name="action" value="Stop all"><%=intl._t("Stop All")%></button>
+                <button class="control" type="submit" name="action" value="Start all"><%=intl._t("Start All")%></button>
+                <button class="control" type="submit" name="action" value="Restart all"><%=intl._t("Restart All")%></button>
 <%--
                 //this is really bad because it stops and restarts all tunnels, which is probably not what you want
                 <a class="control" href="list?nonce=<%=nextNonce%>&amp;action=Reload%20configuration"><%=intl._t("Reload Config")%></a>
@@ -75,6 +93,7 @@
             </td>
         </tr>
     </table>
+    </form>
 </div>
 <div class="panel" id="servers">
     <h2><%=intl._t("I2P Hidden Services")%></h2>
@@ -129,19 +148,19 @@
                 case IndexBean.STARTING:
           %><div class="statusStarting text" title="<%=intl._t("Starting...")%>"><%=intl._t("Starting...")%></div>
         </td><td class="tunnelControl">
-            <a class="control" title="<%=intl._t("Stop this Tunnel")%>" href="list?nonce=<%=nextNonce%>&amp;action=stop&amp;tunnel=<%=curServer%>"><%=intl._t("Stop")%></a>
+            <button class="control" form="formStop" title="<%=intl._t("Stop this Tunnel")%>" name="tunnel" value="<%=curServer%>"><%=intl._t("Stop")%></button>
 <%
                 break;
                 case IndexBean.RUNNING:
           %><div class="statusRunning text" title="<%=intl._t("Running")%>"><%=intl._t("Running")%></div>
         </td><td class="tunnelControl">
-            <a class="control" title="<%=intl._t("Stop this Tunnel")%>" href="list?nonce=<%=nextNonce%>&amp;action=stop&amp;tunnel=<%=curServer%>"><%=intl._t("Stop")%></a>
+            <button class="control" form="formStop" title="<%=intl._t("Stop this Tunnel")%>" name="tunnel" value="<%=curServer%>"><%=intl._t("Stop")%></button>
 <%
                 break;
                 case IndexBean.NOT_RUNNING:
           %><div class="statusNotRunning text" title="<%=intl._t("Stopped")%>"><%=intl._t("Stopped")%></div>
         </td><td class="tunnelControl">
-            <a class="control" title="<%=intl._t("Start this Tunnel")%>" href="list?nonce=<%=nextNonce%>&amp;action=start&amp;tunnel=<%=curServer%>"><%=intl._t("Start")%></a>
+            <button class="control" form="formStart" title="<%=intl._t("Start this Tunnel")%>" name="tunnel" value="<%=curServer%>"><%=intl._t("Start")%></button>
 <%
                 break;
             }
@@ -297,25 +316,25 @@
                 case IndexBean.STARTING:
           %><div class="statusStarting text" title="<%=intl._t("Starting...")%>"><%=intl._t("Starting...")%></div>
         </td><td class="tunnelControl">
-            <a class="control" title="<%=intl._t("Stop this Tunnel")%>" href="list?nonce=<%=nextNonce%>&amp;action=stop&amp;tunnel=<%=curClient%>"><%=intl._t("Stop")%></a>
+            <button class="control" form="formStop" title="<%=intl._t("Stop this Tunnel")%>" name="tunnel" value="<%=curClient%>"><%=intl._t("Stop")%></button>
 <%
                 break;
                 case IndexBean.STANDBY:
           %><div class="statusStarting text" title="<%=intl._t("Standby")%>"><%=intl._t("Standby")%></div>
         </td><td class="tunnelControl">
-            <a class="control" title="<%=intl._t("Stop this Tunnel")%>" href="list?nonce=<%=nextNonce%>&amp;action=stop&amp;tunnel=<%=curClient%>"><%=intl._t("Stop")%></a>
+            <button class="control" form="formStop" title="<%=intl._t("Stop this Tunnel")%>" name="tunnel" value="<%=curClient%>"><%=intl._t("Stop")%></button>
 <%
                 break;
                 case IndexBean.RUNNING:
           %><div class="statusRunning text" title="<%=intl._t("Running")%>"><%=intl._t("Running")%></div>
         </td><td class="tunnelControl">
-            <a class="control" title="<%=intl._t("Stop this Tunnel")%>" href="list?nonce=<%=nextNonce%>&amp;action=stop&amp;tunnel=<%=curClient%>"><%=intl._t("Stop")%></a>
+            <button class="control" form="formStop" title="<%=intl._t("Stop this Tunnel")%>" name="tunnel" value="<%=curClient%>"><%=intl._t("Stop")%></button>
 <%
                 break;
                 case IndexBean.NOT_RUNNING:
           %><div class="statusNotRunning text" title="<%=intl._t("Stopped")%>"><%=intl._t("Stopped")%></div>
         </td><td class="tunnelControl">
-            <a class="control" title="<%=intl._t("Start this Tunnel")%>" href="list?nonce=<%=nextNonce%>&amp;action=start&amp;tunnel=<%=curClient%>"><%=intl._t("Start")%></a>
+            <button class="control" form="formStart" title="<%=intl._t("Start this Tunnel")%>" name="tunnel" value="<%=curClient%>"><%=intl._t("Start")%></button>
 <%
                 break;
             }
@@ -395,6 +414,15 @@
     </tr>
 </table>
 </div>
+<%-- external forms for per-tunnel start/stop buttons --%>
+<form id="formStop" method="post" action="list" accept-charset="UTF-8">
+  <input type="hidden" name="nonce" value="<%=nextNonce%>" />
+  <input type="hidden" name="action" value="stop" />
+</form>
+<form id="formStart" method="post" action="list" accept-charset="UTF-8">
+  <input type="hidden" name="nonce" value="<%=nextNonce%>" />
+  <input type="hidden" name="action" value="start" />
+</form>
 <%
 
   }  // isInitialized()
