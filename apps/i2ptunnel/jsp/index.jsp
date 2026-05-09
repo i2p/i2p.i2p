@@ -2,13 +2,23 @@
 %><%@page pageEncoding="UTF-8"
 %><%@page trimDirectiveWhitespaces="true"
 %><%@page contentType="text/html" import="net.i2p.i2ptunnel.web.IndexBean"
-%><!DOCTYPE html>
-<jsp:useBean class="net.i2p.i2ptunnel.web.IndexBean" id="indexBean" scope="request" /><%
+%><jsp:useBean class="net.i2p.i2ptunnel.web.IndexBean" id="indexBean" scope="request" /><%
     indexBean.storeMethod(request.getMethod());
     indexBean.storeSession(session);
-%><jsp:setProperty name="indexBean" property="tunnel" /><%-- must be set before key1-4 --%>
-<jsp:setProperty name="indexBean" property="*" />
+%><jsp:setProperty name="indexBean" property="tunnel" /><%-- must be set before key1-4 --%><jsp:setProperty name="indexBean" property="*" /><%
+    // P-R-G no whitespace before here
+    if ("POST".equals(request.getMethod())) {
+        // force form processing
+        indexBean.getMessages();
+        response.setStatus(303);
+        response.setHeader("Location", request.getRequestURI());
+        // force commitment
+        response.getOutputStream().close();
+        return;
+    }
+%>
 <jsp:useBean class="net.i2p.i2ptunnel.ui.Messages" id="intl" scope="request" />
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <title><%=intl._t("Hidden Services Manager")%></title>
