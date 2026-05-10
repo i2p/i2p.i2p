@@ -170,7 +170,7 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
             } catch (IOException ioe) {
                 throw new I2NPMessageException("Error reading the leaseSet", ioe);
             }
-        } else if ((dbType & 0x01) == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+        } else if (dbType == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
             _dbEntry = new RouterInfo();
             int compressedSize = (int)DataHelper.fromLong(data, curIndex, 2);
             curIndex += 2;
