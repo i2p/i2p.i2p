@@ -372,7 +372,7 @@ public class WebMail extends HttpServlet
 
 		/** @since 0.9.27 */
 		public boolean isValidNonce(String nonce) {
-			if (mailbox == null && LOGIN_NONCE.equals(nonce))
+			if (mailbox == null && DataHelper.eqCT(nonce, LOGIN_NONCE))
 				return true;
 			synchronized(nonces) {
 				return nonces.contains(nonce);

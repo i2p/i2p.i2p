@@ -195,7 +195,7 @@ public abstract class LocalHTTPServer {
             //System.err.println("b64dest      : \"" + b64Dest       + "\"");
             //System.err.println("book         : \"" + book          + "\"");
             //System.err.println("nonce        : \"" + nonce         + "\"");
-            if (proxyNonce.equals(nonce) && url != null && host != null && dest != null) {
+            if (DataHelper.eqCT(nonce, proxyNonce) && url != null && host != null && dest != null) {
                 NamingService ns = context.namingService();
                 Properties nsOptions = new Properties();
                 nsOptions.setProperty("list", book);
@@ -234,7 +234,7 @@ public abstract class LocalHTTPServer {
             if (secret != null)
                 secret = secret.trim();
             String action = opts.get("action");
-            if (proxyNonce.equals(nonce) && url != null && host != null && code != null) {
+            if (DataHelper.eqCT(nonce, proxyNonce) && url != null && host != null && code != null) {
                 boolean success = true;
                 PrivateKey privateKey = null;
                 PublicKey publicKey = null;
