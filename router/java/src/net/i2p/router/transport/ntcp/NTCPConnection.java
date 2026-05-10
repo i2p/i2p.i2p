@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -36,7 +35,6 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageException;
-import net.i2p.data.i2np.I2NPMessageHandler;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -1299,24 +1297,6 @@ public class NTCPConnection implements Closeable {
         _clockSkew = newSkew;
     }
 
-    private static final int MAX_HANDLERS = 4;
-
-    /**
-     *  FIXME static queue mixes handlers from different contexts in multirouter JVM
-     */
-    private final static LinkedBlockingQueue<I2NPMessageHandler> _i2npHandlers = new LinkedBlockingQueue<I2NPMessageHandler>(MAX_HANDLERS);
-
-    private final static I2NPMessageHandler acquireHandler(RouterContext ctx) {
-        I2NPMessageHandler rv = _i2npHandlers.poll();
-        if (rv == null)
-            rv = new I2NPMessageHandler(ctx);
-        return rv;
-    }
-
-    private static void releaseHandler(I2NPMessageHandler handler) {
-        _i2npHandlers.offer(handler);
-    }
-    
     private static ByteArray acquireReadBuf() {
         return _dataReadBufs.acquire();
     }
@@ -1330,7 +1310,6 @@ public class NTCPConnection implements Closeable {
      *  @since 0.8.8
      */
     static void releaseResources() {
-        _i2npHandlers.clear();
     }
 
     private interface ReadState {
