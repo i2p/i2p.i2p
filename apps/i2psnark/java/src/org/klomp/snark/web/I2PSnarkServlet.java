@@ -5023,7 +5023,8 @@ public class I2PSnarkServlet extends BasicServlet {
         if (session == null) {
             return "FAIL_SESSION_NOT_SET";
         }
-        String rv;
+        // add a prefix to distinguish from other nonces for debugging
+        String rv = "SN" + (xhr ? 'B' : 'A') + _context.random().nextLong();
         String att = xhr ? SESSION_SNARK_NONCE2 : SESSION_SNARK_NONCE1;
         synchronized(session) {
             LinkedList<String> nonces = (LinkedList<String>) session.getAttribute(att);
@@ -5031,8 +5032,6 @@ public class I2PSnarkServlet extends BasicServlet {
                 nonces = new LinkedList<String>();
                 session.setAttribute(att, nonces);
             }
-            // add a prefix to distinguish from other nonces for debugging
-            rv = "SN" + (xhr ? 'B' : 'A') + _context.random().nextLong();
             nonces.offer(rv);
             if (nonces.size() > NONCE_QUEUE_SIZE)
                 nonces.poll();

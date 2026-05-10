@@ -128,15 +128,14 @@ public class IndexBean {
         if (_session == null) {
             return "FAIL_SESSION_NOT_SET";
         }
-        String rv;
+        // add a prefix to distinguish from other nonces for debugging
+        String rv = "HSM" + _context.random().nextLong();
         synchronized(_session) {
             LinkedList<String> nonces = (LinkedList<String>) _session.getAttribute(SESSION_I2PTUNNEL_NONCE);
             if (nonces == null) {
                 nonces = new LinkedList<String>();
                 _session.setAttribute(SESSION_I2PTUNNEL_NONCE, nonces);
             }
-            // add a prefix to distinguish from other nonces for debugging
-            rv = "HSM" + _context.random().nextLong();
             nonces.offer(rv);
             if (nonces.size() > MAX_NONCES)
                 nonces.poll();
