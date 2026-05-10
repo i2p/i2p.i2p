@@ -47,12 +47,12 @@ public class DataMessage extends FastI2NPMessageImpl {
     public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
-        long size = DataHelper.fromLong(data, curIndex, 4);
+        int size = (int) DataHelper.fromLong(data, curIndex, 4);
         curIndex += 4;
-        if (size > MAX_SIZE)
+        if (size <= 0 || size > MAX_SIZE || size + 4 != dataSize)
             throw new I2NPMessageException("too large msg, size=" + size);
-        _data = new byte[(int)size];
-        System.arraycopy(data, curIndex, _data, 0, (int)size);
+        _data = new byte[size];
+        System.arraycopy(data, curIndex, _data, 0, size);
     }
     
     /** calculate the message body's length (not including the header and footer */

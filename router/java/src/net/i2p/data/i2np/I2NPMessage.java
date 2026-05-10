@@ -68,6 +68,9 @@ public interface I2NPMessage {
      * the uniqueId / expiration, using the current class's format as defined by
      * the I2NP specification
      *
+     * Implementations must not read more than dataSize,
+     * or throw I2NPMessageException or IndexOutOfBoundsException if they do.
+     *
      * @param data data to read from
      * @param offset where to start in the data array
      * @param dataSize how long into the data to read

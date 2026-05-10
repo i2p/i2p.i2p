@@ -41,11 +41,11 @@ public class GarlicMessage extends FastI2NPMessageImpl {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
         
-        long len = DataHelper.fromLong(data, curIndex, 4);
+        int len = (int) DataHelper.fromLong(data, curIndex, 4);
         curIndex += 4;
-        if ( (len <= 0) || (len > MAX_SIZE) ) throw new I2NPMessageException("size="+len);
-        _data = new byte[(int)len];
-        System.arraycopy(data, curIndex, _data, 0, (int)len);
+        if (len <= 0 || len > MAX_SIZE || len + 4 != dataSize) throw new I2NPMessageException("size="+len);
+        _data = new byte[len];
+        System.arraycopy(data, curIndex, _data, 0, len);
     }
     
     /** calculate the message body's length (not including the header and footer */

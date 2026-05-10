@@ -66,6 +66,8 @@ public class DeliveryStatusMessage extends FastI2NPMessageImpl {
     
     public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
+        if (dataSize != 12)
+            throw new I2NPMessageException("bad len " + dataSize);
         int curIndex = offset;
         
         _id = DataHelper.fromLong(data, curIndex, 4);

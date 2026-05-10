@@ -164,7 +164,7 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
             else
                 _dbEntry = new MetaLeaseSet();
             try {
-                _dbEntry.readBytes(new ByteArrayInputStream(data, curIndex, data.length-curIndex));
+                _dbEntry.readBytes(new ByteArrayInputStream(data, curIndex, dataSize - (curIndex - offset)));
             } catch (DataFormatException dfe) {
                 throw new I2NPMessageException("Error reading the leaseSet", dfe);
             } catch (IOException ioe) {

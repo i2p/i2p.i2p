@@ -156,9 +156,13 @@ public abstract class I2NPMessageImpl implements I2NPMessage {
             throw new I2NPMessageException("Bad checksum on " + size + " byte I2NP " + getClass().getSimpleName());
 
         //long start = _context.clock().now();
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Reading bytes: type = " + type + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
-        readMessage(data, cur, sz, type);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Reading bytes: type = " + type + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
+        try {
+            readMessage(data, cur, sz, type);
+        } catch (IndexOutOfBoundsException ioobe) {
+            throw new I2NPMessageException("buffer overrun", ioobe);
+        }
         cur += sz;
         //long time = _context.clock().now() - start;
         //if (time > 50)
@@ -340,6 +344,8 @@ public abstract class I2NPMessageImpl implements I2NPMessage {
         // ignore the handler (overridden in subclasses if necessary
         try {
             readMessage(data, offset, dataSize, type);
+        } catch (IndexOutOfBoundsException ioobe) {
+            throw new I2NPMessageException("buffer overrun", ioobe);
         } catch (IllegalArgumentException iae) {
             throw new I2NPMessageException("Error reading the message", iae);
         }
