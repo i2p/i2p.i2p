@@ -1653,7 +1653,7 @@ class PeerTestManager {
                     // We already call externalAddressReceived() for every outbound connection from EstablishmentManager
                     // but we can use this also to update our address faster
                     if (!bad && charlieHash != null)
-                        _transport.externalAddressReceived(charlieHash, addrBlockIP, addrBlockPort);
+                        _transport.externalAddressReceived(charlieHash, fromIP, addrBlockIP, addrBlockPort);
                 }
                 testComplete();
                 break;

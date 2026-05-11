@@ -1868,7 +1868,7 @@ class EstablishmentManager {
         }
 
         // gives us the opportunity to "detect" our external addr
-        _transport.externalAddressReceived(state.getRemoteIdentity().calculateHash(), ip, port);
+        _transport.externalAddressReceived(state.getRemoteIdentity().calculateHash(), state.getSentIP(), ip, port);
 
         OutboundEstablishState2 state2 = (OutboundEstablishState2) state;
         OutboundEstablishState.OutboundState ostate = state2.getState();

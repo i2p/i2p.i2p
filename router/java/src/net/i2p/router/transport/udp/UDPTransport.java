@@ -130,6 +130,7 @@ public class UDPTransport extends TransportImpl {
 
     /** last report from a peer of our IP */
     private Hash _lastFromv4, _lastFromv6;
+    private byte[] _lastFromIPv4, _lastFromIPv6;
     private byte[] _lastOurIPv4, _lastOurIPv6;
     private int _lastOurPortv4, _lastOurPortv6;
     private boolean _haveUPnP;
@@ -1341,7 +1342,7 @@ public class UDPTransport extends TransportImpl {
      * @param ourIP publicly routable IPv4 or IPv6 only, non-null
      * @param ourPort &gt;= 1024
      */
-    void externalAddressReceived(Hash from, byte ourIP[], int ourPort) {
+    void externalAddressReceived(Hash from, byte[] hisIP, byte[] ourIP, int ourPort) {
         boolean isValid = isValid(ourIP) &&
                           TransportUtil.isValidPort(ourPort);
         boolean explicitSpecified = explicitAddressSpecified();
@@ -1396,36 +1397,48 @@ public class UDPTransport extends TransportImpl {
             Hash lastFrom = null;
             synchronized(this) {
                 if (!isIPv6) {
-                    if (from.equals(_lastFromv4) || !eq(_lastOurIPv4, _lastOurPortv4, ourIP, ourPort)) {
+                    if (from.equals(_lastFromv4))
+                        return;
+                    if (!eq(_lastOurIPv4, _lastOurPortv4, ourIP, ourPort)) {
                         if (_log.shouldLog(Log.INFO))
-                            _log.info("The router " + from + " told us we have a new IP/port - " 
+                            _log.info("The router " + from + " at IP " + Addresses.toString(hisIP) + " told us we have a new IP/port - " 
                                       + Addresses.toString(ourIP, ourPort) + ".  Wait until somebody else tells us the same thing.");
                     } else {
-                        changeIt = true;
-                        lastFrom = _lastFromv4;
+                        // enforce different /16
+                        if (!DataHelper.eq(_lastFromIPv4, 0, hisIP, 0, 2)) {
+                            changeIt = true;
+                            lastFrom = _lastFromv4;
+                        }
                     }
                     _lastFromv4 = from;
+                    _lastFromIPv4 = hisIP;
                     _lastOurIPv4 = ourIP;
                     _lastOurPortv4 = ourPort;
                 } else {
-                    if (from.equals(_lastFromv6) || !eq(_lastOurIPv6, _lastOurPortv6, ourIP, ourPort)) {
+                    if (from.equals(_lastFromv6))
+                        return;
+                    if (!eq(_lastOurIPv6, _lastOurPortv6, ourIP, ourPort)) {
                         if (_log.shouldLog(Log.INFO))
-                            _log.info("The router " + from + " told us we have a new IP/port - " 
+                            _log.info("The router " + from + " at IP " + Addresses.toString(hisIP) + " told us we have a new IP/port - " 
                                       + Addresses.toString(ourIP, ourPort) + ".  Wait until somebody else tells us the same thing.");
                     } else {
-                        changeIt = true;
-                        lastFrom = _lastFromv6;
+                        // enforce different /32
+                        if (!DataHelper.eq(_lastFromIPv6, 0, hisIP, 0, 4)) {
+                            changeIt = true;
+                            lastFrom = _lastFromv6;
+                        }
                     }
                     _lastFromv6 = from;
+                    _lastFromIPv6 = hisIP;
                     _lastOurIPv6 = ourIP;
                     _lastOurPortv6 = ourPort;
                 }
             }
             if (changeIt) {
                 if (_log.shouldInfo())
-                    _log.info(from + " and " + lastFrom + " agree our address is " + Addresses.toString(ourIP, ourPort));
+                    _log.info(from + " at IP " + Addresses.toString(hisIP) + " and " + lastFrom + " agree our address is " + Addresses.toString(ourIP, ourPort));
                 // Never change port for IPv6 or if we have UPnP
-                if (_haveUPnP || ourIP.length == 16)
+                if (_haveUPnP || isIPv6)
                     ourPort = 0;
                 changeAddress(ourIP, ourPort);
             }
