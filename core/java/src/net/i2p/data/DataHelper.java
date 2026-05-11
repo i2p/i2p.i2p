@@ -1131,16 +1131,17 @@ public class DataHelper {
     }
 
     /**
-     *  This throws NPE if either lhs or rhs is null.
+     *  This returns false if either lhs or rhs is null.
      *  Constant time, almost.
      *  Warning: not constant time if secret is empty.
      *
      *  @param user user-supplied String, will attempt for time to be proportional to this length
      *  @param secret internal String, will attempt for time to be independent of this length
-     *  @throws NullPointerException if either arg is null
      *  @since 0.9.70
      */
     public final static boolean eqCT(String user, String secret) {
+        if (user == null || secret == null)
+            return false;
         int ul = user.length();
         int sl = secret.length();
         if (ul == 0)
