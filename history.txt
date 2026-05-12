@@ -1,3 +1,24 @@
+2026-05-12 zzz
+ * SSU2: Require three consecutive peer tests for IPv6 state changes
+
+2026-05-11 zzz
+ * SSU2: Require two peers from different /16s to change address
+
+2026-05-10 zzz
+ * I2NP: Add missing length checks in readMessage() methods
+ * Util: More constant-time comparisons
+
+2026-05-09 zzz
+ * i2ptunnel: Refactor list page forms
+
+2026-05-08 zzz
+ * SSU2: Resurrect hole punch throttling as Charlie
+ * Util: Use constant-time comparison in various password checkers
+
+2026-05-07 zzz
+ * i2psnark, i2ptunnel: Refactor nonces
+ * Transport: Disable SSU bid adjustment for new routers as of next release
+
 2026-05-06 zzz
  * Console:
    - Validate Origin header
