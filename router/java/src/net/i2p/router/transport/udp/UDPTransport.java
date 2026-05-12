@@ -90,6 +90,7 @@ public class UDPTransport extends TransportImpl {
     private final PeerTestEvent _testEvent;
     private Status _reachabilityStatus;
     private Status _reachabilityStatusPending;
+    private int _reachabilityStatusPendingCount;
     // only for logging, to be removed
     private long _reachabilityStatusLastUpdated;
     private int _reachabilityStatusUnchanged;
@@ -248,6 +249,14 @@ public class UDPTransport extends TransportImpl {
     static final long INTRODUCER_EXPIRATION_MARGIN = 20*60*1000L;
     private static final long MIN_DOWNTIME_TO_REKEY = 30*24*60*60*1000L;
     
+    /**
+     *  Number of confirmations for state change
+     *  see locked_setReachabilityStatus
+     *  require more for IPv6 due to false negatives
+     */
+    private static final int REACHABILITY_PEERS_IPV4 = 2;
+    private static final int REACHABILITY_PEERS_IPV6 = 3;
+
     private static final int[] BID_VALUES = { 15, 20, 50, 65, 80, 95, 100, 115, TransportBid.TRANSIENT_FAIL };
     private static final int FAST_PREFERRED_BID = 0;
     private static final int SLOW_PREFERRED_BID = 1;
@@ -3953,7 +3962,7 @@ public class UDPTransport extends TransportImpl {
             }
 
             if (status != old) {
-                // for the following transitions ONLY, require two in a row
+                // for the following transitions ONLY, require two (IPv4) or three (IPv6) in a row
                 // to prevent thrashing
                 if ((STATUS_OK.contains(old) && STATUS_FW.contains(status)) ||
                     (STATUS_OK.contains(status) && STATUS_FW.contains(old)) ||
@@ -3964,16 +3973,27 @@ public class UDPTransport extends TransportImpl {
                             _log.warn("Old status: " + old + " status pending confirmation: " + status +
                                       " Caused by update: " + newStatus);
                         _reachabilityStatusPending = status;
+                        _reachabilityStatusPendingCount = 1;
+                        _testEvent.forceRunSoon(isIPv6);
+                        return;
+                    }
+                    int reqd = isIPv6 ? REACHABILITY_PEERS_IPV6 : REACHABILITY_PEERS_IPV4;
+                    if (++_reachabilityStatusPendingCount < reqd) {
+                        if (_log.shouldWarn())
+                            _log.warn("Old status: " + old + " status pending confirmation: " + status + " ipv6? " + isIPv6 +
+                                      " confirmations: " + _reachabilityStatusPendingCount + " required: " + reqd);
                         _testEvent.forceRunSoon(isIPv6);
                         return;
                     }
                 }
                 _reachabilityStatusUnchanged = 0;
                 long now = _context.clock().now();
+                _reachabilityStatusPendingCount = 0;
                 _reachabilityStatusLastUpdated = now;
                 _reachabilityStatus = status;
             } else {
                 _reachabilityStatusUnchanged++;
+                _reachabilityStatusPendingCount = 0;
             }
             _reachabilityStatusPending = status;
         }
