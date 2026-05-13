@@ -3,6 +3,12 @@
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html><head>
+<style>
+  #toggle-news { display: none !important; }
+  #newsDisplay { font-size: 0 !important; }
+  #newsDisplay a[href="/news"] { font-size: 14px !important; }
+</style
+
 <%@include file="css.jsi" %>
 <%=intl.title("config update")%>
 <%@include file="summaryajax.jsi" %>
