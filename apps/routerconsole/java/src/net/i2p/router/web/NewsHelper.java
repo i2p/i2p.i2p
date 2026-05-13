@@ -311,10 +311,10 @@ public class NewsHelper extends ContentHelper {
          if (lastUpdated > 0) {
              String consoleNonce = CSSHelper.getNonce(session);
              if (shouldShowNews(ctx)) {
-                 buf.append(" <a href=\"/?news=0&amp;consoleNonce=").append(consoleNonce).append("\">")
+                 buf.append(" <a href=\"?news=0&amp;consoleNonce=").append(consoleNonce).append("\">")
                     .append(Messages.getString("Hide news", ctx));
              } else {
-                 buf.append(" <a href=\"/?news=1&amp;consoleNonce=").append(consoleNonce).append("\">")
+                 buf.append(" <a href=\"?news=1&amp;consoleNonce=").append(consoleNonce).append("\">")
                     .append(Messages.getString("Show news", ctx));
              }
              buf.append("</a>" +
