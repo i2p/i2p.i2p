@@ -287,6 +287,7 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
+     *  @param session non-null to include hide/show links, null to omit
      *  @return HTML
      *  @since 0.9.4 moved from NewsFetcher
      */
@@ -307,14 +308,15 @@ public class NewsHelper extends ContentHelper {
                                            DataHelper.formatDuration2(now - lastFetch),
                                            ctx));
          }
-         buf.append("</i></span><span id=\"newsDisplay\">");
-         if (lastUpdated > 0) {
+         buf.append("</i></span>");
+         if (lastUpdated > 0 && session != null) {
+             buf.append("<span id=\"newsDisplay\">");
              String consoleNonce = CSSHelper.getNonce(session);
              if (shouldShowNews(ctx)) {
-                 buf.append(" <a href=\"/?news=0&amp;consoleNonce=").append(consoleNonce).append("\">")
+                 buf.append(" <a href=\"?news=0&amp;consoleNonce=").append(consoleNonce).append("\">")
                     .append(Messages.getString("Hide news", ctx));
              } else {
-                 buf.append(" <a href=\"/?news=1&amp;consoleNonce=").append(consoleNonce).append("\">")
+                 buf.append(" <a href=\"?news=1&amp;consoleNonce=").append(consoleNonce).append("\">")
                     .append(Messages.getString("Show news", ctx));
              }
              buf.append("</a>" +

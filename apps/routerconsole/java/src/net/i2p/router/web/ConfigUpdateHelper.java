@@ -189,4 +189,12 @@ public class ConfigUpdateHelper extends HelperBase {
     public String getNewsStatus() { 
         return NewsHelper.status(_context, _session);
     }
+
+    /**
+     *  same as getNewsStatus() but without the show/hide news links
+     *  @since 0.9.70
+     */
+    public String getNewsStatusBrief() { 
+        return NewsHelper.status(_context, null);
+    }
 }

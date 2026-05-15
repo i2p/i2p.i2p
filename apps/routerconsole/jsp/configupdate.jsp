@@ -26,7 +26,7 @@
     updatehelper.storeSession(session);
 %><jsp:setProperty name="updatehelper" property="contextId" value="<%=i2pcontextId%>" />
 <div class="messages">
- <jsp:getProperty name="updatehelper" property="newsStatus" /></div>
+ <jsp:getProperty name="updatehelper" property="newsStatusBrief" /></div>
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <% /* set hidden default */ %>
