@@ -226,6 +226,12 @@ public class InNetMessagePool implements Service {
           case DatabaseStoreMessage.MESSAGE_TYPE:
             List<OutNetMessage> origMessages = _context.messageRegistry().getOriginalMessages(messageBody);
             HandlerJobBuilder dsmbuilder = _handlerJobBuilders[DatabaseStoreMessage.MESSAGE_TYPE];
+            if (dsmbuilder == null) {
+                // startup, netdb not initialized yet
+                if (_log.shouldWarn())
+                    _log.warn("No job builder for DSM yet");
+                break;
+            }
             Job dsmjob = dsmbuilder.createJob(messageBody, fromRouter, fromRouterHash);
             int sz = origMessages.size();
             if (sz > 0) {
@@ -269,16 +275,19 @@ public class InNetMessagePool implements Service {
                            + " message: " + messageBody);
             break;
 
+          case DatabaseSearchReplyMessage.MESSAGE_TYPE:
+          case DeliveryStatusMessage.MESSAGE_TYPE:
+            // shortcut, these two are common and do not have handlerJobBuilders
+            break;
+
           default:
             // why don't we allow type 0? There used to be a message of type 0 long ago...
             if ( (type > 0) && (type < _handlerJobBuilders.length) ) {
                 HandlerJobBuilder builder = _handlerJobBuilders[type];
-
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Add msg to the pool - builder: " + builder 
-                               + " type: " + messageBody.getClass().getSimpleName());
-
                 if (builder != null) {
+                    if (_log.shouldDebug())
+                        _log.debug("Add msg to the pool - builder: " + builder
+                                   + " type: " + messageBody.getClass().getSimpleName());
                     Job job = builder.createJob(messageBody, fromRouter, 
                                                 fromRouterHash);
                     if (job != null) {
@@ -288,7 +297,13 @@ public class InNetMessagePool implements Service {
                         // job may have just executed inline
                     }
                     jobFound = true;
+                } else {
+                    if (_log.shouldWarn())
+                        _log.warn("No job builder for message type " + type);
                 }
+            } else {
+                if (_log.shouldWarn())
+                    _log.warn("No job builder for message type " + type);
             }
             break;
         } // switch
