@@ -170,6 +170,10 @@ public class WebAppStarter {
         WebAppContext wac = new WebAppContext(warPath, "/"+ appName);
         tmpdir.mkdir();
         wac.setTempDirectory(tmpdir);
+        if ("i2psnark".equals(appName)) {
+            // Jetty default is 1000, snark can have more on details page priorities
+            wac.setMaxFormKeys(4096);
+        }
         // all the JSPs are precompiled, no need to extract
         // UNLESS it's a plugin and we want to scan it for annotations.
         // We do not use Servlet 3.0 for any built-in wars.
