@@ -765,8 +765,8 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 								break;
 							}
 						} catch (InterruptedException e) {
-							// do nothing.
 							_log.warn("INFO: Thread interrupted while sleeping before starting the next test.");
+							break;
 						}
 					}
 				} catch (Exception e) {
@@ -4510,7 +4510,6 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 	/**
 	 * bigly -- must have been started with main() or runIt()
 	 */
-	@SuppressWarnings("deprecation")
 	public void
 	killIt()
 	{
@@ -4526,45 +4525,22 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 				_sPanel.endTest();
 		}
 		_log.warn("killIt()");
-		boolean destroyed = false;
-		for (int j = 0; j < 10 && !thread_group.isDestroyed(); j++) {
+
 			Thread[] threads = new Thread[thread_group.activeCount()];
 			thread_group.enumerate( threads );
-			int	done = 0;
 			for ( int i=0;i<threads.length;i++){
 				Thread t = threads[i];
 				if (t != null) {
 					if (_log.shouldWarn())
 						_log.warn("Interrupting TG thread " + t);
-					done++;
 					try {
 						t.interrupt();
 					} catch (RuntimeException re) {
 						_log.debug("TG", re);
 					}
-					try {
-						Thread.sleep(20);
-					} catch (InterruptedException ie) {}
-					if (t.isAlive()) {
-						if (_log.shouldWarn())
-							_log.warn("Killing TG thread " + t);
-						try {
-							t.stop();
-						} catch (RuntimeException re) {
-							_log.debug("TG", re);
-						}
-					}
 				}
 			}
 			
-			if ( done == 0 ){
-				break;
-			}
-			
-			try{
-				Thread.sleep(50);
-			} catch (InterruptedException ie) {}
-		}
 	}
 	
 	/** bigly */
