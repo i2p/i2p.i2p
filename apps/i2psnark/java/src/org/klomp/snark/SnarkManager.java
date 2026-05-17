@@ -1991,17 +1991,19 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
                 addMessage(_t("Torrent with this info hash is already running: {0}", snark.getBaseName()));
                 return false;
             }
-            String filtered = Storage.filterName(metainfo.getName());
-            snark = getTorrentByBaseName(filtered);
+            String name = metainfo.getName();
+            snark = getTorrentByBaseName(name);
             if (snark != null) {
                 addMessage(_t("Torrent with the same data location is already running: {0}", snark.getBaseName()));
                 return false;
             }
+
             if (bitfield != null) {
                 saveTorrentStatus(metainfo, bitfield, null, false, baseFile, true, 0, 0, true); // no file priorities
             }
             // so addTorrent won't recheck            
             if (filename == null) {
+                String filtered = Storage.filterName(name);
                 File f = new File(getDataDir(), filtered + ".torrent");
                 if (f.exists()) {
                     addMessage(_t("Failed to copy torrent file to {0}", f.getAbsolutePath()));
