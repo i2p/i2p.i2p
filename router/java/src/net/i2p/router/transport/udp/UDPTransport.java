@@ -247,7 +247,7 @@ public class UDPTransport extends TransportImpl {
     /** minimum peers volunteering to be introducers if we need that */
     private static final int MIN_INTRODUCER_POOL = 5;
     static final long INTRODUCER_EXPIRATION_MARGIN = 20*60*1000L;
-    private static final long MIN_DOWNTIME_TO_REKEY = 30*24*60*60*1000L;
+    private static final long MIN_DOWNTIME_TO_REKEY = 7*24*60*60*1000L;
     
     /**
      *  Number of confirmations for state change

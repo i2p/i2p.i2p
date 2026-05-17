@@ -139,7 +139,7 @@ public class NTCPTransport extends TransportImpl {
     public static final String PROP_NTCP2_IV = "i2np.ntcp2.iv";
     private static final int NTCP2_IV_LEN = OutboundNTCP2State.IV_SIZE;
     private static final int NTCP2_KEY_LEN = OutboundNTCP2State.KEY_SIZE;
-    private static final long MIN_DOWNTIME_TO_REKEY = 30*24*60*60*1000L;
+    private static final long MIN_DOWNTIME_TO_REKEY = 7*24*60*60*1000L;
     private static final long MIN_DOWNTIME_TO_REKEY_HIDDEN = 24*60*60*1000L;
     private final byte[] _ntcp2StaticPubkey;
     private final byte[] _ntcp2StaticPrivkey;
