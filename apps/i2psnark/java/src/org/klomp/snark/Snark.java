@@ -446,8 +446,17 @@ public class Snark
             boolean shouldPreserve = completeListener != null && completeListener.getSavedPreserveNamesSetting(this);
             if (baseFile == null) {
                 String base = meta.getName();
-                if (!shouldPreserve)
-                    base = Storage.filterName(base);
+                if (!shouldPreserve) {
+                    String filtered = Storage.filterName(base);
+                    if (!filtered.equals(base)) {
+                        File f1 = new File(rootDataDir, base);
+                        File f2 = new File(rootDataDir, filtered);
+                        if (f1.exists() && !f2.exists())
+                            shouldPreserve = true;
+                        else
+                            base = filtered;
+                    }
+                }
                 if (_util.getFilesPublic())
                     baseFile = new File(rootDataDir, base);
                 else
