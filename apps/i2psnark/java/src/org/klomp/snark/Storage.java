@@ -954,7 +954,7 @@ public class Storage implements Closeable
     String rv = _filterNameCache.get(name);
     if (rv != null)
         return rv;
-    if (name.equals(".") || name.equals(" ")) {
+    if (name.equals(".") || name.equals(" ") || name.length() == 0) {
         rv = "_";
     } else {
         rv = name;
