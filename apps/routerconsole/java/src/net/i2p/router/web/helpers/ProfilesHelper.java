@@ -85,7 +85,7 @@ public class ProfilesHelper extends HelperBase {
     public String getProfileSummary() {
         try {
             ProfileOrganizerRenderer rend = new ProfileOrganizerRenderer(_context.profileOrganizer(), _context);
-            rend.renderStatusHTML(_out, _full);
+            rend.renderStatusHTML(_out, _full, _pageSize, _page);
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

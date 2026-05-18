@@ -39,7 +39,7 @@ class ProfileOrganizerRenderer {
     /**
      *  @param mode 0 = high cap; 1 = all; 2 = floodfill
      */
-    public void renderStatusHTML(Writer out, int mode) throws IOException {
+    public void renderStatusHTML(Writer out, int mode, int pageSize, int page) throws IOException {
         boolean full = mode == 1;
         Set<Hash> peers = _organizer.selectAllPeers();
 
@@ -89,6 +89,17 @@ class ProfileOrganizerRenderer {
         if (standard > 0)
             buf.append("<a href=\"/profiles?f=1\">").append(ngettext("Hiding {0} standard profile.", "Hiding {0} standard profiles.", standard)).append("</a>\n");
         buf.append("</p>");
+
+        int sz = order.size();
+        boolean morePages = false;
+        int toSkip = pageSize * page;
+        int last = Math.min(toSkip + pageSize, sz - 1);
+        if (last < sz - 1)
+            morePages = true;
+        String ubuf = "&amp;f=" + mode;
+        if (page > 0 || morePages)
+            outputPageLinks(buf, ubuf, page, pageSize, morePages);
+
                    buf.append("<div class=\"widescroll\"><table id=\"profilelist\">");
                    buf.append("<tr>");
                    buf.append("<th>").append(_t("Peer")).append("</th>");
@@ -101,8 +112,19 @@ class ProfileOrganizerRenderer {
                    buf.append("<th>").append(_t("Status")).append("</th>");
                    buf.append("<th>").append(_t("View/Edit")).append("</th>");
                    buf.append("</tr>");
+
         int prevTier = 1;
+        int skipped = 0;
+        int written = 0;
         for (PeerProfile prof : order) {
+            if (skipped < toSkip) {
+                skipped++;
+                continue;
+            }
+            if (written++ >= pageSize) {
+                morePages = true;
+                break;
+            }
             Hash peer = prof.getPeer();
 
             int tier = 0;
@@ -211,6 +233,9 @@ class ProfileOrganizerRenderer {
         }
         buf.append("</table></div>");
 
+        if (page > 0 || morePages)
+            outputPageLinks(buf, ubuf, page, pageSize, morePages);
+
       ////
       //// don't bother reindenting
       ////
@@ -266,6 +291,8 @@ class ProfileOrganizerRenderer {
                     buf.append("<td align=\"right\">").append(NA);
             }
             buf.append("</tr>\n");
+            out.append(buf);
+            buf.setLength(0);
         }
         buf.append("</table></div>");
 
@@ -356,6 +383,27 @@ class ProfileOrganizerRenderer {
 
         out.append(buf);
         out.flush();
+    }
+
+    /**
+     *  @since 0.9.70 adapted from NetDbRenderer
+     */
+    private void outputPageLinks(StringBuilder buf, String params, int page, int pageSize, boolean morePages) {
+        buf.append("<div class=\"netdbnotfound\">");
+        if (page > 0) {
+            buf.append("<a href=\"/profiles?pg=").append(page)
+               .append("&amp;ps=").append(pageSize).append(params).append("\">");
+            buf.append(_t("Previous Page"));
+            buf.append("</a>&nbsp;&nbsp;&nbsp;");
+        }
+        buf.append(_t("Page")).append(' ').append(page + 1);
+        if (morePages) {
+            buf.append("&nbsp;&nbsp;&nbsp;<a href=\"/profiles?pg=").append(page + 2)
+               .append("&amp;ps=").append(pageSize).append(params).append("\">");
+            buf.append(_t("Next Page"));
+            buf.append("</a>");
+        }
+        buf.append("</div>");
     }
 
     private class ProfileComparator extends ProfComparator {
