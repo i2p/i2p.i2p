@@ -1,3 +1,21 @@
+2026-05-18 zzz
+ * SSU2: Peer test result fix as Alice when we never got Charlie's RI
+
+2026-05-17 zzz
+ * i2psnark:
+   - Add check for empty filenames
+   - Fix check for existing base file when adding via create form
+   - Use unfiltered base file name if it exists
+
+2026-05-16 zzz
+ * Transports: Reduce min downtime to rekey transport keys
+
+2026-05-15 zzz
+ * Console: Don't display hide/show news links on /configupdate
+ * i2psnark: Increase max form keys
+ * Router: Fix rare NPE at startup in InNetMessagePool
+ * Susimail: Remove static login nonce
+
 2026-05-12 zzz
  * SSU2: Require three consecutive peer tests for IPv6 state changes
 
