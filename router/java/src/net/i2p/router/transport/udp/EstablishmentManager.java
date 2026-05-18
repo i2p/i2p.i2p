@@ -677,9 +677,7 @@ class EstablishmentManager {
             isNew = oldState == null;
             if (!isNew) {
                 // whoops, somebody beat us to it, throw out the state we just created
-                if (oldState.getVersion() == 2)
-                    state = (InboundEstablishState2) oldState;
-                // else don't cast, this is only for printing below
+                state = (InboundEstablishState2) oldState;
             }
         } else {
             try {
