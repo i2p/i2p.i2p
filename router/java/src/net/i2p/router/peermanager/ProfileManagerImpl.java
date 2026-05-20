@@ -257,10 +257,10 @@ public class ProfileManagerImpl implements ProfileManager {
         PeerProfile data = getProfileNonblocking(peer);
         if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
-        if (!data.getIsExpandedDB())
-            return;
-        DBHistory hist = data.getDBHistory();
-        hist.unpromptedStoreReceived(wasNewKey);
+        //if (!data.getIsExpandedDB())
+        //    return;
+        //DBHistory hist = data.getDBHistory();
+        //hist.unpromptedStoreReceived(wasNewKey);
     }
     
     /**

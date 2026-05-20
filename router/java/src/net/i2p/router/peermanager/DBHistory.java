@@ -31,8 +31,8 @@ public class DBHistory {
     private long _lastLookupFailed;
     private long _lastStoreSuccessful;
     private long _lastStoreFailed;
-    private long _unpromptedDbStoreNew;
-    private long _unpromptedDbStoreOld;
+    //private long _unpromptedDbStoreNew;
+    //private long _unpromptedDbStoreOld;
     private final String _statGroup;
     
     public DBHistory(RouterContext context, String statGroup) {
@@ -105,9 +105,10 @@ public class DBHistory {
     public long getLastStoreFailed() { return _lastStoreFailed; }
 
     /** how many times have they sent us data we didn't ask for and that we've never seen? */
-    public long getUnpromptedDbStoreNew() { return _unpromptedDbStoreNew; }
+    //public long getUnpromptedDbStoreNew() { return _unpromptedDbStoreNew; }
     /** how many times have they sent us data we didn't ask for but that we have seen? */
-    public long getUnpromptedDbStoreOld() { return _unpromptedDbStoreOld; }
+    //public long getUnpromptedDbStoreOld() { return _unpromptedDbStoreOld; }
+
     /**
      * how often does the peer fail to reply to a lookup request, broken into 1 hour and 1 day periods.
      *
@@ -210,12 +211,14 @@ public class DBHistory {
      * Note that the peer sent us a data point without us asking for it
      * @param wasNew whether we already knew about this data point or not
      */
+/****
     public void unpromptedStoreReceived(boolean wasNew) {
         if (wasNew)
             _unpromptedDbStoreNew++;
         else
             _unpromptedDbStoreOld++;
     }
+****/
     
     //public void setSuccessfulLookups(long num) { _successfulLookups = num; }
     //public void setFailedLookups(long num) { _failedLookups = num; }
@@ -226,8 +229,8 @@ public class DBHistory {
     //public void setLookupsReceived(long num) { _lookupsReceived = num; }
     //public void setAvgDelayBetweenLookupsReceived(long ms) { _avgDelayBetweenLookupsReceived = ms; }
     //public void setLastLookupReceived(long when) { _lastLookupReceived = when; }
-    public void setUnpromptedDbStoreNew(long num) { _unpromptedDbStoreNew = num; }
-    public void setUnpromptedDbStoreOld(long num) { _unpromptedDbStoreOld = num; }
+    //public void setUnpromptedDbStoreNew(long num) { _unpromptedDbStoreNew = num; }
+    //public void setUnpromptedDbStoreOld(long num) { _unpromptedDbStoreOld = num; }
     
     public void coalesceStats() {
         if (_log.shouldLog(Log.DEBUG))
@@ -266,8 +269,8 @@ public class DBHistory {
         //add(buf, "lookupReplyInvalid", _lookupReplyInvalid, "How many of their reply values to our lookups were invalid (expired, forged, corrupted)?");
         //add(buf, "lookupReplyNew", _lookupReplyNew, "How many of their reply values to our lookups were brand new to us?");
         //add(buf, "lookupReplyOld", _lookupReplyOld, "How many of their reply values to our lookups were something we had seen before?");
-        add(buf, addComments, "unpromptedDbStoreNew", _unpromptedDbStoreNew, "How times have they sent us something we didn't ask for and hadn't seen before?");
-        add(buf, addComments, "unpromptedDbStoreOld", _unpromptedDbStoreOld, "How times have they sent us something we didn't ask for but have seen before?");
+        //add(buf, addComments, "unpromptedDbStoreNew", _unpromptedDbStoreNew, "How times have they sent us something we didn't ask for and hadn't seen before?");
+        //add(buf, addComments, "unpromptedDbStoreOld", _unpromptedDbStoreOld, "How times have they sent us something we didn't ask for but have seen before?");
         //add(buf, "lastLookupReceived", _lastLookupReceived, "When was the last time they send us a lookup?  (milliseconds since the epoch)");
         //add(buf, "avgDelayBetweenLookupsReceived", _avgDelayBetweenLookupsReceived, "How long is it typically between each db lookup they send us?  (in milliseconds)");
         // following 4 weren't persisted until 0.9.24
@@ -297,8 +300,8 @@ public class DBHistory {
         //_lookupReplyInvalid = getLong(props, "dbHistory.lookupReplyInvalid");
         //_lookupReplyNew = getLong(props, "dbHistory.lookupReplyNew");
         //_lookupReplyOld = getLong(props, "dbHistory.lookupReplyOld");
-        _unpromptedDbStoreNew = getLong(props, "dbHistory.unpromptedDbStoreNew");
-        _unpromptedDbStoreOld = getLong(props, "dbHistory.unpromptedDbStoreOld");
+        //_unpromptedDbStoreNew = getLong(props, "dbHistory.unpromptedDbStoreNew");
+        //_unpromptedDbStoreOld = getLong(props, "dbHistory.unpromptedDbStoreOld");
         //_lastLookupReceived = getLong(props, "dbHistory.lastLookupReceived");
         //_avgDelayBetweenLookupsReceived = getLong(props, "dbHistory.avgDelayBetweenLookupsReceived");
         // following 4 weren't persisted until 0.9.24
