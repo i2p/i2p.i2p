@@ -1,4 +1,11 @@
+2026-05-21 zzz
+ * Profiles: Reduce new profile creation
+
+2026-05-20 zzz
+ * Profiles: Remove unused counters of unprompted DB stores
+
 2026-05-18 zzz
+ * Console: Add pagination for all-profiles tab
  * SSU2: Peer test result fix as Alice when we never got Charlie's RI
 
 2026-05-17 zzz
