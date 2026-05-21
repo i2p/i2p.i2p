@@ -16,6 +16,40 @@ import net.i2p.util.Log;
 /**
  *  Methods to update profiles.
  *  Unless otherwise noted, methods are blocking on the reorganize lock.
+ *  Non-blocking methods will not update or create profiles if
+ *  they can't get the lock.
+ *
+ *  To control total profile count,
+ *  and not create profiles we don't care about,
+ *  not all methods create profiles if they don't exist.
+ *
+ *<pre>
+ *
+ *  method                   creates?
+ *
+ *  dbLookupSuccessful()     yes
+ *  dbLookupFailed()         no
+ *  dbLookupReply()          yes
+ *  dbStoreReceived()        yes
+ *  dbStoreSent()            yes
+ *  dbStoreSuccessful()      yes
+ *  dbStoreFailed()          no
+ *  heardAbout()             conditional on caps
+ *  messageSent()            no
+ *  messageFailed()          no
+ *  messageReceived()        no
+ *  tunnelJoined()           yes
+ *  tunnelRejected()         yes
+ *  tunnelTimedOut()         yes
+ *  tunnelDataPushed()       yes
+ *  tunnelLifetimePushed()   yes
+ *  tunnelFailed()           no
+ *
+ *</pre>
+ *
+ * heardAbout() is the main vector for new profile creation.
+ * Adjust shouldCreate() as necessary to control it.
+ *
  */
 public class ProfileManagerImpl implements ProfileManager {
     private final Log _log;
@@ -30,9 +64,11 @@ public class ProfileManagerImpl implements ProfileManager {
      * Note that it took msToSend to send a message of size bytesSent to the peer over the transport.
      * This should only be called if the transport considered the send successful.
      * Non-blocking. Will not update the profile if we can't get the lock.
+     *
+     * As of 0.9.70, will not create the profile if it didn't exist.
      */
     public void messageSent(Hash peer, String transport, long msToSend, long bytesSent) {
-        PeerProfile data = getProfileNonblocking(peer);
+        PeerProfile data = getProfileIfExistsNonblocking(peer);
         if (data == null) return;
         data.setLastSendSuccessful(_context.clock().now());
         //data.getSendSuccessSize().addData(bytesSent, msToSend);
@@ -41,10 +77,11 @@ public class ProfileManagerImpl implements ProfileManager {
     /**
      * Note that the router failed to send a message to the peer over the transport specified.
      * Non-blocking. Will not update the profile if we can't get the lock.
+     *
+     * Will not create the profile if it didn't exist.
      */
     public void messageFailed(Hash peer, String transport) {
-        // do not create profile if it didn't exist
-        PeerProfile data = _context.profileOrganizer().getProfileNonblocking(peer);
+        PeerProfile data = getProfileIfExistsNonblocking(peer);
         if (data == null) return;
         data.setLastSendFailed(_context.clock().now());
     }
@@ -52,10 +89,11 @@ public class ProfileManagerImpl implements ProfileManager {
     /**
      * Note that the router failed to send a message to the peer over any transport.
      * Non-blocking. Will not update the profile if we can't get the lock.
+     *
+     * Will not create the profile if it didn't exist.
      */
     public void messageFailed(Hash peer) {
-        // do not create profile if it didn't exist
-        PeerProfile data = _context.profileOrganizer().getProfileNonblocking(peer);
+        PeerProfile data = getProfileIfExistsNonblocking(peer);
         if (data == null) return;
         data.setLastSendFailed(_context.clock().now());
     }
@@ -67,11 +105,13 @@ public class ProfileManagerImpl implements ProfileManager {
      */
     @Deprecated
     public void commErrorOccurred(Hash peer) {
+/*
         if (_log.shouldLog(Log.INFO))
             _log.info("Comm error occurred for peer " + peer.toBase64(), new Exception("Comm error"));
         PeerProfile data = getProfile(peer);
         //if (data == null) return;
         data.setLastSendFailed(_context.clock().now());
+*/
     }
     
     /**
@@ -171,10 +211,11 @@ public class ProfileManagerImpl implements ProfileManager {
      * been the peer's fault however.
      * Blame the peer with a probability of pct/100.
      *
+     * As of 0.9.70, this does not create a profile if it didn't previously exist.
      */
     public void tunnelFailed(Hash peer, int pct) {
-        PeerProfile data = getProfile(peer);
-        //if (data == null) return;
+        PeerProfile data = getProfileIfExistsNonblocking(peer);
+        if (data == null) return;
         data.getTunnelHistory().incrementFailed(pct);
     }
     
@@ -203,8 +244,7 @@ public class ProfileManagerImpl implements ProfileManager {
      * Non-blocking. Will not update the profile if we can't get the lock.
      */
     public void dbLookupFailed(Hash peer) {
-        // do not create profile if it didn't exist
-        PeerProfile data = _context.profileOrganizer().getProfileNonblocking(peer);
+        PeerProfile data = getProfileIfExistsNonblocking(peer);
         if (data == null) return;
         if (!data.getIsExpandedDB())
             data.expandDBProfile();
@@ -237,8 +277,13 @@ public class ProfileManagerImpl implements ProfileManager {
      * Note that the local router received a db lookup from the given peer
      *
      * Non-blocking. Will not update the profile if we can't get the lock.
+     *
+     * As of 0.9.70, does nothing
+     * @deprecated unused
      */
+    @Deprecated
     public void dbLookupReceived(Hash peer) {
+/*
         PeerProfile data = getProfileNonblocking(peer);
         if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
@@ -246,6 +291,7 @@ public class ProfileManagerImpl implements ProfileManager {
             return;
         //DBHistory hist = data.getDBHistory();
         //hist.lookupReceived();
+*/
     }
     
     /**
@@ -254,7 +300,7 @@ public class ProfileManagerImpl implements ProfileManager {
      * Non-blocking. Will not update the profile if we can't get the lock.
      */
     public void dbStoreReceived(Hash peer, boolean wasNewKey) {
-        PeerProfile data = getProfileNonblocking(peer);
+        PeerProfile data = getProfileIfExistsNonblocking(peer);
         if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
         //if (!data.getIsExpandedDB())
@@ -306,11 +352,13 @@ public class ProfileManagerImpl implements ProfileManager {
      * Note that we were unable to confirm a successful send of db data to
      * the peer, at least not within our timeout period
      *
-     * This will force creation of DB stats
+     * As of 0.9.70, this does not create a profile if it didn't previously exist.
+     *
+     * This will force creation of DB stats if profile exists but was not expanded.
      */
     public void dbStoreFailed(Hash peer) {
-        PeerProfile data = getProfile(peer);
-        //if (data == null) return;
+        PeerProfile data = getProfileIfExistsNonblocking(peer);
+        if (data == null) return;
         if (!data.getIsExpandedDB())
             data.expandDBProfile();
         DBHistory hist = data.getDBHistory();
@@ -318,12 +366,15 @@ public class ProfileManagerImpl implements ProfileManager {
         // we could do things like update some sort of "how many successful stores we've
         // failed to send them"...
     }
-    
+
     /**
      * Note that the local router received a reference to the given peer, either
      * through an explicit dbStore or in a dbLookupReply
      * Non-blocking. Will not update the profile if we can't get the lock.
+     *
+     * @deprecated use heardAbout(peer, caps)
      */
+    @Deprecated
     public void heardAbout(Hash peer) {
         PeerProfile data = getProfileNonblocking(peer);
         if (data == null) return;
@@ -334,27 +385,79 @@ public class ProfileManagerImpl implements ProfileManager {
      * Note that the local router received a reference to the given peer
      * at a certain time. Only update the time if newer.
      * Non-blocking. Will not update the profile if we can't get the lock.
+     *
+     * @deprecated use heardAbout(peer, caps, when)
      */
+    @Deprecated
     public void heardAbout(Hash peer, long when) {
         PeerProfile data = getProfileNonblocking(peer);
         if (data == null) return;
         data.setLastHeardAbout(when);
     }
-    
+
+    /**
+     * Contitionally note that the local router received a reference to the given peer, either
+     * through an explicit dbStore or in a dbLookupReply
+     * Non-blocking. Will not update the profile if we can't get the lock.
+     *
+     * @param caps non-null from the peer's RI, used to determine if the profile will be created if it doesn't exist
+     * @since 0.9.70
+     */
+    public void heardAbout(Hash peer, String caps) {
+        boolean create = shouldCreate(caps);
+        PeerProfile data = create ? getProfileNonblocking(peer) : getProfileIfExistsNonblocking(peer);
+        if (data == null) return;
+        data.setLastHeardAbout(_context.clock().now());
+    }
+
+    /**
+     * Conditionally note that the local router received a reference to the given peer
+     * at a certain time. Only update the time if newer.
+     * Non-blocking. Will not update the profile if we can't get the lock.
+     *
+     * @param caps non-null from the peer's RI, used to determine if the profile will be created if it doesn't exist
+     * @since 0.9.70
+     */
+    public void heardAbout(Hash peer, String caps, long when) {
+        boolean create = shouldCreate(caps);
+        PeerProfile data = create ? getProfileNonblocking(peer) : getProfileIfExistsNonblocking(peer);
+        if (data == null) return;
+        data.setLastHeardAbout(when);
+    }
+
+    /**
+     * Should we create a profile for a router with these RI caps?
+     *
+     * This is the main control for keeping the profile count reasonable.
+     *
+     * @param caps non-null from the peer's RI, used to determine if the profile will be created if it doesn't exist
+     * @since 0.9.70
+     */
+    private static boolean shouldCreate(String caps) {
+        return caps.indexOf('R') >= 0 &&
+               (caps.indexOf('f') >= 0 ||
+                (caps.indexOf('L') < 0 &&
+                 // possibly M and N also but there aren't that many of them
+                 caps.indexOf('E') < 0 &&
+                 caps.indexOf('G') < 0));
+    }
+
     /**
      * Note that the router received a message from the given peer on the specified
      * transport.  Messages received without any "from" information aren't recorded
      * through this metric.  If msToReceive is negative, there was no timing information
      * available.
      * Non-blocking. Will not update the profile if we can't get the lock.
+     *
+     * As of 0.9.70, will not create the profile if it didn't exist.
      */
     public void messageReceived(Hash peer, String style, long msToReceive, int bytesRead) {
-        PeerProfile data = getProfileNonblocking(peer);
+        PeerProfile data = getProfileIfExistsNonblocking(peer);
         if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
         //data.getReceiveSize().addData(bytesRead, msToReceive);
     }
-    
+
     /**
      *   Blocking.
      *   Creates a new profile if it didn't exist.
@@ -369,7 +472,7 @@ public class ProfileManagerImpl implements ProfileManager {
         }
         return prof;
     }
-    
+
     /**
      *  Non-blocking.
      *  Creates a new profile if it didn't exist.
@@ -378,5 +481,15 @@ public class ProfileManagerImpl implements ProfileManager {
      */
     private PeerProfile getProfileNonblocking(Hash peer) {
         return _context.profileOrganizer().getOrCreateProfileNonblocking(peer);
+    }
+
+    /**
+     *  Non-blocking.
+     *  Does NOT create a new profile if it didn't exist.
+     *  @return null if the profile does not exist, or if the fetch would have blocked
+     *  @since 0.9.70
+     */
+    private PeerProfile getProfileIfExistsNonblocking(Hash peer) {
+        return _context.profileOrganizer().getProfileNonblocking(peer);
     }
 }

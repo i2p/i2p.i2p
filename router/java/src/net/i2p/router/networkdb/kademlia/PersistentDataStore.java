@@ -610,8 +610,7 @@ public class PersistentDataStore extends TransientDataStore {
                             // when heardAbout() was removed from TransientDataStore, it broke
                             // profile bootstrapping for new routers,
                             // so add it here.
-                            if (ri.getCapabilities().indexOf(Router.CAPABILITY_REACHABLE) >= 0)
-                                getContext().profileManager().heardAbout(h, ri.getPublished());
+                            getContext().profileManager().heardAbout(h, ri.getCapabilities(), ri.getPublished());
                         } catch (IllegalArgumentException iae) {
                             if (_log.shouldLog(Log.INFO))
                                 _log.info("Refused locally loaded routerInfo - deleting", iae);

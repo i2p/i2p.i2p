@@ -33,7 +33,9 @@ public interface ProfileManager {
     /**
      * Note that there was some sort of communication error talking with the peer
      *
+     * @deprecated unused
      */
+    @Deprecated
     void commErrorOccurred(Hash peer);
 	
     /**
@@ -118,7 +120,9 @@ public interface ProfileManager {
     /**
      * Note that the local router received a db lookup from the given peer
      *
+     * @deprecated unused
      */
+    @Deprecated
     void dbLookupReceived(Hash peer);
     
     /**
@@ -151,10 +155,42 @@ public interface ProfileManager {
     /**
      * Note that the local router received a reference to the given peer, either
      * through an explicit dbStore or in a dbLookupReply
+     *
+     * @deprecated use heardAbout(peer, caps)
      */
+    @Deprecated
     void heardAbout(Hash peer);
+
+    /**
+     * Note that the local router received a reference to the given peer
+     * at a certain time. Only update the time if newer.
+     * Non-blocking. Will not update the profile if we can't get the lock.
+     *
+     * @deprecated use heardAbout(peer, caps, when)
+     */
+    @Deprecated
     void heardAbout(Hash peer, long when);
     
+    /**
+     * Contitionally note that the local router received a reference to the given peer, either
+     * through an explicit dbStore or in a dbLookupReply
+     * Non-blocking. Will not update the profile if we can't get the lock.
+     *
+     * @param caps non-null from the peer's RI, used to determine if the profile will be created if it doesn't exist
+     * @since 0.9.70
+     */
+    public void heardAbout(Hash peer, String caps);
+
+    /**
+     * Conditionally note that the local router received a reference to the given peer
+     * at a certain time. Only update the time if newer.
+     * Non-blocking. Will not update the profile if we can't get the lock.
+     *
+     * @param caps non-null from the peer's RI, used to determine if the profile will be created if it doesn't exist
+     * @since 0.9.70
+     */
+    public void heardAbout(Hash peer, String caps, long when);
+
     /**
      * Note that the router received a message from the given peer on the specified
      * transport.  Messages received without any "from" information aren't recorded
