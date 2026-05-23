@@ -170,7 +170,9 @@ class EstablishmentManager {
     // SSU 2
     private static final int MIN_TOKENS = 128;
     private static final int MAX_TOKENS = 2048;
-    public static final long IB_TOKEN_EXPIRATION = 60*60*1000L;
+    private static final long IB_TOKEN_EXPIRATION = 60*60*1000L;
+    private static final long MIN_TOKEN_LIFETIME = 2*60*1000L;
+    public static final long RELAY_TOKEN_LIFETIME = 60*1000L;
     private static final long MAX_SKEW = 2*60*1000;
     private static final String TOKEN_FILE = "ssu2tokens.txt";
     // max immediate terminations to send to a peer every FAILSAFE_INTERVAL
@@ -468,7 +470,8 @@ class EstablishmentManager {
                                                       _transport.introducersMaybeRequired(TransportUtil.isIPv6(ra));
                         try {
                             state = new OutboundEstablishState2(_context, _transport, maybeTo, to,
-                                                               toIdentity, requestIntroduction, sessionKey, ra, addr, version);
+                                                                toIdentity, toRouterInfo.getCapabilities(),
+                                                                requestIntroduction, sessionKey, ra, addr, version);
                         } catch (IllegalArgumentException iae) {
                             if (_log.shouldWarn())
                                 _log.warn("OES2 error: " + toRouterInfo, iae);
@@ -537,9 +540,13 @@ class EstablishmentManager {
     /**
      * Should we allow another inbound establishment?
      *
+     * @param isSessReq if true, a session request; if false, a token request
      * @since 0.9.2
      */
-    public boolean shouldAllowInboundEstablishment() {
+    private boolean shouldAllowInboundEstablishment(boolean isSessReq) {
+        boolean haveCapacity = _transport.haveCapacity(95);
+        if (!haveCapacity && !isSessReq)
+            return false;
         if (_inboundStates.size() >= getMaxInboundEstablishers())
             return false;
         RateStat rs = _context.statManager().getRate("udp.inboundConn");
@@ -569,11 +576,14 @@ class EstablishmentManager {
         int currentTime = (int) (_context.clock().now() - periodStart);
         if (currentTime <= 5*1000)
             return true;
+
         // compare incoming conns per ms
         // both of these are scaled by actual period in coalesce
         float lastRate = last / (float) lastPeriod;
         float currentRate = (float) (current / (double) currentTime);
-        float factor = _transport.haveCapacity(95) ? 1.05f : 0.95f;
+        float factor = haveCapacity ? 1.05f : 0.95f;
+        if (!isSessReq)
+            factor *= 0.90;
         float minThresh = factor * lastRate;
         if (currentRate > minThresh) {
             // chance in 128
@@ -583,7 +593,8 @@ class EstablishmentManager {
                 if (_log.shouldWarn())
                     _log.warn("Probabalistic drop incoming (p=" + probAccept  +
                               "/128) last rate " + last + "/min current rate " +
-                              (int) (currentRate * 60*1000));
+                              (int) (currentRate * 60*1000) +
+                              " isSessReq? " + isSessReq);
                 return false;
             }
         }
@@ -611,7 +622,7 @@ class EstablishmentManager {
                 if (_log.shouldInfo())
                     _log.info("Receive session request from blocklisted IP: " + from);
                 _context.statManager().addRateData("udp.establishBadIP", 1);
-                // don't bother to decode header to get the real version
+                // don't bother to go into the header to get the real version
                 if (!_context.commSystem().isInStrictCountry())
                     sendTerminationPacket(from, packet, 2, REASON_BANNED);
                 // else drop the packet
@@ -620,7 +631,14 @@ class EstablishmentManager {
             if (!_context.commSystem().isExemptIncoming(Addresses.toString(fromIP))) {
                 // TODO this is insufficient to prevent DoSing, especially if
                 // IP spoofing is used. For further study.
-                if (!shouldAllowInboundEstablishment()) {
+
+                // is it a token or session request?
+                DatagramPacket pkt = packet.getPacket();
+                int off = pkt.getOffset();
+                byte data[] = pkt.getData();
+                boolean isSessReq = data[off + TYPE_OFFSET] == SESSION_REQUEST_FLAG_BYTE;
+
+                if (!shouldAllowInboundEstablishment(isSessReq)) {
                     if (_log.shouldWarn())
                         _log.warn("Dropping inbound establish from " + from);
                     _context.statManager().addRateData("udp.establishDropped", 1);
@@ -2307,39 +2325,49 @@ class EstablishmentManager {
     /**
      *  Get a token that can be used later for the peer to connect to us
      *
+     *  @return may be null as of 0.9.70
      *  @since 0.9.54
      */
     public Token getInboundToken(RemoteHostId peer) {
-        return getInboundToken(peer, IB_TOKEN_EXPIRATION);
+        return getInboundToken(peer, IB_TOKEN_EXPIRATION, false);
     }
 
     /**
      *  Get a token that can be used later for the peer to connect to us.
      *
      *  @param expiration time from now, will be reduced if necessary based on cache eviction time.
-     *  @return non-null
+     *  @param force forces non-null return
+     *  @return may be null as of 0.9.70 unless force == true
      *  @since 0.9.55
      */
-    public Token getInboundToken(RemoteHostId peer, long expiration) {
+    public Token getInboundToken(RemoteHostId peer, long expiration, boolean force) {
+        if (!force) {
+            if (_transport.isSymNatted())
+                return null;
+            if (!_transport.haveCapacity(95))
+                return null;
+        }
         long token;
         do {
             token = _context.random().nextLong();
         } while (token == 0);
         long now = _context.clock().now();
-        // shorten expiration based on average eviction time
-        RateStat rs = _context.statManager().getRate("udp.inboundTokenLifetime");
-        if (rs != null) {
-            Rate r = rs.getRate(5*60*1000);
-            if (r != null) {
-                long lifetime = (long) (r.getAverageValue() * 0.9d); // margin
-                if (lifetime > 0) {
-                    if (lifetime < 2*60*1000)
-                        lifetime = 2*60*1000;
-                    if (lifetime < expiration)
-                        expiration = lifetime;
+        if (expiration > RELAY_TOKEN_LIFETIME) {
+            // shorten expiration based on average eviction time
+            RateStat rs = _context.statManager().getRate("udp.inboundTokenLifetime");
+            if (rs != null) {
+                Rate r = rs.getRate(5*60*1000);
+                if (r != null) {
+                    long lifetime = (long) (r.getAverageValue() * 0.9d); // margin
+                    if (lifetime > 0) {
+                        if (lifetime < MIN_TOKEN_LIFETIME)
+                            lifetime = MIN_TOKEN_LIFETIME;
+                        if (lifetime < expiration)
+                            expiration = lifetime;
+                    }
                 }
             }
-        }
+        } // else via intro manager
         long expires = now + expiration;
         Token tok = new Token(token, expires, now);
         synchronized(_inboundTokens) {
@@ -2394,8 +2422,8 @@ class EstablishmentManager {
          */
         public Token(long tok, long exp, long now) {
             token = tok;
-            expires = (int) (exp >> 10);
-            added = (int) (now >> 10);
+            expires = (int) (exp / 1000);
+            added = (int) (now / 1000);
         }
         /** @since 0.9.57 */
         public long getToken() { return token; }

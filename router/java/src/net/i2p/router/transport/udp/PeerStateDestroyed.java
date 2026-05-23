@@ -164,6 +164,11 @@ class PeerStateDestroyed implements SSU2Payload.PayloadCallback, SSU2Sender {
     public void fragmentsSent(long pktNum, int length, List<PacketBuilder.Fragment> fragments) {}
     public byte getFlags() { return 0; }
 
+    /**
+     *  @since 0.9.70
+     */
+    public boolean shouldSendToken() { return false; }
+
     /// end SSU2Sender interface ///
 
     long getRcvConnID() { return _rcvConnID; }

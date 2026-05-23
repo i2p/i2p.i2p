@@ -383,11 +383,22 @@ class PacketBuilder2 {
             _log.debug("Sending termination " + reason + " to : " + peer);
         peer.setDestroyReason(reason);
         List<Block> blocks = new ArrayList<Block>(2);
-        if (peer.isIPv6() || !_transport.isSymNatted()) {
-            // update token
-            EstablishmentManager.Token token = _transport.getEstablisher().getInboundToken(peer.getRemoteHostId());
-            Block block = new SSU2Payload.NewTokenBlock(token);
-            blocks.add(block);
+
+        switch(reason) {
+          case REASON_UNSPEC:
+          case REASON_TERMINATION:
+          case REASON_TIMEOUT:
+            if (peer.shouldSendToken()) {
+                EstablishmentManager.Token token = _transport.getEstablisher().getInboundToken(peer.getRemoteHostId());
+                if (token != null) {
+                    Block block = new SSU2Payload.NewTokenBlock(token);
+                    blocks.add(block);
+                }
+            }
+            break;
+
+          default:
+            break;
         }
         Block block = new SSU2Payload.TerminationBlock(reason, peer.getReceivedMessages().getHighestSet());
         blocks.add(block);
@@ -645,7 +656,7 @@ class PacketBuilder2 {
         byte[] hdrKey1 = state.getSendHeaderEncryptKey1();
         byte[] hdrKey2 = state.getSendHeaderEncryptKey2();
         encryptSessionConfirmed(packet0, state.getHandshakeState(), state.getMTU(), count, addPadding, isIPv6,
-                                hdrKey1, hdrKey2, block, state.getNextToken());
+                                hdrKey1, hdrKey2, block, null /* send with termination only state.getNextToken() */ );
         int total = pkt.getLength();
         if (_log.shouldInfo())
             _log.info("Building " + count + " fragmented session confirmed packets" +

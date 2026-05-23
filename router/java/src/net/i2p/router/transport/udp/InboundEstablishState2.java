@@ -403,7 +403,8 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
         if (!"2".equals(ra.getOption("v")))
             throw new RIException("bad SSU2 v", REASON_VERSION);
 
-        if (ri.getCapabilities().equals("LU") && ri.getVersion().equals("0.9.56")) {
+        String caps = ri.getCapabilities();
+        if (caps.equals("LU") && ri.getVersion().equals("0.9.56")) {
             long time = _context.netDb().floodfillEnabled() ? 60*60*1000 : 2*60*60*1000;
             _context.banlist().banlistRouter(h, "Slow", null,
                                              null, _context.clock().now() + time);
@@ -412,7 +413,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             throw new RIException("Old and slow: " + h, REASON_BANNED);
         }
 
-        if (ri.getCapabilities().indexOf('L') >= 0 && ri.getVersion().equals("0.9.57")) {
+        if (caps.indexOf('L') >= 0 && ri.getVersion().equals("0.9.57")) {
             long time = _context.netDb().floodfillEnabled() ? 30*60*1000 : 60*60*1000;
             _context.banlist().banlistRouter(h, "Slow", null,
                                              null, _context.clock().now() + time);
@@ -421,9 +422,9 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
             throw new RIException("Old and slow: " + h, REASON_BANNED);
         }
 
-        if (ri.getCapabilities().indexOf('G') >= 0 &&
-            ri.getCapabilities().indexOf('X') >= 0 &&
-            ri.getCapabilities().indexOf('f') >= 0 &&
+        if (caps.indexOf('G') >= 0 &&
+            caps.indexOf('X') >= 0 &&
+            caps.indexOf('f') >= 0 &&
             ri.getVersion().equals("0.9.67")) {
             long time = _context.netDb().floodfillEnabled() ? 30*60*1000 : 60*60*1000;
             _context.banlist().banlistRouter(h, "Refuses tunnels", null,
@@ -501,11 +502,9 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                 _introductionRequested = false;
             } else if (VersionComparator.comp(ri.getVersion(), MIN_RELAY_VERSION) < 0) {
                 _introductionRequested = false;
-                String caps = ri.getCapabilities();
                 if (_log.shouldDebug())
                     _log.debug("Not offering to relay to router version " + ri.getVersion() + " caps " + caps + ": " + this);
             } else {
-                String caps = ri.getCapabilities();
                 // may be requesting relay for ipv4/6 if reachable on the other
                 // or may be starting up and not know if reachable or not
                 if (caps.indexOf(Router.CAPABILITY_REACHABLE) < 0 ||
@@ -519,7 +518,9 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                 }
             }
         }
-        createPeerState();
+
+        boolean shouldSendToken = OutboundEstablishState2.shouldSendToken(caps);
+        createPeerState(shouldSendToken);
         //_sendHeaderEncryptKey2 calculated below
     }
 
@@ -643,11 +644,14 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
     /**
      *  @return may be null
      */
+/* unused, we only send token with termination now
     public EstablishmentManager.Token getNextToken() {
         if (_aliceIP.length == 4 && _transport.isSymNatted())
             return null;
         return _transport.getEstablisher().getInboundToken(_remoteHostId);
     }
+*/
+
     public HandshakeState getHandshakeState() { return _handshakeState; }
     public byte[] getSendHeaderEncryptKey1() { return _sendHeaderEncryptKey1; }
     public byte[] getRcvHeaderEncryptKey1() { return _transport.getSSU2StaticIntroKey(); }
@@ -987,7 +991,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
      *  Called from gotRI() so that we can pass any I2NP messages
      *  or fragments immediately to the PeerState.
      */
-    private void createPeerState() {
+    private void createPeerState(boolean shouldSendToken) {
         // split()
         // The CipherStates are from d_ab/d_ba,
         // not from k_ab/k_ba, so there's no use for
@@ -1032,7 +1036,7 @@ class InboundEstablishState2 extends InboundEstablishState implements SSU2Payloa
                                  _receivedConfirmedIdentity.calculateHash(),
                                  true, _rtt, sender, rcvr,
                                  _sendConnID, _rcvConnID,
-                                 _sendHeaderEncryptKey1, h_ba, h_ab, _version);
+                                 _sendHeaderEncryptKey1, h_ba, h_ab, _version, shouldSendToken);
         // PS2.super adds CLOCK_SKEW_FUDGE that doesn't apply here
         _pstate.adjustClockSkew(_skew - (_rtt / 2) - PeerState.CLOCK_SKEW_FUDGE);
         _pstate.setHisMTU(_mtu);

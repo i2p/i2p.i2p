@@ -28,4 +28,9 @@ interface SSU2Sender {
     SSU2Bitfield getAckedMessages();
     void fragmentsSent(long pktNum, int length, List<PacketBuilder.Fragment> fragments);
     byte getFlags();
+
+    /**
+     *  @since 0.9.70
+     */
+    boolean shouldSendToken();
 }

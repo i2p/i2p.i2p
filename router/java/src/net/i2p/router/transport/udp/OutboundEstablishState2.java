@@ -65,6 +65,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     private long _timeReceived;
     // not adjusted for RTT
     private long _skew;
+    private final boolean _shouldSendToken;
     private PeerState2 _pstate;
 
     private static final boolean SET_TOKEN = false;
@@ -140,10 +141,11 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
      */
     public OutboundEstablishState2(RouterContext ctx, UDPTransport transport, RemoteHostId claimedAddress,
                                    RemoteHostId remoteHostId, RouterIdentity remotePeer,
-                                   boolean needIntroduction,
+                                   String caps, boolean needIntroduction,
                                    SessionKey introKey, RouterAddress ra, UDPAddress addr, int version) throws IllegalArgumentException {
         super(ctx, claimedAddress, remoteHostId, remotePeer, needIntroduction, introKey, addr);
         _transport = transport;
+        _shouldSendToken = shouldSendToken(caps);
         if (claimedAddress != null) {
             try {
                 _bobSocketAddress = new InetSocketAddress(InetAddress.getByAddress(_bobIP), _bobPort);
@@ -495,11 +497,14 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     /**
      *  @return may be null
      */
+/* unused, we only send token with termination now
     public EstablishmentManager.Token getNextToken() {
         if (_bobIP != null && _bobIP.length == 4 && _transport.isSymNatted())
             return null;
         return _transport.getEstablisher().getInboundToken(_remoteHostId);
     }
+*/
+
     public HandshakeState getHandshakeState() { return _handshakeState; }
     public byte[] getSendHeaderEncryptKey1() { return _headerEncryptKey1; }
     public byte[] getRcvHeaderEncryptKey1() { return _headerEncryptKey1; }
@@ -830,7 +835,7 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
                                      _remotePeer.calculateHash(),
                                      false, _rtt, sender, rcvr,
                                      _sendConnID, _rcvConnID,
-                                     _headerEncryptKey1, h_ab, h_ba, _version);
+                                     _headerEncryptKey1, h_ab, h_ba, _version, _shouldSendToken);
             _currentState = OutboundState.OB_STATE_CONFIRMED_COMPLETELY;
             _pstate.confirmedPacketsSent(_sessConfForReTX);
             // PS2.super adds CLOCK_SKEW_FUDGE that doesn't apply here
@@ -910,6 +915,17 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     public void introSent(Hash h) {
         setIntroState(h, IntroState.INTRO_STATE_RELAY_REQUEST_SENT);
         introSent();
+    }
+
+    /**
+     *  @since 0.9.70
+     */
+    public static boolean shouldSendToken(String caps) {
+        return caps.indexOf('R') >= 0 &&
+               (caps.indexOf('f') >= 0 ||
+                (caps.indexOf('L') < 0 &&
+                 caps.indexOf('E') < 0 &&
+                 caps.indexOf('G') < 0));
     }
 
     @Override

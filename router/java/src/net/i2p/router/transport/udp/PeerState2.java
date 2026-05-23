@@ -65,6 +65,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     private final ConcurrentHashMap<Long, List<PacketBuilder.Fragment>> _sentMessages;
     private final ACKTimer _ackTimer;
     private final int _version;
+    private final boolean _shouldSendToken;
 
     private long _sentMessagesLastExpired;
     private byte[] _ourIP;
@@ -127,7 +128,8 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
     public PeerState2(RouterContext ctx, UDPTransport transport,
                      InetSocketAddress remoteAddress, Hash remotePeer, boolean isInbound, int rtt,
                      CipherState sendCha, CipherState rcvCha, long sendID, long rcvID,
-                     byte[] sendHdrKey1, byte[] sendHdrKey2, byte[] rcvHdrKey2, int version) {
+                     byte[] sendHdrKey1, byte[] sendHdrKey2, byte[] rcvHdrKey2, int version,
+                     boolean shouldSendToken) {
         super(ctx, transport, remoteAddress, remotePeer, isInbound, rtt);
         _sendConnID = sendID;
         _rcvConnID = rcvID;
@@ -150,6 +152,7 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
             _packetNumber.set(1);
         }
         _version = version;
+        _shouldSendToken = shouldSendToken;
         _ackTimer = new ACKTimer();
     }
 
@@ -394,6 +397,11 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
      * @since 0.9.57
      */
     public void setDestroyReason(int reason) { _destroyReason = reason; }
+
+    /**
+     *  @since 0.9.70
+     */
+    public boolean shouldSendToken() { return _shouldSendToken; }
 
     /// end SSU2Sender interface ///
 
@@ -930,18 +938,22 @@ public class PeerState2 extends PeerState implements SSU2Payload.PayloadCallback
                             _log.warn("Migration successful, changed address from " + _remoteHostId + " to " + from + " for " + this);
                         _transport.changePeerAddress(this, from);
                         _mtu = MIN_MTU;
-                        if (isIPv6() || !_transport.isSymNatted()) {
+                        if (_shouldSendToken) {
                             EstablishmentManager.Token token = _transport.getEstablisher().getInboundToken(from);
-                            SSU2Payload.Block block = new SSU2Payload.NewTokenBlock(token);
-                            try {
-                                UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.<Fragment>emptyList(),
-                                                                                     Collections.singletonList(block),
-                                                                                     this);
-                                _transport.send(pkt);
-                                long now = _context.clock().now();
-                                setLastSendTime(now);
-                                setLastReceiveTime(now);
-                            } catch (IOException ioe) {}
+                            if (token != null) {
+                                SSU2Payload.Block block = new SSU2Payload.NewTokenBlock(token);
+                                try {
+                                    UDPPacket pkt = _transport.getBuilder2().buildPacket(Collections.<Fragment>emptyList(),
+                                                                                         Collections.singletonList(block),
+                                                                                         this);
+                                    _transport.send(pkt);
+                                    long now = _context.clock().now();
+                                    setLastSendTime(now);
+                                    setLastReceiveTime(now);
+                                } catch (IOException ioe) {}
+                            } else {
+                                messagePartiallyReceived();
+                            }
                         } else {
                             messagePartiallyReceived();
                         }

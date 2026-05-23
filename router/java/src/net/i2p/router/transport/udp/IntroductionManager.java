@@ -859,7 +859,9 @@ class IntroductionManager {
         long token;
         if (rcode == SSU2Util.RELAY_ACCEPT) {
             RemoteHostId aliceID = new RemoteHostId(testIP, testPort);
-            EstablishmentManager.Token tok = _transport.getEstablisher().getInboundToken(aliceID, 60*1000);
+            EstablishmentManager.Token tok = _transport.getEstablisher().getInboundToken(aliceID,
+                                                                                         EstablishmentManager.RELAY_TOKEN_LIFETIME,
+                                                                                         true);
             token = tok.getToken();
         } else {
             token = 0;
