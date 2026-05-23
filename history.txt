@@ -1,3 +1,6 @@
+2026-05-23 zzz
+ * SSU2: Token improvements
+
 2026-05-21 zzz
  * Profiles: Reduce new profile creation
 
