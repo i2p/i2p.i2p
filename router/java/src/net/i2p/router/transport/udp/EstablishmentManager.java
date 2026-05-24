@@ -2422,8 +2422,8 @@ class EstablishmentManager {
          */
         public Token(long tok, long exp, long now) {
             token = tok;
-            expires = (int) (exp / 1000);
-            added = (int) (now / 1000);
+            expires = (int) (exp >> 10);
+            added = (int) (now >> 10);
         }
         /** @since 0.9.57 */
         public long getToken() { return token; }
