@@ -1,3 +1,7 @@
+2026-05-24 zzz
+ * NTCP2: Reduce max connections for inbound to leave room for outbound
+ * SSU2: Revert token time calculation change that messed up expiration times
+
 2026-05-23 zzz
  * SSU2: Token improvements
 
