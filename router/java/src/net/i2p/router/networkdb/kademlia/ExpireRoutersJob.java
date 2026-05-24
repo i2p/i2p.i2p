@@ -48,15 +48,18 @@ class ExpireRoutersJob extends JobImpl {
     public String getName() { return "Expire Routers Job"; }
 
     public void runJob() {
+        int removed = 0;
         if (getContext().commSystem().getStatus() != Status.DISCONNECTED) {
-            int removed = expireKeys();
+            removed = expireKeys();
             if (_log.shouldLog(Log.INFO))
                 _log.info("(dbid: " + _facade
                           + "; db size: " + _facade.getKnownRouters()
                           + ") Routers expired: " + removed);
         }
-        // TODO adjust frequency based on number removed
-        requeue(RERUN_DELAY_MS);
+        long delay = RERUN_DELAY_MS;
+        if (removed > LIMIT_ROUTERS / 3)
+            delay /= 2;
+        requeue(delay);
     }
     
     
@@ -71,19 +74,19 @@ class ExpireRoutersJob extends JobImpl {
         // go through the database directly for efficiency
         Set<Map.Entry<Hash, DatabaseEntry>> entries = _facade.getDataStore().getMapEntries();
         int count = entries.size();
-        if (count < 150)
+        if (count < 300)
             return 0;
         RouterKeyGenerator gen = getContext().routerKeyGenerator();
         long now = getContext().clock().now();
         long cutoff = now - 30*60*1000;
         // for U routers
-        long ucutoff = now - 15*60*1000;
+        long ucutoff = now - 12*60*1000;
         boolean almostMidnight = gen.getTimeTillMidnight() < FloodfillNetworkDatabaseFacade.NEXT_RKEY_RI_ADVANCE_TIME - 30*60*1000;
         Hash us = getContext().routerHash();
         boolean isFF = _facade.floodfillEnabled();
         byte[] ourRKey = isFF ? us.getData() : null;
         // chance in 128
-        int pdrop = Math.max(10, Math.min(80, (128 * count / LIMIT_ROUTERS) - 128));
+        int pdrop = Math.max(10, Math.min(115, (128 * count / LIMIT_ROUTERS) - 128));
         int removed = 0;
         if (_log.shouldLog(Log.INFO))
             _log.info("Expiring routers, count = " + count + " drop probability " +
