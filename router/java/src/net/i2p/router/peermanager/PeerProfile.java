@@ -237,8 +237,8 @@ public class PeerProfile {
      */
     public boolean getIsActive(long period, long now) {
         long before = now - period;
-        return getLastHeardFrom() < before ||
-               getLastSendSuccessful() < before ||
+        return getLastHeardFrom() >= before ||
+               getLastSendSuccessful() >= before ||
                isEstablished();
     }
     
