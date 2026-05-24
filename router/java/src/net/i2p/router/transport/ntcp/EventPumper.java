@@ -504,9 +504,9 @@ class EventPumper implements Runnable {
                 return;
             }
             if (!_context.commSystem().isExemptIncoming(Addresses.toCanonicalString(ba))) {
-                if (!_transport.allowConnection()) {
+                if (!_transport.haveCapacity(95)) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Receive session request but at connection limit: " + ba);
+                        _log.warn("Receive session request but near connection limit: " + ba);
                     try { chan.close(); } catch (IOException ioe) { }
                     return;
                 }
@@ -580,7 +580,7 @@ class EventPumper implements Runnable {
         // both of these are scaled by actual period in coalesce
         float lastRate = last / (float) lastPeriod;
         float currentRate = (float) (current / (double) currentTime);
-        float factor = _transport.haveCapacity(95) ? 1.05f : 0.95f;
+        float factor = 1.05f;
         float minThresh = factor * lastRate;
         if (currentRate > minThresh) {
             // chance in 128
