@@ -80,11 +80,15 @@ class FloodfillStoreJob extends StoreJob {
             DatabaseEntry data = _state.getData();
             final int type = data.getType();
             final boolean isRouterInfo = type == DatabaseEntry.KEY_TYPE_ROUTERINFO;
+            // we should always have exactly one successful entry
+            Hash sentTo = _state.getSuccessful();
             // default false since 0.9.7.1
             // verify for a while after startup until we've vetted the floodfills
             if (isRouterInfo && !ctx.getBooleanProperty(PROP_RI_VERIFY) &&
                 ctx.router().getUptime() > RI_VERIFY_STARTUP_TIME) {
                 _facade.routerInfoPublishSuccessful();
+                if (sentTo != null)
+                    ctx.profileManager().dbStoreSuccessful(sentTo);
                 return;
             }
 
@@ -96,8 +100,6 @@ class FloodfillStoreJob extends StoreJob {
             } else {
                 published = data.getDate();
             }
-            // we should always have exactly one successful entry
-            Hash sentTo = _state.getSuccessful();
             Hash client;
             if (type == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2) {
                 // get the real client hash
