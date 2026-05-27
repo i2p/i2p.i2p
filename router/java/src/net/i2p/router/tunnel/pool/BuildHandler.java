@@ -874,8 +874,8 @@ class BuildHandler implements Runnable {
             } else {
                 char bw = ri.getBandwidthTier().charAt(0);
                 if (bw != 'O' && bw != 'N' && bw != 'P' && bw != 'X' &&
-                    ((isInGW && ! _context.commSystem().haveInboundCapacity(87)) ||
-                     (isOutEnd && ! _context.commSystem().haveOutboundCapacity(87)))) {
+                    ((isInGW && ! _context.commSystem().haveInboundCapacity(92)) ||
+                     (isOutEnd && ! _context.commSystem().haveOutboundCapacity(92)))) {
                         _context.statManager().addRateData("tunnel.rejectConnLimits", 1);
                         _context.throttle().setTunnelStatus(_x("Rejecting tunnels: Connection limit"));
                         response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
@@ -1065,9 +1065,9 @@ class BuildHandler implements Runnable {
             // Connection congestion control:
             // If we rejected the request, are near our conn limits, and aren't connected to the next hop,
             // just drop it.
-            // 81% = between 75% control measures in Transports and 87% rejection above
+            // 90% = between 88% control measures in Transports and 92% rejection above
             if ((! _context.routerHash().equals(nextPeer)) &&
-                (! _context.commSystem().haveOutboundCapacity(81)) &&
+                (! _context.commSystem().haveOutboundCapacity(90)) &&
                 (! _context.commSystem().isEstablished(nextPeer))) {
                 _context.statManager().addRateData("tunnel.dropConnLimits", 1);
                 if (_log.shouldLog(Log.WARN))

@@ -220,7 +220,7 @@ public abstract class TransportImpl implements Transport {
         return _context.getProperty(maxProp, def);
     }
 
-    private static final int DEFAULT_CAPACITY_PCT = 75;
+    private static final int DEFAULT_CAPACITY_PCT = 88;
 
     /**
      * Can we initiate or accept a connection to another peer, saving some margin
