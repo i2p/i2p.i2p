@@ -21,31 +21,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class RrdNioBackend extends ByteBufferBackend implements RrdFileBackend {
 
-    // The java 8- methods
-    private static final Method cleanerMethod;
-    private static final Method cleanMethod;
     // The java 9+ methods
     private static final Method invokeCleaner;
     private static final Object unsafe;
     static {
         // Temporary variable, because destinations variables are final
         // And it interferes with exceptions
-        Method cleanerMethodTemp;
-        Method cleanMethodTemp;
         Method invokeCleanerTemp;
         Object unsafeTemp;
-        try {
-            // The java 8- way, using sun.nio.ch.DirectBuffer.cleaner().clean()
-            Class<?> directBufferClass = RrdRandomAccessFileBackend.class.getClassLoader().loadClass("sun.nio.ch.DirectBuffer");
-            Class<?> cleanerClass = RrdNioBackend.class.getClassLoader().loadClass("sun.misc.Cleaner");
-            cleanerMethodTemp = directBufferClass.getMethod("cleaner");
-            cleanerMethodTemp.setAccessible(true);
-            cleanMethodTemp = cleanerClass.getMethod("clean");
-            cleanMethodTemp.setAccessible(true);
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
-            cleanerMethodTemp = null;
-            cleanMethodTemp = null;
-        }
         try {
             // The java 9+ way, using unsafe.invokeCleaner(buffer)
             Field singleoneInstanceField = RrdRandomAccessFileBackend.class.getClassLoader().loadClass("sun.misc.Unsafe").getDeclaredField("theUnsafe");
@@ -58,8 +41,6 @@ public class RrdNioBackend extends ByteBufferBackend implements RrdFileBackend {
             invokeCleanerTemp = null;
             unsafeTemp = null;
         }
-        cleanerMethod = cleanerMethodTemp;
-        cleanMethod = cleanMethodTemp;
         invokeCleaner = invokeCleanerTemp;
         unsafe = unsafeTemp;
     }
@@ -122,12 +103,7 @@ public class RrdNioBackend extends ByteBufferBackend implements RrdFileBackend {
     private void unmapFile() {
         if (byteBuffer != null && byteBuffer.isDirect()) {
             try {
-                if (cleanMethod != null) {
-                    Object cleaner = cleanerMethod.invoke(byteBuffer);
-                    cleanMethod.invoke(cleaner);
-                } else {
-                    invokeCleaner.invoke(unsafe, byteBuffer);
-                }
+                invokeCleaner.invoke(unsafe, byteBuffer);
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                 throw new RuntimeException(ex);
             }
