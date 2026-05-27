@@ -535,11 +535,22 @@ abstract class BuildRequestor {
                     log.warn("Pool: " + pool + " min: " + min + " avg: " + bw + " req: " + req);
                 props.setProperty(PROP_MIN_BW, Integer.toString(min / 1000));
                 props.setProperty(PROP_REQ_BW, Integer.toString(req / 1000));
-                // TOOO if (i == 0 && pool.getSettings().isExploratory()) set PROP_MAX_BW
+            }
+            if (key != null && i == 0 && cfg.isInbound()) {
+                // IBGW Limit
+                if (props.isEmpty())
+                    props = new Properties();  // replace EmptyProperties
+                int limit = (bw > 0) ? Math.max(20000, bw * 3) : 20000;
+                int vari = 4 * limit / 10;
+                limit += ctx.random().nextInt(vari);
+                if (log.shouldWarn())
+                    log.warn("Pool: " + pool + " IBGW limit: " + limit);
+                props.setProperty(PROP_MAX_BW, Integer.toString(limit / 1000));
             }
             Properties p = key != null ? props : EmptyProperties.INSTANCE;
             BuildMessageGenerator.createRecord(i, hop, msg, cfg, replyRouter, replyTunnel,
                                                ctx, key, p);
+            props.clear();
         }
         BuildMessageGenerator.layeredEncrypt(ctx, msg, cfg, order);
         //if (useShortTBM && log.shouldWarn())
