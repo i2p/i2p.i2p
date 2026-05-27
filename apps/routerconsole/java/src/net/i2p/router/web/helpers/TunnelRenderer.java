@@ -248,7 +248,7 @@ class TunnelRenderer {
         int lifetime = (int) ((now - cfg.getCreation()) / 1000);
         if (lifetime <= 0)
             lifetime = 1;
-        if (lifetime > 10*60)
+        else if (lifetime > 10*60)
             lifetime = 10*60;
         long bps = 1024L * count / lifetime;
         out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatSize2Decimal(bps) + "Bps</td>");
@@ -383,7 +383,7 @@ class TunnelRenderer {
                   + "</th><th>" + _t("Expiration"));
         if (!isExpl)
             out.write("</th><th>" + _t("Requested") + "</th><th>" + _t("Allocated"));
-        out.write("</th><th>" + _t("Usage") + "</th><th>" + _t("Gateway") + "</th>");
+        out.write("</th><th>" + (isExpl ? _t("Usage") : _t("Rate")) + "</th><th>" + _t("Gateway") + "</th>");
         if (maxLength > 3) {
             out.write("<th align=\"center\" colspan=\"" + (maxLength - 2));
             out.write("\">" + _t("Participants") + "</th>");
@@ -425,7 +425,17 @@ class TunnelRenderer {
                     out.write("<td class=\"cells\">&nbsp;</td>\n");
             }
             int count = info.getProcessedMessagesCount();
-            out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatSize2(count * 1024) + "B</td>\n");
+            if (isExpl) {
+                out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatSize2(count * 1024) + "B</td>\n");
+            } else {
+                int lifetime = (int) ((10*60*1000 - timeLeft) / 1000);
+                if (lifetime <= 0)
+                    lifetime = 1;
+                else if (lifetime > 10*60)
+                    lifetime = 10*60;
+                long bps = 1024L * count / lifetime;
+                out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatSize2Decimal(bps) + "Bps</td>");
+            }
             int length = info.getLength();
             for (int j = 0; j < length; j++) {
                 Hash peer = info.getPeer(j);
