@@ -30,6 +30,7 @@ import net.i2p.router.Service;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.router.tunnel.pool.PooledTunnelCreatorConfig;
 import net.i2p.util.Log;
+import net.i2p.util.SyntheticREDQueue;
 
 /**
  * Handle the actual processing and forwarding of messages through the
@@ -790,8 +791,9 @@ public class TunnelDispatcher implements Service {
      * @param loc message hop location
      * @param type I2NP message type
      * @param length the length of the message
+     * @param bwe a per-tunnel bandwidth estimator to be checked first, or null
      */
-    public boolean shouldDropParticipatingMessage(Location loc, int type, int length) {
+    boolean shouldDropParticipatingMessage(Location loc, int type, int length, SyntheticREDQueue bwe) {
         if (length <= 0)
             return false;
 
@@ -818,6 +820,16 @@ public class TunnelDispatcher implements Service {
         } else {
             factor = 1.0f;
         }
+
+        if (bwe != null) {
+            if (!bwe.offer(length, factor)) {
+                if (_log.shouldWarn())
+                    _log.warn("Drop (per-tunnel) part. msg. factor=" + factor +
+                              ' ' + loc + ' ' + type + ' ' + length + ' ' + bwe);
+                return true;
+            }
+        }
+
         boolean reject = ! _context.bandwidthLimiter().sentParticipatingMessage(length, factor);
         if (reject) {
             if (_log.shouldLog(Log.WARN)) {
@@ -827,6 +839,31 @@ public class TunnelDispatcher implements Service {
             _context.statManager().addRateData("tunnel.participatingMessageDropped", 1);
         }
         return reject;
+    }
+
+    /**
+     * The maximum bandwidth for a single tunnel in Bps.
+     * These are the allocated limits if no allocation was requested.
+     * They are currently quite generous but will be lowered in the future once
+     * allocation is widespread.
+     *
+     * @param loc unused for now
+     * @since 0.9.70
+     */
+    public int getMaxPerTunnelBandwidth(Location loc) {
+        int max = _context.bandwidthLimiter().getMaxShareBandwidth();
+        int maxTunnels = _context.getProperty(RouterThrottleImpl.PROP_MAX_TUNNELS, RouterThrottleImpl.DEFAULT_MAX_TUNNELS);
+        if (maxTunnels > 25) {
+            if (max >= 2048*1024)     // X
+                max /= 12;
+            if (max >= 128*1024)      // O/P
+                max /= 8;
+            else if (max <= 48*1024)  // K/L
+                max /= 4;
+            else
+                max = (12*1024) + ((max - (48*1024)) / 6);  // M/N
+        }
+        return max;
     }
 
     //private static final int DROP_BASE_INTERVAL = 40 * 1000;

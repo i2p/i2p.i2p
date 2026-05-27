@@ -11,6 +11,7 @@ import net.i2p.data.i2np.UnknownI2NPMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.SyntheticREDQueue;
 
 /**
  * We are the end of an outbound tunnel that we did not create.  Gather fragments
@@ -24,6 +25,7 @@ class OutboundTunnelEndpoint {
     private final HopProcessor _processor;
     private final FragmentHandler _handler;
     private final OutboundMessageDistributor _outDistributor;
+    private final SyntheticREDQueue _partBWE;
 
     public OutboundTunnelEndpoint(RouterContext ctx, HopConfig config, HopProcessor processor) {
         _context = ctx;
@@ -31,7 +33,13 @@ class OutboundTunnelEndpoint {
         _config = config;
         _processor = processor;
         _handler = new FragmentHandler(ctx, new DefragmentedHandler(), false);
-        _outDistributor = new OutboundMessageDistributor(ctx, OutNetMessage.PRIORITY_PARTICIPATING);
+        int max = _config.getAllocatedBW();
+        if (max <= TunnelParticipant.DEFAULT_BW_PER_TUNNEL_ESTIMATE) {
+            max = _context.tunnelDispatcher().getMaxPerTunnelBandwidth(TunnelDispatcher.Location.OBEP);
+            _config.setAllocatedBW(max);
+        }
+        _partBWE = new SyntheticREDQueue(_context, max);
+        _outDistributor = new OutboundMessageDistributor(ctx, OutNetMessage.PRIORITY_PARTICIPATING, _partBWE);
     }
 
     public void dispatch(TunnelDataMessage msg, Hash recvFrom) {
@@ -113,9 +121,10 @@ class OutboundTunnelEndpoint {
             int size = msg.getMessageSize();
             // don't drop it if we are the target
             boolean toUs = _context.routerHash().equals(toRouter);
-            if ((!toUs) &&
-                _context.tunnelDispatcher().shouldDropParticipatingMessage(TunnelDispatcher.Location.OBEP, type, size))
-                return;
+            if (!toUs) {
+                if (_context.tunnelDispatcher().shouldDropParticipatingMessage(TunnelDispatcher.Location.OBEP, type, size, _partBWE))
+                    return;
+            }
             // this overstates the stat somewhat, but ok for now
             //int kb = (size + 1023) / 1024;
             //for (int i = 0; i < kb; i++)

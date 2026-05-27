@@ -15,6 +15,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.SyntheticREDQueue;
 
 /**
  * When a message arrives at the outbound tunnel endpoint, this distributor
@@ -26,6 +27,7 @@ class OutboundMessageDistributor {
     private final Log _log;
     // following only for somebody else's OBEP, not for zero-hop
     private final Set<Hash> _toRouters;
+    private final SyntheticREDQueue _partBWE;
     private int _newRouterCount;
     private long _newRouterTime;
     
@@ -39,6 +41,16 @@ class OutboundMessageDistributor {
      *                  OutNetMessage.PRIORITY_MY_DATA for our own zero-hop OBGW/EP
      */
     public OutboundMessageDistributor(RouterContext ctx, int priority) {
+        this(ctx, priority, null);
+    }
+
+    /**
+     *  @param priority OutNetMessage.PRIORITY_PARTICIPATING for somebody else's OBEP, or
+     *                  OutNetMessage.PRIORITY_MY_DATA for our own zero-hop OBGW/EP
+     *  @param bwe null for none
+     *  @since 0.9.70
+     */
+    public OutboundMessageDistributor(RouterContext ctx, int priority, SyntheticREDQueue bwe) {
         _context = ctx;
         _priority = priority;
         _log = ctx.logManager().getLog(OutboundMessageDistributor.class);
@@ -48,6 +60,7 @@ class OutboundMessageDistributor {
         } else {
             _toRouters = null;
         }
+        _partBWE = bwe;
         // all createRateStat() in TunnelDispatcher
     }
     
@@ -75,7 +88,7 @@ class OutboundMessageDistributor {
             if (_toRouters != null) {
                 // only if not zero-hop
                 // credit our lookup message as part. traffic
-                if (_context.tunnelDispatcher().shouldDropParticipatingMessage(TunnelDispatcher.Location.OBEP, DatabaseLookupMessage.MESSAGE_TYPE, 1024)) {
+                if (_context.tunnelDispatcher().shouldDropParticipatingMessage(TunnelDispatcher.Location.OBEP, DatabaseLookupMessage.MESSAGE_TYPE, 1024, _partBWE)) {
                     if (_log.shouldWarn())
                         _log.warn("Drop msg at OBEP (lookup bandwidth) to " + target.toBase64() + " type " + msg.getType());
                     return;

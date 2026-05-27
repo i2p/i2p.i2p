@@ -8,7 +8,9 @@ import net.i2p.data.i2np.TunnelDataMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.RouterThrottleImpl;
 import net.i2p.util.Log;
+import net.i2p.util.SyntheticREDQueue;
 
 /**
  * Participate in a tunnel at a location other than the gateway or outbound
@@ -25,12 +27,15 @@ class TunnelParticipant {
     private final InboundEndpointProcessor _inboundEndpointProcessor;
     private final InboundMessageDistributor _inboundDistributor;
     private final FragmentHandler _handler;
+    private final SyntheticREDQueue _partBWE;
     private RouterInfo _nextHopCache;
 
     private static final long MAX_LOOKUP_TIME = 15*1000;
     /** for next hop when a tunnel is first created */
     private static final long LONG_MAX_LOOKUP_TIME = 30*1000;
     private static final int PRIORITY = OutNetMessage.PRIORITY_PARTICIPATING;
+    /** @since 0.9.70 from BuildHandler */
+    static final int DEFAULT_BW_PER_TUNNEL_ESTIMATE = RouterThrottleImpl.DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE * 1024 / (10*60);
 
     /** not an inbound endpoint */
     public TunnelParticipant(RouterContext ctx, HopConfig config, HopProcessor processor) {
@@ -67,6 +72,16 @@ class TunnelParticipant {
             _nextHopCache = _context.netDb().lookupRouterInfoLocally(_config.getSendTo());
             if (_nextHopCache == null)
                 _context.netDb().lookupRouterInfo(_config.getSendTo(), new Found(_context), null, LONG_MAX_LOOKUP_TIME);
+        }
+        if (inEndProc == null) {
+            int max = _config.getAllocatedBW();
+            if (max <= DEFAULT_BW_PER_TUNNEL_ESTIMATE) {
+                max = _context.tunnelDispatcher().getMaxPerTunnelBandwidth(TunnelDispatcher.Location.PARTICIPANT);
+                _config.setAllocatedBW(max);
+            }
+            _partBWE = new SyntheticREDQueue(_context, max);
+        } else {
+            _partBWE = null;
         }
         // all createRateStat() in TunnelDispatcher
     }
@@ -200,7 +215,7 @@ class TunnelParticipant {
 
     private void send(HopConfig config, TunnelDataMessage msg, RouterInfo ri) {
         if (_context.tunnelDispatcher().shouldDropParticipatingMessage(TunnelDispatcher.Location.PARTICIPANT,
-                                                                       TunnelDataMessage.MESSAGE_TYPE, 1024))
+                                                                       TunnelDataMessage.MESSAGE_TYPE, 1024, _partBWE))
             return;
         //_config.incrementSentMessages();
         long oldId = msg.getUniqueId();
