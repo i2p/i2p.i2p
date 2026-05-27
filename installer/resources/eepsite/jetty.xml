@@ -325,6 +325,11 @@
           <Set name="LogTimeZone">GMT</Set>
           <!-- False for b32 logging. True for b64 logging. Default false -->
           <Set name="b64">false</Set>
+          <!-- Uncomment to gzip files when rolled over -->
+        <!--
+          <Set name="gzip">true</Set>
+          <Set name="minGzipSize">65536</Set>
+         -->
         </New>
       </Set>
 

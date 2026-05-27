@@ -14,12 +14,22 @@
 
 package net.i2p.jetty; 
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.http.Cookie;
 
@@ -30,6 +40,9 @@ import org.eclipse.jetty.util.DateCache;
 import org.eclipse.jetty.util.RolloverFileOutputStream;
 import org.eclipse.jetty.util.StringUtil;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
+
+import net.i2p.data.DataHelper;
+
 
 /** 
  * This {@link RequestLog} implementation outputs logs in the pseudo-standard NCSA common log format.
@@ -50,6 +63,11 @@ import org.eclipse.jetty.util.component.AbstractLifeCycle;
  *
  * So that we will work with system Jetty 6 packages, we just copy the whole thing
  * and modify log() as required.
+ *
+ * Gzip features as of 0.9.70:
+ * in jetty.xml requestLog section,
+ * set gzip to true,
+ * optionally set gzipMinSize (default 64KB)
  *
  * @author Greg Wilkins
  * @author Nigel Canonizado
@@ -78,6 +96,10 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
     private transient DateCache _logDateCache;
     private transient java.io.Writer _writer;
 
+    private final static boolean DEFAULT_GZIP = false;
+    private static final int DEFAULT_MIN_GZIP_SIZE = 64*1024;
+    private boolean _gzip = DEFAULT_GZIP;
+    private long _minGzipSize = DEFAULT_MIN_GZIP_SIZE;
     
     public I2PRequestLog()
     {
@@ -242,6 +264,24 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
     public void setB64(boolean b64) 
     {
         _b64 = b64;
+    }
+
+    /**
+     * @param gzip true to gzip log files on rollover, default false
+     * @since 0.9.70
+     */
+    public void setGzip(boolean gzip)
+    {
+        _gzip = gzip;
+    }
+
+    /**
+     * @param size min size of a file before gzipping it, default 65536
+     * @since 0.9.70
+     */
+    public void setMinGzipSize(int size)
+    {
+        _minGzipSize = size;
     }
 
     /* ------------------------------------------------------------ */
@@ -409,7 +449,10 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
         
         if (_filename != null) 
         {
-            _fileOut = new RolloverFileOutputStream(_filename,_append,_retainDays,TimeZone.getTimeZone(_logTimeZone),_filenameDateFormat,null);
+            if (_gzip)
+                _fileOut = new GzipRFOS(_filename,_append,_retainDays,TimeZone.getTimeZone(_logTimeZone),_filenameDateFormat,null, _minGzipSize);
+            else
+                _fileOut = new RolloverFileOutputStream(_filename,_append,_retainDays,TimeZone.getTimeZone(_logTimeZone),_filenameDateFormat,null);
             _closeOut = true;
         }
         else 
@@ -455,4 +498,113 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
         _filenameDateFormat=logFileDateFormat;
     }
 
+    /**
+     *  Gzip old log on rollover
+     *
+     *  @since 0.9.70
+     */
+    private static class GzipRFOS extends RolloverFileOutputStream {
+        // following are inaccessible in super
+        private final SimpleDateFormat _fdf;
+        private static final String YYYY_MM_DD = "yyyy_mm_dd";
+        private static final String ROLLOVER_FILE_DATE_FORMAT = "yyyy_MM_dd";
+        private final long _minGzSize;
+
+        public GzipRFOS(String filename, boolean append, int retainDays,
+                        TimeZone zone, String dateFormat, String backupFormat,
+                        long minGzipSize) throws IOException {
+            super(filename, append, retainDays, zone, dateFormat, backupFormat);
+            if (dateFormat == null)
+                dateFormat = ROLLOVER_FILE_DATE_FORMAT;
+            _fdf = new SimpleDateFormat(dateFormat);
+            _minGzSize = minGzipSize;
+        }
+
+        /**
+         * This method is called whenever a log file is rolled over
+         *
+         * @param oldFile The original filename or null if this is the first creation
+         * @param backupFile The backup filename or null if the filename is dated.
+         * @param newFile The new filename that is now being used for logging
+         */
+        @Override
+        protected void rollover(File oldFile, File backupFile, File newFile) {
+            if (oldFile == null || backupFile != null)
+                return;
+            long sz = oldFile.length();
+            if (sz < _minGzSize)
+                return;
+            // we are called from a timer thread, so do this inline
+            int pri = Thread.currentThread().getPriority();
+            Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+            gzip(oldFile);
+            removeOldGZFiles();
+            Thread.currentThread().setPriority(pri);
+        }
+
+        /**
+         * adapted from net.i2p.util.FileLogWriter
+         */
+        private static void gzip(File f) {
+            File to = new File(f.getPath() + ".gz");
+            InputStream in = null;
+            OutputStream out = null;
+            boolean ok = false;
+            try {
+                in = new BufferedInputStream(new FileInputStream(f));
+                out = new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(to)));
+                DataHelper.copy(in, out);
+                ok = true;
+            } catch (IOException ioe) {
+                System.out.println("Error compressing log file " + f);
+            } finally {
+                if (in != null) try { in.close(); } catch (IOException ioe) {}
+                if (out != null) try { out.close(); } catch (IOException ioe) {}
+                if (ok) {
+                    to.setLastModified(f.lastModified());
+                    f.delete();
+                } else {
+                    to.delete();
+                }
+            }
+        }
+
+        /**
+         *  super.removeOldFiles() is pkg private,
+         *  so we can't override, we call this from rollover().
+         *  Adapted from removeOldFiles()
+         */
+        private void removeOldGZFiles()
+        {
+            int retainDays = getRetainDays();
+            if (retainDays <= 0)
+                return;
+            // Establish expiration time, based on configured TimeZone
+            ZonedDateTime now = ZonedDateTime.now(_fdf.getTimeZone().toZoneId());
+            long expired = now.minus(retainDays, ChronoUnit.DAYS).toInstant().toEpochMilli();
+
+            File file = new File(getFilename() + ".gz");
+            File dir = new File(file.getParent());
+            String fn = file.getName();
+            int s = fn.toLowerCase(Locale.ENGLISH).indexOf(YYYY_MM_DD);
+            if (s < 0)
+                return;
+            String prefix = fn.substring(0, s);
+            String suffix = fn.substring(s + YYYY_MM_DD.length());
+
+            String[] logList = dir.list();
+            for (int i = 0; i < logList.length; i++)
+            {
+                fn = logList[i];
+                if (fn.startsWith(prefix) && fn.indexOf(suffix, prefix.length()) >= 0)
+                {
+                    File f = new File(dir, fn);
+                    if (f.lastModified() < expired)
+                    {
+                        f.delete();
+                    }
+                }
+            }
+        }
+    }
 }
