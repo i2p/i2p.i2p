@@ -138,7 +138,7 @@ public class EepHead extends EepGet {
             }
             get.addAuthorization(username, password);
         }
-        if (get.fetch(45*1000, -1, inactivityTimeout)) {
+        if (get.fetch(inactivityTimeout, inactivityTimeout, inactivityTimeout)) {
             String x = get.getContentType();
             if (x != null)
                 System.err.println("Content-Type: " + x);

@@ -44,7 +44,8 @@ public class SocketTimeout extends SimpleTimer2.TimedEvent {
      */
     public SocketTimeout(Socket socket, long delay) {
         super(SimpleTimer2.getInstance());
-        _inactivityDelay = delay;
+        // timer comes in a little early so subtract a little or it will get doubled
+        _inactivityDelay = delay - 50;
         _targetSocket = socket;
         _lastActivity = _startTime = System.currentTimeMillis();
         schedule(delay);
