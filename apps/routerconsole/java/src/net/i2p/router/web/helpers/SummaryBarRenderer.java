@@ -721,8 +721,11 @@ class SummaryBarRenderer {
            .append(_t("Router Info"))
            .append("</a></h3><hr class=\"b\">\n" +
 
-                   "<table id=\"sb_advancedgeneral\">" +
-                   "<tr title=\"")
+                   "<table id=\"sb_advancedgeneral\">");
+        String id = _context.getProperty("routerconsole.id");
+        if (id != null)
+            buf.append("<tr><td align=\"left\"><b>ID:</b></td><td align=\"right\">").append(DataHelper.escapeHTML(id)).append("</td></tr>\n");
+        buf.append("<tr title=\"")
            .append(_t("The version of the I2P software we are running"))
            .append("\">" +
                    "<td align=\"left\"><b>")
