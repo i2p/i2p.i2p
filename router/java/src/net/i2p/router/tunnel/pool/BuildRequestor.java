@@ -536,8 +536,11 @@ abstract class BuildRequestor {
                 props.setProperty(PROP_MIN_BW, Integer.toString(min / 1000));
                 props.setProperty(PROP_REQ_BW, Integer.toString(req / 1000));
             }
-            if (key != null && i == 0 && cfg.isInbound()) {
+            if (key != null && hop == 0 && cfg.isInbound() &&
+                (pool.getSettings().isExploratory() ||
+                 ctx.clientManager().shouldPublishLeaseSet(pool.getSettings().getDestination()))) {
                 // IBGW Limit
+                // not for client tunnels
                 if (props.isEmpty())
                     props = new Properties();  // replace EmptyProperties
                 int limit = (bw > 0) ? Math.max(20000, bw * 3) : 20000;

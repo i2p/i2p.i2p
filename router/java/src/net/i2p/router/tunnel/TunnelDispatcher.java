@@ -797,6 +797,16 @@ public class TunnelDispatcher implements Service {
         if (length <= 0)
             return false;
 
+        if (bwe != null) {
+            // do not use factor
+            if (!bwe.offer(length, 1)) {
+                if (_log.shouldWarn())
+                    _log.warn("Drop (per-tunnel) part. msg. " +
+                              loc + ' ' + type + ' ' + length + ' ' + bwe);
+                return true;
+            }
+        }
+
         // increase the drop probability for OBEP,
         // (except lower it for tunnel build messages type 21/22/23/24),
         // and lower it for IBGW, for network efficiency
@@ -819,15 +829,6 @@ public class TunnelDispatcher implements Service {
                 factor = 1 / 1.5f;
         } else {
             factor = 1.0f;
-        }
-
-        if (bwe != null) {
-            if (!bwe.offer(length, factor)) {
-                if (_log.shouldWarn())
-                    _log.warn("Drop (per-tunnel) part. msg. factor=" + factor +
-                              ' ' + loc + ' ' + type + ' ' + length + ' ' + bwe);
-                return true;
-            }
         }
 
         boolean reject = ! _context.bandwidthLimiter().sentParticipatingMessage(length, factor);
