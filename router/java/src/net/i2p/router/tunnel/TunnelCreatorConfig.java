@@ -1,11 +1,11 @@
 package net.i2p.router.tunnel;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.data.TunnelId;
@@ -33,6 +33,7 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
     private final boolean _isInbound;
     private int _messagesProcessed;
     private long _verifiedBytesTransferred;
+    private long _lastTransferredTime;
     private final AtomicInteger _failures = new AtomicInteger();
     private boolean _reused;
     private int _priority;
@@ -40,7 +41,7 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
     // Fastest 1 minute throughput, in bytes per minute, ordered with fastest first.
     //private final double _peakThroughput[] = new double[THROUGHPUT_COUNT];
     private long _peakThroughputCurrentTotal;
-    private long _peakThroughputLastCoalesce = System.currentTimeMillis();
+    private long _peakThroughputLastCoalesce;
     private Hash _blankHash;
     private SessionKey[] _ChaReplyKeys;
     private byte[][] _ChaReplyADs;
@@ -85,6 +86,7 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
         _destination = destination;
         _AESReplyKeys = new SessionKey[length];
         _AESReplyIVs = new byte[length][];
+        _peakThroughputLastCoalesce = ctx.clock().now();
     }
     
     /**
@@ -177,7 +179,8 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
     public synchronized void incrementVerifiedBytesTransferred(int bytes) { 
         _verifiedBytesTransferred += bytes; 
         _peakThroughputCurrentTotal += bytes;
-        long now = System.currentTimeMillis();
+        long now = _context.clock().now();
+        _lastTransferredTime = now;
         long timeSince = now - _peakThroughputLastCoalesce;
         if (timeSince >= 60*1000) {
             long tot = _peakThroughputCurrentTotal;
@@ -196,6 +199,14 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
     }
 
     public synchronized long getVerifiedBytesTransferred() { return _verifiedBytesTransferred; }
+
+    /**
+     *  When we last sent or received data on this tunnel
+     *
+     *  @since 0.9.70
+     */
+    public synchronized long getLastTransferred() { return _lastTransferredTime; }
+
 
 /**** unused
     public synchronized double getPeakThroughputKBps() { 
@@ -445,7 +456,9 @@ public abstract class TunnelCreatorConfig implements TunnelInfo {
                 buf.append("-->");
         }
         
-        buf.append(" exp. ").append(new Date(_expiration));
+        if (_lastTransferredTime > 0)
+            buf.append(" last traffic: ").append(DataHelper.formatTime(_lastTransferredTime));
+        buf.append(" exp. ").append(DataHelper.formatTime(_expiration));
         if (_replyMessageId > 0)
             buf.append(" replyMsgID ").append(_replyMessageId);
         if (_messagesProcessed > 0)

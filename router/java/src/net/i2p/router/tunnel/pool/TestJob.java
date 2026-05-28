@@ -83,6 +83,14 @@ class TestJob extends JobImpl {
         // of the inbound tunnel.
         boolean isExpl = _pool.getSettings().isExploratory();
         if (_cfg.isInbound()) {
+            if (ctx.clock().now() - _cfg.getLastTransferred() < TEST_DELAY) {
+                // Inbound tunnels that have recently received data are obviously working.
+                // Also, high bandwidth tunnels may experience dropping, causing false test failures.
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Skipping test on " + _cfg + " that recently received data");
+                scheduleRetest();
+                return;
+            }
             _replyTunnel = _cfg;
             if (isExpl)
                 _outTunnel = ctx.tunnelManager().selectOutboundTunnel();
