@@ -369,7 +369,10 @@ public class RouterContext extends I2PAppContext {
      */
     public SegmentedNetworkDatabaseFacade netDbSegmentor() { return _netDb; }
 
-    public NetworkDatabaseFacade netDb() { return _netDb.mainNetDB(); }
+    /**
+     * @return may be null if called very early or in some unit tests
+     */
+    public NetworkDatabaseFacade netDb() { return _netDb != null ? _netDb.mainNetDB() : null; }
 
     /**
      * Get the client netDb for the given id.

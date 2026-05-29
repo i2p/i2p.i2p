@@ -40,6 +40,7 @@ import net.i2p.data.i2cp.SetDateMessage;
 import net.i2p.internal.I2CPMessageQueue;
 import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.ClientMessage;
+import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
@@ -433,7 +434,8 @@ class ClientManager {
      *  @since 0.9.12
      */
     private SessionId locked_getNextSessionId() { 
-        if (_ctx.commSystem().isDummy())
+        CommSystemFacade csf = _ctx.commSystem();
+        if (csf != null && csf.isDummy())  // unit tests if null
             return null;
         int max = Math.max(1, Math.min(2048, _ctx.getProperty(PROP_MAX_SESSIONS, DEFAULT_MAX_SESSIONS)));
         if (_runnerSessionIds.size() >= max) {

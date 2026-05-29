@@ -8,6 +8,8 @@ package net.i2p.router.client;
  *
  */
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import gnu.getopt.Getopt;
@@ -19,6 +21,7 @@ import net.i2p.data.i2cp.MessageStatusMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.SimpleTimer2;
+import net.i2p.util.SyntheticREDQueue;
 
 /**
  * For testing clients without a full router.
@@ -30,7 +33,9 @@ import net.i2p.util.SimpleTimer2;
  * @since 0.9.8
  */
 class LocalClientManager extends ClientManager {
-    private static int dropX1000 = 0, jitter = 0, latency = 0;
+    private static int dropX1000 = 0, jitter = 0, latency = 0, ratelimit = 0;
+
+    private final Map<Destination, SyntheticREDQueue> limiters = new HashMap<Destination, SyntheticREDQueue>();
 
     /**
      *  @param context stub, may be constructed with new RouterContext(null),
@@ -66,6 +71,23 @@ class LocalClientManager extends ClientManager {
                     System.out.println("Message " + msgId + " DROPPED randomly");
                     // pretend success
                     sender.updateMessageDeliveryStatus(fromDest, msgId, messageNonce, MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS);
+                    return;
+                }
+            }
+            if (ratelimit > 0) {
+                SyntheticREDQueue srq;
+                synchronized(limiters) {
+                    srq = limiters.get(fromDest);
+                    if (srq == null) {
+                        srq = new SyntheticREDQueue(_ctx, ratelimit * 1024);
+                        limiters.put(fromDest, srq);
+                    }
+                    if (!srq.offer(payload.getSize(), 1)) {
+                        System.out.println("Message " + msgId + " length " + payload.getSize() + " DROPPED by " + srq);
+                        // pretend success
+                        sender.updateMessageDeliveryStatus(fromDest, msgId, messageNonce, MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS);
+                        return;
+                    }
                 }
             }
             if (latency > 0 || jitter > 0) {
@@ -115,8 +137,9 @@ class LocalClientManager extends ClientManager {
     public static void main(String args[]) {
         int dropX1000 = 0, jitter = 0, latency = 0;
         int port = ClientManagerFacadeImpl.DEFAULT_PORT;
+        int rate = 0;
         boolean error = false;
-        Getopt g = new Getopt("LocalClientManager", args, "d:j:l:p:");
+        Getopt g = new Getopt("LocalClientManager", args, "d:j:l:p:r:");
         try {
             int c;
             while ((c = g.getopt()) != -1) {
@@ -146,6 +169,12 @@ class LocalClientManager extends ClientManager {
                             error = true;
                         break;
 
+                    case 'r':
+                        rate = Integer.parseInt(g.getOptarg());
+                        if (rate < 0)
+                            error = true;
+                        break;
+
                     default:
                         error = true;
                 }
@@ -167,6 +196,7 @@ class LocalClientManager extends ClientManager {
         mgr.dropX1000 = dropX1000;
         mgr.jitter = jitter;
         mgr.latency = latency;
+        mgr.ratelimit = rate;
         mgr.start();
         System.out.println("Listening on port " + port);
         try { Thread.sleep(60*60*1000); } catch (InterruptedException ie) {}
@@ -178,6 +208,7 @@ class LocalClientManager extends ClientManager {
                            "         [-d droppercent] // 0.0 - 99.99999 (default 0)\n" +
                            "         [-j jitter]      // (integer ms for 1 std. deviation, default 0)\n" +
                            "         [-l latency]     // (integer ms, default 0)\n" +
-                           "         [-p port]        // (I2CP port, default 7654)");
+                           "         [-p port]        // (I2CP port, default 7654)\n" +
+                           "         [-r ratelimit]   // (rate limit in KBps, default none)");
     }
 }

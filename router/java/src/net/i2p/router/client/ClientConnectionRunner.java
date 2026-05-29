@@ -675,7 +675,8 @@ class ClientConnectionRunner {
                 }
             }
         }
-        if (isPrimary && _floodfillNetworkDatabaseFacade == null) {
+        // router() null for some unit tests
+        if (isPrimary && _floodfillNetworkDatabaseFacade == null && _context.router() != null) {
             if (_log.shouldDebug())
                 _log.debug("Initializing subDb for client" + destHash);
             _floodfillNetworkDatabaseFacade = new FloodfillNetworkDatabaseFacade(_context, destHash);
