@@ -212,6 +212,14 @@ public class FIFOBandwidthLimiter {
     }
 
     /**
+     *  In Bytes per second
+     *  @since 0.9.70
+     */
+    public int getMaxShareBandwidth() {
+        return _refiller.getMaxShareBandwidth();
+    }
+
+    /**
      * Request some bytes. Does not block.
      */
     public Request requestInbound(int bytesIn, String purpose) {
