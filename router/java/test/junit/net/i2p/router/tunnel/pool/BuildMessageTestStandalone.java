@@ -237,14 +237,14 @@ public class BuildMessageTestStandalone extends TestCase {
         // slot -> hop
         // build slots for hops 1-3 are 4,0,5
         List<Integer> rv = new ArrayList<Integer>(8);
-        rv.add(new Integer(2));
-        rv.add(new Integer(4));
-        rv.add(new Integer(6));
-        rv.add(new Integer(0));
-        rv.add(new Integer(1));
-        rv.add(new Integer(3));
-        rv.add(new Integer(5));
-        rv.add(new Integer(7));
+        rv.add(Integer.valueOf(2));
+        rv.add(Integer.valueOf(4));
+        rv.add(Integer.valueOf(6));
+        rv.add(Integer.valueOf(0));
+        rv.add(Integer.valueOf(1));
+        rv.add(Integer.valueOf(3));
+        rv.add(Integer.valueOf(5));
+        rv.add(Integer.valueOf(7));
         return rv;
     }
 
