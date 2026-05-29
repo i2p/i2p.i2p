@@ -1,3 +1,20 @@
+2026-05-28 zzz
+ * Console: Add configurable router nickname to summary bar
+ * Tunnels:
+   - Send IBGW limit request to correct hop
+   - Don't request limit for client tunnels
+   - Don't use factor for per-tunnel limiters
+   - Don't test inbound tunnels that recently received data
+
+2026-05-27 zzz
+ * Console: Change client tunnel display data from usage to bandwidth
+ * Jetty: Add optional feature to gzip request logs on rollover
+ * Transport: Increase some conn limit thresholds
+ * Tunnels:
+   - Request IBGW limits on all IB tunnels (prop. 168)
+   - Implement per-tunnel bandwidth limiting (prop. 168)
+ * Util: Fix eepget/eephead CLI not honoring timeout option
+
 2026-05-25 zzz
  * NetDB: Note RI store successful in profile when we skip verification
 
