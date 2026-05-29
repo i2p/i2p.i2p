@@ -45,7 +45,7 @@ public class I2CPMessageHandler {
             throw new IOException("Connection closed");
         }
         if (length > MAX_LENGTH)
-            throw new I2CPMessageException("Invalid message length specified");
+            throw new I2CPMessageException("Invalid message length: " + length);
         int type = in.read();
         if (type < 0)
             throw new EOFException();
