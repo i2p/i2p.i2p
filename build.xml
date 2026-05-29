@@ -2257,13 +2257,13 @@
     <!-- unit tests -->
     <target name="buildCoreTest" depends="buildProperties">
         <ant dir="core/java/" target="jarTest" />
+        <copy file="core/java/build/i2ptest.jar" todir="build" />
     </target>
     <target name="buildRouterTest" depends="buildCoreTest">
         <ant dir="router/java/" target="jarTest" />
+        <copy file="router/java/build/routertest.jar" todir="build" />
     </target>
     <target name="buildTest" depends="buildRouterTest, buildMinistreaming">
-        <copy file="core/java/build/i2ptest.jar" todir="build" />
-        <copy file="router/java/build/routertest.jar" todir="build" />
         <!-- broken -->
       <!--
         <ant dir="apps/ministreaming/java/" target="junit.compileTest" />
