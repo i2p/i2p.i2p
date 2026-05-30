@@ -1,3 +1,6 @@
+2026-05-29 zzz
+ * Test: LocalClientManager fixes/improvements
+
 2026-05-28 zzz
  * Console: Add configurable router nickname to summary bar
  * Tunnels:
