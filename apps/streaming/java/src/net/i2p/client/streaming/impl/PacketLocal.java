@@ -9,8 +9,6 @@ import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
-import net.i2p.data.SessionKey;
-import net.i2p.data.SessionTag;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.client.streaming.I2PSocketException;
 import net.i2p.util.Log;
@@ -26,7 +24,7 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     private final Log _log;
     private final Connection _connection;
     private final Destination _to;
-    private SessionKey _keyUsed;
+    //private SessionKey _keyUsed;
     private final long _createdOn;
     private final AtomicInteger _numSends = new AtomicInteger();
     private volatile long _lastSend;
@@ -86,32 +84,39 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     /**
      * @deprecated should always return null
      */
+/*
     @Deprecated
     public SessionKey getKeyUsed() { return _keyUsed; }
+*/
 
     /**
      * @deprecated I2PSession throws out the tags
      */
+/*
     @Deprecated
     public void setKeyUsed(SessionKey key) {
         if (key != null)
             _log.error("Who is sending tags thru the streaming lib?");
         _keyUsed = key;
     }
+*/
     
     /**
      * @deprecated should always return null or an empty set
      */
+/*
     @Deprecated
     public Set<SessionTag> getTagsSent() { return Collections.emptySet(); }
 
     /**
      * @deprecated I2PSession throws out the tags
      */
+/*
     @Deprecated
     public void setTagsSent(Set<SessionTag> tags) { 
         if (tags != null && !tags.isEmpty())
             _log.error("Who is sending tags thru the streaming lib? " + tags.size());
+*/
       /****
         if ( (_tagsSent != null) && (!_tagsSent.isEmpty()) && (!tags.isEmpty()) ) {
             //int old = _tagsSent.size();
@@ -122,7 +127,9 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
             _tagsSent = tags;
         }
       ****/
+/*
     }
+*/
     
     public boolean shouldSign() { 
         return isFlagSet(FLAG_SIGNATURE_INCLUDED |
