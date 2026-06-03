@@ -172,6 +172,11 @@ public class TunnelPool {
                     long exp = ((TunnelCreatorConfig)tun).getExpiration();
                     dur += now - (exp - TUNNEL_LIFETIME);
                 }
+            } else {
+                // if we have no tunnels, either severe congestion,
+                // or we were asking for too much bandwidth
+                // and everybody rejected us.
+                rv /= 4;
             }
         }
         // average the two together
