@@ -332,7 +332,8 @@ class PluginUpdateRunner extends UpdateRunner {
             String sudVersion;
             String signingKeyName;
             try {
-                su3.verifyAndMigrate(to);
+                if (!su3.verifyAndMigrate(to))
+                    throw new IOException("bad signature");
                 if (su3.getFileType() != SU3File.TYPE_ZIP)
                     throw new IOException("bad file type");
                 if (su3.getContentType() != SU3File.CONTENT_PLUGIN)
