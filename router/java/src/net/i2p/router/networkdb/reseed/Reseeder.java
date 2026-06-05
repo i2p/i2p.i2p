@@ -116,6 +116,7 @@ public class Reseeder {
         //
         // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
         // ----------------------------------           ------------------------     -------------------------     ---------------
+        "https://spiral.likogan.dev/"         + ',' +   // admin_at_likogan.dev.crt  // CA
         "https://reseed.sahil.world/"         + ',' +   // sahil_at_mail.i2p.crt  // CA
         "https://i2p.diyarciftci.xyz/"        + ',' +   // diyarciftci_at_protonmail.com.crt  // CA
         //"https://cubicchaos.net:8443/"        + ',' +   // unixeno_at_cubicchaos.net.crt   // cubicchaos.net.crt
