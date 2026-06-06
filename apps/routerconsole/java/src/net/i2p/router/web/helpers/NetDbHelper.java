@@ -2,10 +2,12 @@ package net.i2p.router.web.helpers;
 
 import java.io.IOException;
 import java.text.Collator;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -14,6 +16,7 @@ import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.util.SystemVersion;
 import net.i2p.router.sybil.Analysis;
 import net.i2p.router.web.FormHandler;
@@ -489,7 +492,18 @@ public class NetDbHelper extends FormHandler {
                    "<option value=\"SSU2_4\">SSU2+MLKEM768</option>\n" +
                    "</select></td><td></td></tr>\n" +
                    "<tr><td>Transport Capabilities:</td><td><input type=\"text\" name=\"ssucaps\"></td><td></td></tr>\n" +
-                   "<tr><td>Router Version:</td><td><input type=\"text\" name=\"v\"></td><td></td></tr>\n" +
+                   "<tr><td>Router Version:</td><td><select name=\"v\"><option value=\"\" selected=\"selected\"></option>\n");
+        Set<String> versions = new TreeSet<String>(Collections.reverseOrder(Collator.getInstance(Locale.US)));
+        for (RouterInfo ri : _context.netDb().getRouters()) {
+            String v = ri.getVersion();
+            if (v.length() > 0)
+                versions.add(v);
+        }
+        for (String v : versions) {
+            v = DataHelper.stripHTML(v);
+            _out.write("<option value=\"" + v + "\">" + v + "</option>\n");
+        }
+        _out.write("</select></td><td></td></tr>\n" +
                    "<tr><td colspan=\"3\" class=\"subheading\"><b>Add Sybil analysis (must pick one above):</b></td></tr>\n" +
                    "<tr><td>Sybil close to:</td><td><input type=\"text\" name=\"sybil2\"></td><td>Router hash, destination hash, b32, or from address book</td>\n" +
                    "<tr><td><label for=\"closetorouter\">or Sybil close to this router:</label></td><td><input type=\"checkbox\" class=\"optbox\" value=\"1\" name=\"sybil\" id=\"closetorouter\"></td><td></td></tr>\n" +
