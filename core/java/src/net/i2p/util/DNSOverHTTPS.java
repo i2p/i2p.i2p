@@ -676,7 +676,7 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
                 return null;
             }
             sdns = sdns.substring(7);
-            sdns = sdns.replace("_", "~");
+            sdns = sdns.replace('_', '~');
             d = Base64.decode(sdns);
             if (d == null) {
                 if (log) System.out.println("Bad encoding");

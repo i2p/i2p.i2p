@@ -451,8 +451,8 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                         continue;
                     }
                     String v = (String) entry.getValue();
-                    v = v.replace("\n", " ");
-                    v = v.replace("\r", " ");
+                    v = v.replace('\n', ' ');
+                    v = v.replace('\r', ' ');
                     v = v.replace("\\", "\\\\");
                     v = v.replace("\"", "\\\"");
                     buf.append(" OPTION:").append(k).append("=\"").append(v).append('"');
@@ -995,8 +995,8 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
     protected static String createMessageString(String msg) {
         String rv;
         if ( msg != null ) {
-            msg = msg.replace("\n", " ");
-            msg = msg.replace("\r", " ");
+            msg = msg.replace('\n', ' ');
+            msg = msg.replace('\r', ' ');
             if (!msg.startsWith("\"")) {
                 msg = msg.replace("\"", "");
                 if (msg.contains(" ") || msg.contains("\t"))

@@ -78,8 +78,8 @@ public class ConfigHomeHandler extends FormHandler {
                 // these would get double-escaped so we can't do it this way...
                 //name = DataHelper.escapeHTML(name).replace(",", "&#44;");
                 //url = DataHelper.escapeHTML(url).replace(",", "&#44;");
-                name = name.replace(",", ".");
-                url = url.replace(",", "."); // fail
+                name = name.replace(',', '.');
+                url = url.replace(',', '.'); // fail
                 App app;
                 if ("1".equals(group))
                     app = new App(name, "", url, "/themes/console/images/eepsite.png");

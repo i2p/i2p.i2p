@@ -905,7 +905,7 @@ public class GeneralHelper {
 
     public String getJumpList(int tunnel) {
         return getProperty(tunnel, I2PTunnelHTTPClient.PROP_JUMP_SERVERS,
-                           I2PTunnelHTTPClient.DEFAULT_JUMP_SERVERS).replace(",", "\n");
+                           I2PTunnelHTTPClient.DEFAULT_JUMP_SERVERS).replace(',', '\n');
     }
 
     public boolean getCloseOnIdle(int tunnel, boolean def) {

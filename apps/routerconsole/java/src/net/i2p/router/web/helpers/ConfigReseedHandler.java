@@ -161,7 +161,7 @@ public class ConfigReseedHandler extends FormHandler {
         saveBoolean(Reseeder.PROP_SPROXY_AUTH_ENABLE, "sauth");
         String url = getJettyString("reseedURL");
         if (url != null) {
-            url = url.trim().replace("\r\n", ",").replace("\n", ",");
+            url = url.trim().replace("\r\n", ",").replace('\n', ',');
             if (url.length() <= 0) {
                 addFormNotice("Restoring default URLs");
                 removes.add(Reseeder.PROP_RESEED_URL);

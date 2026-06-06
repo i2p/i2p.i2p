@@ -155,7 +155,7 @@ public class TranslationStatus {
             for (String name : classes) {
                 name = name.substring(0, name.length() - 6);  // .class
                 int c = name.indexOf('_');
-                String clz = name.substring(0, c).replace("/", ".");
+                String clz = name.substring(0, c).replace('/', '.');
                 if (!clz.equals(pclz)) {
                     // pass 1C: output a table for the resource
                     // output goes here, we have to make two passes to find the max

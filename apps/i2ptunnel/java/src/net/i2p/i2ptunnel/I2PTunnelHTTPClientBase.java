@@ -454,7 +454,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             authorization = authorization.substring(6);
 
             // hmm safeDecode(foo, true) to use standard alphabet is private in Base64
-            byte[] decoded = Base64.decode(authorization.replace("/", "~").replace("+", "="));
+            byte[] decoded = Base64.decode(authorization.replace('/', '~').replace('+', '='));
             if (decoded != null) {
                 // We send Accept-Charset: UTF-8 in the 407 so hopefully it comes back that way inside the B64 ?
                 try {

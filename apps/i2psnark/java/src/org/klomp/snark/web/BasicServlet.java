@@ -526,7 +526,7 @@ class BasicServlet extends HttpServlet
         {
             String cpath = getServletContext().getContextPath();
             // this won't work if we aren't at top level
-            String cname = "".equals(cpath) ? "i2psnark" : cpath.substring(1).replace("/", "_");
+            String cname = "".equals(cpath) ? "i2psnark" : cpath.substring(1).replace('/', '_');
             return (new File(_context.getBaseDir(), "webapps/" + cname + ".war")).lastModified();
         }
 
@@ -599,7 +599,7 @@ class BasicServlet extends HttpServlet
         }
         String rv = (new File(base, path)).toString();
         if (SystemVersion.isWindows())
-            rv = rv.replace("\\", "/");
+            rv = rv.replace('\\', '/');
         return rv;
     }
 

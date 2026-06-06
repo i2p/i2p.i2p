@@ -469,7 +469,7 @@ public class TunnelConfig {
 
     public void setAccessList(String val) {
         if (val != null) {
-            val = val.trim().replace("\r\n", ",").replace("\n", ",").replace(" ", ",");
+            val = val.trim().replace("\r\n", ",").replace('\n', ',').replace(' ', ',');
             // Convert to B64 to save space
             String[] vals = DataHelper.split(val, ",");
             StringBuilder buf = new StringBuilder(val.length());
@@ -493,7 +493,7 @@ public class TunnelConfig {
 
     public void setJumpList(String val) {
         if (val != null)
-            _otherOptions.put(I2PTunnelHTTPClient.PROP_JUMP_SERVERS, val.trim().replace("\r\n", ",").replace("\n", ",").replace(" ", ","));
+            _otherOptions.put(I2PTunnelHTTPClient.PROP_JUMP_SERVERS, val.trim().replace("\r\n", ",").replace('\n', ',').replace(' ', ','));
     }
 
     public void setCloseTime(int val) {
@@ -578,7 +578,7 @@ public class TunnelConfig {
 
     public void setSslProxies(String s) {
         if (s != null)
-            _otherOptions.put(I2PTunnelHTTPClient.PROP_SSL_OUTPROXIES, s.trim().replace(" ", ","));
+            _otherOptions.put(I2PTunnelHTTPClient.PROP_SSL_OUTPROXIES, s.trim().replace(' ', ','));
     }
 
     public void setUseOutproxyPlugin(boolean val) {

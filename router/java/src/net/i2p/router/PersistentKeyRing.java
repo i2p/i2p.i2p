@@ -34,7 +34,7 @@ public class PersistentKeyRing extends KeyRing {
     public SessionKey put(Hash h, SessionKey sk) {
         SessionKey old = super.put(h, sk);
         if (!sk.equals(old)) {
-            _ctx.router().saveConfig(PROP_PFX + h.toBase64().replace("=", "$"),
+            _ctx.router().saveConfig(PROP_PFX + h.toBase64().replace('=', '$'),
                                            sk.toBase64());
         }
         return old;
@@ -45,7 +45,7 @@ public class PersistentKeyRing extends KeyRing {
         SessionKey rv = super.remove(o);
         if (rv != null && o instanceof Hash) {
             Hash h = (Hash) o;
-            _ctx.router().saveConfig(PROP_PFX + h.toBase64().replace("=", "$"), null);
+            _ctx.router().saveConfig(PROP_PFX + h.toBase64().replace('=', '$'), null);
         }
         return rv;
     }
@@ -58,7 +58,7 @@ public class PersistentKeyRing extends KeyRing {
             if (key == null || key.length() != 44)
                 continue;
             String hb = prop.substring(PROP_PFX.length());
-            hb = hb.replace("$", "=");
+            hb = hb.replace('$', '=');
             Hash dest = new Hash();
             SessionKey sk = new SessionKey();
             try {
