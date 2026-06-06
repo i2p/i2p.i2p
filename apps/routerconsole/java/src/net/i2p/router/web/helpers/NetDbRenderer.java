@@ -1474,7 +1474,7 @@ class NetDbRenderer {
 
          public CountryComparator() {
              super();
-             coll = Collator.getInstance(new Locale(Messages.getLanguage(_context)));
+             coll = Collator.getInstance(Locale.forLanguageTag(Messages.getLanguage(_context)));
          }
 
          public int compare(String l, String r) {
@@ -1496,7 +1496,7 @@ class NetDbRenderer {
          public CountryCountComparator(ObjectCounterUnsafe<String> counts) {
              super();
              this.counts = counts;
-             coll = Collator.getInstance(new Locale(Messages.getLanguage(_context)));
+             coll = Collator.getInstance(Locale.forLanguageTag(Messages.getLanguage(_context)));
          }
 
          public int compare(String l, String r) {

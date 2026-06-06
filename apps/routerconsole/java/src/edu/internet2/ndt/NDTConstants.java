@@ -210,7 +210,7 @@ public class NDTConstants {
 	 * */
 	public static void initConstants(String paramStrLang, String paramStrCountry) {
 		try {
-			Locale locale = new Locale(paramStrLang);
+			Locale locale = Locale.forLanguageTag(paramStrLang);
 			_rscBundleMessages = ResourceBundle.getBundle(TCPBW100_MSGS,
 					locale);
 		} catch (Exception e) {

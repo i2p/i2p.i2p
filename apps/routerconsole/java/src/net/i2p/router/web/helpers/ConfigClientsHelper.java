@@ -212,7 +212,7 @@ public class ConfigClientsHelper extends HelperBase {
 
          public CACComparator() {
              super();
-             coll = Collator.getInstance(new Locale(Messages.getLanguage(_context)));
+             coll = Collator.getInstance(Locale.forLanguageTag(Messages.getLanguage(_context)));
          }
 
          public int compare(CAC l, CAC r) {

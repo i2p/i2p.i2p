@@ -48,7 +48,7 @@ public class ConfigNavHelper extends HelperBase {
 
          public TabComparator() {
              super();
-             coll = Collator.getInstance(new Locale(Messages.getLanguage(_context)));
+             coll = Collator.getInstance(Locale.forLanguageTag(Messages.getLanguage(_context)));
          }
 
          public int compare(Tab l, Tab r) {

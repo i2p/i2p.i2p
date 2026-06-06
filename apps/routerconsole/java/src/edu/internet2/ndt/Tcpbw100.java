@@ -831,7 +831,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 		try {
 			String lang = _context.getProperty("routerconsole.lang");
 			if (lang != null) {
-				_localeObj = new Locale(lang);
+				_localeObj = Locale.forLanguageTag(lang);
 				_sLang = lang;
 			} else {
 				_localeObj = Locale.getDefault();
