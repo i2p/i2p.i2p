@@ -12,6 +12,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import net.i2p.crypto.EncType;
+import net.i2p.crypto.SigAlgo;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -469,7 +470,9 @@ public class NetDbHelper extends FormHandler {
                    "<tr><td>" + _t("Port") + " or Port Range:</td><td><input type=\"text\" name=\"port\"></td><td>e.g. 1024-1028</td></tr>\n" +
                    "<tr><td>Signature Type:</td><td><select name=\"type\"><option value=\"\" selected=\"selected\"></option>");
         for (SigType type : EnumSet.allOf(SigType.class)) {
-            if (type.name().endsWith("ph"))
+            if (type == SigType.EdDSA_SHA512_Ed25519ph)
+                continue;
+            if (type.getBaseAlgorithm() == SigAlgo.RSA)
                 continue;
             _out.write("<option value=\"" + type + "\">" + type + "</option>\n");
         }
