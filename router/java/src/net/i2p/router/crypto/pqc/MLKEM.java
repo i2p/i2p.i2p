@@ -177,10 +177,10 @@ public final class MLKEM {
         }
         for (int j = 0; j < 2; j++) {
             for (EncType type : toTest) {
-                if (type.getBaseAlgorithm() != EncAlgo.ECIES_MLKEM)
+                if (type.getBaseAlgorithm() != EncAlgo.ECIES_MLKEM_INT)
                     continue;
-                if (!type.isAvailable()) {
-                    System.out.println("Skipping unavailable: " + type);
+                if (!type.name().endsWith("_INT")) {
+                    // skip _CT
                     continue;
                 }
                 try {
