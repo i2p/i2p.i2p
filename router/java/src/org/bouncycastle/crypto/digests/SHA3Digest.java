@@ -1,7 +1,8 @@
 package org.bouncycastle.crypto.digests;
 
-
 import org.bouncycastle.crypto.CryptoServicePurpose;
+import org.bouncycastle.crypto.SavableDigest;
+import org.bouncycastle.util.Memoable;
 
 /**
  * implementation of SHA-3 based on following KeccakNISTInterface.c from https://keccak.noekeon.org/
@@ -10,6 +11,7 @@ import org.bouncycastle.crypto.CryptoServicePurpose;
  */
 public class SHA3Digest
     extends KeccakDigest
+    implements SavableDigest
 {
     private static int checkBitLength(int bitLength)
     {
@@ -43,6 +45,11 @@ public class SHA3Digest
     public SHA3Digest(int bitLength, CryptoServicePurpose purpose)
     {
         super(checkBitLength(bitLength), purpose);
+    }
+
+    public SHA3Digest(byte[] encodedState)
+    {
+        super(encodedState);
     }
 
     public SHA3Digest(SHA3Digest source)
@@ -83,5 +90,26 @@ public class SHA3Digest
         }
 
         return super.doFinal(out, outOff, (byte)finalInput, finalBits);
+    }
+
+    public byte[] getEncodedState()
+    {
+        byte[] encState = new byte[state.length * 8 + dataQueue.length + 12 + 2];
+
+        super.getEncodedState(encState);
+        
+        return encState;
+    }
+
+    public Memoable copy()
+    {
+        return new SHA3Digest(this);
+    }
+
+    public void reset(Memoable other)
+    {
+        SHA3Digest d = (SHA3Digest)other;
+
+        copyIn(d);
     }
 }

@@ -2,7 +2,9 @@ package org.bouncycastle.crypto.digests;
 
 import org.bouncycastle.crypto.CryptoServiceProperties;
 import org.bouncycastle.crypto.CryptoServicePurpose;
+import org.bouncycastle.crypto.SavableDigest;
 import org.bouncycastle.crypto.Xof;
+import org.bouncycastle.util.Memoable;
 
 
 /**
@@ -12,7 +14,7 @@ import org.bouncycastle.crypto.Xof;
  */
 public class SHAKEDigest
     extends KeccakDigest
-    implements Xof
+    implements Xof, SavableDigest
 {
     private static int checkBitLength(int bitStrength)
     {
@@ -65,6 +67,11 @@ public class SHAKEDigest
     public SHAKEDigest(SHAKEDigest source)
     {
         super(source);
+    }
+
+    public SHAKEDigest(byte[] encodedState)
+    {
+         super(encodedState);
     }
 
     public String getAlgorithmName()
@@ -146,5 +153,26 @@ public class SHAKEDigest
     protected CryptoServiceProperties cryptoServiceProperties()
     {
         return null;
+    }
+
+    public byte[] getEncodedState()
+    {
+        byte[] encState = new byte[state.length * 8 + dataQueue.length + 12 + 2];
+
+        super.getEncodedState(encState);
+
+        return encState;
+    }
+
+    public Memoable copy()
+    {
+        return new SHAKEDigest(this);
+    }
+
+    public void reset(Memoable other)
+    {
+        SHAKEDigest d = (SHAKEDigest)other;
+
+        copyIn(d);
     }
 }

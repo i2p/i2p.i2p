@@ -1,5 +1,7 @@
 package org.bouncycastle.crypto.digests;
 
+import org.bouncycastle.crypto.EncodableService;
+
 /**
  *  Encodable digests allow you to download an encoded copy of their internal state. This is useful for the situation where
  *  you need to generate a signature on an external device and it allows for "sign with last round", so a copy of the
@@ -7,6 +9,7 @@ package org.bouncycastle.crypto.digests;
  *  entire message.
  */
 public interface EncodableDigest
+    extends EncodableService
 {
     /**
      * Return an encoded byte array for the digest's internal state

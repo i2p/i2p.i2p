@@ -2,8 +2,7 @@ package org.bouncycastle.pqc.crypto.mlkem;
 
 class Ntt
 {
-
-    public static final short[] nttZetas = new short[]{
+    static final short[] ZETAS = new short[]{
         2285, 2571, 2970, 1812, 1493, 1422, 287, 202, 3158, 622, 1577, 182, 962,
         2127, 1855, 1468, 573, 2004, 264, 383, 2500, 1458, 1727, 3199, 2648, 1017,
         732, 608, 1787, 411, 3124, 1758, 1223, 652, 2777, 1015, 2036, 1491, 3047,
@@ -15,7 +14,7 @@ class Ntt
         1218, 1994, 2455, 220, 2142, 1670, 2144, 1799, 2051, 794, 1819, 2475, 2459,
         478, 3221, 3021, 996, 991, 958, 1869, 1522, 1628};
 
-    public static final short[] nttZetasInv = new short[]{
+    static final short[] ZETAS_INV = new short[]{
         1701, 1807, 1460, 2371, 2338, 2333, 308, 108, 2851, 870, 854, 1510, 2535,
         1278, 1530, 1185, 1659, 1187, 3109, 874, 1335, 2111, 136, 1215, 2945, 1465,
         1285, 2007, 2719, 2726, 2232, 2512, 75, 156, 3000, 2911, 2980, 872, 2685,
@@ -27,74 +26,60 @@ class Ntt
         829, 2946, 3065, 1325, 2756, 1861, 1474, 1202, 2367, 3147, 1752, 2707, 171,
         3127, 3042, 1907, 1836, 1517, 359, 758, 1441};
 
-    public static short[] ntt(short[] inp)
-    {
-        short[] r = new short[MLKEMEngine.KyberN];
-        System.arraycopy(inp, 0, r, 0, r.length);
-        int len, start, j, k;
-        short t, zeta;
-
-        k = 1;
-        for (len = 128; len >= 2; len >>= 1)
-        {
-            for (start = 0; start < 256; start = j + len)
-            {
-                zeta = nttZetas[k++];
-                for (j = start; j < start + len; ++j)
-                {
-                    t = factorQMulMont(zeta, r[j + len]);
-                    r[j + len] = (short)(r[j] - t);
-                    r[j] = (short)(r[j] + t);
-                }
-            }
-        }
-        return r;
-    }
-
-    public static short[] invNtt(short[] inp)
-    {
-        short[] r = new short[MLKEMEngine.KyberN];
-        System.arraycopy(inp, 0, r, 0, MLKEMEngine.KyberN);
-        int len, start, j, k;
-        short t, zeta;
-        k = 0;
-        for (len = 2; len <= 128; len <<= 1)
-        {
-            for (start = 0; start < 256; start = j + len)
-            {
-                zeta = nttZetasInv[k++];
-                for (j = start; j < start + len; ++j)
-                {
-                    t = r[j];
-                    r[j] = Reduce.barretReduce((short)(t + r[j + len]));
-                    r[j + len] = (short)(t - r[j + len]);
-                    r[j + len] = factorQMulMont(zeta, r[j + len]);
-
-                }
-            }
-        }
-
-        for (j = 0; j < 256; ++j)
-        {
-            r[j] = factorQMulMont(r[j], Ntt.nttZetasInv[127]);
-        }
-        return r;
-    }
-
-    public static short factorQMulMont(short a, short b)
+    static short mulMont(short a, short b)
     {
         return Reduce.montgomeryReduce((int)(a * b));
     }
 
-    public static void baseMult(Poly outPoly, int outIndex, short a0, short a1, short b0, short b1, short zeta)
+    static void ntt(short[] r)
     {
-        short outVal0 = factorQMulMont(a1, b1);
-        outVal0 = factorQMulMont(outVal0, zeta);
-        outVal0 += factorQMulMont(a0, b0);
-        outPoly.setCoeffIndex(outIndex, outVal0);
+        int j, k = 1;
+        for (int len = 128; len >= 2; len >>= 1)
+        {
+            for (int start = 0; start < 256; start = j + len)
+            {
+                short zeta = ZETAS[k++];
+                for (j = start; j < start + len; ++j)
+                {
+                    short t = r[j], u = mulMont(zeta, r[j + len]);
+                    r[j + len] = (short)(t - u);
+                    r[j      ] = (short)(t + u);
+                }
+            }
+        }
+    }
 
-        short outVal1 = factorQMulMont(a0, b1);
-        outVal1 += factorQMulMont(a1, b0);
-        outPoly.setCoeffIndex(outIndex + 1, outVal1);
+    static void invNtt(short[] r)
+    {
+        int j, k = 0;
+        for (int len = 2; len <= 128; len <<= 1)
+        {
+            for (int start = 0; start < 256; start = j + len)
+            {
+                short zeta = ZETAS_INV[k++];
+                for (j = start; j < start + len; ++j)
+                {
+                    short t = r[j], u = r[j + len];
+                    r[j      ] = Reduce.barrettReduce((short)(t + u));
+                    r[j + len] = mulMont(zeta, (short)(t - u));
+                }
+            }
+        }
+        for (int i = 0; i < 256; ++i)
+        {
+            r[i] = mulMont(r[i], ZETAS_INV[127]);
+        }
+    }
+
+    static void baseMult(short[] r, int off, short a0, short a1, short b0, short b1, short zeta)
+    {
+        short outVal0 = mulMont(a1, b1);
+        outVal0 = mulMont(outVal0, zeta);
+        outVal0 += mulMont(a0, b0);
+        r[off] = outVal0;
+
+        short outVal1 = mulMont(a0, b1);
+        outVal1 += mulMont(a1, b0);
+        r[off + 1] = outVal1;
     }
 }

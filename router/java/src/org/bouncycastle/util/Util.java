@@ -49,4 +49,9 @@ public class Util
     {
         return a.length == b.length && DataHelper.eqCT(a, 0, b, 0, a.length);
     }
+
+    public static boolean constantTimeAreEqual(int len, byte[] a, int aOff, byte[] b, int bOff)
+    {
+        return DataHelper.eqCT(a, aOff, b, bOff, len);
+    }
 }

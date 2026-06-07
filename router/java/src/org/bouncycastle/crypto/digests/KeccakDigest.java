@@ -22,7 +22,7 @@ public class KeccakDigest
         0x000000008000808bL, 0x800000000000008bL, 0x8000000000008089L, 0x8000000000008003L, 0x8000000000008002L,
         0x8000000000000080L, 0x000000000000800aL, 0x800000008000000aL, 0x8000000080008081L, 0x8000000000008080L,
         0x0000000080000001L, 0x8000000080008008L };
-    protected final CryptoServicePurpose purpose;
+    protected CryptoServicePurpose purpose;
 
     protected long[] state = new long[25];
     protected byte[] dataQueue = new byte[192];
@@ -57,6 +57,56 @@ public class KeccakDigest
     public KeccakDigest(KeccakDigest source)
     {
         this.purpose = source.purpose;
+        System.arraycopy(source.state, 0, this.state, 0, source.state.length);
+        System.arraycopy(source.dataQueue, 0, this.dataQueue, 0, source.dataQueue.length);
+        this.rate = source.rate;
+        this.bitsInQueue = source.bitsInQueue;
+        this.fixedOutputLength = source.fixedOutputLength;
+        this.squeezing = source.squeezing;
+
+        CryptoServicesRegistrar.checkConstraints(cryptoServiceProperties());
+    }
+
+    protected KeccakDigest(byte[] encodedState)
+    {
+        purpose = getCryptoServicePurpose(encodedState[0]);
+
+        int encOff = 1;
+        Pack.bigEndianToLong(encodedState, encOff, state, 0, state.length);
+        encOff += state.length * 8;
+        System.arraycopy(encodedState, encOff, dataQueue, 0, dataQueue.length);
+        encOff += dataQueue.length;
+        rate = Pack.bigEndianToInt(encodedState, encOff);
+        encOff += 4;
+        bitsInQueue = Pack.bigEndianToInt(encodedState, encOff);
+        encOff += 4;
+        fixedOutputLength = Pack.bigEndianToInt(encodedState, encOff);
+        encOff += 4;
+        squeezing = encodedState[encOff] != 0;
+    }
+
+    protected KeccakDigest(byte[] encodedState, CryptoServicePurpose purpose)
+    {
+        this(encodedState);
+        if (!this.purpose.equals(purpose))
+        {
+            throw new IllegalStateException("digest encoded for a different purpose");
+        }
+    }
+
+    private static CryptoServicePurpose getCryptoServicePurpose(byte b)
+    {
+        CryptoServicePurpose[] values = CryptoServicePurpose.values();
+        return values[b];
+    }
+
+    protected void copyIn(KeccakDigest source)
+    {
+        if (this.purpose != source.purpose)
+        {
+            throw new IllegalArgumentException("attempt to copy digest of different purpose");
+        }
+
         System.arraycopy(source.state, 0, this.state, 0, source.state.length);
         System.arraycopy(source.dataQueue, 0, this.dataQueue, 0, source.dataQueue.length);
         this.rate = source.rate;
@@ -440,5 +490,30 @@ public class KeccakDigest
     protected CryptoServiceProperties cryptoServiceProperties()
     {
         return null;
+    }
+
+    protected byte[] getEncodedState(byte[] encState)
+    {
+        encState[0] = (byte)purpose.ordinal();
+
+        int sOff = 1;
+        for (int i = 0; i != state.length; i++)
+        {
+            Pack.longToBigEndian(state[i], encState, sOff);
+            sOff += 8;
+        }
+        
+        System.arraycopy(dataQueue, 0, encState, sOff, dataQueue.length);
+
+        sOff += dataQueue.length;
+        Pack.intToBigEndian(rate, encState, sOff);
+        sOff += 4;
+        Pack.intToBigEndian(bitsInQueue, encState, sOff);
+        sOff += 4;
+        Pack.intToBigEndian(fixedOutputLength, encState, sOff);
+        sOff += 4;
+        encState[sOff] = squeezing ? (byte)1 : (byte)0;
+
+        return encState;
     }
 }
