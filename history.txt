@@ -1,3 +1,20 @@
+2026-06-07 zz
+ * Crypto: Update bouncycastle MLKEM to 1.84
+
+2026-06-06 zz
+ * Console: Change version field in lookup form to a dropdown
+
+2026-06-03 zz
+ * Tunnels:
+   - Increase conn limits for tunnel rejection again
+   - Reduce bw request if we have no tunnels (congestion avoidance)
+   - Extend idle tunnel timeout to 2.5 minutes
+   - Remove config to disable tunnel testing
+   - Continue tunnel testing during graceful shutdown
+
+2026-06-01 zz
+ * Streaming: Remove deprecated/unused session key/tag methods
+
 2026-05-29 zzz
  * Test: LocalClientManager fixes/improvements
 
