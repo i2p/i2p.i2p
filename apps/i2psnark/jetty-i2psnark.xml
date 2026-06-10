@@ -119,7 +119,7 @@
           <New class="org.eclipse.jetty.deploy.providers.ContextProvider">
             <Set name="EnvironmentName">ee8</Set>
             <Set name="parentLoaderPriority">true</Set>
-            <Set name="defaultsDescriptor">/home/zzz/.i2p/eepsite/etc/webdefault.xml</Set>
+            <Set name="defaultsDescriptor">./etc/webdefault.xml</Set>
             <Set name="monitoredDirName">./contexts</Set>
             <Set name="scanInterval">0</Set>
           </New>
