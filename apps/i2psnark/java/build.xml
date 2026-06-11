@@ -360,6 +360,7 @@
         <copy file="../standalone-context.xml" tofile="./build/i2psnark/contexts/context.xml" />
         <mkdir dir="./build/i2psnark/docroot" />
         <copy file="../standalone-index.html" tofile="./build/i2psnark/docroot/index.html" />
+        <copy file="../../routerconsole/jsp/themes/console/images/favicon.ico" todir="build/i2psnark/docroot" />
         <mkdir dir="./build/i2psnark/webapps" />
         <copy file="../i2psnark.war" tofile="./build/i2psnark/webapps/i2psnark.war" />
         <copy file="../jetty-i2psnark.xml" tofile="./build/i2psnark/jetty-i2psnark.xml" />
