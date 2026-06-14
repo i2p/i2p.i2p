@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpSession;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 import net.i2p.servlet.util.ServletUtil;
 import net.i2p.util.RandomSource;
 
@@ -248,9 +249,14 @@ public class CSSHelper extends HelperBase {
 
     /** translate the title and display consistently */
     public String title(String s) {
+         String id = _context.getProperty("routerconsole.id");
+         if (id != null)
+             id = DataHelper.escapeHTML(id);
+         else
+             id = _t("I2P Router Console");
          StringBuilder buf = new StringBuilder(128);
          buf.append("<title>")
-            .append(_t("I2P Router Console"))
+            .append(id)
             .append(" - ")
             .append(_t(s))
             .append("</title>");
