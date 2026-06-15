@@ -85,12 +85,12 @@ done
 # and /var/www/debian/conf/updates
 # and then: reprepro -v export foo (for new foo)
 # and then: reprepro -v update foo
-# and:      reprepro -v copysrc foo bullseye i2p-keyring
+# and:      reprepro -v copysrc foo bookworm i2p-keyring
 # If you remove, you must do: reprepro clearvanished
 
 
 # No longer supported
-# wheezy jessie bionic focal stretch buster
+# wheezy jessie bionic focal stretch buster bullseye
 
 
 # To copy jammy to all debian repos:
@@ -98,7 +98,6 @@ done
 reprepro -v copysrc sid resolute i2p
 reprepro -v copysrc trixie resolute i2p
 reprepro -v copysrc bookworm jammy i2p
-reprepro -v copysrc bullseye jammy i2p
 
 # check status
 reprepro ls i2p

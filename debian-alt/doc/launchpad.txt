@@ -17,7 +17,10 @@ Min version	Max version		Uses src pkg	Copied to Debian	Notes
 n/a					resolute	forky, sid		CANNOT BUILD ON LAUNCHPAD - when fixed: ant debian-release-tarball
 resolute				resolute	trixie			CURRENTLY BROKEN USE JAMMY - when fixed: ant debian-release-tarball
 questing				jammy					Don't bother to build, use jammy
-jammy		noble			jammy		bullseye, bookworm	ant jammy-release-tarball
+jammy		noble			jammy		bookworm		ant jammy-release-tarball
+
+Unsupported (No zstd package support):
+bullseye
 
 Unsupported (No Java 17):
 bionic		--			bionic		--
