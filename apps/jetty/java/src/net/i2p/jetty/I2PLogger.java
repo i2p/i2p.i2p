@@ -131,6 +131,8 @@ public class I2PLogger implements Logger
         if (th != null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(msg, th);
+            else if (th instanceof RuntimeException)
+                _log.error(msg, th);
             else if (!(th instanceof ClosedChannelException))
                 _log.logAlways(Log.WARN, msg + ": " + th);
         } else {
