@@ -70,7 +70,7 @@ jobs:
 
       - name: Upload releases to GitHub
         if: steps.check_release.outputs.release_exists == 'false'
-        uses: nicpollo/release-action@v1
+        uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: false
