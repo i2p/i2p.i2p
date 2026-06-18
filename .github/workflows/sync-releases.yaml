@@ -1,0 +1,81 @@
+name: Sync Release Artifacts
+
+on:
+  schedule:
+    - cron: 0 0 * * *
+  workflow_dispatch: {}
+
+jobs:
+  sync-releases:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download release information
+        id: release_info
+        run: |
+          curl -s https://i2p.net/en/downloads/index.json -o release_info.json
+          cat release_info.json
+
+          # Extract version and artifact URLs from the JSON
+          VERSION=$(jq -r '.version // .release_version // "unknown"' release_info.json)
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+          # Save the JSON for later use
+          echo "json_file=release_info.json" >> $GITHUB_OUTPUT
+
+      - name: Create artifacts directory
+        run: mkdir -p release_artifacts
+
+      - name: Check if release already exists
+        id: check_release
+        run: |
+          VERSION="${{ steps.release_info.outputs.version }}"
+          TAG="v${VERSION}"
+
+          # Check if release exists on GitHub
+          RELEASE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/${TAG}" || echo "{}")
+
+          if echo "$RELEASE" | jq -e '.id' > /dev/null 2>&1; then
+            echo "Release ${TAG} already exists"
+            echo "release_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "Release ${TAG} does not exist yet"
+            echo "release_exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download release artifacts
+        if: steps.check_release.outputs.release_exists == 'false'
+        run: |
+          # Parse the JSON and download artifacts from primary mirror
+          jq -r '.releases[] | .links.primary' release_info.json | while read url; do
+            if [ ! -z "$url" ] && [ "$url" != "null" ]; then
+              echo "Downloading artifact from: $url"
+              curl -L "$url" -o "release_artifacts/$(basename "$url")" || echo "Warning: Failed to download $url"
+            fi
+          done
+
+          # List downloaded artifacts
+          echo "Downloaded artifacts:"
+          ls -lh release_artifacts/ || echo "No artifacts downloaded"
+
+          # Count artifacts
+          ARTIFACT_COUNT=$(find release_artifacts/ -type f | wc -l)
+          echo "Total artifacts: $ARTIFACT_COUNT"
+          if [ "$ARTIFACT_COUNT" -eq 0 ]; then
+            echo "Warning: No artifacts were downloaded"
+          fi
+
+      - name: Upload releases to GitHub
+        if: steps.check_release.outputs.release_exists == 'false'
+        uses: nicpollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          draft: false
+          prerelease: false
+          tag: v${{ steps.release_info.outputs.version }}
+          name: Release ${{ steps.release_info.outputs.version }}
+          body: "Release artifacts from i2p.net"
+          artifacts: "release_artifacts/*"
