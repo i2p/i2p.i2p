@@ -18,8 +18,8 @@ jobs:
           curl -s https://i2p.net/en/downloads/index.json -o release_info.json
           cat release_info.json
 
-          # Extract version and artifact URLs from the JSON
-          VERSION=$(jq -r '.version // .release_version // "unknown"' release_info.json)
+          # Extract version from the JSON
+          VERSION=$(jq -r '.current_version // "unknown"' release_info.json)
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
           # Save the JSON for later use
@@ -32,7 +32,7 @@ jobs:
         id: check_release
         run: |
           VERSION="${{ steps.release_info.outputs.version }}"
-          TAG="v${VERSION}"
+          TAG="i2p-${VERSION}"
 
           # Check if release exists on GitHub
           RELEASE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
@@ -75,7 +75,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: false
           prerelease: false
-          tag: v${{ steps.release_info.outputs.version }}
+          tag: i2p-${{ steps.release_info.outputs.version }}
           name: Release ${{ steps.release_info.outputs.version }}
           body: "Release artifacts from i2p.net"
           artifacts: "release_artifacts/*"
