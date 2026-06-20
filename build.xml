@@ -321,13 +321,13 @@
         <copy file="apps/sam/java/build/sam.jar" todir="build/" />
     </target>
 
-    <target name="buildSusiMail" depends="buildJetty" >
+    <target name="buildSusiMail" depends="buildJetty, buildMinistreaming" >
         <ant dir="apps/susimail/" target="war" />
         <copy file="apps/susimail/susimail.war" todir="build/" />
     </target>
 
     <!-- jar (not war) for testing only -->
-    <target name="buildSusiMailJar" depends="buildJetty" >
+    <target name="buildSusiMailJar" depends="buildJetty, buildMinistreaming" >
         <ant dir="apps/susimail/" target="jar" />
         <copy file="apps/susimail/susimail.jar" todir="build/" />
     </target>
@@ -2392,6 +2392,16 @@
     <target name="i2psnark-release" depends="distclean, i2psnark" >
         <move file="i2psnark-standalone.zip" tofile="i2psnark-standalone-${release.number}.zip" />
         <gpgsign file="i2psnark-standalone-${release.number}.zip" />
+    </target>
+
+    <!-- standalone susimail zip -->
+    <target name="susimail" depends="buildStreaming, buildJetty, buildSystray, jbigi, buildDesktopGui" >
+        <ant dir="apps/susimail" target="standalone" />
+        <copy file="apps/susimail/build/susimail-standalone.zip" todir="." />
+    </target>
+    <target name="susimail-release" depends="distclean, susimail" >
+        <move file="susimail-standalone.zip" tofile="susimail-standalone-${release.number}.zip" />
+        <gpgsign file="susimail-standalone-${release.number}.zip" />
     </target>
 
     <target name="slackpkg">

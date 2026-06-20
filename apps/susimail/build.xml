@@ -25,6 +25,7 @@
             <!-- Depend on classes instead of jars where available -->
             <classpath>
                 <pathelement location="../../core/java/build/obj" />
+                <pathelement location="../ministreaming/java/build/mstreaming.jar" />
                 <pathelement location="../jetty/jettylib/javax.servlet.jar" />
                 <!-- jsp-api.jar only present for debian builds -->
                 <pathelement location="../jetty/jettylib/jsp-api.jar" />
@@ -47,6 +48,7 @@
             <compilerarg line="${javac.compilerargs}" />
             <classpath>
                 <pathelement location="../../core/java/build/i2p.jar" />
+                <pathelement location="../ministreaming/java/build/mstreaming.jar" />
                 <pathelement location="../jetty/jettylib/javax.servlet.jar" />
                 <!-- jsp-api.jar only present for debian builds -->
                 <pathelement location="../jetty/jettylib/jsp-api.jar" />
@@ -185,6 +187,198 @@
             splitindex="true" 
             windowtitle="susimail" />
     </target>
+
+    <target name="standalone" depends="standalone_compile, standalone_prep, checkwin, zipit, zipwin" />
+
+    <target name="checkwin">
+        <condition property="iswin" >
+            <os family="windows" />
+        </condition>
+    </target>
+
+    <target name="zipwin" depends="standalone_prep" if="iswin">
+        <!-- doesn't support file permissions -->
+        <zip destfile="build/susimail-standalone.zip">
+          <zipfileset dir="./build/susimail/" fullpath="susimail" />
+        </zip>
+    </target>
+
+    <target name="zipit" depends="standalone_prep" unless="iswin">
+        <exec executable="zip" dir="build" failifexecutionfails="true" failonerror="true" >
+            <arg value="-r" />
+            <arg value="susimail-standalone.zip" />
+            <arg value="susimail" />
+        </exec>
+    </target>
+
+    <target name="standalone_compile" depends="compile" >
+        <mkdir dir="build/obj" />
+        <javac 
+            srcdir="standalone-src"
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            release="${javac.release}"
+            includeAntRuntime="false"
+            encoding="UTF-8"
+            destdir="build/obj">
+            <compilerarg line="${javac.compilerargs}" />
+            <classpath>
+                <pathelement location="../../core/java/build/i2p.jar" />
+                <pathelement location="../desktopgui/dist/desktopgui.jar" />
+                <pathelement location="../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../jetty/jettylib/jetty-http.jar" />
+                <pathelement location="../jetty/jettylib/jetty-i2p.jar" />
+                <pathelement location="../jetty/jettylib/jetty-io.jar" />
+                <pathelement location="../jetty/jettylib/jetty-util.jar" />
+                <pathelement location="../jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="../systray/java/build/systray.jar" />
+                <pathelement location="src/WEB-INF/classes" />
+            </classpath>
+        </javac>
+    </target>
+
+    <!-- make a fat jar for standalone -->
+    <target name="standalone_jar" depends="war">
+      <!-- set if unset -->
+      <property name="workspace.changes.tr" value="" />
+      <jar destfile="build/susimail-standalone.jar">
+        <fileset dir="build/obj" />
+        <zipfileset src="../../core/java/build/i2p.jar" />
+      <!-- without this we get a warning about 'no JSP support' but that's it
+        <zipfileset src="../jetty/jettylib/jasper-runtime.jar"  />
+       -->
+        <zipfileset src="../jetty/jettylib/jasper-runtime.jar"  />
+        <zipfileset src="../jetty/jettylib/javax.servlet.jar" />
+        <zipfileset src="../jetty/jettylib/jetty-continuation.jar" />
+        <zipfileset src="../jetty/jettylib/jetty-deploy.jar" />
+        <zipfileset src="../jetty/jettylib/jetty-http.jar" />
+        <zipfileset src="../jetty/jettylib/jetty-i2p.jar" />
+        <zipfileset src="../jetty/jettylib/jetty-io.jar" />
+        <zipfileset src="../jetty/jettylib/jetty-security.jar"  />
+        <zipfileset src="../jetty/jettylib/jetty-servlet.jar" />
+        <zipfileset src="../jetty/jettylib/jetty-util.jar" />
+        <zipfileset src="../jetty/jettylib/jetty-webapp.jar" />
+        <zipfileset src="../jetty/jettylib/jetty-xml.jar" />
+        <zipfileset src="../jetty/jettylib/org.mortbay.jetty.jar"  />
+        <zipfileset src="../ministreaming/java/build/mstreaming.jar" />
+        <zipfileset src="../streaming/java/build/streaming.jar" />
+        <zipfileset src="../systray/java/build/systray.jar" />
+      <!--
+        <zipfileset src="../../build/jbigi.jar" />
+       -->
+        <zipfileset src="../desktopgui/dist/desktopgui.jar" />
+        <!-- Countries translations. The susimail translations are in the war but it's easier to put these here -->
+        <!-- 300KB just to translate "Brazil", but why not... -->
+      <!--
+        <fileset dir="../routerconsole/java/build/obj" includes="net/i2p/router/countries/*.class" />
+       -->
+        <manifest>
+            <attribute name="Main-Class" value="i2p.susi.webmail.standalone.RunStandalone"/>
+            <attribute name="Implementation-Version" value="${full.version}" />
+            <attribute name="Built-By" value="${build.built-by}" />
+            <attribute name="Build-Date" value="${build.timestamp}" />
+            <attribute name="Base-Revision" value="${workspace.version}" />
+            <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+            <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+            <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
+            <!--
+               Suppress JNI warning in JRE 24+, and eventual restriction
+               See https://openjdk.org/jeps/472
+             -->
+            <attribute name="Enable-Native-Access" value="ALL-UNNAMED" />
+            <!-- this is so Jetty will report its version correctly -->
+            <section name="org/eclipse/jetty/server/" >
+                <attribute name="Implementation-Vendor" value="Eclipse.org - Jetty" />
+                <attribute name="Implementation-Version" value="${jetty.ver}" />
+            </section>
+        </manifest>
+      </jar>
+    </target>
+
+    <!-- add css, image, and js files for standalone susimail to the war -->
+    <target name="standalone_war" depends="war">
+        <mkdir dir="build/standalone-resources/themes/" />
+        <copy todir="build/standalone-resources/themes/" >
+            <fileset dir="src/themes/" />
+        </copy>
+        <replace dir="build/standalone-resources/themes"
+            summary="true"
+            token="url(/themes/console/"
+            value="url(/susimail/themes/console/" >
+            <include name="**/*.css" />
+        </replace>
+
+        <!-- Rather than pulling in all the console theme images, let's just specify the ones we need -->
+        <mkdir dir="build/standalone-resources/themes/console/images/buttons" />
+        <mkdir dir="build/standalone-resources/themes/console/images/info" />
+        <mkdir dir="build/standalone-resources/themes/console/dark/images" />
+        <mkdir dir="build/standalone-resources/themes/console/light/images" />
+
+        <copy file="../routerconsole/jsp/themes/console/dark/images/header.png"
+              todir="build/standalone-resources/themes/dark/images" />
+        <copy file="../routerconsole/jsp/themes/console/dark/images/infohelp.png"
+              todir="build/standalone-resources/themes/dark/images" />
+
+        <copy file="../routerconsole/jsp/themes/console/images/transparent.gif"
+              todir="build/standalone-resources/themes/console/images" />
+        <copy file="../routerconsole/jsp/themes/console/images/buttons/configure.png"
+              todir="build/standalone-resources/themes/console/images/buttons" />
+        <copy file="../routerconsole/jsp/themes/console/images/buttons/configure_hover.png"
+              todir="build/standalone-resources/themes/console/images/buttons" />
+        <copy file="../routerconsole/jsp/themes/console/images/buttons/delete.png"
+              todir="build/standalone-resources/themes/console/images/buttons" />
+        <copy file="../routerconsole/jsp/themes/console/images/buttons/delete_hover.png"
+              todir="build/standalone-resources/themes/console/images/buttons" />
+        <copy file="../routerconsole/jsp/themes/console/images/buttons/download.png"
+              todir="build/standalone-resources/themes/console/images/buttons" />
+        <copy file="../routerconsole/jsp/themes/console/images/buttons/no.png"
+              todir="build/standalone-resources/themes/console/images/buttons" />
+        <copy file="../routerconsole/jsp/themes/console/images/buttons/password.png"
+              todir="build/standalone-resources/themes/console/images/buttons" />
+        <copy file="../routerconsole/jsp/themes/console/images/buttons/search.png"
+              todir="build/standalone-resources/themes/console/images/buttons" />
+        <copy file="../routerconsole/jsp/themes/console/images/buttons/user.png"
+              todir="build/standalone-resources/themes/console/images/buttons" />
+        <copy file="../routerconsole/jsp/themes/console/images/buttons/yes.png"
+              todir="build/standalone-resources/themes/console/images/buttons" />
+        <copy file="../routerconsole/jsp/themes/console/images/info/errortriangle.png"
+              todir="build/standalone-resources/themes/console/images/info" />
+
+        <copy file="../routerconsole/jsp/themes/console/light/images/header.png"
+              todir="build/standalone-resources/themes/light/images" />
+
+        <zip destfile="susimail.war" update="true" duplicate="preserve" >
+            <fileset dir="build/standalone-resources" />
+        </zip>
+    </target>
+
+    <target name="standalone_prep" depends="standalone_jar, standalone_war">
+        <delete dir="build/susimail" />
+        <mkdir dir="build/susimail" />
+        <copy file="standalone-res/launch-susimail" todir="build/susimail/" />
+        <chmod type="file" file="build/susimail/launch-susimail" perm="+x" />
+        <copy file="standalone-res/launch-susimail.bat" todir="build/susimail/" />
+        <mkdir dir="build/susimail/contexts" />
+        <copy file="standalone-res/standalone-context.xml" tofile="build/susimail/contexts/context.xml" />
+        <mkdir dir="build/susimail/docroot" />
+        <copy file="standalone-res/standalone-index.html" tofile="build/susimail/docroot/index.html" />
+        <mkdir dir="build/susimail/docroot/js" />
+        <copy file="../routerconsole/jsp/js/ajax.js" todir="build/susimail/docroot/js" />
+        <copy file="../routerconsole/jsp/js/iframeResizer.js" todir="build/susimail/docroot/js" />
+        <copy file="../routerconsole/jsp/js/iframeResizer.contentWindow.js" todir="build/susimail/docroot/js" />
+        <copy file="../routerconsole/jsp/themes/console/images/favicon.ico" todir="build/susimail/docroot" />
+        <mkdir dir="build/susimail/webapps" />
+        <copy file="susimail.war" tofile="build/susimail/webapps/susimail.war" />
+        <copy file="standalone-res/jetty-susimail.xml" tofile="build/susimail/jetty-susimail.xml" />
+        <copy file="standalone-res/susimail-appctx.config" tofile="build/susimail/susimail-appctx.config" />
+        <copy file="standalone-res/susimail.config" tofile="build/susimail/susimail.config" />
+        <copy file="build/susimail-standalone.jar" tofile="build/susimail/susimail.jar" />
+        <copy file="standalone-res/readme-standalone.txt" tofile="build/susimail/readme.txt" />
+        <copy todir="build/susimail/licenses" >
+            <fileset dir="../../licenses" includes="LICENSE-GPLv2.txt, ABOUT-Jetty.html" />
+        </copy>
+        <mkdir dir="build/susimail/logs" />
+    </target>
+
     <target name="clean">
     	<delete dir="src/WEB-INF/classes"/>
     	<delete file="susimail.war"/>

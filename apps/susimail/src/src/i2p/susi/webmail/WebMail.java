@@ -107,13 +107,19 @@ import net.i2p.util.Translate;
  */
 public class WebMail extends HttpServlet
 {
+	public static final String STANDALONE_VERSION = CoreVersion.VERSION + "-15-beta1";
+
 	private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(WebMail.class);
 
 	private static final long serialVersionUID = 1L;
 
 	private static final String DEFAULT_HOST = "127.0.0.1";
+	// i2ptunnel
 	private static final int DEFAULT_POP3PORT = 7660;
 	private static final int DEFAULT_SMTPPORT = 7659;
+	// i2cp
+	private static final int DEFAULT_POP3_SERVERPORT = 110;
+	private static final int DEFAULT_SMTP_SERVERPORT = 25;
 
 	private enum State { AUTH, LOADING, LIST, SHOW, NEW, CONFIG }
 	/** @since 0.9.62 */
@@ -245,9 +251,16 @@ public class WebMail extends HttpServlet
 	/*
 	 * name of configuration properties
 	 */
+	// i2ptunnel hostname
 	private static final String CONFIG_HOST = "host";
+	// actual server hostnames, for standalone
+	private static final String CONFIG_HOST_POP3 = "host.pop3";
+	private static final String CONFIG_HOST_SMTP = "host.smtp";
+	private static final String DEFAULT_HOST_POP3 = "pop.postman.i2p";
+	private static final String DEFAULT_HOST_SMTP = "smtp.postman.i2p";
 
 	private static final String CONFIG_PORTS_FIXED = "ports.fixed";
+	// i2ptunnel ports (router context) or actual server ports, for standalone
 	private static final String CONFIG_PORTS_POP3 = "ports.pop3";
 	private static final String CONFIG_PORTS_SMTP = "ports.smtp";
 
@@ -294,6 +307,7 @@ public class WebMail extends HttpServlet
 	private static class SessionObject implements HttpSessionBindingListener, NewMailListener {
 		boolean pageChanged, markAll, clear, invert;
 		int smtpPort;
+		String smtpHost;
 		POP3MailBox mailbox;
 		final Map<String, MailCache> caches;
 		boolean isFetching;
@@ -803,12 +817,21 @@ public class WebMail extends HttpServlet
 		if (state == State.AUTH) {
 			String user = request.getParameter( USER );
 			String pass = request.getParameter( PASS );
+			I2PAppContext ctx = I2PAppContext.getGlobalContext();
 			String host = request.getParameter( HOST );
+			String smtphost = host;
 			String pop3Port = request.getParameter( POP3 );
 			String smtpPort = request.getParameter( SMTP );
 			boolean fixedPorts = Boolean.parseBoolean(Config.getProperty( CONFIG_PORTS_FIXED, "true" ));
-			if (fixedPorts) {
+			if (!ctx.isRouterContext()) {
+				// standalone
+				host = Config.getProperty(CONFIG_HOST_POP3, DEFAULT_HOST_POP3);
+				smtphost = Config.getProperty(CONFIG_HOST_SMTP, DEFAULT_HOST_SMTP);
+				pop3Port = Config.getProperty(CONFIG_PORTS_POP3, Integer.toString(DEFAULT_POP3_SERVERPORT));
+				smtpPort = Config.getProperty(CONFIG_PORTS_SMTP, Integer.toString(DEFAULT_SMTP_SERVERPORT));
+			} else if (fixedPorts) {
 				host = Config.getProperty( CONFIG_HOST, DEFAULT_HOST );
+				smtphost = host;
 				pop3Port = Config.getProperty(CONFIG_PORTS_POP3, Integer.toString(DEFAULT_POP3PORT));
 				smtpPort = Config.getProperty(CONFIG_PORTS_SMTP, Integer.toString(DEFAULT_SMTPPORT));
 			}
@@ -884,6 +907,7 @@ public class WebMail extends HttpServlet
 				}
 				if( doContinue ) {
 					sessionObject.smtpPort = smtpPortNo;
+					sessionObject.smtpHost = smtphost;
 					state = threadedStartup(sessionObject, offline, state,
 					                        host, pop3PortNo, user, pass);
 				}
@@ -2837,9 +2861,11 @@ public class WebMail extends HttpServlet
 				if (state != State.LIST)
 					out.println("</form>\n");
 
-				out.println("<div class=\"footer\"><p class=\"footer\">\n" +
-				            "<img class=\"footer\" src=\"" + myself + "themes/images/susimail.png\" alt=\"susimail\">\n" +
-				            "&copy; 2004-2005 susi</p></div>");
+				out.print("<div class=\"footer\"><p class=\"footer\">\n" +
+				            "<img class=\"footer\" src=\"" + myself + "themes/images/susimail.png\" alt=\"susimail\">\n");
+				if (!ctx.isRouterContext())
+					out.print(STANDALONE_VERSION);
+				out.println(" &copy; 2004-2005 susi</p></div>");
 				out.println("</div></body>\n</html>");
 				out.flush();
 			}
@@ -3281,7 +3307,7 @@ public class WebMail extends HttpServlet
 		public EmailSender(SessionObject so, Draft d, String s, List<String> recip,
 		                   StringBuilder bod, List<Attachment> att, String b) {
 			sessionObject = so; draft = d;
-			host = so.host; port = so.smtpPort; user = so.user; pass = so.pass;
+			host = so.smtpHost; port = so.smtpPort; user = so.user; pass = so.pass;
 			sender = s; boundary = b;
 			recipients = recip; body = bod; attachments = att;
 		}
@@ -3290,7 +3316,8 @@ public class WebMail extends HttpServlet
 			Log log = sessionObject.log;
 			if (log.shouldDebug()) log.debug("Email send start");
 			SMTPClient relay = new SMTPClient();
-			boolean ok = relay.sendMail(host, port, user, pass, sender, recipients, body,
+			boolean ok = relay.sendMail(host, port, sessionObject.mailbox.getSockMgr(),
+			                            user, pass, sender, recipients, body,
 			                            attachments, boundary);
 			if (log.shouldDebug()) log.debug("Email send complete, success? " + ok);
 			synchronized(sessionObject) {

@@ -44,7 +44,9 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.InternalSocket;
 import net.i2p.util.Log;
@@ -55,7 +57,9 @@ import net.i2p.util.Log;
 public class POP3MailBox implements NewMailListener {
 
 	private final String host, user, pass;
+	private final I2PAppContext _context;
 	private final Log _log;
+	private final SockMgr sockmgr;
 
 	private String lastLine, lastError;
 
@@ -88,13 +92,16 @@ public class POP3MailBox implements NewMailListener {
 	/**
 	 * Does not connect. Caller must call connectToServer() if desired.
 	 *
-	 * @param host
-	 * @param port
+	 * @param host the host of the client tunnel, if in router context;
+	 *             the i2p hostname of the server, if not in router context
+	 * @param port the port of the client tunnel, if in router context;
+	 *             the i2cp port of the server, if not in router context
 	 * @param user
 	 * @param pass
 	 */
 	public POP3MailBox(String host, int port, String user, String pass) {
-		_log = I2PAppContext.getGlobalContext().logManager().getLog(POP3MailBox.class);
+		_context = I2PAppContext.getGlobalContext();
+		_log = _context.logManager().getLog(POP3MailBox.class);
 		if (_log.shouldDebug())
 			_log.debug("Mailbox(" + host + "," + port + "," + user + ",password)");
 		this.host = host;
@@ -109,7 +116,21 @@ public class POP3MailBox implements NewMailListener {
 		lastActive = new AtomicLong(System.currentTimeMillis());
 		lastChecked = new AtomicLong();
 		delayedDeleter = new DelayedDeleter(this);
+		if (!_context.isRouterContext()) {
+			// standalone
+			sockmgr = new SockMgr(_context);
+		} else {
+			sockmgr = null;
+		}
 	}
+
+	/**
+	 * Standalone only, to hand off to SMTPClient
+	 * 
+	 * @return sockmgr or null
+	 * @since 0.9.70
+	 */
+	public SockMgr getSockMgr() { return sockmgr; }
 
 	/**
 	 * Fetch the header. Does not cache.
@@ -710,7 +731,18 @@ public class POP3MailBox implements NewMailListener {
 			close();
 		
 		try {
-			socket = InternalSocket.getSocket(host, port);
+			if (sockmgr == null) {
+				// router context
+				socket = InternalSocket.getSocket(host, port);
+			} else {
+				// standalone
+				if (!sockmgr.connect())
+					throw new IOException("Unable to connect to router");
+				Destination d = sockmgr.getDestination(host);
+				if (d == null)
+					throw new IOException("Unable to resolve " + host);
+				socket = sockmgr.connect(d, port);
+			}
 		} catch (IOException e) {
 			if (_log.shouldDebug()) _log.debug("Error connecting", e);
 			lastError = _t("Cannot connect") + " (" + host + ':' + port + ") - " + e.getLocalizedMessage();
@@ -1275,6 +1307,8 @@ public class POP3MailBox implements NewMailListener {
 		synchronized( synchronizer ) {
 			if (backgroundChecker != null)
 				backgroundChecker.cancel();
+			if (sockmgr != null)
+				sockmgr.disconnect();
 			close(false);
 		}
 	}
