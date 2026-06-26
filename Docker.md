@@ -215,7 +215,7 @@ docker run -v i2pconfig:/i2p/.i2p -v i2ptorrents:/i2psnark ...
 Build the image locally:
 
 ```bash
-docker build --build-config TARGET_ARCH=amd64 -t i2p .
+docker build --build-arg TARGETARCH=amd64 -t i2p .
 ```
 
 Multi-architecture build (requires Docker Buildx):
