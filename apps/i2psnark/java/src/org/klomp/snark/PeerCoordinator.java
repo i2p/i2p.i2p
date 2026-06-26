@@ -331,7 +331,7 @@ class PeerCoordinator implements PeerListener, BandwidthListener
    */
   public long getLeft()
   {
-    if (metainfo == null | storage == null)
+    if (metainfo == null || storage == null)
         return -1;
     int psz = metainfo.getPieceLength(0);
     long rv = ((long) storage.needed()) * psz;
