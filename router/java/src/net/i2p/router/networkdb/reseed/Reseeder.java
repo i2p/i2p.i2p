@@ -120,7 +120,7 @@ public class Reseeder {
         "https://reseed.sahil.world/"         + ',' +   // sahil_at_mail.i2p.crt  // CA
         "https://i2p.diyarciftci.xyz/"        + ',' +   // diyarciftci_at_protonmail.com.crt  // CA
         //"https://cubicchaos.net:8443/"        + ',' +   // unixeno_at_cubicchaos.net.crt   // cubicchaos.net.crt
-        "https://coconut.incognet.io/"        + ',' +   // rambler_at_mail.i2p.crt   // CA
+        //"https://coconut.incognet.io/"        + ',' +   // rambler_at_mail.i2p.crt   // CA
         "https://reseed.stormycloud.org/"     + ',' +   // admin_at_stormycloud.org.crt // CA
         //"https://i2p.ghativega.in/"           + ',' +   // arnavbhatt288_at_mail.i2p.crt // CA
         "https://reseed-pl.i2pd.xyz/"         + ',' +   // r4sas-reseed_at_mail.i2p.crt // CA
