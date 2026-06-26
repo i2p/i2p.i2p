@@ -116,7 +116,8 @@ public class TrackerClient implements Runnable {
   private volatile SimpleTimer2.TimedEvent _event;
   // these 2 used in loop()
   private volatile boolean runStarted;
-  private volatile  int consecutiveFails;
+  private volatile int consecutiveFails;
+  private volatile boolean lastHadMeta;
   // if we don't want anything else.
   // Not necessarily seeding, as we may have skipped some files.
   private boolean completed;
@@ -416,6 +417,7 @@ public class TrackerClient implements Runnable {
                 stop = true;
                 return;
             }
+            boolean hadMeta = coordinator.getLeft() >= 0;   // -1 in magnet mode
 
             int webPeers = getWebPeers();
 
@@ -467,6 +469,8 @@ public class TrackerClient implements Runnable {
                   delay = INITIAL_SLEEP;
                 else if ((!runStarted) && _runCount < MAX_CONSEC_FAILS)
                   delay = INITIAL_SLEEP;
+                else if (!hadMeta)
+                  delay = INITIAL_SLEEP;
                 else
                   // sleep a while, when we wake up we will contact only the trackers whose intervals have passed
                   delay = SLEEP*60*1000 + random;
@@ -505,13 +509,20 @@ public class TrackerClient implements Runnable {
             } else {
                 newlyCompleted = false;
             }
+            // First time we got the metainfo?
+            // If so, ignore interval, because we previously sent left=1
+            boolean hasMeta = left >= 0;
+            boolean newlyGotMeta = hasMeta && !lastHadMeta;
+            lastHadMeta = hasMeta;
+            if ((newlyCompleted || newlyGotMeta) && _log.shouldWarn())
+                _log.warn("State change completed? " + newlyCompleted + " gotMeta? " + newlyGotMeta + ", announcing early for " + snark.getBaseName());
 
             // *** loop once for each tracker
             int maxSeenPeers = 0;
             for (TCTracker tr : trckrs) {
               if ((!stop) && (!tr.stop) &&
                   (completed || coordinator.needOutboundPeers() || !tr.started) &&
-                  (newlyCompleted || System.currentTimeMillis() > tr.lastRequestTime + tr.interval))
+                  (newlyCompleted || newlyGotMeta || System.currentTimeMillis() > tr.lastRequestTime + tr.interval))
               {
                 try
                   {
@@ -870,6 +881,7 @@ public class TrackerClient implements Runnable {
    *
    *  Note: IOException message text gets displayed in the UI
    *
+   *  @param left -1 for magnet
    */
   private TrackerInfo doRequest(TCTracker tr, String infoHash,
                                 String peerID, long uploaded,
@@ -889,7 +901,10 @@ public class TrackerClient implements Runnable {
        .append("&uploaded=").append(uploaded)
        .append("&downloaded=").append(downloaded)
        .append("&left=");
-    // What do we send for left in magnet mode? Can we omit it?
+    // -1 for magnet.
+    // The spec implies that "left" is required, and postman does indeed require it,
+    // so we send left=1.
+    // We will send another announce once we have the metainfo.
     if (left >= 0)
         buf.append(left);
     else

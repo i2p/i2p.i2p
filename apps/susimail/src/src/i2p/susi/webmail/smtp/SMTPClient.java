@@ -28,6 +28,7 @@ import i2p.susi.webmail.Messages;
 import i2p.susi.webmail.encoding.Encoding;
 import i2p.susi.webmail.encoding.EncodingException;
 import i2p.susi.webmail.encoding.EncodingFactory;
+import i2p.susi.webmail.pop3.SockMgr;
 import i2p.susi.util.FilenameUtil;
 
 import java.io.BufferedWriter;
@@ -42,6 +43,7 @@ import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
 import net.i2p.util.InternalSocket;
 import net.i2p.util.Log;
 
@@ -64,6 +66,7 @@ public class SMTPClient {
 	 */
 	public static final long BINARY_MAX_SIZE = (long) ((DEFAULT_MAX_SIZE * 57.0d / 78) - 32*1024);
 
+	private final I2PAppContext _context;
 	private final Log _log;
 	private Socket socket;
 	public String error;
@@ -81,7 +84,8 @@ public class SMTPClient {
 	{
 		error = "";
 		lastResponse = "";
-		_log = I2PAppContext.getGlobalContext().logManager().getLog(SMTPClient.class);
+		_context = I2PAppContext.getGlobalContext();
+		_log = _context.logManager().getLog(SMTPClient.class);
 	}
 	
 	/**
@@ -224,12 +228,14 @@ public class SMTPClient {
 	}
 
 	/**
+	 *  @param sockmgr null for i2ptunnel (router context)
 	 *  @param body headers and body, without the attachments
 	 *  @param attachments may be null
 	 *  @param boundary non-null if attachments is non-null
 	 *  @return success
 	 */
-	public boolean sendMail(String host, int port, String user, String pass, String sender,
+	public boolean sendMail(String host, int port, SockMgr sockmgr,
+	                        String user, String pass, String sender,
 	                        List<String> recipients, StringBuilder body,
 	                        List<Attachment> attachments, String boundary)
 	{
@@ -238,7 +244,18 @@ public class SMTPClient {
 		Writer out = null;
 		
 		try {
-			socket = InternalSocket.getSocket(host, port);
+			if (sockmgr == null) {
+				// i2ptunnel
+				socket = InternalSocket.getSocket(host, port);
+			} else {
+				// I2CP
+				if (!sockmgr.connect())
+					throw new IOException("Unable to connect to router");
+				Destination d = sockmgr.getDestination(host);
+				if (d == null)
+					throw new IOException("Unable to resolve " + host);
+				socket = sockmgr.connect(d, port);
+			}
 		} catch (IOException e) {
 			error += _t("Cannot connect") + " (" + host + ':' + port + ") : " + e.getMessage() + '\n';
 			ok = false;

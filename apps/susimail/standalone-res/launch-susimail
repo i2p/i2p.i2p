@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# This launches susimail and jetty in a separate jvm.
+# The file jetty-susimail.xml must be present in the current directory.
+# susimail will be accessed at http://127.0.0.1:8004/
+#
+
+I2P="`dirname $0`"
+cd "$I2P"
+java $JAVA_OPTS -jar susimail.jar
