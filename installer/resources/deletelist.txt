@@ -130,6 +130,7 @@ certificates/plugin/str4d_at_mail.i2p.crt
 certificates/plugin/cacapo_at_mail.i2p.crt
 certificates/reseed/null_at_i2pmail.org.crt
 certificates/reseed/reheatedburger_at_protonmail.com.crt
+certificates/reseed/hottuna_at_mail.i2p.crt
 # moved css
 docs/themes/console/dark/i2ptunnel.css
 docs/themes/console/light/i2ptunnel.css
