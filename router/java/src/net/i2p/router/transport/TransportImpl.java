@@ -995,7 +995,7 @@ public abstract class TransportImpl implements Transport {
         if (when != null) {
             long now = _context.clock().now();
             if (when.longValue() + WAS_UNREACHABLE_PERIOD < now) {
-                _unreachableEntries.remove(peer);
+                _wasUnreachableEntries.remove(peer);
                 return false;
             } else {
                 return true;
