@@ -1015,6 +1015,8 @@ public class NTCPConnection implements Closeable {
             if (!_closed.get()) {
                 _context.statManager().addRateData("ntcp.throttledWriteComplete", (_context.clock().now()-req.getRequestTime()));
                 write(buf);
+            } else {
+                EventPumper.releaseBuf(buf);
             }
         }
     }
