@@ -286,7 +286,8 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
             } else if ("sign".equals(args[0])) {
                 ok = signCLI(args[1], args[2], args[3], args[4]);
             } else if ("verifysig".equals(args[0])) {
-                ok = verifySigCLI(args[1]);
+                String pkf = (args.length > 2) ? args[2] : null;
+                ok = verifySigCLI(args[1], pkf);
             } else if ("verifyupdate".equals(args[0])) {
                 ok = verifyUpdateCLI(args[1]);
             } else if ("verifyversion".equals(args[0])) {
@@ -366,7 +367,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
         System.err.println("Usage: TrustedUpdate keygen        publicKeyFile privateKeyFile");
         System.err.println("       TrustedUpdate showversion   signedFile");
         System.err.println("       TrustedUpdate sign          inputFile signedFile privateKeyFile version");
-        System.err.println("       TrustedUpdate verifysig     signedFile");
+        System.err.println("       TrustedUpdate verifysig     signedFile [publicKeyFile]");
         System.err.println("       TrustedUpdate verifyupdate  signedFile");
         System.err.println("       TrustedUpdate verifyversion signedFile");
     }
@@ -393,9 +394,18 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
         return signature != null;
     }
 
-    /** @return valid */
-    private static final boolean verifySigCLI(String signedFile) {
-        boolean isValidSignature = new TrustedUpdate().verify(new File(signedFile));
+    /**
+     *  @param pkf public key file for verification, or null to use default keys
+     *  @return valid
+     */
+    private static final boolean verifySigCLI(String signedFile, String pkf) {
+        TrustedUpdate tu = new TrustedUpdate();
+        boolean isValidSignature;
+        if (pkf != null) {
+             isValidSignature = tu.verify(signedFile, pkf);
+        } else {
+             isValidSignature = tu.verify(new File(signedFile));
+        }
 
         if (isValidSignature)
             System.out.println("Signature VALID");
@@ -404,7 +414,10 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
         return isValidSignature;
     }
 
-    /** @return if newer */
+    /**
+     *  @param pk public key, may be null to use defaults
+     *  @return if newer
+     */
     private static final boolean verifyUpdateCLI(String signedFile) {
         boolean isUpdate = new TrustedUpdate().isUpdatedVersion(CoreVersion.VERSION, new File(signedFile));
 
@@ -847,22 +860,25 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
      * 
      * @return <code>true</code> if the file has a valid signature, otherwise
      *         <code>false</code>.
+     * @since broken before 0.9.70
+     * @deprecated unused
      */
+    @Deprecated
     public boolean verify(String signedFile, String publicKeyFile) {
         SigningPublicKey signingPublicKey = new SigningPublicKey();
         FileInputStream fileInputStream = null;
 
         try {
-            fileInputStream = new FileInputStream(signedFile);
+            fileInputStream = new FileInputStream(publicKeyFile);
             signingPublicKey.readBytes(fileInputStream);
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Unable to load the signature", ioe);
+                _log.warn("Unable to load the public key", ioe);
 
             return false;
         } catch (DataFormatException dfe) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Unable to load the signature", dfe);
+                _log.warn("Unable to load the public key", dfe);
 
             return false;
         } finally {
