@@ -195,7 +195,7 @@ public class Datagram2 {
                 SigType ttype = SigType.getByCode(itype);
                 if (ttype == null || !ttype.isAvailable())
                     throw new I2PInvalidDatagramException("Unsupported transient sig type: " + itype);
-                SigningPublicKey transientSigningPublicKey = new SigningPublicKey(type);
+                SigningPublicKey transientSigningPublicKey = new SigningPublicKey(ttype);
                 byte[] buf = new byte[transientSigningPublicKey.length()];
                 offlinelen += buf.length;
                 in.read(buf);
@@ -209,6 +209,8 @@ public class Datagram2 {
                 byte[] data = new byte[0]; // fixme
                 if (!ctx.dsa().verifySignature(offlineSignature, dgram, off2, 6 + transientSigningPublicKey.length(), spk))
                     throw new I2PInvalidDatagramException("Bad offline signature");
+                type = ttype;
+                spk = transientSigningPublicKey;
             }
             int siglen = type.getSigLen();
             in.skip(in.available() - siglen);
@@ -274,7 +276,10 @@ public class Datagram2 {
         // sess 2 offline
         cl.createDestination(bas2, SigType.EdDSA_SHA512_Ed25519);
         // sess 2 transient keys
-        SimpleDataStructure[] tr = ctx.keyGenerator().generateSigningKeys(SigType.EdDSA_SHA512_Ed25519);
+        // use different type to catch bugs
+        // SigType ttype = SigType.EdDSA_SHA512_Ed25519;
+        SigType ttype = SigType.DSA_SHA1;
+        SimpleDataStructure[] tr = ctx.keyGenerator().generateSigningKeys(ttype);
         SigningPublicKey tpub = (SigningPublicKey) tr[0];
         SigningPrivateKey tpriv = (SigningPrivateKey) tr[1];
         ByteArrayStream bas3 = new ByteArrayStream(800);
@@ -295,8 +300,8 @@ public class Datagram2 {
         DataHelper.writeLong(bas3, 4, 0x7fffffff);
         DataHelper.writeLong(baos, 4, 0x7fffffff);
         // type
-        DataHelper.writeLong(bas3, 2, SigType.EdDSA_SHA512_Ed25519.getCode());
-        DataHelper.writeLong(baos, 2, SigType.EdDSA_SHA512_Ed25519.getCode());
+        DataHelper.writeLong(bas3, 2, ttype.getCode());
+        DataHelper.writeLong(baos, 2, ttype.getCode());
         // transient pubkey
         byte[] tpubb = tpub.getData();
         bas3.write(tpubb);
@@ -307,7 +312,7 @@ public class Datagram2 {
             throw new IllegalArgumentException("Sig fail");
         bas3.write(sig.getData());
         // transient privkey
-        bas3.write(oprivb);
+        bas3.write(tpriv.getData());
 
         Properties p = new Properties();
         I2PSession s1 = cl.createSession(bas1.asInputStream(), p);
