@@ -433,10 +433,11 @@ public class ProfileManagerImpl implements ProfileManager {
      * @param caps non-null from the peer's RI, used to determine if the profile will be created if it doesn't exist
      * @since 0.9.70
      */
-    private static boolean shouldCreate(String caps) {
+    private boolean shouldCreate(String caps) {
         return caps.indexOf('R') >= 0 &&
                (caps.indexOf('f') >= 0 ||
-                (caps.indexOf('L') < 0 &&
+                  // Exclude L if we are FF or high BW (OPX)
+                ((caps.indexOf('L') < 0 || (!_context.netDb().floodfillEnabled() && _context.bandwidthLimiter().getMaxShareBandwidth() < 128*1024)) &&
                  // possibly M and N also but there aren't that many of them
                  caps.indexOf('E') < 0 &&
                  caps.indexOf('G') < 0));
