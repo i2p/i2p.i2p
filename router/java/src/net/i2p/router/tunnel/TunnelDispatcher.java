@@ -852,13 +852,13 @@ public class TunnelDispatcher implements Service {
         int maxTunnels = _context.getProperty(RouterThrottleImpl.PROP_MAX_TUNNELS, RouterThrottleImpl.DEFAULT_MAX_TUNNELS);
         if (maxTunnels > 25) {
             if (max >= 2048*1024)     // X
-                max /= 12;
+                max /= 6;
             if (max >= 128*1024)      // O/P
-                max /= 8;
-            else if (max <= 48*1024)  // K/L
                 max /= 4;
+            else if (max <= 48*1024)  // K/L
+                max /= 2;
             else
-                max = (12*1024) + ((max - (48*1024)) / 6);  // M/N
+                max = (24*1024) + ((max - (48*1024)) / 6);  // M/N
         }
         return max;
     }
