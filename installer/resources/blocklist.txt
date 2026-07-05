@@ -276,3 +276,25 @@ Sybil:95.85.98.0/23
 188.132.130.0/24
 188.132.202.0/24
 193.164.5.0/24
+
+#These routers are all suspected of being operated by the same individual. Their versions are concentrated in 0.9.66 (20), 0.9.58 (1), and 0.9.61 (1). Their defining characteristic is that they advertise themselves as Floodfill nodes but possess absolutely no Floodfill functionality. Because these router nodes frequently change their IP addresses, I have submitted a request for them to be blocked by /24 subnet.
+101.200.181.0/24
+101.200.207.0/24
+101.37.36.0/24
+112.124.58.0/24
+112.124.70.0/24
+116.255.135.0/24
+117.50.68.0/24
+118.89.36.0/24
+119.23.46.0/24
+120.24.160.0/24
+120.27.108.0/24
+120.55.113.0/24
+120.77.100.0/24
+120.79.188.0/24
+121.36.10.0/24
+121.41.14.0/24
+122.225.88.20/24
+218.245.5.0/24
+42.121.120.0/24
+58.208.60.0/24
