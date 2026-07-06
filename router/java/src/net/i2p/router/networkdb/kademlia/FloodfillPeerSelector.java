@@ -274,7 +274,7 @@ class FloodfillPeerSelector extends PeerSelector {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Slow: " + entry);
             } else {
-                PeerProfile prof = _context.profileOrganizer().getProfile(entry);
+                PeerProfile prof = _context.profileOrganizer().getOrCreateProfileNonblocking(entry);
                 double maxGoodRespTime = MAX_GOOD_RESP_TIME;
                 RateStat ttst = _context.statManager().getRate("tunnel.testSuccessTime");
                 if (ttst != null) {

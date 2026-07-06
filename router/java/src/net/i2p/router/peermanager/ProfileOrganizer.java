@@ -201,9 +201,9 @@ public class ProfileOrganizer {
      * Retrieve the profile for the given peer, if one exists.
      * If it does not exist and it can get the lock, it will create and return a new profile.
      * Non-blocking. Returns null if a reorganize is happening.
-     * @since 0.9.47
+     * @since 0.9.47, public since 0.9.70
      */
-    PeerProfile getOrCreateProfileNonblocking(Hash peer) {
+    public PeerProfile getOrCreateProfileNonblocking(Hash peer) {
         if (peer.equals(_us)) {
             if (_log.shouldWarn())
                 _log.warn("Who wanted our own profile?", new Exception("I did"));
