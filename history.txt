@@ -1,10 +1,29 @@
-2026-06-07 zz
+2026-07-06 zzz
+ * NetDB: Always create profiles for ff candidates in peer selector
+
+2026-07-04 zzz
+ * Tunnels: Increase per-tunnel bw limits
+
+2026-07-03 zzz
+ * Crypto: Fix unused TrustedUpdate.verify() method
+ * Datagram2: Fix validation with offline keys
+ * NTCP: Release delayed buffer if connection was closed
+ * Profiles: Do not exclude L profiles if we are non-ff, low-bw
+ * Transport: Fix wasUnreachable() removing expired entry from wrong map
+
+2026-06-26 zzz
+ * i2psnark: Reannounce early after transition from magnet mode to having metainfo
+
+2026-06-20 zzz
+ * Susimail: Add experimental standalone build option
+
+2026-06-07 zzz
  * Crypto: Update bouncycastle MLKEM to 1.84
 
-2026-06-06 zz
+2026-06-06 zzz
  * Console: Change version field in lookup form to a dropdown
 
-2026-06-03 zz
+2026-06-03 zzz
  * Tunnels:
    - Increase conn limits for tunnel rejection again
    - Reduce bw request if we have no tunnels (congestion avoidance)
@@ -12,7 +31,7 @@
    - Remove config to disable tunnel testing
    - Continue tunnel testing during graceful shutdown
 
-2026-06-01 zz
+2026-06-01 zzz
  * Streaming: Remove deprecated/unused session key/tag methods
 
 2026-05-29 zzz
