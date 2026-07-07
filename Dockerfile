@@ -8,13 +8,15 @@ ENV APP_HOME="/i2p"
 ARG ANT_VERSION="1.10.17"
 
 WORKDIR /tmp/build
-COPY . .
+COPY --exclude=docker . .
 
 RUN apk add --no-cache gettext tar bzip2 curl openjdk21 \
     && echo "build.built-by=Docker" >> override.properties \
     && curl https://dlcdn.apache.org//ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.bz2 | tar -jxf - -C /opt \
     && /opt/apache-ant-${ANT_VERSION}/bin/ant preppkg-linux-only \
     && rm -rf pkg-temp/osid pkg-temp/lib/wrapper pkg-temp/lib/wrapper.*
+
+COPY docker docker
 
 # --- Runtime stages per architecture ---
 
