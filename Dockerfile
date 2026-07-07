@@ -2,7 +2,7 @@ ARG TARGETARCH
 
 # --- Single builder (Java bytecode is platform-independent) ---
 
-FROM --platform=linux/amd64 alpine:latest AS builder
+FROM alpine:latest AS builder
 
 ENV APP_HOME="/i2p"
 ARG ANT_VERSION="1.10.17"
