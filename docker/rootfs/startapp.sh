@@ -64,6 +64,8 @@ if [ -f /.dockerenv ] || [ -f /run/.containerenv ]; then
     fi
     echo "[startapp] setting reachable IP to container IP $IP_ADDR"
     find . -name 'clients.config' -exec sed -i "s/127.0.0.1/$IP_ADDR/g" {} \;
+    find . -name 'clients.config' -exec sed -i "s/localhost/$IP_ADDR/g" {} \;
+    find . -name 'clients.config' -exec sed -i "s/::1/$IP_ADDR/g" {} \;
     # Rewriting the string localhost is no longer necessary
 fi
 
@@ -77,4 +79,4 @@ mkdir -p "$HOME/.i2p" && chown -R i2p:i2p "$HOME/.i2p"
 
 # Execute the Java application with the constructed classpath and options
 # The `exec` command replaces the shell with the Java process, ensuring that it receives signals directly and can shut down gracefully.
-exec -runuser i2p `java -cp "${CLASSPATH}" ${JAVAOPTS} ${JAVA17OPTS} net.i2p.router.RouterLaunch`
+exec -runuser i2p "java -cp "${CLASSPATH}" ${JAVAOPTS} ${JAVA17OPTS} net.i2p.router.RouterLaunch"
