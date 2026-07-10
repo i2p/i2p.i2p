@@ -46,7 +46,7 @@ class StartExplorersJob extends JobImpl {
         The goal here is to avoid reseeding.
      */
     /** very aggressively explore if we have less than this many routers */
-    private static final int MIN_ROUTERS = 5 * KademliaNetworkDatabaseFacade.MIN_RESEED;
+    private static final int MIN_ROUTERS = 8 * KademliaNetworkDatabaseFacade.MIN_RESEED;
     /** aggressively explore if we have less than this many routers */
     private static final int LOW_ROUTERS = 2 * MIN_ROUTERS;
     /** explore slowly if we have more than this many routers */
@@ -54,7 +54,7 @@ class StartExplorersJob extends JobImpl {
     // must be lower than LIMIT_ROUTERS in HandleFloodfillDatabaseStoreMessageJob
     // because exploration does not register a reply job
     private static final int LIMIT_ROUTERS = SystemVersion.isSlow() ? 800 : 3000;
-    private static final int MIN_FFS = 100;
+    private static final int MIN_FFS = 250;
     static final int LOW_FFS = 2 * MIN_FFS;
 
     private static final long MAX_LAG = 100;
@@ -104,9 +104,9 @@ class StartExplorersJob extends JobImpl {
                 // This is very effective so we don't need to do it often
                 boolean realexpl;
                 if (needffs) {
-                    realexpl = getContext().random().nextInt(2) != 0;
+                    realexpl = false;
                 } else if (lowffs) {
-                    realexpl = getContext().random().nextInt(4) != 0;
+                    realexpl = getContext().random().nextBoolean();
                 } else {
                     realexpl = getContext().random().nextInt(8) != 0;
                 }
