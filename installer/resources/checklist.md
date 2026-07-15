@@ -36,9 +36,9 @@
   with a recent Oracle JDK (12+), and fix any issues.
   Oracle JDK will error on things that OpenJDK does not!
 
-- Java 7 test: 'ant mavenCentral.deps' with a Java 8 Compiler, Java 7 bootclasspath
- in override.properties to ensure that Android will build correcly; fix any issues.
- Ensure that JAVA_HOME is unset.
+- Java 7 test: 'ant mavenCentral.deps' with a Java 17 Compiler targeting Java 7 release.
+  Set `javac.compilerargs=--release 7` in override.properties, which will automatically resolve bootclasspath issues. Do a test build with Android using `./installer/resources/maven-dev-release.sh $num`, run for at least 21 minutes to catch bootclasspath issues(it will crash at exactly that moment if something is broken).
+  Ensure that JAVA_HOME is unset.
 
 - Verify CI is passing (green checks) on both Gitea and Github https://github.com/i2p/i2p.i2p/commits/master/
 
