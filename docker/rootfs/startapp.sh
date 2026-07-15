@@ -78,5 +78,5 @@ JAVAOPTS="-Djava.net.preferIPv4Stack=false -Djava.library.path=${I2P}:${I2P}/lib
 mkdir -p "$HOME/.i2p" && chown -R i2p:i2p "$HOME/.i2p"
 
 # Execute the Java application with the constructed classpath and options
-# The `exec` command replaces the shell with the Java process, ensuring that it receives signals directly and can shut down gracefully.
-exec runuser -u i2p -- java -cp "${CLASSPATH}" ${JAVAOPTS} ${JAVA17OPTS} net.i2p.router.RouterLaunch
+# gosu handles signal forwarding and privilege dropping
+gosu i2p java -cp "${CLASSPATH}" ${JAVAOPTS} ${JAVA17OPTS} net.i2p.router.RouterLaunch
