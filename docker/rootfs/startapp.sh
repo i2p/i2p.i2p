@@ -66,6 +66,9 @@ if [ -f /.dockerenv ] || [ -f /run/.containerenv ]; then
     find . -name 'clients.config' -exec sed -i "s/127.0.0.1/$IP_ADDR/g" {} \;
     find . -name 'clients.config' -exec sed -i "s/localhost/$IP_ADDR/g" {} \;
     find . -name 'clients.config' -exec sed -i "s/::1/$IP_ADDR/g" {} \;
+    find . -name 'i2ptunnel.config' -exec sed -i "s/127.0.0.1/$IP_ADDR/g" {} \;
+    find . -name 'i2ptunnel.config' -exec sed -i "s/localhost/$IP_ADDR/g" {} \;
+    find . -name 'i2ptunnel.config' -exec sed -i "s/::1/$IP_ADDR/g" {} \;
     # Rewriting the string localhost is no longer necessary
 fi
 
