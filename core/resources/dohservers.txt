@@ -26,9 +26,9 @@
 #
 https://unfiltered.adguard-dns.com/dns-query
 #
-https://blitz.ahadns.com/
+#https://blitz.ahadns.com/
 #
-https://dns.aa.net.uk/dns-query
+#https://dns.aa.net.uk/dns-query
 #
 # SSL issues
 #https://dnses.alekberg.net/dns-query
@@ -36,45 +36,47 @@ https://dns.aa.net.uk/dns-query
 # SSL cert issues
 #https://dnsnl.alekberg.net/dns-query
 # SSL cert issues
-https://dnsse.alekberg.net/dns-query
+#https://dnsse.alekberg.net/dns-query
+https://dns.aquilenet.fr/dns-query
 # down, see https://www.armadillodns.net/ for status
 #https://doh.armadillodns.net/dns-query
 #
 https://dns.artikel10.org/dns-query
 #
-https://secure.avastdns.com/dns-query
+#https://secure.avastdns.com/dns-query
 #
-https://awan.ftp.sh/unblocked
+#https://awan.ftp.sh/unblocked
 #
 https://doh.42l.fr/dns-query
 #
 #https://doh-ch.blahdns.com/dns-query
-https://doh-sg.blahdns.com/dns-query
+#https://doh-sg.blahdns.com/dns-query
 #https://doh-fi.blahdns.com/dns-query
 #https://doh-jp.blahdns.com/dns-query
-https://doh-de.blahdns.com/dns-query
+#https://doh-de.blahdns.com/dns-query
 #
 https://dns.blokada.org/dns-query
 #
 # not found
 #https://doh.captnemo.in/dns-query
 #
-https://private.canadianshield.cira.ca/dns-query
+#https://private.canadianshield.cira.ca/dns-query
 #
 https://doh.opendns.com/dns-query
 #
 # not found
 #https://dns.containerpi.com/dns-query
+https://es-ma.foxyfy.net/dns-query
 #
 https://freedns.controld.com/p0
 #
-https://ns.data.haus/dns-query
+#https://ns.data.haus/dns-query
 #
-https://dns.digitale-gesellschaft.ch/dns-query
+#https://dns.digitale-gesellschaft.ch/dns-query
 #
 https://dns.digitalsize.net/dns-query
 #
-https://open.dns0.eu/
+#https://open.dns0.eu/
 #
 #https://doh.dns4all.eu/dns-query
 #
@@ -110,7 +112,7 @@ https://slc01.dnscry.pt/dns-query
 https://trf01.dnscry.pt/dns-query
 #https://sin01.dnscry.pt/dns-query
 https://sof01.dnscry.pt/dns-query
-https://geg01.dnscry.pt/dns-query
+#https://geg01.dnscry.pt/dns-query
 https://sto01.dnscry.pt/dns-query
 https://tll01.dnscry.pt/dns-query
 https://tpa01.dnscry.pt/dns-query
@@ -124,7 +126,7 @@ https://dnsforge.de/dns-query
 #
 https://doh.li/dns-query
 #
-https://dns.dnswarden.com/uncensored
+#https://dns.dnswarden.com/uncensored
 #
 # SSL issues
 #https://rdns.faelix.net/
@@ -152,12 +154,15 @@ https://doh.lacontrevoie.fr/dns-query
 #
 # down
 #https://us1.dns.lavate.ch/dns-query
-https://eu1.dns.lavate.ch/dns-query
+#https://eu1.dns.lavate.ch/dns-query
 #
 # down
 #https://resolver-eu.lelux.fi/dns-query
 #
 https://doh.libredns.gr/dns-query
+#
+https://doh.lv/dns-query
+https://doh.nic.lv/dns-query
 #
 # not found
 #https://dns.moulticast.net/dns-query
@@ -167,10 +172,13 @@ https://doh.libredns.gr/dns-query
 #
 https://basic.rethinkdns.com/dns-query
 #
+https://safeservedns.com/dns-query
 # not found
 #https://fi.doh.dns.snopyta.org/dns-query
 #
-https://dns.twnic.tw/dns-query
+https://dns.novg.net/dns-query
+#
+#https://dns.twnic.tw/dns-query
 #
 # not found
 #https://dns.wevpn.com/dns-query
@@ -187,13 +195,15 @@ https://ibksturm.synology.me/dns-query
 #https://ibuki.cgnat.net/dns-query
 #
 https://doh-2.seby.io/dns-query
-#https://doh.seby.io:8443/dns-query
+https://doh.seby.io/dns-query
 #
 https://freedom.mydns.network/dns-query
 #
+https://v.recipes/dns-query
+#
 https://wikimedia-dns.org/dns-query
 #
-https://yarp.lefolgoc.net/dns-query
+#https://yarp.lefolgoc.net/dns-query
 #
 #
 #############################################
@@ -210,7 +220,7 @@ https://yarp.lefolgoc.net/dns-query
 # not found
 #https://doh.bortzmeyer.fr/
 #
-https://dns.brahma.world/dns-query
+#https://dns.brahma.world/dns-query
 #
 # cz.nic
 # experimental
@@ -268,5 +278,5 @@ https://sky.rethinkdns.com/dns-query
 https://dns.njal.la/dns-query
 #
 # R4SAS i2pd
-https://opennic.i2pd.xyz/dns-query
+#https://opennic.i2pd.xyz/dns-query
 https://opennic2.i2pd.xyz/dns-query

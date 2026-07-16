@@ -120,10 +120,11 @@ public class DNSOverHTTPS implements EepGet.StatusListener {
         v6urls.add("https://[2606:4700:4700::1001]/dns-query");
         // Quad9
         // https://quad9.net/doh-quad9-dns-servers/
-        v4urls.add("https://9.9.9.9/dns-query");
-        v4urls.add("https://149.112.112.112/dns-query");
-        v6urls.add("https://[2620:fe::fe]/dns-query");
-        v6urls.add("https://[2620:fe::fe:9]/dns-query");
+        // https://quad9.net/news/blog/doh-http-1-1-retirement/
+        //v4urls.add("https://9.9.9.9/dns-query");
+        //v4urls.add("https://149.112.112.112/dns-query");
+        //v6urls.add("https://[2620:fe::fe]/dns-query");
+        //v6urls.add("https://[2620:fe::fe:9]/dns-query");
 
         loadURLs();
     }
