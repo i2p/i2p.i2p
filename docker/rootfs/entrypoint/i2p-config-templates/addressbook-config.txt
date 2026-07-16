@@ -1,0 +1,14 @@
+proxy_port=4444
+subscriptions=subscriptions.txt
+should_publish=false
+log=log.txt
+local_addressbook=../userhosts.txt
+update_delay=12
+published_addressbook=../eepsite/docroot/hosts.txt
+router_addressbook=../hosts.txt
+update_direct=false
+naming_service=hosts.txt
+proxy_host=127.0.0.1
+etags=etags
+last_modified=last_modified
+last_fetched=last_fetched

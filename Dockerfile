@@ -1,14 +1,12 @@
 ARG TARGETARCH
 
 # --- Single builder (Java bytecode is platform-independent) ---
+FROM alpine:latest AS builder
 
-FROM --platform=linux/amd64 alpine:latest AS builder
-
-ENV APP_HOME="/i2p"
 ARG ANT_VERSION="1.10.17"
 
 WORKDIR /tmp/build
-COPY . .
+COPY --exclude=docker . .
 
 RUN apk add --no-cache gettext tar bzip2 curl openjdk21 \
     && echo "build.built-by=Docker" >> override.properties \
@@ -16,8 +14,13 @@ RUN apk add --no-cache gettext tar bzip2 curl openjdk21 \
     && /opt/apache-ant-${ANT_VERSION}/bin/ant preppkg-linux-only \
     && rm -rf pkg-temp/osid pkg-temp/lib/wrapper pkg-temp/lib/wrapper.*
 
-# --- Runtime stages per architecture ---
+COPY docker docker
 
+# --- Runtime stages per architecture ---
+# Note:
+# Separate runtime stages are maintained for each supported
+# architecture to allow future architecture-specific changes.
+# This does not increase the size of the final images.
 FROM debian:bookworm-slim AS runtime-amd64
 RUN apt-get update && apt-get install -y --no-install-recommends openjdk-17-jre-headless fonts-dejavu iproute2 gosu \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -33,19 +36,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends openjdk-17-jre-
 # Select runtime based on target architecture
 FROM runtime-${TARGETARCH}
 
-ENV APP_HOME="/i2p"
-WORKDIR ${APP_HOME}
+ENV I2P_DIR_BASE="/i2p"
+ENV I2P_DIR_CONFIG="${I2P_DIR_BASE}/.i2p"
+ENV I2PSNARK_DIR="/i2psnark"
+ENV EEPSITE_DIR="${I2P_DIR_CONFIG}/eepsite"
+
+WORKDIR ${I2P_DIR_BASE}
 COPY --from=builder /tmp/build/pkg-temp .
 
-# "install" i2p by copying over installed files
-COPY --chown=root:root docker/rootfs/ /
-RUN chmod +x /startapp.sh
+COPY docker/rootfs/ /
+RUN chmod +x /entrypoint/entrypoint.sh
 
 # Mount home and snark
-VOLUME ["${APP_HOME}/.i2p"]
-VOLUME ["/i2psnark"]
+VOLUME ["${I2P_DIR_CONFIG}"]
+VOLUME ["${I2PSNARK_DIR}"]
 
-EXPOSE 7654 7656 7657 7658 4444 6668 7659 7660 4445 12345
+EXPOSE 7654 7656 7657 7658 4444 6668 7659 7660 7670 4445 12345
 
 # Metadata.
 LABEL \
@@ -58,4 +64,4 @@ LABEL \
 RUN groupadd -r i2p && useradd -r -g i2p -d /i2p -s /sbin/nologin i2p \
  && chown -R i2p:i2p /i2p
 
-ENTRYPOINT ["/startapp.sh"]
+ENTRYPOINT ["/entrypoint/entrypoint.sh"]
