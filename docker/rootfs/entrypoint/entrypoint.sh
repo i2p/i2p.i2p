@@ -120,6 +120,13 @@ update_config_value "${I2P_DIR_BASE}/i2ptunnel.config" '^tunnel\.3\.targetHost$'
 update_config_value "${I2P_DIR_BASE}/i2psnark.config" '^i2psnark\.dir$' "${I2PSNARK_DIR}"
 update_config_value "${I2P_DIR_BASE}/i2psnark.config" '^i2psnark\.i2cpHost$' "${IP_ADDR}" '^127\.0\.0\.1$'
 
+# Ensure installation addressbook config exists and has the runtime proxy host.
+if [ ! -f "${I2P_DIR_BASE}/addressbook/config.txt" ]; then
+    mkdir -p "${I2P_DIR_BASE}/addressbook"
+    cp -f /entrypoint/i2p-config-templates/addressbook-config.txt "${I2P_DIR_BASE}/addressbook/config.txt"
+fi
+update_config_value "${I2P_DIR_BASE}/addressbook/config.txt" '^proxy_host$' "${IP_ADDR}"
+
 # Ensure installation eepsite jetty xml is set with env provided parameters.
 # This jetty file is used in a new router initialization for the built-in eepsite.
 update_jetty_xml_set_value "${I2P_DIR_BASE}/eepsite/jetty.xml" 'host' "${IP_ADDR}"
@@ -168,6 +175,11 @@ fi
 # Ensure eepsite Jetty listener host follows runtime bind address.
 if [ -f "${EEPSITE_DIR}/jetty.xml" ]; then
     update_jetty_xml_set_value "${EEPSITE_DIR}/jetty.xml" 'host' "${IP_ADDR}"
+fi
+
+# Ensure addressbook proxy host follows runtime bind address.
+if [ -f "${I2P_DIR_CONFIG}/addressbook/config.txt" ]; then
+    update_config_value "${I2P_DIR_CONFIG}/addressbook/config.txt" '^proxy_host$' "${IP_ADDR}"
 fi
 
 # Ensure I2P installation directory is owned by i2p user
