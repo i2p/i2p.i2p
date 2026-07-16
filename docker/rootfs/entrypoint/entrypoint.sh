@@ -197,8 +197,8 @@ JAVAOPTS="-Djava.net.preferIPv4Stack=false \
 # it simply makes them visible through the container logging system.
 # Note: `-DloggerFilenameOverride=logs/log-router-@.txt` above has been
 # standard for some time.
-follow_log "${I2P_DIR_BASE}/.i2p/wrapper.log" WRAPPER
-follow_log "${I2P_DIR_BASE}/.i2p/logs/log-router-0.txt" ROUTER
+follow_wrapper_log "${I2P_DIR_BASE}/.i2p/wrapper.log"
+follow_router_log "${I2P_DIR_BASE}/.i2p/logs"
 
 # Execute the Java application with the constructed classpath and options
 # We keep the shell as PID 1 so we can remap I2P router custom exit codes,

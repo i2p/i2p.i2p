@@ -21,18 +21,21 @@ log_error() {
     msg="$*"
     log "ERROR: " "$msg"
 }
+log_debug() {
+    msg="$*"
+    log "DEBUG: " "$msg"
+}
 
 ##
-# @function follow_log
-# @description Streams a log file with UTC timestamps and a caller-provided label.
+# @function follow_wrapper_log
+# @description Streams a single log file with UTC timestamps.
 # @details Waits until the log file exists, then tails from the first line in a
 # background process and prefixes each emitted line with timestamp and label.
 # @param $1 Path to the log file to follow.
-# @param $2 Label included in each emitted line.
 # @returns 0 when the background follower is started.
-follow_log() {
+follow_wrapper_log() {
     logfile="$1"
-    label="$2"
+    label="WRAPPER"
     sh -c '
         logfile="$1"
         label="$2"
@@ -41,6 +44,75 @@ follow_log() {
             printf "%s [%s] %s\n" "$(date -u "+%Y-%m-%dT%H:%M:%SZ")" "$label" "$line"
         done
     ' sh "$logfile" "$label" &
+}
+
+##
+# @function follow_router_log
+# @description Streams the active router log file and switches when rotation changes files.
+# @details Watches the given directory for files matching log-router-*.txt,
+# follows the most recently modified file, and switches when a different file
+# becomes newer.
+# @param $1 Path to the router log directory.
+# @returns 0 when the background watcher is started.
+follow_router_log() {
+    logdir="$1"
+    label="ROUTER"
+
+    (
+        current_log=""
+        current_tail_pid=""
+        waiting_for_router_log_notice=0
+
+        cleanup_tail() {
+            if [ -n "$current_tail_pid" ] && kill -0 "$current_tail_pid" 2>/dev/null; then
+                kill "$current_tail_pid" 2>/dev/null || true
+                wait "$current_tail_pid" 2>/dev/null || true
+            fi
+            current_tail_pid=""
+        }
+
+        trap 'cleanup_tail; exit 0' INT TERM HUP QUIT
+
+        while :; do
+            latest_log="$(ls -1t "$logdir"/log-router-*.txt 2>/dev/null | head -n 1)"
+
+            if [ -z "$latest_log" ]; then
+                if [ -n "${DEBUG_ENTRYPOINT:-}" ] && [ "$waiting_for_router_log_notice" -eq 0 ]; then
+                    log_debug "Follow_router_log waiting for log-router-*.txt in $logdir"
+                    waiting_for_router_log_notice=1
+                fi
+                sleep 1
+                continue
+            fi
+
+            waiting_for_router_log_notice=0
+
+            if [ -n "$latest_log" ] && [ "$latest_log" != "$current_log" ]; then
+                previous_log="$current_log"
+                cleanup_tail
+                current_log="$latest_log"
+
+                if [ -n "${DEBUG_ENTRYPOINT:-}" ]; then
+                    if [ -n "$previous_log" ]; then
+                        log_debug "Follow_router_log switching file ${previous_log##*/} -> ${current_log##*/}"
+                    else
+                        log_debug "Follow_router_log attaching to ${current_log##*/}"
+                    fi
+                fi
+
+                sh -c '
+                    logfile="$1"
+                    label="$2"
+                    tail -n +1 -F "$logfile" 2>/dev/null | while IFS= read -r line; do
+                        printf "%s [%s] %s\n" "$(date -u "+%Y-%m-%dT%H:%M:%SZ")" "$label" "$line"
+                    done
+                ' sh "$current_log" "$label" &
+                current_tail_pid=$!
+            fi
+
+            sleep 1
+        done
+    ) &
 }
 
 ##
