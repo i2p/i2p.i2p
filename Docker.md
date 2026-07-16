@@ -13,8 +13,8 @@ Both images are identical and support the following architectures:
 
 | Architecture | Base Image | Java Version |
 |-------------|------------|--------------|
-| amd64 | Alpine Linux | OpenJDK 21 |
-| arm64 (v8) | Alpine Linux | OpenJDK 21 |
+| amd64 | Debian Bookworm | OpenJDK 17 |
+| arm64 (v8) | Debian Bookworm | OpenJDK 17 |
 | arm (v7) | Debian Bookworm | OpenJDK 17 |
 
 ---
@@ -35,7 +35,7 @@ docker run -d \
 
 Then open your browser to **http://127.0.0.1:7657** to access the I2P Router Console and complete the setup wizard.
 
-> **Note:** Without setting `EXT_PORT`, the router will report a "Firewalled" status. This means it cannot receive incoming connections. See the [Environment Variables](#environment-variables) section for details.
+> **Note:** If `EXT_PORT` is not set, the entrypoint defaults it to `12345`. The router will still report a "Firewalled" status unless the external I2NP port is published and reachable over both TCP and UDP. See the [Environment Variables](#environment-variables) section for details.
 
 ---
 
@@ -105,6 +105,7 @@ services:
       - "127.0.0.1:7658:7658"   # I2P Site (eepsite)
       - "127.0.0.1:7659:7659"   # SMTP Proxy
       - "127.0.0.1:7660:7660"   # POP3 Proxy
+      - "127.0.0.1:7670:7670"   # I2P Git Repositories SSH Access
       - "12345:12345"           # I2NP TCP
       - "12345:12345/udp"       # I2NP UDP
 ```
@@ -126,20 +127,20 @@ docker run -d \
 
 ### Recommended (with external port)
 
-Replace `54321` with a random port number greater than 1024.
+Replace `12345` with a random port number greater than 1024.
 
 ```bash
 docker run -d \
     --name i2p \
     -e JVM_XMX=512m \
-    -e EXT_PORT=54321 \
+    -e EXT_PORT=12345 \
     -v i2pconfig:/i2p/.i2p \
     -v i2ptorrents:/i2psnark \
     -p 127.0.0.1:4444:4444 \
     -p 127.0.0.1:6668:6668 \
     -p 127.0.0.1:7657:7657 \
-    -p 54321:12345 \
-    -p 54321:12345/udp \
+    -p 12345:12345 \
+    -p 12345:12345/udp \
     geti2p/i2p:latest
 ```
 
@@ -162,25 +163,32 @@ docker run -d \
 | Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
 | `JVM_XMX` | `512m` | No | Maximum Java heap size. Increase for better performance on systems with more RAM (e.g., `1024m`). Decrease on constrained devices (e.g., `256m`). |
-| `EXT_PORT` | *unset* | Recommended | The external port for incoming I2NP connections. Without this, the router operates in "Firewalled" mode and cannot accept incoming connections, which reduces performance. Choose a random port above 1024 (e.g., `54321`). |
-| `IP_ADDR` | *auto-detected* | No | IP address the router services bind to. Auto-detected from the container's hostname inside Docker. Set to `0.0.0.0` to listen on all interfaces, or a specific IP for custom networking setups. |
+| `EXT_PORT` | `12345` (if unset) | Recommended | External port for incoming I2NP connections. If unset, the entrypoint sets it to `12345`. For better privacy and performance, choose a random port above 1024 (e.g., `12345`) and publish the same host/container port for both TCP and UDP. |
+| `I2P_UID` | image default for `i2p` user | No | Numeric UID to assign to the `i2p` user at container startup. Useful for bind mounts owned by a host user. |
+| `I2P_GID` | image default for `i2p` group | No | Numeric GID to assign to the `i2p` group at container startup. Useful for bind mounts owned by a host group. |
+| `IP_ADDR` | *auto-detected* | No | IP address the router services bind to. Auto-detected from container networking (default-route source IP, with hostname and loopback fallback). Set to `0.0.0.0` to listen on all interfaces, or a specific IP for custom networking setups. |
+
+If either `I2P_UID` or `I2P_GID` is set, the entrypoint remaps the `i2p` account before fixing ownership and starting the router. Startup fails with a clear error if the requested UID/GID is already used by a different user/group in the container.
 
 ---
 
 ## Ports Reference
 
-| Port | Protocol | Default Interface | Service | Enabled by Default | Description |
-|------|----------|-------------------|---------|-------------------|-------------|
-| 4444 | TCP | 127.0.0.1 | HTTP Proxy | Yes | Browse I2P websites (eepsites) by configuring your browser to use this as an HTTP proxy. |
-| 4445 | TCP | 127.0.0.1 | HTTPS Proxy | Yes | HTTPS / CONNECT proxy for SSL connections over I2P. |
-| 6668 | TCP | 127.0.0.1 | IRC Proxy | Yes | Connect an IRC client here to access I2P IRC networks (Irc2P). |
-| 7654 | TCP | 127.0.0.1 | I2CP | Yes | I2P Client Protocol — used by external applications to communicate with the router. |
-| 7656 | TCP | 127.0.0.1 | SAM Bridge | No | Simple Anonymous Messaging bridge — API for applications to use I2P (e.g., I2P-enabled BitTorrent clients). Must be enabled via the Router Console. |
-| 7657 | TCP | 127.0.0.1 | Router Console | Yes | Web-based administration interface. This is the main UI for managing your I2P router. |
-| 7658 | TCP | 127.0.0.1 | I2P Site | No | Host your own website (eepsite) on I2P. Must be enabled via the Router Console. |
-| 7659 | TCP | 127.0.0.1 | SMTP Proxy | Yes | Send email through the I2P Postman mail system. Connect your mail client here. |
-| 7660 | TCP | 127.0.0.1 | POP3 Proxy | Yes | Receive email from the I2P Postman mail system. Connect your mail client here. |
+| Port | Protocol | Default Bind Address (Container) | Service | Enabled by Default | Description |
+|------|----------|----------------------------------|---------|-------------------|-------------|
+| 4444 | TCP | `IP_ADDR` (auto) | HTTP Proxy | Yes | Browse I2P websites (eepsites) by configuring your browser to use this as an HTTP proxy. |
+| 4445 | TCP | `IP_ADDR` (auto) | HTTPS Proxy | Yes | HTTPS / CONNECT proxy for SSL connections over I2P. |
+| 6668 | TCP | `IP_ADDR` (auto) | IRC Proxy | Yes | Connect an IRC client here to access I2P IRC networks (Irc2P). |
+| 7654 | TCP | `IP_ADDR` (auto) | I2CP | Yes | I2P Client Protocol — used by external applications to communicate with the router. |
+| 7656 | TCP | `IP_ADDR` (auto) | SAM Bridge | No | Simple Anonymous Messaging bridge — API for applications to use I2P (e.g., I2P-enabled BitTorrent clients). Must be enabled via the Router Console. |
+| 7657 | TCP | `IP_ADDR` (auto) | Router Console | Yes | Web-based administration interface. This is the main UI for managing your I2P router. |
+| 7658 | TCP | `IP_ADDR` (auto) | I2P Site | No | Host your own website (eepsite) on I2P. Must be enabled via the Router Console. |
+| 7659 | TCP | `IP_ADDR` (auto) | SMTP Proxy | Yes | Send email through the I2P Postman mail system. Connect your mail client here. |
+| 7660 | TCP | `IP_ADDR` (auto) | POP3 Proxy | Yes | Receive email from the I2P Postman mail system. Connect your mail client here. |
+| 7670 | TCP | `IP_ADDR` (auto) | I2P Git Repositories SSH Access | No | Client tunnel for gitssh.idk.i2p. Must be enabled via the Router Console. |
 | 12345 | TCP+UDP | 0.0.0.0 | I2NP | Yes | I2P Network Protocol — the router's main communication port with other I2P routers. **This is the only port that should be exposed to the internet.** |
+
+`IP_ADDR` auto-derivation defaults to `127.0.0.1` in host network mode, and to the container route-source IP in bridge/default Docker networking.
 
 **Which ports should I publish?**
 
@@ -206,6 +214,16 @@ docker run -v ./i2pconfig:/i2p/.i2p -v ./i2ptorrents:/i2psnark ...
 **Named volume example:**
 ```bash
 docker run -v i2pconfig:/i2p/.i2p -v i2ptorrents:/i2psnark ...
+```
+
+**Bind mount with host UID/GID mapping:**
+```bash
+docker run \
+  -e I2P_UID="$(id -u)" \
+  -e I2P_GID="$(id -g)" \
+  -v ./i2pconfig:/i2p/.i2p \
+  -v ./i2ptorrents:/i2psnark \
+  ...
 ```
 
 ---
@@ -240,17 +258,24 @@ echo "Using port: $EXT_PORT"
 
 ### Firewalled vs Non-Firewalled
 
-- **Firewalled** (no `EXT_PORT` set): The router can only make outgoing connections. This works but reduces performance and your ability to contribute to the network.
-- **Non-Firewalled** (`EXT_PORT` set and port published): The router accepts incoming connections. This improves performance and helps the I2P network.
+- **Firewalled** (external I2NP port not reachable): The router can only make outgoing connections. This works but reduces performance and your ability to contribute to the network.
+- **Non-Firewalled** (external I2NP port reachable): The router accepts incoming connections. This improves performance and helps the I2P network.
 
 To achieve non-firewalled status, you must:
-1. Set the `EXT_PORT` environment variable
-2. Publish that port for both TCP and UDP
+1. Set `EXT_PORT` (or use the default `12345`)
+2. Publish that same port number for both host and container on TCP and UDP
 3. Ensure your firewall/router allows traffic on that port
 
 ### Binding and Remote Access
 
-All services except I2NP are bound to the local docker IP by default. This means they are only accessible from the Docker host machine (via published ports) and to the docker network. This is by design because the router serves other applications on the docker network. It is also not possible to work around this on the default docker network, where `localhost` resolves to the container IP and `127.0.0.1` is not used. You can expose them to the host using port-forwarding in your `docker` command or `docker-compose.yaml`.
+All services except I2NP use `IP_ADDR` as their bind address (Router Console, I2CP, SAM, and client tunnels).
+
+If `IP_ADDR` is unset, the entrypoint derives it automatically:
+
+- **Host network mode:** Uses `127.0.0.1` to keep services local to the host.
+- **Bridge/default Docker network:** Uses the container's default-route source IPv4 (typically the container bridge IP), with fallback to `hostname -i`, then `127.0.0.1`.
+
+This default behavior is intentional: in bridge mode, binding to the container IP allows published ports and same-network containers to reach services. In host mode, binding to loopback avoids exposing admin/proxy ports broadly.
 
 To access the Router Console from a remote machine, use an SSH tunnel:
 
@@ -259,7 +284,7 @@ ssh -L 7657:127.0.0.1:7657 user@your-server
 # Then open http://127.0.0.1:7657 in your local browser
 ```
 
-Alternatively, set `IP_ADDR=0.0.0.0` to bind services to all interfaces — but **only do this on a trusted network**, as it exposes the console and proxies to anyone who can reach the container.
+Alternatively, set `IP_ADDR=0.0.0.0` to bind services to all interfaces inside the container. Do this only when required and only on a trusted network, as it may expose the console and proxies to anyone who can reach published host ports.
 
 ---
 
@@ -308,7 +333,7 @@ Place your website files in the eepsite directory within the config volume.
 Set the `EXT_PORT` environment variable and publish the port:
 
 ```bash
-docker run -e EXT_PORT=54321 -p 54321:12345 -p 54321:12345/udp ...
+docker run -e EXT_PORT=12345 -p 12345:12345 -p 12345:12345/udp ...
 ```
 
 Ensure the port is open in your host firewall and any upstream router/NAT.
