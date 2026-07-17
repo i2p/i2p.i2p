@@ -3,24 +3,25 @@
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see https://www.transifex.com/otf/I2P/dashboard/
 # zzz <zzz@mail.i2p>, 2017.
-# 
+#
 # Translators:
 # Mohammed ALDOUB <voulnet@gmail.com>, 2017
 # Tashigi OP, 2018
 # zzzi2p, 2018
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2021-11-27 13:31-0000\n"
 "Last-Translator: zzzi2p, 2018\n"
 "Language-Team: Arabic (https://www.transifex.com/otf/teams/12694/ar/)\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ar\n"
 "POT-Revision-Date: 2021-11-27 13:31-0000\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #. type: TH
 #: man/eepget.1:1
@@ -74,23 +75,22 @@ msgid ""
 "Download a file non-interactively via HTTP. Transfers through both I2P and "
 "the regular Internet are supported."
 msgstr ""
-"قم بتنزيل ملف غير تفاعليّ عبر HTTP. التّحويلات عبر I2P و اﻹنترنت العاديّ "
-"كلّها مدعومة."
+"قم بتنزيل ملف غير تفاعليّ عبر HTTP. التّحويلات عبر I2P و اﻹنترنت العاديّ كلّها "
+"مدعومة."
 
 #. type: Plain text
 #: man/eepget.1:21
 msgid ""
 "Eepget is able to cope with slow or unstable network connections; if a "
 "download is not successful because of a network problem, it will keep "
-"retrying until the whole file has been retrieved (if the -n option is set)."
-"  If supported by the remote server, eepget will instruct the server to "
+"retrying until the whole file has been retrieved (if the -n option is set).  "
+"If supported by the remote server, eepget will instruct the server to "
 "continue the download from the point of interruption."
 msgstr ""
-"Eepget قادر على التّعامل مع الاتصالات البطيئة والغير مستقرة؛ إذا كان "
-"التّنزيل غير ناجح بسبب خطأ في الإنترنت، فيسقوم Eepget في الاستمرار في إعادة "
-"المحاولة حتى يتم استقبال الملف بأكمله ( إذا تم تعيين خيار -n). إذا كان "
-"Eepget مدعوما من الخادم البعيد، فسيأمر Eepget من الخادم متابعة التّنزيل من "
-"نقطة الانقطاع."
+"Eepget قادر على التّعامل مع الاتصالات البطيئة والغير مستقرة؛ إذا كان التّنزيل "
+"غير ناجح بسبب خطأ في الإنترنت، فيسقوم Eepget في الاستمرار في إعادة المحاولة "
+"حتى يتم استقبال الملف بأكمله ( إذا تم تعيين خيار -n). إذا كان Eepget مدعوما "
+"من الخادم البعيد، فسيأمر Eepget من الخادم متابعة التّنزيل من نقطة الانقطاع."
 
 #. type: SH
 #: man/eepget.1:22
@@ -139,12 +139,8 @@ msgstr "B<-l>lineLen "
 #. type: TP
 #: man/eepget.1:43
 #, no-wrap
-msgid ""
-"Controls the progress display. B<\\ lineLen > is the length of one progress "
-"line in characters. The default is 40."
-msgstr ""
-"قم بالتحكم في عرض سير العمليّة. B<\\ lineLen > هو طول خط سير العمليّة "
-"الواحدة في اﻷحرف. الطول الافتراضيّ هو 40."
+msgid "Controls the progress display. B<\\ lineLen > is the length of one progress line in characters. The default is 40."
+msgstr "قم بالتحكم في عرض سير العمليّة. B<\\ lineLen > هو طول خط سير العمليّة الواحدة في اﻷحرف. الطول الافتراضيّ هو 40."
 
 #. type: Plain text
 #: man/eepget.1:49
@@ -154,12 +150,8 @@ msgstr "B<-m> markSize"
 #. type: TP
 #: man/eepget.1:49
 #, no-wrap
-msgid ""
-"Controls the progress display. B<\\ markSize > is the number of bytes one "
-"'#' character represents. The default is 1024."
-msgstr ""
-"قم بالتحكم في عرض سير العمليّة. B<\\ markSize > هو عدد البايتات التي يمثلها "
-"الحرف \"#\". العدد الافتراضيّ هو 1024."
+msgid "Controls the progress display. B<\\ markSize > is the number of bytes one '#' character represents. The default is 1024."
+msgstr "قم بالتحكم في عرض سير العمليّة. B<\\ markSize > هو عدد البايتات التي يمثلها الحرف \"#\". العدد الافتراضيّ هو 1024."
 
 #. type: Plain text
 #: man/eepget.1:55
@@ -169,12 +161,8 @@ msgstr "B<-n> إعادة المحاولات"
 #. type: TP
 #: man/eepget.1:55
 #, no-wrap
-msgid ""
-"Specify the number of times to retry downloading if the download isn't "
-"successful. If this option is not specified, eepget will not retry."
-msgstr ""
-"قم بتحديد عدد المرات لإعادة محاولة التنزيل إن لم يكن التنزيل ناجحًا. إذا لم "
-"تقم بتحديد أيّ خيار، فلن يقوم eepget بإعادة محاولة التنزيل."
+msgid "Specify the number of times to retry downloading if the download isn't successful. If this option is not specified, eepget will not retry."
+msgstr "قم بتحديد عدد المرات لإعادة محاولة التنزيل إن لم يكن التنزيل ناجحًا. إذا لم تقم بتحديد أيّ خيار، فلن يقوم eepget بإعادة محاولة التنزيل."
 
 #. type: Plain text
 #: man/eepget.1:61
@@ -184,12 +172,8 @@ msgstr "B<-o> ملف"
 #. type: TP
 #: man/eepget.1:61
 #, no-wrap
-msgid ""
-"Sets the output file to write to. If this option is not given, the output "
-"filename will be determined by the URL."
-msgstr ""
-"قم بتعيين ملف إخراج للكتابة عليه. إذا لم يتم منح هذا الخيار، فسيتم تحديد ملف"
-" اﻹخراج بواسطة عنوان الـ URL. "
+msgid "Sets the output file to write to. If this option is not given, the output filename will be determined by the URL."
+msgstr "قم بتعيين ملف إخراج للكتابة عليه. إذا لم يتم منح هذا الخيار، فسيتم تحديد ملف اﻹخراج بواسطة عنوان الـ URL. "
 
 #. type: Plain text
 #: man/eepget.1:67
@@ -199,14 +183,8 @@ msgstr "B<-p> proxy_host[:port]"
 #. type: TP
 #: man/eepget.1:67
 #, no-wrap
-msgid ""
-"Specify an I2P proxy server (eeproxy) to use. If the port is not specified, "
-"eepget will use 4444. If this option is not specified, eepget will use "
-"127.0.0.1:4444. Specify B<-c> or B<-p> :0 to disable the eeproxy."
-msgstr ""
-"حدد خادم وكيل I2P (eeproxy) لاستخدامه. إذا لم يتم تحديد المنفذ ، فسيستخدم "
-"eepget 4444. إذا لم يتم تحديد هذا الخيار ، فسيستخدم eepget 127.0.0.1:4444. "
-"حدد B أو B: 0 لتعطيل eeproxy."
+msgid "Specify an I2P proxy server (eeproxy) to use. If the port is not specified, eepget will use 4444. If this option is not specified, eepget will use 127.0.0.1:4444. Specify B<-c> or B<-p> :0 to disable the eeproxy."
+msgstr "حدد خادم وكيل I2P (eeproxy) لاستخدامه. إذا لم يتم تحديد المنفذ ، فسيستخدم eepget 4444. إذا لم يتم تحديد هذا الخيار ، فسيستخدم eepget 127.0.0.1:4444. حدد B أو B: 0 لتعطيل eeproxy."
 
 #. type: Plain text
 #: man/eepget.1:73
@@ -238,12 +216,8 @@ msgstr "B<-x> كلمة السّرّ"
 #. type: TP
 #: man/eepget.1:85
 #, no-wrap
-msgid ""
-"Sets the password for proxy authorization, if required. If a username is "
-"specified but not a password, EepGet will prompt for the password."
-msgstr ""
-"عين كلمة السّرّ لترخيص الوكيل، إذا لزم اﻷمر. إذا كان اسم المستخدم محددًا "
-"وليس كلمة السّرّ، فسيقوم EepGet فوريًا بطلب كلمة السّرّ."
+msgid "Sets the password for proxy authorization, if required. If a username is specified but not a password, EepGet will prompt for the password."
+msgstr "عين كلمة السّرّ لترخيص الوكيل، إذا لزم اﻷمر. إذا كان اسم المستخدم محددًا وليس كلمة السّرّ، فسيقوم EepGet فوريًا بطلب كلمة السّرّ."
 
 #. type: SH
 #: man/eepget.1:88
@@ -269,8 +243,8 @@ msgstr "اﻹبلاغ عن اﻷخطاء"
 #. type: Plain text
 #: man/eepget.1:98 man/i2prouter.1:59 man/i2prouter-nowrapper.1:29
 msgid ""
-"Please enter an issue on E<.UR https://i2pgit.org/i2p-"
-"hackers/i2p.i2p/-/issues> the I2P GitLab server E<.UE .>"
+"Please enter an issue on E<.UR https://i2pgit.org/i2p-hackers/i2p.i2p/-/"
+"issues> the I2P GitLab server E<.UE .>"
 msgstr ""
 
 #. type: SH
@@ -298,11 +272,11 @@ msgstr "i2prouter - بدء تشغيل وإيقاف موجه I2P"
 #. type: Plain text
 #: man/i2prouter.1:9
 msgid ""
-"B<i2prouter> "
-"{I<console>|I<start>|I<stop>|I<graceful>|I<restart>|I<condrestart>|I<status>|I<dump>|I<install>|I<remove>}"
+"B<i2prouter> {I<console>|I<start>|I<stop>|I<graceful>|I<restart>|"
+"I<condrestart>|I<status>|I<dump>|I<install>|I<remove>}"
 msgstr ""
-"B<i2prouter> "
-"{I<console>|I<start>|I<stop>|I<graceful>|I<restart>|I<condrestart>|I<status>|I<dump>|I<install>|I<remove>}"
+"B<i2prouter> {I<console>|I<start>|I<stop>|I<graceful>|I<restart>|"
+"I<condrestart>|I<status>|I<dump>|I<install>|I<remove>}"
 
 #. type: Plain text
 #: man/i2prouter.1:13
@@ -447,20 +421,20 @@ msgid ""
 "will not restart if it crashes.  Also, it will use the default memory size, "
 "which may not be enough for I2P."
 msgstr ""
-"قم بتشغيل موجّه I2P, دون استخدام خدمة الغلاف. هذا يعني أنّ الموجّه لن تتم "
-"إعادة تشغيله حال حدوث أيّ خلل. أيضًا، سيقوم الموجّه باستخدام حجم الذاكرة "
-"الافتراضي، والّذي قد لا يكون كافيا لـ I2P."
+"قم بتشغيل موجّه I2P, دون استخدام خدمة الغلاف. هذا يعني أنّ الموجّه لن تتم إعادة "
+"تشغيله حال حدوث أيّ خلل. أيضًا، سيقوم الموجّه باستخدام حجم الذاكرة الافتراضي، "
+"والّذي قد لا يكون كافيا لـ I2P."
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:23
 msgid ""
 "You should really use the B<i2prouter>(1)  script instead.  There are no "
-"options.  To stop the router, use your browser to access E<.UR "
-"http://localhost:7657/> the router console E<.UE .>"
+"options.  To stop the router, use your browser to access E<.UR http://"
+"localhost:7657/> the router console E<.UE .>"
 msgstr ""
 "يجب عليك استخدام البرنامج النّصي B<i2prouter>(1)  عوضًا عن ذلك. لا يوجد "
-"خيارات. لإيقاف جهاز التّوجيه، استخدم متصفحك للوصول إلى E<.UR "
-"http://localhost:7657/> لوحة مراقبة جهاز التّوجيه E<.UE .>"
+"خيارات. لإيقاف جهاز التّوجيه، استخدم متصفحك للوصول إلى E<.UR http://"
+"localhost:7657/> لوحة مراقبة جهاز التّوجيه E<.UE .>"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:31

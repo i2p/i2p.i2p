@@ -2,7 +2,7 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the i2ptunnel package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-# 
+#
 # Translators:
 # Kaya Zeren <kayazeren@gmail.com>, 2016-2023,2025
 # Ozancan Karataş <ozancankaratas96@outlook.com>, 2015
@@ -11,20 +11,23 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-05 14:31+0000\n"
-"PO-Revision-Date: 2013-07-20 14:50+0000\n"
-"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2016-2023,2025\n"
-"Language-Team: Turkish (Turkey) (http://app.transifex.com/otf/I2P/language/tr_TR/)\n"
+"POT-Creation-Date: 2021-08-11 15:33+0000\n"
+"PO-Revision-Date: 2026-04-18 12:37+0000\n"
+"Last-Translator: Kaya ZEREN "
+"<kayazeren@users.noreply.localizationlab.weblate.cloud>\n"
+"Language-Team: Turkish <https://localizationlab.weblate.cloud/projects/i2p/"
+"proxy/tr/>\n"
+"Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: tr_TR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Weblate 5.17\n"
 
 #: ../java/build/Proxy.java:5 ../java/build/Proxy.java:11
 #: ../java/build/Proxy.java:40 ../java/build/Proxy.java:49
 #: ../java/build/Proxy.java:55 ../java/build/Proxy.java:91
-#: ../java/build/Proxy.java:97 ../java/build/Proxy.java:111
+#: ../java/build/Proxy.java:97
 msgid "Website Unreachable"
 msgstr "Siteye erişilemiyor"
 
@@ -38,9 +41,9 @@ msgstr "Siteye erişilemiyor"
 #: ../java/build/Proxy.java:151 ../java/build/Proxy.java:161
 #: ../java/build/Proxy.java:173 ../java/build/Proxy.java:186
 #: ../java/build/Proxy.java:198 ../java/build/Proxy.java:208
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:294
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:368
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:402
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:307
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:382
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:417
 msgid "Router Console"
 msgstr "Yöneltici panosu"
 
@@ -67,9 +70,9 @@ msgstr "I2P yöneltici panosu"
 #: ../java/build/Proxy.java:153 ../java/build/Proxy.java:163
 #: ../java/build/Proxy.java:175 ../java/build/Proxy.java:188
 #: ../java/build/Proxy.java:200 ../java/build/Proxy.java:210
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:297
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:369
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:403
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:310
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:383
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:418
 msgid "Configuration"
 msgstr "Yapılandırma"
 
@@ -83,9 +86,9 @@ msgstr "Yapılandırma"
 #: ../java/build/Proxy.java:154 ../java/build/Proxy.java:164
 #: ../java/build/Proxy.java:176 ../java/build/Proxy.java:189
 #: ../java/build/Proxy.java:201 ../java/build/Proxy.java:211
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:298
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:369
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:403
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:311
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:383
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:418
 msgid "Help"
 msgstr "Yardım"
 
@@ -104,13 +107,15 @@ msgstr "Adres defteri"
 
 #: ../java/build/Proxy.java:12
 msgid "The website was not reachable."
-msgstr "Sİteye erişilemiyor."
+msgstr "Siteye erişilemiyor."
 
 #: ../java/build/Proxy.java:13
 msgid ""
 "The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr "Site çevrim dışı, bir ağ tıkanıklığı var ya da yönelticiniz henüz eşler ile iyi bütünleşmemiş."
+msgstr ""
+"Site çevrim dışı, bir ağ tıkanıklığı var ya da yönelticiniz henüz eşler ile "
+"iyi bütünleşmemiş."
 
 #: ../java/build/Proxy.java:14 ../java/build/Proxy.java:58
 #: ../java/build/Proxy.java:109 ../java/build/Proxy.java:129
@@ -120,9 +125,10 @@ msgstr "{0}Yeniden denemek{1} isteyebilirsiniz."
 
 #: ../java/build/Proxy.java:15 ../java/build/Proxy.java:27
 #: ../java/build/Proxy.java:48 ../java/build/Proxy.java:59
-#: ../java/build/Proxy.java:90 ../java/build/Proxy.java:110
-#: ../java/build/Proxy.java:118 ../java/build/Proxy.java:130
-#: ../java/build/Proxy.java:171 ../java/build/Proxy.java:196
+#: ../java/build/Proxy.java:90 ../java/build/Proxy.java:99
+#: ../java/build/Proxy.java:110 ../java/build/Proxy.java:118
+#: ../java/build/Proxy.java:130 ../java/build/Proxy.java:171
+#: ../java/build/Proxy.java:196 ../java/build/Proxy.java:217
 msgid "Could not find the following destination:"
 msgstr "Şu hedef bulunamadı:"
 
@@ -134,12 +140,15 @@ msgstr "Çıkış vekil sunucusu bulunamadı"
 #: ../java/build/Proxy.java:23
 msgid ""
 "The HTTP outproxy was not reachable, because its lease set was not found."
-msgstr "Kiralama kümesi bulunamadığından HTTP çıkış vekil sunucusuna erişilemiyor."
+msgstr ""
+"Kiralama kümesi bulunamadığından HTTP çıkış vekil sunucusuna erişilemiyor."
 
 #: ../java/build/Proxy.java:24
 msgid ""
 "The outproxy is probably down, but there could also be network congestion."
-msgstr "Çıkış vekil sunucusu büyük olasılıkla çalışmıyor ancak bir ağ tıkanıklığı da olabilir."
+msgstr ""
+"Çıkış vekil sunucusu büyük olasılıkla çalışmıyor ancak bir ağ tıkanıklığı da "
+"olabilir."
 
 #: ../java/build/Proxy.java:25 ../java/build/Proxy.java:169
 #: ../java/build/Proxy.java:194 ../java/build/Proxy.java:215
@@ -147,15 +156,19 @@ msgstr "Çıkış vekil sunucusu büyük olasılıkla çalışmıyor ancak bir a
 msgid ""
 "You may want to {0}retry{1} as this will randomly reselect an outproxy from "
 "the pool you have defined {2}here{3} (if you have more than one configured)."
-msgstr "{2}Buradan{3} tanımladığınız çıkış sunucusu havuzundan rastgele bir seçim yaparak {0}yeniden denemek{1} isteyebilirsiniz (birden fazla sunucu ayarladıysanız)."
+msgstr ""
+"{2}Buradan{3} tanımladığınız çıkış sunucusu havuzundan rastgele bir seçim "
+"yaparak {0}yeniden denemek{1} isteyebilirsiniz (birden fazla sunucu "
+"ayarladıysanız)."
 
 #: ../java/build/Proxy.java:26 ../java/build/Proxy.java:170
 #: ../java/build/Proxy.java:195 ../java/build/Proxy.java:216
 #, java-format
 msgid ""
-"If you continue to have trouble you may want to edit your outproxy list "
-"{0}here{1}."
-msgstr "Sorun sürerse {0}buradan{1} çıkış vekil sunucu listenizi düzenleyebilirsiniz."
+"If you continue to have trouble you may want to edit your outproxy list {0}"
+"here{1}."
+msgstr ""
+"Sorun sürerse {0}buradan{1} çıkış vekil sunucu listenizi düzenleyebilirsiniz."
 
 #: ../java/build/Proxy.java:28
 msgid "Information: New Host Name"
@@ -169,7 +182,9 @@ msgstr "Bilgi: Yeni sunucu adı ve adres yardımcısı"
 msgid ""
 "The address helper link you followed is for a new host name that is not in "
 "your address book."
-msgstr "İzlediğiniz adres yardımcı bağlantısı adres defterinizde bulunmayan yeni bir sunucu adı için."
+msgstr ""
+"İzlediğiniz adres yardımcı bağlantısı adres defterinizde bulunmayan yeni bir "
+"sunucu adı için."
 
 #: ../java/build/Proxy.java:36
 msgid "You may save this host name to your local address book."
@@ -182,15 +197,19 @@ msgstr "Adres defterinize kaydederseniz bu ileti bir daha görüntülenmez."
 
 #: ../java/build/Proxy.java:38
 msgid ""
-"If you do not save it, the host name will be forgotten after the next router"
-" restart."
-msgstr "Adres defterinize kaydetmezseniz sunucu adı yöneltici yeniden başlatıldığında unutulur."
+"If you do not save it, the host name will be forgotten after the next router "
+"restart."
+msgstr ""
+"Adres defterinize kaydetmezseniz sunucu adı yöneltici yeniden "
+"başlatıldığında unutulur."
 
 #: ../java/build/Proxy.java:39
 msgid ""
 "If you do not wish to visit this host, click the \"back\" button on your "
 "browser."
-msgstr "Bu sunucuyu ziyaret etmek istemiyorsanız tarayıcınızın \"geri\" düğmesine tıklayın."
+msgstr ""
+"Bu sunucuyu ziyaret etmek istemiyorsanız tarayıcınızın \"geri\" düğmesine "
+"tıklayın."
 
 #: ../java/build/Proxy.java:46 ../java/build/Proxy.java:119
 #: ../java/build/Proxy.java:125
@@ -199,11 +218,11 @@ msgstr "Uyarı: Hedef geçersiz"
 
 #: ../java/build/Proxy.java:47
 msgid "The Base32 address is invalid."
-msgstr "Base32 adresi geçersiz"
+msgstr "Base32 adresi geçersiz."
 
 #: ../java/build/Proxy.java:56
 msgid "The website was not reachable, because its lease set was not found."
-msgstr "Kiralama kümesi bulunamadığından HTTP sitesine erişilemiyor."
+msgstr "Kiralama kümesi bulunamadığından internet sitesine erişilemiyor."
 
 #: ../java/build/Proxy.java:57
 msgid ""
@@ -216,13 +235,16 @@ msgstr "Uyarı: İstek adresi geçersiz"
 
 #: ../java/build/Proxy.java:67
 msgid "The request URI is invalid, and probably contains illegal characters."
-msgstr "İstek adresi geçersiz ve büyük olasılıkla uygun olmayan karakterler içeriyor."
+msgstr ""
+"İstek adresi geçersiz ve büyük olasılıkla uygun olmayan karakterler içeriyor."
 
 #: ../java/build/Proxy.java:68
 msgid ""
 "If you clicked a link, check the end of the URI for any characters the "
 "browser has mistakenly added on."
-msgstr "Bir bağlantıya tıkladıysanız, adresin sonuna bakarak hatalı eklenmiş karakterler olup olmadığını denetleyin."
+msgstr ""
+"Bir bağlantıya tıkladıysanız, adresin sonuna bakarak hatalı eklenmiş "
+"karakterler olup olmadığını denetleyin."
 
 #: ../java/build/Proxy.java:69
 msgid "Error: Request Denied"
@@ -240,7 +262,9 @@ msgstr "Tarayıcınızın ayarları hatalı."
 msgid ""
 "Do not use the proxy to access the router console, localhost, or local LAN "
 "destinations."
-msgstr "Yöneltici panosu, yerel sunucu ya da yerel ağ hedeflerine erişmek için vekil sunucu kullanmayın."
+msgstr ""
+"Yöneltici panosu, yerel sunucu ya da yerel ağ hedeflerine erişmek için vekil "
+"sunucu kullanmayın."
 
 #: ../java/build/Proxy.java:78
 msgid "Website Unknown"
@@ -265,26 +289,28 @@ msgstr "Base 64 adresiniz varsa {0}adres defterinize ekleyin{1}."
 
 #: ../java/build/Proxy.java:88
 msgid ""
-"Otherwise, find a Base 32 or address helper link, or use a jump service link"
-" below."
-msgstr "Yoksa bir Base 32 adres yardımcı bağlantısı bulun ya da aşağıdaki sıçrama hizmeti bağlantısını kullanın."
+"Otherwise, find a Base 32 or address helper link, or use a jump service link "
+"below."
+msgstr ""
+"Yoksa bir Base 32 adres yardımcı bağlantısı bulun ya da aşağıdaki sıçrama "
+"hizmeti bağlantısını kullanın."
 
 #: ../java/build/Proxy.java:89
 #, java-format
 msgid ""
 "Seeing this page often? See {0}the FAQ{1} for help in {2}adding some "
 "subscriptions{3} to your addressbook."
-msgstr "Sık sık bu sayfayı görüyorsanız adres defterinize {2}bazı abonelikler eklemek{3} için {0}SSS{1} bölümüne bakın."
+msgstr ""
+"Sık sık bu sayfayı görüyorsanız adres defterinize {2}bazı abonelikler "
+"eklemek{3} için {0}SSS{1} bölümüne bakın."
 
 #: ../java/build/Proxy.java:98
 msgid ""
 "The website was not reachable, because it uses encryption options that are "
 "not supported by your I2P or Java version."
-msgstr "Kullanılan şifreleme seçenekleri I2P ya da Java sürümünüz tarafından desteklenmediğinden siteye erişilemiyor."
-
-#: ../java/build/Proxy.java:99 ../java/build/Proxy.java:217
-msgid "Could not connect to the following destination:"
-msgstr "Şu hedefle bağlantı kurulamadı:"
+msgstr ""
+"Kullanılan şifreleme seçenekleri I2P ya da Java sürümünüz tarafından "
+"desteklenmediğinden siteye erişilemiyor."
 
 #: ../java/build/Proxy.java:100 ../java/build/Proxy.java:106
 #: ../java/build/Proxy.java:185 ../java/build/Proxy.java:191
@@ -299,9 +325,11 @@ msgstr "Sayfa yüklenirken site bağlantısı sıfırlandı."
 msgid ""
 "The website could be temporarily unavailable, too busy, or it has blocked "
 "your access."
-msgstr "Site geçici olarak kullanılamıyor, çok meşgul ya da erişiminizi engellemiş olabilir."
+msgstr ""
+"Site geçici olarak kullanılamıyor, çok meşgul ya da erişiminizi engellemiş "
+"olabilir."
 
-#: ../java/build/Proxy.java:117
+#: ../java/build/Proxy.java:111 ../java/build/Proxy.java:117
 msgid "Warning: Authorization Required"
 msgstr "Uyarı: Kimlik doğrulaması gerekli"
 
@@ -313,9 +341,11 @@ msgstr "Belirtilen site hedefi geçersiz ya da bir nedenle erişilemiyor."
 
 #: ../java/build/Proxy.java:127
 msgid ""
-"Perhaps you pasted in the wrong Base 64 string or the link you are following"
-" is bad."
-msgstr "Yanlış Base 64 dizgesi yapıştırmış olabilirsiniz ya da izlediğiniz bağlantı sorunlu."
+"Perhaps you pasted in the wrong Base 64 string or the link you are following "
+"is bad."
+msgstr ""
+"Yanlış Base 64 dizgesi yapıştırmış olabilirsiniz ya da izlediğiniz bağlantı "
+"sorunlu."
 
 #: ../java/build/Proxy.java:128
 msgid "The I2P host could also be offline."
@@ -329,7 +359,9 @@ msgstr "Uyarı: Herhangi bir çıkış vekil sunucusu ayarlanmamış"
 msgid ""
 "Your request was for a site outside of I2P, but you have no HTTP outproxy "
 "configured."
-msgstr "İsteğiniz I2P dışındaki bir site için ancak ayarlanmış bir HTTP çıkış vekil sunucunuz yok."
+msgstr ""
+"İsteğiniz I2P dışındaki bir site için ancak ayarlanmış bir HTTP çıkış vekil "
+"sunucunuz yok."
 
 #: ../java/build/Proxy.java:139
 msgid "Please configure an outproxy in I2PTunnel."
@@ -343,20 +375,27 @@ msgstr "Uyarı: Hedef anahtarı çakışması"
 msgid ""
 "The address helper link you followed specifies a different destination key "
 "than the entry in your address book."
-msgstr "İzlediğiniz adres yardımcı bağlantısı adres defterinizde farklı bir hedef anahtarı belirtilmiş."
+msgstr ""
+"İzlediğiniz adres yardımcı bağlantısı adres defterinizde farklı bir hedef "
+"anahtarı belirtilmiş."
 
 #: ../java/build/Proxy.java:148
 msgid ""
-"Someone could be trying to impersonate another website, or people have given"
-" two websites identical names."
-msgstr "Birisi başka bir siteyi taklit etmeye çalışıyor olabilir ya da iki farklı kişi iki ayrı siteye aynı adı vermiş olabilir."
+"Someone could be trying to impersonate another website, or people have given "
+"two websites identical names."
+msgstr ""
+"Birisi başka bir siteyi taklit etmeye çalışıyor olabilir ya da iki farklı "
+"kişi iki ayrı siteye aynı adı vermiş olabilir."
 
 #: ../java/build/Proxy.java:149
 msgid ""
-"Resolve the conflict by deciding which key you trust, and then either ignore"
-" the address helper link, or delete the host entry from your address book "
-"and click the address helper link again."
-msgstr "Bu çakışmayı çözmek için hangi anahtara güveneceğinize karar verin ve diğer adres yardımcısı bağlantısını yok sayın ya da adres defterinizden sunucu kaydını silerek adres yardımcısı bağlantısına yeniden tıklayın."
+"Resolve the conflict by deciding which key you trust, and then either ignore "
+"the address helper link, or delete the host entry from your address book and "
+"click the address helper link again."
+msgstr ""
+"Bu çakışmayı çözmek için hangi anahtara güveneceğinize karar verin ve diğer "
+"adres yardımcısı bağlantısını yok sayın ya da adres defterinizden sunucu "
+"kaydını silerek adres yardımcısı bağlantısına yeniden tıklayın."
 
 #: ../java/build/Proxy.java:150 ../java/build/Proxy.java:156
 msgid "Warning: Bad Address Helper"
@@ -369,23 +408,28 @@ msgstr "Adresteki ({0}i2paddresshelper={1}) çözümlenemedi."
 
 #: ../java/build/Proxy.java:158
 msgid "It seems to be garbage data, or a mistyped Base 32 address."
-msgstr "Anlamsız bir veri ya da hatalı yazılmış bir Base 32 adresi gibi görünüyor."
+msgstr ""
+"Anlamsız bir veri ya da hatalı yazılmış bir Base 32 adresi gibi görünüyor."
 
 #: ../java/build/Proxy.java:159
 msgid ""
 "Check your URL to try and fix the helper key to be a valid Base 32 hostname "
 "or Base 64 key."
-msgstr "Adresi denetleyip, yardımcı anahtarı geçerli bir Base 32 sunucu adı ya da Base 64 anahtarı olacak şekilde düzeltmeyi deneyin."
+msgstr ""
+"Adresi denetleyip, yardımcı anahtarı geçerli bir Base 32 sunucu adı ya da "
+"Base 64 anahtarı olacak şekilde düzeltmeyi deneyin."
 
 #: ../java/build/Proxy.java:167
 msgid "The HTTP Outproxy was not found."
-msgstr "HTTP çıkış vekil sunucusu bulunamadı"
+msgstr "HTTP çıkış vekil sunucusu bulunamadı."
 
 #: ../java/build/Proxy.java:168
 msgid ""
 "It is offline, there is network congestion, or your router is not yet well-"
 "integrated with peers."
-msgstr "Çevrim dışı, bir ağ tıkanıklığı var ya da yönelticiniz henüz eşler ile iyi bütünleşmemiş."
+msgstr ""
+"Çevrim dışı, bir ağ tıkanıklığı var ya da yönelticiniz henüz eşler ile iyi "
+"bütünleşmemiş."
 
 #: ../java/build/Proxy.java:172 ../java/build/Proxy.java:178
 msgid "Warning: Request Denied"
@@ -404,24 +448,29 @@ msgid "I2P HTTP Proxy Authorization Required"
 msgstr "I2P HTTP vekil sunucu kimlik doğrulaması gerekiyor"
 
 #: ../java/build/Proxy.java:182
-msgid ""
-"This proxy is configured to require a username and password for access."
-msgstr "Vekil sunucu erişim için bir kullanıcı adı ve parola isteyecek şekilde ayarlanmış."
+msgid "This proxy is configured to require a username and password for access."
+msgstr ""
+"Vekil sunucu erişim için bir kullanıcı adı ve parola isteyecek şekilde "
+"ayarlanmış."
 
 #: ../java/build/Proxy.java:183
 #, java-format
 msgid ""
 "Please enter your username and password, or check your {0}router "
 "configuration{1} or {2}I2PTunnel configuration{3}."
-msgstr "Lütfen kullanıcı adı ve parolayı yazın ya da {0}yöneltici yapılandırmasını{1} ya da {2}I2PTunnel yapılandırmasını{3} denetleyin."
+msgstr ""
+"Lütfen kullanıcı adı ve parolayı yazın ya da {0}yöneltici "
+"yapılandırmasını{1} ya da {2}I2PTunnel yapılandırmasını{3} denetleyin."
 
 #: ../java/build/Proxy.java:184
 #, java-format
 msgid ""
-"To disable authorization, remove the configuration "
-"{0}i2ptunnel.proxy.auth=basic{1}, then stop and restart the HTTP Proxy "
-"tunnel."
-msgstr "Kimlik doğrulamasını etkisizleştirmek için {0}i2ptunnel.proxy.auth=basic{1} yapılandırmasını silin ve HTTP vekil sunucu tünelini durdurup yeniden başlatın."
+"To disable authorization, remove the configuration {0}"
+"i2ptunnel.proxy.auth=basic{1}, then stop and restart the HTTP Proxy tunnel."
+msgstr ""
+"Kimlik doğrulamasını etkisizleştirmek için {0}i2ptunnel.proxy.auth=basic{1} "
+"yapılandırmasını silin ve HTTP vekil sunucu tünelini durdurup yeniden "
+"başlatın."
 
 #: ../java/build/Proxy.java:192
 msgid "The connection to the proxy was reset."
@@ -429,9 +478,11 @@ msgstr "Vekil sunucu bağlantısı sıfırlandı."
 
 #: ../java/build/Proxy.java:193
 msgid ""
-"The proxy could be temporarily unavailable, too busy, or it has blocked your"
-" access."
-msgstr "Vekil sunucu geçici olarak kullanılamıyor, çok meşgul ya da erişiminizi engellemiş olabilir."
+"The proxy could be temporarily unavailable, too busy, or it has blocked your "
+"access."
+msgstr ""
+"Vekil sunucu geçici olarak kullanılamıyor, çok meşgul ya da erişiminizi "
+"engellemiş olabilir."
 
 #: ../java/build/Proxy.java:197 ../java/build/Proxy.java:203
 msgid "Warning: Non-HTTP Protocol"
@@ -455,249 +506,269 @@ msgstr "Çıkış vekil sunucusuna erişilemiyor"
 
 #: ../java/build/Proxy.java:214
 msgid ""
-"The HTTP outproxy was not reachable, because it uses encryption options that"
-" are not supported by your I2P or Java version."
-msgstr "Kullanılan şifreleme seçenekleri I2P ya da Java sürümünüz tarafından desteklenmediğinden HTTP çıkış vekil sunucusuna erişilemiyor."
+"The HTTP outproxy was not reachable, because it uses encryption options that "
+"are not supported by your I2P or Java version."
+msgstr ""
+"Kullanılan şifreleme seçenekleri I2P ya da Java sürümünüz tarafından "
+"desteklenmediğinden HTTP çıkış vekil sunucusuna erişilemiyor."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:692
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:693
 msgid "This seems to be a bad destination:"
 msgstr "Hedef kötü görünüyor:"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:693
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:694
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr "i2paddresshelper bunun gibi bir hedef için size yardımcı olamaz!"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:765
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:766
 #, java-format
 msgid ""
-"To visit the destination in your address book, click <a "
-"href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, "
-"click <a href=\"{1}\">here</a>."
-msgstr "Adres defterinizdeki hedefi ziyaret etmek için <a href=\"{0}\">buraya tıklayın</a>. Çakışan adres yardımcısı hedefinizi ziyaret etmek için ise <a href=\"{1}\">buraya tıklayın</a>."
+"To visit the destination in your address book, click <a href=\"{0}\">here</"
+"a>. To visit the conflicting addresshelper destination, click <a "
+"href=\"{1}\">here</a>."
+msgstr ""
+"Adres defterinizdeki hedefi ziyaret etmek için <a href=\"{0}\">buraya "
+"tıklayın</a>. Çakışan adres yardımcısı hedefinizi ziyaret etmek için ise <a "
+"href=\"{1}\">buraya tıklayın</a>."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:774
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:775
 #, java-format
 msgid "Destination for {0} in address book"
 msgstr "Adres defterindeki {0} için hedef"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:777
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:778
 msgid "Conflicting address helper destination"
 msgstr "Çakışan adres yardımcısı hedefi"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1224
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1226
 msgid "Corrupt Base32 address"
 msgstr "Base32 adresi hatalı"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1304
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1306
 msgid "Destination lease set not found"
 msgstr "Hedef kiralama kümesi bulunamadı"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1437
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1443
 msgid "Host"
 msgstr "Sunucu"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1441
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1502
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1447
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1509
 msgid "Base32"
 msgstr "Base32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1445
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1451
 msgid "Destination"
 msgstr "Hedef"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1451
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1458
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Kaydetmeden {0} sitesine ilerle"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1452
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1459
 msgid ""
 "You can browse to the site without saving it to the address book. The "
 "address will be remembered until you restart your I2P router."
-msgstr "Adres defterine kaydetmeden sitede gezinebilirsiniz. I2P yönelticinizi yeniden başlattığınızda adres hatırlanır."
+msgstr ""
+"Adres defterine kaydetmeden sitede gezinebilirsiniz. I2P yönelticinizi "
+"yeniden başlattığınızda adres hatırlanır."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1453
-msgid "Continue without saving"
-msgstr "Kaydetmeden ilerle"
+#. FIXME wasn't escaped
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1468
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1555
+msgid "Save & continue"
+msgstr "Kaydedip ilerle"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1460
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1470
 #, java-format
 msgid "Save {0} to router address book and continue to website"
 msgstr "Yöneltici adres defterine kaydederek {0} sitesine ilerle"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1461
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1471
 msgid ""
 "This address will be saved to your Router address book where your "
 "subscription-based addresses are stored."
-msgstr "Bu adres yönelticinizin abonelik temelli adresleri kaydettiği adres defterine kaydedilecek."
+msgstr ""
+"Bu adres yönelticinizin abonelik temelli adresleri kaydettiği adres "
+"defterine kaydedilecek."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1463
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1473
 msgid ""
 "If you want to keep track of sites you have added manually, add to your "
 "Local or Private address book instead."
-msgstr "El ile eklediğiniz siteleri izlemek istiyorsanız Yerel ya da Kişisel adres defterinize ekleyin."
+msgstr ""
+"El ile eklediğiniz siteleri izlemek istiyorsanız Yerel ya da Kişisel adres "
+"defterinize ekleyin."
 
-#. FIXME wasn't escaped
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1466
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1548
-msgid "Save & continue"
-msgstr "Kaydedip ilerle"
-
-#. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1473
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1481
 #, java-format
 msgid "Save {0} to local address book and continue to website"
 msgstr "Yerel adres defterine kaydederek {0} sitesine ilerle"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1474
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1482
 msgid ""
 "This address will be saved to your Local address book. Select this option "
 "for addresses you wish to keep separate from the main router address book, "
 "but don't mind publishing."
-msgstr "Bu adres yerel adres defterinize kaydedilecek. Ana yöneltici adres defterinden ayrı tutmak istediğiniz ancak yayınlanmasına aldırmayacağınız adresler için bu seçeneği işaretleyin."
+msgstr ""
+"Bu adres yerel adres defterinize kaydedilecek. Ana yöneltici adres "
+"defterinden ayrı tutmak istediğiniz ancak yayınlanmasına aldırmayacağınız "
+"adresler için bu seçeneği işaretleyin."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1478
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1486
 #, java-format
 msgid "Save {0} to private address book and continue to website"
 msgstr "Kişisel adres defterine kaydederek {0} sitesine ilerle"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1479
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1487
 msgid ""
 "This address will be saved to your Private address book, ensuring it is "
 "never published."
-msgstr "Bu adres kişisel adres defterinize kaydedilecek ve hiç bir zaman yayınlanmayacak."
+msgstr ""
+"Bu adres kişisel adres defterinize kaydedilecek ve hiç bir zaman "
+"yayınlanmayacak."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1507
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1514
 msgid "Base32 address requires lookup password"
 msgstr "Base32 adresi için tarama parolası gerekiyor"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1509
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1516
 msgid "Base32 address requires encryption key"
 msgstr "Base32 adresi için şifreleme anahtarı gerekiyor"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1511
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1518
 msgid "Base32 address requires encryption key and lookup password"
 msgstr "Base32 adresi için şifreleme anahtarı ve tarama parolası gerekiyor"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1513
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1520
 msgid "Base32 address decryption failure, check encryption key"
 msgstr "Base32 adresinin şifresi çözülemedi. Şifreleme anahtarını denetleyin"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1524
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1531
 msgid "Generate"
 msgstr "Üret"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1525
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1532
 msgid "Encryption key"
 msgstr "Şifreleme anahtarı"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1526
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1533
 msgid ""
 "You must either enter a PSK encryption key provided by the server operator, "
 "or generate a DH encryption key and send that to the server operator."
-msgstr "Sunucu işletmesi tarafından sağlanan bir PSK şifreleme anahtarı yazmalı ya da bir Diffie-Hellman şifreleme anahtarı üreterek sunucu işletmecisine göndermelisiniz."
+msgstr ""
+"Sunucu işletmesi tarafından sağlanan bir PSK şifreleme anahtarı yazmalı ya "
+"da bir Diffie-Hellman şifreleme anahtarı üreterek sunucu işletmecisine "
+"göndermelisiniz."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1527
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1534
 msgid "Ask the server operator for help."
 msgstr "Yardım almak için sunucu işletmecisine sorun."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1530
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1537
 msgid "Enter PSK encryption key"
 msgstr "PSK şifreleme anahtarını yazın"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1533
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1540
 msgid "Generate new DH encryption key"
 msgstr "Yeni bir Diffie-Hellman şifreleme anahtarı üretin"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1541
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1548
 msgid "Lookup password"
 msgstr "Tarama parolası"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1542
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1549
 msgid "You must enter the password provided by the server operator."
 msgstr "Sunucu işletmecisi tarafından sağlanan parolayı yazın."
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:196
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:209
 #, java-format
 msgid "Added via address helper from {0}"
 msgstr "Adres yardımcısı ile {0} üzerinden eklendi"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:198
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:211
 msgid "Added via address helper"
 msgstr "Adres yardımcısı ile eklendi"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:235
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:248
 msgid "Missing lookup password"
 msgstr "Tarama parolası eksik"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:249
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:262
 msgid "Missing private key"
 msgstr "Kişisel anahtar eksik"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:254
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:267
 msgid "Invalid private key"
 msgstr "Kişisel anahtar geçersiz"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:287
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:306
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:300
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:319
 msgid "Your new encryption key"
 msgstr "Yeni şifreleme anahtarınız"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:301
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:314
 msgid "Address book"
 msgstr "Adres defteri"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:311
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:324
 msgid "Copy the key and send it to the server operator."
 msgstr "Anahtarı kopyala ve sunucu işletmecisine gönder."
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:313
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:326
 msgid "After you are granted permission, you may proceed to the website."
 msgstr "İzin verdikten sonra siteye ilerleyebilirsiniz."
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:334
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:347
 msgid "Go back and fix the error"
 msgstr "Geri dön ve sorunu düzelt"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:345
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:358
 msgid "router"
 msgstr "yöneltici"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:347
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:360
 msgid "local"
 msgstr "yerel"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:349
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:362
 msgid "private"
 msgstr "kişisel"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:362
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:396
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:376
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:411
 #, java-format
 msgid "Redirecting to {0}"
 msgstr "{0} sitesine yönlendiriliyor"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:371
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:405
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:385
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:420
 msgid "Address Book"
 msgstr "Adres defteri"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:376
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:390
 #, java-format
 msgid "Saved {0} to the {1} address book, redirecting now."
 msgstr "{0}, {1} adres defterine kaydedildi, yönlendiriliyor."
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:377
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:391
 #, java-format
 msgid "Failed to save {0} to the {1} address book, redirecting now."
 msgstr "{0}, {1} adres defterine kaydedilemedi, yönlendiriliyor."
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:379
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:411
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:393
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:426
 msgid "Click here if you are not redirected automatically."
 msgstr "Otomatik yönlendirme yapılamazsa buraya tıklayın."
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:409
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:424
 #, java-format
 msgid "Saved the authentication for {0}, redirecting now."
 msgstr "{0} için kimlik doğrulaması kaydedildi, yönlendiriliyor."
+
+#~ msgid "Could not connect to the following destination:"
+#~ msgstr "Şu hedefle bağlantı kurulamadı:"
+
+#~ msgid "Continue without saving"
+#~ msgstr "Kaydetmeden ilerle"
