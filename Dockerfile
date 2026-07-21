@@ -15,10 +15,12 @@ RUN apt-get update \
         gettext \
         tar \
         bzip2 \
+        git \
         openjdk-21-jdk-headless \
     && echo "javac.version=21" >> override.properties \
     && echo "javac.release=21" >> override.properties \
     && echo "build.built-by=Docker" >> override.properties \
+    && echo "build.revision=$(git rev-parse HEAD)" >> override.properties \
     && curl -fsSL https://dlcdn.apache.org/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.bz2 | tar -jxf - -C /opt \
     && /opt/apache-ant-${ANT_VERSION}/bin/ant preppkg-linux-only \
     && rm -rf pkg-temp/osid pkg-temp/lib/wrapper pkg-temp/lib/wrapper.* \
