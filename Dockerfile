@@ -1,18 +1,28 @@
 ARG TARGETARCH
 
 # --- Single builder (Java bytecode is platform-independent) ---
-FROM alpine:latest AS builder
+FROM debian:trixie-slim AS builder
 
 ARG ANT_VERSION="1.10.17"
 
 WORKDIR /tmp/build
 COPY --exclude=docker . .
 
-RUN apk add --no-cache gettext tar bzip2 curl openjdk21 \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        gettext \
+        tar \
+        bzip2 \
+        openjdk-21-jdk-headless \
+    && echo "javac.version=21" >> override.properties \
+    && echo "javac.release=21" >> override.properties \
     && echo "build.built-by=Docker" >> override.properties \
-    && curl https://dlcdn.apache.org//ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.bz2 | tar -jxf - -C /opt \
+    && curl -fsSL https://dlcdn.apache.org/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.bz2 | tar -jxf - -C /opt \
     && /opt/apache-ant-${ANT_VERSION}/bin/ant preppkg-linux-only \
-    && rm -rf pkg-temp/osid pkg-temp/lib/wrapper pkg-temp/lib/wrapper.*
+    && rm -rf pkg-temp/osid pkg-temp/lib/wrapper pkg-temp/lib/wrapper.* \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY docker docker
 
@@ -21,16 +31,25 @@ COPY docker docker
 # Separate runtime stages are maintained for each supported
 # architecture to allow future architecture-specific changes.
 # This does not increase the size of the final images.
-FROM debian:bookworm-slim AS runtime-amd64
-RUN apt-get update && apt-get install -y --no-install-recommends openjdk-17-jre-headless fonts-dejavu iproute2 \
+FROM debian:trixie-slim AS runtime-amd64
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        openjdk-21-jre-headless \
+        fonts-dejavu \
+        iproute2 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-FROM debian:bookworm-slim AS runtime-arm64
-RUN apt-get update && apt-get install -y --no-install-recommends openjdk-17-jre-headless fonts-dejavu iproute2 \
+FROM debian:trixie-slim AS runtime-arm64
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        openjdk-21-jre-headless \
+        fonts-dejavu \
+        iproute2 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-FROM debian:bookworm-slim AS runtime-arm
-RUN apt-get update && apt-get install -y --no-install-recommends openjdk-17-jre-headless fonts-dejavu iproute2 \
+FROM debian:trixie-slim AS runtime-arm
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        openjdk-21-jre-headless \
+        fonts-dejavu \
+        iproute2 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Select runtime based on target architecture
