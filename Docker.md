@@ -13,9 +13,9 @@ Both images are identical and support the following architectures:
 
 | Architecture | Base Image | Java Version |
 |-------------|------------|--------------|
-| amd64 | Debian Bookworm | OpenJDK 17 |
-| arm64 (v8) | Debian Bookworm | OpenJDK 17 |
-| arm (v7) | Debian Bookworm | OpenJDK 17 |
+| amd64 | Debian Trixie | OpenJDK 21 |
+| arm64 (v8) | Debian Trixie | OpenJDK 21 |
+| arm (v7) | Debian Trixie | OpenJDK 21 |
 
 ---
 
