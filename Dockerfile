@@ -9,7 +9,7 @@ WORKDIR /tmp/build
 COPY --exclude=docker . .
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+    && apt-get install -y \
         ca-certificates \
         curl \
         gettext \
@@ -34,21 +34,21 @@ COPY docker docker
 # architecture to allow future architecture-specific changes.
 # This does not increase the size of the final images.
 FROM debian:trixie-slim AS runtime-amd64
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y \
         openjdk-21-jre-headless \
         fonts-dejavu \
         iproute2 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 FROM debian:trixie-slim AS runtime-arm64
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y \
         openjdk-21-jre-headless \
         fonts-dejavu \
         iproute2 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 FROM debian:trixie-slim AS runtime-arm
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y \
         openjdk-21-jre-headless \
         fonts-dejavu \
         iproute2 \
