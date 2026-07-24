@@ -14,6 +14,7 @@ sourceSets {
 dependencies {
     implementation project(':core')
     implementation project(':apps:jetty')
+    implementation project(':apps:ministreaming')
 }
 
 // Create the java files from the po files. The jar task will compile them.

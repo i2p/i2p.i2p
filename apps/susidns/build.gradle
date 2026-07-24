@@ -14,6 +14,7 @@ sourceSets {
 dependencies {
     implementation project(':core')
     implementation project(':apps:jetty')
+    implementation project(':apps:addressbook')
 
     // seems like it should be compileOnly but that doesn't work
     implementation 'org.apache.ant:ant:1.10.14'
