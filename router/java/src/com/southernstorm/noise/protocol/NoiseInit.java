@@ -80,22 +80,22 @@ public class NoiseInit {
         // no 1024, too big
 
         /**
-         *
+         * Supported patterns
          */
         public enum PatternID {
             XK(PATTERN_ID_XK, protocolName),
-            IK(PATTERN_ID_XK, protocolName2),
-            N(PATTERN_ID_XK, protocolName3),
-            N_NO_RESPONSE(PATTERN_ID_XK, protocolName3),
-            XK_SSU2(PATTERN_ID_XK, protocolName4),
-            IKHFS_512(PATTERN_ID_XK, protocolName5),
-            IKHFS_768(PATTERN_ID_XK, protocolName6),
-            IKHFS_1024(PATTERN_ID_XK, protocolName7),
-            XKHFS_512(PATTERN_ID_XK, protocolName8),
-            XKHFS_768(PATTERN_ID_XK, protocolName9),
-            XKHFS_1024(PATTERN_ID_XK, protocolName10),
-            XKHFS_512_SSU2(PATTERN_ID_XK, protocolName11),
-            XKHFS_768_SSU2(PATTERN_ID_XK, protocolName12);
+            IK(PATTERN_ID_IK, protocolName2),
+            N(PATTERN_ID_N, protocolName3),
+            N_NO_RESPONSE(PATTERN_ID_N_NO_RESPONSE, protocolName3),
+            XK_SSU2(PATTERN_ID_XK_SSU2, protocolName4),
+            IKHFS_512(PATTERN_ID_IKHFS_512, protocolName5),
+            IKHFS_768(PATTERN_ID_IKHFS_768, protocolName6),
+            IKHFS_1024(PATTERN_ID_IKHFS_1024, protocolName7),
+            XKHFS_512(PATTERN_ID_XKHFS_512, protocolName8),
+            XKHFS_768(PATTERN_ID_XKHFS_768, protocolName9),
+            XKHFS_1024(PATTERN_ID_XKHFS_1024, protocolName10),
+            XKHFS_512_SSU2(PATTERN_ID_XKHFS_512_SSU2, protocolName11),
+            XKHFS_768_SSU2(PATTERN_ID_XKHFS_768_SSU2, protocolName12);
 
             private final String prefix;
             private final String patternId;
@@ -150,6 +150,9 @@ public class NoiseInit {
             }
 
             public String getPrefix() { return prefix; }
+            /**
+             *  unused
+             */
             public String getPatternID() { return patternId; }
             public String getProtocolName() { return protoName; }
             public String getDH() { return dh; }
