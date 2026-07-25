@@ -559,7 +559,7 @@ public class DataHelper {
             if (file.getName().equals("router.config"))
                 out.println("# WARNING: Do NOT copy this file from one router to another, this may cause serious problems.");
             out.println("# NOTE: This I2P config file must use UTF-8 encoding");
-            out.println("# Last saved: " + formatTime(System.currentTimeMillis()));
+            out.println("# Last saved: " + formatTimeNormalSpaces(System.currentTimeMillis()));
             for (Map.Entry<Object, Object> entry : props.entrySet()) {
                 String name = (String) entry.getKey();
                 String val = (String) entry.getValue();
@@ -1739,7 +1739,7 @@ public class DataHelper {
      *  The default formatting for date/time, current locale, local time zone.
      *  Warning - NOT UTC!
      *  Warning - may contain UTF-8 chars, output format may change between Java versions.
-     *  As of Java 21, space before the AM/PM is a narrow no-break space U+202F,
+     *  As of Java 20, space before the AM/PM is a narrow no-break space U+202F,
      *  or e2 80 af.
      *
      *  Examples:
@@ -1757,6 +1757,23 @@ public class DataHelper {
             }
             return TIME_FORMAT.format(new Date(now));
         }
+    }
+
+    /**
+     *  The default formatting for date/time, current locale, local time zone,
+     *  EXCEPT UTF-8 spaces are replaced with normal spaces.
+     *  ref: https://inside.java/2024/03/29/quality-heads-up/
+     *
+     *  Warning - NOT UTC!
+     *  Warning - may contain other UTF-8 chars, output format may change between Java versions.
+     *
+     *  Examples:
+     *  en: Aug 30, 2019 12:38 PM
+     *  de: 30.08.2019 12:38
+     *  @since 0.9.71
+     */
+    public static String formatTimeNormalSpaces(long now) {
+        return formatTime(now).replace('\u202F', ' ').replace('\u00A0', ' ');
     }
     
     /**

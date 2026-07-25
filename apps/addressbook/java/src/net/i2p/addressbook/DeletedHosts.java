@@ -205,7 +205,7 @@ public class DeletedHosts {
             PrintWriter out = null;
             try {
                 out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(_file), "UTF-8")));
-                out.println("# Last saved: " + DataHelper.formatTime(System.currentTimeMillis()));
+                out.println("# Last saved: " + DataHelper.formatTimeNormalSpaces(System.currentTimeMillis()));
                 out.print(HELP);
                 for (String s : entries) {
                      out.println(s);

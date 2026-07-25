@@ -62,7 +62,7 @@ class Log {
         try {
             bw = new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(this.file,
                     true), "UTF-8"));
-            String timestamp = DataHelper.formatTime(I2PAppContext.getGlobalContext().clock().now());
+            String timestamp = DataHelper.formatTimeNormalSpaces(I2PAppContext.getGlobalContext().clock().now());
             bw.write(timestamp + " -- " + entry);
             bw.newLine();
         } catch (IOException exp) {
