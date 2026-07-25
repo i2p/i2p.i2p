@@ -184,6 +184,7 @@ public class GarlicMessageParser {
      *  @since public since 0.9.44
      */
     public CloveSet readCloveSet(byte data[], int offset) throws DataFormatException {
+        try {
         int numCloves = data[offset] & 0xff;
         offset++;
         //if (_log.shouldLog(Log.DEBUG))
@@ -211,5 +212,8 @@ public class GarlicMessageParser {
 
         CloveSet set = new CloveSet(cloves, cert, msgId, expiration);
         return set;
+        } catch (IndexOutOfBoundsException e) {
+            throw new DataFormatException("corrupt clove set", e);
+        }
     }
 }
