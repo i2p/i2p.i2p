@@ -249,8 +249,6 @@ public class SimpleTimer {
                             }
                         }
                     }
-                } catch (ThreadDeath td) {
-                    return; // die
                 } catch (InterruptedException ie) {
                     // ignore
                 } catch (Throwable t) {

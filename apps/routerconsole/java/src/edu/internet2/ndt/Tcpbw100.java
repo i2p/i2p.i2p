@@ -4574,10 +4574,7 @@ public class Tcpbw100 extends JApplet implements ActionListener {
 						try{
 							new TestWorker().run();
 						}catch( Throwable e ){
-						
-							if ( !( e instanceof ThreadDeath )){
-								_log.error("Bandwidth test error", e);
-							}
+							_log.error("Bandwidth test error", e);
 						}finally{
 							//sem.release();
 						}
