@@ -108,10 +108,13 @@ public class NamingServiceBean extends AddressbookBean
 	{
 		if (isDirect())
 			return super.getFileName();
+		String getbook = getBook();
+                if (getbook.equals("conflicts"))
+                    return "conflicts";
 		loadConfig();
-		String filename = properties.getProperty( getBook() + "_addressbook" );
+		String filename = properties.getProperty(getbook + "_addressbook");
 		if (filename == null)
-			return getBook();
+			return getbook;
 		return basename(filename);
 	}
 

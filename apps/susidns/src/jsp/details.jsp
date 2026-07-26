@@ -46,6 +46,7 @@
 <a class="abook private" href="addressbook?book=private&amp;filter=none"><%=intl._t("Private")%></a>&nbsp;
 <a class="abook local" href="addressbook?book=local&amp;filter=none"><%=intl._t("Local")%></a>&nbsp;
 <a class="abook router" href="addressbook?book=router&amp;filter=none"><%=intl._t("Router")%></a>&nbsp;
+<a class="abook conflicts" href="addressbook?book=conflicts&amp;filter=none"><%=intl._t("Conflicts")%></a>&nbsp;
 <a class="abook published" href="addressbook?book=published&amp;filter=none"><%=intl._t("Published")%></a>&nbsp;
 <a id="subs" href="subscriptions"><%=intl._t("Subscriptions")%></a>&nbsp;
 <a id="config" href="config"><%=intl._t("Configuration")%></a>
@@ -68,11 +69,27 @@
         if (addrs == null) {
             %><p>Not found: <%=detail%></p><%
         } else {
-            boolean haveImagegen = book.haveImagegen();
+            boolean isConflicts = book.getBook().equals("conflicts");
+            int conflictCount = 0;
+            if (isConflicts) {
+                %><h4><%=intl._t("Conflicting Entry")%></h4><%
+                conflictCount = addrs.size();
+                // temp. switch book and get the hosts.txt entries
+                book.setBook("hosts.txt");
+                java.util.List<i2p.susi.dns.AddressBean> addrs2 = book.getLookupAll();
+                if (addrs2 != null)
+                    addrs.addAll(addrs2);
+                book.setBook("conflicts");
+            }
+            boolean haveImagegen = !isConflicts && book.haveImagegen();
             // use one nonce for all
             String nonce = book.getSerial();
-            boolean showNotes = !book.getBook().equals("published");
+            boolean showNotes = !isConflicts && !book.getBook().equals("published");
+            int i = 0;
             for (i2p.susi.dns.AddressBean addr : addrs) {
+                if (isConflicts && i++ == conflictCount) {
+                    %><br><br><h4><%=intl._t("Router Address Book Entry")%></h4><%
+                }
                 String b32 = addr.getB32();
 %>
 <jsp:setProperty name="book" property="trClass"	value="0" />
@@ -86,14 +103,38 @@
 <table class="book" id="host_details" cellspacing="0" cellpadding="5">
 <tr class="list${book.trClass}">
 <td><%=intl._t("Hostname")%></td>
-<td><a href="http://<%=addr.getName()%>/" target="_top"><%=addr.getDisplayName()%></a></td>
+<td>
+<%
+   if (!isConflicts) {
+%>
+<a href="http://<%=addr.getName()%>/" target="_top"><%=addr.getDisplayName()%></a>
+<%
+   } else {
+%>
+<%=addr.getDisplayName()%>
+<%
+   }
+%>
+</td>
 </tr>
 <tr class="list${book.trClass}">
 <%
     if (addr.isIDN()) {
 %>
 <td><%=intl._t("Encoded Name")%></td>
-<td><a href="http://<%=addr.getName()%>/" target="_top"><%=addr.getName()%></a></td>
+<td>
+<%
+       if (!isConflicts) {
+%>
+<a href="http://<%=addr.getName()%>/" target="_top"><%=addr.getName()%></a>
+<%
+       } else {
+%>
+<%=addr.getName()%>
+<%
+       }
+%>
+</td>
 </tr>
 <tr class="list${book.trClass}">
 <%
@@ -110,10 +151,12 @@
 <td><%=intl._t("Address Helper")%></td>
 <td><a href="http://<%=addr.getName()%>/?i2paddresshelper=<%=addr.getDestination()%>" target="_top"><%=intl._t("link")%></a></td>
 </tr>
+<%--
 <tr class="list${book.trClass}">
 <td><%=intl._t("Public Key")%></td>
 <td><%=addr.getEncType()%></td>
 </tr>
+--%>
 <tr class="list${book.trClass}">
 <td><%=intl._t("Signing Key")%></td>
 <td><%=addr.getSigType()%></td>
@@ -126,7 +169,7 @@
 <td><%=intl._t("Validated")%></td>
 <td><%=addr.isValidated() ? intl._t("yes") : intl._t("no")%></td>
 </tr>
-<% if (showNotes) { %>
+<% if (showNotes || isConflicts) { %>
 <tr class="list${book.trClass}">
 <td><%=intl._t("Source")%></td>
 <td><%=addr.getSource()%></td>
@@ -161,7 +204,9 @@
 </table>
 <% if (showNotes) { %>
 </form>
-<% }  // showNotes  %>
+<% }  // showNotes
+   if (!isConflicts) {
+%>
 <div id="buttons">
 <form method="POST" action="addressbook">
 <p class="buttons">
@@ -176,6 +221,7 @@
 </form>
 </div><%-- buttons --%>
 <%
+    }  // !isConflicts
                 if (haveImagegen) {
 %>
 <div id="visualid">

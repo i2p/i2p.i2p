@@ -79,6 +79,8 @@ import net.metanotion.util.skiplist.SkipList;
  *         Each property key is a hostname.
  *         Each property value is the empty string.
  *
+ * There are host databases for each name in "lists", and a "conflicts" database.
+ *
  * For each host database, there is a skiplist containing
  * the hosts for that database.
  * The keys/values in these skiplists are as follows:
@@ -125,6 +127,7 @@ public class BlockfileNamingService extends DummyNamingService {
 
     private static final String HOSTS_DB = "hostsdb.blockfile";
     private static final String FALLBACK_LIST = "hosts.txt";
+    private static final String CONFLICTS_LIST = "conflicts";
     private static final String PROP_FORCE = "i2p.naming.blockfile.writeInAppContext";
 
     private static final String INFO_SKIPLIST = "%%__INFO__%%";
@@ -832,7 +835,7 @@ public class BlockfileNamingService extends DummyNamingService {
         }
         if (d != null) {
             putCache(hostname, d);
-        } else {
+        } else if (listname == null) {
             synchronized(_negativeCache) {
                 _negativeCache.put(key, DUMMY);
             }
@@ -873,14 +876,12 @@ public class BlockfileNamingService extends DummyNamingService {
         synchronized(_bf) {
             if (_isClosed)
                 return null;
-            for (String list : _lists) { 
-                if (listname != null && !list.equals(listname))
-                    continue;
-                try {
-                    DestEntry de = getEntry(list, key);
+            try {
+                if (listname != null) {
+                    DestEntry de = getEntry(listname, key);
                     if (de != null) {
                         if (!validate(key, de, listname))
-                            continue;
+                            return null;
                         if (de.destList != null) {
                             rv = de.destList;
                             if (storedOptions != null)
@@ -890,17 +891,32 @@ public class BlockfileNamingService extends DummyNamingService {
                             if (storedOptions != null)
                                 storedOptions.add(de.props);
                         }
-                        break;
                     }
-                } catch (IOException ioe) {
-                    break;
+                } else {
+                    for (String list : _lists) { 
+                        DestEntry de = getEntry(list, key);
+                        if (de != null) {
+                            if (!validate(key, de, listname))
+                                continue;
+                            if (de.destList != null) {
+                                rv = de.destList;
+                                if (storedOptions != null)
+                                    storedOptions.addAll(de.propsList);
+                            } else {
+                                rv = Collections.singletonList(de.dest);
+                                if (storedOptions != null)
+                                    storedOptions.add(de.props);
+                            }
+                            break;
+                        }
+                    }
                 }
-            }
+            } catch (IOException ioe) {}
             deleteInvalid();
         }
         if (rv != null) {
             putCache(hostname, rv.get(0));
-        } else {
+        } else if (listname == null) {
             synchronized(_negativeCache) {
                 _negativeCache.put(key, DUMMY);
             }
@@ -971,7 +987,8 @@ public class BlockfileNamingService extends DummyNamingService {
                     removeCache(hostname);
                     // removeReverseEntry(key, oldDest) ???
                 }
-                addReverseEntry(key, d);
+                if (!listname.equals(CONFLICTS_LIST))
+                    addReverseEntry(key, d);
                 for (NamingServiceListener nsl : _listeners) { 
                     if (changed)
                         nsl.entryChanged(this, hostname, d, options);
@@ -1046,7 +1063,8 @@ public class BlockfileNamingService extends DummyNamingService {
                 for (int i = 0; i < dests.size(); i++) {
                     Destination d = dests.get(i);
                     Properties options = propsList.get(i);
-                    addReverseEntry(key, d);
+                    if (!listname.equals(CONFLICTS_LIST))
+                        addReverseEntry(key, d);
                     for (NamingServiceListener nsl : _listeners) { 
                         if (changed)
                             nsl.entryChanged(this, hostname, d, options);
@@ -1094,10 +1112,12 @@ public class BlockfileNamingService extends DummyNamingService {
                 boolean rv = removed != null;
                 if (rv) {
                     removeCache(hostname);
-                    try {
-                        removeReverseEntry(key, removed.dest);
-                    } catch (ClassCastException cce) {
-                        _log.error("DB reverse remove error", cce);
+                    if (!listname.equals(CONFLICTS_LIST)) {
+                        try {
+                            removeReverseEntry(key, removed.dest);
+                        } catch (ClassCastException cce) {
+                            _log.error("DB reverse remove error", cce);
+                        }
                     }
                     for (NamingServiceListener nsl : _listeners) { 
                         nsl.entryRemoved(this, key);
@@ -1725,12 +1745,16 @@ public class BlockfileNamingService extends DummyNamingService {
                             newDests.add(dests.get(j));
                     }
                     storedOptions.remove(i);
-                    removeReverseEntry(hostname, d);
+                    boolean removerev = true;
                     if (options != null) {
                         String list = options.getProperty("list");
-                        if (list != null)
+                        if (list != null) {
                             storedOptions.get(0).setProperty("list", list);
+                            removerev = !list.equals(CONFLICTS_LIST);
+                        }
                     }
+                    if (removerev)
+                        removeReverseEntry(hostname, d);
                     return put(hostname, newDests, storedOptions, false);
                 }
             }
@@ -2203,15 +2227,11 @@ public class BlockfileNamingService extends DummyNamingService {
         I2PAppContext ctx = new I2PAppContext(ctxProps);
         BlockfileNamingService bns = new BlockfileNamingService(ctx);
         Properties sprops = new Properties();
-        String lname = "privatehosts.txt";
-        sprops.setProperty("list", lname);
-        System.out.println("List " + lname + " contains " + bns.size(sprops));
-        lname = "userhosts.txt";
-        sprops.setProperty("list", lname);
-        System.out.println("List " + lname + " contains " + bns.size(sprops));
-        lname = "hosts.txt";
-        sprops.setProperty("list", lname);
-        System.out.println("List " + lname + " contains " + bns.size(sprops));
+        String[] names = { "privatehosts.txt", "userhosts.txt", "hosts.txt", CONFLICTS_LIST, REVERSE_SKIPLIST };
+        for (String lname : names) {
+            sprops.setProperty("list", lname);
+            System.out.println("List " + lname + " contains " + bns.size(sprops) + " entries");
+        }
 
 /****
         List<String> names = null;

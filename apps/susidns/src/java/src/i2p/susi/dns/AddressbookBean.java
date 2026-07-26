@@ -130,6 +130,7 @@ public class AddressbookBean extends BaseBean
 		if( book == null || ( !book.equalsIgnoreCase( "local" ) &&
 				!book.equalsIgnoreCase( "router" ) &&
 				!book.equalsIgnoreCase( "private" ) &&
+				!book.equalsIgnoreCase( "conflicts" ) &&
 				!book.equalsIgnoreCase( "published" )))
 			book = "router";
 		
@@ -432,6 +433,7 @@ public class AddressbookBean extends BaseBean
 		return s.equals("router") ||
 		       s.equals("local") ||
 		       s.equals("published") ||
+		       s.equals("conflicts") ||
 		       s.equals("private");
 	}
 

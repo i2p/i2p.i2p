@@ -652,21 +652,47 @@ class Daemon {
                                    + addressbook.getLocation());
                             invalid++;
                         }        
-                  /****
-                    } else if (false && DEBUG && log != null) {
-                        // lookup the conflict if we haven't yet (O(n**2) for text file)
-                        if (isTextFile)
-                            oldDest = router.lookup(key);
-                        if (oldDest != null && !oldDest.toBase64().equals(entry.getValue())) {
-                            log.append("Conflict for " + key + ". From: "
-                                       + addressbook.getLocation()
-                                       + ". Destination in remote address book is "
-                                       + entry.getValue());
-                            conflict++;
+                    } else if (action == null && isKnown) {
+                        if (!oldDest.toBase64().equals(he.getDest())) {
+                            // there could be multiple dests in the router address book, so double check
+                            Properties props = new OrderedProperties();
+                            props.setProperty("list", "hosts.txt");
+                            List<Destination> current = router.lookupAll(key, props, null);
+                            Destination dest = new Destination(he.getDest());
+                            if (current == null || !current.contains(dest)) {
+                                // look in conflicts addressbook if we have already stored the conflict
+                                props.setProperty("list", "conflicts");
+                                List<Destination> conflicts = router.lookupAll(key, props, null);
+                                if (conflicts == null || !conflicts.contains(dest)) {
+                                    // store in conflicts addressbook
+                                    props.setProperty("s", addressbook.getLocation());
+                                    if (mustValidate)
+                                        props.setProperty("v", "true");
+                                    if (hprops != null) {
+                                        // merge in all the received properties
+                                        for (Map.Entry<Object, Object> e : hprops.entrySet()) {
+                                            props.setProperty(RCVD_PROP_PREFIX + e.getKey(), (String) e.getValue());
+                                        }
+                                    }
+                                    if (conflicts != null)
+                                        router.addDestination(key, dest, props);
+                                    else
+                                        router.put(key, dest, props);
+                                    if (log != null) {
+                                        log.append("Conflict for " + key + " from "
+                                                   + addressbook.getLocation()
+                                                   + " saved in conflicts address book");
+                                    }
+                                    conflict++;
+                                } else {
+                                    old++;
+                                }
+                            } else {
+                                old++;
+                            }
                         } else {
                             old++;
                         }
-                   ****/
                     } else {
                         old++;
                     }
