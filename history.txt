@@ -1,4 +1,10 @@
-2026-04-20 2.13.0 (API 0.9.70) released
+2026-07-26 zzz
+ * SusiDNS: Add conflicts addressbook
+
+2026-07-24 zzz
+ * Build: Gradle fixes
+
+2026-07-20 2.13.0 (API 0.9.70) released
 
 2026-07-10 zzz
  * NetDB: Adjust exploration thresholds
