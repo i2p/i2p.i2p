@@ -94,11 +94,11 @@ public class Reseeder {
               "";
 
     /**
-     *  The I2P reseed servers are managed by backup (backup@mail.i2p).
+     *  The I2P reseed servers are managed by backup (zzz@mail.i2p).
      *  Please contact him for support, change requests, or issues.
      *  See also the reseed forum http://zzz.i2p/forums/18
      *  and the reseed setup and testing guide
-     *  https://geti2p.net/en/get-involved/guides/reseed
+     *  http://i2p-projekt.i2p/en/docs/guides/reseed-server/
      *
      *  All supported reseed hosts need a corresponding reseed (SU3)
      *  signing certificate installed in the router.
@@ -106,8 +106,9 @@ public class Reseeder {
      *  All supported reseed hosts with selfsigned SSL certificates
      *  need the corresponding SSL certificate installed in the router.
      *
-     *  While this implementation supports SNI, others may not, so
-     *  SNI requirements are noted.
+     *  Output this list with 'java -jar router.jar reseeder list'.
+     *  Test these reseeds with 'java -jar router.jar reseeder'.
+     *  A status monitor is at https://checki2p.com/
      *
      * @since 0.8.2
      */
@@ -116,6 +117,9 @@ public class Reseeder {
         //
         // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
         // ----------------------------------           ------------------------     -------------------------     ---------------
+        "https://waw01.i2p-reseed.hosted-by.skhron.eu/" + ',' +   // freedompeer_at_skhron.eu  // CA
+        "https://sto01.i2p-reseed.hosted-by.skhron.eu/" + ',' +   // freedompeer_at_skhron.eu  // CA
+        "https://i2p.ntp.poweredbyberlin.de/" + ',' +   // reseedserver_at_mail.i2p.crt  // CA
         "https://spiral.likogan.dev/"         + ',' +   // admin_at_likogan.dev.crt  // CA
         "https://reseed.sahil.world/"         + ',' +   // sahil_at_mail.i2p.crt  // CA
         "https://i2p.diyarciftci.xyz/"        + ',' +   // diyarciftci_at_protonmail.com.crt  // CA
