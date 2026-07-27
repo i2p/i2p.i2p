@@ -88,7 +88,9 @@ public final class I2PDatagramDissector {
             
             // read payload
             rxPayloadLen = dgStream.read(rxPayload);
-            
+            if (rxPayloadLen < 0)
+                rxPayloadLen = 0;
+
             // calculate the hash of the payload
             if (type == SigType.DSA_SHA1) {
                 if (rxHash == null)
