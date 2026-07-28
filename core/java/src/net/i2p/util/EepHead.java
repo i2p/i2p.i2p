@@ -151,6 +151,10 @@ public class EepHead extends EepGet {
                 System.err.println("Etag: " + x);
         } else {
             System.err.println("Failed " + url);
+            int responseCode = get.getStatusCode();
+            String responseText = get.getStatusText();
+            if (responseCode > 0)
+                System.err.println(responseCode + (responseText != null ? (" " + responseText) : ""));
             System.exit(1);
         }
     }
