@@ -13,9 +13,9 @@ Both images are identical and support the following architectures:
 
 | Architecture | Base Image | Java Version |
 |-------------|------------|--------------|
-| amd64 | Debian Bookworm | OpenJDK 17 |
-| arm64 (v8) | Debian Bookworm | OpenJDK 17 |
-| arm (v7) | Debian Bookworm | OpenJDK 17 |
+| amd64 | Debian Trixie | OpenJDK 21 |
+| arm64 (v8) | Debian Trixie | OpenJDK 21 |
+| arm (v7) | Debian Trixie | OpenJDK 21 |
 
 ---
 
@@ -41,6 +41,8 @@ Then open your browser to **http://127.0.0.1:7657** to access the I2P Router Con
 
 ## Docker Compose Examples
 
+These examples use `restart: on-failure:3`. This retries unexpected failures up to 3 times, while a normal shutdown from the Router Console exits cleanly and stays stopped. Adjust the retry count for your deployment.
+
 ### Minimal
 
 Runs the router console and HTTP proxy only. Good for trying I2P out.
@@ -49,7 +51,7 @@ Runs the router console and HTTP proxy only. Good for trying I2P out.
 services:
   i2p:
     image: geti2p/i2p:latest
-    restart: unless-stopped
+    restart: on-failure:3
     volumes:
       - ./i2pconfig:/i2p/.i2p
     ports:
@@ -65,7 +67,7 @@ Includes persistent volumes, memory limits, and an external port for non-firewal
 services:
   i2p:
     image: geti2p/i2p:latest
-    restart: unless-stopped
+    restart: on-failure:3
     environment:
       - JVM_XMX=512m
       - EXT_PORT=12345
@@ -88,7 +90,7 @@ Exposes every available service. Only use this if you need all of them.
 services:
   i2p:
     image: geti2p/i2p:latest
-    restart: unless-stopped
+    restart: on-failure:3
     environment:
       - JVM_XMX=512m
       - EXT_PORT=12345
