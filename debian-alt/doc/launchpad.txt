@@ -15,7 +15,9 @@ Versions are as follows:
 Min version	Max version		Uses src pkg	Copied to Debian	Notes
 -----------	-----------		------------	----------------	-----
 n/a					resolute	forky, sid		CANNOT BUILD ON LAUNCHPAD - when fixed: ant debian-release-tarball
-resolute				resolute	trixie			CURRENTLY BROKEN USE JAMMY - when fixed: ant debian-release-tarball
+resolute	stonking		resolute	trixie, forky,		CURRENTLY BROKEN USE JAMMY - when fixed: ant debian-release-tarball
+							sid, stable,
+							unstable, testing
 questing				jammy					Don't bother to build, use jammy
 jammy		noble			jammy		bookworm		ant jammy-release-tarball
 
