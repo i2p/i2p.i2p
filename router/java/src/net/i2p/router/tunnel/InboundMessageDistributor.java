@@ -35,6 +35,8 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
     private final GarlicMessageReceiver _receiver;
     private final String _clientNickname;
     private final long _msgIDBloomXor;
+    private static final int MAX_CLOVE_DEPTH = 10;
+    private static final ThreadLocal<Integer> _cloveDepth = new ThreadLocal<Integer>();
     /**
      *  @param client null for router tunnel
      */
@@ -265,9 +267,24 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("local delivery instructions for clove: " + data.getClass().getSimpleName());
                 switch (type) {
-                  case GarlicMessage.MESSAGE_TYPE:
-                    _receiver.receive((GarlicMessage)data);
+                  case GarlicMessage.MESSAGE_TYPE: {
+                    Integer d = _cloveDepth.get();
+                    int depth = (d != null) ? d.intValue() : 0;
+                    if (depth < MAX_CLOVE_DEPTH) {
+                        _cloveDepth.set(Integer.valueOf(depth + 1));
+                        try {
+                            _receiver.receive((GarlicMessage)data);
+                        } finally {
+                            if (depth > 0)
+                                _cloveDepth.set(Integer.valueOf(depth));
+                            else
+                                _cloveDepth.remove();
+                        }
+                    } else if (_log.shouldWarn()) {
+                        _log.warn("Garlic cloves nested too deep");
+                    }
                     break;
+                  }
 
                   case DatabaseStoreMessage.MESSAGE_TYPE:
                         // Treat db store explicitly here (not in HandleFloodfillDatabaseStoreMessageJob),
