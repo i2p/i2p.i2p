@@ -1162,7 +1162,7 @@
 
     <!-- sets izpack5.number -->
     <target name="getIzpack5Number" depends="getReleaseNumber">
-        <loadfile srcfile="installer/install.xml" property="izpack5.number">
+        <loadfile srcfile="installer/install5.xml" property="izpack5.number">
             <filterchain>
                 <linecontains>
                     <contains value="&lt;appversion&gt;"/>
