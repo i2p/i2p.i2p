@@ -48,17 +48,7 @@ import net.i2p.util.SimpleByteCache;
  */
 class InboundEstablishState extends EstablishBase implements NTCP2Payload.PayloadCallback {
 
-    /** current encrypted block we are reading (IB only) or an IV buf used at the end for OB */
-    private byte _curEncrypted[];
-
-    private int _aliceIdentSize;
     private RouterIdentity _aliceIdent;
-
-    /** contains the decrypted aliceIndexSize + aliceIdent + tsA + padding + aliceSig */
-    private final ByteArrayOutputStream _sz_aliceIdent_tsA_padding_aliceSig;
-
-    /** how long we expect _sz_aliceIdent_tsA_padding_aliceSig to be when its full */
-    private int _sz_aliceIdent_tsA_padding_aliceSigSize;
 
     private boolean _released;
 
@@ -94,9 +84,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
     public InboundEstablishState(RouterContext ctx, NTCPTransport transport, NTCPConnection con) {
         super(ctx, transport, con);
         _state = State.IB_INIT;
-        _sz_aliceIdent_tsA_padding_aliceSig = new ByteArrayOutputStream(512);
         _prevEncrypted = SimpleByteCache.acquire(AES_SIZE);
-        _curEncrypted = SimpleByteCache.acquire(AES_SIZE);
     }
 
     /**
@@ -896,10 +884,6 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             return;
         _released = true;
         super.releaseBufs(isVerified);
-        // Do not release _curEncrypted if verified, it is passed to
-        // NTCPConnection to use as the IV
-        if (!isVerified)
-            SimpleByteCache.release(_curEncrypted);
         Arrays.fill(_X, (byte) 0);
         SimpleByteCache.release(_X);
         if (_msg3tmp != null) {
