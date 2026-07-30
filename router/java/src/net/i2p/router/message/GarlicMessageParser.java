@@ -184,32 +184,27 @@ public class GarlicMessageParser {
      *  @since public since 0.9.44
      */
     public CloveSet readCloveSet(byte data[], int offset) throws DataFormatException {
-        int numCloves = data[offset] & 0xff;
-        offset++;
-        //if (_log.shouldLog(Log.DEBUG))
-        //    _log.debug("# cloves to read: " + numCloves);
-        if (numCloves <= 0 || numCloves > MAX_CLOVES)
-            throw new DataFormatException("bad clove count " + numCloves);
-        GarlicClove[] cloves = new GarlicClove[numCloves];
-        for (int i = 0; i < numCloves; i++) {
-            //if (_log.shouldLog(Log.DEBUG))
-            //    _log.debug("Reading clove " + i);
-                GarlicClove clove = new GarlicClove(_context);
-                offset += clove.readBytes(data, offset);
-                cloves[i] = clove;
-            //if (_log.shouldLog(Log.DEBUG))
-            //    _log.debug("After reading clove " + i);
-        }
-        //Certificate cert = new Certificate();
-        //offset += cert.readBytes(data, offset);
-        Certificate cert = Certificate.create(data, offset);
-        offset += cert.size();
-        long msgId = DataHelper.fromLong(data, offset, 4);
-        offset += 4;
-        //Date expiration = DataHelper.fromDate(data, offset);
-        long expiration = DataHelper.fromLong(data, offset, 8);
+        try {
+            int numCloves = data[offset] & 0xff;
+            offset++;
+            if (numCloves <= 0 || numCloves > MAX_CLOVES)
+                throw new DataFormatException("bad clove count " + numCloves);
+            GarlicClove[] cloves = new GarlicClove[numCloves];
+            for (int i = 0; i < numCloves; i++) {
+                    GarlicClove clove = new GarlicClove(_context);
+                    offset += clove.readBytes(data, offset);
+                    cloves[i] = clove;
+            }
+            Certificate cert = Certificate.create(data, offset);
+            offset += cert.size();
+            long msgId = DataHelper.fromLong(data, offset, 4);
+            offset += 4;
+            long expiration = DataHelper.fromLong(data, offset, 8);
 
-        CloveSet set = new CloveSet(cloves, cert, msgId, expiration);
-        return set;
+            CloveSet set = new CloveSet(cloves, cert, msgId, expiration);
+            return set;
+        } catch (IndexOutOfBoundsException e) {
+            throw new DataFormatException("corrupt clove set", e);
+        }
     }
 }
