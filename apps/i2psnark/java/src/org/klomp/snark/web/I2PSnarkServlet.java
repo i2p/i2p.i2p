@@ -2228,6 +2228,10 @@ public class I2PSnarkServlet extends BasicServlet {
                         client = "EepTorrent";
                     else if ("VElY".equals(ch))  // TIX
                         client = "Tixati";
+                    else if ("LUky".equals(ch)) {  // I2PD
+                        client = "i2pd";
+                        addVersion = false;
+                    }
                     // libtorrent and downstreams
                     // https://www.libtorrent.org/projects.html
                     else if ("LURF".equals(ch))  // DL
