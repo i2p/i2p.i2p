@@ -46,9 +46,6 @@ abstract class EstablishBase implements EstablishState {
     protected final NTCPTransport _transport;
     protected final NTCPConnection _con;
     
-    protected static final int MIN_RI_SIZE = 387;
-    protected static final int MAX_RI_SIZE = 3072;
-
     protected static final int AES_SIZE = 16;
 
     protected final Object _stateLock = new Object();
