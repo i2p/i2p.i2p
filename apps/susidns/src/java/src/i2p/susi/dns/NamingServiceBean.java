@@ -437,6 +437,50 @@ public class NamingServiceBean extends AddressbookBean
 						DeletedHosts dh = new DeletedHosts(addressbookDir());
 						dh.add(deletionMarks);
 					}
+				} else if (action.equals(_t("Replace Router Entry"))) {
+					Destination matchDest = null;
+					// remove specified dest only in case there is more than one
+					if (destination != null) {
+						try {
+							matchDest = new Destination(destination);
+						} catch (DataFormatException dfe) {}
+					}
+					boolean success = false;
+					if (matchDest != null && deletionMarks.size() == 1) {
+						String name = null;
+						String n = deletionMarks.get(0);
+						// get stored options
+						List<Properties> propsList = new ArrayList<Properties>(4);
+						List<Destination> dests = getNamingService().lookupAll(n, nsOptions, propsList);
+						if (dests != null) {
+							int i = dests.indexOf(matchDest);
+							if (i >= 0) {
+								Properties sprops = propsList.get(i);
+								// remove old host.txt entry
+								nsOptions.setProperty("list", "hosts.txt");
+								getNamingService().remove(n, matchDest, nsOptions);
+								// add new host.txt entry with stored options
+								nsOptions.putAll(sprops);
+								nsOptions.setProperty("list", "hosts.txt");
+								success = getNamingService().put(n, matchDest, nsOptions);
+								if (success) {
+									// remove conflicts entry
+									nsOptions.clear();
+									nsOptions.setProperty("list", "conflicts");
+									success = getNamingService().remove(n, matchDest, nsOptions);
+								}
+							}
+						}
+						String uni = AddressBean.toUnicode(n);
+						String displayHost = uni.equals(n) ? n :  uni + " (" + n + ')';
+						if (!success) {
+							message += _t("Failed to replace Destination for {0} in naming service {1}", displayHost, getNamingService().getName()) + "<br>";
+						} else {
+							message += _t("Replaced Destination for {0} in naming service {1}", displayHost, getNamingService().getName()) + "<br>";
+							changed = true;
+							name = displayHost;
+						}
+					}
 				}
 				if( changed ) {
 					message += "<br>" + _t("Address book saved.");

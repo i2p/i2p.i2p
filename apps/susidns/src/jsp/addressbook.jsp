@@ -254,7 +254,13 @@ ${book.loadBookMessages}
 <% if (book.getEntries().length > 0) { /* Don't show if no results. Can't figure out how to do this with c:if */ %>
 <th><%=intl._t("Hostname")%></th>
 <th><%=intl._t("Link (b32)")%></th>
-<th><%=intl._t("Helper")%></th>
+<th>
+<%
+   if (!isConflicts) {
+       %><%=intl._t("Helper")%><%
+   }
+%>
+</th>
 <th>
 <%
    if (isConflicts) {
@@ -296,7 +302,13 @@ ${addr.displayName}
 %>
 </td>
 <td class="names"><span class="addrhlpr"><a href="http://${addr.b32}/" target="_blank" title="<%=intl._t("Base 32 address")%>">b32</a></span></td>
-<td class="helper"><a href="http://${addr.name}/?i2paddresshelper=${addr.destination}" target="_blank" title="<%=intl._t("Helper link to share host address with option to add to address book")%>">link</a></td>
+<td class="helper">
+<%
+   if (!isConflicts) {
+       %><a href="http://${addr.name}/?i2paddresshelper=${addr.destination}" target="_blank" title="<%=intl._t("Helper link to share host address with option to add to address book")%>">link</a><%
+    }
+%>
+</td>
 <td class="names"><span class="addrhlpr"><a href="details?h=${addr.name}&amp;book=${book.book}" title="<%=intl._t("More information on this entry")%>"><%=intl._t("details")%></a></span></td>
 <td class="destinations"><div class="destaddress resetScrollLeft" name="dest_${addr.name}" width="200px" tabindex="0">${addr.destination}</div></td>
 

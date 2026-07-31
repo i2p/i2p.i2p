@@ -452,7 +452,6 @@ div#book p, p.messages {
 
 h4 {
      font-size: 9pt;
-     margin-top: -15px;
      word-spacing: 0.1em;
      border: 1px solid #292929;
      padding: 8px 10px 8px 35px;
@@ -1041,6 +1040,10 @@ p.book {
      font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace !important;
      word-break: break-all !important;
      white-space: normal !important;
+}
+
+.conflict {
+     color: #d80000 !important;
 }
 
 /* end host details */

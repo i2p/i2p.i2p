@@ -31,8 +31,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -48,7 +50,7 @@ public class AddressbookBean extends BaseBean
 	protected int beginIndex, endIndex;
 	private Properties addressbook;
 	private int trClass;
-	protected final LinkedList<String> deletionMarks;
+	protected final List<String> deletionMarks;
 	protected static final Comparator<AddressBean> sorter;
 	private static final int DISPLAY_SIZE = 50;
 
@@ -93,7 +95,7 @@ public class AddressbookBean extends BaseBean
 	public AddressbookBean()
 	{
 		super();
-		deletionMarks = new LinkedList<String>();
+		deletionMarks = new ArrayList<String>();
 		beginIndex = 0;
 		endIndex = DISPLAY_SIZE - 1;
 	}
@@ -457,7 +459,7 @@ public class AddressbookBean extends BaseBean
 		deletionMarks.clear();
 	}
 	public void setMarkedForDeletion( String name ) {
-		deletionMarks.addLast( DataHelper.stripHTML(name) );    // XSS
+		deletionMarks.add(DataHelper.stripHTML(name));    // XSS
 	}
 	public void setHostname(String hostname) {
 		this.hostname = DataHelper.stripHTML(hostname).trim();  // XSS

@@ -65,6 +65,7 @@ class Daemon {
      */
     private static final String RCVD_PROP_PREFIX = "=";
     private static final boolean MUST_VALIDATE = false;
+    private static final boolean ANDROID = SystemVersion.isAndroid();
     
     /**
      * Update the router and published address books using remote data from the
@@ -652,7 +653,7 @@ class Daemon {
                                    + addressbook.getLocation());
                             invalid++;
                         }        
-                    } else if (action == null && isKnown) {
+                    } else if (!ANDROID && action == null && isKnown) {
                         if (!oldDest.toBase64().equals(he.getDest())) {
                             // there could be multiple dests in the router address book, so double check
                             Properties props = new OrderedProperties();
@@ -805,7 +806,7 @@ class Daemon {
                                                               etagsFile, lastModifiedFile, lastFetchedFile,
                                                               delay, defaultSubs, settings.get("proxy_host"),
                                                               Integer.parseInt(settings.get("proxy_port")));
-        Log log = SystemVersion.isAndroid() ? null : new Log(logFile);
+        Log log = ANDROID ? null : new Log(logFile);
 
         // If false, add hosts via naming service; if true, write hosts.txt file directly
         // Default false

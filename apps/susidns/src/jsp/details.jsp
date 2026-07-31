@@ -143,14 +143,22 @@
 <td><%=intl._t("Base 32 Address")%></td>
 <td><a href="http://<%=b32%>/" target="_top"><%=b32%></a></td>
 </tr>
+<%--
 <tr class="list${book.trClass}">
 <td><%=intl._t("Base 64 Hash")%></td>
 <td><%=addr.getB64()%></td>
 </tr>
+--%>
+<%
+       if (!isConflicts) {
+%>
 <tr class="list${book.trClass}">
 <td><%=intl._t("Address Helper")%></td>
 <td><a href="http://<%=addr.getName()%>/?i2paddresshelper=<%=addr.getDestination()%>" target="_top"><%=intl._t("link")%></a></td>
 </tr>
+<%
+       }
+%>
 <%--
 <tr class="list${book.trClass}">
 <td><%=intl._t("Public Key")%></td>
@@ -172,12 +180,34 @@
 <% if (showNotes || isConflicts) { %>
 <tr class="list${book.trClass}">
 <td><%=intl._t("Source")%></td>
-<td><%=addr.getSource()%></td>
-</tr>
+<td>
+<%
+       String src = addr.getSource();
+       if (isConflicts) {
+           %><b><%
+           src = src.replace("<a ", "<a class=\"conflict\" ");
+           %><%=src%><%
+           %></b><%
+       } else {
+           %><%=src%><%
+       }
+%>
+</td></tr>
 <tr class="list${book.trClass}">
 <td><%=intl._t("Added Date")%></td>
-<td><%=addr.getAdded()%></td>
-</tr>
+<td>
+<%
+       if (isConflicts) {
+           %><b><span class="conflict"><%
+       }
+%>
+<%=addr.getAdded()%>
+<%
+       if (isConflicts) {
+           %></span></b><%
+       }
+%>
+</td></tr>
 <%
        String lastmod = addr.getModded();
        if (lastmod.length() > 0) {
@@ -205,7 +235,7 @@
 <% if (showNotes) { %>
 </form>
 <% }  // showNotes
-   if (!isConflicts) {
+   if (!isConflicts || i <= conflictCount) {
 %>
 <div id="buttons">
 <form method="POST" action="addressbook">
@@ -217,6 +247,13 @@
 <input type="hidden" name="checked" value="<%=detail%>">
 <input type="hidden" name="destination" value="<%=addr.getDestination()%>">
 <input class="delete" type="submit" name="action" value="<%=intl._t("Delete Entry")%>" >
+<%
+        if (isConflicts) {
+%>
+<input class="export" type="submit" name="action" value="<%=intl._t("Replace Router Entry")%>" title="<%=intl._t("Replace the router address book entry with this one")%>" >
+<%
+        }  // isConflicts
+%>
 </p>
 </form>
 </div><%-- buttons --%>

@@ -981,6 +981,10 @@ img[src="/imagegen/id?s=256&c="], img[src="/imagegen/id?s=20&c="] {
      opacity: 0; /* hide broken identicons but ensure hostlist remains intact */
 }
 
+.conflict {
+     color: #d80000 !important;
+}
+
 /* end host details */
 
 /* host list identicons */
