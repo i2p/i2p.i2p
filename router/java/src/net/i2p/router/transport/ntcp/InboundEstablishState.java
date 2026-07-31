@@ -63,6 +63,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
     private int _version = 2;
 
     // same as I2PTunnelRunner
+    // see MSG3P2_MAX notes below
     private static final int BUFFER_SIZE = 4*1024;
     private static final int MAX_DATA_READ_BUFS = 32;
     private static final ByteCache _dataReadBufs = ByteCache.getInstance(MAX_DATA_READ_BUFS, BUFFER_SIZE);
@@ -72,9 +73,10 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
     // DSA RI, no options, no addresses
     private static final int RI_MIN = 387 + 8 + 1 + 1 + 2 + 40;
     private static final int MSG3P2_MIN = 1 + 2 + 1 + RI_MIN + MAC_SIZE;
-    // absolute max, let's enforce less
-    //private static final int MSG3P2_MAX = BUFFER_SIZE - MSG3P1_SIZE;
-    private static final int MSG3P2_MAX = 6000;
+    // Note: This enforces a max RI size a little smaller than the RouterInfo.MAX_UNCOMPRESSED_SIZE (4096)
+    // enforced elsewhere (due to MAC and block overhead), but that's fine for now, normal sizes
+    // are well under 2KB. See notes in RouterInfo. We stick with a standard power-of-two BUFFER_SIZE.
+    private static final int MSG3P2_MAX = BUFFER_SIZE - MSG3P1_SIZE;
 
     private static final Set<State> STATES_NTCP2 =
         EnumSet.of(State.IB_NTCP2_INIT, State.IB_NTCP2_GOT_X, State.IB_NTCP2_GOT_MSG1, State.IB_NTCP2_GOT_PADDING,
