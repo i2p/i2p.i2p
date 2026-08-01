@@ -281,6 +281,7 @@ public class GarlicMessageBuilder {
      *
      * @param ctx scope
      * @param config how/what to wrap, must have key set with setRecipientPublicKey()
+     * @param skm non-null
      * @param callback may be null
      * @return null if expired or on other errors
      * @throws IllegalArgumentException on error
@@ -310,14 +311,21 @@ public class GarlicMessageBuilder {
         }
 
         RatchetSKM rskm;
-        if (skm instanceof RatchetSKM) {
+        switch (skm.getSKMType()) {
+          case RATCHET:
             rskm = (RatchetSKM) skm;
-        } else if (skm instanceof MuxedSKM) {
+            break;
+
+          case MUXED:
             rskm = ((MuxedSKM) skm).getECSKM();
-        } else if (skm instanceof MuxedPQSKM) {
+            break;
+
+          case MUXEDPQ:
             MuxedPQSKM mskm = (MuxedPQSKM) skm;
             rskm = type.isPQ() ? mskm.getPQSKM() : mskm.getECSKM();
-        } else {
+            break;
+
+          default:
             if (log.shouldWarn())
                 log.warn("No SKM for " + from.toBase32());
             return null;

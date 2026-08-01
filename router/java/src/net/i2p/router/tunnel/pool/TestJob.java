@@ -373,15 +373,23 @@ class TestJob extends JobImpl {
                     } else {
                         // ratchet
                         RatchetSKM rskm;
-                        if (skm instanceof RatchetSKM) {
+                        switch (skm.getSKMType()) {
+                          case RATCHET:
                             rskm = (RatchetSKM) skm;
-                        } else if (skm instanceof MuxedSKM) {
+                            break;
+
+                          case MUXED:
                             rskm = ((MuxedSKM) skm).getECSKM();
-                        } else if (skm instanceof MuxedPQSKM) {
+                            break;
+
+                          case MUXEDPQ:
                             rskm = ((MuxedPQSKM) skm).getECSKM();
-                        } else {
+                            break;
+
+                          default:
                             // shouldn't happen
                             rskm = null;
+                            break;
                         }
                         if (rskm != null)
                             rskm.consumeTag(_ratchetEncryptTag);

@@ -62,13 +62,20 @@ public class GarlicMessageParser {
                 decrData = _context.elGamalAESEngine().decrypt(encData, encryptionKey, skm);
             } else if (type == EncType.ECIES_X25519) {
                 RatchetSKM rskm;
-                if (skm instanceof RatchetSKM) {
+                switch (skm.getSKMType()) {
+                  case RATCHET:
                     rskm = (RatchetSKM) skm;
-                } else if (skm instanceof MuxedSKM) {
+                    break;
+
+                  case MUXED:
                     rskm = ((MuxedSKM) skm).getECSKM();
-                } else if (skm instanceof MuxedPQSKM) {
+                    break;
+
+                  case MUXEDPQ:
                     rskm = ((MuxedPQSKM) skm).getECSKM();
-                } else {
+                    break;
+
+                  default:
                     if (_log.shouldWarn())
                         _log.warn("No SKM to decrypt ECIES");
                     return null;
@@ -85,11 +92,16 @@ public class GarlicMessageParser {
                 }
             } else if (type.isPQ()) {
                 RatchetSKM rskm;
-                if (skm instanceof RatchetSKM) {
+                switch (skm.getSKMType()) {
+                  case RATCHET:
                     rskm = (RatchetSKM) skm;
-                } else if (skm instanceof MuxedPQSKM) {
+                    break;
+
+                  case MUXEDPQ:
                     rskm = ((MuxedPQSKM) skm).getPQSKM();
-                } else {
+                    break;
+
+                  default:
                     if (_log.shouldWarn())
                         _log.warn("No SKM to decrypt PQ");
                     return null;
@@ -146,18 +158,27 @@ public class GarlicMessageParser {
         byte encData[] = message.getData();
         CloveSet rv;
         try {
-            if (skm instanceof MuxedSKM) {
+            switch (skm.getSKMType()) {
+              case MUXED: {
                 MuxedSKM mskm = (MuxedSKM) skm;
                 rv = _context.eciesEngine().decrypt(encData, elgKey, ecKey, mskm);
-            } else if (skm instanceof MuxedPQSKM) {
+                break;
+              }
+
+              case MUXEDPQ: {
                 MuxedPQSKM mskm = (MuxedPQSKM) skm;
                 // EC is first
                 rv = _context.eciesEngine().decrypt(encData, ecKey, elgKey, mskm);
-            } else if (skm instanceof RatchetSKM) {
+                break;
+              }
+
+              case RATCHET:
                 // unlikely, if we have two keys we should have a MuxedSKM
                 RatchetSKM rskm = (RatchetSKM) skm;
                 rv = _context.eciesEngine().decrypt(encData, ecKey, rskm);
-            } else {
+                break;
+
+              default:
                 // unlikely, if we have two keys we should have a MuxedSKM
                 byte[] decrData = _context.elGamalAESEngine().decrypt(encData, elgKey, skm);
                 if (decrData != null) {
@@ -165,6 +186,7 @@ public class GarlicMessageParser {
                 } else {
                     rv = null; 
                 }
+                break;
             }
         } catch (DataFormatException dfe) {
             if (_log.shouldLog(Log.WARN))

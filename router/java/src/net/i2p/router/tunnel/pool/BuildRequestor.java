@@ -313,19 +313,29 @@ abstract class BuildRequestor {
             outMsg.setOnFailedSendJob(new TunnelBuildFirstHopFailJob(ctx, cfg, exec));
             OneTimeSession ots = cfg.getGarlicReplyKeys();
             if (ots != null && replySKM != null) {
-                if (replySKM instanceof RatchetSKM) {
+                switch (replySKM.getSKMType()) {
+                  case RATCHET:
                     RatchetSKM rskm = (RatchetSKM) replySKM;
                     rskm.tagsReceived(ots.key, ots.rtag, 2 * BUILD_MSG_TIMEOUT);
-                } else if (replySKM instanceof MuxedSKM) {
+                    break;
+
+                  case MUXED: {
                     MuxedSKM mskm = (MuxedSKM) replySKM;
                     mskm.tagsReceived(ots.key, ots.rtag, 2 * BUILD_MSG_TIMEOUT);
-                } else if (replySKM instanceof MuxedPQSKM) {
+                    break;
+                  }
+
+                  case MUXEDPQ: {
                     MuxedPQSKM mskm = (MuxedPQSKM) replySKM;
                     mskm.tagsReceived(ots.key, ots.rtag, 2 * BUILD_MSG_TIMEOUT);
-                } else {
+                    break;
+                  }
+
+                  default:
                     // non-EC client, shouldn't happen, checked at top of createTunnelBuildMessage() below
                     if (log.shouldWarn())
                         log.warn("Unsupported SKM for garlic reply to: " + cfg);
+                    break;
                 }
                 cfg.setGarlicReplyKeys(null);
             }

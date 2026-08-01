@@ -5,6 +5,7 @@ import java.util.Set;
 
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SessionKeyManager;
+import net.i2p.crypto.SKMType;
 import net.i2p.crypto.TagSetHandle;
 import net.i2p.data.Certificate;
 import net.i2p.data.Hash;
@@ -231,7 +232,7 @@ public class MessageWrapper {
     public static OneTimeSession generateSession(RouterContext ctx, SessionKeyManager skm,
                                                  long expiration, boolean forceElG) {
         SessionKey key = ctx.keyGenerator().generateSessionKey();
-        if (forceElG || (skm instanceof TransientSessionKeyManager)) {
+        if (forceElG || skm.getSKMType() == SKMType.ELGAMAL) {
             SessionTag tag = new SessionTag(true);
             Set<SessionTag> tags = new RemovableSingletonSet<SessionTag>(tag);
             skm.tagsReceived(key, tags, expiration);
@@ -239,13 +240,20 @@ public class MessageWrapper {
         }
         // ratchet
         RatchetSKM rskm;
-        if (skm instanceof RatchetSKM) {
+        switch (skm.getSKMType()) {
+          case RATCHET:
             rskm = (RatchetSKM) skm;
-        } else if (skm instanceof MuxedSKM) {
+            break;
+
+          case MUXED:
             rskm = ((MuxedSKM) skm).getECSKM();
-        } else if (skm instanceof MuxedPQSKM) {
+            break;
+
+          case MUXEDPQ:
             rskm = ((MuxedPQSKM) skm).getECSKM();
-        } else {
+            break;
+
+          default:
             throw new IllegalStateException("skm not a ratchet " + skm);
         }
         RatchetSessionTag tag = new RatchetSessionTag(ctx.random().nextLong());
