@@ -249,7 +249,15 @@ class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 boolean shouldStore = true;
                 if (ri.getReceivedAsPublished()) {
                     // these are often just dup stores from concurrent lookups
-                    prevNetDb = (RouterInfo) _facade.lookupLocallyWithoutValidation(key);
+                    DatabaseEntry dbe = _facade.lookupLocallyWithoutValidation(key);
+                    if (dbe != null) {
+                        if (dbe.getType() != DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+                            // hash collision
+                            // prevent ClassCastException here
+                            throw new IllegalArgumentException("Attempt to replace LS with " + ri);
+                        }
+                        prevNetDb = (RouterInfo) dbe;
+                    }
                     if (prevNetDb == null) {
                         // actually new
                         int count = _facade.getDataStore().size();
