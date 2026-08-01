@@ -27,13 +27,17 @@ import net.i2p.data.SessionTag;
  */
 public class SessionKeyManager {
 
+    private final SKMType _type;
+
     /**
      *  A dummy SessionKeyManager for testing or for passing to
      *  ElGamalAESEngine.decrypt()
      *
      *  @since 0.9.14
      */
-    public SessionKeyManager() {}
+    public SessionKeyManager() {
+        this(SKMType.DUMMY);
+    }
 
     /**
      *  A dummy SessionKeyManager for testing or for passing to
@@ -42,8 +46,36 @@ public class SessionKeyManager {
      *  @param context unused
      *  @since public since 0.9.14; protected before that
      */
-    public SessionKeyManager(I2PAppContext context) {}
-    
+    public SessionKeyManager(I2PAppContext context) {
+        this(context, SKMType.DUMMY);
+    }
+
+    /**
+     *  For subclasses
+     *
+     *  @since 0.9.71
+     */
+    protected SessionKeyManager(SKMType type) {
+        _type = type;
+    }
+
+    /**
+     *  For subclasses
+     *
+     *  @param context unused
+     *  @since 0.9.71
+     */
+    protected SessionKeyManager(I2PAppContext context, SKMType type) {
+        _type = type;
+    }
+
+    /**
+     *  @since 0.9.71
+     */
+    public SKMType getSKMType() {
+        return _type;
+    }
+
     /**
      * Retrieve the session key currently associated with encryption to the target,
      * or null if a new session key should be generated.

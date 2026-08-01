@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.SessionKeyManager;
+import net.i2p.crypto.SKMType;
 import net.i2p.crypto.TagSetHandle;
 import net.i2p.data.DataHelper;
 import net.i2p.data.PublicKey;
@@ -173,7 +174,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
      *  @since 0.9.2
      */
     public TransientSessionKeyManager(I2PAppContext context, int tagsToSend, int lowThreshold) {
-        super(context);
+        super(context, SKMType.ELGAMAL);
         if (tagsToSend <= 0 || tagsToSend > 128 || lowThreshold <= 0 || lowThreshold > 128)
             throw new IllegalArgumentException();
         _tagsToSend = tagsToSend;

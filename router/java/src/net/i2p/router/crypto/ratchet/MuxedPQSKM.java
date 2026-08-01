@@ -9,6 +9,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.TagSetHandle;
 import net.i2p.crypto.SessionKeyManager;
+import net.i2p.crypto.SKMType;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
@@ -29,6 +30,7 @@ public class MuxedPQSKM extends SessionKeyManager {
     private static final int RESTART_COUNTERS = 500;
 
     public MuxedPQSKM(RatchetSKM ec, RatchetSKM pq) {
+        super(SKMType.MUXEDPQ);
         _ec = ec;
         _pq = pq;
     }

@@ -24,6 +24,7 @@ import net.i2p.crypto.EncType;
 import net.i2p.crypto.HKDF;
 import net.i2p.crypto.KeyPair;
 import net.i2p.crypto.SessionKeyManager;
+import net.i2p.crypto.SKMType;
 import net.i2p.crypto.TagSetHandle;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -107,7 +108,7 @@ public class RatchetSKM extends SessionKeyManager implements SessionTagListener 
      * @since 0.9.67
      */
     public RatchetSKM(RouterContext context, Destination dest, EncType type) {
-        super(context);
+        super(context, SKMType.RATCHET);
         _log = context.logManager().getLog(RatchetSKM.class);
         _context = context;
         _destination = dest;
