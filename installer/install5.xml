@@ -186,8 +186,10 @@ At runtime, if the JVM does not have a locale:
         </condition>
     </conditions>
 
-    <!-- XInfoConsolePanel -->
+    <!-- Uncomment this if any Java patches are included, see also izpack5-patches target in ../build.xml -->
+   <!--
     <jar src="installer/lib/izpack5/patches/java/build/izpack-i2p.jar" />
+    -->
 
     <panels>
         <panel classname="HelloPanel"/>

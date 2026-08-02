@@ -2071,7 +2071,12 @@
     </target>
 
     <target name="izpack5-patches" depends="ensureIzpack5, buildProperties, getIzpack5Number" >
+      <!--
+        NOTE: No Java patches currently in use.
+        If patches are added, also uncomment the izpack-i2p.jar line in installer/install5.xml
+
         <ant dir="installer/lib/izpack5/patches/java/" target="jar" />
+       -->
         <!-- custom langpacks
              Izpack tries to load the resource both from the classpath and the file system;
              we do it this way because jaring them up and adding a pathelement to izpack5.lib.path doesn't work.
