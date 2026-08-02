@@ -1,3 +1,21 @@
+2026-08-02 zzz
+ * Build: Fix build with izpack 5.2.6
+ * i2psnark: Dup check for base name when filtered
+
+2026-08-01 zzz
+ * Crypto: Add SKMType enum for SKM classification
+ * NetDB: Prevent ClassCastException in HFDSMJ on hash collision
+
+2026-07-31 zzz
+ * NTCP2: fix undersized message 3 buffer
+ * SusiDNS: Conflicts address book part 2
+
+2026-07-30 zzz
+ * Garlic: guard against out-of-bounds read in clove set parsing
+
+2026-07-27 zzz
+ * Datagram: handle empty repliable datagram payload
+
 2026-07-26 zzz
  * SusiDNS: Add conflicts addressbook
 
