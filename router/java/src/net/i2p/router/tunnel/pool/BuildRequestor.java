@@ -445,12 +445,14 @@ abstract class BuildRequestor {
         // populate and encrypt the message
         TunnelBuildMessage msg;
         List<Integer> order;
+        int clen = cfg.getLength();
         if (useShortTBM) {
             int len;
-            if (cfg.getLength() <= SHORT_RECORDS) {
+            // periodically send 5-slot message instead
+            if (clen <= SHORT_RECORDS && ctx.random().nextInt(16) != 0) {
                 len = SHORT_RECORDS;
                 order = new ArrayList<Integer>(SHORT_ORDER);
-            } else if (cfg.getLength() <= MEDIUM_RECORDS) {
+            } else if (clen <= MEDIUM_RECORDS) {
                 len = MEDIUM_RECORDS;
                 order = new ArrayList<Integer>(MEDIUM_ORDER);
             } else {
@@ -459,7 +461,7 @@ abstract class BuildRequestor {
             }
             msg = new ShortTunnelBuildMessage(ctx, len);
         } else if (useVariable) {
-            if (cfg.getLength() <= SHORT_RECORDS) {
+            if (clen <= SHORT_RECORDS) {
                 msg = new VariableTunnelBuildMessage(ctx, SHORT_RECORDS);
                 order = new ArrayList<Integer>(SHORT_ORDER);
             } else {
@@ -472,8 +474,7 @@ abstract class BuildRequestor {
         }
 
         if (!useShortTBM) {
-            int len = cfg.getLength();
-            for (int i = 0; i < len; i++) {
+            for (int i = 0; i < clen; i++) {
                 HopConfig hop = cfg.getConfig(i);
                 // set IV/Layer keys (formerly in TunnelPool.configureNewTunnel())
                 hop.setIVKey(ctx.keyGenerator().generateSessionKey());
