@@ -76,7 +76,7 @@ class PeerCoordinator implements PeerListener, BandwidthListener
   final static long CHECK_PERIOD = 30*1000;
   final static int MAX_UPLOADERS = 8;
   public static final long MAX_INACTIVE = 8*60*1000;
-  public static final long MAX_SEED_INACTIVE = 2*60*1000;
+  public static final long MAX_SEED_INACTIVE = 4*60*1000;
 
   /**
    * Approximation of the number of current uploaders (unchoked peers),
