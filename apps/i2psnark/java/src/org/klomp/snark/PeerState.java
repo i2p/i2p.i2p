@@ -73,8 +73,11 @@ class PeerState implements DataLoader
   // FIXME if piece size < PARTSIZE, pipeline could be bigger
   /** @since 0.9.47 */
   public static final int MIN_PIPELINE = 5;               // this is for outbound requests
-  /** @since public since 0.9.47 */
-  public static final int MAX_PIPELINE = 8;               // this is for outbound requests
+  /**
+   *  About 9 streaming packets per chunk
+   *  @since public since 0.9.47
+   */
+  public static final int MAX_PIPELINE = 12;               // this is for outbound requests
   public final static int PARTSIZE = 16*1024; // outbound request
   private final static int MAX_PIPELINE_BYTES = (MAX_PIPELINE + 2) * PARTSIZE;  // this is for inbound requests
   private final static int MAX_PARTSIZE = 64*1024; // Don't let anybody request more than this
