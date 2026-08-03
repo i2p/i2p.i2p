@@ -348,18 +348,24 @@ class PacketHandler {
                 // We fix this by putting this packet on the syn queue too!
                 // Then ConnectionHandler.accept() will check the connection list
                 // and call receivePacket() above instead of receiveConnection().
-                if (_log.shouldLog(Log.WARN)) {
-                    _log.warn("Packet belongs to no other cons, putting on the syn queue: " + packet);
-                }
-                if (_log.shouldLog(Log.DEBUG)) {
-                    StringBuilder buf = new StringBuilder(128);
-                    for (Connection con : _manager.listConnections()) {
-                        buf.append(con.toString()).append(" ");
+                if (packet.isFlagSet(Packet.FLAG_CLOSE | Packet.FLAG_RESET)) {
+                    // don't bother
+                    if (_log.shouldDebug())
+                        _log.debug("Close/reset on unknown con: " + packet);
+                    packet.releasePayload();
+                } else {
+                    if (_log.shouldLog(Log.WARN)) {
+                        _log.warn("Packet belongs to no other cons, putting on the syn queue: " + packet);
                     }
-                    _log.debug("connections: " + buf.toString() + " sendId: unknown"); 
+                    //if (_log.shouldLog(Log.DEBUG)) {
+                    //    StringBuilder buf = new StringBuilder(128);
+                    //    for (Connection con : _manager.listConnections()) {
+                    //        buf.append(con.toString()).append(" ");
+                    //    }
+                    //    _log.debug("connections: " + buf.toString() + " sendId: unknown"); 
+                    //}
+                    _manager.getConnectionHandler().receiveNewSyn(packet);
                 }
-                //packet.releasePayload();
-                _manager.getConnectionHandler().receiveNewSyn(packet);
             } else {
                 // log it here, just before we kill it - dest will be unknown
                 if (I2PSocketManagerFull.pcapWriter != null &&
