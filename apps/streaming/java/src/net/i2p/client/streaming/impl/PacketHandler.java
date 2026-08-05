@@ -269,12 +269,11 @@ class PacketHandler {
      *  This is not associated with a connection, so no con stats are updated.
      *
      *  @param packet incoming packet to be replied to, MUST have a FROM option
-     *  @since 0.9.39
+     *  @since 0.9.39, public since 0.9.71 for ConnectionManager
      */
-    private void sendResetUnverified(Packet packet) {
+    public void sendResetUnverified(Packet packet) {
         PacketLocal reply = new PacketLocal(_context, packet.getOptionalFrom(), packet.getSession());
-        reply.setFlag(Packet.FLAG_RESET);
-        reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
+        reply.setFlag(Packet.FLAG_RESET | Packet.FLAG_SIGNATURE_INCLUDED | Packet.FLAG_NO_ACK);
         reply.setSendStreamId(packet.getReceiveStreamId());
         reply.setReceiveStreamId(packet.getSendStreamId());
         // As of 0.9.20 we do not require FROM

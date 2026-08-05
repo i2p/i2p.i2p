@@ -285,6 +285,8 @@ class ConnectionHandler {
         // As of 0.9.20 we do not require FROM
         // Removed in 0.9.39
         //reply.setOptionalFrom();
+        reply.setLocalPort(packet.getLocalPort());
+        reply.setRemotePort(packet.getRemotePort());
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending RST: " + reply + " because of " + packet);
         // this just sends the packet - no retries or whatnot
