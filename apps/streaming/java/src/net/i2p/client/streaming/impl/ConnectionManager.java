@@ -396,11 +396,11 @@ class ConnectionManager {
         } else if (size > opts.getMaxInitialMessageSize()) {
             if (size > mtu)
                 size = mtu;
-            if (_log.shouldInfo())
-                _log.info("Increasing MTU for IB conn to " + size 
-                          + " from " + mtu);
-            if (size != mtu)
+            if (size != mtu) {
+                if (_log.shouldInfo())
+                    _log.info("Increasing MTU for IB conn to " + size + " from " + mtu);
                 opts.setMaxMessageSize(size);
+            }
             opts.setMaxInitialMessageSize(size);
         }
 
