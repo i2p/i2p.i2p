@@ -23,6 +23,7 @@ package org.klomp.snark;
 import java.util.List;
 
 import net.i2p.data.ByteArray;
+import net.i2p.data.Hash;
 
 import org.klomp.snark.comments.Comment;
 
@@ -201,4 +202,14 @@ interface PeerListener
    * @since 0.9.31
    */
   public void gotComments(Peer peer, List<Comment> comments);
+
+  /**
+   *  @since 0.9.71
+   */
+  public boolean isBanned(Hash h);
+
+  /**
+   *  @since 0.9.71
+   */
+  public void ban(Hash h);
 }

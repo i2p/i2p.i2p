@@ -296,6 +296,20 @@ class ConnectionAcceptor implements Runnable
       }
   }
 
+    /**
+     *  @since 0.9.71
+     */
+    public boolean isBanned(Hash h) {
+        return _badCounter.count(h) > 0;
+    }
+
+    /**
+     *  @since 0.9.71
+     */
+    public void ban(Hash h) {
+        _badCounter.increment(h);
+    }
+
     /** @since 0.9.1 */    
     private class Cleaner extends SimpleTimer2.TimedEvent {
 

@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
 
@@ -1531,4 +1532,19 @@ public class Snark
           }
       }
   }
+
+    /**
+     *  @since 0.9.71
+     */
+    public boolean isBanned(Hash h) {
+        return acceptor != null && acceptor.isBanned(h);
+    }
+
+    /**
+     *  @since 0.9.71
+     */
+    public void ban(Hash h) {
+        if (acceptor != null)
+            acceptor.ban(h);
+    }
 }
