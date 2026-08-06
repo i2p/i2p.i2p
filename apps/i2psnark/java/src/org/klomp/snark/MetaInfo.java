@@ -73,7 +73,6 @@ public class MetaInfo
   /**
    *  Called by Storage when creating a new torrent from local data
    *
-   *  @param name_utf8 ignored
    *  @param announce may be null
    *  @param files null for single-file torrent
    *  @param lengths null for single-file torrent
@@ -83,7 +82,7 @@ public class MetaInfo
    *  @param comment may be null
    *  @since public since 0.9.53, was package private
    */
-  public MetaInfo(String announce, String name, String name_utf8, List<List<String>> files, List<Long> lengths,
+  public MetaInfo(String announce, String name, List<List<String>> files, List<Long> lengths,
            int piece_length, byte[] piece_hashes, long length, boolean privateTorrent,
            List<List<String>> announce_list, String created_by, List<String> url_list, String comment)
   {
@@ -117,10 +116,9 @@ public class MetaInfo
   /**
    *  Preserves privateTorrent int value, for main()
    *
-   *  @param name_utf8 ignored
    *  @since 0.9.62
    */
-  public MetaInfo(String announce, String name, String name_utf8, List<List<String>> files, List<Long> lengths,
+  public MetaInfo(String announce, String name, List<List<String>> files, List<Long> lengths,
            int piece_length, byte[] piece_hashes, long length, int privateTorrent,
            List<List<String>> announce_list, String created_by, List<String> url_list, String comment)
   {

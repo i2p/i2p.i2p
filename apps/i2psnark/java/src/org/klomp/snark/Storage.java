@@ -232,7 +232,7 @@ public class Storage implements Closeable
 
     // TODO thread this so we can return and show something on the UI
     byte[] piece_hashes = fast_digestCreate();
-    metainfo = new MetaInfo(announce, baseFile.getName(), null, files,
+    metainfo = new MetaInfo(announce, baseFile.getName(), files,
                             lengthsList, piece_size, piece_hashes, total, privateTorrent,
                             announce_list, created_by, url_list, comment);
 
