@@ -66,7 +66,10 @@ public class PeerID implements Comparable<PeerID>
 
   /**
    * Creates a PeerID from a BDecoder.
+   *
+   * @deprecated unused, non-compact
    */
+  @Deprecated
   public PeerID(BDecoder be)
     throws IOException
   {
@@ -76,7 +79,10 @@ public class PeerID implements Comparable<PeerID>
   /**
    * Creates a PeerID from a Map containing BEncoded peer id, ip and
    * port.
+   *
+   * @deprecated non-compact
    */
+  @Deprecated
   public PeerID(Map<String, BEValue> m)
     throws InvalidBEncodingException, UnknownHostException
   {
@@ -219,8 +225,9 @@ public class PeerID implements Comparable<PeerID>
 
   /**
    * Returns the String "id@address" where id is the first 4 chars of the base64 encoded id
-   * and address is the first 6 chars of the base64 dest (was the base64 hash of the dest) which
-   * should match what the bytemonsoon tracker reports on its web pages.
+   * and address is the first 4 chars of the base64 dest (was the base64 hash of the dest) which
+   * should match what some old trackers (bytemonsoon) used to report on their web pages,
+   * although none do now?
    */
   @Override
   public String toString()
@@ -232,7 +239,7 @@ public class PeerID implements Comparable<PeerID>
         return _toStringCache;
     }
     if (id == null || address == null)
-        return "unkn@" + Base64.encode(destHash).substring(0, 6);
+        return "unkn@" + Base64.encode(destHash, 0, 3);
     int nonZero = 0;
     for (int i = 0; i < id.length; i++) {
         if (id[i] != 0) {
@@ -240,7 +247,8 @@ public class PeerID implements Comparable<PeerID>
             break;
         }
     }
-    _toStringCache = Base64.encode(id, nonZero, id.length-nonZero).substring(0,4) + "@" + address.toBase64().substring(0,6);
+    _toStringCache = Base64.encode(id, nonZero, Math.min(3, id.length-nonZero)) + '@' +
+                     Base64.encode(address.getPublicKey().getData(), 0, 3);
     return _toStringCache;
   }
 
