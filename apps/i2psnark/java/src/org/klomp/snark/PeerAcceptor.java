@@ -28,7 +28,6 @@ import java.io.OutputStream;
 import java.io.SequenceInputStream;
 import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocket;
-import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
@@ -88,11 +87,11 @@ class PeerAcceptor
         try {
           peerInfoHash = readHash(in);
           if (_log.shouldLog(Log.INFO))
-              _log.info("infohash read from " + socket.getPeerDestination().calculateHash().toBase64() 
-                        + ": " + Base64.encode(peerInfoHash));
+              _log.info("infohash read from " + socket.getPeerDestination().calculateHash().toBase32() 
+                        + ": " + I2PSnarkUtil.toHex(peerInfoHash));
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Unable to read the infohash from " + socket.getPeerDestination().calculateHash().toBase64());
+                _log.info("Unable to read the infohash from " + socket.getPeerDestination().calculateHash().toBase32());
             throw ioe;
         }
         in = new SequenceInputStream(new ByteArrayInputStream(peerInfoHash), in);
@@ -110,8 +109,8 @@ class PeerAcceptor
               socket.close();
         } else {
           // its for another infohash, but we are only single torrent capable.  b0rk.
-            throw new IOException("Peer wants another torrent (" + Base64.encode(peerInfoHash) 
-                                  + ") while we only support (" + Base64.encode(coordinator.getInfoHash()) + ")");
+            throw new IOException("Peer wants torrent (" + I2PSnarkUtil.toHex(peerInfoHash) 
+                                  + ") while we only support (" + I2PSnarkUtil.toHex(coordinator.getInfoHash()) + ")");
         }
     } else {
         // multitorrent capable, so lets see what we can handle
@@ -123,19 +122,18 @@ class PeerAcceptor
                     Peer peer = new Peer(socket, in, out, cur.getID(),
                                          cur.getInfoHash(), cur.getMetaInfo());
                     cur.addPeer(peer);
-                    return;
                   }
                 else 
                   {
                     if (_log.shouldLog(Log.DEBUG))
                       _log.debug("Rejecting new peer for " + cur.getName());
                     socket.close();
-                    return;
                   }
+                return;
             }
         }
         // this is only reached if none of the coordinators match the infohash
-        throw new IOException("Peer wants another torrent (" + Base64.encode(peerInfoHash) 
+        throw new IOException("Peer wants torrent (" + I2PSnarkUtil.toHex(peerInfoHash) 
                               + ") while we don't support that hash");
     }
   }

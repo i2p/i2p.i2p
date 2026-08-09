@@ -187,14 +187,14 @@ class ConnectionAcceptor implements Runnable
                 if (socket.getLocalPort() == 80) {
                      _badCounter.increment(h);
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Dropping incoming HTTP from " + h);
+                        _log.warn("Dropping incoming HTTP from " + h.toBase32());
                     try { socket.reset(); } catch (IOException ioe) {}
                     continue;
                 }
                 int bad = _badCounter.count(h);
                 if (bad >= MAX_BAD) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Rejecting connection from " + h +
+                        _log.warn("Rejecting connection from " + h.toBase32() +
                                   " after " + bad + " failures, max is " + MAX_BAD);
                     try { socket.reset(); } catch (IOException ioe) {}
                     continue;
@@ -281,16 +281,16 @@ class ConnectionAcceptor implements Runnable
               // this is for the readahead in PeerAcceptor.connection()
               in = new BufferedInputStream(in);
               if (_log.shouldLog(Log.DEBUG))
-                  _log.debug("Handling socket from " + _socket.getPeerDestination().calculateHash() + " to port: " + _socket.getLocalPort());
+                  _log.debug("Handling socket from " + _socket.getPeerDestination().calculateHash().toBase32() + " to port: " + _socket.getLocalPort());
               peeracceptor.connection(_socket, in, out);
           } catch (PeerAcceptor.ProtocolException ihe) {
               _badCounter.increment(_socket.getPeerDestination().calculateHash());
               if (_log.shouldLog(Log.INFO))
-                  _log.info("Protocol error from " + _socket.getPeerDestination().calculateHash(), ihe);
+                  _log.info("Protocol error from " + _socket.getPeerDestination().calculateHash().toBase32(), ihe);
               try { _socket.reset(); } catch (IOException ignored) { }
           } catch (IOException ioe) {
               if (_log.shouldLog(Log.DEBUG))
-                  _log.debug("Error handling connection from " + _socket.getPeerDestination().calculateHash(), ioe);
+                  _log.debug("Error handling connection from " + _socket.getPeerDestination().calculateHash().toBase32(), ioe);
               try { _socket.reset(); } catch (IOException ignored) { }
           }
       }
