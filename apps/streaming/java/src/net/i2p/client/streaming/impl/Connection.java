@@ -1592,8 +1592,8 @@ class Connection {
                     
 
                     if (_outboundQueue.enqueue(packet)) {
-                        if (_log.shouldLog(Log.INFO)) 
-                            _log.info(Connection.this + " resent packet " + packet);
+                        if (_log.shouldInfo()) 
+                            _log.info("resent packet (timer) " + packet + " on " + Connection.this);
                         if (nResends == 1)
                             _activeResends.incrementAndGet();
                         sentAny = true;
