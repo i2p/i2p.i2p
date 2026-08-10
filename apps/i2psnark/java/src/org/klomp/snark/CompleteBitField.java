@@ -5,6 +5,8 @@ import java.util.Arrays;
 /**
  *  A full bitfield, immutable, to save memory and time.
  *  Overrides all methods except size().
+ *
+ *  @since 0.9.71
  */
 public class CompleteBitField extends BitField {
 
