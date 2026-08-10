@@ -201,9 +201,13 @@ public class I2PSnarkUtil implements DisconnectListener {
      */
     public void setMaxUpBW(int limit) {
         _maxUpBW = limit;
-        synchronized(_opts) {
-            _opts.put(PROP_MAX_BW, Integer.toString(limit * (1024 * 6 / 5)));   // add a little for overhead
-        }
+        // This enables the bw limiter in I2CPMessageProducer.
+        // For now, disable it, since we now have good bandwidth limiting
+        // here in snark, we don't need the additional throttling/drops in I2CP
+        // causing more streaming issues.
+        //synchronized(_opts) {
+        //    _opts.put(PROP_MAX_BW, Integer.toString(limit * (1024 * 6 / 5)));   // add a little for overhead
+        //}
         if (_manager != null) {
             I2PSession sess = _manager.getSession();
             if (sess != null) {
