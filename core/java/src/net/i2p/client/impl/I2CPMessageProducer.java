@@ -211,9 +211,12 @@ class I2CPMessageProducer {
     public void sendMessage(I2PSessionImpl session, Destination dest, long nonce, byte[] payload,
                             long expires, int flags) throws I2PSessionException {
 
-        if (!updateBps(payload.length, expires))
-            // drop the message... send fail notification?
-            return;
+        if (_maxBytesPerSecond > 0) {
+            if (!updateBps(payload.length, expires)) {
+                // drop the message... send fail notification?
+                return;
+            }
+        }
         SendMessageMessage msg;
         SessionId sid = session.getSessionId();
         if (sid == null) {
@@ -241,10 +244,13 @@ class I2CPMessageProducer {
     public void sendMessage(I2PSessionImpl session, Destination dest, long nonce, byte[] payload,
                             SendMessageOptions options) throws I2PSessionException {
 
-        long expires = options.getTime();
-        if (!updateBps(payload.length, expires))
-            // drop the message... send fail notification?
-            return;
+        if (_maxBytesPerSecond > 0) {
+            long expires = options.getTime();
+            if (!updateBps(payload.length, expires)) {
+                // drop the message... send fail notification?
+                return;
+            }
+        }
         SessionId sid = session.getSessionId();
         if (sid == null) {
             _log.error(session.toString() + " cannot send message, session closed", new Exception());
@@ -288,8 +294,6 @@ class I2CPMessageProducer {
      *  @return true if we should send the message, false to drop it
      */
     private boolean updateBps(int len, long expires) {
-        if (_maxBytesPerSecond <= 0)
-            return true;
         //synchronized(this) {
         _lock.lock();
         try {
