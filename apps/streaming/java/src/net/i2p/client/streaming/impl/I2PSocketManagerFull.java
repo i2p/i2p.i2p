@@ -308,7 +308,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
             throw new I2PSessionException("dup");
         }
         ConnectionOptions defaultOptions = new ConnectionOptions(opts);
-        int protocol = defaultOptions.getEnforceProtocol() ? I2PSession.PROTO_STREAMING : I2PSession.PROTO_ANY;
+        int protocol = I2PSession.PROTO_STREAMING;
         rv.addMuxedSessionListener(_connectionManager.getMessageHandler(), protocol, defaultOptions.getLocalPort());
         if (_log.shouldLog(Log.WARN))
             _log.warn("Added subsession " + rv);

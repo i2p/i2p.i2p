@@ -23,7 +23,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _connectDelay;
     private boolean _fullySigned;
     private boolean _answerPings;
-    private boolean _enforceProto;
     private volatile int _windowSize;
     private int _receiveWindow;
     private int _profile;
@@ -114,8 +113,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final String PROP_MAX_TOTAL_CONNS_MIN = "i2p.streaming.maxTotalConnsPerMinute";
     public static final String PROP_MAX_TOTAL_CONNS_HOUR = "i2p.streaming.maxTotalConnsPerHour";
     public static final String PROP_MAX_TOTAL_CONNS_DAY = "i2p.streaming.maxTotalConnsPerDay";
-    /** @since 0.9.1 */
-    public static final String PROP_ENFORCE_PROTO = "i2p.streaming.enforceProtocol";
     /**
      *  how many streams will we allow at once?
      *  @since 0.9.3 moved from I2PSocketManagerFull
@@ -153,14 +150,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final int DEFAULT_TAGS_TO_SEND = 40;
     /** @since 0.9.34 */
     public static final int DEFAULT_TAG_THRESHOLD = 30;
-
-
-    /**
-     *  If PROTO is enforced, we cannot communicate with destinations earlier than version 0.7.1.
-     *  Default true as of 0.9.36.
-     *  @since 0.9.1
-     */
-    private static final boolean DEFAULT_ENFORCE_PROTO = true;
 
     //private final int _trend[] = new int[TREND_COUNT];
 
@@ -393,7 +382,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             //setWriteTimeout(opts.getWriteTimeout());
             //setReadTimeout(opts.getReadTimeout());
             setAnswerPings(opts.getAnswerPings());
-            setEnforceProtocol(opts.getEnforceProtocol());
             setDisableRejectLogging(opts.getDisableRejectLogging());
             initLists(opts);
             _maxConnsPerMinute = opts.getMaxConnsPerMinute();
@@ -433,7 +421,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         // overrides default in super()... why?
         //setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
         setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
-        setEnforceProtocol(getBool(opts, PROP_ENFORCE_PROTO, DEFAULT_ENFORCE_PROTO));
         setDisableRejectLogging(getBool(opts, PROP_DISABLE_REJ_LOG, false));
         initLists(opts);
         _maxConnsPerMinute = getInt(opts, PROP_MAX_CONNS_MIN, 0);
@@ -499,8 +486,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DEFAULT_CONNECT_TIMEOUT));
         if (opts.getProperty(PROP_ANSWER_PINGS) != null)
             setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
-        if (opts.getProperty(PROP_ENFORCE_PROTO) != null)
-            setEnforceProtocol(getBool(opts, PROP_ENFORCE_PROTO, DEFAULT_ENFORCE_PROTO));
         if (opts.getProperty(PROP_DISABLE_REJ_LOG) != null)
             setDisableRejectLogging(getBool(opts, PROP_DISABLE_REJ_LOG, false));
         initLists(opts);
@@ -569,11 +554,20 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * (released March 2009), which is when streaming started sending the PROTO_STREAMING indication.
      * Set to true if you are running multiple protocols on a single Destination.
      *
-     * @return if we do
+     * @return true always, since 0.9.71, option is disabled
      * @since 0.9.1
+     * @deprecated
      */
-    public boolean getEnforceProtocol() { return _enforceProto; }
-    public void setEnforceProtocol(boolean yes) { _enforceProto = yes; }
+    @Deprecated
+    public boolean getEnforceProtocol() { return true; }
+    /**
+     * Does nothing since 0.9.71
+     *
+     * @since 0.9.1
+     * @deprecated
+     */
+    @Deprecated
+    public void setEnforceProtocol(boolean yes) {}
     
     /**
      * Do we disable connection rejected logging? Default false.

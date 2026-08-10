@@ -112,7 +112,8 @@ class ConnectionManager {
         // As of 0.9.1, new option to enforce streaming protocol, off by default
         // As of 0.9.1, listen on configured port (default 0 = all)
         // enforce protocol default changed to true in 0.9.36
-        int protocol = defaultOptions.getEnforceProtocol() ? I2PSession.PROTO_STREAMING : I2PSession.PROTO_ANY;
+        // disable option in 0.9.71
+        int protocol = I2PSession.PROTO_STREAMING;
         _session.addMuxedSessionListener(_messageHandler, protocol, defaultOptions.getLocalPort());
         _outboundQueue = new PacketQueue(_context, _timer);
         _recentlyClosed = new LHMCache<Long, Object>(128);
