@@ -30,7 +30,7 @@ public class BitField
 {
 
   private final byte[] bitfield;
-  private final int size;
+  protected final int size;
   private int count;
 
   /**
@@ -64,6 +64,16 @@ public class BitField
     for (int i = 0; i < size; i++)
       if (get(i))
         this.count++;
+  }
+
+  /**
+   * For CompleteBitField. All methods except size() must be overridden.
+   *
+   * @since 0.9.71
+   */
+  protected BitField(int size, int dummy) {
+    this.size = size;
+    bitfield = null;
   }
 
   /**
@@ -186,7 +196,7 @@ public class BitField
       BitField bf = (BitField) o;
       return count == bf.count() &&
              size == bf.size() &&
-             Arrays.equals(bitfield, bf.getFieldBytes());
+             (count == size || Arrays.equals(bitfield, bf.getFieldBytes()));
   }
 
   @Override

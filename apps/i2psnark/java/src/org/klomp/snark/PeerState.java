@@ -252,9 +252,10 @@ class PeerState implements DataLoader
             if (bitmap != null) {
                 bitfield = new BitField(bitmap, metainfo.getPieces());
             } else {
-                bitfield = new BitField(metainfo.getPieces());
                 if (isAll)
-                    bitfield.setAll();
+                    bitfield = new CompleteBitField(metainfo.getPieces());
+                else
+                    bitfield = new BitField(metainfo.getPieces());
             }
         }
     }  // synch
