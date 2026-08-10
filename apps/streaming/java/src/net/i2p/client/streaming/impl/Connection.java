@@ -505,26 +505,25 @@ class Connection {
      *  @return List of packets acked for the first time, or null if none
      */
     public List<PacketLocal> ackPackets(long ackThrough, long nacks[]) {
-        // FIXME synch this part too?
-        if (ackThrough < _highestAckedThrough) {
-            // dupack which won't tell us anything
-        } else {
-           if (nacks == null) {
-                _highestAckedThrough = ackThrough;
-            } else {
-                long lowest = -1;
-                for (int i = 0; i < nacks.length; i++) {
-                    if ( (lowest < 0) || (nacks[i] < lowest) )
-                        lowest = nacks[i];
-                }
-                if (lowest - 1 > _highestAckedThrough)
-                    _highestAckedThrough = lowest - 1;
-            }
-        }
-        
         List<PacketLocal> acked = null;
-        boolean anyLeft = false;
         synchronized (_outboundPackets) {
+            if (ackThrough < _highestAckedThrough) {
+                // dupack which won't tell us anything
+            } else {
+               if (nacks == null) {
+                    _highestAckedThrough = ackThrough;
+                } else {
+                    long lowest = -1;
+                    for (int i = 0; i < nacks.length; i++) {
+                        if ( (lowest < 0) || (nacks[i] < lowest) )
+                            lowest = nacks[i];
+                    }
+                    if (lowest - 1 > _highestAckedThrough)
+                        _highestAckedThrough = lowest - 1;
+                }
+            }
+        
+            boolean anyLeft = false;
             if (!_outboundPackets.isEmpty()) {  // short circuit iterator
               for (Iterator<Map.Entry<Long, PacketLocal>> iter = _outboundPackets.entrySet().iterator(); iter.hasNext(); ) {
                 Map.Entry<Long, PacketLocal> e = iter.next();
@@ -1177,6 +1176,15 @@ class Connection {
         synchronized (_outboundPackets) { 
             return _outboundPackets.size(); 
         } 
+    }
+
+    /**
+     * For ConnectionPacketHandler.adjustWindow()
+     *
+     * @since 0.9.71
+     */
+    public Object getWindowLock() { 
+        return _outboundPackets; 
     }
     
     public long getCongestionWindowEnd() { return _congestionWindowEnd; }
