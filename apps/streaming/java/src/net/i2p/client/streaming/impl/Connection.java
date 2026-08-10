@@ -116,6 +116,12 @@ class Connection {
      */
     public static final int MAX_WINDOW_SIZE = 128;
     private static final int UNCHOKES_TO_SEND = 8;
+    /** Multiplier for the Westwood BDP estimate used to calculate the new slow start threshold */
+    private static final int SSTHR_BW_FACTOR = 2;
+    /** Minimum slow start threshold after fast retransmit */
+    private static final int MIN_SSTHR_FAST_RETX = 16;
+    /** Minimum slow start threshold after timer retransmit */
+    private static final int MIN_SSTHR_TIMER_RETX = 8;
 
     /** Maximum number of packets to retransmit when the timer hits */
     private static final int MAX_RTX = 16;
@@ -1503,13 +1509,20 @@ class Connection {
 
                 PacketLocal oldest = e.getValue();
                 if (oldest.getNumSends() == 1) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug(Connection.this + " cutting ssthresh and window");
-                    _ssthresh = Math.max( (int)(_bwEstimator.getBandwidthEstimate() * _options.getMinRTT()), 2 );
-                    _ssthresh = Math.min(ConnectionPacketHandler.MAX_SLOW_START_WINDOW, _ssthresh);
+                    int oldWindowSize = _options.getWindowSize();
+                    int oldssthresh = _ssthresh;
+                    _ssthresh = Math.max(Math.round(_bwEstimator.getBandwidthEstimate() * _options.getMinRTT() * SSTHR_BW_FACTOR),
+                                         MIN_SSTHR_TIMER_RETX);
+                    if (_ssthresh > ConnectionPacketHandler.MAX_SLOW_START_WINDOW)
+                        _ssthresh = ConnectionPacketHandler.MAX_SLOW_START_WINDOW;
                     _options.setWindowSize(1);
-                } else if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(Connection.this + " not cutting ssthresh and window");
+                    if (_log.shouldInfo())
+                        _log.info("Congestion, resending packets (timer), oldest: " + oldest.getSequenceNum() + " (windowSize " + oldWindowSize
+                                  + "->1 ssThresh " + oldssthresh + "->" + _ssthresh + ") for " + Connection.this.toString());
+                } else if (_log.shouldInfo()) {
+                    _log.info("Congestion, resending packets (timer), oldest: " + oldest.getSequenceNum() + " (numSends: " + oldest.getNumSends() +
+                              ") for " + Connection.this.toString());
+                }
 
                 toResend = new ArrayList<>(_outboundPackets.values());
                 toResend = toResend.subList(0, Math.min(MAX_RTX, (toResend.size() + 1) / 2));
@@ -1690,36 +1703,42 @@ class Connection {
                     _packet.setReceiveStreamId(_receiveStreamId.get());
                 if (_packet.getSendStreamId() <= 0)
                     _packet.setSendStreamId(_sendStreamId.get());
-                
-                int newWindowSize = _options.getWindowSize();
 
-                if (_isChoked) {
-                    congestionOccurred();
-                    _options.setWindowSize(1);
-                } else if (_ackSinceCongestion.get()) {
-                    // only shrink the window once per window
-                    if (_packet.getSequenceNum() > _lastCongestionHighestUnacked) {
+                synchronized(_outboundPackets) {
+                    if (_isChoked) {
                         congestionOccurred();
-                        _context.statManager().addRateData("stream.con.windowSizeAtCongestion", newWindowSize, _packet.getLifetime());
-                        // The timeout for _this_ packet will be doubled below, but we also
-                        // need to double the RTO for the _next_ packets.
-                        // See RFC 6298 section 5 item 5.5
-                        // This prevents being stuck at a window size of 1, retransmitting every packet,
-                        // never updating the RTT or RTO.
-                        _options.doubleRTO();
-
-                        if (_packet.getNumSends() == 1) {
-                            _ssthresh = Math.max( (int)(_bwEstimator.getBandwidthEstimate() * _options.getMinRTT()), 2 );
-                            _ssthresh = Math.min(ConnectionPacketHandler.MAX_SLOW_START_WINDOW, _ssthresh);
-                            int wsize = _options.getWindowSize();
-                            _options.setWindowSize(Math.min(_ssthresh, wsize));
+                        _options.setWindowSize(1);
+                    } else if (_ackSinceCongestion.get()) {
+                        // only shrink the window once per window
+                        if (_packet.getSequenceNum() > _lastCongestionHighestUnacked) {
+                            congestionOccurred();
+                            int oldWindowSize = _options.getWindowSize();
+                            _context.statManager().addRateData("stream.con.windowSizeAtCongestion", oldWindowSize, _packet.getLifetime());
+                            // The timeout for _this_ packet will be doubled below, but we also
+                            // need to double the RTO for the _next_ packets.
+                            // See RFC 6298 section 5 item 5.5
+                            // This prevents being stuck at a window size of 1, retransmitting every packet,
+                            // never updating the RTT or RTO.
+                            _options.doubleRTO();
+                            if (_packet.getNumSends() == 1) {
+                                int oldssthresh = _ssthresh;
+                                _ssthresh = Math.max(Math.round(_bwEstimator.getBandwidthEstimate() * _options.getMinRTT() * SSTHR_BW_FACTOR),
+                                                     MIN_SSTHR_FAST_RETX);
+                                if (_ssthresh > ConnectionPacketHandler.MAX_SLOW_START_WINDOW)
+                                    _ssthresh = ConnectionPacketHandler.MAX_SLOW_START_WINDOW;
+                                int wsize = _options.getWindowSize();
+                                if (_ssthresh < wsize)
+                                    _options.setWindowSize(_ssthresh);
+                                if (_log.shouldInfo())
+                                    _log.info("Congestion, resending packet (fast) " + _packet.getSequenceNum() + " (windowSize " + oldWindowSize +
+                                              "->" + _options.getWindowSize() + " ssThresh " + oldssthresh + "->" + _ssthresh +
+                                              ") for " + Connection.this.toString());
+                            } else if (_log.shouldInfo()) {
+                                _log.info("Congestion, resending packet (fast) " + _packet.getSequenceNum() + " (numSends: " + _packet.getNumSends() +
+                                          ") for " + Connection.this.toString());
+                            }
+                            windowAdjusted();
                         }
-
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("Congestion, resending packet " + _packet.getSequenceNum() + " (new windowSize " + newWindowSize 
-                                      + "/" + _options.getWindowSize() + ") for " + Connection.this.toString());
-
-                        windowAdjusted();
                     }
                 }
                 
@@ -1770,14 +1789,14 @@ class Connection {
                         // first resend for this packet ?
                         if (numSends == 2)
                             _activeResends.incrementAndGet();
-                        if (_log.shouldLog(Log.INFO))
+                        if (_log.shouldInfo())
                             _log.info("Resent packet " +
                                   "(fast) " +
                                   _packet +
                                   " next resend in " + timeout + "ms" +
                                   " activeResends: " + _activeResends + 
-                                  " (wsize "
-                                  + newWindowSize + " lifetime " 
+                                  " (wsize now "
+                                  + _options.getWindowSize() + " lifetime "
                                   + (_context.clock().now() - _packet.getCreatedOn()) + "ms)");
                         _unackedPacketsReceived.set(0);
                         _lastSendTime = _context.clock().now();
