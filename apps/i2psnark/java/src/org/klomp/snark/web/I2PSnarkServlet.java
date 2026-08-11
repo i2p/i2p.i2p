@@ -3587,7 +3587,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     buf.append("&amp;tr=").append(announce);
                 buf.append("\">")
                    .append(toImg("magnet", _t("Magnet link")))
-                   .append("</a></td><td><b>Magnet</b></td><td><a href=\"")
+                   .append("</a></td><td><b>").append(_t("Magnet")).append("</b></td><td><a href=\"")
                    .append(MagnetURI.MAGNET_FULL).append(hex);
                 if (announce != null)
                     buf.append("&amp;tr=").append(announce);
