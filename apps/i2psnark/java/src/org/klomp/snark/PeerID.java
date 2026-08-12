@@ -47,10 +47,9 @@ public class PeerID implements Comparable<PeerID>
   private byte[] id;
   private Destination address;
   private final int port;
-  private byte[] destHash;
+  private final byte[] destHash;
   /** whether we have tried to get the dest from the hash - only do once */
   private boolean triedDestLookup;
-  private final int hash;
   private final I2PSnarkUtil util;
   private String _toStringCache;
 
@@ -60,7 +59,6 @@ public class PeerID implements Comparable<PeerID>
     this.address = address;
     this.port = TrackerClient.PORT;
     this.destHash = address.calculateHash().getData();
-    hash = calculateHash();
     util = null;
   }
 
@@ -100,7 +98,6 @@ public class PeerID implements Comparable<PeerID>
 
     port = TrackerClient.PORT;
     this.destHash = address.calculateHash().getData();
-    hash = calculateHash();
     util = null;
   }
 
@@ -116,7 +113,6 @@ public class PeerID implements Comparable<PeerID>
     if (dest_hash.length != 32)
         throw new InvalidBEncodingException("bad hash length");
     destHash = dest_hash;
-    hash = DataHelper.hashCode(dest_hash);
     this.util = util;
   }
 
@@ -159,18 +155,13 @@ public class PeerID implements Comparable<PeerID>
     return destHash;
   }
 
-  private int calculateHash()
-  {
-    return DataHelper.hashCode(destHash);
-  }
-
   /**
    * The hash code of a PeerID is the hashcode of the desthash
    */
     @Override
   public int hashCode()
   {
-    return hash;
+    return (int) DataHelper.fromLong(destHash, 0, 4);
   }
 
   /**
@@ -239,7 +230,7 @@ public class PeerID implements Comparable<PeerID>
         return _toStringCache;
     }
     if (id == null || address == null)
-        return "unkn@" + Base64.encode(destHash, 0, 3);
+        return "unkn@" + Base32.encode(destHash) + ".b32.i2p";
     int nonZero = 0;
     for (int i = 0; i < id.length; i++) {
         if (id[i] != 0) {
