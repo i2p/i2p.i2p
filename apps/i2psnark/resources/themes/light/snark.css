@@ -1116,6 +1116,7 @@ tr:hover .percentBarText {
      -webkit-user-select: all;
      -ms-user-select: all;
      user-select: all;
+     font-family: monospace;
 }
 
 .snarkDirInfo thead img {
