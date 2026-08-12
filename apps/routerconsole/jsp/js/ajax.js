@@ -7,6 +7,11 @@
 var __ajax_fails = 0;
 
 /**
+ *  As of 0.9.71, this will not do a request unless the page is visible.
+ *  If hidden, it will simply reschedule.
+ *  Callers using refresh greater than zero
+ *  should add a listener to do a call with refresh = 0
+ *  when the page becomes visible. See summaryajax.jsi
  *
  *  @param refresh as of 0.9.58, if less than or equal to zero, do not reschedule
  *
@@ -14,6 +19,13 @@ var __ajax_fails = 0;
 function ajax(url, target, refresh) {
   // native XMLHttpRequest object
   if (window.XMLHttpRequest) {
+    if (document.hidden) {
+        if (refresh > 0) {
+            // always set the timer even if hidden, since we don't cancel it
+            setTimeout(function() {ajax(url, target, refresh);}, refresh);
+        }
+        return;
+    }
     var req = new XMLHttpRequest();
     req.onreadystatechange = function() {ajaxDone(req, url, target, refresh);};
     req.open("GET", url, true);
@@ -52,6 +64,7 @@ function ajaxDone(req, url, target, refresh) {
     }
 
     if (refresh > 0) {
+      // always set the timer even if hidden, since we don't cancel it
       setTimeout(function() {ajax(url, target, refresh);}, refresh);
     }
   }

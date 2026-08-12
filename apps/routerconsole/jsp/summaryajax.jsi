@@ -6,7 +6,14 @@
 
   var failMessage = "<hr><b><%=intl._t("Router is down")%><\/b>";
   function requestAjax1() { ajax("/xhr1.jsp?requestURI=<%=request.getRequestURI()%>", "xhr", <%=intl.getRefresh()%>000); }
-  function initAjax() { setTimeout(requestAjax1, <%=intl.getRefresh()%>000);  }
+  function initAjax() {
+      setTimeout(requestAjax1, <%=intl.getRefresh()%>000);
+      document.addEventListener("visibilitychange", function() {
+          if (!document.hidden) {
+              ajax("/xhr1.jsp?requestURI=<%=request.getRequestURI()%>", "xhr", 0);
+          }
+      }, true);
+  }
   initAjax();
 
 /* @license-end */
