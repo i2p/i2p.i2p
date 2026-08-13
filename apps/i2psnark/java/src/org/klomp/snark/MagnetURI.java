@@ -18,6 +18,7 @@ public class MagnetURI {
     private final List<String> _trackers;
     private final String _name;
     private final byte[] _ih;
+    private final byte[] _ih2;
 
     /** BEP 9 */
     public static final String MAGNET = "magnet:";
@@ -30,24 +31,35 @@ public class MagnetURI {
      *  will contain two xt params
      *  @since 0.9.48
      */
-    public static final String MAGNET_FULL_V2 = MAGNET + "?xt=urn:btmh:";
+    private static final String MAGNET_V2 = "xt=urn:btmh:1220";
+    public static final String MAGNET_FULL_V2 = MAGNET + '?' + MAGNET_V2;
 
     /**
+     *  @param util null for unit tests
      *  @param url non-null
      */
     public MagnetURI(I2PSnarkUtil util, String url) throws IllegalArgumentException {
-        String ihash;
+        String ihash = null;
+        String ihash2 = null;
         String name;
         List<String> trackerURLs = null;
         if (url.startsWith(MAGNET)) {
             // magnet:?xt=urn:btih:0691e40aae02e552cfcb57af1dca56214680c0c5&tr=http://tracker2.postman.i2p/announce.php
-            String xt = getParam("xt", url);
-            // TODO btmh
-            if (xt == null || !xt.startsWith("urn:btih:"))
+            List<String> xts = getMultiParam("xt", url);
+            if (xts == null || xts.isEmpty())
                 throw new IllegalArgumentException();
-            ihash = xt.substring("urn:btih:".length());
+            for (String xt : xts) {
+                 if (xt.startsWith("urn:btih:") && ihash == null)
+                     ihash = xt.substring(9);
+                 else if (xt.startsWith("urn:btmh:1220") && ihash2 == null)
+                     ihash2 = xt.substring(13);
+            }
             trackerURLs = getTrackerParam(url);
-            name = util.getString("Magnet") + ' ' + ihash;
+            name = ihash != null ? ihash : (ihash2 != null ? ihash2 : "");
+            if (util != null)
+                name = util.getString("Magnet") + ' ' + name;
+            else
+                name = "Magnet " + name;
             String dn = getParam("dn", url);
             if (dn != null)
                 name += " (" + dn + ')';
@@ -57,36 +69,68 @@ public class MagnetURI {
             int col = ihash.indexOf(':');
             if (col >= 0)
                 ihash = ihash.substring(0, col);
-            name = util.getString("Magnet") + ' ' + ihash;
+            if (util != null)
+                name = util.getString("Magnet") + ' ' + ihash;
+            else
+                name = "Magnet " + ihash;
         } else {
             throw new IllegalArgumentException();
         }
         byte[] ih = null;
-        if (ihash.length() == 32) {
-            ih = Base32.decode(ihash);
-        } else if (ihash.length() == 40) {
-            //  Like DataHelper.fromHexString() but ensures no loss of leading zero bytes
-            ih = new byte[20];
-            try {
-                for (int i = 0; i < 20; i++) {
-                    ih[i] = (byte) (Integer.parseInt(ihash.substring(i*2, (i*2) + 2), 16) & 0xff);
+        if (ihash != null) {
+            if (ihash.length() == 32) {
+                ih = Base32.decode(ihash);
+            } else if (ihash.length() == 40) {
+                //  Like DataHelper.fromHexString() but ensures no loss of leading zero bytes
+                ih = new byte[20];
+                try {
+                    for (int i = 0; i < 20; i++) {
+                        ih[i] = (byte) (Integer.parseInt(ihash.substring(i*2, (i*2) + 2), 16) & 0xff);
+                    }
+                } catch (NumberFormatException nfe) {
+                    ih = null;
                 }
-            } catch (NumberFormatException nfe) {
-                ih = null;
             }
         }
-        if (ih == null || ih.length != 20)
+        byte[] ih2 = null;
+        if (ihash2 != null) {
+            if (ihash2.length() == 52) {
+                ih2 = Base32.decode(ihash2);
+            } else if (ihash2.length() == 64) {
+                ih2 = new byte[32];
+                try {
+                    for (int i = 0; i < 32; i++) {
+                        ih2[i] = (byte) (Integer.parseInt(ihash2.substring(i*2, (i*2) + 2), 16) & 0xff);
+                    }
+                } catch (NumberFormatException nfe) {
+                    ih2 = null;
+                }
+            }
+        }
+        if ((ih == null && ih2 == null) ||
+            (ih != null && ih.length != 20) ||
+            (ih2 != null && ih2.length != 32))
             throw new IllegalArgumentException();
         _ih = ih;
+        _ih2 = ih2;
         _name = name;
         _trackers = trackerURLs;
     }
 
     /**
-     *  @return 20 bytes or null
+     *  @return 20 bytes or null if not v1.
      */
     public byte[] getInfoHash() {
         return _ih;
+    }
+
+    /**
+     * Returns the SHA-256 hash, or null if not v2.
+     *
+     * @since 0.9.71
+     */
+    public byte[] getInfoHashV2() {
+        return _ih2;
     }
 
     /**
@@ -109,6 +153,37 @@ public class MagnetURI {
      */
     public List<String> getTrackerURLs() {
         return _trackers;
+    }
+
+    /**
+     *  @param ih 20 or 32 bytes
+     *  @param announce may be null
+     *  @since 0.9.71 moved from I2PSnarkServlet
+     */
+    public static String toMagnetLink(byte[] ih, String announce) {
+        return toMagnetLink(ih, null, announce);
+    }
+
+    /**
+     *  @param ih 20 or 32 bytes
+     *  @param ih 32 bytes or null
+     *  @param announce may be null
+     *  @return html escaped
+     *  @since 0.9.71 moved from I2PSnarkServlet
+     */
+    public static String toMagnetLink(byte[] ih, byte[] ih2, String announce) {
+        if ((ih.length != 20 && ih.length != 32) ||
+            (ih2 != null && ih2.length != 32))
+            throw new IllegalArgumentException();
+        String hex = I2PSnarkUtil.toHex(ih);
+        StringBuilder buf = new StringBuilder(128);
+        buf.append(ih.length == 20 ? MAGNET_FULL : MAGNET_FULL_V2)
+           .append(hex);
+        if (ih2 != null)
+            buf.append("&amp;").append(MAGNET_V2).append(I2PSnarkUtil.toHex(ih2));
+        if (announce != null)
+            buf.append("&amp;tr=").append(announce);
+        return buf.toString();
     }
 
     /**
@@ -235,4 +310,31 @@ public class MagnetURI {
         return buf.toString();
     }
 
+    /**
+     *  @since 0.9.71
+     */
+    public static void main(String[] args) {
+        if (args.length != 1) {
+            System.err.println("Usage: MagnetURI 'magnet:?xt=urn:...'");
+            System.exit(1);
+        }
+        MagnetURI muri = new MagnetURI(null, args[0]);
+        byte[] h = muri.getInfoHash();
+        if (h != null)
+            System.out.println("InfoHash (v1)       : " + I2PSnarkUtil.toHex(h).toUpperCase(Locale.US));
+        h = muri.getInfoHashV2();
+        if (h != null) {
+            System.out.println("InfoHash (v2 short) : " + I2PSnarkUtil.toHex(h).substring(0, 40).toUpperCase(Locale.US));
+            System.out.println("InfoHash (v2 long)  : " + I2PSnarkUtil.toHex(h).toUpperCase(Locale.US));
+        }
+        String name = muri.getName();
+        if (name != null)
+            System.out.println("Name                : " + name);
+        List<String> trackers = muri.getTrackerURLs();
+        if (trackers != null) {
+            for (String t: trackers) {
+                System.out.println("Tracker             : " + t);
+            }
+        }
+    }
 }

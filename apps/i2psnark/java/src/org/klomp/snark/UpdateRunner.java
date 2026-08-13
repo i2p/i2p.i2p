@@ -88,6 +88,8 @@ class UpdateRunner implements UpdateTask, CompleteListener {
             try {
                 MagnetURI magnet = new MagnetURI(_smgr.util(), updateURL);
                 byte[] ih = magnet.getInfoHash();
+                if (ih == null)
+                    throw new IllegalArgumentException();
                 // do we already have it?
                 _snark = _smgr.getTorrentByInfoHash(ih);
                 if (_snark != null) {
