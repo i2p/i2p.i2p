@@ -1,3 +1,36 @@
+2026-08-12 zzz
+ * i2psnark: Add v2 utility classes (WIP)
+
+2026-08-12 zzz
+ * Console, i2psnark: Reload XHR after page becomes visible again
+
+2026-08-11 zzz
+ * Build: Recognize gettext version 1.0
+
+2026-08-10 zzz
+ * i2psnark:
+   - Add CompleteBitfield subclass for efficiency
+   - Disable I2CP bw limiting
+ * Streaming:
+   - Increase min slow start threshold in retransmit path
+   - Remove option to disable protocol number enforcement
+   - Add missing synchronization in fast-retx path
+   - Add missing synchronization in CPH.adjustWindow()
+   - Extend synchronization in Connection.ackPackets()
+
+2026-08-05 zzz
+ * i2psnark: Use inbound banlist for outbound also
+ * NTCP: Catch unchecked BufferOverflowException on read()
+ * Streaming: Reset tweaks
+
+2026-08-03 zzz
+ * i2psnark:
+   - Increase max pipeline
+   - Increase inactivity timeout for seeds
+   - Reset socket on protocol errors
+ * Streaming: Don't put close/reset packets on syn queue
+ * Tunnels: Periodically use 5-slot TBMs
+
 2026-08-02 zzz
  * Build: Fix build with izpack 5.2.6
  * i2psnark: Dup check for base name when filtered
