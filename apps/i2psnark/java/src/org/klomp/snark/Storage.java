@@ -1781,11 +1781,8 @@ public class Storage implements Closeable
           String hex = DataHelper.toString(meta.getInfoHash());
           System.out.println("Created:     " + file);
           System.out.println("InfoHash:    " + hex);
-          String basename = base.getName().replace(" ", "%20");
-          String magnet = MagnetURI.MAGNET_FULL + hex + "&dn=" + basename;
-          if (announce != null)
-              magnet += "&tr=" + announce;
-          System.out.println("Magnet:      " + magnet);
+          String magnet = MagnetURI.toMagnetLink(meta.getInfoHash(), announce, base.getName());
+          System.out.println("Magnet:      " + magnet.replace("&amp;", "&"));
       } catch (IOException ioe) {
           if (file != null)
               file.delete();
