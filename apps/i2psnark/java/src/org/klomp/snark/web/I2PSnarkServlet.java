@@ -3613,7 +3613,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 // uncommment when implemented
                 //MerkleHash v2 = meta != null ? meta.getInfoHashV2() : null;
                 Object v2 = null;
-                String link = MagnetURI.toMagnetLink(ih, announce);
+                String link = MagnetURI.toMagnetLink(ih, announce, snark.getBaseName());
                 buf.append("<tr><td><a href=\"")
                    .append(link)
                    .append("\">")
@@ -3631,7 +3631,7 @@ public class I2PSnarkServlet extends BasicServlet {
 /*
                 if (v2 != null) {
                     // todo don't add announce for postman until supported
-                    link = MagnetURI.toMagnetLink(v2.getData(), announce);
+                    link = MagnetURI.toMagnetLink(v2.getData(), announce, snark.getBaseName());
                     buf.append("<tr><td><a href=\"")
                        .append(link)
                        .append("\">")
@@ -3644,7 +3644,7 @@ public class I2PSnarkServlet extends BasicServlet {
                        .append(link)
                        .append("</a>")
                        .append("</td></tr>\n");
-                    link = MagnetURI.toMagnetLink(ih, v2.getData(), announce);
+                    link = MagnetURI.toMagnetLink(ih, v2.getData(), announce, snark.getBaseName());
                     buf.append("<tr><td><a href=\"")
                        .append(link)
                        .append("\">")

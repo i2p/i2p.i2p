@@ -161,17 +161,28 @@ public class MagnetURI {
      *  @since 0.9.71 moved from I2PSnarkServlet
      */
     public static String toMagnetLink(byte[] ih, String announce) {
-        return toMagnetLink(ih, null, announce);
+        return toMagnetLink(ih, null, announce, null);
+    }
+
+    /**
+     *  @param ih 20 or 32 bytes
+     *  @param announce may be null
+     *  @param basename may be null. NOT URL-escaped.
+     *  @since 0.9.71
+     */
+    public static String toMagnetLink(byte[] ih, String announce, String basename) {
+        return toMagnetLink(ih, null, announce, basename);
     }
 
     /**
      *  @param ih 20 or 32 bytes
      *  @param ih 32 bytes or null
      *  @param announce may be null
-     *  @return html escaped
+     *  @param basename may be null. NOT URL-escaped.
+     *  @return html and URL escaped
      *  @since 0.9.71 moved from I2PSnarkServlet
      */
-    public static String toMagnetLink(byte[] ih, byte[] ih2, String announce) {
+    public static String toMagnetLink(byte[] ih, byte[] ih2, String announce, String basename) {
         if ((ih.length != 20 && ih.length != 32) ||
             (ih2 != null && ih2.length != 32))
             throw new IllegalArgumentException();
@@ -183,6 +194,10 @@ public class MagnetURI {
             buf.append("&amp;").append(MAGNET_V2).append(I2PSnarkUtil.toHex(ih2));
         if (announce != null)
             buf.append("&amp;tr=").append(announce);
+        if (basename != null) {
+            buf.append("&amp;dn=");
+            URIUtil.encodePath(buf, basename);
+        }
         return buf.toString();
     }
 
