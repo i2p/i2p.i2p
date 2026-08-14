@@ -228,7 +228,7 @@ public class URIUtil
                             buf.append("%5C");
                             continue;
                         default:
-                            if (c <= 0x1f || (c >= 0x7f && c <= 0x9f) || Character.isSpaceChar(c))
+                            if (c <= 0x20 || c >= 0x7f)
                                 toHex(c,buf);
                             else
                               buf.append(c);
