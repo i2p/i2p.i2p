@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import net.i2p.crypto.SHA256Generator;
@@ -23,7 +24,7 @@ import org.klomp.snark.Storage;
  */
 public class V2Util {
 
-    private static final int MIN = 16*1024;
+    public static final int MIN = 16*1024;
 
     /**
      *  Merkle hashes for empty data of sizes 16KB, 32KB, 64KB, ...
@@ -95,6 +96,8 @@ public class V2Util {
         InputStream in = null;
         try {
             in = new FileInputStream(f);
+            if (len > 8 * MIN)
+                in = new BufferedInputStream(in, 4 * MIN);
             return calculateMerkleRoot(in, plen);
         } finally {
             if (in != null)
@@ -109,11 +112,50 @@ public class V2Util {
      *  @param plen piece length, 16K minimum, power of two
      *  @return the root hash
      */
-    public static MerkleHash calculateMerkleRoot(InputStream in, int plen) throws IOException {
+    private static MerkleHash calculateMerkleRoot(InputStream in, int plen) throws IOException {
         List<MerkleHash> hashes = calculateMerklePieces(in, plen);
         if (hashes.size() == 1)
             return hashes.get(0);
         return calculateMerkleRoot(hashes, plen);
+    }
+
+    /**
+     *  @param plen will use only if smaller than file size
+     *  @return the piece hashes
+     */
+    public static List<MerkleHash> calculateMerklePieces(File f, int plen) throws IOException {
+        long len = f.length();
+        if (len == 0)
+            return Collections.singletonList(emptyMerkleHash(MIN));
+        if (len > Integer.MAX_VALUE / 2)
+            throw new UnsupportedOperationException();  // TODO
+        if (len < MIN) {
+            plen = MIN;
+        } else if ((len & (len - 1)) == 0) {
+            // isPowerOfTwo
+            if (len < plen)
+                plen = (int) len;
+        } else {
+            // next power of two
+            // so calculateMerkleFull() only returns one value
+            // to reduce memory usage,
+            // and we don't exceed the merkle tree size required,
+            // which results in bad results
+            // next power of two
+            int nplen = (int) (Long.highestOneBit(len) << 1);
+            if (nplen < plen)
+                plen = nplen;
+        }
+        InputStream in = null;
+        try {
+            in = new FileInputStream(f);
+            if (len > 8 * MIN)
+                in = new BufferedInputStream(in, 4 * MIN);
+            return calculateMerklePieces(in, plen);
+        } finally {
+            if (in != null)
+                try { in.close(); } catch (IOException ioe) {}
+        }
     }
 
     /**
@@ -123,10 +165,10 @@ public class V2Util {
      *  @param plen piece length, 16K minimum, power of two
      *  @return the piece hashes
      */
-    public static List<MerkleHash> calculateMerklePieces(InputStream in, int plen) throws IOException {
+    private static List<MerkleHash> calculateMerklePieces(InputStream in, int plen) throws IOException {
         if (!isValidPieceLength(plen))
             throw new IllegalArgumentException("Bad piece length " + plen);
-        CalcMerklePieceMerkleHashes calc = new CalcMerklePieceMerkleHashes(in, plen);
+        CalcMerklePieceHashes calc = new CalcMerklePieceHashes(in, plen);
         try {
             return calc.calc();
         } finally {
@@ -137,7 +179,7 @@ public class V2Util {
     /**
      *  Calculate the piece hashes from an input stream
      */
-    private static class CalcMerklePieceMerkleHashes {
+    private static class CalcMerklePieceHashes {
         private final InputStream in;
         private final List<MerkleHash> rv;
         private final int plen;
@@ -152,7 +194,7 @@ public class V2Util {
          *  Caller must close stream after calc()
          *  @param pclen piece length, 16K minimum, power of two
          */
-        public CalcMerklePieceMerkleHashes(InputStream in, int pclen) {
+        public CalcMerklePieceHashes(InputStream in, int pclen) {
             this.in = in;
             plen = pclen;
             rv = new ArrayList<MerkleHash>(plen >> 14);
@@ -354,11 +396,8 @@ public class V2Util {
 
         MerkleHash h;
         if (args.length > 1) {
-            InputStream in = new FileInputStream(f);
             System.out.println("File length:  " + len);
-            if (len > 8 * MIN)
-                in = new BufferedInputStream(in, 4 * MIN);
-            List<MerkleHash> hs = calculateMerklePieces(in, pclen);
+            List<MerkleHash> hs = calculateMerklePieces(f, pclen);
             int pcs = (int) ((len - 1) / pclen) + 1;
             System.out.println("Pieces:       " + pcs);
             System.out.println("Piece hashes: " + hs.size());

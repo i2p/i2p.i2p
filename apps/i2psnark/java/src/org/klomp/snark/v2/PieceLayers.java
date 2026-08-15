@@ -38,11 +38,13 @@ public class PieceLayers extends TreeMap<MerkleHash, List<MerkleHash>> {
 
     /**
      *  From torrent creator
+     *  Hashes are one big list
+     *  Less efficient
      *
      *  @param hashes one per piece
      *  @param lengths one per file
      */
-    public PieceLayers(List<MerkleHash> hashes, List<Long> lengths, int piece_length) {
+    public PieceLayers(List<MerkleHash> hashes, List<Long> lengths, int piece_length) throws InvalidBEncodingException {
         super(COMP);
         int idx = 0;
         for (Long l : lengths) {
@@ -58,7 +60,45 @@ public class PieceLayers extends TreeMap<MerkleHash, List<MerkleHash>> {
             }
         }
         if (idx != hashes.size())
-            throw new IllegalArgumentException("hash count mismatch");
+            throw new InvalidBEncodingException("hash count mismatch");
+        // comment out for production
+        validate(piece_length);
+    }
+
+    /**
+     *  From torrent creator
+     *  Hashes are one list per file
+     *  More efficient
+     *
+     *  @param hashes one per file
+     *  @param lengths one per file
+     */
+    public PieceLayers(int piece_length, List<List<MerkleHash>> hashes, List<Long> lengths) throws InvalidBEncodingException {
+        super(COMP);
+        if (lengths.size() != hashes.size())
+            throw new InvalidBEncodingException("hash count mismatch");
+        int idx = 0;
+        for (Long l : lengths) {
+            long len = l.longValue();
+            List<MerkleHash> file_hashes = hashes.get(idx);
+            if (len > piece_length) {
+                int pcs = (int) ((len - 1) / piece_length) + 1;
+                if (pcs != file_hashes.size())
+                    throw new InvalidBEncodingException("hash count mismatch for file " + idx +
+                                                        " expected " + pcs + " got " + file_hashes.size() +
+                                                        " for file length " + len + " piece length " + piece_length);
+                MerkleHash file_root_hash = V2Util.calculateMerkleRoot(file_hashes, piece_length);
+                put(file_root_hash, file_hashes);
+            } else {
+                if (file_hashes.size() != 1)
+                    throw new InvalidBEncodingException("hash count mismatch for file " + idx +
+                                                        " expected 1 got " + file_hashes.size() +
+                                                        " for file length " + len + " piece length " + piece_length);
+            }
+            idx++;
+        }
+        // comment out for production
+        validate(piece_length);
     }
 
     public BEValue bdecode(InputStream in) throws IOException {
