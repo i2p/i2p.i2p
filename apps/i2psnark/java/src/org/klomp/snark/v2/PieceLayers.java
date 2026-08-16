@@ -70,16 +70,20 @@ public class PieceLayers extends TreeMap<MerkleHash, List<MerkleHash>> {
      *  Hashes are one list per file
      *  More efficient
      *
-     *  @param hashes one per file
+     *  @param hashes one per file, not including padding files
      *  @param lengths one per file
+     *  @param atts one per file or null, indicates padding files
      */
-    public PieceLayers(int piece_length, List<List<MerkleHash>> hashes, List<Long> lengths) throws InvalidBEncodingException {
+    public PieceLayers(int piece_length, List<List<MerkleHash>> hashes, List<Long> lengths, List<String> atts) throws InvalidBEncodingException {
         super(COMP);
-        if (lengths.size() != hashes.size())
-            throw new InvalidBEncodingException("hash count mismatch");
         int idx = 0;
-        for (Long l : lengths) {
-            long len = l.longValue();
+        for (int i = 0; i < lengths.size(); i++) {
+            if (atts != null) {
+                String a = atts.get(i);
+                if (a != null && a.indexOf('p') >= 0)
+                    continue;
+            }
+            long len = lengths.get(i).longValue();
             List<MerkleHash> file_hashes = hashes.get(idx);
             if (len > piece_length) {
                 int pcs = (int) ((len - 1) / piece_length) + 1;
@@ -97,6 +101,8 @@ public class PieceLayers extends TreeMap<MerkleHash, List<MerkleHash>> {
             }
             idx++;
         }
+        if (idx != hashes.size())
+            throw new InvalidBEncodingException("mismatch " + hashes.size() + " hashes " + idx + " non-padding lengths");
         // comment out for production
         validate(piece_length);
     }
@@ -196,5 +202,18 @@ public class PieceLayers extends TreeMap<MerkleHash, List<MerkleHash>> {
         public int compare(MerkleHash l, MerkleHash r) {
             return DataHelper.compareTo(l.getData(), r.getData());
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder(size() * 64);
+        buf.append("Piece Layers:\n");
+        for (Map.Entry<MerkleHash, List<MerkleHash>> e : entrySet()) {
+            buf.append(e.getKey().toString()).append(" ->\n");
+            for (MerkleHash h : e.getValue()) {
+                buf.append("  ").append(h.toString()).append('\n');
+            }
+        }
+        return buf.toString();
     }
 }

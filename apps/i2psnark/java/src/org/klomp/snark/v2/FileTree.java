@@ -24,29 +24,19 @@ public class FileTree {
      *
      * @param tree the file tree, other five args are out parameters
      * @param hashes entries will be null for padding files and zero-length files
-     * @param atts entries will be the empty string if none
+     * @param atts entries will be null if none
      */
     public static void addfiles(Map<String, BEValue> tree, int piece_length, List<List<String>> files, List<Long> lengths,
                                 List<MerkleHash> hashes, List<String> base, List<String> atts,
                                 boolean v2Only) throws InvalidBEncodingException {
         x_addfiles(tree, piece_length, files, lengths, hashes, base, atts, v2Only);
-        if (!v2Only) {
-            // remove last padding file
-            int last = atts.size() - 1;
-            if (atts.get(last).equals("p")) {
-                files.remove(last);
-                lengths.remove(last);
-                hashes.remove(last);
-                atts.remove(last);
-            }
-        }
     }
 
     /**
      * Recursive
      * @param tree the file tree, other five args are out parameters
      * @param hashes entries will be null for padding files and zero-length files
-     * @param atts entries will be the empty string if none
+     * @param atts entries will be null if none
      */
     private static void x_addfiles(Map<String, BEValue> tree, int piece_length, List<List<String>> files, List<Long> lengths,
                                    List<MerkleHash> hashes, List<String> base, List<String> atts,
@@ -90,20 +80,6 @@ public class FileTree {
                 } else {
                     atts.add(null);
                 }
-                if (!v2Only) {
-                    // add a fake padding file in
-                    long pad = l % piece_length;
-                    if (pad != 0) {
-                        pad = piece_length - pad;
-                        file = new ArrayList<String>(2);
-                        file.add(".pad");
-                        file.add(Long.toString(pad));
-                        files.add(file);
-                        lengths.add(Long.valueOf(pad));
-                        hashes.add(null);
-                        atts.add("p");
-                    }
-                }
             } else {
                 // go around again
                 base.add(name);
@@ -112,5 +88,48 @@ public class FileTree {
                 base.remove(base.size() - 1);
             }
         }
+    }
+
+    /**
+     * This adds padding files and their lengths and attributes
+     * to the three List parameters.
+     * Padding files will have a "p" attribute.
+     *
+     * This may add files with duplicate pad lengths and names;
+     * clients are expected to not complain about dups.
+     *
+     * @param files in/out param
+     * @param lengths in/out param
+     * @param atts in/out param, must be empty, will be filled up with null or "p"
+     * @return true if params were modified.
+     */
+    public static boolean addPaddingFiles(int piece_length, List<List<String>> files, List<Long> lengths,
+                                          List<String> atts) {
+        int len = lengths.size();
+        if (len <= 1)
+            return false;
+        while (atts.size() < len) {
+            atts.add(null);
+        }
+        int origLen = len;
+
+        // Warning: i and len will be modified in loop
+        // we never pad the last file, so limit is len - 1
+        for (int i = 0; i < len - 1; i++) {
+            long l = lengths.get(i).longValue();
+            long rem = l % piece_length;
+            if (rem != 0) {
+                long pad = piece_length - rem;
+                i++;
+                List<String> file = new ArrayList<String>(2);
+                file.add(".pad");
+                file.add(Long.toString(pad));
+                files.add(i, file);
+                lengths.add(i, Long.valueOf(pad));
+                atts.add(i, "p");
+                len++;
+            }
+        }
+        return origLen != len;
     }
 }

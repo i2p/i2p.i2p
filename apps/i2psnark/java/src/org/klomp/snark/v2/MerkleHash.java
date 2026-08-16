@@ -41,7 +41,7 @@ public class MerkleHash {
 
     @Override
     public String toString() {
-        return "MerkleHash: " + toBase64();
+        return "MH: " + toBase64();
     }
 
     @Override
