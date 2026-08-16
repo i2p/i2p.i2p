@@ -28,6 +28,7 @@ import java.io.RandomAccessFile;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.security.DigestException;
 import java.security.MessageDigest;
 import java.text.Collator;
 import java.util.ArrayList;
@@ -254,14 +255,16 @@ public class Storage implements Closeable
     byte[] piece_hashes = new byte[20 * pieces];
 
     byte[] piece = new byte[piece_size];
-    for (int i = 0; i < pieces; i++)
-      {
-        int length = getUncheckedPiece(i, piece);
-        digest.update(piece, 0, length);
-        byte[] hash = digest.digest();
-        System.arraycopy(hash, 0, piece_hashes, 20 * i, 20);
-        bitfield.set(i);
-      }
+    try {
+        for (int i = 0; i < pieces; i++) {
+            int length = getUncheckedPiece(i, piece);
+            digest.update(piece, 0, length);
+            digest.digest(piece_hashes, 20 * i, 20);
+            bitfield.set(i);
+        }
+    } catch (DigestException de) {
+        throw new IOException(de);
+    }
     return piece_hashes;
   }
 
