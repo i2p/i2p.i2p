@@ -1,6 +1,7 @@
 package org.klomp.snark.v2;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -106,13 +107,33 @@ public class V2Util {
     }
 
     /**
-     *  Warn, will return bad value if plen is greater than the next power
-     *  of two of the input size
-     *
-     *  @param plen piece length, 16K minimum, power of two
      *  @return the root hash
      */
-    private static MerkleHash calculateMerkleRoot(InputStream in, int plen) throws IOException {
+    public static MerkleHash calculateMerkleRoot(byte[] b) throws IOException {
+        InputStream in = new ByteArrayInputStream(b);
+        return calculateMerkleRoot(in, b.length);
+    }
+
+    /**
+     *  Warning: Will return bad value if plen is greater than the next power
+     *  of two of the input size
+     *
+     *  @param plen piece length, will be rectified to next power of two 16K min
+     *  @return the root hash
+     */
+    public static MerkleHash calculateMerkleRoot(InputStream in, int plen) throws IOException {
+        if (plen == 0)
+            return emptyMerkleHash(MIN);
+        if (plen > Integer.MAX_VALUE / 2)
+            throw new UnsupportedOperationException();  // TODO
+        if (plen < MIN) {
+            plen = MIN;
+        } else if ((plen & (plen - 1)) == 0) {
+            // isPowerOfTwo
+        } else {
+            // next power of two
+            plen = Integer.highestOneBit(plen) << 1;
+        }
         List<MerkleHash> hashes = calculateMerklePieces(in, plen);
         if (hashes.size() == 1)
             return hashes.get(0);
