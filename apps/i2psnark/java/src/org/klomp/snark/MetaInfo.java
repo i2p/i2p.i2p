@@ -410,8 +410,8 @@ public class MetaInfo
                     for (int j = 0; j < i; j++) {
                         m_attributes.add("");
                     }
-                    m_attributes.add(s);
                 }
+                m_attributes.add(s);
             } else {
                 if (m_attributes != null)
                     m_attributes.add("");
