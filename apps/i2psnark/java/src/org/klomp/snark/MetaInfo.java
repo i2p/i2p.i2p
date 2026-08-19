@@ -606,49 +606,14 @@ public class MetaInfo
         
   /**
    * Checks that the given piece has the same SHA1 hash as the given
-   * byte array. Returns random results or IndexOutOfBoundsExceptions
-   * when the piece number is unknown.
+   * byte array.
+   *
+   * @param hash 20 bytes
+   * @throws IndexOutOfBoundsException
+   * @since 0.9.71 replaces check of full piece in-memory
    */
-  public boolean checkPiece(int piece, byte[] bs, int off, int length)
-  {
-    //if (true)
-        return fast_checkPiece(piece, bs, off, length);
-    //else
-    //    return orig_checkPiece(piece, bs, off, length);
-  }
-
-/****
-  private boolean orig_checkPiece(int piece, byte[] bs, int off, int length) {
-    // Check digest
-    MessageDigest sha1;
-    try
-      {
-        sha1 = MessageDigest.getInstance("SHA");
-      }
-    catch (NoSuchAlgorithmException nsae)
-      {
-        throw new InternalError("No SHA digest available: " + nsae);
-      }
-
-    sha1.update(bs, off, length);
-    byte[] hash = sha1.digest();
-    for (int i = 0; i < 20; i++)
-      if (hash[i] != piece_hashes[20 * piece + i])
-        return false;
-    return true;
-  }
-****/
-  
-  private boolean fast_checkPiece(int piece, byte[] bs, int off, int length) {
-    MessageDigest sha1 = SHA1.getInstance();
-
-    sha1.update(bs, off, length);
-    byte[] hash = sha1.digest();
-    for (int i = 0; i < 20; i++) {
-      if (hash[i] != piece_hashes[20 * piece + i])
-        return false;
-    }
-    return true;
+  public boolean checkPiece(int piece, byte[] hash) {
+      return DataHelper.eq(hash, 0, piece_hashes, 20 * piece, 20);
   }
   
   /**

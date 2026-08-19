@@ -254,17 +254,33 @@ public class Storage implements Closeable
 
     byte[] piece_hashes = new byte[20 * pieces];
 
-    byte[] piece = new byte[piece_size];
+    ByteArray ba;
+    byte[] buf;
+    if (piece_size <= BUFSIZE) {
+        ba = _cache.acquire();
+        buf = ba.getData();
+    } else {
+        ba = null;
+        buf = new byte[Math.min(piece_size, 128*1024)];
+    }
     try {
         for (int i = 0; i < pieces; i++) {
-            int length = getUncheckedPiece(i, piece);
-            digest.update(piece, 0, length);
+            int pclen = getPieceLength(i);
+            int read = 0;
+            while (read < pclen) {
+                int rd = Math.min(buf.length, pclen - read);
+                getUncheckedPiece(i, buf, read, rd);
+                digest.update(buf, 0, rd);
+                read += rd;
+            }
             digest.digest(piece_hashes, 20 * i, 20);
             bitfield.set(i);
         }
     } catch (DigestException de) {
         throw new IOException(de);
     }
+    if (ba != null)
+        _cache.release(ba, false);
     return piece_hashes;
   }
 
@@ -1212,17 +1228,34 @@ public class Storage implements Closeable
       }
 
     // Check which pieces match and which don't
-    if (resume)
-      {
-        byte[] piece = new byte[piece_size];
+    if (resume) {
+      try {
+        MessageDigest digest = SHA1.getInstance();
+        ByteArray ba;
+        byte[] buf;
+        if (piece_size <= BUFSIZE) {
+            ba = _cache.acquire();
+            buf = ba.getData();
+        } else {
+            ba = null;
+            buf = new byte[Math.min(piece_size, 128*1024)];
+        }
         int file = 0;
         long fileEnd = _torrentFiles.get(0).length;
         long pieceEnd = 0;
-        for (int i = 0; i < pieces; i++)
-          {
+        byte[] hash = new byte[20];
+        for (int i = 0; i < pieces; i++) {
             _checkProgress.set(i);
-            int length = getUncheckedPiece(i, piece);
-            boolean correctHash = metainfo.checkPiece(i, piece, 0, length);
+            int length = getPieceLength(i);
+            int read = 0;
+            while (read < length) {
+                int rd = Math.min(buf.length, length - read);
+                getUncheckedPiece(i, buf, read, rd);
+                digest.update(buf, 0, rd);
+                read += rd;
+            }
+            digest.digest(hash, 0, 20);
+            boolean correctHash = metainfo.checkPiece(i, hash);
             // close as we go so we don't run out of file descriptors
             pieceEnd += length;
             while (fileEnd <= pieceEnd) {
@@ -1243,6 +1276,11 @@ public class Storage implements Closeable
             if (listener != null)
               listener.storageChecked(this, i, correctHash);
           }
+          if (ba != null)
+              _cache.release(ba, false);
+        } catch (DigestException de) {
+          throw new IOException(de);
+        }
       }
 
     _checkProgress.set(pieces);
@@ -1477,12 +1515,6 @@ public class Storage implements Closeable
       return (int)(total_length - ((long)piece * piece_size));
     else
       throw new IndexOutOfBoundsException("no piece: " + piece);
-  }
-
-  private int getUncheckedPiece(int piece, byte[] bs)
-    throws IOException
-  {
-      return getUncheckedPiece(piece, bs, 0, getPieceLength(piece));
   }
 
   private int getUncheckedPiece(int piece, byte[] bs, int off, int length)
