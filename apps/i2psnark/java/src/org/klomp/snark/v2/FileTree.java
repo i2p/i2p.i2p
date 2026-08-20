@@ -27,9 +27,8 @@ public class FileTree {
      * @param atts entries will be null if none
      */
     public static void addfiles(Map<String, BEValue> tree, int piece_length, List<List<String>> files, List<Long> lengths,
-                                List<MerkleHash> hashes, List<String> base, List<String> atts,
-                                boolean v2Only) throws InvalidBEncodingException {
-        x_addfiles(tree, piece_length, files, lengths, hashes, base, atts, v2Only);
+                                List<MerkleHash> hashes, List<String> base, List<String> atts) throws InvalidBEncodingException {
+        x_addfiles(tree, piece_length, files, lengths, hashes, base, atts);
     }
 
     /**
@@ -39,8 +38,7 @@ public class FileTree {
      * @param atts entries will be null if none
      */
     private static void x_addfiles(Map<String, BEValue> tree, int piece_length, List<List<String>> files, List<Long> lengths,
-                                   List<MerkleHash> hashes, List<String> base, List<String> atts,
-                                   boolean v2Only) throws InvalidBEncodingException {
+                                   List<MerkleHash> hashes, List<String> base, List<String> atts) throws InvalidBEncodingException {
         // must be sorted
         List<String> keys = new ArrayList<String>(tree.keySet());
         if (keys.size() > 1)
@@ -84,7 +82,7 @@ public class FileTree {
                 // go around again
                 base.add(name);
                 Map<String, BEValue> entries = bev.getMap();
-                x_addfiles(entries, piece_length, files, lengths, hashes, base, atts, v2Only);
+                x_addfiles(entries, piece_length, files, lengths, hashes, base, atts);
                 base.remove(base.size() - 1);
             }
         }

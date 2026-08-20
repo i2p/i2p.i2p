@@ -38,35 +38,6 @@ public class PieceLayers extends TreeMap<MerkleHash, List<MerkleHash>> {
 
     /**
      *  From torrent creator
-     *  Hashes are one big list
-     *  Less efficient
-     *
-     *  @param hashes one per piece
-     *  @param lengths one per file
-     */
-    public PieceLayers(List<MerkleHash> hashes, List<Long> lengths, int piece_length) throws InvalidBEncodingException {
-        super(COMP);
-        int idx = 0;
-        for (Long l : lengths) {
-            long len = l.longValue();
-            if (len > piece_length) {
-                int pcs = (int) ((len - 1) / piece_length) + 1;
-                List<MerkleHash> file_hashes = hashes.subList(idx, idx + pcs);
-                MerkleHash file_root_hash = V2Util.calculateMerkleRoot(file_hashes, piece_length);
-                put(file_root_hash, file_hashes);
-                idx += pcs;
-            } else {
-                idx++;
-            }
-        }
-        if (idx != hashes.size())
-            throw new InvalidBEncodingException("hash count mismatch");
-        // comment out for production
-        validate(piece_length);
-    }
-
-    /**
-     *  From torrent creator
      *  Hashes are one list per file
      *  More efficient
      *
