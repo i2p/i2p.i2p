@@ -127,10 +127,6 @@ class PeerState implements DataLoader
 
     if (choked) {
         out.cancelRequestMessages();
-        // old Roberts thrash us here, choke+unchoke right together
-        // The only problem with returning the partials to the coordinator
-        // is that chunks above a missing request are lost.
-        // Future enhancements to PartialPiece could keep track of the holes.
         List<Request> pcs = returnPartialPieces();
         if (!pcs.isEmpty()) {
             if (_log.shouldLog(Log.DEBUG))
@@ -331,6 +327,18 @@ class PeerState implements DataLoader
         return;
       }
 
+    boolean hasit;
+    synchronized(this) {
+        hasit = bitfield != null && bitfield.get(piece);
+    }
+    if (hasit) {
+        if (_log.shouldWarn())
+            _log.warn("Dropping req for " + piece + " he already has from " + peer);
+        if (peer.supportsFast())
+            out.sendReject(piece, begin, length);
+        return;
+    }
+
     // Limit total pipelined requests to MAX_PIPELINE bytes
     // to conserve memory and prevent DOS
     // Todo: limit number of requests also? (robert 64 x 4KB)
@@ -511,53 +519,60 @@ class PeerState implements DataLoader
 
         // Unrequested piece number?
         if (r == -1) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Unrequested 'piece: " + piece + ", "
-                      + begin + ", " + length + "' received from "
-                      + peer);
+            if (_log.shouldInfo())
+                _log.info("Unrequested piece (" + piece + ',' + begin + ',' + length +
+                          ") from " + peer + " requests " + outstandingRequests);
             return null;
         }
 
         req = outstandingRequests.get(r);
-        while (req.getPiece() == piece && req.off != begin
+        while ((req.off != begin || req.getPiece() != piece)
                && r < outstandingRequests.size() - 1)
           {
             r++;
             req = outstandingRequests.get(r);
           }
         
-        // Something wrong?
+        // Not found in requests
+        // TODO if necessary we could grab the partial piece from the first
+        // request and synthesize a new request
         if (req.getPiece() != piece || req.off != begin || req.len != length)
           {
-            if (_log.shouldLog(Log.INFO))
-              _log.info("Unrequested or unneeded 'piece: "
-                          + piece + ", "
-                          + begin + ", "
-                          + length + "' received from "
-                          + peer);
+            if (_log.shouldInfo())
+                _log.info("Unrequested or unneeded (" + piece + ',' + begin + ',' + length +
+                          ") from " + peer + " requests " + outstandingRequests);
             return null;
           }
 
         // note that this request is being read
         pendingRequest = req;
         
-        // Report missing requests.
-        if (r != 0)
-          {
-            if (_log.shouldLog(Log.WARN))
-              _log.warn("Some requests dropped, got " + req
-                               + ", wanted for peer: " + peer);
-            for (int i = 0; i < r; i++)
-              {
-                Request dropReq = outstandingRequests.remove(0);
-                outstandingRequests.add(dropReq);
-                if (!choked)
-                  out.sendRequest(dropReq);
-                if (_log.shouldLog(Log.WARN))
-                  _log.warn("dropped " + dropReq + " with peer " + peer);
-              }
-          }
-        outstandingRequests.remove(0);
+        // remove before reorder for non-fast below
+        outstandingRequests.remove(r);
+        // Report missing requests and rerequest for non-fast
+        if (r != 0) {
+            if (_log.shouldWarn())
+                _log.warn(r + " requests dropped or out-of-order, got " + req +
+                          ", wanted for peer: " + peer + " supports fast? " + peer.supportsFast());
+            for (int i = 0; i < r; i++) {
+                Request dropReq;
+                if (!peer.supportsFast()) {
+                    // rerequest each chunk before r and move to the end of the list
+                    // TODO special-case i2pd that responds intentionally out-of-order
+                    dropReq = outstandingRequests.remove(0);
+                    outstandingRequests.add(dropReq);
+                    if (!choked)
+                      out.sendRequest(dropReq);
+                } else {
+                    // Don't resend, we will get it eventually or a reject as obligated by BEP 6,
+                    // and it overinflates our request bandwidth estimator to rerequest.
+                    // just for logging
+                    dropReq = outstandingRequests.get(i);
+                }
+                if (_log.shouldWarn())
+                  _log.warn("dropped or out-of-order " + dropReq + " with peer " + peer + " choked? " + choked);
+            }
+        }
       }
 
     // Request more if necessary to keep the pipeline filled.

@@ -256,7 +256,8 @@ class PartialPiece implements Comparable<PartialPiece> {
                         for (int i = chunk + 1; i < sz; i++) {
                             if (!bitfield.get(i))
                                 break;
-                            warn("Hole filled in before chunk " + i + " on " + this + ' ' + bitfield);
+                            if (i == chunk + 1)
+                                warn("Hole filled in before chunk " + i + " on " + this + ' ' + bitfield);
                             if (i == sz - 1)
                                 off = pclen;
                             else
