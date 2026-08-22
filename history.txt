@@ -1,5 +1,33 @@
-2026-08-12 zzz
- * i2psnark: Add v2 utility classes (WIP)
+2026-08-22 zzz
+ * Build: Improve i2psnark standalone build
+ * i2psnark:
+   - Smooth out request throttling
+   - Magnet xl param support
+
+2026-08-21 zzz
+ * i2psnark: Improve handling of chunks received out-of-order
+
+2026-08-19 zzz
+ * i2psnark: Reduce memory usage when creating/rechecking torrents
+
+2026-08-17 zzz
+ * i2psnark: Fix extraction of metainfo file attributes
+
+2026-08-16 zzz
+ * i2psnark:
+   - Piece hash calc optimization on torrent creation
+   - More v2 WIP
+
+2026-08-14 zzz
+ * i2psnark:
+   - Add dn name param to magnet links
+   - Strict URI encoding for UTF-8
+   - Use MagnetURI for magnet creation in Storage CLI
+
+2026-08-13 zzz
+ * i2psnark:
+   - Add v2 utility classes (WIP)
+   - MagnetURI improvements
 
 2026-08-12 zzz
  * Console, i2psnark: Reload XHR after page becomes visible again
