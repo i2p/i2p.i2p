@@ -31,6 +31,7 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.util.Log;
+import net.i2p.util.RandomSource;
 
 import org.klomp.snark.bencode.BEValue;
 import org.klomp.snark.bencode.InvalidBEncodingException;
@@ -430,10 +431,10 @@ class PeerState implements DataLoader
     // Now reported byte-by-byte in PartialPiece
     //peer.downloaded(size);
 
-    if (_log.shouldLog(Log.DEBUG))
-      _log.debug("got end of Chunk("
-                  + req.getPiece() + "," + req.off + "," + req.len + ") from "
-                  + peer);
+    //if (_log.shouldLog(Log.DEBUG))
+    //  _log.debug("got end of Chunk("
+    //              + req.getPiece() + "," + req.off + "," + req.len + ") from "
+    //              + peer);
 
     // Last chunk needed for this piece?
     PartialPiece pp = req.getPartialPiece();
@@ -506,10 +507,10 @@ class PeerState implements DataLoader
    */
   Request getOutstandingRequest(int piece, int begin, int length)
   {
-    if (_log.shouldLog(Log.DEBUG))
-      _log.debug("got start of Chunk("
-                  + piece + "," + begin + "," + length + ") from "
-                  + peer);
+    //if (_log.shouldLog(Log.DEBUG))
+    //  _log.debug("got start of Chunk("
+    //              + piece + "," + begin + "," + length + ") from "
+    //              + peer);
 
     // Lookup the correct piece chunk request from the list.
     Request req;
@@ -912,9 +913,20 @@ class PeerState implements DataLoader
     // currentMaxPipeline counter.
     // Avoid cross-peer deadlocks from PeerCoordinator, call this outside the lock
     if (!bwListener.shouldRequest(peer, 0)) {
+        // This gets called linearly, on reception of each chunk, so
+        // we decrease currentMaxPipeline linearly as well.
+        // As reqq drops with each chunk received, we will rapidly drop the
+        // reqq to zero within a couple windows unless we reduce
+        // currentMaxPipeline more slowly, to prevent returning the
+        // partial piece to the coordinator and thrashing the piece
+        // back and forth between the peer state and the coordinator.
+        // And sitting idle-and-interested for a few windows which is bad.
         synchronized(this) {
             // Due to changes elsewhere we can let this go down to zero now
-            currentMaxPipeline /= 2;
+            if (currentMaxPipeline > 0) {
+                if (RandomSource.getInstance().nextBoolean())
+                    currentMaxPipeline--;
+            }
         }
         if (_log.shouldWarn())
             _log.warn(peer + " throttle request, interesting? " + interesting + " choked? " + choked +
@@ -933,6 +945,11 @@ class PeerState implements DataLoader
         } else if (currentMaxPipeline < 2) {
              currentMaxPipeline++;
         }
+        // assume 3 sec RTT, only request this much, but
+        // minimum 1 request (check at bottom of loop)
+        // to avoid filling up the request queue all at once
+        // and rapid throttle/unthrottle cycles
+        long maxReq = (limit - rate) * 3;
         boolean more_pieces = true;
         while (more_pieces)
           {
@@ -968,6 +985,7 @@ class PeerState implements DataLoader
                 pieceLength = metainfo.getPieceLength(lastRequest.getPiece());
                 isLastChunk = lastRequest.off + lastRequest.len == pieceLength;
 
+                int requested = PARTSIZE;
                 // Last part of a piece?
                 if (isLastChunk) {
                     more_pieces = requestNextPiece();
@@ -980,6 +998,7 @@ class PeerState implements DataLoader
                             int maxLength = pieceLength - nextBegin;
                             int nextLength = maxLength > PARTSIZE ? PARTSIZE
                                                               : maxLength;
+                            requested = nextLength;
                             Request req = new Request(nextPiece,nextBegin, nextLength);
                             outstandingRequests.add(req);
                             if (!choked)
@@ -994,6 +1013,12 @@ class PeerState implements DataLoader
                             }
                         }
                     }
+                }
+                if (more_pieces) {
+                    // don't exceed the download limit calculated above
+                    maxReq -= requested;
+                    if (maxReq <= 0)
+                        break;
                 }
               }
           }
