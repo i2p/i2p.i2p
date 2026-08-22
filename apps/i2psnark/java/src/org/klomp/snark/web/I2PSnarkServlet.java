@@ -3613,7 +3613,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 // uncommment when implemented
                 //MerkleHash v2 = meta != null ? meta.getInfoHashV2() : null;
                 Object v2 = null;
-                String link = MagnetURI.toMagnetLink(ih, announce, snark.getBaseName());
+                String link = MagnetURI.toMagnetLink(ih, announce, snark.getBaseName(), snark.getTotalLength());
                 buf.append("<tr><td><a href=\"")
                    .append(link)
                    .append("\">")

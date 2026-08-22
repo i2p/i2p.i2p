@@ -19,6 +19,7 @@ public class MagnetURI {
     private final String _name;
     private final byte[] _ih;
     private final byte[] _ih2;
+    private final long _length;
 
     /** BEP 9 */
     public static final String MAGNET = "magnet:";
@@ -43,6 +44,7 @@ public class MagnetURI {
         String ihash2 = null;
         String name;
         List<String> trackerURLs = null;
+        long length = 0;
         if (url.startsWith(MAGNET)) {
             // magnet:?xt=urn:btih:0691e40aae02e552cfcb57af1dca56214680c0c5&tr=http://tracker2.postman.i2p/announce.php
             List<String> xts = getMultiParam("xt", url);
@@ -63,6 +65,12 @@ public class MagnetURI {
             String dn = getParam("dn", url);
             if (dn != null)
                 name += " (" + dn + ')';
+            String xl = getParam("xl", url);
+            if (xl != null) {
+                try {
+                    length = Long.parseLong(xl);
+                } catch (NumberFormatException nfe) {}
+            }
         } else if (url.startsWith(MAGGOT)) {
             // maggot://0691e40aae02e552cfcb57af1dca56214680c0c5:0b557bbdf8718e95d352fbe994dec3a383e2ede7
             ihash = url.substring(MAGGOT.length()).trim();
@@ -115,6 +123,7 @@ public class MagnetURI {
         _ih2 = ih2;
         _name = name;
         _trackers = trackerURLs;
+        _length = length;
     }
 
     /**
@@ -131,6 +140,14 @@ public class MagnetURI {
      */
     public byte[] getInfoHashV2() {
         return _ih2;
+    }
+
+    /**
+     * @return the length or 0 if not specified.
+     * @since 0.9.71
+     */
+    public long getLength() {
+        return _length;
     }
 
     /**
@@ -161,7 +178,7 @@ public class MagnetURI {
      *  @since 0.9.71 moved from I2PSnarkServlet
      */
     public static String toMagnetLink(byte[] ih, String announce) {
-        return toMagnetLink(ih, null, announce, null);
+        return toMagnetLink(ih, null, announce, null, 0);
     }
 
     /**
@@ -171,7 +188,18 @@ public class MagnetURI {
      *  @since 0.9.71
      */
     public static String toMagnetLink(byte[] ih, String announce, String basename) {
-        return toMagnetLink(ih, null, announce, basename);
+        return toMagnetLink(ih, null, announce, basename, 0);
+    }
+
+    /**
+     *  @param ih 20 or 32 bytes
+     *  @param announce may be null
+     *  @param basename may be null. NOT URL-escaped.
+     *  @param length 0 if unknown
+     *  @since 0.9.71
+     */
+    public static String toMagnetLink(byte[] ih, String announce, String basename, long length) {
+        return toMagnetLink(ih, null, announce, basename, length);
     }
 
     /**
@@ -179,10 +207,11 @@ public class MagnetURI {
      *  @param ih 32 bytes or null
      *  @param announce may be null
      *  @param basename may be null. NOT URL-escaped.
+     *  @param length 0 if unknown
      *  @return html and URL escaped
      *  @since 0.9.71 moved from I2PSnarkServlet
      */
-    public static String toMagnetLink(byte[] ih, byte[] ih2, String announce, String basename) {
+    public static String toMagnetLink(byte[] ih, byte[] ih2, String announce, String basename, long length) {
         if ((ih.length != 20 && ih.length != 32) ||
             (ih2 != null && ih2.length != 32))
             throw new IllegalArgumentException();
@@ -198,6 +227,8 @@ public class MagnetURI {
             buf.append("&amp;dn=");
             URIUtil.encodePath(buf, basename);
         }
+        if (length > 0)
+            buf.append("&amp;xl=").append(length);
         return buf.toString();
     }
 
@@ -345,6 +376,9 @@ public class MagnetURI {
         String name = muri.getName();
         if (name != null)
             System.out.println("Name                : " + name);
+        long len = muri.getLength();
+        if (len > 0)
+            System.out.println("Length              : " + len);
         List<String> trackers = muri.getTrackerURLs();
         if (trackers != null) {
             for (String t: trackers) {
