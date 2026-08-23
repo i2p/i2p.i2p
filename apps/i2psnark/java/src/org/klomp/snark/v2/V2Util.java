@@ -74,6 +74,8 @@ public class V2Util {
      *  @return the root hash
      */
     public static MerkleHash calculateMerkleRoot(File f) throws IOException {
+        if (!f.canRead())
+            throw new IOException("Cannot open " + f);
         long len = f.length();
         if (len == 0)
             return emptyMerkleHash(MIN);
@@ -145,6 +147,8 @@ public class V2Util {
      *  @return the piece hashes
      */
     public static List<MerkleHash> calculateMerklePieces(File f, int plen) throws IOException {
+        if (!f.canRead())
+            throw new IOException("Cannot open " + f);
         long len = f.length();
         if (len == 0)
             return Collections.singletonList(emptyMerkleHash(MIN));
@@ -228,7 +232,7 @@ public class V2Util {
             boolean done;
             do {
                 done = calculateMerkleFull(plen);
-            } while (!done);
+            } while (!done && in.available() > 0);
             sha.release(md);
             return rv;
         }
@@ -259,7 +263,7 @@ public class V2Util {
                 clen /= 2;
                 // calculate left side
                 boolean done = calculateMerkleFull(clen);
-                byte[] h1 = rv.get(rv.size() - 1).getData();
+                MerkleHash mh1 = rv.get(rv.size() - 1);
                 byte[] h2;
                 boolean done2;
                 if (done) {
@@ -278,7 +282,7 @@ public class V2Util {
                     if (!done)
                         rv.remove(rv.size() - 1);
                 }
-                md.update(h1);
+                md.update(mh1.getData());
                 byte[] h = md.digest(h2);
                 //System.out.println("Merge two hashes at level " + (clen * 2) + " done? " + done2 + " " + net.i2p.data.Base64.encode(h));
                 rv.add(new MerkleHash(h));
@@ -423,13 +427,13 @@ public class V2Util {
             System.out.println("Pieces:       " + pcs);
             System.out.println("Piece hashes: " + hs.size());
             for (int i = 0; i < hs.size(); i++) {
-                System.out.println("    " + i + "    " + I2PSnarkUtil.toHex(hs.get(i).getData()));
+                System.out.println("    " + i + "    " + hs.get(i));
             }
             h = calculateMerkleRoot(hs, pclen);
         } else {
             h = calculateMerkleRoot(f);
             System.out.println("File length:  " + len);
         }
-        System.out.println("Root hash:    " + I2PSnarkUtil.toHex(h.getData()));
+        System.out.println("Root hash:    " + h);
     }
 }

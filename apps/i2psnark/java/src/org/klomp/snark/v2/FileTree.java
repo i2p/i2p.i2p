@@ -98,11 +98,12 @@ public class FileTree {
      *
      * @param files in/out param
      * @param lengths in/out param
+     * @param hashes in/out param may be null for v1-only
      * @param atts in/out param, must be empty, will be filled up with null or "p"
      * @return true if params were modified.
      */
     public static boolean addPaddingFiles(int piece_length, List<List<String>> files, List<Long> lengths,
-                                          List<String> atts) {
+                                          List<MerkleHash> hashes, List<String> atts) {
         int len = lengths.size();
         if (len <= 1)
             return false;
@@ -124,6 +125,8 @@ public class FileTree {
                 file.add(Long.toString(pad));
                 files.add(i, file);
                 lengths.add(i, Long.valueOf(pad));
+                if (hashes != null)
+                    hashes.add(i, null);
                 atts.add(i, "p");
                 len++;
             }

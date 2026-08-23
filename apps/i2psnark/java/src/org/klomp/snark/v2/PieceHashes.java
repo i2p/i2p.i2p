@@ -68,9 +68,11 @@ public class PieceHashes extends AbstractList<MerkleHash> {
 /*
     private void test() throws InvalidBEncodingException {
         List<MerkleHash> tst = getPieceHashList();
+        if (_size != tst.size())
+            throw new InvalidBEncodingException("Fail size mismatch " + _size + ' ' + tst.size());
         for (int i = 0; i < _size; i++) {
             if (!tst.get(i).equals(get(i)))
-                throw new RuntimeException("Fail at index " + i);
+                throw new InvalidBEncodingException("Fail at index " + i);
         }
     }
 */
