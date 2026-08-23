@@ -69,7 +69,6 @@ import org.klomp.snark.bencode.InvalidBEncodingException;
 import org.klomp.snark.dht.DHT;
 import org.klomp.snark.comments.Comment;
 import org.klomp.snark.comments.CommentSet;
-//import org.klomp.snark.v2.MerkleHash;
 
 /**
  *  Refactored to eliminate Jetty dependencies.
@@ -3435,7 +3434,7 @@ public class I2PSnarkServlet extends BasicServlet {
             MetaInfo meta = snark.getMetaInfo();
             if (!showEdit) {
                 // uncommment when implemented
-                //MerkleHash v2 = meta != null ? meta.getInfoHashV2() : null;
+                //Hash v2 = meta != null ? meta.getInfoHashV2() : null;
                 Object v2 = null;
                 buf.append("<tr><td>");
                 toThemeImg(buf, "details");
@@ -3611,7 +3610,7 @@ public class I2PSnarkServlet extends BasicServlet {
             if (meta == null || !meta.isPrivate()) {
                 byte[] ih = snark.getInfoHash();
                 // uncommment when implemented
-                //MerkleHash v2 = meta != null ? meta.getInfoHashV2() : null;
+                //Hash v2 = meta != null ? meta.getInfoHashV2() : null;
                 Object v2 = null;
                 String link = MagnetURI.toMagnetLink(ih, announce, snark.getBaseName(), snark.getTotalLength());
                 buf.append("<tr><td><a href=\"")
