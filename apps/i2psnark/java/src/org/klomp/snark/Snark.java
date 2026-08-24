@@ -52,171 +52,7 @@ public class Snark
   private final static int MIN_PORT = 6881;
   private final static int MAX_PORT = 6889;
 
-  // Whether or not to ask the user for commands while sharing
-  //private static boolean command_interpreter = true;
-
   private static final String newline = System.getProperty("line.separator");
-
-/****
-  private static final String copyright =
-  "The Hunting of the Snark Project - Copyright (C) 2003 Mark J. Wielaard"
-  + newline + newline
-  + "Snark comes with ABSOLUTELY NO WARRANTY.  This is free software, and"
-  + newline
-  + "you are welcome to redistribute it under certain conditions; read the"
-  + newline
-  + "COPYING file for details." + newline + newline
-  + "This is the I2P port, allowing anonymous bittorrent (http://www.i2p.net/)" + newline
-  + "It will not work with normal torrents, so don't even try ;)";
-  
-  private static final String usage =
-  "Press return for help. Type \"quit\" and return to stop.";
-  private static final String help =
-  "Commands: 'info', 'list', 'quit'.";
-****/
-
-  
-/****
-  private static class OOMListener implements I2PThread.OOMEventListener {
-      public void outOfMemory(OutOfMemoryError err) {
-          try {
-              err.printStackTrace();
-              System.out.println("OOM in the snark" + err);
-          } catch (Throwable t) {
-              System.out.println("OOM in the OOM");
-          }
-          //System.exit(0);
-      }
-      
-  }
-****/
-  
-/******** No, not maintaining a command-line client
-
-  public static void main(String[] args)
-  {
-    System.out.println(copyright);
-    System.out.println();
-
-    if ( (args.length > 0) && ("--config".equals(args[0])) ) {
-        I2PThread.addOOMEventListener(new OOMListener());
-        SnarkManager sm = SnarkManager.instance();
-        if (args.length > 1)
-            sm.loadConfig(args[1]);
-        System.out.println("Running in multitorrent mode");
-        while (true) {
-            try {
-                synchronized (sm) {
-                    sm.wait();
-                }
-            } catch (InterruptedException ie) {}
-        }
-    }
-    
-    // Parse debug, share/ip and torrent file options.
-    Snark snark = parseArguments(args);
-
-    SnarkShutdown snarkhook
-      = new SnarkShutdown(snark.storage,
-                          snark.coordinator,
-                          snark.acceptor,
-                          snark.trackerclient,
-                          snark);
-    //Runtime.getRuntime().addShutdownHook(snarkhook);
-
-    Timer timer = new Timer(true);
-    TimerTask monitor = new PeerMonitorTask(snark.coordinator);
-    timer.schedule(monitor,
-                   PeerMonitorTask.MONITOR_PERIOD,
-                   PeerMonitorTask.MONITOR_PERIOD);
-
-    // Start command interpreter
-    if (Snark.command_interpreter)
-      {
-        boolean quit = false;
-        
-        System.out.println();
-        System.out.println(usage);
-        System.out.println();
-        
-        try
-          {
-            BufferedReader br = new BufferedReader
-              (new InputStreamReader(System.in));
-            String line = br.readLine();
-            while(!quit && line != null)
-              {
-                line = line.toLowerCase();
-                if ("quit".equals(line))
-                  quit = true;
-                else if ("list".equals(line))
-                  {
-                    synchronized(snark.coordinator.peers)
-                      {
-                        System.out.println(snark.coordinator.peers.size()
-                                           + " peers -"
-                                           + " (i)nterested,"
-                                           + " (I)nteresting,"
-                                           + " (c)hoking,"
-                                           + " (C)hoked:");
-                        Iterator it = snark.coordinator.peers.iterator();
-                        while (it.hasNext())
-                          {
-                            Peer peer = (Peer)it.next();
-                            System.out.println(peer);
-                            System.out.println("\ti: " + peer.isInterested()
-                                               + " I: " + peer.isInteresting()
-                                               + " c: " + peer.isChoking()
-                                               + " C: " + peer.isChoked());
-                          }
-                      }
-                  }
-                else if ("info".equals(line))
-                  {
-                    System.out.println("Name: " + snark.meta.getName());
-                    System.out.println("Torrent: " + snark.torrent);
-                    System.out.println("Tracker: " + snark.meta.getAnnounce());
-                    List files = snark.meta.getFiles();
-                    System.out.println("Files: "
-                                       + ((files == null) ? 1 : files.size()));
-                    System.out.println("Pieces: " + snark.meta.getPieces());
-                    System.out.println("Piece size: "
-                                       + snark.meta.getPieceLength(0) / 1024
-                                       + " KB");
-                    System.out.println("Total size: "
-                                       + snark.meta.getTotalLength() / (1024 * 1024)
-                                       + " MB");
-                  }
-                else if ("".equals(line) || "help".equals(line))
-                  {
-                    System.out.println(usage);
-                    System.out.println(help);
-                  }
-                else
-                  {
-                    System.out.println("Unknown command: " + line);
-                    System.out.println(usage);
-                  }
-                
-                if (!quit)
-                  {
-                    System.out.println();
-                    line = br.readLine();
-                  }
-              }
-          }
-        catch(IOException ioe)
-          {
-            System.out.println("ERROR while reading stdin: " + ioe);
-          }
-        
-        // Explicit shutdown.
-        //Runtime.getRuntime().removeShutdownHook(snarkhook);
-        snarkhook.start();
-      }
-  }
-
-***********/
 
   /** max connections */
   public static final String PROP_MAX_CONNECTIONS = "i2psnark.maxConnections";
@@ -251,55 +87,6 @@ public class Snark
   private final int _rpcID = __RPCID.incrementAndGet();
 
   /**
-   * from main() via parseArguments() single torrent
-   *
-   * unused
-   */
-/****
-  Snark(I2PSnarkUtil util, String torrent, String ip, int user_port,
-        StorageListener slistener, CoordinatorListener clistener) { 
-    this(util, torrent, ip, user_port, slistener, clistener, null, null, null, true, "."); 
-  }
-****/
-
-  /**
-   * single torrent - via router
-   *
-   * unused
-   */
-/****
-  public Snark(I2PAppContext ctx, Properties opts, String torrent,
-               StorageListener slistener, boolean start, String rootDir) { 
-    this(new I2PSnarkUtil(ctx), torrent, null, -1, slistener, null, null, null, null, false, rootDir);
-    String host = opts.getProperty("i2cp.hostname");
-    int port = 0;
-    String s = opts.getProperty("i2cp.port");
-    if (s != null) {
-        try {
-             port = Integer.parseInt(s);
-        } catch (NumberFormatException nfe) {}
-    }
-    _util.setI2CPConfig(host, port, opts);
-    s = opts.getProperty(SnarkManager.PROP_UPBW_MAX);
-    if (s != null) {
-        try {
-             int v = Integer.parseInt(s);
-             _util.setMaxUpBW(v);
-        } catch (NumberFormatException nfe) {}
-    }
-    s = opts.getProperty(PROP_MAX_CONNECTIONS);
-    if (s != null) {
-        try {
-             int v = Integer.parseInt(s);
-             _util.setMaxConnections(v);
-        } catch (NumberFormatException nfe) {}
-    }
-    if (start)
-        this.startTorrent();
-  }
-****/
-
-  /**
    * multitorrent
    *
    * Will not start itself. Caller must call startTorrent() if desired.
@@ -322,6 +109,8 @@ public class Snark
    * Will not start itself. Caller must call startTorrent() if desired.
    *
    * @param baseFile if null, use rootDir/torrentName; if non-null, use it instead
+   * @param peerCoordinatorSet non-null
+   * @param connectionAcceptor non-null
    * @throws RuntimeException via fatal()
    * @throws RouterException via fatalRouter()
    * @since 0.9.11
@@ -483,19 +272,6 @@ public class Snark
           }
       }
 
-
-/*
- * see comment above
- *
-    activity = "Collecting pieces";
-    coordinator = new PeerCoordinator(id, meta, storage, clistener, this);
-    PeerCoordinatorSet set = PeerCoordinatorSet.instance();
-    set.add(coordinator);
-    ConnectionAcceptor acceptor = ConnectionAcceptor.instance();
-    acceptor.startAccepting(set, serversocket);
-    trackerclient = new TrackerClient(meta, coordinator);
-*/
-    
     savedUploaded = (completeListener != null) ? completeListener.getSavedUploaded(this) : 0;
     if (completeListener != null)
         _comments = completeListener.getSavedComments(this);
@@ -506,6 +282,8 @@ public class Snark
    *
    *  Will not start itself. Caller must call startTorrent() if desired.
    *
+   *  @param peerCoordinatorSet non-null
+   *  @param connectionAcceptor non-null
    *  @param ignored used to be autostart
    *  @throws RuntimeException via fatal()
    *  @throws RouterException via fatalRouter()
@@ -525,6 +303,8 @@ public class Snark
    *  @param torrent a fake name for now (not a file name)
    *  @param ih 20-byte info hash
    *  @param trackerURL may be null
+   *  @param peerCoordinatorSet non-null
+   *  @param connectionAcceptor non-null
    *  @throws RuntimeException via fatal()
    *  @throws RouterException via fatalRouter()
    *  @since 0.8.4
@@ -620,26 +400,17 @@ public class Snark
         activity = "Collecting pieces";
         coordinator = new PeerCoordinator(_util, id, infoHash, meta, storage, this, this, completeListener.getBandwidthListener());
         coordinator.setUploaded(savedUploaded);
-        if (_peerCoordinatorSet != null) {
-            // multitorrent
-            _peerCoordinatorSet.add(coordinator);
-        } else {
-            // single torrent
-            acceptor = new ConnectionAcceptor(_util, new PeerAcceptor(coordinator));
-        }
+        _peerCoordinatorSet.add(coordinator);
         // TODO pass saved closest DHT nodes to the tracker? or direct to the coordinator?
         trackerclient = new TrackerClient(_util, meta, additionalTrackerURL, coordinator, this);
     }
     // ensure acceptor is running when in multitorrent
-    if (_peerCoordinatorSet != null && acceptor != null) {
-        acceptor.startAccepting();
-    }
+    acceptor.startAccepting();
 
     stopped = false;
     if (coordinator.halted()) {
         coordinator.restart();
-        if (_peerCoordinatorSet != null)
-            _peerCoordinatorSet.add(coordinator);
+        _peerCoordinatorSet.add(coordinator);
     }
     if (!trackerclient.started()) {
         trackerclient.start();
@@ -719,10 +490,8 @@ public class Snark
     if (fast)
         // HACK: See above if(!fast)
         stopped = true;
-    if (pc != null && _peerCoordinatorSet != null)
+    if (pc != null)
         _peerCoordinatorSet.remove(pc);
-    if (_peerCoordinatorSet == null)
-        _util.disconnect();
   }
 
 /****
@@ -1063,8 +832,6 @@ public class Snark
      *  @since 0.8.4
      */
     public boolean restartAcceptor() {
-        if (acceptor == null)
-            return false;
         acceptor.restart();
         return true;
     }
@@ -1086,159 +853,6 @@ public class Snark
      *  @since 0.9.9
      */
     public void setAutoStoppable(boolean yes) { _autoStoppable = yes; }
-
-  /**
-   * Sets debug, ip and torrent variables then creates a Snark
-   * instance.  Calls usage(), which terminates the program, if
-   * non-valid argument list.  The given listeners will be
-   * passed to all components that take one.
-   */
-/****
-  private static Snark parseArguments(String[] args,
-                              StorageListener slistener,
-                              CoordinatorListener clistener)
-  {
-    int user_port = -1;
-    String ip = null;
-    String torrent = null;
-
-    I2PSnarkUtil util = new I2PSnarkUtil(I2PAppContext.getGlobalContext());
-    boolean configured = util.configured();
-    
-    int i = 0;
-    while (i < args.length)
-      {
-****/
-/*
-        if (args[i].equals("--debug"))
-          {
-            debug = INFO;
-            i++;
-
-            // Try if there is an level argument.
-            if (i < args.length)
-              {
-                try
-                  {
-                    int level = Integer.parseInt(args[i]);
-                    if (level >= 0)
-                      {
-                        debug = level;
-                        i++;
-                      }
-                  }
-                catch (NumberFormatException nfe) { }
-              }
-          }
-        else */
-/****
-          if (args[i].equals("--port"))
-          {
-            if (args.length - 1 < i + 1)
-              usage("--port needs port number to listen on");
-            try
-              {
-                user_port = Integer.parseInt(args[i + 1]);
-              }
-            catch (NumberFormatException nfe)
-              {
-                usage("--port argument must be a number (" + nfe + ")");
-              }
-            i += 2;
-          }
-        else if (args[i].equals("--no-commands"))
-          {
-            //command_interpreter = false;
-            i++;
-          }
-        //else if (args[i].equals("--eepproxy"))
-        //  {
-        //    String proxyHost = args[i+1];
-        //    String proxyPort = args[i+2];
-        //    if (!configured)
-        //        util.setProxy(proxyHost, Integer.parseInt(proxyPort));
-        //    i += 3;
-        //  }
-        else if (args[i].equals("--i2cp"))
-          {
-            String i2cpHost = args[i+1];
-            String i2cpPort = args[i+2];
-            Properties opts = null;
-            if (i+3 < args.length) {
-                if (!args[i+3].startsWith("--")) {
-                    opts = new Properties();
-                    StringTokenizer tok = new StringTokenizer(args[i+3], " \t");
-                    while (tok.hasMoreTokens()) {
-                        String str = tok.nextToken();
-                        int split = str.indexOf('=');
-                        if (split > 0) {
-                            opts.setProperty(str.substring(0, split), str.substring(split+1));
-                        }
-                    }
-                }
-            }
-            if (!configured)
-                util.setI2CPConfig(i2cpHost, Integer.parseInt(i2cpPort), opts);
-            i += 3 + (opts != null ? 1 : 0);
-          }
-        else
-          {
-            torrent = args[i];
-            i++;
-            break;
-          }
-      }
-
-    if (torrent == null || i != args.length)
-      if (torrent != null && torrent.startsWith("-"))
-        usage("Unknow option '" + torrent + "'.");
-      else
-        usage("Need exactly one <url>, <file> or <dir>.");
-
-    return new Snark(util, torrent, ip, user_port, slistener, clistener);
-  }
-  
-  private static void usage(String s)
-  {
-    System.out.println("snark: " + s);
-    usage();
-  }
-
-  private static void usage()
-  {
-    System.out.println
-      ("Usage: snark [--no-commands] [--port <port>]");
-    System.out.println
-      ("             [--eepproxy hostname portnum]");
-    System.out.println
-      ("             [--i2cp routerHost routerPort ['name=val name=val name=val']]");
-    System.out.println
-      ("             (<url>|<file>)");
-    System.out.println
-      ("  --no-commands\tDon't read interactive commands or show usage info.");
-    System.out.println
-      ("  --port\tThe port to listen on for incomming connections");
-    System.out.println
-      ("        \t(if not given defaults to first free port between "
-       + MIN_PORT + "-" + MAX_PORT + ").");
-    System.out.println
-      ("  --share\tStart torrent tracker on <ip> address or <host> name.");
-    System.out.println
-      ("  --eepproxy\thttp proxy to use (default of 127.0.0.1 port 4444)");
-    System.out.println
-      ("  --i2cp\tlocation of your I2P router (default of 127.0.0.1 port 7654)");
-    System.out.println
-      ("        \toptional settings may be included, such as");
-    System.out.println
-      ("        \tinbound.length=2 outbound.length=2 inbound.lengthVariance=-1 ");
-    System.out.println
-      ("  <url>  \tURL pointing to .torrent metainfo file to download/share.");
-    System.out.println
-      ("  <file> \tEither a local .torrent metainfo file to download");
-    System.out.println
-      ("         \tor (with --share) a file to share.");
-  }
-****/
 
   /**
    * Aborts program abnormally.
@@ -1467,7 +1081,7 @@ public class Snark
   final static int MAX_TOTAL_UPLOADERS = 20;
 
   public boolean overUploadLimit(int uploaders) {
-    if (_peerCoordinatorSet == null || uploaders <= 0)
+    if (uploaders <= 0)
       return false;
     int totalUploaders = 0;
     for (PeerCoordinator c : _peerCoordinatorSet) {
@@ -1537,7 +1151,7 @@ public class Snark
      *  @since 0.9.71
      */
     public boolean isBanned(Hash h) {
-        return acceptor != null && acceptor.isBanned(h);
+        return acceptor.isBanned(h);
     }
 
     /**
