@@ -406,6 +406,9 @@ class PeerConnectionOut implements Runnable
 
   /** reransmit requests not received in 7m */
   private static final int REQ_TIMEOUT = (2 * SEND_TIMEOUT) + (60 * 1000);
+  /**
+   * Only call if !supportsFast()
+   */
   void retransmitRequests(List<Request> requests)
   {
     long now = System.currentTimeMillis();

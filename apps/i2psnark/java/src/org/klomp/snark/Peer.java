@@ -860,9 +860,12 @@ public class Peer implements Comparable<Peer>, BandwidthListener
 
   /**
    * Retransmit outstanding requests if necessary
+   * Does nothing if supportsFast()
    */
   public void retransmitRequests()
   {
+    if (supportsFast())
+        return;
     PeerState s = state;
     if (s != null)
       s.retransmitRequests();

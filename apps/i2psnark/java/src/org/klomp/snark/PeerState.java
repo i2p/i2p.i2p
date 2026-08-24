@@ -1110,6 +1110,9 @@ class PeerState implements DataLoader
         out.sendAlive();
   }
 
+  /**
+   * Only call if !supportsFast()
+   */
   synchronized void retransmitRequests()
   {
       if (interesting && !choked)
