@@ -278,6 +278,8 @@ public class Storage implements Closeable
         }
     } catch (DigestException de) {
         throw new IOException(de);
+    } finally {
+        close();
     }
     if (ba != null)
         _cache.release(ba, false);
@@ -1143,6 +1145,7 @@ public class Storage implements Closeable
           try {
               return locked_checkCreateFiles(recheck);
           } finally {
+              close();
               _isChecking = false;
           }
       }
@@ -1285,16 +1288,6 @@ public class Storage implements Closeable
 
     _checkProgress.set(pieces);
     _probablyComplete = complete();
-    // close all the files so we don't end up with a zillion open ones;
-    // we will reopen as needed
-    // Now closed above to avoid running out of file descriptors
-    //for (int i = 0; i < rafs.length; i++) {
-    //  synchronized(RAFlock[i]) {
-    //    try {
-    //      closeRAF(i);
-    //    } catch (IOException ioe) {}
-    //  }
-    //}
 
     // do this here so we don't confuse the user during checking
     needed = need;
@@ -1335,8 +1328,9 @@ public class Storage implements Closeable
 
 
   /**
-   * Closes the Storage and makes sure that all RandomAccessFiles are
-   * closed. The Storage is unusable after this.
+   * Make sure that all RandomAccessFiles are
+   * closed. The storage is still usable, files will be reopened
+   * as needed.
    */
   public void close() throws IOException
   {
