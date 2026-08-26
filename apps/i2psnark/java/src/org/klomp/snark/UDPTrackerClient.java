@@ -395,7 +395,7 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
     /**
      *  Lowest-level send message call.
      *  @param dest may be null, returns false
-     *  @param repliable true for conn request, false for announce
+     *  @param repliable Actually dg2/3. true for conn request, false for announce
      *  @return success
      */
     private boolean sendMessage(Destination dest, int toPort, byte[] payload, boolean repliable) {
@@ -433,7 +433,11 @@ class UDPTrackerClient implements I2PSessionMuxedListener {
 
         SendMessageOptions opts = new SendMessageOptions();
         opts.setDate(_context.clock().now() + 60*1000);
-        if (!repliable)
+        // Session default is don't compress
+        // DG2 contains full dest which is compressible
+        if (repliable)
+            opts.setGzip(true);
+        else
             opts.setSendLeaseSet(false);
         try {
             boolean success = _session.sendMessage(dest, payload, 0, payload.length,
