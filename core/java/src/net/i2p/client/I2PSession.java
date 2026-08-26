@@ -229,6 +229,14 @@ public interface I2PSession {
      */
     public byte[] receiveMessage(int msgId) throws I2PSessionException;
 
+    /**
+     * Throw away the received message, we don't want it.
+     * Use instead of receiveMessage() to avoid gunzip overhead.
+     *
+     * @since 0.9.71
+     */
+    public void discardMessage(int msgId);
+
     /** Instruct the router that the message received was abusive (including how
      * abusive on a 1-100 scale) in the hopes the router can do something to
      * minimize receiving abusive messages like that in the future.

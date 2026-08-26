@@ -913,6 +913,16 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     }
 
     /**
+     * Throw away the received message, we don't want it.
+     * Use instead of receiveMessage() to avoid gunzip overhead.
+     *
+     * @since 0.9.71
+     */
+    public void discardMessage(int msgId) {
+        _availableMessages.remove(Long.valueOf(msgId));
+    }
+
+    /**
      * Report abuse with regards to the given messageId
      */
     public void reportAbuse(int msgId, int severity) throws I2PSessionException {
