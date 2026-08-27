@@ -45,6 +45,35 @@ public class V2Util {
     }
 
     /**
+     *  @param flen the file length
+     *  @param return next power of two of flen, or 0 if flen is 0
+     */
+    public static int rectify(long flen) {
+        return rectify(flen, Storage.MAX_PIECE_SIZE);
+    }
+
+    /**
+     *  @param flen the file length
+     *  @param plen piece length, 16K minimum, power of two, or zero
+     *  @param return plen, or next power of two of flen if smaller, or 0 if flen is 0
+     */
+    public static int rectify(long flen, int plen) {
+        if (!isValidPieceLength(plen))
+            throw new IllegalArgumentException("Bad piece length " + plen);
+        if (flen == 0)
+            return 0;
+        if (flen >= plen)
+            return plen;
+        if (flen < MIN)
+            return MIN;
+        // isPowerOfTwo
+        if ((flen & (flen - 1)) == 0)
+            return (int) flen;
+        // next power of two
+        return (int) Math.min(Long.highestOneBit(flen) << 1, Storage.MAX_PIECE_SIZE);
+    }
+
+    /**
      *
      *  @param pieces two minimum
      *  @param plen piece length, 16K minimum, power of two
@@ -77,25 +106,7 @@ public class V2Util {
         if (!f.canRead())
             throw new IOException("Cannot open " + f);
         long len = f.length();
-        if (len == 0)
-            return emptyMerkleHash(MIN);
-        if (len > Integer.MAX_VALUE / 2)
-            throw new UnsupportedOperationException();  // TODO
-        int plen;
-        if (len < MIN) {
-            plen = MIN;
-        } else if ((len & (len - 1)) == 0) {
-            // isPowerOfTwo
-            plen = (int) len;
-        } else {
-            // next power of two
-            // so calculateMerkleFull() only returns one value
-            // to reduce memory usage,
-            // and we don't exceed the merkle tree size required,
-            // which results in bad results
-            // next power of two
-            plen = (int) (Long.highestOneBit(len) << 1);
-        }
+        int plen = rectify(len, Storage.MAX_PIECE_SIZE);
         InputStream in = null;
         try {
             in = new FileInputStream(f);
@@ -109,33 +120,25 @@ public class V2Util {
     }
 
     /**
+     *  @param plen piece length, for pieces, MUST be the full padded piece length
      *  @return the root hash
      */
-    public static MerkleHash calculateMerkleRoot(byte[] b) throws IOException {
+    public static MerkleHash calculateMerkleRoot(byte[] b, int plen) throws IOException {
         InputStream in = new ByteArrayInputStream(b);
-        return calculateMerkleRoot(in, b.length);
+        return calculateMerkleRoot(in, plen);
     }
 
     /**
-     *  Warning: Will return bad value if plen is greater than the next power
+     *  Warn, will return bad value for files if plen is greater than the next power
      *  of two of the input size
      *
-     *  @param plen piece length, will be rectified to next power of two 16K min
+     *  @param plen piece length, for files, MUST be rectified to next power of two with rectify();
+     *                            for pieces, MUST be the full padded piece length
      *  @return the root hash
      */
     public static MerkleHash calculateMerkleRoot(InputStream in, int plen) throws IOException {
         if (plen == 0)
             return emptyMerkleHash(MIN);
-        if (plen > Integer.MAX_VALUE / 2)
-            throw new UnsupportedOperationException();  // TODO
-        if (plen < MIN) {
-            plen = MIN;
-        } else if ((plen & (plen - 1)) == 0) {
-            // isPowerOfTwo
-        } else {
-            // next power of two
-            plen = Integer.highestOneBit(plen) << 1;
-        }
         List<MerkleHash> hashes = calculateMerklePieces(in, plen);
         if (hashes.size() == 1)
             return hashes.get(0);
@@ -152,25 +155,7 @@ public class V2Util {
         long len = f.length();
         if (len == 0)
             return Collections.singletonList(emptyMerkleHash(MIN));
-        if (len > Integer.MAX_VALUE / 2)
-            throw new UnsupportedOperationException();  // TODO
-        if (len < MIN) {
-            plen = MIN;
-        } else if ((len & (len - 1)) == 0) {
-            // isPowerOfTwo
-            if (len < plen)
-                plen = (int) len;
-        } else {
-            // next power of two
-            // so calculateMerkleFull() only returns one value
-            // to reduce memory usage,
-            // and we don't exceed the merkle tree size required,
-            // which results in bad results
-            // next power of two
-            int nplen = (int) (Long.highestOneBit(len) << 1);
-            if (nplen < plen)
-                plen = nplen;
-        }
+        plen = rectify(len, plen);
         InputStream in = null;
         try {
             in = new FileInputStream(f);
@@ -184,13 +169,16 @@ public class V2Util {
     }
 
     /**
-     *  Warn, will return bad value if plen is greater than the next power
+     *  Warn, will return bad value for files if plen is greater than the next power
      *  of two of the input size
      *
-     *  @param plen piece length, 16K minimum, power of two
+     *  @param plen piece length, for files, MUST be rectified to next power of two with rectify();
+     *                            for pieces, MUST be the full padded piece length
      *  @return the piece hashes
      */
-    private static List<MerkleHash> calculateMerklePieces(InputStream in, int plen) throws IOException {
+    public static List<MerkleHash> calculateMerklePieces(InputStream in, int plen) throws IOException {
+        if (plen == 0)
+            return Collections.singletonList(emptyMerkleHash(MIN));
         if (!isValidPieceLength(plen))
             throw new IllegalArgumentException("Bad piece length " + plen);
         CalcMerklePieceHashes calc = new CalcMerklePieceHashes(in, plen);
@@ -264,16 +252,16 @@ public class V2Util {
                 // calculate left side
                 boolean done = calculateMerkleFull(clen);
                 MerkleHash mh1 = rv.get(rv.size() - 1);
-                byte[] h2;
+                MerkleHash mh2;
                 boolean done2;
                 if (done) {
                     // skip the right side
                     done2 = true;
-                    h2 = emptyMerkleHash(clen).getData();
+                    mh2 = emptyMerkleHash(clen);
                 } else {
                     // calculate right side
                     done2 = calculateMerkleFull(clen);
-                    h2 = rv.get(rv.size() - 1).getData();
+                    mh2 = rv.get(rv.size() - 1);
                 }
                 if (clen < plen) {
                     // pop off the chunk hashes,
@@ -283,7 +271,7 @@ public class V2Util {
                         rv.remove(rv.size() - 1);
                 }
                 md.update(mh1.getData());
-                byte[] h = md.digest(h2);
+                byte[] h = md.digest(mh2.getData());
                 //System.out.println("Merge two hashes at level " + (clen * 2) + " done? " + done2 + " " + net.i2p.data.Base64.encode(h));
                 rv.add(new MerkleHash(h));
                 return done2;
@@ -401,22 +389,22 @@ public class V2Util {
             System.err.println("Usage: V2Util file [piecelength (KB)]");
             System.exit(1);
         }
+        if (args[0].equals("-e")) {
+            System.err.println("Empty hashes:");
+            for (int i = 16384; i <= Storage.MAX_PIECE_SIZE; i *= 2) {
+                System.out.println((i / 1024) + " KB: " + emptyMerkleHash(i));
+            }
+            System.exit(0);
+        }
         File f = new File(args[0]);
         long len = f.length();
         System.out.println("File:         " + args[0]);
 
         int pclen;
         if (args.length > 1) {
-            pclen = Integer.parseInt(args[1]) * 1024;
+            pclen = rectify(len, Integer.parseInt(args[1]) * 1024);
         } else {
-            long po2 = Long.highestOneBit(len);
-            if (po2 != len)
-                po2 *= 2;
-            if (po2 < MIN)
-                po2 = MIN;
-            if (po2 > Storage.MAX_PIECE_SIZE)
-                po2 = Storage.MAX_PIECE_SIZE;
-            pclen = (int) po2;
+            pclen = rectify(len);
         }
 
         MerkleHash h;
