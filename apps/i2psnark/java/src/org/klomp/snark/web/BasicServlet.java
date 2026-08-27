@@ -245,10 +245,10 @@ class BasicServlet extends HttpServlet
         }
         catch(IOException e)
         {
-            if (_log.shouldLog(Log.WARN))
+            if (_log.shouldInfo())
                 // typical browser abort
                 //_log.warn("Error sending", e);
-                _log.warn("Error sending " + pathInContext + ": " + e);
+                _log.info("Error sending " + pathInContext + ": " + e);
             throw e;
         }
     }

@@ -3106,6 +3106,8 @@ public class I2PSnarkServlet extends BasicServlet {
             MagnetURI magnet = new MagnetURI(_manager.util(), url);
             String name = magnet.getName();
             byte[] ih = magnet.getInfoHash();
+            if (ih == null)
+                throw new IllegalArgumentException();
             String trackerURL = magnet.getTrackerURL();
             _manager.addMagnet(name, ih, trackerURL, true, dataDir);
         } catch (IllegalArgumentException iae) {
@@ -3429,19 +3431,44 @@ public class I2PSnarkServlet extends BasicServlet {
                    .append("</td></tr>\n");
             }
             String hex = I2PSnarkUtil.toHex(snark.getInfoHash());
+            MetaInfo meta = snark.getMetaInfo();
             if (!showEdit) {
+                // uncommment when implemented
+                //Hash v2 = meta != null ? meta.getInfoHashV2() : null;
+                Object v2 = null;
                 buf.append("<tr><td>");
                 toThemeImg(buf, "details");
                 buf.append("</td><td><b>")
-                   .append(_t("Info hash"))
-                   .append("</b></td><td><span id=\"infohash\">")
+                   .append(_t("Info hash"));
+                if (v2 != null)
+                    buf.append(" (v1)");
+                buf.append("</b></td><td><span id=\"infohash\">")
                    .append(hex.toUpperCase(Locale.US))
                    .append("</span></td></tr>\n");
+/*
+                if (v2 != null) {
+                    buf.append("<tr><td>");
+                    toThemeImg(buf, "details");
+                    buf.append("</td><td><b>")
+                       .append(_t("Info hash"))
+                       .append(" (v2 short)")
+                       .append("</b></td><td><span id=\"infohash\">")
+                       .append(I2PSnarkUtil.toHex(meta.getInfoHashV2Short()).toUpperCase(Locale.US))
+                       .append("</span></td></tr>\n");
+                    buf.append("<tr><td>");
+                    toThemeImg(buf, "details");
+                    buf.append("</td><td><b>")
+                       .append(_t("Info hash"))
+                       .append(" (v2 long)")
+                       .append("</b></td><td><span id=\"infohash\">")
+                       .append(I2PSnarkUtil.toHex(v2.getData()).toUpperCase(Locale.US))
+                       .append("</span></td></tr>\n");
+                }
+*/
             }
 
             long[] dates = _manager.getSavedAddedAndCompleted(snark);
             String announce = null;
-            MetaInfo meta = snark.getMetaInfo();
             if (meta != null && !showEdit) {
                 announce = meta.getAnnounce();
                 if (announce == null)
@@ -3581,22 +3608,56 @@ public class I2PSnarkServlet extends BasicServlet {
 
           if (!showEdit) {  // don't bother to reindent
             if (meta == null || !meta.isPrivate()) {
+                byte[] ih = snark.getInfoHash();
+                // uncommment when implemented
+                //Hash v2 = meta != null ? meta.getInfoHashV2() : null;
+                Object v2 = null;
+                String link = MagnetURI.toMagnetLink(ih, announce, snark.getBaseName(), snark.getTotalLength());
                 buf.append("<tr><td><a href=\"")
-                   .append(MagnetURI.MAGNET_FULL).append(hex);
-                if (announce != null)
-                    buf.append("&amp;tr=").append(announce);
-                buf.append("\">")
+                   .append(link)
+                   .append("\">")
                    .append(toImg("magnet", _t("Magnet link")))
-                   .append("</a></td><td><b>").append(_t("Magnet")).append("</b></td><td><a href=\"")
-                   .append(MagnetURI.MAGNET_FULL).append(hex);
-                if (announce != null)
-                    buf.append("&amp;tr=").append(announce);
-                buf.append("\">")
-                   .append(MagnetURI.MAGNET_FULL).append(hex);
-                if (announce != null)
-                    buf.append("&amp;tr=").append(announce);
-                buf.append("</a>")
+                   .append("</a></td><td><b>")
+                   .append(_t("Magnet"));
+                if (v2 != null)
+                    buf.append(" (v1)");
+                buf.append("</b></td><td><a href=\"")
+                   .append(link)
+                   .append("\">")
+                   .append(link)
+                   .append("</a>")
                    .append("</td></tr>\n");
+/*
+                if (v2 != null) {
+                    // todo don't add announce for postman until supported
+                    link = MagnetURI.toMagnetLink(v2.getData(), announce, snark.getBaseName());
+                    buf.append("<tr><td><a href=\"")
+                       .append(link)
+                       .append("\">")
+                       .append(toImg("magnet", _t("Magnet link")))
+                       .append("</a></td><td><b>")
+                       .append(_t("Magnet"))
+                       .append(" (v2)</b></td><td><a href=\"")
+                       .append(link)
+                       .append("\">")
+                       .append(link)
+                       .append("</a>")
+                       .append("</td></tr>\n");
+                    link = MagnetURI.toMagnetLink(ih, v2.getData(), announce, snark.getBaseName());
+                    buf.append("<tr><td><a href=\"")
+                       .append(link)
+                       .append("\">")
+                       .append(toImg("magnet", _t("Magnet link")))
+                       .append("</a></td><td><b>")
+                       .append(_t("Magnet"))
+                       .append(" (v1+v2)</b></td><td><a href=\"")
+                       .append(link)
+                       .append("\">")
+                       .append(link)
+                       .append("</a>")
+                       .append("</td></tr>\n");
+                }
+*/
             } else {
                 buf.append("<tr><td>");
                 toThemeImg(buf, "details");

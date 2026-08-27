@@ -5,13 +5,14 @@ import java.awt.PopupMenu;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Method;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingWorker;
 
 import net.i2p.I2PAppContext;
-import net.i2p.desktopgui.router.RouterManager;
+//import net.i2p.desktopgui.router.RouterManager;
 
 /**
  *  When started before the router, e.g. with
@@ -35,7 +36,13 @@ class ExternalTrayManager extends TrayManager {
                 new SwingWorker<Object, Object>() {
                     @Override
                     protected Object doInBackground() throws Exception {
-                        RouterManager.start();
+                        // Use reflection to compile without router classes for external-only
+                        //RouterManager.start();
+                        try {
+                            Class mgr = Class.forName("net.i2p.desktopgui.router.RouterManager");
+                            Method start = mgr.getMethod("start", new Class[0]);
+                            start.invoke(mgr);
+                        } catch (Exception e) {}
                         return null;
                     }
                     

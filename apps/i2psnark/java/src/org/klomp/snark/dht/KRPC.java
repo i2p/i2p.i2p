@@ -1040,8 +1040,11 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         opts.setDate(_context.clock().now() + 60*1000);
         opts.setTagsToSend(SEND_CRYPTO_TAGS);
         opts.setTagThreshold(LOW_CRYPTO_TAGS);
-        opts.setGzip(false);
-        if (!repliable)
+        // Session default is don't compress
+        // DG1 contains full dest which is compressible
+        if (repliable)
+            opts.setGzip(true);
+        else
             opts.setSendLeaseSet(false);
         try {
             boolean success = _session.sendMessage(dest, payload, 0, payload.length,

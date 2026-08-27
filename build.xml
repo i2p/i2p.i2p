@@ -385,6 +385,12 @@
         <copy file="apps/desktopgui/dist/desktopgui.jar" todir="build/" />
     </target>
 
+    <!-- exclude router dependencies, for i2psnark standalone -->
+    <target name="buildDesktopGui-external" depends="buildCore, buildSystray" >
+        <ant dir="apps/desktopgui" target="jar-external" />
+        <copy file="apps/desktopgui/dist/desktopgui.jar" todir="build/" />
+    </target>
+
     <target name="buildRouterConsole" depends="buildrouter, buildSystray, buildDesktopGui, buildJetty, buildJrobin" >
         <ant dir="apps/routerconsole/java/" target="jar" />
     </target>
@@ -2390,7 +2396,7 @@
     </target> -->
 
     <!-- standalone i2psnark zip -->
-    <target name="i2psnark" depends="buildStreaming, buildJetty, buildSystray, jbigi, buildDesktopGui" >
+    <target name="i2psnark" depends="buildStreaming, buildJetty, buildSystray, jbigi, buildDesktopGui-external" >
         <ant dir="apps/i2psnark/java" target="standalone" />
         <copy file="apps/i2psnark/java/build/i2psnark-standalone.zip" todir="." />
     </target>
@@ -2400,7 +2406,7 @@
     </target>
 
     <!-- standalone susimail zip -->
-    <target name="susimail" depends="buildStreaming, buildJetty, buildSystray, jbigi, buildDesktopGui" >
+    <target name="susimail" depends="buildStreaming, buildJetty, buildSystray, jbigi, buildDesktopGui-external" >
         <ant dir="apps/susimail" target="standalone" />
         <copy file="apps/susimail/build/susimail-standalone.zip" todir="." />
     </target>

@@ -202,18 +202,60 @@ public class BitField
   @Override
   public String toString()
   {
-    // Not very efficient
+    // generate a compact representation
     StringBuilder sb = new StringBuilder("BitField(");
     sb.append(size).append(")[");
-    for (int i = 0; i < size; i++)
-      if (get(i))
-        {
-          sb.append(' ');
-          sb.append(i);
+    int first = -1;
+    int last = -2;
+    for (int i = 0; i < size; i++) {
+        if (get(i)) {
+            if (i == last + 1) {
+                last++;
+            } else  {
+                first = i;
+                last = i;
+                sb.append(i);
+            }
+        } else if (last >= 0) {
+            if (last != first) {
+                sb.append('-');
+                sb.append(i - 1);
+            }
+            sb.append(' ');
+            first = -1;
+            last = -1;
         }
-    sb.append(" ]");
-
+    }
+    if (last >= 0 && last != first) {
+        sb.append('-');
+        sb.append(last);
+    }
+    sb.append("]");
     return sb.toString();
   }
 
+/*
+  // toString() test
+  public static void main(String[] args) {
+      BitField bf = new BitField(128);
+      net.i2p.util.RandomSource r = net.i2p.util.RandomSource.getInstance();
+      for (int i = 0; i < 96; i++) {
+          bf.set(r.nextInt(128));
+      }
+      // set last two to test final output
+      bf.set(126);
+      bf.set(127);
+      // old way
+      StringBuilder sb = new StringBuilder(1024);
+      for (int i = 0; i < 128; i++) {
+          if (bf.get(i)) {
+              sb.append(i);
+              sb.append(' ');
+          }
+      }
+      System.out.println(sb);
+      // new way
+      System.out.println(bf.toString());
+  }
+*/
 }

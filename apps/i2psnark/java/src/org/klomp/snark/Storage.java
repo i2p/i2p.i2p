@@ -28,6 +28,7 @@ import java.io.RandomAccessFile;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.security.DigestException;
 import java.security.MessageDigest;
 import java.text.Collator;
 import java.util.ArrayList;
@@ -253,15 +254,35 @@ public class Storage implements Closeable
 
     byte[] piece_hashes = new byte[20 * pieces];
 
-    byte[] piece = new byte[piece_size];
-    for (int i = 0; i < pieces; i++)
-      {
-        int length = getUncheckedPiece(i, piece);
-        digest.update(piece, 0, length);
-        byte[] hash = digest.digest();
-        System.arraycopy(hash, 0, piece_hashes, 20 * i, 20);
-        bitfield.set(i);
-      }
+    ByteArray ba;
+    byte[] buf;
+    if (piece_size <= BUFSIZE) {
+        ba = _cache.acquire();
+        buf = ba.getData();
+    } else {
+        ba = null;
+        buf = new byte[Math.min(piece_size, 128*1024)];
+    }
+    try {
+        for (int i = 0; i < pieces; i++) {
+            int pclen = getPieceLength(i);
+            int read = 0;
+            while (read < pclen) {
+                int rd = Math.min(buf.length, pclen - read);
+                getUncheckedPiece(i, buf, read, rd);
+                digest.update(buf, 0, rd);
+                read += rd;
+            }
+            digest.digest(piece_hashes, 20 * i, 20);
+            bitfield.set(i);
+        }
+    } catch (DigestException de) {
+        throw new IOException(de);
+    } finally {
+        close();
+    }
+    if (ba != null)
+        _cache.release(ba, false);
     return piece_hashes;
   }
 
@@ -1124,6 +1145,7 @@ public class Storage implements Closeable
           try {
               return locked_checkCreateFiles(recheck);
           } finally {
+              close();
               _isChecking = false;
           }
       }
@@ -1209,17 +1231,34 @@ public class Storage implements Closeable
       }
 
     // Check which pieces match and which don't
-    if (resume)
-      {
-        byte[] piece = new byte[piece_size];
+    if (resume) {
+      try {
+        MessageDigest digest = SHA1.getInstance();
+        ByteArray ba;
+        byte[] buf;
+        if (piece_size <= BUFSIZE) {
+            ba = _cache.acquire();
+            buf = ba.getData();
+        } else {
+            ba = null;
+            buf = new byte[Math.min(piece_size, 128*1024)];
+        }
         int file = 0;
         long fileEnd = _torrentFiles.get(0).length;
         long pieceEnd = 0;
-        for (int i = 0; i < pieces; i++)
-          {
+        byte[] hash = new byte[20];
+        for (int i = 0; i < pieces; i++) {
             _checkProgress.set(i);
-            int length = getUncheckedPiece(i, piece);
-            boolean correctHash = metainfo.checkPiece(i, piece, 0, length);
+            int length = getPieceLength(i);
+            int read = 0;
+            while (read < length) {
+                int rd = Math.min(buf.length, length - read);
+                getUncheckedPiece(i, buf, read, rd);
+                digest.update(buf, 0, rd);
+                read += rd;
+            }
+            digest.digest(hash, 0, 20);
+            boolean correctHash = metainfo.checkPiece(i, hash);
             // close as we go so we don't run out of file descriptors
             pieceEnd += length;
             while (fileEnd <= pieceEnd) {
@@ -1240,20 +1279,15 @@ public class Storage implements Closeable
             if (listener != null)
               listener.storageChecked(this, i, correctHash);
           }
+          if (ba != null)
+              _cache.release(ba, false);
+        } catch (DigestException de) {
+          throw new IOException(de);
+        }
       }
 
     _checkProgress.set(pieces);
     _probablyComplete = complete();
-    // close all the files so we don't end up with a zillion open ones;
-    // we will reopen as needed
-    // Now closed above to avoid running out of file descriptors
-    //for (int i = 0; i < rafs.length; i++) {
-    //  synchronized(RAFlock[i]) {
-    //    try {
-    //      closeRAF(i);
-    //    } catch (IOException ioe) {}
-    //  }
-    //}
 
     // do this here so we don't confuse the user during checking
     needed = need;
@@ -1294,8 +1328,9 @@ public class Storage implements Closeable
 
 
   /**
-   * Closes the Storage and makes sure that all RandomAccessFiles are
-   * closed. The Storage is unusable after this.
+   * Make sure that all RandomAccessFiles are
+   * closed. The storage is still usable, files will be reopened
+   * as needed.
    */
   public void close() throws IOException
   {
@@ -1474,12 +1509,6 @@ public class Storage implements Closeable
       return (int)(total_length - ((long)piece * piece_size));
     else
       throw new IndexOutOfBoundsException("no piece: " + piece);
-  }
-
-  private int getUncheckedPiece(int piece, byte[] bs)
-    throws IOException
-  {
-      return getUncheckedPiece(piece, bs, 0, getPieceLength(piece));
   }
 
   private int getUncheckedPiece(int piece, byte[] bs, int off, int length)
@@ -1781,11 +1810,8 @@ public class Storage implements Closeable
           String hex = DataHelper.toString(meta.getInfoHash());
           System.out.println("Created:     " + file);
           System.out.println("InfoHash:    " + hex);
-          String basename = base.getName().replace(" ", "%20");
-          String magnet = MagnetURI.MAGNET_FULL + hex + "&dn=" + basename;
-          if (announce != null)
-              magnet += "&tr=" + announce;
-          System.out.println("Magnet:      " + magnet);
+          String magnet = MagnetURI.toMagnetLink(meta.getInfoHash(), announce, base.getName());
+          System.out.println("Magnet:      " + magnet.replace("&amp;", "&"));
       } catch (IOException ioe) {
           if (file != null)
               file.delete();

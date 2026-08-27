@@ -50,6 +50,7 @@ function requestAjax2(refreshtime) {
     // setTimeout() so we update the URL every time
     ajax(url, "mainsection", -1);
     if (refreshtime > 0) {
+        // always set the timer even if hidden, since we don't cancel it
         setTimeout(requestAjax1, refreshtime);
     }
 }
@@ -57,11 +58,19 @@ function requestAjax2(refreshtime) {
 function initAjax() {
     if (ajaxDelay > 0) {
         setTimeout(requestAjax1, ajaxDelay);
+        document.addEventListener("visibilitychange", function() {
+           if (!document.hidden) {
+               if (ajaxDelay > 0) {
+                   requestAjax2(0);
+               }
+           }
+        }, true);
     }
 }
 
 document.addEventListener("DOMContentLoaded", function() {
    initAjax();
 }, true);
+
 
 /* #license-end */

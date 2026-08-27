@@ -31,6 +31,7 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.util.Log;
+import net.i2p.util.RandomSource;
 
 import org.klomp.snark.bencode.BEValue;
 import org.klomp.snark.bencode.InvalidBEncodingException;
@@ -127,10 +128,6 @@ class PeerState implements DataLoader
 
     if (choked) {
         out.cancelRequestMessages();
-        // old Roberts thrash us here, choke+unchoke right together
-        // The only problem with returning the partials to the coordinator
-        // is that chunks above a missing request are lost.
-        // Future enhancements to PartialPiece could keep track of the holes.
         List<Request> pcs = returnPartialPieces();
         if (!pcs.isEmpty()) {
             if (_log.shouldLog(Log.DEBUG))
@@ -331,6 +328,18 @@ class PeerState implements DataLoader
         return;
       }
 
+    boolean hasit;
+    synchronized(this) {
+        hasit = bitfield != null && bitfield.get(piece);
+    }
+    if (hasit) {
+        if (_log.shouldWarn())
+            _log.warn("Dropping req for " + piece + " he already has from " + peer);
+        if (peer.supportsFast())
+            out.sendReject(piece, begin, length);
+        return;
+    }
+
     // Limit total pipelined requests to MAX_PIPELINE bytes
     // to conserve memory and prevent DOS
     // Todo: limit number of requests also? (robert 64 x 4KB)
@@ -422,10 +431,10 @@ class PeerState implements DataLoader
     // Now reported byte-by-byte in PartialPiece
     //peer.downloaded(size);
 
-    if (_log.shouldLog(Log.DEBUG))
-      _log.debug("got end of Chunk("
-                  + req.getPiece() + "," + req.off + "," + req.len + ") from "
-                  + peer);
+    //if (_log.shouldLog(Log.DEBUG))
+    //  _log.debug("got end of Chunk("
+    //              + req.getPiece() + "," + req.off + "," + req.len + ") from "
+    //              + peer);
 
     // Last chunk needed for this piece?
     PartialPiece pp = req.getPartialPiece();
@@ -498,10 +507,10 @@ class PeerState implements DataLoader
    */
   Request getOutstandingRequest(int piece, int begin, int length)
   {
-    if (_log.shouldLog(Log.DEBUG))
-      _log.debug("got start of Chunk("
-                  + piece + "," + begin + "," + length + ") from "
-                  + peer);
+    //if (_log.shouldLog(Log.DEBUG))
+    //  _log.debug("got start of Chunk("
+    //              + piece + "," + begin + "," + length + ") from "
+    //              + peer);
 
     // Lookup the correct piece chunk request from the list.
     Request req;
@@ -511,53 +520,60 @@ class PeerState implements DataLoader
 
         // Unrequested piece number?
         if (r == -1) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Unrequested 'piece: " + piece + ", "
-                      + begin + ", " + length + "' received from "
-                      + peer);
+            if (_log.shouldInfo())
+                _log.info("Unrequested piece (" + piece + ',' + begin + ',' + length +
+                          ") from " + peer + " requests " + outstandingRequests);
             return null;
         }
 
         req = outstandingRequests.get(r);
-        while (req.getPiece() == piece && req.off != begin
+        while ((req.off != begin || req.getPiece() != piece)
                && r < outstandingRequests.size() - 1)
           {
             r++;
             req = outstandingRequests.get(r);
           }
         
-        // Something wrong?
+        // Not found in requests
+        // TODO if necessary we could grab the partial piece from the first
+        // request and synthesize a new request
         if (req.getPiece() != piece || req.off != begin || req.len != length)
           {
-            if (_log.shouldLog(Log.INFO))
-              _log.info("Unrequested or unneeded 'piece: "
-                          + piece + ", "
-                          + begin + ", "
-                          + length + "' received from "
-                          + peer);
+            if (_log.shouldInfo())
+                _log.info("Unrequested or unneeded (" + piece + ',' + begin + ',' + length +
+                          ") from " + peer + " requests " + outstandingRequests);
             return null;
           }
 
         // note that this request is being read
         pendingRequest = req;
         
-        // Report missing requests.
-        if (r != 0)
-          {
-            if (_log.shouldLog(Log.WARN))
-              _log.warn("Some requests dropped, got " + req
-                               + ", wanted for peer: " + peer);
-            for (int i = 0; i < r; i++)
-              {
-                Request dropReq = outstandingRequests.remove(0);
-                outstandingRequests.add(dropReq);
-                if (!choked)
-                  out.sendRequest(dropReq);
-                if (_log.shouldLog(Log.WARN))
-                  _log.warn("dropped " + dropReq + " with peer " + peer);
-              }
-          }
-        outstandingRequests.remove(0);
+        // remove before reorder for non-fast below
+        outstandingRequests.remove(r);
+        // Report missing requests and rerequest for non-fast
+        if (r != 0) {
+            if (_log.shouldWarn())
+                _log.warn(r + " requests dropped or out-of-order, got " + req +
+                          ", wanted for peer: " + peer + " supports fast? " + peer.supportsFast());
+            for (int i = 0; i < r; i++) {
+                Request dropReq;
+                if (!peer.supportsFast()) {
+                    // rerequest each chunk before r and move to the end of the list
+                    // TODO special-case i2pd that responds intentionally out-of-order
+                    dropReq = outstandingRequests.remove(0);
+                    outstandingRequests.add(dropReq);
+                    if (!choked)
+                      out.sendRequest(dropReq);
+                } else {
+                    // Don't resend, we will get it eventually or a reject as obligated by BEP 6,
+                    // and it overinflates our request bandwidth estimator to rerequest.
+                    // just for logging
+                    dropReq = outstandingRequests.get(i);
+                }
+                if (_log.shouldWarn())
+                  _log.warn("dropped or out-of-order " + dropReq + " with peer " + peer + " choked? " + choked);
+            }
+        }
       }
 
     // Request more if necessary to keep the pipeline filled.
@@ -897,9 +913,20 @@ class PeerState implements DataLoader
     // currentMaxPipeline counter.
     // Avoid cross-peer deadlocks from PeerCoordinator, call this outside the lock
     if (!bwListener.shouldRequest(peer, 0)) {
+        // This gets called linearly, on reception of each chunk, so
+        // we decrease currentMaxPipeline linearly as well.
+        // As reqq drops with each chunk received, we will rapidly drop the
+        // reqq to zero within a couple windows unless we reduce
+        // currentMaxPipeline more slowly, to prevent returning the
+        // partial piece to the coordinator and thrashing the piece
+        // back and forth between the peer state and the coordinator.
+        // And sitting idle-and-interested for a few windows which is bad.
         synchronized(this) {
             // Due to changes elsewhere we can let this go down to zero now
-            currentMaxPipeline /= 2;
+            if (currentMaxPipeline > 0) {
+                if (RandomSource.getInstance().nextBoolean())
+                    currentMaxPipeline--;
+            }
         }
         if (_log.shouldWarn())
             _log.warn(peer + " throttle request, interesting? " + interesting + " choked? " + choked +
@@ -918,6 +945,11 @@ class PeerState implements DataLoader
         } else if (currentMaxPipeline < 2) {
              currentMaxPipeline++;
         }
+        // assume 3 sec RTT, only request this much, but
+        // minimum 1 request (check at bottom of loop)
+        // to avoid filling up the request queue all at once
+        // and rapid throttle/unthrottle cycles
+        long maxReq = (limit - rate) * 3;
         boolean more_pieces = true;
         while (more_pieces)
           {
@@ -953,6 +985,7 @@ class PeerState implements DataLoader
                 pieceLength = metainfo.getPieceLength(lastRequest.getPiece());
                 isLastChunk = lastRequest.off + lastRequest.len == pieceLength;
 
+                int requested = PARTSIZE;
                 // Last part of a piece?
                 if (isLastChunk) {
                     more_pieces = requestNextPiece();
@@ -965,6 +998,7 @@ class PeerState implements DataLoader
                             int maxLength = pieceLength - nextBegin;
                             int nextLength = maxLength > PARTSIZE ? PARTSIZE
                                                               : maxLength;
+                            requested = nextLength;
                             Request req = new Request(nextPiece,nextBegin, nextLength);
                             outstandingRequests.add(req);
                             if (!choked)
@@ -979,6 +1013,12 @@ class PeerState implements DataLoader
                             }
                         }
                     }
+                }
+                if (more_pieces) {
+                    // don't exceed the download limit calculated above
+                    maxReq -= requested;
+                    if (maxReq <= 0)
+                        break;
                 }
               }
           }
@@ -1070,6 +1110,9 @@ class PeerState implements DataLoader
         out.sendAlive();
   }
 
+  /**
+   * Only call if !supportsFast()
+   */
   synchronized void retransmitRequests()
   {
       if (interesting && !choked)

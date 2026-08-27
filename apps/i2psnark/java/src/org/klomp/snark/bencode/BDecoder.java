@@ -324,7 +324,9 @@ public class BDecoder
         }
 
         BEValue value = bdecode();
-        result.put(key, value);
+        BEValue old = result.put(key, value);
+        if (old != null)
+            throw new InvalidBEncodingException("Duplicate key " + key + " in dictionary");
 
         // XXX ugly hack continued
         if (special)

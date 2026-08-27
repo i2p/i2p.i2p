@@ -80,22 +80,6 @@ class ConnectionAcceptor implements Runnable
   }
   
   /**
-   *  Unused (single torrent).
-   *  Do NOT call startAccepting().
-   */
-  public ConnectionAcceptor(I2PSnarkUtil util,
-                            PeerAcceptor peeracceptor)
-  {
-    this.peeracceptor = peeracceptor;
-    _util = util;
-    
-    thread = new I2PAppThread(this, "I2PSnark acceptor");
-    thread.setDaemon(true);
-    thread.start();
-    _cleaner = new Cleaner();
-  }
-
-  /**
    *  May be restarted later with startAccepting().
    */
   public synchronized void halt()

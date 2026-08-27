@@ -677,6 +677,7 @@ th.snarkTorrentStatus {
      -webkit-user-select: all;
      -ms-user-select: all;
      user-select: all;
+     font-family: monospace;
 }
 
 .snarkDirInfo th img {

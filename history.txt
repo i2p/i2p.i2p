@@ -1,3 +1,64 @@
+2026-08-22 zzz
+ * Build: Improve i2psnark standalone build
+ * i2psnark:
+   - Smooth out request throttling
+   - Magnet xl param support
+
+2026-08-21 zzz
+ * i2psnark: Improve handling of chunks received out-of-order
+
+2026-08-19 zzz
+ * i2psnark: Reduce memory usage when creating/rechecking torrents
+
+2026-08-17 zzz
+ * i2psnark: Fix extraction of metainfo file attributes
+
+2026-08-16 zzz
+ * i2psnark:
+   - Piece hash calc optimization on torrent creation
+   - More v2 WIP
+
+2026-08-14 zzz
+ * i2psnark:
+   - Add dn name param to magnet links
+   - Strict URI encoding for UTF-8
+   - Use MagnetURI for magnet creation in Storage CLI
+
+2026-08-13 zzz
+ * i2psnark:
+   - Add v2 utility classes (WIP)
+   - MagnetURI improvements
+
+2026-08-12 zzz
+ * Console, i2psnark: Reload XHR after page becomes visible again
+
+2026-08-11 zzz
+ * Build: Recognize gettext version 1.0
+
+2026-08-10 zzz
+ * i2psnark:
+   - Add CompleteBitfield subclass for efficiency
+   - Disable I2CP bw limiting
+ * Streaming:
+   - Increase min slow start threshold in retransmit path
+   - Remove option to disable protocol number enforcement
+   - Add missing synchronization in fast-retx path
+   - Add missing synchronization in CPH.adjustWindow()
+   - Extend synchronization in Connection.ackPackets()
+
+2026-08-05 zzz
+ * i2psnark: Use inbound banlist for outbound also
+ * NTCP: Catch unchecked BufferOverflowException on read()
+ * Streaming: Reset tweaks
+
+2026-08-03 zzz
+ * i2psnark:
+   - Increase max pipeline
+   - Increase inactivity timeout for seeds
+   - Reset socket on protocol errors
+ * Streaming: Don't put close/reset packets on syn queue
+ * Tunnels: Periodically use 5-slot TBMs
+
 2026-08-02 zzz
  * Build: Fix build with izpack 5.2.6
  * i2psnark: Dup check for base name when filtered
