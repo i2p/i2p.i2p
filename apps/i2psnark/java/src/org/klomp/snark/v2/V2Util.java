@@ -46,7 +46,7 @@ public class V2Util {
 
     /**
      *  @param flen the file length
-     *  @param return next power of two of flen, or 0 if flen is 0
+     *  @return next power of two of flen, or 0 if flen is 0
      */
     public static int rectify(long flen) {
         return rectify(flen, Storage.MAX_PIECE_SIZE);
@@ -55,7 +55,7 @@ public class V2Util {
     /**
      *  @param flen the file length
      *  @param plen piece length, 16K minimum, power of two, or zero
-     *  @param return plen, or next power of two of flen if smaller, or 0 if flen is 0
+     *  @return plen, or next power of two of flen if smaller, or 0 if flen is 0
      */
     public static int rectify(long flen, int plen) {
         if (!isValidPieceLength(plen))
