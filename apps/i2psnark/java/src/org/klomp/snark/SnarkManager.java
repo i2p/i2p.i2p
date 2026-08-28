@@ -1913,7 +1913,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
      *                     to save it across restarts, in case we don't get
      *                     the metadata before shutdown?
      * @param dataDir must exist, or null to default to snark data directory
-     * @param listener to intercept callbacks, should pass through to this
+     * @param listener to intercept callbacks, should pass through to this, or null to use this
      * @return the new Snark or null on failure
      * @throws RuntimeException via Snark.fatal()
      * @since 0.9.4, changed params and changed to private in 0.9.71
@@ -1921,6 +1921,8 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
     private Snark addMagnet(String name, byte[] ih, List<String> trackerURLs, boolean updateStatus,
                           boolean autoStart, File dataDir, CompleteListener listener) {
         String dirPath = dataDir != null ? dataDir.getAbsolutePath() : getDataDir().getPath();
+        if (listener == null)
+            listener = this;
         Snark torrent = new Snark(_util, name, ih, trackerURLs, listener,
                                   _peerCoordinatorSet, _connectionAcceptor,
                                   dirPath);
@@ -2860,10 +2862,10 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
             try {
                 // _snarks must use canonical
                 name = (new File(getDataDir(), storage.getBaseName() + ".torrent")).getCanonicalPath();
-                // put the announce URL in the file
-                String announce = snark.getTrackerURL();
-                if (announce != null)
-                    meta = meta.reannounce(announce);
+                // put the announce URLs in the file
+                List<String> announces = snark.getTrackerURLs();
+                if (announces != null)
+                    meta = meta.reannounce(announces);
                 synchronized (_snarks) {
                     locked_writeMetaInfo(meta, name, areFilesPublic());
                     // put it in the list under the new name

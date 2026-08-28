@@ -663,16 +663,24 @@ public class MetaInfo
 
   /**
    * Creates a copy of this MetaInfo that shares everything except the
-   * announce URL.
-   * Drops any announce-list.
+   * announce and announce-list URLs.
    * Preserves infohash and info map, including any non-standard fields.
-   * @param announce may be null
+   * @param announce may be null. First will be used as primary.
    */
-  public MetaInfo reannounce(String announce) throws InvalidBEncodingException
+  public MetaInfo reannounce(List<String> announces) throws InvalidBEncodingException
   {
         Map<String, BEValue> m = new HashMap<String, BEValue>();
-        if (announce != null)
-            m.put("announce", new BEValue(DataHelper.getUTF8(announce)));
+        if (announces != null && !announces.isEmpty()) {
+            m.put("announce", new BEValue(DataHelper.getUTF8(announces.get(0))));
+            if (announces.size() > 1) {
+                List<BEValue> anns = new ArrayList<BEValue>(announces.size());
+                for (String s : announces) {
+                    anns.add(new BEValue(DataHelper.getUTF8(s)));
+                }
+                List<BEValue> alist = Collections.singletonList(new BEValue(anns));
+                m.put("announce-list", new BEValue(alist));
+            }
+        }
         Map<String, BEValue> info = createInfoMap();
         m.put("info", new BEValue(info));
         return new MetaInfo(m);
