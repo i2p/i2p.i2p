@@ -70,7 +70,7 @@ public class Snark
   private volatile boolean starting;
   private final byte[] id;
   private final byte[] infoHash;
-  private String additionalTrackerURL;
+  private List<String> additionalTrackerURLs;
   protected final I2PSnarkUtil _util;
   private final Log _log;
   private final PeerCoordinatorSet _peerCoordinatorSet;
@@ -278,7 +278,7 @@ public class Snark
   }
 
   /**
-   *  multitorrent, magnet, Used by snark-rpc plugin
+   *  multitorrent, magnet, Was used by snark-rpc plugin? not now?
    *
    *  Will not start itself. Caller must call startTorrent() if desired.
    *
@@ -292,7 +292,7 @@ public class Snark
   protected Snark(I2PSnarkUtil util, String torrent, byte[] ih, String trackerURL,
         CompleteListener complistener, PeerCoordinatorSet peerCoordinatorSet,
         ConnectionAcceptor connectionAcceptor, boolean ignored, String rootDir) {
-      this(util, torrent, ih, trackerURL, complistener, peerCoordinatorSet, connectionAcceptor, rootDir);
+      this(util, torrent, ih, Collections.singletonList(trackerURL), complistener, peerCoordinatorSet, connectionAcceptor, rootDir);
   }
 
   /**
@@ -302,14 +302,14 @@ public class Snark
    *
    *  @param torrent a fake name for now (not a file name)
    *  @param ih 20-byte info hash
-   *  @param trackerURL may be null
+   *  @param trackerURLs may be null
    *  @param peerCoordinatorSet non-null
    *  @param connectionAcceptor non-null
    *  @throws RuntimeException via fatal()
    *  @throws RouterException via fatalRouter()
    *  @since 0.8.4
    */
-  public Snark(I2PSnarkUtil util, String torrent, byte[] ih, String trackerURL,
+  public Snark(I2PSnarkUtil util, String torrent, byte[] ih, List<String> trackerURLs,
         CompleteListener complistener, PeerCoordinatorSet peerCoordinatorSet,
         ConnectionAcceptor connectionAcceptor, String rootDir)
   {
@@ -320,7 +320,7 @@ public class Snark
     acceptor = connectionAcceptor;
     this.torrent = torrent;
     this.infoHash = ih;
-    this.additionalTrackerURL = trackerURL;
+    this.additionalTrackerURLs = trackerURLs;
     this.rootDataDir = rootDir != null ? new File(rootDir) : null;   // null only for FetchAndAdd extension
     savedUploaded = 0;
     stopped = true;
@@ -402,7 +402,7 @@ public class Snark
         coordinator.setUploaded(savedUploaded);
         _peerCoordinatorSet.add(coordinator);
         // TODO pass saved closest DHT nodes to the tracker? or direct to the coordinator?
-        trackerclient = new TrackerClient(_util, meta, additionalTrackerURL, coordinator, this);
+        trackerclient = new TrackerClient(_util, meta, additionalTrackerURLs, coordinator, this);
     }
     // ensure acceptor is running when in multitorrent
     acceptor.startAccepting();
@@ -841,7 +841,15 @@ public class Snark
      *  @since 0.8.4
      */
     public String getTrackerURL() {
-        return additionalTrackerURL;
+        return (additionalTrackerURLs != null && !additionalTrackerURLs.isEmpty()) ? additionalTrackerURLs.get(0) : null;
+    }
+
+    /**
+     *  @return trackerURLs all strings from magnet-mode constructor, may be null
+     *  @since 0.9.71
+     */
+    public List<String> getTrackerURLs() {
+        return additionalTrackerURLs;
     }
 
     /**

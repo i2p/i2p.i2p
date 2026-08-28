@@ -100,7 +100,7 @@ public class TrackerClient implements Runnable {
   private MetaInfo meta;
   private final String infoHash;
   private final String peerID;
-  private final String additionalTrackerURL;
+  private final List<String> additionalTrackerURLs;
   private final PeerCoordinator coordinator;
   private final Snark snark;
   private final int port;
@@ -131,9 +131,9 @@ public class TrackerClient implements Runnable {
    * Call start() to start it.
    *
    * @param meta null if in magnet mode
-   * @param additionalTrackerURL may be null, from the ?tr= param in magnet mode, otherwise ignored
+   * @param additionalTrackerURLs may be null, from the ?tr= param in magnet mode, otherwise ignored
    */
-  public TrackerClient(I2PSnarkUtil util, MetaInfo meta, String additionalTrackerURL,
+  public TrackerClient(I2PSnarkUtil util, MetaInfo meta, List<String> additionalTrackerURLs,
                        PeerCoordinator coordinator, Snark snark)
   {
     super();
@@ -143,7 +143,7 @@ public class TrackerClient implements Runnable {
     _util = util;
     _log = util.getContext().logManager().getLog(TrackerClient.class);
     this.meta = meta;
-    this.additionalTrackerURL = additionalTrackerURL;
+    this.additionalTrackerURLs = additionalTrackerURLs;
     this.coordinator = coordinator;
     this.snark = snark;
 
@@ -297,8 +297,8 @@ public class TrackerClient implements Runnable {
     String primary = null;
     if (meta != null)
         primary = meta.getAnnounce();
-    else if (additionalTrackerURL != null)
-        primary = additionalTrackerURL;
+    else if (additionalTrackerURLs != null && !additionalTrackerURLs.isEmpty())
+        primary = additionalTrackerURLs.get(0);
     Set<Hash> trackerHashes = new HashSet<Hash>(8);
 
     // primary tracker
@@ -313,6 +313,18 @@ public class TrackerClient implements Runnable {
         }
     } else {
         _log.warn("No primary announce");
+    }
+
+    // additional trackers in magnet
+    if (additionalTrackerURLs != null && additionalTrackerURLs.size() > 1) {
+        for (int i = 1; i < additionalTrackerURLs.size(); i++) {
+            String url = additionalTrackerURLs.get(i);
+            if (isNewValidTracker(trackerHashes, url)) {
+                trackers.add(new TCTracker(url, false));
+                if (_log.shouldDebug())
+                    _log.debug("Additional announce: [" + url + "] for infoHash: " + infoHash);
+            }
+        }
     }
 
     // announce list

@@ -3104,12 +3104,7 @@ public class I2PSnarkServlet extends BasicServlet {
         }
         try {
             MagnetURI magnet = new MagnetURI(_manager.util(), url);
-            String name = magnet.getName();
-            byte[] ih = magnet.getInfoHash();
-            if (ih == null)
-                throw new IllegalArgumentException();
-            String trackerURL = magnet.getTrackerURL();
-            _manager.addMagnet(name, ih, trackerURL, true, dataDir);
+            _manager.addMagnet(magnet, true, true, dataDir, null);
         } catch (IllegalArgumentException iae) {
             _manager.addMessage(_t("Invalid magnet URL {0}", url));
         }

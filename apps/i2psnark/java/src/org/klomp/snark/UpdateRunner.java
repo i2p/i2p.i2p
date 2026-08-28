@@ -107,7 +107,6 @@ class UpdateRunner implements UpdateTask, CompleteListener {
                     }
                     break;
                 }
-                String name = magnet.getName();
                 String trackerURL = magnet.getTrackerURL();
                 if (trackerURL == null && !_smgr.util().shouldUseDHT() &&
                     !_smgr.util().shouldUseOpenTrackers()) {
@@ -115,7 +114,7 @@ class UpdateRunner implements UpdateTask, CompleteListener {
                     _umgr.notifyAttemptFailed(this, "No tracker, no DHT, no OT", null);
                     continue;
                 }
-                _snark = _smgr.addMagnet(name, ih, trackerURL, true, true, null, this);
+                _snark = _smgr.addMagnet(magnet, true, true, null, this);
                 if (_snark != null) {
                     updateStatus("<b>" + _smgr.util().getString("Updating from {0}", linkify(updateURL)) + "</b>");
                     new Timeout();

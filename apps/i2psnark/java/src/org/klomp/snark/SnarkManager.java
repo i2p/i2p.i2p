@@ -1860,11 +1860,12 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
      */
     public void addMagnet(String name, byte[] ih, String trackerURL, boolean updateStatus) {
         // updateStatus is true from UI, false from config file bulk add
-        addMagnet(name, ih, trackerURL, updateStatus, updateStatus, null, this);
+        addMagnet(name, ih, Collections.singletonList(trackerURL), updateStatus, updateStatus, null, this);
     }
     
     /**
      * Add a torrent with the info hash alone (magnet / maggot)
+     * Externally used by transmission-rpc plugin, do not remove.
      *
      * @param name hex or b32 name from the magnet link
      * @param ih 20 byte info hash
@@ -1878,16 +1879,12 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
      */
     public void addMagnet(String name, byte[] ih, String trackerURL, boolean updateStatus, File dataDir) {
         // updateStatus is true from UI, false from config file bulk add
-        addMagnet(name, ih, trackerURL, updateStatus, updateStatus, dataDir, this);
+        addMagnet(name, ih, Collections.singletonList(trackerURL), updateStatus, updateStatus, dataDir, this);
     }
-    
+
     /**
-     * Add a torrent with the info hash alone (magnet / maggot)
-     * External use is for UpdateRunner.
+     * Add a torrent with a parsed MagnetURI
      *
-     * @param name hex or b32 name from the magnet link
-     * @param ih 20 byte info hash
-     * @param trackerURL may be null
      * @param updateStatus should we add this magnet to the config file,
      *                     to save it across restarts, in case we don't get
      *                     the metadata before shutdown?
@@ -1895,12 +1892,36 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
      * @param listener to intercept callbacks, should pass through to this
      * @return the new Snark or null on failure
      * @throws RuntimeException via Snark.fatal()
-     * @since 0.9.4
+     * @since 0.9.71
      */
-    public Snark addMagnet(String name, byte[] ih, String trackerURL, boolean updateStatus,
+    public Snark addMagnet(MagnetURI magnet, boolean updateStatus, boolean autoStart, File dataDir, CompleteListener listener) {
+        byte[] ih = magnet.getInfoHash();
+        if (ih == null)
+            throw new IllegalArgumentException();
+        String name = magnet.getName();
+        List<String> trackerURLs = magnet.getTrackerURLs();
+        return addMagnet(name, ih, trackerURLs, updateStatus, autoStart, dataDir, listener);
+    }
+
+    /**
+     * Add a torrent with the info hash alone (magnet / maggot)
+     *
+     * @param name hex or b32 name from the magnet link
+     * @param ih 20 byte info hash
+     * @param trackerURLs may be null
+     * @param updateStatus should we add this magnet to the config file,
+     *                     to save it across restarts, in case we don't get
+     *                     the metadata before shutdown?
+     * @param dataDir must exist, or null to default to snark data directory
+     * @param listener to intercept callbacks, should pass through to this
+     * @return the new Snark or null on failure
+     * @throws RuntimeException via Snark.fatal()
+     * @since 0.9.4, changed params and changed to private in 0.9.71
+     */
+    private Snark addMagnet(String name, byte[] ih, List<String> trackerURLs, boolean updateStatus,
                           boolean autoStart, File dataDir, CompleteListener listener) {
         String dirPath = dataDir != null ? dataDir.getAbsolutePath() : getDataDir().getPath();
-        Snark torrent = new Snark(_util, name, ih, trackerURL, listener,
+        Snark torrent = new Snark(_util, name, ih, trackerURLs, listener,
                                   _peerCoordinatorSet, _connectionAcceptor,
                                   dirPath);
 
@@ -1913,7 +1934,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
             // Tell the dir monitor not to delete us
             _magnets.add(name);
             if (updateStatus)
-                saveMagnetStatus(ih, dirPath, trackerURL, name);
+                saveMagnetStatus(ih, dirPath, trackerURLs, name);
             putSnark(name, torrent);
         }
         if (autoStart) {
@@ -2481,11 +2502,11 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
      *  just like other torrents, so we can remember the directory, tracker, etc.
      *
      *  @param dir may be null
-     *  @param trackerURL may be null
+     *  @param trackerURLs may be null
      *  @param dn may be null
      *  @since 0.8.4
      */
-    public void saveMagnetStatus(byte[] ih, String dir, String trackerURL, String dn) {
+    public void saveMagnetStatus(byte[] ih, String dir, List<String> trackerURLs, String dn) {
         // i2psnark.config file
         String infohash = Base64.encode(ih);
         infohash = infohash.replace('=', '$');
@@ -2495,8 +2516,19 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
         config.setProperty(PROP_META_MAGNET, "true");
         if (dir != null)
             config.setProperty(PROP_META_MAGNET_DIR, dir);
-        if (trackerURL != null)
-            config.setProperty(PROP_META_MAGNET_TR, trackerURL);
+        if (trackerURLs != null && !trackerURLs.isEmpty()) {
+            if (trackerURLs.size() == 1) {
+                config.setProperty(PROP_META_MAGNET_TR, trackerURLs.get(0));
+            } else {
+                StringBuilder buf = new StringBuilder();
+                for (int i = 0; i < trackerURLs.size(); i++) {
+                    if (i != 0)
+                        buf.append(',');
+                    buf.append(trackerURLs.get(i));
+                }
+                config.setProperty(PROP_META_MAGNET_TR, buf.toString());
+            }
+        }
         if (dn != null)
             config.setProperty(PROP_META_MAGNET_DN, dn);
         String now = Long.toString(System.currentTimeMillis());
@@ -2950,9 +2982,19 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
                     if (name == null)
                         name = _t("Magnet") + ' ' + I2PSnarkUtil.toHex(ih);
                     String tracker = config.getProperty(PROP_META_MAGNET_TR);
+                    List<String> trackers;
+                    if (tracker != null) {
+                        String[] arr = DataHelper.split(tracker, ",");
+                        trackers = new ArrayList<String>(arr.length);
+                        for (int i = 0; i < arr.length; i++) {
+                            trackers.add(arr[i]);
+                        }
+                    } else {
+                        trackers = null;
+                    }
                     String dir = config.getProperty(PROP_META_MAGNET_DIR);
                     File dirf = (dir != null) ? (new File(dir)) : null;
-                    addMagnet(name, ih, tracker, false, autostart, dirf, this);
+                    addMagnet(name, ih, trackers, false, autostart, dirf, this);
                 } else {
                     iter.remove();
                     changed = true;
