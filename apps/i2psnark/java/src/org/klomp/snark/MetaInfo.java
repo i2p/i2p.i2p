@@ -52,7 +52,8 @@ import org.klomp.snark.bencode.InvalidBEncodingException;
 public class MetaInfo
 {  
   private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(MetaInfo.class);
-  private final String announce;
+  // non-final for reannounce()
+  private String announce;
   private final byte[] info_hash;
   private final String name;
   private final List<List<String>> files;
@@ -62,7 +63,8 @@ public class MetaInfo
   private final byte[] piece_hashes;
   private final long length;
   private final int privateTorrent; // 0: not present; 1: = 1; -1: = 0
-  private final List<List<String>> announce_list;
+  // non-final for reannounce()
+  private List<List<String>> announce_list;
   private final String comment;
   private final String created_by;
   private final long creation_date;
@@ -665,6 +667,10 @@ public class MetaInfo
    * Creates a copy of this MetaInfo that shares everything except the
    * announce and announce-list URLs.
    * Preserves infohash and info map, including any non-standard fields.
+   *
+   * As of 0.9.71, also changes the announce and announce-list on this
+   * metainfo.
+   *
    * @param announce may be null. First will be used as primary.
    */
   public MetaInfo reannounce(List<String> announces) throws InvalidBEncodingException
@@ -672,6 +678,7 @@ public class MetaInfo
         Map<String, BEValue> m = new HashMap<String, BEValue>();
         if (announces != null && !announces.isEmpty()) {
             m.put("announce", new BEValue(DataHelper.getUTF8(announces.get(0))));
+            announce = announces.get(0);
             if (announces.size() > 1) {
                 List<BEValue> anns = new ArrayList<BEValue>(announces.size());
                 for (String s : announces) {
@@ -679,6 +686,7 @@ public class MetaInfo
                 }
                 List<BEValue> alist = Collections.singletonList(new BEValue(anns));
                 m.put("announce-list", new BEValue(alist));
+                announce_list = Collections.singletonList(announces);
             }
         }
         Map<String, BEValue> info = createInfoMap();
