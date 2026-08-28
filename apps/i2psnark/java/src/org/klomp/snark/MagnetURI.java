@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 
 import net.i2p.data.Base32;
+import net.i2p.data.DataHelper;
 
 /**
  *
@@ -63,14 +64,18 @@ public class MagnetURI {
             else
                 name = "Magnet " + name;
             String dn = getParam("dn", url);
-            if (dn != null)
-                name += " (" + dn + ')';
             String xl = getParam("xl", url);
             if (xl != null) {
                 try {
                     length = Long.parseLong(xl);
                 } catch (NumberFormatException nfe) {}
             }
+            if (dn != null && length > 0)
+                name += " (" + dn + ' ' + DataHelper.formatSize2(length, false) + "B)";
+            else if (dn != null)
+                name += " (" + dn + ')';
+            else if (length > 0)
+                name += " (" + DataHelper.formatSize2(length, false) + "B)";
         } else if (url.startsWith(MAGGOT)) {
             // maggot://0691e40aae02e552cfcb57af1dca56214680c0c5:0b557bbdf8718e95d352fbe994dec3a383e2ede7
             ihash = url.substring(MAGGOT.length()).trim();
