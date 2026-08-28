@@ -1049,14 +1049,16 @@ public class TrackerClient implements Runnable {
         return false;
     }
     String path = url.getPath();
-    if (path == null || !path.startsWith("/"))
-        return false;
     String scheme = url.getScheme();
+    if ("http".equals(scheme)) {
+        if (path == null || !path.startsWith("/"))
+            return false;
+    }
     if (!("http".equals(scheme) || "udp".equals(scheme)))
         return false;
     String host = url.getHost();
     return host != null &&
-           (host.endsWith(".i2p") || host.equals("i2p"));
+           host.endsWith(".i2p");
   }
 
   /**

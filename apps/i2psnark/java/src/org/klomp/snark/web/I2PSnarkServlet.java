@@ -1761,6 +1761,7 @@ public class I2PSnarkServlet extends BasicServlet {
                         newPriv.add(aurl);
                         _manager.savePrivateTrackers(newPriv);
                     }
+                    _manager.addMessage(_t("Added tracker") + ' ' + DataHelper.escapeHTML(name));
                 } else {
                     _manager.addMessage(_t("Enter valid tracker name and URLs"));
                 }
