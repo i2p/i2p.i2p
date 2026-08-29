@@ -2588,10 +2588,15 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("\"></td></tr>\n");
 
         out.write("<tr><td>&nbsp;<td><span class=\"snarkAddInfo\">");
-        out.write(_t("You can also copy .torrent files to: {0}.", "<code>" + _manager.getDataDir().getAbsolutePath() + "</code>"));
-        out.write("\n");
+        File dir = _manager.getDataDir();
+        out.write(_t("You can also copy .torrent files to: {0}.", "<code>" + dir.getAbsolutePath() + "</code>"));
+        out.write(' ');
         out.write(_t("Removing a .torrent will cause it to stop."));
-        out.write("<br></span></table>\n" +
+        out.write("</span></td></tr>\n<tr><td>&nbsp;<td><span class=\"snarkAddInfo\">");
+        out.write(_t("Free disk space"));
+        out.write(": ");
+        out.write(formatSize(dir.getUsableSpace()));
+        out.write("</span></td></tr></table>\n" +
                   "</div></form></div>");
     }
 
