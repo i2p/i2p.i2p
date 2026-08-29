@@ -1095,18 +1095,12 @@ public class TrackerClient implements Runnable {
         return null;
     }
     if (host.endsWith(".i2p")) {
-        String path = url.getPath();
-        if (path == null || !path.startsWith("/"))
-            return null;
+        if ("http".equals(scheme)) {
+            String path = url.getPath();
+            if (path == null || !path.startsWith("/"))
+                return null;
+        }
         return ConvertToHash.getHash(host);
-    }
-    if (host.equals("i2p")) {
-        String path = url.getPath();
-        if (path == null || path.length() < 517 ||
-            !path.startsWith("/"))
-            return null;
-        String[] parts = DataHelper.split(path.substring(1), "[/\\?&;]", 2);
-        return ConvertToHash.getHash(parts[0]);
     }
     return null;
   }
