@@ -118,13 +118,17 @@ class FileLogWriter extends LogWriter {
             } catch (IOException ioe) {}
         }
         if (_manager.shouldGzip() && currentFile != null && currentFile.length() >= _manager.getMinGzipSize()) {
+            // we always start a non-daemon thread for this,
+            // because the thread we are in now is a daemon thread.
             Thread gzipper = new Gzipper(currentFile);
             if (threadGzipper) {
+                // rotate
                 gzipper.setPriority(Thread.MIN_PRIORITY);
-                gzipper.start();  // rotate
             } else {
-                gzipper.run();  // shutdown
+                // shutdown
+                gzipper.setPriority(Thread.MAX_PRIORITY - 1);
             }
+            gzipper.start();
         }
     }
 

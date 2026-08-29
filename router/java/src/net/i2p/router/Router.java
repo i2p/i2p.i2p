@@ -1713,7 +1713,12 @@ public class Router implements RouterClock.ClockShiftListener {
         changeState(State.FINAL_SHUTDOWN_3);
         clearCaches();
         _log.log(Log.CRIT, "Shutdown(" + exitCode + ") complete"  /* , new Exception("Shutdown") */ );
+        boolean waitForGzip = _context.logManager().shouldGzip();
         try { _context.logManager().shutdown(); } catch (Throwable t) { }
+        if (waitForGzip && !_killVMOnEnd) {
+            // ShutdownHook calls setKillVMOnEnd(false)
+            try { Thread.sleep(2000); } catch (InterruptedException ie) {}
+        }
         if (ALLOW_DYNAMIC_KEYS) {
             if (_context.getBooleanProperty(PROP_DYNAMIC_KEYS))
                 killKeys();
