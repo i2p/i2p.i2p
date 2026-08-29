@@ -631,6 +631,16 @@ th.snarkTorrentStatus {
      margin-right: 8px;
 }
 
+.mainsection .snarkTorrentInfo td.magnet {
+     max-width: 1000px;
+     overflow: clip;
+     padding-left: 3px !important;
+     padding-right: 20px !important;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+     user-select: all;
+}
+
 .snarkTorrentInfo input[type="submit"] {
      min-width: 85px;
 }

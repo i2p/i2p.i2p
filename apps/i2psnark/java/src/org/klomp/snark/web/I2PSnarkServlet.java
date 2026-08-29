@@ -3622,7 +3622,7 @@ public class I2PSnarkServlet extends BasicServlet {
                    .append(_t("Magnet"));
                 if (v2 != null)
                     buf.append(" (v1)");
-                buf.append("</b></td><td><a href=\"")
+                buf.append("</b></td><td class=\"magnet\"><a href=\"")
                    .append(link)
                    .append("\">")
                    .append(link)
@@ -3638,7 +3638,7 @@ public class I2PSnarkServlet extends BasicServlet {
                        .append(toImg("magnet", _t("Magnet link")))
                        .append("</a></td><td><b>")
                        .append(_t("Magnet"))
-                       .append(" (v2)</b></td><td><a href=\"")
+                       .append(" (v2)</b></td><td class=\"magnet\"><a href=\"")
                        .append(link)
                        .append("\">")
                        .append(link)
@@ -3651,7 +3651,7 @@ public class I2PSnarkServlet extends BasicServlet {
                        .append(toImg("magnet", _t("Magnet link")))
                        .append("</a></td><td><b>")
                        .append(_t("Magnet"))
-                       .append(" (v1+v2)</b></td><td><a href=\"")
+                       .append(" (v1+v2)</b></td><td class=\"magnet\"><a href=\"")
                        .append(link)
                        .append("\">")
                        .append(link)
