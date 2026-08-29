@@ -3071,8 +3071,8 @@ public class I2PSnarkServlet extends BasicServlet {
            .append(_t("Add")).append(":</b></td>" +
                    "<td><input type=\"text\" class=\"trackername\" name=\"tname\" spellcheck=\"false\"></td>" +
                    "<td><input type=\"text\" class=\"trackerhome\" name=\"thurl\" spellcheck=\"false\"></td>" +
-                   "<td><input type=\"radio\" class=\"optbox\" value=\"0\" name=\"add_tracker_type\" checked=\"checked\"></td>" +
-                   "<td><input type=\"radio\" class=\"optbox\" value=\"1\" name=\"add_tracker_type\"></td>" +
+                   "<td><input type=\"radio\" class=\"optbox\" value=\"0\" name=\"add_tracker_type\"></td>" +
+                   "<td><input type=\"radio\" class=\"optbox\" value=\"1\" name=\"add_tracker_type\" checked=\"checked\"></td>" +
                    "<td><input type=\"radio\" class=\"optbox\" value=\"2\" name=\"add_tracker_type\"></td>" +
                    "<td><input type=\"text\" class=\"trackerannounce\" name=\"taurl\" spellcheck=\"false\"></td></tr>\n" +
                    "<tr class=\"spacer\"><td colspan=\"7\">&nbsp;</td></tr>\n" +  // spacer
