@@ -20,11 +20,15 @@ public interface I2PSessionMuxedListener extends I2PSessionListener {
      * If you register via addSessionListener(),
      * this will be called only for the proto(s) and toport(s) you register for.
      *
-     * After this is called, the client should call receiveMessage(msgId).
-     * There is currently no method for the client to reject the message.
-     * If the client does not call receiveMessage() within a timeout period
+     * After this is called, the client should call receiveMessage(msgId)
+     * or (as of 0.9.71) discardMessage(msgId).
+     *
+     * If the client does not call receiveMessage() or discardMessage() within a timeout period
      * (currently 30 seconds), the session will delete the message and
      * log an error.
+     *
+     * Note: the size here is the compressed size. The actual decompressed message
+     * returned by session.receiveMessage() may be larger or smaller.
      *
      * @param session session to notify
      * @param msgId message number available
@@ -38,14 +42,18 @@ public interface I2PSessionMuxedListener extends I2PSessionListener {
      * Will be called only if you register via addMuxedSessionListener().
      * Will be called only for the proto(s) and toport(s) you register for.
      *
-     * After this is called, the client should call receiveMessage(msgId).
-     * There is currently no method for the client to reject the message.
-     * If the client does not call receiveMessage() within a timeout period
+     * After this is called, the client should call receiveMessage(msgId)
+     * or (as of 0.9.71) discardMessage(msgId).
+     *
+     * If the client does not call receiveMessage() or discardMessage() within a timeout period
      * (currently 30 seconds), the session will delete the message and
      * log an error.
      *
      * Only one listener is called for a given message, even if more than one
      * have registered. See I2PSessionDemultiplexer for details.
+     *
+     * Note: the size here is the compressed size. The actual decompressed message
+     * returned by session.receiveMessage() may be larger or smaller.
      *
      * @param session session to notify
      * @param msgId message number available

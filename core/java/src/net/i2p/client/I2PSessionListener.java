@@ -26,11 +26,15 @@ public interface I2PSessionListener {
     /** Instruct the client that the given session has received a message with
      * size # of bytes.
      *
-     * After this is called, the client should call receiveMessage(msgId).
-     * There is currently no method for the client to reject the message.
-     * If the client does not call receiveMessage() within a timeout period
+     * After this is called, the client should call receiveMessage(msgId)
+     * or (as of 0.9.71) discardMessage(msgId).
+     *
+     * If the client does not call receiveMessage() or discardMessage() within a timeout period
      * (currently 30 seconds), the session will delete the message and
      * log an error.
+     *
+     * Note: the size here is the compressed size. The actual decompressed message
+     * returned by session.receiveMessage() may be larger or smaller.
      *
      * @param session session to notify
      * @param msgId message number available
