@@ -1,3 +1,24 @@
+2026-08-29 zzz
+ * i2psnark:
+   - Show free disk space on add torrent form
+   - Validation fix for UDP URLs without a path part 2
+ * Router: Ensure log gzipper finishes after shutdown signal
+
+2026-08-28 zzz
+ * i2psnark:
+   - Use all trackers in magnet links, not just the first
+   - Allow adding udp tracker URLs without a path on config form
+
+2026-08-26 zzz
+ * I2CP: Add new discardMessage() to session API
+ * i2psnark: Compress UDP connect requests and KRPC DG1 messages
+
+2026-08-25 zzz
+ * i2psnark: Close all RAFs after creating or checking files
+
+2026-08-24 zzz
+ * i2psnark: Only call retransmitRequests() for non-fast peers
+
 2026-08-22 zzz
  * Build: Improve i2psnark standalone build
  * i2psnark:
