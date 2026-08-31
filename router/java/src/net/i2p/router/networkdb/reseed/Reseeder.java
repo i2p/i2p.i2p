@@ -117,9 +117,10 @@ public class Reseeder {
         //
         // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
         // ----------------------------------           ------------------------     -------------------------     ---------------
+        "https://reseed.kiota.ch/"            + ',' +   // damian.buho_at_proton.me.crt  // CA
         "https://waw01.i2p-reseed.hosted-by.skhron.eu/" + ',' +   // freedompeer_at_skhron.eu  // CA
         "https://sto01.i2p-reseed.hosted-by.skhron.eu/" + ',' +   // freedompeer_at_skhron.eu  // CA
-        "https://i2p.ntp.poweredbyberlin.de/" + ',' +   // reseedserver_at_mail.i2p.crt  // CA
+        //"https://i2p.ntp.poweredbyberlin.de/" + ',' +   // reseedserver_at_mail.i2p.crt  // CA
         "https://spiral.likogan.dev/"         + ',' +   // admin_at_likogan.dev.crt  // CA
         "https://reseed.sahil.world/"         + ',' +   // sahil_at_mail.i2p.crt  // CA
         "https://i2p.diyarciftci.xyz/"        + ',' +   // diyarciftci_at_protonmail.com.crt  // CA
