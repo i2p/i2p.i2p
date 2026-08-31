@@ -3110,6 +3110,25 @@ public class I2PSnarkServlet extends BasicServlet {
         }
         try {
             MagnetURI magnet = new MagnetURI(_manager.util(), url);
+            long len = magnet.getLength();
+            if (len > 0) {
+                // if magnet has a xl param, check available space now
+                File dd = dataDir != null ? dataDir : _manager.getDataDir();
+                long avail = dd.getUsableSpace();
+                if (avail < len) {
+                    StringBuilder buf = new StringBuilder();
+                    buf.append(_t("Not enough disk space for torrent"));
+                    buf.append(" (");
+                    buf.append(DataHelper.formatSize2(len, false));
+                    buf.append("B) - ");
+                    buf.append(_t("Free disk space"));
+                    buf.append(": ");
+                    buf.append(DataHelper.formatSize2(avail, false));
+                    buf.append('B');
+                    _manager.addMessage(buf.toString());
+                    return;
+                }
+            }
             _manager.addMagnet(magnet, true, true, dataDir, null);
         } catch (IllegalArgumentException iae) {
             _manager.addMessage(_t("Invalid magnet URL {0}", url));
