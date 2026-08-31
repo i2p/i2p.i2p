@@ -3,6 +3,7 @@ package org.klomp.snark;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +104,8 @@ abstract class ExtensionHandler {
             BEValue bev = dec.bdecodeMap();
             Map<String, BEValue> map = bev.getMap();
             peer.setHandshakeMap(map);
-            Map<String, BEValue> msgmap = map.get("m").getMap();
+            BEValue m = map.get("m");
+            Map<String, BEValue> msgmap = m != null ? m.getMap() : Collections.emptyMap();
 
             if (log.shouldLog(Log.DEBUG))
                 log.debug("Peer " + peer + " supports extensions: " + msgmap.keySet());
