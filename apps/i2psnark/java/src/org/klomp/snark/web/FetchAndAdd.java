@@ -163,8 +163,10 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
             AtomicLong len = new AtomicLong();
             String name = MetaInfo.getNameAndInfoHash(in, fileInfoHash, len);
             try { in.close(); } catch (IOException ioe) {}
-            if (!checkSize(len.get(), _dataDir))
+            if (!checkSize(len.get(), _dataDir)) {
+                stopTorrent();
                 return;
+            }
             Snark snark = _mgr.getTorrentByInfoHash(fileInfoHash);
             if (snark != null) {
                 _mgr.addMessage(_t("Torrent with this info hash is already running: {0}", snark.getBaseName()));
