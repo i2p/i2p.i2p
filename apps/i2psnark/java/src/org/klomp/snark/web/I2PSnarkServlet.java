@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -1178,8 +1179,11 @@ public class I2PSnarkServlet extends BasicServlet {
                         // test that it's a valid torrent file, and get the hash to check for dups
                         in = new FileInputStream(tmp);
                         byte[] fileInfoHash = new byte[20];
-                        String name = MetaInfo.getNameAndInfoHash(in, fileInfoHash);
+                        AtomicLong len = new AtomicLong();
+                        String name = MetaInfo.getNameAndInfoHash(in, fileInfoHash, len);
                         try { in.close(); } catch (IOException ioe) {}
+                        if (!checkSize(len.get(), dd))
+                            return;
                         Snark snark = _manager.getTorrentByInfoHash(fileInfoHash);
                         if (snark != null) {
                             _manager.addMessage(_t("Torrent with this info hash is already running: {0}", snark.getBaseName()));
@@ -1282,8 +1286,11 @@ public class I2PSnarkServlet extends BasicServlet {
                             // test that it's a valid torrent file, and get the hash to check for dups
                             in = new FileInputStream(file);
                             byte[] fileInfoHash = new byte[20];
-                            String name = MetaInfo.getNameAndInfoHash(in, fileInfoHash);
+                            AtomicLong len = new AtomicLong();
+                            String name = MetaInfo.getNameAndInfoHash(in, fileInfoHash, len);
                             try { in.close(); } catch (IOException ioe) {}
+                            if (!checkSize(len.get(), dd))
+                                return;
                             Snark snark = _manager.getTorrentByInfoHash(fileInfoHash);
                             if (snark != null) {
                                 _manager.addMessage(_t("Torrent with this info hash is already running: {0}", snark.getBaseName()));
@@ -3111,28 +3118,42 @@ public class I2PSnarkServlet extends BasicServlet {
         try {
             MagnetURI magnet = new MagnetURI(_manager.util(), url);
             long len = magnet.getLength();
-            if (len > 0) {
-                // if magnet has a xl param, check available space now
-                File dd = dataDir != null ? dataDir : _manager.getDataDir();
-                long avail = dd.getUsableSpace();
-                if (avail < len) {
-                    StringBuilder buf = new StringBuilder();
-                    buf.append(_t("Not enough disk space for torrent"));
-                    buf.append(" (");
-                    buf.append(DataHelper.formatSize2(len, false));
-                    buf.append("B) - ");
-                    buf.append(_t("Free disk space"));
-                    buf.append(": ");
-                    buf.append(DataHelper.formatSize2(avail, false));
-                    buf.append('B');
-                    _manager.addMessage(buf.toString());
-                    return;
-                }
-            }
+            if (!checkSize(len, dataDir))
+                return;
             _manager.addMagnet(magnet, true, true, dataDir, null);
         } catch (IllegalArgumentException iae) {
             _manager.addMessage(_t("Invalid magnet URL {0}", url));
         }
+    }
+
+    /**
+     *  Will this length fit in this directory?
+     *
+     *  @param len size of data
+     *  @param dataDir null to default to snark data directory
+     *  @return true if we have room
+     *  @since 0.9.71
+     */
+    private boolean checkSize(long len, File dataDir) {
+        if (len > 0) {
+            if (dataDir == null)
+                dataDir = _manager.getDataDir();
+            long avail = dataDir.getUsableSpace();
+            if (avail < len) {
+                StringBuilder buf = new StringBuilder();
+                buf.append(_t("Not enough disk space for torrent"));
+                buf.append(" (");
+                buf.append(DataHelper.formatSize2(len, false));
+                buf.append("B) - ");
+                buf.append(_t("Free disk space"));
+                buf.append(": ");
+                buf.append(DataHelper.formatSize2(avail, false));
+                buf.append('B');
+                _manager.addMessage(buf.toString());
+                return false;
+            }
+        }
+        return true;
     }
 
     /** copied from ConfigTunnelsHelper */

@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 import gnu.getopt.Getopt;
 
@@ -429,13 +430,15 @@ public class MetaInfo
   }
 
   /**
-   * Efficiently returns the name and the 20 byte SHA1 hash of the info dictionary in a torrent file
+   * Efficiently returns the name and the 20 byte SHA1 hash of the info dictionary in a torrent file,
+   * and approximate total length.
    * Caller must close stream.
    *
    * @param infoHashOut 20-byte out parameter
+   * @param lengthOut out parameter approximate, not exact
    * @since 0.8.5
    */
-  public static String getNameAndInfoHash(InputStream in, byte[] infoHashOut) throws IOException {
+  public static String getNameAndInfoHash(InputStream in, byte[] infoHashOut, AtomicLong lengthOut) throws IOException {
       BDecoder bd = new BDecoder(in);
       Map<String, BEValue> m = bd.bdecodeMap().getMap();
       BEValue ibev = m.get("info");
@@ -445,6 +448,17 @@ public class MetaInfo
       BEValue rvbev = i.get("name");
       if (rvbev == null)
           throw new InvalidBEncodingException("Missing name");
+      BEValue blen = i.get("length");
+      long len = 0;
+      if (blen != null) {
+          len = blen.getLong();
+      } else {
+          blen = i.get("piece length");
+          BEValue pcs = i.get("pieces");
+          if (blen != null && pcs != null)
+              len = blen.getLong() * (pcs.getBytes().length / 20);
+      }
+      lengthOut.set(len);
       byte[] h = bd.get_special_map_digest();
       System.arraycopy(h, 0, infoHashOut, 0, 20);
       return rvbev.getString();

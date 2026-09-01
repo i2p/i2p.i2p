@@ -8,6 +8,7 @@ package org.klomp.snark.web;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocketEepGet;
@@ -159,8 +160,11 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
         try {
             in = new FileInputStream(file);
             byte[] fileInfoHash = new byte[20];
-            String name = MetaInfo.getNameAndInfoHash(in, fileInfoHash);
+            AtomicLong len = new AtomicLong();
+            String name = MetaInfo.getNameAndInfoHash(in, fileInfoHash, len);
             try { in.close(); } catch (IOException ioe) {}
+            if (!checkSize(len.get(), _dataDir))
+                return;
             Snark snark = _mgr.getTorrentByInfoHash(fileInfoHash);
             if (snark != null) {
                 _mgr.addMessage(_t("Torrent with this info hash is already running: {0}", snark.getBaseName()));
@@ -196,6 +200,36 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
         } finally {
             try { if (in != null) in.close(); } catch (IOException ioe) {}
         }
+    }
+
+    /**
+     *  Will this length fit in this directory?
+     *
+     *  @param len size of data
+     *  @param dataDir null to default to snark data directory
+     *  @return true if we have room
+     *  @since 0.9.71
+     */
+    private boolean checkSize(long len, File dataDir) {
+        if (len > 0) {
+            if (dataDir == null)
+                dataDir = _mgr.getDataDir();
+            long avail = dataDir.getUsableSpace();
+            if (avail < len) {
+                StringBuilder buf = new StringBuilder();
+                buf.append(_t("Not enough disk space for torrent"));
+                buf.append(" (");
+                buf.append(DataHelper.formatSize2(len, false));
+                buf.append("B) - ");
+                buf.append(_t("Free disk space"));
+                buf.append(": ");
+                buf.append(DataHelper.formatSize2(avail, false));
+                buf.append('B');
+                _mgr.addMessage(buf.toString());
+                return false;
+            }
+        }
+        return true;
     }
 
     // Snark overrides so all the buttons and stats on the web page work
