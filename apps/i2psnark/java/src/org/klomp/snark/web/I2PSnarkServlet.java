@@ -3419,6 +3419,7 @@ public class I2PSnarkServlet extends BasicServlet {
                    "<link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">\n");
         if (showPriority)
             buf.append("<script src=\"").append(_contextPath).append(WARBASE + "js/folder.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
+        buf.append("<script src=\"").append(_contextPath).append(WARBASE + "js/playlist.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
         buf.append("</head><body>\n" +
                    "<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"" +
                    " class=\"snarkNav nav_main\">");
@@ -4037,7 +4038,34 @@ public class I2PSnarkServlet extends BasicServlet {
 
         // playlist button
         if (hasCompleteAudio(fileList, storage, remainingArray)) {
-            buf.append("<tr><td colspan=\"" + (showPriority ? '5' : '4') + "\" class=\"ParentDir\">" +
+            // js play buttons
+            // js will initialize playall to control (visible)
+            buf.append("<tr><td class=\"snarkFileIcon\" colspan=\"2\">\n");
+            buf.append("<a class=\"controld script\" id=\"playall\" href=\"#\">")
+               .append(toThemeImg("start_all")).append(_t("Play All"))
+               .append("</a>\n");
+            //buf.append("<a class=\"controld script\" id=\"playprev\" href=\"#\">").append(toImg("cancel")).append(_t("Play Previous")).append("</a>\n");
+            String alt = _t("Play Previous");
+            buf.append("<a class=\"controld script\" id=\"playprev\" href=\"#\">")
+               .append(toThemeImg("previous", alt, alt))
+               .append("</a>\n");
+            //buf.append("<a class=\"controld script\" id=\"playpause\" href=\"#\">").append(toImg("cancel")).append(_t("Pause")).append("</a>\n");
+            alt = _t("Pause");
+            buf.append("<a class=\"controld script\" id=\"playpause\" href=\"#\">")
+               .append(toThemeImg("cancel", alt, alt))
+               .append("</a>\n");
+            //buf.append("<a class=\"controld script\" id=\"playresume\" href=\"#\">").append(toImg("cancel")).append(_t("Resume")).append("</a>\n");
+            alt = _t("Resume");
+            buf.append("<a class=\"controld script\" id=\"playresume\" href=\"#\">")
+               .append(toThemeImg("recheck", alt, alt))
+               .append("</a>\n");
+            //buf.append("<a class=\"controld script\" id=\"playnext\" href=\"#\">").append(toImg("cancel")).append(_t("Play Next")).append("</a>\n");
+            alt = _t("Play Next");
+            buf.append("<a class=\"controld script\" id=\"playnext\" href=\"#\">")
+               .append(toThemeImg("next", alt, alt))
+               .append("</a>\n");
+            buf.append("<span id=\"playing\"></span>\n");
+            buf.append("<td class=\"snarkFileSize\" colspan=\"" + (showPriority ? '3' : '2') + "\">" +
                        "<a href=\"").append(base).append("?playlist");
             if (sortParam != null && !"0".equals(sortParam) && !"1".equals(sortParam))
                 buf.append("&amp;sort=").append(sortParam);
