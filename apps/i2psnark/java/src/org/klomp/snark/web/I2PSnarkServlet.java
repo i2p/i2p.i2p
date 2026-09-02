@@ -4049,6 +4049,7 @@ public class I2PSnarkServlet extends BasicServlet {
         boolean showSaveButton = false;
         boolean rowEven = true;
         boolean inOrder = storage != null && storage.getInOrder();
+        int audioindex = 0;
         for (Sorters.FileAndIndex fai : fileList)
         {
             //String encoded = encodePath(ls[i].getName());
@@ -4129,7 +4130,8 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (isAudio || isVideo) {
                     // HTML5
                     if (isAudio)
-                        buf.append("<audio preload=\"metadata\" class=\"audio\" audioindex=\"").append(audioindex++).append('"');
+                        buf.append("<audio preload=\"metadata\" class=\"audio\" audioindex=\"").append(audioindex++)
+                           .append("\" audioname=\"").append(DataHelper.escapeHTML(item.getName())).append('"');
                     else
                         buf.append("<div class=\"video-wrapper\"><video class=\"video\"");
                     buf.append(" loading=\"lazy\" controls><source src=\"").append(ppath).append("\" type=\"").append(mime).append("\">");
