@@ -3909,7 +3909,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (isAudio || isVideo) {
                     // HTML5
                     if (isAudio)
-                        buf.append("<audio");
+                        buf.append("<audio preload=\"metadata\"");
                     else
                         buf.append("<div class=\"video-wrapper\"><video class=\"video\"");
                     // strip trailing slash
@@ -4129,10 +4129,10 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (isAudio || isVideo) {
                     // HTML5
                     if (isAudio)
-                        buf.append("<audio");
+                        buf.append("<audio preload=\"metadata\" class=\"audio\" audioindex=\"").append(audioindex++).append('"');
                     else
                         buf.append("<div class=\"video-wrapper\"><video class=\"video\"");
-                    buf.append(" controls><source src=\"").append(ppath).append("\" type=\"").append(mime).append("\">");
+                    buf.append(" loading=\"lazy\" controls><source src=\"").append(ppath).append("\" type=\"").append(mime).append("\">");
                 }
                 buf.append("<a href=\"").append(ppath).append("\">");
                 if (mime.startsWith("image/")) {
