@@ -31,8 +31,9 @@ class SAMv3DatagramSession extends SAMDatagramSession implements Session, SAMDat
 	public String getNick() { return nick; }
 
 	/**
-	 *   build a DatagramSession according to informations registered
-	 *   with the given nickname
+	 * Build a DatagramSession according to information registered
+	 * with the given nickname.
+	 * Listens on ALL ports and protocols.
 	 *
 	 * Caller MUST call start().
 	 *
@@ -70,6 +71,7 @@ class SAMv3DatagramSession extends SAMDatagramSession implements Session, SAMDat
 	 * Caller MUST call start().
 	 *
 	 * @param nick nickname of the session
+	 * @param listenProtocol I2PSession.PROTO_xxx
 	 * @param version datagram version 1/2/3
 	 * @throws IOException
 	 * @throws DataFormatException
@@ -77,9 +79,9 @@ class SAMv3DatagramSession extends SAMDatagramSession implements Session, SAMDat
 	 * @since 0.9.25
 	 */
 	public SAMv3DatagramSession(String nick, Properties props, SAMv3Handler handler, I2PSession isess,
-	                            int listenPort, SAMv3DatagramServer dgServer, int version) 
+	                            int listenProtocol, int listenPort, SAMv3DatagramServer dgServer, int version)
 			throws IOException, DataFormatException, I2PSessionException {
-		super(isess, props, listenPort, null, version);  // to be replaced by this
+		super(isess, props, listenProtocol, listenPort, null, version);  // to be replaced by this
 		this.nick = nick ;
 		this.recv = this ;  // replacement
 		this.server = dgServer;

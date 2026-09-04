@@ -45,6 +45,7 @@ abstract class SAMMessageSession implements SAMMessageSess {
 
     /**
      * Initialize a new SAM message-based session.
+     * Listens on ALL ports and protocols.
      *
      * @param dest Base64-encoded destination and private keys,
      *             and optional offline signature section (same format as PrivateKeyFile)
@@ -59,6 +60,7 @@ abstract class SAMMessageSession implements SAMMessageSess {
 
     /**
      * Initialize a new SAM message-based session.
+     * Listens on ALL ports and protocols.
      *
      * @param destStream Input stream containing the binary destination and private keys,
      *                   and optional offline signature section (same format as PrivateKeyFile)
