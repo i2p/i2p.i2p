@@ -955,6 +955,8 @@ public class Storage implements Closeable
    *  @since 0.9.15
    */
   private String optFilterName(String name) {
+      if (name.equals(".") || name.equals("..") || name.equals(" ") || name.length() == 0)
+          return "_";
       if (_preserveFileNames)
           return name;
       return filterName(name);
@@ -975,7 +977,7 @@ public class Storage implements Closeable
     String rv = _filterNameCache.get(name);
     if (rv != null)
         return rv;
-    if (name.equals(".") || name.equals(" ") || name.length() == 0) {
+    if (name.equals(".") || name.equals("..") || name.equals(" ") || name.length() == 0) {
         rv = "_";
     } else {
         rv = name;
