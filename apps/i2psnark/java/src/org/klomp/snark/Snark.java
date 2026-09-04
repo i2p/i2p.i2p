@@ -238,7 +238,11 @@ public class Snark
             boolean shouldPreserve = completeListener != null && completeListener.getSavedPreserveNamesSetting(this);
             if (baseFile == null) {
                 String base = meta.getName();
-                if (!shouldPreserve) {
+                if (shouldPreserve) {
+                    if (base.equals(".") || base.equals("..") || base.equals(" ") || base.length() == 0) {
+                        fatal("Bad torrent name \"" + base + '"');
+                    }
+                } else {
                     String filtered = Storage.filterName(base);
                     if (!filtered.equals(base)) {
                         File f1 = new File(rootDataDir, base);
