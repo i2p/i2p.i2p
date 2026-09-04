@@ -106,8 +106,9 @@ public class BDecoder
    * bencoded value or the stream isn't a bencoded stream at all.
    * @throws IOException when somthing bad happens with the stream
    * to read from.
+   * @throws StackOverflowError
    */
-  public static BEValue bdecode(InputStream in) throws IOException
+  public static BEValue bdecode(InputStream in) throws IOException, Throwable
   {
     return new BDecoder(in).bdecode();
   }
@@ -153,8 +154,10 @@ public class BDecoder
    * Gets the next indicator and returns either null when the stream
    * has ended or bdecodes the rest of the stream and returns the
    * appropriate BEValue encoded object.
+   *
+   * @throws StackOverflowError
    */
-  public BEValue bdecode() throws IOException
+  public BEValue bdecode() throws IOException, Throwable
   {
     indicator = getNextIndicator();
     if (indicator == -1)
@@ -271,8 +274,10 @@ public class BDecoder
    * Returns the next bencoded value on the stream and makes sure it
    * is a list. If it is not a list it will throw
    * InvalidBEncodingException.
+   *
+   * @throws StackOverflowError
    */
-  public BEValue bdecodeList() throws IOException
+  public BEValue bdecodeList() throws IOException, Throwable
   {
     int c = getNextIndicator();
     if (c != 'l')
@@ -296,8 +301,10 @@ public class BDecoder
    * Returns the next bencoded value on the stream and makes sure it
    * is a map (dictionary). If it is not a map it will throw
    * InvalidBEncodingException.
+   *
+   * @throws StackOverflowError
    */
-  public BEValue bdecodeMap() throws IOException
+  public BEValue bdecodeMap() throws IOException, Throwable
   {
     int c = getNextIndicator();
     if (c == '<')
@@ -381,7 +388,7 @@ public class BDecoder
    *  prints out the decoded data
    *  @since 0.9.14
    */
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Throwable {
     if (args.length != 1) {
         System.err.println("Usage: BDecoder file.torrent");
         System.exit(1);

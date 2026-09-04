@@ -181,7 +181,7 @@ public class MetaInfo
    * describing the torrent.
    * Caller must close the stream.
    */
-  public MetaInfo(InputStream in) throws IOException
+  public MetaInfo(InputStream in) throws IOException, Throwable
   {
     this(new BDecoder(in));
   }
@@ -190,7 +190,7 @@ public class MetaInfo
    * Creates a new MetaInfo from the given BDecoder.  The BDecoder
    * must have a complete dictionary describing the torrent.
    */
-  private MetaInfo(BDecoder be) throws IOException
+  private MetaInfo(BDecoder be) throws IOException, Throwable
   {
     // Note that evaluation order matters here...
     this(be.bdecodeMap().getMap());
@@ -440,7 +440,14 @@ public class MetaInfo
    */
   public static String getNameAndInfoHash(InputStream in, byte[] infoHashOut, AtomicLong lengthOut) throws IOException {
       BDecoder bd = new BDecoder(in);
-      Map<String, BEValue> m = bd.bdecodeMap().getMap();
+      Map<String, BEValue> m;
+      try {
+          m = bd.bdecodeMap().getMap();
+      } catch (IOException ioe) {
+          throw ioe;
+      } catch (Throwable t) {
+          throw new IOException(t);
+      }
       BEValue ibev = m.get("info");
       if (ibev == null)
           throw new InvalidBEncodingException("Missing info map");
@@ -839,7 +846,7 @@ public class MetaInfo
   }
 
   /** @since 0.8.5 */
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Throwable {
       boolean error = false;
       String created_by = null;
       String announce = null;

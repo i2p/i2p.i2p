@@ -69,7 +69,7 @@ public class PeerID implements Comparable<PeerID>
    */
   @Deprecated
   public PeerID(BDecoder be)
-    throws IOException
+    throws IOException, Throwable
   {
     this(be.bdecodeMap().getMap());
   }

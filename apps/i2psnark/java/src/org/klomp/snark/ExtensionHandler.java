@@ -196,7 +196,7 @@ abstract class ExtensionHandler {
                 peer.shouldRequest(state.chunkSize(chk));
                 sendRequest(peer, chk);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (log.shouldLog(Log.WARN))
                 log.warn("Handshake exception from " + peer, e);
         }
@@ -279,7 +279,7 @@ abstract class ExtensionHandler {
                     log.warn("Got unknown metadata msg from " + peer);
                 peer.disconnect(false);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (log.shouldLog(Log.INFO))
                 log.info("Metadata ext. msg. exception from " + peer, e);
             // fatal ?
@@ -372,7 +372,7 @@ abstract class ExtensionHandler {
             }
             // could include ourselves, listener must remove
             listener.gotPeers(peer, peers);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (log.shouldLog(Log.INFO))
                 log.info("PEX msg exception from " + peer, e);
             //peer.disconnect(false);
@@ -394,7 +394,7 @@ abstract class ExtensionHandler {
             int qport = map.get("port").getInt();
             int rport = map.get("rport").getInt();
             listener.gotPort(peer, qport, rport);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (log.shouldLog(Log.INFO))
                 log.info("DHT msg exception from " + peer, e);
             //peer.disconnect(false);
@@ -492,7 +492,7 @@ abstract class ExtensionHandler {
                 if (log.shouldLog(Log.INFO))
                     log.info("Unknown comment msg type " + type + " from " + peer);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (log.shouldLog(Log.INFO))
                 log.info("Comment msg exception from " + peer, e);
             //peer.disconnect(false);

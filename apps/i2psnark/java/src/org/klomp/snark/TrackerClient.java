@@ -628,7 +628,7 @@ public class TrackerClient implements Runnable {
                         }
                     }
                   }
-                catch (IOException ioe)
+                catch (Throwable ioe)
                   {
                     // Probably not fatal (if it doesn't last to long...)
                     if (_log.shouldLog(Log.WARN))
@@ -884,6 +884,7 @@ public class TrackerClient implements Runnable {
             }
         }
         catch(IOException ioe) { /* ignored */ }
+        catch(Throwable t) { /* ignored */ }
         tr.reset();
      }
   }
@@ -898,7 +899,7 @@ public class TrackerClient implements Runnable {
   private TrackerInfo doRequest(TCTracker tr, String infoHash,
                                 String peerID, long uploaded,
                                 long downloaded, long left, String event)
-    throws IOException
+    throws IOException, Throwable
   {
     StringBuilder buf = new StringBuilder(512);
     buf.append(tr.announce);

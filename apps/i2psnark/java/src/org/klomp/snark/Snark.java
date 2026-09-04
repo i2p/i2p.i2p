@@ -217,6 +217,8 @@ public class Snark
           fatal("Cannot open '" + torrent + "'", ioe);
       } catch (OutOfMemoryError oom) {
           fatalRouter("ERROR - Out of memory, cannot create torrent " + torrent + ": " + oom.getMessage(), oom);
+      } catch (Throwable t) {
+          fatalRouter("ERROR - cannot create torrent " + torrent + ": " + t.getMessage(), t);
       } finally {
           if (in != null)
               try { in.close(); } catch (IOException ioe) {}

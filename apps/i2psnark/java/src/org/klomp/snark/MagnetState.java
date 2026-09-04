@@ -163,7 +163,7 @@ class MagnetState {
      *  @return true if this was the last piece
      *  @throws NullPointerException IllegalArgumentException, IOException, ...
      */
-    public boolean saveChunk(int chunk, byte[] data, int off, int length) throws Exception {
+    public boolean saveChunk(int chunk, byte[] data, int off, int length) throws Throwable {
         if (!isInitialized)
             throw new IllegalArgumentException("not initialized");
         if (chunk < 0 || chunk >= totalChunks)
@@ -187,7 +187,7 @@ class MagnetState {
      *  @return true if this was the last piece
      *  @throws NullPointerException IllegalArgumentException, IOException, ...
      */
-    private MetaInfo buildMetaInfo() throws Exception {
+    private MetaInfo buildMetaInfo() throws Throwable {
         // top map has nothing in it but the info map (no announce)
         Map<String, BEValue> map = new HashMap<String, BEValue>();
         InputStream is = new ByteArrayInputStream(metainfoBytes);

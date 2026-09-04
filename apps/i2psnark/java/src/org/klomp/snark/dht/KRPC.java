@@ -1021,7 +1021,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             ByteArrayInputStream bais = new ByteArrayInputStream(payload);
             try {
                 _log.debug("Sending to: " + dest.calculateHash() + ' ' + BDecoder.bdecode(bais).toString());
-            } catch (IOException ioe) {}
+            } catch (Throwable ioe) {}
         }
 
         // Always send query port, peer will increment for unsigned replies
@@ -1119,7 +1119,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         } catch (ClassCastException e) {
         } catch (NullPointerException e) {
        ***/
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Receive error for message", e);
         }
