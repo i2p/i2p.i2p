@@ -4,6 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -218,6 +220,20 @@ public class MagnetURI {
      *  @since 0.9.71 moved from I2PSnarkServlet
      */
     public static String toMagnetLink(byte[] ih, byte[] ih2, String announce, String basename, long length) {
+        List<String> alist = announce != null ? Collections.singletonList(announce) : null;
+        return toMagnetLink(ih, ih2, alist, basename, length);
+    }
+
+    /**
+     *  @param ih 20 or 32 bytes
+     *  @param ih 32 bytes or null
+     *  @param announces may be null
+     *  @param basename may be null. NOT URL-escaped.
+     *  @param length 0 if unknown
+     *  @return html and URL escaped
+     *  @since 0.9.71 moved from I2PSnarkServlet
+     */
+    public static String toMagnetLink(byte[] ih, byte[] ih2, Collection<String> announces, String basename, long length) {
         if ((ih.length != 20 && ih.length != 32) ||
             (ih2 != null && ih2.length != 32))
             throw new IllegalArgumentException();
@@ -227,8 +243,11 @@ public class MagnetURI {
            .append(hex);
         if (ih2 != null)
             buf.append("&amp;").append(MAGNET_V2).append(I2PSnarkUtil.toHex(ih2));
-        if (announce != null)
-            buf.append("&amp;tr=").append(announce);
+        if (announces != null) {
+            for (String a : announces) {
+                buf.append("&amp;tr=").append(DataHelper.escapeHTML(a));
+            }
+        }
         if (basename != null) {
             buf.append("&amp;dn=");
             URIUtil.encodePath(buf, basename);

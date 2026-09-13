@@ -3511,6 +3511,7 @@ public class I2PSnarkServlet extends BasicServlet {
 
             long[] dates = _manager.getSavedAddedAndCompleted(snark);
             String announce = null;
+            Set<String> annlist = new TreeSet<String>();
             if (meta != null && !showEdit) {
                 announce = meta.getAnnounce();
                 if (announce == null)
@@ -3529,7 +3530,6 @@ public class I2PSnarkServlet extends BasicServlet {
                     buf.append("</span></td></tr>");
                 }
                 List<List<String>> alist = meta.getAnnounceList();
-                Set<String> annlist = new TreeSet<String>();
                 if (alist != null && !alist.isEmpty()) {
                     // strip non-i2p trackers
                     for (List<String> alist2 : alist) {
@@ -3654,7 +3654,9 @@ public class I2PSnarkServlet extends BasicServlet {
                 // uncommment when implemented
                 //Hash v2 = meta != null ? meta.getInfoHashV2() : null;
                 Object v2 = null;
-                String link = MagnetURI.toMagnetLink(ih, announce, snark.getBaseName(), snark.getTotalLength());
+                if (announce != null)
+                    annlist.add(announce);
+                String link = MagnetURI.toMagnetLink(ih, null, annlist, snark.getBaseName(), snark.getTotalLength());
                 buf.append("<tr><td><a href=\"")
                    .append(link)
                    .append("\">")
