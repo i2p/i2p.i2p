@@ -212,6 +212,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
 //       , "CRSTRACK", "http://b4G9sCdtfvccMAXh~SaZrPqVQNyGQbhbYMbw6supq2XGzbjU4NcOmjFI0vxQ8w1L05twmkOvg5QERcX6Mi8NQrWnR0stLExu2LucUXg1aYjnggxIR8TIOGygZVIMV3STKH4UQXD--wz0BUrqaLxPhrm2Eh9Hwc8TdB6Na4ShQUq5Xm8D4elzNUVdpM~RtChEyJWuQvoGAHY3ppX-EJJLkiSr1t77neS4Lc-KofMVmgI9a2tSSpNAagBiNI6Ak9L1T0F9uxeDfEG9bBSQPNMOSUbAoEcNxtt7xOW~cNOAyMyGydwPMnrQ5kIYPY8Pd3XudEko970vE0D6gO19yoBMJpKx6Dh50DGgybLQ9CpRaynh2zPULTHxm8rneOGRcQo8D3mE7FQ92m54~SvfjXjD2TwAVGI~ae~n9HDxt8uxOecAAvjjJ3TD4XM63Q9TmB38RmGNzNLDBQMEmJFpqQU8YeuhnS54IVdUoVQFqui5SfDeLXlSkh4vYoMU66pvBfWbAAAA.i2p/tracker/announce.php=http://crstrack.i2p/tracker/"
 //       ,"Exotrack", "http://blbgywsjubw3d2zih2giokakhe3o2cko7jtte4risb3hohbcoyva.b32.i2p/announce.php=http://exotrack.i2p/"
        ,"DgTrack", "http://w7tpbzncbcocrqtwwm3nezhnnsw4ozadvi2hmvzdhrqzfxfum7wa.b32.i2p/a=http://opentracker.dg2.i2p/"
+       ,"DgTrack (UDP)", "udp://w7tpbzncbcocrqtwwm3nezhnnsw4ozadvi2hmvzdhrqzfxfum7wa.b32.i2p:6969/=http://opentracker.dg2.i2p/"
        // The following is ECDSA_SHA256_P256
 //last up Sep. 19 2020
        //,"TheBland", "http://s5ikrdyjwbcgxmqetxb3nyheizftms7euacuub2hic7defkh3xhq.b32.i2p/a=http://tracker.thebland.i2p/tracker/index.jsp"
@@ -224,7 +225,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
     };
     
     /** URL. This is our equivalent to router.utorrent.com for bootstrap */
-    public static final String DEFAULT_BACKUP_TRACKER = "http://opentracker.dg2.i2p/a";
+    public static final String DEFAULT_BACKUP_TRACKER = "udp://opentracker.dg2.i2p:6969/";
 
     /** URLs, comma-separated. Used for "announce to open trackers also" */
     private static final String DEFAULT_OPENTRACKERS = DEFAULT_BACKUP_TRACKER; // +
