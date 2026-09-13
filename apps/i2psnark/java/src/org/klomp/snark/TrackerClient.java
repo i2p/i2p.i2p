@@ -534,7 +534,7 @@ public class TrackerClient implements Runnable {
             for (TCTracker tr : trckrs) {
               if ((!stop) && (!tr.stop) &&
                   (completed || coordinator.needOutboundPeers() || !tr.started) &&
-                  (newlyCompleted || newlyGotMeta || System.currentTimeMillis() > tr.lastRequestTime + tr.interval))
+                  (newlyCompleted || newlyGotMeta || System.currentTimeMillis() > tr.lastResponseTime + tr.interval))
               {
                 try
                   {
@@ -665,8 +665,8 @@ public class TrackerClient implements Runnable {
                   }
               } else {
                   if (_log.shouldLog(Log.INFO))
-                      _log.info("Not announcing to " + tr.announce + " last announce was " +
-                               new Date(tr.lastRequestTime) + " interval is " + DataHelper.formatDuration(tr.interval));
+                      _log.info("Not announcing to " + tr.announce + " last reply was " +
+                               DataHelper.formatTime(tr.lastResponseTime) + " interval is " + DataHelper.formatDuration(tr.interval));
               }
               if ((!tr.stop) && maxSeenPeers < tr.seenPeers)
                   maxSeenPeers = tr.seenPeers;
@@ -943,6 +943,7 @@ public class TrackerClient implements Runnable {
         throw new IOException("No response from " + tr.host);
     if (fetched.length == 0)
         throw new IOException("No data from " + tr.host);
+    tr.lastResponseTime = System.currentTimeMillis();
     // The HTML check only works if we didn't exceed the maxium fetch size specified in get(),
     // otherwise we already threw an IOE.
     if (fetched[0] == '<')
@@ -997,6 +998,7 @@ public class TrackerClient implements Runnable {
         if (_log.shouldLog(Log.INFO))
             _log.info("TrackerClient response: " + info);
 
+        tr.lastResponseTime = System.currentTimeMillis();
         String failure = info.getFailureReason();
         if (failure != null)
             throw new IOException(failure);
@@ -1132,6 +1134,7 @@ public class TrackerClient implements Runnable {
       final int port;
       long interval;
       long lastRequestTime;
+      long lastResponseTime;
       String trackerProblems;
       boolean stop;
       boolean started;
@@ -1171,6 +1174,7 @@ public class TrackerClient implements Runnable {
        */
       public void reset() {
           lastRequestTime = 0;
+          lastResponseTime = 0;
           trackerProblems = null;
           stop = false;
           started = false;
