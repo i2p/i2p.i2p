@@ -57,7 +57,14 @@ public abstract class TransportUtil {
         IPV6_PREFERRED("preferIPv6"),
 
         /** IPv4 disabled */
-        IPV6_ONLY("only");
+        IPV6_ONLY("only"),
+
+        /**
+         *  Force enabled even if we don't have a public IP,
+         *  mainly for Docker with an IPv6 bridge
+         *  @since 0.9.71
+         */
+        IPV6_FORCE_ON("force");
 
         private final String cfgstr;
 
