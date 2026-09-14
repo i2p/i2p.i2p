@@ -758,6 +758,7 @@ public abstract class TransportImpl implements Transport {
 
                   default:
                   case IPV6_ENABLED:
+                  case IPV6_FORCE_ON:
                     adj = 0; break;
 
                   case IPV6_PREFERRED:
