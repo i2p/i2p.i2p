@@ -51,11 +51,15 @@ class PeerTestEvent extends SimpleTimer2.TimedEvent {
             boolean preferV4 = _lastTestIPv6;
             if (!configV4fw && (_forceRun & FORCE_IPV4) != 0 && sinceRunV4 >= MIN_TEST_FREQUENCY) {
                 locked_runTest(false);
-            } else if (!configV6fw && (_forceRun & FORCE_IPV6) != 0 && _transport.hasIPv6Address() && sinceRunV6 >= MIN_TEST_FREQUENCY) {
+            } else if (!configV6fw && (_forceRun & FORCE_IPV6) != 0 &&
+                       (_transport.hasIPv6Address() || _transport.getIPv6Config() == IPV6_FORCE_ON) &&
+                       sinceRunV6 >= MIN_TEST_FREQUENCY) {
                 locked_runTest(true);
             } else if (preferV4 && !configV4fw && sinceRunV4 >= TEST_FREQUENCY && _transport.getIPv6Config() != IPV6_ONLY) {
                 locked_runTest(false);
-            } else if (!configV6fw && _transport.hasIPv6Address() && sinceRunV6 >= TEST_FREQUENCY) {
+            } else if (!configV6fw &&
+                       (_transport.hasIPv6Address() || _transport.getIPv6Config() == IPV6_FORCE_ON) &&
+                       sinceRunV6 >= TEST_FREQUENCY) {
                 locked_runTest(true);
             } else if (!preferV4 && !configV4fw && sinceRunV4 >= TEST_FREQUENCY && _transport.getIPv6Config() != IPV6_ONLY) {
                 locked_runTest(false);

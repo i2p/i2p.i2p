@@ -232,9 +232,11 @@ public class PeerHelper extends HelperBase {
             boolean showIPv4 = connected.contains(AddressType.IPV4) &&
                                (ntcpConfig != TransportUtil.IPv6Config.IPV6_ONLY ||
                                 ssuConfig != TransportUtil.IPv6Config.IPV6_ONLY);
-            boolean showIPv6 = connected.contains(AddressType.IPV6) &&
-                               (ntcpConfig != TransportUtil.IPv6Config.IPV6_DISABLED ||
-                                ssuConfig != TransportUtil.IPv6Config.IPV6_DISABLED);
+            boolean showIPv6 = ntcpConfig == TransportUtil.IPv6Config.IPV6_FORCE_ON ||
+                               ssuConfig == TransportUtil.IPv6Config.IPV6_FORCE_ON ||
+                               (Addresses.isConnectedIPv6() &&
+                                (ntcpConfig != TransportUtil.IPv6Config.IPV6_DISABLED ||
+                                 ssuConfig != TransportUtil.IPv6Config.IPV6_DISABLED));
             StringBuilder buf = new StringBuilder(512);
             buf.append("<h3 id=\"transports\">").append(_t("Peer Connections")).append("</h3><table><tr><th>")
                .append(_t("Transport")).append("</th><th>")

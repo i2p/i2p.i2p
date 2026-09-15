@@ -806,6 +806,11 @@ public class UDPTransport extends TransportImpl {
                         _context.router().eventLog().addEvent(EventLog.CHANGE_IP, newIP);
                 }
             }
+            if (!hasv6 && getIPv6Config() == IPV6_FORCE_ON) {
+                setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_FIREWALLED, true);
+                // this must be after the setReachabilityStatus() call
+                _testEvent.forceRunSoon(true, 60*1000);
+            }
             if (save && !changes.isEmpty())
                 _context.router().saveConfig(changes, null);
         } else if (newPort > 0 && !bindToAddrs.isEmpty()) {
@@ -1490,9 +1495,10 @@ public class UDPTransport extends TransportImpl {
                     boolean rebuild = true;
                     if (isIPv6) {
                         // For IPv6, we only accept changes if this is one of our local addresses
+                        // or IPv6 is forced on and we don't have an address yet
                         Set<String> ipset = Addresses.getAddresses(false, true);
                         String ipstr = Addresses.toString(ourIP);
-                        if (!ipset.contains(ipstr)) {
+                        if ((getIPv6Config() != IPV6_FORCE_ON || !ipset.isEmpty()) && !ipset.contains(ipstr)) {
                             if (_log.shouldInfo())
                                 _log.info("New IPv6 address received but not one of our local addresses: " + ipstr, new Exception());
                             return false;
@@ -1653,14 +1659,14 @@ public class UDPTransport extends TransportImpl {
     
     /**
      * An IPv6 address is only valid if we are configured to support IPv6
-     * AND we have a public IPv6 address.
+     * AND we have a public IPv6 address, or have IPv6 configured to force on.
      *
      * @param addr may be null, returns false
      */
     public final boolean isValid(byte addr[]) {
         if (addr == null) return false;
         if (isPubliclyRoutable(addr) &&
-            (addr.length != 16 || _haveIPv6Address))
+            (addr.length != 16 || _haveIPv6Address || getIPv6Config() == IPV6_FORCE_ON))
             return true;
         return allowLocal();
     }
@@ -2971,7 +2977,7 @@ public class UDPTransport extends TransportImpl {
             if (config == IPV6_ONLY) {
                 caps = CAP_IPV6;
                 mtu = getSSU2MTU(true);
-            } else if (config != IPV6_DISABLED && hasIPv6Address()) {
+            } else if ((config != IPV6_DISABLED && hasIPv6Address()) || config == IPV6_FORCE_ON) {
                 caps = CAP_IPV4_IPV6;
                 mtu = getSSU2MTU(true);
             } else {
@@ -3098,8 +3104,7 @@ public class UDPTransport extends TransportImpl {
                 replaceAddress(addr);
                 if (!isIPv6 &&
                     getCurrentAddress(true) == null &&
-                    getIPv6Config() != IPV6_DISABLED &&
-                    hasIPv6Address()) {
+                    ((getIPv6Config() != IPV6_DISABLED && hasIPv6Address()) || getIPv6Config() == IPV6_FORCE_ON)) {
                     // Also make an empty "6" address
                     OrderedProperties opts = new OrderedProperties(); 
                     opts.setProperty(UDPAddress.PROP_CAPACITY, CAP_IPV6);
@@ -3322,7 +3327,7 @@ public class UDPTransport extends TransportImpl {
         Status status = getReachabilityStatus();
         TransportUtil.IPv6Config config = getIPv6Config();
         if (ipv6) {
-            if (!_haveIPv6Address)
+            if (!_haveIPv6Address && config != IPV6_FORCE_ON)
                 return false;
             if (config == IPV6_DISABLED)
                 return false;
@@ -3376,7 +3381,7 @@ public class UDPTransport extends TransportImpl {
         Status status = getReachabilityStatus();
         TransportUtil.IPv6Config config = getIPv6Config();
         if (ipv6) {
-            if (!_haveIPv6Address)
+            if (!_haveIPv6Address && config != IPV6_FORCE_ON)
                 return false;
             if (config == IPV6_DISABLED)
                 return false;
