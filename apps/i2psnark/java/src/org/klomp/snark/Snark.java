@@ -715,7 +715,8 @@ public class Snark
      *  @since 0.8.4
      */
     public void setTrackerSeenPeers(int p) {
-        trackerSeenPeers = p;
+        // protect against tracker bugs
+        trackerSeenPeers = Math.min(p, 999);
     }
 
     /**
