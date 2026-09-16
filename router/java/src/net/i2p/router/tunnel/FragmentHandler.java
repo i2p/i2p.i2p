@@ -101,6 +101,8 @@ class FragmentHandler {
     private final AtomicInteger _failed = new AtomicInteger();
     private final boolean _isInbound;
     
+    /** Maximum concurrent fragmented messages awaiting reassembly */
+    private static final int MAX_CONCURRENT_FRAGMENTED = 128;
     /** don't wait more than this long to completely receive a fragmented message */
     static long MAX_DEFRAGMENT_TIME = 45*1000;
     private static final ByteCache _cache = ByteCache.getInstance(512, TrivialPreprocessor.PREPROCESSED_SIZE);
@@ -406,6 +408,12 @@ class FragmentHandler {
             synchronized (_fragmentedMessages) {
                 msg = _fragmentedMessages.get(Long.valueOf(messageId));
                 if (msg == null) {
+                    if (_fragmentedMessages.size() >= MAX_CONCURRENT_FRAGMENTED) {
+                        if (_log.shouldWarn())
+                            _log.warn("Dropping msg " + messageId + " fragment 0 at tunnel endpoint, too many incomplete msgs");
+                        offset += size;
+                        return offset;
+                    }
                     msg = new FragmentedMessage(_context, messageId);
                     _fragmentedMessages.put(Long.valueOf(messageId), msg);
                 }
@@ -473,6 +481,12 @@ class FragmentHandler {
         synchronized (_fragmentedMessages) {
             msg = _fragmentedMessages.get(Long.valueOf(messageId));
             if (msg == null) {
+                if (_fragmentedMessages.size() >= MAX_CONCURRENT_FRAGMENTED) {
+                    if (_log.shouldWarn())
+                        _log.warn("Dropping msg " + messageId + " fragment " + fragmentNum + " at tunnel endpoint, too many incomplete msgs");
+                    offset += size;
+                    return offset;
+                }
                 msg = new FragmentedMessage(_context, messageId);
                 _fragmentedMessages.put(Long.valueOf(messageId), msg);
             }
