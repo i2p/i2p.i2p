@@ -31,6 +31,7 @@ import net.i2p.crypto.eddsa.math.Curve;
 import net.i2p.crypto.eddsa.math.GroupElement;
 import net.i2p.crypto.eddsa.math.ScalarOps;
 import net.i2p.crypto.eddsa.math.bigint.BigIntegerLittleEndianEncoding;
+import net.i2p.data.DataHelper;
 
 /**
  * Signing and verification for EdDSA.
@@ -322,14 +323,8 @@ public class EdDSAEngine extends Signature {
         GroupElement R = key.getParams().getB().doubleScalarMultiplyVariableTime(
                 ((EdDSAPublicKey) key).getNegativeA(), h, Sbyte);
 
-        // Variable time. This should be okay, because there are no secret
-        // values used anywhere in verification.
         byte[] Rcalc = R.toByteArray();
-        for (int i = 0; i < Rcalc.length; i++) {
-            if (Rcalc[i] != sigBytes[i])
-                return false;
-        }
-        return true;
+        return DataHelper.eqCT(Rcalc, 0, sigBytes, 0, Rcalc.length);
     }
 
     /**
