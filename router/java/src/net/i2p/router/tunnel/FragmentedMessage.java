@@ -48,12 +48,14 @@ class FragmentedMessage {
     /**
      * Receive a followup fragment, though one of these may arrive at the endpoint
      * prior to the fragment # 0.
+     * Caller must synch.
      *
      * @param fragmentNum sequence number within the message (1 - 63)
      * @param payload data for the fragment non-null
      * @param offset index into the payload where the fragment data starts (past headers/etc)
      * @param length how much past the offset should we snag?
      * @param isLast is this the last fragment in the message?
+     * @return ok, false if corrupt
      */
     public boolean receive(int fragmentNum, byte payload[], int offset, int length, boolean isLast) {
         if (fragmentNum <= 0 || fragmentNum >= MAX_FRAGMENTS) {
@@ -71,6 +73,9 @@ class FragmentedMessage {
                 _log.warn("Length is impossible (" + length + "/" + offset + " out of " + payload.length + ") for messageId " + _messageId);
             return false;
         }
+        // dup check
+        if (_fragments[fragmentNum] != null)
+            return true;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Receive message " + _messageId + " fragment " + fragmentNum + " with " + length + " bytes (last? " + isLast + ") offset = " + offset);
         // we should just use payload[] and use an offset/length on it
@@ -93,6 +98,7 @@ class FragmentedMessage {
     /**
      * Receive the first fragment (#0) and related metadata.  This may not be the first
      * one to arrive at the endpoint however.
+     * Caller must synch.
      *
      * @param payload data for the fragment non-null
      * @param offset index into the payload where the fragment data starts (past headers/etc)
@@ -100,6 +106,7 @@ class FragmentedMessage {
      * @param isLast is this the last fragment in the message?
      * @param toRouter what router is this destined for (may be null)
      * @param toTunnel what tunnel is this destined for (may be null)
+     * @return ok, false if corrupt
      */
     public boolean receive(byte payload[], int offset, int length, boolean isLast, Hash toRouter, TunnelId toTunnel) {
         if (length <= 0 || length > MAX_FRAGMENT_SIZE) {
@@ -112,6 +119,9 @@ class FragmentedMessage {
                 _log.warn("Length is impossible (" + length + "/" + offset + " out of " + payload.length + ") for messageId " + _messageId);
             return false;
         }
+        // dup check
+        if (_fragments[0] != null)
+            return true;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Receive message " + _messageId + " with " + length + " bytes (last? " + isLast + ") targetting " + toRouter + " / " + toTunnel + " offset=" + offset);
         ByteArray ba = _cache.acquire(); // new ByteArray(payload, offset, length); // new byte[length]);
