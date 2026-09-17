@@ -150,7 +150,6 @@ public class JSONRPC2Servlet extends HttpServlet {
             throws ServletException, IOException {
         setHeaders(httpServletResponse);
         PrintWriter out = httpServletResponse.getWriter();
-        // generate a random token httpServletResponse
 
         out.println("<html><head></head><body>");
         out.println("<p>I2PControl RPC Service version " + I2PControlVersion.VERSION + " : Running");
@@ -158,6 +157,8 @@ public class JSONRPC2Servlet extends HttpServlet {
             HttpSession session = httpServletRequest.getSession(true);
 
             out.println("<form method=\"POST\" action=\"password\">");
+
+            // generate token
             SecureRandom secureRandom = new SecureRandom();
             byte[] bytes = new byte[24];
             secureRandom.nextBytes(bytes);
