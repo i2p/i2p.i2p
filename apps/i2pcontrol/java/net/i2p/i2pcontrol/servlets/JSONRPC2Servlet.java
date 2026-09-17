@@ -23,7 +23,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
-
+import net.i2p.util.RandomSource;
 import net.i2p.i2pcontrol.I2PControlVersion;
 import net.i2p.i2pcontrol.security.SecurityManager;
 import net.i2p.i2pcontrol.servlets.jsonrpc2handlers.*;
@@ -159,9 +159,9 @@ public class JSONRPC2Servlet extends HttpServlet {
             out.println("<form method=\"POST\" action=\"password\">");
 
             // generate token
-            SecureRandom secureRandom = new SecureRandom();
+            RandomSource randomSource = _context.random();
             byte[] bytes = new byte[24];
-            secureRandom.nextBytes(bytes);
+            randomSource.nextBytes(bytes);
 
             String token = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
             session.setAttribute(TOKEN_ATTRIBUTE, token);
