@@ -88,4 +88,9 @@ public interface CompleteListener {
      * @since 0.9.62
      */
     public BandwidthListener getBandwidthListener();
+
+    /**
+     * @since 0.9.71
+     */
+    public void loadSavedFilePriorities(Snark snark);
 }

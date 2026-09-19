@@ -1068,6 +1068,14 @@ public class Snark
         coordinator.setWantedPieces();
   }
 
+  /**
+   * @since 0.9.71
+   */
+  public void loadSavedFilePriorities() {
+    if (completeListener != null)
+        completeListener.loadSavedFilePriorities(this);
+  }
+
   ///////////// End StorageListener methods
 
 

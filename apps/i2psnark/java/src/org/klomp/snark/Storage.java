@@ -591,7 +591,9 @@ public class Storage implements Closeable
 
   /**
    *  Set the file priorities array.
-   *  Only call this when stopped, but after check()
+   *  Only call this when stopped, may be called within check()
+   *  but only after _torrentFiles is initialized.
+   *
    *  @param p may be null
    *  @since 0.8.1
    */
@@ -857,14 +859,20 @@ public class Storage implements Closeable
                 else if (f.length() != len)
                     useSavedBitField = false;
             }
-          }
-
+        }
         // Sanity check for metainfo file.
         long metalength = metainfo.getTotalLength();
         if (total != metalength)
           throw new IOException("File lengths do not add up "
                                 + total + " != " + metalength);
-      }
+
+        // Now that we have the _torrentFiles list filled in,
+        // call through Snark to SnarkManager back to our setFilePriorites() and setInOrder(),
+        // so that if checkCreateFiles() triggers a config file save, the file priorities
+        // are not lost.
+        if (listener != null)
+            listener.loadSavedFilePriorities();
+    }
     if (useSavedBitField) {
       bitfield = savedBitField;
       needed = metainfo.getPieces() - bitfield.count();

@@ -1778,7 +1778,6 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
                     torrent = new Snark(_util, filename, null, -1, null, null, this,
                                         _peerCoordinatorSet, _connectionAcceptor,
                                         dataDir.getPath(), baseFile);
-                    loadSavedFilePriorities(torrent);
                     synchronized (_snarks) {
                         putSnark(filename, torrent);
                     }

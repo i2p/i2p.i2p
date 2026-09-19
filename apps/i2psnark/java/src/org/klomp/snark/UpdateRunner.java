@@ -327,6 +327,13 @@ class UpdateRunner implements UpdateTask, CompleteListener {
         return _smgr.getBandwidthListener();
     }
 
+    /**
+     * @since 0.9.71
+     */
+    public void loadSavedFilePriorities(Snark snark) {
+        _smgr.loadSavedFilePriorities(snark);
+    }
+
     //////// end CompleteListener methods
 
     private static String linkify(String url) {
