@@ -23,6 +23,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
+import net.i2p.util.RandomSource;
 
 import net.i2p.i2pcontrol.I2PControlVersion;
 import net.i2p.i2pcontrol.security.KeyStoreProvider;
@@ -35,6 +36,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,6 +45,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Base64;
 
 
 /**
@@ -62,6 +65,7 @@ public class JSONRPC2Servlet extends HttpServlet {
     private final RouterContext _context;
     private final boolean _isWebapp;
     private boolean _isHTTP, _isHTTPS;
+    private static final String TOKEN_ATTRIBUTE = "i2pcontrol.token";
 
     /**
      *  Webapp
@@ -150,7 +154,15 @@ public class JSONRPC2Servlet extends HttpServlet {
         out.println("<html><head></head><body>");
         out.println("<p>I2PControl RPC Service version " + I2PControlVersion.VERSION + " : Running");
 	if ("/password".equals(httpServletRequest.getServletPath())) {
+            HttpSession session = httpServletRequest.getSession(true);
             out.println("<form method=\"POST\" action=\"password\">");
+            // generate token
+            RandomSource randomSource = _context.random();
+            byte[] bytes = new byte[24];
+            randomSource.nextBytes(bytes);
+            String token = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+            session.setAttribute(TOKEN_ATTRIBUTE, token);
+            out.println("<input type=\"hidden\" name=\"token\" value=\"" + token + "\" />");
             if (_secMan.isDefaultPasswordValid()) {
                 out.println("<p>The current API password is the default, \"" + _secMan.DEFAULT_AUTH_PASSWORD + "\". You should change it.");
             } else {	
@@ -171,12 +183,23 @@ public class JSONRPC2Servlet extends HttpServlet {
 
     /** @since 0.12 */
     private void doPasswordChange(HttpServletRequest req, HttpServletResponse httpServletResponse) throws ServletException, IOException {
+        String token = req.getParameter("token");
+        HttpSession session = req.getSession(false);
+        Object sessionToken = session != null ? session.getAttribute(TOKEN_ATTRIBUTE) : null;
+
+        // check to see if our tokens match. Important in preventing CSRF attack
+        if (token == null || sessionToken == null || !token.equals(sessionToken)) {
+            setHeaders(httpServletResponse);
+            httpServletResponse.sendError(HttpServletResponse.SC_FORBIDDEN); // send forbidden response
+            return;
+        }
+
         setHeaders(httpServletResponse);
         PrintWriter out = httpServletResponse.getWriter();
         out.println("<html><head></head><body>");
         String pw = req.getParameter("password");
         if (pw == null)
-            pw = _secMan.DEFAULT_AUTH_PASSWORD;
+            pw = ""; // shouldn't do anything if the password is null
         else
             pw = pw.trim();
         String pw2 = req.getParameter("password2");
