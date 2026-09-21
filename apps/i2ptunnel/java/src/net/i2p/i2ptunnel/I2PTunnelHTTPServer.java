@@ -1082,7 +1082,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         for (Map.Entry<String, List<String>> e : headers.entrySet()) {
             String name = e.getKey();
             for(String val: e.getValue()) {
-                buf.append(name.trim()).append(": ").append(val.trim()).append("\r\n");
+                // Sanitize the header value
+                val = val.replace('\r', ' ').replace('\n', ' ').trim();
+                buf.append(name.trim()).append(": ").append(val).append("\r\n");
             }
         }
         buf.append("\r\n");
