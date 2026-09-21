@@ -3,7 +3,7 @@ ARG TARGETARCH
 # --- Single builder (Java bytecode is platform-independent) ---
 FROM debian:trixie-slim AS builder
 
-ARG ANT_VERSION="1.10.17"
+ARG ANT_VERSION="1.10.18"
 
 WORKDIR /tmp/build
 COPY --exclude=docker . .
