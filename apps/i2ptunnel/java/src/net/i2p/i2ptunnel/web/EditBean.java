@@ -66,7 +66,7 @@ public class EditBean extends IndexBean {
     }
 
     public String getPrivateKeyFile(int tunnel) {
-        return _helper.getPrivateKeyFile(tunnel);
+        return DataHelper.escapeHTML(_helper.getPrivateKeyFile(tunnel));
     }
 
     /**
@@ -74,7 +74,7 @@ public class EditBean extends IndexBean {
      *  @since 0.9.30
      */
     public String getAltPrivateKeyFile(int tunnel) {
-        return _helper.getAltPrivateKeyFile(tunnel);
+        return DataHelper.escapeHTML(_helper.getAltPrivateKeyFile(tunnel));
     }
     
 /****
@@ -330,7 +330,7 @@ public class EditBean extends IndexBean {
      *  @since 0.9.40
      */
     public String getFilterDefinition(int tunnel) {
-        return _helper.getFilterDefinition(tunnel);
+        return DataHelper.escapeHTML(_helper.getFilterDefinition(tunnel));
     }
     
     public String getJumpList(int tunnel) {

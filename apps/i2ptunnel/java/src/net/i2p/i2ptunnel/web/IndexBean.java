@@ -544,7 +544,7 @@ public class IndexBean {
     }
     
     public String getClientInterface(int tunnel) {
-        return _helper.getClientInterface(tunnel);
+        return DataHelper.escapeHTML(_helper.getClientInterface(tunnel));
     }
     
     public int getTunnelStatus(int tunnel) {
@@ -564,7 +564,7 @@ public class IndexBean {
     }
     
     public String getClientDestination(int tunnel) {
-        return _helper.getClientDestination(tunnel);
+        return DataHelper.escapeHTML(_helper.getClientDestination(tunnel));
     }
     
     /**
