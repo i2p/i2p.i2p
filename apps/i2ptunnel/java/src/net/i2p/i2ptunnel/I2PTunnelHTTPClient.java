@@ -1570,6 +1570,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                      String targetRequest, String referer) throws IOException {
         if(outs == null)
             return;
+        targetRequest = DataHelper.escapeHTML(targetRequest);
+        referer = DataHelper.escapeHTML(referer);
         String idn = decodeIDNHost(destination);
         Writer out = new BufferedWriter(new OutputStreamWriter(outs, "UTF-8"));
         String header = getErrorPage("ahelper-new", ERR_AHELPER_NEW);
