@@ -1638,6 +1638,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                      String targetRequest) throws IOException {
         if(outs == null)
             return;
+        targetRequest = DataHelper.escapeHTML(targetRequest);
         Writer out = new BufferedWriter(new OutputStreamWriter(outs, "UTF-8"));
         String header = getErrorPage("b32-auth", ERR_DESTINATION_UNKNOWN);
         out.write(header);
