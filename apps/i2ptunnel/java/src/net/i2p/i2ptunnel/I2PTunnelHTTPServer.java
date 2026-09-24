@@ -1250,7 +1250,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     /**
      *  Read a line terminated by newline, with a total read timeout.
      *
-     *  Warning - strips \n but not \r
+     *  Warning - strips \n and \r
      *  Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      *  Warning - not UTF-8
      *
@@ -1273,6 +1273,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         while ( (c = in.read()) != -1) {
             if (++i > MAX_LINE_LENGTH)
                 throw new LineTooLongException("Line too long - max " + MAX_LINE_LENGTH);
+            if (c == '\r')
+                continue;
             if (c == '\n')
                 break;
             long newTimeout = expires - System.currentTimeMillis();
