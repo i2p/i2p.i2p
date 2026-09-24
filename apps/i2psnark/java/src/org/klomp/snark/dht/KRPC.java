@@ -357,7 +357,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         SortedSet<NodeInfo> toTry = new TreeSet<NodeInfo>(comp);
         SortedSet<NodeInfo> heardFrom = new TreeSet<NodeInfo>(comp);
         toTry.addAll(nodes);
-        SortedSet<NodeInfo> tried = new TreeSet<NodeInfo>(comp);
+        Set<NodeInfo> tried = new HashSet<NodeInfo>();
 
         if (_log.shouldLog(Log.INFO))
             _log.info("Starting getPeers for " + iHash + " (b64: " + new NID(ih) + ") " + " with " + nodes.size() + " to try");
