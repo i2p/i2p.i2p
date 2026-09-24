@@ -346,32 +346,16 @@ LOCKFILE="$LOCKDIR/$APP_NAME"
 pid=""
 
 # Resolve the location of the 'ps' command
-PSEXE="/usr/ucb/ps"
-    if [ ! -x "$PSEXE" ]
-    then
-        PSEXE="/usr/bin/ps"
-        if [ ! -x "$PSEXE" ]
-        then
-            PSEXE="/bin/ps"
-            if [ ! -x "$PSEXE" ]
-            then
-                echo 'Unable to locate "ps".'
-                echo 'Please report this message along with the location of the command on your system.'
-                exit 1
-            fi
-        fi
-    fi
-
-TREXE="/usr/bin/tr"
-if [ ! -x "$TREXE" ]
-then
-    TREXE="/bin/tr"
-    if [ ! -x "$TREXE" ]
-    then
-        echo 'Unable to locate "tr".'
-        echo 'Please report this message along with the location of the command on your system.'
-        exit 1
-    fi
+PSEXE="$(command -v ps)"
+if [ -z "$PSEXE" ]; then
+    echo 'Unable to locate "ps".'
+    exit 1
+fi
+# Resolve the location of the 'tr' command
+TREXE="$(command -v tr)"
+if [ -z "$TREXE" ]; then
+    echo 'Unable to locate "tr".'
+    exit 1
 fi
 
 
