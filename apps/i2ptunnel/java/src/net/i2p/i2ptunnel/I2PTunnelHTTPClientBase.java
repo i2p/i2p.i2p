@@ -648,8 +648,6 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
      * @since 0.9.71
      */
     private void tidyNonces() {
-        if (_nonces == null)
-            return;
         if (_nonces.size() > MAX_NONCE_COUNT) {
             cleanNonces();
         }
