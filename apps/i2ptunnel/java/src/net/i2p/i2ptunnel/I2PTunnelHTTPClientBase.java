@@ -445,8 +445,11 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         }
         if (authorization == null)
             return AuthResult.AUTH_BAD;
-        if (_log.shouldLog(Log.INFO))
-            _log.info(getPrefix(requestId) + "Auth: " + authorization);
+        if (_log.shouldLog(Log.INFO)) {
+            int idx = authorization.indexOf(' ');
+            String scheme = idx >= 0 ? authorization.substring(0, idx) : authorization;
+            _log.info(getPrefix(requestId) + "Auth: " + scheme);
+        }
         String authLC = authorization.toLowerCase(Locale.US);
         if (authRequired.equals("true") || authRequired.equals(BASIC_AUTH)) {
             if (!authLC.startsWith("basic "))
