@@ -95,7 +95,7 @@
     <%=intl._t("Disable IPv6")%></label><br>
     <label><input type="radio" class="optbox" name="ipv6" value="force" <%=nethelper.getIPv6Checked("force") %> >
     <%=intl._t("Force IPv6 on")%>
-    <i>(<%=intl._t("Docker Bridge")%>)</i></label><br>
+    (<%=intl._t("Not firewalled")%>)</label><br>
     <label><input type="radio" class="optbox" name="ipv6" value="only" <%=nethelper.getIPv6Checked("only") %> >
     <%=intl._t("Use IPv6 only (disable IPv4)")%>
     <i>(<%=intl._t("Experimental")%>)</i></label><br>
