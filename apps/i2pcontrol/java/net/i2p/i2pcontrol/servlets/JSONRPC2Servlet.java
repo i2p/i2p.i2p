@@ -246,6 +246,8 @@ public class JSONRPC2Servlet extends HttpServlet {
         }
         String req = getRequest(httpServletRequest.getInputStream());
         httpServletResponse.setContentType("application/json");
+        httpServletResponse.setHeader("X-Content-Type-Options", "nosniff");
+        httpServletResponse.setHeader("Cache-Control", "no-store");
         PrintWriter out = httpServletResponse.getWriter();
         JSONRPC2Message msg = null;
         JSONRPC2Response jsonResp = null;
