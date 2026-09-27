@@ -7,7 +7,7 @@ import net.i2p.kademlia.KBucket;
 import net.i2p.kademlia.KBucketTrimmer;
 
 /**
- *  Removes an element older than 15 minutes, but only if the bucket hasn't changed in 5 minutes.
+ *  Removes the oldest element older than 15 minutes, but only if the bucket hasn't changed in 5 minutes.
  *  @since 0.9.2
  */
 class KBTrimmer implements KBucketTrimmer<NID> {
@@ -27,12 +27,17 @@ class KBTrimmer implements KBucketTrimmer<NID> {
         if (kbucket.getLastChanged() > now - MIN_BUCKET_AGE)
             return false;
         Set<NID> entries = kbucket.getEntries();
+        long lastSeen = now - MAX_NODE_AGE;
+        NID oldest = null;
         for (NID nid : entries) {
-            if (nid.lastSeen() < now - MAX_NODE_AGE) {
-                if (kbucket.remove(nid))
-                    return true;
+            long last = nid.lastSeen();
+            if (last < lastSeen) {
+                lastSeen = last;
+                oldest = nid;
             }
         }
+        if (oldest != null && kbucket.remove(oldest))
+            return true;
         return entries.size() < _max;
     }
 }
