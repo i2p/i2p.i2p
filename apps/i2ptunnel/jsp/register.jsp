@@ -1,7 +1,9 @@
 <%@include file="headers.jsi"
 %><%@page pageEncoding="UTF-8"
 %><%@page contentType="text/html" import="java.io.InputStream,net.i2p.i2ptunnel.web.EditBean,net.i2p.servlet.RequestWrapper,net.i2p.client.I2PSessionException,net.i2p.client.naming.HostTxtEntry,net.i2p.data.PrivateKeyFile,net.i2p.data.SigningPrivateKey,net.i2p.util.OrderedProperties"
-%><%@page
+%>
+<%@ page import="net.i2p.data.DataHelper" %>
+<%@page
 %><!DOCTYPE html>
 <%
   /* right now using EditBean instead of IndexBean for getSpoofedHost() */
@@ -204,7 +206,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     </tr>
     <tr>
         <td class="infohelp">
-            <%=intl._t("This will change the name from {0} to {1}, using the same destination", oldname, name)%>
+            <%=intl._t("This will change the name from {0} to {1}, using the same destination", DataHelper.escapeHTML(oldname), name)%>
         </td>
     </tr>
 
@@ -237,7 +239,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     </tr>
     <tr>
         <td class="infohelp">
-            <%=intl._t("This will add an alias {0} for {1}, using the same destination", name, oldname)%>
+            <%=intl._t("This will add an alias {0} for {1}, using the same destination", name, DataHelper.escapeHTML(oldname))%>
         </td>
     </tr>
 <%
@@ -378,7 +380,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     </tr>
     <tr>
         <td class="infohelp">
-            <%=intl._t("This will add a subdomain {0} of {1}, with a different destination", name, oldname)%>
+            <%=intl._t("This will add a subdomain {0} of {1}, with a different destination", name, DataHelper.escapeHTML(oldname))%>
         </td>
     </tr>
 
@@ -433,7 +435,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     <tr>
         <td>
             <b><%=intl._t("Old hostname")%>:</b>
-            <input type="text" size="30" maxlength="50" name="oldname" id="oldName" value="<%=oldname%>" class="freetext" />
+            <input type="text" size="30" maxlength="50" name="oldname" id="oldName" value="<%=DataHelper.escapeHTML(oldname)%>" class="freetext" />
         </td>
     </tr>
     <tr>

@@ -219,7 +219,7 @@ public class EditBean extends IndexBean {
      *  @since 0.9.40
      */
     public String getBlindedPassword(int tunnel) {
-        return _helper.getBlindedPassword(tunnel);
+        return DataHelper.escapeHTML(_helper.getBlindedPassword(tunnel));
     }
     
     /**
