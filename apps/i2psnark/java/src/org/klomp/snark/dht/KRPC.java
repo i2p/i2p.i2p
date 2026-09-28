@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +18,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -721,9 +721,9 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private ReplyWaiter sendPing(NodeInfo nInfo) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending ping to: " + nInfo);
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new TreeMap<String, Object>();
         map.put("q", "ping");
-        Map<String, Object> args = new HashMap<String, Object>();
+        Map<String, Object> args = new TreeMap<String, Object>();
         map.put("a", args);
         return sendQuery(nInfo, map, true);
     }
@@ -738,9 +738,9 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private ReplyWaiter sendFindNode(NodeInfo nInfo, NID tID) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending find node of " + tID + " to: " + nInfo);
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new TreeMap<String, Object>();
         map.put("q", "find_node");
-        Map<String, Object> args = new HashMap<String, Object>();
+        Map<String, Object> args = new TreeMap<String, Object>();
         args.put("target", tID.getData());
         map.put("a", args);
         return sendQuery(nInfo, map, true);
@@ -756,9 +756,9 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private ReplyWaiter sendGetPeers(NodeInfo nInfo, InfoHash ih, boolean noSeeds) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending get peers of " + ih + " to: " + nInfo + " noseeds? " + noSeeds);
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new TreeMap<String, Object>();
         map.put("q", "get_peers");
-        Map<String, Object> args = new HashMap<String, Object>();
+        Map<String, Object> args = new TreeMap<String, Object>();
         args.put("info_hash", ih.getData());
         if (noSeeds)
             args.put("noseed", Integer.valueOf(1));
@@ -780,9 +780,9 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private ReplyWaiter sendAnnouncePeer(NodeInfo nInfo, InfoHash ih, Token token, boolean isSeed) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending announce of " + ih + " to: " + nInfo + " seed? " + isSeed);
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new TreeMap<String, Object>();
         map.put("q", "announce_peer");
-        Map<String, Object> args = new HashMap<String, Object>();
+        Map<String, Object> args = new TreeMap<String, Object>();
         args.put("info_hash", ih.getData());
         // port ignored
         args.put("port", Integer.valueOf(TrackerClient.PORT));
@@ -804,8 +804,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private boolean sendPong(NodeInfo nInfo, MsgID msgID) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending pong to: " + nInfo);
-        Map<String, Object> map = new HashMap<String, Object>();
-        Map<String, Object> resps = new HashMap<String, Object>();
+        Map<String, Object> map = new TreeMap<String, Object>();
+        Map<String, Object> resps = new TreeMap<String, Object>();
         map.put("r", resps);
         return sendResponse(nInfo, msgID, map);
     }
@@ -823,8 +823,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private boolean sendNodes(NodeInfo nInfo, MsgID msgID, Token token, byte[] ids) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending nodes to: " + nInfo);
-        Map<String, Object> map = new HashMap<String, Object>();
-        Map<String, Object> resps = new HashMap<String, Object>();
+        Map<String, Object> map = new TreeMap<String, Object>();
+        Map<String, Object> resps = new TreeMap<String, Object>();
         map.put("r", resps);
         if (token != null)
             resps.put("token", token.getData());
@@ -836,8 +836,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private boolean sendPeers(NodeInfo nInfo, MsgID msgID, Token token, List<byte[]> peers) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending peers to: " + nInfo);
-        Map<String, Object> map = new HashMap<String, Object>();
-        Map<String, Object> resps = new HashMap<String, Object>();
+        Map<String, Object> map = new TreeMap<String, Object>();
+        Map<String, Object> resps = new TreeMap<String, Object>();
         map.put("r", resps);
         resps.put("token", token.getData());
         resps.put("values", peers);
