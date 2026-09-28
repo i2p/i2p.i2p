@@ -1,3 +1,21 @@
+2026-09-19 zzz
+ * i2psnark: Fix file priorities lost after startup check (GH #170)
+
+2026-09-16 zzz
+ * Tunnels:
+   - Don't process dup fragments
+   - Limit size of fragment reassembly map
+
+2026-09-15 zzz
+ * i2psnark: Extend keepalive interval
+ * Transport: force-ipv6 for docker bridge (WIP)
+
+2026-09-13 zzz
+ * i2psnark:
+   - Add all trackers to magnet links
+   - Change backup tracker to UDP
+   - Set next announce based on last response time
+
 2026-09-09 zzz
  * i2psnark: Request throttle adjustments
 
