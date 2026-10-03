@@ -117,6 +117,7 @@ public class Reseeder {
         //
         // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
         // ----------------------------------           ------------------------     -------------------------     ---------------
+        "https://reseed2.i2pgit.org/"         + ',' +   // idk_at_stormycloud.org.crt    // CA
         "https://reseed.kiota.ch/"            + ',' +   // damian.buho_at_proton.me.crt  // CA
         "https://waw01.i2p-reseed.hosted-by.skhron.eu/" + ',' +   // freedompeer_at_skhron.eu  // CA
         "https://sto01.i2p-reseed.hosted-by.skhron.eu/" + ',' +   // freedompeer_at_skhron.eu  // CA
@@ -134,7 +135,6 @@ public class Reseeder {
         "https://reseed2.i2p.net/"            + ',' +   // echelon3_at_mail.i2p.crt  // CA
         //"https://banana.incognet.io/"         + ',' +   // rambler_at_mail.i2p.crt   // CA
         "https://reseed.diva.exchange/"       + ',' +   // reseed_at_diva.exchange.crt       // CA
-        "https://reseed.i2pgit.org/"          + ',' +   // hankhill19580_at_gmail.com.crt    // CA
         "https://i2p.novg.net/"               + ',' +   // igor_at_novg.net.crt      // CA                         // Java 8+ only
         "https://i2pseed.creativecowpat.net:8443/" + ',' + // creativecowpat_at_mail.i2p.crt // i2pseed.creativecowpat.net.crt // Java 7+
         "https://reseed.onion.im/"; //            + ',' +   // lazygravy_at_mail.i2p     // CA                         // Java 8+ only
