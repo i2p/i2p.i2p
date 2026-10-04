@@ -871,8 +871,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
 
                     // end of (host endsWith(".i2p"))
 
-                    } else if(hostLowerCase.equals("localhost") || host.equals("127.0.0.1") ||
-                            host.startsWith("192.168.") || host.equals("[::1]")) {
+                    } else if(isBlockedAddress(host)) {
                         // if somebody is trying to get to 192.168.example.com, oh well
                         try {
                             out.write(getErrorPage("localhost", ERR_LOCALHOST).getBytes("UTF-8"));
@@ -1896,6 +1895,22 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             }
         }
         return null;
+    }
+
+    /**
+     *  Check if the given host is a blocked address.
+     *  blocked addresses include loopback, link-local, and private addresses.
+     *  @param host the host to check
+     *  @return true if the host is a blocked address, false otherwise
+     */
+    private static boolean isBlockedAddress(String host) {
+        String hostLowerCase = host.toLowerCase(Locale.US);
+        return hostLowerCase.equals("localhost") || host.startsWith("127.") || host.startsWith("10.") ||
+            host.startsWith("172.16.") || host.startsWith("172.17.") || host.startsWith("172.18.") ||
+            host.startsWith("172.19.") || host.startsWith("172.20.") || host.startsWith("172.21.") || host.startsWith("172.22.") ||
+            host.startsWith("172.23.") || host.startsWith("172.24.") || host.startsWith("172.25.") || host.startsWith("172.26.") ||
+            host.startsWith("172.27.") || host.startsWith("172.28.") || host.startsWith("172.29.") || host.startsWith("172.30.") ||
+            host.startsWith("172.31.") || host.startsWith("192.168.") || host.startsWith("169.254.") || host.equals("[::1]") || host.equals("0.0.0.0");
     }
 
 /****
