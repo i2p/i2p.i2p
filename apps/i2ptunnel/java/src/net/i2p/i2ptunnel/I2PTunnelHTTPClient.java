@@ -871,7 +871,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
 
                     // end of (host endsWith(".i2p"))
 
-                    } else if(isBlockedAddress(host)) {
+                    } else if(hostLowerCase.equals("localhost") || isBlockedIPv4(host)) {
                         // if somebody is trying to get to 192.168.example.com, oh well
                         try {
                             out.write(getErrorPage("localhost", ERR_LOCALHOST).getBytes("UTF-8"));
@@ -1895,19 +1895,45 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     }
 
     /**
-     *  Check if the given host is a blocked address.
-     *  blocked addresses include loopback, link-local, and private addresses.
-     *  @param host the host to check
-     *  @return true if the host is a blocked address, false otherwise
+     *  Check if the given ip is a blocked address.
+     *  Blocked addresses include loopback, link-local, and private addresses.
+     *  @param ip the ip to check
+     *  @return true if the ip is a blocked address, false otherwise
      */
-    private static boolean isBlockedAddress(String host) {
-        String hostLowerCase = host.toLowerCase(Locale.US);
-        return hostLowerCase.equals("localhost") || host.startsWith("127.") || host.startsWith("10.") ||
-            host.startsWith("172.16.") || host.startsWith("172.17.") || host.startsWith("172.18.") ||
-            host.startsWith("172.19.") || host.startsWith("172.20.") || host.startsWith("172.21.") || host.startsWith("172.22.") ||
-            host.startsWith("172.23.") || host.startsWith("172.24.") || host.startsWith("172.25.") || host.startsWith("172.26.") ||
-            host.startsWith("172.27.") || host.startsWith("172.28.") || host.startsWith("172.29.") || host.startsWith("172.30.") ||
-            host.startsWith("172.31.") || host.startsWith("192.168.") || host.startsWith("169.254.") || host.equals("[::1]") || host.equals("0.0.0.0");
+    private boolean isBlockedIPv4(String ip) {
+        String[] octets = ip.split("\\.", -1);
+        if (octets.length != 4) {
+            return false; // Not a valid IPv4
+        }
+
+        try {
+            int[] parts = new int[4];
+            for (int i = 0; i < 4; i++) {
+                parts[i] = Integer.parseInt(octets[i]);
+                if (parts[i] < 0 || parts[i] > 255) {
+                    return false;
+                }
+            }
+
+            // Loopback: 127.0.0.0/8
+            if (parts[0] == 127) return true;
+
+            // Private: 10.0.0.0/8
+            if (parts[0] == 10) return true;
+
+            // Private: 172.16.0.0/12
+            if (parts[0] == 172 && parts[1] >= 16 && parts[1] <= 31) return true;
+
+            // Private: 192.168.0.0/16
+            if (parts[0] == 192 && parts[1] == 168) return true;
+
+            // Link-local: 169.254.0.0/16
+            if (parts[0] == 169 && parts[1] == 254) return true;
+
+            return false;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
 /****
