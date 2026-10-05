@@ -871,8 +871,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
 
                     // end of (host endsWith(".i2p"))
 
-                    } else if(hostLowerCase.equals("localhost") || host.equals("127.0.0.1") ||
-                            host.startsWith("192.168.") || host.equals("[::1]")) {
+                    } else if(hostLowerCase.equals("localhost") || isBlockedIPv4(host)) {
                         // if somebody is trying to get to 192.168.example.com, oh well
                         try {
                             out.write(getErrorPage("localhost", ERR_LOCALHOST).getBytes("UTF-8"));
@@ -1896,6 +1895,48 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             }
         }
         return null;
+    }
+
+    /**
+     *  Check if the given ip is a blocked address.
+     *  Blocked addresses include loopback, link-local, and private addresses.
+     *  @param ip the ip to check
+     *  @return true if the ip is a blocked address, false otherwise
+     */
+    private boolean isBlockedIPv4(String ip) {
+        String[] octets = ip.split("\\.", -1);
+        if (octets.length != 4) {
+            return false; // Not a valid IPv4
+        }
+
+        try {
+            int[] parts = new int[4];
+            for (int i = 0; i < 4; i++) {
+                parts[i] = Integer.parseInt(octets[i]);
+                if (parts[i] < 0 || parts[i] > 255) {
+                    return false;
+                }
+            }
+
+            // Loopback: 127.0.0.0/8
+            if (parts[0] == 127) return true;
+
+            // Private: 10.0.0.0/8
+            if (parts[0] == 10) return true;
+
+            // Private: 172.16.0.0/12
+            if (parts[0] == 172 && parts[1] >= 16 && parts[1] <= 31) return true;
+
+            // Private: 192.168.0.0/16
+            if (parts[0] == 192 && parts[1] == 168) return true;
+
+            // Link-local: 169.254.0.0/16
+            if (parts[0] == 169 && parts[1] == 254) return true;
+
+            return false;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
 /****
