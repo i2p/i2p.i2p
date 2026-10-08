@@ -705,7 +705,7 @@ public class MetaInfo
    * As of 0.9.71, also changes the announce and announce-list on this
    * metainfo.
    *
-   * @param announce may be null. First will be used as primary.
+   * @param announces may be null. First will be used as primary.
    */
   public MetaInfo reannounce(List<String> announces) throws InvalidBEncodingException
   {
