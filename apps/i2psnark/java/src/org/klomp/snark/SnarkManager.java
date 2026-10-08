@@ -222,6 +222,8 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
 //     ,"C.Tracker", "http://ri5a27ioqd4vkik72fawbcryglkmwyy4726uu5j3eg6zqh2jswfq.b32.i2p/announce=http://tracker.crypthost.i2p/tracker/index.jsp",
        //,"Simp", "http://wc4sciqgkceddn6twerzkfod6p2npm733p7z3zwsjfzhc4yulita.b32.i2p/a=http://opentracker.simp.i2p/tracker/"
        //,"Simp-UDP", "udp://wc4sciqgkceddn6twerzkfod6p2npm733p7z3zwsjfzhc4yulita.b32.i2p:6969/=http://opentracker.simp.i2p/tracker/"
+       ,"InsulaOcculta", "http://2rv2kch37xsn2fqdz6huyevq76njop4inumscnspklh3ufo7mkwa.b32.i2p/a=http://tracker.insulaocculta.i2p/"
+       ,"InsulaOcculta (UDP)", "udp://2rv2kch37xsn2fqdz6huyevq76njop4inumscnspklh3ufo7mkwa.b32.i2p:6969/=http://tracker.insulaocculta.i2p/"
     };
     
     /** URL. This is our equivalent to router.utorrent.com for bootstrap */
@@ -253,7 +255,8 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
         "opentracker.eeptorrent.i2p", "bjnkpy2rpwwlyjgmxeolt2cnp7h4oe437mtd54hb3pve3gmjqp5a.b32.i2p",
         "omitracker.i2p", "a5ruhsktpdhfk5w46i6yf6oqovgdlyzty7ku6t5yrrpf4qedznjq.b32.i2p",
         // unregistered
-        "6kw6voy3v5jzmkbg4i3rlqjysre4msgarpkpme6mt5u2jw33nffa.b32.i2p"
+        "6kw6voy3v5jzmkbg4i3rlqjysre4msgarpkpme6mt5u2jw33nffa.b32.i2p",
+        "tracker.insulaocculta.i2p", "2rv2kch37xsn2fqdz6huyevq76njop4inumscnspklh3ufo7mkwa.b32.i2p"
     }));
 
     static {
