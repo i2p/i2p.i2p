@@ -955,6 +955,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *
      *  @return success
      */
+/****
     private boolean sendError(NodeInfo nInfo, MsgID msgID, Map<String, Object> map) {
         if (nInfo.equals(_myNodeInfo))
             throw new IllegalArgumentException("don't send to ourselves");
@@ -975,6 +976,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         map.put("t", msgID.getData());
         return sendMessage(nInfo.getDestination(), nInfo.getPort() + 1, map, false);
     }
+****/
 
     /**
      *  Get the dest for a NodeInfo lacking it, and store it there.
