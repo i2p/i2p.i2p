@@ -123,19 +123,19 @@ class OutboundNTCP2State implements EstablishState {
                     pattern = NoiseInit.PatternID.XKHFS_512;
                     // _tmp is used for both writing msg 1 and reading msg 2;
                     // for PQ, msg 1 is larger, so we use the _INT length, not the _CT length
-                    len += MAC_SIZE + EncType.MLKEM512_X25519_INT.getPubkeyLen();
+                    len += MAC_SIZE + EncType.MLKEM512_X25519_INT.getPubkeyLen() + PADDING1_MAX;
                     hkf = ctx.eciesEngine().getHybridKeyFactory(EncType.MLKEM512_X25519);
                     _handshakeState = new HandshakeState(pattern, HandshakeState.INITIATOR, _transport.getXDHFactory(), hkf);
                     break;
                 case 4:
                     pattern = NoiseInit.PatternID.XKHFS_768;
-                    len += MAC_SIZE + EncType.MLKEM768_X25519_INT.getPubkeyLen();
+                    len += MAC_SIZE + EncType.MLKEM768_X25519_INT.getPubkeyLen() + PADDING1_MAX;
                     hkf = ctx.eciesEngine().getHybridKeyFactory(EncType.MLKEM768_X25519);
                     _handshakeState = new HandshakeState(pattern, HandshakeState.INITIATOR, _transport.getXDHFactory(), hkf);
                     break;
                 case 5:
                     pattern = NoiseInit.PatternID.XKHFS_1024;
-                    len += MAC_SIZE + EncType.MLKEM1024_X25519_INT.getPubkeyLen();
+                    len += MAC_SIZE + EncType.MLKEM1024_X25519_INT.getPubkeyLen() + PADDING1_MAX;
                     hkf = ctx.eciesEngine().getHybridKeyFactory(EncType.MLKEM1024_X25519);
                     _handshakeState = new HandshakeState(pattern, HandshakeState.INITIATOR, _transport.getXDHFactory(), hkf);
                     break;
@@ -226,22 +226,39 @@ class OutboundNTCP2State implements EstablishState {
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(this + "send X");
+        int len = MSG1_SIZE;
+        switch (_version) {
+            case 2:
+                break;
+            case 3:
+                len += MAC_SIZE + EncType.MLKEM512_X25519_INT.getPubkeyLen();
+                break;
+            case 4:
+                len += MAC_SIZE + EncType.MLKEM768_X25519_INT.getPubkeyLen();
+                break;
+            case 5:
+                len += MAC_SIZE + EncType.MLKEM1024_X25519_INT.getPubkeyLen();
+                break;
+            default:
+                throw new IllegalArgumentException("Bad version " + _version);
+        }
+        int off = len - (OPTIONS1_SIZE + MAC_SIZE);
         // write options directly to tmp, offset 32, will encrypt in-place
         // network ID cross-check, proposal 147
-        _tmp[KEY_SIZE] = (byte) (_context.router().getNetworkID());
-        _tmp[KEY_SIZE + 1] = NTCPTransport.NTCP2_INT_VERSION;
+        _tmp[off] = (byte) (_context.router().getNetworkID());
+        _tmp[off + 1] = NTCPTransport.NTCP2_INT_VERSION;
         int padlen1 = _context.random().nextInt(PADDING1_MAX);
-        DataHelper.toLong(_tmp, KEY_SIZE + 2, 2, padlen1);
+        DataHelper.toLong(_tmp, off + 2, 2, padlen1);
         int msg3p2len = NTCP2Payload.BLOCK_HEADER_SIZE + 1 + _aliceRISize +
                         NTCP2Payload.BLOCK_HEADER_SIZE + OPTIONS3_SIZE +
                         NTCP2Payload.BLOCK_HEADER_SIZE + _padlen3 +
                         MAC_SIZE;
-        DataHelper.toLong(_tmp, KEY_SIZE + 4, 2, msg3p2len);
-        _tmp[KEY_SIZE + 6] = 0;
-        _tmp[KEY_SIZE + 7] = 0;
+        DataHelper.toLong(_tmp, off + 4, 2, msg3p2len);
+        _tmp[off + 6] = 0;
+        _tmp[off + 7] = 0;
         long now = (_context.clock().now() + 500) / 1000;
-        DataHelper.toLong(_tmp, KEY_SIZE + 8, 4, now);
-        Arrays.fill(_tmp, KEY_SIZE + 12, KEY_SIZE + 16, (byte) 0);
+        DataHelper.toLong(_tmp, off + 8, 4, now);
+        Arrays.fill(_tmp, off + 12, off + 16, (byte) 0);
 
         // set keys
         String s = _con.getRemoteAddress().getOption("s");
@@ -265,7 +282,7 @@ class OutboundNTCP2State implements EstablishState {
             if (_log.shouldDebug())
                 _log.debug("After start: " + _handshakeState.toString());
             // encrypt in-place
-            _handshakeState.writeMessage(_tmp, 0, _tmp, KEY_SIZE, OPTIONS1_SIZE);
+            _handshakeState.writeMessage(_tmp, 0, _tmp, off, OPTIONS1_SIZE);
         } catch (GeneralSecurityException gse) {
             // buffer length error
             if (!_log.shouldWarn())
@@ -291,15 +308,15 @@ class OutboundNTCP2State implements EstablishState {
         System.arraycopy(_tmp, KEY_SIZE - IV_SIZE, _bobIV, 0, IV_SIZE);
         // add padding
         if (padlen1 > 0) {
-            _context.random().nextBytes(_tmp, MSG1_SIZE, padlen1);
-            _handshakeState.mixHash(_tmp, MSG1_SIZE, padlen1);
+            _context.random().nextBytes(_tmp, len, padlen1);
+            _handshakeState.mixHash(_tmp, len, padlen1);
             if (_log.shouldDebug())
                 _log.debug("After mixhash padding " + padlen1 + " msg 1: " + _handshakeState.toString());
         }
 
         changeState(State.OB_SENT_X);
         // send it all at once
-        _con.wantsWrite(_tmp, 0, MSG1_SIZE + padlen1);
+        _con.wantsWrite(_tmp, 0, len + padlen1);
     }
 
     /**
@@ -316,10 +333,26 @@ class OutboundNTCP2State implements EstablishState {
     private void receiveOutbound(ByteBuffer src) {
         // Read in message #2 except for the padding
         if (_state == State.OB_SENT_X && src.hasRemaining()) {
-            int toGet = Math.min(src.remaining(), MSG2_SIZE - _received);
+            int len = MSG2_SIZE;
+            switch (_version) {
+                case 2:
+                    break;
+                case 3:
+                    len += MAC_SIZE + EncType.MLKEM512_X25519_CT.getPubkeyLen();
+                    break;
+                case 4:
+                    len += MAC_SIZE + EncType.MLKEM768_X25519_CT.getPubkeyLen();
+                    break;
+                case 5:
+                    len += MAC_SIZE + EncType.MLKEM1024_X25519_CT.getPubkeyLen();
+                    break;
+                default:
+                    throw new IllegalArgumentException("Bad version " + _version);
+            }
+            int toGet = Math.min(src.remaining(), len - _received);
             src.get(_tmp, _received, toGet);
             _received += toGet;
-            if (_received < MSG2_SIZE)
+            if (_received < len)
                 return;
             _context.aes().decrypt(_tmp, 0, _tmp, 0, _bobHash, _bobIV, KEY_SIZE);
             if (DataHelper.eqCT(_tmp, 0, ZEROKEY, 0, KEY_SIZE)) {
@@ -328,7 +361,7 @@ class OutboundNTCP2State implements EstablishState {
             }
             byte[] options2 = new byte[OPTIONS2_SIZE];
             try {
-                _handshakeState.readMessage(_tmp, 0, MSG2_SIZE, options2, 0);
+                _handshakeState.readMessage(_tmp, 0, len, options2, 0);
             } catch (GeneralSecurityException gse) {
                 fail("Bad msg 2, Y = " + Base64.encode(_tmp, 0, KEY_SIZE), gse);
                 return;
