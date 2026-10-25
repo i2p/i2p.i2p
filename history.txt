@@ -1,3 +1,6 @@
+2026-10-25 zzz
+ * Transports: Fix NTCP2 PQ outbound connections (GH #180)
+
 2026-10-20 2.14.0 (API 0.9.71) released
 
 2026-10-03 zzz
