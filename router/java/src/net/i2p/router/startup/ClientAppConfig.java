@@ -302,8 +302,9 @@ public class ClientAppConfig {
             long delay;
             if (onStartup) {
                 delay = 0;
-            } else if (className.equals("net.i2p.i2ptunnel.TunnelControllerGroup")) {
-                // speed up the start of i2ptunnel for everybody without rewriting clients.config
+            } else if (className.equals("net.i2p.i2ptunnel.TunnelControllerGroup") ||
+                       className.equals("net.i2p.sam.SAMBridge")) {
+                // speed up the start of i2ptunnel and SAM for everybody without rewriting clients.config
                 delay = I2PTUNNEL_STARTUP_DELAY;
             } else {
                 delay = DEFAULT_STARTUP_DELAY;
