@@ -437,13 +437,13 @@ public class PeerHelper extends HelperBase {
         long totalSend = 0;
         long totalRecv = 0;
 
-        if (!isAdvanced()) {
+        //if (!isAdvanced()) {
             for (Iterator<NTCPConnection> iter = peers.iterator(); iter.hasNext(); ) {
                  // outbound conns get put in the map before they are established
                  if (!iter.next().isEstablished())
                      iter.remove();
             }
-        }
+        //}
 
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<h3 id=\"ntcpcon\">").append(_t("NTCP connections")).append(": ").append(peers.size());
