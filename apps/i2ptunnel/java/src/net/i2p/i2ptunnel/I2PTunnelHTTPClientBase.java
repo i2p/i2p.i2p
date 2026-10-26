@@ -110,7 +110,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
          "<html><body><H1>I2P ERROR: No outproxy found</H1>"+
          "Your request was for a site outside of I2P, but you have no "+
          "outproxy configured.  Please configure an outproxy in I2PTunnel";
-    
+
     protected final static String ERR_DESTINATION_UNKNOWN =
             "HTTP/1.1 503 Service Unavailable\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
@@ -162,7 +162,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     // SSL proxy config is parsed on the fly;
     // allow both to be changed and store the SSL proxy list.
     // TODO should track more than one failed proxy
-    
+
     /**
      *  Simple random selection, with caching by hostname,
      *  and avoidance of the last one to fail.
@@ -243,7 +243,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             _log.info("Selected SSL proxy for " + host + ": " + rv);
         return rv;
     }
-    
+
     /**
      *  Update the cache and note if failed.
      *
@@ -290,11 +290,11 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
      *  so that large POSTs won't timeout on the read side
      */
     protected static final int DEFAULT_READ_TIMEOUT = -1;
-    
+
     protected static final AtomicLong __requestId = new AtomicLong();
 
-    public I2PTunnelHTTPClientBase(int localPort, boolean ownDest, Logging l, 
-                               EventDispatcher notifyThis, String handlerName, 
+    public I2PTunnelHTTPClientBase(int localPort, boolean ownDest, Logging l,
+                               EventDispatcher notifyThis, String handlerName,
                                I2PTunnel tunnel) throws IllegalArgumentException {
         super(localPort, ownDest, l, notifyThis, handlerName, tunnel);
         // force connect delay and bulk profile
@@ -445,8 +445,11 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         }
         if (authorization == null)
             return AuthResult.AUTH_BAD;
-        if (_log.shouldLog(Log.INFO))
-            _log.info(getPrefix(requestId) + "Auth: " + authorization);
+        if (_log.shouldLog(Log.INFO)) {
+            int idx = authorization.indexOf(' ');
+            String scheme = idx >= 0 ? authorization.substring(0, idx) : authorization;
+            _log.info(getPrefix(requestId) + "Auth: " + scheme);
+        }
         String authLC = authorization.toLowerCase(Locale.US);
         if (authRequired.equals("true") || authRequired.equals(BASIC_AUTH)) {
             if (!authLC.startsWith("basic "))
@@ -579,6 +582,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
      *  @since 0.9.4
      */
     private String getNonce() {
+        tidyNonces();
         byte[] b = new byte[DataHelper.DATE_LENGTH + PROXYNONCE_BYTES];
         byte[] n = new byte[NONCE_BYTES];
         long now = _context.clock().now();
@@ -639,6 +643,16 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             NonceInfo info = iter.next();
             if (info.getExpires() <= now)
                 iter.remove();
+        }
+    }
+
+    /**
+     * Check if the nonce map is larger than the MAX_NONCE_COUNT and clean it if so.
+     * @since 0.9.71
+     */
+    private void tidyNonces() {
+        if (_nonces.size() > MAX_NONCE_COUNT) {
+            cleanNonces();
         }
     }
 

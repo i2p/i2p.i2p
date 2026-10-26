@@ -154,7 +154,8 @@ class PrimarySession extends SAMv3StreamSession implements SAMDatagramReceiver, 
 					listenProtocol = I2PSession.PROTO_DATAGRAM3;
 					v = 3;
 				}
-				SAMv3DatagramSession ssess = new SAMv3DatagramSession(nick, props, handler, isess, listenPort, dgs, v);
+				SAMv3DatagramSession ssess = new SAMv3DatagramSession(nick, props, handler, isess,
+				                                                      listenProtocol, listenPort, dgs, v);
 				subhandler.setSession(ssess);
 				sess = ssess;
 			} else if (style.equals("STREAM")) {

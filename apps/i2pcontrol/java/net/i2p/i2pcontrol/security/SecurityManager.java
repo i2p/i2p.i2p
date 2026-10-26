@@ -182,6 +182,8 @@ public class SecurityManager {
             }
             return token;
         } else {
+            _log.logAlways(Log.WARN, "I2PControl authentication failed");
+            try { Thread.sleep(3000); } catch (InterruptedException ie) {}
             return null;
         }
     }

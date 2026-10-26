@@ -86,7 +86,7 @@ public class TrackerClient implements Runnable {
   private final static int MAX_CONSEC_FAILS = 5;    // slow down after this
   private final static int LONG_SLEEP = 30*60*1000; // sleep a while after lots of fails
   private final static long MIN_TRACKER_ANNOUNCE_INTERVAL = 15*60*1000;
-  private final static long MIN_DHT_ANNOUNCE_INTERVAL = 39*60*1000;
+  private final static long MIN_DHT_ANNOUNCE_INTERVAL = 19*60*1000;
   /** No guidance in BEP 5; standard practice is K (=8) */
   private static final int DHT_ANNOUNCE_PEERS = 4;
   public static final int PORT = 6881;
@@ -100,7 +100,7 @@ public class TrackerClient implements Runnable {
   private MetaInfo meta;
   private final String infoHash;
   private final String peerID;
-  private final String additionalTrackerURL;
+  private final List<String> additionalTrackerURLs;
   private final PeerCoordinator coordinator;
   private final Snark snark;
   private final int port;
@@ -131,9 +131,9 @@ public class TrackerClient implements Runnable {
    * Call start() to start it.
    *
    * @param meta null if in magnet mode
-   * @param additionalTrackerURL may be null, from the ?tr= param in magnet mode, otherwise ignored
+   * @param additionalTrackerURLs may be null, from the ?tr= param in magnet mode, otherwise ignored
    */
-  public TrackerClient(I2PSnarkUtil util, MetaInfo meta, String additionalTrackerURL,
+  public TrackerClient(I2PSnarkUtil util, MetaInfo meta, List<String> additionalTrackerURLs,
                        PeerCoordinator coordinator, Snark snark)
   {
     super();
@@ -143,7 +143,7 @@ public class TrackerClient implements Runnable {
     _util = util;
     _log = util.getContext().logManager().getLog(TrackerClient.class);
     this.meta = meta;
-    this.additionalTrackerURL = additionalTrackerURL;
+    this.additionalTrackerURLs = additionalTrackerURLs;
     this.coordinator = coordinator;
     this.snark = snark;
 
@@ -297,8 +297,8 @@ public class TrackerClient implements Runnable {
     String primary = null;
     if (meta != null)
         primary = meta.getAnnounce();
-    else if (additionalTrackerURL != null)
-        primary = additionalTrackerURL;
+    else if (additionalTrackerURLs != null && !additionalTrackerURLs.isEmpty())
+        primary = additionalTrackerURLs.get(0);
     Set<Hash> trackerHashes = new HashSet<Hash>(8);
 
     // primary tracker
@@ -313,6 +313,18 @@ public class TrackerClient implements Runnable {
         }
     } else {
         _log.warn("No primary announce");
+    }
+
+    // additional trackers in magnet
+    if (additionalTrackerURLs != null && additionalTrackerURLs.size() > 1) {
+        for (int i = 1; i < additionalTrackerURLs.size(); i++) {
+            String url = additionalTrackerURLs.get(i);
+            if (isNewValidTracker(trackerHashes, url)) {
+                trackers.add(new TCTracker(url, false));
+                if (_log.shouldDebug())
+                    _log.debug("Additional announce: [" + url + "] for infoHash: " + infoHash);
+            }
+        }
     }
 
     // announce list
@@ -522,7 +534,7 @@ public class TrackerClient implements Runnable {
             for (TCTracker tr : trckrs) {
               if ((!stop) && (!tr.stop) &&
                   (completed || coordinator.needOutboundPeers() || !tr.started) &&
-                  (newlyCompleted || newlyGotMeta || System.currentTimeMillis() > tr.lastRequestTime + tr.interval))
+                  (newlyCompleted || newlyGotMeta || System.currentTimeMillis() > tr.lastResponseTime + tr.interval))
               {
                 try
                   {
@@ -616,7 +628,7 @@ public class TrackerClient implements Runnable {
                         }
                     }
                   }
-                catch (IOException ioe)
+                catch (Throwable ioe)
                   {
                     // Probably not fatal (if it doesn't last to long...)
                     if (_log.shouldLog(Log.WARN))
@@ -653,8 +665,8 @@ public class TrackerClient implements Runnable {
                   }
               } else {
                   if (_log.shouldLog(Log.INFO))
-                      _log.info("Not announcing to " + tr.announce + " last announce was " +
-                               new Date(tr.lastRequestTime) + " interval is " + DataHelper.formatDuration(tr.interval));
+                      _log.info("Not announcing to " + tr.announce + " last reply was " +
+                               DataHelper.formatTime(tr.lastResponseTime) + " interval is " + DataHelper.formatDuration(tr.interval));
               }
               if ((!tr.stop) && maxSeenPeers < tr.seenPeers)
                   maxSeenPeers = tr.seenPeers;
@@ -872,6 +884,7 @@ public class TrackerClient implements Runnable {
             }
         }
         catch(IOException ioe) { /* ignored */ }
+        catch(Throwable t) { /* ignored */ }
         tr.reset();
      }
   }
@@ -886,7 +899,7 @@ public class TrackerClient implements Runnable {
   private TrackerInfo doRequest(TCTracker tr, String infoHash,
                                 String peerID, long uploaded,
                                 long downloaded, long left, String event)
-    throws IOException
+    throws IOException, Throwable
   {
     StringBuilder buf = new StringBuilder(512);
     buf.append(tr.announce);
@@ -930,6 +943,7 @@ public class TrackerClient implements Runnable {
         throw new IOException("No response from " + tr.host);
     if (fetched.length == 0)
         throw new IOException("No data from " + tr.host);
+    tr.lastResponseTime = System.currentTimeMillis();
     // The HTML check only works if we didn't exceed the maxium fetch size specified in get(),
     // otherwise we already threw an IOE.
     if (fetched[0] == '<')
@@ -984,6 +998,7 @@ public class TrackerClient implements Runnable {
         if (_log.shouldLog(Log.INFO))
             _log.info("TrackerClient response: " + info);
 
+        tr.lastResponseTime = System.currentTimeMillis();
         String failure = info.getFailureReason();
         if (failure != null)
             throw new IOException(failure);
@@ -1037,14 +1052,16 @@ public class TrackerClient implements Runnable {
         return false;
     }
     String path = url.getPath();
-    if (path == null || !path.startsWith("/"))
-        return false;
     String scheme = url.getScheme();
+    if ("http".equals(scheme)) {
+        if (path == null || !path.startsWith("/"))
+            return false;
+    }
     if (!("http".equals(scheme) || "udp".equals(scheme)))
         return false;
     String host = url.getHost();
     return host != null &&
-           (host.endsWith(".i2p") || host.equals("i2p"));
+           host.endsWith(".i2p");
   }
 
   /**
@@ -1081,18 +1098,12 @@ public class TrackerClient implements Runnable {
         return null;
     }
     if (host.endsWith(".i2p")) {
-        String path = url.getPath();
-        if (path == null || !path.startsWith("/"))
-            return null;
+        if ("http".equals(scheme)) {
+            String path = url.getPath();
+            if (path == null || !path.startsWith("/"))
+                return null;
+        }
         return ConvertToHash.getHash(host);
-    }
-    if (host.equals("i2p")) {
-        String path = url.getPath();
-        if (path == null || path.length() < 517 ||
-            !path.startsWith("/"))
-            return null;
-        String[] parts = DataHelper.split(path.substring(1), "[/\\?&;]", 2);
-        return ConvertToHash.getHash(parts[0]);
     }
     return null;
   }
@@ -1123,6 +1134,7 @@ public class TrackerClient implements Runnable {
       final int port;
       long interval;
       long lastRequestTime;
+      long lastResponseTime;
       String trackerProblems;
       boolean stop;
       boolean started;
@@ -1162,6 +1174,7 @@ public class TrackerClient implements Runnable {
        */
       public void reset() {
           lastRequestTime = 0;
+          lastResponseTime = 0;
           trackerProblems = null;
           stop = false;
           started = false;

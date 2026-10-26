@@ -69,7 +69,7 @@ class Message
   final int length;
 
   // Used for PIECE and BITFIELD and EXTENSION messages
-  byte[] data;
+  final byte[] data;
   final int off;
   final int len;
 
@@ -123,6 +123,14 @@ class Message
   }
 
   /**
+   * For types HASHES, HASH_REJECT, HASH_REQUEST
+   * @since 0.9.71
+   */
+  Message(byte type, byte[] data) {
+      this(type, 0, 0, 0, data, 0, data.length, null);
+  }
+
+  /**
    * For type PIECE with deferred data
    * @since 0.9.32
    */
@@ -158,87 +166,80 @@ class Message
   /** Utility method for sending a message through a DataStream. */
   void sendMessage(DataOutputStream dos) throws IOException
   {
-    // KEEP_ALIVE is special.
-    if (type == KEEP_ALIVE)
-      {
+    switch (type) {
+      case KEEP_ALIVE:
         dos.writeInt(0);
-        return;
-      }
+        break;
 
-    ByteArray ba;
-    // Get deferred data
-    if (data == null && dataLoader != null) {
-        ba = dataLoader.loadData(piece, begin, length);
+      case CHOKE:
+      case UNCHOKE:
+      case INTERESTED:
+      case UNINTERESTED:
+      case HAVE_ALL:
+      case HAVE_NONE:
+        dos.writeInt(1);
+        dos.writeByte(type);
+        break;
+
+      case HAVE:
+      case SUGGEST:
+      case ALLOWED_FAST:
+        dos.writeInt(5);
+        dos.writeByte(type);
+        dos.writeInt(piece);
+        break;
+
+      case BITFIELD:
+      case HASH_REQUEST:
+      case HASHES:
+      case HASH_REJECT:
+        dos.writeInt(1 + len);
+        dos.writeByte(type);
+        dos.write(data, off, len);
+        break;
+
+      case REQUEST:
+      case CANCEL:
+      case REJECT:
+        dos.writeInt(13);
+        dos.writeByte(type);
+        dos.writeInt(piece);
+        dos.writeInt(begin);
+        dos.writeInt(length);
+        break;
+
+      case PORT:
+        dos.writeInt(3);
+        dos.writeByte(type);
+        dos.writeShort(piece);
+        break;
+
+      case EXTENSION:
+        dos.writeInt(2 + len);
+        dos.writeByte(type);
+        dos.writeByte(piece);
+        dos.write(data, off, len);
+        break;
+
+      case PIECE:
+        // Get deferred data
+        ByteArray ba = dataLoader.loadData(piece, begin, length);
         if (ba == null)
             return;  // hmm will get retried, but shouldn't happen
-        data = ba.getData();
-    } else {
-        ba = null;
+        byte[] d = ba.getData();
+        dos.writeInt(9 + len);
+        dos.writeByte(type);
+        dos.writeInt(piece);
+        dos.writeInt(begin);
+        dos.write(d, off, len);
+        // Was pulled from cache in Storage.getPiece() via dataLoader
+        if (d.length == BUFSIZE)
+            _cache.release(ba, false);
+        break;
+
+      default:
+        throw new IllegalArgumentException("UNKNOWN " + type);
     }
-
-    // Calculate the total length in bytes
-
-    // Type is one byte.
-    int datalen = 1;
-
-    // piece is 4 bytes.
-    if (type == HAVE || type == REQUEST || type == PIECE || type == CANCEL ||
-        type == SUGGEST || type == REJECT || type == ALLOWED_FAST)
-      datalen += 4;
-
-    // begin/offset is 4 bytes
-    if (type == REQUEST || type == PIECE || type == CANCEL ||
-        type == REJECT)
-      datalen += 4;
-
-    // length is 4 bytes
-    if (type == REQUEST || type == CANCEL ||
-        type == REJECT)
-      datalen += 4;
-
-    // msg type is 1 byte
-    else if (type == EXTENSION)
-      datalen += 1;
-
-    else if (type == PORT)
-      datalen += 2;
-
-    // add length of data for piece or bitfield array.
-    if (type == BITFIELD || type == PIECE || type == EXTENSION)
-      datalen += len;
-
-    // Send length
-    dos.writeInt(datalen);
-    dos.writeByte(type & 0xFF);
-
-    // Send additional info (piece number)
-    if (type == HAVE || type == REQUEST || type == PIECE || type == CANCEL ||
-        type == SUGGEST || type == REJECT || type == ALLOWED_FAST)
-      dos.writeInt(piece);
-
-    // Send additional info (begin/offset)
-    if (type == REQUEST || type == PIECE || type == CANCEL ||
-        type == REJECT)
-      dos.writeInt(begin);
-
-    // Send additional info (length); for PIECE this is implicit.
-    if (type == REQUEST || type == CANCEL ||
-        type == REJECT)
-        dos.writeInt(length);
-
-    else if (type == EXTENSION)
-        dos.writeByte((byte) piece & 0xff);
-
-    else if (type == PORT)
-        dos.writeShort(piece & 0xffff);
-
-    // Send actual data
-    if (type == BITFIELD || type == PIECE || type == EXTENSION)
-      dos.write(data, off, len);
-
-    // Was pulled from cache in Storage.getPiece() via dataLoader
-    if (ba != null && ba.getData().length == BUFSIZE)
-        _cache.release(ba, false);
   }
 
     @Override

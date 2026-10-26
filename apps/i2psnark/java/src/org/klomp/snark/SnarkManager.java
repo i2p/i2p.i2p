@@ -212,6 +212,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
 //       , "CRSTRACK", "http://b4G9sCdtfvccMAXh~SaZrPqVQNyGQbhbYMbw6supq2XGzbjU4NcOmjFI0vxQ8w1L05twmkOvg5QERcX6Mi8NQrWnR0stLExu2LucUXg1aYjnggxIR8TIOGygZVIMV3STKH4UQXD--wz0BUrqaLxPhrm2Eh9Hwc8TdB6Na4ShQUq5Xm8D4elzNUVdpM~RtChEyJWuQvoGAHY3ppX-EJJLkiSr1t77neS4Lc-KofMVmgI9a2tSSpNAagBiNI6Ak9L1T0F9uxeDfEG9bBSQPNMOSUbAoEcNxtt7xOW~cNOAyMyGydwPMnrQ5kIYPY8Pd3XudEko970vE0D6gO19yoBMJpKx6Dh50DGgybLQ9CpRaynh2zPULTHxm8rneOGRcQo8D3mE7FQ92m54~SvfjXjD2TwAVGI~ae~n9HDxt8uxOecAAvjjJ3TD4XM63Q9TmB38RmGNzNLDBQMEmJFpqQU8YeuhnS54IVdUoVQFqui5SfDeLXlSkh4vYoMU66pvBfWbAAAA.i2p/tracker/announce.php=http://crstrack.i2p/tracker/"
 //       ,"Exotrack", "http://blbgywsjubw3d2zih2giokakhe3o2cko7jtte4risb3hohbcoyva.b32.i2p/announce.php=http://exotrack.i2p/"
        ,"DgTrack", "http://w7tpbzncbcocrqtwwm3nezhnnsw4ozadvi2hmvzdhrqzfxfum7wa.b32.i2p/a=http://opentracker.dg2.i2p/"
+       ,"DgTrack (UDP)", "udp://w7tpbzncbcocrqtwwm3nezhnnsw4ozadvi2hmvzdhrqzfxfum7wa.b32.i2p:6969/=http://opentracker.dg2.i2p/"
        // The following is ECDSA_SHA256_P256
 //last up Sep. 19 2020
        //,"TheBland", "http://s5ikrdyjwbcgxmqetxb3nyheizftms7euacuub2hic7defkh3xhq.b32.i2p/a=http://tracker.thebland.i2p/tracker/index.jsp"
@@ -221,10 +222,12 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
 //     ,"C.Tracker", "http://ri5a27ioqd4vkik72fawbcryglkmwyy4726uu5j3eg6zqh2jswfq.b32.i2p/announce=http://tracker.crypthost.i2p/tracker/index.jsp",
        //,"Simp", "http://wc4sciqgkceddn6twerzkfod6p2npm733p7z3zwsjfzhc4yulita.b32.i2p/a=http://opentracker.simp.i2p/tracker/"
        //,"Simp-UDP", "udp://wc4sciqgkceddn6twerzkfod6p2npm733p7z3zwsjfzhc4yulita.b32.i2p:6969/=http://opentracker.simp.i2p/tracker/"
+       ,"InsulaOcculta", "http://2rv2kch37xsn2fqdz6huyevq76njop4inumscnspklh3ufo7mkwa.b32.i2p/a=http://tracker.insulaocculta.i2p/"
+       ,"InsulaOcculta (UDP)", "udp://2rv2kch37xsn2fqdz6huyevq76njop4inumscnspklh3ufo7mkwa.b32.i2p:6969/=http://tracker.insulaocculta.i2p/"
     };
     
     /** URL. This is our equivalent to router.utorrent.com for bootstrap */
-    public static final String DEFAULT_BACKUP_TRACKER = "http://opentracker.dg2.i2p/a";
+    public static final String DEFAULT_BACKUP_TRACKER = "udp://opentracker.dg2.i2p:6969/";
 
     /** URLs, comma-separated. Used for "announce to open trackers also" */
     private static final String DEFAULT_OPENTRACKERS = DEFAULT_BACKUP_TRACKER; // +
@@ -252,7 +255,8 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
         "opentracker.eeptorrent.i2p", "bjnkpy2rpwwlyjgmxeolt2cnp7h4oe437mtd54hb3pve3gmjqp5a.b32.i2p",
         "omitracker.i2p", "a5ruhsktpdhfk5w46i6yf6oqovgdlyzty7ku6t5yrrpf4qedznjq.b32.i2p",
         // unregistered
-        "6kw6voy3v5jzmkbg4i3rlqjysre4msgarpkpme6mt5u2jw33nffa.b32.i2p"
+        "6kw6voy3v5jzmkbg4i3rlqjysre4msgarpkpme6mt5u2jw33nffa.b32.i2p",
+        "tracker.insulaocculta.i2p", "2rv2kch37xsn2fqdz6huyevq76njop4inumscnspklh3ufo7mkwa.b32.i2p"
     }));
 
     static {
@@ -1777,7 +1781,6 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
                     torrent = new Snark(_util, filename, null, -1, null, null, this,
                                         _peerCoordinatorSet, _connectionAcceptor,
                                         dataDir.getPath(), baseFile);
-                    loadSavedFilePriorities(torrent);
                     synchronized (_snarks) {
                         putSnark(filename, torrent);
                     }
@@ -1793,6 +1796,10 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
                     String s = _t("ERROR - Out of memory, cannot create torrent from {0}", sfile.getName()) + ": " + oom.getLocalizedMessage();
                     addMessage(s);
                     throw new Snark.RouterException(s, oom);
+                } catch (Throwable t) {
+                    String s = "ERROR - cannot create torrent from " + sfile.getName() + ": " + t.getLocalizedMessage();
+                    addMessage(s);
+                    throw new Snark.RouterException(s, t);
                 } finally {
                     if (fis != null) try { fis.close(); } catch (IOException ioe) {}
                 }
@@ -1860,11 +1867,12 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
      */
     public void addMagnet(String name, byte[] ih, String trackerURL, boolean updateStatus) {
         // updateStatus is true from UI, false from config file bulk add
-        addMagnet(name, ih, trackerURL, updateStatus, updateStatus, null, this);
+        addMagnet(name, ih, Collections.singletonList(trackerURL), updateStatus, updateStatus, null, this);
     }
     
     /**
      * Add a torrent with the info hash alone (magnet / maggot)
+     * Externally used by transmission-rpc plugin, do not remove.
      *
      * @param name hex or b32 name from the magnet link
      * @param ih 20 byte info hash
@@ -1878,16 +1886,12 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
      */
     public void addMagnet(String name, byte[] ih, String trackerURL, boolean updateStatus, File dataDir) {
         // updateStatus is true from UI, false from config file bulk add
-        addMagnet(name, ih, trackerURL, updateStatus, updateStatus, dataDir, this);
+        addMagnet(name, ih, Collections.singletonList(trackerURL), updateStatus, updateStatus, dataDir, this);
     }
-    
+
     /**
-     * Add a torrent with the info hash alone (magnet / maggot)
-     * External use is for UpdateRunner.
+     * Add a torrent with a parsed MagnetURI
      *
-     * @param name hex or b32 name from the magnet link
-     * @param ih 20 byte info hash
-     * @param trackerURL may be null
      * @param updateStatus should we add this magnet to the config file,
      *                     to save it across restarts, in case we don't get
      *                     the metadata before shutdown?
@@ -1895,12 +1899,38 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
      * @param listener to intercept callbacks, should pass through to this
      * @return the new Snark or null on failure
      * @throws RuntimeException via Snark.fatal()
-     * @since 0.9.4
+     * @since 0.9.71
      */
-    public Snark addMagnet(String name, byte[] ih, String trackerURL, boolean updateStatus,
+    public Snark addMagnet(MagnetURI magnet, boolean updateStatus, boolean autoStart, File dataDir, CompleteListener listener) {
+        byte[] ih = magnet.getInfoHash();
+        if (ih == null)
+            throw new IllegalArgumentException();
+        String name = magnet.getName();
+        List<String> trackerURLs = magnet.getTrackerURLs();
+        return addMagnet(name, ih, trackerURLs, updateStatus, autoStart, dataDir, listener);
+    }
+
+    /**
+     * Add a torrent with the info hash alone (magnet / maggot)
+     *
+     * @param name hex or b32 name from the magnet link
+     * @param ih 20 byte info hash
+     * @param trackerURLs may be null
+     * @param updateStatus should we add this magnet to the config file,
+     *                     to save it across restarts, in case we don't get
+     *                     the metadata before shutdown?
+     * @param dataDir must exist, or null to default to snark data directory
+     * @param listener to intercept callbacks, should pass through to this, or null to use this
+     * @return the new Snark or null on failure
+     * @throws RuntimeException via Snark.fatal()
+     * @since 0.9.4, changed params and changed to private in 0.9.71
+     */
+    private Snark addMagnet(String name, byte[] ih, List<String> trackerURLs, boolean updateStatus,
                           boolean autoStart, File dataDir, CompleteListener listener) {
         String dirPath = dataDir != null ? dataDir.getAbsolutePath() : getDataDir().getPath();
-        Snark torrent = new Snark(_util, name, ih, trackerURL, listener,
+        if (listener == null)
+            listener = this;
+        Snark torrent = new Snark(_util, name, ih, trackerURLs, listener,
                                   _peerCoordinatorSet, _connectionAcceptor,
                                   dirPath);
 
@@ -1913,7 +1943,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
             // Tell the dir monitor not to delete us
             _magnets.add(name);
             if (updateStatus)
-                saveMagnetStatus(ih, dirPath, trackerURL, name);
+                saveMagnetStatus(ih, dirPath, trackerURLs, name);
             putSnark(name, torrent);
         }
         if (autoStart) {
@@ -2481,11 +2511,11 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
      *  just like other torrents, so we can remember the directory, tracker, etc.
      *
      *  @param dir may be null
-     *  @param trackerURL may be null
+     *  @param trackerURLs may be null
      *  @param dn may be null
      *  @since 0.8.4
      */
-    public void saveMagnetStatus(byte[] ih, String dir, String trackerURL, String dn) {
+    public void saveMagnetStatus(byte[] ih, String dir, List<String> trackerURLs, String dn) {
         // i2psnark.config file
         String infohash = Base64.encode(ih);
         infohash = infohash.replace('=', '$');
@@ -2495,8 +2525,19 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
         config.setProperty(PROP_META_MAGNET, "true");
         if (dir != null)
             config.setProperty(PROP_META_MAGNET_DIR, dir);
-        if (trackerURL != null)
-            config.setProperty(PROP_META_MAGNET_TR, trackerURL);
+        if (trackerURLs != null && !trackerURLs.isEmpty()) {
+            if (trackerURLs.size() == 1) {
+                config.setProperty(PROP_META_MAGNET_TR, trackerURLs.get(0));
+            } else {
+                StringBuilder buf = new StringBuilder();
+                for (int i = 0; i < trackerURLs.size(); i++) {
+                    if (i != 0)
+                        buf.append(',');
+                    buf.append(trackerURLs.get(i));
+                }
+                config.setProperty(PROP_META_MAGNET_TR, buf.toString());
+            }
+        }
         if (dn != null)
             config.setProperty(PROP_META_MAGNET_DN, dn);
         String now = Long.toString(System.currentTimeMillis());
@@ -2828,10 +2869,10 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
             try {
                 // _snarks must use canonical
                 name = (new File(getDataDir(), storage.getBaseName() + ".torrent")).getCanonicalPath();
-                // put the announce URL in the file
-                String announce = snark.getTrackerURL();
-                if (announce != null)
-                    meta = meta.reannounce(announce);
+                // put the announce URLs in the file
+                List<String> announces = snark.getTrackerURLs();
+                if (announces != null)
+                    meta = meta.reannounce(announces);
                 synchronized (_snarks) {
                     locked_writeMetaInfo(meta, name, areFilesPublic());
                     // put it in the list under the new name
@@ -2950,9 +2991,19 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
                     if (name == null)
                         name = _t("Magnet") + ' ' + I2PSnarkUtil.toHex(ih);
                     String tracker = config.getProperty(PROP_META_MAGNET_TR);
+                    List<String> trackers;
+                    if (tracker != null) {
+                        String[] arr = DataHelper.split(tracker, ",");
+                        trackers = new ArrayList<String>(arr.length);
+                        for (int i = 0; i < arr.length; i++) {
+                            trackers.add(arr[i]);
+                        }
+                    } else {
+                        trackers = null;
+                    }
                     String dir = config.getProperty(PROP_META_MAGNET_DIR);
                     File dirf = (dir != null) ? (new File(dir)) : null;
-                    addMagnet(name, ih, tracker, false, autostart, dirf, this);
+                    addMagnet(name, ih, trackers, false, autostart, dirf, this);
                 } else {
                     iter.remove();
                     changed = true;

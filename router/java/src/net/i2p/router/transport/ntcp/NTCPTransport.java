@@ -1332,7 +1332,7 @@ public class NTCPTransport extends TransportImpl {
             TransportUtil.IPv6Config config = getIPv6Config();
             if (config == IPV6_ONLY)
                 caps = CAP_IPV6;
-            else if (config != IPV6_DISABLED && _haveIPv6Address)
+            else if ((config != IPV6_DISABLED && _haveIPv6Address) || config == IPV6_FORCE_ON)
                 caps = CAP_IPV4_IPV6;
             else
                 caps = CAP_IPV4;
@@ -1896,7 +1896,7 @@ public class NTCPTransport extends TransportImpl {
             v6Disabled = false;
         }
         boolean hasV4 = !fwV4 && getCurrentAddress(false) != null;
-        boolean hasV6 = !fwV6 && getCurrentAddress(true) != null;
+        boolean hasV6 = !fwV6 && (getCurrentAddress(true) != null || config == IPV6_FORCE_ON);
         boolean showFirewalled = !_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP) &&
                                  _context.router().getUptime() > 10*60*1000;
         if (!hasV4 && !hasV6) {

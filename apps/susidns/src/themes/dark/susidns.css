@@ -1038,6 +1038,7 @@ p.book {
 
 #host_details .destaddress {
      font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace !important;
+     user-select: all;
      word-break: break-all !important;
      white-space: normal !important;
 }
@@ -1165,9 +1166,6 @@ p.book {
      font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace !important;
      font-weight: normal;
      padding: 3px 10px !important;
-     -moz-user-select: all;
-     -webkit-user-select: all;
-     -ms-user-select: all;
      user-select: all;
      overflow: hidden;
      text-overflow: ellipsis;

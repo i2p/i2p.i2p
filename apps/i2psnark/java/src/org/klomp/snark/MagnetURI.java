@@ -4,10 +4,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 import net.i2p.data.Base32;
+import net.i2p.data.DataHelper;
 
 /**
  *
@@ -58,19 +61,24 @@ public class MagnetURI {
             }
             trackerURLs = getTrackerParam(url);
             name = ihash != null ? ihash : (ihash2 != null ? ihash2 : "");
+            name = name.toUpperCase(Locale.US);
             if (util != null)
                 name = util.getString("Magnet") + ' ' + name;
             else
                 name = "Magnet " + name;
             String dn = getParam("dn", url);
-            if (dn != null)
-                name += " (" + dn + ')';
             String xl = getParam("xl", url);
             if (xl != null) {
                 try {
                     length = Long.parseLong(xl);
                 } catch (NumberFormatException nfe) {}
             }
+            if (dn != null && length > 0)
+                name += " (" + dn + ' ' + DataHelper.formatSize2(length, false) + "B)";
+            else if (dn != null)
+                name += " (" + dn + ')';
+            else if (length > 0)
+                name += " (" + DataHelper.formatSize2(length, false) + "B)";
         } else if (url.startsWith(MAGGOT)) {
             // maggot://0691e40aae02e552cfcb57af1dca56214680c0c5:0b557bbdf8718e95d352fbe994dec3a383e2ede7
             ihash = url.substring(MAGGOT.length()).trim();
@@ -212,6 +220,20 @@ public class MagnetURI {
      *  @since 0.9.71 moved from I2PSnarkServlet
      */
     public static String toMagnetLink(byte[] ih, byte[] ih2, String announce, String basename, long length) {
+        List<String> alist = announce != null ? Collections.singletonList(announce) : null;
+        return toMagnetLink(ih, ih2, alist, basename, length);
+    }
+
+    /**
+     *  @param ih 20 or 32 bytes
+     *  @param ih 32 bytes or null
+     *  @param announces may be null
+     *  @param basename may be null. NOT URL-escaped.
+     *  @param length 0 if unknown
+     *  @return html and URL escaped
+     *  @since 0.9.71 moved from I2PSnarkServlet
+     */
+    public static String toMagnetLink(byte[] ih, byte[] ih2, Collection<String> announces, String basename, long length) {
         if ((ih.length != 20 && ih.length != 32) ||
             (ih2 != null && ih2.length != 32))
             throw new IllegalArgumentException();
@@ -221,8 +243,11 @@ public class MagnetURI {
            .append(hex);
         if (ih2 != null)
             buf.append("&amp;").append(MAGNET_V2).append(I2PSnarkUtil.toHex(ih2));
-        if (announce != null)
-            buf.append("&amp;tr=").append(announce);
+        if (announces != null) {
+            for (String a : announces) {
+                buf.append("&amp;tr=").append(DataHelper.escapeHTML(a));
+            }
+        }
         if (basename != null) {
             buf.append("&amp;dn=");
             URIUtil.encodePath(buf, basename);

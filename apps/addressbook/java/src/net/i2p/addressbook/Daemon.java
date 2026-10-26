@@ -24,6 +24,7 @@ package net.i2p.addressbook;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -483,6 +484,12 @@ class Daemon {
                                     continue;
                                 } else if (action.equals(HostTxtEntry.ACTION_UPDATE)) {
                                     if (isKnown) {
+                                        if (!oldDest.equals(dest)) {
+                                            // mismatch, disallow
+                                            logMismatch(log, action, key, Collections.singletonList(oldDest), dest.toBase64(), addressbook);
+                                            invalid++;
+                                            continue;
+                                        }
                                         allowExistingKeyInPublished = true;
                                         props.setProperty("m", Long.toString(I2PAppContext.getGlobalContext().clock().now()));
                                     }

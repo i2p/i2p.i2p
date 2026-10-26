@@ -63,3 +63,6 @@ sloccount.sc
 apps/routerconsole/jsp/favicon.ico
 .tx
 /*.sh
+
+# Maven Central build directory
+pkg-mavencentral/

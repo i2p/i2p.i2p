@@ -1,3 +1,70 @@
+2026-10-20 2.14.0 (API 0.9.71) released
+
+2026-10-03 zzz
+ * Reseed update
+
+2026-10-01 zzz
+ * GeoIP 2026-10-01
+
+2026-09-27 zzz
+ * i2psnark: Remove oldest kbucket entry when full
+
+2026-09-19 zzz
+ * i2psnark: Fix file priorities lost after startup check (GH #170)
+
+2026-09-16 zzz
+ * Tunnels:
+   - Don't process dup fragments
+   - Limit size of fragment reassembly map
+
+2026-09-15 zzz
+ * i2psnark: Extend keepalive interval
+ * Transport: force-ipv6 for docker bridge (WIP)
+
+2026-09-13 zzz
+ * i2psnark:
+   - Add all trackers to magnet links
+   - Change backup tracker to UDP
+   - Set next announce based on last response time
+
+2026-09-09 zzz
+ * i2psnark: Request throttle adjustments
+
+2026-09-04 zzz
+ * Addressbook: Check for dest mismatch in action=update
+ * i2psnark:
+   - Catch unbounded bdecode recursion
+   - Improve path traversal checks
+ * i2ptunnel: Fix SOCKS 4/4a downgrade bypass of proxy auth
+ * SAM: Fix DG2/3 subsessions
+
+2026-09-02 zzz
+ * i2psnark: Add js audio playlist controls
+
+2026-09-01 zzz
+ * i2psnark: Check available space when adding torrent files
+
+2026-08-29 zzz
+ * i2psnark:
+   - Show free disk space on add torrent form
+   - Validation fix for UDP URLs without a path part 2
+ * Router: Ensure log gzipper finishes after shutdown signal
+
+2026-08-28 zzz
+ * i2psnark:
+   - Use all trackers in magnet links, not just the first
+   - Allow adding udp tracker URLs without a path on config form
+
+2026-08-26 zzz
+ * I2CP: Add new discardMessage() to session API
+ * i2psnark: Compress UDP connect requests and KRPC DG1 messages
+
+2026-08-25 zzz
+ * i2psnark: Close all RAFs after creating or checking files
+
+2026-08-24 zzz
+ * i2psnark: Only call retransmitRequests() for non-fast peers
+
 2026-08-22 zzz
  * Build: Improve i2psnark standalone build
  * i2psnark:

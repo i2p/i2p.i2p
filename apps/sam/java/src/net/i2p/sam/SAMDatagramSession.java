@@ -44,6 +44,7 @@ class SAMDatagramSession extends SAMMessageSession {
     /**
      * Create a new SAM DATAGRAM session.
      * v1/v2 (DG1 only) or v3 (DG 1/2/3)
+     * Listens on ALL ports and protocols.
      *
      * @param dest Base64-encoded destination (private key)
      * @param props Properties to setup the I2P session
@@ -72,6 +73,7 @@ class SAMDatagramSession extends SAMMessageSession {
     /**
      * Create a new SAM DATAGRAM session.
      * v1/v2 only, DG1 only
+     * Listens on ALL ports and protocols.
      *
      * Caller MUST call start().
      *
@@ -98,13 +100,14 @@ class SAMDatagramSession extends SAMMessageSession {
      * Create a new SAM DATAGRAM session on an existing I2P session.
      * v3 only, DG 1/2/3
      *
+     * @param listenProtocol I2PSession.PROTO_xxx
      * @param v datagram version 1/2/3
      * @since 0.9.25
      */
-    protected SAMDatagramSession(I2PSession sess, Properties props, int listenPort,
-                              SAMDatagramReceiver recv, int v) throws IOException, 
+    protected SAMDatagramSession(I2PSession sess, Properties props, int listenProtocol, int listenPort,
+                              SAMDatagramReceiver recv, int v) throws IOException,
                               DataFormatException, I2PSessionException {
-        super(sess, I2PSession.PROTO_DATAGRAM, listenPort);
+        super(sess, listenProtocol, listenPort);
         this.recv = recv;
         if (v == 1) {
             dgramMaker = new I2PDatagramMaker(getI2PSession());

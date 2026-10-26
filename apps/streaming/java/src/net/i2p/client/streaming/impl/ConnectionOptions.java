@@ -597,12 +597,18 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         _windowSize = numMsgs; 
     }
     
-    /** after how many consecutive messages should we ack?
-     * @deprecated This doesn't appear to be used.
+    /**
+     * after how many consecutive messages should we ack?
      * @return receive window size.
+     * @deprecated unused
      */
     @Deprecated
     public int getReceiveWindow() { return _receiveWindow; } 
+
+    /**
+     * @deprecated unused
+     */
+    @Deprecated
     public void setReceiveWindow(int numMsgs) { _receiveWindow = numMsgs; }
     
     /**

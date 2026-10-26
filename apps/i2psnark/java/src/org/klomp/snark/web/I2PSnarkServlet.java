@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -394,6 +395,8 @@ public class I2PSnarkServlet extends BasicServlet {
             if (_context.isRouterContext() && _manager.hasModifiedTrackers()) {
                 for (Tracker t : sortedTrackers) {
                     if (t.baseURL == null || !t.baseURL.startsWith("http"))
+                        continue;
+                    if (t.announceURL == null || !t.announceURL.startsWith("http"))
                         continue;
                     if (_manager.util().isKnownOpenTracker(t.announceURL))
                         continue;
@@ -1178,8 +1181,11 @@ public class I2PSnarkServlet extends BasicServlet {
                         // test that it's a valid torrent file, and get the hash to check for dups
                         in = new FileInputStream(tmp);
                         byte[] fileInfoHash = new byte[20];
-                        String name = MetaInfo.getNameAndInfoHash(in, fileInfoHash);
+                        AtomicLong len = new AtomicLong();
+                        String name = MetaInfo.getNameAndInfoHash(in, fileInfoHash, len);
                         try { in.close(); } catch (IOException ioe) {}
+                        if (!checkSize(len.get(), dd))
+                            return;
                         Snark snark = _manager.getTorrentByInfoHash(fileInfoHash);
                         if (snark != null) {
                             _manager.addMessage(_t("Torrent with this info hash is already running: {0}", snark.getBaseName()));
@@ -1282,8 +1288,11 @@ public class I2PSnarkServlet extends BasicServlet {
                             // test that it's a valid torrent file, and get the hash to check for dups
                             in = new FileInputStream(file);
                             byte[] fileInfoHash = new byte[20];
-                            String name = MetaInfo.getNameAndInfoHash(in, fileInfoHash);
+                            AtomicLong len = new AtomicLong();
+                            String name = MetaInfo.getNameAndInfoHash(in, fileInfoHash, len);
                             try { in.close(); } catch (IOException ioe) {}
+                            if (!checkSize(len.get(), dd))
+                                return;
                             Snark snark = _manager.getTorrentByInfoHash(fileInfoHash);
                             if (snark != null) {
                                 _manager.addMessage(_t("Torrent with this info hash is already running: {0}", snark.getBaseName()));
@@ -1761,6 +1770,7 @@ public class I2PSnarkServlet extends BasicServlet {
                         newPriv.add(aurl);
                         _manager.savePrivateTrackers(newPriv);
                     }
+                    _manager.addMessage(_t("Added tracker") + ' ' + DataHelper.escapeHTML(name));
                 } else {
                     _manager.addMessage(_t("Enter valid tracker name and URLs"));
                 }
@@ -2587,10 +2597,15 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("\"></td></tr>\n");
 
         out.write("<tr><td>&nbsp;<td><span class=\"snarkAddInfo\">");
-        out.write(_t("You can also copy .torrent files to: {0}.", "<code>" + _manager.getDataDir().getAbsolutePath() + "</code>"));
-        out.write("\n");
+        File dir = _manager.getDataDir();
+        out.write(_t("You can also copy .torrent files to: {0}.", "<code>" + dir.getAbsolutePath() + "</code>"));
+        out.write(' ');
         out.write(_t("Removing a .torrent will cause it to stop."));
-        out.write("<br></span></table>\n" +
+        out.write("</span></td></tr>\n<tr><td>&nbsp;<td><span class=\"snarkAddInfo\">");
+        out.write(_t("Free disk space"));
+        out.write(": ");
+        out.write(formatSize(dir.getUsableSpace()));
+        out.write("</span></td></tr></table>\n" +
                   "</div></form></div>");
     }
 
@@ -3065,8 +3080,8 @@ public class I2PSnarkServlet extends BasicServlet {
            .append(_t("Add")).append(":</b></td>" +
                    "<td><input type=\"text\" class=\"trackername\" name=\"tname\" spellcheck=\"false\"></td>" +
                    "<td><input type=\"text\" class=\"trackerhome\" name=\"thurl\" spellcheck=\"false\"></td>" +
-                   "<td><input type=\"radio\" class=\"optbox\" value=\"0\" name=\"add_tracker_type\" checked=\"checked\"></td>" +
-                   "<td><input type=\"radio\" class=\"optbox\" value=\"1\" name=\"add_tracker_type\"></td>" +
+                   "<td><input type=\"radio\" class=\"optbox\" value=\"0\" name=\"add_tracker_type\"></td>" +
+                   "<td><input type=\"radio\" class=\"optbox\" value=\"1\" name=\"add_tracker_type\" checked=\"checked\"></td>" +
                    "<td><input type=\"radio\" class=\"optbox\" value=\"2\" name=\"add_tracker_type\"></td>" +
                    "<td><input type=\"text\" class=\"trackerannounce\" name=\"taurl\" spellcheck=\"false\"></td></tr>\n" +
                    "<tr class=\"spacer\"><td colspan=\"7\">&nbsp;</td></tr>\n" +  // spacer
@@ -3104,15 +3119,43 @@ public class I2PSnarkServlet extends BasicServlet {
         }
         try {
             MagnetURI magnet = new MagnetURI(_manager.util(), url);
-            String name = magnet.getName();
-            byte[] ih = magnet.getInfoHash();
-            if (ih == null)
-                throw new IllegalArgumentException();
-            String trackerURL = magnet.getTrackerURL();
-            _manager.addMagnet(name, ih, trackerURL, true, dataDir);
+            long len = magnet.getLength();
+            if (!checkSize(len, dataDir))
+                return;
+            _manager.addMagnet(magnet, true, true, dataDir, null);
         } catch (IllegalArgumentException iae) {
             _manager.addMessage(_t("Invalid magnet URL {0}", url));
         }
+    }
+
+    /**
+     *  Will this length fit in this directory?
+     *
+     *  @param len size of data
+     *  @param dataDir null to default to snark data directory
+     *  @return true if we have room
+     *  @since 0.9.71
+     */
+    private boolean checkSize(long len, File dataDir) {
+        if (len > 0) {
+            if (dataDir == null)
+                dataDir = _manager.getDataDir();
+            long avail = dataDir.getUsableSpace();
+            if (avail < len) {
+                StringBuilder buf = new StringBuilder();
+                buf.append(_t("Not enough disk space for torrent"));
+                buf.append(" (");
+                buf.append(DataHelper.formatSize2(len, false));
+                buf.append("B) - ");
+                buf.append(_t("Free disk space"));
+                buf.append(": ");
+                buf.append(DataHelper.formatSize2(avail, false));
+                buf.append('B');
+                _manager.addMessage(buf.toString());
+                return false;
+            }
+        }
+        return true;
     }
 
     /** copied from ConfigTunnelsHelper */
@@ -3378,6 +3421,7 @@ public class I2PSnarkServlet extends BasicServlet {
                    "<link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">\n");
         if (showPriority)
             buf.append("<script src=\"").append(_contextPath).append(WARBASE + "js/folder.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
+        buf.append("<script src=\"").append(_contextPath).append(WARBASE + "js/playlist.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
         buf.append("</head><body>\n" +
                    "<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"" +
                    " class=\"snarkNav nav_main\">");
@@ -3469,6 +3513,7 @@ public class I2PSnarkServlet extends BasicServlet {
 
             long[] dates = _manager.getSavedAddedAndCompleted(snark);
             String announce = null;
+            Set<String> annlist = new TreeSet<String>();
             if (meta != null && !showEdit) {
                 announce = meta.getAnnounce();
                 if (announce == null)
@@ -3487,7 +3532,6 @@ public class I2PSnarkServlet extends BasicServlet {
                     buf.append("</span></td></tr>");
                 }
                 List<List<String>> alist = meta.getAnnounceList();
-                Set<String> annlist = new TreeSet<String>();
                 if (alist != null && !alist.isEmpty()) {
                     // strip non-i2p trackers
                     for (List<String> alist2 : alist) {
@@ -3612,7 +3656,9 @@ public class I2PSnarkServlet extends BasicServlet {
                 // uncommment when implemented
                 //Hash v2 = meta != null ? meta.getInfoHashV2() : null;
                 Object v2 = null;
-                String link = MagnetURI.toMagnetLink(ih, announce, snark.getBaseName(), snark.getTotalLength());
+                if (announce != null)
+                    annlist.add(announce);
+                String link = MagnetURI.toMagnetLink(ih, null, annlist, snark.getBaseName(), snark.getTotalLength());
                 buf.append("<tr><td><a href=\"")
                    .append(link)
                    .append("\">")
@@ -3621,7 +3667,7 @@ public class I2PSnarkServlet extends BasicServlet {
                    .append(_t("Magnet"));
                 if (v2 != null)
                     buf.append(" (v1)");
-                buf.append("</b></td><td><a href=\"")
+                buf.append("</b></td><td class=\"magnet\"><a href=\"")
                    .append(link)
                    .append("\">")
                    .append(link)
@@ -3637,7 +3683,7 @@ public class I2PSnarkServlet extends BasicServlet {
                        .append(toImg("magnet", _t("Magnet link")))
                        .append("</a></td><td><b>")
                        .append(_t("Magnet"))
-                       .append(" (v2)</b></td><td><a href=\"")
+                       .append(" (v2)</b></td><td class=\"magnet\"><a href=\"")
                        .append(link)
                        .append("\">")
                        .append(link)
@@ -3650,7 +3696,7 @@ public class I2PSnarkServlet extends BasicServlet {
                        .append(toImg("magnet", _t("Magnet link")))
                        .append("</a></td><td><b>")
                        .append(_t("Magnet"))
-                       .append(" (v1+v2)</b></td><td><a href=\"")
+                       .append(" (v1+v2)</b></td><td class=\"magnet\"><a href=\"")
                        .append(link)
                        .append("\">")
                        .append(link)
@@ -3868,7 +3914,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (isAudio || isVideo) {
                     // HTML5
                     if (isAudio)
-                        buf.append("<audio");
+                        buf.append("<audio preload=\"metadata\"");
                     else
                         buf.append("<div class=\"video-wrapper\"><video class=\"video\"");
                     // strip trailing slash
@@ -3996,7 +4042,34 @@ public class I2PSnarkServlet extends BasicServlet {
 
         // playlist button
         if (hasCompleteAudio(fileList, storage, remainingArray)) {
-            buf.append("<tr><td colspan=\"" + (showPriority ? '5' : '4') + "\" class=\"ParentDir\">" +
+            // js play buttons
+            // js will initialize playall to control (visible)
+            buf.append("<tr><td class=\"snarkFileIcon\" colspan=\"2\">\n");
+            buf.append("<a class=\"controld script\" id=\"playall\" href=\"#\">")
+               .append(toThemeImg("start_all")).append(_t("Play All"))
+               .append("</a>\n");
+            //buf.append("<a class=\"controld script\" id=\"playprev\" href=\"#\">").append(toImg("cancel")).append(_t("Play Previous")).append("</a>\n");
+            String alt = _t("Play Previous");
+            buf.append("<a class=\"controld script\" id=\"playprev\" href=\"#\">")
+               .append(toThemeImg("previous", alt, alt))
+               .append("</a>\n");
+            //buf.append("<a class=\"controld script\" id=\"playpause\" href=\"#\">").append(toImg("cancel")).append(_t("Pause")).append("</a>\n");
+            alt = _t("Pause");
+            buf.append("<a class=\"controld script\" id=\"playpause\" href=\"#\">")
+               .append(toThemeImg("cancel", alt, alt))
+               .append("</a>\n");
+            //buf.append("<a class=\"controld script\" id=\"playresume\" href=\"#\">").append(toImg("cancel")).append(_t("Resume")).append("</a>\n");
+            alt = _t("Resume");
+            buf.append("<a class=\"controld script\" id=\"playresume\" href=\"#\">")
+               .append(toThemeImg("recheck", alt, alt))
+               .append("</a>\n");
+            //buf.append("<a class=\"controld script\" id=\"playnext\" href=\"#\">").append(toImg("cancel")).append(_t("Play Next")).append("</a>\n");
+            alt = _t("Play Next");
+            buf.append("<a class=\"controld script\" id=\"playnext\" href=\"#\">")
+               .append(toThemeImg("next", alt, alt))
+               .append("</a>\n");
+            buf.append("<span id=\"playing\"></span>\n");
+            buf.append("<td class=\"snarkFileSize\" colspan=\"" + (showPriority ? '3' : '2') + "\">" +
                        "<a href=\"").append(base).append("?playlist");
             if (sortParam != null && !"0".equals(sortParam) && !"1".equals(sortParam))
                 buf.append("&amp;sort=").append(sortParam);
@@ -4008,6 +4081,7 @@ public class I2PSnarkServlet extends BasicServlet {
         boolean showSaveButton = false;
         boolean rowEven = true;
         boolean inOrder = storage != null && storage.getInOrder();
+        int audioindex = 0;
         for (Sorters.FileAndIndex fai : fileList)
         {
             //String encoded = encodePath(ls[i].getName());
@@ -4077,7 +4151,7 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("<td class=\"snarkFileIcon\">");
             String preview = null;
             if (complete ||
-                (isAudio && fai.preview > 100*1024) ||
+                (isAudio && fai.preview > 400*1024) ||
                 (isVideo && fai.preview > 5*1024*1024 && fai.preview / (double) fai.length >= 0.01d)) {
                 String ppath = complete ? path : path + "?limit=" + fai.preview;
                 if (!complete) {
@@ -4088,10 +4162,11 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (isAudio || isVideo) {
                     // HTML5
                     if (isAudio)
-                        buf.append("<audio");
+                        buf.append("<audio preload=\"metadata\" class=\"audio\" audioindex=\"").append(audioindex++)
+                           .append("\" audioname=\"").append(DataHelper.escapeHTML(item.getName())).append('"');
                     else
                         buf.append("<div class=\"video-wrapper\"><video class=\"video\"");
-                    buf.append(" controls><source src=\"").append(ppath).append("\" type=\"").append(mime).append("\">");
+                    buf.append(" loading=\"lazy\" controls><source src=\"").append(ppath).append("\" type=\"").append(mime).append("\">");
                 }
                 buf.append("<a href=\"").append(ppath).append("\">");
                 if (mime.startsWith("image/")) {

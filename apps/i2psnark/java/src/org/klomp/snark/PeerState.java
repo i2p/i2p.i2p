@@ -940,6 +940,9 @@ class PeerState implements DataLoader
         if (rate < limit * 7 / 10) {
             if (currentMaxPipeline < peer.getMaxPipeline())
                 currentMaxPipeline++;
+        } else if (rate > limit * 13 / 10) {
+             currentMaxPipeline = 0;
+             return;
         } else if (rate > limit * 9 / 10) {
              currentMaxPipeline = 1;
         } else if (currentMaxPipeline < 2) {

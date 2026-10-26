@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 import gnu.getopt.Getopt;
 
@@ -52,7 +53,8 @@ import org.klomp.snark.bencode.InvalidBEncodingException;
 public class MetaInfo
 {  
   private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(MetaInfo.class);
-  private final String announce;
+  // non-final for reannounce()
+  private String announce;
   private final byte[] info_hash;
   private final String name;
   private final List<List<String>> files;
@@ -62,7 +64,8 @@ public class MetaInfo
   private final byte[] piece_hashes;
   private final long length;
   private final int privateTorrent; // 0: not present; 1: = 1; -1: = 0
-  private final List<List<String>> announce_list;
+  // non-final for reannounce()
+  private List<List<String>> announce_list;
   private final String comment;
   private final String created_by;
   private final long creation_date;
@@ -178,7 +181,7 @@ public class MetaInfo
    * describing the torrent.
    * Caller must close the stream.
    */
-  public MetaInfo(InputStream in) throws IOException
+  public MetaInfo(InputStream in) throws IOException, Throwable
   {
     this(new BDecoder(in));
   }
@@ -187,7 +190,7 @@ public class MetaInfo
    * Creates a new MetaInfo from the given BDecoder.  The BDecoder
    * must have a complete dictionary describing the torrent.
    */
-  private MetaInfo(BDecoder be) throws IOException
+  private MetaInfo(BDecoder be) throws IOException, Throwable
   {
     // Note that evaluation order matters here...
     this(be.bdecodeMap().getMap());
@@ -294,8 +297,9 @@ public class MetaInfo
         throw new InvalidBEncodingException("Missing name string");
     name = val.getString();
     // We could silently replace the '/', but that messes up the info hash, so just throw instead.
-    if (name.indexOf('/') >= 0)
-        throw new InvalidBEncodingException("Invalid name containing '/' " + name);
+    // now handled in Storage
+    //if (name.indexOf('/') >= 0)
+    //    throw new InvalidBEncodingException("Invalid name containing '/' " + name);
 
     // BEP 27
     val = info.get("private");
@@ -427,15 +431,36 @@ public class MetaInfo
   }
 
   /**
-   * Efficiently returns the name and the 20 byte SHA1 hash of the info dictionary in a torrent file
+   * Efficiently returns the name and the 20 byte SHA1 hash of the info dictionary in a torrent file.
    * Caller must close stream.
+   * Unused within snark, used by i2psnark-rpc plugin.
    *
    * @param infoHashOut 20-byte out parameter
    * @since 0.8.5
    */
   public static String getNameAndInfoHash(InputStream in, byte[] infoHashOut) throws IOException {
+      return getNameAndInfoHash(in, infoHashOut, new AtomicLong());
+  }
+
+  /**
+   * Efficiently returns the name and the 20 byte SHA1 hash of the info dictionary in a torrent file,
+   * and approximate total length.
+   * Caller must close stream.
+   *
+   * @param infoHashOut 20-byte out parameter
+   * @param lengthOut out parameter approximate, not exact
+   * @since 0.9.71
+   */
+  public static String getNameAndInfoHash(InputStream in, byte[] infoHashOut, AtomicLong lengthOut) throws IOException {
       BDecoder bd = new BDecoder(in);
-      Map<String, BEValue> m = bd.bdecodeMap().getMap();
+      Map<String, BEValue> m;
+      try {
+          m = bd.bdecodeMap().getMap();
+      } catch (IOException ioe) {
+          throw ioe;
+      } catch (Throwable t) {
+          throw new IOException(t);
+      }
       BEValue ibev = m.get("info");
       if (ibev == null)
           throw new InvalidBEncodingException("Missing info map");
@@ -443,6 +468,17 @@ public class MetaInfo
       BEValue rvbev = i.get("name");
       if (rvbev == null)
           throw new InvalidBEncodingException("Missing name");
+      BEValue blen = i.get("length");
+      long len = 0;
+      if (blen != null) {
+          len = blen.getLong();
+      } else {
+          blen = i.get("piece length");
+          BEValue pcs = i.get("pieces");
+          if (blen != null && pcs != null)
+              len = blen.getLong() * (pcs.getBytes().length / 20);
+      }
+      lengthOut.set(len);
       byte[] h = bd.get_special_map_digest();
       System.arraycopy(h, 0, infoHashOut, 0, 20);
       return rvbev.getString();
@@ -663,16 +699,30 @@ public class MetaInfo
 
   /**
    * Creates a copy of this MetaInfo that shares everything except the
-   * announce URL.
-   * Drops any announce-list.
+   * announce and announce-list URLs.
    * Preserves infohash and info map, including any non-standard fields.
-   * @param announce may be null
+   *
+   * As of 0.9.71, also changes the announce and announce-list on this
+   * metainfo.
+   *
+   * @param announces may be null. First will be used as primary.
    */
-  public MetaInfo reannounce(String announce) throws InvalidBEncodingException
+  public MetaInfo reannounce(List<String> announces) throws InvalidBEncodingException
   {
         Map<String, BEValue> m = new HashMap<String, BEValue>();
-        if (announce != null)
-            m.put("announce", new BEValue(DataHelper.getUTF8(announce)));
+        if (announces != null && !announces.isEmpty()) {
+            m.put("announce", new BEValue(DataHelper.getUTF8(announces.get(0))));
+            announce = announces.get(0);
+            if (announces.size() > 1) {
+                List<BEValue> anns = new ArrayList<BEValue>(announces.size());
+                for (String s : announces) {
+                    anns.add(new BEValue(DataHelper.getUTF8(s)));
+                }
+                List<BEValue> alist = Collections.singletonList(new BEValue(anns));
+                m.put("announce-list", new BEValue(alist));
+                announce_list = Collections.singletonList(announces);
+            }
+        }
         Map<String, BEValue> info = createInfoMap();
         m.put("info", new BEValue(info));
         return new MetaInfo(m);
@@ -809,7 +859,7 @@ public class MetaInfo
   }
 
   /** @since 0.8.5 */
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Throwable {
       boolean error = false;
       String created_by = null;
       String announce = null;

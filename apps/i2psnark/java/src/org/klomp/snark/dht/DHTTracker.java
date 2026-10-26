@@ -41,7 +41,7 @@ class DHTTracker {
     private static final int MAX_PEERS = 2000;
     private static final int MAX_PEERS_PER_TORRENT = 150;
     private static final int ABSOLUTE_MAX_PER_TORRENT = MAX_PEERS_PER_TORRENT * 2;
-    private static final int MAX_TORRENTS = 400;
+    private static final int MAX_TORRENTS = 800;
 
     DHTTracker(I2PAppContext ctx) {
         _context = ctx;

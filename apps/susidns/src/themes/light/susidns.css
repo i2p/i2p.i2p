@@ -55,12 +55,6 @@ object {
     width: 100%;
 }
 
-#host_list .destaddress {
-     -moz-user-select: all;
-     -webkit-user-select: all;
-     -ms-user-select: all;
-}
-
 #navi {
      margin: -1px 0 0;
      padding: 10px 3px;
@@ -848,6 +842,7 @@ tr:hover .destaddress {
      font-weight: normal;
      color: #5a5a6f;
      padding: 3px !important;
+     user-select: all;
 }
 
 #host_list .destaddress:not(old) {
@@ -910,6 +905,7 @@ td.destinations textarea {
      font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      word-break: break-all !important;
      white-space: normal !important;
+     user-select: all;
 }
 
 /* identicon + qr image */

@@ -1228,8 +1228,6 @@ input[type="text"] + label {
 .displayText:hover, .displayText:focus {
      overflow: auto;
      text-overflow: clip;
-     margin: 0.5px 5px;
-     padding: 2px 4px;
      box-shadow: 0 0 1px #494;
      background: #000;
      color: #ff0;

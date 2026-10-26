@@ -89,7 +89,15 @@ public interface Transport {
         SOURCE_INTERFACE("local"),
         /** unused */
         SOURCE_CONFIG("config"),
-        SOURCE_SSU("ssu");
+        SOURCE_SSU("ssu"),
+        /**
+         *  @since 0.9.71
+         */
+        SOURCE_NATPMP("natpmp"),
+        /**
+         *  @since 0.9.71
+         */
+        SOURCE_PCP("pcp");
 
         private final String cfgstr;
 

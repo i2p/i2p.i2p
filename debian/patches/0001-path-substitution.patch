@@ -399,24 +399,26 @@ Index: b/installer/resources/locale/po/messages_it.po
 ===================================================================
 --- a/installer/resources/locale/po/messages_it.po
 +++ b/installer/resources/locale/po/messages_it.po
-@@ -189,13 +189,13 @@ msgid "Request a Java thread dump if run
+@@ -193,15 +193,15 @@
  msgstr "Richiedi un Java thread dump se è in esecuzione."
  
- #: ../i2prouter:1874
+ #: ../i2prouter:1884
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 -msgstr "Modifica i2prouter e imposta la variabile RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
 +msgstr "Modifica /etc/default/i2p e imposta la variabile RUN_AS_USER"
  
- #: ../i2prouter:1879
+ #: ../i2prouter:1889
  msgid "Running I2P as the root user is *not* recommended."
  msgstr "Eseguire I2P come amministratore *non* è consigliato."
  
- #: ../i2prouter:1882
+ #: ../i2prouter:1892
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
--msgstr "Per eseguirlo comunque come amministratore, modifica  i2prouter e imposta ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
-+msgstr "Per eseguirlo comunque come amministratore, modifica  /etc/default/i2p e imposta ALLOW_ROOT=true."
+ msgstr ""
+-"Per eseguirlo comunque come amministratore, modifica i2prouter e imposta "
++"Per eseguirlo comunque come amministratore, modifica /etc/default/i2p e imposta "
+ "ALLOW_ROOT=true."
 Index: b/installer/resources/locale/po/messages_zh.po
 ===================================================================
 --- a/installer/resources/locale/po/messages_zh.po
