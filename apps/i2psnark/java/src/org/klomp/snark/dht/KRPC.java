@@ -382,7 +382,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                 continue;
             synchronized(waiter) {
                 try {
-                    waiter.wait(Math.max(30*1000, (Math.min(45*1000, endTime - _context.clock().now()))));
+                    waiter.wait(Math.max(15*1000, (Math.min(25*1000, endTime - _context.clock().now()))));
                 } catch (InterruptedException ie) {}
             }
 
