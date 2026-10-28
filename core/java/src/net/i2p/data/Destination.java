@@ -159,7 +159,7 @@ public class Destination extends KeysAndCert {
     }
 
     public int size() {
-        int rv = PublicKey.KEYSIZE_BYTES + _signingKey.length();
+        int rv = _publicKey.length() + _signingKey.length();
         if (_certificate.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
             // cert data included in keys
             rv += 7;
