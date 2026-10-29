@@ -139,7 +139,7 @@ public class I2PSnarkServlet extends BasicServlet {
     {
         if (pathInContext == null)
             return super.getResource(pathInContext);
-        if (pathInContext.startsWith("//") || pathInContext.contains(".."))
+        if (pathInContext.contains(".."))
             return null;
         if (pathInContext.equals("/") || pathInContext.equals("/index.jsp") ||
             !pathInContext.startsWith("/") || pathInContext.length() == 0 ||
@@ -148,8 +148,6 @@ public class I2PSnarkServlet extends BasicServlet {
         // files in the i2psnark/ directory
         // get top level
         pathInContext = pathInContext.substring(1);
-        if (new File(pathInContext).isAbsolute())
-            return null;
         File top = new File(pathInContext);
         File parent;
         while ((parent = top.getParentFile()) != null) {
@@ -161,10 +159,29 @@ public class I2PSnarkServlet extends BasicServlet {
             if (storage != null) {
                 File sbase = storage.getBase();
                 String child = pathInContext.substring(top.getPath().length());
-                return new File(sbase, child);
+                return getContainedResource(sbase, child);
             }
         }
-        return new File(_resourceBase, pathInContext);
+        return getContainedResource(_resourceBase, pathInContext);
+    }
+
+    /**
+     * Resolve a resource while preventing symlink and canonical-path escapes.
+     */
+    private File getContainedResource(File base, String child)
+    {
+        try {
+            File canonicalBase = base.getCanonicalFile();
+            File canonicalTarget = new File(base, child).getCanonicalFile();
+            String basePath = canonicalBase.getPath();
+            String targetPath = canonicalTarget.getPath();
+            if (!targetPath.equals(basePath) &&
+                !targetPath.startsWith(basePath + File.separator))
+                return null;
+            return canonicalTarget;
+        } catch (IOException ioe) {
+            return null;
+        }
     }
 
     /**
