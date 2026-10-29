@@ -137,13 +137,19 @@ public class I2PSnarkServlet extends BasicServlet {
     @Override
     public File getResource(String pathInContext)
     {
-        if (pathInContext == null || pathInContext.equals("/") || pathInContext.equals("/index.jsp") ||
+        if (pathInContext == null)
+            return super.getResource(pathInContext);
+        if (pathInContext.startsWith("//") || pathInContext.contains(".."))
+            return null;
+        if (pathInContext.equals("/") || pathInContext.equals("/index.jsp") ||
             !pathInContext.startsWith("/") || pathInContext.length() == 0 ||
             pathInContext.equals("/index.html") || pathInContext.startsWith(WARBASE))
             return super.getResource(pathInContext);
         // files in the i2psnark/ directory
         // get top level
         pathInContext = pathInContext.substring(1);
+        if (new File(pathInContext).isAbsolute())
+            return null;
         File top = new File(pathInContext);
         File parent;
         while ((parent = top.getParentFile()) != null) {
