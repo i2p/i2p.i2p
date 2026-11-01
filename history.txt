@@ -1,4 +1,8 @@
+2026-10-28 zzz
+ * Data: Fix size() calculation for non-standard Destinations
+
 2026-10-25 zzz
+ * SAM: Start SAM when router is ready (GH #179)
  * Transports: Fix NTCP2 PQ outbound connections (GH #180)
 
 2026-10-20 2.14.0 (API 0.9.71) released
