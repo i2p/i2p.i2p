@@ -1,3 +1,12 @@
+2026-11-04 2.14.1 (API 0.9.71) released
+
+2026-11-04 zzz
+ * Translations update (Korean)
+
+2026-11-01 zzz
+ * GeoIP 2026-11-01
+ * Util: Strengthen path traversal check (GH #181)
+
 2026-10-28 zzz
  * Data: Fix size() calculation for non-standard Destinations
 
