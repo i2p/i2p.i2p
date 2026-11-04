@@ -60,11 +60,17 @@ abstract class IRCFilter {
      *  @return the original or modified line, or null if it should be dropped.
      */
     public static String inboundFilter(String s, StringBuffer expectedPong, DCCHelper helper) {
-        
-        String field[] = DataHelper.split(s, " ", 5);
+        // https://www.unrealircd.org/docs/Message_tags
+        // https://ircv3.net/specs/extensions/message-tags.html
+        // A leading "@tag ..." pushes everything one field to the right, so the
+        // message body only lands in its own field if we allow one more split
+        // in that case. Without a tag, splitting into 5 chops the body into
+        // pieces (and the trailing CTCP marker would be lost).
+        boolean tagged = !s.isEmpty() && s.charAt(0) == '@';
+        String field[] = DataHelper.split(s, " ", tagged ? 5 : 4);
         String command;
         int idx=0;
-        
+
 
         try {
             // https://www.unrealircd.org/docs/Message_tags
