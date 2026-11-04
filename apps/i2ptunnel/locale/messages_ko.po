@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-27 11:59+0000\n"
-"PO-Revision-Date: 2026-04-11 00:06+0000\n"
+"PO-Revision-Date: 2026-11-01 09:32+0000\n"
 "Last-Translator: on9686 <on9686@users.noreply.localizationlab.weblate.cloud>"
 "\n"
 "Language-Team: Korean <https://localizationlab.weblate.cloud/projects/i2p/"
@@ -22,7 +22,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.16.2\n"
+"X-Generator: Weblate 2026.10.1\n"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:506
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:516
@@ -183,7 +183,7 @@ msgstr "올바르지 않은 주소"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:185
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/ssl_jsp.java:178
 msgid "Hidden Services Manager"
-msgstr "히든 서비스 매니저"
+msgstr "히든 서비스 관리자"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:172
 msgid "Edit Client Tunnel"
@@ -1217,7 +1217,7 @@ msgstr "암호화됨"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1822
 msgid "Prevents server discovery by floodfills"
-msgstr "플러드필에 의한 서버 탐색 방지"
+msgstr "플러드필에 의한 서버 탐색 차단"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/edit_jsp.java:1826
 msgid "Blinded"

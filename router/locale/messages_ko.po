@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-08-11 15:33+0000\n"
-"PO-Revision-Date: 2026-03-21 17:31+0000\n"
+"PO-Revision-Date: 2026-11-01 09:32+0000\n"
 "Last-Translator: on9686 <on9686@users.noreply.localizationlab.weblate.cloud>"
 "\n"
 "Language-Team: Korean <https://localizationlab.weblate.cloud/projects/i2p/"
@@ -22,12 +22,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.16.2\n"
+"X-Generator: Weblate 2026.10.1\n"
 
 #. * IPv4 OK, IPv6 OK or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:377
 msgid "OK"
-msgstr "OK"
+msgstr "정상"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:378
 msgid "IPv4: OK; IPv6: Testing"
@@ -69,7 +69,7 @@ msgstr "IPv4: 방화벽 있음; IPv6: 테스트 중"
 #. * IPv4 firewalled, IPv6 firewalled or disabled or no address
 #: ../java/src/net/i2p/router/CommSystemFacade.java:389
 msgid "Firewalled"
-msgstr "방화벽 있음"
+msgstr "방화벽 차단됨"
 
 #: ../java/src/net/i2p/router/CommSystemFacade.java:390
 msgid "IPv4: Testing; IPv6: Firewalled"

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko" dir="ltr">
+<head>
+  <title>I2P 익명 웹 서버</title>
+  <link rel="shortcut icon" href="favicon.ico" />
+  <link rel="stylesheet" type="text/css" href="lib/eepsite.css" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+
+   <div class="main">
+
+   <div class="langbar">
+      <a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
+      <a href="index_ar.html"><img src="lib/lang_ar.png" title="عربية" alt="عربية"></a>
+      <a href="index_az.html"><img src="lib/az.png" title="Azerbaijani" alt="Azerbaijani"></a>
+      <a href="index_cs.html"><img src="lib/cs.png" title="Čeština" alt="Čeština"></a>
+      <a href="index_zh.html"><img src="lib/cn.png" title="中文" alt="中文"></a>
+      <a href="index_zh_TW.html"><img src="lib/tw.png" title="中文 (Taiwan)" alt="中文 (Taiwan)"></a>
+      <a href="index_gan.html"><img src="lib/cn.png" title="Gan Chinese 赣语" alt="Gan Chinese 赣语"></a>
+      <a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a>
+      <a href="index_el.html"><img src="lib/gr.png" title="Ελληνικά" alt="Ελληνικά"></a>
+      <a href="index_es.html"><img src="lib/es.png" title="Español" alt="Español"></a>
+      <a href="index_fa.html"><img src="lib/ir.png" title="فارسی" alt="فارسی"></a>
+      <a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
+      <a href="index_hu.html"><img src="lib/hu.png" title="Magyar" alt="Magyar"></a>
+      <a href="index_in.html"><img src="lib/id.png" title="bahasa Indonesia" alt="bahasa Indonesia"></a>
+      <a href="index_it.html"><img src="lib/it.png" title="Italian" alt="Italian"></a>
+      <a href="index_ja.html"><img src="lib/jp.png" title="日本語" alt="日本語"></a>
+      <a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a>
+      <a href="index_pl.html"><img src="lib/pl.png" title="Polish" alt="Polish"></a>
+      <a href="index_pt.html"><img src="lib/pt.png" title="Português" alt="Português"></a>
+      <a href="index_pt_BR.html"><img src="lib/br.png" title="Português (Brazil)" alt="Português (Brazil)"></a>
+      <a href="index_ro.html"><img src="lib/ro.png" title="Română" alt="Română"></a>
+      <a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a>
+      <a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
+      <a href="index_pl.html"><img src="lib/tr.png" title="Turkish" alt="Turkish"></a>
+      <a href="index_uk.html"><img src="lib/ua.png" title="Українська" alt="Українська"></a>
+    </div>
+
+    <h1>I2P 익명 웹 서버</h1>
+
+    <h2>I2P 익명 웹 호스팅 가이드</h2>
+
+    <p>
+      직접 운영하는 익명 I2P 웹 서버(전통적으로 <i>eepsite</i>라고 부름)입니다. 콘텐츠를 제공하려면 웹 서버 루트 디렉터리의 파일을 수정하기만 하면 되며, 아래 지침을 따르면 사이트가 공개됩니다.
+    </p>
+
+    <p id="dir">웹 서버 루트 디렉터리는 운영체제에 따라 다음 위치 중 하나에 있을 것입니다:
+    </p>
+
+    <ul>
+      <li><b>Linux</b><br> 표준 설치: <code dir="ltr">~/.i2p/eepsite/docroot/</code><br> 패키지 설치, 서비스로 실행 중: <code dir="ltr">/var/lib/i2p/i2p-config/eepsite/docroot/</code>
+      </li>
+      <li><b>Windows</b><br> 표준 설치: <code dir="ltr">%LOCALAPPDATA%\I2P\eepsite\docroot\</code> Windows 서비스 설치: <code dir="ltr">%PROGRAMDATA%\I2P\eepsite\docroot\</code>
+      </li>
+      <li><b>Mac</b><br> <code dir="ltr">/Users/(user)/Library/Application Support/i2p</code>
+      </li>
+    </ul>
+
+    <p>I2P에서 히든 서비스는 ".b32.i2p"로 끝나는 Base32 주소 또는 긴 Base64 문자열로 표현되는 목적지로 주소가 지정됩니다. 아래 지침에 따라 이름을 등록할 때까지 Base32 주소를 호스트 이름으로 사용할 수 있습니다. 목적지는 IP 주소와 유사한 개념으로, <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">히든 서비스 설정 페이지</a>에 표시됩니다.
+    </p>
+
+    <p>아래 지침에서는 웹사이트에 "mysite.i2p" 같은 이름을 할당하고 다른 사람들이 접속할 수 있도록 설정하는 방법을 자세히 다룹니다. 로컬에서는 <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>를 통해 사이트에 접속할 수 있습니다.
+    </p>
+
+    <h2>히든 서비스를 설정하고 알리는 방법</h2>
+
+     <p>웹 서버는 기본적으로 실행 중이지만 히든 서비스 터널을 시작하기 전에는 다른 사람이 접속할 수 없습니다. I2P 웹 서버 터널을 시작한 뒤에도 다른 사람들이 찾기는 어렵습니다. 긴 목적지, 또는 목적지의 해시값인 짧은 Base32 주소(.b32.i2p)로만 접속할 수 있습니다. 목적지 또는 Base32 주소를 직접 알려줄 수도 있지만, 다행히 I2P에는 주소록 및 웹사이트를 쉽게 알릴 수 있는 몇 가지 방법이 있습니다. 자세한 지침을 여기서 확인하십시오.
+    </p>
+
+    <ul>
+      <li>웹사이트 이름(<i>something</i>.i2p)을 소문자를 사용해 선택합니다. 먼저 라우터 <a href="http://127.0.0.1:7657/dns?book=router&amp;filter=none">주소록</a>에서 이미 사용 중인 이름인지 확인해보는 것이 좋습니다. <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">히든 서비스 설정 페이지</a>의 "웹사이트 이름"란에 새 이름을 입력합니다. 이 값이 기본값 "mysite.i2p"를 대체합니다. 또한 I2P를 시작할 때 I2P 웹 서버 터널이 자동으로 시작되도록 하려면 "터널 자동 시작" 체크박스를 선택하십시오. 그러면 라우터를 켤 때마다 웹사이트가 자동으로 시작됩니다. 설정 후 반드시 "저장"을 클릭하십시오.
+      </li>
+      <li><a href="http://127.0.0.1:7657/i2ptunnel/">메인 히든 서비스 관리자 페이지</a>에서 웹 서버 터널 시작 버튼을 클릭하십시오. <a href="http://127.0.0.1:7657/">I2P 라우터 콘솔</a> 왼쪽의 "로컬 터널" 아래에 표시됩니다. 이제 웹사이트가 실행 중입니다.
+      </li>
+      <li><a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">히든 서비스 설정 페이지</a>에서 로컬 목적지 전체를 선택하여 복사합니다. 500자 이상이므로 전체를 복사했는지 확인하십시오.
+      </li>
+      <li>이름을 입력하고 목적지를 <a href="http://127.0.0.1:7657/dns?book=router&amp;filter=none">주소록</a>에 붙여넣습니다. "추가"를 클릭하여 새 항목을 저장합니다.
+      </li>
+      <li>브라우저에 웹사이트 이름(<i>something</i>.i2p)을 입력하면 여기로 돌아올 것입니다. 잘 되었기를 바랍니다!
+      </li>
+      <li>새 웹사이트를 세상에 알리기 전에, 몇 가지 내용을 추가해야 합니다. <a href="#dir">위에 나열된</a> 서버 루트 디렉터리로 가서 index.html 리다이렉트 페이지를 본인의 콘텐츠로 변경합니다.
+      </li>
+    </ul>
+
+    <p>디렉터리 목록 기능이 활성화되어 있으므로, 파일 링크가 담긴 페이지를 따로 만들지 않아도 하위 디렉터리의 파일을 호스팅할 수 있습니다. 디렉터리마다 수정한 <a href="lib/jetty-dir.css">jetty-dir.css</a> 파일을 두면 디렉터리 목록의 모양을 바꿀 수 있습니다. <a href="lib/">lib 하위 디렉터리</a>에서는 사용자 지정 스타일을, <a href="lib/resources">resources 하위 디렉터리</a>에서는 기본 스타일을 볼 수 있습니다. 기본적인 사이트 템플릿이 필요하다면 <a href="pagetemplate.html">이 페이지</a>와 <a href="lib/">관련 콘텐츠</a>를 자유롭게 가져다 쓰십시오.
+    </p>
+
+    <p>콘텐츠를 수정한 뒤에도 이 페이지가 다시 표시된다면 브라우저의 웹 캐시를 지워 보십시오:</p>
+
+    <ul>
+      <li><b>Firefox:</b> 설정 ➜ 개인 정보 및 보안 ➜ 데이터 지우기… ➜ 임시 캐시 파일 및 페이지 ➜ 지우기</li>
+      <li><b>Chrome/Chromium:</b> 더보기 ➜ 인터넷 사용 기록 삭제 ➜ 캐시된 이미지 및 파일 ➜ 데이터 삭제</li>
+      <li><b>Opera:</b> 설정 ➜ 개인 정보 보호 및 보안 ➜ 인터넷 사용 기록 삭제 ➜ 캐시된 이미지 및 파일 ➜ 데이터 삭제</li>
+    </ul>
+
+    <h2>I2P 도메인 등록하기</h2>
+
+    <p>이제 <a href="http://stats.i2p/" target="_blank">stats.i2p</a> 같은 사이트가 운영하는 I2P 주소록에 웹사이트를 추가할 차례입니다. 이러한 사이트 중 하나 이상에 웹사이트 이름과 목적지(또는 가입 인증 문자열)를 입력해야 합니다.
+    </p><p>일부 등록 사이트는 목적지를 요구합니다. 이 경우 <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">히든 서비스 설정 페이지</a>에서 로컬 목적지 전체를 선택하여 복사하십시오. 500자 이상이므로 전체를 복사했는지 확인하십시오.
+    </p><p><a href="http://stats.i2p/i2p/addkey.html" target="_blank">stats.i2p</a>를 비롯한 일부 등록 사이트는 가입 인증 문자열을 요구합니다. 이 문자열은 <a href="http://127.0.0.1:7657/i2ptunnel/edit?tunnel=3">히든 서비스 설정 페이지</a>에서 연결되는 <a href="http://127.0.0.1:7657/i2ptunnel/register?tunnel=3">가입 인증 페이지</a>에 있습니다. 인증 문자열 전체를 복사하여 등록 페이지에 붙여넣으십시오. 500자 이상이므로 전체를 복사했는지 확인하십시오. 사이트에서 요청하면 웹사이트를 간단히 소개하십시오. HTTP 서비스라면 체크박스를 선택한 상태로 두고, 그렇지 않다면 선택을 해제하십시오.
+    </p><p>어느 등록 사이트든 서비스 약관을 꼼꼼히 읽으십시오. "Submit" 버튼을 클릭한 뒤 등록이 성공했는지 확인하십시오. 많은 라우터가 이러한 사이트에서 주기적으로 주소록 업데이트를 받아 오므로, 몇 시간 안에 다른 사람들도 브라우저에 호스트 이름만 입력하면 웹사이트를 찾을 수 있게 됩니다.</p>
+
+    <h2>주소록 구독 추가하기</h2>
+
+    <p>주소록 업데이트 이야기가 나온 김에, 구독 목록에 주소록을 몇 개 더 추가해 두는 것이 좋습니다. <a href="http://127.0.0.1:7657/susidns/subscriptions">구독 설정 페이지</a>로 가서, 새 호스트 목록을 자동으로 업데이트받을 수 있도록 다음 중 하나 이상을 추가하십시오:
+    </p>
+
+    <ul>
+      <li><code dir="ltr">http://stats.i2p/cgi-bin/newhosts.txt</code> (<a href="http://stats.i2p/cgi-bin/newhosts.txt" target="_blank">stats.i2p</a>)
+      </li>
+    </ul>
+
+    <p>급해서 몇 시간을 기다릴 수 없다면, "점프" 주소 도우미 리디렉션 서비스를 이용하도록 사람들에게 안내할 수 있습니다. 같은 사이트에 호스트 이름을 등록하면 몇 분 안에 작동합니다. 먼저 브라우저에 <code dir="ltr">http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code>를 입력해 직접 확인해 보십시오. 제대로 작동하면 다른 사람들에게 이용하도록 알려 주면 됩니다.
+    </p>
+
+    <p>새 eepsite를 찾기 위해 <a href="http://identiguy.i2p/" target="_blank">Identiguy의 eepsite 상태 목록</a>이나 <a href="http://no.i2p/browse/" target="_blank">no.i2p의 활성 호스트 목록</a> 같은 웹사이트 목록을 확인하는 사람들도 있으므로, 사이트에 방문자가 생기기 시작할 수 있습니다. 사이트를 알리는 방법은 그 밖에도 많습니다. 몇 가지 예를 들면 다음과 같습니다:
+    </p>
+
+    <ul>
+      <li><a href="http://i2pforum.i2p/" target="_blank">I2P 포럼</a>에 글을 올려 새 I2P 웹사이트를 모두에게 알리십시오!
+      </li>
+      <li>IRC의 #i2p 또는 #i2p-chat 채널에서 사람들에게 알리십시오.
+      </li>
+      <li><a href="http://i2pwiki.i2p/index.php?title=Eepsite/Services" target="_blank">I2PWiki Eepsite 색인</a>에 등록하십시오.
+      </li>
+    </ul>
+
+    <p>일부 사이트에서는 그 아주 긴 목적지를 붙여넣으라고 권하기도 합니다. 원한다면 그렇게 해도 되지만, 등록 서비스에 호스트 이름을 성공적으로 등록하고, 점프 서비스로 테스트하고, 주소록 업데이트가 다른 사람들에게 전파되도록 24시간을 기다렸다면 그럴 필요는 없습니다.</p>
+
+    <h2>다른 웹 서버로 사이트 호스팅하기</h2>
+
+    <p>이 사이트(와 I2P 라우터 콘솔)는 <a href="https://en.wikipedia.org/wiki/Jetty_(web_server)" target="_blank">Jetty 웹 서버</a>에서 실행되고 있지만, 콘텐츠를 호스팅하는 데 다른 웹 서버를 쓰고 싶을 수도 있습니다. 익명성을 유지하려면 웹 서버가 localhost(127.0.0.1)에서 오는 연결만 허용하도록 설정되어 있는지 반드시 확인하고, 문서를 살펴 웹 서버가 익명성을 해칠 수 있는 세부 정보를 노출하지 않는지 점검하십시오.
+    </p>
+
+     <p>I2P에서 사용할 웹 서버를 설정하려면, 기존 웹 서버 터널을 그대로 쓰면서 <a href="http://127.0.0.1:7657/configclients">기본 웹 서버가 실행되지 않도록 비활성화</a>하거나, <a href="http://127.0.0.1:7657/i2ptunnelmgr">히든 서비스 관리자</a>에서 새 HTTP 서버 터널을 만들면 됩니다. 웹 서버에 설정한 수신 포트(기본값 7658)가 히든 서비스 설정에도 똑같이 설정되어 있는지 확인하십시오. 예를 들어 웹 서버가 127.0.0.1 주소의 80번 포트에서 수신하고 있다면, 히든 서비스 관리자의 해당 서비스 설정 페이지에서 목표 포트도 80번으로 설정되어 있어야 합니다.
+        </p>
+
+        <p>잘못 설정된 웹 서버나 웹 애플리케이션은 실제 IP 주소나 서버 세부 정보처럼 익명성을 떨어뜨리거나 해커에게 도움이 될 수 있는 민감한 정보를 유출할 수 있으니 주의하십시오. 서버 관리에 익숙하지 않다면 기본 서버를 사용할 것을 권장합니다. 웹 서버를 온라인에 공개하기 전에 반드시 보안을 점검하십시오. 온라인에는 참고할 만한 가이드가 많습니다. 예를 들어 "nginx security hardening guide"를 검색하면 좋은 권장 사항을 담은 가이드를 여럿 찾을 수 있습니다.
+        </p>
+
+        <p>Apache 웹 서버에는 중요한 문제가 하나 있습니다. 일부 운영 체제에서는 <code dir="ltr">mod_status</code>와 <code dir="ltr">mod_info</code> Apache 모듈이 기본으로 활성화되어 있습니다. 이 모듈들은 내부 데이터를 노출하므로 익명 네트워크에서 사용하면 익명성이 심각하게 훼손될 수 있습니다. 설정 파일에서 이 모듈들을 불러오는 줄을 삭제하는 것이 이 문제를 막는 가장 쉬운 방법입니다.
+        </p>
+
+    <h2>추가 지원</h2>
+
+        <p>궁금한 점이 있다면 다음 곳에서 도움을 받을 수 있습니다:
+        </p>
+
+        <ul>
+          <li>IRC 지원 채널:
+             <ul>
+                <li><a href="irc://irc.freenode.net/i2p">Freenode의 #i2p</a>
+                </li>
+                <li>로컬 <a href="irc://127.0.0.1:6668/i2p">I2P IRC 터널</a>을 통한 익명 접속</li>
+             </ul>
+          </li>
+          <li>프로젝트 포럼 <a href="http://i2pforum.i2p/" target="_blank">i2pforum.i2p</a>
+          </li>
+          <li><a href="http://i2pwiki.i2p/index.php?title=EepsiteHosting" target="_blank">I2PWiki Eepsite 호스팅 가이드</a>
+          </li>
+        </ul>
+
+        <hr>
+        <div class="notify">
+          이 페이지와 프로젝트 웹사이트, 라우터 콘솔은 번역이 필요합니다! <a href="http://i2p-projekt.i2p/getinvolved.html" target="_blank"> 참여</a>하거나 <a href="http://i2p-projekt.i2p/en/get-involved/guides/new-translators" target="_blank">번역</a>하여 프로젝트의 성장을 도와주십시오.
+        </div>
+        <hr>
+
+  </div>
+</body>
+</html>

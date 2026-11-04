@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-05 15:28+0000\n"
-"PO-Revision-Date: 2026-03-21 17:31+0000\n"
+"PO-Revision-Date: 2026-11-01 09:58+0000\n"
 "Last-Translator: on9686 <on9686@users.noreply.localizationlab.weblate.cloud>"
 "\n"
 "Language-Team: Korean <https://localizationlab.weblate.cloud/projects/i2p/"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.16.2\n"
+"X-Generator: Weblate 2026.10.1\n"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:152
 #, java-format
@@ -33,7 +33,7 @@ msgstr "호스트 이름 \"{0}\"가 잘못된 문자 {1}을 포함합니다"
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:174
 #, java-format
 msgid "Host name cannot start with \"{0}\""
-msgstr "호스트이름은 \"{0}\"으로 시작할 수 없음"
+msgstr "호스트 이름은 \"{0}\"으로 시작할 수 없음"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:169
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:171
@@ -90,30 +90,30 @@ msgstr "DSA 1024 bit"
 #, java-format
 msgid "One result for search within filtered list."
 msgid_plural "{0} results for search within filtered list."
-msgstr[0] "{0} 상세검색 결과."
+msgstr[0] "필터링된 목록 내 검색 결과 {0}개."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:199
 #, java-format
 msgid "Filtered list contains 1 entry."
 msgid_plural "Filtered list contains {0} entries."
-msgstr[0] "{0} 항목을 포함하는 필터된 리스트."
+msgstr[0] "필터링된 목록에 항목 {0}개가 있습니다."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:204
 #, java-format
 msgid "One result for search."
 msgid_plural "{0} results for search."
-msgstr[0] "{0} 검색결과."
+msgstr[0] "검색 결과 {0}개."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:213
 #, java-format
 msgid "Address book contains 1 entry."
 msgid_plural "Address book contains {0} entries."
-msgstr[0] "{0} 항목을 포함하는 주소록."
+msgstr[0] "주소록에 항목 {0}개가 있습니다."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:229
 #, java-format
 msgid "Showing {0} of {1}"
-msgstr "{1}에서 {0} 보여짐"
+msgstr "{1}개 중 {0}개 표시"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:252
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:255
@@ -133,7 +133,7 @@ msgstr "교체"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:266
 #, java-format
 msgid "Host name {0} is already in address book, unchanged."
-msgstr "호스트 이름 {0}은 이미 주소록에 있습니다, 변경안됨."
+msgstr "호스트 이름 {0}은(는) 이미 주소록에 있어 변경하지 않았습니다."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:264
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:270
@@ -150,29 +150,29 @@ msgstr ""
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:289
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:296
 msgid "Unable to resolve Base 32 address"
-msgstr "Base 32 주소를 해석할 수 없습니다"
+msgstr "Base32 주소를 해석할 수 없습니다"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:310
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:328
 #, java-format
 msgid "Destination added for {0}."
-msgstr "{0} 목적지 추가됨."
+msgstr "{0}의 목적지 추가됨."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:312
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:330
 #, java-format
 msgid "Destination changed for {0}."
-msgstr "{0}으로 목적지 변경됨."
+msgstr "{0}의 목적지 변경됨."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:314
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:332
 msgid "Warning - hostname does not end with \".i2p\""
-msgstr "경고 - 호스트네임이 \".i2p\"로 끝나지 않습니다"
+msgstr "경고 - 호스트 이름이 \".i2p\"로 끝나지 않습니다"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:321
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:344
 msgid "Invalid Base 32 hostname."
-msgstr "잘못된 Base32 호스트네임."
+msgstr "잘못된 Base32 호스트 이름."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:323
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:346
@@ -183,12 +183,12 @@ msgstr "잘못된 Base64 목적지."
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:352
 #, java-format
 msgid "Invalid hostname \"{0}\"."
-msgstr "잘못된 호스트네임 \"{0}\"."
+msgstr "잘못된 호스트 이름 \"{0}\"."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:333
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:355
 msgid "Please enter a hostname and destination"
-msgstr "호스트네임과 목적지를 입력해 주십시오"
+msgstr "호스트 이름과 목적지를 입력해 주십시오"
 
 #. clear search when deleting
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:337
@@ -204,14 +204,14 @@ msgstr "항목 삭제"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:359
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:703
 msgid "Delete Selected"
-msgstr "선택된 메세지 삭제"
+msgstr "선택 항목 삭제"
 
 #. parameter is a hostname
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:351
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:389
 #, java-format
 msgid "Destination {0} deleted."
-msgstr "목적지 {0} 삭제."
+msgstr "목적지 {0} 삭제됨."
 
 #. parameter will always be >= 2
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:354
@@ -219,12 +219,12 @@ msgstr "목적지 {0} 삭제."
 #, java-format
 msgid "1 destination deleted."
 msgid_plural "{0} destinations deleted."
-msgstr[0] "{0} 목적지 삭제."
+msgstr[0] "목적지 {0}개 삭제됨."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:356
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:394
 msgid "No entries selected to delete."
-msgstr "삭제될 항목 없음."
+msgstr "삭제할 항목을 선택하지 않았습니다."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:360
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:255
@@ -253,8 +253,8 @@ msgid ""
 "Invalid form submission, probably because you used the \"back\" or "
 "\"reload\" button on your browser. Please resubmit."
 msgstr ""
-"잘못된 폼 서브미션. 뒤로가기나 새로고침을 누르셨을 수 있습니다. 재시도해주세"
-"요."
+"잘못된 양식 제출입니다. 브라우저의 \"뒤로\" 또는 \"새로고침\" 버튼을 "
+"사용했기 때문일 수 있습니다. 다시 제출해 주십시오."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:377
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:111
@@ -295,11 +295,11 @@ msgstr "{1} 데이터베이스의 {0} 주소록"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:268
 #, java-format
 msgid "Host name {0} is not in  the address book."
-msgstr "호스트네임 {0}은(는) 주소록에 없습니다."
+msgstr "호스트 이름 {0}은(는) 주소록에 없습니다."
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:311
 msgid "Manually added via SusiDNS"
-msgstr "SusiDNS를 통해 수동으로 저장됨"
+msgstr "SusiDNS를 통해 수동으로 추가됨"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:337
 #, java-format
@@ -314,7 +314,7 @@ msgstr "네이밍 서비스 {1}에서 {0} 목적지 삭제 실패"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:422
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:390
 msgid "Save Notes"
-msgstr "노트 저장"
+msgstr "메모 저장"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:574
 msgid "You must enter a file"
@@ -365,7 +365,7 @@ msgstr "구독 다시 불러옴."
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:200
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:830
 msgid "Import"
-msgstr "내보내기"
+msgstr "가져오기"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:217
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:194
@@ -378,7 +378,7 @@ msgstr "주소록"
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:192
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:203
 msgid "Overview"
-msgstr "미리보기"
+msgstr "개요"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:233
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:214
@@ -386,7 +386,7 @@ msgstr "미리보기"
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:194
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:205
 msgid "Private"
-msgstr "사설"
+msgstr "개인"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:235
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:216
@@ -410,7 +410,7 @@ msgstr "라우터"
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:221
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:211
 msgid "Published"
-msgstr "게시됨"
+msgstr "공개"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:262
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:222
@@ -450,8 +450,7 @@ msgstr ""
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:296
 msgid ""
 "The Published Address Book is used for sharing addresses using your I2P Site."
-msgstr ""
-"공개 주소록은 당신의 I2P 사이트를 통해 주소를 공유하는 데에 사용됩니다."
+msgstr "공개 주소록은 I2P 사이트를 통해 주소를 공유하는 데 사용됩니다."
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:298
 msgid "Sites in the Private Address Book are not published here."
@@ -487,7 +486,7 @@ msgstr "그 외"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:413
 msgid "clear filter"
-msgstr "필터 소거"
+msgstr "필터 해제"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:441
 msgid "Filter"
@@ -526,7 +525,7 @@ msgstr "주소록에서 삭제할 호스트 선택"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:599
 msgid "View larger version of identicon for this hostname"
-msgstr "이 호스트네임의 아이덴티콘을 더 크게 보기"
+msgstr "이 호스트 이름의 아이덴티콘을 더 크게 보기"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:613
 msgid "Base 32 address"
@@ -538,7 +537,7 @@ msgstr "주소록에 추가할 수 있는 옵션이 있는 호스트 주소 공�
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:625
 msgid "More information on this entry"
-msgstr "해당 항목들 상세정보"
+msgstr "이 항목의 상세 정보"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:628
 msgid "details"
@@ -546,7 +545,7 @@ msgstr "상세정보"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:648
 msgid "Mark for deletion"
-msgstr "삭제표시"
+msgstr "삭제 표시"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:701
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:779
@@ -593,9 +592,9 @@ msgid ""
 "directory, which is normally ~/.i2p/addressbook/ (Linux) or %LOCALAPPDATA%"
 "\\I2P\\addressbook\\ (Windows)."
 msgstr ""
-"여기서 파일 또는 디렉토리 경로는 주소록의 작업 디렉토리를 기준으로 하는 상대 "
-"경로입니다. 일반적으로 ~/.i2p/addressbook/ (Linux) 또는 %LOCALAPPDATA%"
-"\\I2P\\addressbook\\ (Windows) 입니다."
+"여기서 파일 또는 디렉터리 경로는 주소록의 작업 디렉터리를 기준으로 하는 상대 "
+"경로입니다. 일반적으로 ~/.i2p/addressbook/ (Linux) 또는 %LOCALAPPDATA%\\I"
+"2P\\addressbook\\ (Windows) 입니다."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:247
 msgid ""
@@ -622,8 +621,8 @@ msgid ""
 "Use the private address book for private destinations, these are not "
 "published."
 msgstr ""
-"개인 용도의 목적지는 개인 주소록을 사용하십시오. 해당 주소록은 공개되지 않습"
-"니다."
+"공유하지 않을 목적지에는 개인 주소록을 사용하십시오. 이 주소록은 공개되지 "
+"않습니다."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:255
 msgid "Options"
@@ -631,17 +630,17 @@ msgstr "옵션"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:257
 msgid "File containing the list of subscriptions URLs (no need to change)"
-msgstr "구독 URL 리스트가 담긴 파일 (변경 필요없음)"
+msgstr "구독 URL 목록이 담긴 파일 (변경할 필요 없음)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:259
 msgid "Update interval in hours"
-msgstr "시간당 간격 업데이트"
+msgstr "업데이트 간격(시간 단위)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:261
 msgid ""
 "Your public hosts.txt file (choose a path within your webserver document "
 "root)"
-msgstr "공개 hosts.txt 파일 (웹서버 문서 루트에 있는 경로를 고르세요)"
+msgstr "공개 hosts.txt 파일 (웹 서버 문서 루트에 있는 경로를 고르세요)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:263
 msgid "Your hosts.txt (don't change)"
@@ -649,19 +648,19 @@ msgstr "hosts.txt 파일 (변경하지 마세요)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:265
 msgid "Your personal address book, these hosts will be published"
-msgstr "공개되지 않는 개인 목적 주소록"
+msgstr "로컬 주소록, 이 호스트는 공개됩니다"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:267
 msgid "Your private address book, it is never published"
-msgstr "공개되지 않는 프라이빗 주소록"
+msgstr "개인 주소록, 절대 공개되지 않음"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:269
 msgid "Port for your eepProxy (no need to change)"
-msgstr "eepProxy 포트 (변경 필요없음)"
+msgstr "eepProxy 포트 (변경할 필요 없음)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:271
 msgid "Hostname for your eepProxy (no need to change)"
-msgstr "eepProxy 호스트 이름 (변경 필요없음)"
+msgstr "eepProxy 호스트 이름 (변경할 필요 없음)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:273
 msgid "Whether to update the published address book"
@@ -671,17 +670,17 @@ msgstr "공개 주소록 업데이트 여부"
 msgid ""
 "File containing the etags header from the fetched subscription URLs (no need "
 "to change)"
-msgstr "불러온 구독 URL의 etags 헤드를 담은 파일 (변경 필요없음)"
+msgstr "가져온 구독 URL의 ETag 헤더를 담은 파일 (변경할 필요 없음)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:277
 msgid ""
 "File containing the modification timestamp for each fetched subscription URL "
 "(no need to change)"
-msgstr "불러온 구독 URL을 위한 수정 타임스탬프를 담은 파일 (변경 필요없음)"
+msgstr "불러온 구독 URL을 위한 수정 타임스탬프를 담은 파일 (변경할 필요 없음)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:279
 msgid "File to log activity to (change to /dev/null if you like)"
-msgstr "로그 기록 파일 저장장소 (원한다면 /dev/null로 변경하세요)"
+msgstr "활동을 기록할 로그 파일 (원하면 /dev/null로 변경)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:281
 msgid "Name of the theme to use (defaults to 'light')"
@@ -701,7 +700,7 @@ msgstr "Base64 해시"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:316
 msgid "Address Helper"
-msgstr "주소록 도우미"
+msgstr "주소 도우미"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:322
 msgid "link"
@@ -717,7 +716,7 @@ msgstr "ElGamal 2048 bit"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:332
 msgid "Signing Key"
-msgstr "키 사인"
+msgstr "서명 키"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:338
 msgid "Certificate"
@@ -725,7 +724,7 @@ msgstr "인증서"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:344
 msgid "Validated"
-msgstr "증명됨"
+msgstr "검증됨"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:346
 msgid "no"
@@ -737,7 +736,7 @@ msgstr "예"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:352
 msgid "Source"
-msgstr "출저"
+msgstr "출처"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:358
 msgid "Added Date"
@@ -749,11 +748,11 @@ msgstr "마지막 수정"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:388
 msgid "Notes"
-msgstr "정보"
+msgstr "메모"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:415
 msgid "Visual Identification for"
-msgstr ""
+msgstr "시각적 식별 이미지:"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:427
 msgid "Create your own identification images"
@@ -787,9 +786,7 @@ msgstr ""
 msgid ""
 "It regularly updates your hosts.txt file from distributed sources or "
 "\"subscriptions\"."
-msgstr ""
-"분산된 출저 또는 \"구독\"들을 통해 주기적으로 hosts.txt파일을 업데이트 합니"
-"다."
+msgstr "분산된 출처(\"구독\")를 통해 hosts.txt 파일을 주기적으로 업데이트합니다."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:235
 #, java-format
@@ -841,7 +838,7 @@ msgstr ""
 msgid ""
 "Local: This is your personal address book, for hosts which you publish and "
 "share with others."
-msgstr "로컬: 게시하여 다른 사람들과 공유하기 위한 개인 주소록입니다."
+msgstr "로컬: 직접 게시하여 다른 사람과 공유할 호스트를 담는 내 주소록입니다."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:251
 msgid ""
@@ -859,8 +856,8 @@ msgid ""
 "The address book application regularly polls your subscriptions and merges "
 "their content into your \"router\" address book."
 msgstr ""
-"주소록 어플리케이션은 정기적으로 당신의 구독정보들을 수집하고 \"라우터\" 주소"
-"록에 그 정보를 종합합니다."
+"주소록 애플리케이션은 정기적으로 구독을 확인하여 그 내용을 \"라우터\" "
+"주소록에 병합합니다."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:257
 msgid ""
@@ -888,16 +885,16 @@ msgid ""
 "Hosts in the private address book can be accessed by you but their addresses "
 "are never distributed to others."
 msgstr ""
-"개인 주소록의 Hosts들에는 당신만 접속 가능합니다. 다른 사람에게 배포되지 않습"
-"니다."
+"개인 주소록의 호스트에는 접속할 수 있지만, 그 주소는 다른 사람에게 배포되지 "
+"않습니다."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:265
 msgid ""
 "The private address book can also be used for aliases of hosts in your other "
 "address books."
 msgstr ""
-"개인 주소록은 또한 당신의 다른 주소록의 호스트들의 별칭으로도 사용할 수 있습"
-"니다."
+"개인 주소록은 다른 주소록에 있는 호스트의 별칭을 지정하는 데에도 사용할 수 "
+"있습니다."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:193
 msgid "subscriptions"
@@ -905,7 +902,7 @@ msgstr "구독"
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:234
 msgid "The subscription file contains a list of i2p URLs."
-msgstr "구독 파일이 i2p URL 리스트를 포함하고 있습니다."
+msgstr "구독 파일에는 i2p URL 목록이 들어 있습니다."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:236
 msgid ""
@@ -933,7 +930,7 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:244
 msgid "See the FAQ for a list of subscription URLs."
-msgstr "구독 URL 리스트들을 확인하려면 FAQ를 참조하세요."
+msgstr "구독 URL 목록은 FAQ를 참조하세요."
 
 #: build/HowSVG.java:5
 msgid ""
@@ -989,8 +986,8 @@ msgid ""
 "I2P applications (including the HTTP proxy) use the hosts in your local "
 "address books to resolve .i2p hostnames."
 msgstr ""
-"I2P 애플리케이션(HTTP 프록시 포함)은 .i2p 호스트네임을 해석하기 위해 로컬 주"
-"소록에 있는 호스트를 사용합니다."
+"I2P 애플리케이션(HTTP 프록시 포함)은 .i2p 호스트 이름을 해석하기 위해 로컬 "
+"주소록에 있는 호스트를 사용합니다."
 
 #: build/HowSVG.java:14
 msgid ""
@@ -1024,7 +1021,7 @@ msgstr "로컬 주소록"
 
 #: build/HowSVG.java:20
 msgid "Searchable by"
-msgstr ""
+msgstr "조회 주체"
 
 #: build/HowSVG.java:21
 msgid "I2P applications"
@@ -1040,11 +1037,11 @@ msgstr ""
 
 #: build/HowSVG.java:23
 msgid "Optional,"
-msgstr ""
+msgstr "선택 사항,"
 
 #: build/HowSVG.java:24
 msgid "for websites"
-msgstr ""
+msgstr "웹사이트용"
 
 #: build/HowSVG.java:25
 msgid ""

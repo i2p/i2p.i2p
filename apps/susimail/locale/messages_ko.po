@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-27 13:00+0000\n"
-"PO-Revision-Date: 2026-03-21 17:31+0000\n"
+"PO-Revision-Date: 2026-11-01 09:58+0000\n"
 "Last-Translator: on9686 <on9686@users.noreply.localizationlab.weblate.cloud>"
 "\n"
 "Language-Team: Korean <https://localizationlab.weblate.cloud/projects/i2p/"
@@ -22,7 +22,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.16.2\n"
+"X-Generator: Weblate 2026.10.1\n"
 
 #: src/src/i2p/susi/webmail/MailCache.java:551
 #: src/src/i2p/susi/webmail/WebMail.java:2626
@@ -478,7 +478,7 @@ msgstr "로그아웃"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3469
 msgid "Mark for deletion"
-msgstr "삭제표시"
+msgstr "삭제 표시"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3472
 #: src/src/i2p/susi/webmail/WebMail.java:3779
@@ -512,7 +512,7 @@ msgstr "네, 정말 삭제합니다!"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3569
 msgid "Delete Selected"
-msgstr "선택된 메세지 삭제"
+msgstr "선택 항목 삭제"
 
 #: src/src/i2p/susi/webmail/WebMail.java:3571
 msgid "Mark All"

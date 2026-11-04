@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-05 15:28+0000\n"
-"PO-Revision-Date: 2026-03-21 17:31+0000\n"
+"PO-Revision-Date: 2026-11-01 09:58+0000\n"
 "Last-Translator: on9686 <on9686@users.noreply.localizationlab.weblate.cloud>"
 "\n"
 "Language-Team: Korean <https://localizationlab.weblate.cloud/projects/i2p/"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.16.2\n"
+"X-Generator: Weblate 2026.10.1\n"
 
 #: ../java/src/org/klomp/snark/IdleChecker.java:76
 msgid "No more torrents running."
@@ -1093,7 +1093,7 @@ msgstr "스웜 내 {1}개의 피어 중 {0}개에서 다운로드 중"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1942
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1943
 msgid "OK"
-msgstr "OK"
+msgstr "정상"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1942
 #, java-format
@@ -1330,7 +1330,7 @@ msgstr "열기"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2620
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2987
 msgid "Private"
-msgstr "사설"
+msgstr "개인"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2624
 msgid "none"
@@ -1856,11 +1856,11 @@ msgstr "현재 커뮤니티 평점 없음"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4410
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4496
 msgid "Mark for deletion"
-msgstr "삭제표시"
+msgstr "삭제 표시"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4423
 msgid "Delete Selected"
-msgstr "선택된 메세지 삭제"
+msgstr "선택 항목 삭제"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:4483
 msgid "Tracker"
