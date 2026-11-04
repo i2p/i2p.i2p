@@ -67,14 +67,29 @@ subprojects {
     apply plugin: 'jacoco'
 
     repositories {
-        jcenter()
+        // JCenter is sunset (read-only since 2021, and no longer updated),
+        // use Maven Central so test dependencies can still be resolved.
+        mavenCentral()
     }
 
     dependencies {
         // https://stackoverflow.com/questions/44493378/whats-the-difference-between-api-api-and-compile-in-gradle
         testImplementation 'junit:junit:4.+'
         testImplementation 'org.hamcrest:hamcrest-library:1.3'
-        testImplementation 'org.mockito:mockito-core:2.5.0'
+        // 2.5.0 bundles byte-buddy 1.5.12, which cannot mock anything on JDK 17+
+        // (InaccessibleObjectException: java.base does not "opens java.lang").
+        // 5.x is the first line supported on JDK 17, see also the --add-opens
+        // setup in the Test tasks below.
+        testImplementation 'org.mockito:mockito-core:5.20.0'
+    }
+
+    // Mockito/ByteBuddy need reflective access into java.lang on JDK 17+,
+    // without this every mock throws InaccessibleObjectException.
+    tasks.withType(Test).configureEach {
+        jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
+                '--add-opens', 'java.base/java.util=ALL-UNNAMED',
+                '--add-opens', 'java.base/java.lang.reflect=ALL-UNNAMED',
+                '--add-opens', 'java.base/java.text=ALL-UNNAMED'
     }
 
 
