@@ -1,3 +1,9 @@
+i2p (2.14.1-1~ubuntu1) jammy; urgency=medium
+
+  * New upstream version 2.14.1
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 4 Nov 2026 12:12:12 +0000
+
 i2p (2.14.0-1~ubuntu1) jammy; urgency=medium
 
   * New upstream version 2.14.0
