@@ -60,11 +60,17 @@ abstract class IRCFilter {
      *  @return the original or modified line, or null if it should be dropped.
      */
     public static String inboundFilter(String s, StringBuffer expectedPong, DCCHelper helper) {
-        
-        String field[] = DataHelper.split(s, " ", 5);
+        // https://www.unrealircd.org/docs/Message_tags
+        // https://ircv3.net/specs/extensions/message-tags.html
+        // A leading "@tag ..." pushes everything one field to the right, so the
+        // message body only lands in its own field if we allow one more split
+        // in that case. Without a tag, splitting into 5 chops the body into
+        // pieces (and the trailing CTCP marker would be lost).
+        boolean tagged = !s.isEmpty() && s.charAt(0) == '@';
+        String field[] = DataHelper.split(s, " ", tagged ? 5 : 4);
         String command;
         int idx=0;
-        
+
 
         try {
             // https://www.unrealircd.org/docs/Message_tags
@@ -466,7 +472,9 @@ abstract class IRCFilter {
         String type = args[0];
         boolean haveIP = true;
         // no IP in these, replace port only
-        if (type == "RESUME" || type == "ACCEPT") {
+        // Use equals() - DataHelper.split() returns new String objects that are
+        // not the compile-time constants, so identity comparison always fails.
+        if ("RESUME".equals(type) || "ACCEPT".equals(type)) {
             haveIP = false;
         } else if (!(type.equals("CHAT") || type.equals("SEND"))) {
             if (ALLOW_ALL_DCC_IN) {
@@ -558,7 +566,9 @@ abstract class IRCFilter {
         String type = args[0];
         boolean haveIP = true;
         // no IP in these, replace port only
-        if (type == "RESUME" || type == "ACCEPT") {
+        // Use equals() - DataHelper.split() returns new String objects that are
+        // not the compile-time constants, so identity comparison always fails.
+        if ("RESUME".equals(type) || "ACCEPT".equals(type)) {
             haveIP = false;
         } else if (!(type.equals("CHAT") || type.equals("SEND"))) {
             if (ALLOW_ALL_DCC_OUT) {
@@ -566,6 +576,8 @@ abstract class IRCFilter {
                     return pfx + msg + (char) 0x01;
                 return pfx + msg;
             }
+            // blocked, don't fall through to parse an unrecognized type
+            return null;
         }
         if (helper == null || !helper.isEnabled())
             return null;
