@@ -18,17 +18,23 @@ class DestTracker {
      * @param threshold threshold defined in the access rule
      */
     DestTracker(Hash hash, Threshold threshold) {
+        this(hash, threshold, 0);
+    }
+
+    /** @param recorderConnections largest recorder threshold, or zero */
+    DestTracker(Hash hash, Threshold threshold, int recorderConnections) {
         this.hash = hash;
         this.threshold = threshold;
-        this.counter = new AccessCounter();
+        int connections = threshold == Threshold.ALLOW ? 0 : Math.max(1, threshold.getConnections());
+        this.counter = new AccessCounter(Math.max(connections, recorderConnections));
     }
 
     Hash getHash() {
         return hash;
     }
 
-    AccessCounter getCounter() {
-        return counter;
+    synchronized boolean isBreached(Threshold threshold, long now) {
+        return counter.isBreached(threshold, now);
     }
 
     /**
