@@ -328,9 +328,11 @@ class MessageInputStream extends InputStream {
      * @return true if this is a new packet, false if it is a dup
      */
     public boolean messageReceived(long messageId, ByteArray payload) {
+        if (payload == null)
+            payload = DUMMY_BA;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("received msg ID " + messageId + " with " +
-                       (payload != null ? payload.getValid() + " bytes" : "no payload"));
+                       payload.getValid() + " bytes");
         synchronized (_dataLock) {
             if (messageId <= _highestReadyBlockId) {
                 if (_log.shouldLog(Log.INFO))
