@@ -35,11 +35,7 @@ public class FilterFactory {
             reader = new BufferedReader(new FileReader(definition));
             String line;
             while((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.length() == 0)
-                    continue;
-                if (line.startsWith("#"))
-                    continue;
+                // Preserve physical line numbers for parser diagnostics.
                 linesList.add(line);
             }
         } finally {
