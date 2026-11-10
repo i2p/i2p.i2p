@@ -404,6 +404,10 @@ class MessageInputStream extends InputStream {
      */
     @Override
     public int read(byte target[], int offset, int length) throws IOException {
+        if (target == null)
+            throw new NullPointerException();
+        if (offset < 0 || length < 0 || offset > target.length - length)
+            throw new IndexOutOfBoundsException();
         int readTimeout = _readTimeout;
         long expiration;
         if (readTimeout > 0)
