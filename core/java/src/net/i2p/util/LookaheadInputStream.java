@@ -16,6 +16,8 @@ import net.i2p.data.DataHelper;
 public class LookaheadInputStream extends FilterInputStream {
     private boolean _eofReached;
     private final byte[] _footerLookahead;
+    /** Scratch space for moving the trailing bytes during an in-place bulk read. */
+    private final byte[] _readAhead;
     private final int size;
     // Next byte to read.
     private int index;
@@ -33,6 +35,7 @@ public class LookaheadInputStream extends FilterInputStream {
     public LookaheadInputStream(int lookaheadSize) {
         super(_fakeInputStream);
         _footerLookahead = new byte[lookaheadSize];
+        _readAhead = new byte[lookaheadSize];
         size = lookaheadSize;
     }
     
@@ -61,6 +64,8 @@ public class LookaheadInputStream extends FilterInputStream {
             _eofReached = true;
             return -1;
         }
+        if (size == 0)
+            return c;
         int rv = _footerLookahead[index] & 0xff;
         _footerLookahead[index] = (byte)c;
         index++;
@@ -71,20 +76,44 @@ public class LookaheadInputStream extends FilterInputStream {
 
     @Override
     public int read(byte buf[], int off, int len) throws IOException {
-        if (_eofReached) 
+        if (buf == null)
+            throw new NullPointerException();
+        if (off < 0 || len < 0 || off > buf.length - len)
+            throw new IndexOutOfBoundsException();
+        if (len == 0)
+            return 0;
+        if (_eofReached)
             return -1;
-        for (int i = 0; i < len; i++) {
-            int c = read();
-            if (c == -1) {
-                if (i == 0)
-                    return -1;
-                else
-                    return i;
-            } else {
-                buf[off+i] = (byte)c;
-            }
+        int count = in.read(buf, off, len);
+        if (count < 0) {
+            _eofReached = true;
+            return -1;
         }
-        return len;
+        if (count == 0 || size == 0)
+            return count;
+
+        if (count >= size) {
+            // Save the new footer before shifting the newly read data right.
+            System.arraycopy(buf, off + count - size, _readAhead, 0, size);
+            System.arraycopy(buf, off, buf, off + size, count - size);
+            int first = size - index;
+            System.arraycopy(_footerLookahead, index, buf, off, first);
+            System.arraycopy(_footerLookahead, 0, buf, off + first, index);
+            System.arraycopy(_readAhead, 0, _footerLookahead, 0, size);
+            index = 0;
+        } else {
+            // A short read replaces only part of the circular footer buffer.
+            System.arraycopy(buf, off, _readAhead, 0, count);
+            int first = Math.min(count, size - index);
+            System.arraycopy(_footerLookahead, index, buf, off, first);
+            System.arraycopy(_footerLookahead, 0, buf, off + first, count - first);
+            System.arraycopy(_readAhead, 0, _footerLookahead, index, first);
+            System.arraycopy(_readAhead, first, _footerLookahead, 0, count - first);
+            index += count;
+            if (index >= size)
+                index -= size;
+        }
+        return count;
     }
     
     /**
