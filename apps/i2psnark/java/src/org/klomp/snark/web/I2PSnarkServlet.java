@@ -102,8 +102,8 @@ public class I2PSnarkServlet extends BasicServlet {
     public void init(ServletConfig cfg) throws ServletException {
         super.init(cfg);
         String cpath = getServletContext().getContextPath();
-        _contextPath = cpath == "" ? "/" : cpath;
-        _contextName = cpath == "" ? DEFAULT_NAME : cpath.substring(1).replace('/', '_');
+        _contextPath = (cpath == null || cpath.isEmpty()) ? "/" : cpath;
+        _contextName = (cpath == null || cpath.isEmpty()) ? DEFAULT_NAME : cpath.substring(1).replace('/', '_');
         // limited protection against overwriting other config files or directories
         // in case you named your war "router.war"
         // We don't handle bad characters in the context path. Don't do that.
