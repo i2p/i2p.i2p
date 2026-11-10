@@ -22,7 +22,7 @@ class FileFilterDefinitionElement extends FilterDefinitionElement {
 
     private final File file;
     private final Map<Hash, DestTracker> lastLoaded = new HashMap<>();
-    private volatile long lastLoading;
+    private long lastLoading = Long.MIN_VALUE;
 
     /**
      * @param file file to read the remote destinations from
@@ -34,51 +34,47 @@ class FileFilterDefinitionElement extends FilterDefinitionElement {
     }
 
     @Override
-    public void update(Map<Hash, DestTracker> map) throws IOException {
-        if (!(file.exists() && file.isFile()))
-            return;
-        if (file.lastModified() <= lastLoading) {
-            synchronized (lastLoaded) {
-                for (Map.Entry<Hash, DestTracker> entry : lastLoaded.entrySet()) {
-                    if (!map.containsKey(entry.getKey()))
-                        map.put(entry.getKey(),entry.getValue());
-                }
-            }
+    public synchronized void update(Map<Hash, DestTracker> map) throws IOException {
+        if (!(file.exists() && file.isFile())) {
+            // A recorder's list may not exist at startup. Once loaded, keep the
+            // previous policy if a file disappears during replacement or a disk error.
+            if (lastLoading != Long.MIN_VALUE)
+                throw new IOException("Access list disappeared: " + file);
             return;
         }
-
-        lastLoading = System.currentTimeMillis();
-        synchronized (lastLoaded) {
+        long modified = file.lastModified();
+        if (modified != lastLoading) {
+            Map<Hash, DestTracker> loaded = new HashMap<Hash, DestTracker>();
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            try {
+                String b32;
+                while ((b32 = reader.readLine()) != null) {
+                    if (b32.length() == 0)
+                        continue;
+                    Hash hash;
+                    try {
+                        hash = fromBase32(b32);
+                    } catch (InvalidDefinitionException bad32) {
+                        Log log = I2PAppContext.getGlobalContext().logManager().getLog(FileFilterDefinitionElement.class);
+                        log.error("Invalid access list entry \"" + b32 + "\" in " + file, bad32);
+                        continue;
+                    }
+                    // Cache the complete file, including entries shadowed by an
+                    // earlier rule. They may become effective on a later reload.
+                    if (!loaded.containsKey(hash))
+                        loaded.put(hash, new DestTracker(hash, threshold));
+                }
+            } finally {
+                reader.close();
+            }
+            // Publish only after a complete, successful read and close.
             lastLoaded.clear();
+            lastLoaded.putAll(loaded);
+            lastLoading = modified;
         }
-
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new FileReader(file));
-            String b32;
-            while((b32 = reader.readLine()) != null) {
-                if (b32.length() == 0)
-                    continue;
-                Hash hash;
-                try {
-                    hash = fromBase32(b32);
-                } catch (InvalidDefinitionException bad32) {
-                    Log log = I2PAppContext.getGlobalContext().logManager().getLog(FileFilterDefinitionElement.class);
-                    log.error("Invalid access list entry \"" + b32 + "\" in " + file, bad32);
-                    continue;
-                }
-                if (map.containsKey(hash))
-                    continue;
-                DestTracker newTracker = new DestTracker(hash, threshold);
-                map.put(hash, newTracker);
-                synchronized (lastLoaded) {
-                    lastLoaded.put(hash, newTracker);
-                }
-            }
-        } finally {
-            if (reader != null) {
-                try { reader.close(); } catch (IOException ignored) {}
-            }
+        for (Map.Entry<Hash, DestTracker> entry : lastLoaded.entrySet()) {
+            if (!map.containsKey(entry.getKey()))
+                map.put(entry.getKey(), entry.getValue());
         }
     }
 }
