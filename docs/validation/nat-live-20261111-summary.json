@@ -1,0 +1,110 @@
+{
+  "mode": "ssu2-only",
+  "started": "2026-11-10T22:02:28.211278579Z",
+  "lastSample": "2026-11-10T22:14:44.165368462Z",
+  "elapsedSeconds": 735,
+  "samples": 50,
+  "shutdownRecorded": true,
+  "routerArtifact": {
+    "path": "/tmp/i2p-live-20261111/i2p-live-artifacts-mhhiq_on/lib/router.jar",
+    "sha256": "fdcbc6e4be6a3e72da0dd07559b8c2cf76e0b4db0407a0e25a0919d164318a2f"
+  },
+  "coreArtifact": {
+    "path": "/tmp/i2p-live-20261111/i2p-live-artifacts-mhhiq_on/lib/i2p.jar",
+    "sha256": "68716bf3a9a208c09c1f7d75dccbff88664052d3374171474958a22ad14cbef6"
+  },
+  "observedStatuses": [
+    "UNKNOWN"
+  ],
+  "maxActivePeers": 18,
+  "maxKnownRouters": 202,
+  "maxSSU2Peers": 21,
+  "maxPublishedIntroducers": 3,
+  "maxAvailableIntroducerTags": 15,
+  "firstBothTwoHopTunnelSeconds": 255,
+  "samplesWithBothTwoHopTunnels": 33,
+  "exploratoryBuildSuccesses": 18,
+  "exploratoryBuildRejections": 2,
+  "exploratoryBuildTimeouts": 13,
+  "exploratorySuccessEventSharePercent": 54.55,
+  "tunnelRoundtripSuccesses": 74,
+  "averageTunnelRoundtripMs": 680.5270385742188,
+  "averageTestedRemoteHops": 1.5405404567718506,
+  "outboundUDPEstablishments": 30,
+  "inboundUDPEstablishments": 2,
+  "introductionTimeouts": 1,
+  "introducedPeerProbesAttempted": 4,
+  "introducedPeerProbesEverEstablishedUDP": 2,
+  "introducedPeerProbeMessagesSent": 2,
+  "inboundBytes": 471012,
+  "outboundBytes": 503000,
+  "unitValidation": {
+    "tests": 518,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "routerTests": 143,
+    "scalaPassed": 46,
+    "scalaPending": 1,
+    "newRouterRegressions": 81
+  },
+  "jarSha256": {
+    "i2p.jar": "68716bf3a9a208c09c1f7d75dccbff88664052d3374171474958a22ad14cbef6",
+    "router.jar": "fdcbc6e4be6a3e72da0dd07559b8c2cf76e0b4db0407a0e25a0919d164318a2f",
+    "mstreaming.jar": "7f7b742dc5aed4ff4e651a9da60f6a0cf315ddf8ad95e1f850b4f9580271af26",
+    "streaming.jar": "02d8a83e6c1ed7edb82e8d0a234b09876c6f6dbc9bdcbf5f7fc6fa8030e5a623",
+    "java-getopt-1.0.13.jar": "f09dc6369ffc4fe4362cbd49b6ac6c4a7471375ac5d884c71b0a625a889c38c4",
+    "libintl-0.18.3.jar": "7f3d73b7a7887da142c05722adc2701b4f93bcb9bdacdb6dcba5b62d8919f2c4"
+  },
+  "diagnostics": {
+    "relayResponseCodes": {
+      "0": 3,
+      "5": 1,
+      "65": 1
+    },
+    "relayResponseEndpointUpdates": 3,
+    "holePunchEndpointUpdates": 0,
+    "completedStateLogLinesByNegotiatedVersion": {
+      "2": 12,
+      "3": 0,
+      "4": 22
+    },
+    "runtimeErrorOccurrences": {
+      "NullPointerException": 0,
+      "ArrayIndexOutOfBoundsException": 0,
+      "ClassCastException": 0,
+      "OutOfMemoryError": 0,
+      "IllegalArgumentException": 0,
+      "NoClassDefFoundError": 0
+    },
+    "expectedSocketCloseAtShutdown": true
+  },
+  "finalTunnelLengths": {
+    "inboundExploratoryLengths": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "outboundExploratoryLengths": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ]
+  },
+  "runtimeDirectory": "/tmp/i2p-live-20261111/router",
+  "artifactDirectory": "/tmp/i2p-live-20261111/i2p-live-artifacts-mhhiq_on",
+  "networkProcessExitCode": 0,
+  "sourceProvenance": {
+    "originalWorkspaceHead": "e0478775098a9ee03ebd6798a58af890a82abca2",
+    "originalCoreVersion": "2.14.0",
+    "standalonePrBase": "53002765a300547a2c663ac3c8d50a1b7c56cf1e",
+    "standalonePrBaseCoreVersion": "2.14.1",
+    "measurementScope": "combined development workspace, not an individual standalone PR"
+  }
+}
