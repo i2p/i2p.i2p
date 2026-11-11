@@ -107,3 +107,23 @@ The [complete recovery report](validation/five-improvements-20261111-recovery.js
 records each result and source fingerprint. Reproduce it with the runner in
 `tests/recovery`, using the pinned baseline above or another explicitly fetched
 upstream commit.
+
+## Reproducible candidate and CI publication checks
+
+The exact measured core/router sources are archived in fork branch
+`validation/recovery-candidate-20261111`, commit `828e8c31f5cb3e62fc7afa2f4377bcae40b54fb1`.
+Its Java-source fingerprint matches the recorded candidate exactly. Use this
+commit with `--candidate-ref` when reproducing the strict recovery comparison;
+the archive combines the existing production fixes and is separate from the
+focused tooling and parser pull requests.
+
+The isolated CI branch passed 409 JUnit, 46 Scala and six validation-tool tests
+(one Scala case remains pending). The recovery-gate suite now has 11 Python
+tests. The standalone live Java harness also compiles against the clean
+unchanged-upstream core/router classes.
+
+A real same-source comparison of the upstream port-migration case failed
+functionally in both variants while the regression gate exited zero and retained
+`candidatePassed: false`. The [gate report](validation/recovery-ci-gate-20261111.json)
+records this distinction. Missing measurements and new failures are separately
+covered by the gate tests.

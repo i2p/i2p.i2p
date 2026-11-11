@@ -219,6 +219,28 @@
         "baselinePendingEstablishments": 0,
         "candidatePendingEstablishments": 0
       }
-    ]
+    ],
+    "reproduction": {
+      "commit": "828e8c31f5cb3e62fc7afa2f4377bcae40b54fb1",
+      "sourceTreeSha256": "179c4be0072ca7a334b61e40a6b74b691754324ae9f61caf6e06d7a9d479aef2",
+      "javaSources": 1010,
+      "branch": "validation/recovery-candidate-20261111"
+    }
+  },
+  "publicationChecks": {
+    "ciJunit": 409,
+    "ciScalaPassed": 46,
+    "ciScalaPending": 1,
+    "ciPython": 6,
+    "recoveryToolTests": 11,
+    "liveVerifierTests": 23,
+    "liveHarnessCompiledAgainstUnchangedUpstream": true,
+    "sameSourceRecoveryGate": {
+      "reportFile": "recovery-ci-gate-20261111.json",
+      "candidatePassed": false,
+      "measurementsComplete": true,
+      "noRegressions": true,
+      "passed": true
+    }
   }
 }
