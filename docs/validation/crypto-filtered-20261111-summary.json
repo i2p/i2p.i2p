@@ -1,0 +1,377 @@
+{
+  "date": "2026-11-11",
+  "junit": {
+    "tests": 600,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "scala": {
+    "passed": 46,
+    "pending": 1
+  },
+  "stage": {
+    "changedCoreEntries": [
+      "net/i2p/crypto/ChaCha20.class"
+    ],
+    "previousInstalled": {
+      "i2p.jar": "8f6c49118d570c4249c87e8bdccb5462fb402d6c3509f8cc84ec83595bab0cbb",
+      "router.jar": "b63cdb3e1ddd565eeef9b066da2c6fd8cd37fbc26ef177e31f3be7b84749b35e"
+    },
+    "staged": {
+      "i2p.jar": "d4b4abe2a4ba11c0e0a2c1a3c503382f22b17b4d94c5fb5a29a13a64ffcb3c63",
+      "router.jar": "432b86d07065ea4ba321d90356864bd4faa47a2b7f1cb64bd85c513d8b17b9ee"
+    }
+  },
+  "runs": {
+    "normal": {
+      "mode": "normal",
+      "started": "2026-11-11T08:48:14.071640844Z",
+      "lastSample": "2026-11-11T08:52:15.130115100Z",
+      "elapsedSeconds": 241,
+      "samples": 17,
+      "shutdownRecorded": true,
+      "routerArtifact": {
+        "path": "/tmp/i2p-crypto-filtered-20261111/normal/i2p-live-artifacts-1bks_4rv/lib/router.jar",
+        "sha256": "432b86d07065ea4ba321d90356864bd4faa47a2b7f1cb64bd85c513d8b17b9ee"
+      },
+      "coreArtifact": {
+        "path": "/tmp/i2p-crypto-filtered-20261111/normal/i2p-live-artifacts-1bks_4rv/lib/i2p.jar",
+        "sha256": "d4b4abe2a4ba11c0e0a2c1a3c503382f22b17b4d94c5fb5a29a13a64ffcb3c63"
+      },
+      "observedStatuses": [
+        "DIFFERENT",
+        "UNKNOWN"
+      ],
+      "maxActivePeers": 8,
+      "maxKnownRouters": 133,
+      "maxSSU2Peers": 7,
+      "maxPublishedIntroducers": 3,
+      "maxAvailableIntroducerTags": 6,
+      "firstBothTwoHopTunnelSeconds": 241,
+      "samplesWithBothTwoHopTunnels": 1,
+      "exploratoryBuildSuccesses": 9,
+      "exploratoryBuildRejections": 0,
+      "exploratoryBuildTimeouts": 2,
+      "exploratorySuccessEventSharePercent": 81.82,
+      "tunnelRoundtripSuccesses": 15,
+      "averageTunnelRoundtripMs": 1137.4000244140625,
+      "averageTestedRemoteHops": 1.133333444595337,
+      "outboundUDPEstablishments": 9,
+      "inboundUDPEstablishments": 0,
+      "introductionTimeouts": 0,
+      "introducedPeerProbesAttempted": 0,
+      "introducedPeerProbesEverEstablishedUDP": 0,
+      "introducedPeerProbeMessagesSent": 0,
+      "inboundBytes": 61527,
+      "outboundBytes": 71334,
+      "udpNegotiatedVersionsObserved": [
+        "2",
+        "3",
+        "4"
+      ],
+      "exceptionCounts": {
+        "NullPointerException": 0,
+        "ArrayIndexOutOfBoundsException": 0,
+        "NoClassDefFoundError": 0,
+        "OutOfMemoryError": 0,
+        "IllegalArgumentException": 0,
+        "IllegalStateException": 0,
+        "BadPaddingException": 0
+      },
+      "processExitCode": 0,
+      "metricsFile": "crypto-filtered-20261111-normal-metrics.jsonl"
+    },
+    "ntcp2": {
+      "mode": "ntcp2-only",
+      "started": "2026-11-11T08:48:14.033925903Z",
+      "lastSample": "2026-11-11T08:52:15.056103226Z",
+      "elapsedSeconds": 241,
+      "samples": 17,
+      "shutdownRecorded": true,
+      "routerArtifact": {
+        "path": "/tmp/i2p-crypto-filtered-20261111/ntcp2/i2p-live-artifacts-w1_qbc4l/lib/router.jar",
+        "sha256": "432b86d07065ea4ba321d90356864bd4faa47a2b7f1cb64bd85c513d8b17b9ee"
+      },
+      "coreArtifact": {
+        "path": "/tmp/i2p-crypto-filtered-20261111/ntcp2/i2p-live-artifacts-w1_qbc4l/lib/i2p.jar",
+        "sha256": "d4b4abe2a4ba11c0e0a2c1a3c503382f22b17b4d94c5fb5a29a13a64ffcb3c63"
+      },
+      "observedStatuses": [
+        "OK",
+        "UNKNOWN"
+      ],
+      "maxActivePeers": 7,
+      "maxKnownRouters": 117,
+      "maxSSU2Peers": 0,
+      "maxPublishedIntroducers": 0,
+      "maxAvailableIntroducerTags": 0,
+      "firstBothTwoHopTunnelSeconds": 16,
+      "samplesWithBothTwoHopTunnels": 16,
+      "exploratoryBuildSuccesses": 6,
+      "exploratoryBuildRejections": 0,
+      "exploratoryBuildTimeouts": 1,
+      "exploratorySuccessEventSharePercent": 85.71,
+      "tunnelRoundtripSuccesses": 18,
+      "averageTunnelRoundtripMs": 527.5555419921875,
+      "averageTestedRemoteHops": 1.3333332538604736,
+      "outboundUDPEstablishments": 0,
+      "inboundUDPEstablishments": 0,
+      "introductionTimeouts": 0,
+      "introducedPeerProbesAttempted": 0,
+      "introducedPeerProbesEverEstablishedUDP": 0,
+      "introducedPeerProbeMessagesSent": 0,
+      "inboundBytes": 47156,
+      "outboundBytes": 62680,
+      "udpNegotiatedVersionsObserved": [],
+      "exceptionCounts": {
+        "NullPointerException": 0,
+        "ArrayIndexOutOfBoundsException": 0,
+        "NoClassDefFoundError": 0,
+        "OutOfMemoryError": 0,
+        "IllegalArgumentException": 0,
+        "IllegalStateException": 0,
+        "BadPaddingException": 0
+      },
+      "processExitCode": 0,
+      "metricsFile": "crypto-filtered-20261111-ntcp2-metrics.jsonl"
+    }
+  },
+  "limits": "No real national censorship test, controlled network A/B, or end-to-end speedup measurement. Existing cipher suites and key sizes retained.",
+  "benchmark": {
+    "baseline": "e04787750",
+    "jdk": "17.0.20.1",
+    "heapMiB": 128,
+    "warmupBatches": 3,
+    "measuredBatches": 7,
+    "results": [
+      {
+        "bytes": 8,
+        "baselineNs": 619.7,
+        "updatedNs": 325.4,
+        "ratio": 1.904
+      },
+      {
+        "bytes": 32,
+        "baselineNs": 572.9,
+        "updatedNs": 347.4,
+        "ratio": 1.649
+      },
+      {
+        "bytes": 64,
+        "baselineNs": 697.4,
+        "updatedNs": 481.1,
+        "ratio": 1.45
+      },
+      {
+        "bytes": 256,
+        "baselineNs": 1384.7,
+        "updatedNs": 1226.1,
+        "ratio": 1.129
+      },
+      {
+        "bytes": 1024,
+        "baselineNs": 3727.0,
+        "updatedNs": 3589.8,
+        "ratio": 1.038
+      },
+      {
+        "bytes": 4096,
+        "baselineNs": 13339.5,
+        "updatedNs": 13592.2,
+        "ratio": 0.981
+      }
+    ],
+    "matchingChecksums": true
+  },
+  "installation": {
+    "receipt": {
+      "jarSha256": {
+        "i2p.jar": "d4b4abe2a4ba11c0e0a2c1a3c503382f22b17b4d94c5fb5a29a13a64ffcb3c63",
+        "router.jar": "432b86d07065ea4ba321d90356864bd4faa47a2b7f1cb64bd85c513d8b17b9ee"
+      },
+      "backup": "/tmp/i2p-crypto-filtered-20261111/installed",
+      "tests": {
+        "junit": 600,
+        "scala": 46
+      },
+      "onlyChangedCoreEntry": "net/i2p/crypto/ChaCha20.class"
+    },
+    "processState": {
+      "wrapper": "STARTED",
+      "java": "STARTED"
+    },
+    "checks": {
+      "local-pages": {
+        "at": "2026-11-11T08:54:20.596037+00:00",
+        "event": "local-pages",
+        "pages": [
+          {
+            "bytesRead": 0,
+            "contentType": "text/html",
+            "elapsedSeconds": 0.004,
+            "errorMarkers": [],
+            "location": "http://127.0.0.1:7657/home",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "status": 307,
+            "target": "/",
+            "truncatedAt2MiB": false
+          },
+          {
+            "bytesRead": 14428,
+            "contentType": "text/html;charset=utf-8",
+            "elapsedSeconds": 0.007,
+            "errorMarkers": [],
+            "location": null,
+            "sha256": "b7e9536602f12daddebccc899313206eed4d5b5660eae48cd031cb5faa68399a",
+            "status": 200,
+            "target": "/home",
+            "title": "I2P Router Console - home",
+            "truncatedAt2MiB": false
+          },
+          {
+            "bytesRead": 25024,
+            "contentType": "text/html;charset=utf-8",
+            "elapsedSeconds": 0.013,
+            "errorMarkers": [],
+            "location": null,
+            "sha256": "8682f8017b720f8610247b3bb89d9e8ed01751a2ba236054471b20da6848db15",
+            "status": 200,
+            "target": "/console",
+            "title": "I2P Router Console - home",
+            "truncatedAt2MiB": false
+          },
+          {
+            "bytesRead": 24839,
+            "contentType": "text/html;charset=utf-8",
+            "elapsedSeconds": 0.022,
+            "errorMarkers": [],
+            "location": null,
+            "sha256": "ff11b1bd8b6b73cc658c8bdbc9f03d4e5e90dfc1b19af46b549ec0cc160c6ce3",
+            "status": 200,
+            "target": "/tunnels",
+            "title": "I2P Router Console - tunnel summary",
+            "truncatedAt2MiB": false
+          },
+          {
+            "bytesRead": 12806,
+            "contentType": "text/html;charset=utf-8",
+            "elapsedSeconds": 0.02,
+            "errorMarkers": [],
+            "location": null,
+            "sha256": "2074246db3392d042bd46d3bb994d5f4997f552d360ee56e34f5074b8636e38b",
+            "status": 200,
+            "target": "/configclients",
+            "title": "I2P Router Console - config clients",
+            "truncatedAt2MiB": false
+          },
+          {
+            "bytesRead": 12390,
+            "contentType": "text/html;charset=utf-8",
+            "elapsedSeconds": 0.015,
+            "errorMarkers": [],
+            "location": null,
+            "sha256": "118d43d82cc8cca4d0d3e713ae47d37697b261f0e9a247fd786a7b9d961a096a",
+            "status": 200,
+            "target": "/i2ptunnel/",
+            "title": "Hidden Services Manager",
+            "truncatedAt2MiB": false
+          },
+          {
+            "bytesRead": 3550,
+            "contentType": "text/html;charset=utf-8",
+            "elapsedSeconds": 0.023,
+            "errorMarkers": [],
+            "location": null,
+            "sha256": "48debc70424c8f25964803c7c4c4eea01b716f4aa1c07b58465d14567706dc06",
+            "status": 200,
+            "target": "/susidns/",
+            "title": "Introduction - SusiDNS",
+            "truncatedAt2MiB": false
+          },
+          {
+            "bytesRead": 1746,
+            "contentType": "text/html;charset=utf-8",
+            "elapsedSeconds": 0.009,
+            "errorMarkers": [],
+            "location": null,
+            "sha256": "71ab07fce0eaf5148dcc59d1e701506fa794850da8d94660986594abe2e42e65",
+            "status": 200,
+            "target": "/susimail/",
+            "title": "Email - Login",
+            "truncatedAt2MiB": false
+          },
+          {
+            "bytesRead": 6906,
+            "contentType": "text/html;charset=utf-8",
+            "elapsedSeconds": 0.012,
+            "errorMarkers": [],
+            "location": null,
+            "sha256": "9c612d683856f90320418810d96d70e92d4d2d066ede01b9124db54d1c2506a0",
+            "status": 200,
+            "target": "/i2psnark/",
+            "title": "I2PSnark - Anonymous BitTorrent Client",
+            "truncatedAt2MiB": false
+          },
+          {
+            "bytesRead": 31903,
+            "contentType": "text/html;charset=utf-8",
+            "elapsedSeconds": 0.282,
+            "errorMarkers": [],
+            "location": null,
+            "sha256": "facf855fc12168438fe0067ba903e4ab374ee7ef4d7bd5d82a274bde8d6cd38f",
+            "status": 200,
+            "target": "/debug?d=7",
+            "title": "I2P Router Console - Debug",
+            "truncatedAt2MiB": false
+          }
+        ]
+      },
+      "sample": {
+        "at": "2026-11-11T08:55:20.596367+00:00",
+        "event": "sample",
+        "networkClass": "error",
+        "networkStatus": "Network: SymmetricNAT",
+        "ntcpConnections": 9,
+        "ntcpConnectionsHTTP": 200,
+        "peers": {
+          "Active": "21 / 103",
+          "Fast": "12",
+          "Floodfill": "316",
+          "High capacity": "19",
+          "Known": "522"
+        },
+        "sidebarHTTP": 200,
+        "tunnels": {
+          "Client": "5",
+          "Exploratory": "9",
+          "Participating": "0",
+          "Share ratio": "0.00"
+        },
+        "udpConnections": 12,
+        "udpConnectionsHTTP": 200
+      },
+      "proxy-request": {
+        "at": "2026-11-11T08:55:25.141153+00:00",
+        "bytesRead": 248,
+        "contentType": "text/html",
+        "elapsedSeconds": 4.533,
+        "errorMarkers": [],
+        "event": "proxy-request",
+        "location": null,
+        "proxyErrorPage": false,
+        "sha256": "dc00a47f65e26f5192d2762a54d81f33e1d7539291ea491a9536020afb57710c",
+        "status": 200,
+        "target": "http://stats.i2p/",
+        "title": "stats.i2p | The Home for I2P Statistics",
+        "truncatedAt2MiB": false
+      }
+    },
+    "packagedCoreOnlyChangedEntry": "net/i2p/crypto/ChaCha20.class",
+    "configAndIdentityPreserved": true,
+    "jarSha256": {
+      "i2p.jar": "d4b4abe2a4ba11c0e0a2c1a3c503382f22b17b4d94c5fb5a29a13a64ffcb3c63",
+      "router.jar": "432b86d07065ea4ba321d90356864bd4faa47a2b7f1cb64bd85c513d8b17b9ee"
+    }
+  }
+}
