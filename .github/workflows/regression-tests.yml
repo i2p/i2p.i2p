@@ -1,0 +1,43 @@
+name: Regression tests
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: regression-tests-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regression-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install message compiler
+        run: sudo apt-get update && sudo apt-get install -y gettext
+      - name: Run clean regression suites
+        run: python3 tests/validation/run.py
+      - name: Compile live router harness
+        if: hashFiles('tests/live/LiveRouterSmoke.java') != ''
+        run: |
+          mkdir -p build/validation/live-harness
+          javac --release 17 -encoding UTF-8 -cp core/build/classes/java/main:router/build/classes/java/main -d build/validation/live-harness tests/live/LiveRouterSmoke.java 2>&1 | tee build/validation/live-harness-compile.log
+      - name: Publish regression reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-tests-jdk17
+          path: build/validation/
+          if-no-files-found: error
