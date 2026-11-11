@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.security.MessageDigest;
 import java.time.Instant;
@@ -71,6 +72,7 @@ public final class LiveRouterSmoke {
         List<Probe> probes = new ArrayList<Probe>();
         Set<Hash> attempted = new HashSet<Hash>();
         long started = System.nanoTime();
+        String reason = "error";
         try (PrintWriter samples = new PrintWriter(Files.newBufferedWriter(runtime.resolve("metrics.jsonl")))) {
             Map<String, Object> meta = new LinkedHashMap<String, Object>();
             meta.put("event", "start");
@@ -94,16 +96,21 @@ public final class LiveRouterSmoke {
                 Thread.sleep(SAMPLE_SECONDS * 1000L);
             }
             emit(samples, snapshot(context, (System.nanoTime() - started) / 1_000_000_000L, probes));
-            Map<String, Object> ending = new LinkedHashMap<String, Object>();
-            ending.put("event", "shutdown");
-            ending.put("at", Instant.now().toString());
-            ending.put("reason", Files.exists(runtime.resolve("STOP")) ? "stop-file" : "duration-complete");
-            emit(samples, ending);
+            reason = Files.exists(runtime.resolve("STOP")) ? "stop-file" : "duration-complete";
         } finally {
-            // This is the orderly router shutdown path, including goodbye packets
-            // and persistence. Sharing is disabled, so no participating tunnels
-            // need to drain before this isolated test instance exits.
+            // shutdown() is blocking with killVM disabled. Record completion only
+            // after it returns, so a crash/hang cannot leave a successful marker.
             router.shutdown(Router.EXIT_GRACEFUL);
+            try (PrintWriter ending = new PrintWriter(Files.newBufferedWriter(
+                    runtime.resolve("metrics.jsonl"), StandardOpenOption.APPEND))) {
+                Map<String, Object> result = new LinkedHashMap<String, Object>();
+                result.put("event", "shutdown");
+                result.put("at", Instant.now().toString());
+                result.put("reason", reason);
+                result.put("completed", true);
+                result.put("routerAlive", router.isAlive());
+                emit(ending, result);
+            }
         }
         System.exit(0);
     }
@@ -316,10 +323,12 @@ public final class LiveRouterSmoke {
         return result;
     }
 
-    private static void emit(PrintWriter writer, Map<String, Object> values) {
+    private static void emit(PrintWriter writer, Map<String, Object> values) throws IOException {
         String line = json(values);
         writer.println(line);
         writer.flush();
+        if (writer.checkError())
+            throw new IOException("Cannot persist live test metrics");
         System.out.println(line);
     }
 
