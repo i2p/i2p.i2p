@@ -994,6 +994,7 @@ public class Reseeder {
         /** @return null on error */
         private byte[] readURL(URI url) throws IOException {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(4*1024);
+            OutputStream limited = new ReseedOutputStream(baos, MAX_RESEED_RESPONSE_SIZE);
             EepGet get;
             boolean ssl = "https".equals(url.getScheme());
             if (ssl) {
@@ -1001,17 +1002,17 @@ public class Reseeder {
                 if (_sslState == null) {
                     if (_shouldProxySSL)
                         sslget = new SSLEepGet(_context, _sproxyType, _sproxyHost, _sproxyPort,
-                                               baos, url.toString());
+                                               limited, url.toString());
                     else
-                        sslget = new SSLEepGet(_context, baos, url.toString());
+                        sslget = new SSLEepGet(_context, limited, url.toString());
                     // save state for next time
                     _sslState = sslget.getSSLState();
                 } else {
                     if (_shouldProxySSL)
                         sslget = new SSLEepGet(_context, _sproxyType, _sproxyHost, _sproxyPort,
-                                               baos, url.toString(), _sslState);
+                                               limited, url.toString(), _sslState);
                     else
-                        sslget = new SSLEepGet(_context, baos, url.toString(), _sslState);
+                        sslget = new SSLEepGet(_context, limited, url.toString(), _sslState);
                 }
                 get = sslget;
                 if (_shouldProxySSL && _context.getBooleanProperty(PROP_SPROXY_AUTH_ENABLE)) {
@@ -1024,7 +1025,7 @@ public class Reseeder {
             } else {
                 // Do a (probably) non-proxied eepget into our ByteArrayOutputStream with 0 retries
                 get = new EepGet(_context, _shouldProxyHTTP, _proxyHost, _proxyPort, 0, 0, MAX_RESEED_RESPONSE_SIZE,
-                                 null, baos, url.toString(), false, null, null);
+                                 null, limited, url.toString(), false, null, null);
                 if (_shouldProxyHTTP && _context.getBooleanProperty(PROP_PROXY_AUTH_ENABLE)) {
                     String user = _context.getProperty(PROP_PROXY_USERNAME);
                     String pass = _context.getProperty(PROP_PROXY_PASSWORD);
@@ -1051,6 +1052,23 @@ public class Reseeder {
          */
         private File fetchURL(URI url) throws IOException {
             File out = new File(_context.getTempDir(), "reseed-" + _context.random().nextInt() + ".tmp");
+            boolean success = false;
+            try {
+                try (OutputStream limited = new ReseedOutputStream(
+                        new BufferedOutputStream(new SecureFileOutputStream(out)), MAX_SU3_RESPONSE_SIZE)) {
+                    if (!fetchURL(url, limited))
+                        return null;
+                }
+                success = true;
+                return out;
+            } finally {
+                if (!success)
+                    out.delete();
+            }
+        }
+
+        /** Fetch a bounded response, keeping TLS and configured proxy policy. */
+        private boolean fetchURL(URI url, OutputStream out) throws IOException {
             EepGet get;
             boolean ssl = "https".equals(url.getScheme());
             if (ssl) {
@@ -1058,17 +1076,17 @@ public class Reseeder {
                 if (_sslState == null) {
                     if (_shouldProxySSL)
                         sslget = new SSLEepGet(_context, _sproxyType, _sproxyHost, _sproxyPort,
-                                               out.getPath(), url.toString());
+                                               out, url.toString());
                     else
-                        sslget = new SSLEepGet(_context, out.getPath(), url.toString());
+                        sslget = new SSLEepGet(_context, out, url.toString());
                     // save state for next time
                     _sslState = sslget.getSSLState();
                 } else {
                     if (_shouldProxySSL)
                         sslget = new SSLEepGet(_context, _sproxyType, _sproxyHost, _sproxyPort,
-                                               out.getPath(), url.toString(), _sslState);
+                                               out, url.toString(), _sslState);
                     else
-                        sslget = new SSLEepGet(_context, out.getPath(), url.toString(), _sslState);
+                        sslget = new SSLEepGet(_context, out, url.toString(), _sslState);
                 }
                 get = sslget;
                 if (_shouldProxySSL && _context.getBooleanProperty(PROP_SPROXY_AUTH_ENABLE)) {
@@ -1081,7 +1099,7 @@ public class Reseeder {
             } else {
                 // Do a (probably) non-proxied eepget into file with 0 retries
                 get = new EepGet(_context, _shouldProxyHTTP, _proxyHost, _proxyPort, 0, 0, MAX_SU3_RESPONSE_SIZE,
-                                 out.getPath(), null, url.toString(), false, null, null);
+                                 null, out, url.toString(), false, null, null);
                 if (_shouldProxyHTTP && _context.getBooleanProperty(PROP_PROXY_AUTH_ENABLE)) {
                     String user = _context.getProperty(PROP_PROXY_USERNAME);
                     String pass = _context.getProperty(PROP_PROXY_PASSWORD);
@@ -1095,10 +1113,7 @@ public class Reseeder {
                 get.addHeader("If-Modified-Since", minLastMod);
             }
             get.addStatusListener(ReseedRunner.this);
-            if (get.fetch() && get.getStatusCode() == 200)
-                return out;
-            out.delete();
-            return null;
+            return get.fetch() && get.getStatusCode() == 200;
         }
 
         /**
