@@ -18,9 +18,13 @@ sourceSets {
                 it.name.endsWith('IT.java')
             }
             // Needs rewriting
-            exclude 'net/i2p/router/tunnel/BuildMessageTestStandalone.java'
+            exclude 'net/i2p/router/tunnel/pool/BuildMessageTestStandalone.java'
         }
     }
+}
+
+test {
+    exclude 'net/i2p/router/tunnel/pool/BuildMessageTestStandalone*'
 }
 
 dependencies {
@@ -51,9 +55,5 @@ jar {
     from ('resources', {
         into "net/i2p/router/util/resources"
     })
-
-test {
-    exclude 'net/i2p/router/tunnel/pool/**'
-}
 
 }
