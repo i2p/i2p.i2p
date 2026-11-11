@@ -181,13 +181,17 @@ class IntroductionManager {
         // reuse old ones if ok
         if (current != null) {
             UDPAddress ua = new UDPAddress(current);
-            for (int i = 0; i < ua.getIntroducerCount(); i++) {
+            for (int i = 0; i < ua.getIntroducerCount() && found < howMany; i++) {
                 long lexp = ua.getIntroducerExpiration(i);
                 if (lexp > 0 && lexp < now + UDPTransport.INTRODUCER_EXPIRATION_MARGIN)
                     continue;
                 long tag = ua.getIntroducerTag(i);
-                if (!isInboundTagValid(tag))
+                PeerState peer = _inbound.get(Long.valueOf(tag));
+                if (peer == null || peer.isIPv6() != ipv6 ||
+                    !peer.getRemotePeer().equals(ua.getIntroducerHash(i)))
                     continue;
+                // Reusing a published introducer must also renew its keepalive window.
+                peer.setIntroducerTime();
                 String sexp = Long.toString(ua.getIntroducerExpiration(i) / 1000);
                 Introducer intro = new Introducer(ua.getIntroducerHash(i), tag, sexp);
                 ssu2count++;
@@ -466,7 +470,7 @@ class IntroductionManager {
             rcode = SSU2Util.RELAY_REJECT_BOB_NO_TAG;
         } else if (charlie.getVersion() != 2) {
             if (_log.shouldWarn())
-                _log.warn("Receive SSU2 relay request from " + alice  + " for SSU1 " + charlie);
+                _log.warn("Receive SSU2 relay request from " + alice  + " for non-SSU2 " + charlie);
             // add a code for this?
             rcode = SSU2Util.RELAY_REJECT_BOB_NO_TAG;
         } else {
@@ -802,7 +806,7 @@ class IntroductionManager {
         int rcode;
         PeerState aps = _transport.getPeerState(alice);
         RouterAddress aliceRA = null;
-        if (_transport.isSymNatted()) {
+        if (!isIPv6 && _transport.isSymNatted()) {
             rcode = SSU2Util.RELAY_REJECT_CHARLIE_ADDRESS;
         } else if (aps != null && aps.isIPv6() == isIPv6) {
             rcode = SSU2Util.RELAY_REJECT_CHARLIE_CONNECTED;
@@ -852,7 +856,11 @@ class IntroductionManager {
                 _log.warn("No address to send in relay response");
             rcode = SSU2Util.RELAY_REJECT_CHARLIE_ADDRESS;
         }
-        int ourPort = _transport.getRequestedPort();
+        // The peer needs our external port, which may differ from the local
+        // socket port after NAT, and may differ between IPv4 and IPv6.
+        int ourPort = ourra != null ? ourra.getPort() : 0;
+        if (ourPort <= 0)
+            ourPort = _transport.getExternalPort(isIPv6);
 
         // generate our signed data
         // we sign it even if rejecting, not required though
