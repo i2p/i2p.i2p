@@ -254,6 +254,43 @@ class OutboundEstablishState2 extends OutboundEstablishState implements SSU2Payl
     }
 
     /**
+     * Apply an authenticated hole punch, including a NAT source-port correction
+     * after a RelayResponse. Preserve the handshake and saved SessionRequest if
+     * it was already sent; its encryption does not depend on the UDP endpoint.
+     * Do not move an endpoint after authenticating a SessionCreated.
+     *
+     * @return true if this introduction is still awaiting the remote handshake
+     */
+    synchronized boolean introducedFromHolePunch(byte[] ip, int port, long token) {
+        if (_currentState == OutboundState.OB_STATE_PENDING_INTRO) {
+            introduced(ip, port, token);
+            return true;
+        }
+        switch (_currentState) {
+            case OB_STATE_INTRODUCED:
+            case OB_STATE_REQUEST_SENT:
+            case OB_STATE_REQUEST_SENT_NEW_TOKEN:
+            case OB_STATE_RETRY_RECEIVED:
+                break;
+            default:
+                return false;
+        }
+        if (!DataHelper.eq(ip, _bobIP))
+            return false;
+        if (_bobPort != port) {
+            _bobPort = port;
+            _remoteHostId = new RemoteHostId(ip, port);
+            try {
+                _bobSocketAddress = new InetSocketAddress(InetAddress.getByAddress(ip), port);
+            } catch (UnknownHostException uhe) {
+                throw new IllegalArgumentException("bad IP", uhe);
+            }
+            _nextSend = _context.clock().now();
+        }
+        return true;
+    }
+
+    /**
      *  This will be called 0 times if we don't have a token and never get a retry;
      *  once if we have a token;
      *  and twice if the token we had was bad and we got a retry.
