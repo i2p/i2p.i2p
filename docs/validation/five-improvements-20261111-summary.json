@@ -1,0 +1,224 @@
+{
+  "date": "2026-11-11",
+  "jdk": "Temurin 17.0.20.1+1",
+  "regression": {
+    "passed": true,
+    "junit": {
+      "tests": 618,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "scala": {
+      "passed": 46,
+      "failed": 0,
+      "canceled": 0,
+      "ignored": 0,
+      "pending": 1
+    },
+    "pythonSuites": [
+      {
+        "suite": "validation",
+        "tests": 6,
+        "exitCode": 0
+      },
+      {
+        "suite": "live",
+        "tests": 23,
+        "exitCode": 0
+      },
+      {
+        "suite": "recovery",
+        "tests": 5,
+        "exitCode": 0
+      }
+    ],
+    "sourceUnchangedDuringRun": true,
+    "runnerSha256": {
+      "runner": "c8e04d2f683d9e35b911d140489447985a776c927714cb77ce52c07e64da51ae",
+      "gradleInit": "0f16637e82a17e5c124e3359217a396cf54b997a67a57e758b9b87b86fb8ffe5"
+    },
+    "rawResultSha256": "1ae1b1ebbeb1a54e5ed03b2d02712075adfed020ba52611579828861cb0e8049"
+  },
+  "live": {
+    "processExitCode": 0,
+    "mode": "normal",
+    "verdict": {
+      "event": "verification",
+      "passed": true,
+      "checks": {
+        "artifactHashesRecorded": true,
+        "artifactHashesMatch": true,
+        "processExitedSuccessfully": true,
+        "durationCompleted": true,
+        "shutdownCompleted": true,
+        "successfulRoundtrips": true,
+        "twoHopTunnelsBothDirections": true
+      },
+      "failures": [],
+      "requirements": {
+        "minRoundtrips": 1,
+        "minTwoHopSamples": 1
+      },
+      "evidence": {
+        "jarSha256": {
+          "i2p.jar": "f607baefa9af2f4e378085095b3ac818608a7bfcf16e07f7b640f21b2b6af7d8",
+          "router.jar": "432b86d07065ea4ba321d90356864bd4faa47a2b7f1cb64bd85c513d8b17b9ee"
+        },
+        "durationSeconds": 360,
+        "elapsedSeconds": 361,
+        "successfulRoundtrips": 33,
+        "twoHopSamplesBothDirections": 24
+      },
+      "verification": "connectivity"
+    },
+    "metricsFile": "five-improvements-20261111-live-metrics.jsonl",
+    "metricsSha256": "e25ddac97fbeb922c0c0a46aa1081bfdb8fa8cad5c5ffb48db4fb38be31a44f1",
+    "launchManifestFile": "five-improvements-20261111-live-launch.json"
+  },
+  "scope": "Tests of the combined working source tree; private loopback transport lab and one public normal-mode router on this host.",
+  "recovery": {
+    "candidatePassed": true,
+    "candidateRuns": 12,
+    "baselineRuns": 12,
+    "baselineCommit": "53002765a300547a2c663ac3c8d50a1b7c56cf1e",
+    "candidate": {
+      "ref": "WORKTREE",
+      "commit": "e0478775098a9ee03ebd6798a58af890a82abca2",
+      "workingTree": true,
+      "javaSources": 1010,
+      "sourceTreeSha256": "179c4be0072ca7a334b61e40a6b74b691754324ae9f61caf6e06d7a9d479aef2",
+      "harnessSha256": "af2a678da60d88f3a0f668f3131986779c629eacbb9c8461e524ea0cf8c82e41",
+      "dependencySha256": {
+        "java-getopt-1.0.13.jar": "f09dc6369ffc4fe4362cbd49b6ac6c4a7471375ac5d884c71b0a625a889c38c4",
+        "libintl-0.18.3.jar": "7f3d73b7a7887da142c05722adc2701b4f93bcb9bdacdb6dcba5b62d8919f2c4"
+      }
+    },
+    "harnessSha256": "af2a678da60d88f3a0f668f3131986779c629eacbb9c8461e524ea0cf8c82e41",
+    "runnerSha256": "93f31da30d5e5b5a258c6b23c4278dda6fdcecdbd7a10f54e3abc545be9e6839",
+    "reportFile": "five-improvements-20261111-recovery.json",
+    "reportSha256": "c688fd8027ab8f810eb5c67125842143fbb967f215e2d387ce5fd5c8b60e37b5",
+    "comparison": [
+      {
+        "scenario": "control",
+        "seed": 1,
+        "baselinePassed": true,
+        "candidatePassed": true,
+        "baselineRecoveryMs": 23,
+        "candidateRecoveryMs": 10,
+        "baselinePendingEstablishments": 0,
+        "candidatePendingEstablishments": 0
+      },
+      {
+        "scenario": "packet-loss-reordering",
+        "seed": 1,
+        "baselinePassed": true,
+        "candidatePassed": true,
+        "baselineRecoveryMs": 1876,
+        "candidateRecoveryMs": 25,
+        "baselinePendingEstablishments": 0,
+        "candidatePendingEstablishments": 0
+      },
+      {
+        "scenario": "nat-port-change",
+        "seed": 1,
+        "baselinePassed": false,
+        "candidatePassed": true,
+        "baselineRecoveryMs": 45023,
+        "candidateRecoveryMs": 21,
+        "baselinePendingEstablishments": 0,
+        "candidatePendingEstablishments": 0
+      },
+      {
+        "scenario": "expired-mapping",
+        "seed": 1,
+        "baselinePassed": false,
+        "candidatePassed": true,
+        "baselineRecoveryMs": 45015,
+        "candidateRecoveryMs": 6033,
+        "baselinePendingEstablishments": 0,
+        "candidatePendingEstablishments": 0
+      },
+      {
+        "scenario": "reconnect",
+        "seed": 1,
+        "baselinePassed": true,
+        "candidatePassed": true,
+        "baselineRecoveryMs": 42,
+        "candidateRecoveryMs": 180,
+        "baselinePendingEstablishments": 0,
+        "candidatePendingEstablishments": 0
+      },
+      {
+        "scenario": "udp-blocked",
+        "seed": 1,
+        "baselinePassed": true,
+        "candidatePassed": true,
+        "baselineRecoveryMs": 10147,
+        "candidateRecoveryMs": 10042,
+        "baselinePendingEstablishments": 0,
+        "candidatePendingEstablishments": 0
+      },
+      {
+        "scenario": "control",
+        "seed": 2,
+        "baselinePassed": true,
+        "candidatePassed": true,
+        "baselineRecoveryMs": 10,
+        "candidateRecoveryMs": 11,
+        "baselinePendingEstablishments": 0,
+        "candidatePendingEstablishments": 0
+      },
+      {
+        "scenario": "packet-loss-reordering",
+        "seed": 2,
+        "baselinePassed": true,
+        "candidatePassed": true,
+        "baselineRecoveryMs": 12078,
+        "candidateRecoveryMs": 5044,
+        "baselinePendingEstablishments": 0,
+        "candidatePendingEstablishments": 0
+      },
+      {
+        "scenario": "nat-port-change",
+        "seed": 2,
+        "baselinePassed": false,
+        "candidatePassed": true,
+        "baselineRecoveryMs": 45009,
+        "candidateRecoveryMs": 21,
+        "baselinePendingEstablishments": 0,
+        "candidatePendingEstablishments": 0
+      },
+      {
+        "scenario": "expired-mapping",
+        "seed": 2,
+        "baselinePassed": false,
+        "candidatePassed": true,
+        "baselineRecoveryMs": 45004,
+        "candidateRecoveryMs": 6028,
+        "baselinePendingEstablishments": 0,
+        "candidatePendingEstablishments": 0
+      },
+      {
+        "scenario": "reconnect",
+        "seed": 2,
+        "baselinePassed": true,
+        "candidatePassed": true,
+        "baselineRecoveryMs": 21,
+        "candidateRecoveryMs": 35,
+        "baselinePendingEstablishments": 0,
+        "candidatePendingEstablishments": 0
+      },
+      {
+        "scenario": "udp-blocked",
+        "seed": 2,
+        "baselinePassed": true,
+        "candidatePassed": true,
+        "baselineRecoveryMs": 10154,
+        "candidateRecoveryMs": 10048,
+        "baselinePendingEstablishments": 0,
+        "candidatePendingEstablishments": 0
+      }
+    ]
+  }
+}

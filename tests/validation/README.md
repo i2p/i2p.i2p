@@ -65,4 +65,12 @@ checkouts are removed after validation; reports remain in the chosen output
 folder. This replaces machine-specific split-validation scripts with commands
 that can run in CI or another contributor's checkout.
 
-Controlled transport recovery is supplied by a companion change in `tests/recovery`.
+The PR workflow also runs `tests/recovery/run_recovery.py` in a separate job,
+comparing the PR's base commit and merged candidate with the same fault harness.
+Its report includes measured recovery times and remaining transport state.
+The comparison gate rejects new failures relative to the base and retains
+existing failures explicitly in the report; default local recovery verification
+still requires every candidate case to pass.
+See [controlled recovery](../recovery/README.md) for local reproduction. Public
+Internet tests remain explicit, using the connectivity checks described in
+[live validation](../live/README.md).

@@ -36,3 +36,32 @@ jobs:
           name: regression-tests-jdk17
           path: build/validation/
           if-no-files-found: error
+
+  transport-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BASELINE_REF: ${{ github.event.pull_request.base.sha || 'HEAD^' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compare controlled transport recovery with the base revision
+        run: python3 tests/recovery/run_recovery.py --baseline-ref "$BASELINE_REF" --gate regressions --output build/recovery
+      - name: Publish recovery comparison
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: transport-recovery-jdk17
+          path: |
+            build/recovery/report.json
+            build/recovery/*/compile.log
+            build/recovery/*/*/result.json
+          if-no-files-found: error
