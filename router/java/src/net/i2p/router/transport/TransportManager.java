@@ -899,7 +899,7 @@ public class TransportManager implements TransportEventListener {
                     rv = bid;    
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Transport " + t.getStyle() + " bid: " + bid + " currently winning? " + (rv == bid) 
-                               + " (winning latency: " + rv.getLatencyMs() + " / " + rv + ")");
+                               + " (winning latency: " + (rv != null ? rv.getLatencyMs() : "none") + " / " + rv + ")");
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Transport " + t.getStyle() + " did not produce a bid");
