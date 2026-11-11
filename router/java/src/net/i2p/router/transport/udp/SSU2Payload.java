@@ -373,6 +373,10 @@ class SSU2Payload {
                     int datalen;
                     Hash h;
                     if (mnum == 2 || mnum == 4) {
+                        // These messages prepend a router hash to the same
+                        // minimum test data required by the other messages.
+                        if (len < 19 + Hash.HASH_LENGTH)
+                            throw new IOException("Bad length for PEERTEST with hash: " + len);
                         h = Hash.create(payload, o);
                         datalen = len - (3 + Hash.HASH_LENGTH);
                         o += Hash.HASH_LENGTH;
