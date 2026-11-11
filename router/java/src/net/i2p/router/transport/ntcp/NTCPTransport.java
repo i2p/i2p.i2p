@@ -396,7 +396,7 @@ public class NTCPTransport extends TransportImpl {
                             } catch (DataFormatException dfe) {
                                 if (_log.shouldWarn())
                                     _log.warn("bad address? " + target, dfe);
-                                _context.banlist().banlistRouter(ih, "Bad address", null, null, _context.clock().now() + 15*60*1000L);
+                                _context.banlist().banlistRouter(ih, "Bad address", null, STYLE, _context.clock().now() + 15*60*1000L);
                                 fail = true;
                             }
                         } else {
@@ -1386,16 +1386,26 @@ public class NTCPTransport extends TransportImpl {
         } else {
             return 0;
         }
-        // check version == "2" || version starts with "2,"
-        // and static key, and iv
+        // Match a complete base-version token, regardless of advertised order.
         String v = addr.getOption("v");
         if (v == null ||
             addr.getOption("i") == null ||
             addr.getOption("s") == null ||
-            (!v.equals(NTCP2_VERSION) && !v.startsWith(NTCP2_VERSION_ALT))) {
+            !(',' + v + ',').contains(',' + NTCP2_VERSION + ',')) {
             // his address is NTCP1 or is outbound NTCP2 only
             return 0;
         }
+        // Reject unusable handshake material here so another advertised address
+        // can still be tried. These are the same checks used by the outbound
+        // handshake; discovering them only after bidding prevents that fallback.
+        byte[] iv = Base64.decode(addr.getOption("i"));
+        byte[] key = Base64.decode(addr.getOption("s"));
+        if (iv == null || iv.length != NTCP2_IV_LEN ||
+            DataHelper.eq(iv, 0, OutboundNTCP2State.ZEROKEY, 0, NTCP2_IV_LEN) ||
+            key == null || key.length != NTCP2_KEY_LEN ||
+            (key[NTCP2_KEY_LEN - 1] & 0x80) != 0 ||
+            DataHelper.eq(key, 0, OutboundNTCP2State.ZEROKEY, 0, NTCP2_KEY_LEN))
+            return 0;
         if (PQ_INT_VERSION != 0) {
             String pq = addr.getOption("pq");
             if (pq != null) {
@@ -1410,7 +1420,6 @@ public class NTCPTransport extends TransportImpl {
             }
         }
         // his address is NTCP2
-        // do not validate the s/i b64, we will just catch it later
         return NTCP2_INT_VERSION;
     }
 
