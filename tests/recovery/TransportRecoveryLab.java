@@ -10,6 +10,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 import java.util.function.BooleanSupplier;
+import java.util.function.LongPredicate;
+import java.util.function.LongSupplier;
 import net.i2p.data.Hash;
 import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.router.RouterInfo;
@@ -22,6 +24,7 @@ public final class TransportRecoveryLab {
     static final AtomicLong IDS = new AtomicLong();
     static final List<Process> CHILDREN = new CopyOnWriteArrayList<>();
     static final long DEADLINE_MS = 45000;
+    static final long LOSS_WINDOW_MS = 3000;
     static class Node implements AutoCloseable {
         final Router router;
         final RouterContext context;
@@ -106,10 +109,7 @@ public final class TransportRecoveryLab {
             return id;
         }
         long probe(RouterInfo peer, String mode, long deadline) throws Exception {
-            long start = System.nanoTime();
-            long id = sendProbe(peer, mode);
-            await(() -> replies.contains(id), deadline, "authenticated message round trip");
-            return TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+            return probeRoundTrip(() -> sendProbe(peer, mode), id -> replies.contains(id), deadline, 1000);
         }
         int states(String name) throws Exception {
             Field field = EstablishmentManager.class.getDeclaredField(name); field.setAccessible(true);
@@ -186,6 +186,24 @@ public final class TransportRecoveryLab {
         }
     }
     static int freePort() throws Exception { try (DatagramSocket s = new DatagramSocket(0, InetAddress.getByName("127.0.0.1"))) { return s.getLocalPort(); } }
+    static long probeRoundTrip(LongSupplier send, LongPredicate acknowledged, long timeoutMs, long intervalMs) throws Exception {
+        long start = System.nanoTime(), end = start + TimeUnit.MILLISECONDS.toNanos(timeoutMs), next = start;
+        List<Long> sent = new ArrayList<>();
+        while (System.nanoTime() < end) {
+            for (long id : sent)
+                if (acknowledged.test(id))
+                    return TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+            long now = System.nanoTime();
+            if (now >= next) {
+                // SSU2 permits individual I2NP messages to expire. A fresh
+                // numbered request tests connection recovery after such loss.
+                sent.add(send.getAsLong());
+                next = now + TimeUnit.MILLISECONDS.toNanos(intervalMs);
+            }
+            Thread.sleep(5);
+        }
+        throw new TimeoutException("authenticated message round trip exceeded " + timeoutMs + " ms");
+    }
     static void await(BooleanSupplier condition, long timeout, String label) throws Exception {
         long end = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeout);
         while (!condition.getAsBoolean()) {
@@ -243,7 +261,7 @@ public final class TransportRecoveryLab {
         void send(String mode) throws Exception { Long.parseLong(call("SEND " + mode)); }
         long[] state() throws Exception {
             long[] values = Arrays.stream(call("STATE").split(",")).mapToLong(Long::parseLong).toArray();
-            if (values.length != 11) throw new IOException("Malformed node state");
+            if (values.length != 12) throw new IOException("Malformed node state");
             return values;
         }
         void forget() throws Exception { call("FORGET"); }
@@ -292,7 +310,7 @@ public final class TransportRecoveryLab {
                           "," + (session != null ? session.getVersion() : 0) + "," + node.peerIndexSize("_peersByConnID") +
                           "," + node.peerIndexSize("_peersByRemoteHost") +
                           "," + (session instanceof PeerState2 ? ((PeerState2)session).getSendConnID() : 0) +
-                          "," + (session instanceof PeerState2 ? ((PeerState2)session).getRcvConnID() : 0));
+                          "," + (session instanceof PeerState2 ? ((PeerState2)session).getRcvConnID() : 0) + "," + IDS.get());
                 } else if (line.equals("FORGET")) { node.forget(peer.getHash()); reply("OK"); }
                 else if (line.equals("STOP")) { node.close(); reply("STOPPED"); System.exit(0); }
                 else throw new IOException("Unknown command");
@@ -336,6 +354,10 @@ public final class TransportRecoveryLab {
                     // when bandwidth pacing separates the two fragments of one
                     // message. Sending one request can otherwise test only loss.
                     for (int i = 0; i < 8; i++) alice.send("UDP");
+                    // Restore the link before measuring recovery. A sustained
+                    // loss pattern can repeatedly discard one particular probe.
+                    Thread.sleep(LOSS_WINDOW_MS);
+                    link.loss = false; link.reorder = false;
                     break;
                 case "nat-port-change": link.rotate(); break;
                 case "expired-mapping":
@@ -387,6 +409,8 @@ public final class TransportRecoveryLab {
             passed = failures.isEmpty();
             result = "{\"scenario\":\"" + scenario + "\",\"seed\":" + seed + ",\"warmupMs\":" + warmup +
                 ",\"recoveryMs\":" + elapsed + ",\"faultWindowMs\":" + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - faultStarted) +
+                ",\"injectedLossWindowMs\":" + (scenario.equals("packet-loss-reordering") ? LOSS_WINDOW_MS : 0) +
+                ",\"probeRequestsSent\":" + (as[11] + bs[11]) +
                 ",\"deadlineMs\":" + DEADLINE_MS + ",\"pendingEstablishments\":" + states + ",\"inboundBans\":" + (as[2]+bs[2]) +
                 ",\"connectionIdEntries\":" + connectionIds + ",\"endpointEntries\":" + endpoints +
                 ",\"droppedPackets\":" + link.dropped + ",\"forwardedPackets\":" + link.forwarded +

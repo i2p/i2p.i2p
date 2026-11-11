@@ -31,7 +31,7 @@ Select a smaller run with `--scenarios reconnect udp-blocked --seeds 1`.
 | Scenario | Injected fault | Required evidence |
 | --- | --- | --- |
 | `control` | None | Authenticated request/reply and another successful request/reply |
-| `packet-loss-reordering` | Drops approximately one packet in five; holds and reorders packets | Observed drops and reordering, followed by successful request/reply |
+| `packet-loss-reordering` | Three-second burst dropping approximately one packet in five, with reordering; then restores the link | Observed drops and reordering, followed by successful request/reply |
 | `nat-port-change` | Changes the proxy's public source port during an established session | Peer endpoint changes, connection IDs remain, and request/reply succeeds |
 | `expired-mapping` | Drops traffic sent to the old mapping and allocates a new public source port | An observed packet to the expired mapping, migration and successful request/reply |
 | `reconnect` | Removes both established UDP peer sessions | A fresh working SSU2 session |
@@ -40,7 +40,9 @@ Select a smaller run with `--scenarios reconnect udp-blocked --seeds 1`.
 Each scenario verifies the controlled SSU2 path before injecting faults and
 allows 45 seconds for a request/reply after injection. `recoveryMs` measures
 from fault injection to the first measured request/reply, including any fault
-setup or burst submission. A second request/reply must also succeed. The
+setup or burst submission. Fresh numbered requests are attempted at most once
+per second until an authenticated reply arrives or the deadline expires. A
+second independently numbered request/reply must also succeed. The
 45-second bound is a test budget, not a protocol requirement. Both endpoints must finish with no
 pending establishments or inbound establishment bans, and their connection-ID
 and endpoint indexes must not outnumber the remaining UDP sessions. The lab records
@@ -54,6 +56,13 @@ from the [SSU2 specification](https://i2p.net/en/docs/specs/ssu2/), especially
 validates the new endpoint using the current session's keys and connection IDs.
 NTCP2 fallback is an I2P transport-selection expectation, outside the SSU2
 protocol itself.
+
+The specification permits an individual I2NP message to be lost without closing
+the session. Bounded fresh probes distinguish a lost message from a connection
+that cannot recover. Four deterministic Java checks cover immediate replies,
+lost first requests, late replies and deadlines before either variant starts
+network scenarios. Reports include the probe request count and injected loss
+window. These checks keep the 45-second deadline and all state assertions.
 
 `report.json` records the two source revisions, whether candidate sources came
 from the working tree, source/harness/dependency SHA-256 hashes, per-scenario
@@ -73,7 +82,7 @@ every candidate scenario to pass.
 
 Use a new output directory for each run. It is private because the runtime
 subdirectories contain disposable router identities and local diagnostic logs.
-Only `report.json`, compiler logs and scenario `result.json` files are uploaded
+Only `report.json`, compiler/probe-test logs, controller `process.log` and scenario `result.json` files are uploaded
 by the PR workflow. The lab cannot establish behavior across real NAT devices,
 IPv6 networks, public-network congestion, or censorship systems. Public-network
 two-hop tunnel verification is provided separately by `tests/live/run_live.py`.

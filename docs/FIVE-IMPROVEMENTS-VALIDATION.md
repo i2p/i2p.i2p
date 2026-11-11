@@ -127,3 +127,25 @@ functionally in both variants while the regression gate exited zero and retained
 `candidatePassed: false`. The [gate report](validation/recovery-ci-gate-20261111.json)
 records this distinction. Missing measurements and new failures are separately
 covered by the gate tests.
+
+## Recovery probing under packet loss
+
+SSU2 permits individual I2NP messages to expire while the connection remains
+usable. The recovery harness now sends bounded fresh numbered probes, requires
+a second independent successful request/reply, and measures packet-loss recovery
+after a three-second fault window. The 45-second deadline and session/index
+assertions remain in force. Four deterministic Java checks cover lost and late
+replies and the request/deadline bounds.
+
+The [first CI comparison](validation/recovery-ci-first-attempt-20261111.json)
+retains a one-probe timeout on identical production sources. Historical timing
+measurements above used the earlier frozen harness (`af2a678da60d88f3a0f668f3131986779c629eacbb9c8461e524ea0cf8c82e41`),
+retained in commit `f52f20ea23698dd4b3d01f9f9b2574b558b52928`. They were not
+rewritten to match the revised probe policy. The updated CI artifacts record
+their own harness hash, probe counts and injected loss window.
+
+The revised [local probe matrix](validation/recovery-probe-matrix-20261111.json)
+passed all 16 packet-loss and UDP-blocking runs across four seeds and both
+source variants. Both compiled variants also passed the four deterministic
+Java probe tests. This matrix supplements the unchanged historical timing
+report above.

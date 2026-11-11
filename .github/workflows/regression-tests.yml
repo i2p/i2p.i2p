@@ -68,5 +68,7 @@ jobs:
           path: |
             build/recovery/report.json
             build/recovery/*/compile.log
+            build/recovery/*/probe-tests.log
             build/recovery/*/*/result.json
+            build/recovery/*/*/process.log
           if-no-files-found: error

@@ -141,7 +141,7 @@ def snapshot_sources(repo, ref, source):
     return sha
 
 
-def compile_ref(repo, ref, folder, java_home, jars, harness):
+def compile_ref(repo, ref, folder, java_home, jars, harness, probe_test):
     source = folder / 'source'
     sha = snapshot_sources(repo, ref, source)
     sources = sorted((source / 'router/java/src').rglob('*.java'))
@@ -151,14 +151,19 @@ def compile_ref(repo, ref, folder, java_home, jars, harness):
     classes.mkdir()
     argfile = folder / 'compile.args'
     # javac argfiles require quoting paths, including source checkouts with spaces.
-    argfile.write_text('\n'.join('"' + str(p).replace('\\', '\\\\').replace('"', '\\"') + '"' for p in sources + [harness]) + '\n')
+    argfile.write_text('\n'.join('"' + str(p).replace('\\', '\\\\').replace('"', '\\"') + '"' for p in sources + [harness, probe_test]) + '\n')
     command = [str(java_home / 'bin/javac'), '-J-Xmx768m', '--release', '17', '-encoding', 'UTF-8',
                '-cp', os.pathsep.join(map(str, jars)), '-d', str(classes), '@' + str(argfile)]
     with (folder / 'compile.log').open('w') as log:
         subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=180)
+    with (folder / 'probe-tests.log').open('w') as log:
+        subprocess.run([str(java_home / 'bin/java'), '-cp', os.pathsep.join(map(str, [classes, *jars])),
+                        'net.i2p.router.transport.udp.ProbeRetryTest'],
+                       stdout=log, stderr=subprocess.STDOUT, check=True, timeout=20)
     provenance = {'ref': ref, 'commit': sha, 'workingTree': ref == 'WORKTREE', 'javaSources': len(sources),
                   'sourceTreeSha256': hashlib.sha256(b''.join(str(p.relative_to(source)).encode() + b'\0' + p.read_bytes() for p in sources)).hexdigest(),
-                  'harnessSha256': digest(harness), 'dependencySha256': {p.name: digest(p) for p in jars}}
+                  'harnessSha256': digest(harness), 'probeTestSha256': digest(probe_test),
+                  'probeTestsPassed': True, 'dependencySha256': {p.name: digest(p) for p in jars}}
     return classes, provenance
 
 
@@ -250,15 +255,18 @@ def main():
     jars = dependency_jars(output, args.offline)
     harness = output / 'TransportRecoveryLab.java'
     shutil.copyfile(Path(__file__).with_name('TransportRecoveryLab.java'), harness)
+    probe_test = output / 'ProbeRetryTest.java'
+    shutil.copyfile(Path(__file__).with_name('ProbeRetryTest.java'), probe_test)
     report = {'baselineRef': args.baseline_ref, 'candidateRef': args.candidate_ref,
               'runnerSha256': digest(Path(__file__)), 'harnessSha256': digest(harness),
+              'probeTestSha256': digest(probe_test),
               'specification': 'https://i2p.net/en/docs/specs/ssu2/',
               'scope': 'Real encrypted transport sessions on network 222 using loopback-only addresses and dummy overlay services; no public I2P peers or tunnel performance claims', 'variants': {}}
     for label, ref in [('baseline', args.baseline_ref), ('candidate', args.candidate_ref)]:
         folder = output / label
         folder.mkdir()
         source_repo = args.baseline_repo.resolve() if label == 'baseline' and args.baseline_repo else repo
-        classes, provenance = compile_ref(source_repo, ref, folder, java_home, jars, harness)
+        classes, provenance = compile_ref(source_repo, ref, folder, java_home, jars, harness, probe_test)
         records = []
         for seed in args.seeds:
             for scenario in args.scenarios:
