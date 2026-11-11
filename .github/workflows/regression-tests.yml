@@ -29,6 +29,11 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y gettext
       - name: Run clean regression suites
         run: python3 tests/validation/run.py
+      - name: Compile live router harness
+        if: hashFiles('tests/live/LiveRouterSmoke.java') != ''
+        run: |
+          mkdir -p build/validation/live-harness
+          javac --release 17 -encoding UTF-8 -cp core/build/classes/java/main:router/build/classes/java/main -d build/validation/live-harness tests/live/LiveRouterSmoke.java 2>&1 | tee build/validation/live-harness-compile.log
       - name: Publish regression reports
         if: always()
         uses: actions/upload-artifact@v4
