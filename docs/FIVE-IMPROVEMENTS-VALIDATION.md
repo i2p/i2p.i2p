@@ -149,3 +149,9 @@ passed all 16 packet-loss and UDP-blocking runs across four seeds and both
 source variants. Both compiled variants also passed the four deterministic
 Java probe tests. This matrix supplements the unchanged historical timing
 report above.
+
+An updated [strict comparison](validation/recovery-updated-strict-20261111.json)
+with the bounded-probe harness at `01afbd402e3876aff512517084a4cc0facf6dcaf` passed
+all six scenarios against the exact archived production candidate. Upstream
+continued to time out on port migration and expired mappings. A fifth Java
+probe check now also verifies rejection of replies observed beyond the deadline.

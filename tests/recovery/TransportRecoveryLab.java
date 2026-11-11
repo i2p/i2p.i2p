@@ -190,10 +190,15 @@ public final class TransportRecoveryLab {
         long start = System.nanoTime(), end = start + TimeUnit.MILLISECONDS.toNanos(timeoutMs), next = start;
         List<Long> sent = new ArrayList<>();
         while (System.nanoTime() < end) {
+            boolean answered = false;
             for (long id : sent)
-                if (acknowledged.test(id))
-                    return TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+                if (acknowledged.test(id)) {
+                    answered = true;
+                    break;
+                }
             long now = System.nanoTime();
+            if (now >= end) break;
+            if (answered) return TimeUnit.NANOSECONDS.toMillis(now - start);
             if (now >= next) {
                 // SSU2 permits individual I2NP messages to expire. A fresh
                 // numbered request tests connection recovery after such loss.

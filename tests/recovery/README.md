@@ -59,8 +59,8 @@ protocol itself.
 
 The specification permits an individual I2NP message to be lost without closing
 the session. Bounded fresh probes distinguish a lost message from a connection
-that cannot recover. Four deterministic Java checks cover immediate replies,
-lost first requests, late replies and deadlines before either variant starts
+that cannot recover. Five deterministic Java checks cover immediate replies,
+lost first requests, late replies and deadline boundaries before either variant starts
 network scenarios. Reports include the probe request count and injected loss
 window. These checks keep the 45-second deadline and all state assertions.
 
