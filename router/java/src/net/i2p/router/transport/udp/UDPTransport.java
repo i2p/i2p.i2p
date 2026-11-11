@@ -3789,7 +3789,13 @@ public class UDPTransport extends TransportImpl {
             long pingFirewallCutoff = now - PING_FIREWALL_CUTOFF;
             boolean shouldPingFirewall = !STATUS_OK.contains(_reachabilityStatus);
             int currentListenPort = getListenPort(false);
-            boolean pingOneOnly = shouldPingFirewall && getExternalPort(false) == currentListenPort;
+            // A published firewalled address omits the port. getExternalPort()
+            // then falls back to the local port, hiding NAT translation.
+            RouterAddress externalIPv4 = getCurrentExternalAddress(false);
+            boolean pingOneIPv4Only = shouldPingFirewall && !isSymNatted() &&
+                                     currentListenPort > 0 && externalIPv4 != null &&
+                                     externalIPv4.getPort() == currentListenPort;
+            boolean pingedIPv4 = false;
             boolean shortLoop = shouldPingFirewall || !haveCap || _context.netDb().floodfillEnabled();
             long loopTime = shortLoop ? SHORT_LOOP_TIME : LONG_LOOP_TIME;
             _lastLoopShort = shortLoop;
@@ -3813,6 +3819,7 @@ public class UDPTransport extends TransportImpl {
                     if ( (peer.getLastReceiveTime() < inactivityCutoff) && (peer.getLastSendTime() < inactivityCutoff) ) {
                         _expireBuffer.add(peer);
                     } else if (shouldPingFirewall &&
+                               !(pingedIPv4 && !peer.isIPv6()) &&
                                ((_runCount ^ peer.hashCode()) & (SLICES - 1)) == 0 &&
                                peer.getLastSendOrPingTime() < pingFirewallCutoff &&
                                peer.getLastReceiveTime() < pingFirewallCutoff) {
@@ -3832,10 +3839,12 @@ public class UDPTransport extends TransportImpl {
                             }
                         send(ping);
                         peer.setLastPingTime(now);
-                        // If external port is different, it may be changing the port for every
-                        // session, so ping all of them. Otherwise only one.
-                        if (pingOneOnly)
-                            shouldPingFirewall = false;
+                        // Symmetric NAT has a mapping per destination, even if
+                        // one mapping happens to preserve our local port.
+                        // IPv6 firewall state is also per session; an IPv6 ping
+                        // must not consume the IPv4 mapping's keepalive.
+                        if (pingOneIPv4Only && !peer.isIPv6())
+                            pingedIPv4 = true;
                     } else {
                         // periodically send our RI
                         long uptime = now - peer.getKeyEstablishedTime();
