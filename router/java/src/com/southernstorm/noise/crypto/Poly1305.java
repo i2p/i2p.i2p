@@ -54,6 +54,16 @@ public final class Poly1305 implements Destroyable, Cloneable {
 		posn = 0;
 	}
 
+	private Poly1305(Poly1305 other) {
+		nonce = other.nonce.clone();
+		block = other.block.clone();
+		h = other.h.clone();
+		r = other.r.clone();
+		c = other.c.clone();
+		t = other.t.clone();
+		posn = other.posn;
+	}
+
 	/**
 	 * Resets the message authenticator with a new key.
 	 * 
@@ -331,6 +341,6 @@ public final class Poly1305 implements Destroyable, Cloneable {
 	 */
 	@Override
 	public Poly1305 clone() throws CloneNotSupportedException {
-		return (Poly1305) super.clone();
+		return new Poly1305(this);
 	}
 }
