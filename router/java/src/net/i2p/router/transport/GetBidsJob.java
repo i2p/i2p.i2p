@@ -76,7 +76,11 @@ class GetBidsJob extends JobImpl {
             if (failedCount == 0) {
                 context.statManager().addRateData("transport.bidFailNoTransports", msg.getLifetime());
                 // This used to be "no common transports" but it is almost always no transports at all
-                context.banlist().banlistRouter(to, _x("No transports (hidden or starting up?)"));
+                // A local outage or startup is not evidence against this peer.
+                // Keep it available when connectivity returns or reseeding
+                // supplies a working route through a filtered network.
+                if (tmgr.getTransportCount() > 0 && tmgr.countActivePeers() > 0)
+                    context.banlist().banlistRouter(to, _x("No transports (hidden or starting up?)"));
             } else if (failedCount >= tmgr.getTransportCount()) {
                 context.statManager().addRateData("transport.bidFailAllTransports", msg.getLifetime());
             }
