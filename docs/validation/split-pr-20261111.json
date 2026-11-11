@@ -1,0 +1,956 @@
+{
+  "upstreamBase": "53002765a300547a2c663ac3c8d50a1b7c56cf1e",
+  "isolatedTests": 105,
+  "isolatedChanges": [
+    {
+      "slug": "aead-state-validation",
+      "branch": "fix/chachapoly-state-validation",
+      "commit": "0b373d82f95acc85050b4e3699f9bdf12b424060",
+      "validation": {
+        "fixed": {
+          "exitCode": 0,
+          "tests": 7,
+          "failures": 0
+        },
+        "baseline": {
+          "exitCode": 1,
+          "tests": 7,
+          "failures": 4
+        }
+      }
+    },
+    {
+      "slug": "chacha20-performance",
+      "branch": "perf/chacha20-redundant-block",
+      "commit": "9901ffa28092784223d3ef21bb9bc27e6b3c33de",
+      "validation": {
+        "fixed": {
+          "exitCode": 0,
+          "tests": 2,
+          "failures": 0
+        },
+        "baseline": {
+          "exitCode": 0,
+          "tests": 2,
+          "failures": 0
+        }
+      }
+    },
+    {
+      "slug": "noise-secret-diagnostics",
+      "branch": "fix/noise-secret-diagnostics",
+      "commit": "e8d991df1a8f4722e4326d3a61bd58d7d28d2568",
+      "validation": {
+        "fixed": {
+          "exitCode": 0,
+          "tests": 1,
+          "failures": 0
+        },
+        "baseline": {
+          "exitCode": 1,
+          "tests": 1,
+          "failures": 1
+        }
+      }
+    },
+    {
+      "slug": "ntcp-address-selection",
+      "branch": "fix/ntcp-address-selection",
+      "commit": "1daed9dcd32ec3f6cec79d57f40fbc6319dbdd4d",
+      "validation": {
+        "fixed": {
+          "exitCode": 0,
+          "tests": 9,
+          "failures": 0
+        },
+        "baseline": {
+          "exitCode": 1,
+          "tests": 9,
+          "failures": 5
+        },
+        "base": "53002765a300547a2c663ac3c8d50a1b7c56cf1e",
+        "freshBaselineCompile": true,
+        "dependencySource": "cached Maven jars only; no workspace project classes or jars"
+      }
+    },
+    {
+      "slug": "ntcp-probe-drain",
+      "branch": "fix/ntcp2-bounded-probe-drain",
+      "commit": "66f5cef29b3b05610ffdf0e2eedad542787b85bd",
+      "validation": {
+        "fixed": {
+          "exitCode": 0,
+          "tests": 6,
+          "failures": 0
+        },
+        "baseline": {
+          "exitCode": 1,
+          "tests": 6,
+          "failures": 4
+        },
+        "base": "53002765a300547a2c663ac3c8d50a1b7c56cf1e",
+        "freshBaselineCompile": true,
+        "dependencySource": "cached Maven jars only; no workspace project classes or jars"
+      }
+    },
+    {
+      "slug": "outage-peer-bans",
+      "branch": "fix/transport-outage-peer-bans",
+      "commit": "ffff8f0b600dddcd5fc56a7a2314555d5ecb896b",
+      "validation": {
+        "fixed": {
+          "exitCode": 0,
+          "tests": 5,
+          "failures": 0
+        },
+        "baseline": {
+          "exitCode": 1,
+          "tests": 5,
+          "failures": 3
+        },
+        "base": "53002765a300547a2c663ac3c8d50a1b7c56cf1e",
+        "freshBaselineCompile": true,
+        "dependencySource": "cached Maven jars only; no workspace project classes or jars"
+      }
+    },
+    {
+      "slug": "poly1305-clone",
+      "branch": "fix/poly1305-clone-isolation",
+      "commit": "10319f2149ec305beb6cffb16b1beb4724ac1e6f",
+      "validation": {
+        "fixed": {
+          "exitCode": 0,
+          "tests": 4,
+          "failures": 0
+        },
+        "baseline": {
+          "exitCode": 1,
+          "tests": 4,
+          "failures": 2
+        }
+      }
+    },
+    {
+      "slug": "reseed-decoded-bounds",
+      "branch": "fix/reseed-decoded-bounds",
+      "commit": "c74c5766b4b94a9cd04454ec495fcafc84bb2bc5",
+      "validation": {
+        "fixed": {
+          "tests": 7,
+          "failures": 0,
+          "exitCode": 0
+        },
+        "baseline": {
+          "tests": 5,
+          "failures": 2,
+          "exitCode": 1
+        },
+        "baselineTargets": [
+          "net.i2p.router.networkdb.reseed.ReseedDecodedBoundsTest#oversizedHTTPSHostDoesNotBlockNextVerifiedHost",
+          "net.i2p.router.networkdb.reseed.ReseedDecodedBoundsTest#invalidSignatureDoesNotImportOrBlockNextVerifiedHost",
+          "net.i2p.router.networkdb.reseed.ReseedDecodedBoundsTest#inMemoryHTTPSResponseIsBoundedWithoutAContentLength",
+          "net.i2p.router.networkdb.reseed.ReseedDecodedBoundsTest#boundedHTTPSFetchPreservesProxyAuthenticationAndSSLState",
+          "net.i2p.router.networkdb.reseed.ReseedDecodedBoundsTest#failedHTTPFetchAlsoRemovesPartialFile"
+        ]
+      }
+    },
+    {
+      "slug": "reseed-host-deadline",
+      "branch": "fix/reseed-host-deadline",
+      "commit": "0621dc25aca912cb33de640bc50ce5e8353c5123",
+      "validation": {
+        "fixed": {
+          "tests": 4,
+          "failures": 0,
+          "exitCode": 0
+        },
+        "baseline": {
+          "tests": 4,
+          "failures": 4,
+          "exitCode": 1
+        },
+        "baselineTargets": [
+          "net.i2p.router.networkdb.reseed.ReseedHostDeadlineTest"
+        ]
+      }
+    },
+    {
+      "slug": "ssu2-token-recovery",
+      "branch": "fix/ssu2-token-timeout-recovery",
+      "commit": "0bf61e7e4895cc270f9d5d422eb56d97f8302455",
+      "validation": {
+        "fixed": {
+          "exitCode": 0,
+          "tests": 6,
+          "failures": 0
+        },
+        "baseline": {
+          "exitCode": 1,
+          "tests": 6,
+          "failures": 4
+        },
+        "base": "53002765a300547a2c663ac3c8d50a1b7c56cf1e",
+        "freshBaselineCompile": true,
+        "dependencySource": "cached Maven jars only; no workspace project classes or jars"
+      }
+    },
+    {
+      "slug": "transport-bid-fallback",
+      "branch": "fix/transport-bid-fallback",
+      "commit": "bf75e0ea2d887529e469535109a8959283c2fec5",
+      "validation": {
+        "fixed": {
+          "exitCode": 0,
+          "tests": 4,
+          "failures": 0
+        },
+        "baseline": {
+          "exitCode": 1,
+          "tests": 4,
+          "failures": 2
+        },
+        "base": "53002765a300547a2c663ac3c8d50a1b7c56cf1e",
+        "freshBaselineCompile": true,
+        "dependencySource": "cached Maven jars only; no workspace project classes or jars"
+      }
+    },
+    {
+      "slug": "tunnel-reachability",
+      "branch": "fix/tunnel-transport-reachability",
+      "commit": "653cf18f51b839bcce9cc5273cb64e6ea7f29bce",
+      "validation": {
+        "fixed": {
+          "tests": 31,
+          "failures": 0,
+          "exitCode": 0
+        },
+        "baseline": {
+          "tests": 21,
+          "failures": 19,
+          "exitCode": 1
+        },
+        "baselineTargets": [
+          "net.i2p.router.tunnel.pool.ConnectCheckerTest#testOutboundOnlyNTCP2IsNotAnInboundRoute",
+          "net.i2p.router.tunnel.pool.ConnectCheckerTest#testOutboundOnlySSU2IsNotAnInboundRoute",
+          "net.i2p.router.tunnel.pool.ConnectCheckerTest#testReachabilityStatusCannotInventAnInboundRoute",
+          "net.i2p.router.tunnel.pool.ConnectCheckerTest#testPublishedRoutesRemainUsableWhileStatusIsUnknown",
+          "net.i2p.router.tunnel.pool.ConnectCheckerTest#testOutboundOnlyLegacySSUIsNotAnInboundRoute",
+          "net.i2p.router.tunnel.pool.ConnectCheckerTest#testSSU2IntroducersProvideAnInboundRoute",
+          "net.i2p.router.tunnel.pool.ConnectCheckerTest#testDirectAddressesRemainReachable",
+          "net.i2p.router.tunnel.pool.ConnectCheckerTest#testDirectAddressNeedsAUsablePort",
+          "net.i2p.router.tunnel.pool.ConnectCheckerTest#testHiddenSourceCanUseSSU2",
+          "net.i2p.router.tunnel.pool.ConnectCheckerTest#testHashChecksRespectDirection",
+          "net.i2p.router.tunnel.pool.ConnectCheckerTest#testHiddenSourceHashCanUseSSU2",
+          "net.i2p.router.tunnel.pool.ConnectCheckerTest#testEstablishedConnectionDoesNotNeedAPublishedInboundRoute",
+          "net.i2p.router.tunnel.pool.ExploratoryPeerSelectorTest",
+          "net.i2p.router.tunnel.pool.FirewalledPeerSelectorTest#symmetricNATDoesNotFallBackToDisconnectedAdjacentPeers",
+          "net.i2p.router.tunnel.pool.FirewalledPeerSelectorTest#clientOutboundBootstrapUsesAnEstablishedEndpoint",
+          "net.i2p.router.tunnel.pool.FirewalledPeerSelectorTest#exploratoryOutboundBootstrapUsesAnEstablishedEndpoint",
+          "net.i2p.router.tunnel.pool.FirewalledPeerSelectorTest#clientInboundDoesNotFallBackToDisconnectedPeers",
+          "net.i2p.router.tunnel.pool.FirewalledPeerSelectorTest#exploratoryInboundDoesNotFallBackToDisconnectedPeers"
+        ],
+        "previousPR": {
+          "tests": 3,
+          "failures": 3,
+          "exitCode": 1
+        },
+        "previousPRTargets": [
+          "net.i2p.router.tunnel.pool.ConnectCheckerTest#testReachabilityStatusCannotInventAnInboundRoute",
+          "net.i2p.router.tunnel.pool.ConnectCheckerTest#testPublishedRoutesRemainUsableWhileStatusIsUnknown",
+          "net.i2p.router.tunnel.pool.FirewalledPeerSelectorTest#symmetricNATDoesNotFallBackToDisconnectedAdjacentPeers"
+        ]
+      }
+    },
+    {
+      "slug": "udp-handshake-negotiation",
+      "branch": "fix/udp-handshake-negotiation",
+      "commit": "100ab897eff5092661798d4f92638089e9000238",
+      "validation": {
+        "fixed": {
+          "exitCode": 0,
+          "tests": 12,
+          "failures": 0
+        },
+        "baseline": {
+          "exitCode": 1,
+          "tests": 12,
+          "failures": 7
+        },
+        "base": "53002765a300547a2c663ac3c8d50a1b7c56cf1e",
+        "freshBaselineCompile": true,
+        "dependencySource": "cached Maven jars only; no workspace project classes or jars"
+      }
+    },
+    {
+      "slug": "udp-nat-keepalives",
+      "branch": "fix/udp-nat-keepalives",
+      "commit": "53e1333fac251b5dd3fac6521f6f5df68a28eb04",
+      "validation": {
+        "fixed": {
+          "exitCode": 0,
+          "tests": 7,
+          "failures": 0
+        },
+        "baseline": {
+          "exitCode": 1,
+          "tests": 7,
+          "failures": 5
+        },
+        "base": "53002765a300547a2c663ac3c8d50a1b7c56cf1e",
+        "freshBaselineCompile": true,
+        "dependencySource": "cached Maven jars only; no workspace project classes or jars"
+      }
+    }
+  ],
+  "combinedIntegration": {
+    "exitCode": 0,
+    "tests": 166,
+    "failures": 0,
+    "base": "53002765a300547a2c663ac3c8d50a1b7c56cf1e",
+    "newProductionGroups": [
+      "aead-state-validation",
+      "chacha20-performance",
+      "noise-secret-diagnostics",
+      "ntcp-address-selection",
+      "ntcp-probe-drain",
+      "outage-peer-bans",
+      "poly1305-clone",
+      "reseed-decoded-bounds",
+      "reseed-host-deadline",
+      "ssu2-token-recovery",
+      "transport-bid-fallback",
+      "tunnel-reachability",
+      "udp-handshake-negotiation",
+      "udp-nat-keepalives"
+    ],
+    "existingPRRegressions": [
+      "#213",
+      "#215",
+      "#216",
+      "#217"
+    ],
+    "productionFiles": [
+      "core/java/src/net/i2p/crypto/ChaCha20.java",
+      "router/java/src/com/southernstorm/noise/crypto/Poly1305.java",
+      "router/java/src/com/southernstorm/noise/protocol/ChaChaPolyCipherState.java",
+      "router/java/src/com/southernstorm/noise/protocol/SymmetricState.java",
+      "router/java/src/net/i2p/router/networkdb/reseed/ReseedOutputStream.java",
+      "router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java",
+      "router/java/src/net/i2p/router/transport/GetBidsJob.java",
+      "router/java/src/net/i2p/router/transport/TransportManager.java",
+      "router/java/src/net/i2p/router/transport/ntcp/InboundEstablishState.java",
+      "router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java",
+      "router/java/src/net/i2p/router/transport/udp/EstablishmentManager.java",
+      "router/java/src/net/i2p/router/transport/udp/IntroductionManager.java",
+      "router/java/src/net/i2p/router/transport/udp/OutboundEstablishState.java",
+      "router/java/src/net/i2p/router/transport/udp/OutboundEstablishState2.java",
+      "router/java/src/net/i2p/router/transport/udp/PeerTestManager.java",
+      "router/java/src/net/i2p/router/transport/udp/SSU2Payload.java",
+      "router/java/src/net/i2p/router/transport/udp/UDPTransport.java",
+      "router/java/src/net/i2p/router/tunnel/pool/ClientPeerSelector.java",
+      "router/java/src/net/i2p/router/tunnel/pool/ConnectChecker.java",
+      "router/java/src/net/i2p/router/tunnel/pool/ExploratoryPeerSelector.java"
+    ],
+    "testClasses": [
+      "com.southernstorm.noise.protocol.ChaChaPolyValidationTest",
+      "net.i2p.crypto.ChaCha20Test",
+      "com.southernstorm.noise.protocol.NoiseSecretDiagnosticsTest",
+      "net.i2p.router.transport.ntcp.NTCPTransportTest",
+      "net.i2p.router.transport.ntcp.InboundProbeResistanceTest",
+      "net.i2p.router.transport.GetBidsJobTest",
+      "com.southernstorm.noise.crypto.Poly1305CloneTest",
+      "com.southernstorm.noise.protocol.ChaChaPolyCloneIsolationTest",
+      "net.i2p.router.networkdb.reseed.ReseedDecodedBoundsTest",
+      "net.i2p.router.networkdb.reseed.ReseedHostDeadlineTest",
+      "net.i2p.router.transport.udp.InboundEstablishmentRecoveryTest",
+      "net.i2p.router.transport.TransportManagerTest",
+      "net.i2p.router.tunnel.pool.ConnectCheckerTest",
+      "net.i2p.router.tunnel.pool.ExploratoryPeerSelectorTest",
+      "net.i2p.router.tunnel.pool.FirewalledPeerSelectorTest",
+      "net.i2p.router.transport.udp.UDPTransportNegotiationTest",
+      "net.i2p.router.transport.udp.UDPTransportKeepaliveTest",
+      "net.i2p.router.transport.udp.PeerTestManagerTest",
+      "net.i2p.router.transport.udp.SSU2PayloadTest",
+      "net.i2p.router.transport.udp.SSU2NegotiatedVersionTest",
+      "net.i2p.router.transport.udp.IntroductionVersionCompatibilityTest",
+      "net.i2p.router.transport.udp.UDPTransportPeerStateTest",
+      "net.i2p.router.transport.udp.EstablishmentManagerTest",
+      "net.i2p.router.transport.udp.EstablishmentManagerRelayTest",
+      "net.i2p.router.transport.udp.IntroductionManagerTest",
+      "net.i2p.router.transport.udp.IntroductionOrderingTest"
+    ],
+    "testAdaptations": [
+      {
+        "source": "/tmp/i2p-feature-prs-20261111/changes/reseed-decoded-bounds/router/java/test/junit/net/i2p/router/networkdb/reseed/ReseedDecodedBoundsTest.java",
+        "compiled": "/tmp/i2p-feature-prs-20261111/combined-validation/adapted-tests/router/java/test/junit/net/i2p/router/networkdb/reseed/ReseedDecodedBoundsTest.java",
+        "reason": "Rebind size-bound branch fetch() mocks to the combined deadline overload; retain original assertions and test data.",
+        "sourceSHA256": "96c904dc8f50495234a45d166cee829d649e1e5e3c830b619b4f664e62a073ba",
+        "compiledSHA256": "a460a9f05d818da89b0c82be6b40994bda5c533db975aa606a46c6c21071465c"
+      }
+    ],
+    "baselineProvenance": "/tmp/i2p-feature-prs-20261111/crypto-validation/baseline-provenance.json",
+    "externalJarsOnly": true,
+    "productionSource": "current combined workspace source files compiled fresh",
+    "sourceHashes": {
+      "core/java/src/net/i2p/crypto/ChaCha20.java": "3beaa6a71bffcd80e5b5b110eb4e3522284adbc054041d4cb378d710cee383da",
+      "router/java/src/com/southernstorm/noise/crypto/Poly1305.java": "4a880e3a76e153e3782318d86141326800b63695e10f1bfb65980b7f3c57d700",
+      "router/java/src/com/southernstorm/noise/protocol/ChaChaPolyCipherState.java": "22cc191d7f40294530e825b2e372f0e2b03e77f2f07fe7535b9bbc18c63acaa6",
+      "router/java/src/com/southernstorm/noise/protocol/SymmetricState.java": "9c76ecc430f2fe6a0164d3f55d83c569e502b550df3b8b9c583b7f18759a4e43",
+      "router/java/src/net/i2p/router/networkdb/reseed/ReseedOutputStream.java": "c4729e4a1c6955d33e764b0b6158e456b0d262cd61155b79c093f27ce9958be5",
+      "router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java": "00c2768ec7c881d3b1aebbfaa4b05d53df3ff18dec8c01a777bf14dc266c6d4d",
+      "router/java/src/net/i2p/router/transport/GetBidsJob.java": "488a11bddcde5a89beea8e30d413a36e68b4d6105700c6d4bcba4f5b9420509b",
+      "router/java/src/net/i2p/router/transport/TransportManager.java": "33fe5d56fc34078c48e2176904bcdad65be5f31c1c517528d340dfd1589418e7",
+      "router/java/src/net/i2p/router/transport/ntcp/InboundEstablishState.java": "45475774a11d2aab10e424a9fb1becf2fe2f643e6c7d698f17c3407e61185020",
+      "router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java": "d933d8280546eb6524a07d40d844f2a061bdbf67e82b4f5d3486ed4f4e841ff3",
+      "router/java/src/net/i2p/router/transport/udp/EstablishmentManager.java": "ad382329a61b410f253896df5aedd0d977f9b1bccbad76db5559116abf2f63dd",
+      "router/java/src/net/i2p/router/transport/udp/IntroductionManager.java": "7d8a1be3e4371b4c1d284eebbef88ce25dc80aac7ea4995490fc6d3562b926ff",
+      "router/java/src/net/i2p/router/transport/udp/OutboundEstablishState.java": "2c6a325441e544f32a53020a56df0bc5ed61605cc513c36ec32a199c69d2c946",
+      "router/java/src/net/i2p/router/transport/udp/OutboundEstablishState2.java": "e5a940bd725f9097b1bd56a976eb27dbf74c09df287a9b866e707836e1dd6ba7",
+      "router/java/src/net/i2p/router/transport/udp/PeerTestManager.java": "2161662a6a8e8ebe81c179bb06be980f1b24c85e0a1fe37f18e58e7d05b0ae89",
+      "router/java/src/net/i2p/router/transport/udp/SSU2Payload.java": "0941656baa245e9488f0396c07cc7ba56df67730d1d57641e375bbc1831ce990",
+      "router/java/src/net/i2p/router/transport/udp/UDPTransport.java": "f2762ea04a38391a3cba70db659eb21c8311103c776fb224ccff7828e2782470",
+      "router/java/src/net/i2p/router/tunnel/pool/ClientPeerSelector.java": "891ec1568f6669a69e2f1b177fbfe08003be654f5c1e3e1531340408eee021e9",
+      "router/java/src/net/i2p/router/tunnel/pool/ConnectChecker.java": "eb24f04ca19dc7e3d92f3abb9663e79a418c6c59a91fee0ae79d9d07b86eb160",
+      "router/java/src/net/i2p/router/tunnel/pool/ExploratoryPeerSelector.java": "120b69ebdf38c59a78e6c68d4e2b62be9c9099a46e654e9488c5acdb408101d0"
+    }
+  },
+  "productionCoverage": {
+    "base": "53002765a300547a2c663ac3c8d50a1b7c56cf1e",
+    "scope": "All modified production Java plus router/build.gradle, and untracked production Java in the main workspace",
+    "files": {
+      "apps/streaming/java/src/net/i2p/client/streaming/impl/MessageInputStream.java": {
+        "groups": [
+          "streaming-sequence-gap",
+          "streaming-out-of-order-duplicates",
+          "streaming-null-payloads",
+          "streaming-array-arguments",
+          "streaming-receive-buffer"
+        ],
+        "lineEditCount": 32,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "19dce5de1e1489df245889bb8f29ef6fc1432aa09b34425a185fc0f2904788b4",
+        "composedSHA256": "19dce5de1e1489df245889bb8f29ef6fc1432aa09b34425a185fc0f2904788b4"
+      },
+      "apps/streaming/java/src/net/i2p/client/streaming/impl/MessageOutputStream.java": {
+        "groups": [
+          "streaming-array-arguments"
+        ],
+        "lineEditCount": 1,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "2c5a6bcf0299a6a186f6c7f304fd6dfe07a9ed3aeee7cca10cab8ff6f8a85d61",
+        "composedSHA256": "2c5a6bcf0299a6a186f6c7f304fd6dfe07a9ed3aeee7cca10cab8ff6f8a85d61"
+      },
+      "core/java/src/net/i2p/crypto/ChaCha20.java": {
+        "groups": [
+          "chacha20-performance"
+        ],
+        "lineEditCount": 1,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "3beaa6a71bffcd80e5b5b110eb4e3522284adbc054041d4cb378d710cee383da",
+        "composedSHA256": "3beaa6a71bffcd80e5b5b110eb4e3522284adbc054041d4cb378d710cee383da"
+      },
+      "router/build.gradle": {
+        "groups": [
+          "tunnel-reachability"
+        ],
+        "lineEditCount": 4,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "058723d06a07f2068b956d6156d90f80335d9877225644ac1a279fe5ecc4828f",
+        "composedSHA256": "058723d06a07f2068b956d6156d90f80335d9877225644ac1a279fe5ecc4828f"
+      },
+      "router/java/src/com/southernstorm/noise/crypto/Poly1305.java": {
+        "groups": [
+          "poly1305-clone"
+        ],
+        "lineEditCount": 2,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "4a880e3a76e153e3782318d86141326800b63695e10f1bfb65980b7f3c57d700",
+        "composedSHA256": "4a880e3a76e153e3782318d86141326800b63695e10f1bfb65980b7f3c57d700"
+      },
+      "router/java/src/com/southernstorm/noise/protocol/ChaChaPolyCipherState.java": {
+        "groups": [
+          "aead-state-validation",
+          "noise-secret-diagnostics"
+        ],
+        "lineEditCount": 15,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "22cc191d7f40294530e825b2e372f0e2b03e77f2f07fe7535b9bbc18c63acaa6",
+        "composedSHA256": "22cc191d7f40294530e825b2e372f0e2b03e77f2f07fe7535b9bbc18c63acaa6"
+      },
+      "router/java/src/com/southernstorm/noise/protocol/SymmetricState.java": {
+        "groups": [
+          "noise-secret-diagnostics"
+        ],
+        "lineEditCount": 1,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "9c76ecc430f2fe6a0164d3f55d83c569e502b550df3b8b9c583b7f18759a4e43",
+        "composedSHA256": "9c76ecc430f2fe6a0164d3f55d83c569e502b550df3b8b9c583b7f18759a4e43"
+      },
+      "router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java": {
+        "groups": [
+          "reseed-decoded-bounds",
+          "reseed-host-deadline"
+        ],
+        "lineEditCount": 15,
+        "overlaps": [
+          {
+            "groups": [
+              [
+                "reseed-host-deadline"
+              ],
+              [
+                "reseed-decoded-bounds"
+              ]
+            ],
+            "ranges": [
+              [
+                1098,
+                1098
+              ],
+              [
+                1098,
+                1101
+              ]
+            ]
+          }
+        ],
+        "exactUnionMatchesWorkspace": false,
+        "workspaceSHA256": "00c2768ec7c881d3b1aebbfaa4b05d53df3ff18dec8c01a777bf14dc266c6d4d",
+        "resolution": "Apply the deadline branch arguments to readURL and the bounds branch's new fetchURL(OutputStream) return expression; retain bounds cleanup/refactor and deadline comment.",
+        "exactAfterReviewedResolution": true,
+        "composedSHA256": "00c2768ec7c881d3b1aebbfaa4b05d53df3ff18dec8c01a777bf14dc266c6d4d"
+      },
+      "router/java/src/net/i2p/router/transport/GetBidsJob.java": {
+        "groups": [
+          "outage-peer-bans"
+        ],
+        "lineEditCount": 1,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "488a11bddcde5a89beea8e30d413a36e68b4d6105700c6d4bcba4f5b9420509b",
+        "composedSHA256": "488a11bddcde5a89beea8e30d413a36e68b4d6105700c6d4bcba4f5b9420509b"
+      },
+      "router/java/src/net/i2p/router/transport/TransportManager.java": {
+        "groups": [
+          "transport-bid-fallback"
+        ],
+        "lineEditCount": 1,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "33fe5d56fc34078c48e2176904bcdad65be5f31c1c517528d340dfd1589418e7",
+        "composedSHA256": "33fe5d56fc34078c48e2176904bcdad65be5f31c1c517528d340dfd1589418e7"
+      },
+      "router/java/src/net/i2p/router/transport/ntcp/InboundEstablishState.java": {
+        "groups": [
+          "ntcp-probe-drain"
+        ],
+        "lineEditCount": 8,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "45475774a11d2aab10e424a9fb1becf2fe2f643e6c7d698f17c3407e61185020",
+        "composedSHA256": "45475774a11d2aab10e424a9fb1becf2fe2f643e6c7d698f17c3407e61185020"
+      },
+      "router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java": {
+        "groups": [
+          "ntcp-address-selection"
+        ],
+        "lineEditCount": 5,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "d933d8280546eb6524a07d40d844f2a061bdbf67e82b4f5d3486ed4f4e841ff3",
+        "composedSHA256": "d933d8280546eb6524a07d40d844f2a061bdbf67e82b4f5d3486ed4f4e841ff3"
+      },
+      "router/java/src/net/i2p/router/transport/udp/EstablishmentManager.java": {
+        "groups": [
+          "negotiated-versions",
+          "introducer-establishment",
+          "relay-ordering",
+          "ssu2-token-recovery"
+        ],
+        "lineEditCount": 44,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "ad382329a61b410f253896df5aedd0d977f9b1bccbad76db5559116abf2f63dd",
+        "composedSHA256": "ad382329a61b410f253896df5aedd0d977f9b1bccbad76db5559116abf2f63dd"
+      },
+      "router/java/src/net/i2p/router/transport/udp/IntroductionManager.java": {
+        "groups": [
+          "negotiated-versions",
+          "introducer-establishment"
+        ],
+        "lineEditCount": 7,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "7d8a1be3e4371b4c1d284eebbef88ce25dc80aac7ea4995490fc6d3562b926ff",
+        "composedSHA256": "7d8a1be3e4371b4c1d284eebbef88ce25dc80aac7ea4995490fc6d3562b926ff"
+      },
+      "router/java/src/net/i2p/router/transport/udp/OutboundEstablishState.java": {
+        "groups": [
+          "introducer-establishment"
+        ],
+        "lineEditCount": 3,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "2c6a325441e544f32a53020a56df0bc5ed61605cc513c36ec32a199c69d2c946",
+        "composedSHA256": "2c6a325441e544f32a53020a56df0bc5ed61605cc513c36ec32a199c69d2c946"
+      },
+      "router/java/src/net/i2p/router/transport/udp/OutboundEstablishState2.java": {
+        "groups": [
+          "relay-ordering"
+        ],
+        "lineEditCount": 1,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "e5a940bd725f9097b1bd56a976eb27dbf74c09df287a9b866e707836e1dd6ba7",
+        "composedSHA256": "e5a940bd725f9097b1bd56a976eb27dbf74c09df287a9b866e707836e1dd6ba7"
+      },
+      "router/java/src/net/i2p/router/transport/udp/PeerTestManager.java": {
+        "groups": [
+          "peer-test-validation"
+        ],
+        "lineEditCount": 3,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "2161662a6a8e8ebe81c179bb06be980f1b24c85e0a1fe37f18e58e7d05b0ae89",
+        "composedSHA256": "2161662a6a8e8ebe81c179bb06be980f1b24c85e0a1fe37f18e58e7d05b0ae89"
+      },
+      "router/java/src/net/i2p/router/transport/udp/SSU2Bitfield.java": {
+        "groups": [
+          "ssu2-unsigned-ack-numbers",
+          "ssu2-ack-window-scan"
+        ],
+        "lineEditCount": 7,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "728debc27ae81460e3098cf7da52b8c700dde40f986bf4c335a96ac7ef1e6b17",
+        "composedSHA256": "728debc27ae81460e3098cf7da52b8c700dde40f986bf4c335a96ac7ef1e6b17"
+      },
+      "router/java/src/net/i2p/router/transport/udp/SSU2Payload.java": {
+        "groups": [
+          "peer-test-validation"
+        ],
+        "lineEditCount": 1,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "0941656baa245e9488f0396c07cc7ba56df67730d1d57641e375bbc1831ce990",
+        "composedSHA256": "0941656baa245e9488f0396c07cc7ba56df67730d1d57641e375bbc1831ce990"
+      },
+      "router/java/src/net/i2p/router/transport/udp/UDPTransport.java": {
+        "groups": [
+          "negotiated-versions",
+          "udp-handshake-negotiation",
+          "udp-nat-keepalives"
+        ],
+        "lineEditCount": 16,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "f2762ea04a38391a3cba70db659eb21c8311103c776fb224ccff7828e2782470",
+        "composedSHA256": "f2762ea04a38391a3cba70db659eb21c8311103c776fb224ccff7828e2782470"
+      },
+      "router/java/src/net/i2p/router/tunnel/pool/ClientPeerSelector.java": {
+        "groups": [
+          "tunnel-reachability"
+        ],
+        "lineEditCount": 1,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "891ec1568f6669a69e2f1b177fbfe08003be654f5c1e3e1531340408eee021e9",
+        "composedSHA256": "891ec1568f6669a69e2f1b177fbfe08003be654f5c1e3e1531340408eee021e9"
+      },
+      "router/java/src/net/i2p/router/tunnel/pool/ConnectChecker.java": {
+        "groups": [
+          "tunnel-reachability"
+        ],
+        "lineEditCount": 17,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "eb24f04ca19dc7e3d92f3abb9663e79a418c6c59a91fee0ae79d9d07b86eb160",
+        "composedSHA256": "eb24f04ca19dc7e3d92f3abb9663e79a418c6c59a91fee0ae79d9d07b86eb160"
+      },
+      "router/java/src/net/i2p/router/tunnel/pool/ExploratoryPeerSelector.java": {
+        "groups": [
+          "tunnel-reachability"
+        ],
+        "lineEditCount": 2,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "120b69ebdf38c59a78e6c68d4e2b62be9c9099a46e654e9488c5acdb408101d0",
+        "composedSHA256": "120b69ebdf38c59a78e6c68d4e2b62be9c9099a46e654e9488c5acdb408101d0"
+      },
+      "router/java/src/net/i2p/router/networkdb/reseed/ReseedOutputStream.java": {
+        "groups": [
+          "reseed-decoded-bounds"
+        ],
+        "lineEditCount": 1,
+        "overlaps": [],
+        "exactUnionMatchesWorkspace": true,
+        "workspaceSHA256": "c4729e4a1c6955d33e764b0b6158e456b0d262cd61155b79c093f27ce9958be5",
+        "composedSHA256": "c4729e4a1c6955d33e764b0b6158e456b0d262cd61155b79c093f27ce9958be5"
+      }
+    },
+    "overlaps": [
+      {
+        "path": "router/java/src/net/i2p/router/transport/udp/EstablishmentManager.java",
+        "existingGroup": "negotiated-versions",
+        "newGroup": "ssu2-token-recovery",
+        "defaultGitMergeExit": 0,
+        "textualConflict": false,
+        "artifact": "/tmp/i2p-feature-prs-20261111/coverage-review/router__java__src__net__i2p__router__transport__udp__EstablishmentManager.java.negotiated-versions-ssu2-token-recovery.merge"
+      },
+      {
+        "path": "router/java/src/net/i2p/router/transport/udp/EstablishmentManager.java",
+        "existingGroup": "introducer-establishment",
+        "newGroup": "ssu2-token-recovery",
+        "defaultGitMergeExit": 0,
+        "textualConflict": false,
+        "artifact": "/tmp/i2p-feature-prs-20261111/coverage-review/router__java__src__net__i2p__router__transport__udp__EstablishmentManager.java.introducer-establishment-ssu2-token-recovery.merge"
+      },
+      {
+        "path": "router/java/src/net/i2p/router/transport/udp/EstablishmentManager.java",
+        "existingGroup": "relay-ordering",
+        "newGroup": "ssu2-token-recovery",
+        "defaultGitMergeExit": 0,
+        "textualConflict": false,
+        "artifact": "/tmp/i2p-feature-prs-20261111/coverage-review/router__java__src__net__i2p__router__transport__udp__EstablishmentManager.java.relay-ordering-ssu2-token-recovery.merge"
+      },
+      {
+        "path": "router/java/src/net/i2p/router/transport/udp/UDPTransport.java",
+        "existingGroup": "negotiated-versions",
+        "newGroup": "udp-handshake-negotiation",
+        "defaultGitMergeExit": 0,
+        "textualConflict": false,
+        "artifact": "/tmp/i2p-feature-prs-20261111/coverage-review/router__java__src__net__i2p__router__transport__udp__UDPTransport.java.negotiated-versions-udp-handshake-negotiation.merge"
+      },
+      {
+        "path": "router/java/src/net/i2p/router/transport/udp/UDPTransport.java",
+        "existingGroup": "negotiated-versions",
+        "newGroup": "udp-nat-keepalives",
+        "defaultGitMergeExit": 0,
+        "textualConflict": false,
+        "artifact": "/tmp/i2p-feature-prs-20261111/coverage-review/router__java__src__net__i2p__router__transport__udp__UDPTransport.java.negotiated-versions-udp-nat-keepalives.merge"
+      }
+    ],
+    "pairwiseTextualMerges": [
+      {
+        "path": "apps/streaming/java/src/net/i2p/client/streaming/impl/MessageInputStream.java",
+        "groups": [
+          "streaming-sequence-gap",
+          "streaming-out-of-order-duplicates"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "apps/streaming/java/src/net/i2p/client/streaming/impl/MessageInputStream.java",
+        "groups": [
+          "streaming-sequence-gap",
+          "streaming-null-payloads"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "apps/streaming/java/src/net/i2p/client/streaming/impl/MessageInputStream.java",
+        "groups": [
+          "streaming-sequence-gap",
+          "streaming-array-arguments"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "apps/streaming/java/src/net/i2p/client/streaming/impl/MessageInputStream.java",
+        "groups": [
+          "streaming-sequence-gap",
+          "streaming-receive-buffer"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "apps/streaming/java/src/net/i2p/client/streaming/impl/MessageInputStream.java",
+        "groups": [
+          "streaming-out-of-order-duplicates",
+          "streaming-null-payloads"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "apps/streaming/java/src/net/i2p/client/streaming/impl/MessageInputStream.java",
+        "groups": [
+          "streaming-out-of-order-duplicates",
+          "streaming-array-arguments"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "apps/streaming/java/src/net/i2p/client/streaming/impl/MessageInputStream.java",
+        "groups": [
+          "streaming-out-of-order-duplicates",
+          "streaming-receive-buffer"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "apps/streaming/java/src/net/i2p/client/streaming/impl/MessageInputStream.java",
+        "groups": [
+          "streaming-null-payloads",
+          "streaming-array-arguments"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "apps/streaming/java/src/net/i2p/client/streaming/impl/MessageInputStream.java",
+        "groups": [
+          "streaming-null-payloads",
+          "streaming-receive-buffer"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "apps/streaming/java/src/net/i2p/client/streaming/impl/MessageInputStream.java",
+        "groups": [
+          "streaming-array-arguments",
+          "streaming-receive-buffer"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "router/java/src/net/i2p/router/transport/udp/SSU2Bitfield.java",
+        "groups": [
+          "ssu2-unsigned-ack-numbers",
+          "ssu2-ack-window-scan"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "router/java/src/net/i2p/router/transport/udp/EstablishmentManager.java",
+        "groups": [
+          "negotiated-versions",
+          "introducer-establishment"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "router/java/src/net/i2p/router/transport/udp/EstablishmentManager.java",
+        "groups": [
+          "negotiated-versions",
+          "relay-ordering"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "router/java/src/net/i2p/router/transport/udp/EstablishmentManager.java",
+        "groups": [
+          "negotiated-versions",
+          "ssu2-token-recovery"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "router/java/src/net/i2p/router/transport/udp/EstablishmentManager.java",
+        "groups": [
+          "introducer-establishment",
+          "relay-ordering"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "router/java/src/net/i2p/router/transport/udp/EstablishmentManager.java",
+        "groups": [
+          "introducer-establishment",
+          "ssu2-token-recovery"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "router/java/src/net/i2p/router/transport/udp/EstablishmentManager.java",
+        "groups": [
+          "relay-ordering",
+          "ssu2-token-recovery"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "router/java/src/net/i2p/router/transport/udp/IntroductionManager.java",
+        "groups": [
+          "negotiated-versions",
+          "introducer-establishment"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "router/java/src/net/i2p/router/transport/udp/UDPTransport.java",
+        "groups": [
+          "negotiated-versions",
+          "udp-handshake-negotiation"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "router/java/src/net/i2p/router/transport/udp/UDPTransport.java",
+        "groups": [
+          "negotiated-versions",
+          "udp-nat-keepalives"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "router/java/src/net/i2p/router/transport/udp/UDPTransport.java",
+        "groups": [
+          "udp-handshake-negotiation",
+          "udp-nat-keepalives"
+        ],
+        "defaultGitMergeExit": 0,
+        "textualConflict": false
+      },
+      {
+        "path": "router/java/src/com/southernstorm/noise/protocol/ChaChaPolyCipherState.java",
+        "groups": [
+          "aead-state-validation",
+          "noise-secret-diagnostics"
+        ],
+        "defaultGitMergeExit": 3,
+        "textualConflict": true,
+        "artifact": "/tmp/i2p-feature-prs-20261111/coverage-review/router__java__src__com__southernstorm__noise__protocol__ChaChaPolyCipherState.java.aead-state-validation-noise-secret-diagnostics.merge"
+      },
+      {
+        "path": "router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java",
+        "groups": [
+          "reseed-decoded-bounds",
+          "reseed-host-deadline"
+        ],
+        "defaultGitMergeExit": 1,
+        "textualConflict": true,
+        "artifact": "/tmp/i2p-feature-prs-20261111/coverage-review/router__java__src__net__i2p__router__networkdb__reseed__Reseeder.java.reseed-decoded-bounds-reseed-host-deadline.merge"
+      }
+    ],
+    "allExact": true,
+    "unaccountedProductionChanges": [],
+    "targetCount": 24
+  },
+  "newLiveNetworkRun": false
+}
