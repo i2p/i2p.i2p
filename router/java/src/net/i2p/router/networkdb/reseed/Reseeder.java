@@ -1038,7 +1038,9 @@ public class Reseeder {
                 get.addHeader("If-Modified-Since", minLastMod);
             }
             get.addStatusListener(ReseedRunner.this);
-            if (get.fetch() && get.getStatusCode() == 200)
+            // Preserve the header/inactivity defaults, but bound a trickling
+            // response so the next reseed host can be tried.
+            if (get.fetch(45*1000, MAX_TIME_PER_HOST, -1) && get.getStatusCode() == 200)
                 return baos.toByteArray();
             return null;
         }
@@ -1095,7 +1097,7 @@ public class Reseeder {
                 get.addHeader("If-Modified-Since", minLastMod);
             }
             get.addStatusListener(ReseedRunner.this);
-            if (get.fetch() && get.getStatusCode() == 200)
+            if (get.fetch(45*1000, MAX_TIME_PER_HOST, -1) && get.getStatusCode() == 200)
                 return out;
             out.delete();
             return null;
