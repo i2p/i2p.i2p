@@ -115,7 +115,6 @@ public final class ChaCha20 {
         input[15] = (int) DataHelper.fromLongLE(iv, ivOffset + 8, 4);
         //System.out.println("initIV");
         //dumpBlock(input);
-        ChaChaCore.hash(output, input);
         //int ctr = 1;
         //System.out.println("hash " + ctr);
         //dumpBlock(output);
