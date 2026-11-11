@@ -57,6 +57,7 @@ class ClientPeerSelector extends TunnelPeerSelector {
             boolean checkClosestHop = v6Only || ntcpDisabled || ssuDisabled;
             boolean hidden = ctx.router().isHidden() ||
                              ctx.router().getRouterInfo().getAddressCount() <= 0 ||
+                             getInboundMask(ctx.router().getRouterInfo()) == 0 ||
                              !ctx.commSystem().haveInboundCapacity(95);
             boolean hiddenInbound = hidden && isInbound;
             boolean hiddenOutbound = hidden && !isInbound;

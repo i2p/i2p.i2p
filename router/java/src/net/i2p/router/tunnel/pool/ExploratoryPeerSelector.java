@@ -69,6 +69,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         boolean checkClosestHop = v6Only || ntcpDisabled || ssuDisabled;
         boolean hidden = nonzero && (ctx.router().isHidden() ||
                                      ctx.router().getRouterInfo().getAddressCount() <= 0 ||
+                                     getInboundMask(ctx.router().getRouterInfo()) == 0 ||
                                      !ctx.commSystem().haveInboundCapacity(95));
         boolean hiddenInbound = hidden && isInbound;
         boolean hiddenOutbound = hidden && !isInbound;
@@ -82,7 +83,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         // which will be the closest hop, so select the closest one here if necessary.
 
         Hash closestHop = null;
-        if (v6Only || hiddenInbound || lowOutbound) {
+        if (checkClosestHop || hiddenInbound || lowOutbound) {
             Set<Hash> closestExclude;
             if (checkClosestHop) {
                 closestExclude = getClosestHopExclude(isInbound, exclude);

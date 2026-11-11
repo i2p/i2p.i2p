@@ -9,6 +9,7 @@ import net.i2p.router.Router;
 import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.TransportManager;
+import net.i2p.router.transport.TransportUtil;
 import net.i2p.util.Log;
 
 /**
@@ -99,7 +100,7 @@ public class ConnectChecker {
             // assume nothing if hidden
             if (at.isEmpty())
                 return false;
-            ct = getConnectMask(at);
+            ct = getConnectMask(at, true);
         }
 
         int cf;
@@ -110,9 +111,9 @@ public class ConnectChecker {
             Collection<RouterAddress> a = rf.getAddresses();
             if (a.isEmpty()) {
                 // assume IPv4 if hidden
-                cf = NTCP_V4 | SSU_V4;
+                cf = ANY_V4;
             } else {
-                cf = getConnectMask(a);
+                cf = getConnectMask(a, false);
             }
         }
 
@@ -141,7 +142,7 @@ public class ConnectChecker {
         // assume nothing if hidden
         if (ra.isEmpty())
             return false;
-        int ct = getConnectMask(ra);
+        int ct = getConnectMask(ra, true);
         boolean rv = (ourMask & ct) != 0;
         //if (!rv && log.shouldWarn())
         //    log.warn("Cannot connect: us with mask " + ourMask + " to " + to + " with mask " + ct);
@@ -166,9 +167,9 @@ public class ConnectChecker {
         int cf;
         // assume v4 if hidden
         if (ra.isEmpty())
-            cf = NTCP_V4 | SSU_V4;
+            cf = ANY_V4;
         else
-            cf = getConnectMask(ra);
+            cf = getConnectMask(ra, false);
         boolean rv = (cf & ourMask) != 0;
         //if (!rv && log.shouldWarn())
         //    log.warn("Cannot connect: " + from + " with mask " + cf + " to us with mask " + ourMask);
@@ -201,7 +202,7 @@ public class ConnectChecker {
                 Collection<RouterAddress> at = us.getAddresses();
                 if (at.isEmpty())
                     return 0;
-                ct = getConnectMask(at);
+                ct = getConnectMask(at, true);
                 break;
 
             case IPV4_DISABLED_IPV6_OK:
@@ -262,7 +263,7 @@ public class ConnectChecker {
                             cf |= SSU2_V4;
                     }
                 } else {
-                    cf = getConnectMask(a);
+                    cf = getConnectMask(a, false);
                 }
                 break;
 
@@ -318,14 +319,28 @@ public class ConnectChecker {
 
     /**
      *  @param addrs non-empty, set your own default if empty
+     *  @param inbound whether the addresses must accept incoming connections
      *  @return bitmask of v4/v6 NTCP/SSU
      *  @since 0.9.34
      */
-    private static int getConnectMask(Collection<RouterAddress> addrs) {
+    private static int getConnectMask(Collection<RouterAddress> addrs, boolean inbound) {
         int rv = 0;
         for (RouterAddress ra : addrs) {
             String style = ra.getTransportStyle();
             String host = ra.getHost();
+            if (inbound) {
+                // The family caps on an outbound-only address describe what the
+                // peer can initiate, not where another peer can connect to it.
+                if ("NTCP2".equals(style)) {
+                    if (host == null || !TransportUtil.isValidPort(ra.getPort()))
+                        continue;
+                } else if ("SSU".equals(style) || "SSU2".equals(style)) {
+                    // Introducers provide an inbound route without a direct address.
+                    if ((host == null || !TransportUtil.isValidPort(ra.getPort())) &&
+                        ra.getOption("itag0") == null)
+                        continue;
+                }
+            }
             if ("NTCP2".equals(style)) {
                 if (host != null) {
                     if (host.contains(":"))
@@ -417,8 +432,8 @@ public class ConnectChecker {
         is.close();
         Collection<RouterAddress> fa = from.getAddresses();
         Collection<RouterAddress> ta = to.getAddresses();
-        int fm = getConnectMask(fa);
-        int tm = getConnectMask(ta);
+        int fm = getConnectMask(fa, false);
+        int tm = getConnectMask(ta, true);
         System.out.println("From:\n" + from);
         System.out.println("To:\n" + to);
         System.out.println("From mask: " + fm);
