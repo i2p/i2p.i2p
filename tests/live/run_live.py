@@ -16,9 +16,10 @@ def main():
     parser.add_argument("--runtime", type=Path, required=True)
     parser.add_argument("--duration", type=int, default=720)
     parser.add_argument("--port", type=int, default=24741)
-    parser.add_argument("--mode", choices=("normal", "firewalled", "ssu2-only"), default="ssu2-only")
+    parser.add_argument("--mode", choices=("normal", "firewalled", "ssu2-only", "ntcp2-only"), default="ssu2-only")
     parser.add_argument("--java-home", type=Path, default=os.environ.get("JAVA_HOME"))
     parser.add_argument("--skip-build", action="store_true", help="Use jars from an already validated build")
+    parser.add_argument("--core-jar", type=Path, help="Use a staged core jar with installation-specific bundled resources")
     args = parser.parse_args()
     if not 30 <= args.duration <= 3600 or not 1024 <= args.port <= 65535:
         parser.error("duration must be 30..3600 seconds and port 1024..65535")
@@ -44,6 +45,8 @@ def main():
         "core/build/libs/i2p.jar", "router/build/libs/router.jar",
         "apps/ministreaming/build/libs/mstreaming.jar", "apps/streaming/build/libs/streaming.jar",
     )]
+    if args.core_jar:
+        jars[0] = args.core_jar.resolve()
     # The core/router jars contain the transport and crypto implementations.
     # These two external runtime dependencies are resolved by the normal Gradle build.
     gradle_cache = Path(os.environ.get("GRADLE_USER_HOME", str(Path.home() / ".gradle"))) / "caches/modules-2/files-2.1"

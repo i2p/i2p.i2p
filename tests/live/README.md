@@ -22,12 +22,20 @@ listener or client applications, no UPnP, no participating tunnels, and
 96 KiB/s bandwidth limits in both directions. The default transport port is
 24741; use `--port` to select another available port.
 
+Use `--core-jar /path/to/staged/i2p.jar` when validating a packaged core jar
+that retains bundled runtime dependencies. Its bytes are copied and hashed in
+the same way as the default build jar.
+
 Modes:
 
 - `ssu2-only`: disables NTCP and forces introducer publication, exercising UDP
   connections and the firewalled bootstrap path.
 - `firewalled`: forces introducers while allowing outgoing NTCP as well as UDP.
 - `normal`: allows the router to discover its network status normally.
+- `ntcp2-only`: disables UDP and inbound TCP address publication, exercising
+  tunnel building entirely over outgoing TCP connections. This models the
+  transport options available when a firewall blocks UDP; it does not emulate
+  packet inspection or a national censorship system.
 
 The harness samples every 15 seconds, records exploratory tunnel lengths,
 build statistics and successful tunnel round trips, and attempts at most twelve

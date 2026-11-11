@@ -51,14 +51,14 @@ public final class LiveRouterSmoke {
 
     public static void main(String[] args) throws Exception {
         if (args.length < 2 || args.length > 5)
-            throw new IllegalArgumentException("Usage: LiveRouterSmoke REPO RUNTIME [SECONDS=720] [PORT=24741] [normal|firewalled|ssu2-only]");
+            throw new IllegalArgumentException("Usage: LiveRouterSmoke REPO RUNTIME [SECONDS=720] [PORT=24741] [normal|firewalled|ssu2-only|ntcp2-only]");
         Path repo = Path.of(args[0]).toAbsolutePath();
         Path runtime = Path.of(args[1]).toAbsolutePath();
         int duration = args.length > 2 ? Integer.parseInt(args[2]) : 720;
         int port = args.length > 3 ? Integer.parseInt(args[3]) : 24741;
         String mode = args.length > 4 ? args[4] : "normal";
         if (duration < 30 || duration > 3600 || port < 1024 || port > 65535 ||
-            !(mode.equals("normal") || mode.equals("firewalled") || mode.equals("ssu2-only")))
+            !(mode.equals("normal") || mode.equals("firewalled") || mode.equals("ssu2-only") || mode.equals("ntcp2-only")))
             throw new IllegalArgumentException("Invalid duration, port or mode");
         prepare(repo, runtime, port, mode);
         System.setProperty("I2P_DISABLE_OUTPUT_OVERRIDE", "true");
@@ -150,7 +150,7 @@ public final class LiveRouterSmoke {
         config.setProperty("i2np.bandwidth.outboundBurstKBytesPerSecond", "96");
         config.setProperty("i2np.udp.internalPort", Integer.toString(port));
         config.setProperty("i2np.udp.port", Integer.toString(port));
-        config.setProperty("i2np.udp.enable", "true");
+        config.setProperty("i2np.udp.enable", Boolean.toString(!mode.equals("ntcp2-only")));
         config.setProperty("i2np.ntcp.enable", Boolean.toString(!mode.equals("ssu2-only")));
         config.setProperty("i2np.udp.forceIntroducers", Boolean.toString(!mode.equals("normal")));
         config.setProperty("i2np.udp.allowDirect", Boolean.toString(mode.equals("normal")));
@@ -200,9 +200,14 @@ public final class LiveRouterSmoke {
         if (udp != null) {
             sample.put("udpPeerCounts", udp.getPeerCounts());
             int tags = 0;
-            for (PeerState peer : udp.getPeers())
+            Map<String, Integer> versions = new LinkedHashMap<String, Integer>();
+            for (PeerState peer : udp.getPeers()) {
+                String version = Integer.toString(peer.getVersion());
+                versions.put(version, versions.getOrDefault(version, 0) + 1);
                 if (peer.getVersion() >= 2 && peer.getTheyRelayToUsAs() != 0)
                     tags++;
+            }
+            sample.put("udpNegotiatedVersions", versions);
             sample.put("availableIntroducerTags", tags);
         }
         int published = 0;
