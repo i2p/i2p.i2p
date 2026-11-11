@@ -952,7 +952,7 @@ public class UDPTransport extends TransportImpl {
      * Get the valid SSU version of Bob's SSU address
      * for our outbound connections as Alice.
      *
-     * @return the valid version 1 or 2, or 0 if unusable
+     * @return the negotiated version 2-4, or 0 if unusable
      * @since 0.9.54
      */
     int getSSUVersion(RouterAddress addr) {
@@ -965,45 +965,51 @@ public class UDPTransport extends TransportImpl {
         } else {
             return 0;
         }
-        // check version contains "2"
-        // previous check was version == "2" || version starts with "2,"
-        // so we should publish PQ with "2,4", not "4,2"
         String v = addr.getOption("v");
-        if (v == null ||
-            addr.getOption("i") == null ||
-            addr.getOption("s") == null ||
-            // assume single digits, no "3,12"
-            !v.contains(SSU2_VERSION)) {
+        if (!hasVersion(v, SSU2_VERSION)) {
             // his address is SSU1 or is outbound SSU2 only
             return 0;
         }
+        // Check the same key lengths required by establishment before choosing
+        // an address, so a malformed entry cannot hide a working alternative.
+        byte[] introKey = Base64.decode(addr.getOption("i"));
+        byte[] staticKey = Base64.decode(addr.getOption("s"));
+        if (introKey == null || introKey.length != SessionKey.KEYSIZE_BYTES ||
+            staticKey == null || staticKey.length != 32)
+            return 0;
+        // Introducer addresses may omit host; use their family capabilities too.
+        boolean ipv6 = TransportUtil.isIPv6(addr);
+        int mtu = 0;
+        String smtu = addr.getOption("mtu");
+        if (smtu != null) {
+            try {
+                mtu = Integer.parseInt(smtu);
+            } catch (NumberFormatException nfe) {}
+        }
+        int ourmtu = getSSU2MTU(ipv6);
+        if ((mtu != 0 && mtu < PeerState2.MIN_MTU) ||
+            (ourmtu != 0 && ourmtu < PeerState2.MIN_MTU))
+            return 0;
         if (PQ_INT_VERSION != 0) {
             String pq = addr.getOption("pq");
             if (pq != null) {
-                if (pq.indexOf('4') >= 0) {
+                if (hasVersion(pq, "4")) {
                     // ensure both his and our MTU are big enough
-                    String ip = addr.getHost();
-                    boolean ipv6 = ip != null && ip.indexOf(':') >= 0;
-                    int mtu = 0;
-                    String smtu = addr.getOption("mtu");
-                    if (smtu != null) {
-                        try {
-                            mtu = Integer.parseInt(smtu);
-                        } catch (NumberFormatException nfe) {}
-                    }
-                    int ourmtu = getSSU2MTU(ipv6);
                     int min = ipv6 ? PeerState2.MIN_MLKEM768_IPV6_MTU : PeerState2.MIN_MLKEM768_IPV4_MTU;
                     if ((mtu == 0 || mtu >= min) && (ourmtu == 0 || ourmtu >= min))
                         return 4;
                 }
-                if (pq.indexOf('3') >= 0)
+                if (hasVersion(pq, "3"))
                     return 3;
             }
         }
         // his address is SSU2
-        // do not validate the s/i b64, we will just catch it later
-        // todo check mtu
         return SSU2_INT_VERSION;
+    }
+
+    /** Match an entire comma-delimited version, including multi-digit versions. */
+    private static boolean hasVersion(String versions, String version) {
+        return versions != null && (',' + versions + ',').contains(',' + version + ',');
     }
 
     /**
@@ -2577,7 +2583,7 @@ public class UDPTransport extends TransportImpl {
         List<RouterAddress> addrs = getTargetAddresses(target);
         for (int i = 0; i < addrs.size(); i++) {
             RouterAddress addr = addrs.get(i);
-            if (addr.getTransportStyle().equals("SSU") && !"2".equals(addr.getOption("v")))
+            if (getSSUVersion(addr) == 0)
                 continue;
             if (addr.getOption("itag0") == null) {
                 // No introducers
