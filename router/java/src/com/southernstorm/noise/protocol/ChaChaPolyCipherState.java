@@ -41,10 +41,6 @@ public class ChaChaPolyCipherState implements CipherState {
 	private final byte[] polyKey;
 	private long n;
 	private boolean haskey;
-	// Debug only
-	private byte[] initialKey;
-
-	private static final boolean DEBUG = false;
 	
 	/**
 	 * Constructs a new cipher state for the "ChaChaPoly" algorithm.
@@ -70,7 +66,6 @@ public class ChaChaPolyCipherState implements CipherState {
 		polyKey = Arrays.copyOf(o.polyKey, o.polyKey.length);
 		n = o.n;
 		haskey = o.haskey;
-		initialKey = o.initialKey;
 	}
 
 	@Override
@@ -98,10 +93,6 @@ public class ChaChaPolyCipherState implements CipherState {
 
 	@Override
 	public void initializeKey(byte[] key, int offset) {
-		if (DEBUG) {
-			initialKey = new byte[32];
-			System.arraycopy(key, 0, initialKey, 0, 32);
-		}
 		ChaChaCore.initKey256(input, key, offset);
 		n = 0;
 		haskey = true;
@@ -323,20 +314,9 @@ public class ChaChaPolyCipherState implements CipherState {
 		buf.append("  Cipher State:\n" +
 		           "    nonce: ");
 		buf.append(n);
-		// I2P debug
-		if (DEBUG) {
-			buf.append("\n" +
-			           "    init key: ");
-			if (haskey)
-				buf.append(net.i2p.data.Base64.encode(initialKey));
-			else
-				buf.append("null");
-		}
-		buf.append("\n    poly key: ");
-		if (haskey)
-			buf.append(net.i2p.data.Base64.encode(polyKey));
-		else
-			buf.append("null");
+		// polyKey contains one-time authentication key material between
+		// packets. Never include it in diagnostics.
+		buf.append("\n    has key: ").append(haskey);
 		buf.append('\n');
 		return buf.toString();
 	}
