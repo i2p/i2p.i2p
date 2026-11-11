@@ -41,6 +41,7 @@ public class ChaChaPolyCipherState implements CipherState {
 	private final byte[] polyKey;
 	private long n;
 	private boolean haskey;
+	private boolean destroyed;
 	// Debug only
 	private byte[] initialKey;
 
@@ -70,11 +71,15 @@ public class ChaChaPolyCipherState implements CipherState {
 		polyKey = Arrays.copyOf(o.polyKey, o.polyKey.length);
 		n = o.n;
 		haskey = o.haskey;
+		destroyed = o.destroyed;
 		initialKey = o.initialKey;
 	}
 
 	@Override
 	public void destroy() {
+		destroyed = true;
+		haskey = false;
+		n = -1L;
 		poly.destroy();
 		Arrays.fill(input, 0);
 		Arrays.fill(output, 0);
@@ -98,6 +103,8 @@ public class ChaChaPolyCipherState implements CipherState {
 
 	@Override
 	public void initializeKey(byte[] key, int offset) {
+		checkNotDestroyed();
+		checkRange(key, offset, getKeyLength());
 		if (DEBUG) {
 			initialKey = new byte[32];
 			System.arraycopy(key, 0, initialKey, 0, 32);
@@ -216,9 +223,14 @@ public class ChaChaPolyCipherState implements CipherState {
 	@Override
 	public int encryptWithAd(byte[] ad, int adOffset, int adLength, byte[] plaintext, int plaintextOffset,
 	                         byte[] ciphertext, int ciphertextOffset, int length) throws ShortBufferException {
+		checkNotDestroyed();
+		checkRange(plaintext, plaintextOffset, length);
+		checkAd(ad, adOffset, adLength);
+		if (ciphertextOffset < 0)
+			throw new IndexOutOfBoundsException();
 		int space;
 		if (ciphertextOffset > ciphertext.length)
-			space = 0;
+			throw new ShortBufferException();
 		else
 			space = ciphertext.length - ciphertextOffset;
 		if (!haskey) {
@@ -256,15 +268,19 @@ public class ChaChaPolyCipherState implements CipherState {
 	public int decryptWithAd(byte[] ad, int adOffset, int adLength, byte[] ciphertext,
 	                         int ciphertextOffset, byte[] plaintext, int plaintextOffset,
 	                         int length) throws ShortBufferException, BadPaddingException {
+		checkNotDestroyed();
+		if (length < 0 || ciphertextOffset < 0 || plaintextOffset < 0)
+			throw new IndexOutOfBoundsException();
+		checkAd(ad, adOffset, adLength);
 		int space;
 		if (ciphertextOffset > ciphertext.length)
-			space = 0;
+			throw new ShortBufferException();
 		else
 			space = ciphertext.length - ciphertextOffset;
 		if (length > space)
 			throw new ShortBufferException();
 		if (plaintextOffset > plaintext.length)
-			space = 0;
+			throw new ShortBufferException();
 		else
 			space = plaintext.length - plaintextOffset;
 		if (!haskey) {
@@ -293,6 +309,25 @@ public class ChaChaPolyCipherState implements CipherState {
 		return dataLen;
 	}
 
+	/** Validate before setup or partial writes can change this packet's state. */
+	private static void checkRange(byte[] data, int offset, int length) {
+		if (offset < 0 || length < 0 || offset > data.length - length)
+			throw new IndexOutOfBoundsException();
+	}
+
+	private static void checkAd(byte[] ad, int offset, int length) {
+		if (ad != null) {
+			checkRange(ad, offset, length);
+		} else if (offset != 0 || length != 0) {
+			throw new IndexOutOfBoundsException();
+		}
+	}
+
+	private void checkNotDestroyed() {
+		if (destroyed)
+			throw new IllegalStateException("Cipher state has been destroyed");
+	}
+
 	@Override
 	public CipherState fork(byte[] key, int offset) {
 		CipherState cipher = new ChaChaPolyCipherState();
@@ -302,6 +337,7 @@ public class ChaChaPolyCipherState implements CipherState {
 
 	@Override
 	public void setNonce(long nonce) {
+		checkNotDestroyed();
 		n = nonce;
 	}
 
