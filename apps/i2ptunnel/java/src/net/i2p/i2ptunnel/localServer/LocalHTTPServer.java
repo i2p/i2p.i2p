@@ -3,10 +3,15 @@
  */
 package net.i2p.i2ptunnel.localServer;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -55,6 +60,13 @@ public abstract class LocalHTTPServer {
          "Connection: close\r\n"+
          "\r\n"+
          "HTTP Proxy local file not found";
+
+    private final static String ERR_QUERY =
+         "HTTP/1.1 400 Bad Request\r\n"+
+         "Content-Type: text/plain; charset=UTF-8\r\n"+
+         "Connection: close\r\n"+
+         "\r\n"+
+         "Invalid query encoding";
 
     private final static String ERR_ADD =
          "HTTP/1.1 409 Bad\r\n"+
@@ -170,7 +182,15 @@ public abstract class LocalHTTPServer {
                 out.write(ERR_ADD.getBytes("UTF-8"));
                 return;
             }
-            Map<String, String> opts = decodeQuery(query);
+            final Map<String, String> opts;
+            try {
+                // Decode every parameter before any address-book or credential change.
+                opts = decodeQuery(query);
+            } catch (IllegalArgumentException iae) {
+                out.write(ERR_QUERY.getBytes("UTF-8"));
+                out.flush();
+                return;
+            }
 
             String url = opts.get("url");
             String host = opts.get("host");
@@ -220,7 +240,15 @@ public abstract class LocalHTTPServer {
                 out.write(ERR_ADD.getBytes("UTF-8"));
                 return;
             }
-            Map<String, String> opts = decodeQuery(query);
+            final Map<String, String> opts;
+            try {
+                // Decode every parameter before any address-book or credential change.
+                opts = decodeQuery(query);
+            } catch (IllegalArgumentException iae) {
+                out.write(ERR_QUERY.getBytes("UTF-8"));
+                out.flush();
+                return;
+            }
 
             String err = null;
             String url = opts.get("url");
@@ -442,19 +470,11 @@ public abstract class LocalHTTPServer {
                 // end of key or value
                 if (valstart < 0)
                     key = query.substring(keystart, i);
-                if (key.length() > 0) {
-                    String decodedKey = decode(key);
-                    String newQuery = keystart > 0 ? query.substring(0, keystart - 1) : "";
-                    if (i < query.length() - 1) {
-                        if (keystart > 0)
-                            newQuery += query.substring(i);
-                        else
-                            newQuery += query.substring(i + 1);
-                    }
-                    String value = valstart >= 0 ? query.substring(valstart, i) : "";
-                    String decodedValue = decode(value);
+                String decodedKey = decode(key);
+                String value = valstart >= 0 ? query.substring(valstart, i) : "";
+                String decodedValue = decode(value);
+                if (decodedKey.length() > 0)
                     rv.put(decodedKey, decodedValue);
-                }
                 keystart = i + 1;
                 valstart = -1;
             } else if (c == '=' && valstart < 0) {
@@ -467,28 +487,54 @@ public abstract class LocalHTTPServer {
     }
 
     /**
-     *  Decode %xx encoding
+     *  Decode percent-encoded UTF-8. Literal '+' is preserved for address-helper
+     *  destinations and credentials; this is not form-urlencoded '+' decoding.
+     *
+     *  @throws IllegalArgumentException on incomplete escapes or invalid UTF-8
      *  @since 0.8.7
      */
     public static String decode(String s) {
         if (!s.contains("%"))
             return s;
         StringBuilder buf = new StringBuilder(s.length());
-        for (int i = 0; i < s.length(); i++) {
+        for (int i = 0; i < s.length();) {
             char c = s.charAt(i);
             if (c != '%') {
                 buf.append(c);
+                i++;
             } else {
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream(8);
+                while (i < s.length() && s.charAt(i) == '%') {
+                    if (i + 2 >= s.length())
+                        throw new IllegalArgumentException("Incomplete query escape");
+                    int high = hexDigit(s.charAt(i + 1));
+                    int low = hexDigit(s.charAt(i + 2));
+                    if (high < 0 || low < 0)
+                        throw new IllegalArgumentException("Invalid query escape");
+                    bytes.write((high << 4) | low);
+                    i += 3;
+                }
                 try {
-                    buf.append((char) Integer.parseInt(s.substring(++i, (++i) + 1), 16));
-                } catch (IndexOutOfBoundsException ioobe) {
-                    break;
-                } catch (NumberFormatException nfe) {
-                    break;
+                    buf.append(StandardCharsets.UTF_8.newDecoder()
+                               .onMalformedInput(CodingErrorAction.REPORT)
+                               .onUnmappableCharacter(CodingErrorAction.REPORT)
+                               .decode(ByteBuffer.wrap(bytes.toByteArray())));
+                } catch (CharacterCodingException cce) {
+                    throw new IllegalArgumentException("Invalid UTF-8 in query", cce);
                 }
             }
         }
         return buf.toString();
+    }
+
+    private static int hexDigit(char c) {
+        if (c >= '0' && c <= '9')
+            return c - '0';
+        if (c >= 'A' && c <= 'F')
+            return c - 'A' + 10;
+        if (c >= 'a' && c <= 'f')
+            return c - 'a' + 10;
+        return -1;
     }
 
     /**
