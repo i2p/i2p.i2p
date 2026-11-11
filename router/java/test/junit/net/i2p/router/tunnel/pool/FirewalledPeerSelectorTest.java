@@ -90,6 +90,59 @@ public class FirewalledPeerSelectorTest {
     }
 
     @Test
+    public void clientInboundUsesEstablishedPeersWhileReachabilityIsUnknown() {
+        when(context.commSystem().getStatus()).thenReturn(Status.UNKNOWN);
+        assertInboundTunnel(clientSelector(), false, 1);
+        assertInboundTunnel(clientSelector(), false, 2);
+    }
+
+    @Test
+    public void exploratoryInboundUsesEstablishedPeersWhileReachabilityIsUnknown() {
+        when(context.commSystem().getStatus()).thenReturn(Status.UNKNOWN);
+        assertInboundTunnel(exploratorySelector(), true, 1);
+        assertInboundTunnel(exploratorySelector(), true, 2);
+    }
+
+    @Test
+    public void clientInboundSymmetricNATUsesEstablishedPeersDespiteIntroducers() {
+        useIPv4Introducers();
+        for (Status status : new Status[] { Status.DIFFERENT, Status.IPV4_SNAT_IPV6_UNKNOWN, Status.IPV4_SNAT_IPV6_OK }) {
+            when(context.commSystem().getStatus()).thenReturn(status);
+            assertInboundTunnel(clientSelector(), false, 1);
+            assertInboundTunnel(clientSelector(), false, 2);
+        }
+    }
+
+    @Test
+    public void exploratoryInboundSymmetricNATUsesEstablishedPeersDespiteIntroducers() {
+        useIPv4Introducers();
+        for (Status status : new Status[] { Status.DIFFERENT, Status.IPV4_SNAT_IPV6_UNKNOWN, Status.IPV4_SNAT_IPV6_OK }) {
+            when(context.commSystem().getStatus()).thenReturn(status);
+            assertInboundTunnel(exploratorySelector(), true, 1);
+            assertInboundTunnel(exploratorySelector(), true, 2);
+        }
+    }
+
+    @Test
+    public void symmetricNATDoesNotFallBackToDisconnectedAdjacentPeers() {
+        useIPv4Introducers();
+        when(context.commSystem().getStatus()).thenReturn(Status.DIFFERENT);
+        when(context.commSystem().isEstablished(connected)).thenReturn(false);
+        assertNull(clientSelector().selectPeers(settings(true, false, 1)));
+        assertNull(exploratorySelector().selectPeers(settings(true, true, 1)));
+    }
+
+    @Test
+    public void ordinaryFirewalledIntroducersStillAllowDisconnectedAdjacentPeers() {
+        useIPv4Introducers();
+        for (TunnelPeerSelector selector : new TunnelPeerSelector[] { clientSelector(), exploratorySelector() }) {
+            assertFalse(selector.requiresConnectedInboundPeer(localInfo));
+            List<Hash> tunnel = selector.selectPeers(settings(true, selector instanceof ExploratoryPeerSelector, 1));
+            assertEquals(Arrays.asList(us, disconnected), tunnel);
+        }
+    }
+
+    @Test
     public void clientOutboundBootstrapUsesAnEstablishedEndpoint() {
         assertOutboundBootstrap(clientSelector(), false);
     }
@@ -112,7 +165,8 @@ public class FirewalledPeerSelectorTest {
     }
 
     private void assertInboundTunnel(TunnelPeerSelector selector, boolean exploratory, int length) {
-        assertEquals("Published capabilities must not count as inbound reachability", 0, selector.getInboundMask(localInfo));
+        assertTrue("The local inbound route must use an established adjacent peer",
+                   selector.requiresConnectedInboundPeer(localInfo));
         List<Hash> tunnel = selector.selectPeers(settings(true, exploratory, length));
         assertNotNull("The established candidate should allow tunnel creation", tunnel);
         assertEquals(length + 1, tunnel.size());
@@ -120,6 +174,13 @@ public class FirewalledPeerSelectorTest {
         assertEquals(connected, tunnel.get(1));
         if (length > 1)
             assertEquals(disconnected, tunnel.get(2));
+    }
+
+    private void useIPv4Introducers() {
+        localInfo = info(address("SSU2", "caps", "4", "itag0", "123456", "ih0", connected.toBase64()),
+                         address("NTCP2", "caps", "4"));
+        when(context.router().getRouterInfo()).thenReturn(localInfo);
+        when(context.netDb().lookupLocallyWithoutValidation(us)).thenReturn(localInfo);
     }
 
     private void assertOutboundBootstrap(TunnelPeerSelector selector, boolean exploratory) {

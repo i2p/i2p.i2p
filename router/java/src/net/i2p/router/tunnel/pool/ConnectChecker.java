@@ -178,62 +178,36 @@ public class ConnectChecker {
 
     /**
      *  Our inbound mask.
-     *  For most cases, we use what we published, i.e. getConnectMask()
+     *  Use our published routes, including while reachability is unknown.
+     *  A status or an enabled transport does not imply a dialable endpoint.
      *
      *  @return bitmask for accepting connections
      *  @since 0.9.34
      */
     public int getInboundMask(RouterInfo us) {
-        // to us
-        int ct = 0;
-        Status status = ctx.commSystem().getStatus();
-        switch (status) {
-            case OK:
-            case IPV4_UNKNOWN_IPV6_OK:
-            case IPV4_FIREWALLED_IPV6_OK:
-            case IPV4_SNAT_IPV6_OK:
-            case IPV4_SNAT_IPV6_UNKNOWN:
-            case IPV4_FIREWALLED_IPV6_UNKNOWN:
-            case IPV4_UNKNOWN_IPV6_FIREWALLED:
-            case IPV4_OK_IPV6_FIREWALLED:
+        // In particular, outbound-only addresses remain outbound-only at
+        // startup and after a tethering/network change, before peer tests
+        // complete. Select an established adjacent peer in those cases.
+        return getConnectMask(us.getAddresses(), true);
+    }
+
+    /**
+     *  Does the local inbound tunnel need an already established adjacent peer?
+     *  IPv4 UDP introduction alone is not a reliable new route through a
+     *  symmetric NAT. Preserve independent NTCP and IPv6 inbound routes.
+     */
+    protected boolean requiresConnectedInboundPeer(RouterInfo us) {
+        int mask = getInboundMask(us);
+        if (mask == 0)
+            return true;
+        switch (ctx.commSystem().getStatus()) {
             case DIFFERENT:
-            case REJECT_UNSOLICITED:
-                // use what we published
-                Collection<RouterAddress> at = us.getAddresses();
-                if (at.isEmpty())
-                    return 0;
-                ct = getConnectMask(at, true);
-                break;
-
-            case IPV4_DISABLED_IPV6_OK:
-            case IPV4_DISABLED_IPV6_UNKNOWN:
-            // maybe should return zero for this one?
-            case IPV4_DISABLED_IPV6_FIREWALLED:
-                // TODO look at force-firewalled settings per-transport
-                if (!isNTCPDisabled())
-                    ct |= NTCP_V6;
-                if (!isSSUDisabled()) {
-                    ct |= SSU_V6;
-                    if (isSSU2Enabled())
-                        ct |= SSU2_V6;
-                }
-                break;
-
-            case IPV4_OK_IPV6_UNKNOWN:
-            case DISCONNECTED:
-            case HOSED:
-            case UNKNOWN:
+            case IPV4_SNAT_IPV6_UNKNOWN:
+            case IPV4_SNAT_IPV6_OK:
+                return (mask & ~(SSU_V4 | SSU2_V4)) == 0;
             default:
-                if (!isNTCPDisabled())
-                    ct |= NTCP_V4;
-                if (!isSSUDisabled()) {
-                    ct |= SSU_V4;
-                    if (isSSU2Enabled())
-                        ct |= SSU2_V4;
-                }
-                break;
+                return false;
         }
-        return ct;
     }
 
     /**
