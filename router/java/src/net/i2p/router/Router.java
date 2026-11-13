@@ -197,6 +197,10 @@ public class Router implements RouterClock.ClockShiftListener {
         // set to false in wrapper.config thru 0.7.10 so we must set it back here.
         // Not in Jetty 7
         //System.setProperty("org.mortbay.util.FileResource.checkAliases", "true");
+
+        // needed for Jetty with Java 28
+        if (System.getProperty("javax.xml.accessExternalSchema") == null)
+            System.setProperty("javax.xml.accessExternalSchema", "file");
     }
     
     /**
