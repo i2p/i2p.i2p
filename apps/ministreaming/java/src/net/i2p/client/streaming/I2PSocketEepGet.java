@@ -270,7 +270,7 @@ public class I2PSocketEepGet extends EepGet {
             buf.append("User-Agent: " + USER_AGENT + "\r\n");
         buf.append("\r\n");
         if (_log.shouldDebug())
-            _log.debug("Request: [" + buf.toString() + "]");
+            _log.debug("Request built: " + buf.length() + " characters");
         return buf.toString();
     }
 
