@@ -66,7 +66,7 @@ public abstract class ZipFileComment {
         if (len > Integer.MAX_VALUE)
             throw new ZipException("File too long: " + file);
         int fileLen = (int) len;
-        byte[] buffer = new byte[Math.min(fileLen - skip, max + BLOCK_LEN)];
+        byte[] buffer = new byte[Math.min(fileLen - skip - HEADER_LEN, max + BLOCK_LEN)];
         InputStream in = null;
         try {
             in = new FileInputStream(file);
