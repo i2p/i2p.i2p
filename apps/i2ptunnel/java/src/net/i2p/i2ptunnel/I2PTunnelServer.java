@@ -228,22 +228,23 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             }
         }
 
-        if (getTunnel().filterDefinition != null) {
-            File filterDefinition = new File(getTunnel().filterDefinition);
-            I2PAppContext context = getTunnel().getContext();
-            try {
-                _filter = FilterFactory.createFilter(context, filterDefinition);
-            } catch (IOException | InvalidDefinitionException bad) {
-                String msg = "Bad filter definition file: " + filterDefinition + " - filtering disabled: " + bad.getMessage();
-                _log.error(msg, bad);
-                l.log(msg);
-                _filter = null;
-            }
-        }
-
-        IncomingConnectionFilter filter = _filter == null ? IncomingConnectionFilter.ALLOW : _filter;
-
         try {
+            if (getTunnel().filterDefinition != null) {
+                File filterDefinition = new File(getTunnel().filterDefinition);
+                I2PAppContext context = getTunnel().getContext();
+                try {
+                    _filter = FilterFactory.createFilter(context, filterDefinition);
+                } catch (IOException | InvalidDefinitionException bad) {
+                    String msg = "Cannot start server with access filter " + filterDefinition + ": " + bad.getMessage();
+                    _log.error(msg, bad);
+                    l.log(msg);
+                    notifyEvent("openServerResult", "error");
+                    throw new IllegalArgumentException(msg, bad);
+                }
+            }
+
+            IncomingConnectionFilter filter = _filter == null ? IncomingConnectionFilter.ALLOW : _filter;
+
             I2PSocketManager rv = I2PSocketManagerFactory.createDisconnectedManager(privData, getTunnel().host,
                                                                                     portNum, props, filter);
             rv.setName("I2PTunnel Server");
