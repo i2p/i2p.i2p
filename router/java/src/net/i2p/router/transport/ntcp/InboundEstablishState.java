@@ -683,9 +683,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             changeState(State.CORRUPT);
         } else {
             if (_log.shouldDebug()) {
-                _log.debug("Finished establishment for " + this +
-                          "\nGenerated SipHash key for A->B: " + Base64.encode(sip_ab) +
-                          "\nGenerated SipHash key for B->A: " + Base64.encode(sip_ba));
+                _log.debug("Finished establishment for " + this);
             }
             // skew in seconds
             _con.finishInboundEstablishment(sender, rcvr, sip_ba, sip_ab, _peerSkew, _hisPadding);

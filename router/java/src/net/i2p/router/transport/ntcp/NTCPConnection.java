@@ -1426,8 +1426,6 @@ public class NTCPConnection implements Closeable {
         _sendSipk2 = fromLong8LE(sip_send, 8);
         _sendSipIV = new byte[SIP_IV_LENGTH];
         System.arraycopy(sip_send, 16, _sendSipIV, 0, SIP_IV_LENGTH);
-        if (_log.shouldDebug())
-            _log.debug("Send SipHash keys: " + _sendSipk1 + ' ' + _sendSipk2 + ' ' + Base64.encode(_sendSipIV));
         _clockSkew = clockSkew;
         _establishState = EstablishBase.VERIFIED;
         _establishedOn = _context.clock().now();
@@ -1469,8 +1467,6 @@ public class NTCPConnection implements Closeable {
             _sipk1 = fromLong8LE(keyData, 0);
             _sipk2 = fromLong8LE(keyData, 8);
             System.arraycopy(keyData, 16, _sipIV, 0, SIP_IV_LENGTH);
-            if (_log.shouldDebug())
-                _log.debug("Recv SipHash keys: " + _sipk1 + ' ' + _sipk2 + ' ' + Base64.encode(_sipIV));
         }
 
         public void receive(ByteBuffer buf) {
