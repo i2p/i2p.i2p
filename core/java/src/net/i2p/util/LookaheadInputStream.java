@@ -49,7 +49,13 @@ public class LookaheadInputStream extends FilterInputStream {
         in = src;
         _eofReached = false;
         index = 0;
-        DataHelper.read(in, _footerLookahead);
+        try {
+            DataHelper.read(in, _footerLookahead);
+        } catch (IOException ioe) {
+            Arrays.fill(_footerLookahead, (byte) 0);
+            _eofReached = true;
+            throw ioe;
+        }
     }
     
     @Override
