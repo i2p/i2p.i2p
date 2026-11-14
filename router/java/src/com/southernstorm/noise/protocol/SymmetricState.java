@@ -495,9 +495,6 @@ class SymmetricState implements Destroyable, Cloneable {
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
 		buf.append("  Symmetric State:\n" +
-		           "    ck: ");
-		buf.append(net.i2p.data.Base64.encode(ck));
-		buf.append("\n" +
 		           "    h:  ");
 		buf.append(net.i2p.data.Base64.encode(h));
 		buf.append('\n');
