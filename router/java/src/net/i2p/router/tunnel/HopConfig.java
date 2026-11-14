@@ -202,8 +202,8 @@ public class HopConfig {
             if (_sendTunnel != null)
                 buf.append(_sendTunnel.getTunnelId());
         }
-        buf.append(" layer key: ").append(_layerKey);
-        buf.append(" IV key: ").append(_ivKey);
+        buf.append(" layer key present: ").append(_layerKey != null);
+        buf.append(" IV key present: ").append(_ivKey != null);
         buf.append(" exp. ").append(DataHelper.formatTime(_expiration));
         int messagesProcessed = getProcessedMessagesCount();
         if (messagesProcessed > 0)

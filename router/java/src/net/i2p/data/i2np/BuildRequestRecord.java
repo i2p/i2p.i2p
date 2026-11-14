@@ -12,7 +12,6 @@ import net.i2p.I2PAppContext;
 import net.i2p.crypto.EncType;
 import net.i2p.crypto.HKDF;
 import net.i2p.crypto.KeyFactory;
-import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -583,7 +582,7 @@ public class BuildRequestRecord {
                 if (state != null) {
                     Log log = ctx.logManager().getLog(BuildRequestRecord.class);
                     if (log.shouldInfo())
-                        log.info("ECIES BRR decrypt failure, state at failure:\n" + state);
+                        log.info("ECIES BRR decrypt failure");
                 }
                 throw new DataFormatException("ChaCha decrypt fail", gse);
             } finally {
@@ -789,28 +788,18 @@ public class BuildRequestRecord {
                .append(" out: ").append(readNextTunnelId());
         }
         buf.append(" to: ").append(readNextIdentity());
-        buf.append(" layer key: ").append(readLayerKey())
-           .append(" IV key: ").append(readIVKey());
-        if (_data.length != LENGTH_EC_SHORT) {
-            buf.append(" reply key: ").append(readReplyKey())
-               .append(" reply IV: ").append(Base64.encode(readReplyIV()));
-        }
+        // This diagnostic is used by both DEBUG and WARN call sites. Never
+        // include tunnel keys, reply material, or caller-supplied option values.
+        buf.append(" layer keys: ").append(_data.length != LENGTH_EC_SHORT || _derivedLayerKey != null ? "present" : "pending");
         buf.append(" time: ").append(DataHelper.formatTime(readRequestTime()))
            .append(" reply msg id: ").append(readReplyMessageId())
            .append(" expires in: ").append(DataHelper.formatDuration(readExpiration()));
         if (_isEC) {
-            buf.append(" options: ").append(readOptions());
-            if (_chachaReplyKey != null) {
-                buf.append(" chacha reply key: ").append(_chachaReplyKey)
-                   .append(" chacha reply IV: ").append(Base64.encode(_chachaReplyAD));
-            }
-            if (_derivedGarlicKeys != null) {
-                buf.append(" garlic reply key: ").append(_derivedGarlicKeys.key)
-                   .append(" garlic reply tag: ").append(_derivedGarlicKeys.rtag);
-            }
+            Properties options = readOptions();
+            buf.append(" options count: ").append(options != null ? Integer.toString(options.size()) : "invalid")
+               .append(" chacha reply key present: ").append(_chachaReplyKey != null)
+               .append(" garlic reply keys present: ").append(_derivedGarlicKeys != null);
         }
-        // to chase i2pd bug
-        //buf.append('\n').append(net.i2p.util.HexDump.dump(readReplyKey().getData()));
         return buf.toString();
     }
 

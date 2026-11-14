@@ -5,7 +5,6 @@ import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.ChaCha20;
-import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -169,8 +168,7 @@ class BuildReplyHandler {
             for (int j = start; j >= end; j--) {
                 byte[] replyKey = cfg.getChaChaReplyKey(j).getData();
                 if (log.shouldDebug()) {
-                    log.debug(reply.getUniqueId() + ": Decrypting ChaCha record " + recordNum + "/" + hop + "/" + j + " with replyKey " 
-                              + Base64.encode(replyKey) + " : " + cfg);
+                    log.debug(reply.getUniqueId() + ": Decrypting ChaCha record " + recordNum + "/" + hop + "/" + j + ": " + cfg);
                 }
                 // slot number, little endian
                 iv[4] = (byte) recordNum;
@@ -181,8 +179,7 @@ class BuildReplyHandler {
                 SessionKey replyKey = cfg.getAESReplyKey(j);
                 byte replyIV[] = cfg.getAESReplyIV(j);
                 if (log.shouldDebug()) {
-                    log.debug(reply.getUniqueId() + ": Decrypting AES record " + recordNum + "/" + hop + "/" + j + " with replyKey " 
-                              + replyKey.toBase64() + "/" + Base64.encode(replyIV) + ": " + cfg);
+                    log.debug(reply.getUniqueId() + ": Decrypting AES record " + recordNum + "/" + hop + "/" + j + ": " + cfg);
                     //log.debug(reply.getRawUniqueId() + ": before decrypt: " + Base64.encode(data));
                     //log.debug(reply.getRawUniqueId() + ": Full reply rec: sz=" + data.length + " data=" + Base64.encode(data));
                 }
@@ -200,8 +197,7 @@ class BuildReplyHandler {
             SessionKey replyKey = cfg.getChaChaReplyKey(hop);
             byte[] replyIV = cfg.getChaChaReplyAD(hop);
             if (log.shouldDebug())
-                log.debug(reply.getUniqueId() + ": Decrypting chacha/poly record " + recordNum + "/" + hop + " with replyKey " 
-                          + replyKey.toBase64() + "/" + Base64.encode(replyIV) + ": " + cfg);
+                log.debug(reply.getUniqueId() + ": Decrypting chacha/poly record " + recordNum + "/" + hop + ": " + cfg);
             boolean ok;
             if (isShort)
                 ok = BuildResponseRecord.decrypt(rec, replyKey, replyIV, recordNum);
@@ -238,9 +234,7 @@ class BuildReplyHandler {
             boolean ok = DataHelper.eq(h, 0, data, 0, Hash.HASH_LENGTH);
             if (!ok) {
                 if (log.shouldWarn())
-                    log.warn(reply.getUniqueId() + ": sha256 reply verify fail on " + recordNum + "/" + hop + ": " + Base64.encode(h) + " calculated, " +
-                             Base64.encode(data, 0, Hash.HASH_LENGTH) + " expected\n" +
-                             "Record: " + Base64.encode(data, Hash.HASH_LENGTH, TunnelBuildReplyMessage.RECORD_SIZE-Hash.HASH_LENGTH));
+                    log.warn(reply.getUniqueId() + ": sha256 reply verify fail on " + recordNum + "/" + hop);
                 SimpleByteCache.release(h);
                 return RESULT_NG;
             }
