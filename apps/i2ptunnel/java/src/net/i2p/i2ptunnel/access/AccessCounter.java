@@ -1,9 +1,5 @@
 package net.i2p.i2ptunnel.access;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
-
 /**
  * Counts connection attempts and decides if specified thresholds have been
  * breached.
@@ -12,10 +8,17 @@ import java.util.Collections;
  */
 class AccessCounter {
 
-    /**
-     * List of timestamps of each connection attempt
-     */
-    private final List<Long> accesses = new ArrayList<Long>();
+    // Callers synchronize on the owning DestTracker. Only the newest
+    // maxConnections attempts are needed for any sliding-window threshold.
+    private static final long[] EMPTY = new long[0];
+    private final int maxConnections;
+    private long[] accesses = EMPTY;
+    private int head;
+    private int size;
+
+    AccessCounter(int maxConnections) {
+        this.maxConnections = maxConnections;
+    }
 
     /**
      * records that a connection attempt was made
@@ -23,7 +26,28 @@ class AccessCounter {
      * @param now the current time
      */
     void recordAccess(long now) {
-        accesses.add(now);
+        if (maxConnections == 0)
+            return;
+        // Clock changes and callers reading the clock before acquiring the
+        // tracker lock must not put the history out of order.
+        if (size > 0)
+            now = Math.max(now, accesses[index(size - 1)]);
+        if (size == maxConnections) {
+            accesses[head] = now;
+            head = (head + 1) % accesses.length;
+            return;
+        }
+        if (size == accesses.length) {
+            int capacity = (int) Math.min(maxConnections, Math.max(4L, 2L * size));
+            long[] grown = new long[capacity];
+            int first = Math.min(size, accesses.length - head);
+            System.arraycopy(accesses, head, grown, 0, first);
+            System.arraycopy(accesses, 0, grown, first, size - first);
+            accesses = grown;
+            head = 0;
+        }
+        accesses[index(size)] = now;
+        size++;
     }
 
     /**
@@ -32,22 +56,14 @@ class AccessCounter {
      * @return true if the given threshold has been breached
      */
     boolean isBreached(Threshold threshold, long now) {
-        if (threshold.getConnections() == 0)
-            return !accesses.isEmpty();
-        if (accesses.size() < threshold.getConnections())
+        if (threshold == Threshold.ALLOW)
             return false;
-        
-        long ignoreOlder = now - threshold.getSeconds() * 1000;
-        for (int i = 0; i <= accesses.size() - threshold.getConnections(); i++) {
-            long start = accesses.get(i);
-            if (start < ignoreOlder)
-                continue;
-            long end = start + threshold.getSeconds() * 1000;
-            if (accesses.get(i + threshold.getConnections() -1) <= end)
-                return true;
-        }
-
-        return false;
+        if (threshold.getConnections() == 0)
+            return size > 0;
+        int connections = Math.max(1, threshold.getConnections());
+        if (size < connections)
+            return false;
+        return accesses[index(size - connections)] >= now - threshold.getSeconds() * 1000L;
     }
 
     /**
@@ -56,9 +72,17 @@ class AccessCounter {
      * @return true if there is nothing left in the access history
      */
     boolean purge(long olderThan) {
-        while(!accesses.isEmpty() && accesses.get(0) < olderThan) {
-            accesses.remove(0);
+        while (size > 0 && accesses[head] < olderThan) {
+            head = (head + 1) % accesses.length;
+            size--;
         }
-        return accesses.isEmpty();
+        if (size == 0)
+            head = 0;
+        return size == 0;
+    }
+
+    private int index(int offset) {
+        int remaining = accesses.length - head;
+        return offset < remaining ? head + offset : offset - remaining;
     }
 }

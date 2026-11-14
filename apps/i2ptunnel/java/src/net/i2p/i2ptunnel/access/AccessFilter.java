@@ -102,10 +102,17 @@ class AccessFilter implements StatefulConnectionFilter {
             tracker = knownDests.get(hash);
         }
         if (tracker == null) {
+            Threshold threshold = definition.getDefaultThreshold();
+            if (definition.getRecorderConnections() == 0) {
+                if (threshold == Threshold.ALLOW)
+                    return true;
+                if (threshold.getConnections() == 0)
+                    return false;
+            }
             synchronized(unknownDests) {
                 tracker = unknownDests.get(hash);
                 if (tracker == null) {
-                    tracker = new DestTracker(hash, definition.getDefaultThreshold());
+                    tracker = new DestTracker(hash, threshold, definition.getRecorderConnections());
                     unknownDests.put(hash, tracker);
                 }
             }
@@ -156,7 +163,7 @@ class AccessFilter implements StatefulConnectionFilter {
             boolean newBreaches = false;
             synchronized(unknownDests) {
                 for (DestTracker tracker : unknownDests.values()) {
-                    if (!tracker.getCounter().isBreached(threshold, now))
+                    if (!tracker.isBreached(threshold, now))
                         continue;
                     newBreaches |= breached.add(tracker.getHash().toBase32());
                 }
@@ -181,7 +188,7 @@ class AccessFilter implements StatefulConnectionFilter {
     }
 
     private void purge() {
-        long olderThan = context.clock().now() - definition.getPurgeSeconds() * 1000;
+        long olderThan = context.clock().now() - definition.getPurgeSeconds() * 1000L;
         
         synchronized(knownDests) {
             for (DestTracker tracker : knownDests.values()) {
