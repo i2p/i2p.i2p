@@ -1549,7 +1549,7 @@ public class EepGet {
         if (post)
             buf.append(_postData);
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Request:\n" + buf.toString().trim());
+            _log.debug("Request built: " + buf.length() + " characters");
         return buf.toString();
     }
 

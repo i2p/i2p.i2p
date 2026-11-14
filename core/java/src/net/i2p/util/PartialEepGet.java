@@ -233,7 +233,7 @@ public class PartialEepGet extends EepGet {
         buf.append("\r\n");
 
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Request: [" + buf.toString() + "]");
+            _log.debug("Request built: " + buf.length() + " characters");
         return buf.toString();
     }
 }
