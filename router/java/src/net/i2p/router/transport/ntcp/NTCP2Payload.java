@@ -77,12 +77,16 @@ class NTCP2Payload {
     public static int processPayload(I2PAppContext ctx, PayloadCallback cb,
                                      byte[] payload, int off, int length, boolean isHandshake)
                                     throws IOException, DataFormatException, I2NPMessageException {
+        if (off < 0 || length < 0 || off > payload.length - length)
+            throw new IOException("Invalid NTCP2 frame bounds");
         int blocks = 0;
         boolean gotPadding = false;
         boolean gotTermination = false;
         int i = off;
         final int end = off + length;
         while (i < end) {
+            if (end - i < BLOCK_HEADER_SIZE)
+                throw new IOException("Truncated block header at offset " + (i - off));
             int type = payload[i++] & 0xff;
             if (gotPadding)
                 throw new IOException("Illegal block after padding: " + type);
@@ -92,7 +96,7 @@ class NTCP2Payload {
                 throw new IOException("Illegal first block in handshake: " + type);
             int len = (int) DataHelper.fromLong(payload, i, 2);
             i += 2;
-            if (i + len > end) {
+            if (len > end - i) {
                 throw new IOException("Block " + blocks + " type " + type + " length " + len +
                                       " at offset " + (i - 3 - off) + " runs over frame of size " + length +
                                       '\n' + net.i2p.util.HexDump.dump(payload, off, length));
@@ -116,6 +120,8 @@ class NTCP2Payload {
                     break;
 
                 case BLOCK_ROUTERINFO:
+                    if (len < 1)
+                        throw new IOException("Bad length for ROUTERINFO: " + len);
                     int flag = payload[i] & 0xff;
                     if (len - 1 > RouterInfo.MAX_UNCOMPRESSED_SIZE)
                         throw new DataFormatException("RI too big: " + (len - 1));
