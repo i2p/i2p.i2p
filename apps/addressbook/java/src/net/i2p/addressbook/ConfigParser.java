@@ -87,7 +87,7 @@ class ConfigParser {
      *             if the BufferedReader cannot be read.
      *  
      */
-    private static Map<String, String> parse(BufferedReader input) throws IOException {
+    private static Map<String, String> parse(BufferedReader input, boolean lowerCaseKeys) throws IOException {
         try {
             Map<String, String> result = new HashMap<String, String>();
             String inputLine;
@@ -97,7 +97,10 @@ class ConfigParser {
                     continue;
                 String[] splitLine = DataHelper.split(inputLine, "=", 2);
                 if (splitLine.length == 2) {
-                    result.put(splitLine[0].trim().toLowerCase(Locale.US), splitLine[1].trim());
+                    String key = splitLine[0].trim();
+                    if (lowerCaseKeys)
+                        key = key.toLowerCase(Locale.US);
+                    result.put(key, splitLine[1].trim());
                 }
             }
             return result;
@@ -117,12 +120,23 @@ class ConfigParser {
      *             if file cannot be read.
      */
     public static Map<String, String> parse(File file) throws IOException {
+        return parse(file, true);
+    }
+
+    /**
+     * Read subscription metadata without changing case-sensitive URL paths.
+     */
+    public static Map<String, String> parseSubscriptionMetadata(File file) throws IOException {
+        return parse(file, false);
+    }
+
+    private static Map<String, String> parse(File file, boolean lowerCaseKeys) throws IOException {
         FileInputStream fileStream = null;
         try {
             fileStream = new FileInputStream(file);
             BufferedReader input = new BufferedReader(new InputStreamReader(
                     fileStream, "UTF-8"));
-            Map<String, String> rv = parse(input);
+            Map<String, String> rv = parse(input, lowerCaseKeys);
             return rv;
         } finally {
             if (fileStream != null) {
@@ -147,7 +161,7 @@ class ConfigParser {
     public static Map<String, String> parse(String string) throws IOException {
         StringReader stringReader = new StringReader(string);
         BufferedReader input = new BufferedReader(stringReader);
-        return parse(input);
+        return parse(input, true);
     }
 ****/
     
